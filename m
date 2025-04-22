@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D611DFED;
-	Tue, 22 Apr 2025 07:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166FC13C67C;
+	Tue, 22 Apr 2025 07:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745306222; cv=none; b=bHxx4DCM61yM3lPgRJRzQUlsy2M6s2MD+5s5QIIyseDhlZPUUfEy5g+0dydeSfZ0plK3AYa33GkEPdUgBVCbkdsEUk3tMZm5vQXV2Fih2DkISvx0sacaCVAYgYGYMJD6V8iK8+CuHn+aH8sa8nSzbrlgUAPjjRdKsV8lbOux3Dc=
+	t=1745306292; cv=none; b=MN0TkdMn4bjvT+gu6DRpB3FjkEUs+ztQT/xUf0o2rlaORBl31vG2rXjpMwAgOiX0Kg4EnwBHuDp+flknmmt5Qa6UkKm5Wenj4QCzkudCmGWQrpGAMd3r92hC2gakh0B7Mxe43Fx30nreKXkOQ05cb8adJ52xa9JAKdTds6wUd2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745306222; c=relaxed/simple;
-	bh=RiTI1786nQLxvyfzX1F1f6bY2solbSkPuhlCMQ3AVsA=;
+	s=arc-20240116; t=1745306292; c=relaxed/simple;
+	bh=Tv9Lpbf6KFr1BFLNkpFFtyDnGSbBVP8rHG4MFq889AM=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=LQOooGr3qDBj9QiUvA+4MS35G4KE+zlCzt3IZdlwJODJ8RYs9TA+Lx+U7AeG//uiNbG7jANE7iw2iAag9+EXnj/IYkq/WNN/IjDWqoUNBVFsSqxp1+N0yn1Or2marUMBD1DDMM9tz6eRZyJgM0ttGlaDoivstow1MF0lK/zE8Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KaTkccIQ; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type; b=m7paysUxwEaJeQu7dwnc0H1+yTSAifuzaEe+uiec8ajseNSm14r1lkq0mGewYTKU2LkZWjQ+L0zMfnqRpnQMFtVMa/fiskHjZP3HznWKTFBiSjSGk75f01rfkuNY33EWXN64jy47DCnz+2Kt+oxp9aT/wOdHfzY7MF8AcGSWMgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=1TNUTzD7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KaTkccIQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 302C4C4CEE9;
-	Tue, 22 Apr 2025 07:17:01 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="1TNUTzD7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C999C4CEE9;
+	Tue, 22 Apr 2025 07:18:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1745306221;
-	bh=RiTI1786nQLxvyfzX1F1f6bY2solbSkPuhlCMQ3AVsA=;
+	s=korg; t=1745306291;
+	bh=Tv9Lpbf6KFr1BFLNkpFFtyDnGSbBVP8rHG4MFq889AM=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:From;
-	b=KaTkccIQT4Hj4wl5qytIacStNZKSWbqhtXoNOctHhsPpxriMscG5pUm6m8YkEZT3b
-	 aWUzvXcP/TT0iox9qA1x/+NRmx7TroDGaYeHTvqybHwORU2FQFQ3zol/mh2YtGVj7y
-	 /zura4dbKPXL9h1GiaSRRSOeu/QQuHjX9/axTY8w=
-Subject: Patch "arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9" has been added to the 6.12-stable tree
+	b=1TNUTzD7DaAx1QWwqu0UsVDM5RaSLo+d2Uc5lgqHHDCQUMnJeIH+gX49dKA1pe5xG
+	 Er1qbDXL3ZebmoyWXntsinB+T8WEJOhnChnBjxN8jHP2JReZdaBMI+okxJOAcuJmNv
+	 lwiv/nNIcY7CGSWIapKWCWb7mpCnJHWEk80le7vg=
+Subject: Patch "arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9" has been added to the 6.14-stable tree
 To: anshuman.khandual@arm.com,catalin.marinas@arm.com,corbet@lwn.net,gregkh@linuxfoundation.org,kvmarm@lists.linux.dev,linux-arm-kernel@lists.infradead.org,mark.rutland@arm.com,maz@kernel.org,oliver.upton@linux.dev,robh@kernel.org,will@kernel.org
 Cc: <stable-commits@vger.kernel.org>
 From: <gregkh@linuxfoundation.org>
-Date: Tue, 22 Apr 2025 09:16:59 +0200
-In-Reply-To: <20250415045728.2248935-8-anshuman.khandual@arm.com>
-Message-ID: <2025042259-iron-exclusive-714d@gregkh>
+Date: Tue, 22 Apr 2025 09:18:09 +0200
+In-Reply-To: <20250414045848.2112779-8-anshuman.khandual@arm.com>
+Message-ID: <2025042209-backpedal-juiciness-d608@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,24 +46,24 @@ This is a note to let you know that I've just added the patch titled
 
     arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
 
-to the 6.12-stable tree which can be found at:
+to the 6.14-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
      arm64-boot-enable-el2-requirements-for-feat_pmuv3p9.patch
-and it can be found in the queue-6.12 subdirectory.
+and it can be found in the queue-6.14 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
 
 
-From stable+bounces-132691-greg=kroah.com@vger.kernel.org Tue Apr 15 06:58:05 2025
+From stable+bounces-132390-greg=kroah.com@vger.kernel.org Mon Apr 14 06:59:31 2025
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-Date: Tue, 15 Apr 2025 10:27:28 +0530
+Date: Mon, 14 Apr 2025 10:28:48 +0530
 Subject: arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
 To: stable@vger.kernel.org, gregkh@linuxfoundation.org
 Cc: catalin.marinas@arm.com, will@kernel.org, robh@kernel.org, mark.rutland@arm.com, anshuman.khandual@arm.com
-Message-ID: <20250415045728.2248935-8-anshuman.khandual@arm.com>
+Message-ID: <20250414045848.2112779-8-anshuman.khandual@arm.com>
 
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 
@@ -104,12 +104,11 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
  Documentation/arch/arm64/booting.rst |   22 ++++++++++++++++++++++
  arch/arm64/include/asm/el2_setup.h   |   25 +++++++++++++++++++++++++
- arch/arm64/tools/sysreg              |    1 +
- 3 files changed, 48 insertions(+)
+ 2 files changed, 47 insertions(+)
 
 --- a/Documentation/arch/arm64/booting.rst
 +++ b/Documentation/arch/arm64/booting.rst
-@@ -285,6 +285,12 @@ Before jumping into the kernel, the foll
+@@ -288,6 +288,12 @@ Before jumping into the kernel, the foll
  
      - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
  
@@ -122,7 +121,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
    For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
  
    - If EL3 is present and the kernel is entered at EL2:
-@@ -379,6 +385,22 @@ Before jumping into the kernel, the foll
+@@ -382,6 +388,22 @@ Before jumping into the kernel, the foll
  
      - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
  
@@ -147,7 +146,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
    - If the kernel is entered at EL1 and EL2 is present:
 --- a/arch/arm64/include/asm/el2_setup.h
 +++ b/arch/arm64/include/asm/el2_setup.h
-@@ -215,6 +215,30 @@
+@@ -259,6 +259,30 @@
  .Lskip_fgt_\@:
  .endm
  
@@ -175,35 +174,25 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 +.Lskip_fgt2_\@:
 +.endm
 +
- .macro __init_el2_nvhe_prepare_eret
- 	mov	x0, #INIT_PSTATE_EL1
- 	msr	spsr_el2, x0
-@@ -240,6 +264,7 @@
+ .macro __init_el2_gcs
+ 	mrs_s	x1, SYS_ID_AA64PFR1_EL1
+ 	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
+@@ -304,6 +328,7 @@
  	__init_el2_nvhe_idregs
  	__init_el2_cptr
  	__init_el2_fgt
 +	__init_el2_fgt2
+         __init_el2_gcs
  .endm
  
- #ifndef __KVM_NVHE_HYPERVISOR__
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1238,6 +1238,7 @@ UnsignedEnum	11:8	PMUVer
- 	0b0110	V3P5
- 	0b0111	V3P7
- 	0b1000	V3P8
-+	0b1001	V3P9
- 	0b1111	IMP_DEF
- EndEnum
- UnsignedEnum	7:4	TraceVer
 
 
 Patches currently in stable-queue which might be from anshuman.khandual@arm.com are
 
-queue-6.12/arm64-sysreg-add-register-fields-for-hfgwtr2_el2.patch
-queue-6.12/arm64-boot-enable-el2-requirements-for-feat_pmuv3p9.patch
-queue-6.12/arm64-sysreg-add-register-fields-for-hdfgwtr2_el2.patch
-queue-6.12/arm64-sysreg-update-register-fields-for-id_aa64mmfr0_el1.patch
-queue-6.12/arm64-sysreg-add-register-fields-for-hfgrtr2_el2.patch
-queue-6.12/arm64-sysreg-add-register-fields-for-hfgitr2_el2.patch
-queue-6.12/arm64-sysreg-add-register-fields-for-hdfgrtr2_el2.patch
+queue-6.14/arm64-sysreg-add-register-fields-for-hfgwtr2_el2.patch
+queue-6.14/arm64-boot-enable-el2-requirements-for-feat_pmuv3p9.patch
+queue-6.14/arm64-sysreg-add-register-fields-for-hdfgwtr2_el2.patch
+queue-6.14/arm64-sysreg-update-register-fields-for-id_aa64mmfr0_el1.patch
+queue-6.14/arm64-sysreg-add-register-fields-for-hfgrtr2_el2.patch
+queue-6.14/arm64-sysreg-add-register-fields-for-hfgitr2_el2.patch
+queue-6.14/arm64-sysreg-add-register-fields-for-hdfgrtr2_el2.patch
