@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B586622B5B8;
-	Tue, 22 Apr 2025 06:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A4022B8BF;
+	Tue, 22 Apr 2025 06:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745304265; cv=none; b=JtsvWRrXJhZrZGvVmqxUPmdbUoP4k+MAc1cH8YqMFN74022ka5cwW4dBed/FwZpyQIenUe5qGo9bXMusupyHqi2TvIg5EM+C9hTmd0AIIXV2MvEf0w9FzDDJ80MkANvLYCrsGpoIRaPRiTv4bPrIIhjSkCXq589da4jfTekFbII=
+	t=1745304268; cv=none; b=oczanV0CGooiadHV1PXXvJeuZSraKQ6uBQa/5fVLIJZY7b8aCnK71AhKw9RyDpjBeq9DUyieCyGrPg8DI1AZ3XiTfkRsvodxBAg5Q+Wc/o/GbIdr7vhoUYnSMfi0lHmFfGk0g9gdpGzXv74w+ZGIyHnfUOK+6qi4C2q/9CtUyoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745304265; c=relaxed/simple;
-	bh=nd8adeAHJRvCvLmVHt1BYFikRiii/P3JsB1696vNgFg=;
+	s=arc-20240116; t=1745304268; c=relaxed/simple;
+	bh=KnoyYW7p0I1cimZ9ERmopNxe93tH9ONW9AoWeQB8kAg=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=RVOViWSzypT50Tv8WcyDsBU2bXh6xXAYTVRm1rADCxn/O0ncSQZz8o2SwK5+hkkCmcyh66ZNmZMjSzsprfaMFKuAF0QOxbEPs/YBwTuvUu4NK+r7mGx43OVKG8UbJD+ua4Hr89w46QezIzW9UIFToVU7RtDlEbii/SjmtwRRkQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=H67XYZOa; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type; b=D0z+4n1jPy1ePzGWHgCd4TxGQq9PDBS5V5z1IJ/CDs67NwOjF77tggZyhVNoXJocjdVq77HFvFvNckbwNcbQwTaMNvdfQERRa5j4Rx8j8t2PFXEhWUGFsWhiiv/OEUBYvubwNlaxN1lzjyovJ+hzsh5LtO/Xx9aE6cF/Cp1ono8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ckM4zVxQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="H67XYZOa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49F68C4CEE9;
-	Tue, 22 Apr 2025 06:44:25 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ckM4zVxQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5CF2C4CEE9;
+	Tue, 22 Apr 2025 06:44:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1745304265;
-	bh=nd8adeAHJRvCvLmVHt1BYFikRiii/P3JsB1696vNgFg=;
+	s=korg; t=1745304268;
+	bh=KnoyYW7p0I1cimZ9ERmopNxe93tH9ONW9AoWeQB8kAg=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:From;
-	b=H67XYZOaOErnQ/olzJgv27GF91vbD2KuZ0Us6xRC7WRMgu04AmmPF8FHFdrs7mGyF
-	 VwKYPPy74Niz+qE2mYT3Up5eWlzTFbWSoe9Ue3uBKMFkAR0gnri2lJPdZxqeXNLUF7
-	 EdMbxxJ7RG7sf7N+XiaXjFLCkD8YDLCr37A8t/qg=
-Subject: Patch "KVM: arm64: Calculate cptr_el2 traps on activating traps" has been added to the 6.1-stable tree
-To: broonie@kernel.org,catalin.marinas@arm.com,gregkh@linuxfoundation.org,james.clark@linaro.org,james.morse@arm.com,kvmarm@lists.cs.columbia.edu,kvmarm@lists.linux.dev,linux-arm-kernel@lists.infradead.org,maz@kernel.org,oleg@redhat.com,oliver.upton@linux.dev,suzuki.poulose@arm.com,tabba@google.com,will@kernel.org
+	b=ckM4zVxQi1h/n34zbwA5uytXlE1NeGH7lGqk/PsD4alniMqB+W+itnkm94PdIj9O0
+	 SJBZoOmpOQjHxwgxjakQ6RScrbUQST7rN4TbPPeyhZmVb9D5Bc1+XpjjR2LH0s0rDK
+	 kYSXGmxLCMT4VddAOsXqDfxQrP/plUeiRtWBBrQ8=
+Subject: Patch "KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state" has been added to the 6.1-stable tree
+To: broonie@kernel.org,catalin.marinas@arm.com,eauger@redhat.com,eric.auger@redhat.com,fweimer@redhat.com,gregkh@linuxfoundation.org,james.morse@arm.com,jeremy.linton@arm.com,kvmarm@lists.cs.columbia.edu,kvmarm@lists.linux.dev,linux-arm-kernel@lists.infradead.org,mark.rutland@arm.com,maz@kernel.org,oleg@redhat.com,oliver.upton@linux.dev,pbonzini@redhat.com,suzuki.poulose@arm.com,tabba@google.com,wilco.dijkstra@arm.com,will@kernel.org
 Cc: <stable-commits@vger.kernel.org>
 From: <gregkh@linuxfoundation.org>
-Date: Tue, 22 Apr 2025 08:43:54 +0200
-In-Reply-To: <20250404-stable-sve-6-1-v1-11-cd5c9eb52d49@kernel.org>
-Message-ID: <2025042254-travesty-reprint-cba2@gregkh>
+Date: Tue, 22 Apr 2025 08:43:55 +0200
+In-Reply-To: <20250404-stable-sve-6-1-v1-5-cd5c9eb52d49@kernel.org>
+Message-ID: <2025042255-dyslexia-existing-7bbb@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,181 +44,163 @@ X-Patchwork-Hint: ignore
 
 This is a note to let you know that I've just added the patch titled
 
-    KVM: arm64: Calculate cptr_el2 traps on activating traps
+    KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state
 
 to the 6.1-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
-     kvm-arm64-calculate-cptr_el2-traps-on-activating-traps.patch
+     kvm-arm64-unconditionally-save-flush-host-fpsimd-sve-sme-state.patch
 and it can be found in the queue-6.1 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
 
 
-From broonie@kernel.org Fri Apr  4 15:28:05 2025
+From stable+bounces-128304-greg=kroah.com@vger.kernel.org Fri Apr  4 15:28:43 2025
 From: Mark Brown <broonie@kernel.org>
-Date: Fri, 04 Apr 2025 14:23:44 +0100
-Subject: KVM: arm64: Calculate cptr_el2 traps on activating traps
+Date: Fri, 04 Apr 2025 14:23:38 +0100
+Subject: KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state
 To: Catalin Marinas <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,  James Morse <james.morse@arm.com>,  Suzuki K Poulose <suzuki.poulose@arm.com>,  Oliver Upton <oliver.upton@linux.dev>, Oleg Nesterov <oleg@redhat.com>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,  kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,  Mark Brown <broonie@kernel.org>, stable@vger.kernel.org,  Fuad Tabba <tabba@google.com>, James Clark <james.clark@linaro.org>
-Message-ID: <20250404-stable-sve-6-1-v1-11-cd5c9eb52d49@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,  kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,  Mark Brown <broonie@kernel.org>, stable@vger.kernel.org,  Mark Rutland <mark.rutland@arm.com>, Eric Auger <eauger@redhat.com>,  Wilco Dijkstra <wilco.dijkstra@arm.com>, Eric Auger <eric.auger@redhat.com>,  Florian Weimer <fweimer@redhat.com>, Fuad Tabba <tabba@google.com>,  Jeremy Linton <jeremy.linton@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20250404-stable-sve-6-1-v1-5-cd5c9eb52d49@kernel.org>
 
-From: Fuad Tabba <tabba@google.com>
+From: Mark Rutland <mark.rutland@arm.com>
 
-[ Upstream commit 2fd5b4b0e7b440602455b79977bfa64dea101e6c ]
+[ Upstream commit fbc7e61195e23f744814e78524b73b59faa54ab4 ]
 
-Similar to VHE, calculate the value of cptr_el2 from scratch on
-activate traps. This removes the need to store cptr_el2 in every
-vcpu structure. Moreover, some traps, such as whether the guest
-owns the fp registers, need to be set on every vcpu run.
+There are several problems with the way hyp code lazily saves the host's
+FPSIMD/SVE state, including:
 
-Reported-by: James Clark <james.clark@linaro.org>
-Fixes: 5294afdbf45a ("KVM: arm64: Exclude FP ownership from kvm_vcpu_arch")
-Signed-off-by: Fuad Tabba <tabba@google.com>
-Link: https://lore.kernel.org/r/20241216105057.579031-13-tabba@google.com
+* Host SVE being discarded unexpectedly due to inconsistent
+  configuration of TIF_SVE and CPACR_ELx.ZEN. This has been seen to
+  result in QEMU crashes where SVE is used by memmove(), as reported by
+  Eric Auger:
+
+  https://issues.redhat.com/browse/RHEL-68997
+
+* Host SVE state is discarded *after* modification by ptrace, which was an
+  unintentional ptrace ABI change introduced with lazy discarding of SVE state.
+
+* The host FPMR value can be discarded when running a non-protected VM,
+  where FPMR support is not exposed to a VM, and that VM uses
+  FPSIMD/SVE. In these cases the hyp code does not save the host's FPMR
+  before unbinding the host's FPSIMD/SVE/SME state, leaving a stale
+  value in memory.
+
+Avoid these by eagerly saving and "flushing" the host's FPSIMD/SVE/SME
+state when loading a vCPU such that KVM does not need to save any of the
+host's FPSIMD/SVE/SME state. For clarity, fpsimd_kvm_prepare() is
+removed and the necessary call to fpsimd_save_and_flush_cpu_state() is
+placed in kvm_arch_vcpu_load_fp(). As 'fpsimd_state' and 'fpmr_ptr'
+should not be used, they are set to NULL; all uses of these will be
+removed in subsequent patches.
+
+Historical problems go back at least as far as v5.17, e.g. erroneous
+assumptions about TIF_SVE being clear in commit:
+
+  8383741ab2e773a9 ("KVM: arm64: Get rid of host SVE tracking/saving")
+
+... and so this eager save+flush probably needs to be backported to ALL
+stable trees.
+
+Fixes: 93ae6b01bafee8fa ("KVM: arm64: Discard any SVE state when entering KVM guests")
+Fixes: 8c845e2731041f0f ("arm64/sve: Leave SVE enabled on syscall if we don't context switch")
+Fixes: ef3be86021c3bdf3 ("KVM: arm64: Add save/restore support for FPMR")
+Reported-by: Eric Auger <eauger@redhat.com>
+Reported-by: Wilco Dijkstra <wilco.dijkstra@arm.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Tested-by: Mark Brown <broonie@kernel.org>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Acked-by: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Florian Weimer <fweimer@redhat.com>
+Cc: Fuad Tabba <tabba@google.com>
+Cc: Jeremy Linton <jeremy.linton@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Link: https://lore.kernel.org/r/20250210195226.1215254-2-mark.rutland@arm.com
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+[ Mark: Handle vcpu/host flag conflict, remove host_data_ptr() ]
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/arm64/include/asm/kvm_host.h |    1 -
- arch/arm64/kvm/arm.c              |    1 -
- arch/arm64/kvm/hyp/nvhe/pkvm.c    |   15 ---------------
- arch/arm64/kvm/hyp/nvhe/switch.c  |   38 +++++++++++++++++++++++++++-----------
- 4 files changed, 27 insertions(+), 28 deletions(-)
+ arch/arm64/kernel/fpsimd.c |   25 -------------------------
+ arch/arm64/kvm/fpsimd.c    |   18 ++++++++++--------
+ 2 files changed, 10 insertions(+), 33 deletions(-)
 
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -330,7 +330,6 @@ struct kvm_vcpu_arch {
- 	/* Values of trap registers for the guest. */
- 	u64 hcr_el2;
- 	u64 mdcr_el2;
--	u64 cptr_el2;
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -1672,31 +1672,6 @@ void fpsimd_signal_preserve_current_stat
+ }
  
- 	/* Values of trap registers for the host before guest entry. */
- 	u64 mdcr_el2_host;
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1234,7 +1234,6 @@ static int kvm_arch_vcpu_ioctl_vcpu_init
- 	}
- 
- 	vcpu_reset_hcr(vcpu);
--	vcpu->arch.cptr_el2 = CPTR_EL2_DEFAULT;
- 
- 	/*
- 	 * Handle the "start in power-off" case.
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -17,7 +17,6 @@ static void pvm_init_traps_aa64pfr0(stru
- 	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
- 	u64 hcr_set = HCR_RW;
- 	u64 hcr_clear = 0;
--	u64 cptr_set = 0;
- 
- 	/* Protected KVM does not support AArch32 guests. */
- 	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0),
-@@ -44,16 +43,10 @@ static void pvm_init_traps_aa64pfr0(stru
- 	/* Trap AMU */
- 	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU), feature_ids)) {
- 		hcr_clear |= HCR_AMVOFFEN;
--		cptr_set |= CPTR_EL2_TAM;
- 	}
- 
--	/* Trap SVE */
--	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE), feature_ids))
--		cptr_set |= CPTR_EL2_TZ;
+ /*
+- * Called by KVM when entering the guest.
+- */
+-void fpsimd_kvm_prepare(void)
+-{
+-	if (!system_supports_sve())
+-		return;
 -
- 	vcpu->arch.hcr_el2 |= hcr_set;
- 	vcpu->arch.hcr_el2 &= ~hcr_clear;
--	vcpu->arch.cptr_el2 |= cptr_set;
- }
- 
- /*
-@@ -83,7 +76,6 @@ static void pvm_init_traps_aa64dfr0(stru
- 	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
- 	u64 mdcr_set = 0;
- 	u64 mdcr_clear = 0;
--	u64 cptr_set = 0;
- 
- 	/* Trap/constrain PMU */
- 	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), feature_ids)) {
-@@ -110,13 +102,8 @@ static void pvm_init_traps_aa64dfr0(stru
- 	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_TraceFilt), feature_ids))
- 		mdcr_set |= MDCR_EL2_TTRF;
- 
--	/* Trap Trace */
--	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_TraceVer), feature_ids))
--		cptr_set |= CPTR_EL2_TTA;
+-	/*
+-	 * KVM does not save host SVE state since we can only enter
+-	 * the guest from a syscall so the ABI means that only the
+-	 * non-saved SVE state needs to be saved.  If we have left
+-	 * SVE enabled for performance reasons then update the task
+-	 * state to be FPSIMD only.
+-	 */
+-	get_cpu_fpsimd_context();
 -
- 	vcpu->arch.mdcr_el2 |= mdcr_set;
- 	vcpu->arch.mdcr_el2 &= ~mdcr_clear;
--	vcpu->arch.cptr_el2 |= cptr_set;
- }
+-	if (test_and_clear_thread_flag(TIF_SVE)) {
+-		sve_to_fpsimd(current);
+-		current->thread.fp_type = FP_STATE_FPSIMD;
+-	}
+-
+-	put_cpu_fpsimd_context();
+-}
+-
+-/*
+  * Associate current's FPSIMD context with this cpu
+  * The caller must have ownership of the cpu FPSIMD context before calling
+  * this function.
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -79,9 +79,16 @@ void kvm_arch_vcpu_load_fp(struct kvm_vc
+ 	if (!system_supports_fpsimd())
+ 		return;
  
- /*
-@@ -167,8 +154,6 @@ static void pvm_init_trap_regs(struct kv
- 	/* Clear res0 and set res1 bits to trap potential new features. */
- 	vcpu->arch.hcr_el2 &= ~(HCR_RES0);
- 	vcpu->arch.mdcr_el2 &= ~(MDCR_EL2_RES0);
--	vcpu->arch.cptr_el2 |= CPTR_NVHE_EL2_RES1;
--	vcpu->arch.cptr_el2 &= ~(CPTR_NVHE_EL2_RES0);
- }
+-	fpsimd_kvm_prepare();
+-
+-	vcpu->arch.fp_state = FP_STATE_HOST_OWNED;
++	/*
++	 * Ensure that any host FPSIMD/SVE/SME state is saved and unbound such
++	 * that the host kernel is responsible for restoring this state upon
++	 * return to userspace, and the hyp code doesn't need to save anything.
++	 *
++	 * When the host may use SME, fpsimd_save_and_flush_cpu_state() ensures
++	 * that PSTATE.{SM,ZA} == {0,0}.
++	 */
++	fpsimd_save_and_flush_cpu_state();
++	vcpu->arch.fp_state = FP_STATE_FREE;
  
- /*
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -36,23 +36,39 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_ve
- 
- extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
- 
--static void __activate_traps(struct kvm_vcpu *vcpu)
-+static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
- {
--	u64 val;
-+	u64 val = CPTR_EL2_TAM;	/* Same bit irrespective of E2H */
- 
--	___activate_traps(vcpu);
--	__activate_traps_common(vcpu);
-+	/* !hVHE case upstream */
-+	if (1) {
-+		val |= CPTR_EL2_TTA | CPTR_NVHE_EL2_RES1;
-+
-+		/*
-+		 * Always trap SME since it's not supported in KVM.
-+		 * TSM is RES1 if SME isn't implemented.
-+		 */
-+		val |= CPTR_EL2_TSM;
- 
--	val = vcpu->arch.cptr_el2;
--	val |= CPTR_EL2_TTA | CPTR_EL2_TAM;
--	if (!guest_owns_fp_regs(vcpu)) {
--		val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
--		__activate_traps_fpsimd32(vcpu);
-+		if (!vcpu_has_sve(vcpu) || !guest_owns_fp_regs(vcpu))
-+			val |= CPTR_EL2_TZ;
-+
-+		if (!guest_owns_fp_regs(vcpu))
-+			val |= CPTR_EL2_TFP;
+ 	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
+ 	if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
+@@ -100,11 +107,6 @@ void kvm_arch_vcpu_load_fp(struct kvm_vc
+ 		vcpu_clear_flag(vcpu, HOST_SME_ENABLED);
+ 		if (read_sysreg(cpacr_el1) & CPACR_EL1_SMEN_EL0EN)
+ 			vcpu_set_flag(vcpu, HOST_SME_ENABLED);
+-
+-		if (read_sysreg_s(SYS_SVCR) & (SVCR_SM_MASK | SVCR_ZA_MASK)) {
+-			vcpu->arch.fp_state = FP_STATE_FREE;
+-			fpsimd_save_and_flush_cpu_state();
+-		}
  	}
--	if (cpus_have_final_cap(ARM64_SME))
--		val |= CPTR_EL2_TSM;
-+
-+	if (!guest_owns_fp_regs(vcpu))
-+		__activate_traps_fpsimd32(vcpu);
+ }
  
- 	write_sysreg(val, cptr_el2);
-+}
-+
-+static void __activate_traps(struct kvm_vcpu *vcpu)
-+{
-+	___activate_traps(vcpu);
-+	__activate_traps_common(vcpu);
-+	__activate_cptr_traps(vcpu);
-+
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el2);
- 
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
 
 
 Patches currently in stable-queue which might be from broonie@kernel.org are
