@@ -1,198 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166FC13C67C;
-	Tue, 22 Apr 2025 07:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3841CAA79
+	for <kvmarm@lists.linux.dev>; Tue, 22 Apr 2025 07:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745306292; cv=none; b=MN0TkdMn4bjvT+gu6DRpB3FjkEUs+ztQT/xUf0o2rlaORBl31vG2rXjpMwAgOiX0Kg4EnwBHuDp+flknmmt5Qa6UkKm5Wenj4QCzkudCmGWQrpGAMd3r92hC2gakh0B7Mxe43Fx30nreKXkOQ05cb8adJ52xa9JAKdTds6wUd2g=
+	t=1745308189; cv=none; b=Hpiqfjq1kTgFkebuTf6cqZwv/rlL0osHa8/yBYU6LWOhu2dLMotCmlGL4CXJKCzWbd8i0ruwgaW5xgp8ctpOt1d25SEGiqH0Q3AOMd1diwVzXYB4fMJOkGWrSg781GTztMhKzPipYSxXN38PNDlNHZxdR7ZnPlT4qG6TUJDt43I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745306292; c=relaxed/simple;
-	bh=Tv9Lpbf6KFr1BFLNkpFFtyDnGSbBVP8rHG4MFq889AM=;
-	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=m7paysUxwEaJeQu7dwnc0H1+yTSAifuzaEe+uiec8ajseNSm14r1lkq0mGewYTKU2LkZWjQ+L0zMfnqRpnQMFtVMa/fiskHjZP3HznWKTFBiSjSGk75f01rfkuNY33EWXN64jy47DCnz+2Kt+oxp9aT/wOdHfzY7MF8AcGSWMgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=1TNUTzD7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745308189; c=relaxed/simple;
+	bh=e4SraDC+na1W/l4sWWobEMTl08KwQBoAMpJbyh1Y+SI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ez4kPsY+YK1dmpwd3pQ54Q2ByPlbajc6f8n5Xe+1KErmPQPf4gdSfRdpJeAxHvUVFErTfZfSgU4zzKwDF8q7NFhAuqMtCWy112mkG2pjAia9zfy15KGaKBEMeTo6sS29b6un3GZlauo0yjgtNACMdCczhVbgLp5RMAJa1p6wFf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a/Zh9RU1; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="1TNUTzD7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C999C4CEE9;
-	Tue, 22 Apr 2025 07:18:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1745306291;
-	bh=Tv9Lpbf6KFr1BFLNkpFFtyDnGSbBVP8rHG4MFq889AM=;
-	h=Subject:To:Cc:From:Date:In-Reply-To:From;
-	b=1TNUTzD7DaAx1QWwqu0UsVDM5RaSLo+d2Uc5lgqHHDCQUMnJeIH+gX49dKA1pe5xG
-	 Er1qbDXL3ZebmoyWXntsinB+T8WEJOhnChnBjxN8jHP2JReZdaBMI+okxJOAcuJmNv
-	 lwiv/nNIcY7CGSWIapKWCWb7mpCnJHWEk80le7vg=
-Subject: Patch "arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9" has been added to the 6.14-stable tree
-To: anshuman.khandual@arm.com,catalin.marinas@arm.com,corbet@lwn.net,gregkh@linuxfoundation.org,kvmarm@lists.linux.dev,linux-arm-kernel@lists.infradead.org,mark.rutland@arm.com,maz@kernel.org,oliver.upton@linux.dev,robh@kernel.org,will@kernel.org
-Cc: <stable-commits@vger.kernel.org>
-From: <gregkh@linuxfoundation.org>
-Date: Tue, 22 Apr 2025 09:18:09 +0200
-In-Reply-To: <20250414045848.2112779-8-anshuman.khandual@arm.com>
-Message-ID: <2025042209-backpedal-juiciness-d608@gregkh>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a/Zh9RU1"
+Date: Tue, 22 Apr 2025 00:49:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745308183;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hJqa98pwIripZZNEFlA5eT+l3rfPGm52BpjeBkKSrDI=;
+	b=a/Zh9RU1U1TvV5VT3C4UdR1t+5WBAKj7kULzD9FlHh34TtMOJ29+lki5buWuabfemAfdZT
+	0Aqyu9o7n8jvU5L2pKrHgz9R73Pa6B0nWFUEpPveQucLewVFUkGDG+JnCs4RBYQ9UuwHFC
+	2AGzWW6ytzMX+MOSe7QooIzwHm2bqm4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ankit Agrawal <ankita@nvidia.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"david@redhat.com" <david@redhat.com>,
+	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
+	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
+	Krishnakant Jaju <kjaju@nvidia.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"sebastianene@google.com" <sebastianene@google.com>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com" <gshan@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"ddutile@redhat.com" <ddutile@redhat.com>,
+	"tabba@google.com" <tabba@google.com>,
+	"qperret@google.com" <qperret@google.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+Message-ID: <aAdKCGCuwlUeUXKY@linux.dev>
+References: <Z-QU7qJOf8sEA5R8@google.com>
+ <86y0wrlrxt.wl-maz@kernel.org>
+ <Z-QnBcE1TKPChQay@google.com>
+ <86wmcbllg2.wl-maz@kernel.org>
+ <Z-RGYO3QVj5JNjRB@google.com>
+ <20250331145643.GF10839@nvidia.com>
+ <Z_PtKWnMPzwPb4sp@google.com>
+ <20250407161540.GG1557073@nvidia.com>
+ <Z_QAxiEWEyMpfLgL@google.com>
+ <SA1PR12MB719976799AD7F9FC4407A5A9B0BD2@SA1PR12MB7199.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: 8bit
-X-stable: commit
-X-Patchwork-Hint: ignore 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SA1PR12MB719976799AD7F9FC4407A5A9B0BD2@SA1PR12MB7199.namprd12.prod.outlook.com>
+X-Migadu-Flow: FLOW_OUT
 
+Hi,
 
-This is a note to let you know that I've just added the patch titled
+On Wed, Apr 16, 2025 at 08:51:05AM +0000, Ankit Agrawal wrote:
+> Hi, summarizing the discussion so far and outlining the next steps. The key points
+> are as follows:
+> 1. KVM cap to expose whether the kernel supports mapping cacheable PFNMAP:
+> If the host doesn't have FWB, then the capability doesn't exist. Jason, Oliver, Caitlin
+> and Sean points that this may not be required as userspace do not have
+> much choice anyways. KVM has to follow the PTEs and userspace cannot ask
+> for something different. However, Marc points that enumerating FWB support
+> would allow userspace to discover the support and prevent live-migration
+> across FWB and non-FWB hosts. Jason suggested that this may still be fine as
+> we have already built in VFIO side protection where a live migration can be
+> attempted and then fail because of late-detected HW incompatibilities.
+> 
+> 2. New memslot flag that VMM passes at memslot registration:
+> Discussion point that this is not necessary and KVM should just follow the
+> VMA pgprot.
+> 
+> 3. Fallback path handling for PFNMAP when the FWB is not set:
+> Discussion points that there shouldn't be any fallback path and the memslot
+> should just fail. i.e. KVM should not allow degrading cachable to non-cachable
+> when it can't do flushing. This is to prevent the potential security issue
+> pointed by Jason (S1 cacheable, S2 noncacheable).
+> 
+> 
+> So AIU, the next step is to send out the updated series with the following patches:
+> 1. Block cacheable PFN map in memslot creation (kvm_arch_prepare_memory_region)
+> and during fault handling (user_mem_abort()).
 
-    arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
+Yes, we need to prevent the creation of stage-2 mappings to PFNMAP memory
+that uses cacheable attributes in the host stage-1. I believe we have alignment
+that this is a bugfix.
 
-to the 6.14-stable tree which can be found at:
-    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
+> 2. Enable support for cacheable PFN maps if S2FWB is enabled by following
+> the vma pgprot (this patch).
+> 
+> 3. Add and expose the new KVM cap to expose cacheable PFNMAP (set to false
+> for !FWB), pending maintainers' feedback on the necessity of this capability.
 
-The filename of the patch is:
-     arm64-boot-enable-el2-requirements-for-feat_pmuv3p9.patch
-and it can be found in the queue-6.14 subdirectory.
+Regarding UAPI: I'm still convinced that we need the VMM to buy in to this
+behavior. And no, it doesn't matter if this is some VFIO-based mapping
+or kernel-managed memory.
 
-If you, or anyone else, feels it should not be added to the stable tree,
-please let <stable@vger.kernel.org> know about it.
+The reality is that userspace is an equal participant in remaining coherent with
+the guest. Whether or not FWB is employed for a particular region of IPA
+space is useful information for userspace deciding what it needs to do to access guest
+memory. Ignoring the Nvidia widget for a second, userspace also needs to know this for
+'normal', kernel-managed memory so it understands what CMOs may be necessary when (for
+example) doing live migration of the VM.
 
+So this KVM CAP needs to be paired with a memslot flag.
 
-From stable+bounces-132390-greg=kroah.com@vger.kernel.org Mon Apr 14 06:59:31 2025
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Date: Mon, 14 Apr 2025 10:28:48 +0530
-Subject: arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-To: stable@vger.kernel.org, gregkh@linuxfoundation.org
-Cc: catalin.marinas@arm.com, will@kernel.org, robh@kernel.org, mark.rutland@arm.com, anshuman.khandual@arm.com
-Message-ID: <20250414045848.2112779-8-anshuman.khandual@arm.com>
+ - The capability says KVM is able to enforce Write-Back at stage-2
 
-From: Anshuman Khandual <anshuman.khandual@arm.com>
+ - The memslot flag says userspace expects a particular GFN range to guarantee
+   Write-Back semantics. This can be applied to 'normal', kernel-managed memory
+   and PFNMAP thingies that have cacheable attributes at host stage-1.
 
-commit 858c7bfcb35e1100b58bb63c9f562d86e09418d9 upstream.
+ - Under no situation do we allow userspace to create non-cacheable mapping at
+   stage-2 for something PFNMAP cacheable at stage-1.
 
-FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
-access from EL1 requires appropriate EL2 fine grained trap configuration
-via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
-Otherwise such register accesses will result in traps into EL2.
+No matter what, my understanding is that we all agree the driver which provided the
+host stage-1 mapping is the authoritative source for memory attributes compatible
+with a given device. The accompanying UAPI is necessary for the VMM to understand how
+to handle arbitrary cacheable mappings provided to the VM.
 
-Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
-grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
-bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
-PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
-
-Also update booting.rst with SCR_EL3.FGTEn2 requirement for all FEAT_FGT2
-based registers to be accessible in EL2.
-
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-doc@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: kvmarm@lists.linux.dev
-Fixes: 0bbff9ed8165 ("perf/arm_pmuv3: Add PMUv3.9 per counter EL0 access control")
-Fixes: d8226d8cfbaf ("perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter")
-Tested-by: Rob Herring (Arm) <robh@kernel.org>
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-Link: https://lore.kernel.org/r/20250227035119.2025171-1-anshuman.khandual@arm.com
-Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- Documentation/arch/arm64/booting.rst |   22 ++++++++++++++++++++++
- arch/arm64/include/asm/el2_setup.h   |   25 +++++++++++++++++++++++++
- 2 files changed, 47 insertions(+)
-
---- a/Documentation/arch/arm64/booting.rst
-+++ b/Documentation/arch/arm64/booting.rst
-@@ -288,6 +288,12 @@ Before jumping into the kernel, the foll
- 
-     - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
- 
-+  For CPUs with the Fine Grained Traps 2 (FEAT_FGT2) extension present:
-+
-+  - If EL3 is present and the kernel is entered at EL2:
-+
-+    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
-+
-   For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
- 
-   - If EL3 is present and the kernel is entered at EL2:
-@@ -382,6 +388,22 @@ Before jumping into the kernel, the foll
- 
-     - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
- 
-+  For CPUs with the Performance Monitors Extension (FEAT_PMUv3p9):
-+
-+ - If EL3 is present:
-+
-+    - MDCR_EL3.EnPM2 (bit 7) must be initialised to 0b1.
-+
-+ - If the kernel is entered at EL1 and EL2 is present:
-+
-+    - HDFGRTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
-+    - HDFGRTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
-+    - HDFGRTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
-+
-+    - HDFGWTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
-+    - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
-+    - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
-+
-   For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
- 
-   - If the kernel is entered at EL1 and EL2 is present:
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -259,6 +259,30 @@
- .Lskip_fgt_\@:
- .endm
- 
-+.macro __init_el2_fgt2
-+	mrs	x1, id_aa64mmfr0_el1
-+	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
-+	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
-+	b.lt	.Lskip_fgt2_\@
-+
-+	mov	x0, xzr
-+	mrs	x1, id_aa64dfr0_el1
-+	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMUVer_SHIFT, #4
-+	cmp	x1, #ID_AA64DFR0_EL1_PMUVer_V3P9
-+	b.lt	.Lskip_pmuv3p9_\@
-+
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMICNTR_EL0
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
-+.Lskip_pmuv3p9_\@:
-+	msr_s   SYS_HDFGRTR2_EL2, x0
-+	msr_s   SYS_HDFGWTR2_EL2, x0
-+	msr_s   SYS_HFGRTR2_EL2, xzr
-+	msr_s   SYS_HFGWTR2_EL2, xzr
-+	msr_s   SYS_HFGITR2_EL2, xzr
-+.Lskip_fgt2_\@:
-+.endm
-+
- .macro __init_el2_gcs
- 	mrs_s	x1, SYS_ID_AA64PFR1_EL1
- 	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
-@@ -304,6 +328,7 @@
- 	__init_el2_nvhe_idregs
- 	__init_el2_cptr
- 	__init_el2_fgt
-+	__init_el2_fgt2
-         __init_el2_gcs
- .endm
- 
-
-
-Patches currently in stable-queue which might be from anshuman.khandual@arm.com are
-
-queue-6.14/arm64-sysreg-add-register-fields-for-hfgwtr2_el2.patch
-queue-6.14/arm64-boot-enable-el2-requirements-for-feat_pmuv3p9.patch
-queue-6.14/arm64-sysreg-add-register-fields-for-hdfgwtr2_el2.patch
-queue-6.14/arm64-sysreg-update-register-fields-for-id_aa64mmfr0_el1.patch
-queue-6.14/arm64-sysreg-add-register-fields-for-hfgrtr2_el2.patch
-queue-6.14/arm64-sysreg-add-register-fields-for-hfgitr2_el2.patch
-queue-6.14/arm64-sysreg-add-register-fields-for-hdfgrtr2_el2.patch
+Thanks,
+Oliver
