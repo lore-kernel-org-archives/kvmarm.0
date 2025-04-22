@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027A822A7E9;
-	Tue, 22 Apr 2025 06:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D611DFED;
+	Tue, 22 Apr 2025 07:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745304271; cv=none; b=WqVn1omNMu2XXLytUOWK3DINHmJKfnMtbFPkh4dEoVjd/rYiWyePWF3pGmRIGyeCZJaXq3rHfI8JKAlg9klwx73vqF9enyVFDu1fLNSny/Ucj4GPMYS0CmZ++PvDLCV0zvwJx1vkAOYxUima7aUQ2VASImhiVfOLezZPSa/aFsM=
+	t=1745306222; cv=none; b=bHxx4DCM61yM3lPgRJRzQUlsy2M6s2MD+5s5QIIyseDhlZPUUfEy5g+0dydeSfZ0plK3AYa33GkEPdUgBVCbkdsEUk3tMZm5vQXV2Fih2DkISvx0sacaCVAYgYGYMJD6V8iK8+CuHn+aH8sa8nSzbrlgUAPjjRdKsV8lbOux3Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745304271; c=relaxed/simple;
-	bh=dB+6dmUg0IXUNTerGBybHiDJiTO7E/dRuC4+MPrUZOQ=;
+	s=arc-20240116; t=1745306222; c=relaxed/simple;
+	bh=RiTI1786nQLxvyfzX1F1f6bY2solbSkPuhlCMQ3AVsA=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=pbix7TwU47gsMGfYPgDXzyNszaW2gc3lgyO6EGc49hjpuEop9r6NFHBMsVdaZcEaS2GciboyAvQRHw2TPTWAlB9LcAWYsuhAZ4CNE6jHVy2bBBqYGZq5y7WLSFsrKz7GlCYD/rkwAT4rel6HR7OYnGSZRXD/HFwl7Qxkrw3hZs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=JCNQO+Yj; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type; b=LQOooGr3qDBj9QiUvA+4MS35G4KE+zlCzt3IZdlwJODJ8RYs9TA+Lx+U7AeG//uiNbG7jANE7iw2iAag9+EXnj/IYkq/WNN/IjDWqoUNBVFsSqxp1+N0yn1Or2marUMBD1DDMM9tz6eRZyJgM0ttGlaDoivstow1MF0lK/zE8Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KaTkccIQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="JCNQO+Yj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E51C4CEEA;
-	Tue, 22 Apr 2025 06:44:30 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KaTkccIQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 302C4C4CEE9;
+	Tue, 22 Apr 2025 07:17:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1745304270;
-	bh=dB+6dmUg0IXUNTerGBybHiDJiTO7E/dRuC4+MPrUZOQ=;
+	s=korg; t=1745306221;
+	bh=RiTI1786nQLxvyfzX1F1f6bY2solbSkPuhlCMQ3AVsA=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:From;
-	b=JCNQO+YjihuiJTC9Qi8SFQLZmzCLGyVO4AWvhKR7YDsygJD5pV6cVTKZTF6y6noDp
-	 ay9WG/EwUZuklZs7pJ8DgQgAScO9TWXGJvYLcTeTOL9v35ZAE2MffztHlA0HOgTDdt
-	 0GiGwzb6s0RQIsEZu9yV7CHNF6lRiuwepHZp6emU=
-Subject: Patch "KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN" has been added to the 6.1-stable tree
-To: broonie@kernel.org,catalin.marinas@arm.com,gregkh@linuxfoundation.org,james.morse@arm.com,kvmarm@lists.cs.columbia.edu,kvmarm@lists.linux.dev,linux-arm-kernel@lists.infradead.org,mark.rutland@arm.com,maz@kernel.org,oleg@redhat.com,oliver.upton@linux.dev,suzuki.poulose@arm.com,tabba@google.com,will@kernel.org
+	b=KaTkccIQT4Hj4wl5qytIacStNZKSWbqhtXoNOctHhsPpxriMscG5pUm6m8YkEZT3b
+	 aWUzvXcP/TT0iox9qA1x/+NRmx7TroDGaYeHTvqybHwORU2FQFQ3zol/mh2YtGVj7y
+	 /zura4dbKPXL9h1GiaSRRSOeu/QQuHjX9/axTY8w=
+Subject: Patch "arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9" has been added to the 6.12-stable tree
+To: anshuman.khandual@arm.com,catalin.marinas@arm.com,corbet@lwn.net,gregkh@linuxfoundation.org,kvmarm@lists.linux.dev,linux-arm-kernel@lists.infradead.org,mark.rutland@arm.com,maz@kernel.org,oliver.upton@linux.dev,robh@kernel.org,will@kernel.org
 Cc: <stable-commits@vger.kernel.org>
 From: <gregkh@linuxfoundation.org>
-Date: Tue, 22 Apr 2025 08:43:55 +0200
-In-Reply-To: <20250404-stable-sve-6-1-v1-7-cd5c9eb52d49@kernel.org>
-Message-ID: <2025042255-substance-lumpish-e8d6@gregkh>
+Date: Tue, 22 Apr 2025 09:16:59 +0200
+In-Reply-To: <20250415045728.2248935-8-anshuman.khandual@arm.com>
+Message-ID: <2025042259-iron-exclusive-714d@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,131 +44,166 @@ X-Patchwork-Hint: ignore
 
 This is a note to let you know that I've just added the patch titled
 
-    KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN
+    arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
 
-to the 6.1-stable tree which can be found at:
+to the 6.12-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
-     kvm-arm64-remove-vhe-host-restore-of-cpacr_el1.zen.patch
-and it can be found in the queue-6.1 subdirectory.
+     arm64-boot-enable-el2-requirements-for-feat_pmuv3p9.patch
+and it can be found in the queue-6.12 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
 
 
-From broonie@kernel.org Fri Apr  4 15:27:52 2025
-From: Mark Brown <broonie@kernel.org>
-Date: Fri, 04 Apr 2025 14:23:40 +0100
-Subject: KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN
-To: Catalin Marinas <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,  James Morse <james.morse@arm.com>,  Suzuki K Poulose <suzuki.poulose@arm.com>,  Oliver Upton <oliver.upton@linux.dev>, Oleg Nesterov <oleg@redhat.com>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,  kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,  Mark Brown <broonie@kernel.org>, stable@vger.kernel.org,  Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>
-Message-ID: <20250404-stable-sve-6-1-v1-7-cd5c9eb52d49@kernel.org>
+From stable+bounces-132691-greg=kroah.com@vger.kernel.org Tue Apr 15 06:58:05 2025
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Date: Tue, 15 Apr 2025 10:27:28 +0530
+Subject: arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
+To: stable@vger.kernel.org, gregkh@linuxfoundation.org
+Cc: catalin.marinas@arm.com, will@kernel.org, robh@kernel.org, mark.rutland@arm.com, anshuman.khandual@arm.com
+Message-ID: <20250415045728.2248935-8-anshuman.khandual@arm.com>
 
-From: Mark Rutland <mark.rutland@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
 
-[ Upstream commit 459f059be702056d91537b99a129994aa6ccdd35 ]
+commit 858c7bfcb35e1100b58bb63c9f562d86e09418d9 upstream.
 
-When KVM is in VHE mode, the host kernel tries to save and restore the
-configuration of CPACR_EL1.ZEN (i.e. CPTR_EL2.ZEN when HCR_EL2.E2H=1)
-across kvm_arch_vcpu_load_fp() and kvm_arch_vcpu_put_fp(), since the
-configuration may be clobbered by hyp when running a vCPU. This logic is
-currently redundant.
+FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
+access from EL1 requires appropriate EL2 fine grained trap configuration
+via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
+Otherwise such register accesses will result in traps into EL2.
 
-The VHE hyp code unconditionally configures CPTR_EL2.ZEN to 0b01 when
-returning to the host, permitting host kernel usage of SVE.
+Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
+grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
+bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
+PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
 
-Now that the host eagerly saves and unbinds its own FPSIMD/SVE/SME
-state, there's no need to save/restore the state of the EL0 SVE trap.
-The kernel can safely save/restore state without trapping, as described
-above, and will restore userspace state (including trap controls) before
-returning to userspace.
+Also update booting.rst with SCR_EL3.FGTEn2 requirement for all FEAT_FGT2
+based registers to be accessible in EL2.
 
-Remove the redundant logic.
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Tested-by: Mark Brown <broonie@kernel.org>
-Acked-by: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Link: https://lore.kernel.org/r/20250210195226.1215254-4-mark.rutland@arm.com
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-[Rework for refactoring of where the flags are stored -- broonie]
-Signed-off-by: Mark Brown <broonie@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Fixes: 0bbff9ed8165 ("perf/arm_pmuv3: Add PMUv3.9 per counter EL0 access control")
+Fixes: d8226d8cfbaf ("perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter")
+Tested-by: Rob Herring (Arm) <robh@kernel.org>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Link: https://lore.kernel.org/r/20250227035119.2025171-1-anshuman.khandual@arm.com
+Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/arm64/include/asm/kvm_host.h |    2 --
- arch/arm64/kvm/fpsimd.c           |   16 ----------------
- 2 files changed, 18 deletions(-)
+ Documentation/arch/arm64/booting.rst |   22 ++++++++++++++++++++++
+ arch/arm64/include/asm/el2_setup.h   |   25 +++++++++++++++++++++++++
+ arch/arm64/tools/sysreg              |    1 +
+ 3 files changed, 48 insertions(+)
 
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -556,8 +556,6 @@ struct kvm_vcpu_arch {
- /* Save TRBE context if active  */
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+--- a/Documentation/arch/arm64/booting.rst
++++ b/Documentation/arch/arm64/booting.rst
+@@ -285,6 +285,12 @@ Before jumping into the kernel, the foll
  
--/* SVE enabled for host EL0 */
--#define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
- /* SME enabled for EL0 */
- #define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
- /* Physical CPU not in supported_cpus */
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -88,10 +88,6 @@ void kvm_arch_vcpu_load_fp(struct kvm_vc
- 	fpsimd_save_and_flush_cpu_state();
- 	vcpu->arch.fp_state = FP_STATE_FREE;
+     - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
  
--	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
--	if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
--		vcpu_set_flag(vcpu, HOST_SVE_ENABLED);
--
- 	/*
- 	 * We don't currently support SME guests but if we leave
- 	 * things in streaming mode then when the guest starts running
-@@ -193,18 +189,6 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcp
- 		}
++  For CPUs with the Fine Grained Traps 2 (FEAT_FGT2) extension present:
++
++  - If EL3 is present and the kernel is entered at EL2:
++
++    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
++
+   For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
  
- 		fpsimd_save_and_flush_cpu_state();
--	} else if (has_vhe() && system_supports_sve()) {
--		/*
--		 * The FPSIMD/SVE state in the CPU has not been touched, and we
--		 * have SVE (and VHE): CPACR_EL1 (alias CPTR_EL2) has been
--		 * reset to CPACR_EL1_DEFAULT by the Hyp code, disabling SVE
--		 * for EL0.  To avoid spurious traps, restore the trap state
--		 * seen by kvm_arch_vcpu_load_fp():
--		 */
--		if (vcpu_get_flag(vcpu, HOST_SVE_ENABLED))
--			sysreg_clear_set(CPACR_EL1, 0, CPACR_EL1_ZEN_EL0EN);
--		else
--			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
- 	}
+   - If EL3 is present and the kernel is entered at EL2:
+@@ -379,6 +385,22 @@ Before jumping into the kernel, the foll
  
- 	local_irq_restore(flags);
+     - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
+ 
++  For CPUs with the Performance Monitors Extension (FEAT_PMUv3p9):
++
++ - If EL3 is present:
++
++    - MDCR_EL3.EnPM2 (bit 7) must be initialised to 0b1.
++
++ - If the kernel is entered at EL1 and EL2 is present:
++
++    - HDFGRTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
++    - HDFGRTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
++    - HDFGRTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
++
++    - HDFGWTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
++    - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
++    - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
++
+   For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
+ 
+   - If the kernel is entered at EL1 and EL2 is present:
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -215,6 +215,30 @@
+ .Lskip_fgt_\@:
+ .endm
+ 
++.macro __init_el2_fgt2
++	mrs	x1, id_aa64mmfr0_el1
++	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
++	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
++	b.lt	.Lskip_fgt2_\@
++
++	mov	x0, xzr
++	mrs	x1, id_aa64dfr0_el1
++	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMUVer_SHIFT, #4
++	cmp	x1, #ID_AA64DFR0_EL1_PMUVer_V3P9
++	b.lt	.Lskip_pmuv3p9_\@
++
++	orr	x0, x0, #HDFGRTR2_EL2_nPMICNTR_EL0
++	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
++	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
++.Lskip_pmuv3p9_\@:
++	msr_s   SYS_HDFGRTR2_EL2, x0
++	msr_s   SYS_HDFGWTR2_EL2, x0
++	msr_s   SYS_HFGRTR2_EL2, xzr
++	msr_s   SYS_HFGWTR2_EL2, xzr
++	msr_s   SYS_HFGITR2_EL2, xzr
++.Lskip_fgt2_\@:
++.endm
++
+ .macro __init_el2_nvhe_prepare_eret
+ 	mov	x0, #INIT_PSTATE_EL1
+ 	msr	spsr_el2, x0
+@@ -240,6 +264,7 @@
+ 	__init_el2_nvhe_idregs
+ 	__init_el2_cptr
+ 	__init_el2_fgt
++	__init_el2_fgt2
+ .endm
+ 
+ #ifndef __KVM_NVHE_HYPERVISOR__
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -1238,6 +1238,7 @@ UnsignedEnum	11:8	PMUVer
+ 	0b0110	V3P5
+ 	0b0111	V3P7
+ 	0b1000	V3P8
++	0b1001	V3P9
+ 	0b1111	IMP_DEF
+ EndEnum
+ UnsignedEnum	7:4	TraceVer
 
 
-Patches currently in stable-queue which might be from broonie@kernel.org are
+Patches currently in stable-queue which might be from anshuman.khandual@arm.com are
 
-queue-6.1/kvm-arm64-remove-host-fpsimd-saving-for-non-protected-kvm.patch
-queue-6.1/spi-cadence-qspi-fix-probe-on-am62a-lp-sk.patch
-queue-6.1/asoc-qdsp6-q6asm-dai-fix-q6asm_dai_compr_set_params-error-path.patch
-queue-6.1/asoc-qdsp6-q6apm-dai-fix-capture-pipeline-overruns.patch
-queue-6.1/kvm-arm64-mark-some-header-functions-as-inline.patch
-queue-6.1/kvm-arm64-eagerly-switch-zcr_el-1-2.patch
-queue-6.1/kvm-arm64-unconditionally-save-flush-host-fpsimd-sve-sme-state.patch
-queue-6.1/asoc-amd-add-dmi-quirk-for-acp6x-mic-support.patch
-queue-6.1/kvm-arm64-refactor-exit-handlers.patch
-queue-6.1/asoc-qdsp6-q6apm-dai-set-10-ms-period-and-buffer-alignment.patch
-queue-6.1/asoc-codecs-lpass-wsa-macro-fix-vi-feedback-rate.patch
-queue-6.1/arm64-fpsimd-track-the-saved-fpsimd-state-type-separately-to-tif_sve.patch
-queue-6.1/kvm-arm64-remove-vhe-host-restore-of-cpacr_el1.zen.patch
-queue-6.1/kvm-arm64-remove-vhe-host-restore-of-cpacr_el1.smen.patch
-queue-6.1/asoc-fsl_audmix-register-card-device-depends-on-dais.patch
-queue-6.1/arm64-fpsimd-have-kvm-explicitly-say-which-fp-registers-to-save.patch
-queue-6.1/kvm-arm64-discard-any-sve-state-when-entering-kvm-guests.patch
-queue-6.1/arm64-fpsimd-stop-using-tif_sve-to-manage-register-saving-in-kvm.patch
-queue-6.1/asoc-codecs-lpass-wsa-macro-fix-logic-of-enabling-vi-channels.patch
-queue-6.1/kvm-arm64-calculate-cptr_el2-traps-on-activating-traps.patch
+queue-6.12/arm64-sysreg-add-register-fields-for-hfgwtr2_el2.patch
+queue-6.12/arm64-boot-enable-el2-requirements-for-feat_pmuv3p9.patch
+queue-6.12/arm64-sysreg-add-register-fields-for-hdfgwtr2_el2.patch
+queue-6.12/arm64-sysreg-update-register-fields-for-id_aa64mmfr0_el1.patch
+queue-6.12/arm64-sysreg-add-register-fields-for-hfgrtr2_el2.patch
+queue-6.12/arm64-sysreg-add-register-fields-for-hfgitr2_el2.patch
+queue-6.12/arm64-sysreg-add-register-fields-for-hdfgrtr2_el2.patch
