@@ -1,159 +1,211 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3841CAA79
-	for <kvmarm@lists.linux.dev>; Tue, 22 Apr 2025 07:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B9F202960
+	for <kvmarm@lists.linux.dev>; Tue, 22 Apr 2025 10:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745308189; cv=none; b=Hpiqfjq1kTgFkebuTf6cqZwv/rlL0osHa8/yBYU6LWOhu2dLMotCmlGL4CXJKCzWbd8i0ruwgaW5xgp8ctpOt1d25SEGiqH0Q3AOMd1diwVzXYB4fMJOkGWrSg781GTztMhKzPipYSxXN38PNDlNHZxdR7ZnPlT4qG6TUJDt43I=
+	t=1745318873; cv=none; b=ih/bC6uwY7AwWnC7XiOMEstT737J5DwS8p11YN1GtpFF7cIiI1NMLZhGjuMbN4F+nRrHa2ZFmpySj34vVqHNlaC203G4rw8ouVPqmlAqmO8WVGeESNyZlbMrGTbM9/rIQWYMjwP3ICPfU8ZdvF5SiaxGXsaA65zCz9y/jCI4KFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745308189; c=relaxed/simple;
-	bh=e4SraDC+na1W/l4sWWobEMTl08KwQBoAMpJbyh1Y+SI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ez4kPsY+YK1dmpwd3pQ54Q2ByPlbajc6f8n5Xe+1KErmPQPf4gdSfRdpJeAxHvUVFErTfZfSgU4zzKwDF8q7NFhAuqMtCWy112mkG2pjAia9zfy15KGaKBEMeTo6sS29b6un3GZlauo0yjgtNACMdCczhVbgLp5RMAJa1p6wFf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a/Zh9RU1; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1745318873; c=relaxed/simple;
+	bh=0fkeb74Hl2Ivz8c9du3ee1Nghmh6jRoJoZPmS6sxkdo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=KIe6sq6a7TrmPHeS1nH6xPFQ5Eah44TLb7Wzx/DMzGkWoX/6ixZwsdju8MOyrZuG1thyhzvYrLFDwZYcDAbuTDi+q6aD8e+IhhegU2x/ZndCvHFfFbeoVNSxC7CmnGezLcIaIZio3eDgPoSN2Fjpr22EQfNdiZf1C+Jub9N+6RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=D6UrpM92; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a/Zh9RU1"
-Date: Tue, 22 Apr 2025 00:49:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745308183;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hJqa98pwIripZZNEFlA5eT+l3rfPGm52BpjeBkKSrDI=;
-	b=a/Zh9RU1U1TvV5VT3C4UdR1t+5WBAKj7kULzD9FlHh34TtMOJ29+lki5buWuabfemAfdZT
-	0Aqyu9o7n8jvU5L2pKrHgz9R73Pa6B0nWFUEpPveQucLewVFUkGDG+JnCs4RBYQ9UuwHFC
-	2AGzWW6ytzMX+MOSe7QooIzwHm2bqm4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ankit Agrawal <ankita@nvidia.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Marc Zyngier <maz@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"david@redhat.com" <david@redhat.com>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
-	Krishnakant Jaju <kjaju@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"sebastianene@google.com" <sebastianene@google.com>,
-	"coltonlewis@google.com" <coltonlewis@google.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"ddutile@redhat.com" <ddutile@redhat.com>,
-	"tabba@google.com" <tabba@google.com>,
-	"qperret@google.com" <qperret@google.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
- VMA flags
-Message-ID: <aAdKCGCuwlUeUXKY@linux.dev>
-References: <Z-QU7qJOf8sEA5R8@google.com>
- <86y0wrlrxt.wl-maz@kernel.org>
- <Z-QnBcE1TKPChQay@google.com>
- <86wmcbllg2.wl-maz@kernel.org>
- <Z-RGYO3QVj5JNjRB@google.com>
- <20250331145643.GF10839@nvidia.com>
- <Z_PtKWnMPzwPb4sp@google.com>
- <20250407161540.GG1557073@nvidia.com>
- <Z_QAxiEWEyMpfLgL@google.com>
- <SA1PR12MB719976799AD7F9FC4407A5A9B0BD2@SA1PR12MB7199.namprd12.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D6UrpM92"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0fkeb74Hl2Ivz8c9du3ee1Nghmh6jRoJoZPmS6sxkdo=; b=D6UrpM92ZbT7RvwMawiQ5LkkSE
+	/7mgvlfR4y9XBtNnhr3OANNapYnEaN8lyBR1Vpb71mCz9Xe/OSPq7+N+Q7ZuDscvbPXS/LQBOEoi7
+	dcjAmmknZ4aqRBQ0y5Yg0xUmC16E3aItcBrMKy9pyeePFGmvTTXbETfdIVEuiiUruUVVdAvqFFWw0
+	om2/TpRwTGdIjiIr6UeIpZC9CCBEYLdEZQ0lYK/x3vUV73G5rPL1fd+W91+UQI/dSrKpP5jQhgUz3
+	D4Njk71fYH9r6jSi/iD+f07Xa0SrQaSStW/cAPRQwaNK0UumSBm58aY5vHvsAMS4SkRxqb4sl4QFv
+	uFLoAP8w==;
+Received: from [172.31.31.140] (helo=u09cd745991455d.ant.amazon.com)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1u7BAI-0000000BBJy-1gpH;
+	Tue, 22 Apr 2025 10:47:46 +0000
+Message-ID: <6ff7bf8388303c75092d0cc1078d40f018d2bbc4.camel@infradead.org>
+Subject: Re: [RFC] ARM vGIC-ITS tables serialization when running protected
+ VMs
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marc Zyngier <maz@kernel.org>, Ilias Stamatis <ilstam@amazon.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, eric.auger@redhat.com, andre.przywara@arm.com, 
+	will@kernel.org, jgrall@amazon.co.uk, ugurus@amazon.co.uk, 
+	nh-open-source@amazon.com
+Date: Tue, 22 Apr 2025 11:47:46 +0100
+In-Reply-To: <94fb9d4adb81f824912ee23a296776aa07873354.camel@infradead.org>
+References: <20250414111244.153528-1-ilstam@amazon.com>
+	 <867c3llt43.wl-maz@kernel.org>
+	 <94fb9d4adb81f824912ee23a296776aa07873354.camel@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-Om21sy/m6ZF9tdj2Yqcr"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SA1PR12MB719976799AD7F9FC4407A5A9B0BD2@SA1PR12MB7199.namprd12.prod.outlook.com>
-X-Migadu-Flow: FLOW_OUT
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi,
 
-On Wed, Apr 16, 2025 at 08:51:05AM +0000, Ankit Agrawal wrote:
-> Hi, summarizing the discussion so far and outlining the next steps. The key points
-> are as follows:
-> 1. KVM cap to expose whether the kernel supports mapping cacheable PFNMAP:
-> If the host doesn't have FWB, then the capability doesn't exist. Jason, Oliver, Caitlin
-> and Sean points that this may not be required as userspace do not have
-> much choice anyways. KVM has to follow the PTEs and userspace cannot ask
-> for something different. However, Marc points that enumerating FWB support
-> would allow userspace to discover the support and prevent live-migration
-> across FWB and non-FWB hosts. Jason suggested that this may still be fine as
-> we have already built in VFIO side protection where a live migration can be
-> attempted and then fail because of late-detected HW incompatibilities.
-> 
-> 2. New memslot flag that VMM passes at memslot registration:
-> Discussion point that this is not necessary and KVM should just follow the
-> VMA pgprot.
-> 
-> 3. Fallback path handling for PFNMAP when the FWB is not set:
-> Discussion points that there shouldn't be any fallback path and the memslot
-> should just fail. i.e. KVM should not allow degrading cachable to non-cachable
-> when it can't do flushing. This is to prevent the potential security issue
-> pointed by Jason (S1 cacheable, S2 noncacheable).
-> 
-> 
-> So AIU, the next step is to send out the updated series with the following patches:
-> 1. Block cacheable PFN map in memslot creation (kvm_arch_prepare_memory_region)
-> and during fault handling (user_mem_abort()).
+--=-Om21sy/m6ZF9tdj2Yqcr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yes, we need to prevent the creation of stage-2 mappings to PFNMAP memory
-that uses cacheable attributes in the host stage-1. I believe we have alignment
-that this is a bugfix.
+On Tue, 2025-04-15 at 10:44 +0100, David Woodhouse wrote:
+> =C2=A0
+>=20
+> > > Another issue is that it's actually hard for the lowvisor to know whe=
+re these
+> > > tables live without trusting the EL1 host which virtualizes the ITS. =
+It is
+> > > especially hard knowing the locations of the ITTs (compared to
+> > > Collection/Device tables) because that probably means having to parse=
+ the ITS
+> > > command queue from EL2 which is complex and undesirable.
+> > >=20
+> > > # An alternative: Serializing ITTs into a userspace buffer
+> >=20
+> > NAK.
+> >=20
+> > Share the page-aligned memory with the rest of the hypervisor, and use
+> > the existing API.
+>=20
+> That seems like a bad choice. All this is just using guest memory to
+> store KVM's state.
+>=20
+> Yes, the guest provides a buffer which the virtual hardware *may* use
+> if it wants, but with no IOMMU or access control defined in the
+> specification.
+>=20
+> It seems like it would be much cleaner just to let KVM pass its state
+> up to userspace for serialization like we do for all *other* KVM state,
+> which is what Ilias is proposing.
 
-> 2. Enable support for cacheable PFN maps if S2FWB is enabled by following
-> the vma pgprot (this patch).
-> 
-> 3. Add and expose the new KVM cap to expose cacheable PFNMAP (set to false
-> for !FWB), pending maintainers' feedback on the necessity of this capability.
+Ping?
 
-Regarding UAPI: I'm still convinced that we need the VMM to buy in to this
-behavior. And no, it doesn't matter if this is some VFIO-based mapping
-or kernel-managed memory.
+Redefining the GIC specification to implicitly share whole pages with
+the hypervisor in a protected guest, when they happen to have an ITT
+somewhere inside the page, seems like a very bad idea. Did you have
+some proposed wording for the specification update though, if that's
+the approach you're proposing?
 
-The reality is that userspace is an equal participant in remaining coherent with
-the guest. Whether or not FWB is employed for a particular region of IPA
-space is useful information for userspace deciding what it needs to do to access guest
-memory. Ignoring the Nvidia widget for a second, userspace also needs to know this for
-'normal', kernel-managed memory so it understands what CMOs may be necessary when (for
-example) doing live migration of the VM.
+And *implementing* it by making the lowvisor snoop on the ITS command
+queue is also awful.
 
-So this KVM CAP needs to be paired with a memslot flag.
+Putting the GIC behind an IOMMU so that page-granular access control
+can be done in a sane way might have made sense, as this is
+conceptually DMA. The GIC specification made the same mistake that
+early virtio made, and which we *should* have learned from. But like
+virtio, I think it's too late to fix that without a time machine.
 
- - The capability says KVM is able to enforce Write-Back at stage-2
+I think it's much better just to let KVM pass the state to userspace
+for migration, just like KVM does for almost all *other* state.
 
- - The memslot flag says userspace expects a particular GFN range to guarantee
-   Write-Back semantics. This can be applied to 'normal', kernel-managed memory
-   and PFNMAP thingies that have cacheable attributes at host stage-1.
 
- - Under no situation do we allow userspace to create non-cacheable mapping at
-   stage-2 for something PFNMAP cacheable at stage-1.
+--=-Om21sy/m6ZF9tdj2Yqcr
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-No matter what, my understanding is that we all agree the driver which provided the
-host stage-1 mapping is the authoritative source for memory attributes compatible
-with a given device. The accompanying UAPI is necessary for the VMM to understand how
-to handle arbitrary cacheable mappings provided to the VM.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDQyMjEwNDc0
+NlowLwYJKoZIhvcNAQkEMSIEILqhQpfSaLVrPOcswWySVdW+lQmpGKq/ZuEHI15hkdTjMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAjazR/2BkEUZe
+B5WgNPlBxRKCi+ScNd0SIkKVToP3n0MCs/s4vNrHwK3+1auafiVog6+lXDFDGuCiyInfK8DiYw6w
+mTu3n4MNxmN/iGaq2SmwKL7C9PRl3yuJzs5eqgxzkpc4fW1zc/rwXzsScGIG0trA97RznJOlPxkb
+Y266B/EHpisKqUwlr+JqxD/K8SK6+pHxQJwchfHgUHZEYB3rPnaZLiOsE+2iKe1AFj1z50/KP9IK
+JJ2o+T4MgF5PvHHGNJaSsK1FrpmDPlBg2eELpMDV4WqOEMmsESGZDG0qM3zDv8W/2LGrr0OP0sBo
+apSW/ELeNh4DNHKaOsW3v/od7cnuY1grAwJwjg3akC0WHIJwlhEtFZ2KVr1ESfnSTcBaKgwYtlrb
+DXsNTIAY7qsB9s7gqZsiCc+bXnrqnUMxadElDOTDjRCPfBUqLg1fY5fQgErXvuNqfkkO7yGKibJQ
+2WyAyKrjwVTeCYMtGwFnw3SCup1pFuZwqgfCiF1sWop2qgOJPsW1ylwRXeSIjssz1CUydsdSj/J2
+ddM8Up9vs8e9eWavkhct2YBj87TfHpdVZs5Vbeyna0PWWTIAzokoAUN4AHtcMw4iarG668gKSjq6
+q5opyOua6lUq92jVz6GpUIYFxFqI66pBp7B8xnBOICG9tQgiIvrOvaaBauOuyvoAAAAAAAA=
 
-Thanks,
-Oliver
+
+--=-Om21sy/m6ZF9tdj2Yqcr--
