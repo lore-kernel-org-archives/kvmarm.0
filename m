@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C93199E8D;
-	Tue, 22 Apr 2025 06:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9504722E002;
+	Tue, 22 Apr 2025 06:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745304244; cv=none; b=cpcOAoc6Fo7FVUR3QVeAvIQgyuQ30xTeKLs8v28+LaA3AzMuHGtPB+iprWTprVMMqXyPCEdDiOhUwoC3c8//jYch7lLsCbeP1mSyIX2/7pmJoWf0CycS48tDYIvgPrximZ3zRW+J9iKemn8Vy31FDNb3bHHbIq2UqNWvWHvmqgU=
+	t=1745304247; cv=none; b=KBdTAPeNJXjQPI4cnPrctJc413TdzQ+6dJCQQlJMWzVwn0xMZiD3VSNErtsL1Sp8OpsaCSm/MjvovdvagnDj7p+0mCkkSueNOreasnEMcjVSLM8KRIQutxn2mWwgJfADRY6HGcf7eDISr/Ubn9d9wkFItNjXxAIgnhJ3HCYg5Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745304244; c=relaxed/simple;
-	bh=YGq+Wojbrkku/t87C5s2nrNXW8jF0yCSvTcDlnpXzFs=;
+	s=arc-20240116; t=1745304247; c=relaxed/simple;
+	bh=rdfprJEgfmEITsCJZxeE+qu9Oyu9Y0NCufYPb16Idjw=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=SJuUkAtqV9hFYDNK57SWCUwQsk9ckcw55Y5ZokkRdpDxwHmw1xITIJY62tMqx5Q6iwy9gxAyI6+UEIHtADb7HOtnz5S4BDEDlmLeYmYO6udUYc4BK7HaQCuouvNJfUU4HRL04R9k7adGqwPJuU9xSz7JUmqJCSOg7/RaD4bw/1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nKXhphFc; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type; b=EOoYet1cv5mjjgtjYviyks3xHPNjyS4ncrZn90rv/J9YKwaYc0doPlCGxT+2Ns9429sIZVlUdPV+Ldam0qfzMRPEqErntugu2muhxNRXUWYo9PCyMgqMCPJ6RkamurUJr3bLhs96ly75i2xXrTwQ97DEHJ4umC0jc120lZWobgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=S6Aef4IP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nKXhphFc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D360CC4CEEA;
-	Tue, 22 Apr 2025 06:44:03 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="S6Aef4IP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 998CEC4CEE9;
+	Tue, 22 Apr 2025 06:44:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1745304244;
-	bh=YGq+Wojbrkku/t87C5s2nrNXW8jF0yCSvTcDlnpXzFs=;
+	s=korg; t=1745304246;
+	bh=rdfprJEgfmEITsCJZxeE+qu9Oyu9Y0NCufYPb16Idjw=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:From;
-	b=nKXhphFczzoIjo+sGBICqQKXZG5Jnl6VGHgDssXTTEi907Ql/hcAZov4lI9sBqYAA
-	 YcwsTXskArbJ0dDk3fBP1qDlFw1C0Riyzyp6xDtlIBc40qDLMrZNjSL+WxwdqHP76t
-	 XpVM+xAURK2ooTqa2c30DtfvxlyLFf8hfkyKD+N0=
-Subject: Patch "arm64/fpsimd: Stop using TIF_SVE to manage register saving in KVM" has been added to the 6.1-stable tree
+	b=S6Aef4IPqkpkCkLJkruE1yjfgfnA0BxfniRBNgz6W3g8mY5OQMnK4pZd7TlO8Xs/B
+	 H0ATNCBJ6vmS5fGYcuya1jhKnZiPT3UgfdmnDD10W8G6ll6fF78g9tcCvZ7RUHIHKm
+	 uC8PetkDIy/jbj+C7QiClwaXMo4fnOp5EFKYmD4M=
+Subject: Patch "arm64/fpsimd: Track the saved FPSIMD state type separately to TIF_SVE" has been added to the 6.1-stable tree
 To: broonie@kernel.org,catalin.marinas@arm.com,gregkh@linuxfoundation.org,james.morse@arm.com,kvmarm@lists.cs.columbia.edu,kvmarm@lists.linux.dev,linux-arm-kernel@lists.infradead.org,mark.rutland@arm.com,maz@kernel.org,oleg@redhat.com,oliver.upton@linux.dev,suzuki.poulose@arm.com,will@kernel.org
 Cc: <stable-commits@vger.kernel.org>
 From: <gregkh@linuxfoundation.org>
 Date: Tue, 22 Apr 2025 08:43:53 +0200
-In-Reply-To: <20250404-stable-sve-6-1-v1-4-cd5c9eb52d49@kernel.org>
-Message-ID: <2025042253-follicle-credibly-3c4b@gregkh>
+In-Reply-To: <20250404-stable-sve-6-1-v1-2-cd5c9eb52d49@kernel.org>
+Message-ID: <2025042253-crouch-illusive-59c8@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,114 +44,366 @@ X-Patchwork-Hint: ignore
 
 This is a note to let you know that I've just added the patch titled
 
-    arm64/fpsimd: Stop using TIF_SVE to manage register saving in KVM
+    arm64/fpsimd: Track the saved FPSIMD state type separately to TIF_SVE
 
 to the 6.1-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
-     arm64-fpsimd-stop-using-tif_sve-to-manage-register-saving-in-kvm.patch
+     arm64-fpsimd-track-the-saved-fpsimd-state-type-separately-to-tif_sve.patch
 and it can be found in the queue-6.1 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
 
 
-From stable+bounces-128303-greg=kroah.com@vger.kernel.org Fri Apr  4 15:28:32 2025
+From stable+bounces-128301-greg=kroah.com@vger.kernel.org Fri Apr  4 15:28:10 2025
 From: Mark Brown <broonie@kernel.org>
-Date: Fri, 04 Apr 2025 14:23:37 +0100
-Subject: arm64/fpsimd: Stop using TIF_SVE to manage register saving in KVM
+Date: Fri, 04 Apr 2025 14:23:35 +0100
+Subject: arm64/fpsimd: Track the saved FPSIMD state type separately to TIF_SVE
 To: Catalin Marinas <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,  James Morse <james.morse@arm.com>,  Suzuki K Poulose <suzuki.poulose@arm.com>,  Oliver Upton <oliver.upton@linux.dev>, Oleg Nesterov <oleg@redhat.com>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,  kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,  Mark Brown <broonie@kernel.org>, stable@vger.kernel.org,  Mark Rutland <mark.rutland@arm.com>
-Message-ID: <20250404-stable-sve-6-1-v1-4-cd5c9eb52d49@kernel.org>
+Message-ID: <20250404-stable-sve-6-1-v1-2-cd5c9eb52d49@kernel.org>
 
 From: Mark Brown <broonie@kernel.org>
 
-[ Upstream commit 62021cc36add7b2c015b837f7893f2fb4b8c2586 ]
+[ Upstream commit baa8515281b30861cff3da7db70662d2a25c6440 ]
 
-Now that we are explicitly telling the host FP code which register state
-it needs to save we can remove the manipulation of TIF_SVE from the KVM
-code, simplifying it and allowing us to optimise our handling of normal
-tasks. Remove the manipulation of TIF_SVE from KVM and instead rely on
-to_save to ensure we save the correct data for it.
+When we save the state for the floating point registers this can be done
+in the form visible through either the FPSIMD V registers or the SVE Z and
+P registers. At present we track which format is currently used based on
+TIF_SVE and the SME streaming mode state but particularly in the SVE case
+this limits our options for optimising things, especially around syscalls.
+Introduce a new enum which we place together with saved floating point
+state in both thread_struct and the KVM guest state which explicitly
+states which format is active and keep it up to date when we change it.
 
-There should be no functional or performance impact from this change.
+At present we do not use this state except to verify that it has the
+expected value when loading the state, future patches will introduce
+functional changes.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20221115094640.112848-5-broonie@kernel.org
+Link: https://lore.kernel.org/r/20221115094640.112848-3-broonie@kernel.org
 Signed-off-by: Will Deacon <will@kernel.org>
-[ Mark: trivial backport ]
+[ Mark: fix conflicts due to earlier backports ]
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/arm64/kernel/fpsimd.c |   22 ++++------------------
- arch/arm64/kvm/fpsimd.c    |    3 ---
- 2 files changed, 4 insertions(+), 21 deletions(-)
+ arch/arm64/include/asm/fpsimd.h    |    2 -
+ arch/arm64/include/asm/kvm_host.h  |   12 +++++++
+ arch/arm64/include/asm/processor.h |    6 +++
+ arch/arm64/kernel/fpsimd.c         |   58 +++++++++++++++++++++++++++----------
+ arch/arm64/kernel/process.c        |    2 +
+ arch/arm64/kernel/ptrace.c         |    3 +
+ arch/arm64/kernel/signal.c         |    7 +++-
+ arch/arm64/kvm/fpsimd.c            |    3 +
+ 8 files changed, 74 insertions(+), 19 deletions(-)
 
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -61,7 +61,7 @@ extern void fpsimd_kvm_prepare(void);
+ extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
+ 				     void *sve_state, unsigned int sve_vl,
+ 				     void *za_state, unsigned int sme_vl,
+-				     u64 *svcr);
++				     u64 *svcr, enum fp_type *type);
+ 
+ extern void fpsimd_flush_task_state(struct task_struct *target);
+ extern void fpsimd_save_and_flush_cpu_state(void);
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -309,8 +309,18 @@ struct vcpu_reset_state {
+ struct kvm_vcpu_arch {
+ 	struct kvm_cpu_context ctxt;
+ 
+-	/* Guest floating point state */
++	/*
++	 * Guest floating point state
++	 *
++	 * The architecture has two main floating point extensions,
++	 * the original FPSIMD and SVE.  These have overlapping
++	 * register views, with the FPSIMD V registers occupying the
++	 * low 128 bits of the SVE Z registers.  When the core
++	 * floating point code saves the register state of a task it
++	 * records which view it saved in fp_type.
++	 */
+ 	void *sve_state;
++	enum fp_type fp_type;
+ 	unsigned int sve_max_vl;
+ 	u64 svcr;
+ 
+--- a/arch/arm64/include/asm/processor.h
++++ b/arch/arm64/include/asm/processor.h
+@@ -122,6 +122,11 @@ enum vec_type {
+ 	ARM64_VEC_MAX,
+ };
+ 
++enum fp_type {
++	FP_STATE_FPSIMD,
++	FP_STATE_SVE,
++};
++
+ struct cpu_context {
+ 	unsigned long x19;
+ 	unsigned long x20;
+@@ -152,6 +157,7 @@ struct thread_struct {
+ 		struct user_fpsimd_state fpsimd_state;
+ 	} uw;
+ 
++	enum fp_type		fp_type;	/* registers FPSIMD or SVE? */
+ 	unsigned int		fpsimd_cpu;
+ 	void			*sve_state;	/* SVE registers, if any */
+ 	void			*za_state;	/* ZA register, if any */
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -439,8 +439,8 @@ static void task_fpsimd_load(void)
-  * last, if KVM is involved this may be the guest VM context rather
-  * than the host thread for the VM pointed to by current. This means
-  * that we must always reference the state storage via last rather
-- * than via current, other than the TIF_ flags which KVM will
-- * carefully maintain for us.
-+ * than via current, if we are saving KVM state then it will have
-+ * ensured that the type of registers to save is set in last->to_save.
-  */
- static void fpsimd_save(void)
- {
-@@ -457,27 +457,13 @@ static void fpsimd_save(void)
- 	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
- 		return;
+@@ -125,6 +125,7 @@ struct fpsimd_last_state_struct {
+ 	u64 *svcr;
+ 	unsigned int sve_vl;
+ 	unsigned int sme_vl;
++	enum fp_type *fp_type;
+ };
  
--	if (test_thread_flag(TIF_SVE)) {
-+	if ((last->to_save == FP_STATE_CURRENT && test_thread_flag(TIF_SVE)) ||
-+	    last->to_save == FP_STATE_SVE) {
- 		save_sve_regs = true;
- 		save_ffr = true;
- 		vl = last->sve_vl;
+ static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
+@@ -330,15 +331,6 @@ void task_set_vl_onexec(struct task_stru
+  *    The task can execute SVE instructions while in userspace without
+  *    trapping to the kernel.
+  *
+- *    When stored, Z0-Z31 (incorporating Vn in bits[127:0] or the
+- *    corresponding Zn), P0-P15 and FFR are encoded in
+- *    task->thread.sve_state, formatted appropriately for vector
+- *    length task->thread.sve_vl or, if SVCR.SM is set,
+- *    task->thread.sme_vl.
+- *
+- *    task->thread.sve_state must point to a valid buffer at least
+- *    sve_state_size(task) bytes in size.
+- *
+  *    During any syscall, the kernel may optionally clear TIF_SVE and
+  *    discard the vector state except for the FPSIMD subset.
+  *
+@@ -348,7 +340,15 @@ void task_set_vl_onexec(struct task_stru
+  *    do_sve_acc() to be called, which does some preparation and then
+  *    sets TIF_SVE.
+  *
+- *    When stored, FPSIMD registers V0-V31 are encoded in
++ * During any syscall, the kernel may optionally clear TIF_SVE and
++ * discard the vector state except for the FPSIMD subset.
++ *
++ * The data will be stored in one of two formats:
++ *
++ *  * FPSIMD only - FP_STATE_FPSIMD:
++ *
++ *    When the FPSIMD only state stored task->thread.fp_type is set to
++ *    FP_STATE_FPSIMD, the FPSIMD registers V0-V31 are encoded in
+  *    task->thread.uw.fpsimd_state; bits [max : 128] for each of Z0-Z31 are
+  *    logically zero but not stored anywhere; P0-P15 and FFR are not
+  *    stored and have unspecified values from userspace's point of
+@@ -358,6 +358,19 @@ void task_set_vl_onexec(struct task_stru
+  *    task->thread.sve_state does not need to be non-NULL, valid or any
+  *    particular size: it must not be dereferenced.
+  *
++ *  * SVE state - FP_STATE_SVE:
++ *
++ *    When the full SVE state is stored task->thread.fp_type is set to
++ *    FP_STATE_SVE and Z0-Z31 (incorporating Vn in bits[127:0] or the
++ *    corresponding Zn), P0-P15 and FFR are encoded in in
++ *    task->thread.sve_state, formatted appropriately for vector
++ *    length task->thread.sve_vl or, if SVCR.SM is set,
++ *    task->thread.sme_vl. The storage for the vector registers in
++ *    task->thread.uw.fpsimd_state should be ignored.
++ *
++ *    task->thread.sve_state must point to a valid buffer at least
++ *    sve_state_size(task) bytes in size.
++ *
+  *  * FPSR and FPCR are always stored in task->thread.uw.fpsimd_state
+  *    irrespective of whether TIF_SVE is clear or set, since these are
+  *    not vector length dependent.
+@@ -404,12 +417,15 @@ static void task_fpsimd_load(void)
+ 		}
  	}
  
--	/*
--	 * Validate that an explicitly specified state to save is
--	 * consistent with the task state.
--	 */
--	switch (last->to_save) {
--	case FP_STATE_CURRENT:
--		break;
--	case FP_STATE_FPSIMD:
--		WARN_ON_ONCE(save_sve_regs);
--		break;
--	case FP_STATE_SVE:
--		WARN_ON_ONCE(!save_sve_regs);
--		break;
--	}
--
- 	if (system_supports_sme()) {
- 		u64 *svcr = last->svcr;
+-	if (restore_sve_regs)
++	if (restore_sve_regs) {
++		WARN_ON_ONCE(current->thread.fp_type != FP_STATE_SVE);
+ 		sve_load_state(sve_pffr(&current->thread),
+ 			       &current->thread.uw.fpsimd_state.fpsr,
+ 			       restore_ffr);
+-	else
++	} else {
++		WARN_ON_ONCE(current->thread.fp_type != FP_STATE_FPSIMD);
+ 		fpsimd_load_state(&current->thread.uw.fpsimd_state);
++	}
+ }
  
+ /*
+@@ -474,8 +490,10 @@ static void fpsimd_save(void)
+ 		sve_save_state((char *)last->sve_state +
+ 					sve_ffr_offset(vl),
+ 			       &last->st->fpsr, save_ffr);
++		*last->fp_type = FP_STATE_SVE;
+ 	} else {
+ 		fpsimd_save_state(last->st);
++		*last->fp_type = FP_STATE_FPSIMD;
+ 	}
+ }
+ 
+@@ -851,8 +869,10 @@ int vec_set_vector_length(struct task_st
+ 
+ 	fpsimd_flush_task_state(task);
+ 	if (test_and_clear_tsk_thread_flag(task, TIF_SVE) ||
+-	    thread_sm_enabled(&task->thread))
++	    thread_sm_enabled(&task->thread)) {
+ 		sve_to_fpsimd(task);
++		task->thread.fp_type = FP_STATE_FPSIMD;
++	}
+ 
+ 	if (system_supports_sme()) {
+ 		if (type == ARM64_VEC_SME ||
+@@ -1383,6 +1403,7 @@ static void sve_init_regs(void)
+ 		fpsimd_bind_task_to_cpu();
+ 	} else {
+ 		fpsimd_to_sve(current);
++		current->thread.fp_type = FP_STATE_SVE;
+ 		fpsimd_flush_task_state(current);
+ 	}
+ }
+@@ -1612,6 +1633,8 @@ void fpsimd_flush_thread(void)
+ 		current->thread.svcr = 0;
+ 	}
+ 
++	current->thread.fp_type = FP_STATE_FPSIMD;
++
+ 	put_cpu_fpsimd_context();
+ 	kfree(sve_state);
+ 	kfree(za_state);
+@@ -1660,8 +1683,10 @@ void fpsimd_kvm_prepare(void)
+ 	 */
+ 	get_cpu_fpsimd_context();
+ 
+-	if (test_and_clear_thread_flag(TIF_SVE))
++	if (test_and_clear_thread_flag(TIF_SVE)) {
+ 		sve_to_fpsimd(current);
++		current->thread.fp_type = FP_STATE_FPSIMD;
++	}
+ 
+ 	put_cpu_fpsimd_context();
+ }
+@@ -1683,6 +1708,7 @@ static void fpsimd_bind_task_to_cpu(void
+ 	last->sve_vl = task_get_sve_vl(current);
+ 	last->sme_vl = task_get_sme_vl(current);
+ 	last->svcr = &current->thread.svcr;
++	last->fp_type = &current->thread.fp_type;
+ 	current->thread.fpsimd_cpu = smp_processor_id();
+ 
+ 	/*
+@@ -1706,7 +1732,8 @@ static void fpsimd_bind_task_to_cpu(void
+ 
+ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
+ 			      unsigned int sve_vl, void *za_state,
+-			      unsigned int sme_vl, u64 *svcr)
++			      unsigned int sme_vl, u64 *svcr,
++			      enum fp_type *type)
+ {
+ 	struct fpsimd_last_state_struct *last =
+ 		this_cpu_ptr(&fpsimd_last_state);
+@@ -1720,6 +1747,7 @@ void fpsimd_bind_state_to_cpu(struct use
+ 	last->za_state = za_state;
+ 	last->sve_vl = sve_vl;
+ 	last->sme_vl = sme_vl;
++	last->fp_type = type;
+ }
+ 
+ /*
+--- a/arch/arm64/kernel/process.c
++++ b/arch/arm64/kernel/process.c
+@@ -331,6 +331,8 @@ int arch_dup_task_struct(struct task_str
+ 		clear_tsk_thread_flag(dst, TIF_SME);
+ 	}
+ 
++	dst->thread.fp_type = FP_STATE_FPSIMD;
++
+ 	/* clear any pending asynchronous tag fault raised by the parent */
+ 	clear_tsk_thread_flag(dst, TIF_MTE_ASYNC_FAULT);
+ 
+--- a/arch/arm64/kernel/ptrace.c
++++ b/arch/arm64/kernel/ptrace.c
+@@ -917,6 +917,7 @@ static int sve_set_common(struct task_st
+ 		clear_tsk_thread_flag(target, TIF_SVE);
+ 		if (type == ARM64_VEC_SME)
+ 			fpsimd_force_sync_to_sve(target);
++		target->thread.fp_type = FP_STATE_FPSIMD;
+ 		goto out;
+ 	}
+ 
+@@ -939,6 +940,7 @@ static int sve_set_common(struct task_st
+ 	if (!target->thread.sve_state) {
+ 		ret = -ENOMEM;
+ 		clear_tsk_thread_flag(target, TIF_SVE);
++		target->thread.fp_type = FP_STATE_FPSIMD;
+ 		goto out;
+ 	}
+ 
+@@ -952,6 +954,7 @@ static int sve_set_common(struct task_st
+ 	fpsimd_sync_to_sve(target);
+ 	if (type == ARM64_VEC_SVE)
+ 		set_tsk_thread_flag(target, TIF_SVE);
++	target->thread.fp_type = FP_STATE_SVE;
+ 
+ 	BUILD_BUG_ON(SVE_PT_SVE_OFFSET != sizeof(header));
+ 	start = SVE_PT_SVE_OFFSET;
+--- a/arch/arm64/kernel/signal.c
++++ b/arch/arm64/kernel/signal.c
+@@ -207,6 +207,7 @@ static int restore_fpsimd_context(struct
+ 	__get_user_error(fpsimd.fpcr, &ctx->fpcr, err);
+ 
+ 	clear_thread_flag(TIF_SVE);
++	current->thread.fp_type = FP_STATE_FPSIMD;
+ 
+ 	/* load the hardware registers from the fpsimd_state structure */
+ 	if (!err)
+@@ -297,6 +298,7 @@ static int restore_sve_fpsimd_context(st
+ 	if (sve.head.size <= sizeof(*user->sve)) {
+ 		clear_thread_flag(TIF_SVE);
+ 		current->thread.svcr &= ~SVCR_SM_MASK;
++		current->thread.fp_type = FP_STATE_FPSIMD;
+ 		goto fpsimd_only;
+ 	}
+ 
+@@ -332,6 +334,7 @@ static int restore_sve_fpsimd_context(st
+ 		current->thread.svcr |= SVCR_SM_MASK;
+ 	else
+ 		set_thread_flag(TIF_SVE);
++	current->thread.fp_type = FP_STATE_SVE;
+ 
+ fpsimd_only:
+ 	/* copy the FP and status/control registers */
+@@ -937,9 +940,11 @@ static void setup_return(struct pt_regs
+ 		 * FPSIMD register state - flush the saved FPSIMD
+ 		 * register state in case it gets loaded.
+ 		 */
+-		if (current->thread.svcr & SVCR_SM_MASK)
++		if (current->thread.svcr & SVCR_SM_MASK) {
+ 			memset(&current->thread.uw.fpsimd_state, 0,
+ 			       sizeof(current->thread.uw.fpsimd_state));
++			current->thread.fp_type = FP_STATE_FPSIMD;
++		}
+ 
+ 		current->thread.svcr &= ~(SVCR_ZA_MASK |
+ 					  SVCR_SM_MASK);
 --- a/arch/arm64/kvm/fpsimd.c
 +++ b/arch/arm64/kvm/fpsimd.c
-@@ -151,7 +151,6 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm
- 					 &vcpu->arch.fp_type, fp_type);
+@@ -140,7 +140,8 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm
+ 		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.fp_regs,
+ 					 vcpu->arch.sve_state,
+ 					 vcpu->arch.sve_max_vl,
+-					 NULL, 0, &vcpu->arch.svcr);
++					 NULL, 0, &vcpu->arch.svcr,
++					 &vcpu->arch.fp_type);
  
  		clear_thread_flag(TIF_FOREIGN_FPSTATE);
--		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
- 	}
- }
- 
-@@ -208,7 +207,5 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcp
- 			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
- 	}
- 
--	update_thread_flag(TIF_SVE, 0);
--
- 	local_irq_restore(flags);
- }
+ 		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
 
 
 Patches currently in stable-queue which might be from broonie@kernel.org are
