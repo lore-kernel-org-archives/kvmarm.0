@@ -1,133 +1,195 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0B313BC0C
-	for <kvmarm@lists.linux.dev>; Wed, 23 Apr 2025 13:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE7C27F4D1;
+	Wed, 23 Apr 2025 15:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745414418; cv=none; b=VJuSt8+Q2MFZZCnVYpcyKvTTiQEBQ/PfAZXHPR7tTbH5J21vVjhxqeSU6P5hYk5y1l7r3iMaNWAFcpM+kjJT8IOSCAqvJXjw8IZcRV3NZcZYKx9M0wN4sXqB7HNn9RLdS98XRIxlyjx6VhO9ThC+ORYqNLO3jHzebjKWFXTAulo=
+	t=1745421107; cv=none; b=idLeB2rdmi13x62tsJ5eDMs32GNMJ2rHKIqwlv2rYZo0Zc+M5N5FHM7Nw8AUxJJ0kprF1TPri7QWfR2q22EeNyJCK9QcAsJuk1CQCtIBBYayKKWKWfKX4Ko77Iq5v4aaB5uuAdUvgxs93Xbu6EToOayl69ZNo93ApbUX2hJD2lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745414418; c=relaxed/simple;
-	bh=U3cYqloLbOvSFdJSZqoFl4F6R+8xGjc2XYOjlukdhjk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=ZqJlN5siExiiIbjSAhv9d0Gaq21NeoWEtXJ1Oz4Jf9J9R/pbc/KymJPKFGGkMRtgdiZC2dnKyPxxi699h1u4eoA2rVVwSgQBAgy1GUt0jnXy/bLiFH003oHBDOoFaEKhuVnxdRuu6+B17M44x9RLHp0g7z1+ylD6TM0ca6tZN8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hVnOWRe+; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1745421107; c=relaxed/simple;
+	bh=7DTSy5c0LEFq6TqHnzfnsQmzUsM4pf25hH2RxLEG93Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VsEcSOy+JeYra2YSoGa0J8cei+Xx2igNPCWQen0onmweNHG/JudpLqLmG5kQMkpsMXsAZL3DBTdO7yRr1fDTSQtoxSl7F5I8DeLjWJp4ezbdIio05LswDYY4HqKOXV7a6HKbLyxDc53QiPokQfYI1c0jIbtR8KrKrcWLSQRGOUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0hvFVCAT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hVnOWRe+"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53NAkwud014559;
-	Wed, 23 Apr 2025 13:19:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Kg/vqusO5+9W7QqebKB1OKeumLCf6lCb0QG3HEEF26k=; b=hVnOWRe+nd9oYO9w
-	DgxmuwBnT9myycawSDCOJpWaBYUVC1I3pD+hsrzSu2chKJsFwBT64UcTfB24JvQL
-	ODogym26to60pHPUZaG7VOun4f5AvE5JtHmQ8JtaZag/9Yi8SHzM8iFDamioGttp
-	wFWDXJ+9BzhjiAytculd8UbR/5QFB5ssjWcBi05hz9iIPPLwM6ZA1yiJWnBGRaPP
-	parz4ErjCB09XbP3B+1e18v9ZhZr3vMNepQQKKzDUDH/h4lhfyeAYlpsEC22WJwE
-	anyuqxp+tvxUYUUC/aNYnaVciMKyQ/VcJk6cs3P7btSpiIdEMioW5RSwLsiYwFZc
-	0apilg==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 466jh0j7jr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Apr 2025 13:19:52 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 53NDJpRS022364
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Apr 2025 13:19:51 GMT
-Received: from [10.253.74.233] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 23 Apr
- 2025 06:19:46 -0700
-Message-ID: <1d70b1c8-f5f7-4027-a0cb-b1638e309a48@quicinc.com>
-Date: Wed, 23 Apr 2025 21:19:43 +0800
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0hvFVCAT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A40FC4CEE2;
+	Wed, 23 Apr 2025 15:11:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1745421107;
+	bh=7DTSy5c0LEFq6TqHnzfnsQmzUsM4pf25hH2RxLEG93Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=0hvFVCAT5jtCig0nLcR7J+2P1wXVGhGv9rr1fqWPCDQqC+r/7lY6jONUP0bL1ytgl
+	 5mFUJqmXQQe+4u9tGT5X8/QqouQIk1PlkkqIa90I1ICOq8vw+QED7eZHLF8F1SngTk
+	 3vQDZQF1wXYC9QPBtFNzmVYq8r7P2N/Ly4RFZTd0=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: [PATCH 6.12 192/223] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
+Date: Wed, 23 Apr 2025 16:44:24 +0200
+Message-ID: <20250423142624.996855042@linuxfoundation.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250423142617.120834124@linuxfoundation.org>
+References: <20250423142617.120834124@linuxfoundation.org>
+User-Agent: quilt/0.68
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jie Luo <quic_luoj@quicinc.com>
-Subject: Re: [PATCH v3 0/6] Add FIELD_MODIFY() helper
-To: Yury Norov <yury.norov@gmail.com>, Marc Zyngier <maz@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Nicolas Palix <nicolas.palix@imag.fr>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-        Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, <linux-kernel@vger.kernel.org>,
-        <cocci@inria.fr>, <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.linux.dev>, <quic_kkumarcs@quicinc.com>,
-        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>,
-        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>
-References: <20250417-field_modify-v3-0-6f7992aafcb7@quicinc.com>
- <86sem7jb5t.wl-maz@kernel.org> <0c97c659-bd28-45e0-8537-d9be2637cb22@lunn.ch>
- <86mscek7h3.wl-maz@kernel.org> <aAJq9mGswYsnAOS8@yury>
- <87plh9xz2d.wl-maz@kernel.org> <aAKGHIssRW5jXvdA@yury>
-Content-Language: en-US
-In-Reply-To: <aAKGHIssRW5jXvdA@yury>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: BN88jDYWGmli4vHQcBNP_g8Tvmp6cMeZ
-X-Authority-Analysis: v=2.4 cv=ftfcZE4f c=1 sm=1 tr=0 ts=6808e8f8 cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=VwQbUJbxAAAA:8 a=rL1jKAeQPVWMZnSF2k8A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: BN88jDYWGmli4vHQcBNP_g8Tvmp6cMeZ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDIzMDA5MyBTYWx0ZWRfXzbLcmo1j7n+4 cF/GKqx6vJwZDlKbABC0g/aYzHPNypSuZSbOqMTAGBxJlyZT1Va2fq8JoWHfI4+e7mq9M0Mt8eb 0yngKZ46t89+aaOz89gEWnUJ+9IVWPetjBnmd85XfbutXZZuclw99xOQikSTs0rOeVHCmuN28fI
- V7Q2k+Kyatbom3i9iWEQ6aWEumOMFP9prMv2aFduU2EXKOaUMpKvR2m7oF0Sz1fDUXfoJQbZc2m SKr4s9UAp1Jxcks8AfxlOYUlVADDhZ/qyb+BslC6zDZVXhY1juhIJJdzdR0JtltLXzvPNj5zA5h VEXGLprWpwE5Ctdqty/M+7DO3xFk5/S5+GWq/GFX/CSaRR15f5Dq+dSVgaCxQ1ENHXT/nn3sKxf
- D2g+34XwZg5izFbfxo5Ltkf5JFVZpy6hoOJzVyI/Zqh40tr6j+kZqw++/jtAh0okhNIvnBi4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
- definitions=2025-04-23_08,2025-04-22_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- suspectscore=0 mlxlogscore=884 lowpriorityscore=0 phishscore=0
- malwarescore=0 impostorscore=0 adultscore=0 spamscore=0 clxscore=1015
- priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2504230093
+Content-Transfer-Encoding: 8bit
+
+6.12-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
+
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+
+commit 858c7bfcb35e1100b58bb63c9f562d86e09418d9 upstream.
+
+FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
+access from EL1 requires appropriate EL2 fine grained trap configuration
+via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
+Otherwise such register accesses will result in traps into EL2.
+
+Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
+grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
+bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
+PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
+
+Also update booting.rst with SCR_EL3.FGTEn2 requirement for all FEAT_FGT2
+based registers to be accessible in EL2.
+
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Fixes: 0bbff9ed8165 ("perf/arm_pmuv3: Add PMUv3.9 per counter EL0 access control")
+Fixes: d8226d8cfbaf ("perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter")
+Tested-by: Rob Herring (Arm) <robh@kernel.org>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Link: https://lore.kernel.org/r/20250227035119.2025171-1-anshuman.khandual@arm.com
+Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ Documentation/arch/arm64/booting.rst |   22 ++++++++++++++++++++++
+ arch/arm64/include/asm/el2_setup.h   |   25 +++++++++++++++++++++++++
+ arch/arm64/tools/sysreg              |    1 +
+ 3 files changed, 48 insertions(+)
+
+--- a/Documentation/arch/arm64/booting.rst
++++ b/Documentation/arch/arm64/booting.rst
+@@ -285,6 +285,12 @@ Before jumping into the kernel, the foll
+ 
+     - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
+ 
++  For CPUs with the Fine Grained Traps 2 (FEAT_FGT2) extension present:
++
++  - If EL3 is present and the kernel is entered at EL2:
++
++    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
++
+   For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
+ 
+   - If EL3 is present and the kernel is entered at EL2:
+@@ -379,6 +385,22 @@ Before jumping into the kernel, the foll
+ 
+     - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
+ 
++  For CPUs with the Performance Monitors Extension (FEAT_PMUv3p9):
++
++ - If EL3 is present:
++
++    - MDCR_EL3.EnPM2 (bit 7) must be initialised to 0b1.
++
++ - If the kernel is entered at EL1 and EL2 is present:
++
++    - HDFGRTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
++    - HDFGRTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
++    - HDFGRTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
++
++    - HDFGWTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
++    - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
++    - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
++
+   For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
+ 
+   - If the kernel is entered at EL1 and EL2 is present:
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -215,6 +215,30 @@
+ .Lskip_fgt_\@:
+ .endm
+ 
++.macro __init_el2_fgt2
++	mrs	x1, id_aa64mmfr0_el1
++	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
++	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
++	b.lt	.Lskip_fgt2_\@
++
++	mov	x0, xzr
++	mrs	x1, id_aa64dfr0_el1
++	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMUVer_SHIFT, #4
++	cmp	x1, #ID_AA64DFR0_EL1_PMUVer_V3P9
++	b.lt	.Lskip_pmuv3p9_\@
++
++	orr	x0, x0, #HDFGRTR2_EL2_nPMICNTR_EL0
++	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
++	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
++.Lskip_pmuv3p9_\@:
++	msr_s   SYS_HDFGRTR2_EL2, x0
++	msr_s   SYS_HDFGWTR2_EL2, x0
++	msr_s   SYS_HFGRTR2_EL2, xzr
++	msr_s   SYS_HFGWTR2_EL2, xzr
++	msr_s   SYS_HFGITR2_EL2, xzr
++.Lskip_fgt2_\@:
++.endm
++
+ .macro __init_el2_nvhe_prepare_eret
+ 	mov	x0, #INIT_PSTATE_EL1
+ 	msr	spsr_el2, x0
+@@ -240,6 +264,7 @@
+ 	__init_el2_nvhe_idregs
+ 	__init_el2_cptr
+ 	__init_el2_fgt
++	__init_el2_fgt2
+ .endm
+ 
+ #ifndef __KVM_NVHE_HYPERVISOR__
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -1238,6 +1238,7 @@ UnsignedEnum	11:8	PMUVer
+ 	0b0110	V3P5
+ 	0b0111	V3P7
+ 	0b1000	V3P8
++	0b1001	V3P9
+ 	0b1111	IMP_DEF
+ EndEnum
+ UnsignedEnum	7:4	TraceVer
 
 
-
-On 4/19/2025 1:04 AM, Yury Norov wrote:
->>>> I think a bunch of people have found them, tooling notwithstanding.
->>>>
->>>> As for the documentation, the commit message in 00b0c9b82663ac would
->>>> be advantageously promoted to full-fledged kernel-doc.
->>> The FIELD_MODIFY() and uxx_replace_bits() are simply different things.
->>>
->>> FIELD_MODIFY() employs __BF_FIELD_CHECK(), which allows strict
->>> parameters checking at compile time. And people like it. See
->>> recent fixed-size GENMASK() series:
->>>
->>> https://patchwork.kernel.org/comment/26283604/
->> I don't care much for what people like or not. I don't see this
->> FIELD_MODIFY() as a particular improvement on *_replace_bits().
-> Sad to hear that. Those people are all kernel engineers, and they
-> deserve some respect.
-> 
-> We are talking about tooling here. People use tools only if they like
-> them. Luo likes FIELD_MODIFY() over (yes, undocumented and ungreppable)
-> xx_replace_bits() for the reasons he described very clearly. He's going
-> to use it in his driver shortly, and this arm64 detour has been made
-> after my request.
-> 
->  From my perspective, both functions have their right to live in kernel.
-> They are similar but not identical.
-> 
-> I'll take patch #1 in my branch. Regarding ARM64 part - it's up to you
-> either to switch to FIELD_MODIFY(), _replace_bits(), or do nothing.
-> 
-> Thanks,
-> Yury
-
-Thank you for reviewing and discussing this patch series. The newly
-added macro FIELD_MODIFY() will be utilized by the Qualcomm PPE (Packet
-Processing Engine) Ethernet driver. Regarding the ARM64 core files,
-could you please provide guidance on the preferred approach?
