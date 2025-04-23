@@ -1,53 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE7C27F4D1;
-	Wed, 23 Apr 2025 15:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8190828A415;
+	Wed, 23 Apr 2025 15:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745421107; cv=none; b=idLeB2rdmi13x62tsJ5eDMs32GNMJ2rHKIqwlv2rYZo0Zc+M5N5FHM7Nw8AUxJJ0kprF1TPri7QWfR2q22EeNyJCK9QcAsJuk1CQCtIBBYayKKWKWfKX4Ko77Iq5v4aaB5uuAdUvgxs93Xbu6EToOayl69ZNo93ApbUX2hJD2lA=
+	t=1745421315; cv=none; b=N+r9486/UXxtP5ApUVpjEuGzEsD7u6O0U92GqjFdXwy4qA+SK5+zVlwWa3gtFqs1hx08p5P9RwSx8ocm2fHygXhtaI62DEZSZApNvvGoQmLqBxgJe7ypxajttWVaf/eipcQSzCwRGhvnFQilOG8mFKI9LSZwbJyCCOawpHmVMF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745421107; c=relaxed/simple;
-	bh=7DTSy5c0LEFq6TqHnzfnsQmzUsM4pf25hH2RxLEG93Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VsEcSOy+JeYra2YSoGa0J8cei+Xx2igNPCWQen0onmweNHG/JudpLqLmG5kQMkpsMXsAZL3DBTdO7yRr1fDTSQtoxSl7F5I8DeLjWJp4ezbdIio05LswDYY4HqKOXV7a6HKbLyxDc53QiPokQfYI1c0jIbtR8KrKrcWLSQRGOUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0hvFVCAT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745421315; c=relaxed/simple;
+	bh=bZHiy7djGqlKCH7BRT8mOqs2a1vxBWPwG1GE8d0u0rc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dBSoIa5+O/aBVQdBtmhKM79Kv4G7YQHLwxMO68UnW6GEH8CheOPPqn9Mr+HqRghJB/9hR2mZLBbFy0In3b+05aIK2wKWBx/IAs3nXmcrSFcls39/4qO1lq9DVAY5bw7rBBcH7PdWH3D2S2SH7r607/qu+QROECngBwymJkcZouM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MBknqOYF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0hvFVCAT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A40FC4CEE2;
-	Wed, 23 Apr 2025 15:11:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1745421107;
-	bh=7DTSy5c0LEFq6TqHnzfnsQmzUsM4pf25hH2RxLEG93Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=0hvFVCAT5jtCig0nLcR7J+2P1wXVGhGv9rr1fqWPCDQqC+r/7lY6jONUP0bL1ytgl
-	 5mFUJqmXQQe+4u9tGT5X8/QqouQIk1PlkkqIa90I1ICOq8vw+QED7eZHLF8F1SngTk
-	 3vQDZQF1wXYC9QPBtFNzmVYq8r7P2N/Ly4RFZTd0=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBknqOYF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43BFFC4CEE2;
+	Wed, 23 Apr 2025 15:15:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745421315;
+	bh=bZHiy7djGqlKCH7BRT8mOqs2a1vxBWPwG1GE8d0u0rc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MBknqOYFD0INP9OVGdUAnBC+dC4M3oUxt3jnG8OBBS2XqZWjohWDoWrEXp8nBU8Pb
+	 xi4fOSaNjuHvhF2xlxyhRd7d85ZZhnOaEYo4lzDilqxkvoazdH4w8JIJ9+QT9BEBJg
+	 6XojdR7ApdhVc2MXyVK/3TnpM3ZsCrKFPhxpFpzbe6mZ2K7yxAWlp8U1pfuiumAhey
+	 VSncEM6c0EfUI1IB7Yd8d8W72MlbXBZlgSZx28MFScuGyPIJiR9VHO6hCduz6MtdKx
+	 vBFwW2r11KQQ91kHtC83qglsiL89XCT6TUH2xMkvCIC4RxwAniZlAdIVjC6A2GmEBI
+	 mZgEVzL117AYA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u7boe-0082xr-QA;
+	Wed, 23 Apr 2025 16:15:13 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 6.12 192/223] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-Date: Wed, 23 Apr 2025 16:44:24 +0200
-Message-ID: <20250423142624.996855042@linuxfoundation.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250423142617.120834124@linuxfoundation.org>
-References: <20250423142617.120834124@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH v3 00/17] KVM: arm64: Recursive NV support
+Date: Wed, 23 Apr 2025 16:14:51 +0100
+Message-Id: <20250423151508.2961768-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,141 +52,119 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+This is probably the most interesting bit of the whole NV adventure.
+So far, everything else has been a walk in the park, but this one is
+where the real fun takes place.
 
-------------------
+With FEAT_NV2, most of the NV support revolves around tricking a guest
+into accessing memory while it tries to access system registers. The
+hypervisor's job is to handle the context switch of the actual
+registers with the state in memory as needed.
 
-From: Anshuman Khandual <anshuman.khandual@arm.com>
+This memory (which we shall call the VNCR page henceforth) lives at an
+EL2 VA, and is therefore accessed out of context by the EL1 guest
+hypervisor.
 
-commit 858c7bfcb35e1100b58bb63c9f562d86e09418d9 upstream.
+So far, so good. But what does it mean to virtualise VNCR itself?
 
-FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
-access from EL1 requires appropriate EL2 fine grained trap configuration
-via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
-Otherwise such register accesses will result in traps into EL2.
+It means that when L1 has a prepared a VNCR page for L2, we must map
+it in the L0 EL2, and allow L2 to magically access it. Isn't that fun?
+To some extent. But there's more!
 
-Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
-grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
-bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
-PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
+Having that L0 mapping on behalf of L1 comes with strings attached. It
+means that we must be prepared for this page to become inaccessible,
+which can happen for a variety of reasons:
 
-Also update booting.rst with SCR_EL3.FGTEn2 requirement for all FEAT_FGT2
-based registers to be accessible in EL2.
+- paged out from the host (MMU notifiers)
 
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-doc@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: kvmarm@lists.linux.dev
-Fixes: 0bbff9ed8165 ("perf/arm_pmuv3: Add PMUv3.9 per counter EL0 access control")
-Fixes: d8226d8cfbaf ("perf: arm_pmuv3: Add support for Armv9.4 PMU instruction counter")
-Tested-by: Rob Herring (Arm) <robh@kernel.org>
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-Link: https://lore.kernel.org/r/20250227035119.2025171-1-anshuman.khandual@arm.com
-Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- Documentation/arch/arm64/booting.rst |   22 ++++++++++++++++++++++
- arch/arm64/include/asm/el2_setup.h   |   25 +++++++++++++++++++++++++
- arch/arm64/tools/sysreg              |    1 +
- 3 files changed, 48 insertions(+)
+- unmapped from L1 EL2 stage-1
 
---- a/Documentation/arch/arm64/booting.rst
-+++ b/Documentation/arch/arm64/booting.rst
-@@ -285,6 +285,12 @@ Before jumping into the kernel, the foll
- 
-     - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
- 
-+  For CPUs with the Fine Grained Traps 2 (FEAT_FGT2) extension present:
-+
-+  - If EL3 is present and the kernel is entered at EL2:
-+
-+    - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
-+
-   For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
- 
-   - If EL3 is present and the kernel is entered at EL2:
-@@ -379,6 +385,22 @@ Before jumping into the kernel, the foll
- 
-     - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
- 
-+  For CPUs with the Performance Monitors Extension (FEAT_PMUv3p9):
-+
-+ - If EL3 is present:
-+
-+    - MDCR_EL3.EnPM2 (bit 7) must be initialised to 0b1.
-+
-+ - If the kernel is entered at EL1 and EL2 is present:
-+
-+    - HDFGRTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
-+    - HDFGRTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
-+    - HDFGRTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
-+
-+    - HDFGWTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
-+    - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
-+    - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
-+
-   For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
- 
-   - If the kernel is entered at EL1 and EL2 is present:
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -215,6 +215,30 @@
- .Lskip_fgt_\@:
- .endm
- 
-+.macro __init_el2_fgt2
-+	mrs	x1, id_aa64mmfr0_el1
-+	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
-+	cmp	x1, #ID_AA64MMFR0_EL1_FGT_FGT2
-+	b.lt	.Lskip_fgt2_\@
-+
-+	mov	x0, xzr
-+	mrs	x1, id_aa64dfr0_el1
-+	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMUVer_SHIFT, #4
-+	cmp	x1, #ID_AA64DFR0_EL1_PMUVer_V3P9
-+	b.lt	.Lskip_pmuv3p9_\@
-+
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMICNTR_EL0
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
-+	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
-+.Lskip_pmuv3p9_\@:
-+	msr_s   SYS_HDFGRTR2_EL2, x0
-+	msr_s   SYS_HDFGWTR2_EL2, x0
-+	msr_s   SYS_HFGRTR2_EL2, xzr
-+	msr_s   SYS_HFGWTR2_EL2, xzr
-+	msr_s   SYS_HFGITR2_EL2, xzr
-+.Lskip_fgt2_\@:
-+.endm
-+
- .macro __init_el2_nvhe_prepare_eret
- 	mov	x0, #INIT_PSTATE_EL1
- 	msr	spsr_el2, x0
-@@ -240,6 +264,7 @@
- 	__init_el2_nvhe_idregs
- 	__init_el2_cptr
- 	__init_el2_fgt
-+	__init_el2_fgt2
- .endm
- 
- #ifndef __KVM_NVHE_HYPERVISOR__
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1238,6 +1238,7 @@ UnsignedEnum	11:8	PMUVer
- 	0b0110	V3P5
- 	0b0111	V3P7
- 	0b1000	V3P8
-+	0b1001	V3P9
- 	0b1111	IMP_DEF
- EndEnum
- UnsignedEnum	7:4	TraceVer
+- permission changes in L1 EL2 stage-1
 
+And in case you're wondering, yes, all of these have TLB invalidation
+in common. That's because performing this mapping is akin to
+allocating a "SW managed" TLB for L1's VNCR page.
+
+This is what the bulk of this series is about: TLB management for VNCR
+pages, and making sure we have the correct page at the right time.
+
+From an implementation perspective, it isn't that complicated, as it
+plugs into the existing NV artillery (TLBI, AT, MMU notifiers). Of
+course, nothing is optimised, because we're not at this stage yet. I
+have plans to make this better (i.e. fewer TLBIs, which implies fewer
+traps when nesting), but that's all future work.
+
+But this is functional enough that I can run an L4 guest on my QC
+box. Slowly.
+
+As an added bonus, this series now includes the last two patches that
+switch the damned thing on. Does it mean this is bug-free? Of course
+not. But we're at a point where NV is no longer a third-rate citizen.
+Only a second-rate one.
+
+Patches on top of my kvm-arm64/at-fixes-6.16 branch posted at [3],
+itself based on 6.15-rc3. The full integration is, as always, in my
+kvm-arm64/nv-next branch.
+
+* From v2:
+
+  - Handle access fault on translating the guest S1 to populate the
+    VNCR TLB
+
+  - Added RBs by Ganapatrao on a couple of patches
+
+* From v1:
+
+  - Rebased on 6.15-rc1
+
+  - Picked up the last two patches to enable the full NV shebang
+
+[1] https://lore.kernel.org/r/20250215150134.3765791-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20250408105225.4002637-1-maz@kernel.org
+[3] https://lore.kernel.org/r/20250422122612.2675672-1-maz@kernel.org
+
+Marc Zyngier (17):
+  arm64: sysreg: Add layout for VNCR_EL2
+  KVM: arm64: nv: Allocate VNCR page when required
+  KVM: arm64: nv: Extract translation helper from the AT code
+  KVM: arm64: nv: Snapshot S1 ASID tagging information during walk
+  KVM: arm64: nv: Move TLBI range decoding to a helper
+  KVM: arm64: nv: Don't adjust PSTATE.M when L2 is nesting
+  KVM: arm64: nv: Add pseudo-TLB backing VNCR_EL2
+  KVM: arm64: nv: Add userspace and guest handling of VNCR_EL2
+  KVM: arm64: nv: Handle VNCR_EL2-triggered faults
+  KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2
+  KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers
+  KVM: arm64: nv: Program host's VNCR_EL2 to the fixmap address
+  KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2
+  KVM: arm64: nv: Plumb TLBI S1E2 into system instruction dispatch
+  KVM: arm64: nv: Remove dead code from ERET handling
+  KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*
+  KVM: arm64: Document NV caps and vcpu flags
+
+ Documentation/virt/kvm/api.rst      |  14 +-
+ arch/arm64/include/asm/esr.h        |   2 +
+ arch/arm64/include/asm/fixmap.h     |   6 +
+ arch/arm64/include/asm/kvm_host.h   |  15 +-
+ arch/arm64/include/asm/kvm_nested.h | 100 +++++
+ arch/arm64/include/asm/sysreg.h     |   1 -
+ arch/arm64/kvm/arm.c                |  10 +
+ arch/arm64/kvm/at.c                 | 123 +++---
+ arch/arm64/kvm/emulate-nested.c     |   7 -
+ arch/arm64/kvm/handle_exit.c        |   1 +
+ arch/arm64/kvm/hyp/vhe/switch.c     |  46 ++-
+ arch/arm64/kvm/nested.c             | 609 +++++++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c              |   2 +
+ arch/arm64/kvm/sys_regs.c           | 135 +++---
+ arch/arm64/tools/sysreg             |   6 +
+ include/uapi/linux/kvm.h            |   2 +
+ 16 files changed, 941 insertions(+), 138 deletions(-)
+
+-- 
+2.39.2
 
