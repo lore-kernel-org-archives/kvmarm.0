@@ -1,235 +1,269 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5F528A1F7
-	for <kvmarm@lists.linux.dev>; Wed, 23 Apr 2025 19:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFEC19EED2
+	for <kvmarm@lists.linux.dev>; Thu, 24 Apr 2025 14:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745437250; cv=none; b=NjnbCN+ybAgYLPKQgYxCPauG/Dg7mwhy2/3s6s9ZOlsl4AQKcemWRVIXkFJv/LbIyUrrT3eabHqEVNus0A4VIOCJtR4/DpO0aTX5tfNQSBs3NofdZ+keYWNVEwAmbHJJeE2Gf+aJH1Rpwrmm97yTZHIqNEaJ0A05tPG65iF664I=
+	t=1745504030; cv=none; b=e7boSu5NiIgJ37A8Xhyl4ubSN450ymrLCzJh2pnnquBny7H+WmQ1RL0WJ5F41DLgSX+qI6pGSuSYoTj7PZOxmNY4XIY5a/IKHJmZeR8FAMyGTuZtJnojOmumAtgbaXztHc9XjB4zoNh7Z/+FsPBhrTeqdkNiGGriMWwoxvBrpNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745437250; c=relaxed/simple;
-	bh=aMRE5rhqUubTGLzmZ1zkM/Gk1z4kf8WuzNsoKArWtNE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nXggCA4QRPmXhrpRHV8jhLn+o7G1LShRj/iAlSCfpsUtgJZCJNX73Y/s7WwVFaKPr6NehFPlQJlVJ2yuEw8Dls0L6TcsoF4EP07llk9tDZQia2uCxkzzsoSYwPYOvBlMelXH2sXjM5+ra2Soyni8RK08+MhynOIQB7welVG17Bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MhOCOq+k; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745504030; c=relaxed/simple;
+	bh=gE5B+DRuvYdm1Xx80LASYKx8JQnPdEVc7dWEXx/LEcw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=u8YqEQle4MTCcTiUMg0r+DwuRGMPgnFjW0AD/X7tqISXh87DiJRn9O9UREHxE1bN9L3w0SXRUYYaG2Y9XHyfXjdagYtt6NqDpgYHeAhGXN4WC8WGAUHW1Jia+AGs1jtFVsk8xJAZEbJpBhnhXmSaJ/8J3+ZkpiaEu8nTX0o4leM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=V46pFh3B; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MhOCOq+k"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-223fb0f619dso2428315ad.1
-        for <kvmarm@lists.linux.dev>; Wed, 23 Apr 2025 12:40:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V46pFh3B"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-39c14016868so1019438f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 24 Apr 2025 07:13:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745437248; x=1746042048; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F4TIb8/cGcT5YOO6jpwMUaKc5ramXtbgTdB6E61EUK4=;
-        b=MhOCOq+kgjJ1w/B6VUTEvW2Eh0AT2PHmL3fjNVwRD2FDBijbTFmndOZCBy8bCW3vTX
-         ev2Jhl6b/lP71VpkS45nzFvaQqisgwxQN5d3yONDVokscUEuFw2lc0TqNGv0T7qto7Kv
-         pBAKmTeI3Kgygmc0hoxlGVPVJ84pr/NKt4NpilNWQEp3dTW1/rQxLzNzuaGiWfdnKnHv
-         WlU58yjvzC/w08I1exKSB50tIIAkFD8uO7OxiHAwvts+ZxBeOK3hJEK9SgHJvf8HFsye
-         RJPHaX9I6YhKXhBozGGc2sA6vzhAE+PbBtrtttNDK8MhI2L1JDznMLV/jC3+KBDglXdO
-         5xTw==
+        d=linaro.org; s=google; t=1745504025; x=1746108825; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Gp3+Ahd9oztFC0Ee90Z+LBETEK7lh7obhrs3g0E+vA=;
+        b=V46pFh3B54Zjv1rkHjzng9tQLwLIbXYf3Gz5vCqt7tT0rKDDHg8nJiP01rq7rM0uge
+         HTm12wZB6bLZJ5HUCZ6YexFKsrzjOAW3Af5x/79Qj6WJJnBZIQlH+mf7eu8263/2Npn2
+         JZHXa+taQ1H2n/tFDw1zkm18ykpB/dgu0joTbFYm2WpU6G5+C0P8lMRLcqDzzGbYDCIn
+         UU/G6CnxLOTMb9MkTdPPXhbwUn3HOwNw2C8qHb7t5w2wGEzWmf5dPasKWzKjj5vUb31D
+         OOUlREaXtEJcY+wYKb9CiZixDuPIpjV2ZXoa7o5NQSKLFHb0idGavwbj/AsXSzxiXxbZ
+         pLAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745437248; x=1746042048;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F4TIb8/cGcT5YOO6jpwMUaKc5ramXtbgTdB6E61EUK4=;
-        b=p/Din6a4YZjMg7HBPu/VenEWFXdF8qPBhtoAOexiMCw3jflc9MiwohE5bOa+2CLQIx
-         bqUQ+qobJMqb1RTY6nCU6BvujqA0c8xzapvw8qBYLMVDMsYYRAuroaifZQcb1wKWGTmO
-         8LgZpjUSNHHMfSyIsNjkWAq1aUgFlKr2KYUAAMLNXKu1T2h8IdFUdFR1p8FmDofcPjCE
-         XyMQh4hytAZU/G6stpd44HddoL+6fb2VCnPkz+3czGgdaGwhcQAX9l41jn2rhFFY5HQC
-         aPpYEGUnppUJqYCFLBV8I8j7Lwgz0LfPDE5/pZHHJle08azYoh2ljDRIKXzLHxRmL2j6
-         4NXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUZN5VXpdx9+y2dxaWuRUVUfBPOuobkTRYr4H0u3N2snMdtQ+FqMGS740yNyPUbqZQL7/qb18g=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw+L8rus2nIGZSUzLfK7NWOh0Dd6xCJTN/h4lcIwyBdYxCgE9An
-	6ugOIRYNEBOweIYVi1Q/EuHrtDoFtPzvG4OywtSpLSlDXDBLPlhX
-X-Gm-Gg: ASbGncsMOBzQT9VUe62eO5yptuL42xUnX+5QViudf74RX6xNlhSjn4jwtFJSGI7LbqM
-	tHZQJR7A1UwJJYA7+B8Ka4ve1ajPC9vrxqfqf0GFYExEHLrZEw15YvDSu3lSXm5fGDwZ2Z4lFm9
-	yusUOMyGT/gqHUSlqLG7RpNHf6ArSflz+ujNGJh+IxgUawr3uKGFEkWg8u5FVuE0VyJDITpQFOK
-	Lfg8Zjv81K4zBhDegf28xCS0OPjjwuFupRLPgFHAgG4lOiD3Oyy3PQdv/1EMa2WLc/6x4eyEP+r
-	txUSJQ0489eqpQms4BB/wdv+yuSEJ/ksETtPNUhn
-X-Google-Smtp-Source: AGHT+IGJTj4t3YyBeTpu99dqNzdz4h1Gumsi9bbZoo/nwDcyxygthxC2epv2+Ql+pGJESwDyMuUhMw==
-X-Received: by 2002:a17:902:d492:b0:224:1af1:87f4 with SMTP id d9443c01a7336-22db1aa28a4mr9176975ad.22.1745437248148;
-        Wed, 23 Apr 2025 12:40:48 -0700 (PDT)
-Received: from localhost ([216.228.127.130])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50fe0976sm108905785ad.245.2025.04.23.12.40.46
+        d=1e100.net; s=20230601; t=1745504025; x=1746108825;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+Gp3+Ahd9oztFC0Ee90Z+LBETEK7lh7obhrs3g0E+vA=;
+        b=UelRssMmpKBGYBMJ6QUxfuuJShnS3jYTivt9GnBoeAMvuTOmhex2bHOHt/C5p6csxr
+         cdZWMTARBdLZ16bzTGlA2sNlhZRImDZIkFNWEGFy9A386fe2BsEiXYHvbSdLwfZDMXDg
+         IOwJ0F/Nyefe9F7GeU/3mjmrvXqk40f8wlXzQMktGALn6CPvGanPmdsX5qTZ6//Vf8c+
+         wcc6Fl0aPR/jZiG3IOrPwuB/U4y9UoBn8M5REo9cU2nLk4Uuyxo1ZHophFLZWVycuPho
+         6KjNKwccjEbolIMNdSdXuEd9PYw4ZbYlEE1cpaS6m7LyLKFH0pKhlJpRGoXvviB2LR5D
+         ssjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVsmMT50VUaEUKe0EdniBQTjVQSP0mVZCHAL4yfOSDePhlA4m8x2aAu9Gy5uMMu2pl8/ZVLwi4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwiTt+y+BcjoJ5TQpugwsS0wk/stpRbEZzk3S1XaNS7fP90Vw8I
+	A3rWRVYWizha8eA72KYAkU2Hd9v9MVvNqHn2OuSMX8StOg+51Zy72DJNj1V0tU8=
+X-Gm-Gg: ASbGncsZ91OjcXLhN5JG6+zhRPsYwfrAe27oCPUm+LMHJmIMevoOE/TDrlQtvlXe4D7
+	FeCdZyMs3nhYReiBf/DBHOn9A13rqa10E62ARqhGW53vYiqsJEG4ADj5iqDtPpfAYqBDUp+zV+r
+	ekgdvAfUhKsDtW7ln2u5k33++cwie6dtjj2vM+XR7W4fYV6DlNIv4oSh15OJtmWP61ACPjI8ovz
+	44BJOgiGa2pLuhEYCBVRdqJZ72M6dFjML5YhbF9E6P/ry34uVaBx5FqKiG65HeGcwu6A5azbohj
+	HvGf3QDQWpaWwoaTAX/HKaaxOZKDAGtZF6qiqGizp5mHOBSHnkfWjhwqgDEBzexEASoMNKWeIYg
+	q7BdZn2+a0rgbA9i/
+X-Google-Smtp-Source: AGHT+IG84/KbH73HJzgia5gWQQPbSCf6KDXX629rg6dbolYAjXdYgdIHXLTmBvWlH/T2NybxvuuICA==
+X-Received: by 2002:a05:6000:4304:b0:39c:1257:cd40 with SMTP id ffacd0b85a97d-3a06cfb31damr2275855f8f.58.1745504025160;
+        Thu, 24 Apr 2025 07:13:45 -0700 (PDT)
+Received: from seksu.systems-nuts.com (stevens.inf.ed.ac.uk. [129.215.164.122])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4a8150sm2199951f8f.7.2025.04.24.07.13.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 12:40:47 -0700 (PDT)
-Date: Wed, 23 Apr 2025 15:40:45 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Marc Zyngier <maz@kernel.org>, Luo Jie <quic_luoj@quicinc.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
+        Thu, 24 Apr 2025 07:13:44 -0700 (PDT)
+From: Karim Manaouil <karim.manaouil@linaro.org>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Karim Manaouil <karim.manaouil@linaro.org>,
+	Alexander Graf <graf@amazon.com>,
+	Alex Elder <elder@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org,
-	cocci@inria.fr, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, andrew@lunn.ch, quic_kkumarcs@quicinc.com,
-	quic_linchen@quicinc.com, quic_leiwei@quicinc.com,
-	quic_suruchia@quicinc.com, quic_pavir@quicinc.com
-Subject: Re: [PATCH v3 4/6] arm64: nvhe: Convert the opencoded field modify
-Message-ID: <aAlCPZQtFjr4F-re@yury>
-References: <20250417-field_modify-v3-0-6f7992aafcb7@quicinc.com>
- <20250417-field_modify-v3-4-6f7992aafcb7@quicinc.com>
- <86r01rjald.wl-maz@kernel.org>
- <aAJsaNdznnz-1qap@yury>
- <aAkn8lvzoa1grdkt@shell.armlinux.org.uk>
- <aAkw-tFctkk3xyS8@yury>
- <aAk7VqNOLujcyZS0@shell.armlinux.org.uk>
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Prakruthi Deepak Heragu <quic_pheragu@quicinc.com>,
+	Quentin Perret <qperret@google.com>,
+	Rob Herring <robh@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>,
+	Will Deacon <will@kernel.org>,
+	Haripranesh S <haripran@qti.qualcomm.com>,
+	Carl van Schaik <cvanscha@qti.qualcomm.com>,
+	Murali Nalajala <mnalajal@quicinc.com>,
+	Sreenivasulu Chalamcharla <sreeniva@qti.qualcomm.com>,
+	Trilok Soni <tsoni@quicinc.com>,
+	Stefan Schmidt <stefan.schmidt@linaro.org>
+Subject: [RFC PATCH 00/34] Running Qualcomm's Gunyah Guests via KVM in EL1
+Date: Thu, 24 Apr 2025 15:13:07 +0100
+Message-Id: <20250424141341.841734-1-karim.manaouil@linaro.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aAk7VqNOLujcyZS0@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 23, 2025 at 08:11:18PM +0100, Russell King (Oracle) wrote:
-> On Wed, Apr 23, 2025 at 02:27:06PM -0400, Yury Norov wrote:
-> > On Wed, Apr 23, 2025 at 06:48:34PM +0100, Russell King (Oracle) wrote:
-> > > On Fri, Apr 18, 2025 at 11:14:48AM -0400, Yury Norov wrote:
-> > > > On Thu, Apr 17, 2025 at 12:23:10PM +0100, Marc Zyngier wrote:
-> > > > > On Thu, 17 Apr 2025 11:47:11 +0100,
-> > > > > Luo Jie <quic_luoj@quicinc.com> wrote:
-> > > > > > 
-> > > > > > Replaced below code with the wrapper FIELD_MODIFY(MASK, &reg, val)
-> > > > > > - reg &= ~MASK;
-> > > > > > - reg |= FIELD_PREP(MASK, val);
-> > > > > > The semantic patch that makes this change is available
-> > > > > > in scripts/coccinelle/misc/field_modify.cocci.
-> > > > > > 
-> > > > > > More information about semantic patching is available at
-> > > > > > https://coccinelle.gitlabpages.inria.fr/website
-> > > > > > 
-> > > > > > Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> > > > > > ---
-> > > > > >  arch/arm64/kvm/hyp/include/nvhe/memory.h | 3 +--
-> > > > > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > > > > index 34233d586060..b2af748964d0 100644
-> > > > > > --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > > > > +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > > > > @@ -30,8 +30,7 @@ enum pkvm_page_state {
-> > > > > >  static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
-> > > > > >  						 enum pkvm_page_state state)
-> > > > > >  {
-> > > > > > -	prot &= ~PKVM_PAGE_STATE_PROT_MASK;
-> > > > > > -	prot |= FIELD_PREP(PKVM_PAGE_STATE_PROT_MASK, state);
-> > > > > > +	FIELD_MODIFY(PKVM_PAGE_STATE_PROT_MASK, &prot, state);
-> > > > > >  	return prot;
-> > > > > >  }
-> > > > > 
-> > > > > Following up on my suggestion to *not* add anything new, this patch
-> > > > > could be written as:
-> > > > > 
-> > > > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > > > index 34233d5860607..08cb6ba0e0716 100644
-> > > > > --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > > > +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > > > > @@ -30,9 +30,8 @@ enum pkvm_page_state {
-> > > > >  static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
-> > > > >  						 enum pkvm_page_state state)
-> > > > >  {
-> > > > > -	prot &= ~PKVM_PAGE_STATE_PROT_MASK;
-> > > > > -	prot |= FIELD_PREP(PKVM_PAGE_STATE_PROT_MASK, state);
-> > > > > -	return prot;
-> > > > > +	u64 p = prot;
-> > > > > +	return u64_replace_bits(p, state, PKVM_PAGE_STATE_PROT_MASK);
-> > > > >  }
-> > > > 
-> > > > This is a great example where u64_replace_bit() should NOT be used. 
-> > > 
-> > > Why not? Explain it. Don't leave people in the dark, because right
-> > > now it looks like it's purely a religous fanaticism about what
-> > > should and should not be used. Where's the technical reasoning?
-> > 
-> > Because enum is an integer, i.e. 32-bit type.
-> 
-> This statement is false, in this case.
-> 
-> The kernel currently uses -std=gnu11, and GNU tends to be more relaxed
-> about things, and while the C standard may say that enums are ints,
-> that isn't the case - gcc appears to follow C++ and allow enums that
-> are wider than ints.
-> 
-> $ aarch64-linux-gnu-gcc -S -o - -std=gnu99 -x c -
-> enum foo {
-> A = 1L << 0,
-> B = 1L << 53,
-> };
-> int main()
-> { return sizeof(enum foo); }
-> 
-> Gives the following code:
-> 
-> main:
-> .LFB0:
->         .cfi_startproc
->         mov     w0, 8
->         ret
->         .cfi_endproc
-> 
-> meaning that sizeof(enum foo) is 8 or 64-bit.
-> 
-> If B were 1L << 31, then sizeof(enum foo) is 4.
-> 
-> > Now, the snippet above
-> > typecasts it to 64-bit fixed size type, passes to 64-bit fixed-type
-> > function, and the returned value is typecasted back to 32-bit int.
-> 
-> In this case, the enum is defined using:
-> 
->         KVM_PGTABLE_PROT_X                      = BIT(0),
->         KVM_PGTABLE_PROT_W                      = BIT(1),
->         KVM_PGTABLE_PROT_R                      = BIT(2),
-> 
->         KVM_PGTABLE_PROT_DEVICE                 = BIT(3),
->         KVM_PGTABLE_PROT_NORMAL_NC              = BIT(4),
-> 
->         KVM_PGTABLE_PROT_SW0                    = BIT(55),
->         KVM_PGTABLE_PROT_SW1                    = BIT(56),
->         KVM_PGTABLE_PROT_SW2                    = BIT(57),
->         KVM_PGTABLE_PROT_SW3                    = BIT(58),
-> 
-> As it contains bits beyond bit 31, and we use -std=gnu11 when building
-> the kernel, this enum is represented using a 64-bit integer type. So,
-> the casting to a u64 is not increasing the size of the enum, and the
-> return value is not getting truncated down to 32-bits.
-> 
-> > Doesn't sound the most efficient solution, right? On 32-bit arch it
-> > may double the function size, I guess.
-> 
-> Given that there's no inefficiency here, and that this is arm64 code
-> which is a 64-bit arch, both those points you mention seem to be
-> incorrect or not relevant.
-> 
-> > But the most important is that if we adopt this practice and spread it
-> > around, it will be really easy to overflow the 32-bit storage. The
-> > compiler will keep silence about that.
-> 
-> Given that in Marc's suggestion, "prot" is a 64-bit value, it's being
-> assigned to a u64, which is then being operated on by the u64 variant
-> of _replace_bits(), which returns the u64 result, which then gets
-> returned as a 64-bit enum, there is no issue here as far as I can see.
+This series introduces the capability of running Gunyah guests via KVM on
+Qualcomm SoCs shipped with Gunyah hypervisor [1] (e.g. RB3 Gen2).
 
-Ah, OK. You're right. On the other hand, enum is a bad specifier here,
-because this thing is not an enumeration. It's clearly a bit structure
-that reflects attributes in the page table record.
+The goal of this work is to port the existing Gunyah hypervisor support from a
+standalone driver interface [2] to KVM, with the aim of leveraging as much of the
+existing KVM infrastructure as possible to reduce duplication of effort around
+memory management (e.g. guest_memfd), irqfd, and other core components.
 
-This enum confused me (and probably others), and could better be an
-u64. And because this is really the 64-bit storage that tightly coupled
-to MMU layout, it should be a fixed-type, and should be handled with
-u64_xx_bits() functions.
+In short, Gunyah is a Type-1 hypervisor, meaning that it runs independently of any
+high-level OS kernel such as Linux and runs in a higher CPU privilege level than VMs.
+Gunyah is shipped as firmware and guests typically talk with Gunyah via hypercalls.
+KVM is designed to run as Type-2 hypervisor. This port allows KVM to run in EL1 and
+serve as the interface for VM lifecycle management,while offloading virtualization
+to Gunyah.
 
-If it was a true enumeration, something like dma_data_direction or
-ucount_type, or if it was a true native type like long, using this
-u64_xx_bits() is not optimal.
+This series is heavily based on previous work from Elliot Berman and others,
+available at:
+https://lore.kernel.org/lkml/20240222-gunyah-v17-0-1e9da6763d38@quicinc.com/
+
+Many commits in this series are identical to or derived from previous work. To
+preserve authorship and attribution, original `Author:` and `Signed-off-by:` tags
+have been retained where appropriate, and occasionally `Reviewed-by:` lines were
+kept as well.
+
+While this series builds on much of the original Gunyah implementation, it drops
+certain parts in favor of existing upstream features:
+  - `gunyah_memfd` is dropped (currently using pinned anonymous pages — see below).
+  - `gunyah_irqfd` is dropped in favor of KVM's irqfd.
+  - Resource management, vCPU creation, and VM lifecycle are integrated directly
+    into KVM’s architecture hooks.
+
+At this stage, the port is functional but still **work in progress**. Notably:
+  - Memory for guests is currently backed by **pinned anonymous pages**. This is a
+    temporary solution: we intend to migrate to `guest_memfd`.
+  - Memory compaction or swap must be avoided for now, as pages donated to Gunyah
+    are no longer accessible from the host once mapped into the guest.
+  - SMP boot is not available at the moment because Gunyah does not yet
+    forward PSCI hypercalls to the host.
+  - Virtio is not supported yet.
+
+There is a lot of room for performance improvment. For example, ATM.
+there is a lot of privilege level switching between EL1, EL2 (and
+possible EL3). As well as context swicthing between guest kernel space
+and guest userspace. For those interested, I have a compiled some slides
+here to summarise the issues:
+https://docs.google.com/presentation/d/1fL1TM1oxBrWFSL8KKw4jQtMDh7NOvyqbWWVu8iQxvoI/edit?usp=sharing
+
+To test the port, a modified version of Qemu is needed. A version can be
+found here:
+https://github.com/karim-manaouil/qemu-for-gunyah
+
+The series is based on linux-next as of today. A git tree is also
+available here (gunyah-kvm branch):
+https://github.com/karim-manaouil/linux-next
+
+To test the guest, run (with the modified qemu):
+./qemu-system-aarch64 \
+	-enable-kvm \
+	-machine virt,highmem=off \
+	-cpu host \
+	-smp 1 \
+	-m 1G \
+	-nographic \
+	-kernel Image \
+	-initrd initrd.img \
+	-append "console=ttyAMA0 earlycon rdinit=/bin/sh"
+
+Feedback Welcome!
+
+[1] https://www.qualcomm.com/developer/blog/2024/08/learn-about-gunyah--qualcomm-s-open-source--lightweight-hypervis
+[2] https://lore.kernel.org/lkml/20240222-gunyah-v17-0-1e9da6763d38@quicinc.com/
+
+Elliot Berman (20):
+  docs: gunyah: Introduce Gunyah Hypervisor
+  dt-bindings: Add binding for gunyah hypervisor
+  gunyah: Common types and error codes for Gunyah hypercalls
+  gunyah: Add hypercalls to identify Gunyah
+  gunyah: Add hypervisor driver
+  gunyah: Add hypercalls to send and receive messages
+  gunyah: Add resource manager RPC core
+  gunyah: Add VM lifecycle RPC
+  gunyah: Translate gh_rm_hyp_resource into gunyah_resource
+  gunyah: Add resource tickets
+  gunyah: Add hypercalls for running a vCPU
+  gunyah: Add hypercalls for demand paging
+  gunyah: Add memory parcel RPC
+  gunyah: Add interfaces to map memory into guest address space
+  gunyah: Add platform ops on mem_lend/mem_reclaim
+  gunyah: Add Qualcomm Gunyah platform ops
+  gunyah: Share guest VM dtb configuration to Gunyah
+  gunyah: Add RPC to enable demand paging
+  gunyah: Add RPC to set VM boot context
+  gunyah: Add hypercalls for sending doorbell
+
+Karim Manaouil (14):
+  KVM: Allow arch-specific vCPU allocation and freeing
+  KVM: irqfd: Add architecture hooks for irqfd allocation and
+    initialization
+  KVM: irqfd: Allow KVM backends to override IRQ injection via set_irq
+    callback
+  KVM: Add weak stubs for irqchip-related functions for Gunyah builds
+  KVM: Add KVM_SET_DTB_ADDRESS ioctl to pass guest DTB address from
+    userspace
+  KVM: gunyah: Add initial Gunyah backend support
+  KVM: gunyah: Pin guest memory
+  gunyah: Add basic VM lifecycle management
+  gunyah: add proxy-scheduled vCPUs
+  gunyah: Share memory parcels
+  gunyah: Enable demand paging
+  gunyah: allow userspace to set boot cpu context
+  KVM: gunyah: Implement irqfd interface
+  KVM: gunyah: enable KVM for Gunyah
+
+ .../bindings/firmware/gunyah-hypervisor.yaml  |   82 +
+ Documentation/virt/gunyah/index.rst           |  135 ++
+ Documentation/virt/gunyah/message-queue.rst   |   68 +
+ Documentation/virt/index.rst                  |    1 +
+ arch/arm64/Kbuild                             |    1 +
+ arch/arm64/gunyah/Makefile                    |    3 +
+ arch/arm64/gunyah/gunyah_hypercall.c          |  279 +++
+ arch/arm64/include/asm/gunyah.h               |   57 +
+ arch/arm64/include/asm/kvm_host.h             |   10 +-
+ arch/arm64/include/asm/virt.h                 |    7 +
+ arch/arm64/kernel/cpufeature.c                |    4 +
+ arch/arm64/kernel/image-vars.h                |    2 +-
+ arch/arm64/kvm/Kconfig                        |   22 +-
+ arch/arm64/kvm/Makefile                       |   14 +-
+ arch/arm64/kvm/gunyah.c                       | 2085 +++++++++++++++++
+ drivers/virt/Kconfig                          |    2 +
+ drivers/virt/Makefile                         |    1 +
+ drivers/virt/gunyah/Kconfig                   |   29 +
+ drivers/virt/gunyah/Makefile                  |    7 +
+ drivers/virt/gunyah/gunyah.c                  |   55 +
+ drivers/virt/gunyah/gunyah_platform_hooks.c   |  117 +
+ drivers/virt/gunyah/gunyah_qcom.c             |  220 ++
+ drivers/virt/gunyah/rsc_mgr.c                 |  792 +++++++
+ drivers/virt/gunyah/rsc_mgr_rpc.c             |  572 +++++
+ include/kvm/arm_pmu.h                         |    2 +-
+ include/linux/gunyah.h                        |  425 ++++
+ include/linux/gunyah_rsc_mgr.h                |  182 ++
+ include/linux/irqchip/arm-vgic-info.h         |    2 +-
+ include/linux/kvm_host.h                      |    3 +
+ include/linux/kvm_irqfd.h                     |    5 +
+ include/linux/perf/arm_pmu.h                  |    2 +-
+ include/uapi/linux/kvm.h                      |   14 +-
+ virt/kvm/eventfd.c                            |   56 +-
+ virt/kvm/kvm_main.c                           |   24 +-
+ 34 files changed, 5258 insertions(+), 22 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/firmware/gunyah-hypervisor.yaml
+ create mode 100644 Documentation/virt/gunyah/index.rst
+ create mode 100644 Documentation/virt/gunyah/message-queue.rst
+ create mode 100644 arch/arm64/gunyah/Makefile
+ create mode 100644 arch/arm64/gunyah/gunyah_hypercall.c
+ create mode 100644 arch/arm64/include/asm/gunyah.h
+ create mode 100644 arch/arm64/kvm/gunyah.c
+ create mode 100644 drivers/virt/gunyah/Kconfig
+ create mode 100644 drivers/virt/gunyah/Makefile
+ create mode 100644 drivers/virt/gunyah/gunyah.c
+ create mode 100644 drivers/virt/gunyah/gunyah_platform_hooks.c
+ create mode 100644 drivers/virt/gunyah/gunyah_qcom.c
+ create mode 100644 drivers/virt/gunyah/rsc_mgr.c
+ create mode 100644 drivers/virt/gunyah/rsc_mgr_rpc.c
+ create mode 100644 include/linux/gunyah.h
+ create mode 100644 include/linux/gunyah_rsc_mgr.h
+
+-- 
+2.39.5
+
