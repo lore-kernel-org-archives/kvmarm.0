@@ -1,63 +1,63 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36EDB290BAE
-	for <kvmarm@lists.linux.dev>; Thu, 24 Apr 2025 14:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93B128E5F0
+	for <kvmarm@lists.linux.dev>; Thu, 24 Apr 2025 14:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745504062; cv=none; b=PSQFS/nNp7pakmqaj4wzZbvi747HplHUW/em1EydVdZdbCQRsyBMyvIKWDrL4h6wFIrlZ6Bj6nfAcTwNWNPIz1YY2cS6rKoPKLSvERAUb35LF3pK5SzXZIuU2PaFH/aU8PeSJk2tZMA9fWRYW6EDl+6AsZhhW1Bz6OEdUaLDJCU=
+	t=1745504063; cv=none; b=T4WQqy52np06EJ1fIW9ka/vFKWCrfURgkgLAHxdDyoK4pPv7lTnZ7LyGFLxSgptlGHhjZKYxKAhyw82RBsOuuHYqkHTqoqVJyyCy+98cv0xXkoxF4d3HZYtiEd9ldk7RQaB0mMohq61DSKrGonR634rSlaf3yqI9YSTHBLwRlyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745504062; c=relaxed/simple;
-	bh=vLbxwMoJK25jtdiinc5JboXzA9vEq1NIw2shYX4meSY=;
+	s=arc-20240116; t=1745504063; c=relaxed/simple;
+	bh=NPLvNPRTGZlQyPSKuchNVhThznQp0bCS99QwrEGsnQg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ClLPkEE4oO4OnXMqVQbmmTWZWP5KfHN/h1bgP8ma+fISsozLBePG3lFz5UT4KkLWFjweTadnfV9EK34A7ZcFnzww934sVCQFgRJdP1BuQMI3yGyfZ7qHGoZ8V1bbPwaXwiIBYanMmmQn5obTLjB3YWYvcG2ee6++dZleZdrQHow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pspwnuIR; arc=none smtp.client-ip=209.85.221.45
+	 MIME-Version; b=inxueU3MJUXq4hboAa3eqIY8gVa4HCDu2hVsfXNYSpWO9YexHAX/fZi89C1n7p/i5LOSUPLSPWU6ShcQ4Bq5hp6u4pKxlLo7/CbSh+BK9tqJUlc48GHKrC6BV/BO3uxwjACPAJ0VniuJAahWjGv5KJft/3A5pBnLZ064eOGWmxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TT9hx3zL; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pspwnuIR"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-39efc1365e4so559605f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 24 Apr 2025 07:14:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TT9hx3zL"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4394a823036so10603075e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 24 Apr 2025 07:14:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1745504057; x=1746108857; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1745504056; x=1746108856; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YXeykB8FkcDuL2Q2W63/7k8ahxVIXL64cFUzN9R5114=;
-        b=pspwnuIRcLAfoVh9uWyvp6rs1+6I8dhz3LjmQwxImze7lN8jId/i8A9bBphhQ/3jE4
-         CJQ2qD+x5NONI3Ji0vwBZETNlmWlNe8MoxD5xO9lHxrsALqf1Mu625IP76UnXhn7Diqq
-         UwTScolhtetg19wPt+Xw3auwv20k06vok3a7GFRkKDf6C6MvjPYroAAid7LuJfxD8Bqw
-         l67yDKhhAU3pVxwZRinHII5gAwyPkjyDpGiyK6jlabqx6aqfgMoo68pf7UwSlVvqRGLj
-         QC1XtLY4FnRruz0a+z+xqAvg4BFYSWh0OAC4/ogY3btSCZnDqDA/RBCiBAPRWNWdIute
-         UJTg==
+        bh=2LhbI7ata+xuMo4MQ3LDVVCBYF7iuDckOVgkFelFFVk=;
+        b=TT9hx3zLFZon4sPamRGRVJOkfe3KYBfm85RaVKKdjIYsuDS1Eap30BRbdPHMqyrVu+
+         ShRBXQ/NGrQefYv2mlWdmBU7QUSmr7j28WdPU9kklRAdMbIlhgtMw5y4OCmTC9L7OHFs
+         Uh0E/DYS2NtXIBAJ1F7BeawO8hekdSqN6GGW37Fye4WYuinZROAtSYRCXq4zSq7FFmH/
+         y7dLHoxOfASTIsH9GIE65B2FgrUbNgz3gWuNO4Mat4mE3bvBJRNPCwUcZGliTA/4hvG9
+         g5Ss12LjgfEgBMHRGvjQd7FBSPsWAffPFXdatm9i2EBawxpiHdi1D3hSXTbxL4GKGjzU
+         Wy3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745504057; x=1746108857;
+        d=1e100.net; s=20230601; t=1745504056; x=1746108856;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YXeykB8FkcDuL2Q2W63/7k8ahxVIXL64cFUzN9R5114=;
-        b=Ng4VPi/MSPthwQnuXFB9/dPnsFtguFTL+DxekNV6880B1wAOhWm8vAy4JmBPvfofuz
-         eW+TG64SRiyuj4nPW8Ja04x/rclr+5fVwZykFKpUtbUi3T/hSVzYnnn9Aw3a61//j7FL
-         Q/vavVNvoITLRXsFPr7WAILdFzeSr5z5V8ywaV4d4OVux7NiKrBq0KVTZV23NE8r+Ivn
-         /9uOo9ieZmuYP5enwcidbgoPKy9iK7FVOr6WDnmq3lAMZ21R7H7Toy2OungLgCh/ihfM
-         1tDtdoayFQk7OCO78Jn/jQNc/uZgeFz8uqP5xS/3Rrk9vi+Aq2FJGY4Ef30156FTgT2s
-         IdFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdaV/jkGXc1U7JeA6eb/pGoJ5Ycq1ug2Cyzq79Ssdvp+R4wMtjR9NgsQc2oqBZyeByJ98Q4sI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx6vMBrM/lXrVKE/YfIxOFH44uzeCCaChJrauTqFBZ2XO8JdU93
-	xCnpjv2mjTu1pgPY2fALALojRmHk2JqlGAqxKL/oP45lczavcdH7sZngl0UXW5g=
-X-Gm-Gg: ASbGncsArxz2AmFDE+yhrb7AKeUuR33lgaTM97a7/AS7c8+ljiUh5Y2lfB7V35LLqFP
-	xm7+8BVFyLH6qPGa3TxuUSmXktDAeRaEod26cC9uLQTqmUavEgJ8TbhzecNNpE1wiyg3fkh1nA2
-	fr8GgeyQKdO80dzeh4c3+IPwEsa9AUyBiwbZ+rPtcoUyewZt0Sqb2YLYruw55ZBuM9XK2ATrkNl
-	2AjIjbmGh49OxgiaVXCffnpuKm69rNKZ3K2LCA+2wi0c8iBllbOpccrEyIbh9hHfuqRWcPgjmRF
-	gDNNYjtguR8oaBT+fwoYDfHMYPvN/H6HPKtJIjyolMk59FD/4bWHa+Y5AJUGdneKHGeIx8kNsKW
-	q2lIw8xIDbPlNF0eKKHj4eFnsWOU=
-X-Google-Smtp-Source: AGHT+IFg8XOlOSbfkRtBuJWxisCALodsFHPa4IUTZp3Kj17cI2U8pp461yntnlLPPaPA3d0u/jWMRw==
-X-Received: by 2002:a05:6000:420f:b0:399:71d4:a9 with SMTP id ffacd0b85a97d-3a06cfb2391mr2162635f8f.52.1745504057229;
-        Thu, 24 Apr 2025 07:14:17 -0700 (PDT)
+        bh=2LhbI7ata+xuMo4MQ3LDVVCBYF7iuDckOVgkFelFFVk=;
+        b=N0G9L1ih3iD2THWpfSGzaMIRJzKZMJBuY7YL75JLTuLgT+m0Hx8yt8LmG/mgd5YU+D
+         PD4RYXgsviLlgVGD0RUbwua+5y4btA3wsDfOLHk7g6WT1lZqaNq2P/shoX+skJDSvEKB
+         BhIyFTe1OOSHVEThOUVQWle2PCXnZsKYPXHqtiF1kGcwgoRR3DzqWsPdqXeVW0PGoGHb
+         Q1DsWnEpHfLKibUI0ZTkGTEU3otBSKnqtOFMv8Utis+ye4oTYbNRNkq1/ck5ffWI7qGf
+         hm4vf3ay2rEm0oDvhPixKxkt+d2T3CXjxySXUQwZsbStTaw8N4p0+eyN/4dmaL0JmT0A
+         50yw==
+X-Forwarded-Encrypted: i=1; AJvYcCWCfhfnIWKR3ZMg458M1fbIceNI3f/e4BUtHrF2q/vNDntILcezTRBDcIFXm/H4mrFCtUuFJ/M=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzZPPcSf5GMBxij3YwMl4vY9/m4Zyshpjafc6ULkQHjzls+Jk1e
+	fENP8sc9G3S4mv3HdIWYdkp+lkeVCNTzCkZxTwwJkg/xRjaWAhQJ0nPFAKeGLmI=
+X-Gm-Gg: ASbGncs57myxWrfCkTp9dIBPJgcPG8kosKH+FLVnu7h3RS/lwv5tl04EvYcGKpWn1Np
+	bsJ6MY1aZq0qgVzJxBWONQj+aa4Z7+WbO+Jtaaz1rd+DhMRICUYxbFajfFVMnrIp8tSMkflwf3h
+	+HOcqLhcWHm/iFjq5/rxltPrDaLUGvN7E1JHbuXP4vhM7Bp4+kJwulktznvLSfCz4m49mCVLKdz
+	wh4G8UIuNbjChEc8L4f4t6bzaU/eM2JUXOFx3R9HTfC+XfndJ+4uFrg+bqw2RXC9Gz1pCtvJVHm
+	Mb1ZP9MryAYLdUaiDsv8sen/SowGtOYzSktZxlh15/tiuG6ezHr6Fcdeh9ZiTlF05ebcm1fzPjq
+	IUxnG0nwasnVjJK1x
+X-Google-Smtp-Source: AGHT+IHqcrFkop2AMczZB7InA+Ahpw3ClIzGk7Xop+jnijaBOC/Y4QzTBvOvzogG1ZcwEVc5x1XCjQ==
+X-Received: by 2002:a05:600c:8106:b0:440:6852:5b31 with SMTP id 5b1f17b1804b1-4409bd0d902mr31333525e9.10.1745504055954;
+        Thu, 24 Apr 2025 07:14:15 -0700 (PDT)
 Received: from seksu.systems-nuts.com (stevens.inf.ed.ac.uk. [129.215.164.122])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4a8150sm2199951f8f.7.2025.04.24.07.14.16
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4a8150sm2199951f8f.7.2025.04.24.07.14.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 07:14:16 -0700 (PDT)
+        Thu, 24 Apr 2025 07:14:15 -0700 (PDT)
 From: Karim Manaouil <karim.manaouil@linaro.org>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
@@ -89,9 +89,9 @@ Cc: Karim Manaouil <karim.manaouil@linaro.org>,
 	Trilok Soni <tsoni@quicinc.com>,
 	Stefan Schmidt <stefan.schmidt@linaro.org>,
 	Elliot Berman <quic_eberman@quicinc.com>
-Subject: [RFC PATCH 24/34] gunyah: Add platform ops on mem_lend/mem_reclaim
-Date: Thu, 24 Apr 2025 15:13:31 +0100
-Message-Id: <20250424141341.841734-25-karim.manaouil@linaro.org>
+Subject: [RFC PATCH 23/34] gunyah: Add interfaces to map memory into guest address space
+Date: Thu, 24 Apr 2025 15:13:30 +0100
+Message-Id: <20250424141341.841734-24-karim.manaouil@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250424141341.841734-1-karim.manaouil@linaro.org>
 References: <20250424141341.841734-1-karim.manaouil@linaro.org>
@@ -105,397 +105,305 @@ Content-Transfer-Encoding: 8bit
 
 From: Elliot Berman <quic_eberman@quicinc.com>
 
-On Qualcomm platforms, there is a firmware entity which controls access
-to physical pages. In order to share memory with another VM, this entity
-needs to be informed that the guest VM should have access to the memory.
+This patch is a subset of [1], without gunyah guest-memfd parts.
+I added the original commit message below.
 
-Co-developed-by: Prakruthi Deepak Heragu <quic_pheragu@quicinc.com>
-Signed-off-by: Prakruthi Deepak Heragu <quic_pheragu@quicinc.com>
-Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
-Signed-off-by: Karim Manaouil <karim.manaouil@linaro.org>
+[1] https://lore.kernel.org/lkml/20240222-gunyah-v17-20-1e9da6763d38@quicinc.com/
 ---
- arch/arm64/kvm/gunyah.c                     |  29 ++++-
- drivers/virt/gunyah/Kconfig                 |   4 +
- drivers/virt/gunyah/Makefile                |   1 +
- drivers/virt/gunyah/gunyah_platform_hooks.c | 117 ++++++++++++++++++++
- drivers/virt/gunyah/rsc_mgr_rpc.c           |  19 +++-
- include/linux/gunyah.h                      |  63 +++++++++--
- include/linux/gunyah_rsc_mgr.h              |  10 ++
- 7 files changed, 226 insertions(+), 17 deletions(-)
- create mode 100644 drivers/virt/gunyah/gunyah_platform_hooks.c
+ arch/arm64/kvm/gunyah.c | 212 +++++++++++++++++++++++++++++++++++++++-
+ include/linux/gunyah.h  |   6 ++
+ 2 files changed, 217 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/gunyah.c b/arch/arm64/kvm/gunyah.c
-index 5d18d133df50..7216db642174 100644
+index e066482c2e71..5d18d133df50 100644
 --- a/arch/arm64/kvm/gunyah.c
 +++ b/arch/arm64/kvm/gunyah.c
-@@ -488,7 +488,7 @@ static int gunyah_memory_provide_folio(struct gunyah_vm *ghvm,
- 	size_t size = folio_size(folio);
- 	enum gunyah_error gunyah_error;
- 	unsigned long tag = 0;
--	int ret;
-+	int ret, tmp;
+@@ -10,8 +10,8 @@
+ #include <linux/cpumask.h>
+ #include <linux/kvm_host.h>
+ #include <linux/kvm_irqfd.h>
+-#include <asm/kvm_mmu.h>
+ #include <linux/perf_event.h>
++#include <asm/kvm_mmu.h>
  
- 	if (share) {
- 		guest_extent = __first_resource(&ghvm->guest_shared_extent_ticket);
-@@ -521,6 +521,11 @@ static int gunyah_memory_provide_folio(struct gunyah_vm *ghvm,
- 	else /* !share && !write */
- 		access = GUNYAH_PAGETABLE_ACCESS_RX;
+ #include <linux/gunyah_rsc_mgr.h>
+ #include <linux/gunyah.h>
+@@ -19,6 +19,15 @@
+ #undef pr_fmt
+ #define pr_fmt(fmt) "gunyah: " fmt
  
-+	ret = gunyah_rm_platform_pre_demand_page(ghvm->rm, ghvm->vmid, access,
-+						 folio);
-+	if (ret)
-+		return ret;
++#define GUNYAH_VM_ADDRSPACE_LABEL			0
++#define GUNYAH_VM_MEM_EXTENT_GUEST_PRIVATE_LABEL	0
++#define GUNYAH_VM_MEM_EXTENT_HOST_SHARED_LABEL		1
++#define GUNYAH_VM_MEM_EXTENT_GUEST_SHARED_LABEL		3
++#define GUNYAH_VM_MEM_EXTENT_HOST_PRIVATE_LABEL		2
 +
- 	gunyah_error = gunyah_hypercall_memextent_donate(donate_flags(share),
- 							 host_extent->capid,
- 							 guest_extent->capid,
-@@ -528,7 +533,8 @@ static int gunyah_memory_provide_folio(struct gunyah_vm *ghvm,
- 	if (gunyah_error != GUNYAH_ERROR_OK) {
- 		pr_err("Failed to donate memory for guest address 0x%016llx: %d\n",
- 		       gpa, gunyah_error);
--		return gunyah_error_remap(gunyah_error);
-+		ret = gunyah_error_remap(gunyah_error);
-+		goto platform_release;
- 	}
++#define WRITE_TAG (1 << 0)
++#define SHARE_TAG (1 << 1)
++
+ static int gunyah_vm_start(struct gunyah_vm *ghvm);
  
- 	extent_attrs =
-@@ -556,6 +562,14 @@ static int gunyah_memory_provide_folio(struct gunyah_vm *ghvm,
- 	if (gunyah_error != GUNYAH_ERROR_OK)
- 		pr_err("Failed to reclaim memory donation for guest address 0x%016llx: %d\n",
- 		       gpa, gunyah_error);
-+platform_release:
-+	tmp = gunyah_rm_platform_reclaim_demand_page(ghvm->rm, ghvm->vmid,
-+						     access, folio);
-+	if (tmp) {
-+		pr_err("Platform failed to reclaim memory for guest address 0x%016llx: %d",
-+		       gpa, tmp);
-+		return ret;
-+	}
- 	return ret;
+ static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
+@@ -332,6 +341,23 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	}
  }
  
-@@ -565,6 +579,7 @@ static int gunyah_memory_reclaim_folio(struct gunyah_vm *ghvm,
- 	u32 map_flags = BIT(GUNYAH_ADDRSPACE_MAP_FLAG_PARTIAL);
- 	struct gunyah_resource *guest_extent, *host_extent, *addrspace;
- 	enum gunyah_error gunyah_error;
-+	enum gunyah_pagetable_access access;
- 	phys_addr_t pa;
- 	size_t size;
- 	int ret;
-@@ -604,6 +619,16 @@ static int gunyah_memory_reclaim_folio(struct gunyah_vm *ghvm,
- 		goto err;
- 	}
- 
-+	access = GUNYAH_PAGETABLE_ACCESS_RWX;
++static bool gunyah_vm_resource_ticket_populate_noop(
++	struct gunyah_vm_resource_ticket *ticket, struct gunyah_resource *ghrsc)
++{
++	return true;
++}
++static void gunyah_vm_resource_ticket_unpopulate_noop(
++	struct gunyah_vm_resource_ticket *ticket, struct gunyah_resource *ghrsc)
++{
++}
 +
-+	ret = gunyah_rm_platform_reclaim_demand_page(ghvm->rm, ghvm->vmid, access, folio);
-+	if (ret) {
++static inline struct gunyah_resource *
++__first_resource(struct gunyah_vm_resource_ticket *ticket)
++{
++	return list_first_entry_or_null(&ticket->resources,
++					struct gunyah_resource, list);
++}
++
+ static int gunyah_vm_add_resource_ticket(struct gunyah_vm *ghvm,
+ 				  struct gunyah_vm_resource_ticket *ticket)
+ {
+@@ -430,6 +456,159 @@ static void gunyah_vm_clean_resources(struct gunyah_vm *ghvm)
+ 	mutex_unlock(&ghvm->resources_lock);
+ }
+ 
++static inline u32 donate_flags(bool share)
++{
++	if (share)
++		return FIELD_PREP_CONST(GUNYAH_MEMEXTENT_OPTION_TYPE_MASK,
++					GUNYAH_MEMEXTENT_DONATE_TO_SIBLING);
++	else
++		return FIELD_PREP_CONST(GUNYAH_MEMEXTENT_OPTION_TYPE_MASK,
++					GUNYAH_MEMEXTENT_DONATE_TO_PROTECTED);
++}
++
++static inline u32 reclaim_flags(bool share)
++{
++	if (share)
++		return FIELD_PREP_CONST(GUNYAH_MEMEXTENT_OPTION_TYPE_MASK,
++					GUNYAH_MEMEXTENT_DONATE_TO_SIBLING);
++	else
++		return FIELD_PREP_CONST(GUNYAH_MEMEXTENT_OPTION_TYPE_MASK,
++					GUNYAH_MEMEXTENT_DONATE_FROM_PROTECTED);
++}
++
++static int gunyah_memory_provide_folio(struct gunyah_vm *ghvm,
++		struct folio *folio, gfn_t gfn, bool share, bool write)
++{
++	struct gunyah_resource *guest_extent, *host_extent, *addrspace;
++	u32 map_flags = BIT(GUNYAH_ADDRSPACE_MAP_FLAG_PARTIAL);
++	u64 extent_attrs;
++	gfn_t gpa = gfn_to_gpa(gfn);
++	phys_addr_t pa = PFN_PHYS(folio_pfn(folio));
++	enum gunyah_pagetable_access access;
++	size_t size = folio_size(folio);
++	enum gunyah_error gunyah_error;
++	unsigned long tag = 0;
++	int ret;
++
++	if (share) {
++		guest_extent = __first_resource(&ghvm->guest_shared_extent_ticket);
++		host_extent = __first_resource(&ghvm->host_shared_extent_ticket);
++	} else {
++		guest_extent = __first_resource(&ghvm->guest_private_extent_ticket);
++		host_extent = __first_resource(&ghvm->host_private_extent_ticket);
++	}
++	addrspace = __first_resource(&ghvm->addrspace_ticket);
++
++	if (!addrspace || !guest_extent || !host_extent)
++		return -ENODEV;
++
++	if (share) {
++		map_flags |= BIT(GUNYAH_ADDRSPACE_MAP_FLAG_VMMIO);
++		tag |= SHARE_TAG;
++	} else {
++		map_flags |= BIT(GUNYAH_ADDRSPACE_MAP_FLAG_PRIVATE);
++	}
++
++	if (write)
++		tag |= WRITE_TAG;
++
++	if (share && write)
++		access = GUNYAH_PAGETABLE_ACCESS_RW;
++	else if (share && !write)
++		access = GUNYAH_PAGETABLE_ACCESS_R;
++	else if (!share && write)
++		access = GUNYAH_PAGETABLE_ACCESS_RWX;
++	else /* !share && !write */
++		access = GUNYAH_PAGETABLE_ACCESS_RX;
++
++	gunyah_error = gunyah_hypercall_memextent_donate(donate_flags(share),
++							 host_extent->capid,
++							 guest_extent->capid,
++							 pa, size);
++	if (gunyah_error != GUNYAH_ERROR_OK) {
++		pr_err("Failed to donate memory for guest address 0x%016llx: %d\n",
++		       gpa, gunyah_error);
++		return gunyah_error_remap(gunyah_error);
++	}
++
++	extent_attrs =
++		FIELD_PREP_CONST(GUNYAH_MEMEXTENT_MAPPING_TYPE,
++				 ARCH_GUNYAH_DEFAULT_MEMTYPE) |
++		FIELD_PREP(GUNYAH_MEMEXTENT_MAPPING_USER_ACCESS, access) |
++		FIELD_PREP(GUNYAH_MEMEXTENT_MAPPING_KERNEL_ACCESS, access);
++	gunyah_error = gunyah_hypercall_addrspace_map(addrspace->capid,
++						      guest_extent->capid, gpa,
++						      extent_attrs, map_flags,
++						      pa, size);
++	if (gunyah_error != GUNYAH_ERROR_OK) {
++		pr_err("Failed to map guest address 0x%016llx: %d\n", gpa,
++		       gunyah_error);
++		ret = gunyah_error_remap(gunyah_error);
++		goto memextent_reclaim;
++	}
++
++	return 0;
++memextent_reclaim:
++	gunyah_error = gunyah_hypercall_memextent_donate(reclaim_flags(share),
++							 guest_extent->capid,
++							 host_extent->capid, pa,
++							 size);
++	if (gunyah_error != GUNYAH_ERROR_OK)
++		pr_err("Failed to reclaim memory donation for guest address 0x%016llx: %d\n",
++		       gpa, gunyah_error);
++	return ret;
++}
++
++static int gunyah_memory_reclaim_folio(struct gunyah_vm *ghvm,
++		struct folio *folio, gfn_t gfn, bool share)
++{
++	u32 map_flags = BIT(GUNYAH_ADDRSPACE_MAP_FLAG_PARTIAL);
++	struct gunyah_resource *guest_extent, *host_extent, *addrspace;
++	enum gunyah_error gunyah_error;
++	phys_addr_t pa;
++	size_t size;
++	int ret;
++
++	addrspace = __first_resource(&ghvm->addrspace_ticket);
++	if (!addrspace)
++		return -ENODEV;
++
++	guest_extent = __first_resource(&ghvm->guest_private_extent_ticket);
++	host_extent = __first_resource(&ghvm->host_private_extent_ticket);
++	map_flags |= BIT(GUNYAH_ADDRSPACE_MAP_FLAG_PRIVATE);
++
++	pa = PFN_PHYS(folio_pfn(folio));
++	size = folio_size(folio);
++
++	gunyah_error = gunyah_hypercall_addrspace_unmap(addrspace->capid,
++							guest_extent->capid,
++							gfn_to_gpa(gfn),
++							map_flags, pa, size);
++	if (gunyah_error != GUNYAH_ERROR_OK) {
 +		pr_err_ratelimited(
-+			"Platform failed to reclaim memory for guest address 0x%016llx: %d",
-+			gfn_to_gpa(gfn), ret);
++			"Failed to unmap guest address 0x%016llx: %d\n",
++			gfn_to_gpa(gfn), gunyah_error);
++		ret = gunyah_error_remap(gunyah_error);
 +		goto err;
 +	}
 +
- 	return 0;
- err:
++	gunyah_error = gunyah_hypercall_memextent_donate(reclaim_flags(share),
++							 guest_extent->capid,
++							 host_extent->capid, pa,
++							 size);
++	if (gunyah_error != GUNYAH_ERROR_OK) {
++		pr_err_ratelimited(
++			"Failed to reclaim memory donation for guest address 0x%016llx: %d\n",
++			gfn_to_gpa(gfn), gunyah_error);
++		ret = gunyah_error_remap(gunyah_error);
++		goto err;
++	}
++
++	return 0;
++err:
++	return ret;
++}
++
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+@@ -1357,6 +1536,17 @@ static int gunyah_vm_start(struct gunyah_vm *ghvm)
  	return ret;
-diff --git a/drivers/virt/gunyah/Kconfig b/drivers/virt/gunyah/Kconfig
-index 6f4c85db80b5..23ba523d25dc 100644
---- a/drivers/virt/gunyah/Kconfig
-+++ b/drivers/virt/gunyah/Kconfig
-@@ -3,6 +3,7 @@
- config GUNYAH
- 	tristate "Gunyah Virtualization drivers"
- 	depends on ARM64
-+	select GUNYAH_PLATFORM_HOOKS
- 	help
- 	  The Gunyah drivers are the helper interfaces that run in a guest VM
- 	  such as basic inter-VM IPC and signaling mechanisms, and higher level
-@@ -10,3 +11,6 @@ config GUNYAH
- 
- 	  Say Y/M here to enable the drivers needed to interact in a Gunyah
- 	  virtual environment.
-+
-+config GUNYAH_PLATFORM_HOOKS
-+	tristate
-diff --git a/drivers/virt/gunyah/Makefile b/drivers/virt/gunyah/Makefile
-index b1bdf3e84155..45cabba3110c 100644
---- a/drivers/virt/gunyah/Makefile
-+++ b/drivers/virt/gunyah/Makefile
-@@ -3,3 +3,4 @@
- gunyah_rsc_mgr-y += rsc_mgr.o rsc_mgr_rpc.o
- 
- obj-$(CONFIG_GUNYAH) += gunyah.o gunyah_rsc_mgr.o
-+obj-$(CONFIG_GUNYAH_PLATFORM_HOOKS) += gunyah_platform_hooks.o
-diff --git a/drivers/virt/gunyah/gunyah_platform_hooks.c b/drivers/virt/gunyah/gunyah_platform_hooks.c
-new file mode 100644
-index 000000000000..8a1af171e4c9
---- /dev/null
-+++ b/drivers/virt/gunyah/gunyah_platform_hooks.c
-@@ -0,0 +1,117 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/gunyah.h>
-+#include <linux/module.h>
-+#include <linux/rwsem.h>
-+
-+#include <linux/gunyah_rsc_mgr.h>
-+
-+static const struct gunyah_rm_platform_ops *rm_platform_ops;
-+static DECLARE_RWSEM(rm_platform_ops_lock);
-+
-+int gunyah_rm_platform_pre_mem_share(struct gunyah_rm *rm,
-+				     struct gunyah_rm_mem_parcel *mem_parcel)
-+{
-+	int ret = 0;
-+
-+	down_read(&rm_platform_ops_lock);
-+	if (rm_platform_ops && rm_platform_ops->pre_mem_share)
-+		ret = rm_platform_ops->pre_mem_share(rm, mem_parcel);
-+	up_read(&rm_platform_ops_lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(gunyah_rm_platform_pre_mem_share);
-+
-+int gunyah_rm_platform_post_mem_reclaim(struct gunyah_rm *rm,
-+					struct gunyah_rm_mem_parcel *mem_parcel)
-+{
-+	int ret = 0;
-+
-+	down_read(&rm_platform_ops_lock);
-+	if (rm_platform_ops && rm_platform_ops->post_mem_reclaim)
-+		ret = rm_platform_ops->post_mem_reclaim(rm, mem_parcel);
-+	up_read(&rm_platform_ops_lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(gunyah_rm_platform_post_mem_reclaim);
-+
-+int gunyah_rm_platform_pre_demand_page(struct gunyah_rm *rm, u16 vmid,
-+				       enum gunyah_pagetable_access access,
-+				       struct folio *folio)
-+{
-+	int ret = 0;
-+
-+	down_read(&rm_platform_ops_lock);
-+	if (rm_platform_ops && rm_platform_ops->pre_demand_page)
-+		ret = rm_platform_ops->pre_demand_page(rm, vmid, access, folio);
-+	up_read(&rm_platform_ops_lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(gunyah_rm_platform_pre_demand_page);
-+
-+int gunyah_rm_platform_reclaim_demand_page(struct gunyah_rm *rm, u16 vmid,
-+					   enum gunyah_pagetable_access access,
-+					   struct folio *folio)
-+{
-+	int ret = 0;
-+
-+	down_read(&rm_platform_ops_lock);
-+	if (rm_platform_ops && rm_platform_ops->pre_demand_page)
-+		ret = rm_platform_ops->release_demand_page(rm, vmid, access,
-+							   folio);
-+	up_read(&rm_platform_ops_lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(gunyah_rm_platform_reclaim_demand_page);
-+
-+int gunyah_rm_register_platform_ops(
-+	const struct gunyah_rm_platform_ops *platform_ops)
-+{
-+	int ret = 0;
-+
-+	down_write(&rm_platform_ops_lock);
-+	if (!rm_platform_ops)
-+		rm_platform_ops = platform_ops;
-+	else
-+		ret = -EEXIST;
-+	up_write(&rm_platform_ops_lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(gunyah_rm_register_platform_ops);
-+
-+void gunyah_rm_unregister_platform_ops(
-+	const struct gunyah_rm_platform_ops *platform_ops)
-+{
-+	down_write(&rm_platform_ops_lock);
-+	if (rm_platform_ops == platform_ops)
-+		rm_platform_ops = NULL;
-+	up_write(&rm_platform_ops_lock);
-+}
-+EXPORT_SYMBOL_GPL(gunyah_rm_unregister_platform_ops);
-+
-+static void _devm_gunyah_rm_unregister_platform_ops(void *data)
-+{
-+	gunyah_rm_unregister_platform_ops(
-+		(const struct gunyah_rm_platform_ops *)data);
-+}
-+
-+int devm_gunyah_rm_register_platform_ops(
-+	struct device *dev, const struct gunyah_rm_platform_ops *ops)
-+{
-+	int ret;
-+
-+	ret = gunyah_rm_register_platform_ops(ops);
-+	if (ret)
-+		return ret;
-+
-+	return devm_add_action(dev, _devm_gunyah_rm_unregister_platform_ops,
-+			       (void *)ops);
-+}
-+EXPORT_SYMBOL_GPL(devm_gunyah_rm_register_platform_ops);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Gunyah Platform Hooks");
-diff --git a/drivers/virt/gunyah/rsc_mgr_rpc.c b/drivers/virt/gunyah/rsc_mgr_rpc.c
-index 0266c2a8d583..ec187d116dd7 100644
---- a/drivers/virt/gunyah/rsc_mgr_rpc.c
-+++ b/drivers/virt/gunyah/rsc_mgr_rpc.c
-@@ -212,6 +212,12 @@ int gunyah_rm_mem_share(struct gunyah_rm *rm, struct gunyah_rm_mem_parcel *p)
- 	if (!msg)
- 		return -ENOMEM;
- 
-+	ret = gunyah_rm_platform_pre_mem_share(rm, p);
-+	if (ret) {
-+		kfree(msg);
-+		return ret;
-+	}
-+
- 	req_header = msg;
- 	acl = (void *)req_header + sizeof(*req_header);
- 	mem = (void *)acl + acl_size;
-@@ -237,8 +243,10 @@ int gunyah_rm_mem_share(struct gunyah_rm *rm, struct gunyah_rm_mem_parcel *p)
- 			     &resp_size);
- 	kfree(msg);
- 
--	if (ret)
-+	if (ret) {
-+		gunyah_rm_platform_post_mem_reclaim(rm, p);
- 		return ret;
-+	}
- 
- 	p->mem_handle = le32_to_cpu(*resp);
- 	kfree(resp);
-@@ -270,9 +278,14 @@ int gunyah_rm_mem_reclaim(struct gunyah_rm *rm,
- 	struct gunyah_rm_mem_release_req req = {
- 		.mem_handle = cpu_to_le32(parcel->mem_handle),
- 	};
-+	int ret;
-+
-+	 ret = gunyah_rm_call(rm, GUNYAH_RM_RPC_MEM_RECLAIM, &req, sizeof(req),
-+			 NULL, NULL);
-+	if (ret)
-+		return ret;
- 
--	 return gunyah_rm_call(rm, GUNYAH_RM_RPC_MEM_RECLAIM, &req, sizeof(req),
--			     NULL, NULL);
-+	return gunyah_rm_platform_post_mem_reclaim(rm, parcel);
  }
- ALLOW_ERROR_INJECTION(gunyah_rm_mem_reclaim, ERRNO);
  
++static inline void setup_extent_ticket(struct gunyah_vm *ghvm,
++				       struct gunyah_vm_resource_ticket *ticket,
++				       u32 label)
++{
++	ticket->resource_type = GUNYAH_RESOURCE_TYPE_MEM_EXTENT;
++	ticket->label = label;
++	ticket->populate = gunyah_vm_resource_ticket_populate_noop;
++	ticket->unpopulate = gunyah_vm_resource_ticket_unpopulate_noop;
++	gunyah_vm_add_resource_ticket(ghvm, ticket);
++}
++
+ static struct gunyah_vm *gunyah_vm_alloc(struct gunyah_rm *rm)
+ {
+ 	struct gunyah_vm *ghvm;
+@@ -1375,6 +1565,20 @@ static struct gunyah_vm *gunyah_vm_alloc(struct gunyah_rm *rm)
+ 	INIT_LIST_HEAD(&ghvm->resources);
+ 	INIT_LIST_HEAD(&ghvm->resource_tickets);
+ 
++	ghvm->addrspace_ticket.resource_type = GUNYAH_RESOURCE_TYPE_ADDR_SPACE;
++	ghvm->addrspace_ticket.label = GUNYAH_VM_ADDRSPACE_LABEL;
++	ghvm->addrspace_ticket.populate = gunyah_vm_resource_ticket_populate_noop;
++	ghvm->addrspace_ticket.unpopulate = gunyah_vm_resource_ticket_unpopulate_noop;
++	gunyah_vm_add_resource_ticket(ghvm, &ghvm->addrspace_ticket);
++
++	setup_extent_ticket(ghvm, &ghvm->host_private_extent_ticket,
++			    GUNYAH_VM_MEM_EXTENT_HOST_PRIVATE_LABEL);
++	setup_extent_ticket(ghvm, &ghvm->host_shared_extent_ticket,
++			    GUNYAH_VM_MEM_EXTENT_HOST_SHARED_LABEL);
++	setup_extent_ticket(ghvm, &ghvm->guest_private_extent_ticket,
++			    GUNYAH_VM_MEM_EXTENT_GUEST_PRIVATE_LABEL);
++	setup_extent_ticket(ghvm, &ghvm->guest_shared_extent_ticket,
++			    GUNYAH_VM_MEM_EXTENT_GUEST_SHARED_LABEL);
+ 	return ghvm;
+ }
+ 
+@@ -1389,6 +1593,12 @@ static void gunyah_destroy_vm(struct gunyah_vm *ghvm)
+ 	if (ghvm->vm_status == GUNYAH_RM_VM_STATUS_RUNNING)
+ 		gunyah_vm_stop(ghvm);
+ 
++	gunyah_vm_remove_resource_ticket(ghvm, &ghvm->addrspace_ticket);
++	gunyah_vm_remove_resource_ticket(ghvm, &ghvm->host_shared_extent_ticket);
++	gunyah_vm_remove_resource_ticket(ghvm, &ghvm->host_private_extent_ticket);
++	gunyah_vm_remove_resource_ticket(ghvm, &ghvm->guest_shared_extent_ticket);
++	gunyah_vm_remove_resource_ticket(ghvm, &ghvm->guest_private_extent_ticket);
++
+ 	gunyah_vm_clean_resources(ghvm);
+ 
+ 	if (ghvm->vm_status == GUNYAH_RM_VM_STATUS_EXITED ||
 diff --git a/include/linux/gunyah.h b/include/linux/gunyah.h
-index d1048d0fc246..1d363ab8967a 100644
+index 2648d3a623de..d1048d0fc246 100644
 --- a/include/linux/gunyah.h
 +++ b/include/linux/gunyah.h
-@@ -158,6 +158,57 @@ struct gunyah_vcpu {
- 	struct gunyah_vm_resource_ticket ticket;
+@@ -14,6 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/kvm_host.h>
+ 
++#include <asm/gunyah.h>
+ #include <linux/gunyah_rsc_mgr.h>
+ 
+ #define gunyah_vcpu(kvm_vcpu_ptr) \
+@@ -107,6 +108,11 @@ struct gunyah_vm {
+ 	struct list_head resources;
+ 	struct list_head resource_tickets;
+ 	enum gunyah_rm_vm_auth_mechanism auth;
++	struct gunyah_vm_resource_ticket addrspace_ticket;
++	struct gunyah_vm_resource_ticket host_private_extent_ticket;
++	struct gunyah_vm_resource_ticket host_shared_extent_ticket;
++	struct gunyah_vm_resource_ticket guest_private_extent_ticket;
++	struct gunyah_vm_resource_ticket guest_shared_extent_ticket;
  };
  
-+enum gunyah_pagetable_access {
-+	/* clang-format off */
-+	GUNYAH_PAGETABLE_ACCESS_NONE		= 0,
-+	GUNYAH_PAGETABLE_ACCESS_X		= 1,
-+	GUNYAH_PAGETABLE_ACCESS_W		= 2,
-+	GUNYAH_PAGETABLE_ACCESS_R		= 4,
-+	GUNYAH_PAGETABLE_ACCESS_RX		= 5,
-+	GUNYAH_PAGETABLE_ACCESS_RW		= 6,
-+	GUNYAH_PAGETABLE_ACCESS_RWX		= 7,
-+	/* clang-format on */
-+};
-+
-+struct gunyah_rm_platform_ops {
-+	int (*pre_mem_share)(struct gunyah_rm *rm,
-+			     struct gunyah_rm_mem_parcel *mem_parcel);
-+	int (*post_mem_reclaim)(struct gunyah_rm *rm,
-+				struct gunyah_rm_mem_parcel *mem_parcel);
-+
-+	int (*pre_demand_page)(struct gunyah_rm *rm, u16 vmid,
-+			       enum gunyah_pagetable_access access,
-+			       struct folio *folio);
-+	int (*release_demand_page)(struct gunyah_rm *rm, u16 vmid,
-+				   enum gunyah_pagetable_access access,
-+				   struct folio *folio);
-+};
-+
-+#if IS_ENABLED(CONFIG_GUNYAH_PLATFORM_HOOKS)
-+int gunyah_rm_register_platform_ops(
-+	const struct gunyah_rm_platform_ops *platform_ops);
-+void gunyah_rm_unregister_platform_ops(
-+	const struct gunyah_rm_platform_ops *platform_ops);
-+int devm_gunyah_rm_register_platform_ops(
-+	struct device *dev, const struct gunyah_rm_platform_ops *ops);
-+#else
-+static inline int gunyah_rm_register_platform_ops(
-+	const struct gunyah_rm_platform_ops *platform_ops)
-+{
-+	return 0;
-+}
-+static inline void gunyah_rm_unregister_platform_ops(
-+	const struct gunyah_rm_platform_ops *platform_ops)
-+{
-+}
-+static inline int
-+devm_gunyah_rm_register_platform_ops(struct device *dev,
-+				     const struct gunyah_rm_platform_ops *ops)
-+{
-+	return 0;
-+}
-+#endif
-+
- /******************************************************************************/
- /* Common arch-independent definitions for Gunyah hypercalls                  */
- #define GUNYAH_CAPID_INVAL U64_MAX
-@@ -278,18 +329,6 @@ enum gunyah_error gunyah_hypercall_msgq_recv(u64 capid, void *buff, size_t size,
- 
- #define GUNYAH_ADDRSPACE_SELF_CAP 0
- 
--enum gunyah_pagetable_access {
--	/* clang-format off */
--	GUNYAH_PAGETABLE_ACCESS_NONE		= 0,
--	GUNYAH_PAGETABLE_ACCESS_X		= 1,
--	GUNYAH_PAGETABLE_ACCESS_W		= 2,
--	GUNYAH_PAGETABLE_ACCESS_R		= 4,
--	GUNYAH_PAGETABLE_ACCESS_RX		= 5,
--	GUNYAH_PAGETABLE_ACCESS_RW		= 6,
--	GUNYAH_PAGETABLE_ACCESS_RWX		= 7,
--	/* clang-format on */
--};
--
- /* clang-format off */
- #define GUNYAH_MEMEXTENT_MAPPING_USER_ACCESS		GENMASK_ULL(2, 0)
- #define GUNYAH_MEMEXTENT_MAPPING_KERNEL_ACCESS		GENMASK_ULL(6, 4)
-diff --git a/include/linux/gunyah_rsc_mgr.h b/include/linux/gunyah_rsc_mgr.h
-index c42a0cb42ba6..fb3feee73490 100644
---- a/include/linux/gunyah_rsc_mgr.h
-+++ b/include/linux/gunyah_rsc_mgr.h
-@@ -155,4 +155,14 @@ void gunyah_rm_free_resource(struct gunyah_resource *ghrsc);
- int gunyah_rm_call(struct gunyah_rm *rsc_mgr, u32 message_id,
- 		   const void *req_buf, size_t req_buf_size, void **resp_buf,
- 		   size_t *resp_buf_size);
-+
-+int gunyah_rm_platform_pre_mem_share(struct gunyah_rm *rm,
-+				     struct gunyah_rm_mem_parcel *mem_parcel);
-+int gunyah_rm_platform_post_mem_reclaim(
-+	struct gunyah_rm *rm, struct gunyah_rm_mem_parcel *mem_parcel);
-+
-+int gunyah_rm_platform_pre_demand_page(struct gunyah_rm *rm, u16 vmid,
-+				       u32 flags, struct folio *folio);
-+int gunyah_rm_platform_reclaim_demand_page(struct gunyah_rm *rm, u16 vmid,
-+					   u32 flags, struct folio *folio);
- #endif
+ /**
 -- 
 2.39.5
 
