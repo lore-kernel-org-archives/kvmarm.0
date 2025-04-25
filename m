@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B800622DFF3;
-	Fri, 25 Apr 2025 10:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B0E1DD539;
+	Fri, 25 Apr 2025 10:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745577065; cv=none; b=ShkTBPJ5zyVZojoh83rqV4mYRHFV6tvEglsoEIoR3odN16NM9WnDSJQnaX41J88xq+cWTuaWnZUH5PBskTrpzT5N4gc97LT7QPAj/tg+WRocJzKV1DLN5gRCsaTBnzrzyE7H/3PgUWyr6G0u6SS3ixYmuM11cFiAWaJtBqGn74w=
+	t=1745578107; cv=none; b=fxbsTyNq3csBWlyFypmP23MEn/VqOcOG0wkSuJ9lrb3msnVT+SH57K4E7Il/czCZbD+ggRc24CjE3T6/mJHweUQF7ahw76X6+p7OPXXhaKhQbh8N3ptARcSbuiCtlt+Df9szn/MRi71sNLN4GbfHXodjtXPBJzS5DlnUyd0YiTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745577065; c=relaxed/simple;
-	bh=ck8CLGhJFqmQuLqQnrTVmFNKZSy8Vcxh/L4kS0TVWu8=;
+	s=arc-20240116; t=1745578107; c=relaxed/simple;
+	bh=J7s3QtS1y8NxrN3e4R6heuEhfQ129IhNm+6sUboFvCo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jJpWX4EZ2J7c6vCZdYKZfPNItfNWKiR35VAnVD6rO05SC/wklK8AmAnCw9u1+ci+qgO6ODkTFH4Nb/fSw6vm2UmIg+LJdU8x3t9pdFfiEVLRSePBGodXcfTab57RVUFT6vdPomLXUEFIXOU2HltaPMgTN9TXDN3tCw0PlZb9Xw8=
+	 In-Reply-To:Content-Type; b=iGq/nxtMAJu/iBRseSXJPr0G+dfNQLdxEoHsaNxLb9hsLaJbAFzddOE+l6Y2XoZpTd60LmnllEaghYY7Z6k4mcc2cHXfbXbpFLSbOGNNrEC5azZJU7nNtQsxXAlsvWB7iztA85oqzEFvBg+lPjBN0Fr8WDVYwAHs8L5civUbOmo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A39BB106F;
-	Fri, 25 Apr 2025 03:30:56 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 92989106F;
+	Fri, 25 Apr 2025 03:48:19 -0700 (PDT)
 Received: from [10.57.45.160] (unknown [10.57.45.160])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6F0963F66E;
-	Fri, 25 Apr 2025 03:30:58 -0700 (PDT)
-Message-ID: <2e7c9ee0-377c-49d0-884f-b21d664b4c54@arm.com>
-Date: Fri, 25 Apr 2025 11:30:57 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 818C63F66E;
+	Fri, 25 Apr 2025 03:48:21 -0700 (PDT)
+Message-ID: <d43d1813-5402-488c-aadc-6336dedeccbe@arm.com>
+Date: Fri, 25 Apr 2025 11:48:20 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 03/43] arm64: RME: Add SMC definitions for calling the
- RMM
+Subject: Re: [PATCH v8 04/43] arm64: RME: Add wrappers for RMI calls
 Content-Language: en-GB
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
@@ -44,23 +43,61 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
  <aneesh.kumar@kernel.org>
 References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-4-steven.price@arm.com>
+ <20250416134208.383984-5-steven.price@arm.com>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250416134208.383984-4-steven.price@arm.com>
+In-Reply-To: <20250416134208.383984-5-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+Hi Steven
+
 On 16/04/2025 14:41, Steven Price wrote:
-> The RMM (Realm Management Monitor) provides functionality that can be
-> accessed by SMC calls from the host.
-> 
-> The SMC definitions are based on DEN0137[1] version 1.0-rel0
-> 
-> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+> The wrappers make the call sites easier to read and deal with the
+> boiler plate of handling the error codes from the RMM.
 > 
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes from v7:
+>   * Minor renaming of parameters and updated comments
+> Changes from v5:
+>   * Further improve comments
+> Changes from v4:
+>   * Improve comments
+> Changes from v2:
+>   * Make output arguments optional.
+>   * Mask RIPAS value rmi_rtt_read_entry()
+>   * Drop unused rmi_rtt_get_phys()
+> ---
+>   arch/arm64/include/asm/rmi_cmds.h | 508 ++++++++++++++++++++++++++++++
+>   1 file changed, 508 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+> 
+> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+> new file mode 100644
+> index 000000000000..27cd2751f3bf
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rmi_cmds.h
+> @@ -0,0 +1,508 @@
+
+...
+
+> +
+> +/**
+> + * rmi_rtt_destroy() - Destroy an RTT
+> + * @rd: PA of the RD
+> + * @ipa: Base of the IPA range described by the RTT
+> + * @level: Depth of the RTT within the tree
+> + * @out_rtt: Pointer to write the PA of the RTT which was destroyed
+> + * @out_top: Pointer to write the top IPA of non-live RTT entries
+> + *
+> + * Destroys an RTT. The RTT must be non-live, i.e. none of the entries in the
+> + * table are in ASSIGNED or TABLE state.
+
+minor nit: It may be worth emphasising that you mean HIPAS here and not
+RMI_ASSIGNED (as returned by RTT_READ_ENTRY). The key is, an unprotected
+live leaf mapping  (i.e., HIPAS=ASSIGNED_NS) is considered non-live.
+
+Either ways:
 
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-
