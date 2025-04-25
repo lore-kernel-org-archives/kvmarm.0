@@ -1,265 +1,221 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FB6222576;
-	Fri, 25 Apr 2025 11:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3E31DE3DF
+	for <kvmarm@lists.linux.dev>; Fri, 25 Apr 2025 17:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745579323; cv=none; b=nw3dcXOLiJflRIOPQbn5lDAjKt1Mzq4vjrNvB4rObRlgIsesPY2mqbKT4IUPjtyYRTIgjkpQV4eFiBWQpw1hJofehb1ezmR3F75j2xum7rdqN7ZCJtGXAaRs/1bBe8MkDKeUHv3BMPkfN5nAgrEUSaPWCaRa+0Ufmvg3zmCHj20=
+	t=1745602270; cv=none; b=Ll+jWy6izu0iy+/XTFJRyNxf/PCQGDVZRqR60QFioWWteP5CoTPS33gL1aa9N1w+83WmV2Ap2fmuQfqO4ACjL9Hc8oiQY1bCaE6RPNwPLpj6C9VeVJ7cJv5wbIPECbC+/VnS0XBBmBa4dYAtrPmNdlOfzUXumwSa1fM4Ex2V4ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745579323; c=relaxed/simple;
-	bh=m9oQt6VPLAxFVRIMYXwsR6soKz0BMud64V+MX8cIpw0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QYDMChqgihRhgtfp6tunpIIWS0a076emubwB+LuV4yqzwlcTVbrky1xCv/9NNO/Sner8dHIhsH3nbECoOsb8/NbiW6019szySNf6KPQMYcZgnI12rxOWHFEABUWVmTS9KDC46UyYONM3Ywg7AGkrkioZ+ylcJqoyxEmDuTaVN3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87BC9106F;
-	Fri, 25 Apr 2025 04:08:35 -0700 (PDT)
-Received: from [10.57.45.160] (unknown [10.57.45.160])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 709853F59E;
-	Fri, 25 Apr 2025 04:08:37 -0700 (PDT)
-Message-ID: <d582f30d-4d30-4ca0-992b-6bf7d8f7da83@arm.com>
-Date: Fri, 25 Apr 2025 12:08:36 +0100
+	s=arc-20240116; t=1745602270; c=relaxed/simple;
+	bh=3NbOv3sHZFPKjvpBXeb+EJZGD1o21jNZN64WdCPPvks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BJmoRNKbC+m1P8ZMgrnBYAsVsh7uA7aig6PPIkCWoOovCg81PevOYgrlJtHDOGlRb5P5lG4Yv4Dym0ajwnV7SlL5Ok/FPqS5GncgmiTkcHKCV0oQkAtaPS0g1RRhGz8UiQ5FGjykKLkgXXINNoUtSAey3p5dg+i28VJoRYD1lms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pqgR+DqX; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pqgR+DqX"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43ef83a6bfaso2335e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 25 Apr 2025 10:31:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745602266; x=1746207066; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JFiaMWMIJ6jFGDzd2ejMDb6Y0fvSj84EWSVaMESBeFo=;
+        b=pqgR+DqXYI8Q2BJIsojouuV366c/sJ22cr93oMQbcb/Lxoa3xq+4MRVO5UXarQs61i
+         H2vD71TJ32RzOuUJplNUdPykmsSjuQcFJYicvmGdOqjMBImVDyMTdosEB7A+Ii7usqyH
+         r0RihSvjJBhPf2miNXZAFVgtxTr4JmHXAFFlTnrNVIdq5VeEI0eTPC1IbTt/3npFVpQ7
+         0HdqkTC3JLTVYL1zLnbYkaoLuteXVNwVrdhEYOTUrLV/bCSwJvH4TW/YAaXOOsR4bGOZ
+         Kv45nORZSqcPnnkSkinVoYyJRFQzAcLyZ97y3zYfosV923cOZAqhQlDaMkHKPoW4i9qf
+         DjBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745602266; x=1746207066;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JFiaMWMIJ6jFGDzd2ejMDb6Y0fvSj84EWSVaMESBeFo=;
+        b=QuK9rcuvOILR7E/CCF33+8fZdyHJaxWrMaI7mhZx4WBJTsgxKh5OqkPRaYUZQ5jvfx
+         a37EcKBrDIPz3umU6G+sDu06cINrOWmLXEvueUs5I+tqeanxtp0bXXnRxq8HJc7/nV6M
+         SAaDeWm+e+Kok+5hjyU/bSTEDdlkWP6SQdZmORkVBbQTp9FHkoT54feCsTdvVBp75WtW
+         K+tNn6Yz3quqKf7dLtYjA9YgoY48s67pgkiFOhvXK+mL0j3m8ND+h5tHBdvdc2u62AXH
+         Q3i+NA/MVbCdiUBIEmWSsoIBklXqTXjJ4wq4gIv4AKmkbit4nIpCkoU0VIICWmsC4X+5
+         493A==
+X-Gm-Message-State: AOJu0YzTsYgRbGn9QJKnvAwdNwSai+K2GG0vgW83SjonAwebK8BYLkGP
+	Ryv9tk4aSw/Enzh6JRcaS6U+P75jdQZxmkTxuX7x4FX0VzGyrG5gvOuY7ygfmQ==
+X-Gm-Gg: ASbGncuRj+d7GNAfj/WxSwywmLwtst72rfBkUTs7+jLmdkuEq19+cTxk8Gt9G1X+u8m
+	atNOKtiZpY06zI+u3+uR9uYpwb5R2T/AlZVxILYY8A17wNNE31em/4UsQSpJpOiYo2nlKEVvEwD
+	714pAYVu7ruJZrrM5GFE7abDbww5d+aAu/4jpjhGn5rP6svLVlFH9kD36v8bKInnRIeg+4y+iVX
+	dUtz3c+YjQL4bdC1JIoex9MIbX+KKdJzgU8NF6T8g8wG9X/ID4qac7bBmoy3IfwKGpk92X9vz2E
+	ySsL36bleOpvghyxoPndvdwHG5TZUxM1QolpAx5qgfTXm3b6VXYWwUWwXmid6CnBip0vMWKCgpH
+	i8oc=
+X-Google-Smtp-Source: AGHT+IEVDVRVuX4opsIX/vqCZ4daSuCP6celTChiSDGf34K1DZrofUU6naynvnVCdNa987Qdas1bbg==
+X-Received: by 2002:a05:600c:1c8b:b0:439:8f59:2c56 with SMTP id 5b1f17b1804b1-440abc6d38bmr9835e9.2.1745602266145;
+        Fri, 25 Apr 2025 10:31:06 -0700 (PDT)
+Received: from google.com (202.88.205.35.bc.googleusercontent.com. [35.205.88.202])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4409d2dfc2fsm62434785e9.33.2025.04.25.10.31.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 10:31:05 -0700 (PDT)
+Date: Fri, 25 Apr 2025 17:30:57 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Kees Cook <kees@kernel.org>
+Cc: kvmarm@lists.linux.dev, kasan-dev@googlegroups.com,
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	will@kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+	broonie@kernel.org, catalin.marinas@arm.com, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, elver@google.com,
+	andreyknvl@gmail.com, ryabinin.a.a@gmail.com,
+	akpm@linux-foundation.org, yuzenghui@huawei.com,
+	suzuki.poulose@arm.com, joey.gouly@arm.com, masahiroy@kernel.org,
+	nathan@kernel.org, nicolas.schier@linux.dev
+Subject: Re: [PATCH 3/4] KVM: arm64: Introduce CONFIG_UBSAN_KVM_EL2
+Message-ID: <aAvG0br0XT9BFZ6S@google.com>
+References: <20250416180440.231949-1-smostafa@google.com>
+ <20250416180440.231949-4-smostafa@google.com>
+ <202504161250.CC5C277A@keescook>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 05/43] arm64: RME: Check for RME support at KVM init
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-6-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250416134208.383984-6-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202504161250.CC5C277A@keescook>
 
-On 16/04/2025 14:41, Steven Price wrote:
-> Query the RMI version number and check if it is a compatible version. A
-> static key is also provided to signal that a supported RMM is available.
+On Wed, Apr 16, 2025 at 12:54:21PM -0700, Kees Cook wrote:
+> On Wed, Apr 16, 2025 at 06:04:33PM +0000, Mostafa Saleh wrote:
+> > Add a new Kconfig CONFIG_UBSAN_KVM_EL2 for KVM which enables
+> > UBSAN for EL2 code (in protected/nvhe/hvhe) modes.
+> > This will re-use the same checks enabled for the kernel for
+> > the hypervisor. The only difference is that for EL2 it always
+> > emits a "brk" instead of implementing hooks as the hypervisor
+> > can't print reports.
+> > 
+> > The KVM code will re-use the same code for the kernel
+> > "report_ubsan_failure()" so #ifdefs are changed to also have this
+> > code for CONFIG_UBSAN_KVM_EL2
+> > 
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/Makefile | 6 ++++++
+> >  include/linux/ubsan.h            | 2 +-
+> >  lib/Kconfig.ubsan                | 9 +++++++++
+> >  lib/ubsan.c                      | 6 ++++--
+> >  scripts/Makefile.ubsan           | 5 ++++-
+> >  5 files changed, 24 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> > index b43426a493df..cbe7e12752bc 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> > @@ -99,3 +99,9 @@ KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAG
+> >  # causes a build failure. Remove profile optimization flags.
+> >  KBUILD_CFLAGS := $(filter-out -fprofile-sample-use=% -fprofile-use=%, $(KBUILD_CFLAGS))
+> >  KBUILD_CFLAGS += -fno-asynchronous-unwind-tables -fno-unwind-tables
+> > +
+> > +ifeq ($(CONFIG_UBSAN_KVM_EL2),y)
+> > +UBSAN_SANITIZE := y
+> > +# Always use brk and not hooks
+> > +ccflags-y += $(CFLAGS_UBSAN_FOR_TRAP)
+> > +endif
+> > diff --git a/include/linux/ubsan.h b/include/linux/ubsan.h
+> > index c843816f5f68..3ab8d38aedb8 100644
+> > --- a/include/linux/ubsan.h
+> > +++ b/include/linux/ubsan.h
+> > @@ -2,7 +2,7 @@
+> >  #ifndef _LINUX_UBSAN_H
+> >  #define _LINUX_UBSAN_H
+> >  
+> > -#ifdef CONFIG_UBSAN_TRAP
+> > +#if defined(CONFIG_UBSAN_TRAP) || defined(CONFIG_UBSAN_KVM_EL2)
+> >  const char *report_ubsan_failure(u32 check_type);
+> >  #else
+> >  static inline const char *report_ubsan_failure(u32 check_type)
+> > diff --git a/lib/Kconfig.ubsan b/lib/Kconfig.ubsan
+> > index 4216b3a4ff21..3878858eb473 100644
+> > --- a/lib/Kconfig.ubsan
+> > +++ b/lib/Kconfig.ubsan
+> > @@ -166,4 +166,13 @@ config TEST_UBSAN
+> >  	  This is a test module for UBSAN.
+> >  	  It triggers various undefined behavior, and detect it.
+> >  
+> > +config UBSAN_KVM_EL2
+> > +	bool "UBSAN for KVM code at EL2"
+> > +	depends on ARM64
+> > +	help
+> > +	  Enable UBSAN when running on ARM64 with KVM in a split mode
+> > +	  (nvhe/hvhe/protected) for the hypervisor code running in EL2.
+> > +	  In this mode, any UBSAN violation in EL2 would panic the kernel
+> > +	  and information similar to UBSAN_TRAP would be printed.
+> > +
+> >  endif	# if UBSAN
+> > diff --git a/lib/ubsan.c b/lib/ubsan.c
+> > index 17993727fc96..a6ca235dd714 100644
+> > --- a/lib/ubsan.c
+> > +++ b/lib/ubsan.c
+> > @@ -19,7 +19,7 @@
+> >  
+> >  #include "ubsan.h"
+> >  
+> > -#ifdef CONFIG_UBSAN_TRAP
+> > +#if defined(CONFIG_UBSAN_TRAP) || defined(CONFIG_UBSAN_KVM_EL2)
+> >  /*
+> >   * Only include matches for UBSAN checks that are actually compiled in.
+> >   * The mappings of struct SanitizerKind (the -fsanitize=xxx args) to
+> > @@ -97,7 +97,9 @@ const char *report_ubsan_failure(u32 check_type)
+> >  	}
+> >  }
+> >  
+> > -#else
+> > +#endif
+> > +
+> > +#ifndef CONFIG_UBSAN_TRAP
+> >  static const char * const type_check_kinds[] = {
+> >  	"load of",
+> >  	"store to",
+> > diff --git a/scripts/Makefile.ubsan b/scripts/Makefile.ubsan
+> > index 9e35198edbf0..68af6830af0f 100644
+> > --- a/scripts/Makefile.ubsan
+> > +++ b/scripts/Makefile.ubsan
+> > @@ -1,5 +1,8 @@
+> >  # SPDX-License-Identifier: GPL-2.0
+> >  
+> > +#Shared with KVM/arm64
 > 
-> Functions are provided to query if a VM or VCPU is a realm (or rec)
-> which currently will always return false.
+> Nitpick: Please add a space between "#" and "Shared", and end the line
+> with "."
+
+I will fix it in v2.
+
 > 
-> Later patches make use of struct realm and the states as the ioctls
-> interfaces are added to support realm and REC creation and destruction.
+> > +export CFLAGS_UBSAN_FOR_TRAP := $(call cc-option,-fsanitize-trap=undefined,-fsanitize-undefined-trap-on-error)
+> > +
+> >  # Enable available and selected UBSAN features.
+> >  ubsan-cflags-$(CONFIG_UBSAN_ALIGNMENT)		+= -fsanitize=alignment
+> >  ubsan-cflags-$(CONFIG_UBSAN_BOUNDS_STRICT)	+= -fsanitize=bounds-strict
+> > @@ -10,7 +13,7 @@ ubsan-cflags-$(CONFIG_UBSAN_DIV_ZERO)		+= -fsanitize=integer-divide-by-zero
+> >  ubsan-cflags-$(CONFIG_UBSAN_UNREACHABLE)	+= -fsanitize=unreachable
+> >  ubsan-cflags-$(CONFIG_UBSAN_BOOL)		+= -fsanitize=bool
+> >  ubsan-cflags-$(CONFIG_UBSAN_ENUM)		+= -fsanitize=enum
+> > -ubsan-cflags-$(CONFIG_UBSAN_TRAP)		+= $(call cc-option,-fsanitize-trap=undefined,-fsanitize-undefined-trap-on-error)
+> > +ubsan-cflags-$(CONFIG_UBSAN_TRAP)		+= $(CFLAGS_UBSAN_FOR_TRAP)
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> ---
-> Changes since v6:
->   * Improved message for an unsupported RMI ABI version.
-> Changes since v5:
->   * Reword "unsupported" message from "host supports" to "we want" to
->     clarify that 'we' are the 'host'.
-> Changes since v2:
->   * Drop return value from kvm_init_rme(), it was always 0.
->   * Rely on the RMM return value to identify whether the RSI ABI is
->     compatible.
-> ---
->   arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->   arch/arm64/include/asm/kvm_host.h    |  4 ++
->   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->   arch/arm64/include/asm/virt.h        |  1 +
->   arch/arm64/kvm/Makefile              |  3 +-
->   arch/arm64/kvm/arm.c                 |  6 +++
->   arch/arm64/kvm/rme.c                 | 56 ++++++++++++++++++++++++++++
->   7 files changed, 143 insertions(+), 1 deletion(-)
->   create mode 100644 arch/arm64/include/asm/kvm_rme.h
->   create mode 100644 arch/arm64/kvm/rme.c
+> Another minor style request: please name this "CFLAGS_UBSAN_TRAP"
+> (nothing else in Kconfig uses "FOR" like this, and leaving it off sounds
+> more declarative).
+I will fix it also in v2.
+
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index d7cf66573aca..1c43a4fc25dd 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -686,4 +686,22 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->   			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
->   	}
->   }
-> +
-> +static inline bool kvm_is_realm(struct kvm *kvm)
-> +{
-> +	if (static_branch_unlikely(&kvm_rme_is_available) && kvm)
-> +		return kvm->arch.is_realm;
-> +	return false;
-> +}
-> +
-> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
-> +{
-> +	return READ_ONCE(kvm->arch.realm.state);
-> +}
-> +
-> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
->   #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e98cfe7855a6..7bd81b86eab0 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -27,6 +27,7 @@
->   #include <asm/fpsimd.h>
->   #include <asm/kvm.h>
->   #include <asm/kvm_asm.h>
-> +#include <asm/kvm_rme.h>
->   #include <asm/vncr_mapping.h>
->   
->   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -394,6 +395,9 @@ struct kvm_arch {
->   	 * the associated pKVM instance in the hypervisor.
->   	 */
->   	struct kvm_protected_vm pkvm;
-> +
-> +	bool is_realm;
-> +	struct realm realm;
->   };
->   
->   struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> new file mode 100644
-> index 000000000000..9c8a0b23e0e4
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -0,0 +1,56 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_KVM_RME_H
-> +#define __ASM_KVM_RME_H
-> +
-> +/**
-> + * enum realm_state - State of a Realm
-> + */
-> +enum realm_state {
-> +	/**
-> +	 * @REALM_STATE_NONE:
-> +	 *      Realm has not yet been created. rmi_realm_create() may be
-> +	 *      called to create the realm.
-> +	 */
-> +	REALM_STATE_NONE,
-> +	/**
-> +	 * @REALM_STATE_NEW:
-> +	 *      Realm is under construction, not eligible for execution. Pages
-> +	 *      may be populated with rmi_data_create().
-> +	 */
-> +	REALM_STATE_NEW,
-> +	/**
-> +	 * @REALM_STATE_ACTIVE:
-> +	 *      Realm has been created and is eligible for execution with
-> +	 *      rmi_rec_enter(). Pages may no longer be populated with
-> +	 *      rmi_data_create().
-> +	 */
-> +	REALM_STATE_ACTIVE,
-> +	/**
-> +	 * @REALM_STATE_DYING:
-> +	 *      Realm is in the process of being destroyed or has already been
-> +	 *      destroyed.
-> +	 */
-> +	REALM_STATE_DYING,
-> +	/**
-> +	 * @REALM_STATE_DEAD:
-> +	 *      Realm has been destroyed.
-> +	 */
-> +	REALM_STATE_DEAD
-> +};
-> +
-> +/**
-> + * struct realm - Additional per VM data for a Realm
-> + *
-> + * @state: The lifetime state machine for the realm
-> + */
-> +struct realm {
-> +	enum realm_state state;
-> +};
-> +
-> +void kvm_init_rme(void);
-> +
-> +#endif /* __ASM_KVM_RME_H */
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index ebf4a9f943ed..e45d47156dcf 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -81,6 +81,7 @@ void __hyp_reset_vectors(void);
->   bool is_kvm_arm_initialised(void);
->   
->   DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-> +DECLARE_STATIC_KEY_FALSE(kvm_rme_is_available);
->   
->   static inline bool is_pkvm_initialized(void)
->   {
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 209bc76263f1..2ebc66812d49 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -23,7 +23,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->   	 vgic/vgic-v3.o vgic/vgic-v4.o \
->   	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
->   	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
-> -	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o
-> +	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
-> +	 rme.o
->   
->   kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->   kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 68fec8c95fee..856a721d41ac 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -40,6 +40,7 @@
->   #include <asm/kvm_nested.h>
->   #include <asm/kvm_pkvm.h>
->   #include <asm/kvm_ptrauth.h>
-> +#include <asm/kvm_rme.h>
->   #include <asm/sections.h>
->   
->   #include <kvm/arm_hypercalls.h>
-> @@ -59,6 +60,8 @@ enum kvm_wfx_trap_policy {
->   static enum kvm_wfx_trap_policy kvm_wfi_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
->   static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
->   
-> +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
-> +
->   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->   
->   DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
-> @@ -2819,6 +2822,9 @@ static __init int kvm_arm_init(void)
->   
->   	in_hyp_mode = is_kernel_in_hyp_mode();
->   
-> +	if (in_hyp_mode)
-> +		kvm_init_rme();
-> +
+> >  
+> >  export CFLAGS_UBSAN := $(ubsan-cflags-y)
+> 
+> Otherwise, yes, looks good.
+> 
+> -- 
+> Kees Cook
 
-minor nit:
-
-I wondering if this check is necessary. If the host is running under a
-a hypervisor, it could relay the calls to the RMM. Nothing urgent, but
-it is a possibility. It doesn't matter to the host as such. The
-Realm Guest will do its own verification and the host can ignore
-what lies beneath ?
-
-
-Either ways,
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-
+Thanks,
+Mostafa
