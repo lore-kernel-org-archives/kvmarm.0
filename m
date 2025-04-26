@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241D2253953;
-	Sat, 26 Apr 2025 12:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A1225395A;
+	Sat, 26 Apr 2025 12:28:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745670538; cv=none; b=M9YHtRtBl9eA7ObBZCzoHZjVvEVSaRZgJNeGtitNWgPlKP06FsHrUpjeestlyyc8VtDWZ0OQJGIEfNv2Aa+MqX8r3S9zPap8dLn41JmjOr1LLClMqNx+3NwmLs7RwPao8kdPwCwEHBPQgtI29vKtHVQwLZ+tWUhtaFSmM+SiqHc=
+	t=1745670538; cv=none; b=G3y2rQz12/Ka0EpgiDuctFCYHfS+TNGLm+AFMpNaNNP1vtM9nCiLuK6Tre3akOW9dxP8lEx7sbRfB81Yb5xjgaCl0WGOHUv5jALaO8h/sUyRSyr/f71YMpG5LUhg63wigIQw8LIbj/KgWAHlk8yh3E/SOa5+UNVoXPy7nz5fiWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745670538; c=relaxed/simple;
-	bh=QlIqmV68xTmqg1xztLJcaMauQklC0Pa/jGY/+EYEyfM=;
+	bh=Km4EjVUT40EFJbHRra7EMmpseWaDO7Z/XE3tgQGPtck=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gtnFN7/0Znl4VhT0NCf9CKXttx//rhLCBdI4vei3OwKmelCTlp7s32emuf5oXTbk/3EUUsXMAsCwwm6NSX7C1HlGmxfLhyhSiSXUafWztUH81hDfIc0ew0QFUv6kfiZrLjVR5dg+DFziuPY1Vqy6a7C7ET/rDi/u9jsj1p78RK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfxP2y5b; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=CdYnJusxPilJkDeiyd/syeQxL/EO0BmbDyklo9SA0cB2/8bbR0WmgdAdOvtkLMDBDquI3nCgATIgMfpjKBcSzJPe2aC2b6hHMs/ZLsJ+MjNEggaDWJaOGhldgw9+vFKMc87LBMVbnxV3lWSKCLZwWERMV++1khfcgp+9tCLk84k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CzwzUfrN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfxP2y5b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85AA0C4CEEA;
-	Sat, 26 Apr 2025 12:28:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CzwzUfrN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ECF4C4CEE2;
+	Sat, 26 Apr 2025 12:28:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745670537;
-	bh=QlIqmV68xTmqg1xztLJcaMauQklC0Pa/jGY/+EYEyfM=;
+	s=k20201202; t=1745670538;
+	bh=Km4EjVUT40EFJbHRra7EMmpseWaDO7Z/XE3tgQGPtck=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hfxP2y5bk92GbwEUSqGikFVOEomKuhlcpYgk0Zgm6zcRS9G5UkEJuIbRUU73wN+SS
-	 71GmKzjmVTRlP7qySoNWSvOP50E6soE6JW7rh9NpVCeLOHTvNtYNzUjq35Ieq4j7fP
-	 HAgKHJNVkcpVDtEVJ3qtO72Fcq+5h2+kd9FMNrr/d7/YVPbtW3u6Gt6w1Z21ZdrFNW
-	 Drxndu81hLgICs7XBt1F7LWwUQFswfIOUs1HYo8r2rKqe5DI82EKFMYYsDr/aSsqUX
-	 cMAKEQ4c/kIdITATEYhpUW6ZuYi4HWrLeF9TUJYg7DcVPTrjrxJ8qZzf9Cl11pvp/q
-	 9hIZveazPb9xg==
+	b=CzwzUfrNLKI8KvzHp5POMcdCiDVNuIrQTfAnQHHQQhq4dr1PfZiXAVVPZAkMX53rp
+	 7jwwjx1YyOwJZxL/Lxncy3tXA38GzIewrZX4YNE13KQcG4YkB/MQgjaZHYdvR8UJQG
+	 vLg55pnXqJeOFm+QtTZUkVm4Qqw0FzuTmN+KYQjl3FJJq3q4dUeXiSbC55ocEBCVNc
+	 NQH014y+x1HqWh4Y2gcJAFRmUcL7Fs8em3UkX770+qS8DrgM27qPfa/XdmNUxVqras
+	 hZNkDOpdEyAXz1jsQdsc9irhF+tIgL7k/jtEaObUi2rdTHFNJFK2bsUNCbk2WGXHCO
+	 NnmQdlIcKWG6g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u8eeN-0092VH-LT;
-	Sat, 26 Apr 2025 13:28:55 +0100
+	id 1u8eeO-0092VH-8y;
+	Sat, 26 Apr 2025 13:28:56 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -44,9 +44,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 25/42] KVM: arm64: Propagate FGT masks to the nVHE hypervisor
-Date: Sat, 26 Apr 2025 13:28:19 +0100
-Message-Id: <20250426122836.3341523-26-maz@kernel.org>
+Subject: [PATCH v3 27/42] KVM: arm64: Remove hand-crafted masks for FGT registers
+Date: Sat, 26 Apr 2025 13:28:21 +0100
+Message-Id: <20250426122836.3341523-28-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250426122836.3341523-1-maz@kernel.org>
 References: <20250426122836.3341523-1-maz@kernel.org>
@@ -62,71 +62,111 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The nVHE hypervisor needs to have access to its own view of the FGT
-masks, which unfortunately results in a bit of data duplication.
+These masks are now useless, and can be removed.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 7 +++++++
- arch/arm64/kvm/arm.c              | 8 ++++++++
- arch/arm64/kvm/hyp/nvhe/switch.c  | 7 +++++++
- 3 files changed, 22 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h        | 49 +------------------------
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 19 ----------
+ 2 files changed, 1 insertion(+), 67 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 95fedd27f4bb8..9e5164fad0dbc 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -621,6 +621,13 @@ extern struct fgt_masks hdfgrtr_masks;
- extern struct fgt_masks hdfgwtr_masks;
- extern struct fgt_masks hafgrtr_masks;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 43a630b940bfb..e7c73d16cd451 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -315,54 +315,7 @@
+ 				 GENMASK(19, 18) |	\
+ 				 GENMASK(15, 0))
  
-+extern struct fgt_masks kvm_nvhe_sym(hfgrtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hfgwtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hfgitr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hdfgrtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hdfgwtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hafgrtr_masks);
-+
- struct kvm_cpu_context {
- 	struct user_pt_regs regs;	/* sp = sp_el0 */
+-/*
+- * FGT register definitions
+- *
+- * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
+- * We're not using the generated masks as they are usually ahead of
+- * the published ARM ARM, which we use as a reference.
+- *
+- * Once we get to a point where the two describe the same thing, we'll
+- * merge the definitions. One day.
+- */
+-#define __HFGRTR_EL2_RES0	HFGRTR_EL2_RES0
+-#define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+-#define __HFGRTR_EL2_nMASK	~(__HFGRTR_EL2_RES0 | __HFGRTR_EL2_MASK)
+-
+-/*
+- * The HFGWTR bits are a subset of HFGRTR bits. To ensure we don't miss any
+- * future additions, define __HFGWTR* macros relative to __HFGRTR* ones.
+- */
+-#define __HFGRTR_ONLY_MASK	(BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+-				 GENMASK(26, 25) | BIT(21) | BIT(18) | \
+-				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+-#define __HFGWTR_EL2_RES0	HFGWTR_EL2_RES0
+-#define __HFGWTR_EL2_MASK	(__HFGRTR_EL2_MASK & ~__HFGRTR_ONLY_MASK)
+-#define __HFGWTR_EL2_nMASK	~(__HFGWTR_EL2_RES0 | __HFGWTR_EL2_MASK)
+-
+-#define __HFGITR_EL2_RES0	HFGITR_EL2_RES0
+-#define __HFGITR_EL2_MASK	(BIT(62) | BIT(60) | GENMASK(54, 0))
+-#define __HFGITR_EL2_nMASK	~(__HFGITR_EL2_RES0 | __HFGITR_EL2_MASK)
+-
+-#define __HDFGRTR_EL2_RES0	HDFGRTR_EL2_RES0
+-#define __HDFGRTR_EL2_MASK	(BIT(63) | GENMASK(58, 50) | GENMASK(48, 43) | \
+-				 GENMASK(41, 40) | GENMASK(37, 22) | \
+-				 GENMASK(19, 9) | GENMASK(7, 0))
+-#define __HDFGRTR_EL2_nMASK	~(__HDFGRTR_EL2_RES0 | __HDFGRTR_EL2_MASK)
+-
+-#define __HDFGWTR_EL2_RES0	HDFGWTR_EL2_RES0
+-#define __HDFGWTR_EL2_MASK	(GENMASK(57, 52) | GENMASK(50, 48) | \
+-				 GENMASK(46, 44) | GENMASK(42, 41) | \
+-				 GENMASK(37, 35) | GENMASK(33, 31) | \
+-				 GENMASK(29, 23) | GENMASK(21, 10) | \
+-				 GENMASK(8, 7) | GENMASK(5, 0))
+-#define __HDFGWTR_EL2_nMASK	~(__HDFGWTR_EL2_RES0 | __HDFGWTR_EL2_MASK)
+-
+-#define __HAFGRTR_EL2_RES0	HAFGRTR_EL2_RES0
+-#define __HAFGRTR_EL2_MASK	(GENMASK(49, 17) | GENMASK(4, 0))
+-#define __HAFGRTR_EL2_nMASK	~(__HAFGRTR_EL2_RES0 | __HAFGRTR_EL2_MASK)
+-
+-/* Similar definitions for HCRX_EL2 */
++/* Polarity masks for HCRX_EL2 */
+ #define __HCRX_EL2_RES0         HCRX_EL2_RES0
+ #define __HCRX_EL2_MASK		(BIT(6))
+ #define __HCRX_EL2_nMASK	~(__HCRX_EL2_RES0 | __HCRX_EL2_MASK)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e8645375499df..0d61ec3e907d4 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -156,17 +156,6 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ #define update_fgt_traps(hctxt, vcpu, kvm, reg)		\
+ 	update_fgt_traps_cs(hctxt, vcpu, kvm, reg, 0, 0)
  
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 68fec8c95feef..8951e8693ca7b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2450,6 +2450,14 @@ static void kvm_hyp_init_symbols(void)
- 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
- 	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+-/*
+- * Validate the fine grain trap masks.
+- * Check that the masks do not overlap and that all bits are accounted for.
+- */
+-#define CHECK_FGT_MASKS(reg)							\
+-	do {									\
+-		BUILD_BUG_ON((__ ## reg ## _MASK) & (__ ## reg ## _nMASK));	\
+-		BUILD_BUG_ON(~((__ ## reg ## _RES0) ^ (__ ## reg ## _MASK) ^	\
+-			       (__ ## reg ## _nMASK)));				\
+-	} while(0)
+-
+ static inline bool cpu_has_amu(void)
+ {
+        u64 pfr0 = read_sysreg_s(SYS_ID_AA64PFR0_EL1);
+@@ -180,14 +169,6 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+ 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
  
-+	/* Propagate the FGT state to the the nVHE side */
-+	kvm_nvhe_sym(hfgrtr_masks)  = hfgrtr_masks;
-+	kvm_nvhe_sym(hfgwtr_masks)  = hfgwtr_masks;
-+	kvm_nvhe_sym(hfgitr_masks)  = hfgitr_masks;
-+	kvm_nvhe_sym(hdfgrtr_masks) = hdfgrtr_masks;
-+	kvm_nvhe_sym(hdfgwtr_masks) = hdfgwtr_masks;
-+	kvm_nvhe_sym(hafgrtr_masks) = hafgrtr_masks;
-+
- 	/*
- 	 * Flush entire BSS since part of its data containing init symbols is read
- 	 * while the MMU is off.
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 7d2ba6ef02618..ae55d6d87e3d2 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -33,6 +33,13 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
- DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+-	CHECK_FGT_MASKS(HFGRTR_EL2);
+-	CHECK_FGT_MASKS(HFGWTR_EL2);
+-	CHECK_FGT_MASKS(HFGITR_EL2);
+-	CHECK_FGT_MASKS(HDFGRTR_EL2);
+-	CHECK_FGT_MASKS(HDFGWTR_EL2);
+-	CHECK_FGT_MASKS(HAFGRTR_EL2);
+-	CHECK_FGT_MASKS(HCRX_EL2);
+-
+ 	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+ 		return;
  
-+struct fgt_masks hfgrtr_masks;
-+struct fgt_masks hfgwtr_masks;
-+struct fgt_masks hfgitr_masks;
-+struct fgt_masks hdfgrtr_masks;
-+struct fgt_masks hdfgwtr_masks;
-+struct fgt_masks hafgrtr_masks;
-+
- extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
- 
- static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
 -- 
 2.39.2
 
