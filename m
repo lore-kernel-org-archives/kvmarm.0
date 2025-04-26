@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFF7253349;
-	Sat, 26 Apr 2025 12:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593C3253923;
+	Sat, 26 Apr 2025 12:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745670537; cv=none; b=VjQAadRLwRRYjLYIMoefgIoaSMoO2KSCsp/cLB91a/BSbt+h7BzuhJKEE/nY5u67TsXMLgOQEiMQ1Yki5Z59EA9XOV+pM5tCBc52rwHvmID5gAO53DHirSFww7ZbvHjITcb+0qSOajajGDQkwfeCJuS1fFinvKfWoaLN+xsUOX0=
+	t=1745670537; cv=none; b=dD8ZuMlazn0M8gbYVKWjdeMFMMg5yEqBfQrnk5NpTS+upMdPvglahhrUDlQOvrUIr1eK+9n0pk4+GxwT9HFHy+xfxhhHnPSKXPdP/v3Ksea+arrgmF3phx921k9z7lnORO84ha2klPgVUVsmgnwQ37PzYa0v+8Y3163U5/J9RnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745670537; c=relaxed/simple;
-	bh=xw/w3V9CUbh6dadR2+rCO1kqsM8ZOa8PQNMsMiGppFE=;
+	bh=Y0zjLJEGkJrxaxp4SDctGpq7uyiWPRxobc1+3u1ZYhU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HfNMCEewPbK5QxEESchgiEhSI7lcanvkLkuy3HewvIQrivHVaUHzgJ7gOp747AwK5M3nyu9PM41F7KzELrmRQwxmMQBGaw12S5QaC8xCIybtdAyipanqkw8MkOOfdmVidjJ39IpKDNfHCGUOcnkAriCTg4MyDnhPa/d/vMVPc20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JRpgkOkw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VkG+rHeyxn5oDPQfE7S5XcLIk2tX4b5CLJKnk1oD9m8nMYTfBIk/hAlSRKwc4vHtQalYiN7GqqBrLYfxtNMjeE43ExQw692DlVboZMn/IXkKBQsUKhJsJeVf5tGEJVmK4CU5SuFWwC65tScW1DSbNPS1shJxPUd2+fgU4aGf5nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QjeXx1Q8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JRpgkOkw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9278EC4CEED;
-	Sat, 26 Apr 2025 12:28:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QjeXx1Q8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 340A1C4CEEB;
+	Sat, 26 Apr 2025 12:28:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745670536;
-	bh=xw/w3V9CUbh6dadR2+rCO1kqsM8ZOa8PQNMsMiGppFE=;
+	s=k20201202; t=1745670537;
+	bh=Y0zjLJEGkJrxaxp4SDctGpq7uyiWPRxobc1+3u1ZYhU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JRpgkOkwa0G3MtcA04KBNChL9Wj4yXTYAF8cJsTKZ+v6VGeKNW6V5f63aAoFVgydv
-	 cbV0nVMQZuaIHPa7W5fxFUF3iAjD77Pxypzp/ubtEpxHU2Bf3+L2DmOnKEqhmZLvdP
-	 u/Z+JWA/fj/gp5LoM7t6jIK/gW2ZuQVZqVJlajmLE7+0f1AE/CaB0KwpEQ4KAcl6h1
-	 0EGDV+aJzJD+Wdn5zCsiSkdALtbeJ8GR2sL0jbAfwD2QD+lOWl8pmCmx81IxDp97mL
-	 lMZhSHZg3WraLcAzaXT0gHINh0mDR86JqJazboqvcMbJMHmioiETUn8X1DvCoWxtug
-	 hKXVmypKEn/9w==
+	b=QjeXx1Q8/ckRjMoCiN4L0KbD/3DlX+pDmuFjPRAIpjtZAyDdm5VztU4DAmLJwb6n4
+	 Wj7+nA8Q5mqfMx1X1tv6oJXFSjzSeC4udfOIoS7I7BvMa+ozTlwjOim6YeVRHwpmsD
+	 Q9mIgyiXLoxDhGpC1xJtJRAID3YNXampBiHnwYwWL2IAIMaD3CM7DH8TD3QQPP0+oT
+	 BBN+r2pSO24PBuxLqC2zXfKKAUu2i9i+9vlSTiDBdrmlH4OrkFs9ZOEBfx37ChaT/5
+	 NUTiV8RpsSePeto5wo5txwp4tMkYwulaHjJEJumfN8HiPC4Z1p0JPPzYQuHEjsHrnG
+	 0WXFMHGv9iCwA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u8eeM-0092VH-Nt;
-	Sat, 26 Apr 2025 13:28:54 +0100
+	id 1u8eeN-0092VH-BX;
+	Sat, 26 Apr 2025 13:28:55 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -44,9 +44,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 22/42] KVM: arm64: Add description of FGT bits leading to EC!=0x18
-Date: Sat, 26 Apr 2025 13:28:16 +0100
-Message-Id: <20250426122836.3341523-23-maz@kernel.org>
+Subject: [PATCH v3 24/42] KVM: arm64: Unconditionally configure fine-grain traps
+Date: Sat, 26 Apr 2025 13:28:18 +0100
+Message-Id: <20250426122836.3341523-25-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250426122836.3341523-1-maz@kernel.org>
 References: <20250426122836.3341523-1-maz@kernel.org>
@@ -62,82 +62,94 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The current FTP tables are only concerned with the bits generating
-ESR_ELx.EC==0x18. However, we want an exhaustive view of what KVM
-really knows about.
+From: Mark Rutland <mark.rutland@arm.com>
 
-So let's add another small table that provides that extra information.
+... otherwise we can inherit the host configuration if this differs from
+the KVM configuration.
 
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+[maz: simplified a couple of things]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 36 +++++++++++++++++++++++++++------
- 1 file changed, 30 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 39 ++++++++++---------------
+ 1 file changed, 15 insertions(+), 24 deletions(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 528b33fcfcfd6..c30d970bf81cb 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -1279,16 +1279,21 @@ enum fg_filter_id {
- 	__NR_FG_FILTER_IDS__
- };
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 027d05f308f75..925a3288bd5be 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -107,7 +107,8 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
  
--#define SR_FGF(sr, g, b, p, f)					\
--	{							\
--		.encoding	= sr,				\
--		.end		= sr,				\
--		.tc		= {				\
-+#define __FGT(g, b, p, f)					\
-+		{						\
- 			.fgt = g ## _GROUP,			\
- 			.bit = g ## _EL2_ ## b ## _SHIFT,	\
- 			.pol = p,				\
- 			.fgf = f,				\
--		},						\
-+		}
-+
-+#define FGT(g, b, p)		__FGT(g, b, p, __NO_FGF__)
-+
-+#define SR_FGF(sr, g, b, p, f)					\
-+	{							\
-+		.encoding	= sr,				\
-+		.end		= sr,				\
-+		.tc		= __FGT(g, b, p, f),		\
- 		.line = __LINE__,				\
- 	}
+ #define update_fgt_traps_cs(hctxt, vcpu, kvm, reg, clr, set)		\
+ 	do {								\
+-		u64 c = 0, s = 0;					\
++		u64 c = clr, s = set;					\
++		u64 val;						\
+ 									\
+ 		ctxt_sys_reg(hctxt, reg) = read_sysreg_s(SYS_ ## reg);	\
+ 		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu))		\
+@@ -115,14 +116,10 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ 									\
+ 		compute_undef_clr_set(vcpu, kvm, reg, c, s);		\
+ 									\
+-		s |= set;						\
+-		c |= clr;						\
+-		if (c || s) {						\
+-			u64 val = __ ## reg ## _nMASK;			\
+-			val |= s;					\
+-			val &= ~c;					\
+-			write_sysreg_s(val, SYS_ ## reg);		\
+-		}							\
++		val = __ ## reg ## _nMASK;				\
++		val |= s;						\
++		val &= ~c;						\
++		write_sysreg_s(val, SYS_ ## reg);			\
+ 	} while(0)
  
-@@ -1989,6 +1994,18 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
- 	SR_FGT(SYS_AMEVCNTR0_EL0(0),	HAFGRTR, AMEVCNTR00_EL0, 1),
- };
+ #define update_fgt_traps(hctxt, vcpu, kvm, reg)		\
+@@ -175,33 +172,27 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ 		update_fgt_traps(hctxt, vcpu, kvm, HAFGRTR_EL2);
+ }
  
-+/*
-+ * Additional FGTs that do not fire with ESR_EL2.EC==0x18. This table
-+ * isn't used for exception routing, but only as a promise that the
-+ * trap is handled somewhere else.
-+ */
-+static const union trap_config non_0x18_fgt[] __initconst = {
-+	FGT(HFGITR, nGCSSTR_EL1, 0),
-+	FGT(HFGITR, SVC_EL1, 1),
-+	FGT(HFGITR, SVC_EL0, 1),
-+	FGT(HFGITR, ERET, 1),
-+};
-+
- static union trap_config get_trap_config(u32 sysreg)
+-#define __deactivate_fgt(htcxt, vcpu, kvm, reg)				\
++#define __deactivate_fgt(htcxt, vcpu, reg)				\
+ 	do {								\
+-		if ((vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) ||	\
+-		    kvm->arch.fgu[reg_to_fgt_group_id(reg)])		\
+-			write_sysreg_s(ctxt_sys_reg(hctxt, reg),	\
+-				       SYS_ ## reg);			\
++		write_sysreg_s(ctxt_sys_reg(hctxt, reg),		\
++			       SYS_ ## reg);				\
+ 	} while(0)
+ 
+ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
  {
- 	return (union trap_config) {
-@@ -2203,6 +2220,13 @@ int __init populate_nv_trap_config(void)
- 		}
- 	}
+ 	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+-	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
  
-+	for (int i = 0; i < ARRAY_SIZE(non_0x18_fgt); i++) {
-+		if (!aggregate_fgt(non_0x18_fgt[i])) {
-+			ret = -EINVAL;
-+			kvm_err("non_0x18_fgt[%d] is reserved\n", i);
-+		}
-+	}
-+
- 	ret = check_all_fgt_masks(ret);
+ 	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+ 		return;
  
- 	kvm_info("nv: %ld fine grained trap handlers\n",
+-	__deactivate_fgt(hctxt, vcpu, kvm, HFGRTR_EL2);
+-	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+-		write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
+-	else
+-		__deactivate_fgt(hctxt, vcpu, kvm, HFGWTR_EL2);
+-	__deactivate_fgt(hctxt, vcpu, kvm, HFGITR_EL2);
+-	__deactivate_fgt(hctxt, vcpu, kvm, HDFGRTR_EL2);
+-	__deactivate_fgt(hctxt, vcpu, kvm, HDFGWTR_EL2);
++	__deactivate_fgt(hctxt, vcpu, HFGRTR_EL2);
++	__deactivate_fgt(hctxt, vcpu, HFGWTR_EL2);
++	__deactivate_fgt(hctxt, vcpu, HFGITR_EL2);
++	__deactivate_fgt(hctxt, vcpu, HDFGRTR_EL2);
++	__deactivate_fgt(hctxt, vcpu, HDFGWTR_EL2);
+ 
+ 	if (cpu_has_amu())
+-		__deactivate_fgt(hctxt, vcpu, kvm, HAFGRTR_EL2);
++		__deactivate_fgt(hctxt, vcpu, HAFGRTR_EL2);
+ }
+ 
+ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
 -- 
 2.39.2
 
