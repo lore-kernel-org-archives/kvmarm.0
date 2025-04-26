@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2082550C4;
-	Sat, 26 Apr 2025 12:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C262550DD;
+	Sat, 26 Apr 2025 12:29:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745670542; cv=none; b=lJjI8K/oA2YzhBPZDQ4oJUYn5hchwLT2txeBg//c4c7JWNRUkt6UWq6aya8DxGVItLmUUZoDv2+hU3KUe2T+PYT/P4MkZboV/u1HvaVcya8ArY4sNnKfDoCFmekQkuZ+oCGOZzoLLfQsGtkOQKrbqpRuPAjp/UZXDvMmSoVoDTA=
+	t=1745670543; cv=none; b=i9MjjA7WapwoPpjVf1X79dGxJxNDNqVtKGSxB4/r5EsdPPnKzAxU4/XPRmYjsoCKiDWw2EBAce/WrfTJBqwmrQNeowBMXCNatiJWxRXlHmfa6GU5Px7PqhcjjuHrW+AS2mTB1/GA7oHTiAL5ZFooPOLCA+lsmT2MhNJGTQveHdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745670542; c=relaxed/simple;
-	bh=QWPORVigMPjVGmzrhyvKojgkT3qYbm/Pvcr+VvUdRPc=;
+	s=arc-20240116; t=1745670543; c=relaxed/simple;
+	bh=U0IcVwx7DI2PFPXqgbaLx9sOFJAOnAR9kyfbtx5vOZQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BLzrSw5EvWIwO8AmLiGMGculYN+PNyq9T7sMzPh6nsKFAXb1Uc8pox0gcb3uevLL53lHPGDTn7DemuKA1E9wLN6Fv3ApWTGVEX08LFphTpy+JT3/NM7Fdu51j+vi2pgfzqH8wL8rr3AIKsqZfNVxUCWjlBHe3WwKJPMkiZhy1xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lN/6k3cC; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=FqBhW4xdtA+1oyggkCzizCiTSNMuay+I/Cr7zFig8B2aPZ6HUU/pn7v778GCMTdksHmmlQoj8JEca/VIXg6cIeVLhL+KogofZ7o6kWODOrnioq+d/SyMJadNZBqrs9l1NyIYjgWtp9ZrfNS/l808oijU/6c5hhN/t4hqAmlrD6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JBAsu569; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lN/6k3cC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40665C4CEE2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JBAsu569"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E565BC4CEED;
 	Sat, 26 Apr 2025 12:29:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745670542;
-	bh=QWPORVigMPjVGmzrhyvKojgkT3qYbm/Pvcr+VvUdRPc=;
+	s=k20201202; t=1745670543;
+	bh=U0IcVwx7DI2PFPXqgbaLx9sOFJAOnAR9kyfbtx5vOZQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lN/6k3cCNNOOCL2VAR3bstMtrdEXrYuBBDl4jmgb70a5JbXHJJOsEwNcP53LeVHNk
-	 beNXRkIt4LkaX7oDBOQbYVNGxIjSmeiyNkx+X7CegnG0LpgY0HbGvYJ9OnE3xyCrGT
-	 LOmIHK0Kn2rXXz5qBYCq/+jaam+viYjqPyNWYMkiBuUJ0Chm2Ri/iT3+l1W6mxgexu
-	 gnpr/75HP7C3rVecg26XofRo7JtYyb9zk2hlKDDPCM6KRUQulObEb8CnK0rlSGo0VU
-	 CulJDijzCSy/OCzfUGyRJ74OQZJyTXg54m7qSMCHibPyaHliMlDdzDmBtG0WBlE/Rq
-	 bvidW7Kv6hTvg==
+	b=JBAsu569u8GkwsBFemGInbv3/S5nyd69v6PXGeVeVkak0TBu0A5e7pSxEH89TK2Qd
+	 M5OCO1OEftruULGVy7VTh2mGfwt53/9Lf4djvbnqV0061WLNKne57g78z7u3W44HEb
+	 q3ROoNmXw8OW6zUt5iTOq7js5cZCwL1sEWYTRoaAw/JfKk+btUk3AjDxCiiKNjoJ7E
+	 3vaVTkgWIVxfVbq5Bw6o7CZ1C2v4IVyNGCwg75pLHAwfVU4TYp5LUVxg+wifxWDl+w
+	 yd5yVkKiOm6Yda+TZxxplQIPnmfWsW84dozZ8sOscf1x0zuL3Q56orsgmKAIi/lgsu
+	 P8AMNrZ70bBzw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u8eeS-0092VH-9o;
-	Sat, 26 Apr 2025 13:29:00 +0100
+	id 1u8eeT-0092VH-1M;
+	Sat, 26 Apr 2025 13:29:01 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -44,9 +44,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 37/42] KVM: arm64: Add sanitisation for FEAT_FGT2 registers
-Date: Sat, 26 Apr 2025 13:28:31 +0100
-Message-Id: <20250426122836.3341523-38-maz@kernel.org>
+Subject: [PATCH v3 39/42] KVM: arm64: Add context-switch for FEAT_FGT2 registers
+Date: Sat, 26 Apr 2025 13:28:33 +0100
+Message-Id: <20250426122836.3341523-40-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250426122836.3341523-1-maz@kernel.org>
 References: <20250426122836.3341523-1-maz@kernel.org>
@@ -62,436 +62,91 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Just like the FEAT_FGT registers, treat the FGT2 variant the same
-way. THis is a large  update, but a fairly mechanical one.
-
-The config dependencies are extracted from the 2025-03 JSON drop.
+Just like the rest of the FGT registers, perform a switch of the
+FGT2 equivalent. This avoids the host configuration leaking into
+the guest...
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  15 +++
- arch/arm64/kvm/arm.c              |   5 +
- arch/arm64/kvm/config.c           | 194 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/emulate-nested.c   |  22 ++++
- arch/arm64/kvm/hyp/nvhe/switch.c  |   5 +
- arch/arm64/kvm/nested.c           |  16 +++
- arch/arm64/kvm/sys_regs.c         |   3 +
- 7 files changed, 260 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 44 +++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index abe45f97266c5..4e191c81f9aa1 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -279,6 +279,11 @@ enum fgt_group_id {
- 	HDFGWTR_GROUP = HDFGRTR_GROUP,
- 	HFGITR_GROUP,
- 	HAFGRTR_GROUP,
-+	HFGRTR2_GROUP,
-+	HFGWTR2_GROUP = HFGRTR2_GROUP,
-+	HDFGRTR2_GROUP,
-+	HDFGWTR2_GROUP = HDFGRTR2_GROUP,
-+	HFGITR2_GROUP,
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 0d61ec3e907d4..f131bca36bd3d 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -87,6 +87,21 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ 		case HAFGRTR_EL2:					\
+ 			m = &hafgrtr_masks;				\
+ 			break;						\
++		case HFGRTR2_EL2:					\
++			m = &hfgrtr2_masks;				\
++			break;						\
++		case HFGWTR2_EL2:					\
++			m = &hfgwtr2_masks;				\
++			break;						\
++		case HFGITR2_EL2:					\
++			m = &hfgitr2_masks;				\
++			break;						\
++		case HDFGRTR2_EL2:					\
++			m = &hdfgrtr2_masks;				\
++			break;						\
++		case HDFGWTR2_EL2:					\
++			m = &hdfgwtr2_masks;				\
++			break;						\
+ 		default:						\
+ 			BUILD_BUG_ON(1);				\
+ 		}							\
+@@ -120,6 +135,17 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ 		case HAFGRTR_EL2:					\
+ 			id = HAFGRTR_GROUP;				\
+ 			break;						\
++		case HFGRTR2_EL2:					\
++		case HFGWTR2_EL2:					\
++			id = HFGRTR2_GROUP;				\
++			break;						\
++		case HFGITR2_EL2:					\
++			id = HFGITR2_GROUP;				\
++			break;						\
++		case HDFGRTR2_EL2:					\
++		case HDFGWTR2_EL2:					\
++			id = HDFGRTR2_GROUP;				\
++			break;						\
+ 		default:						\
+ 			BUILD_BUG_ON(1);				\
+ 		}							\
+@@ -182,6 +208,15 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
  
- 	/* Must be last */
- 	__NR_FGT_GROUP_IDS__
-@@ -625,6 +630,11 @@ extern struct fgt_masks hfgitr_masks;
- extern struct fgt_masks hdfgrtr_masks;
- extern struct fgt_masks hdfgwtr_masks;
- extern struct fgt_masks hafgrtr_masks;
-+extern struct fgt_masks hfgrtr2_masks;
-+extern struct fgt_masks hfgwtr2_masks;
-+extern struct fgt_masks hfgitr2_masks;
-+extern struct fgt_masks hdfgrtr2_masks;
-+extern struct fgt_masks hdfgwtr2_masks;
- 
- extern struct fgt_masks kvm_nvhe_sym(hfgrtr_masks);
- extern struct fgt_masks kvm_nvhe_sym(hfgwtr_masks);
-@@ -632,6 +642,11 @@ extern struct fgt_masks kvm_nvhe_sym(hfgitr_masks);
- extern struct fgt_masks kvm_nvhe_sym(hdfgrtr_masks);
- extern struct fgt_masks kvm_nvhe_sym(hdfgwtr_masks);
- extern struct fgt_masks kvm_nvhe_sym(hafgrtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hfgrtr2_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hfgwtr2_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hfgitr2_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hdfgrtr2_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hdfgwtr2_masks);
- 
- struct kvm_cpu_context {
- 	struct user_pt_regs regs;	/* sp = sp_el0 */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8951e8693ca7b..ff1c0cf97ee53 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2457,6 +2457,11 @@ static void kvm_hyp_init_symbols(void)
- 	kvm_nvhe_sym(hdfgrtr_masks) = hdfgrtr_masks;
- 	kvm_nvhe_sym(hdfgwtr_masks) = hdfgwtr_masks;
- 	kvm_nvhe_sym(hafgrtr_masks) = hafgrtr_masks;
-+	kvm_nvhe_sym(hfgrtr2_masks) = hfgrtr2_masks;
-+	kvm_nvhe_sym(hfgwtr2_masks) = hfgwtr2_masks;
-+	kvm_nvhe_sym(hfgitr2_masks) = hfgitr2_masks;
-+	kvm_nvhe_sym(hdfgrtr2_masks)= hdfgrtr2_masks;
-+	kvm_nvhe_sym(hdfgwtr2_masks)= hdfgwtr2_masks;
- 
- 	/*
- 	 * Flush entire BSS since part of its data containing init symbols is read
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 0357d06feaac6..d4e1218b004dd 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -66,7 +66,9 @@ struct reg_bits_to_feat_map {
- #define FEAT_BRBE		ID_AA64DFR0_EL1, BRBE, IMP
- #define FEAT_TRC_SR		ID_AA64DFR0_EL1, TraceVer, IMP
- #define FEAT_PMUv3		ID_AA64DFR0_EL1, PMUVer, IMP
-+#define FEAT_PMUv3p9		ID_AA64DFR0_EL1, PMUVer, V3P9
- #define FEAT_TRBE		ID_AA64DFR0_EL1, TraceBuffer, IMP
-+#define FEAT_TRBEv1p1		ID_AA64DFR0_EL1, TraceBuffer, TRBE_V1P1
- #define FEAT_DoubleLock		ID_AA64DFR0_EL1, DoubleLock, IMP
- #define FEAT_TRF		ID_AA64DFR0_EL1, TraceFilt, IMP
- #define FEAT_AA32EL0		ID_AA64PFR0_EL1, EL0, AARCH32
-@@ -84,8 +86,10 @@ struct reg_bits_to_feat_map {
- #define FEAT_LS64_V		ID_AA64ISAR1_EL1, LS64, LS64_V
- #define FEAT_LS64_ACCDATA	ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA
- #define FEAT_RAS		ID_AA64PFR0_EL1, RAS, IMP
-+#define FEAT_RASv2		ID_AA64PFR0_EL1, RAS, V2
- #define FEAT_GICv3		ID_AA64PFR0_EL1, GIC, IMP
- #define FEAT_LOR		ID_AA64MMFR1_EL1, LO, IMP
-+#define FEAT_SPEv1p4		ID_AA64DFR0_EL1, PMSVer, V1P4
- #define FEAT_SPEv1p5		ID_AA64DFR0_EL1, PMSVer, V1P5
- #define FEAT_ATS1A		ID_AA64ISAR2_EL1, ATS1A, IMP
- #define FEAT_SPECRES2		ID_AA64ISAR1_EL1, SPECRES, COSP_RCTX
-@@ -110,10 +114,23 @@ struct reg_bits_to_feat_map {
- #define FEAT_EVT_TTLBxS		ID_AA64MMFR2_EL1, EVT, TTLBxS
- #define FEAT_MTE2		ID_AA64PFR1_EL1, MTE, MTE2
- #define FEAT_RME		ID_AA64PFR0_EL1, RME, IMP
-+#define FEAT_MPAM		ID_AA64PFR0_EL1, MPAM, 1
- #define FEAT_S2FWB		ID_AA64MMFR2_EL1, FWB, IMP
- #define FEAT_TME		ID_AA64ISAR0_EL1, TME, IMP
- #define FEAT_TWED		ID_AA64MMFR1_EL1, TWED, IMP
- #define FEAT_E2H0		ID_AA64MMFR4_EL1, E2H0, IMP
-+#define FEAT_SRMASK		ID_AA64MMFR4_EL1, SRMASK, IMP
-+#define FEAT_PoPS		ID_AA64MMFR4_EL1, PoPS, IMP
-+#define FEAT_PFAR		ID_AA64PFR1_EL1, PFAR, IMP
-+#define FEAT_Debugv8p9		ID_AA64DFR0_EL1, PMUVer, V3P9
-+#define FEAT_PMUv3_SS		ID_AA64DFR0_EL1, PMSS, IMP
-+#define FEAT_SEBEP		ID_AA64DFR0_EL1, SEBEP, IMP
-+#define FEAT_EBEP		ID_AA64DFR1_EL1, EBEP, IMP
-+#define FEAT_ITE		ID_AA64DFR1_EL1, ITE, IMP
-+#define FEAT_PMUv3_ICNTR	ID_AA64DFR1_EL1, PMICNTR, IMP
-+#define FEAT_SPMU		ID_AA64DFR1_EL1, SPMU, IMP
-+#define FEAT_SPE_nVM		ID_AA64DFR2_EL1, SPE_nVM, IMP
-+#define FEAT_STEP2		ID_AA64DFR2_EL1, STEP, IMP
- 
- static bool not_feat_aa64el3(struct kvm *kvm)
- {
-@@ -180,6 +197,32 @@ static bool feat_sme_smps(struct kvm *kvm)
- 		(read_sysreg_s(SYS_SMIDR_EL1) & SMIDR_EL1_SMPS));
+ 	if (cpu_has_amu())
+ 		update_fgt_traps(hctxt, vcpu, kvm, HAFGRTR_EL2);
++
++	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
++	    return;
++
++	update_fgt_traps(hctxt, vcpu, kvm, HFGRTR2_EL2);
++	update_fgt_traps(hctxt, vcpu, kvm, HFGWTR2_EL2);
++	update_fgt_traps(hctxt, vcpu, kvm, HFGITR2_EL2);
++	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR2_EL2);
++	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR2_EL2);
  }
  
-+static bool feat_spe_fds(struct kvm *kvm)
-+{
-+	/*
-+	 * Revists this if KVM ever supports SPE -- this really should
-+	 * look at the guest's view of PMSIDR_EL1.
-+	 */
-+	return (kvm_has_feat(kvm, FEAT_SPEv1p4) &&
-+		(read_sysreg_s(SYS_PMSIDR_EL1) & PMSIDR_EL1_FDS));
-+}
-+
-+static bool feat_trbe_mpam(struct kvm *kvm)
-+{
-+	/*
-+	 * Revists this if KVM ever supports both MPAM and TRBE --
-+	 * this really should look at the guest's view of TRBIDR_EL1.
-+	 */
-+	return (kvm_has_feat(kvm, FEAT_TRBE) &&
-+		kvm_has_feat(kvm, FEAT_MPAM) &&
-+		(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_MPAM));
-+}
-+
-+static bool feat_ebep_pmuv3_ss(struct kvm *kvm)
-+{
-+	return kvm_has_feat(kvm, FEAT_EBEP) || kvm_has_feat(kvm, FEAT_PMUv3_SS);
-+}
-+
- static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
- {
- 	/* This is purely academic: AArch32 and NV are mutually exclusive */
-@@ -589,6 +632,106 @@ static const struct reg_bits_to_feat_map hafgrtr_feat_map[] = {
- 		   FEAT_AMUv1),
- };
+ #define __deactivate_fgt(htcxt, vcpu, reg)				\
+@@ -205,6 +240,15 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
  
-+static const struct reg_bits_to_feat_map hfgitr2_feat_map[] = {
-+	NEEDS_FEAT(HFGITR2_EL2_nDCCIVAPS, FEAT_PoPS),
-+	NEEDS_FEAT(HFGITR2_EL2_TSBCSYNC, FEAT_TRBEv1p1)
-+};
+ 	if (cpu_has_amu())
+ 		__deactivate_fgt(hctxt, vcpu, HAFGRTR_EL2);
 +
-+static const struct reg_bits_to_feat_map hfgrtr2_feat_map[] = {
-+	NEEDS_FEAT(HFGRTR2_EL2_nPFAR_EL1, FEAT_PFAR),
-+	NEEDS_FEAT(HFGRTR2_EL2_nERXGSR_EL1, FEAT_RASv2),
-+	NEEDS_FEAT(HFGRTR2_EL2_nACTLRALIAS_EL1	|
-+		   HFGRTR2_EL2_nACTLRMASK_EL1	|
-+		   HFGRTR2_EL2_nCPACRALIAS_EL1	|
-+		   HFGRTR2_EL2_nCPACRMASK_EL1	|
-+		   HFGRTR2_EL2_nSCTLR2MASK_EL1	|
-+		   HFGRTR2_EL2_nSCTLRALIAS2_EL1	|
-+		   HFGRTR2_EL2_nSCTLRALIAS_EL1	|
-+		   HFGRTR2_EL2_nSCTLRMASK_EL1	|
-+		   HFGRTR2_EL2_nTCR2ALIAS_EL1	|
-+		   HFGRTR2_EL2_nTCR2MASK_EL1	|
-+		   HFGRTR2_EL2_nTCRALIAS_EL1	|
-+		   HFGRTR2_EL2_nTCRMASK_EL1,
-+		   FEAT_SRMASK),
-+	NEEDS_FEAT(HFGRTR2_EL2_nRCWSMASK_EL1, FEAT_THE),
-+};
++	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
++	    return;
 +
-+static const struct reg_bits_to_feat_map hfgwtr2_feat_map[] = {
-+	NEEDS_FEAT(HFGWTR2_EL2_nPFAR_EL1, FEAT_PFAR),
-+	NEEDS_FEAT(HFGWTR2_EL2_nACTLRALIAS_EL1	|
-+		   HFGWTR2_EL2_nACTLRMASK_EL1	|
-+		   HFGWTR2_EL2_nCPACRALIAS_EL1	|
-+		   HFGWTR2_EL2_nCPACRMASK_EL1	|
-+		   HFGWTR2_EL2_nSCTLR2MASK_EL1	|
-+		   HFGWTR2_EL2_nSCTLRALIAS2_EL1	|
-+		   HFGWTR2_EL2_nSCTLRALIAS_EL1	|
-+		   HFGWTR2_EL2_nSCTLRMASK_EL1	|
-+		   HFGWTR2_EL2_nTCR2ALIAS_EL1	|
-+		   HFGWTR2_EL2_nTCR2MASK_EL1	|
-+		   HFGWTR2_EL2_nTCRALIAS_EL1	|
-+		   HFGWTR2_EL2_nTCRMASK_EL1,
-+		   FEAT_SRMASK),
-+	NEEDS_FEAT(HFGWTR2_EL2_nRCWSMASK_EL1, FEAT_THE),
-+};
-+
-+static const struct reg_bits_to_feat_map hdfgrtr2_feat_map[] = {
-+	NEEDS_FEAT(HDFGRTR2_EL2_nMDSELR_EL1, FEAT_Debugv8p9),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nPMECR_EL1, feat_ebep_pmuv3_ss),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nTRCITECR_EL1, FEAT_ITE),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nPMICFILTR_EL0	|
-+		   HDFGRTR2_EL2_nPMICNTR_EL0,
-+		   FEAT_PMUv3_ICNTR),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nPMUACR_EL1, FEAT_PMUv3p9),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nPMSSCR_EL1	|
-+		   HDFGRTR2_EL2_nPMSSDATA,
-+		   FEAT_PMUv3_SS),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nPMIAR_EL1, FEAT_SEBEP),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nPMSDSFR_EL1, feat_spe_fds),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nPMBMAR_EL1, FEAT_SPE_nVM),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nSPMACCESSR_EL1	|
-+		   HDFGRTR2_EL2_nSPMCNTEN	|
-+		   HDFGRTR2_EL2_nSPMCR_EL0	|
-+		   HDFGRTR2_EL2_nSPMDEVAFF_EL1	|
-+		   HDFGRTR2_EL2_nSPMEVCNTRn_EL0	|
-+		   HDFGRTR2_EL2_nSPMEVTYPERn_EL0|
-+		   HDFGRTR2_EL2_nSPMID		|
-+		   HDFGRTR2_EL2_nSPMINTEN	|
-+		   HDFGRTR2_EL2_nSPMOVS		|
-+		   HDFGRTR2_EL2_nSPMSCR_EL1	|
-+		   HDFGRTR2_EL2_nSPMSELR_EL0,
-+		   FEAT_SPMU),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nMDSTEPOP_EL1, FEAT_STEP2),
-+	NEEDS_FEAT(HDFGRTR2_EL2_nTRBMPAM_EL1, feat_trbe_mpam),
-+};
-+
-+static const struct reg_bits_to_feat_map hdfgwtr2_feat_map[] = {
-+	NEEDS_FEAT(HDFGWTR2_EL2_nMDSELR_EL1, FEAT_Debugv8p9),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nPMECR_EL1, feat_ebep_pmuv3_ss),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nTRCITECR_EL1, FEAT_ITE),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nPMICFILTR_EL0	|
-+		   HDFGWTR2_EL2_nPMICNTR_EL0,
-+		   FEAT_PMUv3_ICNTR),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nPMUACR_EL1	|
-+		   HDFGWTR2_EL2_nPMZR_EL0,
-+		   FEAT_PMUv3p9),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nPMSSCR_EL1, FEAT_PMUv3_SS),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nPMIAR_EL1, FEAT_SEBEP),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nPMSDSFR_EL1, feat_spe_fds),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nPMBMAR_EL1, FEAT_SPE_nVM),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nSPMACCESSR_EL1	|
-+		   HDFGWTR2_EL2_nSPMCNTEN	|
-+		   HDFGWTR2_EL2_nSPMCR_EL0	|
-+		   HDFGWTR2_EL2_nSPMEVCNTRn_EL0	|
-+		   HDFGWTR2_EL2_nSPMEVTYPERn_EL0|
-+		   HDFGWTR2_EL2_nSPMINTEN	|
-+		   HDFGWTR2_EL2_nSPMOVS		|
-+		   HDFGWTR2_EL2_nSPMSCR_EL1	|
-+		   HDFGWTR2_EL2_nSPMSELR_EL0,
-+		   FEAT_SPMU),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nMDSTEPOP_EL1, FEAT_STEP2),
-+	NEEDS_FEAT(HDFGWTR2_EL2_nTRBMPAM_EL1, feat_trbe_mpam),
-+};
-+
- static const struct reg_bits_to_feat_map hcrx_feat_map[] = {
- 	NEEDS_FEAT(HCRX_EL2_PACMEn, feat_pauth_lr),
- 	NEEDS_FEAT(HCRX_EL2_EnFPM, FEAT_FPMR),
-@@ -820,6 +963,27 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
- 					 ARRAY_SIZE(hafgrtr_feat_map),
- 					 0, NEVER_FGU);
- 		break;
-+	case HFGRTR2_GROUP:
-+		val |= compute_res0_bits(kvm, hfgrtr2_feat_map,
-+					 ARRAY_SIZE(hfgrtr2_feat_map),
-+					 0, NEVER_FGU);
-+		val |= compute_res0_bits(kvm, hfgwtr2_feat_map,
-+					 ARRAY_SIZE(hfgwtr2_feat_map),
-+					 0, NEVER_FGU);
-+		break;
-+	case HFGITR2_GROUP:
-+		val |= compute_res0_bits(kvm, hfgitr2_feat_map,
-+					 ARRAY_SIZE(hfgitr2_feat_map),
-+					 0, NEVER_FGU);
-+		break;
-+	case HDFGRTR2_GROUP:
-+		val |= compute_res0_bits(kvm, hdfgrtr2_feat_map,
-+					 ARRAY_SIZE(hdfgrtr2_feat_map),
-+					 0, NEVER_FGU);
-+		val |= compute_res0_bits(kvm, hdfgwtr2_feat_map,
-+					 ARRAY_SIZE(hdfgwtr2_feat_map),
-+					 0, NEVER_FGU);
-+		break;
- 	default:
- 		BUG();
- 	}
-@@ -868,6 +1032,36 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
- 		*res0 |= hafgrtr_masks.res0;
- 		*res1 = HAFGRTR_EL2_RES1;
- 		break;
-+	case HFGRTR2_EL2:
-+		*res0 = compute_res0_bits(kvm, hfgrtr2_feat_map,
-+					  ARRAY_SIZE(hfgrtr2_feat_map), 0, 0);
-+		*res0 |= hfgrtr2_masks.res0;
-+		*res1 = HFGRTR2_EL2_RES1;
-+		break;
-+	case HFGWTR2_EL2:
-+		*res0 = compute_res0_bits(kvm, hfgwtr2_feat_map,
-+					  ARRAY_SIZE(hfgwtr2_feat_map), 0, 0);
-+		*res0 |= hfgwtr2_masks.res0;
-+		*res1 = HFGWTR2_EL2_RES1;
-+		break;
-+	case HFGITR2_EL2:
-+		*res0 = compute_res0_bits(kvm, hfgitr2_feat_map,
-+					  ARRAY_SIZE(hfgitr2_feat_map), 0, 0);
-+		*res0 |= hfgitr2_masks.res0;
-+		*res1 = HFGITR2_EL2_RES1;
-+		break;
-+	case HDFGRTR2_EL2:
-+		*res0 = compute_res0_bits(kvm, hdfgrtr2_feat_map,
-+					  ARRAY_SIZE(hdfgrtr2_feat_map), 0, 0);
-+		*res0 |= hdfgrtr2_masks.res0;
-+		*res1 = HDFGRTR2_EL2_RES1;
-+		break;
-+	case HDFGWTR2_EL2:
-+		*res0 = compute_res0_bits(kvm, hdfgwtr2_feat_map,
-+					  ARRAY_SIZE(hdfgwtr2_feat_map), 0, 0);
-+		*res0 |= hdfgwtr2_masks.res0;
-+		*res1 = HDFGWTR2_EL2_RES1;
-+		break;
- 	case HCRX_EL2:
- 		*res0 = compute_res0_bits(kvm, hcrx_feat_map,
- 					  ARRAY_SIZE(hcrx_feat_map), 0, 0);
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 0b033d3a3d7a4..3312aefa095e0 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2060,6 +2060,11 @@ FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
- FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
- FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
- FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
-+FGT_MASKS(hfgrtr2_masks, HFGRTR2_EL2_RES0);
-+FGT_MASKS(hfgwtr2_masks, HFGWTR2_EL2_RES0);
-+FGT_MASKS(hfgitr2_masks, HFGITR2_EL2_RES0);
-+FGT_MASKS(hdfgrtr2_masks, HDFGRTR2_EL2_RES0);
-+FGT_MASKS(hdfgwtr2_masks, HDFGWTR2_EL2_RES0);
++	__deactivate_fgt(hctxt, vcpu, HFGRTR2_EL2);
++	__deactivate_fgt(hctxt, vcpu, HFGWTR2_EL2);
++	__deactivate_fgt(hctxt, vcpu, HFGITR2_EL2);
++	__deactivate_fgt(hctxt, vcpu, HDFGRTR2_EL2);
++	__deactivate_fgt(hctxt, vcpu, HDFGWTR2_EL2);
+ }
  
- static __init bool aggregate_fgt(union trap_config tc)
- {
-@@ -2082,6 +2087,18 @@ static __init bool aggregate_fgt(union trap_config tc)
- 		rmasks = &hfgitr_masks;
- 		wmasks = NULL;
- 		break;
-+	case HFGRTR2_GROUP:
-+		rmasks = &hfgrtr2_masks;
-+		wmasks = &hfgwtr2_masks;
-+		break;
-+	case HDFGRTR2_GROUP:
-+		rmasks = &hdfgrtr2_masks;
-+		wmasks = &hdfgwtr2_masks;
-+		break;
-+	case HFGITR2_GROUP:
-+		rmasks = &hfgitr2_masks;
-+		wmasks = NULL;
-+		break;
- 	}
- 
- 	/*
-@@ -2141,6 +2158,11 @@ static __init int check_all_fgt_masks(int ret)
- 		&hdfgrtr_masks,
- 		&hdfgwtr_masks,
- 		&hafgrtr_masks,
-+		&hfgrtr2_masks,
-+		&hfgwtr2_masks,
-+		&hfgitr2_masks,
-+		&hdfgrtr2_masks,
-+		&hdfgwtr2_masks,
- 	};
- 	int err = 0;
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index ae55d6d87e3d2..6947aaf117f63 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -39,6 +39,11 @@ struct fgt_masks hfgitr_masks;
- struct fgt_masks hdfgrtr_masks;
- struct fgt_masks hdfgwtr_masks;
- struct fgt_masks hafgrtr_masks;
-+struct fgt_masks hfgrtr2_masks;
-+struct fgt_masks hfgwtr2_masks;
-+struct fgt_masks hfgitr2_masks;
-+struct fgt_masks hdfgrtr2_masks;
-+struct fgt_masks hdfgwtr2_masks;
- 
- extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index b633666be6df4..f6a5736ba7ef7 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1045,6 +1045,22 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
- 	get_reg_fixed_bits(kvm, HAFGRTR_EL2, &res0, &res1);
- 	set_sysreg_masks(kvm, HAFGRTR_EL2, res0, res1);
- 
-+	/* HFG[RW]TR2_EL2 */
-+	get_reg_fixed_bits(kvm, HFGRTR2_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HFGRTR2_EL2, res0, res1);
-+	get_reg_fixed_bits(kvm, HFGWTR2_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HFGWTR2_EL2, res0, res1);
-+
-+	/* HDFG[RW]TR2_EL2 */
-+	get_reg_fixed_bits(kvm, HDFGRTR2_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HDFGRTR2_EL2, res0, res1);
-+	get_reg_fixed_bits(kvm, HDFGWTR2_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HDFGWTR2_EL2, res0, res1);
-+
-+	/* HFGITR2_EL2 */
-+	get_reg_fixed_bits(kvm, HFGITR2_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, HFGITR2_EL2, res0, res1);
-+
- 	/* TCR2_EL2 */
- 	res0 = TCR2_EL2_RES0;
- 	res1 = TCR2_EL2_RES1;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f24d1a7d9a8f4..8b994690bf1ad 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5151,6 +5151,9 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 	compute_fgu(kvm, HFGITR_GROUP);
- 	compute_fgu(kvm, HDFGRTR_GROUP);
- 	compute_fgu(kvm, HAFGRTR_GROUP);
-+	compute_fgu(kvm, HFGRTR2_GROUP);
-+	compute_fgu(kvm, HFGITR2_GROUP);
-+	compute_fgu(kvm, HDFGRTR2_GROUP);
- 
- 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
- out:
+ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
 -- 
 2.39.2
 
