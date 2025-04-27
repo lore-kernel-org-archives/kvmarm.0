@@ -1,70 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AE41FFC5F;
-	Sun, 27 Apr 2025 12:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29D3F9D9
+	for <kvmarm@lists.linux.dev>; Sun, 27 Apr 2025 16:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745756480; cv=none; b=WkIiChKr6npiahfnvMz2bZJk8DEsDcwIfBW8bJ7t8tipRAz8ucrm4E69fFTpNgaFBZq4jJep6a/lrpY4fKSTdmTKsxoNB6FsEXlWLs5VRzoe0q7WBzHNcy7IWfe+S/9TXjKVw44V4Zhy0ev9Jtd/o145HlZjqdXtpVWCLdpC7Sc=
+	t=1745771832; cv=none; b=V/gnUSOSTLp7GW86C3aKtW5GkxuVMiaRsrI79w/yoTZ32Sb435pXCjzWxggYiy0Lq+NyAdFUE5LEYwtn0UNqPRRbwJl7DWvVhxCQ6Rv/Hzpx2HsP0fcZoAJBVRH2rghcZIQ/Q6j6rA6/ZKCPQzIXYyOkiM5LP1ZETjbf01iow1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745756480; c=relaxed/simple;
-	bh=qgR2lz3v3NjAxknpyrFWkaL7/bhQwLOU/tYgivfTSX4=;
+	s=arc-20240116; t=1745771832; c=relaxed/simple;
+	bh=e8tAvyM96LcvgN0cnj6mfcT1+7FPRKk6Gs7+YAPcM28=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qsWvA9tFWLP0TJvZr68BfRddQLFKE+hic2ON8Z27NNoINKNX3AvlYyerL3XQ0fETpS7cPz+BGGCpK9jxJq9+ojmcsbeLsZCIf/yhJkl3QT2aM4J+yThSut+PM/pnxqYU7SdyzUeSKpeH1eHY/geD3e37Zh2srGnRP4eNksN5Hfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XWQ8KECx; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=oa/4+2/xWuTBAgZxK0OSr1CwWk4mQ8eG/GdML3AwdnT8vD6uprN9ZvnPTMkbI6/e4p9sgMzGqPgoFikpRaSFyqW82Rmi+qaCP+rAdCxxKCjjZkHbNYYfFOJKrnz5l0tziBMQ7gNBsbpSUUrOD1EgKs0HTlcUep3Fb4rdL512Sps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oJYGs2h9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XWQ8KECx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A76FC4CEE3;
-	Sun, 27 Apr 2025 12:21:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJYGs2h9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 574FCC4CEE3;
+	Sun, 27 Apr 2025 16:37:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745756480;
-	bh=qgR2lz3v3NjAxknpyrFWkaL7/bhQwLOU/tYgivfTSX4=;
+	s=k20201202; t=1745771831;
+	bh=e8tAvyM96LcvgN0cnj6mfcT1+7FPRKk6Gs7+YAPcM28=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XWQ8KECxSqdvcp0sL5nci/HcxJBQ9cMd8jZsZOy+5vCNBuICJhnuoSM0hN4Zvkn9o
-	 ZcRXK7xE3yXvb9HbhD0i8sH3+o336Ic7QwGjMbQr5qVXf5nCgn77ELHE0N46tHlrHf
-	 lfRu+4a7odTFME8AhUdMG0PGZidoWHoGd1h7YpOPkjcByZnzR3GxpU/Y2dmB6+Drz9
-	 9dfzsRHXLAXP7ba/6fVX8uzDbuIgoop1wkdZHmlPX1PX1CCZm6euVKOCKOS7HmU1PB
-	 gI6dHnlIYGmdmHYQ8cUsbdO1St7JLNwU6M5tI4FVsFcsY+xZJSCCpa7vwQNRKwtG/F
-	 EZdL2ivuJHM0Q==
+	b=oJYGs2h9lbWAiyJlVkCd4GqYGnqcG4Zzz8H4ceZNQs07OTfI4tSEAc1Pqx5SxZL7s
+	 wnNXOuyNFchJcDt0GnWTlHjCmAUGo2GtPtpej51H1d1bWznd4P074WM7DtymGeEY/H
+	 Dn9O/m1OXI9i0gQKpj/tIP1grACweZnUEsTWrT01610DHllLKXZxscfPcvZ+fUlDCl
+	 89Q2vgf8ooV2W4u17lC3FRHu6kgUUe5NP8bos2jUCct+3KdPhnkC7eR6KApk7cmzo1
+	 /+lqd15fLaPkLziPIEXuZ7sINtn4sHzW+jt0/ap8Tx2blY0v48+roBvSBPbPOm3XiM
+	 SQqdS4FPh6wYw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u910X-009GIf-FL;
-	Sun, 27 Apr 2025 13:21:17 +0100
-Date: Sun, 27 Apr 2025 13:21:16 +0100
-Message-ID: <86frhtkd6r.wl-maz@kernel.org>
+	id 1u9508-009JRM-Op;
+	Sun, 27 Apr 2025 17:37:08 +0100
+Date: Sun, 27 Apr 2025 17:37:08 +0100
+Message-ID: <86ecxdk1cb.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark
- <james.clark@linaro.org>,
-	James Morse <james.morse@arm.com>,
-	Joey Gouly
- <joey.gouly@arm.com>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Mark Brown
- <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton
- <oliver.upton@linux.dev>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Shameer
- Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shiqi Liu
- <shiqiliu@hust.edu.cn>,
-	Will Deacon <will@kernel.org>,
-	Yicong Yang
- <yangyicong@hisilicon.com>,
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Ilias Stamatis <ilstam@amazon.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/2] arm64: errata: Work around AmpereOne's erratum AC03_CPU_36
-In-Reply-To: <86frhx9ex6.fsf@scott-ph-mail.amperecomputing.com>
-References: <20250415154711.1698544-1-scott@os.amperecomputing.com>
-	<86wmbkk1yz.wl-maz@kernel.org>
-	<86frhx9ex6.fsf@scott-ph-mail.amperecomputing.com>
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	eric.auger@redhat.com,
+	andre.przywara@arm.com,
+	will@kernel.org,
+	jgrall@amazon.co.uk,
+	ugurus@amazon.co.uk,
+	nh-open-source@amazon.com
+Subject: Re: [RFC] ARM vGIC-ITS tables serialization when running protected VMs
+In-Reply-To: <94fb9d4adb81f824912ee23a296776aa07873354.camel@infradead.org>
+References: <20250414111244.153528-1-ilstam@amazon.com>
+	<867c3llt43.wl-maz@kernel.org>
+	<94fb9d4adb81f824912ee23a296776aa07873354.camel@infradead.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,69 +65,139 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, catalin.marinas@arm.com, james.clark@linaro.org, james.morse@arm.com, joey.gouly@arm.com, kevin.brodsky@arm.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, robh@kernel.org, shameerali.kolothum.thodi@huawei.com, shiqiliu@hust.edu.cn, will@kernel.org, yangyicong@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: dwmw2@infradead.org, ilstam@amazon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com, andre.przywara@arm.com, will@kernel.org, jgrall@amazon.co.uk, ugurus@amazon.co.uk, nh-open-source@amazon.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 25 Apr 2025 03:02:29 +0100,
-D Scott Phillips <scott@os.amperecomputing.com> wrote:
+On Tue, 15 Apr 2025 10:44:39 +0100,
+David Woodhouse <dwmw2@infradead.org> wrote:
 > 
-> Marc Zyngier <maz@kernel.org> writes:
+> [1  <text/plain; UTF-8 (quoted-printable)>]
+> On Tue, 2025-04-15 at 09:35 +0100, Marc Zyngier wrote:
+> > On Mon, 14 Apr 2025 12:12:43 +0100,
+> > Ilias Stamatis <ilstam@amazon.com> wrote:
+> > > 
+> > > # The problem
+> > > 
+> > > KVM's ARM Virtual Interrupt Translation Service (ITS) interface supports the
+> > > KVM_DEV_ARM_ITS_SAVE_TABLES and KVM_DEV_ARM_ITS_RESTORE_TABLES operations.
+> > > These operations save and restore a set of tables (Device Tables, Interrupt
+> > > Translation Tables, Collection Table) to and from guest memory.
+> > > 
+> > > This can be a problem when running a protected VM on top of pKVM or another
+> > > lowvisor since the host kernel (running at EL1) cannot access guest memory.
+> > > 
+> > 
+> > pKVM doesn't allow a guest to be saved/restored, full stop.
 > 
-> > On Tue, 15 Apr 2025 16:47:10 +0100,
-> > D Scott Phillips <scott@os.amperecomputing.com> wrote:
-> >> 
-> >> AC03_CPU_36 can cause asynchronous exceptions to be routed to the wrong
-> >> exception level if an async exception coincides with an update to the
-> >> controls for the target exception level in HCR_EL2. On affected
-> >> machines, always do writes to HCR_EL2 with async exceptions blocked.
-> >
-> > From the actual errata document [1]:
-> >
-> > <quote>
-> > If an Asynchronous Exception to EL2 occurs, while EL2 software is
-> > changing the EL2 exception control bits from a configuration where
-> > asynchronous exceptions are routed to EL2 to a configuration where
-> > asynchronous exceptions are routed to EL1, the processor may exhibit
-> > the incorrect exception behavior of routing an interrupt taken at EL2
-> > to EL1.  The affected system register is HCR_EL2, which contains
-> > control bits for routing and enabling of EL2 exceptions.
-> > </quote>
-> >
-> > My reading is that things can go wrong when clearing the xMO bits.
-> >
-> > I don't think we need to touch the xMO bits at all when running
-> > VHE. So my preference would be to:
-> >
-> > - simply leave the xMO bits set at all times (nothing bad can happen
-> >   from that, can it?)
-> >
-> > - prevent these systems from using anything but VHE (and fail KVM init
-> >   otherwise)
-> 
-> Hi Marc, I started writing up this patch and then realized that the
-> issue can also not happen in nvhe mode. While xMO bits are modified
-> there, async exceptions are always masked and so the "simultaneously
-> take an async exception" part of the erratum can't happen.
-> 
-> Does that sound right to you, or are there cases that I'm missing. If
-> it's right the nvhe is also can't hit the erratum case, then what do you
-> think is the right thing for me to do here?
+> Yet. Either it's going to need to learn to support live update, or
+> it'll remain a toy solution.
 
-That's an interesting point. We always run the nVHE/hVHE hypervisor
-code with interrupts disabled by virtue of taking an HVC exception
-into EL2, so that particular case seems OK as it literally implements
-the proposed workaround.
+Toy solution to what problem?
 
-However, there's at least one catch: the SError handling code in
-hyp/entry.S relies on clearing PSTATE.A to take a pending abort (the
-so-called VAXorcism). I take that this CPU implements FEAT_RAS, and
-that we don't need to worry about this code path either, and that the
-erratum cannot trigger on speculatively executed paths?
+> 
+> > > # Page declassification and why ITTs are special
+> > > 
+> > > The Collection and Device tables are page aligned and their sizes must be a
+> > > multiple of page size. If the lowvisor knows where these tables live, it is
+> > > possible to "declassify" the corresponding pages and configure the MMU such as
+> > > that the EL1 host can write to guest memory directly.
+> > > 
+> > > The ITTs (Interrupt Translation Tables) are different. They are NOT page
+> > > aligned, they are 256 byte aligned and their size is variable. That means that
+> > > the lowvisor can't declassify pages containing ITTs and configure the MMU
+> > > giving the host direct access as above since those pages may contain unrelated
+> > > data.
+> > 
+> > And it is the responsibility of the guest to make these page aligned
+> > if it intend to let the hypervisor use them. To sum it up, the ITT
+> > isn't special at all.
+> 
+> The ITT has nothing to do with virtualization, does it? And despite
+> this being logically "DMA", I don't believe it's possible to advertise
+> it as being behind the SMMU, which would have allowed for access
+> control (and would indeed have meant that the guest would be expected
+> to grant access to full pages).
+> 
+> What exactly are you suggesting? That the GIC specification should be
+> changed to require page alignment, or to document that in a
+> confidential compute setup, the remainder of any page which contains
+> ITTs will be implicitly made non-confidential and shared with the
+> hypervisor?
 
-If we're OK with that, then I don't think there is much to do, other
-than always setting the xMO bits at all times, for which I already
-have a patch in review (v2 coming shortly).
+The GIC architecture is of course absolutely perfect, and there is
+nothing to change there.
+
+I'm suggesting you do what any OS designed to run under a confidential
+infrastructure do. Which is to expose page-sized data to the
+non-trusted infrastructure. Linux has done that for a while (as part
+of both CCA and pKVM enablement), and I don't see why your toy guests
+can't do the same. It's not like using a page pool for ITT allocations
+is rocket science, is it?
+
+> And then the lowvisor would also have to snoop the ITS command queues
+> to even find out which pages to implicitly allow access to?
+
+Why should it? as long as you only expose pages that only contain
+GIC-related data, you should be safe.
+
+However, if your hypervisor doesn't fully validate the interaction of
+the *host* with the HW, then you're dead in the water.
+
+> > > If the lowvisor knows where the ITTs live in guest memory it could instead
+> > > perform the guest memory accesses on behalf of the host. I.e. the EL1 host
+> > > would attempt to save the ITTs to guest memory like it does today, that would
+> > > generate a data abort, and then the EL2 lowvisor could perform the copy after
+> > > validating that the faulty address belongs to an ITT in guest memory.
+> > > 
+> > > One issue with the above is that the ITS save/restore happens at hypervisor
+> > > live update which is a time sensitive operation and the extra traps (one per
+> > > interrupt mapping?) can introduce significant additional overhead
+> > > there.
+> > 
+> > I don't believe this for a second.
+> 
+> You don't believe that every millisecond of live update downtime,
+> perceived by the guest as unwanted steal time of a hypervisor that's
+> generally trying to be as quiescent as possible, is an issue?
+
+I absolutely don't. Certainly not for something that has no tangible
+existence, with no performance numbers whatsoever, and based on shaky
+premises.
+
+> > > Another issue is that it's actually hard for the lowvisor to know where these
+> > > tables live without trusting the EL1 host which virtualizes the ITS. It is
+> > > especially hard knowing the locations of the ITTs (compared to
+> > > Collection/Device tables) because that probably means having to parse the ITS
+> > > command queue from EL2 which is complex and undesirable.
+> > > 
+> > > # An alternative: Serializing ITTs into a userspace buffer
+> > 
+> > NAK.
+> > 
+> > Share the page-aligned memory with the rest of the hypervisor, and use
+> > the existing API.
+> 
+> That seems like a bad choice. All this is just using guest memory to
+> store KVM's state.
+
+The architecture *mandates* the memory allocation. KVM uses this
+memory for the purpose described in the architecture. If you don't
+like it, invent your own interrupt architecture. Trust me, it's real
+fun!
+
+> Yes, the guest provides a buffer which the virtual hardware *may* use
+> if it wants, but with no IOMMU or access control defined in the
+> specification.
+> 
+> It seems like it would be much cleaner just to let KVM pass its state
+> up to userspace for serialization like we do for all *other* KVM state,
+> which is what Ilias is proposing.
+
+Sure. You could also decide that SMMU page tables should be extracted
+separately, because that's the exact same rationale. You could also
+build your own hypervisor instead of inventing new ways to make the
+KVM API even more of a terrible mess.
 
 	M.
 
