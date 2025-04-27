@@ -1,54 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC91B757EA
-	for <kvmarm@lists.linux.dev>; Sat, 26 Apr 2025 18:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AE41FFC5F;
+	Sun, 27 Apr 2025 12:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745691213; cv=none; b=Zmc48nz8TmieTMGtQiHHPpm5wB0hzbaRWPph405Zmu0YmM1L44JZQs+1W947HMJ6akjZEy9DcsjjSr66vu684WhEJLyZ78laZcLD1nFG7va5V2Lse/vzF5m63lnBMwbeOAxTB+SOFwl3F23s92ziMl4+OC8C4XYFzgOBof5nD4s=
+	t=1745756480; cv=none; b=WkIiChKr6npiahfnvMz2bZJk8DEsDcwIfBW8bJ7t8tipRAz8ucrm4E69fFTpNgaFBZq4jJep6a/lrpY4fKSTdmTKsxoNB6FsEXlWLs5VRzoe0q7WBzHNcy7IWfe+S/9TXjKVw44V4Zhy0ev9Jtd/o145HlZjqdXtpVWCLdpC7Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745691213; c=relaxed/simple;
-	bh=RsOofsV613x18QvDryGpmF9JPDB5AAT2eHE5SgYik/4=;
+	s=arc-20240116; t=1745756480; c=relaxed/simple;
+	bh=qgR2lz3v3NjAxknpyrFWkaL7/bhQwLOU/tYgivfTSX4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ei0J8Q7ZPcaCnTpD+cRWYL9DUJ9nv6hSrwyCZ0taPeyC7Aoje34L8ccu2dP6oq+XVBtUq/WmDaqc0gPQUVqEZ0LDOtTB3EIb9NaQf1Lcq6FABSzqNM0MxOMf/RiAD3GEeuXByWFYdsvY6FOQ/btKoYY7Yz/7qPxf507b5hEtWtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lfO8Qw8u; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=qsWvA9tFWLP0TJvZr68BfRddQLFKE+hic2ON8Z27NNoINKNX3AvlYyerL3XQ0fETpS7cPz+BGGCpK9jxJq9+ojmcsbeLsZCIf/yhJkl3QT2aM4J+yThSut+PM/pnxqYU7SdyzUeSKpeH1eHY/geD3e37Zh2srGnRP4eNksN5Hfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XWQ8KECx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lfO8Qw8u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E11BC4CEE2;
-	Sat, 26 Apr 2025 18:13:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XWQ8KECx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A76FC4CEE3;
+	Sun, 27 Apr 2025 12:21:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745691213;
-	bh=RsOofsV613x18QvDryGpmF9JPDB5AAT2eHE5SgYik/4=;
+	s=k20201202; t=1745756480;
+	bh=qgR2lz3v3NjAxknpyrFWkaL7/bhQwLOU/tYgivfTSX4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lfO8Qw8uwWwgS3sjhLURcZk7YC4a076hakyri/2gKMGwKqa49LeJim1ZCTMtY9xf2
-	 dDAD/HgSeODMIk6Ok6C+QjxHYU6jg806ULnkhzQTXOe3amTq4sMyjE9bLvzQhGcrwf
-	 drQJ1O2pb3BftisDEyyE4ngOu9hU3xVuB3y4x4+u9wFe/1gdOA2MeRiYxpWpa5RXU9
-	 HiMm8mD0Wr6TlC8rDMn3m1hjjHZ+/Sd5KQ0kvF4xSlY3+20Zt5VZ6/nmQ7ftQk4ki3
-	 arijG928i0j1/5vYoC6G8W6Oqu1/6Xpj3+CyA4ZiP49y4xADB0YRwHnNQKGgyidCj1
-	 YT+y7jI4vrtuw==
+	b=XWQ8KECxSqdvcp0sL5nci/HcxJBQ9cMd8jZsZOy+5vCNBuICJhnuoSM0hN4Zvkn9o
+	 ZcRXK7xE3yXvb9HbhD0i8sH3+o336Ic7QwGjMbQr5qVXf5nCgn77ELHE0N46tHlrHf
+	 lfRu+4a7odTFME8AhUdMG0PGZidoWHoGd1h7YpOPkjcByZnzR3GxpU/Y2dmB6+Drz9
+	 9dfzsRHXLAXP7ba/6fVX8uzDbuIgoop1wkdZHmlPX1PX1CCZm6euVKOCKOS7HmU1PB
+	 gI6dHnlIYGmdmHYQ8cUsbdO1St7JLNwU6M5tI4FVsFcsY+xZJSCCpa7vwQNRKwtG/F
+	 EZdL2ivuJHM0Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u8k1r-0096YO-03;
-	Sat, 26 Apr 2025 19:13:31 +0100
-Date: Sat, 26 Apr 2025 19:13:29 +0100
-Message-ID: <86h62akcza.wl-maz@kernel.org>
+	id 1u910X-009GIf-FL;
+	Sun, 27 Apr 2025 13:21:17 +0100
+Date: Sun, 27 Apr 2025 13:21:16 +0100
+Message-ID: <86frhtkd6r.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: linux-arm-kernel@lists.infradead.org,
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	James Clark
+ <james.clark@linaro.org>,
+	James Morse <james.morse@arm.com>,
+	Joey Gouly
+ <joey.gouly@arm.com>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	Mark Brown
+ <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton
+ <oliver.upton@linux.dev>,
+	"Rob Herring (Arm)" <robh@kernel.org>,
+	Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shiqi Liu
+ <shiqiliu@hust.edu.cn>,
+	Will Deacon <will@kernel.org>,
+	Yicong Yang
+ <yangyicong@hisilicon.com>,
 	kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui
- Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
-In-Reply-To: <86jz799ozo.fsf@scott-ph-mail.amperecomputing.com>
-References: <20250422123901.2675976-1-maz@kernel.org>
-	<86jz799ozo.fsf@scott-ph-mail.amperecomputing.com>
+	linux-arm-kernel@lists.infradead.org,
+	open list
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] arm64: errata: Work around AmpereOne's erratum AC03_CPU_36
+In-Reply-To: <86frhx9ex6.fsf@scott-ph-mail.amperecomputing.com>
+References: <20250415154711.1698544-1-scott@os.amperecomputing.com>
+	<86wmbkk1yz.wl-maz@kernel.org>
+	<86frhx9ex6.fsf@scott-ph-mail.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,59 +76,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com
+X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, catalin.marinas@arm.com, james.clark@linaro.org, james.morse@arm.com, joey.gouly@arm.com, kevin.brodsky@arm.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, robh@kernel.org, shameerali.kolothum.thodi@huawei.com, shiqiliu@hust.edu.cn, will@kernel.org, yangyicong@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 24 Apr 2025 23:24:59 +0100,
+On Fri, 25 Apr 2025 03:02:29 +0100,
 D Scott Phillips <scott@os.amperecomputing.com> wrote:
 > 
 > Marc Zyngier <maz@kernel.org> writes:
 > 
-> > We keep setting and clearing these bits depending on the role of
-> > the host kernel, mimicking what we do for nVHE. But that's actually
-> > pretty pointless, as we always want physical interrupts to make it
-> > to the host, at EL2.
+> > On Tue, 15 Apr 2025 16:47:10 +0100,
+> > D Scott Phillips <scott@os.amperecomputing.com> wrote:
+> >> 
+> >> AC03_CPU_36 can cause asynchronous exceptions to be routed to the wrong
+> >> exception level if an async exception coincides with an update to the
+> >> controls for the target exception level in HCR_EL2. On affected
+> >> machines, always do writes to HCR_EL2 with async exceptions blocked.
 > >
-> > This has also two problems:
+> > From the actual errata document [1]:
 > >
-> > - it prevents IRQs from being taken when these bits are cleared
-> >   if the implementation has chosen to implement these bits as
-> >   masks when HCR_EL2.{TGE,xMO}=={0,0}
+> > <quote>
+> > If an Asynchronous Exception to EL2 occurs, while EL2 software is
+> > changing the EL2 exception control bits from a configuration where
+> > asynchronous exceptions are routed to EL2 to a configuration where
+> > asynchronous exceptions are routed to EL1, the processor may exhibit
+> > the incorrect exception behavior of routing an interrupt taken at EL2
+> > to EL1.  The affected system register is HCR_EL2, which contains
+> > control bits for routing and enabling of EL2 exceptions.
+> > </quote>
 > >
-> > - it triggers a bad erratum on the AmpereOne HW, which catches
-> >   fire on clearing these bits while an interrupt is being taken
-> >   (AC03_CPU_36).
+> > My reading is that things can go wrong when clearing the xMO bits.
 > >
-> > Let's kill these two birds with a single stone.
+> > I don't think we need to touch the xMO bits at all when running
+> > VHE. So my preference would be to:
 > >
-> > Reported-by: D Scott Phillips <scott@os.amperecomputing.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_arm.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > - simply leave the xMO bits set at all times (nothing bad can happen
+> >   from that, can it?)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index 974d72b5905b8..bba4b0e930915 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -100,7 +100,7 @@
-> >  			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
-> >  #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
-> >  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-> > -#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-> > +#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H | HCR_AMO | HCR_IMO | HCR_FMO)
-> >  
-> >  #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
-> >  #define MPAMHCR_HOST_FLAGS	0
+> > - prevent these systems from using anything but VHE (and fail KVM init
+> >   otherwise)
 > 
-> Should the xMO twiddling in __vgic_v3_get_gic_config() also get dropped
-> here?
+> Hi Marc, I started writing up this patch and then realized that the
+> issue can also not happen in nvhe mode. While xMO bits are modified
+> there, async exceptions are always masked and so the "simultaneously
+> take an async exception" part of the erratum can't happen.
+> 
+> Does that sound right to you, or are there cases that I'm missing. If
+> it's right the nvhe is also can't hit the erratum case, then what do you
+> think is the right thing for me to do here?
 
-Ah, that old chestnut. Yeah, well spotted. It could do with some
-TLC. I'll do some surgery on it and post a v2.
+That's an interesting point. We always run the nVHE/hVHE hypervisor
+code with interrupts disabled by virtue of taking an HVC exception
+into EL2, so that particular case seems OK as it literally implements
+the proposed workaround.
 
-Thanks,
+However, there's at least one catch: the SError handling code in
+hyp/entry.S relies on clearing PSTATE.A to take a pending abort (the
+so-called VAXorcism). I take that this CPU implements FEAT_RAS, and
+that we don't need to worry about this code path either, and that the
+erratum cannot trigger on speculatively executed paths?
+
+If we're OK with that, then I don't think there is much to do, other
+than always setting the xMO bits at all times, for which I already
+have a patch in review (v2 coming shortly).
 
 	M.
 
