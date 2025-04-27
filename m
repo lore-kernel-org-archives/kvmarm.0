@@ -1,60 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1C4522A
-	for <kvmarm@lists.linux.dev>; Sun, 27 Apr 2025 16:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C71A8F6B;
+	Sun, 27 Apr 2025 17:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745772204; cv=none; b=RKULeMsS8iQuf/FJRfA3AwRp0hbjJw7jzmUwQoG/OYn05Thcwt0ZVQ1Z3QqDeUL57D25s+9GmRYmCzv7zt2SY8IH3eDlXlhiJijvPs26+QScpQLYlplKw/hqYt4iJEUCB1DjAWkC79oFWHHfCI6/byKXxlY35dNDMZumPocApCM=
+	t=1745774654; cv=none; b=jczCPckmgp5rCU35wz0B44Pu2BAWwzDEHDwt/+1ZBN6hfTzec3UbLkh5VyQ38Nv2H+uUt1M10cnruJcs3xj4I4U86ZLFvff7PFYSWUOkJmaaGpNh+zzZL/9yTnWxMbgGz97V+8RZ0fJzMS04+wVbRTSriaOnn4BZhhL2RTKx3Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745772204; c=relaxed/simple;
-	bh=tPOIYQvlckSn9ZlJWzhqui3/DPJ7x4EqYVgyVa6Zg8w=;
+	s=arc-20240116; t=1745774654; c=relaxed/simple;
+	bh=zlvI/OsYZS9TORbwigHYcZcf8vMrlAxBIJ912DxqI+s=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hctQ7SGdwoALVS9qv8JITY39+LUlmoC+sOHNeJMwJQmhtm6mGIM5BwjXh3HJmZvYqTd60O0WGZzzfd+BT5NYTvA+a51keFtWIdH/IyRh2QwzS0zN9MHEbEp08eGMT2FlS1qcAZob9n+xlmB4JrMGCAWtP2DIrJPVZHMg7pjfS5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OHXGvfoL; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=cTImJn1YYcTLdAzkfq7tnD+2rtPXZVU5I7fzaCdA+JSpAmo4fi05gpvF2+nITohZao1sUvII/IsTzZAZSPjFPJBTI17wN1xu2sdiREmh8jPUtAcfljFzCYEJpM59I0lCc3q6cqpqrZ335cpzhpiXZ3Kc0zF6X8+dCh6BBLm/BHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7i3EM+9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OHXGvfoL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 883B9C4CEE3;
-	Sun, 27 Apr 2025 16:43:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7i3EM+9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE67C4CEE3;
+	Sun, 27 Apr 2025 17:24:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745772203;
-	bh=tPOIYQvlckSn9ZlJWzhqui3/DPJ7x4EqYVgyVa6Zg8w=;
+	s=k20201202; t=1745774653;
+	bh=zlvI/OsYZS9TORbwigHYcZcf8vMrlAxBIJ912DxqI+s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OHXGvfoLXxYY91p48wm7+XeUIH0vDOfmxN1etUlTlYoeObj70nLyCFLkBzkiTz+SG
-	 rwwB3uER+bA8uHcZrMMGjr6388/o6TGB/W3FtjByoecMcgDJqv0guLcSY946r9oqCB
-	 IffEyyzwx6cX9j5VYd/3UCOfqx9uJQ7QsPLdA+qAVDRIBAsXQOm8R+bn+w6VUFLCFn
-	 nCqKqQ4bJWrRwIDFNuDbw/9sb4B271kfDx+9jiofT9j/qtQpplxGSaJmtZ7Ct0llsF
-	 bipW4+vgBjK+7CB3egAi32YncPI9JfgTIFGG+z1HPyXrLvghuDFUtAtz15q4VB3ICq
-	 VoBwv5d4A/xpQ==
+	b=U7i3EM+93tP91zykMn38I1S5J7RHxE9UAZKjLXNt0GKMtIeBPVqPoUS8NXLhRP+0c
+	 dUsZy32Re3q8yTJT2ilO+nWtEaPcmbWplPelWY9zToczEYe6SzBQrIRzyWRViywIVE
+	 dExFK5kg+qJYFeRlT4USTGViT/OnZLxcDCDSVXzXLeyPiPjzLlt8UXHv5SZnBA1YUx
+	 TbBLTdxTFKhb8kJuatMKobRdnwy2Rsir5+kh2P1BZwCVNqqRvwuah+b76aA7vHTyJy
+	 04JRKeIHNC3Lr76RDEc4NTccAMlPAQnug4wty70mBHv6NizQkCXDfGyqowqJsd1sS3
+	 MOIxgxxileqxw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u9567-009JWO-GZ;
-	Sun, 27 Apr 2025 17:43:21 +0100
-Date: Sun, 27 Apr 2025 17:43:18 +0100
-Message-ID: <86cycxk121.wl-maz@kernel.org>
+	id 1u95jf-009JnY-Df;
+	Sun, 27 Apr 2025 18:24:11 +0100
+Date: Sun, 27 Apr 2025 18:24:10 +0100
+Message-ID: <86bjshjz5x.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Ilias Stamatis <ilstam@amazon.com>,
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
 	oliver.upton@linux.dev,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	eric.auger@redhat.com,
-	andre.przywara@arm.com,
-	will@kernel.org,
-	jgrall@amazon.co.uk,
-	ugurus@amazon.co.uk,
-	nh-open-source@amazon.com
-Subject: Re: [RFC] ARM vGIC-ITS tables serialization when running protected VMs
-In-Reply-To: <6ff7bf8388303c75092d0cc1078d40f018d2bbc4.camel@infradead.org>
-References: <20250414111244.153528-1-ilstam@amazon.com>
-	<867c3llt43.wl-maz@kernel.org>
-	<94fb9d4adb81f824912ee23a296776aa07873354.camel@infradead.org>
-	<6ff7bf8388303c75092d0cc1078d40f018d2bbc4.camel@infradead.org>
+	shuah@kernel.org
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Make MTE_frac masking conditional on MTE capability
+In-Reply-To: <20250414124059.1938303-3-ben.horgan@arm.com>
+References: <20250414124059.1938303-1-ben.horgan@arm.com>
+	<20250414124059.1938303-3-ben.horgan@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,68 +57,102 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dwmw2@infradead.org, ilstam@amazon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com, andre.przywara@arm.com, will@kernel.org, jgrall@amazon.co.uk, ugurus@amazon.co.uk, nh-open-source@amazon.com
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, shuah@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 22 Apr 2025 11:47:46 +0100,
-David Woodhouse <dwmw2@infradead.org> wrote:
->=20
-> [1  <text/plain; UTF-8 (quoted-printable)>]
-> On Tue, 2025-04-15 at 10:44 +0100, David Woodhouse wrote:
-> > =C2=A0
-> >=20
-> > > > Another issue is that it's actually hard for the lowvisor to know w=
-here these
-> > > > tables live without trusting the EL1 host which virtualizes the ITS=
-. It is
-> > > > especially hard knowing the locations of the ITTs (compared to
-> > > > Collection/Device tables) because that probably means having to par=
-se the ITS
-> > > > command queue from EL2 which is complex and undesirable.
-> > > >=20
-> > > > # An alternative: Serializing ITTs into a userspace buffer
-> > >=20
-> > > NAK.
-> > >=20
-> > > Share the page-aligned memory with the rest of the hypervisor, and use
-> > > the existing API.
-> >=20
-> > That seems like a bad choice. All this is just using guest memory to
-> > store KVM's state.
-> >=20
-> > Yes, the guest provides a buffer which the virtual hardware *may* use
-> > if it wants, but with no IOMMU or access control defined in the
-> > specification.
-> >=20
-> > It seems like it would be much cleaner just to let KVM pass its state
-> > up to userspace for serialization like we do for all *other* KVM state,
-> > which is what Ilias is proposing.
->=20
-> Ping?
->=20
-> Redefining the GIC specification to implicitly share whole pages with
-> the hypervisor in a protected guest, when they happen to have an ITT
-> somewhere inside the page, seems like a very bad idea. Did you have
-> some proposed wording for the specification update though, if that's
-> the approach you're proposing?
+On Mon, 14 Apr 2025 13:40:58 +0100,
+Ben Horgan <ben.horgan@arm.com> wrote:
+> 
+> If MTE_frac is masked out unconditionally then the guest will always
+> see ID_AA64PFR1_EL1_MTE_frac as 0. However, a value of 0 when
+> ID_AA64PFR1_EL1_MTE is 2 indicates that MTE_ASYNC is supported. Hence, for
+> a host with ID_AA64PFR1_EL1_MTE==2 and ID_AA64PFR1_EL1_MTE_frac==0xf
+> (MTE_ASYNC unsupported) the guest would see MTE_ASYNC advertised as
+> supported whilst the host does not support it. Hence, expose the sanitised
+> value of MTE_frac to the guest and user-space.
+> 
+> As MTE_frac was previously hidden, always 0, and KVM must accept values
+> from KVM provided by user-space, when ID_AA64PFR1_EL1.MTE is 2 allow
+> user-space to set ID_AA64PFR1_EL1.MTE_frac to 0. However, ignore it to
+> avoid incorrectly claiming hardware support for MTE_ASYNC in the guest.
+> 
+> Note that linux does not check the value of ID_AA64PFR1_EL1_MTE_frac and
+> wrongly assumes that MTE async faults can be generated even on hardware
+> that does nto support them. This issue is not addressed here.
+> 
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 26 ++++++++++++++++++++++++--
+>  1 file changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 005ad28f7306..9ae647082684 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1600,13 +1600,14 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  		val = sanitise_id_aa64pfr0_el1(vcpu, val);
+>  		break;
+>  	case SYS_ID_AA64PFR1_EL1:
+> -		if (!kvm_has_mte(vcpu->kvm))
+> +		if (!kvm_has_mte(vcpu->kvm)) {
+>  			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+> +			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac);
+> +		}
+>
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RNDR_trap);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_NMI);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_GCS);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_THE);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTEX);
+> @@ -1953,11 +1954,32 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
+>  {
+>  	u64 hw_val = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
+>  	u64 mpam_mask = ID_AA64PFR1_EL1_MPAM_frac_MASK;
+> +	u8 mte = SYS_FIELD_GET(ID_AA64PFR1_EL1, MTE, hw_val);
+> +	u8 user_mte_frac = SYS_FIELD_GET(ID_AA64PFR1_EL1, MTE_frac, user_val);
+>  
+>  	/* See set_id_aa64pfr0_el1 for comment about MPAM */
+>  	if ((hw_val & mpam_mask) == (user_val & mpam_mask))
+>  		user_val &= ~ID_AA64PFR1_EL1_MPAM_frac_MASK;
+>  
+> +	/*
+> +	 * Previously MTE_frac was hidden from guest. However, if the
+> +	 * hardware supports MTE2 but not MTE_ASYM_FAULT then a value
+> +	 * of 0 for this field indicates that the hardware supports
+> +	 * MTE_ASYNC. Whereas, 0xf indicates MTE_ASYNC is not supported.
+> +	 *
+> +	 * As KVM must accept values from KVM provided by user-space,
+> +	 * when ID_AA64PFR1_EL1.MTE is 2 allow user-space to set
+> +	 * ID_AA64PFR1_EL1.MTE_frac to 0. However, ignore it to avoid
+> +	 * incorrectly claiming hardware support for MTE_ASYNC in the
+> +	 * guest.
+> +	 */
+> +
+> +	if (mte == ID_AA64PFR1_EL1_MTE_MTE2 &&
 
-That's already a requirement for CCA when used with GICv3/GICv4.
+The spec says that MTE_frac is valid if ID_AA64PFR1_EL1.MTE >= 0b0010.
+Not strictly equal to 0b0010 (which represents MTE2). Crucially, MTE3
+should receive the same treatment.
 
-> And *implementing* it by making the lowvisor snoop on the ITS command
-> queue is also awful.
+> +	    user_mte_frac == ID_AA64PFR1_EL1_MTE_frac_ASYNC) {
+> +		user_val &= ~ID_AA64PFR1_EL1_MTE_frac_MASK;
+> +		user_val |= hw_val & ID_AA64PFR1_EL1_MTE_frac_MASK;
 
-Not only the command queue. *ANY* RD and ITS access. If you don't, it
-is rather easy for the host to use the GIC to repaint your privileged
-code and confidential guest, one bit at a time.
+This means you are unconditionally propagating what the HW supports,
+which feels dodgy, specially considering that we don't know how
+MTE_frac is going to evolve in the future.
 
-But that has nothing to do with sharing the ITT memory, which is only
-manipulated by the KVM emulation.
+I think you should limit the fix to the exact case we're mitigating
+here, not blindly overwrite the guest's view with the HW's capability.
+
+Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
