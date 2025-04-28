@@ -1,126 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6790F2036E2;
-	Mon, 28 Apr 2025 10:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3980D2641F8
+	for <kvmarm@lists.linux.dev>; Mon, 28 Apr 2025 11:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745834649; cv=none; b=DCcgAx7vnsVPqaZhTBLNhhvOx6T9GRL/iz4RuENfLBfvFNX8MKBeJ3LifACMwuhrai4Io4LvEZJvfWbLaW1FZLM32BoC4BYspHmhmDX6vQ2mdLd4b+PHGdNxANw6pehkhfX0rE8YG4CZ/4lLR2tmLyRauOLEhM7snWVXQdH0hlE=
+	t=1745839611; cv=none; b=RrTrFL3I9w+Xg/1HX+B3uJwOU2KI5wNdIp8QhR9Vi5AS/45mHdQhsXSvA4iN4UNrM7O9vgM+j+3+1LDYU/37Lb63xgH6DAu+RmkSNnVfO9ruean0+03qM2gfsyv5tTxlnNzSM38F2YnJFSy0+N0VB4QN1jTIz6kKCClpDx1CKpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745834649; c=relaxed/simple;
-	bh=vAoG5/xSEr/30IS/WDi1H6EZUnCxT0ydzdIngcc8O/M=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I/ftaPRrf0bJeLqoBMtVlPb5N829MP8Q9HtRLS5GQhtjeEaOmhJqYcMvkh7xUX4z190lNuG9+a5+FaDjiPv868hZMTMMOb1GFzIyfI/FAN9ai0T5+5iGTsqU9QCoslITUtr6iWOs1/jDnqf7QDh+46BjIue0G5mc1sBRPrkPb7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ICE4fLJd; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ICE4fLJd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF3D8C4CEE4;
-	Mon, 28 Apr 2025 10:04:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745834648;
-	bh=vAoG5/xSEr/30IS/WDi1H6EZUnCxT0ydzdIngcc8O/M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ICE4fLJdboNxGzgGECHOJxbMT0kwWt5N6Tk6Zmc9mJZ+7/UZNh6fL9QaSAeOGAl1n
-	 K9oXqCtxqepMiutpU9RF+V+CewWe4EPURqQlNnh3Kc0oi6D0w4INU6dAKHpzwuAbe/
-	 jthwIm+cfrp9yUDQcKOyBJ2lY5dBuuacNFFu8KPgnyBKAelkWFFrZ2LQrTf7DszO62
-	 TqiZQLVScHQYv1A74qAGVALZ00WMlUoSTKy4hJkY36NdV8cvDDY3mwfiRmwvOClokE
-	 yy1WVcxokj5nvAdo4lI2hN3u/uti053EDaczhDzvjydieXIB/5WIgapTqSFo81Vj8T
-	 7aRxnlZALumZg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u9LLK-009ToD-5g;
-	Mon, 28 Apr 2025 11:04:06 +0100
-Date: Mon, 28 Apr 2025 11:04:05 +0100
-Message-ID: <86a580k3fu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Seongsu Park" <sgsu.park@samsung.com>
-Cc: "'Anshuman Khandual'" <anshuman.khandual@arm.com>,
-	<will@kernel.org>,
-	<catalin.marinas@arm.com>,
-	<suzuki.poulose@arm.com>,
-	<joey.gouly@arm.com>,
-	<oliver.upton@linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>,
-	<cpgs@samsung.com>
-Subject: Re: [PATCH] arm64: kvm: Replace ternary flags with str_on_off() helper
-In-Reply-To: <0fd501dbb80c$d5a91d30$80fb5790$@samsung.com>
-References: <CGME20250415012410epcas1p42b48977934c21b5db0b19f4185f7a63c@epcas1p4.samsung.com>
-	<1891546521.01744691102904.JavaMail.epsvc@epcpadp1new>
-	<f998cbba-bda0-472b-8f4a-a972a29f21ef@arm.com>
-	<0fd501dbb80c$d5a91d30$80fb5790$@samsung.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1745839611; c=relaxed/simple;
+	bh=O9SIO+O4YfF78ixDd98wXc/IQFIu5PJ8TjGSSZQt4nI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kLf4f3PRTYQK5OH/bUIpPtRDM0wo+y4N7xxcdvglDaDEBmLqBXfeRF/AjCxOni7iv5txMIFYfd7hERWEVCnzcQwr/7+MMhUimdEr3kdJzlsTmV8rUct5p0/kAlHoHkjBEbKLVWFY0NlsJ3X0HERDKICscMr5R/yPKUV+pJ9iqxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF09C1516;
+	Mon, 28 Apr 2025 04:26:42 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CC3053F673;
+	Mon, 28 Apr 2025 04:26:47 -0700 (PDT)
+Message-ID: <f44eabb4-9b5e-479b-b78b-e9c918b3798c@arm.com>
+Date: Mon, 28 Apr 2025 12:26:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sgsu.park@samsung.com, anshuman.khandual@arm.com, will@kernel.org, catalin.marinas@arm.com, suzuki.poulose@arm.com, joey.gouly@arm.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, cpgs@samsung.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Make MTE_frac masking conditional on
+ MTE capability
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, shuah@kernel.org
+References: <20250414124059.1938303-1-ben.horgan@arm.com>
+ <20250414124059.1938303-3-ben.horgan@arm.com> <86bjshjz5x.wl-maz@kernel.org>
+Content-Language: en-US
+From: Ben Horgan <ben.horgan@arm.com>
+In-Reply-To: <86bjshjz5x.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 28 Apr 2025 08:11:59 +0100,
-"Seongsu Park" <sgsu.park@samsung.com> wrote:
-> > On 4/15/25 06:54, Seongsu Park wrote:
-> > > Replace repetitive ternary expressions with the str_on_off() helper
-> > > function. This change improves code readability and ensures
-> > > consistency in tracepoint string formatting
-> > >
-> > > Signed-off-by: Seongsu Park <sgsu.park@samsung.com>
-> > > ---
-> > >  arch/arm64/kvm/trace_arm.h | 6 +++---
-> > >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-> > > index c18c1a95831e..9c60f6465c78 100644
-> > > --- a/arch/arm64/kvm/trace_arm.h
-> > > +++ b/arch/arm64/kvm/trace_arm.h
-> > > @@ -176,7 +176,7 @@ TRACE_EVENT(kvm_set_way_flush,
-> > >  	    ),
-> > >
-> > >  	    TP_printk("S/W flush at 0x%016lx (cache %s)",
-> > > -		      __entry->vcpu_pc, __entry->cache ? "on" : "off")
-> > > +		      __entry->vcpu_pc, str_on_off(__entry->cache))
-> > >  );
-> > >
-> > >  TRACE_EVENT(kvm_toggle_cache,
-> > > @@ -196,8 +196,8 @@ TRACE_EVENT(kvm_toggle_cache,
-> > >  	    ),
-> > >
-> > >  	    TP_printk("VM op at 0x%016lx (cache was %s, now %s)",
-> > > -		      __entry->vcpu_pc, __entry->was ? "on" : "off",
-> > > -		      __entry->now ? "on" : "off")
-> > > +		      __entry->vcpu_pc, str_on_off(__entry->was),
-> > > +		      str_on_off(__entry->now))
-> > >  );
-> > >
-> > >  /*
-> > 
-> > Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Hi Marc,
+
+On 4/27/25 18:24, Marc Zyngier wrote:
+> On Mon, 14 Apr 2025 13:40:58 +0100,
+> Ben Horgan <ben.horgan@arm.com> wrote:
+>> [...]
+>> +	/*
+>> +	 * Previously MTE_frac was hidden from guest. However, if the
+>> +	 * hardware supports MTE2 but not MTE_ASYM_FAULT then a value
+>> +	 * of 0 for this field indicates that the hardware supports
+>> +	 * MTE_ASYNC. Whereas, 0xf indicates MTE_ASYNC is not supported.
+>> +	 *
+>> +	 * As KVM must accept values from KVM provided by user-space,
+>> +	 * when ID_AA64PFR1_EL1.MTE is 2 allow user-space to set
+>> +	 * ID_AA64PFR1_EL1.MTE_frac to 0. However, ignore it to avoid
+>> +	 * incorrectly claiming hardware support for MTE_ASYNC in the
+>> +	 * guest.
+>> +	 */
+>> +
+>> +	if (mte == ID_AA64PFR1_EL1_MTE_MTE2 &&
 > 
-> Dear Anshuman,
+> The spec says that MTE_frac is valid if ID_AA64PFR1_EL1.MTE >= 0b0010.
+> Not strictly equal to 0b0010 (which represents MTE2). Crucially, MTE3
+> should receive the same treatment.
+
+This is specific to MTE2 as when MTE3 is supported MTE_ASYM_FAULT is 
+also supported and when MTE_ASYM_FAULT is supported the spec says 
+MTE_frac is 0.
 > 
-> Do you have any feedback?
-> If you have, please let me know.
-> I think this patch is appropriate.
+>> +	    user_mte_frac == ID_AA64PFR1_EL1_MTE_frac_ASYNC) {
+>> +		user_val &= ~ID_AA64PFR1_EL1_MTE_frac_MASK;
+>> +		user_val |= hw_val & ID_AA64PFR1_EL1_MTE_frac_MASK;
+> 
+> This means you are unconditionally propagating what the HW supports,
+> which feels dodgy, specially considering that we don't know how
+> MTE_frac is going to evolve in the future.
+> 
+> I think you should limit the fix to the exact case we're mitigating
+> here, not blindly overwrite the guest's view with the HW's capability.
 
-There isn't much to add. This patch looks reasonable, but it also
-doesn't warrant being merged immediately (it is purely cosmetic).
+Sure, better safe than sorry. I can update the if condition to the below.
 
-Once I start queuing patches for 6.16, I'll probably add it to the
-mix.
+u8 hw_mte_frac = SYS_FIELD_GET(ID_AA64PFR1_EL1, MTE_frac, hw_val);
+...
+if (mte == ID_AA64PFR1_EL1_MTE_MTE2 &&
+     hw_mte_frac == ID_AA64PFR1_EL1_MTE_frac_NI &&
+     user_mte_frac == ID_AA64PFR1_EL1_MTE_frac_ASYNC)
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
 Thanks,
 
-	M.
+Ben
 
--- 
-Without deviation from the norm, progress is not possible.
