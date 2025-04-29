@@ -1,168 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4482C374B;
-	Tue, 29 Apr 2025 11:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E4F2D29D6
+	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 13:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745927013; cv=none; b=W8vGelRsGPffuQJGJZtTHwtTQmdsyzUjM6zrhc0ABsHzlAIfKxcG06k1umyabvubPaBh+pjKkyWXug+oRkYJMi04MBOd3wZ8vZjDJ+IvUiR7HYYaFeDcQhR9f4KSk/AW1zAjMOsCnrBHqL7xvtEHPKVCdxlgT1iYekn8/Vc6vpg=
+	t=1745932043; cv=none; b=HDy5PlFmvILxkJYSoVqI6TM5C1S7mXvo2nmI1/qoU6i7Jy5CPuU4b/8Eb/+jcVzfhQGhL//GfYAY/eEjpLo2AYZdydaXLYIMZJT7o0jyzPg1k9JmYDP2dZBx8pv28/ZZPr6HmF9nPJe/PM2UDxapqREcGx+/4KIMQsSrD/YkJOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745927013; c=relaxed/simple;
-	bh=9ZzZ2PUUe62ESKAkB2c5E8q80p5NNCf2tGXDF7sXtlA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u+hQhwTyuyXNm4I6JJg8nmdGAGTtWFx2yX6X1x8UWMCut7QPw7OYdPLmG2EZNkoE0gu2LC0QKfpjkW0iJn6dyBbwSCXGMQ907z++NkwQmbKDgihGz8/bukNDPp+FOV49LhgCN28OjeYIkiLtT67RXU7M6vkdm3eaI7tawHuXaB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eef7Ny0N; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eef7Ny0N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6D4BC4CEE3;
-	Tue, 29 Apr 2025 11:43:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745927011;
-	bh=9ZzZ2PUUe62ESKAkB2c5E8q80p5NNCf2tGXDF7sXtlA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Eef7Ny0Nw1TSqWdRODz4I099aCTZln80IlK5ML2ODp35P7NV5Z6uBafKBI2BCfT8j
-	 tG2CgqLMZlwc4X0do2X9+RG6vD7NwjCs8tHxqGyLJmWaoigZTlntAaqxKcIH72uG/p
-	 /r3QtlD3RNShyID2I6kIaC2qUhde7kLVU+DQJt6euHZn+r63H0UAi6J24qKhZ5RNOU
-	 95bbx+r3K7t6dbSKnfbZnBrB0DDxybnaSNdCDNDQDNUVmMP2QMS7JHDgBFWFzYqcQG
-	 caEGtoF+F3QvYBbQNKAZz/cwsj+ZuXk7Heayg6DOSjtDUU+hZIWHQSNPVl+HpJ2r5K
-	 zA3PfYHylyxOA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u9jN3-009t4S-LJ;
-	Tue, 29 Apr 2025 12:43:29 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: [PATCH v2] KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
-Date: Tue, 29 Apr 2025 12:43:26 +0100
-Message-Id: <20250429114326.3618875-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1745932043; c=relaxed/simple;
+	bh=ZmHfsW91YPWRvQ6rKwiFn3NnMv9gzsRMQhen56flCqo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QQuS7eK5XtEEpD2cxGpKCZORwp2NQOJIiL0HmN8lqmGi5iNB2sD3L9oXJVx+G+QiYZr1ZSn6SRKSYSpxxh+whK776pfgxDzGjNo4b4b/42IWphr4O5YjDqpn+rTHtHNB83rBnrgExPs3AI85xQElLLvRhOVRqO6q+A9NPgxlfHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E54961515;
+	Tue, 29 Apr 2025 06:07:14 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D59CC3F673;
+	Tue, 29 Apr 2025 06:07:19 -0700 (PDT)
+Message-ID: <b41361d2-fe4c-4242-b814-b0556cb91ec0@arm.com>
+Date: Tue, 29 Apr 2025 14:07:18 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 04/42] arm64: sysreg: Replace HGFxTR_EL2 with
+ HFG{R,W}TR_EL2
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>,
+ Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+ <20250426122836.3341523-5-maz@kernel.org>
+Content-Language: en-US
+From: Ben Horgan <ben.horgan@arm.com>
+In-Reply-To: <20250426122836.3341523-5-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-We keep setting and clearing these bits depending on the role of
-the host kernel, mimicking what we do for nVHE. But that's actually
-pretty pointless, as we always want physical interrupts to make it
-to the host, at EL2.
+Hi Marc
 
-This has also two problems:
+On 4/26/25 13:27, Marc Zyngier wrote:
+> Treating HFGRTR_EL2 and HFGWTR_EL2 identically was a mistake.
+> It makes things hard to reason about, has the potential to
+> introduce bugs by giving a meaning to bits that are really reserved,
+> and is in general a bad description of the architecture.
 
-- it prevents IRQs from being taken when these bits are cleared
-  if the implementation has chosen to implement these bits as
-  masks when HCR_EL2.{TGE,xMO}=={0,0}
+There is a typo in the subject line. HGFxTR_EL2 should be HFG_xTR_EL2.
 
-- it triggers a bad erratum on the AmpereOne HW, which catches
-  fire on clearing these bits while an interrupt is being taken
-  (AC03_CPU_36).
+Thanks,
 
-Let's kill these two birds with a single stone, and permanently
-set the xMO bits when running VHE. This involves a bit of surgery
-on code paths that rely on flipping these bits on and off for
-other purposes.
-
-Note that the earliest setting of hcr_el2 (in the init_hcr_el2
-macro) is left untouched as is runs extremely early, with interrupts
-disabled, and soon enough overwritten with the final value containing
-the xMO bits.
-
-Reported-by: D Scott Phillips <scott@os.amperecomputing.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_arm.h |  2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c  | 36 +++++++++++++++++++-------------
- 2 files changed, 22 insertions(+), 16 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 974d72b5905b8..bba4b0e930915 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -100,7 +100,7 @@
- 			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
--#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-+#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H | HCR_AMO | HCR_IMO | HCR_FMO)
- 
- #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
- #define MPAMHCR_HOST_FLAGS	0
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index ed363aa3027e5..50aa8dbcae75b 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -429,23 +429,27 @@ u64 __vgic_v3_get_gic_config(void)
- 	/*
- 	 * To check whether we have a MMIO-based (GICv2 compatible)
- 	 * CPU interface, we need to disable the system register
--	 * view. To do that safely, we have to prevent any interrupt
--	 * from firing (which would be deadly).
-+	 * view.
- 	 *
--	 * Note that this only makes sense on VHE, as interrupts are
--	 * already masked for nVHE as part of the exception entry to
--	 * EL2.
--	 */
--	if (has_vhe())
--		flags = local_daif_save();
--
--	/*
- 	 * Table 11-2 "Permitted ICC_SRE_ELx.SRE settings" indicates
- 	 * that to be able to set ICC_SRE_EL1.SRE to 0, all the
- 	 * interrupt overrides must be set. You've got to love this.
-+	 *
-+	 * As we always run VHE with HCR_xMO set, no extra xMO
-+	 * manipulation is required in that case.
-+	 *
-+	 * To safely disable SRE, we have to prevent any interrupt
-+	 * from firing (which would be deadly). This only makes sense
-+	 * on VHE, as interrupts are already masked for nVHE as part
-+	 * of the exception entry to EL2.
- 	 */
--	sysreg_clear_set(hcr_el2, 0, HCR_AMO | HCR_FMO | HCR_IMO);
--	isb();
-+	if (has_vhe()) {
-+		flags = local_daif_save();
-+	} else {
-+		sysreg_clear_set(hcr_el2, 0, HCR_AMO | HCR_FMO | HCR_IMO);
-+		isb();
-+	}
-+
- 	write_gicreg(0, ICC_SRE_EL1);
- 	isb();
- 
-@@ -453,11 +457,13 @@ u64 __vgic_v3_get_gic_config(void)
- 
- 	write_gicreg(sre, ICC_SRE_EL1);
- 	isb();
--	sysreg_clear_set(hcr_el2, HCR_AMO | HCR_FMO | HCR_IMO, 0);
--	isb();
- 
--	if (has_vhe())
-+	if (has_vhe()) {
- 		local_daif_restore(flags);
-+	} else {
-+		sysreg_clear_set(hcr_el2, HCR_AMO | HCR_FMO | HCR_IMO, 0);
-+		isb();
-+	}
- 
- 	val  = (val & ICC_SRE_EL1_SRE) ? 0 : (1ULL << 63);
- 	val |= read_gicreg(ICH_VTR_EL2);
--- 
-2.39.2
-
+Ben
