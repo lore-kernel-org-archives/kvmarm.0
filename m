@@ -1,113 +1,104 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8A52135A4
-	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 13:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78242C375B;
+	Tue, 29 Apr 2025 13:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745933891; cv=none; b=lK/gMYbOjAWaEHcvrzPCJAV5m01gOWxAKxfV5GDxCG7uizC2Tu+G/PWq6pUAl9FDMcCLVgUhL2CgnpUlXdPINkQcu7+iVaSV79zNpUl1j/b5jGSlcwDCP0/0ijLeR9r5ObNSsr8bLOEBGsN6Bw0l1mRgPleTUQUtx15exyt83Eg=
+	t=1745934077; cv=none; b=mfADktK4ZnG1r4HExGNskDNtH8PaxXWf9GZWOzCxmZYSTxRQtfV7ep7Hj1Ydv47wudE0tWVJWKnCSlMAzmfljhqhgAekNe0GnoJfvvUG9xs6Q22u3RLcW9O8Tuj6rv+v3+/szOu9+npSDPdKr7W0C4Vxp0T4K9R/Xtvxo5lzzCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745933891; c=relaxed/simple;
-	bh=wB70FRP/aSmlCkRecgc26yX2ofUavoiKG/fAqHKjKFQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PFvGMUbN3GM7FI1POnT1J6WTJPLUGswX2tBzRsFwtUA8aK+Lme4KbyjbMCz1/EtgVHctVnvqMoqmnDpM1SankRgVsvRMvGsavpx9R9U5B3oJiskRpxFKuLLfugS0GOB9r2kVgKZC3g6fkO42M9ZDxadnj5bdfKU6VSeSm58VfbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD6D81515;
-	Tue, 29 Apr 2025 06:38:01 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 916F93F673;
-	Tue, 29 Apr 2025 06:38:06 -0700 (PDT)
-Date: Tue, 29 Apr 2025 14:38:03 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1745934077; c=relaxed/simple;
+	bh=bJRpUbI549tFu5fdC+DCORV9nXGD3YYzkP2HcOX7uQY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d7kW1z3rfURlr1TAdLbPNF99nR2sPWmefWmumEgHUBn/ONSArwyfM4yDbOYwcJXyz0sjTxqNFq+URceCTFGgUPzazjlc4WxgvriJX/uhe+4nFNF0UH8x73KIgmbl3Z+urX35ASu1dCbFmu3ntWvbl8aHe58Qf047wAOgS3OtKZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOexpkUF; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOexpkUF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F781C4CEE3;
+	Tue, 29 Apr 2025 13:41:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745934074;
+	bh=bJRpUbI549tFu5fdC+DCORV9nXGD3YYzkP2HcOX7uQY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hOexpkUFYTMHUAahkUcB99gyQNhZi94+y5iTQIKG3/0Pge+BHKZJsq4hUAfCbzZ4O
+	 MlqiFUPPewBo8vPmY1sleA2XxiHyL4U0xJr7x9QvlrM5FCWcijVER/3tQbbCZkJtJb
+	 SCOb0IE8r/tlW7EdexI9cWLwfuLJxKvoqfdaaHaoFWNo2o5OY6hFpBaR5cVzfwedAs
+	 p/Wl9mf3z4SYUvIVGcD9QTS5ZKkG5hTzc58i1xNuG5dXvvr2hws8DdDHTrn8Ygf2PQ
+	 eQiA7c3BHd/qxXR+bK2mF5hKURUrH/eKHI214QQSk8O+NllaOYEe4yzs/krjI+Gv49
+	 OvEJ9S5cBtgKQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u9lCx-009vXz-TM;
+	Tue, 29 Apr 2025 14:41:12 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 02/42] arm64: sysreg: Update ID_AA64MMFR4_EL1
- description
-Message-ID: <20250429133803.GB1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-3-maz@kernel.org>
+	Quentin Perret <qperret@google.com>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/7] Move pKVM ownership state to hyp_vmemmap
+Date: Tue, 29 Apr 2025 14:41:08 +0100
+Message-Id: <174593405817.3620453.10683944453931548390.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250416152648.2982950-1-qperret@google.com>
+References: <20250416152648.2982950-1-qperret@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-3-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, vdonnefort@google.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Apr 26, 2025 at 01:27:56PM +0100, Marc Zyngier wrote:
-> Resync the ID_AA64MMFR4_EL1 with the architectue description.
+On Wed, 16 Apr 2025 15:26:40 +0000, Quentin Perret wrote:
+> This series moves the hypervisor's ownership state to the hyp_vmemmap,
+> as discussed in [1]. The two main benefits are:
 > 
-> This results in:
+>  1. much cheaper hyp state lookups, since we can avoid the hyp stage-1
+>     page-table walk;
 > 
-> - the new PoPS field
-> - the new NV2P1 value for the NV_frac field
-> - the new RMEGDI field
-> - the new SRMASK field
+>  2. de-correlates the hyp state from the presence of a mapping in the
+>     linear map range of the hypervisor; which enables a bunch of
+>     clean-ups in the existing code and will simplify the introduction of
+>     other features in the future (hyp tracing, ...)
 > 
-> These fields have been generated from the reference JSON file.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/tools/sysreg | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index e5da8848b66b5..fce8328c7c00b 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -1946,12 +1946,21 @@ EndEnum
->  EndSysreg
->  
->  Sysreg	ID_AA64MMFR4_EL1	3	0	0	7	4
-> -Res0	63:40
-> +Res0	63:48
-> +UnsignedEnum	47:44	SRMASK
-> +	0b0000	NI
-> +	0b0001	IMP
-> +EndEnum
-> +Res0	43:40
->  UnsignedEnum	39:36	E3DSE
->  	0b0000	NI
->  	0b0001	IMP
->  EndEnum
-> -Res0	35:28
-> +Res0	35:32
-> +UnsignedEnum	31:28	RMEGDI
-> +	0b0000	NI
-> +	0b0001	IMP
-> +EndEnum
->  SignedEnum	27:24	E2H0
->  	0b0000	IMP
->  	0b1110	NI_NV1
-> @@ -1960,6 +1969,7 @@ EndEnum
->  UnsignedEnum	23:20	NV_frac
->  	0b0000	NV_NV2
->  	0b0001	NV2_ONLY
-> +	0b0010	NV2P1
->  EndEnum
->  UnsignedEnum	19:16	FGWTE3
->  	0b0000	NI
-> @@ -1979,7 +1989,10 @@ SignedEnum	7:4	EIESB
->  	0b0010	ToELx
->  	0b1111	ANY
->  EndEnum
-> -Res0	3:0
-> +UnsignedEnum	3:0	PoPS
-> +	0b0000	NI
-> +	0b0001	IMP
-> +EndEnum
->  EndSysreg
->  
->  Sysreg	SCTLR_EL1	3	0	1	0	0
+> [...]
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Applied to next, thanks!
+
+[1/7] KVM: arm64: Track SVE state in the hypervisor vcpu structure
+      commit: 5db1bef933427aa467ad89c7b695a84a6b4afe16
+[2/7] KVM: arm64: Fix pKVM page-tracking comments
+      commit: ba637018ca67224fa21dc2212cb4457b357a5455
+[3/7] KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
+      commit: cd4b039165a5e709d0d599e207709d73141a8bed
+[4/7] KVM: arm64: Introduce {get,set}_host_state() helpers
+      commit: ba5b2e5b9dff5ba14940e1525f6e3a595f012466
+[5/7] KVM: arm64: Move hyp state to hyp_vmemmap
+      commit: 3390b3cbb613bc0822854f5754437cd1d1b3d5d0
+[6/7] KVM: arm64: Defer EL2 stage-1 mapping on share
+      commit: 48d848882395a6a42ff1bb685082c79791d4e753
+[7/7] KVM: arm64: Unconditionally cross check hyp state
+      commit: 43c475504a39e98f10f5e6ec4d9d9ed60672a753
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
