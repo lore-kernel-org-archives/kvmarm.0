@@ -1,104 +1,118 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78242C375B;
-	Tue, 29 Apr 2025 13:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3A01FC0ED;
+	Tue, 29 Apr 2025 13:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745934077; cv=none; b=mfADktK4ZnG1r4HExGNskDNtH8PaxXWf9GZWOzCxmZYSTxRQtfV7ep7Hj1Ydv47wudE0tWVJWKnCSlMAzmfljhqhgAekNe0GnoJfvvUG9xs6Q22u3RLcW9O8Tuj6rv+v3+/szOu9+npSDPdKr7W0C4Vxp0T4K9R/Xtvxo5lzzCA=
+	t=1745934581; cv=none; b=Q0hJbI2B7hJ1mS5Nmv5UK380HQkkQmJi9tlsbGiLEqzbTL9JqrDxKpydNLz0BADAaVubOuR1IuH8C10EQ+Pr5cQ/Xx1V7zMjj1loTDc3NJQmqJ10tErCeTdvZ94A1pRBFeVZWkjAMJPY7BLS+5BgyatCoLh/ILmLq6S0FaNsqiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745934077; c=relaxed/simple;
-	bh=bJRpUbI549tFu5fdC+DCORV9nXGD3YYzkP2HcOX7uQY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d7kW1z3rfURlr1TAdLbPNF99nR2sPWmefWmumEgHUBn/ONSArwyfM4yDbOYwcJXyz0sjTxqNFq+URceCTFGgUPzazjlc4WxgvriJX/uhe+4nFNF0UH8x73KIgmbl3Z+urX35ASu1dCbFmu3ntWvbl8aHe58Qf047wAOgS3OtKZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOexpkUF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745934581; c=relaxed/simple;
+	bh=B3/QK4Il9/bFKReyINzmP0VuCV66h4eDXoELS2iLT8o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pSqE5sxCA7xpPwDyfewsRMxXyK+3l6fU8bEGQ789LFJS3gwLJEUv3ocSrCJKtsgv3zK2Rl700+xbgVolARlK2uHzH3Ejcr+Gz/jlYT0WvB+srGhj9HA4uaTlGRrmussnW+M9y2f0q8Dw4/iZdOyupQ/AMLsL5jw0sFHkmYR3CZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BCQ54AOQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOexpkUF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F781C4CEE3;
-	Tue, 29 Apr 2025 13:41:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BCQ54AOQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D58C4CEE3;
+	Tue, 29 Apr 2025 13:49:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745934074;
-	bh=bJRpUbI549tFu5fdC+DCORV9nXGD3YYzkP2HcOX7uQY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hOexpkUFYTMHUAahkUcB99gyQNhZi94+y5iTQIKG3/0Pge+BHKZJsq4hUAfCbzZ4O
-	 MlqiFUPPewBo8vPmY1sleA2XxiHyL4U0xJr7x9QvlrM5FCWcijVER/3tQbbCZkJtJb
-	 SCOb0IE8r/tlW7EdexI9cWLwfuLJxKvoqfdaaHaoFWNo2o5OY6hFpBaR5cVzfwedAs
-	 p/Wl9mf3z4SYUvIVGcD9QTS5ZKkG5hTzc58i1xNuG5dXvvr2hws8DdDHTrn8Ygf2PQ
-	 eQiA7c3BHd/qxXR+bK2mF5hKURUrH/eKHI214QQSk8O+NllaOYEe4yzs/krjI+Gv49
-	 OvEJ9S5cBtgKQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1745934580;
+	bh=B3/QK4Il9/bFKReyINzmP0VuCV66h4eDXoELS2iLT8o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BCQ54AOQ0P3jLiyj+3w+/U+Ozru8AXZ3vJ4UPPknNCpINRX5xG2zBuQeAf6+ycX9s
+	 LyaELBBcBOjAVG0BO33HV/GOXXs8QR+pLZ5ZHik3tYdQPp02yDhFP3hNxw2k8Io6Ux
+	 IMdDh+G7oigOC5jGIqOjiyJY/pBKN1cFmKhZIduFmgWzAwOqf3vcpHcIjZTwU9H1QY
+	 ekLSlfFojx8v7OH10vWFdI8Wpn/GQqix7O0ErGYdSKSO11wK3/wag9SEEPOVTTj1sn
+	 ttuC1YQnlR/YRpb2haakKoJtCS099oEw+kMkbsBaAiJkKaSwK0tWGg/zypzcCXAHJz
+	 Xc6sfcEeydGGg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u9lCx-009vXz-TM;
-	Tue, 29 Apr 2025 14:41:12 +0100
+	id 1u9lL7-009vjZ-UB;
+	Tue, 29 Apr 2025 14:49:38 +0100
+Date: Tue, 29 Apr 2025 14:49:37 +0100
+Message-ID: <86h627hyby.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>,
-	Fuad Tabba <tabba@google.com>,
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/7] Move pKVM ownership state to hyp_vmemmap
-Date: Tue, 29 Apr 2025 14:41:08 +0100
-Message-Id: <174593405817.3620453.10683944453931548390.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250416152648.2982950-1-qperret@google.com>
-References: <20250416152648.2982950-1-qperret@google.com>
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 24/42] KVM: arm64: Unconditionally configure fine-grain traps
+In-Reply-To: <363383a2-c05e-458c-82b7-acc6e5d73939@arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+	<20250426122836.3341523-25-maz@kernel.org>
+	<363383a2-c05e-458c-82b7-acc6e5d73939@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, vdonnefort@google.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 16 Apr 2025 15:26:40 +0000, Quentin Perret wrote:
-> This series moves the hypervisor's ownership state to the hyp_vmemmap,
-> as discussed in [1]. The two main benefits are:
+On Tue, 29 Apr 2025 14:08:27 +0100,
+Ben Horgan <ben.horgan@arm.com> wrote:
 > 
->  1. much cheaper hyp state lookups, since we can avoid the hyp stage-1
->     page-table walk;
+> Hi Marc,
 > 
->  2. de-correlates the hyp state from the presence of a mapping in the
->     linear map range of the hypervisor; which enables a bunch of
->     clean-ups in the existing code and will simplify the introduction of
->     other features in the future (hyp tracing, ...)
-> 
-> [...]
+> On 4/26/25 13:28, Marc Zyngier wrote:
+> > From: Mark Rutland <mark.rutland@arm.com>
+> > 
+> > ... otherwise we can inherit the host configuration if this differs from
+> > the KVM configuration.
+> > 
+> > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> > [maz: simplified a couple of things]
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/kvm/hyp/include/hyp/switch.h | 39 ++++++++++---------------
+> >   1 file changed, 15 insertions(+), 24 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index 027d05f308f75..925a3288bd5be 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -107,7 +107,8 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+> >   [...]
+> >     static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu
+> > *vcpu)
+> >   {
+> >   	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+> > -	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> >     	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> >   		return;
+> >   -	__deactivate_fgt(hctxt, vcpu, kvm, HFGRTR_EL2);
+> > -	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> Don't we need to continue considering the ampere errata here? Or, at
+> least worth a mention in the commit message.
 
-Applied to next, thanks!
+The FGT registers are always context switched, so whatever was saved
+*before* the workaround was applied in __activate_traps_hfgxtr() is
+blindly restored...
 
-[1/7] KVM: arm64: Track SVE state in the hypervisor vcpu structure
-      commit: 5db1bef933427aa467ad89c7b695a84a6b4afe16
-[2/7] KVM: arm64: Fix pKVM page-tracking comments
-      commit: ba637018ca67224fa21dc2212cb4457b357a5455
-[3/7] KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
-      commit: cd4b039165a5e709d0d599e207709d73141a8bed
-[4/7] KVM: arm64: Introduce {get,set}_host_state() helpers
-      commit: ba5b2e5b9dff5ba14940e1525f6e3a595f012466
-[5/7] KVM: arm64: Move hyp state to hyp_vmemmap
-      commit: 3390b3cbb613bc0822854f5754437cd1d1b3d5d0
-[6/7] KVM: arm64: Defer EL2 stage-1 mapping on share
-      commit: 48d848882395a6a42ff1bb685082c79791d4e753
-[7/7] KVM: arm64: Unconditionally cross check hyp state
-      commit: 43c475504a39e98f10f5e6ec4d9d9ed60672a753
+> > -		write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
 
-Cheers,
+... and this write always happens.
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
