@@ -1,89 +1,111 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0F02472B0
-	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 16:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912CB22AE68;
+	Tue, 29 Apr 2025 18:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745945123; cv=none; b=oNTdJ9IMfwJFC3cnjpKcor1wNIKQhkIux6RQ3qKxR/Oev90H6wEJ6FCqRTgcbVwtjl83J7XuTxbKIL/0W7CtEMewFC6LncvpbQ9gjfscDs2EO0XX5VC2qQmXNz0JHNEebjGYy1SimspDEAp4FfDdP66K/fNqOiLHpROkGMNXJ38=
+	t=1745950191; cv=none; b=gr5wGmeEz54zlKMKG8bKXQ3Xe2yIzBzi5u2enilUt54PJY+5ZsgIIxjb0bQsMnSPJba3+xpuly4T79lHcACOefmeg+LAGm5QFn4LUCSE7Zf6iTtj2V5JbDXmr4w8UZHEf4WmK4cnUe63cNtuVL5H3jxZJqL8h1MGz3VMwALU51Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745945123; c=relaxed/simple;
-	bh=NuBSriunJki75VP9+4VyqJ5KXuHhAB4EctSKiWzZUJM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pwxY/TxJOSIchIAzR5bi+2MZnn2w+l7WOqHTBZBfq+PvGCBDIAqwJKEZ0iK0t4XbQX3qJUpzSdlzi9zK3jfT2GAbC2ek4oOfKSd/VAI66Cz0YA7qynocebHPiF0Auu0gLgrKAdOeysOyB0XJhuMYgvRNwJkYe9z8sND914NdMFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF9DF1515;
-	Tue, 29 Apr 2025 09:45:12 -0700 (PDT)
-Received: from [10.1.25.156] (XHFQ2J9959.cambridge.arm.com [10.1.25.156])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A832A3F66E;
-	Tue, 29 Apr 2025 09:45:18 -0700 (PDT)
-Message-ID: <b07c1320-3140-40d3-899b-7c2b6e0d3c18@arm.com>
-Date: Tue, 29 Apr 2025 17:45:16 +0100
+	s=arc-20240116; t=1745950191; c=relaxed/simple;
+	bh=cgX1IR8vPYPAGwr2f9WzQECwoisg/CxDDQT1XmiNJG4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QfjEDpTtyO/PGFaSp+WM71uHd2CJBLzuLNvqnD/scddZuYJTA5va/gGb0sSSSA9dlEwApDV/t8TraCvgTGJKxO6q1AIBJGfQ8th23+lOTcSCIDi0brCzotJbkhWCo2tNvembvH3sqpsxYyGl9cmsgZRIER9D9dNoVW3Dw3f09lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1CB2C4CEEA;
+	Tue, 29 Apr 2025 18:09:44 +0000 (UTC)
+Date: Tue, 29 Apr 2025 19:09:42 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Ankit Agrawal <ankita@nvidia.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sean Christopherson <seanjc@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"david@redhat.com" <david@redhat.com>,
+	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
+	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
+	Krishnakant Jaju <kjaju@nvidia.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"sebastianene@google.com" <sebastianene@google.com>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com" <gshan@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"ddutile@redhat.com" <ddutile@redhat.com>,
+	"tabba@google.com" <tabba@google.com>,
+	"qperret@google.com" <qperret@google.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+Message-ID: <aBEV5gxYoDFct9PC@arm.com>
+References: <20250422233556.GB1648741@nvidia.com>
+ <aAjEsIwhYQpkphrW@arm.com>
+ <20250423120243.GD1648741@nvidia.com>
+ <aAjci3rddHt_R_x3@arm.com>
+ <20250423130323.GE1648741@nvidia.com>
+ <SA1PR12MB71996988916E1FB15149DD13B0802@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <aBDTpu_ACoXAPoE2@arm.com>
+ <20250429141437.GC2260709@nvidia.com>
+ <aBD4RsUZp-BmcLwC@arm.com>
+ <20250429164430.GD2260709@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] arm64/mm: Implement pte_po_index() for permission
- overlay index
-Content-Language: en-GB
-To: Will Deacon <will@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250415054442.2287891-1-anshuman.khandual@arm.com>
- <20250429151134.GB26272@willie-the-truck>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <20250429151134.GB26272@willie-the-truck>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250429164430.GD2260709@nvidia.com>
 
-On 29/04/2025 16:11, Will Deacon wrote:
-> On Tue, Apr 15, 2025 at 11:14:42AM +0530, Anshuman Khandual wrote:
->> From: Ryan Roberts <ryan.roberts@arm.com>
->>
->> Previously pte_access_permitted() used FIELD_GET() directly to retrieve
->> the permission overlay index from the pte. However, FIELD_GET() doesn't
->> work for 128 bit quanitites. Since we are about to add support for D128
->> pgtables, let's create a specific helper, pte_po_index() which can do
->> the required mask and shift regardless of the data type width.
+On Tue, Apr 29, 2025 at 01:44:30PM -0300, Jason Gunthorpe wrote:
+> On Tue, Apr 29, 2025 at 05:03:18PM +0100, Catalin Marinas wrote:
+> > On Tue, Apr 29, 2025 at 11:14:37AM -0300, Jason Gunthorpe wrote:
+> > > On Tue, Apr 29, 2025 at 02:27:02PM +0100, Catalin Marinas wrote:
+> > > > BTW, we should reject exec mappings as well (they probably fail for S1
+> > > > VFIO since set_pte_at() will try to do cache maintenance).
+> > > 
+> > > To be clear the S2 should leave the mapping as execute allowed
+> > > though. Only the VM knows how it will use this memory and VM's do
+> > > actually execute out of the cachable PFNMAP VMA today. The VM will set
+> > > any execute deny/allow on its S1 table according to how it uses the
+> > > memory.
+> > 
+> > If S2 is executable, wouldn't KVM try to invalidate the I-cache and it
+> > won't have an alias to do this? Unless it doesn't end up in
+> > stage2_map_walker_try_leaf() or the walk has been flagged as skipping
+> > the CMO.
 > 
-> You say:
+> Okay, that does seem to have been overlooked a bit. The answer I got
+> back is:
 > 
-> "we are about to add support for D128 pgtables"
+> Cachable PFNMAP is also relying on ARM64_HAS_CACHE_DIC also, simlar to
+> how S2FWB allows KVM to avoid flushing the D cache, that CPU cap
+> allows KVM to avoid flushing the icache and turns icache_inval_pou()
+> into a NOP.
 
-Providing some context: Anshuman has a private branch that adds D128 pgtable
-support to the kernel (it does not yet do this for KVM). I originally created
-this patch to fix a bug on that branch, so the "we are about to add ..." comment
-really only makes sense in that context.
+Another CAP for executable PFNMAP then? I feel like this is a different
+use-case (e.g. more like general purpose CXL attached memory) than the
+GPU one. Unless FWB implies CTR_EL0.DIC (AFAIK, it doesn't) we may be
+restricting some CPUs.
 
-We are not yet ready to post D128 upstream - there are still a lot of questions
-to answer - but Anshuman has been posting some of the reshuffling and cleanups
-that prepare the way for D128 where (we think) it makes sense. The aim is to
-reduce the diff as much as we can.
-
-> 
-> but all I've seen so far are piecemeal patches like this and it's hard
-> to know what to do with them, to be honest. Somebody could reasonably
-> turn up next week and clean this up to use FIELD_GET() again.
-> 
-> Grepping around, I also see that the KVM page-table code uses the FIELD_*
-> macros on page-table entries, so perhaps we're better off adding support
-> for 128-bit types to those instead of trying to avoid them?
-
-I think FIELD_* are always implicitly 64 bit, right? I could be wrong...
-
-But I agree with the overall sentiment; where stuff is clearly crossing over
-into KVM, which hasn't been tackled yet, don't post until we have a good view on
-what KVM needs.
-
-Thanks,
-Ryan
-
-> 
-> Will
-
+-- 
+Catalin
