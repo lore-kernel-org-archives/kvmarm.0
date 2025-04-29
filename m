@@ -1,195 +1,726 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2046.outbound.protection.outlook.com [40.107.93.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675272D29CA
-	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 14:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745936086; cv=fail; b=NGPHY2z9UxepVgWoJw2I+dRHudDn+eLMCmL7S1xYF7aWl/KXM8uDLQgNthCSOhtC//rA7FenSq5dsNw7nHfdkoYAhYSCyAgWcRIS3DWTGJrudZJiEqSxWQit8n5ss5+ZAp2FfL3VOaUDCra8yjtwQfdO2a0ULRI3tgzc8/8IZFs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745936086; c=relaxed/simple;
-	bh=LxluroMxF2uHY+DJJ4ucJBcewK+oHM54wW00zohV95k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=HYev/GnkOCro2Jv38nVRzel0odkqdxzDMOU/Ttr3HRGJkHWN++1C5XcIPSl8dxlxL0n/DZdUE4KPCy2xvuqcUiMUdsuQvsxFjImUr57eAGfTNv6U2kSpFYwF6B4vGZamnuRrBEQRnOLB2EKTfhJJyD/C6XIZoKTwjKb2EbpZ2Qw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PN1AEIy8; arc=fail smtp.client-ip=40.107.93.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PN1AEIy8"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=j2CvIUNyg79RM3x3ktu4lPYCrYSO3+Xzc5xSCw9l+Vp9VpmXfhymVK5JT42EygvnviutCyKzAtEzGCce2Zom2Bz/dyPuyvPH5C4eq2BMncQ/0U/bS53X9tK3aMPa54vAlp86IIwzWSVo7XhwBEP4ezCmJkSsL2QHt72N89P5MKc6CvfRiK7jNJzidz4W/w8G5R2fieMx8JgwTA72CoR4joET8hkH2tET9R4P16CpJRkBeNmAnHx0hJYOd7Bf7AO6aYkBRjbaYmdBm5ARfY7swAsgy0vPazEDAUAD0X1WP1VoYuD5O0jEmaa+s2hsCS1jWrK0rR7jMRAhOUfKU7rQ7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LxluroMxF2uHY+DJJ4ucJBcewK+oHM54wW00zohV95k=;
- b=yKBkbtoVjotLvnHCP/My3gfqA9JdQwCrsIkrvdQE+SUrWIMbuWDj4TJLPWOCrdkNEXCmGzQifM4RNEo2BvUh6AL713uFdE9xmzrdSiz0b5WWnV10zJ7JUgeQMwN2Nw/M1BRbCU8CC7vgxyLpqXsNDZh5IhJ6HQaHW6S9oc6Gxy5BuFeYxrXuPaNKzqFCfXbIDssaNxqiLxSChHPyT8Au8iux8DUVHX1KmNjOgbxJH4NGdmBobmexOSlD34rHg07vz8w4lukv/V5pl/Y5wEVbTfMSnZBYrb1XlMWIuAr2W+dBwv/ylulpnR5ajllnMKmmRc269/mqic3GFXbapdT1kg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LxluroMxF2uHY+DJJ4ucJBcewK+oHM54wW00zohV95k=;
- b=PN1AEIy8eXS+/YTtg6shfP5t0gqHZHOfroz8MpvcYdFHUDS9It847RpMb1weTEToPcr0fuMV7VES77wfgrzT20N0skuSGKNs6o45aCpwWe0cvDHrbJI8o3ufxzpT94DwJhzfKz++mwS1lOavZ819zRDYJpySRAvYaaURI1CGeMjw4FGeM1YTnqSZ0QhSHSUq0Buj6u1qYXXLvQfdFjjBtgRXWZKLx8Eot8IVUlyykF1XGSrSwk2/eM6RAfOFYHOxAaQ8Tawmu71acnMeYqvQDnCEloaeJ70psNGZiyoJeNX3vPvxaw0lqihfgGTtU0eIauUj8LmWn3ZCnlRDxp597A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by IA0PR12MB8421.namprd12.prod.outlook.com (2603:10b6:208:40f::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.19; Tue, 29 Apr
- 2025 14:14:39 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8678.028; Tue, 29 Apr 2025
- 14:14:38 +0000
-Date: Tue, 29 Apr 2025 11:14:37 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ankit Agrawal <ankita@nvidia.com>,
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D3C7E107
+	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 14:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745936823; cv=none; b=OTXZUc0pBvqxDIFFTkD5/7VpnYJypPapwD/JVQIcwUJ9tthTNismOzpb8UcC6LS89HDFPPbSWvFnNltRUSuQPdSdKEpTmGWJ8f2sQdQuak3NWbfp5sewsvUM4vx8b6PsG9Mevw7lFhBJ0Cb+n5ew5F+8qyeRH7Qp0WCxEHokGcw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745936823; c=relaxed/simple;
+	bh=UiIY08Y/6+nhIJI8wKvKvIAHTXxvlTKEvJzUqzV6zvY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UAMy9RyOPoQnNdYcApdSEu7O8WOVaooizbQKVMOxZR5ftc5BPfc39SMvsoOFZ4suH/rJVWJxnmI64d/BqBIOuzn3YggeFYQc3SHJqLEKh46W/mqoMJXgk2kLAU4hLluua9Kt0qtusxvmT834e1sTWtYE/5Qa5RdXoDDYQ2E47DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08AE416F3;
+	Tue, 29 Apr 2025 07:26:54 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D42EE3F66E;
+	Tue, 29 Apr 2025 07:26:58 -0700 (PDT)
+Date: Tue, 29 Apr 2025 15:26:56 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Sean Christopherson <seanjc@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"david@redhat.com" <david@redhat.com>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
-	Krishnakant Jaju <kjaju@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"sebastianene@google.com" <sebastianene@google.com>,
-	"coltonlewis@google.com" <coltonlewis@google.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"ddutile@redhat.com" <ddutile@redhat.com>,
-	"tabba@google.com" <tabba@google.com>,
-	"qperret@google.com" <qperret@google.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
- VMA flags
-Message-ID: <20250429141437.GC2260709@nvidia.com>
-References: <aAfI2GR1__-1KQHn@arm.com>
- <20250422170324.GB1645809@nvidia.com>
- <aAgJ8g8Gbb06quSM@linux.dev>
- <20250422233556.GB1648741@nvidia.com>
- <aAjEsIwhYQpkphrW@arm.com>
- <20250423120243.GD1648741@nvidia.com>
- <aAjci3rddHt_R_x3@arm.com>
- <20250423130323.GE1648741@nvidia.com>
- <SA1PR12MB71996988916E1FB15149DD13B0802@SA1PR12MB7199.namprd12.prod.outlook.com>
- <aBDTpu_ACoXAPoE2@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBDTpu_ACoXAPoE2@arm.com>
-X-ClientProxiedBy: BL1P223CA0044.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:208:5b6::17) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 04/42] arm64: sysreg: Replace HGFxTR_EL2 with
+ HFG{R,W}TR_EL2
+Message-ID: <20250429142656.GD1859293@e124191.cambridge.arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+ <20250426122836.3341523-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|IA0PR12MB8421:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2518b00e-b040-478e-a88e-08dd87282d24
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eMQ0Ux/zym3aBuObBuiafu0954k9GhfnXg01hVk0gZhm31qsH5Bo2DVDaJwD?=
- =?us-ascii?Q?5tRYRmqOdn7DtGDp8gphhPi0n6DoghRkMA0tY76qfaAcv8fGYO9fl+HR9VQz?=
- =?us-ascii?Q?clLx4HFcEHMt0XT4VdVVmnoYzYt/ieW2JygNxd7B1+B9OuSpXobBXNB1nFPH?=
- =?us-ascii?Q?IldZigEErMG3gY09OGnr+utzYJfnH2N4kTtYUCCLdz9/NJ9oI4SICXunfKpl?=
- =?us-ascii?Q?thB1VcDW1dTSTPQod0xD7WSUSyPjPol/iGGc35TIu/7JGvXgPPr3THWl8Zeu?=
- =?us-ascii?Q?l8kGdtZS8eY6UDkf5qRuGKbJU5BvXi9qgCsyAeQJnG7dmw9oF3q8xbtPZoXv?=
- =?us-ascii?Q?GdU0mi+jJB2zYuz7mFBalT2khhInpkfCnHov5CJxOmTwtZ47GauCoRtcxItb?=
- =?us-ascii?Q?56N+obLafOfZtOLjbrqDe3qwgFw5v59HtfUzYM8z8rK79mF22JtznPOsDKBv?=
- =?us-ascii?Q?L3lbNhlIA46ngO0nFUgM+wrYVq2lPPXjU4IgzpjUzZjh9O9m0dOb+69dOzbQ?=
- =?us-ascii?Q?s0s7BO45+PdV31gcNlE7sGVG9FujtQxFWhuvnvCzw8hjU/W75tsjp0xGtgWW?=
- =?us-ascii?Q?ml9B+ET0X65rz1pG3dApgUVzXnLhcdWrM0smAIp2+auiwi92RRbEH91rTia9?=
- =?us-ascii?Q?0QPx5tt/0UtL2zAvzFliSEg2r2N0F5CMQIYc4EovkuVq+9/bKZY6m5fnGWGB?=
- =?us-ascii?Q?PdxquCHGKtjOt60tNSvt4zpQ0f2n3sl0w1SUDyoRlbg1R9TJ32A+lqof7BeF?=
- =?us-ascii?Q?5eGwBHxTg6d7hM9rQPbQeyZEIAiH4EATduJ2fXumb7bP3UEUXOLRwwTQL9gL?=
- =?us-ascii?Q?2YRI4qk4L8cpGfhT/9o5pn0DXfFWOVmkioNQWgQRZm3WmxsSjwNqdpbAUg8r?=
- =?us-ascii?Q?tnD8AZ1rfjBanXyjEB6W80gouBBVC/nFuxSYWtIfGs7u1wPZvvvhggtD42QJ?=
- =?us-ascii?Q?ZvfyK7jevLuo2UeVg7k/2yfKc39K5obVLXhGRJgMAFOa1S7FCzXkBXgwXUbc?=
- =?us-ascii?Q?U6/ovIEF0EipMtBKwqnELOzLvpMOlexPn06D4X2fk+S6lH0riNLcUm4RlIMm?=
- =?us-ascii?Q?jWtvkz3lJ4+l87GSn3zjPPGcrEOdmu2Gh4cScCpZUzgA1ZmYz1JTBZu65i6e?=
- =?us-ascii?Q?T3xytrrRQmVu0Z2GppoOJup/ccHVdMZup6A8DknP8GG4lC+LA2NbG5ROG28W?=
- =?us-ascii?Q?yXiYDhQQCrKGEtbTESFqCe39pa6MvZU4iF/Nbhbs/kX4el3rmqyKtcob0f5i?=
- =?us-ascii?Q?VciQLArb+ITOvWa/U2XIsbQkoYFY6/RUfQo0DqAVCasrsnPM+S1V87bmNDHf?=
- =?us-ascii?Q?lTMGNgfJj2Oj+F0gzD8URolrctz32UDjjmtQ+lZNCF3wCXf+1NOWBW+l8vNN?=
- =?us-ascii?Q?MN8K8SW0D8MLmoiI9lagM1cSuXvEUOx2C55wmZSdE2R+15EPnJTKG6CRFslI?=
- =?us-ascii?Q?4i9DoKVWyUU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?3Dbvh81Bdegx/3vpIL9ZkGQBrB23LifVjT2uJSpxf6x3QHhA5lP6UlZh6AL5?=
- =?us-ascii?Q?cZkVYen6uC7x1QEy/26oLeDhfzg3nVM2BFlrWYMHQGo8JYWopbvVDU+m4p0+?=
- =?us-ascii?Q?LKd+a5yXvmW88Hyl789wiNvzbw2p+GAlFyzanmxZoQbiA4K92/PeMs8Bv+YY?=
- =?us-ascii?Q?nS/AVrV7koiSQVnM+zKpJYpu6llf2Ps8PDK5EK0INit96sjZhrrgpjuoIq/W?=
- =?us-ascii?Q?O8w94+AwNM+IMhAcHzXTBlGjWZskQ8ZyhlcqOC0uW48W33L+bD51kAauzdnO?=
- =?us-ascii?Q?ckh18yM6mf+ktTTJ0Sw3VAvQpb3FH0fJRax51HaMr7j2QEc6Nx9EOG02l3ld?=
- =?us-ascii?Q?50ntQZgtt/Edc2X4V9wBXEzwv/QOzweJlIDMY/eHXLcvum7jLjb0zYXKtpmW?=
- =?us-ascii?Q?1laqBhkoFu2y9q5j16SdKKdLVFNiSnkUS0Rju7sGCKtFlS/ciSG/kD8y/yQA?=
- =?us-ascii?Q?7KKsDR2kW4bJw+39cy1F+WPBpY+PfrrAMXwV6364z4Cjckpu8cLK4YTpzHaT?=
- =?us-ascii?Q?EZ/QfTTKJrYxen5C3u1SMjsg7ARgHc8n/SV8QzDgWouU4AWN3H2gU1x3tLBN?=
- =?us-ascii?Q?yFj+wvkyylH7W5msKMQwP9hP24ZNK3KCHcE/mQxo1L+ahsXI1jj0uGp8oxDi?=
- =?us-ascii?Q?WP+47KOIgrAfO5pDbGVt4yiOx3grd1cjtocxjGx9azuS3402Mbqx8op1VHMy?=
- =?us-ascii?Q?ZXlfAXU010YFYKJpGy+R7BVudJNzfxVyXkj7kDE4n+N1j7uDzZpVT5/c7bRq?=
- =?us-ascii?Q?yBJ4GFUNPnDMJr3SvkgBoGdjiWWP5Sif6Z0xh3uEgElqEOKbM+mQ7PTrt8sg?=
- =?us-ascii?Q?VQ7fus/+oyngv73bu9O+EvSfwAV7XhgUssoRJs6Zx7o6OfzTPu77J0uLZN3T?=
- =?us-ascii?Q?rMgSm9xA9pQqnXddEOKpo0S8jSreNrbTPAbll/9P1jjqPUTSQkscFf3RsESC?=
- =?us-ascii?Q?4y9E3IAuXQYwqAHTibKd+dEswi7adnFpYCN5FzdCBunKgFuFApOwNOdVFZx0?=
- =?us-ascii?Q?3iAUUlEORX3w0u9ImZJnyQxo+Lb2UV/MVTyHEco/COlUC0kaJHtW8GV48/Hx?=
- =?us-ascii?Q?OHUpsodouBi+bowv6aq0I5IQgDy4Is7HLJ0ke2mbcK76pOM1yzDBve/46bLN?=
- =?us-ascii?Q?9zZzaNgNuMH+dBa528OKIlGwNSKDOm7U3M7TioOCht+pNV60DLmQQUvWxd40?=
- =?us-ascii?Q?kke4DRswsx6jycvgM0Qn3xqMnVMbv22AE+n49wi+nTtCQ4gU4gC3Mi9AFMEn?=
- =?us-ascii?Q?s+581iJ3PrEVxVBIua+ceCfHZPxM907RrPe9vviGzL0BNWpoF3pzfzkpsBRg?=
- =?us-ascii?Q?sVHpqzA0Wy4px0NAGeZcJNnUOfSamaJ24gC6jiAyER5wYLU7gwa5RGZGZRHE?=
- =?us-ascii?Q?A9hPRCdL89YHPbE1aANekMca4pMFj2ZJzvNM4JFxro37q1uh6NEgjyvOnG1b?=
- =?us-ascii?Q?SMAqSRSCKnibwHUgfxOme4mhbvVxY7CJiGSRUMeti20kUnNPvtckT8G43mR8?=
- =?us-ascii?Q?yNP2lkYo7di69KL1jXAoCiwT/8GSvGLp6egg4cN9SMG/qBtVTE9QgnZ9lrcH?=
- =?us-ascii?Q?6PDRfToZcTxcVBHOsKhBzxdizqGSpJdIwLnTr7Is?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2518b00e-b040-478e-a88e-08dd87282d24
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2025 14:14:38.6020
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qwSBhQbzANnuwlenNMAVR5EJtDdkwv9Er6wbevhnFgVdlZBvGwoJ1ObkP4PprxIs
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8421
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250426122836.3341523-5-maz@kernel.org>
 
-On Tue, Apr 29, 2025 at 02:27:02PM +0100, Catalin Marinas wrote:
+On Sat, Apr 26, 2025 at 01:27:58PM +0100, Marc Zyngier wrote:
+> Treating HFGRTR_EL2 and HFGWTR_EL2 identically was a mistake.
+> It makes things hard to reason about, has the potential to
+> introduce bugs by giving a meaning to bits that are really reserved,
+> and is in general a bad description of the architecture.
+> 
+> Given that #defines are cheap, let's describe both registers as
+> intended by the architecture, and repaint all the existing uses.
+> 
+> Yes, this is painful.
+> 
+> The registers themselves are generated from the JSON file in
+> an automated way.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/el2_setup.h      |  14 +-
+>  arch/arm64/include/asm/kvm_arm.h        |   4 +-
+>  arch/arm64/include/asm/kvm_host.h       |   3 +-
+>  arch/arm64/kvm/emulate-nested.c         | 154 +++++++++----------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |   4 +-
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c         |   8 +-
+>  arch/arm64/kvm/nested.c                 |  42 ++---
+>  arch/arm64/kvm/sys_regs.c               |  20 +--
+>  arch/arm64/tools/sysreg                 | 194 +++++++++++++++---------
+>  9 files changed, 250 insertions(+), 193 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index ebceaae3c749b..055e69a4184ce 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -213,8 +213,8 @@
+>  	cbz	x1, .Lskip_debug_fgt_\@
+>  
+>  	/* Disable nVHE traps of TPIDR2 and SMPRI */
+> -	orr	x0, x0, #HFGxTR_EL2_nSMPRI_EL1_MASK
+> -	orr	x0, x0, #HFGxTR_EL2_nTPIDR2_EL0_MASK
+> +	orr	x0, x0, #HFGRTR_EL2_nSMPRI_EL1_MASK
+> +	orr	x0, x0, #HFGRTR_EL2_nTPIDR2_EL0_MASK
+>  
+>  .Lskip_debug_fgt_\@:
+>  	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+> @@ -222,8 +222,8 @@
+>  	cbz	x1, .Lskip_pie_fgt_\@
+>  
+>  	/* Disable trapping of PIR_EL1 / PIRE0_EL1 */
+> -	orr	x0, x0, #HFGxTR_EL2_nPIR_EL1
+> -	orr	x0, x0, #HFGxTR_EL2_nPIRE0_EL1
+> +	orr	x0, x0, #HFGRTR_EL2_nPIR_EL1
+> +	orr	x0, x0, #HFGRTR_EL2_nPIRE0_EL1
+>  
+>  .Lskip_pie_fgt_\@:
+>  	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+> @@ -231,7 +231,7 @@
+>  	cbz	x1, .Lskip_poe_fgt_\@
+>  
+>  	/* Disable trapping of POR_EL0 */
+> -	orr	x0, x0, #HFGxTR_EL2_nPOR_EL0
+> +	orr	x0, x0, #HFGRTR_EL2_nPOR_EL0
+>  
+>  .Lskip_poe_fgt_\@:
+>  	/* GCS depends on PIE so we don't check it if PIE is absent */
+> @@ -240,8 +240,8 @@
+>  	cbz	x1, .Lset_fgt_\@
+>  
+>  	/* Disable traps of access to GCS registers at EL0 and EL1 */
+> -	orr	x0, x0, #HFGxTR_EL2_nGCS_EL1_MASK
+> -	orr	x0, x0, #HFGxTR_EL2_nGCS_EL0_MASK
+> +	orr	x0, x0, #HFGRTR_EL2_nGCS_EL1_MASK
+> +	orr	x0, x0, #HFGRTR_EL2_nGCS_EL0_MASK
+>  
+>  .Lset_fgt_\@:
+>  	msr_s	SYS_HFGRTR_EL2, x0
 
-> BTW, we should reject exec mappings as well (they probably fail for S1
-> VFIO since set_pte_at() will try to do cache maintenance).
+We still treat them as the same here, funny that the diff cut off the next line:
 
-To be clear the S2 should leave the mapping as execute allowed
-though. Only the VM knows how it will use this memory and VM's do
-actually execute out of the cachable PFNMAP VMA today. The VM will set
-any execute deny/allow on its S1 table according to how it uses the
-memory.
+	msr_s   SYS_HFGWTR_EL2, x0
 
-Jason
+Not saying you should do anything about it, I think it's fine.	
+
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index f36d067967c33..43a630b940bfb 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -325,7 +325,7 @@
+>   * Once we get to a point where the two describe the same thing, we'll
+>   * merge the definitions. One day.
+>   */
+> -#define __HFGRTR_EL2_RES0	HFGxTR_EL2_RES0
+> +#define __HFGRTR_EL2_RES0	HFGRTR_EL2_RES0
+>  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+>  #define __HFGRTR_EL2_nMASK	~(__HFGRTR_EL2_RES0 | __HFGRTR_EL2_MASK)
+>  
+> @@ -336,7 +336,7 @@
+>  #define __HFGRTR_ONLY_MASK	(BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+>  				 GENMASK(26, 25) | BIT(21) | BIT(18) | \
+>  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+> -#define __HFGWTR_EL2_RES0	(__HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
+> +#define __HFGWTR_EL2_RES0	HFGWTR_EL2_RES0
+>  #define __HFGWTR_EL2_MASK	(__HFGRTR_EL2_MASK & ~__HFGRTR_ONLY_MASK)
+>  #define __HFGWTR_EL2_nMASK	~(__HFGWTR_EL2_RES0 | __HFGWTR_EL2_MASK)
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e98cfe7855a62..7a1ef5be7efb2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -273,7 +273,8 @@ struct kvm_sysreg_masks;
+>  
+>  enum fgt_group_id {
+>  	__NO_FGT_GROUP__,
+> -	HFGxTR_GROUP,
+> +	HFGRTR_GROUP,
+> +	HFGWTR_GROUP = HFGRTR_GROUP,
+
+I think this change makes most of the diffs using this enum more confusing, but
+it also seems to algin the code more closely with HDFGWTR_EL2 and HDFGWTR_EL2.
+
+>  	HDFGRTR_GROUP,
+>  	HDFGWTR_GROUP = HDFGRTR_GROUP,
+>  	HFGITR_GROUP,
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 0fcfcc0478f94..efe1eb3f1bd07 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -1296,81 +1296,81 @@ enum fg_filter_id {
+>  
+>  static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+>  	/* HFGRTR_EL2, HFGWTR_EL2 */
+> -	SR_FGT(SYS_AMAIR2_EL1,		HFGxTR, nAMAIR2_EL1, 0),
+> -	SR_FGT(SYS_MAIR2_EL1,		HFGxTR, nMAIR2_EL1, 0),
+> -	SR_FGT(SYS_S2POR_EL1,		HFGxTR, nS2POR_EL1, 0),
+> -	SR_FGT(SYS_POR_EL1,		HFGxTR, nPOR_EL1, 0),
+> -	SR_FGT(SYS_POR_EL0,		HFGxTR, nPOR_EL0, 0),
+> -	SR_FGT(SYS_PIR_EL1,		HFGxTR, nPIR_EL1, 0),
+> -	SR_FGT(SYS_PIRE0_EL1,		HFGxTR, nPIRE0_EL1, 0),
+> -	SR_FGT(SYS_RCWMASK_EL1,		HFGxTR, nRCWMASK_EL1, 0),
+> -	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
+> -	SR_FGT(SYS_SMPRI_EL1,		HFGxTR, nSMPRI_EL1, 0),
+> -	SR_FGT(SYS_GCSCR_EL1,		HFGxTR, nGCS_EL1, 0),
+> -	SR_FGT(SYS_GCSPR_EL1,		HFGxTR, nGCS_EL1, 0),
+> -	SR_FGT(SYS_GCSCRE0_EL1,		HFGxTR, nGCS_EL0, 0),
+> -	SR_FGT(SYS_GCSPR_EL0,		HFGxTR, nGCS_EL0, 0),
+> -	SR_FGT(SYS_ACCDATA_EL1,		HFGxTR, nACCDATA_EL1, 0),
+> -	SR_FGT(SYS_ERXADDR_EL1,		HFGxTR, ERXADDR_EL1, 1),
+> -	SR_FGT(SYS_ERXPFGCDN_EL1,	HFGxTR, ERXPFGCDN_EL1, 1),
+> -	SR_FGT(SYS_ERXPFGCTL_EL1,	HFGxTR, ERXPFGCTL_EL1, 1),
+> -	SR_FGT(SYS_ERXPFGF_EL1,		HFGxTR, ERXPFGF_EL1, 1),
+> -	SR_FGT(SYS_ERXMISC0_EL1,	HFGxTR, ERXMISCn_EL1, 1),
+> -	SR_FGT(SYS_ERXMISC1_EL1,	HFGxTR, ERXMISCn_EL1, 1),
+> -	SR_FGT(SYS_ERXMISC2_EL1,	HFGxTR, ERXMISCn_EL1, 1),
+> -	SR_FGT(SYS_ERXMISC3_EL1,	HFGxTR, ERXMISCn_EL1, 1),
+> -	SR_FGT(SYS_ERXSTATUS_EL1,	HFGxTR, ERXSTATUS_EL1, 1),
+> -	SR_FGT(SYS_ERXCTLR_EL1,		HFGxTR, ERXCTLR_EL1, 1),
+> -	SR_FGT(SYS_ERXFR_EL1,		HFGxTR, ERXFR_EL1, 1),
+> -	SR_FGT(SYS_ERRSELR_EL1,		HFGxTR, ERRSELR_EL1, 1),
+> -	SR_FGT(SYS_ERRIDR_EL1,		HFGxTR, ERRIDR_EL1, 1),
+> -	SR_FGT(SYS_ICC_IGRPEN0_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
+> -	SR_FGT(SYS_ICC_IGRPEN1_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
+> -	SR_FGT(SYS_VBAR_EL1,		HFGxTR, VBAR_EL1, 1),
+> -	SR_FGT(SYS_TTBR1_EL1,		HFGxTR, TTBR1_EL1, 1),
+> -	SR_FGT(SYS_TTBR0_EL1,		HFGxTR, TTBR0_EL1, 1),
+> -	SR_FGT(SYS_TPIDR_EL0,		HFGxTR, TPIDR_EL0, 1),
+> -	SR_FGT(SYS_TPIDRRO_EL0,		HFGxTR, TPIDRRO_EL0, 1),
+> -	SR_FGT(SYS_TPIDR_EL1,		HFGxTR, TPIDR_EL1, 1),
+> -	SR_FGT(SYS_TCR_EL1,		HFGxTR, TCR_EL1, 1),
+> -	SR_FGT(SYS_TCR2_EL1,		HFGxTR, TCR_EL1, 1),
+> -	SR_FGT(SYS_SCXTNUM_EL0,		HFGxTR, SCXTNUM_EL0, 1),
+> -	SR_FGT(SYS_SCXTNUM_EL1, 	HFGxTR, SCXTNUM_EL1, 1),
+> -	SR_FGT(SYS_SCTLR_EL1, 		HFGxTR, SCTLR_EL1, 1),
+> -	SR_FGT(SYS_REVIDR_EL1, 		HFGxTR, REVIDR_EL1, 1),
+> -	SR_FGT(SYS_PAR_EL1, 		HFGxTR, PAR_EL1, 1),
+> -	SR_FGT(SYS_MPIDR_EL1, 		HFGxTR, MPIDR_EL1, 1),
+> -	SR_FGT(SYS_MIDR_EL1, 		HFGxTR, MIDR_EL1, 1),
+> -	SR_FGT(SYS_MAIR_EL1, 		HFGxTR, MAIR_EL1, 1),
+> -	SR_FGT(SYS_LORSA_EL1, 		HFGxTR, LORSA_EL1, 1),
+> -	SR_FGT(SYS_LORN_EL1, 		HFGxTR, LORN_EL1, 1),
+> -	SR_FGT(SYS_LORID_EL1, 		HFGxTR, LORID_EL1, 1),
+> -	SR_FGT(SYS_LOREA_EL1, 		HFGxTR, LOREA_EL1, 1),
+> -	SR_FGT(SYS_LORC_EL1, 		HFGxTR, LORC_EL1, 1),
+> -	SR_FGT(SYS_ISR_EL1, 		HFGxTR, ISR_EL1, 1),
+> -	SR_FGT(SYS_FAR_EL1, 		HFGxTR, FAR_EL1, 1),
+> -	SR_FGT(SYS_ESR_EL1, 		HFGxTR, ESR_EL1, 1),
+> -	SR_FGT(SYS_DCZID_EL0, 		HFGxTR, DCZID_EL0, 1),
+> -	SR_FGT(SYS_CTR_EL0, 		HFGxTR, CTR_EL0, 1),
+> -	SR_FGT(SYS_CSSELR_EL1, 		HFGxTR, CSSELR_EL1, 1),
+> -	SR_FGT(SYS_CPACR_EL1, 		HFGxTR, CPACR_EL1, 1),
+> -	SR_FGT(SYS_CONTEXTIDR_EL1, 	HFGxTR, CONTEXTIDR_EL1, 1),
+> -	SR_FGT(SYS_CLIDR_EL1, 		HFGxTR, CLIDR_EL1, 1),
+> -	SR_FGT(SYS_CCSIDR_EL1, 		HFGxTR, CCSIDR_EL1, 1),
+> -	SR_FGT(SYS_APIBKEYLO_EL1, 	HFGxTR, APIBKey, 1),
+> -	SR_FGT(SYS_APIBKEYHI_EL1, 	HFGxTR, APIBKey, 1),
+> -	SR_FGT(SYS_APIAKEYLO_EL1, 	HFGxTR, APIAKey, 1),
+> -	SR_FGT(SYS_APIAKEYHI_EL1, 	HFGxTR, APIAKey, 1),
+> -	SR_FGT(SYS_APGAKEYLO_EL1, 	HFGxTR, APGAKey, 1),
+> -	SR_FGT(SYS_APGAKEYHI_EL1, 	HFGxTR, APGAKey, 1),
+> -	SR_FGT(SYS_APDBKEYLO_EL1, 	HFGxTR, APDBKey, 1),
+> -	SR_FGT(SYS_APDBKEYHI_EL1, 	HFGxTR, APDBKey, 1),
+> -	SR_FGT(SYS_APDAKEYLO_EL1, 	HFGxTR, APDAKey, 1),
+> -	SR_FGT(SYS_APDAKEYHI_EL1, 	HFGxTR, APDAKey, 1),
+> -	SR_FGT(SYS_AMAIR_EL1, 		HFGxTR, AMAIR_EL1, 1),
+> -	SR_FGT(SYS_AIDR_EL1, 		HFGxTR, AIDR_EL1, 1),
+> -	SR_FGT(SYS_AFSR1_EL1, 		HFGxTR, AFSR1_EL1, 1),
+> -	SR_FGT(SYS_AFSR0_EL1, 		HFGxTR, AFSR0_EL1, 1),
+> +	SR_FGT(SYS_AMAIR2_EL1,		HFGRTR, nAMAIR2_EL1, 0),
+> +	SR_FGT(SYS_MAIR2_EL1,		HFGRTR, nMAIR2_EL1, 0),
+> +	SR_FGT(SYS_S2POR_EL1,		HFGRTR, nS2POR_EL1, 0),
+> +	SR_FGT(SYS_POR_EL1,		HFGRTR, nPOR_EL1, 0),
+> +	SR_FGT(SYS_POR_EL0,		HFGRTR, nPOR_EL0, 0),
+> +	SR_FGT(SYS_PIR_EL1,		HFGRTR, nPIR_EL1, 0),
+> +	SR_FGT(SYS_PIRE0_EL1,		HFGRTR, nPIRE0_EL1, 0),
+> +	SR_FGT(SYS_RCWMASK_EL1,		HFGRTR, nRCWMASK_EL1, 0),
+> +	SR_FGT(SYS_TPIDR2_EL0,		HFGRTR, nTPIDR2_EL0, 0),
+> +	SR_FGT(SYS_SMPRI_EL1,		HFGRTR, nSMPRI_EL1, 0),
+> +	SR_FGT(SYS_GCSCR_EL1,		HFGRTR, nGCS_EL1, 0),
+> +	SR_FGT(SYS_GCSPR_EL1,		HFGRTR, nGCS_EL1, 0),
+> +	SR_FGT(SYS_GCSCRE0_EL1,		HFGRTR, nGCS_EL0, 0),
+> +	SR_FGT(SYS_GCSPR_EL0,		HFGRTR, nGCS_EL0, 0),
+> +	SR_FGT(SYS_ACCDATA_EL1,		HFGRTR, nACCDATA_EL1, 0),
+> +	SR_FGT(SYS_ERXADDR_EL1,		HFGRTR, ERXADDR_EL1, 1),
+> +	SR_FGT(SYS_ERXPFGCDN_EL1,	HFGRTR, ERXPFGCDN_EL1, 1),
+> +	SR_FGT(SYS_ERXPFGCTL_EL1,	HFGRTR, ERXPFGCTL_EL1, 1),
+> +	SR_FGT(SYS_ERXPFGF_EL1,		HFGRTR, ERXPFGF_EL1, 1),
+> +	SR_FGT(SYS_ERXMISC0_EL1,	HFGRTR, ERXMISCn_EL1, 1),
+> +	SR_FGT(SYS_ERXMISC1_EL1,	HFGRTR, ERXMISCn_EL1, 1),
+> +	SR_FGT(SYS_ERXMISC2_EL1,	HFGRTR, ERXMISCn_EL1, 1),
+> +	SR_FGT(SYS_ERXMISC3_EL1,	HFGRTR, ERXMISCn_EL1, 1),
+> +	SR_FGT(SYS_ERXSTATUS_EL1,	HFGRTR, ERXSTATUS_EL1, 1),
+> +	SR_FGT(SYS_ERXCTLR_EL1,		HFGRTR, ERXCTLR_EL1, 1),
+> +	SR_FGT(SYS_ERXFR_EL1,		HFGRTR, ERXFR_EL1, 1),
+> +	SR_FGT(SYS_ERRSELR_EL1,		HFGRTR, ERRSELR_EL1, 1),
+> +	SR_FGT(SYS_ERRIDR_EL1,		HFGRTR, ERRIDR_EL1, 1),
+> +	SR_FGT(SYS_ICC_IGRPEN0_EL1,	HFGRTR, ICC_IGRPENn_EL1, 1),
+> +	SR_FGT(SYS_ICC_IGRPEN1_EL1,	HFGRTR, ICC_IGRPENn_EL1, 1),
+> +	SR_FGT(SYS_VBAR_EL1,		HFGRTR, VBAR_EL1, 1),
+> +	SR_FGT(SYS_TTBR1_EL1,		HFGRTR, TTBR1_EL1, 1),
+> +	SR_FGT(SYS_TTBR0_EL1,		HFGRTR, TTBR0_EL1, 1),
+> +	SR_FGT(SYS_TPIDR_EL0,		HFGRTR, TPIDR_EL0, 1),
+> +	SR_FGT(SYS_TPIDRRO_EL0,		HFGRTR, TPIDRRO_EL0, 1),
+> +	SR_FGT(SYS_TPIDR_EL1,		HFGRTR, TPIDR_EL1, 1),
+> +	SR_FGT(SYS_TCR_EL1,		HFGRTR, TCR_EL1, 1),
+> +	SR_FGT(SYS_TCR2_EL1,		HFGRTR, TCR_EL1, 1),
+> +	SR_FGT(SYS_SCXTNUM_EL0,		HFGRTR, SCXTNUM_EL0, 1),
+> +	SR_FGT(SYS_SCXTNUM_EL1, 	HFGRTR, SCXTNUM_EL1, 1),
+> +	SR_FGT(SYS_SCTLR_EL1, 		HFGRTR, SCTLR_EL1, 1),
+> +	SR_FGT(SYS_REVIDR_EL1, 		HFGRTR, REVIDR_EL1, 1),
+> +	SR_FGT(SYS_PAR_EL1, 		HFGRTR, PAR_EL1, 1),
+> +	SR_FGT(SYS_MPIDR_EL1, 		HFGRTR, MPIDR_EL1, 1),
+> +	SR_FGT(SYS_MIDR_EL1, 		HFGRTR, MIDR_EL1, 1),
+> +	SR_FGT(SYS_MAIR_EL1, 		HFGRTR, MAIR_EL1, 1),
+> +	SR_FGT(SYS_LORSA_EL1, 		HFGRTR, LORSA_EL1, 1),
+> +	SR_FGT(SYS_LORN_EL1, 		HFGRTR, LORN_EL1, 1),
+> +	SR_FGT(SYS_LORID_EL1, 		HFGRTR, LORID_EL1, 1),
+> +	SR_FGT(SYS_LOREA_EL1, 		HFGRTR, LOREA_EL1, 1),
+> +	SR_FGT(SYS_LORC_EL1, 		HFGRTR, LORC_EL1, 1),
+> +	SR_FGT(SYS_ISR_EL1, 		HFGRTR, ISR_EL1, 1),
+> +	SR_FGT(SYS_FAR_EL1, 		HFGRTR, FAR_EL1, 1),
+> +	SR_FGT(SYS_ESR_EL1, 		HFGRTR, ESR_EL1, 1),
+> +	SR_FGT(SYS_DCZID_EL0, 		HFGRTR, DCZID_EL0, 1),
+> +	SR_FGT(SYS_CTR_EL0, 		HFGRTR, CTR_EL0, 1),
+> +	SR_FGT(SYS_CSSELR_EL1, 		HFGRTR, CSSELR_EL1, 1),
+> +	SR_FGT(SYS_CPACR_EL1, 		HFGRTR, CPACR_EL1, 1),
+> +	SR_FGT(SYS_CONTEXTIDR_EL1, 	HFGRTR, CONTEXTIDR_EL1, 1),
+> +	SR_FGT(SYS_CLIDR_EL1, 		HFGRTR, CLIDR_EL1, 1),
+> +	SR_FGT(SYS_CCSIDR_EL1, 		HFGRTR, CCSIDR_EL1, 1),
+> +	SR_FGT(SYS_APIBKEYLO_EL1, 	HFGRTR, APIBKey, 1),
+> +	SR_FGT(SYS_APIBKEYHI_EL1, 	HFGRTR, APIBKey, 1),
+> +	SR_FGT(SYS_APIAKEYLO_EL1, 	HFGRTR, APIAKey, 1),
+> +	SR_FGT(SYS_APIAKEYHI_EL1, 	HFGRTR, APIAKey, 1),
+> +	SR_FGT(SYS_APGAKEYLO_EL1, 	HFGRTR, APGAKey, 1),
+> +	SR_FGT(SYS_APGAKEYHI_EL1, 	HFGRTR, APGAKey, 1),
+> +	SR_FGT(SYS_APDBKEYLO_EL1, 	HFGRTR, APDBKey, 1),
+> +	SR_FGT(SYS_APDBKEYHI_EL1, 	HFGRTR, APDBKey, 1),
+> +	SR_FGT(SYS_APDAKEYLO_EL1, 	HFGRTR, APDAKey, 1),
+> +	SR_FGT(SYS_APDAKEYHI_EL1, 	HFGRTR, APDAKey, 1),
+> +	SR_FGT(SYS_AMAIR_EL1, 		HFGRTR, AMAIR_EL1, 1),
+> +	SR_FGT(SYS_AIDR_EL1, 		HFGRTR, AIDR_EL1, 1),
+> +	SR_FGT(SYS_AFSR1_EL1, 		HFGRTR, AFSR1_EL1, 1),
+> +	SR_FGT(SYS_AFSR0_EL1, 		HFGRTR, AFSR0_EL1, 1),
+>  	/* HFGITR_EL2 */
+>  	SR_FGT(OP_AT_S1E1A, 		HFGITR, ATS1E1A, 1),
+>  	SR_FGT(OP_COSP_RCTX, 		HFGITR, COSPRCTX, 1),
+> @@ -2243,7 +2243,7 @@ static bool check_fgt_bit(struct kvm_vcpu *vcpu, bool is_read,
+>  		return false;
+>  
+>  	switch ((enum fgt_group_id)tc.fgt) {
+> -	case HFGxTR_GROUP:
+> +	case HFGRTR_GROUP:
+>  		sr = is_read ? HFGRTR_EL2 : HFGWTR_EL2;
+>  		break;
+>  
+> @@ -2319,7 +2319,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
+>  	case __NO_FGT_GROUP__:
+>  		break;
+>  
+> -	case HFGxTR_GROUP:
+> +	case HFGRTR_GROUP:
+>  		if (is_read)
+>  			val = __vcpu_sys_reg(vcpu, HFGRTR_EL2);
+>  		else
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index b741ea6aefa58..3150e42d79341 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -79,7 +79,7 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>  		switch(reg) {						\
+>  		case HFGRTR_EL2:					\
+>  		case HFGWTR_EL2:					\
+> -			id = HFGxTR_GROUP;				\
+> +			id = HFGRTR_GROUP;				\
+>  			break;						\
+>  		case HFGITR_EL2:					\
+>  			id = HFGITR_GROUP;				\
+> @@ -166,7 +166,7 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	update_fgt_traps(hctxt, vcpu, kvm, HFGRTR_EL2);
+>  	update_fgt_traps_cs(hctxt, vcpu, kvm, HFGWTR_EL2, 0,
+>  			    cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38) ?
+> -			    HFGxTR_EL2_TCR_EL1_MASK : 0);
+> +			    HFGWTR_EL2_TCR_EL1_MASK : 0);
+>  	update_fgt_traps(hctxt, vcpu, kvm, HFGITR_EL2);
+>  	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR_EL2);
+>  	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR_EL2);
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index ed363aa3027e5..f38565e28a23a 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -1052,11 +1052,11 @@ static bool __vgic_v3_check_trap_forwarding(struct kvm_vcpu *vcpu,
+>  	switch (sysreg) {
+>  	case SYS_ICC_IGRPEN0_EL1:
+>  		if (is_read &&
+> -		    (__vcpu_sys_reg(vcpu, HFGRTR_EL2) & HFGxTR_EL2_ICC_IGRPENn_EL1))
+> +		    (__vcpu_sys_reg(vcpu, HFGRTR_EL2) & HFGRTR_EL2_ICC_IGRPENn_EL1))
+>  			return true;
+>  
+>  		if (!is_read &&
+> -		    (__vcpu_sys_reg(vcpu, HFGWTR_EL2) & HFGxTR_EL2_ICC_IGRPENn_EL1))
+> +		    (__vcpu_sys_reg(vcpu, HFGWTR_EL2) & HFGWTR_EL2_ICC_IGRPENn_EL1))
+>  			return true;
+>  
+>  		fallthrough;
+> @@ -1073,11 +1073,11 @@ static bool __vgic_v3_check_trap_forwarding(struct kvm_vcpu *vcpu,
+>  
+>  	case SYS_ICC_IGRPEN1_EL1:
+>  		if (is_read &&
+> -		    (__vcpu_sys_reg(vcpu, HFGRTR_EL2) & HFGxTR_EL2_ICC_IGRPENn_EL1))
+> +		    (__vcpu_sys_reg(vcpu, HFGRTR_EL2) & HFGRTR_EL2_ICC_IGRPENn_EL1))
+>  			return true;
+>  
+>  		if (!is_read &&
+> -		    (__vcpu_sys_reg(vcpu, HFGWTR_EL2) & HFGxTR_EL2_ICC_IGRPENn_EL1))
+> +		    (__vcpu_sys_reg(vcpu, HFGWTR_EL2) & HFGWTR_EL2_ICC_IGRPENn_EL1))
+>  			return true;
+>  
+>  		fallthrough;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 4a3fc11f7ecf3..16f6129c70b59 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1103,40 +1103,40 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+>  	res0 = res1 = 0;
+>  	if (!(kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
+>  	      kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_GENERIC)))
+> -		res0 |= (HFGxTR_EL2_APDAKey | HFGxTR_EL2_APDBKey |
+> -			 HFGxTR_EL2_APGAKey | HFGxTR_EL2_APIAKey |
+> -			 HFGxTR_EL2_APIBKey);
+> +		res0 |= (HFGRTR_EL2_APDAKey | HFGRTR_EL2_APDBKey |
+> +			 HFGRTR_EL2_APGAKey | HFGRTR_EL2_APIAKey |
+> +			 HFGRTR_EL2_APIBKey);
+>  	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
+> -		res0 |= (HFGxTR_EL2_LORC_EL1 | HFGxTR_EL2_LOREA_EL1 |
+> -			 HFGxTR_EL2_LORID_EL1 | HFGxTR_EL2_LORN_EL1 |
+> -			 HFGxTR_EL2_LORSA_EL1);
+> +		res0 |= (HFGRTR_EL2_LORC_EL1 | HFGRTR_EL2_LOREA_EL1 |
+> +			 HFGRTR_EL2_LORID_EL1 | HFGRTR_EL2_LORN_EL1 |
+> +			 HFGRTR_EL2_LORSA_EL1);
+>  	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, CSV2, CSV2_2) &&
+>  	    !kvm_has_feat(kvm, ID_AA64PFR1_EL1, CSV2_frac, CSV2_1p2))
+> -		res0 |= (HFGxTR_EL2_SCXTNUM_EL1 | HFGxTR_EL2_SCXTNUM_EL0);
+> +		res0 |= (HFGRTR_EL2_SCXTNUM_EL1 | HFGRTR_EL2_SCXTNUM_EL0);
+>  	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, GIC, IMP))
+> -		res0 |= HFGxTR_EL2_ICC_IGRPENn_EL1;
+> +		res0 |= HFGRTR_EL2_ICC_IGRPENn_EL1;
+>  	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP))
+> -		res0 |= (HFGxTR_EL2_ERRIDR_EL1 | HFGxTR_EL2_ERRSELR_EL1 |
+> -			 HFGxTR_EL2_ERXFR_EL1 | HFGxTR_EL2_ERXCTLR_EL1 |
+> -			 HFGxTR_EL2_ERXSTATUS_EL1 | HFGxTR_EL2_ERXMISCn_EL1 |
+> -			 HFGxTR_EL2_ERXPFGF_EL1 | HFGxTR_EL2_ERXPFGCTL_EL1 |
+> -			 HFGxTR_EL2_ERXPFGCDN_EL1 | HFGxTR_EL2_ERXADDR_EL1);
+> +		res0 |= (HFGRTR_EL2_ERRIDR_EL1 | HFGRTR_EL2_ERRSELR_EL1 |
+> +			 HFGRTR_EL2_ERXFR_EL1 | HFGRTR_EL2_ERXCTLR_EL1 |
+> +			 HFGRTR_EL2_ERXSTATUS_EL1 | HFGRTR_EL2_ERXMISCn_EL1 |
+> +			 HFGRTR_EL2_ERXPFGF_EL1 | HFGRTR_EL2_ERXPFGCTL_EL1 |
+> +			 HFGRTR_EL2_ERXPFGCDN_EL1 | HFGRTR_EL2_ERXADDR_EL1);
+>  	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
+> -		res0 |= HFGxTR_EL2_nACCDATA_EL1;
+> +		res0 |= HFGRTR_EL2_nACCDATA_EL1;
+>  	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP))
+> -		res0 |= (HFGxTR_EL2_nGCS_EL0 | HFGxTR_EL2_nGCS_EL1);
+> +		res0 |= (HFGRTR_EL2_nGCS_EL0 | HFGRTR_EL2_nGCS_EL1);
+>  	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, SME, IMP))
+> -		res0 |= (HFGxTR_EL2_nSMPRI_EL1 | HFGxTR_EL2_nTPIDR2_EL0);
+> +		res0 |= (HFGRTR_EL2_nSMPRI_EL1 | HFGRTR_EL2_nTPIDR2_EL0);
+>  	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
+> -		res0 |= HFGxTR_EL2_nRCWMASK_EL1;
+> +		res0 |= HFGRTR_EL2_nRCWMASK_EL1;
+>  	if (!kvm_has_s1pie(kvm))
+> -		res0 |= (HFGxTR_EL2_nPIRE0_EL1 | HFGxTR_EL2_nPIR_EL1);
+> +		res0 |= (HFGRTR_EL2_nPIRE0_EL1 | HFGRTR_EL2_nPIR_EL1);
+>  	if (!kvm_has_s1poe(kvm))
+> -		res0 |= (HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nPOR_EL1);
+> +		res0 |= (HFGRTR_EL2_nPOR_EL0 | HFGRTR_EL2_nPOR_EL1);
+>  	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
+> -		res0 |= HFGxTR_EL2_nS2POR_EL1;
+> +		res0 |= HFGRTR_EL2_nS2POR_EL1;
+>  	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, AIE, IMP))
+> -		res0 |= (HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nAMAIR2_EL1);
+> +		res0 |= (HFGRTR_EL2_nMAIR2_EL1 | HFGRTR_EL2_nAMAIR2_EL1);
+>  	set_sysreg_masks(kvm, HFGRTR_EL2, res0 | __HFGRTR_EL2_RES0, res1);
+>  	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | __HFGWTR_EL2_RES0, res1);
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 005ad28f73068..6e01b06bedcae 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -5147,12 +5147,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+>  	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+>  		goto out;
+>  
+> -	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
+> -				       HFGxTR_EL2_nMAIR2_EL1		|
+> -				       HFGxTR_EL2_nS2POR_EL1		|
+> -				       HFGxTR_EL2_nACCDATA_EL1		|
+> -				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+> -				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+> +	kvm->arch.fgu[HFGRTR_GROUP] = (HFGRTR_EL2_nAMAIR2_EL1		|
+> +				       HFGRTR_EL2_nMAIR2_EL1		|
+> +				       HFGRTR_EL2_nS2POR_EL1		|
+> +				       HFGRTR_EL2_nACCDATA_EL1		|
+> +				       HFGRTR_EL2_nSMPRI_EL1_MASK	|
+> +				       HFGRTR_EL2_nTPIDR2_EL0_MASK);
+
+For example here you see HFGRTR_GROUP but it actually also applies to HFGWTR_GROUP.
+
+>  
+>  	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+>  		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
+> @@ -5188,12 +5188,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+>  						HFGITR_EL2_ATS1E1WP);
+>  
+>  	if (!kvm_has_s1pie(kvm))
+> -		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
+> -						HFGxTR_EL2_nPIR_EL1);
+> +		kvm->arch.fgu[HFGRTR_GROUP] |= (HFGRTR_EL2_nPIRE0_EL1 |
+> +						HFGRTR_EL2_nPIR_EL1);
+>  
+>  	if (!kvm_has_s1poe(kvm))
+> -		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPOR_EL1 |
+> -						HFGxTR_EL2_nPOR_EL0);
+> +		kvm->arch.fgu[HFGRTR_GROUP] |= (HFGRTR_EL2_nPOR_EL1 |
+> +						HFGRTR_EL2_nPOR_EL0);
+>  
+>  	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
+>  		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 7f39c8f7f036d..e21e881314a33 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2464,73 +2464,6 @@ UnsignedEnum	2:0	F8S1
+>  EndEnum
+>  EndSysreg
+>  
+> -SysregFields	HFGxTR_EL2
+> -Field	63	nAMAIR2_EL1
+> -Field	62	nMAIR2_EL1
+> -Field	61	nS2POR_EL1
+> -Field	60	nPOR_EL1
+> -Field	59	nPOR_EL0
+> -Field	58	nPIR_EL1
+> -Field	57	nPIRE0_EL1
+> -Field	56	nRCWMASK_EL1
+> -Field	55	nTPIDR2_EL0
+> -Field	54	nSMPRI_EL1
+> -Field	53	nGCS_EL1
+> -Field	52	nGCS_EL0
+> -Res0	51
+> -Field	50	nACCDATA_EL1
+> -Field	49	ERXADDR_EL1
+> -Field	48	ERXPFGCDN_EL1
+> -Field	47	ERXPFGCTL_EL1
+> -Field	46	ERXPFGF_EL1
+> -Field	45	ERXMISCn_EL1
+> -Field	44	ERXSTATUS_EL1
+> -Field	43	ERXCTLR_EL1
+> -Field	42	ERXFR_EL1
+> -Field	41	ERRSELR_EL1
+> -Field	40	ERRIDR_EL1
+> -Field	39	ICC_IGRPENn_EL1
+> -Field	38	VBAR_EL1
+> -Field	37	TTBR1_EL1
+> -Field	36	TTBR0_EL1
+> -Field	35	TPIDR_EL0
+> -Field	34	TPIDRRO_EL0
+> -Field	33	TPIDR_EL1
+> -Field	32	TCR_EL1
+> -Field	31	SCXTNUM_EL0
+> -Field	30	SCXTNUM_EL1
+> -Field	29	SCTLR_EL1
+> -Field	28	REVIDR_EL1
+> -Field	27	PAR_EL1
+> -Field	26	MPIDR_EL1
+> -Field	25	MIDR_EL1
+> -Field	24	MAIR_EL1
+> -Field	23	LORSA_EL1
+> -Field	22	LORN_EL1
+> -Field	21	LORID_EL1
+> -Field	20	LOREA_EL1
+> -Field	19	LORC_EL1
+> -Field	18	ISR_EL1
+> -Field	17	FAR_EL1
+> -Field	16	ESR_EL1
+> -Field	15	DCZID_EL0
+> -Field	14	CTR_EL0
+> -Field	13	CSSELR_EL1
+> -Field	12	CPACR_EL1
+> -Field	11	CONTEXTIDR_EL1
+> -Field	10	CLIDR_EL1
+> -Field	9	CCSIDR_EL1
+> -Field	8	APIBKey
+> -Field	7	APIAKey
+> -Field	6	APGAKey
+> -Field	5	APDBKey
+> -Field	4	APDAKey
+> -Field	3	AMAIR_EL1
+> -Field	2	AIDR_EL1
+> -Field	1	AFSR1_EL1
+> -Field	0	AFSR0_EL1
+> -EndSysregFields
+> -
+>  Sysreg	HCR_EL2		3	4	1	1	0
+>  Field	63:60	TWEDEL
+>  Field	59	TWEDEn
+> @@ -2635,11 +2568,134 @@ Field	4:0	HPMN
+>  EndSysreg
+>  
+>  Sysreg HFGRTR_EL2	3	4	1	1	4
+> -Fields	HFGxTR_EL2
+> +Field	63	nAMAIR2_EL1
+> +Field	62	nMAIR2_EL1
+> +Field	61	nS2POR_EL1
+> +Field	60	nPOR_EL1
+> +Field	59	nPOR_EL0
+> +Field	58	nPIR_EL1
+> +Field	57	nPIRE0_EL1
+> +Field	56	nRCWMASK_EL1
+> +Field	55	nTPIDR2_EL0
+> +Field	54	nSMPRI_EL1
+> +Field	53	nGCS_EL1
+> +Field	52	nGCS_EL0
+> +Res0	51
+> +Field	50	nACCDATA_EL1
+> +Field	49	ERXADDR_EL1
+> +Field	48	ERXPFGCDN_EL1
+> +Field	47	ERXPFGCTL_EL1
+> +Field	46	ERXPFGF_EL1
+> +Field	45	ERXMISCn_EL1
+> +Field	44	ERXSTATUS_EL1
+> +Field	43	ERXCTLR_EL1
+> +Field	42	ERXFR_EL1
+> +Field	41	ERRSELR_EL1
+> +Field	40	ERRIDR_EL1
+> +Field	39	ICC_IGRPENn_EL1
+> +Field	38	VBAR_EL1
+> +Field	37	TTBR1_EL1
+> +Field	36	TTBR0_EL1
+> +Field	35	TPIDR_EL0
+> +Field	34	TPIDRRO_EL0
+> +Field	33	TPIDR_EL1
+> +Field	32	TCR_EL1
+> +Field	31	SCXTNUM_EL0
+> +Field	30	SCXTNUM_EL1
+> +Field	29	SCTLR_EL1
+> +Field	28	REVIDR_EL1
+> +Field	27	PAR_EL1
+> +Field	26	MPIDR_EL1
+> +Field	25	MIDR_EL1
+> +Field	24	MAIR_EL1
+> +Field	23	LORSA_EL1
+> +Field	22	LORN_EL1
+> +Field	21	LORID_EL1
+> +Field	20	LOREA_EL1
+> +Field	19	LORC_EL1
+> +Field	18	ISR_EL1
+> +Field	17	FAR_EL1
+> +Field	16	ESR_EL1
+> +Field	15	DCZID_EL0
+> +Field	14	CTR_EL0
+> +Field	13	CSSELR_EL1
+> +Field	12	CPACR_EL1
+> +Field	11	CONTEXTIDR_EL1
+> +Field	10	CLIDR_EL1
+> +Field	9	CCSIDR_EL1
+> +Field	8	APIBKey
+> +Field	7	APIAKey
+> +Field	6	APGAKey
+> +Field	5	APDBKey
+> +Field	4	APDAKey
+> +Field	3	AMAIR_EL1
+> +Field	2	AIDR_EL1
+> +Field	1	AFSR1_EL1
+> +Field	0	AFSR0_EL1
+>  EndSysreg
+>  
+>  Sysreg HFGWTR_EL2	3	4	1	1	5
+> -Fields	HFGxTR_EL2
+> +Field	63	nAMAIR2_EL1
+> +Field	62	nMAIR2_EL1
+> +Field	61	nS2POR_EL1
+> +Field	60	nPOR_EL1
+> +Field	59	nPOR_EL0
+> +Field	58	nPIR_EL1
+> +Field	57	nPIRE0_EL1
+> +Field	56	nRCWMASK_EL1
+> +Field	55	nTPIDR2_EL0
+> +Field	54	nSMPRI_EL1
+> +Field	53	nGCS_EL1
+> +Field	52	nGCS_EL0
+> +Res0	51
+> +Field	50	nACCDATA_EL1
+> +Field	49	ERXADDR_EL1
+> +Field	48	ERXPFGCDN_EL1
+> +Field	47	ERXPFGCTL_EL1
+> +Res0	46
+> +Field	45	ERXMISCn_EL1
+> +Field	44	ERXSTATUS_EL1
+> +Field	43	ERXCTLR_EL1
+> +Res0	42
+> +Field	41	ERRSELR_EL1
+> +Res0	40
+> +Field	39	ICC_IGRPENn_EL1
+> +Field	38	VBAR_EL1
+> +Field	37	TTBR1_EL1
+> +Field	36	TTBR0_EL1
+> +Field	35	TPIDR_EL0
+> +Field	34	TPIDRRO_EL0
+> +Field	33	TPIDR_EL1
+> +Field	32	TCR_EL1
+> +Field	31	SCXTNUM_EL0
+> +Field	30	SCXTNUM_EL1
+> +Field	29	SCTLR_EL1
+> +Res0	28
+> +Field	27	PAR_EL1
+> +Res0	26:25	
+> +Field	24	MAIR_EL1
+> +Field	23	LORSA_EL1
+> +Field	22	LORN_EL1
+> +Res0	21
+> +Field	20	LOREA_EL1
+> +Field	19	LORC_EL1
+> +Res0	18
+> +Field	17	FAR_EL1
+> +Field	16	ESR_EL1
+> +Res0	15:14
+> +Field	13	CSSELR_EL1
+> +Field	12	CPACR_EL1
+> +Field	11	CONTEXTIDR_EL1
+> +Res0	10:9
+> +Field	8	APIBKey
+> +Field	7	APIAKey
+> +Field	6	APGAKey
+> +Field	5	APDBKey
+> +Field	4	APDAKey
+> +Field	3	AMAIR_EL1
+> +Res0	2
+> +Field	1	AFSR1_EL1
+> +Field	0	AFSR0_EL1
+>  EndSysreg
+>  
+>  Sysreg HFGITR_EL2	3	4	1	1	6
+> -- 
+> 2.39.2
+> 
