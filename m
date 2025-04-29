@@ -1,276 +1,71 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8A7130A54
-	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 14:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AEB2C17AE
+	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 14:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745935331; cv=none; b=TMfAy550/cpI07ZWABrTr9zgbfTPkptFRQMf0ND933KmVtJYPzyyQjKdQKrG5zcGgdysogtyND6eg4Ei87nHxK6oFZYAT+JB6tlVFRhZjbsh/Q9kyKm6mAo/Kct9V858gBDAqhcCns995JYBxzDzKwOX36PzVs4ATd+H7ZM40oY=
+	t=1745935803; cv=none; b=AJot1dJ2cNGUuZ0MyiD8XQMEe0/ARXum0k9j/SB3Oh2ZMAEiZBeFTezPDAjSAVwWwa+sPmWC9RnQ3ZCdLta/1/wfsrv64GTnLOGR7b5FiLVsHc9OSWghxJgZXyw/MEGNYgG8gI93nUOBoG4PrJbp02qxmdgVoUNsvEvoJlrS9kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745935331; c=relaxed/simple;
-	bh=IlzTOjbT3m7PjVvPB6q6l++9Z725Gr9QMVPLS92Xj0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MBfWSxEw6KfwfPTF5kX3M5v6nvNi83AatSpU9/9Bmildhjv6xa9hkb/0YlYyhzYi8nCyi6zby8Zfwe8oyQR/30zm8eG9A8E7Re7Y/oSJjPPO22eU/tx+IQvGxpQkHpNkaf8Z6oC9dOfbjHd7Tn5t0OHXAv9Ojnj4tsK+b87Fxqw=
+	s=arc-20240116; t=1745935803; c=relaxed/simple;
+	bh=7ilE6Mulu69YDl0t29ldX0rUe0mYNOb23tG+PTX5YIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Oks/gCneL71P5R15FNOPkP9YEuF9gmv0rnOkZAYfDxP4yWaV90gqVmHjDq4ah8jOkNKtAVV7zGSKlLu1gNFhapQfkyhfOZaKA18UDtJryBG4nicFwTQxmo8XeFTENk7EmdyXFq6aTkerW9CMUWaIuRp3WeLu/NvvwnU20OOkxHI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 57E5C1515;
-	Tue, 29 Apr 2025 07:02:02 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CE2B3F66E;
-	Tue, 29 Apr 2025 07:02:07 -0700 (PDT)
-Date: Tue, 29 Apr 2025 15:02:04 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 03/42] arm64: sysreg: Add layout for HCR_EL2
-Message-ID: <20250429140204.GC1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-4-maz@kernel.org>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00A291515;
+	Tue, 29 Apr 2025 07:09:51 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E5E293F66E;
+	Tue, 29 Apr 2025 07:09:55 -0700 (PDT)
+Message-ID: <69211539-5ffa-45ad-bd19-25e8bcd6eccc@arm.com>
+Date: Tue, 29 Apr 2025 15:09:54 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-4-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 24/42] KVM: arm64: Unconditionally configure fine-grain
+ traps
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+ <20250426122836.3341523-25-maz@kernel.org>
+ <363383a2-c05e-458c-82b7-acc6e5d73939@arm.com> <86h627hyby.wl-maz@kernel.org>
+Content-Language: en-US
+From: Ben Horgan <ben.horgan@arm.com>
+In-Reply-To: <86h627hyby.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Apr 26, 2025 at 01:27:57PM +0100, Marc Zyngier wrote:
-> Add HCR_EL2 to the sysreg file, more or less directly generated
-> from the JSON file.
+On 4/29/25 14:49, Marc Zyngier wrote:
+> On Tue, 29 Apr 2025 14:08:27 +0100,
+> Ben Horgan <ben.horgan@arm.com> wrote:
+>>>    -	__deactivate_fgt(hctxt, vcpu, kvm, HFGRTR_EL2);
+>>> -	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+>> Don't we need to continue considering the ampere errata here? Or, at
+>> least worth a mention in the commit message.
 > 
-> Since the generated names significantly differ from the existing
-> naming, express the old names in terms of the new one. One day, we'll
-> fix this mess, but I'm not in any hurry.
+> The FGT registers are always context switched, so whatever was saved
+> *before* the workaround was applied in __activate_traps_hfgxtr() is
+> blindly restored...
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h | 125 ++++++++++++++++---------------
->  arch/arm64/tools/sysreg          |  68 +++++++++++++++++
->  2 files changed, 132 insertions(+), 61 deletions(-)
+>>> -		write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 974d72b5905b8..f36d067967c33 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -12,67 +12,70 @@
->  #include <asm/sysreg.h>
->  #include <asm/types.h>
->  
-> -/* Hyp Configuration Register (HCR) bits */
-> -
-> -#define HCR_TID5	(UL(1) << 58)
-> -#define HCR_DCT		(UL(1) << 57)
-> -#define HCR_ATA_SHIFT	56
-> -#define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
-> -#define HCR_TTLBOS	(UL(1) << 55)
-> -#define HCR_TTLBIS	(UL(1) << 54)
-> -#define HCR_ENSCXT	(UL(1) << 53)
-> -#define HCR_TOCU	(UL(1) << 52)
-> -#define HCR_AMVOFFEN	(UL(1) << 51)
-> -#define HCR_TICAB	(UL(1) << 50)
-> -#define HCR_TID4	(UL(1) << 49)
-> -#define HCR_FIEN	(UL(1) << 47)
-> -#define HCR_FWB		(UL(1) << 46)
-> -#define HCR_NV2		(UL(1) << 45)
-> -#define HCR_AT		(UL(1) << 44)
-> -#define HCR_NV1		(UL(1) << 43)
-> -#define HCR_NV		(UL(1) << 42)
-> -#define HCR_API		(UL(1) << 41)
-> -#define HCR_APK		(UL(1) << 40)
-> -#define HCR_TEA		(UL(1) << 37)
-> -#define HCR_TERR	(UL(1) << 36)
-> -#define HCR_TLOR	(UL(1) << 35)
-> -#define HCR_E2H		(UL(1) << 34)
-> -#define HCR_ID		(UL(1) << 33)
-> -#define HCR_CD		(UL(1) << 32)
-> -#define HCR_RW_SHIFT	31
-> -#define HCR_RW		(UL(1) << HCR_RW_SHIFT)
-> -#define HCR_TRVM	(UL(1) << 30)
-> -#define HCR_HCD		(UL(1) << 29)
-> -#define HCR_TDZ		(UL(1) << 28)
-> -#define HCR_TGE		(UL(1) << 27)
-> -#define HCR_TVM		(UL(1) << 26)
-> -#define HCR_TTLB	(UL(1) << 25)
-> -#define HCR_TPU		(UL(1) << 24)
-> -#define HCR_TPC		(UL(1) << 23) /* HCR_TPCP if FEAT_DPB */
-> -#define HCR_TSW		(UL(1) << 22)
-> -#define HCR_TACR	(UL(1) << 21)
-> -#define HCR_TIDCP	(UL(1) << 20)
-> -#define HCR_TSC		(UL(1) << 19)
-> -#define HCR_TID3	(UL(1) << 18)
-> -#define HCR_TID2	(UL(1) << 17)
-> -#define HCR_TID1	(UL(1) << 16)
-> -#define HCR_TID0	(UL(1) << 15)
-> -#define HCR_TWE		(UL(1) << 14)
-> -#define HCR_TWI		(UL(1) << 13)
-> -#define HCR_DC		(UL(1) << 12)
-> -#define HCR_BSU		(3 << 10)
-> -#define HCR_BSU_IS	(UL(1) << 10)
-> -#define HCR_FB		(UL(1) << 9)
-> -#define HCR_VSE		(UL(1) << 8)
-> -#define HCR_VI		(UL(1) << 7)
-> -#define HCR_VF		(UL(1) << 6)
-> -#define HCR_AMO		(UL(1) << 5)
-> -#define HCR_IMO		(UL(1) << 4)
-> -#define HCR_FMO		(UL(1) << 3)
-> -#define HCR_PTW		(UL(1) << 2)
-> -#define HCR_SWIO	(UL(1) << 1)
-> -#define HCR_VM		(UL(1) << 0)
-> -#define HCR_RES0	((UL(1) << 48) | (UL(1) << 39))
-> +/*
-> + * Because I'm terribly lazy and that repainting the whole of the KVM
-> + * code with the proper names is a pain, use a helper to map the names
-> + * inherited from AArch32 with the new fancy nomenclature. One day...
-> + */
-> +#define	__HCR(x)	HCR_EL2_##x
-> +
-> +#define HCR_TID5	__HCR(TID5)
-> +#define HCR_DCT		__HCR(DCT)
-> +#define HCR_ATA_SHIFT	__HCR(ATA_SHIFT)
-> +#define HCR_ATA		__HCR(ATA)
-> +#define HCR_TTLBOS	__HCR(TTLBOS)
-> +#define HCR_TTLBIS	__HCR(TTLBIS)
-> +#define HCR_ENSCXT	__HCR(EnSCXT)
-> +#define HCR_TOCU	__HCR(TOCU)
-> +#define HCR_AMVOFFEN	__HCR(AMVOFFEN)
-> +#define HCR_TICAB	__HCR(TICAB)
-> +#define HCR_TID4	__HCR(TID4)
-> +#define HCR_FIEN	__HCR(FIEN)
-> +#define HCR_FWB		__HCR(FWB)
-> +#define HCR_NV2		__HCR(NV2)
-> +#define HCR_AT		__HCR(AT)
-> +#define HCR_NV1		__HCR(NV1)
-> +#define HCR_NV		__HCR(NV)
-> +#define HCR_API		__HCR(API)
-> +#define HCR_APK		__HCR(APK)
-> +#define HCR_TEA		__HCR(TEA)
-> +#define HCR_TERR	__HCR(TERR)
-> +#define HCR_TLOR	__HCR(TLOR)
-> +#define HCR_E2H		__HCR(E2H)
-> +#define HCR_ID		__HCR(ID)
-> +#define HCR_CD		__HCR(CD)
-> +#define HCR_RW		__HCR(RW)
-> +#define HCR_TRVM	__HCR(TRVM)
-> +#define HCR_HCD		__HCR(HCD)
-> +#define HCR_TDZ		__HCR(TDZ)
-> +#define HCR_TGE		__HCR(TGE)
-> +#define HCR_TVM		__HCR(TVM)
-> +#define HCR_TTLB	__HCR(TTLB)
-> +#define HCR_TPU		__HCR(TPU)
-> +#define HCR_TPC		__HCR(TPCP)
-> +#define HCR_TSW		__HCR(TSW)
-> +#define HCR_TACR	__HCR(TACR)
-> +#define HCR_TIDCP	__HCR(TIDCP)
-> +#define HCR_TSC		__HCR(TSC)
-> +#define HCR_TID3	__HCR(TID3)
-> +#define HCR_TID2	__HCR(TID2)
-> +#define HCR_TID1	__HCR(TID1)
-> +#define HCR_TID0	__HCR(TID0)
-> +#define HCR_TWE		__HCR(TWE)
-> +#define HCR_TWI		__HCR(TWI)
-> +#define HCR_DC		__HCR(DC)
-> +#define HCR_BSU		__HCR(BSU)
-> +#define HCR_BSU_IS	__HCR(BSU_IS)
-> +#define HCR_FB		__HCR(FB)
-> +#define HCR_VSE		__HCR(VSE)
-> +#define HCR_VI		__HCR(VI)
-> +#define HCR_VF		__HCR(VF)
-> +#define HCR_AMO		__HCR(AMO)
-> +#define HCR_IMO		__HCR(IMO)
-> +#define HCR_FMO		__HCR(FMO)
-> +#define HCR_PTW		__HCR(PTW)
-> +#define HCR_SWIO	__HCR(SWIO)
-> +#define HCR_VM		__HCR(VM)
->  
->  /*
->   * The bits we set in HCR:
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index fce8328c7c00b..7f39c8f7f036d 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2531,6 +2531,74 @@ Field	1	AFSR1_EL1
->  Field	0	AFSR0_EL1
->  EndSysregFields
->  
-> +Sysreg	HCR_EL2		3	4	1	1	0
-> +Field	63:60	TWEDEL
-> +Field	59	TWEDEn
-> +Field	58	TID5
-> +Field	57	DCT
-> +Field	56	ATA
-> +Field	55	TTLBOS
-> +Field	54	TTLBIS
-> +Field	53	EnSCXT
-> +Field	52	TOCU
-> +Field	51	AMVOFFEN
-> +Field	50	TICAB
-> +Field	49	TID4
-> +Field	48	GPF
-> +Field	47	FIEN
-> +Field	46	FWB
-> +Field	45	NV2
-> +Field	44	AT
-> +Field	43	NV1
-> +Field	42	NV
-> +Field	41	API
-> +Field	40	APK
-> +Field	39	TME
-> +Field	38	MIOCNCE
-> +Field	37	TEA
-> +Field	36	TERR
-> +Field	35	TLOR
-> +Field	34	E2H
-> +Field	33	ID
-> +Field	32	CD
-> +Field	31	RW
-> +Field	30	TRVM
-> +Field	29	HCD
-> +Field	28	TDZ
-> +Field	27	TGE
-> +Field	26	TVM
-> +Field	25	TTLB
-> +Field	24	TPU
-> +Field	23	TPCP
-> +Field	22	TSW
-> +Field	21	TACR
-> +Field	20	TIDCP
-> +Field	19	TSC
-> +Field	18	TID3
-> +Field	17	TID2
-> +Field	16	TID1
-> +Field	15	TID0
-> +Field	14	TWE
-> +Field	13	TWI
-> +Field	12	DC
-> +UnsignedEnum	11:10	BSU
-> +	0b00	NONE
-> +	0b01	IS
-> +	0b10	OS
-> +	0b11	FS
-> +EndEnum
-> +Field	9	FB
-> +Field	8	VSE
-> +Field	7	VI
-> +Field	6	VF
-> +Field	5	AMO
-> +Field	4	IMO
-> +Field	3	FMO
-> +Field	2	PTW
-> +Field	1	SWIO
-> +Field	0	VM
-> +EndSysreg
-> +
->  Sysreg MDCR_EL2		3	4	1	1	1
->  Res0	63:51
->  Field	50	EnSTEPOP
+> ... and this write always happens.
+Thanks for the explanation. I now agree this code is correct.
+> 
+> 	M.
+> 
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Thanks,
+
+Ben
+
