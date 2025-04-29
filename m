@@ -1,114 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C31C5383;
-	Tue, 29 Apr 2025 14:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48526219A89;
+	Tue, 29 Apr 2025 14:47:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745937040; cv=none; b=dPzVtp13qVgXzu4zE+9QaEGp8+mtpWGLLfQ+80azN8uxwdg5TeAWaV+3sV5ST7cBBfwk2NwKgQEYbIf0nqYw1gJUCs4ox0cu+KA8uQcz0grJADoDQrkkphBczPaIHW21++hKSzHb157QTygE+4ulNXpMD4MdBtcQkmMoN+CjBuE=
+	t=1745938038; cv=none; b=VTksXo/nCwxr8T2iHEEj/x4TatNQPS5YTHNOWowMzf6StJw6rjRCkYF1xgkAy2mbyp+R/X8HkqBx03f0O0B/jeuEL2+H+Sd1/I8SYQYSbtY+99oQ2cNDPtBfgwcauVQvipXrxJvrkRXdaqYH5eoFjKfLRaJEk1YhtFmDX4H7UcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745937040; c=relaxed/simple;
-	bh=vixJhPP+/x/iuyIpqX968fhhIzXttzJBY8B+JgAqiko=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZlejV1sIYHsplHpb8lvVWJusmMqpzMd6DaMn/x/9EkclQAjxGUXDENhnTRC2bulRD4uaBC5x/OR45UYmg/B3jVK7eo9lxv83tRKvYRHVKISBgHxPnz0rlXIba+JGj80gEFpX2i+v4C+5CZ0nxJ3RDA0hBFZpkdPYfzk8yKj/QkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8Unw6XI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745938038; c=relaxed/simple;
+	bh=YrCTaP+tcbajXC6/b7SoFDFq5t/KwEus2QAmCVIBrgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YQXBzOfoLe8rrRPJ298VQYEVYCjm4AFtP8l7ZquHMRpFJWe/6ZtFTxK8rda1iF+Borwxbvf3dI12bruMK7s+DU/KTLjji48x0dQoumW3g6mqoqaAG0hOUcYxgweX98ImwJf5DSWvXXdL5AI4iFtttWvLu4htymbUhj3Lk0S7ZoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbR1oFYP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8Unw6XI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE274C4CEE3;
-	Tue, 29 Apr 2025 14:30:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbR1oFYP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39EDDC4CEE3;
+	Tue, 29 Apr 2025 14:47:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745937039;
-	bh=vixJhPP+/x/iuyIpqX968fhhIzXttzJBY8B+JgAqiko=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=R8Unw6XIEkeQxtWYT0fIrRn4z1S5sJ8PZUjLO68l5xqw9fHV9+PE04IF1p9JHcXQS
-	 mbdtFvsqYkecFzgVMY0o+nCAp7tUchqbdaGA1WvX0U+LkdKjDmRhkgOoPrJwUOdo9S
-	 JZGTr4g/y4qbbsxNGa2aJVqi6966VRjKiRR68Ya8fdBnoYVjckTViccvjTsetFMVak
-	 1N0LUIhg1xXoNVDpEX8eZeO0/GFVpJe4zyftb4erMOk1OcNwN5cwTscEUAyTIFWEju
-	 u8RcwU6GgAXdrmLNo3cMHJ2cBLOw0g7qlIvx+uxA7iqvjRtGg2UhKhRDifFNhab6wm
-	 0eKTpizVMN73Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u9lyn-009wib-JE;
-	Tue, 29 Apr 2025 15:30:37 +0100
-Date: Tue, 29 Apr 2025 15:30:37 +0100
-Message-ID: <86ecxbhwfm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 41/42] KVM: arm64: Add FGT descriptors for FEAT_FGT2
-In-Reply-To: <b956142a-b759-4f5a-b1a9-d8142a622f21@arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
-	<20250426122836.3341523-42-maz@kernel.org>
-	<b956142a-b759-4f5a-b1a9-d8142a622f21@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1745938037;
+	bh=YrCTaP+tcbajXC6/b7SoFDFq5t/KwEus2QAmCVIBrgU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hbR1oFYPepr21AnMku8sxgvGJfsYYvl+fDZNSEjow+OM+SmnawdmzUYE6W503cQt8
+	 XZjoDeTObvh5TG7hYoRM1I4oxZUxAxaTjfJA1NwXoiMeZJwrf/fC8leQincBNcved7
+	 yP3NDUoYMLwFAh5F3o0o/MmxYtdPTDBBlEL8y7zs5hklYuV8BGzfckSbcG6qogpMVa
+	 iHNbiGVS1X/EN75MQp6WlLOtNog52OasZ3jLYJwKOIQwiFOyOzy6I+tG5h5xKDRO4X
+	 McRfIe8Isa3OaUzcWQOArxt0gUukeKzFVYMnyDILtjyd401Es3kKvyAzdQPPtMEkqS
+	 cP6smDLj3VjUA==
+Date: Tue, 29 Apr 2025 15:47:10 +0100
+From: Will Deacon <will@kernel.org>
+To: Yicong Yang <yangyicong@huawei.com>
+Cc: catalin.marinas@arm.com, maz@kernel.org, oliver.upton@linux.dev,
+	corbet@lwn.net, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	linux-doc@vger.kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, shuah@kernel.org,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	linuxarm@huawei.com, prime.zeng@hisilicon.com, xuwei5@huawei.com,
+	yangyicong@hisilicon.com, tangchengchang@huawei.com,
+	broonie@kernel.org
+Subject: Re: [PATCH v2 1/6] arm64: Provide basic EL2 setup for FEAT_{LS64,
+ LS64_V} usage at EL0/1
+Message-ID: <20250429144710.GA26174@willie-the-truck>
+References: <20250331094320.35226-1-yangyicong@huawei.com>
+ <20250331094320.35226-2-yangyicong@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ben.horgan@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250331094320.35226-2-yangyicong@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, 29 Apr 2025 14:09:13 +0100,
-Ben Horgan <ben.horgan@arm.com> wrote:
+On Mon, Mar 31, 2025 at 05:43:15PM +0800, Yicong Yang wrote:
+> From: Yicong Yang <yangyicong@hisilicon.com>
 > 
-> Hi Marc,
+> Instructions introduced by FEAT_{LS64, LS64_V} is controlled by
+> HCRX_EL2.{EnALS, EnASR}. Configure all of these to allow usage
+> at EL0/1.
 > 
-> On 4/26/25 13:28, Marc Zyngier wrote:
-> > Bulk addition of all the FGT2 traps reported with EC == 0x18,
-> > as described in the 2025-03 JSON drop.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >   arch/arm64/kvm/emulate-nested.c | 83 +++++++++++++++++++++++++++++++++
-> >   1 file changed, 83 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index 9c7ecfccbd6e9..f7678af272bbb 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> [...]
-> >   	/*
-> >   	 * HDFGWTR_EL2
-> >   	 *
-> > @@ -1896,12 +1972,19 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
-> >   	 * read-side mappings, and only the write-side mappings that
-> >   	 * differ from the read side, and the trap handler will pick
-> >   	 * the correct shadow register based on the access type.
-> > +	 *
-> > +	 * Same model applies to the FEAT_FGT2 registers.
-> >   	 */
-> >   	SR_FGT(SYS_TRFCR_EL1,		HDFGWTR, TRFCR_EL1, 1),
-> >   	SR_FGT(SYS_TRCOSLAR,		HDFGWTR, TRCOSLAR, 1),
-> >   	SR_FGT(SYS_PMCR_EL0,		HDFGWTR, PMCR_EL0, 1),
-> >   	SR_FGT(SYS_PMSWINC_EL0,		HDFGWTR, PMSWINC_EL0, 1),
-> >   	SR_FGT(SYS_OSLAR_EL1,		HDFGWTR, OSLAR_EL1, 1),
-> > +
-> > +	/* HDFGWTR_EL2 */
-> A missing 2. HDFGWTR_EL2 should be HDFGWTR2_EL2.
+> This doesn't mean these instructions are always available in
+> EL0/1 if provided. The hypervisor still have the control at
+> runtime.
+> 
+> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+> ---
+>  arch/arm64/include/asm/el2_setup.h | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index ebceaae3c749..0259941602c4 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -57,9 +57,19 @@
+>          /* Enable GCS if supported */
+>  	mrs_s	x1, SYS_ID_AA64PFR1_EL1
+>  	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
+> -	cbz	x1, .Lset_hcrx_\@
+> +	cbz	x1, .Lskip_gcs_hcrx_\@
+>  	orr	x0, x0, #HCRX_EL2_GCSEn
+>  
+> +.Lskip_gcs_hcrx_\@:
+> +	/* Enable LS64, LS64_V if supported */
+> +	mrs_s	x1, SYS_ID_AA64ISAR1_EL1
+> +	ubfx	x1, x1, #ID_AA64ISAR1_EL1_LS64_SHIFT, #4
+> +	cbz	x1, .Lset_hcrx_\@
+> +	orr	x0, x0, #HCRX_EL2_EnALS
+> +	cmp	x1, #ID_AA64ISAR1_EL1_LS64_LS64_V
+> +	b.lt	.Lset_hcrx_\@
+> +	orr	x0, x0, #HCRX_EL2_EnASR
 
-All reported typos fixed, thanks you!
+How do these HCRX settings survive a world-switch to and from a KVM
+guest? AFAICT, the trap deactivation path there restores HCRX_HOST_FLAGS
+when returning to the host. That would mean that the GCS code is broken
+too, unless I'm missing something :/
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
