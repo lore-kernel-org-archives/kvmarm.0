@@ -1,80 +1,497 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5048C19F424
-	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 05:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F975277813;
+	Tue, 29 Apr 2025 07:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745905059; cv=none; b=bObkyh54u9H3cyUw/2g8GUnBZ/eHh1XGLDC+8mMj7OkrZ8MGI9CbdItYSdFgDkxpeVJWmPwNfsWOezwvzSwQapmZWroXOk+JaYCFt+Lft6eMq2r/d5Sg3SNJguK7ZctLVXeCZD/qtZM5zwAhyzyqlCB2szzrLABHj9Aoc+R7WCI=
+	t=1745912051; cv=none; b=iZDlNBIp96VT46+ZqHVsTm0BWT4IQl0dWkjaKQWU2VL7JGvn1PymTWAblkOFOhNv4XN54mMXYM3YdRiL3WPN4/rlvVB1YeyF7tAsubA0hPgzGXbHud24HEc9a9xtB1X/0OGb5MXQfouXo8+eHNKjzoc8051FsbS/5uXnjTRBBmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745905059; c=relaxed/simple;
-	bh=KFqzEyNKOFOAeSkTWy5DiiPoP4XGs7Kz86yGcU1/JJw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XxiBhC47EaWhp9+3LQqOPZTwgVysXu7V7SyrI0pNilaXeVnJ2n+st4NubU9UZKFkWy0OnH5kn2jDHmYuH3QjknGy0OSk/ACWL2rZ8yQ84ihtix/QqvxCulih8pTT642p3a3gO8wLjd0EJ1rAM+7lKv4m7cUKNkMG9vkXy1pYoTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E36411515;
-	Mon, 28 Apr 2025 22:37:30 -0700 (PDT)
-Received: from [10.163.52.122] (unknown [10.163.52.122])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D23DC3F5A1;
-	Mon, 28 Apr 2025 22:37:32 -0700 (PDT)
-Message-ID: <06140631-c3cb-4837-bb4c-bdff30863ad2@arm.com>
-Date: Tue, 29 Apr 2025 11:07:28 +0530
+	s=arc-20240116; t=1745912051; c=relaxed/simple;
+	bh=LQkqFpkhMYEtm10gHoIsXIbeErXzIYB3k+HILWYm/n8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oX5XWFWXZQdcQv7sYFA1/WgHyfQTMsH9/0pRYWP2wcWSItli3t58YYEQBK1fxwT/GQcGX3DGLcrV3CFLdEMmpDSesGQw2pNYn8DK5kerIG1G12H6NXeL87rGyiiu6I7lpp9UEKkYvynFEjaXg8dRXqMEBATIltFJl+KqRX4v8ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bWkrMvpi; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bWkrMvpi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ACBBC4CEE9;
+	Tue, 29 Apr 2025 07:34:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745912050;
+	bh=LQkqFpkhMYEtm10gHoIsXIbeErXzIYB3k+HILWYm/n8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bWkrMvpimy2ykexF825aofiZEClD3199wwqrsZrQzyCgvdzo9kBn6D/t3NfEqVK4s
+	 XdIGdZIH1X6ig0N+7LxzsgI/TqNfU9tqQ2xzJgRepGpl0zWiShiaBkXpgrtQNK67ZX
+	 Um2azKCdy4HOSYoXNhZx86BB4e4ozFobdqi3d3agaYdQjCaRQfxHv87hYXhD4/KuYF
+	 1eypFmf23xaf6zVXryJMzmpckLWM78PRDPDkDg88e9wchNk/oQr66A5/bKiHGygNkV
+	 xDEw6PEQCDG3vgvuHRiqhFotoCpXYzooKuc1dl/oH1wWDuZOGIZ6a1XCgstyKYAKzB
+	 Q1Y9ov3KIYtHA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u9fTj-009on5-AO;
+	Tue, 29 Apr 2025 08:34:07 +0100
+Date: Tue, 29 Apr 2025 08:34:17 +0100
+Message-ID: <87msbzxvye.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 00/42] KVM: arm64: Revamp Fine Grained Trap handling
+In-Reply-To: <4e63a13f-c5dc-4f97-879a-26b5548da07f@os.amperecomputing.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+	<4e63a13f-c5dc-4f97-879a-26b5548da07f@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, robh@kernel.org
-Cc: Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, stable@vger.kernel.org
-References: <20250227035119.2025171-1-anshuman.khandual@arm.com>
- <174171335999.3659520.16613654046629962007.b4-ty@arm.com>
- <ddeb3df1-995b-44f4-ad20-50edfb906a28@arm.com>
-Content-Language: en-US
-In-Reply-To: <ddeb3df1-995b-44f4-ad20-50edfb906a28@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 3/12/25 09:16, Anshuman Khandual wrote:
+On Mon, 28 Apr 2025 19:33:10 +0100,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
+> Hi Marc,
 > 
-> On 3/11/25 22:47, Catalin Marinas wrote:
->> On Thu, 27 Feb 2025 09:21:19 +0530, Anshuman Khandual wrote:
->>> FEAT_PMUv3p9 registers such as PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1
->>> access from EL1 requires appropriate EL2 fine grained trap configuration
->>> via FEAT_FGT2 based trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2.
->>> Otherwise such register accesses will result in traps into EL2.
->>>
->>> Add a new helper __init_el2_fgt2() which initializes FEAT_FGT2 based fine
->>> grained trap control registers HDFGRTR2_EL2 and HDFGWTR2_EL2 (setting the
->>> bits nPMICNTR_EL0, nPMICFILTR_EL0 and nPMUACR_EL1) to enable access into
->>> PMICNTR_EL0, PMICFILTR_EL0, and PMUACR_EL1 registers.
->>>
->>> [...]
->>
->> Applied to arm64 (for-next/el2-enable-feat-pmuv3p9), thanks!
->>
->> [1/1] arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9
->>       https://git.kernel.org/arm64/c/858c7bfcb35e
->>
->> I removed Cc: stable since, if it gets backported automatically, it will
->> miss the sysreg updates and break the build. Please send it to stable
->> directly once it lands upstream, together with the dependencies.
+> On 26-04-2025 17:57, Marc Zyngier wrote:
+> > This is yet another version of the series last posted at [1].
+> > 
+> > The eagled eye reviewer will have noticed that since v2, the series
+> > has more or less doubled in size for any reasonable metric (number of
+> > patches, number of lines added or deleted). It is therefore pretty
+> > urgent that this gets either merged or forgotten! ;-)
+> > 
+> > See the change log below for the details -- most of it is related to
+> > FGT2 (and its rather large dependencies) being added.
+> > 
+> > * From v2:
+> > 
+> >    - Added comprehensive support for FEAT_FGT2, as the host kernel is
+> >      now making use of these registers, without any form of context
+> >      switch in KVM. What could possibly go wrong?
+> > 
+> >    - Reworked some of the FGT description and handling primitives,
+> >      reducing the boilerplate code and tables that get added over time.
+> > 
+> >    - Rebased on 6.15-rc3.
+> > 
+> > [1]: https://lore.kernel.org/r/20250310122505.2857610-1-maz@kernel.org
+> > 
+> > Marc Zyngier (41):
+> >    arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
+> >    arm64: sysreg: Update ID_AA64MMFR4_EL1 description
+> >    arm64: sysreg: Add layout for HCR_EL2
+> >    arm64: sysreg: Replace HGFxTR_EL2 with HFG{R,W}TR_EL2
+> >    arm64: sysreg: Update ID_AA64PFR0_EL1 description
+> >    arm64: sysreg: Update PMSIDR_EL1 description
+> >    arm64: sysreg: Update TRBIDR_EL1 description
+> >    arm64: sysreg: Add registers trapped by HFG{R,W}TR2_EL2
+> >    arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
+> >    arm64: sysreg: Add system instructions trapped by HFGIRT2_EL2
+> >    arm64: Remove duplicated sysreg encodings
+> >    arm64: tools: Resync sysreg.h
+> >    arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
+> >    arm64: Add FEAT_FGT2 capability
+> >    KVM: arm64: Tighten handling of unknown FGT groups
+> >    KVM: arm64: Simplify handling of negative FGT bits
+> >    KVM: arm64: Handle trapping of FEAT_LS64* instructions
+> >    KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_ST64_ACCDATA being
+> >      disabled
+> >    KVM: arm64: Don't treat HCRX_EL2 as a FGT register
+> >    KVM: arm64: Plug FEAT_GCS handling
+> >    KVM: arm64: Compute FGT masks from KVM's own FGT tables
+> >    KVM: arm64: Add description of FGT bits leading to EC!=0x18
+> >    KVM: arm64: Use computed masks as sanitisers for FGT registers
+> >    KVM: arm64: Propagate FGT masks to the nVHE hypervisor
+> >    KVM: arm64: Use computed FGT masks to setup FGT registers
+> >    KVM: arm64: Remove hand-crafted masks for FGT registers
+> >    KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
+> >    KVM: arm64: Handle PSB CSYNC traps
+> >    KVM: arm64: Switch to table-driven FGU configuration
+> >    KVM: arm64: Validate FGT register descriptions against RES0 masks
+> >    KVM: arm64: Use FGT feature maps to drive RES0 bits
+> >    KVM: arm64: Allow kvm_has_feat() to take variable arguments
+> >    KVM: arm64: Use HCRX_EL2 feature map to drive fixed-value bits
+> >    KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
+> >    KVM: arm64: Add FEAT_FGT2 registers to the VNCR page
+> >    KVM: arm64: Add sanitisation for FEAT_FGT2 registers
+> >    KVM: arm64: Add trap routing for FEAT_FGT2 registers
+> >    KVM: arm64: Add context-switch for FEAT_FGT2 registers
+> >    KVM: arm64: Allow sysreg ranges for FGT descriptors
+> >    KVM: arm64: Add FGT descriptors for FEAT_FGT2
+> >    KVM: arm64: Handle TSB CSYNC traps
+> > 
+> > Mark Rutland (1):
+> >    KVM: arm64: Unconditionally configure fine-grain traps
+> > 
+> >   arch/arm64/include/asm/el2_setup.h      |   14 +-
+> >   arch/arm64/include/asm/esr.h            |   10 +-
+> >   arch/arm64/include/asm/kvm_arm.h        |  186 ++--
+> >   arch/arm64/include/asm/kvm_host.h       |   56 +-
+> >   arch/arm64/include/asm/sysreg.h         |   26 +-
+> >   arch/arm64/include/asm/vncr_mapping.h   |    5 +
+> >   arch/arm64/kernel/cpufeature.c          |    7 +
+> >   arch/arm64/kvm/Makefile                 |    2 +-
+> >   arch/arm64/kvm/arm.c                    |   13 +
+> >   arch/arm64/kvm/config.c                 | 1085 +++++++++++++++++++++++
+> >   arch/arm64/kvm/emulate-nested.c         |  580 ++++++++----
+> >   arch/arm64/kvm/handle_exit.c            |   77 ++
+> >   arch/arm64/kvm/hyp/include/hyp/switch.h |  158 ++--
+> >   arch/arm64/kvm/hyp/nvhe/switch.c        |   12 +
+> >   arch/arm64/kvm/hyp/vgic-v3-sr.c         |    8 +-
+> >   arch/arm64/kvm/nested.c                 |  223 +----
+> >   arch/arm64/kvm/sys_regs.c               |   68 +-
+> >   arch/arm64/tools/cpucaps                |    1 +
+> >   arch/arm64/tools/sysreg                 | 1002 ++++++++++++++++++++-
+> >   tools/arch/arm64/include/asm/sysreg.h   |   65 +-
+> >   20 files changed, 2888 insertions(+), 710 deletions(-)
+> >   create mode 100644 arch/arm64/kvm/config.c
+> > 
 > 
-> Sure, will do that.
-> 
+> I am trying nv-next branch and I believe these FGT related changes are
+> merged. With this, selftest arm64/set_id_regs is failing. From initial
+> debug it seems, the register access of SYS_CTR_EL0, SYS_MIDR_EL1,
+> SYS_REVIDR_EL1 and SYS_AIDR_EL1 from guest_code is resulting in trap
+> to EL2 (HCR_ID1,ID2 are set) and is getting forwarded back to EL1,
+> since EL1 sync handler is not installed in the test code, resulting in
+> hang(endless guest_exit/entry).
 
-Just FYI,
+Let's start by calling bullshit on the test itself:
 
-This patch along with required tools sysreg patches are merged in applicable
-stable branches which are now available in v6.12.25 and v6.14.4 respectively.
+root@semi-fraudulent:/home/maz# grep AA64PFR0 /sys/kernel/debug/kvm/2008-4/idregs 
+ SYS_ID_AA64PFR0_EL1:	0000000020110000
+
+It basically disable anything 64bit at EL{0,1,2,3]. Frankly, all these
+tests are pure garbage. I'm baffled that anyone expects this crap to
+give any meaningful result.
+
+> It is due to function "triage_sysreg_trap" is returning true.
+> 
+> When guest_code is in EL1 (default case) it is due to return in below if.
+> 
+>  if (tc.fgt != __NO_FGT_GROUP__ &&
+>             (vcpu->kvm->arch.fgu[tc.fgt] & BIT(tc.bit))) {
+>                 kvm_inject_undefined(vcpu);
+>                 return true;
+>         }
+
+That explains why we end-up here. The 64bit ISA is "disabled", a bunch
+of trap bits are advertised as depending on it, so the corresponding
+FGU bits are set to "emulate" the requested behaviour.
+
+Works as intended, and this proves once more that what we call testing
+is just horseshit.
+
+In retrospect, we should do a few things:
+
+- Prevent writes to ID_AA64PFR0_EL1 disabling the 64bit ISA, breaking
+  this stupid test for good.
+
+- Flag all the FGT bits depending on FEAT_AA64EL1 as NEVER_FGU,
+  because that shouldn't happen, by construction (there is no
+  architecture revision where these sysregs are UNDEFined).
+
+- Mark all these test as unmaintained and deprecated, recognising that
+  they are utterly pointless (optional).
+
+Full patch below.
+
+	M.
+
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index d4e1218b004dd..666070d4ccd7f 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -295,34 +295,34 @@ static const struct reg_bits_to_feat_map hfgrtr_feat_map[] = {
+ 		   HFGRTR_EL2_APDBKey		|
+ 		   HFGRTR_EL2_APDAKey,
+ 		   feat_pauth),
+-	NEEDS_FEAT(HFGRTR_EL2_VBAR_EL1		|
+-		   HFGRTR_EL2_TTBR1_EL1		|
+-		   HFGRTR_EL2_TTBR0_EL1		|
+-		   HFGRTR_EL2_TPIDR_EL0		|
+-		   HFGRTR_EL2_TPIDRRO_EL0	|
+-		   HFGRTR_EL2_TPIDR_EL1		|
+-		   HFGRTR_EL2_TCR_EL1		|
+-		   HFGRTR_EL2_SCTLR_EL1		|
+-		   HFGRTR_EL2_REVIDR_EL1	|
+-		   HFGRTR_EL2_PAR_EL1		|
+-		   HFGRTR_EL2_MPIDR_EL1		|
+-		   HFGRTR_EL2_MIDR_EL1		|
+-		   HFGRTR_EL2_MAIR_EL1		|
+-		   HFGRTR_EL2_ISR_EL1		|
+-		   HFGRTR_EL2_FAR_EL1		|
+-		   HFGRTR_EL2_ESR_EL1		|
+-		   HFGRTR_EL2_DCZID_EL0		|
+-		   HFGRTR_EL2_CTR_EL0		|
+-		   HFGRTR_EL2_CSSELR_EL1	|
+-		   HFGRTR_EL2_CPACR_EL1		|
+-		   HFGRTR_EL2_CONTEXTIDR_EL1	|
+-		   HFGRTR_EL2_CLIDR_EL1		|
+-		   HFGRTR_EL2_CCSIDR_EL1	|
+-		   HFGRTR_EL2_AMAIR_EL1		|
+-		   HFGRTR_EL2_AIDR_EL1		|
+-		   HFGRTR_EL2_AFSR1_EL1		|
+-		   HFGRTR_EL2_AFSR0_EL1,
+-		   FEAT_AA64EL1),
++	NEEDS_FEAT_FLAG(HFGRTR_EL2_VBAR_EL1	|
++			HFGRTR_EL2_TTBR1_EL1	|
++			HFGRTR_EL2_TTBR0_EL1	|
++			HFGRTR_EL2_TPIDR_EL0	|
++			HFGRTR_EL2_TPIDRRO_EL0	|
++			HFGRTR_EL2_TPIDR_EL1	|
++			HFGRTR_EL2_TCR_EL1	|
++			HFGRTR_EL2_SCTLR_EL1	|
++			HFGRTR_EL2_REVIDR_EL1	|
++			HFGRTR_EL2_PAR_EL1	|
++			HFGRTR_EL2_MPIDR_EL1	|
++			HFGRTR_EL2_MIDR_EL1	|
++			HFGRTR_EL2_MAIR_EL1	|
++			HFGRTR_EL2_ISR_EL1	|
++			HFGRTR_EL2_FAR_EL1	|
++			HFGRTR_EL2_ESR_EL1	|
++			HFGRTR_EL2_DCZID_EL0	|
++			HFGRTR_EL2_CTR_EL0	|
++			HFGRTR_EL2_CSSELR_EL1	|
++			HFGRTR_EL2_CPACR_EL1	|
++			HFGRTR_EL2_CONTEXTIDR_EL1|
++			HFGRTR_EL2_CLIDR_EL1	|
++			HFGRTR_EL2_CCSIDR_EL1	|
++			HFGRTR_EL2_AMAIR_EL1	|
++			HFGRTR_EL2_AIDR_EL1	|
++			HFGRTR_EL2_AFSR1_EL1	|
++			HFGRTR_EL2_AFSR0_EL1,
++			NEVER_FGU, FEAT_AA64EL1),
+ };
+ 
+ static const struct reg_bits_to_feat_map hfgwtr_feat_map[] = {
+@@ -368,25 +368,25 @@ static const struct reg_bits_to_feat_map hfgwtr_feat_map[] = {
+ 		   HFGWTR_EL2_APDBKey		|
+ 		   HFGWTR_EL2_APDAKey,
+ 		   feat_pauth),
+-	NEEDS_FEAT(HFGWTR_EL2_VBAR_EL1		|
+-		   HFGWTR_EL2_TTBR1_EL1		|
+-		   HFGWTR_EL2_TTBR0_EL1		|
+-		   HFGWTR_EL2_TPIDR_EL0		|
+-		   HFGWTR_EL2_TPIDRRO_EL0	|
+-		   HFGWTR_EL2_TPIDR_EL1		|
+-		   HFGWTR_EL2_TCR_EL1		|
+-		   HFGWTR_EL2_SCTLR_EL1		|
+-		   HFGWTR_EL2_PAR_EL1		|
+-		   HFGWTR_EL2_MAIR_EL1		|
+-		   HFGWTR_EL2_FAR_EL1		|
+-		   HFGWTR_EL2_ESR_EL1		|
+-		   HFGWTR_EL2_CSSELR_EL1	|
+-		   HFGWTR_EL2_CPACR_EL1		|
+-		   HFGWTR_EL2_CONTEXTIDR_EL1	|
+-		   HFGWTR_EL2_AMAIR_EL1		|
+-		   HFGWTR_EL2_AFSR1_EL1		|
+-		   HFGWTR_EL2_AFSR0_EL1,
+-		   FEAT_AA64EL1),
++	NEEDS_FEAT_FLAG(HFGWTR_EL2_VBAR_EL1	|
++			HFGWTR_EL2_TTBR1_EL1	|
++			HFGWTR_EL2_TTBR0_EL1	|
++			HFGWTR_EL2_TPIDR_EL0	|
++			HFGWTR_EL2_TPIDRRO_EL0	|
++			HFGWTR_EL2_TPIDR_EL1	|
++			HFGWTR_EL2_TCR_EL1	|
++			HFGWTR_EL2_SCTLR_EL1	|
++			HFGWTR_EL2_PAR_EL1	|
++			HFGWTR_EL2_MAIR_EL1	|
++			HFGWTR_EL2_FAR_EL1	|
++			HFGWTR_EL2_ESR_EL1	|
++			HFGWTR_EL2_CSSELR_EL1	|
++			HFGWTR_EL2_CPACR_EL1	|
++			HFGWTR_EL2_CONTEXTIDR_EL1|
++			HFGWTR_EL2_AMAIR_EL1	|
++			HFGWTR_EL2_AFSR1_EL1	|
++			HFGWTR_EL2_AFSR0_EL1,
++			NEVER_FGU, FEAT_AA64EL1),
+ };
+ 
+ static const struct reg_bits_to_feat_map hdfgrtr_feat_map[] = {
+@@ -443,17 +443,17 @@ static const struct reg_bits_to_feat_map hdfgrtr_feat_map[] = {
+ 		   FEAT_TRBE),
+ 	NEEDS_FEAT_FLAG(HDFGRTR_EL2_OSDLR_EL1, NEVER_FGU,
+ 			FEAT_DoubleLock),
+-	NEEDS_FEAT(HDFGRTR_EL2_OSECCR_EL1	|
+-		   HDFGRTR_EL2_OSLSR_EL1	|
+-		   HDFGRTR_EL2_DBGPRCR_EL1	|
+-		   HDFGRTR_EL2_DBGAUTHSTATUS_EL1|
+-		   HDFGRTR_EL2_DBGCLAIM		|
+-		   HDFGRTR_EL2_MDSCR_EL1	|
+-		   HDFGRTR_EL2_DBGWVRn_EL1	|
+-		   HDFGRTR_EL2_DBGWCRn_EL1	|
+-		   HDFGRTR_EL2_DBGBVRn_EL1	|
+-		   HDFGRTR_EL2_DBGBCRn_EL1,
+-		   FEAT_AA64EL1)
++	NEEDS_FEAT_FLAG(HDFGRTR_EL2_OSECCR_EL1	|
++			HDFGRTR_EL2_OSLSR_EL1	|
++			HDFGRTR_EL2_DBGPRCR_EL1	|
++			HDFGRTR_EL2_DBGAUTHSTATUS_EL1|
++			HDFGRTR_EL2_DBGCLAIM	|
++			HDFGRTR_EL2_MDSCR_EL1	|
++			HDFGRTR_EL2_DBGWVRn_EL1	|
++			HDFGRTR_EL2_DBGWCRn_EL1	|
++			HDFGRTR_EL2_DBGBVRn_EL1	|
++			HDFGRTR_EL2_DBGBCRn_EL1,
++			NEVER_FGU, FEAT_AA64EL1)
+ };
+ 
+ static const struct reg_bits_to_feat_map hdfgwtr_feat_map[] = {
+@@ -503,16 +503,16 @@ static const struct reg_bits_to_feat_map hdfgwtr_feat_map[] = {
+ 		   FEAT_TRBE),
+ 	NEEDS_FEAT_FLAG(HDFGWTR_EL2_OSDLR_EL1,
+ 			NEVER_FGU, FEAT_DoubleLock),
+-	NEEDS_FEAT(HDFGWTR_EL2_OSECCR_EL1	|
+-		   HDFGWTR_EL2_OSLAR_EL1	|
+-		   HDFGWTR_EL2_DBGPRCR_EL1	|
+-		   HDFGWTR_EL2_DBGCLAIM		|
+-		   HDFGWTR_EL2_MDSCR_EL1	|
+-		   HDFGWTR_EL2_DBGWVRn_EL1	|
+-		   HDFGWTR_EL2_DBGWCRn_EL1	|
+-		   HDFGWTR_EL2_DBGBVRn_EL1	|
+-		   HDFGWTR_EL2_DBGBCRn_EL1,
+-		   FEAT_AA64EL1),
++	NEEDS_FEAT_FLAG(HDFGWTR_EL2_OSECCR_EL1	|
++			HDFGWTR_EL2_OSLAR_EL1	|
++			HDFGWTR_EL2_DBGPRCR_EL1	|
++			HDFGWTR_EL2_DBGCLAIM	|
++			HDFGWTR_EL2_MDSCR_EL1	|
++			HDFGWTR_EL2_DBGWVRn_EL1	|
++			HDFGWTR_EL2_DBGWCRn_EL1	|
++			HDFGWTR_EL2_DBGBVRn_EL1	|
++			HDFGWTR_EL2_DBGBCRn_EL1,
++			NEVER_FGU, FEAT_AA64EL1),
+ 	NEEDS_FEAT(HDFGWTR_EL2_TRFCR_EL1, FEAT_TRF),
+ };
+ 
+@@ -556,38 +556,38 @@ static const struct reg_bits_to_feat_map hfgitr_feat_map[] = {
+ 		   HFGITR_EL2_ATS1E1RP,
+ 		   FEAT_PAN2),
+ 	NEEDS_FEAT(HFGITR_EL2_DCCVADP, FEAT_DPB2),
+-	NEEDS_FEAT(HFGITR_EL2_DCCVAC		|
+-		   HFGITR_EL2_SVC_EL1		|
+-		   HFGITR_EL2_SVC_EL0		|
+-		   HFGITR_EL2_ERET		|
+-		   HFGITR_EL2_TLBIVAALE1	|
+-		   HFGITR_EL2_TLBIVALE1		|
+-		   HFGITR_EL2_TLBIVAAE1		|
+-		   HFGITR_EL2_TLBIASIDE1	|
+-		   HFGITR_EL2_TLBIVAE1		|
+-		   HFGITR_EL2_TLBIVMALLE1	|
+-		   HFGITR_EL2_TLBIVAALE1IS	|
+-		   HFGITR_EL2_TLBIVALE1IS	|
+-		   HFGITR_EL2_TLBIVAAE1IS	|
+-		   HFGITR_EL2_TLBIASIDE1IS	|
+-		   HFGITR_EL2_TLBIVAE1IS	|
+-		   HFGITR_EL2_TLBIVMALLE1IS	|
+-		   HFGITR_EL2_ATS1E0W		|
+-		   HFGITR_EL2_ATS1E0R		|
+-		   HFGITR_EL2_ATS1E1W		|
+-		   HFGITR_EL2_ATS1E1R		|
+-		   HFGITR_EL2_DCZVA		|
+-		   HFGITR_EL2_DCCIVAC		|
+-		   HFGITR_EL2_DCCVAP		|
+-		   HFGITR_EL2_DCCVAU		|
+-		   HFGITR_EL2_DCCISW		|
+-		   HFGITR_EL2_DCCSW		|
+-		   HFGITR_EL2_DCISW		|
+-		   HFGITR_EL2_DCIVAC		|
+-		   HFGITR_EL2_ICIVAU		|
+-		   HFGITR_EL2_ICIALLU		|
+-		   HFGITR_EL2_ICIALLUIS,
+-		   FEAT_AA64EL1),
++	NEEDS_FEAT_FLAG(HFGITR_EL2_DCCVAC	|
++			HFGITR_EL2_SVC_EL1	|
++			HFGITR_EL2_SVC_EL0	|
++			HFGITR_EL2_ERET		|
++			HFGITR_EL2_TLBIVAALE1	|
++			HFGITR_EL2_TLBIVALE1	|
++			HFGITR_EL2_TLBIVAAE1	|
++			HFGITR_EL2_TLBIASIDE1	|
++			HFGITR_EL2_TLBIVAE1	|
++			HFGITR_EL2_TLBIVMALLE1	|
++			HFGITR_EL2_TLBIVAALE1IS	|
++			HFGITR_EL2_TLBIVALE1IS	|
++			HFGITR_EL2_TLBIVAAE1IS	|
++			HFGITR_EL2_TLBIASIDE1IS	|
++			HFGITR_EL2_TLBIVAE1IS	|
++			HFGITR_EL2_TLBIVMALLE1IS|
++			HFGITR_EL2_ATS1E0W	|
++			HFGITR_EL2_ATS1E0R	|
++			HFGITR_EL2_ATS1E1W	|
++			HFGITR_EL2_ATS1E1R	|
++			HFGITR_EL2_DCZVA	|
++			HFGITR_EL2_DCCIVAC	|
++			HFGITR_EL2_DCCVAP	|
++			HFGITR_EL2_DCCVAU	|
++			HFGITR_EL2_DCCISW	|
++			HFGITR_EL2_DCCSW	|
++			HFGITR_EL2_DCISW	|
++			HFGITR_EL2_DCIVAC	|
++			HFGITR_EL2_ICIVAU	|
++			HFGITR_EL2_ICIALLU	|
++			HFGITR_EL2_ICIALLUIS,
++			NEVER_FGU, FEAT_AA64EL1),
+ };
+ 
+ static const struct reg_bits_to_feat_map hafgrtr_feat_map[] = {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 157de0ace6e7e..28dc778d0d9bb 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1946,6 +1946,12 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	if ((hw_val & mpam_mask) == (user_val & mpam_mask))
+ 		user_val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
+ 
++	/* Fail the guest's request to disable the AA64 ISA at EL{0,1,2} */
++	if (!FIELD_GET(ID_AA64PFR0_EL1_EL0, user_val) ||
++	    !FIELD_GET(ID_AA64PFR0_EL1_EL1, user_val) ||
++	    (vcpu_has_nv(vcpu) && !FIELD_GET(ID_AA64PFR0_EL1_EL2, user_val)))
++		return -EINVAL;
++
+ 	return set_id_reg(vcpu, rd, user_val);
+ }
+ 
+diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+index 322b9d3b01255..57708de2075df 100644
+--- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+@@ -129,10 +129,10 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, DIT, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, SEL2, 0),
+ 	REG_FTR_BITS(FTR_EXACT, ID_AA64PFR0_EL1, GIC, 0),
+-	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL3, 0),
+-	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL2, 0),
+-	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL1, 0),
+-	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL0, 0),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL3, 1),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL2, 1),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL1, 1),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL0, 1),
+ 	REG_FTR_END,
+ };
+ 
+
+-- 
+Jazz isn't dead. It just smells funny.
