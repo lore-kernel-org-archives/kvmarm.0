@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0442C17A8
-	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 20:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91632C2ACB
+	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 20:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746045049; cv=none; b=oJr5NTeLGbLBVoginAHEABfRRb4LU71cV7RcxaXp2G19CO5cx1+BojQvAAXAKVsmQTrvO0qotSmrIVEr4pv+39zMAufK++Oi+twwgieGfFezkvm5/Em8o5QTRX837QSLI6v4cIpV1qWJdk72nApelefjC8A/77g6xbpkyudbbjw=
+	t=1746045057; cv=none; b=iU1Ac6IeXabRuNvtufmTuu58uMN/McMrZj6+BCvvKBy+GuyJ47XID2qpT6ahBFS66XJ8mTZvN6tTLgBf4738bNRuhxIiQH5MQUKhuPPMbXI3MwKpUtA0yqRDoH7mULd2dcxwhr4h69kz0mwgBD/UVZ4HCXqMbA2ZNNU2mQfw20o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746045049; c=relaxed/simple;
-	bh=8LOVouw/uXiAyDHqo28yXBTFK41O/HPRr3Q48Y2c4NY=;
+	s=arc-20240116; t=1746045057; c=relaxed/simple;
+	bh=FYSieWUXv96exfZG1ShbZz/LgMQ+Pxv/qsWOZ2g+uo4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y+PMOhk70WnXEqV/ILDipTsvGTbe17RLzo4b2EpQNRZYM/Xg3pbJu4mPM0z15zzUpMa/0bxVt4kx7vuLlP3P2xU4qPaZuvVwCR5g6BXEUPzv/Am/YHzIFV3KyVWUQzyrHAFP+7tm2u+3h0ZcU8qkhvrhNiKZziOBZQ11IKmBmck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RSbtmAdz; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=ifnIv6M3/PhuWmXzc6NPF7T65UkwO7KMG7nYVwdvLtZffzj7elx+3P/egdBUh2H3huCizGdqMIoZYLxGvGSK1L1eEsnF+n0fk2S11xBY+t4d9PGfIXs514OdhUyfEccuQ2Q+G6StlVFk/fB7HRVepqetnlCIUjTOCEWFcHF9Ibs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gAQDWYkf; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RSbtmAdz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gAQDWYkf"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746045046;
+	s=mimecast20190719; t=1746045053;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eSDMr6CrswXgqByQYff1QxuCHlV9bXTUySTX4ETsg9o=;
-	b=RSbtmAdzHaTK3s1184hxbNPzSGlwZNGQ+WPrF3Fk0LGmwUXrp70ySHqXuwR/YSaKbDsHkp
-	x9yEO029BLUF40Y5YdwGcYpvMQoeaJvuwTm2dXb9s0LP6TiRNYhaqeRmJs5LHQPGu3s/1k
-	0/DHIDGq6ptBGyeEIpCneh2i9XJtzDs=
+	bh=I7SnvbxN813odoTR96udwnhW9eUh5grZic2/nYbCNXE=;
+	b=gAQDWYkfE3lExaYM3eMUdy4x88BEL7yYrjcigzbnHP4/s7Ih5mQX27L2o6kZZyEhCpLkZT
+	WCIR6PjMZLrQRsj7sVWCRXuslZEM4X9NTlpAYcndrVJ8epoPUb8bQ2pzupFmau/nZWg8Fx
+	e5Thhz24iu6/v5yCbG4uIdOueTLbxJ4=
 Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-125-JeYiPc9bMbmPGcw60FO2yQ-1; Wed,
- 30 Apr 2025 16:30:41 -0400
-X-MC-Unique: JeYiPc9bMbmPGcw60FO2yQ-1
-X-Mimecast-MFC-AGG-ID: JeYiPc9bMbmPGcw60FO2yQ_1746045036
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-314-Qd5DEF1SOCGz2yLj7LCsqg-1; Wed,
+ 30 Apr 2025 16:30:52 -0400
+X-MC-Unique: Qd5DEF1SOCGz2yLj7LCsqg-1
+X-Mimecast-MFC-AGG-ID: Qd5DEF1SOCGz2yLj7LCsqg_1746045047
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C6F31801A16;
-	Wed, 30 Apr 2025 20:30:35 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 281B51800877;
+	Wed, 30 Apr 2025 20:30:47 +0000 (UTC)
 Received: from intellaptop.lan (unknown [10.22.80.5])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9C7F71800879;
-	Wed, 30 Apr 2025 20:30:29 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B40F81800365;
+	Wed, 30 Apr 2025 20:30:41 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: kvm@vger.kernel.org
 Cc: linux-riscv@lists.infradead.org,
@@ -83,9 +83,9 @@ Cc: linux-riscv@lists.infradead.org,
 	Maxim Levitsky <mlevitsk@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when locking all vCPUs
-Date: Wed, 30 Apr 2025 16:30:10 -0400
-Message-ID: <20250430203013.366479-3-mlevitsk@redhat.com>
+Subject: [PATCH v4 4/5] locking/mutex: implement mutex_lock_killable_nest_lock
+Date: Wed, 30 Apr 2025 16:30:12 -0400
+Message-ID: <20250430203013.366479-5-mlevitsk@redhat.com>
 In-Reply-To: <20250430203013.366479-1-mlevitsk@redhat.com>
 References: <20250430203013.366479-1-mlevitsk@redhat.com>
 Precedence: bulk
@@ -97,310 +97,95 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Use mutex_trylock_nest_lock instead of mutex_trylock when locking all vCPUs
-of a VM, to avoid triggering a lockdep warning, if the VM is configured to
-have more than MAX_LOCK_DEPTH vCPUs.
+KVM's SEV intra-host migration code needs to lock all vCPUs
+of the source and the target VM, before it proceeds with the migration.
 
-This fixes the following false lockdep warning:
+The number of vCPUs that belong to each VM is not bounded by anything
+except a self-imposed KVM limit of CONFIG_KVM_MAX_NR_VCPUS vCPUs which is
+significantly larger than the depth of lockdep's lock stack.
 
-[  328.171264] BUG: MAX_LOCK_DEPTH too low!
-[  328.175227] turning off the locking correctness validator.
-[  328.180726] Please attach the output of /proc/lock_stat to the bug report
-[  328.187531] depth: 48  max: 48!
-[  328.190678] 48 locks held by qemu-kvm/11664:
-[  328.194957]  #0: ffff800086de5ba0 (&kvm->lock){+.+.}-{3:3}, at: kvm_ioctl_create_device+0x174/0x5b0
-[  328.204048]  #1: ffff0800e78800b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-[  328.212521]  #2: ffff07ffeee51e98 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-[  328.220991]  #3: ffff0800dc7d80b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-[  328.229463]  #4: ffff07ffe0c980b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-[  328.237934]  #5: ffff0800a3883c78 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
-[  328.246405]  #6: ffff07fffbe480b8 (&vcpu->mutex){+.+.}-{3:3}, at: lock_all_vcpus+0x16c/0x2a0
+Luckily, the locks in both of the cases mentioned above, are held under
+the 'kvm->lock' of each VM, which means that we can use the little
+known lockdep feature called a "nest_lock" to support this use case in
+a cleaner way, compared to the way it's currently done.
 
-Since the locking of all vCPUs is a primitive that can be useful in other
-architectures that are supported by KVM, also move the code to kvm_main.c
+Implement and expose 'mutex_lock_killable_nest_lock' for this
+purpose.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h     |  3 --
- arch/arm64/kvm/arch_timer.c           |  4 +--
- arch/arm64/kvm/arm.c                  | 43 ---------------------------
- arch/arm64/kvm/vgic/vgic-init.c       |  4 +--
- arch/arm64/kvm/vgic/vgic-its.c        |  8 ++---
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 12 ++++----
- include/linux/kvm_host.h              |  3 ++
- virt/kvm/kvm_main.c                   | 34 +++++++++++++++++++++
- 8 files changed, 51 insertions(+), 60 deletions(-)
+ include/linux/mutex.h  | 17 +++++++++++++----
+ kernel/locking/mutex.c |  7 ++++---
+ 2 files changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e98cfe7855a6..96ce0b01a61e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1263,9 +1263,6 @@ int __init populate_sysreg_config(const struct sys_reg_desc *sr,
- 				  unsigned int idx);
- int __init populate_nv_trap_config(void);
+diff --git a/include/linux/mutex.h b/include/linux/mutex.h
+index da4518cfd59c..a039fa8c1780 100644
+--- a/include/linux/mutex.h
++++ b/include/linux/mutex.h
+@@ -156,16 +156,15 @@ static inline int __devm_mutex_init(struct device *dev, struct mutex *lock)
+ #ifdef CONFIG_DEBUG_LOCK_ALLOC
+ extern void mutex_lock_nested(struct mutex *lock, unsigned int subclass);
+ extern void _mutex_lock_nest_lock(struct mutex *lock, struct lockdep_map *nest_lock);
+-
+ extern int __must_check mutex_lock_interruptible_nested(struct mutex *lock,
+ 					unsigned int subclass);
+-extern int __must_check mutex_lock_killable_nested(struct mutex *lock,
+-					unsigned int subclass);
++extern int __must_check _mutex_lock_killable(struct mutex *lock,
++		unsigned int subclass, struct lockdep_map *nest_lock);
+ extern void mutex_lock_io_nested(struct mutex *lock, unsigned int subclass);
  
--bool lock_all_vcpus(struct kvm *kvm);
--void unlock_all_vcpus(struct kvm *kvm);
--
- void kvm_calculate_traps(struct kvm_vcpu *vcpu);
+ #define mutex_lock(lock) mutex_lock_nested(lock, 0)
+ #define mutex_lock_interruptible(lock) mutex_lock_interruptible_nested(lock, 0)
+-#define mutex_lock_killable(lock) mutex_lock_killable_nested(lock, 0)
++#define mutex_lock_killable(lock) _mutex_lock_killable(lock, 0, NULL)
+ #define mutex_lock_io(lock) mutex_lock_io_nested(lock, 0)
  
- /* MMIO helpers */
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 5133dcbfe9f7..fdbc8beec930 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1766,7 +1766,7 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+ #define mutex_lock_nest_lock(lock, nest_lock)				\
+@@ -174,6 +173,15 @@ do {									\
+ 	_mutex_lock_nest_lock(lock, &(nest_lock)->dep_map);		\
+ } while (0)
  
- 	mutex_lock(&kvm->lock);
++#define mutex_lock_killable_nest_lock(lock, nest_lock)			\
++(									\
++	typecheck(struct lockdep_map *, &(nest_lock)->dep_map),		\
++	_mutex_lock_killable(lock, 0, &(nest_lock)->dep_map)		\
++)
++
++#define mutex_lock_killable_nested(lock, subclass) \
++	_mutex_lock_killable(lock, subclass, NULL)
++
+ #else
+ extern void mutex_lock(struct mutex *lock);
+ extern int __must_check mutex_lock_interruptible(struct mutex *lock);
+@@ -183,6 +191,7 @@ extern void mutex_lock_io(struct mutex *lock);
+ # define mutex_lock_nested(lock, subclass) mutex_lock(lock)
+ # define mutex_lock_interruptible_nested(lock, subclass) mutex_lock_interruptible(lock)
+ # define mutex_lock_killable_nested(lock, subclass) mutex_lock_killable(lock)
++# define mutex_lock_killable_nest_lock(lock, nest_lock) mutex_lock_killable(lock)
+ # define mutex_lock_nest_lock(lock, nest_lock) mutex_lock(lock)
+ # define mutex_lock_io_nested(lock, subclass) mutex_lock_io(lock)
+ #endif
+diff --git a/kernel/locking/mutex.c b/kernel/locking/mutex.c
+index c75a838d3bae..234923121ff0 100644
+--- a/kernel/locking/mutex.c
++++ b/kernel/locking/mutex.c
+@@ -808,11 +808,12 @@ _mutex_lock_nest_lock(struct mutex *lock, struct lockdep_map *nest)
+ EXPORT_SYMBOL_GPL(_mutex_lock_nest_lock);
  
--	if (lock_all_vcpus(kvm)) {
-+	if (!kvm_trylock_all_vcpus(kvm)) {
- 		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
- 
- 		/*
-@@ -1778,7 +1778,7 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
- 		kvm->arch.timer_data.voffset = offset->counter_offset;
- 		kvm->arch.timer_data.poffset = offset->counter_offset;
- 
--		unlock_all_vcpus(kvm);
-+		kvm_unlock_all_vcpus(kvm);
- 	} else {
- 		ret = -EBUSY;
- 	}
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 68fec8c95fee..d31f42a71bdc 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1914,49 +1914,6 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 	}
- }
- 
--/* unlocks vcpus from @vcpu_lock_idx and smaller */
--static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
--{
--	struct kvm_vcpu *tmp_vcpu;
--
--	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
--		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
--		mutex_unlock(&tmp_vcpu->mutex);
--	}
--}
--
--void unlock_all_vcpus(struct kvm *kvm)
--{
--	lockdep_assert_held(&kvm->lock);
--
--	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
--}
--
--/* Returns true if all vcpus were locked, false otherwise */
--bool lock_all_vcpus(struct kvm *kvm)
--{
--	struct kvm_vcpu *tmp_vcpu;
--	unsigned long c;
--
--	lockdep_assert_held(&kvm->lock);
--
--	/*
--	 * Any time a vcpu is in an ioctl (including running), the
--	 * core KVM code tries to grab the vcpu->mutex.
--	 *
--	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
--	 * other VCPUs can fiddle with the state while we access it.
--	 */
--	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
--		if (!mutex_trylock(&tmp_vcpu->mutex)) {
--			unlock_vcpus(kvm, c - 1);
--			return false;
--		}
--	}
--
--	return true;
--}
--
- static unsigned long nvhe_percpu_size(void)
+ int __sched
+-mutex_lock_killable_nested(struct mutex *lock, unsigned int subclass)
++_mutex_lock_killable(struct mutex *lock, unsigned int subclass,
++				      struct lockdep_map *nest)
  {
- 	return (unsigned long)CHOOSE_NVHE_SYM(__per_cpu_end) -
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 1f33e71c2a73..6a426d403a6b 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -88,7 +88,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	lockdep_assert_held(&kvm->lock);
- 
- 	ret = -EBUSY;
--	if (!lock_all_vcpus(kvm))
-+	if (kvm_trylock_all_vcpus(kvm))
- 		return ret;
- 
- 	mutex_lock(&kvm->arch.config_lock);
-@@ -142,7 +142,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 
- out_unlock:
- 	mutex_unlock(&kvm->arch.config_lock);
--	unlock_all_vcpus(kvm);
-+	kvm_unlock_all_vcpus(kvm);
- 	return ret;
+-	return __mutex_lock(lock, TASK_KILLABLE, subclass, NULL, _RET_IP_);
++	return __mutex_lock(lock, TASK_KILLABLE, subclass, nest, _RET_IP_);
  }
+-EXPORT_SYMBOL_GPL(mutex_lock_killable_nested);
++EXPORT_SYMBOL_GPL(_mutex_lock_killable);
  
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index fb96802799c6..7454388e3646 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -1999,7 +1999,7 @@ static int vgic_its_attr_regs_access(struct kvm_device *dev,
- 
- 	mutex_lock(&dev->kvm->lock);
- 
--	if (!lock_all_vcpus(dev->kvm)) {
-+	if (kvm_trylock_all_vcpus(dev->kvm)) {
- 		mutex_unlock(&dev->kvm->lock);
- 		return -EBUSY;
- 	}
-@@ -2034,7 +2034,7 @@ static int vgic_its_attr_regs_access(struct kvm_device *dev,
- 	}
- out:
- 	mutex_unlock(&dev->kvm->arch.config_lock);
--	unlock_all_vcpus(dev->kvm);
-+	kvm_unlock_all_vcpus(dev->kvm);
- 	mutex_unlock(&dev->kvm->lock);
- 	return ret;
- }
-@@ -2704,7 +2704,7 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
- 
- 	mutex_lock(&kvm->lock);
- 
--	if (!lock_all_vcpus(kvm)) {
-+	if (kvm_trylock_all_vcpus(kvm)) {
- 		mutex_unlock(&kvm->lock);
- 		return -EBUSY;
- 	}
-@@ -2726,7 +2726,7 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
- 
- 	mutex_unlock(&its->its_lock);
- 	mutex_unlock(&kvm->arch.config_lock);
--	unlock_all_vcpus(kvm);
-+	kvm_unlock_all_vcpus(kvm);
- 	mutex_unlock(&kvm->lock);
- 	return ret;
- }
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index 359094f68c23..f9ae790163fb 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -268,7 +268,7 @@ static int vgic_set_common_attr(struct kvm_device *dev,
- 				return -ENXIO;
- 			mutex_lock(&dev->kvm->lock);
- 
--			if (!lock_all_vcpus(dev->kvm)) {
-+			if (kvm_trylock_all_vcpus(dev->kvm)) {
- 				mutex_unlock(&dev->kvm->lock);
- 				return -EBUSY;
- 			}
-@@ -276,7 +276,7 @@ static int vgic_set_common_attr(struct kvm_device *dev,
- 			mutex_lock(&dev->kvm->arch.config_lock);
- 			r = vgic_v3_save_pending_tables(dev->kvm);
- 			mutex_unlock(&dev->kvm->arch.config_lock);
--			unlock_all_vcpus(dev->kvm);
-+			kvm_unlock_all_vcpus(dev->kvm);
- 			mutex_unlock(&dev->kvm->lock);
- 			return r;
- 		}
-@@ -390,7 +390,7 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
- 
- 	mutex_lock(&dev->kvm->lock);
- 
--	if (!lock_all_vcpus(dev->kvm)) {
-+	if (kvm_trylock_all_vcpus(dev->kvm)) {
- 		mutex_unlock(&dev->kvm->lock);
- 		return -EBUSY;
- 	}
-@@ -415,7 +415,7 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
- 
- out:
- 	mutex_unlock(&dev->kvm->arch.config_lock);
--	unlock_all_vcpus(dev->kvm);
-+	kvm_unlock_all_vcpus(dev->kvm);
- 	mutex_unlock(&dev->kvm->lock);
- 
- 	if (!ret && !is_write)
-@@ -554,7 +554,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 
- 	mutex_lock(&dev->kvm->lock);
- 
--	if (!lock_all_vcpus(dev->kvm)) {
-+	if (kvm_trylock_all_vcpus(dev->kvm)) {
- 		mutex_unlock(&dev->kvm->lock);
- 		return -EBUSY;
- 	}
-@@ -611,7 +611,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 
- out:
- 	mutex_unlock(&dev->kvm->arch.config_lock);
--	unlock_all_vcpus(dev->kvm);
-+	kvm_unlock_all_vcpus(dev->kvm);
- 	mutex_unlock(&dev->kvm->lock);
- 
- 	if (!ret && uaccess && !is_write) {
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 1dedc421b3e3..10d6652c7aa0 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1015,6 +1015,9 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
- 
- void kvm_destroy_vcpus(struct kvm *kvm);
- 
-+int kvm_trylock_all_vcpus(struct kvm *kvm);
-+void kvm_unlock_all_vcpus(struct kvm *kvm);
-+
- void vcpu_load(struct kvm_vcpu *vcpu);
- void vcpu_put(struct kvm_vcpu *vcpu);
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 69782df3617f..834f08dfa24c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1368,6 +1368,40 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
- 	return 0;
- }
- 
-+/*
-+ * Try to lock all of the VM's vCPUs.
-+ * Assumes that the kvm->lock is held.
-+ */
-+int kvm_trylock_all_vcpus(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i, j;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm)
-+		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
-+			goto out_unlock;
-+	return 0;
-+
-+out_unlock:
-+	kvm_for_each_vcpu(j, vcpu, kvm) {
-+		if (i == j)
-+			break;
-+		mutex_unlock(&vcpu->mutex);
-+	}
-+	return -EINTR;
-+}
-+EXPORT_SYMBOL_GPL(kvm_trylock_all_vcpus);
-+
-+void kvm_unlock_all_vcpus(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm)
-+		mutex_unlock(&vcpu->mutex);
-+}
-+EXPORT_SYMBOL_GPL(kvm_unlock_all_vcpus);
-+
- /*
-  * Allocation size is twice as large as the actual dirty bitmap size.
-  * See kvm_vm_ioctl_get_dirty_log() why this is needed.
+ int __sched
+ mutex_lock_interruptible_nested(struct mutex *lock, unsigned int subclass)
 -- 
 2.46.0
 
