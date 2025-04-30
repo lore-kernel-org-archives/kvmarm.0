@@ -1,223 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934B418CBFB;
-	Wed, 30 Apr 2025 15:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA0725EF94
+	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 16:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746028388; cv=none; b=W6DN5590KGlOcT+Q+pbhQFZj+2wyFz/W/nHt6Yfc8RL492TU7h0shQlyFyYqkZU5NLtQEGqGoWScr2lZnKAG0edcUHuvDsABz7LsMfOalPlimicBGT4ojaEaAombRW9HxnVC+Iz+BHgPD8wOER/edVLS6MV7nH/9w6nnVbaaMIU=
+	t=1746030447; cv=none; b=MgktzdztaTW62fgeYlMkEcv/94x5CYgTNsnUw3nCfBBlBTd8kSvjcnI8rAYRAnReOxoBxnmMpAFf9QwjDkaOOTn6qlh6ZxdmxwzbVZPFInp6cNGytkEBz6rJtwqlEov+Pv8OVW19uw6bTlKfCgvPwXVI+XG82oyB7lTdjeUKUqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746028388; c=relaxed/simple;
-	bh=m0UugMtWCbzfPWtuy2ts8556YUjy07o4bV0mVOb9sq8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pytFKpiqz7iF2JFJrl0tlIZHCIVliUL9tsmit1A0iUQCNeGtokA8q7cu7UBuqZcjMLo1K5wiB87he9DQTy0NJoeP1vwkigSw0lAZZJ+c+uhq09K+soqWdneJatpAeNFl3VCVRTE7mWiekecxNOHjq9M3V5oFqQO6zfxe3qdP7Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1g+2Omv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746030447; c=relaxed/simple;
+	bh=SLuh1vXjFWArp9DGV88WbiawPX5gMpDl3YY+JUPkHDc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JxKNpzUz7g31ixAmCmcOBc+NCB+41gEickKWVHPXRE+Ils38MDjrlF+OWBZMFryBbq1n/sLcKnXT2Erlj0xtTPOgSN9Fm+1V+nJuo2tor3QnzLxhbYq+MrNEkIFWc3RsceMobQMC8Xo5eOPWrNlo/a/xnnwxZ/dEY3wvogoewMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vhZMW3+y; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e1g+2Omv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B25AC4CEE7;
-	Wed, 30 Apr 2025 15:53:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746028388;
-	bh=m0UugMtWCbzfPWtuy2ts8556YUjy07o4bV0mVOb9sq8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e1g+2OmvuZOGcznUQ5tILgNY9GEUShEVzqZwoFHgpSeRPpz+49sIXbBOwEtBm/cAJ
-	 8AD3KZDARms4UDFekzvsmu0tO50mzOFsD6UkZEMExNYTSnvj1Hxd+mOH1AlPirN2XS
-	 PKOGK8XXJMVmHqjRfsw3esfbyOoL7m063jMZh1kpy2g48W2kEdra0/F1/Il8EWsRBU
-	 t43/UXhKohzxEILsWIIWy3jfDxHhDVUIxErgzdbCmfCv0q6zsjLIX1ov/D6y2DabXO
-	 Mt8LUmI+UW8QafEdNolGovNdR44Bb5KSxhj7v6J7lmjHLgV3KFZU9H2iy9NuXvMWxP
-	 dMsH+XX3Q9pfQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uA9k9-00AKWb-I4;
-	Wed, 30 Apr 2025 16:53:05 +0100
-Date: Wed, 30 Apr 2025 16:53:04 +0100
-Message-ID: <865xilir33.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	James Morse <james.morse@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	"Rob Herring  (Arm)" <robh@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
-	Will Deacon <will@kernel.org>,
-	Yicong Yang <yangyicong@hisilicon.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] arm64: errata: Work around AmpereOne's erratum AC04_CPU_23
-In-Reply-To: <20250425024741.1309893-1-scott@os.amperecomputing.com>
-References: <20250425024741.1309893-1-scott@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vhZMW3+y"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43ced8c2eb7so54119615e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 09:27:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746030444; x=1746635244; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=son2TtAYXWFKHIb+qv3GEJQE2heH3nn7VYU4EbNQqf8=;
+        b=vhZMW3+yo39f+og5TRwfQ2zPYXniEN2rX31GpHEERMcZxee/9URANeCvk6c8HjRZxa
+         xqg/zqZc8ykCwwP/GxKwE4VgsNtP6VhlMm6SpAhLsg1sJAvkz4YLezb2WU/hiTKnrWtR
+         +rRpX7j9aoBZBhfYYhwDixhyyjvDBLvFFmmXooNqnoULlm4BDGys996PSK1Q3BcVBUEp
+         KDu6i4xKre3BjbbTfKr5JLt5gXxKvpj5FKHQ9D4wFtfGJirtH1ElvKsuQnEt71p/aUGF
+         5nk+m3jg91fvJFXwQAbyOJT8MpP9be7DoxAEMahbIZKatq0CNt8E9W8DQTLVSvpNKMJy
+         BC/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746030444; x=1746635244;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=son2TtAYXWFKHIb+qv3GEJQE2heH3nn7VYU4EbNQqf8=;
+        b=UjlcByI4zo7GcIxULi+5/qt+rZ78MZYfHbCcfqW3VtMIblzgW43wSQKJ0ZS7FUTmzD
+         hb9RQz3n9yL0B3j2X7TBoM+oovJvv3iWPimwWRCqeyiROQ8lAOcK+F0bzNFxhIQ9Dnqn
+         IQxKnAkeTXZsGprnbDA925mtnA4HH4StmTNu8NrBX7vKrB1MoV2i+Oy3sRUTWrxd5Oe8
+         1ye5YeVQqDN4m+ezct1WXRvO21u3c4B7zohrgB8TCFBL657c2+syDMYmI3UAplWdZsTI
+         NqpcQNHXdhmqwg92OBN1jglXTA4XzC5+QzkVNIgraHmS4ECqA1skXLx1lvuHfRpNn51f
+         PScA==
+X-Gm-Message-State: AOJu0YynkW1q6MQrV5xrnFJ3YXS0IBqQ2KAeri0SdJY8RR6p9+SRP/jv
+	9aYJpKxUG6YN1Ag0o0wLmoKPKEAuajjaK9LC/JGwcA3kwd1Zl8jvqpqmwBqOUNGbLYSXagIpuYe
+	TQQP0LzzEl0AdyCK/AbCzHAxY+pWvndBv/r5en/xV4GKu/TNfA7LXp6iLPG6xnGWzNpZGucAG9A
+	qzY/3P71UT0pIjp68/KXkhi/QF/IxqAJH/Fw5uCBJaTyM=
+X-Google-Smtp-Source: AGHT+IFQ2Mdes0eRtKfnxWeLvHYhOcWYODGlYYFwAfRst9gZKnEGAYllVA7JEZatII5sz3zXBjKQtfWJvzFPDQ==
+X-Received: from wmqb17.prod.google.com ([2002:a05:600c:4e11:b0:440:5e10:a596])
+ (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:1f0c:b0:43d:b51:46fb with SMTP id 5b1f17b1804b1-441b1f31004mr39397195e9.2.1746030443778;
+ Wed, 30 Apr 2025 09:27:23 -0700 (PDT)
+Date: Wed, 30 Apr 2025 16:27:07 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: scott@os.amperecomputing.com, catalin.marinas@arm.com, james.clark@linaro.org, james.morse@arm.com, joey.gouly@arm.com, kevin.brodsky@arm.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, robh@kernel.org, shameerali.kolothum.thodi@huawei.com, shiqiliu@hust.edu.cn, will@kernel.org, yangyicong@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
+Message-ID: <20250430162713.1997569-1-smostafa@google.com>
+Subject: [PATCH v2 0/4] KVM: arm64: UBSAN at EL2
+From: Mostafa Saleh <smostafa@google.com>
+To: kvmarm@lists.linux.dev, kasan-dev@googlegroups.com, 
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	broonie@kernel.org, catalin.marinas@arm.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, kees@kernel.org, elver@google.com, andreyknvl@gmail.com, 
+	ryabinin.a.a@gmail.com, akpm@linux-foundation.org, yuzenghui@huawei.com, 
+	suzuki.poulose@arm.com, joey.gouly@arm.com, masahiroy@kernel.org, 
+	nathan@kernel.org, nicolas.schier@linux.dev, 
+	Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 25 Apr 2025 03:47:41 +0100,
-D Scott Phillips <scott@os.amperecomputing.com> wrote:
-> 
-> Updates to HCR_EL2 can rarely corrupt simultaneous translations for data
-> addresses initiated by load/store instructions. Only instruction
-> initiated translations are vulnerable, not translations from prefetches
-> for example. A DSB before the store to HCR_EL2 is sufficient to prevent older
-> instructions from hitting the window for corruption, and an ISB after
-> is sufficient to prevent younger instructions from hitting the window
-> for corruption.
-> 
-> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
-> ---
-> v1: https://lore.kernel.org/kvmarm/20250415154711.1698544-2-scott@os.amperecomputing.com/
-> Changes since v1:
->  - Add a write_sysreg_hcr() helper (Oliver)
->  - Add more specific wording in the errata description (Oliver & Marc)
-> 
->  arch/arm64/Kconfig                      | 17 +++++++++++++++++
->  arch/arm64/include/asm/hardirq.h        |  4 ++--
->  arch/arm64/include/asm/sysreg.h         | 10 ++++++++++
->  arch/arm64/kernel/cpu_errata.c          | 14 ++++++++++++++
->  arch/arm64/kvm/at.c                     |  8 ++++----
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c   |  2 +-
->  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
->  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
->  arch/arm64/kvm/hyp/vhe/tlb.c            |  4 ++--
->  arch/arm64/tools/cpucaps                |  1 +
->  11 files changed, 54 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index a182295e6f08b..3ae4e80e3002b 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -464,6 +464,23 @@ config AMPERE_ERRATUM_AC03_CPU_38
->  
->  	  If unsure, say Y.
->  
-> +config AMPERE_ERRATUM_AC04_CPU_23
-> +        bool "AmpereOne: AC04_CPU_23:  Failure to synchronize writes to HCR_EL2 may corrupt address translations."
-> +	default y
-> +	help
-> +	  This option adds an alternative code sequence to work around Ampere
-> +	  errata AC04_CPU_23 on AmpereOne.
-> +
-> +	  Updates to HCR_EL2 can rarely corrupt simultaneous translations for
-> +	  data addresses initiated by load/store instructions. Only
-> +	  instruction initiated translations are vulnerable, not translations
-> +	  from prefetches for example. A DSB before the store to HCR_EL2 is
-> +	  sufficient to prevent older instructions from hitting the window
-> +	  for corruption, and an ISB after is sufficient to prevent younger
-> +	  instructions from hitting the window for corruption.
-> +
-> +	  If unsure, say Y.
-> +
->  config ARM64_WORKAROUND_CLEAN_CACHE
->  	bool
->  
-> diff --git a/arch/arm64/include/asm/hardirq.h b/arch/arm64/include/asm/hardirq.h
-> index cbfa7b6f2e098..77d6b8c63d4e6 100644
-> --- a/arch/arm64/include/asm/hardirq.h
-> +++ b/arch/arm64/include/asm/hardirq.h
-> @@ -41,7 +41,7 @@ do {									\
->  									\
->  	___hcr = read_sysreg(hcr_el2);					\
->  	if (!(___hcr & HCR_TGE)) {					\
-> -		write_sysreg(___hcr | HCR_TGE, hcr_el2);		\
-> +		write_sysreg_hcr(___hcr | HCR_TGE);			\
->  		isb();							\
->  	}								\
->  	/*								\
-> @@ -82,7 +82,7 @@ do {									\
->  	 */								\
->  	barrier();							\
->  	if (!___ctx->cnt && !(___hcr & HCR_TGE))			\
-> -		write_sysreg(___hcr, hcr_el2);				\
-> +		write_sysreg_hcr(___hcr);				\
->  } while (0)
->  
->  static inline void ack_bad_irq(unsigned int irq)
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 2639d3633073d..d41eeba7f8201 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -1185,6 +1185,16 @@
->  		write_sysreg_s(__scs_new, sysreg);			\
->  } while (0)
->  
-> +#define write_sysreg_hcr(__val) do {					\
-> +	if(IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23) &&		\
-> +	   alternative_has_cap_unlikely(ARM64_WORKAROUND_AMPERE_AC04_CPU_23)) \
-> +		asm volatile("dsb nsh; msr hcr_el2, %x0; isb"		\
-> +			     : : "rZ" (__val));				\
-> +	else								\
-> +		asm volatile("msr hcr_el2, %x0"				\
-> +			     : : "rZ" (__val));				\
-> +} while (0)
-> +
+Many of the sanitizers the kernel supports are disabled when running
+in EL2 with nvhe/hvhe/proctected modes, some of those are easier
+(and makes more sense) to integrate than others.
+Last year, kCFI support was added in [1]
 
-I'm worried that some of these accesses may occur before we compute
-the capabilities. I'd be more confident if the default was to have the
-workaround, and only to relax it once we know we're not on a broken
-system.
+This patchset adds support for UBSAN in EL2.
+UBSAN can run in 2 modes:
+  1) =E2=80=9CNormal=E2=80=9D (CONFIG_UBSAN_TRAP=3Dn): In this mode the com=
+piler will
+  do the UBSAN checks and insert some function calls in case of
+  failures, it can provide more information(ex: what is the value of
+  the out of bound) about the failures through those function arguments,
+  and those functions(implemented in lib/ubsan.c) will print a report with
+  such errors.
 
-But that leaves the question of the early stuff that runs before we
-get to C code. Are you sure this isn't affected by this issue (for
-example, the code in head.S, hyp-stub.S, and el2-setup.h)?
+  2) Trap (CONFIG_UBSAN_TRAP=3Dy): This is a minimal mode, where similarly,
+  the compiler will do the checks, but instead of doing function calls,
+  it would do a =E2=80=9Cbrk #imm=E2=80=9D (for ARM64) with a unique code w=
+ith the failure
+  type, but without any extra information (ex: only print the out-bound lin=
+e
+  but not the index)
 
->  #define read_sysreg_par() ({						\
->  	u64 par;							\
->  	asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));	\
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index b55f5f7057502..60f1b70fc0845 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -557,6 +557,13 @@ static const struct midr_range erratum_ac03_cpu_38_list[] = {
->  };
->  #endif
->  
-> +#ifdef CONFIG_AMPERE_ERRATUM_AC04_CPU_23
-> +static const struct midr_range erratum_ac04_cpu_23_list[] = {
-> +	MIDR_ALL_VERSIONS(MIDR_AMPERE1A),
-> +	{},
-> +};
-> +#endif
-> +
->  const struct arm64_cpu_capabilities arm64_errata[] = {
->  #ifdef CONFIG_ARM64_WORKAROUND_CLEAN_CACHE
->  	{
-> @@ -875,6 +882,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
->  		.capability = ARM64_WORKAROUND_AMPERE_AC03_CPU_38,
->  		ERRATA_MIDR_RANGE_LIST(erratum_ac03_cpu_38_list),
->  	},
-> +#endif
-> +#ifdef CONFIG_AMPERE_ERRATUM_AC04_CPU_23
-> +	{
-> +		.desc = "AmpereOne erratum AC04_CPU_23",
-> +		.capability = ARM64_WORKAROUND_AMPERE_AC04_CPU_23,
-> +		ERRATA_MIDR_RANGE_LIST(erratum_ac04_cpu_23_list),
-> +	},
->  #endif
+For nvhe/hvhe/proctected modes, #2 would be suitable, as there is no way to
+print reports from EL2, so similarly to kCFI(even with permissive) it would
+cause the hypervisor to panic.
 
-This needs to be captured in Documentation/arch/arm64/silicon-errata.rst.
+But that means that for EL2 we need to compile the code with the same optio=
+ns
+as used by =E2=80=9CCONFIG_UBSAN_TRAP=E2=80=9D independently from the kerne=
+l config.
 
-Thanks,
+This patch series adds a new KCONFIG for ARM64 to choose to enable UBSAN
+separately for the modes mentioned.
 
-	M.
+The same logic decoding the kernel UBSAN is reused, so the messages from
+the hypervisor will look similar as:
+[   29.215332] kvm [190]: nVHE hyp UBSAN: array index out of bounds at: [<f=
+fff8000811f2344>] __kvm_nvhe_handle___pkvm_init_vm+0xa8/0xac!
 
--- 
-Without deviation from the norm, progress is not possible.
+In this patch set, the same UBSAN options(for check types) are used for bot=
+h
+EL1/EL2, although a case can be made to have separate options (leading to
+totally separate CFLAGS) if we want EL2 to be compiled with stricter checks
+for something as protected mode.
+However, re-using the current flags, makes code re-use easier for
+report_ubsan_failure() and  Makefile.ubsan
+
+[1] https://lore.kernel.org/all/20240610063244.2828978-1-ptosi@google.com/
+
+Changes from v1:
+- https://lore.kernel.org/all/20250416180440.231949-1-smostafa@google.com/
+- Collected Kees Acked-By
+- Rename CFLAGS flag to CFLAGS_UBSAN_TRAP
+- Small comment fix
+
+Mostafa Saleh (4):
+  arm64: Introduce esr_is_ubsan_brk()
+  ubsan: Remove regs from report_ubsan_failure()
+  KVM: arm64: Introduce CONFIG_UBSAN_KVM_EL2
+  KVM: arm64: Handle UBSAN faults
+
+ arch/arm64/include/asm/esr.h     | 5 +++++
+ arch/arm64/kernel/traps.c        | 4 ++--
+ arch/arm64/kvm/handle_exit.c     | 6 ++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile | 6 ++++++
+ arch/x86/kernel/traps.c          | 2 +-
+ include/linux/ubsan.h            | 6 +++---
+ lib/Kconfig.ubsan                | 9 +++++++++
+ lib/ubsan.c                      | 8 +++++---
+ scripts/Makefile.ubsan           | 5 ++++-
+ 9 files changed, 41 insertions(+), 10 deletions(-)
+
+--=20
+2.49.0.967.g6a0df3ecc3-goog
+
