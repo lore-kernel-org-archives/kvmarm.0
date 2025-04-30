@@ -1,258 +1,126 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B661EA80
-	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 12:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CA21B5EB5
+	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 13:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746015083; cv=none; b=e3E+/VDPm9dS7a5U4ukRvIgseX67oZ4TQvwm8Hk4XVwA6+lkBWQgLLUHJNEu+QsVrcNgIsZ87mTeEJrVgyue4bN1tzxoxTG4tXYRAqppp7qvxToyP5/PFrUspxhyOy2n34jI3atE25+S/ZiOWqy+lnZ9jo3t3kTXEGOmSn7TOCQ=
+	t=1746020916; cv=none; b=qrPt/fWzIlQpiFKs3hzmjA/2cIdxO8arqw99l2dKcY1TinSU5+wrYwMiXwwj/R3KGuCTzpkweS5WjV2Fp6f//yBhVxRDP4HplifZRXnh9Hw7rE4093AHLm6U7Tbcm3qNMGpBtCJ6t4KkI3qPJFkG72jjA42HHopr9g+00P22wq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746015083; c=relaxed/simple;
-	bh=WBVwmUGhNQeqSG1wEq0pfwpkL0pYYhpZqSLVK9JWP60=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YRiWZq6tyYACdHze5OXY/4hYi6M/N1cxPldGNBB5Pz8o+sDZ0bwCqMzpK0zmo53P8lYLMVYdqRTps8mp1pxECKy9pZywX3K/xOXrISlFXi+Ov9gSrUh7PGJZI/O+cCZuzKjKXGtAD6bflWooCE3I0lrHs0Du9bjAJCjpAj0YMSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AD9ZwQDi; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1746020916; c=relaxed/simple;
+	bh=F7OHKbHBAWKGpOsKHwFjNVum8HITE016F5PD2hFPHxw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pTMqz2sG2d8a3HHBkKaIPLzLz2Gtw/PBu4YiU8+9uPYL1zGiK+8Y3GQNSMxtdyYugAbal4aYeJachqh/ZEA2mY4gJQq+7Db7yD/a86RMX2w4XjZXOP8THpTsr/DcvNvwAwYnUJdI6R5TSrQCIIeXrXBrYeYAbP60SZuevAeia8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OC5SXcpT; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AD9ZwQDi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OC5SXcpT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746015080;
+	s=mimecast20190719; t=1746020913;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7tFgFXzqc2ivrCQjcqTMjWCPkQCLYsEDRrk0U+aYhgw=;
-	b=AD9ZwQDiw12pJ4/0qBFC0KYKIY275yb2X44z9HbIgp7HlY5DmTSsRRDxdraq4Ui2EztyY/
-	oOGPOt6ijRTV18Z5Fp+eSX97nIgiVdvVI38rnF5wNZbPJ0Sr5lPZl/iR9bHsZf9tXu6YCm
-	BG3ptSO/YFU/yQZDKDmj7IceVcVXaGY=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-306-Cj79jUSmPZe4-llIKAUDGg-1; Wed, 30 Apr 2025 08:11:19 -0400
-X-MC-Unique: Cj79jUSmPZe4-llIKAUDGg-1
-X-Mimecast-MFC-AGG-ID: Cj79jUSmPZe4-llIKAUDGg_1746015078
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2242f3fd213so61373595ad.1
-        for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 05:11:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746015078; x=1746619878;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7tFgFXzqc2ivrCQjcqTMjWCPkQCLYsEDRrk0U+aYhgw=;
-        b=IObzBSecNfU/PkD/D4uRmNIfhEjwgqYi3GO1Rg9YBKaZ2E64/YuPV4Ndhwtp7zLm3z
-         V8THOwJtYBfcHr0/t0kgtWvBjSiHlzS+T+nG+8+jBx1/UBT8vrgxseMLyPpPTNDsNvEr
-         fN0dYl2/XRtT86unrmtl3s/AeIOkF4G+vqgunCbXMaXh1LjuGtasfZ4H35BhaEHGdvmx
-         7bdnHJF2vPE6SObvHpMipLA50N3Dw/NJYvwEnbuRH0T9VeS+GD/nMFIfjG3nfT3hnJm/
-         PNGOJk+RQuChNr7V21D24YpoGYgJdcrpYKO3ydq3up7GydsequULMrpRdt9qIWtjdYEq
-         dLHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUs6fTCmaabz/X/Qkan+CfE/tq7pnRnrnljhd3IxDQI45yFi5ModOGwqq4w3NJTQK0gzSe50W4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwUfUtZzbEj7vguP/E/28UmtA0jB6ljqIPPTpeGHT3jeLpctx1G
-	GcoXFBMXqHuEYsJWnewisys/oGrUkjoXu1a62TRYWCDc1Jiop8PISiQVdu346crqOLKq9s8Vavr
-	BFYcxFA4EyRDKyicGJEsKeaqDjrsdIsJbsE7yWrku1kLBWMyZLeVXNQ==
-X-Gm-Gg: ASbGncvFB3kYRP86iavu1KgO1i9oSxYEPjeSilW3N1bWYDyeIyMdXZ608sFJXCmZAci
-	UEfkRZwWUsqw8jiEz7j/sjkvybMjHjundcIe/GN8pMhcMBtONElymIShmTt5zUs2U2Umr04o2se
-	DWxwRag98nvgeXdLmgtlDoC0qqqR0Elvx9jxqeI/Vn80YTw6L8KKcAFrCMaJATuWQ9/J0cFiegq
-	atC8896g45n7ljHfyzdq3ekDw0JYDC4Un9hxr6qrRYeCQlP+HH+Vhfqt2kbXwT+3dxNn+BZ9tvo
-	44nNvJWtEkuW
-X-Received: by 2002:a17:902:ebcc:b0:223:f408:c3f8 with SMTP id d9443c01a7336-22df578bcebmr38849545ad.14.1746015078599;
-        Wed, 30 Apr 2025 05:11:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHL6LT3h1gUo31SZA1COwvt+3Fy8+QNcJQ2pDlfoosU3yDt8W0PlDXI1jufTia5Y9HcVnFrHw==
-X-Received: by 2002:a17:902:ebcc:b0:223:f408:c3f8 with SMTP id d9443c01a7336-22df578bcebmr38849145ad.14.1746015078260;
-        Wed, 30 Apr 2025 05:11:18 -0700 (PDT)
-Received: from [192.168.68.51] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db50e89acsm120641205ad.113.2025.04.30.05.11.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Apr 2025 05:11:17 -0700 (PDT)
-Message-ID: <b5770d9b-4f17-4be8-95a7-1549322debb2@redhat.com>
-Date: Wed, 30 Apr 2025 22:11:09 +1000
+	bh=oLVOo1RS7FiUiZjstQUcuIC9vXhBzHVmV4xEjiYp0vQ=;
+	b=OC5SXcpT8QaFPlinnbwu1WY11MeP65aFlwwsGvVJ1ECVgEQtkikjcB6JuyDe9PxZltzlt+
+	6V7M0rlAthfgSKcoW5K82OS711aXNWllUHefbMfOxX1QVvBa6jerADsekt2Loe8F3HSF/4
+	7+p4mqmlBMGuzrUvd1NPnYP9qscF6nQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-328-9t1_IlpnMES5Gy2AHNDGcA-1; Wed,
+ 30 Apr 2025 09:48:32 -0400
+X-MC-Unique: 9t1_IlpnMES5Gy2AHNDGcA-1
+X-Mimecast-MFC-AGG-ID: 9t1_IlpnMES5Gy2AHNDGcA_1746020910
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0574B1800446;
+	Wed, 30 Apr 2025 13:48:29 +0000 (UTC)
+Received: from localhost (unknown [10.67.24.156])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 100E919560A3;
+	Wed, 30 Apr 2025 13:48:25 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Sebastian Ott <sebott@redhat.com>
+Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
+ oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com,
+ armbru@redhat.com, berrange@redhat.com, abologna@redhat.com,
+ jdenemar@redhat.com, agraf@csgraf.de, shahuang@redhat.com,
+ mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
+Subject: Re: [PATCH v3 05/10] arm/cpu: accessors for writable id registers
+In-Reply-To: <bebefcad-d9db-a2b7-ab69-8eed34b9e63d@redhat.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20250414163849.321857-1-cohuck@redhat.com>
+ <20250414163849.321857-6-cohuck@redhat.com>
+ <bebefcad-d9db-a2b7-ab69-8eed34b9e63d@redhat.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Wed, 30 Apr 2025 15:48:19 +0200
+Message-ID: <877c31rc9o.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 17/43] arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-18-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250416134208.383984-18-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: hAJ_ldVyMG9Ht-K3_nAAyl0OLsT9P6188h2M7loz3DE_1746015078
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 4/16/25 11:41 PM, Steven Price wrote:
-> The guest can request that a region of it's protected address space is
-> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
-> RSI_IPA_STATE_SET. This causes a guest exit with the
-> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
-> protected region to unprotected (or back), exiting to the VMM to make
-> the necessary changes to the guest_memfd and memslot mappings. On the
-> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
-> calls.
-> 
-> The VMM may wish to reject the RIPAS change requested by the guest. For
-> now it can only do with by no longer scheduling the VCPU as we don't
-> currently have a usecase for returning that rejection to the guest, but
-> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
-> open for adding a new ioctl in the future for this purpose.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v7:
->   * Rework the loop in realm_set_ipa_state() to make it clear when the
->     'next' output value of rmi_rtt_set_ripas() is used.
-> New patch for v7: The code was previously split awkwardly between two
-> other patches.
-> ---
->   arch/arm64/kvm/rme.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 88 insertions(+)
-> 
+On Tue, Apr 29 2025, Sebastian Ott <sebott@redhat.com> wrote:
 
-One nitpick below, either way:
+> On Mon, 14 Apr 2025, Cornelia Huck wrote:
+>> Also add conversion between the different indices.
+>>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>> target/arm/cpu.h | 18 ++++++++++++++++++
+>> 1 file changed, 18 insertions(+)
+>>
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index bbee7ff2414a..775a8aebc5d3 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -876,6 +876,13 @@ typedef struct IdRegMap {
+>>     uint64_t regs[NR_ID_REGS];
+>> } IdRegMap;
+>>
+>> +#define ARM_FEATURE_ID_RANGE_IDX(op0, op1, crn, crm, op2)               \
+>> +        ({                                                              \
+>> +                __u64 __op1 = (op1) & 3;                                \
+>> +                __op1 -= (__op1 == 3);                                  \
+>> +                (__op1 << 6 | ((crm) & 7) << 3 | (op2));                \
+>> +        })
+>> +
+>> /* REG is ID_XXX */
+>> #define FIELD_DP64_IDREG(ISAR, REG, FIELD, VALUE)                       \
+>>     ({                                                                  \
+>> @@ -923,6 +930,17 @@ typedef struct IdRegMap {
+>>         i_->idregs[REG ## _EL1_IDX];                                    \
+>>     })
+>>
+>> +#define GET_IDREG_WRITABLE(MAP, REG)                                  \
+>> +    ({                                                                \
+>> +    const IdRegMap *m_ = (MAP);                                       \
+>> +    int index = ARM_FEATURE_ID_RANGE_IDX((sysreg >> 14) & 0x0000c000, \
+>> +                                         (sysreg >> 11) & 0x00003800, \
+>> +                                         (sysreg >> 7) & 0x00000780,  \
+>> +                                         (sysreg >> 3) & 0x00000078,  \
+>> +                                         sysreg & 0x00000007);        \
+>> +    m_->regs[index];                                                  \
+>> +    })
+>> +
+>
+> s/sysreg/REG/
+>
+> Also GET_IDREG_WRITABLE doesn't seem to be used in this series.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index bee9dfe12e03..fe0d5b8703d2 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -624,6 +624,65 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->   		realm_unmap_private_range(kvm, start, end);
->   }
->   
-> +static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
-> +			       unsigned long start,
-> +			       unsigned long end,
-> +			       unsigned long ripas,
-> +			       unsigned long *top_ipa)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	phys_addr_t rd_phys = virt_to_phys(realm->rd);
-> +	phys_addr_t rec_phys = virt_to_phys(rec->rec_page);
-> +	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-> +	unsigned long ipa = start;
-> +	int ret = 0;
-> +
-> +	while (ipa < end) {
-> +		unsigned long next;
-> +
-> +		ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
-> +
-> +		if (RMI_RETURN_STATUS(ret) == RMI_SUCCESS) {
-> +			ipa = next;
-> +		} else if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-
---->
-
-> +			int walk_level = RMI_RETURN_INDEX(ret);
-> +			int level = find_map_level(realm, ipa, end);
-> +
-> +			/*
-> +			 * If the RMM walk ended early then more tables are
-> +			 * needed to reach the required depth to set the RIPAS.
-> +			 */
-> +			if (walk_level < level) {
-> +				ret = realm_create_rtt_levels(realm, ipa,
-> +							      walk_level,
-> +							      level,
-> +							      memcache);
-> +				/* Retry with RTTs created */
-> +				if (!ret)
-> +					continue;
-> +			} else {
-> +				ret = -EINVAL;
-> +			}
-> +
-
-<--- This block of code have been existing in multiple functions. I guess
-it would be worthy to introduce a helper for it if you agree. Alternatively,
-it's definitely something to do in the future, after this series is merged :)
-
-> +			break;
-> +		} else {
-> +			WARN(1, "Unexpected error in %s: %#x\n", __func__,
-> +			     ret);
-> +			ret = -ENXIO;
-> +			break;
-> +		}
-> +	}
-> +
-> +	*top_ipa = ipa;
-> +
-> +	if (ripas == RMI_EMPTY && ipa != start)
-> +		realm_unmap_private_range(kvm, start, ipa);
-> +
-> +	return ret;
-> +}
-> +
->   static int realm_init_ipa_state(struct realm *realm,
->   				unsigned long ipa,
->   				unsigned long end)
-> @@ -863,6 +922,32 @@ void kvm_destroy_realm(struct kvm *kvm)
->   	kvm_free_stage2_pgd(&kvm->arch.mmu);
->   }
->   
-> +static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long base = rec->run->exit.ripas_base;
-> +	unsigned long top = rec->run->exit.ripas_top;
-> +	unsigned long ripas = rec->run->exit.ripas_value;
-> +	unsigned long top_ipa;
-> +	int ret;
-> +
-> +	do {
-> +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
-> +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
-> +		write_lock(&kvm->mmu_lock);
-> +		ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
-> +		write_unlock(&kvm->mmu_lock);
-> +
-> +		if (WARN_RATELIMIT(ret && ret != -ENOMEM,
-> +				   "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx, ripas: %#lx\n",
-> +				   base, top, ripas))
-> +			break;
-> +
-> +		base = top_ipa;
-> +	} while (top_ipa < top);
-> +}
-> +
->   int kvm_rec_enter(struct kvm_vcpu *vcpu)
->   {
->   	struct realm_rec *rec = &vcpu->arch.rec;
-> @@ -873,6 +958,9 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu)
->   		for (int i = 0; i < REC_RUN_GPRS; i++)
->   			rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
->   		break;
-> +	case RMI_EXIT_RIPAS_CHANGE:
-> +		kvm_complete_ripas_change(vcpu);
-> +		break;
->   	}
->   
->   	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
-
-Thanks,
-Gavin
+Hm, and it wouldn't have worked if we did use it... probably an artifact
+left over from earlier refactorings, I think we can get rid of it.
 
