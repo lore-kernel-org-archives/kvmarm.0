@@ -1,261 +1,331 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844B72D0AD6
-	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 20:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C962C1791
+	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 21:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746045064; cv=none; b=Dzr96azmhivvGT9fh6muCx+L/9BRnexyldY8Fj9aA2IcDutzFlRiYwofefiA42Rt4/SzXDRX5JDjkvsueR8lAgBkwumIUnqgm/S/x1FkjHeW3chCydhcBYrFRYfUOPUQ5e8DhSDyIjoIgpVgew8pv5UxCH6G+h4uswLTQoLw06E=
+	t=1746048669; cv=none; b=amrDXys8Q35rDoeTfCH2s6o19QNohK5NftYhCWC0FIuAW6cplC0wTPmpObHOvWLrkqTWt/vj7CVB/iupyXOheevc1clVxHn84LqgwvdAO7qJhNmTYN2F/hpJEFv9PKGrP3TaSkhcD9G6iPKGtC80EtEJzMPAxtlMDX4lnN/Locw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746045064; c=relaxed/simple;
-	bh=e0k7kAtfuw3ZmlklUuw6SXBXSm2o7IJFdIgicj6fkHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JBWDjivRdTVRDHoUzVKPmf4z/ePBRXocVpe/iUf1eJbpqItUkdws4qxZfvlH1FxfnpqhVw9ZnudmzgOzpGgg6WZUfJGEvIAXhExt1IQOgWCnztH5JCaintCZGb9AdEE1yvXQ8WABNoAxlZXiCZtPtpaxCtJi5MBPBTnaqJ2hgRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P31Gyby2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746048669; c=relaxed/simple;
+	bh=YfqyjeRvCT6Q9XBCN/pMSc9kNCURSqFYecy67yOB+M0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=shVL71Jh37Qfx6RzWYwKofaJDQ1KlMclXrrjC6J/VzAQoyigUkvSaqTtF+h11tKi94QUlbeHnd696R5S4aAV6vU1sTBzO7mHebHtH5xoi83kUxddH5yV0CA5klVKQQXQwOBdsMKhfXGGWL5Gy+LzLjOfXinJoHv7TCbWhry16ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qNo18rxz; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P31Gyby2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746045061;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+MZvmRfCtI61m/XdI87EqyqLvZ2yGHt28AUm8pnJCIE=;
-	b=P31Gyby2bTLXo8CtWGGUy3y2ZhfCuvc5ooCk0PEvIdDs9lTbxzbE0cK4CVd3/a89pIphKq
-	S2l8Uoxhz0nSLD/pl4K29dLZJJtJ8SVMieB8vUiy8Ix1xqocFDN6xxVZ/zbY555ZFUfKTq
-	ePtO7cdPR6NnMyl4+p8NZr/fd0Iqwgg=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-44-gYJXFO_UNeOIXNgOfeawgA-1; Wed,
- 30 Apr 2025 16:30:57 -0400
-X-MC-Unique: gYJXFO_UNeOIXNgOfeawgA-1
-X-Mimecast-MFC-AGG-ID: gYJXFO_UNeOIXNgOfeawgA_1746045053
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9DC291956094;
-	Wed, 30 Apr 2025 20:30:52 +0000 (UTC)
-Received: from intellaptop.lan (unknown [10.22.80.5])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 61B781800365;
-	Wed, 30 Apr 2025 20:30:47 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: linux-riscv@lists.infradead.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Waiman Long <longman@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Alexander Potapenko <glider@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Andre Przywara <andre.przywara@arm.com>,
-	x86@kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	kvm-riscv@lists.infradead.org,
-	Atish Patra <atishp@atishpatra.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	kvmarm@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Shusen Li <lishusen2@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 5/5] x86: KVM: SEV: implement kvm_lock_all_vcpus and use it
-Date: Wed, 30 Apr 2025 16:30:13 -0400
-Message-ID: <20250430203013.366479-6-mlevitsk@redhat.com>
-In-Reply-To: <20250430203013.366479-1-mlevitsk@redhat.com>
-References: <20250430203013.366479-1-mlevitsk@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qNo18rxz"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30a3c3014fcso231208a91.3
+        for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 14:31:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746048666; x=1746653466; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xuwtCmee8bUCMaCxATpebgMybOMoD89ZAK9YtlS2GJU=;
+        b=qNo18rxzgxRHvSH5CeDGks0D5BO0OgP1neOpRMNUKw9QKreFyqIPn244gfPzbeCE54
+         lyeArjnES2HnqeuEKRkd1nCwhk2DA3Y0iYPHhe5wtllKjhWdFzK+CCXVSUua5IhmrKBT
+         O2iuI2SHwl03Eo0W+R65hUvqeBbG6DRxy59qFewCDkx9eQkNdcrsNgjnLzy2T5PlE22+
+         uJffu5dIJjQvJQfqL+k7OHKQgpXqSr9542Eq+iHGzIEf1+QAgJZCCIK6roNdG6Q2f0u8
+         ibTAsed6hoLGSgZLi8phKRxNbvMBS5Bk2Wt/rYGOEIKgonh9kanEH14p2H2v94z2Ul/j
+         kYvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746048666; x=1746653466;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xuwtCmee8bUCMaCxATpebgMybOMoD89ZAK9YtlS2GJU=;
+        b=gegJXD7LLkVnOfANdlF1qa+pJSigdrxjfiQLr1QAMGdKxa7xFlJ3fRVWERhKZBfngl
+         3oeF3BO7um+BSUpBMBpzGVbh1e1EPFsj+IPrEWm2uu1dmMjaT1eXnqz0+Tgg2PUop5Jc
+         js9V/kZiedMK6ETOefFs9kmgXfBv2jNwlRoxwURQSqlJP3nxkevta1ucZCseJg44N8rw
+         7HRtq1bxTDZLlID8dzo/pXnIUsnRdxVyAwMyyaWF4J1f0miJ6q7ub2JAsWUwcRLjGt02
+         bbBfyLq3Mhkj+Ih4x3/GmXe5g4SIum43GR4JRtmSLaVwtt6dglD3SVVAVicogk5pbdQo
+         jz7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUv38CEm/fHkpz801cG9idi/H1BVQkE8p7VNwMg+RGU9rUQp5M0uyndvfc1Nmt3B95jHKhYDmY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxIDByFkUE6Efo2dTTbZ5SOlIRltOi5SojyK69XI/5mszwsnP0d
+	kEkhSccmpbR/5qiQh1Rvn8wDBzfoogGFf5Fr1+HxBr/jo0r4kEGG+ddyPlwXHriafvMRILeUgV3
+	hng==
+X-Google-Smtp-Source: AGHT+IF7u1ROE1txYWgvgQtIPyo8p3omIkgPpGClJtR2AwQs8qcKywBRQB3ypqTRcMHct1VgXw598olvhbg=
+X-Received: from pjbsn16.prod.google.com ([2002:a17:90b:2e90:b0:2fc:2f33:e07d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:da8e:b0:2ff:7b28:a51a
+ with SMTP id 98e67ed59e1d1-30a34409defmr7144925a91.17.1746048666708; Wed, 30
+ Apr 2025 14:31:06 -0700 (PDT)
+Date: Wed, 30 Apr 2025 14:31:05 -0700
+In-Reply-To: <20250222005943.3348627-3-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Mime-Version: 1.0
+References: <20250222005943.3348627-1-vipinsh@google.com> <20250222005943.3348627-3-vipinsh@google.com>
+Message-ID: <aBKWmRDBrjeZhAW0@google.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Create KVM selftest runner
+From: Sean Christopherson <seanjc@google.com>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, 
+	anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
+	imbrenda@linux.ibm.com, maz@kernel.org, oliver.upton@linux.dev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Implement kvm_lock_all_vcpus() and use it instead of
-sev own sev_{lock|unlock}_vcpus_for_migration().
+This is awesome!
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/sev.c   | 72 +++-------------------------------------
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 25 ++++++++++++++
- 3 files changed, 30 insertions(+), 68 deletions(-)
+I have lots of idea, but not all of them need to be address for the initial
+commit.  Some of them I would consider blockers, but I also don't want to e=
+nd up
+with massive scope creep that causes this to stall out for (more) months on=
+ end.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 0bc708ee2788..16db6179013d 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1882,70 +1882,6 @@ static void sev_unlock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
- 	atomic_set_release(&src_sev->migration_in_progress, 0);
- }
- 
--/* vCPU mutex subclasses.  */
--enum sev_migration_role {
--	SEV_MIGRATION_SOURCE = 0,
--	SEV_MIGRATION_TARGET,
--	SEV_NR_MIGRATION_ROLES,
--};
--
--static int sev_lock_vcpus_for_migration(struct kvm *kvm,
--					enum sev_migration_role role)
--{
--	struct kvm_vcpu *vcpu;
--	unsigned long i, j;
--
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (mutex_lock_killable_nested(&vcpu->mutex, role))
--			goto out_unlock;
--
--#ifdef CONFIG_PROVE_LOCKING
--		if (!i)
--			/*
--			 * Reset the role to one that avoids colliding with
--			 * the role used for the first vcpu mutex.
--			 */
--			role = SEV_NR_MIGRATION_ROLES;
--		else
--			mutex_release(&vcpu->mutex.dep_map, _THIS_IP_);
--#endif
--	}
--
--	return 0;
--
--out_unlock:
--
--	kvm_for_each_vcpu(j, vcpu, kvm) {
--		if (i == j)
--			break;
--
--#ifdef CONFIG_PROVE_LOCKING
--		if (j)
--			mutex_acquire(&vcpu->mutex.dep_map, role, 0, _THIS_IP_);
--#endif
--
--		mutex_unlock(&vcpu->mutex);
--	}
--	return -EINTR;
--}
--
--static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
--{
--	struct kvm_vcpu *vcpu;
--	unsigned long i;
--	bool first = true;
--
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (first)
--			first = false;
--		else
--			mutex_acquire(&vcpu->mutex.dep_map,
--				      SEV_NR_MIGRATION_ROLES, 0, _THIS_IP_);
--
--		mutex_unlock(&vcpu->mutex);
--	}
--}
--
- static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- {
- 	struct kvm_sev_info *dst = to_kvm_sev_info(dst_kvm);
-@@ -2083,10 +2019,10 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 		charged = true;
- 	}
- 
--	ret = sev_lock_vcpus_for_migration(kvm, SEV_MIGRATION_SOURCE);
-+	ret = kvm_lock_all_vcpus(kvm);
- 	if (ret)
- 		goto out_dst_cgroup;
--	ret = sev_lock_vcpus_for_migration(source_kvm, SEV_MIGRATION_TARGET);
-+	ret = kvm_lock_all_vcpus(source_kvm);
- 	if (ret)
- 		goto out_dst_vcpu;
- 
-@@ -2100,9 +2036,9 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 	ret = 0;
- 
- out_source_vcpu:
--	sev_unlock_vcpus_for_migration(source_kvm);
-+	kvm_unlock_all_vcpus(source_kvm);
- out_dst_vcpu:
--	sev_unlock_vcpus_for_migration(kvm);
-+	kvm_unlock_all_vcpus(kvm);
- out_dst_cgroup:
- 	/* Operates on the source on success, on the destination on failure.  */
- 	if (charged)
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 10d6652c7aa0..a6140415c693 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1016,6 +1016,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
- void kvm_destroy_vcpus(struct kvm *kvm);
- 
- int kvm_trylock_all_vcpus(struct kvm *kvm);
-+int kvm_lock_all_vcpus(struct kvm *kvm);
- void kvm_unlock_all_vcpus(struct kvm *kvm);
- 
- void vcpu_load(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 834f08dfa24c..9211b07b0565 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1392,6 +1392,31 @@ int kvm_trylock_all_vcpus(struct kvm *kvm)
- }
- EXPORT_SYMBOL_GPL(kvm_trylock_all_vcpus);
- 
-+/*
-+ * Lock all of the VM's vCPUs.
-+ * Assumes that the kvm->lock is held.
-+ * Returns -EINTR if the process is killed.
-+ */
-+int kvm_lock_all_vcpus(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	unsigned long i, j;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm)
-+		if (mutex_lock_killable_nest_lock(&vcpu->mutex, &kvm->lock))
-+			goto out_unlock;
-+	return 0;
-+
-+out_unlock:
-+	kvm_for_each_vcpu(j, vcpu, kvm) {
-+		if (i == j)
-+			break;
-+		mutex_unlock(&vcpu->mutex);
-+	}
-+	return -EINTR;
-+}
-+EXPORT_SYMBOL_GPL(kvm_lock_all_vcpus);
-+
- void kvm_unlock_all_vcpus(struct kvm *kvm)
- {
- 	struct kvm_vcpu *vcpu;
--- 
-2.46.0
+On Fri, Feb 21, 2025, Vipin Sharma wrote:
+> Create KVM selftest runner to run selftests and provide various options
+> for execution.
+>=20
+> Provide following features in the runner:
+> 1. --timeout/-t: Max time each test should finish in before killing it.
 
+The help for this needs to specify the units.  I assume it's seconds?
+
+> 2. --jobs/-j: Run these many tests in parallel.
+> 3. --tests: Provide space separated path of tests to execute.
+> 4. --test_dirs: Directories to search for test files and run them.
+> 5. --output/-o: Create the folder with given name and dump output of
+>    each test in a hierarchical way.
+> 6. Add summary at the end.
+>=20
+> Runner needs testcase files which are provided in the previous patch.
+> Following are the examples to start the runner (cwd is
+> tools/testing/selftests/kvm)
+
+The runner definitely needs a command line option to specify the path to th=
+e
+test executables.  Defaulting to in-tree builds is totally fine, but we sho=
+uld
+also support out-of-tree builds (or copying to a remote host, etc.).
+
+The default testcases will have relative paths, e.g. $arch/$test, so the us=
+er
+will still need to maintain the same directory structure as in-tree builds,=
+ but
+IMO that's totally fine.
+
+> - Basic run:
+>   python3 runner --test_dirs testcases
+>=20
+> - Run specific test
+>   python3 runner --tests ./testcases/dirty_log_perf_test/default.test
+>=20
+> - Run tests parallel
+>   python3 runner --test_dirs testcases -j 10
+>=20
+> - Run 5 tests parallely at a time, with the timeout of 10 seconds and
+>   dump output in "result" directory
+>   python3 runner --test_dirs testcases -j 5 -t 10 --output result
+>=20
+> Sample output from the above command:
+>=20
+> python3_binary runner --test_dirs testcases -j 5 -t 10 --output result
+>=20
+> 2025-02-21 16:45:46,774 | 16809 |     INFO | [Passed] testcases/guest_pri=
+nt_test/default.test
+> 2025-02-21 16:45:47,040 | 16809 |     INFO | [Passed] testcases/kvm_creat=
+e_max_vcpus/default.test
+> 2025-02-21 16:45:49,244 | 16809 |     INFO | [Passed] testcases/dirty_log=
+_perf_test/default.test
+
+
+Printing the timestamps to the console isn't terrible interesting, and IMO =
+isn't
+at all worth the noise.
+
+The PID is nice, but it needs to be printed _before_ the test finishes, and=
+ it
+needs to track the PID of the test.  If getting that working is non-trivial=
+,
+definitely punt it for the initial commit.
+
+And presumably INFO is the level of logging.  That needs to go.
+
+> ...
+> 2025-02-21 16:46:07,225 | 16809 |     INFO | [Passed] testcases/x86_64/pm=
+u_event_filter_test/default.test
+> 2025-02-21 16:46:08,020 | 16809 |     INFO | [Passed] testcases/x86_64/vm=
+x_preemption_timer_test/default.test
+> 2025-02-21 16:46:09,734 | 16809 |     INFO | [Timed out] testcases/x86_64=
+/pmu_counters_test/default.test
+
+I would really like to have terminal colored+bolded output for tests that f=
+ail
+(or timeout) or are skipped.
+
+I think we should also provide controls for the verbosity of the output.  E=
+.g. to
+skip printing tests that pass entirely.  My vote would be for a collection =
+of
+boolean knobs, i.e. not a log_level or whatever, because inevitably we'll e=
+nd up
+with output that isn't strictly "increasing".
+
+Adding a param to disable printing of passed tests is presumably trivial, s=
+o maybe
+do that for the initial commit, and then we can work on the fancier stuff?
+
+> 2025-02-21 16:46:10,202 | 16809 |     INFO | [Passed] testcases/hardware_=
+disable_test/default.test
+> 2025-02-21 16:46:10,203 | 16809 |     INFO | Tests ran: 85 tests
+
+It would be very nice to have a summary of things printed out periodically.=
+  E.g.
+if my normal run has a few failures, but the current run has already failed=
+ a
+decent number of tests, then I'd probably kill the run and start debugging.
+
+Alternatively, and maybe even better, would be to make the runner mildly in=
+teractive,
+i.e. to accept rudimentary commands while tests are running.  Then the user=
+ can
+query the state of things while the runner is still doing its thing.  E.g. =
+bind
+a few keys to print the various statuses.
+
+> 2025-02-21 16:46:10,204 | 16809 |     INFO | Passed: 61
+> 2025-02-21 16:46:10,204 | 16809 |     INFO | Failed: 4
+> 2025-02-21 16:46:10,204 | 16809 |     INFO | Skipped: 17
+> 2025-02-21 16:46:10,204 | 16809 |     INFO | Timed out: 3
+> 2025-02-21 16:46:10,204 | 16809 |     INFO | No run: 0
+
+A not-quite-mandatory, but very-nice-to-have feature would be the ability t=
+o
+display which tests Passed/Failed/Skipped/Timed Out/Incomplete, with comman=
+d line
+knobs for each.  My vote is for everything but Passed on-by-default, though=
+ it's
+easy enough to put a light wrapper around this (which I'll do no matter wha=
+t), so
+my preference for the default doesn't matter all that much.
+
+That could tie into the above idea of grabbing keys to print such informati=
+on on-demand.
+
+Also CTRL-C handling needs much more graceful output.  Ideally, no stack tr=
+aces
+whatsover, and instead a summary like the above, but with information about=
+ which
+tests didn't complete.
+
+> Output dumped in result directory
+>=20
+> $ tree result/
+> result/
+
+The runner should have an (on-by-default?) option to abort if the output di=
+rectory
+already exists, e.g. so that users don't clobber previous runs.  And/or an =
+option
+to append a timestamp, e.g. $result.yyyy.mm.dd.MM.SS, so that all users don=
+'t end
+up writing the same wrapper to generate a timestamp.
+
+Having a no-timestamp + overwrite mode is also useful, e.g. when I'm runnin=
+g in
+a more "interactive" mode where I'm doing initial testing of something, and=
+ I
+don't care about
+
+> =E2=94=9C=E2=94=80=E2=94=80 log
+> =E2=94=94=E2=94=80=E2=94=80 testcases
+>     =E2=94=9C=E2=94=80=E2=94=80 access_tracking_perf_test
+>     =E2=94=82=C2=A0=C2=A0 =E2=94=94=E2=94=80=E2=94=80 default.test
+>     =E2=94=82=C2=A0=C2=A0     =E2=94=9C=E2=94=80=E2=94=80 stderr
+>     =E2=94=82=C2=A0=C2=A0     =E2=94=94=E2=94=80=E2=94=80 stdout
+>     =E2=94=9C=E2=94=80=E2=94=80 coalesced_io_test
+>     =E2=94=82=C2=A0=C2=A0 =E2=94=94=E2=94=80=E2=94=80 default.test
+>     =E2=94=82=C2=A0=C2=A0     =E2=94=9C=E2=94=80=E2=94=80 stderr
+>     =E2=94=82=C2=A0=C2=A0     =E2=94=94=E2=94=80=E2=94=80 stdout
+> ...
+>=20
+> results/log file will have the status of each test like the one printed
+> on console. Each stderr and stdout will have data based on the
+> execution.
+>=20
+> Runner is implemented in python and needs at least 3.6 version.
+>=20
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+
+...
+
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selft=
+ests/kvm/.gitignore
+> index 550b7c2b4a0c..a23fd4b2cb5f 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -11,3 +11,4 @@
+>  !Makefile
+>  !Makefile.kvm
+>  !*.test
+> +!*.py
+
+Sort this alphabetically as well.
+
+> +def fetch_test_files(args):
+> +    exclude_dirs =3D ["aarch64", "x86_64", "riscv", "s390x"]
+
+These are now:
+
+arm64, x86, riscv, s390
+
+> +    def __init__(self, test_path, output_dir=3DNone, timeout=3DNone,):
+> +        test_command =3D pathlib.Path(test_path).read_text().strip()
+> +        if not test_command:
+> +            raise ValueError("Empty test command in " + test_path)
+> +
+> +        if output_dir is not None:
+> +            output_dir =3D os.path.join(output_dir, test_path)
+
+This doesn't do the right thing if test_path is absolute (or maybe it's if =
+the
+output_dir is in a completely different hierarchy?)
+
+I was able to fudge around this with=20
+
+diff --git a/tools/testing/selftests/kvm/runner/selftest.py b/tools/testing=
+/selftests/kvm/runner/selftest.py
+index cdf5d1085c08..3bce023693cb 100644
+--- a/tools/testing/selftests/kvm/runner/selftest.py
++++ b/tools/testing/selftests/kvm/runner/selftest.py
+@@ -30,7 +30,8 @@ class Selftest:
+             raise ValueError("Empty test command in " + test_path)
+=20
+         if output_dir is not None:
+-            output_dir =3D os.path.join(output_dir, test_path)
++            dirpath, filename =3D os.path.split(test_path)
++            output_dir =3D os.path.join(output_dir, os.path.basename(dirpa=
+th), filename)
+         self.test_path =3D test_path
+         self.command =3D command.Command(test_command, timeout, output_dir=
+)
+         self.status =3D SelftestStatus.NO_RUN
+
+Lastly, please don't wrap agressively (off-list, you mentioned it was due t=
+o a
+formatter?).  E.g.
+
+diff --git a/tools/testing/selftests/kvm/runner/test_runner.py b/tools/test=
+ing/selftests/kvm/runner/test_runner.py
+index b9d34c20bf88..5a568e155477 100644
+--- a/tools/testing/selftests/kvm/runner/test_runner.py
++++ b/tools/testing/selftests/kvm/runner/test_runner.py
+@@ -12,8 +12,7 @@ class TestRunner:
+         self.tests =3D []
+=20
+         for test_file in test_files:
+-            self.tests.append(selftest.Selftest(
+-                test_file, output_dir, timeout))
++            self.tests.append(selftest.Selftest(test_file, output_dir, tim=
+eout))
+=20
+     def _run(self, test):
+         test.run()
