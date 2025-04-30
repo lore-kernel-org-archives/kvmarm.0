@@ -1,87 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12C8267B85
-	for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 20:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8183D1854;
+	Wed, 30 Apr 2025 00:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745958507; cv=none; b=lrjWg+tebTqEDNpbGj5moXuki+VChUPvubqot24yXiN5HlbRD0eHftsJWSQRWww45enVcuNB/9Dyv2HIjGR7tUDiHfUqEgTI6bVvyFGCg7P/wkgHTamQONuSGhCBtjKO4Is8EbmPBMoI9IeQnjFIeZFGnDoH7kCkOI1qmDY5G/o=
+	t=1745974116; cv=none; b=YyfXGRj9prn42ZVYyZA9pLcTHxqJbAXFsq7+We66zAHkk2xk8Cbo2PLfAOnOVliCbywuOC2YrPWfksFPqBSZldP86UOJlPoPGEdKz2FPImb02ahZDifaobgqtXiuaAUiC7gNukAnd43WESh7bI6BCsFbPlsFY9CF/0WJd456Er4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745958507; c=relaxed/simple;
-	bh=ox3lx5JlJ8b5ZVrs7yb4Ryi6efyD6oZG+SX4GVnpUQ0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rbmm+JVP9G+waPFN4Z3Jg/DH62tTOEDUTu3MLUJ5nuQ1C8i+WJor1iap407/2bKCTybz1rO2lUNPVJfrDwzqG4vlj0r0SfS7JIi4ADHKtIHdny4KrhBC3cezf6QVz1m02NCSzeFK0h3Eumnut5aPzuj9C4GH5//WK6FCaGiRBz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IgK0Q+KT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745974116; c=relaxed/simple;
+	bh=VVFZTctHxV0J4BThDv/Rh1bu5X7V1E/RSG49b70KuFk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F3DtYWFeQKH4xNDwAOO0sRec0Bq/ashWMXNPZZOvz+hTmmxecTnAq/sB5+1onviG+PPCyf/WWXmazEX0TEotC34ev1U7JkVC9AAn6+iVMj/Ltj2KCByws719T5YZPLhOyqA4PA50TT8fuEFG0tvx1wM03/N4OP3EcE6SV5ubc9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NW+eklPw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IgK0Q+KT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD32C4CEEA;
-	Tue, 29 Apr 2025 20:28:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NW+eklPw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD11C4CEE3;
+	Wed, 30 Apr 2025 00:48:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745958506;
-	bh=ox3lx5JlJ8b5ZVrs7yb4Ryi6efyD6oZG+SX4GVnpUQ0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IgK0Q+KTnoknBdI0qBrfZEEOVwiUsIiTq7TZOWSVo5nqxDmsIIOI5tQCsQOejuIXM
-	 ZmhoDXq8c4JlVXS8Kx4eo1MN/bkEtdwWYIBiiRL7+tuHShNIydxOl+Ir5Iuc5LR7nz
-	 5k4QOqzSs+CziwyNEBW8e+v2uKZjNEEcYwVieS/Lx7j7IKHmL0xhpaZ65U4urXN9ra
-	 mIcoawHkHAK5hvo7xhHrwOe76zpSL3X4uQk3AjZwjFFmeVZt/a/4cRYXo7HobGuT6I
-	 TNxxY/jCii66xs4U2yJg70ZpRG3TouPBlWj70rp/xF5POQ4kzsN/Y0w9ZPgoiuUG0C
-	 I13Toccn/EaMA==
-From: Will Deacon <will@kernel.org>
-To: catalin.marinas@arm.com,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Yicong Yang <yangyicong@huawei.com>
-Cc: kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	shameerali.kolothum.thodi@huawei.com,
-	jonathan.cameron@huawei.com,
-	prime.zeng@hisilicon.com,
-	xuwei5@huawei.com,
-	yangyicong@hisilicon.com,
-	linuxarm@huawei.com
-Subject: Re: [PATCH 0/3] Two minor fixups around FEAT_E2H0
-Date: Tue, 29 Apr 2025 21:27:53 +0100
-Message-Id: <174593019872.429067.18438816126339860301.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20250329034409.21354-1-yangyicong@huawei.com>
-References: <20250329034409.21354-1-yangyicong@huawei.com>
+	s=k20201202; t=1745974115;
+	bh=VVFZTctHxV0J4BThDv/Rh1bu5X7V1E/RSG49b70KuFk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NW+eklPwrSa6qc0ANGDyz5ecCRQIwS8PesnSG7ZB0CPRIM67IQ+chPQENuKAi8zd0
+	 Zm0R4pyyTFAJ92d2wvYK8KPthnCFMB4BchhmNBtnzWe8xgtVMFWUGiyoWKvSGNE2Fw
+	 ENRTIbvu37efEZw9Qc9JXc3kQFVt9iN7UUm1kJrvcFFzdq6cNsGSE7nkA+c7mr4XpO
+	 1Lzs6pVxugKDBfktLfW4aEWSQIThcWbYpdZvOE+/EEUrwFtNI6r3Tq0J9zcYco04Ao
+	 uuPddb65DCIMCvzEIGz8vbggqDjU6uZxMsTS6t7v1flq7FdDn5fM4GFDvj9xs+TbRA
+	 /7/jj5o1gfZ/A==
+Date: Wed, 30 Apr 2025 09:48:31 +0900
+From: Mark Brown <broonie@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: selftests: add test for SVE host corruption
+Message-ID: <aBFzXw-ASk1bXQvx@finisterre.sirena.org.uk>
+References: <20250417-kvm-selftest-sve-signal-v1-1-6330c2f3da0c@kernel.org>
+ <aBDv39FD7eDYoplg@J2N7QTR9R3.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="C+U9jvApfUFUi2KB"
+Content-Disposition: inline
+In-Reply-To: <aBDv39FD7eDYoplg@J2N7QTR9R3.cambridge.arm.com>
+X-Cookie: Well begun is half done.
 
-On Sat, 29 Mar 2025 11:44:06 +0800, Yicong Yang wrote:
-> Two minor fixups for the FEAT_E2H0:
-> 1) add missing feature register update
-> 2) fix boot warning with kvm-arm.mode=nvhe if !FEAT_E2H0
-> 
-> Add a cpucap identify the HCR_EL2.E2H RES1 (!FEAT_E2H0) support.
-> 
-> Yicong Yang (3):
->   arm64/cpufeature: Add missing id_aa64mmfr4 feature reg update
->   arm64/cpufeature: Add cpucap for HCR_EL2.E2H RES1 (!FEAT_E2H0)
->   KVM: arm64: Fix boot warning with kvm-arm.mode=nvhe on !FEAT_E2H0
->     platforms
-> 
-> [...]
 
-Applied first patch only to arm64 (for-next/cpufeature), thanks!
+--C+U9jvApfUFUi2KB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-[1/3] arm64/cpufeature: Add missing id_aa64mmfr4 feature reg update
-      https://git.kernel.org/arm64/c/35382a364640
+On Tue, Apr 29, 2025 at 04:27:27PM +0100, Mark Rutland wrote:
+> On Thu, Apr 17, 2025 at 12:32:49AM +0100, Mark Brown wrote:
 
-Cheers,
--- 
-Will
+> > Signed-off-by: Mark Brown <broonie@kernel.org>
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+> Looks like my Signed-off-by got dropped by accident; it should be above
+> yours here.
+
+> Aside from that, and the initial feature test, this looks pretty much
+> identical to my original WIP.
+
+Sorry, for a while I had a version of the program that was a lot more
+modified (I was trying to make it work with a wider range of supervised
+programs) so it didn't feel right to carry your SoB forward, but those
+didn't actually go all the way to working enough to enable any of the
+additional programs I was looking at so I ended up unwinding them and
+didn't also unwind that change.
+
+> I'm not sure if it's worth keeping all the printf() calls, which were
+> only there to help me check the UDF trap was being handled correctly.
+
+I've found them handy when using it.
+
+--C+U9jvApfUFUi2KB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmgRc10ACgkQJNaLcl1U
+h9AtJAf+MbIe0znLqzLeaZE59FpZ7imkJVYN6BNayn6dR6KSH0ba5TR2bJ6BOB+F
+420HSoFS7860BB8M5gF1SYpt0BfhiwjXrCFEBjh/CI4n7XhIJKgWodPjFsSN4hIA
+scNzDwbQ8TSF6N2BV/Wqa1y6SX2qE6HcSEsS3kiIn8dcPFXWKwxMAypCXPJpVF6p
+SfQKTaqgkOkQBHW4TrPMbA20jdgLgGnYfGtB77/1VgTWfqaULkOc16bYSPVTYvu7
+DXXhpzMrMwzCLSPIS9t9c3IZDSQKyeyk5SM2O17y5moR2ymnTSBRtR9aA1IQh+AJ
+D/dD4tw21AQDTCp5d5zWoqSLzmIeyg==
+=V8X6
+-----END PGP SIGNATURE-----
+
+--C+U9jvApfUFUi2KB--
