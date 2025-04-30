@@ -1,71 +1,71 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A246E1D86D6
-	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 05:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD56D1E0E1A
+	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 05:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745992069; cv=none; b=lEGWqqjnoavuTmQo+44UyYbXMd/L/zHDVfUH86NTRK1Q4jcuCfsTQImcfpRgEoKWF0gmbzjAP4QVOvYiMoq9Fw9LcJIIgRbI/YToh/4+YkC+pwHLhYwtlF7xDKEOe7Ibnyvb0Q0uV9pAz3U/COw6A8g6PaZQ/1QJ9kKtjB0oB1E=
+	t=1745992463; cv=none; b=cXHboL6z9YtXUW8C0/rn1hg6UzyI7lYvF+In0Dys13no3yl3TzqpnpWezSg0co0vWnd3EtBGX0BZjwLnCjsgCC6/jsLs71/fWIG6CxozybgqCZIjThTmPmhh6MMoGylDRLt1tSmdDzFp+8TnNodTVjinXPShWw3XHg/eQiqb7UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745992069; c=relaxed/simple;
-	bh=0Gj8CKa062ZMAoAEd5s2NoFzkcBqpVYig5/ML9jfLCo=;
+	s=arc-20240116; t=1745992463; c=relaxed/simple;
+	bh=gjiijpuNZ8eaxb49J32vdBIrEm2hghOHXs5lHIIU/Wg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nw95NJhNtwbD7+XYXTGDq+y7v2gDDDU7yCo3T9CovTJviO6g2+9mTOo/6sn6BSwDhnjDk+RckLjroCl1KGpDoLPQExeG0K5niIMcxLNGrQKgqva/qnA6aR7P91v7qmubjHv+BVs622oAQGozrFtmJWzeJBKCi/OWbhPZrf74zCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jx6aVOCI; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=AFiaYQ/CrwWPSdy8zLPUQhEeo0pOMQN+vRr4XsQ+ozhIoSY4Z026thoPcas5y3msiAwLmjn4XbxBbvgK4b16DdhTMMYHV2OH68xy/hFGlXydtBgE3F182CowZZ15Rg4XTVUxQaWOkcx7G2Aen+BQkDuo+KKlSO831wMsgfSGq/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hZwUs5rW; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jx6aVOCI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hZwUs5rW"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745992065;
+	s=mimecast20190719; t=1745992459;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=979akrJcal7eXFEBBeKgkEGR2Z+cXNr2mNqqWnT1LPM=;
-	b=Jx6aVOCIXa0B01cJDxU4ZLcQTdhCZXkoYdm+ohunwj3YZeKU3kq0d6SCZRGEdZgPdcO3dz
-	2rSXbZivZVPCI7sI0saXmgE8C47E874hxxxiV94h8eiPCjGBbbR9nSNhrTFQrgxEnXI8KK
-	TyivIbvlbqTDgTdN+zzBAdGdrPdAIy4=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bIGWFGarGyFIijKMOzGh/uSVQg6azY82PqS3bKeu+Kk=;
+	b=hZwUs5rWgk56EPiga55icA2l4rDrSxK2Db74ZHyyIwn01rgLnJETFFYfg5Z05IDGOo3H/Z
+	R9WuQcLKgCDqg+3sPFZlGE8fXJHbhgf50QNUtsjcsBokeNu9roPy/4++Hen65v7m42lH+u
+	LMaRgglVaxMgispzxKwcsMQXO/ILlqY=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-WXtu4rLiN_qOgzmzkYvpBQ-1; Wed, 30 Apr 2025 01:47:43 -0400
-X-MC-Unique: WXtu4rLiN_qOgzmzkYvpBQ-1
-X-Mimecast-MFC-AGG-ID: WXtu4rLiN_qOgzmzkYvpBQ_1745992062
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b1442e039eeso3891783a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 22:47:43 -0700 (PDT)
+ us-mta-552-5AQkYsuxO2iUVRgDs7wexA-1; Wed, 30 Apr 2025 01:54:18 -0400
+X-MC-Unique: 5AQkYsuxO2iUVRgDs7wexA-1
+X-Mimecast-MFC-AGG-ID: 5AQkYsuxO2iUVRgDs7wexA_1745992457
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-736c1ea954fso3491767b3a.3
+        for <kvmarm@lists.linux.dev>; Tue, 29 Apr 2025 22:54:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745992062; x=1746596862;
+        d=1e100.net; s=20230601; t=1745992457; x=1746597257;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=979akrJcal7eXFEBBeKgkEGR2Z+cXNr2mNqqWnT1LPM=;
-        b=be6iPMr8AnE9Q3gM3K4A0P1mKSkyL/rzaIjN5sJJylzKrNPAl8IRjTrB5VzVpnqvVB
-         X1JFBBwVWTr+fA5t5hAHj8uw2jqFlR98SrO3dudMRVW3YwDUgCNR4hGxv0xeMdE83z6C
-         OaEtZqCMDNGpVN1ARtOd33d59wFYlh3srqnyY5T0XHuNdsaffGiZxZ/LCBk8dlEV56IW
-         jFFX04jFtzky+VLF3FUkTCBmXBholNFJ8U+RFHAZlOInB9uUP5vIs0MPNfawj/yHOum0
-         f14fK77kHSkZgv+d2K+pRbp1T7A7lclvEi8QIjeEfNkbB9o90IQy0C+eEt5d85XBHLYP
-         /3fA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCM1yY61F9HaGqsBOZUrwikrHicusblxk0G3Hivgb9Nf2gF2zK0/7O+mchcHxYcfZW3CEMeos=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwDz78Bn0akUzqaFBIwR2sQf5/5HYd8mzygsuU8Xxoz12keVq+i
-	yooL2XN/vJILyIBW/TZBV8K68+BDl+TtRAGQgfCF2X+9JfpI1r5hJDNYUeNqMkvimiIaZkg3YNi
-	3MVhBwWHu3Gs89V6lFJ/N0pjDl/g6X0r6PF4lJBkHFbgfHfIIIlmKNw==
-X-Gm-Gg: ASbGncsRgsfczSW4FY6DBm33iCcaj4srCcqPW51At4kdA6mNhOHGvYubUjpkzBEeAcN
-	6dfAOPEkI+NOyqJ4EbRQcRpbOkYH7WBM2L8JaPafKrvjsq8WUYGbwA9ZbCc47b+rQGrWePw6VXv
-	lBXhdPO7o8p2OADBhuk1M4eis8JQHoLw6hDxiNXCthmrmcpZmBk5EyMjkpvrOid6KjhdcPtS9SW
-	qrEbv3z9hEM7sReWtT26vPHnjgxx04l+8N02lmwdHufuJyeiJj1RpsN7EeN116xgCvl+QRSZHSL
-	0hakwaLIQKKM
-X-Received: by 2002:a05:6a20:6f0a:b0:203:de5e:798c with SMTP id adf61e73a8af0-20a87758d04mr2491499637.18.1745992062579;
-        Tue, 29 Apr 2025 22:47:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2yvTT56xhp4nevnnTnhdd5Vxurc2bkepUSfMbuUK1rX9UIiG+hWa401GgVAzKuOXYEii5qQ==
-X-Received: by 2002:a05:6a20:6f0a:b0:203:de5e:798c with SMTP id adf61e73a8af0-20a87758d04mr2491475637.18.1745992062247;
-        Tue, 29 Apr 2025 22:47:42 -0700 (PDT)
+        bh=bIGWFGarGyFIijKMOzGh/uSVQg6azY82PqS3bKeu+Kk=;
+        b=bg4hr3La1RRXBd1FniJxjzEpB17TEcC2J4YaUV3XqbVKgAlTK0SqbKdi0lQlA+M331
+         mv4qecj0XUgVZMZZjhZ+4LD0rrN3sj1M3uuTHF+Lao1hDo+6EFC84R478C4mCfxwP4w2
+         0JnrC9JzeAfEMVfdY1YfcKwSGPjgWr/JqWjXMPG1QMjSP2u+Wls9/WiF0SJ4EtirlENc
+         oa+Veg0YgsjjAi/r25g4WGv9la/svzU6q9v0dpzF2vjlgoqjdj2VDzhaBQg5594VzJ1j
+         rMXYWwdfMOudM0+7XRgOcilUeDmpiB5eSdgZoIFsOJ9rpEfWB52YNePfwzaJ3jHZqVR7
+         0WQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXjvitxrp9Stwu6vzIblUbPX0dHn7LvvUkA0HS0Ex/hpOeIgC9+BWzRrhtbDML1aOuo3FWvdG4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwOS8TJQwf4Idkv/IC0Qz5AUAXKKvJSgB2Cmw/j5g78I6w3ePnI
+	4U6fM8eGT2DpW8ovcrsw7FjKXiX8IdIGJEHH73trclpIqJOn4FpJspMRN98/PCooA3YSD9Ve8aX
+	k8nBaHBpMGCjXOW6ANufYj1sNljJxPcLZpACws6UCVAQwKyhVBQ9uQA==
+X-Gm-Gg: ASbGncsZaR/xrxhB3GVmucFoEwvGz7H/ku6/Yxihb9OhufKEKtTg+yPUeEGh3gOx7Qz
+	nQpIXbmY8vQNLAt0wKwS26BR6eMWEiEXfXlPU0jJFnlD1b8Dxvqp18wQiAhRJxV70ScQPQpIq8P
+	kHWnM0o5PKBc0avI5I3Uesm8k/zcvs3l/u/LyBmQiCQERZ9hVfPp4gspbjrRG6Nnscv54bdsWB9
+	dYgZspzGOvUn2vXTXy0bkJN+/gapbwkIGlO00/YQ65ZmlPugWwx422IHXRH88w017w9AlHD6I28
+	6pfOLDavrj4s
+X-Received: by 2002:a05:6a20:6f09:b0:1ee:c7c8:ca4 with SMTP id adf61e73a8af0-20a89a00bbcmr2861336637.36.1745992457142;
+        Tue, 29 Apr 2025 22:54:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHUXFSfIAhV0jE/BzfNUpot5jDexa8qPOr5xBP2FVKQDAqbgwsZM0ilxjtUmRqioxNOvLSyig==
+X-Received: by 2002:a05:6a20:6f09:b0:1ee:c7c8:ca4 with SMTP id adf61e73a8af0-20a89a00bbcmr2861303637.36.1745992456803;
+        Tue, 29 Apr 2025 22:54:16 -0700 (PDT)
 Received: from [192.168.68.51] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74039a3100dsm787733b3a.90.2025.04.29.22.47.34
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74039a94aecsm792360b3a.178.2025.04.29.22.54.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Apr 2025 22:47:41 -0700 (PDT)
-Message-ID: <9c998d71-0368-4f93-ab37-7933bec9b419@redhat.com>
-Date: Wed, 30 Apr 2025 15:47:33 +1000
+        Tue, 29 Apr 2025 22:54:16 -0700 (PDT)
+Message-ID: <dda34de7-703b-4d9c-8666-c1a195327f32@redhat.com>
+Date: Wed, 30 Apr 2025 15:54:08 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 09/43] KVM: arm64: Allow passing machine type in KVM
- creation
+Subject: Re: [PATCH v8 12/43] KVM: arm64: vgic: Provide helper for number of
+ list registers
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -90,38 +90,85 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-10-steven.price@arm.com>
+ <20250416134208.383984-13-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250416134208.383984-10-steven.price@arm.com>
+In-Reply-To: <20250416134208.383984-13-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: b0RhW424xRR7X3RMQaw3KsHTmdK5ilWMs-VzIUoB-jw_1745992062
+X-Mimecast-MFC-PROC-ID: vpJiX4KaPjhmsFJl-tSiWDddA0KglX9Pmkyi1LXCqsg_1745992457
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 4/16/25 11:41 PM, Steven Price wrote:
-> Previously machine type was used purely for specifying the physical
-> address size of the guest. Reserve the higher bits to specify an ARM
-> specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
-> used to create a realm guest.
+> Currently the number of list registers available is stored in a global
+> (kvm_vgic_global_state.nr_lr). With Arm CCA the RMM is permitted to
+> reserve list registers for its own use and so the number of available
+> list registers can be fewer for a realm VM. Provide a wrapper function
+> to fetch the global in preparation for restricting nr_lr when dealing
+> with a realm VM.
 > 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
-> Changes since v7:
->   * Add some documentation explaining the new machine type.
-> Changes since v6:
->   * Make the check for kvm_rme_is_available more visible and report an
->     error code of -EPERM (instead of -EINVAL) to make it explicit that
->     the kernel supports RME, but the platform doesn't.
+> New patch for v6
 > ---
->   Documentation/virt/kvm/api.rst | 16 ++++++++++++++--
->   arch/arm64/kvm/arm.c           | 15 +++++++++++++++
->   arch/arm64/kvm/mmu.c           |  3 ---
->   include/uapi/linux/kvm.h       | 19 +++++++++++++++----
->   4 files changed, 44 insertions(+), 9 deletions(-)
+>   arch/arm64/kvm/vgic/vgic.c | 11 ++++++++---
+>   1 file changed, 8 insertions(+), 3 deletions(-)
 > 
 
+With below nitpick addressed:
+
 Reviewed-by: Gavin Shan <gshan@redhat.com>
+
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 8f8096d48925..8d189ce18ea0 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -21,6 +21,11 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+>   	.gicv3_cpuif = STATIC_KEY_FALSE_INIT,
+>   };
+>   
+> +static inline int kvm_vcpu_vgic_nr_lr(struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_vgic_global_state.nr_lr;
+> +}
+> +
+>   /*
+>    * Locking order is always:
+>    * kvm->lock (mutex)
+> @@ -802,7 +807,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>   	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+>   
+>   	count = compute_ap_list_depth(vcpu, &multi_sgi);
+> -	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
+> +	if (count > kvm_vcpu_vgic_nr_lr(vcpu) || multi_sgi)
+>   		vgic_sort_ap_list(vcpu);
+>   
+>   	count = 0;
+> @@ -831,7 +836,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>   
+>   		raw_spin_unlock(&irq->irq_lock);
+>   
+> -		if (count == kvm_vgic_global_state.nr_lr) {
+> +		if (count == kvm_vcpu_vgic_nr_lr(vcpu)) {
+>   			if (!list_is_last(&irq->ap_list,
+>   					  &vgic_cpu->ap_list_head))
+>   				vgic_set_underflow(vcpu);
+> @@ -840,7 +845,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	/* Nuke remaining LRs */
+> -	for (i = count ; i < kvm_vgic_global_state.nr_lr; i++)
+> +	for (i = count ; i < kvm_vcpu_vgic_nr_lr(vcpu); i++)
+>   		vgic_clear_lr(vcpu, i);
+>   
+
+The unnecessary space before the semicolon can be dropped.
+
+	for (i = count; i < kvm_vcpu_vgic_nr_lr(vcpu); i++)
+
+>   	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+
+Thanks,
+Gavin
 
