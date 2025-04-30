@@ -1,64 +1,66 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA0725EF94
-	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 16:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E571262FDB
+	for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 16:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746030447; cv=none; b=MgktzdztaTW62fgeYlMkEcv/94x5CYgTNsnUw3nCfBBlBTd8kSvjcnI8rAYRAnReOxoBxnmMpAFf9QwjDkaOOTn6qlh6ZxdmxwzbVZPFInp6cNGytkEBz6rJtwqlEov+Pv8OVW19uw6bTlKfCgvPwXVI+XG82oyB7lTdjeUKUqA=
+	t=1746030449; cv=none; b=lvy85Bc1ZfE5WsUQGwiXfIxRwvTDjoo2Ke3v/YmCruTjiN7qhwY7oJ4U2guiA4AAhDbKAG2W69eJIfqUwDNbe3mXYsLn8kb7ec+COxUPjkEizZCxQJXu6ZonbGuBJy6QehDmaCZEaiSln9Xdi3A+6ycC8xV20oCZC9zuAeQxwBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746030447; c=relaxed/simple;
-	bh=SLuh1vXjFWArp9DGV88WbiawPX5gMpDl3YY+JUPkHDc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JxKNpzUz7g31ixAmCmcOBc+NCB+41gEickKWVHPXRE+Ils38MDjrlF+OWBZMFryBbq1n/sLcKnXT2Erlj0xtTPOgSN9Fm+1V+nJuo2tor3QnzLxhbYq+MrNEkIFWc3RsceMobQMC8Xo5eOPWrNlo/a/xnnwxZ/dEY3wvogoewMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vhZMW3+y; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1746030449; c=relaxed/simple;
+	bh=nrCPdU0q/z+UhkgAcPbUE7M11/Gu6PDUNNKarNUhmLU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NGnNwtBDKH3BpdfOc8KHL75flTe7YxxSjJHn4VdQ1D2ifKXTSqN+vBurwCFODwluTH9Qw1//cpOQk/3jZ1BnIdDlnPaBITwyqce1/zOOCj5iPfcgKmR1fIUt99BKk/gGHeM59NQeZyyAjR8qasiBAlzLQPwtRgFSFcfLRvLPIYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4cPZEL7Y; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vhZMW3+y"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43ced8c2eb7so54119615e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 09:27:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4cPZEL7Y"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a08a1c0fc5so1332019f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 09:27:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746030444; x=1746635244; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=son2TtAYXWFKHIb+qv3GEJQE2heH3nn7VYU4EbNQqf8=;
-        b=vhZMW3+yo39f+og5TRwfQ2zPYXniEN2rX31GpHEERMcZxee/9URANeCvk6c8HjRZxa
-         xqg/zqZc8ykCwwP/GxKwE4VgsNtP6VhlMm6SpAhLsg1sJAvkz4YLezb2WU/hiTKnrWtR
-         +rRpX7j9aoBZBhfYYhwDixhyyjvDBLvFFmmXooNqnoULlm4BDGys996PSK1Q3BcVBUEp
-         KDu6i4xKre3BjbbTfKr5JLt5gXxKvpj5FKHQ9D4wFtfGJirtH1ElvKsuQnEt71p/aUGF
-         5nk+m3jg91fvJFXwQAbyOJT8MpP9be7DoxAEMahbIZKatq0CNt8E9W8DQTLVSvpNKMJy
-         BC/Q==
+        d=google.com; s=20230601; t=1746030446; x=1746635246; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Cc1UFbHiSntYShVPXAcoplaHQWwRkP8Qvo8LnShWWI=;
+        b=4cPZEL7Y+8ozZp5oKh50ZpGOLnwlCa7Viob+G0nvAWq9tDOe4zgP/yZ3VzF5/WiIKJ
+         G9h51ToRlOqXoCyMP709Truo+dp4kCI6nCiqUbw6sMJoajW2Cn8AtajyMACowsbNuH4N
+         zPfgYyIYWGX/rhkCbKGMzGUTIFpouF+bLkydunR2jejZQmuJCg+VfA9NLZVOR1LZyifX
+         8sr8C+HRspwghebiiKvpl20v+3nn3S1W89xoqyZ9cvix8mjh4EVhri2jXsvs4X8BrI6J
+         7ZThImfAqm/R+Rh8HOgNFHj3XHy3j0SunhoCCP2seq2uQ97E6ijAdUSOlz0SWJvULJiR
+         p6hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746030444; x=1746635244;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=son2TtAYXWFKHIb+qv3GEJQE2heH3nn7VYU4EbNQqf8=;
-        b=UjlcByI4zo7GcIxULi+5/qt+rZ78MZYfHbCcfqW3VtMIblzgW43wSQKJ0ZS7FUTmzD
-         hb9RQz3n9yL0B3j2X7TBoM+oovJvv3iWPimwWRCqeyiROQ8lAOcK+F0bzNFxhIQ9Dnqn
-         IQxKnAkeTXZsGprnbDA925mtnA4HH4StmTNu8NrBX7vKrB1MoV2i+Oy3sRUTWrxd5Oe8
-         1ye5YeVQqDN4m+ezct1WXRvO21u3c4B7zohrgB8TCFBL657c2+syDMYmI3UAplWdZsTI
-         NqpcQNHXdhmqwg92OBN1jglXTA4XzC5+QzkVNIgraHmS4ECqA1skXLx1lvuHfRpNn51f
-         PScA==
-X-Gm-Message-State: AOJu0YynkW1q6MQrV5xrnFJ3YXS0IBqQ2KAeri0SdJY8RR6p9+SRP/jv
-	9aYJpKxUG6YN1Ag0o0wLmoKPKEAuajjaK9LC/JGwcA3kwd1Zl8jvqpqmwBqOUNGbLYSXagIpuYe
-	TQQP0LzzEl0AdyCK/AbCzHAxY+pWvndBv/r5en/xV4GKu/TNfA7LXp6iLPG6xnGWzNpZGucAG9A
-	qzY/3P71UT0pIjp68/KXkhi/QF/IxqAJH/Fw5uCBJaTyM=
-X-Google-Smtp-Source: AGHT+IFQ2Mdes0eRtKfnxWeLvHYhOcWYODGlYYFwAfRst9gZKnEGAYllVA7JEZatII5sz3zXBjKQtfWJvzFPDQ==
-X-Received: from wmqb17.prod.google.com ([2002:a05:600c:4e11:b0:440:5e10:a596])
+        d=1e100.net; s=20230601; t=1746030446; x=1746635246;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Cc1UFbHiSntYShVPXAcoplaHQWwRkP8Qvo8LnShWWI=;
+        b=I+CxCgBUhwREtG8sB1KOW2Z9w+Uwu9JI+PAMVELQb7H7M9fFTnEOuyFLB83Zp5UZYR
+         Qeo7nKTrKlm3aTEZnPZ0EV7h1uaQAKUPaGgPKxVRUXNiDgGVihb6FY2gcO0XgVj4Ik15
+         lmwSG/uFWxYNB3+teRaSUKcOBvW8OB2aLnWECKm4TBfUeT9VqJFs9PeBNVUQ9Ij920a4
+         vqE4kEATKR8VbdZRgZxI3lQjKRGEofxCeCJKAnPZN+niRzyPjtZAO/ItrxC9f7SwyOdG
+         p6Dbqxhkhfy6IgZM0QCK0C8e3YdltrTA7WSD2lfihudjSV09oxuJeAr0H8u0T2c8WcAx
+         ltrw==
+X-Gm-Message-State: AOJu0YyQ+xaw6XsCjnwQghWvw72Zqtz0lVcoAvIJNZH/8lhY8fD00v2n
+	ol7HYsz5FLK/v5xfZ0fPLl9rSFp2jG1JrVyx9lOQJTf7/PZJBgS2r/qCWBxOUmMW1w85KYmK74i
+	rHgMtWOlBcf2RfJ131yRwhvGA+hbcYpm8uFLms5A4KaNTnadNTsU0xmVB9uZayvLIjw1omTPn1E
+	YBPh3NEUWTn4MeliQnrxjoTW7LJlOVJoeo2PwzMpTTW3g=
+X-Google-Smtp-Source: AGHT+IHDzYZhWgLNGxcyelrM4O2AAV3CEZWXJdSJ7SeEaiIFmtJryw2vi0tu8g2u+0VnUpRP7QxKQEtc5Ig7EQ==
+X-Received: from wrbfu6.prod.google.com ([2002:a05:6000:25e6:b0:39a:bcee:e7a1])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1f0c:b0:43d:b51:46fb with SMTP id 5b1f17b1804b1-441b1f31004mr39397195e9.2.1746030443778;
- Wed, 30 Apr 2025 09:27:23 -0700 (PDT)
-Date: Wed, 30 Apr 2025 16:27:07 +0000
+ 2002:a05:6000:420e:b0:3a0:847d:8326 with SMTP id ffacd0b85a97d-3a08f777d82mr3895576f8f.25.1746030445844;
+ Wed, 30 Apr 2025 09:27:25 -0700 (PDT)
+Date: Wed, 30 Apr 2025 16:27:08 +0000
+In-Reply-To: <20250430162713.1997569-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250430162713.1997569-1-smostafa@google.com>
 X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
-Message-ID: <20250430162713.1997569-1-smostafa@google.com>
-Subject: [PATCH v2 0/4] KVM: arm64: UBSAN at EL2
+Message-ID: <20250430162713.1997569-2-smostafa@google.com>
+Subject: [PATCH v2 1/4] arm64: Introduce esr_is_ubsan_brk()
 From: Mostafa Saleh <smostafa@google.com>
 To: kvmarm@lists.linux.dev, kasan-dev@googlegroups.com, 
 	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, 
@@ -72,81 +74,46 @@ Cc: will@kernel.org, maz@kernel.org, oliver.upton@linux.dev,
 	nathan@kernel.org, nicolas.schier@linux.dev, 
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Many of the sanitizers the kernel supports are disabled when running
-in EL2 with nvhe/hvhe/proctected modes, some of those are easier
-(and makes more sense) to integrate than others.
-Last year, kCFI support was added in [1]
+Soon, KVM is going to use this logic for hypervisor panics,
+so add it in a wrapper that can be used by the hypervisor exit
+handler to decode hyp panics.
 
-This patchset adds support for UBSAN in EL2.
-UBSAN can run in 2 modes:
-  1) =E2=80=9CNormal=E2=80=9D (CONFIG_UBSAN_TRAP=3Dn): In this mode the com=
-piler will
-  do the UBSAN checks and insert some function calls in case of
-  failures, it can provide more information(ex: what is the value of
-  the out of bound) about the failures through those function arguments,
-  and those functions(implemented in lib/ubsan.c) will print a report with
-  such errors.
+Signed-off-by: Mostafa Saleh <smostafa@google.com>
+---
+ arch/arm64/include/asm/esr.h | 5 +++++
+ arch/arm64/kernel/traps.c    | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-  2) Trap (CONFIG_UBSAN_TRAP=3Dy): This is a minimal mode, where similarly,
-  the compiler will do the checks, but instead of doing function calls,
-  it would do a =E2=80=9Cbrk #imm=E2=80=9D (for ARM64) with a unique code w=
-ith the failure
-  type, but without any extra information (ex: only print the out-bound lin=
-e
-  but not the index)
-
-For nvhe/hvhe/proctected modes, #2 would be suitable, as there is no way to
-print reports from EL2, so similarly to kCFI(even with permissive) it would
-cause the hypervisor to panic.
-
-But that means that for EL2 we need to compile the code with the same optio=
-ns
-as used by =E2=80=9CCONFIG_UBSAN_TRAP=E2=80=9D independently from the kerne=
-l config.
-
-This patch series adds a new KCONFIG for ARM64 to choose to enable UBSAN
-separately for the modes mentioned.
-
-The same logic decoding the kernel UBSAN is reused, so the messages from
-the hypervisor will look similar as:
-[   29.215332] kvm [190]: nVHE hyp UBSAN: array index out of bounds at: [<f=
-fff8000811f2344>] __kvm_nvhe_handle___pkvm_init_vm+0xa8/0xac!
-
-In this patch set, the same UBSAN options(for check types) are used for bot=
-h
-EL1/EL2, although a case can be made to have separate options (leading to
-totally separate CFLAGS) if we want EL2 to be compiled with stricter checks
-for something as protected mode.
-However, re-using the current flags, makes code re-use easier for
-report_ubsan_failure() and  Makefile.ubsan
-
-[1] https://lore.kernel.org/all/20240610063244.2828978-1-ptosi@google.com/
-
-Changes from v1:
-- https://lore.kernel.org/all/20250416180440.231949-1-smostafa@google.com/
-- Collected Kees Acked-By
-- Rename CFLAGS flag to CFLAGS_UBSAN_TRAP
-- Small comment fix
-
-Mostafa Saleh (4):
-  arm64: Introduce esr_is_ubsan_brk()
-  ubsan: Remove regs from report_ubsan_failure()
-  KVM: arm64: Introduce CONFIG_UBSAN_KVM_EL2
-  KVM: arm64: Handle UBSAN faults
-
- arch/arm64/include/asm/esr.h     | 5 +++++
- arch/arm64/kernel/traps.c        | 4 ++--
- arch/arm64/kvm/handle_exit.c     | 6 ++++++
- arch/arm64/kvm/hyp/nvhe/Makefile | 6 ++++++
- arch/x86/kernel/traps.c          | 2 +-
- include/linux/ubsan.h            | 6 +++---
- lib/Kconfig.ubsan                | 9 +++++++++
- lib/ubsan.c                      | 8 +++++---
- scripts/Makefile.ubsan           | 5 ++++-
- 9 files changed, 41 insertions(+), 10 deletions(-)
-
---=20
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index e4f77757937e..350f02bf437d 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -440,6 +440,11 @@ static inline bool esr_is_cfi_brk(unsigned long esr)
+ 	       (esr_brk_comment(esr) & ~CFI_BRK_IMM_MASK) == CFI_BRK_IMM_BASE;
+ }
+ 
++static inline bool esr_is_ubsan_brk(unsigned long esr)
++{
++	return (esr_brk_comment(esr) & ~UBSAN_BRK_MASK) == UBSAN_BRK_IMM;
++}
++
+ static inline bool esr_fsc_is_translation_fault(unsigned long esr)
+ {
+ 	esr = esr & ESR_ELx_FSC;
+diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+index 529cff825531..224f927ac8af 100644
+--- a/arch/arm64/kernel/traps.c
++++ b/arch/arm64/kernel/traps.c
+@@ -1145,7 +1145,7 @@ int __init early_brk64(unsigned long addr, unsigned long esr,
+ 		return kasan_handler(regs, esr) != DBG_HOOK_HANDLED;
+ #endif
+ #ifdef CONFIG_UBSAN_TRAP
+-	if ((esr_brk_comment(esr) & ~UBSAN_BRK_MASK) == UBSAN_BRK_IMM)
++	if (esr_is_ubsan_brk(esr))
+ 		return ubsan_handler(regs, esr) != DBG_HOOK_HANDLED;
+ #endif
+ 	return bug_handler(regs, esr) != DBG_HOOK_HANDLED;
+-- 
 2.49.0.967.g6a0df3ecc3-goog
 
