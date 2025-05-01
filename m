@@ -1,126 +1,228 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA481F03C9
-	for <kvmarm@lists.linux.dev>; Thu,  1 May 2025 03:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3221E8855;
+	Thu,  1 May 2025 08:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746071447; cv=none; b=c2l06qro264/eXUeJYAWwqGVh9nsbdiz7ThA6jWnYdipBFbQ03gwx/mZq4Gs3hc8+Uz+YrgFX1k131mi1yROx757mNPgsA1r30N/ON64AwAg8o/VTkJGCSn73h4aUHGbd/jKHwg0ypgFnCCrDBZeUW/r4ZQfOYQ4ddVuJWQpkm4=
+	t=1746087856; cv=none; b=YEtsyNoUYHe2j+ONm4jHpckNl/6Zxv5pjIqF68N9Oc3PC+fxaNCraUlJknCGzhrYf1/pE/gdfPfOazRrN8OuMhAjPpXDzon8xHRkZbCKP8D6DsFpDMHLxrXfY/QiIK5IGDmFoseHSXRzd6eRCn8X6loG+xUDOen9/UqhmzFps8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746071447; c=relaxed/simple;
-	bh=2dAVFnoSWIkTOqjHfYENLB8pzU1NdvuV0xq8Gvel9G0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gejz3FMwUc2p2UZR71bpqU/CBKKqaT6zjLpC7ulf516MN132iNFaMWxhZSNUHsagWYs/unM7K5c/L+QlmYDdoIkuk2UHL9uQBanug0/MJFRuyidb+kJBBaeFgY1HYc8+Y5pXZl3NN5LpfCiFVTxIfggX5mGRciytZag/KR7ndls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IQWibwIc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746087856; c=relaxed/simple;
+	bh=FUtw7sDZdVXOm9Nv2svOTgxrCByJlvpP+UTjvuTtS1I=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FM5I6CuVokmwmn/0v6xlE1o9sRRAcUmFStDsfNdyl67edvRYmFkxVVYjytUydOZqqENx0prmVZ6NkDU1Rc44p1kMGKO+pjoJMmpzJB9Oz9I/orxdoym5n2VVihFBMsj/4FsGMW0ZTlChDnk9Ve1zF1l7oi0KfudCa/kU8iHRn90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O97L3cnM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IQWibwIc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746071444;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xu+Kf0+DFCNXRO2ndZGA8xUx9TD/werA57XUeiFDww0=;
-	b=IQWibwIcdfF/tz6XEWtD69Y1E/jrvkb0eq6SmtQgm9vHB40Dx3kTY6bgi/7VmTXnLwLtdX
-	O5EnP7FCTnfsFxF38MrkTFgB0XNUmimQMjEia4geXwnjptjzG9yGqQ6ns15Jej8fjhOHhY
-	Lagw9xCQvOAg30I/L/5WGh3xgWRkNFU=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-588-JerBRLQHMiqQP90Y1kkLGQ-1; Wed, 30 Apr 2025 23:50:41 -0400
-X-MC-Unique: JerBRLQHMiqQP90Y1kkLGQ-1
-X-Mimecast-MFC-AGG-ID: JerBRLQHMiqQP90Y1kkLGQ_1746071441
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-7375e2642b4so440903b3a.2
-        for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 20:50:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746071441; x=1746676241;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xu+Kf0+DFCNXRO2ndZGA8xUx9TD/werA57XUeiFDww0=;
-        b=ePov9ERPtoN1kiUGEptFAOuPRJuBdi8Hox94rTtnphbfWhPX/VpRO83cfqzwWXIRnP
-         4Xr5PIIpkgwz4wWheBWSyIut9rWu5NAz25vdJTqIKlwjydROnc37EwO2wrWYHWwS57OM
-         Jv/MyNO2XElwP7q6L0382NxKrKC1pHGDT3Dp4fN/5ICeQHcz8Er4DOq95xVnVSehjunC
-         qSyKSxD9pKXiou46TQZUucG/+hMLYf7Ipl3Kb3Y5eU4bPYhC5nGEDdLjBg4JjyxQdZII
-         aqkcSlINcllR9mZHFgBLLC0qEiFWemqeFmqSylHRSugFvJWd4eSnf/9AoZ387k2XGM1R
-         HOnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQzbJNviDUK1+0H6LTpmlVQtbdHp5647KUhihB95/o5kyn73S1nw3YFJAS+PcT8er1IWbqq3Q=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzkXPHSAln/13lEg55Y0gHMYGlZfKPyBBRYpIdN0/FjjmMNabn8
-	D28XB0/wUo2jhSlR8c/l6CRna1dwYjl+trcKJjEmbB2mOiIXe73PyDg/wsRwaGMdogZREGzEucB
-	YlYOeYS9RpDxjUV3+5+yfzc1A3DDjG73jvI1roWPMRnX2222OJ7E+rw==
-X-Gm-Gg: ASbGnctDDrzRlu7/8Ot6QlZnEc20hurdXxkM7iSekZPiUsupGeyCRUTTvkQ3P+oJcqz
-	zq2Wqb/EhHvsOmNE5PV/UxoUAgshzCIo9vZDLk1UQFLXLSdfF80IxGv+m1esQghKMVeC6cp2f87
-	/vcmyo+L3HHEW97TwXSi12TLngkWx1XvSshWeouwPuL8oOmTZ9zuRdBGZEHaojCQ2z3xGNVvwbD
-	CdcKjnvoeWDT8QFzvcv2vIMEWNDZ/ooGFH6J9AcyGF23DcCPXpgFw9wWC/qOIDSSI+5aGKFFXgL
-	04q6ImiX7MdH
-X-Received: by 2002:a05:6a00:2da3:b0:736:a82a:58ad with SMTP id d2e1a72fcca58-7404923a33dmr1298199b3a.15.1746071440948;
-        Wed, 30 Apr 2025 20:50:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF+2TUVWiAQRNStfJKlXXyrEy8i+Rkh7KlouLhbtQWVsBfOICdI6sUfx8nwE+QueIaBYA6F7Q==
-X-Received: by 2002:a05:6a00:2da3:b0:736:a82a:58ad with SMTP id d2e1a72fcca58-7404923a33dmr1298168b3a.15.1746071440658;
-        Wed, 30 Apr 2025 20:50:40 -0700 (PDT)
-Received: from [192.168.68.51] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74039a2e5ccsm2541439b3a.110.2025.04.30.20.50.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Apr 2025 20:50:40 -0700 (PDT)
-Message-ID: <87f40de1-dd3b-43e2-aa67-8d7b6288acf8@redhat.com>
-Date: Thu, 1 May 2025 13:50:31 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O97L3cnM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60251C4CEE3;
+	Thu,  1 May 2025 08:24:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746087855;
+	bh=FUtw7sDZdVXOm9Nv2svOTgxrCByJlvpP+UTjvuTtS1I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O97L3cnMvunZjO/0b3AD7mX6YsWjOA1AairfrKios6nfa+PekJx8V9jm72WccaYLD
+	 MFg2U9+xORpdBstItLdTn2jDJ/KEsIRT04HWQvHyQCbyTtG0ClRI3D/X2CD6XM+FOj
+	 /tz1rvNkqLQslwyHEIsvRxeQEF7oPqOkIM7OE5yCyUmforniQ2Wdg+RNlnV8cmfd9X
+	 16HjICyqst700kZfBgn5lDQrvldBI/haW5J2/qj7rZP5/M2+H5tq4/MkVCxXr+bLok
+	 BPs+unjgpwBK9BDZKgsuXLVUjyyxhBLmEvRC18HDlHZbiqF5SS0uUSHzhHrhH/LVHG
+	 92LXRRsmolgow==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uAPDI-00AWZy-KR;
+	Thu, 01 May 2025 09:24:12 +0100
+Date: Thu, 01 May 2025 09:24:11 +0100
+Message-ID: <864iy4ivro.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Waiman Long <longman@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Alexander Potapenko <glider@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Andre Przywara <andre.przywara@arm.com>,
+	x86@kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	kvm-riscv@lists.infradead.org,
+	Atish Patra <atishp@atishpatra.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+	Sebastian Ott <sebott@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Shusen Li <lishusen2@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when locking all vCPUs
+In-Reply-To: <20250430203013.366479-3-mlevitsk@redhat.com>
+References: <20250430203013.366479-1-mlevitsk@redhat.com>
+	<20250430203013.366479-3-mlevitsk@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 38/43] arm64: RME: Configure max SVE vector length for
- a Realm
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-39-steven.price@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250416134208.383984-39-steven.price@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: cLeAAI-fsc6fTm3h-1HarXwetxk7a0EL1P5ssW-zjBs_1746071441
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mlevitsk@redhat.com, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, jiangkunkun@huawei.com, longman@redhat.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, bhelgaas@google.com, boqun.feng@gmail.com, bp@alien8.de, aou@eecs.berkeley.edu, anup@brainfault.org, paul.walmsley@sifive.com, suzuki.poulose@arm.com, palmer@dabbelt.com, alex@ghiti.fr, glider@google.com, oliver.upton@linux.dev, andre.przywara@arm.com, x86@kernel.org, joey.gouly@arm.com, tglx@linutronix.de, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, mingo@redhat.com, jingzhangos@google.com, hpa@zytor.com, dave.hansen@linux.intel.com, kvmarm@lists.linux.dev, will@kernel.org, keisuke.nishimura@inria.fr, sebott@redhat.com, peterz@infradead.org, lishusen2@huawei.com, pbonzini@redhat.com, rdunlap@infradead.org, seanjc@google.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 4/16/25 11:42 PM, Steven Price wrote:
-> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> 
-> Obtain the max vector length configured by userspace on the vCPUs, and
-> write it into the Realm parameters. By default the vCPU is configured
-> with the max vector length reported by RMM, and userspace can reduce it
-> with a write to KVM_REG_ARM64_SVE_VLS.
-> 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v6:
->   * Rename max_vl/realm_max_vl to vl/last_vl - there is nothing "maximum"
->     about them, we're just checking that all realms have the same vector
->     length
-> ---
->   arch/arm64/kvm/guest.c |  3 ++-
->   arch/arm64/kvm/rme.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 44 insertions(+), 1 deletion(-)
-> 
+nit: in keeping with the existing arm64 patches, please write the
+subject as "KVM: arm64: Use ..."
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+On Wed, 30 Apr 2025 21:30:10 +0100,
+Maxim Levitsky <mlevitsk@redhat.com> wrote:
 
+[...]
+
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 68fec8c95fee..d31f42a71bdc 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1914,49 +1914,6 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  	}
+>  }
+>  
+> -/* unlocks vcpus from @vcpu_lock_idx and smaller */
+> -static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
+> -{
+> -	struct kvm_vcpu *tmp_vcpu;
+> -
+> -	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+> -		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
+> -		mutex_unlock(&tmp_vcpu->mutex);
+> -	}
+> -}
+> -
+> -void unlock_all_vcpus(struct kvm *kvm)
+> -{
+> -	lockdep_assert_held(&kvm->lock);
+
+Note this assertion...
+
+> -
+> -	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
+> -}
+> -
+> -/* Returns true if all vcpus were locked, false otherwise */
+> -bool lock_all_vcpus(struct kvm *kvm)
+> -{
+> -	struct kvm_vcpu *tmp_vcpu;
+> -	unsigned long c;
+> -
+> -	lockdep_assert_held(&kvm->lock);
+
+and this one...
+
+> -
+> -	/*
+> -	 * Any time a vcpu is in an ioctl (including running), the
+> -	 * core KVM code tries to grab the vcpu->mutex.
+> -	 *
+> -	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
+> -	 * other VCPUs can fiddle with the state while we access it.
+> -	 */
+> -	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
+> -		if (!mutex_trylock(&tmp_vcpu->mutex)) {
+> -			unlock_vcpus(kvm, c - 1);
+> -			return false;
+> -		}
+> -	}
+> -
+> -	return true;
+> -}
+> -
+>  static unsigned long nvhe_percpu_size(void)
+>  {
+>  	return (unsigned long)CHOOSE_NVHE_SYM(__per_cpu_end) -
+
+[...]
+
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 69782df3617f..834f08dfa24c 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1368,6 +1368,40 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Try to lock all of the VM's vCPUs.
+> + * Assumes that the kvm->lock is held.
+
+Assuming is not enough. These assertions have caught a number of bugs,
+and I'm not prepared to drop them.
+
+> + */
+> +int kvm_trylock_all_vcpus(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i, j;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
+> +			goto out_unlock;
+> +	return 0;
+> +
+> +out_unlock:
+> +	kvm_for_each_vcpu(j, vcpu, kvm) {
+> +		if (i == j)
+> +			break;
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+> +	return -EINTR;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_trylock_all_vcpus);
+> +
+> +void kvm_unlock_all_vcpus(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		mutex_unlock(&vcpu->mutex);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_unlock_all_vcpus);
+
+I don't mind you not including the assertions in these helpers, but
+then the existing primitives have to stay and call into the new stuff.
+Which, from a simple patch volume, would be far preferable and help
+with managing backports.
+
+I'd also expect the introduction of these new helpers to be done in
+its own patch, so that we don't get cross architecture dependencies if
+something needs to be backported for a reason or another.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
