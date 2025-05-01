@@ -1,71 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F8A33F7
-	for <kvmarm@lists.linux.dev>; Thu,  1 May 2025 00:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD99F213E9C
+	for <kvmarm@lists.linux.dev>; Thu,  1 May 2025 02:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746058615; cv=none; b=gsckTGrNEczm2vOLK8YiklN3GfCpmlpGNi8ONX68wUpqgvcT0VxaddrYr9oKpPw+SxbJewCc0TbisnlCggRHNk8dR0rEl3YpP68p/NdanmB+v+Qu0EgW1S8OhrVxmMq7LlQHBzKgnk1sMwODnaQzkpMx/+YzCcgZAgwtSxh+Ac8=
+	t=1746068114; cv=none; b=mm8hdOte6jX7UerBtOF1G+tDS29fa8ed3JwEwzhqjkd6r2MtS5jiStK5+HVianfFDrFaVObyfWBdQLk8fNOeEK2UC0xjARQQytd8oVTnkoFEsbPCW9/CKfIdxxW3cdHy1dj8vS25ENJmiKSQ39SV8NgB/o09mPqXF4e/9HiYdDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746058615; c=relaxed/simple;
-	bh=47CoopMyUfAejCNY06coQyZIdMENgtC3KaqSv/FeFcs=;
+	s=arc-20240116; t=1746068114; c=relaxed/simple;
+	bh=E58/Ir3nEphDsEt/8roe/A0l6EH+/+K6JbtT6e73W70=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s82+EQLw8ekvOkBApOVTlGkCziQOKZlEYWi9u0VFYVlLf8UvQZCNemWcbf/7jgz2IY5zBIuBgK5OliURURCTwQ+JIUU1Kof2feO3LQbv2o5JJ1hDs7/L+1HsKixAXlI+RMrqyucpcmDSTSBwIHNwPTgI9MvqEh0a1cJsMzSlan4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=djFi1uut; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=XREKB6DVZlKDuafJcNosVIGRw+uxyOWZiWZM26T3Ih/aHuHO0wHUB2/Hpna2TaRdHbaeu+m4blcaifuOyc9LrDdj8R2HGOdcAPBpkRb+s3sSOg6kB4Pp1zJ8sZFDJZaJWFJh9fqbSKLAr7kc0/a5v0T91NkHYUFC4FVlDnZOAwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LgKxJBlV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="djFi1uut"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LgKxJBlV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746058612;
+	s=mimecast20190719; t=1746068111;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EZb7eMkJRyx/Lus2IgqKmamTgxXPWBKqlzSs8f4bCVI=;
-	b=djFi1uutx/eMskY3zARhVA6NkWK1VgHU8H/PZahnQ5z5VxueE2RvDfXZVX0GZi+UZzlI6U
-	fOgEzpBYxwz7hGMKOeUwAyqwLfhR58/NIX2iWjCn8OcxS8N7h2skm05hmtQx0xino9Vtui
-	Ld13NxtkQ7pkNCHvzPwwhwJOq1x9cfo=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=O0f0P0r46I4wQ1N14Wr4dQIPr/ky0+9o8c+Aikg6Uic=;
+	b=LgKxJBlVJEzOSMcyBt3gOG1eYBY3oWbjf9b55cBqgfly6gqec6XPDppZ8GOB62fA4i2i2j
+	maqRDc9tjcD/ejF8TI7KSUHD/J4ThTHpWrgogK/2AqEkBSc6FfRUtHgXARXXOqEHBd4f09
+	eQ4n6x+hLhw4218IbC9PWyAl4cf4h+A=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-141-4o6hbnrONpSDWDoN_rrdSQ-1; Wed, 30 Apr 2025 20:16:50 -0400
-X-MC-Unique: 4o6hbnrONpSDWDoN_rrdSQ-1
-X-Mimecast-MFC-AGG-ID: 4o6hbnrONpSDWDoN_rrdSQ_1746058608
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3085f5855c4so418459a91.1
-        for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 17:16:49 -0700 (PDT)
+ us-mta-26-qPRWuovDMBWDHBufBK4q4g-1; Wed, 30 Apr 2025 22:55:09 -0400
+X-MC-Unique: qPRWuovDMBWDHBufBK4q4g-1
+X-Mimecast-MFC-AGG-ID: qPRWuovDMBWDHBufBK4q4g_1746068109
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-736fff82264so433468b3a.1
+        for <kvmarm@lists.linux.dev>; Wed, 30 Apr 2025 19:55:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746058608; x=1746663408;
+        d=1e100.net; s=20230601; t=1746068109; x=1746672909;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EZb7eMkJRyx/Lus2IgqKmamTgxXPWBKqlzSs8f4bCVI=;
-        b=G5cfj3vdbAJpi8eaR8FWyKAuw02dZdb3ZGG52hTZoHYB2krSK+vQlmLLPpFZKLXygA
-         G7Ec+byNrq/ylcc2wg486/IsdIufLAw62EFio7ziIarLTHT/kJodtj5zwW1RCSDj5NA0
-         KTH9GgGdMy4hs4GazvR9pFyLQAx1EJry4H+pj7Y3kSzRjbZP/OPHFDP+NcWc2xsHokLA
-         qzFrWduuDt94wQ/cW80+pF6X7zYO2zo4ji/Y9I/O8ew2w6J8zKQuQZ7J6latwWfzBCZU
-         C0xN6aH1aXAi6EzsSjj7IKYMkDE+Np3E6ybdsvfZuChLPtyUQ03aPfkZ74n1uRt+B4VE
-         LvXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVArgDkMqzlRfJvfFBNE/lgvN7r5GG6N7JTNLJIKh2Uoh60Ncr3mteYd+fXPhTJvPF4cxgJj24=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwM3VPAZQaO3omoH2TW5x6JRykV1uEkxjNcsQsBz6gBEzyrhXpk
-	++RaGGRg8cUHCPsZKIXfeW73CBOWbPRqTLrwv50gHLH7XjU2RXhs7ElLXcYaTvy6UDADHsyvoPj
-	G4fqsCqT404XLbgC50OxcSCyvbiCbwuSJZVK0TuQzGBCHzpHG6RCPrQ==
-X-Gm-Gg: ASbGncufpRsOZgY2/Zp4nLAphWeG6SMVQ4u4d27GwwW4buMe9WQ3P9Sa9KMji/zcwVn
-	JlqABFRzRo4Pjz7lg3u317ZhqmMBlgjkNYNij87WgqQv+zTljtgPRQHA2UmUdHCYovCTsN1bnQf
-	DHCQ0NDWjOjaWWvnXi0o5fRdW9EBJY259D9b0QBA7k+2d0PdvqvPNBed3/oGzJm7sC4vX4klZ2o
-	tKqATIiLCIfjv7yWw1nPku8zD45JeogDeJUSjQFL21vwaHQeFhhcOPquw6vb1VOftJ3biHKrvIB
-	X51a/fdiZYqc
-X-Received: by 2002:a17:90b:544e:b0:2ff:5a9d:937f with SMTP id 98e67ed59e1d1-30a3335f521mr8269822a91.24.1746058607785;
-        Wed, 30 Apr 2025 17:16:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH0+5LsVstlB0oWs/emtPEk9ieFB3kYXVq8522/16fp81LD4gGp0OBkwBulVxLtIQwxremaeQ==
-X-Received: by 2002:a17:90b:544e:b0:2ff:5a9d:937f with SMTP id 98e67ed59e1d1-30a3335f521mr8269777a91.24.1746058607287;
-        Wed, 30 Apr 2025 17:16:47 -0700 (PDT)
+        bh=O0f0P0r46I4wQ1N14Wr4dQIPr/ky0+9o8c+Aikg6Uic=;
+        b=MW37BAgaPx0sKdIk3NJg5/MThsUVhn4ZvF0+smLGcg4+xMVwMrSTzBdERs0ayUrFny
+         vQbefG+F4z2sz2Oxl6A8VqAQFSnxUN5gVPXLGJIH7udGsh+yVZuKRwfSy0P7WrDuawzK
+         edsBQoCYwD5xi5imKQaVucSmDbv3GywcHwjdFnxhfMb7xQusKWTDUUvLfvNvOqSpiVOo
+         Vws1y/wJBi4BornCNhjWKwK54MbByPKaF3gWECWoI7dyNi1I20Oz+M5r9b02oBxJwXG/
+         xssYpQCa3PsolI/gf8zS9Wg9j07Y9ClfH6jLkYQr8xvY57+dKTTSdcZ2cIUmcR2MRe+g
+         eJTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWe8piwV2DbBDrJho4VelaIRSc3jZvspuwrOwMC9BtTcagbD+kp28io+Gw8u3h19HUK3Td4ue8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyKTsDyTsEoZFkNwgaXqbFTRxEz7AaZOsbav+HY/+bfXSqPPkJT
+	yJjkxQhtnJRGGQUK8cfJB2xB7lMZBzXv+uzX1sAovtrBLDqRcvWs189fs2cpe1bLpbLLGvyWVWT
+	ZR8auZi4unPNuxXdZFpGKqL7z63SXOqniSOtbG1V9cfyjdxQP+MQvUQ==
+X-Gm-Gg: ASbGncvB5YTYZwUiEjK+CMxRsKrReIkAuM9y4TDFCnAf+Zdeyvnn6vV981M07iD65Mn
+	TZt4PJwoZNdlZCGdp5s4oigBldXBBgHdizVEgaZwt7Yrpus/DnNJZ2TXteYc5syzNKsM9W2j2Uw
+	J2Rd64sTt1O+SSuHG749UaH8cXLNosyPe5N5CTxG2HVst9BB9LoqG+FAix/Y7ko0pNIAPlYkVZj
+	fRcWO/eaSWaN24zO5e3WymyuJmo9ysYHKwvbMWKXMmIuN0Ov7LhD9/V5qUSoqrP7jWxYIao2kCK
+	JMxECOY66Abs
+X-Received: by 2002:a05:6a00:35c8:b0:736:bced:f4cf with SMTP id d2e1a72fcca58-7404927930fmr1396634b3a.0.1746068108746;
+        Wed, 30 Apr 2025 19:55:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFylzKnp6diohi3udmCDZ47tP/kvpo9wyUKWLV/9Fl+cS6PnVhqYmglGK+RzeWLQDfWNo9YJQ==
+X-Received: by 2002:a05:6a00:35c8:b0:736:bced:f4cf with SMTP id d2e1a72fcca58-7404927930fmr1396611b3a.0.1746068108438;
+        Wed, 30 Apr 2025 19:55:08 -0700 (PDT)
 Received: from [192.168.68.51] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30a349ffe38sm2311087a91.12.2025.04.30.17.16.39
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74039a60016sm2536538b3a.133.2025.04.30.19.55.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Apr 2025 17:16:46 -0700 (PDT)
-Message-ID: <c99b408c-3819-482a-a427-68045211e434@redhat.com>
-Date: Thu, 1 May 2025 10:16:36 +1000
+        Wed, 30 Apr 2025 19:55:07 -0700 (PDT)
+Message-ID: <770205d5-8c08-497d-b862-1be4852ae665@redhat.com>
+Date: Thu, 1 May 2025 12:54:59 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,7 +73,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 20/43] arm64: RME: Runtime faulting of memory
+Subject: Re: [PATCH v8 22/43] KVM: arm64: Validate register access for a Realm
+ VM
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -89,558 +90,38 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-21-steven.price@arm.com>
+ <20250416134208.383984-23-steven.price@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250416134208.383984-21-steven.price@arm.com>
+In-Reply-To: <20250416134208.383984-23-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: -IYe7w-NwGrmco6kn8PQHhX3-YYXvPyxiO-FCU8geIw_1746058608
+X-Mimecast-MFC-PROC-ID: I3WITZ1xp5ptsmKHhQlbeb8RI3jmNc1LwMGnqxoHdTU_1746068109
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 4/16/25 11:41 PM, Steven Price wrote:
-> At runtime if the realm guest accesses memory which hasn't yet been
-> mapped then KVM needs to either populate the region or fault the guest.
+> The RMM only allows setting the GPRS (x0-x30) and PC for a realm
+> guest. Check this in kvm_arm_set_reg() so that the VMM can receive a
+> suitable error return if other registers are written to.
 > 
-> For memory in the lower (protected) region of IPA a fresh page is
-> provided to the RMM which will zero the contents. For memory in the
-> upper (shared) region of IPA, the memory from the memslot is mapped
-> into the realm VM non secure.
+> The RMM makes similar restrictions for reading of the guest's registers
+> (this is *confidential* compute after all), however we don't impose the
+> restriction here. This allows the VMM to read (stale) values from the
+> registers which might be useful to read back the initial values even if
+> the RMM doesn't provide the latest version. For migration of a realm VM,
+> a new interface will be needed so that the VMM can receive an
+> (encrypted) blob of the VM's state.
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
-> Changes since v7:
->   * Remove redundant WARN_ONs for realm_create_rtt_levels() - it will
->     internally WARN when necessary.
-> Changes since v6:
->   * Handle PAGE_SIZE being larger than RMM granule size.
->   * Some minor renaming following review comments.
 > Changes since v5:
->   * Reduce use of struct page in preparation for supporting the RMM
->     having a different page size to the host.
->   * Handle a race when delegating a page where another CPU has faulted on
->     a the same page (and already delegated the physical page) but not yet
->     mapped it. In this case simply return to the guest to either use the
->     mapping from the other CPU (or refault if the race is lost).
->   * The changes to populate_par_region() are moved into the previous
->     patch where they belong.
-> Changes since v4:
->   * Code cleanup following review feedback.
->   * Drop the PTE_SHARED bit when creating unprotected page table entries.
->     This is now set by the RMM and the host has no control of it and the
->     spec requires the bit to be set to zero.
-> Changes since v2:
->   * Avoid leaking memory if failing to map it in the realm.
->   * Correctly mask RTT based on LPA2 flag (see rtt_get_phys()).
->   * Adapt to changes in previous patches.
+>   * Upper GPRS can be set as part of a HOST_CALL return, so fix up the
+>     test to allow them.
 > ---
->   arch/arm64/include/asm/kvm_emulate.h |  10 ++
->   arch/arm64/include/asm/kvm_rme.h     |  10 ++
->   arch/arm64/kvm/mmu.c                 | 127 ++++++++++++++++++-
->   arch/arm64/kvm/rme.c                 | 180 +++++++++++++++++++++++++++
->   4 files changed, 321 insertions(+), 6 deletions(-)
+>   arch/arm64/kvm/guest.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 40 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index c803c8188d9c..def439d6d732 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -704,6 +704,16 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
->   	return kvm_is_realm(kvm) && kvm_realm_state(kvm) != REALM_STATE_NONE;
->   }
->   
-> +static inline gpa_t kvm_gpa_from_fault(struct kvm *kvm, phys_addr_t ipa)
-> +{
-> +	if (kvm_is_realm(kvm)) {
-> +		struct realm *realm = &kvm->arch.realm;
-> +
-> +		return ipa & ~BIT(realm->ia_bits - 1);
-> +	}
-> +	return ipa;
-> +}
-> +
->   static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->   {
->   	if (static_branch_unlikely(&kvm_rme_is_available))
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index d86051ef0c5c..47aa6362c6c9 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -108,6 +108,16 @@ void kvm_realm_unmap_range(struct kvm *kvm,
->   			   unsigned long ipa,
->   			   unsigned long size,
->   			   bool unmap_private);
-> +int realm_map_protected(struct realm *realm,
-> +			unsigned long base_ipa,
-> +			kvm_pfn_t pfn,
-> +			unsigned long size,
-> +			struct kvm_mmu_memory_cache *memcache);
-> +int realm_map_non_secure(struct realm *realm,
-> +			 unsigned long ipa,
-> +			 kvm_pfn_t pfn,
-> +			 unsigned long size,
-> +			 struct kvm_mmu_memory_cache *memcache);
->   
->   static inline bool kvm_realm_is_private_address(struct realm *realm,
->   						unsigned long addr)
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 71c04259e39f..02b66ee35426 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -338,8 +338,13 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
->   
->   	lockdep_assert_held_write(&kvm->mmu_lock);
->   	WARN_ON(size & ~PAGE_MASK);
-> -	WARN_ON(stage2_apply_range(mmu, start, end, KVM_PGT_FN(kvm_pgtable_stage2_unmap),
-> -				   may_block));
-> +
-> +	if (kvm_is_realm(kvm))
-> +		kvm_realm_unmap_range(kvm, start, size, !only_shared);
-> +	else
-> +		WARN_ON(stage2_apply_range(mmu, start, end,
-> +					   KVM_PGT_FN(kvm_pgtable_stage2_unmap),
-> +					   may_block));
->   }
->   
 
-As spotted previsouly, the parameter @may_block isn't handled by kvm_realm_unmap_range().
-
->   void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
-> @@ -359,7 +364,10 @@ static void stage2_flush_memslot(struct kvm *kvm,
->   	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
->   	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
->   
-> -	kvm_stage2_flush_range(&kvm->arch.mmu, addr, end);
-> +	if (kvm_is_realm(kvm))
-> +		kvm_realm_unmap_range(kvm, addr, end - addr, false);
-> +	else
-> +		kvm_stage2_flush_range(&kvm->arch.mmu, addr, end);
->   }
->   
->   /**
-> @@ -1053,6 +1061,10 @@ void stage2_unmap_vm(struct kvm *kvm)
->   	struct kvm_memory_slot *memslot;
->   	int idx, bkt;
->   
-> +	/* For realms this is handled by the RMM so nothing to do here */
-> +	if (kvm_is_realm(kvm))
-> +		return;
-> +
->   	idx = srcu_read_lock(&kvm->srcu);
->   	mmap_read_lock(current->mm);
->   	write_lock(&kvm->mmu_lock);
-> @@ -1078,6 +1090,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->   	if (kvm_is_realm(kvm) &&
->   	    (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
->   	     kvm_realm_state(kvm) != REALM_STATE_NONE)) {
-> +		kvm_stage2_unmap_range(mmu, 0, (~0ULL) & PAGE_MASK, false);
->   		write_unlock(&kvm->mmu_lock);
->   		kvm_realm_destroy_rtts(kvm, pgt->ia_bits);
-
-(~0ULL & PAGE_MASK) wouldn't be a problem since the range will be limited to
-[0, BIT(realm->ia_bits) - 1] in kvm_realm_unmap_range(). I think it's reasonable
-to pass the maximal size here, something like:
-
-		kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), false);
-
->   
-> @@ -1482,6 +1495,82 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
->   	return vma->vm_flags & VM_MTE_ALLOWED;
->   }
->   
-> +static int realm_map_ipa(struct kvm *kvm, phys_addr_t ipa,
-> +			 kvm_pfn_t pfn, unsigned long map_size,
-> +			 enum kvm_pgtable_prot prot,
-> +			 struct kvm_mmu_memory_cache *memcache)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +
-> +	if (WARN_ON(!(prot & KVM_PGTABLE_PROT_W)))
-> +		return -EFAULT;
-
-A comment to explain why KVM_PGTABLE_PROT_W is required would be nice, something like:
-
-	/*
-	 * Write permission is required for now even though it's possible to
-	 * map unprotected pages (granules) as read-only. It's impossible to
-	 * map protected pages (granules) as read-only.
-	 */
-
-> +
-> +	ipa = ALIGN_DOWN(ipa, PAGE_SIZE);
-> +
-> +	if (!kvm_realm_is_private_address(realm, ipa))
-> +		return realm_map_non_secure(realm, ipa, pfn, map_size,
-> +					    memcache);
-> +
-> +	return realm_map_protected(realm, ipa, pfn, map_size, memcache);
-> +}
-> +
-> +static int private_memslot_fault(struct kvm_vcpu *vcpu,
-> +				 phys_addr_t fault_ipa,
-> +				 struct kvm_memory_slot *memslot)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	gpa_t gpa = kvm_gpa_from_fault(kvm, fault_ipa);
-> +	gfn_t gfn = gpa >> PAGE_SHIFT;
-> +	bool is_priv_gfn = kvm_mem_is_private(kvm, gfn);
-> +	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-> +	struct page *page;
-> +	kvm_pfn_t pfn;
-> +	int ret;
-> +	/*
-> +	 * For Realms, the shared address is an alias of the private GPA with
-> +	 * the top bit set. Thus is the fault address matches the GPA then it
-> +	 * is the private alias.
-> +	 */
-> +	bool is_priv_fault = (gpa == fault_ipa);
-> +
-> +	if (is_priv_gfn != is_priv_fault) {
-> +		kvm_prepare_memory_fault_exit(vcpu,
-> +					      gpa,
-> +					      PAGE_SIZE,
-> +					      kvm_is_write_fault(vcpu),
-> +					      false, is_priv_fault);
-
-nit:
-
-		kvm_prepare_memory_fault_exit(vcpu, gpa, PAGE_SIZE,
-				kvm_is_write_fault(vcpu), false, is_priv_fault);
-
-> +
-> +		/*
-> +		 * KVM_EXIT_MEMORY_FAULT requires an return code of -EFAULT,
-> +		 * see the API documentation
-> +		 */
-> +		return -EFAULT;
-> +	}
-> +
-> +	if (!is_priv_fault) {
-> +		/* Not a private mapping, handling normally */
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret = kvm_mmu_topup_memory_cache(memcache,
-> +					 kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &page, NULL);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* FIXME: Should be able to use bigger than PAGE_SIZE mappings */
-> +	ret = realm_map_ipa(kvm, fault_ipa, pfn, PAGE_SIZE, KVM_PGTABLE_PROT_W,
-> +			    memcache);
-> +	if (!ret)
-> +		return 1; /* Handled */
-> +
-> +	put_page(page);
-> +	return ret;
-> +}
-> +
->   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   			  struct kvm_s2_trans *nested,
->   			  struct kvm_memory_slot *memslot, unsigned long hva,
-> @@ -1509,6 +1598,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	if (fault_is_perm)
->   		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
->   	write_fault = kvm_is_write_fault(vcpu);
-> +
-> +	/*
-> +	 * Realms cannot map protected pages read-only
-> +	 * FIXME: It should be possible to map unprotected pages read-only
-> +	 */
-> +	if (vcpu_is_rec(vcpu))
-> +		write_fault = true;
-> +
->   	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
->   	VM_BUG_ON(write_fault && exec_fault);
->   
-> @@ -1623,7 +1720,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   		ipa &= ~(vma_pagesize - 1);
->   	}
->   
-> -	gfn = ipa >> PAGE_SHIFT;
-> +	gfn = kvm_gpa_from_fault(kvm, ipa) >> PAGE_SHIFT;
->   	mte_allowed = kvm_vma_mte_allowed(vma);
->   
->   	vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
-> @@ -1756,6 +1853,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   		 */
->   		prot &= ~KVM_NV_GUEST_MAP_SZ;
->   		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, fault_ipa, prot, flags);
-> +	} else if (kvm_is_realm(kvm)) {
-> +		ret = realm_map_ipa(kvm, fault_ipa, pfn, vma_pagesize,
-> +				    prot, memcache);
->   	} else {
->   		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, vma_pagesize,
->   					     __pfn_to_phys(pfn), prot,
-> @@ -1897,8 +1997,15 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->   		nested = &nested_trans;
->   	}
->   
-> -	gfn = ipa >> PAGE_SHIFT;
-> +	gfn = kvm_gpa_from_fault(vcpu->kvm, ipa) >> PAGE_SHIFT;
->   	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-> +
-> +	if (kvm_slot_can_be_private(memslot)) {
-> +		ret = private_memslot_fault(vcpu, ipa, memslot);
-> +		if (ret != -EINVAL)
-> +			goto out;
-> +	}
-> +
->   	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
->   	write_fault = kvm_is_write_fault(vcpu);
->   	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
-> @@ -1942,7 +2049,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->   		 * of the page size.
->   		 */
->   		ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> -		ret = io_mem_abort(vcpu, ipa);
-> +		ret = io_mem_abort(vcpu, kvm_gpa_from_fault(vcpu->kvm, ipa));
->   		goto out_unlock;
->   	}
->   
-> @@ -1990,6 +2097,10 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->   	if (!kvm->arch.mmu.pgt)
->   		return false;
->   
-> +	/* We don't support aging for Realms */
-> +	if (kvm_is_realm(kvm))
-> +		return true;
-> +
->   	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
->   						   range->start << PAGE_SHIFT,
->   						   size, true);
-> @@ -2006,6 +2117,10 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->   	if (!kvm->arch.mmu.pgt)
->   		return false;
->   
-> +	/* We don't support aging for Realms */
-> +	if (kvm_is_realm(kvm))
-> +		return true;
-> +
->   	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
->   						   range->start << PAGE_SHIFT,
->   						   size, false);
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index f6af3ea6ea8a..b6959cd17a6c 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -714,6 +714,186 @@ static int realm_create_protected_data_page(struct realm *realm,
->   	return -ENXIO;
->   }
->   
-> +static int fold_rtt(struct realm *realm, unsigned long addr, int level)
-> +{
-> +	phys_addr_t rtt_addr;
-> +	int ret;
-> +
-> +	ret = realm_rtt_fold(realm, addr, level, &rtt_addr);
-> +	if (ret)
-> +		return ret;
-> +
-> +	free_delegated_granule(rtt_addr);
-> +
-> +	return 0;
-> +}
-> +
-> +int realm_map_protected(struct realm *realm,
-> +			unsigned long ipa,
-> +			kvm_pfn_t pfn,
-> +			unsigned long map_size,
-> +			struct kvm_mmu_memory_cache *memcache)
-> +{
-> +	phys_addr_t phys = __pfn_to_phys(pfn);
-> +	phys_addr_t rd = virt_to_phys(realm->rd);
-> +	unsigned long base_ipa = ipa;
-> +	unsigned long size;
-> +	int map_level;
-> +	int ret = 0;
-> +
-> +	if (WARN_ON(!IS_ALIGNED(map_size, RMM_PAGE_SIZE)))
-> +		return -EINVAL;
-> +
-> +	if (WARN_ON(!IS_ALIGNED(ipa, map_size)))
-> +		return -EINVAL;
-> +
-> +	if (IS_ALIGNED(map_size, RMM_L2_BLOCK_SIZE))
-> +		map_level = 2;
-> +	else
-> +		map_level = 3;
-> +
-
-This block of code can be compacted a bit:
-
-	int map_level = IS_ALIGNED(map_size, RMM_L2_BLOCK_SIZE) ? 2 : 3;
-
-	if (WARN_ON(!IS_ALIGNED(map_size, RMM_PAGE_SIZE) || !IS_ALIGNED(ipa, map_size))
-		return -EINVAL;
-
-> +	if (map_level < RMM_RTT_MAX_LEVEL) {
-> +		/*
-> +		 * A temporary RTT is needed during the map, precreate it,
-> +		 * however if there is an error (e.g. missing parent tables)
-> +		 * this will be handled below.
-> +		 */
-> +		realm_create_rtt_levels(realm, ipa, map_level,
-> +					RMM_RTT_MAX_LEVEL, memcache);
-> +	}
-> +
-> +	for (size = 0; size < map_size; size += RMM_PAGE_SIZE) {
-> +		if (rmi_granule_delegate(phys)) {
-> +			/*
-> +			 * It's likely we raced with another VCPU on the same
-> +			 * fault. Assume the other VCPU has handled the fault
-> +			 * and return to the guest.
-> +			 */
-> +			return 0;
-> +		}
-> +
-> +		ret = rmi_data_create_unknown(rd, phys, ipa);
-> +
-> +		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> +			/* Create missing RTTs and retry */
-> +			int level = RMI_RETURN_INDEX(ret);
-> +
-> +			WARN_ON(level == RMM_RTT_MAX_LEVEL);
-> +
-> +			ret = realm_create_rtt_levels(realm, ipa, level,
-> +						      RMM_RTT_MAX_LEVEL,
-> +						      memcache);
-> +			if (ret)
-> +				goto err_undelegate;
-> +
-> +			ret = rmi_data_create_unknown(rd, phys, ipa);
-> +		}
-> +
-> +		if (WARN_ON(ret))
-> +			goto err_undelegate;
-> +
-> +		phys += RMM_PAGE_SIZE;
-> +		ipa += RMM_PAGE_SIZE;
-> +	}
-> +
-> +	if (map_size == RMM_L2_BLOCK_SIZE) {
-> +		ret = fold_rtt(realm, base_ipa, map_level + 1);
-> +		if (WARN_ON(ret))
-> +			goto err;
-> +	}
-> +
-> +	return 0;
-> +
-> +err_undelegate:
-> +	if (WARN_ON(rmi_granule_undelegate(phys))) {
-> +		/* Page can't be returned to NS world so is lost */
-> +		get_page(phys_to_page(phys));
-> +	}
-> +err:
-> +	while (size > 0) {
-> +		unsigned long data, top;
-> +
-> +		phys -= RMM_PAGE_SIZE;
-> +		size -= RMM_PAGE_SIZE;
-> +		ipa -= RMM_PAGE_SIZE;
-> +
-> +		WARN_ON(rmi_data_destroy(rd, ipa, &data, &top));
-> +
-> +		if (WARN_ON(rmi_granule_undelegate(phys))) {
-> +			/* Page can't be returned to NS world so is lost */
-> +			get_page(phys_to_page(phys));
-> +		}
-> +	}
-> +	return -ENXIO;
-> +}
-> +
-> +int realm_map_non_secure(struct realm *realm,
-> +			 unsigned long ipa,
-> +			 kvm_pfn_t pfn,
-> +			 unsigned long size,
-> +			 struct kvm_mmu_memory_cache *memcache)
-> +{
-> +	phys_addr_t rd = virt_to_phys(realm->rd);
-> +	phys_addr_t phys = __pfn_to_phys(pfn);
-> +	unsigned long offset;
-> +	int map_size, map_level;
-> +	int ret = 0;
-> +
-> +	if (WARN_ON(!IS_ALIGNED(size, RMM_PAGE_SIZE)))
-> +		return -EINVAL;
-> +
-> +	if (WARN_ON(!IS_ALIGNED(ipa, size)))
-> +		return -EINVAL;
-> +
-> +	if (IS_ALIGNED(size, RMM_L2_BLOCK_SIZE)) {
-> +		map_level = 2;
-> +		map_size = RMM_L2_BLOCK_SIZE;
-> +	} else {
-> +		map_level = 3;
-> +		map_size = RMM_PAGE_SIZE;
-> +	}
-> +
-
-Similiarly, it can be compacted a bit:
-
-	int map_size = IS_ALIGNED(size, RMM_L2_BLOCK_SIZE) ? RMM_L2_BLOCK_SIZE : RMM_PAGE_SIZE;
-	int map_level = IS_ALIGNED(map_size, RMM_L2_BLOCK_SIZE) ? 2 : 3;
-
-	if (WARN_ON(!IS_ALIGNED(size, RMM_PAGE_SIZE) || !IS_ALIGNED(ipa, size))
-		return -EINVAL;
-
-> +	for (offset = 0; offset < size; offset += map_size) {
-> +		/*
-> +		 * realm_map_ipa() enforces that the memory is writable,
-> +		 * so for now we permit both read and write.
-> +		 */
-> +		unsigned long desc = phys |
-> +				     PTE_S2_MEMATTR(MT_S2_FWB_NORMAL) |
-> +				     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |
-> +				     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> +		ret = rmi_rtt_map_unprotected(rd, ipa, map_level, desc);
-> +
-> +		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> +			/* Create missing RTTs and retry */
-> +			int level = RMI_RETURN_INDEX(ret);
-> +
-> +			ret = realm_create_rtt_levels(realm, ipa, level,
-> +						      map_level, memcache);
-> +			if (ret)
-> +				return -ENXIO;
-> +
-> +			ret = rmi_rtt_map_unprotected(rd, ipa, map_level, desc);
-> +		}
-> +		/*
-> +		 * RMI_ERROR_RTT can be reported for two reasons: either the
-> +		 * RTT tables are not there, or there is an RTTE already
-> +		 * present for the address.  The call to
-> +		 * realm_create_rtt_levels() above handles the first case, and
-> +		 * in the second case this indicates that another thread has
-> +		 * already populated the RTTE for us, so we can ignore the
-> +		 * error and continue.
-> +		 */
-> +		if (ret && RMI_RETURN_STATUS(ret) != RMI_ERROR_RTT)
-> +			return -ENXIO;
-
-The comments needs to be aligned in format :)
-
-If RMM returns RMI_ERROR_RTT for third case in the future, the assumption here
-is broken. I think it's worthy to double confirm by checking the RTT entry
-through RTT_READ_ENTRY interface. If the mapping doesn't exist, we probably
-still need to retry.
-
-> +
-> +		ipa += map_size;
-> +		phys += map_size;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   static int populate_region(struct kvm *kvm,
->   			   phys_addr_t ipa_base,
->   			   phys_addr_t ipa_end,
-
-Thanks,
-Gavin
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
