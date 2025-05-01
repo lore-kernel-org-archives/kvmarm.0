@@ -1,39 +1,75 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25202E401
-	for <kvmarm@lists.linux.dev>; Thu,  1 May 2025 11:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBAE2E401;
+	Thu,  1 May 2025 11:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746097317; cv=none; b=XSte5Y+Pl7Sn1LP81lBiPOgSC1h/EpvIsKMmSnJaLd3n0L5FaYHs17BdvVeGrURNefLWfcVkDuEQ6e+EOVzDreHqHcaoDaVFX0fGye4WgNQyyIA4k/FMLEitCyF/dP+UkR9WCmu8G2n8hJ7eiOGkzLMOYGqdXX10tWlEfvGbSd8=
+	t=1746098175; cv=none; b=IUf00eHMg5l4SBJgRlxUDQjYrrpxuzk90jpDPUzj0I6zuL8oCPlqlWb8YJCE0btHk7WqIh82gfeP1Kvxj7ZBPjJAI2bd30GHQgKF2uLmKoGXdp3divG0v9AWKiZQGF0etG8YY0rRhIxEoMaaWaxYTZLjegzOkTJ5+39PSDAHSp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746097317; c=relaxed/simple;
-	bh=GiCrzs2Fdvusv4yoGsES1ow6eU4r+keqOuYRsOqAxcI=;
+	s=arc-20240116; t=1746098175; c=relaxed/simple;
+	bh=SwSSX+bWsYo0Krc0eYqwPhxxTVgwr3IwX+8zNKHF+tk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pISC4pQq/MGJOD7/RQWcd9hcemuz1bkdtCaP4imUnaY85kV7HM+7pCrN4DtIb1/rktCkF/fIydC7vl6xijs7tXtSw9dDsIkqJOchX/pPBNKm2jjIOsM18CwxzZjzumJww3GU+pm/eRkuYRflhvIbEcwJzrG71K0u2Gc/vhiucxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B2237106F;
-	Thu,  1 May 2025 04:01:47 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DFF63F5A1;
-	Thu,  1 May 2025 04:01:53 -0700 (PDT)
-Date: Thu, 1 May 2025 12:01:50 +0100
-From: Joey Gouly <joey.gouly@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NHYbCJTXS8KKa0jhJLdXzAwBn5VPubrGK/TIsKEr1baqSDq+LF+SaY8qC8LOmkIUNu4PCH0r7vT1wE7v2HPCoSHV5Qfr7X2e9BVMOEVutvxBjVo6SFI04yW2J1KLfuLQmBfczBiWbw7eY3hekbJlUZo5tPU3g4AfM7xg28teebo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=T9/U85yA; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="T9/U85yA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=fDTwHpsnK1HXZhn01AWF6PLmK/DHwvlEcCJKIgKSjwU=; b=T9/U85yA6hIvoLlv4HtdStuKjP
+	k6a+M4OL1L8OrIa901hPNKwtI82kA7+N0hMBR4zoBE4E7d8nz+08o7P3Hqnf+luSVJtZHm26QDQeL
+	coxvHFky9Ql49FikfAU1SxOAuXLIYDOauM3z0FBIQq3Tir7getueoC3bLogxKBsh1TJEEzkYqaO8h
+	09XEiOWi3RGIS1ZNaoLTFMCQegpfBzn1q8vB4AjvsBn0X+A1YyCqSj+RKU0GwXh7padrqDdihLm6T
+	B92bH9jqwkkHgnw/yI9KSsUvXa44Jpy90QMruIl10CIFHO3WayAfe9wLnVOvJZd0v+25QAZwAnm2U
+	0sx7Dndw==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uARtR-0000000HaXn-0gzL;
+	Thu, 01 May 2025 11:15:53 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id A2CD8300230; Thu,  1 May 2025 13:15:52 +0200 (CEST)
+Date: Thu, 1 May 2025 13:15:52 +0200
+From: Peter Zijlstra <peterz@infradead.org>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Waiman Long <longman@redhat.com>, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>,
+	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Alexander Potapenko <glider@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Andre Przywara <andre.przywara@arm.com>, x86@kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, kvm-riscv@lists.infradead.org,
+	Atish Patra <atishp@atishpatra.org>, Ingo Molnar <mingo@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, kvmarm@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 17/42] KVM: arm64: Handle trapping of FEAT_LS64*
- instructions
-Message-ID: <20250501110150.GH1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-18-maz@kernel.org>
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+	Sebastian Ott <sebott@redhat.com>, Shusen Li <lishusen2@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when
+ locking all vCPUs
+Message-ID: <20250501111552.GO4198@noisy.programming.kicks-ass.net>
+References: <20250430203013.366479-1-mlevitsk@redhat.com>
+ <20250430203013.366479-3-mlevitsk@redhat.com>
+ <864iy4ivro.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,98 +78,111 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-18-maz@kernel.org>
+In-Reply-To: <864iy4ivro.wl-maz@kernel.org>
 
-On Sat, Apr 26, 2025 at 01:28:11PM +0100, Marc Zyngier wrote:
-> We generally don't expect FEAT_LS64* instructions to trap, unless
-> they are trapped by a guest hypervisor.
+On Thu, May 01, 2025 at 09:24:11AM +0100, Marc Zyngier wrote:
+> nit: in keeping with the existing arm64 patches, please write the
+> subject as "KVM: arm64: Use ..."
 > 
-> Otherwise, this is just the guest playing tricks on us by using
-> an instruction that isn't advertised, which we handle with a well
-> deserved UNDEF.
+> On Wed, 30 Apr 2025 21:30:10 +0100,
+> Maxim Levitsky <mlevitsk@redhat.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> [...]
+> 
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 68fec8c95fee..d31f42a71bdc 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1914,49 +1914,6 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+> >  	}
+> >  }
+> >  
+> > -/* unlocks vcpus from @vcpu_lock_idx and smaller */
+> > -static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
+> > -{
+> > -	struct kvm_vcpu *tmp_vcpu;
+> > -
+> > -	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+> > -		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
+> > -		mutex_unlock(&tmp_vcpu->mutex);
+> > -	}
+> > -}
+> > -
+> > -void unlock_all_vcpus(struct kvm *kvm)
+> > -{
+> > -	lockdep_assert_held(&kvm->lock);
+> 
+> Note this assertion...
+> 
+> > -
+> > -	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
+> > -}
+> > -
+> > -/* Returns true if all vcpus were locked, false otherwise */
+> > -bool lock_all_vcpus(struct kvm *kvm)
+> > -{
+> > -	struct kvm_vcpu *tmp_vcpu;
+> > -	unsigned long c;
+> > -
+> > -	lockdep_assert_held(&kvm->lock);
+> 
+> and this one...
+> 
+> > -
+> > -	/*
+> > -	 * Any time a vcpu is in an ioctl (including running), the
+> > -	 * core KVM code tries to grab the vcpu->mutex.
+> > -	 *
+> > -	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
+> > -	 * other VCPUs can fiddle with the state while we access it.
+> > -	 */
+> > -	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
+> > -		if (!mutex_trylock(&tmp_vcpu->mutex)) {
+> > -			unlock_vcpus(kvm, c - 1);
+> > -			return false;
+> > -		}
+> > -	}
+> > -
+> > -	return true;
+> > -}
+> > -
+> >  static unsigned long nvhe_percpu_size(void)
+> >  {
+> >  	return (unsigned long)CHOOSE_NVHE_SYM(__per_cpu_end) -
+> 
+> [...]
+> 
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 69782df3617f..834f08dfa24c 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -1368,6 +1368,40 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+> >  	return 0;
+> >  }
+> >  
+> > +/*
+> > + * Try to lock all of the VM's vCPUs.
+> > + * Assumes that the kvm->lock is held.
+> 
+> Assuming is not enough. These assertions have caught a number of bugs,
+> and I'm not prepared to drop them.
+> 
+> > + */
+> > +int kvm_trylock_all_vcpus(struct kvm *kvm)
+> > +{
+> > +	struct kvm_vcpu *vcpu;
+> > +	unsigned long i, j;
+> > +
+> > +	kvm_for_each_vcpu(i, vcpu, kvm)
+> > +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+This one includes an assertion that kvm->lock is actually held.
 
-> ---
->  arch/arm64/kvm/handle_exit.c | 56 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 56 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index b73dc26bc44b4..636c14ed2bb82 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -298,6 +298,61 @@ static int handle_svc(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +static int handle_other(struct kvm_vcpu *vcpu)
-> +{
-> +	bool is_l2 = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
-> +	u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
-> +	u64 esr = kvm_vcpu_get_esr(vcpu);
-> +	u64 iss = ESR_ELx_ISS(esr);
-> +	struct kvm *kvm = vcpu->kvm;
-> +	bool allowed, fwd = false;
-> +
-> +	/*
-> +	 * We only trap for two reasons:
-> +	 *
-> +	 * - the feature is disabled, and the only outcome is to
-> +	 *   generate an UNDEF.
-> +	 *
-> +	 * - the feature is enabled, but a NV guest wants to trap the
-> +	 *   feature used my its L2 guest. We forward the exception in
-> +	 *   this case.
-> +	 *
-> +	 * What we don't expect is to end-up here if the guest is
-> +	 * expected be be able to directly use the feature, hence the
-> +	 * WARN_ON below.
-> +	 */
-> +	switch (iss) {
-> +	case ESR_ELx_ISS_OTHER_ST64BV:
-> +		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
-> +		if (is_l2)
-> +			fwd = !(hcrx & HCRX_EL2_EnASR);
-> +		break;
-> +	case ESR_ELx_ISS_OTHER_ST64BV0:
-> +		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
-> +		if (is_l2)
-> +			fwd = !(hcrx & HCRX_EL2_EnAS0);
-> +		break;
-> +	case ESR_ELx_ISS_OTHER_LDST64B:
-> +		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
-> +		if (is_l2)
-> +			fwd = !(hcrx & HCRX_EL2_EnALS);
-> +		break;
-> +	default:
-> +		/* Clearly, we're missing something. */
-> +		WARN_ON_ONCE(1);
-> +		allowed = false;
-> +	}
-> +
-> +	WARN_ON_ONCE(allowed && !fwd);
-> +
-> +	if (allowed && fwd)
-> +		kvm_inject_nested_sync(vcpu, esr);
-> +	else
-> +		kvm_inject_undefined(vcpu);
-> +
-> +	return 1;
-> +}
-> +
->  static exit_handle_fn arm_exit_handlers[] = {
->  	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
->  	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-> @@ -307,6 +362,7 @@ static exit_handle_fn arm_exit_handlers[] = {
->  	[ESR_ELx_EC_CP14_LS]	= kvm_handle_cp14_load_store,
->  	[ESR_ELx_EC_CP10_ID]	= kvm_handle_cp10_id,
->  	[ESR_ELx_EC_CP14_64]	= kvm_handle_cp14_64,
-> +	[ESR_ELx_EC_OTHER]	= handle_other,
->  	[ESR_ELx_EC_HVC32]	= handle_hvc,
->  	[ESR_ELx_EC_SMC32]	= handle_smc,
->  	[ESR_ELx_EC_HVC64]	= handle_hvc,
-> -- 
-> 2.39.2
-> 
+That said, I'm not at all sure what the purpose of all this trylock
+stuff is here.
+
+Can someone explain? Last time I asked someone said something about
+multiple VMs, but I don't know enough about kvm to know what that means.
+
+Are those vcpu->mutex another class for other VMs? Or what gives?
