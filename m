@@ -1,228 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3221E8855;
-	Thu,  1 May 2025 08:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D0E22C35B
+	for <kvmarm@lists.linux.dev>; Thu,  1 May 2025 10:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746087856; cv=none; b=YEtsyNoUYHe2j+ONm4jHpckNl/6Zxv5pjIqF68N9Oc3PC+fxaNCraUlJknCGzhrYf1/pE/gdfPfOazRrN8OuMhAjPpXDzon8xHRkZbCKP8D6DsFpDMHLxrXfY/QiIK5IGDmFoseHSXRzd6eRCn8X6loG+xUDOen9/UqhmzFps8U=
+	t=1746094302; cv=none; b=E6eIyJsm3uO4F5iFw3BXBXCeKC+v2BQVGWT+TBldzIJKT/ZQ5JtF/WUopJjQy2HnfoDdLaiQEudpISWBhE4hBws6noWlCqzDFL7IYz2HttYTOCeGEizn8pvJq+7TcsBJLJBp2wjreD+QjgBxtWZD+fNWMWobHIXTv2UaBH7w1MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746087856; c=relaxed/simple;
-	bh=FUtw7sDZdVXOm9Nv2svOTgxrCByJlvpP+UTjvuTtS1I=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FM5I6CuVokmwmn/0v6xlE1o9sRRAcUmFStDsfNdyl67edvRYmFkxVVYjytUydOZqqENx0prmVZ6NkDU1Rc44p1kMGKO+pjoJMmpzJB9Oz9I/orxdoym5n2VVihFBMsj/4FsGMW0ZTlChDnk9Ve1zF1l7oi0KfudCa/kU8iHRn90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O97L3cnM; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O97L3cnM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60251C4CEE3;
-	Thu,  1 May 2025 08:24:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746087855;
-	bh=FUtw7sDZdVXOm9Nv2svOTgxrCByJlvpP+UTjvuTtS1I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=O97L3cnMvunZjO/0b3AD7mX6YsWjOA1AairfrKios6nfa+PekJx8V9jm72WccaYLD
-	 MFg2U9+xORpdBstItLdTn2jDJ/KEsIRT04HWQvHyQCbyTtG0ClRI3D/X2CD6XM+FOj
-	 /tz1rvNkqLQslwyHEIsvRxeQEF7oPqOkIM7OE5yCyUmforniQ2Wdg+RNlnV8cmfd9X
-	 16HjICyqst700kZfBgn5lDQrvldBI/haW5J2/qj7rZP5/M2+H5tq4/MkVCxXr+bLok
-	 BPs+unjgpwBK9BDZKgsuXLVUjyyxhBLmEvRC18HDlHZbiqF5SS0uUSHzhHrhH/LVHG
-	 92LXRRsmolgow==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uAPDI-00AWZy-KR;
-	Thu, 01 May 2025 09:24:12 +0100
-Date: Thu, 01 May 2025 09:24:11 +0100
-Message-ID: <864iy4ivro.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Waiman Long <longman@redhat.com>,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1746094302; c=relaxed/simple;
+	bh=iyZ16sdGQsP82p+qCPamyEMebM2WjIzBkFmhKiJG1Ps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ai78xOOvdBhDQ4GXyVrdkXNNg+9tbdKoKnnFLjBnpgiGj+2gtezErkKIq+E85j2Q2s9kTg2j0smsR6Mo+Wn+mvi66xhKm58lFQKX3C9BIAp1Etda3XzV3fHmpzPYVzOUTJBX4lwHpW6orxoP8utYkS69g3mBraFgoRiu0wFFsCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06365106F;
+	Thu,  1 May 2025 03:11:33 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A25C13F673;
+	Thu,  1 May 2025 03:11:38 -0700 (PDT)
+Date: Thu, 1 May 2025 11:11:36 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Alexander Potapenko <glider@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Andre Przywara <andre.przywara@arm.com>,
-	x86@kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	kvm-riscv@lists.infradead.org,
-	Atish Patra <atishp@atishpatra.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	kvmarm@lists.linux.dev,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Shusen Li <lishusen2@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when locking all vCPUs
-In-Reply-To: <20250430203013.366479-3-mlevitsk@redhat.com>
-References: <20250430203013.366479-1-mlevitsk@redhat.com>
-	<20250430203013.366479-3-mlevitsk@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 08/42] arm64: sysreg: Add registers trapped by
+ HFG{R,W}TR2_EL2
+Message-ID: <20250501101136.GE1859293@e124191.cambridge.arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+ <20250426122836.3341523-9-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mlevitsk@redhat.com, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, jiangkunkun@huawei.com, longman@redhat.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, bhelgaas@google.com, boqun.feng@gmail.com, bp@alien8.de, aou@eecs.berkeley.edu, anup@brainfault.org, paul.walmsley@sifive.com, suzuki.poulose@arm.com, palmer@dabbelt.com, alex@ghiti.fr, glider@google.com, oliver.upton@linux.dev, andre.przywara@arm.com, x86@kernel.org, joey.gouly@arm.com, tglx@linutronix.de, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, mingo@redhat.com, jingzhangos@google.com, hpa@zytor.com, dave.hansen@linux.intel.com, kvmarm@lists.linux.dev, will@kernel.org, keisuke.nishimura@inria.fr, sebott@redhat.com, peterz@infradead.org, lishusen2@huawei.com, pbonzini@redhat.com, rdunlap@infradead.org, seanjc@google.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250426122836.3341523-9-maz@kernel.org>
 
-nit: in keeping with the existing arm64 patches, please write the
-subject as "KVM: arm64: Use ..."
-
-On Wed, 30 Apr 2025 21:30:10 +0100,
-Maxim Levitsky <mlevitsk@redhat.com> wrote:
-
-[...]
-
+On Sat, Apr 26, 2025 at 01:28:02PM +0100, Marc Zyngier wrote:
+> Bulk addition of all the system registers trapped by HFG{R,W}TR2_EL2.
 > 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 68fec8c95fee..d31f42a71bdc 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1914,49 +1914,6 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  	}
->  }
+> The descriptions are extracted from the BSD-licenced JSON file part
+> of the 2025-03 drop from ARM.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/tools/sysreg | 395 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 395 insertions(+)
+> 
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 6433a3ebcef49..7969e632492bb 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2068,6 +2068,26 @@ Field	1	A
+>  Field	0	M
+>  EndSysreg
 >  
-> -/* unlocks vcpus from @vcpu_lock_idx and smaller */
-> -static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
-> -{
-> -	struct kvm_vcpu *tmp_vcpu;
-> -
-> -	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
-> -		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
-> -		mutex_unlock(&tmp_vcpu->mutex);
-> -	}
-> -}
-> -
-> -void unlock_all_vcpus(struct kvm *kvm)
-> -{
-> -	lockdep_assert_held(&kvm->lock);
+> +Sysreg	SCTLR_EL12      3	5	1	0	0
+> +Mapping	SCTLR_EL1
+> +EndSysreg
+> +
+> +Sysreg	SCTLRALIAS_EL1  3	0	1	4	6
+> +Mapping	SCTLR_EL1
+> +EndSysreg
+> +
+> +Sysreg	ACTLR_EL1	3	0	1	0	1
+> +Field   63:0    IMPDEF
+> +EndSysreg
+> +
+> +Sysreg	ACTLR_EL12      3	5	1	0	1
+> +Mapping	ACTLR_EL1
+> +EndSysreg
+> +
+> +Sysreg	ACTLRALIAS_EL1  3	0	1	4	5
+> +Mapping	ACTLR_EL1
+> +EndSysreg
+> +
 
-Note this assertion...
+Do you want to update CPACR_EL1 while you're at it, so that it matches
+CPACRMASK_EL1?
 
-> -
-> -	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
-> -}
-> -
-> -/* Returns true if all vcpus were locked, false otherwise */
-> -bool lock_all_vcpus(struct kvm *kvm)
-> -{
-> -	struct kvm_vcpu *tmp_vcpu;
-> -	unsigned long c;
-> -
-> -	lockdep_assert_held(&kvm->lock);
-
-and this one...
-
-> -
-> -	/*
-> -	 * Any time a vcpu is in an ioctl (including running), the
-> -	 * core KVM code tries to grab the vcpu->mutex.
-> -	 *
-> -	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
-> -	 * other VCPUs can fiddle with the state while we access it.
-> -	 */
-> -	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
-> -		if (!mutex_trylock(&tmp_vcpu->mutex)) {
-> -			unlock_vcpus(kvm, c - 1);
-> -			return false;
-> -		}
-> -	}
-> -
-> -	return true;
-> -}
-> -
->  static unsigned long nvhe_percpu_size(void)
->  {
->  	return (unsigned long)CHOOSE_NVHE_SYM(__per_cpu_end) -
-
-[...]
-
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 69782df3617f..834f08dfa24c 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1368,6 +1368,40 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
->  	return 0;
->  }
+>  Sysreg	CPACR_EL1	3	0	1	0	2
+>  Res0	63:30
+>  Field	29	E0POE
+> @@ -2081,6 +2101,323 @@ Field	17:16	ZEN
+>  Res0	15:0
+>  EndSysreg
 >  
-> +/*
-> + * Try to lock all of the VM's vCPUs.
-> + * Assumes that the kvm->lock is held.
-
-Assuming is not enough. These assertions have caught a number of bugs,
-and I'm not prepared to drop them.
-
-> + */
-> +int kvm_trylock_all_vcpus(struct kvm *kvm)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i, j;
+> +Sysreg	CPACR_EL12      3	5	1	0	2
+> +Mapping	CPACR_EL1
+> +EndSysreg
 > +
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-> +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
-> +			goto out_unlock;
-> +	return 0;
+> +Sysreg	CPACRALIAS_EL1  3	0	1	4	4
+> +Mapping	CPACR_EL1
+> +EndSysreg
 > +
-> +out_unlock:
-> +	kvm_for_each_vcpu(j, vcpu, kvm) {
-> +		if (i == j)
-> +			break;
-> +		mutex_unlock(&vcpu->mutex);
-> +	}
-> +	return -EINTR;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_trylock_all_vcpus);
+> +Sysreg	ACTLRMASK_EL1	3	0	1	4	1
+> +Field	63:0	IMPDEF
+> +EndSysreg
 > +
-> +void kvm_unlock_all_vcpus(struct kvm *kvm)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
+> +Sysreg	ACTLRMASK_EL12	3	5	1	4	1
+> +Mapping	ACTLRMASK_EL1
+> +EndSysreg
 > +
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-> +		mutex_unlock(&vcpu->mutex);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_unlock_all_vcpus);
+> +Sysreg	CPACRMASK_EL1	3	0	1	4	2
+> +Res0	63:32
+> +Field	31	TCPAC
+> +Field	30	TAM
+> +Field	29	E0POE
+> +Field	28	TTA
+> +Res0	27:25	
+> +Field	24	SMEN
+> +Res0	23:21	
+> +Field	20	FPEN
+> +Res0	19:17	
+> +Field	16	ZEN
+> +Res0	15:0
+> +EndSysreg
+> +
+> +Sysreg	CPACRMASK_EL12	3	5	1	4	2
+> +Mapping CPACRMASK_EL1
+> +EndSysreg
+> +
 
-I don't mind you not including the assertions in these helpers, but
-then the existing primitives have to stay and call into the new stuff.
-Which, from a simple patch volume, would be far preferable and help
-with managing backports.
-
-I'd also expect the introduction of these new helpers to be done in
-its own patch, so that we don't get cross architecture dependencies if
-something needs to be backported for a reason or another.
+[..]
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Joey
