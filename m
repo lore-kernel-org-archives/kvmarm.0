@@ -1,85 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1F41EEE6;
-	Thu,  1 May 2025 12:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7878818C930;
+	Thu,  1 May 2025 13:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746103472; cv=none; b=TYB8Ab9/nImi3fNlgZJwT5oB9ezMX2TJko4+gypc5rGac0jsFtglwdvq+CsSCoJNg7Gzld2BhTzYx4/bWPCfu0xB3K1A2I31czdTyaI4v/NVIIL4540JlC2TbttfJg2sUyfCfOXYL5WqJ/7Tl+Mp2OMGbTo/d19M5v82cmyz+lY=
+	t=1746105642; cv=none; b=aPkVy5zLl+munRbTQ3iLM6E/14W9yCovFPngVD0mpEZpRdBhHhTJPWbYAYG0+pFO7CL2xFHwN/uhYLatvpqImnmZ8MPJ4AtWxVp2ou8+hwBOuWcsTOb13cW3hye3xyybJ8r0TWlLl1tYnmret9V0JSpt4i/PJWrlZ2B8AswYsdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746103472; c=relaxed/simple;
-	bh=WPG4ItA0UQzz9G5Wed/nsDRuYNB8SmpWf7d7wvrM4Ig=;
+	s=arc-20240116; t=1746105642; c=relaxed/simple;
+	bh=Os11/kUyL5V6AODv9qoGyyUIKSAfj1P38I2fDvunLJE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m4KkZO0oOO/Jti5Zem06Qr98h6IAgcCBcJHvhXe9mW5g4sMB3CJRxQkj5FcSKzgogT32VqyV7/7VXx4eRfVAz9RMJxy+i0ovQyKz+tx8wDci4i9wvfP0oTyGeyPYFs0wbtXFhJj+CtG7uszdg2+rbs4Sgo3RIdy3RbwzQ7ui2hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QxDjMdGB; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FUySqGLy8MLPoo5EH5zTO5x2LDish+l3+PQB69WiuYgOTtrzI2lmhvkM/xmcrb/3bUw/HuUnJ+UPwIvvJDT3Zap8znHi/vLRELgrQgGud8ATxTQpoBdIFaz6lFBYCLo3ZyXPN44wrhgHK6OLKkzzZRwaLZbuggKx8gkIsSwXNto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6JbTqUr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QxDjMdGB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D40FC4CEE3;
-	Thu,  1 May 2025 12:44:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6JbTqUr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF271C4CEED;
+	Thu,  1 May 2025 13:20:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746103472;
-	bh=WPG4ItA0UQzz9G5Wed/nsDRuYNB8SmpWf7d7wvrM4Ig=;
+	s=k20201202; t=1746105641;
+	bh=Os11/kUyL5V6AODv9qoGyyUIKSAfj1P38I2fDvunLJE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QxDjMdGBaO7OILE121xxXL/ZOnOaqCLtEBXhMWqkB+3PJ/81e/MmSvY1wUToCrhj4
-	 o09UND4kIgR1FXBbOv/55FCd/OzVBwRgoBGOKRqd4tO9c5cjsRV1GlGty2ybIey98M
-	 Lg+nMO5pZgEPqvPhdAFXoifIaxQoyNf5AIQ+1z0cDZWJ9kRunCBuAPEBO/FXXum7lW
-	 W1LmcTN82A52L8g5iIa5Ucd/iUs8WO+yyP/I650zIl0luAwZDGv+aVLdfXY2xUanJs
-	 d03TuxAlnXfTT8Rtp+TeEMdJfupvUktoh6E1sLRqamQNoOxsDebivNk/cK+bAp+RnI
-	 Bf6br0mFislfA==
+	b=n6JbTqUrpaLfHlfvu5L22w27yom1lrlLhx27ERqNuGM0RwQBmGiXiihE8ZdZpQPCv
+	 cS+xxrrKGfcs6qZi9wCQUTakiukkvlhs2pNokiQJGuA0ZXdDWEcpse5GAujKrViIwU
+	 VIfB43WSzt8Lrq8PnuyRJ8JP13EIzRbVKKi87rSaepGpfSR6DsfQMDCnkw0Er5C0kj
+	 jjhKL6ZqpYi2pkODlpPzsS4J1c3sCK5WzQw5khwBlLbFL3Xi7+sqr/YroLSr4ONXjb
+	 voajhkctUHnUgjmy8Uv42ahIQs3sS/kkHHqzsru69sxz0yYjQ/xAdoU0pK/SnI9hdX
+	 lrysXZF2RHFww==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uATHB-00AZcw-3q;
-	Thu, 01 May 2025 13:44:29 +0100
-Date: Thu, 01 May 2025 13:44:28 +0100
-Message-ID: <861pt8ijpv.wl-maz@kernel.org>
+	id 1uATqB-00Aa7U-MT;
+	Thu, 01 May 2025 14:20:39 +0100
+Date: Thu, 01 May 2025 14:20:39 +0100
+Message-ID: <86zffwh3h4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>,
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Waiman Long <longman@redhat.com>,
-	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Alexander Potapenko <glider@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Andre Przywara <andre.przywara@arm.com>,
-	x86@kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	kvm-riscv@lists.infradead.org,
-	Atish Patra <atishp@atishpatra.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	kvmarm@lists.linux.dev,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>,
-	Shusen Li <lishusen2@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when locking all vCPUs
-In-Reply-To: <20250501111552.GO4198@noisy.programming.kicks-ass.net>
-References: <20250430203013.366479-1-mlevitsk@redhat.com>
-	<20250430203013.366479-3-mlevitsk@redhat.com>
-	<864iy4ivro.wl-maz@kernel.org>
-	<20250501111552.GO4198@noisy.programming.kicks-ass.net>
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 04/42] arm64: sysreg: Replace HGFxTR_EL2 with HFG{R,W}TR_EL2
+In-Reply-To: <20250429142656.GD1859293@e124191.cambridge.arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+	<20250426122836.3341523-5-maz@kernel.org>
+	<20250429142656.GD1859293@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -91,64 +62,125 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: peterz@infradead.org, mlevitsk@redhat.com, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, jiangkunkun@huawei.com, longman@redhat.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, bhelgaas@google.com, boqun.feng@gmail.com, bp@alien8.de, aou@eecs.berkeley.edu, anup@brainfault.org, paul.walmsley@sifive.com, suzuki.poulose@arm.com, palmer@dabbelt.com, alex@ghiti.fr, glider@google.com, oliver.upton@linux.dev, andre.przywara@arm.com, x86@kernel.org, joey.gouly@arm.com, tglx@linutronix.de, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, mingo@redhat.com, jingzhangos@google.com, hpa@zytor.com, dave.hansen@linux.intel.com, kvmarm@lists.linux.dev, will@kernel.org, keisuke.nishimura@inria.fr, sebott@redhat.com, lishusen2@huawei.com, pbonzini@redhat.com, rdunlap@infradead.org, seanjc@google.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 01 May 2025 12:15:52 +0100,
-Peter Zijlstra <peterz@infradead.org> wrote:
+On Tue, 29 Apr 2025 15:26:56 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> > > + */
-> > > +int kvm_trylock_all_vcpus(struct kvm *kvm)
-> > > +{
-> > > +	struct kvm_vcpu *vcpu;
-> > > +	unsigned long i, j;
-> > > +
-> > > +	kvm_for_each_vcpu(i, vcpu, kvm)
-> > > +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
+> On Sat, Apr 26, 2025 at 01:27:58PM +0100, Marc Zyngier wrote:
+
+> > @@ -240,8 +240,8 @@
+> >  	cbz	x1, .Lset_fgt_\@
+> >  
+> >  	/* Disable traps of access to GCS registers at EL0 and EL1 */
+> > -	orr	x0, x0, #HFGxTR_EL2_nGCS_EL1_MASK
+> > -	orr	x0, x0, #HFGxTR_EL2_nGCS_EL0_MASK
+> > +	orr	x0, x0, #HFGRTR_EL2_nGCS_EL1_MASK
+> > +	orr	x0, x0, #HFGRTR_EL2_nGCS_EL0_MASK
+> >  
+> >  .Lset_fgt_\@:
+> >  	msr_s	SYS_HFGRTR_EL2, x0
 > 
-> This one includes an assertion that kvm->lock is actually held.
-
-Ah, cunning. Thanks.
-
-> That said, I'm not at all sure what the purpose of all this trylock
-> stuff is here.
+> We still treat them as the same here, funny that the diff cut off the next line:
 > 
-> Can someone explain? Last time I asked someone said something about
-> multiple VMs, but I don't know enough about kvm to know what that means.
+> 	msr_s   SYS_HFGWTR_EL2, x0
+> 
+> Not saying you should do anything about it, I think it's fine.
 
-Multiple VMs? That'd be real fun. Not.
+Yeah, I had spotted these, but pointlessly duplicating these for R/W
+did seem over the top.
 
-> Are those vcpu->mutex another class for other VMs? Or what gives?
+Overall, What I am trying to achieve is to prevent that someone
+accidentally uses something such as HFGxTR_EL2.AIDR_EL1 to HFGWTR_EL2.
+I want to be able to catch those early (compile time) when they are
+used in macros that compose register and bit names.
 
-Nah. This is firmly single VM.
+> 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index f36d067967c33..43a630b940bfb 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -325,7 +325,7 @@
+> >   * Once we get to a point where the two describe the same thing, we'll
+> >   * merge the definitions. One day.
+> >   */
+> > -#define __HFGRTR_EL2_RES0	HFGxTR_EL2_RES0
+> > +#define __HFGRTR_EL2_RES0	HFGRTR_EL2_RES0
+> >  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+> >  #define __HFGRTR_EL2_nMASK	~(__HFGRTR_EL2_RES0 | __HFGRTR_EL2_MASK)
+> >  
+> > @@ -336,7 +336,7 @@
+> >  #define __HFGRTR_ONLY_MASK	(BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+> >  				 GENMASK(26, 25) | BIT(21) | BIT(18) | \
+> >  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+> > -#define __HFGWTR_EL2_RES0	(__HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
+> > +#define __HFGWTR_EL2_RES0	HFGWTR_EL2_RES0
+> >  #define __HFGWTR_EL2_MASK	(__HFGRTR_EL2_MASK & ~__HFGRTR_ONLY_MASK)
+> >  #define __HFGWTR_EL2_nMASK	~(__HFGWTR_EL2_RES0 | __HFGWTR_EL2_MASK)
+> >  
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e98cfe7855a62..7a1ef5be7efb2 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -273,7 +273,8 @@ struct kvm_sysreg_masks;
+> >  
+> >  enum fgt_group_id {
+> >  	__NO_FGT_GROUP__,
+> > -	HFGxTR_GROUP,
+> > +	HFGRTR_GROUP,
+> > +	HFGWTR_GROUP = HFGRTR_GROUP,
+> 
+> I think this change makes most of the diffs using this enum more confusing, but
+> it also seems to algin the code more closely with HDFGWTR_EL2 and HDFGWTR_EL2.
 
-The purpose of this contraption is that there are some rare cases
-where we need to make sure that if we update some global state, all
-the vcpus of a VM need to see, or none of them.
+Indeed. And once you add FEAT_FGT2 to the mix, HFGxTR becomes really
+out of place. As for the confusing aspect, I agree that the notion of
+group is a bit jarring, and maybe some documentation would help. The
+idea is actually simple:
 
-For these cases, the guarantee comes from luserspace, and it gives the
-pinky promise that none of the vcpus are running at that point. But
-being of a suspicious nature, we assert that this is true by trying to
-take all the vcpu mutexes in one go. This will fail if a vcpu is
-running, as KVM itself takes the vcpu mutex before doing anything.
+A sysreg trap always tells us whether this is for read or write. The
+data stored for each sysreg tells us which FGT register is controlling
+that trap. But since we can have one FGT register for read, and
+another for write, we would have to store both. Trouble is, we only
+have 63 bits in that descriptor. To save some space, we encode only
+the group (covering both read and write), and use the WnR bit to pick
+the correct guy.
 
-Similar requirement exists if we need to synthesise some state for
-userspace from all the individual vcpu states.
+This means we can encode 11 possible registers in 3 bits, with
+restrictions. We still have plenty of bits left, but I'm pretty sure
+the architecture will force us to eat into it pretty quickly.
 
-If the global locking fails, we return to userspace with a middle
-finger indication, and all is well. Of course, this is pretty
-expensive, which is why it is only done in setup phases, when the VMM
-configures the guest.
+[...]
 
-The splat this is trying to address is that when you have more than 48
-vcpus in a single VM, lockdep gets upset seeing up to 512 locks of a
-similar class being taken.
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 005ad28f73068..6e01b06bedcae 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -5147,12 +5147,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+> >  	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+> >  		goto out;
+> >  
+> > -	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
+> > -				       HFGxTR_EL2_nMAIR2_EL1		|
+> > -				       HFGxTR_EL2_nS2POR_EL1		|
+> > -				       HFGxTR_EL2_nACCDATA_EL1		|
+> > -				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+> > -				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+> > +	kvm->arch.fgu[HFGRTR_GROUP] = (HFGRTR_EL2_nAMAIR2_EL1		|
+> > +				       HFGRTR_EL2_nMAIR2_EL1		|
+> > +				       HFGRTR_EL2_nS2POR_EL1		|
+> > +				       HFGRTR_EL2_nACCDATA_EL1		|
+> > +				       HFGRTR_EL2_nSMPRI_EL1_MASK	|
+> > +				       HFGRTR_EL2_nTPIDR2_EL0_MASK);
+> 
+> For example here you see HFGRTR_GROUP but it actually also applies to HFGWTR_GROUP.
 
-Disclaimer: all the above is completely arm64-specific, and I didn't
-even try to understand what other architectures are doing.
+Because we use the same encoding trick. I don't see a good way to express
+that in a clean way, unfortunately. If you have an idea, I'm all ears!
 
-HTH,
+Thanks,
 
 	M.
 
