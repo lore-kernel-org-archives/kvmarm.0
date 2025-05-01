@@ -1,38 +1,77 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127FF2AF04
-	for <kvmarm@lists.linux.dev>; Thu,  1 May 2025 13:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0778E199934;
+	Thu,  1 May 2025 13:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746106409; cv=none; b=h6MP2bYHtXs/SzbsmYi9Ch2V+t1lDhG/fgWG3KwxSUKy7LlC/t/YtOqlPS2ZpIXkF4DXLu443fNC+h72wDyLEExaFtE9JQVq2nv5VmK5EgUc0tdrn755rudf1PAWFOy/z7YKiTrtOExvaajlSJhiSyFJulZP9c3XnXjpNBrWc5E=
+	t=1746106922; cv=none; b=tATpJfYWzSIQ/5kHfLZZduchHNxyRpQQoU01eL8PaP+5f8WLUee8dcFyZjeR03jiMC+8eLByJM0IR8fBQogXKsvaAwUaat4P1w8vKWI/qt6E2rI5ssqjvAZshYObd6FVTnfJyOeZLML23KhVhGEwGMUFvbDp74GQQSIjz54m6WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746106409; c=relaxed/simple;
-	bh=gIw0yVMmwINoqVcG8GDhGRlFwrbyuTi70escyHOEk/Q=;
+	s=arc-20240116; t=1746106922; c=relaxed/simple;
+	bh=Kj/tTIVj+YbmZAeGhD45xGA77N5aCHiVWUmsTJOf5Y4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p+3EMyFf8KJjHFyvsWCY830HUb0mKVQztVlnGbeVfMNbCMXrVf2lrhloS+5H62Gg0CEhWkuVaC8OMzX6eiyGy9HkGEwaXgT7E9W4lsZWendUz9RJQHpKaa/rc3fM4xmQkqslndQJcUh6RL5EJJU+1Aa/02IXkUXcLGuaVrXtf9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B891A168F;
-	Thu,  1 May 2025 06:33:19 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DA993F5A1;
-	Thu,  1 May 2025 06:33:25 -0700 (PDT)
-Date: Thu, 1 May 2025 14:33:22 +0100
-From: Joey Gouly <joey.gouly@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dTRkBog/0EY4Jzq0Qps6hEWcaTAHsIfeUZjFCRPE/4mrOYgSzXYCU6u4+pfYyBFxk43fPUVveHukucB55GcGGvWTGTK2UlqZBBX8fPZQz64DcS0uwHgKL77tr8Md8b18I6C6xIqkDXOo07lB2izLmQNkdnN8LQ1bWnrSmllAucw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Q9FCL2T2; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Q9FCL2T2"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=xowpOTNHZuGO7hdiOZBA1ktd0ANINI9wdxjSaNfAYr4=; b=Q9FCL2T2yxtlsZmsHNZUwJ8del
+	DL8laA78CDwP4h6JIEK8DYCPbAEn5jqEbbLSZWIhOKuDrIy1I6OqTo9KD9RydEXs9LtTQP7JwdVeq
+	4saOXLHsvs5AkFnJ22A0h3WN+8CgiXYNQ/0f8sG5/dYNuYkLxnqAaR+vvCg/5l2w8jZZCo7FHKQiW
+	f288JWqa60gzVN2mzNjAgCr3QbhjMXdNy9WwPnwoi3VTWwB8wMrcCtefnZGM/Bk0zwdWtETejY/nF
+	8yoxbchPCJPBA6ar0KmslCX7gVXF+rtiSA7clAWpkSlgnj6PDZkABXJr1Y2KN+tXGm4cSTkn3K4kE
+	LaXMEXvg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1uAUAJ-0000000E13k-38FL;
+	Thu, 01 May 2025 13:41:28 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 2B30630035E; Thu,  1 May 2025 15:41:27 +0200 (CEST)
+Date: Thu, 1 May 2025 15:41:26 +0200
+From: Peter Zijlstra <peterz@infradead.org>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Waiman Long <longman@redhat.com>, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>,
+	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Alexander Potapenko <glider@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Andre Przywara <andre.przywara@arm.com>, x86@kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, kvm-riscv@lists.infradead.org,
+	Atish Patra <atishp@atishpatra.org>, Ingo Molnar <mingo@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, kvmarm@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 28/42] KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
-Message-ID: <20250501133322.GJ1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-29-maz@kernel.org>
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+	Sebastian Ott <sebott@redhat.com>, Shusen Li <lishusen2@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when
+ locking all vCPUs
+Message-ID: <20250501134126.GT4439@noisy.programming.kicks-ass.net>
+References: <20250430203013.366479-1-mlevitsk@redhat.com>
+ <20250430203013.366479-3-mlevitsk@redhat.com>
+ <864iy4ivro.wl-maz@kernel.org>
+ <20250501111552.GO4198@noisy.programming.kicks-ass.net>
+ <861pt8ijpv.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,93 +80,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-29-maz@kernel.org>
+In-Reply-To: <861pt8ijpv.wl-maz@kernel.org>
 
-On Sat, Apr 26, 2025 at 01:28:22PM +0100, Marc Zyngier wrote:
-> We do not have a computed table for HCRX_EL2, so statically define
-> the bits we know about. A warning will fire if the architecture
-> grows bits that are not handled yet.
+On Thu, May 01, 2025 at 01:44:28PM +0100, Marc Zyngier wrote:
+> On Thu, 01 May 2025 12:15:52 +0100,
+> Peter Zijlstra <peterz@infradead.org> wrote:
+> > 
+> > > > + */
+> > > > +int kvm_trylock_all_vcpus(struct kvm *kvm)
+> > > > +{
+> > > > +	struct kvm_vcpu *vcpu;
+> > > > +	unsigned long i, j;
+> > > > +
+> > > > +	kvm_for_each_vcpu(i, vcpu, kvm)
+> > > > +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
+> > 
+> > This one includes an assertion that kvm->lock is actually held.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-> ---
->  arch/arm64/include/asm/kvm_arm.h | 18 ++++++++++++++----
->  arch/arm64/kvm/emulate-nested.c  |  5 +++++
->  arch/arm64/kvm/nested.c          |  4 ++--
->  3 files changed, 21 insertions(+), 6 deletions(-)
+> Ah, cunning. Thanks.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index e7c73d16cd451..52b3aeb19efc6 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -315,10 +315,20 @@
->  				 GENMASK(19, 18) |	\
->  				 GENMASK(15, 0))
->  
-> -/* Polarity masks for HCRX_EL2 */
-> -#define __HCRX_EL2_RES0         HCRX_EL2_RES0
-> -#define __HCRX_EL2_MASK		(BIT(6))
-> -#define __HCRX_EL2_nMASK	~(__HCRX_EL2_RES0 | __HCRX_EL2_MASK)
-> +/*
-> + * Polarity masks for HCRX_EL2, limited to the bits that we know about
-> + * at this point in time. It doesn't mean that we actually *handle*
-> + * them, but that at least those that are not advertised to a guest
-> + * will be RES0 for that guest.
-> + */
-> +#define __HCRX_EL2_MASK		(BIT_ULL(6))
-> +#define __HCRX_EL2_nMASK	(GENMASK_ULL(24, 14) | \
-> +				 GENMASK_ULL(11, 7)  | \
-> +				 GENMASK_ULL(5, 0))
-> +#define __HCRX_EL2_RES0		~(__HCRX_EL2_nMASK | __HCRX_EL2_MASK)
-> +#define __HCRX_EL2_RES1		~(__HCRX_EL2_nMASK | \
-> +				  __HCRX_EL2_MASK  | \
-> +				  __HCRX_EL2_RES0)
-
-Convoluted way of writing 0, but it makes sense!
-
->  
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~UL(0xf))
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index c30d970bf81cb..c581cf29bc59e 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2157,6 +2157,7 @@ int __init populate_nv_trap_config(void)
->  	BUILD_BUG_ON(__NR_CGT_GROUP_IDS__ > BIT(TC_CGT_BITS));
->  	BUILD_BUG_ON(__NR_FGT_GROUP_IDS__ > BIT(TC_FGT_BITS));
->  	BUILD_BUG_ON(__NR_FG_FILTER_IDS__ > BIT(TC_FGF_BITS));
-> +	BUILD_BUG_ON(__HCRX_EL2_MASK & __HCRX_EL2_nMASK);
->  
->  	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
->  		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
-> @@ -2182,6 +2183,10 @@ int __init populate_nv_trap_config(void)
->  		}
->  	}
->  
-> +	if (__HCRX_EL2_RES0 != HCRX_EL2_RES0)
-> +		kvm_info("Sanitised HCR_EL2_RES0 = %016llx, expecting %016llx\n",
-> +			 __HCRX_EL2_RES0, HCRX_EL2_RES0);
-> +
->  	kvm_info("nv: %ld coarse grained trap handlers\n",
->  		 ARRAY_SIZE(encoding_to_cgt));
->  
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 479ffd25eea63..666df85230c9b 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1058,8 +1058,8 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
->  	set_sysreg_masks(kvm, HCR_EL2, res0, res1);
->  
->  	/* HCRX_EL2 */
-> -	res0 = HCRX_EL2_RES0;
-> -	res1 = HCRX_EL2_RES1;
-> +	res0 = __HCRX_EL2_RES0;
-> +	res1 = __HCRX_EL2_RES1;
->  	if (!kvm_has_feat(kvm, ID_AA64ISAR3_EL1, PACM, TRIVIAL_IMP))
->  		res0 |= HCRX_EL2_PACMEn;
->  	if (!kvm_has_feat(kvm, ID_AA64PFR2_EL1, FPMR, IMP))
-> -- 
-> 2.39.2
+> > That said, I'm not at all sure what the purpose of all this trylock
+> > stuff is here.
+> > 
+> > Can someone explain? Last time I asked someone said something about
+> > multiple VMs, but I don't know enough about kvm to know what that means.
 > 
+> Multiple VMs? That'd be real fun. Not.
+> 
+> > Are those vcpu->mutex another class for other VMs? Or what gives?
+> 
+> Nah. This is firmly single VM.
+> 
+> The purpose of this contraption is that there are some rare cases
+> where we need to make sure that if we update some global state, all
+> the vcpus of a VM need to see, or none of them.
+> 
+> For these cases, the guarantee comes from luserspace, and it gives the
+> pinky promise that none of the vcpus are running at that point. But
+> being of a suspicious nature, we assert that this is true by trying to
+> take all the vcpu mutexes in one go. This will fail if a vcpu is
+> running, as KVM itself takes the vcpu mutex before doing anything.
+> 
+> Similar requirement exists if we need to synthesise some state for
+> userspace from all the individual vcpu states.
+
+Ah, okay. Because x86 is simply doing mutex_lock() instead of
+mutex_trylock() -- which would end up waiting for this activity to
+subside I suppose.
+
+Hence the use of the killable variant I suppose, for when they get tired
+of waiting.
+
+If all the architectures are basically doing the same thing, it might
+make sense to unify this particular behaviour. But what do I know.
+
+
