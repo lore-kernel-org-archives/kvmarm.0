@@ -1,284 +1,295 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazolkn19010010.outbound.protection.outlook.com [52.103.20.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B452E2581
-	for <kvmarm@lists.linux.dev>; Fri,  2 May 2025 03:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746158140; cv=none; b=Tqi8cYG1jStWBBhbtxi8HyM/klLH1CZL7lZn71McZl8IeIdQi0EEkDpbltnrYL5iMjwLvCrsHKc1YuM2cxm9bhWqSbntegI74fkoTFaQD7aBBjv8Lj0OVpkb6NPaYSZibuc1v81ngyHKGMqbKEvsq0wLdQNhBFDX7TVRfjVVBWo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746158140; c=relaxed/simple;
-	bh=SV6kDskcD8vX3e+V8hJrPJ/AP7JSHOtflGY5z+lLqP8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Ycna+Kqg8jNycSyQDh53iX0Dmlx8UgekNEITfj5s9PpHxP5iEKejx2aiu7a6hw/RCqMK6N7YB7kUTwnqk0r1G8VF9dX0rH3VUAGC6GUTBXv2qfqYYcMKJQYsYEr5uuFlhzd8RdAWlMGSPtYBXFnxhB3MOQlDG+V28NdaTjRVS0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=immunant.com; spf=none smtp.mailfrom=immunant.com; dkim=pass (2048-bit key) header.d=immunant-com.20230601.gappssmtp.com header.i=@immunant-com.20230601.gappssmtp.com header.b=RXJAXDOV; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=immunant.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=immunant.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98535224FA
+	for <kvmarm@lists.linux.dev>; Fri,  2 May 2025 04:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.20.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746158916; cv=fail; b=KvWjfLOLeBTXPcvL7D0TJpXqSfDLc5t2L5f8Hi9QfaTxPKoZu8u2CxbXG3UIa7DKnqpPHmsF9TP+s35B384kiSydlGmTUMNkJB+TsfHU8iVgp/04ltNDp64nVPA+MSLsM+kPahSeLiFjZu1jkAZt1ehoOsn3ZlNfTn4MffHaez8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746158916; c=relaxed/simple;
+	bh=Ipd9emE2DQhrjGPD935THLYkgfSDo7Nimw286XrRBKs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FD+RvdY+0J5sodC5MGl2+moYp/NHy0uN9OyILRzBB9nK67bPEDvMhKZc593aAWqgxNdCgHv/4Nt/DsG6MUcZE5NUxdcIk+Gzirh/d0UG6YLl7cXrcA0lMEYpY8Tzn5GAk9ZssI7iMNtA4K2eKEaUxHGemfYaXBuy8kPUqmcan+M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=eWZXNHDV; arc=fail smtp.client-ip=52.103.20.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=immunant-com.20230601.gappssmtp.com header.i=@immunant-com.20230601.gappssmtp.com header.b="RXJAXDOV"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3feaedb4085so973730b6e.0
-        for <kvmarm@lists.linux.dev>; Thu, 01 May 2025 20:55:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=immunant-com.20230601.gappssmtp.com; s=20230601; t=1746158137; x=1746762937; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Im2wn77ObSMGvD0IVWpoY+rJ8u2j14mJFBlYt2WH2+o=;
-        b=RXJAXDOVaUyYUqjjNyybco25gMt3gCHAWAjYpVQi4g8Qk8BG6vXkb+G3lzhr/hDAXz
-         rNDo+S1d6kIV8bVWtVCVcs0pU/iAesTy6xscK07u83ltbsfrjVsZDcfhV7gMJ9Ne+5sr
-         YYWIblYrSXVp3QNqjXt5P+US36q6sOf999bOx5vDp8bhJ+eb4MiaxeqLzoxXMJGZvWnj
-         nFf0nk/t1xx2O97quXcB4Z/T3WYeOVus9VAPNpvKxS0yq/IrlfmNGozZvvm/70t+6A+W
-         w9F04qvDVCXkAnci0b5UsBEYKf9WaBbFORMK5vZg8gOCItd7Me55R51cyifThTL0xDtg
-         YQaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746158137; x=1746762937;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Im2wn77ObSMGvD0IVWpoY+rJ8u2j14mJFBlYt2WH2+o=;
-        b=bjWgZZHG6V4ZM8Elz8J6dWlxU/IPLLtS1duoNAr43n78H4IdUAXOLu7lpDf5fMm+7o
-         mLW2kGq3q5hnrdReuvfipUMao910XM18JVtvovYefYOKAChm+2lhXgkXuGaff0j5mmTL
-         h6hmnPFPrCrpAru10miMP7qcdOs4xmrKHlPgG8Tr1aIt6Wc9Gbr+01cKAa2wKoTCniV6
-         ZxdGXyJtBB3k8PzkeJfaMkoWlg/4u+T4iSDkq/Ia0eBb3UmVvUL6o1FQvVrGqa/bdCax
-         rOB2sKgWZ3e31IM0qQVbehnBnksSTk93tZcWKMstM+cmD3laXLlcfVDZsr5qY1B7xJss
-         YIZg==
-X-Forwarded-Encrypted: i=1; AJvYcCUO65kDssDk4J85eVtL5LUPsh5Hev7sHP/B9PRm92skB9le5GxAZwv7PO+xkBKZ0AYqnWvp9/E=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzT/k7mjeXWjJlpQT7KpAD04EtdcQO13H7cRvcfWnf4ODv6OsJM
-	vmRXI3TNfXIIzOZwBwKckCv/cAoQDtlwlQ2cDpoY15Rki/9QxRS/pdITWHNdc3xLcjcR/e0HTcw
-	zftiNbk1HdJKMiacQaku5F78r8l/8r8E6KYVrBXR18iFfeK/L4ABnSQ==
-X-Gm-Gg: ASbGncsMX3BYCKqBMK6jtuWQj1FrRl4WU/czSd7K1EpQxkYOTuZBVQhEwwzu+k1voBO
-	/CigjHyse7ZTI1cxl6SMuPJpqAMggGpoSPGOri9scNr+EurX+XZOL+2jZxCicrvXMJe8MfQ9P76
-	w/KvMpK/fWTTK/sxE4dw==
-X-Google-Smtp-Source: AGHT+IFXJBMRQbIPo5upk/R/ynSAAL3AnaaJ66tAq0jNpRLvOIklKis2IE27LIZ/YWgQwFB71nAgw3pr/a9+o43Ab5A=
-X-Received: by 2002:a05:6808:398d:b0:403:31f8:44c6 with SMTP id
- 5614622812f47-4034146849amr923236b6e.26.1746158137659; Thu, 01 May 2025
- 20:55:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="eWZXNHDV"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Vn3rGm9y/N4U74MNXXYBdOVLIZEb4mr907ETC9IMArepvR2PRIbARTNhxAvYtnwjtcF3HbtgpVWaEFEyZWrlNa1bC1d1aaxGbv77necOEZyDPvOpxkcRzFYOZN5CsDX0UPYJ6PF96A/nW0DN1QnpxfH+rsTN7DO0jpJMv0YFtYETXDJdlpTUEKGFY3zbHH0hY9Wgbg/2NDHvZiwRt+4jR3fxV+3eiUGofI0JkKnTmyUW40UMbmAJZ8MxYzq791ciAVqybz/wWKwxJ2LPDGEYl8r+Z4cBTIunmptocmtBnZxWBmFgyG3/WV8yfbTxv77dnZIE4Y+5tYtPuVNdsKx1CQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CuldBf2vD5Ueodak/LG2QmCsYGRG6HHCVDQXm91jIsw=;
+ b=FpU8BfZEOO0F6V5YiVQGF2LRaWMlUbZXle9TPOi5URrdPK1hRypoWW3RGCG7dqE8s49/sfojsvOmXniFFXqqf0tGJYKaaFNrwcqOtsW0P0I0NAZvcZYjDlBqzM/5YtWPfyhCyTi+cnCRmyOt19el0AdKXvvR2uObyofZ8vbOJszbxREYbPRyRSfWRIVK5X1xfnDoNMae6jRQB3vGP8NyX1tsG8UPjbGAHT9PQY0ql1lBQkNf2AQMdJQUQZQgXdYCU62R+ulpuFosJ/gnfIVQ9OIVZP27N3YZZLys96oL0+/yXDKJdGE/UHPYTdpcuVYhSOjrzT7dpc1uCCpJ6g0lzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CuldBf2vD5Ueodak/LG2QmCsYGRG6HHCVDQXm91jIsw=;
+ b=eWZXNHDVpmt5XKAJWuAi18ktp4f1T4SyxSImd/IhB6zJ+m0Vt0RduWlP8nG9tCZOgARvz1vI2mEs8empbKsDCwFgUTgho708LNkVDc8N6IOuoUg9Ft/HEanwmK4d3h+L1P56Izj4aKEmoBBRVOruJmcKm9kNF7AOFuorOqTAxz1Ky4OsgCPANjiIOOBrsx5BQf7N+EPME83DKMDC7TtG/GasmHzrfQQ9PKPLMMDBms6NwUbXH/p9Eq8cH2pntv2j0U4oCcgAaXv6AtOwUTgcJrYU9KB02kLuRd+7QZU27VsNgdZ5sP5PEGe1vQt1Cbj/r2qXlM2uOgidu5QHc3oDIg==
+Received: from BN7PR02MB4148.namprd02.prod.outlook.com (2603:10b6:406:f6::17)
+ by PH0PR02MB8646.namprd02.prod.outlook.com (2603:10b6:510:10e::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.23; Fri, 2 May
+ 2025 04:08:29 +0000
+Received: from BN7PR02MB4148.namprd02.prod.outlook.com
+ ([fe80::1c3a:f677:7a85:4911]) by BN7PR02MB4148.namprd02.prod.outlook.com
+ ([fe80::1c3a:f677:7a85:4911%4]) with mapi id 15.20.8699.010; Fri, 2 May 2025
+ 04:08:29 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Roman Kisel <romank@linux.microsoft.com>, "arnd@arndb.de" <arnd@arndb.de>,
+	"bhelgaas@google.com" <bhelgaas@google.com>, "bp@alien8.de" <bp@alien8.de>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "decui@microsoft.com" <decui@microsoft.com>,
+	"haiyangz@microsoft.com" <haiyangz@microsoft.com>, "hpa@zytor.com"
+	<hpa@zytor.com>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "kw@linux.com" <kw@linux.com>,
+	"kys@microsoft.com" <kys@microsoft.com>, "lenb@kernel.org" <lenb@kernel.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"manivannan.sadhasivam@linaro.org" <manivannan.sadhasivam@linaro.org>,
+	"mark.rutland@arm.com" <mark.rutland@arm.com>, "maz@kernel.org"
+	<maz@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "rafael@kernel.org"
+	<rafael@kernel.org>, "robh@kernel.org" <robh@kernel.org>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"sudeep.holla@arm.com" <sudeep.holla@arm.com>, "suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, "will@kernel.org"
+	<will@kernel.org>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-acpi@vger.kernel.org"
+	<linux-acpi@vger.kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "linux-arch@vger.kernel.org"
+	<linux-arch@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>
+CC: "apais@microsoft.com" <apais@microsoft.com>, "benhill@microsoft.com"
+	<benhill@microsoft.com>, "bperkins@microsoft.com" <bperkins@microsoft.com>,
+	"sunilmut@microsoft.com" <sunilmut@microsoft.com>
+Subject: RE: [PATCH hyperv-next v9 11/11] PCI: hv: Get vPCI MSI IRQ domain
+ from DeviceTree
+Thread-Topic: [PATCH hyperv-next v9 11/11] PCI: hv: Get vPCI MSI IRQ domain
+ from DeviceTree
+Thread-Index: AQHbuIIGiFt9aynoMUK6tNHuTgnFP7O+vmPw
+Date: Fri, 2 May 2025 04:08:28 +0000
+Message-ID:
+ <BN7PR02MB4148C37D53E84A5BBAB999F8D48D2@BN7PR02MB4148.namprd02.prod.outlook.com>
+References: <20250428210742.435282-1-romank@linux.microsoft.com>
+ <20250428210742.435282-12-romank@linux.microsoft.com>
+In-Reply-To: <20250428210742.435282-12-romank@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN7PR02MB4148:EE_|PH0PR02MB8646:EE_
+x-ms-office365-filtering-correlation-id: c55fbe45-7705-4e35-b193-08dd892efe75
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|15080799006|8060799006|8062599003|19110799003|461199028|440099028|3412199025|12091999003|41001999003|102099032;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?sSGUMc6YxWe/gGiDo/aCfkMIiUef44vfc9FclxLJQHXfSbBtmZsuTacZRfcu?=
+ =?us-ascii?Q?Tlor6MzFACnecpewPUF9Fnk3tRrjZCRJmzDyqMWyUCqk2Aj+ox9OHns3NW1o?=
+ =?us-ascii?Q?53IsCUOF9mz35ehNTNy18a57nOp3304CnStDwYaSQZrVbAnL4UVEnYlfb8zm?=
+ =?us-ascii?Q?WyeHQN4Vr+D18ha5riwGmYFzcVlvY2GX7Lvi1VVtl+TRszkNy8DK12tVjRAQ?=
+ =?us-ascii?Q?9uUYKaSQ6/cJuf2BeaV2KjeO0bVsClFnbLjCE41ErDtg3Di4NxHnfkPGKVMV?=
+ =?us-ascii?Q?7FxvpCHmezQsE6hnjcNr56em84Jgfdw3KYWpoQvvIMdqtRsKUdfeQcxB9at3?=
+ =?us-ascii?Q?3PrrANkfhU+mX/z5n6hWCaVOPNNC3DSdpNh+JnsZokx3s7OFXluQG5gh3+uM?=
+ =?us-ascii?Q?l7cm0dF//gSDL+eXsq68VJLfLSeDe8l6ErOPDjxBuhROBylXVeOVozyq+4bk?=
+ =?us-ascii?Q?CM6A5xrd9aVcOPCrOL8+ckX4yRRbyUDu/IWQDzQu84+/RmcnkArfvn6dc8zO?=
+ =?us-ascii?Q?5mmGex+RsPZEDHpCTDct8imSG2ysrnM6hGGiQbO7gbC0LW+kpaYqov0lq3uU?=
+ =?us-ascii?Q?fRfPywUn/lVDULzxIMZpl5IOLr4kVcjlhoAlnEhlyCD+rmjVZeXOan6/BTCQ?=
+ =?us-ascii?Q?nC9fS9SJ0nGzhC2yr8A/Do3cKKrCGMEz7oKQOhdgb01kXBWljv2f/8cIhJ+l?=
+ =?us-ascii?Q?i0ciKrZrJed9AmvtUqH9rRbJeaGEUaxYHWzTCOmNg/JmY1MQ+D+95DjpC/p6?=
+ =?us-ascii?Q?x0iutfTOL/mEKHtsd6Lw3G2PGUV5v3mgmX3XyBWCg7Cre2gpksiEv43sfDzt?=
+ =?us-ascii?Q?1twuQthkifLV/fiV+WNQx1sN9UaGSjxJfXqixIYNZLqWz426Lyy6euUWIPqo?=
+ =?us-ascii?Q?f6CED9VW7ex6kg5xdmePcIZa8dHwdKnn8OuqWVJPZKiDxdDWzZcj7hIAr6Oj?=
+ =?us-ascii?Q?JDdRhh9/9l6+Q0htxKk6CeSQHvi6zMLJXB0QfkImImgFXvXrPZVToomyJl31?=
+ =?us-ascii?Q?aaIosr/DSGdz/EwrrnyIIpiPxj0wMa1eCD3+6mKz+V8Vd+gjAFnwYwcg19OT?=
+ =?us-ascii?Q?jQxwrhP6Jmi88dLh8QK0gmpr+/LgA/5nSb3ZlhOucJgnznbRFDQPgc7r0fw4?=
+ =?us-ascii?Q?nq4sjw0OG04W+hSDYQjcmECZwOfB0xsZzg=3D=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?4fiNAP8E1MuxVkSOBa3fhp3BgBsy5xnHDXRhcLoTd0LgzkZM+ImrVyKYJEj7?=
+ =?us-ascii?Q?rMmZd1blnzCqYX9hwTJFt5CFK98VfGzUu/NRfmlw8SwMEQILn1sPxQl/3ohV?=
+ =?us-ascii?Q?ej0ZD9eplRpDgZdZ8dQ1SQEg6nyzLmPcqrf+9u96Kuz4HuJKVwxGCoC/dUS9?=
+ =?us-ascii?Q?Ih4FrTlDoFVcrhPe10tJbAINiIa2WYrOTE7aOBr5Gp0yikNfG7xXqey8PZIa?=
+ =?us-ascii?Q?PaE1UzUYgEvroMv/9WlzoEzm5JOxa0ow1ejl63Mh1gzzdrVdG0xTAxOYcC9I?=
+ =?us-ascii?Q?KaCisKIUlzhlzsoyqtpULwqxhggz7meMse1Mq6mtM/Nbfm9tS2EBeXaId4we?=
+ =?us-ascii?Q?mZ0Q6ZHUusuWwpwZ4QWPjiZ/v4fXlL5uI+/JBcoJaOxxB6ws9QKhz6YwK9Rr?=
+ =?us-ascii?Q?F7vlaklA6TIcHPQEUYmdMgnhJ8f14BkBLcIukccrqmZbWTJwXm9kUXaqD9rN?=
+ =?us-ascii?Q?udO+YFDNzVr8MQ+WDpiuDrNsLjNsX/VGXHnQbFs3VuBcUD3GSYHitD8F12w1?=
+ =?us-ascii?Q?vk6Ivf46c968OxfcDJoFzyBoPLzgjAifR6skV0jcK8STbw7UABBUxS3gS+gz?=
+ =?us-ascii?Q?k//NsiksAo/r0pYJeNOMHMpOXXPG/EDVEHzTWNL6O12d1lrGaDtX8BNWFvNN?=
+ =?us-ascii?Q?UyhqJyLAOIERjSFr21YtJCXw3C04UpuKgcStXPqXbHoQNsASoxfZHB8V/U/8?=
+ =?us-ascii?Q?fnw7jc5zsVJ6ARodvo1HKCnaavih0Gv20X58HWiGYMQpNOQ8rROp+T2Y8sHr?=
+ =?us-ascii?Q?uB27OmUEYIYUrVBWFKfp4Jzwx889hACUi4+122bvg0HibrP7BF42BTicWoiv?=
+ =?us-ascii?Q?yV3jigcMARK0Af5tYnU4Bz3jCLsoCKkT+i9Y/0smb7vjTOUqxvUz9J0JU5Id?=
+ =?us-ascii?Q?W4P4hnvzrXnjj+YqUB1dbY9DpmtT4Tg68+31C9p6UBI0QlrUyJ1jMwnbymIL?=
+ =?us-ascii?Q?ugVXLRLNgoZC9SNbhHJOOTzwU/ygOzN3w5nLGWWyoHvJNl8RMgqFjQ5Wyndv?=
+ =?us-ascii?Q?2lvXzN++gyNJ7cbbJIjZdkCLtgywPmiqadlKBHd1PNpSb4JLxDjYv6OItfKC?=
+ =?us-ascii?Q?yMM3GYSNBUuzi/7hDsXvDZbGBy0pqmp9mGZvNEn3U7UswEaxB5HEGAJx+NI4?=
+ =?us-ascii?Q?1LC4fSM251eACl4Q+QTGThZ9mlzbvmnZW9VTnMs1k/8uFOC1jLBnhh/JqSui?=
+ =?us-ascii?Q?7pxXY2f4YnO8gwiylxXopk2lfXUPOeF0YwzKILJCVwgmxenP9EM12wTjnOQ?=
+ =?us-ascii?Q?=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: Per Larsen <perl@immunant.com>
-Date: Thu, 1 May 2025 20:55:01 -0700
-X-Gm-Features: ATxdqUETGCaB026jgU5kFDUTuyNNtcaXNdvxmW6ZQm2ObrvQa8lUVjqiXD5HINw
-Message-ID: <CA+AY4Xd64AuJvfFujtm-MSDNFoHo77Co5+kzzV-fb928J6QaLg@mail.gmail.com>
-Subject: [PATCH 3/3] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in host handler
-To: linux-kernel@vger.kernel.org
-Cc: "qperret@google.com" <qperret@google.com>, "sebastianene@google.com" <sebastianene@google.com>, kernel-team@android.com, 
-	"will@kernel.org" <will@kernel.org>, maz@kernel.org, 
-	"sudeep.holla@arm.com" <sudeep.holla@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, yuzenghui@huawei.com, 
-	Armelle Laine <armellel@google.com>, arve@android.org
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN7PR02MB4148.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: c55fbe45-7705-4e35-b193-08dd892efe75
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 May 2025 04:08:28.6901
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB8646
 
-FF-A 1.2 adds the DIRECT_REQ2 messaging interface which is similar to
-the existing FFA_MSG_SEND_DIRECT_{REQ,RESP} functions except that it
-uses the SMC calling convention v1.2 which allows calls to use x4-x17 as
-argument and return registers. Add support for FFA_MSG_SEND_DIRECT_REQ2
-in the host ffa handler.
+From: Roman Kisel <romank@linux.microsoft.com> Sent: Monday, April 28, 2025=
+ 2:08 PM
+>=20
+> The hyperv-pci driver uses ACPI for MSI IRQ domain configuration on
+> arm64. It won't be able to do that in the VTL mode where only DeviceTree
+> can be used.
+>=20
+> Update the hyperv-pci driver to get vPCI MSI IRQ domain in the DeviceTree
+> case, too.
+>=20
+> Signed-off-by: Roman Kisel <romank@linux.microsoft.com>
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
-Signed-off-by: Per Larsen <perlarsen@google.com>
-Signed-off-by: Per Larsen <perl@immunant.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 111 +++++++++++++++++++++++++++++++++-
- include/linux/arm_ffa.h       |   2 +
- 2 files changed, 111 insertions(+), 2 deletions(-)
+Reviewed-by: Michael Kelley <mhklinux@outlook.com>
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 8102dd6a19f7..d8c066f3c5c9 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -79,6 +79,14 @@ static void ffa_to_smccc_error(struct arm_smccc_res
-*res, u64 ffa_errno)
-  };
- }
+> ---
+>  drivers/pci/controller/pci-hyperv.c | 70 ++++++++++++++++++++++++++---
+>  1 file changed, 64 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller=
+/pci-hyperv.c
+> index 6084b38bdda1..a48524d2a1eb 100644
+> --- a/drivers/pci/controller/pci-hyperv.c
+> +++ b/drivers/pci/controller/pci-hyperv.c
+> @@ -50,6 +50,7 @@
+>  #include <linux/irqdomain.h>
+>  #include <linux/acpi.h>
+>  #include <linux/sizes.h>
+> +#include <linux/of_irq.h>
+>  #include <asm/mshyperv.h>
+>=20
+>  /*
+> @@ -817,9 +818,17 @@ static int hv_pci_vec_irq_gic_domain_alloc(struct ir=
+q_domain
+> *domain,
+>  	int ret;
+>=20
+>  	fwspec.fwnode =3D domain->parent->fwnode;
+> -	fwspec.param_count =3D 2;
+> -	fwspec.param[0] =3D hwirq;
+> -	fwspec.param[1] =3D IRQ_TYPE_EDGE_RISING;
+> +	if (is_of_node(fwspec.fwnode)) {
+> +		/* SPI lines for OF translations start at offset 32 */
+> +		fwspec.param_count =3D 3;
+> +		fwspec.param[0] =3D 0;
+> +		fwspec.param[1] =3D hwirq - 32;
+> +		fwspec.param[2] =3D IRQ_TYPE_EDGE_RISING;
+> +	} else {
+> +		fwspec.param_count =3D 2;
+> +		fwspec.param[0] =3D hwirq;
+> +		fwspec.param[1] =3D IRQ_TYPE_EDGE_RISING;
+> +	}
+>=20
+>  	ret =3D irq_domain_alloc_irqs_parent(domain, virq, 1, &fwspec);
+>  	if (ret)
+> @@ -887,10 +896,44 @@ static const struct irq_domain_ops hv_pci_domain_op=
+s =3D {
+>  	.activate =3D hv_pci_vec_irq_domain_activate,
+>  };
+>=20
+> +#ifdef CONFIG_OF
+> +
+> +static struct irq_domain *hv_pci_of_irq_domain_parent(void)
+> +{
+> +	struct device_node *parent;
+> +	struct irq_domain *domain;
+> +
+> +	parent =3D of_irq_find_parent(hv_get_vmbus_root_device()->of_node);
+> +	if (!parent)
+> +		return NULL;
+> +	domain =3D irq_find_host(parent);
+> +	of_node_put(parent);
+> +
+> +	return domain;
+> +}
+> +
+> +#endif
+> +
+> +#ifdef CONFIG_ACPI
+> +
+> +static struct irq_domain *hv_pci_acpi_irq_domain_parent(void)
+> +{
+> +	acpi_gsi_domain_disp_fn gsi_domain_disp_fn;
+> +
+> +	gsi_domain_disp_fn =3D acpi_get_gsi_dispatcher();
+> +	if (!gsi_domain_disp_fn)
+> +		return NULL;
+> +	return irq_find_matching_fwnode(gsi_domain_disp_fn(0),
+> +				     DOMAIN_BUS_ANY);
+> +}
+> +
+> +#endif
+> +
+>  static int hv_pci_irqchip_init(void)
+>  {
+>  	static struct hv_pci_chip_data *chip_data;
+>  	struct fwnode_handle *fn =3D NULL;
+> +	struct irq_domain *irq_domain_parent =3D NULL;
+>  	int ret =3D -ENOMEM;
+>=20
+>  	chip_data =3D kzalloc(sizeof(*chip_data), GFP_KERNEL);
+> @@ -907,9 +950,24 @@ static int hv_pci_irqchip_init(void)
+>  	 * way to ensure that all the corresponding devices are also gone and
+>  	 * no interrupts will be generated.
+>  	 */
+> -	hv_msi_gic_irq_domain =3D acpi_irq_create_hierarchy(0, HV_PCI_MSI_SPI_N=
+R,
+> -							  fn, &hv_pci_domain_ops,
+> -							  chip_data);
+> +#ifdef CONFIG_ACPI
+> +	if (!acpi_disabled)
+> +		irq_domain_parent =3D hv_pci_acpi_irq_domain_parent();
+> +#endif
+> +#ifdef CONFIG_OF
+> +	if (!irq_domain_parent)
+> +		irq_domain_parent =3D hv_pci_of_irq_domain_parent();
+> +#endif
+> +	if (!irq_domain_parent) {
+> +		WARN_ONCE(1, "Invalid firmware configuration for VMBus
+> interrupts\n");
+> +		ret =3D -EINVAL;
+> +		goto free_chip;
+> +	}
+> +
+> +	hv_msi_gic_irq_domain =3D irq_domain_create_hierarchy(irq_domain_parent=
+, 0,
+> +		HV_PCI_MSI_SPI_NR,
+> +		fn, &hv_pci_domain_ops,
+> +		chip_data);
+>=20
+>  	if (!hv_msi_gic_irq_domain) {
+>  		pr_err("Failed to create Hyper-V arm64 vPCI MSI IRQ domain\n");
+> --
+> 2.43.0
+>=20
 
-+static void ffa_to_smccc_1_2_error(struct arm_smccc_1_2_regs *regs,
-u64 ffa_errno)
-+{
-+ *regs = (struct arm_smccc_1_2_regs) {
-+ .a0 = FFA_ERROR,
-+ .a2 = ffa_errno,
-+ };
-+}
-+
- static void ffa_to_smccc_res_prop(struct arm_smccc_res *res, int ret, u64 prop)
- {
-  if (ret == FFA_RET_SUCCESS) {
-@@ -89,11 +97,26 @@ static void ffa_to_smccc_res_prop(struct
-arm_smccc_res *res, int ret, u64 prop)
-  }
- }
-
-+static void ffa_to_smccc_1_2_regs_prop(struct arm_smccc_1_2_regs
-*regs, int ret, u64 prop)
-+{
-+ if (ret == FFA_RET_SUCCESS) {
-+ *regs = (struct arm_smccc_1_2_regs) { .a0 = FFA_SUCCESS,
-+ .a2 = prop };
-+ } else {
-+ ffa_to_smccc_1_2_error(regs, ret);
-+ }
-+}
-+
- static void ffa_to_smccc_res(struct arm_smccc_res *res, int ret)
- {
-  ffa_to_smccc_res_prop(res, ret, 0);
- }
-
-+static void ffa_to_smccc_1_2_regs(struct arm_smccc_1_2_regs *regs, int ret)
-+{
-+ ffa_to_smccc_1_2_regs_prop(regs, ret, 0);
-+}
-+
- static void ffa_set_retval(u64 func_id,
-     struct kvm_cpu_context *ctxt,
-     struct arm_smccc_res *res)
-@@ -127,6 +150,29 @@ static void ffa_set_retval(u64 func_id,
-  }
- }
-
-+static void ffa_set_retval_smccc_1_2(struct kvm_cpu_context *ctxt,
-+    struct arm_smccc_1_2_regs *regs)
-+{
-+ cpu_reg(ctxt, 0) = regs->a0;
-+ cpu_reg(ctxt, 1) = regs->a1;
-+ cpu_reg(ctxt, 2) = regs->a2;
-+ cpu_reg(ctxt, 3) = regs->a3;
-+ cpu_reg(ctxt, 4) = regs->a4;
-+ cpu_reg(ctxt, 5) = regs->a5;
-+ cpu_reg(ctxt, 6) = regs->a6;
-+ cpu_reg(ctxt, 7) = regs->a7;
-+ cpu_reg(ctxt, 8) = regs->a8;
-+ cpu_reg(ctxt, 9) = regs->a9;
-+ cpu_reg(ctxt, 10) = regs->a10;
-+ cpu_reg(ctxt, 11) = regs->a11;
-+ cpu_reg(ctxt, 12) = regs->a12;
-+ cpu_reg(ctxt, 13) = regs->a13;
-+ cpu_reg(ctxt, 14) = regs->a14;
-+ cpu_reg(ctxt, 15) = regs->a15;
-+ cpu_reg(ctxt, 16) = regs->a16;
-+ cpu_reg(ctxt, 17) = regs->a17;
-+}
-+
- /* Call SMC64 using SMCCC 1.2 if hyp negotiated FF-A 1.2 falling back to 1.1 */
- static void arm_smccc_1_2_smc_fallback(u64 func_id, u64 a1, u64 a2, u64 a3,
-         u64 a4, u64 a5, u64 a6, u64 a7,
-@@ -681,7 +727,6 @@ static bool ffa_call_supported(u64 func_id)
-  case FFA_NOTIFICATION_GET:
-  case FFA_NOTIFICATION_INFO_GET:
-  /* Unimplemented interfaces added in FF-A 1.2 */
-- case FFA_MSG_SEND_DIRECT_REQ2:
-
-  /*
-  * FFA_MSG_SEND_DIRECT_RESP2 is not meant to be invoked by the host or
-@@ -709,6 +754,20 @@ static bool ffa_call_supported(u64 func_id)
-  return true;
- }
-
-+/*
-+ * Must a given FFA function use the SMC calling convention v1.2?
-+ */
-+static bool ffa_call_needs_smccc_1_2(u64 func_id)
-+{
-+ switch (func_id) {
-+ case FFA_MSG_SEND_DIRECT_REQ2:
-+ case FFA_MSG_SEND_DIRECT_RESP2:
-+ return true;
-+ }
-+
-+ return false;
-+}
-+
- static bool do_ffa_features(struct arm_smccc_res *res,
-      struct kvm_cpu_context *ctxt)
- {
-@@ -882,9 +941,47 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
-  hyp_spin_unlock(&host_buffers.lock);
- }
-
-+static void do_ffa_direct_msg2(struct arm_smccc_1_2_regs *regs,
-+       struct kvm_cpu_context *ctxt,
-+       u64 vm_handle)
-+{
-+ DECLARE_REG(u32, func_id, ctxt, 0);
-+ DECLARE_REG(u32, endp, ctxt, 1);
-+ DECLARE_REG(u64, uuid_lo, ctxt, 2);
-+ DECLARE_REG(u64, uuid_hi, ctxt, 3);
-+ DECLARE_REG(u64, x4, ctxt, 4);
-+ DECLARE_REG(u64, x5, ctxt, 5);
-+ DECLARE_REG(u64, x6, ctxt, 6);
-+ DECLARE_REG(u64, x7, ctxt, 7);
-+ DECLARE_REG(u64, x8, ctxt, 8);
-+ DECLARE_REG(u64, x9, ctxt, 9);
-+ DECLARE_REG(u64, x10, ctxt, 10);
-+ DECLARE_REG(u64, x11, ctxt, 11);
-+ DECLARE_REG(u64, x12, ctxt, 12);
-+ DECLARE_REG(u64, x13, ctxt, 13);
-+ DECLARE_REG(u64, x14, ctxt, 14);
-+ DECLARE_REG(u64, x15, ctxt, 15);
-+ DECLARE_REG(u64, x16, ctxt, 16);
-+ DECLARE_REG(u64, x17, ctxt, 17);
-+
-+ if (FIELD_GET(FFA_SRC_ENDPOINT_MASK, endp) != vm_handle) {
-+ ffa_to_smccc_1_2_regs(regs, FFA_RET_INVALID_PARAMETERS);
-+ return;
-+ }
-+
-+ struct arm_smccc_1_2_regs args = {
-+ func_id, endp, uuid_lo, uuid_hi,
-+ x4,  x5,  x6,  x7,  x8,  x9, x10,
-+ x11, x12, x13, x14, x15, x16, x17
-+ };
-+
-+ arm_smccc_1_2_smc(&args, regs);
-+}
-+
- bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- {
-  struct arm_smccc_res res;
-+ struct arm_smccc_1_2_regs regs;
-
-  /*
-  * There's no way we can tell what a non-standard SMC call might
-@@ -940,14 +1037,24 @@ bool kvm_host_ffa_handler(struct
-kvm_cpu_context *host_ctxt, u32 func_id)
-  case FFA_PARTITION_INFO_GET:
-  do_ffa_part_get(&res, host_ctxt);
-  goto out_handled;
-+ case FFA_MSG_SEND_DIRECT_REQ2:
-+ if (hyp_ffa_version >= FFA_VERSION_1_2) {
-+ do_ffa_direct_msg2(&regs, host_ctxt, HOST_FFA_ID);
-+ goto out_handled;
-+ }
-+ goto out_not_supported;
-  }
-
-  if (ffa_call_supported(func_id))
-  return false; /* Pass through */
-
-+out_not_supported:
-  ffa_to_smccc_error(&res, FFA_RET_NOT_SUPPORTED);
- out_handled:
-- ffa_set_retval(func_id, host_ctxt, &res);
-+ if (ffa_call_needs_smccc_1_2(func_id))
-+ ffa_set_retval_smccc_1_2(host_ctxt, &regs);
-+ else
-+ ffa_set_retval(func_id, host_ctxt, &res);
-  return true;
- }
-
-diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
-index 5bded24dc24f..4d541cf12ceb 100644
---- a/include/linux/arm_ffa.h
-+++ b/include/linux/arm_ffa.h
-@@ -268,6 +268,8 @@ bool ffa_partition_check_property(struct
-ffa_device *dev, u32 property)
-  (ffa_partition_check_property(dev, FFA_PARTITION_DIRECT_REQ2_RECV) && \
-  !dev->mode_32bit)
-
-+#define FFA_SRC_ENDPOINT_MASK GENMASK(31, 16)
-+
- /* For use with FFA_MSG_SEND_DIRECT_{REQ,RESP} which pass data via registers */
- struct ffa_send_direct_data {
-  unsigned long data0; /* w3/x3 */
--- 
-2.49.0.906.g1f30a19c02-goog
