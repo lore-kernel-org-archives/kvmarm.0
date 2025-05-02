@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5642D19D891;
-	Fri,  2 May 2025 08:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF01A22A7F8;
+	Fri,  2 May 2025 08:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746175669; cv=none; b=PpJhUHGson0FFSfk4O5tdET7UypnvZmiKvGY5OzheN5WYUq6tXU0mpcOS9FKwVwf6Ih5BwJsSHmvQAPFFAiRhMSL7tHkCzSzj6u4J/FNhW6QB6qosrSy7dBOZgoZ4H4CDNG9CF8eEj13YLagZ6tTaT0pdd0YLLcLgup1u491GMQ=
+	t=1746175774; cv=none; b=k3OyvAiTgbiXPq9bDknBGMnsKZ5NkbIKBTNpSYfPkFLIerASMXQhHov1dNGGPKdwuD0apxUaEQdU8k9rdN9CSzJoif+PAP7LBJ4UKdpnfAqXnGu5PcncV1E5l/OwdNE2Nb69T9xRL3L+3z4vUF2PfHh1e3Pf6Irrw8f1RNXHMfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746175669; c=relaxed/simple;
-	bh=NCirDjbr0P+QIBLiB7dQOcgcs9vpxXzMLjZHxOXUKuc=;
+	s=arc-20240116; t=1746175774; c=relaxed/simple;
+	bh=IXj90t/coI1E4Vk2Kk10Crmulx42AP2WnydDTYguq94=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mz64U8qm0AFfbqviw2rRXafEtg5v65w4j/UCCCmAGWjLJ7DfOz9+OLUOEBvYwZdPClos3H330mdgP3M/LGKrWaBrL8X3LsMGegjjfE0qpe24JRbU5D7Kg0hhcyECeTl7GbIt2qlsDICxOR6FzQZY3C901Aw3MEDy4QHRXMnIIHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dDTH9KZO; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Pdpc8tBC6O/Vi38wEIaadXkMz4wFaToldzAms4TEvaA/L7hfQ0gWPrlVrlyz6pbI2NpHELzu8ryrPogQzA9ghsJYJd1q6QfbAG0EwZGEDVZkPw6J7leGDb/c4q41u2s4GMKLg4bDsatGBYa2Oged7fI7hpstql7Ys8F9HPP+JLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uXb/riDr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dDTH9KZO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1CADC4CEE4;
-	Fri,  2 May 2025 08:47:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uXb/riDr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 483B9C4CEE4;
+	Fri,  2 May 2025 08:49:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746175668;
-	bh=NCirDjbr0P+QIBLiB7dQOcgcs9vpxXzMLjZHxOXUKuc=;
+	s=k20201202; t=1746175773;
+	bh=IXj90t/coI1E4Vk2Kk10Crmulx42AP2WnydDTYguq94=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dDTH9KZOh1hEj5xVKE8c4rjCXx6+gYnRq4nmbWqx+h06O4kbsj8rs3Cjor4bsvuxy
-	 IGVhsrPI+9HG3K1KPCVrJLkQ3Kyirq8fgViGp0hv3zYpPjFmdxqCXAP69SStXn19Yc
-	 xZWCq1QmxZ0v7nWggAMIJEEYmbb3XqEW2L93TLA/wto4PyFRIW34manFUmZq4gqR1+
-	 vbspoZbhRI9zQSxguE6Omoh41tLkqsiCmh4u0le1Z66WjXGuVl8Is5qO1QBDnoWcYK
-	 EutwhLC4Zr2qRZPlZdambTEO6RkFZPV6w2KfF5SvNs1BJmunFL4TSduEEXhshF1N66
-	 qkplJtD0MN8lA==
+	b=uXb/riDrmA8ILv3xURvq9XQ8m5gOYpwlRyUrhjqac2qm8e7MRYIYn8Ku2K5TwcxlB
+	 eajBlsBamob2bxIWWuasRpslRxeQXUriBZNLbIT81AE2T7/zy+VboPjxfp74DhxrgC
+	 1H63UMiRx+6wuvnwCTgxdpFnJYl8ZaK7CDMPSGLor4hAYL1Ao9G+eALZokG7iCh/n/
+	 DhvOdAEDjWt2EEYf4pmKmea7siQDA3zNZBNAIdeZi91m9ogqe2p0YF+CE/qF7NVzXn
+	 SARHVuoFMjLxQzmy56VrWIfHFuGwVA9hl2jOjJb1BuEiGKsd+TSgknWO2WorpldJuC
+	 /byBSNcueoLQw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uAm3e-00Apre-AY;
-	Fri, 02 May 2025 09:47:46 +0100
-Date: Fri, 02 May 2025 09:47:45 +0100
-Message-ID: <86r017h00e.wl-maz@kernel.org>
+	id 1uAm5K-00ApuN-Mx;
+	Fri, 02 May 2025 09:49:30 +0100
+Date: Fri, 02 May 2025 09:49:30 +0100
+Message-ID: <86plgrgzxh.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Per Larsen <perl@immunant.com>
 Cc: linux-kernel@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc: linux-kernel@vger.kernel.org,
 	yuzenghui@huawei.com,
 	Armelle Laine <armellel@google.com>,
 	arve@android.org
-Subject: Re: [PATCH 1/3] KVM: arm64: Restrict FF-A host version renegotiation
-In-Reply-To: <CA+AY4XcaJa1_U3qXQUBj4wZJYc9hKmRX8FTNeDvV2auEnC_WrA@mail.gmail.com>
-References: <CA+AY4XcaJa1_U3qXQUBj4wZJYc9hKmRX8FTNeDvV2auEnC_WrA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: Bump the supported version of FF-A to 1.2
+In-Reply-To: <CA+AY4XfcDKiSpN-UbrfGdqshQvw+LhY59SSuUmB6XQRYh9m0sw@mail.gmail.com>
+References: <CA+AY4XfcDKiSpN-UbrfGdqshQvw+LhY59SSuUmB6XQRYh9m0sw@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,70 +66,26 @@ X-SA-Exim-Rcpt-To: perl@immunant.com, linux-kernel@vger.kernel.org, qperret@goog
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 02 May 2025 04:52:39 +0100,
+On Fri, 02 May 2025 04:53:51 +0100,
 Per Larsen <perl@immunant.com> wrote:
 > 
-> FF-A implementations with the same major version must interoperate with
-> earlier minor versions per DEN0077A 1.2 REL0 13.2.1 but FF-A version 1.1
-> broke the ABI on several structures and 1.2 relies on SMCCC 1.2 is not
-> backwards compatible with SMCCC 1.2 (see DEN0028 1.6 G BET0 Appendix F).
+> FF-A version 1.2 introduces the DIRECT_REQ2 ABI. Bump the FF-A version
+> preferred by the hypervisor as a precursor to implementing the 1.2-only
+> FFA_MSG_SEND_DIRECT_REQ2 and FFA_MSG_SEND_RESP2 messaging interfaces.
 > 
-> If we return the negotiated hypervisor version when the host requests a
-> lesser minor version, the host will rely on the FF-A interoperability
-> rules. Since the hypervisor does not currently have the necessary
-> compatibility paths (e.g. to handle breaking changes to the SMC calling
-> convention), return NOT_SUPPORTED.
+> We must also use SMCCC 1.2 for 64-bit SMCs if hypervisor negotiated FF-A
+> 1.2, so ffa_set_retval is updated and a new function to call 64-bit smcs
+> using SMCCC 1.2 with fallback to SMCCC 1.1 is introduced.
 > 
+> Update deny-list in ffa_call_supported to mark FFA_NOTIFICATION_* and
+> interfaces added in FF-A 1.2 as unsupported lest they get forwarded.
+> 
+> Signed-off-by: Ayrton Munoz <ayrton@google.com>
 > Signed-off-by: Per Larsen <perlarsen@google.com>
 > Signed-off-by: Per Larsen <perl@immunant.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 3369dd0c4009..10e88207b78e 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -712,7 +712,24 @@ static void do_ffa_version(struct arm_smccc_res *res,
-> 
->   hyp_spin_lock(&version_lock);
->   if (has_version_negotiated) {
-> - res->a0 = hyp_ffa_version;
-> + /*
-> + * FF-A implementations with the same major version must
-> + * interoperate with earlier minor versions per DEN0077A 1.2
-> + * REL0 13.2.1 but FF-A version 1.1 broke the ABI on several
-> + * structures and 1.2 relies on SMCCC 1.2 is not backwards
-> + * compatible with SMCCC 1.2 (see DEN0028 1.6 G BET0 Appendix F).
 
-I can't parse this sentence. Missing words?
-
-> + *
-> + * If we return the negotiated hypervisor version when the host
-> + * requests a lesser minor version, the host will rely on the
-> + * aforementioned FF-A interoperability rules. Since the
-> + * hypervisor does not currently have the necessary compatibility
-> + * paths (e.g. to paper over the above-mentioned calling
-> + * convention changes), return NOT_SUPPORTED.
-> + */
-> + if (FFA_MINOR_VERSION(ffa_req_version) < FFA_MINOR_VERSION(hyp_ffa_version))
-> + res->a0 = FFA_RET_NOT_SUPPORTED;
-> + else
-> + res->a0 = hyp_ffa_version;
->   goto unlock;
->   }
-> 
-
-Something has gone seriously wrong with your email, and the patches
-are badly mangled and unusable. They are also sent as individual
-patches and not as a thread, which is a sign that you didn't send them
-using git. Please fix this for your next posting.
-
-More to the meat of the patches: why should the hypervisor paper over
-anything if the spec is broken? Why can't the host just as well decide
-for itself what to do?
-
-Thanks,
+Who is the author of this patch? Please follow the documentation when
+it comes to patch attribution.
 
 	M.
 
