@@ -1,152 +1,195 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A69264A77
-	for <kvmarm@lists.linux.dev>; Mon,  5 May 2025 17:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34FB2262FD3
+	for <kvmarm@lists.linux.dev>; Mon,  5 May 2025 19:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746466341; cv=none; b=AxsI7crQDBM6AOM/Lx3jzU7SqdDBsb6O97JAm4y0dMtGrfNOteyGSumA7Q+h4E41hvFw4XDEc8+l+FHvQyBCcE2m7RvwJ3+8gcWMjez3dP/eFzLcO1mIk+gB+YcC8BQD5MlvsVpYTz4CUdMUiE7YVW39zhSCKSJYezFWulSdaVM=
+	t=1746471947; cv=none; b=Xcj+1Hap5HJnAltBJFdSq6UzdzNEkxXbX5i/Ej9JYV+Fk/lS+Mp9ksLzccN4ra1EjJG4fpBs3NBtgmzctQOcGfmgt+Fc7w1hRfNU4WDtw7B5FfVkWy8eeQcXc9nW2I7ugA+b4poBY8k7wD8nCqgKXmNmrWvyVYnoi4KmnytL1dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746466341; c=relaxed/simple;
-	bh=Sirt4gr8r2sZgygHZ7WpIIJ0uwlYX2WulgE8mLU8plo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:content-type; b=RSOv4cp97Y6zTx49sBuFmOuHhXGiAWhHOHTwV2Tplkztv4XeJuJcuhvNZbuhm7I0+9riPqcPCa9ypJbB2Fj/BI0dopSflKwDJIuOp1OzlRrGYFFbBbjtj3acZofbxH13/Ls6lvuK1HDOh8SpGuj4olUU6DzYnI3FawFKxjoPdfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CyvYvDI8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746471947; c=relaxed/simple;
+	bh=ln/n/A7vDkSHNwU9VZoPwGfRXDYa7Qag+aGXjW75oWg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gYHu8lkLWzjv5X0JcUkz75ZEvkUavOeORX4W7pNixNq/69uZ7SDvjlwndRA9BvQn2h+ImMBSVOO1hullMmIPZbB9b+IecIlM61RB4Ynd9KB6SKAx3lytmWOitRtnOA/TVL/W9d8GKKQUWTWtk/DFJrBqHvqxw8qdAbYly6dW2cU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B7P+oaBP; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CyvYvDI8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746466337;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JjAxyTaB2HZtvewgEgyYKDE4ThQVrWuUNuivvsqnLN4=;
-	b=CyvYvDI8ufORcNsNs5MpCkj5wllOSwb9TA82amlfvBe3BjK4aX/UIWlcIVRVShtew0wwol
-	+P0adLJia+z1aR4h0mT8KNUDaqGzqChDjx5C8IxrcSDCDe+uwY9JJzeYRUtnYKIDY8sVn1
-	GL8H1cJ6UzTY0+9CDxdpNMvN1N5gPHM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-130-5kvrwfSHP9Wy4gFYi8mimw-1; Mon, 05 May 2025 13:32:16 -0400
-X-MC-Unique: 5kvrwfSHP9Wy4gFYi8mimw-1
-X-Mimecast-MFC-AGG-ID: 5kvrwfSHP9Wy4gFYi8mimw_1746466335
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43eea5a5d80so25208365e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 05 May 2025 10:32:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B7P+oaBP"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22e1eafa891so29935ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 05 May 2025 12:05:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746471945; x=1747076745; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nxc3AA271rP0clF1WTv1WRpUSSHlH6QI7su8jxLA6Qg=;
+        b=B7P+oaBPsUcNUH2wMeESBHqtYZMF8bhxESBbomdyIq7UT2l+IHTPc5QNYYSdhKrmos
+         xfoj2R1iV5G18vP+Nw984zBn9T7HtuTXbu9ljvZxVaoU62lM5+GeB6qtPCfRZTRxfLZP
+         E76dPtrq/MjZxgqSrjq98jCDT31wOQW+PcJy2zzDeJlwieBUMM+aQdcxU0tCH/nu7Gyn
+         QmHnk14GZ41sF5sZcJw/O35o/skAxj2250E5fkw4SMHb3K0uzv8s7Y2VPJbyOklmTnvh
+         RXWuGBM29x5Pqog5WUOX11pgKn91YzkhOEw8WduRE5RwIyPM0/NpY+bpQFXof1YdvZAj
+         S5IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746466335; x=1747071135;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JjAxyTaB2HZtvewgEgyYKDE4ThQVrWuUNuivvsqnLN4=;
-        b=NXMTBUalb/hHdO0WSvD7O6T5MdIpBFkxPKB9BHDaPThIJ1Gwm34Ivx5ht7RsH4tEbP
-         HLh5CHpkn6IXNyUVEaH0aDi7zCwrNwZLtvtZ41CouXeryNOc3JtkbeceLnVL+KREiGNH
-         RLW7smukwQQgLr2yU7G4ZvpkPX7W5hx197Ps6Fzj5GbgI2Py5vHTkEWxnDsNNrO/GWDE
-         c5dxzsFkwB9IdVk/S+Lz9TzLA/ghTk89nfazltIt74RTXrE4ZNka6n/v7i0U5wdMO1Cn
-         Hp4GsxMs2AEhceTTw/TYuDVVxRyL3Z/wxgScWFz0+dllrT7yDfh5r2KdvTFdldojHSUP
-         lsJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULitKjN7ZGkjBhYqtq8DKozAVDl206ACmvxd/8F/sZcFEPqKtfcuuiGq6qGO+Gp6W9pLxrcN4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyDUryOh3z1uX4jT1B+ut+HUoCP48lf04kW96Xw/yToY1RdlFie
-	A5+ihgVxKXxHsv3mFjz3d/6l0Il4Xli/952PiL7RkjFDzHUD540E65qSgCFcvDAHHb+E7xlNWwM
-	BcvgFW0FbbnI13tSTBiy/Q1s56sDNW7Ou5ASYdnZMo+SO7dLfTBRzLQ==
-X-Gm-Gg: ASbGnctAQWrUXK//t5yv1ySs3RQPq5LyJ8elQ/O7tnzRixAdpT5v+D2s9GQ5CeuDsIB
-	7LwkRm4N1QarDjBTtqkyAMsN/8wyjpeVKd38UVY5bI8dikqd7P9HenZxsXD1gb1ms2/mfmNkUIQ
-	p18GTsehonLF85KvKoO75pz42sSdVpcQwJRIZlCTZ1IFtjBUkReVhuvBg2kOuLufoIw45rpkOOG
-	unwOPmzCOI5bZiW+2a511M/n0y8ZT/YQNql30n8ept8fCIqHAJF+L0zCCFCuck4cB8SpFK+upHR
-	x3Vl0DEVsfvyEyApBz0L0ZENlbnuaeaNguRoa42PckDRnzBlTRCG6XqjolETgmaqDZ0RNOBV6w=
+        d=1e100.net; s=20230601; t=1746471945; x=1747076745;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nxc3AA271rP0clF1WTv1WRpUSSHlH6QI7su8jxLA6Qg=;
+        b=J03xCiRPRltkUI2UykgRZvhrcdfGbXwyXAKLPpJk8QRUxQMLQNg/bjtNb0ps8jealL
+         G4AKHVIZoix13ZjyS3wwBib2OedoPABH0/Tryfewe49x3SoDCJPpjhrBzwZSjbnQzLO0
+         zdVE7GN5YhPcqF+Pk+v7IzlC+E1YtkiMXHCuzsZU+O6nr2dpI65pozKBpeNctbFamgG0
+         eZ65gujpukIuZ6frartFRClFhyC5bwhINbvmtoGgf95Xc3ClnNyMjPbV/XvSHRP2qi/p
+         4rCZNuzNlxHeYz1p4E89O0VYeyGUgw9pN955raVmQNDk4gnGTW3cF8lIOLTvCzsHknI3
+         62mw==
+X-Forwarded-Encrypted: i=1; AJvYcCXF1nWti4MhWk9a96p6yJ0wJebTmryJizOI3yA89mvYAoMdk1RKSsbG1I62mRLT4/tNuBinuIQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzrTVwI4CF27h7rkygjNiUT7sHWpOy2GxqMo9iY39j4QErCnK6G
+	VV23vSzLdNjfz2WQHatYCyh8vn+TMvSnzfXd+/NSWgOF4xDiRgxoHb841a+Dog==
+X-Gm-Gg: ASbGncsJ6iUsujzuwEDU9FV0CkROs66XoQnUXZseQaMSnIrxi0SEiuZkDv0Z+ZwH47k
+	y/S0vxLEUcGdBay9+HOeFwZjqJg4Fk3QAPYQZkWD2GQ+HPW6ct5p4/isje7ZxOQ+LnfwqNIvsQO
+	IeL1qHvDowl81oNgmqOgdHKj10iD3N52EKn+zmrEMWKDcqHdO5X/UZgQSPCPSUP+ce4jEseYL+u
+	Ob6rWxYEj2mkUm+QOq4sD1TGxz+4Rko3yprLIh5QeOgJwxQDHP2JSR7rqcAI8omOMhlYF+RsGTD
+	ZTE8QOSNQfJT8YtIdHRyFAfU8YPQ9hrU05gsPnHUo5b5NDc2WB33S+nQAJvv8bbbgKo/VG8ZofA
 	=
-X-Received: by 2002:a05:600c:a401:b0:43c:e2dd:98f3 with SMTP id 5b1f17b1804b1-441c525facbmr56096385e9.21.1746466335029;
-        Mon, 05 May 2025 10:32:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFILc2vKI3/xP04PnDAD0gBqfLoTJ7gk5HkYL4nRmV2jGTs1rwbkDQtRYRRFH+l5ESk0GD4dg==
-X-Received: by 2002:a05:600c:a401:b0:43c:e2dd:98f3 with SMTP id 5b1f17b1804b1-441c525facbmr56096055e9.21.1746466334623;
-        Mon, 05 May 2025 10:32:14 -0700 (PDT)
-Received: from rh.fritz.box (p200300f6af1bce00e6fe5f11c0a7f4a1.dip0.t-ipconnect.de. [2003:f6:af1b:ce00:e6fe:5f11:c0a7:f4a1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae0c3dsm11343310f8f.12.2025.05.05.10.32.13
+X-Google-Smtp-Source: AGHT+IFASicqsLQoC4gNxHelYC0aG3lNabvqq0UOOhgv1HOFYapFQUFpIvWUjmSTv3Puo5pNrUg8AQ==
+X-Received: by 2002:a17:903:46cd:b0:223:37ec:63be with SMTP id d9443c01a7336-22e34dee32bmr461265ad.4.1746471945198;
+        Mon, 05 May 2025 12:05:45 -0700 (PDT)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522fa16sm58920035ad.239.2025.05.05.12.05.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 10:32:14 -0700 (PDT)
-From: Sebastian Ott <sebott@redhat.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Sebastian Ott <sebott@redhat.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Fix uninitialized memcache pointer in user_mem_abort()
-Date: Mon,  5 May 2025 19:31:48 +0200
-Message-ID: <20250505173148.33900-1-sebott@redhat.com>
-X-Mailer: git-send-email 2.49.0
+        Mon, 05 May 2025 12:05:44 -0700 (PDT)
+Date: Mon, 5 May 2025 12:05:38 -0700
+From: Vipin Sharma <vipinsh@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+	pbonzini@redhat.com, anup@brainfault.org, borntraeger@linux.ibm.com,
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, maz@kernel.org,
+	oliver.upton@linux.dev
+Subject: Re: [PATCH 1/2] KVM: selftests: Add default testfiles for KVM
+ selftests runner
+Message-ID: <20250505190538.GA1168139.vipinsh@google.com>
+References: <20250222005943.3348627-1-vipinsh@google.com>
+ <20250222005943.3348627-2-vipinsh@google.com>
+ <aBJXabTuiJyRZb-O@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: nS_JjsEX0cQ-sW0PIgcxHSdZ0Y462D7JPpc6D8oflek_1746466335
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aBJXabTuiJyRZb-O@google.com>
 
-Commit fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM") made the
-initialization of the local memcache variable in user_mem_abort()
-conditional, leaving a codepath where it is used uninitialized via
-kvm_pgtable_stage2_map().
+On 2025-04-30 10:01:29, Sean Christopherson wrote:
+> On Fri, Feb 21, 2025, Vipin Sharma wrote:
+> We definitely auto-generate the default testcases.  Relying on the user to remember
+> to add a testcase, and on the maintainer to remember to check for that, isn't a
+> winning strategy.
 
-This can fail on any path that requires a stage-2 allocation
-without transition via a permission fault or dirty logging.
+Good idea, this will help in at least automatically run the default tests.
+Also, if tests are in the selftest kvm source directory then it will
+give an hint to developer/maintainer that they missed writing a default
+test file for a newly introduced test when they run git status.
 
-Fix this by making sure that memcache is always valid.
+> 
+> But, I do think we should commit the default.test files to the repository.  If
+> they're ephemeral, then several problems arise:
+> 
+>  1. For out-of-tree builds, the default.test files should arguably be placed in
+>     the OUTPUT directory.  But if/when we add curated testcases/, then we'll either
+>     end up with multiple testcases/ directories (source and output), or we'll have
+>     to copy testcases/ from the source to the output on a normal build, which is
+>     rather gross.  Or we'd need e.g. "make testcases", which is also gross, e.g.
+>     I don't want to have to run yet more commands just to execute tests.
+> 
+>  2. Generating default.test could overwrite a user-defined file.  That's firmly
+>     a user error, but at least if they default.test files are commited, the user
+>     will get a hint or three that they're doing things wrong.
+> 
+>  3. If the files aren't committed, then they probably should removed on "clean",
+>     which isn't the end of the world since they're trivially easy to generate,
+>     but it's kinda funky. 
+> 
+> So, what if we add this to auto-generate the files?  It's obviously wasteful since
+> the files will exist 99.9999999% of the time, but the overhead is completely
+> negligible.  The only concern I have is if this will do the wrong thing for some
+> build environments, i.e. shove the files in the wrong location.
 
-Fixes: fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM")
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/kvmarm/3f5db4c7-ccce-fb95-595c-692fa7aad227@redhat.com/
----
- arch/arm64/kvm/mmu.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+We can get the current path of the Makefile.kvm by writing this at the top
+of the Makefile.kvm:
+	MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 754f2fe0cc67..eeda92330ade 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1501,6 +1501,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
- 
-+	if (!is_protected_kvm_enabled())
-+		memcache = &vcpu->arch.mmu_page_cache;
-+	else
-+		memcache = &vcpu->arch.pkvm_memcache;
-+
- 	/*
- 	 * Permission faults just need to update the existing leaf entry,
- 	 * and so normally don't require allocations from the memcache. The
-@@ -1510,13 +1515,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (!fault_is_perm || (logging_active && write_fault)) {
- 		int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
- 
--		if (!is_protected_kvm_enabled()) {
--			memcache = &vcpu->arch.mmu_page_cache;
-+		if (!is_protected_kvm_enabled())
- 			ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
--		} else {
--			memcache = &vcpu->arch.pkvm_memcache;
-+		else
- 			ret = topup_hyp_memcache(memcache, min_pages);
--		}
-+
- 		if (ret)
- 			return ret;
- 	}
+Then MAKEFILE_DIR will have the source directory of Makfile.kvm and
+testcase will be in the same directory.
 
-base-commit: 92a09c47464d040866cf2b4cd052bc60555185fb
--- 
-2.49.0
+With this we can modify the below foreach you wrote by prefixing
+MAKEFILE_DIR to "testcases".
 
+Does this alleviate concern regaring build environment?
+
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index f62b0a5aba35..d94bb8330ad1 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -198,6 +198,13 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH))
+>  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH))
+>  LIBKVM += $(LIBKVM_$(ARCH))
+>  
+> +$(foreach tc, $(TEST_PROGS), $(shell mkdir -p testcases/$(patsubst %.sh,%,$(tc))))
+> +$(foreach tc, $(TEST_GEN_PROGS), $(shell mkdir -p testcases/$(tc)))
+> +$(foreach tc, $(TEST_PROGS), \
+> +  $(shell echo $(tc) > $(patsubst %.sh,testcases/%/default.test,$(tc))))
+> +$(foreach tc, $(TEST_GEN_PROGS), \
+> +  $(shell echo $(tc) > $(patsubst %,testcases/%/default.test,$(tc))))
+> +
+
+This looks good.
+
+> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> > index 1d41a046a7bf..550b7c2b4a0c 100644
+> > --- a/tools/testing/selftests/kvm/.gitignore
+> > +++ b/tools/testing/selftests/kvm/.gitignore
+> > @@ -9,4 +9,5 @@
+> >  !config
+> >  !settings
+> >  !Makefile
+> > -!Makefile.kvm
+> > \ No newline at end of file
+> > +!Makefile.kvm
+> > +!*.test
+> 
+> Let's keep the extension wildcards sorted alphabetically, i.e.:
+> 
+> # SPDX-License-Identifier: GPL-2.0-only
+> *
+> !/**/
+> !*.c
+> !*.h
+> !*.py
+> !*.S
+> !*.sh
+> !*.test
+> !.gitignore
+> !config
+> !settings
+> !Makefile
+> !Makefile.kvm
+> 
+
+Okay.
+
+> > diff --git a/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test b/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
+> > new file mode 100644
+> > index 000000000000..5db8723f554f
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
+> > @@ -0,0 +1 @@
+> > +./aarch64/aarch32_id_regs
+> 
+> I don't see any reason to make the paths directly consumable with a leading "./".
+> Spoiler alert from the next patch: the location of the test executables needs to
+> explicitly resolved by the test runner.
+
+I will remove this.
