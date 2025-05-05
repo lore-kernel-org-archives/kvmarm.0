@@ -1,116 +1,93 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B794519ABD8;
-	Sat,  3 May 2025 10:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4401E5218
+	for <kvmarm@lists.linux.dev>; Mon,  5 May 2025 08:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746266935; cv=none; b=gecQba97/o8IP2bwiV8JpcPwjmMhtMDwOYRsb4Iryj4+LYHt+MLi4iZ13Z5TcUt/CSoTHd+Wcl+Vtd/v4pN4UG6hGSVkvORDeFaGciZqh2px3ODNN13Ii5sldx6JXkw8SXjoYcHKT7cAkHwYkH1ME/SG/rlGFKvQM6E5jlVBmbU=
+	t=1746435055; cv=none; b=OMWRDj9NWt9J6yY4eQl+hzbSMv6BrGId0lQMol91vEiaOG6u8vBaUd/g9Qj0dkdAqOaHhMNtWel5JakIDDdydLJFU44TMt0N7neitHW8D9yeTJ9KITzuK0kn93w4MHYYRdZuIWS/TW1ELjevfcZkRag3zuOsYvIbjBcOgQ9/CyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746266935; c=relaxed/simple;
-	bh=9op9BmzY8ov6wLvu2KZZNlZJhoo/hYZSZDgi3xq3z0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BOrTtDhmPNPPDy4LpcfagPi2Baij2F1K7GP/+jpusngUMIh0DBGaeTrbjqbPevXWZklZ5Oxpat5/MPQgTIzicKmcJbkshOdwPOfUDkqAK0OkVP0gTn65meWPqPvRQt+r7Mtw5rfFOyGrwFpcWKeJ7zMZo+Nlyo/o7nv+ZWbDG8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GOB+MR3V; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GOB+MR3V"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=dJ5yxwzSd18ze9t6hVLldU0j6KOkUmoNge4T8HYqBS0=; b=GOB+MR3VxfN1j7WarrQhI/6dmH
-	vRfudx8ixVXXLahZ5Vh8j/YV+rz0bN0tn9bTArcTr1NsyR+0jGLwlNt8EYztmc0IUq0DpZL7Pe46D
-	mCGzoxK2teuDvnXJsCVUEUXwYXDC3wAee2RqoeN+fsJd+RzTI+mQwxdDIvggeLZlaiKAWFLqPRq0S
-	IuswIIPXKlfbEagBmwO0i3IGgARDudkxbUIeLTk+oovsy5LYtPuksQ4IQ+OneWlj/q6IJCz1xOC8h
-	XittOBymb3zchZdOthguklAKCk9nDEM6I2jsYEv83el4962flzGypwFgOz5frjIaNshHKTwaMi6+8
-	KWo6/NdQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uB9nB-00000002xfU-2zcZ;
-	Sat, 03 May 2025 10:08:22 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 09B7630114C; Sat,  3 May 2025 12:08:21 +0200 (CEST)
-Date: Sat, 3 May 2025 12:08:20 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Waiman Long <longman@redhat.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>,
-	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Alexander Potapenko <glider@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Andre Przywara <andre.przywara@arm.com>, x86@kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, kvm-riscv@lists.infradead.org,
-	Atish Patra <atishp@atishpatra.org>, Ingo Molnar <mingo@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, kvmarm@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>, Shusen Li <lishusen2@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 5/5] x86: KVM: SEV: implement kvm_lock_all_vcpus and
- use it
-Message-ID: <20250503100820.GF4198@noisy.programming.kicks-ass.net>
-References: <20250430203013.366479-1-mlevitsk@redhat.com>
- <20250430203013.366479-6-mlevitsk@redhat.com>
- <aBUxqZ6qgfYZLsye@google.com>
+	s=arc-20240116; t=1746435055; c=relaxed/simple;
+	bh=dGj+nqxvZoZhR5SxY74gTpr9hBbS8Khk7mmyoBCBZq4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rGVJhh9w5ieC4VajXt3Qnvn/H2u820WIfgXiVGBTzMkSSxAPWalaWoPA0vdqjafqWO9Hoi49/Fw3QNDfcForduveGt63Flo59PSAGjAjjrnQ5IRZhnsQUlL5M3Z8UkpbS3dZA7d6p45h8n7+b7nUNHKEEOp3//0AUx7HinOcA5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD2BD1007;
+	Mon,  5 May 2025 01:50:43 -0700 (PDT)
+Received: from [10.163.53.144] (unknown [10.163.53.144])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 257CA3F5A1;
+	Mon,  5 May 2025 01:50:49 -0700 (PDT)
+Message-ID: <16ffa9f2-5ebb-4839-ab87-3c193ab9683a@arm.com>
+Date: Mon, 5 May 2025 14:20:46 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBUxqZ6qgfYZLsye@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] arm64/mm: Implement pte_po_index() for permission
+ overlay index
+To: Ryan Roberts <ryan.roberts@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250415054442.2287891-1-anshuman.khandual@arm.com>
+ <20250429151134.GB26272@willie-the-truck>
+ <b07c1320-3140-40d3-899b-7c2b6e0d3c18@arm.com>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <b07c1320-3140-40d3-899b-7c2b6e0d3c18@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 02, 2025 at 01:57:13PM -0700, Sean Christopherson wrote:
 
-> int kvm_lock_all_vcpus(struct kvm *kvm)
-> {
-> 	struct kvm_vcpu *vcpu;
-> 	unsigned long i, j;
-> 	int r;
+
+On 4/29/25 22:15, Ryan Roberts wrote:
+> On 29/04/2025 16:11, Will Deacon wrote:
+>> On Tue, Apr 15, 2025 at 11:14:42AM +0530, Anshuman Khandual wrote:
+>>> From: Ryan Roberts <ryan.roberts@arm.com>
+>>>
+>>> Previously pte_access_permitted() used FIELD_GET() directly to retrieve
+>>> the permission overlay index from the pte. However, FIELD_GET() doesn't
+>>> work for 128 bit quanitites. Since we are about to add support for D128
+>>> pgtables, let's create a specific helper, pte_po_index() which can do
+>>> the required mask and shift regardless of the data type width.
+>>
+>> You say:
+>>
+>> "we are about to add support for D128 pgtables"
 > 
-> 	lockdep_assert_held(&kvm->lock);
-
-So I agree that having this assertion here is probably good from a
-read-code pov, however, strictly speaking, it is redundant in that:
-
-> 	kvm_for_each_vcpu(i, vcpu, kvm) {
-> 		r = mutex_lock_killable_nest_lock(&vcpu->mutex, &kvm->lock);
-
-will implicitly assert kvm->lock is held. If you try to use an unheld
-lock as nest lock, it will complain loudly :-)
-
-(my inner pendant had to reply, ignore at will :-)
-
-> 		if (r)
-> 			goto out_unlock;
-> 	}
-> 	return 0;
+> Providing some context: Anshuman has a private branch that adds D128 pgtable
+> support to the kernel (it does not yet do this for KVM). I originally created
+> this patch to fix a bug on that branch, so the "we are about to add ..." comment
+> really only makes sense in that context.
 > 
-> out_unlock:
-> 	kvm_for_each_vcpu(j, vcpu, kvm) {
-> 		if (i == j)
-> 			break;
-> 		mutex_unlock(&vcpu->mutex);
-> 	}
-> 	return r;
-> }
-> EXPORT_SYMBOL_GPL(kvm_lock_all_vcpus);
+> We are not yet ready to post D128 upstream - there are still a lot of questions
+> to answer - but Anshuman has been posting some of the reshuffling and cleanups
+> that prepare the way for D128 where (we think) it makes sense. The aim is to
+> reduce the diff as much as we can.
+
+Agreed. All these patches have been really harmless clean ups and re-orgs etc,
+that do not affect existing 64 bit page table management or its functioning in
+any manner. OTOH these changes help the kernel prepare for D128 enablement.
+
+> 
+>>
+>> but all I've seen so far are piecemeal patches like this and it's hard
+>> to know what to do with them, to be honest. Somebody could reasonably
+>> turn up next week and clean this up to use FIELD_GET() again.
+>>
+>> Grepping around, I also see that the KVM page-table code uses the FIELD_*
+>> macros on page-table entries, so perhaps we're better off adding support
+>> for 128-bit types to those instead of trying to avoid them?
+> 
+> I think FIELD_* are always implicitly 64 bit, right? I could be wrong...
+> 
+> But I agree with the overall sentiment; where stuff is clearly crossing over
+> into KVM, which hasn't been tackled yet, don't post until we have a good view on
+> what KVM needs.
+Keeping KVM changes separate was the motivation in V1 of this patch for similar
+reasons. KVM uses FIELD_GET() for all the page table management purposes, hence
+wanted to keep these S1 changes separate.
