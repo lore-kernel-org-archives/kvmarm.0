@@ -1,214 +1,197 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02B62586FE
-	for <kvmarm@lists.linux.dev>; Mon,  5 May 2025 16:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B22526A0F2
+	for <kvmarm@lists.linux.dev>; Mon,  5 May 2025 16:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746461119; cv=none; b=KZg1GuTOgYPX+hFqtAGkwLAxh1YMQ+eSwzVMyIXYQtlShYAOuD0EzOlEyv2yy+g6c6SOONbtXkkkljvnMWUZ9eYYOTNQjRfSCen7pZRiJChxypDg6YicjYa1NpmgCkmWpyAasEmpi/VXAumW4m/2n+OlwprospHeNG+N+PxCIIM=
+	t=1746461658; cv=none; b=Mh9HZEi/cRPCldx+wz2M+xlKfS0LKYIP+l9X70mBNSV4GwJJSINTVnDB9SNH1I6BuImjb7HRQI1PGLpZdh70Kg5YIPz6yGUGZMnzh2xdBqLOA5u3QI13rHvo6uHX1SOYzm0AtHQjPXLqrpuZcVR3/Rt5KsnfahtkS3aZcBAZQP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746461119; c=relaxed/simple;
-	bh=iBc34nW32DsGbg1aE4Fh/HhP86gdrvKGrvUD3HhCb2Q=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=B1o0iTLvrvh0IZXyk/JJWVZc0GWk4vJZJQ8tR2wF8PEhzwYDapTQAXn4CtKgaEtoRb8V/5ZHI8VCaQ5eDKXgsvshJ2fAXRMIL8+SOFADD03mSE8267OQj8QYxa3xSTAIO3OXCWKXNnWnEQ8ntlQ09p27NZ+6qDD1+lh7ByzSy48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SAKfuSzD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1746461658; c=relaxed/simple;
+	bh=46u2XlOILqRiuyiqz9Sifgha9tyJxwuBFrgpc1JvSys=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q216fFKpSXkq4zsxaofhmjOWReq/u/FrZJkBXT3FHjXyyLKQAer6wO11thkoympMlGMLQaTGwWkzaojJJFIolSQhu4Q80AOqKdjOwtccW7RYz/4kJIXGJpeiyxMN6SqbGszd9Lgx3iYMU5UatJx659btps9+8PSVagAbqE8t1ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mIWjzHYR; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAKfuSzD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746461114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xbmQKqHbaixk79j7TKKru6hbZh7kM54PuiKw9+W744U=;
-	b=SAKfuSzDNesikq5hPC5kOf213IlUhw/DhVMT4v82tDwsZn7saxBRdbW58hm2rIvkEtpPCZ
-	QZ9c3BQ4mH5O70K4lOKPJVn/293H/s8vD2yG/8D3XfQHiFoF5C/wB14NjUCczA6ciTULhs
-	n6aetU/ZGJTB9D5DgPz74/WmFcsCibI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-19YBDid7P768sBFCJ84c4g-1; Mon, 05 May 2025 12:05:12 -0400
-X-MC-Unique: 19YBDid7P768sBFCJ84c4g-1
-X-Mimecast-MFC-AGG-ID: 19YBDid7P768sBFCJ84c4g_1746461111
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a064c45f03so1902482f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 05 May 2025 09:05:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mIWjzHYR"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b115fb801bcso4906158a12.3
+        for <kvmarm@lists.linux.dev>; Mon, 05 May 2025 09:14:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746461656; x=1747066456; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Y6KHT1fuAVM+MkXSINIoI6H3OHOwSneU2VxsD+qo2oQ=;
+        b=mIWjzHYRpqjRDodq03XdJHmHFmaSYJSuKA3yaHZxFcsbXdN+AzIAyfYOdHQLjBgIEh
+         edBnJyg6zht1tuD7btWdcm0V9dcCadIS/42nMv/WJhmYihFbw0BeLbV97QQp1R/tNHmJ
+         VaPZxE+HblIjpvz2xwX9IJptZdgnLYoqwZxc9wWdQyI+90H6241yKcFSIQyzywa8TSk+
+         9MeoMzduJT/YKJFeeqW4mFSu1YFeTyp9SwlKd+exmQEVtLr8mjYDWHtHG/41D0zS1Tpk
+         47iLtrlLhbDys7uX/5NRV+IheJyIZWY56n7mw3WBeQK0Zay0o9ysZmfHYZNFukilWIX5
+         BXNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746461111; x=1747065911;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xbmQKqHbaixk79j7TKKru6hbZh7kM54PuiKw9+W744U=;
-        b=HWer9Q1v7wUqO6Wi2+S74moBVRzCRC/JszED8K/AP1SLoNFYAf+omD+7a7MbeYpwMA
-         cxe2BykLt4AFuuakuI7qhHjC5IJFxvEZ8ex5yE5GfCzB4qPVptDNdXzlrUqfyvCJw/H1
-         EtXWFNYlX7JJrEd5YcRZWnjTyXEnQf38TgyvtTrMP9hxHgJWSlX0bS+ttX3OR9Kkh/D1
-         2b5ewv4JQJ4jSJxi0cVVuX7hX14I0csLb0szKYnCGunbxP3x5ZjCUdUIs/GdKaqYa7pI
-         PSwKdmvd4KywPpI3odaF9CGcl0HcmT/qc2oW5iAmz8qP7NZH5aNMMaA8g8lFu5otp17D
-         zmEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUifm0XouPeT/JeX7VK8GoY4tOPm8LrN7sXAwRBNi8/O0mtbcFbrIKnF99gplmwTD71+SM/ixE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwYKOZuBzi/addDpOAAR4oqKQcZXQXfBBciCNQylfq3j/9CWom5
-	LFl0QK3sp51X681jncgSMFxRhFtSDS7hzOej409YTvr4PExg1K4gHzeLjxvvkwshGC36+bYUThb
-	NNF9AviqHb+DDcyl36G///rHT4SAGQmLuIUzBAmLduhrjNyWWKpLxVw==
-X-Gm-Gg: ASbGncs1/vsc16mFI0xzqzs/Z1WMqkbDuwJZr5j9OUuEIYe7dGX8rnyaaIg7U5R8oPI
-	FiSxL8Xi5YWkC7J0XJ5VpMmSN3d/6bt4/arU1NVqwGDQqNrnU3yeJIQhl+2BIzEeAFbKEe4MC1h
-	m7p+/5YezkL3V15phfTmTB2ivT8yRn2FhKCKXgZ4dLvHc/+vK2oLtMpxPGpyEtGAmod9tQtQoVb
-	w+XDkLue1fy6OFA24degI+A5uqGPYfrhBeAMKaoYdTKKv7S02Ho/wlRgZeLrwlbj+Nur6DGEKsC
-	VtX15CkwoJkDsGwHCk9vh2GfDSmYCtakPcKLRbcq1wgN+EbRUiWs3tX9zu1C
-X-Received: by 2002:a5d:5847:0:b0:3a0:92d9:da4 with SMTP id ffacd0b85a97d-3a0ab5570d7mr42038f8f.6.1746461110874;
-        Mon, 05 May 2025 09:05:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGrTCOZOA7pAPkGMgb4M/yK3jl2JFA1fizSH2/7N2z92v4GSBR5vAiFYanEje4sscTa08V1CA==
-X-Received: by 2002:a5d:5847:0:b0:3a0:92d9:da4 with SMTP id ffacd0b85a97d-3a0ab5570d7mr41959f8f.6.1746461110131;
-        Mon, 05 May 2025 09:05:10 -0700 (PDT)
-Received: from rh (p200300f6af1bce00e6fe5f11c0a7f4a1.dip0.t-ipconnect.de. [2003:f6:af1b:ce00:e6fe:5f11:c0a7:f4a1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b89cc469sm139635145e9.6.2025.05.05.09.05.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 09:05:09 -0700 (PDT)
-Date: Mon, 5 May 2025 18:05:08 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-cc: Oliver Upton <oliver.upton@linux.dev>, Quentin Perret <qperret@google.com>, 
-    Fuad Tabba <tabba@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-    Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>, 
-    Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, 
-    kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: LM regression: fce886a60207 KVM: arm64: Plumb the pKVM MMU in
- KVM
-In-Reply-To: <86ldrbgl2x.wl-maz@kernel.org>
-Message-ID: <7863e387-0b91-fac5-9925-e461ae7b30cd@redhat.com>
-References: <3f5db4c7-ccce-fb95-595c-692fa7aad227@redhat.com> <86msbrguka.wl-maz@kernel.org> <e1117e68-ef05-9de2-d018-685bb7d86bb5@redhat.com> <86ldrbgl2x.wl-maz@kernel.org>
+        d=1e100.net; s=20230601; t=1746461656; x=1747066456;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y6KHT1fuAVM+MkXSINIoI6H3OHOwSneU2VxsD+qo2oQ=;
+        b=jLafpxS2evj6Bu9EbW1tbmcdxRw46/FBjxJYk7OoY34qcBC7nbsyG8psa++0FTZpg2
+         2llM+0gx2NwGWiN0b3TQ5hZRuWvxo/Ti+JOprGz5QyoksA6BCNFVFEfRBWSRfzHX8MBl
+         I400bqNbRZmjEhldD5dxS2vVOtMo4HAB4q8lnzTQvpXBgLh55lgw/SKGN6AF/+jJwKfF
+         SEEdAm8ZOa+hx1SePAD+ud7l4mc0AIU2gLXl9GEzanrVed7tcOLl8H6JeRoL6uqHYxK3
+         6O+Ky1EknjuiO72Ohq8hnrq76MEZCqVDZCeYG1IoRppYgiEsoq4ZJCCSztCigkiJad5x
+         2bRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU0rSG4NPrGxSdW8b8rxwlvn/jzPcBe7MDnKWKG//My7XshDQZfbkQbr0tELZPpvEPsz5MJJDo=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywt6u0W/wP0YOuc3oJE1iVe/PYUtTS98KaGYELb0k5jJfGj4DVe
+	6WZCz8KJU1Grenu0Iev0IHgMw0nKcDwgUDpb8G8cJvoqn9uCGROkB/3xAqbn8KepvB/TldE7mkw
+	loJyAHPI+mQ==
+X-Google-Smtp-Source: AGHT+IFROwVfZzwUrc47gwt10xGllcKawPs6+PzhuOzeHVlfd+NhQ3axCf6K4h719pvA/HvyBR0gDvS7G15Lqw==
+X-Received: from pji8.prod.google.com ([2002:a17:90b:3fc8:b0:2fc:2ee0:d38a])
+ (user=jiaqiyan job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4ec7:b0:309:e351:2e3d with SMTP id 98e67ed59e1d1-30a5ae132e5mr18020085a91.12.1746461655808;
+ Mon, 05 May 2025 09:14:15 -0700 (PDT)
+Date: Mon,  5 May 2025 16:14:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: PsLWPMB3TRXsPUfrwraR20HQL54-5Z8gVhV4qitRcgA_1746461111
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
+Message-ID: <20250505161412.1926643-1-jiaqiyan@google.com>
+Subject: [PATCH v1 0/6] VMM can handle guest SEA via KVM_EXIT_ARM_SEA
+From: Jiaqi Yan <jiaqiyan@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev
+Cc: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	shuah@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	duenwen@google.com, rananta@google.com, jthoughton@google.com, 
+	Jiaqi Yan <jiaqiyan@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 5 May 2025, Marc Zyngier wrote:
-> On Mon, 05 May 2025 15:01:24 +0100,
-> Sebastian Ott <sebott@redhat.com> wrote:
->>
->> On Mon, 5 May 2025, Marc Zyngier wrote:
->>> On Mon, 05 May 2025 11:52:00 +0100,
->>> Sebastian Ott <sebott@redhat.com> wrote:
->>>> Doing back and forth migrations currently fails on arm after a couple iterations.
->>>> During the failing migration KVM_RUN exits via guest_abort and returns -ENOMEM.
->>>> I can reliably reproduce this by migrating between 2 qemu instances on an ampere
->>>> altra machine. This fails after < 5 iterations. In this case qemu would spit out
->>>> smth like this (other than that - nothing in the logs):
->>>>
->>>> error: kvm run failed Cannot allocate memory
->>>>  PC=0000aaaae7d48590 X00=0000aaaae80a2e00 X01=0000aaaae7ea2fc0
->>>> X02=0000000001d3a5d0 X03=0000aaaae7eace8c X04=000000003b9aca00
->>>> X05=000000000000004a X06=000000000000004a X07=0000000028000000
->>>> X08=0000000000001d70 X09=0000000000000018 X10=000144b7d0000000
->>>> X11=00ffffffffffffff X12=000000008378f367 X13=0000aaab1a202d70
->>>> X14=0000000000000000 X15=0000000000000000 X16=0000ffffa2e2f7a8
->>>> X17=0000ffffa2541f20 X18=000000000000a000 X19=84bfda6288cf2dd6
->>>> X20=0000aaab1a1f1ce0 X21=000000007fffffff X22=0000ffffc5431788
->>>> X23=0000aaab1a17db60 X24=0000ffffc5431770 X25=0000000100000000
->>>> X26=0000004100000000 X27=0000000000000001 X28=0000aaab1a1f1c20
->>>> X29=0000ffffc54316d0 X30=0000aaaae7f8cd24  SP=0000ffffc5431650
->>>> PSTATE=20001000 --C- EL0t
->>>>
->>>> Guest and host are otherwise idle, kvm is in normal VHE mode.
->>>>
->>>> Git bisect points to (fce886a60207 "KVM: arm64: Plumb the pKVM MMU in KVM")
->>>> I also double checked that by reverting this commit on top of 6.14.
->>>
->>> Thanks for find the triggering commit. Can you further identify *what*
->>> causes the -ENOMEM? The only new -ENOMEM in that patch is the one
->>> added to topup_hyp_memcache(), which shouldn't be called.
->>
->> The kvm_pgtable_stage2_map() call in user_mem_abort() returns -ENOMEM
->> because the memcache pointer was not initialized!
->>
->> It looks like smth like this without other conditions could do the trick:
->>
->> if (!is_protected_kvm_enabled())
->> 	memcache = &vcpu->arch.mmu_page_cache;
->> else
->> 	memcache = &vcpu->arch.pkvm_memcache;
->>
->> (I'll try this now)
->
-> Right, we end-up with an uninitialised memcache variable. Why isn't
-> the compiler screaming?
+Problem
+=======
 
-Yea. Also I was under the impression that these kind of warnings tend to
-over indicate..
+When host APEI is unable to claim synchronous external abort (SEA)
+during stage-2 guest abort, today KVM directly injects an async SError
+into the VCPU then resumes it. The injected SError usually results in
+unpleasant guest kernel panic.
 
-> I think you can indeed simply hoist the init of memcache very early
-> on, which should solve hopefully solve the issue.
+One of the major situation of guest SEA is when VCPU consumes recoverable
+uncorrected memory error (UER), which is not uncommon at all in modern
+datacenter servers with large amounts of physical memory. Although SError
+and guest panic is sufficient to stop the propagation of corrupted memory
+there is still room to recover from memory UER in a more graceful manner.
 
-It solves the issue for me. Please note that in this case topup cache is
-not called - I hope that this is not an issue (but it was also the case
-before commit fce886a60207).
+Proposed Solution
+=================
 
->>
->>> Also, a failure to allocate would leave some nastygram in the kernel
->>> log, so it is unlikely to be an actual failure to allocate.
->>>
->>> Is it the first KVM_RUN that fails after migration?
->>
->> Nope, it happens on the side that triggers the migration.
->
-> Probably because splitting pages requires allocating some memory, and
-> all of a sudden you trigger the allocation from the memcache. Boo.
->
-> Thanks for spotting this, I'm looking forward to the fix!
+Alternatively KVM can replay the SEA to the faulting VCPU, via existing
+KVM_SET_VCPU_EVENTS API. If the memory poison consumption or the fault
+that cause SEA is not from guest kernel, the blast radius can be limited
+to the consuming or faulting guest userspace process, so the VM can keep
+running.
 
-------->8
-From c594bbf9c3c4186594b798734ea9b1779be3b584 Mon Sep 17 00:00:00 2001
-From: Sebastian Ott <sebott@redhat.com>
-Date: Mon, 5 May 2025 11:09:58 -0400
-Subject: [PATCH] KVM: arm64: Fix uninitialized memcache pointer in user_mem_abort()
+In addition, instead of doing under the hood without involving userspace,
+there are benefits to redirect the SEA to VMM:
 
-Commit fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM") made the
-initialization of the local memcache variable in user_mem_abort()
-conditional, leaving a codepath where it is used uninitialized via
-kvm_pgtable_stage2_map().
+- VM customers care about the disruptions caused by memory errors, and
+  VMM usually has the responsibility to start the process of notifying
+  the customers of memory error events in their VMs. For example some
+  cloud provider emits a critical log in their observability UI [1], and
+  provides playbook for customers on how to mitigate disruptions to
+  their workloads.
 
-This can lead to migration failures where KVM_RUN exits with -ENOMEM.
-Fix this by making sure that memcache is always valid.
+- VMM can protect future memory error consumption or faults by unmapping
+  the poisoned pages from stage-2 page table with KVM userfault [2],
+  which is more performant than splitting the memslot that contains
+  the poisoned guest pages.
 
-Fixes: fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM")
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
----
-  arch/arm64/kvm/mmu.c | 7 +++++--
-  1 file changed, 5 insertions(+), 2 deletions(-)
+- VMM can keep track SEA events in the VM. When VMM thinks the status
+  on the host or the VM is bad enough, e.g. number of distinct SEAs
+  exceeds a threshold, it can restart the VM on another healthy host.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 754f2fe0cc67..6c3c658c5f29 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1501,6 +1501,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-  		return -EFAULT;
-  	}
+- Behavior parity with x86 architecture. When machine check exception
+  (MCE) is caused by VCPU, kernel or KVM signals userspace SIGBUS to
+  let VMM either recover from the MCE, or terminate itself with VM.
+  The prior RFC proposes to implement SIGBUS on arm64 as well, but
+  Marc preferred VCPU exit over signal [3]. However, implementation
+  aside, returning SEA to VMM is on par with returning MCE to VMM.
 
-+	if (!is_protected_kvm_enabled())
-+		memcache = &vcpu->arch.mmu_page_cache;
-+	else
-+		memcache = &vcpu->arch.pkvm_memcache;
-+
-  	/*
-  	 * Permission faults just need to update the existing leaf entry,
-  	 * and so normally don't require allocations from the memcache. The
-@@ -1511,10 +1516,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-  		int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+Once SEA is redirected to VMM, among other actions, VMM is encouraged
+to inject external aborts into the faulting VCPU, which is already
+supported by KVM on arm64, although not fully supported by
+KVM_SET_VCPU_EVENTS but complemented in this patchset.
 
-  		if (!is_protected_kvm_enabled()) {
--			memcache = &vcpu->arch.mmu_page_cache;
-  			ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
-  		} else {
--			memcache = &vcpu->arch.pkvm_memcache;
-  			ret = topup_hyp_memcache(memcache, min_pages);
-  		}
-  		if (ret)
+New UAPIs
+=========
 
-base-commit: 92a09c47464d040866cf2b4cd052bc60555185fb
+This patchset introduces following userspace-visiable changes to empower
+VMM to control what happens next for guest SEA:
+
+- KVM_CAP_ARM_SEA_TO_USER. If userspace enables this new capability at VM
+  creation, KVM will not inject SError while taking SEA, but VM exit to
+  userspace.
+
+- KVM_EXIT_ARM_SEA. This is the VM exit reason VMM gets. The details
+  about the SEA is provided in arm_sea as much as possible, including
+  ESR value at EL2, if guest virtual and physical addresses (GPA and GVA)
+  are available and the values if available.
+
+- KVM_CAP_ARM_INJECT_EXT_IABT. VMM today can inject external data abort
+  to VCPU via KVM_SET_VCPU_EVENTS API. However, in case of instruction
+  abort, VMM cannot inject it via KVM_SET_VCPU_EVENTS.
+  KVM_CAP_ARM_INJECT_EXT_IABT is just a natural extend to
+  KVM_CAP_ARM_INJECT_EXT_DABT that tells VMM KVM_SET_VCPU_EVENTS now
+  supports external instruction abort.
+
+Patchset utilizes commit 26fbdf369227 ("KVM: arm64: Don't translate
+FAR if invalid/unsafe") from [4], available already in kvmarm/next.
+[4] makes KVM safely do address translation for HPFAR_EL2, including at
+the event of SEA, and indicate if HPFAR_EL2 is valid in NS bit.
+This patchset depends on [4] to tell userspace if GPA is valid and
+its value if valid.
+
+Patchset is based on commit 68ec8b4e84446 ("Merge branch
+kvm-arm64/pkvm-6.16 into kvmarm-master/next")
+
+[1] https://cloud.google.com/solutions/sap/docs/manage-host-errors
+[2] https://lpc.events/event/18/contributions/1757/attachments/1442/3073/LPC_%20KVM%20Userfault.pdf
+[3] https://lore.kernel.org/kvm/86pljbqqh0.wl-maz@kernel.org
+[4] https://lore.kernel.org/all/174369514508.3034362.13165690020799838042.b4-ty@linux.dev
+
+Jiaqi Yan (5):
+  KVM: arm64: VM exit to userspace to handle SEA
+  KVM: arm64: Set FnV for VCPU when FAR_EL2 is invalid
+  KVM: selftests: Test for KVM_EXIT_ARM_SEA and KVM_CAP_ARM_SEA_TO_USER
+  KVM: selftests: Test for KVM_CAP_INJECT_EXT_IABT
+  Documentation: kvm: new uAPI for handling SEA
+
+Raghavendra Rao Ananta (1):
+  KVM: arm64: Allow userspace to inject external instruction aborts
+
+ Documentation/virt/kvm/api.rst                | 120 ++++++-
+ arch/arm64/include/asm/kvm_emulate.h          |  12 +
+ arch/arm64/include/asm/kvm_host.h             |   8 +
+ arch/arm64/include/asm/kvm_ras.h              |  21 +-
+ arch/arm64/include/uapi/asm/kvm.h             |   3 +-
+ arch/arm64/kvm/Makefile                       |   3 +-
+ arch/arm64/kvm/arm.c                          |   6 +
+ arch/arm64/kvm/guest.c                        |  13 +-
+ arch/arm64/kvm/inject_fault.c                 |   3 +
+ arch/arm64/kvm/kvm_ras.c                      |  54 +++
+ arch/arm64/kvm/mmu.c                          |  12 +-
+ include/uapi/linux/kvm.h                      |  12 +
+ tools/arch/arm64/include/uapi/asm/kvm.h       |   3 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   2 +
+ .../testing/selftests/kvm/arm64/inject_iabt.c | 100 ++++++
+ .../testing/selftests/kvm/arm64/sea_to_user.c | 324 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+ 17 files changed, 654 insertions(+), 43 deletions(-)
+ create mode 100644 arch/arm64/kvm/kvm_ras.c
+ create mode 100644 tools/testing/selftests/kvm/arm64/inject_iabt.c
+ create mode 100644 tools/testing/selftests/kvm/arm64/sea_to_user.c
+
 -- 
-2.49.0
+2.49.0.967.g6a0df3ecc3-goog
 
