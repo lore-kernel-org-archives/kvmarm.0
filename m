@@ -1,253 +1,212 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1E326D4E1
-	for <kvmarm@lists.linux.dev>; Mon,  5 May 2025 16:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEC71865E3;
+	Mon,  5 May 2025 16:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746461667; cv=none; b=pi1m4eBGx+nRQr4W8VPwwBnPEE9y5kYke1hcekW5828OzO1N+deN3e/mKgex6OKqOqF83G4RuEeNvr+JM4/7lL9bvzHpjwUj/GQGe5g5pZLl37qkg5+pEFwWaNIFp6KeDfsSh3Q8p0CkMhnJ/Vbi3TuDKIKYP1BlkzIuzTx3f9k=
+	t=1746462394; cv=none; b=BessoZ/BaMylpORTeYmNEtxK5n5D3SOysSzaS3KIsIeJTFLrWgN8PSWtVDLAkYi5h/GNWVP2kB4jjI0piog3H1LLcs4P2uqUohVWeet2lHExrRmSGdTXaTSY1EamT5swSf03/oJLMaOths3SNOQiMHFu5xUVfJV1uQWhQjnDiLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746461667; c=relaxed/simple;
-	bh=fyGzyoomoTYo9P/p+ApF12DGGrn8h/VhXiAUSg88UfE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sQq+8TlDD3HhetDhiyK7g3ckH3+A6g5SzzJ4jrjUCM3Tk4xzuXZdZZMOGaruO7/fe3KLlgQvAAD4QyZMSGqcfNkl8LS/5e5YvAgf74Qbte4hZVA6smSEU3tJJnjjQgg9CW9s3KY1wcvi6d1KWRY2+Z/UTsj09Wa3X+lGcq0QqCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XujPNfLW; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com
+	s=arc-20240116; t=1746462394; c=relaxed/simple;
+	bh=GtIIzxDECq7kLae9jREw4F50qmrqIijGoHyorGzxYbw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A3/oRqZagRTQIKkA0bD0ZfdZAjVg2X9mf31Croq19TB1FT6dwbrpAgFnPWGUBoQeaZgHt0mSLdBe/tsTXuK1x5MJ7p0q5W8IZC6xtUwS0ZHnHWvQoMs5OhyA8KB9h9E7PKUKf8Bn1ZpB3t32IkUiW1kOHcPCHzPuJ6Tvm3c0gLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J9p6gnBk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XujPNfLW"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-736c7df9b6cso6338876b3a.3
-        for <kvmarm@lists.linux.dev>; Mon, 05 May 2025 09:14:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746461664; x=1747066464; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qCRTPaLL/ddSZCO1i6dVdhSDdFDF5EjuW/HmAYg1Ry0=;
-        b=XujPNfLW/NdufOA9QQo44+IMXiJwy4GRPAElmfLHw7DwFIlo6CNAV9u2necbLCEZgb
-         u6YeXtHE4b56duhvft1uIfm+FS5AduAI98j6vcS9+vg0pLv0Cvid9LrAEPhjL32TEnup
-         XpEgBe693VZ2zfqJXYIh6Vkiupo1dMfoeNXbsmD9uBfPGAHRt4IPrQGiuQ28v++FzzBC
-         MQ9wHHO7lEdZZwqT+OHZ42jwQZDv35L8v0423cXoU+pBlfu6o6lIn8pp1zfeG/14m9xJ
-         +kTdvwqYoDoWMShAbpNnZdGVggfoYM+erpYP+o1EwDJZ8ZJJL3v3fchYbnOPLeNnPdjr
-         BPtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746461664; x=1747066464;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qCRTPaLL/ddSZCO1i6dVdhSDdFDF5EjuW/HmAYg1Ry0=;
-        b=S06LtL5snZswkNQ8j3Ix76DUN9MR1cv9SdrHsBwblFERUONYE84kOtcFdLjFojGnFP
-         MCmeHNdxVD8n3oQjganVteYiy6qD8+AD3ee8Vtz4y5r5wQg6MIUzjk2oFpX2eLArJx7Z
-         /MkqRIdtB7MzUiYvHpTav6IFILFPF0brx9eiUo3+INui9hSLgQEogw/ekTnhmuEVmbSo
-         +2RXevvnDNg6klptBTqRX+YJnRCMbjqPoutjnP3zTXZPHfOvVYa/2DwNTEf5jbLKqWjO
-         AJQYGK/GWkh8+4pz+Wwe7B2BXr5EXbrX1oMpk5hif9vzxQOahwvQHQEmWTiayBFK0LRl
-         Pb4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWLWUspAVvQLzt5S0sD5+3/NN/ZbdtTBvlt2MKupgKZyBmB3rk35dBybKl86paJFFhP1HPlzDQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxH8uO8VbNua/akTcoZfJIrbi2bWVmln5CQOQopKkeow2xcr7Bd
-	imPh9aM/w6WGMkzplm+h0vyvOpbhtQdN1XNufBP0pxifOTsBSX/zDpv/FgqC2E3DY5v+1X0NtZX
-	zosMLF7C9Tg==
-X-Google-Smtp-Source: AGHT+IE1SVeU3n4ai6CrxrMJm0u9dBQoZvk8Si1b7xa5PwydPXT87LL3o3Oqy2HVQLl3IBAbqfHn31O9UmD3SA==
-X-Received: from pfbki23.prod.google.com ([2002:a05:6a00:9497:b0:73d:b1c4:5d7f])
- (user=jiaqiyan job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:2e9d:b0:740:6f7f:7645 with SMTP id d2e1a72fcca58-7406f7f7a1amr12841654b3a.8.1746461664178;
- Mon, 05 May 2025 09:14:24 -0700 (PDT)
-Date: Mon,  5 May 2025 16:14:12 +0000
-In-Reply-To: <20250505161412.1926643-1-jiaqiyan@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J9p6gnBk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00960C4CEE4;
+	Mon,  5 May 2025 16:26:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746462394;
+	bh=GtIIzxDECq7kLae9jREw4F50qmrqIijGoHyorGzxYbw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=J9p6gnBkEFKu7t4zhvSfi4T0OXWty2q9dBQYJ/RXZhU0TPeDoaVsC4xsdpt5aSelq
+	 ELWVFNnyxXwb55qoWMwf5QdhhakNFQTmqJ0KQhLT8izzTFiwVGhDt9B+OC71K0auqg
+	 WmCdwkNeywxp4arN/C/tLjX3O47QwvRl6ytpgY6c25QPu4Yc4K45U7+WhOKWWs82OO
+	 qFrtfWGXSIS/xX5wCz9tzCshlvtEKdiSS31a6WBkgxg19+JNgYkWwUytZHWFV/fb0K
+	 8oYx/ZlFi4QbhHtq2LwepFh376O30+h42b1aHnhYad+wEBtyisJwnULsx3x+q/5DZo
+	 Eju87o1Mv+VrQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uByeF-00Bmmj-O3;
+	Mon, 05 May 2025 17:26:31 +0100
+Date: Mon, 05 May 2025 17:26:31 +0100
+Message-ID: <86jz6vgh1k.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: LM regression: fce886a60207 KVM: arm64: Plumb the pKVM MMU in KVM
+In-Reply-To: <7863e387-0b91-fac5-9925-e461ae7b30cd@redhat.com>
+References: <3f5db4c7-ccce-fb95-595c-692fa7aad227@redhat.com>
+	<86msbrguka.wl-maz@kernel.org>
+	<e1117e68-ef05-9de2-d018-685bb7d86bb5@redhat.com>
+	<86ldrbgl2x.wl-maz@kernel.org>
+	<7863e387-0b91-fac5-9925-e461ae7b30cd@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250505161412.1926643-1-jiaqiyan@google.com>
-X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
-Message-ID: <20250505161412.1926643-7-jiaqiyan@google.com>
-Subject: [PATCH v1 6/6] Documentation: kvm: new uAPI for handling SEA
-From: Jiaqi Yan <jiaqiyan@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev
-Cc: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	shuah@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	duenwen@google.com, rananta@google.com, jthoughton@google.com, 
-	Jiaqi Yan <jiaqiyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebott@redhat.com, oliver.upton@linux.dev, qperret@google.com, tabba@google.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Document the new userspace-visible features and APIs for handling
-synchronous external abort (SEA)
-- KVM_CAP_ARM_SEA_TO_USER: How userspace enables the new feature.
-- KVM_EXIT_ARM_SEA: When userspace needs to handle SEA and what
-  userspace gets while taking the SEA.
-- KVM_CAP_ARM_INJECT_EXT_(D|I)ABT: How userspace injects SEA to
-  guest while taking the SEA.
+On Mon, 05 May 2025 17:05:08 +0100,
+Sebastian Ott <sebott@redhat.com> wrote:
+> 
+> On Mon, 5 May 2025, Marc Zyngier wrote:
+> > On Mon, 05 May 2025 15:01:24 +0100,
+> > Sebastian Ott <sebott@redhat.com> wrote:
+> >> 
+> >> On Mon, 5 May 2025, Marc Zyngier wrote:
+> >>> On Mon, 05 May 2025 11:52:00 +0100,
+> >>> Sebastian Ott <sebott@redhat.com> wrote:
+> >>>> Doing back and forth migrations currently fails on arm after a couple iterations.
+> >>>> During the failing migration KVM_RUN exits via guest_abort and returns -ENOMEM.
+> >>>> I can reliably reproduce this by migrating between 2 qemu instances on an ampere
+> >>>> altra machine. This fails after < 5 iterations. In this case qemu would spit out
+> >>>> smth like this (other than that - nothing in the logs):
+> >>>> 
+> >>>> error: kvm run failed Cannot allocate memory
+> >>>>  PC=0000aaaae7d48590 X00=0000aaaae80a2e00 X01=0000aaaae7ea2fc0
+> >>>> X02=0000000001d3a5d0 X03=0000aaaae7eace8c X04=000000003b9aca00
+> >>>> X05=000000000000004a X06=000000000000004a X07=0000000028000000
+> >>>> X08=0000000000001d70 X09=0000000000000018 X10=000144b7d0000000
+> >>>> X11=00ffffffffffffff X12=000000008378f367 X13=0000aaab1a202d70
+> >>>> X14=0000000000000000 X15=0000000000000000 X16=0000ffffa2e2f7a8
+> >>>> X17=0000ffffa2541f20 X18=000000000000a000 X19=84bfda6288cf2dd6
+> >>>> X20=0000aaab1a1f1ce0 X21=000000007fffffff X22=0000ffffc5431788
+> >>>> X23=0000aaab1a17db60 X24=0000ffffc5431770 X25=0000000100000000
+> >>>> X26=0000004100000000 X27=0000000000000001 X28=0000aaab1a1f1c20
+> >>>> X29=0000ffffc54316d0 X30=0000aaaae7f8cd24  SP=0000ffffc5431650
+> >>>> PSTATE=20001000 --C- EL0t
+> >>>> 
+> >>>> Guest and host are otherwise idle, kvm is in normal VHE mode.
+> >>>> 
+> >>>> Git bisect points to (fce886a60207 "KVM: arm64: Plumb the pKVM MMU in KVM")
+> >>>> I also double checked that by reverting this commit on top of 6.14.
+> >>> 
+> >>> Thanks for find the triggering commit. Can you further identify *what*
+> >>> causes the -ENOMEM? The only new -ENOMEM in that patch is the one
+> >>> added to topup_hyp_memcache(), which shouldn't be called.
+> >> 
+> >> The kvm_pgtable_stage2_map() call in user_mem_abort() returns -ENOMEM
+> >> because the memcache pointer was not initialized!
+> >> 
+> >> It looks like smth like this without other conditions could do the trick:
+> >> 
+> >> if (!is_protected_kvm_enabled())
+> >> 	memcache = &vcpu->arch.mmu_page_cache;
+> >> else
+> >> 	memcache = &vcpu->arch.pkvm_memcache;
+> >> 
+> >> (I'll try this now)
+> > 
+> > Right, we end-up with an uninitialised memcache variable. Why isn't
+> > the compiler screaming?
+> 
+> Yea. Also I was under the impression that these kind of warnings tend to
+> over indicate..
 
-Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
----
- Documentation/virt/kvm/api.rst | 120 +++++++++++++++++++++++++++++----
- 1 file changed, 107 insertions(+), 13 deletions(-)
+Quite. The obvious conclusion is that compilers are crap. Oh well.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 47c7c3f92314e..fa91a123e1b88 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1236,8 +1236,9 @@ directly to the virtual CPU).
- 		__u8 serror_pending;
- 		__u8 serror_has_esr;
- 		__u8 ext_dabt_pending;
-+		__u8 ext_iabt_pending;
- 		/* Align it to 8 bytes */
--		__u8 pad[5];
-+		__u8 pad[4];
- 		__u64 serror_esr;
- 	} exception;
- 	__u32 reserved[12];
-@@ -1292,20 +1293,52 @@ ARM64:
- 
- User space may need to inject several types of events to the guest.
- 
-+Inject SError
-+~~~~~~~~~~~~~
-+
- Set the pending SError exception state for this VCPU. It is not possible to
- 'cancel' an Serror that has been made pending.
- 
--If the guest performed an access to I/O memory which could not be handled by
--userspace, for example because of missing instruction syndrome decode
--information or because there is no device mapped at the accessed IPA, then
--userspace can ask the kernel to inject an external abort using the address
--from the exiting fault on the VCPU. It is a programming error to set
--ext_dabt_pending after an exit which was not either KVM_EXIT_MMIO or
--KVM_EXIT_ARM_NISV. This feature is only available if the system supports
--KVM_CAP_ARM_INJECT_EXT_DABT. This is a helper which provides commonality in
--how userspace reports accesses for the above cases to guests, across different
--userspace implementations. Nevertheless, userspace can still emulate all Arm
--exceptions by manipulating individual registers using the KVM_SET_ONE_REG API.
-+Inject SEA (synchronous external abort)
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+- If the guest performed an access to I/O memory which could not be handled by
-+  userspace, for example because of missing instruction syndrome decode
-+  information or because there is no device mapped at the accessed IPA.
-+
-+- If the guest consumed an uncorrected memory error, and RAS extension in the
-+  Trusted Firmware choose to notify PE with SEA, KVM has to handle it when
-+  host APEI is unable to claim the SEA. For the following types of faults,
-+  if userspace enabled KVM_CAP_ARM_SEA_TO_USER, KVM returns to userspace with
-+  KVM_EXIT_ARM_SEA:
-+
-+  - Synchronous external abort, not on translation table walk or hardware
-+    update of translation table.
-+
-+  - Synchronous external abort on translation table walk or hardware update of
-+    translation table, including all levels.
-+
-+  - Synchronous parity or ECC error on memory access, not on translation table
-+    walk.
-+
-+  - Synchronous parity or ECC error on memory access on translation table walk
-+    or hardware update of translation table, including all levels.
-+
-+For the cases above, userspace can ask the kernel to replay either an external
-+data abort (by setting ext_dabt_pending) or an external instruciton abort
-+(by setting ext_iabt_pending) into the faulting VCPU. KVM will use the address
-+from the exiting fault on the VCPU. Setting both ext_dabt_pending and
-+ext_iabt_pending at the same time will return -EINVAL.
-+
-+It is a programming error to set ext_dabt_pending or ext_iabt_pending after an
-+exit which was not KVM_EXIT_MMIO, KVM_EXIT_ARM_NISV or KVM_EXIT_ARM_SEA.
-+Injecting SEA for data and instruction abort is only available if KVM supports
-+KVM_CAP_ARM_INJECT_EXT_DABT and KVM_CAP_ARM_INJECT_EXT_IABT respectively.
-+
-+This is a helper which provides commonality in how userspace reports accesses
-+for the above cases to guests, across different userspace implementations.
-+Nevertheless, userspace can still emulate all Arm exceptions by manipulating
-+individual registers using the KVM_SET_ONE_REG API.
- 
- See KVM_GET_VCPU_EVENTS for the data structure.
- 
-@@ -7151,6 +7184,55 @@ The valid value for 'flags' is:
-   - KVM_NOTIFY_CONTEXT_INVALID -- the VM context is corrupted and not valid
-     in VMCS. It would run into unknown result if resume the target VM.
- 
-+::
-+
-+    /* KVM_EXIT_ARM_SEA */
-+    struct {
-+      __u64 esr;
-+  #define KVM_EXIT_ARM_SEA_FLAG_GVA_VALID   (1ULL << 0)
-+  #define KVM_EXIT_ARM_SEA_FLAG_GPA_VALID   (1ULL << 1)
-+      __u64 flags;
-+      __u64 gva;
-+	    __u64 gpa;
-+    } arm_sea;
-+
-+Used on arm64 systems. When the VM capability KVM_CAP_ARM_SEA_TO_USER is
-+enabled, a VM exit is generated if guest caused a synchronous external abort
-+(SEA) and the host APEI fails to handle the SEA.
-+
-+Historically KVM handles SEA by first delegating the SEA to host APEI as there
-+is high chance that the SEA is caused by consuming uncorrected memory error.
-+However, not all platforms support SEA handling in APEI, and KVM's fallback
-+handling is to inject an async SError into the guest, which usually panics
-+guest kernel unpleasantly. As an alternative, userspace can participate into
-+the SEA handling by enabling KVM_CAP_ARM_SEA_TO_USER at VM creation, after
-+querying the capability. Once enabled, when KVM has to handle the guest
-+caused SEA, it returns to userspace with KVM_EXIT_ARM_SEA, with details
-+about the SEA available in 'arm_sea'.
-+
-+The 'esr' filed holds the value of the exception syndrome register (ESR) while
-+KVM taking the SEA, which tells userspace the character of the current SEA,
-+such as its Exception Class, Synchronous Error Type, Fault Specific Code and
-+so on. For more details on ESR, check the Arm Architecture Registers
-+documentation.
-+
-+The 'flags' field indicates if the faulting addresses are available while
-+taking the SEA:
-+
-+  - KVM_EXIT_ARM_SEA_FLAG_GVA_VALID -- the faulting guest virtual address
-+    is valid and userspace can get its value in the 'gva' field.
-+  - KVM_EXIT_ARM_SEA_FLAG_GPA_VALID -- the faulting guest physical address
-+    is valid and userspace can get its value in the 'gpa' filed.
-+
-+Userspace needs to take actions to handle guest SEA synchronously, namely in
-+the same thread that runs KVM_RUN and receives KVM_EXIT_ARM_SEA. One of the
-+encouraged approaches is to utilize the KVM_SET_VCPU_EVENTS to inject the SEA
-+to the faulting VCPU. This way, the guest has the opportunity to keep running
-+and limit the blast radius of the SEA to the particular guest application that
-+caused the SEA. If the Exception Class indicated by 'esr' field in 'arm_sea'
-+is data abort, userspace should inject data abort. If the Exception Class is
-+instruction abort, userspace should inject instruction abort.
-+
- ::
- 
- 		/* Fix the size of the union. */
-@@ -8478,7 +8560,7 @@ ENOSYS for the others.
- When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
- type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
- 
--7.37 KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
-+7.42 KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
- -------------------------------------
- 
- :Architectures: arm64
-@@ -8496,6 +8578,18 @@ aforementioned registers before the first KVM_RUN. These registers are VM
- scoped, meaning that the same set of values are presented on all vCPUs in a
- given VM.
- 
-+7.43 KVM_CAP_ARM_SEA_TO_USER
-+----------------------------
-+
-+:Architecture: arm64
-+:Target: VM
-+:Parameters: none
-+:Returns: 0 on success, -EINVAL if unsupported.
-+
-+This capability, if KVM_CHECK_EXTENSION indicates that it is available, means
-+that KVM has an implementation that allows userspace to participate in handling
-+synchronous external abort caused by VM, by an exit of KVM_EXIT_ARM_SEA.
-+
- 8. Other capabilities.
- ======================
- 
+> 
+> > I think you can indeed simply hoist the init of memcache very early
+> > on, which should solve hopefully solve the issue.
+> 
+> It solves the issue for me. Please note that in this case topup cache is
+> not called - I hope that this is not an issue (but it was also the case
+> before commit fce886a60207).
+
+Indeed, and that's how I expect it to fail. We're also pretty lucky
+that we get a NULL instead of some random pointer...
+
+> From c594bbf9c3c4186594b798734ea9b1779be3b584 Mon Sep 17 00:00:00 2001
+> From: Sebastian Ott <sebott@redhat.com>
+> Date: Mon, 5 May 2025 11:09:58 -0400
+> Subject: [PATCH] KVM: arm64: Fix uninitialized memcache pointer in user_mem_abort()
+> 
+> Commit fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM") made the
+> initialization of the local memcache variable in user_mem_abort()
+> conditional, leaving a codepath where it is used uninitialized via
+> kvm_pgtable_stage2_map().
+> 
+> This can lead to migration failures where KVM_RUN exits with -ENOMEM.
+
+Not only. It can fail on any path that requires a stage-2 allocation
+without transition via a permission fault or logging. It is actually
+pretty amazing that it fails so rarely...
+
+> Fix this by making sure that memcache is always valid.
+> 
+> Fixes: fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM")
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+
++ Cc: stable@vger.kernel.org
+
+> ---
+>  arch/arm64/kvm/mmu.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 754f2fe0cc67..6c3c658c5f29 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1501,6 +1501,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  	}
+> 
+> +	if (!is_protected_kvm_enabled())
+> +		memcache = &vcpu->arch.mmu_page_cache;
+> +	else
+> +		memcache = &vcpu->arch.pkvm_memcache;
+> +
+>  	/*
+>  	 * Permission faults just need to update the existing leaf entry,
+>  	 * and so normally don't require allocations from the memcache. The
+> @@ -1511,10 +1516,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+> 
+>  		if (!is_protected_kvm_enabled()) {
+> -			memcache = &vcpu->arch.mmu_page_cache;
+>  			ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
+>  		} else {
+> -			memcache = &vcpu->arch.pkvm_memcache;
+
+Feel free to drop the {}s that are now superfluous.
+
+>  			ret = topup_hyp_memcache(memcache, min_pages);
+>  		}
+>  		if (ret)
+> 
+
+With the above addressed:
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+Please post it as a standalone patch so that Oliver can add it to the
+next batch of fixes for 6.15.
+
+Thanks,
+
+	M.
+
 -- 
-2.49.0.967.g6a0df3ecc3-goog
-
+Without deviation from the norm, progress is not possible.
