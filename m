@@ -1,112 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAAD19D892;
-	Tue,  6 May 2025 08:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B24321A427;
+	Tue,  6 May 2025 08:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746520608; cv=none; b=L+ZJha/DPauISbBv7FThQMncn/1pC4vgf8dzOJgM+89cZQ7/O8qm6V4BU5AkydaSkTmpceEPu56XK/ZHrgy3OplYu1u4ke9u2GRC+XkmuCYwNNR5ZOOl8/7OvBpFZD2mz7BkOU5zr4mGuW6caHMFJfv4YkI6NFDaGstsFB7YzMw=
+	t=1746520796; cv=none; b=bKkhRZBpu3e558T3190oHj639Iwy6kvtCOThaYSUIwkZZS00LxdTJSQj4aaKPqZVKstY2V62It5veKE23TgzPT3Hz08ZgJJq20XVrAwf7g6Oc/A6ZO39c7Bq4PKL/qk9SuEMaky/O5fOf8QpStFtNRK1YiARPL/zhtEZF4Z7Rng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746520608; c=relaxed/simple;
-	bh=9VOMYTlC6ALS5IdAgzBAWP1xvgjsjQLiqbJ2O0ZhVHc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CNztpUsBHipjkw6DyCBfSg2tEsysDazJ01wSGYNsyShSU2ahL5YzRMROz/UG19xPdrq2ij3SFuukrksbboGWIDZlQMEBuzSS8LJFOruTL/sUdP2HVE3iBFCxaxkrgrx7gw0aIAI5G6ldT+ogPztxvSIeMwkQLfoijlVEcDNJ0P8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G2RqhqDT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746520796; c=relaxed/simple;
+	bh=R/t6fC8BgZ5UGdDoJP9eN+Jq6tu4AHWylYBkIjZvB30=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mL6CuHzz+99PZhqqJObrLUzcTE+JEvn7EIWi9SiPTaEaMF48lv5pVL/WG8WPLtDZsihonFhLyitHV9jURGrlicnTv0tp5RiLwU5G6ANYqeKmq8zg8SGiPOE6g/NwYWuQQ2xSFNQnB51tb+5QoR2l9IO9Bio+w1pXiLYdJYXOwrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRSTsY5L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G2RqhqDT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65BFFC4CEE4;
-	Tue,  6 May 2025 08:36:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRSTsY5L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BD75C4CEE4;
+	Tue,  6 May 2025 08:39:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746520607;
-	bh=9VOMYTlC6ALS5IdAgzBAWP1xvgjsjQLiqbJ2O0ZhVHc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G2RqhqDT+gZcdaDr4WlZdP0vofL3oNiEIDADXbadpArkaiurY9O2NUT46rZO3n8HL
-	 jheqZY23TyYhxAdGoyvOBgunYrbJggEAmbLA6prLdruFjdxUVZK+Fdj4BLg+/be53X
-	 ljTpmaR8UBdsVD0pU8pxIlLg2i+N/VYk06hW7XmwZB8a7kC58GIBqOxd90gR3K15t4
-	 mZS8hULgWZ050J/nBHpd3DhBjt2ikA0BHa1pZbWQDcIkT/0j5oRrxDepWyb2lqQWk7
-	 wpKD8UXmWU7x5bd1cFOUj72v+j9pbH3QdzheDN1EVmX9M899aGKEM9buy6Yewu3pjJ
-	 UhkhI1czrIBAw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1746520794;
+	bh=R/t6fC8BgZ5UGdDoJP9eN+Jq6tu4AHWylYBkIjZvB30=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FRSTsY5LuJkkIY9zFfEo0+imGmpxP0qCMWRRx1CLhWW/GFA7jcIbnxSjOMe9jmpZM
+	 STHSWL7V19PlSxKqKVjmL58P/cPDCTKJAJmEaqrlq6PTGduSpQ9RwKaU/YH2QypP1p
+	 R5svl3kG87xcom0CWV/q+/h+tBjJB12yEJzH+9FyWRup7uNTTtuw6XjD1KCGcNAIRm
+	 7xqhV21ksPpOFXpEsIZIxptRmMdN7kVcqSr06B2R9UTOR/fPpFtksdfy/TJDk2ugQh
+	 QZYgAceEpQiefLtcrPMCfftTDcKJNIYBMUSsAeQCP4Zpdu/HoebMAEcWf05WNBP6Oy
+	 rFf81znN24FIw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCDnA-00C97H-GY;
-	Tue, 06 May 2025 09:36:45 +0100
-Date: Tue, 06 May 2025 09:36:44 +0100
-Message-ID: <86h61ygmoz.wl-maz@kernel.org>
+	id 1uCDqC-00C9CL-B9;
+	Tue, 06 May 2025 09:39:52 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Mostafa Saleh <smostafa@google.com>,
-	kvmarm@lists.linux.dev,
-	kasan-dev@googlegroups.com,
-	linux-hardening@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	will@kernel.org,
-	oliver.upton@linux.dev,
-	broonie@kernel.org,
+To: will@kernel.org,
 	catalin.marinas@arm.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	elver@google.com,
-	andreyknvl@gmail.com,
-	ryabinin.a.a@gmail.com,
-	akpm@linux-foundation.org,
 	yuzenghui@huawei.com,
 	suzuki.poulose@arm.com,
 	joey.gouly@arm.com,
-	masahiroy@kernel.org,
-	nathan@kernel.org,
-	nicolas.schier@linux.dev
-Subject: Re: [PATCH v2 0/4] KVM: arm64: UBSAN at EL2
-In-Reply-To: <202504301131.3C1CBCA8@keescook>
-References: <20250430162713.1997569-1-smostafa@google.com>
-	<202504301131.3C1CBCA8@keescook>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	oliver.upton@linux.dev,
+	Seongsu Park <sgsu.park@samsung.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	cpgs@samsung.com
+Subject: Re: [PATCH] arm64: kvm: Replace ternary flags with str_on_off() helper
+Date: Tue,  6 May 2025 09:39:47 +0100
+Message-Id: <174652075464.339217.18009123147130751247.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <1891546521.01744691102904.JavaMail.epsvc@epcpadp1new>
+References: <CGME20250415012410epcas1p42b48977934c21b5db0b19f4185f7a63c@epcas1p4.samsung.com> <1891546521.01744691102904.JavaMail.epsvc@epcpadp1new>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kees@kernel.org, smostafa@google.com, kvmarm@lists.linux.dev, kasan-dev@googlegroups.com, linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, catalin.marinas@arm.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, elver@google.com, andreyknvl@gmail.com, ryabinin.a.a@gmail.com, akpm@linux-foundation.org, yuzenghui@huawei.com, suzuki.poulose@arm.com, joey.gouly@arm.com, masahiroy@kernel.org, nathan@kernel.org, nicolas.schier@linux.dev
+X-SA-Exim-Rcpt-To: will@kernel.org, catalin.marinas@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, joey.gouly@arm.com, oliver.upton@linux.dev, sgsu.park@samsung.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, cpgs@samsung.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 30 Apr 2025 19:32:23 +0100,
-Kees Cook <kees@kernel.org> wrote:
+On Tue, 15 Apr 2025 10:24:05 +0900, Seongsu Park wrote:
+> Replace repetitive ternary expressions with the str_on_off() helper
+> function. This change improves code readability and ensures consistency
+> in tracepoint string formatting
 > 
-> On Wed, Apr 30, 2025 at 04:27:07PM +0000, Mostafa Saleh wrote:
-> > Many of the sanitizers the kernel supports are disabled when running
-> > in EL2 with nvhe/hvhe/proctected modes, some of those are easier
-> > (and makes more sense) to integrate than others.
-> > Last year, kCFI support was added in [1]
-> > 
-> > This patchset adds support for UBSAN in EL2.
 > 
-> This touches both UBSAN and arm64 -- I'm happy to land this via the
-> hardening tree, but I expect the arm64 folks would rather take it via
-> their tree. What would people like to have happen?
 
-I don't mind either way, but in any case I'd like a stable branch with
-that code so that I can merge it if any conflict occurs in -next.
+Applied to kvm-arm64/misc-6.16, thanks!
 
-Alternatively, I can take it via the kvmarm tree, and publish a stable
-branch for anyone to pick and resolve conflicts ahead of the merge
-window.
+[1/1] arm64: kvm: Replace ternary flags with str_on_off() helper
+      commit: d2f14174f9e839e1128664ab339bbe17c333208b
 
-Thanks,
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
