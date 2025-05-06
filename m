@@ -1,69 +1,116 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4B7307206
-	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 03:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E161F6FC5;
+	Tue,  6 May 2025 06:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746502463; cv=none; b=NwPKEIZtEP7QMcwkkLJIMBsYF+bNXoydZPnmgyWsGVFWgcOJ2+5jlWDNJNx27e+76sTla4TqS0Xd8ydeNAbfo9pNr2eiBGOte9lvblANXKz1n9Nw0iNVgA/GscOM5TOoH6X6a3JThjAu5Kblv6Fym/IPNBRcdFz5EEI8vhdsWyc=
+	t=1746512400; cv=none; b=U8qldhBDD/x4a3GxK+Mm2nNIV+VyqG3tif8llBz8Cop5vPY/m/LyUR79vRgwe9Bp2QOcEexNWyNshCX7K8X9BIBzAkZAfayKRGSjKXapMgK4AffoiXQBkpAbJrW57GAHjE4/N2bP174DFWDkwn5YsP8m1Ppj39af0UwBbaw9V3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746502463; c=relaxed/simple;
-	bh=YXxzwzUfShMmUTLeJNa4UxyS7JtYbIjaxIMf/MdcsGo=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=febvWiEHLvUa2XjUw1ul9+xL/DX+F8JArGsFN6oP7aWPblpDxv/u7NjzO4C8n56DVgRYs4RKajTEJQMpb6If2vExgPGRyD8n84Mayrw+E+4JvhME1FVmn2EHDZDhDVFEaIYGxl621UI7oFGYS5MDXiYKZ5qXsoSxUZCxKoPwKIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Zs3mq2C3BzyVKC;
-	Tue,  6 May 2025 11:30:03 +0800 (CST)
-Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2974A180B5F;
-	Tue,  6 May 2025 11:34:18 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 6 May 2025 11:34:16 +0800
-Subject: Re: [PATCH] arm64: kvm: Replace ternary flags with str_on_off()
- helper
-To: Seongsu Park <sgsu.park@samsung.com>
-CC: <will@kernel.org>, <catalin.marinas@arm.com>, <suzuki.poulose@arm.com>,
-	<joey.gouly@arm.com>, <oliver.upton@linux.dev>, <maz@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <cpgs@samsung.com>
-References: <CGME20250415012410epcas1p42b48977934c21b5db0b19f4185f7a63c@epcas1p4.samsung.com>
- <1891546521.01744691102904.JavaMail.epsvc@epcpadp1new>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <112b336f-40ee-113b-2b10-4ba2f19573de@huawei.com>
-Date: Tue, 6 May 2025 11:34:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	s=arc-20240116; t=1746512400; c=relaxed/simple;
+	bh=IaknPFqcP0N7YD+hkdGoIITlQSTa3FqWiaGwJ4M7xOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q62u78yke+Jb7HoPIJT9y/SetEu0tjcjfqjhgFstE6Ie3LoxSRytYFTSGdjA+2dSqhyOFdI2kpPhKflb+AfyTl2J03ucem5EtMEfoYIe1kvP1ZKLStyycn/lSUS10JeQQaWH8n1iNxNggotXV511797AFYw+KHO4DOC3f75XzHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZIRkTWuY; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZIRkTWuY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEE70C4CEEB;
+	Tue,  6 May 2025 06:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746512399;
+	bh=IaknPFqcP0N7YD+hkdGoIITlQSTa3FqWiaGwJ4M7xOc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZIRkTWuYiswfaOZhaA9mMbfIsTR/ZTklZu2Oe44c9xSTzghAJERx/3W0TESSm787U
+	 CLR3YOKZjtiYprxUIhVt6kY7tF0oYRoYxYxEpdimHmXA+u4dadKipt6WARl1mkRAU9
+	 DYMKW2mOUDdVzhaqf4Wxjsbw0BSWwQ66y/4ruC2EQ9FcSOQ6GdVOrAsYjqHoIEiGnQ
+	 rtslXz2wkE5IQdgaxJYYNss6cFHmKoW2P6+1getUhQIgG1bZT6T7bDzYUHGdGuJQJW
+	 R2M8i144n5z2YDH+umSx8sNUXhYwLbUKuUn2WZam2i7g8mOIGx5KAiU/OrXh/rGPk4
+	 3T3KMLHJBsjfQ==
+Date: Tue, 6 May 2025 06:19:57 +0000
+From: Wei Liu <wei.liu@kernel.org>
+To: Roman Kisel <romank@linux.microsoft.com>
+Cc: arnd@arndb.de, bhelgaas@google.com, bp@alien8.de,
+	catalin.marinas@arm.com, conor+dt@kernel.org,
+	dave.hansen@linux.intel.com, decui@microsoft.com,
+	haiyangz@microsoft.com, hpa@zytor.com, joey.gouly@arm.com,
+	krzk+dt@kernel.org, kw@linux.com, kys@microsoft.com,
+	lenb@kernel.org, lpieralisi@kernel.org,
+	manivannan.sadhasivam@linaro.org, mark.rutland@arm.com,
+	maz@kernel.org, mingo@redhat.com, oliver.upton@linux.dev,
+	rafael@kernel.org, robh@kernel.org, ssengar@linux.microsoft.com,
+	sudeep.holla@arm.com, suzuki.poulose@arm.com, tglx@linutronix.de,
+	wei.liu@kernel.org, will@kernel.org, yuzenghui@huawei.com,
+	linux-hyperv@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	x86@kernel.org, apais@microsoft.com, benhill@microsoft.com,
+	bperkins@microsoft.com, sunilmut@microsoft.com
+Subject: Re: [PATCH hyperv-next v9 00/11] arm64: hyperv: Support Virtual
+ Trust Level Boot
+Message-ID: <aBmqDU_UjxIAx2lP@liuwe-devbox-ubuntu-v2.tail21d00.ts.net>
+References: <20250428210742.435282-1-romank@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <1891546521.01744691102904.JavaMail.epsvc@epcpadp1new>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemk200017.china.huawei.com (7.202.194.83)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250428210742.435282-1-romank@linux.microsoft.com>
 
-It'd better to write the subject as "KVM: arm64: Replace ..."
-
-On 2025/4/15 9:24, Seongsu Park wrote:
-> Replace repetitive ternary expressions with the str_on_off() helper
-> function. This change improves code readability and ensures consistency
-> in tracepoint string formatting
+On Mon, Apr 28, 2025 at 02:07:31PM -0700, Roman Kisel wrote:
+> This patch set allows the Hyper-V code to boot on ARM64 inside a Virtual Trust
+> Level. These levels are a part of the Virtual Secure Mode documented in the
+> Top-Level Functional Specification available at
+> https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/vsm.
 > 
-> Signed-off-by: Seongsu Park <sgsu.park@samsung.com>
-> ---
->  arch/arm64/kvm/trace_arm.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> The OpenHCL paravisor https://github.com/microsoft/openvmm/tree/main/openhcl
+> can serve as a practical application of these patches on ARM64.
+> 
+> For validation, I built kernels for the {x86_64, ARM64} x {VTL0, VTL2} set with
+> a small initrd embedded into the kernel and booted VMs managed by Hyper-V and
+> OpenVMM off of that.
+> 
+> Starting from V5, the patch series includes a non-functional change to KVM on
+> arm64 which I tested as well.
+> 
+> I've kept the Acked-by tags given by Arnd and Bjorn. These patches (1 and 11)
+> have changed very slightly since then (V5 and V6), no functional changes:
+> in patch 1, removed macro's in favour of functions as Marc suggested to get rid
+> of "sparse" warnings, and in patch 11, fixed building as a module. Please let me
+> know if I should have not kept the tags.
+> 
+[...]
+> Roman Kisel (11):
+>   arm64: kvm, smccc: Introduce and use API for getting hypervisor UUID
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+I notice there were review comments from multiple people on this patch.
+To the best of my knowledge, those comments have been addressed in this
+version, but I only had a cursory look and am by no means an expert on
+ARM64.
+
+My assumption is Arnd's review is good enough for this patch to get
+merged.
+
+With that assumption, I have applied this whole series to hyperv-next.
+
+ARM64 maintainers, please let me know if you have an objection -- I can
+drop the series and let Roman address further comments.
 
 Thanks,
-Zenghui
+Wei.
+
+>   arm64: hyperv: Use SMCCC to detect hypervisor presence
+>   Drivers: hv: Enable VTL mode for arm64
+>   Drivers: hv: Provide arch-neutral implementation of get_vtl()
+>   arm64: hyperv: Initialize the Virtual Trust Level field
+>   arm64, x86: hyperv: Report the VTL the system boots in
+>   dt-bindings: microsoft,vmbus: Add interrupt and DMA coherence
+>     properties
+>   Drivers: hv: vmbus: Get the IRQ number from DeviceTree
+>   Drivers: hv: vmbus: Introduce hv_get_vmbus_root_device()
+>   ACPI: irq: Introduce acpi_get_gsi_dispatcher()
+>   PCI: hv: Get vPCI MSI IRQ domain from DeviceTree
+
