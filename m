@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE792857FC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F65286409;
 	Tue,  6 May 2025 16:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549850; cv=none; b=hPJeQ+SRxy7LEEVAAXpA/7pB3walmcmPJ7QN7jl1/IXUhOgdEj52+IxQbyf50GN2E8pVFsbivBkotZS7yagHQqEBwSy1fEpTbBsUKezTis7Qd2vAoWxwgye+X2NnHxzScDo/bRbAGpayYJHHTO9+vatLIah6D51Hik2Fees5Ypc=
+	t=1746549851; cv=none; b=jog9yHzSXV3jUmYENkQ+568/E9zqYYWGd72zNAFC8i4qyQt2viz4sKDChE3IDL33Dr6KjvIKhFEQRNxj/nW8QKbB3zhuxG3kEtL9kpqC7Jv1IgMG9zjhGaKF8DP8tsosqTBA2rGnA3oszJ8XmH7nvWAkClACOIyDvCqbOvAc37k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746549850; c=relaxed/simple;
-	bh=9pgxiWCL9Lomr3yxaonxBwT8LnBlQFBPORiK3/1n6t8=;
+	s=arc-20240116; t=1746549851; c=relaxed/simple;
+	bh=Wx52G5fJ77nIURvNqC1cFOpUV+HYXyuUHEQTcLPJWco=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ACIYzu/nKp2QECH5n6jVy+bWi8ppFhwh5FoEUW+E5uo7PQZdL6CMSucLhrTRkYAZU2Q6zMMULMe9KFBwo+OaJOMa/+9Ss9Oiq4xBWsEdj/5+30af1Z187cq7KNxIuJ772hylaEEB3iHT/mka/PsU29G1EBVm66g6R8sB+mSJVPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OKaooU1v; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=DFgxjOaZCKUvo29oNXZcmNr4qvUyqInKUTyNrd4ABdvvcAuHonHKuNTTq1c97dSBmJnpAC0PLsWWAFgKTeqsZ7AThaYRnu/uZpeqsK+U+hEYZjOzV2J+ZX14h40teoMZbGMfaYnR74Vx9uqF0szCbc3iG4UF6bWqcOXKz1pBek4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iy21rx+S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OKaooU1v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4154CC4CEEF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iy21rx+S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF271C4CEF2;
 	Tue,  6 May 2025 16:44:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746549850;
-	bh=9pgxiWCL9Lomr3yxaonxBwT8LnBlQFBPORiK3/1n6t8=;
+	bh=Wx52G5fJ77nIURvNqC1cFOpUV+HYXyuUHEQTcLPJWco=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OKaooU1vaMH1e8FMVzAsGtVdE0doZ8eKPkepCxsD1juTxGAUO6HtZ98aHfFEFeAcb
-	 bSTDy9oxcI1ihu5Ovtf26kffF1d/wkmg+RYlSYfj7HKwXRAIsExF6OmJ/dmDE2Ajzj
-	 tO/QEzUq7Hc0HfhYUr6xD+8DhBgE4oYRcnsXk2aLxSEiBT9NGwRtz726qOd/O6sllS
-	 pUx1EQRObS5kHs6JGg8lLRDkAoBKjKSacQXzZJHatGgxDqE2luixzvGx2PZuTZsSNI
-	 cabUBsJWoARjQ/pzZrT4lrTbCLw8F34Xu9XbcEBneJ0P8U0T9xk54l5+tXnZES50aK
-	 RnqtjZAVRLicg==
+	b=iy21rx+S+2O5/xcNahjzTZHhjRr43WI4mqBF/d5b/eLuP7mDqCWsW0CuHiQhbZfSP
+	 rNBzQmZCfNTCRom/LIAEPlAb5ht/oVs0xG9lwuKsQtYY97zkm4SPpeUN/KryDXImbJ
+	 SigmWJTW+8ekWCFPUzlxXNITRZ3u98xkpSYMZe5IeGmsL3YkwHulLWWLc5EfWoTZki
+	 tMtrPquhRzIBNn7MSl2yrjSPZaaQh/uXugPNO+PxsZxAkuE5p2IV7I3HTvhqjVDKvm
+	 Udhjr2iJQkzQjWidjoShJDNVOQQysCwVBLmWu+TzrmZuHqA3IV2+ooc5URe9FlOLQu
+	 5V61Ngh88YGQQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCLOq-00CJkN-HR;
-	Tue, 06 May 2025 17:44:08 +0100
+	id 1uCLOq-00CJkN-Vn;
+	Tue, 06 May 2025 17:44:09 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v4 11/43] arm64: sysreg: Add system instructions trapped by HFGIRT2_EL2
-Date: Tue,  6 May 2025 17:43:16 +0100
-Message-Id: <20250506164348.346001-12-maz@kernel.org>
+Subject: [PATCH v4 13/43] arm64: tools: Resync sysreg.h
+Date: Tue,  6 May 2025 17:43:18 +0100
+Message-Id: <20250506164348.346001-14-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
 References: <20250506164348.346001-1-maz@kernel.org>
@@ -63,17 +63,17 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the new CMOs trapped by HFGITR2_EL2.
+Perform a bulk resync of tools/arch/arm64/include/asm/sysreg.h.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ tools/arch/arm64/include/asm/sysreg.h | 65 ++++++++++++++++++++-------
+ 1 file changed, 48 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index a943eac446938..8908eec48f313 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
+diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+index b6c5ece4fdee7..690b6ebd118f4 100644
+--- a/tools/arch/arm64/include/asm/sysreg.h
++++ b/tools/arch/arm64/include/asm/sysreg.h
 @@ -117,6 +117,7 @@
  
  #define SB_BARRIER_INSN			__SYS_BARRIER_INSN(0, 7, 31)
@@ -97,6 +97,140 @@ index a943eac446938..8908eec48f313 100644
  /*
   * Automatically generated definitions for system registers, the
   * manual encodings below are in the process of being converted to
+@@ -475,6 +478,7 @@
+ #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+ 
+ #define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
++#define SYS_CNTVCT_EL0			sys_reg(3, 3, 14, 0, 2)
+ #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
+ #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
+ 
+@@ -482,23 +486,36 @@
+ #define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
+ #define SYS_CNTP_CVAL_EL0		sys_reg(3, 3, 14, 2, 2)
+ 
++#define SYS_CNTV_TVAL_EL0		sys_reg(3, 3, 14, 3, 0)
+ #define SYS_CNTV_CTL_EL0		sys_reg(3, 3, 14, 3, 1)
+ #define SYS_CNTV_CVAL_EL0		sys_reg(3, 3, 14, 3, 2)
+ 
+ #define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
+ #define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
+ #define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
++#define SYS_AARCH32_CNTVCT		sys_reg(0, 1, 0, 14, 0)
+ #define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
+ #define SYS_AARCH32_CNTPCTSS		sys_reg(0, 8, 0, 14, 0)
++#define SYS_AARCH32_CNTVCTSS		sys_reg(0, 9, 0, 14, 0)
+ 
+ #define __PMEV_op2(n)			((n) & 0x7)
+ #define __CNTR_CRm(n)			(0x8 | (((n) >> 3) & 0x3))
++#define SYS_PMEVCNTSVRn_EL1(n)		sys_reg(2, 0, 14, __CNTR_CRm(n), __PMEV_op2(n))
+ #define SYS_PMEVCNTRn_EL0(n)		sys_reg(3, 3, 14, __CNTR_CRm(n), __PMEV_op2(n))
+ #define __TYPER_CRm(n)			(0xc | (((n) >> 3) & 0x3))
+ #define SYS_PMEVTYPERn_EL0(n)		sys_reg(3, 3, 14, __TYPER_CRm(n), __PMEV_op2(n))
+ 
+ #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+ 
++#define	SYS_SPMCGCRn_EL1(n)		sys_reg(2, 0, 9, 13, ((n) & 1))
++
++#define __SPMEV_op2(n)			((n) & 0x7)
++#define __SPMEV_crm(p, n)		((((p) & 7) << 1) | (((n) >> 3) & 1))
++#define SYS_SPMEVCNTRn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b000, n), __SPMEV_op2(n))
++#define	SYS_SPMEVFILT2Rn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b011, n), __SPMEV_op2(n))
++#define	SYS_SPMEVFILTRn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b010, n), __SPMEV_op2(n))
++#define	SYS_SPMEVTYPERn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b001, n), __SPMEV_op2(n))
++
+ #define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
+ #define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
+ 
+@@ -518,7 +535,6 @@
+ #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+ 
+ #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+-#define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+ #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+ #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+ #define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+@@ -604,28 +620,18 @@
+ 
+ /* VHE encodings for architectural EL0/1 system registers */
+ #define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
+-#define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
+-#define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
+-#define SYS_SCTLR2_EL12			sys_reg(3, 5, 1, 0, 3)
+-#define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
+-#define SYS_TRFCR_EL12			sys_reg(3, 5, 1, 2, 1)
+-#define SYS_SMCR_EL12			sys_reg(3, 5, 1, 2, 6)
+ #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+ #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+-#define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
+-#define SYS_TCR2_EL12			sys_reg(3, 5, 2, 0, 3)
+ #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+ #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
+ #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+ #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+ #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+ #define SYS_TFSR_EL12			sys_reg(3, 5, 5, 6, 0)
+-#define SYS_FAR_EL12			sys_reg(3, 5, 6, 0, 0)
+ #define SYS_PMSCR_EL12			sys_reg(3, 5, 9, 9, 0)
+ #define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
+ #define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
+ #define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
+-#define SYS_CONTEXTIDR_EL12		sys_reg(3, 5, 13, 0, 1)
+ #define SYS_SCXTNUM_EL12		sys_reg(3, 5, 13, 0, 7)
+ #define SYS_CNTKCTL_EL12		sys_reg(3, 5, 14, 1, 0)
+ #define SYS_CNTP_TVAL_EL02		sys_reg(3, 5, 14, 2, 0)
+@@ -1028,8 +1034,11 @@
+ #define PIE_RX		UL(0xa)
+ #define PIE_RW		UL(0xc)
+ #define PIE_RWX		UL(0xe)
++#define PIE_MASK	UL(0xf)
+ 
+-#define PIRx_ELx_PERM(idx, perm)	((perm) << ((idx) * 4))
++#define PIRx_ELx_BITS_PER_IDX		4
++#define PIRx_ELx_PERM_SHIFT(idx)	((idx) * PIRx_ELx_BITS_PER_IDX)
++#define PIRx_ELx_PERM_PREP(idx, perm)	(((perm) & PIE_MASK) << PIRx_ELx_PERM_SHIFT(idx))
+ 
+ /*
+  * Permission Overlay Extension (POE) permission encodings.
+@@ -1040,12 +1049,34 @@
+ #define POE_RX		UL(0x3)
+ #define POE_W		UL(0x4)
+ #define POE_RW		UL(0x5)
+-#define POE_XW		UL(0x6)
+-#define POE_RXW		UL(0x7)
++#define POE_WX		UL(0x6)
++#define POE_RWX		UL(0x7)
+ #define POE_MASK	UL(0xf)
+ 
+-/* Initial value for Permission Overlay Extension for EL0 */
+-#define POR_EL0_INIT	POE_RXW
++#define POR_ELx_BITS_PER_IDX		4
++#define POR_ELx_PERM_SHIFT(idx)		((idx) * POR_ELx_BITS_PER_IDX)
++#define POR_ELx_PERM_GET(idx, reg)	(((reg) >> POR_ELx_PERM_SHIFT(idx)) & POE_MASK)
++#define POR_ELx_PERM_PREP(idx, perm)	(((perm) & POE_MASK) << POR_ELx_PERM_SHIFT(idx))
++
++/*
++ * Definitions for Guarded Control Stack
++ */
++
++#define GCS_CAP_ADDR_MASK		GENMASK(63, 12)
++#define GCS_CAP_ADDR_SHIFT		12
++#define GCS_CAP_ADDR_WIDTH		52
++#define GCS_CAP_ADDR(x)			FIELD_GET(GCS_CAP_ADDR_MASK, x)
++
++#define GCS_CAP_TOKEN_MASK		GENMASK(11, 0)
++#define GCS_CAP_TOKEN_SHIFT		0
++#define GCS_CAP_TOKEN_WIDTH		12
++#define GCS_CAP_TOKEN(x)		FIELD_GET(GCS_CAP_TOKEN_MASK, x)
++
++#define GCS_CAP_VALID_TOKEN		0x1
++#define GCS_CAP_IN_PROGRESS_TOKEN	0x5
++
++#define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
++					       GCS_CAP_VALID_TOKEN)
+ 
+ #define ARM64_FEATURE_FIELD_BITS	4
+ 
 -- 
 2.39.2
 
