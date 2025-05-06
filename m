@@ -1,160 +1,169 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827C2201270
-	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 14:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A8C252282;
+	Tue,  6 May 2025 16:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746542830; cv=none; b=riF9i06nqdBTcd0Jhh1QV295bk9dJI45Ju/GUmYEhIcEl1XNJACldUGHvJ44PPqlxrc6EFTPmmhIN7HjuzxIFSvOkt+J6ZXeQASAWPCTqsdGf0gD9MRctO1x2gt3XR4VL2D5FQ5mB46bO18vbwiV7B1VtCq/t9oFN/U1M9Tyf/w=
+	t=1746549848; cv=none; b=JzXt9BNvy10S4yah1YAJJMUmFj6qT21O9vC0b1r/XlNR7yi4amzqbK/M2mhhzBUIIgyNDCsXqBVeE9HcGMpXfYjRA0g/0ErZ7WQ7qu3KBLhUkBnw1vXlEZdL2CEL4eSeW/MYBbsTbLUMmQaI7a/+leZYBGXDdaAubNYY31dXVZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746542830; c=relaxed/simple;
-	bh=NMQ6gHoepk2Hh+GE5YhvmtUey4N6usZn6VaPR71gppg=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k1v4k7V8zQVtxlQaQoIi1lWBDbhv0fAe37pfIx9HSGZkT5rTl7rscKQLKtQ4ofdJamXrBKYmVmiOmYKNB7JtmJduiYnGPSxEV91KgAjxoH/tqfxoTBX0PamNF/H6yLtBVOaatR6szKLRqYGfUoB/HuXehULilmsSCDDYuqmGkFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZsLnp0cdTz6K5kv;
-	Tue,  6 May 2025 22:46:54 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0994E14011D;
-	Tue,  6 May 2025 22:47:05 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 6 May
- 2025 16:47:04 +0200
-Date: Tue, 6 May 2025 15:47:02 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-CC: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Joey
- Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>, Leo Yan <leo.yan@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-perf-users@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v21 0/4] arm64/perf: Enable branch stack sampling
-Message-ID: <20250506154702.00002b57@huawei.com>
-In-Reply-To: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
-References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1746549848; c=relaxed/simple;
+	bh=geXjI7e3xVdMJHmwrLdJeTsuEUT9kysy5HNGfgTThy8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tHpkngGAwCxAcGzgqwNuB5tn3fkw+i9h37w/TrVZMYsSfDEi1IFADlk/AN3FfZOnjB92kL4Fem7zhD5K5x0BvlOj3XMpwXuzK1hUMa2njaIXMZdoxHbYIh6Ox8Az54xBP6JYegAXkiSojyW8jyQDmyQUJnhzlN+NWL/GJXUSqBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AB7dyfjo; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AB7dyfjo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0834AC4CEE4;
+	Tue,  6 May 2025 16:44:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746549848;
+	bh=geXjI7e3xVdMJHmwrLdJeTsuEUT9kysy5HNGfgTThy8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AB7dyfjozKuZZqAC7hFPnftj1PglNR0DKf6/pY2BR8VNm9yuH35JwXj4/KBcmAMhs
+	 KaLFsDgxYB8F3fLnIVdp3AEwXlbfLz8eduN0sj343ffdM1oEaM74jdavkDbpJGfyC+
+	 +WbK73LO0svX1BsERv8FWXSuneKDySyuFVe4GrqnrriJWcFdr/mU39tu/tqMC6EOcZ
+	 2Gd+obaXTtdmxtxQ3LzxEy2iBVZznhmGCytPqsnVCRloTYv2ROQWyRqM5KOoUL38of
+	 YbIzh/OxrsVUqhi3SwbWHRbYoCBf7Qxidr8qd4eXl6isupIoManoSVsMjNTXDa0jjk
+	 lcPDOmdKwQh7Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uCLOn-00CJkN-Mg;
+	Tue, 06 May 2025 17:44:05 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>
+Subject: [PATCH v4 00/43] KVM: arm64: Revamp Fine Grained Trap handling
+Date: Tue,  6 May 2025 17:43:05 +0100
+Message-Id: <20250506164348.346001-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com, ben.horgan@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 07 Apr 2025 12:41:29 -0500
-"Rob Herring (Arm)" <robh@kernel.org> wrote:
+This is yet another version of the series last posted at [1].
 
-> This series enables perf branch stack sampling support on arm64 via a 
-> v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details 
-> on BRBE can be found in the Arm ARM[1] chapter D18.
-> 
-> I've picked up this series from Anshuman. v19 and v20 versions have been 
-> reworked quite a bit by Mark and myself. The bulk of those changes are 
-> in patch 4.
-> 
-> A git branch is here[2].
-> 
-> [1] https://developer.arm.com/documentation/ddi0487/latest/
-> [2] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git arm/brbe-v21
+The eagled eye reviewer will have noticed that since v2, the series
+has more or less doubled in size for any reasonable metric (number of
+patches, number of lines added or deleted). It is therefore pretty
+urgent that this gets either merged or forgotten! ;-)
 
-Hi Rob,
+See the change log below for the details -- most of it is related to
+FGT2 (and its rather large dependencies) being added.
 
-Expecting any changes on this?  Anything specific we can do to help then shout.
+* From v3:
 
-We need to pull in the reworked version into openeuler that is carrying older
-code and would rather not do it more than once. 
+  - Added missing bit fields for CPACR_EL1
 
-Jonathan
+  - Fixed a bunch of typos in comments and commit messages
 
-> 
-> v21:
-> - Drop clean-up patches 1-7 already applied
-> - Rebase on v6.15-rc1
-> 
-> v20:
->  - https://lore.kernel.org/r/20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org
->  - Added back some of the arm64 specific exception types. The x86 IRQ 
->    branches also include other exceptions like page faults. On arm64, we 
->    can distinguish the exception types, so we do. Also, to better 
->    align with x86, we convert 'call' branches which are user to kernel 
->    to 'syscall'.
->  - Only enable exceptions and exception returns if recording kernel
->    branches (matching x86)
->  - Drop requiring event and branch privileges to match
->  - Add "branches" caps sysfs attribute like x86
->  - Reword comment about FZP and MDCR_EL2.HPMN interaction
->  - Rework BRBE invalidation to avoid invalidating in interrupt handler
->    when no handled events capture the branch stack (i.e. when there are 
->    multiple users).
->  - Also clear BRBCR_ELx bits in brbe_disable(). This is for KVM nVHE 
->    checks if BRBE is enabled.
->  - Document that MDCR_EL3.SBRBE can be 0b01 also
-> 
-> v19:
->  - https://lore.kernel.org/all/20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org/
->  - Drop saving of branch records when task scheduled out (Mark). Make 
->    sched_task() callback actually get called. Enabling requires a call 
->    to perf_sched_cb_inc(). So the saving of branch records never 
->    happened.
->  - Got rid of added armpmu ops. All BRBE support is contained within 
->    pmuv3 code.
->  - Fix freeze on overflow for VHE
->  - The cycle counter doesn't freeze BRBE on overflow, so avoid assigning
->    it when BRBE is enabled.
->  - Drop all the Arm specific exception branches. Not a clear need for
->    them.
->  - Fix handling of branch 'cycles' reading. CC field is
->    mantissa/exponent, not an integer.
->  - Rework s/w filtering to better match h/w filtering
->  - Reject events with disjoint event filter and branch filter or with 
->    exclude_host set
->  - Dropped perf test patch which has been applied for 6.14
->  - Dropped patch "KVM: arm64: Explicitly handle BRBE traps as UNDEFINED"
->    which has been applied for 6.14
-> 
-> v18:
->  - https://lore.kernel.org/all/20240613061731.3109448-1-anshuman.khandual@arm.com/
-> 
-> For v1-v17, see the above link. Not going to duplicate it all here...
-> 
-> Signed-off-by: "Rob Herring (Arm)" <robh@kernel.org>
-> ---
-> Anshuman Khandual (4):
->       arm64/sysreg: Add BRBE registers and fields
->       arm64: Handle BRBE booting requirements
->       KVM: arm64: nvhe: Disable branch generation in nVHE guests
->       perf: arm_pmuv3: Add support for the Branch Record Buffer Extension (BRBE)
-> 
->  Documentation/arch/arm64/booting.rst |  21 +
->  arch/arm64/include/asm/el2_setup.h   |  86 +++-
->  arch/arm64/include/asm/kvm_host.h    |   2 +
->  arch/arm64/include/asm/sysreg.h      |  17 +-
->  arch/arm64/kvm/debug.c               |   4 +
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c   |  32 ++
->  arch/arm64/kvm/hyp/nvhe/switch.c     |   2 +-
->  arch/arm64/tools/sysreg              | 132 ++++++
->  drivers/perf/Kconfig                 |  11 +
->  drivers/perf/Makefile                |   1 +
->  drivers/perf/arm_brbe.c              | 802 +++++++++++++++++++++++++++++++++++
->  drivers/perf/arm_brbe.h              |  47 ++
->  drivers/perf/arm_pmu.c               |  15 +-
->  drivers/perf/arm_pmuv3.c             | 129 +++++-
->  include/linux/perf/arm_pmu.h         |   8 +
->  15 files changed, 1287 insertions(+), 22 deletions(-)
-> ---
-> base-commit: 0af2f6be1b4281385b618cb86ad946eded089ac8
-> change-id: 20250129-arm-brbe-v19-24d5d9e5e623
-> 
-> Best regards,
+  - Cleaned-up whitespace damage from the sysreg generator
+
+  - Collected RBs from Joey, with thanks!
+
+* From v2:
+
+  - Added comprehensive support for FEAT_FGT2, as the host kernel is
+    now making use of these registers, without any form of context
+    switch in KVM. What could possibly go wrong?
+
+  - Reworked some of the FGT description and handling primitives,
+    reducing the boilerplate code and tables that get added over time.
+
+  - Rebased on 6.15-rc3.
+
+[1]: https://lore.kernel.org/r/20250426122836.3341523-1-maz@kernel.org
+
+Marc Zyngier (42):
+  arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
+  arm64: sysreg: Update ID_AA64MMFR4_EL1 description
+  arm64: sysreg: Add layout for HCR_EL2
+  arm64: sysreg: Replace HFGxTR_EL2 with HFG{R,W}TR_EL2
+  arm64: sysreg: Update ID_AA64PFR0_EL1 description
+  arm64: sysreg: Update PMSIDR_EL1 description
+  arm64: sysreg: Update TRBIDR_EL1 description
+  arm64: sysreg: Update CPACR_EL1 description
+  arm64: sysreg: Add registers trapped by HFG{R,W}TR2_EL2
+  arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
+  arm64: sysreg: Add system instructions trapped by HFGIRT2_EL2
+  arm64: Remove duplicated sysreg encodings
+  arm64: tools: Resync sysreg.h
+  arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
+  arm64: Add FEAT_FGT2 capability
+  KVM: arm64: Tighten handling of unknown FGT groups
+  KVM: arm64: Simplify handling of negative FGT bits
+  KVM: arm64: Handle trapping of FEAT_LS64* instructions
+  KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_LS64_ACCDATA being
+    disabled
+  KVM: arm64: Don't treat HCRX_EL2 as a FGT register
+  KVM: arm64: Plug FEAT_GCS handling
+  KVM: arm64: Compute FGT masks from KVM's own FGT tables
+  KVM: arm64: Add description of FGT bits leading to EC!=0x18
+  KVM: arm64: Use computed masks as sanitisers for FGT registers
+  KVM: arm64: Propagate FGT masks to the nVHE hypervisor
+  KVM: arm64: Use computed FGT masks to setup FGT registers
+  KVM: arm64: Remove hand-crafted masks for FGT registers
+  KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
+  KVM: arm64: Handle PSB CSYNC traps
+  KVM: arm64: Switch to table-driven FGU configuration
+  KVM: arm64: Validate FGT register descriptions against RES0 masks
+  KVM: arm64: Use FGT feature maps to drive RES0 bits
+  KVM: arm64: Allow kvm_has_feat() to take variable arguments
+  KVM: arm64: Use HCRX_EL2 feature map to drive fixed-value bits
+  KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
+  KVM: arm64: Add FEAT_FGT2 registers to the VNCR page
+  KVM: arm64: Add sanitisation for FEAT_FGT2 registers
+  KVM: arm64: Add trap routing for FEAT_FGT2 registers
+  KVM: arm64: Add context-switch for FEAT_FGT2 registers
+  KVM: arm64: Allow sysreg ranges for FGT descriptors
+  KVM: arm64: Add FGT descriptors for FEAT_FGT2
+  KVM: arm64: Handle TSB CSYNC traps
+
+Mark Rutland (1):
+  KVM: arm64: Unconditionally configure fine-grain traps
+
+ arch/arm64/include/asm/el2_setup.h      |   14 +-
+ arch/arm64/include/asm/esr.h            |   10 +-
+ arch/arm64/include/asm/kvm_arm.h        |  186 ++--
+ arch/arm64/include/asm/kvm_host.h       |   56 +-
+ arch/arm64/include/asm/sysreg.h         |   26 +-
+ arch/arm64/include/asm/vncr_mapping.h   |    5 +
+ arch/arm64/kernel/cpufeature.c          |    7 +
+ arch/arm64/kvm/Makefile                 |    2 +-
+ arch/arm64/kvm/arm.c                    |   13 +
+ arch/arm64/kvm/config.c                 | 1085 +++++++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c         |  583 ++++++++----
+ arch/arm64/kvm/handle_exit.c            |   77 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  158 ++--
+ arch/arm64/kvm/hyp/nvhe/switch.c        |   12 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c         |    8 +-
+ arch/arm64/kvm/nested.c                 |  223 +----
+ arch/arm64/kvm/sys_regs.c               |   68 +-
+ arch/arm64/tools/cpucaps                |    1 +
+ arch/arm64/tools/sysreg                 | 1006 ++++++++++++++++++++-
+ tools/arch/arm64/include/asm/sysreg.h   |   65 +-
+ 20 files changed, 2894 insertions(+), 711 deletions(-)
+ create mode 100644 arch/arm64/kvm/config.c
+
+-- 
+2.39.2
 
