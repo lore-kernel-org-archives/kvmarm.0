@@ -1,54 +1,54 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4806288C3E
-	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 16:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3604288CA8
+	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 16:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746550126; cv=none; b=Saz6Sb8FX97emrciNe61xF0axkPfa+uOX+F6wIy2PCl1pXHLhrLE1TGbmx3MvMR56FNP29cE7zKDgepgBJ7tp9FMFiJdcv+5i0M7cI9grxwq2AYOnNuk8Hw2hc0Te3y6/mdmuoB59/KZ8PPFiuJhP0GxeG8vGFU57U6BSBPZvvw=
+	t=1746550128; cv=none; b=CFRsrBCyTbCd31DCfA6nLNYiMjQMzhNWbEnESzxDP2YRZQkfsNBcr6Ezad996WROxf8scOnhfh5LS1lpfYTLd5N+agbflKAimluvR/3C97j3LZkGvg3ZEGWie67YTzjn/7IEkAYOpnBFl7TR25XVSMtJiKxsnOUpP+AggccV5xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746550126; c=relaxed/simple;
-	bh=wQBFYyELFNvHLzXQ+9NDItNJua1krR5kq62o/pGyp00=;
+	s=arc-20240116; t=1746550128; c=relaxed/simple;
+	bh=l3cyRuYF81wunoJ7TifMvH83r4i55FQixMLbcy3lwME=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lMJOrqNv8X1AJ6qndE7Y1BISo5Q71P0jQsCX9snxnbNfXo3KywkczRNPRILlQHvSZgfZSKNqX6i1iwN6neIgfbioC2wpP2HNI9ei8vcDFtYDCAQCw4hX2/I2aSoIgiJ8kSZMRVnM1shHTJrvC/bHLpniQ6XsXmQqu6fTwKyJAHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0x0/0+5a; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=ono2+NjSnqKyHdlLaC/EEg7RTlE/1vkCMe3dvHkNcR+PlVCWt1TKTxlFI3zGtmjBENrK9D5hX/mp6egH2rjIYCRBuBHa3gvvOYHxewPdZ/lhynF8H6898rMkaJ/gSppTDjkNuK8QY7UOrY8os7UtWihuQuCZZpsD9VhbylftX+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yDcTddbN; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0x0/0+5a"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43d209dc2d3so27639675e9.3
-        for <kvmarm@lists.linux.dev>; Tue, 06 May 2025 09:48:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yDcTddbN"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3912d5f6689so2843178f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 06 May 2025 09:48:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746550123; x=1747154923; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1746550125; x=1747154925; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BsA8D4HjHlecCQdG9p+xY7qsrnVwx8gbv9XN30ZeOP4=;
-        b=0x0/0+5ak/OMKKzjbnz+jhQ4QXjnciQeUFjA4vKAsSMqwfvQlVA+zFpotdaLWNxJuW
-         VKftDiiakV84eFMxsT8EoJw1yn9zV4kUiZeWhB9TgD1Tt3MS3mzoJV/bH7SLlzX6fHU3
-         +4wPi8CwkPfjpFt9eZIkyyzsNMGHmnsU0Az9XiSPkPZVzuU2+901/T4Y7GLWmCO1ZclL
-         lz63q5Bz07trmXO1n3T+GBUDEvpf/e1XPJfwKSZIt87ftF5LF/nUFbRjiFy8EVSvFU1w
-         /lN+HQC+ix8kmgbF9DzhrExpueNWC/Z12LdpKp6tFS6OxXn2ZA6SyNiPBCSHNr4oRa47
-         EZHQ==
+        bh=ulR0t05oQC1aYq/PHkhH5FZiwJoFyTXIHcnk/CuN1Ys=;
+        b=yDcTddbNmimDrTD3XNxhThHYLIx9JvRYrSN1rXRUQpX7hUpXsISVPPIFAoWfd/2E09
+         UMtX4wE5cDZsEKg9Hwao0LI4nD7kZ96c1+Y63LKSqDFUaCURtzmfzG3XFVBzj2gd3aXC
+         iVDMB6NrCgLsfBOMCjTJP+DwApubDTcQsNh0O7pzQ3wT064gH38IIpzp90j+Gno+ln8k
+         p2zN868aImEqp4yEXc3bchb/TvR/JtwrdP62u5ftlIZnMpAgF2E9fCJ2akMR4up3gyMj
+         K50Mel258tprEriTGkwmQJc3nhsrtUNXf3Vj+j60rU7GJbbSjp5YiH3QRNbuI4oz/Dwd
+         I8+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746550123; x=1747154923;
+        d=1e100.net; s=20230601; t=1746550125; x=1747154925;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BsA8D4HjHlecCQdG9p+xY7qsrnVwx8gbv9XN30ZeOP4=;
-        b=krmm+9v3vVKSsHon0eNgMWhbnljPCVzj/gTx8QvxIjZxLwGVLXtQWjvrcvq594SEPy
-         wPkMZPUQPqRrSDULygCdTp5NbKTiPsYZF3XSFQyXpVxG6A9oWJ3hsK4UOgw1KAsUQd6X
-         GuaKeFfn4LDOTUeDI0zg6XW9wAiuyiyJ4qhd1Pjp9JjoEBOia2SbWVrytjPQYYuK4HIP
-         mQ04qd2AU3UqtWuL36ZA9lDjYGW4VlBnVlQihasjoVgAJgDf/4I85rdEm4f//Uyl8tbU
-         ZP6KhquZ6lwYx78Ak9H1Sp6tQ5vroHdQw5kng3yaAKPn0Q9CDO9cSxWPN7YlEHcKMk/G
-         01jw==
-X-Gm-Message-State: AOJu0YwBPA4l7U2vkUg/scUTrA/Airjwl3O48y9j4hR5ehKvVLQn8XmX
-	S2tHjrfrbXXkakPF4vXsggwv9HY7ohIYA0AGn/efnVVHqBaHBDYxCC6GgQpQFzpGJunStB0wQJZ
-	8ABMOjrSKNgkVdWWYXQ==
-X-Google-Smtp-Source: AGHT+IF5PMMWTS3cwH1oB8k42s2Xq6vSAGn672jUyunHJnJQKljjoLiBSvKPyhszSFei8WE+2z41aT3Hv72Lx/Nf
-X-Received: from wmbay23.prod.google.com ([2002:a05:600c:1e17:b0:43d:522a:45e8])
+        bh=ulR0t05oQC1aYq/PHkhH5FZiwJoFyTXIHcnk/CuN1Ys=;
+        b=AYvx/LMStmnsmcGrRxUItpLoDP4bA4JDRUrxMsUavG0WTcCi54oShnY0qPaN4N3oHa
+         SIXaJqPQqvQ6X+KinfPPUKpz14gkUWXMm+UvMoBUFWrxPtllTV/hSD11JulEpyIuszpj
+         NLnhEZSpC4Iz4icmmvqHW+Md8tBw3V7nSAnHUKi+j0y0h2KRcXwIVgwelD3j/FgIdC5f
+         6hSDLerJmxABdB+BXcxakL5Ta+MsVc+GTjOH1VodZIXUjtW7vN8ZGY5Wp8/pxJhCiiVU
+         egQXyi09G30nPDVDb0JASY5V6HK7w954+uosf8ghhlm7DjbP/ggJVBBMMIz0WL1DS+Iw
+         RvYw==
+X-Gm-Message-State: AOJu0YwRcts+WV3nLU4njr5I2rr/Ha3cWk6wya9yll7Th4/xI3Yape6K
+	EosPYjau1/1YDFXlmNMB5JPCODo1el+MwF5B/lAUC3Au+btVd5DCp+lF7/ffqfBCfC7TkwhaOHP
+	3xVImuyLU8hvbtBkyIQ==
+X-Google-Smtp-Source: AGHT+IG1v09/s12usa8mhNe5u/61861N0/kCY4NkyY380pXa7lF6ETtkjTMmugXHCVnG7wZDISxXe9P8kKhSjb56
+X-Received: from wrbbs23.prod.google.com ([2002:a05:6000:717:b0:3a0:90bc:bf72])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:5105:b0:43d:1840:a13f with SMTP id 5b1f17b1804b1-441d100a9edmr34417665e9.25.1746550123251;
- Tue, 06 May 2025 09:48:43 -0700 (PDT)
-Date: Tue,  6 May 2025 17:47:59 +0100
+ 2002:a5d:47c7:0:b0:3a0:8352:775a with SMTP id ffacd0b85a97d-3a0b49b5e48mr195832f8f.34.1746550125284;
+ Tue, 06 May 2025 09:48:45 -0700 (PDT)
+Date: Tue,  6 May 2025 17:48:00 +0100
 In-Reply-To: <20250506164820.515876-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250506164820.515876-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
-Message-ID: <20250506164820.515876-4-vdonnefort@google.com>
-Subject: [PATCH v4 03/24] tracing: Add reset to trace remotes
+Message-ID: <20250506164820.515876-5-vdonnefort@google.com>
+Subject: [PATCH v4 04/24] tracing: Add init callback to trace remotes
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -70,107 +70,52 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-For standard trace instance, "trace" files allow to do non-consuming
-read of the ring-buffers. This is however not applicable to ring-buffer
-remotes due to the lack of support in the meta-page. Nonetheless this
-file is still useful to reset a ring-buffer so let's add a write-only
-version.
+Add a .init call back so the trace remote callers can add entries to the
+tracefs directory.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
 diff --git a/include/linux/trace_remote.h b/include/linux/trace_remote.h
-index de043a6f2fe0..1aa99da3c96a 100644
+index 1aa99da3c96a..82d26d97a536 100644
 --- a/include/linux/trace_remote.h
 +++ b/include/linux/trace_remote.h
-@@ -11,6 +11,7 @@ struct trace_remote_callbacks {
- 	void	(*unload_trace_buffer)(struct trace_buffer_desc *desc, void *priv);
- 	int	(*enable_tracing)(bool enable, void *priv);
- 	int	(*swap_reader_page)(unsigned int cpu, void *priv);
-+	int	(*reset)(unsigned int cpu, void *priv);
- };
+@@ -3,9 +3,11 @@
+ #ifndef _LINUX_TRACE_REMOTE_H
+ #define _LINUX_TRACE_REMOTE_H
  
- int trace_remote_register(const char *name, struct trace_remote_callbacks *cbs, void *priv);
++#include <linux/dcache.h>
+ #include <linux/ring_buffer.h>
+ 
+ struct trace_remote_callbacks {
++	int	(*init)(struct dentry *d, void *priv);
+ 	struct trace_buffer_desc *
+ 		(*load_trace_buffer)(unsigned long size, void *priv);
+ 	void	(*unload_trace_buffer)(struct trace_buffer_desc *desc, void *priv);
 diff --git a/kernel/trace/trace_remote.c b/kernel/trace/trace_remote.c
-index 462c2d085a08..2221705f65f4 100644
+index 2221705f65f4..6f4b921f6955 100644
 --- a/kernel/trace/trace_remote.c
 +++ b/kernel/trace/trace_remote.c
-@@ -70,6 +70,7 @@ static int trace_remote_load(struct trace_remote *remote)
- 	rb_remote->desc = remote->trace_buffer_desc;
- 	rb_remote->swap_reader_page = remote->cbs->swap_reader_page;
- 	rb_remote->priv = remote->priv;
-+	rb_remote->reset = remote->cbs->reset;
- 	remote->trace_buffer = ring_buffer_remote(rb_remote);
- 	if (!remote->trace_buffer) {
- 		remote->cbs->unload_trace_buffer(remote->trace_buffer_desc, remote->priv);
-@@ -135,6 +136,19 @@ static int trace_remote_stop(struct trace_remote *remote)
- 	return 0;
- }
- 
-+static void trace_remote_reset(struct trace_remote *remote, int cpu)
-+{
-+	lockdep_assert_held(&remote->lock);
-+
-+	if (!trace_remote_loaded(remote))
-+		return;
-+
-+	if (cpu == RING_BUFFER_ALL_CPUS)
-+		ring_buffer_reset(remote->trace_buffer);
-+	else
-+		ring_buffer_reset_cpu(remote->trace_buffer, cpu);
-+}
-+
- static ssize_t
- tracing_on_write(struct file *filp, const char __user *ubuf, size_t cnt, loff_t *ppos)
+@@ -479,6 +479,7 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
+ int trace_remote_register(const char *name, struct trace_remote_callbacks *cbs, void *priv)
  {
-@@ -369,6 +383,26 @@ static const struct file_operations trace_pipe_fops = {
- 	.release	= trace_pipe_release,
- };
+ 	struct trace_remote *remote;
++	int ret;
  
-+static ssize_t trace_write(struct file *filp, const char __user *ubuf, size_t cnt, loff_t *ppos)
-+{
-+	struct inode *inode = file_inode(filp);
-+	struct trace_remote *remote = inode->i_private;
-+	int cpu = RING_BUFFER_ALL_CPUS;
-+
-+	if (inode->i_cdev)
-+		cpu = (long)inode->i_cdev - 1;
-+
-+	guard(mutex)(&remote->lock);
-+
-+	trace_remote_reset(remote, cpu);
-+
-+	return cnt;
-+}
-+
-+static const struct file_operations trace_fops = {
-+	.write		= trace_write,
-+};
-+
- static int trace_remote_init_tracefs(const char *name, struct trace_remote *remote)
- {
- 	struct dentry *remote_d, *percpu_d;
-@@ -399,7 +433,9 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
- 	    !trace_create_file("buffer_size_kb", TRACEFS_MODE_WRITE, remote_d, remote,
- 			       &buffer_size_kb_fops) ||
- 	    !trace_create_file("trace_pipe", TRACEFS_MODE_READ, remote_d, remote,
--			       &trace_pipe_fops))
-+			       &trace_pipe_fops) ||
-+	    !trace_create_file("trace", 0200, remote_d, remote,
-+			       &trace_fops))
- 		goto err;
- 
- 	percpu_d = tracefs_create_dir("per_cpu", remote_d);
-@@ -421,7 +457,9 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
- 		}
- 
- 		if (!trace_create_cpu_file("trace_pipe", TRACEFS_MODE_READ, cpu_d, remote, cpu,
--					   &trace_pipe_fops))
-+					   &trace_pipe_fops) ||
-+		    !trace_create_cpu_file("trace", 0200, cpu_d, remote, cpu,
-+					   &trace_fops))
- 			goto err;
+ 	remote = kzalloc(sizeof(*remote), GFP_KERNEL);
+ 	if (!remote)
+@@ -495,7 +496,11 @@ int trace_remote_register(const char *name, struct trace_remote_callbacks *cbs,
+ 		return -ENOMEM;
  	}
  
+-	return 0;
++	ret = cbs->init ? cbs->init(remote->dentry, priv) : 0;
++	if (ret)
++		pr_err("Init failed for trace remote '%s' (%d)\n", name, ret);
++
++	return ret;
+ }
+ 
+ void trace_remote_free_buffer(struct trace_buffer_desc *desc)
 -- 
 2.49.0.967.g6a0df3ecc3-goog
 
