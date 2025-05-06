@@ -1,116 +1,105 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E161F6FC5;
-	Tue,  6 May 2025 06:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB31324169A;
+	Tue,  6 May 2025 08:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746512400; cv=none; b=U8qldhBDD/x4a3GxK+Mm2nNIV+VyqG3tif8llBz8Cop5vPY/m/LyUR79vRgwe9Bp2QOcEexNWyNshCX7K8X9BIBzAkZAfayKRGSjKXapMgK4AffoiXQBkpAbJrW57GAHjE4/N2bP174DFWDkwn5YsP8m1Ppj39af0UwBbaw9V3o=
+	t=1746520346; cv=none; b=Z+IHHHb2e+hp3sArtMuzNeTr+4DUV0kvXFRr6qdzYuZiZ+IDNl7NVUdBJ+Up9us7U3BRI3ok6cxVK6MUJsXyKS2hfUIiSkijsqeKQ9MDL89xJhnsgo1hEkM2JKcYyZRvm7tHToswsavM30ZW317X4qhyx+cZP8U/2VZbvOkOIIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746512400; c=relaxed/simple;
-	bh=IaknPFqcP0N7YD+hkdGoIITlQSTa3FqWiaGwJ4M7xOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q62u78yke+Jb7HoPIJT9y/SetEu0tjcjfqjhgFstE6Ie3LoxSRytYFTSGdjA+2dSqhyOFdI2kpPhKflb+AfyTl2J03ucem5EtMEfoYIe1kvP1ZKLStyycn/lSUS10JeQQaWH8n1iNxNggotXV511797AFYw+KHO4DOC3f75XzHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZIRkTWuY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746520346; c=relaxed/simple;
+	bh=ypJ9hdbekmAtwiansv/u/Vu9Y546qW0ilyEarbxlrvg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Rnih/8k8z589+svWA96ZRFzF2jbqx/aAYZiYa4/7VvEE1hgVaartnVBZaPBLkiCEKVZb0WDxld1l2WbdqIqXX8Ka27TgeCCY5SBO2n7Bbb0FZ6xRZZqN5ZCW0PBeSHH0b0fZeIjy3Wc/ZS+Jai5ffmkF+7Wuf2xS3aNKRsoV7hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IB6K6Lxl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZIRkTWuY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEE70C4CEEB;
-	Tue,  6 May 2025 06:19:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IB6K6Lxl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3629DC4CEE4;
+	Tue,  6 May 2025 08:32:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746512399;
-	bh=IaknPFqcP0N7YD+hkdGoIITlQSTa3FqWiaGwJ4M7xOc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZIRkTWuYiswfaOZhaA9mMbfIsTR/ZTklZu2Oe44c9xSTzghAJERx/3W0TESSm787U
-	 CLR3YOKZjtiYprxUIhVt6kY7tF0oYRoYxYxEpdimHmXA+u4dadKipt6WARl1mkRAU9
-	 DYMKW2mOUDdVzhaqf4Wxjsbw0BSWwQ66y/4ruC2EQ9FcSOQ6GdVOrAsYjqHoIEiGnQ
-	 rtslXz2wkE5IQdgaxJYYNss6cFHmKoW2P6+1getUhQIgG1bZT6T7bDzYUHGdGuJQJW
-	 R2M8i144n5z2YDH+umSx8sNUXhYwLbUKuUn2WZam2i7g8mOIGx5KAiU/OrXh/rGPk4
-	 3T3KMLHJBsjfQ==
-Date: Tue, 6 May 2025 06:19:57 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Roman Kisel <romank@linux.microsoft.com>
-Cc: arnd@arndb.de, bhelgaas@google.com, bp@alien8.de,
-	catalin.marinas@arm.com, conor+dt@kernel.org,
-	dave.hansen@linux.intel.com, decui@microsoft.com,
-	haiyangz@microsoft.com, hpa@zytor.com, joey.gouly@arm.com,
-	krzk+dt@kernel.org, kw@linux.com, kys@microsoft.com,
-	lenb@kernel.org, lpieralisi@kernel.org,
-	manivannan.sadhasivam@linaro.org, mark.rutland@arm.com,
-	maz@kernel.org, mingo@redhat.com, oliver.upton@linux.dev,
-	rafael@kernel.org, robh@kernel.org, ssengar@linux.microsoft.com,
-	sudeep.holla@arm.com, suzuki.poulose@arm.com, tglx@linutronix.de,
-	wei.liu@kernel.org, will@kernel.org, yuzenghui@huawei.com,
-	linux-hyperv@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-acpi@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	x86@kernel.org, apais@microsoft.com, benhill@microsoft.com,
-	bperkins@microsoft.com, sunilmut@microsoft.com
-Subject: Re: [PATCH hyperv-next v9 00/11] arm64: hyperv: Support Virtual
- Trust Level Boot
-Message-ID: <aBmqDU_UjxIAx2lP@liuwe-devbox-ubuntu-v2.tail21d00.ts.net>
-References: <20250428210742.435282-1-romank@linux.microsoft.com>
+	s=k20201202; t=1746520346;
+	bh=ypJ9hdbekmAtwiansv/u/Vu9Y546qW0ilyEarbxlrvg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IB6K6LxlTNc840zPic9i8KZTQDyAZLzCUPzmL2W2NFshYtVmaz2/GTPaMxcQtDNDc
+	 7QnQbD6zk0FraWGT1DnRrlzURslfrslxeA2w+UwB4W/KEYfdIBFXwvHzCexSW9VJTX
+	 DNULODwfnEwmZoJk9YphrRWlhjHnGt8sVSDJ19j/ThLOvc2AiSp8hXIUUKSgvI0fSU
+	 XRcRmTbWp28eLwsA02SCPRGHxV1vNv4Xp2L3FrMZxfcLsN5UZciY/k7SKv2NUlNPEn
+	 eU+iUiZmhA4NbiroTMwGaV2o5uRyLZ3HY8YO0HheLO6nX8Xk1LHBZ2DXvDSqbl9wxf
+	 Wp6kcj3BWKGdg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uCDiw-00C91n-Hp;
+	Tue, 06 May 2025 09:32:23 +0100
+Date: Tue, 06 May 2025 09:32:22 +0100
+Message-ID: <86ikmegmw9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	qperret@google.com
+Subject: Re: [PATCH] KVM: arm64: Fix memory check in host_stage2_set_owner_locked()
+In-Reply-To: <20250501162450.2784043-1-smostafa@google.com>
+References: <20250501162450.2784043-1-smostafa@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428210742.435282-1-romank@linux.microsoft.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: smostafa@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Apr 28, 2025 at 02:07:31PM -0700, Roman Kisel wrote:
-> This patch set allows the Hyper-V code to boot on ARM64 inside a Virtual Trust
-> Level. These levels are a part of the Virtual Secure Mode documented in the
-> Top-Level Functional Specification available at
-> https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/vsm.
+On Thu, 01 May 2025 17:24:50 +0100,
+Mostafa Saleh <smostafa@google.com> wrote:
 > 
-> The OpenHCL paravisor https://github.com/microsoft/openvmm/tree/main/openhcl
-> can serve as a practical application of these patches on ARM64.
+> I found this simple bug while preparing some patches for pKVM.
+> AFAICT, it should be harmless (besides crashing the kernel if it
+> was misbehaving)
 > 
-> For validation, I built kernels for the {x86_64, ARM64} x {VTL0, VTL2} set with
-> a small initrd embedded into the kernel and booted VMs managed by Hyper-V and
-> OpenVMM off of that.
+> Fixes: e94a7dea2972 ("KVM: arm64: Move host page ownership tracking to the hyp vmemmap")
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Starting from V5, the patch series includes a non-functional change to KVM on
-> arm64 which I tested as well.
-> 
-> I've kept the Acked-by tags given by Arnd and Bjorn. These patches (1 and 11)
-> have changed very slightly since then (V5 and V6), no functional changes:
-> in patch 1, removed macro's in favour of functions as Marc suggested to get rid
-> of "sparse" warnings, and in patch 11, fixed building as a module. Please let me
-> know if I should have not kept the tags.
-> 
-[...]
-> Roman Kisel (11):
->   arm64: kvm, smccc: Introduce and use API for getting hypervisor UUID
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 2a5284f749b4..e80f3ebd3e2a 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -503,7 +503,7 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
+>  {
+>  	int ret;
+>  
+> -	if (!addr_is_memory(addr))
+> +	if (!range_is_memory(addr, addr + size))
+>  		return -EPERM;
+>  
+>  	ret = host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.pgt,
 
-I notice there were review comments from multiple people on this patch.
-To the best of my knowledge, those comments have been addressed in this
-version, but I only had a cursory look and am by no means an expert on
-ARM64.
+I vaguely seem to remember that there was an assumption around
+addr/size representing a single page, and therefore addr_is_memory()
+was doing the right thing.
 
-My assumption is Arnd's review is good enough for this patch to get
-merged.
-
-With that assumption, I have applied this whole series to hyperv-next.
-
-ARM64 maintainers, please let me know if you have an objection -- I can
-drop the series and let Roman address further comments.
+Has this assumption changed? Or is this only a figment of my imagination?
 
 Thanks,
-Wei.
 
->   arm64: hyperv: Use SMCCC to detect hypervisor presence
->   Drivers: hv: Enable VTL mode for arm64
->   Drivers: hv: Provide arch-neutral implementation of get_vtl()
->   arm64: hyperv: Initialize the Virtual Trust Level field
->   arm64, x86: hyperv: Report the VTL the system boots in
->   dt-bindings: microsoft,vmbus: Add interrupt and DMA coherence
->     properties
->   Drivers: hv: vmbus: Get the IRQ number from DeviceTree
->   Drivers: hv: vmbus: Introduce hv_get_vmbus_root_device()
->   ACPI: irq: Introduce acpi_get_gsi_dispatcher()
->   PCI: hv: Get vPCI MSI IRQ domain from DeviceTree
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
