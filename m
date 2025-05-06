@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A122286D4A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B2C286D4F;
 	Tue,  6 May 2025 16:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549852; cv=none; b=Gq00iTExViUZ0ZAfV6SX6oYr9gWiprVko9nPjnkyB8xgzCJFn+FGZ3Mkh4NjHn/88ouDNn1sXioKsmoLew+dRYxJ85LXqrgIlbUKa+3n0zpNfrN9k/UIIObIhH0HgnSZA7ccV3DZJQOBHlWBdhWPsflYljRKHeOY7+PReW/EMlY=
+	t=1746549852; cv=none; b=E6238TQzh7xsJTTdnyMO2m1YOmbJsKPDbkI8Pwl6P0cxI9dyu3n6hBZQx8YPQRrDRRLUNce7eEPQjumaSLBFlpftBY+sbTZuLSrLl+iAKBh2D1OjCL/9kIoyzrNSK7Lzx3Lb9NFE/Fhgw+UdZ9J9r12nlsrSmk2O66JacMcrEWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746549852; c=relaxed/simple;
-	bh=cXLy+//a+Wbc2PWFhsn34/2XszY14fVQQbnlUcjHWGg=;
+	bh=FeOE5HYailM3U6MquKVcLgzFQMjShRvF/V4972/W2u8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IFnJrO/ZP4o86SP3ufvzHf5opnlDeP+7buwmNCsdKsKz5uciVMnv3VaBT2r03tfB/qteU/mMmcslJVW1yPR+3cSOSzkILEdRdSmSR7cCNUo6SkyKJHPxPlDTV1wpZbmirvDjdAHU/ks8QWmRKkFC7HHA+IopGTjuUjxNaqx8xvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ygth1+ur; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=enHhFvV50cw+EZ/yYn4FqV+KFhC0cMDyaCE0FMcaMmscRnDn5QbaAreG/Yz5TYG5vVAeTl4q9b9n6+1IFjNFAOlEB1FbSL6ZJqOgWL/UVJM0IG2/eBT4XvNIkFEfebiFF9JJ0ucvJ8vAVJv62BsaJoWcK+P07d24CAaYtNq7Zwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p0K8F1G1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ygth1+ur"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 229D8C4CEF7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p0K8F1G1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9242EC4CEF0;
 	Tue,  6 May 2025 16:44:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746549852;
-	bh=cXLy+//a+Wbc2PWFhsn34/2XszY14fVQQbnlUcjHWGg=;
+	bh=FeOE5HYailM3U6MquKVcLgzFQMjShRvF/V4972/W2u8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ygth1+urekfiF1GRYwFFvJEHLIbPemK0bhY89b4zJ/liMXixm3F4MhM2NYHsUJHE0
-	 vqC6Z/LsjU9njN3du52P5ckCK6DCNH1cFLGUo6dqNkIn1FQ8OYqG3G9yQxqOZgBvfC
-	 wNs/Bly56x6rUS2/GY1R7v253Na9nwlKGVtGXoOTr1gmcwg4+9uqXnE1Oq7LVm6rAm
-	 WG6621bg6lYO/U6wI4vCagZZNdvoOlyi7j0YMmtmEdKIuLY4VSHiE0l30j9+qJ9QWv
-	 sIkMpq33EELMWkjzBSKlkL3SKtvomLbuYHExsxI+vwB67cOi6Ia1PGQ37mKBU/0cMv
-	 byMxCmZNHrizQ==
+	b=p0K8F1G1SGx5NgO/zc2XMds88gXLnoo9q10jvAo5qfCbxl6pAWMzoeHdAOUqFqgH+
+	 dUPP4WvdnBBHUElKDsvNGZbcLTGKLYhKDA/ittrrezINrP/p77OORtIFzOFLvp4nn9
+	 pbWgBNalBmKgfenNfzg8TzDt2lYrQlQSVKyqQVsJz5d1GaFTg+m1D5eCZFMVEgZG2H
+	 F9j0is4w0S1L/KeOJhal7/8UxoRLLAqmNJ4uROJOfKedRRF3GkiZtXgobtAbhMYs+Q
+	 RXpkGqgKJSq4/qKiP4XNpNGu7ZntrnR1vypmguhO1wzXyHkEjo/RtjjmwKZ9aLabNJ
+	 Fyzay+Gue1VTA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCLOs-00CJkN-Cj;
+	id 1uCLOs-00CJkN-S3;
 	Tue, 06 May 2025 17:44:10 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -45,9 +45,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v4 19/43] KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_LS64_ACCDATA being disabled
-Date: Tue,  6 May 2025 17:43:24 +0100
-Message-Id: <20250506164348.346001-20-maz@kernel.org>
+Subject: [PATCH v4 21/43] KVM: arm64: Plug FEAT_GCS handling
+Date: Tue,  6 May 2025 17:43:26 +0100
+Message-Id: <20250506164348.346001-22-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
 References: <20250506164348.346001-1-maz@kernel.org>
@@ -63,34 +63,64 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We currently unconditionally make ACCDATA_EL1 accesses UNDEF.
-
-As we are about to support it, restrict the UNDEF behaviour to cases
-where FEAT_LS64_ACCDATA is not exposed to the guest.
+We don't seem to be handling the GCS-specific exception class.
+Handle it by delivering an UNDEF to the guest, and populate the
+relevant trap bits.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/handle_exit.c | 11 +++++++++++
+ arch/arm64/kvm/sys_regs.c    |  8 ++++++++
+ 2 files changed, 19 insertions(+)
 
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index ff75695fb8c96..cc5c2eeebab32 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -298,6 +298,16 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+ 
++static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
++{
++	/* We don't expect GCS, so treat it with contempt */
++	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
++		WARN_ON_ONCE(1);
++
++	kvm_inject_undefined(vcpu);
++	return 1;
++}
++
+ static int handle_other(struct kvm_vcpu *vcpu)
+ {
+ 	bool is_l2 = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
+@@ -380,6 +390,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
+ 	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
++	[ESR_ELx_EC_GCS]	= kvm_handle_gcs,
+ };
+ 
+ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6e01b06bedcae..ce347ddb6fae0 100644
+index ce347ddb6fae0..a9ecca4b2fa74 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -5150,10 +5150,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 	kvm->arch.fgu[HFGRTR_GROUP] = (HFGRTR_EL2_nAMAIR2_EL1		|
- 				       HFGRTR_EL2_nMAIR2_EL1		|
- 				       HFGRTR_EL2_nS2POR_EL1		|
--				       HFGRTR_EL2_nACCDATA_EL1		|
- 				       HFGRTR_EL2_nSMPRI_EL1_MASK	|
- 				       HFGRTR_EL2_nTPIDR2_EL0_MASK);
+@@ -5209,6 +5209,14 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 						HFGITR_EL2_nBRBIALL);
+ 	}
  
-+	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
-+		kvm->arch.fgu[HFGRTR_GROUP] |= HFGRTR_EL2_nACCDATA_EL1;
++	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP)) {
++		kvm->arch.fgu[HFGRTR_GROUP] |= (HFGRTR_EL2_nGCS_EL0 |
++						HFGRTR_EL2_nGCS_EL1);
++		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_nGCSPUSHM_EL1 |
++						HFGITR_EL2_nGCSSTR_EL1 |
++						HFGITR_EL2_nGCSEPP);
++	}
 +
- 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
- 		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
- 						HFGITR_EL2_TLBIRVALE1OS	|
+ 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+ out:
+ 	mutex_unlock(&kvm->arch.config_lock);
 -- 
 2.39.2
 
