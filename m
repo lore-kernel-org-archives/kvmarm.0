@@ -1,96 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F0D15C158
-	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 21:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C875A153BD9
+	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 23:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746567056; cv=none; b=dis/ycIM+HxMLgCryWreCOSd85PEcF9LhDFeHcwaxBzVDZMokuf1VfDPfXvlCY0/HnzcHdWVRFOwMpmUEaj1DHn4i1KssuLnO8UVkoImFS9CO6Ex7C+umbRTcHIlMNjz76gli5yI2mXpeQqxG7oeXl8XZNLkHpPCnILcGrvpO1Q=
+	t=1746575284; cv=none; b=eMdNR0f4wiU22DdF9WbVqR0fy3Ds5KOgnMOYQuup0Zip7qmsE/BcZXdA98XYd78iiasiXnoI1P5UQ8jkKoO626xLweka63bHRo4VPh4sO6fbPh9vJQMzNeUkYK8Mt5pqDVAlXlXsqL9Sg9filzaJh50+6cZdhl7cpaR6RN+buSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746567056; c=relaxed/simple;
-	bh=LF4XyTkcgWoicn7uCeNsDcChHQo5BLnimhFxKCYZDII=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YE6c4IJYEZ/pTYfJmtlFTFj0Cc+GIOEWrB9ENStHbVANy5skPnj3uV5BIGEnCAu60q3mSDSGsUJ8Rqg8V59AT79aJ3bMWUkUC5l7GXsOs81OfuP1vl9BIp2qaRWdKHVVYMLE65Cp3d+lIUi03oW53JxX2XLXiPBSOla9CAwTukM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fNluEQFk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746575284; c=relaxed/simple;
+	bh=NzEAJGMGj67aqLOqPzD1WsJBqcysNCKrFhpDypZk/yY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bPdqlmPoWRFsHyF4Ev+F5cqMTElxq50yDTlDp9UQnJvDrL+t5TMG5gWrXuCry/d3L+qA883SDosJubpwrLpK+kT9vmw9eY5HWVHgc+BjLXk2aMBK/Tk5gpaNFKk8MCkDtlbg9e3wYTOWfHzReS0TSUNMMDDPxtdu8MU/Ul8Oe5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lX4GNA+h; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNluEQFk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDC15C4CEF2
-	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 21:30:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746567055;
-	bh=LF4XyTkcgWoicn7uCeNsDcChHQo5BLnimhFxKCYZDII=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=fNluEQFkkeCwvPrfzIVWjNz/fxO7XClp4/+43s1LbqX5aWnCweVwRbbM2lIYlPpCz
-	 pE4shwMICs31y+e3dEBL0qFiTMcHcQa6DaDtdijSyzGWXbbjB0hMmZioDeseLr5LdV
-	 Bqm8W7lsCe7nxWxPzYGpJS2OEXeEOpbTANCxdQrXEirS3KWCwLf6Sh79/T5nqBXM+D
-	 A38Hy9YlwRtnXh9GEgv+xaYXKVMviIpE+Tr/vWwHMxGfW3rwbvDmRokxWBFQRkA1OV
-	 PY8L5UOfl7dsosAq05DeIbgW+tayqRx9TUDyQcdHmAp1X11LklEHfM946KdUBE/zBm
-	 8dwZM/sqTM0KQ==
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5e5e63162a0so9420900a12.3
-        for <kvmarm@lists.linux.dev>; Tue, 06 May 2025 14:30:55 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVFQ97JisHvcXqnEhx2mcboQDNI65ed4euFn32ZUz7OF1lSc7oTm/uDUYhWBEHOEX8cnT4k6YY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwRX2L0PT7U1g5xfB9/Zvvid/vEhMYNTi16NiXMVC0QbAkLd6ER
-	PAJhegIgIkyRcg6nOjSpq78FILhT3WtNq/9JV7P02mYOLioqVCoU9hQKE7qzltWpOevgoxVIafQ
-	AKmjuL9PP/ZsS/Ou96tpcVP7Mfg==
-X-Google-Smtp-Source: AGHT+IEnd5G8SKlNRW5w4iFO/mLcDtaGwA9ndk5+resb4iEheEVI1rHK1zs74rWur7nF5rXXl5sEz573M/0kmSBOH+I=
-X-Received: by 2002:a05:6402:1941:b0:5fb:9f73:d0e3 with SMTP id
- 4fb4d7f45d1cf-5fbe9e29f20mr703063a12.18.1746567054358; Tue, 06 May 2025
- 14:30:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lX4GNA+h"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-306b590faaeso4444873a91.3
+        for <kvmarm@lists.linux.dev>; Tue, 06 May 2025 16:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746575282; x=1747180082; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iGR21MUMyA/Iej7QErtZc8eyio+Dks1zWhBSbKI/rik=;
+        b=lX4GNA+hDJxXEI1GMZmI5Vaf1WCXNGlPMhlLsiq1cqrGwMx3tMy6UDNhj1/6l+e2k8
+         iAuLUpr1dSUIXSjD4WvruDSJlv3HCEhrZ4m4yeE53rT7M+XiMn0rwim64vvbAuiTY0WP
+         MjNKCCzRT3cXbnlATqXb3HO1vHj81M2T1SGDZa8UWI3p1uWh++WfYegPkbsTwkubiuwb
+         Rv+SU2xzxdsZ87vV5cRSgUjxJKhDJ2NeUXpCN1qR2jXkBHc9i7tAoeP5m5v/s+Rm+6r/
+         sheSMQFJBufh/MehPzeF9unXFAfWLOa5m21mTx5VvivMU9SdLaIkgglW7+2GilxubIJo
+         Anpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746575282; x=1747180082;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iGR21MUMyA/Iej7QErtZc8eyio+Dks1zWhBSbKI/rik=;
+        b=RbuKHcOTKiVAbteDFeOS1v/jaR+J2/FevqTODupCexh2ydtDUhlPvm8qFKX9qgMhPv
+         96PR7ODS/c3WW9kdH33Af+Oq6oJY/gskdO1/MC7vcaTOz/x4SwPSz7fSFGc2sz9KIZbr
+         CGLWdLq1P+EYWdbEuJztJ1wU745lsmx5PZx44C0fUE/xu1sE8RtuVYoHvZxA/5McKZWS
+         iGsVdj2Nctjt2cBnxjzJckH4xUkeGI9o0NHw9mJzhLzEk/8ePMZGg25O0N+Es3iZNllh
+         /ImhIkZB9yhvQUS6MWsKzEfgX1Y7VaF+30YljFXtvzgTlpaKHTW1j9mxX0h2LA0EUOpa
+         oy1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUUSlG8scybBkPK8zSzS2G0kI9eAIZ1DLcxytWAbYRCE4TF+QwIyMosXhF+rs0tJolOKkF6aE4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyRj5Vj/qzcvsnwg/jciEk/r7mQRXrA04XPy28tNXaRxBt7rjgf
+	iVM/BZP589dp9en+gfZXAQmdJEvQacWovxRfmfkbr/YpqsFmAEg2TWYHKPVJwsQ/F7ogZyo+AMQ
+	NJQ==
+X-Google-Smtp-Source: AGHT+IEI4VPbZHYscktwEOVP6g5TZOKepWU/P1YF6Ndm56diDY5BXYXdB3X0UtnsxrDOZgtWBFkyQyHQxS4=
+X-Received: from pjbsr12.prod.google.com ([2002:a17:90b:4e8c:b0:30a:2095:204b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e84:b0:2ff:5357:1c7f
+ with SMTP id 98e67ed59e1d1-30aac28b3bcmr1863522a91.30.1746575282052; Tue, 06
+ May 2025 16:48:02 -0700 (PDT)
+Date: Tue, 6 May 2025 16:48:00 -0700
+In-Reply-To: <20250109204929.1106563-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org> <20250506154702.00002b57@huawei.com>
-In-Reply-To: <20250506154702.00002b57@huawei.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 6 May 2025 16:30:43 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqL2ZeNhpm3E=xVEtdiwGXV7Ni4YpdYn7thvbgt7Gn-QUA@mail.gmail.com>
-X-Gm-Features: ATxdqUHdtGklHSUrSP-OlxuranOH14q1bQqj56TmZsXDcW7Zo0EE4YurWkIdGsA
-Message-ID: <CAL_JsqL2ZeNhpm3E=xVEtdiwGXV7Ni4YpdYn7thvbgt7Gn-QUA@mail.gmail.com>
-Subject: Re: [PATCH v21 0/4] arm64/perf: Enable branch stack sampling
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	James Clark <james.clark@linaro.org>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250109204929.1106563-1-jthoughton@google.com>
+Message-ID: <aBqfsGtUjBUJudFB@google.com>
+Subject: Re: [PATCH v2 00/13] KVM: Introduce KVM Userfault
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
+	Nikita Kalyazin <kalyazin@amazon.com>, Anish Moorthy <amoorthy@google.com>, 
+	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
+	David Matlack <dmatlack@google.com>, wei.w.wang@intel.com, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, May 6, 2025 at 9:47=E2=80=AFAM Jonathan Cameron
-<Jonathan.Cameron@huawei.com> wrote:
->
-> On Mon, 07 Apr 2025 12:41:29 -0500
-> "Rob Herring (Arm)" <robh@kernel.org> wrote:
->
-> > This series enables perf branch stack sampling support on arm64 via a
-> > v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details
-> > on BRBE can be found in the Arm ARM[1] chapter D18.
-> >
-> > I've picked up this series from Anshuman. v19 and v20 versions have bee=
-n
-> > reworked quite a bit by Mark and myself. The bulk of those changes are
-> > in patch 4.
-> >
-> > A git branch is here[2].
-> >
-> > [1] https://developer.arm.com/documentation/ddi0487/latest/
-> > [2] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git arm/br=
-be-v21
->
-> Hi Rob,
->
-> Expecting any changes on this?  Anything specific we can do to help then =
-shout.
+On Thu, Jan 09, 2025, James Houghton wrote:
+> James Houghton (13):
+>   KVM: Add KVM_MEM_USERFAULT memslot flag and bitmap
+>   KVM: Add KVM_MEMORY_EXIT_FLAG_USERFAULT
+>   KVM: Allow late setting of KVM_MEM_USERFAULT on guest_memfd memslot
+>   KVM: Advertise KVM_CAP_USERFAULT in KVM_CHECK_EXTENSION
 
-I hope not. Still waiting on Mark R's review though... I'm sure there
-will be something and since perf drivers seemingly only get reviewed
-once a cycle, I guess it will be another cycle... Sigh.
+Starting with some series-wide feedback, the granularity of these first few
+patches is too fine.  I normally like to split things up, but honestly, this is
+such a small feature that I don't see much point in separating the uAPI from the
+infrastructure.
 
-Rob
+To avoid cyclical dependencies between common KVM and arch code, we can do all
+the prep, but not fully enable+advertise support on any architecture until all
+targeted architectures are fully ready.
+
+In other words, I think we should squish these into one patch, minus this bit at
+the very end of the series (spoiler alert):
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ce7bf5de6d72..0106d6d461a3 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1545,6 +1545,9 @@ static int check_memory_region_flags(struct kvm *kvm,
+            !(mem->flags & KVM_MEM_GUEST_MEMFD))
+                valid_flags |= KVM_MEM_READONLY;
+ 
++       if (IS_ENABLED(CONFIG_KVM_GENERIC_PAGE_FAULT))
++               valid_flags |= KVM_MEM_USERFAULT;
++
+        if (mem->flags & ~valid_flags)
+                return -EINVAL;
+ 
+@@ -4824,6 +4827,9 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+        case KVM_CAP_CHECK_EXTENSION_VM:
+        case KVM_CAP_ENABLE_CAP_VM:
+        case KVM_CAP_HALT_POLL:
++#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
++       case KVM_CAP_USERFAULT:
++#endif
+                return 1;
+ #ifdef CONFIG_KVM_MMIO
+        case KVM_CAP_COALESCED_MMIO:
