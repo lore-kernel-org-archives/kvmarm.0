@@ -1,54 +1,72 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB31324169A;
-	Tue,  6 May 2025 08:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAAD19D892;
+	Tue,  6 May 2025 08:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746520346; cv=none; b=Z+IHHHb2e+hp3sArtMuzNeTr+4DUV0kvXFRr6qdzYuZiZ+IDNl7NVUdBJ+Up9us7U3BRI3ok6cxVK6MUJsXyKS2hfUIiSkijsqeKQ9MDL89xJhnsgo1hEkM2JKcYyZRvm7tHToswsavM30ZW317X4qhyx+cZP8U/2VZbvOkOIIs=
+	t=1746520608; cv=none; b=L+ZJha/DPauISbBv7FThQMncn/1pC4vgf8dzOJgM+89cZQ7/O8qm6V4BU5AkydaSkTmpceEPu56XK/ZHrgy3OplYu1u4ke9u2GRC+XkmuCYwNNR5ZOOl8/7OvBpFZD2mz7BkOU5zr4mGuW6caHMFJfv4YkI6NFDaGstsFB7YzMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746520346; c=relaxed/simple;
-	bh=ypJ9hdbekmAtwiansv/u/Vu9Y546qW0ilyEarbxlrvg=;
+	s=arc-20240116; t=1746520608; c=relaxed/simple;
+	bh=9VOMYTlC6ALS5IdAgzBAWP1xvgjsjQLiqbJ2O0ZhVHc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rnih/8k8z589+svWA96ZRFzF2jbqx/aAYZiYa4/7VvEE1hgVaartnVBZaPBLkiCEKVZb0WDxld1l2WbdqIqXX8Ka27TgeCCY5SBO2n7Bbb0FZ6xRZZqN5ZCW0PBeSHH0b0fZeIjy3Wc/ZS+Jai5ffmkF+7Wuf2xS3aNKRsoV7hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IB6K6Lxl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=CNztpUsBHipjkw6DyCBfSg2tEsysDazJ01wSGYNsyShSU2ahL5YzRMROz/UG19xPdrq2ij3SFuukrksbboGWIDZlQMEBuzSS8LJFOruTL/sUdP2HVE3iBFCxaxkrgrx7gw0aIAI5G6ldT+ogPztxvSIeMwkQLfoijlVEcDNJ0P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G2RqhqDT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IB6K6Lxl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3629DC4CEE4;
-	Tue,  6 May 2025 08:32:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G2RqhqDT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65BFFC4CEE4;
+	Tue,  6 May 2025 08:36:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746520346;
-	bh=ypJ9hdbekmAtwiansv/u/Vu9Y546qW0ilyEarbxlrvg=;
+	s=k20201202; t=1746520607;
+	bh=9VOMYTlC6ALS5IdAgzBAWP1xvgjsjQLiqbJ2O0ZhVHc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IB6K6LxlTNc840zPic9i8KZTQDyAZLzCUPzmL2W2NFshYtVmaz2/GTPaMxcQtDNDc
-	 7QnQbD6zk0FraWGT1DnRrlzURslfrslxeA2w+UwB4W/KEYfdIBFXwvHzCexSW9VJTX
-	 DNULODwfnEwmZoJk9YphrRWlhjHnGt8sVSDJ19j/ThLOvc2AiSp8hXIUUKSgvI0fSU
-	 XRcRmTbWp28eLwsA02SCPRGHxV1vNv4Xp2L3FrMZxfcLsN5UZciY/k7SKv2NUlNPEn
-	 eU+iUiZmhA4NbiroTMwGaV2o5uRyLZ3HY8YO0HheLO6nX8Xk1LHBZ2DXvDSqbl9wxf
-	 Wp6kcj3BWKGdg==
+	b=G2RqhqDT+gZcdaDr4WlZdP0vofL3oNiEIDADXbadpArkaiurY9O2NUT46rZO3n8HL
+	 jheqZY23TyYhxAdGoyvOBgunYrbJggEAmbLA6prLdruFjdxUVZK+Fdj4BLg+/be53X
+	 ljTpmaR8UBdsVD0pU8pxIlLg2i+N/VYk06hW7XmwZB8a7kC58GIBqOxd90gR3K15t4
+	 mZS8hULgWZ050J/nBHpd3DhBjt2ikA0BHa1pZbWQDcIkT/0j5oRrxDepWyb2lqQWk7
+	 wpKD8UXmWU7x5bd1cFOUj72v+j9pbH3QdzheDN1EVmX9M899aGKEM9buy6Yewu3pjJ
+	 UhkhI1czrIBAw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCDiw-00C91n-Hp;
-	Tue, 06 May 2025 09:32:23 +0100
-Date: Tue, 06 May 2025 09:32:22 +0100
-Message-ID: <86ikmegmw9.wl-maz@kernel.org>
+	id 1uCDnA-00C97H-GY;
+	Tue, 06 May 2025 09:36:45 +0100
+Date: Tue, 06 May 2025 09:36:44 +0100
+Message-ID: <86h61ygmoz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-kernel@vger.kernel.org,
+To: Kees Cook <kees@kernel.org>
+Cc: Mostafa Saleh <smostafa@google.com>,
 	kvmarm@lists.linux.dev,
+	kasan-dev@googlegroups.com,
+	linux-hardening@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
 	will@kernel.org,
-	qperret@google.com
-Subject: Re: [PATCH] KVM: arm64: Fix memory check in host_stage2_set_owner_locked()
-In-Reply-To: <20250501162450.2784043-1-smostafa@google.com>
-References: <20250501162450.2784043-1-smostafa@google.com>
+	oliver.upton@linux.dev,
+	broonie@kernel.org,
+	catalin.marinas@arm.com,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	elver@google.com,
+	andreyknvl@gmail.com,
+	ryabinin.a.a@gmail.com,
+	akpm@linux-foundation.org,
+	yuzenghui@huawei.com,
+	suzuki.poulose@arm.com,
+	joey.gouly@arm.com,
+	masahiroy@kernel.org,
+	nathan@kernel.org,
+	nicolas.schier@linux.dev
+Subject: Re: [PATCH v2 0/4] KVM: arm64: UBSAN at EL2
+In-Reply-To: <202504301131.3C1CBCA8@keescook>
+References: <20250430162713.1997569-1-smostafa@google.com>
+	<202504301131.3C1CBCA8@keescook>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,42 +78,31 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: smostafa@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com
+X-SA-Exim-Rcpt-To: kees@kernel.org, smostafa@google.com, kvmarm@lists.linux.dev, kasan-dev@googlegroups.com, linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, catalin.marinas@arm.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, elver@google.com, andreyknvl@gmail.com, ryabinin.a.a@gmail.com, akpm@linux-foundation.org, yuzenghui@huawei.com, suzuki.poulose@arm.com, joey.gouly@arm.com, masahiroy@kernel.org, nathan@kernel.org, nicolas.schier@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 01 May 2025 17:24:50 +0100,
-Mostafa Saleh <smostafa@google.com> wrote:
+On Wed, 30 Apr 2025 19:32:23 +0100,
+Kees Cook <kees@kernel.org> wrote:
 > 
-> I found this simple bug while preparing some patches for pKVM.
-> AFAICT, it should be harmless (besides crashing the kernel if it
-> was misbehaving)
+> On Wed, Apr 30, 2025 at 04:27:07PM +0000, Mostafa Saleh wrote:
+> > Many of the sanitizers the kernel supports are disabled when running
+> > in EL2 with nvhe/hvhe/proctected modes, some of those are easier
+> > (and makes more sense) to integrate than others.
+> > Last year, kCFI support was added in [1]
+> > 
+> > This patchset adds support for UBSAN in EL2.
 > 
-> Fixes: e94a7dea2972 ("KVM: arm64: Move host page ownership tracking to the hyp vmemmap")
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 2a5284f749b4..e80f3ebd3e2a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -503,7 +503,7 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
->  {
->  	int ret;
->  
-> -	if (!addr_is_memory(addr))
-> +	if (!range_is_memory(addr, addr + size))
->  		return -EPERM;
->  
->  	ret = host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.pgt,
+> This touches both UBSAN and arm64 -- I'm happy to land this via the
+> hardening tree, but I expect the arm64 folks would rather take it via
+> their tree. What would people like to have happen?
 
-I vaguely seem to remember that there was an assumption around
-addr/size representing a single page, and therefore addr_is_memory()
-was doing the right thing.
+I don't mind either way, but in any case I'd like a stable branch with
+that code so that I can merge it if any conflict occurs in -next.
 
-Has this assumption changed? Or is this only a figment of my imagination?
+Alternatively, I can take it via the kvmarm tree, and publish a stable
+branch for anyone to pick and resolve conflicts ahead of the merge
+window.
 
 Thanks,
 
