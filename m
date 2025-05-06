@@ -1,235 +1,324 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA2227E1DD
-	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 11:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E79827A478
+	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 12:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746531770; cv=none; b=qtm+yXxTF2xKXH2r+4cIQm4ZHE+iWSUNJksAHyszpE8tchgw2oSTNFz3naMGPv1l/40vLfycDZ+l6XNe7+r/DQf29Ctm8DQpk0hIomXrfBajmiI6okBW++GnyFdB+9TJ6ibsPZO7jNz+z9RDKn+em3Sj1zHupXdvHuwfPtKDl3I=
+	t=1746532913; cv=none; b=m5Es48HJCAU1v/0Uksx9vVSoPQvueFjT+DvxKolcjm8kikze615WM1OG8WAoMGss1vLOr2kv99yi1AViPK4HWmb7sJE0jlt5RBTRk2r/xxdUa3LeNOAxJ5UaeTzggLKxY8DLl3dxPqPAxr3ZgH0OTB5peMo3q04/1+rDBzqwWEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746531770; c=relaxed/simple;
-	bh=3sMCtIotqVivKM8/Ownc6QdZfz5Z6QLgO4uRyf0+zJ4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X1cExTa55JuHqurS36ct6AxF4W5ZaPjBT8s+zsvJHiZovOTmoaSFgXRgDyC9I95jeaWAszgJ5EWdEoCyZMtB1oUR23SN3ZMSpfOH1oS81w6vn25/HW380JkQ8apzQ86VV+o2D+gQ0RNiVoAGHJ8z/i7Zj1Q+Wjex1mHQ9xL5EvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pzymE78U; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1746532913; c=relaxed/simple;
+	bh=grSs7Q9oNzsBgMn5sHgYcjBDVM3ojcSOsr4ThtytB2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MEabOa1hQ/Twko5yJcCIY5YmYe1HV6bkH4uMmILfvFSi9yvIdW5V3tCzwATGO/UaDHPH7wX3QHdhHuEdsubyg8/qF7qYutEA0Z3U0xSxElNnsJjRFoV6F6e68QwckS9Yk3zwqivENoQBqRgSaj2M3T3WMt6VaeZ4JXqMvKI05Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=utQoauqc; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pzymE78U"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-39ee682e0ddso3718798f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 06 May 2025 04:42:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="utQoauqc"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43d5f10e1aaso58045e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 06 May 2025 05:01:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746531766; x=1747136566; darn=lists.linux.dev;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BkqHrlk5rXmqQcmnUyYZSiZOvHTWZlNV/KJqAn/HjmE=;
-        b=pzymE78UOHnc/xJcy/7SUTRCyXlTMwVS3NIOJAJenRl0w/B0UnsQ9tgE09IFeAJLZj
-         VWT5ax4U8zY7ypDA+eOPCRbuOrxNQ7p3VrwSLPPtEkYjJKYaJs+EQJ5YP87AOMBkENRF
-         uG/oVoYJFgmAm5ydrjwaRIGpTD+6f1DKBZ40noWKHX2m57qP30i6IRlA28+td8HzLx01
-         Zi2/dVgk5hsrUZLnWcrfBWwiLwGtL8nHH5NRFD85E4BbZaA8aHprZNSM4XRGb2b1bG6g
-         cmhccRAhk/GusMevPUJc6eWMt50EfVjFqm/OZyjahgGiNl9KJ5K/HA0V5N9g8vAttim7
-         7TNQ==
+        d=google.com; s=20230601; t=1746532909; x=1747137709; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MSzvORr/gVZ7jSN0HABhiXm3spnKfDLNDT+Dp/cd+n0=;
+        b=utQoauqcks1j46LSrr4w3uCeFMroGEEBpLo+6e2r4Yha5rr7cJOPiH8f6ijJA1KCND
+         9YdDs0lRAZ4/wUVdw0aRFk7atW4/dTnoTUk/n+i61J5cSD2xkL6okddv6RcoCUIPAcoY
+         33Y6DIcm2PgJ+yL1oS7A3WP+CpnqqlciS3gcjdjs5sydcqxNIvlmpcXTmS0IZuTvOzJm
+         Oxu5dp7XN1Mm36yTtTky2DwUBxJ78DUqgDaQillmG/TrKxcIQr5KXe/6snaZ9NxLgw+y
+         +jB+Y+sqVKzy95HFmQDt4mvmtj5idkVJSqI8h4vdb8lcIM5P5bOf2iuAuxtOeAtvFUEa
+         dprA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746531766; x=1747136566;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BkqHrlk5rXmqQcmnUyYZSiZOvHTWZlNV/KJqAn/HjmE=;
-        b=IqsKrZWPr3tt6ydWa5ia/37vr+4ENSStVVsTxkY+HG/70G1UJK2LIzfmgvrWRlpVVP
-         G9NRCi/W/SEF8/4OSfLT7Nbc6Mj3CO00jdFKhXpVgqgotpjQTm9lBFsMVQ+fb1Eu5CxV
-         /lhpmhHDJskWVTRUTHNQyqkHkek5J71u5h4CpnFJIBw1AZFVxOYBFgv65eRWj0NyTo4K
-         X2OcMq3WpO+32HlCS+EeZ0We6uhL8kp8xyNkb2QFTv3Oj6o0bhdTq7wFsqRJTnJersj5
-         MlNOhGZlevh7kQD1V2X2fTZtTvvDE4hYtJ0wbT8elrIUndHMCoPujqzsMMNajVCPGDQR
-         aThg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmfW1+vOy9QHSiGX2V7EAdB/lvzP8/kGg2Pe03NNSORz3PC82hvsJQdkHeC6K3z9eaysAWPUc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx3Pfpf26Be+Ry9puXB3CjBq8UZKg82qHqZDNRb8j6j4y4Mcg/+
-	HcdQZdqUKdnfNatt1GyjiQYxL3+oB7lV4TLx29SA4w3zW52r2HC+wxHGyV2e4ks=
-X-Gm-Gg: ASbGnctPQn9VdKghzOAFL/r7pb3b3WcXgLJlQRfU6dgcKGMCEDMO0sk8YGhkSuY18y8
-	kq6ppN3fx0gWkej2eeTQ3XKupO/0Gf2eUOQZVBnsKjdWe5SZB2LGjYKPJ7vmiPv9MxXnKdnjLLM
-	oZDWx+0hqiyALiaVoPgsHYt68G2sxhKgapoDsN52PCvaSE6tiCi4PXAPtsSmZEJ8cwnJQTGJ6Be
-	yag85D/qLDCLDA90Fvp2rP6r14gq5SS9+ukXREq8bZ8EpHxTbX/DjOBu78HH34r0YLMRmOZ6ZYE
-	3dsRpg4FvAUlXTg4WCnpmFl99laB5k0z9/7mKkENedmQCPQ=
-X-Google-Smtp-Source: AGHT+IGUvZmO1ysjfj2110bUiJ8J7jVXWaXvMQnsa2Hz+uClfkGhq0fClzub1N37FV3ldFVqBc7yhA==
-X-Received: by 2002:a05:6000:2287:b0:391:3f4f:a169 with SMTP id ffacd0b85a97d-3a0ac0ec06fmr2094137f8f.32.1746531765765;
-        Tue, 06 May 2025 04:42:45 -0700 (PDT)
-Received: from ho-tower-lan.lan ([77.81.75.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae344esm13198473f8f.25.2025.05.06.04.42.44
+        d=1e100.net; s=20230601; t=1746532909; x=1747137709;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MSzvORr/gVZ7jSN0HABhiXm3spnKfDLNDT+Dp/cd+n0=;
+        b=WO9m2iF6ECqf9pVaV/TJXV0/KAjLP0h1ARjQse0pWsqedNX3+7m5ON8HGZvgwJUzdl
+         /Ba9MjNxw+NeXSB7yKxXGV5MGGO0L9cgPzYa6958YPN2ZT3SyWSOq6LNAO5fkhifnCwI
+         V+X5bTXHevcI6xzhPKscTLHjV1TZtMoX+UVbxJ7zaimeFfskqj2tDWy+mNQtRMTEajbN
+         jxPnANUnhiF6aGirniausUO8Sqy33UYLKvWZTYsCcr6dkJxiL88mms12Sf4+EluCR1LT
+         lqMwPpT4dxGLbH8II0Xgxd70RCw7R7bq8GoeWf2g7C4eJM3VFH0QJWX8JuTd+2Zt+cqI
+         KqEg==
+X-Forwarded-Encrypted: i=1; AJvYcCX1eYMFqi8TSusuBMilm3SAtc/DVYYdVnNbFjLg3Lq/AuCiNkEJ5+fdoLOYwohn3Bh+FVv5gC0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzh2cbMPrxb0JuxGcK8Gh6H+2vjjA4J8GcgVPfjyUu1/zPhYWha
+	+ER4NFdv19wRiils8rXuyXm2QoPH7fqdWXNpB9FQzDSZrZOhjaxjWCnMpCBhoA==
+X-Gm-Gg: ASbGncs6FVnk7muZ0fL/hAnu5DpImTktlpalrSCj1Edcz1Vpxga8xVI+CFC6CojByoH
+	YjSbDQlbSpxLzu5t5+kVT2qWXNpWDxdjuQPeelcmOcKiroOalARQYDXK2KapFNH1pDzdhtOJg98
+	Fckr8+vZnkmiHeiI4gYN9TWdgSzoqXtE8+kS5k4Zh+b1Ap4n58vwy8GUwgGAApkxwLmME11Yh8w
+	bjtWBh1AqZFuvl0UQhftoN2Wtt0OopeOkfm9recvdIHJXTVxVfHwu9wkHgMzi12UJpyO/XKXuCB
+	p1qhYWd6gAaS3/pSmy4SFLyVicR9l9mkyms+RdkHVUjppR/hBDH8FbFb9f7aOI8Ury8OPeJYRB7
+	3KdXKaw==
+X-Google-Smtp-Source: AGHT+IFBpEtiuzrhdK03rKZqJG6PwBucCmCJtiJ6cB8NuTFy5G+tiPNJu5pB483uNv06dEHDGi/VFw==
+X-Received: by 2002:a05:600c:4657:b0:43b:c2cc:5075 with SMTP id 5b1f17b1804b1-441d123f608mr713235e9.5.1746532909129;
+        Tue, 06 May 2025 05:01:49 -0700 (PDT)
+Received: from google.com (207.57.78.34.bc.googleusercontent.com. [34.78.57.207])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae831esm13723056f8f.57.2025.05.06.05.01.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 04:42:45 -0700 (PDT)
-From: James Clark <james.clark@linaro.org>
-Date: Tue, 06 May 2025 12:41:42 +0100
-Subject: [PATCH 10/10] perf docs: arm-spe: Document new SPE filtering
- features
+        Tue, 06 May 2025 05:01:48 -0700 (PDT)
+Date: Tue, 6 May 2025 12:01:42 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Per Larsen <perl@immunant.com>
+Cc: linux-kernel@vger.kernel.org, catalin.marinas@arm.com,
+	james.morse@arm.com, jean-philippe@linaro.org,
+	kernel-team@android.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, lpieralisi@kernel.org,
+	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
+	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
+	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
+	armellel@google.com, arve@android.com, ahomescu@google.com,
+	Per Larsen <perlarsen@google.com>, Ayrton Munoz <ayrton@google.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: Bump the supported version of FF-A to 1.2
+Message-ID: <aBn6JlRUoA9hKdZd@google.com>
+References: <20250502092108.3224341-1-perl@immunant.com>
+ <20250502092108.3224341-3-perl@immunant.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250506-james-perf-feat_spe_eft-v1-10-dd480e8e4851@linaro.org>
-References: <20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org>
-In-Reply-To: <20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
- Arnaldo Carvalho de Melo <acme@kernel.org>, 
- Namhyung Kim <namhyung@kernel.org>, 
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
- Adrian Hunter <adrian.hunter@intel.com>, Jonathan Corbet <corbet@lwn.net>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, leo.yan@arm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-perf-users@vger.kernel.org, James Clark <james.clark@linaro.org>, 
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250502092108.3224341-3-perl@immunant.com>
 
-FEAT_SPE_EFT and FEAT_SPE_FDS etc have new user facing format attributes
-so document them. Also document existing 'event_filter' bits that were
-missing from the doc and the fact that latency values are stored in the
-weight field.
+On Fri, May 02, 2025 at 02:21:07AM -0700, Per Larsen wrote:
+> From: Per Larsen <perlarsen@google.com>
+> 
+> FF-A version 1.2 introduces the DIRECT_REQ2 ABI. Bump the FF-A version
+> preferred by the hypervisor as a precursor to implementing the 1.2-only
+> FFA_MSG_SEND_DIRECT_REQ2 and FFA_MSG_SEND_RESP2 messaging interfaces.
+> 
+> We must also use SMCCC 1.2 for 64-bit SMCs if hypervisor negotiated FF-A
+> 1.2, so ffa_set_retval is updated and a new function to call 64-bit smcs
+> using SMCCC 1.2 with fallback to SMCCC 1.1 is introduced.
+> 
+> Update deny-list in ffa_call_supported to mark FFA_NOTIFICATION_* and
+> interfaces added in FF-A 1.2 as unsupported lest they get forwarded.
+> 
+> Co-Developed-by: Ayrton Munoz <ayrton@google.com>
+> Signed-off-by: Per Larsen <perlarsen@google.com>
+> Signed-off-by: Per Larsen <perl@immunant.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/Makefile |   1 +
+>  arch/arm64/kvm/hyp/nvhe/ffa.c    | 109 ++++++++++++++++++++++++++-----
+>  2 files changed, 94 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index b43426a493df..95404ff16dac 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -27,6 +27,7 @@ hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
+>  	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
+>  hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+>  	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+> +hyp-obj-y += ../../../kernel/smccc-call.o
+>  hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
+>  hyp-obj-y += $(lib-objs)
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 10e88207b78e..8102dd6a19f7 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -94,13 +94,57 @@ static void ffa_to_smccc_res(struct arm_smccc_res *res, int ret)
+>  	ffa_to_smccc_res_prop(res, ret, 0);
+>  }
+>  
+> -static void ffa_set_retval(struct kvm_cpu_context *ctxt,
+> +static void ffa_set_retval(u64 func_id,
+> +			   struct kvm_cpu_context *ctxt,
+>  			   struct arm_smccc_res *res)
+>  {
+>  	cpu_reg(ctxt, 0) = res->a0;
+>  	cpu_reg(ctxt, 1) = res->a1;
+>  	cpu_reg(ctxt, 2) = res->a2;
+>  	cpu_reg(ctxt, 3) = res->a3;
+> +
+> +	/*
+> +	 * Other result registers must be zero per DEN0077A but SMC32/HVC32 must
+> +	 * preserve x8-x30 per DEN0028.
+> +	 */
+> +	cpu_reg(ctxt, 4) = 0;
+> +	cpu_reg(ctxt, 5) = 0;
+> +	cpu_reg(ctxt, 6) = 0;
+> +	cpu_reg(ctxt, 7) = 0;
+> +
+> +	/* Per DEN0077A v1.2, x8-x17 must be zero for SMC64/HVC64 results*/
+> +	if (ARM_SMCCC_IS_64(func_id) && hyp_ffa_version >= FFA_VERSION_1_2) {
 
-Signed-off-by: James Clark <james.clark@linaro.org>
----
- tools/perf/Documentation/perf-arm-spe.txt | 86 ++++++++++++++++++++++++++++---
- 1 file changed, 78 insertions(+), 8 deletions(-)
+We don't currently handle SMC32 so ARM_SMCCC_IS_64(func_id) should not
+be needed and we can also drop the func_id argument.
+Also hyp_ffa_version should be accessed with a lock.
 
-diff --git a/tools/perf/Documentation/perf-arm-spe.txt b/tools/perf/Documentation/perf-arm-spe.txt
-index 37afade4f1b2..a90da9f36d93 100644
---- a/tools/perf/Documentation/perf-arm-spe.txt
-+++ b/tools/perf/Documentation/perf-arm-spe.txt
-@@ -141,27 +141,60 @@ Config parameters
- These are placed between the // in the event and comma separated. For example '-e
- arm_spe/load_filter=1,min_latency=10/'
- 
--  branch_filter=1     - collect branches only (PMSFCR.B)
--  event_filter=<mask> - filter on specific events (PMSEVFR) - see bitfield description below
-+  event_filter=<mask> - logical AND filter on specific events (PMSEVFR) - see bitfield description below
-+  inv_event_filter=<mask> - logical AND to filter out specific events (PMSNEVFR, FEAT_SPEv1p2) - see bitfield description below
-   jitter=1            - use jitter to avoid resonance when sampling (PMSIRR.RND)
--  load_filter=1       - collect loads only (PMSFCR.LD)
-   min_latency=<n>     - collect only samples with this latency or higher* (PMSLATFR)
-   pa_enable=1         - collect physical address (as well as VA) of loads/stores (PMSCR.PA) - requires privilege
-   pct_enable=1        - collect physical timestamp instead of virtual timestamp (PMSCR.PCT) - requires privilege
--  store_filter=1      - collect stores only (PMSFCR.ST)
-   ts_enable=1         - enable timestamping with value of generic timer (PMSCR.TS)
-   discard=1           - enable SPE PMU events but don't collect sample data - see 'Discard mode' (PMBLIMITR.FM = DISCARD)
-+  data_src_filter=<mask> - mask to filter from 0-63 possible data sources (PMSDSFR, FEAT_SPE_FDS) - See 'Data source filtering'
- 
- +++*+++ Latency is the total latency from the point at which sampling started on that instruction, rather
- than only the execution latency.
- 
--Only some events can be filtered on; these include:
-+Only some events can be filtered on using 'event_filter' bits. The overall
-+filter is the logical AND of these bits, for example if bits 3 and 5 are set
-+only samples that have both L1D cache refill and TLB walk are recorded. When
-+FEAT_SPEv1p2 is implemented 'inv_event_filter' can also be used to filter on
-+events that do _not_ have the target bit set. Filter bits for both event_filter
-+and inv_event_filter are:
- 
--  bit 1     - instruction retired (i.e. omit speculative instructions)
-+  bit 1     - Instruction retired (i.e. omit speculative instructions)
-+  bit 2     - L1D access (FEAT_SPEv1p4)
-   bit 3     - L1D refill
-+  bit 4     - TLB access (FEAT_SPEv1p4)
-   bit 5     - TLB refill
--  bit 7     - mispredict
--  bit 11    - misaligned access
-+  bit 6     - Not taken event (FEAT_SPEv1p2)
-+  bit 7     - Mispredict
-+  bit 8     - Last level cache access (FEAT_SPEv1p4)
-+  bit 9     - Last level cache miss (FEAT_SPEv1p4)
-+  bit 10    - Remote access (FEAT_SPEv1p4)
-+  bit 11    - Misaligned access (FEAT_SPEv1p1)
-+  bit 12-15 - IMPLEMENTATION DEFINED events (when implemented)
-+  bit 16    - FEAT_TME transactions
-+  bit 17    - Partial or empty SME or SVE predicate (FEAT_SPEv1p1)
-+  bit 18    - Empty SME or SVE predicate (FEAT_SPEv1p1)
-+  bit 19    - L2D access (FEAT_SPEv1p4)
-+  bit 20    - L2D miss (FEAT_SPEv1p4)
-+  bit 21    - Cache data modified (FEAT_SPEv1p4)
-+  bit 22    - Recently fetched (FEAT_SPEv1p4)
-+  bit 23    - Data snooped (FEAT_SPEv1p4)
-+  bit 24    - Streaming SVE mode event when FEAT_SPE_SME is implemented, or
-+              IMPLEMENTATION DEFINED event 24 (when implemented)
-+  bit 25    - SMCU or external coprocessor operation event when FEAT_SPE_SME is implemented, or
-+              IMPLEMENTATION DEFINED event 25 (when implemented)
-+  bit 26-31 - IMPLEMENTATION DEFINED events (only versions less than FEAT_SPEv1p4)
-+  bit 48-63 - IMPLEMENTATION DEFINED events (when implemented)
-+
-+For IMPLEMENTATION DEFINED bits, refer to the CPU TRM if these bits are
-+implemented.
-+
-+The driver will reject events if requested filter bits require unimplemented SPE
-+versions, but will not reject filter bits for unimplemented IMPDEF bits or when
-+their related feature is not present (e.g. SME). For example, if FEAT_SPEv1p2 is
-+not implemented, filtering on "Not taken event" (bit 6) will be rejected.
- 
- So to sample just retired instructions:
- 
-@@ -171,6 +204,29 @@ or just mispredicted branches:
- 
-   perf record -e arm_spe/event_filter=0x80/ -- ./mybench
- 
-+When set, the following filters can be used to select samples that match any of
-+the operation types (OR filtering). If only one is set then only samples of that
-+type are collected:
-+
-+  branch_filter=1     - Collect branches (PMSFCR.B)
-+  load_filter=1       - Collect loads (PMSFCR.LD)
-+  store_filter=1      - Collect stores (PMSFCR.ST)
-+
-+When extended filtering is supported (FEAT_SPE_EFT), operation type filters can
-+be changed to AND and also new filters are added. For example samples could be
-+selected if they are store AND SIMD by setting
-+'store_filter=1,simd_filter=1,store_filter_mask=1,simd_filter_mask=1'. The new
-+filters are as follows:
-+
-+  branch_filter_mask=1  - Change branch filter behavior from OR to AND (PMSFCR.Bm)
-+  load_filter_mask=1    - Change load filter behavior from OR to AND (PMSFCR.LDm)
-+  store_filter_mask=1   - Change store filter behavior from OR to AND (PMSFCR.STm)
-+  simd_filter_mask=1    - Change SIMD filter behavior from OR to AND (PMSFCR.SIMDm)
-+  float_filter_mask=1   - Change floating point filter behavior from OR to AND (PMSFCR.FPm)
-+
-+  simd_filter=1         - Collect SIMD loads, stores and operations (PMSFCR.SIMD)
-+  float_filter=1        - Collect floating point loads, stores and operations (PMSFCR.FP)
-+
- Viewing the data
- ~~~~~~~~~~~~~~~~~
- 
-@@ -204,6 +260,10 @@ Memory access details are also stored on the samples and this can be viewed with
- 
-   perf report --mem-mode
- 
-+The latency value from the SPE sample is stored in the 'weight' field of the
-+Perf samples and can be displayed in Perf script and report outputs by enabling
-+its display from the command line.
-+
- Common errors
- ~~~~~~~~~~~~~
- 
-@@ -247,6 +307,16 @@ to minimize output. Then run perf stat:
-   perf record -e arm_spe/discard/ -a -N -B --no-bpf-event -o - > /dev/null &
-   perf stat -e SAMPLE_FEED_LD
- 
-+Data source filtering
-+~~~~~~~~~~~~~~~~~~~~~
-+
-+When FEAT_SPE_FDS is present, 'data_src_filter' can be used as a mask to filter
-+a subset (0 - 63) of possible data source IDs. The full range of data sources is
-+0 - 65 535 although these are unlikely to be used in practice. Data sources are
-+IMPDEF so refer to the TRM for the mappings. Each bit N of the filter maps to
-+data source N. The filter is an OR of all the bits, so for example setting bits
-+0 and 3 filters on packets from data sources 0 OR 3.
-+
- SEE ALSO
- --------
- 
+> +		cpu_reg(ctxt, 8) = 0;
+> +		cpu_reg(ctxt, 9) = 0;
+> +		cpu_reg(ctxt, 10) = 0;
+> +		cpu_reg(ctxt, 11) = 0;
+> +		cpu_reg(ctxt, 12) = 0;
+> +		cpu_reg(ctxt, 13) = 0;
+> +		cpu_reg(ctxt, 14) = 0;
+> +		cpu_reg(ctxt, 15) = 0;
+> +		cpu_reg(ctxt, 16) = 0;
+> +		cpu_reg(ctxt, 17) = 0;
 
--- 
-2.34.1
+How can we know from the hypervisor(which is the caller) whether these registers are
+used or not by the calee ? IMO this should be TZ responsibility to mitigate the
+risk of leaking information through register if these are not used.
 
+> +	}
+> +}
+> +
+> +/* Call SMC64 using SMCCC 1.2 if hyp negotiated FF-A 1.2 falling back to 1.1 */
+> +static void arm_smccc_1_2_smc_fallback(u64 func_id, u64 a1, u64 a2, u64 a3,
+
+Should we rename this to arm_smccc_1_x_smc to keep the same name format
+?
+
+> +				       u64 a4, u64 a5, u64 a6, u64 a7,
+> +				       struct arm_smccc_res *res)
+> +{
+> +	struct arm_smccc_1_2_regs args, regs;
+
+Initialize regs with {0} to prevent leakaging the hypervisor
+stack values in case the callee doesn't make use of it.
+
+> +
+> +	/* SMC64 only as SMC32 must preserve x8-x30 per DEN0028 1.6G Sec 2.6 */
+> +	if (ARM_SMCCC_IS_64(func_id) && hyp_ffa_version >= FFA_VERSION_1_2) {
+> +		args = (struct arm_smccc_1_2_regs) { func_id, a1, a2, a3, a4,
+> +						     a5, a6, a7 };
+> +		arm_smccc_1_2_smc(&args, &regs);
+> +		*res = (struct arm_smccc_res) { .a0 = regs.a0, .a1 = regs.a1,
+> +						.a2 = regs.a2, .a3 = regs.a3 };
+> +		return;
+> +	}
+> +
+> +	arm_smccc_1_1_smc(func_id, a1, a2, a3, a4, a5, a6, a7, res);
+>  }
+>  
+>  static bool is_ffa_call(u64 func_id)
+> @@ -115,12 +159,12 @@ static int ffa_map_hyp_buffers(u64 ffa_page_count)
+>  {
+>  	struct arm_smccc_res res;
+>  
+> -	arm_smccc_1_1_smc(FFA_FN64_RXTX_MAP,
+> -			  hyp_virt_to_phys(hyp_buffers.tx),
+> -			  hyp_virt_to_phys(hyp_buffers.rx),
+> -			  ffa_page_count,
+> -			  0, 0, 0, 0,
+> -			  &res);
+> +	arm_smccc_1_2_smc_fallback(FFA_FN64_RXTX_MAP,
+> +				   hyp_virt_to_phys(hyp_buffers.tx),
+> +				   hyp_virt_to_phys(hyp_buffers.rx),
+> +				   ffa_page_count,
+> +				   0, 0, 0, 0,
+> +				   &res);
+>  
+>  	return res.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : res.a2;
+>  }
+> @@ -174,10 +218,10 @@ static void ffa_mem_reclaim(struct arm_smccc_res *res, u32 handle_lo,
+>  
+>  static void ffa_retrieve_req(struct arm_smccc_res *res, u32 len)
+>  {
+> -	arm_smccc_1_1_smc(FFA_FN64_MEM_RETRIEVE_REQ,
+> -			  len, len,
+> -			  0, 0, 0, 0, 0,
+> -			  res);
+> +	arm_smccc_1_2_smc_fallback(FFA_FN64_MEM_RETRIEVE_REQ,
+> +				   len, len,
+> +				   0, 0, 0, 0, 0,
+> +				   res);
+>  }
+>  
+>  static void ffa_rx_release(struct arm_smccc_res *res)
+> @@ -628,6 +672,37 @@ static bool ffa_call_supported(u64 func_id)
+>  	case FFA_RXTX_MAP:
+>  	case FFA_MEM_DONATE:
+>  	case FFA_MEM_RETRIEVE_REQ:
+> +	/* Optional notification interfaces added in FF-A 1.1 */
+> +	case FFA_NOTIFICATION_BITMAP_CREATE:
+> +	case FFA_NOTIFICATION_BITMAP_DESTROY:
+> +	case FFA_NOTIFICATION_BIND:
+> +	case FFA_NOTIFICATION_UNBIND:
+> +	case FFA_NOTIFICATION_SET:
+> +	case FFA_NOTIFICATION_GET:
+> +	case FFA_NOTIFICATION_INFO_GET:
+> +	/* Unimplemented interfaces added in FF-A 1.2 */
+> +	case FFA_MSG_SEND_DIRECT_REQ2:
+> +
+> +	/*
+> +	 * FFA_MSG_SEND_DIRECT_RESP2 is not meant to be invoked by the host or
+> +	 * a guest VM because pkvm does not support communication between VMs
+> +	 * via FF-A. Direct messages can only be sent from a non-secure sender
+> +	 * endpoint to a secure receiver endpoint. Only receiver endpoints are
+> +	 * expected to invoke FFA_MSG_SEND_DIRECT_RESP2.
+> +	 */
+> +	case FFA_MSG_SEND_DIRECT_RESP2:
+> +
+> +	/* Reserved for secure endpoints per DEN0077A 1.2 REL0 Table 13.53. */
+
+I don't know if the comment is relevant to the upstream code, should we
+drop it ? The same with the previous one and few after this.
+
+> +	case FFA_CONSOLE_LOG:
+> +
+> +	/*
+> +	 * Mandatory for secure endpoints per DEN0077A 1.2 REL0 Table 13.1 and
+> +	 * optional for non-secure endpoints according to Table 13.38.
+> +	 */
+> +	case FFA_PARTITION_INFO_GET_REGS:
+> +
+> +	/* Reserved for secure endpoints per DEN0077A 1.2 REL0 Table 17.2. */
+> +	case FFA_EL3_INTR_HANDLE:
+>  		return false;
+>  	}
+>  
+> @@ -680,7 +755,8 @@ static int hyp_ffa_post_init(void)
+>  	if (res.a0 != FFA_SUCCESS)
+>  		return -EOPNOTSUPP;
+>  
+> -	switch (res.a2) {
+> +	/* Bit[0:1] holds minimum buffer size and alignment boundary */
+> +	switch (res.a2 & 0x3) {
+
+What is 0x3 ? Can you please define the mask for it ?
+
+>  	case FFA_FEAT_RXTX_MIN_SZ_4K:
+>  		min_rxtx_sz = SZ_4K;
+>  		break;
+> @@ -871,7 +947,7 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+>  
+>  	ffa_to_smccc_error(&res, FFA_RET_NOT_SUPPORTED);
+>  out_handled:
+> -	ffa_set_retval(host_ctxt, &res);
+> +	ffa_set_retval(func_id, host_ctxt, &res);
+>  	return true;
+>  }
+>  
+> @@ -883,7 +959,7 @@ int hyp_ffa_init(void *pages)
+>  	if (kvm_host_psci_config.smccc_version < ARM_SMCCC_VERSION_1_2)
+>  		return 0;
+>  
+> -	arm_smccc_1_1_smc(FFA_VERSION, FFA_VERSION_1_1, 0, 0, 0, 0, 0, 0, &res);
+> +	arm_smccc_1_1_smc(FFA_VERSION, FFA_VERSION_1_2, 0, 0, 0, 0, 0, 0, &res);
+>  	if (res.a0 == FFA_RET_NOT_SUPPORTED)
+>  		return 0;
+>  
+> @@ -903,10 +979,11 @@ int hyp_ffa_init(void *pages)
+>  	if (FFA_MAJOR_VERSION(res.a0) != 1)
+>  		return -EOPNOTSUPP;
+>  
+> -	if (FFA_MINOR_VERSION(res.a0) < FFA_MINOR_VERSION(FFA_VERSION_1_1))
+> +	/* See do_ffa_guest_version before bumping maximum supported version. */
+> +	if (FFA_MINOR_VERSION(res.a0) < FFA_MINOR_VERSION(FFA_VERSION_1_2))
+>  		hyp_ffa_version = res.a0;
+>  	else
+> -		hyp_ffa_version = FFA_VERSION_1_1;
+> +		hyp_ffa_version = FFA_VERSION_1_2;
+>  
+>  	tx = pages;
+>  	pages += KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE;
+> -- 
+> 2.49.0
+> 
