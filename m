@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43752853F1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D932853FA;
 	Tue,  6 May 2025 16:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549849; cv=none; b=AILoE/1d++5GjYhZvJW79ibm5XKoL7Tnouv+YwIGJmNFjhJpdRiSEOOtjCoeQp6F1fpD/4AkfoqO+By3J9Cx9JfqdFQSzkBKXFjrvDxm1w2BbrQd1Nssab2UzgCqYs8/vPfWsSxUOfYnEQA0r8hhKpGWYCjBq/uywFHKHul1xGc=
+	t=1746549849; cv=none; b=tddjG/CZaEHAX0hdZyLYW96joVw/zPiXMvGPk9zZeZEFoIJNT7IL6SGh+niMQdtma9R4VUlx6CQw15HUyAhjuaj7Ce8cqtzjsgnLXeQflqc0aQy/MYGWvZz1drzLkwdcbxWHccoVYQvNxymbmzJHsgTJgPGEmICuowf1RngbYB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746549849; c=relaxed/simple;
-	bh=jJkIDne2hoOcyn91XOfMc176KV1oYdB63I9cuKD1rVA=;
+	bh=IC/sbdjlRxGlbPcYnZe6UUMLYD3r/rULHfthHQdque4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oD+W784huskU+5CZFdHu08trpJ4W81BLO6rdw07N1ovGXLjicTznLZQtN9YnJIa2dDfk8lw92DjTrgmGsxm1LclfLYfVZLj3WS6KZmzwEq/o2q5it42d0Jw1X77ymUkzRyajs0J4ybPNmiVPzb76sURaT/aM9YQbLU9lfTclKU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTFwxWv0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Fw/ztxan0wsQwYjN9eLx6mhLTk04DZNi50kr75x0rkOMjZfc/RybY9gUfMIm+fIA/QnlDrnlynLeTbMraikVgGinZrTvfeU+vNj/wjgiD0JQqw4oKb0N8Kci+IxASFNIRUQ1Z3DEfX2zHSa0dchFDBGGOgxgpWxxyJIhqaNPRzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxdX5f4k; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bTFwxWv0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 494D1C4CEF3;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxdX5f4k"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A738CC4CEEB;
 	Tue,  6 May 2025 16:44:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746549849;
-	bh=jJkIDne2hoOcyn91XOfMc176KV1oYdB63I9cuKD1rVA=;
+	bh=IC/sbdjlRxGlbPcYnZe6UUMLYD3r/rULHfthHQdque4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bTFwxWv0B2E+RPBVdqgncmqMCp93NF/Xbl9jtyZtptrQQVn2QI/l7A6higB6p+9/K
-	 TRI8QR0FTtRO8Z4iwghRwx7eTRK8FYgQgqTYosSVR59iDPhEJcep80DMpacF99+MKY
-	 oxy7pP4KLU2H1wz1hGi71fKoB3udW3+TbPB0p+7Tdu2xx7dU0a+FAcMj7FwScla425
-	 fBy5W+73LjaywMBUqUIY42gZ8Y6owU57Q6N3f6bqvcIpFN6WX3wGiy+/cvPiyxRwTW
-	 Y10owDuIEVhsRVjoejWjimV6A6AfFTxskJZwmbUK+JqmkA8tkLuYwInMC2JZbELzuy
-	 eakochRwYEhRQ==
+	b=OxdX5f4ky8jWFlVOBTx7zzZvzqYiNzKPZ48XKtdIggTLpA5CsWXJobe3WHOL3Y8r2
+	 6/csPA5DvaqYa75pQ3mUy4BB5Be097i3OYf/4WHbmzCmWR3p+HqDtP+RdWJHSg6SFT
+	 NAAn3DqoJjdm6X3el+gIwkl98CrbN55W0/KBoNNiTWSXeWZgFy7xFjfacvsKWkjZwM
+	 6Ymd6kwE1NbTnjjDWWN7uwohSzcWjblPwWhxQt2kBcwpoH86THij0Uz8o4q+IViKus
+	 ZMKILXY1hCS9q3JsI5T9oEv0oRVgaoUYVl096d15NoAV61ycjAqViF4Pnkynwz5MRx
+	 MzBCBvDlXELsA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCLOp-00CJkN-3n;
+	id 1uCLOp-00CJkN-QO;
 	Tue, 06 May 2025 17:44:07 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -45,9 +45,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v4 05/43] arm64: sysreg: Update ID_AA64PFR0_EL1 description
-Date: Tue,  6 May 2025 17:43:10 +0100
-Message-Id: <20250506164348.346001-6-maz@kernel.org>
+Subject: [PATCH v4 08/43] arm64: sysreg: Update CPACR_EL1 description
+Date: Tue,  6 May 2025 17:43:13 +0100
+Message-Id: <20250506164348.346001-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
 References: <20250506164348.346001-1-maz@kernel.org>
@@ -63,25 +63,28 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the missing RASv2 description.
+Add the couple of fields introduced with FEAT_NV2p1.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/tools/sysreg | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 4c51d9a67b14d..6c64fd7d84951 100644
+index 10052d2eacdf7..bb92464fc9abf 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -907,6 +907,7 @@ UnsignedEnum	31:28	RAS
- 	0b0000	NI
- 	0b0001	IMP
- 	0b0010	V1P1
-+	0b0011	V2
- EndEnum
- UnsignedEnum	27:24	GIC
- 	0b0000	NI
+@@ -2069,7 +2069,9 @@ Field	0	M
+ EndSysreg
+ 
+ Sysreg	CPACR_EL1	3	0	1	0	2
+-Res0	63:30
++Res0	63:32
++Field	31	TCPAC
++Field	30	TAM
+ Field	29	E0POE
+ Field	28	TTA
+ Res0	27:26
 -- 
 2.39.2
 
