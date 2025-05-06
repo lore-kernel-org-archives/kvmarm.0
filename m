@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3589286D56;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01007286D63;
 	Tue,  6 May 2025 16:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549852; cv=none; b=KqKRhK+9RO+Oc5dHwEoa/RrAUHiF1gAlGl/T/ciMWN/ZSnJc6NFiUkLTsxuRcNdBKw5AY66Er+de4lM/i/G9Ki34UirJ+xOSvQemkO4ArajLYgVL9NQjyTf20oWNCa7+PlRXcvvY/FhSko6MzIHq9DEAQoQcFi/tTapV4P3oHhU=
+	t=1746549853; cv=none; b=Ns/SmeglbzvLJmQPyqht/Ucs4XhclgGuvTONSTPbGQ8fPt7bSDc0hlGt1wNX49ZWWxC8wwUozyXqRn2Ejej8n8FmE+sXUshz4tHMyna+2+SifUXYCSVq1hHd/FUSVssgwYJpo71VKVJTUER43XztT7mQnXhcMu5nQamXALYxPZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746549852; c=relaxed/simple;
-	bh=4gVu6PuCEYwqR8T4hiE7L+z2SsXJBvzsxceLEkn+bGU=;
+	s=arc-20240116; t=1746549853; c=relaxed/simple;
+	bh=c8cNlbwo7UxQmsP5Q+bgzpSg7nc6PYBeavFGnFyHY/w=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aegpFTGQZx/YR41AHNI21ja8wIsHposgTvm+m1KBrj3Nc1xXdUW8Bp4WEp1YFVWS1LUm2KfqrhDBHODtQSbU8IZWXHFbn2ocvlz6eJwbwY1PoOBmdNYzA7WUqnfu2eT5BUQUyA1xUS/KWK9zqJkCmIm/0Btp0aFeLi+NUPTzv0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbT1vkHt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=SUPxUwnV6CEq2nVRS0fNx82VlP6ncnsPxbHEhqX2tD0Rp8ASz6D8lNs6xRILemZkgN3Zpv1EV2e56l8wxNq6M1gdcX+FxTn5hxD4bFCdXD5cfSb2L8Z56yULufIpkMhdyd5KLX1I8P0uIAAs1EKpgDCozovcsqQTX6+PI6YakWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XXmFDBnH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbT1vkHt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65002C4CEF1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XXmFDBnH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D37A8C4CEEB;
 	Tue,  6 May 2025 16:44:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746549852;
-	bh=4gVu6PuCEYwqR8T4hiE7L+z2SsXJBvzsxceLEkn+bGU=;
+	bh=c8cNlbwo7UxQmsP5Q+bgzpSg7nc6PYBeavFGnFyHY/w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bbT1vkHtonjtWVfetsIP4h+6PJL1Sq3gBgSZ+jvaGg5Mwt64UTix2hgBNLe7dp82A
-	 L+F2md7wbd8NqONehEXmUlG2qcBZjHHCK3fk6f4wpSDRc3TPXNp6Bi/vYX0OUa+sJr
-	 bgKV6t6NT2WKjEvpQB2a8XT0dXZVMSI8Nwnl24c+MOFmG6Bd63YSp7YukHqtRwKqbn
-	 qXbF/42PJQsP8EdDf9gM+MFYazU2k2fBQV9vDn+ZR+RZZjchYRnxGIOYCMtZsBcotf
-	 K1o3xfYnjT/AvKdREhNjXIaj9Dg8wuoUwlVYaBb04Olj73o+5nJBN9wTML4AFj5Mma
-	 of9hmY6BCb4/Q==
+	b=XXmFDBnHD0L80OVWuX6HEnk/xHpO5/YewKJGd93R9sY08RqpV/+rfSHV0STEJv9MV
+	 F8Q+ZimbhBj2x6nSi4C4DkAm/0RZLY/rxmCT9nATksVnJZRTyQ1ayZP17vZ63aO+Vy
+	 8JIdvMqcrEmVy7PHD/yHnsnSx3LzX0ZJ9EIS2MXYXRUxay0sfmDQcyZ9AXtFtmHtY/
+	 FHY5g+T7fDcK9QVUB/rwk4rIN2S68L8+hV0UUaK65e+N62DZ6t0cGR6iBIqcEU1VyU
+	 BCResOpJHodf0hJeLfoSXZKJ+YLWsaoEX5qGtThMWKqwIoXLu2e/cNE6518i9PwcHO
+	 rYkssHcAcJa/A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCLOs-00CJkN-Kl;
-	Tue, 06 May 2025 17:44:10 +0100
+	id 1uCLOt-00CJkN-3U;
+	Tue, 06 May 2025 17:44:11 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v4 20/43] KVM: arm64: Don't treat HCRX_EL2 as a FGT register
-Date: Tue,  6 May 2025 17:43:25 +0100
-Message-Id: <20250506164348.346001-21-maz@kernel.org>
+Subject: [PATCH v4 22/43] KVM: arm64: Compute FGT masks from KVM's own FGT tables
+Date: Tue,  6 May 2025 17:43:27 +0100
+Message-Id: <20250506164348.346001-23-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
 References: <20250506164348.346001-1-maz@kernel.org>
@@ -63,35 +63,170 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Treating HCRX_EL2 as yet another FGT register seems excessive, and
-gets in a way of further improvements. It is actually simpler to
-just be explicit about the masking, so just to that.
+In the process of decoupling KVM's view of the FGT bits from the
+wider architectural state, use KVM's own FGT tables to build
+a synthetic view of what is actually known.
 
+This allows for some checking along the way.
+
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  14 ++++
+ arch/arm64/kvm/emulate-nested.c   | 106 ++++++++++++++++++++++++++++++
+ 2 files changed, 120 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 3150e42d79341..027d05f308f75 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -261,12 +261,9 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
- 		u64 hcrx = vcpu->arch.hcrx_el2;
- 		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
--			u64 clr = 0, set = 0;
--
--			compute_clr_set(vcpu, HCRX_EL2, clr, set);
--
--			hcrx |= set;
--			hcrx &= ~clr;
-+			u64 val = __vcpu_sys_reg(vcpu, HCRX_EL2);
-+			hcrx |= val & __HCRX_EL2_MASK;
-+			hcrx &= ~(~val & __HCRX_EL2_nMASK);
- 		}
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7a1ef5be7efb2..95fedd27f4bb8 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -607,6 +607,20 @@ struct kvm_sysreg_masks {
+ 	} mask[NR_SYS_REGS - __SANITISED_REG_START__];
+ };
  
- 		write_sysreg_s(hcrx, SYS_HCRX_EL2);
++struct fgt_masks {
++	const char	*str;
++	u64		mask;
++	u64		nmask;
++	u64		res0;
++};
++
++extern struct fgt_masks hfgrtr_masks;
++extern struct fgt_masks hfgwtr_masks;
++extern struct fgt_masks hfgitr_masks;
++extern struct fgt_masks hdfgrtr_masks;
++extern struct fgt_masks hdfgwtr_masks;
++extern struct fgt_masks hafgrtr_masks;
++
+ struct kvm_cpu_context {
+ 	struct user_pt_regs regs;	/* sp = sp_el0 */
+ 
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 52a2d63a667c9..528b33fcfcfd6 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2033,6 +2033,105 @@ static u32 encoding_next(u32 encoding)
+ 	return sys_reg(op0 + 1, 0, 0, 0, 0);
+ }
+ 
++#define FGT_MASKS(__n, __m)						\
++	struct fgt_masks __n = { .str = #__m, .res0 = __m, }
++
++FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
++FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
++FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
++FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
++FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
++FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
++
++static __init bool aggregate_fgt(union trap_config tc)
++{
++	struct fgt_masks *rmasks, *wmasks;
++
++	switch (tc.fgt) {
++	case HFGRTR_GROUP:
++		rmasks = &hfgrtr_masks;
++		wmasks = &hfgwtr_masks;
++		break;
++	case HDFGRTR_GROUP:
++		rmasks = &hdfgrtr_masks;
++		wmasks = &hdfgwtr_masks;
++		break;
++	case HAFGRTR_GROUP:
++		rmasks = &hafgrtr_masks;
++		wmasks = NULL;
++		break;
++	case HFGITR_GROUP:
++		rmasks = &hfgitr_masks;
++		wmasks = NULL;
++		break;
++	}
++
++	/*
++	 * A bit can be reserved in either the R or W register, but
++	 * not both.
++	 */
++	if ((BIT(tc.bit) & rmasks->res0) &&
++	    (!wmasks || (BIT(tc.bit) & wmasks->res0)))
++		return false;
++
++	if (tc.pol)
++		rmasks->mask |= BIT(tc.bit) & ~rmasks->res0;
++	else
++		rmasks->nmask |= BIT(tc.bit) & ~rmasks->res0;
++
++	if (wmasks) {
++		if (tc.pol)
++			wmasks->mask |= BIT(tc.bit) & ~wmasks->res0;
++		else
++			wmasks->nmask |= BIT(tc.bit) & ~wmasks->res0;
++	}
++
++	return true;
++}
++
++static __init int check_fgt_masks(struct fgt_masks *masks)
++{
++	unsigned long duplicate = masks->mask & masks->nmask;
++	u64 res0 = masks->res0;
++	int ret = 0;
++
++	if (duplicate) {
++		int i;
++
++		for_each_set_bit(i, &duplicate, 64) {
++			kvm_err("%s[%d] bit has both polarities\n",
++				masks->str, i);
++		}
++
++		ret = -EINVAL;
++	}
++
++	masks->res0 = ~(masks->mask | masks->nmask);
++	if (masks->res0 != res0)
++		kvm_info("Implicit %s = %016llx, expecting %016llx\n",
++			 masks->str, masks->res0, res0);
++
++	return ret;
++}
++
++static __init int check_all_fgt_masks(int ret)
++{
++	static struct fgt_masks * const masks[] __initconst = {
++		&hfgrtr_masks,
++		&hfgwtr_masks,
++		&hfgitr_masks,
++		&hdfgrtr_masks,
++		&hdfgwtr_masks,
++		&hafgrtr_masks,
++	};
++	int err = 0;
++
++	for (int i = 0; i < ARRAY_SIZE(masks); i++)
++		err |= check_fgt_masks(masks[i]);
++
++	return ret ?: err;
++}
++
+ int __init populate_nv_trap_config(void)
+ {
+ 	int ret = 0;
+@@ -2097,8 +2196,15 @@ int __init populate_nv_trap_config(void)
+ 			ret = xa_err(prev);
+ 			print_nv_trap_error(fgt, "Failed FGT insertion", ret);
+ 		}
++
++		if (!aggregate_fgt(tc)) {
++			ret = -EINVAL;
++			print_nv_trap_error(fgt, "FGT bit is reserved", ret);
++		}
+ 	}
+ 
++	ret = check_all_fgt_masks(ret);
++
+ 	kvm_info("nv: %ld fine grained trap handlers\n",
+ 		 ARRAY_SIZE(encoding_to_fgt));
+ 
 -- 
 2.39.2
 
