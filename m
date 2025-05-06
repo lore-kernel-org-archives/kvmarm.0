@@ -1,54 +1,54 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C6B28A1E8
-	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 16:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5744528A409
+	for <kvmarm@lists.linux.dev>; Tue,  6 May 2025 16:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746550146; cv=none; b=XODo6QTopqN/AullRnBYwVn3PJev4AljK+8Vyls6M/KLJ9aS/EPv8trdrDJ8AY+NGtMyLbZ6iGvynTaC7QY6onY5E0fZtEUrirC/DeRyNFCQ/cESKfFJ4t3OqKCcn3g/QIHi7oXvX/KMp+7GRELvzTEo6lCBSNWEy2v/YF241NY=
+	t=1746550149; cv=none; b=gZHiMXdPNixlNlJHfk0ruCUdsm/x7DTV0xxKEsARWEYftUhAeqIeQMI6XIK6wK7/QaKCiIvpIm5RPkj+U9gtNjOYoAK2gYSTjOzgmyu59+5X73XEnJhNQIoK0WcS+UmAgE8APS+E41jf0IKrK6MpDArEG3yMFR7/qBsmLUO+VCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746550146; c=relaxed/simple;
-	bh=PgCe5Ig4Hz5VA3Et4j2ZYh+G8htR5m2rXa4V0St1e+k=;
+	s=arc-20240116; t=1746550149; c=relaxed/simple;
+	bh=6nhV7XpN3WZyy+/QohB9tJlpXsrab2K78OgulSH7QaM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=caC3X62rXiHNodZUVmhDQ/E2CBeKOGpOJSZjeqI6JWQjeS0hPAE7zwfRZx7mqOQS40M9+tfKYu8oLR9UH/6yTmxTok1cuDgQhj4t5PyJgfvKT8uYPs6+PZDYhka9xoQM+unIbH08W4O1PTW6ph4zwkp5aaxHoTX3Z4d1Vw1YtBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cwnAlyol; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=QJrNOPdeklO0k0nfSv1piSXxj+HXO1Z3oW9INnFji3gl/As6r8QoGQY1qs98apIAPcHvPB8myxG3grySHlTXbJoO0uHzxHYmn0B/rEDnvBtPOO6zZ3FRE1v0i75UJonuF67cCP4IVVlXGnjhRmgelU2zdA41WBpwCNaFDglLNGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x5FDfwkw; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cwnAlyol"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43d209dc2d3so27641005e9.3
-        for <kvmarm@lists.linux.dev>; Tue, 06 May 2025 09:49:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x5FDfwkw"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-441c96c1977so18404735e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 06 May 2025 09:49:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746550143; x=1747154943; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1746550145; x=1747154945; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=njQ3TmZpiHbN0W0T2NSyLt6EnFI9+R+BtiPGKvCoesw=;
-        b=cwnAlyolz/GG8+F2P4yTmlZIl8+5lA/FMpXeZgtATVtfG9BLAQf8q1cvGTh/jcwYyF
-         yNIq4x/byUvEHjliMuD7n37LYD8W17XiBqAd0EhQsjPbN3ze1WWEsQQEfGllLa6BH/6M
-         7VzRzofEJlZeis+P1PyDwb+Zk5SNCihq/r7jPo1DgRaP6CGQIYIlsm18Dw5qDPaEW+i/
-         6Bvu4sEsK0rBH3q0vkUT1g3UNYYO+quOE5xe8vK4vuyOQmkBs3k/BtGHiiB/CU0T0XTk
-         AEkTp8Jo4rCnn154NwRWp+UW0g2/RzutN28ey5Vp8lqF8FkZh6ZrEo8Ch+qg1Tpl908R
-         b6gg==
+        bh=Uwe9TWcp7UhmX4oZw7S8iXQCB83ssWQWzCZsAER4ojM=;
+        b=x5FDfwkwmduXyZShRPrJ53pa5aexNYFSiUhxU+N6dZI/n7puJ9AKI14rynxofewkUg
+         qCgoWgoyGJ24T/Q/OCtGznSecCkEn9vNUA8d6Jx8hFAa+YVkfWQn7h98tVWcKAJh/zfA
+         lZlZ1kjvl/sCYhuTwt+7sGGOqPzqTrkrM+Eg1wNaSXG4cZXFO24izzo7QHNF2/sgwcBV
+         RrkAr4KSLOATFgKHVn4LxmIGhHhwxTTmk7Th3VEA/kpWfieYFVgz+SyaodWOyj3tLmuo
+         L0rsfqrAJXRxgjRoQ+6GQivtTosa85TCQrzJKg1Ez17SW1q2VbRhVIAzscRv80+eYnnG
+         WlMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746550143; x=1747154943;
+        d=1e100.net; s=20230601; t=1746550145; x=1747154945;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=njQ3TmZpiHbN0W0T2NSyLt6EnFI9+R+BtiPGKvCoesw=;
-        b=AOqV7VcNN+EVrg7HgJUlvkeRabTjIve8SaFwh0LBj43pnmDvMzt8/Vnd66DFKnsQfw
-         ePhUpUSl2DDqzv+nrurrYd1sP0Clnkf1Mp3XjZqTKWJ/N9a/oSk/Xkkd5fsI1ub4Uv/b
-         ac0wczr4OYFOyfTje60zm0zN//IBxSZYuzVz/k9ykrZEl2Cn1D44qZ3qS9/DTgKrrFDm
-         rddGUMI7Y+amuy0TbgHEhUtgdRdr/pTfBovgnZf59PrZ+ToRQXfvwEOdZ5qrX3j3OZpU
-         snDq/iBVuF6hA+7Cmx4HLdiEMuLymV2fZX6WWDHieb2TetKoKdhWME5T8ajG6tKcJ4w7
-         2G+w==
-X-Gm-Message-State: AOJu0YwChgdRQKEOym2O+6S8wOkHovQjWa+bPZw0dVJ+MeqFWZJjG+cb
-	+vQTcMhykhtd+XFNacGb1IJzDBkSfbuydzTYVlxzS951h38wiwh1etcDjfPugxCh9YTf+XIPce0
-	QY683iG6f9VMmCiK8hg==
-X-Google-Smtp-Source: AGHT+IHF02PKPiIhJbOE1ndD3uShLpPGP1nAp1HVPAQRz98xV5Rm4WeCONHAOCoe603i2rkE7H3ckkLeK9deDeKS
-X-Received: from wmbay12.prod.google.com ([2002:a05:600c:1e0c:b0:43d:1dd4:37f2])
+        bh=Uwe9TWcp7UhmX4oZw7S8iXQCB83ssWQWzCZsAER4ojM=;
+        b=sE9Y6WcvVmUm3UvFv1nzSV8BeVD7kDs5VWmwdi8XpBQEoVu8nS39FOmBBw5YNabR1I
+         +bue+UdQ/h5PS5Z/2KDfjkGYkd2u6XGHy9CkLZsQ51lOASjSKxBeKFvBYwAigzveaAJw
+         PopevECFiXPsJmKikhZpVEzoqtd2sAlp60fuwa6nJX1hPM0JB4CkqNz2g6UoJ/eI5E8P
+         HtQtzo+hqN9a4WO6zGmWWnJ18inWHAUtklOi3TaJBxJsT2WV8Ao0R90rIr663lm3vTm/
+         ni1MzGfbIJp/b6hOlllId3D9F1s/NdlzSQdwVdjevOvLABheWmDBEUdP5QdWPzmdgfSz
+         beUA==
+X-Gm-Message-State: AOJu0YxtbsgXAS+gpeHEpaOt4DmZxJRjnZg++/f3lRZtspMUQ3qO/YeV
+	U1RqQedoXEABQtP+F5Rk/KJ9DCV/lGQGxUMfntvCp1akqsL8yCl1eb4nR9EVBj7mTVY+hnfwa5g
+	qOU0OtUXV6z6ezMs5mw==
+X-Google-Smtp-Source: AGHT+IFD0lWDGk03I/L52reS0E96znl56Cu/MfnVewrpbgBLyMFf/ajBPFdbrDJBI3q4GHyXoNdIe4tdhRJb9WFi
+X-Received: from wmbz22.prod.google.com ([2002:a05:600c:c096:b0:43c:f6b3:fa10])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:154a:b0:43d:42b:e186 with SMTP id 5b1f17b1804b1-441d0fcc750mr28382805e9.8.1746550143106;
- Tue, 06 May 2025 09:49:03 -0700 (PDT)
-Date: Tue,  6 May 2025 17:48:09 +0100
+ 2002:a05:600c:a03:b0:439:9424:1b70 with SMTP id 5b1f17b1804b1-441d054c884mr38006405e9.30.1746550144942;
+ Tue, 06 May 2025 09:49:04 -0700 (PDT)
+Date: Tue,  6 May 2025 17:48:10 +0100
 In-Reply-To: <20250506164820.515876-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250506164820.515876-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
-Message-ID: <20250506164820.515876-14-vdonnefort@google.com>
-Subject: [PATCH v4 13/24] tracing: Check for undefined symbols in simple_ring_buffer
+Message-ID: <20250506164820.515876-15-vdonnefort@google.com>
+Subject: [PATCH v4 14/24] KVM: arm64: Support unaligned fixmap in the nVHE hyp
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -70,36 +70,25 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The simple_ring_buffer implementation must remain simple enough to be
-used by the pKVM hypervisor. Prevent the object build if unresolved
-symbols are found.
+Return the fixmap VA with the page offset, instead of the page base
+address. This allows to use hyp_fixmap_map() seamlessly regardless of
+the address alignment.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-index 8f5e194eba71..a2f1489e11af 100644
---- a/kernel/trace/Makefile
-+++ b/kernel/trace/Makefile
-@@ -114,4 +114,19 @@ obj-$(CONFIG_TRACE_REMOTE) += trace_remote.o
- obj-$(CONFIG_SIMPLE_RING_BUFFER) += simple_ring_buffer.o
- obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
+diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+index f41c7440b34b..720cc3b36596 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mm.c
++++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+@@ -240,7 +240,7 @@ void *hyp_fixmap_map(phys_addr_t phys)
+ 	WRITE_ONCE(*ptep, pte);
+ 	dsb(ishst);
  
-+#
-+# simple_ring_buffer is used by the pKVM hypervisor which does not have access
-+# to all kernel symbols. Fail the build if forbidden symbols are found.
-+#
-+UNDEFINED_ALLOWLIST := alt_cb_patch_nops
-+UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
-+
-+quiet_cmd_check_undefined = NM      $<
-+      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(UNDEFINED_ALLOWLIST)`"
-+
-+$(obj)/%.o.checked: $(obj)/%.o FORCE
-+	$(call if_changed,check_undefined)
-+
-+always-$(CONFIG_SIMPLE_RING_BUFFER) +=  simple_ring_buffer.o.checked
-+
- libftrace-y := ftrace.o
+-	return (void *)slot->addr;
++	return (void *)slot->addr + offset_in_page(phys);
+ }
+ 
+ static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
 -- 
 2.49.0.967.g6a0df3ecc3-goog
 
