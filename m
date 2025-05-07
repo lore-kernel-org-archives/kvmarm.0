@@ -1,213 +1,178 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C43EC14884C;
-	Wed,  7 May 2025 10:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150B715C158
+	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 15:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746614555; cv=none; b=HviLTxEAm7o3XDV1Ad2uhqWT5+VAZhgt2wCBKTClAs/qf53Dv1pzdxPu2rsZW7/xqklNxRhKnFqG3eor8Nrxt30SAvzU1StLQmx+wvsFG/Or6/aOO7xK0joyZ592td7ZWRKq56YuWqUNlnuPbOaf0PxHAOcuKMzdkGyS6lpMwqo=
+	t=1746630795; cv=none; b=GfiL0G8mdxJ2HiPnI1glXyfbwDhUdrrcq+yorW5oG5b9Qxu5kyK1V5AFVOIncs5a5uiYwsfKUHdYXWrO7tAH7nhMxUFaBB2bFbrwHftlodF2YUMAVn9j6znWCQXE54BDoqHaHykxoGJb93bmkRIeAxNJR19ugb17ffWUf8R4OqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746614555; c=relaxed/simple;
-	bh=K7FRUYsKa68Pm5CEDV96iYy58lhLu7ZJV05L7Jo9o1c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r5ebBKuPkFwMIUw4F0KjQe6vmTgqI71eTegaJ/DXcHMB1TuBrN3vCrbGS2wzvCS3I+Y5dM3SzZ3BMXTJRHMXTKO7VfKsntqREs0l+7cK2dnslMqT45XgLs6mB0vRRIqPgbsYSP9TsuuMRCItJvqzDU0OVq0GxE4aOOBdSolAl4s=
+	s=arc-20240116; t=1746630795; c=relaxed/simple;
+	bh=erjqJjbQiAdebnC64Ummh0rNVRgrZ2tt5dbVIsfoKUc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HRy7Zqkb9v1Ww3pd3zDjuXhNQZPYDNIExBc5v5IJLopjOABBR2LgnSMo0fixTg8tOU87L5WmYCxy7/UnJWlXh4xSgWGG+L20uYphT07fNMH5l84JhfLTQ4Gvp3tQdpcA9ACZfgIbumemkrMev3Bqq4q8KPFoghqh+TdX3s8xsho=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0016B339;
-	Wed,  7 May 2025 03:42:22 -0700 (PDT)
-Received: from [10.1.30.69] (unknown [10.1.30.69])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 04BF93F5A1;
-	Wed,  7 May 2025 03:42:29 -0700 (PDT)
-Message-ID: <54a21b12-2b17-4e0a-9cbf-f68406fb003a@arm.com>
-Date: Wed, 7 May 2025 11:42:29 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 367FB339;
+	Wed,  7 May 2025 08:13:03 -0700 (PDT)
+Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2C7783F58B;
+	Wed,  7 May 2025 08:13:10 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: andrew.jones@linux.dev,
+	eric.auger@redhat.com,
+	lvivier@redhat.com,
+	thuth@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com,
+	david@redhat.com,
+	pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	will@kernel.org,
+	julien.thierry.kdev@gmail.com,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	joey.gouly@arm.com,
+	andre.przywara@arm.com
+Subject: [kvm-unit-tests PATCH v3 00/16] arm/arm64: Add kvmtool to the runner script
+Date: Wed,  7 May 2025 16:12:40 +0100
+Message-ID: <20250507151256.167769-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 17/43] arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-18-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250416134208.383984-18-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 16/04/2025 14:41, Steven Price wrote:
-> The guest can request that a region of it's protected address space is
-> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
-> RSI_IPA_STATE_SET. This causes a guest exit with the
-> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
-> protected region to unprotected (or back), exiting to the VMM to make
-> the necessary changes to the guest_memfd and memslot mappings. On the
-> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
-> calls.
-> 
-> The VMM may wish to reject the RIPAS change requested by the guest. For
-> now it can only do with by no longer scheduling the VCPU as we don't
-> currently have a usecase for returning that rejection to the guest, but
-> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
-> open for adding a new ioctl in the future for this purpose.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v7:
->   * Rework the loop in realm_set_ipa_state() to make it clear when the
->     'next' output value of rmi_rtt_set_ripas() is used.
-> New patch for v7: The code was previously split awkwardly between two
-> other patches.
-> ---
->   arch/arm64/kvm/rme.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 88 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index bee9dfe12e03..fe0d5b8703d2 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -624,6 +624,65 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->   		realm_unmap_private_range(kvm, start, end);
->   }
->   
-> +static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
-> +			       unsigned long start,
-> +			       unsigned long end,
-> +			       unsigned long ripas,
-> +			       unsigned long *top_ipa)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	phys_addr_t rd_phys = virt_to_phys(realm->rd);
-> +	phys_addr_t rec_phys = virt_to_phys(rec->rec_page);
-> +	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-> +	unsigned long ipa = start;
-> +	int ret = 0;
-> +
-> +	while (ipa < end) {
-> +		unsigned long next;
-> +
-> +		ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
-> +
-> +		if (RMI_RETURN_STATUS(ret) == RMI_SUCCESS) {
-> +			ipa = next;
-> +		} else if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> +			int walk_level = RMI_RETURN_INDEX(ret);
-> +			int level = find_map_level(realm, ipa, end);
-> +
-> +			/*
-> +			 * If the RMM walk ended early then more tables are
-> +			 * needed to reach the required depth to set the RIPAS.
-> +			 */
-> +			if (walk_level < level) {
-> +				ret = realm_create_rtt_levels(realm, ipa,
-> +							      walk_level,
-> +							      level,
-> +							      memcache);
-> +				/* Retry with RTTs created */
+v2 can be found here [1].
 
-minor nit: Do we need to add a comment here, saying, we stop processing
-the request if we run out of RTT pages in this go and Realm could retry
-it.
+To goal is to allow the user to do:
 
-> +				if (!ret)
-> +					continue;
-> +			} else {
-> +				ret = -EINVAL;
-> +			}
-> +
-> +			break;
-> +		} else {
-> +			WARN(1, "Unexpected error in %s: %#x\n", __func__,
-> +			     ret);
-> +			ret = -ENXIO;
-> +			break;
-> +		}
+$ ./configure --target=kvmtool
+$ make clean && make
+$ ./run_tests.sh
 
-minor nit: Following from Gavin's comment on another patch, could
-switch() make the above code more readable and remove the continue; ?
+to run all the tests automatically with kvmtool.
 
-		switch (RMI_RETURN_STATUS(ret)) {
-		case RMI_SUCCESS:
-			ipa = next;
-			break;
-		case RMI_ERROR_RTT: {
+Reasons to use kvmtool:
 
-		
-		}
-			break;
-		default:
-			WARN(..);
-			ret = -ENXIO;
-			goto out;
-		}
+* kvmtool is smaller and a lot easier to hack than qemu, which means
+developers may prefer it when adding or prototyping new features to KVM.
+Being able to run all the tests reliably and automatically is very useful
+in the development process.
 
-I am fine either way.
+* kvmtool is faster to run the tests (a couple of times faster on
+my rockpro64), making for a quick turnaround. But do keep in mind that not
+all tests work on kvmtool because of missing features compared to qemu.
 
-> +	}
-> +
+* kvmtool does things differently than qemu: different memory layout,
+different uart, PMU emulation is disabled by default, etc. This makes it a
+good testing vehicule for kvm-unit-tests itself.
 
-out:
+Changes in v3
+-------------
 
-> +	*top_ipa = ipa;
-> +
-> +	if (ripas == RMI_EMPTY && ipa != start)
-> +		realm_unmap_private_range(kvm, start, ipa);
-> +
-> +	return ret;
-> +}
-> +
->   static int realm_init_ipa_state(struct realm *realm,
->   				unsigned long ipa,
->   				unsigned long end)
-> @@ -863,6 +922,32 @@ void kvm_destroy_realm(struct kvm *kvm)
->   	kvm_free_stage2_pgd(&kvm->arch.mmu);
->   }
->   
-> +static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long base = rec->run->exit.ripas_base;
-> +	unsigned long top = rec->run->exit.ripas_top;
-> +	unsigned long ripas = rec->run->exit.ripas_value;
-> +	unsigned long top_ipa;
-> +	int ret;
-> +
-> +	do {
-> +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
-> +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
-> +		write_lock(&kvm->mmu_lock);
-> +		ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
-> +		write_unlock(&kvm->mmu_lock);
-> +
-> +		if (WARN_RATELIMIT(ret && ret != -ENOMEM,
-> +				   "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx, ripas: %#lx\n",
-> +				   base, top, ripas))
-> +			break;
-> +
-> +		base = top_ipa;
-> +	} while (top_ipa < top);
-> +}
-> +
+Lots of changes following the excellent feedback I got. A bird's eye view:
 
-Rest looks good to me.
+* Split extra_params into qemu_params and test_args: qemu_params for qemu
+arguments and test_args for the test's main() function.
 
-Suzuki
+Now that I'm putting the cover letter together I'm considering that maybe
+having qemu_params, kvmtool_params and test_params (instead of test_args)
+might be a better naming scheme.
 
+* TARGET is now exported unconditionally. Unfortunately a side effect of
+this is that checking out these series and running the tests will end up
+with an error because the scripts now expect TARGET to be defined in
+config.mak.
+
+If it's unacceptable, I can drop this and handle everything in vmm.bash by
+converting direct accesses to vmm_opts with functions defined in vmm.bash
+(vmm_opts[$TARGET:parse_premature_failure] becomes
+vmm_parse_premature_failure(), for example).
+
+* Introduced scripts/vmm.bash to keep the vmm stuff contained. As a
+consequence there's very little $TARGET stuff in scripts/runtime.bash (only
+for premature_failure(), and no more 'case' statements anywhere) and
+instead scripts/common.bash passes the correct arguments directly to
+runtime.bash::run().
+
+Unfortunately, because of all the changes, I decided not to keep some of
+the Reviewed-by tags. That's not to say that the effort is not appreciated,
+on the contrary, these changes are a direct result of the review; I dropped
+the tags because I was worried they might not apply to the current content
+of the patches.
+
+If no major changes are needed following this round of review, for the next
+iteration I'm planning to send the first two patches (extra_params renamed
+to qemu_params and the new test_args) separately, to make sure it gets the
+review it deserves from the rest of the architectures.
+
+Still haven't managed to get EDK2 to work with kvmtool, so I've decided to
+explicitely disabled UEFI tests in the last patch ("scripts: Enable
+kvmtool") - this is new.
+
+I would also like to point out that despite Drew's comment I kept the
+'disabled_if' test definition because I think using 'targets', with the
+default value of 'qemu', will probably lead to most, if not all, of the new
+tests which will be added never being run or tested with kvmtool. More
+details in patch #15 ("scripts: Add 'disabled_if' test definition parameter
+for kvmtool to use").
+
+[1] https://lore.kernel.org/kvm/20250120164316.31473-1-alexandru.elisei@arm.com/
+
+Alexandru Elisei (16):
+  scripts: unittests.cfg: Rename 'extra_params' to 'qemu_params'
+  scripts: Add 'test_args' test definition parameter
+  configure: Export TARGET unconditionally
+  run_tests.sh: Document --probe-maxsmp argument
+  scripts: Document environment variables
+  scripts: Refuse to run the tests if not configured for qemu
+  scripts: Use an associative array for qemu argument names
+  scripts: Add 'kvmtool_params' to test definition
+  scripts: Add support for kvmtool
+  scripts: Add default arguments for kvmtool
+  scripts: Add KVMTOOL environment variable for kvmtool binary path
+  scripts: Detect kvmtool failure in premature_failure()
+  scripts: Do not probe for maximum number of VCPUs when using kvmtool
+  scripts/mkstandalone: Export $TARGET
+  scripts: Add 'disabled_if' test definition parameter for kvmtool to
+    use
+  scripts: Enable kvmtool
+
+ README.md               |  18 ++++-
+ arm/efi/run             |   8 ++
+ arm/run                 | 161 +++++++++++++++++++++++--------------
+ arm/unittests.cfg       | 125 ++++++++++++++++++++---------
+ configure               |  37 ++++++---
+ docs/unittests.txt      |  54 +++++++++++--
+ powerpc/run             |   4 +-
+ powerpc/unittests.cfg   |  21 ++---
+ riscv/run               |   4 +-
+ riscv/unittests.cfg     |   2 +-
+ run_tests.sh            |  35 ++++++---
+ s390x/run               |   2 +-
+ s390x/unittests.cfg     |  53 +++++++------
+ scripts/arch-run.bash   | 113 ++++++++++----------------
+ scripts/common.bash     |  71 +++++++++++------
+ scripts/mkstandalone.sh |   4 +
+ scripts/runtime.bash    |  51 +++++-------
+ scripts/vmm.bash        | 170 ++++++++++++++++++++++++++++++++++++++++
+ x86/run                 |   4 +-
+ x86/unittests.cfg       | 164 +++++++++++++++++++++-----------------
+ 20 files changed, 730 insertions(+), 371 deletions(-)
+ create mode 100644 scripts/vmm.bash
+
+
+base-commit: 08db0f5cfbca16b36f200b7bc54a78fa4941bcce
+-- 
+2.49.0
 
