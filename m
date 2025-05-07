@@ -1,48 +1,51 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71A1221578
-	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 07:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B46221D98
+	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 07:57:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746604632; cv=none; b=rgQF9xWlcQxHHTFWqRyNmg9Xfo7B+HoNl6LFxHxYgB6+3E2MWqcpWGVuZmaiW3Uzrmq/kdcN19fZjKLE/ekbvAMQdQYiQHb3W0A1/V7Sl5VIb7/sn5QNaAbUtg+XXlLBw6qkOx5IWyguJfDcFpkprlMhCIBdIdaShHSRUJLJSAw=
+	t=1746604635; cv=none; b=Q023aLG4BbHuHRXi7zYAe8cblpkIKsK2GpFsrnnShvrFSPxVtY3RAdDJFSdBRKVy2mp2TY2PMOsAPce4sfovxBFvPMWdEWVehchAKn+uYenJt6GXIf92bb/1cVqpK7GlTJ0WMN/wdiZQDfEB206xOgPzYdxsVGPVqotUSML7eIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746604632; c=relaxed/simple;
-	bh=A4KqFUfiMWSBY37pZWbrLNHyowfIzlyC7+VB02RvYZo=;
+	s=arc-20240116; t=1746604635; c=relaxed/simple;
+	bh=TcMcUur/jQdLVvp833wknmZft9SDv6KsBh9u9mBzHug=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IOl7a+PUWacOIdZlqciRMUjN/83r4nd1vd+2G2aFp/4JjSdo91duNl+HEHv9KurjAfo/+4brYA7KLfujAvwjcjUycCK3i7B6UN0Nv1ENqoKxJ++zpqJ99PQNx9qat7qNWNpDZBwgipatzwhr+/dLDK4kMOPuzwEEjEEbs52smtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=azLg/sI8; arc=none smtp.client-ip=95.215.58.177
+	 MIME-Version:Content-Type; b=urvHw4OkZQP5WnrH9LoTA660r0nQbCRkTNrdMiv1+JK6bKjZ38bmQv1ayvP1pU0+BPoAAqnEfoZRnARjR1OtrilCNk9fTxRAemY4lmI2H7cwjdmbl9EfxpPAVK2C5Oj4vQjhyODa4XEmBBfla/UPGmhv+95ksT3csPqbFqwk58U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bVzP8GPg; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="azLg/sI8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bVzP8GPg"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746604628;
+	t=1746604631;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=x/jWrb5ObufWdp/TqLTqFq4iyOq4wwysHakUs6xba8E=;
-	b=azLg/sI8sSK0Zi6OEV5H7j14UusXX4bvQhsXMag0nu0Hvv+9jCRS1yP9o2QRAxkPvc0fyX
-	hChtum8TT4F7JzgcLJGFAyGeYiGvkWQtVM1QZNiAh/nUo5yKRThfJvX0UlpV8y+oGbIzV7
-	/8a3yOvmr2ixCv/CLkcPNlNCCpYPqHE=
+	bh=qRWq+bBWMkqfZbZV/+7P3UIt2LtdL2A1Y5faFTjaNBA=;
+	b=bVzP8GPgXCiJVtfukPZyZEn+h1ClvsVypIaZaEC/5LM2fZIMR+jjCvHA9f7exEtTbry2rE
+	FJCnvJ9D2C7HZbuAGq+aYluNIbwZbjNud8S8OfPTPsZkjHyO0qEgKTH+JsqLWgxzfJRRvr
+	jCNDUrNNnMVcCMel/QN+VtI6FzW4OBA=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Sebastian Ott <sebott@redhat.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: Re: [PATCH v2] KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
-Date: Wed,  7 May 2025 00:56:50 -0700
-Message-Id: <174660459087.2542293.11599535036974656323.b4-ty@linux.dev>
-In-Reply-To: <20250429114326.3618875-1-maz@kernel.org>
-References: <20250429114326.3618875-1-maz@kernel.org>
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix uninitialized memcache pointer in user_mem_abort()
+Date: Wed,  7 May 2025 00:56:51 -0700
+Message-Id: <174660459083.2542293.85268453831284543.b4-ty@linux.dev>
+In-Reply-To: <20250505173148.33900-1-sebott@redhat.com>
+References: <20250505173148.33900-1-sebott@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,20 +56,21 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, 29 Apr 2025 12:43:26 +0100, Marc Zyngier wrote:
-> We keep setting and clearing these bits depending on the role of
-> the host kernel, mimicking what we do for nVHE. But that's actually
-> pretty pointless, as we always want physical interrupts to make it
-> to the host, at EL2.
+On Mon, 05 May 2025 19:31:48 +0200, Sebastian Ott wrote:
+> Commit fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM") made the
+> initialization of the local memcache variable in user_mem_abort()
+> conditional, leaving a codepath where it is used uninitialized via
+> kvm_pgtable_stage2_map().
 > 
-> This has also two problems:
+> This can fail on any path that requires a stage-2 allocation
+> without transition via a permission fault or dirty logging.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/1] KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
-      https://git.kernel.org/kvmarm/kvmarm/c/859c60276e12
+[1/1] KVM: arm64: Fix uninitialized memcache pointer in user_mem_abort()
+      https://git.kernel.org/kvmarm/kvmarm/c/157dbc4a321f
 
 --
 Best,
