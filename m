@@ -1,32 +1,32 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DA71DF25C
-	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 07:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71A1221578
+	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 07:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746604631; cv=none; b=a2FE14lW0MzH+byvFAnZvcSjKbvL3+HK8tjLpGXzj1H891I7qmf1yvA7y2gWipUFfB0YtALyDAgTBiO7mQptuAwFOvU3yKe3npAmsC4bJW/P5Izcmu5TZ81UaV4oYFLC1pAu101KyoCAoAMmF3x8Yz/PhPtukQmUnavViA3Q0j4=
+	t=1746604632; cv=none; b=rgQF9xWlcQxHHTFWqRyNmg9Xfo7B+HoNl6LFxHxYgB6+3E2MWqcpWGVuZmaiW3Uzrmq/kdcN19fZjKLE/ekbvAMQdQYiQHb3W0A1/V7Sl5VIb7/sn5QNaAbUtg+XXlLBw6qkOx5IWyguJfDcFpkprlMhCIBdIdaShHSRUJLJSAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746604631; c=relaxed/simple;
-	bh=uuJWPfHJXcnB4dBIwpisrMyjhNK9JSAOkWSSPue3dkQ=;
+	s=arc-20240116; t=1746604632; c=relaxed/simple;
+	bh=A4KqFUfiMWSBY37pZWbrLNHyowfIzlyC7+VB02RvYZo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HoJ4YMXvqDHdbsXjnWyg/WWjv+kdR9kFeHy/oO38lTLi6zrhyMOb4N/VbZnFmKaOBVGgXUeDGmnlQptyttHa+xcXIy6n7MXfvyer18S9YJIPM0YmeTA75W7wOwdDXaa41+g0jgqPUsD04htSMI9EOxO94MapsADv/1aCll+Wi48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=krCymqbL; arc=none smtp.client-ip=95.215.58.179
+	 MIME-Version:Content-Type; b=IOl7a+PUWacOIdZlqciRMUjN/83r4nd1vd+2G2aFp/4JjSdo91duNl+HEHv9KurjAfo/+4brYA7KLfujAvwjcjUycCK3i7B6UN0Nv1ENqoKxJ++zpqJ99PQNx9qat7qNWNpDZBwgipatzwhr+/dLDK4kMOPuzwEEjEEbs52smtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=azLg/sI8; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="krCymqbL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="azLg/sI8"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746604626;
+	t=1746604628;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nHAbVa6E1A/wHvD5/4+iVSocKc6b/G3IZErcqqcFL0s=;
-	b=krCymqbLFkpq88vV/Mhy4It39SJqdhzNcJtBDki6dLsYGxo/0LkfTarWJ4hw2m9MsghJ/K
-	dUDJZJvsi5y+TSOOUJd78Eap71hGr0jO49hbYlhznHBcDrCkTufg5nfuPxwd6IIuomgo+X
-	NfzwyoYrIAvLzcA73mtDg0KTiSdOQAI=
+	bh=x/jWrb5ObufWdp/TqLTqFq4iyOq4wwysHakUs6xba8E=;
+	b=azLg/sI8sSK0Zi6OEV5H7j14UusXX4bvQhsXMag0nu0Hvv+9jCRS1yP9o2QRAxkPvc0fyX
+	hChtum8TT4F7JzgcLJGFAyGeYiGvkWQtVM1QZNiAh/nUo5yKRThfJvX0UlpV8y+oGbIzV7
+	/8a3yOvmr2ixCv/CLkcPNlNCCpYPqHE=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -36,12 +36,13 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH 0/2] KVM: arm64: Make AArch64 support sticky
-Date: Wed,  7 May 2025 00:56:49 -0700
-Message-Id: <174660459090.2542293.281555922316726481.b4-ty@linux.dev>
-In-Reply-To: <20250429114117.3618800-1-maz@kernel.org>
-References: <20250429114117.3618800-1-maz@kernel.org>
+	Mark Rutland <mark.rutland@arm.com>,
+	D Scott Phillips <scott@os.amperecomputing.com>
+Subject: Re: [PATCH v2] KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
+Date: Wed,  7 May 2025 00:56:50 -0700
+Message-Id: <174660459087.2542293.11599535036974656323.b4-ty@linux.dev>
+In-Reply-To: <20250429114326.3618875-1-maz@kernel.org>
+References: <20250429114326.3618875-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,23 +53,20 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, 29 Apr 2025 12:41:15 +0100, Marc Zyngier wrote:
-> It's been recently reported[1] that our sorry excuse for a test suite
-> is writing a bunch of zeroes to ID_AA64PFR0_EL1.EL{0,1,2,3},
-> effectively removing the advertised support for AArch64 to the guest.
+On Tue, 29 Apr 2025 12:43:26 +0100, Marc Zyngier wrote:
+> We keep setting and clearing these bits depending on the role of
+> the host kernel, mimicking what we do for nVHE. But that's actually
+> pretty pointless, as we always want physical interrupts to make it
+> to the host, at EL2.
 > 
-> This leads to an interesting interaction with the NV code which reacts
-> in a slightly overzealous way and inject an UNDEF at the earliest
-> opportunity.
+> This has also two problems:
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/2] KVM: arm64: Prevent userspace from disabling AArch64 support at any virtualisable EL
-      https://git.kernel.org/kvmarm/kvmarm/c/7af7cfbe78e2
-[2/2] KVM: arm64: selftest: Don't try to disable AArch64 support
-      https://git.kernel.org/kvmarm/kvmarm/c/b60e285b6acd
+[1/1] KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
+      https://git.kernel.org/kvmarm/kvmarm/c/859c60276e12
 
 --
 Best,
