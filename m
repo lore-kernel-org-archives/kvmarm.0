@@ -1,48 +1,47 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BBC220F22
-	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 07:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DA71DF25C
+	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 07:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746604630; cv=none; b=fdcYbAHGH6SyGvtPHhtg2QoAxSfoDpGJ31vEHwkcBHUCq/Q8VR344GXGYcZLCsaKHt1E6+cqGK9n5FxuyXWi+qub2d5GYTRwXfnWVDJoNLmHMFOy1YA+5aAk2WE8rVeTN01NUntPjFH/VQUGhOpQ65hOjnhLya0IJWm/MRMr9RM=
+	t=1746604631; cv=none; b=a2FE14lW0MzH+byvFAnZvcSjKbvL3+HK8tjLpGXzj1H891I7qmf1yvA7y2gWipUFfB0YtALyDAgTBiO7mQptuAwFOvU3yKe3npAmsC4bJW/P5Izcmu5TZ81UaV4oYFLC1pAu101KyoCAoAMmF3x8Yz/PhPtukQmUnavViA3Q0j4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746604630; c=relaxed/simple;
-	bh=z/ApciQD2h+gyUJzhSXeO9HL6cAVlTbrVF4uSHhAvoA=;
+	s=arc-20240116; t=1746604631; c=relaxed/simple;
+	bh=uuJWPfHJXcnB4dBIwpisrMyjhNK9JSAOkWSSPue3dkQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PoOdX3lPqEpmG7GRm9qyCeNsGEraJrSfMGDhgn871FZKOlEsOZWO4PeTRXQmb3eQxj3UG0d7jz+d3HONg9tiam/wZiKtAVcU0U2zQas0gPUuRwXT8cszAWWiIbJuJf/YGhFt/QZltXztfAnDsuDPOi/ePg6/e+SAWf1AsBGCDDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f9Q/+hSU; arc=none smtp.client-ip=95.215.58.176
+	 MIME-Version:Content-Type; b=HoJ4YMXvqDHdbsXjnWyg/WWjv+kdR9kFeHy/oO38lTLi6zrhyMOb4N/VbZnFmKaOBVGgXUeDGmnlQptyttHa+xcXIy6n7MXfvyer18S9YJIPM0YmeTA75W7wOwdDXaa41+g0jgqPUsD04htSMI9EOxO94MapsADv/1aCll+Wi48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=krCymqbL; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f9Q/+hSU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="krCymqbL"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746604624;
+	t=1746604626;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sS0llExS1eXxyFgw4+Gpjgkw6K/xV+LT7FYdS3MPFFs=;
-	b=f9Q/+hSUFnHY6a+pp1lBG1/y48EqELsSn4GeRn0uLg21uAFTFPwitAR0GaDz5s4y4kAakC
-	ZUQoK9ZKS7bs2S8KuQu1zdWRYLZ639cPwjrz8JMumYG24Oq7T1Xy8P/3Nch4Ym0LY0ZOpG
-	2BP5MgRKbgWY4/Smo0PkxzAyJ4eMn6U=
+	bh=nHAbVa6E1A/wHvD5/4+iVSocKc6b/G3IZErcqqcFL0s=;
+	b=krCymqbLFkpq88vV/Mhy4It39SJqdhzNcJtBDki6dLsYGxo/0LkfTarWJ4hw2m9MsghJ/K
+	dUDJZJvsi5y+TSOOUJd78Eap71hGr0jO49hbYlhznHBcDrCkTufg5nfuPxwd6IIuomgo+X
+	NfzwyoYrIAvLzcA73mtDg0KTiSdOQAI=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
 	Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 0/2] KVM: arm64: Fix HCRX_EL2.GCSEn handling
-Date: Wed,  7 May 2025 00:56:48 -0700
-Message-Id: <174660459090.2542293.10603043906149596192.b4-ty@linux.dev>
-In-Reply-To: <20250430105916.3815157-1-maz@kernel.org>
-References: <20250430105916.3815157-1-maz@kernel.org>
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Make AArch64 support sticky
+Date: Wed,  7 May 2025 00:56:49 -0700
+Message-Id: <174660459090.2542293.281555922316726481.b4-ty@linux.dev>
+In-Reply-To: <20250429114117.3618800-1-maz@kernel.org>
+References: <20250429114117.3618800-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,22 +52,23 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, 30 Apr 2025 11:59:14 +0100, Marc Zyngier wrote:
-> Will points out[1] that GCS is completely busted on the host if we
-> ever run a guest, as HCRX_EL2 gets set to a fixed value on vcpu exit,
-> value that doesn't include the GCSEn bit. This is likely to kaboom on
-> a nVHE/hVHE setup.
+On Tue, 29 Apr 2025 12:41:15 +0100, Marc Zyngier wrote:
+> It's been recently reported[1] that our sorry excuse for a test suite
+> is writing a bunch of zeroes to ID_AA64PFR0_EL1.EL{0,1,2,3},
+> effectively removing the advertised support for AArch64 to the guest.
 > 
-> Obviously, nobody ever tested this.
+> This leads to an interesting interaction with the NV code which reacts
+> in a slightly overzealous way and inject an UNDEF at the earliest
+> opportunity.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/2] KVM: arm64: Properly save/restore HCRX_EL2
-      https://git.kernel.org/kvmarm/kvmarm/c/ffea7c73d181
-[2/2] KVM: arm64: Kill HCRX_HOST_FLAGS
-      https://git.kernel.org/kvmarm/kvmarm/c/ef296ee98bb1
+[1/2] KVM: arm64: Prevent userspace from disabling AArch64 support at any virtualisable EL
+      https://git.kernel.org/kvmarm/kvmarm/c/7af7cfbe78e2
+[2/2] KVM: arm64: selftest: Don't try to disable AArch64 support
+      https://git.kernel.org/kvmarm/kvmarm/c/b60e285b6acd
 
 --
 Best,
