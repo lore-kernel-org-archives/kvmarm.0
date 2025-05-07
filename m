@@ -1,107 +1,75 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7009B22128B
-	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 07:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BBC220F22
+	for <kvmarm@lists.linux.dev>; Wed,  7 May 2025 07:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746604566; cv=none; b=KcWUfcBtGzqTwcstxG0Pj97VSieiD1biEyvY8IavzHjz1h266qkW276MeqTc+0qzHHuj0JF8qCBAFx3BwXQ0560wuns4tWaxL+uNWYJCpRvn34xGcMQj6fYwrQDlT0vq0I+QbpsAPAgubwDfBtpfWl25YyZ78tH1BCRhFME58CE=
+	t=1746604630; cv=none; b=fdcYbAHGH6SyGvtPHhtg2QoAxSfoDpGJ31vEHwkcBHUCq/Q8VR344GXGYcZLCsaKHt1E6+cqGK9n5FxuyXWi+qub2d5GYTRwXfnWVDJoNLmHMFOy1YA+5aAk2WE8rVeTN01NUntPjFH/VQUGhOpQ65hOjnhLya0IJWm/MRMr9RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746604566; c=relaxed/simple;
-	bh=sJGD6d0tKzo1zgSJs5v+k+6paZ0owgCovIf/ErtkgqU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=JXk3tn73PXy4iILqM0LmAnf03NoDvLGPTqU67FujSL4w/2cp429VYkct1dxRlQr7QP5UGH1oajoiNqVrtQ6NdD/Jz0Xy+d7pG6H2qzC5A/Yfhm9zfVKTg5votZzXLl0k/lXzNi75QtJCQyr5MS0U4hODPFf9j3/n+sYKscNz9+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jrLDEXA4; arc=none smtp.client-ip=91.218.175.180
+	s=arc-20240116; t=1746604630; c=relaxed/simple;
+	bh=z/ApciQD2h+gyUJzhSXeO9HL6cAVlTbrVF4uSHhAvoA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PoOdX3lPqEpmG7GRm9qyCeNsGEraJrSfMGDhgn871FZKOlEsOZWO4PeTRXQmb3eQxj3UG0d7jz+d3HONg9tiam/wZiKtAVcU0U2zQas0gPUuRwXT8cszAWWiIbJuJf/YGhFt/QZltXztfAnDsuDPOi/ePg6/e+SAWf1AsBGCDDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f9Q/+hSU; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jrLDEXA4"
-Date: Wed, 7 May 2025 00:55:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746604559;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=Qs2ymGmFE4Exf9+DNZUXGKGppSFIJ90KNPIX17yY0JU=;
-	b=jrLDEXA4IGwo4G5FYDmQ6viAezrAj56u2aaP35qqCiHwDdzuBT5cZ0d5xfBEbrmlH51AiM
-	fNKJHQL4A2IikwixKwuvSbST1HAxWppqOuErMbbPjbV4H0Jvg8wXCuVPkEIQdrix71D8+O
-	MZuHk4vg7RvIoe5MJYMqHvrHsfGxWyY=
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f9Q/+hSU"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746604624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sS0llExS1eXxyFgw4+Gpjgkw6K/xV+LT7FYdS3MPFFs=;
+	b=f9Q/+hSUFnHY6a+pp1lBG1/y48EqELsSn4GeRn0uLg21uAFTFPwitAR0GaDz5s4y4kAakC
+	ZUQoK9ZKS7bs2S8KuQu1zdWRYLZ639cPwjrz8JMumYG24Oq7T1Xy8P/3Nch4Ym0LY0ZOpG
+	2BP5MgRKbgWY4/Smo0PkxzAyJ4eMn6U=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.15, round #3
-Message-ID: <aBsSAKYrVPjj4tSa@linux.dev>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 0/2] KVM: arm64: Fix HCRX_EL2.GCSEn handling
+Date: Wed,  7 May 2025 00:56:48 -0700
+Message-Id: <174660459090.2542293.10603043906149596192.b4-ty@linux.dev>
+In-Reply-To: <20250430105916.3815157-1-maz@kernel.org>
+References: <20250430105916.3815157-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Hi Paolo,
+On Wed, 30 Apr 2025 11:59:14 +0100, Marc Zyngier wrote:
+> Will points out[1] that GCS is completely busted on the host if we
+> ever run a guest, as HCRX_EL2 gets set to a fixed value on vcpu exit,
+> value that doesn't include the GCSEn bit. This is likely to kaboom on
+> a nVHE/hVHE setup.
+> 
+> Obviously, nobody ever tested this.
+> 
+> [...]
 
-This is probably the last batch of fixes I have for 6.15. The bug in
-user_mem_abort() getting fixed is likely to bite some folks. On top of
-that, Marc snuck in another erratum fix for AmpereOne with more to come
-on that front...
+Applied to fixes, thanks!
 
-Please pull.
+[1/2] KVM: arm64: Properly save/restore HCRX_EL2
+      https://git.kernel.org/kvmarm/kvmarm/c/ffea7c73d181
+[2/2] KVM: arm64: Kill HCRX_HOST_FLAGS
+      https://git.kernel.org/kvmarm/kvmarm/c/ef296ee98bb1
 
-The following changes since commit b4432656b36e5cc1d50a1f2dc15357543add530e:
-
-  Linux 6.15-rc4 (2025-04-27 15:19:23 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.15-3
-
-for you to fetch changes up to 3949e28786cd0afcd96a46ce6629245203f629e5:
-
-  KVM: arm64: Fix memory check in host_stage2_set_owner_locked() (2025-05-07 00:17:05 -0700)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.15, round #3
-
- - Avoid use of uninitialized memcache pointer in user_mem_abort()
-
- - Always set HCR_EL2.xMO bits when running in VHE, allowing interrupts
-   to be taken while TGE=0 and fixing an ugly bug on AmpereOne that
-   occurs when taking an interrupt while clearing the xMO bits
-   (AC03_CPU_36)
-
- - Prevent VMMs from hiding support for AArch64 at any EL virtualized by
-   KVM
-
- - Save/restore the host value for HCRX_EL2 instead of restoring an
-   incorrect fixed value
-
- - Make host_stage2_set_owner_locked() check that the entire requested
-   range is memory rather than just the first page
-
-----------------------------------------------------------------
-Marc Zyngier (5):
-      KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
-      KVM: arm64: Prevent userspace from disabling AArch64 support at any virtualisable EL
-      KVM: arm64: selftest: Don't try to disable AArch64 support
-      KVM: arm64: Properly save/restore HCRX_EL2
-      KVM: arm64: Kill HCRX_HOST_FLAGS
-
-Mostafa Saleh (1):
-      KVM: arm64: Fix memory check in host_stage2_set_owner_locked()
-
-Sebastian Ott (1):
-      KVM: arm64: Fix uninitialized memcache pointer in user_mem_abort()
-
- arch/arm64/include/asm/el2_setup.h              |  2 +-
- arch/arm64/include/asm/kvm_arm.h                |  3 +--
- arch/arm64/kvm/hyp/include/hyp/switch.h         | 13 +++++----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c           |  2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c                 | 36 ++++++++++++++-----------
- arch/arm64/kvm/mmu.c                            | 13 +++++----
- arch/arm64/kvm/sys_regs.c                       |  6 +++++
- tools/testing/selftests/kvm/arm64/set_id_regs.c |  8 +++---
- 8 files changed, 48 insertions(+), 35 deletions(-)
+--
+Best,
+Oliver
