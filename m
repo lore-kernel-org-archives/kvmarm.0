@@ -1,92 +1,184 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0150925EFAA
-	for <kvmarm@lists.linux.dev>; Thu,  8 May 2025 08:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785CF239E95;
+	Thu,  8 May 2025 08:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746694367; cv=none; b=SX1pMTIvQ7xDGgoG1nZPfqpv+QjlTFMZJ5q0eiK/EHpUC3CsoWbRxl40tzvkdbLLwQDpoT+hSsBmREUbroYza7iO3wBN1qhBX78Iy+sX/l+MLznD0jAHAKDUvlTl9ylFO6TMZwUcjvCEXW0amUf9zWAGLg13whnV7O8TxHWi5q0=
+	t=1746694508; cv=none; b=nXCePiQRr+P7b/+lnW6B3IXzfx5zixrRfmwhLnjH3xXIoppLHWWk1bDhpuuL60ABhqOABi0pWqIY5PK5pt+FHDuJ+cwBwUmyj3Bk0wMpRkm49tyty9CnicTHAq8Qk+TQPS9tagrBSfroF3vEM2uc7RNcXuxm/1dFTGEdhfTYvjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746694367; c=relaxed/simple;
-	bh=NkTSapsrn+gYyqlk3WGioQ33WT4lYLgGat1uFHaF1lg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EcyD0V5YbVnicxibfW3tP3jdjL1L5S/9cuzA7JnhACUv0HlRN+dNP+Gbv6M7r0BJ5HkXkSe8z+adL+wlVmeM1VmigpLzmDbE3tj36QgW9NL8t9zMTn9qKwx8VOLIDFrdrCFeFNmdXj67afid3rupP0CiLPLBg1d4kZqtwjrlcH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4BB81688;
-	Thu,  8 May 2025 01:52:33 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 15DB03F673;
-	Thu,  8 May 2025 01:52:40 -0700 (PDT)
-Date: Thu, 8 May 2025 09:52:38 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v3 03/16] configure: Export TARGET
- unconditionally
-Message-ID: <aBxw1uaO1FZQ15VR@raptor>
-References: <20250507151256.167769-1-alexandru.elisei@arm.com>
- <20250507151256.167769-4-alexandru.elisei@arm.com>
- <20250507-78bbc45f50ea8867b4fa7e74@orel>
+	s=arc-20240116; t=1746694508; c=relaxed/simple;
+	bh=UFEexb2wQ4VfbaBPjbBUtzh7EapVioSw3lWphbIeH08=;
+	h=From:Date:Message-ID:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lsbKC3eKAUM64sXgnnMPpAWvf/LM7sChQDPFt9RHDY8LLAqf6XFmi17xj3jlOlbv2+zZBBoOVrMv8Nh15iqzriLxXYCu5gNc+ynRTlPXqnihrEH+/64URYF+scsDQu1rXx8ziMLTVoK9aVauh4dtyRT6tyGNzyQSCYX8rW8wafk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6R8bauI; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6R8bauI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D6ADC4CEE7;
+	Thu,  8 May 2025 08:55:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746694508;
+	bh=UFEexb2wQ4VfbaBPjbBUtzh7EapVioSw3lWphbIeH08=;
+	h=From:Date:To:Cc:Subject:In-Reply-To:References:From;
+	b=n6R8bauIp46ZLLCPVuJlQfBGsEY5sBWEdFp8l3zG4jt0xPxD7q7pPOFvzRGvDXrZs
+	 seVOiPtrklHsvTgKnlyBs1Bk/ZQJQoVa+1FS6huyxtjVTIaq3sJ0828NRyOhpHRtok
+	 4pTGj10m2fbJrYwoQw0xnMQyLIIaqeCtII8dvsqctOZtAg5BXWFkmj/hRyoosnGRKI
+	 ANDs8fsOUMhQbO2yC7fp49EkKJFn2uiEhJS1NTuqxewrwRv2qKNO+oA6jcr2Zc1ezn
+	 E2N8II9Tgi+ZPyndvtLFUnqzRX37K4cW8gDR3HdggM+jatxaDQ40iJzerTSs5xINgp
+	 GytsSqOJeRTeg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uCx21-00CwQo-UV;
+	Thu, 08 May 2025 09:55:06 +0100
+From: Marc Zyngier <maz@kernel.org>
+Date: Thu, 08 May 2025 09:55:05 +0100
+Message-ID: <8634dfh47q.wl-maz@kernel.org>
+>From: Marc Zyngier <maz@kernel.org>
+To: Per Larsen <perl@immunant.com>
+Cc: armellel@google.com,
+	arve@android.com,
+	catalin.marinas@arm.com,
+	kernel-team@android.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	qperret@google.com,
+	sebastianene@google.com,
+	sudeep.holla@arm.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	Per Larsen <perlarsen@google.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Restrict FF-A host version renegotiation
+In-Reply-To: <aBnNXyJn818ZEKOS@google.com>
+References: <CA+AY4XcaJa1_U3qXQUBj4wZJYc9hKmRX8FTNeDvV2auEnC_WrA@mail.gmail.com>
+	<86r017h00e.wl-maz@kernel.org>
+	<aBnNXyJn818ZEKOS@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250507-78bbc45f50ea8867b4fa7e74@orel>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: perl@immunant.com, armellel@google.com, arve@android.com, catalin.marinas@arm.com, kernel-team@android.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, qperret@google.com, sebastianene@google.com, sudeep.holla@arm.com, will@kernel.org, yuzenghui@huawei.com, perlarsen@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Drew,
-
-On Wed, May 07, 2025 at 06:02:31PM +0200, Andrew Jones wrote:
-> On Wed, May 07, 2025 at 04:12:43PM +0100, Alexandru Elisei wrote:
-> > Only arm and arm64 are allowed to set --target to kvmtool; the rest of the
-> > architectures can only set --target to 'qemu', which is also the default.
-> > 
-> > Needed to make the changes necessary to add support for kvmtool to the test
-> > runner.
-> > 
-> > kvmtool also supports running the riscv tests, so it's not outside of the
-> > realm of the possibily for the riscv tests to get support for kvmtool.
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  configure | 36 ++++++++++++++++++++++++------------
-> >  1 file changed, 24 insertions(+), 12 deletions(-)
-> >
+On Tue, 06 May 2025 10:29:41 +0100,
+Per Larsen <perl@immunant.com> wrote:
 > 
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> From: Per Larsen <perlarsen@google.com>
+> 
+> On Fri, May 02, 2025 at 09:47:45AM +0100, Marc Zyngier wrote:
+> > On Fri, 02 May 2025 04:52:39 +0100,
+> > Per Larsen <perl@immunant.com> wrote:
+> > > 
+> > > FF-A implementations with the same major version must interoperate with
+> > > earlier minor versions per DEN0077A 1.2 REL0 13.2.1 but FF-A version 1.1
+> > > broke the ABI on several structures and 1.2 relies on SMCCC 1.2 is not
+> > > backwards compatible with SMCCC 1.2 (see DEN0028 1.6 G BET0 Appendix F).
+> > > 
+> > > If we return the negotiated hypervisor version when the host requests a
+> > > lesser minor version, the host will rely on the FF-A interoperability
+> > > rules. Since the hypervisor does not currently have the necessary
+> > > compatibility paths (e.g. to handle breaking changes to the SMC calling
+> > > convention), return NOT_SUPPORTED.
+> > > 
+> > > Signed-off-by: Per Larsen <perlarsen@google.com>
+> > > Signed-off-by: Per Larsen <perl@immunant.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/nvhe/ffa.c | 19 ++++++++++++++++++-
+> > >  1 file changed, 18 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > index 3369dd0c4009..10e88207b78e 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > > @@ -712,7 +712,24 @@ static void do_ffa_version(struct arm_smccc_res *res,
+> > > 
+> > >   hyp_spin_lock(&version_lock);
+> > >   if (has_version_negotiated) {
+> > > - res->a0 = hyp_ffa_version;
+> > > + /*
+> > > + * FF-A implementations with the same major version must
+> > > + * interoperate with earlier minor versions per DEN0077A 1.2
+> > > + * REL0 13.2.1 but FF-A version 1.1 broke the ABI on several
+> > > + * structures and 1.2 relies on SMCCC 1.2 is not backwards
+> > > + * compatible with SMCCC 1.2 (see DEN0028 1.6 G BET0 Appendix F).
+> > 
+> > I can't parse this sentence. Missing words?
+> > 
+> 
+> Yes, I will fix this in v2.
+> 
+> > > + *
+> > > + * If we return the negotiated hypervisor version when the host
+> > > + * requests a lesser minor version, the host will rely on the
+> > > + * aforementioned FF-A interoperability rules. Since the
+> > > + * hypervisor does not currently have the necessary compatibility
+> > > + * paths (e.g. to paper over the above-mentioned calling
+> > > + * convention changes), return NOT_SUPPORTED.
+> > > + */
+> > > + if (FFA_MINOR_VERSION(ffa_req_version) < FFA_MINOR_VERSION(hyp_ffa_version))
+> > > + res->a0 = FFA_RET_NOT_SUPPORTED;
+> > > + else
+> > > + res->a0 = hyp_ffa_version;
+> > >   goto unlock;
+> > >   }
+> > > 
+> > 
+> > Something has gone seriously wrong with your email, and the patches
+> > are badly mangled and unusable. They are also sent as individual
+> > patches and not as a thread, which is a sign that you didn't send them
+> > using git. Please fix this for your next posting.
+> > 
+> 
+> Yes, my apologies. I will use git send-email to post v2.
+> 
+> > More to the meat of the patches: why should the hypervisor paper over
+> > anything if the spec is broken? Why can't the host just as well decide
+> > for itself what to do?
+> > 
+> 
+> Asssuming we drop this patch from the series and apply the rest, the
+> hypervisor and host can negotiate FF-A 1.2. If the host then calls
+> FFA_VERSION a second time to request FF-A 1.1, the hypervisor would
+> return version 1.2 (without this patch).
 
-Thank you for the review!
+Why would it do that? Once a particular version has been negotiated, I
+expect to be immutable.
 
-Just to be clear, you are ok with this happening because of the patch:
+> Per the spec, that means the
+> host is can use the compatibility rules (DEN0077A Sec 13.2.1) to go
+> ahead and use FF-A 1.1 (every function in 1.A must work in a compatible
+> way in 1.B if B>A).
 
-$ git pull
-$ make clean && make
-$ ./run_tests.sh
-scripts/runtime.bash: line 24: scripts/arch-run.bash: line 444: [: =: unary operator expected
-timeout -k 1s --foreground 90s /usr/bin/qemu-system-x86_64 --no-reboot -nodefaults -device pc-testdev -device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device pci-testdev -machine accel=kvm -kernel _NO_FILE_4Uhere_ 2 #  /tmp/tmp.bME9I2BZRG
-qemu-system-x86_64: 2: Could not open '2': No such file or directory
-scripts/arch-run.bash: line 19: 1: command not found: No such file or directory
-FAIL apic-split
-scripts/runtime.bash: line 24: scripts/arch-run.bash: line 444: [: =: unary operator expected
-timeout -k 1s --foreground 90s /usr/bin/qemu-system-x86_64 --no-reboot -nodefaults -device pc-testdev -device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device pci-testdev -machine accel=kvm -kernel _NO_FILE_4Uhere_ 1 #  /tmp/tmp.11und6qZbL
-qemu-system-x86_64: 1: Could not open '1': No such file or directory
-scripts/arch-run.bash: line 19: 1: command not found: No such file or directory
-FAIL ioapic-split
-[..]
+I don't interpret this as "you can switch between versions" after the
+initial negotiation.
 
-That's because TARGET is missing from config.mak. If you're ok with the
-error, I'll make it clear in the commit message why this is happening.
+> However, the hypervisor negotiated version stays at 1.2 so it will use
+> SMCCC 1.2 for 64-bit interfaces. The host has no way of knowing this and
+> might as well assume that the hypervisor was implemented to fall back to
+> SMCCC 1.1 in this particular case. 
+> 
+> I don't even know that the host will ever try to renegotiate as it is
+> explicitly not allowed by the FF-A spec. There is no way for the
+> hypervisor to say, "stay at the negotiated version" so we must return
+> NOT_SUPPORTED. 
+
+If it is not allowed, why should we do *anything*? And if the host is
+broken, let's fix the host rather than adding pointless validation
+code to EL2.
 
 Thanks,
-Alex
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
