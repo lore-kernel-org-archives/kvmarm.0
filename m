@@ -1,133 +1,376 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929872798F5
-	for <kvmarm@lists.linux.dev>; Thu,  8 May 2025 15:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AB527935C
+	for <kvmarm@lists.linux.dev>; Thu,  8 May 2025 15:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746719119; cv=none; b=UDFLuzY6P3IRf9kOW5nF0xAcoRNGpymducgeclVwtdU2oCojrrPOISZ0BmTIQTISsHfCIxTf+/ZMSAUHhFaAOtaTKWPOrThOSk8sdxkq7MxIS0n0/uAjLSzt+U9EmtQ5ECPIzuRfFTFVx2C5CejvK2r7wy+Bt+4lemNrZMR2ShY=
+	t=1746719696; cv=none; b=BQcboOCn91FRK7ddyWXNZKS0NtYsElfiwNDTu4pOajI6aIXH9Qy0ATa8n8LTvoAJou5Sl7obkR//xpa3Z2jQbix2K4ssglj7/JNf+ZEN39qa4Ck0xigjVkje871rOBPgCv3Owc5dY3SexrCyoAtaM50Miz30LQ3WlDUcf1YRSQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746719119; c=relaxed/simple;
-	bh=MuUjO0lVy+uE19DvVWBJLTPKJIu/iOqDmi/K4/QirxE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KyOBRwz41ris5Ck7m3zXTZS/zUU3bu/XH3BX4YU6gHDXC96hxHUBoG9L4x+zp/bS3dPMLTrs1T2HjyAaxZJj35yHtcMsFFF8/nVqkFKZloWF1Qi0ioIR47X5ah1GXHPBK+EbsBI38xgsrP9UkS6XcaEERLM8M9whg1ivQNWHa10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=android.com; spf=pass smtp.mailfrom=android.com; dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b=KYakj4yM; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=android.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=android.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="KYakj4yM"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6f53c42cea6so11091026d6.0
-        for <kvmarm@lists.linux.dev>; Thu, 08 May 2025 08:45:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20230601; t=1746719115; x=1747323915; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NM4QjkPCoOZz7ahD1Rov7Pc15g+3o4zNeRGOhW1N2W4=;
-        b=KYakj4yM3d1QWYDvK+IHc1Uo8sAZuy2uU+TZne4AiXgFvn0kBPf9D6xbibjdHkqOxK
-         0Bn8whL2Ng04o4rI8LqI1PIHpoPAoq1P8P5s4Iqz+/Q4ehfPugrERJ5mwNZntjC9wx5P
-         edQrCzOe6g4j10TI30IkQY8WEkUwWKduoP1mltUEUjB7PYaP0THr32QUzf/K/TE2BCE2
-         J2h6cdjTbvtJ2dkD7fd80GfNVY4kC/cRo+symIm2/MZS3i/0VKrWWvzp7b1XGDzMbSzJ
-         Qq0T575FKWb1AWJUXwWZ+wp6grqrnYPWY1XafXsjdWnT+qBk/nc1zH5oxg4j/uXvKu4b
-         J/0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746719115; x=1747323915;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NM4QjkPCoOZz7ahD1Rov7Pc15g+3o4zNeRGOhW1N2W4=;
-        b=lJ7ATukBTCQ9pFybRPL7zrIfSgQQ8+iddM7Y7czg5ggFIYS1RvwPUdj0bAHS38/aXd
-         7nMlWI4XH/wDI6f3yRgkEiLbrLYNb/GcWnOHdvgeHBqM75bkFgqMpN2oerN9IrCcmWGF
-         v2kWKy7LzCP+uRHTUrtj04TC7vSTaUesShVoTsL6X+vlq1Cr9JxaWX+nYuWVbKuQIWv3
-         xIunGDbkBwKkjIbMQUYq/Cl+uD4Zjr32d0TdZV2CI+8s54jCCJGhhWcXwQryPbC/XIVl
-         SMmt+ysvWblJnsZ4uiOLEaerE641FvX/5adTKa38+z6JuOiPbI5WHAZBpcFS2+z4m4NC
-         508Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVAnYFp8MiCVEAkBqUEb+jQw89J+VZBm1/jKA5OxWWCHMlvR1mPyIMIQhlYv54vJovL3/27Lzg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwQZeSkA1qPLHi5t5KniFxgWcXkY2S97IURn20l21Y49bDSYXj5
-	RtxP5refmMZIvoaFz52r0zqNjViXkSiCjXWMjOtRMk+GwUvY/nfvLR79Sv4cXNhCaM3DPmZsseR
-	gVRc/a6AinHyJ3PhlQvA62HJKt1/+eXNdjHL8
-X-Gm-Gg: ASbGncui8PSX/DJoAXMc/ICjlqaswYO9UIsL7rJE4D7WLCaO1cGdnx6eXrjMVc1faOK
-	hl5wOF3w3uZPrapUUuGrge+nkJF/pPlSvN+IpbdIbh82BGWWF55HQCmzG5PRo1Cby5B1pmr1fkt
-	eWv6THiqV4wjGKxwEFb7/L+F8mOW2NqpyGCnrV18/BskxZHrNx9oEh8lc=
-X-Google-Smtp-Source: AGHT+IHc5QpsocWh4+JhJxyePGK+eK7xc3hc4CKN9/ujajSYCJIlTH83nwZ4fer3bYFp280RvLfeG7NtLclp+yhwbtI=
-X-Received: by 2002:a05:6214:20ef:b0:6f5:374d:3cec with SMTP id
- 6a1803df08f44-6f542adfef8mr152122036d6.38.1746719112652; Thu, 08 May 2025
- 08:45:12 -0700 (PDT)
+	s=arc-20240116; t=1746719696; c=relaxed/simple;
+	bh=NSe6wG+xWEN4cvrpd7mEcW9NPJQoGI7H2DdbsrN92qw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o52sPSlQekNRni/5MrD2/3btNb2qRPp4bUJ9c4wA9z0q7ur1RYfOtgfPPMkTVQqB9eIbyl6doQra44AkXXgvYYvaUaW6dueIj4FU9qwXlo0IleN/51cil+m2NAUMQZdcNu9ZY/0zfb+Ccepqheyuac0Czx+NI05bvJL9gvg7BjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DB761E2F;
+	Thu,  8 May 2025 08:54:42 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 539973F5A1;
+	Thu,  8 May 2025 08:54:49 -0700 (PDT)
+Date: Thu, 8 May 2025 16:54:46 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 08/16] scripts: Add 'kvmtool_params' to
+ test definition
+Message-ID: <aBzTxv6pO4rWu4CU@raptor>
+References: <20250507151256.167769-1-alexandru.elisei@arm.com>
+ <20250507151256.167769-9-alexandru.elisei@arm.com>
+ <20250507-5b376c9bc878cbdffabdb3c2@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CA+AY4XcaJa1_U3qXQUBj4wZJYc9hKmRX8FTNeDvV2auEnC_WrA@mail.gmail.com>
- <86r017h00e.wl-maz@kernel.org> <aBnNXyJn818ZEKOS@google.com>
- <8634dfh47q.wl-maz@kernel.org> <20250508-spectral-sage-whippet-4f7ac2@sudeepholla>
-In-Reply-To: <20250508-spectral-sage-whippet-4f7ac2@sudeepholla>
-From: =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>
-Date: Thu, 8 May 2025 08:45:01 -0700
-X-Gm-Features: ATxdqUHLxJTSxwoqFpk9lA8TVBYoTMM9oR5V-VvKoxrBxJB4bep25PWQBicEw1s
-Message-ID: <CAMP5XgcCg+kB7tPwSYUcjfZqR_734cGEs_KX4st9SQOVLBV-Yw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Restrict FF-A host version renegotiation
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Per Larsen <perl@immunant.com>, armellel@google.com, 
-	catalin.marinas@arm.com, kernel-team@android.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	qperret@google.com, sebastianene@google.com, will@kernel.org, 
-	yuzenghui@huawei.com, Per Larsen <perlarsen@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250507-5b376c9bc878cbdffabdb3c2@orel>
 
-On Thu, May 8, 2025 at 2:27=E2=80=AFAM Sudeep Holla <sudeep.holla@arm.com> =
-wrote:
->
-> (just adding some additional info not particularly impacting the $subject
->  change implementation)
->
-> On Thu, May 08, 2025 at 09:55:05AM +0100, Marc Zyngier wrote:
-> > On Tue, 06 May 2025 10:29:41 +0100,
-> > Per Larsen <perl@immunant.com> wrote:
-> > >
->
-> [...]
->
-> > > Asssuming we drop this patch from the series and apply the rest, the
-> > > hypervisor and host can negotiate FF-A 1.2. If the host then calls
-> > > FFA_VERSION a second time to request FF-A 1.1, the hypervisor would
-> > > return version 1.2 (without this patch).
-> >
-> > Why would it do that? Once a particular version has been negotiated, I
-> > expect to be immutable.
-> >
->
-> Not suggesting that we need to support this, but it is technically possib=
-le
-> today by loading FF-A as a module=E2=80=94first inserting and removing a =
-module with
-> v1.2 support, then loading one with v1.1 support. It can ever throw error
-> as not supported to keep it simple.
->
+Hi Drew,
 
-I'm not sure how what you are suggesting here is different from what
-this patch does. This patch does not alter what versions the host can
-negotiate. The hypervisor already disallows negotiating a different
-version once has_version_negotiated is set, the return code just
-doesn't always reflect this. If you try to load the 1.0 driver in the
-host after unloading the 1.1 driver similar to what you describe
-above, then this CL will let the 1.0 driver know that the hypervisor
-does not support 1.0 (I use 1.1 to 1.0 as the example here since this
-is an issue even without the next CL in this patch series that bumps
-the hypervisor supported version to 1.2). Without this CL, the 1.0
-driver will now proceed making other ffa calls using 1.0 data
-structures that the hypervisor will incorrectly interpret as 1.1 data
-structures.
+On Wed, May 07, 2025 at 06:28:04PM +0200, Andrew Jones wrote:
+> On Wed, May 07, 2025 at 04:12:48PM +0100, Alexandru Elisei wrote:
+> > arm/arm64 supports running tests under kvmtool, but kvmtool's syntax for
+> > running and configuring a virtual machine is different to qemu. To run
+> > tests using the automated test infrastructure, add a new test parameter,
+> > 'kvmtool_params'. The parameter serves the exact purpose as 'qemu_params',
+> > but using kvmtool's syntax.
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  arm/unittests.cfg   | 24 +++++++++++++++++++++++
+> >  docs/unittests.txt  |  8 ++++++++
+> >  scripts/common.bash | 47 +++++++++++++++++++++++++++++----------------
+> >  3 files changed, 62 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> > index a4192ed7e20b..f3c773e56933 100644
+> > --- a/arm/unittests.cfg
+> > +++ b/arm/unittests.cfg
+> > @@ -17,6 +17,7 @@ file = selftest.flat
+> >  smp = 2
+> >  test_args = 'setup smp=2 mem=256'
+> >  qemu_params = -m 256
+> > +kvmtool_params = --mem 256
+> >  groups = selftest
+> >  
+> >  # Test vector setup and exception handling (kernel mode).
+> > @@ -48,66 +49,77 @@ groups = pci
+> >  file = pmu.flat
+> >  groups = pmu
+> >  test_args = "cycle-counter 0"
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-event-introspection]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-event-introspection
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-event-counter-config]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-event-counter-config
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-basic-event-count]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-basic-event-count
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-mem-access]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-mem-access
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-mem-access-reliability]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-mem-access-reliability
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-sw-incr]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-sw-incr
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-chained-counters]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-chained-counters
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-chained-sw-incr]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-chained-sw-incr
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-chain-promotion]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-chain-promotion
+> > +kvmtool_params = --pmu
+> >  
+> >  [pmu-overflow-interrupt]
+> >  file = pmu.flat
+> >  groups = pmu
+> >  arch = arm64
+> >  test_args = pmu-overflow-interrupt
+> > +kvmtool_params = --pmu
+> >  
+> >  # Test PMU support (TCG) with -icount IPC=1
+> >  #[pmu-tcg-icount-1]
+> > @@ -131,6 +143,7 @@ file = gic.flat
+> >  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> >  test_args = ipi
+> >  qemu_params = -machine gic-version=2
+> > +kvmtool_params = --irqchip=gicv2
+> >  groups = gic
+> >  
+> >  [gicv2-mmio]
+> > @@ -138,6 +151,7 @@ file = gic.flat
+> >  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> >  test_args = mmio
+> >  qemu_params = -machine gic-version=2
+> > +kvmtool_params = --irqchip=gicv2
+> >  groups = gic
+> >  
+> >  [gicv2-mmio-up]
+> > @@ -145,6 +159,7 @@ file = gic.flat
+> >  smp = 1
+> >  test_args = mmio
+> >  qemu_params = -machine gic-version=2
+> > +kvmtool_params = --irqchip=gicv2
+> >  groups = gic
+> >  
+> >  [gicv2-mmio-3p]
+> > @@ -152,6 +167,7 @@ file = gic.flat
+> >  smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
+> >  test_args = mmio
+> >  qemu_params = -machine gic-version=2
+> > +kvmtool_params = --irqchip=gicv2
+> >  groups = gic
+> >  
+> >  [gicv3-ipi]
+> > @@ -159,6 +175,7 @@ file = gic.flat
+> >  smp = $MAX_SMP
+> >  test_args = ipi
+> >  qemu_params = -machine gic-version=3
+> > +kvmtool_params = --irqchip=gicv3
+> >  groups = gic
+> >  
+> >  [gicv2-active]
+> > @@ -166,6 +183,7 @@ file = gic.flat
+> >  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> >  test_args = active
+> >  qemu_params = -machine gic-version=2
+> > +kvmtool_params = --irqchip=gicv2
+> >  groups = gic
+> >  
+> >  [gicv3-active]
+> > @@ -173,6 +191,7 @@ file = gic.flat
+> >  smp = $MAX_SMP
+> >  test_args = active
+> >  qemu_params = -machine gic-version=3
+> > +kvmtool_params = --irqchip=gicv3
+> >  groups = gic
+> >  
+> >  [its-introspection]
+> > @@ -180,6 +199,7 @@ file = gic.flat
+> >  smp = $MAX_SMP
+> >  test_args = its-introspection
+> >  qemu_params = -machine gic-version=3
+> > +kvmtool_params = --irqchip=gicv3-its
+> >  groups = its
+> >  arch = arm64
+> >  
+> > @@ -188,6 +208,7 @@ file = gic.flat
+> >  smp = $MAX_SMP
+> >  test_args = its-trigger
+> >  qemu_params = -machine gic-version=3
+> > +kvmtool_params = --irqchip=gicv3-its
+> >  groups = its
+> >  arch = arm64
+> >  
+> > @@ -196,6 +217,7 @@ file = gic.flat
+> >  smp = $MAX_SMP
+> >  test_args = its-migration
+> >  qemu_params = -machine gic-version=3
+> > +kvmtool_params = --irqchip=gicv3
+> >  groups = its migration
+> >  arch = arm64
+> >  
+> > @@ -204,6 +226,7 @@ file = gic.flat
+> >  smp = $MAX_SMP
+> >  test_args = its-pending-migration
+> >  qemu_params = -machine gic-version=3
+> > +kvmtool_params = --irqchip=gicv3
+> >  groups = its migration
+> >  arch = arm64
+> >  
+> > @@ -212,6 +235,7 @@ file = gic.flat
+> >  smp = $MAX_SMP
+> >  test_args = its-migrate-unmapped-collection
+> >  qemu_params = -machine gic-version=3
+> > +kvmtool_params = --irqchip=gicv3
+> >  groups = its migration
+> >  arch = arm64
+> >  
+> > diff --git a/docs/unittests.txt b/docs/unittests.txt
+> > index ea0da959f008..a9164bccc24c 100644
+> > --- a/docs/unittests.txt
+> > +++ b/docs/unittests.txt
+> > @@ -78,6 +78,14 @@ extra_params
+> >  Alias for 'qemu_params', supported for compatibility purposes. Use
+> >  'qemu_params' for new tests.
+> >  
+> > +kvmtool_params
+> > +--------------
+> > +Extra parameters supplied to the kvmtool process. Works similarly to
+> > +'qemu_params', but uses kvmtool's syntax for command line arguments. The
+> > +example for 'qemu_params', applied to kvmtool, would be:
+> > +
+> > +kvmtool_params = --mem 256
+> > +
+> >  groups
+> >  ------
+> >  groups = <group_name1> <group_name2> ...
+> > diff --git a/scripts/common.bash b/scripts/common.bash
+> > index 649f1c737617..0645235d8baa 100644
+> > --- a/scripts/common.bash
+> > +++ b/scripts/common.bash
+> > @@ -1,6 +1,29 @@
+> >  source config.mak
+> >  source scripts/vmm.bash
+> >  
+> > +function parse_opts()
+> > +{
+> > +	local opts="$1"
+> > +	local fd="$2"
+> > +
+> > +	while read -r -u $fd; do
+> > +		#escape backslash newline, but not double backslash
+> > +		if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
+> > +			if (( ${#BASH_REMATCH[1]} % 2 == 1 )); then
+> > +				opts=${opts%\\$'\n'}
+> > +			fi
+> > +		fi
+> > +		if [[ "$REPLY" =~ ^(.*)'"""'[:blank:]*$ ]]; then
+> > +			opts+=${BASH_REMATCH[1]}
+> > +			break
+> > +		else
+> > +			opts+=$REPLY$'\n'
+> > +		fi
+> > +	done
+> > +
+> > +	echo "$opts"
+> > +}
+> > +
+> >  function for_each_unittest()
+> >  {
+> >  	local unittests="$1"
+> > @@ -46,24 +69,14 @@ function for_each_unittest()
+> >  			smp="${vmm_opts[$TARGET:nr_cpus]} ${BASH_REMATCH[1]}"
+> >  		elif [[ $line =~ ^test_args\ *=\ *(.*)$ ]]; then
+> >  			test_args="${vmm_opts[$TARGET:args]} ${BASH_REMATCH[1]}"
+> > -		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
+> > -			opts=${BASH_REMATCH[2]}$'\n'
+> > -			while read -r -u $fd; do
+> > -				#escape backslash newline, but not double backslash
+> > -				if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
+> > -					if (( ${#BASH_REMATCH[1]} % 2 == 1 )); then
+> > -						opts=${opts%\\$'\n'}
+> > -					fi
+> > -				fi
+> > -				if [[ "$REPLY" =~ ^(.*)'"""'[:blank:]*$ ]]; then
+> > -					opts+=${BASH_REMATCH[1]}
+> > -					break
+> > -				else
+> > -					opts+=$REPLY$'\n'
+> > -				fi
+> > -			done
+> > -		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *(.*)$ ]]; then
+> > +		elif [[ $TARGET = "qemu" ]] && [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
+> 
+> Should use == with [[ ]]
 
-With this CL, loading a 1.2 driver after the initial 1.1 driver will
-work as it did before by returning version 1.1 to the 1.2 driver to
-let it know that _it_ needs to downgrade to 1.1. if it wants to
-proceed. Loading the 1.0 driver after 1.1 will now fail at the version
-negotiation stage however. This will be clearer, and more correct,
-than getting FFA_RET_INVALID_PARAMETERS return codes from other ffa
-calls when passing valid 1.0 parameters to those calls.
+Ack.
 
---
-Arve Hj=C3=B8nnev=C3=A5g
+> 
+> > +			opts=$(parse_opts ${BASH_REMATCH[2]}$'\n' $fd)
+> > +		elif [[ $TARGET  = "qemu" ]] && [[ $line =~ ^(extra_params|qemu_params)\ *=\ *(.*)$ ]]; then
+>                                ^ extra space
+> 
+> >  			opts=${BASH_REMATCH[2]}
+> > +		elif [[ $TARGET = "kvmtool" ]] && [[ $line =~ ^kvmtool_params\ *=\ *'"""'(.*)$ ]]; then
+> > +			opts=$(parse_opts ${BASH_REMATCH[1]}$'\n' $fd)
+> > +		elif [[ $TARGET = "kvmtool" ]] && [[ $line =~ ^kvmtool_params\ *=\ *(.*)$ ]]; then
+> > +			opts=${BASH_REMATCH[1]}
+> 
+> I think we can do something like
+> 
+> if [[ $TARGET == "qemu" ]]; then
+>    params='(extra_params|qemu_params)'
+> elif [[ $TARGET == "kvmtool" ]]; then
+>    params='(kvmtool_params)'
+> else
+>    ...fail...
+> fi
+> 
+> And then use $params in the regular expressions and always use
+> BASH_REMATCH[2]. That would allow us to avoid duplicating the if
+> statements and then we wouldn't need to factor out parse_opts either.
+
+Sounds good. I can even wrap it with with a vmm function, something like
+vmm_get_params_name().
+
+Thanks,
+Alex
+
+> 
+> Thanks,
+> drew
+> 
+> >  		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
+> >  			groups=${BASH_REMATCH[1]}
+> >  		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
+> > -- 
+> > 2.49.0
+> > 
+> > 
+> > -- 
+> > kvm-riscv mailing list
+> > kvm-riscv@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/kvm-riscv
