@@ -1,166 +1,105 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F2E3C26;
-	Thu,  8 May 2025 00:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4A62620CA;
+	Thu,  8 May 2025 08:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746663876; cv=none; b=ZOPHAEuerkX29UaxXz6w4nraFLYc/L0H1yCf5yX4ExVQB2wEN77VlpYE0JAJfHYFg4b0jm5v3IyuXnrE6bSpTCQXHUW4uDeHxm6YZbzbfEe3SNl78e1s3S+3pe4GG8iDExJdTENWFAg57auXp0ZTl2vQUB2Gf+WBVHl9p6D63wg=
+	t=1746693572; cv=none; b=PcQPeG0TB99OFtLzyooFvqel5H5tdEVRV2HIH/4HEKVv2lRoQnMSHBUSA2c/ianexfUFOuoVP5nl0eFCg1KW80l0/j+VcEuBHhxhYWnSneqFEJNfVy7dGvnde1SCpgpROL8kYqvWJg/J/5VEePDdW0QZWTRMtM2qa1zwhoYJAvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746663876; c=relaxed/simple;
-	bh=mDH+ZL79YTMq+Jv0bVy+9Pty09ZB23vy1luG3tCeplI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YDAMg+fBwkeSPfQNIh0Q8SzaoNTOZkbgx2SqTGAGYtTFCsIQyhgWsHi1U7nO9YhAdbcIfna+SaKGk0+NkhAlFVCxbvf9A+EvQOB4s2GjYuuyop1w+Ntbw1nxt+8BYvykb65wU4bviuKpxuizpUmWoAMQOzzPIoBz2IFxyM/2afU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96F3CC4CEE2;
-	Thu,  8 May 2025 00:24:33 +0000 (UTC)
-Date: Wed, 7 May 2025 20:24:44 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
- joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- jstultz@google.com, qperret@google.com, will@kernel.org,
- kernel-team@android.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 02/24] tracing: Introduce trace remotes
-Message-ID: <20250507202444.43963c84@gandalf.local.home>
-In-Reply-To: <20250506164820.515876-3-vdonnefort@google.com>
-References: <20250506164820.515876-1-vdonnefort@google.com>
-	<20250506164820.515876-3-vdonnefort@google.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1746693572; c=relaxed/simple;
+	bh=yuBweLnXJr+UlHoAeP0Vp5rW+zBWTBXlDB/S+fvgixg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=FXxI7fQo27Mh4JB/mJ6fw2yO5A9TmXf//fcBVyawzHFFDPmvQfhc445mSHzsM+fXtLC5hkf5mZVkwgvbtZROyd+kInONGZmnqumHZ5V3hX9+nEW6PThuyrbSNerMIOEkM39rJGmY5fYAyT2/VtrNm0K4lEJ17mDJEplaaEKW9DA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCaXU2yy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCaXU2yy"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EDA60C4CEEF;
+	Thu,  8 May 2025 08:39:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746693572;
+	bh=yuBweLnXJr+UlHoAeP0Vp5rW+zBWTBXlDB/S+fvgixg=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=RCaXU2yy1eGr0Ao8jVrCf4FS/Gj9dHBIGZOoYtF7QleJaVWX6f56MtZ37Pm4IYJI6
+	 f97zAssJjYoRHFLmeIoqktFp7zrtbtgBHa1b5ADak76G58xUiK7w/Tm/6TSWHAABPe
+	 w5C5NkJYTrPOFsj/gbcEYSFh94VuY8xK+PvpNNL8PyyjvyYwrzxEhgABkatyxIidBs
+	 +08EvAJpyQi+JSdZJxT7uUoZKnO/+WXsqYDkjAAEPSTzEMfJTJkmJM6fwZ8prS35e1
+	 3HLmpyS4PQVUT6OWHRYqsJReDWM+iue4WFnQyDevQpW2FtAmDD+ypVG5O/ySMWUkk/
+	 56L+6dgyFQEfw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA856C3ABC5;
+	Thu,  8 May 2025 08:39:31 +0000 (UTC)
+From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
+Date: Thu, 08 May 2025 08:38:52 +0000
+Subject: [PATCH v2 1/3] KVM: arm64: Restrict FF-A host version
+ renegotiation
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250508-virtio-msg-ffa-v2-1-ed84f8053965@google.com>
+References: <20250508-virtio-msg-ffa-v2-0-ed84f8053965@google.com>
+In-Reply-To: <20250508-virtio-msg-ffa-v2-0-ed84f8053965@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Sudeep Holla <sudeep.holla@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, arve@android.com, lpieralisi@kernel.org, 
+ qwandor@google.com, jean-philippe@linaro.org, james.morse@arm.com, 
+ perl@immunant.com, tabba@google.com, kernel-team@android.com, 
+ armellel@google.com, qperret@google.com, sebastianene@google.com, 
+ ahomescu@google.com, Per Larsen <perlarsen@google.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1746693571; l=1162;
+ i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
+ bh=J3MWSM5x2/SDttpy5fJekCrept6pUn9foVmr8XHfbVs=;
+ b=Tg7dgit3kVDTUX65R4PhEXNXxB3lmCZRYexlRi3hD5jNmaUMG4KAbKfgshhUz94xxl0AsCRLm
+ EkblOHMrR3rCekrYx3uolLaOoJxg+OaWEnz+RuGNqykxMOnI9X5gOAm
+X-Developer-Key: i=perlarsen@google.com; a=ed25519;
+ pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
+X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
+ auth_id=402
+X-Original-From: Per Larsen <perlarsen@google.com>
+Reply-To: perlarsen@google.com
 
-On Tue,  6 May 2025 17:47:58 +0100
-Vincent Donnefort <vdonnefort@google.com> wrote:
+From: Per Larsen <perlarsen@google.com>
 
-> +
-> +static bool trace_remote_loaded(struct trace_remote *remote)
-> +{
-> +	return remote->trace_buffer;
-> +}
-> +
-> +static bool trace_remote_busy(struct trace_remote *remote)
+Prevent the host from re-negotiating a lesser minor version with the
+hypervisor. Once the hypervisor negotiates a version, that should
+remain locked in. Fix the current behaviour by returning NOT_SUPPORTED
+to avoid the FF-A interoperability rules with lesser minor versions that
+allow the host version to downgrade.
 
-Can you add comments to what these functions are doing?
+Signed-off-by: Per Larsen <perlarsen@google.com>
+Signed-off-by: Per Larsen <perl@immunant.com>
+---
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Doesn't need to be kerneldoc (it actually shouldn't be), but describe why
-they would return true and why they would return false.
+diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+index 3369dd0c4009f84ad3cf9481c747bdc57a162370..2c199d40811efb5bfae199c4a67d8ae3d9307357 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ffa.c
++++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+@@ -712,7 +712,10 @@ static void do_ffa_version(struct arm_smccc_res *res,
+ 
+ 	hyp_spin_lock(&version_lock);
+ 	if (has_version_negotiated) {
+-		res->a0 = hyp_ffa_version;
++		if (FFA_MINOR_VERSION(ffa_req_version) < FFA_MINOR_VERSION(hyp_ffa_version))
++			res->a0 = FFA_RET_NOT_SUPPORTED;
++		else
++			res->a0 = hyp_ffa_version;
+ 		goto unlock;
+ 	}
+ 
 
-> +{
-> +	return trace_remote_loaded(remote) &&
-> +		(remote->nr_readers || remote->tracing_on ||
-> +		 !ring_buffer_empty(remote->trace_buffer));
-> +}
-> +
-> +static int trace_remote_load(struct trace_remote *remote)
-> +{
-> +	struct ring_buffer_remote *rb_remote = &remote->rb_remote;
-> +
-> +	lockdep_assert_held(&remote->lock);
-> +
-> +	if (trace_remote_loaded(remote))
-> +		return 0;
-> +
-> +	remote->trace_buffer_desc = remote->cbs->load_trace_buffer(remote->trace_buffer_size,
-> +								   remote->priv);
-> +	if (!remote->trace_buffer_desc)
-> +		return -ENOMEM;
-
-The error may not be -ENOMEM, have the load_trace_buffer return an ERR_PTR
-and then you can return:
-
-	if (IS_ERR(remote->trace_buffer_desc)
-		return PTR_ERR(remote->trace_buffer_desc);
+-- 
+2.49.0.987.g0cc8ee98dc-goog
 
 
-> +
-> +	rb_remote->desc = remote->trace_buffer_desc;
-> +	rb_remote->swap_reader_page = remote->cbs->swap_reader_page;
-> +	rb_remote->priv = remote->priv;
-> +	remote->trace_buffer = ring_buffer_remote(rb_remote);
-> +	if (!remote->trace_buffer) {
-
-Same here.
-
-> +		remote->cbs->unload_trace_buffer(remote->trace_buffer_desc, remote->priv);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void trace_remote_unload(struct trace_remote *remote)
-> +{
-> +	lockdep_assert_held(&remote->lock);
-> +
-> +	if (!trace_remote_loaded(remote) || trace_remote_busy(remote))
-> +		return;
-
-Can this cause leaks? Should trace_remote_unload() return an error value to
-let the caller know it wasn't unloaded?
-
-> +
-> +	ring_buffer_free(remote->trace_buffer);
-> +	remote->trace_buffer = NULL;
-> +	remote->cbs->unload_trace_buffer(remote->trace_buffer_desc, remote->priv);
-> +}
-> +
-
-Short description of what trace_remote_start does.
-
-> +static int trace_remote_start(struct trace_remote *remote)
-> +{
-> +	int ret;
-> +
-> +	lockdep_assert_held(&remote->lock);
-> +
-> +	if (remote->tracing_on)
-> +		return 0;
-> +
-> +	ret = trace_remote_load(remote);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = remote->cbs->enable_tracing(true, remote->priv);
-> +	if (ret) {
-> +		trace_remote_unload(remote);
-> +		return ret;
-> +	}
-> +
-> +	remote->tracing_on = true;
-> +
-> +	return 0;
-> +}
-> +
-
-Same for stop.
-
--- Steve
-
-> +static int trace_remote_stop(struct trace_remote *remote)
-> +{
-> +	int ret;
-> +
-> +	lockdep_assert_held(&remote->lock);
-> +
-> +	if (!remote->tracing_on)
-> +		return 0;
-> +
-> +	ret = remote->cbs->enable_tracing(false, remote->priv);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ring_buffer_poll_remote(remote->trace_buffer, RING_BUFFER_ALL_CPUS);
-> +	remote->tracing_on = false;
-> +	trace_remote_unload(remote);
-> +
-> +	return 0;
-> +}
