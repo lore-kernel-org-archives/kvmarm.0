@@ -1,139 +1,56 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214EA18DB14
-	for <kvmarm@lists.linux.dev>; Thu,  8 May 2025 13:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF80245008;
+	Thu,  8 May 2025 14:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746712198; cv=none; b=fyVfqqp/zdfx1g2LRlMTf35WXlUP5UO38DlEZQePjoEwK7Loeh8omZ+t0p8UR8ONicizhztAJpJgrIadVMhjv2pFaDE5OfyZewdGmg633TUS3hkpexNZCb03HXQhB6OYGozDq1K/38oXIbe0No321c+VicO6dyxvCK3gp81VqpQ=
+	t=1746713113; cv=none; b=iKX7D1+rDWeZ6o/J8F6nACSFgGoujePoNxvH+Gdj9MRzFCo10hcBFOlgLz+JzeBfB0nmoAMx+ls2AIVOLonVvQfkmuC8AB66iEccowIxQ5APs22FuUsmuGt4jhnb1x4el9Z/umplaJ04QipJ1dqOls2pye+44WF1//ew4gjXAJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746712198; c=relaxed/simple;
-	bh=uBC2Ihdt2rDNkt4rQMMXMF3OAN4i06Q6AEeMdRZfFL8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W8lAAf0yhQhOhaQ1LSpDWQPdzdyl1np+pC/0+Yh93HNMaDdy88Ql0Y4JbY4ZgreNQsJqvo3vo2zoerxO+fex0jHS0UwxNLGAE836oueIXHFku2DAEL9VJuEv0PmEhWlNE2lCfQwfHdaQtNG0qx43OxhX1tbA06bFe7bFsw0twa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC540106F;
-	Thu,  8 May 2025 06:49:45 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4038E3F58B;
-	Thu,  8 May 2025 06:49:54 -0700 (PDT)
-Date: Thu, 8 May 2025 14:49:48 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v4 27/43] KVM: arm64: Use computed FGT masks to setup FGT
- registers
-Message-ID: <20250508134948.GA3256485@e124191.cambridge.arm.com>
-References: <20250506164348.346001-1-maz@kernel.org>
- <20250506164348.346001-28-maz@kernel.org>
+	s=arc-20240116; t=1746713113; c=relaxed/simple;
+	bh=4tmmAWJlkbjL1Nm4lMJmI0kVjwvxTXhmNQBdvHjddZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eiNxrqq6+gNAXwYumhLP3j24xszShJ69S+gK3/J3oFiZIJqRVJZkNp8js240euxN7oRfxC4d00+GqJuWy/wHJvg2tf2MAHLAS/Lf8Q1Wqnu+vjn7r1XvqhsgWuvPOgMPuw09ZYTQ9swtlWG51rK18PFQ1sJQz+gVLgdyBSrnn64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 113B4C4CEE7;
+	Thu,  8 May 2025 14:05:10 +0000 (UTC)
+Date: Thu, 8 May 2025 10:05:23 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ kernel-team@android.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 01/24] ring-buffer: Introduce ring-buffer remotes
+Message-ID: <20250508100523.750dfbaa@gandalf.local.home>
+In-Reply-To: <aBx1EBa6QFH7dmqs@google.com>
+References: <20250506164820.515876-1-vdonnefort@google.com>
+	<20250506164820.515876-2-vdonnefort@google.com>
+	<20250507194722.263a8d1e@gandalf.local.home>
+	<aBx1EBa6QFH7dmqs@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250506164348.346001-28-maz@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 06, 2025 at 05:43:32PM +0100, Marc Zyngier wrote:
-> Flip the hyervisor FGT configuration over to the computed FGT
-> masks.
+On Thu, 8 May 2025 10:10:40 +0100
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
+> > Hmm, I wonder if this would be worth adding to the user interface?  
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 45 +++++++++++++++++++++----
->  1 file changed, 38 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 925a3288bd5be..e8645375499df 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -65,12 +65,41 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +#define reg_to_fgt_masks(reg)						\
-> +	({								\
-> +		struct fgt_masks *m;					\
-> +		switch(reg) {						\
-> +		case HFGRTR_EL2:					\
-> +			m = &hfgrtr_masks;				\
-> +			break;						\
-> +		case HFGWTR_EL2:					\
-> +			m = &hfgwtr_masks;				\
-> +			break;						\
-> +		case HFGITR_EL2:					\
-> +			m = &hfgitr_masks;				\
-> +			break;						\
-> +		case HDFGRTR_EL2:					\
-> +			m = &hdfgrtr_masks;				\
-> +			break;						\
-> +		case HDFGWTR_EL2:					\
-> +			m = &hdfgwtr_masks;				\
-> +			break;						\
-> +		case HAFGRTR_EL2:					\
-> +			m = &hafgrtr_masks;				\
-> +			break;						\
-> +		default:						\
-> +			BUILD_BUG_ON(1);				\
-> +		}							\
-> +									\
-> +		m;							\
-> +	})
-> +
->  #define compute_clr_set(vcpu, reg, clr, set)				\
->  	do {								\
-> -		u64 hfg;						\
-> -		hfg = __vcpu_sys_reg(vcpu, reg) & ~__ ## reg ## _RES0;	\
+> Would trace-cmd have any use for those fields? That said, even if it does not at
+> the moment, it would mean the meta-page has a single version between
+> kern/user-space and hyp/kern which is probably better?
 
-__vcpu_sys_reg() has done the ~RES0 part since 888f0880702 ("KVM: arm64: nv: Add sanitising to VNCR-backed sysregs"),
-in case anyone else wondered where that part went!
+I was thinking that it's better to have the consistency than user space
+using it. I'm not sure how much overhead it has for the normal buffer to
+update those fields.
 
-> -		set |= hfg & __ ## reg ## _MASK; 			\
-> -		clr |= ~hfg & __ ## reg ## _nMASK; 			\
-> +		u64 hfg = __vcpu_sys_reg(vcpu, reg);			\
-> +		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
-> +		set |= hfg & m->mask;					\
-> +		clr |= ~hfg & m->nmask;					\
->  	} while(0)
->  
->  #define reg_to_fgt_group_id(reg)					\
-> @@ -101,12 +130,14 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
->  #define compute_undef_clr_set(vcpu, kvm, reg, clr, set)			\
->  	do {								\
->  		u64 hfg = kvm->arch.fgu[reg_to_fgt_group_id(reg)];	\
-> -		set |= hfg & __ ## reg ## _MASK;			\
-> -		clr |= hfg & __ ## reg ## _nMASK; 			\
-> +		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
-> +		set |= hfg & m->mask;					\
-> +		clr |= hfg & m->nmask;					\
->  	} while(0)
->  
->  #define update_fgt_traps_cs(hctxt, vcpu, kvm, reg, clr, set)		\
->  	do {								\
-> +		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
->  		u64 c = clr, s = set;					\
->  		u64 val;						\
->  									\
-> @@ -116,7 +147,7 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
->  									\
->  		compute_undef_clr_set(vcpu, kvm, reg, c, s);		\
->  									\
-> -		val = __ ## reg ## _nMASK;				\
-> +		val = m->nmask;						\
->  		val |= s;						\
->  		val &= ~c;						\
->  		write_sysreg_s(val, SYS_ ## reg);			\
+-- Steve
