@@ -1,176 +1,139 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57B82253F3
-	for <kvmarm@lists.linux.dev>; Thu,  8 May 2025 12:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214EA18DB14
+	for <kvmarm@lists.linux.dev>; Thu,  8 May 2025 13:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746707130; cv=none; b=XaicFjBgCAs/dGj8d1b66t0j20Qq8yoPw5vute/gO+GIiK/25HXTVibtFKwd66SNI5qy8Ydj8IvyQ+Qd3fz8VuGwpfTFHqs1OCwkVgB380R4QHuDJxC2uqENQWGKeWTWeAa6pjNB0Z0Xr+SrqogBFlCmwtBusA69uIA/EoQubmI=
+	t=1746712198; cv=none; b=fyVfqqp/zdfx1g2LRlMTf35WXlUP5UO38DlEZQePjoEwK7Loeh8omZ+t0p8UR8ONicizhztAJpJgrIadVMhjv2pFaDE5OfyZewdGmg633TUS3hkpexNZCb03HXQhB6OYGozDq1K/38oXIbe0No321c+VicO6dyxvCK3gp81VqpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746707130; c=relaxed/simple;
-	bh=GSPlMkE9xl1CKG6+aR4Lnpqmp6kkUaBOsXBjm7FdCs8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xtqi3woBKbMqmFlcwjGsLJjMXp/NLdG7emAF1YOy/2k3j9ugWQ4Extlbs1LYC8wlYMbt5HzimNha9WYfrCNDbCDEKkCzzk7wNmEpu5r6rkhADR498JRulf7a/ZnLFH8nFOeHGa9wlQS7z/FYvG7WNhWOs5OYyaiWwSgkXcmTUbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZDcAlmCH; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZDcAlmCH"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5493b5bc6e8so1187288e87.2
-        for <kvmarm@lists.linux.dev>; Thu, 08 May 2025 05:25:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746707126; x=1747311926; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SGXUIdTFQac7mJFRH+e+84EpMzV6neC01o/VEUKascg=;
-        b=ZDcAlmCHuNbTyfxTi0Mxek1FQHVRgCm6oH6UggdhD5fQ5Si0t0hQnxLOgKhO27Vlv4
-         84sn4tyRXGJhHWtE4M/L+aXSSNHxN6pw7oyS5q/Ky7ptSDZsx92hg3/NSSHuD9sJolgX
-         xZcUHNPAYaXBQet60yY5LEhgyckuWICRtJKFM4WiL9OnJZ0P1Fjve8BKWhK2Iuq7FN5f
-         e60xx3gsN7SdnnKoFZfxfDOULirByeJta4+dqnCJ2E6s3Bi0PCYJMLU+QozzD/1fyY2i
-         6S9CBf0ZC147CU/275kUVTcQAhG6n9h032J+4XsnVtwZ+xpL1oUIzfQDM7AGK0I4Lvo+
-         YF4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746707126; x=1747311926;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SGXUIdTFQac7mJFRH+e+84EpMzV6neC01o/VEUKascg=;
-        b=gwQkfPUBdn03rDbbUR59cbtTlEmeBT9J8IPgcjn/Q4IpWEMjRh18gPcWxNHbJSjaMA
-         CURO1AdbTMzfuzF40ue7nbpYsmnoXibAh26nPCau1D9Cly0OSo9AWMJodQ3YPKUXgplp
-         s0t/xQVa0kqdHoKFgYLN4rEdMCmOKBvfMj+dUXqQNFFoIXIwII5PB1VV5bBga7huNs54
-         r6i73hPRFCkm6FrGTiRVHUnB8cTVUHObpMbymagpiR8lbyrhCasxkSS2nDnss6IWKKGl
-         CiDQN9hY8uoYJEvckaDOsBrACkiqQDt9I0ShX8tSNiX10Hue95kN+p9hUg8fqHdJIA1X
-         xc0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUMeprfDBog5qlwQYHBmae3dZN1fACint7lzasWSKnlkQYY/CiFLP9DnKr8WQ82DbapRrq59eA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxIXw5dF6eY8xzQCJAfoJmR20RSh8kiOl/mHDF+ySqSzhQUclQ4
-	OCJLTgO/CxbUSKO5CEyEtqC8Lpgo6upSnLjZYnZkvdZGLQPlOdD7fBm0zWEUQRCjyxUMe8Xm5fL
-	zB0xmnPsI4re8UC5JPaFxffqdWA9DPmaM0PAc
-X-Gm-Gg: ASbGnctQobl5D4NmqT8M7+h6vmTMFS9j3N3mY1qI4lWxWmSPklu33fa1j7sVWlRBO5I
-	3J230G9RbvxoEypnYNgbToSfMDOuOnfcxeAWAuJ2ZoYjAYENsSRz8AS7X10WJlqR6DmMFUhoX4O
-	PRq2ZZpKm1XsrOAzUHAiFGj907DV9ex80Sm9mcDcsy2Z0kSeE8R0JO
-X-Google-Smtp-Source: AGHT+IHELJP6PjDmjgnoQ+DcewZezMvkPDTBk3DlAEgOIW2HtUu14uSoRBVrm2tBSd/cEMjU36ADUjG1Ap9y8UFRrr8=
-X-Received: by 2002:a05:651c:b11:b0:30b:f006:3f5 with SMTP id
- 38308e7fff4ca-326b87dacdfmr7793251fa.15.1746707125568; Thu, 08 May 2025
- 05:25:25 -0700 (PDT)
+	s=arc-20240116; t=1746712198; c=relaxed/simple;
+	bh=uBC2Ihdt2rDNkt4rQMMXMF3OAN4i06Q6AEeMdRZfFL8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W8lAAf0yhQhOhaQ1LSpDWQPdzdyl1np+pC/0+Yh93HNMaDdy88Ql0Y4JbY4ZgreNQsJqvo3vo2zoerxO+fex0jHS0UwxNLGAE836oueIXHFku2DAEL9VJuEv0PmEhWlNE2lCfQwfHdaQtNG0qx43OxhX1tbA06bFe7bFsw0twa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC540106F;
+	Thu,  8 May 2025 06:49:45 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4038E3F58B;
+	Thu,  8 May 2025 06:49:54 -0700 (PDT)
+Date: Thu, 8 May 2025 14:49:48 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>
+Subject: Re: [PATCH v4 27/43] KVM: arm64: Use computed FGT masks to setup FGT
+ registers
+Message-ID: <20250508134948.GA3256485@e124191.cambridge.arm.com>
+References: <20250506164348.346001-1-maz@kernel.org>
+ <20250506164348.346001-28-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250507180852.work.231-kees@kernel.org> <20250507181615.1947159-2-kees@kernel.org>
- <CANpmjNPcYPvnQzMT3p+Vc2=EiEbR1WnykUEjuYc0bH2HOFi6HQ@mail.gmail.com>
-In-Reply-To: <CANpmjNPcYPvnQzMT3p+Vc2=EiEbR1WnykUEjuYc0bH2HOFi6HQ@mail.gmail.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Thu, 8 May 2025 14:25:13 +0200
-X-Gm-Features: ATxdqUEOMWVMkXbvXQaHqruZq4t8-pmXFLrRyvMg5ohXOpGrzDC1z300bwlcEE0
-Message-ID: <CACT4Y+betRmieWEHBdEf=gOLhWiNVRH5CSDeN6ykBtoP1GrzLA@mail.gmail.com>
-Subject: Re: [PATCH 2/8] init.h: Disable sanitizer coverage for __init and __head
-To: Marco Elver <elver@google.com>
-Cc: Kees Cook <kees@kernel.org>, Alexander Potapenko <glider@google.com>, 
-	Aleksandr Nogikh <nogikh@google.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Sami Tolvanen <samitolvanen@google.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	kasan-dev@googlegroups.com, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
-	Christoph Hellwig <hch@lst.de>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas.schier@linux.dev>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	sparclinux@vger.kernel.org, llvm@lists.linux.dev, 
-	syzkaller <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250506164348.346001-28-maz@kernel.org>
 
-On Thu, 8 May 2025 at 14:23, Marco Elver <elver@google.com> wrote:
->
-> +Cc KCOV maintainers
->
-> On Wed, 7 May 2025 at 20:16, Kees Cook <kees@kernel.org> wrote:
-> >
-> > While __noinstr already contained __no_sanitize_coverage, it needs to
-> > be added to __init and __head section markings to support the Clang
-> > implementation of CONFIG_STACKLEAK. This is to make sure the stack depth
-> > tracking callback is not executed in unsupported contexts.
-> >
-> > The other sanitizer coverage options (trace-pc and trace-cmp) aren't
-> > needed in __head nor __init either ("We are interested in code coverage
-> > as a function of a syscall inputs"[1]), so this appears safe to disable
-> > for them as well.
->
-> @ Dmitry, Aleksandr - Will this produce some unwanted side-effects for
-> syzbot? I also think it's safe, but just double checking.
+On Tue, May 06, 2025 at 05:43:32PM +0100, Marc Zyngier wrote:
+> Flip the hyervisor FGT configuration over to the computed FGT
+> masks.
 
-I do not see any problems with this.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-> > Link: https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/kernel/kcov.c?h=v6.14#n179 [1]
-> > Signed-off-by: Kees Cook <kees@kernel.org>
->
-> Acked-by: Marco Elver <elver@google.com>
->
-> > ---
-> > Cc: Marco Elver <elver@google.com>
-> > Cc: Andrey Konovalov <andreyknvl@gmail.com>
-> > Cc: Andrey Ryabinin <ryabinin.a.a@gmail.com>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Ingo Molnar <mingo@redhat.com>
-> > Cc: Borislav Petkov <bp@alien8.de>
-> > Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> > Cc: <x86@kernel.org>
-> > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > Cc: Ard Biesheuvel <ardb@kernel.org>
-> > Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-> > Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> > Cc: Andrew Morton <akpm@linux-foundation.org>
-> > Cc: Masahiro Yamada <masahiroy@kernel.org>
-> > Cc: "Peter Zijlstra (Intel)" <peterz@infradead.org>
-> > Cc: Luis Chamberlain <mcgrof@kernel.org>
-> > Cc: Sami Tolvanen <samitolvanen@google.com>
-> > Cc: Arnd Bergmann <arnd@arndb.de>
-> > Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-> > Cc: <kasan-dev@googlegroups.com>
-> > ---
-> >  arch/x86/include/asm/init.h | 2 +-
-> >  include/linux/init.h        | 4 +++-
-> >  2 files changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/init.h b/arch/x86/include/asm/init.h
-> > index 8b1b1abcef15..6bfdaeddbae8 100644
-> > --- a/arch/x86/include/asm/init.h
-> > +++ b/arch/x86/include/asm/init.h
-> > @@ -5,7 +5,7 @@
-> >  #if defined(CONFIG_CC_IS_CLANG) && CONFIG_CLANG_VERSION < 170000
-> >  #define __head __section(".head.text") __no_sanitize_undefined __no_stack_protector
-> >  #else
-> > -#define __head __section(".head.text") __no_sanitize_undefined
-> > +#define __head __section(".head.text") __no_sanitize_undefined __no_sanitize_coverage
-> >  #endif
-> >
-> >  struct x86_mapping_info {
-> > diff --git a/include/linux/init.h b/include/linux/init.h
-> > index ee1309473bc6..c65a050d52a7 100644
-> > --- a/include/linux/init.h
-> > +++ b/include/linux/init.h
-> > @@ -49,7 +49,9 @@
-> >
-> >  /* These are for everybody (although not all archs will actually
-> >     discard it in modules) */
-> > -#define __init         __section(".init.text") __cold  __latent_entropy __noinitretpoline
-> > +#define __init         __section(".init.text") __cold __latent_entropy \
-> > +                                               __noinitretpoline       \
-> > +                                               __no_sanitize_coverage
-> >  #define __initdata     __section(".init.data")
-> >  #define __initconst    __section(".init.rodata")
-> >  #define __exitdata     __section(".exit.data")
-> > --
-> > 2.34.1
-> >
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 45 +++++++++++++++++++++----
+>  1 file changed, 38 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 925a3288bd5be..e8645375499df 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -65,12 +65,41 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +#define reg_to_fgt_masks(reg)						\
+> +	({								\
+> +		struct fgt_masks *m;					\
+> +		switch(reg) {						\
+> +		case HFGRTR_EL2:					\
+> +			m = &hfgrtr_masks;				\
+> +			break;						\
+> +		case HFGWTR_EL2:					\
+> +			m = &hfgwtr_masks;				\
+> +			break;						\
+> +		case HFGITR_EL2:					\
+> +			m = &hfgitr_masks;				\
+> +			break;						\
+> +		case HDFGRTR_EL2:					\
+> +			m = &hdfgrtr_masks;				\
+> +			break;						\
+> +		case HDFGWTR_EL2:					\
+> +			m = &hdfgwtr_masks;				\
+> +			break;						\
+> +		case HAFGRTR_EL2:					\
+> +			m = &hafgrtr_masks;				\
+> +			break;						\
+> +		default:						\
+> +			BUILD_BUG_ON(1);				\
+> +		}							\
+> +									\
+> +		m;							\
+> +	})
+> +
+>  #define compute_clr_set(vcpu, reg, clr, set)				\
+>  	do {								\
+> -		u64 hfg;						\
+> -		hfg = __vcpu_sys_reg(vcpu, reg) & ~__ ## reg ## _RES0;	\
+
+__vcpu_sys_reg() has done the ~RES0 part since 888f0880702 ("KVM: arm64: nv: Add sanitising to VNCR-backed sysregs"),
+in case anyone else wondered where that part went!
+
+> -		set |= hfg & __ ## reg ## _MASK; 			\
+> -		clr |= ~hfg & __ ## reg ## _nMASK; 			\
+> +		u64 hfg = __vcpu_sys_reg(vcpu, reg);			\
+> +		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
+> +		set |= hfg & m->mask;					\
+> +		clr |= ~hfg & m->nmask;					\
+>  	} while(0)
+>  
+>  #define reg_to_fgt_group_id(reg)					\
+> @@ -101,12 +130,14 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>  #define compute_undef_clr_set(vcpu, kvm, reg, clr, set)			\
+>  	do {								\
+>  		u64 hfg = kvm->arch.fgu[reg_to_fgt_group_id(reg)];	\
+> -		set |= hfg & __ ## reg ## _MASK;			\
+> -		clr |= hfg & __ ## reg ## _nMASK; 			\
+> +		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
+> +		set |= hfg & m->mask;					\
+> +		clr |= hfg & m->nmask;					\
+>  	} while(0)
+>  
+>  #define update_fgt_traps_cs(hctxt, vcpu, kvm, reg, clr, set)		\
+>  	do {								\
+> +		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
+>  		u64 c = clr, s = set;					\
+>  		u64 val;						\
+>  									\
+> @@ -116,7 +147,7 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>  									\
+>  		compute_undef_clr_set(vcpu, kvm, reg, c, s);		\
+>  									\
+> -		val = __ ## reg ## _nMASK;				\
+> +		val = m->nmask;						\
+>  		val |= s;						\
+>  		val &= ~c;						\
+>  		write_sysreg_s(val, SYS_ ## reg);			\
