@@ -1,93 +1,102 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A6720E011;
-	Fri,  9 May 2025 15:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA996235360;
+	Fri,  9 May 2025 15:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746802959; cv=none; b=ebSnHexqAUDpZL8M8SHR8MwaoPz7KusOltCbG104JtD0VcI72H1e+xdvO52RnxQ0MPfRza9sPXoP2AWxEPTvuzUvQGy9JL0qM7JLvOdrMWxDoeql4AmazJlOBHr3VxTwqJ3Mgw+KeSlkwmAAta1wfLZwBtutfc1W2JVxvJwn7f0=
+	t=1746806262; cv=none; b=TSJumugGnTVdJ1HwZY9lkQN35vh61/7vT7tUf00Ria6OZ6BkFEK8m+VfObsSuCcn3jIXSjg+TrZ4Vt/z4HmL+gDHlZbMTx9vLHakwPzPdoOVxfEEvE8zvCTdMZNvceXhXrk6Nt+D0fER1JqODFCJ+FMfSPh+DPMKTYUxQ6siIN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746802959; c=relaxed/simple;
-	bh=7NskiScE5gptOGADrQReISR757xZmSnWMX0UyKOeZCM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ho6VZkvSiOzq9p5BW3NCEsplmQAb7tk8JhOxVHK/GUU7EnjymXn+nPXhXe3PIuBVqrXqKPoJXw5al/zALlLecoo/pxY1PVugwjUI5NN+pLeZwe/C/kEbL8NeREGHHFm/e/AeambI71rB+BeyZWHGijhUIKOH8sft6ih+8wlnL58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWQzY+hv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746806262; c=relaxed/simple;
+	bh=7/MNjjNtDaTlouyx656vOEkXvTq9x85h8AYf16G6kY4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O7m0uZAUodbMk9ZABoVIXeobalKFaCQP9OMN5/G3rHRdCoQFcKrIX4guyh8KqFjXz/UTCrHSrP3dyCA6KLDD7qn/KKtIseIrJcKbXD8nadN1xq7OwjzXaoYlrcMkpZqOrMB9TTlzmJ2eFBWiO9UtOlaWS1jGkYKxEJbrk8YxlWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EC63aiOY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWQzY+hv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38004C4CEE4;
-	Fri,  9 May 2025 15:02:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EC63aiOY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D090C4CEE4;
+	Fri,  9 May 2025 15:57:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746802958;
-	bh=7NskiScE5gptOGADrQReISR757xZmSnWMX0UyKOeZCM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZWQzY+hvdRs9Re4KDHntxug0qY5Ca7OwjjFfM2Dn7yZOCj6QK6lIfaqvNMQ4OIo3d
-	 w87JJHVlm/5gF48Ytqb2lav051IsEnhc0mUdBnQG6VIWR/VBplOAZMLSIwVXaYDfBq
-	 J5W1U8D2EqfTJkZrlE5RnxyNH+lAWNBi5l7k4NQxZ2njHf983SifjFK6mlksmZ+RS2
-	 zTf8bJBT/+oCJt6zumU+GZxluzCGzPuCI0hcWgf/2GQjTGibVLVWYs2AckrZNWPW4r
-	 lgoCSsj8pLyGn9/krfB6WCElwvcIeO8tY8PCJUuhrRM9NsiX1TO7NmGh472rnvCfrO
-	 /JKGE0GOhqOBA==
-Date: Fri, 9 May 2025 16:02:33 +0100
-From: Will Deacon <will@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Ryan Roberts <ryan.roberts@arm.com>,
+	s=k20201202; t=1746806261;
+	bh=7/MNjjNtDaTlouyx656vOEkXvTq9x85h8AYf16G6kY4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EC63aiOYHa2FEhR7y19MISasjwZb1YmAjmQZmxYUicaFchRnypNc/tbruTUG7UidG
+	 4krwF39n5wqmD0i21wjtbxpbep789RE7R4+xlqVy1/GpmdokLBOABfuuUb20kFN26T
+	 Rbf6bqeVfQIRSYArtmm26F/Jh5wri8cWG8uX78wcaXY6cMitgz6HffHaLi6oJy5QfI
+	 DkeWdL+9cNk6gzI9pJYORE61XKpSyd9lApWAbJxA51Hg0r9TQ9YKHXJ18vUHwiaFYK
+	 ihqMqUbVU3UFqnodWPuGLw8Ua6RiH0LaS8xxz5kkdHChpQ4ARI3L2bKXR9OjSFUIYK
+	 6yf+68a9PboFQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uDQ6V-00DRuz-5i;
+	Fri, 09 May 2025 16:57:39 +0100
+Date: Fri, 09 May 2025 16:57:38 +0100
+Message-ID: <86zfflg4jx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2] arm64/mm: Implement pte_po_index() for permission
- overlay index
-Message-ID: <20250509150232.GA5984@willie-the-truck>
-References: <20250415054442.2287891-1-anshuman.khandual@arm.com>
- <20250429151134.GB26272@willie-the-truck>
- <b07c1320-3140-40d3-899b-7c2b6e0d3c18@arm.com>
- <16ffa9f2-5ebb-4839-ab87-3c193ab9683a@arm.com>
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v3 02/17] KVM: arm64: nv: Allocate VNCR page when required
+In-Reply-To: <aB3UxDxwXhz5iY9J@linux.dev>
+References: <20250423151508.2961768-1-maz@kernel.org>
+	<20250423151508.2961768-3-maz@kernel.org>
+	<aB3UxDxwXhz5iY9J@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <16ffa9f2-5ebb-4839-ab87-3c193ab9683a@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, May 05, 2025 at 02:20:46PM +0530, Anshuman Khandual wrote:
+On Fri, 09 May 2025 11:11:16 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> 
-> On 4/29/25 22:15, Ryan Roberts wrote:
-> > On 29/04/2025 16:11, Will Deacon wrote:
-> >> On Tue, Apr 15, 2025 at 11:14:42AM +0530, Anshuman Khandual wrote:
-> >>> From: Ryan Roberts <ryan.roberts@arm.com>
-> >>>
-> >>> Previously pte_access_permitted() used FIELD_GET() directly to retrieve
-> >>> the permission overlay index from the pte. However, FIELD_GET() doesn't
-> >>> work for 128 bit quanitites. Since we are about to add support for D128
-> >>> pgtables, let's create a specific helper, pte_po_index() which can do
-> >>> the required mask and shift regardless of the data type width.
-> >>
-> >> You say:
-> >>
-> >> "we are about to add support for D128 pgtables"
+> On Wed, Apr 23, 2025 at 04:14:53PM +0100, Marc Zyngier wrote:
+> > If running a NV guest on an ARMv8.4-NV capable system, let's
+> > allocate an additional page that will be used by the hypervisor
+> > to fulfill system register accesses.
 > > 
-> > Providing some context: Anshuman has a private branch that adds D128 pgtable
-> > support to the kernel (it does not yet do this for KVM). I originally created
-> > this patch to fix a bug on that branch, so the "we are about to add ..." comment
-> > really only makes sense in that context.
+> > Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/nested.c | 9 +++++++++
+> >  arch/arm64/kvm/reset.c  | 1 +
+> >  2 files changed, 10 insertions(+)
 > > 
-> > We are not yet ready to post D128 upstream - there are still a lot of questions
-> > to answer - but Anshuman has been posting some of the reshuffling and cleanups
-> > that prepare the way for D128 where (we think) it makes sense. The aim is to
-> > reduce the diff as much as we can.
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 4a3fc11f7ecf3..884b3e25795c4 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -55,6 +55,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
+> >  		return -EINVAL;
+> >  
+> > +	if (!vcpu->arch.ctxt.vncr_array)
+> > +		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
 > 
-> Agreed. All these patches have been really harmless clean ups and re-orgs etc,
-> that do not affect existing 64 bit page table management or its functioning in
-> any manner. OTOH these changes help the kernel prepare for D128 enablement.
+> Think you want GFP_KERNEL_ACCOUNT here.
 
-In this case, I wouldn't call it harmless clean-up. You're actively
-removing the use of helper macros which is inevitably going to result in
-churn.
+Yup, good point. I'll fold that in.
 
-Please teach FIELD_GET() to work with 128-bit types instead.
+Thanks,
 
-Will
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
