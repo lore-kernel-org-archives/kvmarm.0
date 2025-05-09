@@ -1,45 +1,70 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BDE238C20
-	for <kvmarm@lists.linux.dev>; Fri,  9 May 2025 10:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB86D290D9B;
+	Fri,  9 May 2025 12:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746785490; cv=none; b=qvpAxTz/bX/tOZe8qPmpL1IYXA/6nBHALGhg7y5vkoQM0Eohgpl8zazAWo/y41ndeBgAMSiozJy2V6S8+Y8Op39b01ks2v5Fuuy3Su9KrD3ATfV/085ZvhAsmwIlVoPnQ+kFrZCi2H83nrwEPGuaRYYwxu/0G0QgD8+n0/kucvI=
+	t=1746794866; cv=none; b=oJdkskxKbbWbIUQJ3u9GeGxkJl5gyJb9XsU0SqORu6tR1sEuWYGM+YrkdRxdCY4vgbpNKRhjij9Z5S1q/SPKjSPKu7TJ8yZpYmy8oQnFHzEh+H19AFThrxE609YOXyjsn9VKNh/eWS+d7q2q57+2izV6SojjWjIUXOY4pCa+DN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746785490; c=relaxed/simple;
-	bh=Ar0OFSFbAZYi+/eYa8H5g+BNAP9J4sNaDYBUw0iwgo8=;
+	s=arc-20240116; t=1746794866; c=relaxed/simple;
+	bh=Sgl4dmv2d30oYMAuM3YMqPWMtQeY4TyzuoWF79Ce3xA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aNWZZJQL52/YMweuzq5+o8j0OeQtCr3sNcG9EL913OyAeJiodUpRkrxetfoEze6OxHkllXXeZlEunspY/yfFHcdpy8kzLKU2oD3zvfEalpU7Mnb9eneYwOhjR04AgyVOIzQf0+cN8bxyhY/DP8W+d0CYz1Po7cXs8++T+JTZDCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oeJVqoXz; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oeJVqoXz"
-Date: Fri, 9 May 2025 03:11:16 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746785486;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gADP7rDY+Aim+5KEmwjyMEJOxyUwFF8/OBHyG20/FUA=;
-	b=oeJVqoXzqvHiRN3YALK3a5w3UYfGRpQO+N4t0GHjMe0EjZ8C4TJwY+s8DH22NNVQbEqZ8D
-	aFg0CxBak1q68+mfPJhXLlnm9PjE5BKbYIdKEt06F6WG2iv2sCE7rXB00plRCQgSBWwnat
-	7I8cKYIOA5Tub8dbHiaHpQnAqV0baRA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v3 02/17] KVM: arm64: nv: Allocate VNCR page when required
-Message-ID: <aB3UxDxwXhz5iY9J@linux.dev>
-References: <20250423151508.2961768-1-maz@kernel.org>
- <20250423151508.2961768-3-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gfIz1b5ogauPk3lYyeCqTAFZ/319zmdG7Pgq742+YxHN+5JDMNAwTIPApevij7564wOFtSsDRcT/XzgEmvPPgQlNp4d1lzAO2wNf7RG/JobUAt1Ptf7oAD40m9eXEDxrwFlJcfuSVEvHCcEsGvun88rO7R9EgFqtmHT+azBOKhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D4DBC4CEEF;
+	Fri,  9 May 2025 12:47:38 +0000 (UTC)
+Date: Fri, 9 May 2025 13:47:36 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Ankit Agrawal <ankita@nvidia.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>,
+	Sean Christopherson <seanjc@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"david@redhat.com" <david@redhat.com>,
+	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
+	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
+	Krishnakant Jaju <kjaju@nvidia.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"sebastianene@google.com" <sebastianene@google.com>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com" <gshan@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"ddutile@redhat.com" <ddutile@redhat.com>,
+	"tabba@google.com" <tabba@google.com>,
+	"qperret@google.com" <qperret@google.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+Message-ID: <aB35aOZzdKZKMOht@arm.com>
+References: <aAjci3rddHt_R_x3@arm.com>
+ <20250423130323.GE1648741@nvidia.com>
+ <SA1PR12MB71996988916E1FB15149DD13B0802@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <aBDTpu_ACoXAPoE2@arm.com>
+ <20250429141437.GC2260709@nvidia.com>
+ <aBD4RsUZp-BmcLwC@arm.com>
+ <20250429164430.GD2260709@nvidia.com>
+ <aBEV5gxYoDFct9PC@arm.com>
+ <20250429181926.GE2260709@nvidia.com>
+ <SA1PR12MB71992BC382DA4ED506100590B088A@SA1PR12MB7199.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,33 +73,27 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250423151508.2961768-3-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <SA1PR12MB71992BC382DA4ED506100590B088A@SA1PR12MB7199.namprd12.prod.outlook.com>
 
-On Wed, Apr 23, 2025 at 04:14:53PM +0100, Marc Zyngier wrote:
-> If running a NV guest on an ARMv8.4-NV capable system, let's
-> allocate an additional page that will be used by the hypervisor
-> to fulfill system register accesses.
+On Wed, May 07, 2025 at 03:26:05PM +0000, Ankit Agrawal wrote:
+> >> Unless FWB implies CTR_EL0.DIC (AFAIK, it doesn't) we may be
+> >> restricting some CPUs.
+> >
+> > Yes, it will further narrow the CPUs down.
+> > 
+> > However, we just did this discussion for BBML2 + SMMUv3 SVA. I think
+> > the same argument holds. If someone is crazy enough to build a CPU
+> > with CXLish support and uses an old core without DIC, IDC and S2FWB
+> > then they are going to have a bunch of work to fix the SW to support
+> > it. Right now we know of no system that exists like this..
+> >
+> > Jason
 > 
-> Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/nested.c | 9 +++++++++
->  arch/arm64/kvm/reset.c  | 1 +
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 4a3fc11f7ecf3..884b3e25795c4 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -55,6 +55,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
->  		return -EINVAL;
->  
-> +	if (!vcpu->arch.ctxt.vncr_array)
-> +		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
+> Catalin, do you agree if I can go ahead and add the check for
+> ARM64_HAS_CACHE_DIC?
 
-Think you want GFP_KERNEL_ACCOUNT here.
+As long as we don't leave out some hardware that has FWB but not DIC,
+that's fine by me.
 
-Thanks,
-Oliver
+-- 
+Catalin
