@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6AE25E471;
-	Fri,  9 May 2025 19:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFCE23CEF8;
+	Fri,  9 May 2025 19:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746820042; cv=none; b=WiRBtXltD1E7cr0YrGyU6CsNA/x4e25NjYEfYF3DpdgcALLh68ce5VpdSfNA1yDOrAZxCLNdgFVVUHUOq77coxsM9Myjd4gKK1LTde9Hx8Aw+OYpxTmlZrBa/U56cUJiniKhiAfNkfkdbTQxysdbw6gBYYAT/q2ET9Tnkzs9QhY=
+	t=1746820440; cv=none; b=jRpGgdvlEOiRboBtxEQtgod1wbqMDeR7X/008sMOUxhEpdO7d2VROQo6W3Ewxtwc7rrzNOt4mi1ADOzjAIEsl4+f7wKM2Fs0OWN3S7mNQ8IS4RJcl0vnCB0SdQrrSrFXk1QbTlEw+OGsfGKEwgwazL8v8L1CVEOTYcG+4jA1+/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746820042; c=relaxed/simple;
-	bh=NFUht2wKDJ+lhKUqHDc+W11Fj3bUVE0Zk2wQ0tkASbU=;
+	s=arc-20240116; t=1746820440; c=relaxed/simple;
+	bh=9F7MpQr8DTQtiQSo+kr1eN+p3ADiua+iMiJ1xVEnzX4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hSTXUmSsJNILM7mSVSr2gl2u5IvoZMSkZaW432fwBtAwowNLJ2aPlK6LJ/g1Lm9azI2LkkvjS2MY9DyWqR7XcqcEf+pm5srFsxMvqhpOiM7MoEDcHkxdFsQx6R5V8Q3TeD7gehAN5awtNPff0h10Ea/L3ErcpbnH9U1x53rEI64=
+	 MIME-Version:Content-Type; b=SR8DLqHhmCWUX5z5XsC7aZmuXgMl95OfiBq+XOfyHBMyQwOA0PMZ9cQoDUJKWNdlFSGD9CVGmWJ/6ed4DDMat59SyLZRN7h2lPpVXDwcjP5qNNX+Oer6RxziEXU3rtX8SgjMZYkG1rIm8ZSP06PhTFVTKAc5a47SZly0i1Ii7Z0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A7D8C4CEE4;
-	Fri,  9 May 2025 19:47:20 +0000 (UTC)
-Date: Fri, 9 May 2025 15:47:35 -0400
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4BE1C4CEE4;
+	Fri,  9 May 2025 19:53:57 +0000 (UTC)
+Date: Fri, 9 May 2025 15:54:12 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
@@ -23,11 +23,11 @@ Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
  kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
  jstultz@google.com, qperret@google.com, will@kernel.org,
  kernel-team@android.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 05/24] tracing: Add events to trace remotes
-Message-ID: <20250509154735.530d4a37@gandalf.local.home>
-In-Reply-To: <20250506164820.515876-6-vdonnefort@google.com>
+Subject: Re: [PATCH v4 08/24] ring-buffer: Expose buffer_data_page material
+Message-ID: <20250509155412.03c89196@gandalf.local.home>
+In-Reply-To: <20250506164820.515876-9-vdonnefort@google.com>
 References: <20250506164820.515876-1-vdonnefort@google.com>
-	<20250506164820.515876-6-vdonnefort@google.com>
+	<20250506164820.515876-9-vdonnefort@google.com>
 X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -38,42 +38,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue,  6 May 2025 17:48:01 +0100
+On Tue,  6 May 2025 17:48:04 +0100
 Vincent Donnefort <vdonnefort@google.com> wrote:
 
-> diff --git a/include/linux/trace_remote_event.h b/include/linux/trace_remote_event.h
-> new file mode 100644
-> index 000000000000..621c5dff0664
-> --- /dev/null
-> +++ b/include/linux/trace_remote_event.h
-> @@ -0,0 +1,23 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +#ifndef _LINUX_TRACE_REMOTE_EVENTS_H
-> +#define _LINUX_TRACE_REMOTE_EVENTS_H
-> +
-> +struct trace_remote;
-> +struct trace_event_fields;
-> +
-> +struct remote_event_hdr {
-> +	unsigned short	id;
-> +};
-> +
-> +#define REMOTE_EVENT_NAME_MAX 29
+> In preparation for allowing the write of ring-buffer compliant pages
+> outside of ring_buffer.c, move buffer_data_page and timestamps
+> encoding functions into the publicly available ring_buffer.h.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-29 is a particularly strange number. It's not even divisible by
-sizeof(short). This will leave a hole in the remote_event structure.
+Let's create a new file for this instead of adding it to ring_buffer.h.
+Although it's being used by remote buffers, I rather not make this
+something that people may think they can access anywhere.
 
-Should it be "30" to plug up that one byte space between name and "id"?
+Perhaps: ring_buffer_types.h
+
+with a comment stating that these are to be used by the remote ring buffers
+and the ring buffer internals and should not be used directly.
 
 -- Steve
 
-> +struct remote_event {
-> +	char				name[REMOTE_EVENT_NAME_MAX];
-> +	unsigned short			id;
-> +	bool				enabled;
-> +	struct trace_remote		*remote;
-> +	struct trace_event_fields	*fields;
-> +	char				*print_fmt;
-> +	void				(*print)(void *evt, struct trace_seq *seq);
-> +};
