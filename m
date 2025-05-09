@@ -1,102 +1,79 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA996235360;
-	Fri,  9 May 2025 15:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6AE25E471;
+	Fri,  9 May 2025 19:47:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746806262; cv=none; b=TSJumugGnTVdJ1HwZY9lkQN35vh61/7vT7tUf00Ria6OZ6BkFEK8m+VfObsSuCcn3jIXSjg+TrZ4Vt/z4HmL+gDHlZbMTx9vLHakwPzPdoOVxfEEvE8zvCTdMZNvceXhXrk6Nt+D0fER1JqODFCJ+FMfSPh+DPMKTYUxQ6siIN4=
+	t=1746820042; cv=none; b=WiRBtXltD1E7cr0YrGyU6CsNA/x4e25NjYEfYF3DpdgcALLh68ce5VpdSfNA1yDOrAZxCLNdgFVVUHUOq77coxsM9Myjd4gKK1LTde9Hx8Aw+OYpxTmlZrBa/U56cUJiniKhiAfNkfkdbTQxysdbw6gBYYAT/q2ET9Tnkzs9QhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746806262; c=relaxed/simple;
-	bh=7/MNjjNtDaTlouyx656vOEkXvTq9x85h8AYf16G6kY4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O7m0uZAUodbMk9ZABoVIXeobalKFaCQP9OMN5/G3rHRdCoQFcKrIX4guyh8KqFjXz/UTCrHSrP3dyCA6KLDD7qn/KKtIseIrJcKbXD8nadN1xq7OwjzXaoYlrcMkpZqOrMB9TTlzmJ2eFBWiO9UtOlaWS1jGkYKxEJbrk8YxlWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EC63aiOY; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EC63aiOY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D090C4CEE4;
-	Fri,  9 May 2025 15:57:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746806261;
-	bh=7/MNjjNtDaTlouyx656vOEkXvTq9x85h8AYf16G6kY4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EC63aiOYHa2FEhR7y19MISasjwZb1YmAjmQZmxYUicaFchRnypNc/tbruTUG7UidG
-	 4krwF39n5wqmD0i21wjtbxpbep789RE7R4+xlqVy1/GpmdokLBOABfuuUb20kFN26T
-	 Rbf6bqeVfQIRSYArtmm26F/Jh5wri8cWG8uX78wcaXY6cMitgz6HffHaLi6oJy5QfI
-	 DkeWdL+9cNk6gzI9pJYORE61XKpSyd9lApWAbJxA51Hg0r9TQ9YKHXJ18vUHwiaFYK
-	 ihqMqUbVU3UFqnodWPuGLw8Ua6RiH0LaS8xxz5kkdHChpQ4ARI3L2bKXR9OjSFUIYK
-	 6yf+68a9PboFQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uDQ6V-00DRuz-5i;
-	Fri, 09 May 2025 16:57:39 +0100
-Date: Fri, 09 May 2025 16:57:38 +0100
-Message-ID: <86zfflg4jx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v3 02/17] KVM: arm64: nv: Allocate VNCR page when required
-In-Reply-To: <aB3UxDxwXhz5iY9J@linux.dev>
-References: <20250423151508.2961768-1-maz@kernel.org>
-	<20250423151508.2961768-3-maz@kernel.org>
-	<aB3UxDxwXhz5iY9J@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1746820042; c=relaxed/simple;
+	bh=NFUht2wKDJ+lhKUqHDc+W11Fj3bUVE0Zk2wQ0tkASbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hSTXUmSsJNILM7mSVSr2gl2u5IvoZMSkZaW432fwBtAwowNLJ2aPlK6LJ/g1Lm9azI2LkkvjS2MY9DyWqR7XcqcEf+pm5srFsxMvqhpOiM7MoEDcHkxdFsQx6R5V8Q3TeD7gehAN5awtNPff0h10Ea/L3ErcpbnH9U1x53rEI64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A7D8C4CEE4;
+	Fri,  9 May 2025 19:47:20 +0000 (UTC)
+Date: Fri, 9 May 2025 15:47:35 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ kernel-team@android.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 05/24] tracing: Add events to trace remotes
+Message-ID: <20250509154735.530d4a37@gandalf.local.home>
+In-Reply-To: <20250506164820.515876-6-vdonnefort@google.com>
+References: <20250506164820.515876-1-vdonnefort@google.com>
+	<20250506164820.515876-6-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com, gankulkarni@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
 
-On Fri, 09 May 2025 11:11:16 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Apr 23, 2025 at 04:14:53PM +0100, Marc Zyngier wrote:
-> > If running a NV guest on an ARMv8.4-NV capable system, let's
-> > allocate an additional page that will be used by the hypervisor
-> > to fulfill system register accesses.
-> > 
-> > Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/nested.c | 9 +++++++++
-> >  arch/arm64/kvm/reset.c  | 1 +
-> >  2 files changed, 10 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 4a3fc11f7ecf3..884b3e25795c4 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -55,6 +55,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
-> >  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
-> >  		return -EINVAL;
-> >  
-> > +	if (!vcpu->arch.ctxt.vncr_array)
-> > +		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
-> 
-> Think you want GFP_KERNEL_ACCOUNT here.
+On Tue,  6 May 2025 17:48:01 +0100
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-Yup, good point. I'll fold that in.
+> diff --git a/include/linux/trace_remote_event.h b/include/linux/trace_remote_event.h
+> new file mode 100644
+> index 000000000000..621c5dff0664
+> --- /dev/null
+> +++ b/include/linux/trace_remote_event.h
+> @@ -0,0 +1,23 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef _LINUX_TRACE_REMOTE_EVENTS_H
+> +#define _LINUX_TRACE_REMOTE_EVENTS_H
+> +
+> +struct trace_remote;
+> +struct trace_event_fields;
+> +
+> +struct remote_event_hdr {
+> +	unsigned short	id;
+> +};
+> +
+> +#define REMOTE_EVENT_NAME_MAX 29
 
-Thanks,
+29 is a particularly strange number. It's not even divisible by
+sizeof(short). This will leave a hole in the remote_event structure.
 
-	M.
+Should it be "30" to plug up that one byte space between name and "id"?
 
--- 
-Without deviation from the norm, progress is not possible.
+-- Steve
+
+> +struct remote_event {
+> +	char				name[REMOTE_EVENT_NAME_MAX];
+> +	unsigned short			id;
+> +	bool				enabled;
+> +	struct trace_remote		*remote;
+> +	struct trace_event_fields	*fields;
+> +	char				*print_fmt;
+> +	void				(*print)(void *evt, struct trace_seq *seq);
+> +};
