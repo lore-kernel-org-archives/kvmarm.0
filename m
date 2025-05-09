@@ -1,68 +1,70 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55FD223DE9
-	for <kvmarm@lists.linux.dev>; Fri,  9 May 2025 14:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EA0224B1E
+	for <kvmarm@lists.linux.dev>; Fri,  9 May 2025 14:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746801210; cv=none; b=fqbO7Bu7GDC5ZXh6qL8s3BFAdnzRk3jhhtcadSRVgjiPQErisCNELeJ4LYjGrgqtUryn+WEIJ9Oui4KGCpRvcpf0Uq80fo3T1KeQYcrMUoKzI84Kf+aIZqcHGutxZIlaxwBKaxhKuC/ty01X8E61TDZOW840H6C6BsLQydJ9/Ac=
+	t=1746801213; cv=none; b=aA4DiXJ1l9Srsf1r1zGQpLPn2Dpufhuz5VPbberdoK4ZoVrdzmsXkt1DrVn392nmJMfJ2gDJ0M8sic0UCdAq/bFOVn33+ChJXxGMr4pInAym8dqnh0oWzjYyB44AeDBSZzaZwTG+y5pYP3GjWqMRGy8tLn5mzanUaKmXzBM2eI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746801210; c=relaxed/simple;
-	bh=FFvBCknd8IuGRR/pjTvYSyuDF4+NszF59ge0pjk8rhk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:content-type; b=T+NbUQNlzt9yU0kyRzX7fbv2ojZMLGNFPcnHEdohyNJLrY0Shk2rud4jg3wibHEpSsZiWoPUh66poP7vjkWyBOoMgVXzvXhCpoWtyv2QYkKV1Al4Jy5o4DjSOjQm+LFjYLwt26OHs8+s7INIGf5FVwDRn2KTt7IymmM4aa4w884=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W2R7FJYZ; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1746801213; c=relaxed/simple;
+	bh=VzQyPkruYWrDZAOkmL/UT3N0xShjKnGR9pQJo0jQ/Qk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:content-type; b=h3bdGmHNkYXFwrEkXih8HuJQJUK1q/L232nDdrztZcykMGg+fKRD0qoSxg31xea2ak8fMeUryIt0CaHZyTMh9bha/Ttx+SrB7tICAgsHhbFM/olJtn3Natx+OzH9qRfK3xD0CQJ4TFPVGmRV9jaPI6ahFlxZNSbJlDaxl9mWnrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Khacbic/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W2R7FJYZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Khacbic/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746801207;
+	s=mimecast20190719; t=1746801210;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VL9vZro0BdFwyk98zVNm2YYJ6CabP26FrlBnQZyFPJw=;
-	b=W2R7FJYZZRsUFUT+4t/TgEzdv/VV+yEw2g9JzgjrXVFtW6ZVJ1PeJiuB8yUt04L8D9oa5D
-	5iUZQTiROyTkRsWWZYfBWLfssZEwVv6+RBHeAQJtrsGiLexyiCc0asOIw5LM3Sjs5gB6u9
-	jd3P068ubqtGCuRRAlX6cDxvquyqiVs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AdRsO2Uefrz8JMO751IFZEkS7KH/EcFqwNDUBdHYAOY=;
+	b=Khacbic/wESm9hX5V7JtrNuQAJRKUCXAT455ONE8y2AJJ/zgkvhMJyipOhcQWs0jHNC+Og
+	qCxRm2brWoQBYln/rnesmg/K9Q9tECjsJ7zcP4WpRgiJjFrtdUO6gg13u7Gp7iZDtBNVZX
+	FcC55EWvlY62MOcapU9PFkfil5IujiE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-526-mGTuRkwROwOtwwaGx1tH1w-1; Fri, 09 May 2025 10:33:26 -0400
-X-MC-Unique: mGTuRkwROwOtwwaGx1tH1w-1
-X-Mimecast-MFC-AGG-ID: mGTuRkwROwOtwwaGx1tH1w_1746801205
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so10754315e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 09 May 2025 07:33:25 -0700 (PDT)
+ us-mta-184-B5vWmeQbPXWgnI7-VjJe0Q-1; Fri, 09 May 2025 10:33:29 -0400
+X-MC-Unique: B5vWmeQbPXWgnI7-VjJe0Q-1
+X-Mimecast-MFC-AGG-ID: B5vWmeQbPXWgnI7-VjJe0Q_1746801208
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-442ccf0eb4eso16756395e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 09 May 2025 07:33:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746801205; x=1747406005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VL9vZro0BdFwyk98zVNm2YYJ6CabP26FrlBnQZyFPJw=;
-        b=LFh2j+bVZ+rgETzZPghRuMCMvA7cGsQk13KMC2eO0GfKJaEmnKJIy9KKFlODd0WtIt
-         FxyPKNcL+qrRsxly6erJ+cOvveW3rM8T30nwY+UWu6oEhy0vwn3SNcc7h0eefOFhaajs
-         DbdUP+47NiQuhLZH5unWjucIOs31ATRxtcQE7H7gbx7ju4MkIIvNOHU0rdg4eqI8OcJB
-         /mICtV2XhRglYMJqXd4tZE3FSPdi0/SiCUyxp3iMpOAP30EdfkjqF5OSVmg+kNWarlBH
-         FokFFNvrMURbqb+zLdHg/2jMoBx6eVtRE/thcCBN+wzmJb2iDr01HDfr0+GiAgLop9yh
-         cqHA==
-X-Forwarded-Encrypted: i=1; AJvYcCXC/3Pmuhy0iGwp+5iOIBCw0jtQ9bvbSR5DJ3UdpzsrUQNOQLPOzEnMc/ozJXQUwQ7ln8CLjiI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzcNRgxW5/TYNbYFjJG7SZkhxOF2Fl7vtyh++erzbv8HlDk/rhA
-	SiS+gS9BQemN4pBF0EaGtOfsTxtMCk7ZbjVVruHlLXFoTrVGivG6FosRGuFUzujT3ajkne5J7RV
-	FfL9Zvp2Xr13+D+Ng8/d7jA0l/grrj+zRI0UD8TVhK9d/uuZCtyV0iA==
-X-Gm-Gg: ASbGncuEXT9CdmKTU7sL7PY+QQ0b7QByI7XN3FK7/F9ZO+HGHsXMZn+/HxWTzN/U9a9
-	eUnRC8lE7nq2FP3yvPeg7aKI1ns02GHAYEu6Wn4/pZQ8W8YTSa5SeGSxp7Eu1gTvJWtEDnbUIKE
-	kYlaGN92xxZSd3EuXZp/fWHyszxnQR7swD/wCU2G94fhIBZpgfNmX4pNGgKq8XkrrYYMDK+QD+Q
-	MiAoYbrdNdpzGWGUTgKvIawJ2inQb5DGDG2HIV8h54LxcPeCFScao/XiEULn/tBgj5sH+kKvXVt
-	EG6GsLVmUjCO5Isog64fd4Tfz1q/GhxyuBBhZrfMpsuQNXooVi2eT2aIzZIPHcV9h9VF10tztLY
+        d=1e100.net; s=20230601; t=1746801208; x=1747406008;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AdRsO2Uefrz8JMO751IFZEkS7KH/EcFqwNDUBdHYAOY=;
+        b=rQk2UOz8domUhz8+3OuyuAjlhWAofsRsFxOrbu6IEIGMX8PyguIiRMZVN/FLzKUZiO
+         z/Fvk1wWKZZLGhkOMD4iOYO7MEDe2jg6bo3EqRTNWoVqeHgNsz9Ko1mj5X4GXL+1C2In
+         OAFUUoZIGAcIQGbyJhx5dOp8xKoMVTuer8ZKr80XOKxk5zymmtfJNEEWUJGr+92UwwI+
+         KxH7c1OLtZjWL0VW6/dDxRROzU/g5+RwOPudvyxGKaUCt2Bbg7G4HJWx/FZbL4jhIBhM
+         orMK3wugA7fz6p2cdf3SKoDQn94Bkx0U/wk/qPuzR/OPCvS97J6aMarNZWqnsZ5jdxy6
+         5IXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWUnaFZig0W2XuVmAn2MebCWk1Vsve6QTGsP7fYRFki+L+ppjWXQPtvsWdtIfV8BebFdNokcpE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxfMqX1mr5FPm2shJV7GREB59wF37b7TpTVjMD8xzF0eMlalRQD
+	rSvouDsz8eSbdqYr9z1ktdbSXqVbCmfRRnXbGox1GAhXhNbLSWZceuB8IwyPAcSpta5chGe7r1G
+	blp+Iwc/lcLPBRvFDRuISAOyLAp3hkS1jV7UghuuZ4TYs0Mc+WeVsJg==
+X-Gm-Gg: ASbGncvZ3I+YjECr9fS5M3xFivbHF3DcB8tTGbH2KM7hXP83xEP8OoFHk5LjSq1/Krf
+	LPjzyF9zykGQCfk4nHzBMgLsEiPZxK3oel4V4Kgm9H1m6XjwOLO+luQvubAGopXug7Avlta6jBV
+	Thl6NQZaEkC1//RXe85/TSPvxoO65Twi+k4VpUW0LDlnqcXK/l1PApmqvb3yUDyNrCGPXv9us++
+	+PEekpOgn0vj27gs5sICZeUhaoVyBMyzwdUW7Y7HUszGK1+dKEAarV592KIJQJMZGnBbDiOLHYg
+	n0HrTp+kUxOpwYl76SNEJ5p6GSoL9d0pgB189kqEeSYwFwTjrTtMZJl4pLpSZuhF+7+AaKFJMSc
 	=
-X-Received: by 2002:a05:600c:83ca:b0:43d:2313:7b4a with SMTP id 5b1f17b1804b1-442d6d18302mr36807215e9.3.1746801204810;
-        Fri, 09 May 2025 07:33:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHsWDESg6zUq+whRTNp61iivnxaZlKkiv8gH+MG5fYiPl5xSd+s4VyqNCOQwrNmOxuB7m8DQQ==
-X-Received: by 2002:a05:600c:83ca:b0:43d:2313:7b4a with SMTP id 5b1f17b1804b1-442d6d18302mr36806865e9.3.1746801204462;
-        Fri, 09 May 2025 07:33:24 -0700 (PDT)
+X-Received: by 2002:a05:600c:83ca:b0:43c:fb95:c752 with SMTP id 5b1f17b1804b1-442d6d18b68mr35853885e9.3.1746801207832;
+        Fri, 09 May 2025 07:33:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHm9MkDy/quubUQsSnalTOipje79m4aFFrG3Bj/W0QEAlm0r1Z0dt5gqWlFblcQZwsloaT3Fw==
+X-Received: by 2002:a05:600c:83ca:b0:43c:fb95:c752 with SMTP id 5b1f17b1804b1-442d6d18b68mr35853555e9.3.1746801207515;
+        Fri, 09 May 2025 07:33:27 -0700 (PDT)
 Received: from rh.redhat.com (p200300f6af1bce00e6fe5f11c0a7f4a1.dip0.t-ipconnect.de. [2003:f6:af1b:ce00:e6fe:5f11:c0a7:f4a1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442d67d5c7bsm32150775e9.4.2025.05.09.07.33.23
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442d67d5c7bsm32150775e9.4.2025.05.09.07.33.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 May 2025 07:33:24 -0700 (PDT)
+        Fri, 09 May 2025 07:33:27 -0700 (PDT)
 From: Sebastian Ott <sebott@redhat.com>
 To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
@@ -77,10 +79,12 @@ Cc: Colton Lewis <coltonlewis@google.com>,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Sebastian Ott <sebott@redhat.com>
-Subject: [PATCH 0/3] KVM: arm64: selftests: arch_timer_edge_cases fixes
-Date: Fri,  9 May 2025 16:33:09 +0200
-Message-ID: <20250509143312.34224-1-sebott@redhat.com>
+Subject: [PATCH 1/3] KVM: arm64: selftests: fix help text for arch_timer_edge_cases
+Date: Fri,  9 May 2025 16:33:10 +0200
+Message-ID: <20250509143312.34224-2-sebott@redhat.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250509143312.34224-1-sebott@redhat.com>
+References: <20250509143312.34224-1-sebott@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -88,25 +92,32 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: oUz7RlG8FapGQr018A6pmk_BK28qQFEXVu5YHnifrk4_1746801205
+X-Mimecast-MFC-PROC-ID: 6WN1rMbRzVoPO2oW8jb4S9hIFVz6rtif9erqsnzB79M_1746801208
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
-Some small fixes for arch_timer_edge_cases that I stumbled upon
-while debugging failures for this selftest on ampere-one.
+Fix the help text for arch_timer_edge_cases to show the correct
+option for setting the wait time.
 
-Sebastian Ott (3):
-  KVM: arm64: selftests: fix help text for arch_timer_edge_cases
-  KVM: arm64: selftests: fix thread migration in arch_timer_edge_cases
-  KVM: arm64: selftests: arch_timer_edge_cases - workaround for
-    AC03_CPU_14
+Signed-off-by: Sebastian Ott <sebott@redhat.com>
+---
+ tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- .../selftests/kvm/arm64/arch_timer_edge_cases.c      | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-
-base-commit: 9c69f88849045499e8ad114e5e13dbb3c85f4443
+diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+index a36a7e2db434..c4716e0c1438 100644
+--- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
++++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+@@ -986,7 +986,7 @@ static void test_print_help(char *name)
+ 	pr_info("\t-b: Test both physical and virtual timers (default: true)\n");
+ 	pr_info("\t-l: Delta (in ms) used for long wait time test (default: %u)\n",
+ 	     LONG_WAIT_TEST_MS);
+-	pr_info("\t-l: Delta (in ms) used for wait times (default: %u)\n",
++	pr_info("\t-w: Delta (in ms) used for wait times (default: %u)\n",
+ 		WAIT_TEST_MS);
+ 	pr_info("\t-p: Test physical timer (default: true)\n");
+ 	pr_info("\t-v: Test virtual timer (default: true)\n");
 -- 
 2.49.0
 
