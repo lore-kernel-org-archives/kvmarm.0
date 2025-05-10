@@ -1,60 +1,142 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFCE23CEF8;
-	Fri,  9 May 2025 19:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59686610D;
+	Sat, 10 May 2025 09:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746820440; cv=none; b=jRpGgdvlEOiRboBtxEQtgod1wbqMDeR7X/008sMOUxhEpdO7d2VROQo6W3Ewxtwc7rrzNOt4mi1ADOzjAIEsl4+f7wKM2Fs0OWN3S7mNQ8IS4RJcl0vnCB0SdQrrSrFXk1QbTlEw+OGsfGKEwgwazL8v8L1CVEOTYcG+4jA1+/4=
+	t=1746867796; cv=none; b=bzzBKsXraOjEMKRIu93unglA+bZvj+5NaQPxPq2w5GKs0veCDgKdGDo7k5xhyXp3iDrZ3vA4Dz7WgsokG0eTy2Z2pablPh44aYxBM1rMhGqX46q/VhogKzAEY3a7dCoIMzJnKGWpMEy0nood7ORfFCNsL9sumeX9enwM0J0FU9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746820440; c=relaxed/simple;
-	bh=9F7MpQr8DTQtiQSo+kr1eN+p3ADiua+iMiJ1xVEnzX4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SR8DLqHhmCWUX5z5XsC7aZmuXgMl95OfiBq+XOfyHBMyQwOA0PMZ9cQoDUJKWNdlFSGD9CVGmWJ/6ed4DDMat59SyLZRN7h2lPpVXDwcjP5qNNX+Oer6RxziEXU3rtX8SgjMZYkG1rIm8ZSP06PhTFVTKAc5a47SZly0i1Ii7Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4BE1C4CEE4;
-	Fri,  9 May 2025 19:53:57 +0000 (UTC)
-Date: Fri, 9 May 2025 15:54:12 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
- joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- jstultz@google.com, qperret@google.com, will@kernel.org,
- kernel-team@android.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 08/24] ring-buffer: Expose buffer_data_page material
-Message-ID: <20250509155412.03c89196@gandalf.local.home>
-In-Reply-To: <20250506164820.515876-9-vdonnefort@google.com>
-References: <20250506164820.515876-1-vdonnefort@google.com>
-	<20250506164820.515876-9-vdonnefort@google.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1746867796; c=relaxed/simple;
+	bh=gKArUPq/LOsmWZFtbSjRAerxf4ZgQ0kJBSBsD9tlBuY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cL6788+2Mdp6a+Yws4hUfjdrzq+GuCmTX84WwgudstKMr0h/PkeU1wJwJwEiKFLZRBeb3bW/cN/DsB3E9c42VNdd+a9MS+t2Xdgg+wIi7s6bbz6+g1iR9QCUb4kIS8ttsROeI5vucfBLnNIuqHbg/k1hm7u1WMnNsbrKzJcZrYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m0Pj8se0; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m0Pj8se0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9ABDC4CEEB;
+	Sat, 10 May 2025 09:03:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746867795;
+	bh=gKArUPq/LOsmWZFtbSjRAerxf4ZgQ0kJBSBsD9tlBuY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m0Pj8se0Xs9Y/tCzp8Yw9GXyysM7WmBxuWI8x4y3qe+7btAl3Ym3gGxG6jigQAKcw
+	 BgYItJGvA5paKzlGMOcC3lEKctSaQUw3osChhdrrKi6+oEP3S6t8ewOFYCCfe2ScO6
+	 TB69GHyVFtvPad0hXwZwQWU8adjd+t9xtIUgKDKd1askI+PewXlOiutRQQTfmTbRC9
+	 6dxR3ffqHoYIrtkTjDzB3jqId4bDFZ2hj7FYNUjqGKbLqwmzKdo3hPN12XobiH3IiV
+	 6zfZGh76SFs+MxZPjJo90MS5RKeQo8kHFYp7urBTxO+y7INcxGzix6QN6bp+HX73sw
+	 xFQRzucMJ8B4g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uDg6z-00DdfH-Cc;
+	Sat, 10 May 2025 10:03:13 +0100
+Date: Sat, 10 May 2025 10:03:10 +0100
+Message-ID: <87jz6o6do1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Colton Lewis <coltonlewis@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 3/3] KVM: arm64: selftests: arch_timer_edge_cases - workaround for AC03_CPU_14
+In-Reply-To: <20250509143312.34224-4-sebott@redhat.com>
+References: <20250509143312.34224-1-sebott@redhat.com>
+	<20250509143312.34224-4-sebott@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebott@redhat.com, oliver.upton@linux.dev, coltonlewis@google.com, ricarkol@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue,  6 May 2025 17:48:04 +0100
-Vincent Donnefort <vdonnefort@google.com> wrote:
-
-> In preparation for allowing the write of ring-buffer compliant pages
-> outside of ring_buffer.c, move buffer_data_page and timestamps
-> encoding functions into the publicly available ring_buffer.h.
+On Fri, 09 May 2025 15:33:12 +0100,
+Sebastian Ott <sebott@redhat.com> wrote:
 > 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> arch_timer_edge_cases currently fails on ampere-one machines with
+> the following assertion failure:
+> 
+> ==== Test Assertion Failure ====
+>   arm64/arch_timer_edge_cases.c:169: timer_condition == istatus
+>   pid=11236 tid=11236 errno=4 - Interrupted system call
+>      1  0x0000000000404ce7: test_run at arch_timer_edge_cases.c:938
+>      2  0x0000000000401ebb: main at arch_timer_edge_cases.c:1053
+>      3  0x0000ffff9fa8625b: ?? ??:0
+>      4  0x0000ffff9fa8633b: ?? ??:0
+>      5  0x0000000000401fef: _start at ??:?
+>   0x1 != 0x0 (timer_condition != istatus)
+> 
+> Meaning that the timer condition was met and an interrupt
+> was presented but the timer status bit in the control register
+> was not set.
+> 
+> This happens due to AC03_CPU_14 "Timer CVAL programming of a delta
+> greater than 2^63 will result in incorrect behavior."
+> 
+> Work around this issue by reducing the value that is used to reset
+> the counter and thus reduce the delta.
+> 
+> Link: https://lore.kernel.org/kvmarm/ac1de1d2-ef2b-d439-dc48-8615e121b07b@redhat.com
+> Link: https://amperecomputing.com/assets/AmpereOne_Developer_ER_v0_80_20240823_28945022f4.pdf
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> index a813b4c6c817..2f0397df0aa6 100644
+> --- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> +++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> @@ -31,7 +31,7 @@ static const int32_t TVAL_MIN = INT32_MIN;
+>  static const uint32_t TIMEOUT_NO_IRQ_US = 50000;
+>  
+>  /* A nice counter value to use as the starting one for most tests. */
+> -static const uint64_t DEF_CNT = (CVAL_MAX / 2);
+> +static const uint64_t DEF_CNT = (CVAL_MAX / 4);
 
-Let's create a new file for this instead of adding it to ring_buffer.h.
-Although it's being used by remote buffers, I rather not make this
-something that people may think they can access anywhere.
+This is rather arbitrary, and only sidestep the issue: the core
+problem is that CVAL_MAX is defined as ~0, and that we have no idea
+what the *effective* counter width is.
 
-Perhaps: ring_buffer_types.h
+So while this happen to sidestep the particular Ampere erratum (and
+avoid failures on X1E), this is only papering over the problem. Which
+is why I always had some reservations on this particular test -- it is
+remarkably broken.
 
-with a comment stating that these are to be used by the remote ring buffers
-and the ring buffer internals and should not be used directly.
+If anything, we should compute the expected width of the counter based
+on the frequency and the architectural guarantees ("Roll-over time of
+not less than 40 years."), just like the kernel driver does (see
+arch_counter_get_width()).
 
--- Steve
+I'm also not keen on hiding a HW bug by altering the test. What of
+other guests that would fall into the same issue? If we think the
+problem exposed by this test is serious enough, then we need to fully
+trap and emulate the timers, X1E style. Performance would definitely
+suffer, but that would be the correct thing to do.
 
+So my proposal is to fix the test to be compliant with the intent of
+the architecture instead of making bets and using semi-random values.
+If that's good enough to make that test pass on A1, great.
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
