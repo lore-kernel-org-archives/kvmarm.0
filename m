@@ -1,105 +1,307 @@
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050111E32DB
-	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 14:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E499918DB14;
+	Mon, 12 May 2025 14:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747058964; cv=none; b=Zv1rUDrh5Rxh21lIbDC8GfOapPrai6rxDGiAOip0aL0a8zlPOx0mBVXP5b2BqorteAnx0DgWlv6M6rWrYIwTBI+9JyS+eDqC7CROWaqzTjFR7AZcyP6ANYGNzc9lXkLUqa0n6Wdy3riNbMPYvkKqeD2ZzFoIVRElewB7QR0CJ5s=
+	t=1747061101; cv=none; b=FGs3+wJfIIhP89BnSCIvYz3qgzOE+J/F+Hi9WouAW1K4yJka8zG7d1IxAqSDXh3Cvaqoqrt5zxbpcTbaiqk3tj5c8R9T6LEjxqRxchiXoWorNg/e6Q2NMO9NtkfzC7g3mcVp3i/2WswH31CiF4f1tXd5zJ4Qj2e2GaouDudQB04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747058964; c=relaxed/simple;
-	bh=bs0KT0uEopTREFIV09FXprEMp4r+yb1cp38ev0pRS7o=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XZd5qwzHbQsT+uF8wVlrtdikXDAfbNwMvfEoTzUxr6GXev4LBxHCZsbaZdSB06QOUSk5huQcvQ99HxymEj1rx05kge6CWT15f52I6o6BQLGTtbaJ0Tn7vvYV8XeBbpCwbaBFxA6fLjDL6yVTOfqyAN/fJ2vVxTDtr0EjB677KE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=s9KQ4ByV; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="s9KQ4ByV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1747058963; x=1778594963;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bs0KT0uEopTREFIV09FXprEMp4r+yb1cp38ev0pRS7o=;
-  b=s9KQ4ByVZwCtw8FnIG6rzV6PwIa71HAg9AGlviS8njwPznNMUB1hH9Rr
-   o+xyeWd0F6UxHAtUurb9meYdifM9rgt+78ztOBdw7OoOD+KumGmftyuIA
-   kxqw7IHz+pGVMVoPEjbCEYLm1FHI+XrR0GdCV8MEAAskSuc5J3T4mwjWo
-   7p7NkvrsqZDaxBmTtBWEOtDqbDp2cnpOC0yPFjp9Ohhq0zPbe3RqOHqBn
-   716x7QrSh5CwRKrAhif8kpLbey8utMbdge8Nb25YyjrF+ofEJL5/GCHw4
-   JD8IteHfcPMHy8UjujvJHjEt3/9G2GeNsUvlZHhg1RvfRd3WEjtG39n4E
-   w==;
-X-IronPort-AV: E=Sophos;i="6.15,282,1739836800"; 
-   d="scan'208";a="489002478"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 14:09:19 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:46847]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.21.215:2525] with esmtp (Farcaster)
- id d1c2ccfc-6936-4d2e-9e97-d566a0803f65; Mon, 12 May 2025 14:09:19 +0000 (UTC)
-X-Farcaster-Flow-ID: d1c2ccfc-6936-4d2e-9e97-d566a0803f65
-Received: from EX19D023EUB003.ant.amazon.com (10.252.51.5) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 12 May 2025 14:09:18 +0000
-Received: from dev-dsk-dssauerw-1b-2c5f429c.eu-west-1.amazon.com
- (10.13.238.31) by EX19D023EUB003.ant.amazon.com (10.252.51.5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14; Mon, 12 May 2025 14:09:13 +0000
-From: David Sauerwein <dssauerw@amazon.de>
-To: <jingzhangos@google.com>
-CC: <andre.przywara@arm.com>, <coltonlewis@google.com>, <eauger@redhat.com>,
-	<jiangkunkun@huawei.com>, <joey.gouly@arm.com>, <kvm@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<lishusen2@huawei.com>, <maz@kernel.org>, <oupton@google.com>,
-	<pbonzini@redhat.com>, <rananta@google.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <graf@amazon.com>, <nh-open-source@amazon.com>
-Subject: Re: [PATCH v4 5/5] KVM: arm64: vgic-its: Clear ITE when DISCARD frees an ITE
-Date: Mon, 12 May 2025 14:09:09 +0000
-Message-ID: <20250512140909.3464-1-dssauerw@amazon.de>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241107214137.428439-6-jingzhangos@google.com>
-References: <20241107214137.428439-6-jingzhangos@google.com>
+	s=arc-20240116; t=1747061101; c=relaxed/simple;
+	bh=XAITQ9gGYPlNcp5g5iWOivskIm4vLmuGTyg7TfZHkIQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bo4kG97MRtnYWrCq/v4a+CsU59CQlv39J8SuQKH41QXnwF0h6fcMPEnFL2QcckJQhm6aXPFYiIlpZF/8WSED07eDNeb/J5Uyc3w4q6tb9tidru4tpRv2j50/DaVgQjzD0q6C+QB44eAH0NpQO6llj46GZNath5oO5WyZ+nTWRRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39CAC14BF;
+	Mon, 12 May 2025 07:44:47 -0700 (PDT)
+Received: from [10.57.21.218] (unknown [10.57.21.218])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A08D3F673;
+	Mon, 12 May 2025 07:44:53 -0700 (PDT)
+Message-ID: <8f7ab79a-6d9e-4b66-a74e-5fb1dd2beecd@arm.com>
+Date: Mon, 12 May 2025 15:44:51 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
- EX19D023EUB003.ant.amazon.com (10.252.51.5)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 13/43] arm64: RME: Support for the VGIC in realms
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-14-steven.price@arm.com>
+ <bf0b9232-36b0-41c5-89a5-6639719cd09e@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <bf0b9232-36b0-41c5-89a5-6639719cd09e@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Jing,
+On 02/05/2025 12:04, Suzuki K Poulose wrote:
+> On 16/04/2025 14:41, Steven Price wrote:
+>> The RMM provides emulation of a VGIC to the realm guest but delegates
+>> much of the handling to the host. Implement support in KVM for
+>> saving/restoring state to/from the REC structure.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes from v5:
+>>   * Handle RMM providing fewer GIC LRs than the hardware supports.
+>> ---
+>>   arch/arm64/include/asm/kvm_rme.h |  1 +
+>>   arch/arm64/kvm/arm.c             | 16 +++++++++---
+>>   arch/arm64/kvm/rme.c             |  5 ++++
+>>   arch/arm64/kvm/vgic/vgic-init.c  |  2 +-
+>>   arch/arm64/kvm/vgic/vgic-v3.c    |  6 ++++-
+>>   arch/arm64/kvm/vgic/vgic.c       | 43 ++++++++++++++++++++++++++++++--
+>>   6 files changed, 66 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>> asm/kvm_rme.h
+>> index f716b890e484..9bcad6ec5dbb 100644
+>> --- a/arch/arm64/include/asm/kvm_rme.h
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -92,6 +92,7 @@ struct realm_rec {
+>>     void kvm_init_rme(void);
+>>   u32 kvm_realm_ipa_limit(void);
+>> +u32 kvm_realm_vgic_nr_lr(void);
+>>     int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap
+>> *cap);
+>>   int kvm_init_realm_vm(struct kvm *kvm);
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index fd83efb667cc..808d7e479571 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -683,19 +683,24 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>           kvm_call_hyp_nvhe(__pkvm_vcpu_put);
+>>       }
+>>   +    kvm_timer_vcpu_put(vcpu);
+>> +    kvm_vgic_put(vcpu);
+>> +
+>> +    vcpu->cpu = -1;
+>> +
+>> +    if (vcpu_is_rec(vcpu))
+>> +        return;
+>> +
+>>       kvm_vcpu_put_debug(vcpu);
+>>       kvm_arch_vcpu_put_fp(vcpu);
+>>       if (has_vhe())
+>>           kvm_vcpu_put_vhe(vcpu);
+>> -    kvm_timer_vcpu_put(vcpu);
+>> -    kvm_vgic_put(vcpu);
+>>       kvm_vcpu_pmu_restore_host(vcpu);
+>>       if (vcpu_has_nv(vcpu))
+>>           kvm_vcpu_put_hw_mmu(vcpu);
+>>       kvm_arm_vmid_clear_active();
+>>         vcpu_clear_on_unsupported_cpu(vcpu);
+>> -    vcpu->cpu = -1;
+>>   }
+>>     static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>> @@ -912,6 +917,11 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu
+>> *vcpu)
+>>               return ret;
+>>       }
+>>   +    if (!irqchip_in_kernel(kvm) && kvm_is_realm(vcpu->kvm)) {
+>> +        /* Userspace irqchip not yet supported with Realms */
+>> +        return -EOPNOTSUPP;
+>> +    }
+>> +
+>>       mutex_lock(&kvm->arch.config_lock);
+>>       set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+>>       mutex_unlock(&kvm->arch.config_lock);
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+>> index f4923fc3b34e..1239eb07aca6 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -77,6 +77,11 @@ u32 kvm_realm_ipa_limit(void)
+>>       return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+>>   }
+>>   +u32 kvm_realm_vgic_nr_lr(void)
+>> +{
+>> +    return u64_get_bits(rmm_feat_reg0,
+>> RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS);
+>> +}
+>> +
+>>   static int get_start_level(struct realm *realm)
+>>   {
+>>       return 4 - ((realm->ia_bits - 8) / (RMM_PAGE_SHIFT - 3));
+>> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/
+>> vgic-init.c
+>> index 1f33e71c2a73..a81c7f3d1d42 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-init.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+>> @@ -81,7 +81,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>>        * the proper checks already.
+>>        */
+>>       if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
+>> -        !kvm_vgic_global_state.can_emulate_gicv2)
+>> +        (!kvm_vgic_global_state.can_emulate_gicv2 || kvm_is_realm(kvm)))
+>>           return -ENODEV;
+>>         /* Must be held to avoid race with vCPU creation */
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-
+>> v3.c
+>> index b9ad7c42c5b0..c10ad817030d 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -8,9 +8,11 @@
+>>   #include <linux/kvm_host.h>
+>>   #include <linux/string_choices.h>
+>>   #include <kvm/arm_vgic.h>
+>> +#include <asm/kvm_emulate.h>
+>>   #include <asm/kvm_hyp.h>
+>>   #include <asm/kvm_mmu.h>
+>>   #include <asm/kvm_asm.h>
+>> +#include <asm/rmi_smc.h>
+>>     #include "vgic.h"
+>>   @@ -758,7 +760,9 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+>>           return;
+>>       }
+>>   -    if (likely(!is_protected_kvm_enabled()))
+>> +    if (vcpu_is_rec(vcpu))
+>> +        cpu_if->vgic_vmcr = vcpu->arch.rec.run->exit.gicv3_vmcr;
+>> +    else if (likely(!is_protected_kvm_enabled()))
+>>           kvm_call_hyp(__vgic_v3_save_vmcr_aprs, cpu_if);
+>>       WARN_ON(vgic_v4_put(vcpu));
+>>   diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+>> index 8d189ce18ea0..c68a41a29917 100644
+>> --- a/arch/arm64/kvm/vgic/vgic.c
+>> +++ b/arch/arm64/kvm/vgic/vgic.c
+>> @@ -10,7 +10,9 @@
+>>   #include <linux/list_sort.h>
+>>   #include <linux/nospec.h>
+>>   +#include <asm/kvm_emulate.h>
+>>   #include <asm/kvm_hyp.h>
+>> +#include <asm/kvm_rme.h>
+>>     #include "vgic.h"
+>>   @@ -23,6 +25,8 @@ struct vgic_global kvm_vgic_global_state
+>> __ro_after_init = {
+>>     static inline int kvm_vcpu_vgic_nr_lr(struct kvm_vcpu *vcpu)
+>>   {
+>> +    if (unlikely(vcpu_is_rec(vcpu)))
+>> +        return kvm_realm_vgic_nr_lr();
+>>       return kvm_vgic_global_state.nr_lr;
+>>   }
+>>   @@ -864,10 +868,23 @@ static inline bool
+>> can_access_vgic_from_kernel(void)
+>>       return !
+>> static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) || has_vhe();
+>>   }
+>>   +static inline void vgic_rmm_save_state(struct kvm_vcpu *vcpu)
+>> +{
+>> +    struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < kvm_vcpu_vgic_nr_lr(vcpu); i++) {
+>> +        cpu_if->vgic_lr[i] = vcpu->arch.rec.run->exit.gicv3_lrs[i];
+>> +        vcpu->arch.rec.run->enter.gicv3_lrs[i] = 0;
+>> +    }
+>> +}
+> 
+> We also need to save/restore gicv3_hcr/cpuif->vgic_hcr.
 
-After pulling this patch in via the v6.6.64 and v5.10.226 LTS releases, I see
-NULL pointer dereferences in some guests. The dereference happens in different
-parts of the kernel outside of the GIC driver (file systems, NVMe driver,
-etc.). The issue only appears once every few hundred DISCARDs / guest boots.
-Reverting the commit does fix the problem. I have seen multiple different guest
-kernel versions (4.14, 5.15) and distributions exhibit this issue.
+I'm not sure how I missed that. Note that the RMM spec restricts the
+fields that the normal world is allowed to set. So I'll also add a new
+define to rmi_smc.h to provide the bitmask:
 
-The issue looks like some kind of race. I think the guest re-uses the memory
-allocated for the ITT before the hypervisor is actually done with the DISCARD
-command, i.e. before it zeros the ITE. From what I can tell, the guest should
-wait for the command to finish via its_wait_for_range_completion(). I tried
-locking reads to its->cwriter in vgic_mmio_read_its_cwriter() and its->creadr
-in vgic_mmio_read_its_creadr() with its->cmd_lock in the hypervisor kernel, but
-that did not help. I also instrumented the guest kernel both via printk() and
-trace events. In both cases the issue disappears once the instrumentation is in
-place, so I'm not able to fully observe what is happening on the guest side.
+#define RMI_PERMITTED_GICV3_HCR_BITS   (ICH_HCR_EL2_UIE |              \
+                                        ICH_HCR_EL2_LRENPIE |          \
+                                        ICH_HCR_EL2_NPIE |             \
+                                        ICH_HCR_EL2_VGrp0EIE |         \
+                                        ICH_HCR_EL2_VGrp0DIE |         \
+                                        ICH_HCR_EL2_VGrp1EIE |         \
+                                        ICH_HCR_EL2_VGrp1DIE |         \
+                                        ICH_HCR_EL2_TDIR)
 
-Do you have an idea of what might cause the issue?
+>> +
+>>   static inline void vgic_save_state(struct kvm_vcpu *vcpu)
+>>   {
+>>       if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>>           vgic_v2_save_state(vcpu);
+>> +    else if (vcpu_is_rec(vcpu))
+>> +        vgic_rmm_save_state(vcpu);
+>>       else
+>>           __vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
+>>   }
+>> @@ -903,10 +920,28 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>>       vgic_prune_ap_list(vcpu);
+>>   }
+>>   +static inline void vgic_rmm_restore_state(struct kvm_vcpu *vcpu)
+>> +{
+>> +    struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < kvm_vcpu_vgic_nr_lr(vcpu); i++) {
+>> +        vcpu->arch.rec.run->enter.gicv3_lrs[i] = cpu_if->vgic_lr[i];
+>> +        /*
+>> +         * Also populate the rec.run->exit copies so that a late
+>> +         * decision to back out from entering the realm doesn't cause
+>> +         * the state to be lost
+>> +         */
+>> +        vcpu->arch.rec.run->exit.gicv3_lrs[i] = cpu_if->vgic_lr[i];
+>> +    }
+>> +}
+>> +
+>>   static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+>>   {
+>>       if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>>           vgic_v2_restore_state(vcpu);
+>> +    else if (vcpu_is_rec(vcpu))
+>> +        vgic_rmm_restore_state(vcpu);
+>>       else
+>>           __vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+>>   }
+>> @@ -976,7 +1011,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>>     void kvm_vgic_load(struct kvm_vcpu *vcpu)
+>>   {
+>> -    if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !
+>> vgic_initialized(vcpu->kvm))) {
+>> +    if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
+>> +             !vgic_initialized(vcpu->kvm) ||
+>> +             vcpu_is_rec(vcpu))) {
+> 
+> 
+>>           if (has_vhe() &&
+>> static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>>               __vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+>>           return;
+>> @@ -990,7 +1027,9 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu)
+>>     void kvm_vgic_put(struct kvm_vcpu *vcpu)
+>>   {
+>> -    if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !
+>> vgic_initialized(vcpu->kvm))) {
+>> +    if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
+>> +             !vgic_initialized(vcpu->kvm) ||
+>> +             vcpu_is_rec(vcpu))) {
+>>           if (has_vhe() &&
+>> static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>>               __vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+> 
+> We could return early here for rec, and skip the unnecessary trap steps.
+> Similar for the vgic_load case.
 
-David
+Ack. I think this was me getting confused during a rebase ;) I'll pull
+out the "if (unlikely(vcpu_is_rec())" and return early.
 
+Steve
 
-
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
+> Rest looks good to me.
+> 
+> Suzuki
+> 
+> 
+>>           return;
+> 
 
