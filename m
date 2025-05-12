@@ -1,291 +1,197 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A561EDA06;
-	Mon, 12 May 2025 14:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667D324C099
+	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 16:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747061141; cv=none; b=kFneupT73yUZLTzcb+Qbw8lHdDrV06sNM/yuvBe8s3RizcXYG71yX24T1JQixyV4VfkytBSqTd7Okm5Mwh819j/GTZQen4L6o/blirSiEVwoHpNwD+PYX1A/aJLU8f5z9K15T9/k7QhG0EI8s3NtPPfIi2XWJ0jQnOzl2kGOWvM=
+	t=1747068387; cv=none; b=exIZtbJzC6tN9X51XpAQcOnORBT7qNz6QQpueS/iGyz+GWIQtp3JkaMANP3r1bf5Rs3vP8XrmKWOYHNGovg6cH9BOS1rRv8U+A9EOtP6wgnlk+Xk4Keu31Jg6HW6BftwxON2cG9u9SPC36efjVA1vDHxtXpv68uP3u9iVxmUp0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747061141; c=relaxed/simple;
-	bh=u5dr95GixDsIATIzfH8+P0BjJQyZkXENkW98trzSn/k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fEx1akb15zza2LI3LP3+PNEGsV3oGqfCKzWTDgutyMX2QgXDYUA4QnCXvjMdBVXMqbFSHmPrzzbpRsDk/1dtwlA6uet9c3CFEpyd6kd36InNRqJlPIhXTGGvWbeybSlLZi6UIjGZ80eYxOKvfMNnqzS0DXDf/6aUfYRN5vHYPes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CD6014BF;
-	Mon, 12 May 2025 07:45:27 -0700 (PDT)
-Received: from [10.57.21.218] (unknown [10.57.21.218])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D8883F673;
-	Mon, 12 May 2025 07:45:33 -0700 (PDT)
-Message-ID: <805af62d-1d3a-4084-8f71-17b58ff0089f@arm.com>
-Date: Mon, 12 May 2025 15:45:31 +0100
+	s=arc-20240116; t=1747068387; c=relaxed/simple;
+	bh=qukYTQ9gqsLGpARstbxnyXkpA+4LfgM/mx0IKU7X1MU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KFUhmp3KKrO7zsbuOh0fijR8hxFWrY01TKzy2hVXMLj7GzVtlkhvEUUVD0mM5LGWb1Jhvn2T+EMxnWIur1PzK/KBP9eVNu1SG0k74rYBXWPTl407G0innOBdc88bSLfSo5I8ibLLB0bJHEsgyvpmEMTDCnu75EFuiTqvFaQOOHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d81a0224e7so83022535ab.3
+        for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 09:46:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747068384; x=1747673184;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e79DEBw39ni0myLiGMqi2od8L0GXfqigIyanB8qli9w=;
+        b=wgnei+A50Iv9uVpaxUF5anybXZCBBDn0ayqZg3idvwEy6fJkx07jOWeqfbeHmvM3h8
+         qF4TcwgqBOlROkHLhV6Gqu8lGap0oBZCWNarrnT66qtiNHjB0e/ibpHk0Rl8KzWH1gkO
+         EZt+pIczuM7hL/99bhiEjl7y9QXwNmgjVhM0GuPLaO73insP3/KBisdGR6JtRlTn3NOE
+         RZh/bKo+ZJ4TvguURvPGBLLbloTRwK4LqN9yll/ZuY3B3qqBFQJPKi+L2CyG1ydQ/i2k
+         yxVwNL2p4SMSBLU+t0hK0KF/ixIwJIvyCe/ljC4E3xp9es/j1+IoE0k/U3HAUiDuC7zZ
+         2UHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2J/9vtksv8PLsbWQ/dBwshb92eZPxF6mwlAbsDMvGI82xC7NMe258IdoBWXB6U3944ClHwHY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxuUm5iMnFUJFCGhXFKF85incB8YgJlgBa5uav7c8nsz0c4q5xS
+	VgC5c7DhutdBfOKe4OJMjJqQ3v7HzCXaWi+dvn8Owtk9DNv/4tsbVHVkuLvdoXvG7k/oeGg4dfr
+	9s9RoDy5yyV44/JwAH8jOAbIQDk4Q5O58I47N10NfMjyFyiR5sYgXoD4=
+X-Google-Smtp-Source: AGHT+IFXNBCoJpWUIqc40y4go3YSzmW9SL0u3Q96FgkKvHitoh8WNiTMksarST9yKwP7q5T4iCwsN4hbe1ibq60vt4FXo0QMpcSz
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-17-steven.price@arm.com>
- <82c0ee14-65fb-4f34-892a-a3820d8d0f97@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <82c0ee14-65fb-4f34-892a-a3820d8d0f97@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:154e:b0:3d8:2187:5cea with SMTP id
+ e9e14a558f8ab-3da7e1e6257mr169782655ab.1.1747068384389; Mon, 12 May 2025
+ 09:46:24 -0700 (PDT)
+Date: Mon, 12 May 2025 09:46:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <682225e0.050a0220.f2294.0075.GAE@google.com>
+Subject: [syzbot] [kvmarm?] KASAN: invalid-access Read in kvm_vgic_set_owner
+From: syzbot <syzbot+9993ad918a0b1c0af91c@syzkaller.appspotmail.com>
+To: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, 
+	syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 07/05/2025 11:26, Suzuki K Poulose wrote:
-> On 16/04/2025 14:41, Steven Price wrote:
->> Entering a realm is done using a SMC call to the RMM. On exit the
->> exit-codes need to be handled slightly differently to the normal KVM
->> path so define our own functions for realm enter/exit and hook them
->> in if the guest is a realm guest.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v7:
->>   * A return of 0 from kvm_handle_sys_reg() doesn't mean the register has
->>     been read (although that can never happen in the current code). Tidy
->>     up the condition to handle any future refactoring.
->> Changes since v6:
->>   * Use vcpu_err() rather than pr_err/kvm_err when there is an associated
->>     vcpu to the error.
->>   * Return -EFAULT for KVM_EXIT_MEMORY_FAULT as per the documentation for
->>     this exit type.
->>   * Split code handling a RIPAS change triggered by the guest to the
->>     following patch.
->> Changes since v5:
->>   * For a RIPAS_CHANGE request from the guest perform the actual RIPAS
->>     change on next entry rather than immediately on the exit. This allows
->>     the VMM to 'reject' a RIPAS change by refusing to continue
->>     scheduling.
->> Changes since v4:
->>   * Rename handle_rme_exit() to handle_rec_exit()
->>   * Move the loop to copy registers into the REC enter structure from the
->>     to rec_exit_handlers callbacks to kvm_rec_enter(). This fixes a bug
->>     where the handler exits to user space and user space wants to modify
->>     the GPRS.
->>   * Some code rearrangement in rec_exit_ripas_change().
->> Changes since v2:
->>   * realm_set_ipa_state() now provides an output parameter for the
->>     top_iap that was changed. Use this to signal the VMM with the correct
->>     range that has been transitioned.
->>   * Adapt to previous patch changes.
->> ---
->>   arch/arm64/include/asm/kvm_rme.h |   3 +
->>   arch/arm64/kvm/Makefile          |   2 +-
->>   arch/arm64/kvm/arm.c             |  19 +++-
->>   arch/arm64/kvm/rme-exit.c        | 170 +++++++++++++++++++++++++++++++
->>   arch/arm64/kvm/rme.c             |  19 ++++
->>   5 files changed, 207 insertions(+), 6 deletions(-)
->>   create mode 100644 arch/arm64/kvm/rme-exit.c
->>
->> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
->> asm/kvm_rme.h
->> index b916db8565a2..d86051ef0c5c 100644
->> --- a/arch/arm64/include/asm/kvm_rme.h
->> +++ b/arch/arm64/include/asm/kvm_rme.h
->> @@ -101,6 +101,9 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32
->> ia_bits);
->>   int kvm_create_rec(struct kvm_vcpu *vcpu);
->>   void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->>   +int kvm_rec_enter(struct kvm_vcpu *vcpu);
->> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
->> +
->>   void kvm_realm_unmap_range(struct kvm *kvm,
->>                  unsigned long ipa,
->>                  unsigned long size,
->> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index 2ebc66812d49..c4b10012faa3 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -24,7 +24,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o
->> pvtime.o \
->>        vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
->>        vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
->>        vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
->> -     rme.o
->> +     rme.o rme-exit.o
->>     kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->>   kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 7c0bb1b05f4c..cf707130ef66 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -1263,7 +1263,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>           trace_kvm_entry(*vcpu_pc(vcpu));
->>           guest_timing_enter_irqoff();
->>   -        ret = kvm_arm_vcpu_enter_exit(vcpu);
->> +        if (vcpu_is_rec(vcpu))
->> +            ret = kvm_rec_enter(vcpu);
->> +        else
->> +            ret = kvm_arm_vcpu_enter_exit(vcpu);
->>             vcpu->mode = OUTSIDE_GUEST_MODE;
->>           vcpu->stat.exits++;
->> @@ -1319,10 +1322,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
->> *vcpu)
->>             local_irq_enable();
->>   -        trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu),
->> *vcpu_pc(vcpu));
->> -
->>           /* Exit types that need handling before we can be preempted */
->> -        handle_exit_early(vcpu, ret);
->> +        if (!vcpu_is_rec(vcpu)) {
->> +            trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu),
->> +                       *vcpu_pc(vcpu));
->> +
->> +            handle_exit_early(vcpu, ret);
->> +        }
-> 
-> minor nit: Looks like we loose the kvm_exit trace. Could we add
-> something in handle_rec_exit ?
+Hello,
 
-I dropped the trace because we can't provide the PC value. I'm not sure
-what's best here:
+syzbot found the following issue on:
 
- (1). Provide kvm_exit trace but with a bogus PC.
- (2). Introduce a new 'kvm_rec_exit'.
- (3). Wait until someone comes along with a use-case and hope they
-      implement what they need.
+HEAD commit:    c4e91ea0cc7e Merge branch kvm-arm64/misc-6.16 into kvmarm-..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10f27768580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2f705363127f7638
+dashboard link: https://syzkaller.appspot.com/bug?extid=9993ad918a0b1c0af91c
+compiler:       Debian clang version 20.1.3 (++20250415083350+2131242240f7-1~exp1~20250415203523.103), Debian LLD 20.1.3
+userspace arch: arm64
 
-Obviously my preference is 3 ;)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-In practice I haven't actually dropped kvm_entry (so that has a bogus
-PC), so for now I guess I'll go with (1).
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-c4e91ea0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7ecf29c15547/vmlinux-c4e91ea0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/59a7b6f25d98/Image-c4e91ea0.gz.xz
 
->>             preempt_enable();
->>   @@ -1345,7 +1351,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
->> *vcpu)
->>               ret = ARM_EXCEPTION_IL;
->>           }
->>   -        ret = handle_exit(vcpu, ret);
->> +        if (vcpu_is_rec(vcpu))
->> +            ret = handle_rec_exit(vcpu, ret);
->> +        else
->> +            ret = handle_exit(vcpu, ret);
->>       }
->>         /* Tell userspace about in-kernel device output levels */
->> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
->> new file mode 100644
->> index 000000000000..a1adf5610455
->> --- /dev/null
->> +++ b/arch/arm64/kvm/rme-exit.c
->> @@ -0,0 +1,170 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#include <linux/kvm_host.h>
->> +#include <kvm/arm_hypercalls.h>
->> +#include <kvm/arm_psci.h>
->> +
->> +#include <asm/rmi_smc.h>
->> +#include <asm/kvm_emulate.h>
->> +#include <asm/kvm_rme.h>
->> +#include <asm/kvm_mmu.h>
->> +
->> +typedef int (*exit_handler_fn)(struct kvm_vcpu *vcpu);
->> +
->> +static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +
->> +    vcpu_err(vcpu, "Unhandled exit reason from realm (ESR: %#llx)\n",
->> +         rec->run->exit.esr);
->> +    return -ENXIO;
->> +}
->> +
->> +static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
->> +{
->> +    return kvm_handle_guest_abort(vcpu);
->> +}
->> +
->> +static int rec_exit_sync_iabt(struct kvm_vcpu *vcpu)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +
->> +    vcpu_err(vcpu, "Unhandled instruction abort (ESR: %#llx).\n",
->> +         rec->run->exit.esr);
->> +    return -ENXIO;
->> +}
->> +
->> +static int rec_exit_sys_reg(struct kvm_vcpu *vcpu)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    unsigned long esr = kvm_vcpu_get_esr(vcpu);
->> +    int rt = kvm_vcpu_sys_get_rt(vcpu);
->> +    bool is_write = !(esr & 1);
->> +    int ret;
->> +
->> +    if (is_write)
->> +        vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[0]);
->> +
->> +    ret = kvm_handle_sys_reg(vcpu);
->> +    if (ret > 0 && !is_write)
->> +        rec->run->enter.gprs[0] = vcpu_get_reg(vcpu, rt);
->> +
->> +    return ret;
->> +}
->> +
->> +static exit_handler_fn rec_exit_handlers[] = {
->> +    [0 ... ESR_ELx_EC_MAX]    = rec_exit_reason_notimpl,
->> +    [ESR_ELx_EC_SYS64]    = rec_exit_sys_reg,
->> +    [ESR_ELx_EC_DABT_LOW]    = rec_exit_sync_dabt,
->> +    [ESR_ELx_EC_IABT_LOW]    = rec_exit_sync_iabt
->> +};
->> +
->> +static int rec_exit_psci(struct kvm_vcpu *vcpu)
->> +{
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    int i;
->> +
->> +    for (i = 0; i < REC_RUN_GPRS; i++)
->> +        vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
->> +
->> +    return kvm_smccc_call_handler(vcpu);
->> +}
->> +
->> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm *kvm = vcpu->kvm;
->> +    struct realm *realm = &kvm->arch.realm;
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    unsigned long base = rec->run->exit.ripas_base;
->> +    unsigned long top = rec->run->exit.ripas_top;
->> +    unsigned long ripas = rec->run->exit.ripas_value;
->> +
->> +    if (!kvm_realm_is_private_address(realm, base) ||
->> +        !kvm_realm_is_private_address(realm, top - 1)) {
->> +        vcpu_err(vcpu, "Invalid RIPAS_CHANGE for %#lx - %#lx, ripas:
->> %#lx\n",
->> +             base, top, ripas);
-> 
-> Do we need to set the RMI_REJECT for run->enter.flags
-> REC_ENTER_FLAG_RIPAS_RESPONSE ?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9993ad918a0b1c0af91c@syzkaller.appspotmail.com
 
-Makes sense, will add.
+==================================================================
+BUG: KASAN: invalid-access in __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+BUG: KASAN: invalid-access in _raw_spin_lock_irqsave+0x5c/0x7c kernel/locking/spinlock.c:162
+Read of size 1 at addr 00000000000013c8 by task syz.0.1041/7144
 
-Thanks,
-Steve
+CPU: 0 UID: 0 PID: 7144 Comm: syz.0.1041 Not tainted 6.15.0-rc4-syzkaller-gc4e91ea0cc7e #0 PREEMPT 
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:466 (C)
+ __dump_stack+0x30/0x40 lib/dump_stack.c:94
+ dump_stack_lvl+0xd8/0x12c lib/dump_stack.c:120
+ print_report+0x5c/0xa0 mm/kasan/report.c:524
+ kasan_report+0xb0/0x110 mm/kasan/report.c:634
+ __kasan_check_byte+0x3c/0x54 mm/kasan/common.c:557
+ kasan_check_byte include/linux/kasan.h:399 [inline]
+ lock_acquire+0xb0/0x2e0 kernel/locking/lockdep.c:5840
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0x5c/0x7c kernel/locking/spinlock.c:162
+ kvm_vgic_set_owner+0x18c/0x294 arch/arm64/kvm/vgic/vgic.c:611
+ timer_irqs_are_valid arch/arm64/kvm/arch_timer.c:1573 [inline]
+ kvm_timer_enable+0x1c4/0x794 arch/arm64/kvm/arch_timer.c:1631
+ kvm_arch_vcpu_run_pid_change+0x1f0/0x458 arch/arm64/kvm/arm.c:857
+ kvm_vcpu_ioctl+0xae8/0xc24 virt/kvm/kvm_main.c:4381
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl fs/ioctl.c:892 [inline]
+ __arm64_sys_ioctl+0x18c/0x244 fs/ioctl.c:892
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x90/0x2b4 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x180/0x2f4 arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x58/0x74 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x58/0x134 arch/arm64/kernel/entry-common.c:744
+ el0t_64_sync_handler+0x78/0x108 arch/arm64/kernel/entry-common.c:762
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
+==================================================================
+Unable to handle kernel paging request at virtual address ffef80000000013b
+KASAN: maybe wild-memory-access in range [0xff000000000013b0-0xff000000000013bf]
+Mem abort info:
+  ESR = 0x0000000096000004
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x04: level 0 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[ffef80000000013b] address between user and kernel address ranges
+Internal error: Oops: 0000000096000004 [#1]  SMP
+Modules linked in:
+CPU: 0 UID: 0 PID: 7144 Comm: syz.0.1041 Tainted: G    B               6.15.0-rc4-syzkaller-gc4e91ea0cc7e #0 PREEMPT 
+Tainted: [B]=BAD_PAGE
+Hardware name: linux,dummy-virt (DT)
+pstate: 604020c9 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : debug_spin_lock_before kernel/locking/spinlock_debug.c:86 [inline]
+pc : do_raw_spin_lock+0x4c/0x2b4 kernel/locking/spinlock_debug.c:115
+lr : __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
+lr : _raw_spin_lock_irqsave+0x64/0x7c kernel/locking/spinlock.c:162
+sp : ffff8000a8ef7930
+x29: ffff8000a8ef7940 x28: ddf00000139057c0 x27: ddf0000013906c30
+x26: 0000000000000001 x25: ddf0000013906e10 x24: 0000000000000010
+x23: a3ff8000a91ee000 x22: ddf00000139057c0 x21: ffff8000801fd8a4
+x20: 00000000000013b0 x19: efff800000000000 x18: 00000000000000ff
+x17: 000000000000001f x16: 00000000000000fe x15: 0000000000000000
+x14: 0000000000000000 x13: 00000000ffffffff x12: 0000000000000002
+x11: 0000000000000001 x10: 0ff000000000013b x9 : 0000000000000000
+x8 : 00000000000013b4 x7 : ffff8000870a9afd x6 : ffff800086582ed8
+x5 : 0000000000000000 x4 : 0000000000000000 x3 : ffff8000802a42dc
+x2 : 0000000000000001 x1 : 0000000000000000 x0 : 00000000000013b0
+Call trace:
+ debug_spin_lock_before kernel/locking/spinlock_debug.c:86 [inline] (P)
+ do_raw_spin_lock+0x4c/0x2b4 kernel/locking/spinlock_debug.c:115 (P)
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
+ _raw_spin_lock_irqsave+0x64/0x7c kernel/locking/spinlock.c:162
+ kvm_vgic_set_owner+0x18c/0x294 arch/arm64/kvm/vgic/vgic.c:611
+ timer_irqs_are_valid arch/arm64/kvm/arch_timer.c:1573 [inline]
+ kvm_timer_enable+0x1c4/0x794 arch/arm64/kvm/arch_timer.c:1631
+ kvm_arch_vcpu_run_pid_change+0x1f0/0x458 arch/arm64/kvm/arm.c:857
+ kvm_vcpu_ioctl+0xae8/0xc24 virt/kvm/kvm_main.c:4381
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl fs/ioctl.c:892 [inline]
+ __arm64_sys_ioctl+0x18c/0x244 fs/ioctl.c:892
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x90/0x2b4 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x180/0x2f4 arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x58/0x74 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x58/0x134 arch/arm64/kernel/entry-common.c:744
+ el0t_64_sync_handler+0x78/0x108 arch/arm64/kernel/entry-common.c:762
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
+Code: d344fd4a aa0003f4 f90007e9 d378fd09 (386a6a6a) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	d344fd4a 	lsr	x10, x10, #4
+   4:	aa0003f4 	mov	x20, x0
+   8:	f90007e9 	str	x9, [sp, #8]
+   c:	d378fd09 	lsr	x9, x8, #56
+* 10:	386a6a6a 	ldrb	w10, [x19, x10] <-- trapping instruction
 
-> Rest looks fine to me.
-> 
-> Suzuki
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
