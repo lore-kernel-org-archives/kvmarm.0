@@ -1,45 +1,79 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F192920B2
-	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 11:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B9A2951D2
+	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 13:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747050117; cv=none; b=L89c/KNVeSsZOXT/fA4dyNBf0os66n3XGN0n+wa3bcTQgJbPpKHbUbnv/sRvbCHH4Tc3M1soHWKK84BJZiyB5ykJSIsdN999pU+whEvKSVh+7962Uh3XWindYEiwI8hBPGZHa1bND+M1xG2JEQJ5GpNnZXKbvGrnv1S1HDp3HVY=
+	t=1747056619; cv=none; b=Dda/4QQ8zC1r7wPpGQmKz8A8m6BKG4SZxDVGQBl3pPgGCIb1YMwXglMz2e6jefai+Z0ishLU2b+ErfJ4VFko7b+0bYCvAXaJmmIFfrgj8ukOP2EiMrgFiUh55enQwhLw5mvFL/WBPIGakNVYWjdB1Q6x+9f5XDaqMoZ8dPDoJRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747050117; c=relaxed/simple;
-	bh=xs/xChQJ+EXLO8JrE05C4WI80rLUGS+/n8RI29Rdn2c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pGzUlA/oULzwCebNdhp4IX4bPiFOP1DEGzdCVQwj5Rq4/gAn5/C6twVB+Ro9lD4/7xVLKivPLzMfPNMJbWdyPF5nXuCOCfyYSyCj582R2lHXp7Ru5saF9ZR2Q0N7gEB0zQ5K7o/bnegiX2W7J4h1JthpEYujc9t96jZxNEGG6Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD15B150C;
-	Mon, 12 May 2025 04:41:43 -0700 (PDT)
-Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 64EE03F5A1;
-	Mon, 12 May 2025 04:41:52 -0700 (PDT)
-From: Ben Horgan <ben.horgan@arm.com>
-To: catalin.marinas@arm.com,
-	will@kernel.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
+	s=arc-20240116; t=1747056619; c=relaxed/simple;
+	bh=O8oz5UvKiTFaAgUQe1w3ZHg8nAMDBTrMSIwdDYm3EAE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GiLHaBBFrNYB5eLi449KOMg4UUwMvApiw/BYE0qFUEn8sxcePlOvTFKRtdLK7ddXMKZjmUuz3iYsSgGSVPTIprc1e8dQxWLLgT5waC0YwiyV7aaj5tLu1r0/UmXWpIiClCHlOQNL2ot62ibwaQ/8wt5h/8sapTT7qC3lKF/fzkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=Tmlzo3/3; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="Tmlzo3/3"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43d0782d787so30489345e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 06:30:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie.ntu.edu.tw; s=google; t=1747056613; x=1747661413; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6O0jvL9bp0RhLH3gFStx+IoQOSIzReGN6we6Sj8t7oo=;
+        b=Tmlzo3/3grvs8PTtZ3oH5odCBX7f1xKcMx0AssoBBTKPAx6tHUTXuSBm88n67V/5Tk
+         nq3d43EaIJctMoODKExsCVzCw15lodxRGrFdkjazSAzBH8m4lrj3obDVrCY0gZk+fukf
+         BP+b2VQkAHOJazCwlZY/xiiw/7O9kFdd99G+9F5m4C5ujUqRVLv1fZhuD12iKrzw9Dq/
+         /fMTstKXe2SI+PdZapW6oSZgyk9oyDpnudRyrf6C5eLtwCFC9gxoA+qV4fuRaqmz0rey
+         YXHCMUzmZfs/kWfrnMFvaYdrMpB9IVj6c0KhfqS2bRBwmje8e1bCxhoMEd4viK/Xlhh4
+         yzGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747056613; x=1747661413;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6O0jvL9bp0RhLH3gFStx+IoQOSIzReGN6we6Sj8t7oo=;
+        b=FBewG9IxOpIqVip1I63W+TEps4KZWRgxuCAeC23Bj3iv1AiHnNo9XkWrc6xqKPIDGv
+         bhartTOg6HTpjdoVVQt0HwfVyDkI34Yzm9ym5wDyAIBrGNkOTWKUDDMXCieOaFyh+B3E
+         yJpHHQv0WrJ5Bvqp7nM8znAdA8AxDc9Os6xDylApKWEc4UbIQgo0UT5jBnqfNN3JDpp2
+         kErP241J4VfoEBnXtaZrTvbaMsP94m5BxAvQakv1tb1Z27rZ1H/cqNmqySGbV436jfJM
+         3TeyUqmG0OnvYYaxy11zLYrv4lqCdh/r6GpKqUSqxHJdRNV5NidZL/Ztt0NPL8oUeqL+
+         AwjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULcr82FkJmVxCLPu6hQxfd/SOrBo65j4sJWfHPec/coTUG0N3GpAuyQtQ1CzeFVYmrr1jUUAo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxyNTG3ctjyHb9zgkJL+2GUWz3RtM6Lm3CG1cxhaZ6HgasLtVE3
+	GU4AP6yv81gW7QuMHPRpqQfsnt+QbzhGD5eAhy50eR1eXgRPuXO07fgtCrH9Wk8/Zq1NIDSUw/H
+	ShPJ48ACgMNIdFoc5aPrtHjTUAkqD29ImAhsXy7ozM5DIQJA=
+X-Gm-Gg: ASbGncsoevciL8HBPfClqKsFqKnyGi09Ku++zJifPmzrSuL773beAU32OsLtJwvF84k
+	Z6IAR2Ig2lsdaQ++C8pR9J5U50gQohl5ENowx9icBowfr7Zj0hmZHipoKzgWgAg86K6E2EaAl2O
+	WtVcB5aIxHNTws34iAgQ37oxQBEZc4UX1EkuZvl1F5t98sR2sdp6LSVYhDcfgfJNUzaLnoB8AiS
+	5iBnijcZADapOijGTkj6qBzjUXBBF5b6OQIgjxzFDlC1oHywS/gCLWd7pC4ZeZ7rMN8ZYewRvJ+
+	qrDIkY1VEtH/cK6cyLlessPkX9KIQfghPrcG8VAW3TBpTshWDA0WvNKClsLnNwzU6vFgCDRl
+X-Google-Smtp-Source: AGHT+IGvjNxhAX66VVq4W0wV6STryscjMOGjWiI63Myou666P8Evc1sc/t303qv3kgeVp110Hjntxg==
+X-Received: by 2002:a05:600c:5250:b0:43c:ea1a:720c with SMTP id 5b1f17b1804b1-442d6d6ad52mr105665795e9.18.1747056612621;
+        Mon, 12 May 2025 06:30:12 -0700 (PDT)
+Received: from localhost.localdomain ([213.157.19.150])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442d67ee33bsm125593325e9.20.2025.05.12.06.30.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 May 2025 06:30:12 -0700 (PDT)
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Christoffer Dall <christoffer.dall@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: james.morse@arm.com,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: [RFC PATCH v2 3/3] KVM: selftests: Confirm exposing MTE_frac does not break migration
-Date: Mon, 12 May 2025 12:41:12 +0100
-Message-ID: <20250512114112.359087-4-ben.horgan@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250512114112.359087-1-ben.horgan@arm.com>
-References: <20250512114112.359087-1-ben.horgan@arm.com>
+	linux-kernel@vger.kernel.org,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Subject: [PATCH] KVM: arm64: nv: Remove clearing of ICH_LR<n>.EOI if ICH_LR<n>.HW == 1
+Date: Mon, 12 May 2025 21:32:23 +0800
+Message-ID: <20250512133223.866999-1-r09922117@csie.ntu.edu.tw>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,141 +81,33 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-When MTE is supported but MTE_ASYMM is not (ID_AA64PFR1_EL1.MTE == 2)
-ID_AA64PFR1_EL1.MTE_frac == 0xF indicates MTE_ASYNC is unsupported
-and MTE_frac == 0 indicates it is supported.
+In the case of ICH_LR<n>.HW == 1, bit 41 of LR is just a part of pINTID
+without EOI meaning, and bit 41 will be zeroed by the subsequent clearing
+of ICH_LR_PHYS_ID_MASK anyway.
+No functional changes intended.
 
-As MTE_frac was previously unconditionally read as 0 from the guest
-and user-space, check that using SET_ONE_REG to set it to 0 succeeds
-but does not change MTE_frac from unsupported (0xF) to supported (0).
-This is required as values originating from KVM from user-space must
-be accepted to avoid breaking migration.
-
-Also, to allow this MTE field to be tested, enable KVM_ARM_CAP_MTE
-for the set_id_regs test. No effect on existing tests is expected.
-
-Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
 ---
- .../testing/selftests/kvm/arm64/set_id_regs.c | 77 ++++++++++++++++++-
- 1 file changed, 76 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 322b9d3b0125..34f4174e7285 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -15,6 +15,8 @@
- #include "test_util.h"
- #include <linux/bitfield.h>
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index bfa5bde1f106..4f6954c30674 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -240,9 +240,6 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu,
+ 			goto next;
+ 		}
  
-+bool have_cap_arm_mte;
-+
- enum ftr_type {
- 	FTR_EXACT,			/* Use a predefined safe value */
- 	FTR_LOWER_SAFE,			/* Smaller value is safe */
-@@ -543,6 +545,70 @@ static void test_user_set_mpam_reg(struct kvm_vcpu *vcpu)
- 		ksft_test_result_fail("ID_AA64PFR1_EL1.MPAM_frac value should not be ignored\n");
- }
- 
-+#define MTE_IDREG_TEST 1
-+static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
-+{
-+	uint64_t masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-+	struct reg_mask_range range = {
-+		.addr = (__u64)masks,
-+	};
-+	uint64_t val;
-+	uint64_t mte;
-+	uint64_t mte_frac;
-+	int idx, err;
-+
-+	if (!have_cap_arm_mte) {
-+		ksft_test_result_skip("MTE capability not supported, nothing to test\n");
-+		return;
-+	}
-+
-+	/* Get writable masks for feature ID registers */
-+	memset(range.reserved, 0, sizeof(range.reserved));
-+	vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
-+
-+	idx = encoding_to_range_idx(SYS_ID_AA64PFR1_EL1);
-+	if ((masks[idx] & ID_AA64PFR1_EL1_MTE_frac_MASK) == ID_AA64PFR1_EL1_MTE_frac_MASK) {
-+		ksft_test_result_skip("ID_AA64PFR1_EL1.MTE_frac is officially writable, nothing to test\n");
-+		return;
-+	}
-+
-+	/*
-+	 * When MTE is supported but MTE_ASYMM is not (ID_AA64PFR1_EL1.MTE == 2)
-+	 * ID_AA64PFR1_EL1.MTE_frac == 0xF indicates MTE_ASYNC is unsupported
-+	 * and MTE_frac == 0 indicates it is supported.
-+	 *
-+	 * As MTE_frac was previously unconditionally read as 0, check
-+	 * that the set to 0 succeeds but does not change MTE_frac
-+	 * from unsupported (0xF) to supported (0).
-+	 *
-+	 */
-+	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
-+
-+	mte = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE), val);
-+	mte_frac = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac), val);
-+	if (mte != ID_AA64PFR1_EL1_MTE_MTE2 ||
-+	    mte_frac != ID_AA64PFR1_EL1_MTE_frac_NI) {
-+		ksft_test_result_skip("MTE_ASYNC or MTE_ASYMM are supported, nothing to test\n");
-+		return;
-+	}
-+
-+	/* Try to set MTE_frac=0. */
-+	val &= ~ID_AA64PFR1_EL1_MTE_frac_MASK;
-+	val |= FIELD_PREP(ID_AA64PFR1_EL1_MTE_frac_MASK, 0);
-+	err = __vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1), val);
-+	if (err) {
-+		ksft_test_result_fail("ID_AA64PFR1_EL1.MTE_frac=0 was not accepted\n");
-+		return;
-+	}
-+
-+	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
-+	mte_frac = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac), val);
-+	if (mte_frac == ID_AA64PFR1_EL1_MTE_frac_NI)
-+		ksft_test_result_pass("ID_AA64PFR1_EL1.MTE_frac=0 accepted and still 0xF\n");
-+	else
-+		ksft_test_result_pass("ID_AA64PFR1_EL1.MTE_frac no longer 0xF\n");
-+}
-+
- static void test_guest_reg_read(struct kvm_vcpu *vcpu)
- {
- 	bool done = false;
-@@ -673,6 +739,14 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
- 	ksft_test_result_pass("%s\n", __func__);
- }
- 
-+void kvm_arch_vm_post_create(struct kvm_vm *vm)
-+{
-+	if (vm_check_cap(vm, KVM_CAP_ARM_MTE)) {
-+		vm_enable_cap(vm, KVM_CAP_ARM_MTE, 0);
-+		have_cap_arm_mte = true;
-+	}
-+}
-+
- int main(void)
- {
- 	struct kvm_vcpu *vcpu;
-@@ -701,7 +775,7 @@ int main(void)
- 		   ARRAY_SIZE(ftr_id_aa64pfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr2_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) - ARRAY_SIZE(test_regs) + 3 +
--		   MPAM_IDREG_TEST;
-+		   MPAM_IDREG_TEST + MTE_IDREG_TEST;
- 
- 	ksft_set_plan(test_cnt);
- 
-@@ -709,6 +783,7 @@ int main(void)
- 	test_vcpu_ftr_id_regs(vcpu);
- 	test_vcpu_non_ftr_id_regs(vcpu);
- 	test_user_set_mpam_reg(vcpu);
-+	test_user_set_mte_reg(vcpu);
- 
- 	test_guest_reg_read(vcpu);
- 
+-		/* It is illegal to have the EOI bit set with HW */
+-		lr &= ~ICH_LR_EOI;
+-
+ 		/* Translate the virtual mapping to the real one */
+ 		lr &= ~ICH_LR_PHYS_ID_MASK;
+ 		lr |= FIELD_PREP(ICH_LR_PHYS_ID_MASK, (u64)irq->hwintid);
 -- 
-2.43.0
+2.49.0
 
