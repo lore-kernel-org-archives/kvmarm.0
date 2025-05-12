@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB902920AC
-	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 11:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9302920AC
+	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 11:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747050095; cv=none; b=RxChPR4v6yFGRElccqbZ5Yd/7EDmj1To/5KnJN9plM9sMoZcASQ5BX+V2Dfp2carfteJITAqSI/I1XRt3FBGv6/+zYj9lxu9kHI/9xDFwnWp8YxiOIO5Wc99S3wN0+4bW1a4/GGJF8haMb+kKqyMuA3yohkMWHOLTZQXPMkG8oY=
+	t=1747050100; cv=none; b=Ye7KK4MLDEmj5XWIntyjge/gj/liQJsm4qHuaCXvQ6lRTaAD8/C/t/xnvUMeGOCCSnbNY4REObNQWZqa2aKDHtOvu1FVCtPljks7pp06kdfgb0XSTNaQht19BgdJd/cQRGZAHedcuV1q5JthBUQnZuzFfqIV9YDF894IMSyCZ9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747050095; c=relaxed/simple;
-	bh=mWYcgjGOa+RvdxWeiM3aiO+amws/xXynTcpOsBkdzkQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jnRIqC2272IsTzE1MkQP5hW4Gy262bfwt3Far1M2zttfK1do/1xZlUoq9OS/5tLJPw012nRh58huq291jOpQpDf8fOzS2jRvFUsLswoCwDwYDzgHun6EC/OFLlazSgeLnnW+s8rqyD/ETbpbRgLo3tx4XuMtI/rS0bWDFaSmZNE=
+	s=arc-20240116; t=1747050100; c=relaxed/simple;
+	bh=wHTey9QES+7TBCCs12VEYIzamkYQTCFcXGKfYKmAobE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=i77liELleM1/SllxuPnmFwGw4oJ2lCH/nTEZNU3Lx/2hArxcQNJ7mBLZYox87YrzOUg3+BX6ltvWVw8SKkSIuSU4AO3ZM187nwxWMPHJzdslXwPfDoQc+4zy6VeqwUq1AmhOZvk0XGtUIOR+hn38Rt9Xx2xosEO9CjbAVNkOcvw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B04B150C;
-	Mon, 12 May 2025 04:41:19 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCBB11515;
+	Mon, 12 May 2025 04:41:25 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E57673F5A1;
-	Mon, 12 May 2025 04:41:27 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 64C8A3F5A1;
+	Mon, 12 May 2025 04:41:34 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -33,10 +34,12 @@ To: catalin.marinas@arm.com,
 	linux-kselftest@vger.kernel.org
 Cc: james.morse@arm.com,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [RFC PATCH v2 0/3] KVM: arm64: Don't claim MTE_ASYNC if not supported
-Date: Mon, 12 May 2025 12:41:09 +0100
-Message-ID: <20250512114112.359087-1-ben.horgan@arm.com>
+Subject: [RFC PATCH v2 1/3] arm64/sysreg: Expose MTE_frac so that it is visible to KVM
+Date: Mon, 12 May 2025 12:41:10 +0100
+Message-ID: <20250512114112.359087-2-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250512114112.359087-1-ben.horgan@arm.com>
+References: <20250512114112.359087-1-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,37 +48,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The ID_AA64PFR1_EL1.MTE_frac field is currently hidden from KVM.
-However, when ID_AA64PFR1_EL1.MTE==2, ID_AA64PFR1_EL1.MTE_frac==0
-indicates that MTE_ASYNC is supported. On a host with
-ID_AA64PFR1_EL1.MTE==2 but without MTE_ASYNC support a guest with the
-MTE capability enabled will incorrectly see MTE_ASYNC advertised as
-supported. This series fixes that.
+KVM exposes the sanitised ID registers to guests. Currently these ignore
+the ID_AA64PFR1_EL1.MTE_frac field, meaning guests always see a value of
+zero.
 
-This was found by inspection and the current behaviour is not known to
-break anything. Linux doesn't check MTE_frac, and wrongly, assumes
-MTE async faults can be generated whenever MTE is supported. This is
-a separate problem and not addressed here.
+This is a problem for platforms without the MTE_ASYNC feature where
+ID_AA64PFR1_EL1.MTE==0x2 and ID_AA64PFR1_EL1.MTE_frac==0xf. KVM forces
+MTE_frac to zero, meaning the guest believes MTE_ASYNC is supported, when
+no async fault will ever occur.
 
-I am looking for feedback on whether this change is valuable or
-otherwise.
+Before KVM can fix this, the architecture needs to sanitise the ID
+register field for MTE_frac.
 
-Changes since v1:
-        Only pass MTE_Frac hw value to the guest when it is the exact failure case.
-        Changed base commit to v6.15-rc5 but still applies on v6.16-rc2 as well.
+Linux itself does not use MTE_frac field and just assumes MTE async faults
+can be generated if MTE is supported.
 
-Ben Horgan (3):
-  arm64/sysreg: Expose MTE_frac so that it is visible to KVM
-  KVM: arm64: Make MTE_frac masking conditional on MTE capability
-  KVM: selftests: Confirm exposing MTE_frac does not break migration
+Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+---
+ arch/arm64/kernel/cpufeature.c | 1 +
+ 1 file changed, 1 insertion(+)
 
- arch/arm64/kernel/cpufeature.c                |  1 +
- arch/arm64/kvm/sys_regs.c                     | 28 ++++++-
- .../testing/selftests/kvm/arm64/set_id_regs.c | 77 ++++++++++++++++++-
- 3 files changed, 103 insertions(+), 3 deletions(-)
-
-
-base-commit: 92a09c47464d040866cf2b4cd052bc60555185fb
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9c4d6d552b25..e952f4b07ce1 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -298,6 +298,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+ static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
+ 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_GCS),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_GCS_SHIFT, 4, 0),
++	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MTE_frac_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SME),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_SME_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MPAM_frac_SHIFT, 4, 0),
 -- 
 2.43.0
 
