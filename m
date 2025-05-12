@@ -1,28 +1,28 @@
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11020114.outbound.protection.outlook.com [52.101.56.114])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11022097.outbound.protection.outlook.com [40.93.195.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390DE268FF4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9242690F0
 	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 10:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.114
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.97
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747047204; cv=fail; b=FoqQKo7fDRUgHcUXg+pl0IQ5nPp8uxWHneqMJTxoa1niz5fC1kxoQfXVyvUziglXlyIgCuCOugpE+cQkZT6CaMKWvP9t3gqGPQPlX/9bAveAvmeblAkwFuHLdPNgWbtLFaL/rV2s2oF/Q21tmT4zn2E9D3vQ8c/8Py/Rv7LA1PE=
+	t=1747047204; cv=fail; b=BaNItMMw9x2ZSsi/CgwVfscKqxGrzKjjAljJR83DFdbZjzcLtdHurBj8CWr4RFBUoFWwJ2iA0yopJZYJbF3PFMWio6gzpvjULpSmdfMbYslQEkJ20ZVvl1TruiK457J9GxjJZgse9QkwAJ6iF1EEer7jVDFnac7tU+ncst/sm7k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747047204; c=relaxed/simple;
-	bh=PqksUTGG30LrLMfQMA+O1RYRH16slCUbqzapDKaFCkY=;
+	bh=44/beeK+cAMEd0TdL3j3RbuMftwoy5PchCGZAJO9dm0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=i6O8hZMLLabVEYsEjaVbDKSAX9QHfdgFz2jHl+Wuete+JJbNzaRjY6Q6xC2BI8OVQ/dZIdFyRBNIh6RjvybuZDdApx5mNOOmKTUJVpUsNYwuSRpkDJ/hMZ/qRhHV+TPuylhwyEntYapcErJ8XIpdv6tPLaAptwccxtFKZjrwwCg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=pMqTuYeL; arc=fail smtp.client-ip=52.101.56.114
+	 Content-Type:MIME-Version; b=fnUI2SffI7BTPwYjzPFvaqfPsYeVhE5BA707F+1+8D2ocaPpnBdhiBK/9gaSADTZFAkHYehawaDkPjm3Bq/Q9Y/K1S99Sgta2m3bYuYg2hXai88QF7Fzf0N48Q1FPQ79VeR9N8TlOeyMCEot+Ftx2jnOKhaDLK2fH6Al/p2heWY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=A4/TC4dU; arc=fail smtp.client-ip=40.93.195.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="pMqTuYeL"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="A4/TC4dU"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WhL5WA4wKtoJAM8Gd6S8OTZztGAnJ2ra6vcll6PfxuTvRDINZfquFkmK8Ca4kBnGs8WEKDGqyapOKxCPgKuVz3afCufclm8DrPZuP6ig6qZYlVHH6qgOAKDlzj10jqRHL/M5hVZWITnEi3tQW11KrHnfa/Cxs1omuykQfDTHn1oEPnqc2vGvttzjmRfCnvnAZWV1xtpWV0Dt5nM/gWIfUMnZPlbzPg40Ghp5urz6Kwu1T14NVnhVk0N6Zw6J7BcQuwoKa7YnhE2w7EGlQO+KViK2UxQ+83C9FznTPBs61fAZKjkFKpyTuQUMS8F5VIIRhHmpA8GQu91vUy5tPck4yg==
+ b=L2g1OuF9jFyEK4wGfE+mb4S2WwdsqcHOHwkZp2FjihksAqNNJQ7p1w30qf+fZqf+L9DqiNdcWPXSYYnnys9aUqXU6JcMYJ69dS4kIFnKfGMD3q7e+INCgq5zsh6r3cZI9dwg0IZtDAAHjWUczKzUE6X8fJcATr0Ikm+9AgFF8zTebSmov6WJD5TI82Jo5r4RyX1ChbkGcA4PwSVRTI1XQN7i/A2oowhDR6K7b5AxoAuXADofD9nzFD5PE/Pz9J7LZXnQHXNPKzn5Kc8jpuDS5y3YRS3p/YLYFFmt1geXefLvmjc/6pYxuKZlycvT+b3nP/lAQHibhgycfo86cEzw/Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L05xc3yqBYa/yx4IrMdswRl4wmLviOLP33WWphRodaw=;
- b=h1LJKcfMpRqr6Cz9U/VL8rRIb0+ynI2JtPMPxv9Glfv+5C9Yv/rETqKfw5lARVpHwCx1IkMoeb9mjJ0Ohzis2NSGYfwWwAph7dPyt9mv+XjHtnXWe6DnY6KVupVWL30s1dlpj1asxRj0TFVC97GvNO0+q+v7kgWKrDDm1d7Klfq8nCBstl0B36ufYKEbEIN2qChYYtRXl5aRadctOovXuOBoUH/4+bFygCENmVALlR8JVxfPMCEw3sb5eRAozmGXtAXCJ9cQhhvQ2n4PNMmaBFkqQEYU0GiM1bGTNMnhWRO/S/gtbOvjnzQCl8UKF4L7Y7rFnGgdTg+pyJaf0jMGSA==
+ bh=7cA+TyiNhqZOY1xxKE1PB6wcfsc0wR6rTmxNZEOwG04=;
+ b=OV48M0s1N9/gSVHJ/EX8tgN4l0CjmJkDKY18/ZrD2RXZMmpDztay+ijrJuhcJK9dxofAk5tz2QUUVXGOD40IeaGo6vlqxsEmFXaYMM70nKVuoM6My1GjsAlJXCuKkh+MzxwS9UumIS9panI0iFT0Ey2+IlXcZntqCvBnGa/Zth9Bh3QQkLRRvzcYekO+FiaPXJrvlQYft26gOi8yNJRlGlIZBxiXah9MZ8aLtOpX8mRcsPjSPJoLtYSHl9CXrGqdy0vzV0sUWFEuxb+Uld2bq1SdGAL29FVHNYl/BmpNv/yaDlk9YhIyhNQmKYNtdBzJWKiFAmtVr1UnKFBs12WYKg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -30,18 +30,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L05xc3yqBYa/yx4IrMdswRl4wmLviOLP33WWphRodaw=;
- b=pMqTuYeL38Pvyoot4Iza4zjuMZ9Mh+DGoF5OlJpJ18uf9ppQfdZ8QgDc8dh8Hh6VFnwfL1bpOVLEraVt09tDkDBgBLOvIEZroMjtq/AmnMxGsX1fwvLUzw6YPZu4syVrqujOeXPoV94AQCx7ZNzO9tH8fjt/Iruwpa/Q4tB4k0E=
+ bh=7cA+TyiNhqZOY1xxKE1PB6wcfsc0wR6rTmxNZEOwG04=;
+ b=A4/TC4dUZZWiH3r2a0v+jw70w7m9+AT9QmVlrQfnF3GH0Bl1IgIgYQlNN4AGa0vkFEN/EcdsViFbtUMe9Spuj9zJNLhe+sAvyK2dBeKdf875TEcXD+ivetTGAA28Rmqngl5KewuglWigFKyE6HXKU+58mqCCizz/dmqsctB51k8=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
  CH0PR01MB6907.prod.exchangelabs.com (2603:10b6:610:104::15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.28; Mon, 12 May 2025 10:53:16 +0000
+ 15.20.8722.28; Mon, 12 May 2025 10:53:14 +0000
 Received: from SJ2PR01MB8101.prod.exchangelabs.com
  ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
  ([fe80::292:6d9c:eb9a:95c9%6]) with mapi id 15.20.8722.027; Mon, 12 May 2025
- 10:53:16 +0000
+ 10:53:14 +0000
 From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -55,9 +55,9 @@ Cc: maz@kernel.org,
 	seanjc@google.com,
 	darren@os.amperecomputing.com,
 	gankulkarni@os.amperecomputing.com
-Subject: [RFC PATCH v2 3/9] KVM: arm64: nv: selftests: Enable hypervisor timer tests to run in vEL2
-Date: Mon, 12 May 2025 03:52:45 -0700
-Message-ID: <20250512105251.577874-4-gankulkarni@os.amperecomputing.com>
+Subject: [RFC PATCH v2 1/9] KVM: arm64: nv: selftests: Add support to run guest code in vEL2.
+Date: Mon, 12 May 2025 03:52:43 -0700
+Message-ID: <20250512105251.577874-2-gankulkarni@os.amperecomputing.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
 References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
@@ -74,427 +74,394 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|CH0PR01MB6907:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d75353a-eb32-451d-ab72-08dd914332ec
+X-MS-Office365-Filtering-Correlation-Id: 7b770f6a-ff6f-4814-16b7-08dd914331c1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|52116014|7416014|366016|1800799024|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?H8KgIbNLMN18eJXB5qTOkovsXGARIWSPHjmQ+klzk9n/olS1OJvkzeKraAOh?=
- =?us-ascii?Q?iaoEzG04tTEoC2QsbIIi0gK4ujeLdSu1BLgB+W4tiRFdsNQw2UCYfQXlA38v?=
- =?us-ascii?Q?o8LciDVONnKRhqPBlFBhhUKlpzdAhxw71e7+rwYcDs6QMZ4xhTOHLpAM8FEB?=
- =?us-ascii?Q?jxZeP1asnMG1qU0NikoaHbps9Dl7tzAyvUKpyBXNsExijJV24J9VHHdaBk95?=
- =?us-ascii?Q?Ponv0Qti6P34J/kZnNqdDnGw4ldNpXKxd9Ixn3aWzAIcI2gG4fBPzTJM7B7Q?=
- =?us-ascii?Q?5AQ83g5NbH2sh6Z4AmybffDMBo7zq+GdaKIf1tfdktqKnnwf0967M2+++cdj?=
- =?us-ascii?Q?aUUk4TL7cVNWfx+p9dpEieKE0gLSRa5p/hCcDkCQ3eb6f+0Hl/Hz+6GbVLhV?=
- =?us-ascii?Q?+4jTw6kp02zJvlUoG7xUSSq/2h7Fi2UUTNmTsLD+vWq1JLTNZmqRRVVmBP7H?=
- =?us-ascii?Q?xWlnxF22CSYhavnNHsH22hOxW0CjVIaWnh8oX+WUCqR8LcQulGxC/JqlWjip?=
- =?us-ascii?Q?syqAe27yghQsF00WvuFdbvgmyshaGtC6Njt9LszXKXP+vw4Iy+ZO+dWFSmIa?=
- =?us-ascii?Q?rXMHw/04E5AlWkY00ZD6GEDfT33eQ0vzTisRKySMt+NHr0G8bErdudNrzGlr?=
- =?us-ascii?Q?U3m+EZXXZyCYxKuoQ5U2mOkRbhe4qWDHyQ2SCxCtxRuNVPZY76IhrQQYJQAs?=
- =?us-ascii?Q?mEVB2hXY6apbzBX9YWez5ihozhwpo01x8xberz5A8Q9Hjk7Msdc3Ogjr1PIa?=
- =?us-ascii?Q?QCCJ2mgJrFHEBgRnf4nNoLaNy2+SA2pT4GUNg0k03qg4hrKYPAR2knqtP3Q+?=
- =?us-ascii?Q?UgKRTuO9OP8WoIoa3ApSDArF9KA8qfmEtKbPqK2wwNg8g4eewncrSnab0Lko?=
- =?us-ascii?Q?wvZ6hUnWsm2X4RpPZTSh4lgsITj6YccX8/zohzAgKoL0A8dkAD1E/uYKu4Ds?=
- =?us-ascii?Q?sY1UpbesXXYZ3wyEwJ1X/VgxsV+CfZx2pyvDFRDYqdx9fK3EwxzY52EcxtF/?=
- =?us-ascii?Q?1TsdMS3Qwaf6T/3xaMSs3jFPYG0FVadAu+0RTCRp5Fohsx8dAyu/k2LllXDH?=
- =?us-ascii?Q?gUjXlolqJYRwfYd8e1ipHFWCJga6Sfkep5Q6TkXOrFHFNmoYpe38NzXKGFjP?=
- =?us-ascii?Q?AAvoZuQSGn5Np6hgcc6sl+mumNCL4ziqb5LbnGqxaVzxO9C8bZgZ/kWJDXDu?=
- =?us-ascii?Q?aM4LigVs8zX31bjN72rO62FHJ2Favs99FrbN6xh+b5h9n0yPSIlU1yygvtiL?=
- =?us-ascii?Q?NyMjrKFnStU5iQ85kWgsFuNLys/zPCuJVzE+xOlCfeaa0eR/sW4Bc7j3XNAQ?=
- =?us-ascii?Q?CAEVwKwyNHOijlTzVV5QytkOiLy/7rA6rYn10NSSxNto0ME4FSVpx5e70hXo?=
- =?us-ascii?Q?f3hF5L27xkUCRhA/qCnkONcWMhSCHDdLIEZqO1G96a+cFzy3W7zyWwnxAAwI?=
- =?us-ascii?Q?NE8S5N7GC7dL7gxRiJ2lw+Jd1+zXykn7TSQU4j/uus+ptIUSkjERCQ=3D=3D?=
+	=?us-ascii?Q?lfKAySUHSCzX/M7u/H0KpeNty9lO0ssbhIdWwPfa9OtSYJg/BOXmKIe3KZIc?=
+ =?us-ascii?Q?AhHCyjcUSC+0CYLDqRWZBiSGcDM4nrr3RitJLncs36tAvezUUMIlQu5Web26?=
+ =?us-ascii?Q?QdF3ddoTyGtUeqolwmaB+tXQoJfY9UP7vlgVaax3T01ylD8c8CuoKvchGrCv?=
+ =?us-ascii?Q?zMQJ6L9mI7N0EbYADsTjCVpYwEvxk8YqoU7xNq1bU1+BryUFw9yCwDdUeLXR?=
+ =?us-ascii?Q?mqB2VbqZw6Dh4PoNIcGqF24PD1U44nrNbKwPVzUIFXw2RN+oVTgJzui46ctk?=
+ =?us-ascii?Q?Sv30motC6ukismakYEDbwEeBfAUB0LD4lp4JZUsWco2cUS4kdJKI9/WytCgZ?=
+ =?us-ascii?Q?4Kco7uBz3yc6zZLdj4AB24eM7DQxZTVGabwBNKMMK86VRHcI3EzcX7elmkzx?=
+ =?us-ascii?Q?7YrxaMXes7C38XFP8kG+9fiGaonDv8fzXTnvIXD0HwwrPJxTBTTffjt/pESK?=
+ =?us-ascii?Q?yATU5nOYrkqzc5AjgeCrfl+f1HVYplJhFKKXAa1WzpVltyfghwtyl8tZBFcb?=
+ =?us-ascii?Q?+ohVxu3EREKftCgi1fpeu9XCV0Gf4x0Df+HVKxJHI/a6xx6mQrOaBXMymK15?=
+ =?us-ascii?Q?3/zbY9LWM6Ob1pJELLrkrOthQxMjuMNruu0QFYGuGsR/iJ2pVwNc5ZJbm9O7?=
+ =?us-ascii?Q?GsrfWEZ3xVSKBTIajngZj22uZGGvnR7zyTGnhqhvD83jrcMummp2i2kXvPfi?=
+ =?us-ascii?Q?z1q14PKczsIifzazUzUwJqKp9DGcAyc2WrABBwqmR+ZRTm7BXCSAUGRS5jlk?=
+ =?us-ascii?Q?WMLPuQTP/Zi8q8jl+OGTnAw8tsAnlYAYoXWX/yPW+YKgWxMmVo4GfsMbfITf?=
+ =?us-ascii?Q?XIptid9/I0usXg8FU3tIrjutLxc8kZOpbgL6/S1wHSmsIdSWy5RKcDql9tAv?=
+ =?us-ascii?Q?ejXVqRlhz8/pL0IMMt4enJbeLqEGyI8AHcYr+R+kRd8XC7Rl+N9Vyg8WJZfl?=
+ =?us-ascii?Q?BI73T0fBOt737Etp36tHT0xxAPQeMVCUydU00hjOVgQ7aNstUVxElthNIMBm?=
+ =?us-ascii?Q?TI/H51fk1gJfkAFmBWFOXBUntrovCs7e5mRZDZZ4mtuuTVfLI0Roxf2DZPPZ?=
+ =?us-ascii?Q?2vPR/vhmBYWVPVsLfr/nlFX8kEncgkSxMF9mKiiTUBdckXNOIofthjNUTXni?=
+ =?us-ascii?Q?0EL9GGtEbRl+TMVCUZe3epw1N/U7JsPuKtbKg9oBYDt2cLTbg2oM4uO5brKh?=
+ =?us-ascii?Q?LzA0gQ16TAb2zJpmVojsqvJvRsWc3zJFXhOHooQgQupx5RHP84NHcAb8Q1NO?=
+ =?us-ascii?Q?sxdNvRm7br4U+W5X8rZIzbAoiq4/vjIAGZZXWQPafiWypKgvQ1mp64r91zml?=
+ =?us-ascii?Q?Wkfne5fTKyC96tADzhif7FenDgia7VR3zlKW6PoQjaJ5gPF/HQUcz0HaXO5/?=
+ =?us-ascii?Q?euajJZEhLAJmaBf024S+uZi463Ae/Jxu0Hci5/npbaVvGSzlI9LOuZWbAi32?=
+ =?us-ascii?Q?jh9M4iL0it10ECwAPzJQcXKfNtZxnmGqctPQpsEdUWEGw4WI6AdfPw=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(7416014)(366016)(1800799024)(38350700014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?x7N/OAVYm1puxFodpSZCK4V6nbdEOxnzXFxvuaWnFZaTIMKxVl9O6PoeroDt?=
- =?us-ascii?Q?5DuT/rFhE8RJUgMFzJWKmBaQ/Ud0DwULViDvwV9cJlE12IaiGOi4d3Lw3RTg?=
- =?us-ascii?Q?pxjgeo+CcC7FOh8eJW02/Xs56Qike/X5ZZBD9ryB5kmEWn7PgRQJPT0tRAHN?=
- =?us-ascii?Q?O2Okl8CdFZ3Q56BPNpxFPbJ0469/ZuKeM9SCU3Oc2rU/RrbeGXcgT58lHKJT?=
- =?us-ascii?Q?fdUZ7mVYmESNF/BzP1UqUTbCDRsNA4mSJ5wYf/K1VJeWM9c94Oli1k8DUyhs?=
- =?us-ascii?Q?otCQmtRrAxka6vGbqxPQZM6zWxb1WOHlTseioqmPgvnUlSdXxvjvJSs8uvNb?=
- =?us-ascii?Q?4nX72GjeBQaYSwGcX+59pRY3nxbTqcN+QLU1AKy/UmuO9U53wEZCejuZekVn?=
- =?us-ascii?Q?+LyaL3JJAr3qkKpjrkaPXNMiPyV8ngp4J25D0IObcQV4swrLvyDkQk2ymqNI?=
- =?us-ascii?Q?Jy0MTQAk3VvPBcNoHd3RkZKvdFeg8qWOUbAN+dyhl4Mos27BNALcmc5Ae1jd?=
- =?us-ascii?Q?38sNlztiaOnHEyEdVnQj4GKmerYnN3nzJPl7PfBWDuVAT1iu6ukprFnomlRg?=
- =?us-ascii?Q?ouC5lxkvpiaMjp4Lk8TItYZdJBze5v7q5MJNAvs9GGVKlB/UZJpur5ok+DmW?=
- =?us-ascii?Q?emBp5NZUINTin8Mb4+r24uvj0eIsr1259QYrY6tEt403/aMw0GIAqsCmSF0u?=
- =?us-ascii?Q?bX4nmcnufpPvFL2TsoIVNUnn5kpiZV6XvgxwUBTB2ivOT1u1VueQGIZAgT7M?=
- =?us-ascii?Q?so6/9Kp9IEhZvmg7513Lsuvy/E/oxB2h6zl26TnX74NBGTodX7XXWd0387P+?=
- =?us-ascii?Q?SxulqC4c5wOr0KKrwPDnsR3e/NDgfP9/hiiUxIBboLkNB+ASaIxCaw+H9G4z?=
- =?us-ascii?Q?3xWNcnOfXkWt7iaYHY89YJpZKLqGP08J2c682xJA6PVRPrNGHjZp5pvdm9Jm?=
- =?us-ascii?Q?YeeJH+aRbKvhOEWtp6Ol9gPE397xxO+zAqicBLjjgx9t2L/TXrmTcIuKLMlJ?=
- =?us-ascii?Q?sTKssWkGgG+OlRskYIY09Gndz8QHC1yFJuwAB3EpwW2Vjgo/9VfDS/pjRqbD?=
- =?us-ascii?Q?goIxc+c5fbgU/fdNe1N3C6JLxStEtnT04eG3Gcp5KbwopkSZNOHHkk6l+uo9?=
- =?us-ascii?Q?PP+m6BIXn/dn+cdwM5FXt9S/9+4pK79pdlpk+lmttWYPhkXyNMZ0CahQfWhj?=
- =?us-ascii?Q?YoImEsVnokkrTbPvBfgfFMQYc8sYbIxIvPkwThcHrZPbSzsA/JBhkSSxfIMs?=
- =?us-ascii?Q?zQajw9uBXjgMo4E6tBg3so1N6S2rgBqZjuLZXx1NIjnnudmIW4W4n2+ZLSoh?=
- =?us-ascii?Q?zOiGb/bFwId6G66NkqjlHrCCOgv8l7ZDC/lGzNgVS1Hpa/mspr0AidkV15Da?=
- =?us-ascii?Q?T+sf4QgkKMZm52+oUorCT/uRc6Vg/LoRqBWkaWnX29odCugPFj+0V8jgCGly?=
- =?us-ascii?Q?pvjqITqC1rYF18X6LQ/It7nR13GQY1YtaUu10Sc2pGezS5JkgmkHbI1M0k8s?=
- =?us-ascii?Q?ayGgRJb9qqvf54dycF1JUl8t9ItA11nm87B2swttWkD7aDmE+/ChEozyXlIK?=
- =?us-ascii?Q?vswe/UP4l7Bwnwhnzy3a1F6ITXLybtO/ueBKD0tVqSNeHyADQJJRi5sMEer/?=
- =?us-ascii?Q?oAM91uUdWwZg5r1LbK31v1FI6dECyyMEoFocVyPoJ396?=
+	=?us-ascii?Q?6GcJfN5hBNtD/M5wKIi338vf5IopdqInogsFKOwz0LANgngqsF5lOOvU/yPs?=
+ =?us-ascii?Q?soWFczG7r9nhIazupF2nXCDxF7261aEDx82UpYnFKO3GbDgPVik7Qa6ZWWTz?=
+ =?us-ascii?Q?onqE6rJoH3+RhtzZ5jlCKjrB/Es45PuCllVCTHtdc2tcEBLJCl8boGtHyLuK?=
+ =?us-ascii?Q?ZLU+JJaPFZ1rYGzY8MR/NSb0kTTk5vZOUaXL/dSHOI0Q/BuFnaXnDvu5xuAk?=
+ =?us-ascii?Q?SAjWh91andRPJ1oUgnZRarc0T/033KGx5RRi9mBsWujKAxMGh9zNW6q9ZD9E?=
+ =?us-ascii?Q?3co0iZn43AB74hg9Q/lKmSh3bg0rVId4uCOyYtlHzp7iMrB0Pgvb/4nVJhFQ?=
+ =?us-ascii?Q?d1sQwo+0zHMarnZgO3Osuq/YisaKINCGM4GuE79WipLF6lnztq0MyfgOkb4V?=
+ =?us-ascii?Q?naIVoB3OGguqMe/T+HTX+jKF1pTf7fsPhm6xfm8Zsknx1+qCZlpno066UtuU?=
+ =?us-ascii?Q?qGnfKwllunn5sG7NXWvVlmHiwDS6wJABSbIHoX0Vsvwyz4czZvDOm5//JnCp?=
+ =?us-ascii?Q?wnDU4EXHlsuVZZX9qc+Zsf/XdYD9gwECeU+rcGbkg4mpugGJnhVnZVX8k9/J?=
+ =?us-ascii?Q?vQbLZGHO4LYtlT3O2oPLr+0mzrlJ0JiYJPZVa7BV7suE+UNjff5HA84y3iof?=
+ =?us-ascii?Q?WrEiRrCFSydu3D4BnVkS4LCcJp+P2Iacvn+b9CgwcnRfI3XIK2+L5NYqVjuB?=
+ =?us-ascii?Q?dSMeTDLty1H/Trtgr+rHmYZpm4l6Gu2uY7VPZ0XdU5zcIdOESss5T/qLHBFR?=
+ =?us-ascii?Q?OUqzJ2nEXA/vgrz4gM1TxSx/yZPbYOqj5YN7Wc2ji0UZ6KtWUBbfdn/t8e+U?=
+ =?us-ascii?Q?j2Wg27zmpA6z3TpLzoPd99pYr1d5y3IteV32lCMqbGgmH/QnVpWM6W3dABqh?=
+ =?us-ascii?Q?t0Bv6ViSKOiTCXjxWVRVVgcMbHcqZyJFDDGmGBoSJgV5hWng+K2ItoSzJ5Fo?=
+ =?us-ascii?Q?tI6Qww4psudyr6wZaVYNKlefYu9R0650xLtNHj48Njl8bO0vgzj7V1ZPIeJv?=
+ =?us-ascii?Q?q79mraIqFnTDFq549rFIINXvBvieLFvlgGrMIiDhJW6t/ybUBVaOABuN4v7K?=
+ =?us-ascii?Q?sCWi/XR+tEarrr+HYcPs67/GAtQlKkx4HBuxztzkzqYCqgNk7FViY/CB5mK6?=
+ =?us-ascii?Q?Nt62j0J/RQ90v6tyuUnnxkIGLFgXzQ5vSWxhmjinI0OIOwJoPktdx1X9W3NI?=
+ =?us-ascii?Q?VEV1h5NS+AFRm2PNv2xq+8aA4mjeztHquDFmpMmcXi9KniMgnTzYO5miakyA?=
+ =?us-ascii?Q?pCZmD/Rei20IthXz8Dn6VbZSxV0BJW3ydn88rHII1rFMDwmG+FOysG51Wo24?=
+ =?us-ascii?Q?sKfYwLc7CYdFUxi9M+n17y3c63CPOZOf9DJgVvNOynOdNZOwPxvBVDcZGkXe?=
+ =?us-ascii?Q?jFSf9VsoMlRX8Mz3oFirrTQNCjppNwdJ0nnU0HvY3ghHa6snztz52b21biiI?=
+ =?us-ascii?Q?lZGE13Yw3JcziFA4khCdjjt7Bd6Jv/cuyo/d73UhUMAkvK967PdNX5jU87a6?=
+ =?us-ascii?Q?tmGTy+dswKu919uADVrKS/04Fy6Z0wBtqLN5oSYj91llQos/cvdKzIEkiWHT?=
+ =?us-ascii?Q?ik0pxG/g6Gimdchi5bZU7uf76ApEmFsyZOR3Hgp+oMslrw8EdcSF+L9WEXKk?=
+ =?us-ascii?Q?UrB4g5l7IkswYztClXyXVMeRKily3aqcLO2qJjVbhF9L?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d75353a-eb32-451d-ab72-08dd914332ec
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b770f6a-ff6f-4814-16b7-08dd914331c1
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 10:53:16.1060
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 10:53:14.1166
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gwdTL1HmKtwbhsqtI/+Kb1o2l/G7jZNvZHlwxB74UvoMEDidOquQWUSdqdDR2/4q53ZQZNCvk8D2BC7+ScCO90Qi8iTfEx9h8K4i4OY5dI9HJ0nSW8a9gFrdHVQIoNJc
+X-MS-Exchange-CrossTenant-UserPrincipalName: Y//xWy0uG3OAfJziDIu0OAmeNdw5CadarKEZodkqRygmZ8OpO49O2KNmYPDhAKihhboIUprQkCDvJfFUZ6JRT4ehG5j9692DUKOOxizd97gR8sX2kLGGw8wYX871jhrE
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR01MB6907
 
-Adding required changes to enable and test HVTIMER and HPTIMER
-in vEL2. In default case, PTIMER and VTIMER are validated and with
-NV enabled (with argument "-g 1"), HPTIMER and HVTIMER are validated
-by injecting respective timer interrupts.
+This patch adds required changes to vcpu init to run a guest code
+in vEL2 context and also adds NV specific helper functions.
 
 Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 ---
- tools/testing/selftests/kvm/arch_timer.c      |   8 +-
- .../testing/selftests/kvm/arm64/arch_timer.c  | 118 +++++++++++++++---
- .../selftests/kvm/include/arm64/arch_timer.h  |  16 +++
- .../selftests/kvm/include/timer_test.h        |   1 +
- 4 files changed, 123 insertions(+), 20 deletions(-)
+ tools/testing/selftests/kvm/Makefile.kvm      |  2 +
+ .../kvm/include/arm64/kvm_util_arch.h         |  3 +
+ .../selftests/kvm/include/arm64/nv_util.h     | 45 ++++++++++++++
+ .../selftests/kvm/include/arm64/vgic.h        |  1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  3 +
+ tools/testing/selftests/kvm/lib/arm64/nv.c    | 46 ++++++++++++++
+ .../selftests/kvm/lib/arm64/processor.c       | 61 ++++++++++++++-----
+ tools/testing/selftests/kvm/lib/arm64/vgic.c  |  8 +++
+ 8 files changed, 155 insertions(+), 14 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/arm64/nv_util.h
+ create mode 100644 tools/testing/selftests/kvm/lib/arm64/nv.c
 
-diff --git a/tools/testing/selftests/kvm/arch_timer.c b/tools/testing/selftests/kvm/arch_timer.c
-index acb2cb596332..5c30bda0462b 100644
---- a/tools/testing/selftests/kvm/arch_timer.c
-+++ b/tools/testing/selftests/kvm/arch_timer.c
-@@ -35,6 +35,7 @@ struct test_args test_args = {
- 	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
- 	.timer_err_margin_us = TIMER_TEST_ERR_MARGIN_US,
- 	.reserved = 1,
-+	.is_nested = false,
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index f773f8f99249..3348f729d3b2 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -37,6 +37,7 @@ LIBKVM_arm64 += lib/arm64/processor.c
+ LIBKVM_arm64 += lib/arm64/spinlock.c
+ LIBKVM_arm64 += lib/arm64/ucall.c
+ LIBKVM_arm64 += lib/arm64/vgic.c
++LIBKVM_arm64 += lib/arm64/nv.c
+ 
+ LIBKVM_s390 += lib/s390/diag318_test_handler.c
+ LIBKVM_s390 += lib/s390/processor.c
+@@ -155,6 +156,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+ TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+ TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+ TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
++TEST_GEN_PROGS_arm64 += arm64/nv_guest_hypervisor
+ TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+ TEST_GEN_PROGS_arm64 += arch_timer
+ TEST_GEN_PROGS_arm64 += coalesced_io_test
+diff --git a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+index e43a57d99b56..ab5279c24413 100644
+--- a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
++++ b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+@@ -2,6 +2,9 @@
+ #ifndef SELFTEST_KVM_UTIL_ARCH_H
+ #define SELFTEST_KVM_UTIL_ARCH_H
+ 
++#define CurrentEL_EL1		(1 << 2)
++#define CurrentEL_EL2		(2 << 2)
++
+ struct kvm_vm_arch {};
+ 
+ #endif  // SELFTEST_KVM_UTIL_ARCH_H
+diff --git a/tools/testing/selftests/kvm/include/arm64/nv_util.h b/tools/testing/selftests/kvm/include/arm64/nv_util.h
+new file mode 100644
+index 000000000000..622a17c9d142
+--- /dev/null
++++ b/tools/testing/selftests/kvm/include/arm64/nv_util.h
+@@ -0,0 +1,45 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (c) 2025 Ampere Computing
++ */
++#ifndef SELFTEST_NV_UTIL_H
++#define SELFTEST_NV_UTIL_H
++
++#include <linux/bitmap.h>
++#include <vgic.h>
++
++#define HCR_NV2		(UL(1) << 45)
++#define HCR_AT		(UL(1) << 44)
++#define HCR_NV		(UL(1) << 42)
++#define HCR_E2H		(UL(1) << 34)
++#define HCR_TTLB        (UL(1) << 25)
++
++/* Enable NV2 and guest in VHE mode */
++#define HCR_EL2_NV_EANBLE (HCR_E2H | HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB)
++
++struct kvm_vm *nv_vm_create_with_vcpus_gic(uint32_t nr_vcpus,
++		struct kvm_vcpu **vcpus, int *gic_fd, void *guest_code);
++
++struct kvm_vm *__nv_vm_create_with_vcpus_gic(struct vm_shape shape,
++		uint32_t nr_vcpus, struct kvm_vcpu **vcpus,
++		uint64_t extra_mem_pages, int *gic_fd, void *guest_code);
++
++/* NV helpers */
++static inline void init_vcpu_nested(struct kvm_vcpu_init *init)
++{
++	init->features[0] |= (1 << KVM_ARM_VCPU_HAS_EL2);
++}
++
++static inline bool kvm_arm_vcpu_has_el2(struct kvm_vcpu_init *init)
++{
++	unsigned long features = init->features[0];
++
++	return test_bit(KVM_ARM_VCPU_HAS_EL2, &features);
++}
++
++static inline bool is_vcpu_nested(struct kvm_vcpu *vcpu)
++{
++	return vcpu->nested;
++}
++
++#endif /* SELFTEST_NV_UTIL_H */
+diff --git a/tools/testing/selftests/kvm/include/arm64/vgic.h b/tools/testing/selftests/kvm/include/arm64/vgic.h
+index c481d0c00a5d..46142fa36199 100644
+--- a/tools/testing/selftests/kvm/include/arm64/vgic.h
++++ b/tools/testing/selftests/kvm/include/arm64/vgic.h
+@@ -17,6 +17,7 @@
+ 	index)
+ 
+ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs);
++void vgic_v3_close(int gic_fd);
+ 
+ #define VGIC_MAX_RESERVED	1023
+ 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 373912464fb4..9b26b9124dc3 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -65,6 +65,9 @@ struct kvm_vcpu {
+ 	struct kvm_dirty_gfn *dirty_gfns;
+ 	uint32_t fetch_index;
+ 	uint32_t dirty_gfns_count;
++#ifdef __aarch64__
++	bool nested;
++#endif
  };
  
- struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
-@@ -43,6 +44,7 @@ struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
- static pthread_t pt_vcpu_run[KVM_MAX_VCPUS];
- static unsigned long *vcpu_done_map;
- static pthread_mutex_t vcpu_done_map_lock;
-+bool is_nested;
+ struct userspace_mem_regions {
+diff --git a/tools/testing/selftests/kvm/lib/arm64/nv.c b/tools/testing/selftests/kvm/lib/arm64/nv.c
+new file mode 100644
+index 000000000000..e930808a7ed4
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/arm64/nv.c
+@@ -0,0 +1,46 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2025 Ampere Computing LLC
++ */
++
++#include <linux/compiler.h>
++#include <assert.h>
++
++#include "guest_modes.h"
++#include "kvm_util.h"
++#include "nv_util.h"
++#include "processor.h"
++
++struct kvm_vm *__nv_vm_create_with_vcpus_gic(struct vm_shape shape, uint32_t nr_vcpus,
++		struct kvm_vcpu **vcpus, uint64_t extra_mem_pages, int *gic_fd, void *guest_code)
++{
++	struct kvm_vcpu_init init;
++	struct kvm_vm *vm;
++	int i;
++
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_EL2));
++
++	vm = __vm_create(shape, nr_vcpus, extra_mem_pages);
++	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
++	init_vcpu_nested(&init);
++
++	for (i = 0; i < nr_vcpus; ++i) {
++		vcpus[i] = aarch64_vcpu_add(vm, i, &init, guest_code);
++		__TEST_REQUIRE(is_vcpu_nested(vcpus[i]), "Failed to Enable NV");
++	}
++
++	/* vgic is not created, If gic_fd argument is NULL */
++	if (gic_fd) {
++		*gic_fd = vgic_v3_setup(vm, nr_vcpus, 64);
++		__TEST_REQUIRE(*gic_fd >= 0, "Failed to create vgic-v3");
++	}
++
++	return vm;
++}
++
++struct kvm_vm *nv_vm_create_with_vcpus_gic(uint32_t nr_vcpus,
++		struct kvm_vcpu **vcpus, int *gic_fd, void *guest_code)
++{
++	return __nv_vm_create_with_vcpus_gic(VM_SHAPE_DEFAULT,
++				nr_vcpus, vcpus, 0, gic_fd, guest_code);
++}
+diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+index 7ba3aa3755f3..6e759981bf9e 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/processor.c
++++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+@@ -10,6 +10,7 @@
  
- static void *test_vcpu_run(void *arg)
- {
-@@ -193,6 +195,7 @@ static void test_print_help(char *name)
- 	pr_info("\t-o: Counter offset (in counter cycles, default: 0) [aarch64-only]\n");
- 	pr_info("\t-e: Interrupt arrival error margin (in us) of the guest timer (default: %u)\n",
- 		TIMER_TEST_ERR_MARGIN_US);
-+	pr_info("\t-g: Enable Nested Virtualization, run guest code as guest hypervisor (default: Disabled)\n");
- 	pr_info("\t-h: print this help screen\n");
- }
- 
-@@ -200,7 +203,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hn:i:p:m:o:e:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:i:p:m:o:e:g:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			test_args.nr_vcpus = atoi_positive("Number of vCPUs", optarg);
-@@ -226,6 +229,9 @@ static bool parse_args(int argc, char *argv[])
- 			test_args.counter_offset = strtol(optarg, NULL, 0);
- 			test_args.reserved = 0;
- 			break;
-+		case 'g':
-+			test_args.is_nested = atoi_non_negative("Is Nested", optarg);
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
-diff --git a/tools/testing/selftests/kvm/arm64/arch_timer.c b/tools/testing/selftests/kvm/arm64/arch_timer.c
-index eeba1cc87ff8..50bf05bb6f85 100644
---- a/tools/testing/selftests/kvm/arm64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/arm64/arch_timer.c
-@@ -12,16 +12,22 @@
- #include "timer_test.h"
+ #include "guest_modes.h"
+ #include "kvm_util.h"
++#include "nv_util.h"
+ #include "processor.h"
  #include "ucall_common.h"
- #include "vgic.h"
-+#include <nv_util.h>
  
- enum guest_stage {
- 	GUEST_STAGE_VTIMER_CVAL = 1,
- 	GUEST_STAGE_VTIMER_TVAL,
- 	GUEST_STAGE_PTIMER_CVAL,
- 	GUEST_STAGE_PTIMER_TVAL,
-+	GUEST_STAGE_HVTIMER_CVAL,
-+	GUEST_STAGE_HVTIMER_TVAL,
-+	GUEST_STAGE_HPTIMER_CVAL,
-+	GUEST_STAGE_HPTIMER_TVAL,
- 	GUEST_STAGE_MAX,
- };
- 
- static int vtimer_irq, ptimer_irq;
-+static int hvtimer_irq, hptimer_irq;
- 
- static void
- guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
-@@ -47,6 +53,26 @@ guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
- 		shared_data->xcnt = timer_get_cntct(PHYSICAL);
- 		timer_set_ctl(PHYSICAL, CTL_ENABLE);
- 		break;
-+	case GUEST_STAGE_HVTIMER_CVAL:
-+		timer_set_next_cval_ms(HVIRTUAL, test_args.timer_period_ms);
-+		shared_data->xcnt = timer_get_cntct(HVIRTUAL);
-+		timer_set_ctl(HVIRTUAL, CTL_ENABLE);
-+		break;
-+	case GUEST_STAGE_HVTIMER_TVAL:
-+		timer_set_next_tval_ms(HVIRTUAL, test_args.timer_period_ms);
-+		shared_data->xcnt = timer_get_cntct(HVIRTUAL);
-+		timer_set_ctl(HVIRTUAL, CTL_ENABLE);
-+		break;
-+	case GUEST_STAGE_HPTIMER_CVAL:
-+		timer_set_next_cval_ms(HPHYSICAL, test_args.timer_period_ms);
-+		shared_data->xcnt = timer_get_cntct(HPHYSICAL);
-+		timer_set_ctl(HPHYSICAL, CTL_ENABLE);
-+		break;
-+	case GUEST_STAGE_HPTIMER_TVAL:
-+		timer_set_next_tval_ms(HPHYSICAL, test_args.timer_period_ms);
-+		shared_data->xcnt = timer_get_cntct(HPHYSICAL);
-+		timer_set_ctl(HPHYSICAL, CTL_ENABLE);
-+		break;
- 	default:
- 		GUEST_ASSERT(0);
+@@ -258,14 +259,49 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
  	}
-@@ -75,6 +101,16 @@ static void guest_validate_irq(unsigned int intid,
- 		accessor = PHYSICAL;
- 		timer_irq = ptimer_irq;
- 		break;
-+	case GUEST_STAGE_HVTIMER_CVAL:
-+	case GUEST_STAGE_HVTIMER_TVAL:
-+		accessor = HVIRTUAL;
-+		timer_irq = hvtimer_irq;
-+		break;
-+	case GUEST_STAGE_HPTIMER_CVAL:
-+	case GUEST_STAGE_HPTIMER_TVAL:
-+		accessor = HPHYSICAL;
-+		timer_irq = hptimer_irq;
-+		break;
- 	default:
- 		GUEST_ASSERT(0);
- 		return;
-@@ -142,38 +178,79 @@ static void guest_code(void)
- {
- 	uint32_t cpu = guest_get_vcpuid();
- 	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
-+	bool is_nested = false;
-+	enum arch_timer vtimer, ptimer;
-+	int vtmr_irq, ptmr_irq;
-+	enum guest_stage stage_vtimer_cval, stage_vtimer_tval;
-+	enum guest_stage stage_ptimer_cval, stage_ptimer_tval;
- 
--	local_irq_disable();
-+	if (read_sysreg(CurrentEL) == CurrentEL_EL2)
-+		is_nested = true;
- 
-+	local_irq_disable();
- 	gic_init(GIC_V3, test_args.nr_vcpus);
- 
--	timer_set_ctl(VIRTUAL, CTL_IMASK);
--	timer_set_ctl(PHYSICAL, CTL_IMASK);
-+	if (is_nested) {
-+
-+		vtimer = HVIRTUAL;
-+		ptimer = HPHYSICAL;
-+		vtmr_irq = hvtimer_irq;
-+		ptmr_irq = hptimer_irq;
-+		stage_vtimer_cval = GUEST_STAGE_HVTIMER_CVAL;
-+		stage_vtimer_tval = GUEST_STAGE_HVTIMER_TVAL;
-+		stage_ptimer_cval = GUEST_STAGE_HPTIMER_CVAL;
-+		stage_ptimer_tval = GUEST_STAGE_HPTIMER_TVAL;
-+	} else {
-+		vtimer = VIRTUAL;
-+		ptimer = PHYSICAL;
-+		vtmr_irq = vtimer_irq;
-+		ptmr_irq = ptimer_irq;
-+		stage_vtimer_cval = GUEST_STAGE_VTIMER_CVAL;
-+		stage_vtimer_tval = GUEST_STAGE_VTIMER_TVAL;
-+		stage_ptimer_cval = GUEST_STAGE_PTIMER_CVAL;
-+		stage_ptimer_tval = GUEST_STAGE_PTIMER_TVAL;
-+	}
-+
-+	timer_set_ctl(vtimer, CTL_IMASK);
-+	timer_set_ctl(ptimer, CTL_IMASK);
-+	gic_irq_enable(vtmr_irq);
-+	gic_irq_enable(ptmr_irq);
- 
--	gic_irq_enable(vtimer_irq);
--	gic_irq_enable(ptimer_irq);
- 	local_irq_enable();
- 
--	guest_run_stage(shared_data, GUEST_STAGE_VTIMER_CVAL);
--	guest_run_stage(shared_data, GUEST_STAGE_VTIMER_TVAL);
--	guest_run_stage(shared_data, GUEST_STAGE_PTIMER_CVAL);
--	guest_run_stage(shared_data, GUEST_STAGE_PTIMER_TVAL);
-+	guest_run_stage(shared_data, stage_vtimer_cval);
-+	guest_run_stage(shared_data, stage_vtimer_tval);
-+	guest_run_stage(shared_data, stage_ptimer_cval);
-+	guest_run_stage(shared_data, stage_ptimer_tval);
- 
- 	GUEST_DONE();
  }
  
- static void test_init_timer_irq(struct kvm_vm *vm)
++static void aarch64_vcpu_set_reg(struct kvm_vcpu *vcpu, uint64_t sctlr_el1,
++			uint64_t tcr_el1, uint64_t ttbr0_el1)
++{
++	uint64_t fpen;
++
++	/*
++	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
++	 * registers, which the variable argument list macros do.
++	 */
++	fpen = 3 << 20;
++
++	if (is_vcpu_nested(vcpu)) {
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPTR_EL2), fpen);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL2), sctlr_el1);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL2), tcr_el1);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL2), DEFAULT_MAIR_EL1);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL2), ttbr0_el1);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), HCR_EL2_NV_EANBLE);
++	} else {
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPACR_EL1), fpen);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), ttbr0_el1);
++
++	}
++
++	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpu->id);
++}
++
+ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
  {
--	/* Timer initid should be same for all the vCPUs, so query only vCPU-0 */
--	vcpu_device_attr_get(vcpus[0], KVM_ARM_VCPU_TIMER_CTRL,
--			     KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq);
--	vcpu_device_attr_get(vcpus[0], KVM_ARM_VCPU_TIMER_CTRL,
--			     KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq);
+ 	struct kvm_vcpu_init default_init = { .target = -1, };
+ 	struct kvm_vm *vm = vcpu->vm;
+ 	uint64_t sctlr_el1, tcr_el1, ttbr0_el1;
  
--	sync_global_to_guest(vm, ptimer_irq);
--	sync_global_to_guest(vm, vtimer_irq);
+-	if (!init)
++	if (!init) {
+ 		init = &default_init;
++	} else {
++		/* Is this vcpu a Guest-Hypersior */
++		if (kvm_arm_vcpu_has_el2(init))
++			vcpu->nested = true;
++	}
+ 
+ 	if (init->target == -1) {
+ 		struct kvm_vcpu_init preferred;
+@@ -275,12 +311,6 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+ 
+ 	vcpu_ioctl(vcpu, KVM_ARM_VCPU_INIT, init);
+ 
+-	/*
+-	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
+-	 * registers, which the variable argument list macros do.
+-	 */
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPACR_EL1), 3 << 20);
 -
--	pr_debug("ptimer_irq: %d; vtimer_irq: %d\n", ptimer_irq, vtimer_irq);
-+	/* Timer initid should be same for all the vCPUs, so query only vCPU-0 */
-+	if (is_vcpu_nested(vcpus[0])) {
-+		vcpu_device_attr_get(vcpus[0], KVM_ARM_VCPU_TIMER_CTRL,
-+				KVM_ARM_VCPU_TIMER_IRQ_HPTIMER, &hptimer_irq);
-+		vcpu_device_attr_get(vcpus[0], KVM_ARM_VCPU_TIMER_CTRL,
-+				KVM_ARM_VCPU_TIMER_IRQ_HVTIMER, &hvtimer_irq);
-+
-+		sync_global_to_guest(vm, hptimer_irq);
-+		sync_global_to_guest(vm, hvtimer_irq);
-+
-+		pr_debug("hptimer_irq: %d; hvtimer_irq: %d\n", hptimer_irq, hvtimer_irq);
-+	} else {
-+		vcpu_device_attr_get(vcpus[0], KVM_ARM_VCPU_TIMER_CTRL,
-+				KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq);
-+		vcpu_device_attr_get(vcpus[0], KVM_ARM_VCPU_TIMER_CTRL,
-+				KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq);
-+
-+		sync_global_to_guest(vm, ptimer_irq);
-+		sync_global_to_guest(vm, vtimer_irq);
-+
-+		pr_debug("ptimer_irq: %d; vtimer_irq: %d\n", ptimer_irq, vtimer_irq);
-+	}
+ 	sctlr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1));
+ 	tcr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1));
+ 
+@@ -349,11 +379,7 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+ 	if (use_lpa2_pte_format(vm))
+ 		tcr_el1 |= (1ul << 59) /* DS */;
+ 
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), ttbr0_el1);
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpu->id);
++	aarch64_vcpu_set_reg(vcpu, sctlr_el1, tcr_el1, ttbr0_el1);
  }
  
- static int gic_fd;
-@@ -184,7 +261,10 @@ struct kvm_vm *test_vm_create(void)
- 	unsigned int i;
- 	int nr_vcpus = test_args.nr_vcpus;
+ void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
+@@ -387,7 +413,11 @@ static struct kvm_vcpu *__aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
  
--	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
-+	if (test_args.is_nested)
-+		vm = nv_vm_create_with_vcpus_gic(nr_vcpus, vcpus, NULL, guest_code);
+ 	aarch64_vcpu_setup(vcpu, init);
+ 
+-	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
++	if (is_vcpu_nested(vcpu))
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SP_EL2), stack_vaddr + stack_size);
 +	else
-+		vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
++		vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
++
+ 	return vcpu;
+ }
  
- 	vm_init_descriptor_tables(vm);
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
-diff --git a/tools/testing/selftests/kvm/include/arm64/arch_timer.h b/tools/testing/selftests/kvm/include/arm64/arch_timer.h
-index bf461de34785..82ba908fba8b 100644
---- a/tools/testing/selftests/kvm/include/arm64/arch_timer.h
-+++ b/tools/testing/selftests/kvm/include/arm64/arch_timer.h
-@@ -11,6 +11,8 @@
- enum arch_timer {
- 	VIRTUAL,
- 	PHYSICAL,
-+	HVIRTUAL,
-+	HPHYSICAL,
- };
+@@ -457,7 +487,10 @@ void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
+ {
+ 	extern char vectors;
  
- #define CTL_ENABLE	(1 << 0)
-@@ -37,8 +39,10 @@ static inline uint64_t timer_get_cntct(enum arch_timer timer)
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
++	if (is_vcpu_nested(vcpu))
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL2), (uint64_t)&vectors);
++	else
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
+ }
  
- 	switch (timer) {
- 	case VIRTUAL:
-+	case HVIRTUAL:
- 		return read_sysreg(cntvct_el0);
- 	case PHYSICAL:
-+	case HPHYSICAL:
- 		return read_sysreg(cntpct_el0);
- 	default:
- 		GUEST_FAIL("Unexpected timer type = %u", timer);
-@@ -52,9 +56,11 @@ static inline void timer_set_cval(enum arch_timer timer, uint64_t cval)
- {
- 	switch (timer) {
- 	case VIRTUAL:
-+	case HVIRTUAL:
- 		write_sysreg(cval, cntv_cval_el0);
- 		break;
- 	case PHYSICAL:
-+	case HPHYSICAL:
- 		write_sysreg(cval, cntp_cval_el0);
- 		break;
- 	default:
-@@ -68,8 +74,10 @@ static inline uint64_t timer_get_cval(enum arch_timer timer)
- {
- 	switch (timer) {
- 	case VIRTUAL:
-+	case HVIRTUAL:
- 		return read_sysreg(cntv_cval_el0);
- 	case PHYSICAL:
-+	case HPHYSICAL:
- 		return read_sysreg(cntp_cval_el0);
- 	default:
- 		GUEST_FAIL("Unexpected timer type = %u", timer);
-@@ -83,9 +91,11 @@ static inline void timer_set_tval(enum arch_timer timer, int32_t tval)
- {
- 	switch (timer) {
- 	case VIRTUAL:
-+	case HVIRTUAL:
- 		write_sysreg(tval, cntv_tval_el0);
- 		break;
- 	case PHYSICAL:
-+	case HPHYSICAL:
- 		write_sysreg(tval, cntp_tval_el0);
- 		break;
- 	default:
-@@ -100,8 +110,10 @@ static inline int32_t timer_get_tval(enum arch_timer timer)
- 	isb();
- 	switch (timer) {
- 	case VIRTUAL:
-+	case HVIRTUAL:
- 		return read_sysreg(cntv_tval_el0);
- 	case PHYSICAL:
-+	case HPHYSICAL:
- 		return read_sysreg(cntp_tval_el0);
- 	default:
- 		GUEST_FAIL("Could not get timer %d\n", timer);
-@@ -115,9 +127,11 @@ static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
- {
- 	switch (timer) {
- 	case VIRTUAL:
-+	case HVIRTUAL:
- 		write_sysreg(ctl, cntv_ctl_el0);
- 		break;
- 	case PHYSICAL:
-+	case HPHYSICAL:
- 		write_sysreg(ctl, cntp_ctl_el0);
- 		break;
- 	default:
-@@ -131,8 +145,10 @@ static inline uint32_t timer_get_ctl(enum arch_timer timer)
- {
- 	switch (timer) {
- 	case VIRTUAL:
-+	case HVIRTUAL:
- 		return read_sysreg(cntv_ctl_el0);
- 	case PHYSICAL:
-+	case HPHYSICAL:
- 		return read_sysreg(cntp_ctl_el0);
- 	default:
- 		GUEST_FAIL("Unexpected timer type = %u", timer);
-diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
-index 9b6edaafe6d4..95f61c4a8a80 100644
---- a/tools/testing/selftests/kvm/include/timer_test.h
-+++ b/tools/testing/selftests/kvm/include/timer_test.h
-@@ -26,6 +26,7 @@ struct test_args {
- 	/* Members of struct kvm_arm_counter_offset */
- 	uint64_t counter_offset;
- 	uint64_t reserved;
-+	bool is_nested;
- };
+ void route_exception(struct ex_regs *regs, int vector)
+diff --git a/tools/testing/selftests/kvm/lib/arm64/vgic.c b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+index 4427f43f73ea..67822b803d0f 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/vgic.c
++++ b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+@@ -79,6 +79,14 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
+ 	return gic_fd;
+ }
  
- /* Shared variables between host and guest */
++void  vgic_v3_close(int gic_fd)
++{
++	if (gic_fd < 0)
++		return;
++
++	close(gic_fd);
++}
++
+ /* should only work for level sensitive interrupts */
+ int _kvm_irq_set_level_info(int gic_fd, uint32_t intid, int level)
+ {
 -- 
 2.48.1
 
