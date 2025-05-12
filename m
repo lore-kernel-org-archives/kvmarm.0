@@ -1,113 +1,105 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B9A2951D2
-	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 13:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050111E32DB
+	for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 14:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747056619; cv=none; b=Dda/4QQ8zC1r7wPpGQmKz8A8m6BKG4SZxDVGQBl3pPgGCIb1YMwXglMz2e6jefai+Z0ishLU2b+ErfJ4VFko7b+0bYCvAXaJmmIFfrgj8ukOP2EiMrgFiUh55enQwhLw5mvFL/WBPIGakNVYWjdB1Q6x+9f5XDaqMoZ8dPDoJRg=
+	t=1747058964; cv=none; b=Zv1rUDrh5Rxh21lIbDC8GfOapPrai6rxDGiAOip0aL0a8zlPOx0mBVXP5b2BqorteAnx0DgWlv6M6rWrYIwTBI+9JyS+eDqC7CROWaqzTjFR7AZcyP6ANYGNzc9lXkLUqa0n6Wdy3riNbMPYvkKqeD2ZzFoIVRElewB7QR0CJ5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747056619; c=relaxed/simple;
-	bh=O8oz5UvKiTFaAgUQe1w3ZHg8nAMDBTrMSIwdDYm3EAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GiLHaBBFrNYB5eLi449KOMg4UUwMvApiw/BYE0qFUEn8sxcePlOvTFKRtdLK7ddXMKZjmUuz3iYsSgGSVPTIprc1e8dQxWLLgT5waC0YwiyV7aaj5tLu1r0/UmXWpIiClCHlOQNL2ot62ibwaQ/8wt5h/8sapTT7qC3lKF/fzkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=Tmlzo3/3; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+	s=arc-20240116; t=1747058964; c=relaxed/simple;
+	bh=bs0KT0uEopTREFIV09FXprEMp4r+yb1cp38ev0pRS7o=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XZd5qwzHbQsT+uF8wVlrtdikXDAfbNwMvfEoTzUxr6GXev4LBxHCZsbaZdSB06QOUSk5huQcvQ99HxymEj1rx05kge6CWT15f52I6o6BQLGTtbaJ0Tn7vvYV8XeBbpCwbaBFxA6fLjDL6yVTOfqyAN/fJ2vVxTDtr0EjB677KE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=s9KQ4ByV; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="Tmlzo3/3"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43d0782d787so30489345e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 12 May 2025 06:30:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="s9KQ4ByV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie.ntu.edu.tw; s=google; t=1747056613; x=1747661413; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6O0jvL9bp0RhLH3gFStx+IoQOSIzReGN6we6Sj8t7oo=;
-        b=Tmlzo3/3grvs8PTtZ3oH5odCBX7f1xKcMx0AssoBBTKPAx6tHUTXuSBm88n67V/5Tk
-         nq3d43EaIJctMoODKExsCVzCw15lodxRGrFdkjazSAzBH8m4lrj3obDVrCY0gZk+fukf
-         BP+b2VQkAHOJazCwlZY/xiiw/7O9kFdd99G+9F5m4C5ujUqRVLv1fZhuD12iKrzw9Dq/
-         /fMTstKXe2SI+PdZapW6oSZgyk9oyDpnudRyrf6C5eLtwCFC9gxoA+qV4fuRaqmz0rey
-         YXHCMUzmZfs/kWfrnMFvaYdrMpB9IVj6c0KhfqS2bRBwmje8e1bCxhoMEd4viK/Xlhh4
-         yzGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747056613; x=1747661413;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6O0jvL9bp0RhLH3gFStx+IoQOSIzReGN6we6Sj8t7oo=;
-        b=FBewG9IxOpIqVip1I63W+TEps4KZWRgxuCAeC23Bj3iv1AiHnNo9XkWrc6xqKPIDGv
-         bhartTOg6HTpjdoVVQt0HwfVyDkI34Yzm9ym5wDyAIBrGNkOTWKUDDMXCieOaFyh+B3E
-         yJpHHQv0WrJ5Bvqp7nM8znAdA8AxDc9Os6xDylApKWEc4UbIQgo0UT5jBnqfNN3JDpp2
-         kErP241J4VfoEBnXtaZrTvbaMsP94m5BxAvQakv1tb1Z27rZ1H/cqNmqySGbV436jfJM
-         3TeyUqmG0OnvYYaxy11zLYrv4lqCdh/r6GpKqUSqxHJdRNV5NidZL/Ztt0NPL8oUeqL+
-         AwjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULcr82FkJmVxCLPu6hQxfd/SOrBo65j4sJWfHPec/coTUG0N3GpAuyQtQ1CzeFVYmrr1jUUAo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxyNTG3ctjyHb9zgkJL+2GUWz3RtM6Lm3CG1cxhaZ6HgasLtVE3
-	GU4AP6yv81gW7QuMHPRpqQfsnt+QbzhGD5eAhy50eR1eXgRPuXO07fgtCrH9Wk8/Zq1NIDSUw/H
-	ShPJ48ACgMNIdFoc5aPrtHjTUAkqD29ImAhsXy7ozM5DIQJA=
-X-Gm-Gg: ASbGncsoevciL8HBPfClqKsFqKnyGi09Ku++zJifPmzrSuL773beAU32OsLtJwvF84k
-	Z6IAR2Ig2lsdaQ++C8pR9J5U50gQohl5ENowx9icBowfr7Zj0hmZHipoKzgWgAg86K6E2EaAl2O
-	WtVcB5aIxHNTws34iAgQ37oxQBEZc4UX1EkuZvl1F5t98sR2sdp6LSVYhDcfgfJNUzaLnoB8AiS
-	5iBnijcZADapOijGTkj6qBzjUXBBF5b6OQIgjxzFDlC1oHywS/gCLWd7pC4ZeZ7rMN8ZYewRvJ+
-	qrDIkY1VEtH/cK6cyLlessPkX9KIQfghPrcG8VAW3TBpTshWDA0WvNKClsLnNwzU6vFgCDRl
-X-Google-Smtp-Source: AGHT+IGvjNxhAX66VVq4W0wV6STryscjMOGjWiI63Myou666P8Evc1sc/t303qv3kgeVp110Hjntxg==
-X-Received: by 2002:a05:600c:5250:b0:43c:ea1a:720c with SMTP id 5b1f17b1804b1-442d6d6ad52mr105665795e9.18.1747056612621;
-        Mon, 12 May 2025 06:30:12 -0700 (PDT)
-Received: from localhost.localdomain ([213.157.19.150])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442d67ee33bsm125593325e9.20.2025.05.12.06.30.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 06:30:12 -0700 (PDT)
-From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Subject: [PATCH] KVM: arm64: nv: Remove clearing of ICH_LR<n>.EOI if ICH_LR<n>.HW == 1
-Date: Mon, 12 May 2025 21:32:23 +0800
-Message-ID: <20250512133223.866999-1-r09922117@csie.ntu.edu.tw>
-X-Mailer: git-send-email 2.49.0
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1747058963; x=1778594963;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=bs0KT0uEopTREFIV09FXprEMp4r+yb1cp38ev0pRS7o=;
+  b=s9KQ4ByVZwCtw8FnIG6rzV6PwIa71HAg9AGlviS8njwPznNMUB1hH9Rr
+   o+xyeWd0F6UxHAtUurb9meYdifM9rgt+78ztOBdw7OoOD+KumGmftyuIA
+   kxqw7IHz+pGVMVoPEjbCEYLm1FHI+XrR0GdCV8MEAAskSuc5J3T4mwjWo
+   7p7NkvrsqZDaxBmTtBWEOtDqbDp2cnpOC0yPFjp9Ohhq0zPbe3RqOHqBn
+   716x7QrSh5CwRKrAhif8kpLbey8utMbdge8Nb25YyjrF+ofEJL5/GCHw4
+   JD8IteHfcPMHy8UjujvJHjEt3/9G2GeNsUvlZHhg1RvfRd3WEjtG39n4E
+   w==;
+X-IronPort-AV: E=Sophos;i="6.15,282,1739836800"; 
+   d="scan'208";a="489002478"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 14:09:19 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:46847]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.21.215:2525] with esmtp (Farcaster)
+ id d1c2ccfc-6936-4d2e-9e97-d566a0803f65; Mon, 12 May 2025 14:09:19 +0000 (UTC)
+X-Farcaster-Flow-ID: d1c2ccfc-6936-4d2e-9e97-d566a0803f65
+Received: from EX19D023EUB003.ant.amazon.com (10.252.51.5) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 12 May 2025 14:09:18 +0000
+Received: from dev-dsk-dssauerw-1b-2c5f429c.eu-west-1.amazon.com
+ (10.13.238.31) by EX19D023EUB003.ant.amazon.com (10.252.51.5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1544.14; Mon, 12 May 2025 14:09:13 +0000
+From: David Sauerwein <dssauerw@amazon.de>
+To: <jingzhangos@google.com>
+CC: <andre.przywara@arm.com>, <coltonlewis@google.com>, <eauger@redhat.com>,
+	<jiangkunkun@huawei.com>, <joey.gouly@arm.com>, <kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<lishusen2@huawei.com>, <maz@kernel.org>, <oupton@google.com>,
+	<pbonzini@redhat.com>, <rananta@google.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <graf@amazon.com>, <nh-open-source@amazon.com>
+Subject: Re: [PATCH v4 5/5] KVM: arm64: vgic-its: Clear ITE when DISCARD frees an ITE
+Date: Mon, 12 May 2025 14:09:09 +0000
+Message-ID: <20250512140909.3464-1-dssauerw@amazon.de>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241107214137.428439-6-jingzhangos@google.com>
+References: <20241107214137.428439-6-jingzhangos@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Gm-Spam: 0
-X-Gm-Phishy: 0
+X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
+ EX19D023EUB003.ant.amazon.com (10.252.51.5)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-In the case of ICH_LR<n>.HW == 1, bit 41 of LR is just a part of pINTID
-without EOI meaning, and bit 41 will be zeroed by the subsequent clearing
-of ICH_LR_PHYS_ID_MASK anyway.
-No functional changes intended.
+Hi Jing,
 
-Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
----
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 3 ---
- 1 file changed, 3 deletions(-)
+After pulling this patch in via the v6.6.64 and v5.10.226 LTS releases, I see
+NULL pointer dereferences in some guests. The dereference happens in different
+parts of the kernel outside of the GIC driver (file systems, NVMe driver,
+etc.). The issue only appears once every few hundred DISCARDs / guest boots.
+Reverting the commit does fix the problem. I have seen multiple different guest
+kernel versions (4.14, 5.15) and distributions exhibit this issue.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index bfa5bde1f106..4f6954c30674 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -240,9 +240,6 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu,
- 			goto next;
- 		}
- 
--		/* It is illegal to have the EOI bit set with HW */
--		lr &= ~ICH_LR_EOI;
--
- 		/* Translate the virtual mapping to the real one */
- 		lr &= ~ICH_LR_PHYS_ID_MASK;
- 		lr |= FIELD_PREP(ICH_LR_PHYS_ID_MASK, (u64)irq->hwintid);
--- 
-2.49.0
+The issue looks like some kind of race. I think the guest re-uses the memory
+allocated for the ITT before the hypervisor is actually done with the DISCARD
+command, i.e. before it zeros the ITE. From what I can tell, the guest should
+wait for the command to finish via its_wait_for_range_completion(). I tried
+locking reads to its->cwriter in vgic_mmio_read_its_cwriter() and its->creadr
+in vgic_mmio_read_its_creadr() with its->cmd_lock in the hypervisor kernel, but
+that did not help. I also instrumented the guest kernel both via printk() and
+trace events. In both cases the issue disappears once the instrumentation is in
+place, so I'm not able to fully observe what is happening on the guest side.
+
+Do you have an idea of what might cause the issue?
+
+David
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
