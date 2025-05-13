@@ -1,184 +1,124 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C00818E1F
-	for <kvmarm@lists.linux.dev>; Tue, 13 May 2025 15:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D70914F9EB
+	for <kvmarm@lists.linux.dev>; Tue, 13 May 2025 15:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747149399; cv=none; b=pWxjsNyzCoaskf7CI40kvSNiHZEDBCmdVNnvqap7rvu6lMt1q4HTE3KQrI/VefEK2IX/BOlQu3aCXFouMCI2fjZeTkOeuY7IFtQZM7EmV2EfIfAjB3mdj/p0W/tV3UzSRFlKj2iRjC0FIi2nl34kEUNnWwtCiJXZm2VnsK0Cu5I=
+	t=1747149813; cv=none; b=pT8Mw2unretdTQYKktugMfnagPdl7uE6DsV3QiL/+iPijr6NXgWXOnLzu9ihLQlVaC2orIwZPGZm15GyGhL47GzJ/FodeIuoQFtsERDFlFDdworajAln7ml3HB+uRKrUvc+Ly4Nk63vTUKxGBWdtII2YP0dxnRH61BvjQmkIiZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747149399; c=relaxed/simple;
-	bh=94P94eJc7x4T5OebFcGLwzjvtyyYxZm7baogL1P3QoI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B1tDvw3a6PK+ShBUYb7evVI3KkKGOmWpHBIyNoZA1TSSvNAOoiVecUQCdr1oWYqP13RLAHIiswHarq4m1fPUfTh87E/y8XQWyQhGDizpB6YtNvvpAQxzF3pJnEaI7CUMNXj6NceK73onVmfSFdmgc3k8TED3NucQ6OWhVv6yReI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=edVE0MQU; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1747149813; c=relaxed/simple;
+	bh=W1wUySPSy0bY2pfl0wEDUXt0ALzKHKgSQ7jjhydvnvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g2XZbN3LjX6Z9EzP1QxYY2QBGMR1Bhamx6Z3nEpjcKvNKrSzqS9+pzrP1MWxcoUywd/wupv9TUHSmcE/lWsD3snZJMeig1Z4PE1wNIz61WGVsdhXYhB7EBvT2GfTo5OKXItmm5gjM3WZJXfpgupAsvquCuNxvSEB2dG7zAt4Pn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZRsP34et; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="edVE0MQU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRsP34et"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747149396;
+	s=mimecast20190719; t=1747149810;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/XoJ42U2y/9zd0YP7um9oFc+AhPWl/ZEz6pZ6QwMtwA=;
-	b=edVE0MQUj5kIjJYyc2XBE84QUrCUI+zOi0FX+jFRPazpNOzsnL/lFzZ3I8YFYHgik/8E19
-	ThGqsbf6JvLr54UgoWy5tfokiqvmgPKf5seuuZhebY7AVdZNjr40tO+IxBuIspaxQlqCC7
-	sNoNmrF7lwA3XMU13mkLw4bKgFDURJo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-kXNhUBqhO_2mh1geA89cVg-1; Tue, 13 May 2025 11:16:35 -0400
-X-MC-Unique: kXNhUBqhO_2mh1geA89cVg-1
-X-Mimecast-MFC-AGG-ID: kXNhUBqhO_2mh1geA89cVg_1747149394
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a0b7c8b3e2so3667141f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 13 May 2025 08:16:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747149394; x=1747754194;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/XoJ42U2y/9zd0YP7um9oFc+AhPWl/ZEz6pZ6QwMtwA=;
-        b=R9AIYAbYVywXKFIeiZcXat/AAapK9xsL4lqciUnc/HIuR/2XtaVpDlqcvHrxQcE9YJ
-         crnK+OmFOxkqSfAtD4yw4YXGQoSN9/opirFQGjPr82co1JcBPb2C+AdoMJlya3JJNHA6
-         KJn/zXV5fBVhlnRmxixP3QpjoezCu0N1980WUlyFNyJD6ewHr0STtAj7WW8UY4KOZxku
-         od2rxjF9B+GKYC48q5VTyncLn8inQxvIoiEJ4IL67AMLEPna/1auaLhahj8lzLuN35q6
-         npZ6qg6aKzCURTCQHQRyzkS+7OkqRYIbRnA0iSONYLGC9z+si0O5+Lz05extFkAmmXuA
-         1C1w==
-X-Forwarded-Encrypted: i=1; AJvYcCU2ofmYIzNgl639kM5JTYUnDBW72a0vdmRmjtpeUot++mXFlX7dWOfrPXiFFSgvdPK/SbXumZE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwfEd+0eEB/v2GHSXIb0EGEJFh+WMsQzbz5mLrGd0+rKxyelIDR
-	b4bCimPrVUChpSXOZ1XqkfaheyLqTdZybXNkDGZai5TgtW0Di7NgpnCFB26J/sVOmiat+dB5ftq
-	GcJHOqoU63tdkVpAC2CqCqJBnxphbIIlNQWy1AxOFiX07zppRJDQMEw==
-X-Gm-Gg: ASbGnctF5tToBDqjFda/RydTl36JrZ1uCUt1HokQjhsRxx9diP2W79SzL/BIRufIxo5
-	Q3UVf4ArLcL4sRh0AxYglVpbINYjZizGN2SWVb1dK+lqqkI1z8JgIehrGCvh8TMk0pc5Pv9dRco
-	Xe517IYPccpQNBKBx6bEEyKWfyVoRbLH0P9luIdPlC+CrFKZzeglbTWNwc3gf+2tz+0elnoxrkc
-	sndIt2x36CXRKRRzYt7+sn2OwSQzATDffyyIV2GxLP7Z8nQCZjMAQnaR1CP+tFaGakFU/Rc8fGn
-	OGDkgGaFoB355UmoobaWTO5fmkH+03IERz0Y5TKyle3DUeHRu3whHJteNx8=
-X-Received: by 2002:a5d:598e:0:b0:39c:2688:612b with SMTP id ffacd0b85a97d-3a1f64277femr15646996f8f.7.1747149394177;
-        Tue, 13 May 2025 08:16:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEO9N1Muxi40863izt+xRGg83Sc69SpQT6SZfRFMKC1kCRtYNKU+SmXOLs5AdVDo+SN9lle3Q==
-X-Received: by 2002:a5d:598e:0:b0:39c:2688:612b with SMTP id ffacd0b85a97d-3a1f64277femr15646959f8f.7.1747149393817;
-        Tue, 13 May 2025 08:16:33 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58ecb46sm16707990f8f.30.2025.05.13.08.16.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 May 2025 08:16:33 -0700 (PDT)
-Message-ID: <b62b7529-e782-41d6-91d4-c59af1b92020@redhat.com>
-Date: Tue, 13 May 2025 17:16:30 +0200
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=cgbu7nue8vQ9ere64ITgIcQRi4NqnKKSII3mmlr4q+U=;
+	b=ZRsP34etH4pHoTsHtiujKhfL+70Z5mti1uVWYe2NGZ6hDrj6D7dot4V9ByswUmsfHXb6xh
+	SJzzPlwC/aXC+QzkHvKUyg9FVuHMDsyv0Sbj4dM99iFhkjCxhgQFJOY4/PAyHG+oqjWPd4
+	pjVCV2XhPzyiUaBvzjZRSB/zHTu1Zjc=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-195-GJWtSxzUOQ2zpbXRAKwSLg-1; Tue,
+ 13 May 2025 11:23:26 -0400
+X-MC-Unique: GJWtSxzUOQ2zpbXRAKwSLg-1
+X-Mimecast-MFC-AGG-ID: GJWtSxzUOQ2zpbXRAKwSLg_1747149804
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB46819560AF;
+	Tue, 13 May 2025 15:23:23 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.110])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6FEF919560A7;
+	Tue, 13 May 2025 15:23:16 +0000 (UTC)
+Date: Tue, 13 May 2025 16:23:13 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org, richard.henderson@linaro.org,
+	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+	agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com,
+	philmd@linaro.org, pbonzini@redhat.com
+Subject: Re: [PATCH v3 02/10] arm/cpu: Add sysreg properties generation
+Message-ID: <aCNj4dFWLkBZrmmh@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20250414163849.321857-1-cohuck@redhat.com>
+ <20250414163849.321857-3-cohuck@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 04/10] kvm: kvm_get_writable_id_regs
-To: Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
- peter.maydell@linaro.org, richard.henderson@linaro.org,
- alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
- sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
-Cc: agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com,
- philmd@linaro.org, pbonzini@redhat.com
-References: <20250414163849.321857-1-cohuck@redhat.com>
- <20250414163849.321857-5-cohuck@redhat.com>
- <4f370fae-8234-48ca-97e2-3b7038092974@redhat.com> <878qn0po69.fsf@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <878qn0po69.fsf@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: Vwy3n76BQCCBuaEgWkY0p9HykQ5jv08ZRVjJJMl_PDI_1747149394
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250414163849.321857-3-cohuck@redhat.com>
+User-Agent: Mutt/2.2.14 (2025-02-20)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
+On Mon, Apr 14, 2025 at 06:38:41PM +0200, Cornelia Huck wrote:
+> From: Eric Auger <eric.auger@redhat.com>
+> 
+> Introduce a script that automates the generation of system register
+> properties definitions from a given linux source tree
+> arch/arm64/tools/sysreg.
+> 
+> Invocation of
+> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
+> in scripts directory additionally generates
+> target/arm/cpu-sysreg-properties.c containing definitions for
+> feature ID registers.
+> 
+> update-aarch64-sysreg-code.sh additionally calls
+> gen-cpu-sysreg-properties.awk which is inherited from kernel
+> arch/arm64/tools/gen-sysreg.awk. All credits to Mark Rutland
+> the original author of this script.
+> 
+> [CH: split off from original patch adding both sysreg definitions
+>  and properties]
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++++++++++++++++
+>  scripts/update-aarch64-sysreg-code.sh |   5 +-
+>  2 files changed, 329 insertions(+), 1 deletion(-)
+>  create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+> 
+> diff --git a/scripts/gen-cpu-sysreg-properties.awk b/scripts/gen-cpu-sysreg-properties.awk
+> new file mode 100755
+> index 000000000000..76c37938b168
+> --- /dev/null
+> +++ b/scripts/gen-cpu-sysreg-properties.awk
+> @@ -0,0 +1,325 @@
+> +#!/bin/awk -f
+> +# SPDX-License-Identifier: GPL-2.0
 
+GPL-2.0 is a deprecated SPDX identifier. checkpatch.pl ought to
+have complained about this, requiring GPL-2.0-or-later as the
+preference, with GPL-2.0-only requiring justification in the
+commit.
 
-On 5/13/25 4:42 PM, Cornelia Huck wrote:
-> On Tue, May 13 2025, Eric Auger <eric.auger@redhat.com> wrote:
->
->> Hi Connie,
->>
->> On 4/14/25 6:38 PM, Cornelia Huck wrote:
->>> Add an helper to retrieve the writable id reg bitmask. The
->>> status of the query is stored in the CPU struct so that an
->>> an error, if any, can be reported on vcpu realize().
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>  target/arm/cpu.h     | 26 ++++++++++++++++++++++++++
->>>  target/arm/kvm.c     | 32 ++++++++++++++++++++++++++++++++
->>>  target/arm/kvm_arm.h |  7 +++++++
->>>  3 files changed, 65 insertions(+)
->>>
->>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->>> index d27134f4a025..bbee7ff2414a 100644
->>> --- a/target/arm/cpu.h
->>> +++ b/target/arm/cpu.h
->>> @@ -856,6 +856,26 @@ typedef struct {
->>>      uint32_t map, init, supported;
->>>  } ARMVQMap;
->>>  
->>> +typedef enum ARMIdRegsState {
->>> +    WRITABLE_ID_REGS_UNKNOWN,
->>> +    WRITABLE_ID_REGS_NOT_DISCOVERABLE,
->>> +    WRITABLE_ID_REGS_FAILED,
->>> +    WRITABLE_ID_REGS_AVAIL,
->>> +} ARMIdRegsState;
->>> +
->>> +/*
->>> + * The following structures are for the purpose of mapping the output of
->>> + * KVM_ARM_GET_REG_WRITABLE_MASKS that also may cover id registers we do
->>> + * not support in QEMU
->>> + * ID registers in op0==3, op1=={0,1,3}, crn=0, crm=={0-7}, op2=={0-7},
->>> + * as used by the KVM_ARM_GET_REG_WRITABLE_MASKS ioctl call.
->>> + */
->>> +#define NR_ID_REGS (3 * 8 * 8)
->> We may rename this define to better associate to the KVM API. I tend to
->> mix it with NUM_ID_IDX now ;-)
->> maybe something like KVM_NR_EXPOSED_ID_REGS
-> The kernel calls it KVM_FEATURE_ID_RANGE_SIZE, but I'd like to avoid
-> adding 'KVM' in the name, as it is basically a range of registers and
-> nothing really KVM specific... maybe ID_REG_RANGE_SIZE?
-what about NR_ID_REG_MASKS
-because it is masks actually.
->
->>> +
->>> +typedef struct IdRegMap {
->>> +    uint64_t regs[NR_ID_REGS];
->>> +} IdRegMap;
->> I would add a comment saying this is the mask array, just to prevent the
->> reading from thinking it is the actual reg content.
-> "More comments" seems to be a theme :) I'll go ahead and add them where
-> it makes sense.
-yeah. I am sorry. previously we had a single indexing and on top of that
-we have several kinds of definitions for id regs and writable masks.
-Even for me who contributed to that mess it can be difficult to parse so
-I imagine it can be painful to read for other readers too ;-)
+> +# gen-cpu-sysreg-properties.awk: arm64 sysreg header generator
+> +#
+> +# Usage: awk -f gen-cpu-sysreg-properties.awk $LINUX_PATH/arch/arm64/tools/sysreg
 
-Eric
->
->>> +
->>>  /* REG is ID_XXX */
->>>  #define FIELD_DP64_IDREG(ISAR, REG, FIELD, VALUE)                       \
->>>      ({                                                                  \
->>> @@ -1044,6 +1064,12 @@ struct ArchCPU {
->>>       */
->>>      bool host_cpu_probe_failed;
->>>  
->>> +    /*
->>> +     * state of writable id regs query used to report an error, if any,
->>> +     * on KVM custom vcpu model realize
->>> +     */
->>> +    ARMIdRegsState writable_id_regs;
->> maybe rename into writable_id_reg_status that would better reflect what
->> it is.
-> Indeed.
->
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
