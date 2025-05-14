@@ -1,88 +1,204 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEDE25D21B
-	for <kvmarm@lists.linux.dev>; Wed, 14 May 2025 09:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F24200B99;
+	Wed, 14 May 2025 10:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747216076; cv=none; b=PelWCQFAlpdVby6gqtqZVKxFUrl4FfXcBGSnDj/zsr+EfN1VK7ImTZq736yGtTXQc/Bivhcwx1EErtKHOcHt80WsAQ+yC9o9zONQ/bxJiu94GeLqZNzNKEPgXmzV+tCeBJeJoI2lz4qwZUDBHF4nOWhZQKetaM8LHq1oQSwHGTk=
+	t=1747218260; cv=none; b=C1YM8tiGIYYMUDHTygxaCC4OelZnwFbL9E9DLtH9TpEWdof8UTgwoMFgZy8PD/GVIj1Ls+OfO40W7Aadn2zvm+KaHc7fkkg39jL7IRe0lcKU90lz170Knz+Dw8Lt/ZF8TkG5J+SnAtX1x0DSvZjTMBLMV0GwubIFqsJWKJ6gnOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747216076; c=relaxed/simple;
-	bh=TG0IqLi9AgL0Uh4OwoVqyFUkBSVCDzsr00L7JqscPGg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bolYZWumA3iFaU1horRiyGIxlDWdhOh4ZXLzS6D4Wui+UuuJWV1RizWuvBQQ434n3CqED5HZSoj0oIQJRTc5I+D5BCJBpyRo/837FDawKRILL/uh1wRkBDLJHaPfzqsVY6KF/yzelk0Aj2ah7Z65aInnBp5SKfhKlVmfTEnCaPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKJ/NDQP; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKJ/NDQP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6073C4CEE9;
-	Wed, 14 May 2025 09:47:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747216074;
-	bh=TG0IqLi9AgL0Uh4OwoVqyFUkBSVCDzsr00L7JqscPGg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BKJ/NDQPzgPL2kV4gUS/qrUj3/e/JZ7/nyykwXtI6FqNNyNXs935nu4z/ooJg3J5c
-	 tEBCioUOB9edyD7uC3jIWaeWbbijfow+7XjykDk93CGOEpEizatuq2nl8r+xxbSUSW
-	 YYZ5EY8e812ArH0NDML5JRrwOEuwLTG292L352l0uivzM0TmE7goUKA+8+MWrdYSsL
-	 PUgOjzCTnK4g2pHVQnwTEx8eoXNLQU5bYPoOXkHdK1oQuePJ7WG7fj7+PGdElKN8zJ
-	 B8J6oeAHKEp9Kr2d34DMtyG3vR0DsfplHKVpVe1tS6zFBJ/y7zs7DkxkoKW+JgLsr3
-	 l983tbEQPg8ng==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uF8iO-00Eo8b-Pz;
-	Wed, 14 May 2025 10:47:52 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: Address Translation fixes
-Date: Wed, 14 May 2025 10:47:48 +0100
-Message-Id: <174721605556.2224247.6675762921692651616.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250422122612.2675672-1-maz@kernel.org>
-References: <20250422122612.2675672-1-maz@kernel.org>
+	s=arc-20240116; t=1747218260; c=relaxed/simple;
+	bh=BOofkBfaOlAL0tDVDzAKaauS2ThgBGfeSjAHZg5HhgQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MmWog2EWepAFI77E/IduQrdlfpjL6Mws1SGLiMCNI7i5M96HLciEg/XyacWO0ilKjhSC17WMy03UfRz1xW4w9nkPh33owKX0aPbaPGaF6tJ0DikLpLVVagdcIohw6wRS8I7o2JfD20j3ExFfqVTxLC2uwWcvGrUqSS9Zw7s7tvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6673E14BF;
+	Wed, 14 May 2025 03:24:05 -0700 (PDT)
+Received: from [10.57.24.82] (unknown [10.57.24.82])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A00C53F673;
+	Wed, 14 May 2025 03:24:12 -0700 (PDT)
+Message-ID: <36c46f16-85c2-43f8-b460-942f34631e0d@arm.com>
+Date: Wed, 14 May 2025 11:24:10 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 15/43] arm64: RME: Allow VMM to set RIPAS
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-16-steven.price@arm.com>
+ <83071e55-cbe4-4786-b60e-d26ce16368b3@arm.com>
+ <f4ee678d-112d-46d1-8b87-70e55d6617e1@arm.com>
+ <d0cbb637-6ba1-4858-b326-31271e9949ea@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <d0cbb637-6ba1-4858-b326-31271e9949ea@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 22 Apr 2025 13:26:09 +0100, Marc Zyngier wrote:
-> Here's a small series of fixes for KVM's implementation of address
-> translation (aka the AT S1* instructions), addressing a number of
-> issues in increasing levels of severity:
+On 13/05/2025 11:43, Suzuki K Poulose wrote:
+> On 12/05/2025 15:45, Steven Price wrote:
+>> On 06/05/2025 14:23, Suzuki K Poulose wrote:
+>>> Hi Steven
+>>>
+>>> On 16/04/2025 14:41, Steven Price wrote:
+
+[...]
+
 > 
-> - We misreport PAR_EL1.PTW in a number of occasions, including state
->   that is not possible as per the architecture definition
+>>
+>>>> +    }
+>>>> +
+>>>> +    realm_fold_rtt_level(realm, get_start_level(realm) + 1,
+>>>> +                 start, end);
+>>>
+>>> We don't seem to be reclaiing the RTTs from shared mapping case ?
+>>
+>> I'm not sure I follow: realm_fold_rtt_level() will free any RTTs that
+>> are released.
+>>
+>> Or are you referring to the fact that we don't (yet) fold the shared
+>> range? I have been purposefully leaving that for now as normally we'd
 > 
-> [...]
+> sorry it was a bit vague. We don't seem to be reclaiming the RTTs in
+> realm_unmap_shared_range(), like we do for the private range.
 
-Applied to next, thanks!
+Ah, you mean we potentially leave empty RTTs which are only reclaimed
+when destroying the realm. Whereas in the private range we
+opportunistically fold which will (usually) cause these to be freed.
 
-[1/3] KVM: arm64: Fix PAR_EL1.{PTW,S} reporting on AT S1E*
-      commit: 493b01de726d02e835c510d01df6880fa28d41b7
-[2/3] KVM: arm64: Teach address translation about access faults
-      commit: ed648ab8043aab3135490d6c01f1c889c4bac62c
-[3/3] KVM: arm64: Don't feed uninitialised data to HCR_EL2
-      commit: 3e4d597220587593dba505f5a7e932309155c54d
+>> follow the page size in the VMM to choose the page size on the guest,
+>> but that doesn't work when the RMM might have a different page size to
+>> the host. So my reasons for leaving it for later are:
+>>
+>>   * First huge pages is very much a TODO in general.
+>>
+>>   * When we support >4K host pages then a huge page on the host may not
+>>     be available in the RMM, so we can't just follow the VMM.
+>>
+>>   * We don't have support in realm_unmap_shared_range() to split a block
+>>     mapping up - it could be added, but it's not clear to me if it's best
+>>     to split a block mapping, or remove the whole and refault as
+>>     required.
+>>
+>>   * guest_memfd might well be able to provide some good hints here, but
+>>     we'll have to wait for that series to settle.
+> 
+> I am not sure I follow. None of this affects folding, once we have
+> "unmapped". For that matter, we could easily DESTROY the RTTs in
+> shared side without unmapping, but we can do that later as an
+> optimisation.
 
-Cheers,
+Yeah, ignore the above - like you say it's not relevant to unmapping, I
+hadn't understood your point ;)
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+I'll stick a call to realm_fold_rtt_level() at the end of
+realm_unmap_shared_range() which should opportunistically free unused
+RTTs. Like you say there's a optimisation to just straight to destroying
+the RTTs in the shared region - but I think that's best left until later.
 
+>>
+>>>> +}
+>>>> +
+>>>> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
+>>>> +               unsigned long size, bool unmap_private)
+>>>> +{
+>>>> +    unsigned long end = start + size;
+>>>> +    struct realm *realm = &kvm->arch.realm;
+>>>> +
+>>>> +    end = min(BIT(realm->ia_bits - 1), end);
+>>>> +
+>>>> +    if (realm->state == REALM_STATE_NONE)
+>>>> +        return;
+>>>> +
+>>>> +    realm_unmap_shared_range(kvm, find_map_level(realm, start, end),
+>>>> +                 start, end);
+>>>> +    if (unmap_private)
+>>>> +        realm_unmap_private_range(kvm, start, end);
+>>>> +}
+>>>> +
+>>>> +static int realm_init_ipa_state(struct realm *realm,
+>>>> +                unsigned long ipa,
+>>>> +                unsigned long end)
+>>>> +{
+>>>> +    phys_addr_t rd_phys = virt_to_phys(realm->rd);
+>>>> +    int ret;
+>>>> +
+>>>> +    while (ipa < end) {
+>>>> +        unsigned long next;
+>>>> +
+>>>> +        ret = rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
+>>>> +
+>>>> +        if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+>>>> +            int err_level = RMI_RETURN_INDEX(ret);
+>>>> +            int level = find_map_level(realm, ipa, end);
+>>>> +
+>>>> +            if (WARN_ON(err_level >= level))
+>>>
+>>> I am wondering if WARN_ON() is required here. A buggy VMM could trigger
+>>> the WARN_ON(). (e.g, INIT_IPA after POPULATE, where L3 table is
+>>> created.). The only case where it may be worth WARNING is if the level
+>>> == 3.
+>>
+>> I have to admit I've struggled to get my head round this ;)
+>>
+>> init_ripas will fail with ERROR_RTT in three cases:
+>>
+>>   1. (base_align) The base address isn't aligned for the level reached.
+>>
+>>   2. (rtt_state) The rtte state is !UNASSIGNED.
+>>
+>>   3. (no_progress) base==walk_top - the while condition should prevent
+>>      this.
+>>
+>> So I think case 1 is the case we're expecting, and creating RTTs should
+>> resolve it.
+>>
+>> Case 2 is presumably the case you are concerned about, although it's not
+>> because tables have been created, but because INIT_RIPAS is invalid on
+>> areas that have been populated already.
+> 
+> Correct, this is the case I was referring to.
+> 
+>>
+>> If my reading of the spec is correct, then level == 3 isn't a possible
+>> result, so beyond potentially finding RMM bugs I don't think a WARN for
+> 
+> It is almost certainly possible, with L3 page mapping created for
+> POPULATE and a follow up INIT_RIPAS with 2M or even 1G alignment, could
+> lead us to expect that only L1 or L2 is required (find_map_level) but
+> the RTT walk reached L3 and failed. This is not a case of RMM bug, but
+> a VMM not following the rules.
+
+Sorry, I wasn't clear. I mean "level == 3" isn't something that we
+should be WARNing on.
+
+>> that is very interesting. So for now I'll just drop the WARN_ON here
+>> altogether.
+> 
+> Thanks, that is much safer
+
+Ack.
+
+Thanks,
+Steve
+
+> Suzuki
+> 
 
