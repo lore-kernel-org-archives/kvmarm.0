@@ -1,559 +1,1290 @@
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2137.outbound.protection.outlook.com [40.107.95.137])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211248479
-	for <kvmarm@lists.linux.dev>; Tue, 13 May 2025 18:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.137
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747161924; cv=fail; b=Cr2/0flkPfZ0NHdOuOE2wd/KQCe6aBq69dDtnR9I6sYzwzoy4nt9b4BS5bzVH9zrZKuE3vaFdMpeaApMdfyhVSer5yUnnc++Bb2WeavMLVEKZLbYqyp3u7Bu0cxSGcxjfoKJ3pYAP1SNf94cBMGdF6Cnt0+yDd5s8VT12I/OIH8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747161924; c=relaxed/simple;
-	bh=GdCwJqTJ8HZ+KNCowkbIsoELsia+Hrxn23OqFibgmEA=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ZNOKvm8ozxzAzkrLaqfBTEiK+51WIF1e3jP/o2yOV7tlpvwxNXt+3NIU+LJHfvfX6vvnZtQDRlqY2htqoNfRmdAswf9YU9cI471lJFR9ajxV0sgOq8KSfJ74YXMXhxvIVB1xn1mzlhXACd/Yl25Y27Eyp9U56FHhawCew40A7Z0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=fgvgo96e; arc=fail smtp.client-ip=40.107.95.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955E61E521B
+	for <kvmarm@lists.linux.dev>; Wed, 14 May 2025 02:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747191512; cv=none; b=pwLcPvKQ3GFFTSD2dT66wvdJnd4LZfOqlu1Ev7GAf/3pp1zjq42PQZtQMvoh0qja/x7iRSqbVs/JU7cqgJBAD/us4sn0QWcoAzEl884C7V/3VnpbLSb8aObBNJ45EQZyP6LS0ebmOaK3qWtEhZTj2jLvYp6K3b53qa3gHmGplHM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747191512; c=relaxed/simple;
+	bh=k6ghV4tWmPA/vjzHfQm/IiYzz5sjqXUUrYZgWa3mQvc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gyrUfGJqhDN5oKlOhWZhIZfOQGR1Llt/vFt6RjpR/av/HNJ09QKZ+xaj4Co0jDQQZV9JnrLYa6zUAYDcigzBADwodPXLAbcseZQPzx7bq7wlhCEOmZSGbs86RTJ1a8TAGwAho/10OFPEsfouBVa7iaXMVJezbORTn2g+ZE4DrKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I3HTe8Gh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="fgvgo96e"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Rd48BDRVUmCLYkvyIKg2aUTREL27huLhpcPSppYbwfAg0rZzuFP8CajBRGfj9M2lx8pb7D5iJElF8pSSnlvYHA/b5JRVXBBxopJRLBdFE3vluz93C4pRIz2GWHZMCYIN4fncREIBNgpjm2/8eD0S7gYj6nOQgK4oXhKTQE3rFUTge8MhhSThi5pSWnuchaFb82ReekNImO3dMIx6FnJZdshzdeOmW8uMvPaQIC6AcntgnZOuBP1oAsh6UO918t0dCw5ELrtJqEyE3cdIG/m9RjowDUU3ekwA4r6IQyFeE26pA7SiX1v13GhaEXp8Qsd4Fikvj6TSZg8w4sQqZdL+pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=habv9dJAtv3q/6ngT6h1GC0sW3HIM3hff8eY8oqAhkg=;
- b=AQkSCY2M7JifcY8U+0TQa2FyN/nFDE8Hqhubc/QxUVp8mHsYLG5+MmQ2cjOe/wlalqehmeTJJ/dSmsZoXsWaXBmEnUsso8DI0AOFXJh6rEAmDqV/h2UU70vhAovQtQ0QAMAF+bJejTrR/wzLwLbXYgKhCh85Yp2LapkJpDai6xrgbnwphtU3fQ2q5i98O+Mg5bkwO+eli1lh75SdUgE5Yj117NGTQE6xl0nR1tq6UVPS6LGl24FInSCAocrN/cSf6UATDivnMNYOXZeuWWThXj67uIpig3lbUDi52+dkohrisX1alt5XhFTpbxrxiFUNP5K8aiIUOt1KYBKcEzk9tQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=habv9dJAtv3q/6ngT6h1GC0sW3HIM3hff8eY8oqAhkg=;
- b=fgvgo96eEtR2MRJC8F0wCjA7BKbfLaMrElRhSgAytVL+tAYbvtu0hGQD90uVuYE4hcQx/Nz5ElFR22n5uGPsXP3Sj/HA6YDc8GKNUyQebot5ao9io70TE8M6+RrWEPHDSz1WLgFJLqXmENkLoLsH9fx0KRgsCPA1OlY9YY9hmrc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from LV2PR01MB7792.prod.exchangelabs.com (2603:10b6:408:14f::10) by
- DS2PR01MB9229.prod.exchangelabs.com (2603:10b6:8:279::5) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.29; Tue, 13 May 2025 18:45:17 +0000
-Received: from LV2PR01MB7792.prod.exchangelabs.com
- ([fe80::2349:ebe6:2948:adb9]) by LV2PR01MB7792.prod.exchangelabs.com
- ([fe80::2349:ebe6:2948:adb9%5]) with mapi id 15.20.8722.027; Tue, 13 May 2025
- 18:45:17 +0000
-From: D Scott Phillips <scott@os.amperecomputing.com>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	James Morse <james.morse@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	"Rob Herring  (Arm)" <robh@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
-	Will Deacon <will@kernel.org>,
-	Yicong Yang <yangyicong@hisilicon.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4] arm64: errata: Work around AmpereOne's erratum AC04_CPU_23
-Date: Tue, 13 May 2025 11:45:14 -0700
-Message-ID: <20250513184514.2678288-1-scott@os.amperecomputing.com>
-X-Mailer: git-send-email 2.48.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: CH2PR02CA0023.namprd02.prod.outlook.com
- (2603:10b6:610:4e::33) To LV2PR01MB7792.prod.exchangelabs.com
- (2603:10b6:408:14f::10)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I3HTe8Gh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747191508;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qki9LdQjtAuB9rdSNOpOrtVN3/cyzGlkpiRxnFd5QxQ=;
+	b=I3HTe8Gh9wALL+5ZdIyvFEbCHu4pGFG2eVQpPuwBtQrxW6b+BvpEh3d1cFtdlhWJHi3m9P
+	5Gdps8nYNrFEvPPXfpCyxOALeP2goJBg7DJvCQskmi1ee0AMDXbTffsm23edaMXKQgZhib
+	eWmUMFPwcPL3VRMQfCTn0cEfmBuY3XE=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-384-zM0_as4IPfyHAPZ2gNQjNA-1; Tue, 13 May 2025 22:58:27 -0400
+X-MC-Unique: zM0_as4IPfyHAPZ2gNQjNA-1
+X-Mimecast-MFC-AGG-ID: zM0_as4IPfyHAPZ2gNQjNA_1747191506
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b240fdc9c20so5158499a12.3
+        for <kvmarm@lists.linux.dev>; Tue, 13 May 2025 19:58:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747191506; x=1747796306;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qki9LdQjtAuB9rdSNOpOrtVN3/cyzGlkpiRxnFd5QxQ=;
+        b=YdSvZjZBKxNIydXjn63Zs2T/ZFSIv494rcIb9bGMq0+G1uGEp2edoe1m7Iu+fcDcdg
+         jDz8+rNcuenk0j6aYT9eJ30uDeZU/N4gCR1nG3uEUXB/IvvozEnL9ysSSvNEqd7ahjVr
+         fxfRVY8lrxLcnBtEsUaX3oldCLkcTJAQn5UIF0YpHoEj5GIcL7BvhLcXi49dei3O78jo
+         xkYy2k2yfoFhg/pwrEZBzigVjR87GX3U1UuTQEkDftmAUvcsBLp58iIxWk16LzG1TzvW
+         petvr4H7CweEiW6KAvxKJaJRduGClq/64jNSa4EpoHEnvzLhe3JGhnl3Hlpuo+fBPLoc
+         x19Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV9FWk4ZMIC4yhsAXP9N9vTRBY+ZADgu9zXtcJroubnUWEyxESTfqLomI9y7S/eR+OH4fLMi7w=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxU5tbuEqx/M7KIxxgMoOEaMfsZ2V1NEwHCXqjSU9YUCzhFobly
+	QBm71BYVvuYH5rbn1gIU4lz0Rq2WcvTCvvnm+g4NeJYjEP5QSu105zqeXrHZgVwIz9r4lFbyBML
+	5A0G7w/WNRwnvZBzDeeWu1pD/TqtBpXO8rvnLryY188F+PVsRdWe5Dg==
+X-Gm-Gg: ASbGncsTFGgu2vbyRFtqCBN9adMW++cucm+XX9l/Dcf3TXGmXo2XHf5SVBqXk+d5KE5
+	4PyCXQMJttLkbBPyrXy7sadeq3V0D+AugPPsMku4HxuuuRuN6NopWfJmxOiXRsIjAfgjHYYYNpX
+	G5KXcK8Ww6HN3DeZYCj+0oQPMYeyB0mlRtVB2FNYSd8TL7gYkPRj+GNb8TRA2jSISusnqnAqhwM
+	td4AyNNzBKEVIu+FQDHGxLIuG/+3ockTybbZ6pkNplFHlpub9ebFiW4DL33928RYnmanGmsKogA
+	ADbH53ePMgHngn0k
+X-Received: by 2002:a17:90b:1b09:b0:2ff:5c4e:5acd with SMTP id 98e67ed59e1d1-30e2e630192mr2692008a91.35.1747191505614;
+        Tue, 13 May 2025 19:58:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IES5FwFqM+jrNlEU4SGfTBZTe1UXiaXheUXNCYmDBTW+m5hzT3MB31mVdHsV719R+ZY9V1/wA==
+X-Received: by 2002:a17:90b:1b09:b0:2ff:5c4e:5acd with SMTP id 98e67ed59e1d1-30e2e630192mr2691936a91.35.1747191504942;
+        Tue, 13 May 2025 19:58:24 -0700 (PDT)
+Received: from [10.72.116.125] ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30e334fb829sm381166a91.45.2025.05.13.19.57.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 May 2025 19:58:24 -0700 (PDT)
+Message-ID: <46b07625-7b5d-4531-b1d6-32283520892f@redhat.com>
+Date: Wed, 14 May 2025 10:57:55 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR01MB7792:EE_|DS2PR01MB9229:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1f4b771-c43c-4e2e-fba6-08dd924e4e56
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|52116014|376014|1800799024|366016|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vrrfTrF+7xwJy2mL6eXUQKTTpfo0vqqZ4CkdrEuS6hCRyMWjAJCWMbejq+YI?=
- =?us-ascii?Q?IRvlc/hkXE6CYEvqVjFPw1VDlHzH4s5wI3Gmpw5+DxUY8yeV+VCox3/lAqKX?=
- =?us-ascii?Q?atHhUp0wBOk1cWwwd78i9IfVjGPLHl4q2uvcZUS7QQAx5zUCt9W5xgBBoVSG?=
- =?us-ascii?Q?asTNkZRjVD7mOb1mWgGf39183ExRRxs8VV2mLae3nWFnjrX/vB0Y1gFoAuMG?=
- =?us-ascii?Q?b//37Siwcvbg4al83cHZrARpWPJqTuIe6XR/SOnxomDVECR+T8knR2v7u6X2?=
- =?us-ascii?Q?Olwog3kNy8FHvyHru2OhqbTO12sCbS77jH2khmJK+jkV4mxiRjqBmlv/EXA6?=
- =?us-ascii?Q?Dk8rrSJ5quPA/3unk858l+9M6pDWeGb5ZJexGYAzVZ0KKTk6ZoUEaEiMvM/Q?=
- =?us-ascii?Q?IjhSdBJWO2FS2v1rpxOdM9fi33gTEIJPcqQ1HtIvHMYEhyo5JyIrgwlRjOP9?=
- =?us-ascii?Q?5Xm2BgsmAApsfdVZYMsAyev+Q4cFnBNHAvPangXN1SB19XHIWZX00DGSzLWi?=
- =?us-ascii?Q?VLIfEmxzp5KFz+D6Im5xpSsvLiEM4AiEzME0TycV+EKz++QN7ZBmm130oCaJ?=
- =?us-ascii?Q?Y4RwMPN67b4NuPU/vrryN7XQ/QTEwL8wOW1nilln3qploHAhjJ+NuihYWv11?=
- =?us-ascii?Q?OWxWYhhccu8v6kLLtWQhSNfjQrAWf1wUytr6+OkGf6TrmR0sp/UkQdu9w0Jy?=
- =?us-ascii?Q?M63vIQ7Rd55MQTAl1owdl9YwyHI/XgU/NsDC+qs3/rYxXXVCz8GLB0k3TVlD?=
- =?us-ascii?Q?Y68BOGbh8DMbwjsqGXD9u7E4+d7P9p9+3SENxE8C6e0cN+/Nt8EEv+K0/Rr/?=
- =?us-ascii?Q?c0Kj6JQy3LP/XqErySLNgKUdv9eiddYcLqUlbyA1O5Pcm/c/fgmR5mIQFpn3?=
- =?us-ascii?Q?ttUscRN3wmoIqfnJKLFx0XWInx0mtSxG4mThFEMipxAv20cK+YHEeUV1fo7W?=
- =?us-ascii?Q?UV5zKWs3K1+47UqBR6dW77dvO4+6kj6q93E+mh0T4SEFBJJTh/g3ERJ2S+y1?=
- =?us-ascii?Q?vDbGit9bVb9ALnxJvTG1gjL2juDzmqooCkjNWd1aZIFsnfy6Xx49eR0j3f8p?=
- =?us-ascii?Q?JnAPUGNcIzWy4fvkPm5leHiBysG9PxyNuSqtx9qcqb/OT/tEvHsJ3JxVI4Ok?=
- =?us-ascii?Q?Ndv94jLwuaslYhHHj10zFDq6F7XrdwM0k8AwW55W+u11gdUlPiBoBjVKJ09x?=
- =?us-ascii?Q?mIEwf5XtAY7bsNGrBjjZpu+giYnqELr7T52zkHRY3k4IdnYsK+bZFrjyDdIG?=
- =?us-ascii?Q?afblXYmU6PfcqhbcbSe9E7O8AB7KKbth9kzbVwhiKj8DpYv45HiHxtarKBMa?=
- =?us-ascii?Q?HnAFI/fFzwiZRDaz6ZgAX7UJXD+ljBQ9OZuuUEPUYOdU+YpDNMGLad2yadpD?=
- =?us-ascii?Q?L+AvMNXfElXC2Gk7b/c49/7yiN1ugaxKayRxphzdi07DLlyUrIWR3REyqWb7?=
- =?us-ascii?Q?WGSbkcN2SXbNRpVL0SgkMh389tqjrO2LZk/7M9NABthzabbPfegI/C91SFI+?=
- =?us-ascii?Q?rY7UwbpZYToGRfQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR01MB7792.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(52116014)(376014)(1800799024)(366016)(38350700014)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?GgX4mFzos1J6Km51f8/j0aywUS+tg5/NF2SP1mI883gFSGb5dXnJkGS6zFfL?=
- =?us-ascii?Q?GgIXjLGH4TlupLOIuPp+KVSoQPtUOB9SdDxrv0sQia0EtoWgcqkfIhWfijwp?=
- =?us-ascii?Q?KWLmZDInzi8c+Zen06yyikNuqGD6+FJG8/XZDmE6XuVycbS2CCBgGfw4EEPw?=
- =?us-ascii?Q?5Zki7zyNBiBYPgOddQIqQYGa9kgToVh77HY8Ga0iFt5V+JJoRvNO/ZtPMYya?=
- =?us-ascii?Q?S4zrO6vKfJWpXtCZ7TCvDRfUni9sO/dLRmcvS4iWZ5Es07Q8TBiWP2mgZiqL?=
- =?us-ascii?Q?+tyfsDYDX2+NXqCk2lxg2nuq31M0Wrveau6lDYif5p3nGPqUyVruUKJ0Qelg?=
- =?us-ascii?Q?MtrP7Sjig4jK/Mn7atpTROBTtYh794oSyv4sgoEBBA5e4pnzugWV7ZAS25Dr?=
- =?us-ascii?Q?TNV1paNaFMNnixJJEFE9vI25BbfKu4ul8TiZsatcAbF2l3ORjaWXaP233Ag6?=
- =?us-ascii?Q?Z3mVenOq2V/cSjlB6UI7yNcX8IH1cf4NeC+4GuJxjdojZSEs7SSfX5DsObDY?=
- =?us-ascii?Q?b5VOlaRWscEABhnb4EFcwjMg8Af0jPXbv653bVKIcpk19Kc/k3m9b0b6Hcr2?=
- =?us-ascii?Q?QL7NfyOO4Z8VKG6BCz1VcRpgeZLDWn7/l830eMlAXxfYnGRaS57Xt8sL3TAF?=
- =?us-ascii?Q?Nyp3FIkUMEXN+DsIW/7rziRuUTrmT5FArvMrMyRdxo2J8MqYBCmrLpjc5yhy?=
- =?us-ascii?Q?WZbX9hu+83Lqs0e+ggHr3cBBLXNteOqPdK9MxvdxaLyqG1TNsoy8usOItkY0?=
- =?us-ascii?Q?qX+bLupswCFTjP6VwfLH0ZJ9hHBetS8bsOYJCtKia15mdJrMmwmTMzd4fbgx?=
- =?us-ascii?Q?aKt9+AGBv+3aM0JbtWiIjbpjmmb+HBQJybKIhR/3nwCObARD4Bsw4ZDUM/OV?=
- =?us-ascii?Q?Y8nTSZoi6At0FK/GBdguh5KPpt9ifpRzOFu6NByU8id8cm7abNXJz1DO9CQv?=
- =?us-ascii?Q?xo5rb15Qky+Jlr/GThcNuqUM/vAT96bQFMZZTiUA9FBSm34YdweQ641AeOs9?=
- =?us-ascii?Q?mRWf86yovd7vP2t/QuA8sf4JrjbaI2KGjPGjEaGb6xys0KGDIuVnMdYDVE7P?=
- =?us-ascii?Q?RxpHsWtBBw4aXsDxEQQ7qRDfCeLG1l4vk2HXczJWSWQj6tOIu4cd9dBQBIVn?=
- =?us-ascii?Q?hj35IIQ+GSRZhVpAd55eYAM9Hq94nmF1VotETAVT4CWAKXR2423k1vH/Mf0B?=
- =?us-ascii?Q?JWrGThYaRJ8tbPlBvj6Zha1gzHHDUqeP72VSyLqMFphesN2hk9+YJ2FJ/UGP?=
- =?us-ascii?Q?j5Hs9nNKC7Eom5C/DXQdcm6vpMHOlCfY9FkxWGG648RlygYf/H60lMV3Pc9/?=
- =?us-ascii?Q?0HPVlNspkUgvFzNgxNyxmU92ySyz0DI55zaNE/9R6boDLj3m2JoGv8WYBucu?=
- =?us-ascii?Q?OtDUSVTeeWWxBe4l5XfOpIFjMUqvE/ZWducG/aEwXQGXsL0elrV59eNf4/op?=
- =?us-ascii?Q?xoXvm42lY/zh6jDoseUFvUDxn+4Ug7FFT+b7n16eX5Ra4pa3Jw5KuPbptGRv?=
- =?us-ascii?Q?u+8bi4qUHKGYc0ab8swWJz/UAz0VBt0S4Ba2fdPkUb/0LLZejJJCLuR6G3pZ?=
- =?us-ascii?Q?B8Mi5BuEXBSWnlkyHhh8zzMPd46Vy7S/FkbbuScKp+RZPJWO6h4Ey23HCzuX?=
- =?us-ascii?Q?nfX7V6NECBfnA7d52gEIxWc=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1f4b771-c43c-4e2e-fba6-08dd924e4e56
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR01MB7792.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2025 18:45:17.7694
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i09mhM6x+eTm3xv6u83o+3Tr52G9kuGg1dCOOsJXb2VzzW2dtG5fn9pavFEpzYazehgvL7dhTWV3CkBy/CRkzpujvm4jE8LiEAb3zjqd/+Kkiwek3yx6R8vPIKSwOvVB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR01MB9229
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v3 01/16] scripts: unittests.cfg: Rename
+ 'extra_params' to 'qemu_params'
+To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
+ eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+ frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+ david@redhat.com, pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com,
+ maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
+References: <20250507151256.167769-1-alexandru.elisei@arm.com>
+ <20250507151256.167769-2-alexandru.elisei@arm.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20250507151256.167769-2-alexandru.elisei@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: VNAFNnj92K4K6jpRv6FISDXgNO2D8WnF7qMhejEOSMs_1747191506
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On AmpereOne AC04, updates to HCR_EL2 can rarely corrupt simultaneous
-translations for data addresses initiated by load/store instructions.
-Only instruction initiated translations are vulnerable, not translations
-from prefetches for example. A DSB before the store to HCR_EL2 is
-sufficient to prevent older instructions from hitting the window for
-corruption, and an ISB after is sufficient to prevent younger
-instructions from hitting the window for corruption.
 
-Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
----
-v3: https://lore.kernel.org/kvmarm/20250508210009.428998-1-scott@os.amperecomputing.com/
-Changes since v3:
- - Added entry in silicon-errata.rst (Marc)
 
-v2: https://lore.kernel.org/kvmarm/20250425024741.1309893-1-scott@os.amperecomputing.com/
-Changes since v2:
- - Apply the workaround before alternatives are applied (Marc)
- - Also catch stores to HCR_EL2 in assembly files (Marc)
- - Added a sysreg_clear_set_hcr() helper for the HCR_EL2 fiddling in
-   vgic-v3-sr.c that I had previously missed.
+On 5/7/25 11:12 PM, Alexandru Elisei wrote:
+> The arm and arm64 architectures can also be run with kvmtool, and work is
+> under way to have it supported by the run_tests.sh test runner. Not
+> suprisingly, kvmtool's syntax for running a virtual machine is different to
+> qemu's.
+> 
+> Add a new unittest parameter, 'qemu_params', with the goal to add a similar
+> parameter for kvmtool, when that's supported.
+> 
+> 'extra_params' has been kept in the scripts as an alias for 'qemu_params'
+> to preserve compatibility with custom test definition, but it is expected
+> that going forward new tests will use 'qemu_params'.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-v1: https://lore.kernel.org/kvmarm/20250415154711.1698544-2-scott@os.amperecomputing.com/
-Changes since v1:
- - Add a write_sysreg_hcr() helper (Oliver)
- - Add more specific wording in the errata description (Oliver & Marc)
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 
- Documentation/arch/arm64/silicon-errata.rst |  2 ++
- arch/arm64/Kconfig                          | 17 +++++++++++++
- arch/arm64/include/asm/el2_setup.h          |  2 +-
- arch/arm64/include/asm/hardirq.h            |  4 +--
- arch/arm64/include/asm/sysreg.h             | 27 +++++++++++++++++++++
- arch/arm64/kernel/cpu_errata.c              | 14 +++++++++++
- arch/arm64/kernel/hyp-stub.S                |  2 +-
- arch/arm64/kvm/at.c                         |  8 +++---
- arch/arm64/kvm/hyp/include/hyp/switch.h     |  2 +-
- arch/arm64/kvm/hyp/nvhe/host.S              |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S          |  4 +--
- arch/arm64/kvm/hyp/nvhe/mem_protect.c       |  2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c            |  2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c             |  4 +--
- arch/arm64/kvm/hyp/vhe/switch.c             |  2 +-
- arch/arm64/kvm/hyp/vhe/tlb.c                |  4 +--
- arch/arm64/tools/cpucaps                    |  1 +
- 17 files changed, 80 insertions(+), 19 deletions(-)
+> ---
+>   arm/unittests.cfg     |  76 +++++++++++------------
+>   docs/unittests.txt    |  15 +++--
+>   powerpc/unittests.cfg |  18 +++---
+>   riscv/unittests.cfg   |   2 +-
+>   s390x/unittests.cfg   |  50 +++++++--------
+>   scripts/common.bash   |   8 +--
+>   scripts/runtime.bash  |   6 +-
+>   x86/unittests.cfg     | 140 +++++++++++++++++++++---------------------
+>   8 files changed, 160 insertions(+), 155 deletions(-)
+> 
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index fe1011454f88..6c6f76b2fb52 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -15,26 +15,26 @@
+>   [selftest-setup]
+>   file = selftest.flat
+>   smp = 2
+> -extra_params = -m 256 -append 'setup smp=2 mem=256'
+> +qemu_params = -m 256 -append 'setup smp=2 mem=256'
+>   groups = selftest
+>   
+>   # Test vector setup and exception handling (kernel mode).
+>   [selftest-vectors-kernel]
+>   file = selftest.flat
+> -extra_params = -append 'vectors-kernel'
+> +qemu_params = -append 'vectors-kernel'
+>   groups = selftest
+>   
+>   # Test vector setup and exception handling (user mode).
+>   [selftest-vectors-user]
+>   file = selftest.flat
+> -extra_params = -append 'vectors-user'
+> +qemu_params = -append 'vectors-user'
+>   groups = selftest
+>   
+>   # Test SMP support
+>   [selftest-smp]
+>   file = selftest.flat
+>   smp = $MAX_SMP
+> -extra_params = -append 'smp'
+> +qemu_params = -append 'smp'
+>   groups = selftest
+>   
+>   # Test PCI emulation
+> @@ -46,79 +46,79 @@ groups = pci
+>   [pmu-cycle-counter]
+>   file = pmu.flat
+>   groups = pmu
+> -extra_params = -append 'cycle-counter 0'
+> +qemu_params = -append 'cycle-counter 0'
+>   
+>   [pmu-event-introspection]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-event-introspection'
+> +qemu_params = -append 'pmu-event-introspection'
+>   
+>   [pmu-event-counter-config]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-event-counter-config'
+> +qemu_params = -append 'pmu-event-counter-config'
+>   
+>   [pmu-basic-event-count]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-basic-event-count'
+> +qemu_params = -append 'pmu-basic-event-count'
+>   
+>   [pmu-mem-access]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-mem-access'
+> +qemu_params = -append 'pmu-mem-access'
+>   
+>   [pmu-mem-access-reliability]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-mem-access-reliability'
+> +qemu_params = -append 'pmu-mem-access-reliability'
+>   
+>   [pmu-sw-incr]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-sw-incr'
+> +qemu_params = -append 'pmu-sw-incr'
+>   
+>   [pmu-chained-counters]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-chained-counters'
+> +qemu_params = -append 'pmu-chained-counters'
+>   
+>   [pmu-chained-sw-incr]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-chained-sw-incr'
+> +qemu_params = -append 'pmu-chained-sw-incr'
+>   
+>   [pmu-chain-promotion]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-chain-promotion'
+> +qemu_params = -append 'pmu-chain-promotion'
+>   
+>   [pmu-overflow-interrupt]
+>   file = pmu.flat
+>   groups = pmu
+>   arch = arm64
+> -extra_params = -append 'pmu-overflow-interrupt'
+> +qemu_params = -append 'pmu-overflow-interrupt'
+>   
+>   # Test PMU support (TCG) with -icount IPC=1
+>   #[pmu-tcg-icount-1]
+>   #file = pmu.flat
+> -#extra_params = -icount 0 -append 'cycle-counter 1'
+> +#qemu_params = -icount 0 -append 'cycle-counter 1'
+>   #groups = pmu
+>   #accel = tcg
+>   
+>   # Test PMU support (TCG) with -icount IPC=256
+>   #[pmu-tcg-icount-256]
+>   #file = pmu.flat
+> -#extra_params = -icount 8 -append 'cycle-counter 256'
+> +#qemu_params = -icount 8 -append 'cycle-counter 256'
+>   #groups = pmu
+>   #accel = tcg
+>   
+> @@ -126,77 +126,77 @@ extra_params = -append 'pmu-overflow-interrupt'
+>   [gicv2-ipi]
+>   file = gic.flat
+>   smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> -extra_params = -machine gic-version=2 -append 'ipi'
+> +qemu_params = -machine gic-version=2 -append 'ipi'
+>   groups = gic
+>   
+>   [gicv2-mmio]
+>   file = gic.flat
+>   smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> -extra_params = -machine gic-version=2 -append 'mmio'
+> +qemu_params = -machine gic-version=2 -append 'mmio'
+>   groups = gic
+>   
+>   [gicv2-mmio-up]
+>   file = gic.flat
+>   smp = 1
+> -extra_params = -machine gic-version=2 -append 'mmio'
+> +qemu_params = -machine gic-version=2 -append 'mmio'
+>   groups = gic
+>   
+>   [gicv2-mmio-3p]
+>   file = gic.flat
+>   smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
+> -extra_params = -machine gic-version=2 -append 'mmio'
+> +qemu_params = -machine gic-version=2 -append 'mmio'
+>   groups = gic
+>   
+>   [gicv3-ipi]
+>   file = gic.flat
+>   smp = $MAX_SMP
+> -extra_params = -machine gic-version=3 -append 'ipi'
+> +qemu_params = -machine gic-version=3 -append 'ipi'
+>   groups = gic
+>   
+>   [gicv2-active]
+>   file = gic.flat
+>   smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> -extra_params = -machine gic-version=2 -append 'active'
+> +qemu_params = -machine gic-version=2 -append 'active'
+>   groups = gic
+>   
+>   [gicv3-active]
+>   file = gic.flat
+>   smp = $MAX_SMP
+> -extra_params = -machine gic-version=3 -append 'active'
+> +qemu_params = -machine gic-version=3 -append 'active'
+>   groups = gic
+>   
+>   [its-introspection]
+>   file = gic.flat
+>   smp = $MAX_SMP
+> -extra_params = -machine gic-version=3 -append 'its-introspection'
+> +qemu_params = -machine gic-version=3 -append 'its-introspection'
+>   groups = its
+>   arch = arm64
+>   
+>   [its-trigger]
+>   file = gic.flat
+>   smp = $MAX_SMP
+> -extra_params = -machine gic-version=3 -append 'its-trigger'
+> +qemu_params = -machine gic-version=3 -append 'its-trigger'
+>   groups = its
+>   arch = arm64
+>   
+>   [its-migration]
+>   file = gic.flat
+>   smp = $MAX_SMP
+> -extra_params = -machine gic-version=3 -append 'its-migration'
+> +qemu_params = -machine gic-version=3 -append 'its-migration'
+>   groups = its migration
+>   arch = arm64
+>   
+>   [its-pending-migration]
+>   file = gic.flat
+>   smp = $MAX_SMP
+> -extra_params = -machine gic-version=3 -append 'its-pending-migration'
+> +qemu_params = -machine gic-version=3 -append 'its-pending-migration'
+>   groups = its migration
+>   arch = arm64
+>   
+>   [its-migrate-unmapped-collection]
+>   file = gic.flat
+>   smp = $MAX_SMP
+> -extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
+> +qemu_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
+>   groups = its migration
+>   arch = arm64
+>   
+> @@ -231,37 +231,37 @@ groups = cache
+>   [debug-bp]
+>   file = debug.flat
+>   arch = arm64
+> -extra_params = -append 'bp'
+> +qemu_params = -append 'bp'
+>   groups = debug
+>   
+>   [debug-bp-migration]
+>   file = debug.flat
+>   arch = arm64
+> -extra_params = -append 'bp-migration'
+> +qemu_params = -append 'bp-migration'
+>   groups = debug migration
+>   
+>   [debug-wp]
+>   file = debug.flat
+>   arch = arm64
+> -extra_params = -append 'wp'
+> +qemu_params = -append 'wp'
+>   groups = debug
+>   
+>   [debug-wp-migration]
+>   file = debug.flat
+>   arch = arm64
+> -extra_params = -append 'wp-migration'
+> +qemu_params = -append 'wp-migration'
+>   groups = debug migration
+>   
+>   [debug-sstep]
+>   file = debug.flat
+>   arch = arm64
+> -extra_params = -append 'ss'
+> +qemu_params = -append 'ss'
+>   groups = debug
+>   
+>   [debug-sstep-migration]
+>   file = debug.flat
+>   arch = arm64
+> -extra_params = -append 'ss-migration'
+> +qemu_params = -append 'ss-migration'
+>   groups = debug migration
+>   
+>   # FPU/SIMD test
+> @@ -276,17 +276,17 @@ arch = arm64
+>   [mte-sync]
+>   file = mte.flat
+>   groups = mte
+> -extra_params = -machine mte=on -append 'sync'
+> +qemu_params = -machine mte=on -append 'sync'
+>   arch = arm64
+>   
+>   [mte-async]
+>   file = mte.flat
+>   groups = mte
+> -extra_params = -machine mte=on -append 'async'
+> +qemu_params = -machine mte=on -append 'async'
+>   arch = arm64
+>   
+>   [mte-asymm]
+>   file = mte.flat
+>   groups = mte
+> -extra_params = -machine mte=on -append 'asymm'
+> +qemu_params = -machine mte=on -append 'asymm'
+>   arch = arm64
+> diff --git a/docs/unittests.txt b/docs/unittests.txt
+> index c4269f6230c8..3d19fd70953f 100644
+> --- a/docs/unittests.txt
+> +++ b/docs/unittests.txt
+> @@ -24,9 +24,9 @@ param = value format.
+>   
+>   Available parameters
+>   ====================
+> -Note! Some parameters like smp and extra_params modify how a test is run,
+> -while others like arch and accel restrict the configurations in which the
+> -test is run.
+> +Note! Some parameters like smp and qemu_params/extra_params modify how a
+> +test is run, while others like arch and accel restrict the configurations
+> +in which the test is run.
+>   
+>   file
+>   ----
+> @@ -56,13 +56,18 @@ smp = <number>
+>   Optional, the number of processors created in the machine to run the test.
+>   Defaults to 1. $MAX_SMP can be used to specify the maximum supported.
+>   
+> -extra_params
+> +qemu_params
+>   ------------
+>   These are extra parameters supplied to the QEMU process. -append '...' can
+>   be used to pass arguments into the test case argv. Multiple parameters can
+>   be added, for example:
+>   
+> -extra_params = -m 256 -append 'smp=2'
+> +qemu_params = -m 256 -append 'smp=2'
+> +
+> +extra_params
+> +------------
+> +Alias for 'qemu_params', supported for compatibility purposes. Use
+> +'qemu_params' for new tests.
+>   
+>   groups
+>   ------
+> diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
+> index 149f963f3d53..5097911e4bf3 100644
+> --- a/powerpc/unittests.cfg
+> +++ b/powerpc/unittests.cfg
+> @@ -15,7 +15,7 @@
+>   [selftest-setup]
+>   file = selftest.elf
+>   smp = 2
+> -extra_params = -m 1g -append 'setup smp=2 mem=1024'
+> +qemu_params = -m 1g -append 'setup smp=2 mem=1024'
+>   groups = selftest
+>   
+>   [selftest-migration]
+> @@ -27,7 +27,7 @@ groups = selftest migration
+>   file = selftest-migration.elf
+>   machine = pseries
+>   groups = selftest migration
+> -extra_params = -append "skip"
+> +qemu_params = -append "skip"
+>   
+>   [migration-memory]
+>   file = memory-verify.elf
+> @@ -46,20 +46,20 @@ machine = pseries
+>   file = rtas.elf
+>   machine = pseries
+>   timeout = 5
+> -extra_params = -append "get-time-of-day date=$(date +%s)"
+> +qemu_params = -append "get-time-of-day date=$(date +%s)"
+>   groups = rtas
+>   
+>   [rtas-get-time-of-day-base]
+>   file = rtas.elf
+>   machine = pseries
+>   timeout = 5
+> -extra_params = -rtc base="2006-06-17" -append "get-time-of-day date=$(date --date="2006-06-17 UTC" +%s)"
+> +qemu_params = -rtc base="2006-06-17" -append "get-time-of-day date=$(date --date="2006-06-17 UTC" +%s)"
+>   groups = rtas
+>   
+>   [rtas-set-time-of-day]
+>   file = rtas.elf
+>   machine = pseries
+> -extra_params = -append "set-time-of-day"
+> +qemu_params = -append "set-time-of-day"
+>   timeout = 5
+>   groups = rtas
+>   
+> @@ -94,7 +94,7 @@ smp = 2
+>   [atomics-migration]
+>   file = atomics.elf
+>   machine = pseries
+> -extra_params = -append "migration -m"
+> +qemu_params = -append "migration -m"
+>   groups = migration
+>   
+>   [timebase]
+> @@ -103,14 +103,14 @@ file = timebase.elf
+>   [timebase-icount]
+>   file = timebase.elf
+>   accel = tcg
+> -extra_params = -icount shift=5
+> +qemu_params = -icount shift=5
+>   
+>   [h_cede_tm]
+>   file = tm.elf
+>   machine = pseries
+>   accel = kvm
+>   smp = 2,threads=2
+> -extra_params = -machine cap-htm=on -append "h_cede_tm"
+> +qemu_params = -machine cap-htm=on -append "h_cede_tm"
+>   groups = h_cede_tm
+>   
+>   [sprs]
+> @@ -119,7 +119,7 @@ file = sprs.elf
+>   [sprs-migration]
+>   file = sprs.elf
+>   machine = pseries
+> -extra_params = -append '-w'
+> +qemu_params = -append '-w'
+>   groups = migration
+>   
+>   [sieve]
+> diff --git a/riscv/unittests.cfg b/riscv/unittests.cfg
+> index 2eb760eca24e..5b31047f75c7 100644
+> --- a/riscv/unittests.cfg
+> +++ b/riscv/unittests.cfg
+> @@ -10,7 +10,7 @@
+>   [selftest]
+>   file = selftest.flat
+>   smp = $MAX_SMP
+> -extra_params = -append 'foo bar baz'
+> +qemu_params = -append 'foo bar baz'
+>   groups = selftest
+>   
+>   # Set $FIRMWARE_OVERRIDE to /path/to/firmware to select the SBI implementation.
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index a9af6680f2a6..1e129fef3c38 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -10,7 +10,7 @@
+>   file = selftest.elf
+>   groups = selftest
+>   # please keep the kernel cmdline in sync with $(TEST_DIR)/selftest.parmfile
+> -extra_params = -append 'test 123'
+> +qemu_params = -append 'test 123'
+>   
+>   [selftest-migration]
+>   file = selftest-migration.elf
+> @@ -22,7 +22,7 @@ accel = kvm
+>   [selftest-migration-skip]
+>   file = selftest-migration.elf
+>   groups = selftest migration
+> -extra_params = -append "skip"
+> +qemu_params = -append "skip"
+>   
+>   # This fails due to a QEMU TCG bug so KVM-only until QEMU is fixed upstream
+>   [migration-memory]
+> @@ -47,7 +47,7 @@ file = sthyi.elf
+>   
+>   [skey]
+>   file = skey.elf
+> -extra_params = -device virtio-net-ccw
+> +qemu_params = -device virtio-net-ccw
+>   
+>   [diag10]
+>   file = diag10.elf
+> @@ -75,11 +75,11 @@ file = cpumodel.elf
+>   
+>   [diag288]
+>   file = diag288.elf
+> -extra_params=-device diag288,id=watchdog0 --watchdog-action inject-nmi
+> +qemu_params=-device diag288,id=watchdog0 --watchdog-action inject-nmi
+>   
+>   [stsi]
+>   file = stsi.elf
+> -extra_params=-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc55-0242ac130003 -smp 1,maxcpus=8
+> +qemu_params=-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc55-0242ac130003 -smp 1,maxcpus=8
+>   
+>   [smp]
+>   file = smp.elf
+> @@ -87,15 +87,15 @@ smp = 2
+>   
+>   [sclp-1g]
+>   file = sclp.elf
+> -extra_params = -m 1G
+> +qemu_params = -m 1G
+>   
+>   [sclp-3g]
+>   file = sclp.elf
+> -extra_params = -m 3G
+> +qemu_params = -m 3G
+>   
+>   [css]
+>   file = css.elf
+> -extra_params = -device virtio-net-ccw
+> +qemu_params = -device virtio-net-ccw
+>   
+>   [skrf]
+>   file = skrf.elf
+> @@ -126,25 +126,25 @@ file = spec_ex.elf
+>   [firq-linear-cpu-ids-kvm]
+>   file = firq.elf
+>   timeout = 20
+> -extra_params = -smp 1,maxcpus=3 -device host-s390x-cpu,core-id=1 -device host-s390x-cpu,core-id=2
+> +qemu_params = -smp 1,maxcpus=3 -device host-s390x-cpu,core-id=1 -device host-s390x-cpu,core-id=2
+>   accel = kvm
+>   
+>   [firq-nonlinear-cpu-ids-kvm]
+>   file = firq.elf
+>   timeout = 20
+> -extra_params = -smp 1,maxcpus=3 -device host-s390x-cpu,core-id=2 -device host-s390x-cpu,core-id=1
+> +qemu_params = -smp 1,maxcpus=3 -device host-s390x-cpu,core-id=2 -device host-s390x-cpu,core-id=1
+>   accel = kvm
+>   
+>   [firq-linear-cpu-ids-tcg]
+>   file = firq.elf
+>   timeout = 20
+> -extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=1 -device qemu-s390x-cpu,core-id=2
+> +qemu_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=1 -device qemu-s390x-cpu,core-id=2
+>   accel = tcg
+>   
+>   [firq-nonlinear-cpu-ids-tcg]
+>   file = firq.elf
+>   timeout = 20
+> -extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=2 -device qemu-s390x-cpu,core-id=1
+> +qemu_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=2 -device qemu-s390x-cpu,core-id=1
+>   accel = tcg
+>   
+>   [sck]
+> @@ -152,7 +152,7 @@ file = sck.elf
+>   
+>   [epsw]
+>   file = epsw.elf
+> -extra_params = -device virtio-net-ccw
+> +qemu_params = -device virtio-net-ccw
+>   
+>   [tprot]
+>   file = tprot.elf
+> @@ -161,26 +161,26 @@ file = tprot.elf
+>   file = adtl-status.elf
+>   smp = 2
+>   accel = kvm
+> -extra_params = -cpu host,gs=on,vx=on
+> +qemu_params = -cpu host,gs=on,vx=on
+>   
+>   [adtl-status-no-vec-no-gs-kvm]
+>   file = adtl-status.elf
+>   smp = 2
+>   accel = kvm
+> -extra_params = -cpu host,gs=off,vx=off
+> +qemu_params = -cpu host,gs=off,vx=off
+>   
+>   [adtl-status-tcg]
+>   file = adtl-status.elf
+>   smp = 2
+>   accel = tcg
+>   # no guarded-storage support in tcg
+> -extra_params = -cpu qemu,vx=on
+> +qemu_params = -cpu qemu,vx=on
+>   
+>   [adtl-status-no-vec-no-gs-tcg]
+>   file = adtl-status.elf
+>   smp = 2
+>   accel = tcg
+> -extra_params = -cpu qemu,gs=off,vx=off
+> +qemu_params = -cpu qemu,gs=off,vx=off
+>   
+>   [migration]
+>   file = migration.elf
+> @@ -214,13 +214,13 @@ smp = 2
+>   [migration-skey-sequential]
+>   file = migration-skey.elf
+>   groups = migration
+> -extra_params = -append '--sequential'
+> +qemu_params = -append '--sequential'
+>   
+>   [migration-skey-parallel]
+>   file = migration-skey.elf
+>   smp = 2
+>   groups = migration
+> -extra_params = -append '--parallel'
+> +qemu_params = -append '--parallel'
+>   
+>   [execute]
+>   file = ex.elf
+> @@ -229,34 +229,34 @@ file = ex.elf
+>   file = pv-icptcode.elf
+>   smp = 3
+>   groups = pv-host
+> -extra_params = -m 2200
+> +qemu_params = -m 2200
+>   
+>   [pv-ipl]
+>   file = pv-ipl.elf
+>   groups = pv-host
+> -extra_params = -m 2200
+> +qemu_params = -m 2200
+>   
+>   [pv-diags]
+>   file = pv-diags.elf
+>   groups = pv-host
+> -extra_params = -m 2200
+> +qemu_params = -m 2200
+>   
+>   [uv-host]
+>   file = uv-host.elf
+>   smp = 2
+>   groups = pv-host
+> -extra_params = -m 2200
+> +qemu_params = -m 2200
+>   
+>   [topology]
+>   file = topology.elf
+>   
+>   [topology-2]
+>   file = topology.elf
+> -extra_params = -cpu max,ctop=on -smp sockets=31,cores=8,maxcpus=248  -append '-sockets 31 -cores 8'
+> +qemu_params = -cpu max,ctop=on -smp sockets=31,cores=8,maxcpus=248  -append '-sockets 31 -cores 8'
+>   
+>   [topology-3]
+>   file = topology.elf
+> -extra_params = """-cpu max,ctop=on -smp cpus=1,drawers=2,books=2,sockets=2,cores=16,maxcpus=128 \
+> +qemu_params = """-cpu max,ctop=on -smp cpus=1,drawers=2,books=2,sockets=2,cores=16,maxcpus=128 \
+>   -append '-drawers 2 -books 2 -sockets 2 -cores 16' \
+>   -device max-s390x-cpu,core-id=31,drawer-id=0,book-id=0,socket-id=0,entitlement=medium,dedicated=false \
+>   -device max-s390x-cpu,core-id=11,drawer-id=0,book-id=0,socket-id=0,entitlement=high,dedicated=true \
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index 3aa557c8c03d..bd7c82f1adda 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -38,8 +38,8 @@ function for_each_unittest()
+>   			kernel=$TEST_DIR/${BASH_REMATCH[1]}
+>   		elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
+>   			smp=${BASH_REMATCH[1]}
+> -		elif [[ $line =~ ^extra_params\ *=\ *'"""'(.*)$ ]]; then
+> -			opts=${BASH_REMATCH[1]}$'\n'
+> +		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
+> +			opts=${BASH_REMATCH[2]}$'\n'
+>   			while read -r -u $fd; do
+>   				#escape backslash newline, but not double backslash
+>   				if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
+> @@ -54,8 +54,8 @@ function for_each_unittest()
+>   					opts+=$REPLY$'\n'
+>   				fi
+>   			done
+> -		elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
+> -			opts=${BASH_REMATCH[1]}
+> +		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *(.*)$ ]]; then
+> +			opts=${BASH_REMATCH[2]}
+>   		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
+>   			groups=${BASH_REMATCH[1]}
+>   		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index ee229631277d..400e8a082528 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -179,9 +179,9 @@ function run()
+>           echo $cmdline
+>       fi
+>   
+> -    # extra_params in the config file may contain backticks that need to be
+> -    # expanded, so use eval to start qemu.  Use "> >(foo)" instead of a pipe to
+> -    # preserve the exit status.
+> +    # qemu_params/extra_params in the config file may contain backticks that
+> +    # need to be expanded, so use eval to start qemu.  Use "> >(foo)" instead of
+> +    # a pipe to preserve the exit status.
+>       summary=$(eval "$cmdline" 2> >(RUNTIME_log_stderr $testname) \
+>                                > >(tee >(RUNTIME_log_stdout $testname $kernel) | extract_summary))
+>       ret=$?
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 6e69c50b9b0d..a356f486eaec 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -10,20 +10,20 @@
+>   [apic-split]
+>   file = apic.flat
+>   smp = 2
+> -extra_params = -cpu qemu64,+x2apic,+tsc-deadline -machine kernel_irqchip=split
+> +qemu_params = -cpu qemu64,+x2apic,+tsc-deadline -machine kernel_irqchip=split
+>   arch = x86_64
+>   groups = apic
+>   
+>   [ioapic-split]
+>   file = ioapic.flat
+> -extra_params = -cpu qemu64 -machine kernel_irqchip=split
+> +qemu_params = -cpu qemu64 -machine kernel_irqchip=split
+>   arch = x86_64
+>   groups = apic
+>   
+>   [x2apic]
+>   file = apic.flat
+>   smp = 2
+> -extra_params = -cpu qemu64,+x2apic,+tsc-deadline
+> +qemu_params = -cpu qemu64,+x2apic,+tsc-deadline
+>   arch = x86_64
+>   timeout = 30
+>   groups = apic
+> @@ -33,7 +33,7 @@ groups = apic
+>   [xapic]
+>   file = apic.flat
+>   smp = 2
+> -extra_params = -cpu qemu64,-x2apic,+tsc-deadline -machine pit=off
+> +qemu_params = -cpu qemu64,-x2apic,+tsc-deadline -machine pit=off
+>   arch = x86_64
+>   timeout = 60
+>   groups = apic
+> @@ -41,7 +41,7 @@ groups = apic
+>   [ioapic]
+>   file = ioapic.flat
+>   smp = 4
+> -extra_params = -cpu qemu64,+x2apic
+> +qemu_params = -cpu qemu64,+x2apic
+>   arch = x86_64
+>   
+>   [cmpxchg8b]
+> @@ -58,27 +58,27 @@ smp = 3
+>   
+>   [vmexit_cpuid]
+>   file = vmexit.flat
+> -extra_params = -append 'cpuid'
+> +qemu_params = -append 'cpuid'
+>   groups = vmexit
+>   
+>   [vmexit_vmcall]
+>   file = vmexit.flat
+> -extra_params = -append 'vmcall'
+> +qemu_params = -append 'vmcall'
+>   groups = vmexit
+>   
+>   [vmexit_mov_from_cr8]
+>   file = vmexit.flat
+> -extra_params = -append 'mov_from_cr8'
+> +qemu_params = -append 'mov_from_cr8'
+>   groups = vmexit
+>   
+>   [vmexit_mov_to_cr8]
+>   file = vmexit.flat
+> -extra_params = -append 'mov_to_cr8'
+> +qemu_params = -append 'mov_to_cr8'
+>   groups = vmexit
+>   
+>   [vmexit_inl_pmtimer]
+>   file = vmexit.flat
+> -extra_params = -append 'inl_from_pmtimer'
+> +qemu_params = -append 'inl_from_pmtimer'
+>   groups = vmexit
+>   
+>   # To allow IPIs to be accelerated by SVM AVIC when the feature is available and
+> @@ -87,77 +87,77 @@ groups = vmexit
+>   [vmexit_ipi]
+>   file = vmexit.flat
+>   smp = 2
+> -extra_params = -machine pit=off -append 'ipi'
+> +qemu_params = -machine pit=off -append 'ipi'
+>   groups = vmexit
+>   
+>   [vmexit_ipi_halt]
+>   file = vmexit.flat
+>   smp = 2
+> -extra_params = -append 'ipi_halt'
+> +qemu_params = -append 'ipi_halt'
+>   groups = vmexit
+>   
+>   [vmexit_ple_round_robin]
+>   file = vmexit.flat
+> -extra_params = -append 'ple_round_robin'
+> +qemu_params = -append 'ple_round_robin'
+>   groups = vmexit
+>   
+>   [vmexit_tscdeadline]
+>   file = vmexit.flat
+>   groups = vmexit
+> -extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline
+> +qemu_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline
+>   
+>   [vmexit_tscdeadline_immed]
+>   file = vmexit.flat
+>   groups = vmexit
+> -extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
+> +qemu_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
+>   
+>   [vmexit_cr0_wp]
+>   file = vmexit.flat
+>   smp = 2
+> -extra_params = -append 'toggle_cr0_wp'
+> +qemu_params = -append 'toggle_cr0_wp'
+>   groups = vmexit
+>   
+>   [vmexit_cr4_pge]
+>   file = vmexit.flat
+>   smp = 2
+> -extra_params = -append 'toggle_cr4_pge'
+> +qemu_params = -append 'toggle_cr4_pge'
+>   groups = vmexit
+>   
+>   [access]
+>   file = access_test.flat
+>   arch = x86_64
+> -extra_params = -cpu max,host-phys-bits
+> +qemu_params = -cpu max,host-phys-bits
+>   
+>   [access_fep]
+>   file = access_test.flat
+>   arch = x86_64
+> -extra_params = -cpu max,host-phys-bits -append force_emulation
+> +qemu_params = -cpu max,host-phys-bits -append force_emulation
+>   groups = nodefault
+>   timeout = 240
+>   
+>   [access-reduced-maxphyaddr]
+>   file = access_test.flat
+>   arch = x86_64
+> -extra_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off
+> +qemu_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off
+>   check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
+>   
+>   [smap]
+>   file = smap.flat
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   
+>   [pku]
+>   file = pku.flat
+>   arch = x86_64
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   
+>   [pks]
+>   file = pks.flat
+>   arch = x86_64
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   
+>   [asyncpf]
+>   file = asyncpf.flat
+> -extra_params = -cpu host -m 2048
+> +qemu_params = -cpu host -m 2048
+>   
+>   [emulator]
+>   file = emulator.flat
+> @@ -177,7 +177,7 @@ arch = x86_64
+>   
+>   [memory]
+>   file = memory.flat
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   arch = x86_64
+>   
+>   [msr]
+> @@ -186,11 +186,11 @@ arch = x86_64
+>   # support follows the host kernel.  Running a 32-bit guest on a 64-bit host
+>   # will fail due to shortcomings in KVM.
+>   file = msr.flat
+> -extra_params = -cpu max,vendor=GenuineIntel
+> +qemu_params = -cpu max,vendor=GenuineIntel
+>   
+>   [pmu]
+>   file = pmu.flat
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   check = /sys/module/kvm/parameters/enable_pmu=Y /proc/sys/kernel/nmi_watchdog=0
+>   accel = kvm
+>   groups = pmu
+> @@ -198,7 +198,7 @@ groups = pmu
+>   [pmu_lbr]
+>   arch = x86_64
+>   file = pmu_lbr.flat
+> -extra_params = -cpu host,migratable=no
+> +qemu_params = -cpu host,migratable=no
+>   check = /sys/module/kvm/parameters/enable_pmu=Y /proc/sys/kernel/nmi_watchdog=0 /sys/module/kvm/parameters/ignore_msrs=N
+>   accel = kvm
+>   groups = pmu
+> @@ -206,14 +206,14 @@ groups = pmu
+>   [pmu_pebs]
+>   arch = x86_64
+>   file = pmu_pebs.flat
+> -extra_params = -cpu host,migratable=no
+> +qemu_params = -cpu host,migratable=no
+>   check = /sys/module/kvm/parameters/enable_pmu=Y /proc/sys/kernel/nmi_watchdog=0
+>   accel = kvm
+>   groups = pmu
+>   
+>   [vmware_backdoors]
+>   file = vmware_backdoors.flat
+> -extra_params = -machine vmport=on -cpu max
+> +qemu_params = -machine vmport=on -cpu max
+>   check = /sys/module/kvm/parameters/enable_vmware_backdoor=Y
+>   arch = x86_64
+>   accel = kvm
+> @@ -234,20 +234,20 @@ timeout = 180
+>   [syscall]
+>   file = syscall.flat
+>   arch = x86_64
+> -extra_params = -cpu Opteron_G1,vendor=AuthenticAMD
+> +qemu_params = -cpu Opteron_G1,vendor=AuthenticAMD
+>   
+>   [tsc]
+>   file = tsc.flat
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   
+>   [tsc_adjust]
+>   file = tsc_adjust.flat
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   
+>   [xsave]
+>   file = xsave.flat
+>   arch = x86_64
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   
+>   [rmap_chain]
+>   file = rmap_chain.flat
+> @@ -256,20 +256,20 @@ arch = x86_64
+>   [svm]
+>   file = svm.flat
+>   smp = 2
+> -extra_params = -cpu max,+svm -m 4g -append "-pause_filter_test"
+> +qemu_params = -cpu max,+svm -m 4g -append "-pause_filter_test"
+>   arch = x86_64
+>   groups = svm
+>   
+>   [svm_pause_filter]
+>   file = svm.flat
+> -extra_params = -cpu max,+svm -overcommit cpu-pm=on -m 4g -append pause_filter_test
+> +qemu_params = -cpu max,+svm -overcommit cpu-pm=on -m 4g -append pause_filter_test
+>   arch = x86_64
+>   groups = svm
+>   
+>   [svm_npt]
+>   file = svm_npt.flat
+>   smp = 2
+> -extra_params = -cpu max,+svm -m 4g
+> +qemu_params = -cpu max,+svm -m 4g
+>   arch = x86_64
+>   
+>   [taskswitch]
+> @@ -285,68 +285,68 @@ groups = tasks
+>   [kvmclock_test]
+>   file = kvmclock_test.flat
+>   smp = 2
+> -extra_params = --append "10000000 `date +%s`"
+> +qemu_params = --append "10000000 `date +%s`"
+>   
+>   [pcid-enabled]
+>   file = pcid.flat
+> -extra_params = -cpu qemu64,+pcid,+invpcid
+> +qemu_params = -cpu qemu64,+pcid,+invpcid
+>   arch = x86_64
+>   groups = pcid
+>   
+>   [pcid-disabled]
+>   file = pcid.flat
+> -extra_params = -cpu qemu64,-pcid,-invpcid
+> +qemu_params = -cpu qemu64,-pcid,-invpcid
+>   arch = x86_64
+>   groups = pcid
+>   
+>   [pcid-asymmetric]
+>   file = pcid.flat
+> -extra_params = -cpu qemu64,-pcid,+invpcid
+> +qemu_params = -cpu qemu64,-pcid,+invpcid
+>   arch = x86_64
+>   groups = pcid
+>   
+>   [rdpru]
+>   file = rdpru.flat
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   arch = x86_64
+>   
+>   [umip]
+>   file = umip.flat
+> -extra_params = -cpu qemu64,+umip
+> +qemu_params = -cpu qemu64,+umip
+>   
+>   [la57]
+>   file = la57.flat
+> -extra_params = -cpu max,host-phys-bits
+> +qemu_params = -cpu max,host-phys-bits
+>   
+>   [vmx]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -apic_reg_virt_test -virt_x2apic_mode_test -vmx_pf_exception_test -vmx_pf_exception_forced_emulation_test -vmx_pf_no_vpid_test -vmx_pf_invvpid_test -vmx_pf_vpid_test -vmx_basic_vid_test -vmx_eoi_virt_test -vmx_posted_interrupts_test"
+> +qemu_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -apic_reg_virt_test -virt_x2apic_mode_test -vmx_pf_exception_test -vmx_pf_exception_forced_emulation_test -vmx_pf_no_vpid_test -vmx_pf_invvpid_test -vmx_pf_vpid_test -vmx_basic_vid_test -vmx_eoi_virt_test -vmx_posted_interrupts_test"
+>   arch = x86_64
+>   groups = vmx
+>   
+>   [ept]
+>   file = vmx.flat
+> -extra_params = -cpu max,host-phys-bits,+vmx -m 2560 -append "ept_access*"
+> +qemu_params = -cpu max,host-phys-bits,+vmx -m 2560 -append "ept_access*"
+>   arch = x86_64
+>   groups = vmx
+>   
+>   [vmx_eoi_bitmap_ioapic_scan]
+>   file = vmx.flat
+>   smp = 2
+> -extra_params = -cpu max,+vmx -m 2048 -append vmx_eoi_bitmap_ioapic_scan_test
+> +qemu_params = -cpu max,+vmx -m 2048 -append vmx_eoi_bitmap_ioapic_scan_test
+>   arch = x86_64
+>   groups = vmx
+>   
+>   [vmx_hlt_with_rvi_test]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append vmx_hlt_with_rvi_test
+> +qemu_params = -cpu max,+vmx -append vmx_hlt_with_rvi_test
+>   arch = x86_64
+>   groups = vmx
+>   timeout = 10
+>   
+>   [vmx_apicv_test]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append "apic_reg_virt_test virt_x2apic_mode_test vmx_basic_vid_test vmx_eoi_virt_test"
+> +qemu_params = -cpu max,+vmx -append "apic_reg_virt_test virt_x2apic_mode_test vmx_basic_vid_test vmx_eoi_virt_test"
+>   arch = x86_64
+>   groups = vmx
+>   timeout = 30
+> @@ -354,7 +354,7 @@ timeout = 30
+>   [vmx_posted_intr_test]
+>   file = vmx.flat
+>   smp = 2
+> -extra_params = -cpu max,+vmx -append "vmx_posted_interrupts_test"
+> +qemu_params = -cpu max,+vmx -append "vmx_posted_interrupts_test"
+>   arch = x86_64
+>   groups = vmx
+>   timeout = 10
+> @@ -362,14 +362,14 @@ timeout = 10
+>   [vmx_apic_passthrough_thread]
+>   file = vmx.flat
+>   smp = 2
+> -extra_params = -cpu max,+vmx -m 2048 -append vmx_apic_passthrough_thread_test
+> +qemu_params = -cpu max,+vmx -m 2048 -append vmx_apic_passthrough_thread_test
+>   arch = x86_64
+>   groups = vmx
+>   
+>   [vmx_init_signal_test]
+>   file = vmx.flat
+>   smp = 2
+> -extra_params = -cpu max,+vmx -m 2048 -append vmx_init_signal_test
+> +qemu_params = -cpu max,+vmx -m 2048 -append vmx_init_signal_test
+>   arch = x86_64
+>   groups = vmx
+>   timeout = 10
+> @@ -377,62 +377,62 @@ timeout = 10
+>   [vmx_sipi_signal_test]
+>   file = vmx.flat
+>   smp = 2
+> -extra_params = -cpu max,+vmx -m 2048 -append vmx_sipi_signal_test
+> +qemu_params = -cpu max,+vmx -m 2048 -append vmx_sipi_signal_test
+>   arch = x86_64
+>   groups = vmx
+>   timeout = 10
+>   
+>   [vmx_apic_passthrough_tpr_threshold_test]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -m 2048 -append vmx_apic_passthrough_tpr_threshold_test
+> +qemu_params = -cpu max,+vmx -m 2048 -append vmx_apic_passthrough_tpr_threshold_test
+>   arch = x86_64
+>   groups = vmx
+>   timeout = 10
+>   
+>   [vmx_vmcs_shadow_test]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append vmx_vmcs_shadow_test
+> +qemu_params = -cpu max,+vmx -append vmx_vmcs_shadow_test
+>   arch = x86_64
+>   groups = vmx
+>   timeout = 180
+>   
+>   [vmx_pf_exception_test]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append "vmx_pf_exception_test"
+> +qemu_params = -cpu max,+vmx -append "vmx_pf_exception_test"
+>   arch = x86_64
+>   groups = vmx nested_exception
+>   
+>   [vmx_pf_exception_test_fep]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append "vmx_pf_exception_forced_emulation_test"
+> +qemu_params = -cpu max,+vmx -append "vmx_pf_exception_forced_emulation_test"
+>   arch = x86_64
+>   groups = vmx nested_exception nodefault
+>   timeout = 240
+>   
+>   [vmx_pf_vpid_test]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append "vmx_pf_vpid_test"
+> +qemu_params = -cpu max,+vmx -append "vmx_pf_vpid_test"
+>   arch = x86_64
+>   groups = vmx nested_exception nodefault
+>   timeout = 240
+>   
+>   [vmx_pf_invvpid_test]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append "vmx_pf_invvpid_test"
+> +qemu_params = -cpu max,+vmx -append "vmx_pf_invvpid_test"
+>   arch = x86_64
+>   groups = vmx nested_exception nodefault
+>   timeout = 240
+>   
+>   [vmx_pf_no_vpid_test]
+>   file = vmx.flat
+> -extra_params = -cpu max,+vmx -append "vmx_pf_no_vpid_test"
+> +qemu_params = -cpu max,+vmx -append "vmx_pf_no_vpid_test"
+>   arch = x86_64
+>   groups = vmx nested_exception nodefault
+>   timeout = 240
+>   
+>   [vmx_pf_exception_test_reduced_maxphyaddr]
+>   file = vmx.flat
+> -extra_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off,+vmx -append "vmx_pf_exception_test"
+> +qemu_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off,+vmx -append "vmx_pf_exception_test"
+>   arch = x86_64
+>   groups = vmx nested_exception
+>   check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
+> @@ -444,31 +444,31 @@ arch = x86_64
+>   [hyperv_synic]
+>   file = hyperv_synic.flat
+>   smp = 2
+> -extra_params = -cpu host,hv_passthrough -device hyperv-testdev
+> +qemu_params = -cpu host,hv_passthrough -device hyperv-testdev
+>   groups = hyperv
+>   
+>   [hyperv_connections]
+>   file = hyperv_connections.flat
+>   smp = 2
+> -extra_params = -cpu host,hv_passthrough -device hyperv-testdev
+> +qemu_params = -cpu host,hv_passthrough -device hyperv-testdev
+>   groups = hyperv
+>   
+>   [hyperv_stimer]
+>   file = hyperv_stimer.flat
+>   smp = 2
+> -extra_params = -cpu host,hv_passthrough
+> +qemu_params = -cpu host,hv_passthrough
+>   groups = hyperv
+>   
+>   [hyperv_stimer_direct]
+>   file = hyperv_stimer.flat
+>   smp = 2
+> -extra_params = -cpu host,hv_passthrough -append direct
+> +qemu_params = -cpu host,hv_passthrough -append direct
+>   groups = hyperv
+>   
+>   [hyperv_clock]
+>   file = hyperv_clock.flat
+>   smp = 2
+> -extra_params = -cpu host,hv_passthrough
+> +qemu_params = -cpu host,hv_passthrough
+>   arch = x86_64
+>   groups = hyperv
+>   check = /sys/devices/system/clocksource/clocksource0/current_clocksource=tsc
+> @@ -478,20 +478,20 @@ file = intel-iommu.flat
+>   arch = x86_64
+>   timeout = 30
+>   smp = 4
+> -extra_params = -M q35,kernel-irqchip=split -device intel-iommu,intremap=on,eim=off -device edu
+> +qemu_params = -M q35,kernel-irqchip=split -device intel-iommu,intremap=on,eim=off -device edu
+>   
+>   [tsx-ctrl]
+>   file = tsx-ctrl.flat
+> -extra_params = -cpu max
+> +qemu_params = -cpu max
+>   groups = tsx-ctrl
+>   
+>   [intel_cet]
+>   file = cet.flat
+>   arch = x86_64
+>   smp = 2
+> -extra_params = -enable-kvm -m 2048 -cpu host
+> +qemu_params = -enable-kvm -m 2048 -cpu host
+>   
+>   [lam]
+>   file = lam.flat
+>   arch = x86_64
+> -extra_params = -enable-kvm -cpu max
+> +qemu_params = -enable-kvm -cpu max
 
-diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-index f968c13b46a78..b18ef4064bc04 100644
---- a/Documentation/arch/arm64/silicon-errata.rst
-+++ b/Documentation/arch/arm64/silicon-errata.rst
-@@ -57,6 +57,8 @@ stable kernels.
- +----------------+-----------------+-----------------+-----------------------------+
- | Ampere         | AmpereOne AC04  | AC04_CPU_10     | AMPERE_ERRATUM_AC03_CPU_38  |
- +----------------+-----------------+-----------------+-----------------------------+
-+| Ampere         | AmpereOne AC04  | AC04_CPU_23     | AMPERE_ERRATUM_AC04_CPU_23  |
-++----------------+-----------------+-----------------+-----------------------------+
- +----------------+-----------------+-----------------+-----------------------------+
- | ARM            | Cortex-A510     | #2457168        | ARM64_ERRATUM_2457168       |
- +----------------+-----------------+-----------------+-----------------------------+
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index a182295e6f08b..3ae4e80e3002b 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -464,6 +464,23 @@ config AMPERE_ERRATUM_AC03_CPU_38
- 
- 	  If unsure, say Y.
- 
-+config AMPERE_ERRATUM_AC04_CPU_23
-+        bool "AmpereOne: AC04_CPU_23:  Failure to synchronize writes to HCR_EL2 may corrupt address translations."
-+	default y
-+	help
-+	  This option adds an alternative code sequence to work around Ampere
-+	  errata AC04_CPU_23 on AmpereOne.
-+
-+	  Updates to HCR_EL2 can rarely corrupt simultaneous translations for
-+	  data addresses initiated by load/store instructions. Only
-+	  instruction initiated translations are vulnerable, not translations
-+	  from prefetches for example. A DSB before the store to HCR_EL2 is
-+	  sufficient to prevent older instructions from hitting the window
-+	  for corruption, and an ISB after is sufficient to prevent younger
-+	  instructions from hitting the window for corruption.
-+
-+	  If unsure, say Y.
-+
- config ARM64_WORKAROUND_CLEAN_CACHE
- 	bool
- 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index ebceaae3c749b..2500fd0a1f66a 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -38,7 +38,7 @@
- 
- 	orr	x0, x0, #HCR_E2H
- .LnVHE_\@:
--	msr	hcr_el2, x0
-+	msr_hcr_el2 x0
- 	isb
- .endm
- 
-diff --git a/arch/arm64/include/asm/hardirq.h b/arch/arm64/include/asm/hardirq.h
-index cbfa7b6f2e098..77d6b8c63d4e6 100644
---- a/arch/arm64/include/asm/hardirq.h
-+++ b/arch/arm64/include/asm/hardirq.h
-@@ -41,7 +41,7 @@ do {									\
- 									\
- 	___hcr = read_sysreg(hcr_el2);					\
- 	if (!(___hcr & HCR_TGE)) {					\
--		write_sysreg(___hcr | HCR_TGE, hcr_el2);		\
-+		write_sysreg_hcr(___hcr | HCR_TGE);			\
- 		isb();							\
- 	}								\
- 	/*								\
-@@ -82,7 +82,7 @@ do {									\
- 	 */								\
- 	barrier();							\
- 	if (!___ctx->cnt && !(___hcr & HCR_TGE))			\
--		write_sysreg(___hcr, hcr_el2);				\
-+		write_sysreg_hcr(___hcr);				\
- } while (0)
- 
- static inline void ack_bad_irq(unsigned int irq)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 2639d3633073d..7284828f0dc9e 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -1091,6 +1091,15 @@
- 	__emit_inst(0xd5000000|(\sreg)|(.L__gpr_num_\rt))
- 	.endm
- 
-+	.macro	msr_hcr_el2, reg
-+#if IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23)
-+	dsb	nsh
-+	msr	hcr_el2, \reg
-+	isb
-+#else
-+	msr	hcr_el2, \reg
-+#endif
-+	.endm
- #else
- 
- #include <linux/bitfield.h>
-@@ -1178,6 +1187,13 @@
- 		write_sysreg(__scs_new, sysreg);			\
- } while (0)
- 
-+#define sysreg_clear_set_hcr(clear, set) do {				\
-+	u64 __scs_val = read_sysreg(hcr_el2);				\
-+	u64 __scs_new = (__scs_val & ~(u64)(clear)) | (set);		\
-+	if (__scs_new != __scs_val)					\
-+		write_sysreg_hcr(__scs_new);			\
-+} while (0)
-+
- #define sysreg_clear_set_s(sysreg, clear, set) do {			\
- 	u64 __scs_val = read_sysreg_s(sysreg);				\
- 	u64 __scs_new = (__scs_val & ~(u64)(clear)) | (set);		\
-@@ -1185,6 +1201,17 @@
- 		write_sysreg_s(__scs_new, sysreg);			\
- } while (0)
- 
-+#define write_sysreg_hcr(__val) do {					\
-+	if (IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23) &&		\
-+	   (!system_capabilities_finalized() ||				\
-+	    alternative_has_cap_unlikely(ARM64_WORKAROUND_AMPERE_AC04_CPU_23))) \
-+		asm volatile("dsb nsh; msr hcr_el2, %x0; isb"		\
-+			     : : "rZ" (__val));				\
-+	else								\
-+		asm volatile("msr hcr_el2, %x0"				\
-+			     : : "rZ" (__val));				\
-+} while (0)
-+
- #define read_sysreg_par() ({						\
- 	u64 par;							\
- 	asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));	\
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 6b0ad5070d3e0..59d723c9ab8f5 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -557,6 +557,13 @@ static const struct midr_range erratum_ac03_cpu_38_list[] = {
- };
- #endif
- 
-+#ifdef CONFIG_AMPERE_ERRATUM_AC04_CPU_23
-+static const struct midr_range erratum_ac04_cpu_23_list[] = {
-+	MIDR_ALL_VERSIONS(MIDR_AMPERE1A),
-+	{},
-+};
-+#endif
-+
- const struct arm64_cpu_capabilities arm64_errata[] = {
- #ifdef CONFIG_ARM64_WORKAROUND_CLEAN_CACHE
- 	{
-@@ -875,6 +882,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		.capability = ARM64_WORKAROUND_AMPERE_AC03_CPU_38,
- 		ERRATA_MIDR_RANGE_LIST(erratum_ac03_cpu_38_list),
- 	},
-+#endif
-+#ifdef CONFIG_AMPERE_ERRATUM_AC04_CPU_23
-+	{
-+		.desc = "AmpereOne erratum AC04_CPU_23",
-+		.capability = ARM64_WORKAROUND_AMPERE_AC04_CPU_23,
-+		ERRATA_MIDR_RANGE_LIST(erratum_ac04_cpu_23_list),
-+	},
- #endif
- 	{
- 		.desc = "Broken CNTVOFF_EL2",
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index ae990da1eae5a..36e2d26b54f5c 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -97,7 +97,7 @@ SYM_CODE_START_LOCAL(__finalise_el2)
- 2:
- 	// Engage the VHE magic!
- 	mov_q	x0, HCR_HOST_VHE_FLAGS
--	msr	hcr_el2, x0
-+	msr_hcr_el2 x0
- 	isb
- 
- 	// Use the EL1 allocated stack, per-cpu offset
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index f74a66ce3064b..9c13e70fadf5e 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -516,7 +516,7 @@ static void __mmu_config_save(struct mmu_config *config)
- 
- static void __mmu_config_restore(struct mmu_config *config)
- {
--	write_sysreg(config->hcr,	hcr_el2);
-+	write_sysreg_hcr(config->hcr);
- 
- 	/*
- 	 * ARM errata 1165522 and 1530923 require TGE to be 1 before
-@@ -1267,7 +1267,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 
- skip_mmu_switch:
- 	/* Clear TGE, enable S2 translation, we're rolling */
--	write_sysreg((config.hcr & ~HCR_TGE) | HCR_VM,	hcr_el2);
-+	write_sysreg_hcr((config.hcr & ~HCR_TGE) | HCR_VM);
- 	isb();
- 
- 	switch (op) {
-@@ -1350,7 +1350,7 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		if (!vcpu_el2_e2h_is_set(vcpu))
- 			val |= HCR_NV | HCR_NV1;
- 
--		write_sysreg(val, hcr_el2);
-+		write_sysreg_hcr(val);
- 		isb();
- 
- 		par = SYS_PAR_EL1_F;
-@@ -1375,7 +1375,7 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		if (!fail)
- 			par = read_sysreg_par();
- 
--		write_sysreg(hcr, hcr_el2);
-+		write_sysreg_hcr(hcr);
- 		isb();
- 	}
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index b741ea6aefa58..06aa37dbc957d 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -301,7 +301,7 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
- 		hcr |= HCR_TVM;
- 
--	write_sysreg(hcr, hcr_el2);
-+	write_sysreg_hcr(hcr);
- 
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 58f0cb2298cc2..eef15b374abb0 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -124,7 +124,7 @@ SYM_FUNC_START(__hyp_do_panic)
- 	/* Ensure host stage-2 is disabled */
- 	mrs	x0, hcr_el2
- 	bic	x0, x0, #HCR_VM
--	msr	hcr_el2, x0
-+	msr_hcr_el2 x0
- 	isb
- 	tlbi	vmalls12e1
- 	dsb	nsh
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index f8af11189572f..aada42522e7be 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -100,7 +100,7 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
- 	msr	mair_el2, x1
- 
- 	ldr	x1, [x0, #NVHE_INIT_HCR_EL2]
--	msr	hcr_el2, x1
-+	msr_hcr_el2 x1
- 
- 	mov	x2, #HCR_E2H
- 	and	x2, x1, x2
-@@ -262,7 +262,7 @@ reset:
- 
- alternative_if ARM64_KVM_PROTECTED_MODE
- 	mov_q	x5, HCR_HOST_NVHE_FLAGS
--	msr	hcr_el2, x5
-+	msr_hcr_el2 x5
- alternative_else_nop_endif
- 
- 	/* Install stub vectors */
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 31173c6946951..d1488d4e51413 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -309,7 +309,7 @@ int __pkvm_prot_finalize(void)
- 	 */
- 	kvm_flush_dcache_to_poc(params, sizeof(*params));
- 
--	write_sysreg(params->hcr_el2, hcr_el2);
-+	write_sysreg_hcr(params->hcr_el2);
- 	__load_stage2(&host_mmu.arch.mmu, &host_mmu.arch);
- 
- 	/*
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 7d2ba6ef02618..4024fafbe3594 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -142,7 +142,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 
- 	__deactivate_traps_common(vcpu);
- 
--	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
-+	write_sysreg_hcr(this_cpu_ptr(&kvm_init_params)->hcr_el2);
- 
- 	__deactivate_cptr_traps(vcpu);
- 	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 50aa8dbcae75b..f8a91780e49a9 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -446,7 +446,7 @@ u64 __vgic_v3_get_gic_config(void)
- 	if (has_vhe()) {
- 		flags = local_daif_save();
- 	} else {
--		sysreg_clear_set(hcr_el2, 0, HCR_AMO | HCR_FMO | HCR_IMO);
-+		sysreg_clear_set_hcr(0, HCR_AMO | HCR_FMO | HCR_IMO);
- 		isb();
- 	}
- 
-@@ -461,7 +461,7 @@ u64 __vgic_v3_get_gic_config(void)
- 	if (has_vhe()) {
- 		local_daif_restore(flags);
- 	} else {
--		sysreg_clear_set(hcr_el2, HCR_AMO | HCR_FMO | HCR_IMO, 0);
-+		sysreg_clear_set_hcr(HCR_AMO | HCR_FMO | HCR_IMO, 0);
- 		isb();
- 	}
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 731a0378ed132..faacdfb328af6 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -184,7 +184,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 
- 	___deactivate_traps(vcpu);
- 
--	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-+	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
- 
- 	if (has_cntpoff()) {
- 		struct timer_map map;
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 3d50a1bd2bdbc..ec25698186297 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -63,7 +63,7 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
- 	__load_stage2(mmu, mmu->arch);
- 	val = read_sysreg(hcr_el2);
- 	val &= ~HCR_TGE;
--	write_sysreg(val, hcr_el2);
-+	write_sysreg_hcr(val);
- 	isb();
- }
- 
-@@ -73,7 +73,7 @@ static void exit_vmid_context(struct tlb_inv_context *cxt)
- 	 * We're done with the TLB operation, let's restore the host's
- 	 * view of HCR_EL2.
- 	 */
--	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-+	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
- 	isb();
- 
- 	/* ... and the stage-2 MMU context that we switched away from */
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 772c1b008e437..72f10b74ce807 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -94,6 +94,7 @@ WORKAROUND_2457168
- WORKAROUND_2645198
- WORKAROUND_2658417
- WORKAROUND_AMPERE_AC03_CPU_38
-+WORKAROUND_AMPERE_AC04_CPU_23
- WORKAROUND_TRBE_OVERWRITE_FILL_MODE
- WORKAROUND_TSB_FLUSH_FAILURE
- WORKAROUND_TRBE_WRITE_OUT_OF_RANGE
 -- 
-2.48.1
+Shaoqin
 
