@@ -1,285 +1,233 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E02211A3D
-	for <kvmarm@lists.linux.dev>; Thu, 15 May 2025 15:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AEA20B7FE
+	for <kvmarm@lists.linux.dev>; Thu, 15 May 2025 15:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747322678; cv=none; b=BUbZ3indHxTXTJbJwx737NHZEKa2L1q0rvswmu3Uiiem5evwudy8a6tuVetIFJV1fZs4kLye0paLjHza5JSzCf3jXnizjXvx4GHQ2H4swugaOMjKwGHbxkLSyXS2ON4xaHiso4QUOG9JiUqf7BX1umnN86+ABonKoZumHDCPEfY=
+	t=1747323571; cv=none; b=tXXbPOhFWLmHbkZPTpY/8N1T1jPNTFLUrLkD798p1MHoo7Qs8oNEE5owja5TzucqhmM6j9rnavS5p9E2KFJe7RMeSae4pCQVd5jkd2nnh6eON4GIvWkbuxHs4jKLKYQUj3IPWAs5ezt2YG5mi/GX+IpdqhKGOV90xSlePNs8wu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747322678; c=relaxed/simple;
-	bh=wh8yNL1oUHMYv1DqQxCXEvfYNwpJOTk46IC/ffSc8kk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oayi4uydf6SRE35ovK1WoQQEXbpa01dK4P2EOIUl2ZRKOgxaGEP/fLQzLmRoAQjgpZp2XIEMQ6toSFy8CZJe7+UyHQmezOnakR4LYxP2icK0so1B9IFIdwNt/qjcIkb+02z5WSwcMzAUif6cwEmIln+fgDdSnomeAAnJ45fOq/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8C55C14BF;
-	Thu, 15 May 2025 08:24:23 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 308353F673;
-	Thu, 15 May 2025 08:24:33 -0700 (PDT)
-Date: Thu, 15 May 2025 16:24:27 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v4 33/43] KVM: arm64: Use FGT feature maps to drive RES0
- bits
-Message-ID: <20250515152427.GA118636@e124191.cambridge.arm.com>
-References: <20250506164348.346001-1-maz@kernel.org>
- <20250506164348.346001-34-maz@kernel.org>
+	s=arc-20240116; t=1747323571; c=relaxed/simple;
+	bh=kLEwt1tqQGOHQAJJu+MXC7zTg3yDvjEAlh+VdGtRMiA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=eU61MG54L0hk2X2kqjoSC0w+iQAlU3eKvptsokpYk0DgkxmS0OI7wRHiNrsicJa1fqvbjW9ibqoEUibfsIZMULU5JPn6cICcZpqOAzjf4BnOYJNG0IzxRLtID3fXSJnxPwLtdQeTjlJ7BeXgTiQ2AZFzNIzIjH2ELGxjiR37LXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KRglyrW+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KRglyrW+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747323568;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ocmnV2GWtSq3V0yNvdY3M/5w9Ajvv0VMgCeCDVSbzfM=;
+	b=KRglyrW+ZTKfKxVVPvBtX9jIDlWa2NLjXOGkLjHsyUARjlMIddiehji/Ky2g/5UhmqyBwk
+	EtPIQ3XWRjL2WSptkwlg8Wh2aGZz6avZagADdWCZHR4487vOjidGO9v6DaQrWD6ETNxfJI
+	PwEcuQkEo9/1Lvvr9z17zM7x6hBKLYQ=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-92-VyR5x9TqPT-0LNh_wGrlmg-1; Thu,
+ 15 May 2025 11:39:26 -0400
+X-MC-Unique: VyR5x9TqPT-0LNh_wGrlmg-1
+X-Mimecast-MFC-AGG-ID: VyR5x9TqPT-0LNh_wGrlmg_1747323562
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EC371800874;
+	Thu, 15 May 2025 15:39:21 +0000 (UTC)
+Received: from gondolin.redhat.com (unknown [10.45.225.145])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C47C11956066;
+	Thu, 15 May 2025 15:39:12 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: eric.auger.pro@gmail.com,
+	eric.auger@redhat.com,
+	qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	peter.maydell@linaro.org,
+	richard.henderson@linaro.org,
+	alex.bennee@linaro.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	sebott@redhat.com,
+	shameerali.kolothum.thodi@huawei.com,
+	armbru@redhat.com,
+	berrange@redhat.com,
+	abologna@redhat.com,
+	jdenemar@redhat.com,
+	agraf@csgraf.de
+Cc: shahuang@redhat.com,
+	mark.rutland@arm.com,
+	philmd@linaro.org,
+	pbonzini@redhat.com,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH v7 00/14] arm: rework id register storage
+Date: Thu, 15 May 2025 17:38:53 +0200
+Message-ID: <20250515153907.151174-1-cohuck@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250506164348.346001-34-maz@kernel.org>
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Tue, May 06, 2025 at 05:43:38PM +0100, Marc Zyngier wrote:
-> Another benefit of mapping bits to features is that it becomes trivial
-> to define which bits should be handled as RES0.
-> 
-> Let's apply this principle to the guest's view of the FGT registers.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h |   1 +
->  arch/arm64/kvm/config.c           |  46 +++++++++++
->  arch/arm64/kvm/nested.c           | 129 +++---------------------------
->  3 files changed, 57 insertions(+), 119 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 59bfb049ce987..0eff513167868 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1611,6 +1611,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
->  	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
->  
->  void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
-> +void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64*res1);
+Some small fixes, including fixing up/adding SPDX identifiers, keeping the
+series bisectable, and updating MAINTAINERS (please check if that's ok.)
 
-nit: u64* res1
+Also available at
+https://gitlab.com/cohuck/qemu/-/commits/arm-rework-idreg-storage-v7
 
->  void check_feature_map(void);
->  
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 242c82eefd5e4..388f207bf64f6 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -616,3 +616,49 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
->  
->  	kvm->arch.fgu[fgt] = val;
->  }
-> +
-> +void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1)
-> +{
-> +	switch (reg) {
-> +	case HFGRTR_EL2:
-> +		*res0 = compute_res0_bits(kvm, hfgrtr_feat_map,
-> +					  ARRAY_SIZE(hfgrtr_feat_map), 0, 0);
-> +		*res0 |= hfgrtr_masks.res0;
-> +		*res1 = HFGRTR_EL2_RES1;
-> +		break;
-> +	case HFGWTR_EL2:
-> +		*res0 = compute_res0_bits(kvm, hfgwtr_feat_map,
-> +					  ARRAY_SIZE(hfgwtr_feat_map), 0, 0);
-> +		*res0 |= hfgwtr_masks.res0;
-> +		*res1 = HFGWTR_EL2_RES1;
-> +		break;
-> +	case HFGITR_EL2:
-> +		*res0 = compute_res0_bits(kvm, hfgitr_feat_map,
-> +					  ARRAY_SIZE(hfgitr_feat_map), 0, 0);
-> +		*res0 |= hfgitr_masks.res0;
-> +		*res1 = HFGITR_EL2_RES1;
-> +		break;
-> +	case HDFGRTR_EL2:
-> +		*res0 = compute_res0_bits(kvm, hdfgrtr_feat_map,
-> +					  ARRAY_SIZE(hdfgrtr_feat_map), 0, 0);
-> +		*res0 |= hdfgrtr_masks.res0;
-> +		*res1 = HDFGRTR_EL2_RES1;
-> +		break;
-> +	case HDFGWTR_EL2:
-> +		*res0 = compute_res0_bits(kvm, hdfgwtr_feat_map,
-> +					  ARRAY_SIZE(hdfgwtr_feat_map), 0, 0);
-> +		*res0 |= hdfgwtr_masks.res0;
-> +		*res1 = HDFGWTR_EL2_RES1;
-> +		break;
-> +	case HAFGRTR_EL2:
-> +		*res0 = compute_res0_bits(kvm, hafgrtr_feat_map,
-> +					  ARRAY_SIZE(hafgrtr_feat_map), 0, 0);
-> +		*res0 |= hafgrtr_masks.res0;
-> +		*res1 = HAFGRTR_EL2_RES1;
-> +		break;
-> +	default:
-> +		WARN_ON_ONCE(1);
-> +		*res0 = *res1 = 0;
-> +		break;
-> +	}
-> +}
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 666df85230c9b..3d91a0233652b 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1100,132 +1100,23 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
->  	set_sysreg_masks(kvm, HCRX_EL2, res0, res1);
->  
->  	/* HFG[RW]TR_EL2 */
-> -	res0 = res1 = 0;
-> -	if (!(kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
-> -	      kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_GENERIC)))
+<v6 cover letter>
+Just some small changes:
+- fixed up some botched conversions noted by Eric (thanks!)
+- rebased to current master
+- new patch with a small cleanup suggested by Eric
 
-The change from checking kvm_vcpu_has_feature() to using feat_pauth() (from
-"KVM: arm64: Switch to table-driven FGU configuration" patch 31) is fine
-because the ID regs (ID_AA64ISAR1_EL, ID_AA64ISAR2_EL) are sanitised by
-__kvm_read_sanitised_id_reg(), which checks vcpu_has_feature() via
-vcpu_has_ptrauth().
+<v5 cover letter>
+Just a quick respin to fix a missed conversion in hvf.c.
 
-> -		res0 |= (HFGRTR_EL2_APDAKey | HFGRTR_EL2_APDBKey |
-> -			 HFGRTR_EL2_APGAKey | HFGRTR_EL2_APIAKey |
-> -			 HFGRTR_EL2_APIBKey);
-> -	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
-> -		res0 |= (HFGRTR_EL2_LORC_EL1 | HFGRTR_EL2_LOREA_EL1 |
-> -			 HFGRTR_EL2_LORID_EL1 | HFGRTR_EL2_LORN_EL1 |
-> -			 HFGRTR_EL2_LORSA_EL1);
-> -	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, CSV2, CSV2_2) &&
-> -	    !kvm_has_feat(kvm, ID_AA64PFR1_EL1, CSV2_frac, CSV2_1p2))
-> -		res0 |= (HFGRTR_EL2_SCXTNUM_EL1 | HFGRTR_EL2_SCXTNUM_EL0);
-> -	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, GIC, IMP))
-> -		res0 |= HFGRTR_EL2_ICC_IGRPENn_EL1;
-> -	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP))
-> -		res0 |= (HFGRTR_EL2_ERRIDR_EL1 | HFGRTR_EL2_ERRSELR_EL1 |
-> -			 HFGRTR_EL2_ERXFR_EL1 | HFGRTR_EL2_ERXCTLR_EL1 |
-> -			 HFGRTR_EL2_ERXSTATUS_EL1 | HFGRTR_EL2_ERXMISCn_EL1 |
-> -			 HFGRTR_EL2_ERXPFGF_EL1 | HFGRTR_EL2_ERXPFGCTL_EL1 |
-> -			 HFGRTR_EL2_ERXPFGCDN_EL1 | HFGRTR_EL2_ERXADDR_EL1);
-> -	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
-> -		res0 |= HFGRTR_EL2_nACCDATA_EL1;
-> -	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> -		res0 |= (HFGRTR_EL2_nGCS_EL0 | HFGRTR_EL2_nGCS_EL1);
-> -	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, SME, IMP))
-> -		res0 |= (HFGRTR_EL2_nSMPRI_EL1 | HFGRTR_EL2_nTPIDR2_EL0);
-> -	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
-> -		res0 |= HFGRTR_EL2_nRCWMASK_EL1;
-> -	if (!kvm_has_s1pie(kvm))
-> -		res0 |= (HFGRTR_EL2_nPIRE0_EL1 | HFGRTR_EL2_nPIR_EL1);
-> -	if (!kvm_has_s1poe(kvm))
-> -		res0 |= (HFGRTR_EL2_nPOR_EL0 | HFGRTR_EL2_nPOR_EL1);
-> -	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
-> -		res0 |= HFGRTR_EL2_nS2POR_EL1;
-> -	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, AIE, IMP))
-> -		res0 |= (HFGRTR_EL2_nMAIR2_EL1 | HFGRTR_EL2_nAMAIR2_EL1);
-> -	set_sysreg_masks(kvm, HFGRTR_EL2, res0 | hfgrtr_masks.res0, res1);
-> -	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | hfgwtr_masks.res0, res1);
-> +	get_reg_fixed_bits(kvm, HFGRTR_EL2, &res0, &res1);
-> +	set_sysreg_masks(kvm, HFGRTR_EL2, res0, res1);
-> +	get_reg_fixed_bits(kvm, HFGWTR_EL2, &res0, &res1);
-> +	set_sysreg_masks(kvm, HFGWTR_EL2, res0, res1);
->  
->  	/* HDFG[RW]TR_EL2 */
-> -	res0 = res1 = 0;
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DoubleLock, IMP))
-> -		res0 |= HDFGRTR_EL2_OSDLR_EL1;
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
-> -		res0 |= (HDFGRTR_EL2_PMEVCNTRn_EL0 | HDFGRTR_EL2_PMEVTYPERn_EL0 |
-> -			 HDFGRTR_EL2_PMCCFILTR_EL0 | HDFGRTR_EL2_PMCCNTR_EL0 |
-> -			 HDFGRTR_EL2_PMCNTEN | HDFGRTR_EL2_PMINTEN |
-> -			 HDFGRTR_EL2_PMOVS | HDFGRTR_EL2_PMSELR_EL0 |
-> -			 HDFGRTR_EL2_PMMIR_EL1 | HDFGRTR_EL2_PMUSERENR_EL0 |
-> -			 HDFGRTR_EL2_PMCEIDn_EL0);
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, IMP))
-> -		res0 |= (HDFGRTR_EL2_PMBLIMITR_EL1 | HDFGRTR_EL2_PMBPTR_EL1 |
-> -			 HDFGRTR_EL2_PMBSR_EL1 | HDFGRTR_EL2_PMSCR_EL1 |
-> -			 HDFGRTR_EL2_PMSEVFR_EL1 | HDFGRTR_EL2_PMSFCR_EL1 |
-> -			 HDFGRTR_EL2_PMSICR_EL1 | HDFGRTR_EL2_PMSIDR_EL1 |
-> -			 HDFGRTR_EL2_PMSIRR_EL1 | HDFGRTR_EL2_PMSLATFR_EL1 |
-> -			 HDFGRTR_EL2_PMBIDR_EL1);
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceVer, IMP))
-> -		res0 |= (HDFGRTR_EL2_TRC | HDFGRTR_EL2_TRCAUTHSTATUS |
-> -			 HDFGRTR_EL2_TRCAUXCTLR | HDFGRTR_EL2_TRCCLAIM |
-> -			 HDFGRTR_EL2_TRCCNTVRn | HDFGRTR_EL2_TRCID |
-> -			 HDFGRTR_EL2_TRCIMSPECn | HDFGRTR_EL2_TRCOSLSR |
-> -			 HDFGRTR_EL2_TRCPRGCTLR | HDFGRTR_EL2_TRCSEQSTR |
-> -			 HDFGRTR_EL2_TRCSSCSRn | HDFGRTR_EL2_TRCSTATR |
-> -			 HDFGRTR_EL2_TRCVICTLR);
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceBuffer, IMP))
-> -		res0 |= (HDFGRTR_EL2_TRBBASER_EL1 | HDFGRTR_EL2_TRBIDR_EL1 |
-> -			 HDFGRTR_EL2_TRBLIMITR_EL1 | HDFGRTR_EL2_TRBMAR_EL1 |
-> -			 HDFGRTR_EL2_TRBPTR_EL1 | HDFGRTR_EL2_TRBSR_EL1 |
-> -			 HDFGRTR_EL2_TRBTRG_EL1);
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
-> -		res0 |= (HDFGRTR_EL2_nBRBIDR | HDFGRTR_EL2_nBRBCTL |
-> -			 HDFGRTR_EL2_nBRBDATA);
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2))
-> -		res0 |= HDFGRTR_EL2_nPMSNEVFR_EL1;
-> -	set_sysreg_masks(kvm, HDFGRTR_EL2, res0 | hdfgrtr_masks.res0, res1);
-> -
-> -	/* Reuse the bits from the read-side and add the write-specific stuff */
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
-> -		res0 |= (HDFGWTR_EL2_PMCR_EL0 | HDFGWTR_EL2_PMSWINC_EL0);
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceVer, IMP))
-> -		res0 |= HDFGWTR_EL2_TRCOSLAR;
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceFilt, IMP))
-> -		res0 |= HDFGWTR_EL2_TRFCR_EL1;
-> -	set_sysreg_masks(kvm, HFGWTR_EL2, res0 | hdfgwtr_masks.res0, res1);
-> +	get_reg_fixed_bits(kvm, HDFGRTR_EL2, &res0, &res1);
-> +	set_sysreg_masks(kvm, HDFGRTR_EL2, res0, res1);
-> +	get_reg_fixed_bits(kvm, HDFGWTR_EL2, &res0, &res1);
-> +	set_sysreg_masks(kvm, HDFGWTR_EL2, res0, res1);
->  
->  	/* HFGITR_EL2 */
-> -	res0 = hfgitr_masks.res0;
-> -	res1 = HFGITR_EL2_RES1;
-> -	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, DPB, DPB2))
-> -		res0 |= HFGITR_EL2_DCCVADP;
-> -	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN2))
-> -		res0 |= (HFGITR_EL2_ATS1E1RP | HFGITR_EL2_ATS1E1WP);
-> -	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-> -		res0 |= (HFGITR_EL2_TLBIRVAALE1OS | HFGITR_EL2_TLBIRVALE1OS |
-> -			 HFGITR_EL2_TLBIRVAAE1OS | HFGITR_EL2_TLBIRVAE1OS |
-> -			 HFGITR_EL2_TLBIVAALE1OS | HFGITR_EL2_TLBIVALE1OS |
-> -			 HFGITR_EL2_TLBIVAAE1OS | HFGITR_EL2_TLBIASIDE1OS |
-> -			 HFGITR_EL2_TLBIVAE1OS | HFGITR_EL2_TLBIVMALLE1OS);
-> -	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
-> -		res0 |= (HFGITR_EL2_TLBIRVAALE1 | HFGITR_EL2_TLBIRVALE1 |
-> -			 HFGITR_EL2_TLBIRVAAE1 | HFGITR_EL2_TLBIRVAE1 |
-> -			 HFGITR_EL2_TLBIRVAALE1IS | HFGITR_EL2_TLBIRVALE1IS |
-> -			 HFGITR_EL2_TLBIRVAAE1IS | HFGITR_EL2_TLBIRVAE1IS |
-> -			 HFGITR_EL2_TLBIRVAALE1OS | HFGITR_EL2_TLBIRVALE1OS |
-> -			 HFGITR_EL2_TLBIRVAAE1OS | HFGITR_EL2_TLBIRVAE1OS);
-> -	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, SPECRES, IMP))
-> -		res0 |= (HFGITR_EL2_CFPRCTX | HFGITR_EL2_DVPRCTX |
-> -			 HFGITR_EL2_CPPRCTX);
-> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP))
-> -		res0 |= (HFGITR_EL2_nBRBINJ | HFGITR_EL2_nBRBIALL);
-> -	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> -		res0 |= (HFGITR_EL2_nGCSPUSHM_EL1 | HFGITR_EL2_nGCSSTR_EL1 |
-> -			 HFGITR_EL2_nGCSEPP);
-> -	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, SPECRES, COSP_RCTX))
-> -		res0 |= HFGITR_EL2_COSPRCTX;
-> -	if (!kvm_has_feat(kvm, ID_AA64ISAR2_EL1, ATS1A, IMP))
-> -		res0 |= HFGITR_EL2_ATS1E1A;
-> +	get_reg_fixed_bits(kvm, HFGITR_EL2, &res0, &res1);
->  	set_sysreg_masks(kvm, HFGITR_EL2, res0, res1);
->  
->  	/* HAFGRTR_EL2 - not a lot to see here */
-> -	res0 = hafgrtr_masks.res0;
-> -	res1 = HAFGRTR_EL2_RES1;
-> -	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
-> -		res0 |= ~(res0 | res1);
-> +	get_reg_fixed_bits(kvm, HAFGRTR_EL2, &res0, &res1);
->  	set_sysreg_masks(kvm, HAFGRTR_EL2, res0, res1);
->  
->  	/* TCR2_EL2 */
+<v4 cover letter>
+Next iteration of the id register patches; only small changes.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Changed from v3:
+- added R-bs (thanks!)
+- added missing SPDX header
+- merged patch introducing accessors for kvm to the first user
+- skip over sysregs outside of the id register range when generating
+  register definitions again
+
+Also available at
+https://gitlab.com/cohuck/qemu/-/commits/arm-rework-idreg-storage-v4
+
+<v3 cover letter>
+Yet another update of the id register series, less changes this time
+around.
+
+Changed from v2:
+- changed generation of the various register defines via the "DEF"
+  magic suggested by Richard
+- some kvm-only code moved to kvm.c; some code potentially useful to
+  non-kvm code stayed out of there (the cpu model code will make use
+  of it, and that one should be extendable outside of kvm -- a
+  revised version of those patches is still in the works, but I'll be
+  off for a few days and rather wanted to get this one out first)
+
+Also available at
+https://gitlab.com/cohuck/qemu/-/commits/arm-rework-idreg-storage-v3
+
+<v2 cover letter>
+
+Changed from v1:
+- Noticed that we missed the hvf code. Converted, compiled, but not tested
+  as I'm lacking an environment for testing.
+- Hopefully incorporated most of the suggested changes -- if I missed
+  something, it was unintentional unless mentioned below.
+  - fixed repeated inclusion of definitions
+  - hopefully made macros more robust
+  - removed distinction between reading 32/64 values, which was mostly
+    adding churn for little value
+  - postponed generating property definitions to the cpu model patches,
+    where they are actually used
+  - juggled hunks and moved them to the right patches
+  - fixed some typos
+- rebased to a more recent code base
+
+NOT changed from v1:
+- definitions are still generated from the Linux sysregs file
+  - I still think updating the generated files on demand (so that we can
+    double check the result) is the right thing to do
+  - I'm open to changing the source of the definitions from the sysregs
+    file to the JSON definitions published by Arm; however, I first wanted
+    to get the code using it right -- we can switch out the code generating
+    the file to use a different source easily later on, and I'd also like
+    to steal parts of the script from Linux once integrated (which I think
+    hasn't happened yet?)
+
+<v1 cover letter>
+
+[Note: I've kept the cc list from the last round of cpu model patches;
+so if you're confused as to why you're cc:ed here, take it as a
+heads-up that a new cpu model series will come along soon]
+
+This patch series contains patches extracted from the larger cpu model
+series (RFC v2 last posted at
+https://lore.kernel.org/qemu-devel/20241206112213.88394-1-cohuck@redhat.com/)
+and aims at providing a base upon which we can continue with building
+support for cpu models, but which is hopefully already an improvement
+on its own.
+
+Main changes from the patches in that series include:
+- post-pone the changes to handle KVM writable ID registers for cpu models
+  (I have a series including that on top of this one)
+- change how we store the list of ID registers, and access them
+  basically, use an enum for indexing, and an enum doing encodings in a
+  pattern similar to cpregs
+- move some hunks to different patches
+- update the scripts to generate the register descriptions, and run
+  them against a recent Linux sysregs file
+
+What I've kept:
+- generating the register descriptions from the Linux sysregs file
+  I think that file is still our best bet to generate the descriptions
+  easily, and updating the definitions is a manual step that can be checked
+  for unintended changes
+- most of the hard work that Eric had been doing; all new bugs in there
+  are my own :)
+
+</v1 cover letter>
+</v2 cover letter>
+</v3 cover letter>
+</v4 cover letter>
+</v5 cover letter>
+</v6 cover letter>
+
+Cornelia Huck (2):
+  arm/cpu: switch to a generated cpu-sysregs.h.inc
+  arm/kvm: use fd instead of fdarray[2]
+
+Eric Auger (12):
+  arm/cpu: Add sysreg definitions in cpu-sysregs.h
+  arm/cpu: Store aa64isar0/aa64zfr0 into the idregs arrays
+  arm/cpu: Store aa64isar1/2 into the idregs array
+  arm/cpu: Store aa64pfr0/1 into the idregs array
+  arm/cpu: Store aa64mmfr0-3 into the idregs array
+  arm/cpu: Store aa64dfr0/1 into the idregs array
+  arm/cpu: Store aa64smfr0 into the idregs array
+  arm/cpu: Store id_isar0-7 into the idregs array
+  arm/cpu: Store id_pfr0/1/2 into the idregs array
+  arm/cpu: Store id_dfr0/1 into the idregs array
+  arm/cpu: Store id_mmfr0-5 into the idregs array
+  arm/cpu: Add sysreg generation scripts
+
+ MAINTAINERS                           |   1 +
+ hw/intc/armv7m_nvic.c                 |  27 +-
+ scripts/gen-cpu-sysregs-header.awk    |  35 ++
+ scripts/update-aarch64-sysreg-code.sh |  26 ++
+ target/arm/cpu-features.h             | 317 +++++++++---------
+ target/arm/cpu-sysregs.h              |  42 +++
+ target/arm/cpu-sysregs.h.inc          |  52 +++
+ target/arm/cpu.c                      | 111 +++----
+ target/arm/cpu.h                      |  80 +++--
+ target/arm/cpu64.c                    | 128 +++----
+ target/arm/helper.c                   |  68 ++--
+ target/arm/hvf/hvf.c                  |  39 ++-
+ target/arm/internals.h                |   6 +-
+ target/arm/kvm.c                      | 139 ++++----
+ target/arm/ptw.c                      |   6 +-
+ target/arm/tcg/cpu-v7m.c              | 174 +++++-----
+ target/arm/tcg/cpu32.c                | 320 +++++++++---------
+ target/arm/tcg/cpu64.c                | 459 +++++++++++++-------------
+ 18 files changed, 1105 insertions(+), 925 deletions(-)
+ create mode 100755 scripts/gen-cpu-sysregs-header.awk
+ create mode 100755 scripts/update-aarch64-sysreg-code.sh
+ create mode 100644 target/arm/cpu-sysregs.h
+ create mode 100644 target/arm/cpu-sysregs.h.inc
+
+-- 
+2.49.0
+
