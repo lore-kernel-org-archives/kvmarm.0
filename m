@@ -1,229 +1,371 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF4672601;
-	Fri, 16 May 2025 13:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC5772601;
+	Fri, 16 May 2025 13:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747403439; cv=none; b=Il2Xcpg+BVAh5kK+FiJT7vvDU13rcINtINhLHOZ6iWXxdJp/so5SZ/xwnCMSTosrd2oyIpsGvidO1WrZWf+aJPOD1ZjF3jx6sx00Td2LGyMlOfKI4ArJlNiW1JzHdsf6bz3lHWRY0O2lguJTorIsMy+C8q9F9iQF7ToXW4z2T70=
+	t=1747403731; cv=none; b=HBtJkYhr7mOgcu6xakLFwCMLV1dwaReKuU3B3Q05hV7JTAEJC0lGxPNM5Qb3CctgDxLaxehXzpotkl6UnY1T5eUTeH1HPYb9v/gl4jVI2seIOGzdY2WuVxQZvS22B5LxNagiAZQGtjO46oEht+lgk2fBr01pzQs7EungjrokaZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747403439; c=relaxed/simple;
-	bh=0THkZyxxSuZVTH5og5hjwibotSM4qUDA6bNyzgM51BM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TkuQxKhV3o2zyVK7eiaP52H2tYDamsOZAv5lf/eC/1DDyH815+jIbHqMq6l96YGx3pFlgTUf3x7FOJ18NDH9/d7IGrnAE3XRw8ZjJnDMXoY/BIv5DzkN2DS3tmCmzfF5rXdWxw/02/vmVYrY/w3hYfVmtB1gAhUrish4ZBsXqyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C511169C;
-	Fri, 16 May 2025 06:50:23 -0700 (PDT)
-Received: from [10.1.27.17] (e122027.cambridge.arm.com [10.1.27.17])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAE733F673;
-	Fri, 16 May 2025 06:50:30 -0700 (PDT)
-Message-ID: <c4c2d45a-0c9f-41ee-8659-d119edda457b@arm.com>
-Date: Fri, 16 May 2025 14:50:28 +0100
+	s=arc-20240116; t=1747403731; c=relaxed/simple;
+	bh=kXogt4iFZiSuDOpJ1zpztLcK0rga4wuTYqF+xCSgbUA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bGB7Le431tZGg5Hu4cm7XBO59mGBVAHKwzoZTQKpLMbxIId973bPcBDLwJiAQMBMyNx5pcqY50leql+OrEdZe2+W95Hq5L27TpOae15rHoYlKL7b3P7yiTCBbvvsXs5otQxDNq7bLPlcLJRi0XfS8W697YwblFjG0HqSUbCLl/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=krPohU+b; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="krPohU+b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33606C4CEE4;
+	Fri, 16 May 2025 13:55:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747403730;
+	bh=kXogt4iFZiSuDOpJ1zpztLcK0rga4wuTYqF+xCSgbUA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=krPohU+bQPLALzxQxCOYbyNE0JlUjbZL1llaENNkLxxhIO1ety0ZCKuWQXROnCIPq
+	 uFVOuGuZTcifZAF6u9gtSiFqTBAV7jJvYcOdF1nKulYhx8QE5H1IIJy4bcNh8h/30O
+	 fZ/20rGdYex1Ax73T9756NO2Sp+TIaRvZVhBu5POiIDJ6zpmjNCv/6V9TZTPnTIh/q
+	 PGFgQkvyogowh2uaKzlh3vNQSUfH1503gxwd1TZzLNsb5mQBZB8GS3fSrMel3WCCJA
+	 8yrYWWjZnZfR1mRp89bSvXww797lysxXkeF/KmV5Vt6msKRCBivdxa1BWnv337+MaQ
+	 SehUL8Q1tli4Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uFvX5-00FZrY-Sr;
+	Fri, 16 May 2025 14:55:28 +0100
+Date: Fri, 16 May 2025 14:55:27 +0100
+Message-ID: <864ixkfynk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	qperret@google.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v4 10/10] KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
+In-Reply-To: <20250509131706.2336138-11-vdonnefort@google.com>
+References: <20250509131706.2336138-1-vdonnefort@google.com>
+	<20250509131706.2336138-11-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 17/43] arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-18-steven.price@arm.com>
- <54a21b12-2b17-4e0a-9cbf-f68406fb003a@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <54a21b12-2b17-4e0a-9cbf-f68406fb003a@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 07/05/2025 11:42, Suzuki K Poulose wrote:
-> On 16/04/2025 14:41, Steven Price wrote:
->> The guest can request that a region of it's protected address space is
->> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
->> RSI_IPA_STATE_SET. This causes a guest exit with the
->> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
->> protected region to unprotected (or back), exiting to the VMM to make
->> the necessary changes to the guest_memfd and memslot mappings. On the
->> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
->> calls.
->>
->> The VMM may wish to reject the RIPAS change requested by the guest. For
->> now it can only do with by no longer scheduling the VCPU as we don't
->> currently have a usecase for returning that rejection to the guest, but
->> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
->> open for adding a new ioctl in the future for this purpose.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v7:
->>   * Rework the loop in realm_set_ipa_state() to make it clear when the
->>     'next' output value of rmi_rtt_set_ripas() is used.
->> New patch for v7: The code was previously split awkwardly between two
->> other patches.
->> ---
->>   arch/arm64/kvm/rme.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 88 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> index bee9dfe12e03..fe0d5b8703d2 100644
->> --- a/arch/arm64/kvm/rme.c
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -624,6 +624,65 @@ void kvm_realm_unmap_range(struct kvm *kvm,
->> unsigned long start,
->>           realm_unmap_private_range(kvm, start, end);
->>   }
->>   +static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->> +                   unsigned long start,
->> +                   unsigned long end,
->> +                   unsigned long ripas,
->> +                   unsigned long *top_ipa)
->> +{
->> +    struct kvm *kvm = vcpu->kvm;
->> +    struct realm *realm = &kvm->arch.realm;
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    phys_addr_t rd_phys = virt_to_phys(realm->rd);
->> +    phys_addr_t rec_phys = virt_to_phys(rec->rec_page);
->> +    struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
->> +    unsigned long ipa = start;
->> +    int ret = 0;
->> +
->> +    while (ipa < end) {
->> +        unsigned long next;
->> +
->> +        ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
->> +
->> +        if (RMI_RETURN_STATUS(ret) == RMI_SUCCESS) {
->> +            ipa = next;
->> +        } else if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->> +            int walk_level = RMI_RETURN_INDEX(ret);
->> +            int level = find_map_level(realm, ipa, end);
->> +
->> +            /*
->> +             * If the RMM walk ended early then more tables are
->> +             * needed to reach the required depth to set the RIPAS.
->> +             */
->> +            if (walk_level < level) {
->> +                ret = realm_create_rtt_levels(realm, ipa,
->> +                                  walk_level,
->> +                                  level,
->> +                                  memcache);
->> +                /* Retry with RTTs created */
+On Fri, 09 May 2025 14:17:06 +0100,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> minor nit: Do we need to add a comment here, saying, we stop processing
-> the request if we run out of RTT pages in this go and Realm could retry
-> it.
+> With the introduction of stage-2 huge mappings in the pKVM hypervisor,
+> guest pages CMO is needed for PMD_SIZE size. Fixmap only supports
+> PAGE_SIZE and iterating over the huge-page is time consuming (mostly due
+> to TLBI on hyp_fixmap_unmap) which is a problem for EL2 latency.
+> 
+> Introduce a shared PMD_SIZE fixmap (hyp_fixblock_map/hyp_fixblock_unmap)
+> to improve guest page CMOs when stage-2 huge mappings are installed.
+> 
+> On a Pixel6, the iterative solution resulted in a latency of ~700us,
+> while the PMD_SIZE fixmap reduces it to ~100us.
+> 
+> Because of the horrendous private range allocation that would be
+> necessary, this is disabled for 64KiB pages systems.
+> 
+> Suggested-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 1b43bcd2a679..2888b5d03757 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -59,6 +59,11 @@ typedef u64 kvm_pte_t;
+>  
+>  #define KVM_PHYS_INVALID		(-1ULL)
+>  
+> +#define KVM_PTE_TYPE			BIT(1)
+> +#define KVM_PTE_TYPE_BLOCK		0
+> +#define KVM_PTE_TYPE_PAGE		1
+> +#define KVM_PTE_TYPE_TABLE		1
+> +
+>  #define KVM_PTE_LEAF_ATTR_LO		GENMASK(11, 2)
+>  
+>  #define KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX	GENMASK(4, 2)
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> index 230e4f2527de..b0c72bc2d5ba 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> @@ -13,9 +13,11 @@
+>  extern struct kvm_pgtable pkvm_pgtable;
+>  extern hyp_spinlock_t pkvm_pgd_lock;
+>  
+> -int hyp_create_pcpu_fixmap(void);
+> +int hyp_create_fixmap(void);
+>  void *hyp_fixmap_map(phys_addr_t phys);
+>  void hyp_fixmap_unmap(void);
+> +void *hyp_fixblock_map(phys_addr_t phys);
+> +void hyp_fixblock_unmap(void);
+>  
+>  int hyp_create_idmap(u32 hyp_va_bits);
+>  int hyp_map_vectors(void);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 97e0fea9db4e..9f3ffa4e0690 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -220,16 +220,52 @@ static void guest_s2_put_page(void *addr)
+>  	hyp_put_page(&current_vm->pool, addr);
+>  }
+>  
+> +static void *__fixmap_guest_page(void *va, size_t *size)
+> +{
+> +	if (IS_ALIGNED(*size, PMD_SIZE)) {
+> +		void *addr = hyp_fixblock_map(__hyp_pa(va));
+> +
+> +		if (addr)
+> +			return addr;
+> +
+> +		*size = PAGE_SIZE;
+> +	}
+> +
+> +	if (IS_ALIGNED(*size, PAGE_SIZE))
+> +		return hyp_fixmap_map(__hyp_pa(va));
+> +
+> +	WARN_ON(1);
+> +
+> +	return NULL;
+> +}
+> +
+> +static void __fixunmap_guest_page(size_t size)
+> +{
+> +	switch (size) {
+> +	case PAGE_SIZE:
+> +		hyp_fixmap_unmap();
+> +		break;
+> +	case PMD_SIZE:
+> +		hyp_fixblock_unmap();
+> +		break;
+> +	default:
+> +		WARN_ON(1);
+> +	}
 
-I'm not really sure this is the right place, and following Gavin's
-comment I've combined this with the INIT_RIPAS code.
+This is pretty ugly. How can we end-up there the first place? I'd
+rather you make sure we can't reach this default path at all. See also
+towards the end of this patch (tl;dr: hyp_fixblock_unmap() should
+never explode).
 
-Also the situation at the moment isn't that we return to the guest -
-kvm_complete_ripas_change() will topup the memory cache and retry until
-the whole region is covered. There is an argument that perhaps it
-shouldn't, but I'm not sure what a guest can usefully do beyond retry in
-the case of a partial RIPAS change. In which case why have the overhead
-of returning to the guest?
+> +}
+> +
+>  static void clean_dcache_guest_page(void *va, size_t size)
+>  {
+>  	WARN_ON(!PAGE_ALIGNED(size));
+>  
+>  	while (size) {
+> -		__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> -					  PAGE_SIZE);
+> -		hyp_fixmap_unmap();
+> -		va += PAGE_SIZE;
+> -		size -= PAGE_SIZE;
+> +		size_t fixmap_size = size == PMD_SIZE ? size : PAGE_SIZE;
+> +		void *addr = __fixmap_guest_page(va, &fixmap_size);
+> +
+> +		__clean_dcache_guest_page(addr, fixmap_size);
+> +		__fixunmap_guest_page(fixmap_size);
+> +
+> +		size -= fixmap_size;
+> +		va += fixmap_size;
 
->> +                if (!ret)
->> +                    continue;
->> +            } else {
->> +                ret = -EINVAL;
->> +            }
->> +
->> +            break;
->> +        } else {
->> +            WARN(1, "Unexpected error in %s: %#x\n", __func__,
->> +                 ret);
->> +            ret = -ENXIO;
->> +            break;
->> +        }
-> 
-> minor nit: Following from Gavin's comment on another patch, could
-> switch() make the above code more readable and remove the continue; ?
-> 
->         switch (RMI_RETURN_STATUS(ret)) {
->         case RMI_SUCCESS:
->             ipa = next;
->             break;
->         case RMI_ERROR_RTT: {
-> 
->        
->         }
->             break;
->         default:
->             WARN(..);
->             ret = -ENXIO;
->             goto out;
->         }
-> 
-> I am fine either way.
+Can this ever be called with a *multiple* of PMD_SIZE? In this case
+you'd still end-up doing PAGE_SIZEd-bite CMOs until there is only
+PMD_SIZE left, ruining the optimisation.
 
-Since I'm combining the two functions, I've kept just the switch()
-version of the code.
+I think this needs fixing.
 
->> +    }
->> +
-> 
-> out:
-> 
->> +    *top_ipa = ipa;
->> +
->> +    if (ripas == RMI_EMPTY && ipa != start)
->> +        realm_unmap_private_range(kvm, start, ipa);
->> +
->> +    return ret;
->> +}
->> +
->>   static int realm_init_ipa_state(struct realm *realm,
->>                   unsigned long ipa,
->>                   unsigned long end)
->> @@ -863,6 +922,32 @@ void kvm_destroy_realm(struct kvm *kvm)
->>       kvm_free_stage2_pgd(&kvm->arch.mmu);
->>   }
->>   +static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm *kvm = vcpu->kvm;
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    unsigned long base = rec->run->exit.ripas_base;
->> +    unsigned long top = rec->run->exit.ripas_top;
->> +    unsigned long ripas = rec->run->exit.ripas_value;
->> +    unsigned long top_ipa;
->> +    int ret;
->> +
->> +    do {
->> +        kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
->> +                       kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
->> +        write_lock(&kvm->mmu_lock);
->> +        ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
->> +        write_unlock(&kvm->mmu_lock);
->> +
->> +        if (WARN_RATELIMIT(ret && ret != -ENOMEM,
->> +                   "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx,
->> ripas: %#lx\n",
->> +                   base, top, ripas))
->> +            break;
->> +
->> +        base = top_ipa;
->> +    } while (top_ipa < top);
->> +}
->> +
-> 
-> Rest looks good to me.
+>  	}
+>  }
+>  
+> @@ -238,11 +274,14 @@ static void invalidate_icache_guest_page(void *va, size_t size)
+>  	WARN_ON(!PAGE_ALIGNED(size));
+>  
+>  	while (size) {
+> -		__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> -					       PAGE_SIZE);
+> -		hyp_fixmap_unmap();
+> -		va += PAGE_SIZE;
+> -		size -= PAGE_SIZE;
+> +		size_t fixmap_size = size == PMD_SIZE ? size : PAGE_SIZE;
+> +		void *addr = __fixmap_guest_page(va, &fixmap_size);
+> +
+> +		__invalidate_icache_guest_page(addr, fixmap_size);
+> +		__fixunmap_guest_page(fixmap_size);
+> +
+> +		size -= fixmap_size;
+> +		va += fixmap_size;
+>  	}
+>  }
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index f41c7440b34b..e3b1bece8504 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -229,9 +229,8 @@ int hyp_map_vectors(void)
+>  	return 0;
+>  }
+>  
+> -void *hyp_fixmap_map(phys_addr_t phys)
+> +static void *fixmap_map_slot(struct hyp_fixmap_slot *slot, phys_addr_t phys)
+>  {
+> -	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
+>  	kvm_pte_t pte, *ptep = slot->ptep;
+>  
+>  	pte = *ptep;
+> @@ -243,10 +242,21 @@ void *hyp_fixmap_map(phys_addr_t phys)
+>  	return (void *)slot->addr;
+>  }
+>  
+> +void *hyp_fixmap_map(phys_addr_t phys)
+> +{
+> +	return fixmap_map_slot(this_cpu_ptr(&fixmap_slots), phys);
+> +}
+> +
+>  static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
+>  {
+>  	kvm_pte_t *ptep = slot->ptep;
+>  	u64 addr = slot->addr;
+> +	u32 level;
+> +
+> +	if (FIELD_GET(KVM_PTE_TYPE, *ptep) == KVM_PTE_TYPE_PAGE)
+> +		level = KVM_PGTABLE_LAST_LEVEL;
+> +	else
+> +		level = KVM_PGTABLE_LAST_LEVEL - 1; /* create_fixblock() guarantees PMD level */
+
+Seeing this, (KVM_PGTABLE_LAST_LEVEL - 1) looks nicee than the "2" I
+suggested in one of the previous patches.
+
+>
+>  	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
+>  
+> @@ -260,7 +270,7 @@ static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
+>  	 * https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/T/#mf10dfbaf1eaef9274c581b81c53758918c1d0f03
+>  	 */
+>  	dsb(ishst);
+> -	__tlbi_level(vale2is, __TLBI_VADDR(addr, 0), KVM_PGTABLE_LAST_LEVEL);
+> +	__tlbi_level(vale2is, __TLBI_VADDR(addr, 0), level);
+>  	dsb(ish);
+>  	isb();
+>  }
+> @@ -273,9 +283,9 @@ void hyp_fixmap_unmap(void)
+>  static int __create_fixmap_slot_cb(const struct kvm_pgtable_visit_ctx *ctx,
+>  				   enum kvm_pgtable_walk_flags visit)
+>  {
+> -	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)ctx->arg);
+> +	struct hyp_fixmap_slot *slot = (struct hyp_fixmap_slot *)ctx->arg;
+>  
+> -	if (!kvm_pte_valid(ctx->old) || ctx->level != KVM_PGTABLE_LAST_LEVEL)
+> +	if (!kvm_pte_valid(ctx->old) || (ctx->end - ctx->start) != kvm_granule_size(ctx->level))
+>  		return -EINVAL;
+>  
+>  	slot->addr = ctx->addr;
+> @@ -296,13 +306,73 @@ static int create_fixmap_slot(u64 addr, u64 cpu)
+>  	struct kvm_pgtable_walker walker = {
+>  		.cb	= __create_fixmap_slot_cb,
+>  		.flags	= KVM_PGTABLE_WALK_LEAF,
+> -		.arg = (void *)cpu,
+> +		.arg = (void *)per_cpu_ptr(&fixmap_slots, cpu),
+
+Do you really need this cast?
+
+>  	};
+>  
+>  	return kvm_pgtable_walk(&pkvm_pgtable, addr, PAGE_SIZE, &walker);
+>  }
+>  
+> -int hyp_create_pcpu_fixmap(void)
+> +#ifndef CONFIG_ARM64_64K_PAGES
+
+I don't have much faith in this symbol. We have changed the config
+stuff so often over the years that I wouldn't trust it long term.
+
+Using something like PAGE_SIZE or PAGE_SHIFT is likely to be more
+robust.
+
+> +static struct hyp_fixmap_slot hyp_fixblock_slot;
+> +static DEFINE_HYP_SPINLOCK(hyp_fixblock_lock);
+> +
+> +void *hyp_fixblock_map(phys_addr_t phys)
+> +{
+> +	hyp_spin_lock(&hyp_fixblock_lock);
+> +	return fixmap_map_slot(&hyp_fixblock_slot, phys);
+> +}
+> +
+> +void hyp_fixblock_unmap(void)
+> +{
+> +	fixmap_clear_slot(&hyp_fixblock_slot);
+> +	hyp_spin_unlock(&hyp_fixblock_lock);
+> +}
+> +
+> +static int create_fixblock(void)
+> +{
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb	= __create_fixmap_slot_cb,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +		.arg = (void *)&hyp_fixblock_slot,
+> +	};
+> +	unsigned long addr;
+> +	phys_addr_t phys;
+> +	int ret, i;
+> +
+> +	/* Find a RAM phys address, PMD aligned */
+> +	for (i = 0; i < hyp_memblock_nr; i++) {
+> +		phys = ALIGN(hyp_memory[i].base, PMD_SIZE);
+> +		if (phys + PMD_SIZE < (hyp_memory[i].base + hyp_memory[i].size))
+> +			break;
+> +	}
+> +
+> +	if (i >= hyp_memblock_nr)
+> +		return -EINVAL;
+> +
+> +	hyp_spin_lock(&pkvm_pgd_lock);
+> +	addr = ALIGN(__io_map_base, PMD_SIZE);
+> +	ret = __pkvm_alloc_private_va_range(addr, PMD_SIZE);
+> +	if (ret)
+> +		goto unlock;
+> +
+> +	ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PMD_SIZE, phys, PAGE_HYP);
+> +	if (ret)
+> +		goto unlock;
+> +
+> +	ret = kvm_pgtable_walk(&pkvm_pgtable, addr, PMD_SIZE, &walker);
+> +
+> +unlock:
+> +	hyp_spin_unlock(&pkvm_pgd_lock);
+> +
+> +	return ret;
+> +}
+> +#else
+> +void hyp_fixblock_unmap(void) { WARN_ON(1); }
+> +void *hyp_fixblock_map(phys_addr_t phys) { return NULL; }
+> +static int create_fixblock(void) { return 0; }
+> +#endif
+
+I can't say I like this. Can't you have a fallback that does the
+iteration rather than these placeholders that are only there to make
+things catch fire?
 
 Thanks,
-Steve
 
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
