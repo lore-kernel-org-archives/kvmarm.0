@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2E472601;
-	Fri, 16 May 2025 13:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF4672601;
+	Fri, 16 May 2025 13:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747403424; cv=none; b=mWj78ttmCDSe/0gw4eJ6fSTNRQzuds/knL8tVHhD2UB70cLdNMLFoGwqNo7bFdopfg6gjNIq8o7HML8R3LxGCqJuIqS4tvoD455KrC7FAaQiz8aJHWwVLjJBqFMTiOFFrHhZfrdB7HDLkC28jI9qSc06Z6+WqMojqn4oFG6Mu10=
+	t=1747403439; cv=none; b=Il2Xcpg+BVAh5kK+FiJT7vvDU13rcINtINhLHOZ6iWXxdJp/so5SZ/xwnCMSTosrd2oyIpsGvidO1WrZWf+aJPOD1ZjF3jx6sx00Td2LGyMlOfKI4ArJlNiW1JzHdsf6bz3lHWRY0O2lguJTorIsMy+C8q9F9iQF7ToXW4z2T70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747403424; c=relaxed/simple;
-	bh=nf3OQE9ZhNsiJA068uF5vECxBvjjy1drOxz1l/4Kwgc=;
+	s=arc-20240116; t=1747403439; c=relaxed/simple;
+	bh=0THkZyxxSuZVTH5og5hjwibotSM4qUDA6bNyzgM51BM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=exdPULYFtmnHtaKSx62wfFNWdsPvXw6s2kG9p9ystRTQEGkwtHVSsRXguVvaaesJQFBO6fbyjN6XxycMR7x5gjQve/whv4MO+rjZ6e3LLqUGyWxnCwTyrXyXXweaFXoYtAeLUgaM+NV9u8C69OKtZqUxSdpuK0mybNyp4s0nf04=
+	 In-Reply-To:Content-Type; b=TkuQxKhV3o2zyVK7eiaP52H2tYDamsOZAv5lf/eC/1DDyH815+jIbHqMq6l96YGx3pFlgTUf3x7FOJ18NDH9/d7IGrnAE3XRw8ZjJnDMXoY/BIv5DzkN2DS3tmCmzfF5rXdWxw/02/vmVYrY/w3hYfVmtB1gAhUrish4ZBsXqyU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB252169C;
-	Fri, 16 May 2025 06:50:09 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C511169C;
+	Fri, 16 May 2025 06:50:23 -0700 (PDT)
 Received: from [10.1.27.17] (e122027.cambridge.arm.com [10.1.27.17])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73A8F3F673;
-	Fri, 16 May 2025 06:50:17 -0700 (PDT)
-Message-ID: <31bf9eac-a234-44dd-a4a3-0939092da66a@arm.com>
-Date: Fri, 16 May 2025 14:50:15 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAE733F673;
+	Fri, 16 May 2025 06:50:30 -0700 (PDT)
+Message-ID: <c4c2d45a-0c9f-41ee-8659-d119edda457b@arm.com>
+Date: Fri, 16 May 2025 14:50:28 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -28,30 +28,30 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v8 17/43] arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
 References: <20250416134208.383984-1-steven.price@arm.com>
  <20250416134208.383984-18-steven.price@arm.com>
- <b5770d9b-4f17-4be8-95a7-1549322debb2@redhat.com>
+ <54a21b12-2b17-4e0a-9cbf-f68406fb003a@arm.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <b5770d9b-4f17-4be8-95a7-1549322debb2@redhat.com>
+In-Reply-To: <54a21b12-2b17-4e0a-9cbf-f68406fb003a@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 30/04/2025 13:11, Gavin Shan wrote:
-> On 4/16/25 11:41 PM, Steven Price wrote:
+On 07/05/2025 11:42, Suzuki K Poulose wrote:
+> On 16/04/2025 14:41, Steven Price wrote:
 >> The guest can request that a region of it's protected address space is
 >> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
 >> RSI_IPA_STATE_SET. This causes a guest exit with the
@@ -78,11 +78,6 @@ On 30/04/2025 13:11, Gavin Shan wrote:
 >>   arch/arm64/kvm/rme.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
 >>   1 file changed, 88 insertions(+)
 >>
-> 
-> One nitpick below, either way:
-> 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> 
 >> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
 >> index bee9dfe12e03..fe0d5b8703d2 100644
 >> --- a/arch/arm64/kvm/rme.c
@@ -114,9 +109,6 @@ On 30/04/2025 13:11, Gavin Shan wrote:
 >> +        if (RMI_RETURN_STATUS(ret) == RMI_SUCCESS) {
 >> +            ipa = next;
 >> +        } else if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> 
-> --->
-> 
 >> +            int walk_level = RMI_RETURN_INDEX(ret);
 >> +            int level = find_map_level(realm, ipa, end);
 >> +
@@ -130,31 +122,27 @@ On 30/04/2025 13:11, Gavin Shan wrote:
 >> +                                  level,
 >> +                                  memcache);
 >> +                /* Retry with RTTs created */
+> 
+> minor nit: Do we need to add a comment here, saying, we stop processing
+> the request if we run out of RTT pages in this go and Realm could retry
+> it.
+
+I'm not really sure this is the right place, and following Gavin's
+comment I've combined this with the INIT_RIPAS code.
+
+Also the situation at the moment isn't that we return to the guest -
+kvm_complete_ripas_change() will topup the memory cache and retry until
+the whole region is covered. There is an argument that perhaps it
+shouldn't, but I'm not sure what a guest can usefully do beyond retry in
+the case of a partial RIPAS change. In which case why have the overhead
+of returning to the guest?
+
 >> +                if (!ret)
 >> +                    continue;
 >> +            } else {
 >> +                ret = -EINVAL;
 >> +            }
 >> +
-> 
-> <--- This block of code have been existing in multiple functions. I guess
-> it would be worthy to introduce a helper for it if you agree.
-> Alternatively,
-> it's definitely something to do in the future, after this series is
-> merged :)
-
-I believe it's just two functions: realm_set_ipa_state() and
-realm_init_ipa_state(). Those two functions are going basically the same
-thing just at different stages (realm_init before the guest has started,
-and realm_set when it's running).
-
-I've had a go and combing the two functions, it's a little clunky
-because of the differences, but I think it's an improvement over the
-repeated code.
-
-Thanks,
-Steve
-
 >> +            break;
 >> +        } else {
 >> +            WARN(1, "Unexpected error in %s: %#x\n", __func__,
@@ -162,8 +150,35 @@ Steve
 >> +            ret = -ENXIO;
 >> +            break;
 >> +        }
+> 
+> minor nit: Following from Gavin's comment on another patch, could
+> switch() make the above code more readable and remove the continue; ?
+> 
+>         switch (RMI_RETURN_STATUS(ret)) {
+>         case RMI_SUCCESS:
+>             ipa = next;
+>             break;
+>         case RMI_ERROR_RTT: {
+> 
+>        
+>         }
+>             break;
+>         default:
+>             WARN(..);
+>             ret = -ENXIO;
+>             goto out;
+>         }
+> 
+> I am fine either way.
+
+Since I'm combining the two functions, I've kept just the switch()
+version of the code.
+
 >> +    }
 >> +
+> 
+> out:
+> 
 >> +    *top_ipa = ipa;
 >> +
 >> +    if (ripas == RMI_EMPTY && ipa != start)
@@ -205,20 +220,10 @@ Steve
 >> +    } while (top_ipa < top);
 >> +}
 >> +
->>   int kvm_rec_enter(struct kvm_vcpu *vcpu)
->>   {
->>       struct realm_rec *rec = &vcpu->arch.rec;
->> @@ -873,6 +958,9 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu)
->>           for (int i = 0; i < REC_RUN_GPRS; i++)
->>               rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
->>           break;
->> +    case RMI_EXIT_RIPAS_CHANGE:
->> +        kvm_complete_ripas_change(vcpu);
->> +        break;
->>       }
->>         if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
 > 
-> Thanks,
-> Gavin
-> 
+> Rest looks good to me.
+
+Thanks,
+Steve
+
 
