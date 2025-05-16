@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0F44B1E4A;
-	Fri, 16 May 2025 13:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE047082A;
+	Fri, 16 May 2025 13:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747401348; cv=none; b=Px8Sh4BJ0IJrTi2AmZxTDn27XPXS8eMnvCv91Z3ktEMAtwX0HV6IXQ/gs0VTJdDJlvgRGlf9L2skUCo8/MQ7es9E7QyNWigXEBtk/7iLL6x0JMWPxqaif/7yURqTfMLB1TBKsd9vAnjeUK70wXFMnMELJQ43/6RZBfjQZ72CNbg=
+	t=1747402110; cv=none; b=WjLYlVhZ/RBeR9ibaMEQFb+nFiora5OSFG28bZW/iDYcaWD+4Ppe5MR71kj0B42B/0qdGcsjqrjLkXR/CSBIMEhzgPhPpweNwXilzcOEnzv0ng9Zdc//BWBKsrZZ5/XxBcyAnFrmR9xGKayLTzNUE9YPXpHrZACu4howXuEB8mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747401348; c=relaxed/simple;
-	bh=aIVuP15lLI18U0B27tPS187TYHrY2xiLduyapf9Ur+w=;
+	s=arc-20240116; t=1747402110; c=relaxed/simple;
+	bh=3sB616abDAZb5EfAV8UVfyzoSDpEdedb+Tq6sVApafs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VxfOEvHlScoI7RsfoL/HE16/Hundk69aiaqs1JBgq1RlSK22c1takfUPit/YU0Re5W5KQAOzy4nA3REhaA1zYb2ISmviXQYh1NvTYr/wpcw5AfG13IQjVqtfYbMSLy8xIOXR5NOWqk0lcrrsVQma2MLtrgsfG4xtkplqshlbhQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WNzvVjlX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=VQ5zy/R/SJWKGFT+/bjn/WqFXf7tIGyi3GCA0O7PWvbBhnRLUdvnO4fBo0dvR5j7wuML5pH73NPkcOz4taMpUNFICmIbZJRQRYOxqvxATOoaBQgGc5uzvI2hNJr6NwDKgwSu2HFS/RDESkQnZYdj7nZ7CLnsUOefJE80f9CJQWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tAXSSID3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNzvVjlX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B674BC4CEE4;
-	Fri, 16 May 2025 13:15:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tAXSSID3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98826C4CEE4;
+	Fri, 16 May 2025 13:28:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747401347;
-	bh=aIVuP15lLI18U0B27tPS187TYHrY2xiLduyapf9Ur+w=;
+	s=k20201202; t=1747402110;
+	bh=3sB616abDAZb5EfAV8UVfyzoSDpEdedb+Tq6sVApafs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WNzvVjlXL2rom+TaLrRhnGLzOtPPIqPH2Sbaww3H4+/4s0Qab7I7VpvL7EcI1G/RF
-	 zmDbBDdnWAQtcWwrJe5DkLutsVGA0NpDDFFXf+3ZnXVgI+f6tI92fJD1EwVyMIfsW1
-	 w+5RkzWnstATQtjzh8qEZyLM3Sqbv2fXqWqnHZdRn9fVXMCIQ7Pst+4XdkI8AZCesZ
-	 VYj45a3d2Gi4dFdKWQxiQ7dFXXCWJZbLBKW9Qq9bQua0ohw8+gKzOkOPaGcoE5tT/d
-	 0jc/vxhwoXL1VzKAAeOKplXupXTuA+rtwdNxGTShHGod077hHA1Uwss0N62W9dIrbX
-	 uDO/SeJiH+5hQ==
+	b=tAXSSID34gaLT7yTutbPqUGXCPqNDpcju20eDMkAm/NIZ6RUyjVcTtewhn/OQSwQR
+	 9W4/+ZCRGTe77wpfOlJDgGjffsjTo0mtzd2Wj72RlMFajFPntjcMdG34s7JBmj94+6
+	 I6lAwCARa+DL+ZpywiThTkmY0fHM8CvPygtcR9lVjDwzg6PELcWXlblPscZ5XvwVMi
+	 H8/4J7OjKbIHbukh/bulZOKm1g7NCbvzgtsI7sLaQz46F5YZRIbp0FdQDTu33WLkF0
+	 Wv+ffmd40ig0YN5MVZvcZZTTko1EsZ+9Wyu055ti6MCM7SGycbKkczQKVveJ9qxAdg
+	 lpn9iBHEBDJVw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uFuuf-00FYy4-Nm;
-	Fri, 16 May 2025 14:15:45 +0100
-Date: Fri, 16 May 2025 14:15:45 +0100
-Message-ID: <867c2gg0hq.wl-maz@kernel.org>
+	id 1uFv6y-00FZ8u-CD;
+	Fri, 16 May 2025 14:28:28 +0100
+Date: Fri, 16 May 2025 14:28:27 +0100
+Message-ID: <865xi0fzwk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: oliver.upton@linux.dev,
@@ -47,10 +47,10 @@ Cc: oliver.upton@linux.dev,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	kernel-team@android.com
-Subject: Re: [PATCH v4 07/10] KVM: arm64: Convert pkvm_mappings to interval tree
-In-Reply-To: <20250509131706.2336138-8-vdonnefort@google.com>
+Subject: Re: [PATCH v4 09/10] KVM: arm64: Stage-2 huge mappings for np-guests
+In-Reply-To: <20250509131706.2336138-10-vdonnefort@google.com>
 References: <20250509131706.2336138-1-vdonnefort@google.com>
-	<20250509131706.2336138-8-vdonnefort@google.com>
+	<20250509131706.2336138-10-vdonnefort@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,123 +66,55 @@ X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 09 May 2025 14:17:03 +0100,
+On Fri, 09 May 2025 14:17:05 +0100,
 Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> From: Quentin Perret <qperret@google.com>
+> Now np-guests hypercalls with range are supported, we can let the
+> hypervisor to install block mappings whenever the Stage-1 allows it,
+> that is when backed by either Hugetlbfs or THPs. The size of those block
+> mappings is limited to PMD_SIZE.
 > 
-> In preparation for supporting stage-2 huge mappings for np-guest, let's
-> convert pgt.pkvm_mappings to an interval tree.
-> 
-> No functional change intended.
-> 
-> Suggested-by: Vincent Donnefort <vdonnefort@google.com>
-> Signed-off-by: Quentin Perret <qperret@google.com>
 > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 6b9d274052c7..1b43bcd2a679 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -413,7 +413,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
->   */
->  struct kvm_pgtable {
->  	union {
-> -		struct rb_root					pkvm_mappings;
-> +		struct rb_root_cached				pkvm_mappings;
->  		struct {
->  			u32					ia_bits;
->  			s8					start_level;
-> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> index d91bfcf2db56..da75d41c948c 100644
-> --- a/arch/arm64/include/asm/kvm_pkvm.h
-> +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> @@ -173,6 +173,7 @@ struct pkvm_mapping {
->  	struct rb_node node;
->  	u64 gfn;
->  	u64 pfn;
-> +	u64 __subtree_last;	/* Internal member for interval tree */
->  };
->  
->  int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 057874bbe3e1..6febddbec69e 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -5,6 +5,7 @@
->   */
->  
->  #include <linux/init.h>
-> +#include <linux/interval_tree_generic.h>
->  #include <linux/kmemleak.h>
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_mmu.h>
-> @@ -256,80 +257,63 @@ static int __init finalize_pkvm(void)
->  }
->  device_initcall_sync(finalize_pkvm);
->  
-> -static int cmp_mappings(struct rb_node *node, const struct rb_node *parent)
-> +static u64 __pkvm_mapping_start(struct pkvm_mapping *m)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 78fb9cea2034..97e0fea9db4e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -167,7 +167,7 @@ int kvm_host_prepare_stage2(void *pgt_pool_base)
+>  static bool guest_stage2_force_pte_cb(u64 addr, u64 end,
+>  				      enum kvm_pgtable_prot prot)
 >  {
-> -	struct pkvm_mapping *a = rb_entry(node, struct pkvm_mapping, node);
-> -	struct pkvm_mapping *b = rb_entry(parent, struct pkvm_mapping, node);
-> -
-> -	if (a->gfn < b->gfn)
-> -		return -1;
-> -	if (a->gfn > b->gfn)
-> -		return 1;
-> -	return 0;
-> +	return m->gfn * PAGE_SIZE;
+> -	return true;
+> +	return false;
 >  }
->  
-> -static struct rb_node *find_first_mapping_node(struct rb_root *root, u64 gfn)
-> +static u64 __pkvm_mapping_end(struct pkvm_mapping *m)
->  {
-> -	struct rb_node *node = root->rb_node, *prev = NULL;
-> -	struct pkvm_mapping *mapping;
-> -
-> -	while (node) {
-> -		mapping = rb_entry(node, struct pkvm_mapping, node);
-> -		if (mapping->gfn == gfn)
-> -			return node;
-> -		prev = node;
-> -		node = (gfn < mapping->gfn) ? node->rb_left : node->rb_right;
-> -	}
-> -
-> -	return prev;
-> +	return (m->gfn + 1) * PAGE_SIZE - 1;
->  }
->  
-> -/*
-> - * __tmp is updated to rb_next(__tmp) *before* entering the body of the loop to allow freeing
-> - * of __map inline.
-> - */
-> +INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64, __subtree_last,
-> +		     __pkvm_mapping_start, __pkvm_mapping_end, static,
-> +		     pkvm_mapping);
-> +
->  #define for_each_mapping_in_range_safe(__pgt, __start, __end, __map)				\
-> -	for (struct rb_node *__tmp = find_first_mapping_node(&(__pgt)->pkvm_mappings,		\
-> -							     ((__start) >> PAGE_SHIFT));	\
-> +	for (struct pkvm_mapping *__tmp = pkvm_mapping_iter_first(&(__pgt)->pkvm_mappings,	\
-> +								  __start, __end - 1);		\
->  	     __tmp && ({									\
-> -				__map = rb_entry(__tmp, struct pkvm_mapping, node);		\
-> -				__tmp = rb_next(__tmp);						\
-> +				__map = __tmp;							\
-> +				__tmp = pkvm_mapping_iter_next(__map, __start, __end - 1);	\
->  				true;								\
->  		       });									\
-> -	    )											\
-> -		if (__map->gfn < ((__start) >> PAGE_SHIFT))					\
-> -			continue;								\
-> -		else if (__map->gfn >= ((__end) >> PAGE_SHIFT))					\
-> -			break;									\
-> -		else
-> +	    )
 
-The removal of the comment worries me a bit. Is this iterator still
-safe wrt freeing of the iterator in the loop?
+Can we get rid of this callback now? And of the .force_pte_cb field in
+the kvm_pgtable struct?
+
+>  
+>  static void *guest_s2_zalloc_pages_exact(size_t size)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 754f2fe0cc67..7c8be22e81f9 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1537,7 +1537,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 * logging_active is guaranteed to never be true for VM_PFNMAP
+>  	 * memslots.
+>  	 */
+> -	if (logging_active || is_protected_kvm_enabled()) {
+> +	if (logging_active) {
+>  		force_pte = true;
+>  		vma_shift = PAGE_SHIFT;
+>  	} else {
+> @@ -1547,7 +1547,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	switch (vma_shift) {
+>  #ifndef __PAGETABLE_PMD_FOLDED
+>  	case PUD_SHIFT:
+> -		if (fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
+> +		if (!is_protected_kvm_enabled() &&
+> +		    fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
+
+Can you move this new condition into the fault_supports...() helper instead?
 
 Thanks,
 
