@@ -1,159 +1,158 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C26117A5BE;
-	Fri, 16 May 2025 16:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092E12AEED
+	for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 17:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747411219; cv=none; b=a7M/y2cu+X253GSCLU3Q7scvZv4AZXK2zDlvQroLPLqopfvpZ6hVXVWO4+rRG8xOO8/uK0y0jKGPWUcIYhNLAb5rHV67U4QKCj81PEJH13Id8JLlCsBC+WsNnDk5BtJbYF2CPONBLhcmjd9tJ43Sj7cxcnoXGqZKJKE+8R4V8ww=
+	t=1747418015; cv=none; b=H7zMU2ujCiAHYQTGtbphqTwcGD0Aer4/1DL461H6ZmU9qHbjRAzOEREjLuJugecv4a0LbQSH749woVEtA1j1OdXRuYB0O0OE+4+Kq+xUbHMqXQSZDtNObiZix3Dpu1MAiUeCAQiUFSelIBecCCGalC/u9Kz/O6wL3dHJwPsqNbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747411219; c=relaxed/simple;
-	bh=dlfXNqe7fgW+ic4s5DLoOQjk+cTXyw5CXxEJwqYfkUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q2mUN9+jZJNHM4QSGMf7bkmdc1PvafpOBiBuXt3g/FFf4AUBs8ja69L8tEOmHalFzk2HV+HFUPQxDZAL/ngsSGK+wHUUPO9ad1aNFRBIB+nrQkXTAnxLRgnRalfdVUHLhr1nWe5qf4FNBJiCiQ25aXN9iFLH6PuXlob36J/QnYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 711D4169C;
-	Fri, 16 May 2025 09:00:05 -0700 (PDT)
-Received: from [10.1.27.17] (e122027.cambridge.arm.com [10.1.27.17])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC4D63F63F;
-	Fri, 16 May 2025 09:00:13 -0700 (PDT)
-Message-ID: <64fd76aa-10b0-4b4f-875c-6c24977464f9@arm.com>
-Date: Fri, 16 May 2025 17:00:11 +0100
+	s=arc-20240116; t=1747418015; c=relaxed/simple;
+	bh=8upEJ/Pro8IkXndSvkiwT/kFxgoDTzCkAC7XhGjYZVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HwbQpaN01wsZ3ayZmMBwX1OwgABnsku7VC44kfLmI34Mcj7G5RM6ZhHDHLlRHfutRrlQ06WVCveyZGfy+f+tORk/zcDgs84/vbg7hob/ylDgAKwd3iAQlpTOwsJh/jfOiMTrDTuoXnvinedtKnCsChDiy6QVJgonaozfQZuj10A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SwzQxZ0a; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SwzQxZ0a"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-441c99459e9so15232295e9.3
+        for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 10:53:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747418012; x=1748022812; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2PUV/bkg4QUBVAIj3GMyPK/efOdWpKA1GWmXkehoUR4=;
+        b=SwzQxZ0a9z0ZP/s79V22NF6QoZHIHf4cuqr/gRMfYBzRfadnQ+DaEZlcCSOy5R9r3R
+         ylzgM6emXN1nhUIysbWGlpQvY2CUNdsGVZGnL/f+uEshXEvnADwHnEgBUPHepZzJWrIl
+         LgjTKpVJNqOqRM3x4/6l2Ro426mQR+Feyv6M75rKNE8WYgET04rQiiLxPQEByj4CWilo
+         ztk7sGv3lYqh7pk5YNG9G2rCvZcYpGXFfyHc5DDtRaS755tXJHS+GH3mc+jliaiOlRrX
+         ky0RHN31GvSXwauxV6EG7wq8aM5Uku5h7sREDgaSf1MSA8grXLkZCN4NjDld3jJtDDRL
+         hsxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747418012; x=1748022812;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2PUV/bkg4QUBVAIj3GMyPK/efOdWpKA1GWmXkehoUR4=;
+        b=fCkfbQCnp3zKxPnC6h6u+JDj218iHljT30wRS6i9KM8oO7mBt2mNehwbKs1TKTFWYE
+         yLyo2wjD8HcTikyVSxGap38BfVLPwVea4WPLfy7WW4ysHwv1C+TJBIF4YmNPwhCCwwO1
+         OIXtVb5H7G99qh6FabXXGVXtss/EXhL245nk2Ul6+Knq7cdiVniMOd0cTlwMyFBqPNLu
+         av3KQJC7djKG5DArfJsgjfZy0x+5e54b1HZsc8K67CS8fYBjSKdLZZ6E+/2AY3yiUYOy
+         ok2Cv1Czyez9lS1h+EkOAckBvFho72Ir0Ne3T0buznrjXqOm7XQAUHrQ8shn0yKRzllG
+         2iBw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4DGAPxTgVTVJhxDDWKYlgaXUUXwyLtJc2cN0SCI1gimxd6ejaBLfk6tB0duNsf6Vvyfi1eR0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzAfVp+PXqTpeVjEJZOn+3vzqc9UsOXcxALU47e4fd2FaWTAbvN
+	UCiHVyYiAeJYSBZgVK6czpNjEVTc3CXbnsvLQTeFcTlLj6SyP87J0wuALYDY97kB7w==
+X-Gm-Gg: ASbGncuiko3Nkeunr57ecBdzm7Pr6SznjMDvRoc6gb3O84lZ05/XTE0i0w/Laa4Dw++
+	8N6X1mk5Yn+DRRmuVn0eTv91/5d/uyNlbGJL7A/oZbfaYmBxmXj+Pex7xlmC877hRk8QY3pNF7j
+	KL0P5i+LHHhUSTgOCZSv0QBD86om25IXyBCLCy9sYWDcSTgPhXjxf1YaBc9Cew0MRLHOYwXHiLV
+	CCnRNIxLGyv3xRVLsWQpFw07wofjizmF8BF5dljTyZmOALjM6REIJ/NKhs/wnWi4EALsml0o/vZ
+	vk+/3gY8e08Ov21tUW7x3pqKyv9QApyHNijSKfY4usGpo8GK/s3CzoSOeP+gcFMIzRsz2Zp34Hp
+	PtWEZR4Tzl2D8UmDnyVGvMYlSB7E=
+X-Google-Smtp-Source: AGHT+IEv0Zz+YAfIIihBgvDHDhxHsSF6QrQSMcho8CQZS8XKX5FCrwPQKgycTnORAz6U0zTZnRbJsw==
+X-Received: by 2002:a05:600c:1e09:b0:43c:f616:f08 with SMTP id 5b1f17b1804b1-442fd624854mr45671515e9.8.1747418012214;
+        Fri, 16 May 2025 10:53:32 -0700 (PDT)
+Received: from google.com (218.131.22.34.bc.googleusercontent.com. [34.22.131.218])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442fd50b9b2sm42329115e9.12.2025.05.16.10.53.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 May 2025 10:53:31 -0700 (PDT)
+Date: Fri, 16 May 2025 18:53:27 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	qperret@google.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v4 01/10] KVM: arm64: Handle huge mappings for np-guest
+ CMOs
+Message-ID: <aCd7l455qd4NmOeb@google.com>
+References: <20250509131706.2336138-1-vdonnefort@google.com>
+ <20250509131706.2336138-2-vdonnefort@google.com>
+ <86bjrsg3az.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/43] arm64: Support for Arm CCA in KVM
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <fa874ef5-5da5-44de-a9d0-24663eb684a0@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <fa874ef5-5da5-44de-a9d0-24663eb684a0@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86bjrsg3az.wl-maz@kernel.org>
 
-Hi Gavin,
+Hi,
 
-On 02/05/2025 01:46, Gavin Shan wrote:
-> On 4/16/25 11:41 PM, Steven Price wrote:
-> 
-> [...]
-> 
->>
->> The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[1].
->>
->> This series is based on v6.15-rc1. It is also available as a git
->> repository:
->>
->> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v8
->>
->> Work in progress changes for kvmtool are available from the git
->> repository below:
->>
->> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v6
->>
->> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
->> [2] https://lore.kernel.org/r/20250408105225.4002637-17-maz%40kernel.org
->>
-> 
-> I got a chance to try the following combination, the guest can boot using
-> qemu/kvmtool except a RCU stall is observed (more details provided below)
-> 
-> host.tf-rmm      https://git.codelinaro.org/linaro/dcap/
-> rmm.git                      (cca/v8)
-> host.edk2        git@github.com:tianocore/
-> edk2.git                                   (edk2-stable202411)
-> host.tf-a        https://git.codelinaro.org/linaro/dcap/tf-a/trusted-
-> firmware-a.git  (cca/v4)
-> host.qemu        https://git.qemu.org/git/
-> qemu.git                                   (stable-9.2)
-> host.linux       https://git.gitlab.arm.com/linux-arm/linux-
-> cca.git                  (cca-host/v8)
-> host.buildroot   https://github.com/buildroot/
-> buildroot                              (master)
-> guest.qemu       https://git.codelinaro.org/linaro/dcap/
-> qemu.git                     (cca/latest)
-> guest.kvmtool    https://gitlab.arm.com/linux-arm/kvmtool-
-> cca                        (cca/latest)
-> guest.buildroot  https://github.com/buildroot/
-> buildroot                              (master)
-> 
-> RCU stall report
-> ----------------
-> 
-> [ 7816.381336] rcu: INFO: rcu_preempt self-detected stall on CPU
-> [ 7816.382816] rcu:     6-....: (5249 ticks this GP)
-> idle=3a4c/1/0x4000000000000000 softirq=6001/6003 fqs=2624
-> [ 7816.384399] rcu:     (t=5250 jiffies g=29821 q=47 ncpus=8)
-> [ 7816.386059] CPU: 6 UID: 0 PID: 203 Comm: qemu-system-aar Not tainted
-> 6.15.0-rc1-gavin-g78b23c56de79 #34 PREEMPT
-> [ 7816.387133] Hardware name: QEMU QEMU Virtual Machine, BIOS unknown
-> 02/02/2022
-> [ 7816.387926] pstate: 61402009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS
-> BTYPE=--)
-> [ 7816.388678] pc : realm_unmap_private_range+0x19c/0x2c0
-> [ 7816.389878] lr : realm_unmap_private_range+0x94/0x2c0
-> [ 7816.390388] sp : ffff80008095bb60
-> [ 7816.390765] x29: ffff80008095bb60 x28: 000000007caef000 x27:
-> ffffba3322764000
-> [ 7816.392321] x26: 00007fffffffffff x25: 000000007caf0000 x24:
-> 0001000000000000
-> [ 7816.393168] x23: 00000000c4000155 x22: ffff8000801b5e98 x21:
-> 0000000106481000
-> [ 7816.393999] x20: 000000007caef000 x19: 0000000000000000 x18:
-> 0000000000000000
-> [ 7816.394833] x17: 0000000000000000 x16: 0000000000000000 x15:
-> 0000ffff8e997058
-> [ 7816.395668] x14: 0000000000000000 x13: 0000000000000000 x12:
-> 0000000000000000
-> [ 7816.396548] x11: 0000000038e38e39 x10: 0000000000000004 x9 :
-> ffffba33218a2564
-> [ 7816.397419] x8 : ffff8000801b5e98 x7 : 000000003fffffff x6 :
-> 0000000000000001
-> [ 7816.398243] x5 : 000000011e795000 x4 : 0000000000000002 x3 :
-> 0000000000000000
-> [ 7816.399062] x2 : 000000007caf0000 x1 : 000000011e796000 x0 :
-> 0000000000000000
-> [ 7816.400021] Call trace:
-> [ 7816.400604]  realm_unmap_private_range+0x19c/0x2c0 (P)
+Thanks for having a look at the series.
 
-So I suspect this is because I didn't have a cond_resched_rwlock_write()
-in here - which was (as you pointed out) because I hadn't propagated
-"may_block" down. Finger's crossed this will be fixed with that change.
+On Fri, May 16, 2025 at 01:15:00PM +0100, Marc Zyngier wrote:
+> On Fri, 09 May 2025 14:16:57 +0100,
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> > 
+> > clean_dcache_guest_page() and invalidate_icache_guest_page() accept a
+> > size as an argument. But they also rely on fixmap, which can only map a
+> > single PAGE_SIZE page.
+> > 
+> > With the upcoming stage-2 huge mappings for pKVM np-guests, those
+> > callbacks will get size > PAGE_SIZE. Loop the CMOs on a PAGE_SIZE basis
+> > until the whole range is done.
+> > 
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 31173c694695..23544928a637 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -219,14 +219,28 @@ static void guest_s2_put_page(void *addr)
+> >  
+> >  static void clean_dcache_guest_page(void *va, size_t size)
+> >  {
+> > -	__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
+> > -	hyp_fixmap_unmap();
+> > +	WARN_ON(!PAGE_ALIGNED(size));
+> 
+> What if "va" isn't aligned?
 
-Thanks,
-Steve
+So the only callers are either for PAGE_SIZE or PMD_SIZE with the right
+alignment addr alignment.
 
-> [ 7816.401347]  kvm_realm_unmap_range+0x94/0xb0
-> [ 7816.401894]  __unmap_stage2_range+0x70/0xa0
-> [ 7816.402421]  kvm_arch_post_set_memory_attributes+0x68/0xa8
-> [ 7816.403011]  kvm_vm_ioctl+0x6bc/0x1b58
-> [ 7816.403509]  __arm64_sys_ioctl+0xa4/0xe8
-> [ 7816.404020]  invoke_syscall+0x50/0x120
-> [ 7816.404562]  el0_svc_common.constprop.0+0x48/0xf0
-> [ 7816.405113]  do_el0_svc+0x24/0x38
-> [ 7816.405584]  el0_svc+0x34/0xf0
-> [ 7816.406045]  el0t_64_sync_handler+0x10c/0x138
-> [ 7816.406571]  el0t_64_sync+0x1ac/0x1b0
+But happy to make this more future-proof, after all an ALIGN() is quite cheap.
+
+> 
+> > +
+> > +	while (size) {
+> > +		__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> > +					  PAGE_SIZE);
+> > +		hyp_fixmap_unmap();
+> > +		va += PAGE_SIZE;
+> > +		size -= PAGE_SIZE;
+> > +	}
+> 
+> I know pKVM dies on WARN, but this code "looks" unsafe. Can you align
+> va and size to be on page boundaries, so that we are 100% sure the
+> loop terminates?
+> 
+> >  }
+> >  
+> >  static void invalidate_icache_guest_page(void *va, size_t size)
+> >  {
+> > -	__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
+> > -	hyp_fixmap_unmap();
+> > +	WARN_ON(!PAGE_ALIGNED(size));
+> > +
+> > +	while (size) {
+> > +		__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> > +					       PAGE_SIZE);
+> > +		hyp_fixmap_unmap();
+> > +		va += PAGE_SIZE;
+> > +		size -= PAGE_SIZE;
+> > +	}
+> 
+> Same here.
 > 
 > Thanks,
-> Gavin
 > 
-
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
