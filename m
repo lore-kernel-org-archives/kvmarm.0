@@ -1,146 +1,224 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F7F200B9F
-	for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 13:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2E472601;
+	Fri, 16 May 2025 13:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747402884; cv=none; b=Th10ZfIonbocjkRS5njYJ4pmrfXLeQri4ETiyz/v83upoPewMia4aI735+73gCuo94wgaGgUs6pm+bdf6/gSr/KFdPgciRaCeF6I1+qnXRIa2mAhawxIp3WuhYQ8fb9gpLb7Icc61WmCEQ9slKCZZD5X23es9/J7licQfQ/uW9Y=
+	t=1747403424; cv=none; b=mWj78ttmCDSe/0gw4eJ6fSTNRQzuds/knL8tVHhD2UB70cLdNMLFoGwqNo7bFdopfg6gjNIq8o7HML8R3LxGCqJuIqS4tvoD455KrC7FAaQiz8aJHWwVLjJBqFMTiOFFrHhZfrdB7HDLkC28jI9qSc06Z6+WqMojqn4oFG6Mu10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747402884; c=relaxed/simple;
-	bh=uJWI89wvuu58ssW9qPj7mRyoSGLNQzk4PZd/GC7Hv54=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rmWM4gE7A/h7QkeVnxBF89Be3irtWuHc+FzDJhrZdRhwgSlBp47NePX13nZtRFOV7fTZ2S3jnhF5yg8VclSWJy9t3G/snbCkBouq9DGIsCUE8zpllS2CE51NPyK6WW3zaaxjBQNtlM+yY8e7VjgASVenWUEaMABl24w+Ujaqcok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XjOPRukn; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XjOPRukn"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a1c86b62a8so1448563f8f.3
-        for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 06:41:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747402880; x=1748007680; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P7GVxU0/r+w5zLWT8gZSbiy4WliZZRj39MPigOv2RvQ=;
-        b=XjOPRuknE1y4TLz6tpJyXfSw0Y9+TP7jlVOUM5i3i2AdSjP1DpogzUwCy1502DxkLA
-         ZxNY1zpYvSxGhIhrXh7ZYHadpWd5kB7+snKsuP0Wdn/UjiCFka3TEVPXq8232X2EifNm
-         Ds5FyeJBx+R4xUes3cGJAxMZ7BXiIm/TqU/JsXTRQizxGvNjF2FpUo4JLe0G9Q7FCMw/
-         IsAZbQW+RETcHqnneEYCXu0ri7MaKE2fs9BvzxITbSpXp2CH0JBo5OX3ikvqTKNftgsz
-         Xjk+fP2d2LmHr9Xp1NbHUzj93XUWbXnnr7UXiMfnT1eVW6anYKFUInm3+Cke2PH9H17Y
-         5nbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747402880; x=1748007680;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P7GVxU0/r+w5zLWT8gZSbiy4WliZZRj39MPigOv2RvQ=;
-        b=AHHevpCMaVYC9BIIBOq47pdsD0RBS7V39MWtWezgZC/TiIrU7gP4+hmJAYS9ShprlU
-         mAouVXAHKENjSUTncu7Plk/jX7/gtj5MB66onkUriiXpwUIIDhoFupbi2g1saeAV1vcx
-         ocJiR8K55k2VABtM8036a/ZRb/H4EBdTEQN4aQnTQzhnAYDFyVOqnWyVGz8EtDepP/PD
-         C5OZsTALfi+KphYeelve0vZIZkymYvvmgFOH0BebsVnfwFAfArjJnwzdONypGCdqah2+
-         91kSbfaZKJJd9j6eb4SBvHCcn/btwrYEmyl24ePX3BdmzKdnpM1epWU34v0Clgc8ubF6
-         Q7PA==
-X-Gm-Message-State: AOJu0YxYRsHJbjr8KazsN6zFp63vkT4M9jjXr+ZgFaxie9D6W3p9xXCi
-	v8OPCBN2AQLRXmE887NBYtlsPKOBEmH36kZo6WZsYyXIIyTjVRRsE1l9jbtUWd9Za8iupIRog8O
-	oDj4ITGsR+opnzYY+Tp//Bw==
-X-Google-Smtp-Source: AGHT+IF5jgzJGfaBS/UHJ3X8WaZX+60Zli0llPdcw+b0LDQXYJrpjyQFz+/w5KLRHR1Rt2m4D1p45WOPNgP2H7ul
-X-Received: from wmbhg17.prod.google.com ([2002:a05:600c:5391:b0:43d:58c9:bb51])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:2289:b0:3a0:bcb1:fc02 with SMTP id ffacd0b85a97d-3a35c84ae4dmr3449099f8f.54.1747402880322;
- Fri, 16 May 2025 06:41:20 -0700 (PDT)
-Date: Fri, 16 May 2025 14:40:31 +0100
-In-Reply-To: <20250516134031.661124-1-vdonnefort@google.com>
+	s=arc-20240116; t=1747403424; c=relaxed/simple;
+	bh=nf3OQE9ZhNsiJA068uF5vECxBvjjy1drOxz1l/4Kwgc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=exdPULYFtmnHtaKSx62wfFNWdsPvXw6s2kG9p9ystRTQEGkwtHVSsRXguVvaaesJQFBO6fbyjN6XxycMR7x5gjQve/whv4MO+rjZ6e3LLqUGyWxnCwTyrXyXXweaFXoYtAeLUgaM+NV9u8C69OKtZqUxSdpuK0mybNyp4s0nf04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB252169C;
+	Fri, 16 May 2025 06:50:09 -0700 (PDT)
+Received: from [10.1.27.17] (e122027.cambridge.arm.com [10.1.27.17])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73A8F3F673;
+	Fri, 16 May 2025 06:50:17 -0700 (PDT)
+Message-ID: <31bf9eac-a234-44dd-a4a3-0939092da66a@arm.com>
+Date: Fri, 16 May 2025 14:50:15 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250516134031.661124-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <20250516134031.661124-26-vdonnefort@google.com>
-Subject: [PATCH v5 25/25] tracing: selftests: Add pKVM trace remote tests
-From: Vincent Donnefort <vdonnefort@google.com>
-To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	jstultz@google.com, qperret@google.com, will@kernel.org, 
-	kernel-team@android.com, linux-kernel@vger.kernel.org, 
-	Vincent Donnefort <vdonnefort@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 17/43] arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-18-steven.price@arm.com>
+ <b5770d9b-4f17-4be8-95a7-1549322debb2@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <b5770d9b-4f17-4be8-95a7-1549322debb2@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Run the trace remote selftests with the pKVM trace remote "hypervisor".
+On 30/04/2025 13:11, Gavin Shan wrote:
+> On 4/16/25 11:41 PM, Steven Price wrote:
+>> The guest can request that a region of it's protected address space is
+>> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
+>> RSI_IPA_STATE_SET. This causes a guest exit with the
+>> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
+>> protected region to unprotected (or back), exiting to the VMM to make
+>> the necessary changes to the guest_memfd and memslot mappings. On the
+>> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
+>> calls.
+>>
+>> The VMM may wish to reject the RIPAS change requested by the guest. For
+>> now it can only do with by no longer scheduling the VCPU as we don't
+>> currently have a usecase for returning that rejection to the guest, but
+>> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
+>> open for adding a new ioctl in the future for this purpose.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v7:
+>>   * Rework the loop in realm_set_ipa_state() to make it clear when the
+>>     'next' output value of rmi_rtt_set_ripas() is used.
+>> New patch for v7: The code was previously split awkwardly between two
+>> other patches.
+>> ---
+>>   arch/arm64/kvm/rme.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 88 insertions(+)
+>>
+> 
+> One nitpick below, either way:
+> 
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> 
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+>> index bee9dfe12e03..fe0d5b8703d2 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -624,6 +624,65 @@ void kvm_realm_unmap_range(struct kvm *kvm,
+>> unsigned long start,
+>>           realm_unmap_private_range(kvm, start, end);
+>>   }
+>>   +static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
+>> +                   unsigned long start,
+>> +                   unsigned long end,
+>> +                   unsigned long ripas,
+>> +                   unsigned long *top_ipa)
+>> +{
+>> +    struct kvm *kvm = vcpu->kvm;
+>> +    struct realm *realm = &kvm->arch.realm;
+>> +    struct realm_rec *rec = &vcpu->arch.rec;
+>> +    phys_addr_t rd_phys = virt_to_phys(realm->rd);
+>> +    phys_addr_t rec_phys = virt_to_phys(rec->rec_page);
+>> +    struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>> +    unsigned long ipa = start;
+>> +    int ret = 0;
+>> +
+>> +    while (ipa < end) {
+>> +        unsigned long next;
+>> +
+>> +        ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
+>> +
+>> +        if (RMI_RETURN_STATUS(ret) == RMI_SUCCESS) {
+>> +            ipa = next;
+>> +        } else if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+> 
+> --->
+> 
+>> +            int walk_level = RMI_RETURN_INDEX(ret);
+>> +            int level = find_map_level(realm, ipa, end);
+>> +
+>> +            /*
+>> +             * If the RMM walk ended early then more tables are
+>> +             * needed to reach the required depth to set the RIPAS.
+>> +             */
+>> +            if (walk_level < level) {
+>> +                ret = realm_create_rtt_levels(realm, ipa,
+>> +                                  walk_level,
+>> +                                  level,
+>> +                                  memcache);
+>> +                /* Retry with RTTs created */
+>> +                if (!ret)
+>> +                    continue;
+>> +            } else {
+>> +                ret = -EINVAL;
+>> +            }
+>> +
+> 
+> <--- This block of code have been existing in multiple functions. I guess
+> it would be worthy to introduce a helper for it if you agree.
+> Alternatively,
+> it's definitely something to do in the future, after this series is
+> merged :)
 
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kselftest@vger.kernel.org
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+I believe it's just two functions: realm_set_ipa_state() and
+realm_init_ipa_state(). Those two functions are going basically the same
+thing just at different stages (realm_init before the guest has started,
+and realm_set when it's running).
 
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/pkvm/buffer_size.tc b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/buffer_size.tc
-new file mode 100644
-index 000000000000..383ef7a84274
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/buffer_size.tc
-@@ -0,0 +1,10 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test pkvm hypervisor tracing buffer size
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/buffer_size.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_buffer_size
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/pkvm/reset.tc b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/reset.tc
-new file mode 100644
-index 000000000000..679e31257d0b
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/reset.tc
-@@ -0,0 +1,10 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test pkvm hypervisor tracing reset
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/reset.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_reset
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/pkvm/trace_pipe.tc b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/trace_pipe.tc
-new file mode 100644
-index 000000000000..4c77431e884f
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/trace_pipe.tc
-@@ -0,0 +1,10 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test pkvm hypervisor tracing pipe
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/trace_pipe.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_trace_pipe
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/pkvm/unloading.tc b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/unloading.tc
-new file mode 100644
-index 000000000000..059c7ad1c008
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/unloading.tc
-@@ -0,0 +1,10 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test pkvm hypervisor tracing buffer unloading
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/unloading.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_unloading
--- 
-2.49.0.1101.gccaa498523-goog
+I've had a go and combing the two functions, it's a little clunky
+because of the differences, but I think it's an improvement over the
+repeated code.
+
+Thanks,
+Steve
+
+>> +            break;
+>> +        } else {
+>> +            WARN(1, "Unexpected error in %s: %#x\n", __func__,
+>> +                 ret);
+>> +            ret = -ENXIO;
+>> +            break;
+>> +        }
+>> +    }
+>> +
+>> +    *top_ipa = ipa;
+>> +
+>> +    if (ripas == RMI_EMPTY && ipa != start)
+>> +        realm_unmap_private_range(kvm, start, ipa);
+>> +
+>> +    return ret;
+>> +}
+>> +
+>>   static int realm_init_ipa_state(struct realm *realm,
+>>                   unsigned long ipa,
+>>                   unsigned long end)
+>> @@ -863,6 +922,32 @@ void kvm_destroy_realm(struct kvm *kvm)
+>>       kvm_free_stage2_pgd(&kvm->arch.mmu);
+>>   }
+>>   +static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
+>> +{
+>> +    struct kvm *kvm = vcpu->kvm;
+>> +    struct realm_rec *rec = &vcpu->arch.rec;
+>> +    unsigned long base = rec->run->exit.ripas_base;
+>> +    unsigned long top = rec->run->exit.ripas_top;
+>> +    unsigned long ripas = rec->run->exit.ripas_value;
+>> +    unsigned long top_ipa;
+>> +    int ret;
+>> +
+>> +    do {
+>> +        kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
+>> +                       kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
+>> +        write_lock(&kvm->mmu_lock);
+>> +        ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
+>> +        write_unlock(&kvm->mmu_lock);
+>> +
+>> +        if (WARN_RATELIMIT(ret && ret != -ENOMEM,
+>> +                   "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx,
+>> ripas: %#lx\n",
+>> +                   base, top, ripas))
+>> +            break;
+>> +
+>> +        base = top_ipa;
+>> +    } while (top_ipa < top);
+>> +}
+>> +
+>>   int kvm_rec_enter(struct kvm_vcpu *vcpu)
+>>   {
+>>       struct realm_rec *rec = &vcpu->arch.rec;
+>> @@ -873,6 +958,9 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu)
+>>           for (int i = 0; i < REC_RUN_GPRS; i++)
+>>               rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
+>>           break;
+>> +    case RMI_EXIT_RIPAS_CHANGE:
+>> +        kvm_complete_ripas_change(vcpu);
+>> +        break;
+>>       }
+>>         if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
+> 
+> Thanks,
+> Gavin
+> 
 
