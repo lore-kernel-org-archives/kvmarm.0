@@ -1,97 +1,113 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6594F1C07C3
-	for <kvmarm@lists.linux.dev>; Thu, 15 May 2025 16:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7A3231856;
+	Fri, 16 May 2025 09:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747327715; cv=none; b=QkKrzU9+bN7C70Tls18k0X/76cYRO7AUTOSrQsfUChQgTlW6VnPZ3+C4K4KXabSC3pLcEOV+dyX7iUIsNSqzu5aDsjZ434yKWgPj4svPUYwSCPazC+8nCnXKGVZENP9pem52CIO2PZ1pT2dKFXLKFk/4SJi5RJL3+mnodq3ozEU=
+	t=1747389131; cv=none; b=fwWrlERYTahgJnTZuRWYL0lxuA9Rucq8t4GajmcG78g8FdV+Rwn/t7zpd3jjeqDgOayE1MBWMfHxjHaNdU06Cfb9x4L2T0FD6bKisW5l7ajwK8q/KftTNNevy0pbV3XFhL9/Ui3LNrvVmFJtl2wNZeRMKJ56I+voEe3LjFcmkPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747327715; c=relaxed/simple;
-	bh=0ADnEgUksaRuN7xX8QNORj+pUqdmF0PSLqFRMgWLl/I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gIUeyvaoDM59W0yuc+JKsQC/FAUAmvUGW68sgPNc34/NrTWXkVz27rfBlbcSGVd6y4sfQjbI4oLiHAd+tQkP+1mJR647g/kmRTJxH+tno7ByF00HmkSJOzEAJ8/Qwb5Ia2iTlOjo6wtG43+g0aLO3UVlvpwk4IM7q1RoPMAMaQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3B5A14BF;
-	Thu, 15 May 2025 09:48:20 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B05A3F5A1;
-	Thu, 15 May 2025 09:48:31 -0700 (PDT)
-Message-ID: <89c75451-8a30-42c1-ba2a-a63b818a1a04@arm.com>
-Date: Thu, 15 May 2025 17:48:30 +0100
+	s=arc-20240116; t=1747389131; c=relaxed/simple;
+	bh=g993Po7E99wuV/4TxgCTWS/do6agKuPkxb8TJjjNqlw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oDx45nv1rpKP0LcEvu69PSx9uGBMDnOAH8HEMDJI+CtENQn+DY31+z840CHPc7kB56fstaCxSVXXfow8IuBsBXBbapi4/FNZSxY6Y/kbF2qTwecFbGuKTxyCEAuJLfDwmbhwt3yxrmuhucnbhYOdeyXjebwpcMSrbyTvLLPJBEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ijkJ1Y8Q; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ijkJ1Y8Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FBE8C4CEE4;
+	Fri, 16 May 2025 09:52:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747389129;
+	bh=g993Po7E99wuV/4TxgCTWS/do6agKuPkxb8TJjjNqlw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ijkJ1Y8QMKQAV4ToU7FtBC8X0Jukkb2f7N4P5nadDrTT2PJQuEf3EzJaDgzEz8kGB
+	 C0+7Jk/KTiF6qgyIF2+xLFb9LDJsJ7S+xGltdmkpR6r89OAGZ389oAzAcoFEbVxJSK
+	 D7fa13Jfrm9CN/JTqO2HcfRINjLlOPai2aG+kIO84gSGpNONwC302OT81yZFjzVs2z
+	 jOJEjhfHqmiAewJoUtH2YBn9rDtdI4Q508q+g3bphhG77OQ2QeElck9m1Ih89+o/dj
+	 ozccXkCcOvPhU9pCq3Q5ehGaYzKX4GlFuwaGtG3eszTtsWKAGxsoiJBb88SqMnASD+
+	 jGyb4QiBze/FQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uFrja-00FVxR-Vq;
+	Fri, 16 May 2025 10:52:07 +0100
+Date: Fri, 16 May 2025 10:52:06 +0100
+Message-ID: <86ecwog9x5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Sauerwein <dssauerw@amazon.de>
+Cc: <jingzhangos@google.com>,
+	<andre.przywara@arm.com>,
+	<coltonlewis@google.com>,
+	<eauger@redhat.com>,
+	<jiangkunkun@huawei.com>,
+	<joey.gouly@arm.com>,
+	<kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<lishusen2@huawei.com>,
+	<oupton@google.com>,
+	<pbonzini@redhat.com>,
+	<rananta@google.com>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<graf@amazon.com>,
+	<nh-open-source@amazon.com>
+Subject: Re: [PATCH v4 5/5] KVM: arm64: vgic-its: Clear ITE when DISCARD frees an ITE
+In-Reply-To: <20250512140909.3464-1-dssauerw@amazon.de>
+References: <20241107214137.428439-6-jingzhangos@google.com>
+	<20250512140909.3464-1-dssauerw@amazon.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] KVM: arm64: Allow vGICv4 configuration per VM
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- Mingwei Zhang <mizhang@google.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250514192159.1751538-1-rananta@google.com>
- <5d204cf7-c6a0-455c-8706-753e1fce3777@arm.com>
- <CAJHc60w1rYc9guoideuKpKaukuCyvxu3S7Fidoy3Lh94+_xDiw@mail.gmail.com>
-Content-Language: en-US
-From: Ben Horgan <ben.horgan@arm.com>
-In-Reply-To: <CAJHc60w1rYc9guoideuKpKaukuCyvxu3S7Fidoy3Lh94+_xDiw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dssauerw@amazon.de, jingzhangos@google.com, andre.przywara@arm.com, coltonlewis@google.com, eauger@redhat.com, jiangkunkun@huawei.com, joey.gouly@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, lishusen2@huawei.com, oupton@google.com, pbonzini@redhat.com, rananta@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, graf@amazon.com, nh-open-source@amazon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
-
-On 5/15/25 16:55, Raghavendra Rao Ananta wrote:
-> On Thu, May 15, 2025 at 3:30 AM Ben Horgan <ben.horgan@arm.com> wrote:
->>
->> Hi,
->>
->> On 5/14/25 20:21, Raghavendra Rao Ananta wrote:
->>> Hello,
->>>
->>> When kvm-arm.vgic_v4_enable=1, KVM adds support for direct interrupt
->>> injection by default to all the VMs in the system, aka GICv4. A
->>> shortcoming of the GIC architecture is that there's an absolute limit on
->>> the number of vPEs that can be tracked by the ITS. It is possible that
->>> an operator is running a mix of VMs on a system, only wanting to provide
->>> a specific class of VMs with hardware interrupt injection support.
->>>
->>> To support this, introduce a GIC attribute, KVM_DEV_ARM_VGIC_CONFIG_GICV4,
->>> for the userspace to enable or disable vGICv4 for a given VM.
->>>
->>> The attribute allows the configuration only when vGICv4 is enabled in KVM,
->>> else it acts a read-only attribute returning
->>> KVM_DEV_ARM_VGIC_CONFIG_GICV4_UNAVAILABLE as the value.
->> What's the reason for the cmdline enable continuing to be absolute in
->> the disable case? I wonder if this is unnecessarily restrictive.
->>
->> Couldn't KVM_DEV_ARM_VGIC_CONFIG_GICV4_UNAVAILABLE be reserved for
->> hardware that doesn't support vgic_v4 and if kvm-arm.vgic_v4_enable=0,
->> or omitted, on supporting hardware then default to
->> KVM_DEV_ARM_VGIC_CONFIG_GICV4_DISABLE but allow it to be overridden? I
->> don't think this changes the behaviour when your new attribute is not used.
+On Mon, 12 May 2025 15:09:09 +0100,
+David Sauerwein <dssauerw@amazon.de> wrote:
 > 
-> KVM_DEV_ARM_VGIC_CONFIG_GICV4_UNAVAILABLE is reserved for the exact
-> situation that you mentioned (no GICv4 h/w support  or if cmdline is
-> disabled/omitted).
-> Regarding defaulting to KVM_DEV_ARM_VGIC_CONFIG_GICV4_DISABLE,
-> wouldn't it change the existing expectations, i.e., vGICv4 is enabled
-> if available and set by cmdline?
-I was suggesting keeping the defaults the same when your new gic 
-attribute is untouched but in the same way that it overrides enable to 
-disable you could also allow it to override disable to enable.
-
-Based on Marc's comments this does not seem desirable. As things are 
-now, and with your changes, setting kvm-arm.vgic_v4_enable=1 at boot 
-implies a promise that vgic_v4 works on the system. As there is broken 
-hardware we can't take this promise for granted.
+> Hi Jing,
 > 
-> Thank you.
-> Raghavendra
+> After pulling this patch in via the v6.6.64 and v5.10.226 LTS releases, I see
+> NULL pointer dereferences in some guests. The dereference happens in different
+> parts of the kernel outside of the GIC driver (file systems, NVMe driver,
+> etc.). The issue only appears once every few hundred DISCARDs / guest boots.
+> Reverting the commit does fix the problem. I have seen multiple different guest
+> kernel versions (4.14, 5.15) and distributions exhibit this issue.
+
+Where is the guest stack trace?
+
+> The issue looks like some kind of race. I think the guest re-uses the memory
+> allocated for the ITT before the hypervisor is actually done with the DISCARD
+> command, i.e. before it zeros the ITE. From what I can tell, the guest should
+> wait for the command to finish via its_wait_for_range_completion(). I tried
+> locking reads to its->cwriter in vgic_mmio_read_its_cwriter() and its->creadr
+> in vgic_mmio_read_its_creadr() with its->cmd_lock in the hypervisor kernel, but
+> that did not help. I also instrumented the guest kernel both via printk() and
+> trace events. In both cases the issue disappears once the instrumentation is in
+> place, so I'm not able to fully observe what is happening on the guest side.
+> 
+> Do you have an idea of what might cause the issue?
+
+I'm a bit sceptical of this analysis, because KVM makes no use of the
+guest's owned memory outside of a save/restore event, and otherwise
+shadows everything.
+
+So what are you *exactly* doing here? Have you reproduced this with an
+upstream, current KVM host?
 
 Thanks,
 
-Ben
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
