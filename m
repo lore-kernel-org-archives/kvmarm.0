@@ -1,113 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7A3231856;
-	Fri, 16 May 2025 09:52:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDBD71361;
+	Fri, 16 May 2025 12:04:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747389131; cv=none; b=fwWrlERYTahgJnTZuRWYL0lxuA9Rucq8t4GajmcG78g8FdV+Rwn/t7zpd3jjeqDgOayE1MBWMfHxjHaNdU06Cfb9x4L2T0FD6bKisW5l7ajwK8q/KftTNNevy0pbV3XFhL9/Ui3LNrvVmFJtl2wNZeRMKJ56I+voEe3LjFcmkPk=
+	t=1747397056; cv=none; b=FmQnFs0vw1TInS5woiCjQvNCpjYJN8Qkid8zoMOJW2M3u4/2pRp/SuPnKSPfvXpV6YvZiHffJK1oVmT6uNwknQ5GT5wKZBpP0A6OZbzWtU+jOAOpkchBOOHNCiMF88Z9+C1xrvLlnED0mjJaGxeA4INcTybkF/qjSyrfOAgU67A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747389131; c=relaxed/simple;
-	bh=g993Po7E99wuV/4TxgCTWS/do6agKuPkxb8TJjjNqlw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oDx45nv1rpKP0LcEvu69PSx9uGBMDnOAH8HEMDJI+CtENQn+DY31+z840CHPc7kB56fstaCxSVXXfow8IuBsBXBbapi4/FNZSxY6Y/kbF2qTwecFbGuKTxyCEAuJLfDwmbhwt3yxrmuhucnbhYOdeyXjebwpcMSrbyTvLLPJBEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ijkJ1Y8Q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747397056; c=relaxed/simple;
+	bh=KCwjgKTMuHSCGCH8zsLHrN2hAJYJKLa4Jq5iL6Vf2cE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k1x4zlPLMe7FMVHlxuXJPDTDYnsJ4EIH4UklWNowENJ3fFFGZgN3XE2J9TVoJ1O20h6K0f8ysgGus3RHA4zIy94cBN57yuLLkxNT6FLjsgtAeLXmq6I4EEGMW2JeHI2tm8Wvmim/Isrqc+jcTTuEY5WuJdXfP4mNOQIUOtNAfeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UD8PqnZA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ijkJ1Y8Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FBE8C4CEE4;
-	Fri, 16 May 2025 09:52:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UD8PqnZA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C165C4CEE4;
+	Fri, 16 May 2025 12:04:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747389129;
-	bh=g993Po7E99wuV/4TxgCTWS/do6agKuPkxb8TJjjNqlw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ijkJ1Y8QMKQAV4ToU7FtBC8X0Jukkb2f7N4P5nadDrTT2PJQuEf3EzJaDgzEz8kGB
-	 C0+7Jk/KTiF6qgyIF2+xLFb9LDJsJ7S+xGltdmkpR6r89OAGZ389oAzAcoFEbVxJSK
-	 D7fa13Jfrm9CN/JTqO2HcfRINjLlOPai2aG+kIO84gSGpNONwC302OT81yZFjzVs2z
-	 jOJEjhfHqmiAewJoUtH2YBn9rDtdI4Q508q+g3bphhG77OQ2QeElck9m1Ih89+o/dj
-	 ozccXkCcOvPhU9pCq3Q5ehGaYzKX4GlFuwaGtG3eszTtsWKAGxsoiJBb88SqMnASD+
-	 jGyb4QiBze/FQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1747397056;
+	bh=KCwjgKTMuHSCGCH8zsLHrN2hAJYJKLa4Jq5iL6Vf2cE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UD8PqnZALDd4Vfg+SoKbbdSuOiBznKSTYi986eO3GsWGWrlohNVWeVQYbZSu0zwas
+	 7uIrS2h2nU/BQpyTP+12jXMyejDcEiuxp+Awn+wz5QxbUR8VvYuVg5zYKf964BxE8A
+	 rx9SJ4iUTUBwoUBFumOmCf+7LNwkeubLDw2hEJW8586xxaUhR77JFLkMI7CUKSbTgH
+	 ZD19WjtT9RdEQeAjUtCKMARt5BVhIubtmG/+ta7my/fig0CZQ4QhAX0sNw8HmwAiSE
+	 yJeL4nOtG0H0rU1fSYpsYSb8fThjGZCWtHIyYRwN02sGVsReahHMKvB/9xncQK/NnA
+	 7FNmF9nlKApxg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uFrja-00FVxR-Vq;
-	Fri, 16 May 2025 10:52:07 +0100
-Date: Fri, 16 May 2025 10:52:06 +0100
-Message-ID: <86ecwog9x5.wl-maz@kernel.org>
+	id 1uFtnR-00FXoM-Rm;
+	Fri, 16 May 2025 13:04:13 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: David Sauerwein <dssauerw@amazon.de>
-Cc: <jingzhangos@google.com>,
-	<andre.przywara@arm.com>,
-	<coltonlewis@google.com>,
-	<eauger@redhat.com>,
-	<jiangkunkun@huawei.com>,
-	<joey.gouly@arm.com>,
-	<kvm@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<lishusen2@huawei.com>,
-	<oupton@google.com>,
-	<pbonzini@redhat.com>,
-	<rananta@google.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<graf@amazon.com>,
-	<nh-open-source@amazon.com>
-Subject: Re: [PATCH v4 5/5] KVM: arm64: vgic-its: Clear ITE when DISCARD frees an ITE
-In-Reply-To: <20250512140909.3464-1-dssauerw@amazon.de>
-References: <20241107214137.428439-6-jingzhangos@google.com>
-	<20250512140909.3464-1-dssauerw@amazon.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: catalin.marinas@arm.com,
+	will@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Ben Horgan <ben.horgan@arm.com>
+Cc: james.morse@arm.com
+Subject: Re: [RFC PATCH v2 0/3] KVM: arm64: Don't claim MTE_ASYNC if not supported
+Date: Fri, 16 May 2025 13:04:10 +0100
+Message-Id: <174739704125.2524774.18416359728104050072.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250512114112.359087-1-ben.horgan@arm.com>
+References: <20250512114112.359087-1-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dssauerw@amazon.de, jingzhangos@google.com, andre.przywara@arm.com, coltonlewis@google.com, eauger@redhat.com, jiangkunkun@huawei.com, joey.gouly@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, lishusen2@huawei.com, oupton@google.com, pbonzini@redhat.com, rananta@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, graf@amazon.com, nh-open-source@amazon.com
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, ben.horgan@arm.com, james.morse@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 12 May 2025 15:09:09 +0100,
-David Sauerwein <dssauerw@amazon.de> wrote:
+On Mon, 12 May 2025 12:41:09 +0100, Ben Horgan wrote:
+> The ID_AA64PFR1_EL1.MTE_frac field is currently hidden from KVM.
+> However, when ID_AA64PFR1_EL1.MTE==2, ID_AA64PFR1_EL1.MTE_frac==0
+> indicates that MTE_ASYNC is supported. On a host with
+> ID_AA64PFR1_EL1.MTE==2 but without MTE_ASYNC support a guest with the
+> MTE capability enabled will incorrectly see MTE_ASYNC advertised as
+> supported. This series fixes that.
 > 
-> Hi Jing,
-> 
-> After pulling this patch in via the v6.6.64 and v5.10.226 LTS releases, I see
-> NULL pointer dereferences in some guests. The dereference happens in different
-> parts of the kernel outside of the GIC driver (file systems, NVMe driver,
-> etc.). The issue only appears once every few hundred DISCARDs / guest boots.
-> Reverting the commit does fix the problem. I have seen multiple different guest
-> kernel versions (4.14, 5.15) and distributions exhibit this issue.
+> [...]
 
-Where is the guest stack trace?
+Applied to next, thanks!
 
-> The issue looks like some kind of race. I think the guest re-uses the memory
-> allocated for the ITT before the hypervisor is actually done with the DISCARD
-> command, i.e. before it zeros the ITE. From what I can tell, the guest should
-> wait for the command to finish via its_wait_for_range_completion(). I tried
-> locking reads to its->cwriter in vgic_mmio_read_its_cwriter() and its->creadr
-> in vgic_mmio_read_its_creadr() with its->cmd_lock in the hypervisor kernel, but
-> that did not help. I also instrumented the guest kernel both via printk() and
-> trace events. In both cases the issue disappears once the instrumentation is in
-> place, so I'm not able to fully observe what is happening on the guest side.
-> 
-> Do you have an idea of what might cause the issue?
+[1/3] arm64/sysreg: Expose MTE_frac so that it is visible to KVM
+      commit: 5799a2983fea4f22f6aaa291aee3b704db81d29f
+[2/3] KVM: arm64: Make MTE_frac masking conditional on MTE capability
+      commit: fe21ff5d4b46c06c4e43a310fdb781d1e6b5173e
+[3/3] KVM: selftests: Confirm exposing MTE_frac does not break migration
+      commit: 69018866d2baa014413e340744bfb342ec0cdbcd
 
-I'm a bit sceptical of this analysis, because KVM makes no use of the
-guest's owned memory outside of a save/restore event, and otherwise
-shadows everything.
-
-So what are you *exactly* doing here? Have you reproduced this with an
-upstream, current KVM host?
-
-Thanks,
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
