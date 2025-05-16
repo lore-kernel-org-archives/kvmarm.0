@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059601DFDE;
-	Fri, 16 May 2025 12:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF05F2417C6;
+	Fri, 16 May 2025 13:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747400275; cv=none; b=VvvO/PQyJQXexHxQcFcawK1lN8f9bEDwWy3QYZHj2B7Z4Dx5fSh8RiV9SRJohE0iGXqtBj4EfiCqumRC+rm570nxzfdnWtNnL99Yb7LK2BBWkG1mzpWPv5NgPdwR0NuLJeoHUpbexvRenOIb7MPEpxDvH5vIeYjSG6R1+BtDqPw=
+	t=1747401012; cv=none; b=Vuv6loCn9AhloVCRnxcUEKg99TYdGh8Zrx/8HXQvIO41gyCI4rRc9MUUtBR/kivAmuq61DblAR4wrVEhCuTAg3JRtpxy/N/k2bM+M/daDSTwvUp8wO08QhDDlchb/5S6rpcDXz6sqVdTzgluwetbATJuogyaX6g857fAZRfanOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747400275; c=relaxed/simple;
-	bh=YZxxILgmfc1qF1rrNWG6/WtUXq2234pqpZt+RioE+Oc=;
+	s=arc-20240116; t=1747401012; c=relaxed/simple;
+	bh=f3bSpBjDNhpmuG7CwGPUxc40Ow4uGBBx47VJXM4QwWE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yd2LRPCHzD9ZvFtsfPeDE6r2ZO96Q67AN3/G+5OAx2oSg43xfoUXX6EoiXSah0SL406/AtbmgwRMHZqqt18GUUmgvwUT9eDy0z8oI6oNHUmbdc+1fyCidqvm2Hjdk5zxffUofDjyot1tYDJjUe8/RaTShyEU/qFfRvXy2vHClVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c3wJ9KUe; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=JHE8vlcCHQKkPDOrZNU0p7ZRP8kBr+URWXdltgf4PcjWNPQNGXkCUkQh6+lSzDzmXmGKmTWC1DdKTU6ZHlwyQl9ojGgkg9DBfNzFILCeVMzX5hV5IH0Hy4vvA1eQRKE9Jyo1DpuZfdHTcf13qAz6u8JC3/cFtH/fDtc2gxRmi7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BvOyR4z9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c3wJ9KUe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2798C4CEE4;
-	Fri, 16 May 2025 12:57:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvOyR4z9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CF00C4CEE4;
+	Fri, 16 May 2025 13:10:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747400274;
-	bh=YZxxILgmfc1qF1rrNWG6/WtUXq2234pqpZt+RioE+Oc=;
+	s=k20201202; t=1747401010;
+	bh=f3bSpBjDNhpmuG7CwGPUxc40Ow4uGBBx47VJXM4QwWE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=c3wJ9KUewGkliyK1GQc3uMF2StFwkDkd44yXnLyqtpOXcMZY+iFDdhz1CMgJvR1JS
-	 QnxWz3HQ7VsoXpbIiUeguYfzo+JHtEjj1Sp3o7PjYG4oOGzi2thZ8XU1Sg2c9wX10g
-	 pzPgsVc5yKRXhPo0LRSO+smBm9BVkKmLcZWORBURWZO4i7gHN+Nd05jXe8PbfFPdrL
-	 IB5xV8xKWoJ5Dl6qdc69cCSvEBJK6we9xOT2fCMDD+AP/O6gT7aBINVnCXv80Jl3RU
-	 E4BSWm+viNGiy5iex/O5cn6lomBwWInw/9XIA9yJe03a3bTxekkYEPg1LjmXgzJ2IO
-	 FukrHGfuxqiVw==
+	b=BvOyR4z9k89vA4LEiLj1r7wo8xfwWz8ngi5XkjnLeTrmDfXKR5LfcHzLx+ICH83tb
+	 fn766OyuVwFC8G7gkvwlOfmWd+rzsMZQQ+c2vyiehlT22B/8VDWocVfqBUvNfrV1oE
+	 IrsAn41sy+W5GsanX+V1llzb4GNl8InClIxuVjtTjIzWGWp1DVPZScn9csjaqpSOV0
+	 pg8TEEW0JLoPrdTPtsZbpO64B/OjtJOnfCoOxutffY9lGhtt/rjmrR7mb7bEY4KvxD
+	 KfxVHthYyX+R0MGIFwFhKd0bc+kBkEiBxeL+nuadmHZ9kiOQoMA0XYw4URmB6d6DE5
+	 iUxQjayLGu+hg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uFudM-00FYgz-LR;
-	Fri, 16 May 2025 13:57:52 +0100
-Date: Fri, 16 May 2025 13:57:52 +0100
-Message-ID: <86a57cg1bj.wl-maz@kernel.org>
+	id 1uFupD-00FYsP-P5;
+	Fri, 16 May 2025 14:10:08 +0100
+Date: Fri, 16 May 2025 14:10:06 +0100
+Message-ID: <868qmwg0r5.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: oliver.upton@linux.dev,
@@ -47,10 +47,10 @@ Cc: oliver.upton@linux.dev,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	kernel-team@android.com
-Subject: Re: [PATCH v4 02/10] KVM: arm64: Introduce for_each_hyp_page
-In-Reply-To: <20250509131706.2336138-3-vdonnefort@google.com>
+Subject: Re: [PATCH v4 03/10] KVM: arm64: Add a range to __pkvm_host_share_guest()
+In-Reply-To: <20250509131706.2336138-4-vdonnefort@google.com>
 References: <20250509131706.2336138-1-vdonnefort@google.com>
-	<20250509131706.2336138-3-vdonnefort@google.com>
+	<20250509131706.2336138-4-vdonnefort@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,108 +66,99 @@ X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 09 May 2025 14:16:58 +0100,
+On Fri, 09 May 2025 14:16:59 +0100,
 Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Add a helper to iterate over the hypervisor vmemmap. This will be
-> particularly handy with the introduction of huge mapping support
-> for the np-guest stage-2.
+> In preparation for supporting stage-2 huge mappings for np-guest. Add a
+> nr_pages argument to the __pkvm_host_share_guest hypercall. This range
+> supports only two values: 1 or PMD_SIZE / PAGE_SIZE (that is 512 on a
+> 4K-pages system).
 > 
 > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> index eb0c2ebd1743..676a0a13c741 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> @@ -96,24 +96,24 @@ static inline struct hyp_page *hyp_phys_to_page(phys_addr_t phys)
->  #define hyp_page_to_virt(page)	__hyp_va(hyp_page_to_phys(page))
->  #define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
->  
-> -static inline enum pkvm_page_state get_host_state(phys_addr_t phys)
-> +static inline enum pkvm_page_state get_host_state(struct hyp_page *p)
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 26016eb9323f..47aa7b01114f 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -39,7 +39,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+>  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+> -int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu,
+> +int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
+>  			    enum kvm_pgtable_prot prot);
+>  int __pkvm_host_unshare_guest(u64 gfn, struct pkvm_hyp_vm *hyp_vm);
+>  int __pkvm_host_relax_perms_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu, enum kvm_pgtable_prot prot);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 59db9606e6e1..4d3d215955c3 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -245,7 +245,8 @@ static void handle___pkvm_host_share_guest(struct kvm_cpu_context *host_ctxt)
 >  {
-> -	return (enum pkvm_page_state)hyp_phys_to_page(phys)->__host_state;
-> +	return (enum pkvm_page_state)p->__host_state;
-
-I'm not quite sure why we have this cast the first place. If we are so
-keen on type consistency, why isn't __host_state an enum pkvm_page_state
-the first place?
-
->  }
+>  	DECLARE_REG(u64, pfn, host_ctxt, 1);
+>  	DECLARE_REG(u64, gfn, host_ctxt, 2);
+> -	DECLARE_REG(enum kvm_pgtable_prot, prot, host_ctxt, 3);
+> +	DECLARE_REG(u64, nr_pages, host_ctxt, 3);
+> +	DECLARE_REG(enum kvm_pgtable_prot, prot, host_ctxt, 4);
+>  	struct pkvm_hyp_vcpu *hyp_vcpu;
+>  	int ret = -EINVAL;
 >  
-> -static inline void set_host_state(phys_addr_t phys, enum pkvm_page_state state)
-> +static inline void set_host_state(struct hyp_page *p, enum pkvm_page_state state)
->  {
-> -	hyp_phys_to_page(phys)->__host_state = state;
-> +	p->__host_state = state;
->  }
+> @@ -260,7 +261,7 @@ static void handle___pkvm_host_share_guest(struct kvm_cpu_context *host_ctxt)
+>  	if (ret)
+>  		goto out;
 >  
-> -static inline enum pkvm_page_state get_hyp_state(phys_addr_t phys)
-> +static inline enum pkvm_page_state get_hyp_state(struct hyp_page *p)
->  {
-> -	return hyp_phys_to_page(phys)->__hyp_state_comp ^ PKVM_PAGE_STATE_MASK;
-> +	return p->__hyp_state_comp ^ PKVM_PAGE_STATE_MASK;
-
-And we don't seem that bothered here.
-
+> -	ret = __pkvm_host_share_guest(pfn, gfn, hyp_vcpu, prot);
+> +	ret = __pkvm_host_share_guest(pfn, gfn, nr_pages, hyp_vcpu, prot);
+>  out:
+>  	cpu_reg(host_ctxt, 1) =  ret;
 >  }
->  
-> -static inline void set_hyp_state(phys_addr_t phys, enum pkvm_page_state state)
-> +static inline void set_hyp_state(struct hyp_page *p, enum pkvm_page_state state)
->  {
-> -	hyp_phys_to_page(phys)->__hyp_state_comp = state ^ PKVM_PAGE_STATE_MASK;
-> +	p->__hyp_state_comp = state ^ PKVM_PAGE_STATE_MASK;
->  }
->  
->  /*
 > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 23544928a637..4d269210dae0 100644
+> index 4d269210dae0..f0f7c6f83e57 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -60,6 +60,9 @@ static void hyp_unlock_component(void)
->  	hyp_spin_unlock(&pkvm_pgd_lock);
+> @@ -696,10 +696,9 @@ static enum pkvm_page_state guest_get_page_state(kvm_pte_t pte, u64 addr)
+>  	return pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte));
 >  }
 >  
-> +#define for_each_hyp_page(start, size, page)   \
-> +	for (page = hyp_phys_to_page(start); page < hyp_phys_to_page((start) + (size)); page++)
+> -static int __guest_check_page_state_range(struct pkvm_hyp_vcpu *vcpu, u64 addr,
+> +static int __guest_check_page_state_range(struct pkvm_hyp_vm *vm, u64 addr,
+>  					  u64 size, enum pkvm_page_state state)
+>  {
+> -	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+>  	struct check_walk_data d = {
+>  		.desired	= state,
+>  		.get_page_state	= guest_get_page_state,
+> @@ -908,48 +907,81 @@ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages)
+>  	return ret;
+>  }
+>  
+> -int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu,
+> +static int __guest_check_transition_size(u64 phys, u64 ipa, u64 nr_pages, u64 *size)
+> +{
+> +	if (nr_pages == 1) {
+> +		*size = PAGE_SIZE;
+> +		return 0;
+> +	}
 > +
+> +	/* We solely support PMD_SIZE huge-pages */
+> +	if (nr_pages != (1 << (PMD_SHIFT - PAGE_SHIFT)))
+> +		return -EINVAL;
 
-Huh. This really should be something like:
+I'm not really keen on the whole PxD nomenclature. What we really care
+about is a mapping level (level 2 in this instance). Can we instead
+use kvm_granule_size()?  Something like:
 
-#define for_each_hyp_page(__p, __st, __sz)   			\
-	for (struct hyp_page *__p = hyp_phys_to_page(__st),	\
-	     *__e = __p + ((__sz) >> PAGE_SHIFT);		\
-	     __p < __e; __p++)
+	if ((nr_page * PAGE_SIZE) != kvm_granule_size(2))
+		return -EINVAL;
 
-so that:
+> +
+> +	if (!IS_ALIGNED(phys | ipa, PMD_SIZE))
+> +		return -EINVAL;
+> +
+> +	*size = PMD_SIZE;
 
-- the iterator variable comes first and looks like a normal for-loop
-- the iterator has a scope limited to the loop
-- we don't evaluate parameters multiple times
-- we don't evaluate the end of the loop multiple times
-- we try not to reuse common variable names
-
->  static void *host_s2_zalloc_pages_exact(size_t size)
->  {
->  	void *addr = hyp_alloc_pages(&host_s2_pool, get_order(size));
-> @@ -481,7 +484,8 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
->  		return -EAGAIN;
->  
->  	if (pte) {
-> -		WARN_ON(addr_is_memory(addr) && get_host_state(addr) != PKVM_NOPAGE);
-> +		WARN_ON(addr_is_memory(addr) &&
-> +			get_host_state(hyp_phys_to_page(addr)) != PKVM_NOPAGE);
->  		return -EPERM;
->  	}
->  
-> @@ -507,10 +511,10 @@ int host_stage2_idmap_locked(phys_addr_t addr, u64 size,
->  
->  static void __host_update_page_state(phys_addr_t addr, u64 size, enum pkvm_page_state state)
->  {
-> -	phys_addr_t end = addr + size;
-> +	struct hyp_page *page;
-
-and then these extra declarations can go.
+Similar things here. But also, should this level-2 block checking be
+moved to the patch that actually allows block mapping?
 
 Thanks,
 
