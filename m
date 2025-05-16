@@ -1,117 +1,139 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25F714884C
-	for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 14:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60C439ACC;
+	Fri, 16 May 2025 14:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747405040; cv=none; b=m5J8RUk/ZaoIi2VTF4HzbUEUt6Gsxo7gUjv5MoCj80/jNhBQMlKIFdpviYh9Ukken2vfz42qHrEYwHYcKyjdpaokrSzYCbV0wR6+nouZVgkqZwoSY4JA/gd8cGpxj++9jL0wVFjmf7zx6a4nEUXba9CDMMzJ9lrYWvd+wpKtTIA=
+	t=1747406332; cv=none; b=f2cga5lXoURjMAcXxcbvfwdOxXKJBNtG6D8oArcxlN6cSkXmITKsy/JhK+I4SK3Kkyy29QSD85vDjQbOVwJX1iiRlwuy+FE7YLHQcSc35l/+YA7827P15mGrTq65Hm1dUoSK3WHyAdtc4gjNu8XcZUMC7Cwbcl7UAGGZgUfjrG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747405040; c=relaxed/simple;
-	bh=ENx+qCzlWxL/Tu+I9kT+kNn9SOax+0FqCL8HPl5eosA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lkY3FyVAgFkWG6UOPEkstatTYq0LzCh+ICuW7JUfM6qH5jlIgYHj9K7873awz3Ncco8s/aG0yJ3p+pQ3ajSsVQ3oDaOTR8PKAi9U1KA081Pm58gSyjFHo58KChSaMKaIDtt5IkSDfj6RJAQZ6zHPaCdg4OSFYcBgufuXQIoW6IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CJqUmLsJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1747406332; c=relaxed/simple;
+	bh=l46kwxbPoNzDDSweacWIRFfRPs/0kNJkrBDYOOUaEF4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ocTwR5MF024g/hkBxpmXMM/8HtUqeshzM2dhlqirxIGg7guf5csynxSJwt/nZThX/EENokhUHSzsZfMEVIezUylQjSiyJPPQlAeHDpsR2w1ymyZDLZkQDWW434mLP92YrShSvCuC9erMTeWzhoSLUjlO/JRS0lG9lfPy9XlgLOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZrFLqBwc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CJqUmLsJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747405037;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TERTr/nzmmczkc5dKkRLFBUYCo0L45Zgj3qT12f3LLU=;
-	b=CJqUmLsJ4ng4ExAc9S3KKFTfwJA82XHS1vmt+xFcexv1e12Y967J0dBPbNiE2bpPnjCLow
-	LgEfL36ROVv22G1H3SardKd7WXBbLQLMFZLZ6NkgxipT7w3VbPD2wsWPh/hH5FkGz2Uz0z
-	T1q8mMy1y2VPGYhZlJxuRaPP2p6SE0I=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-489-GNsxUTNXPbqjfztNOK0eSw-1; Fri,
- 16 May 2025 10:17:13 -0400
-X-MC-Unique: GNsxUTNXPbqjfztNOK0eSw-1
-X-Mimecast-MFC-AGG-ID: GNsxUTNXPbqjfztNOK0eSw_1747405031
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CF948195608C;
-	Fri, 16 May 2025 14:17:09 +0000 (UTC)
-Received: from localhost (dhcp-192-216.str.redhat.com [10.33.192.216])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D154B195608D;
-	Fri, 16 May 2025 14:17:07 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
- richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
- oliver.upton@linux.dev, sebott@redhat.com,
- shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
-Cc: agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com,
- philmd@linaro.org, pbonzini@redhat.com
-Subject: Re: [PATCH v3 06/10] arm/kvm: Allow reading all the writable ID
- registers
-In-Reply-To: <a706e9a2-0a49-4296-ba0a-8001f433b8b8@redhat.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20250414163849.321857-1-cohuck@redhat.com>
- <20250414163849.321857-7-cohuck@redhat.com>
- <a706e9a2-0a49-4296-ba0a-8001f433b8b8@redhat.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Fri, 16 May 2025 16:17:05 +0200
-Message-ID: <871psod4im.fsf@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZrFLqBwc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17874C4CEE4;
+	Fri, 16 May 2025 14:38:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747406332;
+	bh=l46kwxbPoNzDDSweacWIRFfRPs/0kNJkrBDYOOUaEF4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZrFLqBwc+bmZgKP4ysNa27JWlVVh2fI3XBE0Q4rbGJ5tmnj7DN0xElAYQKtyHv+cD
+	 U/Qkg5apYb4d/VNOCBoN9GuU1IuQJSoxW2pLDWHET9IPNfUNxaCTsBoSPikjPQhogX
+	 cTXcFCeE+/mSMv0UVbvnb6axASj8+CsiwwfLYfUKMcGg+R3HlcBDLI05cYakndF3KG
+	 MkRyb+z+eTQgJQz7oTIROYcTHqpDX0Qk2eq4UTWhQNmQMnbyqAxqwSL+ug1uIzi4dO
+	 IShlEdMPWduVz+UaElDFaAiDDuFPo6yemYxY9hs/JRYwXj1EvngevKbZKKSBWqv214
+	 OAn0K5e6diF1Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uFwD3-00FaaK-A8;
+	Fri, 16 May 2025 15:38:49 +0100
+Date: Fri, 16 May 2025 15:38:48 +0100
+Message-ID: <8634d4fwnb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	leo.yan@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 01/10] arm64: sysreg: Add new PMSIDR_EL1 and PMSFCR_EL1 fields
+In-Reply-To: <20250506-james-perf-feat_spe_eft-v1-1-dd480e8e4851@linaro.org>
+References: <20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org>
+	<20250506-james-perf-feat_spe_eft-v1-1-dd480e8e4851@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.clark@linaro.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, leo.yan@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, May 13 2025, Eric Auger <eric.auger@redhat.com> wrote:
+On Tue, 06 May 2025 12:41:33 +0100,
+James Clark <james.clark@linaro.org> wrote:
+> 
+> Add new fields and registers that are introduced for the features
+> FEAT_SPE_CRR (call return records), FEAT_SPE_EFT (extended filtering),
+> FEAT_SPE_FPF (floating point flag), FEAT_SPE_FDS (data source
+> filtering), FEAT_SPE_ALTCLK and FEAT_SPE_SME.
+>
+> Signed-off-by: James Clark <james.clark@linaro.org>
+> ---
+>  arch/arm64/tools/sysreg | 26 ++++++++++++++++++++++----
+>  1 file changed, 22 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index bdf044c5d11b..80d57c83a5f5 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2205,11 +2205,20 @@ Field	0	RND
+>  EndSysreg
+>  
+>  Sysreg	PMSFCR_EL1	3	0	9	9	4
+> -Res0	63:19
+> +Res0	63:53
+> +Field	52	SIMDm
+> +Field	51	FPm
+> +Field	50	STm
+> +Field	49	LDm
+> +Field	48	Bm
+> +Res0	47:21
+> +Field	20	SIMD
+> +Field	19	FP
+>  Field	18	ST
+>  Field	17	LD
+>  Field	16	B
+> -Res0	15:4
+> +Res0	15:5
+> +Field	4	FDS
+>  Field	3	FnE
+>  Field	2	FL
+>  Field	1	FT
+> @@ -2226,7 +2235,12 @@ Field	15:0	MINLAT
+>  EndSysreg
+>  
+>  Sysreg	PMSIDR_EL1	3	0	9	9	7
+> -Res0	63:25
+> +Res0	63:33
+> +Field	32	SME
+> +Field	31:28	ALTCLK
+> +Field	27	FPF
+> +Field	26	EFT
+> +Field	25	CRR
 
-> On 4/14/25 6:38 PM, Cornelia Huck wrote:
->> From: Eric Auger <eric.auger@redhat.com>
-(...)
+These are described as enumerations in the JSON file (see [1]).
 
->> +static bool
->> +kvm_arm_get_host_cpu_features(ARMCPU *cpu, ARMHostCPUFeatures *ahcf,
->> +                              bool exhaustive)
-> maybe the exhaustive term shall be replaced by handle_writable_id_regs
-> which tells more explicitly what it does
+	M.
 
-Maybe get_all_writable_id_regs?
+[1] https://lore.kernel.org/all/20250506164348.346001-7-maz@kernel.org
 
->>  {
->>      /* Identify the feature bits corresponding to the host CPU, and
->>       * fill out the ARMHostCPUClass fields accordingly. To do this
-
-(...)
-
->> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
->> index 8d1f20ca8d89..90ba4f7d8987 100644
->> --- a/target/arm/kvm_arm.h
->> +++ b/target/arm/kvm_arm.h
->> @@ -141,8 +141,12 @@ uint32_t kvm_arm_sve_get_vls(ARMCPU *cpu);
->>   *
->>   * Set up the ARMCPU struct fields up to match the information probed
->>   * from the host CPU.
->> + *
->> + * @cpu: cpu object
->> + * @exhaustive: if true, all the feature ID regs are queried instead of
-> s/queried/handled
->> + *              a subset
-
-And make this "if true, additionally get the contents of all writable ID
-registers as well"?
-
->>   */
->> -void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
->> +void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu, bool exhaustive);
-
+-- 
+Without deviation from the norm, progress is not possible.
