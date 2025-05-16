@@ -1,54 +1,54 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D503B13A258
-	for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 13:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914FA1A5B8C
+	for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 13:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747402852; cv=none; b=AVe4BZ3beDe/s5ieBdaTmW+sDbQBUPxslxTxn7ZNQFax9tad3JkXhYDm+PQxWytRf58Qw+tjyCupYZIyNPyFR6tzpWw+1NDH43Q97+O++HD7lUr5Qyr5LCmcK271ynBIBj4vxwi6gz9vpAjA5wPj4gJx/ExUJeWFHnlgi/kEjWA=
+	t=1747402854; cv=none; b=U/3ZiTd0YU/3PdRrQ2lMvtD61uJa10958ZXL/ElboqwliKk7sMMFFp2oWMqZOh9/QOVpPRwkYdWsg5Lis0QF4iFsapr51zuyCquO+Elye1hJeAzsEZc5dMAyqts01ze+nQtSZHnENBS6cejuTz6Xeoj1uaoLjFcqt0A8+w7yus4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747402852; c=relaxed/simple;
-	bh=w8JKPJ88iJQDLUk1FH/Uus7ffIKXybTpLwm4M6OOBUs=;
+	s=arc-20240116; t=1747402854; c=relaxed/simple;
+	bh=wsH31ydPHtGC8nSyG5aiDWiL3F7qWOKzsCXUCTUDMoY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JWO5Xg3XqgLCn8ajTEcZhSwAB6N9kIj94C38SrILX05cTDdYH6zdhUE/e9KLDFsuc96CewQr6UUGMyOjrCniD/Woctd8Vz+QnF84xgFHmAoIfANu4WMny1pK8S5YcnJ2exoTYxN/jinbhufkvKCcpAPmccimFV+NMkdzlseog+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jLPGUPpl; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=BYCekHiXourYZNTviErm1CxxLxaiViaWa+NAvLjYYrXjFTIzg7Z7E4M70KxhWlUfiSDZTWTY1P57iNlc71Qh45kbdaVU3pH0QY9TydIb161dJBM6LVPhBkDeHkrer2NEHQgmUI9aLqTLyM6FdFelblO0cKwKV4iM08ZH+l43qXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dQem7QPA; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jLPGUPpl"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43d0830c3f7so14932365e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 06:40:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dQem7QPA"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a0b5d18cb7so1142160f8f.2
+        for <kvmarm@lists.linux.dev>; Fri, 16 May 2025 06:40:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747402849; x=1748007649; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1747402851; x=1748007651; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uMPV6q6AhxevNFuuJTWHVmUqHFVmOMovU6ugpBlq244=;
-        b=jLPGUPpls9MwWhCJtWciPQuCxd0Dt02UlzRzVfoDUA3JJyrMspu1iya1FJnrXvprxF
-         Inc4WXKTn3hF8abswMKQS/WbBaoDO/Zo+VYlpupvSN7ZnHlbodAm5TH8Mah8S3/0IWyc
-         1QVJiPr028QifWitBIRZnNrGkIKgM8TGDN52GBmL1sK/S9ZKjm0vGaVX44sih/Q/AI1q
-         eujDNTRVQeKPEGGJ6YSSUylQ9BRA2FJO8E9oFhyib2gC9eqkN03o+O9FPXzC7dudQUo/
-         wCfY3ql/Z10zGHsp0R333M68xcC55jbNtqvGgk08t3rRDrMzZ9nDey+q+B+Mkhcu7ASL
-         rMsA==
+        bh=sts3k8S/JL66rJ24fFiDhVPJbMR9OVDJbVTiN/eWqHU=;
+        b=dQem7QPAVdbty+8w1U2xWsQpmV59E1AFk+GJfmPGDJ64BbfFU6S7FYYB9YAQ7CQsBJ
+         ywaiwBMUI9hdSix//XfCSqUBek3BRgUIvTX59GYKO/as2cJKj6MO42Voyb+ayXYyaF1z
+         ulfbX7mxmXfXqqH1Adh1kT6H1pv9lo5jMkxYJZfN/3EjqF7kQFM2QMYTYNfkKUk/8iTt
+         FnSmuzBR6vzwoOk3IJLb1FCJewduBm1mvW++50kqcNI0MSTf1r/J1gESCFkUqPeYUGb6
+         TTWFjs7mE7Uud/vQAX4Av2/iBD7ov2wATr+LrxRTxZAo6asyv7xI4cq2ck1ti8sfTP1a
+         c0xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747402849; x=1748007649;
+        d=1e100.net; s=20230601; t=1747402851; x=1748007651;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uMPV6q6AhxevNFuuJTWHVmUqHFVmOMovU6ugpBlq244=;
-        b=hWy7+GSsHeQJ0Z/OwRFZtDsA+dew+0AwiSiN7GW9CDdBdadW2uY2nhghUhv0LIWZ9s
-         CbyigD1t+aILercYF6JnKjGo3ufwqd4xCzp+B2INcAmdDywtXNp7dzYGHg0Hl70RJuW/
-         7w0LGdqSQSNyeXNyzhBwRWtp+AzXNkGCxI/Iqcohq3Rz2kfZ43MapGSkJ4WUYaD7kCqj
-         9KBYuV6dwoepJ0pFtBGQ4URh9WF+3VKr577jr21Q1c0uejL5paxIS9Xy7TN6ZJX+l/Ew
-         lAFfwwalokFwSLm5xa2rX5q4RpTiKB4YVnfNtvwiqmHdgDNFQM5FjyVq5yBMspctnEqR
-         yC+w==
-X-Gm-Message-State: AOJu0Yy06Lv+XYuQgmH6Q/L+eFXuoIcdZYPf14cCA4YZAuRrLckhfU6v
-	xqAoa6VqW+HOPPZd1X9aQgbsojbKFmTlz67y1j5ndB5277rh+SskUhkwOe98b12YWuSkXiLRJsI
-	PM1yxBWg8UamTKcmx+pmqQQ==
-X-Google-Smtp-Source: AGHT+IHjdYekjEtSxYYuQf8wZlV0mGx8EyL0cimXZ1RlU//8JTdiC8v32KOEE5rEeE110DQaD1BJQza2ZZZwb4Cn
-X-Received: from wmbei22.prod.google.com ([2002:a05:600c:3f16:b0:43c:ef1f:48d3])
+        bh=sts3k8S/JL66rJ24fFiDhVPJbMR9OVDJbVTiN/eWqHU=;
+        b=bv8EG8cafCNGsH+RJDoXpFq75KsCAaKEoTh3YQvIN4s4GXHez1U1fe9UGyXvo/9F0S
+         PQcHgzlU6OcJ6ugfFGn/FGzPTkTTlOOy5q5l7HUGhPLnb/O48RTaG3+OI1ACh8SQOObi
+         4Be+Oojb4ZnRv394QljHl4eTldKqq1KEF7hpg/RVeDZm8066hasAFLhZCCtqEafzNaZP
+         rAQaLXingofl0Vf6Fm/TqptmT7oKvYA6bhzUDqlugP5C/wHHu8KszuOnAl4Sz3/KfG2+
+         z2tOTxXgMH6vQdROTP85saUUpbmftCZaRNiWAn/RPst+3tS0Cwq3Fq8pnCpmC1+z5xgP
+         GGJg==
+X-Gm-Message-State: AOJu0Yw8b6y3pI8FT/2eAMQfKLS8pPRtzqCfl/YU4hk2B/xleMNqT9AJ
+	gvkxPP+RB1LnGHp+KgzBFsNOlgVtMUZeZKLWzwLglX0XXQJ7dTEkWHy2QCu4rDNqxlr1VGHatsp
+	l1WUk2IhzUxNPGni374ImVQ==
+X-Google-Smtp-Source: AGHT+IGnqfA97BVbR/Mi8Ve40w0dtCeOsw/hPCYSNZEP3cEaZDO8G74lb40v8p70u0x6PTZ1uUBUClqeLpxaBluT
+X-Received: from wrf23.prod.google.com ([2002:a05:6000:43d7:b0:3a2:78c:3f3c])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4f42:b0:442:f4d4:522 with SMTP id 5b1f17b1804b1-442fd60a5bemr35175355e9.5.1747402849231;
- Fri, 16 May 2025 06:40:49 -0700 (PDT)
-Date: Fri, 16 May 2025 14:40:14 +0100
+ 2002:a5d:5f53:0:b0:39a:c467:a095 with SMTP id ffacd0b85a97d-3a35fe6777dmr2300705f8f.24.1747402851035;
+ Fri, 16 May 2025 06:40:51 -0700 (PDT)
+Date: Fri, 16 May 2025 14:40:15 +0100
 In-Reply-To: <20250516134031.661124-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250516134031.661124-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <20250516134031.661124-9-vdonnefort@google.com>
-Subject: [PATCH v5 08/25] tracing: Add helpers to create trace remote events
+Message-ID: <20250516134031.661124-10-vdonnefort@google.com>
+Subject: [PATCH v5 09/25] ring-buffer: Export buffer_data_page and macros
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -70,124 +70,134 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Declaring remote events can be cumbersome let's add a set of macros to
-simplify developers life. The declaration of a remote event is very
-similar to kernel's events:
-
- REMOTE_EVENT(name, id,
-     RE_STRUCT(
-        re_field(u64 foo)
-     ),
-     RE_PRINTK("foo=%llu", __entry->foo)
- )
+In preparation for allowing the writing of ring-buffer compliant pages
+outside of ring_buffer.c, move buffer_data_page and timestamps encoding
+macros into the publicly available ring_buffer_types.h.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/include/linux/trace_remote_event.h b/include/linux/trace_remote_event.h
-index a4449008a075..c8ae1e1f5e72 100644
---- a/include/linux/trace_remote_event.h
-+++ b/include/linux/trace_remote_event.h
-@@ -5,6 +5,7 @@
- 
- struct trace_remote;
- struct trace_event_fields;
-+struct trace_seq;
- 
- struct remote_event_hdr {
- 	unsigned short	id;
-@@ -20,4 +21,13 @@ struct remote_event {
- 	char				*print_fmt;
- 	void				(*print)(void *evt, struct trace_seq *seq);
- };
-+
-+#define RE_STRUCT(__args...) __args
-+#define re_field(__type, __field) __type __field;
-+
-+#define REMOTE_EVENT_FORMAT(__name, __struct)	\
-+	struct remote_event_format_##__name {	\
-+		struct remote_event_hdr hdr;	\
-+		__struct			\
-+	}
- #endif
-diff --git a/include/trace/define_remote_events.h b/include/trace/define_remote_events.h
+diff --git a/include/linux/ring_buffer_types.h b/include/linux/ring_buffer_types.h
 new file mode 100644
-index 000000000000..03c9f5515c5a
+index 000000000000..54577021a49d
 --- /dev/null
-+++ b/include/trace/define_remote_events.h
-@@ -0,0 +1,73 @@
++++ b/include/linux/ring_buffer_types.h
+@@ -0,0 +1,41 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _LINUX_RING_BUFFER_TYPES_H
++#define _LINUX_RING_BUFFER_TYPES_H
 +
-+#include <linux/trace_events.h>
-+#include <linux/trace_remote_event.h>
-+#include <linux/trace_seq.h>
-+#include <linux/stringify.h>
++#include <asm/local.h>
 +
-+#define REMOTE_EVENT_INCLUDE(__file) __stringify(../../__file)
++#define TS_SHIFT        27
++#define TS_MASK         ((1ULL << TS_SHIFT) - 1)
++#define TS_DELTA_TEST   (~TS_MASK)
 +
-+#ifdef REMOTE_EVENT_SECTION
-+# define __REMOTE_EVENT_SECTION(__name) __used __section(REMOTE_EVENT_SECTION"."#__name)
++/*
++ * We need to fit the time_stamp delta into 27 bits.
++ */
++static inline bool test_time_stamp(u64 delta)
++{
++	return !!(delta & TS_DELTA_TEST);
++}
++
++#define BUF_PAGE_HDR_SIZE offsetof(struct buffer_data_page, data)
++
++#define RB_EVNT_HDR_SIZE (offsetof(struct ring_buffer_event, array))
++#define RB_ALIGNMENT		4U
++#define RB_MAX_SMALL_DATA	(RB_ALIGNMENT * RINGBUF_TYPE_DATA_TYPE_LEN_MAX)
++#define RB_EVNT_MIN_SIZE	8U	/* two 32bit words */
++
++#ifndef CONFIG_HAVE_64BIT_ALIGNED_ACCESS
++# define RB_FORCE_8BYTE_ALIGNMENT	0
++# define RB_ARCH_ALIGNMENT		RB_ALIGNMENT
 +#else
-+# define __REMOTE_EVENT_SECTION(__name)
++# define RB_FORCE_8BYTE_ALIGNMENT	1
++# define RB_ARCH_ALIGNMENT		8U
 +#endif
 +
-+#define __REMOTE_PRINTK_COUNT_ARGS(_0, _1, _2, _n, __args...) _n
-+#define REMOTE_PRINTK_COUNT_ARGS(__args...) __REMOTE_PRINTK_COUNT_ARGS(, ##__args, 2, 1, 0)
++#define RB_ALIGN_DATA		__aligned(RB_ARCH_ALIGNMENT)
 +
-+#define __remote_printk0()								\
-+	trace_seq_putc(seq, '\n')
-+
-+#define __remote_printk1(__fmt)								\
-+	trace_seq_puts(seq, " " __fmt "\n")						\
-+
-+#define __remote_printk2(__fmt, __args...)						\
-+do {											\
-+	trace_seq_putc(seq, ' ');							\
-+	trace_seq_printf(seq, __fmt, __args);						\
-+	trace_seq_putc(seq, '\n');							\
-+} while (0)
-+
-+/* Apply the appropriate trace_seq sequence according to the number of arguments */
-+#define remote_printk(__args...)							\
-+	CONCATENATE(__remote_printk, REMOTE_PRINTK_COUNT_ARGS(__args))(__args)
-+
-+#define RE_PRINTK(__args...) __args
-+
-+#define REMOTE_EVENT(__name, __id, __struct, __printk)					\
-+	REMOTE_EVENT_FORMAT(__name, __struct);						\
-+	static void remote_event_print_##__name(void *evt, struct trace_seq *seq)	\
-+	{										\
-+		struct remote_event_format_##__name __maybe_unused *__entry = evt;	\
-+		trace_seq_puts(seq, #__name);						\
-+		remote_printk(__printk);						\
-+	}
-+#include REMOTE_EVENT_INCLUDE(REMOTE_EVENT_INCLUDE_FILE)
-+
-+#undef REMOTE_EVENT
-+#undef RE_PRINTK
-+#undef re_field
-+#define re_field(__type, __field)							\
-+	{										\
-+		.type = #__type, .name = #__field,					\
-+		.size = sizeof(__type), .align = __alignof__(__type),			\
-+		.is_signed = is_signed_type(__type),					\
-+	},
-+#define __entry REC
-+#define RE_PRINTK(__fmt, __args...) "\"" __fmt "\", " __stringify(__args)
-+#define REMOTE_EVENT(__name, __id, __struct, __printk)					\
-+	static struct trace_event_fields remote_event_fields_##__name[] = {		\
-+		__struct								\
-+		{}									\
-+	};										\
-+	static char remote_event_print_fmt_##__name[] = __printk;			\
-+	static struct remote_event __REMOTE_EVENT_SECTION(__name)			\
-+	remote_event_##__name = {							\
-+		.name		= #__name,						\
-+		.id		= __id,							\
-+		.fields		= remote_event_fields_##__name,				\
-+		.print_fmt	= remote_event_print_fmt_##__name,			\
-+		.print		= remote_event_print_##__name,				\
-+	}
-+#include REMOTE_EVENT_INCLUDE(REMOTE_EVENT_INCLUDE_FILE)
++struct buffer_data_page {
++	u64		 time_stamp;	/* page time stamp */
++	local_t		 commit;	/* write committed index */
++	unsigned char	 data[] RB_ALIGN_DATA;	/* data of buffer page */
++};
++#endif
+diff --git a/kernel/trace/ring_buffer.c b/kernel/trace/ring_buffer.c
+index 8f94ccf3f55e..91c69945a0fa 100644
+--- a/kernel/trace/ring_buffer.c
++++ b/kernel/trace/ring_buffer.c
+@@ -4,6 +4,7 @@
+  *
+  * Copyright (C) 2008 Steven Rostedt <srostedt@redhat.com>
+  */
++#include <linux/ring_buffer_types.h>
+ #include <linux/trace_recursion.h>
+ #include <linux/trace_events.h>
+ #include <linux/ring_buffer.h>
+@@ -156,23 +157,6 @@ int ring_buffer_print_entry_header(struct trace_seq *s)
+ /* Used for individual buffers (after the counter) */
+ #define RB_BUFFER_OFF		(1 << 20)
+ 
+-#define BUF_PAGE_HDR_SIZE offsetof(struct buffer_data_page, data)
+-
+-#define RB_EVNT_HDR_SIZE (offsetof(struct ring_buffer_event, array))
+-#define RB_ALIGNMENT		4U
+-#define RB_MAX_SMALL_DATA	(RB_ALIGNMENT * RINGBUF_TYPE_DATA_TYPE_LEN_MAX)
+-#define RB_EVNT_MIN_SIZE	8U	/* two 32bit words */
+-
+-#ifndef CONFIG_HAVE_64BIT_ALIGNED_ACCESS
+-# define RB_FORCE_8BYTE_ALIGNMENT	0
+-# define RB_ARCH_ALIGNMENT		RB_ALIGNMENT
+-#else
+-# define RB_FORCE_8BYTE_ALIGNMENT	1
+-# define RB_ARCH_ALIGNMENT		8U
+-#endif
+-
+-#define RB_ALIGN_DATA		__aligned(RB_ARCH_ALIGNMENT)
+-
+ /* define RINGBUF_TYPE_DATA for 'case RINGBUF_TYPE_DATA:' */
+ #define RINGBUF_TYPE_DATA 0 ... RINGBUF_TYPE_DATA_TYPE_LEN_MAX
+ 
+@@ -315,10 +299,6 @@ EXPORT_SYMBOL_GPL(ring_buffer_event_data);
+ #define for_each_online_buffer_cpu(buffer, cpu)		\
+ 	for_each_cpu_and(cpu, buffer->cpumask, cpu_online_mask)
+ 
+-#define TS_SHIFT	27
+-#define TS_MASK		((1ULL << TS_SHIFT) - 1)
+-#define TS_DELTA_TEST	(~TS_MASK)
+-
+ static u64 rb_event_time_stamp(struct ring_buffer_event *event)
+ {
+ 	u64 ts;
+@@ -337,12 +317,6 @@ static u64 rb_event_time_stamp(struct ring_buffer_event *event)
+ 
+ #define RB_MISSED_MASK		(3 << 30)
+ 
+-struct buffer_data_page {
+-	u64		 time_stamp;	/* page time stamp */
+-	local_t		 commit;	/* write committed index */
+-	unsigned char	 data[] RB_ALIGN_DATA;	/* data of buffer page */
+-};
+-
+ struct buffer_data_read_page {
+ 	unsigned		order;	/* order of the page */
+ 	struct buffer_data_page	*data;	/* actual data, stored in this page */
+@@ -401,14 +375,6 @@ static void free_buffer_page(struct buffer_page *bpage)
+ 	kfree(bpage);
+ }
+ 
+-/*
+- * We need to fit the time_stamp delta into 27 bits.
+- */
+-static inline bool test_time_stamp(u64 delta)
+-{
+-	return !!(delta & TS_DELTA_TEST);
+-}
+-
+ struct rb_irq_work {
+ 	struct irq_work			work;
+ 	wait_queue_head_t		waiters;
 -- 
 2.49.0.1101.gccaa498523-goog
 
