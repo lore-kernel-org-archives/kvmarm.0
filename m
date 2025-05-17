@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA67DB676;
-	Sat, 17 May 2025 08:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57991DE8A0;
+	Sat, 17 May 2025 08:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747471863; cv=none; b=em5ipowB4H4OYr/6za06BolxEkF9IgbeyPwxA40dIC/WEvgtzq3GdINZGAN8nohxp9WLD1Doqi7oJMe8IK+RjqRQdi/oysQHAwpBGn21pLxJPgKLfrHTZsmhqugG9f494ufGklc4GPJHktnVLoC4pHf6Zs93bkm9x2ccyK5PBc4=
+	t=1747471969; cv=none; b=Co8J/5E2x1kRYSQ5U8a1nTBVLtScMSowIWC+gfsZ+vDVcoRvlMy6NowDE+3m0pnysvEOVrAn/2p8H/OeM27CFkv2RJkplthkyZBV174FgFLwI6K90mWkvhTMqh2ZCHIXQSwdZBpfHZQ3doryvFBGFDskK4xs5WfKrzWUyYKBRYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747471863; c=relaxed/simple;
-	bh=dDQtD4ccdQG3UJa8qk1S/jtk3uLsTxKgzWBbQ6o6fdI=;
+	s=arc-20240116; t=1747471969; c=relaxed/simple;
+	bh=qcZhH/eXIxJWC3CJPIuxmlJlmaJ5e1iSxpa3ehv9pgY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kV1Vyow7phCbeSSo5/ml/VbPYmWtu3ySkx2rKxp9L/IF7gTJimncppSbZN5UEgF9h3Dk6k60sWxC5ma8+loCf0aiEvhgDw1RyHiuJmqS9ZgdHcJmZvKU2OiNSc2lLzpfAS0kkkjuP17PkiQaAmc0YKeSDgm4vxnzAU7PS1zEqEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cVyTSYLw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=hLr2pO83F28tEelnjOLjzbcP2TVWS/ziLY0Sov6wj+BLRz0+K0xyLp6lOS0BlrAGye3HV4ThnRnwUAEpzXurLlhbnM+GNZOqdYgQSeoMYMbwZ5edc+MHkCBHSG87UNOCzfc1duhOJ+DsECV7SgmF5LdsqQMS/x6BcHX0/Pcy6So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O9VvIyw2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cVyTSYLw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30D7FC4CEE3;
-	Sat, 17 May 2025 08:51:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O9VvIyw2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2938EC4CEE3;
+	Sat, 17 May 2025 08:52:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747471863;
-	bh=dDQtD4ccdQG3UJa8qk1S/jtk3uLsTxKgzWBbQ6o6fdI=;
+	s=k20201202; t=1747471969;
+	bh=qcZhH/eXIxJWC3CJPIuxmlJlmaJ5e1iSxpa3ehv9pgY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cVyTSYLwsGN96CR4uED4vSOD9avoVXlg309uHrcqPr1euk0/Zm0lnHavfYrikseMY
-	 ft+N/Mim4XEOxbycMS91qF2LYiHWeGbwFnzXkiMeRXYF1S1l7lcOHyWfdlYpOVAiA+
-	 cS19ZxHEqtHRmlGCdFEJRSG50tri7jfQg7IHuL+EHB3Pp78hrIgBa1IMdXdoa8GKBC
-	 Iqaugk9tI/h4rLE657RdnwG/kkdmVcVE0+yRqng5sqNOnQ5px7ELEfImjW3uTsMjSV
-	 QhxF8l359kle+Mnhy4lfnNY2tI3pBhM5udaOKYhEyBR5CSeBHXwhE2MwiHvUFLmypJ
-	 kzWCkzECP5pqA==
+	b=O9VvIyw2Z8yRTfvujjSYRKh2ZNhXdFvtVk5KowlsjCkC3MjVjDeLQ4oVyjy13Iog2
+	 4hb8ofmIXLAUZ3CHuDlH2WwaHEcitEdQ1ru29xiZIefJ+t18P5yul3jBCP6O4jM6gL
+	 ueUYvR/BlTTB+VYhOX0hOAmwQT5srl2JFZmTEdq2FVgvVE0j7LCTztBHidLbWBDmBW
+	 m0XyxfIh6Xh4gB9SPG3YGuZ/sZHOnaOdHPTYCBP4EhMItaC3WOExtTYHSYpZ/0pQzW
+	 4+OqBG0/yz6xck+XdYETwZB6VW8ShZWVL7+tOutamvCM7iPjVmwJQ0SbhSFtX35N+3
+	 /ZSRlV9Obon7g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uGDG0-00Flz2-OG;
-	Sat, 17 May 2025 09:51:00 +0100
-Date: Sat, 17 May 2025 09:51:39 +0100
-Message-ID: <878qmvr55w.wl-maz@kernel.org>
+	id 1uGDHi-00Fm0h-F3;
+	Sat, 17 May 2025 09:52:46 +0100
+Date: Sat, 17 May 2025 09:53:24 +0100
+Message-ID: <877c2fr52z.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: oliver.upton@linux.dev,
@@ -47,12 +47,12 @@ Cc: oliver.upton@linux.dev,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	kernel-team@android.com
-Subject: Re: [PATCH v4 01/10] KVM: arm64: Handle huge mappings for np-guest CMOs
-In-Reply-To: <aCd7l455qd4NmOeb@google.com>
+Subject: Re: [PATCH v4 10/10] KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
+In-Reply-To: <aCd94sBdThAj6jT9@google.com>
 References: <20250509131706.2336138-1-vdonnefort@google.com>
-	<20250509131706.2336138-2-vdonnefort@google.com>
-	<86bjrsg3az.wl-maz@kernel.org>
-	<aCd7l455qd4NmOeb@google.com>
+	<20250509131706.2336138-11-vdonnefort@google.com>
+	<864ixkfynk.wl-maz@kernel.org>
+	<aCd94sBdThAj6jT9@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,48 +68,45 @@ X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 16 May 2025 18:53:27 +0100,
+On Fri, 16 May 2025 19:03:14 +0100,
 Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Hi,
-> 
-> Thanks for having a look at the series.
-> 
-> On Fri, May 16, 2025 at 01:15:00PM +0100, Marc Zyngier wrote:
-> > On Fri, 09 May 2025 14:16:57 +0100,
-> > Vincent Donnefort <vdonnefort@google.com> wrote:
-> > > 
-> > > clean_dcache_guest_page() and invalidate_icache_guest_page() accept a
-> > > size as an argument. But they also rely on fixmap, which can only map a
-> > > single PAGE_SIZE page.
-> > > 
-> > > With the upcoming stage-2 huge mappings for pKVM np-guests, those
-> > > callbacks will get size > PAGE_SIZE. Loop the CMOs on a PAGE_SIZE basis
-> > > until the whole range is done.
-> > > 
-> > > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > index 31173c694695..23544928a637 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > @@ -219,14 +219,28 @@ static void guest_s2_put_page(void *addr)
-> > >  
+> > > +}
+> > > +
 > > >  static void clean_dcache_guest_page(void *va, size_t size)
 > > >  {
-> > > -	__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
-> > > -	hyp_fixmap_unmap();
-> > > +	WARN_ON(!PAGE_ALIGNED(size));
+> > >  	WARN_ON(!PAGE_ALIGNED(size));
+> > >  
+> > >  	while (size) {
+> > > -		__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
+> > > -					  PAGE_SIZE);
+> > > -		hyp_fixmap_unmap();
+> > > -		va += PAGE_SIZE;
+> > > -		size -= PAGE_SIZE;
+> > > +		size_t fixmap_size = size == PMD_SIZE ? size : PAGE_SIZE;
+> > > +		void *addr = __fixmap_guest_page(va, &fixmap_size);
+> > > +
+> > > +		__clean_dcache_guest_page(addr, fixmap_size);
+> > > +		__fixunmap_guest_page(fixmap_size);
+> > > +
+> > > +		size -= fixmap_size;
+> > > +		va += fixmap_size;
 > > 
-> > What if "va" isn't aligned?
+> > Can this ever be called with a *multiple* of PMD_SIZE? In this case
+> > you'd still end-up doing PAGE_SIZEd-bite CMOs until there is only
+> > PMD_SIZE left, ruining the optimisation.
+> > 
+> > I think this needs fixing.
 > 
-> So the only callers are either for PAGE_SIZE or PMD_SIZE with the right
-> alignment addr alignment.
+> So this can be only called with size either equal to PAGE_SIZE or PMD_SIZE. I
+> wasn't sure if it was worth to make it more generic than it needs.
 > 
-> But happy to make this more future-proof, after all an ALIGN() is quite cheap.
+> But like for the first patch, I can make it more future-proof by handling size >
+> PMD_SIZE.
 
-Exactly. I'd rather have too many of those instead of something that
-may not terminate. If anything, it makes it easy to reason about it.
+Yup. These things are hard enough to debug that we should try and make
+it fool-proof, even if that's not immediately used (and fixing that is
+pretty easy).
 
 Thanks,
 
