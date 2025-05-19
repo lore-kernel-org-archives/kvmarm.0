@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A532321171D;
-	Mon, 19 May 2025 19:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B4B211A3C;
+	Mon, 19 May 2025 21:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747683078; cv=none; b=Rbs4/LkuJDXX+gbflZ7x9l6dVru4zUx6efrIzBnkX8UF2vT7iuhWc6BqjVq3UOnaqzQUj4A9TLfz9W5gk5cU5vIvMdDII+UZ9tPTDHR2Z+82Ll0XP9oeW1vJ7Vt714+JZRYGH8I/mhob0+LZWinf3OhPXKBOcJgyKOBVEvdVimo=
+	t=1747691815; cv=none; b=RTDrj3PRhFJE28JPvEY0EdjAQxqWHtrkf1Jho2cu406JqsnXN9UWyVw3kkwrxiy1JLPx565ZbTj/g0TUVjAvJt8DFaRWz4oTtyLL77iMsjt21HIoWhOJIEYWkPipBUJF8sWnd9MpjAPc53F2fdeqsnA5OmGlbaXtawwyJyY9GTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747683078; c=relaxed/simple;
-	bh=gNg/DaGQnuA//ujvR2i1hxwQU/CrZUxguVa5vf6EakQ=;
+	s=arc-20240116; t=1747691815; c=relaxed/simple;
+	bh=G/udjNOlZf5UZB0lntyyPqplVnxx+IfVlpycxwLSers=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FOliP20VD/hVL6vXsGtjtGcePQKTibFp7b0nV+g1MiFTmgAs3k9ZegDvNSuHfJ223dY0JJ1n+ygJe2eINhTQzkvgFlvG3oWt8bGkd2O3lwnq6SmwprcMp5amu5X1ZXiN/od7gWPDqvSvvw+EkQ3p9ftiGiKEjASvPIzIN3Y11Zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4IBLEQs; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=mqH9KUl4d8T+CA1437T4xxELMxL92t9Nlwy9S1S1DYDtE6R8k+92Q8GDUrpW7wAXL2RTWryhRcP0YF+9zaOAPlErCPmvoWtz4lYfwSENoTa55J1IJqdHkmkD9Akc5wCPjpvAJNZ21DS2zj3R3i/191KRTx4E3SE4hoJaPPwEsEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nu7elZZO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4IBLEQs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB437C4CEE4;
-	Mon, 19 May 2025 19:31:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nu7elZZO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6853C4CEE4;
+	Mon, 19 May 2025 21:56:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747683078;
-	bh=gNg/DaGQnuA//ujvR2i1hxwQU/CrZUxguVa5vf6EakQ=;
+	s=k20201202; t=1747691813;
+	bh=G/udjNOlZf5UZB0lntyyPqplVnxx+IfVlpycxwLSers=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M4IBLEQs1j7rqqlJMrer+R9eK8Uu3wPF+8htwN6MfYqavo8fsdG+TXKGawl6qgll5
-	 Xpvk34Sp9b7SEw4th06cWm2bmnLa13ffJ27fy+ghspt2o0WcFg2l8TQcATKoz+TwOQ
-	 jWE1aurFQNUwWjz7BNJG/vizT7BUJFIdovfI1e3IOiRqAQ7Unb8KiGZl2RkPop2qVU
-	 PVq1+vpoI7HR2+ywAgau9Lr57jXx7He1nii4IIrpwI1BtK7lSHtrRlP6OZrZx7I2Te
-	 E2Z7oiA5zZelFCeZ7xmX6xLkC2JP+CDAb3IXmvUDj3qi60rFFsVtw5jK+atauATUAk
-	 2zyk+YDbKYeUA==
-Date: Mon, 19 May 2025 14:31:16 -0500
+	b=nu7elZZO8YqPcuNtMtp5sqtcZInfD7DMrpPlmrSWymeWoZDVi8ldUf3dIg1UbBQGA
+	 L3ctZKe1k5K6Rj8aZhmnWFijoqZ8XQ5NgZz7EchEHAaCx2N97S+QH+j2uxryCz7ca+
+	 lrBbBeSw/rge4wYpIS2ETtVm8QVLMpMvzVprpwR9rEKbc6bKKZxJnHXnIc4kXFq+Ec
+	 WykFkcGPTa6bmMM/Y5n9ssDikJ2HErrqV7ZEJYbRgOMrN7RomlXhxLcUR0e/9Z5KdJ
+	 0XN6xz6yCWTEmgWZ0uzrrK0P2gi/ZXa+XB2j39ezM5be++R0hjGS0wy7wF92/wPTbU
+	 i9rKjkEVOsXbQ==
+Date: Mon, 19 May 2025 16:56:51 -0500
 From: Rob Herring <robh@kernel.org>
 To: Will Deacon <will@kernel.org>
 Cc: Mark Rutland <mark.rutland@arm.com>,
@@ -41,11 +41,12 @@ Cc: Mark Rutland <mark.rutland@arm.com>,
 	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org,
 	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v21 2/4] arm64: Handle BRBE booting requirements
-Message-ID: <20250519193116.GA2650608-robh@kernel.org>
+Subject: Re: [PATCH v21 4/4] perf: arm_pmuv3: Add support for the Branch
+ Record Buffer Extension (BRBE)
+Message-ID: <20250519215651.GB2650608-robh@kernel.org>
 References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
- <20250407-arm-brbe-v19-v21-2-ff187ff6c928@kernel.org>
- <20250519140713.GA16991@willie-the-truck>
+ <20250407-arm-brbe-v19-v21-4-ff187ff6c928@kernel.org>
+ <20250519150621.GA17177@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,218 +55,151 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250519140713.GA16991@willie-the-truck>
+In-Reply-To: <20250519150621.GA17177@willie-the-truck>
 
-On Mon, May 19, 2025 at 03:07:15PM +0100, Will Deacon wrote:
-> On Mon, Apr 07, 2025 at 12:41:31PM -0500, Rob Herring (Arm) wrote:
+On Mon, May 19, 2025 at 04:06:22PM +0100, Will Deacon wrote:
+> Hey Rob,
+> 
+> On Mon, Apr 07, 2025 at 12:41:33PM -0500, Rob Herring (Arm) wrote:
 > > From: Anshuman Khandual <anshuman.khandual@arm.com>
 > > 
-> > To use the Branch Record Buffer Extension (BRBE), some configuration is
-> > necessary at EL3 and EL2. This patch documents the requirements and adds
-> > the initial EL2 setup code, which largely consists of configuring the
-> > fine-grained traps and initializing a couple of BRBE control registers.
-> > 
-> > Before this patch, __init_el2_fgt() would initialize HDFGRTR_EL2 and
-> > HDFGWTR_EL2 with the same value, relying on the read/write trap controls
-> > for a register occupying the same bit position in either register. The
-> > 'nBRBIDR' trap control only exists in bit 59 of HDFGRTR_EL2, while bit
-> > 59 of HDFGWTR_EL2 is RES0, and so this assumption no longer holds.
-> > 
-> > To handle HDFGRTR_EL2 and HDFGWTR_EL2 having (slightly) different bit
-> > layouts, __init_el2_fgt() is changed to accumulate the HDFGRTR_EL2 and
-> > HDFGWTR_EL2 control bits separately. While making this change the
-> > open-coded value (1 << 62) is replaced with
-> > HDFG{R,W}TR_EL2_nPMSNEVFR_EL1_MASK.
-> > 
-> > The BRBCR_EL1 and BRBCR_EL2 registers are unusual and require special
-> > initialisation: even though they are subject to E2H renaming, both have
-> > an effect regardless of HCR_EL2.TGE, even when running at EL2, and
-> > consequently both need to be initialised. This is handled in
-> > __init_el2_brbe() with a comment to explain the situation.
-> > 
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Reviewed-by: Leo Yan <leo.yan@arm.com>
-> > Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> > [Mark: rewrite commit message, fix typo in comment]
-> > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> > Signed-off-by: "Rob Herring (Arm)" <robh@kernel.org>
-> > Tested-by: James Clark <james.clark@linaro.org>
+> > The ARMv9.2 architecture introduces the optional Branch Record Buffer
+> > Extension (BRBE), which records information about branches as they are
+> > executed into set of branch record registers. BRBE is similar to x86's
+> > Last Branch Record (LBR) and PowerPC's Branch History Rolling Buffer
+> > (BHRB).
+> 
+> Since you picked this up from v19, the driver has changed considerably
+> and I presume you will be continuing to extend it in future as the
+> architecture progresses. Perhaps having you listed as Author (and
+> crucially, in git blame :p) with Anshuman as a Co-developed-by: would be
+> more appropriate?
+
+Shrug.
+
 > > ---
-> > v20:
-> >  - Document that MDCR_EL3.SBRBE can be 0b01 also
-> >  - Fix "HDFGWTR_EL2 is RES0" in commit msg
-> > ---
-> >  Documentation/arch/arm64/booting.rst | 21 +++++++++
-> >  arch/arm64/include/asm/el2_setup.h   | 86 ++++++++++++++++++++++++++++++++++--
-> >  2 files changed, 104 insertions(+), 3 deletions(-)
+> >  drivers/perf/Kconfig         |  11 +
+> >  drivers/perf/Makefile        |   1 +
+> >  drivers/perf/arm_brbe.c      | 802 +++++++++++++++++++++++++++++++++++++++++++
+> >  drivers/perf/arm_brbe.h      |  47 +++
+> >  drivers/perf/arm_pmu.c       |  15 +-
+> >  drivers/perf/arm_pmuv3.c     | 129 ++++++-
+> >  include/linux/perf/arm_pmu.h |   8 +
+> >  7 files changed, 1006 insertions(+), 7 deletions(-)
 > 
-> It would be good to have an Ack from the kvm/arm64 side on this, but in
-> the meantime I've left some comments inline.
-> 
-> > diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
-> > index dee7b6de864f..a627c1e0e4a0 100644
-> > --- a/Documentation/arch/arm64/booting.rst
-> > +++ b/Documentation/arch/arm64/booting.rst
-> > @@ -358,6 +358,27 @@ Before jumping into the kernel, the following conditions must be met:
+> Do you know if James Clark's tests [1] are going to be respun for the
+> perf tool? It would be handy to have some way to test this new
+> functionality.
+
+Yes. I dropped them here because I've been told by Arnaldo in the past 
+to send userspace stuff separately.
+
+> > diff --git a/drivers/perf/Kconfig b/drivers/perf/Kconfig
+> > index 4e268de351c4..3be60ff4236d 100644
+> > --- a/drivers/perf/Kconfig
+> > +++ b/drivers/perf/Kconfig
+> > @@ -223,6 +223,17 @@ config ARM_SPE_PMU
+> >  	  Extension, which provides periodic sampling of operations in
+> >  	  the CPU pipeline and reports this via the perf AUX interface.
 > >  
-> >      - HWFGWTR_EL2.nSMPRI_EL1 (bit 54) must be initialised to 0b01.
+> > +config ARM64_BRBE
+> > +	bool "Enable support for branch stack sampling using FEAT_BRBE"
+> > +	depends on ARM_PMUV3 && ARM64
+> > +	default y
+> > +	help
+> > +	  Enable perf support for Branch Record Buffer Extension (BRBE) which
+> > +	  records all branches taken in an execution path. This supports some
+> > +	  branch types and privilege based filtering. It captures additional
+> > +	  relevant information such as cycle count, misprediction and branch
+> > +	  type, branch privilege level etc.
+> 
+> It's a shame that this can't be modular, but I suppose the tight
+> integration with the CPU PMU driver precludes that. Oh well.
+> 
+> > diff --git a/drivers/perf/arm_brbe.c b/drivers/perf/arm_brbe.c
+> > new file mode 100644
+> > index 000000000000..2f254bd40af3
+> > --- /dev/null
+> > +++ b/drivers/perf/arm_brbe.c
+> 
+> (The driver code looks fine to me but I'd like an Ack from Mark on the
+> UAPI).
+> 
+> > diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
+> > index 2f33e69a8caf..df9867c0dc57 100644
+> > --- a/drivers/perf/arm_pmu.c
+> > +++ b/drivers/perf/arm_pmu.c
+> > @@ -99,7 +99,7 @@ static const struct pmu_irq_ops percpu_pmunmi_ops = {
+> >  	.free_pmuirq = armpmu_free_percpu_pmunmi
+> >  };
 > >  
-> > +  For CPUs with feature Branch Record Buffer Extension (FEAT_BRBE):
-> 
-> This doesn't make sense ^^^
-
-You mean it should be "with the Branch Record Buffer Extension feature" 
-instead?
-
-> 
-> > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-> > index ebceaae3c749..e7fcba1e7d8e 100644
-> > --- a/arch/arm64/include/asm/el2_setup.h
-> > +++ b/arch/arm64/include/asm/el2_setup.h
-> > @@ -189,6 +189,39 @@
-> >  .Lskip_set_cptr_\@:
-> >  .endm
+> > -static DEFINE_PER_CPU(struct arm_pmu *, cpu_armpmu);
+> > +DEFINE_PER_CPU(struct arm_pmu *, cpu_armpmu);
+> >  static DEFINE_PER_CPU(int, cpu_irq);
+> >  static DEFINE_PER_CPU(const struct pmu_irq_ops *, cpu_irq_ops);
 > >  
-> > +/*
-> > + * Configure BRBE to permit recording cycle counts and branch mispredicts.
-> > + *
-> > + * At any EL, to record cycle counts BRBE requires that both BRBCR_EL2.CC=1 and
-> > + * BRBCR_EL1.CC=1.
-> > + *
-> > + * At any EL, to record branch mispredicts BRBE requires that both
-> > + * BRBCR_EL2.MPRED=1 and BRBCR_EL1.MPRED=1.
-> > + *
-> > + * When HCR_EL2.E2H=1, the BRBCR_EL1 encoding is redirected to BRBCR_EL2, but
-> > + * the {CC,MPRED} bits in the real BRBCR_EL1 register still apply.
-> > + *
-> > + * Set {CC,MPRED} in both BRBCR_EL2 and BRBCR_EL1 so that at runtime we only
-> > + * need to enable/disable these in BRBCR_EL1 regardless of whether the kernel
-> > + * ends up executing in EL1 or EL2.
-> > + */
-> > +.macro __init_el2_brbe
-> > +	mrs	x1, id_aa64dfr0_el1
-> > +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
-> > +	cbz	x1, .Lskip_brbe_\@
-> > +
-> > +	mov_q	x0, BRBCR_ELx_CC | BRBCR_ELx_MPRED
-> > +	msr_s	SYS_BRBCR_EL2, x0
-> > +
-> > +	__check_hvhe .Lset_brbe_nvhe_\@, x1
-> > +	msr_s	SYS_BRBCR_EL12, x0	// VHE
-> > +	b	.Lskip_brbe_\@
-> > +
-> > +.Lset_brbe_nvhe_\@:
-> > +	msr_s	SYS_BRBCR_EL1, x0	// NVHE
-> > +.Lskip_brbe_\@:
-> 
-> Why do we have to poke BRBCR_EL12/BRBCR_EL1 here rather than in the BRBE
-> driver code?
-
-Yeah, I think we can drop this. Originally, the driver did not touch 
-SYS_BRBCR_EL12, but it turns out we need to for freeze on overflow to 
-work correctly with VHE (see the comment in the driver for 
-SYS_BRBCR_EL12 access).
-
-The only other reason I can come up with is some fields reset to UNKNOWN 
-and there may be no driver. However, the important ones, ExBRE, reset to 
-0, so we should be fine.
-
-
-> > +.endm
-> > +
-> >  /* Disable any fine grained traps */
-> >  .macro __init_el2_fgt
-> >  	mrs	x1, id_aa64mmfr0_el1
-> > @@ -196,16 +229,48 @@
-> >  	cbz	x1, .Lskip_fgt_\@
+> > @@ -317,6 +317,11 @@ armpmu_del(struct perf_event *event, int flags)
+> >  	struct hw_perf_event *hwc = &event->hw;
+> >  	int idx = hwc->idx;
 > >  
-> >  	mov	x0, xzr
-> > +	mov	x2, xzr
-> >  	mrs	x1, id_aa64dfr0_el1
-> >  	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMSVer_SHIFT, #4
-> >  	cmp	x1, #3
-> >  	b.lt	.Lskip_spe_fgt_\@
-> > +
-> >  	/* Disable PMSNEVFR_EL1 read and write traps */
-> > -	orr	x0, x0, #(1 << 62)
-> > +	orr	x0, x0, #HDFGRTR_EL2_nPMSNEVFR_EL1_MASK
-> > +	orr	x2, x2, #HDFGWTR_EL2_nPMSNEVFR_EL1_MASK
-> >  
-> >  .Lskip_spe_fgt_\@:
-> > +#ifdef CONFIG_ARM64_BRBE
+> > +	if (has_branch_stack(event)) {
+> > +		hw_events->branch_users--;
+> > +		perf_sched_cb_dec(event->pmu);
+> > +	}
 > 
-> Why is this gated on CONFIG_ARM64_BRBE?
+> Shouldn't we decrement this *after* calling armpmu_stop()?
 
-Shrug. We don't do that anywhere else, so I'll drop it.
+Logically, that would make more sense. It's all serialized by the perf 
+core though, so we can't get .sched_task() during this.
 
-> > +	mrs	x1, id_aa64dfr0_el1
-> > +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
-> > +	cbz	x1, .Lskip_brbe_reg_fgt_\@
 > > +
-> > +	/*
-> > +	 * Disable read traps for the following registers
-> > +	 *
-> > +	 * [BRBSRC|BRBTGT|RBINF]_EL1
-> > +	 * [BRBSRCINJ|BRBTGTINJ|BRBINFINJ|BRBTS]_EL1
-> > +	 */
-> > +	orr	x0, x0, #HDFGRTR_EL2_nBRBDATA_MASK
-> > +
-> > +	/*
-> > +	 * Disable write traps for the following registers
-> > +	 *
-> > +	 * [BRBSRCINJ|BRBTGTINJ|BRBINFINJ|BRBTS]_EL1
-> > +	 */
-> > +	orr	x2, x2, #HDFGWTR_EL2_nBRBDATA_MASK
-> > +
-> > +	/* Disable read and write traps for [BRBCR|BRBFCR]_EL1 */
-> > +	orr	x0, x0, #HDFGRTR_EL2_nBRBCTL_MASK
-> > +	orr	x2, x2, #HDFGWTR_EL2_nBRBCTL_MASK
-> > +
-> > +	/* Disable read traps for BRBIDR_EL1 */
-> > +	orr	x0, x0, #HDFGRTR_EL2_nBRBIDR_MASK
-> > +
-> > +.Lskip_brbe_reg_fgt_\@:
+> >  	armpmu_stop(event, PERF_EF_UPDATE);
+> >  	hw_events->events[idx] = NULL;
+> >  	armpmu->clear_event_idx(hw_events, event);
 > 
-> I think this label should become .Lset_debug_fgt_\@:. That way, we have
-> a clear point at which we're done with HDFG*TR_EL2. We can zero x0 and
-> x2 and from then on we can focus on HFG*TR + HFGITR.
+> [...]
 > 
-> nit: the existing .Lskip_debug_fgt_\@ label looks to be misnamed -- it
-> should probably be .Lskip_sme_fgt_\@ ?
+> > +static int branch_records_alloc(struct arm_pmu *armpmu)
+> > +{
+> > +	struct perf_branch_stack *branch_stack_cpu;
+> > +	struct perf_branch_stack __percpu *branch_stack;
+> > +	size_t size = struct_size(branch_stack_cpu, entries, brbe_num_branch_records(armpmu));
+> > +	int cpu;
+> > +
+> > +	branch_stack = __alloc_percpu_gfp(size, __alignof__(*branch_stack_cpu),
+> > +					  GFP_KERNEL);
+> > +	if (!branch_stack)
+> > +		return -ENOMEM;
+> > +
+> > +	for_each_possible_cpu(cpu) {
+> > +		struct pmu_hw_events *events_cpu;
+> > +
+> > +		events_cpu = per_cpu_ptr(armpmu->hw_events, cpu);
+> > +		branch_stack_cpu = per_cpu_ptr(branch_stack, cpu);
+> > +		events_cpu->branch_stack = branch_stack_cpu;
+> > +	}
+> > +	return 0;
+> >  }
 > 
-> > +#endif /* CONFIG_ARM64_BRBE */
-> >  	msr_s	SYS_HDFGRTR_EL2, x0
-> > -	msr_s	SYS_HDFGWTR_EL2, x0
-> > +	msr_s	SYS_HDFGWTR_EL2, x2
-> 
-> nit: It would be cleaner to use x0/x1 for the pair of trap registers
-> but I can see that would be a more invasive change.
+> How does this work in a heterogeneous system? Shouldn't we at least
+> scope the allocation to the CPUs associated with this PMU?
 
-That would not be worth the churn IMO. We'd want to just swap x1 and x2 
-everywhere so we consistently use x2 for ID registers. 
+Leaks memory, that's how.
 
-And then I'd be to blame for *all* this wonderful code. ;)
+As a bonus, it could overrun some memory too if the record sizes are 
+different though mostly overrunning into other BRBE buffers...
 
-> 
-> >  	mov	x0, xzr
-> >  	mrs	x1, id_aa64pfr1_el1
-> > @@ -246,7 +311,21 @@
-> >  .Lset_fgt_\@:
-> >  	msr_s	SYS_HFGRTR_EL2, x0
-> >  	msr_s	SYS_HFGWTR_EL2, x0
-> > -	msr_s	SYS_HFGITR_EL2, xzr
-> > +	mov	x0, xzr
-> > +#ifdef CONFIG_ARM64_BRBE
-> > +	mrs	x1, id_aa64dfr0_el1
-> > +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
-> > +	cbz	x1, .Lskip_brbe_insn_fgt_\@
-> 
-> It would probably scale better if we unconditionally stick x2 in
-> HFGITR_EL2 and zero that register in '.Lset_debug_fgt_\@'. We still have
-> two checks for BRBE, but at least '.Lset_fgt_\@' could just stick to
-> writing the registers.
+I think we just need to loop over cpu_pmu->supported_cpus and call 
+kmalloc(). Since events_cpu is already percpu, we don't need a percpu 
+allocation of the branch stack buffers.
 
-All that looks doable.
+I'm assuming it is safe to assume all CPUs either have BRBE or they 
+don't? Different record sizes at least should work fine (other than the 
+above issue). 
+
+BTW, I was scratching my head how armpmu_alloc() works with 
+for_each_possible_cpu(), but I guess the hotplug callbacks overwrite the 
+events->percpu_pmu value. I think we could just remove the loop there. 
+I'll investigate that.
 
 Rob
