@@ -1,138 +1,150 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9CD6AD3
-	for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 14:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA6F27F758
+	for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 14:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747665978; cv=none; b=R8jbrpxYtTWNkixJkVphNYV/Mw/ptMOMkkt/H6ticCKWFFY3Fruf/INBJQEsnr8uptyl2tNCnyU6+0bwuTpqa5ucFeS8zOaoERS9GazTR9vGXg71okp3ywTWHR7aB0X7eftLOC/ZgZ8EEi+gM7GAwz0Xi9+LHpxCTLbzlkP1+Is=
+	t=1747666189; cv=none; b=PFzzecfeaZNhVCf0LqgRWdQ5siQmajJyGh1RefeyzPLijjOUiA3Lx49x0Dfjl4FfcF2tmee+Bwovn8QUmkg4A/vLFsqgax9cKWgVS76VQjtKIf+nJht8H+9J5sI38extORaHLWuCq07tTByNhafP86V15exvbCevBHD8PNJFmVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747665978; c=relaxed/simple;
-	bh=b407WGJFqvxUfiereTRtKfvLxMRLPUiIXKAC5mokj5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iqcYAYtV9Ptg8j7+dOLjiPQgRQ1qW/y+KuBGC/dPZx516WNIVxdJjd/4kFT/BVOyjWx24yPiWc4R/rN8Bi2oYD6RfKdv3Wdyw529b9X1y2b/lI0otlTv4+6ay4FGXrb4k98OgTMs0S4g4exbqYYFodYNozGlm7BssYGMicXkikE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s+N62zQ6; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1747666189; c=relaxed/simple;
+	bh=p1fQv51b02Jvu1gOSgVr15AXrgUkfL6JxvfoztOhouc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=I1ajaYnwiAhJy77g7VCRWoyvW1N1ajZ8blQu+TY7uzQ6sjLOMAlhopvWxBEMOWzI/REnLq9aLQoOtm7snpnnVB+pfNtH2annNdXckPCS3WNc5Uu2md43skJDmyAQmTOigkd2Kq1iwFyuF+YieEFuI2B6n0WOAJIOWrN5YeQTmqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bosL8n18; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s+N62zQ6"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-601ad859ec0so3569948a12.0
-        for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 07:46:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747665974; x=1748270774; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QSIIDWdlqzl+xIuuE81sCKCMdcV/4Mu0UdNur2XU8WE=;
-        b=s+N62zQ6EvYZvVkcsZPw/j2sVWlbcRutNX+drVU+EyxndAHyc8Ny+fbJFukbwJvRXx
-         ioR3AN0QMoTCkPR0QtDWigQEkbQpJhLgxHMO+KxgyEzFyjhDp2njhZ7gBPVH4OtIQIzE
-         /gw6OFoEMWNWIgZ9eHvRpVs1dcgo54L5Lvn88JwT4BtEb1lvvf0WcgdVIEbpiE0MbYTS
-         ocxxOCnvUu49awCUxJtAKnfqkYpWxnOB96a4yTnv06nq21wp0iW/4+Qn9pzScCh8Sc9x
-         voUIptdEbyTCVkEOeg8vEUzBX/zkKh/K92KRGLljqyN8n/W7wWGkA1wRBV3KA0U68GUL
-         en5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747665974; x=1748270774;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QSIIDWdlqzl+xIuuE81sCKCMdcV/4Mu0UdNur2XU8WE=;
-        b=TGt/Yt3Lvu6bvDXA3P4DZjOHAPeQEC51TNLGCh5xSoEQ5GjavwmGAsWktoMPWYySOE
-         lrwQvyooqmg5jGMLcaV3f3C6jOJKJe7bvLQj9tfuMiik8XaGArNKk9tNmHMVYGHqwCZE
-         zv04v3v88utV9GXc30PHRfJ/JuSnBSg8S5+DLUUXBIMNvhdhZpUVvlJZR/Cmssmgn4Ft
-         VRegUGYadYwKB1DQW/yjiIhnmoT71holtBeklo6wacH8dn0z6Ck1JysmA6l4alqeBLoZ
-         oYV2RSw0P6dx/u7GPxsuJOKXMKCH9l7DeQ8l9Q9k3W88rv8f/wvBURHiceBFvIOpybON
-         XbOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwqarVj5tesPrW0LEruVjOPywM/st+/0zvNc91HOynZzSybLmNAiXiZMb+hbehIgdTaMdSQJI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyc0QeiwUvQOvS4kEEjbguH5duX4Z+eGWTaL+D3dgtdaFA27I7Y
-	3yw4XSlFL+vSLC2P/Gvcyx7AH8IjKra4gReYt895uFrDWnit56LXQGfoqMLxCpiG5A==
-X-Gm-Gg: ASbGncsWSJqkPi8dbyM1+BTBDofnQMUROuneViaGB0k+OCsJxSry3hWS6ORtB06QSsC
-	3iMmf7E3qK2KEs7z+AOgPp4dxrvGMWPRv2aui3DEgB1lOQ1wsVGFioW1z6jF8qaioHeyavc68dV
-	D6phtHwAhV+ISlGn+Hf9OkT6HneUSc20ikYiyGb0uLZ8gEaA9IrbLHv+/QNCkuvxP0HLroN/N8b
-	7oOmplGbkTQZqZ2XMjMoS2zK50rE+pB3rpPdQpplYmPiPnHcjq3use1hUK0s+SFE5FMUdblCWlU
-	awryQzXMk4X1ODub/4zzVSH5p1pa2BxzVHGJFXt4YlHhbOZVMj0dO5aHALX71YJ6u8v+pLJQgAA
-	5DefhE+BvvA==
-X-Google-Smtp-Source: AGHT+IEC3KHkrShBXny3Q7Ir1m0+6kZ8RmzKZn0Y25hUeD6jm+0Maqs5MW8iW3AbNc6hR400bbV0fQ==
-X-Received: by 2002:a05:6402:4415:b0:5fb:1c08:d8f7 with SMTP id 4fb4d7f45d1cf-6008a5a8caemr11231023a12.12.1747665974299;
-        Mon, 19 May 2025 07:46:14 -0700 (PDT)
-Received: from google.com (68.57.204.35.bc.googleusercontent.com. [35.204.57.68])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6005a6e5383sm5849380a12.37.2025.05.19.07.46.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 May 2025 07:46:13 -0700 (PDT)
-Date: Mon, 19 May 2025 14:46:10 +0000
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>, oliver.upton@linux.dev,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v4 02/10] KVM: arm64: Introduce for_each_hyp_page
-Message-ID: <aCtEMoZSCfRAPHXN@google.com>
-References: <20250509131706.2336138-1-vdonnefort@google.com>
- <20250509131706.2336138-3-vdonnefort@google.com>
- <86a57cg1bj.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bosL8n18"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747666186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tRyjY+JWvC1SFU2iPZWdTV9D8qwkGz6FhpIexNifnV4=;
+	b=bosL8n18+agrzHEfOOR8rQzkPcUjxQ04sgleqsgseCRbCWYbLMk6ry/hYDq0e+iWyGLMid
+	CeQvVkMVGGwvteD7DWk44Bt2yGySOtzjypLDeQZj6tYZq3WMxtoEu1qGnOII6axJHv5gvy
+	kYpI3HpFfHDseqkZt0OnnpKJnARgQO0=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-382-O8UDVZr3PySseP2kZxhRsw-1; Mon,
+ 19 May 2025 10:49:43 -0400
+X-MC-Unique: O8UDVZr3PySseP2kZxhRsw-1
+X-Mimecast-MFC-AGG-ID: O8UDVZr3PySseP2kZxhRsw_1747666181
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7EE48180045B;
+	Mon, 19 May 2025 14:49:40 +0000 (UTC)
+Received: from localhost (dhcp-192-216.str.redhat.com [10.33.192.216])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B7A41956095;
+	Mon, 19 May 2025 14:49:37 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ eric.auger.pro@gmail.com,
+ eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ kvmarm@lists.linux.dev, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
+ oliver.upton@linux.dev, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
+Cc: agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com,
+ pbonzini@redhat.com
+Subject: Re: [PATCH v3 02/10] arm/cpu: Add sysreg properties generation
+In-Reply-To: <0fb4cd74-bcbf-4063-bc3b-0e8359d04117@linaro.org>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20250414163849.321857-1-cohuck@redhat.com>
+ <20250414163849.321857-3-cohuck@redhat.com>
+ <0fb4cd74-bcbf-4063-bc3b-0e8359d04117@linaro.org>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 19 May 2025 16:49:34 +0200
+Message-ID: <87msb8bqpt.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86a57cg1bj.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Friday 16 May 2025 at 13:57:52 (+0100), Marc Zyngier wrote:
-> On Fri, 09 May 2025 14:16:58 +0100,
-> Vincent Donnefort <vdonnefort@google.com> wrote:
-> > 
-> > Add a helper to iterate over the hypervisor vmemmap. This will be
-> > particularly handy with the introduction of huge mapping support
-> > for the np-guest stage-2.
-> > 
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > index eb0c2ebd1743..676a0a13c741 100644
-> > --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > @@ -96,24 +96,24 @@ static inline struct hyp_page *hyp_phys_to_page(phys_addr_t phys)
-> >  #define hyp_page_to_virt(page)	__hyp_va(hyp_page_to_phys(page))
-> >  #define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
-> >  
-> > -static inline enum pkvm_page_state get_host_state(phys_addr_t phys)
-> > +static inline enum pkvm_page_state get_host_state(struct hyp_page *p)
-> >  {
-> > -	return (enum pkvm_page_state)hyp_phys_to_page(phys)->__host_state;
-> > +	return (enum pkvm_page_state)p->__host_state;
-> 
-> I'm not quite sure why we have this cast the first place. If we are so
-> keen on type consistency, why isn't __host_state an enum pkvm_page_state
-> the first place?
+On Tue, Apr 15 2025, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
 
-Purely for cosmetic reasons TBH. The *hyp* state (as you've seen below)
-really needs accessors with some logic to decode whatever we store in
-hyp_page (the _complement_ of the hyp state in practice). So we
-introduced accessors for the *host* state for consistency and obfuscated
-the __host_state type in hyp_page to encourage the usage of these
-accessors. None of that is strictly necessary, though. And the explicit
-cast can go, it is already implicit from the return type of the accessor
-and the compiler should be happy enough I think.
+> On 14/4/25 18:38, Cornelia Huck wrote:
+>> From: Eric Auger <eric.auger@redhat.com>
+>>=20
+>> Introduce a script that automates the generation of system register
+>> properties definitions from a given linux source tree
+>> arch/arm64/tools/sysreg.
+>>=20
+>> Invocation of
+>> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
+>> in scripts directory additionally generates
+>> target/arm/cpu-sysreg-properties.c containing definitions for
+>> feature ID registers.
+>>=20
+>> update-aarch64-sysreg-code.sh additionally calls
+>> gen-cpu-sysreg-properties.awk which is inherited from kernel
+>> arch/arm64/tools/gen-sysreg.awk. All credits to Mark Rutland
+>> the original author of this script.
+>>=20
+>> [CH: split off from original patch adding both sysreg definitions
+>>   and properties]
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>>   scripts/gen-cpu-sysreg-properties.awk | 325 ++++++++++++++++++++++++++
+>>   scripts/update-aarch64-sysreg-code.sh |   5 +-
+>>   2 files changed, 329 insertions(+), 1 deletion(-)
+>>   create mode 100755 scripts/gen-cpu-sysreg-properties.awk
+>>=20
+>> diff --git a/scripts/gen-cpu-sysreg-properties.awk b/scripts/gen-cpu-sys=
+reg-properties.awk
+>> new file mode 100755
+>> index 000000000000..76c37938b168
+>> --- /dev/null
+>> +++ b/scripts/gen-cpu-sysreg-properties.awk
+>> @@ -0,0 +1,325 @@
+>> +#!/bin/awk -f
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +# gen-cpu-sysreg-properties.awk: arm64 sysreg header generator
+>> +#
+>> +# Usage: awk -f gen-cpu-sysreg-properties.awk $LINUX_PATH/arch/arm64/to=
+ols/sysreg
+>
+>
+>> +BEGIN {
+>
+>          print "/* AUTOMATICALLY GENERATED, DO NOT MODIFY */\n"
 
-> >  }
-> >  
-> > -static inline void set_host_state(phys_addr_t phys, enum pkvm_page_state state)
-> > +static inline void set_host_state(struct hyp_page *p, enum pkvm_page_state state)
-> >  {
-> > -	hyp_phys_to_page(phys)->__host_state = state;
-> > +	p->__host_state = state;
-> >  }
-> >  
-> > -static inline enum pkvm_page_state get_hyp_state(phys_addr_t phys)
-> > +static inline enum pkvm_page_state get_hyp_state(struct hyp_page *p)
-> >  {
-> > -	return hyp_phys_to_page(phys)->__hyp_state_comp ^ PKVM_PAGE_STATE_MASK;
-> > +	return p->__hyp_state_comp ^ PKVM_PAGE_STATE_MASK;
-> 
-> And we don't seem that bothered here.
+Makes sense.
 
-Cheers,
-Quentin
+>
+> Should we keep copyright?
+
+GPL-2.0-or-later, I guess?
+
+>
+>> +	print "#include \"cpu-custom.h\""
+>> +	print ""
+>> +	print "ARM64SysReg arm64_id_regs[NUM_ID_IDX];"
+>> +	print ""
+>> +	print "void initialize_cpu_sysreg_properties(void)"
+>> +	print "{"
+>> +        print "    memset(arm64_id_regs, 0, sizeof(ARM64SysReg) * NUM_I=
+D_IDX);"
+>> +        print ""
+>> +
+>> +	__current_block_depth =3D 0
+>> +	__current_block[__current_block_depth] =3D "Root"
+>> +}
+
