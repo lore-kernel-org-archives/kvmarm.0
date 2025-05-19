@@ -1,158 +1,246 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE99627F753
-	for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 13:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DB026A1B9;
+	Mon, 19 May 2025 14:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747662306; cv=none; b=aZ+5+bCKssW00GYmqkIUERChGskxsebuyjK253KEuSiw/meT4aSmRTclgus1QdXpcBNmXJO9eXccIlUzvGoqixxATl+tj8WqA4GyTvZugsFcI7qLE2QWQJbvih+ko1QIi/hdHLZURFUYnodcdQerqbdedUQ8EzRhy8PMyaUCt+4=
+	t=1747663642; cv=none; b=o9k8CJ1Bl65za1Zvevh6JvieuhyxnLCsXVEMDktoXXX9rsoGGpk3vQ7j+ufXbElnm5dvmZwAjD3DGs5q4jFLRZLkJPnSUHhBCal545TXZrAS2PJwA+puPIqqTG3iU+++eMO3QQG8VReL35gecRLC9Qcmy+wSzEQJWMlaJlgZzpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747662306; c=relaxed/simple;
-	bh=FN57vLe65C1svcmEj8o0ceeTxyA4BHTqUN3W2enYKdM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=iu2TKDyP/oiKibzZvMrXH86Ar2wucusawWHyR6kVqfXp/z1VuNV+hzg8eOl5SRg9rPmI+j6Lcv9lpxQpvGx6gv2ghFTnCgHaqJ0aIQWep53RtlD3F7BsKFfNd4AEdTdBgruauw634Sxq7m+svAPN31Ui2pK/74Kmau5BRX4rRwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=prEs2AZG; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1747663642; c=relaxed/simple;
+	bh=Vjxx3sdINLSP5xcLk8gOYpfc7PhkgV2RnCzn4FnV044=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bqdrYJ2xt/pRklAdAjPrvHq9ILZgkdPZsa6u4Vwy4mI1KqjzetIQq3FXsDB7bQyakdQ/OHoSoZgJ8TcQJVGd6WYdY8PjZ8EeWtu0iN4Ug+TAAF5MjO5nSrCKUR01mbseVvYOSONg3uNN/TQmoXFimjQP6fLR0oAX1wRUTznayDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OUGyJqZB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="prEs2AZG"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54J9IUfw028604;
-	Mon, 19 May 2025 13:44:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	PdV8uO80/mflHpZW6Zmyg39cv5SMy1ND2QAP2t8eHzY=; b=prEs2AZG6sM1zEGe
-	VlkKyMnGGYxkLQMT3wdOmMthss1lBfNyEtDD15+kpRauYm9ctxxE1rtGyBG7Fv0f
-	7mJCkiJOnbNqwy/6kx5b3EJw/fdr4USRKjSBQQZQ0jHR3qMi+DE0bCsRrQ4toQWM
-	XQpE8v6IZupkHpPDe9Et6SnwT6edFLhvkgEDwG+tYmfYg686FX3HielgtSb5ymMw
-	H/6iWbGkmnrSAkUBtyDQyIUB5N69MUsS4VuPSWbwetCUd2aJT9KZy84qdFiXZdPk
-	mqWtVNNGCrWJyKA02Gb/R93mSzgTlfhvNmEC0JXDbA8nvT4pFil22EVufRp+SY2P
-	LCv/Dw==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46pju7cgmc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 May 2025 13:44:32 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54JDiVn1028686
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 May 2025 13:44:31 GMT
-Received: from [10.253.10.117] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 19 May
- 2025 06:44:23 -0700
-Message-ID: <1e3ba498-2bfb-4cab-ba13-5ab2c5b03ef9@quicinc.com>
-Date: Mon, 19 May 2025 21:44:20 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OUGyJqZB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94EC2C4CEE4;
+	Mon, 19 May 2025 14:07:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747663641;
+	bh=Vjxx3sdINLSP5xcLk8gOYpfc7PhkgV2RnCzn4FnV044=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OUGyJqZBxfE0T2+hgIza/5xrQaClypfGHZhlPS1OYpQeM8FkeJOsiGDVJqL52nuf4
+	 yYhKAwzAS7Tf31lG5xoLcEgQRssYWn/b0k8H5zsT96akuXDLsx0FNB67Wp/tujIhYg
+	 Ifak/vE8mTwOLZSLDJtGDHbKbWJ8CN23U+zQNrOxnkQPym0MxrkldTS6iHxQ1poH9e
+	 SbKan18lTHozANPl1Gg2U+bCVFx1oHv0KEEhbb4C3hfCqAi6hOMCm77yMnGrqJqJ8r
+	 ZP3eTjXHstTzFVTU6Lc4olp0eh9QxVMCJ1Uq55V3qLLxT9Ca2CYoqXs1YOrjmDEI69
+	 bJX2rLrdgnXlQ==
+Date: Mon, 19 May 2025 15:07:15 +0100
+From: Will Deacon <will@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v21 2/4] arm64: Handle BRBE booting requirements
+Message-ID: <20250519140713.GA16991@willie-the-truck>
+References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
+ <20250407-arm-brbe-v19-v21-2-ff187ff6c928@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [cocci] [PATCH v3 2/6] coccinelle: misc: Add field_modify script
-To: Markus Elfring <Markus.Elfring@web.de>, <cocci@inria.fr>,
-        <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-        "Catalin
- Marinas" <catalin.marinas@arm.com>,
-        Joey Gouly <joey.gouly@arm.com>,
-        "Julia
- Lawall" <Julia.Lawall@inria.fr>, Marc Zyngier <maz@kernel.org>,
-        Nicolas Palix
-	<nicolas.palix@imag.fr>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        "Rasmus
- Villemoes" <linux@rasmusvillemoes.dk>,
-        Suzuki Poulouse
-	<suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, Yury Norov
-	<yury.norov@gmail.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-CC: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        "Kiran
- Kumar C.S.K" <quic_kkumarcs@quicinc.com>,
-        Lei Wei <quic_leiwei@quicinc.com>, Pavithra R <quic_pavir@quicinc.com>,
-        Suruchi Agarwal
-	<quic_suruchia@quicinc.com>,
-        <quic_linchen@quicinc.com>
-References: <20250417-field_modify-v3-0-6f7992aafcb7@quicinc.com>
- <20250417-field_modify-v3-2-6f7992aafcb7@quicinc.com>
- <a1be0efc-a4c9-461d-a01a-8fb830b2c68d@web.de>
- <0ee48e2f-58db-49b0-b651-dcc0e517465e@quicinc.com>
- <43712874-6f1d-435c-98b2-30ac44d25309@web.de>
-Content-Language: en-US
-From: Luo Jie <quic_luoj@quicinc.com>
-In-Reply-To: <43712874-6f1d-435c-98b2-30ac44d25309@web.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=XKEwSRhE c=1 sm=1 tr=0 ts=682b35c0 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=NEAV23lmAAAA:8
- a=c3S3xlzBOW1yjAwqZsgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: DDx5Kpyrf6pBeNUIV-O76BAavKioXic-
-X-Proofpoint-GUID: DDx5Kpyrf6pBeNUIV-O76BAavKioXic-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE5MDEyNyBTYWx0ZWRfX8LBxompbvgoH
- 3i7uWyfrxx5T3Tfgsvy7ubiVJ6v1qhIGwf4jf/Xj3Xy1N8bv6dH9EU/v4+YK8hk3EOZKpGwsXpO
- zKPXnFqYrqWOXyiJzvXGm6Lg+ocGxkUpkTDXJZ/O5AXvVsS8FpVHPcnvp90SgtTIkcdhMEupjQ2
- uOj/n9xXrmiGEGLnLbuK3/1L9NHPSOpmoaK3yrzHw6a5A4PoIXXRCzpq8QAa9ZmTuW4GdgZaAci
- EHCwTjF+Lk7iDIzSmtS2qgKhzHtqhTC9bWvgCDe3sDRnz3V+dDqppGyupxR8VK2WXx2IejHyv8w
- JFBhRBjRDa880TK7422aleYlIMa6BgheyGcrQ8t5EswA8UqaJ1amugbbjV7lOzAkyz96FklOAvx
- XIva8OfJHDHpw248ZP7AXaRVN54826XqkLx8ayhxETvYMM/RYgIieue2XoBPYKPK+9fivQ+l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-19_06,2025-05-16_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 priorityscore=1501 impostorscore=0 clxscore=1015
- spamscore=0 suspectscore=0 malwarescore=0 adultscore=0 mlxscore=0
- mlxlogscore=999 phishscore=0 bulkscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505070000 definitions=main-2505190127
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407-arm-brbe-v19-v21-2-ff187ff6c928@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-
-
-On 4/24/2025 12:35 AM, Markus Elfring wrote:
-> …
->>> -reg &= ~mask;
->>> -reg |= FIELD_PREP
->>> +       FIELD_MODIFY
->>>                     (mask,
->>> +                  &reg,
->>>                      val
->>>                     );
-> …
->> With this code variant, there is no space prior to &reg, here is the
->> example code changes generated by the SmPL code as below, is this expected?
-> …
->> +++ b/drivers/phy/starfive/phy-jh7110-dphy-tx.c
->> @@ -244,8 +244,7 @@ static int stf_dphy_configure(struct phy
->>          i = stf_dphy_get_config_index(bitrate);
->>
->>          tmp = readl(dphy->topsys + STF_DPHY_APBIFSAIF_SYSCFG(100));
->> -       tmp &= ~STF_DPHY_REFCLK_IN_SEL;
->> -       tmp |= FIELD_PREP(STF_DPHY_REFCLK_IN_SEL, STF_DPHY_REFCLK_12M);
->> +       FIELD_MODIFY(STF_DPHY_REFCLK_IN_SEL,&tmp, STF_DPHY_REFCLK_12M);
->>          writel(tmp, dphy->topsys + STF_DPHY_APBIFSAIF_SYSCFG(100));
+On Mon, Apr 07, 2025 at 12:41:31PM -0500, Rob Herring (Arm) wrote:
+> From: Anshuman Khandual <anshuman.khandual@arm.com>
 > 
-> The Coccinelle software is still evolving somehow.
-> Thus your test result can trigger further development considerations.
-> I hope that clarifications and corresponding improvements can be achieved
-> also according to such source code layout concerns.
+> To use the Branch Record Buffer Extension (BRBE), some configuration is
+> necessary at EL3 and EL2. This patch documents the requirements and adds
+> the initial EL2 setup code, which largely consists of configuring the
+> fine-grained traps and initializing a couple of BRBE control registers.
 > 
-> Regards,
-> Markus
+> Before this patch, __init_el2_fgt() would initialize HDFGRTR_EL2 and
+> HDFGWTR_EL2 with the same value, relying on the read/write trap controls
+> for a register occupying the same bit position in either register. The
+> 'nBRBIDR' trap control only exists in bit 59 of HDFGRTR_EL2, while bit
+> 59 of HDFGWTR_EL2 is RES0, and so this assumption no longer holds.
+> 
+> To handle HDFGRTR_EL2 and HDFGWTR_EL2 having (slightly) different bit
+> layouts, __init_el2_fgt() is changed to accumulate the HDFGRTR_EL2 and
+> HDFGWTR_EL2 control bits separately. While making this change the
+> open-coded value (1 << 62) is replaced with
+> HDFG{R,W}TR_EL2_nPMSNEVFR_EL1_MASK.
+> 
+> The BRBCR_EL1 and BRBCR_EL2 registers are unusual and require special
+> initialisation: even though they are subject to E2H renaming, both have
+> an effect regardless of HCR_EL2.TGE, even when running at EL2, and
+> consequently both need to be initialised. This is handled in
+> __init_el2_brbe() with a comment to explain the situation.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Reviewed-by: Leo Yan <leo.yan@arm.com>
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> [Mark: rewrite commit message, fix typo in comment]
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Signed-off-by: "Rob Herring (Arm)" <robh@kernel.org>
+> Tested-by: James Clark <james.clark@linaro.org>
+> ---
+> v20:
+>  - Document that MDCR_EL3.SBRBE can be 0b01 also
+>  - Fix "HDFGWTR_EL2 is RES0" in commit msg
+> ---
+>  Documentation/arch/arm64/booting.rst | 21 +++++++++
+>  arch/arm64/include/asm/el2_setup.h   | 86 ++++++++++++++++++++++++++++++++++--
+>  2 files changed, 104 insertions(+), 3 deletions(-)
 
-OK, understand. I will keep the original patch as below for now, as we
-need to ensure the script generates code with the expected style.
-+- reg &= ~mask;
-+- reg |= FIELD_PREP(mask, val);
-++ FIELD_MODIFY(mask, &reg, val);
+It would be good to have an Ack from the kvm/arm64 side on this, but in
+the meantime I've left some comments inline.
 
-In addition, below case is filed to request this improvement on the
-coccinelle project.
-https://github.com/coccinelle/coccinelle/issues/397
+> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+> index dee7b6de864f..a627c1e0e4a0 100644
+> --- a/Documentation/arch/arm64/booting.rst
+> +++ b/Documentation/arch/arm64/booting.rst
+> @@ -358,6 +358,27 @@ Before jumping into the kernel, the following conditions must be met:
+>  
+>      - HWFGWTR_EL2.nSMPRI_EL1 (bit 54) must be initialised to 0b01.
+>  
+> +  For CPUs with feature Branch Record Buffer Extension (FEAT_BRBE):
 
-Thanks.
+This doesn't make sense ^^^
+
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index ebceaae3c749..e7fcba1e7d8e 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -189,6 +189,39 @@
+>  .Lskip_set_cptr_\@:
+>  .endm
+>  
+> +/*
+> + * Configure BRBE to permit recording cycle counts and branch mispredicts.
+> + *
+> + * At any EL, to record cycle counts BRBE requires that both BRBCR_EL2.CC=1 and
+> + * BRBCR_EL1.CC=1.
+> + *
+> + * At any EL, to record branch mispredicts BRBE requires that both
+> + * BRBCR_EL2.MPRED=1 and BRBCR_EL1.MPRED=1.
+> + *
+> + * When HCR_EL2.E2H=1, the BRBCR_EL1 encoding is redirected to BRBCR_EL2, but
+> + * the {CC,MPRED} bits in the real BRBCR_EL1 register still apply.
+> + *
+> + * Set {CC,MPRED} in both BRBCR_EL2 and BRBCR_EL1 so that at runtime we only
+> + * need to enable/disable these in BRBCR_EL1 regardless of whether the kernel
+> + * ends up executing in EL1 or EL2.
+> + */
+> +.macro __init_el2_brbe
+> +	mrs	x1, id_aa64dfr0_el1
+> +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
+> +	cbz	x1, .Lskip_brbe_\@
+> +
+> +	mov_q	x0, BRBCR_ELx_CC | BRBCR_ELx_MPRED
+> +	msr_s	SYS_BRBCR_EL2, x0
+> +
+> +	__check_hvhe .Lset_brbe_nvhe_\@, x1
+> +	msr_s	SYS_BRBCR_EL12, x0	// VHE
+> +	b	.Lskip_brbe_\@
+> +
+> +.Lset_brbe_nvhe_\@:
+> +	msr_s	SYS_BRBCR_EL1, x0	// NVHE
+> +.Lskip_brbe_\@:
+
+Why do we have to poke BRBCR_EL12/BRBCR_EL1 here rather than in the BRBE
+driver code?
+
+> +.endm
+> +
+>  /* Disable any fine grained traps */
+>  .macro __init_el2_fgt
+>  	mrs	x1, id_aa64mmfr0_el1
+> @@ -196,16 +229,48 @@
+>  	cbz	x1, .Lskip_fgt_\@
+>  
+>  	mov	x0, xzr
+> +	mov	x2, xzr
+>  	mrs	x1, id_aa64dfr0_el1
+>  	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMSVer_SHIFT, #4
+>  	cmp	x1, #3
+>  	b.lt	.Lskip_spe_fgt_\@
+> +
+>  	/* Disable PMSNEVFR_EL1 read and write traps */
+> -	orr	x0, x0, #(1 << 62)
+> +	orr	x0, x0, #HDFGRTR_EL2_nPMSNEVFR_EL1_MASK
+> +	orr	x2, x2, #HDFGWTR_EL2_nPMSNEVFR_EL1_MASK
+>  
+>  .Lskip_spe_fgt_\@:
+> +#ifdef CONFIG_ARM64_BRBE
+
+Why is this gated on CONFIG_ARM64_BRBE?
+
+> +	mrs	x1, id_aa64dfr0_el1
+> +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
+> +	cbz	x1, .Lskip_brbe_reg_fgt_\@
+> +
+> +	/*
+> +	 * Disable read traps for the following registers
+> +	 *
+> +	 * [BRBSRC|BRBTGT|RBINF]_EL1
+> +	 * [BRBSRCINJ|BRBTGTINJ|BRBINFINJ|BRBTS]_EL1
+> +	 */
+> +	orr	x0, x0, #HDFGRTR_EL2_nBRBDATA_MASK
+> +
+> +	/*
+> +	 * Disable write traps for the following registers
+> +	 *
+> +	 * [BRBSRCINJ|BRBTGTINJ|BRBINFINJ|BRBTS]_EL1
+> +	 */
+> +	orr	x2, x2, #HDFGWTR_EL2_nBRBDATA_MASK
+> +
+> +	/* Disable read and write traps for [BRBCR|BRBFCR]_EL1 */
+> +	orr	x0, x0, #HDFGRTR_EL2_nBRBCTL_MASK
+> +	orr	x2, x2, #HDFGWTR_EL2_nBRBCTL_MASK
+> +
+> +	/* Disable read traps for BRBIDR_EL1 */
+> +	orr	x0, x0, #HDFGRTR_EL2_nBRBIDR_MASK
+> +
+> +.Lskip_brbe_reg_fgt_\@:
+
+I think this label should become .Lset_debug_fgt_\@:. That way, we have
+a clear point at which we're done with HDFG*TR_EL2. We can zero x0 and
+x2 and from then on we can focus on HFG*TR + HFGITR.
+
+nit: the existing .Lskip_debug_fgt_\@ label looks to be misnamed -- it
+should probably be .Lskip_sme_fgt_\@ ?
+
+> +#endif /* CONFIG_ARM64_BRBE */
+>  	msr_s	SYS_HDFGRTR_EL2, x0
+> -	msr_s	SYS_HDFGWTR_EL2, x0
+> +	msr_s	SYS_HDFGWTR_EL2, x2
+
+nit: It would be cleaner to use x0/x1 for the pair of trap registers
+but I can see that would be a more invasive change.
+
+>  	mov	x0, xzr
+>  	mrs	x1, id_aa64pfr1_el1
+> @@ -246,7 +311,21 @@
+>  .Lset_fgt_\@:
+>  	msr_s	SYS_HFGRTR_EL2, x0
+>  	msr_s	SYS_HFGWTR_EL2, x0
+> -	msr_s	SYS_HFGITR_EL2, xzr
+> +	mov	x0, xzr
+> +#ifdef CONFIG_ARM64_BRBE
+> +	mrs	x1, id_aa64dfr0_el1
+> +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
+> +	cbz	x1, .Lskip_brbe_insn_fgt_\@
+
+It would probably scale better if we unconditionally stick x2 in
+HFGITR_EL2 and zero that register in '.Lset_debug_fgt_\@'. We still have
+two checks for BRBE, but at least '.Lset_fgt_\@' could just stick to
+writing the registers.
+
+Will
