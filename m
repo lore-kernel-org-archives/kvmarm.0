@@ -1,126 +1,310 @@
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B127926A0E5
-	for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 15:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DACF1E9B35;
+	Mon, 19 May 2025 17:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747669269; cv=none; b=pX8xCrOJ9wcXoX6Z3xk4Ymnyr+2L2HL499Yy1LGnUZ/7klXfCyaF9RNnBKhpyMaXlteVIqUsVaw8ATU8B6zJfc+RVNHNiErHBcW1lG83emylDq/0sENMVhKHCYmntXO3rosA4WhihtUNWV9wZc03yx17O1VS9uiUJLK2Pk5XfN0=
+	t=1747676167; cv=none; b=OjVeRiAwtv+phOPKlh3XAl5wbXCwh0c1nJ/KoC58RyhvVtaTMSJUMKynY1eHT+FPi7ZTUHHryS2pSyTX55I7texP3i7j6T5q82FS6pdbu2pZs4mDsMCJSbiGoyYBg3tYzaHPmFitYCNu8R+NRYhc+BBSLzfZq2hhzE7vRZ3aA90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747669269; c=relaxed/simple;
-	bh=JWwxo0x+l19TqUeaDFmjwz0H0sA5vd+hp1s5vT1QIhw=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ERkl4PsEF13t7AFMgTUole+JcW/3b79MzJ3oeRHlgdoQSdfIP32yxrHXYhuRzy78+RvSUDix1yMUuOhQKan7xpaHMfp64SO/SAc5esH698V41uYQ206lm1tSuDfUsRIspmk2Z2qK+IMA9sK/S71DtE813JtCXTHBAW5bqglqL70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=BiEOr8lh; arc=none smtp.client-ip=192.134.164.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="BiEOr8lh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=9HMc0DzIN5ocrXZLGX5hiW5AlfZP52hbSKBuKVVgxw8=;
-  b=BiEOr8lh1wbmqmPbg972i+TnuDfMlW9JpMOq4PXcQ00yckg/fDp/evN6
-   TXLX0ltcbAsPdK/AvMslBPE98gezKlPvAAn38pHMJ8h5Roa+VDDC1nD+K
-   WenDR9H3KIIeDXGfFefWZUTHbtRM9ZVPCq9Z9K9SJ9xzSjm0enLCaf/MB
-   U=;
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.15,301,1739833200"; 
-   d="scan'208";a="116972886"
-Received: from unknown (HELO hadrien) ([194.182.8.86])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 17:39:53 +0200
-Date: Mon, 19 May 2025 17:39:52 +0200 (CEST)
-From: Julia Lawall <julia.lawall@inria.fr>
-To: Luo Jie <quic_luoj@quicinc.com>
-cc: Markus Elfring <Markus.Elfring@web.de>, cocci@inria.fr, 
-    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-    Catalin Marinas <catalin.marinas@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
-    Julia Lawall <Julia.Lawall@inria.fr>, Marc Zyngier <maz@kernel.org>, 
-    Nicolas Palix <nicolas.palix@imag.fr>, 
-    Oliver Upton <oliver.upton@linux.dev>, 
-    Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-    Suzuki Poulouse <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
-    Yury Norov <yury.norov@gmail.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-    LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-    "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>, 
-    Lei Wei <quic_leiwei@quicinc.com>, Pavithra R <quic_pavir@quicinc.com>, 
-    Suruchi Agarwal <quic_suruchia@quicinc.com>, quic_linchen@quicinc.com
-Subject: Re: [cocci] [PATCH v3 2/6] coccinelle: misc: Add field_modify
- script
-In-Reply-To: <1e3ba498-2bfb-4cab-ba13-5ab2c5b03ef9@quicinc.com>
-Message-ID: <6fe2aed9-f29e-4a77-5f47-855cfefe1973@inria.fr>
-References: <20250417-field_modify-v3-0-6f7992aafcb7@quicinc.com> <20250417-field_modify-v3-2-6f7992aafcb7@quicinc.com> <a1be0efc-a4c9-461d-a01a-8fb830b2c68d@web.de> <0ee48e2f-58db-49b0-b651-dcc0e517465e@quicinc.com> <43712874-6f1d-435c-98b2-30ac44d25309@web.de>
- <1e3ba498-2bfb-4cab-ba13-5ab2c5b03ef9@quicinc.com>
+	s=arc-20240116; t=1747676167; c=relaxed/simple;
+	bh=uRxGMqVvMhdnhZUCOSCjxyGRSKnkRsYIWlWK7s5f0LE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mXdRVOt6dNx01uicJ4eLBJ7QCG1wf8j4oxwrrbkpZ4GiSIX/ot1YmRe4ys5av9KXwQwBzFxhrVJinBTTyTnL2mGyo7Wqd+ucTJjY0QXu/Op8W72vel2JZrEJEVijimfs/9RNVrLHMn4pyZiP4jxFvkbbtIZwQVZZlxvNlksjRoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 323FD1655;
+	Mon, 19 May 2025 10:35:50 -0700 (PDT)
+Received: from [10.57.50.157] (unknown [10.57.50.157])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C790F3F673;
+	Mon, 19 May 2025 10:35:59 -0700 (PDT)
+Message-ID: <3a04995a-524c-4d07-8c8b-82930f9bca72@arm.com>
+Date: Mon, 19 May 2025 18:35:58 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-477211006-1747669194=:4212"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 20/43] arm64: RME: Runtime faulting of memory
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-21-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250416134208.383984-21-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Hi Steven
 
---8323329-477211006-1747669194=:4212
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+On 16/04/2025 14:41, Steven Price wrote:
+> At runtime if the realm guest accesses memory which hasn't yet been
+> mapped then KVM needs to either populate the region or fault the guest.
+> 
+> For memory in the lower (protected) region of IPA a fresh page is
+> provided to the RMM which will zero the contents. For memory in the
+> upper (shared) region of IPA, the memory from the memslot is mapped
+> into the realm VM non secure.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+
+Please find some comments below.
+
+...
+
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index f6af3ea6ea8a..b6959cd17a6c 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -714,6 +714,186 @@ static int realm_create_protected_data_page(struct realm *realm,
+>   	return -ENXIO;
+>   }
+>   
+> +static int fold_rtt(struct realm *realm, unsigned long addr, int level)
+> +{
+> +	phys_addr_t rtt_addr;
+> +	int ret;
+> +
+> +	ret = realm_rtt_fold(realm, addr, level, &rtt_addr);
+> +	if (ret)
+> +		return ret;
+> +
+> +	free_delegated_granule(rtt_addr);
+> +
+> +	return 0;
+> +}
+> +
+> +int realm_map_protected(struct realm *realm,
+> +			unsigned long ipa,
+> +			kvm_pfn_t pfn,
+> +			unsigned long map_size,
+> +			struct kvm_mmu_memory_cache *memcache)
+> +{
+> +	phys_addr_t phys = __pfn_to_phys(pfn);
+> +	phys_addr_t rd = virt_to_phys(realm->rd);
+> +	unsigned long base_ipa = ipa;
+> +	unsigned long size;
+> +	int map_level;
+> +	int ret = 0;
+> +
+> +	if (WARN_ON(!IS_ALIGNED(map_size, RMM_PAGE_SIZE)))
+> +		return -EINVAL;
+> +
+> +	if (WARN_ON(!IS_ALIGNED(ipa, map_size)))
+> +		return -EINVAL;
+> +
+> +	if (IS_ALIGNED(map_size, RMM_L2_BLOCK_SIZE))
+> +		map_level = 2;
+
+minor nit : RMM_RTT_BLOCK_LEVEL
+
+> +	else
+> +		map_level = 3;
+
+minor nit:  RMM_RTT_MAX_LEVEL ?
+
+> +
+> +	if (map_level < RMM_RTT_MAX_LEVEL) {
+> +		/*
+> +		 * A temporary RTT is needed during the map, precreate it,
+> +		 * however if there is an error (e.g. missing parent tables)
+> +		 * this will be handled below.
+> +		 */
+> +		realm_create_rtt_levels(realm, ipa, map_level,
+> +					RMM_RTT_MAX_LEVEL, memcache);
+> +	}
+> +
+> +	for (size = 0; size < map_size; size += RMM_PAGE_SIZE) {
+> +		if (rmi_granule_delegate(phys)) {
+> +			/*
+> +			 * It's likely we raced with another VCPU on the same
+> +			 * fault. Assume the other VCPU has handled the fault
+> +			 * and return to the guest.
+> +			 */
+> +			return 0;
+> +		}
+> +
+> +		ret = rmi_data_create_unknown(rd, phys, ipa);
+> +
+> +		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+> +			/* Create missing RTTs and retry */
+> +			int level = RMI_RETURN_INDEX(ret);
+> +
+> +			WARN_ON(level == RMM_RTT_MAX_LEVEL);
+> +
+> +			ret = realm_create_rtt_levels(realm, ipa, level,
+> +						      RMM_RTT_MAX_LEVEL,
+> +						      memcache);
+> +			if (ret)
+> +				goto err_undelegate;
+> +
+> +			ret = rmi_data_create_unknown(rd, phys, ipa);
+> +		}
+> +
+> +		if (WARN_ON(ret))
+> +			goto err_undelegate;
+> +
+> +		phys += RMM_PAGE_SIZE;
+> +		ipa += RMM_PAGE_SIZE;
+> +	}
+> +
+> +	if (map_size == RMM_L2_BLOCK_SIZE) {
+> +		ret = fold_rtt(realm, base_ipa, map_level + 1);
+> +		if (WARN_ON(ret))
+> +			goto err;
+> +	}
+> +
+> +	return 0;
+> +
+> +err_undelegate:
+> +	if (WARN_ON(rmi_granule_undelegate(phys))) {
+> +		/* Page can't be returned to NS world so is lost */
+> +		get_page(phys_to_page(phys));
+> +	}
+> +err:
+> +	while (size > 0) {
+> +		unsigned long data, top;
+> +
+> +		phys -= RMM_PAGE_SIZE;
+> +		size -= RMM_PAGE_SIZE;
+> +		ipa -= RMM_PAGE_SIZE;
+> +
+> +		WARN_ON(rmi_data_destroy(rd, ipa, &data, &top));
+> +
+> +		if (WARN_ON(rmi_granule_undelegate(phys))) {
+> +			/* Page can't be returned to NS world so is lost */
+> +			get_page(phys_to_page(phys));
+> +		}
+> +	}
+> +	return -ENXIO;
+> +}
+> +
+> +int realm_map_non_secure(struct realm *realm,
+> +			 unsigned long ipa,
+> +			 kvm_pfn_t pfn,
+> +			 unsigned long size,
+> +			 struct kvm_mmu_memory_cache *memcache)
+> +{
+> +	phys_addr_t rd = virt_to_phys(realm->rd);
+> +	phys_addr_t phys = __pfn_to_phys(pfn);
+> +	unsigned long offset;
+> +	int map_size, map_level;
+> +	int ret = 0;
+> +
+> +	if (WARN_ON(!IS_ALIGNED(size, RMM_PAGE_SIZE)))
+> +		return -EINVAL;
+> +
+> +	if (WARN_ON(!IS_ALIGNED(ipa, size)))
+> +		return -EINVAL;
+> +
+> +	if (IS_ALIGNED(size, RMM_L2_BLOCK_SIZE)) {
+> +		map_level = 2;
+> +		map_size = RMM_L2_BLOCK_SIZE;
+
+Same here, stick to the symbols than digits.
+
+> +	} else {
+> +		map_level = 3;
+> +		map_size = RMM_PAGE_SIZE;
+> +	}
+> +
+> +	for (offset = 0; offset < size; offset += map_size) {
+> +		/*
+> +		 * realm_map_ipa() enforces that the memory is writable,
+
+The function names seems to be obsolete, please fix.
+
+> +		 * so for now we permit both read and write.
+> +		 */
+> +		unsigned long desc = phys |
+> +				     PTE_S2_MEMATTR(MT_S2_FWB_NORMAL) |
+> +				     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |
+> +				     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> +		ret = rmi_rtt_map_unprotected(rd, ipa, map_level, desc);
+> +
+> +		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+
+Could we hit the following case and end up in failure ?
+
+* Initially a single page is shared and the S2 is mapped
+* Later the Realm shares the entire L2 block and encounters a fault
+   at a new IPA within the L2 block.
+
+In this case, we may try to L2 mapping when there is a L3 mapping and
+we could encounter (RMI_ERROR_RTT, 2).
+
+
+> +			/* Create missing RTTs and retry */
+> +			int level = RMI_RETURN_INDEX(ret);
+
+So we should probably go down the rtt create step, with the following
+check.
+
+			if (level < map_level) {
+
+> +
+> +			ret = realm_create_rtt_levels(realm, ipa, level,
+> +						      map_level, memcache);
+> +			if (ret)
+> +				return -ENXIO;
+> +
+> +			ret = rmi_rtt_map_unprotected(rd, ipa, map_level, desc);
+
+
+		} else {
+
+Otherwise, may be we need to do some more hard work to fix it up.
+
+1. If map_level == 3, something is terribly wrong or we raced with 
+another thread ?
+
+2. If map_level < 3 and we didn't race :
+
+   a. Going one level down and creating the mappings there and then 
+folding. But we could endup dealing with ERROR_RTT,3 as in (1).
+
+   b. Easiest is to destroy the table at "map_level + 1" and retry the map.
+
+
+Suzuki
 
 
 
-On Mon, 19 May 2025, Luo Jie wrote:
+> +		}
+> +		/*
+> +		 * RMI_ERROR_RTT can be reported for two reasons: either the
+> +		 * RTT tables are not there, or there is an RTTE already
+> +		 * present for the address.  The call to
+> +		 * realm_create_rtt_levels() above handles the first case, and
+> +		 * in the second case this indicates that another thread has
+> +		 * already populated the RTTE for us, so we can ignore the
+> +		 * error and continue.
+> +		 */
+> +		if (ret && RMI_RETURN_STATUS(ret) != RMI_ERROR_RTT)
+> +			return -ENXIO;
+> +
+> +		ipa += map_size;
+> +		phys += map_size;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>   static int populate_region(struct kvm *kvm,
+>   			   phys_addr_t ipa_base,
+>   			   phys_addr_t ipa_end,
 
->
->
-> On 4/24/2025 12:35 AM, Markus Elfring wrote:
-> > …
-> > > > -reg &= ~mask;
-> > > > -reg |= FIELD_PREP
-> > > > +       FIELD_MODIFY
-> > > >                     (mask,
-> > > > +                  &reg,
-> > > >                      val
-> > > >                     );
-> > …
-> > > With this code variant, there is no space prior to &reg, here is the
-> > > example code changes generated by the SmPL code as below, is this
-> > > expected?
-> > …
-> > > +++ b/drivers/phy/starfive/phy-jh7110-dphy-tx.c
-> > > @@ -244,8 +244,7 @@ static int stf_dphy_configure(struct phy
-> > >          i = stf_dphy_get_config_index(bitrate);
-> > >
-> > >          tmp = readl(dphy->topsys + STF_DPHY_APBIFSAIF_SYSCFG(100));
-> > > -       tmp &= ~STF_DPHY_REFCLK_IN_SEL;
-> > > -       tmp |= FIELD_PREP(STF_DPHY_REFCLK_IN_SEL, STF_DPHY_REFCLK_12M);
-> > > +       FIELD_MODIFY(STF_DPHY_REFCLK_IN_SEL,&tmp, STF_DPHY_REFCLK_12M);
-> > >          writel(tmp, dphy->topsys + STF_DPHY_APBIFSAIF_SYSCFG(100));
-> >
-> > The Coccinelle software is still evolving somehow.
-> > Thus your test result can trigger further development considerations.
-> > I hope that clarifications and corresponding improvements can be achieved
-> > also according to such source code layout concerns.
-> >
-> > Regards,
-> > Markus
->
-> OK, understand. I will keep the original patch as below for now, as we
-> need to ensure the script generates code with the expected style.
-> +- reg &= ~mask;
-> +- reg |= FIELD_PREP(mask, val);
-> ++ FIELD_MODIFY(mask, &reg, val);
->
-> In addition, below case is filed to request this improvement on the
-> coccinelle project.
-> https://github.com/coccinelle/coccinelle/issues/397
-
-Thanks for the report.
-
-julia
-
-
->
-> Thanks.
->
---8323329-477211006-1747669194=:4212--
