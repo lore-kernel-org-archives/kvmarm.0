@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA02272E51;
-	Mon, 19 May 2025 14:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C806A26A1DA;
+	Mon, 19 May 2025 14:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747663741; cv=none; b=QpMdyXG8eVKF2eU42WU+ayHQIKRVOD0ixbsIZGopomNG4trYVjOLzV2f62kBk4ET9aRlWMRJ9vkEwkbduTSehMdXDHkAKDV92xrkrddZlKTt2U51bRvsvGyE2zYc9A8qqyp3/MByayqcnbNTK8lpJEjuSgivlAGLC7KiW85HKgY=
+	t=1747663877; cv=none; b=WXBxSksG1RBQ02FixWaLCC9vFdwJyo2gqDAGt7MgUsUC0/DtbQRuvt8zA0qZenLa4Y9sCNgcQOpv5ZneFDosb72X0COtkrmavWe4JiVnHPzXCRPklg+n2xHuaLUZsnI7TAx2BSyDXiaYNoaZ3zYnjnvjnNsmdKB14rGjXRltmJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747663741; c=relaxed/simple;
-	bh=XdmqhIOgyWrpqvPrXuD5sGuSVFBd8VTkIvjeyIdrYEQ=;
+	s=arc-20240116; t=1747663877; c=relaxed/simple;
+	bh=e1ejy1mxpIjt2Bw3FSFixCpdrvKaPbVj5b42czyYzxg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZPf+C9ag9NKJ5MrQGeQa/uRLi8XmDh8Sda0XF5FMQkEc49jNABtkF93/3NsTl012RDgKHgTx8QU3HQZTqCa3N9tjpIeJdHVSwmzJkKsCnPfd4oSa1B2j5GniDwNyl6hWAQha0Ew3iOei5nUxkWQxYUoY9KVJFCEWmFkjYRM/G6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=luVc22gJ; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMpclgJrUM/4xXc+Es7QOv7z2OZbiyYR0/2bx1UhDVcgO2xVvT/NBhaYUTiw45Di+R9xwZJ7TN3kv/YjNhvGCB8prisMtVRz5iN5uX4sy/MKhN27n6YoG8FXjSKWJA3LiDzdKvGFIrmjLBEhO4UeXBLVjRc1TBmrLzc3Ord500Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuwiVYBO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="luVc22gJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1E1CC4CEEF;
-	Mon, 19 May 2025 14:08:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuwiVYBO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA3BC4CEE4;
+	Mon, 19 May 2025 14:11:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747663740;
-	bh=XdmqhIOgyWrpqvPrXuD5sGuSVFBd8VTkIvjeyIdrYEQ=;
+	s=k20201202; t=1747663877;
+	bh=e1ejy1mxpIjt2Bw3FSFixCpdrvKaPbVj5b42czyYzxg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=luVc22gJlJH+x7jQc5VnMH8Mm+HofKOpjX+5dOE7qm+sNjKW4mfOAPApZPdfB+5oN
-	 L5WkCCqZcZjsiWMjWi8Y65lgd43FG8l8/yQ6uXJf4t/4XHw6H2BOTuGQMmwOGrIleq
-	 ShGb01ty8Y1jqBgpk40uqMem0porz7lyt5mfsJgU42FrdJCy92MaifwR1DMR48REes
-	 e1aPhcRzdx2qZfiLn98KEXOL3Kh46lK/S1sGv8vssY/JrpXI8VlkXfhj4pdKBQNmFt
-	 rfS1w2E8nQRUsWQkvDKDzSSfc4BCpTM/Vj78vpjFToRCV6B6Lt3e314T4t0e+NgP7H
-	 35EBm7kF+RA5Q==
-Date: Mon, 19 May 2025 15:08:54 +0100
+	b=UuwiVYBOmT0r42eJ2BqI4kUGWbraux+H8fHr1YvAZeA9N9XwhGUYwmIXillv60Ih9
+	 /kCS7UbncUQhT1kEgfPVltZdCiGO4EanQSEKr8vci8xkPu27AYe1tHnGn0g6pHiVRi
+	 4N3l359n5U3jgumzYPeuR5rRhukDobMO2WzWpCRDMJUhT87QF8K7EJJe0lQ8kMu1X/
+	 5eqDmq7Q0tRQuOm7M3bogWphHNV/480ddeGJLnGUXZifEC24lUKmPMAzMUn22R7wr7
+	 IZ8UWdYDSsMQlvY/GZFu9phFXmpLAj7fz8By3/nS93KPzpNrJkpwxddkt66syizpKC
+	 SfoWiaf3/nmPA==
+Date: Mon, 19 May 2025 15:11:11 +0100
 From: Will Deacon <will@kernel.org>
 To: "Rob Herring (Arm)" <robh@kernel.org>
 Cc: Mark Rutland <mark.rutland@arm.com>,
@@ -40,12 +40,12 @@ Cc: Mark Rutland <mark.rutland@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org,
 	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v21 1/4] arm64/sysreg: Add BRBE registers and fields
-Message-ID: <20250519140852.GB16991@willie-the-truck>
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v21 3/4] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
+Message-ID: <20250519141106.GC16991@willie-the-truck>
 References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
- <20250407-arm-brbe-v19-v21-1-ff187ff6c928@kernel.org>
+ <20250407-arm-brbe-v19-v21-3-ff187ff6c928@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,36 +54,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250407-arm-brbe-v19-v21-1-ff187ff6c928@kernel.org>
+In-Reply-To: <20250407-arm-brbe-v19-v21-3-ff187ff6c928@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, Apr 07, 2025 at 12:41:30PM -0500, Rob Herring (Arm) wrote:
+On Mon, Apr 07, 2025 at 12:41:32PM -0500, Rob Herring (Arm) wrote:
 > From: Anshuman Khandual <anshuman.khandual@arm.com>
 > 
-> This patch adds definitions related to the Branch Record Buffer Extension
-> (BRBE) as per ARM DDI 0487K.a. These will be used by KVM and a BRBE driver
-> in subsequent patches.
+> While BRBE can record branches within guests, the host recording
+> branches in guests is not supported by perf (though events are).
+> Support for BRBE in guests will supported by providing direct access
+> to BRBE within the guests. That is how x86 LBR works for guests.
+> Therefore, BRBE needs to be disabled on guest entry and restored on
+> exit.
 > 
-> Some existing BRBE definitions in asm/sysreg.h are replaced with equivalent
-> generated definitions.
+> For nVHE, this requires explicit handling for guests. Before
+> entering a guest, save the BRBE state and disable the it. When
+> returning to the host, restore the state.
 > 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
+> For VHE, it is not necessary. We initialize
+> BRBCR_EL1.{E1BRE,E0BRE}=={0,0} at boot time, and HCR_EL2.TGE==1 while
+> running in the host. We configure BRBCR_EL2.{E2BRE,E0HBRE} to enable
+> branch recording in the host. When entering the guest, we set
+> HCR_EL2.TGE==0 which means BRBCR_EL1 is used instead of BRBCR_EL2.
+> Consequently for VHE, BRBE recording is disabled at EL1 and EL0 when
+> running a guest.
+> 
+> Should recording in guests (by the host) ever be desired, the perf ABI
+> will need to be extended to distinguish guest addresses (struct
+> perf_branch_entry.priv) for starters. BRBE records would also need to be
+> invalidated on guest entry/exit as guest/host EL1 and EL0 records can't
+> be distinguished.
+> 
 > Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: "Rob Herring (Arm)" <robh@kernel.org>
+> Co-developed-by: Rob Herring (Arm) <robh@kernel.org>
 > Tested-by: James Clark <james.clark@linaro.org>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 > ---
+> v20:
+>  - Reword commit message about no guest recording.
+>  - Add BRBE to __kvm_vcpu_run() synchronization comment
+> 
 > v19:
-> - split BRBINF.CC field into mantissa and exponent
+>  - Rework due to v6.14 debug flag changes
+>  - Redo commit message
 > ---
->  arch/arm64/include/asm/sysreg.h |  17 ++----
->  arch/arm64/tools/sysreg         | 132 ++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 138 insertions(+), 11 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h  |  2 ++
+>  arch/arm64/kvm/debug.c             |  4 ++++
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 32 ++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
+>  4 files changed, 39 insertions(+), 1 deletion(-)
 
-Some of the field names here are made up, but overall they seem to
-correspond to the architecture, so:
-
-Acked-by: Will Deacon <will@kernel.org>
+This one also needs reviewing from the KVM/arm64 side...
 
 Will
