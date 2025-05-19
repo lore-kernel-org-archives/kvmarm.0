@@ -1,240 +1,271 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9015D21D59B
-	for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 18:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A532321171D;
+	Mon, 19 May 2025 19:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747680942; cv=none; b=cAQt7piA5EUN9urEvA426L8rqivt4AM4JkGY9kRzh9ym1bwepFAkIkr2rC5vdxwjwGEM741mBadGJIlWqevN2SsUUAX79BO+3AdpEgBXYOIr5KWwfry1oBdVtpH+hpKDcUiyv6bsS6TMspTX5tidhNXaSLRJpujnhgy8J96GCko=
+	t=1747683078; cv=none; b=Rbs4/LkuJDXX+gbflZ7x9l6dVru4zUx6efrIzBnkX8UF2vT7iuhWc6BqjVq3UOnaqzQUj4A9TLfz9W5gk5cU5vIvMdDII+UZ9tPTDHR2Z+82Ll0XP9oeW1vJ7Vt714+JZRYGH8I/mhob0+LZWinf3OhPXKBOcJgyKOBVEvdVimo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747680942; c=relaxed/simple;
-	bh=aQcu4y4UtLWz9/5R61mPVfQF3kh3SVAwkRKMIhfaWQo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L2rBk/4i5k6Ubf229N1hRd1ULU4Fp+EUbLkVLBMEIDNPaqN5bYhKxmlsni3iXEx3NBGNfQ6G8CUMA1djL2yDtT9wG4SczWMKeb5lYMX7NbVRYAF7LbygBXnQDEwAMQdd8LhEhipDckYe4J86J1SFkdpAH9W24/MQlDM7BTfbRaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jdsDyoUF; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1747683078; c=relaxed/simple;
+	bh=gNg/DaGQnuA//ujvR2i1hxwQU/CrZUxguVa5vf6EakQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FOliP20VD/hVL6vXsGtjtGcePQKTibFp7b0nV+g1MiFTmgAs3k9ZegDvNSuHfJ223dY0JJ1n+ygJe2eINhTQzkvgFlvG3oWt8bGkd2O3lwnq6SmwprcMp5amu5X1ZXiN/od7gWPDqvSvvw+EkQ3p9ftiGiKEjASvPIzIN3Y11Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4IBLEQs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jdsDyoUF"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-23206c06d29so13013415ad.0
-        for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 11:55:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747680940; x=1748285740; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=epd5QhukG4RMUXX9jB19LOAHKrcbjUAqfegEAiRpQQ4=;
-        b=jdsDyoUF5TxI7f8opTZvr2z2BhbXZLguQjyqrdHCsOau0NNOvGPXwJWpak47K5fX5x
-         9XyynoDvOaUcMOCIfIcYgIx6FHyLbBcU1r9qqRKyjBYc/pdV1rsyY1p9EWvO7ZxQmgGC
-         9THGf4tLhhZPYVNwgIK3+/0cgb6caoWySCiSHjs1Wtxo0T/7FhrvZuzHWO+99/S2bj/P
-         OdBc1N4BqnyKyMvv3WKEKxa42cjgMAi76J3OGqTE5C9gNVMTqrA6u5Fy3acV5OugMS3n
-         kTo9bMe5Gj6oG/TFiuD0NY0OPRuMXm9q7L71xR9zertwAOLPCAZ5jSlk9d450CUdpdHG
-         KJ6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747680940; x=1748285740;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=epd5QhukG4RMUXX9jB19LOAHKrcbjUAqfegEAiRpQQ4=;
-        b=W3tUZ0ofIFEQdgD0e8O3vCKpFD5N3jAmu6LIHlZBBpuFPuWLc5O3pUrwkyovKrlzaz
-         t2h08Wddau1Z9nF0sZwSRl/rGKU3MbIqiNscUbXZCO6uXexcAyk9jtrIz6Q3qVqCLNax
-         QgZw9969aBixsXWVLPgk5iCcAAs1eln/Un6v6B1s3iVAIQQml4Wqg2pie+6EVVyGK3on
-         +ct2X4pnmgRvnJ4pfUq8jrtAxK2lF3EJIEY7JIquJtU246bydndlTweA63CtXGU1hGuZ
-         BHO+/0x1qVUFfpCTFIdxqzfUTcjOKMRwtz6E53hTO965zNHaM1xLykrJb51kmoDOG80h
-         Q7xw==
-X-Forwarded-Encrypted: i=1; AJvYcCV+r4NJotCeSmGjff8AmFCtBJGJhQoqU3HeCPvutR6npOjzcTtQzha7FFN1NJ/RTGvv9durGJs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzPpQFFg3eelg4Pjrusppg/v84fPf0f/NA5bwCaIMCd+mo8yWdc
-	4zWQml0bd6M2eWWrHD5cF1MOFqC0votygYaSAJ4Odusn5a5GwXu1RXKF9g09CVAVdlQOTTFgEN6
-	4Z0wVRA==
-X-Google-Smtp-Source: AGHT+IGBgkTOOJjqrOCr7f/TpoYr6FJS7i8wklMdXOmCklTJv4b98ohj2f5O8xsS1rt/iLaAKTKHNpn9mBQ=
-X-Received: from pjbdy14.prod.google.com ([2002:a17:90b:6ce:b0:2fc:1356:bcc3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33c2:b0:2fe:afa7:eaf8
- with SMTP id 98e67ed59e1d1-30e7d50b040mr21142830a91.13.1747680939950; Mon, 19
- May 2025 11:55:39 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 19 May 2025 11:55:14 -0700
-In-Reply-To: <20250519185514.2678456-1-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4IBLEQs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB437C4CEE4;
+	Mon, 19 May 2025 19:31:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747683078;
+	bh=gNg/DaGQnuA//ujvR2i1hxwQU/CrZUxguVa5vf6EakQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=M4IBLEQs1j7rqqlJMrer+R9eK8Uu3wPF+8htwN6MfYqavo8fsdG+TXKGawl6qgll5
+	 Xpvk34Sp9b7SEw4th06cWm2bmnLa13ffJ27fy+ghspt2o0WcFg2l8TQcATKoz+TwOQ
+	 jWE1aurFQNUwWjz7BNJG/vizT7BUJFIdovfI1e3IOiRqAQ7Unb8KiGZl2RkPop2qVU
+	 PVq1+vpoI7HR2+ywAgau9Lr57jXx7He1nii4IIrpwI1BtK7lSHtrRlP6OZrZx7I2Te
+	 E2Z7oiA5zZelFCeZ7xmX6xLkC2JP+CDAb3IXmvUDj3qi60rFFsVtw5jK+atauATUAk
+	 2zyk+YDbKYeUA==
+Date: Mon, 19 May 2025 14:31:16 -0500
+From: Rob Herring <robh@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v21 2/4] arm64: Handle BRBE booting requirements
+Message-ID: <20250519193116.GA2650608-robh@kernel.org>
+References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
+ <20250407-arm-brbe-v19-v21-2-ff187ff6c928@kernel.org>
+ <20250519140713.GA16991@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250519185514.2678456-1-seanjc@google.com>
-X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <20250519185514.2678456-13-seanjc@google.com>
-Subject: [PATCH v2 12/12] KVM: selftests: Add a KVM_IRQFD test to verify
- uniqueness requirements
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	K Prateek Nayak <kprateek.nayak@amd.com>, David Matlack <dmatlack@google.com>, 
-	Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250519140713.GA16991@willie-the-truck>
 
-Add a selftest to verify that eventfd+irqfd bindings are globally unique,
-i.e. that KVM doesn't allow multiple irqfds to bind to a single eventfd,
-even across VMs.
+On Mon, May 19, 2025 at 03:07:15PM +0100, Will Deacon wrote:
+> On Mon, Apr 07, 2025 at 12:41:31PM -0500, Rob Herring (Arm) wrote:
+> > From: Anshuman Khandual <anshuman.khandual@arm.com>
+> > 
+> > To use the Branch Record Buffer Extension (BRBE), some configuration is
+> > necessary at EL3 and EL2. This patch documents the requirements and adds
+> > the initial EL2 setup code, which largely consists of configuring the
+> > fine-grained traps and initializing a couple of BRBE control registers.
+> > 
+> > Before this patch, __init_el2_fgt() would initialize HDFGRTR_EL2 and
+> > HDFGWTR_EL2 with the same value, relying on the read/write trap controls
+> > for a register occupying the same bit position in either register. The
+> > 'nBRBIDR' trap control only exists in bit 59 of HDFGRTR_EL2, while bit
+> > 59 of HDFGWTR_EL2 is RES0, and so this assumption no longer holds.
+> > 
+> > To handle HDFGRTR_EL2 and HDFGWTR_EL2 having (slightly) different bit
+> > layouts, __init_el2_fgt() is changed to accumulate the HDFGRTR_EL2 and
+> > HDFGWTR_EL2 control bits separately. While making this change the
+> > open-coded value (1 << 62) is replaced with
+> > HDFG{R,W}TR_EL2_nPMSNEVFR_EL1_MASK.
+> > 
+> > The BRBCR_EL1 and BRBCR_EL2 registers are unusual and require special
+> > initialisation: even though they are subject to E2H renaming, both have
+> > an effect regardless of HCR_EL2.TGE, even when running at EL2, and
+> > consequently both need to be initialised. This is handled in
+> > __init_el2_brbe() with a comment to explain the situation.
+> > 
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Oliver Upton <oliver.upton@linux.dev>
+> > Reviewed-by: Leo Yan <leo.yan@arm.com>
+> > Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> > [Mark: rewrite commit message, fix typo in comment]
+> > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> > Signed-off-by: "Rob Herring (Arm)" <robh@kernel.org>
+> > Tested-by: James Clark <james.clark@linaro.org>
+> > ---
+> > v20:
+> >  - Document that MDCR_EL3.SBRBE can be 0b01 also
+> >  - Fix "HDFGWTR_EL2 is RES0" in commit msg
+> > ---
+> >  Documentation/arch/arm64/booting.rst | 21 +++++++++
+> >  arch/arm64/include/asm/el2_setup.h   | 86 ++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 104 insertions(+), 3 deletions(-)
+> 
+> It would be good to have an Ack from the kvm/arm64 side on this, but in
+> the meantime I've left some comments inline.
+> 
+> > diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+> > index dee7b6de864f..a627c1e0e4a0 100644
+> > --- a/Documentation/arch/arm64/booting.rst
+> > +++ b/Documentation/arch/arm64/booting.rst
+> > @@ -358,6 +358,27 @@ Before jumping into the kernel, the following conditions must be met:
+> >  
+> >      - HWFGWTR_EL2.nSMPRI_EL1 (bit 54) must be initialised to 0b01.
+> >  
+> > +  For CPUs with feature Branch Record Buffer Extension (FEAT_BRBE):
+> 
+> This doesn't make sense ^^^
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm |   1 +
- tools/testing/selftests/kvm/irqfd_test.c | 130 +++++++++++++++++++++++
- 2 files changed, 131 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/irqfd_test.c
+You mean it should be "with the Branch Record Buffer Extension feature" 
+instead?
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 307ef31d3557..d118b86f6acf 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -55,6 +55,7 @@ TEST_PROGS_x86 += x86/nx_huge_pages_test.sh
- TEST_GEN_PROGS_COMMON = demand_paging_test
- TEST_GEN_PROGS_COMMON += dirty_log_test
- TEST_GEN_PROGS_COMMON += guest_print_test
-+TEST_GEN_PROGS_COMMON += irqfd_test
- TEST_GEN_PROGS_COMMON += kvm_binary_stats_test
- TEST_GEN_PROGS_COMMON += kvm_create_max_vcpus
- TEST_GEN_PROGS_COMMON += kvm_page_table_test
-diff --git a/tools/testing/selftests/kvm/irqfd_test.c b/tools/testing/selftests/kvm/irqfd_test.c
-new file mode 100644
-index 000000000000..286f2b15fde6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/irqfd_test.c
-@@ -0,0 +1,130 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <errno.h>
-+#include <pthread.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <stdint.h>
-+#include <sys/sysinfo.h>
-+
-+#include "kvm_util.h"
-+
-+static struct kvm_vm *vm1;
-+static struct kvm_vm *vm2;
-+static int __eventfd;
-+static bool done;
-+
-+/*
-+ * KVM de-assigns based on eventfd *and* GSI, but requires unique eventfds when
-+ * assigning (the API isn't symmetrical).  Abuse the oddity and use a per-task
-+ * GSI base to avoid false failures due to cross-task de-assign, i.e. so that
-+ * the secondary doesn't de-assign the primary's eventfd and cause assign to
-+ * unexpectedly succeed on the primary.
-+ */
-+#define GSI_BASE_PRIMARY	0x20
-+#define GSI_BASE_SECONDARY	0x30
-+
-+static void juggle_eventfd_secondary(struct kvm_vm *vm, int eventfd)
-+{
-+	int r, i;
-+
-+	/*
-+	 * The secondary task can encounter EBADF since the primary can close
-+	 * the eventfd at any time.  And because the primary can recreate the
-+	 * eventfd, at the safe fd in the file table, the secondary can also
-+	 * encounter "unexpected" success, e.g. if the close+recreate happens
-+	 * between the first and second assignments.  The secondary's role is
-+	 * mostly to antagonize KVM, not to detect bugs.
-+	 */
-+	for (i = 0; i < 2; i++) {
-+		r = __kvm_irqfd(vm, GSI_BASE_SECONDARY, eventfd, 0);
-+		TEST_ASSERT(!r || errno == EBUSY || errno == EBADF,
-+			    "Wanted success, EBUSY, or EBADF, r = %d, errno = %d",
-+			    r, errno);
-+
-+		/* De-assign should succeed unless the eventfd was closed. */
-+		r = __kvm_irqfd(vm, GSI_BASE_SECONDARY + i, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+		TEST_ASSERT(!r || errno == EBADF,
-+			    "De-assign should succeed unless the fd was closed");
-+	}
-+}
-+
-+static void *secondary_irqfd_juggler(void *ign)
-+{
-+	while (!READ_ONCE(done)) {
-+		juggle_eventfd_secondary(vm1, READ_ONCE(__eventfd));
-+		juggle_eventfd_secondary(vm2, READ_ONCE(__eventfd));
-+	}
-+
-+	return NULL;
-+}
-+
-+static void juggle_eventfd_primary(struct kvm_vm *vm, int eventfd)
-+{
-+	int r1, r2;
-+
-+	/*
-+	 * At least one of the assigns should fail.  KVM disallows assigning a
-+	 * single eventfd to multiple GSIs (or VMs), so it's possible that both
-+	 * assignments can fail, too.
-+	 */
-+	r1 = __kvm_irqfd(vm, GSI_BASE_PRIMARY, eventfd, 0);
-+	TEST_ASSERT(!r1 || errno == EBUSY,
-+		    "Wanted success or EBUSY, r = %d, errno = %d", r1, errno);
-+
-+	r2 = __kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, 0);
-+	TEST_ASSERT(r1 || (r2 && errno == EBUSY),
-+		    "Wanted failure (EBUSY), r1 = %d, r2 = %d, errno = %d",
-+		    r1, r2, errno);
-+
-+	/*
-+	 * De-assign should always succeed, even if the corresponding assign
-+	 * failed.
-+	 */
-+	kvm_irqfd(vm, GSI_BASE_PRIMARY, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	pthread_t racing_thread;
-+	int r, i;
-+
-+	/* Create "full" VMs, as KVM_IRQFD requires an in-kernel IRQ chip. */
-+	vm1 = vm_create(1);
-+	vm2 = vm_create(1);
-+
-+	WRITE_ONCE(__eventfd, kvm_new_eventfd());
-+
-+	kvm_irqfd(vm1, 10, __eventfd, 0);
-+
-+	r = __kvm_irqfd(vm1, 11, __eventfd, 0);
-+	TEST_ASSERT(r && errno == EBUSY,
-+		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
-+
-+	r = __kvm_irqfd(vm2, 12, __eventfd, 0);
-+	TEST_ASSERT(r && errno == EBUSY,
-+		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
-+
-+	kvm_irqfd(vm1, 11, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 12, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 13, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 14, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+	kvm_irqfd(vm1, 10, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
-+
-+	close(__eventfd);
-+
-+	pthread_create(&racing_thread, NULL, secondary_irqfd_juggler, vm2);
-+
-+	for (i = 0; i < 10000; i++) {
-+		WRITE_ONCE(__eventfd, kvm_new_eventfd());
-+
-+		juggle_eventfd_primary(vm1, __eventfd);
-+		juggle_eventfd_primary(vm2, __eventfd);
-+		close(__eventfd);
-+	}
-+
-+	WRITE_ONCE(done, true);
-+	pthread_join(racing_thread, NULL);
-+}
--- 
-2.49.0.1101.gccaa498523-goog
+> 
+> > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> > index ebceaae3c749..e7fcba1e7d8e 100644
+> > --- a/arch/arm64/include/asm/el2_setup.h
+> > +++ b/arch/arm64/include/asm/el2_setup.h
+> > @@ -189,6 +189,39 @@
+> >  .Lskip_set_cptr_\@:
+> >  .endm
+> >  
+> > +/*
+> > + * Configure BRBE to permit recording cycle counts and branch mispredicts.
+> > + *
+> > + * At any EL, to record cycle counts BRBE requires that both BRBCR_EL2.CC=1 and
+> > + * BRBCR_EL1.CC=1.
+> > + *
+> > + * At any EL, to record branch mispredicts BRBE requires that both
+> > + * BRBCR_EL2.MPRED=1 and BRBCR_EL1.MPRED=1.
+> > + *
+> > + * When HCR_EL2.E2H=1, the BRBCR_EL1 encoding is redirected to BRBCR_EL2, but
+> > + * the {CC,MPRED} bits in the real BRBCR_EL1 register still apply.
+> > + *
+> > + * Set {CC,MPRED} in both BRBCR_EL2 and BRBCR_EL1 so that at runtime we only
+> > + * need to enable/disable these in BRBCR_EL1 regardless of whether the kernel
+> > + * ends up executing in EL1 or EL2.
+> > + */
+> > +.macro __init_el2_brbe
+> > +	mrs	x1, id_aa64dfr0_el1
+> > +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
+> > +	cbz	x1, .Lskip_brbe_\@
+> > +
+> > +	mov_q	x0, BRBCR_ELx_CC | BRBCR_ELx_MPRED
+> > +	msr_s	SYS_BRBCR_EL2, x0
+> > +
+> > +	__check_hvhe .Lset_brbe_nvhe_\@, x1
+> > +	msr_s	SYS_BRBCR_EL12, x0	// VHE
+> > +	b	.Lskip_brbe_\@
+> > +
+> > +.Lset_brbe_nvhe_\@:
+> > +	msr_s	SYS_BRBCR_EL1, x0	// NVHE
+> > +.Lskip_brbe_\@:
+> 
+> Why do we have to poke BRBCR_EL12/BRBCR_EL1 here rather than in the BRBE
+> driver code?
 
+Yeah, I think we can drop this. Originally, the driver did not touch 
+SYS_BRBCR_EL12, but it turns out we need to for freeze on overflow to 
+work correctly with VHE (see the comment in the driver for 
+SYS_BRBCR_EL12 access).
+
+The only other reason I can come up with is some fields reset to UNKNOWN 
+and there may be no driver. However, the important ones, ExBRE, reset to 
+0, so we should be fine.
+
+
+> > +.endm
+> > +
+> >  /* Disable any fine grained traps */
+> >  .macro __init_el2_fgt
+> >  	mrs	x1, id_aa64mmfr0_el1
+> > @@ -196,16 +229,48 @@
+> >  	cbz	x1, .Lskip_fgt_\@
+> >  
+> >  	mov	x0, xzr
+> > +	mov	x2, xzr
+> >  	mrs	x1, id_aa64dfr0_el1
+> >  	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMSVer_SHIFT, #4
+> >  	cmp	x1, #3
+> >  	b.lt	.Lskip_spe_fgt_\@
+> > +
+> >  	/* Disable PMSNEVFR_EL1 read and write traps */
+> > -	orr	x0, x0, #(1 << 62)
+> > +	orr	x0, x0, #HDFGRTR_EL2_nPMSNEVFR_EL1_MASK
+> > +	orr	x2, x2, #HDFGWTR_EL2_nPMSNEVFR_EL1_MASK
+> >  
+> >  .Lskip_spe_fgt_\@:
+> > +#ifdef CONFIG_ARM64_BRBE
+> 
+> Why is this gated on CONFIG_ARM64_BRBE?
+
+Shrug. We don't do that anywhere else, so I'll drop it.
+
+> > +	mrs	x1, id_aa64dfr0_el1
+> > +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
+> > +	cbz	x1, .Lskip_brbe_reg_fgt_\@
+> > +
+> > +	/*
+> > +	 * Disable read traps for the following registers
+> > +	 *
+> > +	 * [BRBSRC|BRBTGT|RBINF]_EL1
+> > +	 * [BRBSRCINJ|BRBTGTINJ|BRBINFINJ|BRBTS]_EL1
+> > +	 */
+> > +	orr	x0, x0, #HDFGRTR_EL2_nBRBDATA_MASK
+> > +
+> > +	/*
+> > +	 * Disable write traps for the following registers
+> > +	 *
+> > +	 * [BRBSRCINJ|BRBTGTINJ|BRBINFINJ|BRBTS]_EL1
+> > +	 */
+> > +	orr	x2, x2, #HDFGWTR_EL2_nBRBDATA_MASK
+> > +
+> > +	/* Disable read and write traps for [BRBCR|BRBFCR]_EL1 */
+> > +	orr	x0, x0, #HDFGRTR_EL2_nBRBCTL_MASK
+> > +	orr	x2, x2, #HDFGWTR_EL2_nBRBCTL_MASK
+> > +
+> > +	/* Disable read traps for BRBIDR_EL1 */
+> > +	orr	x0, x0, #HDFGRTR_EL2_nBRBIDR_MASK
+> > +
+> > +.Lskip_brbe_reg_fgt_\@:
+> 
+> I think this label should become .Lset_debug_fgt_\@:. That way, we have
+> a clear point at which we're done with HDFG*TR_EL2. We can zero x0 and
+> x2 and from then on we can focus on HFG*TR + HFGITR.
+> 
+> nit: the existing .Lskip_debug_fgt_\@ label looks to be misnamed -- it
+> should probably be .Lskip_sme_fgt_\@ ?
+> 
+> > +#endif /* CONFIG_ARM64_BRBE */
+> >  	msr_s	SYS_HDFGRTR_EL2, x0
+> > -	msr_s	SYS_HDFGWTR_EL2, x0
+> > +	msr_s	SYS_HDFGWTR_EL2, x2
+> 
+> nit: It would be cleaner to use x0/x1 for the pair of trap registers
+> but I can see that would be a more invasive change.
+
+That would not be worth the churn IMO. We'd want to just swap x1 and x2 
+everywhere so we consistently use x2 for ID registers. 
+
+And then I'd be to blame for *all* this wonderful code. ;)
+
+> 
+> >  	mov	x0, xzr
+> >  	mrs	x1, id_aa64pfr1_el1
+> > @@ -246,7 +311,21 @@
+> >  .Lset_fgt_\@:
+> >  	msr_s	SYS_HFGRTR_EL2, x0
+> >  	msr_s	SYS_HFGWTR_EL2, x0
+> > -	msr_s	SYS_HFGITR_EL2, xzr
+> > +	mov	x0, xzr
+> > +#ifdef CONFIG_ARM64_BRBE
+> > +	mrs	x1, id_aa64dfr0_el1
+> > +	ubfx	x1, x1, #ID_AA64DFR0_EL1_BRBE_SHIFT, #4
+> > +	cbz	x1, .Lskip_brbe_insn_fgt_\@
+> 
+> It would probably scale better if we unconditionally stick x2 in
+> HFGITR_EL2 and zero that register in '.Lset_debug_fgt_\@'. We still have
+> two checks for BRBE, but at least '.Lset_fgt_\@' could just stick to
+> writing the registers.
+
+All that looks doable.
+
+Rob
