@@ -1,71 +1,64 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31ACB26982C
-	for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 08:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043222698BC
+	for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 08:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747642432; cv=none; b=RhIskCwC0BHa1IEc254N7J3naztfP/GNzARiJH0tmjUgZDqgn8MayesKcJeEH5ceVAdxay4CIzN333rD+QpdSUTbk8rkRdnWAr3YkNwa/l9CWiI2yQP7kSgZtjMPVvDs6ZGtkvCj0OkmNWBulPKL0YKprQB94aslAiXRGLSX7Qw=
+	t=1747642617; cv=none; b=qHeXWurkWWWF5YZw2lX2TZsFiV//PE9JoVboHtEIsuBICLwD8diFI3hDDK9uMQLW2AoTa8XF4vXN1IBihWhdpzaT//I8cXsCZW58pcIEOm1UihlIC9QOi8M9vyGvIc13Rfq3QH8nQX2dQ3+trTfyPLfxLfn1tFE9hEKupc5iDBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747642432; c=relaxed/simple;
-	bh=Eu3W+hohQyyMEX725mTcqUwWoPBTenrR9qpK8mDWlr8=;
+	s=arc-20240116; t=1747642617; c=relaxed/simple;
+	bh=H8ajxtmiTCjvOOIE2ApRVZ9momS0HTXG8Sy481IZrjo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TUUy0MCXJXZi1aL9wYcKOBSOFFEX0z3GvTbqneCZxBtxz26oa7x6NB7YimSEplBJpsNuWO1ePI53sWRUMQyd5MQM88GXuvDdjXkCAB+jRF3utT2MuckjUR2sRlbvFxlBfCU7mSuR+PjkC0pGDzFdmLSrSOvI0mJBrlTcFVlkQhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S55i6/Eg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 In-Reply-To:Content-Type; b=vFu52lGpZZonOMcGPQDZbc3f/HJG9FXuwdC/iSQqGMpNPyqIlWNv9e4cOL2lxDzMgWemScKXVjic9r8X0LOTgObu1ifDtYuJP7GXUkTHZLZlTxlzeqb7TtbsrCoB2Ik744fepHZCTbwODJBOvqQMTW+yo6QO6I13RoWeQza1fuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F0rJboDJ; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S55i6/Eg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747642430;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=81MSjO1sHE2YfuqWDok69M/T/8z7rZ6g9u0DZWkIwK4=;
-	b=S55i6/EgY/wztwyXBTrLyszqyicv050CD7UqZxWX1qghacuQMcodbUyt7ciWUAWfPcrtI5
-	iQCcfq28Fc2DvenJBh4KUmO8s9hh7Nl75i6AAr1/zPA3Gz4pgxBiw2Y10JH0waeDKvdv3w
-	GPTYup47bQO7rwdnenC4dpUkc1soal8=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-27-VvkHpWu0PES60c9cGyre9Q-1; Mon, 19 May 2025 04:13:48 -0400
-X-MC-Unique: VvkHpWu0PES60c9cGyre9Q-1
-X-Mimecast-MFC-AGG-ID: VvkHpWu0PES60c9cGyre9Q_1747642427
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-7401179b06fso3261900b3a.1
-        for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 01:13:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F0rJboDJ"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a3673e12c4so906760f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 19 May 2025 01:16:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1747642613; x=1748247413; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kUL9QUi3QxO33JzaB+qq5zCH3BOr2BvD/SOLCCy++Kg=;
+        b=F0rJboDJ/bBsdLAtsHMNfyrwvIc077ECYUFMi+DIqZBMyl9b0V1rmbf8w64E7p6Nrt
+         HWlJ9h+zrnIN+ZeCudDyAC4QTq2ckvgue5UbqmsY4cPYnvyY1Qz75XSGJu/shY/sCkH2
+         30cd22dS/d9VXhunXslPHEi+C0hJdCrH0RzSKNjLTlpGnVSvUnUDDdtxQQWygenky7jt
+         J+gYtZ0zatBSwpURLcAOUrLNKzbHacGH7gzo4Nqtg31Tt/KNEgFvTyLA6bcOWzhIheJo
+         j+BogC9nzJJ0FMYOjISpbEPlQCahr7JJDBKJug72y42MvOqHtPY20ooxKu5A3ez9ssXa
+         lNtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747642427; x=1748247227;
+        d=1e100.net; s=20230601; t=1747642613; x=1748247413;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=81MSjO1sHE2YfuqWDok69M/T/8z7rZ6g9u0DZWkIwK4=;
-        b=fznRVUxQU4Krrf/T5VnwIE9ZDCTSL2obDcnqOKVFhwCD2Af1b7ZXQLuDVYyzlOZfEE
-         ytiEFQNlCJNcpdtw00QXkpua6fWnqV/1XjeLVz7ryROWzAd9O2+htOluEgtEk9u+shBX
-         sxu4Qir2vruwnVRcJnPnJxMPxTdpC9A/Sn0IEwAPqerUKSopgshIj/0Wx3ffF/4KpAlL
-         lIEwv7A7qvECKXhAkcDITK/FyqXSQGGTboOqo0pPycCUV/tQuT+P7VWcJ5RIXLzwoCfV
-         rK9vN4aSZP7v3wNSSmkkGg7midxXkKA5cHJJiQm3PwIdjhRD9MeeRqVdtaHbNLWlcOql
-         m+IA==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ8Ux9SoDJLu+6jFkV3BGH9CRTtlWqmURqyzWuDDlSDlGXBVl9hiaqrafer4pvfDp52PaIGxs=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy4f9htt96UumM/es5XkvYCKqsZllFghaoI+mV73oiA0Hr0oopP
-	9ICLhVYeIkWpCnG1ErvvbogCwDcCtPo196JwRlaL0clI7PqLqzzAPvgkgjYUkfZbVJ9FJfCeLZF
-	mFeswWPGGSuqO4Y4EdQ5KPsetECsV8O6u71esPsVTHUxfI4LTTUPPpO4yzw==
-X-Gm-Gg: ASbGncvuEWCH1VWyc2BdhPNL8/Z6UiNVNDwWdalJf8myDDOtSJGK3bZHa950ituv5Z7
-	15eKw78/9omUbnoZ9dPDCbd8DjvuUDbHxfxlme3YbV4RZflmcv9nuzYHHhoz1xMTWtpJES4ghY+
-	00V+3lpEkRBUiodqr0AO0aM0sARrPtTxgkVaB1aIYEMfOnDeEB1pCA0z+GB4yEhBLth2C4F387U
-	HLKxlzhxBHqj5t/hF0HRDUPE/y5opU+TE083VjiNvDgxCBQpjZc5dUpEsNJ3WURhHIEux0BH62D
-	faisK18HyHCduZ2J
-X-Received: by 2002:a05:6a21:7e86:b0:218:bbb:c13d with SMTP id adf61e73a8af0-2180bbbc1b0mr13502997637.13.1747642427008;
-        Mon, 19 May 2025 01:13:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFKS9dBCdoBJSd2fsnxqZtqXXkuCdfx1TMqH+JdIVWuZzC6jtmWsd4CbKxNWoE3TDYRsqvBDg==
-X-Received: by 2002:a05:6a21:7e86:b0:218:bbb:c13d with SMTP id adf61e73a8af0-2180bbbc1b0mr13502979637.13.1747642426697;
-        Mon, 19 May 2025 01:13:46 -0700 (PDT)
-Received: from [10.72.116.146] ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a970b9c7sm5585368b3a.48.2025.05.19.01.13.37
+        bh=kUL9QUi3QxO33JzaB+qq5zCH3BOr2BvD/SOLCCy++Kg=;
+        b=RrMPrFJmEvdad2sZ/VCcTSfNvTcLv01hxSU7iQtxO+JdzTT9ElWfNSCfGzz7iHfDNq
+         ggZIEbiuyjRhYHWg7NBmYAi1AtmlATojnQkW/9pYQqL8vsL4dWQS1Dywg1SK7ZxPubiu
+         Cu7Q9wG05FgXo48b+AvwvrWGqPDjetyqY7FXSRhZ3zSWApyhmqwvIK22dGBLwiBOTAuF
+         urgEctvwKtClYZu+oDTlV6Cm0XY114jlzQ00iHgc56wlKlqEZuyjKyZRyMX+1YWLHbwo
+         oTw42ZFa25kctlgYvc6GYQrujGEyAWV5TpKcx8aeVpjmXvxyUA3b7mwlpuF0hayF+fTH
+         FlkA==
+X-Forwarded-Encrypted: i=1; AJvYcCX7pZdG3mYjUJ4vwjgJThtqvJk0q1YX8L+PhPg9CK5WHaatf7CEUXKidG8Dh9MgB/jDuizjwPw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyLSxIUF4uCYjMo1vLzmvUBYGUIYwHz5ISxARvBC/oZg5JTXiz4
+	NUk0KX9+nK+01nJ2GUCTL990fOeszf4bGk09bsrux20ny1Gmyy5jhhBa/EKte3c+Zf8=
+X-Gm-Gg: ASbGnctR9mfaBLaPL2Jbl6VMFF4X1RVyQbBu/6Y1Y8NsVXE7imF9/mR8Yumeow55NTK
+	URImMEwjMcp2YTFX+X3WrF8tIHWoNPYqPkWTJuVSuwvm6m2FlplIaXKQmA9XDxaNTovhkl7j9Nb
+	G2xs1vj61E4ko3Lh9PlgNcQk9cfHDmarChiPafsiBCNXRMtPqbgTEkkazkncjF0DF1nym+UnbRP
+	UMt84Stxsvih2fJGikntIOlgE72PTOze20zq4NyUOOgDUh6+fgHkPRzE1oR6AidvungWkpDzjeu
+	oo19Jx7OimFX8DGhyyn/WwmX79LmuPa/OFatBzqDnArwJSM/m4Q0Jdvt
+X-Google-Smtp-Source: AGHT+IHSO1KA4bNQxfQbc4te6baDy9fxE6Gyb6malS9UHm7L4qyXIFr1J9YNRKOGPiR0u203LvVC6Q==
+X-Received: by 2002:a05:6000:2911:b0:3a3:6bc1:f1e7 with SMTP id ffacd0b85a97d-3a36bc1f466mr3082730f8f.52.1747642613267;
+        Mon, 19 May 2025 01:16:53 -0700 (PDT)
+Received: from [192.168.1.3] ([37.18.136.128])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442fd4a0a5dsm132048605e9.0.2025.05.19.01.16.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 May 2025 01:13:46 -0700 (PDT)
-Message-ID: <e90c3221-4a31-4c53-afb9-c2fcf09ae358@redhat.com>
-Date: Mon, 19 May 2025 16:13:35 +0800
+        Mon, 19 May 2025 01:16:52 -0700 (PDT)
+Message-ID: <8518b861-326d-472f-b6ff-3cda41517587@linaro.org>
+Date: Mon, 19 May 2025 09:16:50 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,78 +66,96 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 11/16] scripts: Add KVMTOOL environment
- variable for kvmtool binary path
-To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
- eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
- frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
- david@redhat.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com,
- maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
-References: <20250507151256.167769-1-alexandru.elisei@arm.com>
- <20250507151256.167769-12-alexandru.elisei@arm.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20250507151256.167769-12-alexandru.elisei@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: zltKVQzqluhdYQQPFrjIG6ravj_CcGQlPkEcXNzh-yU_1747642427
-X-Mimecast-Originator: redhat.com
+Subject: Re: [PATCH 01/10] arm64: sysreg: Add new PMSIDR_EL1 and PMSFCR_EL1
+ fields
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, Jonathan Corbet <corbet@lwn.net>,
+ Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, leo.yan@arm.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org>
+ <20250506-james-perf-feat_spe_eft-v1-1-dd480e8e4851@linaro.org>
+ <8634d4fwnb.wl-maz@kernel.org>
 Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <8634d4fwnb.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 5/7/25 11:12 PM, Alexandru Elisei wrote:
-> kvmtool is often used for prototyping new features, and a developer might
-> not want to install it system-wide. Add a KVMTOOL environment variable to
-> make it easier for tests to use a binary not in $PATH.
+On 16/05/2025 3:38 pm, Marc Zyngier wrote:
+> On Tue, 06 May 2025 12:41:33 +0100,
+> James Clark <james.clark@linaro.org> wrote:
+>>
+>> Add new fields and registers that are introduced for the features
+>> FEAT_SPE_CRR (call return records), FEAT_SPE_EFT (extended filtering),
+>> FEAT_SPE_FPF (floating point flag), FEAT_SPE_FDS (data source
+>> filtering), FEAT_SPE_ALTCLK and FEAT_SPE_SME.
+>>
+>> Signed-off-by: James Clark <james.clark@linaro.org>
+>> ---
+>>   arch/arm64/tools/sysreg | 26 ++++++++++++++++++++++----
+>>   1 file changed, 22 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+>> index bdf044c5d11b..80d57c83a5f5 100644
+>> --- a/arch/arm64/tools/sysreg
+>> +++ b/arch/arm64/tools/sysreg
+>> @@ -2205,11 +2205,20 @@ Field	0	RND
+>>   EndSysreg
+>>   
+>>   Sysreg	PMSFCR_EL1	3	0	9	9	4
+>> -Res0	63:19
+>> +Res0	63:53
+>> +Field	52	SIMDm
+>> +Field	51	FPm
+>> +Field	50	STm
+>> +Field	49	LDm
+>> +Field	48	Bm
+>> +Res0	47:21
+>> +Field	20	SIMD
+>> +Field	19	FP
+>>   Field	18	ST
+>>   Field	17	LD
+>>   Field	16	B
+>> -Res0	15:4
+>> +Res0	15:5
+>> +Field	4	FDS
+>>   Field	3	FnE
+>>   Field	2	FL
+>>   Field	1	FT
+>> @@ -2226,7 +2235,12 @@ Field	15:0	MINLAT
+>>   EndSysreg
+>>   
+>>   Sysreg	PMSIDR_EL1	3	0	9	9	7
+>> -Res0	63:25
+>> +Res0	63:33
+>> +Field	32	SME
+>> +Field	31:28	ALTCLK
+>> +Field	27	FPF
+>> +Field	26	EFT
+>> +Field	25	CRR
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-
-> ---
->   run_tests.sh          | 1 +
->   scripts/arch-run.bash | 3 ++-
->   2 files changed, 3 insertions(+), 1 deletion(-)
+> These are described as enumerations in the JSON file (see [1]).
 > 
-> diff --git a/run_tests.sh b/run_tests.sh
-> index dd9d27377905..150a06a91064 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -36,6 +36,7 @@ The following environment variables are used:
->       TIMEOUT         Timeout duration for the timeout(1) command
->       CHECK           Overwrites the 'check' unit test parameter (see
->                       docs/unittests.txt)
-> +    KVMTOOL         Path to kvmtool binary for ARCH-run
->   EOF
->   }
->   
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 8cf67e4f3b51..d4fc7116abbe 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -372,7 +372,7 @@ search_kvmtool_binary ()
->   {
->   	local kvmtoolcmd kvmtool
->   
-> -	for kvmtoolcmd in lkvm vm lkvm-static; do
-> +	for kvmtoolcmd in ${KVMTOOL:-lkvm vm lkvm-static}; do
->   		if "$kvmtoolcmd" --help 2>/dev/null| grep -q 'The most commonly used'; then
->   			kvmtool="$kvmtoolcmd"
->   			break
-> @@ -381,6 +381,7 @@ search_kvmtool_binary ()
->   
->   	if [ -z "$kvmtool" ]; then
->   		echo "A kvmtool binary was not found." >&2
-> +		echo "You can set a custom location by using the KVMTOOL=<path> environment variable." >&2
->   		return 2
->   	fi
->   
+> 	M.
+> 
+> [1] https://lore.kernel.org/all/20250506164348.346001-7-maz@kernel.org
+> 
 
--- 
-Shaoqin
+So they are. I'll take your commit and double check the other new ones 
+against the json.
+
+Thanks
+James
 
