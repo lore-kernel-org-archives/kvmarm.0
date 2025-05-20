@@ -1,92 +1,101 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DB1256C95
-	for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 11:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999361B0416;
+	Tue, 20 May 2025 12:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747741466; cv=none; b=MVRpcwg6ng+hG7kqG4lv5kakR3REwlx5PPXZCxcvzGoE9unl6U9EpWVYWj736wrcb/r/LDk/59fLkRQyAW2QnbIkGgtrHJDalVqTrQf1eZLNa6QwriIFIJpgb6e6lRbT2n5nvhbsrjQlJ85YVHiwdI+FgQjaq+QzsTnP6cUtgos=
+	t=1747745110; cv=none; b=td1hc7RWQYTye3fv/a+SOeQFcnTDbQMVsTHEvB+4XorLZSxNuLu13q56kNHrtrEZo2GJl3A7F/DLZ/9HRwn10T23oMn7Bq9mRCiaMFPbeVWU3v4Cy4VCCt2935NkLjq6kN4xOZvapQxOyKbK0V7KnsAochLNUKLdkfXrIAv5IeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747741466; c=relaxed/simple;
-	bh=L1WyVe9zLtyPJzScsMT1xfgUXE3KD3nVWtdX6xgNB+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iJjnM6hp/0imCVLVxwmvOt/PDxvUT6ZzEJ4PP2bNzP+H++f6/lrZjlncHd2/edYK72jlGPIYabqC2fR8klEgoMSl9C9Vv2W+QMzCCY+Al0A5lh+HrLHTKHsMTAJAhNO27OJTEfb6Rh31z2CKU471W/DZ5yLF7GAdiaJBs171H7A=
+	s=arc-20240116; t=1747745110; c=relaxed/simple;
+	bh=NzdOdgoQ23Hz5lBHiviB4k5++/DN2bgjc3n42aDFjM0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YJAIUY67OgxohZdkS3j53qXtn9CWV2lf0qZQJvgJ7wTJF/0jbVJrZpi4E5Svp3M+YQh9DjGDsEUzkfgSQHUnaU9o2J+VSt7tKdX0y8HHN2n7W5VmXtcfOn/6tL+gsc97u3qBfp27+iG27N/7rvgYdZSm/KpJ2ljUAUoeVA3P6pc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30E511516;
-	Tue, 20 May 2025 04:44:11 -0700 (PDT)
-Received: from localhost (e132581.arm.com [10.1.196.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 363743F6A8;
-	Tue, 20 May 2025 04:44:24 -0700 (PDT)
-Date: Tue, 20 May 2025 12:44:22 +0100
-From: Leo Yan <leo.yan@arm.com>
-To: James Clark <james.clark@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 06/10] perf: Add perf_event_attr::config4
-Message-ID: <20250520114422.GP412060@e132581.arm.com>
-References: <20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org>
- <20250506-james-perf-feat_spe_eft-v1-6-dd480e8e4851@linaro.org>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5BE211516;
+	Tue, 20 May 2025 05:44:53 -0700 (PDT)
+Received: from [10.1.36.74] (Suzukis-MBP.cambridge.arm.com [10.1.36.74])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7D77A3F5A1;
+	Tue, 20 May 2025 05:45:03 -0700 (PDT)
+Message-ID: <bfddad3d-b15b-4122-a460-47489af11f24@arm.com>
+Date: Tue, 20 May 2025 13:45:02 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250506-james-perf-feat_spe_eft-v1-6-dd480e8e4851@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 33/43] arm64: RME: Hide KVM_CAP_READONLY_MEM for realm
+ guests
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-34-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250416134208.383984-34-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 06, 2025 at 12:41:38PM +0100, James Clark wrote:
-> Arm FEAT_SPE_FDS adds the ability to filter on the data source of a
-> packet using another 64-bits of event filtering control. As the existing
-> perf_event_attr::configN fields are all used up for SPE PMU, an
-> additional field is needed. Add a new 'config4' field.
+On 16/04/2025 14:41, Steven Price wrote:
+> For protected memory read only isn't supported by the RMM. While it may
+> be possible to support read only for unprotected memory, this isn't
+> supported at the present time.
 > 
-> Signed-off-by: James Clark <james.clark@linaro.org>
+> Note that this does mean that ROM (or flash) data cannot be emulated
+> correctly by the VMM as the stage 2 mappings are either always
+> read/write or are trapped as MMIO (so don't support operations where the
+> syndrome information doesn't allow emulation, e.g. load/store pair).
+> 
+> This restriction can be lifted in the future by allowing the stage 2
 
-Reviewed-by: Leo Yan <leo.yan@arm.com>
+minor nit: s/allowing the/allowing the unprotected/
+
+> mappings to be made read only.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
 > ---
->  include/uapi/linux/perf_event.h | 2 ++
->  1 file changed, 2 insertions(+)
+> Changes since v7:
+>   * Updated commit message to spell out the impact on ROM/flash
+>     emulation.
+> ---
+>   arch/arm64/kvm/arm.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/uapi/linux/perf_event.h b/include/uapi/linux/perf_event.h
-> index 5fc753c23734..c7c2b1d4ad28 100644
-> --- a/include/uapi/linux/perf_event.h
-> +++ b/include/uapi/linux/perf_event.h
-> @@ -379,6 +379,7 @@ enum perf_event_read_format {
->  #define PERF_ATTR_SIZE_VER6	120	/* add: aux_sample_size */
->  #define PERF_ATTR_SIZE_VER7	128	/* add: sig_data */
->  #define PERF_ATTR_SIZE_VER8	136	/* add: config3 */
-> +#define PERF_ATTR_SIZE_VER9	144	/* add: config4 */
->  
->  /*
->   * Hardware event_id to monitor via a performance monitoring event:
-> @@ -533,6 +534,7 @@ struct perf_event_attr {
->  	__u64	sig_data;
->  
->  	__u64	config3; /* extension of config2 */
-> +	__u64	config4; /* extension of config3 */
->  };
->  
->  /*
-> 
-> -- 
-> 2.34.1
-> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8060e25afbd0..4780e3af1bb9 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -340,7 +340,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ONE_REG:
+>   	case KVM_CAP_ARM_PSCI:
+>   	case KVM_CAP_ARM_PSCI_0_2:
+> -	case KVM_CAP_READONLY_MEM:
+>   	case KVM_CAP_MP_STATE:
+>   	case KVM_CAP_IMMEDIATE_EXIT:
+>   	case KVM_CAP_VCPU_EVENTS:
+> @@ -355,6 +354,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_COUNTER_OFFSET:
+> +	case KVM_CAP_READONLY_MEM:
+>   	case KVM_CAP_SET_GUEST_DEBUG:
+>   		r = !kvm_is_realm(kvm);
+>   		break;
+
