@@ -1,205 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B4B211A3C;
-	Mon, 19 May 2025 21:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978F81DA61B
+	for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 08:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747691815; cv=none; b=RTDrj3PRhFJE28JPvEY0EdjAQxqWHtrkf1Jho2cu406JqsnXN9UWyVw3kkwrxiy1JLPx565ZbTj/g0TUVjAvJt8DFaRWz4oTtyLL77iMsjt21HIoWhOJIEYWkPipBUJF8sWnd9MpjAPc53F2fdeqsnA5OmGlbaXtawwyJyY9GTQ=
+	t=1747731183; cv=none; b=GgtiZ+Z9t9LXmQhMKkeRk3C6cCFwV989v6UoKPbgNn6SxpJR62lIL6k6SvabzLi1bgp4cvJWDV0ncGNSv2KwPMX1qC6hHMXanIK/jwVeW62LZialafujPn6YpCFvAUyidXSuG2CUTHMhwCELQJqQ4kXvwgJLg5xSAFvkhVj20kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747691815; c=relaxed/simple;
-	bh=G/udjNOlZf5UZB0lntyyPqplVnxx+IfVlpycxwLSers=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mqH9KUl4d8T+CA1437T4xxELMxL92t9Nlwy9S1S1DYDtE6R8k+92Q8GDUrpW7wAXL2RTWryhRcP0YF+9zaOAPlErCPmvoWtz4lYfwSENoTa55J1IJqdHkmkD9Akc5wCPjpvAJNZ21DS2zj3R3i/191KRTx4E3SE4hoJaPPwEsEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nu7elZZO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747731183; c=relaxed/simple;
+	bh=uw13QPggAl+A94pkIcH2RFvi8JKQ4cNypwyB4yn48+4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FCtUWqSg4l4Si2pW8skxCR/eRGIkDf5CHuL7CxlLyJhKcQq4DHm1XZfMcV3WG5opcAzE6yZnnB/sUKqFbqKGGfs23fxVxLIBKuNS/PGYYJbd3ifIBX1KKGwnxMk44vaKWxmHIunuSoFPFg4zgOvlREy1GIonfZPo7d1TUh02i/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UALBlDEy; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nu7elZZO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6853C4CEE4;
-	Mon, 19 May 2025 21:56:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747691813;
-	bh=G/udjNOlZf5UZB0lntyyPqplVnxx+IfVlpycxwLSers=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nu7elZZO8YqPcuNtMtp5sqtcZInfD7DMrpPlmrSWymeWoZDVi8ldUf3dIg1UbBQGA
-	 L3ctZKe1k5K6Rj8aZhmnWFijoqZ8XQ5NgZz7EchEHAaCx2N97S+QH+j2uxryCz7ca+
-	 lrBbBeSw/rge4wYpIS2ETtVm8QVLMpMvzVprpwR9rEKbc6bKKZxJnHXnIc4kXFq+Ec
-	 WykFkcGPTa6bmMM/Y5n9ssDikJ2HErrqV7ZEJYbRgOMrN7RomlXhxLcUR0e/9Z5KdJ
-	 0XN6xz6yCWTEmgWZ0uzrrK0P2gi/ZXa+XB2j39ezM5be++R0hjGS0wy7wF92/wPTbU
-	 i9rKjkEVOsXbQ==
-Date: Mon, 19 May 2025 16:56:51 -0500
-From: Rob Herring <robh@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v21 4/4] perf: arm_pmuv3: Add support for the Branch
- Record Buffer Extension (BRBE)
-Message-ID: <20250519215651.GB2650608-robh@kernel.org>
-References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
- <20250407-arm-brbe-v19-v21-4-ff187ff6c928@kernel.org>
- <20250519150621.GA17177@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UALBlDEy"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a370309e5cso1313611f8f.3
+        for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 01:53:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747731180; x=1748335980; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1R+g8p9p/0+qgGtEWSsfrtXcyJzKxwZsoiTTrliTdnI=;
+        b=UALBlDEyeqPiNvKXKxbVtzml7svwTuMjbIQDTmCg4JePzfIVphEQV/M/8Tq+Vjnzar
+         PfFYz1xdo1buoHyYTpFIxH/ZJozIRQBB/6IOxP/2TjtMpa9I+yqaZfeYVGK1WjL9b9/q
+         hVXA/c148ZMCfu7HSw5BU/N5OjxP0w643Vv0Oeg8lT3LCTsA6TbAP6nx9w90j4Ft7xgD
+         pZYL+fOT3A3M+iL83lORsU+XzJykGPMHh9b85zw/opI+gq795T7IfkBIPBkTZ7NQ4aTd
+         xOx7En4ET9JRUtBexVNdoNKGecqD4T37WEa1tR1jm3OhWEVwDu9qnDuiWx+IEOOHhRfB
+         oCew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747731180; x=1748335980;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1R+g8p9p/0+qgGtEWSsfrtXcyJzKxwZsoiTTrliTdnI=;
+        b=sBqEd3DtRApU8m3jqOQUby5lXr7r8pYAlQ/zS7HCf1tLxln3tpmCohs3vXKi5KZVBZ
+         GHgH5TMX4c5pMCcdvOC2RyVIbiz3elMlFaPSwdp+UWrC0z45/QCKvWMaMAgzF29UUmq5
+         kq0egXU4/mBnAiEHAmcyKrDFzIhxsAOY9AMVRXjN1q3/NI9bOUZ2Gs2fbt53dcNkWABt
+         hUJ+TjOZfClGdDPhkEWyvFJarkolxQDsY9zz6xkt1lCce5lQoi2CuBRE7f0X0MIB7xdf
+         DpDnykiSfgKWDVjJeI1Gjyf2fwsxcjYunLhRgmJpWfOfgq78vsZ3dhWTAdRWHeHK0Vzv
+         +A8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV+gORmEoHMD4zAcbNOmVOBDkZbPP5C4esIh0QOnZ/eD1x2jTLjZ0Fu698dZMcZlKJ1/QIekzw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxc1/ybt6rHEqyp5VAd2qWgsyC+luFOFJct2sHo5rVOqgffVK3l
+	yPgn927ML8QRa3UAs4qbghb0Ei6Aqctxw9I82vKw7dojmjatSJm+nqWZRZNAAEQ80RoEGcc6njC
+	YlnwJ61UAMZtddjuzqBosXA==
+X-Google-Smtp-Source: AGHT+IFvnJ0x096AewJLW91FfyVpd0hjBTiaPSvB/MeNfz/Q4KVLUUxYR8v5yoCX37oRP3aJR89EPXhq3td9C3jQ
+X-Received: from wrbee4.prod.google.com ([2002:a05:6000:2104:b0:3a0:b3cf:8dee])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a5d:5986:0:b0:3a3:76da:32b3 with SMTP id ffacd0b85a97d-3a376da331fmr3865387f8f.18.1747731180063;
+ Tue, 20 May 2025 01:53:00 -0700 (PDT)
+Date: Tue, 20 May 2025 09:51:51 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250519150621.GA17177@willie-the-truck>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.1143.g0be31eac6b-goog
+Message-ID: <20250520085201.3059786-1-vdonnefort@google.com>
+Subject: [PATCH v5 00/10] Stage-2 huge mappings for pKVM np-guests
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, May 19, 2025 at 04:06:22PM +0100, Will Deacon wrote:
-> Hey Rob,
-> 
-> On Mon, Apr 07, 2025 at 12:41:33PM -0500, Rob Herring (Arm) wrote:
-> > From: Anshuman Khandual <anshuman.khandual@arm.com>
-> > 
-> > The ARMv9.2 architecture introduces the optional Branch Record Buffer
-> > Extension (BRBE), which records information about branches as they are
-> > executed into set of branch record registers. BRBE is similar to x86's
-> > Last Branch Record (LBR) and PowerPC's Branch History Rolling Buffer
-> > (BHRB).
-> 
-> Since you picked this up from v19, the driver has changed considerably
-> and I presume you will be continuing to extend it in future as the
-> architecture progresses. Perhaps having you listed as Author (and
-> crucially, in git blame :p) with Anshuman as a Co-developed-by: would be
-> more appropriate?
+Hi all,
 
-Shrug.
+This series adds support for stage-2 huge mappings (PMD_SIZE) to pKVM
+np-guests, that is installing PMD-level mappings in the stage-2,
+whenever the stage-1 is backed by either Hugetlbfs or THPs.
 
-> > ---
-> >  drivers/perf/Kconfig         |  11 +
-> >  drivers/perf/Makefile        |   1 +
-> >  drivers/perf/arm_brbe.c      | 802 +++++++++++++++++++++++++++++++++++++++++++
-> >  drivers/perf/arm_brbe.h      |  47 +++
-> >  drivers/perf/arm_pmu.c       |  15 +-
-> >  drivers/perf/arm_pmuv3.c     | 129 ++++++-
-> >  include/linux/perf/arm_pmu.h |   8 +
-> >  7 files changed, 1006 insertions(+), 7 deletions(-)
-> 
-> Do you know if James Clark's tests [1] are going to be respun for the
-> perf tool? It would be handy to have some way to test this new
-> functionality.
+The last patch of that series is an optimization for CMOs using a shared
+PMD_SIZE fixmap.
 
-Yes. I dropped them here because I've been told by Arnaldo in the past 
-to send userspace stuff separately.
+Changes since v4 (https://lore.kernel.org/all/20250509131706.2336138-1-vdonnefort@google.com/)
 
-> > diff --git a/drivers/perf/Kconfig b/drivers/perf/Kconfig
-> > index 4e268de351c4..3be60ff4236d 100644
-> > --- a/drivers/perf/Kconfig
-> > +++ b/drivers/perf/Kconfig
-> > @@ -223,6 +223,17 @@ config ARM_SPE_PMU
-> >  	  Extension, which provides periodic sampling of operations in
-> >  	  the CPU pipeline and reports this via the perf AUX interface.
-> >  
-> > +config ARM64_BRBE
-> > +	bool "Enable support for branch stack sampling using FEAT_BRBE"
-> > +	depends on ARM_PMUV3 && ARM64
-> > +	default y
-> > +	help
-> > +	  Enable perf support for Branch Record Buffer Extension (BRBE) which
-> > +	  records all branches taken in an execution path. This supports some
-> > +	  branch types and privilege based filtering. It captures additional
-> > +	  relevant information such as cycle count, misprediction and branch
-> > +	  type, branch privilege level etc.
-> 
-> It's a shame that this can't be modular, but I suppose the tight
-> integration with the CPU PMU driver precludes that. Oh well.
-> 
-> > diff --git a/drivers/perf/arm_brbe.c b/drivers/perf/arm_brbe.c
-> > new file mode 100644
-> > index 000000000000..2f254bd40af3
-> > --- /dev/null
-> > +++ b/drivers/perf/arm_brbe.c
-> 
-> (The driver code looks fine to me but I'd like an Ack from Mark on the
-> UAPI).
-> 
-> > diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
-> > index 2f33e69a8caf..df9867c0dc57 100644
-> > --- a/drivers/perf/arm_pmu.c
-> > +++ b/drivers/perf/arm_pmu.c
-> > @@ -99,7 +99,7 @@ static const struct pmu_irq_ops percpu_pmunmi_ops = {
-> >  	.free_pmuirq = armpmu_free_percpu_pmunmi
-> >  };
-> >  
-> > -static DEFINE_PER_CPU(struct arm_pmu *, cpu_armpmu);
-> > +DEFINE_PER_CPU(struct arm_pmu *, cpu_armpmu);
-> >  static DEFINE_PER_CPU(int, cpu_irq);
-> >  static DEFINE_PER_CPU(const struct pmu_irq_ops *, cpu_irq_ops);
-> >  
-> > @@ -317,6 +317,11 @@ armpmu_del(struct perf_event *event, int flags)
-> >  	struct hw_perf_event *hwc = &event->hw;
-> >  	int idx = hwc->idx;
-> >  
-> > +	if (has_branch_stack(event)) {
-> > +		hw_events->branch_users--;
-> > +		perf_sched_cb_dec(event->pmu);
-> > +	}
-> 
-> Shouldn't we decrement this *after* calling armpmu_stop()?
+  - Make guest CMO functions working with any input (Marc)
+  - Improve for_each_hyp_page() and fold struct hyp_page declaration
+    (Marc)
+  - in mem_protect.c "PMD_SIZE" replaced with kvm_granule_size(KVM_PGTABLE_LAST_LEVEL - 1)
+    (Marc)
+  - Remove useless guest pgtable callback force_pte (Marc)
+  - Fixblock functions fallsback on fixmap on 64KiB pages systems.
+    (Marc)
 
-Logically, that would make more sense. It's all serialized by the perf 
-core though, so we can't get .sched_task() during this.
+Changes since v3 (https://lore.kernel.org/all/20250407082706.1239603-1-vdonnefort@google.com/)
 
-> > +
-> >  	armpmu_stop(event, PERF_EF_UPDATE);
-> >  	hw_events->events[idx] = NULL;
-> >  	armpmu->clear_event_idx(hw_events, event);
-> 
-> [...]
-> 
-> > +static int branch_records_alloc(struct arm_pmu *armpmu)
-> > +{
-> > +	struct perf_branch_stack *branch_stack_cpu;
-> > +	struct perf_branch_stack __percpu *branch_stack;
-> > +	size_t size = struct_size(branch_stack_cpu, entries, brbe_num_branch_records(armpmu));
-> > +	int cpu;
-> > +
-> > +	branch_stack = __alloc_percpu_gfp(size, __alignof__(*branch_stack_cpu),
-> > +					  GFP_KERNEL);
-> > +	if (!branch_stack)
-> > +		return -ENOMEM;
-> > +
-> > +	for_each_possible_cpu(cpu) {
-> > +		struct pmu_hw_events *events_cpu;
-> > +
-> > +		events_cpu = per_cpu_ptr(armpmu->hw_events, cpu);
-> > +		branch_stack_cpu = per_cpu_ptr(branch_stack, cpu);
-> > +		events_cpu->branch_stack = branch_stack_cpu;
-> > +	}
-> > +	return 0;
-> >  }
-> 
-> How does this work in a heterogeneous system? Shouldn't we at least
-> scope the allocation to the CPUs associated with this PMU?
+  - Rebase on kvmarm/next
 
-Leaks memory, that's how.
+Changes since v2 (https://lore.kernel.org/all/20250306110038.3733649-1-vdonnefort@google.com/)
 
-As a bonus, it could overrun some memory too if the record sizes are 
-different though mostly overrunning into other BRBE buffers...
+  - Fix PUD_SIZE -> PMD_SIZE enforcement (Quentin)
+  - Rework pkvm_host_share_guest() to remove one hyp_page walk (Quentin)
+  - Remove one pgtable walk into __check_host_shared_guest() (Quentin)
+  - Return EBUSY on host_share_guest_count overflow
 
-I think we just need to loop over cpu_pmu->supported_cpus and call 
-kmalloc(). Since events_cpu is already percpu, we don't need a percpu 
-allocation of the branch stack buffers.
+Changes since v1 (https://lore.kernel.org/all/20250228102530.1229089-1-vdonnefort@google.com/)
 
-I'm assuming it is safe to assume all CPUs either have BRBE or they 
-don't? Different record sizes at least should work fine (other than the 
-above issue). 
+  - WARN_ON() on !PAGE_ALIGNED size for guest CMOs (Quentin)
+  - check_range_allowed_memory() before accessing the Vmemmap (Quentin)
 
-BTW, I was scratching my head how armpmu_alloc() works with 
-for_each_possible_cpu(), but I guess the hotplug callbacks overwrite the 
-events->percpu_pmu value. I think we could just remove the loop there. 
-I'll investigate that.
+Quentin Perret (2):
+  KVM: arm64: Convert pkvm_mappings to interval tree
+  KVM: arm64: Add a range to pkvm_mappings
 
-Rob
+Vincent Donnefort (8):
+  KVM: arm64: Handle huge mappings for np-guest CMOs
+  KVM: arm64: Introduce for_each_hyp_page
+  KVM: arm64: Add a range to __pkvm_host_share_guest()
+  KVM: arm64: Add a range to __pkvm_host_unshare_guest()
+  KVM: arm64: Add a range to __pkvm_host_wrprotect_guest()
+  KVM: arm64: Add a range to __pkvm_host_test_clear_young_guest()
+  KVM: arm64: Stage-2 huge mappings for np-guests
+  KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
+
+ arch/arm64/include/asm/kvm_pgtable.h          |   7 +-
+ arch/arm64/include/asm/kvm_pkvm.h             |   2 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   8 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  16 +-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |   4 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  16 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 264 +++++++++++-------
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |  97 ++++++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  15 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |   6 -
+ arch/arm64/kvm/mmu.c                          |   6 +-
+ arch/arm64/kvm/pkvm.c                         | 129 ++++-----
+ 12 files changed, 365 insertions(+), 205 deletions(-)
+
+
+base-commit: c4e91ea0cc7e6345a4f7b8167e838d728ca86c30
+-- 
+2.49.0.1143.g0be31eac6b-goog
+
