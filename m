@@ -1,25 +1,64 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E729024E4BF;
-	Tue, 20 May 2025 15:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA2B433CE
+	for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 15:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747753204; cv=none; b=nD5fjYlVIEU/z6YAFbI6jpax+MNfibVKxacVSDFYc8Ow6NDwr9rqccTKsKXfM0tSlqDVufTprZzS0HXSFMt9f4N5d/+6SOT11BPRERxGQ/Olc0ch2DCM/987FHwdxKJey5K1ZV/dM4lCqpl4Ml4ai8JVeVkyIgBDzuMBLlI9Uqg=
+	t=1747753265; cv=none; b=sQTAutKirCRaKi80Pltc1cXRq/7yXpJ3GZT1Simr0zEwaedrfoEpR1OXadLhsJq1uF/dPNZjSLerBm2SZFQAo+Dw5AMF94XeHGr56HG6l8P4cCMFRmtAQ3PiOy55NRZJCHh3GklNx65AMWCPaHNP8Wtw1VZfImTmjM40DqID37c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747753204; c=relaxed/simple;
-	bh=b2CXkXS2G46uSTQOueN2gHh64Q7El3fMSoWYlj2jZoc=;
+	s=arc-20240116; t=1747753265; c=relaxed/simple;
+	bh=vxtLkO7E3I4lrtJrUfMLXkQwXrxvUdKqWCgJy3w4zag=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qRn2kv/D63bBmGX+Rma/sWiS/5qe1O7mkNuvCs8SaBR1kbrKOAmHEMfvr++zAQ7hCVD/OK/VG3889gQNnFmd5qOp5HF4goVweTjTfzJTUmsOPuYy94sjkFTqn8MKk6OByuuKmIQAqTzG3MgQbLactJbvLApFobF4pxCTcDc50es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C92181516;
-	Tue, 20 May 2025 07:59:47 -0700 (PDT)
-Received: from [10.57.50.40] (unknown [10.57.50.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2722C3F6A8;
-	Tue, 20 May 2025 07:59:58 -0700 (PDT)
-Message-ID: <3103faef-1f02-47f9-b1ca-ec6af200773f@arm.com>
-Date: Tue, 20 May 2025 15:59:57 +0100
+	 In-Reply-To:Content-Type; b=NdqF4yGGzAh9ok7JMgvixyRxPEULYKv9tXeswAeQgXJqIPOrR4StQ9Y/YX5VUJ4Mz5cpallacnZhdYY0AcDAFmdASE2zUshwSPXzTVYrQelTGI3fSRLR51UXhS0uDJcm3+qgTgOQOZW95XKM5vtleg+Moxj2l0Wub9rwiV4Xz4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lZFz3R9R; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lZFz3R9R"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cfebc343dso43543335e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 08:01:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1747753261; x=1748358061; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YEtrnnDuAmJYKZeSMvf5c7nmLNzlk/l+Iae0vySJelU=;
+        b=lZFz3R9Rk0KbzlWjgdVI626Vfru+1hL9Jg9XzfkV9Hsnn4QZq0r7XJCfIh/4+kAi16
+         RxTI7mUyr4oJIASv2pHWOqGGSEyvmzqd70DimuYuk+w7NUlFgCTcxZaxBpiKJzs7YLD7
+         m+Rb5I/3chEIwL3StfqZTVe+vUMYTCh/TPHxneCfVjsfE7BvYxs7WVR7IRZwn9zOuksR
+         itmK9ZTazsTOQ/etE6Vsjga3eLxugbX6S/5VnuWkmKenawblKKeJtIGvjj7o+39duO77
+         g9kXzHir7vdiZZXerancDg9FkaeQOxJzkaOCtBFW7W+r1y+0l2jjG0mh9k/U7yBlQ6ws
+         bdXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747753261; x=1748358061;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YEtrnnDuAmJYKZeSMvf5c7nmLNzlk/l+Iae0vySJelU=;
+        b=ThdhqdZslMI/3KR3zZvRB+hZv22agejibHwtAc08yUzEajsEMYFcBs13Xa+eOnuAXP
+         ajgHIP+S2Weqsz2mNcJfVe90HoRB05p/uMCYVyB2nAWoxe8CyT5iTGJUmP+XJEcEpTi2
+         rYRbfFf8VfQHKrVDTlWTV3PR4sQwJeuUo9c040oDt74rHydyf6Cy8cC2VfRImeAk+30+
+         RVSFKIwH+2QB9W+gF00EIdhhChvz/krWj5LIG2JYt42JdTRgYHhEoajicfMmorRG5nLx
+         VZZH2H6vCCdW18kb65iqCLK1lYL4fPa1dkwkB7BZgsdf0IS8IDJ4A5JhWysZ0yDkR8OR
+         J0lg==
+X-Forwarded-Encrypted: i=1; AJvYcCVbNirOR6UluRQ5dpbkvY9+tNOSc6SZoDIeMvXlrkWDvQLFWDLYT0zaT3yoXAqm9duwE/fPasM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxUuLdCcWn+DB5k2hz7TGCi30fbLzNbzvgvenNRS6QAkPT40cnm
+	SFHaZlcQaBMvGAmwUXY5trHU9PpQeUzAIiRDUO7drybRgF9Dm0jsGdhLTe97uqCM8B4=
+X-Gm-Gg: ASbGncv5vcH3AZvvcdDeD/ACocPbMUTpy/58rDdMJlAtjuPGUy5CJw23J5x59pZBG+Z
+	ZrMqlmFSVZbJn/fJhDBMBZuC82+ohaLCVIXTIaUGBigEPJrMwzrhh8JPvvVmdZea+dNa/L3E+7X
+	mrtksz8iLskPVnOco/Atg9gWBK8feiswhxQzCGqdsldxhXRA9EKVb4H/kaPci2NwOYiTaFMORHF
+	UG4FcFWaKAEWTbgKkZZmDyj1GTuXX47qXzajaPFtzHhEsPbIJ51I5q+Yby8PPNBq5rLwDC14eGr
+	lwnOMybVnZpaFdsadAXooivR4I2DLRLlEnu69VrPtNaNWBgsuWsjnTPc
+X-Google-Smtp-Source: AGHT+IH24Rob6qzsp/B6a4YvVXoqQFWt4twT0lUoObQ25VvZu+ofvWuRa8S+DtGe5tHJROxKWkMZ3Q==
+X-Received: by 2002:a05:600c:a418:b0:445:1984:2479 with SMTP id 5b1f17b1804b1-445198425a6mr87579185e9.5.1747753261270;
+        Tue, 20 May 2025 08:01:01 -0700 (PDT)
+Received: from [192.168.1.3] ([37.18.136.128])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6b295fdsm35699865e9.5.2025.05.20.08.00.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 May 2025 08:01:00 -0700 (PDT)
+Message-ID: <443141db-6950-4a15-83be-ad9e9c0e03a0@linaro.org>
+Date: Tue, 20 May 2025 16:00:59 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,77 +66,195 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 29/43] arm64: RME: Always use 4k pages for realms
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-30-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250416134208.383984-30-steven.price@arm.com>
+Subject: Re: [PATCH 07/10] perf: arm_spe: Add support for filtering on data
+ source
+To: Leo Yan <leo.yan@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org>
+ <20250506-james-perf-feat_spe_eft-v1-7-dd480e8e4851@linaro.org>
+ <20250520134632.GR412060@e132581.arm.com>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20250520134632.GR412060@e132581.arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16/04/2025 14:41, Steven Price wrote:
-> Guest_memfd doesn't yet natively support huge pages, and there are
-> currently difficulties for a VMM to manage huge pages efficiently so for
-> now always split up mappings to PTE (4k).
-> 
-> The two issues that need progressing before supporting huge pages for
-> realms are:
-> 
->   1. guest_memfd needs to be able to allocate from an appropriate
->      allocator which can provide huge pages.
-> 
->   2. The VMM needs to be able to repurpose private memory for a shared
->      mapping when the guest VM requests memory is transitioned. Because
->      this can happen at a 4k granularity it isn't possible to
->      free/reallocate while huge pages are in use. Allowing the VMM to
->      mmap() the shared portion of a huge page would allow the huge page
->      to be recreated when the memory is unshared and made protected again.
-> 
-> These two issues are not specific to realms and don't affect the realm
-> API, so for now just break everything down to 4k pages in the RMM
-> controlled stage 2. Future work can add huge page support without
-> changing the uAPI.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
 
-With comments from Gavin addressed,
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-> ---
-> Changes since v7:
->   * Rewritten commit message
-> ---
->   arch/arm64/kvm/mmu.c | 4 ++++
->   1 file changed, 4 insertions(+)
+On 20/05/2025 2:46 pm, Leo Yan wrote:
+> On Tue, May 06, 2025 at 12:41:39PM +0100, James Clark wrote:
+>> SPE_FEAT_FDS adds the ability to filter on the data source of packets.
+>> Like the other existing filters, enable filtering with PMSFCR_EL1.FDS
+>> when any of the filter bits are set.
+>>
+>> Each bit maps to data sources 0-63 described by bits[0:5] in the data
+>> source packet (although the full range of data source is 16 bits so
+>> higher value data sources can't be filtered on). The filter is an OR of
+>> all the bits, so for example setting bits 0 and 3 filters packets from
+>> data sources 0 OR 3.
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 02b66ee35426..29bab7a46033 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1653,6 +1653,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	if (logging_active || is_protected_kvm_enabled()) {
->   		force_pte = true;
->   		vma_shift = PAGE_SHIFT;
-> +	} else if (vcpu_is_rec(vcpu)) {
-> +		// Force PTE level mappings for realms
-> +		force_pte = true;
-> +		vma_shift = PAGE_SHIFT;
->   	} else {
->   		vma_shift = get_vma_page_shift(vma, hva);
->   	}
+> As Arm ARM says:
+> 
+>    0b0 : If PMSFCR_EL1.FDS is 1, do not record load operations that have
+>          bits [5:0] of the Data Source packet set to <m>.
+>    0b1 : Load operations with Data Source <m> are unaffected by
+>          PMSFCR_EL1.FDS.
+> 
+> We need extra handling for this configuration (0b0 means filtering,
+> 0b1 means no affaction):
+> 
+> - By default, the driver should set all bits in the 'data_src_filter'
+>    field.
+> 
+> - The perf tool needs an extra patch in userspace to initialize all
+>    bits in config4 unless user specify other values.
+> 
+> Thanks,
+> Leo
+> 
+
+Did you take into account PMSFCR_EL1.FDS being set automatically? I 
+think the wording is slightly confusing but I tested it on the model and 
+it works.
+
+If PMSFCR_EL1.FDS == 0 then PMSDSFR_EL1 does nothing, and if the data 
+source filter isn't set by the user then FDS isn't set so there's no 
+need to set all the bits in the filter to 1. Once the user asks for any 
+filter then we set FDS, at which point it's whatever filter they asked 
+for. They can set all the bits if they want, or just one.
+
+This is same way PMSFCR_EL1.FT already works. If the user asks for any 
+filter then it's set automatically, but we don't allow the user to ask 
+for "no filters" but with FT set.
+
+So the only thing we can't do is filter out samples with _any_ data 
+source. Which would be PMSFCR_EL1.FDS == 1 and PMSDSFR_EL1 == 0. But I 
+don't think that's useful, and there are other filters to get you all or 
+most of the way there.
+
+>> Signed-off-by: James Clark <james.clark@linaro.org>
+>> ---
+>>   drivers/perf/arm_spe_pmu.c | 31 +++++++++++++++++++++++++++++++
+>>   1 file changed, 31 insertions(+)
+>>
+>> diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
+>> index 9309b846f642..d04318411f77 100644
+>> --- a/drivers/perf/arm_spe_pmu.c
+>> +++ b/drivers/perf/arm_spe_pmu.c
+>> @@ -87,6 +87,7 @@ struct arm_spe_pmu {
+>>   #define SPE_PMU_FEAT_INV_FILT_EVT		(1UL << 6)
+>>   #define SPE_PMU_FEAT_DISCARD			(1UL << 7)
+>>   #define SPE_PMU_FEAT_EFT			(1UL << 8)
+>> +#define SPE_PMU_FEAT_FDS			(1UL << 9)
+>>   #define SPE_PMU_FEAT_DEV_PROBED			(1UL << 63)
+>>   	u64					features;
+>>   
+>> @@ -232,6 +233,10 @@ static const struct attribute_group arm_spe_pmu_cap_group = {
+>>   #define ATTR_CFG_FLD_inv_event_filter_LO	0
+>>   #define ATTR_CFG_FLD_inv_event_filter_HI	63
+>>   
+>> +#define ATTR_CFG_FLD_data_src_filter_CFG	config4	/* PMSDSFR_EL1 */
+>> +#define ATTR_CFG_FLD_data_src_filter_LO	0
+>> +#define ATTR_CFG_FLD_data_src_filter_HI	63
+>> +
+>>   GEN_PMU_FORMAT_ATTR(ts_enable);
+>>   GEN_PMU_FORMAT_ATTR(pa_enable);
+>>   GEN_PMU_FORMAT_ATTR(pct_enable);
+>> @@ -248,6 +253,7 @@ GEN_PMU_FORMAT_ATTR(float_filter);
+>>   GEN_PMU_FORMAT_ATTR(float_filter_mask);
+>>   GEN_PMU_FORMAT_ATTR(event_filter);
+>>   GEN_PMU_FORMAT_ATTR(inv_event_filter);
+>> +GEN_PMU_FORMAT_ATTR(data_src_filter);
+>>   GEN_PMU_FORMAT_ATTR(min_latency);
+>>   GEN_PMU_FORMAT_ATTR(discard);
+>>   
+>> @@ -268,6 +274,7 @@ static struct attribute *arm_spe_pmu_formats_attr[] = {
+>>   	&format_attr_float_filter_mask.attr,
+>>   	&format_attr_event_filter.attr,
+>>   	&format_attr_inv_event_filter.attr,
+>> +	&format_attr_data_src_filter.attr,
+>>   	&format_attr_min_latency.attr,
+>>   	&format_attr_discard.attr,
+>>   	NULL,
+>> @@ -286,6 +293,9 @@ static umode_t arm_spe_pmu_format_attr_is_visible(struct kobject *kobj,
+>>   	if (attr == &format_attr_inv_event_filter.attr && !(spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT))
+>>   		return 0;
+>>   
+>> +	if (attr == &format_attr_data_src_filter.attr && !(spe_pmu->features & SPE_PMU_FEAT_FDS))
+>> +		return 0;
+>> +
+>>   	if ((attr == &format_attr_branch_filter_mask.attr ||
+>>   	     attr == &format_attr_load_filter_mask.attr ||
+>>   	     attr == &format_attr_store_filter_mask.attr ||
+>> @@ -406,6 +416,9 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
+>>   	if (ATTR_CFG_GET_FLD(attr, inv_event_filter))
+>>   		reg |= PMSFCR_EL1_FnE;
+>>   
+>> +	if (ATTR_CFG_GET_FLD(attr, data_src_filter))
+>> +		reg |= PMSFCR_EL1_FDS;
+>> +
+>>   	if (ATTR_CFG_GET_FLD(attr, min_latency))
+>>   		reg |= PMSFCR_EL1_FL;
+>>   
+>> @@ -430,6 +443,12 @@ static u64 arm_spe_event_to_pmslatfr(struct perf_event *event)
+>>   	return FIELD_PREP(PMSLATFR_EL1_MINLAT, ATTR_CFG_GET_FLD(attr, min_latency));
+>>   }
+>>   
+>> +static u64 arm_spe_event_to_pmsdsfr(struct perf_event *event)
+>> +{
+>> +	struct perf_event_attr *attr = &event->attr;
+>> +	return ATTR_CFG_GET_FLD(attr, data_src_filter);
+>> +}
+>> +
+>>   static void arm_spe_pmu_pad_buf(struct perf_output_handle *handle, int len)
+>>   {
+>>   	struct arm_spe_pmu_buf *buf = perf_get_aux(handle);
+>> @@ -788,6 +807,10 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
+>>   	if (arm_spe_event_to_pmsnevfr(event) & arm_spe_pmsevfr_res0(spe_pmu->pmsver))
+>>   		return -EOPNOTSUPP;
+>>   
+>> +	if (arm_spe_event_to_pmsdsfr(event) &&
+>> +	    !(spe_pmu->features & SPE_PMU_FEAT_FDS))
+>> +		return -EOPNOTSUPP;
+>> +
+>>   	if (attr->exclude_idle)
+>>   		return -EOPNOTSUPP;
+>>   
+>> @@ -857,6 +880,11 @@ static void arm_spe_pmu_start(struct perf_event *event, int flags)
+>>   		write_sysreg_s(reg, SYS_PMSNEVFR_EL1);
+>>   	}
+>>   
+>> +	if (spe_pmu->features & SPE_PMU_FEAT_FDS) {
+>> +		reg = arm_spe_event_to_pmsdsfr(event);
+>> +		write_sysreg_s(reg, SYS_PMSDSFR_EL1);
+>> +	}
+>> +
+>>   	reg = arm_spe_event_to_pmslatfr(event);
+>>   	write_sysreg_s(reg, SYS_PMSLATFR_EL1);
+>>   
+>> @@ -1116,6 +1144,9 @@ static void __arm_spe_pmu_dev_probe(void *info)
+>>   	if (FIELD_GET(PMSIDR_EL1_EFT, reg))
+>>   		spe_pmu->features |= SPE_PMU_FEAT_EFT;
+>>   
+>> +	if (FIELD_GET(PMSIDR_EL1_FDS, reg))
+>> +		spe_pmu->features |= SPE_PMU_FEAT_FDS;
+>> +
+>>   	/* This field has a spaced out encoding, so just use a look-up */
+>>   	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
+>>   	switch (fld) {
+>>
+>> -- 
+>> 2.34.1
+>>
 
