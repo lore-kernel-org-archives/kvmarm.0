@@ -1,199 +1,124 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAEB22D7A8
-	for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 13:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EED24503E
+	for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 14:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747748800; cv=none; b=aWt2xeW2f+oMTT9RgOTugnbLudpxnVLsN/pWOFJ3Ep/5jgQtIvLp0YpAfCGDeXOE9DOQ+L5CWolR3hynlRVluNyOrtVCYOerSWMB3VN4cGI1M9S5jad1ODYditp4b99ArlLWmHEzGrVkXSbdtRypkdlE9ILICI59MBjEjINx0x0=
+	t=1747749921; cv=none; b=l1NF37tw/14KYYNMG+jZp9JBPxpYXHAMW3nMVLvgcXcu2PtdjGcqfMZLj0rfH2FvcpgRlS59oBkz9QI4FxwVVmc+VrpRv6vf5G/Qb+Pdp7gejcuIVrubnfCMcIh6wU5VoOPonAuKlaOq8gShPeNE5qufdak/Ib+8axDxjObTlxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747748800; c=relaxed/simple;
-	bh=A3ymgb18BnOuOySJr5/XRA0C9ZYBVPd49CK+UkvTeoc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oPPDU7XycZJ6P7LCPde97Aroj664TSIuKvF2MiK5fVACoB2sAN0e8RjF/OLtRvdQJt6dmZEr/AKJH9EzS6sQDmaIgypWvpJhNl090G6lyaAjm5KU+Ajz0w7PtkMo0dwk4FvFFHfdp5Pt9N40N9wOqh7FqvcS+pTNOWdjHJrtgHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 709A31516;
-	Tue, 20 May 2025 06:46:23 -0700 (PDT)
-Received: from localhost (e132581.arm.com [10.1.196.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7CBB93F5A1;
-	Tue, 20 May 2025 06:46:36 -0700 (PDT)
-Date: Tue, 20 May 2025 14:46:32 +0100
-From: Leo Yan <leo.yan@arm.com>
-To: James Clark <james.clark@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 07/10] perf: arm_spe: Add support for filtering on data
- source
-Message-ID: <20250520134632.GR412060@e132581.arm.com>
-References: <20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org>
- <20250506-james-perf-feat_spe_eft-v1-7-dd480e8e4851@linaro.org>
+	s=arc-20240116; t=1747749921; c=relaxed/simple;
+	bh=W0wvuAqJtwjPNZsphRu58z/MF8fEw377JO902o5elYY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=aW/YAzIqyVV/8fsRd1mtTJ5/4H7N6PGnLzB8s7U9G+K9jUksw6N9q95pu5ENxY9qIuywOp3VvcCjKBe5aO7PCckSV3wHHGzybMy04uiFDUoOaaMdQ9qgBWU4VUS3j8uzXAbdCG0TpTtcDuHIfP634p82CgcmoG9vPiMGZqXX0FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M/2QTa2z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/2QTa2z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747749918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Dqea7MZDYhyQlC4xKO8LGx5epUTJ/uHF9sDafau5YHY=;
+	b=M/2QTa2zZfg1Tbg+EnGbUm/Xm7F1z/WrXq1y1MRAPEcTBd84lBe/vTzcIJVtmRkfaz/Jl2
+	H7X7pxsS2YqZ4Q29hd3WI9dq528dMVUDLQ6roP/8/ZC86g9JHZc45BIUlBlTqOyY+sjIo4
+	Jt58qpcNO+4pzOCMLXlcrEda79l32iw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-94-bVnTc1EAMAylZKevhQ0_1Q-1; Tue,
+ 20 May 2025 10:05:14 -0400
+X-MC-Unique: bVnTc1EAMAylZKevhQ0_1Q-1
+X-Mimecast-MFC-AGG-ID: bVnTc1EAMAylZKevhQ0_1Q_1747749911
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2C7151800874;
+	Tue, 20 May 2025 14:05:10 +0000 (UTC)
+Received: from localhost (dhcp-192-216.str.redhat.com [10.33.192.216])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 693CB1956095;
+	Tue, 20 May 2025 14:05:07 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: eric.auger@redhat.com, eric.auger.pro@gmail.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
+ oliver.upton@linux.dev, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com
+Cc: agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com,
+ philmd@linaro.org, pbonzini@redhat.com
+Subject: Re: [PATCH v3 06/10] arm/kvm: Allow reading all the writable ID
+ registers
+In-Reply-To: <a706e9a2-0a49-4296-ba0a-8001f433b8b8@redhat.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20250414163849.321857-1-cohuck@redhat.com>
+ <20250414163849.321857-7-cohuck@redhat.com>
+ <a706e9a2-0a49-4296-ba0a-8001f433b8b8@redhat.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Tue, 20 May 2025 16:05:05 +0200
+Message-ID: <87jz6bbcoe.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250506-james-perf-feat_spe_eft-v1-7-dd480e8e4851@linaro.org>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tue, May 06, 2025 at 12:41:39PM +0100, James Clark wrote:
-> SPE_FEAT_FDS adds the ability to filter on the data source of packets.
-> Like the other existing filters, enable filtering with PMSFCR_EL1.FDS
-> when any of the filter bits are set.
-> 
-> Each bit maps to data sources 0-63 described by bits[0:5] in the data
-> source packet (although the full range of data source is 16 bits so
-> higher value data sources can't be filtered on). The filter is an OR of
-> all the bits, so for example setting bits 0 and 3 filters packets from
-> data sources 0 OR 3.
+On Tue, May 13 2025, Eric Auger <eric.auger@redhat.com> wrote:
 
-As Arm ARM says:
+> On 4/14/25 6:38 PM, Cornelia Huck wrote:
+>> From: Eric Auger <eric.auger@redhat.com>
+>>
+>> At the moment kvm_arm_get_host_cpu_features() reads a subset of the
+>> ID regs. As we want to introduce properties for all writable ID reg
+>> fields, we want more genericity and read more default host register
+>> values.
+>>
+>> Introduce a new get_host_cpu_idregs() helper and add a new exhaustive
+>> boolean parameter to kvm_arm_get_host_cpu_features() and
+>> kvm_arm_set_cpu_features_from_host() to select the right behavior.
+>> The host cpu model will keep the legacy behavior unless the writable
+>> id register interface is available.
+>>
+>> A writable_map IdRegMap is introduced in the CPU object. A subsequent
+>> patch will populate it.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>>  target/arm/cpu-sysregs.h |  2 ++
+>>  target/arm/cpu.h         |  3 ++
+>>  target/arm/cpu64.c       |  2 +-
+>>  target/arm/kvm.c         | 78 ++++++++++++++++++++++++++++++++++++++--
+>>  target/arm/kvm_arm.h     |  9 +++--
+>>  target/arm/trace-events  |  1 +
+>>  6 files changed, 89 insertions(+), 6 deletions(-)
+>>
 
-  0b0 : If PMSFCR_EL1.FDS is 1, do not record load operations that have
-        bits [5:0] of the Data Source packet set to <m>.
-  0b1 : Load operations with Data Source <m> are unaffected by
-        PMSFCR_EL1.FDS.
+(...)
 
-We need extra handling for this configuration (0b0 means filtering,
-0b1 means no affaction):
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index 775a8aebc5d3..8717c5e7695b 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -1088,6 +1088,9 @@ struct ArchCPU {
+>>       */
+>>      ARMIdRegsState writable_id_regs;
+>>  
+>> +    /* ID reg writable bitmask (KVM only) */
+>> +    IdRegMap *writable_map;
+> as it is KVM only we may put it in ifdef CONFIG_KVM block above
 
-- By default, the driver should set all bits in the 'data_src_filter'
-  field.
+Forgot to reply here; the CONFIG_KVM block is gone with a725f3710231
+("target/arm/cpu: always define kvm related registers")
 
-- The perf tool needs an extra patch in userspace to initialize all
-  bits in config4 unless user specify other values.
-
-Thanks,
-Leo
-
-> Signed-off-by: James Clark <james.clark@linaro.org>
-> ---
->  drivers/perf/arm_spe_pmu.c | 31 +++++++++++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
-> 
-> diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-> index 9309b846f642..d04318411f77 100644
-> --- a/drivers/perf/arm_spe_pmu.c
-> +++ b/drivers/perf/arm_spe_pmu.c
-> @@ -87,6 +87,7 @@ struct arm_spe_pmu {
->  #define SPE_PMU_FEAT_INV_FILT_EVT		(1UL << 6)
->  #define SPE_PMU_FEAT_DISCARD			(1UL << 7)
->  #define SPE_PMU_FEAT_EFT			(1UL << 8)
-> +#define SPE_PMU_FEAT_FDS			(1UL << 9)
->  #define SPE_PMU_FEAT_DEV_PROBED			(1UL << 63)
->  	u64					features;
->  
-> @@ -232,6 +233,10 @@ static const struct attribute_group arm_spe_pmu_cap_group = {
->  #define ATTR_CFG_FLD_inv_event_filter_LO	0
->  #define ATTR_CFG_FLD_inv_event_filter_HI	63
->  
-> +#define ATTR_CFG_FLD_data_src_filter_CFG	config4	/* PMSDSFR_EL1 */
-> +#define ATTR_CFG_FLD_data_src_filter_LO	0
-> +#define ATTR_CFG_FLD_data_src_filter_HI	63
-> +
->  GEN_PMU_FORMAT_ATTR(ts_enable);
->  GEN_PMU_FORMAT_ATTR(pa_enable);
->  GEN_PMU_FORMAT_ATTR(pct_enable);
-> @@ -248,6 +253,7 @@ GEN_PMU_FORMAT_ATTR(float_filter);
->  GEN_PMU_FORMAT_ATTR(float_filter_mask);
->  GEN_PMU_FORMAT_ATTR(event_filter);
->  GEN_PMU_FORMAT_ATTR(inv_event_filter);
-> +GEN_PMU_FORMAT_ATTR(data_src_filter);
->  GEN_PMU_FORMAT_ATTR(min_latency);
->  GEN_PMU_FORMAT_ATTR(discard);
->  
-> @@ -268,6 +274,7 @@ static struct attribute *arm_spe_pmu_formats_attr[] = {
->  	&format_attr_float_filter_mask.attr,
->  	&format_attr_event_filter.attr,
->  	&format_attr_inv_event_filter.attr,
-> +	&format_attr_data_src_filter.attr,
->  	&format_attr_min_latency.attr,
->  	&format_attr_discard.attr,
->  	NULL,
-> @@ -286,6 +293,9 @@ static umode_t arm_spe_pmu_format_attr_is_visible(struct kobject *kobj,
->  	if (attr == &format_attr_inv_event_filter.attr && !(spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT))
->  		return 0;
->  
-> +	if (attr == &format_attr_data_src_filter.attr && !(spe_pmu->features & SPE_PMU_FEAT_FDS))
-> +		return 0;
-> +
->  	if ((attr == &format_attr_branch_filter_mask.attr ||
->  	     attr == &format_attr_load_filter_mask.attr ||
->  	     attr == &format_attr_store_filter_mask.attr ||
-> @@ -406,6 +416,9 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
->  	if (ATTR_CFG_GET_FLD(attr, inv_event_filter))
->  		reg |= PMSFCR_EL1_FnE;
->  
-> +	if (ATTR_CFG_GET_FLD(attr, data_src_filter))
-> +		reg |= PMSFCR_EL1_FDS;
-> +
->  	if (ATTR_CFG_GET_FLD(attr, min_latency))
->  		reg |= PMSFCR_EL1_FL;
->  
-> @@ -430,6 +443,12 @@ static u64 arm_spe_event_to_pmslatfr(struct perf_event *event)
->  	return FIELD_PREP(PMSLATFR_EL1_MINLAT, ATTR_CFG_GET_FLD(attr, min_latency));
->  }
->  
-> +static u64 arm_spe_event_to_pmsdsfr(struct perf_event *event)
-> +{
-> +	struct perf_event_attr *attr = &event->attr;
-> +	return ATTR_CFG_GET_FLD(attr, data_src_filter);
-> +}
-> +
->  static void arm_spe_pmu_pad_buf(struct perf_output_handle *handle, int len)
->  {
->  	struct arm_spe_pmu_buf *buf = perf_get_aux(handle);
-> @@ -788,6 +807,10 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
->  	if (arm_spe_event_to_pmsnevfr(event) & arm_spe_pmsevfr_res0(spe_pmu->pmsver))
->  		return -EOPNOTSUPP;
->  
-> +	if (arm_spe_event_to_pmsdsfr(event) &&
-> +	    !(spe_pmu->features & SPE_PMU_FEAT_FDS))
-> +		return -EOPNOTSUPP;
-> +
->  	if (attr->exclude_idle)
->  		return -EOPNOTSUPP;
->  
-> @@ -857,6 +880,11 @@ static void arm_spe_pmu_start(struct perf_event *event, int flags)
->  		write_sysreg_s(reg, SYS_PMSNEVFR_EL1);
->  	}
->  
-> +	if (spe_pmu->features & SPE_PMU_FEAT_FDS) {
-> +		reg = arm_spe_event_to_pmsdsfr(event);
-> +		write_sysreg_s(reg, SYS_PMSDSFR_EL1);
-> +	}
-> +
->  	reg = arm_spe_event_to_pmslatfr(event);
->  	write_sysreg_s(reg, SYS_PMSLATFR_EL1);
->  
-> @@ -1116,6 +1144,9 @@ static void __arm_spe_pmu_dev_probe(void *info)
->  	if (FIELD_GET(PMSIDR_EL1_EFT, reg))
->  		spe_pmu->features |= SPE_PMU_FEAT_EFT;
->  
-> +	if (FIELD_GET(PMSIDR_EL1_FDS, reg))
-> +		spe_pmu->features |= SPE_PMU_FEAT_FDS;
-> +
->  	/* This field has a spaced out encoding, so just use a look-up */
->  	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
->  	switch (fld) {
-> 
-> -- 
-> 2.34.1
-> 
