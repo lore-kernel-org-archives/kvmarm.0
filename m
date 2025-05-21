@@ -1,88 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224162367D4;
-	Wed, 21 May 2025 11:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120CB4B1E7B
+	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 11:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747825399; cv=none; b=lSdtEWHKSBbN1fo+9JpylthRhTLUhXVjOJ0nhzQuQfPPTSziSbPma1HIo1uvXZbTuAObRlqOezE5LP15Y3gLRiuE+Uz8Gm9CDMshvCGMuQ94UrK2xgCnAdoQncdXHroK2C7V/xtd8AWuacWPTumy/j55iZWyyCzwu99ZNGENEzY=
+	t=1747825493; cv=none; b=JOO7UzDfPnW+WmwxAVPKLksHDsiAbsl7p5vB/fY1aKX6APAapnBnUL0SqlEmnnvVLm4W3LLeadrAn4szX2F2KSZIRu/pcDNTXxelQEm9aR7RDMKuG+ZlyDOvLygTkvFGXbqv21rWGVOc3FQTHJ3LQLrtjVu9bJzwh4NO+rnOOzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747825399; c=relaxed/simple;
-	bh=QAUAYNKmlM0RlaNjGicH9GqKIAhlrFtqHhssH2BVJ88=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RrC+NppFHUwhe36PVgJOGukn5n4GmCIaywa/Wh1IIF4jiZVAvmNFlqWrRWTVZzxqJM7unknryq7L3crPthz5te829hI14phofOEG4FG1OOAZnszL98xs0SBjqOrV4f+N72UgLUXsLwBl7tWZJzvizMUqlRL0BWdbC49xWEkeaUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VtShJ3KJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747825493; c=relaxed/simple;
+	bh=WJdu57W6UhDvcHCfpgC+UA9weTaVsrZwvOCeKead1G0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WqIphDi/35HE+kodNIUX7yn8a5pH1QNUeLGK1cwmnyt/59bUzFl7AJqYTa74kQwELzrQnyLrBud8OLE8fiCVYnHuxhBSYkn5RZ8yuy5vHehS776NKuOnufQK9cm7YJY9dfWk2dLsld7mwA11gORoVQxcLUXh1pQ5nr6dzo2NA/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2db5NFh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VtShJ3KJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0738DC4CEEA;
-	Wed, 21 May 2025 11:03:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2db5NFh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8672CC4CEE4;
+	Wed, 21 May 2025 11:04:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747825398;
-	bh=QAUAYNKmlM0RlaNjGicH9GqKIAhlrFtqHhssH2BVJ88=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VtShJ3KJfMOydCfX5LajLrW/grN0PgqMTvj8HUyAMTJ5FEC1IsFZMNmbHkxRz87Xz
-	 UkbWY81F+ziNXmhvlfU2JLD4NvHSCGjDlybRT19p8UrwW8Vp2AUaLTBRl5HY4FPEhF
-	 L0ceKaiyVl6ctqBuDIzw9rSu7lzWfTWsV+KFVhJd2VhtLoxMRuSdqUXMbaUFMlYUY6
-	 fGlMt/nulJ2DFsJ+T3D5JJwWcjlqWF7qjCGOk+W3Jc+HVrSyPIVzDEkc8ZlOPlP+pX
-	 sYB71O1EVTh1ixylTXJDmFRLmL3fcachHtO1Vu8T/T7obmGPUSweDn6Tz+Cd1fzFlR
-	 EGKRY/rOOkROw==
-From: Will Deacon <will@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1747825492;
+	bh=WJdu57W6UhDvcHCfpgC+UA9weTaVsrZwvOCeKead1G0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=f2db5NFhShu2tICwJNJQFax1HAv25M/sDmZZRWTxQsEPnxBJ8HCEWWC77Sj+kfS3n
+	 yQHXYydq8WtpxCjpmlUeizYLrSs0NQ36I1EcDoYj5QMxk55tXWa0NIHnkkmpwbXMzy
+	 kfJYEEmMWA6odT5O7UdPZ5h/4T2iMp7mVipKM4jscO3pd6QeXmj3Rk10OMoA/sgyHS
+	 z4VDlw1O+z+Ewo4xv5cWDTy+/BhaK8+1ZnfWgjmxLHnTFyCszOrA5882mOIRccLR+c
+	 lsD+TXJp8ObQZPghLFMdSMU36zwZvnOEcJWWFZTgqqu9X8mdGc6emjKDp9uAWdLPOz
+	 fBKdtbK6ZRVIA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uHhFi-00GuEZ-Ca;
+	Wed, 21 May 2025 12:04:50 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Leo Yan <leo.yan@arm.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>
-Cc: kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Mark Brown <broonie@kernel.org>,
-	Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v22 0/5] arm64/perf: Enable branch stack sampling
-Date: Wed, 21 May 2025 12:01:18 +0100
-Message-Id: <174782307035.3423409.3825975640964405604.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20250520-arm-brbe-v19-v22-0-c1ddde38e7f8@kernel.org>
-References: <20250520-arm-brbe-v19-v22-0-c1ddde38e7f8@kernel.org>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: nv: Release faulted-in VNCR page from mmu_lock critical section
+Date: Wed, 21 May 2025 12:04:35 +0100
+Message-Id: <20250521110435.66273-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 20 May 2025 17:27:35 -0500, Rob Herring (Arm) wrote:
-> This series enables perf branch stack sampling support on arm64 via a
-> v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details
-> on BRBE can be found in the Arm ARM[1] chapter D18.
-> 
-> I've picked up this series from Anshuman. v19 and later versions have
-> been reworked quite a bit by Mark and myself. The bulk of those changes
-> are in patch 5.
-> 
-> [...]
+The conversion to kvm_release_faultin_page() missed the requirement
+for this to be called within a critical section with mmu_lock held
+for write. Move this call up to satisfy this requirement.
 
-Applied the '__init_el2_fgt' label cleanup to arm64 (for-next/entry), thanks!
+Fixes: 069a05e535496 ("KVM: arm64: nv: Handle VNCR_EL2-triggered faults")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[2/5] arm64: el2_setup.h: Make __init_el2_fgt labels consistent, again
-      https://git.kernel.org/arm64/c/54b8070548c6
-
-Cheers,
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 2381663d2ee98..e7e71f1615f19 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1228,9 +1228,9 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu)
+ 		vt->cpu = -1;
+ 
+ 		kvm_make_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu);
++		kvm_release_faultin_page(vcpu->kvm, page, false, vt->wr.pw);
+ 	}
+ 
+-	kvm_release_faultin_page(vcpu->kvm, page, false, vt->wr.pw);
+ 	if (vt->wr.pw)
+ 		mark_page_dirty(vcpu->kvm, gfn);
+ 
 -- 
-Will
+2.39.2
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
