@@ -1,145 +1,106 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B0A270548;
-	Wed, 21 May 2025 13:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F35E2A1BF;
+	Wed, 21 May 2025 14:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747833732; cv=none; b=Uudp9ffDKcqFaAmeZvVPYRyOJ2rtUnU7pT92njXR4YLxDCPO1irm9CEdK8j6CteUsTIlLt6nDS71MEoZNopmAQNIHuWS0ZZTcQuWgeylVzQEW8wCc+XD4CzFnvkgZGTDvZfKi00Wt0bYua8lze8cW4JUwIbNsPMgDVkAYzYeO6w=
+	t=1747836043; cv=none; b=kdTCENC7AzR9+1/SJ8h8YRCOkXp95G0Q0YxkcwLG7XtpLlmZ4MnUDDUoIRcOlufGHmh1kOjkbL9wM3+TILaMZG+ufaHjaP5LDEYsX0jT7z/Q5j0Ko0diQ2japa4y0ADUTbNcgfcx0RG7hXuTOevPDRkVjsF9d+KX0mAGKvyVaTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747833732; c=relaxed/simple;
-	bh=EX4ui2tQT7UMETR1W+xK25rJPJELgoGDLpEuPhuzklw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bsXw8bW4GHdo0WjrHtSXpUhb60NtltfO9+//SsF78MpmMyQLkAWMG6u1ZpJhe06UI4D4QKAnJV9UIkTfyurnEt6+VyMivqzfs8HsVF6VnodkA25fFab6dwKT5XZwy/Ry90ksrKY2ltFSAz0lkLf44IEJNofwzpJqgjT45R/xNgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E6jBTMek; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747836043; c=relaxed/simple;
+	bh=TG7KGt9Z8KkHwG8PtZech7PK1ytDELh9NZgI+4R2pzI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fPqi0J9ceAmpT0mOvAbu4fwL2Jem9KmiCiwjTRtUfcWP4jC5oV6O0lJmYW78nXLDiRYlqyZPS+b5eD4U8gtxonifwKnU+8h2IPkygRZP7ePlFXiAtJ3yS4YBp9OIVZgEZLZ2f5ZjxhbTPKVxqiOmR1ulUFIuq6S7lq/c5aUr+bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KbALZD/d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6jBTMek"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CBF4C4CEE7;
-	Wed, 21 May 2025 13:22:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KbALZD/d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F81C4CEE4;
+	Wed, 21 May 2025 14:00:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747833729;
-	bh=EX4ui2tQT7UMETR1W+xK25rJPJELgoGDLpEuPhuzklw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E6jBTMekBv+UH9ycukXQK3H0XIxjnYZg58I9raQ05E10M9qL3PlndBrrRB12kMb08
-	 iqktE52OFdoAFLtISTnJFqKBhKN6BdmAjziVHoh95aCf7PaCdh9+0fllYKDz6oCBk+
-	 6Q+Q7u3ytdNjmawsULl8BmV8rLtnCf/C4DViZyhMpbkOXa/d7hZVJT49XCTw/Ik1DD
-	 S2u5NI+atPUaOeHnw6+813IgVJvh92MGCgJ/+k4L2qd9kIeNJS86XhcWACfsUuRx7T
-	 MMFLYsUWhGzRyyRgwQVdL+eguZVorq2GrBcVSfnaikocXW3qRLNswt4DtvbPiskgkg
-	 FRmF6L9gww5xA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1747836043;
+	bh=TG7KGt9Z8KkHwG8PtZech7PK1ytDELh9NZgI+4R2pzI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=KbALZD/dEscVsNoTk46Tney3bpr9YBapbD6kPiCrP6jYQVYeU1B+lRBw0hGJnMIxA
+	 fxhEojnMsplG0brkRHU0kGSzA5rdSej0MtquM4ljjzCMg9FPzyYqsj6CWuJ/qtqwNZ
+	 Fxb8yRoc6SMYtWQIldMJI9Zxjot0qbS9IkvzCHwhM3q4XLQ5WEcKQCHFerrp3fdCfc
+	 dqxQN6LjTj71cn1owXAGH822pLzILvFd4FnLld/oIDJrS/AXKscTyAjPwLxBMi4rER
+	 bDKJdtaZftPXqHhCUJEqVAWvWy2P/P3VNs41LeT1kV9IV/+5Ic94ygZ6pgDCKo4vnM
+	 RoY6vcigApi+w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uHjOZ-00GwxK-Fd;
-	Wed, 21 May 2025 14:22:07 +0100
-Date: Wed, 21 May 2025 14:22:06 +0100
-Message-ID: <86r00idrpd.wl-maz@kernel.org>
+	id 1uHjzs-00Gxn5-Mt;
+	Wed, 21 May 2025 15:00:40 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Leo Yan <leo.yan@arm.com>,
+To: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: qperret@google.com,
 	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
+	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v22 4/5] KVM: arm64: nvhe: Disable branch generation in nVHE guests
-In-Reply-To: <20250520-arm-brbe-v19-v22-4-c1ddde38e7f8@kernel.org>
-References: <20250520-arm-brbe-v19-v22-0-c1ddde38e7f8@kernel.org>
-	<20250520-arm-brbe-v19-v22-4-c1ddde38e7f8@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kernel-team@android.com
+Subject: Re: [PATCH v6 00/10] Stage-2 huge mappings for pKVM np-guests
+Date: Wed, 21 May 2025 15:00:36 +0100
+Message-Id: <174783602755.119525.10800483609741009182.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250521124834.1070650-1-vdonnefort@google.com>
+References: <20250521124834.1070650-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: robh@kernel.org, will@kernel.org, mark.rutland@arm.com, catalin.marinas@arm.com, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, james.clark@linaro.org, anshuman.khandual@arm.com, leo.yan@arm.com, linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, qperret@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 20 May 2025 23:27:39 +0100,
-"Rob Herring (Arm)" <robh@kernel.org> wrote:
+On Wed, 21 May 2025 13:48:24 +0100, Vincent Donnefort wrote:
+> This series adds support for stage-2 huge mappings (PMD_SIZE) to pKVM
+> np-guests, that is installing PMD-level mappings in the stage-2,
+> whenever the stage-1 is backed by either Hugetlbfs or THPs.
 > 
-> From: Anshuman Khandual <anshuman.khandual@arm.com>
+> The last patch of that series is an optimization for CMOs using a shared
+> PMD_SIZE fixmap.
 > 
-> While BRBE can record branches within guests, the host recording
-> branches in guests is not supported by perf (though events are).
-> Support for BRBE in guests will supported by providing direct access
-> to BRBE within the guests. That is how x86 LBR works for guests.
-> Therefore, BRBE needs to be disabled on guest entry and restored on
-> exit.
-> 
-> For nVHE, this requires explicit handling for guests. Before
-> entering a guest, save the BRBE state and disable the it. When
-> returning to the host, restore the state.
-> 
-> For VHE, it is not necessary. We initialize
-> BRBCR_EL1.{E1BRE,E0BRE}=={0,0} at boot time, and HCR_EL2.TGE==1 while
-> running in the host. We configure BRBCR_EL2.{E2BRE,E0HBRE} to enable
-> branch recording in the host. When entering the guest, we set
-> HCR_EL2.TGE==0 which means BRBCR_EL1 is used instead of BRBCR_EL2.
-> Consequently for VHE, BRBE recording is disabled at EL1 and EL0 when
-> running a guest.
-> 
-> Should recording in guests (by the host) ever be desired, the perf ABI
-> will need to be extended to distinguish guest addresses (struct
-> perf_branch_entry.priv) for starters. BRBE records would also need to be
-> invalidated on guest entry/exit as guest/host EL1 and EL0 records can't
-> be distinguished.
-> 
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Co-developed-by: Rob Herring (Arm) <robh@kernel.org>
-> Tested-by: James Clark <james.clark@linaro.org>
-> Reviewed-by: Leo Yan <leo.yan@arm.com>
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
-> v20:
->  - Reword commit message about no guest recording.
->  - Add BRBE to __kvm_vcpu_run() synchronization comment
-> 
-> v19:
->  - Rework due to v6.14 debug flag changes
->  - Redo commit message
-> ---
->  arch/arm64/include/asm/kvm_host.h  |  2 ++
->  arch/arm64/kvm/debug.c             |  4 ++++
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 32 ++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
->  4 files changed, 39 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e98cfe7855a6..e3f1e7b5ce52 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -654,6 +654,7 @@ struct kvm_host_data {
->  #define KVM_HOST_DATA_FLAG_HAS_TRBE			1
->  #define KVM_HOST_DATA_FLAG_TRBE_ENABLED			4
->  #define KVM_HOST_DATA_FLAG_EL1_TRACING_CONFIGURED	5
-> +#define KVM_HOST_DATA_FLAG_HAS_BRBE			6
+> [...]
 
-Just as a heads up: this is going to clash with what is currently
-queued in -next (bits 6 and 7 are already claimed).
+Applied to next, thanks!
 
-Otherwise,
+[01/10] KVM: arm64: Handle huge mappings for np-guest CMOs
+        commit: 944a1ed8cc3ea6c5b16b6aca11475ced0daf68a9
+[02/10] KVM: arm64: Introduce for_each_hyp_page
+        commit: 3db771fa23ed6aecdf28ce4b806309198eea84e2
+[03/10] KVM: arm64: Add a range to __pkvm_host_share_guest()
+        commit: 4274385ebf090461b46b9bddb0f7c526182ba3c0
+[04/10] KVM: arm64: Add a range to __pkvm_host_unshare_guest()
+        commit: f28f1d02f4eaac05c2ad6bf7264a8696dc21d011
+[05/10] KVM: arm64: Add a range to __pkvm_host_wrprotect_guest()
+        commit: 0eb802b3b4ecfb10046bc325f47e7fd741c72ffe
+[06/10] KVM: arm64: Add a range to __pkvm_host_test_clear_young_guest()
+        commit: c4d99a833d34d8041a568f0c076379ae53c47896
+[07/10] KVM: arm64: Convert pkvm_mappings to interval tree
+        commit: b38c9775f73941ee59aebc0a489aa5c22e632def
+[08/10] KVM: arm64: Add a range to pkvm_mappings
+        commit: 3669ddd8fa8b5a46d96b9c54a6fa519a17e4a4fa
+[09/10] KVM: arm64: Stage-2 huge mappings for np-guests
+        commit: db14091d8f75852d960b18834c7bdb1b7c2bb74f
+[10/10] KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
+        commit: c353fde17d8f7e710884532da50393cd22ddbfbe
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
