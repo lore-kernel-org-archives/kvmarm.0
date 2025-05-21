@@ -1,64 +1,25 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A5C237713
-	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 08:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABF4236A70;
+	Wed, 21 May 2025 08:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747817694; cv=none; b=iDImoFapW+rgXdfzX3jJTunCNMwkjHipI48iHfVm5EGaZ7/ZzT/QgBjPor0FYE0T7GM1q6qt2n3m39xyE6YyBkPezlIHR7npBMayhvv7jQ3XEN8A7YokTv/szO/ZCGNGrGqk3hKnHwSKBdL5gA9D5nSzn6bCBUqCz3+NeGFEzno=
+	t=1747817753; cv=none; b=kKmeDeLUerAMDQFCbp9hb+r0SnlnZEV9qLfe/ubNYNHsrhMUZydzGZ0EALZ5Df+9fhCwXfRRgiLgwdgBt9pvrRqbf4VfhkHe8jil/pF5TdD2QhoY9UrUX/WfwRrh1ZSV51OXv0vwCpBrEX3QGGfxmaZaRs8sOlCa87vcBI4bnqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747817694; c=relaxed/simple;
-	bh=w8uGtywi8FTT/FAgTCq7UeSzJ2Y+7StYHR09dw3aCDE=;
+	s=arc-20240116; t=1747817753; c=relaxed/simple;
+	bh=J3eT9enofDeXnYSzoWheHzHJjQzB95yLnnDDVWBQ5Jc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b5DxmuNhJuVMdle2hmTXDqiLipBrAVgid82NBao+gRfxGDOIOqlV0Tk1LphhpSsso5NS9szB7AI50+YkDkw+sZbKX+7ILOiJYeXI5fSUu483WzdKSdm/lEfwqvbfRG1OTNlhiktYzFH2VFz4TWc/aMgbZUIItGoSYP5aCKLAzBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=p4PQGDdB; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p4PQGDdB"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a0ac853894so5788581f8f.3
-        for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 01:54:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747817690; x=1748422490; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sbdPpdpIurd9SvA4bpOQHcg2N+24lyWEgW2cl5m4WjA=;
-        b=p4PQGDdBT3YC3httYHG+wO7qWjJle+lNb2l7uDTA/JnaDFx0kP//VrOGf7MhaGmJ6F
-         s6CPYBtU35Wo2hpNJSTiq9GmoAiRjXULE7T9xYg7TS7jZs1wIv6GJWIN2Y7JCdnCJwos
-         tNTsZ7+VML56r5shBg2FpmfxmeSvxyU1YkSISmafpxXxxl/zw4pSNqKH5gydlywhnRTx
-         3MFpRxc60+0vF0YnslGZW5Edro/tF0y2s07TfU18P6z2aC8N9PhAvROJC8XK3HwX0gUC
-         LCPLmD6YVln/aS+j3O/23UMPctFETzSwCthz7R58Zb56j+SoB2XI91xTpzxVb+6gmL3o
-         KGfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747817690; x=1748422490;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sbdPpdpIurd9SvA4bpOQHcg2N+24lyWEgW2cl5m4WjA=;
-        b=WPcr2vaN5SVUiEwDRx2FAU5L4T9m8ExkbLnv1Pz010vZo6E0A5USO0OQwN/6pDwKE6
-         Xi8sa78Jv4DDCT0jQnxdAwzKjOFNwYLEpOQ6cho9wER7nNpdHnOvU1wFO7uaUniwWQnJ
-         Uz1U5TIpwKzP025mnWiVSgR71eD4wXgxcW8M7E2MjlxzdMe/q9ijwgqUWJ8Qi+gq2HeS
-         stWkac7vtZzAegrvPjpzeAWu3COFxg5H4/Q/70HmqXJGpnS6wX86nmKXaCZl5iibc5fO
-         0P7BDiVJLARV+Jr4Qg09ro/riXOBygsCWY9MtLjUV+iR0jcuw+F3ZMBxlp+FsJldhQO+
-         Nf/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWYn93IABXKadP13qp5oaLo/WbU8cpbzQDwJFtAbhz65gCUCkIJi3SzJAX1Vusec6pNGf7YgZU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwnUfVbT9GRXA51MH+1SzkLNvXKWR8cGV+LKEVW6BGOfKDVa6it
-	WEGCkkC6yKuUUYVbVEkyCtlPwdPMoKgSyJBE5z+fXD8DCwi06217xWWyt/lkX8Ad9KI=
-X-Gm-Gg: ASbGncu+dA6svwpB4qfmu1dUhIEFeOBwiQSjAfU+f5eZhS+B/kA74a98fohCuDtoGil
-	OW13jSpbEZKDCEovKlvyu9gnHbb7IXBtxLDn69DiAA3gmCTrWOi5DFhcuRRm7Bi98bPuUUpboOG
-	IzedwfA57gjpyb1WcY+L11D8mdi/ENZBG9iOtGhQHHTqbgxwDovHzL7ES8NfZKgMSowARspGngw
-	qlAuq8Qp//jhIQYSJcVd2J4D6annLJU/qKkPJpCE3MgrnGSTrAyqP2GuQ4VKmeiQs7sV3sVWBk0
-	jt9n2pgnDUU8nYcwipgvx/cHDBzfdJboKbdYheZUvKAMBmJiObPRVJnn
-X-Google-Smtp-Source: AGHT+IHcXYGtM7XVHHJEdGmOY1yvOZ0EB0s4eDSPvPzqzTL5ClJRA8YIoq/xMdJkfTjyIFVgJ2bfQA==
-X-Received: by 2002:a05:6000:18ac:b0:3a3:67c4:580b with SMTP id ffacd0b85a97d-3a367c45acemr12032252f8f.46.1747817690326;
-        Wed, 21 May 2025 01:54:50 -0700 (PDT)
-Received: from [192.168.1.3] ([37.18.136.128])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a366e08747sm15804239f8f.95.2025.05.21.01.54.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 May 2025 01:54:49 -0700 (PDT)
-Message-ID: <5752f039-51c1-4452-b5df-03ff06da7be3@linaro.org>
-Date: Wed, 21 May 2025 09:54:48 +0100
+	 In-Reply-To:Content-Type; b=tSpKa4dclT8E6va7CNhUuAHhdAQboaGZbxVkBTXWJULh9skfMoqieNpBMpJF86F15DvvNckYpSexSg4/beE6l7EFDXtP5EDLUsa1TBHbmv5qSbg1YOljv623AVfkXT1Asn67IZ3XICY9ampQWzsg/qZhDJnyxGu3Pcxx1oEfUhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CE4E71515;
+	Wed, 21 May 2025 01:55:36 -0700 (PDT)
+Received: from [10.57.23.70] (unknown [10.57.23.70])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4864A3F6A8;
+	Wed, 21 May 2025 01:55:46 -0700 (PDT)
+Message-ID: <c544b3fe-3cf2-4dcd-8c0f-ab9f1795e305@arm.com>
+Date: Wed, 21 May 2025 09:55:43 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,62 +27,207 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/10] perf: arm_spe: Add support for filtering on data
- source
-To: Leo Yan <leo.yan@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-References: <20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org>
- <20250506-james-perf-feat_spe_eft-v1-7-dd480e8e4851@linaro.org>
- <20250520134632.GR412060@e132581.arm.com>
- <443141db-6950-4a15-83be-ad9e9c0e03a0@linaro.org>
- <20250520161003.GT412060@e132581.arm.com>
- <20250520162243.GU412060@e132581.arm.com>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <20250520162243.GU412060@e132581.arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v8 20/43] arm64: RME: Runtime faulting of memory
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, Gavin Shan <gshan@redhat.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-21-steven.price@arm.com>
+ <c99b408c-3819-482a-a427-68045211e434@redhat.com>
+ <4fca6bfa-3687-4fdf-8204-00fa90d36e2a@arm.com>
+ <d1b3caaf-636f-48e6-90e6-0bb650753748@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <d1b3caaf-636f-48e6-90e6-0bb650753748@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-
-On 20/05/2025 5:22 pm, Leo Yan wrote:
-> On Tue, May 20, 2025 at 05:10:03PM +0100, Leo Yan wrote:
+On 20/05/2025 15:48, Suzuki K Poulose wrote:
+> On 16/05/2025 16:33, Steven Price wrote:
+>> On 01/05/2025 01:16, Gavin Shan wrote:
+>>> On 4/16/25 11:41 PM, Steven Price wrote:
+>>>> At runtime if the realm guest accesses memory which hasn't yet been
+>>>> mapped then KVM needs to either populate the region or fault the guest.
+>>>>
+>>>> For memory in the lower (protected) region of IPA a fresh page is
+>>>> provided to the RMM which will zero the contents. For memory in the
+>>>> upper (shared) region of IPA, the memory from the memslot is mapped
+>>>> into the realm VM non secure.
+>>>>
+>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>> ---
+>>>> Changes since v7:
+>>>>    * Remove redundant WARN_ONs for realm_create_rtt_levels() - it will
+>>>>      internally WARN when necessary.
+>>>> Changes since v6:
+>>>>    * Handle PAGE_SIZE being larger than RMM granule size.
+>>>>    * Some minor renaming following review comments.
+>>>> Changes since v5:
+>>>>    * Reduce use of struct page in preparation for supporting the RMM
+>>>>      having a different page size to the host.
+>>>>    * Handle a race when delegating a page where another CPU has
+>>>> faulted on
+>>>>      a the same page (and already delegated the physical page) but
+>>>> not yet
+>>>>      mapped it. In this case simply return to the guest to either
+>>>> use the
+>>>>      mapping from the other CPU (or refault if the race is lost).
+>>>>    * The changes to populate_par_region() are moved into the previous
+>>>>      patch where they belong.
+>>>> Changes since v4:
+>>>>    * Code cleanup following review feedback.
+>>>>    * Drop the PTE_SHARED bit when creating unprotected page table
+>>>> entries.
+>>>>      This is now set by the RMM and the host has no control of it
+>>>> and the
+>>>>      spec requires the bit to be set to zero.
+>>>> Changes since v2:
+>>>>    * Avoid leaking memory if failing to map it in the realm.
+>>>>    * Correctly mask RTT based on LPA2 flag (see rtt_get_phys()).
+>>>>    * Adapt to changes in previous patches.
+>>>> ---
+>>>>    arch/arm64/include/asm/kvm_emulate.h |  10 ++
+>>>>    arch/arm64/include/asm/kvm_rme.h     |  10 ++
+>>>>    arch/arm64/kvm/mmu.c                 | 127 ++++++++++++++++++-
+>>>>    arch/arm64/kvm/rme.c                 | 180 ++++++++++++++++++++++
+>>>> +++++
+>>>>    4 files changed, 321 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/
+>>>> include/asm/kvm_emulate.h
+>>>> index c803c8188d9c..def439d6d732 100644
+>>>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>>>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>>>> @@ -704,6 +704,16 @@ static inline bool kvm_realm_is_created(struct
+>>>> kvm *kvm)
+>>>>        return kvm_is_realm(kvm) && kvm_realm_state(kvm) !=
+>>>> REALM_STATE_NONE;
+>>>>    }
+>>>>    +static inline gpa_t kvm_gpa_from_fault(struct kvm *kvm, phys_addr_t
+>>>> ipa)
+>>>> +{
+>>>> +    if (kvm_is_realm(kvm)) {
+>>>> +        struct realm *realm = &kvm->arch.realm;
+>>>> +
+>>>> +        return ipa & ~BIT(realm->ia_bits - 1);
+>>>> +    }
+>>>> +    return ipa;
+>>>> +}
+>>>> +
+>>>>    static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>>>>    {
+>>>>        if (static_branch_unlikely(&kvm_rme_is_available))
+>>>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>>>> asm/kvm_rme.h
+>>>> index d86051ef0c5c..47aa6362c6c9 100644
+>>>> --- a/arch/arm64/include/asm/kvm_rme.h
+>>>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>>>> @@ -108,6 +108,16 @@ void kvm_realm_unmap_range(struct kvm *kvm,
+>>>>                   unsigned long ipa,
+>>>>                   unsigned long size,
+>>>>                   bool unmap_private);
+>>>> +int realm_map_protected(struct realm *realm,
+>>>> +            unsigned long base_ipa,
+>>>> +            kvm_pfn_t pfn,
+>>>> +            unsigned long size,
+>>>> +            struct kvm_mmu_memory_cache *memcache);
+>>>> +int realm_map_non_secure(struct realm *realm,
+>>>> +             unsigned long ipa,
+>>>> +             kvm_pfn_t pfn,
+>>>> +             unsigned long size,
+>>>> +             struct kvm_mmu_memory_cache *memcache);
+>>>>      static inline bool kvm_realm_is_private_address(struct realm
+>>>> *realm,
+>>>>                            unsigned long addr)
+>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>> index 71c04259e39f..02b66ee35426 100644
+>>>> --- a/arch/arm64/kvm/mmu.c
+>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>> @@ -338,8 +338,13 @@ static void __unmap_stage2_range(struct
+>>>> kvm_s2_mmu *mmu, phys_addr_t start, u64
+>>>>          lockdep_assert_held_write(&kvm->mmu_lock);
+>>>>        WARN_ON(size & ~PAGE_MASK);
+>>>> -    WARN_ON(stage2_apply_range(mmu, start, end,
+>>>> KVM_PGT_FN(kvm_pgtable_stage2_unmap),
+>>>> -                   may_block));
+>>>> +
+>>>> +    if (kvm_is_realm(kvm))
+>>>> +        kvm_realm_unmap_range(kvm, start, size, !only_shared);
+>>>> +    else
+>>>> +        WARN_ON(stage2_apply_range(mmu, start, end,
+>>>> +                       KVM_PGT_FN(kvm_pgtable_stage2_unmap),
+>>>> +                       may_block));
+>>>>    }
+>>>>    
+>>>
+>>> As spotted previsouly, the parameter @may_block isn't handled by
+>>> kvm_realm_unmap_range().
+>>
+>> Ack.
+>>
+>>>>    void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t
+>>>> start,
+>>>> @@ -359,7 +364,10 @@ static void stage2_flush_memslot(struct kvm *kvm,
+>>>>        phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
+>>>>        phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
+>>>>    -    kvm_stage2_flush_range(&kvm->arch.mmu, addr, end);
+>>>> +    if (kvm_is_realm(kvm))
+>>>> +        kvm_realm_unmap_range(kvm, addr, end - addr, false);
+>>>> +    else
+>>>> +        kvm_stage2_flush_range(&kvm->arch.mmu, addr, end);
+>>>>    }
+>>>>      /**
+>>>> @@ -1053,6 +1061,10 @@ void stage2_unmap_vm(struct kvm *kvm)
+>>>>        struct kvm_memory_slot *memslot;
+>>>>        int idx, bkt;
+>>>>    +    /* For realms this is handled by the RMM so nothing to do
+>>>> here */
+>>>> +    if (kvm_is_realm(kvm))
+>>>> +        return;
+>>>> +
+>>>>        idx = srcu_read_lock(&kvm->srcu);
+>>>>        mmap_read_lock(current->mm);
+>>>>        write_lock(&kvm->mmu_lock);
+>>>> @@ -1078,6 +1090,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>>>>        if (kvm_is_realm(kvm) &&
+>>>>            (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
+>>>>             kvm_realm_state(kvm) != REALM_STATE_NONE)) {
+>>>> +        kvm_stage2_unmap_range(mmu, 0, (~0ULL) & PAGE_MASK, false);
+>>>>            write_unlock(&kvm->mmu_lock);
+>>>>            kvm_realm_destroy_rtts(kvm, pgt->ia_bits);
+>>>
+>>> (~0ULL & PAGE_MASK) wouldn't be a problem since the range will be
+>>> limited to
+>>> [0, BIT(realm->ia_bits) - 1] in kvm_realm_unmap_range(). I think it's
+>>> reasonable
+>>> to pass the maximal size here, something like:
+>>>
+>>>          kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), false);
 > 
-> [...]
+> I think this must be, given the end is excluding:
+>        kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits), false);
 > 
->> If 'PMSFCR_EL1.FDS == 0 and PMSDSFR_EL1 == 0x0' is the init state, as
->> you said, when user passed 0xFFFF,FFFF,FFFF,FFFF for data filter, we
->> cannot distinguish it from the init state, as a result, we will fail
->> to handle this case.
-> 
-> Correct a typo. The case above, it means "when a user passes 0x0 for
-> data source filter ....".
-> 
-> Sorry for spamming.
-> 
-> Leo
+> BIT(realm->ia_bits - 1) only covers the protected half. The unprotected
+> half spans  [ BIT(realm->ia_bits - 1), BIT(realm->ia_bits))
 
-I'm thinking I'd rather leave it consistent with PMSFCR_EL1.FT and 
-automatically enable PMSFCR_EL1.FDS for any non zero data-source filter.
+The kernel treats the two halves as aliasing. kvm_realm_unmap_range()
+caps the end to min(BIT(realm->ia_bits - 1), end). So this wouldn't make
+any difference.
 
-This means we don't need a tool change to set some other flag when a 
-filter is provided (even if it's zero) and it's much simpler. It also 
-doesn't prevent the possibility of adding the enable flag in the future 
-if someone comes out with a need for it, but I don't think it needs to 
-be done now. TBH I can't imagine a case where someone would want to 
-filter out any samples that have any data source. Surely you'd only be 
-looking for a selected set of data sources, or no filtering at all.
+This an unfortunate outcome of the memory slots describing both the
+protected region (via guestmem_fd) and the shared region (via VMM maps).
+So a single memslot describes two regions which leads to the kernel
+treating those regions as aliasing for some purposes.
 
-
+Thanks,
+Steve
 
