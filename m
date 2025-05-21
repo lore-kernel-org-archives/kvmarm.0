@@ -1,81 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A20B4B1E7B
-	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 11:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571BE22B8B1;
+	Wed, 21 May 2025 11:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747825520; cv=none; b=GTFTje6XlDadi6MQpkXDbjetMUwAtVwTbs88igA3SiuSOE/vcx3cV13N5hbQ8fnGUtYys8umee6QqQblzJFbcD5m0rYbE1rYF9V+dyono1v5qHlFi1ChY7jZ9/3r0fOJfWVUa97JqhwrcjeQ8PllqSz9RApT4bxmKZ7jScgoAcE=
+	t=1747827763; cv=none; b=HImsbcJVselinqpCoTyUrGKtbvQf59aSEZMKju42YQ8HilnZ54WQEbmiwDaF1TLZF7pAH/OWeVGh/2u+N+zBjG44EbzUIQokSq2MyF/tS4SHUXyGXDqTRXbJHJSFCAh8huowD5356njkIoNXSXUzIpCzHoMTWTCVnB+5Kwdh9Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747825520; c=relaxed/simple;
-	bh=42u/zmytvqbcX3xApId5MoKd0PTEG2SAmeYvKU2zQd4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A1lLdgKxkXo8oWAJ/r0bUVnchd77bwBNXbruMH3GTNNr7aAPwsQq/qh+4lkRQnFw/aOf4X611V7F55PFpKlavN3HSi6n+ixi4NC6aqLeVc1qxnd7STFbJUUY5cNEtKTpyXfqVxQzpNzKMqIYD7yPfGYWPw1VN1yLy+bJsCihKc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AqN4FMLB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747827763; c=relaxed/simple;
+	bh=BBLaqALTYPrcSvGY4FSvdax+qvgZN3k55RMHh1U2OpI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BHY56iR6eTMoTOE3qRu2+2HVhTHl6YX2c1eZDgrJUpBA2/ftcf9WcI5xFuJwYnySV6uaQE2xdSow6LE0dafQ+ZUH30ErhC1VfVDKDYd37ZdMwD+WuEA34LHiJZxhvt0PrIWlB4zNCXEKuceKyV2nLuCgHxUiJBQJqYUCGEjasaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=J+ZA1LkN; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AqN4FMLB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19E54C4CEE4;
-	Wed, 21 May 2025 11:05:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747825520;
-	bh=42u/zmytvqbcX3xApId5MoKd0PTEG2SAmeYvKU2zQd4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AqN4FMLB6wqzCn4JgVF9n7vZaP+jMQ81756k1kI9Fu6P03YWo/fNGAGaqnTfLmqX7
-	 xCqnx5ZJLDb7AK5RW31f4rstkckzyXVgdm7aKrJbtK0wj5tTFQo3oweG6cAVPCtrVv
-	 d3CeRIM2BP9Vv8bKCGugkK3TsB9UAxRvvkj8/PbHnaFRw+gs8kwTKDKAWfb4T+GYyO
-	 VkromKhPXv5Qf/INpi5E5r5SQHQZYJWQG/1F8FxLSzJkwB73QoJTegrhmE0Wexf5H9
-	 7O2a6ya/+TvH1qePD1vLeKdk8J384+TO4iYQ5fOJovVekjTGyJUH6b1huidRezsaGn
-	 Bs7g2ND+Rnzzw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uHhG9-00GuFW-OT;
-	Wed, 21 May 2025 12:05:17 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: nv: Handle TLBI S1E2 for VNCR invalidation with mmu_lock held
-Date: Wed, 21 May 2025 12:05:14 +0100
-Message-Id: <20250521110514.66305-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J+ZA1LkN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=+KOoH+QcbNIcFt9a+edbvuTeUreK6auzBcTQsLb2atU=; b=J+ZA1LkNIZvB2wt5zV0IUe5eaO
+	GhuaqpVSmOn9urMlfTUl+99lOTpOO+f/pKPDMPFnU/NqePPiHuAxDYGupA+8qh8qXhRmbs6tX5hE8
+	u6dkqBqpoh9TKIkQUILB0b5bVr+1imyLQj2jeTKmC7U4WmTqUpYnlhopptqDp7qC8cUMr6p90Zm69
+	nettF2xLWVUEiEI+dsK0hKGlo+GYUn+gXM7kr0szlrZOAI+qdeOvSb5knGoIDiA2s70Jaf8XMvICI
+	XanMgNn2dhRd352C3mtDH/+o4D/POcJxcolPn7egKhWx163FR8YjlkoLPFs9VpXbLQOF2bZ3QVm88
+	+pS+1Drg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1uHhqE-00000000vno-2rKA;
+	Wed, 21 May 2025 11:42:34 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id C9BC1300348; Wed, 21 May 2025 13:42:33 +0200 (CEST)
+Date: Wed, 21 May 2025 13:42:33 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sean Christopherson <seanjc@google.com>, mhklinux@outlook.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, K Prateek Nayak <kprateek.nayak@amd.com>,
+	David Matlack <dmatlack@google.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+Subject: Re: [PATCH v2 08/12] sched/wait: Drop WQ_FLAG_EXCLUSIVE from
+ add_wait_queue_priority()
+Message-ID: <20250521114233.GC39944@noisy.programming.kicks-ass.net>
+References: <20250519185514.2678456-1-seanjc@google.com>
+ <20250519185514.2678456-9-seanjc@google.com>
+ <20250520191816.GJ16434@noisy.programming.kicks-ass.net>
+ <aC0AEJX0FIMl9lDy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aC0AEJX0FIMl9lDy@google.com>
 
-Calling invalidate_vncr_va() without the mmu_lock held for write
-is a bad idea, and lockdep tells you about that.
+On Tue, May 20, 2025 at 03:20:00PM -0700, Sean Christopherson wrote:
+> On Tue, May 20, 2025, Peter Zijlstra wrote:
+> > On Mon, May 19, 2025 at 11:55:10AM -0700, Sean Christopherson wrote:
+> > > Drop the setting of WQ_FLAG_EXCLUSIVE from add_wait_queue_priority() to
+> > > differentiate it from add_wait_queue_priority_exclusive().  The one and
+> > > only user add_wait_queue_priority(), Xen privcmd's irqfd_wakeup(),
+> > > unconditionally returns '0', i.e. doesn't actually operate in exclusive
+> > > mode.
+> > 
+> > I find:
+> > 
+> > drivers/hv/mshv_eventfd.c:      add_wait_queue_priority(wqh, &irqfd->irqfd_wait);
+> > drivers/xen/privcmd.c:  add_wait_queue_priority(wqh, &kirqfd->wait);
+> > 
+> > I mean, it might still be true and all, but hyperv seems to also use
+> > this now.
+> 
+> Oh FFS, another "heavily inspired by KVM".  I should have bribed someone to take
+> this series when I had the chance.  *sigh*
+> 
+> Unfortunately, the Hyper-V code does actually operate in exclusive mode.  Unless
+> you have a better idea, I'll tweak the series to:
+> 
+>   1. Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority() and have the callers
+>      explicitly set the flag, 
+>   2. Add a patch to drop WQ_FLAG_EXCLUSIVE from Xen privcmd entirely.
+>   3. Introduce add_wait_queue_priority_exclusive() and switch KVM to use it.
+> 
+> That has an added bonus of introducing the Xen change in a dedicated patch, i.e.
+> is probably a sequence anyways.
+> 
+> Alternatively, I could rewrite the Hyper-V code a la the KVM changes, but I'm not
+> feeling very charitable at the moment (the complete lack of documentation for
+> their ioctl doesn't help).
 
-Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/nested.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 56b732003caa7..2381663d2ee98 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1044,6 +1044,8 @@ void kvm_handle_s1e2_tlbi(struct kvm_vcpu *vcpu, u32 inst, u64 val)
- 	struct s1e2_tlbi_scope scope = {};
- 
- 	compute_s1_tlbi_range(vcpu, inst, val, &scope);
-+
-+	guard(write_lock)(&vcpu->kvm->mmu_lock);
- 	invalidate_vncr_va(vcpu->kvm, &scope);
- }
- 
--- 
-2.39.2
-
+Works for me. Michael is typically very responsive wrt hyperv (but you
+probably know this).
