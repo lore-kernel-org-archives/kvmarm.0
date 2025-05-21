@@ -1,165 +1,138 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F76D1779B8
-	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 15:05:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EC427CCE4
+	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 15:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747839913; cv=none; b=lEXNTspeMg1CIEgCfWR3kHY1zUw6vBZOeIyILgq7TSFvr0h0QeAwtR1rxv84MhZRRhMZ1DjakdbFTLEg+ZEw3f+YP4XydRdhaINcekkpnGqDse6BiQrQyiFvmF+TmFOfme+I5VGqM2/g4YE+j0pFAuFDQSp4W0IncusycZQWw5E=
+	t=1747843128; cv=none; b=WWTRdp0MobkWK78Thl2ZhWFlqGEZv2DIIKErNJpg5cKpF4dpI0yJlIoitrlVWNlqmIhnExOP5DCpmpPw9p2KMaxio9bYKpmexyKlRj+2R4qUgqjhbUDeVdkAdlU64pS8N8bjb+ho+vsM/L88Zduj7QejHx8WDO6YEIVi7zH4UNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747839913; c=relaxed/simple;
-	bh=RKB2z0hQP/qo6VCyUDMpywyny5OcLY+qjiNZEUbDqQ4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mcT36sinngEtejYSJwuVUTJ2b4tH2hK6X7BnRegQjqExjSBNm0e6ZJwP3XeNevo5t9DOWq4NEbbNPcd5x0UkzcecfvV3Q2gpB/F+5WclUtYCkJlryNAoCtfYqYNdwtUNMqww7xYWGAnKtApVIhxDITmZWegBOdx5boDbpakzwTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1QiFUpgU; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1747843128; c=relaxed/simple;
+	bh=I9VBBxVFYOrWsTK7GjRldDLctXPPzg+fbuHoTp+4SCk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sB2jgvk8mYgMgcLDSBw21avZMa1i5ja7VE9RpRPTEL2+v5jZKJdY4hkMX4Ox8br1hO3CbKg+JCBafdE1Vq28UNLY32ae4dOq7KRXsvuThjjbDApnhE+HYDtaKZlohcLMvHdMBhyblWaspigjqKS4Rh5gBRB/Q87p5CDMr7GcEmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JCUwghKq; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1QiFUpgU"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-742cf6f6a10so4532827b3a.1
-        for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 08:05:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JCUwghKq"
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-43cec5cd73bso48357175e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 08:58:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747839910; x=1748444710; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zVleagUiVHw/5vhkBi8LDSAfw55ruRJcasWRJK+un3M=;
-        b=1QiFUpgUsgPJw9f3GQpAggJGyQKpDblJ4/r4/8KxaFlx4zsNO9J0AVmMdm85nnIsDC
-         6/JcRN48++v8mb7plCtmJ27ZlCR4ExKcbCQsrtxTt+xdWigWU0ocb9c/mfzy9v2abo8j
-         0jCg5IGiZfs6dzAxBXU4gqCC6A1hkYB7LxmWy4ayTpBo97OuudvPNp08Y0tWYE9PeqlW
-         fiNlrHTprPtcuE0sj4EROOJ9HmY39FQL/tdBxlNn0cn3Dm4vnWyK6SW78mmAZ+n5ljol
-         EoB2ryHvbtle/VcTtrgT68f9HSFjBg0vtfq3eJ5a5w6CRm4KaAj+0OCefS7vdVSwWOkp
-         8ccw==
+        d=linaro.org; s=google; t=1747843124; x=1748447924; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7jGMaRN9DTvk91Wh6QyGZY6sK/KJmkltlvMirfVWYJg=;
+        b=JCUwghKq21MOywsGQ+isFmOD2RT2/UMvqPyd95ZxN6BA8V8ji7kdV2zhgeG0fKEHTt
+         faf9khRwPUEJJUTxFi9HV65wZIsed13jhKISTF0bwuu7gzvtOI/vMxqT1GzmbYdQUUFh
+         spyDqUvU37gQ18Sm6aocfJEAQNwG7nHeuZ5DJ/eoJbXjdpSoM6OJNPB474QnbZ3tXtUO
+         iLXds0CHnQNSxcDe0V3EmRy76IbCVYZmz3ZpCQdCbpw28/7+sCOOeZDaz5P5cX6sy8HU
+         eOsiLLDYpjn0M+3rnNWaiugp88WAGqXG0JUqhsUg/XOJGESiNPqEx12mD5kP9FCYa8Az
+         hvJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747839910; x=1748444710;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zVleagUiVHw/5vhkBi8LDSAfw55ruRJcasWRJK+un3M=;
-        b=Kovq3r0bxj48HZ6I9jQljvBZ5DH68NPjRpBCME4j9VEE9vm7DMoqfvrCsPHlkeC7GL
-         GM+et8z1mpWG4W6gOL3qoFn3Nugnqsyao+pQ/ZpWK0V6i3P+ZGGjSGUaSs73Ns79LUvE
-         FcBlc0WV/F1QmVJf9u5wVVWf8T1PGBpZwXinnF1z+FwPywvPs7BZUEfsmTlzVbVRM73J
-         KmKiCbe0rhqYa/NGyYR8jDB2LiRyICUYppFPtyXNE7bk2JhlAHYLSkj2CKxMJ7jRK/iz
-         XjiwZ5d6fRNIcUw3py6TaN3uWfKDLSud922hjbt0VvchVPW+lbwNSiOnYCyvYLnP/ycD
-         88+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUizFCLK0TNMRANC7wOJdbT81nhpIoedLx3ExUPgLELdjyCAqztLfh8p0jFBQgLVyF9iaXTQ8o=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw7K16WGb2/k4AwyclfXekoyR4GY0k8HsU7wDOK5giNBFYYcZ8x
-	zETdj+JRVPEpG+LlKdrYKMJnk5qrzsV6r6/8jY23HyKQsYI0ulsZSExTup7moMWAXkkQbSYko30
-	vt64V0w==
-X-Google-Smtp-Source: AGHT+IHGSpJmNv8SAS14hmKKh6ZIg5876VKcdbgoWSZxr3DEmUJT2DSMLR2M8INJy/4FyAqIRr98hcZr/w0=
-X-Received: from pgbfe5.prod.google.com ([2002:a05:6a02:2885:b0:b26:eac3:3979])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:103:b0:1fe:90c5:7d00
- with SMTP id adf61e73a8af0-216219c82fcmr35252646637.28.1747839910386; Wed, 21
- May 2025 08:05:10 -0700 (PDT)
-Date: Wed, 21 May 2025 08:05:09 -0700
-In-Reply-To: <BN7PR02MB4148503E1599C1310F408863D49EA@BN7PR02MB4148.namprd02.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1747843124; x=1748447924;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7jGMaRN9DTvk91Wh6QyGZY6sK/KJmkltlvMirfVWYJg=;
+        b=DP48TuYSmN8u+F+mSagx87gARzTCdXPYYZulZsLYR8H2E2M4ju5hVICUFoOTwzbY/g
+         L6TAp0DEhbthkwc8vmy2exgLQ2eyNp1qKE/7cpYI/pJTucwkqEmaNJLTELydafAnFjcV
+         BPiXyxu4uJi3X2Jwpvbn60vzp7dIA8EXPyVwElfSFTUa8sfMH7TVFDeXXFoqwbfnsMk0
+         krAwPtgwXGNms3vc6vj0DGMAilKKzWPntbfzVMBzNMp3/LiXBBIkr3FRcTiCKfAmnfnY
+         Iak8ovTSz7LCBiQynk32cuwhec/UXE9updVN1KJyAKczgB+1t7SyhEPBx3SXOVRGlSHj
+         6Gmg==
+X-Forwarded-Encrypted: i=1; AJvYcCV4hx4pEFjch870aTrsTZzyeZ5t+sOmI5tX6KZ8GiWFQb5r+2RWWl7MpRZYWZTpN8zotizFGTg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxyE/M2kl9g9lzXXd7DawZdIm+3HBLrc+zsxH5XbNz8wCIy4pf0
+	534NTaYzahNc6lOGR89wo+07NJY3PgoN2KqeE8VJ90YPbPCKp+bRnKyLO0nGGM+ovg0=
+X-Gm-Gg: ASbGncu+RlWSSDgwGro3m7yuIRYVNzn5HmoOgCz7md4PW+eiW4MjhNIbnPDn09kzv4p
+	pnNmnA66K66hqK0ykuTR5axRYXQERjc7nd3hwSMkX4yVo06VEXhvUHaSSljZnuYiMf/aCROvTUY
+	DDyYW3xQxW2dHFkC9T68ayj4XNCdhlTK4aAeBM3gRO3kVGQ3tUBCr7MpWwtiYPQF/GVqQgx7do8
+	Yzr++aXSIaXflWgXQ5L2XyJ+jlaBOYP8vo6nIGshh1PSSoM2gxH42qYqWCqpnemljWfShimBeOm
+	SheC0zVA8vtvNX4C8PenlodFtDxAcYOFMiZpY2stKtQ5AtxH4U+ebugqr2SsZmwjht4=
+X-Google-Smtp-Source: AGHT+IE94Qc/sbvf18GBZCQv3ZQ8s8ZqdtBvtnfrv3gSKGcbnewhx8YlU5QP8S7QSIUDnlJDrBopzQ==
+X-Received: by 2002:a05:600c:34c4:b0:43c:ee62:33f5 with SMTP id 5b1f17b1804b1-442fd6752e7mr217340645e9.27.1747843124389;
+        Wed, 21 May 2025 08:58:44 -0700 (PDT)
+Received: from [192.168.1.3] ([37.18.136.128])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca4d2ddsm19933864f8f.7.2025.05.21.08.58.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 May 2025 08:58:44 -0700 (PDT)
+Message-ID: <119c9a70-6ea8-46f0-b877-8a433d97ce84@linaro.org>
+Date: Wed, 21 May 2025 16:58:42 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250519185514.2678456-1-seanjc@google.com> <20250519185514.2678456-9-seanjc@google.com>
- <20250520191816.GJ16434@noisy.programming.kicks-ass.net> <aC0AEJX0FIMl9lDy@google.com>
- <20250521114233.GC39944@noisy.programming.kicks-ass.net> <BN7PR02MB4148503E1599C1310F408863D49EA@BN7PR02MB4148.namprd02.prod.outlook.com>
-Message-ID: <aC3rpZChhtw4NODS@google.com>
-Subject: Re: [PATCH v2 08/12] sched/wait: Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority()
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Nuno Das Neves <nunodasneves@linux.microsoft.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, K Prateek Nayak <kprateek.nayak@amd.com>, 
-	David Matlack <dmatlack@google.com>, Juergen Gross <jgross@suse.com>, 
-	Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 4/4] perf: arm_pmuv3: Add support for the Branch
+ Record Buffer Extension (BRBE)
+To: Rob Herring <robh@kernel.org>, Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Leo Yan <leo.yan@arm.com>,
+ linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
+ <20250407-arm-brbe-v19-v21-4-ff187ff6c928@kernel.org>
+ <20250519150621.GA17177@willie-the-truck>
+ <20250519215651.GB2650608-robh@kernel.org>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20250519215651.GB2650608-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 21, 2025, Michael Kelley wrote:
-> From: Peter Zijlstra <peterz@infradead.org> Sent: Wednesday, May 21, 2025 4:43 AM
-> > 
-> > On Tue, May 20, 2025 at 03:20:00PM -0700, Sean Christopherson wrote:
-> > > On Tue, May 20, 2025, Peter Zijlstra wrote:
-> > > > On Mon, May 19, 2025 at 11:55:10AM -0700, Sean Christopherson wrote:
-> > > > > Drop the setting of WQ_FLAG_EXCLUSIVE from add_wait_queue_priority() to
-> > > > > differentiate it from add_wait_queue_priority_exclusive().  The one and
-> > > > > only user add_wait_queue_priority(), Xen privcmd's irqfd_wakeup(),
-> > > > > unconditionally returns '0', i.e. doesn't actually operate in exclusive
-> > > > > mode.
-> > > >
-> > > > I find:
-> > > >
-> > > > drivers/hv/mshv_eventfd.c:      add_wait_queue_priority(wqh, &irqfd->irqfd_wait);
-> > > > drivers/xen/privcmd.c:  add_wait_queue_priority(wqh, &kirqfd->wait);
-> > > >
-> > > > I mean, it might still be true and all, but hyperv seems to also use
-> > > > this now.
-> > >
-> > > Oh FFS, another "heavily inspired by KVM".  I should have bribed someone to take
-> > > this series when I had the chance.  *sigh*
-> > >
-> > > Unfortunately, the Hyper-V code does actually operate in exclusive mode.  Unless
-> > > you have a better idea, I'll tweak the series to:
-> > >
-> > >   1. Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority() and have the callers
-> > >      explicitly set the flag,
-> > >   2. Add a patch to drop WQ_FLAG_EXCLUSIVE from Xen privcmd entirely.
-> > >   3. Introduce add_wait_queue_priority_exclusive() and switch KVM to use it.
-> > >
-> > > That has an added bonus of introducing the Xen change in a dedicated patch, i.e.
-> > > is probably a sequence anyways.
-> > >
-> > > Alternatively, I could rewrite the Hyper-V code a la the KVM changes, but I'm not
-> > > feeling very charitable at the moment (the complete lack of documentation for
-> > > their ioctl doesn't help).
-> > 
-> > Works for me. Michael is typically very responsive wrt hyperv (but you
-> > probably know this).
+
+
+On 19/05/2025 10:56 pm, Rob Herring wrote:
+> On Mon, May 19, 2025 at 04:06:22PM +0100, Will Deacon wrote:
+>> Hey Rob,
+>>
+>> On Mon, Apr 07, 2025 at 12:41:33PM -0500, Rob Herring (Arm) wrote:
+>>> From: Anshuman Khandual <anshuman.khandual@arm.com>
+>>>
+>>> The ARMv9.2 architecture introduces the optional Branch Record Buffer
+>>> Extension (BRBE), which records information about branches as they are
+>>> executed into set of branch record registers. BRBE is similar to x86's
+>>> Last Branch Record (LBR) and PowerPC's Branch History Rolling Buffer
+>>> (BHRB).
+>>
+>> Since you picked this up from v19, the driver has changed considerably
+>> and I presume you will be continuing to extend it in future as the
+>> architecture progresses. Perhaps having you listed as Author (and
+>> crucially, in git blame :p) with Anshuman as a Co-developed-by: would be
+>> more appropriate?
 > 
-> I can't be much help on this issue. This Hyper-V code is for Linux running in
-> the root partition (i.e., "dom0") and I don't have a setup where I can run and
-> test that configuration.
+> Shrug.
 > 
-> Adding Nuno Das Neves from Microsoft for his thoughts.
+>>> ---
+>>>   drivers/perf/Kconfig         |  11 +
+>>>   drivers/perf/Makefile        |   1 +
+>>>   drivers/perf/arm_brbe.c      | 802 +++++++++++++++++++++++++++++++++++++++++++
+>>>   drivers/perf/arm_brbe.h      |  47 +++
+>>>   drivers/perf/arm_pmu.c       |  15 +-
+>>>   drivers/perf/arm_pmuv3.c     | 129 ++++++-
+>>>   include/linux/perf/arm_pmu.h |   8 +
+>>>   7 files changed, 1006 insertions(+), 7 deletions(-)
+>>
+>> Do you know if James Clark's tests [1] are going to be respun for the
+>> perf tool? It would be handy to have some way to test this new
+>> functionality.
+> 
+> Yes. I dropped them here because I've been told by Arnaldo in the past
+> to send userspace stuff separately.
+> 
 
-A slightly more helpful, less ranty explanation of what's going on:
+That version of the test was out of date so I've pushed the new version 
+here: 
+https://git.linaro.org/plugins/gitiles/people/james.clark/linux.git/+/16e4a18c2d5fc53736f05c9052b1d11d74909707
 
-KVM's irqfd code, which was pretty copied verbatim for Hyper-V partitions, disallows
-binding an eventfd to a single VM multiple times, but doesn't handle the scenario
-where an eventfd is bound to multiple VMs, i.e. to multiple partitions.  What's
-particular "fun" about such a scenario is that WQ_FLAG_EXCLUSIVE+WQ_FLAG_PRIORITY
-means only the first VM/partition that bound the eventfd will be notified.
+But I'll wait for the driver changes to be finalised before posting it. 
+Or Rob can take it back into the patchset.
 
-For KVM-based setups, this is a legitimate concern because KVM supports intra-host
-migration.  E.g. to upgrade the userspace VMM, a guest can be "migrated" from the
-old VMM's "struct kvm" instance to the new VMM's "struct kvm".  If userspace mucks
-up the migration, e.g. doesn't *unbind* the eventfd from the old VM(M) before
-resuming the guest in the new VM(M), KVM will effectively drop virtual IRQs.
-
-This is purely a hardening exercise, i.e. isn't required for correctness, assuming
-userspace userspace is bug-free.  The KVM patches surrounding this patch show how
-I am planning on ensuring a 1:1 eventfd:VM binding.
-
-To not block the KVM hardening on Hyper-V's eventfd usage, I am planning on making
-this change in the next version of the series:
-
-diff --git a/drivers/hv/mshv_eventfd.c b/drivers/hv/mshv_eventfd.c
-index 8dd22be2ca0b..b348928871c2 100644
---- a/drivers/hv/mshv_eventfd.c
-+++ b/drivers/hv/mshv_eventfd.c
-@@ -368,6 +368,14 @@ static void mshv_irqfd_queue_proc(struct file *file, wait_queue_head_t *wqh,
-                        container_of(polltbl, struct mshv_irqfd, irqfd_polltbl);
- 
-        irqfd->irqfd_wqh = wqh;
-+
-+       /*
-+        * TODO: Ensure there isn't already an exclusive, priority waiter, e.g.
-+        * that the irqfd isn't already bound to another partition.  Only the
-+        * first exclusive waiter encountered will be notified, and
-+        * add_wait_queue_priority() doesn't enforce exclusivity.
-+        */
-+       irqfd->irqfd_wait.flags |= WQ_FLAG_EXCLUSIVE;
-        add_wait_queue_priority(wqh, &irqfd->irqfd_wait);
- }
