@@ -1,55 +1,55 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-lj1-f201.google.com (mail-lj1-f201.google.com [209.85.208.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62DD26C3AF
-	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 12:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329DA2701D3
+	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 12:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747831886; cv=none; b=SBRbrKo6sRtXXh6Dxiu+k7XVC9nwKucgpwJUptWhQDTm1Nv5HpSV0xKSTOmVC/mr2TdLbhT0pTAZeD1snRltsuvFfBdcJp8v4q6/TjWPG2WwR7VmsU4lm0B1w4CI8A6iQpL+xsidik+0iU/0OliRwC3mRDLHIFC/OVXXSVRGOT8=
+	t=1747831891; cv=none; b=gCmRkME+zcSzrarXee1gQuoYN3SwElXob48/0glrul95R4dFcjaUODePzsN2lN3gLGgqQk05JfT0L+dP4fQvdqAAtp5hSlk6TbYlIQ36SkoYSbbvc39zXnXPCpKYamdCNHbmCOBr+DucPKNXHPS+8J/wMzm4onuv5XEF+eENV7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747831886; c=relaxed/simple;
-	bh=FrjjkAPvsmfKvlOlRsbAfJi1psoLqx8eK/erV4N9fAA=;
+	s=arc-20240116; t=1747831891; c=relaxed/simple;
+	bh=Jxm7YsSOcl7SbKDCg4jgzBC7+DrbcLOhLsnFtsowMSE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=n6xAWWPp/3VVqNTX9aKjzPqjwqhLHHMRyYRP1O7fNxgR5T4m1kmCYxBaDpaWELi0eQ+EtaGy6ujE9Y/VjQ5E88Z3DplX4ZJo3/7aLwSSUKGePeuBP2YXzAjzzpTmrYQTcbdLy/X6gxMQSigog+k1MuvgmcqQFM4FEGSqt4uz+mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D8vYPMnM; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=am9j2rpSEWNmr+RyTYJFDaD3MmtVivrPlAQIP8GN1+JGdzSIsYibHmFqoZDySF8eryqGgjJVuGOmMxAyyCeti25rV8+qse0zAe5SYdzzeUd53Mxu8NTATuFKgfSP+qBd7EZTEfg1IYRPsAaUpzPsbiRi97EvsN1Nptxb8dTj1mQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hWzYwu0T; arc=none smtp.client-ip=209.85.208.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D8vYPMnM"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a364802ec5so1728371f8f.0
-        for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 05:51:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hWzYwu0T"
+Received: by mail-lj1-f201.google.com with SMTP id 38308e7fff4ca-32813317834so29059441fa.1
+        for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 05:51:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747831882; x=1748436682; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1747831887; x=1748436687; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JPzlBmS/vixQNlnFlLNVTrpyQWywNNSCiH/beuvalSg=;
-        b=D8vYPMnM4HlR2snjShpDmi5Iv8fCa8DDrR/LenonIlIqsgrZmutFqeHkSY5HsoAHbA
-         u2FnzfRybFA693r19lF5tX1nSH55TiIq5IImXXJ9Pe0yijywnaDyuLqh5aKCYjyjRVpX
-         JTQUD23k24edo48HpZ0MpoG7U7uaUgE04SUmEc8WH27halQLFfGl8gBFTHyKYlOKhE8Y
-         glSLnxRjyrqZGXm3n3l//wucEpC1NFYE0TbI1UCum61ANrb9VNwv++ItzwFoBsKxA7Q/
-         VxlsxbZf91SnyZ9sIJR017Ut8w6fcITWe8e//bOcSX+tDeJU39JDqD4Sylv7oeVJHjTS
-         dMhQ==
+        bh=+mAmm5g1Jwly1b5ldQINlnDEQuSKb4osn8uy2X9OeKI=;
+        b=hWzYwu0TKAiesfnS3s7wo/5ilEsB7IA58d67rrddiV2tjUP5QQVFLRamftl/db7BBr
+         pyJ/5HbndaNeZJ+bqQX9GgaQhcAU6z6LX14UZekjrolGWlIxJJQapqF0Zg5wQupqvVHz
+         Y7p3pnZKYaDy3mZMu4RRIwYFft/4tro/sjIK2wD6BmA/60n84w/HhiJF+Zb/X0yLCOMZ
+         q3xVKMEd30VZubDRi0mNkzU0hL/61/DsJbXwa0kLt8eWAZDNb6SoyfVhOXtvdltS0MDg
+         g/Ke35T4vgj1h0IO3Z7q3Io61gip4wweVNLpnGmULLd2b3Y/Qa+ybZ+krqNcEJ9zunhv
+         FLmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747831882; x=1748436682;
+        d=1e100.net; s=20230601; t=1747831887; x=1748436687;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JPzlBmS/vixQNlnFlLNVTrpyQWywNNSCiH/beuvalSg=;
-        b=UtgAntHrVPmfbsbLfZxBohqOXBa+ndCu0pAMl9t2Xq2Xhl22KsrQclL0/NjvnKjVt0
-         2/O9fOLPmIFX+cMw7kQ/PN9wXZIc8sqn97bEYr1EqHdcxVtH7M24N8vbS/nlrVkujHSX
-         I6Pw+LbTabOFjD2W/53csv4ON5FKtJ6jOe9g9XxZjwjNFAme+DO29yVCFUs5KSo8sxdB
-         2NVluvtjhiTKLSw9vzutUt935tkX5VQSuA3pgqhKPuBzxVjXGLXH+ZjkjMPAAtxQ5287
-         IDgYQ5uVUj7xrCZdS5MVtOyqyl/0GRP6PUBB3qrkkiGLcY8VeNXNen10eYwxAeuQ2VyI
-         rH0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXRJpnsT0bQ3zKkjTJEFNFzLbU2/6qazU80Oll3g8Z7vTG2CXUmGamZ08UtgrgvUa2U4j23Ibg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwfLN/zm9W9DWGMMD+t54AlEqdugfQtXXS5BHt5LG0wFVTcmM0M
-	4hd+AT94xKNgKF/ro3DDSXRPbgjz8F0KwUcuaCp8N+SjyEmfZT09ZJGz2MBx0mkBLjCuftIMd6Q
-	MfWSaDjYsqEHK4DAUYKwlRQ==
-X-Google-Smtp-Source: AGHT+IE/jsEpHUOKUoZ6F/+QjPoabXMpV1/0WZAcaBafnmGb5uaRjEjbFBFVLyfZWlGhTulY1NK7gFRGkHiLEeFY
-X-Received: from wmbdr13.prod.google.com ([2002:a05:600c:608d:b0:43d:1f28:b8bf])
+        bh=+mAmm5g1Jwly1b5ldQINlnDEQuSKb4osn8uy2X9OeKI=;
+        b=F4agoVznkWs7VeSt9sbK2cAJS10NYr1Zd0Mujfvw8/KMeoZYEzfDSNwQsj+QfmPILj
+         zV/Sxm237eaVWC2FrD9z9AFxO6ThsH9WoPQHH3L1a+Pr1HFTnmrS5XzHC7iokPSlx/iN
+         8bn1xzRMJF+kmGc4l3/D1Zad7X3zh76Oxxe5mFZdPeDZ8UYP9YOPusyYo3ruszfq8FNa
+         aYenRUnxUffNq6t5AJrdoubznYRtHwcXBwBmJrxzAiVOmyOe0HzA9exRfiujkuwD3mgx
+         xCM9Mcqzbw7LLOI4WmNICpJgNtDkykGkBOVkOm0pbX747VyzCjzcxTUTmlpZqlDIN79G
+         ncdg==
+X-Forwarded-Encrypted: i=1; AJvYcCVu5uNJU+SkxARrTLz9WCDMcMijJEz/lb3Q0aUKdA7EMVmgaK9aQFpQ1r29fXvbcqB+98HKnKU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx///V7/qd0FD8CWcp1qKSUZF2blcINrVZHUpApk578ONeye40u
+	cj67A0gCq8/ITS+M4qEMLZFGK/TsrwqTS3rRttLFr6B7C4+Kz6MoVqbVYn44FSVZ7t9IK83j84g
+	aAzvZ5FWgBYgLtnavco8qeQ==
+X-Google-Smtp-Source: AGHT+IEUewuPBYFEtkW3sMmEWy+gJssUHZIxGZsES1eNOW8n7Onooz0aLiuqT7Knq0tYOoF85SSNBz4q6/qkCg9C
+X-Received: from wmsu25.prod.google.com ([2002:a05:600c:c3d9:b0:43c:fd72:aae1])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:40ce:b0:3a3:68c7:e486 with SMTP id ffacd0b85a97d-3a368c7e67bmr14514425f8f.51.1747831882368;
- Wed, 21 May 2025 05:51:22 -0700 (PDT)
-Date: Wed, 21 May 2025 13:48:34 +0100
+ 2002:a05:600c:1d07:b0:43c:e305:6d50 with SMTP id 5b1f17b1804b1-442fd660721mr162062465e9.24.1747831876497;
+ Wed, 21 May 2025 05:51:16 -0700 (PDT)
+Date: Wed, 21 May 2025 13:48:31 +0100
 In-Reply-To: <20250521124834.1070650-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250521124834.1070650-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.49.0.1112.g889b7c5bd8-goog
-Message-ID: <20250521124834.1070650-11-vdonnefort@google.com>
-Subject: [PATCH v6 10/10] KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
+Message-ID: <20250521124834.1070650-8-vdonnefort@google.com>
+Subject: [PATCH v6 07/10] KVM: arm64: Convert pkvm_mappings to interval tree
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
@@ -70,305 +70,198 @@ Cc: qperret@google.com, linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-With the introduction of stage-2 huge mappings in the pKVM hypervisor,
-guest pages CMO is needed for PMD_SIZE size. Fixmap only supports
-PAGE_SIZE and iterating over the huge-page is time consuming (mostly due
-to TLBI on hyp_fixmap_unmap) which is a problem for EL2 latency.
+From: Quentin Perret <qperret@google.com>
 
-Introduce a shared PMD_SIZE fixmap (hyp_fixblock_map/hyp_fixblock_unmap)
-to improve guest page CMOs when stage-2 huge mappings are installed.
+In preparation for supporting stage-2 huge mappings for np-guest, let's
+convert pgt.pkvm_mappings to an interval tree.
 
-On a Pixel6, the iterative solution resulted in a latency of ~700us,
-while the PMD_SIZE fixmap reduces it to ~100us.
+No functional change intended.
 
-Because of the horrendous private range allocation that would be
-necessary, this is disabled for 64KiB pages systems.
-
-Suggested-by: Quentin Perret <qperret@google.com>
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+Suggested-by: Vincent Donnefort <vdonnefort@google.com>
 Signed-off-by: Quentin Perret <qperret@google.com>
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 1b43bcd2a679..2888b5d03757 100644
+index 6b9d274052c7..1b43bcd2a679 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -59,6 +59,11 @@ typedef u64 kvm_pte_t;
+@@ -413,7 +413,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
+  */
+ struct kvm_pgtable {
+ 	union {
+-		struct rb_root					pkvm_mappings;
++		struct rb_root_cached				pkvm_mappings;
+ 		struct {
+ 			u32					ia_bits;
+ 			s8					start_level;
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index d91bfcf2db56..da75d41c948c 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -173,6 +173,7 @@ struct pkvm_mapping {
+ 	struct rb_node node;
+ 	u64 gfn;
+ 	u64 pfn;
++	u64 __subtree_last;	/* Internal member for interval tree */
+ };
  
- #define KVM_PHYS_INVALID		(-1ULL)
+ int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 057874bbe3e1..8a1a2faf66a8 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -5,6 +5,7 @@
+  */
  
-+#define KVM_PTE_TYPE			BIT(1)
-+#define KVM_PTE_TYPE_BLOCK		0
-+#define KVM_PTE_TYPE_PAGE		1
-+#define KVM_PTE_TYPE_TABLE		1
-+
- #define KVM_PTE_LEAF_ATTR_LO		GENMASK(11, 2)
+ #include <linux/init.h>
++#include <linux/interval_tree_generic.h>
+ #include <linux/kmemleak.h>
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_mmu.h>
+@@ -256,80 +257,67 @@ static int __init finalize_pkvm(void)
+ }
+ device_initcall_sync(finalize_pkvm);
  
- #define KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX	GENMASK(4, 2)
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 230e4f2527de..6e83ce35c2f2 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -13,9 +13,11 @@
- extern struct kvm_pgtable pkvm_pgtable;
- extern hyp_spinlock_t pkvm_pgd_lock;
- 
--int hyp_create_pcpu_fixmap(void);
-+int hyp_create_fixmap(void);
- void *hyp_fixmap_map(phys_addr_t phys);
- void hyp_fixmap_unmap(void);
-+void *hyp_fixblock_map(phys_addr_t phys, size_t *size);
-+void hyp_fixblock_unmap(void);
- 
- int hyp_create_idmap(u32 hyp_va_bits);
- int hyp_map_vectors(void);
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 1c18fca82209..f67c1a91e4eb 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -216,34 +216,42 @@ static void guest_s2_put_page(void *addr)
- 	hyp_put_page(&current_vm->pool, addr);
+-static int cmp_mappings(struct rb_node *node, const struct rb_node *parent)
++static u64 __pkvm_mapping_start(struct pkvm_mapping *m)
+ {
+-	struct pkvm_mapping *a = rb_entry(node, struct pkvm_mapping, node);
+-	struct pkvm_mapping *b = rb_entry(parent, struct pkvm_mapping, node);
+-
+-	if (a->gfn < b->gfn)
+-		return -1;
+-	if (a->gfn > b->gfn)
+-		return 1;
+-	return 0;
++	return m->gfn * PAGE_SIZE;
  }
  
--static void clean_dcache_guest_page(void *va, size_t size)
-+static void __apply_guest_page(void *va, size_t size,
-+			       void (*func)(void *addr, size_t size))
+-static struct rb_node *find_first_mapping_node(struct rb_root *root, u64 gfn)
++static u64 __pkvm_mapping_end(struct pkvm_mapping *m)
  {
- 	size += va - PTR_ALIGN_DOWN(va, PAGE_SIZE);
- 	va = PTR_ALIGN_DOWN(va, PAGE_SIZE);
- 	size = PAGE_ALIGN(size);
- 
- 	while (size) {
--		__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
--					  PAGE_SIZE);
--		hyp_fixmap_unmap();
--		va += PAGE_SIZE;
--		size -= PAGE_SIZE;
-+		size_t map_size = PAGE_SIZE;
-+		void *map;
-+
-+		if (IS_ALIGNED((unsigned long)va, PMD_SIZE) && size >= PMD_SIZE)
-+			map = hyp_fixblock_map(__hyp_pa(va), &map_size);
-+		else
-+			map = hyp_fixmap_map(__hyp_pa(va));
-+
-+		func(map, map_size);
-+
-+		if (map_size == PMD_SIZE)
-+			hyp_fixblock_unmap();
-+		else
-+			hyp_fixmap_unmap();
-+
-+		size -= map_size;
-+		va += map_size;
- 	}
- }
- 
--static void invalidate_icache_guest_page(void *va, size_t size)
-+static void clean_dcache_guest_page(void *va, size_t size)
- {
--	size += va - PTR_ALIGN_DOWN(va, PAGE_SIZE);
--	va = PTR_ALIGN_DOWN(va, PAGE_SIZE);
--	size = PAGE_ALIGN(size);
-+	__apply_guest_page(va, size, __clean_dcache_guest_page);
-+}
- 
--	while (size) {
--		__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)),
--					       PAGE_SIZE);
--		hyp_fixmap_unmap();
--		va += PAGE_SIZE;
--		size -= PAGE_SIZE;
+-	struct rb_node *node = root->rb_node, *prev = NULL;
+-	struct pkvm_mapping *mapping;
+-
+-	while (node) {
+-		mapping = rb_entry(node, struct pkvm_mapping, node);
+-		if (mapping->gfn == gfn)
+-			return node;
+-		prev = node;
+-		node = (gfn < mapping->gfn) ? node->rb_left : node->rb_right;
 -	}
-+static void invalidate_icache_guest_page(void *va, size_t size)
-+{
-+	__apply_guest_page(va, size, __invalidate_icache_guest_page);
+-
+-	return prev;
++	return (m->gfn + 1) * PAGE_SIZE - 1;
  }
  
- int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index f41c7440b34b..ae8391baebc3 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -229,9 +229,8 @@ int hyp_map_vectors(void)
++INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64, __subtree_last,
++		     __pkvm_mapping_start, __pkvm_mapping_end, static,
++		     pkvm_mapping);
++
+ /*
+- * __tmp is updated to rb_next(__tmp) *before* entering the body of the loop to allow freeing
+- * of __map inline.
++ * __tmp is updated to iter_first(pkvm_mappings) *before* entering the body of the loop to allow
++ * freeing of __map inline.
+  */
+ #define for_each_mapping_in_range_safe(__pgt, __start, __end, __map)				\
+-	for (struct rb_node *__tmp = find_first_mapping_node(&(__pgt)->pkvm_mappings,		\
+-							     ((__start) >> PAGE_SHIFT));	\
++	for (struct pkvm_mapping *__tmp = pkvm_mapping_iter_first(&(__pgt)->pkvm_mappings,	\
++								  __start, __end - 1);		\
+ 	     __tmp && ({									\
+-				__map = rb_entry(__tmp, struct pkvm_mapping, node);		\
+-				__tmp = rb_next(__tmp);						\
++				__map = __tmp;							\
++				__tmp = pkvm_mapping_iter_next(__map, __start, __end - 1);	\
+ 				true;								\
+ 		       });									\
+-	    )											\
+-		if (__map->gfn < ((__start) >> PAGE_SHIFT))					\
+-			continue;								\
+-		else if (__map->gfn >= ((__end) >> PAGE_SHIFT))					\
+-			break;									\
+-		else
++	    )
+ 
+ int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ 			     struct kvm_pgtable_mm_ops *mm_ops)
+ {
+-	pgt->pkvm_mappings	= RB_ROOT;
++	pgt->pkvm_mappings	= RB_ROOT_CACHED;
+ 	pgt->mmu		= mmu;
+ 
  	return 0;
  }
  
--void *hyp_fixmap_map(phys_addr_t phys)
-+static void *fixmap_map_slot(struct hyp_fixmap_slot *slot, phys_addr_t phys)
+-void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
++static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 end)
  {
--	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
- 	kvm_pte_t pte, *ptep = slot->ptep;
+ 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
+ 	pkvm_handle_t handle = kvm->arch.pkvm.handle;
+ 	struct pkvm_mapping *mapping;
+-	struct rb_node *node;
++	int ret;
  
- 	pte = *ptep;
-@@ -243,10 +242,21 @@ void *hyp_fixmap_map(phys_addr_t phys)
- 	return (void *)slot->addr;
- }
+ 	if (!handle)
+-		return;
++		return 0;
  
-+void *hyp_fixmap_map(phys_addr_t phys)
-+{
-+	return fixmap_map_slot(this_cpu_ptr(&fixmap_slots), phys);
-+}
-+
- static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
- {
- 	kvm_pte_t *ptep = slot->ptep;
- 	u64 addr = slot->addr;
-+	u32 level;
-+
-+	if (FIELD_GET(KVM_PTE_TYPE, *ptep) == KVM_PTE_TYPE_PAGE)
-+		level = KVM_PGTABLE_LAST_LEVEL;
-+	else
-+		level = KVM_PGTABLE_LAST_LEVEL - 1; /* create_fixblock() guarantees PMD level */
- 
- 	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
- 
-@@ -260,7 +270,7 @@ static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
- 	 * https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/T/#mf10dfbaf1eaef9274c581b81c53758918c1d0f03
- 	 */
- 	dsb(ishst);
--	__tlbi_level(vale2is, __TLBI_VADDR(addr, 0), KVM_PGTABLE_LAST_LEVEL);
-+	__tlbi_level(vale2is, __TLBI_VADDR(addr, 0), level);
- 	dsb(ish);
- 	isb();
- }
-@@ -273,9 +283,9 @@ void hyp_fixmap_unmap(void)
- static int __create_fixmap_slot_cb(const struct kvm_pgtable_visit_ctx *ctx,
- 				   enum kvm_pgtable_walk_flags visit)
- {
--	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)ctx->arg);
-+	struct hyp_fixmap_slot *slot = (struct hyp_fixmap_slot *)ctx->arg;
- 
--	if (!kvm_pte_valid(ctx->old) || ctx->level != KVM_PGTABLE_LAST_LEVEL)
-+	if (!kvm_pte_valid(ctx->old) || (ctx->end - ctx->start) != kvm_granule_size(ctx->level))
- 		return -EINVAL;
- 
- 	slot->addr = ctx->addr;
-@@ -296,13 +306,84 @@ static int create_fixmap_slot(u64 addr, u64 cpu)
- 	struct kvm_pgtable_walker walker = {
- 		.cb	= __create_fixmap_slot_cb,
- 		.flags	= KVM_PGTABLE_WALK_LEAF,
--		.arg = (void *)cpu,
-+		.arg	= per_cpu_ptr(&fixmap_slots, cpu),
- 	};
- 
- 	return kvm_pgtable_walk(&pkvm_pgtable, addr, PAGE_SIZE, &walker);
- }
- 
--int hyp_create_pcpu_fixmap(void)
-+#if PAGE_SHIFT < 16
-+#define HAS_FIXBLOCK
-+static struct hyp_fixmap_slot hyp_fixblock_slot;
-+static DEFINE_HYP_SPINLOCK(hyp_fixblock_lock);
-+#endif
-+
-+static int create_fixblock(void)
-+{
-+#ifdef HAS_FIXBLOCK
-+	struct kvm_pgtable_walker walker = {
-+		.cb	= __create_fixmap_slot_cb,
-+		.flags	= KVM_PGTABLE_WALK_LEAF,
-+		.arg	= &hyp_fixblock_slot,
-+	};
-+	unsigned long addr;
-+	phys_addr_t phys;
-+	int ret, i;
-+
-+	/* Find a RAM phys address, PMD aligned */
-+	for (i = 0; i < hyp_memblock_nr; i++) {
-+		phys = ALIGN(hyp_memory[i].base, PMD_SIZE);
-+		if (phys + PMD_SIZE < (hyp_memory[i].base + hyp_memory[i].size))
-+			break;
-+	}
-+
-+	if (i >= hyp_memblock_nr)
-+		return -EINVAL;
-+
-+	hyp_spin_lock(&pkvm_pgd_lock);
-+	addr = ALIGN(__io_map_base, PMD_SIZE);
-+	ret = __pkvm_alloc_private_va_range(addr, PMD_SIZE);
-+	if (ret)
-+		goto unlock;
-+
-+	ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PMD_SIZE, phys, PAGE_HYP);
-+	if (ret)
-+		goto unlock;
-+
-+	ret = kvm_pgtable_walk(&pkvm_pgtable, addr, PMD_SIZE, &walker);
-+
-+unlock:
-+	hyp_spin_unlock(&pkvm_pgd_lock);
-+
-+	return ret;
-+#else
-+	return 0;
-+#endif
-+}
-+
-+void *hyp_fixblock_map(phys_addr_t phys, size_t *size)
-+{
-+#ifdef HAS_FIXBLOCK
-+	*size = PMD_SIZE;
-+	hyp_spin_lock(&hyp_fixblock_lock);
-+	return fixmap_map_slot(&hyp_fixblock_slot, phys);
-+#else
-+	*size = PAGE_SIZE;
-+	return hyp_fixmap_map(phys);
-+#endif
-+}
-+
-+void hyp_fixblock_unmap(void)
-+{
-+#ifdef HAS_FIXBLOCK
-+	fixmap_clear_slot(&hyp_fixblock_slot);
-+	hyp_spin_unlock(&hyp_fixblock_lock);
-+#else
-+	hyp_fixmap_unmap();
-+#endif
-+}
-+
-+int hyp_create_fixmap(void)
- {
- 	unsigned long addr, i;
- 	int ret;
-@@ -322,7 +403,7 @@ int hyp_create_pcpu_fixmap(void)
- 			return ret;
+-	node = rb_first(&pgt->pkvm_mappings);
+-	while (node) {
+-		mapping = rb_entry(node, struct pkvm_mapping, node);
+-		kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn);
+-		node = rb_next(node);
+-		rb_erase(&mapping->node, &pgt->pkvm_mappings);
++	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
++		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn, 1);
++		if (WARN_ON(ret))
++			return ret;
++		pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
+ 		kfree(mapping);
  	}
- 
--	return 0;
-+	return create_fixblock();
++
++	return 0;
++}
++
++void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
++{
++	__pkvm_pgtable_stage2_unmap(pgt, 0, ~(0ULL));
  }
  
- int hyp_create_idmap(u32 hyp_va_bits)
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index c19860fc8183..a48d3f5a5afb 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -312,7 +312,7 @@ void __noreturn __pkvm_init_finalise(void)
- 	if (ret)
- 		goto out;
+ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+@@ -357,28 +345,16 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	swap(mapping, cache->mapping);
+ 	mapping->gfn = gfn;
+ 	mapping->pfn = pfn;
+-	WARN_ON(rb_find_add(&mapping->node, &pgt->pkvm_mappings, cmp_mappings));
++	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
  
--	ret = hyp_create_pcpu_fixmap();
-+	ret = hyp_create_fixmap();
- 	if (ret)
- 		goto out;
+ 	return ret;
+ }
  
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index df5cc74a7dd0..c351b4abd5db 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -11,12 +11,6 @@
- #include <asm/kvm_pgtable.h>
- #include <asm/stage2_pgtable.h>
- 
+ int pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
+-	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
+-	pkvm_handle_t handle = kvm->arch.pkvm.handle;
+-	struct pkvm_mapping *mapping;
+-	int ret = 0;
 -
--#define KVM_PTE_TYPE			BIT(1)
--#define KVM_PTE_TYPE_BLOCK		0
--#define KVM_PTE_TYPE_PAGE		1
--#define KVM_PTE_TYPE_TABLE		1
--
- struct kvm_pgtable_walk_data {
- 	struct kvm_pgtable_walker	*walker;
+-	lockdep_assert_held_write(&kvm->mmu_lock);
+-	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+-		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn, 1);
+-		if (WARN_ON(ret))
+-			break;
+-		rb_erase(&mapping->node, &pgt->pkvm_mappings);
+-		kfree(mapping);
+-	}
++	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(pgt->mmu)->mmu_lock);
  
+-	return ret;
++	return __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
+ }
+ 
+ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
 -- 
 2.49.0.1112.g889b7c5bd8-goog
 
