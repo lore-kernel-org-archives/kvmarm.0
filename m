@@ -1,85 +1,353 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A57129E6E
-	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 09:09:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9B5129E6E;
+	Wed, 21 May 2025 09:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747818560; cv=none; b=GuZTxJBlVrYSMx5cHbcAnQSdqPw0FeMYHC6gl5P36vxGtF6icIAsGOjRYvJVWiw++Z2DkpIgOL7mD1m5hw2XAdXg032qs8k0VF2Xf3SV3VZ9tgWV3mPBxalWLDMDpwoMpGfeOGlbBek3OIq+a2BqplYLG2DhhlMkb1kERrblyz8=
+	t=1747818661; cv=none; b=hoZdfoDFnoC+otHAFp/GCJ+Ffj4eQxxvvMoM5spsrrMQBAMNx8930o0EUCJHfOVBslu7Zc/+2dMaYKR/CTinNoGxsM8e7/6fMQZpqxOCbJRPmMxKTu4ayoaneNNLxsscV4DIQ9aP7a0vR0Kb+HK5esDVYdbTVLIR2H8R4GYoPs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747818560; c=relaxed/simple;
-	bh=rQWeD7Zv9S8lUfwgwcqjvMT3NtNYxB+ORXu2V9AzkaM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JH/n1IsBzJyVmUJC7zJhj/uF5UtlCS3xh/FEzyP7xOqGhmlh14sVsv6LYMGZpee+tfwehlS4RX+RLYWlxzPB1NaZu8GZimHrILKsVSj/X3L0+G3LB//XZrXlG2n7xyKtJqv4QRPqRGuJDO2YsdWT+sIon077P5wdYiTQ7tTWeag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xn9Uwkn6; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xn9Uwkn6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C42CC4CEE4;
-	Wed, 21 May 2025 09:09:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747818555;
-	bh=rQWeD7Zv9S8lUfwgwcqjvMT3NtNYxB+ORXu2V9AzkaM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Xn9Uwkn6mweXruw9RicrdMOuWK+snyHBEQ9ymv6cVIFJJ/n12Qbx4bthyH8LdXujB
-	 kkiNJRLevZHe2P8JflQXN0pbI1S8mbqKt8SJbEJ1yIzedDS34lS6OgA3G2zk1sQDrb
-	 CtZ/+6k4E5xJq085hXQDR43k5boJ80Tgg7XjyX53C40YNpPq56Su9gXZWd6RsFv2B3
-	 O+Q8jhKk5Wamqn3DTpSJ4mXu5BnzNQYXzc4XgmNs+sukudYGMaFaCMThDvufi85PR+
-	 A+/Tzuup5+JsPgnXmBW2WsGkuN/FafeRJvg2pIh9x+Q7vk6i+Y/o71h959EQ7yMwku
-	 pPTgfrPf0e4gw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uHfRo-00GrlR-NR;
-	Wed, 21 May 2025 10:09:12 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Hold mmu_lock when invalidating VNCR SW-TLB before translating
-Date: Wed, 21 May 2025 10:09:09 +0100
-Message-Id: <174781853950.4059800.1864401181776978793.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250520144116.3667978-1-maz@kernel.org>
-References: <20250520144116.3667978-1-maz@kernel.org>
+	s=arc-20240116; t=1747818661; c=relaxed/simple;
+	bh=siftGh43D73bCW3rfiYqiafo3E2wCnhURCeldIYzrWQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CdHo6kDZ+FCb7hcychxt4ba2mQ8eUv+7Are7RTCpQKd37umBjb6GpY+jQi5naRGhzd4hgs/C6vfWwBlbz/UnX6/R5aFBgWBd1wUkukABzEXWbtMZbgXXm5nUuboS+W0GL9K+fWz3PYQfDPiGYcGpEIkgiM8c/w2EUZolPZMJLAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00AC91515;
+	Wed, 21 May 2025 02:10:39 -0700 (PDT)
+Received: from [10.57.23.70] (unknown [10.57.23.70])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3955D3F6A8;
+	Wed, 21 May 2025 02:10:48 -0700 (PDT)
+Message-ID: <c6ae4a77-6477-4e37-bca7-1ddfdfbce803@arm.com>
+Date: Wed, 21 May 2025 10:10:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 20/43] arm64: RME: Runtime faulting of memory
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-21-steven.price@arm.com>
+ <3a04995a-524c-4d07-8c8b-82930f9bca72@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <3a04995a-524c-4d07-8c8b-82930f9bca72@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 20 May 2025 15:41:16 +0100, Marc Zyngier wrote:
-> When translating a VNCR translation fault, we start by marking the
-> current SW-managed TLB as invalid, so that we can populate it
-> in place. This is, however, done without the mmu_lock held.
+On 19/05/2025 18:35, Suzuki K Poulose wrote:
+> Hi Steven
 > 
-> A consequence of this is that another CPU dealing with TLBI
-> emulation can observe a translation still flagged as valid, but
-> with invalid walk results (such as pgshift being 0). Bad things
-> can result from this, such as a BUG() in pgshift_level_to_ttl().
+> On 16/04/2025 14:41, Steven Price wrote:
+>> At runtime if the realm guest accesses memory which hasn't yet been
+>> mapped then KVM needs to either populate the region or fault the guest.
+>>
+>> For memory in the lower (protected) region of IPA a fresh page is
+>> provided to the RMM which will zero the contents. For memory in the
+>> upper (shared) region of IPA, the memory from the memslot is mapped
+>> into the realm VM non secure.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
 > 
-> [...]
+> Please find some comments below.
+> 
+> ...
+> 
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+>> index f6af3ea6ea8a..b6959cd17a6c 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -714,6 +714,186 @@ static int
+>> realm_create_protected_data_page(struct realm *realm,
+>>       return -ENXIO;
+>>   }
+>>   +static int fold_rtt(struct realm *realm, unsigned long addr, int
+>> level)
+>> +{
+>> +    phys_addr_t rtt_addr;
+>> +    int ret;
+>> +
+>> +    ret = realm_rtt_fold(realm, addr, level, &rtt_addr);
+>> +    if (ret)
+>> +        return ret;
+>> +
+>> +    free_delegated_granule(rtt_addr);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +int realm_map_protected(struct realm *realm,
+>> +            unsigned long ipa,
+>> +            kvm_pfn_t pfn,
+>> +            unsigned long map_size,
+>> +            struct kvm_mmu_memory_cache *memcache)
+>> +{
+>> +    phys_addr_t phys = __pfn_to_phys(pfn);
+>> +    phys_addr_t rd = virt_to_phys(realm->rd);
+>> +    unsigned long base_ipa = ipa;
+>> +    unsigned long size;
+>> +    int map_level;
+>> +    int ret = 0;
+>> +
+>> +    if (WARN_ON(!IS_ALIGNED(map_size, RMM_PAGE_SIZE)))
+>> +        return -EINVAL;
+>> +
+>> +    if (WARN_ON(!IS_ALIGNED(ipa, map_size)))
+>> +        return -EINVAL;
+>> +
+>> +    if (IS_ALIGNED(map_size, RMM_L2_BLOCK_SIZE))
+>> +        map_level = 2;
+> 
+> minor nit : RMM_RTT_BLOCK_LEVEL
+> 
+>> +    else
+>> +        map_level = 3;
+> 
+> minor nit:  RMM_RTT_MAX_LEVEL ?
 
-Applied to next, thanks!
+Ack
 
-[1/1] KVM: arm64: nv: Hold mmu_lock when invalidating VNCR SW-TLB before translating
-      commit: d43548f422f27219eff5ce1897336af2c4f15091
+>> +
+>> +    if (map_level < RMM_RTT_MAX_LEVEL) {
+>> +        /*
+>> +         * A temporary RTT is needed during the map, precreate it,
+>> +         * however if there is an error (e.g. missing parent tables)
+>> +         * this will be handled below.
+>> +         */
+>> +        realm_create_rtt_levels(realm, ipa, map_level,
+>> +                    RMM_RTT_MAX_LEVEL, memcache);
+>> +    }
+>> +
+>> +    for (size = 0; size < map_size; size += RMM_PAGE_SIZE) {
+>> +        if (rmi_granule_delegate(phys)) {
+>> +            /*
+>> +             * It's likely we raced with another VCPU on the same
+>> +             * fault. Assume the other VCPU has handled the fault
+>> +             * and return to the guest.
+>> +             */
+>> +            return 0;
+>> +        }
+>> +
+>> +        ret = rmi_data_create_unknown(rd, phys, ipa);
+>> +
+>> +        if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+>> +            /* Create missing RTTs and retry */
+>> +            int level = RMI_RETURN_INDEX(ret);
+>> +
+>> +            WARN_ON(level == RMM_RTT_MAX_LEVEL);
+>> +
+>> +            ret = realm_create_rtt_levels(realm, ipa, level,
+>> +                              RMM_RTT_MAX_LEVEL,
+>> +                              memcache);
+>> +            if (ret)
+>> +                goto err_undelegate;
+>> +
+>> +            ret = rmi_data_create_unknown(rd, phys, ipa);
+>> +        }
+>> +
+>> +        if (WARN_ON(ret))
+>> +            goto err_undelegate;
+>> +
+>> +        phys += RMM_PAGE_SIZE;
+>> +        ipa += RMM_PAGE_SIZE;
+>> +    }
+>> +
+>> +    if (map_size == RMM_L2_BLOCK_SIZE) {
+>> +        ret = fold_rtt(realm, base_ipa, map_level + 1);
+>> +        if (WARN_ON(ret))
+>> +            goto err;
+>> +    }
+>> +
+>> +    return 0;
+>> +
+>> +err_undelegate:
+>> +    if (WARN_ON(rmi_granule_undelegate(phys))) {
+>> +        /* Page can't be returned to NS world so is lost */
+>> +        get_page(phys_to_page(phys));
+>> +    }
+>> +err:
+>> +    while (size > 0) {
+>> +        unsigned long data, top;
+>> +
+>> +        phys -= RMM_PAGE_SIZE;
+>> +        size -= RMM_PAGE_SIZE;
+>> +        ipa -= RMM_PAGE_SIZE;
+>> +
+>> +        WARN_ON(rmi_data_destroy(rd, ipa, &data, &top));
+>> +
+>> +        if (WARN_ON(rmi_granule_undelegate(phys))) {
+>> +            /* Page can't be returned to NS world so is lost */
+>> +            get_page(phys_to_page(phys));
+>> +        }
+>> +    }
+>> +    return -ENXIO;
+>> +}
+>> +
+>> +int realm_map_non_secure(struct realm *realm,
+>> +             unsigned long ipa,
+>> +             kvm_pfn_t pfn,
+>> +             unsigned long size,
+>> +             struct kvm_mmu_memory_cache *memcache)
+>> +{
+>> +    phys_addr_t rd = virt_to_phys(realm->rd);
+>> +    phys_addr_t phys = __pfn_to_phys(pfn);
+>> +    unsigned long offset;
+>> +    int map_size, map_level;
+>> +    int ret = 0;
+>> +
+>> +    if (WARN_ON(!IS_ALIGNED(size, RMM_PAGE_SIZE)))
+>> +        return -EINVAL;
+>> +
+>> +    if (WARN_ON(!IS_ALIGNED(ipa, size)))
+>> +        return -EINVAL;
+>> +
+>> +    if (IS_ALIGNED(size, RMM_L2_BLOCK_SIZE)) {
+>> +        map_level = 2;
+>> +        map_size = RMM_L2_BLOCK_SIZE;
+> 
+> Same here, stick to the symbols than digits.
 
-Cheers,
+Ack
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+>> +    } else {
+>> +        map_level = 3;
+>> +        map_size = RMM_PAGE_SIZE;
+>> +    }
+>> +
+>> +    for (offset = 0; offset < size; offset += map_size) {
+>> +        /*
+>> +         * realm_map_ipa() enforces that the memory is writable,
+> 
+> The function names seems to be obsolete, please fix.
 
+realm_map_ipa() is in arch/arm64/kvm/mmu.c and contains...
+
+	/*
+	 * Write permission is required for now even though it's possible to
+	 * map unprotected pages (granules) as read-only. It's impossible to
+	 * map protected pages (granules) as read-only.
+	 */
+	if (WARN_ON(!(prot & KVM_PGTABLE_PROT_W)))
+		return -EFAULT;
+
+...which is what this is referring to.
+[And now I've read your follow up email ;) ]
+
+>> +         * so for now we permit both read and write.
+>> +         */
+>> +        unsigned long desc = phys |
+>> +                     PTE_S2_MEMATTR(MT_S2_FWB_NORMAL) |
+>> +                     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |
+>> +                     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>> +        ret = rmi_rtt_map_unprotected(rd, ipa, map_level, desc);
+>> +
+>> +        if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+> 
+> Could we hit the following case and end up in failure ?
+> 
+> * Initially a single page is shared and the S2 is mapped
+> * Later the Realm shares the entire L2 block and encounters a fault
+>   at a new IPA within the L2 block.
+> 
+> In this case, we may try to L2 mapping when there is a L3 mapping and
+> we could encounter (RMI_ERROR_RTT, 2).
+
+Ugh! You are of course correct, this is broken. It turns out this is all
+irrelevant as things stand because we don't currently support anything
+bigger than (host) PAGE_SIZE mappings (forced in user_mem_abort()).
+
+Given this I'm very much tempted to just delete the code supporting
+block mappings for now (just set map_level to RMM_RTT_MAX_LEVEL).
+
+Longer term, I'm not sure what is the best approach, the options are:
+
+1. Drop down and map the region at L3 (ignoring conflicting entries),
+   followed by attempting to fold.
+
+2. Destroy the table and directly map at L2.
+
+Option 2 is clearly the most performant, but is potentially racy. In
+particular I'm not 100% sure whether you could end up with another
+thread attempting to map at L3 between the destroy and map, and
+therefore recreating the table.
+
+Thanks,
+Steve
+
+> 
+>> +            /* Create missing RTTs and retry */
+>> +            int level = RMI_RETURN_INDEX(ret);
+> 
+> So we should probably go down the rtt create step, with the following
+> check.
+> 
+>             if (level < map_level) {
+> 
+>> +
+>> +            ret = realm_create_rtt_levels(realm, ipa, level,
+>> +                              map_level, memcache);
+>> +            if (ret)
+>> +                return -ENXIO;
+>> +
+>> +            ret = rmi_rtt_map_unprotected(rd, ipa, map_level, desc);
+> 
+> 
+>         } else {
+> 
+> Otherwise, may be we need to do some more hard work to fix it up.
+> 
+> 1. If map_level == 3, something is terribly wrong or we raced with
+> another thread ?
+> 
+> 2. If map_level < 3 and we didn't race :
+> 
+>   a. Going one level down and creating the mappings there and then
+> folding. But we could endup dealing with ERROR_RTT,3 as in (1).
+> 
+>   b. Easiest is to destroy the table at "map_level + 1" and retry the map.
+> 
+> 
+> Suzuki
+> 
+> 
+> 
+>> +        }
+>> +        /*
+>> +         * RMI_ERROR_RTT can be reported for two reasons: either the
+>> +         * RTT tables are not there, or there is an RTTE already
+>> +         * present for the address.  The call to
+>> +         * realm_create_rtt_levels() above handles the first case, and
+>> +         * in the second case this indicates that another thread has
+>> +         * already populated the RTTE for us, so we can ignore the
+>> +         * error and continue.
+>> +         */
+>> +        if (ret && RMI_RETURN_STATUS(ret) != RMI_ERROR_RTT)
+>> +            return -ENXIO;
+>> +
+>> +        ipa += map_size;
+>> +        phys += map_size;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   static int populate_region(struct kvm *kvm,
+>>                  phys_addr_t ipa_base,
+>>                  phys_addr_t ipa_end,
+> 
 
