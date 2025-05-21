@@ -1,71 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB8E22FAC3
-	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 06:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B68322FDFF
+	for <kvmarm@lists.linux.dev>; Wed, 21 May 2025 06:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747807385; cv=none; b=IejZFEskJizrGlZCtyk75jvU8IjE0J96BdK22jPj/cm6GZgN1iuFB8UyVxwUwIHeZiAvW1thmMOaZ/ykLGIQBdMqSaymA7PfpqNYZ32AnCgq9nTd99ucLdibifB0fIKyStWZD+Lh1QLMz7KxkO+HZKZhqVtRGq74SK4C7E3IIZg=
+	t=1747808194; cv=none; b=O2OSDobRnpPIdbr3m3vOWZKbqp/1LQvAV87PZv+cOjzJST1+1p84SXwMyc3PelTCPKFvJK0wVCbI9jwFCuxk8CJWwQsykLE0q2zIiWLAZrZItXAEfINJWCDKbwDEXYzLZ9A1/3qqH7a+KqZOwQDghCuDp/gAGlbn14f3lPkTsww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747807385; c=relaxed/simple;
-	bh=cTFLET0mXVLedaG6A7OEmnIZXr74rqMVNe8GNHLCJJ0=;
+	s=arc-20240116; t=1747808194; c=relaxed/simple;
+	bh=/PmoCyZ6dzOc/MlhabM3w+kAofXoLQ2s+DiWceK6Kz4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EjaMwjjd7iNr4bNF+VckEn2+K5inyXEjhBsM8AD+MLUNkDqQd6QZ+xxkfk1BoRqNtwSbPRyuVs2rY/cK92xrnm5Lz2XjOOQ3ruWSMoLemoH2Phvys6tcAkyLqdULU4KLMluWgCUPY4ZUyxSztwZJ32MFlGLyDufnqMMwWDRu/ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A7V5o52C; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Z5twCWn46AucqpIqGSZ4Dwz8MAnXEeBVWXsemUxHTvec208HujBb5mZHbIoY1TlhsssV9HmPyUqiifAOrYjXAzn4RfKs+JIMgIQE1oE9kbbZakPca0+NB0hfaQ829Vss0ohVg5VsFHPOqHbLvzHdCtArh5UvpGcJ/6BWHJPyxX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HiK3d3LX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7V5o52C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HiK3d3LX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747807382;
+	s=mimecast20190719; t=1747808191;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Luzvl9YYiKKkKv2ZrlEtI5HQQUPGehqlA/R1MmkzXtU=;
-	b=A7V5o52Cl9ryx/8WS3bHeBGxGnrrmzepfGJCdEKikv1ZwZN5bnShW6YPKQd3NUCdhW8j4p
-	ZXlVkDRnOm4sifCojO9/5RCKcZWZfnDIPiMdAwk3tVcWM3ualaiWoLw1fIcXJOMqtSybUD
-	m37VaBETR9hoq2gJDM6LIHi35k/yDwc=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=iw5uJHJc2V+sRbe4e4Tg6n7ubVHazSs+sdmDhxZTg8c=;
+	b=HiK3d3LXL9bN7GdSU2TR5Swdm6WzzRdKLsjky3on3jtCbN1aGs4dhzMVPcyn0JjIhdS8ul
+	UFk2s+5OF7sCdMDBV1reWA1AWINz5WCLTI2zBjaCddHtAi9NZTAYQmhQxcL6qX013x6bg7
+	APkSzbQdpMK3Mqi1Nu96E4DRI44Tf+A=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-445-6vHntNVeM9mEjkaN-t3ztw-1; Wed, 21 May 2025 02:03:01 -0400
-X-MC-Unique: 6vHntNVeM9mEjkaN-t3ztw-1
-X-Mimecast-MFC-AGG-ID: 6vHntNVeM9mEjkaN-t3ztw_1747807380
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-742b8c0eaf0so2211614b3a.2
-        for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 23:03:00 -0700 (PDT)
+ us-mta-668-x7uMxNuZNEi4UiJXTZ-eTQ-1; Wed, 21 May 2025 02:16:28 -0400
+X-MC-Unique: x7uMxNuZNEi4UiJXTZ-eTQ-1
+X-Mimecast-MFC-AGG-ID: x7uMxNuZNEi4UiJXTZ-eTQ_1747808187
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-b26e33ae9d5so6814861a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 20 May 2025 23:16:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747807380; x=1748412180;
+        d=1e100.net; s=20230601; t=1747808187; x=1748412987;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Luzvl9YYiKKkKv2ZrlEtI5HQQUPGehqlA/R1MmkzXtU=;
-        b=PyRbGl02KU36QDb6xG+KCi25ce1vx6fs1Q48G6k4JGP0G8omy0eo+1xJoHIxdp4TKB
-         WqeqYo2bCfWbMFvfqORQ9iTjGkjyqTdF5YNOZa5CEwlSNFl7KgDFeuhUuyotUbDP/0A2
-         ydACXelQDfbbLiD/v1rptBg/OphydCcM9CEmF5PdYIsm3ubsTqXHtnFdP3pxCEZMenuk
-         oJobsGGJPE/4pDBTIwUrVpXNyxqe83UZHiNdvxdf9746sM4nsllZ2ysYw0kH6xnef/ih
-         THnSOVNi1HBMRRS68pF0QrVTinBx98GRIOtVO+p8FFQtcreyPhW6ndyTzjkxMlXpGJOa
-         zfrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVuL/9j4Z58dE/IF1O1WVRg+OnEubSLJcHtd7gC22Jogtow1LBuCn76mX6wNBRlYeS7Zb0bdTI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyf2u2OkwsJEc+VNtZBrL4PLARLxS48FWZS69hmUulfjeGg0uat
-	dsEMSzqqD5MVP7Cg8ePVEJEAiQXij5jwd2ZQGHzUfAEvO39SLkJ+gK1Zu1OgvT52tDCw5rRfGmi
-	hpHzZUjrglNjmRqGHv06HrEt22GFaqbpj7eRZvaiB5+3aV7lDh92coOmi5Q==
-X-Gm-Gg: ASbGncs2M38UB/0/05VljLmoV7VFnuUha2HXELCWFoXzrGc7oKOWgvTdlMzfcAq0xQ6
-	Dm4s8InV1x0I1eFPA2RMGWHUqe9UVeV7UNhspLprUW95IUa+fxAfe2SUWG4u85SO+6wBnXhFCuQ
-	AtAJfKYbns2sc1UhYdrbr/81bqLIttP1G4+kV4Tq0+xfc8y2dklYP9n8RyWUzb6RmHI0xJLG3pP
-	Xe63EolJgRXSYs9h35X+tQ1cO2dXbA4iEiZrsHONSGCnI0vjWVBmumZd8S9q4vcEeWawm8e2eaL
-	q+HbAu3/uy9nogc=
-X-Received: by 2002:a05:6a00:1788:b0:736:5544:7ad7 with SMTP id d2e1a72fcca58-742a97eb5b9mr28757188b3a.14.1747807379855;
-        Tue, 20 May 2025 23:02:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkzCM7/Ctb9gNAgNxzZrfSW/B0q8J+JojRSlwDFqY3yzQr38av5VTKAulIBRs6Cj/pJdZcvA==
-X-Received: by 2002:a05:6a00:1788:b0:736:5544:7ad7 with SMTP id d2e1a72fcca58-742a97eb5b9mr28757152b3a.14.1747807379436;
-        Tue, 20 May 2025 23:02:59 -0700 (PDT)
+        bh=iw5uJHJc2V+sRbe4e4Tg6n7ubVHazSs+sdmDhxZTg8c=;
+        b=oRicwGVjr4Q1+aIcuJixrgGC/CfwOLZorwDq6D6F3urXIdL0IBS++y6O/ipFE0yQzF
+         TecGSrgdcGMM3jttFSkFaJM9yLBvZFsOcBJUWD94P45Y/cXcQP7yrXsppSP+wY8TF1W6
+         h1Nnv8oQKeiLrv/RfuEeuAlydAHU5wtfJg3u7Xh14WnITBTYQxN9YhCg3TJwABonOJjo
+         Pq99LEiBL4WHeQzi8BgXvrOZhbbWhtV2l+DK1DWPfeXIQ7XMs3+ExexaoAuWzhS0nRNe
+         goJYsN3JLSMnNU3LE5/9QG1AbdEIiXTD6WDKwyPOIBr7VnotE2U5sBJb6SIdRu6ssfF3
+         R8YA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkoUpgmFd8lADtmPCl7hZdurtCd0dpfvD84ZNh/FWq92FvGJvSRSWwoDyUARx/VTYeE5KAiKw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywo89sO8HzzeveFlhChfpMatMdXYlDjQYHgdIoZBsMRK0O2eD/8
+	wuC82iixOojg+Nth2uxn6/lNYSWjs4GS2fAlKjSDO0/wU1gbrSJK9MM1xpBL5hwmFbtP6Icz3u/
+	A+SPZ6dG0RTVI2ZEiMD2bWBNtw+unMhW44yaOopKvZc9BJhKHA8itvL1Rew==
+X-Gm-Gg: ASbGncsKmFz8bj15VWY2HF2NI7T8cSFqPiP9IGx2uyeJUXVYNTnaGEJzTmtITqPjzNS
+	DD/9dzCZ9jiQ7cRdCOr/JGNjsr0NOERWrqN8RQQI/urAGaOEf3JbyIFntFTQWBpCvBEKMQtNzkz
+	AereOXCAqTV5XK6s5EqXgeQfag48NE2i7pqS5gH8HgG4unyUG7YwOrryu7g1LAqMpJJnFB6QXbn
+	5++Y0/X1y9KNIowXlS6NMjWIZEghi9UVPYL/hdmqWINxMq50Xh2/NE7Js4peGa6MfnR6xui6fb0
+	sdxmMX0j3Dra8NA=
+X-Received: by 2002:a17:902:fc46:b0:231:bf74:e1df with SMTP id d9443c01a7336-231de3515demr258862335ad.7.1747808187207;
+        Tue, 20 May 2025 23:16:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGMaGJi9XZe04iIaqoT0LCToE4EYldNnY+Yj53uJr8Djqjif4zPPKYkEdeIkY17gXv01FY1iA==
+X-Received: by 2002:a17:902:fc46:b0:231:bf74:e1df with SMTP id d9443c01a7336-231de3515demr258862005ad.7.1747808186859;
+        Tue, 20 May 2025 23:16:26 -0700 (PDT)
 Received: from [10.72.116.61] ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a9829b87sm8888368b3a.114.2025.05.20.23.02.50
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4ed5460sm85707015ad.241.2025.05.20.23.16.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 23:02:58 -0700 (PDT)
-Message-ID: <3b33d060-895a-4f4b-a067-66164a29f8b4@redhat.com>
-Date: Wed, 21 May 2025 14:02:45 +0800
+        Tue, 20 May 2025 23:16:26 -0700 (PDT)
+Message-ID: <b5d2d946-7f46-4908-b44a-6ce80b67c46c@redhat.com>
+Date: Wed, 21 May 2025 14:16:18 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 13/16] scripts: Do not probe for maximum
- number of VCPUs when using kvmtool
+Subject: Re: [kvm-unit-tests PATCH v3 14/16] scripts/mkstandalone: Export
+ $TARGET
 To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
  eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
  frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
@@ -85,11 +85,11 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
  yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
 References: <20250507151256.167769-1-alexandru.elisei@arm.com>
- <20250507151256.167769-14-alexandru.elisei@arm.com>
+ <20250507151256.167769-15-alexandru.elisei@arm.com>
 From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20250507151256.167769-14-alexandru.elisei@arm.com>
+In-Reply-To: <20250507151256.167769-15-alexandru.elisei@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: R50u1fLfSf5aB3jdzqReyPvtCVJjbsqnwWF0mKjD2Kk_1747807380
+X-Mimecast-MFC-PROC-ID: rIqtEz9dtu36-G3q8_Pa5-W1DCkHJbSLtguMU9rl2HQ_1747808187
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -98,126 +98,30 @@ Content-Transfer-Encoding: 7bit
 
 
 On 5/7/25 11:12 PM, Alexandru Elisei wrote:
-> The --probe-maxsmp parameter updates MAX_SMP with the maximum number of
-> VCPUs that the host supports. Qemu will exit with an error when creating a
-> virtual machine if the number of VCPUs is exceeded.
+> $TARGET is needed for the test runner to decide if it should use qemu or
+> kvmtool, so export it.
 > 
-> kvmtool behaves differently: it will automatically limit the number of
-> VCPUs to the what KVM supports, which is exactly what --probe-maxsmp wants
-> to achieve. When doing --probe-maxsmp with kvmtool, print a message
-> explaining why it's redundant and don't do anything else.
-> 
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 
 > ---
->   run_tests.sh         |  3 ++-
->   scripts/runtime.bash | 16 ----------------
->   scripts/vmm.bash     | 24 ++++++++++++++++++++++++
->   3 files changed, 26 insertions(+), 17 deletions(-)
+>   scripts/mkstandalone.sh | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 150a06a91064..a69c3665b7a4 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -10,6 +10,7 @@ if [ ! -f config.mak ]; then
->   fi
->   source config.mak
->   source scripts/common.bash
-> +source scripts/vmm.bash
+> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> index 4f666cefe076..3b2caf198b00 100755
+> --- a/scripts/mkstandalone.sh
+> +++ b/scripts/mkstandalone.sh
+> @@ -47,6 +47,7 @@ generate_test ()
+>   	config_export ARCH_NAME
+>   	config_export TARGET_CPU
+>   	config_export DEFAULT_QEMU_CPU
+> +	config_export TARGET
 >   
->   function usage()
->   {
-> @@ -90,7 +91,7 @@ while [ $# -gt 0 ]; do
->               list_tests="yes"
->               ;;
->           --probe-maxsmp)
-> -            probe_maxsmp
-> +            ${vmm_opts[$TARGET:probe_maxsmp]}
->               ;;
->           --)
->               ;;
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 01ec8eae2bba..a802686c511d 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -209,19 +209,3 @@ function run()
+>   	echo "echo BUILD_HEAD=$(cat build-head)"
 >   
->       return $ret
->   }
-> -
-> -#
-> -# Probe for MAX_SMP, in case it's less than the number of host cpus.
-> -#
-> -function probe_maxsmp()
-> -{
-> -	local smp
-> -
-> -	if smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& grep 'SMP CPUs'); then
-> -		smp=${smp##* }
-> -		smp=${smp/\(}
-> -		smp=${smp/\)}
-> -		echo "Restricting MAX_SMP from ($MAX_SMP) to the max supported ($smp)" >&2
-> -		MAX_SMP=$smp
-> -	fi
-> -}
-> diff --git a/scripts/vmm.bash b/scripts/vmm.bash
-> index a1d50ed51981..ef9819f4132c 100644
-> --- a/scripts/vmm.bash
-> +++ b/scripts/vmm.bash
-> @@ -105,6 +105,22 @@ function qemu_parse_premature_failure()
->   	return 0
->   }
->   
-> +#
-> +# Probe for MAX_SMP, in case it's less than the number of host cpus.
-> +#
-> +function qemu_probe_maxsmp()
-> +{
-> +	local smp
-> +
-> +	if smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& grep 'SMP CPUs'); then
-> +		smp=${smp##* }
-> +		smp=${smp/\(}
-> +		smp=${smp/\)}
-> +		echo "Restricting MAX_SMP from ($MAX_SMP) to the max supported ($smp)" >&2
-> +		MAX_SMP=$smp
-> +	fi
-> +}
-> +
->   function kvmtool_parse_premature_failure()
->   {
->   	local log="$@"
-> @@ -114,6 +130,12 @@ function kvmtool_parse_premature_failure()
->   	return 0
->   }
->   
-> +function kvmtool_probe_maxsmp()
-> +{
-> +	echo "kvmtool automatically limits the number of VCPUs to maximum supported"
-> +	echo "The 'smp' test parameter won't be modified"
-> +}
-> +
->   declare -A vmm_opts=(
->   	[qemu:nr_cpus]='-smp'
->   	[qemu:kernel]='-kernel'
-> @@ -122,6 +144,7 @@ declare -A vmm_opts=(
->   	[qemu:default_opts]=''
->   	[qemu:fixup_return_code]=qemu_fixup_return_code
->   	[qemu:parse_premature_failure]=qemu_parse_premature_failure
-> +	[qemu:probe_maxsmp]=qemu_probe_maxsmp
->   
->   	[kvmtool:nr_cpus]='--cpus'
->   	[kvmtool:kernel]='--kernel'
-> @@ -130,6 +153,7 @@ declare -A vmm_opts=(
->   	[kvmtool:default_opts]="$KVMTOOL_DEFAULT_OPTS"
->   	[kvmtool:fixup_return_code]=kvmtool_fixup_return_code
->   	[kvmtool:parse_premature_failure]=kvmtool_parse_premature_failure
-> +	[kvmtool:probe_maxsmp]=kvmtool_probe_maxsmp
->   )
->   
->   function check_vmm_supported()
 
 -- 
 Shaoqin
