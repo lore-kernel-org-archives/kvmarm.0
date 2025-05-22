@@ -1,209 +1,98 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846BB286425
-	for <kvmarm@lists.linux.dev>; Thu, 22 May 2025 11:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5909D4594A
+	for <kvmarm@lists.linux.dev>; Thu, 22 May 2025 16:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747912339; cv=none; b=UDtUUeWYdnWy+eX24QjtDo0OSbWAgU+uMtEmOJiKn6F+FZ3uC9QDf6xa+gQ2PMFzr9aXVmUpK8vhUnMF7pu+kEkKNyW96d1ugRE9xBxkukXsDegsvX7RGC6pXS/FVgWj9I9finlDu+WvBI9Cz8jIgl9TkWYahLgJTI9mkDfyNPM=
+	t=1747930514; cv=none; b=leUn1qh8Cf+jOwwayjRAgkcG+xQGSyVBg7w41tkTOvHoE3ucCDAJYPkspPVgnKs933/xMykYXkGz6HltlXSFDlMMWig8EV8SPvMfce4EVx8ZQXTV7inT+GcBCHlPPYFAcF2OGJsTPBeX/PTKPOT7Muug3ztsUoy2DkeHJqgpAyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747912339; c=relaxed/simple;
-	bh=75I/OW5q8OM58GIc6q02iQepqOY7feV5LCtaTaQtmtw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=H8lNVY3/7QLo5BNX+XQP2EBNMaSDXk3MlCqNREilHaqSV2td6dSpZUoMn+FSOn7dY4/4SHewRhQuUiHzKHhNPPEpUm7BHVeL0cCgXPrh2tkVKb0c5x+EW1X1P3w26Q4vaMkN3DZKWaIp69TcfjMtu+bHE6iAzOZEbUVJyk4GvrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4b35Fj0bH7z1f1gs;
-	Thu, 22 May 2025 19:11:21 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 775FF1800B3;
-	Thu, 22 May 2025 19:12:15 +0800 (CST)
-Received: from kwepemq200011.china.huawei.com (7.202.195.155) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 22 May 2025 19:11:58 +0800
-Received: from huawei.com (10.67.174.28) by kwepemq200011.china.huawei.com
- (7.202.195.155) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 22 May
- 2025 19:11:56 +0800
-From: Liao Chang <liaochang1@huawei.com>
-To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <mark.rutland@arm.com>, <broonie@kernel.org>,
-	<liaochang1@huawei.com>, <puranjay@kernel.org>, <sgsu.park@samsung.com>,
-	<frederic@kernel.org>, <gshan@redhat.com>, <sudeep.holla@arm.com>,
-	<guohanjun@huawei.com>, <ryan.roberts@arm.com>,
-	<Jonathan.Cameron@huawei.com>, <liuwei09@cestc.cn>,
-	<shameerali.kolothum.thodi@huawei.com>, <james.morse@arm.com>,
-	<hardevsinh.palaniya@siliconsignals.io>, <ptosi@google.com>,
-	<kristina.martsenko@arm.com>, <vschneid@redhat.com>,
-	<thiago.bauermann@linaro.org>, <yang@os.amperecomputing.com>,
-	<david@redhat.com>, <minhuadotchen@gmail.com>, <tglx@linutronix.de>,
-	<farbere@amazon.com>, <arnd@arndb.de>, <rppt@kernel.org>,
-	<mcgrof@kernel.org>, <guoweikang.kernel@gmail.com>, <robh@kernel.org>,
-	<andreyknvl@gmail.com>, <usamaarif642@gmail.com>,
-	<samuel.holland@sifive.com>, <kevin.brodsky@arm.com>, <Dave.Martin@arm.com>,
-	<rmk+kernel@armlinux.org.uk>, <jean-philippe@linaro.org>,
-	<ruanjinjie@huawei.com>, <dianders@chromium.org>, <pcc@google.com>,
-	<bigeasy@linutronix.de>, <jintack@cs.columbia.edu>,
-	<christoffer.dall@arm.com>, <tabba@google.com>, <robin.murphy@arm.com>,
-	<ziy@nvidia.com>, <wangkefeng.wang@huawei.com>, <quic_zhenhuah@quicinc.com>,
-	<anshuman.khandual@arm.com>, <yangyicong@hisilicon.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>
-Subject: [PATCH v5 0/2] Rework Arm64 exception mask helpers
-Date: Thu, 22 May 2025 10:56:56 +0000
-Message-ID: <20250522105658.1338331-1-liaochang1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747930514; c=relaxed/simple;
+	bh=B86oQzXDGwPGfXAvGevtUP+BpvzTXxAlz1S8MFh34Us=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b4O0+sVXLayAAnXQym913ogFHPeUuwnSuJdivn0OqCrtoTLKcifHawioCzcs/8bmF/y68kprIuyZ2k1r8fcNxLnKIwq+Whi9kaDU5W/gU9yB6Ge2ZxNz1zpmGUt3f6+A8AXDLWVkIv6Wyo/Gktr6j6nnWzKrQQ4hFvagN9sdQwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 312CA1A2D;
+	Thu, 22 May 2025 09:14:56 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.52])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9E8D3F5A1;
+	Thu, 22 May 2025 09:15:07 -0700 (PDT)
+Date: Thu, 22 May 2025 17:15:02 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v22 2/5] arm64: el2_setup.h: Make __init_el2_fgt labels
+ consistent, again
+Message-ID: <aC9NhvYzajduVm7y@e133380.arm.com>
+References: <20250520-arm-brbe-v19-v22-0-c1ddde38e7f8@kernel.org>
+ <20250520-arm-brbe-v19-v22-2-c1ddde38e7f8@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemq200011.china.huawei.com (7.202.195.155)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250520-arm-brbe-v19-v22-2-c1ddde38e7f8@kernel.org>
 
-This patch series is a significant rework of the exception mask helpers,
-building upon the discussions from a year ago [1]. The need for this
-reworking has become increasingly apparent with the emerging platform
-and virtualization support for FEAT_NMI [2], and Mark Brown's FEAT_NMI
-patch series [3] really highlighted the existing "hacking style"
-approach to DAIF management that needed addressing before NMI
-functionality could be properly integrated.
+On Tue, May 20, 2025 at 05:27:37PM -0500, Rob Herring (Arm) wrote:
+> From: Anshuman Khandual <anshuman.khandual@arm.com>
+> 
+> Commit 5b39db6037e7 ("arm64: el2_setup.h: Rename some labels to be more
+> diff-friendly") reworked the labels in __init_el2_fgt to say what's
+> skipped rather than what the target location is. The exception was
+> "set_fgt_" which is where registers are written. In reviewing the BRBE
+> additions, Will suggested "set_debug_fgt_" where HDFGxTR_EL2 are
+> written. Doing that would partially revert commit 5b39db6037e7 undoing
+> the goal of minimizing additions here, but it would follow the
+> convention for labels where registers are written.
+> 
+> So let's do both. Branches that skip something go to a "skip" label and
+> places that set registers have a "set" label. This results in some
+> double labels, but it makes things entirely consistent.
+> 
+> While we're here, the SME skip label was incorrectly named, so fix it.
+> 
+> Reported-by: Will Deacon <will@kernel.org>
+> Cc: Dave Martin <Dave.Martin@arm.com>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+> This one can be applied even if the rest of the series is not.
+> 
+> v22:
+>  - New patch
+> ---
+>  arch/arm64/include/asm/el2_setup.h | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index ebceaae3c749..30f57b0334a3 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -204,19 +204,21 @@
+>  	orr	x0, x0, #(1 << 62)
+>  
+>  .Lskip_spe_fgt_\@:
+> +
+> +.Lset_debug_fgt_\@:
 
-Furthermore, with Jonathan has platform that now support FEAT_NMI,
-there's a strong desire to see Mark Brown's FEAT_NMI patchset merged
-soon. All of these factors emphasize the importance of a robust and
-clean exception mask rework. Therefore, I'm pushing this patchset again
-and would greatly appreciate your review.
+Dangling label?  There doesn't seem to be any branch to it in this
+series, unless I've missed something.
 
-This series broadly follows the suggestions made by Mark Rutland in
-response [4] to Mark Brown's FEAT_NMI patchset. To summarize his
-thoughts on DAIF + PMR + ALLINT management:
+[...]
 
-(a) Adding entry-specific helpers to manipulate abstract exception masks
-    covering DAIF + PMR + ALLINT. Those need unmask-at-entry and
-    mask-at-exit behaviour, and today only need to manage DAIF + PMR.
-
-    It should be possible to do this ahead of ALLINT / NMI support.
-
-(b) Adding new "logical exception mask" helpers that treat DAIF + PMR +
-    ALLINT as separate elements. 
-
-While attempting to follow Mark Rutland's guidance, I may have initially
-misunderstood some nuances, leading to a complete redesign and recoding
-of this patchset. As a result, it looks rather different from the previous
-revision.
-
-In short summary, to reduce the complexity of a single, monolithic
-function trying to handle every scenario, this patchset now introduces
-two distinct series of logical exception mask helpers. Each series is
-tailored for a specific kernel configuration and use case. I believe
-this policy makes the behavior of each exception mask helper much more
-explicit for any given situation, and simplifies the future integration
-of FEAT_NMI support without introducing further complexity.
-
-Thanks,
-
-[1] https://lore.kernel.org/all/20240614034433.602622-1-liaochang1@huawei.com/
-[2] https://lore.kernel.org/all/20240407081733.3231820-1-ruanjinjie@huawei.com/
-[3] https://lore.kernel.org/linux-arm-kernel/20221112151708.175147-1-broonie@kernel.org/
-[4] https://lore.kernel.org/linux-arm-kernel/Y5c9SLeJacLYHmP7@FVFF77S0Q05N/
-
-v5->v4:
-1. The rework has been fully redesigned, you'll find all the details in
-   the first patch.
-2. The rework focus on replacing the helpers defined in daifflags.h, so
-   less patches in this series, it will be easier to review and discuss.
-
-v4->v3:
-General Enhancements
---------------------
-Commit messages of [PATCH 04/05/06] have been enriched to outline the
-implementation details, motivations and potential effects. This might
-improve develper understanding and review efficiency.
-
-Specific Changes
-----------------
-1. [PATCH 01] new utilize the existing helper maco in sysregs.h to
-   generate the "MSR ALLLINT, #Imm1" instruction. Additionally, helper
-   names have been renamed to start with msr_pstate_ for better
-   discoverability (as suggested by Mark Brown).
-
-2. For [PATCH 04], due to the barrier side-effect of writing to PSTATE
-   fields, it is unnecessary to call pmr_sync() in
-   __pmr_local_allint_restore(). Add a table in comments to depict the
-   relationship between the type of interrupt masking and hardware
-   register configuration.
-
-3. For [PATCH 05/06], function names have been revised to better reflect
-   their purpose:
-
-   local_errint_enable()       -> local_irq_serror_enable()
-   local_errint_disable()      -> local_nmi_serror_disable()
-   local_allint_mark_enabled() -> local_irq_mark_enabled()
-   local_allint_disable()      -> local_nmi_disable()
-   local_errnmi_enable()       -> local_nmi_serror_enable()
-
-4. For [PATCH 07], A bug in local_nmi_enable() has been fixed. The v3
-   version is overly complex and included an unnecessary write operation
-   to PSTATE.DAIF.
-
-5. [PATCH 09] introduce a slight optimization for NMI handling. Since
-   the intermediate step of marking IRQ TO-BE enabled is no longer
-   required, dropping PMR before acknowledge PSEUDO_NMI is also
-   unnecessary.
-
-6. [PATCH 10] migrates CPU idle contex save/restore operation to the
-   newly introduced logical interrupt masking helper functions.
-
-v3->v2:
-1. Squash two commits that address two minor issues into Mark Brown's
-   origin patch for detecting FEAT_NMI.
-2. Add one patch resolves the kprobe reenter panic while testing
-   FEAT_NMI on QEMU.
-
-v2->v1:
-Add SoB tags following the origin author's SoBs.
-
----
-
-Liao Chang (2):
-  arm64: New exception mask helpers to manage DAIF, PMR and ALLINT
-  arm64: Deprecate the old daifflags helpers
-
- arch/arm64/include/asm/daifflags.h      | 144 -------------------
- arch/arm64/include/asm/exception_mask.h | 137 ++++++++++++++++++
- arch/arm64/include/asm/kvm_host.h       |   2 +-
- arch/arm64/include/asm/mmu_context.h    |   2 +-
- arch/arm64/kernel/Makefile              |   2 +-
- arch/arm64/kernel/acpi.c                |  10 +-
- arch/arm64/kernel/cpufeature.c          |   3 +
- arch/arm64/kernel/debug-monitors.c      |   6 +-
- arch/arm64/kernel/entry-common.c        |  81 +++++------
- arch/arm64/kernel/exception_mask.c      | 177 ++++++++++++++++++++++++
- arch/arm64/kernel/hibernate.c           |   6 +-
- arch/arm64/kernel/irq.c                 |   4 +-
- arch/arm64/kernel/machine_kexec.c       |   4 +-
- arch/arm64/kernel/probes/kprobes.c      |   2 +-
- arch/arm64/kernel/setup.c               |   4 +-
- arch/arm64/kernel/signal.c              |   2 +-
- arch/arm64/kernel/smp.c                 |  10 +-
- arch/arm64/kernel/suspend.c             |   6 +-
- arch/arm64/kernel/traps.c               |   2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c         |   4 +-
- arch/arm64/kvm/hyp/vhe/switch.c         |   4 +-
- arch/arm64/mm/fault.c                   |   2 +-
- arch/arm64/mm/mmu.c                     |   6 +-
- 23 files changed, 397 insertions(+), 223 deletions(-)
- delete mode 100644 arch/arm64/include/asm/daifflags.h
- create mode 100644 arch/arm64/include/asm/exception_mask.h
- create mode 100644 arch/arm64/kernel/exception_mask.c
-
--- 
-2.34.1
-
+Cheers
+---Dave
