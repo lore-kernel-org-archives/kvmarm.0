@@ -1,119 +1,166 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4910417A2F3
-	for <kvmarm@lists.linux.dev>; Thu, 22 May 2025 17:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F097271A9D
+	for <kvmarm@lists.linux.dev>; Thu, 22 May 2025 23:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747934448; cv=none; b=AreDKDJJqbv0y/XX40w7R1XK02GCEu4/HszTRf+j9Yf7hN0dr1LNiAOc38ekv6Rt0Q5BIT6RsMNOI/sBzBtdaPXLJxjrzbUBWK7yEiocrJ9CZx3VbyykXw1ti7w2qELHQBu4M598nC2JFsAaFhzrPAm47vAe0M/FcO/FVm2UxlI=
+	t=1747957956; cv=none; b=W/eQQ9x4I0eo9aYHCDNAvdw1Ub7hyK9mAySoRnPpC23tdUbKu6pq+pCJWvwLhlVoc4goDLuHpMUjKJQdCWdU5Ab+FRHcv7Bxg74EFfgNwjxhOWps6sDBj+4IbyD4wLHKAeSbkVBcTrsg5S6MBTnRy526R5WulNkLg6UYzmANo8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747934448; c=relaxed/simple;
-	bh=f0XMvMxyxmQO+2lM8j8iwFTLKsVl26kGRvuGKeTW2FI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gyHmQX0vd0PIGZgmFP39WP/rP9xk9LaF6ieCw8TDDZ6yb21osWHHURjkmjbyXoOLOJ3p9Vs8Axd5+eJL1rxRpPvDJCRboz24hibjljLIuNSm9avBk7o4xikaILaVpKeDi/h3i9cX/j1TQyT/UEQltPIYd7LBJ18Yi4cFqCSeTOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dImguw1T; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747957956; c=relaxed/simple;
+	bh=zSgoAnQejqHLW8WQDINPRPjIjmA3d28SSrIQu0zseIM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qg2LPg/9kFSgFvBHFdHCs6fWMO1CrcFeIotzqOLinbaMk/2mCoQYZ7AQywLI8+vJv1RpTBYMTLfL3I3iWUkgxWhh7iZSC3X10JCl6TlRa9z+pg5U1hGCpepTI2nhyM8x9/Y6thP2otZHaLCH06F0Mely+mDGD0glnSQoVKuQ+As=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h7iX2l2V; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dImguw1T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCC39C4CEF1
-	for <kvmarm@lists.linux.dev>; Thu, 22 May 2025 17:20:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747934447;
-	bh=f0XMvMxyxmQO+2lM8j8iwFTLKsVl26kGRvuGKeTW2FI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=dImguw1T60mad+h3HSsvAIAGBZoPyTPvysg0PLKfbw7ZusucDBwWkXb/t8dv8WMOU
-	 ZZ6aAsxZ3NJaHzMeK/jILjLP3f8g/G5mfEWuPVyaHDO7YU2O0/3emWRgm3pOcU/MoM
-	 JmlGrDbi1bgSs7VKOTVEUhua/5BFdd5TCnrm1JsexjraKyYjwoxxR/waR0FmqALK7U
-	 xbqfkbyRGTquiPEsVtBNQYh/T7x6txLXkXBg1QEvdEh+0GNyr9mlk8LW4muXOp/J3t
-	 wYvzYg2cpvpsRfSGiwFDKDnCHx7VRengnDHNYN1c1iRuk7Zj09NcuXByPiXItZX38l
-	 KVc5EXz0yFjaw==
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ad51ef2424bso1326223066b.0
-        for <kvmarm@lists.linux.dev>; Thu, 22 May 2025 10:20:47 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUaCYPnRTAdQSMD3pv72Izx5Fvu4MEbUGcp1rKPLJU1bccvTk/xhWKCf+7RAXTQtJMVyaSwWs4=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyl8g8+eDigW7arI66j4qsmdVjZLyy3MuvLGFCJQWfhrUi1l3cN
-	Bg+5l8fOCPpaVCAZaEOdSOhphOlvmIp5+Ie+rvmhRGRNk4qzY8PNB8N2NHx1P5oBWkuasA1PHSO
-	jDoUL9Pi6Ool8wt/+o0ZdW8kJtzhLYQ==
-X-Google-Smtp-Source: AGHT+IGAYYG+vIgGuI/ayC2uGqWgyniPCcMHhUSyeQcygsPjUjSYmhf9rYJn77siFd52fYZ5ibkezDZJq/F4ygapM/I=
-X-Received: by 2002:a17:907:3f08:b0:ad5:6939:8333 with SMTP id
- a640c23a62f3a-ad569398704mr1462923066b.37.1747934446333; Thu, 22 May 2025
- 10:20:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h7iX2l2V"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-310a0668968so2203515a91.0
+        for <kvmarm@lists.linux.dev>; Thu, 22 May 2025 16:52:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747957954; x=1748562754; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tip5ipIFHbSR2IYZnXAE5GbVsPWdm0Tjm7OJATFbViQ=;
+        b=h7iX2l2Vef0lC0/WIZ24cqWO7tgj5JWs2SqC3M+mdIeKkQAmaaFoF/r0OtS+VrT0hV
+         z2+UloU94VNJJ6XAbRc/weuGDXFHROOV0UFsaNu0aF7RAD3RK80ToG+wtRJQGzCR+4yw
+         MDTmEGdz1QjgQQyGRedRUFKu34fApJ7s1jI4qDkmmk7wclC1kGL8RZTOOB1WRQ1yB7Tv
+         XpjJTFCY8AfJv0q0tj3Mmf0X1OEaKr1aOBw1HvNCUb+OEl3F4qWDXrmjsy1O2Dg19owd
+         7Mf9C6wqFumEa/PVkpG2wrN8lZTwHl3r+ECfF6lM6Vk0ayYguGqk/xz4cRktKm9yYyDN
+         BvsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747957954; x=1748562754;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tip5ipIFHbSR2IYZnXAE5GbVsPWdm0Tjm7OJATFbViQ=;
+        b=OreP49wprcpWyXmAwXjb4r7ckijcX5V0VsOyVPD94e6254PSKvImJw3W4L1D1CeU+N
+         YUoUIeUQ4SzLnwTmNGTYNWXey8IoYlwJ4VUQbBoa+sqAdCYly9SVLj4B5OMdJs2BRgL6
+         RzWwqCuFm0e904EfG7UJHWMrE6UpJM+GChfhRmUqdi6gHT5+jK8lBVr6dikNKfAa5Hka
+         Gzt60/lkSLk87kJmk2bu+Xu6L0f95pvkLe5M0A74LvypbBrLA4DWnHVF1CATJuYGPRKx
+         ZngqC+zeSiNq+Ax3QG30AXmcGy5N5PgRqboSsSmKoEJktIzQhH7SIMEAd0iJvjhECKgR
+         4jfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWplU8Zfytb6A8GYozhZ3IbCCvnrdHLBHFvka12wMBSSV6lsHy2McgaM+ib5iHtKsyZGnFhGjU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyaGReZ8RG1gFbNDFXnpR3dIBrYUvRlK59px23fNf0R5i+5t/I3
+	gKDIO7BjiBguAZz7k4GjPbxblJHIZekW5QQNlKiyngk9WqqVutfY8vQKiOlO5nIc+shQ62eMA5l
+	w65wQ5A==
+X-Google-Smtp-Source: AGHT+IFoFNCkbt8aJJ0xnDKCzmCnIh6gGll4rd5AbALinv7jGcAxGvJdpWgEmk1cX+UlvCwIOcTYID0HpNU=
+X-Received: from pjtu15.prod.google.com ([2002:a17:90a:c88f:b0:30a:2020:e2bd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d604:b0:303:75a7:26a4
+ with SMTP id 98e67ed59e1d1-30e7d4fea75mr43035958a91.7.1747957954327; Thu, 22
+ May 2025 16:52:34 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 22 May 2025 16:52:10 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250520-arm-brbe-v19-v22-0-c1ddde38e7f8@kernel.org>
- <20250520-arm-brbe-v19-v22-2-c1ddde38e7f8@kernel.org> <aC9NhvYzajduVm7y@e133380.arm.com>
-In-Reply-To: <aC9NhvYzajduVm7y@e133380.arm.com>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 22 May 2025 12:20:35 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqKWY7rRGTbHXTmm4RC9F8fqrs133=75XFkVdm91bLHfaw@mail.gmail.com>
-X-Gm-Features: AX0GCFvVXljRLS6CQowdkTNTXjrD3dK31miPdgViETu3tYaW68KPRqx4Jf1fUa0
-Message-ID: <CAL_JsqKWY7rRGTbHXTmm4RC9F8fqrs133=75XFkVdm91bLHfaw@mail.gmail.com>
-Subject: Re: [PATCH v22 2/5] arm64: el2_setup.h: Make __init_el2_fgt labels
- consistent, again
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	James Clark <james.clark@linaro.org>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
+Message-ID: <20250522235223.3178519-1-seanjc@google.com>
+Subject: [PATCH v3 00/13] KVM: Make irqfd registration globally unique
+From: Sean Christopherson <seanjc@google.com>
+To: "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Shuah Khan <shuah@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	xen-devel@lists.xenproject.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, K Prateek Nayak <kprateek.nayak@amd.com>, 
+	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 22, 2025 at 11:15=E2=80=AFAM Dave Martin <Dave.Martin@arm.com> =
-wrote:
->
-> On Tue, May 20, 2025 at 05:27:37PM -0500, Rob Herring (Arm) wrote:
-> > From: Anshuman Khandual <anshuman.khandual@arm.com>
-> >
-> > Commit 5b39db6037e7 ("arm64: el2_setup.h: Rename some labels to be more
-> > diff-friendly") reworked the labels in __init_el2_fgt to say what's
-> > skipped rather than what the target location is. The exception was
-> > "set_fgt_" which is where registers are written. In reviewing the BRBE
-> > additions, Will suggested "set_debug_fgt_" where HDFGxTR_EL2 are
-> > written. Doing that would partially revert commit 5b39db6037e7 undoing
-> > the goal of minimizing additions here, but it would follow the
-> > convention for labels where registers are written.
-> >
-> > So let's do both. Branches that skip something go to a "skip" label and
-> > places that set registers have a "set" label. This results in some
-> > double labels, but it makes things entirely consistent.
-> >
-> > While we're here, the SME skip label was incorrectly named, so fix it.
-> >
-> > Reported-by: Will Deacon <will@kernel.org>
-> > Cc: Dave Martin <Dave.Martin@arm.com>
-> > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> > ---
-> > This one can be applied even if the rest of the series is not.
-> >
-> > v22:
-> >  - New patch
-> > ---
-> >  arch/arm64/include/asm/el2_setup.h | 10 +++++++---
-> >  1 file changed, 7 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/as=
-m/el2_setup.h
-> > index ebceaae3c749..30f57b0334a3 100644
-> > --- a/arch/arm64/include/asm/el2_setup.h
-> > +++ b/arch/arm64/include/asm/el2_setup.h
-> > @@ -204,19 +204,21 @@
-> >       orr     x0, x0, #(1 << 62)
-> >
-> >  .Lskip_spe_fgt_\@:
-> > +
-> > +.Lset_debug_fgt_\@:
->
-> Dangling label?  There doesn't seem to be any branch to it in this
-> series, unless I've missed something.
+Non-KVM folks,
 
-I tried to explain that in the commit message. To have both what you
-wanted and what Will suggested, you end up with 2 labels in between
-the last skip and setting registers.
+I am hoping to route this through the KVM tree (6.17 or later), as the non-KVM
+changes should be glorified nops.  Please holler if you object to that idea.
 
-Rob
+Hyper-V folks in particular, let me know if you want a stable topic branch/tag,
+e.g. on the off chance you want to make similar changes to the Hyper-V code,
+and I'll make sure that happens.
+
+
+As for what this series actually does...
+
+Rework KVM's irqfd registration to require that an eventfd is bound to at
+most one irqfd throughout the entire system.  KVM currently disallows
+binding an eventfd to multiple irqfds for a single VM, but doesn't reject
+attempts to bind an eventfd to multiple VMs.
+
+This is obviously an ABI change, but I'm fairly confident that it won't
+break userspace, because binding an eventfd to multiple irqfds hasn't
+truly worked since commit e8dbf19508a1 ("kvm/eventfd: Use priority waitqueue
+to catch events before userspace").  A somewhat undocumented, and perhaps
+even unintentional, side effect of suppressing eventfd notifications for
+userspace is that the priority+exclusive behavior also suppresses eventfd
+notifications for any subsequent waiters, even if they are priority waiters.
+I.e. only the first VM with an irqfd+eventfd binding will get notifications.
+
+And for IRQ bypass, a.k.a. device posted interrupts, globally unique
+bindings are a hard requirement (at least on x86; I assume other archs are
+the same).  KVM and the IRQ bypass manager kinda sorta handle this, but in
+the absolute worst way possible (IMO).  Instead of surfacing an error to
+userspace, KVM silently ignores IRQ bypass registration errors.
+
+The motivation for this series is to harden against userspace goofs.  AFAIK,
+we (Google) have never actually had a bug where userspace tries to assign
+an eventfd to multiple VMs, but the possibility has come up in more than one
+bug investigation (our intra-host, a.k.a. copyless, migration scheme
+transfers eventfds from the old to the new VM when updating the host VMM).
+
+v3:
+ - Retain WQ_FLAG_EXCLUSIVE in mshv_eventfd.c, which snuck in between v1
+   and v2. [Peter]
+ - Use EXPORT_SYMBOL_GPL. [Peter]
+ - Move WQ_FLAG_EXCLUSIVE out of add_wait_queue_priority() in a prep patch
+   so that the affected subsystems are more explicitly documented (and then
+   immediately drop the flag from drivers/xen/privcmd.c, which amusingly
+   hides that file from the diff stats).
+
+v2:
+ - https://lore.kernel.org/all/20250519185514.2678456-1-seanjc@google.com
+ - Use guard(spinlock_irqsave). [Prateek]
+
+v1: https://lore.kernel.org/all/20250401204425.904001-1-seanjc@google.com
+
+
+Sean Christopherson (13):
+  KVM: Use a local struct to do the initial vfs_poll() on an irqfd
+  KVM: Acquire SCRU lock outside of irqfds.lock during assignment
+  KVM: Initialize irqfd waitqueue callback when adding to the queue
+  KVM: Add irqfd to KVM's list via the vfs_poll() callback
+  KVM: Add irqfd to eventfd's waitqueue while holding irqfds.lock
+  sched/wait: Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority()
+  xen: privcmd: Don't mark eventfd waiter as EXCLUSIVE
+  sched/wait: Add a waitqueue helper for fully exclusive priority
+    waiters
+  KVM: Disallow binding multiple irqfds to an eventfd with a priority
+    waiter
+  KVM: Drop sanity check that per-VM list of irqfds is unique
+  KVM: selftests: Assert that eventfd() succeeds in Xen shinfo test
+  KVM: selftests: Add utilities to create eventfds and do KVM_IRQFD
+  KVM: selftests: Add a KVM_IRQFD test to verify uniqueness requirements
+
+ drivers/hv/mshv_eventfd.c                     |   8 ++
+ include/linux/kvm_irqfd.h                     |   1 -
+ include/linux/wait.h                          |   2 +
+ kernel/sched/wait.c                           |  22 ++-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ tools/testing/selftests/kvm/arm64/vgic_irq.c  |  12 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |  40 ++++++
+ tools/testing/selftests/kvm/irqfd_test.c      | 130 ++++++++++++++++++
+ .../selftests/kvm/x86/xen_shinfo_test.c       |  21 +--
+ virt/kvm/eventfd.c                            | 130 +++++++++++++-----
+ 10 files changed, 302 insertions(+), 65 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/irqfd_test.c
+
+
+base-commit: 45eb29140e68ffe8e93a5471006858a018480a45
+-- 
+2.49.0.1151.ga128411c76-goog
+
