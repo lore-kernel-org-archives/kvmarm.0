@@ -1,112 +1,124 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4769B295D90
-	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 14:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9B520C465;
+	Fri, 23 May 2025 15:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748010912; cv=none; b=seNhxK6gopDB5Yu7GPBT2XafkngjI9/nlz8S7oAErB1lQk4zw5BnOyR/KfIHAdBrE4bx++7crfkR9J67afqLYtuXkXbuhR90vhwdhR3xd1fMNfQWuYgYDyh5S/gdqFlqx+O91yypOcgI9+fJiTnsCSlqMCpdcbrIVLnHQ51uy6E=
+	t=1748012410; cv=none; b=Rpxct8zzWUgcAeYqP+lRAgovHa8bUTVXYBAwh1yELkWj2WOGi9QFMw1MkujEqSc0/e3nbgPL1lkKt8ExDoVgwC+axY9PtUo83snbjpqfytaL1eGAKqyi75FLJ/RudlgtRkiU9cBNmY1c0epLHQ+ddPnyHHucCGrEcLUrU10BBsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748010912; c=relaxed/simple;
-	bh=rpziN1/05Zj11wUE9u4BbCxVKKTZOSPJiBdxOoe4oCQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eT4cLg0jjNypPDnHx64McQ2zgU2bn43Eyc3ooEw1459fVtoKCrji4a6VEkhgP1iYQxu55rkWA6S+jg4yA/e3nnRbh4gjDtfl1RnG+Mo2vIunarwTqxd4xZ/zZ1xVa165HcZAlFchmmaEstU4b2I9DwSZg0dAdgbq9Bjh6EGk0QI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h5HxEnBM; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1748012410; c=relaxed/simple;
+	bh=Hk+9dxRaWTHmkirrqICnnV8gGlkcDt7jVcXhQiCkSjU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FS6VSorpcxWnc1Tft0nOZzM27mantfcz/LE5RT6spncZEgSRl+8JXOFV4pOmYyJpC9OO+GN4hLKZDHbjqIfMZDzcm+QRD04w4l5sdEp4WRodVeZm3xXGpSJ7DG1PbIFOvEgyjv58HE+PnteztwHaOZciYke2/cqEVivc99k34JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d/+o3mto; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h5HxEnBM"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-231e76f6eafso66656465ad.0
-        for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 07:35:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748010909; x=1748615709; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OHIXFovAEYPRF7pj3DkvXM+Wh6ry7OAZQdb2dc5cgKo=;
-        b=h5HxEnBMLFtXwfbhJIrFcgjub7cbTN+bsDhe2XfuOF3zXAUJ3I9MVqFZnkxuiVLYK0
-         92EIbAp1IZ9prMcKfX9NFu00uOzKjQEOFR6oluvH2QSRi6tseyQ4T9ZMGiprFFbjouqm
-         U+j8VEgLh16cOMXJx6ur0XufJD/XrIZebGiFg0Rq7JvPk7iExVENSz360OagoJMZSoGs
-         zNcAJ53PVAnC96Gng5YxQ2Rs4HjMxaXeIku8RlLQZ0onJBlsp/gNJVwwXDw1owQBdKNl
-         p0Zo9T9R4wdUEEyNDI/VAlXTUxQDlvSmRRsbzH9w+46C43JFZFqSMR++LAVHRXuS6fQa
-         COSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748010909; x=1748615709;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OHIXFovAEYPRF7pj3DkvXM+Wh6ry7OAZQdb2dc5cgKo=;
-        b=Oa13eVbigGKHzebwuOPnjLICvCirp/OoKTRlhJkl0wh6jdmy78e5OgSdZ9d8e46ckq
-         z9HO5Y/19kIJzIV+NmnNOZRXA979+SWzvGVfYSCEf98ZuQXhD9mp28ECpR07aa07SfSP
-         WEZbaRyOEUmM27rhlC9Hw5or8/lNCoCdvBJCSr6x+zYFq6Kd+hNyZRpvZjCWW/QN0EoM
-         QgcZgOJ/9SQgdO7MnXM4aoCzDLOtI8gIcIr3bjWZv4IlUFAmii6d5cI1RgLZWvDSIUBH
-         cbRYHTG9H3xlATMBxmp4CCMzcMaDijlz5dRij/HmstkplYPk0jNau3EaeA1z+Q2U7HqQ
-         owYA==
-X-Forwarded-Encrypted: i=1; AJvYcCX82P+YU2j2YbEby1WAI8v4X/CpSCXdUNGw/1eJybYJi6WVzrBvMF8MIXuYn3J9XOOOMiKtF9A=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxkAeayU+AhlTxpcmyuRGT3uftkNpCKgFbQpbg15wDn43JoUJ+I
-	POQHRICSXM/Hb3jd/krr7652N6HftDyDpExcoaogdBoDSGWtjnjgDAWjjMABKIIq+t/0d/LztGo
-	q5qv9Ew==
-X-Google-Smtp-Source: AGHT+IFz7sb0nLy8RLNRfKCeKqRGA0z4OYWQ9Q5+lv5cIKJ3DXiQQbAp7L//6YajGR6GltgQpVeH/+sDQGY=
-X-Received: from plka13.prod.google.com ([2002:a17:903:f8d:b0:231:def0:d268])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:41c7:b0:224:1221:1ab4
- with SMTP id d9443c01a7336-231de317b43mr439457305ad.22.1748010908457; Fri, 23
- May 2025 07:35:08 -0700 (PDT)
-Date: Fri, 23 May 2025 07:35:03 -0700
-In-Reply-To: <20250523043935.2009972-4-kees@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d/+o3mto"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 619EFC4CEE9;
+	Fri, 23 May 2025 15:00:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748012409;
+	bh=Hk+9dxRaWTHmkirrqICnnV8gGlkcDt7jVcXhQiCkSjU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d/+o3mtoYralQyEh0EUfx4bdpAPZIB1gQu5iZ7n7kpjYmyg1KtY0lffY2QW6tj2YF
+	 rOMPRIgdRL3MPLDQFhOi0mu6G5SscqnFst5mRUkY9OMrK/MDhTGZo7eevtvMlkanuM
+	 ZFfAs+RDAMxb/WLvUFnXG8oqGxnV/UL9vCe196r5g/xgydLBJBC1NRKiKhqGu3/Sxw
+	 o7kcv/DJU5DG64wEOmNlsIlin/1aFX6zqay4GRLuQq38vllTnriQGhBeBXeOYD5y0t
+	 VTOPDQBjTjIrgUMfOAzWsnKYMGa1Unro72iRzteLBmZLfeq6meNQHpI1GtYxheCuHM
+	 d/r2YoY578qWQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uITsU-0001Wm-UX;
+	Fri, 23 May 2025 16:00:07 +0100
+Date: Fri, 23 May 2025 16:00:06 +0100
+Message-ID: <87wma7e5jd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: D Scott Phillips <scott@os.amperecomputing.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Clark <james.clark@linaro.org>,
+	James Morse <james.morse@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	"Rob Herring  (Arm)" <robh@kernel.org>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shiqi Liu <shiqiliu@hust.edu.cn>,
+	Will Deacon <will@kernel.org>,
+	Yicong Yang <yangyicong@hisilicon.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] arm64: errata: Work around AmpereOne's erratum AC04_CPU_23
+In-Reply-To: <aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk>
+References: <20250513184514.2678288-1-scott@os.amperecomputing.com>
+	<aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250523043251.it.550-kees@kernel.org> <20250523043935.2009972-4-kees@kernel.org>
-Message-ID: <aDCHl0RBMgNzGu6j@google.com>
-Subject: Re: [PATCH v2 04/14] x86: Handle KCOV __init vs inline mismatches
-From: Sean Christopherson <seanjc@google.com>
-To: Kees Cook <kees@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Henrique de Moraes Holschuh <hmh@hmh.eng.br>, 
-	Hans de Goede <hdegoede@redhat.com>, 
-	"Ilpo =?utf-8?B?SsOkcnZpbmVu?=" <ilpo.jarvinen@linux.intel.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Len Brown <lenb@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, 
-	Mike Rapoport <rppt@kernel.org>, Michal Wilczynski <michal.wilczynski@intel.com>, 
-	Juergen Gross <jgross@suse.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Roger Pau Monne <roger.pau@citrix.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Usama Arif <usama.arif@bytedance.com>, 
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>, Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>, 
-	kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net, 
-	platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-mm@kvack.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Marco Elver <elver@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org, 
-	kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	sparclinux@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, scott@os.amperecomputing.com, catalin.marinas@arm.com, james.clark@linaro.org, james.morse@arm.com, joey.gouly@arm.com, kevin.brodsky@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, robh@kernel.org, shameerali.kolothum.thodi@huawei.com, shiqiliu@hust.edu.cn, will@kernel.org, yangyicong@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, May 22, 2025, Kees Cook wrote:
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 921c1c783bc1..72f13d643fca 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -420,7 +420,7 @@ static u64 kvm_steal_clock(int cpu)
->  	return steal;
->  }
->  
-> -static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
-> +static __always_inline void __set_percpu_decrypted(void *ptr, unsigned long size)
+On Fri, 23 May 2025 15:15:53 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Tue, May 13, 2025 at 11:45:14AM -0700, D Scott Phillips wrote:
+> > On AmpereOne AC04, updates to HCR_EL2 can rarely corrupt simultaneous
+> > translations for data addresses initiated by load/store instructions.
+> > Only instruction initiated translations are vulnerable, not translations
+> > from prefetches for example. A DSB before the store to HCR_EL2 is
+> > sufficient to prevent older instructions from hitting the window for
+> > corruption, and an ISB after is sufficient to prevent younger
+> > instructions from hitting the window for corruption.
+> 
+> This patch, which is in -next as fed55f49fad181be9dfb93c0, breaks the
+> build of at least the vDSO selftests:
+> 
+> $ make -C tools/testing/selftests ARCH=arm64 LLVM=1 TARGETS=vDSO
+> 
+>   CC       vdso_test_chacha
+> In file included from vgetrandom-chacha.S:9:
+> In file included from ./../../../../arch/arm64/kernel/vdso/vgetrandom-chacha.S:5:
+> In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/assembler.h:21:
+> In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/cpufeature.h:13:
+> /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/sysreg.h:1097:5: error: function-like macro 'IS_ENABLED' is not defined
+>  1097 | #if IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23)
+>       |     ^
+> 1 error generated.
 
-I'd rather drop the "inline" and explicitly mark this "__init".  There's value
-in documenting and enforcing that memory is marked decrypted/shared only during
-boot.
+This:
 
->  {
->  	early_set_memory_decrypted((unsigned long) ptr, size);
->  }
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index ad63457a05c5b..4389d3916426c 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -13,6 +13,7 @@
+ #define __ASM_ASSEMBLER_H
+ 
+ #include <linux/export.h>
++#include <linux/kconfig.h>
+ 
+ #include <asm/alternative.h>
+ #include <asm/asm-bug.h>
+
+should solve it.
+
+But it also outlines that the vdso is getting built using stuff that
+is not meant for userspace code.
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
