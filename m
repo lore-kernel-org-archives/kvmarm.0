@@ -1,93 +1,166 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEF321D5BC
-	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 17:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF49222A1CD
+	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 17:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748019735; cv=none; b=Qns3zwlWEfW0rlt6svx26Z7uJdpl5eNLl9jJ8vbXdje897Ryz679J+2J+ME+L5Rmvy2Rbk3wVBcsmdfer2VrA9tvdeT2mU9525wIDgRXLKgSSTxV9VOZNp5+qeNcuetgm0wIqlPpDpoS709uITZN07mXt5MNLEw2XjGxo55s4eU=
+	t=1748021154; cv=none; b=fxHLUIyXv5hBKu4u+zDteeR6pnxyYztw/6ycuXnhuhO1C+0llVuSrSc7W3bC/zqulERijWRxdtRqMzckZkTlLPkvSfU4yrZdSBp5BVxPR6mS5paBoxtZpQaxa8RzcTMjqJYfRVsc4Y0ZTpnRdz2nuadmE7upRKdMiP+tm5Rj4Js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748019735; c=relaxed/simple;
-	bh=XfBSdfdD/kXxiwUBFnPdb6JpH5LmGZGFFN5ATSPDw7U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sjCNW9hmtCKoosW/5OjiTXWUf9sqNlMfyqcyO4SR2rtJrIf2t8OtJNoTS34sc5zPB5WwwiS5FZSBVH5hXVnpmYihsB8j++iJ/2cjay8Yk9S+clbvNjXcfdQWmFk4ATygH3eVlIyriXvqG9CI7wCbyj2cBSfkQ1lszhNb9SotyqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZxla8oC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748021154; c=relaxed/simple;
+	bh=qKV4cw2WVMo2P4Xl7B0pHlolYQ4vJsMjCohjwJ0322k=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GNnoP1qeo3/yNVh4Vj0hYDU5JtgXAGZeCZ3NYul5J0gSutZfoa0UQuSuYVlHtSRjF8oN9QwIHgqDa0ti6iaKpBOeRN8VAcXfIJ3a22Gwkln0vXudodOSJK+qFtVjtPHsA0gb8GQ+Yy73d19Vqx1glwOwmPtOT3LFlZHZYUTPilg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKOXWUA/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZxla8oC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF8E4C4CEEF;
-	Fri, 23 May 2025 17:02:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKOXWUA/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61F0CC4CEE9;
+	Fri, 23 May 2025 17:25:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748019733;
-	bh=XfBSdfdD/kXxiwUBFnPdb6JpH5LmGZGFFN5ATSPDw7U=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BZxla8oCDH2AcyoUG4Dlxq243yQYJ3i1MsuTn6NMZi2sG1qJLY+RfF8hSOs1iTp+t
-	 2Hb3buvxctMEXV/u6Yj0VVk06w5SCsp3MK9BzfY79XjVyuaGngO30ICFSkjBM462LF
-	 wy1cUq4+PzCuynbcBvu6kl7i4rWgcdKodZidlA2qofZdbm1waAnrwalLtvVsYv88P5
-	 dp46LYL4G6M4k9aWCxdP33rO13b4L4uRfyFAzG2PtCYBgOze7n91jsXDO5WhJ2+gBe
-	 0AuOXhLh0j8hNseJ0iL7arlgd7dzjnZQUHqJw6lhnefBFT12UcKWE4L/JJEa7HAmZq
-	 HQa7rpE6RHnNw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1748021153;
+	bh=qKV4cw2WVMo2P4Xl7B0pHlolYQ4vJsMjCohjwJ0322k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bKOXWUA/gxxjysGdDqwqDxpPmC67fGa/KLOo6HBVJXHSuxjU0E+HIyw1rF6nsvUco
+	 CgRxADWtRxSgnNrCHLFzD9xbrmnJPwwbISuksE00Si83CswTMZqC/VGTGgnJsfweTR
+	 86COVW+VkE+LeawKy+Oj3WPceivFsjVE0uDW8oaFOpQrr8RDklUb1pH2Gy9ZBbGUdk
+	 aMmpmGFtuwwopfOrHWKKgnd0wbrivPhyz4bCaoXuLhmvKlWAZ9M22rEy4suav/M+MP
+	 oD/BsGk2p0mBvOomFPTqa6z2r7pXukfCTbTSX3McVcTRVdUqgb9ekL1QQPBEnyLu9r
+	 GNzf0vhTxT9/g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uIVmd-0003gD-AG;
-	Fri, 23 May 2025 18:02:11 +0100
+	id 1uIW9W-00047h-Qv;
+	Fri, 23 May 2025 18:25:51 +0100
+Date: Fri, 23 May 2025 18:25:50 +0100
+Message-ID: <87v7prdysh.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Mark Brown <broonie@kernel.org>,
-	D Scott Phillips <scott@os.amperecomputing.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH] arm64: sysreg: Drag linux/kconfig.h to work around vdso build issue
-Date: Fri, 23 May 2025 18:02:08 +0100
-Message-Id: <20250523170208.530818-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Sweet Tea Dorminy <sweettea@google.com>
+Subject: Re: [PATCH 3/5] KVM: arm64: Resolve vLPI by host IRQ in vgic_v4_unset_forwarding()
+In-Reply-To: <20250523160810.4049313-4-oliver.upton@linux.dev>
+References: <20250523160810.4049313-1-oliver.upton@linux.dev>
+	<20250523160810.4049313-4-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, broonie@kernel.org, scott@os.amperecomputing.com, catalin.marinas@arm.com, oliver.upton@linux.dev, will@kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, sweettea@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Broonie reports that fed55f49fad18 ("arm64: errata: Work around
-AmpereOne's erratum AC04_CPU_23") breaks one of the vdso selftests
-(vdso_test_chacha) as it indirectly drags asm/sysreg.h.
+On Fri, 23 May 2025 17:08:08 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> The virtual mapping and "GSI" routing of a particular vLPI is subject to
+> change in response to the guest / userspace. This can be pretty annoying
+> to deal with when KVM needs to track the physical state that's managed
+> for vLPI direct injection.
+> 
+> Make vgic_v4_unset_forwarding() resilient by using the host IRQ to
+> resolve the vgic IRQ.
+> 
+> Tested-by: Sweet Tea Dorminy <sweettea@google.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/arm.c          |  3 +--
+>  arch/arm64/kvm/vgic/vgic-v4.c | 45 +++++++++++++++++++----------------
+>  include/kvm/arm_vgic.h        |  3 +--
+>  3 files changed, 27 insertions(+), 24 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 36cfcffb40d8..1de49b48e35e 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2800,8 +2800,7 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+>  	if (irq_entry->type != KVM_IRQ_ROUTING_MSI)
+>  		return;
+>  
+> -	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq,
+> -				     &irqfd->irq_entry);
+> +	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq);
+>  }
+>  
+>  void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+> index 01a5de8e9e94..193946108192 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -508,10 +508,27 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>  	return ret;
+>  }
+>  
+> -int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+> -				 struct kvm_kernel_irq_routing_entry *irq_entry)
+> +static struct vgic_irq *__vgic_host_irq_get_vlpi(struct kvm *kvm, int host_irq)
+> +{
+> +	struct vgic_irq *irq;
+> +	unsigned long idx;
+> +
+> +	guard(rcu)();
+> +	xa_for_each(&kvm->arch.vgic.lpi_xa, idx, irq) {
+> +		if (!irq->hw || irq->host_irq != host_irq)
+> +			continue;
+> +
+> +		if (!vgic_try_get_irq_kref(irq))
+> +			return NULL;
+> +
+> +		return irq;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int host_irq)
+>  {
+> -	struct vgic_its *its;
+>  	struct vgic_irq *irq;
+>  	unsigned long flags;
+>  	int ret = 0;
+> @@ -519,31 +536,19 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+>  	if (!vgic_supports_direct_msis(kvm))
+>  		return 0;
+>  
+> -	/*
+> -	 * Get the ITS, and escape early on error (not a valid
+> -	 * doorbell for any of our vITSs).
+> -	 */
+> -	its = vgic_get_its(kvm, irq_entry);
+> -	if (IS_ERR(its))
+> +	irq = __vgic_host_irq_get_vlpi(kvm, host_irq);
+> +	if (!irq)
+>  		return 0;
+>  
+> -	mutex_lock(&its->its_lock);
+> -
+> -	ret = vgic_its_resolve_lpi(kvm, its, irq_entry->msi.devid,
+> -				   irq_entry->msi.data, &irq);
+> -	if (ret)
+> -		goto out;
+> -
 
-It is rather unfortunate (and worrying) that userspace gets built
-with non-UAPI headers. In any case, paper over the issue by dragging
-linux/kconfig.h in asm/sysreg.h. It is the right thing to do, at
-least from the kernel perspective.
+Removing the reliance on the ITS locking is another thing that could
+be mentioned in the commit message, as it is slightly surprising to
+see it here, given that the previous patch is all about that.
 
-Reported-by: Mark Brown <broonie@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Fixes: fed55f49fad18 ("arm64: errata: Work around AmpereOne's erratum AC04_CPU_23")
-Link: https://lore.kernel.org/r/aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk
-Cc: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Will Deacon <will@kernel.org>
----
- arch/arm64/include/asm/sysreg.h | 1 +
- 1 file changed, 1 insertion(+)
+My other gripe is that we lose the doorbell validation. I'm not sure
+it is a big deal, but I'd rather we keep verifying we're not being fed
+rubbish data, in case we need to rely on that in the future.
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index cd853801a8f7b..f1bb0d10c39a3 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -12,6 +12,7 @@
- #include <linux/bits.h>
- #include <linux/stringify.h>
- #include <linux/kasan-tags.h>
-+#include <linux/kconfig.h>
- 
- #include <asm/gpr-num.h>
- 
+Thanks,
+
+	M.
+
 -- 
-2.39.2
-
+Jazz isn't dead. It just smells funny.
