@@ -1,103 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285C0219FC;
-	Fri, 23 May 2025 14:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F2B1FECBD
+	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 14:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748009758; cv=none; b=hL5C05VJ2paIS4m4dskQuPXJ63pYWGgkcahBDNFU0+JSNfOdSXWalje4VRI1YqSuCxNrYw200ENwOTJXvLgKn9kfxj0ZFgFUlXZDrU1oHYjv1MpeQuZkl8Q2nC7X9Mfm2Kf2ErHTAMnq+0BjDkN7H5LA61Y8jVkEeEcOLxHASFg=
+	t=1748010818; cv=none; b=CEGyTbTQHVcv068mQ2dv8JPi6y9YKniFxDMXnJxr0gyW6W0nV6Bx2eD36mH7BQZTe89KG7l+0l2ACDactzFD0suSiZm3URnpOonJ4UDekrgoZdPBY6Ufo0iElMukw2MZdY3NPtoN7n1GZ5vqinp2UMk4kyNBh5lUpbKu/xPrCHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748009758; c=relaxed/simple;
-	bh=E2T15UQb7YmouLcQa9XmZQe3OTz89LQ9xuaFzoFi6tA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RfmyVZcImABtPAOmby5iGg+WUaLaMAy+RvTZvdSLkUnf0+VGf6rSOVHypswMUJ0PMMZGnkCdp5yOHy6ZL6zzn4V3bBD6yymnigs5Rl4iIzxh0c1jGuhWj3bkcdS0liO5Vgy0yJ9v7qGXbhsjdlhKdAiEnLuVxTb8WcwWecWvgR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SAtFyDcM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748010818; c=relaxed/simple;
+	bh=M0JM/iagUnyNnadh7PX4hbYGXfsli6u0A5pI6J9XwVs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Dussb7Mo1zpxVZ9rJSWUfMqC87xL6hm0Zz/P1oDAJi4HuxTinMYOiT7O2qQgNHLNoU5B66nVrV9fhf3d4NcQoRIeAyPRi1eWD4Htr9z3YIAJBPNRSlMTwKORZwFSq+fHiObjZGUNqLNukFCTA+/UcHoqgWZHbEt1Tjt8w+Xh4wU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=umf9lMuw; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SAtFyDcM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E71AEC4CEE9;
-	Fri, 23 May 2025 14:15:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748009757;
-	bh=E2T15UQb7YmouLcQa9XmZQe3OTz89LQ9xuaFzoFi6tA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SAtFyDcMb8cPtd+I6NmN6gXlU5jz2lHRPwrwl1dVWWQMjkzDoHPs+DYfrSfIBUZnU
-	 mVqgLR0xt/lgbEdY/+OWagqccWqRoiBTNUzvnW4SVDtWTpL5HQUmndRupgOVstrK29
-	 /dp5pNnucd909xPdYF+jqK86o3kckB1sVr0AJQbvcUejN8lC49ic1gz3nr/rVoG7IJ
-	 Q4Gp/3hCgeQca84/zDWVCWSrEwR4sRyy6sqxAeHU5lj9/YtKWYXF4xesQ7ak+v7205
-	 sZZwWYNEEvuxydVXJvkCauk9Jou5faH7sDRXdCKK4+KK+yDfAg8jmCqMRKQY2Quijy
-	 w6BvCQcBsQjiw==
-Date: Fri, 23 May 2025 15:15:53 +0100
-From: Mark Brown <broonie@kernel.org>
-To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	James Morse <james.morse@arm.com>, Joey Gouly <joey.gouly@arm.com>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	"Rob Herring  (Arm)" <robh@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>, Will Deacon <will@kernel.org>,
-	Yicong Yang <yangyicong@hisilicon.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] arm64: errata: Work around AmpereOne's erratum
- AC04_CPU_23
-Message-ID: <aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk>
-References: <20250513184514.2678288-1-scott@os.amperecomputing.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="umf9lMuw"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-310efb64693so23257a91.0
+        for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 07:33:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748010817; x=1748615617; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/uvu6aXDIrLF08vsxpzyNfXk0GOFzmWSaZdsX/BEX7c=;
+        b=umf9lMuwkY+X/6pPw1uX8lQqx7UVzh+2qDLd+7u9j6wtlelUKXrrjAlBpDd/COnWtY
+         PNTDUw9R2Qxgy7nb4ipq9iezKcnvejifFwiRoLK+7Ry4K7PxijDw7l2hYZ+TUiqjE0nO
+         T1X26JFu7JVqr3gfyP7L8M8T/tr9JuaXpFkCDTR6vzS35/oRhwhpn4pE3hsMsXHSdNt/
+         anFsW/bNR72OcFcyeOXojXqY52lECDIjJQdfSjUvCYKRh5oMG5AVTwNDn6YU0B2mY6Cr
+         nukBI6fWE+mm/WLDlvdKCDFMhuRtouyUVee+lyN7Vu68tkJaLotRcsSvqHr34K3sP2zY
+         n6/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748010817; x=1748615617;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/uvu6aXDIrLF08vsxpzyNfXk0GOFzmWSaZdsX/BEX7c=;
+        b=Ye0VNdOqmxhs7+GxDIevdrwit41g3gpuBqVUa2TcqdJ+xCCMindNRSTDF3k+k+G0cv
+         tmwvNggfiaHJscIT2Dpue11909NEQG33kw324+Jq0BvY1h+EPlu+eoDmdBaGIgSfWPbp
+         fSJg/An4DD+GM8jpWNrkmopp0fDxUf5fhEF3E4K8VAdmQBoO8hkP9a/ctI2CkziBfW5o
+         OQZt6oJVTjAuP2seFSsHEizlrepyPOJxFwDU++H9BwCZvxXTANeIqun3btjCrHZAvZvY
+         eOfv7kfdwH4rAkyT/NkBQFJH54TiuNdGCFnaat+MPMm6EfeJ6sYlnehz3aAhPN0ugbez
+         4vWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnrQaqP6FgjzMgfVHk/04MAOwru89HYdIg6gnuALAg7l9XEgxwTemorXxrIrQ9opyM3nx0PWc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy6NaJ8i81y9PCRLJdfTmpsQwUK8hU0m5JT3h6tAk374X//ghdh
+	Wlc9Z/hm43C1UTLSwmSSQGCWPRbuQltmn+AWjOKJ2wUJImUlQS+bHrLZiKYQLj/4inJ7MoHbI1p
+	8wtthkg==
+X-Google-Smtp-Source: AGHT+IHsZ0QnOLBFT5oLqgFlsou+V6RqzdnkAMpT1uyTVqCC/FSYHIecluEf4Yy5p3wiVYxCHPutaUGV15c=
+X-Received: from pjbmf7.prod.google.com ([2002:a17:90b:1847:b0:30e:7b26:f68b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1846:b0:301:9f62:a944
+ with SMTP id 98e67ed59e1d1-30e7d5ca287mr50858908a91.33.1748010816755; Fri, 23
+ May 2025 07:33:36 -0700 (PDT)
+Date: Fri, 23 May 2025 07:33:30 -0700
+In-Reply-To: <2c52daad-0b64-48a9-8e73-d1aba977993b@amd.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="JOptcxW8/D3dLVn7"
-Content-Disposition: inline
-In-Reply-To: <20250513184514.2678288-1-scott@os.amperecomputing.com>
-X-Cookie: Always wear your seat belt.
+Mime-Version: 1.0
+References: <20250522235223.3178519-1-seanjc@google.com> <20250522235223.3178519-14-seanjc@google.com>
+ <2c52daad-0b64-48a9-8e73-d1aba977993b@amd.com>
+Message-ID: <aDB-2lcq4jJm9-OV@google.com>
+Subject: Re: [PATCH v3 13/13] KVM: selftests: Add a KVM_IRQFD test to verify
+ uniqueness requirements
+From: Sean Christopherson <seanjc@google.com>
+To: Sairaj Kodilkar <sarunkod@amd.com>
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Shuah Khan <shuah@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	K Prateek Nayak <kprateek.nayak@amd.com>, David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Fri, May 23, 2025, Sairaj Kodilkar wrote:
+> On 5/23/2025 5:22 AM, Sean Christopherson wrote:
+> 
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +	pthread_t racing_thread;
+> > +	int r, i;
+> > +
+> > +	/* Create "full" VMs, as KVM_IRQFD requires an in-kernel IRQ chip. */
+> > +	vm1 = vm_create(1);
+> > +	vm2 = vm_create(1);
+> > +
+> > +	WRITE_ONCE(__eventfd, kvm_new_eventfd());
+> > +
+> > +	kvm_irqfd(vm1, 10, __eventfd, 0);
+> > +
+> > +	r = __kvm_irqfd(vm1, 11, __eventfd, 0);
+> > +	TEST_ASSERT(r && errno == EBUSY,
+> > +		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
+> > +
+> > +	r = __kvm_irqfd(vm2, 12, __eventfd, 0);
+> > +	TEST_ASSERT(r && errno == EBUSY,
+> > +		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
+> > +
+> > +	kvm_irqfd(vm1, 11, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
+> > +	kvm_irqfd(vm1, 12, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
+> > +	kvm_irqfd(vm1, 13, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
+> > +	kvm_irqfd(vm1, 14, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
+> 
+> Hi Sean,
+> I dont see any allocation for the GSI 13 and 14..
+> Is there any reason for the deassigning these two GSIs ?
 
---JOptcxW8/D3dLVn7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, May 13, 2025 at 11:45:14AM -0700, D Scott Phillips wrote:
-> On AmpereOne AC04, updates to HCR_EL2 can rarely corrupt simultaneous
-> translations for data addresses initiated by load/store instructions.
-> Only instruction initiated translations are vulnerable, not translations
-> from prefetches for example. A DSB before the store to HCR_EL2 is
-> sufficient to prevent older instructions from hitting the window for
-> corruption, and an ISB after is sufficient to prevent younger
-> instructions from hitting the window for corruption.
-
-This patch, which is in -next as fed55f49fad181be9dfb93c0, breaks the
-build of at least the vDSO selftests:
-
-$ make -C tools/testing/selftests ARCH=arm64 LLVM=1 TARGETS=vDSO
-
-  CC       vdso_test_chacha
-In file included from vgetrandom-chacha.S:9:
-In file included from ./../../../../arch/arm64/kernel/vdso/vgetrandom-chacha.S:5:
-In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/assembler.h:21:
-In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/cpufeature.h:13:
-/home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/sysreg.h:1097:5: error: function-like macro 'IS_ENABLED' is not defined
- 1097 | #if IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23)
-      |     ^
-1 error generated.
-
---JOptcxW8/D3dLVn7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmgwgxkACgkQJNaLcl1U
-h9A3Pgf9GsTk5F/0fGNY7kWqakfU1yTU+RDK9n6FFb+6TJtfgeAXmmC8cEWLDAC7
-tZX+QqEMT6QCMrQwW30wWrG0DMlSXea4lOlEbe+Bxyj7nXyb7buttUfdXWhSnWBv
-yIJBf376RmMy97ILyMoS6rtIhLtKoU75JXoWjB5QgYiGkypejZR1F8nH9y/hGO+9
-tXRx1oLyc/5agIHMewTCuqeCBZRz3yv+I5cF5C133O0bMdLt5JaPJ5tYL+SH1vi2
-Cqe9Au9ZZsVntJwxf/c+iq7qtvjxxy+NMfgJrx+ebEgZVOzZN2HjDUoWgb9Z83pv
-MVZQBGqQ1cq/g8bSFqTDiGjj4VbZTQ==
-=buIY
------END PGP SIGNATURE-----
-
---JOptcxW8/D3dLVn7--
+Yes, KVM's rather bizarre ABI is that DEASSIGN is allowed even if the VM doesn't
+have a corresponding assigned irqfd.  The reason I added these early DEASSIGN
+calls is so that there will be an easier-to-debug failure if KVM's behavior
+changes (the racing threads part of the test abuses KVM's ABI).  I didn't add a
+comment because the helpers already have comments, but looking at this again, I
+agree that main() needs a better comment.
