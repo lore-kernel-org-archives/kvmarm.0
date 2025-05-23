@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF49222A1CD
-	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 17:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE98822A1CD
+	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 17:26:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748021154; cv=none; b=fxHLUIyXv5hBKu4u+zDteeR6pnxyYztw/6ycuXnhuhO1C+0llVuSrSc7W3bC/zqulERijWRxdtRqMzckZkTlLPkvSfU4yrZdSBp5BVxPR6mS5paBoxtZpQaxa8RzcTMjqJYfRVsc4Y0ZTpnRdz2nuadmE7upRKdMiP+tm5Rj4Js=
+	t=1748021213; cv=none; b=PvBeTlRhGU0uOnKfCDXYEZ4A15rhH91vKAza2M3+q5b3jFzKbhwYiW2qSPscBP6gvhHrPSdN0Auh+WkfUCd1nS/4DonyIUHzJIZkmYyWlSUqXtIwyZ3CclF2LPwA9bmlgmc3tpfdIrdfyQrgYWMM50NV96VND3hzKbmziRqieSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748021154; c=relaxed/simple;
-	bh=qKV4cw2WVMo2P4Xl7B0pHlolYQ4vJsMjCohjwJ0322k=;
+	s=arc-20240116; t=1748021213; c=relaxed/simple;
+	bh=B+ZJNQfUGf2czxGVKkBPue5psKVLYxEzwaWYlfySouY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GNnoP1qeo3/yNVh4Vj0hYDU5JtgXAGZeCZ3NYul5J0gSutZfoa0UQuSuYVlHtSRjF8oN9QwIHgqDa0ti6iaKpBOeRN8VAcXfIJ3a22Gwkln0vXudodOSJK+qFtVjtPHsA0gb8GQ+Yy73d19Vqx1glwOwmPtOT3LFlZHZYUTPilg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKOXWUA/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=EQ+RdHQWI9l7JaJ3cZ9+oBSueKVyxWh5GapZS0P7wFx/FaiyJV/KEoMIi5HDCmJduLEglTDfgFTMfTXZyFR5WJCZbU9S5TITENhDoB7AIRQDiso3Flz4QVMNpqMF4tKA0sFEmQ6s5TI5laiGbt0eoRSFcvUqZArJ/eQsa95J+gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7UFpWOc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKOXWUA/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61F0CC4CEE9;
-	Fri, 23 May 2025 17:25:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7UFpWOc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BEFC4CEE9;
+	Fri, 23 May 2025 17:26:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748021153;
-	bh=qKV4cw2WVMo2P4Xl7B0pHlolYQ4vJsMjCohjwJ0322k=;
+	s=k20201202; t=1748021213;
+	bh=B+ZJNQfUGf2czxGVKkBPue5psKVLYxEzwaWYlfySouY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bKOXWUA/gxxjysGdDqwqDxpPmC67fGa/KLOo6HBVJXHSuxjU0E+HIyw1rF6nsvUco
-	 CgRxADWtRxSgnNrCHLFzD9xbrmnJPwwbISuksE00Si83CswTMZqC/VGTGgnJsfweTR
-	 86COVW+VkE+LeawKy+Oj3WPceivFsjVE0uDW8oaFOpQrr8RDklUb1pH2Gy9ZBbGUdk
-	 aMmpmGFtuwwopfOrHWKKgnd0wbrivPhyz4bCaoXuLhmvKlWAZ9M22rEy4suav/M+MP
-	 oD/BsGk2p0mBvOomFPTqa6z2r7pXukfCTbTSX3McVcTRVdUqgb9ekL1QQPBEnyLu9r
-	 GNzf0vhTxT9/g==
+	b=o7UFpWOc27dk0z4sJX3z+bN9iAbZHpDfFfCNVaJnzREpepCgYPXjdn0xKnqUbe1Zt
+	 0iNVSTkSd5KMpyO9ntUlaLB2J3ggE0vkaUZw5AuQaRrFIBEbSW8iSyecUVr5iYkQbm
+	 9oFFDcAzL+XhXgiYNyEbHD9GJU5EF31iiYukqI/sBpw2uYaLkSWWM8hxXLSmo4cN7U
+	 af29vUa+bp7vK4CsvqrvzbR1jlxiI2IxBquhfr11bu3+MBYdJQTgXTccx1XZZrveY1
+	 YcNeeb4vf5JHfsNXi9LVS3sXSGpibJzHJWQiJRr5g3B5pTQTDBon+ywrSmo8DhSkHo
+	 2jCxzC9hRrP5Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uIW9W-00047h-Qv;
-	Fri, 23 May 2025 18:25:51 +0100
-Date: Fri, 23 May 2025 18:25:50 +0100
-Message-ID: <87v7prdysh.wl-maz@kernel.org>
+	id 1uIWAV-00048M-1E;
+	Fri, 23 May 2025 18:26:51 +0100
+Date: Fri, 23 May 2025 18:26:49 +0100
+Message-ID: <87tt5bdyqu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -41,10 +41,10 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Sweet Tea Dorminy <sweettea@google.com>
-Subject: Re: [PATCH 3/5] KVM: arm64: Resolve vLPI by host IRQ in vgic_v4_unset_forwarding()
-In-Reply-To: <20250523160810.4049313-4-oliver.upton@linux.dev>
+Subject: Re: [PATCH 4/5] KVM: arm64: Unmap vLPIs affected by changes to GSI routing information
+In-Reply-To: <20250523160810.4049313-5-oliver.upton@linux.dev>
 References: <20250523160810.4049313-1-oliver.upton@linux.dev>
-	<20250523160810.4049313-4-oliver.upton@linux.dev>
+	<20250523160810.4049313-5-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,103 +60,96 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 23 May 2025 17:08:08 +0100,
+On Fri, 23 May 2025 17:08:09 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> The virtual mapping and "GSI" routing of a particular vLPI is subject to
-> change in response to the guest / userspace. This can be pretty annoying
-> to deal with when KVM needs to track the physical state that's managed
-> for vLPI direct injection.
+> KVM's interrupt infrastructure is dodgy at best, allowing for some ugly
+> 'off label' usage of the various UAPIs. In one example, userspace can
+> change the routing entry of a particular "GSI" after configuring
+> irqbypass with KVM_IRQFD. KVM/arm64 is oblivious to this, and winds up
+> preserving the stale translation in cases where vLPIs are configured.
 > 
-> Make vgic_v4_unset_forwarding() resilient by using the host IRQ to
-> resolve the vgic IRQ.
+> Honor userspace's intentions and tear down the vLPI mapping if affected
+> by a "GSI" routing change. Make no attempt to reconstruct vLPIs if the
+> new target is an MSI and just fall back to software injection.
 > 
 > Tested-by: Sweet Tea Dorminy <sweettea@google.com>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/arm.c          |  3 +--
->  arch/arm64/kvm/vgic/vgic-v4.c | 45 +++++++++++++++++++----------------
->  include/kvm/arm_vgic.h        |  3 +--
->  3 files changed, 27 insertions(+), 24 deletions(-)
+>  arch/arm64/kvm/arm.c | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
 > 
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 36cfcffb40d8..1de49b48e35e 100644
+> index 1de49b48e35e..505d504b52b5 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -2800,8 +2800,7 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
->  	if (irq_entry->type != KVM_IRQ_ROUTING_MSI)
->  		return;
->  
-> -	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq,
-> -				     &irqfd->irq_entry);
-> +	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq);
+> @@ -2790,6 +2790,7 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+>  	return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
+>  					  &irqfd->irq_entry);
+>  }
+> +
+>  void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+>  				      struct irq_bypass_producer *prod)
+>  {
+> @@ -2803,6 +2804,28 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+>  	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq);
 >  }
 >  
->  void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
-> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-> index 01a5de8e9e94..193946108192 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v4.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
-> @@ -508,10 +508,27 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->  	return ret;
->  }
->  
-> -int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
-> -				 struct kvm_kernel_irq_routing_entry *irq_entry)
-> +static struct vgic_irq *__vgic_host_irq_get_vlpi(struct kvm *kvm, int host_irq)
+> +bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *old,
+> +				  struct kvm_kernel_irq_routing_entry *new)
 > +{
-> +	struct vgic_irq *irq;
-> +	unsigned long idx;
+> +	if (new->type != KVM_IRQ_ROUTING_MSI)
+> +		return true;
 > +
-> +	guard(rcu)();
-> +	xa_for_each(&kvm->arch.vgic.lpi_xa, idx, irq) {
-> +		if (!irq->hw || irq->host_irq != host_irq)
-> +			continue;
-> +
-> +		if (!vgic_try_get_irq_kref(irq))
-> +			return NULL;
-> +
-> +		return irq;
-> +	}
-> +
-> +	return NULL;
+> +	return memcmp(&old->msi, &new->msi, sizeof(new->msi));
 > +}
 > +
-> +int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int host_irq)
->  {
-> -	struct vgic_its *its;
->  	struct vgic_irq *irq;
->  	unsigned long flags;
->  	int ret = 0;
-> @@ -519,31 +536,19 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
->  	if (!vgic_supports_direct_msis(kvm))
->  		return 0;
->  
-> -	/*
-> -	 * Get the ITS, and escape early on error (not a valid
-> -	 * doorbell for any of our vITSs).
-> -	 */
-> -	its = vgic_get_its(kvm, irq_entry);
-> -	if (IS_ERR(its))
-> +	irq = __vgic_host_irq_get_vlpi(kvm, host_irq);
-> +	if (!irq)
->  		return 0;
->  
-> -	mutex_lock(&its->its_lock);
-> -
-> -	ret = vgic_its_resolve_lpi(kvm, its, irq_entry->msi.devid,
-> -				   irq_entry->msi.data, &irq);
-> -	if (ret)
-> -		goto out;
-> -
+> +int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
+> +				  uint32_t guest_irq, bool set)
 
-Removing the reliance on the ITS locking is another thing that could
-be mentioned in the commit message, as it is slightly surprising to
-see it here, given that the previous patch is all about that.
+If we're adding this, can we take out the trash and get rid of this
+'set' parameter? Its only purpose is to be set to '1' and fed to the
+x86-specific stuff. How about this:
 
-My other gripe is that we lose the doorbell validation. I'm not sure
-it is a big deal, but I'd rather we keep verifying we're not being fed
-rubbish data, in case we need to rely on that in the future.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index df5b99ea1f181..2d69609c1ec00 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13613,9 +13613,9 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+ }
+ 
+ int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
+-				   uint32_t guest_irq, bool set)
++				   uint32_t guest_irq)
+ {
+-	return kvm_x86_call(pi_update_irte)(kvm, host_irq, guest_irq, set);
++	return kvm_x86_call(pi_update_irte)(kvm, host_irq, guest_irq, true);
+ }
+ 
+ bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *old,
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 11e5d1e3f12ea..2e60d0bf02e2f 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -287,7 +287,7 @@ void __attribute__((weak)) kvm_arch_irq_bypass_start(
+ 
+ int  __attribute__((weak)) kvm_arch_update_irqfd_routing(
+ 				struct kvm *kvm, unsigned int host_irq,
+-				uint32_t guest_irq, bool set)
++				uint32_t guest_irq)
+ {
+ 	return 0;
+ }
+@@ -621,7 +621,7 @@ void kvm_irq_routing_update(struct kvm *kvm)
+ 		    kvm_arch_irqfd_route_changed(&old, &irqfd->irq_entry)) {
+ 			int ret = kvm_arch_update_irqfd_routing(
+ 					irqfd->kvm, irqfd->producer->irq,
+-					irqfd->gsi, 1);
++					irqfd->gsi);
+ 			WARN_ON(ret);
+ 		}
+ #endif
+
 
 Thanks,
 
