@@ -1,124 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9B520C465;
-	Fri, 23 May 2025 15:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1D3184E;
+	Fri, 23 May 2025 15:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748012410; cv=none; b=Rpxct8zzWUgcAeYqP+lRAgovHa8bUTVXYBAwh1yELkWj2WOGi9QFMw1MkujEqSc0/e3nbgPL1lkKt8ExDoVgwC+axY9PtUo83snbjpqfytaL1eGAKqyi75FLJ/RudlgtRkiU9cBNmY1c0epLHQ+ddPnyHHucCGrEcLUrU10BBsM=
+	t=1748013325; cv=none; b=fYCTMXvypmQCv7kWy0fAjNoZJV4l3cAhzYRjf/cMF5dv8SjSZWheWw5KGvLjmNDFwtfyQ8YSWRNKf+VpQSKcQ67g814RDOxuxRQTe0gqhUqRKxL1FDDu+RVjuTv74lQ9tPgRIOZAlhi1PG3buWdAHXsUqMYlOAYMhpMWDvZPXvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748012410; c=relaxed/simple;
-	bh=Hk+9dxRaWTHmkirrqICnnV8gGlkcDt7jVcXhQiCkSjU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FS6VSorpcxWnc1Tft0nOZzM27mantfcz/LE5RT6spncZEgSRl+8JXOFV4pOmYyJpC9OO+GN4hLKZDHbjqIfMZDzcm+QRD04w4l5sdEp4WRodVeZm3xXGpSJ7DG1PbIFOvEgyjv58HE+PnteztwHaOZciYke2/cqEVivc99k34JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d/+o3mto; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748013325; c=relaxed/simple;
+	bh=8VAZ+KkDBpgajXwea43E3Jxb6kQkvjoqXTpZNv0Qq/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qoocdpi1T2eQ3gI+I1KLIb9ICi7CVWyPtwcAq2DfpFUXniW4rhxEQnoz/f1QLPgOSAT1g+btRcomoFzEqXncyPF4G2DKpYXyXWngCu6jkvqjg0LmtNUz59FNkP+Xopeg4iBi2Tc0V5nHydm7ALWwrhkuOlHZVI0NdP9esaQTFRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pGQkJ1lC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d/+o3mto"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 619EFC4CEE9;
-	Fri, 23 May 2025 15:00:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pGQkJ1lC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A632BC4CEE9;
+	Fri, 23 May 2025 15:15:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748012409;
-	bh=Hk+9dxRaWTHmkirrqICnnV8gGlkcDt7jVcXhQiCkSjU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d/+o3mtoYralQyEh0EUfx4bdpAPZIB1gQu5iZ7n7kpjYmyg1KtY0lffY2QW6tj2YF
-	 rOMPRIgdRL3MPLDQFhOi0mu6G5SscqnFst5mRUkY9OMrK/MDhTGZo7eevtvMlkanuM
-	 ZFfAs+RDAMxb/WLvUFnXG8oqGxnV/UL9vCe196r5g/xgydLBJBC1NRKiKhqGu3/Sxw
-	 o7kcv/DJU5DG64wEOmNlsIlin/1aFX6zqay4GRLuQq38vllTnriQGhBeBXeOYD5y0t
-	 VTOPDQBjTjIrgUMfOAzWsnKYMGa1Unro72iRzteLBmZLfeq6meNQHpI1GtYxheCuHM
-	 d/r2YoY578qWQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uITsU-0001Wm-UX;
-	Fri, 23 May 2025 16:00:07 +0100
-Date: Fri, 23 May 2025 16:00:06 +0100
-Message-ID: <87wma7e5jd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+	s=k20201202; t=1748013324;
+	bh=8VAZ+KkDBpgajXwea43E3Jxb6kQkvjoqXTpZNv0Qq/I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pGQkJ1lC2/A+T2pz2yWocsEtvsiqUZZrEeNtanIv8DT3RFBAWPuP02jbRJFNFDE48
+	 GPc9LopvR4eQb5iPOTsgmVrNhJK5RNWA8Z+yd3hTrF2m77McGnQ9/5QuxbMW/FxrNc
+	 2ZDgRw10qC8TiiQmZtLDUdSWao72gM270Um0KAHv07hw3TbFOx+Savswqx7MRCqSDy
+	 3mDPWLDYDimovIXkUlDJBztZv9zymx/F2+r48fjhnLX8OBeQYHYG7IlKluNy/IOgAJ
+	 uJUPEJSPOS0ilK4HrOdJghDxRLydoNNXRPPxayHHhOTb8qNjaIDMdAAW1Es2AxqUGS
+	 x37eWYDlYP0ag==
+Date: Fri, 23 May 2025 16:15:20 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc: D Scott Phillips <scott@os.amperecomputing.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	James Clark <james.clark@linaro.org>,
-	James Morse <james.morse@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
+	James Morse <james.morse@arm.com>, Joey Gouly <joey.gouly@arm.com>,
 	Kevin Brodsky <kevin.brodsky@arm.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	"Rob Herring  (Arm)" <robh@kernel.org>,
 	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>,
-	Will Deacon <will@kernel.org>,
-	Yicong Yang <yangyicong@hisilicon.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] arm64: errata: Work around AmpereOne's erratum AC04_CPU_23
-In-Reply-To: <aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk>
+	Shiqi Liu <shiqiliu@hust.edu.cn>, Will Deacon <will@kernel.org>,
+	Yicong Yang <yangyicong@hisilicon.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] arm64: errata: Work around AmpereOne's erratum
+ AC04_CPU_23
+Message-ID: <aDCRCOSB287IafJL@finisterre.sirena.org.uk>
 References: <20250513184514.2678288-1-scott@os.amperecomputing.com>
-	<aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk>
+ <87wma7e5jd.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, scott@os.amperecomputing.com, catalin.marinas@arm.com, james.clark@linaro.org, james.morse@arm.com, joey.gouly@arm.com, kevin.brodsky@arm.com, mark.rutland@arm.com, oliver.upton@linux.dev, robh@kernel.org, shameerali.kolothum.thodi@huawei.com, shiqiliu@hust.edu.cn, will@kernel.org, yangyicong@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+Yyr2O7xEu/r8n9d"
+Content-Disposition: inline
+In-Reply-To: <87wma7e5jd.wl-maz@kernel.org>
+X-Cookie: Well begun is half done.
 
-On Fri, 23 May 2025 15:15:53 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Tue, May 13, 2025 at 11:45:14AM -0700, D Scott Phillips wrote:
-> > On AmpereOne AC04, updates to HCR_EL2 can rarely corrupt simultaneous
-> > translations for data addresses initiated by load/store instructions.
-> > Only instruction initiated translations are vulnerable, not translations
-> > from prefetches for example. A DSB before the store to HCR_EL2 is
-> > sufficient to prevent older instructions from hitting the window for
-> > corruption, and an ISB after is sufficient to prevent younger
-> > instructions from hitting the window for corruption.
-> 
-> This patch, which is in -next as fed55f49fad181be9dfb93c0, breaks the
-> build of at least the vDSO selftests:
-> 
-> $ make -C tools/testing/selftests ARCH=arm64 LLVM=1 TARGETS=vDSO
-> 
->   CC       vdso_test_chacha
-> In file included from vgetrandom-chacha.S:9:
-> In file included from ./../../../../arch/arm64/kernel/vdso/vgetrandom-chacha.S:5:
-> In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/assembler.h:21:
-> In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/cpufeature.h:13:
-> /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/sysreg.h:1097:5: error: function-like macro 'IS_ENABLED' is not defined
->  1097 | #if IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23)
->       |     ^
-> 1 error generated.
 
-This:
+--+Yyr2O7xEu/r8n9d
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index ad63457a05c5b..4389d3916426c 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -13,6 +13,7 @@
- #define __ASM_ASSEMBLER_H
- 
- #include <linux/export.h>
-+#include <linux/kconfig.h>
- 
- #include <asm/alternative.h>
- #include <asm/asm-bug.h>
+On Fri, May 23, 2025 at 04:00:06PM +0100, Marc Zyngier wrote:
+> On Fri, 23 May 2025 15:15:53 +0100,
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Tue, May 13, 2025 at 11:45:14AM -0700, D Scott Phillips wrote:
 
-should solve it.
+> > > On AmpereOne AC04, updates to HCR_EL2 can rarely corrupt simultaneous
+> > > translations for data addresses initiated by load/store instructions.
 
-But it also outlines that the vdso is getting built using stuff that
-is not meant for userspace code.
+> > This patch, which is in -next as fed55f49fad181be9dfb93c0, breaks the
+> > build of at least the vDSO selftests:
 
-	M.
+> > $ make -C tools/testing/selftests ARCH=arm64 LLVM=1 TARGETS=vDSO
 
--- 
-Jazz isn't dead. It just smells funny.
+> >   CC       vdso_test_chacha
+> > In file included from vgetrandom-chacha.S:9:
+> > In file included from ./../../../../arch/arm64/kernel/vdso/vgetrandom-chacha.S:5:
+> > In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/assembler.h:21:
+> > In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/cpufeature.h:13:
+> > /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/sysreg.h:1097:5: error: function-like macro 'IS_ENABLED' is not defined
+> >  1097 | #if IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23)
+> >       |     ^
+> > 1 error generated.
+
+> This:
+
+...
+
+> should solve it.
+
+Yes, that works.
+
+Tested-by: Mark Brown <broonie@kernel.org>
+
+> But it also outlines that the vdso is getting built using stuff that
+> is not meant for userspace code.
+
+Indeed, adding Jason for that.  It's the same for all architectures.
+
+--+Yyr2O7xEu/r8n9d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmgwkQUACgkQJNaLcl1U
+h9BDdAf5AeNkCRljY3IolOsbcV9AvHe7eansIWFCvJ6HxTOQqQmsS6T+op6eJZ4a
+0N8yNPVxuuydStcSR1kFeoTrr1eYs6hQYMeU4oEidizB9l2d9pxxD9dpZN4eW0jf
+JFwE9/4NsSn2IP1XC729xvE+FYZdkkD+u8R72XlUN1z6DNkqPv+Sm/UVgmTnpFKl
+PRJ6dD0yPP0uhpa8cfWkB9lkNtwzGFnqiznOSALxyZfEymhH8v3SVu3Vi+6mXApd
+V6LBBs9lr3K+V8rUmpM8KfcQj1UoQC2tMNhZq0LyHLkAJUlwkfQnU/HFaC5WJZOb
+mhSFdprkC8hgYBfU0eRXxq1KmCOiVw==
+=BxGU
+-----END PGP SIGNATURE-----
+
+--+Yyr2O7xEu/r8n9d--
