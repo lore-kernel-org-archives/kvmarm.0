@@ -1,128 +1,105 @@
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A23822A4F0;
-	Fri, 23 May 2025 11:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD4549620
+	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 13:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747999224; cv=none; b=VbvVK++JWiqsSLNlSbFMjcuu40B47FUXE2b3F9NNLf0i+d6SjNGQ8NTyDxkB5skiKsSy5+GDPR0S0+zsSLGf6b27Rq20YXBsLbg4qm3hViXUhTZ9T3wCqY4wPN838B50/WxS3hvtrn8Y4+aZxMmbSdjVLHXz/7/cM4j9/vjwiWc=
+	t=1748005532; cv=none; b=GzbI41fFcG8+ua4OCXIW1paK4xrF7KpxO9nKE0cvcQfrfjqKpGExpt+cCPaybgGztfuMN36/AcGbwvRKC1yVJbS0juWaGytjiHfwO8jKTI7va9noV8JoTpzSGivtmGTBdaFi6MqB9NXnzrBwqd8MZFxArfVQpu12ayxoPI8Xg8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747999224; c=relaxed/simple;
-	bh=XmeiGBXI70ukFbp2wX31QSqHU/R9FyAhU/P3DDXoibQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dZqpf625yzz5fsLA1/xVjLnyNq2MPBIk9OFzOcUhNLLsqrHAxwEo4xC7N0sCoEieD4W1CgkRVqTny++rj5PsKRgdqXWKHVE/0i6HiJa3Loc49h4JXihU9TIxJICTfSXHENJ4xTVV7+75awTu8Sc4RUPjueieBEWcgwt2QtLdC90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=pGrh4cl5; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1748005532; c=relaxed/simple;
+	bh=eBKAm2AJciIUpLbPQOmLAQPNygq8Ocm2Eml3M6OpgbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Scdr0RVwFcs8j7DgFhFep2c95/o5QXBRoxEcgxEp/kVGJGXzNhw8XZMa1hCzmIqnHOfF2EbRovatq60WtakHcBZXbLS/CkFuNVlbrB6h2dxIZy7/4MH0Ons4MnQxvCf3j3b5KZAedS9tUo6ZuEpVO5KAgnTw4V+h2PPWvnR4JVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=awGPfw8X; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="pGrh4cl5"
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 54NBJc1K2086996;
-	Fri, 23 May 2025 06:19:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1747999178;
-	bh=G3eBoRI6ajKzQj7PIYgoVul0HEV9Bq6GwjJIxWdrMvs=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=pGrh4cl5UNwlzQb/0t74988xZoSrBH7x4348QMBKDmfEIEnMxH8v3P122scZKOLoq
-	 WcvICifTw0IpvVBp7SlgqxN1dmooOa4XIXH6VEXHmwzZMIPuwOd/B/40p6zsECZIL9
-	 nKV7oX048/6bbOEblbgcqX9fFjhONqR8xG9NOzpE=
-Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 54NBJcAC023157
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Fri, 23 May 2025 06:19:38 -0500
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 23
- May 2025 06:19:37 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 23 May 2025 06:19:37 -0500
-Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 54NBJblW1172257;
-	Fri, 23 May 2025 06:19:37 -0500
-Date: Fri, 23 May 2025 06:19:37 -0500
-From: Nishanth Menon <nm@ti.com>
-To: Kees Cook <kees@kernel.org>
-CC: Arnd Bergmann <arnd@arndb.de>, Russell King <linux@armlinux.org.uk>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner
-	<tglx@linutronix.de>,
-        Santosh Shilimkar <ssantosh@kernel.org>, Lee Jones
-	<lee@kernel.org>,
-        Allison Randal <allison@lohutok.net>,
-        Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Christoph Hellwig
-	<hch@lst.de>, Marco Elver <elver@google.com>,
-        Andrey Konovalov
-	<andreyknvl@gmail.com>,
-        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-        Ard
- Biesheuvel <ardb@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan
- Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas.schier@linux.dev>,
-        Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-        Bill Wendling
-	<morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>, <linux-kernel@vger.kernel.org>,
-        <x86@kernel.org>, <kasan-dev@googlegroups.com>,
-        <linux-doc@vger.kernel.org>, <kvmarm@lists.linux.dev>,
-        <linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
-        <linux-efi@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <linux-kbuild@vger.kernel.org>,
-        <linux-security-module@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <sparclinux@vger.kernel.org>,
-        <llvm@lists.linux.dev>
-Subject: Re: [PATCH v2 05/14] arm: Handle KCOV __init vs inline mismatches
-Message-ID: <20250523111937.f2fqhoshqevdoxcl@snowbird>
-References: <20250523043251.it.550-kees@kernel.org>
- <20250523043935.2009972-5-kees@kernel.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="awGPfw8X"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43cfdc2c8c9so56144015e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 06:05:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1748005529; x=1748610329; darn=lists.linux.dev;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kuI3B9kxX1Iq6NEwiLbLt18bZ814ygZMl/v7N70dy3g=;
+        b=awGPfw8XYwvaF4eNcXsaPwEpYH9zGa2PRqS8EFLyKi1Jyy0YhCtO7gELEp9X2tU+XT
+         FlIymkNykc1mph+/UpJA0j9+Fjua5c96mLKPAsFZYUuGzo4qfIqM91zK50KzDMbpzG+f
+         lJzdrkEhazXq/xEeW9TdKR4s/Gn4P6UMHvr0b3cyQl6UNlTmhxJKLw2pzvws3So8mO7q
+         Yx5cbzJlgSsrjn9cnj5f+x0w+yrUfrI1+pLIyPyCitsbvx/n/zoCLyEGQhbqeXopfciQ
+         PdTbJlVBLnR8Nhl7wPHYzqRoHSSp9CG7OXuf2BfBVeeXXnwZoBTi7w/21eDFqUPeMJLG
+         tEYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748005529; x=1748610329;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kuI3B9kxX1Iq6NEwiLbLt18bZ814ygZMl/v7N70dy3g=;
+        b=m14bEBo3PftACD5CTt84WBAHM6iAS1JNll1Hp8WQB1R2t3vXWrP4VWMcRU/pALnIFa
+         jOl/xXsrcANj9AWjC7x3EgRfuGw3IJwWDhUidDSv4Mv45GdWV3rMyiOuw9qDqiSQz95x
+         4IUkgepuzcTNEzGkv68kaF3VBrg6ozb2hn8HjCPDel6I8iF0PnWWh/sKbwVOjpPshzd9
+         JBa/jMsDVnYDOEzdPAEwutVHfmUaCoFpy8QZ5mY5RuUOoUvMtgsJbo3D9HnAX+x2EYd2
+         foXio5QiXJHKWfMW+OEFso+glE2prnf7B0Aez9qsjCvqAGug7fGmqPA/W0s5SqWNvzwz
+         m4Gw==
+X-Gm-Message-State: AOJu0YzdxBOBdLXdW4udvCkNdJYZCyS2MH2fVJZ9o6LVmUR/XzG4fh+S
+	pWndWUf/5DueFJGDMA4sVT9PyPCUSzsDQPgvV+D4rOWf2zRpXMs6FgKNa66k/dLLTsU=
+X-Gm-Gg: ASbGnctiJICSrXzfX1Ddmxz62tc0vnr2OfF3SwVix6lFVKRmr+JjuMDumoYgbB8H9VT
+	VKHeZVRnPgo27jT4NK3P7d4omHxYxSYp5dSeQ6yY7TG+aU/wuN0ZC8zbcACL15rRKLAQeotd7H3
+	+C7xyBXBYiGPjx4pb5a1csecMxXv1kgDVX1BHm78tSVkAh9rSr1ETn83xvT+fVWmHDBLp5hSXj+
+	+Ec/edKmGpnRPUMWBLAwiQnIsOrDv7XYpl9kRVCYjHJjJopN2J10zbbIrJJdRKb41Sxra834tsA
+	C0+gmClUSqvpUlXIjMsVK3PUrywDeJLgGNdSCV3qEs7PF8FgnpON4cQT
+X-Google-Smtp-Source: AGHT+IEqDH1CWQYUcy5XHxM3u6T+x8FZEAV0ii/i/tIa0TrGB4czeYzSNwQjjT9Ou/Jf7clYm3EGeA==
+X-Received: by 2002:a05:600c:548c:b0:43d:fa58:700e with SMTP id 5b1f17b1804b1-442fd6759c0mr239671525e9.33.1748005528715;
+        Fri, 23 May 2025 06:05:28 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-447f38142aasm137416885e9.27.2025.05.23.06.05.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 May 2025 06:05:28 -0700 (PDT)
+Date: Fri, 23 May 2025 16:05:24 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Jing Zhang <jingzhangos@google.com>
+Cc: kvmarm@lists.linux.dev
+Subject: [bug report] KVM: arm64: vgic-its: Add debugfs interface to expose
+ ITS tables
+Message-ID: <aDBylI1YnjPatAbr@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250523043935.2009972-5-kees@kernel.org>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 21:39-20250522, Kees Cook wrote:
-> When KCOV is enabled all functions get instrumented, unless
-> the __no_sanitize_coverage attribute is used. To prepare for
-> __no_sanitize_coverage being applied to __init functions, we have to
-> handle differences in how GCC's inline optimizations get resolved. For
-> arm this exposed several places where __init annotations were missing
-> but ended up being "accidentally correct". Fix these cases and force
-> several functions to be inline with __always_inline.
-> 
-> Signed-off-by: Kees Cook <kees@kernel.org>
-> ---
-[...]
-> diff --git a/drivers/soc/ti/pm33xx.c b/drivers/soc/ti/pm33xx.c
-> index dfdff186c805..dc52a2197d24 100644
-> --- a/drivers/soc/ti/pm33xx.c
-> +++ b/drivers/soc/ti/pm33xx.c
-> @@ -145,7 +145,7 @@ static int am33xx_do_sram_idle(u32 wfi_flags)
->  	return pm_ops->cpu_suspend(am33xx_do_wfi_sram, wfi_flags);
->  }
->  
-> -static int __init am43xx_map_gic(void)
-> +static int am43xx_map_gic(void)
->  {
->  	gic_dist_base = ioremap(AM43XX_GIC_DIST_BASE, SZ_4K);
->  
-> -- 
-> 2.34.1
-> 
-Acked-by: Nishanth Menon <nm@ti.com>
--- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
+Hello Jing Zhang,
+
+This is a semi-automatic email about new static checker warnings.
+
+Commit 30deb51a677b ("KVM: arm64: vgic-its: Add debugfs interface to
+expose ITS tables") from Feb 20, 2025, leads to the following Smatch
+complaint:
+
+    arch/arm64/kvm/vgic/vgic-debug.c:501 vgic_its_debug_show()
+    warn: variable dereferenced before check 'ite' (see line 493)
+
+arch/arm64/kvm/vgic/vgic-debug.c
+   492	
+   493		if (list_is_first(&ite->ite_list, &dev->itt_head)) {
+                                   ^^^^^^^^^^^^^
+This dereferences "ite"
+
+   494			seq_printf(s, "\n");
+   495			seq_printf(s, "Device ID: 0x%x, Event ID Range: [0 - %llu]\n",
+   496				   dev->device_id, BIT_ULL(dev->num_eventid_bits) - 1);
+   497			seq_printf(s, "EVENT_ID    INTID  HWINTID   TARGET   COL_ID HW\n");
+   498			seq_printf(s, "-----------------------------------------------\n");
+   499		}
+   500	
+   501		if (ite && ite->irq && ite->collection) {
+                    ^^^
+So this check is too late.
+
+   502			seq_printf(s, "%8u %8u %8u %8u %8u %2d\n",
+   503				   ite->event_id, ite->irq->intid, ite->irq->hwintid,
+
+regards,
+dan carpenter
