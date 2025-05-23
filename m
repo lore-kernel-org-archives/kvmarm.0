@@ -1,32 +1,32 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65BA293739
-	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 16:08:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471C7178372
+	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 16:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748016510; cv=none; b=QF2wOjbRB3ZK45/RPjavjhZfm0IFd1PHQg0eNadjnaWrA9vY304vDvfUc9QbFUOEEGXS4CcDk/HtPu+0DXSBpiJI3bojW5G86eTxTBpZy7W4/K3yGMEcz2j/QHXnMu73Hg/U6mhMYRa1qrnIqMWiTcksTfOFMCdZw1ZRE4Y1h/k=
+	t=1748016512; cv=none; b=UPu8q6w00UQwBzY53YACuSGDRb6k7+Ob3RtCEBd3l37AGMXnXTw9z0avQy+Qd3jDvLyf46O6gXOyl8+u0v39wYsWrDhHQOtRZvpyTCpz56jFN9rzZfK19ShYkkmvmb/35kbDfwIQsOiXQiQiSMOe3+9vVIZt1LjO2sG77MsmL7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748016510; c=relaxed/simple;
-	bh=QB74p9Cfpib0Ybkh/T5GC1Px46oC7sU46z/LZ+NL7Js=;
+	s=arc-20240116; t=1748016512; c=relaxed/simple;
+	bh=5Mn2VX3Qi/n/Ft9oegIAHQba23a4+hjXftiqYVBj+EM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jQ6SScyGXdugTKwLfh+Q2GWYiHgIwpfVofODUSJqH4x3AtjbTYO4OM/DnddkzEET3tECfv2RfqAgDxkQpZDXSYOnFq1Sfrt425qMECxdlpc0mM2h7x/6Z/vgiU9M02sNXw2tOCqRUnLrRrREE6f2qgl86euO9uutqf0ssP2WzOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MFMvGEGI; arc=none smtp.client-ip=95.215.58.183
+	 MIME-Version; b=jZlF2h0+XvDqFvtiCl8+LoMNuVOL/94bDnPYTt7pMNIlf/BvRiWptmICUqhxtI/GK1Ss9j0PCn1/R3NmBhTo6jX6ZmNEw8DwpocU7GJMmbEdTLL+LPn6fbAsNhn/LBzHZR++yBhpgWYhIHC72GYT81ydSJmGzpbBL5BIimsIhHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HcpgaMiC; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MFMvGEGI"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HcpgaMiC"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748016503;
+	t=1748016507;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lPBnu+KPAL6yB4ssu2XCKZrQ7LI+CLjrIF8KYHn6eq8=;
-	b=MFMvGEGIYpRwllZ46M6KSCa8dLaGWRhhv5fubJ9KZ26tE84VjThyQ8J2nkXzbgkQEcy7h0
-	eth1EYp7ritjak3ZA7I2X2Zi2zfuUZBVs8GrWcLBFZ3LZGuoPVz413KddLNp0pvSLsCaFH
-	xnz5nRPoz9IlV7dglkjoumcHmj94Wy8=
+	bh=fbOME1NnprD0AGO0HcXD7XEnwm5Jc4Ui6GasBYzgRnU=;
+	b=HcpgaMiCuDEq+GvRwYuWzSWm1v8nvpWwRvtZqu6QXQ18Y5MEXj90Lt5KRdZxMovoJNxp0b
+	URMgE/3kIKQ+Sv9gG1N/XzQZfNb86whXtzELcomOmVzqISgEb8+Xhg6udHzZnE1vSGPWMf
+	wCQE3/+V5mG9iTNgaZC2tkBvtIA3UTU=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Sweet Tea Dorminy <sweettea@google.com>
-Subject: [PATCH 2/5] KVM: arm64: Protect vLPI translation with vgic_irq::irq_lock
-Date: Fri, 23 May 2025 09:08:07 -0700
-Message-Id: <20250523160810.4049313-3-oliver.upton@linux.dev>
+Subject: [PATCH 4/5] KVM: arm64: Unmap vLPIs affected by changes to GSI routing information
+Date: Fri, 23 May 2025 09:08:09 -0700
+Message-Id: <20250523160810.4049313-5-oliver.upton@linux.dev>
 In-Reply-To: <20250523160810.4049313-1-oliver.upton@linux.dev>
 References: <20250523160810.4049313-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -49,191 +49,63 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Though undocumented, KVM generally protects the translation of a vLPI
-with the its_lock. While this makes perfectly good sense, as the ITS
-itself contains the guest translation, an upcoming change will require
-twiddling the vLPI mapping in an atomic context.
+KVM's interrupt infrastructure is dodgy at best, allowing for some ugly
+'off label' usage of the various UAPIs. In one example, userspace can
+change the routing entry of a particular "GSI" after configuring
+irqbypass with KVM_IRQFD. KVM/arm64 is oblivious to this, and winds up
+preserving the stale translation in cases where vLPIs are configured.
 
-Switch to using the vIRQ's irq_lock to protect the translation.
+Honor userspace's intentions and tear down the vLPI mapping if affected
+by a "GSI" routing change. Make no attempt to reconstruct vLPIs if the
+new target is an MSI and just fall back to software injection.
 
 Tested-by: Sweet Tea Dorminy <sweettea@google.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 48 +++++++++++++++++-----------------
- arch/arm64/kvm/vgic/vgic-v4.c  | 41 ++++++++++++++++-------------
- 2 files changed, 47 insertions(+), 42 deletions(-)
+ arch/arm64/kvm/arm.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 569f9da9049f..beca12dae779 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -306,39 +306,34 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 		}
- 	}
- 
--	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
--
- 	if (irq->hw)
--		return its_prop_update_vlpi(irq->host_irq, prop, needs_inv);
-+		ret = its_prop_update_vlpi(irq->host_irq, prop, needs_inv);
- 
--	return 0;
-+	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+	return ret;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 1de49b48e35e..505d504b52b5 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2790,6 +2790,7 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+ 	return kvm_vgic_v4_set_forwarding(irqfd->kvm, prod->irq,
+ 					  &irqfd->irq_entry);
+ }
++
+ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+ 				      struct irq_bypass_producer *prod)
+ {
+@@ -2803,6 +2804,28 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+ 	kvm_vgic_v4_unset_forwarding(irqfd->kvm, prod->irq);
  }
  
- static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
- {
--	int ret = 0;
--	unsigned long flags;
-+	struct its_vlpi_map map;
-+	int ret;
- 
--	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+	guard(raw_spinlock_irqsave)(&irq->irq_lock);
- 	irq->target_vcpu = vcpu;
--	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- 
--	if (irq->hw) {
--		struct its_vlpi_map map;
--
--		ret = its_get_vlpi(irq->host_irq, &map);
--		if (ret)
--			return ret;
-+	if (!irq->hw)
-+		return 0;
- 
--		if (map.vpe)
--			atomic_dec(&map.vpe->vlpi_count);
--		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
--		atomic_inc(&map.vpe->vlpi_count);
-+	ret = its_get_vlpi(irq->host_irq, &map);
-+	if (ret)
-+		return ret;
- 
--		ret = its_map_vlpi(irq->host_irq, &map);
--	}
-+	if (map.vpe)
-+		atomic_dec(&map.vpe->vlpi_count);
- 
--	return ret;
-+	map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+	atomic_inc(&map.vpe->vlpi_count);
-+	return its_map_vlpi(irq->host_irq, &map);
- }
- 
- static struct kvm_vcpu *collection_to_vcpu(struct kvm *kvm,
-@@ -756,12 +751,17 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
- /* Requires the its_lock to be held. */
- static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- {
-+	struct vgic_irq *irq = ite->irq;
- 	list_del(&ite->ite_list);
- 
- 	/* This put matches the get in vgic_add_lpi. */
--	if (ite->irq) {
--		if (ite->irq->hw)
--			WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
-+	if (irq) {
-+		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
-+			if (irq->hw)
-+				WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
++bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *old,
++				  struct kvm_kernel_irq_routing_entry *new)
++{
++	if (new->type != KVM_IRQ_ROUTING_MSI)
++		return true;
 +
-+			irq->hw = false;
-+		}
- 
- 		vgic_put_irq(kvm, ite->irq);
- 	}
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 8b25e7650998..01a5de8e9e94 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -457,9 +457,11 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
- 				 irq_entry->msi.data, &irq))
- 		return 0;
- 
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++	return memcmp(&old->msi, &new->msi, sizeof(new->msi));
++}
 +
- 	/* Silently exit if the vLPI is already mapped */
- 	if (irq->hw)
--		return 0;
-+		goto out_unlock_irq;
- 
- 	/*
- 	 * Emit the mapping request. If it fails, the ITS probably
-@@ -479,30 +481,30 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
- 
- 	ret = its_map_vlpi(virq, &map);
- 	if (ret)
--		return ret;
-+		goto out_unlock_irq;
- 
- 	irq->hw		= true;
- 	irq->host_irq	= virq;
- 	atomic_inc(&map.vpe->vlpi_count);
- 
- 	/* Transfer pending state */
--	raw_spin_lock_irqsave(&irq->irq_lock, flags);
--	if (irq->pending_latch) {
--		ret = irq_set_irqchip_state(irq->host_irq,
--					    IRQCHIP_STATE_PENDING,
--					    irq->pending_latch);
--		WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
-+	if (!irq->pending_latch)
-+		goto out_unlock_irq;
- 
--		/*
--		 * Clear pending_latch and communicate this state
--		 * change via vgic_queue_irq_unlock.
--		 */
--		irq->pending_latch = false;
--		vgic_queue_irq_unlock(kvm, irq, flags);
--	} else {
--		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
--	}
-+	ret = irq_set_irqchip_state(irq->host_irq, IRQCHIP_STATE_PENDING,
-+				    irq->pending_latch);
-+	WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
-+
++int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
++				  uint32_t guest_irq, bool set)
++{
 +	/*
-+	 * Clear pending_latch and communicate this state
-+	 * change via vgic_queue_irq_unlock.
++	 * Remapping the vLPI requires taking the its_lock mutex to resolve
++	 * the new translation. We're in spinlock land at this point, so no
++	 * chance of resolving the translation.
++	 *
++	 * Unmap the vLPI and fall back to software LPI injection.
 +	 */
-+	irq->pending_latch = false;
-+	vgic_queue_irq_unlock(kvm, irq, flags);
-+	return ret;
- 
-+out_unlock_irq:
-+	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- 	return ret;
- }
- 
-@@ -511,7 +513,8 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
++	return kvm_vgic_v4_unset_forwarding(kvm, host_irq);
++}
++
+ void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
  {
- 	struct vgic_its *its;
- 	struct vgic_irq *irq;
--	int ret;
-+	unsigned long flags;
-+	int ret = 0;
- 
- 	if (!vgic_supports_direct_msis(kvm))
- 		return 0;
-@@ -531,6 +534,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
- 	if (ret)
- 		goto out;
- 
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 	WARN_ON(irq->hw && irq->host_irq != virq);
- 	if (irq->hw) {
- 		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
-@@ -538,6 +542,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
- 		ret = its_unmap_vlpi(virq);
- 	}
- 
-+	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- out:
- 	mutex_unlock(&its->its_lock);
- 	return ret;
+ 	struct kvm_kernel_irqfd *irqfd =
 -- 
 2.39.5
 
