@@ -1,80 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADAE183CC3
-	for <kvmarm@lists.linux.dev>; Fri, 23 May 2025 11:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CCA229B1C;
+	Fri, 23 May 2025 11:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747998091; cv=none; b=q/QAEXvlVK2kArq0nRjgn18kp73IW1r2rYbfv1HPrxNy5sLGm+k4bgNaIcNqxBGqpSPsR3EQ/Rbh99nMjZV522bYQ9D5hq6Is1T/opTudrxYOWO6NdrXcB+LeR/IekvBCNGRzi5hNrCX+LztDFyGdMDOEjKHezDyU1V0jy6YAFM=
+	t=1747998864; cv=none; b=JIFGfssbAQc8MypDOeyiXbqVcuBwDgfPUjUVX0xgEF8oENHaHNPmPy0iXtyZBahSq4gLW4VHDlVnCQ/XQZiArLXczrEWwut5ETTYMlTvt+D2jJyhlPRIeaNydRpRlrFHttLj8LdoKzSUGFKiG68VpFHjY5rvq2eu3X/Lfpg/ng4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747998091; c=relaxed/simple;
-	bh=9loMDs0wNC/4CPZhZBtMbb/MHaiUqpZY4NUO5J6p9hI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SLbyiUjr1gqjdiUAC55HDdOQ2F/TQA5+aJ6mg3Ss5wPF4xfWg6d6e8lV8nMrZnjKSelliVLpx8NOJeNw/REW8XsM9Pkp6G5BSB874h6h2ojQx2YYMLMDt2qvEnLik+UmaZn00qIqNxMnALBDrKMOngpZoGrAxzMILqLI2DYmqP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=azERMFUR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747998864; c=relaxed/simple;
+	bh=fQM36qxJEofH550SYEql58cMFaL0cbMQSEGt5673CDE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sriaRVd5IdO/W1mQ3F7C8H0WSN8xBLyrZLdFZiA/3pdQM6B/dSWr6u1mT1hZ4rGAPyISYgcKUte+JVXZiG5aIfbctmWyFfht5wCgttPb79Qwv3ASzFgq0orKbJqMt01Iz97X19K3S7auhW1bM5PgKYKo9EdTHHU2b15CPvFNK/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VTm6YpXt; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azERMFUR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91CD4C4CEEA;
-	Fri, 23 May 2025 11:01:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747998090;
-	bh=9loMDs0wNC/4CPZhZBtMbb/MHaiUqpZY4NUO5J6p9hI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=azERMFURc2zj0S9nkfN3BwfhmkzPD2mjGXbz09oWMrdp45wveeRoLUdp3O+mfAOQ0
-	 MoMuLbDm+erizFRZByCx3qmGuqOCeBHbEx+dOY16TvaeDOgF+EsZr80bQlYcI41OV1
-	 ejYqdvD7UNgG1sel7m5mSOaUwlREkBMqNSsrS4WHra9moGxWdN0NkOP8iX+9QrJ+eW
-	 0oL9RUrcMLeVHeYV6EKTIFgg6UhNfn8e+ShLjEfOKSG5E5SRdunFHbd+3463uQnYqq
-	 sZPiSIAPv1XujFexFOFdMnJ8GbyWbV/hDfdGmbsZZ98miGy8h9W3QHgt5dbnEba/wZ
-	 Z2APcVvApywiQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uIQ9Y-00HYcR-Kq;
-	Fri, 23 May 2025 12:01:28 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Release faulted-in VNCR page from mmu_lock critical section
-Date: Fri, 23 May 2025 12:01:13 +0100
-Message-Id: <174799806251.145825.13963857244128795511.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250521110435.66273-1-maz@kernel.org>
-References: <20250521110435.66273-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VTm6YpXt"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=qFE8tg2hkqL/QDMRDxBmyrXVviTv054S7EmAHGK1Cu8=; b=VTm6YpXt+rg+boo/Y2XlDLHfjF
+	uTUdFDuv7CRduVt0vgcpt1H3qXyWcKOUKwBJyBzjyRnEO9SE7JRpGZOhTfBBSEBXLgYIEYKbXlZDB
+	tpsVGBoReZXjDVnjHYqsbdp3l9lenZI0uN4sGBmjoTHFC/oSTcCk06BRBBvKukbRvtHnIoQOohxFp
+	AAk2xVkEy/ZUzR6Fa5IR24TYqZXrrQUCbpTsXVqK4NnKuLMx7BbaRzGqb7TLhfaz4cV5tvbk6Bwys
+	vuAtkKS5Ar3GY61i/vpDcdclGEPpTbtP7i+0lOv6wFveWet/d/4Gtx0J7aORLDJMVameaAuX32RZ0
+	m/g+9Shg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uIQLx-00000007VFJ-22r2;
+	Fri, 23 May 2025 11:14:17 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 10E13300583; Fri, 23 May 2025 13:14:17 +0200 (CEST)
+Date: Fri, 23 May 2025 13:14:16 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, xen-devel@lists.xenproject.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v3 00/13] KVM: Make irqfd registration globally unique
+Message-ID: <20250523111416.GJ39944@noisy.programming.kicks-ass.net>
+References: <20250522235223.3178519-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250522235223.3178519-1-seanjc@google.com>
 
-On Wed, 21 May 2025 12:04:35 +0100, Marc Zyngier wrote:
-> The conversion to kvm_release_faultin_page() missed the requirement
-> for this to be called within a critical section with mmu_lock held
-> for write. Move this call up to satisfy this requirement.
-> 
-> 
+On Thu, May 22, 2025 at 04:52:10PM -0700, Sean Christopherson wrote:
+>   sched/wait: Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority()
+>   sched/wait: Add a waitqueue helper for fully exclusive priority
+>     waiters
 
-Applied to next, thanks!
-
-[1/1] KVM: arm64: nv: Release faulted-in VNCR page from mmu_lock critical section
-      commit: 538fbac74019c13dac341b20fbcc1e96c9a8d01e
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
