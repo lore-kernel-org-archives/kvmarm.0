@@ -1,120 +1,89 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1D3184E;
-	Fri, 23 May 2025 15:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8CF7DA7F;
+	Fri, 23 May 2025 15:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748013325; cv=none; b=fYCTMXvypmQCv7kWy0fAjNoZJV4l3cAhzYRjf/cMF5dv8SjSZWheWw5KGvLjmNDFwtfyQ8YSWRNKf+VpQSKcQ67g814RDOxuxRQTe0gqhUqRKxL1FDDu+RVjuTv74lQ9tPgRIOZAlhi1PG3buWdAHXsUqMYlOAYMhpMWDvZPXvU=
+	t=1748013354; cv=none; b=TaxsJS+Zx2WQLxgEvIm2vOoOZdrmbuGNC+V61nhGV8Cf66Hejy+VFbM7pP48IVLOxnUIqKYN3sXWAZ7gk3Lm93v0xwu5PAWKvDW0AkEBdSzKr4zSWK1V8Lb1gM85qYs/YgX1yM9/p/3gzbhSpSzDVRZtDpxHuVEpQICOMdHxUOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748013325; c=relaxed/simple;
-	bh=8VAZ+KkDBpgajXwea43E3Jxb6kQkvjoqXTpZNv0Qq/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qoocdpi1T2eQ3gI+I1KLIb9ICi7CVWyPtwcAq2DfpFUXniW4rhxEQnoz/f1QLPgOSAT1g+btRcomoFzEqXncyPF4G2DKpYXyXWngCu6jkvqjg0LmtNUz59FNkP+Xopeg4iBi2Tc0V5nHydm7ALWwrhkuOlHZVI0NdP9esaQTFRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pGQkJ1lC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748013354; c=relaxed/simple;
+	bh=XWCE6jqKFyONnv3rqRo5aIekZYBw6AYzIcZy4RKLG3w=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=gUvbWIjqZGzR0kwBk9GxyLtL3M9i+ynSJrVbCTXlDQA560qtQa44FhYAbR3seiEPvon5wCBSKuavj3TY1q5K4ntsUwBVvVITJbvor4jl449ydX3lPNEItpX/T468aHuHhP/lTqKJrC7HZTlcIHqjIPyRz/bxtnKtnk0N3aQ3Wnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HX8ckC8A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pGQkJ1lC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A632BC4CEE9;
-	Fri, 23 May 2025 15:15:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HX8ckC8A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C994AC4CEE9;
+	Fri, 23 May 2025 15:15:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748013324;
-	bh=8VAZ+KkDBpgajXwea43E3Jxb6kQkvjoqXTpZNv0Qq/I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pGQkJ1lC2/A+T2pz2yWocsEtvsiqUZZrEeNtanIv8DT3RFBAWPuP02jbRJFNFDE48
-	 GPc9LopvR4eQb5iPOTsgmVrNhJK5RNWA8Z+yd3hTrF2m77McGnQ9/5QuxbMW/FxrNc
-	 2ZDgRw10qC8TiiQmZtLDUdSWao72gM270Um0KAHv07hw3TbFOx+Savswqx7MRCqSDy
-	 3mDPWLDYDimovIXkUlDJBztZv9zymx/F2+r48fjhnLX8OBeQYHYG7IlKluNy/IOgAJ
-	 uJUPEJSPOS0ilK4HrOdJghDxRLydoNNXRPPxayHHhOTb8qNjaIDMdAAW1Es2AxqUGS
-	 x37eWYDlYP0ag==
-Date: Fri, 23 May 2025 16:15:20 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: D Scott Phillips <scott@os.amperecomputing.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	James Morse <james.morse@arm.com>, Joey Gouly <joey.gouly@arm.com>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	"Rob Herring  (Arm)" <robh@kernel.org>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shiqi Liu <shiqiliu@hust.edu.cn>, Will Deacon <will@kernel.org>,
-	Yicong Yang <yangyicong@hisilicon.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] arm64: errata: Work around AmpereOne's erratum
- AC04_CPU_23
-Message-ID: <aDCRCOSB287IafJL@finisterre.sirena.org.uk>
-References: <20250513184514.2678288-1-scott@os.amperecomputing.com>
- <aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk>
- <87wma7e5jd.wl-maz@kernel.org>
+	s=k20201202; t=1748013353;
+	bh=XWCE6jqKFyONnv3rqRo5aIekZYBw6AYzIcZy4RKLG3w=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=HX8ckC8AMTt3FFPZ5hRUKl69FZBqaXO6fLB2Y7SpVFP65PAO1kjsi8SJWon7Y8VAL
+	 5AlZGipDmdwo6ASrUJHjlZWt23IWVhtZ8w28sd2J+3k/5KL0Ds5/1Kd8fX92L9NeSK
+	 djeiHI1ul7E3zdbl/W4YgmZQN1kHFHTDKeqsu/HEEZ+Cnkla1/YwztmITvG8ynuDgE
+	 JgYg8/t8HUSDfYIDhxSbHCCufsrGiAF7Z4dT97PjU3++rt/osFUnAzdC53SPsceP8v
+	 LTwB//5TEGvRiD/yhKtzXkNNBxvtdGzOsRy/8HOt85jlnfIqIfWPNhzlqEZfOF+w9l
+	 PDqA51dZv9e7g==
+Date: Fri, 23 May 2025 08:15:49 -0700
+From: Kees Cook <kees@kernel.org>
+To: Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>
+CC: Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Naveen N Rao <naveen@kernel.org>,
+ "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
+ "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Marco Elver <elver@google.com>,
+ Andrey Konovalov <andreyknvl@gmail.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Masahiro Yamada <masahiroy@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nicolas.schier@linux.dev>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-kernel@vger.kernel.org, x86@kernel.org, kasan-dev@googlegroups.com,
+ linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ sparclinux@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v2 08/14] powerpc: Handle KCOV __init vs inline mismatches
+User-Agent: K-9 Mail for Android
+In-Reply-To: <e50abba6c962772c73342bacf20fb87dc99dd542.camel@linux.ibm.com>
+References: <20250523043251.it.550-kees@kernel.org> <20250523043935.2009972-8-kees@kernel.org> <e50abba6c962772c73342bacf20fb87dc99dd542.camel@linux.ibm.com>
+Message-ID: <6E407BC0-4D84-4420-AE07-EF85EBA1AB1C@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="+Yyr2O7xEu/r8n9d"
-Content-Disposition: inline
-In-Reply-To: <87wma7e5jd.wl-maz@kernel.org>
-X-Cookie: Well begun is half done.
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
---+Yyr2O7xEu/r8n9d
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Fri, May 23, 2025 at 04:00:06PM +0100, Marc Zyngier wrote:
-> On Fri, 23 May 2025 15:15:53 +0100,
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Tue, May 13, 2025 at 11:45:14AM -0700, D Scott Phillips wrote:
+On May 22, 2025 10:24:30 PM PDT, Andrew Donnellan <ajd@linux=2Eibm=2Ecom> =
+wrote:
+>On Thu, 2025-05-22 at 21:39 -0700, Kees Cook wrote:
+>> When KCOV is enabled all functions get instrumented, unless
+>> the __no_sanitize_coverage attribute is used=2E To prepare for
+>> __no_sanitize_coverage being applied to __init functions, we have to
+>> handle differences in how GCC's inline optimizations get resolved=2E
+>> For
+>> s390 this requires forcing a couple functions to be inline with
+>
+>I assume you mean powerpc here, though I'm sure my employer is happy
+>that you're at least confusing us with IBM's other architecture :)
 
-> > > On AmpereOne AC04, updates to HCR_EL2 can rarely corrupt simultaneous
-> > > translations for data addresses initiated by load/store instructions.
+Whoops! Yes=2E Paste-o on my part=2E The rest of the sentence was updated =
+correctly though=2E :)
 
-> > This patch, which is in -next as fed55f49fad181be9dfb93c0, breaks the
-> > build of at least the vDSO selftests:
-
-> > $ make -C tools/testing/selftests ARCH=arm64 LLVM=1 TARGETS=vDSO
-
-> >   CC       vdso_test_chacha
-> > In file included from vgetrandom-chacha.S:9:
-> > In file included from ./../../../../arch/arm64/kernel/vdso/vgetrandom-chacha.S:5:
-> > In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/assembler.h:21:
-> > In file included from /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/cpufeature.h:13:
-> > /home/broonie/git/bisect/tools/testing/selftests/../../../arch/arm64/include/asm/sysreg.h:1097:5: error: function-like macro 'IS_ENABLED' is not defined
-> >  1097 | #if IS_ENABLED(CONFIG_AMPERE_ERRATUM_AC04_CPU_23)
-> >       |     ^
-> > 1 error generated.
-
-> This:
-
-...
-
-> should solve it.
-
-Yes, that works.
-
-Tested-by: Mark Brown <broonie@kernel.org>
-
-> But it also outlines that the vdso is getting built using stuff that
-> is not meant for userspace code.
-
-Indeed, adding Jason for that.  It's the same for all architectures.
-
---+Yyr2O7xEu/r8n9d
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmgwkQUACgkQJNaLcl1U
-h9BDdAf5AeNkCRljY3IolOsbcV9AvHe7eansIWFCvJ6HxTOQqQmsS6T+op6eJZ4a
-0N8yNPVxuuydStcSR1kFeoTrr1eYs6hQYMeU4oEidizB9l2d9pxxD9dpZN4eW0jf
-JFwE9/4NsSn2IP1XC729xvE+FYZdkkD+u8R72XlUN1z6DNkqPv+Sm/UVgmTnpFKl
-PRJ6dD0yPP0uhpa8cfWkB9lkNtwzGFnqiznOSALxyZfEymhH8v3SVu3Vi+6mXApd
-V6LBBs9lr3K+V8rUmpM8KfcQj1UoQC2tMNhZq0LyHLkAJUlwkfQnU/HFaC5WJZOb
-mhSFdprkC8hgYBfU0eRXxq1KmCOiVw==
-=BxGU
------END PGP SIGNATURE-----
-
---+Yyr2O7xEu/r8n9d--
+--=20
+Kees Cook
