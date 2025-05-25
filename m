@@ -1,107 +1,183 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481E2A29
-	for <kvmarm@lists.linux.dev>; Sun, 25 May 2025 17:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9F77262D;
+	Sun, 25 May 2025 21:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748195908; cv=none; b=WzrHmFQHwfhSeieaQaunvKdTiD6LjveMNkL3axaFeK8DLl5WUFT7qLqhVmKNxq1eAbQHZwVVI4wHpSxMB+nYLpFqyUac7mBSUIseNquQohPGWo/Og79nreG8/kRnuD15zOOZPvARiFMrM9i2WYZk3Hq+vjhBqf0i7bwmBHv5mpo=
+	t=1748210015; cv=none; b=mSEPmm4Jjlnlo1Tqrphlq8aCTHWadcFVyjaKeQu+hV7EtLJS4KkUMQi/+DGphSacqnVcOPEuYWuMGnTXsuOs2qreM/JRz8eFq0GIisjqLq/Sw9OkJJ/ybdUzs5SQjEXC/LbkDo32/KBji46736+ERETKDqby/qE4F73LwsmWsSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748195908; c=relaxed/simple;
-	bh=c0DVjSp9QtchPMDhJIS/125dCk8iVBUSWQRTJ1mZiZE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TkwMNrWCCdDMmvF0aleC5NkSKOdGFv/inksKFBkgiJNAJbSiWzB2MZ4te45Vp9nXn9e9O2wQlwIJ0aM0IVjZWwlRe7Jtxy9M29x/OK5LVSNx1xLx2FaIUeC5hxW1z7AkKkhU9FkfYZJLsStvFxN+9CCjtEqgPWEM3CBWNbomNAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UY/+q0Ve; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748210015; c=relaxed/simple;
+	bh=y5rT2ewj429hL1YZNClBKAuoapp2CjjiHYqsoHYBDa8=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=ivfXgqeQQawE+Act3qu6cJPHXlg2C9Rr1WGWgN2cmDTcH+gUfTWq62Qp8eMh/+ZnjW7AXEjyT46xzM9pNAuFWqcxakVkLnSozkfH4KzYT5OBLjeHBpSkk+9kYid/0nB+RzdPGzEQq3Gr4+SkcwfTCUC29R/FajMtoLLjIhKMqyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ceT//yHx; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UY/+q0Ve"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD01AC4CEEA;
-	Sun, 25 May 2025 17:58:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748195907;
-	bh=c0DVjSp9QtchPMDhJIS/125dCk8iVBUSWQRTJ1mZiZE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UY/+q0VeM/1QeG7MMfxF1aO/l0cMoxy7lUMeQCB1joiVOIOC2DfTQyCXQeE5PjCv6
-	 CGoRghZmDgPyZPLNXyfXnWFRQM0J52gX2Sr+A2dbMpQ/pROxOkrSoj8tlJZcWUeL8t
-	 s9mpoG9Epu5C5spe2Y0qtAR6yKIZczmbFzJua0Yzta4KmBGhEd/cYn2Coe07HVDBXt
-	 a87lvRPAgkdC2zqKk1zQBxxZtI/CzLRQLnCAvLDoqq+JK3G8XFXlWVcW4n3yCMwpTx
-	 /btEXqsAx8DPniPh/RlOI3VLaEJasBkdWcENi+2wiOhhYRgvalmLuf86gn87aPX47p
-	 F+WNFXu+hbjuw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uJFc9-000QgR-AZ;
-	Sun, 25 May 2025 18:58:25 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: Mask out non-VA bits from TLBI VA* on VNCR invalidation
-Date: Sun, 25 May 2025 18:57:59 +0100
-Message-Id: <20250525175759.780891-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ceT//yHx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748210014; x=1779746014;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version:content-id;
+  bh=y5rT2ewj429hL1YZNClBKAuoapp2CjjiHYqsoHYBDa8=;
+  b=ceT//yHx7F0JqM4+bzORHTA3Hi0DK9vzfTD1ChrJRaNLXIhJqaQrPXuV
+   jeTpNhnEGDPaw8H78PwGHktNfpPl6dAdZnMrVh6xm1h0OeNOrtjXYgAQP
+   HYJvVZ8LewX/ce74CBC3V2xjHqrvNUpVDNL6sJy8F3rmaul/SA3qqMHai
+   2894vABY/4tUZ5uOvuNyUXGwk9+lY+VakC1LK4rQ/xwTjuuYThHsIEazu
+   MYeuZPolTV3eA+ejC3fihWhKEDYqtSrkTEPhz6SgE0HplDA2/xcMU0C6H
+   ve00bhfgJ3wnSFXHsbgX+rFdoGEUqCKzyEaz8CigT+qrPQKOHfw4ry55i
+   A==;
+X-CSE-ConnectionGUID: lVEBEug4TD2lqwrcwdtnEw==
+X-CSE-MsgGUID: jVyRsAJzSY6v2jv/s2QIug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="60435789"
+X-IronPort-AV: E=Sophos;i="6.15,314,1739865600"; 
+   d="scan'208";a="60435789"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2025 14:53:32 -0700
+X-CSE-ConnectionGUID: srkUUk2LSiS9AVRoLfAP+A==
+X-CSE-MsgGUID: abYToWTKQVe6L6ZrKUUaNQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,314,1739865600"; 
+   d="scan'208";a="141991367"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.99])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2025 14:53:16 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Mon, 26 May 2025 00:53:13 +0300 (EEST)
+To: Kees Cook <kees@kernel.org>
+cc: Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, 
+    Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+    Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+    "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+    Vitaly Kuznetsov <vkuznets@redhat.com>, 
+    Henrique de Moraes Holschuh <hmh@hmh.eng.br>, 
+    Hans de Goede <hdegoede@redhat.com>, 
+    "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>, 
+    Masami Hiramatsu <mhiramat@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, 
+    Mike Rapoport <rppt@kernel.org>, 
+    Michal Wilczynski <michal.wilczynski@intel.com>, 
+    Juergen Gross <jgross@suse.com>, 
+    Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+    "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
+    Roger Pau Monne <roger.pau@citrix.com>, 
+    David Woodhouse <dwmw@amazon.co.uk>, Usama Arif <usama.arif@bytedance.com>, 
+    "Guilherme G. Piccoli" <gpiccoli@igalia.com>, 
+    Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>, 
+    kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net, 
+    platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org, 
+    linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org, 
+    linux-mm@kvack.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+    Christoph Hellwig <hch@lst.de>, Marco Elver <elver@google.com>, 
+    Andrey Konovalov <andreyknvl@gmail.com>, 
+    Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
+    Masahiro Yamada <masahiroy@kernel.org>, 
+    Nathan Chancellor <nathan@kernel.org>, 
+    Nicolas Schier <nicolas.schier@linux.dev>, 
+    Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+    Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+    LKML <linux-kernel@vger.kernel.org>, kasan-dev@googlegroups.com, 
+    linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+    kvmarm@lists.linux.dev, linux-riscv@lists.infradead.org, 
+    linux-s390@vger.kernel.org, linux-hardening@vger.kernel.org, 
+    linux-kbuild@vger.kernel.org, linux-security-module@vger.kernel.org, 
+    linux-kselftest@vger.kernel.org, sparclinux@vger.kernel.org, 
+    llvm@lists.linux.dev
+Subject: Re: [PATCH v2 04/14] x86: Handle KCOV __init vs inline mismatches
+In-Reply-To: <20250523043935.2009972-4-kees@kernel.org>
+Message-ID: <ba4f4fd0-1bcf-3d84-c08e-ba0dd040af16@linux.intel.com>
+References: <20250523043251.it.550-kees@kernel.org> <20250523043935.2009972-4-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: multipart/mixed; BOUNDARY="8323328-965883235-1748206555=:933"
+Content-ID: <8656ab6c-8f8d-81d1-5dfa-740e7f21544c@linux.intel.com>
 
-When handling a TLBI VA* instruction that potentially targets a
-VNCR page mapping, we fail to mask out the top bits that contain
-the ASID and TTL fields, hence potentially failing the VA check
-in the TLB code.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-An additional wrinkle is that we fail to sign extend the VA,
-again leading to failed VA checks.
+--8323328-965883235-1748206555=:933
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-ID: <fa62886f-fdfb-f2a5-84db-475ce3a46169@linux.intel.com>
 
-Fix both in one go by sign-extending the VA from bit 48, making
-it comparable to the way we interpret VNCR_EL2.BADDR.
+On Thu, 22 May 2025, Kees Cook wrote:
 
-Fixes: 4ffa72ad8f37e ("KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/nested.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+> When KCOV is enabled all functions get instrumented, unless the
+> __no_sanitize_coverage attribute is used. To prepare for
+> __no_sanitize_coverage being applied to __init functions, we have to
+> handle differences in how GCC's inline optimizations get resolved. For
+> x86 this means forcing several functions to be inline with
+> __always_inline.
+>=20
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: <x86@kernel.org>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Cc: "Ilpo J=E4rvinen" <ilpo.jarvinen@linux.intel.com>
+> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> Cc: Len Brown <lenb@kernel.org>
+> Cc: Masami Hiramatsu <mhiramat@kernel.org>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Mike Rapoport <rppt@kernel.org>
+> Cc: Michal Wilczynski <michal.wilczynski@intel.com>
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> Cc: Roger Pau Monne <roger.pau@citrix.com>
+> Cc: David Woodhouse <dwmw@amazon.co.uk>
+> Cc: Usama Arif <usama.arif@bytedance.com>
+> Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Brian Gerst <brgerst@gmail.com>
+> Cc: <kvm@vger.kernel.org>
+> Cc: <ibm-acpi-devel@lists.sourceforge.net>
+> Cc: <platform-driver-x86@vger.kernel.org>
+> Cc: <linux-acpi@vger.kernel.org>
+> Cc: <linux-trace-kernel@vger.kernel.org>
+> Cc: <linux-efi@vger.kernel.org>
+> Cc: <linux-mm@kvack.org>
+> ---
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 291dbe38eb5cf..4a53e4147fb01 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -918,6 +918,8 @@ static void invalidate_vncr_va(struct kvm *kvm,
- 	}
- }
- 
-+#define tlbi_va_s1_to_va(v)	(u64)sign_extend64((v) << 12, 48)
-+
- static void compute_s1_tlbi_range(struct kvm_vcpu *vcpu, u32 inst, u64 val,
- 				  struct s1e2_tlbi_scope *scope)
- {
-@@ -964,7 +966,7 @@ static void compute_s1_tlbi_range(struct kvm_vcpu *vcpu, u32 inst, u64 val,
- 		scope->size = ttl_to_size(FIELD_GET(TLBI_TTL_MASK, val));
- 		if (!scope->size)
- 			scope->size = SZ_1G;
--		scope->va = (val << 12) & ~(scope->size - 1);
-+		scope->va = tlbi_va_s1_to_va(val) & ~(scope->size - 1);
- 		scope->asid = FIELD_GET(TLBIR_ASID_MASK, val);
- 		break;
- 	case OP_TLBI_ASIDE1:
-@@ -992,7 +994,7 @@ static void compute_s1_tlbi_range(struct kvm_vcpu *vcpu, u32 inst, u64 val,
- 		scope->size = ttl_to_size(FIELD_GET(TLBI_TTL_MASK, val));
- 		if (!scope->size)
- 			scope->size = SZ_1G;
--		scope->va = (val << 12) & ~(scope->size - 1);
-+		scope->va = tlbi_va_s1_to_va(val) & ~(scope->size - 1);
- 		break;
- 	case OP_TLBI_RVAE2:
- 	case OP_TLBI_RVAE2IS:
--- 
-2.39.2
+> diff --git a/drivers/platform/x86/thinkpad_acpi.c b/drivers/platform/x86/=
+thinkpad_acpi.c
+> index e7350c9fa3aa..0518d5b1f4ec 100644
+> --- a/drivers/platform/x86/thinkpad_acpi.c
+> +++ b/drivers/platform/x86/thinkpad_acpi.c
+> @@ -559,12 +559,12 @@ static unsigned long __init tpacpi_check_quirks(
+>  =09return 0;
+>  }
+> =20
+> -static inline bool __pure __init tpacpi_is_lenovo(void)
+> +static __always_inline bool __pure tpacpi_is_lenovo(void)
+>  {
+>  =09return thinkpad_id.vendor =3D=3D PCI_VENDOR_ID_LENOVO;
+>  }
+> =20
+> -static inline bool __pure __init tpacpi_is_ibm(void)
+> +static __always_inline bool __pure tpacpi_is_ibm(void)
+>  {
+>  =09return thinkpad_id.vendor =3D=3D PCI_VENDOR_ID_IBM;
+>  }
 
+Hi Kees,
+
+What's your plan on upstreaming route/timeline for this? I'd prefer to=20
+retain full control over this file as we were planning on some=20
+reorganization of files into lenovo/ subdir.
+
+
+--=20
+ i.
+--8323328-965883235-1748206555=:933--
