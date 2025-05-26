@@ -1,198 +1,206 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2079.outbound.protection.outlook.com [40.107.220.79])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D454C62
-	for <kvmarm@lists.linux.dev>; Mon, 26 May 2025 03:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748230616; cv=fail; b=DVr34V5XxUbJV87TNgJcJWrYu2/Ed+xW7ZXH6+aOrLlXs0+4Hvsy2oxnKY8vjvf8MMmcBSNGY0Op1kKz0mTtH0HmcyZqUeCJ4tGQV01gX4W3OulyZ0Pj4LvDqllplvIptGbfAQGRYTmkAWE7DIjVVF839COgPy+EwPITNY/6PJI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748230616; c=relaxed/simple;
-	bh=gBikVCO8qyAuPJ8AQNllBoODkE5DywT1gzjCfjVBVVk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qhk/psWkHF9t9B6Nh7ZDqDiQ837iBDn1LHg3Apg1eizQjEsqsnq0jt8bd7c3OugzOwiMscscWFJf7NNdl5ZKLtspOUU1y+lsHE9rMh9vj+FWIsPzeRC2E2ejm9pHiG0QLof1Li4vIezVFXX/flQsOs1hjCZxo4D/lz635UD05O4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rG+8xNaa; arc=fail smtp.client-ip=40.107.220.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3CD1BE238
+	for <kvmarm@lists.linux.dev>; Mon, 26 May 2025 12:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748263066; cv=none; b=f7kZ/nKIyOxtH+nIaEwV+RVom6PhPqbx3cXiJTDZHqiNCMNq/C0SkH4RMP/mvCEaAZiIWD/AACdaF9dZ/wXQCes1kC5VQpDo6b+oXLRvlQNpc9I9bWBbkUgLQfthsZCrJOLft5nnnhMJ9dHyyrjyiWBJPASdA7Fc8dgQHehYZjk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748263066; c=relaxed/simple;
+	bh=kpbKAeqHaOlXHCl9Kwqv02gPUspKAJP/JvCmqulBsL8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=AObVSZ+tutqT4DKJ2ep3E+9Dankk2ERbb9chHUs/+MOikZhHp1Cp27nSJ2M9XU25yWbWwB5axpWxI9H2dwK8cnk1d49/kYajX1BwaU7Dd9q76EY634C+yXhT6wDHrxO742vTgW2ZIz5xtfoZ+MH2MTjuebskFUa+kzJlaO8H3WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LgxbWC0s; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rG+8xNaa"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cyOutsl0JWDdUi3VF7Fbf6XYNd983YSiFIUvcFbSIxsKWZ4E6PtF+PVkPMa+ox7yk8Af/jYb3/UIcjv7IPJJJQfpjEaGN8z3GwksmThm2mDxJEnchROPa2UJ5JY4XZpWum38F2Vhc+r/fb52x97T84egFUubcPHej6YBun/lkC8WGqFMi3fzIJuW/set3BJapPWeOatbCEyfy2CBc+lTUF3mEydLN9kUsyJurUXCmRY+k0X4GNeb5ry6D6UrZ6PRfBqOanMSfmqJPiMY77UfMBfBPn7EuTHhxEhJ+l5oPjInk4t7lW4OxcQNT6N3O0sUypGc0vrPIeShI1ESgu9Leg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AcW/L6v+m+CrfjHxmtlsRoH+9g7AQSR4jQVgl1NCXok=;
- b=YWI93GBpJHbad4AzFVb6m92G5KJiIgT/GGpN4+agPRR/zGkGHnZfCvsLblFJcStwqyqcLQLv7Q2vgDDWjbjXW12wGI4oR0ER3zgmpimtKDw+BQFUECeaUA4wqRxhvOjzRrYnTGQkEQz+8Pg0U/tl0zrosiCL6QiMoEJBQp6o/3FE4khYJlvWkVDaVPW4Ag2mGcPAe44i06tnikyagiOqGVRLWIazAD0Vfpjla9hCErNEBLDc44T6VsBFZhor4dJZnRBGrdguCJQRowXe/FvBJ1+s6SebKKQ4yeCnPgfrwKhwNZrBVBiEZxfB6QEJEQMNytCfkVcus3Y4IVR9zuhffA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AcW/L6v+m+CrfjHxmtlsRoH+9g7AQSR4jQVgl1NCXok=;
- b=rG+8xNaa9F+5+WBOHbfSXgrc2X6ucBKfObO64gzRjAaLgcg5FEHYT82PL2sjILB1KLX9iS+JkPN5zxYguN6RWEy6PGe3h9Xk6ruVUktZ5d8g/WeBJtS2BLWAi1G40SbRM5nW4Mz6Bqk0pUGjUGFaYMGbb4OFTPjS+aMlshLEyyA=
-Received: from MW4P222CA0008.NAMP222.PROD.OUTLOOK.COM (2603:10b6:303:114::13)
- by BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.26; Mon, 26 May
- 2025 03:36:48 +0000
-Received: from SJ1PEPF00001CE7.namprd03.prod.outlook.com
- (2603:10b6:303:114:cafe::91) by MW4P222CA0008.outlook.office365.com
- (2603:10b6:303:114::13) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8769.19 via Frontend Transport; Mon,
- 26 May 2025 03:36:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CE7.mail.protection.outlook.com (10.167.242.23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8769.18 via Frontend Transport; Mon, 26 May 2025 03:36:47 +0000
-Received: from [10.85.47.107] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sun, 25 May
- 2025 22:36:36 -0500
-Message-ID: <432193cf-e4bd-4cfb-a146-25b19c02d78e@amd.com>
-Date: Mon, 26 May 2025 09:06:35 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LgxbWC0s"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748263063;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bdtrnT9RkpG11o+5p+F4BXtRoB0VKLAec4NLA2DCwqM=;
+	b=LgxbWC0s9mbN+WAe/0qruECTGllL9jweX1pH7CXsMh3mrKUoyWAqLZkXAbCNCWRDj6ww/s
+	tUXOiDFdhiilnASoq79ZSmnSZ12pmMsuc9RvJx0Zr7cUcmO/X4WMmEPBSd07+AhfZ2SoL/
+	Z179fsuLcxFNPtDARDT8XvbEpwCuNak=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-317-vjeMu_RjNlC9nfbj3I-ifw-1; Mon,
+ 26 May 2025 08:37:39 -0400
+X-MC-Unique: vjeMu_RjNlC9nfbj3I-ifw-1
+X-Mimecast-MFC-AGG-ID: vjeMu_RjNlC9nfbj3I-ifw_1748263058
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D69AE1956089;
+	Mon, 26 May 2025 12:37:36 +0000 (UTC)
+Received: from localhost (dhcp-192-216.str.redhat.com [10.33.192.216])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5E902195608D;
+	Mon, 26 May 2025 12:37:33 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "maz@kernel.org"
+ <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "sebott@redhat.com" <sebott@redhat.com>, "armbru@redhat.com"
+ <armbru@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>, "jdenemar@redhat.com"
+ <jdenemar@redhat.com>
+Cc: "agraf@csgraf.de" <agraf@csgraf.de>, "shahuang@redhat.com"
+ <shahuang@redhat.com>, "mark.rutland@arm.com" <mark.rutland@arm.com>,
+ "philmd@linaro.org" <philmd@linaro.org>, "pbonzini@redhat.com"
+ <pbonzini@redhat.com>
+Subject: RE: [PATCH v3 06/10] arm/kvm: Allow reading all the writable ID
+ registers
+In-Reply-To: <ee2e2631faf640f3807c08c6acd95732@huawei.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20250414163849.321857-1-cohuck@redhat.com>
+ <20250414163849.321857-7-cohuck@redhat.com>
+ <ee2e2631faf640f3807c08c6acd95732@huawei.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 26 May 2025 14:37:31 +0200
+Message-ID: <87ecwbbl9w.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 13/13] KVM: selftests: Add a KVM_IRQFD test to verify
- uniqueness requirements
-To: Sean Christopherson <seanjc@google.com>
-CC: "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang
-	<haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
-	<decui@microsoft.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
-	<sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar
-	<mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Juri Lelli
-	<juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, "Shuah
- Khan" <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
-	<oliver.upton@linux.dev>, <linux-kernel@vger.kernel.org>,
-	<linux-hyperv@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
-	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>, "K Prateek
- Nayak" <kprateek.nayak@amd.com>, David Matlack <dmatlack@google.com>
-References: <20250522235223.3178519-1-seanjc@google.com>
- <20250522235223.3178519-14-seanjc@google.com>
- <2c52daad-0b64-48a9-8e73-d1aba977993b@amd.com> <aDB-2lcq4jJm9-OV@google.com>
-Content-Language: en-US
-From: Sairaj Kodilkar <sarunkod@amd.com>
-In-Reply-To: <aDB-2lcq4jJm9-OV@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE7:EE_|BL3PR12MB9049:EE_
-X-MS-Office365-Filtering-Correlation-Id: 93188829-a743-42d1-a849-08dd9c068b78
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?a0EralROS043WjhCbHFOZ2lydDZJaGFDRUdGR3JxZVVwT3FYbTZJOUdvZGhZ?=
- =?utf-8?B?YktPQXg5Zy9EMXcwMzFHaFNFOVBPc0UxUHBiUFlIeThjRmVaSW5IbDNKekpI?=
- =?utf-8?B?bWFnbTR5VXZ6WEVoTUFRcWN2alVDbHlKRU9BRzA4bEU2Qlp5aXZZcVl4cTgx?=
- =?utf-8?B?UHFqYm9Wbkx6ak9oWGpMRldMbmxsdy9OQ3ZxWVN6cTFSK2dmdy9pMFlHYVU5?=
- =?utf-8?B?MnNUWHZRRFNYNXRhR3o4blBQbksxM1FkN2dqL0hjdHhpRE9oTkRwRmFKY1Na?=
- =?utf-8?B?bUN6NG04UlBxM0tZczJqSEVOZ0FSNW44NFNLTWZMTDFCbERJQklhWnVvalFK?=
- =?utf-8?B?RDJsOXMxL2txVWl5cGJqdFU1OEwwSGU2eGtWaVNweWdJWVRscWFsNDQyNFdL?=
- =?utf-8?B?QTZBYW5Fd1RyY3pENHYzNmJsME0xOU5XOGovNmNkWmlkaDRIME5ncEFJQ0Fh?=
- =?utf-8?B?N2MwT2JydW15VWFOQ255VGxxNXhiM2FxSnFFRzl6dVo3UEo4bGRnS3ZzbnFq?=
- =?utf-8?B?SERiUGZpQnJndmRmbGc3eko5aFFhNGozUUI3d1U4TkorOHlpSFp3USs1NnZU?=
- =?utf-8?B?TjNJTnVTYVhlR0dnRWQzODlNQWQxTk4vWTgvVjI5Vm5pTnJEam5mOHdBWVdK?=
- =?utf-8?B?akE4MlVqRzM5R2UxTUZMSjFZbVA2T2hWQ1VHVHVkaC9mWWlldXFEdCs3NTk5?=
- =?utf-8?B?Mkd4Z21aSXViUG92ZHJaUkZxeHlteFcyNnRiTEZEd2F6QWhURS9ESkNFbmlB?=
- =?utf-8?B?N2FZT0tnTmZkdzU0eDFoSzhHbS8ydHJsWmRTN3FWdGlOVUhVa09ydSt5N3Fm?=
- =?utf-8?B?UjIvZnpVYkluSVVUdENzMzE2ZGdtd1I5WHZ1bmIxSGNtRzhLaElWc1JWZjFt?=
- =?utf-8?B?VW14b3dOVDMxU1B2bnQ3d0RBam5mcWwwUzdCRkZjWFJHUk1tTEN6aE9TTFhI?=
- =?utf-8?B?OVUvUzg2d2N1QjZGdjI0QkxFMzZDTEZOanYxQWdJcURDT3J4bnFZVkxhajht?=
- =?utf-8?B?dEF0cEs4SUhyRVNyVTErZzRqRS91ZXU2d2pDd3B4L0tJN2VBMEV6cDlidGJX?=
- =?utf-8?B?NkhxQnM3dDAyQnNpVDhqTVM3Ly9QS25NMWtUa3IvbE0vM2pVMmlrOHFPampn?=
- =?utf-8?B?LythNmVYUDN4ajFQWmdjbXpMbzdDUW1mUWpJb0E2aGdTc2dLZkNTdXU2MlBD?=
- =?utf-8?B?TnFLakZzWUlROWJNWDRXL3Rsb0dDYWhzcTFIQ0pPakp6VEVkWWNub1A0dFpP?=
- =?utf-8?B?MTRKSk1LRkYvYnJYb2gvTjRDbkx3ZFRqL3BtdUtoeUZmcFh2ZHBRMlJWSkRF?=
- =?utf-8?B?R0xVOEVEU1crVEJlV0ZzVlFTcWtCQmt0NWpHdnp6S2JmN3hacmgvMG5jOS9E?=
- =?utf-8?B?RWg3ZjhNMy9CRjhCS1Z4VGppKzdoYzdjbVhJREJ5ZGZobUFGTUtPVEFWZVUv?=
- =?utf-8?B?OVhySWhOVzBORXdmajJxK25TWE5JWnlxb05IRUVkcGt3RElRek1ycStzbFFG?=
- =?utf-8?B?NkFkTi8zb29TYUd1bGVWdXdtTENaQUFKOHpka0JSaUF0NVZZU2ZwVE9OM2M4?=
- =?utf-8?B?UGVRWHdTWE5KNis4STd1Mm9pU0FjUU9MUnBPT3l0cnpPTTRLaGY1dXZEL0Qx?=
- =?utf-8?B?czNURXVwUkFKS0JoMzFOalo5VzVNU3VYVHFtQnFSVkxzbGdicndNbU03dDla?=
- =?utf-8?B?TnRReVQ3eFM2dysxNThZWUgwZU9YUWRKNjFRb3RMMFNLdWdqUDFGcDAyS0VN?=
- =?utf-8?B?NldMbW5sWXNwb1JGYmxmd2lBUS9SRUZTNDdiT0l5MWtpc3YxaDFIdUdnQTFM?=
- =?utf-8?B?dmFtWEtaVEhtdUxjMjFCZU5rSXpCMFBUREJQdytINW5BN3dWT1NhT3FrQnMr?=
- =?utf-8?B?dGgvQThnVmJsd1VnVnIzRy83NlQ1bUdDWStmaVRoczk2WnhXSk9HZVFVcGQ4?=
- =?utf-8?B?WFhOL3FiZUxsck5KZ2lObjZTNXlIcWM3ajgzd3IzU1pUVmNqeVpzTUduYm16?=
- =?utf-8?B?bnNhWnJORGlUcVRZNGNuV21vbEFqYkl2Y2huT2dxTkwyYWIvbmQ3VktodCtF?=
- =?utf-8?Q?nSkLAd?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2025 03:36:47.8886
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 93188829-a743-42d1-a849-08dd9c068b78
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE7.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB9049
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
+On Fri, May 23 2025, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
+>> -----Original Message-----
+>> From: Cornelia Huck <cohuck@redhat.com>
+>> Sent: Monday, April 14, 2025 5:39 PM
+>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
+>> devel@nongnu.org; qemu-arm@nongnu.org; kvmarm@lists.linux.dev;
+>> peter.maydell@linaro.org; richard.henderson@linaro.org;
+>> alex.bennee@linaro.org; maz@kernel.org; oliver.upton@linux.dev;
+>> sebott@redhat.com; Shameerali Kolothum Thodi
+>> <shameerali.kolothum.thodi@huawei.com>; armbru@redhat.com;
+>> berrange@redhat.com; abologna@redhat.com; jdenemar@redhat.com
+>> Cc: agraf@csgraf.de; shahuang@redhat.com; mark.rutland@arm.com;
+>> philmd@linaro.org; pbonzini@redhat.com; Cornelia Huck
+>> <cohuck@redhat.com>
+>> Subject: [PATCH v3 06/10] arm/kvm: Allow reading all the writable ID
+>> registers
+>> 
+>> From: Eric Auger <eric.auger@redhat.com>
+>> 
+>> At the moment kvm_arm_get_host_cpu_features() reads a subset of the
+>> ID regs. As we want to introduce properties for all writable ID reg
+>> fields, we want more genericity and read more default host register
+>> values.
+>> 
+>> Introduce a new get_host_cpu_idregs() helper and add a new exhaustive
+>> boolean parameter to kvm_arm_get_host_cpu_features() and
+>> kvm_arm_set_cpu_features_from_host() to select the right behavior.
+>> The host cpu model will keep the legacy behavior unless the writable
+>> id register interface is available.
+>> 
+>> A writable_map IdRegMap is introduced in the CPU object. A subsequent
+>> patch will populate it.
+>> 
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>>  target/arm/cpu-sysregs.h |  2 ++
+>>  target/arm/cpu.h         |  3 ++
+>>  target/arm/cpu64.c       |  2 +-
+>>  target/arm/kvm.c         | 78 ++++++++++++++++++++++++++++++++++++++--
+>>  target/arm/kvm_arm.h     |  9 +++--
+>>  target/arm/trace-events  |  1 +
+>>  6 files changed, 89 insertions(+), 6 deletions(-)
 
-On 5/23/2025 8:03 PM, Sean Christopherson wrote:
-> On Fri, May 23, 2025, Sairaj Kodilkar wrote:
->> On 5/23/2025 5:22 AM, Sean Christopherson wrote:
->>
->>> +
->>> +int main(int argc, char *argv[])
->>> +{
->>> +	pthread_t racing_thread;
->>> +	int r, i;
->>> +
->>> +	/* Create "full" VMs, as KVM_IRQFD requires an in-kernel IRQ chip. */
->>> +	vm1 = vm_create(1);
->>> +	vm2 = vm_create(1);
->>> +
->>> +	WRITE_ONCE(__eventfd, kvm_new_eventfd());
->>> +
->>> +	kvm_irqfd(vm1, 10, __eventfd, 0);
->>> +
->>> +	r = __kvm_irqfd(vm1, 11, __eventfd, 0);
->>> +	TEST_ASSERT(r && errno == EBUSY,
->>> +		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
->>> +
->>> +	r = __kvm_irqfd(vm2, 12, __eventfd, 0);
->>> +	TEST_ASSERT(r && errno == EBUSY,
->>> +		    "Wanted EBUSY, r = %d, errno = %d", r, errno);
->>> +
->>> +	kvm_irqfd(vm1, 11, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
->>> +	kvm_irqfd(vm1, 12, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
->>> +	kvm_irqfd(vm1, 13, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
->>> +	kvm_irqfd(vm1, 14, READ_ONCE(__eventfd), KVM_IRQFD_FLAG_DEASSIGN);
->>
->> Hi Sean,
->> I dont see any allocation for the GSI 13 and 14..
->> Is there any reason for the deassigning these two GSIs ?
-> 
-> Yes, KVM's rather bizarre ABI is that DEASSIGN is allowed even if the VM doesn't
-> have a corresponding assigned irqfd.  The reason I added these early DEASSIGN
-> calls is so that there will be an easier-to-debug failure if KVM's behavior
-> changes (the racing threads part of the test abuses KVM's ABI).  I didn't add a
-> comment because the helpers already have comments, but looking at this again, I
-> agree that main() needs a better comment.
+(...)
 
-Makes sense, thanks for the explanation.
+>> +/*
+>> + * get_host_cpu_idregs: Read all the writable ID reg host values
+>> + *
+>> + * Need to be called once the writable mask has been populated
+>> + * Note we may want to read all the known id regs but some of them are
+>> not
+>> + * writable and return an error, hence the choice of reading only those
+>> which
+>> + * are writable. Those are also readable!
+>> + */
+>> +static int get_host_cpu_idregs(ARMCPU *cpu, int fd, ARMHostCPUFeatures
+>> *ahcf)
+>> +{
+>> +    int err = 0;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < NUM_ID_IDX; i++) {
+>> +        ARM64SysReg *sysregdesc = &arm64_id_regs[i];
+>> +        ARMSysRegs sysreg = sysregdesc->sysreg;
+>> +        uint64_t writable_mask = cpu->writable_map-
+>> >regs[idregs_idx_to_kvm_idx(i)];
+>> +        uint64_t *reg;
+>> +        int ret;
+>> +
+>> +        if (!writable_mask) {
+>> +            continue;
+>> +        }
+>> +
+>> +        reg = &ahcf->isar.idregs[i];
+>> +        ret = read_sys_reg64(fd, reg, idregs_sysreg_to_kvm_reg(sysreg));
+>
+> I think we can use get_host_cpu_reg() here.
 
-Thanks
-Sairaj Kodilkar
+We'd need to rejiggle the tracing a bit, though.
+
+Looking at this, maybe we have too many cross-indexing variants, I'll
+check and see if we can simplify that a bit.
+
+>
+>> +        trace_get_host_cpu_idregs(sysregdesc->name, *reg);
+>> +        if (ret) {
+>> +            error_report("%s error reading value of host %s register (%m)",
+>> +                         __func__, sysregdesc->name);
+>> +
+>> +            err = ret;
+>> +        }
+>> +    }
+>> +    return err;
+>> +}
+>> +
+>> +static bool
+>> +kvm_arm_get_host_cpu_features(ARMCPU *cpu, ARMHostCPUFeatures
+>> *ahcf,
+>> +                              bool exhaustive)
+>>  {
+>>      /* Identify the feature bits corresponding to the host CPU, and
+>>       * fill out the ARMHostCPUClass fields accordingly. To do this
+>> @@ -398,6 +465,11 @@ static bool
+>> kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>>          err |= get_host_cpu_reg(fd, ahcf, ID_DFR1_EL1_IDX);
+>>          err |= get_host_cpu_reg(fd, ahcf, ID_MMFR5_EL1_IDX);
+>> 
+>> +        /* Make sure writable ID reg values are read */
+>> +        if (exhaustive) {
+>> +            err |= get_host_cpu_idregs(cpu, fd, ahcf);
+>> +        }
+>
+>
+> Also if we do this a bit above can we avoid reading the ID registers twice
+> if "exhaustive=true" ?
+
+It's probably not performance critical as we just do this once, but
+let's try that anyway.
 
