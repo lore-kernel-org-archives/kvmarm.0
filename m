@@ -1,209 +1,155 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AF619CD16
-	for <kvmarm@lists.linux.dev>; Tue, 27 May 2025 14:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F5F283FF0
+	for <kvmarm@lists.linux.dev>; Tue, 27 May 2025 17:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748355903; cv=none; b=HJHlQ43L+YgjdiGacRXKQG9EPkqzSCHM9UN5R+XrVJV3cY54fteD7m4KD1kvjcGT9umUSgDtg0eS7oMmmO1HW7ZMUzf5LPkF2PXifur5sLVFzy91YLOUnAATbDoakdZpjlxWfEcaVP6Pe/zaOAcJhUHnFn7EsXz6AZEZ5iTScA4=
+	t=1748368669; cv=none; b=V0WFWKQfAfmDLbwDTNnB13CO1LNVbju8AVDcf4ABm4f4w74sbpvnmatDU4AyBFy028T+xivverU3mPt7FOWLuBcUub6Kht3Dv/k998yUI/y+dEXKxS+OA5jT7Fncih1A7lhg6xex0Lm9NQ8GEW3W4K8V0c3rw1MiAH/91dYalGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748355903; c=relaxed/simple;
-	bh=ocRxSy5EJXKWPp1wtDInyrXbEN2m5DHwoDq0BP3WbmY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=bcYbWoklxMuIhekUbqwEetjb6582FspIMM+uVvxtQG5ZyPO2ZnSIZ+4zc0RS+lzTOeBnXf5cS+vrZD9gqKu+XLFTHaJIacOU/Xze5tUkk46VTElDjyG/ibwIN/T00kKJNuwLDD7as/jJ9SQFUV2rsAT+kU2JAVENUj0tGJkxkFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FX378gPA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1748368669; c=relaxed/simple;
+	bh=Pba0PHIEYIGNrf6XjJ6nlDeAkd8emTX4pz2cTHqOo1M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P2UPN88rO/hvgL45vRoHeiXEc2iH7iqhK2v0eKD22DnrDNtVBQ3MS8OY86/43LR39kwpLS2cVkCEIgwLVUUhcnxVZCrsJKwfFYj86r/9VJgdV1wZh6UyyiweE1f1TexBGB4CrIPSfaqzRWawZDazlNXHAsl1aEcJWd8pWV9mXbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JuFuutjb; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FX378gPA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748355899;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=unMc8iAgdhI+llHDkqJsAFL7ZbF0O8Lqzu9ojtHqeJA=;
-	b=FX378gPA4KsKAfOjnB+Q+/Oz54XFo07nH04DzLxBJKmH/AbJ/bjCOolY1rjwo0+xj8RhTP
-	MWp7F5C7CdrNmoOQI5TLSFtpLR/HiYynDT6x2rLSSlThL4p9FK28l5AmwmrbvyjOQ/l0E7
-	vTItf5n3ZY16aDJZBQuHGLhBmlxc2h8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-yUHiYUIHMDqI6tvyHQXMGg-1; Tue, 27 May 2025 10:24:49 -0400
-X-MC-Unique: yUHiYUIHMDqI6tvyHQXMGg-1
-X-Mimecast-MFC-AGG-ID: yUHiYUIHMDqI6tvyHQXMGg_1748355888
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4d5e1af1fso1086377f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 27 May 2025 07:24:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JuFuutjb"
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-442ea341570so27014315e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 27 May 2025 10:57:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1748368665; x=1748973465; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K66IbQMbjje707cA7mD5l9PP1/zHD1PIxR0a5Pb7bKE=;
+        b=JuFuutjbEbXiTSgVNk7ogWaBOOTmto4rS9826770q1ClRJTL4j5BPwIUPFfYHDpegO
+         BgDLMEf8jXGbEdszbN/VHcnuGmulm+pyKKT/GBVlNI2isAtHMExz1E1rMrNFwZZq3cdt
+         cPgR9+V9Wk+qDNe5TczFda+ARHAhYwEZMvx1okL3UPs0ea1rvF705X3eym1p+wzAtx6P
+         3nnO+LFixKX6Sg9dFPXwKCEoRihW34pPrVxw8haJDDIhpA00mVz82tQbyZrgTkO2uLOR
+         LhoALGzrnbgacVhBdSxjZUmRQXuy32qu5DBQ0eXx8QlsZ9xHOq3c8clFun97plXnnkxu
+         s+hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748355888; x=1748960688;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=unMc8iAgdhI+llHDkqJsAFL7ZbF0O8Lqzu9ojtHqeJA=;
-        b=qFAcdWDfR8/IcT2Dvo9hQwu83iVSxMfyimc8nln6fPYxbzwazMlkpLZmZRVM5SMUTh
-         wIg4VDAR/lwMCnQKto0X427t5jtle8JmzLZgYKIO5o8736SEa+8XiQSEefzDn02If4Rm
-         /ZWEdP2BSl3d9375AsYtCJ87trc/09BHY6FB+akuT4ldbQK8T5ocmiZZ4dec0gz4t5lb
-         qcDNK5sOrllfDSomQjw59tJshdz3TUJJu8n2KRWQWTji+cLtyTRYBkiVcd+6bYT0HWjq
-         wd6cBCunVNyiDsbXy0bNEG/1E5GY1yk0tzumugHHEPlcXLQFbpXEsMS6jnGwkZnQ6EAD
-         QSnw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEbgM6/kPgH90r3s/Vshs1V/Fi7UipbbyKuOIRXH6aSesN34JTIlOkQwBaapgWCaSV9KcxTcs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzO/zr8SA8vobgDCqPo6XmhQVs/L9KKEGNDkfDLmPq44wwwcJEd
-	msnAz5FSmaGc5GwpWs+ZiExTFukLtQAIzC8rK9Rxqy/o0+1x5f1Het0Te4gFq2VTgeb7IN04BvF
-	loF+IzriBK+UUnV/O9Yk3ksMj2Q9QKAboPG4KV0upktNwClpgqZDSGfKGBA==
-X-Gm-Gg: ASbGncuL1ZXVC/mILVvpC3lO2w+GNjoqPoKOjAE+A5N1kAQaGp+BgZVius0KRNn78Pb
-	hNd6e1nZUqJ5+zjYgA6/e2VyXlsasqB0G2hOMwKyURQ5118JWw2iYSS7brvzUbGjt14d1PPeqQx
-	mo7q4miiDvuK4R2r/zp9n0IPjJ+hXTvXY9Tv2UeuS3JryNNesFaPLpVBjNHysjerl/l5Rqx1G7P
-	0trm7gPN63pOg2mltWvkauhBHP2DAy/6VWGSaxLxfXoXJeP+eobq7gdwgrcF6abfPWt8h6pvxgd
-	wH9izXnGii/aXVWWwRb3NL98aaIXakIKRuIbeQf9son2uBoSdp79ROgF1xA4RrU4JQug1v5AgA=
-	=
-X-Received: by 2002:a5d:5f55:0:b0:3a4:e1ea:3b38 with SMTP id ffacd0b85a97d-3a4e5e5d241mr1030438f8f.7.1748355887865;
-        Tue, 27 May 2025 07:24:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IED6cDk0pjU6x3lxG7ezTVdoW3wzIGaXlNoiosT7cd0gwNQ04WLe8XIloW7vpZA7k37aWMp8g==
-X-Received: by 2002:a5d:5f55:0:b0:3a4:e1ea:3b38 with SMTP id ffacd0b85a97d-3a4e5e5d241mr1030399f8f.7.1748355887452;
-        Tue, 27 May 2025 07:24:47 -0700 (PDT)
-Received: from rh.fritz.box (p200300f6af1bce00e6fe5f11c0a7f4a1.dip0.t-ipconnect.de. [2003:f6:af1b:ce00:e6fe:5f11:c0a7:f4a1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f73d3edcsm278766415e9.20.2025.05.27.07.24.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 May 2025 07:24:47 -0700 (PDT)
-From: Sebastian Ott <sebott@redhat.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Colton Lewis <coltonlewis@google.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Sebastian Ott <sebott@redhat.com>
-Subject: [PATCH v2 3/3] KVM: arm64: selftests: arch_timer_edge_cases - determine effective counter width
-Date: Tue, 27 May 2025 16:24:34 +0200
-Message-ID: <20250527142434.25209-4-sebott@redhat.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250527142434.25209-1-sebott@redhat.com>
-References: <20250527142434.25209-1-sebott@redhat.com>
+        d=1e100.net; s=20230601; t=1748368665; x=1748973465;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K66IbQMbjje707cA7mD5l9PP1/zHD1PIxR0a5Pb7bKE=;
+        b=cIz/6uDAuIVfzoSu35QnTrkVX6BT0tNg/6AyE0dGseaBXCKairI+mWoo3Xru9HmTGA
+         kJqXkiOIOOPcPusnv0CuokdpMxAdNnV2i/d0MvpFjjfqH+kX0L3jEwDbWO7EGOWmOyjm
+         /S3e2CzACvweUTl50vg/zF+Xcv7itfWGBFDu9LAzFzG96oZ21gz0ZVb6k8jeB9dTD/qZ
+         iAn97koMS2bt5Ycqz9bPe3pTlgPsnCcsEEHi3T2gSb2MtwSY8idSD5oxO4L7SY8fuWdi
+         lV49g5hzdJZy3K/AeDzSzBimjAqdfLMbtn50c3Q401fF3MKmFOnJsJMoE2Lp9+v1j4nB
+         yuHg==
+X-Forwarded-Encrypted: i=1; AJvYcCVL8YM48T6OzTo8U1FuLUvqsl4E2iE+HEbNZtLA7BFDUZS4smw96hhqREG8jAfGQHb/K4HPoHY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwnbG0BBZ6Bb0KkjfaITNCBZiB6XuNLvsjfeJwdgyRqxxL2wM/u
+	D5MCqRBg59rGis4eGipQZJo0qltdmRzTGFek4cuYcIce5b/YZ5C8rcR4FzL0XRAfcuI=
+X-Gm-Gg: ASbGnctXhAKDTt3/QXsAnd2ddBHX7CJt+0J4MlHSynCIOi1Qt+bwvl4tHz+mBz9HOcx
+	6hS4ImPpOFKw+8KdXc1cgZkbTbt53dzfBxZc01zcAedDkXMcOb5cuU9YW5XU0Q9k8DTaCoz4dML
+	x8oXM9Ouxl99zEj3gadkzvk6hSiM9WUZw+tlIQj+XmaywyxBNp/+ldDDc7b7kk/8jbqw9VHJFBy
+	DKChoa7i3yCyS0SeRPA5yeWTTYZq/UJkmXTBnzeX3ajmhyNKclETdnp42FADeTdGUYrp9P+GwTL
+	bPmJDzu+KemimTx0e8XyvXQphHc5NFYs35hlcqRe42lZWscb5vBpoH4F
+X-Google-Smtp-Source: AGHT+IGWVp+1pe2g72Y3zco5kiY52P50nzKLHDIXvLoqcgNBLuwmb5ic8TmQyg2vlxnYIHLktroXHw==
+X-Received: by 2002:a05:600c:1e1c:b0:441:d438:4ea5 with SMTP id 5b1f17b1804b1-44c9493e6b1mr107966315e9.20.1748368664703;
+        Tue, 27 May 2025 10:57:44 -0700 (PDT)
+Received: from [192.168.1.3] ([37.18.136.128])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6b29548sm290642395e9.4.2025.05.27.10.57.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 May 2025 10:57:44 -0700 (PDT)
+Message-ID: <c2393238-d1cb-43bd-b67e-08105a9834fd@linaro.org>
+Date: Tue, 27 May 2025 18:57:43 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: bkdJ9KmeU3asVrDQ45fmt361LXG2Xwp5As65bY7KlxE_1748355888
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 4/4] perf: arm_pmuv3: Add support for the Branch
+ Record Buffer Extension (BRBE)
+To: Will Deacon <will@kernel.org>
+Cc: Rob Herring <robh@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Leo Yan <leo.yan@arm.com>,
+ linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
+ <20250407-arm-brbe-v19-v21-4-ff187ff6c928@kernel.org>
+ <20250519150621.GA17177@willie-the-truck>
+ <20250519215651.GB2650608-robh@kernel.org>
+ <119c9a70-6ea8-46f0-b877-8a433d97ce84@linaro.org>
+ <20250527105035.GA26328@willie-the-truck>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20250527105035.GA26328@willie-the-truck>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-arch_timer_edge_cases uses ~0 as the maximum counter value, however there's
-no architectural guarantee that this is valid.
 
-Figure out the effective counter width based on the effective frequency
-like it's done by the kernel.
 
-Note that the following subtest only worked since the counter initialized
-with CVAL_MAX would instantly overflow (which is no longer the case):
+On 27/05/2025 11:50 am, Will Deacon wrote:
+> On Wed, May 21, 2025 at 04:58:42PM +0100, James Clark wrote:
+>>
+>>
+>> On 19/05/2025 10:56 pm, Rob Herring wrote:
+>>> On Mon, May 19, 2025 at 04:06:22PM +0100, Will Deacon wrote:
+>>>> Hey Rob,
+>>>>
+>>>> On Mon, Apr 07, 2025 at 12:41:33PM -0500, Rob Herring (Arm) wrote:
+>>>>> From: Anshuman Khandual <anshuman.khandual@arm.com>
+>>>>>
+>>>>> The ARMv9.2 architecture introduces the optional Branch Record Buffer
+>>>>> Extension (BRBE), which records information about branches as they are
+>>>>> executed into set of branch record registers. BRBE is similar to x86's
+>>>>> Last Branch Record (LBR) and PowerPC's Branch History Rolling Buffer
+>>>>> (BHRB).
+>>>>
+>>>> Since you picked this up from v19, the driver has changed considerably
+>>>> and I presume you will be continuing to extend it in future as the
+>>>> architecture progresses. Perhaps having you listed as Author (and
+>>>> crucially, in git blame :p) with Anshuman as a Co-developed-by: would be
+>>>> more appropriate?
+>>>
+>>> Shrug.
+>>>
+>>>>> ---
+>>>>>    drivers/perf/Kconfig         |  11 +
+>>>>>    drivers/perf/Makefile        |   1 +
+>>>>>    drivers/perf/arm_brbe.c      | 802 +++++++++++++++++++++++++++++++++++++++++++
+>>>>>    drivers/perf/arm_brbe.h      |  47 +++
+>>>>>    drivers/perf/arm_pmu.c       |  15 +-
+>>>>>    drivers/perf/arm_pmuv3.c     | 129 ++++++-
+>>>>>    include/linux/perf/arm_pmu.h |   8 +
+>>>>>    7 files changed, 1006 insertions(+), 7 deletions(-)
+>>>>
+>>>> Do you know if James Clark's tests [1] are going to be respun for the
+>>>> perf tool? It would be handy to have some way to test this new
+>>>> functionality.
+>>>
+>>> Yes. I dropped them here because I've been told by Arnaldo in the past
+>>> to send userspace stuff separately.
+>>>
+>>
+>> That version of the test was out of date so I've pushed the new version
+>> here: https://git.linaro.org/plugins/gitiles/people/james.clark/linux.git/+/16e4a18c2d5fc53736f05c9052b1d11d74909707
+>>
+>> But I'll wait for the driver changes to be finalised before posting it. Or
+>> Rob can take it back into the patchset.
+> 
+> Thanks, James. I just wanted to make sure that there was still a plan
+> for upstreaming these separately from the driver. Have you had a chance
+> to run them against this v21?
+> 
+> Will
 
-	test_set_cnt_after_cval_no_irq(timer, 0, DEF_CNT, CVAL_MAX, sm);
 
-To fix this we could swap CVAL_MAX for 0 here but since that is already
-done by test_move_counters_behind_timers() let's remove that subtest.
+Yes I'll send it once the driver is merged. And yes they're passing 
+against v21, but I'll retest v22 as well.
 
-This also serves as a workaround for AC03_CPU_14 that led to the
-following assertion failure on ampere-one machines:
-
-==== Test Assertion Failure ====
-  arm64/arch_timer_edge_cases.c:169: timer_condition == istatus
-  pid=11236 tid=11236 errno=4 - Interrupted system call
-     1  0x0000000000404ce7: test_run at arch_timer_edge_cases.c:938
-     2  0x0000000000401ebb: main at arch_timer_edge_cases.c:1053
-     3  0x0000ffff9fa8625b: ?? ??:0
-     4  0x0000ffff9fa8633b: ?? ??:0
-     5  0x0000000000401fef: _start at ??:?
-  0x1 != 0x0 (timer_condition != istatus)
-
-Link: https://lore.kernel.org/kvmarm/ac1de1d2-ef2b-d439-dc48-8615e121b07b@redhat.com
-Link: https://amperecomputing.com/assets/AmpereOne_Developer_ER_v0_80_20240823_28945022f4.pdf
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
----
- .../kvm/arm64/arch_timer_edge_cases.c         | 27 ++++++++++++-------
- 1 file changed, 18 insertions(+), 9 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-index a813b4c6c817..1e3e36d869d4 100644
---- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-+++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-@@ -22,7 +22,8 @@
- #include "gic.h"
- #include "vgic.h"
- 
--static const uint64_t CVAL_MAX = ~0ULL;
-+/* Depends on counter width. */
-+static uint64_t CVAL_MAX;
- /* tval is a signed 32-bit int. */
- static const int32_t TVAL_MAX = INT32_MAX;
- static const int32_t TVAL_MIN = INT32_MIN;
-@@ -30,8 +31,8 @@ static const int32_t TVAL_MIN = INT32_MIN;
- /* After how much time we say there is no IRQ. */
- static const uint32_t TIMEOUT_NO_IRQ_US = 50000;
- 
--/* A nice counter value to use as the starting one for most tests. */
--static const uint64_t DEF_CNT = (CVAL_MAX / 2);
-+/* Counter value to use as the starting one for most tests. Set to CVAL_MAX/2 */
-+static uint64_t DEF_CNT;
- 
- /* Number of runs. */
- static const uint32_t NR_TEST_ITERS_DEF = 5;
-@@ -732,12 +733,6 @@ static void test_move_counters_ahead_of_timers(enum arch_timer timer)
- 		test_set_cnt_after_tval(timer, 0, tval, (uint64_t) tval + 1,
- 					wm);
- 	}
--
--	for (i = 0; i < ARRAY_SIZE(sleep_method); i++) {
--		sleep_method_t sm = sleep_method[i];
--
--		test_set_cnt_after_cval_no_irq(timer, 0, DEF_CNT, CVAL_MAX, sm);
--	}
- }
- 
- /*
-@@ -975,6 +970,8 @@ static void test_vm_create(struct kvm_vm **vm, struct kvm_vcpu **vcpu,
- 	test_init_timer_irq(*vm, *vcpu);
- 	vgic_v3_setup(*vm, 1, 64);
- 	sync_global_to_guest(*vm, test_args);
-+	sync_global_to_guest(*vm, CVAL_MAX);
-+	sync_global_to_guest(*vm, DEF_CNT);
- }
- 
- static void test_print_help(char *name)
-@@ -1035,6 +1032,17 @@ static bool parse_args(int argc, char *argv[])
- 	return false;
- }
- 
-+static void set_counter_defaults(void)
-+{
-+	const uint64_t MIN_ROLLOVER_SECS = 40ULL * 365 * 24 * 3600;
-+	uint64_t freq = read_sysreg(CNTFRQ_EL0);
-+	uint64_t width = ilog2(MIN_ROLLOVER_SECS * freq);
-+
-+	width = clamp(width, 56, 64);
-+	CVAL_MAX = GENMASK_ULL(width - 1, 0);
-+	DEF_CNT = CVAL_MAX / 2;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	struct kvm_vcpu *vcpu;
-@@ -1047,6 +1055,7 @@ int main(int argc, char *argv[])
- 		exit(KSFT_SKIP);
- 
- 	sched_getaffinity(0, sizeof(default_cpuset), &default_cpuset);
-+	set_counter_defaults();
- 
- 	if (test_args.test_virtual) {
- 		test_vm_create(&vm, &vcpu, VIRTUAL);
--- 
-2.49.0
+James
 
