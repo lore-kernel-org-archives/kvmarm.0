@@ -1,115 +1,91 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D011F4CBB
-	for <kvmarm@lists.linux.dev>; Tue, 27 May 2025 13:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86ACC3FC7
+	for <kvmarm@lists.linux.dev>; Tue, 27 May 2025 13:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748351118; cv=none; b=NKas8erAJmeRwXati7dhfHyaBoArEJk2S60npkxxrVgZ/LzjPjuoY1Mg23B0oV3cUQLcIJ/tVWXLekiEoJ4DvdWP+TifrOfN0T3LZq/9CYpw/xbLKjGPEGVTnm9XS+UtFdu11Gvst1b4VJ1WhAjorvrhdwmnV7b6dpmoo84pnyo=
+	t=1748351729; cv=none; b=YAb0388HGtDjMPEgd4sHBDSWQK520QS67bUlxK7MJyWRglcSuWLdyozMQhsBNyrBNXJY3aRYShNHz0ts6KJh/GsRr1y4LFbGrFePZngqXsWD/bOMq28YGF9ur1KBX+I9B+m6czVRMZUbNwBie3dTRlSmO3lP+2fPvaxxihs58Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748351118; c=relaxed/simple;
-	bh=cFA/dkYyvc3X1Y7GQyzohC1dFXVFvAzkHJAS97M1O70=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=SZELsK8GAGDESec1olI72vZezGXdJbDyIltv8RrsJhI2d63XsKuz0BSLSUq0Ya7EUNqE+XkJzx25x+9z/eL9Xq5ln08p5MnRutpuPf1sjgVz1gP5q0JHXl3LJK01BAQYfjnushF+aUu6VhdVEwI3Mg539lVBanW/mWDwJv7K5BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4b6CVm4T0kz13Lsf;
-	Tue, 27 May 2025 21:03:28 +0800 (CST)
-Received: from kwepemg100001.china.huawei.com (unknown [7.202.181.18])
-	by mail.maildlp.com (Postfix) with ESMTPS id D126C140134;
-	Tue, 27 May 2025 21:05:11 +0800 (CST)
-Received: from [10.67.121.183] (10.67.121.183) by
- kwepemg100001.china.huawei.com (7.202.181.18) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 27 May 2025 21:05:11 +0800
-Message-ID: <86bcc70b-f41f-45d3-967e-c6190c6ceadd@huawei.com>
-Date: Tue, 27 May 2025 21:05:10 +0800
+	s=arc-20240116; t=1748351729; c=relaxed/simple;
+	bh=6D54vByl5BJVj7Q5acyjMDCFnX+ZDlUCn2n+jBrJ18Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MhPlqyBiJ7Bfekjr5nhRDG1g3/vQRAZFYpNtRWXfPUrEtki9xyn7vCSlEIuA5y7sn+kYIUiTZLWupsOSb5gFPXzpAs7r/yYwsIXSe6YrMPjk0CFzw1F5UQOkfyx82ttgXDdXBHl2KJ/4Sx+JkjZ6aFyt7jZMXuNAcvXfQxSi57s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W23sI7XW; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W23sI7XW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD8FFC4CEE9;
+	Tue, 27 May 2025 13:15:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748351729;
+	bh=6D54vByl5BJVj7Q5acyjMDCFnX+ZDlUCn2n+jBrJ18Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W23sI7XW7HJ4bRv/EKFKvnWoqni4NiXspbqA0f5IZ3Mw4rtBP2qPzGl0MPWDF6TiK
+	 VOIlkSp/HF4PqJI5IFXn3CVZ+BbtECGfc20ZsqRGVnDoHzBiDhGwP8ffTMM/B8V6gs
+	 xPbnEQ2UrOsjhJCOMtZHmYsreTu7uDr6A59qbTpCtQGKRydnOV2dBAgiWxI3JAG12s
+	 uJgBS2qrOwMu0ZFc/jKhzc2O+2TTH0Wz5yclE/Snoy+ICowWIzRq+8SG6540cRvM+E
+	 QKJjqEq7BBt1jO0h3ebDfoUGUKVSnvzkKEkVaeOSSyGSy/CIA1uYfJPINRuPtYBdZq
+	 uyNMd2YjkmZxw==
+Date: Tue, 27 May 2025 14:15:24 +0100
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Mark Brown <broonie@kernel.org>,
+	D Scott Phillips <scott@os.amperecomputing.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH] arm64: sysreg: Drag linux/kconfig.h to work around vdso
+ build issue
+Message-ID: <20250527131523.GA26734@willie-the-truck>
+References: <20250523170208.530818-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: arm64: Make HCX writable from userspace
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: <maz@kernel.org>, <yuzenghui@huawei.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <liuyonglong@huawei.com>,
-	<jiangkunkun@huawei.com>
-References: <20250325121126.1380681-1-yangjinqian1@huawei.com>
- <Z-LX5H5mjGyTQ9N4@linux.dev>
-From: Jinqian Yang <yangjinqian1@huawei.com>
-In-Reply-To: <Z-LX5H5mjGyTQ9N4@linux.dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemg100001.china.huawei.com (7.202.181.18)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250523170208.530818-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
+On Fri, May 23, 2025 at 06:02:08PM +0100, Marc Zyngier wrote:
+> Broonie reports that fed55f49fad18 ("arm64: errata: Work around
+> AmpereOne's erratum AC04_CPU_23") breaks one of the vdso selftests
+> (vdso_test_chacha) as it indirectly drags asm/sysreg.h.
+> 
+> It is rather unfortunate (and worrying) that userspace gets built
+> with non-UAPI headers. In any case, paper over the issue by dragging
+> linux/kconfig.h in asm/sysreg.h. It is the right thing to do, at
+> least from the kernel perspective.
+> 
+> Reported-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Fixes: fed55f49fad18 ("arm64: errata: Work around AmpereOne's erratum AC04_CPU_23")
+> Link: https://lore.kernel.org/r/aDCDGZ-G-nCP3hJI@finisterre.sirena.org.uk
+> Cc: D Scott Phillips <scott@os.amperecomputing.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index cd853801a8f7b..f1bb0d10c39a3 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -12,6 +12,7 @@
+>  #include <linux/bits.h>
+>  #include <linux/stringify.h>
+>  #include <linux/kasan-tags.h>
+> +#include <linux/kconfig.h>
+>  
+>  #include <asm/gpr-num.h>
 
-> Hi Jinqian,
->
-> On Tue, Mar 25, 2025 at 08:11:26PM +0800, Jinqian Yang wrote:
->> Allow userspace to modify guest visible value for HCX in
->> ID_AA64MMFR1_EL1.
->>
->> Signed-off-by: Jinqian Yang <yangjinqian1@huawei.com>
->
-> This is fine, but I would rather we handle all the features like FEAT_HCX
-> instead of a trickle of one-off patches.
->
-> So, could you please:
->
-> - Identify all of the features that describe an *EL2* feature which
->   we've exposed to non-nested VMs
->
-> - Implement patch(es) to make those fields writable (i.e. allow them to
->   be downgraded)
->
-> - Add corresponding test cases to the set_id_regs selftest
->
-> Thanks,
-> Oliver
->
-Hi Oliver，
+Marc, it will be quickest for you to take this as you also took the
+AC04_CPU_23 workaround:
 
-Thanks for the detailed explantation!
+Acked-by: Will Deacon <will@kernel.org>
 
-During our testing of cross-generation live migration, we encountered
-an issue that requires applying the patch. The problem arises when two
-chips have inconsistent FEAT_HCX. To ensure consistent virtual machine
-behavior before and after migration, we need to make FEAT_HCX writable,
-thereby aligning the feature flags across source and destination hosts.
-
-
-Above is the context of this patch. I will revise this patch following your
-suggestions, but I need to confirm: does the term *EL2* feature specifically
-refer to capabilities related to ​​HCRX_EL2​​ and ​​HCR_EL2​​?
-
-Jinqian
-
-
->> ---
->>  arch/arm64/kvm/sys_regs.c | 1 -
->>  1 file changed, 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 82430c1e1dd0..b105f156bdf6 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -2666,7 +2666,6 @@ static const struct sys_reg_desc 
->> sys_reg_descs[] = {
->>                      ID_AA64MMFR0_EL1_TGRAN16_2 |
->>                      ID_AA64MMFR0_EL1_ASIDBITS)),
->>      ID_WRITABLE(ID_AA64MMFR1_EL1, ~(ID_AA64MMFR1_EL1_RES0 |
->> -                    ID_AA64MMFR1_EL1_HCX |
->>                      ID_AA64MMFR1_EL1_TWED |
->>                      ID_AA64MMFR1_EL1_XNX |
->>                      ID_AA64MMFR1_EL1_VH |
->> -- 
->> 2.33.0
->>
->
+Will
