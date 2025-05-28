@@ -1,155 +1,141 @@
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F5F283FF0
-	for <kvmarm@lists.linux.dev>; Tue, 27 May 2025 17:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA57127147C
+	for <kvmarm@lists.linux.dev>; Wed, 28 May 2025 10:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748368669; cv=none; b=V0WFWKQfAfmDLbwDTNnB13CO1LNVbju8AVDcf4ABm4f4w74sbpvnmatDU4AyBFy028T+xivverU3mPt7FOWLuBcUub6Kht3Dv/k998yUI/y+dEXKxS+OA5jT7Fncih1A7lhg6xex0Lm9NQ8GEW3W4K8V0c3rw1MiAH/91dYalGQ=
+	t=1748428133; cv=none; b=gqbkcxHEFhOTb7knnmSAsMuGlDUvU4GHVoGWdcFDcUdW5z2t8xY7W/QAgZ9NHlJ4FbqrPuCZfV6p5ocht96xe5UhwFElg26KyoTbunrvoBJYdXFLO/Ubi2USZ4RuHTRlkJi5C0SHc3plYSnR30lK2zA3bOuQrPy0frdTEExH68Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748368669; c=relaxed/simple;
-	bh=Pba0PHIEYIGNrf6XjJ6nlDeAkd8emTX4pz2cTHqOo1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P2UPN88rO/hvgL45vRoHeiXEc2iH7iqhK2v0eKD22DnrDNtVBQ3MS8OY86/43LR39kwpLS2cVkCEIgwLVUUhcnxVZCrsJKwfFYj86r/9VJgdV1wZh6UyyiweE1f1TexBGB4CrIPSfaqzRWawZDazlNXHAsl1aEcJWd8pWV9mXbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JuFuutjb; arc=none smtp.client-ip=209.85.128.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1748428133; c=relaxed/simple;
+	bh=pevQLIwlYhcrh9j/PEoiFM8IoOPUhaa8Z8UX5eKAVSo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FgbQL1We9Gu6Z9/POFoRaVR7hWLt8wZOeLCO1F8oto5IhYvUpQ0CdgTkJh4mY+ySOjl65orwnl8RaaGIQ5W+40gC9ASL5W4gsFMEhpqA+yKb823C7O21sVZ+RyAS4yUwPaZ4/tkvb4NOTQAT+FZnhU0ZPbmIpkxV9O8BV3zEXdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n1qXbrVr; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JuFuutjb"
-Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-442ea341570so27014315e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 27 May 2025 10:57:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n1qXbrVr"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6fab5dfe095so13712286d6.1
+        for <kvmarm@lists.linux.dev>; Wed, 28 May 2025 03:28:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1748368665; x=1748973465; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=K66IbQMbjje707cA7mD5l9PP1/zHD1PIxR0a5Pb7bKE=;
-        b=JuFuutjbEbXiTSgVNk7ogWaBOOTmto4rS9826770q1ClRJTL4j5BPwIUPFfYHDpegO
-         BgDLMEf8jXGbEdszbN/VHcnuGmulm+pyKKT/GBVlNI2isAtHMExz1E1rMrNFwZZq3cdt
-         cPgR9+V9Wk+qDNe5TczFda+ARHAhYwEZMvx1okL3UPs0ea1rvF705X3eym1p+wzAtx6P
-         3nnO+LFixKX6Sg9dFPXwKCEoRihW34pPrVxw8haJDDIhpA00mVz82tQbyZrgTkO2uLOR
-         LhoALGzrnbgacVhBdSxjZUmRQXuy32qu5DBQ0eXx8QlsZ9xHOq3c8clFun97plXnnkxu
-         s+hA==
+        d=google.com; s=20230601; t=1748428130; x=1749032930; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IPM+otKwF7DxF026kJrXJ2nOt14z8mTLc7lr53b8T9c=;
+        b=n1qXbrVrZokH0QThy7oMXz+G6ADpvJhr0au4ANy5pBvBXNWS8RJSuyry+igksTFdXC
+         fKsXJ6jAGeQMtaQuyvxq9dUry2vxp7+1FUqLU8qoPRFo72vROt2TUiY9UocToYdsLIbM
+         FJPumC9CSqqIixaM5bAGKQFdYwh5szyje2qKH1O5v4e5LLf8p7eYhhGF7XtfFvAHuKV5
+         W5qK7F7wrph2IpvWyIaoSh/sZ9OcXR1Xzf8mY09Hbrkkk6qwbg4j/46wrP3BKHO7dHK4
+         ryuyzcauhY9ssiG8TQJnRmGgR9xZi9iaHxOtSVd513AUhIf5/nmRfSH0BrAlE7PSRUgJ
+         Vczg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748368665; x=1748973465;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K66IbQMbjje707cA7mD5l9PP1/zHD1PIxR0a5Pb7bKE=;
-        b=cIz/6uDAuIVfzoSu35QnTrkVX6BT0tNg/6AyE0dGseaBXCKairI+mWoo3Xru9HmTGA
-         kJqXkiOIOOPcPusnv0CuokdpMxAdNnV2i/d0MvpFjjfqH+kX0L3jEwDbWO7EGOWmOyjm
-         /S3e2CzACvweUTl50vg/zF+Xcv7itfWGBFDu9LAzFzG96oZ21gz0ZVb6k8jeB9dTD/qZ
-         iAn97koMS2bt5Ycqz9bPe3pTlgPsnCcsEEHi3T2gSb2MtwSY8idSD5oxO4L7SY8fuWdi
-         lV49g5hzdJZy3K/AeDzSzBimjAqdfLMbtn50c3Q401fF3MKmFOnJsJMoE2Lp9+v1j4nB
-         yuHg==
-X-Forwarded-Encrypted: i=1; AJvYcCVL8YM48T6OzTo8U1FuLUvqsl4E2iE+HEbNZtLA7BFDUZS4smw96hhqREG8jAfGQHb/K4HPoHY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwnbG0BBZ6Bb0KkjfaITNCBZiB6XuNLvsjfeJwdgyRqxxL2wM/u
-	D5MCqRBg59rGis4eGipQZJo0qltdmRzTGFek4cuYcIce5b/YZ5C8rcR4FzL0XRAfcuI=
-X-Gm-Gg: ASbGnctXhAKDTt3/QXsAnd2ddBHX7CJt+0J4MlHSynCIOi1Qt+bwvl4tHz+mBz9HOcx
-	6hS4ImPpOFKw+8KdXc1cgZkbTbt53dzfBxZc01zcAedDkXMcOb5cuU9YW5XU0Q9k8DTaCoz4dML
-	x8oXM9Ouxl99zEj3gadkzvk6hSiM9WUZw+tlIQj+XmaywyxBNp/+ldDDc7b7kk/8jbqw9VHJFBy
-	DKChoa7i3yCyS0SeRPA5yeWTTYZq/UJkmXTBnzeX3ajmhyNKclETdnp42FADeTdGUYrp9P+GwTL
-	bPmJDzu+KemimTx0e8XyvXQphHc5NFYs35hlcqRe42lZWscb5vBpoH4F
-X-Google-Smtp-Source: AGHT+IGWVp+1pe2g72Y3zco5kiY52P50nzKLHDIXvLoqcgNBLuwmb5ic8TmQyg2vlxnYIHLktroXHw==
-X-Received: by 2002:a05:600c:1e1c:b0:441:d438:4ea5 with SMTP id 5b1f17b1804b1-44c9493e6b1mr107966315e9.20.1748368664703;
-        Tue, 27 May 2025 10:57:44 -0700 (PDT)
-Received: from [192.168.1.3] ([37.18.136.128])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6b29548sm290642395e9.4.2025.05.27.10.57.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 May 2025 10:57:44 -0700 (PDT)
-Message-ID: <c2393238-d1cb-43bd-b67e-08105a9834fd@linaro.org>
-Date: Tue, 27 May 2025 18:57:43 +0100
+        d=1e100.net; s=20230601; t=1748428130; x=1749032930;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IPM+otKwF7DxF026kJrXJ2nOt14z8mTLc7lr53b8T9c=;
+        b=QhtwZ22mgiObrqaUsY3Ym1LwNm+383NKUQ62vYR9wlVRTX1quz5A2bfS9qHsTm+Z/U
+         CIMz0BuvfIkPS74Hyq7tWC1YYxR5rAMCH8VXHemtaURzVjrgprEjihxwsc6EHEy8LnUP
+         Rt19u8a3kUQ7w90lasGCL1HYKx4ZL7PP0jOMgrdmd3hAOFrrGdWR9Cig2fvNwUmt8ADn
+         Xhpjhsjzwwj5PCYP3+qWuIjiNkeh0v6QeDpvjFIn6DcPdM7oviesaNxYEiWEJPrW+Iu6
+         /leFtWiPAqxEqvEKUBc8p+KFiuXqqlahc+h37oKlWq7sQH45fsr4GuPLJ/js9FqPi08y
+         ebOg==
+X-Gm-Message-State: AOJu0YwUVSmbbjVS1kvjN7T6D2r0YnXBEac4hwzs9ShAHafScJk+XVia
+	NdXZL6hgRq0ch+KJffewZCAQbTm0CLGcdlk8UVpJDXHtWxVSaMTQZ0PLmCGWIVDYfGchmdpmM3u
+	xPp1DQdCWEXSHDQIsGXdR1p5gzbdenpSX/HTcjoQ+txqLjGsePKTWgm0L
+X-Gm-Gg: ASbGncvzrXWEKXacOJ9tZl6IzkrG0sgoYca0AZXyjzognU97B2ArpQJn+kfPzc6ScjI
+	EJ8UhG17ViGQcl2Af1agDk4NmAqNH0RZuxDRsz3xoZEVx74k1wtzFsaj3vXkrq1MHejVFu4xi/1
+	LxqU0GzX9dIFcxDuuACXsuQI4cUXqMMaf72si7kL57ypNKzClgc4TrtTrqe5GnIOtrhzHrEs/kj
+	A==
+X-Google-Smtp-Source: AGHT+IE2MBfXrh2pPNKnu5xPskQVXuxIGACW0lcXCrwydnw01xsBlJMRiX8UyXtGVlJBsgYuIqcq/rmdSbFUWhrAaH0=
+X-Received: by 2002:a05:6214:4214:b0:6fa:c41e:cc70 with SMTP id
+ 6a1803df08f44-6fac41ed6b7mr1758756d6.22.1748428119770; Wed, 28 May 2025
+ 03:28:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 4/4] perf: arm_pmuv3: Add support for the Branch
- Record Buffer Extension (BRBE)
-To: Will Deacon <will@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Leo Yan <leo.yan@arm.com>,
- linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
- <20250407-arm-brbe-v19-v21-4-ff187ff6c928@kernel.org>
- <20250519150621.GA17177@willie-the-truck>
- <20250519215651.GB2650608-robh@kernel.org>
- <119c9a70-6ea8-46f0-b877-8a433d97ce84@linaro.org>
- <20250527105035.GA26328@willie-the-truck>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <20250527105035.GA26328@willie-the-truck>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250523194722.4066715-1-oliver.upton@linux.dev> <20250523194722.4066715-6-oliver.upton@linux.dev>
+In-Reply-To: <20250523194722.4066715-6-oliver.upton@linux.dev>
+From: Alexander Potapenko <glider@google.com>
+Date: Wed, 28 May 2025 12:28:02 +0200
+X-Gm-Features: AX0GCFuqo7ZNxWaDrV25pmfr_3Q-U8pasM8cRQqGf1TpcbGpNVMOpQtB602UFNg
+Message-ID: <CAG_fn=U37fM9y8iT8XPRWAwa3ygNOPtNaQgFLw9-gDQ_vc+r0g@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: vgic-init: Plug vCPU vs. VGIC creation race
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, May 23, 2025 at 9:47=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> syzkaller has found another ugly race in the VGIC, this time dealing
+> with VGIC creation. Since kvm_vgic_create() doesn't sufficiently protect
+> against in-flight vCPU creations, it is possible to get a vCPU into the
+> kernel w/ an in-kernel VGIC but no allocation of private IRQs:
+>
+>   Unable to handle kernel NULL pointer dereference at virtual address 000=
+0000000000d20
+>   Mem abort info:
+>     ESR =3D 0x0000000096000046
+>     EC =3D 0x25: DABT (current EL), IL =3D 32 bits
+>     SET =3D 0, FnV =3D 0
+>     EA =3D 0, S1PTW =3D 0
+>     FSC =3D 0x06: level 2 translation fault
+>   Data abort info:
+>     ISV =3D 0, ISS =3D 0x00000046, ISS2 =3D 0x00000000
+>     CM =3D 0, WnR =3D 1, TnD =3D 0, TagAccess =3D 0
+>     GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
+>   user pgtable: 4k pages, 48-bit VAs, pgdp=3D0000000103e4f000
+>   [0000000000000d20] pgd=3D0800000102e1c403, p4d=3D0800000102e1c403, pud=
+=3D0800000101146403, pmd=3D0000000000000000
+>   Internal error: Oops: 0000000096000046 [#1] PREEMPT SMP
+>   CPU: 9 UID: 0 PID: 246 Comm: test Not tainted 6.14.0-rc6-00097-g0c90821=
+f5db8 #16
+>   Hardware name: linux,dummy-virt (DT)
+>   pstate: 814020c5 (Nzcv daIF +PAN -UAO -TCO +DIT -SSBS BTYPE=3D--)
+>   pc : _raw_spin_lock_irqsave+0x34/0x8c
+>   lr : kvm_vgic_set_owner+0x54/0xa4
+>   sp : ffff80008086ba20
+>   x29: ffff80008086ba20 x28: ffff0000c19b5640 x27: 0000000000000000
+>   x26: 0000000000000000 x25: ffff0000c4879bd0 x24: 000000000000001e
+>   x23: 0000000000000000 x22: 0000000000000000 x21: ffff0000c487af80
+>   x20: ffff0000c487af18 x19: 0000000000000000 x18: 0000001afadd5a8b
+>   x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000001
+>   x14: ffff0000c19b56c0 x13: 0030c9adf9d9889e x12: ffffc263710e1908
+>   x11: 0000001afb0d74f2 x10: e0966b840b373664 x9 : ec806bf7d6a57cd5
+>   x8 : ffff80008086b980 x7 : 0000000000000001 x6 : 0000000000000001
+>   x5 : 0000000080800054 x4 : 4ec4ec4ec4ec4ec5 x3 : 0000000000000000
+>   x2 : 0000000000000001 x1 : 0000000000000000 x0 : 0000000000000d20
+>   Call trace:
+>    _raw_spin_lock_irqsave+0x34/0x8c (P)
+>    kvm_vgic_set_owner+0x54/0xa4
+>    kvm_timer_enable+0xf4/0x274
+>    kvm_arch_vcpu_run_pid_change+0xe0/0x380
+>    kvm_vcpu_ioctl+0x93c/0x9e0
+>    __arm64_sys_ioctl+0xb4/0xec
+>    invoke_syscall+0x48/0x110
+>    el0_svc_common.constprop.0+0x40/0xe0
+>    do_el0_svc+0x1c/0x28
+>    el0_svc+0x30/0xd0
+>    el0t_64_sync_handler+0x10c/0x138
+>    el0t_64_sync+0x198/0x19c
+>    Code: b9000841 d503201f 52800001 52800022 (88e17c02)
+>    ---[ end trace 0000000000000000 ]---
+>
+> Plug the race by explicitly checking for an in-progress vCPU creation
+> and failing kvm_vgic_create() when that's the case. Add some comments to
+> document all the things kvm_vgic_create() is trying to guard against
+> too.
+>
+> Reported-by: Alexander Potapenko <glider@google.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Tested-by: Alexander Potapenko <glider@google.com>
 
-
-On 27/05/2025 11:50 am, Will Deacon wrote:
-> On Wed, May 21, 2025 at 04:58:42PM +0100, James Clark wrote:
->>
->>
->> On 19/05/2025 10:56 pm, Rob Herring wrote:
->>> On Mon, May 19, 2025 at 04:06:22PM +0100, Will Deacon wrote:
->>>> Hey Rob,
->>>>
->>>> On Mon, Apr 07, 2025 at 12:41:33PM -0500, Rob Herring (Arm) wrote:
->>>>> From: Anshuman Khandual <anshuman.khandual@arm.com>
->>>>>
->>>>> The ARMv9.2 architecture introduces the optional Branch Record Buffer
->>>>> Extension (BRBE), which records information about branches as they are
->>>>> executed into set of branch record registers. BRBE is similar to x86's
->>>>> Last Branch Record (LBR) and PowerPC's Branch History Rolling Buffer
->>>>> (BHRB).
->>>>
->>>> Since you picked this up from v19, the driver has changed considerably
->>>> and I presume you will be continuing to extend it in future as the
->>>> architecture progresses. Perhaps having you listed as Author (and
->>>> crucially, in git blame :p) with Anshuman as a Co-developed-by: would be
->>>> more appropriate?
->>>
->>> Shrug.
->>>
->>>>> ---
->>>>>    drivers/perf/Kconfig         |  11 +
->>>>>    drivers/perf/Makefile        |   1 +
->>>>>    drivers/perf/arm_brbe.c      | 802 +++++++++++++++++++++++++++++++++++++++++++
->>>>>    drivers/perf/arm_brbe.h      |  47 +++
->>>>>    drivers/perf/arm_pmu.c       |  15 +-
->>>>>    drivers/perf/arm_pmuv3.c     | 129 ++++++-
->>>>>    include/linux/perf/arm_pmu.h |   8 +
->>>>>    7 files changed, 1006 insertions(+), 7 deletions(-)
->>>>
->>>> Do you know if James Clark's tests [1] are going to be respun for the
->>>> perf tool? It would be handy to have some way to test this new
->>>> functionality.
->>>
->>> Yes. I dropped them here because I've been told by Arnaldo in the past
->>> to send userspace stuff separately.
->>>
->>
->> That version of the test was out of date so I've pushed the new version
->> here: https://git.linaro.org/plugins/gitiles/people/james.clark/linux.git/+/16e4a18c2d5fc53736f05c9052b1d11d74909707
->>
->> But I'll wait for the driver changes to be finalised before posting it. Or
->> Rob can take it back into the patchset.
-> 
-> Thanks, James. I just wanted to make sure that there was still a plan
-> for upstreaming these separately from the driver. Have you had a chance
-> to run them against this v21?
-> 
-> Will
-
-
-Yes I'll send it once the driver is merged. And yes they're passing 
-against v21, but I'll retest v22 as well.
-
-James
-
+This fixes the problem for me, thank you!
