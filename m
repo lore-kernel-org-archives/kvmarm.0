@@ -1,162 +1,378 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC13230BF9
-	for <kvmarm@lists.linux.dev>; Wed, 28 May 2025 23:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA4B4685
+	for <kvmarm@lists.linux.dev>; Wed, 28 May 2025 23:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748474728; cv=none; b=ZncPYvmcPmayB7LaYePna3cEOzH8+D1x0hrxfJQPHfom55lRepkCmedGLtRG2N8BZg7epozrrBydSce8Y8MeEwoMvm3NGRr6JmbK6WRGSA3nSajOpEIdpKLBHOEiwXgmSYPQZvArIhMVWFhNTB5WedRWEwrr4R0ki93UT9jisTI=
+	t=1748475576; cv=none; b=ma0rFlD9Uvg8XdPsAZLsJgdhXwaxQCjgZQvwT/95UCtveFs3aBA1WntQGQe+GAnLwQxIFp0VwNRx0CTjRyWvadWhOh/RiUdxVYXlVgQFCT5DnzoSTvvZYD9hlJ7+vfUhW73eKdFPIR7H4ptE1FZ32MUOU71TBulPBhnvs2COPro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748474728; c=relaxed/simple;
-	bh=HgABNnq1PWhhK0FklJ/SVzoi8Z+ONJI1riVy8DoPDxc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Gmlm1tTIhCUf4Ex1oAPOybQtIQ/qwSw+AGaeBoEh00qaCblcq/a6/N4aEsyiGnD1UxTkmComn8uOr+X/JG7IstgZYWGg1lqhyiDjjCp2xs4LDNju+DdhNIR4WlAomBJQUoTbzx3bwzlCC8wu9ePVbQsg4PH+p1+614Gtuyu2Fnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EdfuO27R; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1748475576; c=relaxed/simple;
+	bh=k1kQlVJgH6q7dRU5ldvGLOVOwub346WXXiCsMt6agkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X/rvHl8A6JJcuvawpA+KeLgmK+soz+G737zVw4poaY8inbEvbt7sw7yjB+mbsUr/aMP0SNp5HzDAyeLY0v4WFvpR+sJqdV6XCTKMSMZjcgMJJHP1bgv6SMw5aqRwDvfOutw3d2HbakTNr1qOd9b/Wwr6VebVSaZ6UOjNqeQex5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I2OgV/fQ; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EdfuO27R"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7401179b06fso168595b3a.1
-        for <kvmarm@lists.linux.dev>; Wed, 28 May 2025 16:25:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748474725; x=1749079525; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gcxQaHt9YO/4vp8lHIwRWi8ySYcHIjzznVMdx4yu7+k=;
-        b=EdfuO27RGJuFV+GXN4RWni4LL764jHlIXM2bO6zekDJbd18MFo+Q7Ak+CnPE+B8uVc
-         4sFopldUlUdQhY1Rqjobp48jddywu3z9Jths2ByVTHAlXBABH3NyHaTaYnDW1g44jSDX
-         xvCGiohQcnkLr7yLOjrRmun3dxZMbHQI/aJSpQGaln1teCAlTFvJb4WnliT++x45DD2j
-         tBPjcajMS7wKxqzJKzso6FqjUHeSgkSLqhzR4dTspFFoo2iS7OHb0QFjHqDhcm+dhyLO
-         pP1cG8GfHW4ogOMsWtz+3BpulZDTcCgUIJNmWueTK1cGzxPIWK8VxByK/eEkc5/HaffQ
-         2biA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748474725; x=1749079525;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gcxQaHt9YO/4vp8lHIwRWi8ySYcHIjzznVMdx4yu7+k=;
-        b=HcJI0gNCuvlii6AOdZa01wFOmcHmFgLmkMCJbL1nvSFCOeHmhJBAv0E5GbNi7eF17v
-         FUAV/b6DQUWU/y7NCO8yDLU+/hqUvPaWgHMnD+aKZ2714zkD3AFgCv3p5jTM0lNGIKlw
-         CVtBktyHoC71nH9VZ7HVaq1wQhZeIPxq2rw0ifXcsbL7zWcskIzQg4vd/EzjaQxn0wv3
-         qc8nYtAyoqTa60fHu4DOvBcWlv6x+hNmEYVmP2X2y3On31UBikIRsxjR8ldXKMSkpex8
-         dIb64gHKH1VZM47m9I2WdHdcMb9aL3Q17Vy5wIy7f6QQ/DJbS3bGu6xbK0dXSYrIRpTr
-         mLKg==
-X-Forwarded-Encrypted: i=1; AJvYcCX74haxxzhhfddWOsQ8ymsiXnEquv8e41dAMmsJhdOracLFbGTl4kvnqTYLEDN0Y+94MAJEeNQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyq4APdWyVvc2h+H/uZS8E3/4ghZ0CAOSaf646WbrCHTQmUSs7N
-	4DHIx/4d9MQnzPBdjNgn+ZU7Qx72dWZbEm3jkO36X8HsCrhHgLUtSN45Q9zHnlIY7UE24Ubk2vK
-	sEhDh6g==
-X-Google-Smtp-Source: AGHT+IErw9co+DcBT121540SfwKH6gZVIzfkdn9B2d2kwxMAwaFIuqhkwNuL6Huhgc39bFpmxXdGbf8i9Ig=
-X-Received: from pgdu5.prod.google.com ([2002:a05:6a02:2f45:b0:b2e:c392:14f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:699:b0:218:cdcf:106b
- with SMTP id adf61e73a8af0-21aad7827femr6695431637.9.1748474725210; Wed, 28
- May 2025 16:25:25 -0700 (PDT)
-Date: Wed, 28 May 2025 16:25:24 -0700
-In-Reply-To: <20250528201756.36271-1-jthoughton@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I2OgV/fQ"
+Date: Thu, 29 May 2025 08:39:20 +0900
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748475570;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R63PwFVA/9d9S96TV3kYiTBL2lE7Bke5AfXlMMFR5tY=;
+	b=I2OgV/fQdg913ekiXwixAf04eNpxY8BlshIyqFM1w2ABnm+F/Izd3iFHlm2e+SWYLrMDjF
+	3uUwaGtpH+Hj4HkrwnlBGeZLShKA9dZ32lkM9zHO3NzMrAYWXj2s6l9zZA++9QYp5w2EkA
+	1aH0q3KS3kX06nxIckn0hSai3npoqm0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com,
+	darren@os.amperecomputing.com
+Subject: Re: [PATCH RFC v2 1/9] KVM: arm64: nv: selftests: Add support to run
+ guest code in vEL2.
+Message-ID: <aDeeqMQ3JvAayTJF@vm4>
+References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
+ <20250512105251.577874-2-gankulkarni@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <aDdILHOu9g-m5hSm@google.com> <20250528201756.36271-1-jthoughton@google.com>
-Message-ID: <aDebZD1Kmmg15zs7@google.com>
-Subject: Re: [PATCH v2 06/13] KVM: arm64: Add support for KVM_MEM_USERFAULT
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: amoorthy@google.com, corbet@lwn.net, dmatlack@google.com, 
-	kalyazin@amazon.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	pbonzini@redhat.com, peterx@redhat.com, pgonda@google.com, 
-	wei.w.wang@intel.com, yan.y.zhao@intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250512105251.577874-2-gankulkarni@os.amperecomputing.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 28, 2025, James Houghton wrote:
-> On Wed, May 28, 2025 at 1:30=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index c5d21bcfa3ed4..f1db3f7742b28 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2127,15 +2131,23 @@ void kvm_arch_commit_memory_region(struct kvm *kv=
-m,
->  				   const struct kvm_memory_slot *new,
->  				   enum kvm_mr_change change)
->  {
-> -	bool log_dirty_pages =3D new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
-> +	u32 old_flags =3D old ? old->flags : 0;
-> +	u32 new_flags =3D new ? new->flags : 0;
+Hi Ganapatrao
+On Mon, May 12, 2025 at 03:52:43AM -0700, Ganapatrao Kulkarni wrote:
+> This patch adds required changes to vcpu init to run a guest code
+> in vEL2 context and also adds NV specific helper functions.
+> 
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+
+I'm interested in testing this, but is this series against kvmarm? which
+branch I can cleanly do git am?
+
+Thanks,
+Itaru.
+
+> ---
+>  tools/testing/selftests/kvm/Makefile.kvm      |  2 +
+>  .../kvm/include/arm64/kvm_util_arch.h         |  3 +
+>  .../selftests/kvm/include/arm64/nv_util.h     | 45 ++++++++++++++
+>  .../selftests/kvm/include/arm64/vgic.h        |  1 +
+>  .../testing/selftests/kvm/include/kvm_util.h  |  3 +
+>  tools/testing/selftests/kvm/lib/arm64/nv.c    | 46 ++++++++++++++
+>  .../selftests/kvm/lib/arm64/processor.c       | 61 ++++++++++++++-----
+>  tools/testing/selftests/kvm/lib/arm64/vgic.c  |  8 +++
+>  8 files changed, 155 insertions(+), 14 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/arm64/nv_util.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nv.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index f773f8f99249..3348f729d3b2 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -37,6 +37,7 @@ LIBKVM_arm64 += lib/arm64/processor.c
+>  LIBKVM_arm64 += lib/arm64/spinlock.c
+>  LIBKVM_arm64 += lib/arm64/ucall.c
+>  LIBKVM_arm64 += lib/arm64/vgic.c
+> +LIBKVM_arm64 += lib/arm64/nv.c
+>  
+>  LIBKVM_s390 += lib/s390/diag318_test_handler.c
+>  LIBKVM_s390 += lib/s390/processor.c
+> @@ -155,6 +156,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+>  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+>  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+>  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
+> +TEST_GEN_PROGS_arm64 += arm64/nv_guest_hypervisor
+>  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+>  TEST_GEN_PROGS_arm64 += arch_timer
+>  TEST_GEN_PROGS_arm64 += coalesced_io_test
+> diff --git a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+> index e43a57d99b56..ab5279c24413 100644
+> --- a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+> +++ b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+> @@ -2,6 +2,9 @@
+>  #ifndef SELFTEST_KVM_UTIL_ARCH_H
+>  #define SELFTEST_KVM_UTIL_ARCH_H
+>  
+> +#define CurrentEL_EL1		(1 << 2)
+> +#define CurrentEL_EL2		(2 << 2)
+> +
+>  struct kvm_vm_arch {};
+>  
+>  #endif  // SELFTEST_KVM_UTIL_ARCH_H
+> diff --git a/tools/testing/selftests/kvm/include/arm64/nv_util.h b/tools/testing/selftests/kvm/include/arm64/nv_util.h
+> new file mode 100644
+> index 000000000000..622a17c9d142
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/arm64/nv_util.h
+> @@ -0,0 +1,45 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (c) 2025 Ampere Computing
+> + */
+> +#ifndef SELFTEST_NV_UTIL_H
+> +#define SELFTEST_NV_UTIL_H
+> +
+> +#include <linux/bitmap.h>
+> +#include <vgic.h>
+> +
+> +#define HCR_NV2		(UL(1) << 45)
+> +#define HCR_AT		(UL(1) << 44)
+> +#define HCR_NV		(UL(1) << 42)
+> +#define HCR_E2H		(UL(1) << 34)
+> +#define HCR_TTLB        (UL(1) << 25)
+> +
+> +/* Enable NV2 and guest in VHE mode */
+> +#define HCR_EL2_NV_EANBLE (HCR_E2H | HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB)
+> +
+> +struct kvm_vm *nv_vm_create_with_vcpus_gic(uint32_t nr_vcpus,
+> +		struct kvm_vcpu **vcpus, int *gic_fd, void *guest_code);
+> +
+> +struct kvm_vm *__nv_vm_create_with_vcpus_gic(struct vm_shape shape,
+> +		uint32_t nr_vcpus, struct kvm_vcpu **vcpus,
+> +		uint64_t extra_mem_pages, int *gic_fd, void *guest_code);
+> +
+> +/* NV helpers */
+> +static inline void init_vcpu_nested(struct kvm_vcpu_init *init)
+> +{
+> +	init->features[0] |= (1 << KVM_ARM_VCPU_HAS_EL2);
+> +}
+> +
+> +static inline bool kvm_arm_vcpu_has_el2(struct kvm_vcpu_init *init)
+> +{
+> +	unsigned long features = init->features[0];
+> +
+> +	return test_bit(KVM_ARM_VCPU_HAS_EL2, &features);
+> +}
+> +
+> +static inline bool is_vcpu_nested(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->nested;
+> +}
+> +
+> +#endif /* SELFTEST_NV_UTIL_H */
+> diff --git a/tools/testing/selftests/kvm/include/arm64/vgic.h b/tools/testing/selftests/kvm/include/arm64/vgic.h
+> index c481d0c00a5d..46142fa36199 100644
+> --- a/tools/testing/selftests/kvm/include/arm64/vgic.h
+> +++ b/tools/testing/selftests/kvm/include/arm64/vgic.h
+> @@ -17,6 +17,7 @@
+>  	index)
+>  
+>  int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs);
+> +void vgic_v3_close(int gic_fd);
+>  
+>  #define VGIC_MAX_RESERVED	1023
+>  
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 373912464fb4..9b26b9124dc3 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -65,6 +65,9 @@ struct kvm_vcpu {
+>  	struct kvm_dirty_gfn *dirty_gfns;
+>  	uint32_t fetch_index;
+>  	uint32_t dirty_gfns_count;
+> +#ifdef __aarch64__
+> +	bool nested;
+> +#endif
+>  };
+>  
+>  struct userspace_mem_regions {
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/nv.c b/tools/testing/selftests/kvm/lib/arm64/nv.c
+> new file mode 100644
+> index 000000000000..e930808a7ed4
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/arm64/nv.c
+> @@ -0,0 +1,46 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2025 Ampere Computing LLC
+> + */
+> +
+> +#include <linux/compiler.h>
+> +#include <assert.h>
+> +
+> +#include "guest_modes.h"
+> +#include "kvm_util.h"
+> +#include "nv_util.h"
+> +#include "processor.h"
+> +
+> +struct kvm_vm *__nv_vm_create_with_vcpus_gic(struct vm_shape shape, uint32_t nr_vcpus,
+> +		struct kvm_vcpu **vcpus, uint64_t extra_mem_pages, int *gic_fd, void *guest_code)
+> +{
+> +	struct kvm_vcpu_init init;
+> +	struct kvm_vm *vm;
+> +	int i;
+> +
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_EL2));
+> +
+> +	vm = __vm_create(shape, nr_vcpus, extra_mem_pages);
+> +	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	init_vcpu_nested(&init);
+> +
+> +	for (i = 0; i < nr_vcpus; ++i) {
+> +		vcpus[i] = aarch64_vcpu_add(vm, i, &init, guest_code);
+> +		__TEST_REQUIRE(is_vcpu_nested(vcpus[i]), "Failed to Enable NV");
+> +	}
+> +
+> +	/* vgic is not created, If gic_fd argument is NULL */
+> +	if (gic_fd) {
+> +		*gic_fd = vgic_v3_setup(vm, nr_vcpus, 64);
+> +		__TEST_REQUIRE(*gic_fd >= 0, "Failed to create vgic-v3");
+> +	}
+> +
+> +	return vm;
+> +}
+> +
+> +struct kvm_vm *nv_vm_create_with_vcpus_gic(uint32_t nr_vcpus,
+> +		struct kvm_vcpu **vcpus, int *gic_fd, void *guest_code)
+> +{
+> +	return __nv_vm_create_with_vcpus_gic(VM_SHAPE_DEFAULT,
+> +				nr_vcpus, vcpus, 0, gic_fd, guest_code);
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> index 7ba3aa3755f3..6e759981bf9e 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> @@ -10,6 +10,7 @@
+>  
+>  #include "guest_modes.h"
+>  #include "kvm_util.h"
+> +#include "nv_util.h"
+>  #include "processor.h"
+>  #include "ucall_common.h"
+>  
+> @@ -258,14 +259,49 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+>  	}
+>  }
+>  
+> +static void aarch64_vcpu_set_reg(struct kvm_vcpu *vcpu, uint64_t sctlr_el1,
+> +			uint64_t tcr_el1, uint64_t ttbr0_el1)
+> +{
+> +	uint64_t fpen;
 > +
 > +	/*
-> +	 * If only changing flags, nothing to do if not toggling
-> +	 * dirty logging.
+> +	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
+> +	 * registers, which the variable argument list macros do.
 > +	 */
-> +	if (change =3D=3D KVM_MR_FLAGS_ONLY &&
-> +	    !((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES))
-> +		return;
-> =20
->  	/*
->  	 * At this point memslot has been committed and there is an
->  	 * allocated dirty_bitmap[], dirty pages will be tracked while the
->  	 * memory slot is write protected.
->  	 */
-> -	if (log_dirty_pages) {
+> +	fpen = 3 << 20;
+> +
+> +	if (is_vcpu_nested(vcpu)) {
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPTR_EL2), fpen);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL2), sctlr_el1);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL2), tcr_el1);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL2), DEFAULT_MAIR_EL1);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL2), ttbr0_el1);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), HCR_EL2_NV_EANBLE);
+> +	} else {
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPACR_EL1), fpen);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), ttbr0_el1);
+> +
+> +	}
+> +
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpu->id);
+> +}
+> +
+>  void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+>  {
+>  	struct kvm_vcpu_init default_init = { .target = -1, };
+>  	struct kvm_vm *vm = vcpu->vm;
+>  	uint64_t sctlr_el1, tcr_el1, ttbr0_el1;
+>  
+> -	if (!init)
+> +	if (!init) {
+>  		init = &default_init;
+> +	} else {
+> +		/* Is this vcpu a Guest-Hypersior */
+> +		if (kvm_arm_vcpu_has_el2(init))
+> +			vcpu->nested = true;
+> +	}
+>  
+>  	if (init->target == -1) {
+>  		struct kvm_vcpu_init preferred;
+> @@ -275,12 +311,6 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+>  
+>  	vcpu_ioctl(vcpu, KVM_ARM_VCPU_INIT, init);
+>  
+> -	/*
+> -	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
+> -	 * registers, which the variable argument list macros do.
+> -	 */
+> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPACR_EL1), 3 << 20);
 > -
-> +	if (new_flags & KVM_MEM_LOG_DIRTY_PAGES) {
->  		if (change =3D=3D KVM_MR_DELETE)
->  			return;
-> =20
->=20
-> So we need to bail out early if we are enabling KVM_MEM_USERFAULT but
-> KVM_MEM_LOG_DIRTY_PAGES is already enabled, otherwise we'll be
-> write-protecting a bunch of PTEs that we don't need or want to WP.
->=20
-> When *disabling* KVM_MEM_USERFAULT, we definitely don't want to WP
-> things, as we aren't going to get the unmap afterwards anyway.
->=20
-> So the check we started with handles this:
-> > > > > + =C2=A0 =C2=A0 =C2=A0 u32 old_flags =3D old ? old->flags : 0;
-> > > > > + =C2=A0 =C2=A0 =C2=A0 u32 new_flags =3D new ? new->flags : 0;
-> > > > > +
-> > > > > + =C2=A0 =C2=A0 =C2=A0 /* Nothing to do if not toggling dirty log=
-ging. */
-> > > > > + =C2=A0 =C2=A0 =C2=A0 if (!((old_flags ^ new_flags) & KVM_MEM_LO=
-G_DIRTY_PAGES))
-> > > > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
->=20
-> So why also check for `change =3D=3D KVM_MR_FLAGS_ONLY` as well? Everythi=
-ng I just
-> said doesn't really apply when the memslot is being created, moved, or
-> destroyed. Otherwise, consider the case where we never enable dirty loggi=
-ng:
->=20
->  - Memslot deletion would be totally broken; we'll see that
->    KVM_MEM_LOG_DIRTY_PAGES is not getting toggled and then bail out, skip=
-ping
->    some freeing.
-
-No, because @new and thus new_flags will be 0.  If dirty logging wasn't ena=
-bled,
-then there's nothing to be done.
-
->  - Memslot creation would be broken in a similar way; we'll skip a bunch =
-of
->    setup work.
-
-No, because @old and thus old_flags will be 0.  If dirty logging isn't bein=
-g
-enabled, then there's nothing to be done.
-
->  - For memslot moving, the only case that we could possibly be leaving
->    KVM_MEM_LOG_DIRTY_PAGES set without the change being KVM_MR_FLAGS_ONLY=
-,
->    I think we still need to do the split and WP stuff.
-
-No, because KVM invokes kvm_arch_flush_shadow_memslot() on the memslot and =
-marks
-it invalid prior to installing the new, moved memslot.  See kvm_invalidate_=
-memslot().
-
-So I'm still not seeing what's buggy.
+>  	sctlr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1));
+>  	tcr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1));
+>  
+> @@ -349,11 +379,7 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+>  	if (use_lpa2_pte_format(vm))
+>  		tcr_el1 |= (1ul << 59) /* DS */;
+>  
+> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
+> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
+> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
+> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), ttbr0_el1);
+> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpu->id);
+> +	aarch64_vcpu_set_reg(vcpu, sctlr_el1, tcr_el1, ttbr0_el1);
+>  }
+>  
+>  void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
+> @@ -387,7 +413,11 @@ static struct kvm_vcpu *__aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+>  
+>  	aarch64_vcpu_setup(vcpu, init);
+>  
+> -	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
+> +	if (is_vcpu_nested(vcpu))
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SP_EL2), stack_vaddr + stack_size);
+> +	else
+> +		vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
+> +
+>  	return vcpu;
+>  }
+>  
+> @@ -457,7 +487,10 @@ void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
+>  {
+>  	extern char vectors;
+>  
+> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
+> +	if (is_vcpu_nested(vcpu))
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL2), (uint64_t)&vectors);
+> +	else
+> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
+>  }
+>  
+>  void route_exception(struct ex_regs *regs, int vector)
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/vgic.c b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+> index 4427f43f73ea..67822b803d0f 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/vgic.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+> @@ -79,6 +79,14 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
+>  	return gic_fd;
+>  }
+>  
+> +void  vgic_v3_close(int gic_fd)
+> +{
+> +	if (gic_fd < 0)
+> +		return;
+> +
+> +	close(gic_fd);
+> +}
+> +
+>  /* should only work for level sensitive interrupts */
+>  int _kvm_irq_set_level_info(int gic_fd, uint32_t intid, int level)
+>  {
+> 
+> -- 
+> 2.48.1
+> 
