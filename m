@@ -1,86 +1,130 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF82214A69
-	for <kvmarm@lists.linux.dev>; Wed, 28 May 2025 16:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599F41922C0
+	for <kvmarm@lists.linux.dev>; Wed, 28 May 2025 17:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748448560; cv=none; b=tchcmLfnlgpmHPWJy0aK6qhO4hh4S89euPjpN59rhUi4NYtyL/ZWxIE1Mh3TAlxUac+V25SQfeNQh1TGcjwH8lySbaJvJ3cBtK/3pThHfKi8uNdSCZyZ+3g/+NlCi5ZUzPZOU+AL03miVFbrR3dKpBpFNrqFO9ZNc1dGsEbj4yU=
+	t=1748453423; cv=none; b=WNEauqgLsibYOoISzZK+h/AoprLp2S/7biHRN7j8zsECY9qe3ae52/n+sGBm1RCtNnVSEM1fDKlLO/7C0YDgTf41pKt+oHruQ+xtLXwo3pWkt5ZrNYoI8XB/q9XphqxR84nyVf9JRsAgiBrC3tr4LGlU0HTFl0edLSNMOwlet/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748448560; c=relaxed/simple;
-	bh=O2qtelB4US+cJIhzPme3LIw1Jt2jPMgLescTbOZA/UE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jT+NIGTPkbdbfNCpJMihc7xENwkERpzYdQDPBX3PF/o9RTFa7cV0YCs/nidGtl4Cf7T8fhmHUl1Nsi3Ue5Bsk87TTuW8TJ/O5DsfKAc4pVe1vto6Iil6kq2bVXGUYIEKNe5f/p+SSm2fVZ+YCGCqb2UnuhxPsAD1X8jd/LmZiSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1FEFF1A2D;
-	Wed, 28 May 2025 09:09:01 -0700 (PDT)
-Received: from [10.57.48.160] (unknown [10.57.48.160])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7C4D93F673;
-	Wed, 28 May 2025 09:09:14 -0700 (PDT)
-Message-ID: <4f5c956e-19e7-4df0-b1f2-d8750c0af4d7@arm.com>
-Date: Wed, 28 May 2025 17:09:12 +0100
+	s=arc-20240116; t=1748453423; c=relaxed/simple;
+	bh=ARY8CwNgeEkx4xeewofft7OOZG05/4+sLW6rStZljR4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=A5ZHhtISNk/GQx41+vK7hFQgFqr4takWWqrbG1u9d8gdJou7nDv/o1SjT3vwRiSy86GzI1H53utho89mvrfyF7xvpReuCuGr0CSbGWsFTz+PSZ5JdSpNJJPkAZEPLmzGdkUo3D01mcVQna85PsNW+L95ZbjrONFP+kbS6m4EMdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=awzwTCDp; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="awzwTCDp"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3108d54d423so893993a91.1
+        for <kvmarm@lists.linux.dev>; Wed, 28 May 2025 10:30:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748453421; x=1749058221; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X5lk3aR+RzRKEkMTxOWzVHzMD+THYlxrp/Tixh3xiWc=;
+        b=awzwTCDpBWfRbf1I9fDQOmlagontk20xcgfharoDYpZZrbRU+upy/a/jgsqmShwyQK
+         0YgPHMeeIE09P82NzPtK6+g8jx3h3a1/3T/N+uEG2eLTNHwCxYFw//iSjWKGist7yUU1
+         r0WU5xHKa/R9tnlaDcW3jpXhf/v0xVN6bUFFDiTC4+W1VDbvOU4W2we5s6PYcTaUs6G7
+         P5CzUBSgDaOrLs99nZrrxcoXoY7mGc7zzR1Jw3YXS44l1dLGQT9PY3id1lfIrVnr4gx8
+         gt1+Ub1Af934opxEwb772Xcv6ku3LtOonWJ8eF1iKuw9PvyKAzq15Ws4MRCZ9EtyaKpd
+         Ar4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748453421; x=1749058221;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=X5lk3aR+RzRKEkMTxOWzVHzMD+THYlxrp/Tixh3xiWc=;
+        b=j+yzxGwcNx1cq2QTVNDx+hIDPOxWoeH2uGwslwFtCEY2oZ+6Z863KqqBidmH5Vq9z0
+         yCGVPnXl/M+DM7C1P/IQPyFClYZJ9GIxetj7c8NyHUI7QB7Yt16l/DZ5Ay6AUysDRwsU
+         oQquHr5bMUK3iUf4OgYeWy3cohp8i/YcSepvPGcAnwCNZdTcQOCD/DtVcKFf3bzyOtVu
+         gVviqQlfpNKZFiUCnb1yv7tFuUk8QM+iT8/cwbJ7RuclkFhWYXCqmnGkb675iIGdBsBx
+         kBKMkizxkjWZHtzWti3ZQiY+2I6juVUqBEt6phOqPGZbxhwbbKtDnpgLYTuzHcsuaMWJ
+         lTtw==
+X-Forwarded-Encrypted: i=1; AJvYcCXErAYyTSQdS3hnHlDMHonDl9GhtXMqQMEJOfzepsTT2Lbz2RH6E1kNZfk9rOKJPSYxAVH5aAI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxo44YJfF1kWgrVnlOeRuOkQV1JVy17u8BqAMFgCbuOm4SRb6U6
+	TxMsQznOL5XjtWtYBFws3KQEwCqvnqDf6RPWkkm76zSrKmp+cgWLe58HZQFwBgeGwgQ2CllW9LJ
+	eT/RMCg==
+X-Google-Smtp-Source: AGHT+IEsnEf7VuMExZRw8wVJdfyr2XCnHx5H/B/LOCvx+d5raumWeIsp3ExyZi0ZxIt7xWBlYTiCNvkn+ag=
+X-Received: from pjbpx18.prod.google.com ([2002:a17:90b:2712:b0:311:8076:14f1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3848:b0:311:be43:f09a
+ with SMTP id 98e67ed59e1d1-31214e6e01dmr517950a91.9.1748453421388; Wed, 28
+ May 2025 10:30:21 -0700 (PDT)
+Date: Wed, 28 May 2025 10:30:20 -0700
+In-Reply-To: <CADrL8HXS7zvJZjOxTxPKH0dAGoMXnFrrxCW7J7CXRtaeV6izjQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 3/4] KVM: arm64: nvhe: Disable branch generation in
- nVHE guests
-Content-Language: en-GB
-To: "Rob Herring (Arm)" <robh@kernel.org>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- James Clark <james.clark@linaro.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Leo Yan <leo.yan@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org>
- <20250407-arm-brbe-v19-v21-3-ff187ff6c928@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250407-arm-brbe-v19-v21-3-ff187ff6c928@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250109204929.1106563-1-jthoughton@google.com>
+ <20250109204929.1106563-7-jthoughton@google.com> <aBqkINKO9PUAzZeS@google.com>
+ <CADrL8HXDDRC6Ey5HYWvtzQzjcM2RNX7c7ngGyjUsD3WiBF3VYA@mail.gmail.com> <CADrL8HXS7zvJZjOxTxPKH0dAGoMXnFrrxCW7J7CXRtaeV6izjQ@mail.gmail.com>
+Message-ID: <aDdILHOu9g-m5hSm@google.com>
+Subject: Re: [PATCH v2 06/13] KVM: arm64: Add support for KVM_MEM_USERFAULT
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
+	Nikita Kalyazin <kalyazin@amazon.com>, Anish Moorthy <amoorthy@google.com>, 
+	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
+	David Matlack <dmatlack@google.com>, wei.w.wang@intel.com, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 07/04/2025 18:41, Rob Herring (Arm) wrote:
-> From: Anshuman Khandual <anshuman.khandual@arm.com>
-> 
-> While BRBE can record branches within guests, the host recording
-> branches in guests is not supported by perf (though events are).
-> Support for BRBE in guests will supported by providing direct access
-> to BRBE within the guests. That is how x86 LBR works for guests.
-> Therefore, BRBE needs to be disabled on guest entry and restored on
-> exit.
-> 
-> For nVHE, this requires explicit handling for guests. Before
-> entering a guest, save the BRBE state and disable the it. When
-> returning to the host, restore the state.
-> 
-> For VHE, it is not necessary. We initialize
-> BRBCR_EL1.{E1BRE,E0BRE}=={0,0} at boot time, and HCR_EL2.TGE==1 while
-> running in the host. We configure BRBCR_EL2.{E2BRE,E0HBRE} to enable
-> branch recording in the host. When entering the guest, we set
-> HCR_EL2.TGE==0 which means BRBCR_EL1 is used instead of BRBCR_EL2.
-> Consequently for VHE, BRBE recording is disabled at EL1 and EL0 when
-> running a guest.
-> 
-> Should recording in guests (by the host) ever be desired, the perf ABI
-> will need to be extended to distinguish guest addresses (struct
-> perf_branch_entry.priv) for starters. BRBE records would also need to be
-> invalidated on guest entry/exit as guest/host EL1 and EL0 records can't
-> be distinguished.
-> 
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Co-developed-by: Rob Herring (Arm) <robh@kernel.org>
-> Tested-by: James Clark <james.clark@linaro.org>
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+On Wed, May 28, 2025, James Houghton wrote:
+> On Wed, May 28, 2025 at 11:09=E2=80=AFAM James Houghton <jthoughton@googl=
+e.com> wrote:
+> >
+> > On Tue, May 6, 2025 at 8:06=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > >
+> > > On Thu, Jan 09, 2025, James Houghton wrote:
+> > > > @@ -2073,6 +2080,23 @@ void kvm_arch_commit_memory_region(struct kv=
+m *kvm,
+> > > >                                  enum kvm_mr_change change)
+> > > >  {
+> > > >       bool log_dirty_pages =3D new && new->flags & KVM_MEM_LOG_DIRT=
+Y_PAGES;
+> > > > +     u32 new_flags =3D new ? new->flags : 0;
+> > > > +     u32 changed_flags =3D (new_flags) ^ (old ? old->flags : 0);
+> > >
+> > > This is a bit hard to read, and there's only one use of log_dirty_pag=
+es.  With
+> > > zapping handled in common KVM, just do:
+> >
+> > Thanks, Sean. Yeah what you have below looks a lot better, thanks for
+> > applying it for me. I'll post a new version soon. One note below.
+> >
+> > >
+> > > @@ -2127,14 +2131,19 @@ void kvm_arch_commit_memory_region(struct kvm=
+ *kvm,
+> > >                                    const struct kvm_memory_slot *new,
+> > >                                    enum kvm_mr_change change)
+> > >  {
+> > > -       bool log_dirty_pages =3D new && new->flags & KVM_MEM_LOG_DIRT=
+Y_PAGES;
+> > > +       u32 old_flags =3D old ? old->flags : 0;
+> > > +       u32 new_flags =3D new ? new->flags : 0;
+> > > +
+> > > +       /* Nothing to do if not toggling dirty logging. */
+> > > +       if (!((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES))
+> > > +               return;
+> >
+> > This is my bug, not yours, but I think this condition must also check
+> > that `change =3D=3D KVM_MR_FLAGS_ONLY` for it to be correct. This, for
+> > example, will break the case where we are deleting a memslot that
+> > still has KVM_MEM_LOG_DIRTY_PAGES enabled. Will fix in the next
+> > version.
+>=20
+> Ah it wouldn't break that example, as `new` would be NULL. But I think
+> it would break the case where we are moving a memslot that keeps
+> `KVM_MEM_LOG_DIRTY_PAGES`.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-
+Can you elaborate?  Maybe with the full snippet of the final code that's br=
+oken.
+I'm not entirely following what's path you're referring to.
