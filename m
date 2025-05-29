@@ -1,204 +1,114 @@
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D216E22AE59
-	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 16:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 258F5221FCB
+	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 16:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748535467; cv=none; b=cGFhoWfntVGNwE5ICogoVkscRdlT1xB5KcxuZFCUw83fK1bbdU+eFWdaaTSosxYTUix31gvAT5Ds55+N7hR7HmiWyI4Wzpc6Kro/rme9gCH3/4ludQAhDdgvn4V4ijmBGDgNUST9CHyQa47WZvjYiqrSzTrrRn65SdSoBYrUtZY=
+	t=1748535924; cv=none; b=uV2lXwL+b62o0Q4SXpIVfmKfIH4Yt18fVBdM4kyqHBuSHmyEpOgPyO6JFeXs3jZqPkxPlIfjxBv8Aqq9RfDoLFMFMsLIDWVN6Zto7k3hUdQ15itbjWahOfQ3h5gQFfMfzYS/bbfvWJAE4zM61PPk+B628cf3258u21oNFWWcZoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748535467; c=relaxed/simple;
-	bh=qdz6hBl1zKNtjJs9q/5z5I8Zm2mnRaEEneEX4tmGMvo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B4ZdelE86CFQc7a3dW4vAW76ZcWt9P8icDk4jCNKn2Wb+rRMO145Xi2baKHlKLQd/zbGtafTr64iFWYCE9TSMvGJbKxVNahl3J0vEXm1RsXn2McRxnzojjW2QnlNcp+CgfWW0zWrORz118TonQCjY9kYVRhCY7cvEy6N/kAMBYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BezERGbh; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BezERGbh"
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e731a56e111so992268276.1
-        for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 09:17:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748535465; x=1749140265; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nFXz1a5AzZ0BGVhwiRYx2U+xdcfYzrs9yjeyMb/mIK4=;
-        b=BezERGbhwOnrybstoDgLTEE5+RWVc5+WiSDotNYLyDPwve6lth2ijg2xEUutXH4sIy
-         caLyM5+vaRPG7zptriPnmTxA5rL9XwWsZRFcqZLH2jHgyk+xlVeTfkAg3guc3VriUDao
-         NVKxkc05mzLQCE/XvXwbj8lduMu0X2nArxwTbC/eAuzt48xkT2gkhbBzTQBRTlurMUQh
-         qZKklHA36XBMDevjfBCAeS36PAuK4qKEDdAZTNIOuOnAfIM4+uXpK3qCBpaw5BICXAIt
-         JrT3X+qL+zyy5yFs+r0Xx1QnOLgHZGkQVW4/yl/rka696/fsEYf5NZw097Ba11Z3Bfzm
-         jTSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748535465; x=1749140265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nFXz1a5AzZ0BGVhwiRYx2U+xdcfYzrs9yjeyMb/mIK4=;
-        b=dahw50rh66n+MJLFy973IfgMmPDlscOJmL6azZsEwTHWNMB+lytgMkgbUq8XbXgKxu
-         xL/MvGXLMUB5b0adwR++9BR0fQb1bG2lQZjRMkQG3bMVYgbGn9THvSHQVQWMT2ZscXMW
-         CNWf+3DX+yBlthI4RSEvJonj1fAaT6ABncaMMBkn+u4KCfFalM8TdS9pkWqndMJ/n7zZ
-         IG91TgVb5wwS9evSO7u1bkiePRatN1+Hq1AsWJmZDnUKqPkrHLAczJREPQhBrTFINwbp
-         IFaMmtKudD3t4Rdh608+1cgEkjorEEK5IgarDOwyl1hVxRFBN6CMeGknlwCPNAPpNSmf
-         1pgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtZBebqKawQqzJnKXgT8Xts9fLavwdcZ982b9h8QUJ2P05Nrbif1hOStH4fcim98/jzkhl0Ik=@lists.linux.dev
-X-Gm-Message-State: AOJu0YztqJQG/gxl3yPcAh+YC42vH3Vyem1AA4+UL5p9I9RrIjn145t6
-	rUNx4gzf8xnh519UorzxaiHtqZD/oDCs3JgX8hpnUd9JZwvPNczam7NEYjLfgAFndKoo0uKSmIG
-	/ck7c0W313flNRy9GFSBJdgvhc2aXdJGbIKmFw0f6
-X-Gm-Gg: ASbGncsbnjiBcvJ8dvPR6SaoWLskRpLSksjHDrRZYiwehCXzECtVnUJhh/+NxYsGk6z
-	Xg/WNfsPLCjOrC1K4yjRLk31gCEvM2hiJW3KbvdVdKo3I9iAg9vS/USAGizHsFOhekp/AU3RsyJ
-	LXU4wInFp2X9SnWSsnfEAchODLy7vpV90XtfnjXmNPnDVeOLXaQjEvIvFo0Ya3IAQ8jFeUGkBgp
-	IO1Cw==
-X-Google-Smtp-Source: AGHT+IF2r9KlCyWj26WmElOEW91mfbdAeVcd/eA82K9ZIcXgbLmgmEn0mrSZRnVH71gS/1JkigbmLcuptMyfDe0ic3c=
-X-Received: by 2002:a05:6902:2b10:b0:e7a:b37b:725e with SMTP id
- 3f1490d57ef6-e7f81e54c0bmr349501276.24.1748535464377; Thu, 29 May 2025
- 09:17:44 -0700 (PDT)
+	s=arc-20240116; t=1748535924; c=relaxed/simple;
+	bh=YyLoKZsWKbWRvLPGsT8AtP4lKJfTA3IbeNNRo7uXUY4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NI6dXJDgKq2tNP4/d/YcM6UhjrkiAflgahEb6cKADKf/SFkHnFb8IYvFT+8Lbky6crvVpYY/flJDpht5b+RQ7MZ/V3F1OdDgrimNRwQZiz8zRk4F3MUlPtLNPRq5/lLeQJcoBMMb2nOGyyfp4xE4lefGxeO1a6ORwxSCQ1HViGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED9E2176A;
+	Thu, 29 May 2025 09:25:04 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.52])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 85B843F673;
+	Thu, 29 May 2025 09:25:18 -0700 (PDT)
+Date: Thu, 29 May 2025 17:25:13 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@linaro.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Leo Yan <leo.yan@arm.com>, linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v22 2/5] arm64: el2_setup.h: Make __init_el2_fgt labels
+ consistent, again
+Message-ID: <aDiBuC2JjAUNDq29@e133380.arm.com>
+References: <20250520-arm-brbe-v19-v22-0-c1ddde38e7f8@kernel.org>
+ <20250520-arm-brbe-v19-v22-2-c1ddde38e7f8@kernel.org>
+ <aC9NhvYzajduVm7y@e133380.arm.com>
+ <CAL_JsqKWY7rRGTbHXTmm4RC9F8fqrs133=75XFkVdm91bLHfaw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250109204929.1106563-1-jthoughton@google.com>
- <aBqlkz1bqhu-9toV@google.com> <CADrL8HXjLjVyFiFee9Q58TQ9zBfXiO+VG=25Rw4UD+fbDmxQFg@mail.gmail.com>
- <aDh9GtncjlVvvVJ1@google.com>
-In-Reply-To: <aDh9GtncjlVvvVJ1@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Thu, 29 May 2025 12:17:07 -0400
-X-Gm-Features: AX0GCFtfh9MpZ-FDeJh2HrOczvbP9Hqyb2MdkVjRGdhWtHrFMpUcFHJvfRdVctg
-Message-ID: <CADrL8HUVf0wekmZHfZeb59w1j1=gFhs6oRZgNkufB3gOL-TENQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/13] KVM: Introduce KVM Userfault
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Nikita Kalyazin <kalyazin@amazon.com>, Anish Moorthy <amoorthy@google.com>, 
-	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
-	David Matlack <dmatlack@google.com>, wei.w.wang@intel.com, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	Jiaqi Yan <jiaqiyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqKWY7rRGTbHXTmm4RC9F8fqrs133=75XFkVdm91bLHfaw@mail.gmail.com>
 
-On Thu, May 29, 2025 at 11:28=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Wed, May 28, 2025, James Houghton wrote:
-> > The only thing that I want to call out again is that this UAPI works
-> > great for when we are going from userfault --> !userfault. That is, it
-> > works well for postcopy (both for guest_memfd and for standard
-> > memslots where userfaultfd scalability is a concern).
+Hi,
+
+On Thu, May 22, 2025 at 12:20:35PM -0500, Rob Herring wrote:
+> On Thu, May 22, 2025 at 11:15 AM Dave Martin <Dave.Martin@arm.com> wrote:
 > >
-> > But there is another use case worth bringing up: unmapping pages that
-> > the VMM is emulating as poisoned.
+> > On Tue, May 20, 2025 at 05:27:37PM -0500, Rob Herring (Arm) wrote:
+> > > From: Anshuman Khandual <anshuman.khandual@arm.com>
+> > >
+> > > Commit 5b39db6037e7 ("arm64: el2_setup.h: Rename some labels to be more
+> > > diff-friendly") reworked the labels in __init_el2_fgt to say what's
+> > > skipped rather than what the target location is. The exception was
+> > > "set_fgt_" which is where registers are written. In reviewing the BRBE
+> > > additions, Will suggested "set_debug_fgt_" where HDFGxTR_EL2 are
+> > > written. Doing that would partially revert commit 5b39db6037e7 undoing
+> > > the goal of minimizing additions here, but it would follow the
+> > > convention for labels where registers are written.
+> > >
+> > > So let's do both. Branches that skip something go to a "skip" label and
+> > > places that set registers have a "set" label. This results in some
+> > > double labels, but it makes things entirely consistent.
+> > >
+> > > While we're here, the SME skip label was incorrectly named, so fix it.
+> > >
+> > > Reported-by: Will Deacon <will@kernel.org>
+> > > Cc: Dave Martin <Dave.Martin@arm.com>
+> > > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> > > ---
+> > > This one can be applied even if the rest of the series is not.
+> > >
+> > > v22:
+> > >  - New patch
+> > > ---
+> > >  arch/arm64/include/asm/el2_setup.h | 10 +++++++---
+> > >  1 file changed, 7 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> > > index ebceaae3c749..30f57b0334a3 100644
+> > > --- a/arch/arm64/include/asm/el2_setup.h
+> > > +++ b/arch/arm64/include/asm/el2_setup.h
+> > > @@ -204,19 +204,21 @@
+> > >       orr     x0, x0, #(1 << 62)
+> > >
+> > >  .Lskip_spe_fgt_\@:
+> > > +
+> > > +.Lset_debug_fgt_\@:
 > >
-> > Normally this can be handled by mm (e.g. with UFFDIO_POISON), but for
-> > 4K poison within a HugeTLB-backed memslot (if the HugeTLB page remains
-> > mapped in userspace), KVM Userfault is the only option (if we don't
-> > want to punch holes in memslots). This leaves us with three problems:
-> >
-> > 1. If using KVM Userfault to emulate poison, we are stuck with small
-> > pages in stage 2 for the entire memslot.
-> > 2. We must unmap everything when toggling on KVM Userfault just to
-> > unmap a single page.
-> > 3. If KVM Userfault is already enabled, we have no choice but to
-> > toggle KVM Userfault off and on again to unmap the newly poisoned
-> > pages (i.e., there is no ioctl to scan the bitmap and unmap
-> > newly-userfault pages).
-> >
-> > All of these are non-issues if we emulate poison by removing memslots,
-> > and I think that's possible. But if that proves too slow, we'd need to
-> > be a little bit more clever with hugepage recovery and with unmapping
-> > newly-userfault pages, both of which I think can be solved by adding
-> > some kind of bitmap re-scan ioctl. We can do that later if the need
-> > arises.
->
-> Hmm.
->
-> On the one hand, punching a hole in a memslot is generally gross, e.g. re=
-quires
-> deleting the entire memslot and thus unmapping large swaths of guest memo=
-ry (or
-> all of guest memory for most x86 VMs).
->
-> On the other hand, unless userspace sets KVM_MEM_USERFAULT from time zero=
-, KVM
-> will need to unmap guest memory (or demote the mapping size a la eager pa=
-ge
-> splitting?) when KVM_MEM_USERFAULT is toggled from 0=3D>1.
->
-> One thought would be to change the behavior of KVM's processing of the us=
-erfault
-> bitmap, such that KVM doesn't infer *anything* about the mapping sizes, a=
-nd instead
-> give userspace more explicit control over the mapping size.  However, on =
-non-x86
-> architectures, implementing such a control would require a non-trivial am=
-ount of
-> code and complexity, and would incur overhead that doesn't exist today (i=
-.e. we'd
-> need to implement equivalent infrastructure to x86's disallow_lpage track=
-ing).
->
-> And IIUC, another problem with KVM Userfault is that it wouldn't Just Wor=
-k for
-> KVM accesses to guest memory.  E.g. if the HugeTLB page is still mapped i=
-nto
-> userspace, then depending on the flow that gets hit, I'm pretty sure that=
- emulating
-> an access to the poisoned memory would result in KVM_EXIT_INTERNAL_ERROR,=
- whereas
-> punching a hole in a memslot would result in a much more friendly KVM_EXI=
-T_MMIO.
+> > Dangling label?  There doesn't seem to be any branch to it in this
+> > series, unless I've missed something.
+> 
+> I tried to explain that in the commit message. To have both what you
+> wanted and what Will suggested, you end up with 2 labels in between
+> the last skip and setting registers.
 
-Oh, yes, of course. KVM Userfault is not enough for memory poison
-emulation for non-guest-memfd memslots. Like how for these memslots we
-need userfaultfd to do post-copy properly, for memory poison, we still
-need userfaultfd (so 4K emulated poison within a HugeTLB memslot is
-not possible).
+Hmm, I wasn't trying to advocate for adding dead labels in anticipation
+of their use, just to avoid labels whose names conflict with an
+anticipated future use.
 
-So yeah in this case (4K poison in a still-mapped HugeTLB page), we
-would need to punch a hole and get KVM_EXIT_MMIO. SGTM.
+I guess this is harmless, but I may look at this again as and when...
 
-For guest_memfd memslots, we can handle uaccess to emulated poison
-like tmpfs: with UFFDIO_POISON (Nikita has already started on
-UFFDIO_CONTINUE support[1]). We *could* make the gmem page fault
-handler (what Fuad is implementing) respect KVM Userfault, but that
-isn't necessary (and would look quite like a reimplementation of
-userfaultfd).
-
-[1]: https://lore.kernel.org/kvm/20250404154352.23078-1-kalyazin@amazon.com=
-/
-
-> All in all, given that KVM needs to correctly handle hugepage vs. memslot
-> alignment/size issues no matter what, and that KVM has well-established b=
-ehavior
-> for handling no-memslot accesses, I'm leaning towards saying userspace sh=
-ould
-> punch a hole in the memslot in order to emulate a poisoned page.  The onl=
-y reason
-> I can think of for preferring a different approach is if userspace can't =
-provide
-> the desired latency/performance characteristics when punching a hole in a=
- memslot.
-> Hopefully reacting to a poisoned page is a fairly slow path?
-
-In general, yes it is. Memory poison is rare.
-
-For non-HugeTLB (tmpfs or guest_memfd), I don't think we need to punch
-a hole, so that's good. For HugeTLB, there are two circumstances that
-are perhaps concerning:
-
-1. Learning about poison during post-copy? This should be vanishingly
-rare, as most poison is discovered in the first pre-copy pass. If we
-didn't do *any* pre-copy passes, then it could be a concern.
-2. Learning about poison during pre-copy after shattering? If doing
-lazy page splitting with incremental dirty log clearing, this isn't a
-*huge* problem, otherwise it could be.
-
-I think userspace has two ways out: (1) don't make super large
-memslots, or (2) don't use HugeTLB.
-
-Just to be clear, this isn't really an issue with KVM Userfault -- in
-its current form (not preventing KVM's uaccess), it cannot help here.
+Cheers
+---Dave
