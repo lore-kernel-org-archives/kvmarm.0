@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BEC3227B9F
-	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 13:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549E922A4E0
+	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 13:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748526995; cv=none; b=NmtZDH/RTc+IQCUrXnywx/pEO2Iac6nAlEUH+W7UiG2vyqE9yVObhDJzQMhNBgqaGlU4aoNDO9mxF9h1a2sXmzfxT1lcd5aNTv3YU4h2W4UcCB8WWE6IktP2XaM8AG5wVI1qAdGPwh8N2g8/bRQvQgAvf9Jqrs7nLQHUeGThWRQ=
+	t=1748526996; cv=none; b=EMifJF2TEFx6NtZ6mvQPuRhykI4lNT7r2EjkIG6bRYxW5wFGGCcvdVcWBi9cO+tS0Vwn4Af2v7yYoJCi/5DPFabn2BSCjZhV/Mmq9TU3RqkIO5s/nPQ/g9LKW1Iydra9u0AbnZ44Rv8YCD7LaCnJ/NY9OS8tFlGBgj5L0VHyEdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748526995; c=relaxed/simple;
-	bh=TLxU1KLq3Qo2XQIsvmxiND2nz1HgwrXoBk5v2solMkM=;
+	s=arc-20240116; t=1748526996; c=relaxed/simple;
+	bh=moIMP+WW4xOut04v506xlQP7prm+awmGgYk6GfOKqAM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tpKrCwOZhAGX61EuTDcUosWo6/rqQnHagQUzR6T7KgBQMRo7LPlxVRoUM+i5LlKoWl85eHAD3XbezxX9je242qRUjcjJksfKKqnGa9s+U/w396y+W+AvSiLozUJOkTwT4gk/YTBuQV1iImeu35VD9B3nM+cR0MVPJbY+F/NLXBM=
+	 MIME-Version; b=u9zYeKP9Qq2Tlmw0TzZNEV4/LXhgCGydXr3aoNuNw4XXtr7pbbyXSV9JdzPDhyoS+6n5vKxOmeS8q43SJCCnjUGKXfd8KmMd0TBEnrQCNM5KDaTGLVw+VJgLtRAW+aFQ0goIkJ+sGyqh/APi4fuu93JuAeuV6R9nCZtdLqt4ePI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2AEF22D7;
-	Thu, 29 May 2025 06:56:14 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A78522EA;
+	Thu, 29 May 2025 06:56:18 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 299D43F673;
-	Thu, 29 May 2025 06:56:30 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 65BAE3F673;
+	Thu, 29 May 2025 06:56:33 -0700 (PDT)
 From: Joey Gouly <joey.gouly@arm.com>
 To: kvm@vger.kernel.org
 Cc: alexandru.elisei@arm.com,
@@ -26,9 +26,9 @@ Cc: alexandru.elisei@arm.com,
 	kvmarm@lists.linux.dev,
 	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v2 1/9] arm64: drop to EL1 if booted at EL2
-Date: Thu, 29 May 2025 14:55:49 +0100
-Message-Id: <20250529135557.2439500-2-joey.gouly@arm.com>
+Subject: [kvm-unit-tests PATCH v2 3/9] arm64: efi: initialise the EL
+Date: Thu, 29 May 2025 14:55:51 +0100
+Message-Id: <20250529135557.2439500-4-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250529135557.2439500-1-joey.gouly@arm.com>
 References: <20250529135557.2439500-1-joey.gouly@arm.com>
@@ -40,124 +40,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-EL2 is not currently supported, drop to EL1 to conitnue booting.
+Initialise the exception level, which may include dropping to EL1 from EL2, if
+VHE is not supported.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arm/cstart64.S         | 47 +++++++++++++++++++++++++++++++++++++++---
- lib/arm64/asm/sysreg.h | 14 +++++++++++++
- 2 files changed, 58 insertions(+), 3 deletions(-)
+ arm/efi/crt0-efi-aarch64.S | 5 +++++
+ lib/arm/asm/setup.h        | 1 +
+ lib/arm/setup.c            | 1 +
+ 3 files changed, 7 insertions(+)
 
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 014c9c7b..79b93dd4 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -15,6 +15,46 @@
- #include <asm/thread_info.h>
- #include <asm/sysreg.h>
+diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
+index 71ce2794..5632fee0 100644
+--- a/arm/efi/crt0-efi-aarch64.S
++++ b/arm/efi/crt0-efi-aarch64.S
+@@ -147,6 +147,11 @@ _start:
+ 0:	ldp		x29, x30, [sp], #32
+ 	ret
  
-+.macro init_el, tmp
-+	mrs	\tmp, CurrentEL
-+	cmp	\tmp, CurrentEL_EL2
-+	b.ne	1f
-+	/* EL2 setup */
-+	mrs	\tmp, mpidr_el1
-+	msr	vmpidr_el2, \tmp
-+	mrs	\tmp, midr_el1
-+	msr	vpidr_el2, \tmp
-+	/* clear trap registers */
-+	mrs	\tmp, id_aa64mmfr0_el1
-+	ubfx	\tmp, \tmp, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
-+	cbz	\tmp, .Lskip_fgt_\@
-+	mov	\tmp, #0
-+	msr_s	SYS_HFGRTR_EL2, \tmp
-+	msr_s	SYS_HFGWTR_EL2, \tmp
-+	msr_s	SYS_HFGITR_EL2, \tmp
-+	mrs	\tmp, id_aa64mmfr0_el1
-+	ubfx	\tmp, \tmp, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
-+	cmp	\tmp, #ID_AA64MMFR0_EL1_FGT_FGT2
-+	bne	.Lskip_fgt_\@
-+	mov	\tmp, #0
-+	msr_s	SYS_HFGRTR2_EL2, \tmp
-+	msr_s	SYS_HFGWTR2_EL2, \tmp
-+	msr_s	SYS_HFGITR2_EL2, \tmp
-+.Lskip_fgt_\@:
-+	mov	\tmp, #0
-+	msr	cptr_el2, \tmp
-+	ldr	\tmp, =(INIT_HCR_EL2_EL1_ONLY)
-+	msr	hcr_el2, \tmp
-+	mov	\tmp, PSR_MODE_EL1t
-+	msr	spsr_el2, \tmp
-+	adrp	\tmp, 1f
-+	add	\tmp, \tmp, :lo12:1f
-+	msr	elr_el2, \tmp
-+	eret
-+1:
-+.endm
++.globl do_init_el
++do_init_el:
++	init_el x16
++	ret
 +
-+
- #ifdef CONFIG_EFI
- #include "efi/crt0-efi-aarch64.S"
- #else
-@@ -56,15 +96,15 @@ start:
- 	add     x6, x6, :lo12:reloc_end
- 1:
- 	cmp	x5, x6
--	b.hs	1f
-+	b.hs	reloc_done
- 	ldr	x7, [x5]			// r_offset
- 	ldr	x8, [x5, #16]			// r_addend
- 	add	x8, x8, x4			// val = base + r_addend
- 	str	x8, [x4, x7]			// base[r_offset] = val
- 	add	x5, x5, #24
- 	b	1b
--
--1:
-+reloc_done:
-+	init_el x4
- 	/* zero BSS */
- 	adrp	x4, bss
- 	add	x4, x4, :lo12:bss
-@@ -185,6 +225,7 @@ get_mmu_off:
+ 	.section	.data
  
- .globl secondary_entry
- secondary_entry:
-+	init_el x0
- 	/* enable FP/ASIMD and SVE */
- 	mov	x0, #(3 << 20)
- 	orr	x0, x0, #(3 << 16)
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index e537bb46..ed776716 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -77,6 +77,9 @@ asm(
- #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
- #define ID_AA64PFR1_EL1_MTE_SHIFT	8
+ .balign 65536
+diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+index 9f8ef82e..6a409b38 100644
+--- a/lib/arm/asm/setup.h
++++ b/lib/arm/asm/setup.h
+@@ -28,6 +28,7 @@ void setup(const void *fdt, phys_addr_t freemem_start);
  
-+#define ID_AA64MMFR0_EL1_FGT_SHIFT	56
-+#define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
-+
- #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
- #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
- #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
-@@ -113,6 +116,17 @@ asm(
- #define SCTLR_EL1_TCF0_SHIFT	38
- #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
+ #include <efi.h>
  
-+#define HCR_EL2_RW		_BITULL(31)
-+
-+#define INIT_HCR_EL2_EL1_ONLY	(HCR_EL2_RW)
-+
-+#define SYS_HFGRTR_EL2		sys_reg(3, 4, 1, 1, 4)
-+#define SYS_HFGWTR_EL2		sys_reg(3, 4, 1, 1, 5)
-+#define SYS_HFGITR_EL2		sys_reg(3, 4, 1, 1, 6)
-+#define SYS_HFGRTR2_EL2		sys_reg(3, 4, 3, 1, 2)
-+#define SYS_HFGWTR2_EL2		sys_reg(3, 4, 3, 1, 3)
-+#define SYS_HFGITR2_EL2		sys_reg(3, 4, 3, 1, 7)
-+
- #define INIT_SCTLR_EL1_MMU_OFF	\
- 			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
- 			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
++void do_init_el(void);
+ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
+ 
+ #endif
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 0a22dbab..f49fa8ca 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -349,6 +349,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+ {
+ 	efi_status_t status;
+ 
++	do_init_el();
+ 
+ 	// EFI exits boot services with SCTLR_ELx.M=1, so keep
+ 	// the MMU enabled.
 -- 
 2.25.1
 
