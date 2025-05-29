@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863D719F10A;
-	Thu, 29 May 2025 16:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AEA22D4C9;
+	Thu, 29 May 2025 16:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748537775; cv=none; b=YgOY2evsnoDbomT7SMYcL+CjdB86brwE+PHx963vUDeLZ38agiym7lej37S4uKcLypKhBSCepAbM6TA9xPerIQjvQqF1fTE/61iKH+ToZP+PaYFj9W5f6gZ+tOF/gwcsSn6J6h8ZGZRUU0lvcnkbmAVuQNunYoTC8nhUhd4fE6Q=
+	t=1748537847; cv=none; b=uDKrJEHcXgXe3HLoyQ0PqyT+GZyEJRahUNiaYmRSHXz73GwaDog2rpmetxEfWtxwYJTSYBoE47cX+WCDIu7gsGyBaNaf1Qcbi7QQEbvwjuGMyaRXcIgqqMwFj2Myvn7lLcIxk99DEcn1OISb3Z3WhLyMQn4GwaPKbTZ938+7YZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748537775; c=relaxed/simple;
-	bh=DRaD1/jwNIxgIiu48AG/4frKcAETzPdIlDu3ZM3psGY=;
+	s=arc-20240116; t=1748537847; c=relaxed/simple;
+	bh=nTb8EzIrvGiW+oT3lk+HKRBUzG7cl6yVbYX2HGFS1wY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l8rpuiH7IBrYRo1sMArecziJ6PYrIdipdcyFDcY67xfnxerG+mYb1cVzyaZJ1Y2M0cuIy2LaYI4xITVrqVBFZKGB189pU01kHBRka4M2v8qdC7uIdTe81LBEXqIYlfQDPxyKW2X+yirYcrzRZ79h7IMTGRfY9oYEX93ql2xvlk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIDhpcE1; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=LKCq01mz1Wf6m67rBqFMpJj/bBJEyVK+FCQGIGFnQF4Eex0NDw1JqXwVWHWImAvjgqsRO5jgjSJJED9VjDkw9IczpN0I09KSUXkANrwQhtaNDd3KWe7EofJEZ5GFW46K35ixn5UuxlJjPo9wqSPZRHHvSPf0LF69hQm02iskd/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ocydWOce; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIDhpcE1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB6ECC4CEE7;
-	Thu, 29 May 2025 16:56:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ocydWOce"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3891FC4CEE7;
+	Thu, 29 May 2025 16:57:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748537774;
-	bh=DRaD1/jwNIxgIiu48AG/4frKcAETzPdIlDu3ZM3psGY=;
+	s=k20201202; t=1748537847;
+	bh=nTb8EzIrvGiW+oT3lk+HKRBUzG7cl6yVbYX2HGFS1wY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gIDhpcE1ynd3+7vSpPrOvxUKNvDMgUoOkEX4LZUgb0B6MUhwkkQ7qSGAf2Ei/Ka37
-	 tuU84O9CJlS5vUKpzniOmU/Z+V2IxZ6KWX56UvBIIEYF3orRMkseqfL++q2Av7uVUN
-	 GU9ezDGkYsxDDJ822W2OmGAmZpwW9u8dAusndcwrkIaSj8um7Lp2eMhNZNnOyMwwqf
-	 IKc0PdGmhD+/ulFCTvN0sXsURVqZFaH2dJp+eu3zZAAk60A6Tf9mgnbVxu2+VokQin
-	 bwOIQVnnB8360DYl7zLIajbDaS/QbFjopslOYyD4PYXZHZSwB+aNnjutIUOVDuYj1R
-	 51DyHqGiFTpNA==
+	b=ocydWOce2vgQ01StCxi2p8JIr5rtxb48tv1V7H37/y3VwgQFMz/G/OC8MgZFiAdK5
+	 5sLWjC4vr7ThGNaftjRtqwxLh1KmpBBcTMf0i+AzWSa31JT55xS+wPOw5oDF3DXVol
+	 +ktqh8a1R+ROKDCVXuT7JR64GyottFxcT+kVzap4ZJkhIqCaTpPsTTFd0I0AIev3hK
+	 lucd3K9DUfRO+vtFpXtBcn7uDeTY7FnrI20xUBr1wGCZv0Kykw2nAVn8voYXH0Ykv9
+	 tCNTNoIZAwJpB2bPTqrFoLra/CEEa9dCSMMz016V7PzpTxb0l0pKkNWyY6hOOKxwhU
+	 ryg4iHafOGHXw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uKgY8-001ckx-7m;
-	Thu, 29 May 2025 17:56:12 +0100
-Date: Thu, 29 May 2025 17:56:11 +0100
-Message-ID: <867c1ze4pg.wl-maz@kernel.org>
+	id 1uKgZI-001cmR-Ja;
+	Thu, 29 May 2025 17:57:24 +0100
+Date: Thu, 29 May 2025 17:57:24 +0100
+Message-ID: <865xhje4nf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: James Clark <james.clark@linaro.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -57,10 +57,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	linux-perf-users@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 06/11] KVM: arm64: Add trap configs for PMSDSFR_EL1
-In-Reply-To: <20250529-james-perf-feat_spe_eft-v2-6-a01a9baad06a@linaro.org>
+Subject: Re: [PATCH v2 05/11] arm64/boot: Enable EL2 requirements for SPE_FEAT_FDS
+In-Reply-To: <20250529-james-perf-feat_spe_eft-v2-5-a01a9baad06a@linaro.org>
 References: <20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org>
-	<20250529-james-perf-feat_spe_eft-v2-6-a01a9baad06a@linaro.org>
+	<20250529-james-perf-feat_spe_eft-v2-5-a01a9baad06a@linaro.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,46 +76,60 @@ X-SA-Exim-Rcpt-To: james.clark@linaro.org, catalin.marinas@arm.com, will@kernel.
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 29 May 2025 12:30:27 +0100,
+On Thu, 29 May 2025 12:30:26 +0100,
 James Clark <james.clark@linaro.org> wrote:
 > 
-> SPE data source filtering (SPE_FEAT_FDS) adds a new register
-> PMSDSFR_EL1, add the trap configs for it.
+> SPE data source filtering (optional from Armv8.8) requires that traps to
+> the filter register PMSDSFR be disabled. Document the requirements and
+> disable the traps if the feature is present.
 > 
 > Signed-off-by: James Clark <james.clark@linaro.org>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 1 +
->  arch/arm64/kvm/sys_regs.c       | 1 +
->  2 files changed, 2 insertions(+)
+>  Documentation/arch/arm64/booting.rst | 11 +++++++++++
+>  arch/arm64/include/asm/el2_setup.h   | 14 ++++++++++++++
+>  2 files changed, 25 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 0fcfcc0478f9..05d3e6b93ae9 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -1169,6 +1169,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
->  	SR_TRAP(SYS_PMSIRR_EL1,		CGT_MDCR_TPMS),
->  	SR_TRAP(SYS_PMSLATFR_EL1,	CGT_MDCR_TPMS),
->  	SR_TRAP(SYS_PMSNEVFR_EL1,	CGT_MDCR_TPMS),
-> +	SR_TRAP(SYS_PMSDSFR_EL1,	CGT_MDCR_TPMS),
->  	SR_TRAP(SYS_TRFCR_EL1,		CGT_MDCR_TTRF),
->  	SR_TRAP(SYS_TRBBASER_EL1,	CGT_MDCR_E2TB),
->  	SR_TRAP(SYS_TRBLIMITR_EL1,	CGT_MDCR_E2TB),
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 5dde9285afc8..9f544ac7b5a6 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2956,6 +2956,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_PMBLIMITR_EL1), undef_access },
->  	{ SYS_DESC(SYS_PMBPTR_EL1), undef_access },
->  	{ SYS_DESC(SYS_PMBSR_EL1), undef_access },
-> +	{ SYS_DESC(SYS_PMSDSFR_EL1), undef_access },
+> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+> index dee7b6de864f..abd75085a239 100644
+> --- a/Documentation/arch/arm64/booting.rst
+> +++ b/Documentation/arch/arm64/booting.rst
+> @@ -404,6 +404,17 @@ Before jumping into the kernel, the following conditions must be met:
+>      - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
+>      - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
+>  
+> +  For CPUs with SPE data source filtering (FEAT_SPE_FDS):
+> +
+> +  - If EL3 is present:
+> +
+> +    - MDCR_EL3.EnPMS3 (bit 42) must be initialised to 0b1.
+> +
+> +  - If the kernel is entered at EL1 and EL2 is present:
+> +
+> +    - HDFGRTR2_EL2.nPMSDSFR_EL1 (bit 19) must be initialised to 0b1.
+> +    - HDFGWTR2_EL2.nPMSDSFR_EL1 (bit 19) must be initialised to 0b1.
+> +
+>    For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
+>  
+>    - If the kernel is entered at EL1 and EL2 is present:
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index f6d72ca03133..6d0d8c25e912 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -279,6 +279,20 @@
+>  	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
+>  	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
+>  .Lskip_pmuv3p9_\@:
+> +	mrs	x1, id_aa64dfr0_el1
+> +	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMSVer_SHIFT, #4
+> +	/* If SPE is implemented, */
+> +	cmp	x1, #ID_AA64DFR0_EL1_PMSVer_IMP
+> +	b.lt	.Lskip_spefds_\@
+> +	/* we can read PMSIDR and */
+> +	mrs_s	x1, SYS_PMSIDR_EL1
+> +	and	x1, x1,  #(1 << PMSIDR_EL1_FDS_SHIFT)
 
-PMSDSFR_EL1 has an offset in the VNCR page (0x858), and must be
-described as such. This is equally true for a bunch of other
-SPE-related registers, so you might as well fix those while you're at
-it.
-
-Thanks,
+Use PMSIDR_EL1_FDS directly, just like you do for the other register
+fields.
 
 	M.
 
