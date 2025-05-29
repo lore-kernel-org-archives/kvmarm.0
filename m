@@ -1,29 +1,45 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256A878F34
-	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 16:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863D719F10A;
+	Thu, 29 May 2025 16:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748537323; cv=none; b=H4px/8ZfmTPni65fVta/DjYF0Ht2p1vEZmCsbiX3wa75qxh0Z+UhXIlLkNHEsPz1J7V/BKboutmI66d8JogX+V9391FHoz2c0GN9d4Z65USK4mX/tln7Uw6VA9Nht3//Xo0/G5UYEOxo8fw/86jSCkhKEH7DTcP9plyZRqVMrtc=
+	t=1748537775; cv=none; b=YgOY2evsnoDbomT7SMYcL+CjdB86brwE+PHx963vUDeLZ38agiym7lej37S4uKcLypKhBSCepAbM6TA9xPerIQjvQqF1fTE/61iKH+ToZP+PaYFj9W5f6gZ+tOF/gwcsSn6J6h8ZGZRUU0lvcnkbmAVuQNunYoTC8nhUhd4fE6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748537323; c=relaxed/simple;
-	bh=VMJUu7GA7yCr7klV0J6AkeQHLeLdi1qD21FabNndM5w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FnqE45BtVQkLTkDNxYdqOo5G0e6fAQ1e5wKLXV6oRq8ETIkpbuUhDn1J6rB0hEDI0RjzAXldQKhKZK1O4QpxEDApykI3HPrWb9uRB2c1wwNBgRpyt4hXkYZWqi1Y9olaVr2HbaAtMAA8YlothtBLTHOj7Af6BhfK5NA+gY6gl9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE3211764;
-	Thu, 29 May 2025 09:48:24 -0700 (PDT)
-Received: from localhost (e132581.arm.com [10.1.196.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3FA03F673;
-	Thu, 29 May 2025 09:48:40 -0700 (PDT)
-Date: Thu, 29 May 2025 17:48:39 +0100
-From: Leo Yan <leo.yan@arm.com>
+	s=arc-20240116; t=1748537775; c=relaxed/simple;
+	bh=DRaD1/jwNIxgIiu48AG/4frKcAETzPdIlDu3ZM3psGY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l8rpuiH7IBrYRo1sMArecziJ6PYrIdipdcyFDcY67xfnxerG+mYb1cVzyaZJ1Y2M0cuIy2LaYI4xITVrqVBFZKGB189pU01kHBRka4M2v8qdC7uIdTe81LBEXqIYlfQDPxyKW2X+yirYcrzRZ79h7IMTGRfY9oYEX93ql2xvlk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIDhpcE1; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIDhpcE1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB6ECC4CEE7;
+	Thu, 29 May 2025 16:56:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748537774;
+	bh=DRaD1/jwNIxgIiu48AG/4frKcAETzPdIlDu3ZM3psGY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gIDhpcE1ynd3+7vSpPrOvxUKNvDMgUoOkEX4LZUgb0B6MUhwkkQ7qSGAf2Ei/Ka37
+	 tuU84O9CJlS5vUKpzniOmU/Z+V2IxZ6KWX56UvBIIEYF3orRMkseqfL++q2Av7uVUN
+	 GU9ezDGkYsxDDJ822W2OmGAmZpwW9u8dAusndcwrkIaSj8um7Lp2eMhNZNnOyMwwqf
+	 IKc0PdGmhD+/ulFCTvN0sXsURVqZFaH2dJp+eu3zZAAk60A6Tf9mgnbVxu2+VokQin
+	 bwOIQVnnB8360DYl7zLIajbDaS/QbFjopslOYyD4PYXZHZSwB+aNnjutIUOVDuYj1R
+	 51DyHqGiFTpNA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uKgY8-001ckx-7m;
+	Thu, 29 May 2025 17:56:12 +0100
+Date: Thu, 29 May 2025 17:56:11 +0100
+Message-ID: <867c1ze4pg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: James Clark <james.clark@linaro.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -33,39 +49,75 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Arnaldo Carvalho de Melo <acme@kernel.org>,
 	Namhyung Kim <namhyung@kernel.org>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
 	Adrian Hunter <adrian.hunter@intel.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 00/11] perf: arm_spe: Armv8.8 SPE features
-Message-ID: <20250529164839.GN2566836@e132581.arm.com>
+Subject: Re: [PATCH v2 06/11] KVM: arm64: Add trap configs for PMSDSFR_EL1
+In-Reply-To: <20250529-james-perf-feat_spe_eft-v2-6-a01a9baad06a@linaro.org>
 References: <20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org>
+	<20250529-james-perf-feat_spe_eft-v2-6-a01a9baad06a@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.clark@linaro.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, May 29, 2025 at 12:30:21PM +0100, James Clark wrote:
-> Support 3 new SPE features: FEAT_SPEv1p4 filters, FEAT_SPE_EFT extended
-> filtering, and SPE_FEAT_FDS data source filtering. The features are
-> independent can be applied separately:
+On Thu, 29 May 2025 12:30:27 +0100,
+James Clark <james.clark@linaro.org> wrote:
 > 
->   * Prerequisite sysreg changes - patches 1 - 2
->   * FEAT_SPEv1p4 - patch 3
->   * FEAT_SPE_EFT - patch 4
->   * FEAT_SPE_FDS - patches 5 - 8
->   * FEAT_SPE_FDS Perf tool changes - patches 9 - 11
+> SPE data source filtering (SPE_FEAT_FDS) adds a new register
+> PMSDSFR_EL1, add the trap configs for it.
 > 
-> The first two features will work with old Perfs but a Perf change to
-> parse the new config4 is required for the last feature.
+> Signed-off-by: James Clark <james.clark@linaro.org>
+> ---
+>  arch/arm64/kvm/emulate-nested.c | 1 +
+>  arch/arm64/kvm/sys_regs.c       | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 0fcfcc0478f9..05d3e6b93ae9 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -1169,6 +1169,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+>  	SR_TRAP(SYS_PMSIRR_EL1,		CGT_MDCR_TPMS),
+>  	SR_TRAP(SYS_PMSLATFR_EL1,	CGT_MDCR_TPMS),
+>  	SR_TRAP(SYS_PMSNEVFR_EL1,	CGT_MDCR_TPMS),
+> +	SR_TRAP(SYS_PMSDSFR_EL1,	CGT_MDCR_TPMS),
+>  	SR_TRAP(SYS_TRFCR_EL1,		CGT_MDCR_TTRF),
+>  	SR_TRAP(SYS_TRBBASER_EL1,	CGT_MDCR_E2TB),
+>  	SR_TRAP(SYS_TRBLIMITR_EL1,	CGT_MDCR_E2TB),
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 5dde9285afc8..9f544ac7b5a6 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2956,6 +2956,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_PMBLIMITR_EL1), undef_access },
+>  	{ SYS_DESC(SYS_PMBPTR_EL1), undef_access },
+>  	{ SYS_DESC(SYS_PMBSR_EL1), undef_access },
+> +	{ SYS_DESC(SYS_PMSDSFR_EL1), undef_access },
 
-I tested the load_filter_mask / store_filter_mask (FEAT_SPE_EFT) and
-data_src_filter (SPE_FEAT_FDS), all of them work as expected.
+PMSDSFR_EL1 has an offset in the VNCR page (0x858), and must be
+described as such. This is equally true for a bunch of other
+SPE-related registers, so you might as well fix those while you're at
+it.
 
-Tested-by: Leo Yan <leo.yan@arm.com>
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
