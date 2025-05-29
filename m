@@ -1,66 +1,66 @@
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D274628ECE6
-	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 11:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CC328F52A
+	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 11:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748518398; cv=none; b=laKO0nVhjjC+BCttkMLN564pqgYaV2fT8KaBhzp+gF1Dzq570GcV4AwLk7xXLSot+or2rCfFtfeVmjd/rV/R9xaRmhJ9ottmcOen8HNjb7cqpQEZzJOlNMpg/dFLDNDBSqbEc4fttinPAa0n2dGL3NrXcgHRvutO/K9RrvdUZAg=
+	t=1748518400; cv=none; b=hLaeG81JNfUcASdYVFczJLuYmX3syGFBhWpyWMW3tdHzz9cBHUwHukxj/bvUUWxxkklVwVS/y3hPa+VxB/xjoFGQSpPuZU1Xswpr+nHoCF7vH5roz/eriAtrq4fBmrKpxXql9A2aeEP9Xo0t9Iobcn8RrLQDnpgzVijZq1hH6SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748518398; c=relaxed/simple;
-	bh=JLw1SbFI9hf2HJHhhd0RjbsrbancA+Y8QFfWRVSOicI=;
+	s=arc-20240116; t=1748518400; c=relaxed/simple;
+	bh=41eja3GEP0F1NgK0VkDUcr/lsnX2RYh7poVYaCc8trk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JnzBvesy/urBmL5in2IncNPdjtXCDyEEs3LhKwqtsSVwKk4kKUvqYbRn9YYUI/uMWYqJngRbYxOO8+40iJMYjMuCwsbJXVC19OBQ2M2kU35psaeGXicjS0vmKOVCVJslbNkKfPFQzPnzoLzdfKfKAs0SXG+cqTzliPq4Y7OUbFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cWIKQTkg; arc=none smtp.client-ip=209.85.128.65
+	 In-Reply-To:To:Cc; b=Q1V6NyxBmON4geRQsNh+OriJbE5ndr8ENnQM8qS4rDC4+j5U5njhiZk41N85VS7JWGOUrfGSNVAm0t3e07YB4cooo+JP+/RSVRWGk7l4BvtqTEIicTzbLRW9eTwPAgycCHwUf6ugLSjMfw4TbYEQKBasYKGDcVP+a6XaTYW++Gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CEvMCeyz; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cWIKQTkg"
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-43cf680d351so12632465e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 04:33:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CEvMCeyz"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-450cd6b511cso5007775e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 04:33:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1748518394; x=1749123194; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1748518395; x=1749123195; darn=lists.linux.dev;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pfKDbgxKd2ROJeUv6l7PkfuDFl5ROKG8g8tB4U0lR18=;
-        b=cWIKQTkgReO/fnGjnL2yOMQW3lM1mYjrMZLCzXWzyaswYHg70Ew808BLjKR7LERlD3
-         UjgGoYH/Vu4fAsAyE0cuHH2TT5EeMYO/mba0GnGFHHZHYs0IhESW11I0ijLLqFdNk7Nl
-         NVFmGKDkLyADOLoc8Q+5/UsB7XNQsOhsWVqL14xQNFbL7FM+BZW8YY7VOy17bDxXE+vN
-         9IjhEC8EZjQU+kzyEHYanTUeVnRVarz/4xgFIpBGB/3zhOZokRqZOL9uwq02Fz60v7Qh
-         Iei33XbAV7L7bwvOvWps6XBwUI0eNSibqAXdzlsQrQNTk/Q1uH6/5d3a18USnGjG/4jh
-         5fqA==
+        bh=YBZfytqoLfoLLkCHGYVhQ8mByrfQ3MODercYrOljLZA=;
+        b=CEvMCeyzbR5zwsbeQQqZK/9WzPOOk/1OSr2k+Ze2lUPYxghg0AysWOUHtGeeC5MoT4
+         ZwV6ZhV2cnMD/kzaWOHfot0kMgj4ERpOu+OvsOcfpFLaQtYXtQFYjK+7aW5KXa3O6Gu8
+         RFphAPHgULwniX7UxEBG5ByoFbZc1WjWKNjnwg187iZOi8ElbY6xZNbvzk4ZYsNLsDrI
+         OUOD/kcU1ea5Qw3ezC8zfGcolygTDM7Uc9eYF4pskmrfJJ2+wPBjRAThoXGlNKIrwLMg
+         l4hG6kbOYQS1BCzwtQLomA6HnCh6luHd0LU+xuLvfge7VnFoqucQttli2hDTDUBXtBQa
+         ygIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748518394; x=1749123194;
+        d=1e100.net; s=20230601; t=1748518395; x=1749123195;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pfKDbgxKd2ROJeUv6l7PkfuDFl5ROKG8g8tB4U0lR18=;
-        b=rEaDuS6V6CoDUimKQ55gO9iiybJIAog2x8WFrw6vX2ymtxK62OS7+zLEiY76L6bZ+p
-         k+aifHz3ipcVdwK288HoCdnUlRH1QQJq8Fy3JF1o0DNgCdWzxR94EykyvqYDYq2PG3Sn
-         n1sNIvwgNAEE4ckI0l7Tz2K45oYbGmUbVhfxa1CLRu11Hgjt+zoYmNiEBMxFFZHWlycc
-         HR1d8i6js4HNuxqbx5nRt+uxtELtbY+3rS78Ho62sjouv8/TVIrKpDrt9ZflDZ6vqGcv
-         fagdgAV5lWQOnqluqwy8mx7I5497d9QgQLquxKF0ArsxZYX+oQUzwGKIbe6T8AF0VD4f
-         uk5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWWgq9dA22C65Jtt5DD2OYokcsdfr7T3/twiqwAQ6KhJw4j6/YIPKYtFz2cAjKee9vfUysDhFQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxzylc2QvWFDD/7oTnUWDdsXUVtzJ2tmJtZWiDh7eM1eTxaUMAM
-	yKqjDzQaSHxjLxbFJ+yAqpRQB5K13zQ0eHe3TJSU52d3ro11y64lw53Om2qPIIVkUdI=
-X-Gm-Gg: ASbGncsQcnR0nx8SYYFoHf/8ugWdgt1DMi0OL8oEG4OQaN/kKbck5KlfhGN4rjnBuM6
-	E7m4vGVbZOzd8qqdqsm4bLq7KdM/dZ3TwP47xXijbsO4ZugXH8XfI6z4pmJColhUOYnaraJaFAY
-	lF9e1b+I+1e86CbB9OjuNOSvZAAjC2K1LejzLv5TYrlLdeHbPMoaMhOeIKuPHhHnIEmTDY3tikv
-	O2MLJDwkcD5sNWzMAsQN9s7OO38Kliuy4BksrGtwBnHf1+Hlfmezt3ETSoKbYZD7M51jPpDSslS
-	EksFHp0AAhle0WMWl1f8JynxIAz+/YUvjt9Rij+tUHNwQ6Ps428TXljOV5MA
-X-Google-Smtp-Source: AGHT+IHSPmk4fOgPDFLIZtWqcVjzQhEo6i8WE5FJ9ZlisuotXu0mllwIX71So8rjCmQxGTK63Cn0Dw==
-X-Received: by 2002:a05:600c:4649:b0:43c:ec72:3daf with SMTP id 5b1f17b1804b1-450ce88aa5dmr21155125e9.14.1748518394056;
-        Thu, 29 May 2025 04:33:14 -0700 (PDT)
+        bh=YBZfytqoLfoLLkCHGYVhQ8mByrfQ3MODercYrOljLZA=;
+        b=SglbKoelU0KwCyJZEkiKtd8cHvHkCMWpT0UeOInJ8d5WcjgwtcCWTkmgLXocQD01Z0
+         eRcUPOK7+zUYrvLSAZOjlAB4n3+HnqTiue8UzzveTD4GTF1Twx7ZGU9coISuZh5nyGeJ
+         vr8jFE3Q+GUD/p/I8r5PtlQX+4PguPTJL+EhRzgdTzCG1FzZ5gAYBcuo8zqsMESNKN1k
+         JW9mgi3vJueQhsnshRRSzWEYbdAgJvRNhEwuEym7VtXGHjD+g1DPs++eudcawDyfYwZO
+         eV7Dcw99nEdQFRVoQrXBtVvQF93psWEiymkGKaRyGhclcLbRQrcLHqAztQ/tJJPKwmCE
+         c9rw==
+X-Forwarded-Encrypted: i=1; AJvYcCXp0VP1Uwq0LL6sjf2sKCC2vOYNVegHnkfQxRaJuZ4tbM1pQPQQ760lpkcTMvL+Hq2NhINQNEE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzpGpMIIS9Fr4XeqWkNMoGa+eSVBXq3NPKN8Si/kY/1/s0BO4G3
+	lVxvWJM+1QMLyecl+cil6b0349QhSJV0IE4y/g891cfn6zQTRc3XFliKWvPy+0PLlec=
+X-Gm-Gg: ASbGncsTXK9bc2/+RiL/hDP1RGXo0jyEX6QjLF1BFoxcJCoGVNckS17a3co/IjcwF46
+	VI9cBZCDHDOQNxz7Mk0Gkt0Vlta7INZchz+N9lqtU/L8mt/7ZNDXidHcDpRzlEiOgEEghluaK7o
+	+SRatN7cWegaJ4Wduh52eAYuNGPnnYipUlR5tP+9yF8pZV33LYQz8+lHn5RY0HXXKWFvHW7E2Pd
+	uFrYth7Bn8h95DRSrIwmyDg3lmzr9frc/JYvGqrtxp3RGZcD54PFPl+0GZFtxf5zdpcxhXEdBVO
+	9ib5zLGLqV99m8zk44l7xA+bW/RtjkemJ1K+oe6cQ6gpVsEiJmJU4h6VYDa8
+X-Google-Smtp-Source: AGHT+IHMMfVW7IE9nbkSMy9wDfF0tmM1c9IXy+rbxej/RhTBlE7UtH3OLrCFPOGZOGsnCFRe6FkZLQ==
+X-Received: by 2002:a05:600c:4394:b0:450:cc79:676 with SMTP id 5b1f17b1804b1-450cc79077fmr23266695e9.20.1748518395511;
+        Thu, 29 May 2025 04:33:15 -0700 (PDT)
 Received: from ho-tower-lan.lan ([37.18.136.128])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450cfc3785bsm17443945e9.40.2025.05.29.04.33.12
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450cfc3785bsm17443945e9.40.2025.05.29.04.33.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 04:33:13 -0700 (PDT)
+        Thu, 29 May 2025 04:33:15 -0700 (PDT)
 From: James Clark <james.clark@linaro.org>
-Date: Thu, 29 May 2025 12:30:25 +0100
-Subject: [PATCH v2 04/11] perf: arm_spe: Add support for FEAT_SPE_EFT
- extended filtering
+Date: Thu, 29 May 2025 12:30:26 +0100
+Subject: [PATCH v2 05/11] arm64/boot: Enable EL2 requirements for
+ SPE_FEAT_FDS
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250529-james-perf-feat_spe_eft-v2-4-a01a9baad06a@linaro.org>
+Message-Id: <20250529-james-perf-feat_spe_eft-v2-5-a01a9baad06a@linaro.org>
 References: <20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org>
 In-Reply-To: <20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -85,165 +85,66 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
  Adrian Hunter <adrian.hunter@intel.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, Leo Yan <leo.yan@arm.com>, 
- James Clark <james.clark@linaro.org>
+ kvmarm@lists.linux.dev, James Clark <james.clark@linaro.org>
 X-Mailer: b4 0.14.0
 
-FEAT_SPE_EFT (optional from Armv9.4) adds mask bits for the existing
-load, store and branch filters. It also adds two new filter bits for
-SIMD and floating point with their own associated mask bits. The current
-filters only allow OR filtering on samples that are load OR store etc,
-and the new mask bits allow setting part of the filter to an AND, for
-example filtering samples that are store AND SIMD. With mask bits set to
-0, the OR behavior is preserved, so the unless any masks are explicitly
-set old filters will behave the same.
+SPE data source filtering (optional from Armv8.8) requires that traps to
+the filter register PMSDSFR be disabled. Document the requirements and
+disable the traps if the feature is present.
 
-Add them all and make them behave the same way as existing format bits,
-hidden and return EOPNOTSUPP if set when the feature doesn't exist.
-
-Reviewed-by: Leo Yan <leo.yan@arm.com>
 Signed-off-by: James Clark <james.clark@linaro.org>
 ---
- drivers/perf/arm_spe_pmu.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ Documentation/arch/arm64/booting.rst | 11 +++++++++++
+ arch/arm64/include/asm/el2_setup.h   | 14 ++++++++++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index d9f6d229dce8..9309b846f642 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -86,6 +86,7 @@ struct arm_spe_pmu {
- #define SPE_PMU_FEAT_ERND			(1UL << 5)
- #define SPE_PMU_FEAT_INV_FILT_EVT		(1UL << 6)
- #define SPE_PMU_FEAT_DISCARD			(1UL << 7)
-+#define SPE_PMU_FEAT_EFT			(1UL << 8)
- #define SPE_PMU_FEAT_DEV_PROBED			(1UL << 63)
- 	u64					features;
+diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+index dee7b6de864f..abd75085a239 100644
+--- a/Documentation/arch/arm64/booting.rst
++++ b/Documentation/arch/arm64/booting.rst
+@@ -404,6 +404,17 @@ Before jumping into the kernel, the following conditions must be met:
+     - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
+     - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
  
-@@ -197,6 +198,27 @@ static const struct attribute_group arm_spe_pmu_cap_group = {
- #define ATTR_CFG_FLD_discard_CFG		config	/* PMBLIMITR_EL1.FM = DISCARD */
- #define ATTR_CFG_FLD_discard_LO			35
- #define ATTR_CFG_FLD_discard_HI			35
-+#define ATTR_CFG_FLD_branch_filter_mask_CFG	config	/* PMSFCR_EL1.Bm */
-+#define ATTR_CFG_FLD_branch_filter_mask_LO	36
-+#define ATTR_CFG_FLD_branch_filter_mask_HI	36
-+#define ATTR_CFG_FLD_load_filter_mask_CFG	config	/* PMSFCR_EL1.LDm */
-+#define ATTR_CFG_FLD_load_filter_mask_LO	37
-+#define ATTR_CFG_FLD_load_filter_mask_HI	37
-+#define ATTR_CFG_FLD_store_filter_mask_CFG	config	/* PMSFCR_EL1.STm */
-+#define ATTR_CFG_FLD_store_filter_mask_LO	38
-+#define ATTR_CFG_FLD_store_filter_mask_HI	38
-+#define ATTR_CFG_FLD_simd_filter_CFG		config	/* PMSFCR_EL1.SIMD */
-+#define ATTR_CFG_FLD_simd_filter_LO		39
-+#define ATTR_CFG_FLD_simd_filter_HI		39
-+#define ATTR_CFG_FLD_simd_filter_mask_CFG	config	/* PMSFCR_EL1.SIMDm */
-+#define ATTR_CFG_FLD_simd_filter_mask_LO	40
-+#define ATTR_CFG_FLD_simd_filter_mask_HI	40
-+#define ATTR_CFG_FLD_float_filter_CFG		config	/* PMSFCR_EL1.FP */
-+#define ATTR_CFG_FLD_float_filter_LO		41
-+#define ATTR_CFG_FLD_float_filter_HI		41
-+#define ATTR_CFG_FLD_float_filter_mask_CFG	config	/* PMSFCR_EL1.FPm */
-+#define ATTR_CFG_FLD_float_filter_mask_LO	42
-+#define ATTR_CFG_FLD_float_filter_mask_HI	42
- 
- #define ATTR_CFG_FLD_event_filter_CFG		config1	/* PMSEVFR_EL1 */
- #define ATTR_CFG_FLD_event_filter_LO		0
-@@ -215,8 +237,15 @@ GEN_PMU_FORMAT_ATTR(pa_enable);
- GEN_PMU_FORMAT_ATTR(pct_enable);
- GEN_PMU_FORMAT_ATTR(jitter);
- GEN_PMU_FORMAT_ATTR(branch_filter);
-+GEN_PMU_FORMAT_ATTR(branch_filter_mask);
- GEN_PMU_FORMAT_ATTR(load_filter);
-+GEN_PMU_FORMAT_ATTR(load_filter_mask);
- GEN_PMU_FORMAT_ATTR(store_filter);
-+GEN_PMU_FORMAT_ATTR(store_filter_mask);
-+GEN_PMU_FORMAT_ATTR(simd_filter);
-+GEN_PMU_FORMAT_ATTR(simd_filter_mask);
-+GEN_PMU_FORMAT_ATTR(float_filter);
-+GEN_PMU_FORMAT_ATTR(float_filter_mask);
- GEN_PMU_FORMAT_ATTR(event_filter);
- GEN_PMU_FORMAT_ATTR(inv_event_filter);
- GEN_PMU_FORMAT_ATTR(min_latency);
-@@ -228,8 +257,15 @@ static struct attribute *arm_spe_pmu_formats_attr[] = {
- 	&format_attr_pct_enable.attr,
- 	&format_attr_jitter.attr,
- 	&format_attr_branch_filter.attr,
-+	&format_attr_branch_filter_mask.attr,
- 	&format_attr_load_filter.attr,
-+	&format_attr_load_filter_mask.attr,
- 	&format_attr_store_filter.attr,
-+	&format_attr_store_filter_mask.attr,
-+	&format_attr_simd_filter.attr,
-+	&format_attr_simd_filter_mask.attr,
-+	&format_attr_float_filter.attr,
-+	&format_attr_float_filter_mask.attr,
- 	&format_attr_event_filter.attr,
- 	&format_attr_inv_event_filter.attr,
- 	&format_attr_min_latency.attr,
-@@ -250,6 +286,16 @@ static umode_t arm_spe_pmu_format_attr_is_visible(struct kobject *kobj,
- 	if (attr == &format_attr_inv_event_filter.attr && !(spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT))
- 		return 0;
- 
-+	if ((attr == &format_attr_branch_filter_mask.attr ||
-+	     attr == &format_attr_load_filter_mask.attr ||
-+	     attr == &format_attr_store_filter_mask.attr ||
-+	     attr == &format_attr_simd_filter.attr ||
-+	     attr == &format_attr_simd_filter_mask.attr ||
-+	     attr == &format_attr_float_filter.attr ||
-+	     attr == &format_attr_float_filter_mask.attr) &&
-+	     !(spe_pmu->features & SPE_PMU_FEAT_EFT))
-+		return 0;
++  For CPUs with SPE data source filtering (FEAT_SPE_FDS):
 +
- 	return attr->mode;
- }
- 
-@@ -341,8 +387,15 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
- 	u64 reg = 0;
- 
- 	reg |= FIELD_PREP(PMSFCR_EL1_LD, ATTR_CFG_GET_FLD(attr, load_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_LDm, ATTR_CFG_GET_FLD(attr, load_filter_mask));
- 	reg |= FIELD_PREP(PMSFCR_EL1_ST, ATTR_CFG_GET_FLD(attr, store_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_STm, ATTR_CFG_GET_FLD(attr, store_filter_mask));
- 	reg |= FIELD_PREP(PMSFCR_EL1_B, ATTR_CFG_GET_FLD(attr, branch_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_Bm, ATTR_CFG_GET_FLD(attr, branch_filter_mask));
-+	reg |= FIELD_PREP(PMSFCR_EL1_SIMD, ATTR_CFG_GET_FLD(attr, simd_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_SIMDm, ATTR_CFG_GET_FLD(attr, simd_filter_mask));
-+	reg |= FIELD_PREP(PMSFCR_EL1_FP, ATTR_CFG_GET_FLD(attr, float_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_FPm, ATTR_CFG_GET_FLD(attr, float_filter_mask));
- 
- 	if (reg)
- 		reg |= PMSFCR_EL1_FT;
-@@ -716,6 +769,10 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
- 	u64 reg;
- 	struct perf_event_attr *attr = &event->attr;
- 	struct arm_spe_pmu *spe_pmu = to_spe_pmu(event->pmu);
-+	const u64 feat_spe_eft_bits = PMSFCR_EL1_LDm | PMSFCR_EL1_STm |
-+				      PMSFCR_EL1_Bm | PMSFCR_EL1_SIMD |
-+				      PMSFCR_EL1_SIMDm | PMSFCR_EL1_FP |
-+				      PMSFCR_EL1_FPm;
- 
- 	/* This is, of course, deeply driver-specific */
- 	if (attr->type != event->pmu->type)
-@@ -761,6 +818,10 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_LAT))
- 		return -EOPNOTSUPP;
- 
-+	if ((reg & feat_spe_eft_bits) &&
-+	    !(spe_pmu->features & SPE_PMU_FEAT_EFT))
-+		return -EOPNOTSUPP;
++  - If EL3 is present:
 +
- 	if (ATTR_CFG_GET_FLD(&event->attr, discard) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_DISCARD))
- 		return -EOPNOTSUPP;
-@@ -1052,6 +1113,9 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 	if (spe_pmu->pmsver >= ID_AA64DFR0_EL1_PMSVer_V1P2)
- 		spe_pmu->features |= SPE_PMU_FEAT_DISCARD;
- 
-+	if (FIELD_GET(PMSIDR_EL1_EFT, reg))
-+		spe_pmu->features |= SPE_PMU_FEAT_EFT;
++    - MDCR_EL3.EnPMS3 (bit 42) must be initialised to 0b1.
 +
- 	/* This field has a spaced out encoding, so just use a look-up */
- 	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
- 	switch (fld) {
++  - If the kernel is entered at EL1 and EL2 is present:
++
++    - HDFGRTR2_EL2.nPMSDSFR_EL1 (bit 19) must be initialised to 0b1.
++    - HDFGWTR2_EL2.nPMSDSFR_EL1 (bit 19) must be initialised to 0b1.
++
+   For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
+ 
+   - If the kernel is entered at EL1 and EL2 is present:
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index f6d72ca03133..6d0d8c25e912 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -279,6 +279,20 @@
+ 	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
+ 	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
+ .Lskip_pmuv3p9_\@:
++	mrs	x1, id_aa64dfr0_el1
++	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMSVer_SHIFT, #4
++	/* If SPE is implemented, */
++	cmp	x1, #ID_AA64DFR0_EL1_PMSVer_IMP
++	b.lt	.Lskip_spefds_\@
++	/* we can read PMSIDR and */
++	mrs_s	x1, SYS_PMSIDR_EL1
++	and	x1, x1,  #(1 << PMSIDR_EL1_FDS_SHIFT)
++	/* if FEAT_SPE_FDS is implemented, */
++	cbz	x1, .Lskip_spefds_\@
++	/* disable traps to PMSDSFR. */
++	orr	x0, x0, #HDFGRTR2_EL2_nPMSDSFR_EL1
++
++.Lskip_spefds_\@:
+ 	msr_s   SYS_HDFGRTR2_EL2, x0
+ 	msr_s   SYS_HDFGWTR2_EL2, x0
+ 	msr_s   SYS_HFGRTR2_EL2, xzr
 
 -- 
 2.34.1
