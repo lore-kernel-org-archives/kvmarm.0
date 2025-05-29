@@ -1,189 +1,151 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2132.outbound.protection.outlook.com [40.107.94.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8556E20E70F
-	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 10:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.132
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748514641; cv=fail; b=sA/SuKZF8Vf9yoek/y3ZzOZtzl+cQy2kgSl109qbZI3BwaKwE57JUXgAjSUzr38OIlfDrCZWtK1ZuVY4EGtKiCwp/GXZeIkdbrEfIKR1/FjCMvRedRncmr3cBdi4ZFMhM/UP/Ex74ket6mUDUMtE/2Y4OTU648x2jv6GW4kpERE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748514641; c=relaxed/simple;
-	bh=8YNsQdA7u9si+72nfDUpno2kNwfEbWnK5cNZ3eu8tGk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZDXtOy+s45cq1l9qhvSiRkT1x+BaVX/F6Qaz9Tzazz6zX6hbBbZ11Clh+kOMMUg64l5kXvrkT/Heyu1GBbCfgbmQcvjT3u6Ijf6xwbphNo+r5q6DQCwfq59mBGMgszGT3Jzqo3QBhbPNHdexCgxahCM8+hncIU47HQPBpiRn6cY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=vCplEBGS; arc=fail smtp.client-ip=40.107.94.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1544A28DB5B
+	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 11:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748518393; cv=none; b=GxnmLa6osyOFNaFffa4vj0EHlCt/nzzwTctJJAoXWCjBQLygHSza2iNW5bQ0XnQUOZlXisOq/8Y9TQU2uWh9xfCShAEOfC/CyYQCaAsyM843ZVmo8uiJkyEdiE4/kqUHg/GNdasQI+8KMhm23+6Vg0qGtnUEbvGydloG217WdHM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748518393; c=relaxed/simple;
+	bh=bh4MgnxAaRyek2UdQKghPpoTWMGgrTm8WvxljGcyuvo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jJzY0IxCtoDMNKRQ30OpSZ4Y+ZOJQhO5Mu+d+kn7pwlDLwiPHVQe4yZsenY7D++JSbF+sJik/xfDpRhdt0tR7Re0iOcP6Ixnvw4ZW92+xMQLmfO8uZhV8CVGbLiAfd/FrhmhNn2Qrnb9cPhcSfMFjQbomdQ1Lsk1qAiYIQprsFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=L0fjgY0H; arc=none smtp.client-ip=209.85.128.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="vCplEBGS"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Cf3bhLfUITLCsaG56o8zCHPDSSFs717NVoHUdHI7TjgosEgk0I8Tgi5DZgVNXcgM6qbaIMjR1s1uWqZc79+5S8IZ5L2JOTjiDntom2Ew4AfYjdyxzL0y2b1ceT4rrl2QrSqfw68NXO5yDtPJfL5dm9ZqzdxnNrB21v4DJMo5H4LMdV5yKr3hZEwD7pN15vzzrP0JUhHSNVOBl4JUjzod1hBE96cVxUcE+Uye3zdN8SQP06D/6hVX141GL0l+wgWhV0xr9/jdSKBVoPJM6MbLa4Tnz/beB4u0tS9XnAd1/MT3iLLamVPk+GdAvbWm8mZpFDG5osBeXNVRxk7wV1SeJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AklerkohkR0+itr5AkvJP0qTU7Y7xB3yY6iA75i9xiM=;
- b=oYDedXdHCq6M1t9TX6BwL99+eLKcw2NINbUfkpaabWMHY6IQc5PdesO32+pGkDvxSI9aA1fBuuizA6VlOTpfs1kDs/DjIzOMURrLjHKBBeB7bGK528mV+J1yLslh+GWac4wlsSyomC7LMyXZx8buC+IDvV1dHduz2mA5VQutjaMjaII64S54YQaWUFgz66hmd0g/qFyv8jSi4o1KbO5p1elcm1HQahkTwyUw6PWzS8u5I/d/nREBPr0Lizu11tiyM7nNyWPzOkAq2tyQZmBynh46WVAZv6UxFkr2Vt5XOcr/MBbl5J7s8qYtdyUocdte5/8fyKtozbOK5CRGxYEqCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L0fjgY0H"
+Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-441ab63a415so9350135e9.3
+        for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 04:33:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AklerkohkR0+itr5AkvJP0qTU7Y7xB3yY6iA75i9xiM=;
- b=vCplEBGSoD6MILNGVJqYg0YR3tLGjPZqkP8twdSj/dOzGXSszzoDyKzgcipkLCkfquDVAgf0eIo1lxDEZrbjxn+TtcB9oFzzG39uXGAJ366b/QHvKsISgDRWAXDkTilNqcH888iYlKZIm/Sdjc6VKUAAXGeEeTy1MnylDCevuog=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
- BL1PR01MB7650.prod.exchangelabs.com (2603:10b6:208:395::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8769.27; Thu, 29 May 2025 10:30:16 +0000
-Received: from SJ2PR01MB8101.prod.exchangelabs.com
- ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
- ([fe80::292:6d9c:eb9a:95c9%6]) with mapi id 15.20.8722.027; Thu, 29 May 2025
- 10:30:15 +0000
-Message-ID: <7bf7bd52-7553-42a7-afdb-a5e95f8699b5@os.amperecomputing.com>
-Date: Thu, 29 May 2025 15:59:58 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 0/9] KVM: Enable Nested Virt selftests
-To: Eric Auger <eauger@redhat.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com,
- darren@os.amperecomputing.com
-References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
- <92c7e99c-5574-422c-92f1-62d5cde58fec@redhat.com>
-Content-Language: en-US
-From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <92c7e99c-5574-422c-92f1-62d5cde58fec@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0065.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:ad::9) To SJ2PR01MB8101.prod.exchangelabs.com
- (2603:10b6:a03:4f6::10)
+        d=linaro.org; s=google; t=1748518388; x=1749123188; darn=lists.linux.dev;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9RGEjbS+3C/e9OMoWBvhsdf9eFJydSpRbxivnh7opTI=;
+        b=L0fjgY0HKl1y3GUh1F/jZ8PaX1ZAf7Ugol3hIuVg9UtVgaM95QLAvE87Ltu0d3lkJn
+         yS/qej6BhGZkKR9rPsg+pLRQvfz0hXis2o0sH+jJCGSkls4WxaOs+sjoydFdusN1H6SJ
+         TJmEGcqtabxVbN/G9nk2YAKOXOTLS5ciXxwIr1UJ3YudA8GPjh6NVFUY+p8kSO2dWhuc
+         DJu5LQPc2IqYmjT2oj/9O42i6APYHs0Oehaky4DgVtfaGdA5YSOdhHdg45wMu4hVvz3V
+         8nCicHSIurA0yLSUIbW7CHXwTHFZ5Yn25HJ3kNYvgdblO8lVs8h0fNx+g36mh1vyDMLU
+         UYdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748518388; x=1749123188;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9RGEjbS+3C/e9OMoWBvhsdf9eFJydSpRbxivnh7opTI=;
+        b=lwVYjpUC9XeqBeCy1GVp1Jvr35lqJy7bMnvdxTX8Qd77lUalkaKifu2Y62nk0Wes5D
+         +asJIigVVV4LjYLyOVg98gSryRbdD4ceaS6kmx+d40itcQV7bq1vl2EMc87p10EyNTVJ
+         tjbZHDTasPqvnS5/KWFB/n52kTWp5SrWC+EiZ0mNKmEhnGcHTAkw1bVZZTxpRi0KKw2Y
+         6/XKjdDG92Jv/Zs9s9lbi/nMjNYJgNW+8PPHFYaKYC73nkHMfW363o+HrO3QsTmQEdR9
+         pYiYVOFm+Sr0OVlPGVGGfbStXvBEKmWQHJzO/SPbqS2aTwogwIcX6nNpr9LLyztiC+TP
+         ULWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMmFdDJAnDoYjwI3P9DOoKHlZkupTuHBpaw7nEe+XL2TS7QaQw1nrwu3H03SnmXh6En+j/MuY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyfDW8jOLrG05mMwo9DQbKkBCGRdpsHd5V0ixWVS1FgfKvV2vJp
+	7VFKHX7SlqRXm18SAZNK+Pe+4K2uctmsbUaLXoIZTeuAfD+R1tfSTXJwq+6AXK2eUL0=
+X-Gm-Gg: ASbGncsY8tkrdWH+BUhe5vDiKHaKv98IoLjB4e1UC0KUifQWaiVrNW0yGe17IpbzIt6
+	exjw+T1RsBusF/u1a7migdnR8wQHOYv9QnbvAtOwZx4CI4JfdMqJAGXlOdZ74Q1N5+EloELKvn4
+	K1regvzjpQtYNQke3R9bMfyOsLBrwQWNQDCMRPd0iiDHhDAeQl9qwzQkY6lMvI0Syia1bpW1jZ7
+	2XGSdWODa+fjzTUWK8VPXBlF4CVUbkbQpm/3XvKM9wNZkn/NjF520q0wumFlKQrVsMDhzZ62Atj
+	gjjU2YBr5vJXKfj/x17V2xV5eJWV3OKQldhoowFXFd5NwAjjqTx3DfXhfy1W
+X-Google-Smtp-Source: AGHT+IFDz2Nzk5rV8H17aE5jP5Yo1dXjiKY7Wt+ZcHiSvBCRbRuqUmfh+W28PJ1soWP3lufeYbHSmw==
+X-Received: by 2002:a05:600c:3482:b0:441:b00d:e9d1 with SMTP id 5b1f17b1804b1-450d055ba9fmr18892675e9.2.1748518388273;
+        Thu, 29 May 2025 04:33:08 -0700 (PDT)
+Received: from ho-tower-lan.lan ([37.18.136.128])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450cfc3785bsm17443945e9.40.2025.05.29.04.33.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 May 2025 04:33:07 -0700 (PDT)
+From: James Clark <james.clark@linaro.org>
+Subject: [PATCH v2 00/11] perf: arm_spe: Armv8.8 SPE features
+Date: Thu, 29 May 2025 12:30:21 +0100
+Message-Id: <20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|BL1PR01MB7650:EE_
-X-MS-Office365-Filtering-Correlation-Id: 907c9744-79b2-436e-f450-08dd9e9bcd4c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cXhHeW51QlR1TnZLQnRqeUtGZkVzYXdEYjM0Qk13RlQrcUdyeXFRQURnRVZ1?=
- =?utf-8?B?RWgzYXl5TE5ITGZKcEVhSEwybDRhLzZOUFRxZjBLMWhldzZzcjlCcUl2cXZ5?=
- =?utf-8?B?NEp3VkpHcVpCMTc1Q09CWGxqdTY0b05YQyt1amEzZExoU3hocFRocE80RzdC?=
- =?utf-8?B?OFgrM1lxK3hPcGllMktuSlM0U2xYdlYxRVRTR1lnUkowQm9JeExnWHZKT01i?=
- =?utf-8?B?Y1dhbFpmcW9VVkp0bkIxWUlrRUpBYlRPbi9HNmNCRWVGKzk5eDJEa2JRTGR5?=
- =?utf-8?B?NktzY2tyYlZYc0Fzdzk1UG56Vmx3L3F4cGVZdFRiMGdUSzNzeTdQT0l1eGJz?=
- =?utf-8?B?MlZkZlFrTWJzTHRjMitoU2V3RU5KVFhKWXd4VUdhT2Rwci9pemZ3MXpIOFhL?=
- =?utf-8?B?dk50S1VHQ1hwb1JQdlByZUExYnYvcllHU2JsamMzc0NCdm1YdXBYSjVScmtL?=
- =?utf-8?B?Nk5HdWFtOUhmdTZkQm8weUVwMldqZ0xpRHUxWEV6SWVqRDB3NVExQjVCdnhw?=
- =?utf-8?B?YXJhM1lvWVlXSEpYdktVWE5jZkk4dmt5L0RPSmEvM1ByUm9idXp0anNCZGFO?=
- =?utf-8?B?bVBjSlVKWW5aZ20vMVczNzk5MzB3TzhjZU52WHhHRTZkQmtucDdtS0hIc01o?=
- =?utf-8?B?SkRuc3hvSnZDbjZhRk9nZkltUU0rZytKT3NKS053VVpWK0dVWnN0UG1LVVEz?=
- =?utf-8?B?ZFl3bVg4NmpsR0FqL2U5M2QzZ3Q5YnhVK3NFbzRoVEN0NVhMeHBzQ2ZCZHQ3?=
- =?utf-8?B?WlQ1WTZrQzB1Z3BZRVRHbHlRdVA2VW16bTRlUWJQUzY4YThtQzc1ckU5VE1B?=
- =?utf-8?B?UEtHSTVuOWVFWFBRUWl2K0FYWUtWNlZCbGpHZFVMTHJOK1pMcTNBMnBGbEhu?=
- =?utf-8?B?SENscXBnRi96UnNCeDRta2oyTVA0U1pBcjdlZXRyaDB5amdSMDBnVWdvMTBQ?=
- =?utf-8?B?dmQ0ZTFjZWNRd1lROTQ1NlBuOGdaRmtGeXEzZkRJZzV6QVMyWGlWL0JKQ3hF?=
- =?utf-8?B?YTVtNVBzYTJlRzVRNnhGNGNaUjlGM3RaRzR2YWFydllXM0VMK1VsMnlia25I?=
- =?utf-8?B?VERwWjh6Nm1kaUtsMUMrWHh0NzFkb0xNbmdDaVZPU09ONlJNWFlHTC9OL1JH?=
- =?utf-8?B?eHVMclZEL0JYbFdEOTgrOHpNWWxQQkZuZzN1azNyN2VyRTJqRWNxUXZpNTJU?=
- =?utf-8?B?NkpoQ1ZTUytsSWtzWVdhekRlRFBNem5zTWNGdnVpZWY2cVFxYllnL04vRzlM?=
- =?utf-8?B?aG91aXNma1FsVGZFSTEvZUFXd2lyWjZpcDRWN2FadHJ2N2d2eEo5WitDakdI?=
- =?utf-8?B?ZERtam01a3JDa1d6aE9GYWcyWS94a0xNdW1EWU5wY3BSbU93MDNONTZCSCs4?=
- =?utf-8?B?U3lHbDQ4d3RRMjNSQUQrTzhhNWtQNjNVbFQ0Q3ZYWDdpQ0lsN3lodEJEUW93?=
- =?utf-8?B?WU92VmM4NkxNdmh6MVluQm8xUHdvb3luRGl3ZzNiVm5jSkorUHNOWEZnak4x?=
- =?utf-8?B?L2hTK0o4dk1GQzIzSGV3eE56dVg3TTZCRGN0WlMvSkxXUU5oQTR4Sjc4Vnhr?=
- =?utf-8?B?M3RwNnN1Rys2S202aWhQYkI5clo1ejVyK3MvcHFrRUxhdDRPbUZYZmcyMFA1?=
- =?utf-8?B?dU9zbHZISVJKVk9jSXFPdTBDaXdVZk9Ic3EveHpGTWpTRGpYNnRENG9kUm9u?=
- =?utf-8?B?b3pGNXlabjZRUUM3ZTlEbVdoSlJWZWVsTVNqaURYL0tSOWJoOUVSekV6QjA4?=
- =?utf-8?B?Y0orVmUzWE9OQzlaWERvYnB1UitXUG5IWXQwTW5BVTAxWnpzZ3VsVExrcXJN?=
- =?utf-8?B?THlhanFDUUo1dUtXa2h1bkgrMVJEZmVobTBZbzBVbVhYY0tnbHFoNysrQm9F?=
- =?utf-8?B?ZkU4bGY1TEZibUN2ZWtXY2ZRSnNEVHNJOHlPUGNFQk1tazR1Q29mYnZmbTNy?=
- =?utf-8?Q?SZyvcNf0qGo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?L3VMUTV3L2VxdmgrYjhaVTlkbjc1dnFHZkVaQmgwY0kvMEJuQmJ4bzcrNit2?=
- =?utf-8?B?UTFJcTFjeEViTHlFcjRMdUtqNHNmSU92LzJzS2JQOCs4SkpEUnhmbS8zRWYr?=
- =?utf-8?B?TFhqWWNucTBTWDBaSjZjYW9TZlFuemF4R2I4MEtnemNJL0MvdmpGa0pxdDUr?=
- =?utf-8?B?d1k1SUxLTVdIMk1ualJpVDB1WjV1dzlNbkJFdkF2VFR5SkZBYi9rc0Jwbmlq?=
- =?utf-8?B?NFZlK0hyQWdxMXltMWtjTXVNTEdzK0hoTVVVaDczMFhqUnA1Mmx5QWFPUE90?=
- =?utf-8?B?VVE0OXVoWXkvMkZBWnlyZ1FzUW40WVhnR1ZrUlFWd0tERFA1VWhSWUVLZVlU?=
- =?utf-8?B?MDMyUmgvRm8vUDJWYnd3UXdubDhFMTIyckVkRE1QM1VPcmxmSUl2SFJ2Uloy?=
- =?utf-8?B?bVFYVW1IVDkyYTR2WEY0RlJmWVFSUFZkM2pJNnowRXhpTTg5K1pCS0pHOXdK?=
- =?utf-8?B?VWJQeGJwbE41b080c1NSSWFyZEpwb3FWOG10dElMTHRBa0d3blZxMG9OZHNz?=
- =?utf-8?B?M2hmOUdnUlQvVFF4cTFaTmU5VE5XZ3RhMm5qWmNYU3ZZVVpkZkd5VEJEaG1R?=
- =?utf-8?B?T1FlK1ByekYydXR6Mkt3SXdhVEJLRTV1VzN6WkVNVWJ3K29GUTdxbmlybEZa?=
- =?utf-8?B?elFjRjRPOXBhRTlSaE0zTk1MQ0JkY092a2t1d0djMXdaREEydG1SYWorQWp3?=
- =?utf-8?B?V055THJ4WC9MMm5xUnE0SzlkeFVMUzVxNFdrOVI2RzZyWHlZQWlzU0tkdkc4?=
- =?utf-8?B?SG04TGNMQ2Zscm1HRXhkNEJnNlRNQVpLSzFqTmpZUnpQY1Fhakw3eHJKdERM?=
- =?utf-8?B?cjJqajZDcHNKT0k5VW9ZMkx5R0NPZXVxdjdiaWlaRUdlajhzdXRKMGNvekRH?=
- =?utf-8?B?bjBsMFFmY2M1cnBKRFdWWHc0aXdOMnVJNzJjb1hCdzNOc1lNSkV1OTRHVUMy?=
- =?utf-8?B?MncvNXN2a0YwRjFrdk1EY3g4UWlLMFVYNFJGRFZtN1ZFK1BMSW1HbklGbFhV?=
- =?utf-8?B?OEJhb2g2dzdEUk9QcDY1QmZoZEx5OGpUWXRVNkVVV3BsSDZDLytiTDZQOFhD?=
- =?utf-8?B?cm9VV004TGpNSnlvMGMyVmVrdkh0bDNjVzFOaThuZm56ZFh0U25mYWdzRVph?=
- =?utf-8?B?VjhIS2ZyNFRHNEZaU2VsdXpvQzdObWZvT1dwdFEySW0rZWI1MFpFL29zRkl4?=
- =?utf-8?B?Ymo0elhja0VzUVhuSGpZUitDZ0dMd09wSnYwbmd1dDhrb0g0anAvN3V1MFhG?=
- =?utf-8?B?VExrQXltS3EvTTF2bGNqMzNXSXV6cWh1ZE01c3puYVRHQ1ZZRVZ0TzFMUzlJ?=
- =?utf-8?B?L1dIbmJvLzMyNHhiT1Z6bXB2RGRpU09iZGxqejFyNExWelJ4enl6NlZOeFNv?=
- =?utf-8?B?eW9PU09FM0NJWE0ySVcyWjZadXdYMGZXcjA0bHhkRHNoR0MrNHZ3TS8vdVBw?=
- =?utf-8?B?NTR4NUlTTXhtWXVmWFBtTmtVTm95STRFVk1jOHRlZ3pwbjdXdk1MU3djOTFS?=
- =?utf-8?B?ZWpUY1BBL1BjVTdhRUFWYTh5bysxM0JpMU41WFJzOWFYVlk1d2E2SWVBMm9t?=
- =?utf-8?B?TG1iWGlDSWhQdkpvQU9zQis2dzQ2OTJBcU1zNUk5UVgyczlvWlRmY1FrdnFk?=
- =?utf-8?B?b0V2VU81QVBTWDZqOHFERC9yRi9NQk9OYWwzVUFHekl3VjdYeHlOMnZaOWVh?=
- =?utf-8?B?MjRGTVRSWXRTUDliZGl3Ykc3ajBhWGo1WEw2aDVZQUtSUmg5SXYvQmhHc1l4?=
- =?utf-8?B?VGt0ang1bWVyOU5PeVRjejBKbm1sQytxQXVBTWRYeTNTd3hWcFhna1dTQjN0?=
- =?utf-8?B?eHJJdXV5cTR4NzZuaG8va0NmeXFMNDNUVjAyQlk2QThxMXEyVDkvVitHb09j?=
- =?utf-8?B?V2ZkdWk1VXQ4VitLcFp6SmhZUFd2ZlFMK28yaVcvYXVDUkNGb3NjOFRmZUhm?=
- =?utf-8?B?R2tCZSsvRGxFRk1NQmFoeFJOY090d2pTb0tXV2NsamU2YXRZYWVManF2Zno4?=
- =?utf-8?B?LzlGYXJubUxWSTVWWWZrV1dIcFRSNDFJOGJkOTRIWitRZWJod1BMY1JUd05a?=
- =?utf-8?B?clVQSkhCSFNpZE5ZRzM0bDBPM0JqRkZ5eU85RHBqTGRvUEwyV0NFUGJoZWR2?=
- =?utf-8?B?SmNUMkxTZFhrcVZuQlIxTDdkakdFWFYwaUVub2JidHRxZWt0WFozKy81REE3?=
- =?utf-8?Q?vC9Mbu3OxBZOt7OwkFu/ggQ=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 907c9744-79b2-436e-f450-08dd9e9bcd4c
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2025 10:30:15.9132
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qngvslE4qKzZ70+X9wQmUHHRHGzF0hcVaIqWXvTOMgmRm4aT3KCW4ZAXi42ysmVBccyyvCCKaYFfCD4TTZituo+Zp2SP+8g4SbAuVYyRyfUfgH8XIw13fPIUcxZnsiOb
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR01MB7650
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAE1FOGgC/33N0QqDIBTG8VcJr+c4mjXb1d5jRIgey7FpaMRG9
+ O6zYLCb7fJ/4Py+hSSMDhM5FwuJOLvkgs/BDwXRg/I9UmdyEw68gpJxelMPTHTEaKlFNXVpxA7
+ tROtaGyuMtNg0JH+PEa177vK1zT24NIX42odmtl0/ZvnTnBkFypXmYASctJaXu/MqhmOI/baxA
+ xXU/wFjhASUKGTFvoF2Xdc3cIeZJgABAAA=
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, Peter Zijlstra <peterz@infradead.org>, 
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Namhyung Kim <namhyung@kernel.org>, 
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
+ Adrian Hunter <adrian.hunter@intel.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org, 
+ kvmarm@lists.linux.dev, James Clark <james.clark@linaro.org>, 
+ Leo Yan <leo.yan@arm.com>
+X-Mailer: b4 0.14.0
 
+Support 3 new SPE features: FEAT_SPEv1p4 filters, FEAT_SPE_EFT extended
+filtering, and SPE_FEAT_FDS data source filtering. The features are
+independent can be applied separately:
 
-Hi Eric,
+  * Prerequisite sysreg changes - patches 1 - 2
+  * FEAT_SPEv1p4 - patch 3
+  * FEAT_SPE_EFT - patch 4
+  * FEAT_SPE_FDS - patches 5 - 8
+  * FEAT_SPE_FDS Perf tool changes - patches 9 - 11
 
-On 5/28/2025 6:58 PM, Eric Auger wrote:
-> Hi Ganapatrao,
-> 
-> On 5/12/25 12:52 PM, Ganapatrao Kulkarni wrote:
->> This patch series makes the selftest work with NV enabled. The guest code
->> is run in vEL2 instead of EL1. We add a command line option to enable
->> testing of NV. The NV tests are disabled by default.
-> 
-> For commodity, I would add in the coverletter that for all tests
-> enhanced with vEL2 testing "-g 1" option shall be added to force that mode.
+The first two features will work with old Perfs but a Perf change to
+parse the new config4 is required for the last feature.
 
-Sure, will do.
+---
+Changes in v2:
+- Fix detection of FEAT_SPE_FDS in el2_setup.h
+- Pickup Marc Z's sysreg change instead which matches the json
+- Restructure and expand docs changes
+- Link to v1: https://lore.kernel.org/r/20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org
 
-> 
-> I don't really get how you chose tests capable to run at vEL2 and
-> excluded others? Wouldn't it make sense to have a way to run all tests
-> in either mode?
-There is no selection as such. I have worked on around 50% of the tests and sent for the early review.
-Yes, almost all tests can/should run in vEL2 except few.
+---
+James Clark (10):
+      arm64: sysreg: Add new PMSFCR_EL1 fields and PMSDSFR_EL1 register
+      perf: arm_spe: Support FEAT_SPEv1p4 filters
+      perf: arm_spe: Add support for FEAT_SPE_EFT extended filtering
+      arm64/boot: Enable EL2 requirements for SPE_FEAT_FDS
+      KVM: arm64: Add trap configs for PMSDSFR_EL1
+      perf: Add perf_event_attr::config4
+      perf: arm_spe: Add support for filtering on data source
+      tools headers UAPI: Sync linux/perf_event.h with the kernel sources
+      perf tools: Add support for perf_event_attr::config4
+      perf docs: arm-spe: Document new SPE filtering features
 
+Marc Zyngier (1):
+      arm64: sysreg: Update PMSIDR_EL1 description
+
+ Documentation/arch/arm64/booting.rst      |  11 ++++
+ arch/arm64/include/asm/el2_setup.h        |  14 +++++
+ arch/arm64/include/asm/sysreg.h           |   7 +++
+ arch/arm64/kvm/emulate-nested.c           |   1 +
+ arch/arm64/kvm/sys_regs.c                 |   1 +
+ arch/arm64/tools/sysreg                   |  45 ++++++++++++--
+ drivers/perf/arm_spe_pmu.c                | 100 +++++++++++++++++++++++++++++-
+ include/uapi/linux/perf_event.h           |   2 +
+ tools/include/uapi/linux/perf_event.h     |   2 +
+ tools/perf/Documentation/perf-arm-spe.txt |  97 ++++++++++++++++++++++++++---
+ tools/perf/tests/parse-events.c           |  14 ++++-
+ tools/perf/util/parse-events.c            |  11 ++++
+ tools/perf/util/parse-events.h            |   1 +
+ tools/perf/util/parse-events.l            |   1 +
+ tools/perf/util/pmu.c                     |   8 +++
+ tools/perf/util/pmu.h                     |   1 +
+ 16 files changed, 301 insertions(+), 15 deletions(-)
+---
+base-commit: 90b83efa6701656e02c86e7df2cb1765ea602d07
+change-id: 20250312-james-perf-feat_spe_eft-66cdf4d8fe99
+
+Best regards,
 -- 
-Thanks,
-Gk
+James Clark <james.clark@linaro.org>
+
