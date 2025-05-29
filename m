@@ -1,547 +1,434 @@
-Received: from esa13.fujitsucc.c3s2.iphmx.com (esa13.fujitsucc.c3s2.iphmx.com [68.232.156.96])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2AE1A2643;
-	Thu, 29 May 2025 04:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.156.96
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748494435; cv=fail; b=UllPxCbUd31k/E8Ql31Q/WkJyT8c8194Dj6upv1UPr5P9IJOSGZxpGpfSeUDqDFA16tOaxioBozNX/tdEmaBepkfKhpRjMvVEMp5pUwV3yYuTSnih9SMfMAPJdZqxaHq8bAyEZxQRdN7ODBBT48nPhUfEwYNk50Sm5wFu/oTR/4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748494435; c=relaxed/simple;
-	bh=HNjsYSNDGfMO2NUSLrakQDxfb0LfG7oIOoPopN0Mh3M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YvSjRc2tvFX9tKohNIJuDVRoAdaQbqVp2mQK0Wej5P65ye09dmola4RRvs3fj33XH4EaEhGM03w0znaC2hfs39ps3bvCxPT082culWvmjntnr15/7i5boW8CAfi4BygT6/QsG9PIpg0cPfU7xq7bWkHFlMDIUNazaF+Q2F40q90=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=gADiATrP; arc=fail smtp.client-ip=68.232.156.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376781EB5FA
+	for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 09:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748509502; cv=none; b=FVUl8xO0ubmgH3DvhKbY3dSr0yV3mVv4imIzg7SVSmMWlUCYFKtuDhelxMWRNx8Gh3nYNIKx0L6f00dhMU69i/R4DicBPo4B0GgXyXgEnVc4L8UiSkzJSYKKIgPloUHzlHb4I9I238Kt+BMdLIeBgzvYPAUABCbsnfVrI0YbWzY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748509502; c=relaxed/simple;
+	bh=Cgz25Gzc3ikuzbLU64kAUZzKbKGdxSdYOra6tP3NOI0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jQGsQ9/mOcl0IRVUimPCOHNNLLsJ+eq5mRvOR5MXHJYO3J4Xm7deR50aGletDbK2gkk8WHRIMVDu8bNm89kY1MEQg35+cvsjSxHFGRw7Z4dPL9iUxoO7VaTXtwcWwX1UcF+273e6wzW4tk7dLPBbil4QsgIdS6EVcBRFA62j81E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bAl41rfn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="gADiATrP"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj1;
-  t=1748494434; x=1780030434;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=HNjsYSNDGfMO2NUSLrakQDxfb0LfG7oIOoPopN0Mh3M=;
-  b=gADiATrP0zNb05H3/VlGmv9RxokUsQG85hi8NIJsneSb2gFLWcvBoMG9
-   PFzaxwWgq3ECkGQvaJZQbad9v5bFOZgkgJlU1+yuO4+tuf4UdNQNRBukS
-   nRUxyxmTXKNp4RCKdmWzgNz6ugB7R3fh1b+qMoHd/sEDBHU8QTexc49NP
-   rhruiTeFukBEM9vDL+ZyE1VhIPb8Oxes39Aa6Pny4MMoZI5/Hpb6Hc5G/
-   vvCqoPzdWnFMSf4HKENL2UTM9lAGG9LthhWCkHDnIf9KDMIALB5An9UYn
-   gDTGZ7StUd62buhM43ZKTMDd90qmb8AmHwFfSpyGuVfCEMXPBzlAxt5Y9
-   w==;
-X-CSE-ConnectionGUID: FyHafbDsRBKvy0YdeCEdGw==
-X-CSE-MsgGUID: ej/iXiCsSTG/j2S/EqHquA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11447"; a="156450964"
-X-IronPort-AV: E=Sophos;i="6.15,323,1739804400"; 
-   d="scan'208";a="156450964"
-Received: from mail-japanwestazlp17011026.outbound.protection.outlook.com (HELO OS0P286CU010.outbound.protection.outlook.com) ([40.93.130.26])
-  by ob1.fujitsucc.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2025 13:52:37 +0900
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Pr9SLaVpeKgJ7OEHwAcYPXogfgGbZnp/yzPvOMv5+AtzBQtU51xkAH3s+UFvBRKeRf6/JCXhKJuVxzDHo6qE1ET7Y1v7Z64SrWKb+eEQWlGs+wXvLyGBkWEM8vsPyrBwQVqNoUu3gIKAIDBg+RiHli01h1lV4Xe7Xgc93zVPc9y7mwe+qiYdhK+76Ef3PYs3LP8+stDcTILudk9lLvUxUXH9XU86F2MMbbod4tVrKDkkMiteqlq4Nb2TqkWAeckvephEabtozND1PkVkSDjthCqtePV01tU40Z99yt2iC19JboHCi4gry/fOm+5bwsLM1kpmX2lGzEgXZbjksx13nA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/qioMlpApMqt+A1CQCoNF9t5zFK0+B2haNOrT7LS6vI=;
- b=yDwHEBW4uF2Sb9rpd7gDXLlYGVtJ97VhHnXqiz4rROCMVY0hb5sOev8ulcEsXDNEA67QEMI18oR+BpX7fHQHqP/nlvB/AJa0b6e7hgVxklsCRqWUnirwiFZr0UXvfK4ZotLM4MRcOReNLpcnZ+OCIzY3jiY6aRnnIGBknTYcoFTr+SXY0nj+esVcUW2oTixaKkPWLpbXScIB4ws713ZfSxI1VHtGZ6pUtwJb0p0VXfYAwSR3GIAXHRO2+17C138QN6x0qnX7jBwwItify094MrW+4ynsVuEfT3RaCcO28CiSUgtm6yPrRtA2aa7GDqg0jJF1brROaTDfv15anTUH7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fujitsu.com; dmarc=pass action=none header.from=fujitsu.com;
- dkim=pass header.d=fujitsu.com; arc=none
-Received: from TYCPR01MB11463.jpnprd01.prod.outlook.com
- (2603:1096:400:389::10) by OS7PR01MB15077.jpnprd01.prod.outlook.com
- (2603:1096:604:36f::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.30; Thu, 29 May
- 2025 04:52:33 +0000
-Received: from TYCPR01MB11463.jpnprd01.prod.outlook.com
- ([fe80::5df7:5225:6f58:e8e8]) by TYCPR01MB11463.jpnprd01.prod.outlook.com
- ([fe80::5df7:5225:6f58:e8e8%6]) with mapi id 15.20.8769.022; Thu, 29 May 2025
- 04:52:33 +0000
-From: "Emi Kisanuki (Fujitsu)" <fj0570is@fujitsu.com>
-To: 'Steven Price' <steven.price@arm.com>, "'kvm@vger.kernel.org'"
-	<kvm@vger.kernel.org>, "'kvmarm@lists.linux.dev'" <kvmarm@lists.linux.dev>
-CC: 'Catalin Marinas' <catalin.marinas@arm.com>, 'Marc Zyngier'
-	<maz@kernel.org>, 'Will Deacon' <will@kernel.org>, 'James Morse'
-	<james.morse@arm.com>, 'Oliver Upton' <oliver.upton@linux.dev>, 'Suzuki K
- Poulose' <suzuki.poulose@arm.com>, 'Zenghui Yu' <yuzenghui@huawei.com>,
-	"'linux-arm-kernel@lists.infradead.org'"
-	<linux-arm-kernel@lists.infradead.org>, "'linux-kernel@vger.kernel.org'"
-	<linux-kernel@vger.kernel.org>, 'Joey Gouly' <joey.gouly@arm.com>, 'Alexandru
- Elisei' <alexandru.elisei@arm.com>, 'Christoffer Dall'
-	<christoffer.dall@arm.com>, 'Fuad Tabba' <tabba@google.com>,
-	"'linux-coco@lists.linux.dev'" <linux-coco@lists.linux.dev>, 'Ganapatrao
- Kulkarni' <gankulkarni@os.amperecomputing.com>, 'Gavin Shan'
-	<gshan@redhat.com>, 'Shanker Donthineni' <sdonthineni@nvidia.com>, 'Alper
- Gun' <alpergun@google.com>, "'Aneesh Kumar K . V'" <aneesh.kumar@kernel.org>
-Subject: RE: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
-Thread-Topic: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
-Thread-Index: AQMPKfif4GpC56WX1Xmo2sNneTWC8QG0s1FFsXSt8vA=
-Date: Thu, 29 May 2025 04:52:33 +0000
-Message-ID:
- <TYCPR01MB11463D8002D90705A7F860B85C366A@TYCPR01MB11463.jpnprd01.prod.outlook.com>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-17-steven.price@arm.com>
-In-Reply-To: <20250416134208.383984-17-steven.price@arm.com>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_ActionId=3cfb0c78-9ffe-4273-9732-ec034cb20816;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_ContentBits=0;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Enabled=true;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Method=Privileged;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_Name=FUJITSU-PUBLIC?;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_SetDate=2025-05-29T04:40:31Z;MSIP_Label_1e92ef73-0ad1-40c5-ad55-46de3396802f_SiteId=a19f121d-81e1-4858-a9d8-736e267fd4c7;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=fujitsu.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYCPR01MB11463:EE_|OS7PR01MB15077:EE_
-x-ms-office365-filtering-correlation-id: fac4332e-36d8-4937-52f8-08dd9e6ca004
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|1800799024|376014|366016|1580799027|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-2022-jp?B?OWxVTVNQNk1Ia0xCSmRnUFdDUG5rL0I2Y2VsOVhWTUVZeVhDUVdwRTM5?=
- =?iso-2022-jp?B?QUhudk1NbzVwaEV2Nm80VCtqek9vdzJ3Sk56dG10cUNmMk45bm5YdHBs?=
- =?iso-2022-jp?B?Z0dOazRiRkVlVlVleHprNTNtVENNNVZHdFdSNzFYUlVPTmdnM2ptWFdD?=
- =?iso-2022-jp?B?Sm1mUGRRTXJaVHJPdXVOLytwWDJGTlhQeHFQbTdmRmtZbGpObFlxTXJa?=
- =?iso-2022-jp?B?aGtOeG1sWjd6MFBINXh4QXdIWW9RRE9UcnlVcDRnaWpvNnN3V2R4d2oz?=
- =?iso-2022-jp?B?UnRkODYwZXQxZk9KNW1PNzJ2elhCWFUrZFpTdGxESnlsK1BycVNQWGli?=
- =?iso-2022-jp?B?Y2lNNzJpMHY4Z2ZPWEFDM0dsVHZhck9aYWJrVGRET0ZDaDJDbmFlQmRk?=
- =?iso-2022-jp?B?azlFTUN1cG1OazdBcnhzbWhmRk43UFI3Tit1QzZ0TWlEVE9CREIvUlph?=
- =?iso-2022-jp?B?Skc2WnBER04vQkxoSHdKbnBkOURuTSt6K0xFdDFyRE4vS1FVVTg2b040?=
- =?iso-2022-jp?B?UnNXYnVhMGZBY0NQTWt6L2ZyN0l5c3V2VFZUSmhuVklBdmxDanlXajRk?=
- =?iso-2022-jp?B?N0NZOWJZeitMS0hDRWsyTE1KQzlUalh4WStGa1BSMlhhY0pSUFNmWW54?=
- =?iso-2022-jp?B?bTRTbWdndmxsYmYzbDVBdXdPcEQrZFRaV3g4L2ttS3F4VWFoZ0I1MGFZ?=
- =?iso-2022-jp?B?d0gvdERWOUE5MjM3enh6RnZGVVJ6VTliblFQdzB6Nkh6TXBQdDVWMDZH?=
- =?iso-2022-jp?B?aGRSTnQrYjhOYzdSUXhnb3B3aWVPZCtZSGxpSy9BbEo3eWRQc0lJbnhD?=
- =?iso-2022-jp?B?aUdXZitvbkNDSENrUTFMaURQTmNyUmw3T1kxNm5DUmVNcFlNcXJ2VkVI?=
- =?iso-2022-jp?B?U0d6alBqWW96bS9UMTkraklNbE93cnl0SktmcnJqbEp0UW5DWi9wdktP?=
- =?iso-2022-jp?B?RUNTbDhCaXlZa0xaa2NKYmF1dHU3SGxvMUlIdm1kRVhuQTV1d2lEVnFD?=
- =?iso-2022-jp?B?VTBZUGtCS2NEbjNYTFVrcFNpejVkSWlyU0pOUFFIOGpxa1c2bG8xZVpT?=
- =?iso-2022-jp?B?YkFwbzRFWlBzY01FOHQwaHBsRjFzTTVWMDRUaGZmdlJrbXVNTGtTZmpF?=
- =?iso-2022-jp?B?WjJTQzZCOFN6dVc0RFJrZFBCcGJSbzBGdkhzWmNSTmpBRXZEKzJxdmxK?=
- =?iso-2022-jp?B?VEtocUIvSDFiSlpjRUlJbStFemdnWGpTR2wxMkdLZUQreFZqL1lNYjk4?=
- =?iso-2022-jp?B?Z2x4Z2NicmJBT2srUzFETjB2V0phN21rN2JhMnRrOGJ6WnJDMERhSGFx?=
- =?iso-2022-jp?B?L2VJUzZ6M1VNL25ySi90eXBaTzJlM3lKWDIxaEpzTTJuSGF2OXBFM3hZ?=
- =?iso-2022-jp?B?Q0pyWE9NajZqY0lTRHFCSjlaTVdZRFM0SmthMGpnUmppQ1FkSFpvbnNS?=
- =?iso-2022-jp?B?RjFobWNpMTRXVFN3VTNPUHhhS0xjV3pVcE1oR1ROZUVEQlEzQVFvWFpP?=
- =?iso-2022-jp?B?ZVpwS29mSzc3eWtvSkduQVZxaFJhZ1ZGVHFCRVNaSUhUUHNoY0hvNVEz?=
- =?iso-2022-jp?B?eSt3TVB0Sld3TUVxZzVuQS9qNXlvLzN0dUZGMjUwdFFoK1JFejdTUmZq?=
- =?iso-2022-jp?B?eVhCVUQ1YVgvUlViYXpCVGRsZFlRS0Zvak02Z3RPRlIwQkRRSVJDQ2d0?=
- =?iso-2022-jp?B?REZrNDdyNmxrQ3RpSmxLZWFDR0p2VGpUaDdMSWNid1llczZCZytlWEhj?=
- =?iso-2022-jp?B?RUsxVzRkN0NnYno3aUR2YkhUMFR0aFFHMFFPVHFqM1p5d0VvUHRkbkxF?=
- =?iso-2022-jp?B?dHFYQzBibFJ0R29pc0xINlJNN3FxakRuR0IzSVJBOTBZdXVEbDRzcnZG?=
- =?iso-2022-jp?B?SW9iQXU1eU9iSFlVai8rdVdYTS9RRTVFMWJpWEtiNUlyd1gwTEl5TEEr?=
- =?iso-2022-jp?B?SXB6YWlWVVF2M0hTalU2bEl0aDlCcjg0U29ZVXY3cUNUUzZvMkZXYSto?=
- =?iso-2022-jp?B?dkhwTjZzWmZBWkwxZURGWUJ5V1VrZGkvNGZKcU9EMnVmdjlCMEVVb2lP?=
- =?iso-2022-jp?B?WTFMWCttOC8vcW1ma1IxNzZGbmlqSHl3bnB6NHJ6MzloUUJaNm04dS9N?=
- =?iso-2022-jp?B?UWFNaFMrcWxJcWRiM0cwQjRCOVNMRkZQYm4zRElSRHVkNEg4N1VmL25a?=
- =?iso-2022-jp?B?QytxWXg4MjFFQ0lzd1cvNGQ3YnZQdXha?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:ja;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCPR01MB11463.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(1580799027)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-2022-jp?B?U2QwODlwS0NJL0xHR1lDamdSS1dtTzBWUzlxcG9RVmlZTGdCeXFvVW9u?=
- =?iso-2022-jp?B?OUd6ZzBucmVFVVdtUnhPQ0g3QXg3T3BQUDcwNnNNV3AxMzNlTDRRUFZU?=
- =?iso-2022-jp?B?WENmbmI4NFYvSkE3WGNuMEkyUUhzMEJONFFmbEtwSjBxbDBvQmJBSHd0?=
- =?iso-2022-jp?B?WDJYbVdJTHpPcGJRU3pVU2EybHQwaTBiSGZmQkhRdDNCTE01ajBrSXdo?=
- =?iso-2022-jp?B?c2V5STA2bmRjczVhMzhLUDFWdTk3amFpYVJza2M4dXpOZXEvK3NuVThL?=
- =?iso-2022-jp?B?eTIwUFo4bG9NeDkzL0FZdjMxWDJOZTlqcThUblB1VjBPMXdML1hBRXlD?=
- =?iso-2022-jp?B?cnhMUFVLS2pTWHV3T0JpUWhaTlVpeU1kTlRUNjRkNlZxQzIyaFg5YXFS?=
- =?iso-2022-jp?B?YlR5bll1NFY4bHhEcmZINUVIQTJsVFk1dE9FdjdMRFdrSUxHN2hmdDUw?=
- =?iso-2022-jp?B?SVl2YXgzaEhjUXFmckc0K1dmMGIraGRWV3pVYnVVaFpwdXNRbHZaeVVL?=
- =?iso-2022-jp?B?MDFUSk9uLzZVY3ZPNDN6VDd1b0E3TDY4NlJiMHlaV2FETys5bDJZRTQx?=
- =?iso-2022-jp?B?RlJEQWJUalU5RTdtOEN0eHdjS3NXV2VRYnVRUWkwY3JWMWVPdmFtT1ZH?=
- =?iso-2022-jp?B?cEVxY3RqQjhyWnN0MXNlWjc5V3E4TlZQd1JHUFpCYTBkaklWMDA4Wnlr?=
- =?iso-2022-jp?B?ZUFLMnZTTzBrKzFYeGpjOVdpRnJSOWJzL2VVYnpxbHd4cGZwdWh5NkdQ?=
- =?iso-2022-jp?B?T2V5ZzMwbFM0OWxLZVJqYkpVcTB1aHFWSitFUXl5bGtvcTZvdDZHK0ZU?=
- =?iso-2022-jp?B?WmdycHo0UTFob09kUDdkTncrQmVqRnUxSk5lZXBKTGY5R01xZkxWZ2lk?=
- =?iso-2022-jp?B?K3EweTZKMVZNMjI0ei9WVUlTRTErN25RWVU0UkJmMkRQOGVJcEk0T3Rl?=
- =?iso-2022-jp?B?UnpxSHN1UzNNUzhDNGtSUXV3NUUzOFdyVWZKaXNOc203Wm1oQVIzRkNj?=
- =?iso-2022-jp?B?bksrNkZ1VUY0Y1B4Q0JmbFFUUnk2aUUxQnZSKytVZTFCcEI3TEQ0bGN3?=
- =?iso-2022-jp?B?WTBMRUp2T2ZiZEhUTDBQdk5SSStwTjFIREhiTVkxTk8rN1pnK1U1UmVQ?=
- =?iso-2022-jp?B?UytoallUS0hmSUNpWmNaWjhUZ3ZKUlZ1VzExN28zU2RvV1Q0TXVvc1Qz?=
- =?iso-2022-jp?B?a1BUMkVHVWVJbENwd3NaVDF6OVhSN1RyYm9KMnJDYTRmbGpHSHV3b0ph?=
- =?iso-2022-jp?B?TDdaN09oZGM1WVc0NXZqN29KWDczUUx4a0twTHZuZ3ZRS1dZRTc2dzd3?=
- =?iso-2022-jp?B?MTZ4K3dHYVJRM1JZMmY4Um9DaUMxVEtvMjBnaS94eUdubFNpRWdRSzIz?=
- =?iso-2022-jp?B?WWJFTWRnUW5EUVNZaFpENXNXejhMdVc0UFdKL0Zza09UZDZyMThxclVH?=
- =?iso-2022-jp?B?NTJrMzZxVmhRZERPVURLMWZBL2Fvd25oYWp1R0s4S1V1aEdBdkNaODBi?=
- =?iso-2022-jp?B?REJVT2FmS0pIczVBdGVCaCt4a2JZTGtzek1xYm5mWUwwMU4yZnRzODBu?=
- =?iso-2022-jp?B?ODdsT21GNXVpcUNvZTRQckdLcHJ2Z3Q4eGFJNnp5cC92ci9mY1RncGdC?=
- =?iso-2022-jp?B?NjNJeUViWGtaTzBrTmMwUW9zeXBMSXUzenlZMnRHaVV3bDBWNmpRa01O?=
- =?iso-2022-jp?B?eWl0b1kzakJNNnpZeHdyajJYQWtXUFlmczE4ck1WVmUwaHB3TFpCMWhM?=
- =?iso-2022-jp?B?ekZOcHRBRG8yL2lKRFZIVlBMa0JLQ2NJaEV3RlZMWGJLN2J5c3JzSmQr?=
- =?iso-2022-jp?B?TTg2YTh1WFhtaS81YjZkWjZrY2VmM0grdGVtS2I2djgwanJkZW44d2Nw?=
- =?iso-2022-jp?B?OTY3clptMU9YNEZBdmpZclNWMFJUWGJOTTVCeFNQUnpLQlBSMHd2OVVq?=
- =?iso-2022-jp?B?bGVmOENsclhiZjVXdG95RDI3Njd0bytvYWVJRURmWkNFWXpJVU1sQ1pK?=
- =?iso-2022-jp?B?VXpYZ1lVVkh5eEI1NHVTTFZxeUFDcW1MaXlXRXB2NFAwS0U3NGYxU1Qw?=
- =?iso-2022-jp?B?QzkwUmxlTUNlclJGR0N2Q0x0dVZLNVRXODZCTWg2K2pLSmlaSTBoNlhY?=
- =?iso-2022-jp?B?amd2OUdOQWpqN0hrNnJuTldXcE5WRTIvMThiRTNsK212cEVjNnEzdVA1?=
- =?iso-2022-jp?B?dnRQb29meFVSY2xYZFV4bmg2ZXQyNnpEZldZbVZuelM2K3VxbGEwTlh0?=
- =?iso-2022-jp?B?YlA1dWxXcnBPT0Q2QWpBaVpFVkt4NmhtWWNpKytaOG4vY2RzdFBaa291?=
- =?iso-2022-jp?B?d0pOOUNSY2FyTHc2b2lFbUVnZ0R4dXUzQWc9PQ==?=
-Content-Type: text/plain; charset="iso-2022-jp"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bAl41rfn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748509499;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rf94fEja4fPZDVYXlb9N2+GViHCNDZtS2H0JkfyPmy0=;
+	b=bAl41rfnGIuOzIOiHaUllkNO25p6lvCxzS178UXKJreZ5BQsNZZ10QoQ8B+IaTy8/PCC2Q
+	7aJXdwQqzdLiCNa19835OoVOniZYO/PugyVqM7MV/XSrn+IB4/u6eaNHHy9XRCub0MO/KP
+	a3LY3rIeA203FOOIAabIF6Cks7IHyRU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-nuACS26CMdW7mGDT1tGUJw-1; Thu, 29 May 2025 05:04:57 -0400
+X-MC-Unique: nuACS26CMdW7mGDT1tGUJw-1
+X-Mimecast-MFC-AGG-ID: nuACS26CMdW7mGDT1tGUJw_1748509496
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a367b3bb78so444768f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 29 May 2025 02:04:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748509496; x=1749114296;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rf94fEja4fPZDVYXlb9N2+GViHCNDZtS2H0JkfyPmy0=;
+        b=KcjF/m/Igoxpq7Jm9cbLwCD7aFkXXRz/ejRm0Uu5r0OHPCs6xp2L8ZTQVmW7xlzK3w
+         Vu/DJKvcDKY2a2XZOjJNgzQYg9iIdGwDpnYQLlB1P292iU5+Tl6idzN4As7sOvQZAA3t
+         7kSKOjX9/JyWJi+vnGLGx9DDHzOeUL8mUPceKDg2jQa6A5QRtXwSkHdTgyreVabLIA81
+         6Mh01cMkoVovs1XdCpfnQzpt5T0EhLu/iWv++PqQqFy99Jkm/L8TS9zBIeQp7haE2IWS
+         bgm4gW2g943YO01ZWFHAdz02Tbmmzb6GQfY1UOYfCy8r5nKwmo1aPmEEbEOtxwWDAC+j
+         c0IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZhtDzsL5ZOlV8ibziwFU0KMrjO3D2O53ueSvx0ry7jum6LwRBx12n+jUcolgh+ypEMuFNqe8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx1V4CR3nlu3DOUJ42AOfzP2oQCW48O/UMNjRlV911oTLt9XJCI
+	pz/dvU3VuAUAHbZEuJp9qQ53GnI0x66VUegGqrCxifS/KM47WsZDH+MwKz+jr8IpBA/dBHXTBIr
+	uN2rCMtfYad5e5kLFOjWij8S2fLcq/nxBo2DsrkYDKRQeUOcm7ZUN3LSq/Q==
+X-Gm-Gg: ASbGncton8/vRT/8A0wTV2pW3HhRMzHCjT3LtJNU//L2oppM1Cbnbb8qEyQYMbbhDao
+	0y6ZDSIexPsdtwRPcmWmH4VxwHc66g6r7gLMzaAx4/J329y9/NzY/h63cBYzv//qTCnOjE9Jnak
+	yl1KZ+XXNDzHXFHG8nlJ5kRw3OwSC+iZoIwvdXgIXrjbrsA5a17uYPf+DEX7SZNHQhw3m1+12lL
+	9O6gv/YqHZBBwjjgT6eg5vx8YB3QrRJ6qw6sGx4hUKSP4Xl2tQ8RjKt42WEZ2Mnp5LFdOyB/9es
+	Kighs9rYB3/3c2Joj2eMnZNolbA2pEXs5ZqHxewplhj17Z9SAo0whw==
+X-Received: by 2002:a05:6000:24c8:b0:3a4:ec32:e4f3 with SMTP id ffacd0b85a97d-3a4ec32e648mr3929675f8f.17.1748509496345;
+        Thu, 29 May 2025 02:04:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFaMMS0GBdbp7zwM960jC58+Zia37daqyv2xwFNLBHAE11BRz+qy2WAsZgsUd9WyykrMJAGrw==
+X-Received: by 2002:a05:6000:24c8:b0:3a4:ec32:e4f3 with SMTP id ffacd0b85a97d-3a4ec32e648mr3929645f8f.17.1748509495896;
+        Thu, 29 May 2025 02:04:55 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4f009f9d6sm1331020f8f.84.2025.05.29.02.04.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 May 2025 02:04:54 -0700 (PDT)
+Message-ID: <9552d3eb-c01b-4ff2-84f0-deec5e12b92a@redhat.com>
+Date: Thu, 29 May 2025 11:04:46 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	WxLDkPAEpMI2Xx1tfDcv8nKQOwDVFyKGOKNgb37qncakhY2c8UBj7OcpU95/+dl4oCzUd/1a0TXTfg5ZpLZx4ftIOqBQS9tSzlrgzirh3nCPGZUEuYzH/MZWHTRg7XeMNGKC3uduy9bZM87Nhs3XsENMf+EIOtQrTAwHRa3ZC9ZBx/FRQe1hDIdNSE6Lu1UKr53X7zDKSFy6gN5y8zNbSdYJS6GdmlKFG89g+4ccJWUEyA1A60XUT+U/u6IZmAgRKWKT8wleVrOoW/LH/tqK3UKGhay3na2C4jER/tSXudeLDfbE3NhxtzyaMvpsMlJMRAFKwuRKsAJr8MswL2DqN9etoMJkRUd2Q1DzcT9Xk10Ho1SIhDT8jpiiOY9QRvGm6kkjD2ixIDbq62fLejMNedb9aB7fnVJuU2f+7jeJtZdp6jQsY8OS+EXhRkro2/pk3IQytwLxO1M+ipYvuqnqwonKvcxdObDuQb3ZfRCGIL/KfDjlPPq10zQnLsEfLaRQQz0Ut6A29SXP8cwDz+jpoVOVQLHvba6l7eSpeK983kJ0C+THSd0uUhVAcqeZ5Db6vC26uBIwgDshNqCus6Nq+62d6BUf+rL5C8bFNheEh4qjpxGxeQ8in7Tt3bqfYOKc
-X-OriginatorOrg: fujitsu.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYCPR01MB11463.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fac4332e-36d8-4937-52f8-08dd9e6ca004
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2025 04:52:33.4637
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a19f121d-81e1-4858-a9d8-736e267fd4c7
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /Ki8nnxDmH4fxSJetE9now9JCenf+CjVsVcYYzjDR05RYF3fttQpctQSX2gu/SXwkuPeuVwhxQyBNvCeoii6VG9+/cyxf4qiAHD0gmfmVb0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS7PR01MB15077
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v2 1/9] KVM: arm64: nv: selftests: Add support to run
+ guest code in vEL2.
+To: Itaru Kitayama <itaru.kitayama@linux.dev>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com,
+ darren@os.amperecomputing.com
+References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
+ <20250512105251.577874-2-gankulkarni@os.amperecomputing.com>
+ <aDeeqMQ3JvAayTJF@vm4>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <aDeeqMQ3JvAayTJF@vm4>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: EYEjWbQQ5LdSANOIiDTuLhcY5BRtbJrFK0_wj0w7OII_1748509496
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello, I comment below.
+Hi Itaru,
 
-> Subject: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
->=20
-> Entering a realm is done using a SMC call to the RMM. On exit the exit-co=
-des
-> need to be handled slightly differently to the normal KVM path so define =
-our own
-> functions for realm enter/exit and hook them in if the guest is a realm g=
-uest.
->=20
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v7:
->  * A return of 0 from kvm_handle_sys_reg() doesn't mean the register has
->    been read (although that can never happen in the current code). Tidy
->    up the condition to handle any future refactoring.
-> Changes since v6:
->  * Use vcpu_err() rather than pr_err/kvm_err when there is an associated
->    vcpu to the error.
->  * Return -EFAULT for KVM_EXIT_MEMORY_FAULT as per the documentation
-> for
->    this exit type.
->  * Split code handling a RIPAS change triggered by the guest to the
->    following patch.
-> Changes since v5:
->  * For a RIPAS_CHANGE request from the guest perform the actual RIPAS
->    change on next entry rather than immediately on the exit. This allows
->    the VMM to 'reject' a RIPAS change by refusing to continue
->    scheduling.
-> Changes since v4:
->  * Rename handle_rme_exit() to handle_rec_exit()
->  * Move the loop to copy registers into the REC enter structure from the
->    to rec_exit_handlers callbacks to kvm_rec_enter(). This fixes a bug
->    where the handler exits to user space and user space wants to modify
->    the GPRS.
->  * Some code rearrangement in rec_exit_ripas_change().
-> Changes since v2:
->  * realm_set_ipa_state() now provides an output parameter for the
->    top_iap that was changed. Use this to signal the VMM with the correct
->    range that has been transitioned.
->  * Adapt to previous patch changes.
-> ---
->  arch/arm64/include/asm/kvm_rme.h |   3 +
->  arch/arm64/kvm/Makefile          |   2 +-
->  arch/arm64/kvm/arm.c             |  19 +++-
->  arch/arm64/kvm/rme-exit.c        | 170
-> +++++++++++++++++++++++++++++++
->  arch/arm64/kvm/rme.c             |  19 ++++
->  5 files changed, 207 insertions(+), 6 deletions(-)  create mode 100644
-> arch/arm64/kvm/rme-exit.c
->=20
-> diff --git a/arch/arm64/include/asm/kvm_rme.h
-> b/arch/arm64/include/asm/kvm_rme.h
-> index b916db8565a2..d86051ef0c5c 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -101,6 +101,9 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32
-> ia_bits);  int kvm_create_rec(struct kvm_vcpu *vcpu);  void
-> kvm_destroy_rec(struct kvm_vcpu *vcpu);
->=20
-> +int kvm_rec_enter(struct kvm_vcpu *vcpu); int handle_rec_exit(struct
-> +kvm_vcpu *vcpu, int rec_run_status);
-> +
->  void kvm_realm_unmap_range(struct kvm *kvm,
->  			   unsigned long ipa,
->  			   unsigned long size,
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile index
-> 2ebc66812d49..c4b10012faa3 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -24,7 +24,7 @@ kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o pvtim=
-e.o
-> \
->  	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
->  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
->  	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
-> -	 rme.o
-> +	 rme.o rme-exit.o
->=20
->  kvm-$(CONFIG_HW_PERF_EVENTS)  +=3D pmu-emul.o pmu.o
->  kvm-$(CONFIG_ARM64_PTR_AUTH)  +=3D pauth.o diff --git
-> a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c index
-> 7c0bb1b05f4c..cf707130ef66 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1263,7 +1263,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		trace_kvm_entry(*vcpu_pc(vcpu));
->  		guest_timing_enter_irqoff();
->=20
-> -		ret =3D kvm_arm_vcpu_enter_exit(vcpu);
-> +		if (vcpu_is_rec(vcpu))
-> +			ret =3D kvm_rec_enter(vcpu);
-> +		else
-> +			ret =3D kvm_arm_vcpu_enter_exit(vcpu);
->=20
->  		vcpu->mode =3D OUTSIDE_GUEST_MODE;
->  		vcpu->stat.exits++;
-> @@ -1319,10 +1322,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu=
-)
->=20
->  		local_irq_enable();
->=20
-> -		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu),
-> *vcpu_pc(vcpu));
-> -
->  		/* Exit types that need handling before we can be preempted */
-> -		handle_exit_early(vcpu, ret);
-> +		if (!vcpu_is_rec(vcpu)) {
-> +			trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu),
-> +				       *vcpu_pc(vcpu));
-> +
-> +			handle_exit_early(vcpu, ret);
-> +		}
->=20
->  		preempt_enable();
->=20
-> @@ -1345,7 +1351,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  			ret =3D ARM_EXCEPTION_IL;
->  		}
->=20
-> -		ret =3D handle_exit(vcpu, ret);
-> +		if (vcpu_is_rec(vcpu))
-> +			ret =3D handle_rec_exit(vcpu, ret);
-> +		else
-> +			ret =3D handle_exit(vcpu, ret);
->  	}
->=20
->  	/* Tell userspace about in-kernel device output levels */ diff --git
-> a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c new file mode
-> 100644 index 000000000000..a1adf5610455
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rme-exit.c
-> @@ -0,0 +1,170 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <kvm/arm_hypercalls.h>
-> +#include <kvm/arm_psci.h>
-> +
-> +#include <asm/rmi_smc.h>
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_rme.h>
-> +#include <asm/kvm_mmu.h>
-> +
-> +typedef int (*exit_handler_fn)(struct kvm_vcpu *vcpu);
-> +
-> +static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu) {
-> +	struct realm_rec *rec =3D &vcpu->arch.rec;
-> +
-> +	vcpu_err(vcpu, "Unhandled exit reason from realm (ESR: %#llx)\n",
-> +		 rec->run->exit.esr);
-> +	return -ENXIO;
-> +}
-> +
-> +static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu) {
-> +	return kvm_handle_guest_abort(vcpu);
-> +}
-> +
-> +static int rec_exit_sync_iabt(struct kvm_vcpu *vcpu) {
-> +	struct realm_rec *rec =3D &vcpu->arch.rec;
-> +
-> +	vcpu_err(vcpu, "Unhandled instruction abort (ESR: %#llx).\n",
-> +		 rec->run->exit.esr);
-> +	return -ENXIO;
-> +}
-> +
-> +static int rec_exit_sys_reg(struct kvm_vcpu *vcpu) {
-> +	struct realm_rec *rec =3D &vcpu->arch.rec;
-> +	unsigned long esr =3D kvm_vcpu_get_esr(vcpu);
-> +	int rt =3D kvm_vcpu_sys_get_rt(vcpu);
-> +	bool is_write =3D !(esr & 1);
-> +	int ret;
-> +
-> +	if (is_write)
-> +		vcpu_set_reg(vcpu, rt, rec->run->exit.gprs[0]);
-> +
-> +	ret =3D kvm_handle_sys_reg(vcpu);
-> +	if (ret > 0 && !is_write)
-> +		rec->run->enter.gprs[0] =3D vcpu_get_reg(vcpu, rt);
-> +
-> +	return ret;
-> +}
-> +
-> +static exit_handler_fn rec_exit_handlers[] =3D {
-> +	[0 ... ESR_ELx_EC_MAX]	=3D rec_exit_reason_notimpl,
-> +	[ESR_ELx_EC_SYS64]	=3D rec_exit_sys_reg,
-> +	[ESR_ELx_EC_DABT_LOW]	=3D rec_exit_sync_dabt,
-> +	[ESR_ELx_EC_IABT_LOW]	=3D rec_exit_sync_iabt
-> +};
-> +
-> +static int rec_exit_psci(struct kvm_vcpu *vcpu) {
-> +	struct realm_rec *rec =3D &vcpu->arch.rec;
-> +	int i;
-> +
-> +	for (i =3D 0; i < REC_RUN_GPRS; i++)
-> +		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
-> +
-> +	return kvm_smccc_call_handler(vcpu);
-> +}
-> +
-> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu) {
-> +	struct kvm *kvm =3D vcpu->kvm;
-> +	struct realm *realm =3D &kvm->arch.realm;
-> +	struct realm_rec *rec =3D &vcpu->arch.rec;
-> +	unsigned long base =3D rec->run->exit.ripas_base;
-> +	unsigned long top =3D rec->run->exit.ripas_top;
-> +	unsigned long ripas =3D rec->run->exit.ripas_value;
-> +
-> +	if (!kvm_realm_is_private_address(realm, base) ||
-> +	    !kvm_realm_is_private_address(realm, top - 1)) {
-> +		vcpu_err(vcpu, "Invalid RIPAS_CHANGE for %#lx - %#lx,
-> ripas: %#lx\n",
-> +			 base, top, ripas);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Exit to VMM, the actual RIPAS change is done on next entry */
-> +	kvm_prepare_memory_fault_exit(vcpu, base, top - base, false, false,
-> +				      ripas =3D=3D RMI_RAM);
-> +
-> +	/*
-> +	 * KVM_EXIT_MEMORY_FAULT requires an return code of -EFAULT, see
-> the
-> +	 * API documentation
-> +	 */
-> +	return -EFAULT;
-> +}
-> +
-> +static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu) {
-> +	struct realm_rec *rec =3D &vcpu->arch.rec;
-> +
-> +	__vcpu_sys_reg(vcpu, CNTV_CTL_EL0) =3D rec->run->exit.cntv_ctl;
-> +	__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0) =3D rec->run->exit.cntv_cval;
-> +	__vcpu_sys_reg(vcpu, CNTP_CTL_EL0) =3D rec->run->exit.cntp_ctl;
-> +	__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) =3D rec->run->exit.cntp_cval;
-> +
-> +	kvm_realm_timers_update(vcpu);
-> +}
-> +
-> +/*
-> + * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason)
-> +on
-> + * proper exit to userspace.
-> + */
-> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret) {
-> +	struct realm_rec *rec =3D &vcpu->arch.rec;
-> +	u8 esr_ec =3D ESR_ELx_EC(rec->run->exit.esr);
-> +	unsigned long status, index;
-> +
-> +	status =3D RMI_RETURN_STATUS(rec_run_ret);
-> +	index =3D RMI_RETURN_INDEX(rec_run_ret);
-> +
-> +	/*
-> +	 * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we
-> might
-> +	 * see the following status code and index indicating an attempt to run
-> +	 * a REC when the RD state is SYSTEM_OFF.  In this case, we just need
-> to
-> +	 * return to user space which can deal with the system event or will tr=
-y
-> +	 * to run the KVM VCPU again, at which point we will no longer attempt
-> +	 * to enter the Realm because we will have a sleep request pending on
-> +	 * the VCPU as a result of KVM's PSCI handling.
-> +	 */
-> +	if (status =3D=3D RMI_ERROR_REALM && index =3D=3D 1) {
-> +		vcpu->run->exit_reason =3D KVM_EXIT_UNKNOWN;
-> +		return 0;
-> +	}
-Running kvm-unit-tests-cca selftest(smp) test in quick succession may trigg=
-er these conditions, resulting in the following error logs.
- Error: KVM exit reason: 0 ("KVM_EXIT_UNKNOWN")
+On 5/29/25 1:39 AM, Itaru Kitayama wrote:
+> Hi Ganapatrao
+> On Mon, May 12, 2025 at 03:52:43AM -0700, Ganapatrao Kulkarni wrote:
+>> This patch adds required changes to vcpu init to run a guest code
+>> in vEL2 context and also adds NV specific helper functions.
+>>
+>> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> 
+> I'm interested in testing this, but is this series against kvmarm? which
+> branch I can cleanly do git am?
 
-Since KVM_EXIT_UNKNOWN is used when no specific exit reason applies, I thin=
-k it would be better to make it identifiable as an error.
-How about adding and setting a new ARM64 exit_reason value to indicate that=
- the PSCI_SYSTEM_OFF request is conflicting with a running vcpu?
+I gave it a try on kvm-next. There is a minor conflict to resolve when
+applying.
 
-Best Regards,
-Emi Kisanuki
-> +
-> +	if (rec_run_ret)
-> +		return -ENXIO;
-> +
-> +	vcpu->arch.fault.esr_el2 =3D rec->run->exit.esr;
-> +	vcpu->arch.fault.far_el2 =3D rec->run->exit.far;
-> +	vcpu->arch.fault.hpfar_el2 =3D rec->run->exit.hpfar;
-> +
-> +	update_arch_timer_irq_lines(vcpu);
-> +
-> +	/* Reset the emulation flags for the next run of the REC */
-> +	rec->run->enter.flags =3D 0;
-> +
-> +	switch (rec->run->exit.exit_reason) {
-> +	case RMI_EXIT_SYNC:
-> +		return rec_exit_handlers[esr_ec](vcpu);
-> +	case RMI_EXIT_IRQ:
-> +	case RMI_EXIT_FIQ:
-> +		return 1;
-> +	case RMI_EXIT_PSCI:
-> +		return rec_exit_psci(vcpu);
-> +	case RMI_EXIT_RIPAS_CHANGE:
-> +		return rec_exit_ripas_change(vcpu);
-> +	}
-> +
-> +	kvm_pr_unimpl("Unsupported exit reason: %u\n",
-> +		      rec->run->exit.exit_reason);
-> +	vcpu->run->exit_reason =3D KVM_EXIT_INTERNAL_ERROR;
-> +	return 0;
-> +}
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c index
-> 33eb793d8bdb..bee9dfe12e03 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -863,6 +863,25 @@ void kvm_destroy_realm(struct kvm *kvm)
->  	kvm_free_stage2_pgd(&kvm->arch.mmu);
->  }
->=20
-> +int kvm_rec_enter(struct kvm_vcpu *vcpu) {
-> +	struct realm_rec *rec =3D &vcpu->arch.rec;
-> +
-> +	switch (rec->run->exit.exit_reason) {
-> +	case RMI_EXIT_HOST_CALL:
-> +	case RMI_EXIT_PSCI:
-> +		for (int i =3D 0; i < REC_RUN_GPRS; i++)
-> +			rec->run->enter.gprs[i] =3D vcpu_get_reg(vcpu, i);
-> +		break;
-> +	}
-> +
-> +	if (kvm_realm_state(vcpu->kvm) !=3D REALM_STATE_ACTIVE)
-> +		return -EINVAL;
-> +
-> +	return rmi_rec_enter(virt_to_phys(rec->rec_page),
-> +			     virt_to_phys(rec->run));
-> +}
-> +
->  static void free_rec_aux(struct page **aux_pages,
->  			 unsigned int num_aux)
->  {
-> --
-> 2.43.0
->=20
+Thanks
+
+Eric
+> 
+> Thanks,
+> Itaru.
+> 
+>> ---
+>>  tools/testing/selftests/kvm/Makefile.kvm      |  2 +
+>>  .../kvm/include/arm64/kvm_util_arch.h         |  3 +
+>>  .../selftests/kvm/include/arm64/nv_util.h     | 45 ++++++++++++++
+>>  .../selftests/kvm/include/arm64/vgic.h        |  1 +
+>>  .../testing/selftests/kvm/include/kvm_util.h  |  3 +
+>>  tools/testing/selftests/kvm/lib/arm64/nv.c    | 46 ++++++++++++++
+>>  .../selftests/kvm/lib/arm64/processor.c       | 61 ++++++++++++++-----
+>>  tools/testing/selftests/kvm/lib/arm64/vgic.c  |  8 +++
+>>  8 files changed, 155 insertions(+), 14 deletions(-)
+>>  create mode 100644 tools/testing/selftests/kvm/include/arm64/nv_util.h
+>>  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nv.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+>> index f773f8f99249..3348f729d3b2 100644
+>> --- a/tools/testing/selftests/kvm/Makefile.kvm
+>> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+>> @@ -37,6 +37,7 @@ LIBKVM_arm64 += lib/arm64/processor.c
+>>  LIBKVM_arm64 += lib/arm64/spinlock.c
+>>  LIBKVM_arm64 += lib/arm64/ucall.c
+>>  LIBKVM_arm64 += lib/arm64/vgic.c
+>> +LIBKVM_arm64 += lib/arm64/nv.c
+>>  
+>>  LIBKVM_s390 += lib/s390/diag318_test_handler.c
+>>  LIBKVM_s390 += lib/s390/processor.c
+>> @@ -155,6 +156,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+>>  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+>>  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+>>  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
+>> +TEST_GEN_PROGS_arm64 += arm64/nv_guest_hypervisor
+>>  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+>>  TEST_GEN_PROGS_arm64 += arch_timer
+>>  TEST_GEN_PROGS_arm64 += coalesced_io_test
+>> diff --git a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+>> index e43a57d99b56..ab5279c24413 100644
+>> --- a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+>> +++ b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+>> @@ -2,6 +2,9 @@
+>>  #ifndef SELFTEST_KVM_UTIL_ARCH_H
+>>  #define SELFTEST_KVM_UTIL_ARCH_H
+>>  
+>> +#define CurrentEL_EL1		(1 << 2)
+>> +#define CurrentEL_EL2		(2 << 2)
+>> +
+>>  struct kvm_vm_arch {};
+>>  
+>>  #endif  // SELFTEST_KVM_UTIL_ARCH_H
+>> diff --git a/tools/testing/selftests/kvm/include/arm64/nv_util.h b/tools/testing/selftests/kvm/include/arm64/nv_util.h
+>> new file mode 100644
+>> index 000000000000..622a17c9d142
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/include/arm64/nv_util.h
+>> @@ -0,0 +1,45 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * Copyright (c) 2025 Ampere Computing
+>> + */
+>> +#ifndef SELFTEST_NV_UTIL_H
+>> +#define SELFTEST_NV_UTIL_H
+>> +
+>> +#include <linux/bitmap.h>
+>> +#include <vgic.h>
+>> +
+>> +#define HCR_NV2		(UL(1) << 45)
+>> +#define HCR_AT		(UL(1) << 44)
+>> +#define HCR_NV		(UL(1) << 42)
+>> +#define HCR_E2H		(UL(1) << 34)
+>> +#define HCR_TTLB        (UL(1) << 25)
+>> +
+>> +/* Enable NV2 and guest in VHE mode */
+>> +#define HCR_EL2_NV_EANBLE (HCR_E2H | HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB)
+>> +
+>> +struct kvm_vm *nv_vm_create_with_vcpus_gic(uint32_t nr_vcpus,
+>> +		struct kvm_vcpu **vcpus, int *gic_fd, void *guest_code);
+>> +
+>> +struct kvm_vm *__nv_vm_create_with_vcpus_gic(struct vm_shape shape,
+>> +		uint32_t nr_vcpus, struct kvm_vcpu **vcpus,
+>> +		uint64_t extra_mem_pages, int *gic_fd, void *guest_code);
+>> +
+>> +/* NV helpers */
+>> +static inline void init_vcpu_nested(struct kvm_vcpu_init *init)
+>> +{
+>> +	init->features[0] |= (1 << KVM_ARM_VCPU_HAS_EL2);
+>> +}
+>> +
+>> +static inline bool kvm_arm_vcpu_has_el2(struct kvm_vcpu_init *init)
+>> +{
+>> +	unsigned long features = init->features[0];
+>> +
+>> +	return test_bit(KVM_ARM_VCPU_HAS_EL2, &features);
+>> +}
+>> +
+>> +static inline bool is_vcpu_nested(struct kvm_vcpu *vcpu)
+>> +{
+>> +	return vcpu->nested;
+>> +}
+>> +
+>> +#endif /* SELFTEST_NV_UTIL_H */
+>> diff --git a/tools/testing/selftests/kvm/include/arm64/vgic.h b/tools/testing/selftests/kvm/include/arm64/vgic.h
+>> index c481d0c00a5d..46142fa36199 100644
+>> --- a/tools/testing/selftests/kvm/include/arm64/vgic.h
+>> +++ b/tools/testing/selftests/kvm/include/arm64/vgic.h
+>> @@ -17,6 +17,7 @@
+>>  	index)
+>>  
+>>  int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs);
+>> +void vgic_v3_close(int gic_fd);
+>>  
+>>  #define VGIC_MAX_RESERVED	1023
+>>  
+>> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+>> index 373912464fb4..9b26b9124dc3 100644
+>> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+>> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+>> @@ -65,6 +65,9 @@ struct kvm_vcpu {
+>>  	struct kvm_dirty_gfn *dirty_gfns;
+>>  	uint32_t fetch_index;
+>>  	uint32_t dirty_gfns_count;
+>> +#ifdef __aarch64__
+>> +	bool nested;
+>> +#endif
+>>  };
+>>  
+>>  struct userspace_mem_regions {
+>> diff --git a/tools/testing/selftests/kvm/lib/arm64/nv.c b/tools/testing/selftests/kvm/lib/arm64/nv.c
+>> new file mode 100644
+>> index 000000000000..e930808a7ed4
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/lib/arm64/nv.c
+>> @@ -0,0 +1,46 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (c) 2025 Ampere Computing LLC
+>> + */
+>> +
+>> +#include <linux/compiler.h>
+>> +#include <assert.h>
+>> +
+>> +#include "guest_modes.h"
+>> +#include "kvm_util.h"
+>> +#include "nv_util.h"
+>> +#include "processor.h"
+>> +
+>> +struct kvm_vm *__nv_vm_create_with_vcpus_gic(struct vm_shape shape, uint32_t nr_vcpus,
+>> +		struct kvm_vcpu **vcpus, uint64_t extra_mem_pages, int *gic_fd, void *guest_code)
+>> +{
+>> +	struct kvm_vcpu_init init;
+>> +	struct kvm_vm *vm;
+>> +	int i;
+>> +
+>> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_EL2));
+>> +
+>> +	vm = __vm_create(shape, nr_vcpus, extra_mem_pages);
+>> +	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+>> +	init_vcpu_nested(&init);
+>> +
+>> +	for (i = 0; i < nr_vcpus; ++i) {
+>> +		vcpus[i] = aarch64_vcpu_add(vm, i, &init, guest_code);
+>> +		__TEST_REQUIRE(is_vcpu_nested(vcpus[i]), "Failed to Enable NV");
+>> +	}
+>> +
+>> +	/* vgic is not created, If gic_fd argument is NULL */
+>> +	if (gic_fd) {
+>> +		*gic_fd = vgic_v3_setup(vm, nr_vcpus, 64);
+>> +		__TEST_REQUIRE(*gic_fd >= 0, "Failed to create vgic-v3");
+>> +	}
+>> +
+>> +	return vm;
+>> +}
+>> +
+>> +struct kvm_vm *nv_vm_create_with_vcpus_gic(uint32_t nr_vcpus,
+>> +		struct kvm_vcpu **vcpus, int *gic_fd, void *guest_code)
+>> +{
+>> +	return __nv_vm_create_with_vcpus_gic(VM_SHAPE_DEFAULT,
+>> +				nr_vcpus, vcpus, 0, gic_fd, guest_code);
+>> +}
+>> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+>> index 7ba3aa3755f3..6e759981bf9e 100644
+>> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+>> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+>> @@ -10,6 +10,7 @@
+>>  
+>>  #include "guest_modes.h"
+>>  #include "kvm_util.h"
+>> +#include "nv_util.h"
+>>  #include "processor.h"
+>>  #include "ucall_common.h"
+>>  
+>> @@ -258,14 +259,49 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+>>  	}
+>>  }
+>>  
+>> +static void aarch64_vcpu_set_reg(struct kvm_vcpu *vcpu, uint64_t sctlr_el1,
+>> +			uint64_t tcr_el1, uint64_t ttbr0_el1)
+>> +{
+>> +	uint64_t fpen;
+>> +
+>> +	/*
+>> +	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
+>> +	 * registers, which the variable argument list macros do.
+>> +	 */
+>> +	fpen = 3 << 20;
+>> +
+>> +	if (is_vcpu_nested(vcpu)) {
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPTR_EL2), fpen);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL2), sctlr_el1);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL2), tcr_el1);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL2), DEFAULT_MAIR_EL1);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL2), ttbr0_el1);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), HCR_EL2_NV_EANBLE);
+>> +	} else {
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPACR_EL1), fpen);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), ttbr0_el1);
+>> +
+>> +	}
+>> +
+>> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpu->id);
+>> +}
+>> +
+>>  void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+>>  {
+>>  	struct kvm_vcpu_init default_init = { .target = -1, };
+>>  	struct kvm_vm *vm = vcpu->vm;
+>>  	uint64_t sctlr_el1, tcr_el1, ttbr0_el1;
+>>  
+>> -	if (!init)
+>> +	if (!init) {
+>>  		init = &default_init;
+>> +	} else {
+>> +		/* Is this vcpu a Guest-Hypersior */
+>> +		if (kvm_arm_vcpu_has_el2(init))
+>> +			vcpu->nested = true;
+>> +	}
+>>  
+>>  	if (init->target == -1) {
+>>  		struct kvm_vcpu_init preferred;
+>> @@ -275,12 +311,6 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+>>  
+>>  	vcpu_ioctl(vcpu, KVM_ARM_VCPU_INIT, init);
+>>  
+>> -	/*
+>> -	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
+>> -	 * registers, which the variable argument list macros do.
+>> -	 */
+>> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPACR_EL1), 3 << 20);
+>> -
+>>  	sctlr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1));
+>>  	tcr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1));
+>>  
+>> @@ -349,11 +379,7 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+>>  	if (use_lpa2_pte_format(vm))
+>>  		tcr_el1 |= (1ul << 59) /* DS */;
+>>  
+>> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
+>> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
+>> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
+>> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), ttbr0_el1);
+>> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpu->id);
+>> +	aarch64_vcpu_set_reg(vcpu, sctlr_el1, tcr_el1, ttbr0_el1);
+>>  }
+>>  
+>>  void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
+>> @@ -387,7 +413,11 @@ static struct kvm_vcpu *__aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+>>  
+>>  	aarch64_vcpu_setup(vcpu, init);
+>>  
+>> -	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
+>> +	if (is_vcpu_nested(vcpu))
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SP_EL2), stack_vaddr + stack_size);
+>> +	else
+>> +		vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
+>> +
+>>  	return vcpu;
+>>  }
+>>  
+>> @@ -457,7 +487,10 @@ void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
+>>  {
+>>  	extern char vectors;
+>>  
+>> -	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
+>> +	if (is_vcpu_nested(vcpu))
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL2), (uint64_t)&vectors);
+>> +	else
+>> +		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
+>>  }
+>>  
+>>  void route_exception(struct ex_regs *regs, int vector)
+>> diff --git a/tools/testing/selftests/kvm/lib/arm64/vgic.c b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+>> index 4427f43f73ea..67822b803d0f 100644
+>> --- a/tools/testing/selftests/kvm/lib/arm64/vgic.c
+>> +++ b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+>> @@ -79,6 +79,14 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
+>>  	return gic_fd;
+>>  }
+>>  
+>> +void  vgic_v3_close(int gic_fd)
+>> +{
+>> +	if (gic_fd < 0)
+>> +		return;
+>> +
+>> +	close(gic_fd);
+>> +}
+>> +
+>>  /* should only work for level sensitive interrupts */
+>>  int _kvm_irq_set_level_info(int gic_fd, uint32_t intid, int level)
+>>  {
+>>
+>> -- 
+>> 2.48.1
+>>
+> 
 
