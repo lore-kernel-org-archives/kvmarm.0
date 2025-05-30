@@ -1,133 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CF01411EB;
-	Fri, 30 May 2025 09:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C8B22E3F7
+	for <kvmarm@lists.linux.dev>; Fri, 30 May 2025 15:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748598767; cv=none; b=gG1Yor8Dz3URgOrLP0AxwndkhCZ6Oo/CdT5ZbqH4nR0MGkY6Y41tZoPTKO5xEz4z6p6z94apv77Bl05bAQpxJdhKUiYiDqkRsw54YErCyrUwtluasdI5Nacjr53vuBklvwH6TuybbvOYhIbJajHpcqlURnvGYEi81FF6hLoOWkA=
+	t=1748617922; cv=none; b=VGbcZla8MWqg0ZJ4f1LvCDRJK3Zqm86ebQn98Egtu3nLlWTW6dBJ1Z+Q+tihIbLJFW/4owg8HfRXa7qggi0dFDNUhRYZEoL94f22Gtd2vMm5qh+4JUEWH59nO3RkPGIzxtuKeU9Ehs9Zg7yYbxSX45HGQrHOZzAsTErOf+FR5mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748598767; c=relaxed/simple;
-	bh=vQBPZkgMXyD+EbgfzSAlFm0EAAyiNqjKIVGyLm9BEZo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LoI79LC7BW55LhklTitXlOmdIcmxkF2vD6XBVb9i0QMFW7KmtBj7IgjJbUGYS01jhtkcdOKSGb1y2zd8Zo+iofW34pJR0KgX1CYb8+xtI4NLzUjPFQDB8aFqEYYX3n2zuUtoZstk8UWjtPDG1BR14Y7XE2cBI15d80KnnCwXst8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ci+KBFGO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748617922; c=relaxed/simple;
+	bh=yfqZ4uwCBedZ314UKTh8R56ds3rRmx+4qFuELqIHy8I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BpQbuwRvmP0J/QV6zBNoco8m1llVR/TufqGIdKAfK+lq2xJJkDIjdiV3r81QVmoW0JDviat5Y7LuC3VJsjZhARNSAtZAyranwKrWEPjNim0n8TdZCIoRHXG5gjUZqb8670WeEY9Ejb1BVYKqpnN6DGPgo3nirQMf1nGsD0O/Yd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gUkHyEmw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ci+KBFGO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8254DC4CEE9;
-	Fri, 30 May 2025 09:52:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748598766;
-	bh=vQBPZkgMXyD+EbgfzSAlFm0EAAyiNqjKIVGyLm9BEZo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Ci+KBFGO8HoE+478ZVAO1y5C4e4nsPcCvd07wOyfb3tSotn1gzGnOVPjA+b1bNM1R
-	 zuVmo7ekE5rXvnCJl68CEysYYClhtOaDpKPhmFURc9IHrNoqZ+KWX2NaaYuvflCM3i
-	 OdeY4yYm5fPmouOdh88XCjNO+VnvIda7aXmp2tLbbM3I0mjOFH9YPw1JLK7oDtq8gG
-	 C+U26ZcMQv+fKNKF9jkyg5/zStv9AwP7Rqgvl6dLhjzfoqXNizB86v/zviXnGWu/Ci
-	 jMNcLDU+eQsjWoeMtb8uggdTPoZ2I1gBQP0CAn5n7K250ZV4RVl5ayIEo2nbNaJqwC
-	 aTvsSlQ3dFsTw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uKwPs-001ovg-67;
-	Fri, 30 May 2025 10:52:44 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexander Potapenko <glider@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	D Scott Phillips <scott@os.amperecomputing.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Mark Brown <broonie@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Sweet Tea Dorminy <sweettea-kernel@dorminy.me>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.16, take #1
-Date: Fri, 30 May 2025 10:52:23 +0100
-Message-Id: <20250530095223.1153860-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUkHyEmw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748617918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yfqZ4uwCBedZ314UKTh8R56ds3rRmx+4qFuELqIHy8I=;
+	b=gUkHyEmwTaEdHgT+rCKRr1uH1dvhT2oMZAAGfd3j76oOSZS2julNO8VsCUQ2HCbVyGERHo
+	Ad5fMe1/vYBLrmDzYcvcXxu9Gbdl0iaNSyXh8hqMwLYxOS+qCdNkS+AAJ2b5L7+p6uIZkN
+	JmXDafxSmXQPmDP+L9YM2stK/Gl0+Jg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-2-4nPPTX1cNP-q5R8T4SBTZA-1; Fri, 30 May 2025 11:11:56 -0400
+X-MC-Unique: 4nPPTX1cNP-q5R8T4SBTZA-1
+X-Mimecast-MFC-AGG-ID: 4nPPTX1cNP-q5R8T4SBTZA_1748617915
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a4eb9c80deso1204901f8f.0
+        for <kvmarm@lists.linux.dev>; Fri, 30 May 2025 08:11:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748617915; x=1749222715;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yfqZ4uwCBedZ314UKTh8R56ds3rRmx+4qFuELqIHy8I=;
+        b=X49FT/tT8DHRmdGz4EtyX5Bt2M0d4qJnTSxfGDo5i22/8WriB7dD2gu2szjzt0fhuK
+         2txGdeDcSM3uFD42h0Z3TQIOOLeyy61Ca2qkih4AB2iAzBBlnt5e7MAkyUaAr4QXvhMJ
+         4lIeuGrpy10H0siR7BUXOddrw0wCU3Qgj98qq3AvD4ue8SQZEglNtKdXTo2incZ7ecuW
+         PQWDchR29WQ+GIsh+1A7/z2rBwoeB4UIP9ONCKrjgi6flWTgGdo6pB7XSEOapufiSPJ6
+         G5bt0TTSHdmFE8vtDZkXKiwo5tOFqr/KHMi0kRVuusYVWAXasfwDRv9/5D/dkXptie4z
+         BS/A==
+X-Forwarded-Encrypted: i=1; AJvYcCV86zF11cHLAr3ewifyszxZ/QsfxaK9krBqjNkKk7kshg+6w5yZzvSd0A/q+2biB+zUP5a6Q4c=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw1dyz3kiqQaJG56vegyjLjmkJbEe3wSoDwTvf7peVgCe8kJV1R
+	07LMkRV8PQ4udVNTo6yBIIToLJwfxapxHWF1FGn81a32sJFTakVodjUQDQvAQBwXF7FlCmesiEF
+	xxaMREShpMgv3cO5txvoNlbXEKvb4lAXMwbr0HHDfvcnM54dxN6piQIGjggVnEjqKo68xFrN4dK
+	ghXx+DxpJjL27UH8/mnBK/DctecfTqKE5P
+X-Gm-Gg: ASbGncvTWC/rOzOgx/3qcPyUjPot1MK+B5h7kzBnrSdu0K2uB7iDbAhrJpz58gedZNo
+	XZUiG6xxf8mT94J7YI+rWqKCEHsJQVWyvMIj1eOwnS4x1n528HGHhBXaxCQPe/qlgM8E=
+X-Received: by 2002:a05:6000:2907:b0:3a4:f6b7:8b07 with SMTP id ffacd0b85a97d-3a4f89dd0e0mr2510030f8f.48.1748617915369;
+        Fri, 30 May 2025 08:11:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0zplckeg0pZyVVtsF4Rx+t90b7lYELscoecfMN3axFdzklZzbvdq5/jQJWSDnQewmwTsExNb1LUaSwI9dMiY=
+X-Received: by 2002:a05:6000:2907:b0:3a4:f6b7:8b07 with SMTP id
+ ffacd0b85a97d-3a4f89dd0e0mr2509983f8f.48.1748617915000; Fri, 30 May 2025
+ 08:11:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, catalin.marinas@arm.com, dan.carpenter@linaro.org, scott@os.amperecomputing.com, jingzhangos@google.com, broonie@kernel.org, oliver.upton@linux.dev, sweettea-kernel@dorminy.me, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20250530095223.1153860-1-maz@kernel.org>
+In-Reply-To: <20250530095223.1153860-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 30 May 2025 17:11:42 +0200
+X-Gm-Features: AX0GCFs45z1db-bj9Xqr5W0smLTP6OZ81Z8ky2sMoDqJ9qQmYN3iiueiMy14ig8
+Message-ID: <CABgObfb+MeNYmRpubfqf=KHWxNcK4bR7bHSsaKERF28ATYj6yQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.16, take #1
+To: Marc Zyngier <maz@kernel.org>
+Cc: Alexander Potapenko <glider@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, D Scott Phillips <scott@os.amperecomputing.com>, 
+	Jing Zhang <jingzhangos@google.com>, Mark Brown <broonie@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Sweet Tea Dorminy <sweettea-kernel@dorminy.me>, 
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: mbt9ucrSMS6Uaw1G-uvvK7DTauTqJoSGEdvF4tgSEYw_1748617915
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo,
+On Fri, May 30, 2025 at 11:52=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> Paolo,
+>
+> Here's the first batch of fixes for KVM/arm64. Nothing very exciting,
+> except for yet another annoying race condition in the vgic init code
+> spotted by everybody's favourite backtrace generator (syzkaller).
 
-Here's the first batch of fixes for KVM/arm64. Nothing very exciting,
-except for yet another annoying race condition in the vgic init code
-spotted by everybody's favourite backtrace generator (syzkaller).
+That was fast. :) Pulled, thanks.
 
-Details in the tag below.
+Paolo
 
-Please pull,
-
-	M.
-
-The following changes since commit 1b85d923ba8c9e6afaf19e26708411adde94fba8:
-
-  Merge branch kvm-arm64/misc-6.16 into kvmarm-master/next (2025-05-23 10:59:43 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.16-1
-
-for you to fetch changes up to 4d62121ce9b58ea23c8d62207cbc604e98ecdc0a:
-
-  KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer (2025-05-30 10:24:49 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.16, take #1
-
-- Make the irqbypass hooks resilient to changes in the GSI<->MSI
-  routing, avoiding behind stale vLPI mappings being left behind. The
-  fix is to resolve the VGIC IRQ using the host IRQ (which is stable)
-  and nuking the vLPI mapping upon a routing change.
-
-- Close another VGIC race where vCPU creation races with VGIC
-  creation, leading to in-flight vCPUs entering the kernel w/o private
-  IRQs allocated.
-
-- Fix a build issue triggered by the recently added workaround for
-  Ampere's AC04_CPU_23 erratum.
-
-- Correctly sign-extend the VA when emulating a TLBI instruction
-  potentially targeting a VNCR mapping.
-
-- Avoid dereferencing a NULL pointer in the VGIC debug code, which can
-  happen if the device doesn't have any mapping yet.
-
-----------------------------------------------------------------
-Marc Zyngier (3):
-      arm64: sysreg: Drag linux/kconfig.h to work around vdso build issue
-      KVM: arm64: Mask out non-VA bits from TLBI VA* on VNCR invalidation
-      KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer
-
-Oliver Upton (5):
-      KVM: arm64: Use lock guard in vgic_v4_set_forwarding()
-      KVM: arm64: Protect vLPI translation with vgic_irq::irq_lock
-      KVM: arm64: Resolve vLPI by host IRQ in vgic_v4_unset_forwarding()
-      KVM: arm64: Unmap vLPIs affected by changes to GSI routing information
-      KVM: arm64: vgic-init: Plug vCPU vs. VGIC creation race
-
- arch/arm64/include/asm/sysreg.h  |  1 +
- arch/arm64/kvm/arm.c             | 26 +++++++++++-
- arch/arm64/kvm/nested.c          |  6 ++-
- arch/arm64/kvm/vgic/vgic-debug.c |  5 ++-
- arch/arm64/kvm/vgic/vgic-init.c  | 27 +++++++++++-
- arch/arm64/kvm/vgic/vgic-its.c   | 48 ++++++++++-----------
- arch/arm64/kvm/vgic/vgic-v4.c    | 92 ++++++++++++++++++++++------------------
- include/kvm/arm_vgic.h           |  3 +-
- 8 files changed, 134 insertions(+), 74 deletions(-)
