@@ -1,89 +1,133 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B2F21FF44
-	for <kvmarm@lists.linux.dev>; Fri, 30 May 2025 09:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CF01411EB;
+	Fri, 30 May 2025 09:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748597273; cv=none; b=MEobQaZ8dfC1mcIIJ8zhrGANNWkShs12SOxcjSvVrINEdMrIH/pLJwIlyMS2B1ahBIw8ZeqzSiKQsGN01PHQ+tA1QWPU/hq9dcP7PHkT5J3eJpYsuqTKLwwVlbT2FTnHy2ElncIPWyPD4kjkqyCPq2vzCPG9KoNMgj2NWIjvXMc=
+	t=1748598767; cv=none; b=gG1Yor8Dz3URgOrLP0AxwndkhCZ6Oo/CdT5ZbqH4nR0MGkY6Y41tZoPTKO5xEz4z6p6z94apv77Bl05bAQpxJdhKUiYiDqkRsw54YErCyrUwtluasdI5Nacjr53vuBklvwH6TuybbvOYhIbJajHpcqlURnvGYEi81FF6hLoOWkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748597273; c=relaxed/simple;
-	bh=yZbB/aYnq5RRXas7SL6sK522IMjXH177xHOkAAcNkXI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PgFL9mM/sRt3VnGdwPlApz55gYnLTyzSQNKTz8v1vgGELG48Kd8PyvUV+yun+Xv9D9X7y0kx0NIs6Vw8SIGNGIU6VLVGuKGfKjP+RG2eRyKq+lw1LgVmjNM7nFTFtOBYRp9Ww6s2Jm7YTSw0ez8xHcIBweMYIH2l/FFXudwwB/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KJCYVd63; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748598767; c=relaxed/simple;
+	bh=vQBPZkgMXyD+EbgfzSAlFm0EAAyiNqjKIVGyLm9BEZo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LoI79LC7BW55LhklTitXlOmdIcmxkF2vD6XBVb9i0QMFW7KmtBj7IgjJbUGYS01jhtkcdOKSGb1y2zd8Zo+iofW34pJR0KgX1CYb8+xtI4NLzUjPFQDB8aFqEYYX3n2zuUtoZstk8UWjtPDG1BR14Y7XE2cBI15d80KnnCwXst8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ci+KBFGO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KJCYVd63"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4021FC4CEEB;
-	Fri, 30 May 2025 09:27:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ci+KBFGO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8254DC4CEE9;
+	Fri, 30 May 2025 09:52:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748597273;
-	bh=yZbB/aYnq5RRXas7SL6sK522IMjXH177xHOkAAcNkXI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KJCYVd63aquv3Xa7Mr+m7Pry8/2ajc+X70pSQ5KvFPzyceO004i9Wn0pJFGptuxbj
-	 K+LUwc2jzpbRHn+nNQylyV5YgCNdlv29UO3N2p5hvRwCcKQ50+DVCsDPOnR00/aLz8
-	 BRV7NEHG2Ag3kvoZ4yk9beBfMyeSe897/33XvX4dYac+t0jxXl9OaiBvebOXB76A+c
-	 yCVoFsQqTyhWGkgxoF2cyFUn8DX6su3Dh14vCttRvwjz+VVSsaiO8LfdMitvtVKorz
-	 tbqNeKU1nL9NQ6YhrpivIKbVkN2TJRCYz/It5CYDWXb9hsZyG8NN/J6vbAmnFEuhZJ
-	 O2CPuN6JcMOAg==
+	s=k20201202; t=1748598766;
+	bh=vQBPZkgMXyD+EbgfzSAlFm0EAAyiNqjKIVGyLm9BEZo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ci+KBFGO8HoE+478ZVAO1y5C4e4nsPcCvd07wOyfb3tSotn1gzGnOVPjA+b1bNM1R
+	 zuVmo7ekE5rXvnCJl68CEysYYClhtOaDpKPhmFURc9IHrNoqZ+KWX2NaaYuvflCM3i
+	 OdeY4yYm5fPmouOdh88XCjNO+VnvIda7aXmp2tLbbM3I0mjOFH9YPw1JLK7oDtq8gG
+	 C+U26ZcMQv+fKNKF9jkyg5/zStv9AwP7Rqgvl6dLhjzfoqXNizB86v/zviXnGWu/Ci
+	 jMNcLDU+eQsjWoeMtb8uggdTPoZ2I1gBQP0CAn5n7K250ZV4RVl5ayIEo2nbNaJqwC
+	 aTvsSlQ3dFsTw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uKw1m-001oJL-KT;
-	Fri, 30 May 2025 10:27:51 +0100
+	id 1uKwPs-001ovg-67;
+	Fri, 30 May 2025 10:52:44 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Joey Gouly <joey.gouly@arm.com>,
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexander Potapenko <glider@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	D Scott Phillips <scott@os.amperecomputing.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Mark Brown <broonie@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sweet Tea Dorminy <sweettea-kernel@dorminy.me>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 0/5] KVM: arm64: Some VGIC-related fixes
-Date: Fri, 30 May 2025 10:27:47 +0100
-Message-Id: <174859721251.1152851.11865968004373991220.b4-ty@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.16, take #1
+Date: Fri, 30 May 2025 10:52:23 +0100
+Message-Id: <20250530095223.1153860-1-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250523194722.4066715-1-oliver.upton@linux.dev>
-References: <20250523194722.4066715-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, catalin.marinas@arm.com, dan.carpenter@linaro.org, scott@os.amperecomputing.com, jingzhangos@google.com, broonie@kernel.org, oliver.upton@linux.dev, sweettea-kernel@dorminy.me, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 23 May 2025 12:47:17 -0700, Oliver Upton wrote:
-> v1 -> v2:
->  - Added details to changelog about why its_lock gets removed later from
->    vgic_v4_unset_forwarding() (Marc)
->  - Fix email address for Sweet Tea's Tested-by tags (sorry about that!)
-> 
-> v1: https://lore.kernel.org/kvmarm/20250523160810.4049313-1-oliver.upton@linux.dev/
-> 
-> [...]
+Paolo,
 
-Applied to next, thanks!
+Here's the first batch of fixes for KVM/arm64. Nothing very exciting,
+except for yet another annoying race condition in the vgic init code
+spotted by everybody's favourite backtrace generator (syzkaller).
 
-[1/5] KVM: arm64: Use lock guard in vgic_v4_set_forwarding()
-      commit: 761aabe76e6b1eb8850e72141cb026c7057e46fd
-[2/5] KVM: arm64: Protect vLPI translation with vgic_irq::irq_lock
-      commit: fc4dafe87b93ec94204896c4bc8cad7e71bdd151
-[3/5] KVM: arm64: Resolve vLPI by host IRQ in vgic_v4_unset_forwarding()
-      commit: 05b9405f2fa1848e984f231708fa1e5d385e4d27
-[4/5] KVM: arm64: Unmap vLPIs affected by changes to GSI routing information
-      commit: 4bf3693d36af9768c9bcc1df3a12d00ad6ea8083
-[5/5] KVM: arm64: vgic-init: Plug vCPU vs. VGIC creation race
-      commit: 07212d16adc7a02810e1641c2721762751ce4f88
+Details in the tag below.
 
-Cheers,
+Please pull,
 
 	M.
--- 
-Without deviation from the norm, progress is not possible.
 
+The following changes since commit 1b85d923ba8c9e6afaf19e26708411adde94fba8:
 
+  Merge branch kvm-arm64/misc-6.16 into kvmarm-master/next (2025-05-23 10:59:43 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.16-1
+
+for you to fetch changes up to 4d62121ce9b58ea23c8d62207cbc604e98ecdc0a:
+
+  KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer (2025-05-30 10:24:49 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.16, take #1
+
+- Make the irqbypass hooks resilient to changes in the GSI<->MSI
+  routing, avoiding behind stale vLPI mappings being left behind. The
+  fix is to resolve the VGIC IRQ using the host IRQ (which is stable)
+  and nuking the vLPI mapping upon a routing change.
+
+- Close another VGIC race where vCPU creation races with VGIC
+  creation, leading to in-flight vCPUs entering the kernel w/o private
+  IRQs allocated.
+
+- Fix a build issue triggered by the recently added workaround for
+  Ampere's AC04_CPU_23 erratum.
+
+- Correctly sign-extend the VA when emulating a TLBI instruction
+  potentially targeting a VNCR mapping.
+
+- Avoid dereferencing a NULL pointer in the VGIC debug code, which can
+  happen if the device doesn't have any mapping yet.
+
+----------------------------------------------------------------
+Marc Zyngier (3):
+      arm64: sysreg: Drag linux/kconfig.h to work around vdso build issue
+      KVM: arm64: Mask out non-VA bits from TLBI VA* on VNCR invalidation
+      KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer
+
+Oliver Upton (5):
+      KVM: arm64: Use lock guard in vgic_v4_set_forwarding()
+      KVM: arm64: Protect vLPI translation with vgic_irq::irq_lock
+      KVM: arm64: Resolve vLPI by host IRQ in vgic_v4_unset_forwarding()
+      KVM: arm64: Unmap vLPIs affected by changes to GSI routing information
+      KVM: arm64: vgic-init: Plug vCPU vs. VGIC creation race
+
+ arch/arm64/include/asm/sysreg.h  |  1 +
+ arch/arm64/kvm/arm.c             | 26 +++++++++++-
+ arch/arm64/kvm/nested.c          |  6 ++-
+ arch/arm64/kvm/vgic/vgic-debug.c |  5 ++-
+ arch/arm64/kvm/vgic/vgic-init.c  | 27 +++++++++++-
+ arch/arm64/kvm/vgic/vgic-its.c   | 48 ++++++++++-----------
+ arch/arm64/kvm/vgic/vgic-v4.c    | 92 ++++++++++++++++++++++------------------
+ include/kvm/arm_vgic.h           |  3 +-
+ 8 files changed, 134 insertions(+), 74 deletions(-)
