@@ -1,53 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5F021578F
-	for <kvmarm@lists.linux.dev>; Fri, 30 May 2025 09:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B2F21FF44
+	for <kvmarm@lists.linux.dev>; Fri, 30 May 2025 09:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748597269; cv=none; b=mdYEht+QgZYD65xzS/9wSeN66pL9vDjxKbnrHRS5JUShPMrnCvAQt9dxZxdFBqoH8C7bhB9aLpL1EeQYnjfBpvXvPLS8BL2H7bU16qz7WhguRFJDPNfkBVY9XkFOS0SfUg1ff1Gs/2vhVe5hlw7IW4Lp7R8QvWrS6/WOD31sRNU=
+	t=1748597273; cv=none; b=MEobQaZ8dfC1mcIIJ8zhrGANNWkShs12SOxcjSvVrINEdMrIH/pLJwIlyMS2B1ahBIw8ZeqzSiKQsGN01PHQ+tA1QWPU/hq9dcP7PHkT5J3eJpYsuqTKLwwVlbT2FTnHy2ElncIPWyPD4kjkqyCPq2vzCPG9KoNMgj2NWIjvXMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748597269; c=relaxed/simple;
-	bh=/ebqk5EBZxzGGlkyw6B6h4CC/MuDUNAPuwoTejd2tEs=;
+	s=arc-20240116; t=1748597273; c=relaxed/simple;
+	bh=yZbB/aYnq5RRXas7SL6sK522IMjXH177xHOkAAcNkXI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=chRoGbmyXMy9x5C9W6UOtgFSgLdqyI+Vwdc+uY4sk+hhbs/uQOdXmY8//ppcBy80t3RQAKf1ToufEs3crTlQmOlIxV+t3OAop0qZd5v8ijzWUMeMxpxgN63rvZsQlbqOW6AjUNIzD5hNAWsqVs+bhiWvZ36i7uuMwpZYzO42KB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G36byAWV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=PgFL9mM/sRt3VnGdwPlApz55gYnLTyzSQNKTz8v1vgGELG48Kd8PyvUV+yun+Xv9D9X7y0kx0NIs6Vw8SIGNGIU6VLVGuKGfKjP+RG2eRyKq+lw1LgVmjNM7nFTFtOBYRp9Ww6s2Jm7YTSw0ez8xHcIBweMYIH2l/FFXudwwB/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KJCYVd63; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G36byAWV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E304CC4CEEE;
-	Fri, 30 May 2025 09:27:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KJCYVd63"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4021FC4CEEB;
+	Fri, 30 May 2025 09:27:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748597268;
-	bh=/ebqk5EBZxzGGlkyw6B6h4CC/MuDUNAPuwoTejd2tEs=;
+	s=k20201202; t=1748597273;
+	bh=yZbB/aYnq5RRXas7SL6sK522IMjXH177xHOkAAcNkXI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=G36byAWVROT11g+bEvLS/8ozKuiVqs56Ag0r/SFA6WwNNrQv2eEsUY0fsxvvnESwf
-	 ZiTV09ahOfD3LiNTveCaMEjxc3PKc9C7pjlvtNV/udzcOsqxiurIdrPx4P8NyD4d4a
-	 o9RiZJPLbK1d6KXVSa+pdP2NOsfe5tqmCcDShAGZxBECV531Ov3DCO0gVbsT6DMzLC
-	 DiIIVr6PICv1zvYwQmirQky5VwZyU0D07aptZdK6Y6E2lA8oR63pE0gPkD3aXCs1g5
-	 DQRlmf8Zm6JbdkDkzRir4CL3P2SCcXnaGZ3wfec0pW9+gX8izhRP6odMsb06BUjbh2
-	 UMzMynxIiEc2Q==
+	b=KJCYVd63aquv3Xa7Mr+m7Pry8/2ajc+X70pSQ5KvFPzyceO004i9Wn0pJFGptuxbj
+	 K+LUwc2jzpbRHn+nNQylyV5YgCNdlv29UO3N2p5hvRwCcKQ50+DVCsDPOnR00/aLz8
+	 BRV7NEHG2Ag3kvoZ4yk9beBfMyeSe897/33XvX4dYac+t0jxXl9OaiBvebOXB76A+c
+	 yCVoFsQqTyhWGkgxoF2cyFUn8DX6su3Dh14vCttRvwjz+VVSsaiO8LfdMitvtVKorz
+	 tbqNeKU1nL9NQ6YhrpivIKbVkN2TJRCYz/It5CYDWXb9hsZyG8NN/J6vbAmnFEuhZJ
+	 O2CPuN6JcMOAg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uKw1i-001oIv-Uj;
-	Fri, 30 May 2025 10:27:47 +0100
+	id 1uKw1m-001oJL-KT;
+	Fri, 30 May 2025 10:27:51 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
+	Oliver Upton <oliver.upton@linux.dev>
 Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer
-Date: Fri, 30 May 2025 10:27:44 +0100
-Message-Id: <174859721253.1152851.15902065633561816989.b4-ty@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 0/5] KVM: arm64: Some VGIC-related fixes
+Date: Fri, 30 May 2025 10:27:47 +0100
+Message-Id: <174859721251.1152851.11865968004373991220.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250530091647.1152489-1-maz@kernel.org>
-References: <20250530091647.1152489-1-maz@kernel.org>
+In-Reply-To: <20250523194722.4066715-1-oliver.upton@linux.dev>
+References: <20250523194722.4066715-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,24 +53,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, dan.carpenter@linaro.org, jingzhangos@google.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 30 May 2025 10:16:47 +0100, Marc Zyngier wrote:
-> Dan reports that iterating over a device ITEs can legitimately lead
-> to a NULL pointer, and that the NULL check is placed *after* the
-> pointer has already been dereferenced.
+On Fri, 23 May 2025 12:47:17 -0700, Oliver Upton wrote:
+> v1 -> v2:
+>  - Added details to changelog about why its_lock gets removed later from
+>    vgic_v4_unset_forwarding() (Marc)
+>  - Fix email address for Sweet Tea's Tested-by tags (sorry about that!)
 > 
-> Hoist the pointer check as early as possible and be done with it.
-> 
+> v1: https://lore.kernel.org/kvmarm/20250523160810.4049313-1-oliver.upton@linux.dev/
 > 
 > [...]
 
 Applied to next, thanks!
 
-[1/1] KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer
-      commit: 4d62121ce9b58ea23c8d62207cbc604e98ecdc0a
+[1/5] KVM: arm64: Use lock guard in vgic_v4_set_forwarding()
+      commit: 761aabe76e6b1eb8850e72141cb026c7057e46fd
+[2/5] KVM: arm64: Protect vLPI translation with vgic_irq::irq_lock
+      commit: fc4dafe87b93ec94204896c4bc8cad7e71bdd151
+[3/5] KVM: arm64: Resolve vLPI by host IRQ in vgic_v4_unset_forwarding()
+      commit: 05b9405f2fa1848e984f231708fa1e5d385e4d27
+[4/5] KVM: arm64: Unmap vLPIs affected by changes to GSI routing information
+      commit: 4bf3693d36af9768c9bcc1df3a12d00ad6ea8083
+[5/5] KVM: arm64: vgic-init: Plug vCPU vs. VGIC creation race
+      commit: 07212d16adc7a02810e1641c2721762751ce4f88
 
 Cheers,
 
