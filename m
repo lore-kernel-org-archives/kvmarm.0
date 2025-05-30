@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9990212B3D
-	for <kvmarm@lists.linux.dev>; Fri, 30 May 2025 09:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5F021578F
+	for <kvmarm@lists.linux.dev>; Fri, 30 May 2025 09:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748597266; cv=none; b=N8m1dgt03+metWl0gW9bALVc83o9QWvUhPD1ZsXVoUUh0psI/5KdYreYJeDhn3gR+GSviga3w/mifhtYfC+kWX0ZRtqnJw0MXdpR87uxlk0HFqRDKk7TMUhtwZEUmhYHlUgG/YOpaIvT6zwJw9QtFDQjVhLCpV8RdXGIG9tX1iU=
+	t=1748597269; cv=none; b=mdYEht+QgZYD65xzS/9wSeN66pL9vDjxKbnrHRS5JUShPMrnCvAQt9dxZxdFBqoH8C7bhB9aLpL1EeQYnjfBpvXvPLS8BL2H7bU16qz7WhguRFJDPNfkBVY9XkFOS0SfUg1ff1Gs/2vhVe5hlw7IW4Lp7R8QvWrS6/WOD31sRNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748597266; c=relaxed/simple;
-	bh=BfDBWaH+bJ58F06SMIRI1yZY1zg0J69UAxOI6infm10=;
+	s=arc-20240116; t=1748597269; c=relaxed/simple;
+	bh=/ebqk5EBZxzGGlkyw6B6h4CC/MuDUNAPuwoTejd2tEs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FjC5tAYN82hxn12ihs/7gkiq3qhMdP6ibh3WTxVzqMbv3KrtzIr9Kv8/lZoYexYqKSFWwzJDnba9WCMP2XNiH2EBPw8wZ9dmKLM1J8t9bNDIYlNVIiFY2XazA+LrkwYWIsFcMQhKBGpPQT+HNBP7l0zjzngsT0uwnUHvHZMMORU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4J2GRQv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=chRoGbmyXMy9x5C9W6UOtgFSgLdqyI+Vwdc+uY4sk+hhbs/uQOdXmY8//ppcBy80t3RQAKf1ToufEs3crTlQmOlIxV+t3OAop0qZd5v8ijzWUMeMxpxgN63rvZsQlbqOW6AjUNIzD5hNAWsqVs+bhiWvZ36i7uuMwpZYzO42KB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G36byAWV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4J2GRQv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21A01C4CEEB;
-	Fri, 30 May 2025 09:27:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G36byAWV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E304CC4CEEE;
+	Fri, 30 May 2025 09:27:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748597266;
-	bh=BfDBWaH+bJ58F06SMIRI1yZY1zg0J69UAxOI6infm10=;
+	s=k20201202; t=1748597268;
+	bh=/ebqk5EBZxzGGlkyw6B6h4CC/MuDUNAPuwoTejd2tEs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q4J2GRQvouH7L9uxLceCUH8hLwPpUnG5Dtt5R+hu1nz/p0pZR27IMUgqNGuTdG01T
-	 gDTg6e2qvHWs5ogY6yxbVq+VSPX6JFc1hr4s23yKa70OfQra5pmQwwIK/yfnWwCsXt
-	 sWFFhBhMd8FqE94iJhglBUXim+By0Kk/dckl67b3e88vlxu908EEKhHvKp08An9/8x
-	 OU67ExJ5ukAtHJDn84HhLLPBYSwImKog2MgknwnujBNUjlyO0eN7+1KUVAUmGxWQrL
-	 rwQ6AXntEJQSWKI1Tp37v4nMuhAKSoeFc5MpNLMwj/RXJiomj9aSUL3l4pzQNJ9pOK
-	 zldQyFXIkqfrg==
+	b=G36byAWVROT11g+bEvLS/8ozKuiVqs56Ag0r/SFA6WwNNrQv2eEsUY0fsxvvnESwf
+	 ZiTV09ahOfD3LiNTveCaMEjxc3PKc9C7pjlvtNV/udzcOsqxiurIdrPx4P8NyD4d4a
+	 o9RiZJPLbK1d6KXVSa+pdP2NOsfe5tqmCcDShAGZxBECV531Ov3DCO0gVbsT6DMzLC
+	 DiIIVr6PICv1zvYwQmirQky5VwZyU0D07aptZdK6Y6E2lA8oR63pE0gPkD3aXCs1g5
+	 DQRlmf8Zm6JbdkDkzRir4CL3P2SCcXnaGZ3wfec0pW9+gX8izhRP6odMsb06BUjbh2
+	 UMzMynxIiEc2Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uKw1f-001oIX-Ug;
-	Fri, 30 May 2025 10:27:44 +0100
+	id 1uKw1i-001oIv-Uj;
+	Fri, 30 May 2025 10:27:47 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -39,13 +39,15 @@ To: kvmarm@lists.linux.dev,
 Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Mask out non-VA bits from TLBI VA* on VNCR invalidation
-Date: Fri, 30 May 2025 10:27:39 +0100
-Message-Id: <174859721251.1152851.5430955827758174565.b4-ty@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH] KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer
+Date: Fri, 30 May 2025 10:27:44 +0100
+Message-Id: <174859721253.1152851.15902065633561816989.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250525175759.780891-1-maz@kernel.org>
-References: <20250525175759.780891-1-maz@kernel.org>
+In-Reply-To: <20250530091647.1152489-1-maz@kernel.org>
+References: <20250530091647.1152489-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,25 +57,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, dan.carpenter@linaro.org, jingzhangos@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, 25 May 2025 18:57:59 +0100, Marc Zyngier wrote:
-> When handling a TLBI VA* instruction that potentially targets a
-> VNCR page mapping, we fail to mask out the top bits that contain
-> the ASID and TTL fields, hence potentially failing the VA check
-> in the TLB code.
+On Fri, 30 May 2025 10:16:47 +0100, Marc Zyngier wrote:
+> Dan reports that iterating over a device ITEs can legitimately lead
+> to a NULL pointer, and that the NULL check is placed *after* the
+> pointer has already been dereferenced.
 > 
-> An additional wrinkle is that we fail to sign extend the VA,
-> again leading to failed VA checks.
+> Hoist the pointer check as early as possible and be done with it.
+> 
 > 
 > [...]
 
 Applied to next, thanks!
 
-[1/1] KVM: arm64: Mask out non-VA bits from TLBI VA* on VNCR invalidation
-      commit: 667304740537e546dac676be9eb81cee41d2ebdd
+[1/1] KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer
+      commit: 4d62121ce9b58ea23c8d62207cbc604e98ecdc0a
 
 Cheers,
 
