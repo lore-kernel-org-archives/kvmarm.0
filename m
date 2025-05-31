@@ -1,44 +1,42 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9ABE28C5BF
-	for <kvmarm@lists.linux.dev>; Fri, 30 May 2025 23:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3664A21
+	for <kvmarm@lists.linux.dev>; Sat, 31 May 2025 01:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748646404; cv=none; b=FV5KGcV++VSqNuctiMNhToNZElbNtVtLwYpV4/OiLXn99YOGvhucvjL38EKF9QK6Ur8gx9davfIrZdm0dr6KJwCIk41sBiS+g512VLJKuKK+vMWAu9u8lip+zOhLkWlSw3RkA8FtHNGyPV7Di99lqtS1Jw5zYryZSCkOTf09eUs=
+	t=1748654761; cv=none; b=bwgARBHl2nNu8FeF7zVT+g+mxY0TZs1PxjWV1yMVZ73bNgARgKa4m4uA19pKVfM7J7rzJO4K5/9XfGypaly7tejMRwQA+HTxkfslevfaqSXBz2VCdEACo15tKn2xvRBWomaWUgDSqOCGzNpQkLgT2bfvcn32eLr6Jwz3TBXLvh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748646404; c=relaxed/simple;
-	bh=aUt8fXL0AH/BVeclhW6hx7CDrokRoa9QZKfyr/v40N4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pUHmXG/u+rqV0sNWLTx2SRlO8HtJpuJiWGT5935KC2RrT37BbeKXRF7HaibWSBKllkg5EzTvdTjrI7/aYy2F0EAQw+i0fWzP9xDZF5U5viKkbq334h/NXvcashX+fyz1vg65y6hJlOSO7AAZadO5vvaW0g3HB8fOayzrr1pKTPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bNVagtwj; arc=none smtp.client-ip=91.218.175.173
+	s=arc-20240116; t=1748654761; c=relaxed/simple;
+	bh=NMzCDBVA6Jwbp6bgbYi7zhjOCPs57oErrhOYbEk0Faw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NPfvUoo2qPNexm902o5UXw6/aPI03dNgRmUwRA901rIM40J6Mwy7zCjbFL1Ut/b2DPJ8ijEOzvJrw9GjFnG7fjiUTPY5x5ACJV2/rdVR9CBNRlz6sCtv1CJE9OYfT8AbvUoi1IwkZ8zuYjTwsoXuno3ite5++kWXxFb3oOXa7dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ICAefNPf; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bNVagtwj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ICAefNPf"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748646401;
+	t=1748654755;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KLHGOUe8htugSzjobBtkUrXJUl92FR7hblGdKzPIFz4=;
-	b=bNVagtwjJx4OyWUZ/HEQRKp7+oAa2nunxAGR1P24iCstffZ1ubejZU/yUG3PboAzC0H8gw
-	BxLygv7aDbbJKbzfHtDZ67AhZRDArUJiwFP6yqxQgkV3JOOyHSMu8hKUMb9IkHVjfWpCCz
-	MCiuv64/6UXLi579LlYOx/+G7oHPx0w=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4qgcf9CA8yuSqgpxE84a6xIK8JIit4KLm7YBZABk1vk=;
+	b=ICAefNPfD2yEN5HvpCTJCyyMhw73h+k2KYncdtielcRVzJhG1msexBucnlENbgJwfEpo0f
+	3Bo1YJRkFjionHvRywRrwMxvTaK4qmVbLGQlGqjcuziQx5PNsaVe/qk1u+aHjqJtmIOEZX
+	+VKev5srbkZ0UQLk68rjYz5eLfsfHdE=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ben Horgan <ben.horgan@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 4/4] KVM: arm64: Treat vCPU with pending SError as runnable
-Date: Fri, 30 May 2025 16:06:23 -0700
-Message-Id: <20250530230623.650888-5-oliver.upton@linux.dev>
-In-Reply-To: <20250530230623.650888-1-oliver.upton@linux.dev>
-References: <20250530230623.650888-1-oliver.upton@linux.dev>
+Subject: [PATCH v2 0/4] KVM: arm64: Add attribute to control GICD_TYPER2.nASSGIcap
+Date: Fri, 30 May 2025 18:25:41 -0700
+Message-Id: <20250531012545.709887-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,29 +46,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Per R_VRLPB, a pending SError is a WFI wakeup event regardless of
-PSTATE.A, meaning that the vCPU is runnable. Sample VSE in addition to
-the other IRQ lines.
+Raghu, I applied this locally for review and wound up changing enough
+things to where it was easier just to repost. Sorry, hope you don't
+mind.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/arm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+v1: https://lore.kernel.org/kvmarm/20250514192159.1751538-1-rananta@google.com/
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5a4aca8082e7..c5c1b3ec0f7e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -740,7 +740,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-  */
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
- {
--	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
-+	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF | HCR_VSE);
-+
- 	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
- 		&& !kvm_arm_vcpu_stopped(v) && !v->arch.pause);
- }
+v1 -> v2:
+ - Drop all use of GICv4 in the UAPI and KVM-internal helpers in favor
+   of nASSGIcap. This changes things around to model a guest feature,
+   not a host feature.
+
+ - Consolidate UAPI into a single attribute and expect userspace to use
+   to read the attribute for discovery, much like we do with the ID
+   registers
+
+ - Squash documentation together with implementation
+
+ - Clean up maintenance IRQ attribute handling, which I ran into as part
+   of reviewing this series
+
+Oliver Upton (2):
+  KVM: arm64: Disambiguate support for vSGIs v. vLPIs
+  KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
+
+Raghavendra Rao Ananta (2):
+  KVM: arm64: Introduce attribute to control GICD_TYPER2.nASSGIcap
+  KVM: arm64: selftests: Add test for nASSGIcap attribute
+
+ .../virt/kvm/devices/arm-vgic-v3.rst          | 29 ++++++
+ arch/arm64/include/uapi/asm/kvm.h             |  3 +
+ arch/arm64/kvm/vgic/vgic-init.c               |  7 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         | 88 +++++++++++++------
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c            | 24 +++--
+ arch/arm64/kvm/vgic/vgic-v4.c                 |  4 +-
+ arch/arm64/kvm/vgic/vgic.c                    |  4 +-
+ arch/arm64/kvm/vgic/vgic.h                    |  7 ++
+ include/kvm/arm_vgic.h                        |  3 +
+ tools/testing/selftests/kvm/arm64/vgic_init.c | 41 +++++++++
+ 10 files changed, 172 insertions(+), 38 deletions(-)
+
+
+base-commit: 1b85d923ba8c9e6afaf19e26708411adde94fba8
 -- 
 2.39.5
 
