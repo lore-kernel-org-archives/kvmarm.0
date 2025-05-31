@@ -1,127 +1,350 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384424A21
-	for <kvmarm@lists.linux.dev>; Sat, 31 May 2025 01:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FCC8F40
+	for <kvmarm@lists.linux.dev>; Sat, 31 May 2025 16:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748654766; cv=none; b=nzRQLiJAWt56I/6lz69gu0jsn3T15u+UB22t6XNyceJucQmzwf26cVefaMy1TiGMWKhTI5BTUdLCKLtutZ6is0KhBN9RzmQDP3oMo9PGaWUp0bkb8cmBljdtNMVlge+M+GfRRg50DSMZyqpl/scXzYqgpmfav26HT9WvlnRP0aU=
+	t=1748708629; cv=none; b=XAcyClsovkO6PV9JWXYtbuxfPwqwK4mxy3NSHbV/C+bUzn/sYZMiTKQh9TyoH2sJJel8nWF4obE41RrapLYwtY3f6ywkZzYCnzndt099QPibW0ZJwcFYIC7GOob2hugbPUxysXe5bUv9hKRxuMG70tSKYVjLsYXFxL6JBQaD/zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748654766; c=relaxed/simple;
-	bh=bugMo8r8RnxxM9E/b/A/vLBV83UPuDJJn1et5GRMCjA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YQIdYxFsmBfFnF2mVnBURBk9M/9x12v9hvATaQnSA8LayzA1ebdjfsROiUoWagEQMtOxf//ODPdu5mtxnZEjmltgwR7xU/tqkv2HW9ZvvPo06PmbW7ghONZtgagO4KUZ2mRkSUkA6q64dcM6uxkwLtREAAmRtHRoldyUoxrSw7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HKLi9jo7; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1748708629; c=relaxed/simple;
+	bh=pENL6xX0kq7SPKcJ+REbxAdrHafmCDOLbSBf8dniU28=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uaSXXINCUH5ljC2wqiOPEJpJAfrHnrukhhnIW6/O4ZABt/wbhye4jU+sMGz5W2ZnJCCT/80sirlX7Xsb53/LdVaJfc5v60jo9QonjSh5d+nkGjJyS2/M4RIAbYP5lfO7Vdlca8sthEsrP3iTmSIXZ26znZydKF4t53wwyEQu4BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kLKQy7Xy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HKLi9jo7"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748654763;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=POZepvMnS98kCy9E83ZMnekacdtvcTLSoMsUWYLNaR8=;
-	b=HKLi9jo7Zg9YutTI5pAG0+ST0kTuiArlSIfplrMi1Rp1EJBWwpkY9dYVsxyQD2JWToiNSO
-	IY2u7EKZHYxKDJXPajjYe0doMFV52a+H5SHelM6ljb3efhAK3pET6aKYHAJGWxEnPNFDYa
-	sIFwp0TnZgnAmTbYSzzOoHFXS42K93o=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kLKQy7Xy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 651E1C4CEE3;
+	Sat, 31 May 2025 16:23:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748708628;
+	bh=pENL6xX0kq7SPKcJ+REbxAdrHafmCDOLbSBf8dniU28=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kLKQy7XyG1IaIhD99cN1g62GTa46G/5Tc5H1PaUbJ3Y6ktZdYxMA4tzV/1+sL1n9Z
+	 5Kh5BDbtZqr+5khW4CZbbO7Y+Jdmqoy7S7GBX2YLL80sFulk+O0fb6o8GZKzewPvYC
+	 gnWff6jqXt3YhYpd+vwd9KzWaegHKfnNTQR087qHNrLafdzJ0fzloYqDCQo2t5aFzk
+	 Hz9Gzyac8soj92ZATv5hSSrmnrhPK5V7OH8pX3TzYq/UY7SeERiHARoiinijCoPDaL
+	 jaiuj6/ztfRObkK9UO/7NJOokkBsKh/alKxX077+9h07t2Ljmw74fBVS4tIIxHd4TB
+	 SUqbI1Xre0ZRQ==
+Received: from [149.88.19.236] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uLOzp-0029VU-QL;
+	Sat, 31 May 2025 17:23:46 +0100
+Date: Sat, 31 May 2025 17:23:44 +0100
+Message-ID: <87r004eokv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 4/4] KVM: arm64: selftests: Add test for nASSGIcap attribute
-Date: Fri, 30 May 2025 18:25:45 -0700
-Message-Id: <20250531012545.709887-5-oliver.upton@linux.dev>
-In-Reply-To: <20250531012545.709887-1-oliver.upton@linux.dev>
-References: <20250531012545.709887-1-oliver.upton@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: nv: Respect exception routing rules for SEAs
+In-Reply-To: <20250530230623.650888-2-oliver.upton@linux.dev>
+References: <20250530230623.650888-1-oliver.upton@linux.dev>
+	<20250530230623.650888-2-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 149.88.19.236
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Raghavendra Rao Ananta <rananta@google.com>
+On Sat, 31 May 2025 00:06:20 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Synchronous external aborts are taken to EL2 if ELIsInHost() or
+> HCR_EL2.TEA=1. Rework the SEA injection plumbing to respect the imposed
+> routing of the guest hypervisor and opportunistically rephrase things to
+> make their function a bit more obvious.
 
-Extend vgic_init to test the nASSGIcap attribute, asserting that it is
-configurable (within reason) prior to initializing the VGIC.
-Additionally, check that userspace cannot set the attribute after the
-VGIC has been initialized.
+nit: this is only true when FEAT_RAS is implemented, which isn't the
+case so far when NV is enabled.
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/arm64/vgic_init.c | 41 +++++++++++++++++++
- 1 file changed, 41 insertions(+)
+>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 15 +++++++++--
+>  arch/arm64/kvm/emulate-nested.c      | 20 ++++++++++++++
+>  arch/arm64/kvm/guest.c               |  8 ++++--
+>  arch/arm64/kvm/inject_fault.c        | 40 +++++++++-------------------
+>  arch/arm64/kvm/mmio.c                |  6 ++---
+>  arch/arm64/kvm/mmu.c                 | 15 +++--------
+>  6 files changed, 57 insertions(+), 47 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index bd020fc28aa9..e0fa8a5a2530 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -46,15 +46,26 @@ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+>  
+>  void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+>  void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+> -void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> -void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> +void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+> +int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+>  void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+>  
+> +static inline int kvm_inject_sea_dabt(struct kvm_vcpu *vcpu, u64 addr)
+> +{
+> +	return kvm_inject_sea(vcpu, false, addr);
+> +}
+> +
+> +static inline int kvm_inject_sea_iabt(struct kvm_vcpu *vcpu, u64 addr)
+> +{
+> +	return kvm_inject_sea(vcpu, true, addr);
+> +}
+> +
+>  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+>  
+>  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+>  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+>  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
+> +int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+>  
+>  static inline void kvm_inject_nested_sve_trap(struct kvm_vcpu *vcpu)
+>  {
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 3a384e9660b8..3d2f98fdca2f 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2816,3 +2816,23 @@ int kvm_inject_nested_irq(struct kvm_vcpu *vcpu)
+>  	/* esr_el2 value doesn't matter for exits due to irqs. */
+>  	return kvm_inject_nested(vcpu, 0, except_type_irq);
+>  }
+> +
+> +int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+> +{
+> +	u64 esr;
+> +
+> +	/*
+> +	 * The destination EL is in the same translation regime as the origin;
+> +	 * directly inject the SEA.
+> +	 */
+> +	if (is_hyp_ctxt(vcpu) || !(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_TEA)) {
+> +		__kvm_inject_sea(vcpu, iabt, addr);
+> +		return 1;
+> +	}
 
-diff --git a/tools/testing/selftests/kvm/arm64/vgic_init.c b/tools/testing/selftests/kvm/arm64/vgic_init.c
-index b3b5fb0ff0a9..aaecba432dbc 100644
---- a/tools/testing/selftests/kvm/arm64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/arm64/vgic_init.c
-@@ -675,6 +675,46 @@ static void test_v3_its_region(void)
- 	vm_gic_destroy(&v);
- }
- 
-+static void test_v3_nassgicap(void)
-+{
-+	struct kvm_vcpu *vcpus[NR_VCPUS];
-+	struct vm_gic vm;
-+	__u8 nassgicap;
-+	int ret;
-+
-+	vm = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS, vcpus);
-+	TEST_REQUIRE(!__kvm_has_device_attr(vm.gic_fd, KVM_DEV_ARM_VGIC_GRP_FEATURES,
-+					    KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap));
-+
-+	kvm_device_attr_get(vm.gic_fd, KVM_DEV_ARM_VGIC_GRP_FEATURES,
-+			    KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap, &nassgicap);
-+	if (!nassgicap) {
-+		nassgicap = true;
-+		ret = __kvm_device_attr_set(vm.gic_fd, KVM_DEV_ARM_VGIC_GRP_FEATURES,
-+					    KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap, &nassgicap);
-+		TEST_ASSERT(ret && errno == EINVAL,
-+			    "Enabled nASSGIcap even though it's unavailable");
-+	} else {
-+		nassgicap = false;
-+		kvm_device_attr_set(vm.gic_fd, KVM_DEV_ARM_VGIC_GRP_FEATURES,
-+				    KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap, &nassgicap);
-+
-+		nassgicap = true;
-+		kvm_device_attr_set(vm.gic_fd, KVM_DEV_ARM_VGIC_GRP_FEATURES,
-+				    KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap, &nassgicap);
-+	}
-+
-+	kvm_device_attr_set(vm.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
-+
-+	ret = __kvm_device_attr_set(vm.gic_fd, KVM_DEV_ARM_VGIC_GRP_FEATURES,
-+				    KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap, &nassgicap);
-+	TEST_ASSERT(ret && errno == EBUSY,
-+		    "Configured nASSGIcap after initializing the VGIC");
-+
-+	vm_gic_destroy(&vm);
-+}
-+
- /*
-  * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
-  */
-@@ -730,6 +770,7 @@ void run_tests(uint32_t gic_dev_type)
- 		test_v3_last_bit_single_rdist();
- 		test_v3_redist_ipa_range_check_at_vcpu_run();
- 		test_v3_its_region();
-+		test_v3_nassgicap();
- 	}
- }
- 
+I find this a bit confusing.
+
+Here, we end-up *not* injecting a nested exception, but instead
+delivering it in context. I think it would be clearer to move this
+condition in kvm_inject_sea(), and then make __kvm_inject_sea()
+static.
+
+I guess the confusion also stems from the fact that we tend to lump
+two things together:
+
+- exception taken from EL2&0 to EL2
+
+- exception taken from EL1&0 to EL2
+
+I would like to make sure that it is the second case we deal with in
+emulated-nested.c, and the first one locally.
+
+At which point, you can end up with something like:
+
+static inline bool is_nested_ctxt(struct kvm_vcpu *vcpu)
+{
+	return vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
+}
+
+int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+{
+	lockdep_assert_held(&vcpu->mutex);
+
+	if (is_nested_ctxt(vcpu) && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_TEA))
+		return kvm_inject_nested_sea(vcpu, iabt, addr);
+
+	__kvm_inject_sea(vcpu, iabt, addr);
+	return 1;
+}
+
+I'll post a separate patch with the is_nested_ctxt() helper, as it
+makes things more readable overall.
+
+> +
+> +	esr = FIELD_PREP(ESR_ELx_EC_MASK,
+> +			 iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW);
+> +	esr |= ESR_ELx_FSC_EXTABT | ESR_ELx_IL;
+> +
+> +	return kvm_inject_s2_fault(vcpu, esr);
+> +}
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 2196979a24a3..dd5cce0006f3 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -839,6 +839,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  	bool serror_pending = events->exception.serror_pending;
+>  	bool has_esr = events->exception.serror_has_esr;
+>  	bool ext_dabt_pending = events->exception.ext_dabt_pending;
+> +	int ret;
+>  
+>  	if (serror_pending && has_esr) {
+>  		if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+> @@ -852,8 +853,11 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  		kvm_inject_vabt(vcpu);
+>  	}
+>  
+> -	if (ext_dabt_pending)
+> -		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +	if (ext_dabt_pending) {
+> +		ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+>  
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index a640e839848e..3e61fa0a721b 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -155,36 +155,23 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
+>  	vcpu_write_sys_reg(vcpu, far, FAR_EL1);
+>  }
+>  
+> -/**
+> - * kvm_inject_dabt - inject a data abort into the guest
+> - * @vcpu: The VCPU to receive the data abort
+> - * @addr: The address to report in the DFAR
+> - *
+> - * It is assumed that this code is called from the VCPU thread and that the
+> - * VCPU therefore is not currently executing guest code.
+> - */
+> -void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> +void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+>  {
+>  	if (vcpu_el1_is_32bit(vcpu))
+> -		inject_abt32(vcpu, false, addr);
+> +		inject_abt32(vcpu, iabt, addr);
+>  	else
+> -		inject_abt64(vcpu, false, addr);
+> +		inject_abt64(vcpu, iabt, addr);
+>  }
+>  
+> -/**
+> - * kvm_inject_pabt - inject a prefetch abort into the guest
+> - * @vcpu: The VCPU to receive the prefetch abort
+> - * @addr: The address to report in the DFAR
+> - *
+> - * It is assumed that this code is called from the VCPU thread and that the
+> - * VCPU therefore is not currently executing guest code.
+> - */
+> -void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> +int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+>  {
+> -	if (vcpu_el1_is_32bit(vcpu))
+> -		inject_abt32(vcpu, true, addr);
+> -	else
+> -		inject_abt64(vcpu, true, addr);
+> +	lockdep_assert_held(&vcpu->mutex);
+> +
+> +	if (vcpu_has_nv(vcpu))
+> +		return kvm_inject_nested_sea(vcpu, iabt, addr);
+> +
+> +	__kvm_inject_sea(vcpu, iabt, addr);
+> +	return 1;
+>  }
+>  
+>  void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+> @@ -194,10 +181,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+>  	addr  = kvm_vcpu_get_fault_ipa(vcpu);
+>  	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+>  
+> -	if (kvm_vcpu_trap_is_iabt(vcpu))
+> -		kvm_inject_pabt(vcpu, addr);
+> -	else
+> -		kvm_inject_dabt(vcpu, addr);
+> +	__kvm_inject_sea(vcpu, kvm_vcpu_trap_is_iabt(vcpu), addr);
+>  
+>  	/*
+>  	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index ab365e839874..573a6ade2f4e 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -169,10 +169,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>  		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
+>  				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
+>  
+> -		if (vcpu_is_protected(vcpu)) {
+> -			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> -			return 1;
+> -		}
+> +		if (vcpu_is_protected(vcpu))
+> +			return kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+>  
+>  		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
+>  			     &vcpu->kvm->arch.flags)) {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index e445db2cb4a4..0e0d51d7ab85 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1833,11 +1833,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  		if (fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr))) {
+>  			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+>  
+> -			if (is_iabt)
+> -				kvm_inject_pabt(vcpu, fault_ipa);
+> -			else
+> -				kvm_inject_dabt(vcpu, fault_ipa);
+> -			return 1;
+> +			return kvm_inject_sea(vcpu, is_iabt, fault_ipa);
+>  		}
+>  	}
+>  
+> @@ -1909,8 +1905,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  		}
+>  
+>  		if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> -			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> -			ret = 1;
+> +			ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+>  			goto out_unlock;
+>  		}
+>  
+> @@ -1955,10 +1950,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	if (ret == 0)
+>  		ret = 1;
+>  out:
+> -	if (ret == -ENOEXEC) {
+> -		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> -		ret = 1;
+> -	}
+> +	if (ret == -ENOEXEC)
+> +		ret = kvm_inject_sea_iabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+>  out_unlock:
+>  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>  	return ret;
+
+Other than my rambling above, this looks rather good. But there is a
+bit more, "thanks" to FEAT_DoubleFault2:
+
+- HCRX_EL2.TMEA also affects this patch, both on the SEA and SError
+  paths (both can be routed to EL2 when masked).
+
+- SCTLR2_EL{1,2}2.EASE also influence the delivery of the SEA,
+  upgrading it to a SError (yes, this is the routing from hell and
+  ties directly into the following patches).
+
+I was expecting to see FEAT_RAS being enabled at some point, but
+that's not the case yet. Are you planning to do so?
+
+Thanks,
+
+	M.
+
 -- 
-2.39.5
-
+Jazz isn't dead. It just smells funny.
