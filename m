@@ -1,32 +1,32 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111B71799F
-	for <kvmarm@lists.linux.dev>; Sat, 31 May 2025 01:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AEB4A21
+	for <kvmarm@lists.linux.dev>; Sat, 31 May 2025 01:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748654762; cv=none; b=ct9whPk6vCM3tYJBjobv9beCZwKFnVf2edrBNBrlxha2YLW4+lhQg30vNfFs1xxOLJaEVpdM6yNYGls9mupCyklNctozbBp63/Dl7XCCaedyzTA5V0mAtWZOdnmtQ/1NhdamtlDyq7H2UrPYbZOZY8iEchsfC32E0LPAbGiVmQ4=
+	t=1748654763; cv=none; b=i+DxEfzRsCttWmPVXyOH7kt4ssseH/IgncYgytI/FQWIzkr5+ZzafEIndFqprUYZC3U4QmHH7GjUlTVwSJYgU1SGVfG1BIZh3zWb71VZYHB1RGRw6ZcqtFBhROAv9eVENN/uomKZNfHu3e8+O8sJqw18Mk97OG+speRSFRXEiGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748654762; c=relaxed/simple;
-	bh=CcR0UEhTtHzTeCIxydXjk50/KeCwYAZYn6b3Wqewaho=;
+	s=arc-20240116; t=1748654763; c=relaxed/simple;
+	bh=TQ4lyudDLcODMbJvxotFkrCvBg5CzT+6LHCwICx54+k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qfSdlNsm6lQxGVjhmSYmT4dykVLQwsuf7OdUBqE8GWooxXqEqeSFkj3GuPVf8Gzez386vf5Z1X92AsEbXxa+hZnbpOeQ8TN9G4qwtnmuyA2aVMzvRmUe3BoZo1kgXZGRbasyXXuvBWI+kiHT3W0BXnlNTkO2xV3KbGHRJaZZ4v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IsL5zSJX; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=g/8jUUJ1CDBRGrF1YLdxTPsZ2ZEoNAJo/IVGIYfjqMs1Sz2rDeZHcOX6VQAduBUUEjZY1oMsriSPQgJArIq6T0vBg0ihvRwgcDssAAYgHJXmbw3JqU8fLBPwgPnR4NmAjoSlo94l6tns86HRM8GLEEWK4hSokFTs+UkwagjHGVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BxfXeXpF; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IsL5zSJX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BxfXeXpF"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748654757;
+	t=1748654759;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NX0lzwFtBTgjDoNzZiZMbw16dfqmnOXiPYhWKyrfwec=;
-	b=IsL5zSJXUdjivX8d0omdr4K8BLHDEqXolZIvyv/o9ZSG3N5uCJl/4ei6S++ptjsUBKPwS3
-	mpWxdmtaKG1oaPig0FnsrhWQifbSnToZsbfAHBYRi2n+CHE5yIM8nPQPWk4T2qfIxSaT6A
-	kyG3rJMG9PuWmDg/6vvkxWe8vOld3/Y=
+	bh=IonO+wn0PdqL7DOD2OInnY9UqYbVmZ+fnFKbaMnNjnM=;
+	b=BxfXeXpFcmMWFXuzmgOtRcrlwWoZa8yiqZKzem+41I1hqBONs1PJQ6jWKCAOJFiY4Wsl+N
+	v6WXZcRQ68DzfDnI5EAtmqNf9IoBxxrxfnsoF8jvWsh20kY1KRqXN6lRpKC6lVywfjp1ey
+	CXKluxV80zz+PUJwHlC6h35ibvXxppQ=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -36,9 +36,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Ben Horgan <ben.horgan@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 1/4] KVM: arm64: Disambiguate support for vSGIs v. vLPIs
-Date: Fri, 30 May 2025 18:25:42 -0700
-Message-Id: <20250531012545.709887-2-oliver.upton@linux.dev>
+Subject: [PATCH v2 2/4] KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
+Date: Fri, 30 May 2025 18:25:43 -0700
+Message-Id: <20250531012545.709887-3-oliver.upton@linux.dev>
 In-Reply-To: <20250531012545.709887-1-oliver.upton@linux.dev>
 References: <20250531012545.709887-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -50,158 +50,121 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-vgic_supports_direct_msis() is a bit of a misnomer, as it returns true
-if either vSGIs or vLPIs are supported. Pick it apart into a few
-predicates and replace some open-coded checks for vSGIs.
+Consolidate the duplicated handling of the VGICv3 maintenance IRQ
+attribute as a regular GICv3 attribute, as it is neither a register nor
+a common attribute.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-init.c    |  4 ++--
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 16 ++++++++++------
- arch/arm64/kvm/vgic/vgic-v4.c      |  4 ++--
- arch/arm64/kvm/vgic/vgic.c         |  4 ++--
- arch/arm64/kvm/vgic/vgic.h         |  7 +++++++
- 5 files changed, 23 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 51 +++++++++++++--------------
+ 1 file changed, 25 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 1f33e71c2a73..fd9e639cd665 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -370,7 +370,7 @@ int vgic_init(struct kvm *kvm)
- 	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
- 	 * enable it if we present a virtual ITS to the guest.
- 	 */
--	if (vgic_supports_direct_msis(kvm)) {
-+	if (vgic_supports_direct_irqs(kvm)) {
- 		ret = vgic_v4_init(kvm);
- 		if (ret)
- 			goto out;
-@@ -418,7 +418,7 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index 359094f68c23..b0baad68777c 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -303,12 +303,6 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+ 			     VGIC_NR_PRIVATE_IRQS, uaddr);
+ 		break;
+ 	}
+-	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
+-		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-
+-		r = put_user(dev->kvm->arch.vgic.mi_intid, uaddr);
+-		break;
+-	}
  	}
  
--	if (vgic_supports_direct_msis(kvm))
-+	if (vgic_supports_direct_irqs(kvm))
- 		vgic_v4_teardown(kvm);
+ 	return r;
+@@ -523,7 +517,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 	struct vgic_reg_attr reg_attr;
+ 	gpa_t addr;
+ 	struct kvm_vcpu *vcpu;
+-	bool uaccess, post_init = true;
++	bool uaccess;
+ 	u32 val;
+ 	int ret;
  
- 	xa_destroy(&dist->lpi_xa);
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index ae4c0593d114..1a9c5b4418b2 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -50,8 +50,12 @@ bool vgic_has_its(struct kvm *kvm)
+@@ -539,9 +533,6 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 		/* Sysregs uaccess is performed by the sysreg handling code */
+ 		uaccess = false;
+ 		break;
+-	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+-		post_init = false;
+-		fallthrough;
+ 	default:
+ 		uaccess = true;
+ 	}
+@@ -561,7 +552,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
  
- bool vgic_supports_direct_msis(struct kvm *kvm)
- {
--	return (kvm_vgic_global_state.has_gicv4_1 ||
--		(kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm)));
-+	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
-+}
-+
-+bool vgic_supports_direct_sgis(struct kvm *kvm)
-+{
-+	return kvm_vgic_global_state.has_gicv4_1 && gic_cpuif_has_vsgi();
- }
+ 	mutex_lock(&dev->kvm->arch.config_lock);
  
- /*
-@@ -86,7 +90,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+-	if (post_init != vgic_initialized(dev->kvm)) {
++	if (!vgic_initialized(dev->kvm)) {
+ 		ret = -EBUSY;
+ 		goto out;
+ 	}
+@@ -591,19 +582,6 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
  		}
  		break;
- 	case GICD_TYPER2:
--		if (kvm_vgic_global_state.has_gicv4_1 && gic_cpuif_has_vsgi())
-+		if (vgic_supports_direct_sgis(vcpu->kvm))
- 			value = GICD_TYPER2_nASSGIcap;
+ 	}
+-	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+-		if (!is_write) {
+-			val = dev->kvm->arch.vgic.mi_intid;
+-			ret = 0;
+-			break;
+-		}
+-
+-		ret = -EINVAL;
+-		if ((val < VGIC_NR_PRIVATE_IRQS) && (val >= VGIC_NR_SGIS)) {
+-			dev->kvm->arch.vgic.mi_intid = val;
+-			ret = 0;
+-		}
+-		break;
+ 	default:
+ 		ret = -EINVAL;
  		break;
- 	case GICD_IIDR:
-@@ -119,7 +123,7 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
- 		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
- 
- 		/* Not a GICv4.1? No HW SGIs */
--		if (!kvm_vgic_global_state.has_gicv4_1 || !gic_cpuif_has_vsgi())
-+		if (!vgic_supports_direct_sgis(vcpu->kvm))
- 			val &= ~GICD_CTLR_nASSGIreq;
- 
- 		/* Dist stays enabled? nASSGIreq is RO */
-@@ -133,7 +137,7 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
- 		if (is_hwsgi != dist->nassgireq)
- 			vgic_v4_configure_vsgis(vcpu->kvm);
- 
--		if (kvm_vgic_global_state.has_gicv4_1 &&
-+		if (vgic_supports_direct_sgis(vcpu->kvm) &&
- 		    was_enabled != dist->enabled)
- 			kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_RELOAD_GICv4);
- 		else if (!was_enabled && dist->enabled)
-@@ -178,7 +182,7 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
- 		}
- 	case GICD_CTLR:
- 		/* Not a GICv4.1? No HW SGIs */
--		if (!kvm_vgic_global_state.has_gicv4_1)
-+		if (vgic_supports_direct_sgis(vcpu->kvm))
- 			val &= ~GICD_CTLR_nASSGIreq;
- 
- 		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index c7de6154627c..a9c772697a43 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -356,7 +356,7 @@ int vgic_v4_put(struct kvm_vcpu *vcpu)
- {
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
- 
--	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
-+	if (!vgic_supports_direct_irqs(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
- 	return its_make_vpe_non_resident(vpe, vgic_v4_want_doorbell(vcpu));
-@@ -367,7 +367,7 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
- 	int err;
- 
--	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
-+	if (!vgic_supports_direct_irqs(vcpu->kvm) || vpe->resident)
- 		return 0;
- 
- 	if (vcpu_get_flag(vcpu, IN_WFI))
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 8f8096d48925..f5148b38120a 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -951,7 +951,7 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 	 * can be directly injected (GICv4).
- 	 */
- 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head) &&
--	    !vgic_supports_direct_msis(vcpu->kvm))
-+	    !vgic_supports_direct_irqs(vcpu->kvm))
- 		return;
- 
- 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
-@@ -965,7 +965,7 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 	if (can_access_vgic_from_kernel())
- 		vgic_restore_state(vcpu);
- 
--	if (vgic_supports_direct_msis(vcpu->kvm))
-+	if (vgic_supports_direct_irqs(vcpu->kvm))
- 		vgic_v4_commit(vcpu);
- }
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 4349084cb9a6..ebf9ed6adeac 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -370,6 +370,13 @@ int vgic_its_inv_lpi(struct kvm *kvm, struct vgic_irq *irq);
- int vgic_its_invall(struct kvm_vcpu *vcpu);
- 
- bool vgic_supports_direct_msis(struct kvm *kvm);
-+bool vgic_supports_direct_sgis(struct kvm *kvm);
+@@ -630,8 +608,24 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
+-	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return vgic_v3_attr_regs_access(dev, attr, true);
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
++		u32 __user *uaddr = (u32 __user *)attr->addr;
++		u32 val;
 +
-+static inline bool vgic_supports_direct_irqs(struct kvm *kvm)
-+{
-+	return vgic_supports_direct_msis(kvm) || vgic_supports_direct_sgis(kvm);
-+}
++		if (get_user(val, uaddr))
++			return -EFAULT;
 +
- int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
- void vgic_v4_configure_vsgis(struct kvm *kvm);
++		guard(mutex)(&dev->kvm->arch.config_lock);
++		if (vgic_initialized(dev->kvm))
++			return -EBUSY;
++
++		if ((val < VGIC_NR_SGIS) || (val >= VGIC_NR_PRIVATE_IRQS))
++			return -EINVAL;
++
++		dev->kvm->arch.vgic.mi_intid = val;
++		return 0;
++	}
+ 	default:
+ 		return vgic_set_common_attr(dev, attr);
+ 	}
+@@ -645,8 +639,13 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
+-	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return vgic_v3_attr_regs_access(dev, attr, false);
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++
++		guard(mutex)(&dev->kvm->arch.config_lock);
++		return put_user(dev->kvm->arch.vgic.mi_intid, uaddr);
++	}
+ 	default:
+ 		return vgic_get_common_attr(dev, attr);
+ 	}
 -- 
 2.39.5
 
