@@ -1,76 +1,96 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272B4182B7
-	for <kvmarm@lists.linux.dev>; Sat, 31 May 2025 17:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3088017C21E
+	for <kvmarm@lists.linux.dev>; Sun,  1 Jun 2025 06:54:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748713937; cv=none; b=gVi+0baNXvmpUnNU/AKEgSthsi6ksV9ZohsaqNTiOrje1ZFhaUS2BlB7itZhPNBwrFV4x7sg0GRqWPQ81ih2mEVvF0pit5Fj9XNwDPFK2yg5X7298PRXPSbLPRFv61SEl0BJpz00Ugy9w47ThtV1H3oSoYWYhlszu9ajSnqRc/E=
+	t=1748760884; cv=none; b=Mk+TPQ8AmCGos1VWE8RDHsD56qy4RVCNvvNxybDMPQEwb7qP52h0ofdCUtaLle6twGhm6K2jUeCTvRyLDt9zOAKNMcV5+bbRBymFB9VPlWbKyT7h+wnNIenidPFZhgFBHqUtj0gBl5esSBdjz+m9Z1xz3vN8CJZKsZQzkCR7clQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748713937; c=relaxed/simple;
-	bh=vQPOxLEjGOKxURuDGxJ6NtQJZh9zh77bs03hG94j3uI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rpl8xyRkuBUgaDhs8bmHuzaSLWB29Lw22/bqh37u9XNgu/qyICQvPLHASWg9hzEHpx22QvXwGcYYSVxrdbSVO7AWROmtIZ+r/f1AtMlkV31ZybiHBz8vKUdIKO9VmfWfSBkQP2EzAef/2jEBVC7Y51tCleS0vGMPcNd7wpEONyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lh73EyMa; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1748760884; c=relaxed/simple;
+	bh=4cZDxV9YnToAxPkxZDbpuJAsMb2NE5kLi9+nIVI2M6Q=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CkpvHbPst+lR5sz8OynvzIoL8LvGngm6+PE+y1sOJ9V6etiCQyxwmQfnb/QfKMWR6r0nUwn9BfVtcyRPiBNIcauNJeGFDZ1V5TYeUHfAm1OLkHVof5Rx8hlAJNd1Y7d9ac1BhhjPOa3m1P03kmEncYDQ/SwBUMe4X91+M4RTbQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQWnwm+3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lh73EyMa"
-Date: Sat, 31 May 2025 10:52:07 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748713932;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mIKaGfWeay4gmgyitDh7ECLUFubr+Qk+a6BxZ38Xhw4=;
-	b=lh73EyMa2Ds6x5eHvP1OegrOq1lLDkdWfC2sOEGDrwumkDIpZDjAuBHm8RAzrD9BN+KmG/
-	g4reFmDMcopUnKU/rM05GHnDDq9LtbGeqWjm4nZtwhZKv2waw9UspWtYXz8kfadLHktq8/
-	0gmalqL7gcf5GhEhj1vCWtRAk2cEJPU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQWnwm+3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09D1DC4CEE7;
+	Sun,  1 Jun 2025 06:54:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748760884;
+	bh=4cZDxV9YnToAxPkxZDbpuJAsMb2NE5kLi9+nIVI2M6Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BQWnwm+3phEsOwoh75X1EinpftlcCjKWrDz3NIltacgNGUAq5/GXhobJo08ZPIohZ
+	 tsf82Ww8JFWXzd3BE1UuZvoa5c0y7BZE91bMc1XGWMZofzKanJ+UVGiPrprqVW7UTp
+	 HuJ6+AfE3UL/TX2w2USpO90sck/ojjfYJ3hEzsovaEulUkoNlS46jzVT8tgTAyWnXy
+	 yk71jdN1v1MxSw0BepDJ+oGtF7A2bicEu5mfuw7+MtC49BXx426Ec0dSz7vm0k8u+U
+	 7Kt+pugFPt2SAw4u2cCTPkb3NLpYfEWA4cqTIJEisr6QtjtwEDwePnxSCOcFJUsD8T
+	 f0LX8PLEL7/4w==
+Received: from [149.88.19.236] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uLcaf-002FI5-IS;
+	Sun, 01 Jun 2025 07:54:41 +0100
+Date: Sun, 01 Jun 2025 07:54:40 +0100
+Message-ID: <87plfodk9b.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
 Subject: Re: [PATCH] KVM: arm64: Add helper to identify a nested context
-Message-ID: <aDtBx7BXLeCzofPf@linux.dev>
+In-Reply-To: <aDtBx7BXLeCzofPf@linux.dev>
 References: <20250531164901.1166892-1-maz@kernel.org>
+	<aDtBx7BXLeCzofPf@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250531164901.1166892-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 149.88.19.236
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, May 31, 2025 at 05:49:01PM +0100, Marc Zyngier wrote:
-> A common idiom in the KVM code is to check if we are currently
-> dealing with a "nested" context, defined as having NV enabled,
-> but being in the EL1&0 translation regime.
+On Sat, 31 May 2025 18:52:07 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> This is usually expressed as:
+> On Sat, May 31, 2025 at 05:49:01PM +0100, Marc Zyngier wrote:
+> > A common idiom in the KVM code is to check if we are currently
+> > dealing with a "nested" context, defined as having NV enabled,
+> > but being in the EL1&0 translation regime.
+> > 
+> > This is usually expressed as:
+> > 
+> > 	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu) ... )
+> > 
+> > which is a mouthful and a bit hard to read, specially when followed
+> > by additional conditions.
+> > 
+> > Introduce a new helper that encapsulate these two terms, allowing
+> > the above to be written as
+> > 
+> > 	if (is_nested_context(vcpu) ... )
+> > 
+> > which is both shorter and easier to read, and makes more obvious
+> > the potential for simplification on some code paths.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
-> 	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu) ... )
-> 
-> which is a mouthful and a bit hard to read, specially when followed
-> by additional conditions.
-> 
-> Introduce a new helper that encapsulate these two terms, allowing
-> the above to be written as
-> 
-> 	if (is_nested_context(vcpu) ... )
-> 
-> which is both shorter and easier to read, and makes more obvious
-> the potential for simplification on some code paths.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Thanks! I'll probably pick this up as a prefix on my abort routing
+> series if that's OK with you.
 
-Thanks! I'll probably pick this up as a prefix on my abort routing
-series if that's OK with you.
+Of course!
 
-Best,
-Oliver
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
