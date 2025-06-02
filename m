@@ -1,55 +1,55 @@
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384DC225768
-	for <kvmarm@lists.linux.dev>; Mon,  2 Jun 2025 19:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612F82288C6
+	for <kvmarm@lists.linux.dev>; Mon,  2 Jun 2025 19:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748892542; cv=none; b=jqWv4xYoxRDeojd8c2FqvUeh38BRNOLiG0ZqHkmzJJ/FA6yGE1XOhPSawbqHi9eP01J8gVibJIXxu+dlDaJoqgz1DQi5J4pzLgQGGpuDCo2noEH15xRMhlCmX+ym5Wvz6UAJdH5VQEP1kKYgAsAbbOOJiz2zjrXb3AA5gv41RbM=
+	t=1748892543; cv=none; b=ajpkrXo+90qYt4/9JNIp0NJqxmavrcOlkwBeX5WXUr0fo6dZ4qyU6WFVkU/1SpsFPbGfXmX9vl9LT9MxyXGteXjnIVx+DIV1wEsq+NQfKkjJs0DcV5JUTTFjU6nf9YSJp5fdK3THKgOWONIcpzdIBuvCspZ3dEvpJEzKGwr7tqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748892542; c=relaxed/simple;
-	bh=EE8lwX3DPSHd479fj6h8oG+WY564CeOYM752jwwfbIY=;
+	s=arc-20240116; t=1748892543; c=relaxed/simple;
+	bh=hTJhSiv8BCxLXoZ+NIawSUFDzfOoIJdaR2ZVHq+pdOY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bjNXsXPVlIOnCkVhJpDIYb3c/4nb3MgDFHD3c8d48cxcQ99uB9/gQ/AIwQXzvtHduxXlNGXw5c9sOaQMtJR8v6kpEkt0GGFP2o687aWa6tnzF9VZ24bIZfwdJLVwEpqpQOWPDQxPC4SIis6e9jfZmxtfyPkCFYCGnzLfXP/Yy1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2s08FtbC; arc=none smtp.client-ip=209.85.166.202
+	 To:Cc:Content-Type; b=kuZYTpZ1q6MvJJg3Tcd1AcsawGv4SE6gv8wMYvaqeT6gvTVyx7+GZPtX1d9qBEr9w/g5/WYOYzlZ2U4E2ax5s9uhYj1L2FlLEE3qyixcWsRPNe6VHpETlstcUJP4zD50VKQiVGl5syk+jIXyKoaeqPaU/rLy1NhG5lTqpWeIH/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=on0KhTlp; arc=none smtp.client-ip=209.85.166.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2s08FtbC"
-Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3dd7587af8dso41696905ab.1
-        for <kvmarm@lists.linux.dev>; Mon, 02 Jun 2025 12:29:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="on0KhTlp"
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3dc9cd70437so56718895ab.1
+        for <kvmarm@lists.linux.dev>; Mon, 02 Jun 2025 12:29:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748892539; x=1749497339; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1748892540; x=1749497340; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ob4i5lx3NjoopJMkPn2Gu2SflaQcZ8+s5uU/xFdQFYQ=;
-        b=2s08FtbCqb7qZn3HiGb5SMjrpkvsNoOWvLeO8LxSl3DMAcSByWpVLLmDExKX4MDSYw
-         6yGl1MPGBhOg1IGrXzAoWgl8pT4zvd+cTSFWdnKpuNdv4HRDES5RDs/UZrraMXcHxfg/
-         9ZP2L93G2UQDoYNRADh0k2o+dWtdTgFzy+JbwNmV7PzJ3LkkgypGog7wKac3WfPjh8/6
-         4YgKeMP+ACMWDC8md7iGHDylkAvvcphTROFEvV3pXxRisfyIhoMlp8DDOI4w8fjRaJBy
-         BAxftrK3nIU4L+e0DnRb1BpL6Ot/7mmzV/uzD1RZdemtPBFx3o9KiwYK35TrlUPLtp5A
-         WqSQ==
+        bh=OVB/n3He0PUlo5Tdl7uIOjIZvaOC3NNae41+U8BzpWw=;
+        b=on0KhTlpT0laXA4sTKEpmmQlbHBISfT2IXMigNosbZbnqP1TXt50P1xob1xU37uR4t
+         nrJLwxsq9h4uT45o3w8j6afJA0YX6gL3l+G49b9mjxddEb74hAqUl5shYX/iT5ziw9VR
+         GuwZ7r4STbqkXdqX/fCU5oGyC4/Vw4dg5Di/qpaQxgxEkIcn53ivsMWfLyA8W6GSdDyR
+         uHUfs2pgxnATvBvYJ+HabfQw1Jr9PFpaj/bng/G7O9M4eMhnEjcMk6dGnaB3ojvdmaya
+         1ckpJuBSnMP0I0RaK0nrJa74jt4On1A00LAPpjSNLQSWzM21RmC1TstvqN1ppshaoyi5
+         OcLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748892539; x=1749497339;
+        d=1e100.net; s=20230601; t=1748892540; x=1749497340;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ob4i5lx3NjoopJMkPn2Gu2SflaQcZ8+s5uU/xFdQFYQ=;
-        b=Su1enBgw+gw+UvHXKVJXE2pb/1lurLUYgC0oi9ckgj4kilzhj/iAESiXsHRT+21uUK
-         WBuUemT8zJO8eD+1iPpQOA40AuInZHJS1CgT+E3qpTy6ktPILwwxHxt/d8fn6fF6jjaW
-         SRQlvluWBQ0sSnwv0szauM9G3OOz/ao3CmIE/teQqiOATFyOFYdD4UOCu3ZK+FVBb+iA
-         PKEtX6kMNqpA5fvjiQp3JVxgJ4+RRVvEAfqAVCly0EtQM+GmA1BIjyXS9jLGo88S9MfM
-         s6Fg59xHvBEibWCymnak1QROmjhM2PdMZncC9JvvAvgaQtQqLpkWP1sQ0Jiq6yPhYX25
-         iPUA==
-X-Forwarded-Encrypted: i=1; AJvYcCUgjvvCYuxXiY9vvtNO6Wp2KRADw2r6YfepAF63gqVrO1vJUvNQtz78EhSkGXXwoXwRGHAmoAI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz+HOJWdfipcwhquIkLmaPrY0aiebVH6fjcTnv8NXQKVJVKlHIx
-	jBmAz+CaG3TbulfDGvjrrYsdPS7BUf8cCN4DVn63c1WE8tqpssQp5lMS09yVhuvpdcukDKAVSZu
-	QOWx45Cv26PyWHewpPwrgJqKZag==
-X-Google-Smtp-Source: AGHT+IG9118tOdExJjBuer/f/VBDO3HNWaiwxBHIeaEYz6xcDfDEYQh0uxIwgejlm2yfIrTUPAC6q6L4NmScHLSSog==
-X-Received: from ilbbp25.prod.google.com ([2002:a05:6e02:3499:b0:3dc:756a:e520])
+        bh=OVB/n3He0PUlo5Tdl7uIOjIZvaOC3NNae41+U8BzpWw=;
+        b=G35BlQMj3uOc3yk+OgWPjyC0uv/Tp/YwJxtCxwLvt2ZFNraWOOtuCCDcWdMvqynH6u
+         7iS4nQyapxRK0tfFQ+ySV8oSY6ywVx99htnzmyS+D67zDzE/f92LsJu/vKyt6ts4mlt2
+         n4B+eYRRbtg2FNnHnYaf0+0eTv5rkF8oofaPcgiFuLobIODomO+TZQU4uwKQKIZgeZl2
+         nDIDxxSgLT/M0lKl9dPP/0GGqGDGJRwu3sBu9LrtX+YqjU5/psLM2c0N59VHizVPCRgd
+         ukIIRoGxdC7TuVtlUUOjdmI2ZOIGwqu1fJFvuaLKNRHN+HkjwlAXFkbzOB0dPwVf8fl7
+         0NHw==
+X-Forwarded-Encrypted: i=1; AJvYcCW0XpB//CL5NbCBvo0DxZKFRVcbva6fjGadePE4pihYHAmIdkVu5zmVRNmMnSrSYm4LHkRbO6g=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxoAX55hQ6fAUsJ6vvutsuPtzpF7X0No9fq6zS625NGtW4+O2mh
+	9OtI7L0a5/aD7140ZCa59l4F06wJ9rIO4oQtFhPJhVR/jFLDvWtwfW1lkzq0KHFEwmkjg/9e89L
+	WUVF/mHfC0+w1U7Ji5RQcdmGcQw==
+X-Google-Smtp-Source: AGHT+IGP8Tr9H87Uubq0BhuyNeY27JD5iCuR6Hrz2NAJX2PVsu7lMWY1S1KfCHmBz3Zd2wWiWUQw5wTiYh98OuafJw==
+X-Received: from ilbby14.prod.google.com ([2002:a05:6e02:260e:b0:3dc:64a8:fc81])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:1aa6:b0:3dc:8e8b:42a8 with SMTP id e9e14a558f8ab-3dd99c28963mr156701455ab.16.1748892539395;
- Mon, 02 Jun 2025 12:28:59 -0700 (PDT)
-Date: Mon,  2 Jun 2025 19:26:47 +0000
+ 2002:a05:6e02:1a25:b0:3dc:8b57:b770 with SMTP id e9e14a558f8ab-3dda3370d7cmr84711015ab.11.1748892540564;
+ Mon, 02 Jun 2025 12:29:00 -0700 (PDT)
+Date: Mon,  2 Jun 2025 19:26:48 +0000
 In-Reply-To: <20250602192702.2125115-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250602192702.2125115-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250602192702.2125115-3-coltonlewis@google.com>
-Subject: [PATCH 02/17] arm64: Generate sign macro for sysreg Enums
+Message-ID: <20250602192702.2125115-4-coltonlewis@google.com>
+Subject: [PATCH 03/17] arm64: cpufeature: Add cpucap for PMICNTR
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -74,27 +74,45 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-There's no reason Enums shouldn't be equivalent to UnsignedEnums and
-explicitly specify they are unsigned. This will avoid the annoyance I
-had with HPMN0.
+Add a cpucap for FEAT_PMUv3_PMICNTR, meaning there is a dedicated
+instruction counter as well as the cycle counter.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/tools/gen-sysreg.awk | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kernel/cpufeature.c | 7 +++++++
+ arch/arm64/tools/cpucaps       | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
-index f2a1732cb1f6..fa21a632d9b7 100755
---- a/arch/arm64/tools/gen-sysreg.awk
-+++ b/arch/arm64/tools/gen-sysreg.awk
-@@ -308,6 +308,7 @@ $1 == "Enum" && (block_current() == "Sysreg" || block_current() == "SysregFields
- 	parse_bitdef(reg, field, $2)
- 
- 	define_field(reg, field, msb, lsb)
-+	define_field_sign(reg, field, "false")
- 
- 	next
- }
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 578eea321a60..e798a706d8fb 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2892,6 +2892,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		ARM64_CPUID_FIELDS(ID_AA64DFR0_EL1, HPMN0, IMP)
+ 	},
++	{
++		.desc = "PMU Dedicated Instruction Counter",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_PMICNTR,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64DFR1_EL1, PMICNTR, IMP)
++	},
+ #ifdef CONFIG_ARM64_SME
+ 	{
+ 		.desc = "Scalable Matrix Extension",
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 5b196ba21629..6dd72fcdd612 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -47,6 +47,7 @@ HAS_LSE_ATOMICS
+ HAS_MOPS
+ HAS_NESTED_VIRT
+ HAS_PAN
++HAS_PMICNTR
+ HAS_PMUV3
+ HAS_S1PIE
+ HAS_S1POE
 -- 
 2.49.0.1204.g71687c7c1d-goog
 
