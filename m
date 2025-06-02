@@ -1,120 +1,105 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B3D1DF73C;
-	Mon,  2 Jun 2025 15:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4657F17BBF;
+	Mon,  2 Jun 2025 15:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748877409; cv=none; b=JbJ4bzkp6PrZyoSaIBkatA76Jq5HB8+J1lp4AfdzF8KvPgOMtBLgCq/guNcj2PjI6EzZWsx4g/E0R2dQcMyUk4R3anUiTnJ78JTu6p2yeJnITRNVnngtC5YFHPspifT/5gqWJR1E8o+6OhunXy+8wyuI9p4aXB+sprjYbFes29E=
+	t=1748878725; cv=none; b=GcnoS5J1FeGQ09YOBAHhD7pHF6+XwQU/5GyGnA49CktESCS0W/UVQLPczayE64D4T9KF0Md4wSEuFxG6UCSKrbebr2O7uoGz5xFqXZ1AVMurXW95C6AinIOSoD+RiTfsOhOYes2I+3EzXPm6N9giY8c94Ce0quXZFikjApxKeEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748877409; c=relaxed/simple;
-	bh=/+njjjjeknWT+7eViUtPJz6TBdiNujnF97CGeFdxBgk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pKUfmBttYHvrprnGR1+6sNGMzxXHhuvMJhVKxgLvbFyPSkG5fPdwJpzQaAcyuI4i+ccaKTly/+gEi3+XEs2HeTNpFus/EDlc3ZnUSXckDCfQtnHwQvBYQh4bEQoJOvfOGyGn5FTNXLYdPctNTSfciW6oQBCGUD2h2Bu3qUvkyLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AC8071424;
-	Mon,  2 Jun 2025 08:16:30 -0700 (PDT)
-Received: from [10.57.47.191] (unknown [10.57.47.191])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0BC4E3F5A1;
-	Mon,  2 Jun 2025 08:16:43 -0700 (PDT)
-Message-ID: <8a4c285e-2b6f-44f0-b1d8-0b5a6f6b6581@arm.com>
-Date: Mon, 2 Jun 2025 16:16:43 +0100
+	s=arc-20240116; t=1748878725; c=relaxed/simple;
+	bh=IJDZ1hQCAOyA73sAOdBWo1+XIgrBqdEcKZf5fgDiopo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BK9J739M3d/107D33nu7wwM+Z0kSUQK6pcL43Lu6KhHfvBZp1Y4me8k1yDRMDt2ziuhXWzHny2OmEf+daAVpKB7CtbQR41MHVdBYbvC5RWznnU8pILrhtvuFzyHPjXMV191/hSKuBMEWnKWJlr7xX91jV1tkWcm05MpC4Qenp+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0faTVcy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0faTVcy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7FA0C4CEEB;
+	Mon,  2 Jun 2025 15:38:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748878723;
+	bh=IJDZ1hQCAOyA73sAOdBWo1+XIgrBqdEcKZf5fgDiopo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d0faTVcyXEz4vhADLUaC8q8EBcHEKbkJYBvXw+PQPFVOKkkes3fH44eIk+v7sQ1v5
+	 zs0hTpfSD0eslB8w2jU5jZeR0bFsOHghqd0rhcyoZziF+T2mH4vejqwks8pKW+1FNu
+	 f4gHIRcpYrgQFme3Tk/3dFZ//1kCZILHRiJF4kuDzcJ3bflodWQihx7GxwMZg7Ry/f
+	 TWOYBDkSIVHOs4KNi91Bopy0Zw9aKSY1mF4GTRR9vHrVDfyl0PqT/a8Ghz9RQcG1xz
+	 Qd5BlQDWb6c8Q39xnO7ruR9YcY3oO9GaZCYxSWzz+keJyZkvl9Gr8FRYvN1Vd1Ms1t
+	 7iV0dXDl/kEQg==
+Received: from [149.88.19.236] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uM7FI-002WrR-Vh;
+	Mon, 02 Jun 2025 16:38:41 +0100
+Date: Mon, 02 Jun 2025 16:38:38 +0100
+Message-ID: <87msaqdugx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Itaru Kitayama <itaru.kitayama@linux.dev>
+Cc: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	seanjc@google.com,
+	darren@os.amperecomputing.com
+Subject: Re: [RFC PATCH v2 8/9] KVM: selftests: arm64: Extend kvm_page_table_test to run guest code in vEL2
+In-Reply-To: <aD0+1+aVBrPEeYUl@vm4>
+References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
+	<20250512105251.577874-9-gankulkarni@os.amperecomputing.com>
+	<aD0+1+aVBrPEeYUl@vm4>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>,
- "Emi Kisanuki (Fujitsu)" <fj0570is@fujitsu.com>,
- "'kvm@vger.kernel.org'" <kvm@vger.kernel.org>,
- "'kvmarm@lists.linux.dev'" <kvmarm@lists.linux.dev>
-Cc: 'Catalin Marinas' <catalin.marinas@arm.com>,
- 'Marc Zyngier' <maz@kernel.org>, 'Will Deacon' <will@kernel.org>,
- 'James Morse' <james.morse@arm.com>, 'Oliver Upton'
- <oliver.upton@linux.dev>, 'Zenghui Yu' <yuzenghui@huawei.com>,
- "'linux-arm-kernel@lists.infradead.org'"
- <linux-arm-kernel@lists.infradead.org>,
- "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
- 'Joey Gouly' <joey.gouly@arm.com>,
- 'Alexandru Elisei' <alexandru.elisei@arm.com>,
- 'Christoffer Dall' <christoffer.dall@arm.com>,
- 'Fuad Tabba' <tabba@google.com>,
- "'linux-coco@lists.linux.dev'" <linux-coco@lists.linux.dev>,
- 'Ganapatrao Kulkarni' <gankulkarni@os.amperecomputing.com>,
- 'Gavin Shan' <gshan@redhat.com>,
- 'Shanker Donthineni' <sdonthineni@nvidia.com>,
- 'Alper Gun' <alpergun@google.com>,
- "'Aneesh Kumar K . V'" <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-17-steven.price@arm.com>
- <TYCPR01MB11463D8002D90705A7F860B85C366A@TYCPR01MB11463.jpnprd01.prod.outlook.com>
- <673853c4-b7b0-4a7f-915e-37646ae8cf6f@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <673853c4-b7b0-4a7f-915e-37646ae8cf6f@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 149.88.19.236
+X-SA-Exim-Rcpt-To: itaru.kitayama@linux.dev, gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, darren@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 02/06/2025 16:14, Steven Price wrote:
-> On 29/05/2025 05:52, Emi Kisanuki (Fujitsu) wrote:
->> Hello, I comment below.
+On Mon, 02 Jun 2025 07:04:07 +0100,
+Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
 > 
-> Hi Emi,
+> On Mon, May 12, 2025 at 03:52:50AM -0700, Ganapatrao Kulkarni wrote:
+> > Adding code to run guest_code in vEL2.
+> > NV is enabled using command line argument and it is disabled by default.
+> > 
+> > NV is only enabled on ARM64, for other architectures the test will exit
+> > with an ASSERT, if tried to run with NV enabled.
+> > 
 > 
->>> Subject: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
->>>
->>> Entering a realm is done using a SMC call to the RMM. On exit the exit-codes
->>> need to be handled slightly differently to the normal KVM path so define our own
->>> functions for realm enter/exit and hook them in if the guest is a realm guest.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
+> I'm seeing this in QEMU TCG mode, does this mean the limitation of the
+> emulation?
 > 
-> [..]
-> 
->>> +/*
->>> + * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason)
->>> +on
->>> + * proper exit to userspace.
->>> + */
->>> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret) {
->>> +	struct realm_rec *rec = &vcpu->arch.rec;
->>> +	u8 esr_ec = ESR_ELx_EC(rec->run->exit.esr);
->>> +	unsigned long status, index;
->>> +
->>> +	status = RMI_RETURN_STATUS(rec_run_ret);
->>> +	index = RMI_RETURN_INDEX(rec_run_ret);
->>> +
->>> +	/*
->>> +	 * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we
->>> might
->>> +	 * see the following status code and index indicating an attempt to run
->>> +	 * a REC when the RD state is SYSTEM_OFF.  In this case, we just need
->>> to
->>> +	 * return to user space which can deal with the system event or will try
->>> +	 * to run the KVM VCPU again, at which point we will no longer attempt
->>> +	 * to enter the Realm because we will have a sleep request pending on
->>> +	 * the VCPU as a result of KVM's PSCI handling.
->>> +	 */
->>> +	if (status == RMI_ERROR_REALM && index == 1) {
->>> +		vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
->>> +		return 0;
->>> +	}
->> Running kvm-unit-tests-cca selftest(smp) test in quick succession may trigger these conditions, resulting in the following error logs.
->>   Error: KVM exit reason: 0 ("KVM_EXIT_UNKNOWN")
->>
->> Since KVM_EXIT_UNKNOWN is used when no specific exit reason applies, I think it would be better to make it identifiable as an error.
->> How about adding and setting a new ARM64 exit_reason value to indicate that the PSCI_SYSTEM_OFF request is conflicting with a running vcpu?
-> 
-> Aneesh pointed this out to me off-list. We agreed that KVM_EXIT_SHUTDOWN
-> was more appropriate here. I'll make the change for v9.
+> $ sudo /mnt/projects/linux/tools/testing/selftests/kvm/arm64/page_fault_test -m 3 -s anonymous
+> Random seed: 0x6b8b4567
+> ==== Test Assertion Failure ====
+>   arm64/page_fault_test.c:632: test->expected_events.uffd_faults == events.uffd_faults
+>   pid=769 tid=769 errno=9 - Bad file descriptor
+>      1	0x000000000040325b: check_event_counts at page_fault_test.c:632
+>      2	 (inlined by) run_test at page_fault_test.c:739
+>      3	0x0000000000403cbf: for_each_guest_mode at guest_modes.c:96
+>      4	0x0000000000401cfb: for_each_test_and_guest_mode at page_fault_test.c:1107
+>      5	 (inlined by) main at page_fault_test.c:1133
+>      6	0x0000ffff848122db: ?? ??:0
+>      7	0x0000ffff848123bb: ?? ??:0
+>      8	0x0000000000401def: _start at ??:?
+>   0x2 != 0x1 (test->expected_events.uffd_faults != events.uffd_faults)
 
-Sounds good to me
+Unlikely. This could be a bug in the test, in KVM, or most likely
+both.  You will have to investigate, I'm afraid.
 
-Cheers
-Suzuki
+	M.
 
+-- 
+Jazz isn't dead. It just smells funny.
