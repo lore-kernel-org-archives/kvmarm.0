@@ -1,193 +1,182 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE781531E9
-	for <kvmarm@lists.linux.dev>; Mon,  2 Jun 2025 06:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51F022CBFE;
+	Mon,  2 Jun 2025 15:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748844264; cv=none; b=ngBwl5bTo+xHpU4ds9EI++4FYiBFowLhWDgSjMEh0KcHsygGiDPwM4De2uflOGxjdjoDsC9qTyLqQHOkRPA788GIeNTN6z3Y4h+v7WI3WYzNZKf+A7onf/c4kbnWxn+WLBtdJ8TIGAi1ZBUxQmlb2Iup1QaR5Zd9DEXk7ash4SY=
+	t=1748877294; cv=none; b=YE3iMknaK+SF+ecU8DrtNIL9mDxGF5rKnmlhGMnVyjbjVQOgJcmNh5/gGpJQw9xbLemgIJEURfEQiLkXxYCZeIkhE+WLScHQRQwAWllVAC3+dijUZgPokQbQAgcp3n3/+4EGKFtVW6lSXbUQS5hcpLOBa90Q7VC9R0usE/nMMVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748844264; c=relaxed/simple;
-	bh=HVG0rvThnlLsvFnldLgXtx9AOhCIl8P6TpfOPiY+MN8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hOrqiZxfJt4UhT/mGxQBVKbdZkwYUSz//L7zGRoalraqyn/aGGCSvD/gm2f4NiQvsC4PZIdUbQhaGbolI5c0CCp0/6fb1nGmmSIjhggTnLDbGBzrykc7cUMrW+GwWxyTiCn77vUvPRmJJWX1B30a+NM9+fWWToyhxgbpehvaJJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f3AgcvBK; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f3AgcvBK"
-Date: Mon, 2 Jun 2025 15:04:07 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748844258;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QniNQ3xHzFU8fnE9PGpL0Qovj9YdgufC11Jf/aMIhfo=;
-	b=f3AgcvBK3cZmc5eKl/4vi530BREgxOc88lbHAKqeeAgN/l6Ql/fR9ttwG8KK4+tjSZhicR
-	4fD+FXjD0EM2brgdDUu42zmRCezMQc92XBIceJKg13cMA8DacpRS3swajg8PsaKTxKbqlv
-	J14WljJJer4BlyBW7Nsd2VhWbNwQzDE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com,
-	darren@os.amperecomputing.com
-Subject: Re: [RFC PATCH v2 8/9] KVM: selftests: arm64: Extend
- kvm_page_table_test to run guest code in vEL2
-Message-ID: <aD0+1+aVBrPEeYUl@vm4>
-References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
- <20250512105251.577874-9-gankulkarni@os.amperecomputing.com>
+	s=arc-20240116; t=1748877294; c=relaxed/simple;
+	bh=Szo9uGF0rg5w3SBDMgWbGMqvVdF5MMEJIQ0W/n76qhE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cZpvssGMZdUE7lH/clx8uqm7h386XsTdAHKT1jxeog1wzMwJ0+Z4ZHLZO4S75h0+4W9Z9S6028zQFwXCFJtZylUG+J3uY6lHKpjh49h/dD4WTZ3ljM9gEetm9rmq7U/Zyr/QNoOEdAGMON+yIL20Fu7VyaPJk6x9VAZw7pa/gL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABBED1424;
+	Mon,  2 Jun 2025 08:14:34 -0700 (PDT)
+Received: from [10.57.64.248] (unknown [10.57.64.248])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 22FDA3F5A1;
+	Mon,  2 Jun 2025 08:14:46 -0700 (PDT)
+Message-ID: <673853c4-b7b0-4a7f-915e-37646ae8cf6f@arm.com>
+Date: Mon, 2 Jun 2025 16:14:45 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250512105251.577874-9-gankulkarni@os.amperecomputing.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
+To: "Emi Kisanuki (Fujitsu)" <fj0570is@fujitsu.com>,
+ "'kvm@vger.kernel.org'" <kvm@vger.kernel.org>,
+ "'kvmarm@lists.linux.dev'" <kvmarm@lists.linux.dev>
+Cc: 'Catalin Marinas' <catalin.marinas@arm.com>,
+ 'Marc Zyngier' <maz@kernel.org>, 'Will Deacon' <will@kernel.org>,
+ 'James Morse' <james.morse@arm.com>, 'Oliver Upton'
+ <oliver.upton@linux.dev>, 'Suzuki K Poulose' <suzuki.poulose@arm.com>,
+ 'Zenghui Yu' <yuzenghui@huawei.com>,
+ "'linux-arm-kernel@lists.infradead.org'"
+ <linux-arm-kernel@lists.infradead.org>,
+ "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
+ 'Joey Gouly' <joey.gouly@arm.com>,
+ 'Alexandru Elisei' <alexandru.elisei@arm.com>,
+ 'Christoffer Dall' <christoffer.dall@arm.com>,
+ 'Fuad Tabba' <tabba@google.com>,
+ "'linux-coco@lists.linux.dev'" <linux-coco@lists.linux.dev>,
+ 'Ganapatrao Kulkarni' <gankulkarni@os.amperecomputing.com>,
+ 'Gavin Shan' <gshan@redhat.com>,
+ 'Shanker Donthineni' <sdonthineni@nvidia.com>,
+ 'Alper Gun' <alpergun@google.com>,
+ "'Aneesh Kumar K . V'" <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-17-steven.price@arm.com>
+ <TYCPR01MB11463D8002D90705A7F860B85C366A@TYCPR01MB11463.jpnprd01.prod.outlook.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <TYCPR01MB11463D8002D90705A7F860B85C366A@TYCPR01MB11463.jpnprd01.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 12, 2025 at 03:52:50AM -0700, Ganapatrao Kulkarni wrote:
-> Adding code to run guest_code in vEL2.
-> NV is enabled using command line argument and it is disabled by default.
+On 29/05/2025 05:52, Emi Kisanuki (Fujitsu) wrote:
+> Hello, I comment below.
+
+Hi Emi,
+
+>> Subject: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
+>>
+>> Entering a realm is done using a SMC call to the RMM. On exit the exit-codes
+>> need to be handled slightly differently to the normal KVM path so define our own
+>> functions for realm enter/exit and hook them in if the guest is a realm guest.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+
+[..]
+
+>> +/*
+>> + * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason)
+>> +on
+>> + * proper exit to userspace.
+>> + */
+>> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret) {
+>> +	struct realm_rec *rec = &vcpu->arch.rec;
+>> +	u8 esr_ec = ESR_ELx_EC(rec->run->exit.esr);
+>> +	unsigned long status, index;
+>> +
+>> +	status = RMI_RETURN_STATUS(rec_run_ret);
+>> +	index = RMI_RETURN_INDEX(rec_run_ret);
+>> +
+>> +	/*
+>> +	 * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we
+>> might
+>> +	 * see the following status code and index indicating an attempt to run
+>> +	 * a REC when the RD state is SYSTEM_OFF.  In this case, we just need
+>> to
+>> +	 * return to user space which can deal with the system event or will try
+>> +	 * to run the KVM VCPU again, at which point we will no longer attempt
+>> +	 * to enter the Realm because we will have a sleep request pending on
+>> +	 * the VCPU as a result of KVM's PSCI handling.
+>> +	 */
+>> +	if (status == RMI_ERROR_REALM && index == 1) {
+>> +		vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
+>> +		return 0;
+>> +	}
+> Running kvm-unit-tests-cca selftest(smp) test in quick succession may trigger these conditions, resulting in the following error logs.
+>  Error: KVM exit reason: 0 ("KVM_EXIT_UNKNOWN")
 > 
-> NV is only enabled on ARM64, for other architectures the test will exit
-> with an ASSERT, if tried to run with NV enabled.
-> 
+> Since KVM_EXIT_UNKNOWN is used when no specific exit reason applies, I think it would be better to make it identifiable as an error.
+> How about adding and setting a new ARM64 exit_reason value to indicate that the PSCI_SYSTEM_OFF request is conflicting with a running vcpu?
 
-I'm seeing this in QEMU TCG mode, does this mean the limitation of the
-emulation?
-
-$ sudo /mnt/projects/linux/tools/testing/selftests/kvm/arm64/page_fault_test -m 3 -s anonymous
-Random seed: 0x6b8b4567
-==== Test Assertion Failure ====
-  arm64/page_fault_test.c:632: test->expected_events.uffd_faults == events.uffd_faults
-  pid=769 tid=769 errno=9 - Bad file descriptor
-     1	0x000000000040325b: check_event_counts at page_fault_test.c:632
-     2	 (inlined by) run_test at page_fault_test.c:739
-     3	0x0000000000403cbf: for_each_guest_mode at guest_modes.c:96
-     4	0x0000000000401cfb: for_each_test_and_guest_mode at page_fault_test.c:1107
-     5	 (inlined by) main at page_fault_test.c:1133
-     6	0x0000ffff848122db: ?? ??:0
-     7	0x0000ffff848123bb: ?? ??:0
-     8	0x0000000000401def: _start at ??:?
-  0x2 != 0x1 (test->expected_events.uffd_faults != events.uffd_faults)
+Aneesh pointed this out to me off-list. We agreed that KVM_EXIT_SHUTDOWN
+was more appropriate here. I'll make the change for v9.
 
 Thanks,
-Itaru.
+Steve
 
-> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-> ---
->  .../selftests/kvm/kvm_page_table_test.c       | 30 +++++++++++++++++--
->  1 file changed, 27 insertions(+), 3 deletions(-)
+> Best Regards,
+> Emi Kisanuki
+>> +
+>> +	if (rec_run_ret)
+>> +		return -ENXIO;
+>> +
+>> +	vcpu->arch.fault.esr_el2 = rec->run->exit.esr;
+>> +	vcpu->arch.fault.far_el2 = rec->run->exit.far;
+>> +	vcpu->arch.fault.hpfar_el2 = rec->run->exit.hpfar;
+>> +
+>> +	update_arch_timer_irq_lines(vcpu);
+>> +
+>> +	/* Reset the emulation flags for the next run of the REC */
+>> +	rec->run->enter.flags = 0;
+>> +
+>> +	switch (rec->run->exit.exit_reason) {
+>> +	case RMI_EXIT_SYNC:
+>> +		return rec_exit_handlers[esr_ec](vcpu);
+>> +	case RMI_EXIT_IRQ:
+>> +	case RMI_EXIT_FIQ:
+>> +		return 1;
+>> +	case RMI_EXIT_PSCI:
+>> +		return rec_exit_psci(vcpu);
+>> +	case RMI_EXIT_RIPAS_CHANGE:
+>> +		return rec_exit_ripas_change(vcpu);
+>> +	}
+>> +
+>> +	kvm_pr_unimpl("Unsupported exit reason: %u\n",
+>> +		      rec->run->exit.exit_reason);
+>> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> +	return 0;
+>> +}
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c index
+>> 33eb793d8bdb..bee9dfe12e03 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -863,6 +863,25 @@ void kvm_destroy_realm(struct kvm *kvm)
+>>  	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>>  }
+>>
+>> +int kvm_rec_enter(struct kvm_vcpu *vcpu) {
+>> +	struct realm_rec *rec = &vcpu->arch.rec;
+>> +
+>> +	switch (rec->run->exit.exit_reason) {
+>> +	case RMI_EXIT_HOST_CALL:
+>> +	case RMI_EXIT_PSCI:
+>> +		for (int i = 0; i < REC_RUN_GPRS; i++)
+>> +			rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
+>> +		break;
+>> +	}
+>> +
+>> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
+>> +		return -EINVAL;
+>> +
+>> +	return rmi_rec_enter(virt_to_phys(rec->rec_page),
+>> +			     virt_to_phys(rec->run));
+>> +}
+>> +
+>>  static void free_rec_aux(struct page **aux_pages,
+>>  			 unsigned int num_aux)
+>>  {
+>> --
+>> 2.43.0
+>>
 > 
-> diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
-> index dd8b12f626d3..383f9d134ecb 100644
-> --- a/tools/testing/selftests/kvm/kvm_page_table_test.c
-> +++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
-> @@ -20,6 +20,10 @@
->  #include "guest_modes.h"
->  #include "ucall_common.h"
->  
-> +#ifdef __aarch64__
-> +#include <nv_util.h>
-> +#endif
-> +
->  #define TEST_MEM_SLOT_INDEX             1
->  
->  /* Default size(1GB) of the memory for testing */
-> @@ -229,7 +233,9 @@ static void *vcpu_worker(void *data)
->  struct test_params {
->  	uint64_t phys_offset;
->  	uint64_t test_mem_size;
-> +	bool is_nested;
->  	enum vm_mem_backing_src_type src_type;
-> +	int fd;
->  };
->  
->  static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
-> @@ -252,8 +258,17 @@ static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
->  
->  	/* Create a VM with enough guest pages */
->  	guest_num_pages = test_mem_size / guest_page_size;
-> -	vm = __vm_create_with_vcpus(VM_SHAPE(mode), nr_vcpus, guest_num_pages,
-> +	if (p->is_nested) {
-> +#ifdef __aarch64__
-> +		vm = __nv_vm_create_with_vcpus_gic(VM_SHAPE(mode), nr_vcpus,
-> +				test_args.vcpus, guest_num_pages, &p->fd, guest_code);
-> +#else
-> +		TEST_FAIL("Nested Not Supported");
-> +#endif
-> +	} else {
-> +		vm = __vm_create_with_vcpus(VM_SHAPE(mode), nr_vcpus, guest_num_pages,
->  				    guest_code, test_args.vcpus);
-> +	}
->  
->  	/* Align down GPA of the testing memslot */
->  	if (!p->phys_offset)
-> @@ -345,6 +360,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	struct timespec start;
->  	struct timespec ts_diff;
->  	int ret, i;
-> +	struct test_params *p =  (struct test_params *)arg;
->  
->  	/* Create VM with vCPUs and make some pre-initialization */
->  	vm = pre_init_before_test(mode, arg);
-> @@ -414,6 +430,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	TEST_ASSERT(ret == 0, "Error in sem_destroy");
->  
->  	free(vcpu_threads);
-> +	if (p->is_nested)
-> +		close(p->fd);
->  	kvm_vm_free(vm);
->  }
->  
-> @@ -421,7 +439,7 @@ static void help(char *name)
->  {
->  	puts("");
->  	printf("usage: %s [-h] [-p offset] [-m mode] "
-> -	       "[-b mem-size] [-v vcpus] [-s mem-type]\n", name);
-> +	       "[-b mem-size] [-v vcpus] [-s mem-type] [-g nv]\n", name);
->  	puts("");
->  	printf(" -p: specify guest physical test memory offset\n"
->  	       "     Warning: a low offset can conflict with the loaded test code.\n");
-> @@ -430,6 +448,8 @@ static void help(char *name)
->  	       "     (default: 1G)\n");
->  	printf(" -v: specify the number of vCPUs to run\n"
->  	       "     (default: 1)\n");
-> +	printf(" -g: Enable Nested Virtualization, run guest code as guest hypervisor.\n"
-> +	       "     (default: Disabled)\n");
->  	backing_src_help("-s");
->  	puts("");
->  }
-> @@ -440,12 +460,13 @@ int main(int argc, char *argv[])
->  	struct test_params p = {
->  		.test_mem_size = DEFAULT_TEST_MEM_SIZE,
->  		.src_type = DEFAULT_VM_MEM_SRC,
-> +		.is_nested = false,
->  	};
->  	int opt;
->  
->  	guest_modes_append_default();
->  
-> -	while ((opt = getopt(argc, argv, "hp:m:b:v:s:")) != -1) {
-> +	while ((opt = getopt(argc, argv, "hp:m:b:v:s:g:")) != -1) {
->  		switch (opt) {
->  		case 'p':
->  			p.phys_offset = strtoull(optarg, NULL, 0);
-> @@ -464,6 +485,9 @@ int main(int argc, char *argv[])
->  		case 's':
->  			p.src_type = parse_backing_src_type(optarg);
->  			break;
-> +		case 'g':
-> +			p.is_nested = atoi_non_negative("Is Nested", optarg);
-> +			break;
->  		case 'h':
->  		default:
->  			help(argv[0]);
-> -- 
-> 2.48.1
-> 
+
