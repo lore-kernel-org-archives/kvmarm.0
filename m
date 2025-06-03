@@ -1,190 +1,122 @@
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9945D20371F
-	for <kvmarm@lists.linux.dev>; Tue,  3 Jun 2025 20:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FEE223DD4
+	for <kvmarm@lists.linux.dev>; Tue,  3 Jun 2025 20:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748983717; cv=none; b=IZHgdqOJXQjYE08fTqghS6/UdSerunelORrQC2wQ74Vj1EvN1u2Vyf9+8QK+vGuq2To/UdOuDh77wGLZIThO/Fb58lKwazWWXqpEUVPvu8YjO84Hd1dEfCihAmW4PjCWpxp50TOma6FnjGvcdhbUaW5qac12q/tGC6N/Jo01bNU=
+	t=1748983832; cv=none; b=CUEtMl88r4oyWL8u3/Zt577S+fI/Q37g8DcOlNL7Y384/3kKBTTSxQnnAK5yCe+q+fHMPYxcmJWPJoQszfJpBVMd5jUM1pYRUgAXv4iZmYe5oqc3LNggnRYp8l6TGfDGZ2L4Ar7LDdV4zmBroY0tkuEKuHDB5kBthViLsnJL6EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748983717; c=relaxed/simple;
-	bh=J4Gy+MHq+K8H73A1pdlJXVmj/G1iM1mYhcwzLpTgyXE=;
+	s=arc-20240116; t=1748983832; c=relaxed/simple;
+	bh=1ORI/LqUz7dCfdMO8958T7FDJ2un7M0ICUmDzX9c648=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=gCXTFJ+V3dnMYzxmLjm77Wa9AvJJjCogdES1UIOMcfXoA707WWIZOJ23BXr3AMqgKRvonh5VgKP27FKrU1J3KfXblDfhHwRHxJu3Vxn1xLiC7oLrYwaragVaaRoUxoNu7j4lvHtz2BIXRRQNzSziyysoXuBIpFPaKZtmiLt0M+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rTGSDQMn; arc=none smtp.client-ip=209.85.166.202
+	 Content-Type; b=eAlf6treq9nahgWB8lIgx7C5O0pQQNQlUZBsYzVQF6+vsNUvYDbVfLFlQ1V892cd7TNz3S4OwLnhkfqd7zMppS4/U4Kwv4QfJSxEQ6nk/urqhkTDN45reAIJ3MFP/iCMlToqfcJ2kTfPxVabPLM/WU/BraxfA3M9sQ+BuRn5paA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1YwCmJak; arc=none smtp.client-ip=209.85.166.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rTGSDQMn"
-Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3dd789f3b99so124023195ab.0
-        for <kvmarm@lists.linux.dev>; Tue, 03 Jun 2025 13:48:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1YwCmJak"
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-86cfe68a8bbso387678739f.1
+        for <kvmarm@lists.linux.dev>; Tue, 03 Jun 2025 13:50:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748983714; x=1749588514; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1748983829; x=1749588629; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=xqk6Ae+AoodqjhacwdxkSu1Yb8TCbPjMAbFosVWhG+Q=;
-        b=rTGSDQMnGfksmesiwjp1hwlPo10bTNyh4qfGuoHmvT45ZR0MP39QNW+OFZSDtBc8Nx
-         bCYbJhjA4xUKmsYVgiQ3sANRrhRgjQLPYXIwELd/bvqv1luVbTEwQmQsnLDKlV5JoGyt
-         5TJdiJWXFs3sE+gZFwMYwcbl3bnOiVgFrCD+ktAt5NOnQCjHTOur+KPPufoEti0ewR5D
-         O2vF6zcnS7x9t5qLJS8Bqh0ztzcEd/naT1NjbA2nzgAKJMNkvSXDf64fyuIoN4F+uuxu
-         H6yzLUE19wJNoZH4Dp/oMw0OGBib5tkRQzgFj8VMbgmBSY7942pWI2mQYYrUSZxwX3NO
-         RKMg==
+        bh=3lsZMwRkh1UP98Tqde8+akeySm6v1iX6h0YAqQdmB3c=;
+        b=1YwCmJak+pjSM2xZ50tkEomwzL5YLUkC4W0CZH7zpjeaJLmlzQDIEAqfKG6ygcdtoN
+         DOuzfEa3gKQfBU8qKejrVVi2LGisn6eMsAH0nL7sg3yBMIMj+xfCyEUEY+nsV5V/bVWs
+         7eXaIPgcskAlSUU0or0e0rvC4ToRWvvs3wVvul2QB3RXCbjJu0L6DP5h+QrmhfaATOCV
+         Y+Wk3d13csyjbxCiE1KaZgFQYpYsBojOKg24nurH9VT3mNbDXHiiOH+IV0OhHAOq28yR
+         Ir/If0Btz3YDvLyiw4yP4brUQsCS1ug2CK09qXHxD1LebC277KAYzoW+IVbFshnPWtjd
+         LxDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748983714; x=1749588514;
+        d=1e100.net; s=20230601; t=1748983829; x=1749588629;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xqk6Ae+AoodqjhacwdxkSu1Yb8TCbPjMAbFosVWhG+Q=;
-        b=q81cTo9ceGC3JaFNOehLEia6ndNF66axpjOV370fvZ7INI0ZcvL9ewMXARD06X2crt
-         w+JSUZuy213ecCmGdVfNQI8TdvmmcmNsju9vydEbGvbg0nUSeuBJp4Z9P7lF4pV0VKz/
-         suy5mKhdCs6VHCQXLvxWHGtU56XHwBasl53bW813ByH/rMlP7iCMZ8gZ8jPmbubxGO+e
-         L+bUDQuAnCAK4/dlIn38NpWNAVMidij3uZrUmrNgk081WM9Tt3QQaDRnQ6f1pUetDXdv
-         UohVNwuIN01/yIYG1hI2ukdQvWDCOOXfW5QeV51/+UVPwY+aU5cIW1D1wf8BUQk0AEkV
-         OiIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrTjLa9D+pqEJviQ+SYCKkRpy2MsPEPNRQRtakNDwk2QNpFLRgy+VsK8bgwI4YXJezjEfZ+FI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxeTZflbn3Jr9ujpXrtaNsDfB4dX1mE56OI06RKyPFbi4xRUW89
-	ElJlwN3fUXKRRkckzEUtBI0m2rJnYjdTnb1jwUAMI2BjfzQUvO7MvXNmzAzURYcc42iCt1SZtl/
-	acukCRwb8xSNcRoU4NBY6XoLrkA==
-X-Google-Smtp-Source: AGHT+IH++9MIP5okdS2+/trmd8V6fLN6bmZyUPwJNgnr4Lv2JKgei2gsZjCTP6Pc/H1zIhLn0nH3fYC4XYFcP1PDwQ==
-X-Received: from ilbbz4.prod.google.com ([2002:a05:6e02:2684:b0:3dd:b9c7:8f2f])
+        bh=3lsZMwRkh1UP98Tqde8+akeySm6v1iX6h0YAqQdmB3c=;
+        b=PJ/YntkQWgxvAc2tZMl78sN0dRK4yKDPGjhTg1GpsXALrc+n8GcDkIQ8oXPEhYogIZ
+         7wJ+bI+jzzkXQXNoR1KH+lH3o4XqVGfIHuYaAar9YLO1HZoUa8j3N6Fzk46bL2ns6cic
+         0HDswZ39SNq37w9dwPGWjjj8hfrLyZEf5qO6qepT4xWO+gjueenZrYDMV4Q4RYlqrdxm
+         LZEm7O5LvnTU2rJCzWMdWeCeuCxNPX8capYE82LGk7uw4qpFsR5mn8WLc5hMeIhNM6CD
+         VeYhPfHqmS+6oMqFuM8Ar1yMDGzGWtZv8/5azCfOv6ozcb3lDSFV5XoCR3v18ZhW6Ufm
+         3CgA==
+X-Forwarded-Encrypted: i=1; AJvYcCWS/A+E0UVom+HloQnMJBorvpLspDiR+ffhvQPFNXilOsdwFIA1HdtBGXF57fjZqlXMdXkZBqs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzWStSbX+3tT31Q5uq/wou5WSNQArxv5GmjMvpE4RcKM0W75tdW
+	WzLSapFFpulzBtNEhMeH1ehyos8e1gvnFRLrU+aC+fFeztxqdScRykI9sHpOL7Ym7PCB6YLMiB4
+	8fihYCKyNbotz1JSJRFGSZGVW4g==
+X-Google-Smtp-Source: AGHT+IE8lcweOrXzv1dJ7JnXQujzAi86ZbFeivqiLkC8HSJs78PXh7Mwa8lRBkCmnRTpW9aZv5V6w/tu2G1Ilng5MA==
+X-Received: from ilbbf2.prod.google.com ([2002:a05:6e02:3082:b0:3dd:a279:72c1])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:260c:b0:3dd:89b0:8e1b with SMTP id e9e14a558f8ab-3ddbed8aa48mr5481105ab.15.1748983713821;
- Tue, 03 Jun 2025 13:48:33 -0700 (PDT)
-Date: Tue, 03 Jun 2025 20:48:32 +0000
-In-Reply-To: <aD4a1T7ZmBLNunxi@google.com> (message from Sean Christopherson
- on Mon, 2 Jun 2025 14:42:45 -0700)
+ 2002:a05:6e02:1807:b0:3dc:8b29:30bc with SMTP id e9e14a558f8ab-3ddbedbef4cmr5429525ab.21.1748983829547;
+ Tue, 03 Jun 2025 13:50:29 -0700 (PDT)
+Date: Tue, 03 Jun 2025 20:50:28 +0000
+In-Reply-To: <aD4ijUaSGm9b2g5H@linux.dev> (message from Oliver Upton on Mon, 2
+ Jun 2025 15:15:41 -0700)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsnta56o361r.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 04/17] KVM: arm64: Cleanup PMU includes
+Message-ID: <gsnt7c1s35yj.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 01/17] arm64: cpufeature: Add cpucap for HPMN0
 From: Colton Lewis <coltonlewis@google.com>
-To: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
 	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
-	shuah@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Sean Christopherson <seanjc@google.com> writes:
+Hi Oliver. Thanks for the speedy response.
 
-> On Mon, Jun 02, 2025, Colton Lewis wrote:
->> * Delete kvm/arm_pmu.h. These functions are mostly internal to KVM and
->>    should go in asm/kvm_host.h.
+Oliver Upton <oliver.upton@linux.dev> writes:
 
-> Ha!  I'm a hair too late, as usual.  I _just_ resurrected a patch[*] to  
-> move and
-> rename all of the <kvm/arm_xxx.h> headers to <asm/kvm_xxx.h>.  If only I  
-> had
-> posted on Friday when they were ready :-)
+> Hi Colton,
 
-Great minds think alike :) (In this case the other one was Marc)
+> On Mon, Jun 02, 2025 at 07:26:46PM +0000, Colton Lewis wrote:
+>> Add a capability for FEAT_HPMN0, whether MDCR_EL2.HPMN can specify 0
+>> counters reserved for the guest.
 
-> It's a relatively small series (mostly arm64 code movement), but it does  
-> touch
-> all architectures due to giving the same treatment to kvm/iodev.h (and  
-> purging
-> include/kvm entirely).
+>> This required changing HPMN0 to an UnsignedEnum in tools/sysreg
+>> because otherwise not all the appropriate macros are generated to add
+>> it to arm64_cpu_capabilities_arm64_features.
 
-> Any preference/thoughts on how to proceed?  My stuff obviously isn't  
-> urgent since
-> I sat on the patches for almost two years.  On the other hand, the almost  
-> pure
-> code movement would be a nice precursor to this patch, e.g. move and  
-> rename to
-> asm/kvm_pmu.h before extracting chunks of code into asm/kvm_host.h.
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>   arch/arm64/kernel/cpufeature.c | 8 ++++++++
+>>   arch/arm64/tools/cpucaps       | 1 +
+>>   arch/arm64/tools/sysreg        | 6 +++---
+>>   3 files changed, 12 insertions(+), 3 deletions(-)
 
-Letting the rename go first is fine and won't inconveneince me. I'm
-expecting this series to take a while to be accepted and Oliver told me
-I'll probably need a reroll to make my context switching lazy. Thanks
-for asking.
+>> diff --git a/arch/arm64/kernel/cpufeature.c  
+>> b/arch/arm64/kernel/cpufeature.c
+>> index a3da020f1d1c..578eea321a60 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -541,6 +541,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
+>>   };
 
-> [*]  
-> https://lore.kernel.org/all/20230916003118.2540661-15-seanjc@google.com
+>>   static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
+>> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,  
+>> ID_AA64DFR0_EL1_HPMN0_SHIFT, 4, 0),
+>>   	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,  
+>> ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
+>>   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE,  
+>> ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
+>>   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,  
+>> ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
+>> @@ -2884,6 +2885,13 @@ static const struct arm64_cpu_capabilities  
+>> arm64_features[] = {
+>>   		.matches = has_cpuid_feature,
+>>   		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, FGT2)
+>>   	},
+>> +	{
+>> +		.desc = "Hypervisor PMU Partitioning 0 Guest Counters",
 
+> nit: just use the the FEAT_xxx name for the description (i.e. "HPMN0").
 
-> Diff stats for context:
-> ---
-> Anish Ghulati (1):
->    KVM: arm64: Move arm_{psci,hypercalls}.h to an internal KVM path
-
-> Sean Christopherson (7):
->    KVM: arm64: Include KVM headers to get forward declarations
->    KVM: arm64: Move ARM specific headers in include/kvm to arch directory
->    KVM: Move include/kvm/iodev.h to include/linux as kvm_iodev.h
->    KVM: MIPS: Stop adding virt/kvm to the arch include path
->    KVM: PPC: Stop adding virt/kvm to the arch include path
->    KVM: s390: Stop adding virt/kvm to the arch include path
->    KVM: Standardize include paths across all architectures
-
->   MAINTAINERS                                                | 1 -
->   .../arm64/include/asm/kvm_arch_timer.h                     | 2 ++
->   arch/arm64/include/asm/kvm_host.h                          | 7 +++----
->   include/kvm/arm_pmu.h => arch/arm64/include/asm/kvm_pmu.h  | 2 ++
->   .../kvm/arm_vgic.h => arch/arm64/include/asm/kvm_vgic.h    | 2 +-
->   arch/arm64/kvm/Makefile                                    | 2 --
->   arch/arm64/kvm/arch_timer.c                                | 5 ++---
->   arch/arm64/kvm/arm.c                                       | 6 +++---
->   {include => arch/arm64}/kvm/arm_hypercalls.h               | 0
->   {include => arch/arm64}/kvm/arm_psci.h                     | 0
->   arch/arm64/kvm/guest.c                                     | 2 +-
->   arch/arm64/kvm/handle_exit.c                               | 2 +-
->   arch/arm64/kvm/hyp/Makefile                                | 6 +++---
->   arch/arm64/kvm/hyp/include/hyp/switch.h                    | 4 ++--
->   arch/arm64/kvm/hyp/nvhe/switch.c                           | 4 ++--
->   arch/arm64/kvm/hyp/vhe/switch.c                            | 4 ++--
->   arch/arm64/kvm/hypercalls.c                                | 4 ++--
->   arch/arm64/kvm/pmu-emul.c                                  | 4 ++--
->   arch/arm64/kvm/psci.c                                      | 4 ++--
->   arch/arm64/kvm/pvtime.c                                    | 2 +-
->   arch/arm64/kvm/reset.c                                     | 3 +--
->   arch/arm64/kvm/trace_arm.h                                 | 2 +-
->   arch/arm64/kvm/trng.c                                      | 2 +-
->   arch/arm64/kvm/vgic/vgic-debug.c                           | 2 +-
->   arch/arm64/kvm/vgic/vgic-init.c                            | 2 +-
->   arch/arm64/kvm/vgic/vgic-irqfd.c                           | 2 +-
->   arch/arm64/kvm/vgic/vgic-kvm-device.c                      | 2 +-
->   arch/arm64/kvm/vgic/vgic-mmio-v2.c                         | 4 ++--
->   arch/arm64/kvm/vgic/vgic-mmio-v3.c                         | 4 ++--
->   arch/arm64/kvm/vgic/vgic-mmio.c                            | 6 +++---
->   arch/arm64/kvm/vgic/vgic-v2.c                              | 2 +-
->   arch/arm64/kvm/vgic/vgic-v3-nested.c                       | 3 +--
->   arch/arm64/kvm/vgic/vgic-v3.c                              | 2 +-
->   arch/loongarch/include/asm/kvm_eiointc.h                   | 2 +-
->   arch/loongarch/include/asm/kvm_ipi.h                       | 2 +-
->   arch/loongarch/include/asm/kvm_pch_pic.h                   | 2 +-
->   arch/mips/include/asm/kvm_host.h                           | 3 +--
->   arch/mips/kvm/Makefile                                     | 2 --
->   arch/powerpc/kvm/Makefile                                  | 2 --
->   arch/powerpc/kvm/mpic.c                                    | 2 +-
->   arch/riscv/kvm/Makefile                                    | 2 --
->   arch/riscv/kvm/aia_aplic.c                                 | 2 +-
->   arch/riscv/kvm/aia_imsic.c                                 | 2 +-
->   arch/s390/kvm/Makefile                                     | 2 --
->   arch/x86/kvm/Makefile                                      | 1 -
->   arch/x86/kvm/i8254.h                                       | 2 +-
->   arch/x86/kvm/ioapic.h                                      | 2 +-
->   arch/x86/kvm/irq.h                                         | 2 +-
->   arch/x86/kvm/lapic.h                                       | 2 +-
->   include/{kvm/iodev.h => linux/kvm_iodev.h}                 | 0
->   virt/kvm/Makefile.kvm                                      | 2 ++
->   virt/kvm/coalesced_mmio.c                                  | 3 +--
->   virt/kvm/eventfd.c                                         | 2 +-
->   virt/kvm/kvm_main.c                                        | 3 +--
->   54 files changed, 64 insertions(+), 77 deletions(-)
->   rename include/kvm/arm_arch_timer.h =>  
-> arch/arm64/include/asm/kvm_arch_timer.h (98%)
->   rename include/kvm/arm_pmu.h => arch/arm64/include/asm/kvm_pmu.h (99%)
->   rename include/kvm/arm_vgic.h => arch/arm64/include/asm/kvm_vgic.h (99%)
->   rename {include => arch/arm64}/kvm/arm_hypercalls.h (100%)
->   rename {include => arch/arm64}/kvm/arm_psci.h (100%)
->   rename include/{kvm/iodev.h => linux/kvm_iodev.h} (100%)
-
-
-> base-commit: 45eb29140e68ffe8e93a5471006858a018480a45
-> --
+Okay
