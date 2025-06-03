@@ -1,92 +1,94 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0002C3254
-	for <kvmarm@lists.linux.dev>; Mon,  2 Jun 2025 22:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA35268C4B
+	for <kvmarm@lists.linux.dev>; Tue,  3 Jun 2025 07:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748904022; cv=none; b=G+iFRKNUihEusxCHxBpPIyW0p2MVQkPVF1WpSBpwCh18DsO2yOxJHNQ3A6gzf5jv9uY9Rp+oQdbG+Wrf5yecoQLew2dY7+Cy7AqPstyPvbat+l9PUtNOVUTBKHkVgNGzv24CW3arfoWhoVs/atMjBRUudZvdJAzkv1+yFrXKbwQ=
+	t=1748934524; cv=none; b=FryluIQkk9N3nVGJc5GuPJZeN1E8kER6NWdcQH6ADDmrUxbf+RHV1F+lpA/wDl1FHkiXvf7MRatexTNc1qPAXecOQm48bg+Y2fHWRLhQhFBM53kGspN0BL0wTs0T5CFIn9aEnISULWX61FnQjyfCdZgQcdB2b/ab/zq5b1g4HCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748904022; c=relaxed/simple;
-	bh=Raej5S0fr0owynKaFtp+ssLwlG8DLE+hbQHXsl4GgeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JzKwbTTLQKN+F4Lf3dYOJ6MJo4NmE9iL+3t9U5zgHxkVrAbkWppq2Zlgmn8t8Y7GBxnBOIkVXELbELCRxbVzsGPcbaTXqEQ9UHOLIHKcpDQxGc0cWhRAp2tPRLCd4FmsJD1J5xwxisfgAzFLKx7kJjtD/8WmpwJrHghrE88VE64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DRGlTg2l; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1748934524; c=relaxed/simple;
+	bh=K/RtzbQ+b7dH8ZrEJdeD2NQuerIL9r6Cxc/FT5nhyEQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=MYA2Slmy1qtm9nhUgH+kEQthQYv45gMOWRwPYNSCz9xYn9fBqxCKs54gvmdWbaFZD86y5Xyn59QAZypH/Q63X41lx5f/JQlTVeKNU6KZ9LtP1wrBI4oJNzJQIk/s+OoyOYAcsruDVvhic//f8zWGAs+5mvaEDwB8LBQq0owcskk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHeMJ/WQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DRGlTg2l"
-Date: Mon, 2 Jun 2025 15:40:11 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748904017;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pVDqG7Qru3dfMpTwDZ3dCGAw70KwMy1IAEgL6+IAtD0=;
-	b=DRGlTg2l6dj3mx3YU+Hkrx8unn1zTLt40R3DTpki2p/KXrAfQdCsBTXlNY3/1LiA5NL/C3
-	AKu5HQu4fMzKoqvysZOOGOi+dS5HDBNebnMVbg8Q3KTQ3HS+lmWRWnqZ0S7Jx7EQrbL9cC
-	j1ccMBNvsr0LPvKUOue0qfpmAfPYP1w=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHeMJ/WQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE42FC4CEF3;
+	Tue,  3 Jun 2025 07:08:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748934523;
+	bh=K/RtzbQ+b7dH8ZrEJdeD2NQuerIL9r6Cxc/FT5nhyEQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ZHeMJ/WQsfvNjiBObMaqQKbveVze3OVotUDM2xxNQ605ImX/SjtN+cMCZwDmRGRpg
+	 VYF3I4Q9Dby8zBTB364ppewvAWhmaXGp0BhBhRrXaQFx20ltvq+ttSdQWnbGeLlk3R
+	 3hNhlAobqz+FgtxKUGTw23YQq3p5HR0rzaedOznouE3hFzCXM1H2szRF0c0d1ii4RI
+	 Z+ZqhrStoNlErca/lTUr0ME1aD1JTNyMCxzmWqm8S58GZhF992PI8jKieQNC8CNE/c
+	 VeaXKjtSoXDIF2BlzCbD1e6si5uGGvYW+tmhUz1dTqwyHpyIbm0tbdOGT0e/JJ9PE9
+	 /l/3oRo8qP3Ow==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uMLlJ-002isr-TL;
+	Tue, 03 Jun 2025 08:08:41 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 16/17] KVM: arm64: Add ioctl to partition the PMU when
- supported
-Message-ID: <aD4oS1_tnMPlgDJ6@linux.dev>
-References: <20250602192702.2125115-1-coltonlewis@google.com>
- <20250602192702.2125115-17-coltonlewis@google.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v2 4/4] KVM: arm64: Make __vcpu_sys_reg() a pure rvalue operand
+Date: Tue,  3 Jun 2025 08:08:24 +0100
+Message-Id: <20250603070824.1192795-5-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250603070824.1192795-1-maz@kernel.org>
+References: <20250603070824.1192795-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250602192702.2125115-17-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jun 02, 2025 at 07:27:01PM +0000, Colton Lewis wrote:
-> +	case KVM_ARM_PARTITION_PMU: {
+Now that we don't have any use of __vcpu_sys_reg() as a lvalue,
+remove the in-place update, and directly return the sanitised
+value.
 
-This should be a vCPU attribute similar to the other PMUv3 controls we
-already have. Ideally a single attribute where userspace tells us it
-wants paritioning and specifies the PMU ID to use. None of this can be
-changed after INIT'ing the PMU.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-> +		struct arm_pmu *pmu;
-> +		u8 host_counters;
-> +
-> +		if (unlikely(!kvm_vcpu_initialized(vcpu)))
-> +			return -ENOEXEC;
-> +
-> +		if (!kvm_pmu_partition_supported())
-> +			return -EPERM;
-> +
-> +		if (copy_from_user(&host_counters, argp, sizeof(host_counters)))
-> +			return -EFAULT;
-> +
-> +		pmu = vcpu->kvm->arch.arm_pmu;
-> +		return kvm_pmu_partition(pmu, host_counters);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index c361f8aa16c90..b4ac2f515f94f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1129,13 +1129,13 @@ u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *, enum vcpu_sysreg, u64);
+ 	} while (0)
+ 
+ #define __vcpu_sys_reg(v,r)						\
+-	(*({								\
++	({								\
+ 		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
+-		u64 *__r = __ctxt_sys_reg(ctxt, (r));			\
++		u64 __v = ctxt_sys_reg(ctxt, (r));			\
+ 		if (vcpu_has_nv((v)) && (r) >= __SANITISED_REG_START__)	\
+-			*__r = kvm_vcpu_apply_reg_masks((v), (r), *__r);\
+-		__r;							\
+-	}))
++			__v = kvm_vcpu_apply_reg_masks((v), (r), __v);	\
++		__v;							\
++	})
+ 
+ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg);
+ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
+-- 
+2.39.2
 
-Yeah, we really can't be changing the counters available to the ARM PMU
-driver at this point. What happens to host events already scheduled on
-the CPU?
-
-Either the partition of host / KVM-owned counters needs to be computed
-up front (prior to scheduling events) or KVM needs a way to direct perf
-to reschedule events on the PMU based on the new operating constraints.
-
-Thanks,
-Oliver
