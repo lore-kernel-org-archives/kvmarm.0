@@ -1,31 +1,31 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2A1235076
-	for <kvmarm@lists.linux.dev>; Tue,  3 Jun 2025 22:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7814773451
+	for <kvmarm@lists.linux.dev>; Tue,  3 Jun 2025 22:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748989418; cv=none; b=qzFh50CESVX/3u6/+n1Fq0P98Q0gkD2q6UeMNKtf3cfb3VLIT2fPXx+QqvB8Jf77g9y++Hox4s8PwXRXpdj0TNW4wNA98udk7YCCbcnjO5hDNSY8Xm2Ybt0ImwgQjsjpilA6L5z4vVf3DgY+Hmt+FH3JF2K95w79WI6E9hDG0wE=
+	t=1748990669; cv=none; b=dOt6OgtigVJMAwqEhACl1/hJRs8ZfePGvoXbD9pKOckr3Lqa2ES8uEa7LFFNH99NDqC9KZrFz5m8Yj0ySRONxIRurFrAwepknDzGzS/ABSN3G6bm2gVZKZU3oC8SSa0hGMRbPZUULn1+ztDqRc5uez8K2Gn5ufG9YsDwdgZR8SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748989418; c=relaxed/simple;
-	bh=/MhTDh1qESFrZExtR+SCTFFsKrkDxVGO6OCMPivcISk=;
+	s=arc-20240116; t=1748990669; c=relaxed/simple;
+	bh=LLoqeM/UCB0mh20l/3/Xv9BmLg+WjY+M+SHRDQyeuwA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gLlivi8c5SomeUrZd/ByD8VUcVK7Hq+O71OolP2gCMgCpX4YX6c+1kJOfvjCUKTa3fvgALENAWyQ2n9+hl6k5rTlUCbc5pmvOj3pImbQuFsYgfNJSUiDz8onVUpUiH6rAyjLMTPpsSgfSpt2GK80+y8+xOM4xRcYiZxUF4YPPg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eRimniX8; arc=none smtp.client-ip=95.215.58.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pi7WqimRRSOyYt2OfDt2wmOBJdrbTR9l3bUFPcC2NBbKLfOSmb02tzDRqzm0n+9TLDl+kLAwYkIiLCx1wsIrscSagRyUAAyf835FuL9ZukRdVCO05mbiB7BQJwsDZm2hcXJwBVMXvCwHwiVWg8j//9Ahf7iq2FpNlppcMzdsml0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lzCIQEGZ; arc=none smtp.client-ip=95.215.58.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eRimniX8"
-Date: Tue, 3 Jun 2025 15:22:54 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lzCIQEGZ"
+Date: Tue, 3 Jun 2025 15:43:58 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748989402;
+	t=1748990654;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=niaSUpNhBQ89KPyB0pVEOrY4XFpNCP0lf6WviOejFww=;
-	b=eRimniX8eSc5OSQy+LM1nI6Dhv3MYnIr4b0Kj8coGDibHna3u81l7v23qFFDHdwinARZa8
-	xMuELseQUnvc+hrp9LYmF5h20GBKCGCcaLBq7LdbJM3ZbJB56zDxKeEoegbVsE5HltYeQg
-	j/YwAqMYBnAAtov23jZAIUGTZntaGa8=
+	bh=GoKlMc1lHrduXpDbBbVFy4M8aj5m5zbNDdssxMr5tdc=;
+	b=lzCIQEGZ9FI8wt89dqHEjgAakygFlEyD4l9ip53qVy9LfjTGPS95wVhPcy/2qmUyOYVAjE
+	JRaFapvUKpqg/O3lcUMMPEcYcp7ibaVQc7D6mRAMyy7cTKnSFcjae5MS7anwW9DSr5vcUV
+	rFDNBe0JSQRHTY/ygvKnzMkxuvVGfU8=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Colton Lewis <coltonlewis@google.com>
@@ -41,10 +41,9 @@ Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 10/17] KVM: arm64: Writethrough trapped PMEVTYPER register
-Message-ID: <aD91vp8QXdIjs1Nh@linux.dev>
+Subject: Re: [PATCH 00/17] ARM64 PMU Partitioning
+Message-ID: <aD96rn78BSUDbEu1@linux.dev>
 References: <20250602192702.2125115-1-coltonlewis@google.com>
- <20250602192702.2125115-11-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,99 +52,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250602192702.2125115-11-coltonlewis@google.com>
+In-Reply-To: <20250602192702.2125115-1-coltonlewis@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jun 02, 2025 at 07:26:55PM +0000, Colton Lewis wrote:
-> With FGT in place, the remaining trapped registers need to be written
-> through to the underlying physical registers as well as the virtual
-> ones. Failing to do this means delaying when guest writes take effect.
+On Mon, Jun 02, 2025 at 07:26:45PM +0000, Colton Lewis wrote:
+> Caveats:
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 27 +++++++++++++++++++++++++--
->  1 file changed, 25 insertions(+), 2 deletions(-)
+> Because the most consistent and performant thing to do was untrap
+> PMCR_EL0, the number of counters visible to the guest via PMCR_EL0.N
+> is always equal to the value KVM sets for MDCR_EL2.HPMN. Previously
+> allowed writes to PMCR_EL0.N via {GET,SET}_ONE_REG no longer affect
+> the guest.
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index d368eeb4f88e..afd06400429a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -18,6 +18,7 @@
->  #include <linux/printk.h>
->  #include <linux/uaccess.h>
->  #include <linux/irqchip/arm-gic-v3.h>
-> +#include <linux/perf/arm_pmu.h>
->  #include <linux/perf/arm_pmuv3.h>
->  
->  #include <asm/arm_pmuv3.h>
-> @@ -942,7 +943,11 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
->  {
->  	u64 pmcr, val;
->  
-> -	pmcr = kvm_vcpu_read_pmcr(vcpu);
-> +	if (kvm_vcpu_pmu_is_partitioned(vcpu))
-> +		pmcr = read_pmcr();
-
-Reading PMCR_EL0 from EL2 is not going to have the desired effect.
-PMCR_EL0.N only returns HPMN when read from the guest.
-
-> +	else
-> +		pmcr = kvm_vcpu_read_pmcr(vcpu);
-> +
->  	val = FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
->  	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
->  		kvm_inject_undefined(vcpu);
-> @@ -1037,6 +1042,22 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +static void writethrough_pmevtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +				   u64 reg, u64 idx)
-> +{
-> +	u64 evmask = kvm_pmu_evtyper_mask(vcpu->kvm);
-> +	u64 val = p->regval & evmask;
-> +
-> +	__vcpu_sys_reg(vcpu, reg) = val;
-> +
-> +	if (idx == ARMV8_PMU_CYCLE_IDX)
-> +		write_pmccfiltr(val);
-> +	else if (idx == ARMV8_PMU_INSTR_IDX)
-> +		write_pmicfiltr(val);
-> +	else
-> +		write_pmevtypern(idx, val);
-> +}
-> +
-
-How are you preventing the VM from configuring an event counter to count
-at EL2?
-
-I see that you're setting MDCR_EL2.HPMD (which assumes FEAT_PMUv3p1) but
-due to an architecture bug there's no control to prohibit the cycle
-counter until FEAT_PMUv3p5 (MDCR_EL2.HCCD).
-
-Since you're already trapping PMCCFILTR you could potentially configure
-the hardware value in such a way that it filters EL2.
-
->  static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  			       const struct sys_reg_desc *r)
->  {
-> @@ -1063,7 +1084,9 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	if (!pmu_counter_idx_valid(vcpu, idx))
->  		return false;
->  
-> -	if (p->is_write) {
-> +	if (kvm_vcpu_pmu_is_partitioned(vcpu) && p->is_write) {
-> +		writethrough_pmevtyper(vcpu, p, reg, idx);
-
-What about the vPMU event filter?
-
-> +	} else if (p->is_write) {
->  		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
->  		kvm_vcpu_pmu_restore_guest(vcpu);
->  	} else {
-> -- 
-> 2.49.0.1204.g71687c7c1d-goog
+> These improvements come at a cost to 7-35 new registers that must be
+> swapped at every vcpu_load and vcpu_put if the feature is enabled. I
+> have been informed KVM would like to avoid paying this cost when
+> possible.
 > 
+> One solution is to make the trapping changes and context swapping lazy
+> such that the trapping changes and context swapping only take place
+> after the guest has actually accessed the PMU so guests that never
+> access the PMU never pay the cost.
+
+You should try and model this similar to how we manage the debug
+breakpoints/watchpoints. In that case the debug register context is
+loaded if either:
+
+ (1) Self-hosted debug is actively in use by the guest, or
+
+ (2) The guest has accessed a debug register since the last vcpu_load()
+
+> This is not done here because it is not crucial to the primary
+> functionality and I thought review would be more productive as soon as
+> I had something complete enough for reviewers to easily play with.
+> 
+> However, this or any better ideas are on the table for inclusion in
+> future re-rolls.
+
+One of the other things that I'd like to see is if we can pare down the
+amount of CPU feature dependencies for a partitioned PMU. Annoyingly,
+there aren't a lot of machines out there with FEAT_FGT yet, and you
+should be able to make all of this work in VHE + FEAT_PMUv3p1.
+
+That "just" comes at the cost of extra traps (leaving TPM and
+potentially TPMCR set). You can mitigate the cost of this by emulating
+accesses in the fast path that don't need to go out to a kernel context
+to be serviced. Same goes for requiring FEAT_HPMN0 to expose 0 event
+counters, we can fall back to TPM traps if needed.
+
+Taking perf out of the picture should still give you a significant
+reduction vPMU overheads.
+
+Last thing, let's table guest support for FEAT_PMUv3_ICNTR for the time
+being. Yes, it falls in the KVM-owned range, but we can just handle it
+with a fine-grained undef for now. Once the core infrastructure has
+landed upstream we can start layering new features into the partitioned
+implementation.
 
 Thanks,
 Oliver
