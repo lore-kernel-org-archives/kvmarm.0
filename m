@@ -1,138 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CB0320F
-	for <kvmarm@lists.linux.dev>; Wed,  4 Jun 2025 18:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09892231854
+	for <kvmarm@lists.linux.dev>; Wed,  4 Jun 2025 20:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749063499; cv=none; b=WicGAnIPoCogkQoYb+DLtBYTi5nGuPousG1IsDxBydtYlUJNoI6DqOFtYm1UWfY32bqhq+6bhuHwI+HX7PfuO6fmRvACZ1kmxF+vpAHjfkQaa1gTeaRei1AyVb+8AIJbmWJSpcpbe5rOufTm0tWYnBASuBRTlduC5SXpdfWGUHE=
+	t=1749067819; cv=none; b=RMmw2i0FZseRUkqN5MuosyU4IjemY68XSq0Wk1FD/yNpdmHaqrrsaH1zu/E9U5XIhwRMlJQ6UFCDCYYyiRh4EnoSRltxkqujsguMIdI2LTtPVPCnMOCoioLnPlyAEyUE4HaW4Eb4bU0ETo9lbi6VW+3eKg+rj/7lRfKSAHWbKVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749063499; c=relaxed/simple;
-	bh=eUnmTJwiF/5X4d8p1DufRVVsKor+rR4PUXMhQywg6OI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GjtdiC+75jwX6R0S9CTrDq26yGn8JzM4kjUvUrfHBt+i2Lq60XSs/1nf8ed1IA0STsShFKn8Ucq7F2Flqpo7BdVF8VdbYzg7ohhs7BdsyGk6AmCKroR/qua7HXZyQn4sJttD2FD/8WjUFVCa9yd9Nb3RsUoodNXHulbg9XhiV/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IK9enBNF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749067819; c=relaxed/simple;
+	bh=+FLkUpcT3PESJgNscr3x/ohUzN/uoff55tujHNikLec=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=UP5iLXIaSwpYfcjKmxDPhH7pfUkfbXVfPMOa4xIBfc5S3R5Uo4gjaplFQ7S6XEvtvSpLCWkJOpudj57uNBNDfttOVw3AV3GKO8jB1jLV1XSb79icWcTFldWlWnQSw2ZWyFUI1myXkNhqyXydgiblNJ0zVDDrNG2IyjR8GSNDNG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WV0dqYDV; arc=none smtp.client-ip=209.85.160.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IK9enBNF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E36AC4CEED;
-	Wed,  4 Jun 2025 18:58:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749063495;
-	bh=eUnmTJwiF/5X4d8p1DufRVVsKor+rR4PUXMhQywg6OI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IK9enBNF87alFNn+k+dH4Ax2tmd5j9/nWa8YVhDOQKJM1NmyrbQQJ9OlhNouN6QGY
-	 WdepCy5d5U05M3vbM4Za5h/leU36RfxGsHcD/NawkhyNvC2bIbTbmUUSiXuu7AT/Ev
-	 Pdo6Nreghv07ab46M3yH0g2vDntiH8LBJw0ZF5LIRlmc5HcRzichInMltm2BZJCfCg
-	 h1c5cWG9IXGuFr9nbSzyKGJJT7+WH5C7l8NBhOMpHPMPeXRA4GOx3fpoB8mCIwQg5m
-	 ess8EGmU+teEQauGUQbcHkw6vkPtqetSnlj/epkae/agWo9DaxuWVDKBM4NntMLA0W
-	 cs10mJcC8QCVQ==
-Received: from [149.88.19.236] (helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uMtJU-003Lvi-PG;
-	Wed, 04 Jun 2025 19:58:13 +0100
-Date: Wed, 04 Jun 2025 19:58:11 +0100
-Message-ID: <877c1re3lo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton
-	<oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: vcpu sysreg accessor rework
-In-Reply-To: <AD26CFBA-FE32-4C7D-A75B-53729B70C591@oracle.com>
-References: <20250603070824.1192795-1-maz@kernel.org>
-	<2264D21F-C28B-4523-9132-A53EB8ABFCF0@oracle.com>
-	<87bjr3edsr.wl-maz@kernel.org>
-	<AD26CFBA-FE32-4C7D-A75B-53729B70C591@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WV0dqYDV"
+Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-2d5723630a2so437078fac.2
+        for <kvmarm@lists.linux.dev>; Wed, 04 Jun 2025 13:10:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749067817; x=1749672617; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lHzQy57VH5Dlm3eWN9P8hBycQlEQ3v1q3yM5kgGsFF0=;
+        b=WV0dqYDVuCYsxH+YLDxSevxIGo6af181tELtTa/l5LVnqMqsWTSRSpHtw9XqgvalEi
+         SLBxPprHA55geUnha2t+BqDDByDUySWE/n1Zpc5ewVooJ0e0ByT56Okd4gCCedXkwAPi
+         p2EVIq9+CzuYmeDrha1Jpp0IoVRGeb3lcLmdJekyRdc6BC9rE3CzHRzNfPOetLFRdnOu
+         mDe5TPxCcCAKVc/0chOr0R1TIi4GG7QL2SaS/RH8dlfS5tuVx9Zn29OiK5WcVESDmROH
+         aMxrm5bYXgTbqlHosRFvKnrSmP28rZBGyEiwU1X8mdQCurGj5Mg5BBRI4iYxdrlL330z
+         IzBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749067817; x=1749672617;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lHzQy57VH5Dlm3eWN9P8hBycQlEQ3v1q3yM5kgGsFF0=;
+        b=V4pzxiMMwBHR9UNbtYlCDs/lWU620KWCtv7K3u2D2UllnS7Z7z3r21YaKXL8kcVOOl
+         U1pMBbc5mpSz2oMC32T6tP93FMhOPXmbG2ljCq68UyYEuR85EiC6sGSt/oZuuabCywH3
+         X9BgAE2RfXwwwgt5By1FHv4C/JSgRU37rFD5KdT4geBxT36vLoVMnB/2n3ETJi6MjTuq
+         NLRnPtQL5IyGNuvc4eAN8DOoDcRMWGS8oCFSWo0/NdudinpHqVqW0dRytPmTcBf/BkBo
+         UL1gAWtOjUOFE2Z4Y3WzTzwFvkbqHUyf4b0Sb0Y98tbHu3mfo7qQkT4u0udSZytk3U3m
+         8pWw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWDCMPHfT7zJQCYRIYntdkx3pvbWFckg3wOaWCq99UejVzzbfN6I5cRI+gs7MIH5PxHNfFpsc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzQbrvhuXeQppoNAuV8TEFl/o+/OJFdFVXdjpNG0Bf28bbD35ps
+	Z8l9zi1eGsRr9kakDBjYJR8J/UPv2JKYtwY27niuNJBfuKChxzdgzVVp0OHRhKdDOnyJhCNQjqL
+	6FwV8xVF+9LfzmuQZuFYEzFf0WQ==
+X-Google-Smtp-Source: AGHT+IGLogg78YRXI+ioMZ0+UVCCfd+jEelWcrdnbClXw8ZFThU177ehWe7bFnJXpvQmuVRW9orWyDUTziNbdD2zgw==
+X-Received: from oabgq6.prod.google.com ([2002:a05:6870:d906:b0:2b8:e735:4798])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6871:4387:b0:2b8:f595:2374 with SMTP id 586e51a60fabf-2e9bf502cc2mr2945734fac.36.1749067817128;
+ Wed, 04 Jun 2025 13:10:17 -0700 (PDT)
+Date: Wed, 04 Jun 2025 20:10:16 +0000
+In-Reply-To: <aD96rn78BSUDbEu1@linux.dev> (message from Oliver Upton on Tue, 3
+ Jun 2025 15:43:58 -0700)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 149.88.19.236
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+Message-ID: <gsnttt4v1d5j.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 00/17] ARM64 PMU Partitioning
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
+	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Wed, 04 Jun 2025 16:53:01 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
->=20
->=20
->=20
-> > On 4 Jun 2025, at 15:17, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > On Wed, 04 Jun 2025 11:47:57 +0100,
-> > Miguel Luis <miguel.luis@oracle.com> wrote:
-> >>=20
-> >> Hi Marc,
-> >>=20
-> >>> On 3 Jun 2025, at 07:08, Marc Zyngier <maz@kernel.org> wrote:
-> >>>=20
-> >>> This series tries to bring some sanity to the way the RESx masks
-> >>> are applied when accessing the in-memory view of the guest's
-> >>> system registers.
-> >>>=20
-> >>> Currently, we have *one* accessor (__vcpu_sys_reg()) that can either
-> >>> be used as a rvalue or lvalue while that applies the RESx masks behind
-> >>> the scenes. This works fine when used as a rvalue.
-> >>>=20
-> >>> However, when used as a lvalue, it does the wrong thing, as it only
-> >>> sanitises the value we're about to overwrite. This is pointless work
-> >>> and potentially hides bugs.
-> >>>=20
-> >>> I propose that we move to a set of store-specific accessors (for
-> >>> assignments and RMW) instead of the lvalue hack, ensuring that the
-> >>> assigned value is the one that gets sanitised. This then allows the=20
-> >>> legacy accessor to be converted to rvalue-only.
-> >>>=20
-> >>> Given the level of churn this introduces, I'd like this to land very
-> >>> early in the cycle. Either before 6.16-rc2, or early in 6.17.
-> >>>=20
-> >>=20
-> >> For the series:
-> >> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-> >=20
-> > Thanks.
-> >=20
-> >>=20
-> >> nit: the rmw accessor implies an implicit assignment which could be sp=
-ecified
-> >> within its macro instead but it's fine by me.
-> >=20
-> > I'm not sure what you mean. Looking at this macro again, the early
-> > writeback to the sysreg array is pretty unfortunate, and could be
-> > avoided.
-> >=20
-> > Does the following change address your concern? If not, please clearly
-> > point out what you're after.
->=20
-> I believe this should give a clearer idea while avoids repeating the assi=
-gnment everywhere
-> the accessor is used. Just replace =E2=80=98&=3D=E2=80=98 and =E2=80=98|=
-=3D=E2=80=98 by =E2=80=98&=E2=80=99 and =E2=80=98|=E2=80=99.
+Oliver Upton <oliver.upton@linux.dev> writes:
 
-I have the opposite view. I think the '=3D' sign conveys an important
-meaning, and hiding it makes things less obvious. If I had lost common
-sense and was writing C++ , I would have simply overloaded the various
-operators, retaining the existing syntax. This macro does the hard job
-of applying the RESx masks, but the operator is what is semantically
-significant.
+> On Mon, Jun 02, 2025 at 07:26:45PM +0000, Colton Lewis wrote:
+>> Caveats:
 
-Thanks,
+>> Because the most consistent and performant thing to do was untrap
+>> PMCR_EL0, the number of counters visible to the guest via PMCR_EL0.N
+>> is always equal to the value KVM sets for MDCR_EL2.HPMN. Previously
+>> allowed writes to PMCR_EL0.N via {GET,SET}_ONE_REG no longer affect
+>> the guest.
 
-	M.
+>> These improvements come at a cost to 7-35 new registers that must be
+>> swapped at every vcpu_load and vcpu_put if the feature is enabled. I
+>> have been informed KVM would like to avoid paying this cost when
+>> possible.
 
---=20
-Jazz isn't dead. It just smells funny.
+>> One solution is to make the trapping changes and context swapping lazy
+>> such that the trapping changes and context swapping only take place
+>> after the guest has actually accessed the PMU so guests that never
+>> access the PMU never pay the cost.
+
+> You should try and model this similar to how we manage the debug
+> breakpoints/watchpoints. In that case the debug register context is
+> loaded if either:
+
+>   (1) Self-hosted debug is actively in use by the guest, or
+
+>   (2) The guest has accessed a debug register since the last vcpu_load()
+
+Okay
+
+>> This is not done here because it is not crucial to the primary
+>> functionality and I thought review would be more productive as soon as
+>> I had something complete enough for reviewers to easily play with.
+
+>> However, this or any better ideas are on the table for inclusion in
+>> future re-rolls.
+
+> One of the other things that I'd like to see is if we can pare down the
+> amount of CPU feature dependencies for a partitioned PMU. Annoyingly,
+> there aren't a lot of machines out there with FEAT_FGT yet, and you
+> should be able to make all of this work in VHE + FEAT_PMUv3p1.
+
+> That "just" comes at the cost of extra traps (leaving TPM and
+> potentially TPMCR set). You can mitigate the cost of this by emulating
+> accesses in the fast path that don't need to go out to a kernel context
+> to be serviced. Same goes for requiring FEAT_HPMN0 to expose 0 event
+> counters, we can fall back to TPM traps if needed.
+
+> Taking perf out of the picture should still give you a significant
+> reduction vPMU overheads.
+
+Okay
+
+> Last thing, let's table guest support for FEAT_PMUv3_ICNTR for the time
+> being. Yes, it falls in the KVM-owned range, but we can just handle it
+> with a fine-grained undef for now. Once the core infrastructure has
+> landed upstream we can start layering new features into the partitioned
+> implementation.
+
+Sure
+
+> Thanks,
+> Oliver
