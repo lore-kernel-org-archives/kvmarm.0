@@ -1,184 +1,125 @@
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EF622D781
-	for <kvmarm@lists.linux.dev>; Wed,  4 Jun 2025 20:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5DB215787
+	for <kvmarm@lists.linux.dev>; Wed,  4 Jun 2025 20:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749067850; cv=none; b=U3Rc3ZCFWAmH0Obew7DYEUzoccErcxc7OvkuV8YZJ2qxCAMMDHFtfe5hiQQKuzu93TmnFDgpzePpTlLtEu05PrxQ2FlaxrbSUiQyKtVbIocHe0KJigIK/CbXnlBAGA6owvq8a6YclcCEWLT4/cFi+107Hu7YyhwMQwhJhgKHWP0=
+	t=1749067928; cv=none; b=tn1P683HfbB8sqaFJ9YaekJTcQcjs16Gt4G3/SBLCO0No4UTAnqHJsRFmKVVTl39g6Fr6MH13PIXLfApOeefiUE3oFHQMKzxiittJNGcNsku0MCDexOWy+niglFE1FsC8tOygcWqf7rUjwL7ipE9mXOlMOW2EucIfuP7XBzMdwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749067850; c=relaxed/simple;
-	bh=mS4fz7cgO9m1HSXc8SA6kSBVkdgVjgUeW9KFvTjpWvk=;
+	s=arc-20240116; t=1749067928; c=relaxed/simple;
+	bh=Yf/iHPu8H60AsxB9qOlBzBCZlW0/bPjuVXhfXOJSwAA=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=K8xdXe7kAN5s6v4RHP9mPdClb9NcJswXeWU0sdB3q+wcdW/vIYinzxasRxcdPihcoFO1MSWDBHe6ETeVZU16PgINBj9B2fb8T2thqOFpsH8qAPt1/amEYj+6Uv/a23flcHiP8o/xAldELcu7g/KxGND5xcQNJ+K81o8JRIkNtMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zdxkHL+R; arc=none smtp.client-ip=209.85.166.201
+	 Content-Type; b=I3WkncHn/RWpP8IJtECvs8Oh+jCS42VqVk9O7c7M+mfMfKZT9gHxbgGizYQ3MzZln/SsQmJUf7y8EWW7q1dSIHNF7QPUJVnNFK1NNdmM8yCqtbdr95ueXmqj3r1zocKLfb6MxFEZPksjyVQZ522RDnV0cQG4VKycL6VK7tIXsu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VogwEdpk; arc=none smtp.client-ip=209.85.160.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zdxkHL+R"
-Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3ddc65f95b8so3551325ab.3
-        for <kvmarm@lists.linux.dev>; Wed, 04 Jun 2025 13:10:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VogwEdpk"
+Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-2e8809bb584so322978fac.0
+        for <kvmarm@lists.linux.dev>; Wed, 04 Jun 2025 13:12:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749067848; x=1749672648; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1749067926; x=1749672726; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=l0gzEZMaKBz+geZl5pxHGq7kFzj0QyinBj1xrmpUWk4=;
-        b=zdxkHL+RY808gAfEF+39ffCHDLGlAmW5R8gi6igTUVRx4pP9HrMzKvlFDWD10Xo8c0
-         AWSVgoR7fC3c2pZaNeE/LAUitJjKrBa8lXrudJZ2R6VUEGdfYGdFEoa+jdhWWLgc8jtw
-         KmZ5FQFFD1sdgORCOIQ7sqhk9mop+4j0KXW76d41CqtnJwg06fyb+ERxORt6K/k/6wyM
-         6xSj4YWb/+eyfzcDzrZQiHRCxVUP1T91mp5M+kosg8i+qlHgy/qaEQ/HWAKBm7xmWsR2
-         F8ps0B0Hp0L79Sj971HzYbEKoprmvQhj1HnICaVqEsTXYgIYiytFFUwBxHyY9vCI2z4D
-         xYCQ==
+        bh=l2ZfRBtkCFUyGNfWWgvViMBCRTnEKTD5lF2sn5A9h8E=;
+        b=VogwEdpkfKvDr1LHQ8o0l825JHUyMD1EIXFJGcpZZmlGBhrZjq1JgRyL3kwKPR71Cz
+         I2mCS4syrcBAclQg/f8lH3DjKruz9l80mizX0+7SoCirjk9ix0ZugKOMV4v8tu8AopSR
+         6ITfsFY8zkhnaDAXqUVzyly3kiVaaaFjqDoMujulznlnxAs+9JcP0Io1iWrBmpAtfw9C
+         LpQh1eD6Qbq/0jwoOH4m9nrL2zT/HAv1Sj/FcvPB3Kqh+P1b6wnLI2ChVyWI+Li2WZfj
+         kq3Cw7W6S2B+q1W/pzOlriSfZynfl0+VIUKFuMY4cugUDB26FXRkBS11cbw7v3clDZZA
+         +UQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749067848; x=1749672648;
+        d=1e100.net; s=20230601; t=1749067926; x=1749672726;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l0gzEZMaKBz+geZl5pxHGq7kFzj0QyinBj1xrmpUWk4=;
-        b=J0+QmqmSdWaMZH2BncWmwMFoGrwnR6scpJ3DqKalC2L7w07rWjFLjT1bQTcQgXBeE+
-         xkQLFAaokw9JNXjDZLPTnc7Q0ybdYh5fQJfTQiRT7evpGO+Osu5L7Ms5NVhT0Pxt1dbL
-         z4t5RR9FuoxTvG4WirxClIDkRIeL5HxjdzK4tYNQfARlFEY5AN1XycgmvD7S6jht6xdX
-         JoIi1zePzNGK3euycMu4ghJpA/Lzh/pilqMvR9gJLxtkEyrOHzjXuv33znPx8b90KLai
-         0NLfHp13mB6P7IRYrG3SfvTdGTc8MT74yebzLh+uUX3UHdWERT9hrts1zYQPMrroWBEo
-         4/cA==
-X-Forwarded-Encrypted: i=1; AJvYcCVAwtk4mPLesRdLy4WjODuGXdO//YsJdzoYrDbUHSvkpP4v86gN7gx/3wwm0IlEx+KW/cVq/3Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyNwByZ0Z+IkyTBBmletmYcG4RleOZA7ys3B9yIExAhnG8MdvGo
-	K8VQxFAFJ/jUGpYSFnUVciEHuQe+IRBnJRh6ajiCnxsNVAqxgX9u2n5jkMiKkXKz1MpOHFMZIXp
-	26U2UGlk9Jlf7NI6K/sBqcZm/Ew==
-X-Google-Smtp-Source: AGHT+IEebJ+gdBmXEWqe1Fe3czqgQNBwW10WesxaqzS4IgnDmyZIhGpgkmk6gkpNi9jz//MbXeTmhCWS5OjtRGNtmg==
-X-Received: from ilfj26.prod.google.com ([2002:a05:6e02:221a:b0:3dd:7629:ec3a])
+        bh=l2ZfRBtkCFUyGNfWWgvViMBCRTnEKTD5lF2sn5A9h8E=;
+        b=p6xHZZ/nLmCscN3rYeUhpkrXdhz9Bk9XkBzdkGW1l3uMcgyAC444V73YIAmP19gEvs
+         6eR9uhsX2PLZl4Yp3zW7s/7rrxwDJ3Hl+gAKcpAH5QwvRt6sIWWNEaTVt7N/kEZ0h0Kz
+         XO91xHRDcTmKtz8HWjVxLQ+jgfp8xymFMs1ln/BuDRciJH7yoBDxc3KbSLMpH90ZbWsZ
+         DmjeEXXCtOUq/RNkb1bkqfy90Xl/FZcqyvbSsKpjdSdc9t2GnS9YMsJO9vbaO9mtHwtv
+         4dVWNtJ2+oDEfRePuGhse7rNBSrfcIlyLhkgP1fmB23HMQk60xouEe4MoHKuxFD8dkoB
+         bpRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWbrJhKIn/Rkoywx3sXO5MHoWJyBgmHi73hwBatSmd2kkUAK5KwD71eDf1lNtz4+YbPDjCuaY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxUC3Mx+1VGr6MM6iL/8T8QzpqrlXmuoE1578q7E9WVZ4l8NjMu
+	fFB9gE0/xA/faPJ+PlF1RUtViYXEBOnvK5wiXMZDgJg/ksGBfYIv7qIDCZx7VS2mjUQQgnB5xMJ
+	KtWsmoKZV7hd7fKp8To3XbyDz5w==
+X-Google-Smtp-Source: AGHT+IHnv4E1vDPP/ZiBUn0UZugjQZBj8858Crg/sw9WU1O9tNE8wE+e6qgJBHSzAxiHAj9ZIzvPLqoD1kotwzxLmg==
+X-Received: from oabfz25.prod.google.com ([2002:a05:6870:ed99:b0:2e9:175e:cff3])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:3e06:b0:3dc:87c7:a5b5 with SMTP id e9e14a558f8ab-3ddbfc344efmr50438865ab.3.1749067847917;
- Wed, 04 Jun 2025 13:10:47 -0700 (PDT)
-Date: Wed, 04 Jun 2025 20:10:47 +0000
-In-Reply-To: <aD91vp8QXdIjs1Nh@linux.dev> (message from Oliver Upton on Tue, 3
- Jun 2025 15:22:54 -0700)
+ 2002:a05:6871:e716:b0:2d4:e29d:5297 with SMTP id 586e51a60fabf-2e9bfbe153emr3220979fac.29.1749067926258;
+ Wed, 04 Jun 2025 13:12:06 -0700 (PDT)
+Date: Wed, 04 Jun 2025 20:12:05 +0000
+In-Reply-To: <gsnt1ps033ch.fsf@coltonlewis-kvm.c.googlers.com> (message from
+ Colton Lewis on Tue, 03 Jun 2025 21:46:54 +0000)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsntqzzz1d4o.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 10/17] KVM: arm64: Writethrough trapped PMEVTYPER register
+Message-ID: <gsntplfj1d2i.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 16/17] KVM: arm64: Add ioctl to partition the PMU when supported
 From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+To: Colton Lewis <coltonlewis@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, 
+	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
+	will@kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
 	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, 
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+> Oliver Upton <oliver.upton@linux.dev> writes:
 
-> On Mon, Jun 02, 2025 at 07:26:55PM +0000, Colton Lewis wrote:
->> With FGT in place, the remaining trapped registers need to be written
->> through to the underlying physical registers as well as the virtual
->> ones. Failing to do this means delaying when guest writes take effect.
+>> On Mon, Jun 02, 2025 at 07:27:01PM +0000, Colton Lewis wrote:
+>>> +	case KVM_ARM_PARTITION_PMU: {
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>   arch/arm64/kvm/sys_regs.c | 27 +++++++++++++++++++++++++--
->>   1 file changed, 25 insertions(+), 2 deletions(-)
+>> This should be a vCPU attribute similar to the other PMUv3 controls we
+>> already have. Ideally a single attribute where userspace tells us it
+>> wants paritioning and specifies the PMU ID to use. None of this can be
+>> changed after INIT'ing the PMU.
 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index d368eeb4f88e..afd06400429a 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -18,6 +18,7 @@
->>   #include <linux/printk.h>
->>   #include <linux/uaccess.h>
->>   #include <linux/irqchip/arm-gic-v3.h>
->> +#include <linux/perf/arm_pmu.h>
->>   #include <linux/perf/arm_pmuv3.h>
+> Okay
 
->>   #include <asm/arm_pmuv3.h>
->> @@ -942,7 +943,11 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu  
->> *vcpu, u64 idx)
->>   {
->>   	u64 pmcr, val;
+>>> +		struct arm_pmu *pmu;
+>>> +		u8 host_counters;
+>>> +
+>>> +		if (unlikely(!kvm_vcpu_initialized(vcpu)))
+>>> +			return -ENOEXEC;
+>>> +
+>>> +		if (!kvm_pmu_partition_supported())
+>>> +			return -EPERM;
+>>> +
+>>> +		if (copy_from_user(&host_counters, argp, sizeof(host_counters)))
+>>> +			return -EFAULT;
+>>> +
+>>> +		pmu = vcpu->kvm->arch.arm_pmu;
+>>> +		return kvm_pmu_partition(pmu, host_counters);
 
->> -	pmcr = kvm_vcpu_read_pmcr(vcpu);
->> +	if (kvm_vcpu_pmu_is_partitioned(vcpu))
->> +		pmcr = read_pmcr();
+>> Yeah, we really can't be changing the counters available to the ARM PMU
+>> driver at this point. What happens to host events already scheduled on
+>> the CPU?
 
-> Reading PMCR_EL0 from EL2 is not going to have the desired effect.
-> PMCR_EL0.N only returns HPMN when read from the guest.
+> Okay. I remember talking about this before.
 
-Okay. I'll change that.
+>> Either the partition of host / KVM-owned counters needs to be computed
+>> up front (prior to scheduling events) or KVM needs a way to direct perf
+>> to reschedule events on the PMU based on the new operating constraints.
 
->> +	else
->> +		pmcr = kvm_vcpu_read_pmcr(vcpu);
->> +
->>   	val = FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
->>   	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
->>   		kvm_inject_undefined(vcpu);
->> @@ -1037,6 +1042,22 @@ static bool access_pmu_evcntr(struct kvm_vcpu  
->> *vcpu,
->>   	return true;
->>   }
+> Yes. I will think about it.
 
->> +static void writethrough_pmevtyper(struct kvm_vcpu *vcpu, struct  
->> sys_reg_params *p,
->> +				   u64 reg, u64 idx)
->> +{
->> +	u64 evmask = kvm_pmu_evtyper_mask(vcpu->kvm);
->> +	u64 val = p->regval & evmask;
->> +
->> +	__vcpu_sys_reg(vcpu, reg) = val;
->> +
->> +	if (idx == ARMV8_PMU_CYCLE_IDX)
->> +		write_pmccfiltr(val);
->> +	else if (idx == ARMV8_PMU_INSTR_IDX)
->> +		write_pmicfiltr(val);
->> +	else
->> +		write_pmevtypern(idx, val);
->> +}
->> +
+It would be cool to have perf reschedule events. I'm not positive how to
+do that, but it looks not too hard. Can someone comment on the
+correctness and feasibility here?
 
-> How are you preventing the VM from configuring an event counter to count
-> at EL2?
+1. Scan perf events and call event_sched_out on all events using the
+    counters KVM wants.
+2. Do the PMU surgery to change the available counters.
+3. Call ctx_resched to reschedule events with the available counters.
 
-I had thought that's what kvm_pmu_evtyper_mask() did since masking with
-that is what kvm_pmu_set_counter_event_type() writes to the vCPU register.
-
-> I see that you're setting MDCR_EL2.HPMD (which assumes FEAT_PMUv3p1) but
-> due to an architecture bug there's no control to prohibit the cycle
-> counter until FEAT_PMUv3p5 (MDCR_EL2.HCCD).
-
-I'll fix that.
-
-> Since you're already trapping PMCCFILTR you could potentially configure
-> the hardware value in such a way that it filters EL2.
-
-Sure.
-
->>   static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct  
->> sys_reg_params *p,
->>   			       const struct sys_reg_desc *r)
->>   {
->> @@ -1063,7 +1084,9 @@ static bool access_pmu_evtyper(struct kvm_vcpu  
->> *vcpu, struct sys_reg_params *p,
->>   	if (!pmu_counter_idx_valid(vcpu, idx))
->>   		return false;
-
->> -	if (p->is_write) {
->> +	if (kvm_vcpu_pmu_is_partitioned(vcpu) && p->is_write) {
->> +		writethrough_pmevtyper(vcpu, p, reg, idx);
-
-> What about the vPMU event filter?
-
-I'll check that too.
-
->> +	} else if (p->is_write) {
->>   		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
->>   		kvm_vcpu_pmu_restore_guest(vcpu);
->>   	} else {
->> --
->> 2.49.0.1204.g71687c7c1d-goog
-
-
-> Thanks,
-> Oliver
+There is a second option to avoid a permanent partition up front. We
+know which counters are in use through used_mask. We could check if the
+partition would claim any counters in use and fail with an error if it
+would.
