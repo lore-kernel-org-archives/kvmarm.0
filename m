@@ -1,53 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DAA1917D0
-	for <kvmarm@lists.linux.dev>; Wed,  4 Jun 2025 15:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9036B18B47E;
+	Wed,  4 Jun 2025 15:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749050281; cv=none; b=k6GpzmoZmrsBpAi4/KA1Hxeu/qitunuO8y/ZTRxm3zIf19WN1gt+6C9KjWtSo7ObfAwgJ+3rtLOWBdCTlockWYXs70Hn9pYFn5r1Y3Z8OvhSCP8MjSnIHEsQmL86gCsi2im67Osc6IzzJ8wCT/R9K/NHcjMV0MVTEbwKl86OWPE=
+	t=1749051075; cv=none; b=iLI3RX8bbplynwN+frUr33S8gqJuSqjBmTz3tC6YgQia1L9NEwx92A6k53aOC6tjkJKFdnOqFuNBDnyiXaU0/GpGdYzzHE+KLSLQAqU+KzLb2tPkx55Foq7ezOdPzOxlfttWZ94iBqs/qPsBwJvwmCUI7T8m1loYWEWuHcylzow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749050281; c=relaxed/simple;
-	bh=xD1KpN3NFnTFtqrapuhJVN0NufwIbEVuXgGuab0veIQ=;
+	s=arc-20240116; t=1749051075; c=relaxed/simple;
+	bh=xjwQ85hYcU1ZrPH6YnswDzMKpczKMUcTOpAQm5SeA+8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oawlcHeKQwJjHoBB12Jmx4IgEnw5l5zUTUES5l5dtuO0luMBJyF8VTwq9ueyeivDgGpONd8vF7KKgxfTOI8yvoHCG/04mHzdPfcd2EgM766RChrDTFHTTRWjYcDLwQhpu47oUYLo/GpEx00j41lJoAtlOwAz7RfrLkNrzujTz9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntMESso9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=XpmkHcqmtthetSrGinZLCXtNTJilwv4M9Ux2Xxez1XP5Ii80DRlXz40BvuifTmR9yYQxtysQm9wIu6S/1TmQ5v7AHeJ9BYj7AllIeA0uleuMSmML+ej/sR+Nod9YwOiUXpRxT/4gBdH/Bpo3tNTULs01Kt73vG3s89K3gl3dYM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RFZ1SKoC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntMESso9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BD57C4CEE4;
-	Wed,  4 Jun 2025 15:18:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RFZ1SKoC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECB9DC4CEE4;
+	Wed,  4 Jun 2025 15:31:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749050281;
-	bh=xD1KpN3NFnTFtqrapuhJVN0NufwIbEVuXgGuab0veIQ=;
+	s=k20201202; t=1749051074;
+	bh=xjwQ85hYcU1ZrPH6YnswDzMKpczKMUcTOpAQm5SeA+8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ntMESso9CJ0GSafJYxvNm8BI8FRxSZUoGrukBT7IcbxhyG0aO81pOPjvx4LXNmaV/
-	 P3gINQh7B+msycKa+el7GWmhwwPfgPjWkNWbUpygnTaKSWC2mL99h+sFKiy+h/8tfP
-	 H50t4iHGUFfYUebwk+eibLJQBjXGZn+3NHe/BZN4GYGkesDyCWP2bIM3XVFPPVpXcp
-	 I+41Ja/AyuZtUPXNBbPcoBnwsXipXLqnkABKjWPR9dezmpZN9QclcbJhwmf56FJNnx
-	 XnIpKNYhqN+fah0Bet+BlsPyDL6E9uwvS5EnJkV1CV8Ct7t5HKiONPONFNHyRea4Yr
-	 Vp9h/eicuw8ig==
+	b=RFZ1SKoCh5NLJ8Hir4XT3wS2hpvE9PKPaoXUwqK6A8Y6cyWPWxoiDHP0B3g97Ezw2
+	 oHmbFqVnwwa+1BujyqnxsP0HYVzTaaMYo6TvJmShbXRzO+7+74vAELoOyv7PXZfuuE
+	 vt8jqfGmV1yKX96vfbSYofPX1rrlrfdapV5NS/Q9kHfzwJkebOYVcgEkUqSvslFs+P
+	 qRMsf01mcU1aGfLgFUgwkHhPDv1PbR2dnAGoC4JMZ/2/DoRmTpjTQvOwvN9RywAc3o
+	 6IFzqzEnCBgdXkssXygB6MpnW+faE9oMjEnP1y9MXt03hRF5mZd6hxekaJkATa9hr4
+	 fyxQftlHoBWTQ==
 Received: from [149.88.19.236] (helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uMpsL-003Flv-TW;
-	Wed, 04 Jun 2025 16:17:58 +0100
-Date: Wed, 04 Jun 2025 16:17:56 +0100
-Message-ID: <87bjr3edsr.wl-maz@kernel.org>
+	id 1uMq59-003Fww-Fx;
+	Wed, 04 Jun 2025 16:31:11 +0100
+Date: Wed, 04 Jun 2025 16:31:08 +0100
+Message-ID: <87a56ned6r.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
+To: James Clark <james.clark@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton
-	<oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: vcpu sysreg accessor rework
-In-Reply-To: <2264D21F-C28B-4523-9132-A53EB8ABFCF0@oracle.com>
-References: <20250603070824.1192795-1-maz@kernel.org>
-	<2264D21F-C28B-4523-9132-A53EB8ABFCF0@oracle.com>
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 06/11] KVM: arm64: Add trap configs for PMSDSFR_EL1
+In-Reply-To: <2fb1965b-bef9-4a8e-a1c7-c8a77d957b23@linaro.org>
+References: <20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org>
+	<20250529-james-perf-feat_spe_eft-v2-6-a01a9baad06a@linaro.org>
+	<867c1ze4pg.wl-maz@kernel.org>
+	<2fb1965b-bef9-4a8e-a1c7-c8a77d957b23@linaro.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,70 +75,120 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 149.88.19.236
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: james.clark@linaro.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 04 Jun 2025 11:47:57 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
+On Tue, 03 Jun 2025 10:50:23 +0100,
+James Clark <james.clark@linaro.org> wrote:
 > 
-> Hi Marc,
 > 
-> > On 3 Jun 2025, at 07:08, Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On 29/05/2025 5:56 pm, Marc Zyngier wrote:
+> > On Thu, 29 May 2025 12:30:27 +0100,
+> > James Clark <james.clark@linaro.org> wrote:
+> >> 
+> >> SPE data source filtering (SPE_FEAT_FDS) adds a new register
+> >> PMSDSFR_EL1, add the trap configs for it.
+> >> 
+> >> Signed-off-by: James Clark <james.clark@linaro.org>
+> >> ---
+> >>   arch/arm64/kvm/emulate-nested.c | 1 +
+> >>   arch/arm64/kvm/sys_regs.c       | 1 +
+> >>   2 files changed, 2 insertions(+)
+> >> 
+> >> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> >> index 0fcfcc0478f9..05d3e6b93ae9 100644
+> >> --- a/arch/arm64/kvm/emulate-nested.c
+> >> +++ b/arch/arm64/kvm/emulate-nested.c
+> >> @@ -1169,6 +1169,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+> >>   	SR_TRAP(SYS_PMSIRR_EL1,		CGT_MDCR_TPMS),
+> >>   	SR_TRAP(SYS_PMSLATFR_EL1,	CGT_MDCR_TPMS),
+> >>   	SR_TRAP(SYS_PMSNEVFR_EL1,	CGT_MDCR_TPMS),
+> >> +	SR_TRAP(SYS_PMSDSFR_EL1,	CGT_MDCR_TPMS),
+> >>   	SR_TRAP(SYS_TRFCR_EL1,		CGT_MDCR_TTRF),
+> >>   	SR_TRAP(SYS_TRBBASER_EL1,	CGT_MDCR_E2TB),
+> >>   	SR_TRAP(SYS_TRBLIMITR_EL1,	CGT_MDCR_E2TB),
+> >> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> >> index 5dde9285afc8..9f544ac7b5a6 100644
+> >> --- a/arch/arm64/kvm/sys_regs.c
+> >> +++ b/arch/arm64/kvm/sys_regs.c
+> >> @@ -2956,6 +2956,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >>   	{ SYS_DESC(SYS_PMBLIMITR_EL1), undef_access },
+> >>   	{ SYS_DESC(SYS_PMBPTR_EL1), undef_access },
+> >>   	{ SYS_DESC(SYS_PMBSR_EL1), undef_access },
+> >> +	{ SYS_DESC(SYS_PMSDSFR_EL1), undef_access },
 > > 
-> > This series tries to bring some sanity to the way the RESx masks
-> > are applied when accessing the in-memory view of the guest's
-> > system registers.
+> > PMSDSFR_EL1 has an offset in the VNCR page (0x858), and must be
+> > described as such. This is equally true for a bunch of other
+> > SPE-related registers, so you might as well fix those while you're at
+> > it.
 > > 
-> > Currently, we have *one* accessor (__vcpu_sys_reg()) that can either
-> > be used as a rvalue or lvalue while that applies the RESx masks behind
-> > the scenes. This works fine when used as a rvalue.
+> > Thanks,
 > > 
-> > However, when used as a lvalue, it does the wrong thing, as it only
-> > sanitises the value we're about to overwrite. This is pointless work
-> > and potentially hides bugs.
-> > 
-> > I propose that we move to a set of store-specific accessors (for
-> > assignments and RMW) instead of the lvalue hack, ensuring that the
-> > assigned value is the one that gets sanitised. This then allows the 
-> > legacy accessor to be converted to rvalue-only.
-> > 
-> > Given the level of churn this introduces, I'd like this to land very
-> > early in the cycle. Either before 6.16-rc2, or early in 6.17.
+> > 	M.
 > > 
 > 
-> For the series:
-> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-
-Thanks.
-
+> I got a bit stuck with what that would look like with registers that
+> are only undef in case there was something that I missed, but do I
+> just document the offsets?
 > 
-> nit: the rmw accessor implies an implicit assignment which could be specified
-> within its macro instead but it's fine by me.
+> +++ b/arch/arm64/include/asm/vncr_mapping.h
+> @@ -87,6 +87,8 @@
+>  #define VNCR_PMSICR_EL1         0x838
+>  #define VNCR_PMSIRR_EL1         0x840
+>  #define VNCR_PMSLATFR_EL1       0x848
+> +#define VNCR_PMSNEVFR_EL1       0x850
+> +#define VNCR_PMSDSFR_EL1        0x858
+>
 
-I'm not sure what you mean. Looking at this macro again, the early
-writeback to the sysreg array is pretty unfortunate, and could be
-avoided.
+This should be enough.
 
-Does the following change address your concern? If not, please clearly
-point out what you're after.
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -596,6 +596,16 @@ enum vcpu_sysreg {
+>         VNCR(ICH_HCR_EL2),
+>         VNCR(ICH_VMCR_EL2),
+> 
+> +       /* SPE Registers */
+> +       VNCR(PMBLIMITR_EL1),
+> +       VNCR(PMBPTR_EL1),
+> +       VNCR(PMBSR_EL1),
+> +       VNCR(PMSCR_EL1),
+> +       VNCR(PMSEVFR_EL1),
+> +       VNCR(PMSICR_EL1),
+> +       VNCR(PMSIRR_EL1),
+> +       VNCR(PMSLATFR_EL1),
+
+I don't see a point in having those until we actually have SPE support
+for guests, if ever, as these will potentially increase the size of
+the vcpu sysreg array for no good reason.
+
+> And then sys_reg_descs[] remain as "{ SYS_DESC(SYS_PMBLIMITR_EL1),
+> undef_access }," rather than EL2_REG_VNCR() because we don't actually
+> want to change to bad_vncr_trap()?
+
+This seem OK for now. We may want to refine this in the future though,
+as these registers cannot trap when NV is enabled. Yes, this is a bug
+in the architecture.
+
+> There are some other parts about fine grained traps and res0 bits for
+> NV, but they all already look to be setup correctly. Except
+> HDFGRTR2_EL2.nPMSDSFR_EL1, but it's inverted, none of the FGT2 traps
+> are configured currently and PMSDSFR_EL1 is already trapped by
+> MDCR_EL2 anyway.
+
+Can you elaborate on that? We have:
+
+	SR_FGT(SYS_PMSDSFR_EL1,		HDFGRTR2, nPMSDSFR_EL1, 0),
+
+which seems to match the spec.
+
+We also have full support for FEAT_FGT2 already (even if we have no
+support for the stuff they trap).
+
+Thanks,
 
 	M.
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index b4ac2f515f94..382b382d14da 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1121,7 +1121,8 @@ u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *, enum vcpu_sysreg, u64);
- #define __vcpu_rmw_sys_reg(v, r, op, val)				\
- 	do {								\
- 		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
--		u64 __v = ctxt_sys_reg(ctxt, (r)) op (val);		\
-+		u64 __v = ctxt_sys_reg(ctxt, (r));			\
-+		__v op (val);						\
- 		if (vcpu_has_nv((v)) && (r) >= __SANITISED_REG_START__)	\
- 			__v = kvm_vcpu_apply_reg_masks((v), (r), __v);	\
- 									\
 
 -- 
 Jazz isn't dead. It just smells funny.
