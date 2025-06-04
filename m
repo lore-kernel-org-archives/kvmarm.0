@@ -1,54 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7152A2B9A9
-	for <kvmarm@lists.linux.dev>; Wed,  4 Jun 2025 06:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38B4238166
+	for <kvmarm@lists.linux.dev>; Wed,  4 Jun 2025 06:54:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749019932; cv=none; b=aBkUNx1J/BN4RBjH0fnLL+eoh6hLDiyAKJoOsIOyTDt5FN65T5xwdrtbCC0YWmJNCMt85Gw5JMimIbJlCVImJ9Jgpq9NGDMWDWYMyC4evB6tBtypG2w4j7mwnfyGtyTRe1eoCFqQAtlQQHxyAul8JloxVlB+Z4UZxlG0o6WUjbM=
+	t=1749020100; cv=none; b=WJQKIl/1VoOxuQGKvQ02svq5Ly3riobU2v1L4zLLKhnKF3s8XIHcP0SkYnN+yRAn/3RpIDmd6LRdlNiGqPqWZ8Ts/67QAlVJw2jsK5hpBxZsToNlvr+KvvUcJfwGC9SvLoBLQYJ33e70bHYRuqqraFlg3IztO+JsP5qI0sJHsMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749019932; c=relaxed/simple;
-	bh=5KeFKazHO/RDTwQDMbsuVfCpSFTYFiD5R/uZirrpxkY=;
+	s=arc-20240116; t=1749020100; c=relaxed/simple;
+	bh=FWpdcjiy6UtflQwkZexf4d0V3CaS7JiXW1hDgpjYlNE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BFpHbWsFC0DBPQuAuhfBabCL0F4oDxaBAwvS6kdiTUnIg8uZwbEFKS2kiIWnXJgohsw3vdos/prZ4xOC47/aLVu0pZQQJywbTmWPJnm4/BiPfwWcym29Gc29db6OQkczI4DaALRyZ1/oFmvECvTv2zMu0sZxJaotU1bmz97c98Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pWLjssjW; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FIgdTd5c3sElfjoWxrC1PMGLIQOTvw6JsKahgAvgaJYSY6NSGlzqeFpU1ApPPC1Ny9MSFZWe5IWiYCyQarTmb4rROFIMEQdo9P3uswZExqQZIPHGLczjbMqdKaI3lyhd+42olbtOTwLvryN97+m7/IjqmAqTQ/ZoeVi7CAmG0bA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B9Zo22sG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pWLjssjW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6B90C4CEE7;
-	Wed,  4 Jun 2025 06:52:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B9Zo22sG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E253C4CEED;
+	Wed,  4 Jun 2025 06:54:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749019929;
-	bh=5KeFKazHO/RDTwQDMbsuVfCpSFTYFiD5R/uZirrpxkY=;
+	s=k20201202; t=1749020099;
+	bh=FWpdcjiy6UtflQwkZexf4d0V3CaS7JiXW1hDgpjYlNE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pWLjssjWhc5BhlTOpqxa7mY0ESCuLngkoIOaDwKKUF1z06qvZBib37tGuLFweC27Q
-	 JdRwa/c+AwIIclQ9hSAyT7L7F0WJNM0AkWQ6MoyLN5kKLwl5rzhtUoNjRLUziSiHkH
-	 X35Y3xyRO4kQ9EfuUgCAMMsfUuUfyWOM7EbR87Icf0CjA/V8Xk3jDBnZg6xI5oUlpU
-	 YBHUX35NW0yacBHq4MnD0U7y9k43+i8LLvWhfwcTIzrn+gwmOGwe2rheDu2/Ubqkhq
-	 q1GEP5XTFC3rSK4GTD5u2GUnJQorgKNJmHYxSTjD5T/Q4gfrcgIJSX58SKnQQ+CZ3Y
-	 8kxHJVi4vrKQQ==
+	b=B9Zo22sGVsRAVhwQZyQJ3DldIKuL47yphEm5CWQcI9dzYgU8YmcYHQx8cRtooTRrp
+	 vxVxUePmvu/dCcNtXWkyArI9q9Zvw0uPqmXTp2YnN99MTVmPB5aYyNcxuiUjrTibv9
+	 S5R60+Yx1PkCvlcPNLR7nWzncVFO0/ptcxyYMQGRlnGdJcOMMLzsRdSCQwlggqTYVb
+	 Ybz+gNDh4CDEo8snZYfyyuSfdWhmhZxCor5kDcut/Rq78pyvxZYC3nQ4TF8IUEqMus
+	 8gg5ZEMEx3pJStdpXizLKQmu9XmpYZjoRNf/k72MSTl+PoYFeNiLpTO71Hnw7MZ/K3
+	 UPzbVcmhKF36g==
 Received: from [149.88.19.236] (helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uMhyp-0038Yq-88;
-	Wed, 04 Jun 2025 07:52:07 +0100
-Date: Wed, 04 Jun 2025 07:52:05 +0100
-Message-ID: <87ecw0dmne.wl-maz@kernel.org>
+	id 1uMi1Y-0038cW-Ov;
+	Wed, 04 Jun 2025 07:54:57 +0100
+Date: Wed, 04 Jun 2025 07:54:55 +0100
+Message-ID: <87cybkdmio.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton
-	<oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Add assignment-specific sysreg accessor
-In-Reply-To: <84553621-E2B8-47A0-A812-FE273505ED47@oracle.com>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: vcpu sysreg accessor rework
+In-Reply-To: <aD9isAgEuvPL02ER@linux.dev>
 References: <20250603070824.1192795-1-maz@kernel.org>
-	<20250603070824.1192795-2-maz@kernel.org>
-	<84553621-E2B8-47A0-A812-FE273505ED47@oracle.com>
+	<aD9isAgEuvPL02ER@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,76 +56,49 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 149.88.19.236
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 03 Jun 2025 19:01:34 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
+On Tue, 03 Jun 2025 22:06:27 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hi Marc,
+> On Tue, Jun 03, 2025 at 08:08:20AM +0100, Marc Zyngier wrote:
+> > This series tries to bring some sanity to the way the RESx masks
+> > are applied when accessing the in-memory view of the guest's
+> > system registers.
+> > 
+> > Currently, we have *one* accessor (__vcpu_sys_reg()) that can either
+> > be used as a rvalue or lvalue while that applies the RESx masks behind
+> > the scenes. This works fine when used as a rvalue.
+> > 
+> > However, when used as a lvalue, it does the wrong thing, as it only
+> > sanitises the value we're about to overwrite. This is pointless work
+> > and potentially hides bugs.
+> > 
+> > I propose that we move to a set of store-specific accessors (for
+> > assignments and RMW) instead of the lvalue hack, ensuring that the
+> > assigned value is the one that gets sanitised. This then allows the 
+> > legacy accessor to be converted to rvalue-only.
 > 
-> > On 3 Jun 2025, at 07:08, Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > Assigning a value to a system register doesn't do what it is
-> > supposed to be doing if that register is one that has RESx bits.
-> > 
-> > The main problem is that we use __vcpu_sys_reg(), which can be used
-> > both as a lvalue and rvalue. When used as a lvalue, the bit masking
-> > occurs *before* the new value is assigned, meaning that we (1) do
-> > pointless work on the old cvalue, and (2) potentially assign an
-> > invalid value as we fail to apply the masks to it.
-> > 
-> > Fix this by providing a new __vcpu_assign_sys_reg() that does
-> > what it says on the tin, and sanitises the *new* value instead of
-> > the old one. This comes with a significant amount of churn.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> > arch/arm64/include/asm/kvm_host.h          | 11 ++++++
-> > arch/arm64/kvm/arch_timer.c                | 16 ++++----
-> > arch/arm64/kvm/hyp/exception.c             |  4 +-
-> > arch/arm64/kvm/hyp/include/hyp/switch.h    |  4 +-
-> > arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  6 +--
-> > arch/arm64/kvm/hyp/nvhe/hyp-main.c         |  4 +-
-> > arch/arm64/kvm/hyp/vhe/switch.c            |  4 +-
-> > arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 44 +++++++++++-----------
-> > arch/arm64/kvm/pmu-emul.c                  | 14 +++----
-> > arch/arm64/kvm/sys_regs.c                  | 38 ++++++++++---------
-> > arch/arm64/kvm/sys_regs.h                  |  4 +-
-> > arch/arm64/kvm/vgic/vgic-v3-nested.c       | 10 ++---
-> > 12 files changed, 86 insertions(+), 73 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index d941abc6b5eef..3b84ad91116b4 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1107,6 +1107,17 @@ static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
-> > #define ctxt_sys_reg(c,r) (*__ctxt_sys_reg(c,r))
-> > 
-> > u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *, enum vcpu_sysreg, u64);
-> > +
-> > +#define __vcpu_assign_sys_reg(v, r, val) \
-> > + do { \
-> > + const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt; \
-> > + u64 __v = (val); \
-> > + if (vcpu_has_nv((v)) && (r) >= __SANITISED_REG_START__) \
+> Very happy with how this is shaping up.
 > 
-> Would it make sense to make it more strict by testing < NR_SYS_REGS too?
+> > Given the level of churn this introduces, I'd like this to land very
+> > early in the cycle. Either before 6.16-rc2, or early in 6.17.
+> 
+> What's your mood on sneaking this in as a fix for 6.16? It'd fix the
+> unmasked write bug you mention and hopefully give a semi-stable / early
+> base for building the 6.17 content on top off.
 
-It is important to notice that you don't pass random integers here.
-You pass something that is of an enum type, for which the maximum
-value is NR_SYS_REGS. So as long as you pass a literal value, you're
-100% safe. If you pass a constant value that goes over the limit, you
-will hit the *existing* BUILD_BUG_ON().
+I'm absolutely in favour of taking this in ASAP. The impact should be
+minimal for new code (and trivial to fix). I'll send this to Paolo by
+the end of the week, or early next week at the latest.
 
-You could fall into a trap by iterating over a base value and going
-over the limit. But your check will only catch you going over the
-array, and not the state corruption you will have introduced.
+> Otherwise this will be the very first thing I take for 6.17.
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-Finally, this is performance critical code, and I'd rather not add
-extra checks that will only be a burden at runtime. If you want to
-catch these overflows, using KASAN+UBSAN makes a lot more sense.
+Thanks!
 
 	M.
 
