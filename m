@@ -1,242 +1,181 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC66A33062
-	for <kvmarm@lists.linux.dev>; Thu,  5 Jun 2025 17:45:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4EF17A317
+	for <kvmarm@lists.linux.dev>; Thu,  5 Jun 2025 18:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749145549; cv=none; b=U+534X1Ix0U07IAIakvdgzgKqXN1rxDEGoWFNwCxArSA4cWarQhCemCmNuyf9MbYUyacnKUjzW87teU+IwPkdtMzcyyvHwbetiAOmGWFoDxTK74A+l5pJNCFDM09U4+yzQrkbCQRBhDKGcIh7wM6VTAYmkkuVulz43jUa48xoK8=
+	t=1749148233; cv=none; b=rxx+qZkTdSN5fiAf7BqOcFJwJ1dZ4H9wIYJ8fv+RTsnKgFCFV4m3qztrtTPTgCGsLSE6+oF+Bq/s2SLBUX6joCnOI2jFUquRYwlN2kapvMjLYciKPYRiNdBFk5ta9PQN9RzrQjgy96KYdryEuptt8iTBUESnAlfUvOWUO/BDGB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749145549; c=relaxed/simple;
-	bh=QNdCnJVKmdKzShkyLqXCnZNWAkyA+YMxWaf2KFWA+qE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DZdkyxBCXgZTpRVa7ihcPCCyO94mwuF00tX8pn0EupBcUwE8wkSp01oR8kxRSZmOFVF2zDVHbF+eDXC+/DdrJxMvFUSIHQ7t2716cf/ybOhSHgmV0DzGSq2l6ii8FzjTmjS7OtlHGDk9Jjpc1JvVkqzTkAqDC+cbY+/skTVlPKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BVc/VDLE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749148233; c=relaxed/simple;
+	bh=LnyQlmsP5i9Gpf9tYX7BjcukxJuRTi2gzqGvRKTWTn0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ji9thxZGWMacYqc3Gj6P1Ky8uBkTU5t1QT8gUQX9DFr8lmKqeduPoADACKJbN89PmfmEXOTUCDvH/21Lc6i6lopsahahtQhCNz2QonnFL/MA0V+1M/nK3+v61IxThfs9mmhfyyHvLEXWV4MLdlX1W4XUQjLYBGql2RLHrDOKDd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B6JQRqhL; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BVc/VDLE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749145546;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=h/OOspH5zhhxCEC7+N2bDLLvPNO31+FMMfFv0bTShZg=;
-	b=BVc/VDLERgLAyA1Q1hPN1ukM6531pg3L9A311SRq+wXaHgJzORIFFRRSfe229yB3FGU+KO
-	U1uw6rO6l9AVzTO67065BtidFqc1oJgNDHsIG/xojl7oQCFlgGI/nMhvi5GjwfTQwTc9hU
-	F9AofC7IE3vjCAGsmPHd9JrJMamMUPA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-u-M6S4UQMe27flKvENv0uw-1; Thu, 05 Jun 2025 13:45:45 -0400
-X-MC-Unique: u-M6S4UQMe27flKvENv0uw-1
-X-Mimecast-MFC-AGG-ID: u-M6S4UQMe27flKvENv0uw_1749145544
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-442dc702850so7834385e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 05 Jun 2025 10:45:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B6JQRqhL"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4a58197794eso35051cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 05 Jun 2025 11:30:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749148231; x=1749753031; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4HrdqA/k41LxSYTdKh0OWWXzlPloxAg6qTNcrag1JWY=;
+        b=B6JQRqhLmoE7IfTjMDUoEyQ4KfSaDD0Iz6NX1D8zoDsM9i6uKuuZeh2z9t8QcoRc1t
+         rZkiODPx43sFDpwDTVUMbPu8XNXmzF4wHX3S3t1QIrn/Wz382ZiaLtDshg7KpnLo+vGj
+         Q9NfHVm5ijSvV7bbihwn1X1OIH7v1qdZP+PQwlESh/3fAUqF3q9TmbjzRL2OtVgEKlXk
+         UGm0hNjM/FFohsk4d1VlOQbv5HXChr5PZ67P/KCb/iKQDXgTvy88/KT3MAsBDbdIXCWF
+         6BlYq6M4P8p7htq/mDMKR3tTIZu2w5CPZRYmF/WNEBFDAp8P5sOsIQGITwX9rVYrJwjg
+         OlHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749145544; x=1749750344;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=h/OOspH5zhhxCEC7+N2bDLLvPNO31+FMMfFv0bTShZg=;
-        b=lybN/nsRhrG2SENKJnEJ84zH/qnkgDVb/SVeoeG6myDxxwtTi2iwe+neOeJ5uySZli
-         pQY8UMuzd7G7EWdSZJNPur0Vucs51owx3+DkeJuANbHa134kqanGzONFSzbwxDSBxD0v
-         6c0hcUuGDmfLHq5RJquiPUQPUOJm/Ab1VF+qNv1azE3Vs2ctucA2P6LQ5504cAgvsa6Y
-         43F6cfngrXbXuuGto+0ccPtlH/ai+63eCemcoEI5HrCyoBgYOn0X81BGtpRV7Usoj/YN
-         wsnFHg/euvA03OuYCXdsA+CNrivFZTzkwUuWyU6ZRyFEAtp8JDdM4B5EhHgGw8tH1RhR
-         J3Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCULytdBrNyvyvJnOyykROfYTySZHUzTYDnvEmL7OYvzPb/ATjNAWMuFH6QCa+seTBEQwCbNztE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxUqtd6FAZK+T122uS0zWguARypZIvTUXRTDpQzVHQbEy5kMwiT
-	Q8A6TKT+QMTgD7NpdoroYwz3RodzzK+/543SPh9hgInxqvanF3MEgSNUjl8c2Y2Sa0jkO1zhMRT
-	PAlMEfQKKmp++haV6Qa/ORYy/fbrOoeOyUKA0IiB7pe2wx9mzdfYCSpS5uQ==
-X-Gm-Gg: ASbGncs84wGSNy/rhvi1vOyYODu9fauzY9+Qkck4CnGrEgejoi7BcAqohz7Xh4saPuc
-	QXsSJX/Ty/ME352aGYH0xYBlO6TcKGJjdPj3JJqt4yqNSA5MCXdfFX5MonXPPqmR6IxUWYCzPPY
-	qfnpXSkKdmy5RgQeX6/b1xuXrdeNxyC0FedPOCb2Ng2tT+wRuQajJtbcoxShyPUGZ8aZ9znHNQF
-	lVIEJcz7ctWVGscXhMeZVz2H5U4h8ilhOcpKc23u46DbJrAczBFvBJ/QWqTXDlhWbmM98UFvls0
-	apW0zCZLuqfWNOCv6aTfbIDRg/CBYGGLgjJUcpqe9pKeFx+xUBMA1g+d6RTl5QzVSXm3fthtZaA
-	R8TugLci9NWOjCet/n6EnW9zMjVBtpC2uskWa
-X-Received: by 2002:a05:600c:4ecf:b0:450:d61f:dd45 with SMTP id 5b1f17b1804b1-4520134088bmr2952465e9.4.1749145544119;
-        Thu, 05 Jun 2025 10:45:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEtyWhrOJI2jJREVrG+ADLExQmgejiXl1hTcg3Jp+xEdc0a7v4angK37xQYcRA7qKDImsWnSA==
-X-Received: by 2002:a05:600c:4ecf:b0:450:d61f:dd45 with SMTP id 5b1f17b1804b1-4520134088bmr2951635e9.4.1749145543496;
-        Thu, 05 Jun 2025 10:45:43 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f27:ec00:4f4d:d38:ba97:9aa2? (p200300d82f27ec004f4d0d38ba979aa2.dip0.t-ipconnect.de. [2003:d8:2f27:ec00:4f4d:d38:ba97:9aa2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-451f9924a41sm31495085e9.40.2025.06.05.10.45.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 10:45:42 -0700 (PDT)
-Message-ID: <637ffae1-a61e-4d68-8332-9ec11a3a78d4@redhat.com>
-Date: Thu, 5 Jun 2025 19:45:39 +0200
+        d=1e100.net; s=20230601; t=1749148231; x=1749753031;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4HrdqA/k41LxSYTdKh0OWWXzlPloxAg6qTNcrag1JWY=;
+        b=vBkYYuKFYU+OJ0/w+13Q3QRyWsX2tnYHiXU84PiNNxnW6orTDPwSDhiC5x+My4erGB
+         tXuJ0Xfp9EH07dyMauqEVdFmZBEYMvYRfGJQBg2nj0o4bbLkU0c4jzwswgMzgMCdnbo1
+         tUR5pqaSA1fCxi446KzFwfgxMedTl8+FBdmp+9Lb/lu+WCBmQHxo4fVohmlVgV9emF6d
+         zuV4zlz1jRC2q3+RC8X0Skc7wKKAlylI/0TsXGMJ1LJ3nl/KYRy8xvt9A4mSnPOyL68u
+         1UONZTakLyLzz4HVJZPOFw+NL8v1CGBN+pwTIxW22SdiMl9/Oi+4jKQHGrHPHHrV2zQK
+         isPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX5MIP39jA/t0qSfWxEEYyvP3OyKxiFyPR6tWi0OAdLfZwiLvUShwNiyjxHreIIdC+7hiRwObE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzp9iITzIipi/cPrmjl4qZ929wfYaFoeqodqVjXFuRriQ1fmMnQ
+	XPWkm7yDr1gECA/lbZuj5Frf+sUfEjrA0tW6fkbGrm1MzxwvH6WTPHJ3LWoWMjt2L0AsyBc/7qJ
+	2jeyabEjcYQ3/0aEPTzQnJMaxrME3SQxsRrN2oRKz
+X-Gm-Gg: ASbGncv5ObQvQgc1+9QIoo82u7WYpj0vOy/EEJrIOdgKN7gY5qA/CT7LYBGiYezEmcj
+	Bp3HkAwOewXQS/xNH+qwklgMbk2M6CbW8EwAfTp76GGR+zPDY/MzUIeRZhjWOmChATexb5N/oxY
+	S/Rp41sjVKyF82iYkhH4gTkgA/tY70c2Sq/NHd/kZZYLw=
+X-Google-Smtp-Source: AGHT+IH7FgESvCVozX/CiDB6ulbbev2isNZ+Soh9txr1mG6fDd4w52Z5DJcOcfE45agVq/Nr3QCWQsAjORWdDsJL18w=
+X-Received: by 2002:ac8:41c4:0:b0:48a:ba32:370 with SMTP id
+ d75a77b69052e-4a5baa649ccmr283761cf.10.1749148230605; Thu, 05 Jun 2025
+ 11:30:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-13-tabba@google.com>
+ <4909d6dc-09f5-4960-b8be-5150b2a03e45@redhat.com> <CA+EHjTwnAV=tu1eUjixyKAhE4bpNc3XV7EhnMME3+WJ-cu6PNA@mail.gmail.com>
+ <8782284c-0ffc-489d-adfe-b25d5ccb77b3@redhat.com> <CA+EHjTw-dgn+QbHd5aCxjLXCGamx7eTr75qcFm+o16qyVydnBQ@mail.gmail.com>
+ <637ffae1-a61e-4d68-8332-9ec11a3a78d4@redhat.com>
+In-Reply-To: <637ffae1-a61e-4d68-8332-9ec11a3a78d4@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 5 Jun 2025 19:29:53 +0100
+X-Gm-Features: AX0GCFsQbfhZC_FlYPxk85rO768zb9vVPjsu-8YXphOrtD0BhntZritMMuHZreE
+Message-ID: <CA+EHjTyxJ3VKqPF_9oswYAcbrJM3_MiYoExe6-Dx8A+0bZa+nQ@mail.gmail.com>
 Subject: Re: [PATCH v11 12/18] KVM: x86: Enable guest_memfd shared memory for
  SW-protected VMs
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
- mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
- viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
- akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
- chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
- dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
- vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
- mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250605153800.557144-1-tabba@google.com>
- <20250605153800.557144-13-tabba@google.com>
- <4909d6dc-09f5-4960-b8be-5150b2a03e45@redhat.com>
- <CA+EHjTwnAV=tu1eUjixyKAhE4bpNc3XV7EhnMME3+WJ-cu6PNA@mail.gmail.com>
- <8782284c-0ffc-489d-adfe-b25d5ccb77b3@redhat.com>
- <CA+EHjTw-dgn+QbHd5aCxjLXCGamx7eTr75qcFm+o16qyVydnBQ@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <CA+EHjTw-dgn+QbHd5aCxjLXCGamx7eTr75qcFm+o16qyVydnBQ@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: ccT8PNgtjnYpwbZ-lXj2TPwJvrsk_dVydxCKt4hRIEE_1749145544
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 05.06.25 19:43, Fuad Tabba wrote:
-> On Thu, 5 Jun 2025 at 18:35, David Hildenbrand <david@redhat.com> wrote:
->>
->> On 05.06.25 18:11, Fuad Tabba wrote:
->>> On Thu, 5 Jun 2025 at 16:49, David Hildenbrand <david@redhat.com> wrote:
->>>>
->>>> On 05.06.25 17:37, Fuad Tabba wrote:
->>>>> Define the architecture-specific macro to enable shared memory support
->>>>> in guest_memfd for relevant software-only VM types, specifically
->>>>> KVM_X86_DEFAULT_VM and KVM_X86_SW_PROTECTED_VM.
->>>>>
->>>>> Enable the KVM_GMEM_SHARED_MEM Kconfig option if KVM_SW_PROTECTED_VM is
->>>>> enabled.
->>>>>
->>>>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
->>>>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->>>>> Signed-off-by: Fuad Tabba <tabba@google.com>
->>>>> ---
->>>>>     arch/x86/include/asm/kvm_host.h | 10 ++++++++++
->>>>>     arch/x86/kvm/Kconfig            |  1 +
->>>>>     arch/x86/kvm/x86.c              |  3 ++-
->>>>>     3 files changed, 13 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->>>>> index 709cc2a7ba66..ce9ad4cd93c5 100644
->>>>> --- a/arch/x86/include/asm/kvm_host.h
->>>>> +++ b/arch/x86/include/asm/kvm_host.h
->>>>> @@ -2255,8 +2255,18 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
->>>>>
->>>>>     #ifdef CONFIG_KVM_GMEM
->>>>>     #define kvm_arch_supports_gmem(kvm) ((kvm)->arch.supports_gmem)
->>>>> +
->>>>> +/*
->>>>> + * CoCo VMs with hardware support that use guest_memfd only for backing private
->>>>> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
->>>>> + */
->>>>> +#define kvm_arch_supports_gmem_shared_mem(kvm)                       \
->>>>> +     (IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM) &&                      \
->>>>> +      ((kvm)->arch.vm_type == KVM_X86_SW_PROTECTED_VM ||             \
->>>>> +       (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM))
->>>>>     #else
->>>>>     #define kvm_arch_supports_gmem(kvm) false
->>>>> +#define kvm_arch_supports_gmem_shared_mem(kvm) false
->>>>>     #endif
->>>>>
->>>>>     #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
->>>>> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
->>>>> index b37258253543..fdf24b50af9d 100644
->>>>> --- a/arch/x86/kvm/Kconfig
->>>>> +++ b/arch/x86/kvm/Kconfig
->>>>> @@ -47,6 +47,7 @@ config KVM_X86
->>>>>         select KVM_GENERIC_HARDWARE_ENABLING
->>>>>         select KVM_GENERIC_PRE_FAULT_MEMORY
->>>>>         select KVM_GENERIC_GMEM_POPULATE if KVM_SW_PROTECTED_VM
->>>>> +     select KVM_GMEM_SHARED_MEM if KVM_SW_PROTECTED_VM
->>>>>         select KVM_WERROR if WERROR
->>>>
->>>> Is $subject and this still true, given that it's now also supported for
->>>> KVM_X86_DEFAULT_VM?
->>>
->>> True, just not the whole truth :)
->>>
->>> I guess a better one would be, for Software VMs (remove protected)?
->>
->> Now I am curious, what is a Hardware VM? :)
-> 
-> The opposite of a software one! ;) i.e., hardware-supported CoCo,
-> e.g., TDX, CCA...
+On Thu, 5 Jun 2025 at 18:45, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 05.06.25 19:43, Fuad Tabba wrote:
+> > On Thu, 5 Jun 2025 at 18:35, David Hildenbrand <david@redhat.com> wrote:
+> >>
+> >> On 05.06.25 18:11, Fuad Tabba wrote:
+> >>> On Thu, 5 Jun 2025 at 16:49, David Hildenbrand <david@redhat.com> wrote:
+> >>>>
+> >>>> On 05.06.25 17:37, Fuad Tabba wrote:
+> >>>>> Define the architecture-specific macro to enable shared memory support
+> >>>>> in guest_memfd for relevant software-only VM types, specifically
+> >>>>> KVM_X86_DEFAULT_VM and KVM_X86_SW_PROTECTED_VM.
+> >>>>>
+> >>>>> Enable the KVM_GMEM_SHARED_MEM Kconfig option if KVM_SW_PROTECTED_VM is
+> >>>>> enabled.
+> >>>>>
+> >>>>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> >>>>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> >>>>> Signed-off-by: Fuad Tabba <tabba@google.com>
+> >>>>> ---
+> >>>>>     arch/x86/include/asm/kvm_host.h | 10 ++++++++++
+> >>>>>     arch/x86/kvm/Kconfig            |  1 +
+> >>>>>     arch/x86/kvm/x86.c              |  3 ++-
+> >>>>>     3 files changed, 13 insertions(+), 1 deletion(-)
+> >>>>>
+> >>>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> >>>>> index 709cc2a7ba66..ce9ad4cd93c5 100644
+> >>>>> --- a/arch/x86/include/asm/kvm_host.h
+> >>>>> +++ b/arch/x86/include/asm/kvm_host.h
+> >>>>> @@ -2255,8 +2255,18 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+> >>>>>
+> >>>>>     #ifdef CONFIG_KVM_GMEM
+> >>>>>     #define kvm_arch_supports_gmem(kvm) ((kvm)->arch.supports_gmem)
+> >>>>> +
+> >>>>> +/*
+> >>>>> + * CoCo VMs with hardware support that use guest_memfd only for backing private
+> >>>>> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
+> >>>>> + */
+> >>>>> +#define kvm_arch_supports_gmem_shared_mem(kvm)                       \
+> >>>>> +     (IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM) &&                      \
+> >>>>> +      ((kvm)->arch.vm_type == KVM_X86_SW_PROTECTED_VM ||             \
+> >>>>> +       (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM))
+> >>>>>     #else
+> >>>>>     #define kvm_arch_supports_gmem(kvm) false
+> >>>>> +#define kvm_arch_supports_gmem_shared_mem(kvm) false
+> >>>>>     #endif
+> >>>>>
+> >>>>>     #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
+> >>>>> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> >>>>> index b37258253543..fdf24b50af9d 100644
+> >>>>> --- a/arch/x86/kvm/Kconfig
+> >>>>> +++ b/arch/x86/kvm/Kconfig
+> >>>>> @@ -47,6 +47,7 @@ config KVM_X86
+> >>>>>         select KVM_GENERIC_HARDWARE_ENABLING
+> >>>>>         select KVM_GENERIC_PRE_FAULT_MEMORY
+> >>>>>         select KVM_GENERIC_GMEM_POPULATE if KVM_SW_PROTECTED_VM
+> >>>>> +     select KVM_GMEM_SHARED_MEM if KVM_SW_PROTECTED_VM
+> >>>>>         select KVM_WERROR if WERROR
+> >>>>
+> >>>> Is $subject and this still true, given that it's now also supported for
+> >>>> KVM_X86_DEFAULT_VM?
+> >>>
+> >>> True, just not the whole truth :)
+> >>>
+> >>> I guess a better one would be, for Software VMs (remove protected)?
+> >>
+> >> Now I am curious, what is a Hardware VM? :)
+> >
+> > The opposite of a software one! ;) i.e., hardware-supported CoCo,
+> > e.g., TDX, CCA...
+>
+> So, you mean a sofware VM is ... just an ordinary VM? :P
+>
+> "KVM: x86: Enable guest_memfd shared memory for ordinary (non-CoCo) VMs" ?
+>
+> But, whatever you prefer :)
 
-So, you mean a sofware VM is ... just an ordinary VM? :P
+This sounds better. I was thrown off by the KVM_SW_PROTECTED_VM type :)
 
-"KVM: x86: Enable guest_memfd shared memory for ordinary (non-CoCo) VMs" ?
+/fuad
 
-But, whatever you prefer :)
-
--- 
-Cheers,
-
-David / dhildenb
-
+> --
+> Cheers,
+>
+> David / dhildenb
+>
