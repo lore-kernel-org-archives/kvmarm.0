@@ -1,55 +1,55 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACD524166B
-	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 23:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01BC24292E
+	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 23:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749254205; cv=none; b=d9lhZQJVC8GQ+6BdOomPubWAzxvaSVGyoZxFDyCsaXO2CuM75X/xO4y9U1To76EVR3J8qc0E7m7+gS0/CZYqb1xiy1z+S2XurVCOfe829ACQYgsTneWpyAsjeR856D49AKtyDQSnuyxCS/U5eno5kGd8ls9lGyTYW1wGDzOpYwA=
+	t=1749254206; cv=none; b=KN5rhPNMPppPqPddIRh16VxJagzfe/9tcorha6pAcN0Rr+CPkAc6dsqRJjipj3vUmDUhoPeEttcNUvrcB/bC89qG0zuQpRqyxfVaDJeJOPrty5fcdSj8OcDNriZZK59ENSTuLKaEEZAOEgIAtZqcB+CB4sos/CeezA9L3KGq3bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749254205; c=relaxed/simple;
-	bh=VyCqfXOdfbOsRkoGkNU5UmQxiMZNF/Jl1QSi1q90LNs=;
+	s=arc-20240116; t=1749254206; c=relaxed/simple;
+	bh=f+eEB/iYNCpX8oI/VsUjK9SDKs311EQm6wKDEhFqTfI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SWFedaIECOCfCpYm0p06ccf7CLQuYrM8kEU9BYveC8UH7ovHVTIqRkka6u3lgGIKL9c1JkHmYbENBg8xSEa58FV7OaLU/JuxhanyzBbXo0QNV5S0meJdFcG0kckSjJKbVp+HqKTXm8NeXkWRaY0nduYyoID1SRsDuEm4J1VMtmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pou4BqCi; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=KZQDOrgfa9AgxS3NeQ2wioz5KrAJ47jkMtFDkmM+CtEAy7Hnyjy/eQS8pYjf+FuQDFmzukM71g9/jfVyy+K6zb02CcxIluc7jgSFIx2EUTlrvZtVFoMcEPB5eXun7LPNVSRY6MR7fE2NYJ16iuLVfDTkEyUQwyNN9tbYLwit4Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sscV6zja; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pou4BqCi"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7377139d8b1so2154632b3a.0
-        for <kvmarm@lists.linux.dev>; Fri, 06 Jun 2025 16:56:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sscV6zja"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-234dbbc4899so42103965ad.2
+        for <kvmarm@lists.linux.dev>; Fri, 06 Jun 2025 16:56:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749254203; x=1749859003; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1749254204; x=1749859004; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8z4WvBicEoN9caj+LocUILTDszd9KNhP2i6ClnV4SYQ=;
-        b=Pou4BqCiNvzuq6FXbJLEPh1H2Qx039wHk7VGPIyjBmJ9Zhug6+LnRstHqgUqe8jt3S
-         YAQXWbwOhdlo+dnVMgVmNJItf0cQuQSCCXkxqTlSNNDk0NSsL7JXw8/B74WATO27gT1f
-         TpmHwCC6fL9XyoVWnq1xf/DXgON6lHvjVtFatG6Ft+sDrfM9rjpiVP1v2niwGWv/TmIP
-         p6w3+9lyf07RmebsoZYBJobMtAB0UajNKkLUpmvi5mzEFRGKqEJUf2CZyp06LL06GOMV
-         FvNPH8u8gbnALGczergy3DhbHvzEmNrb44Q7bYy9dGLlfYvB3NwWY5pD909wWzLe91ug
-         wz6w==
+        bh=Eryy+YJT09TinpK7TLn0VFQh3NTz7wAuAJ/KxptN2XM=;
+        b=sscV6zjax8+X+0IOLMifxJHU6F7sBCRMKTjIraxkdkO/4VtKFgo+lozXxUm/wSpKEz
+         ouxNHEVjmXwhBKyhdvkmwk7BaTDcbZFp++FR35ZfKAABxvT9Wdbzt/0JOQSKP91c4zfq
+         shczE30UhwDCUGWkCDqBRMCxH9rPGHVUUV9IJ7obZTF7Y+A9uZhImvuvZmGjHdRDJYwT
+         BO464mwbHZ75/5RE8BDgWJg5pmT/Xfs8Q9I//N5448vw90zC0vahwraPVrO2v3d4A1uv
+         t0jzbk/94TSUdoxpep/AEqSLTwXbLouAGCtorMoWIszMVoV+cQAGwxVYVQ5uFu86C0TN
+         tTOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749254203; x=1749859003;
+        d=1e100.net; s=20230601; t=1749254204; x=1749859004;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8z4WvBicEoN9caj+LocUILTDszd9KNhP2i6ClnV4SYQ=;
-        b=YJOPKuMCy7oK6hEKpRoj2TB1THWvMrb3tRWOaYvUhj3R6Lc98G1mskoOy90jEsL4gx
-         jSjTVpnSZZjNQnqLROzkVxe8QhUjXm8VQJp9kUidutsXQPAMvPrbAUQDwmhwfSn4BuOx
-         UxEl9mZfuTmKNiCY7XCjwNTKtuHQoAshCDlZ4ci7YI/Tqyx/zZEn5y090H/lJ2mEh0rB
-         e08nhhhRA1qRnw9qEn8JXyzkSbsqzQ1X10YdsdT2MeO/PDWZM2MKSUEn3pFdBaI0/cT0
-         VRcCqJm6WgK5aS2XEsHahoNXs6Q6p4ww9rkdf1aKfV6BRxOhl+zEIbarYGpmm9ebzulB
-         e+8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUE4ND5qOce3KRNOdFCm0D+Vwzs4mWFN0dmsk+4gbXM9WJ+WiOpkWI2mckgnCe/xABpi7bIMf8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzyxRhHfRiaKXNf55HYt+hPH+M3paZqzKkIiOn9ere0tlDv4RjV
-	ioGgABZ/WFzH6QuceBpGuyKcCOJUOA0pJVBWf3pzWoCy5TPYwjG/EhyZaYWgkeFDOTcuiXSITaB
-	J79Vuf/tukg==
-X-Google-Smtp-Source: AGHT+IHcrbHn9p0w2bYAvuft/4cgpIgfj6gM1mOsYQAwopTnS4Dm3TWFUPJLijBX/4q2FB3OKh1WxAvHIbCa
-X-Received: from pfbdh10.prod.google.com ([2002:a05:6a00:478a:b0:747:aac7:7c2])
- (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b4d:b0:748:3822:e8e0
- with SMTP id d2e1a72fcca58-7483822ef98mr1370463b3a.13.1749254202756; Fri, 06
- Jun 2025 16:56:42 -0700 (PDT)
-Date: Fri,  6 Jun 2025 16:56:11 -0700
+        bh=Eryy+YJT09TinpK7TLn0VFQh3NTz7wAuAJ/KxptN2XM=;
+        b=vyixvJ/rL3prOwhrr6Z319XuqZ94QlEce73GOOwdA4TSe2zXLuBNBxKgytdjyePf8m
+         WyZeKi4jV0QuhP0DCi+yr3D85DUQtjTSvr+9ZZqxazP4WrvSOJhAiN/UaVqFpwhsry1o
+         LW/qUwTELoHLlEqWTGKozwLRkojR+/Tr/juk85CDUe5Hg6XAx+l5bVPxJIB3BbI+a7/Y
+         7ZiueWV4rDqvoeSWsstToyy3lcwRNLZhdl+Y+iDOWOnv65gr5hB2pdFfWxhccj2CJA8i
+         0zAPmwThjN3cG3heBGN2aXSwWyBQuM31VlKLF7YqOGsf4fHGfui4ojI6Vl1oUvu3iNpE
+         JJ5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVCNpoJBcjaWo6ZlWiWa58pWaAcgEEJ1tO2qLPjwGtgmj5KjYnoBgODwTS9tO3+6F1CA8qmPrk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YziAqXywwc+VjH1tOnI4NN5e++gRky38Ug4t+hwaICVbmc/juoi
+	aAAg9siBvUGRv0SOMpbk7FDC/CGFE9CaO5hWasAHB+oCHcYI/Z2GTcVtfMX0F5IC+NF8rdQxmYU
+	MfPuBuMkUrA==
+X-Google-Smtp-Source: AGHT+IHoWyMkTDRUV9FORNhwP9EK3SZsd3ZxOrapFYSdtobGvViIWq2t5Q6eVMf+UJBQjw9Zhem7ol5n6al1
+X-Received: from pgww16.prod.google.com ([2002:a05:6a02:2c90:b0:b2c:3dd5:8139])
+ (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc86:b0:235:e9fe:83c0
+ with SMTP id d9443c01a7336-23601d18723mr75766385ad.27.1749254204307; Fri, 06
+ Jun 2025 16:56:44 -0700 (PDT)
+Date: Fri,  6 Jun 2025 16:56:12 -0700
 In-Reply-To: <20250606235619.1841595-1-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250606235619.1841595-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.604.gd4ff7b7c86-goog
-Message-ID: <20250606235619.1841595-8-vipinsh@google.com>
-Subject: [PATCH v2 07/15] KVM: selftests: Add various print flags to KVM
- Selftest Runner
+Message-ID: <20250606235619.1841595-9-vipinsh@google.com>
+Subject: [PATCH v2 08/15] KVM: selftests: Print sticky KVM Selftests Runner
+ status at bottom
 From: Vipin Sharma <vipinsh@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
 	linux-arm-kernel@lists.infradead.org
@@ -71,194 +71,78 @@ Cc: seanjc@google.com, pbonzini@redhat.com, anup@brainfault.org,
 	Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add various print flags to selectively print outputs on terminal based
-on test execution status (passed, failed, timed out, skipped, no run).
+Print current state of the KVM Selftest Runner during its execution.
+Show it as the bottom most line, make it sticky and colored. Provide
+the following information:
+- Total number of tests selected for run.
+- How many have executed.
+- Total for each end state.
 
-Provide further options to print only particular execution status, like
-print only status of failed tests.
+Example:
 
-Example: To print status, stdout and stderr for failed tests and only
-print status of passed test:
-
-   python3 runner --test-dirs tests  --print-failed \
-   --print-passed-status
+Total: 3/3 Passed: 1 Failed: 1 Skipped: 0 Timed Out: 0 No Run: 1
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- .../testing/selftests/kvm/runner/__main__.py  | 114 ++++++++++++++++++
- .../selftests/kvm/runner/test_runner.py       |  10 +-
- 2 files changed, 123 insertions(+), 1 deletion(-)
+ .../selftests/kvm/runner/test_runner.py        | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/runner/__main__.py b/tools/testing/selftests/kvm/runner/__main__.py
-index 3f11a20e76a9..4406d8e4847a 100644
---- a/tools/testing/selftests/kvm/runner/__main__.py
-+++ b/tools/testing/selftests/kvm/runner/__main__.py
-@@ -64,9 +64,115 @@ def cli():
-                         default=False,
-                         help="Print only test's status and avoid printing stdout and stderr of the tests")
- 
-+    parser.add_argument("--print-passed",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print passed test's stdout, stderr and status."
-+                        )
-+
-+    parser.add_argument("--print-passed-status",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print only passed test's status."
-+                        )
-+
-+    parser.add_argument("--print-failed",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print failed test's stdout, stderr and status."
-+                        )
-+
-+    parser.add_argument("--print-failed-status",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print only failed test's status."
-+                        )
-+
-+    parser.add_argument("--print-skipped",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print skipped test's stdout, stderr and status."
-+                        )
-+
-+    parser.add_argument("--print-skipped-status",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print only skipped test's status."
-+                        )
-+
-+    parser.add_argument("--print-timed-out",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print timed out test's stdout, stderr and status."
-+                        )
-+
-+    parser.add_argument("--print-timed-out-status",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print only timed out test's status."
-+                        )
-+
-+    parser.add_argument("--print-no-runs",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print stdout, stderr and status for tests which didn't run."
-+                        )
-+
-+    parser.add_argument("--print-no-runs-status",
-+                        action="store_true",
-+                        default=False,
-+                        help="Print only tests which didn't run."
-+                        )
-+
-     return parser.parse_args()
- 
- 
-+def level_filters(args):
-+    # Levels added here will be printed by logger.
-+    levels = set()
-+
-+    if args.print_passed or args.print_passed_status or args.print_status:
-+        levels.add(SelftestStatus.PASSED)
-+
-+    if args.print_failed or args.print_failed_status or args.print_status:
-+        levels.add(SelftestStatus.FAILED)
-+
-+    if args.print_skipped or args.print_skipped_status or args.print_status:
-+        levels.add(SelftestStatus.SKIPPED)
-+
-+    if args.print_timed_out or args.print_timed_out_status or args.print_status:
-+        levels.add(SelftestStatus.TIMED_OUT)
-+
-+    if args.print_no_runs or args.print_no_runs_status or args.print_status:
-+        levels.add(SelftestStatus.NO_RUN)
-+
-+    # Nothing set explicitly, enable all.
-+    if not levels:
-+        args.print_passed = True
-+        levels.add(SelftestStatus.PASSED)
-+
-+        args.print_failed = True
-+        levels.add(SelftestStatus.FAILED)
-+
-+        args.print_skipped = True
-+        levels.add(SelftestStatus.SKIPPED)
-+
-+        args.print_timed_out = True
-+        levels.add(SelftestStatus.TIMED_OUT)
-+
-+        args.print_no_runs = True
-+        levels.add(SelftestStatus.NO_RUN)
-+
-+    levels.add(logging.NOTSET)
-+    levels.add(logging.DEBUG)
-+    levels.add(logging.INFO)
-+    levels.add(logging.WARN)
-+    levels.add(logging.ERROR)
-+    levels.add(logging.CRITICAL)
-+
-+    return levels
-+
-+
- def setup_logging(args):
-     class TerminalColorFormatter(logging.Formatter):
-         reset = "\033[0m"
-@@ -91,6 +197,13 @@ def setup_logging(args):
-             return (self.COLORS.get(record.levelno, "") +
-                     super().format(record) + self.reset)
- 
-+    class LevelFilter:
-+        def __init__(self, levels):
-+            self.levels = levels
-+
-+        def filter(self, record):
-+            return record.levelno in self.levels
-+
-     logger = logging.getLogger("runner")
-     logger.setLevel(logging.INFO)
- 
-@@ -102,6 +215,7 @@ def setup_logging(args):
-     ch = logging.StreamHandler()
-     ch_formatter = TerminalColorFormatter(**formatter_args)
-     ch.setFormatter(ch_formatter)
-+    ch.addFilter(LevelFilter(level_filters(args)))
-     logger.addHandler(ch)
- 
-     if args.output != None:
 diff --git a/tools/testing/selftests/kvm/runner/test_runner.py b/tools/testing/selftests/kvm/runner/test_runner.py
-index 474408fcab51..8f2372834104 100644
+index 8f2372834104..e0da30d216a2 100644
 --- a/tools/testing/selftests/kvm/runner/test_runner.py
 +++ b/tools/testing/selftests/kvm/runner/test_runner.py
-@@ -18,6 +18,13 @@ class TestRunner:
+@@ -15,6 +15,7 @@ logger = logging.getLogger("runner")
+ class TestRunner:
+     def __init__(self, test_files, args):
+         self.tests = []
++        self.status = {x: 0 for x in SelftestStatus}
          self.output_dir = args.output
          self.jobs = args.jobs
          self.print_status = args.print_status
-+        self.print_stds = {
-+            SelftestStatus.PASSED: args.print_passed,
-+            SelftestStatus.FAILED: args.print_failed,
-+            SelftestStatus.SKIPPED: args.print_skipped,
-+            SelftestStatus.TIMED_OUT: args.print_timed_out,
-+            SelftestStatus.NO_RUN: args.print_no_runs
-+        }
+@@ -34,7 +35,17 @@ class TestRunner:
+         test.run()
+         return test
  
-         for test_file in test_files:
-             self.tests.append(Selftest(test_file, args.executable,
-@@ -30,7 +37,8 @@ class TestRunner:
++    def _sticky_update(self):
++        print(f"\r\033[1mTotal: {self.tests_ran}/{len(self.tests)}" \
++                f"\033[32;1m Passed: {self.status[SelftestStatus.PASSED]}" \
++                f"\033[31;1m Failed: {self.status[SelftestStatus.FAILED]}" \
++                f"\033[33;1m Skipped: {self.status[SelftestStatus.SKIPPED]}"\
++                f"\033[91;1m Timed Out: {self.status[SelftestStatus.TIMED_OUT]}"\
++                f"\033[34;1m No Run: {self.status[SelftestStatus.NO_RUN]}\033[0m", end="\r")
++
      def _log_result(self, test_result):
++        # Clear the status line
++        print("\033[2K", end="\r")
          logger.log(test_result.status,
                     f"[{test_result.status}] {test_result.test_path}")
--        if (self.output_dir is None and self.print_status is False):
-+        if (self.output_dir is None and self.print_status is False
-+                and self.print_stds.get(test_result.status, True)):
-             logger.info("************** STDOUT BEGIN **************")
-             logger.info(test_result.stdout)
-             logger.info("************** STDOUT END **************")
+         if (self.output_dir is None and self.print_status is False
+@@ -46,8 +57,13 @@ class TestRunner:
+             logger.info(test_result.stderr)
+             logger.info("************** STDERR END **************")
+ 
++        self.status[test_result.status] += 1
++        # Sticky bottom line
++        self._sticky_update()
++
+     def start(self):
+         ret = 0
++        self.tests_ran = 0
+ 
+         with concurrent.futures.ProcessPoolExecutor(max_workers=self.jobs) as executor:
+             all_futures = []
+@@ -57,9 +73,11 @@ class TestRunner:
+ 
+             for future in concurrent.futures.as_completed(all_futures):
+                 test_result = future.result()
++                self.tests_ran += 1
+                 self._log_result(test_result)
+                 if (test_result.status not in [SelftestStatus.PASSED,
+                                                SelftestStatus.NO_RUN,
+                                                SelftestStatus.SKIPPED]):
+                     ret = 1
++        print("\n")
+         return ret
 -- 
 2.50.0.rc0.604.gd4ff7b7c86-goog
 
