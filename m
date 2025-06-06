@@ -1,183 +1,275 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CF42CA6
-	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 17:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24E5433A6
+	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 18:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749232658; cv=none; b=e1nDqP3bvR76vLrHtU0mr/AdV06IOhmWRcr4XqzbfLeJFLQnD+0rzMEoJXBY4VPf49k7HE8/UQKyJ3rz1q1mpzT9ohNRd+SbIUHb6QnoENOkbXck0JFEbimgkID5Nh6vXHX+gObg+PrUR6UXtUbHruYFIPRSMduMYefiLkUovG4=
+	t=1749233520; cv=none; b=H2bKtY8rrsXhDkp0arNoxEuHZhMQYLBkKF97gjCRrl0P0Jv09ECkUw1zSRzAUkUcwXDyRJTt//z+60vej6y3azpgy4HNiPaox0+laQ3mqFirH/NNWGKKdB2NqRMOzL6AIlNuZxFkRayuBAEmOs9q6u5GfZSa/yaDF8KiS1nt+sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749232658; c=relaxed/simple;
-	bh=ZB0NWHd/9jnUvtnq6UmpQDkeF2Lhk/dOw/6eYJnYbfo=;
+	s=arc-20240116; t=1749233520; c=relaxed/simple;
+	bh=AGMz9ZKOylSWIfehSBLwfJo5U8gevcDw4zx/mHAF+AQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Wxr9KyLWIOpBxtyMuL+wroMsiyS4/YB4xYg3YPZNwcmBWkF32vwok4LR+D5/6UQwv63MnjISZTrZDs64RIcs2mmLLa6S9h4XlSUMxq5w7jz1KOnCMIgKie/fqyLNoOT5o2TGMSu17Ek61lsig+hJ38IPPbVqzCDW7qhCC7NvN2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EVly+r2z; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=G0lXaQzrwPpOOyEZ5vw4xQNkLDhqQzTYJOykhpwM2E8H+0pVd4/2FKd1juQPYOcXiCb1AI++TseQ87T7xuwg4XdaOtfsIXZZMSvXVhKKJjtA4A5idJvuz2JhCLeHiAvaKzLUfbgLEx7vaJ9oBTF7b4jvnFmrPiM/u/+vCdYznwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jFESMaPC; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EVly+r2z"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74299055c3dso3648969b3a.0
-        for <kvmarm@lists.linux.dev>; Fri, 06 Jun 2025 10:57:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jFESMaPC"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31327b2f8e4so2230672a91.1
+        for <kvmarm@lists.linux.dev>; Fri, 06 Jun 2025 11:11:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749232656; x=1749837456; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1749233518; x=1749838318; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uy4s6eK2oicgrVJHBktYrwR1uwscm0ofZKzJBnShpYk=;
-        b=EVly+r2zofFlupPDDroDa5/YuQiwh6PZGI3hMbSqbw4sWHRJYctfcQzpPRWAu+4JRL
-         Y5diivA0Ugfj+qIIYii3yXh8Y4J5zAHmi5jmzZbqyFGdYEHjG1q8lFEfHBRjwzTtE1wn
-         cvKKQfRtCCxnxGW25yosBTlfuS78Kz0cOjS67EG9JYzXMbO2d6Q5vZINdcRBVQl/AJiu
-         jxQ2CBa+XpADIwzJI8kNyJtZduon+jTzhbuz7hl/iUrYTuV091/wWHG0o5aSHbi8KVlq
-         bKypx9NeSw9HgCIX+1lSYveaif+vGd7H4+EWQEcuM0CuDoJwsDFsP54fi21Z76S8/Pm1
-         PLUA==
+        bh=goGsGlGK4aCvgRlt6QQZwnV9SY/etRc0Yb1ngROaDOc=;
+        b=jFESMaPCV5SJGGucvrqqAvUg6kwn/drX0h//D+Z01OFKsKMUu6/dFHhTFiNdQXXd0X
+         vPwNfxCurgaW+kLp/VN6rH8nJXuJ5xsnFCAup4vUcHV4p5W19OHNtQlJu0+wc4T9UPs1
+         79ZEgfD2U2EC4e+WmL1NM71YfhTRrtFQnk8FmHFXIEQ7hbkSuXF6CPs0vIA6zP6/o593
+         7LQ0rqxohr6bIgGwEu+oFBjM5cJLpUGcit1F87IqGJeNHU2scRiX+r9e+P/adJAFDRa9
+         9Cz75O5+Rb/Ab/RSslrtXxMDd/TCbzN+8OC0pouL0JVgMEOwi1VboeADIh35J63xBKZ4
+         BaGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749232656; x=1749837456;
+        d=1e100.net; s=20230601; t=1749233518; x=1749838318;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uy4s6eK2oicgrVJHBktYrwR1uwscm0ofZKzJBnShpYk=;
-        b=F9PARQH+OOMC/lOyqKPOzyZsuRsRxSB0mHUrrj9bPc0bRpDUj8IbNG9+9XDPgooWFp
-         ic+2GOVK/zSMnjTRTpX8lPkOv6cMqpuTVhCKXe/z4OBn0Sp0HKCR10ZUT93X90yaOU9f
-         oaIZXISBWLQrYgUcf7/AO5kB18A2r+2Y+MhGgqp/blyLKVheQStQMlc2rQTKxpTiwfgB
-         H1nt+ibpaZ7KuHbGUhzp9kdPznrrPZLwCsnp5AhUErBgTMmfpyiNGXQwCquAK2RZfPkJ
-         bHGwm9Onq9dUvy5ZxqsrnzcckPwZTO4b77l1/rBMFP06dmHvxOB4wgAGooaj7lWqIhUt
-         QVfg==
-X-Forwarded-Encrypted: i=1; AJvYcCWuCR1ng8CPFQDzCZXlj9JcgXBSVoKUaJn1DnLURuh3iYgt9Wj+KfHlklXDe/h8qBEhb1LqPDg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yye6IoxP3B1iyDcyOrNpRsmEgDjBJJXi2aINYeyIEXjSJtv5iKn
-	LBhd+BQ1zc8I4lPUQX11BfyQAq/vT2AtaPU5zJjW3LkO5s8yEJSzS4sCDwKKmhaimiuP55FTLFg
-	7gxOhCA==
-X-Google-Smtp-Source: AGHT+IE0O8E/z1AW0aCKfeQ6ZwKpA8wqWW3uIA5Eo0Mj+1d46DIjhKhwh8m8l5jhmiyq44/R62b0WTD+8ZQ=
-X-Received: from pfaz1.prod.google.com ([2002:aa7:91c1:0:b0:746:3185:144e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:22d1:b0:742:a91d:b2f5
- with SMTP id d2e1a72fcca58-74827ea2140mr5987849b3a.13.1749232656472; Fri, 06
- Jun 2025 10:57:36 -0700 (PDT)
-Date: Fri, 6 Jun 2025 10:57:34 -0700
-In-Reply-To: <SA1PR12MB71990A84FDB4350DC02CEC6EB064A@SA1PR12MB7199.namprd12.prod.outlook.com>
+        bh=goGsGlGK4aCvgRlt6QQZwnV9SY/etRc0Yb1ngROaDOc=;
+        b=rOC+1rF1qRC5mFuh1kjiRuLguqMZH1xvv9BshVE/dbxxgczoQxgE4FsZ9FL3vIVzKy
+         yrFxMckG1AYWNKqyR/cQUG0FB40Ee/e0jdvDyuqQXx381nP1rp47M4KWkPsNO/ZwBtts
+         TYZ0O+ucpdwbNpdg/Vq9IiMmmuBWnIWHpDptV+XCzT5p5TzjqcWysWaqtHrqoDxTs6FD
+         ygxcCIcWECxPtyL2NbWDPkI6IFH6FHvEuVsa5ntGWuZJwsl9ycd4W0dx92Je10UOGP2a
+         mmiq6sCuuTUvQ6vIV4IbPlcfihqC00T3zd3yFNFPMTVVvvUdObN8x97xoArhACK7lSgx
+         +eNw==
+X-Forwarded-Encrypted: i=1; AJvYcCWklyHM5XWldtoqCm8B7B5Ji/vUXeSK19yHR5BP4fqZIaN+m0K4UAm/Ir7n/mWb7Mjfw5AyqdQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyrvPsFN3iPmV4Dkw1K9SCOjyzKNeIWx85HPsrJbQNb28a/mLu4
+	LuTv5RMZUvRtcmx9QTrHtyvWBRkCyUYmBkPYU0PKGS6gB7yFtEFSERMzY1bnjXVSw4q8+OXvmTs
+	p4Hy8wA==
+X-Google-Smtp-Source: AGHT+IEL48Zr+RVpxcph90N0P9k6HL0QyILrRx6484oP33DwOnxzZeVG7VJ6lc1LW/g9pPx5ZMAaWFJF2Pc=
+X-Received: from pjbqd13.prod.google.com ([2002:a17:90b:3ccd:b0:312:4274:c4ce])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17c5:b0:313:33ca:3b8b
+ with SMTP id 98e67ed59e1d1-31346b21437mr6696240a91.9.1749233518162; Fri, 06
+ Jun 2025 11:11:58 -0700 (PDT)
+Date: Fri, 6 Jun 2025 11:11:56 -0700
+In-Reply-To: <20250524013943.2832-2-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250524013943.2832-1-ankita@nvidia.com> <20250524013943.2832-4-ankita@nvidia.com>
- <20250527002652.GM61950@nvidia.com> <SA1PR12MB71990A84FDB4350DC02CEC6EB064A@SA1PR12MB7199.namprd12.prod.outlook.com>
-Message-ID: <aEMsDsi3DSm1up0G@google.com>
-Subject: Re: [PATCH v6 3/5] kvm: arm64: New memslot flag to indicate cacheable mapping
+References: <20250524013943.2832-1-ankita@nvidia.com> <20250524013943.2832-2-ankita@nvidia.com>
+Message-ID: <aEMvbIu530nCqwhG@google.com>
+Subject: Re: [PATCH v6 1/5] KVM: arm64: Block cacheable PFNMAP mapping
 From: Sean Christopherson <seanjc@google.com>
-To: Ankit Agrawal <ankita@nvidia.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, "maz@kernel.org" <maz@kernel.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "joey.gouly@arm.com" <joey.gouly@arm.com>, 
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>, 
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "shahuang@redhat.com" <shahuang@redhat.com>, 
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, "david@redhat.com" <david@redhat.com>, 
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, 
-	Kirti Wankhede <kwankhede@nvidia.com>, Krishnakant Jaju <kjaju@nvidia.com>, 
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, 
-	Andy Currid <acurrid@nvidia.com>, Alistair Popple <apopple@nvidia.com>, 
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, 
-	Matt Ochs <mochs@nvidia.com>, Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>, 
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, 
-	"sebastianene@google.com" <sebastianene@google.com>, "coltonlewis@google.com" <coltonlewis@google.com>, 
-	"kevin.tian@intel.com" <kevin.tian@intel.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"gshan@redhat.com" <gshan@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"ddutile@redhat.com" <ddutile@redhat.com>, "tabba@google.com" <tabba@google.com>, 
-	"qperret@google.com" <qperret@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"maobibo@loongson.cn" <maobibo@loongson.cn>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, ryan.roberts@arm.com, shahuang@redhat.com, 
+	lpieralisi@kernel.org, david@redhat.com, aniketa@nvidia.com, cjia@nvidia.com, 
+	kwankhede@nvidia.com, kjaju@nvidia.com, targupta@nvidia.com, 
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, 
+	jhubbard@nvidia.com, danw@nvidia.com, zhiw@nvidia.com, mochs@nvidia.com, 
+	udhoke@nvidia.com, dnigam@nvidia.com, alex.williamson@redhat.com, 
+	sebastianene@google.com, coltonlewis@google.com, kevin.tian@intel.com, 
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org, 
+	gshan@redhat.com, linux-mm@kvack.org, ddutile@redhat.com, tabba@google.com, 
+	qperret@google.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, maobibo@loongson.cn
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, May 27, 2025, Ankit Agrawal wrote:
-> > I thought we agreed not to do this? Sean was strongly against it
-> > right?
-
-Yes.  NAK, at least for this implementation.
-
-IMO, this has no business being in KVM's uAPI, and it's a mess.  KVM x86
-unconditionally supports cacheable PFNMAP mappings, yet this:
-
-  bool __weak kvm_arch_supports_cacheable_pfnmap(void)
-  {
-	return false;
-  }
-
-	if (kvm_arch_supports_cacheable_pfnmap())
-		valid_flags |= KVM_MEM_ENABLE_CACHEABLE_PFNMAP;
-
-means x86 will disallow KVM_MEM_ENABLE_CACHEABLE_PFNMAP.  Which is fine-ish from
-a uAPI perspective, as the flag is documented as arm64-only, and we can state that
-all other architectures always allow cacheable mappings.  But even that is a mess,
-because KVM won't _guarantee_ the final mapping is cacheable.
-
-On AMD, there's simply no sane way to force WB (KVM can't override guest PAT,
-i.e. the memtype requested/set by the guest's stage-1 page tables).
-
-On Intel, after years of pain, we _finally_ got KVM out of a mess where KVM was
-forcing WB for all non-MMIO memory.  Only to have to immediately revert and add
-KVM_X86_QUIRK_IGNORE_GUEST_PAT because buggy guest drivers were relying on KVM's
-behavior :-(
-
-So there's zero chance of this memslot flag ever being supported on x86.  Which,
-again, is fine for uAPI.  But for internal code it's going to be all kinds of
-confusing, because kvm_arch_supports_cacheable_pfnmap() is a flat out lie.
-
-And as proposed, the memslot flag also doesn't actually address Oliver's want:
-
-  The memslot flag says userspace expects a particular GFN range to guarantee
-                                                                    ^^^^^^^^^
-  Write-Back semantics.
-
-IIUC, what Oliver wants is:
-
-			if (mapping_type_noncacheable(vma->vm_page_prot)) {
-				if (new->flags & KVM_MEM_FORCE_CACHEABLE_PFNMAP)
-					return -EINVAL;
-			} else {
-				if (!kvm_arch_supports_cacheable_pfnmap()))
-					return -EINVAL;
-			}
-
-That's at least a bit more palatable, as it doesn't create impossible situations
-on x86, e.g. x86 simply doesn't support letting userspace force a cacheable.
-
-And Oliver also stated:
-
-  Whether or not FWB is employed for a particular region of IPA space is useful
-  information for userspace deciding what it needs to do to access guest memory. 
-
-The above would only cover half of that, i.e. wouldn't prevent userspace from
-getting surprised by a WB mapping.  So I think it would need to be this?
-
-			if (mapping_type_noncacheable(vma->vm_page_prot) !=
-                            !(new->flags & KVM_MEM_FORCE_CACHEABLE_PFNMAP))
-				return -EINVAL;
-
-Which I don't hate as much, but I still don't love it, as it's overly specific,
-e.g. only helps with PFNMAP memory, and pushes a sanity from userspace into KVM.
-
-Which is another complaint with this uAPI: it effectively assumes/implies PFNMAP is
-device memory, but that's simply not true.  There are zero guarantees with respect
-to what actually lies behind any given PFNMAP.  It could be device memory, but
-it could also be regular RAM, or something in between.
-
-I would much prefer we have a way userspace query the effective memtype for a
-range of memory, either for a VMA or for a KVM mapping, and let _userspace_ do
-whatever sanity checks it wants.  That seems like it would be more generally
-useful, and would be feasible to support on multiple architectures.  Though I'd
-probably prefer to avoid even that, e.g. in favor of providing enough information
-in other ways so that userspace can (somewhat easily) deduce how KVM will behave
-for a giving mapping.
-
-> > There is no easy way for VFIO to know to set it, and the kernel will
-> > not allow switching a cachable VMA to non-cachable anyhow.
+On Sat, May 24, 2025, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> > So all it does is make it harder to create a memslot.
+> Fixes a security bug due to mismatched attributes between S1 and
+> S2 mapping.
 > 
-> Oliver had mentioned earlier that he would still prefer a memslot flag as
-> VMM should convey its intent through that flag:
->
-> https://lore.kernel.org/all/aAdKCGCuwlUeUXKY@linux.dev/
-> Oliver, could you please confirm if you are convinced with not having this
-> flag? Can we rely on MT_NORMAL in vma mapping to convey this?
+> Currently, it is possible for a region to be cacheable in S1, but mapped
+> non cached in S2. This creates a potential issue where the VMM may
+> sanitize cacheable memory across VMs using cacheable stores, ensuring
+> it is zeroed. However, if KVM subsequently assigns this memory to a VM
+> as uncached, the VM could end up accessing stale, non-zeroed data from
+> a previous VM, leading to unintended data exposure. This is a security
+> risk.
+> 
+> Block such mismatch attributes case by returning EINVAL when userspace
+> try to map PFNMAP cacheable. Only allow NORMAL_NC and DEVICE_*.
+> 
+> CC: Oliver Upton <oliver.upton@linux.dev>
+> CC: Sean Christopherson <seanjc@google.com>
+> CC: Catalin Marinas <catalin.marinas@arm.com>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 2feb6c6b63af..305a0e054f81 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1466,6 +1466,18 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+>  	return vma->vm_flags & VM_MTE_ALLOWED;
+>  }
+>  
+> +/*
+> + * Determine the memory region cacheability from VMA's pgprot. This
+> + * is used to set the stage 2 PTEs.
+> + */
+> +static unsigned long mapping_type_noncacheable(pgprot_t page_prot)
 
-Is MT_NORMAL visable and/or controllable by userspace?
+Return a bool.  And given that all the usage queries cachaeable, maybe invert
+this predicate?
+
+> +{
+> +	unsigned long mt = FIELD_GET(PTE_ATTRINDX_MASK, pgprot_val(page_prot));
+> +
+> +	return (mt == MT_NORMAL_NC || mt == MT_DEVICE_nGnRnE ||
+> +		mt == MT_DEVICE_nGnRE);
+> +}
+
+No need for the parantheses.  And since the values are clumped together, maybe
+use a switch statement to let the compiler optimize the checks (though I'm
+guessing modern compilers will optimize either way).
+
+E.g.
+
+static bool kvm_vma_is_cacheable(struct vm_area_struct *vma)
+{
+	switch (FIELD_GET(PTE_ATTRINDX_MASK, pgprot_val(vma->vm_page_prot))) {
+	case MT_NORMAL_NC:
+	case MT_DEVICE_nGnRnE:
+	case MT_DEVICE_nGnRE:
+		return false;
+	default:
+		return true;
+	}
+}
+
+
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  struct kvm_s2_trans *nested,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+> @@ -1612,6 +1624,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  
+>  	vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
+>  
+> +	if ((vma->vm_flags & VM_PFNMAP) &&
+> +	    !mapping_type_noncacheable(vma->vm_page_prot))
+
+I don't think this is correct, and there's a very real chance this will break
+existing setups.  PFNMAP memory isn't strictly device memory, and IIUC, KVM
+force DEVICE/NORMAL_NC based on kvm_is_device_pfn(), not based on VM_PFNMAP.
+
+	if (kvm_is_device_pfn(pfn)) {
+		/*
+		 * If the page was identified as device early by looking at
+		 * the VMA flags, vma_pagesize is already representing the
+		 * largest quantity we can map.  If instead it was mapped
+		 * via __kvm_faultin_pfn(), vma_pagesize is set to PAGE_SIZE
+		 * and must not be upgraded.
+		 *
+		 * In both cases, we don't let transparent_hugepage_adjust()
+		 * change things at the last minute.
+		 */
+		device = true;
+	}
+
+	if (device) {
+		if (vfio_allow_any_uc)
+			prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+		else
+			prot |= KVM_PGTABLE_PROT_DEVICE;
+	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC) &&
+		   (!nested || kvm_s2_trans_executable(nested))) {
+		prot |= KVM_PGTABLE_PROT_X;
+	}
+
+which gets morphed into the hardware memtype attributes as:
+
+	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
+			KVM_PGTABLE_PROT_NORMAL_NC)) {
+	case KVM_PGTABLE_PROT_DEVICE | KVM_PGTABLE_PROT_NORMAL_NC:
+		return -EINVAL;
+	case KVM_PGTABLE_PROT_DEVICE:
+		if (prot & KVM_PGTABLE_PROT_X)
+			return -EINVAL;
+		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+		break;
+	case KVM_PGTABLE_PROT_NORMAL_NC:
+		if (prot & KVM_PGTABLE_PROT_X)
+			return -EINVAL;
+		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+		break;
+	default:
+		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+	}
+
+E.g. if the admin hides RAM from the kernel and manages it in userspace via
+/dev/mem, this will break (I think).
+
+So I believe what you want is something like this:
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index eeda92330ade..4129ab5ac871 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1466,6 +1466,18 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+        return vma->vm_flags & VM_MTE_ALLOWED;
+ }
+ 
++static bool kvm_vma_is_cacheable(struct vm_area_struct *vma)
++{
++       switch (FIELD_GET(PTE_ATTRINDX_MASK, pgprot_val(vma->vm_page_prot))) {
++       case MT_NORMAL_NC:
++       case MT_DEVICE_nGnRnE:
++       case MT_DEVICE_nGnRE:
++               return false;
++       default:
++               return true;
++       }
++}
++
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+                          struct kvm_s2_trans *nested,
+                          struct kvm_memory_slot *memslot, unsigned long hva,
+@@ -1473,7 +1485,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ {
+        int ret = 0;
+        bool write_fault, writable, force_pte = false;
+-       bool exec_fault, mte_allowed;
++       bool exec_fault, mte_allowed, is_vma_cacheable;
+        bool device = false, vfio_allow_any_uc = false;
+        unsigned long mmu_seq;
+        phys_addr_t ipa = fault_ipa;
+@@ -1615,6 +1627,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+        vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
+ 
++       is_vma_cacheable = kvm_vma_is_cacheable(vma);
++
+        /* Don't use the VMA after the unlock -- it may have vanished */
+        vma = NULL;
+ 
+@@ -1639,6 +1653,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+                return -EFAULT;
+ 
+        if (kvm_is_device_pfn(pfn)) {
++               if (is_vma_cacheable)
++                       return -EINVAL;
++
+                /*
+                 * If the page was identified as device early by looking at
+                 * the VMA flags, vma_pagesize is already representing the
+@@ -1722,6 +1739,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+                prot |= KVM_PGTABLE_PROT_X;
+ 
+        if (device) {
++               if (is_vma_cacheable) {
++                       ret = -EINVAL;
++                       goto out;
++               }
++
+                if (vfio_allow_any_uc)
+                        prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+                else
+
