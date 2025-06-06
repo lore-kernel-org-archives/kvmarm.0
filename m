@@ -1,73 +1,61 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7A2286419
-	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 09:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68AD2853FD
+	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 09:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749201287; cv=none; b=u8nJL8toTVfvCnZi9laBKT91P2QRDng6l3u2jOrZe/7gxvmfFV/qdpHboBxM1aMqhXbWzveuEgQM+/Rnu4NlfydjBRyZ6q2n9JXvPOQatHxPtUsR9h+5teIHr2oPMTXXswhKJl5hDsrJYVyaCTycuRA0wL+YuoouwxOPkoOJKnE=
+	t=1749201494; cv=none; b=LXXd6cYY+5oY+pCPc96tmwJ2KfKPKhAnqA/tv7qBKVoaKoGyA0I8Dj6Tx3BfUYRCAKW4bxSG2uXpQVFAVxfDdoepZtEMnBe/Ud9GSXLSI/mRQAso01ZWr8qkLdo8SG8ggUCsRFLAZvDprhTjwjjtVONWAi7yIozsuBprEW4YecM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749201287; c=relaxed/simple;
-	bh=B1sHZVub/dqRM9/63GetGGqfhY8L0l8Ko9CARf4d3QQ=;
+	s=arc-20240116; t=1749201494; c=relaxed/simple;
+	bh=Fhk8JW40lJiOzjJuYl9plVhfmLpuSn9Evq5zmniYlMo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HAa7c/rO9pMg24pzKG6pabQ36ZADcIDaXgC9OtpCPbAxQqumM58NXmoec8b/jfVmuMfCESP2FtRbBmgs/wYc1QcWW72t8zZvNSXgs0YBkAZCn5adDce7K37srybImGJBAZJmTRJczlHyAfznnFUo8HhZsUm49UMr30GQus+YSiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZC3ILgMc; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=SYoSUNdhLTJdr2FeU8q+AC1u8uVLqdnsRAJIR61Z7R4wzxRLxLcfCrKM+O5CSkQY8+vfYEG9u4r9LzTyQgnRpBqHVYhufg2vxEYMYa0qL4LHCdk8i7lAlEX4Apj8M2dMzxDzvmphGYOJ/BX3+dTApEKlQDI4xtbfOUpsjB1+iew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZC3ILgMc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749201284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=oCj6+Sxcxs0auBfeuChSwk33Y3pn/sByOGMCDkMC3UA=;
-	b=ZC3ILgMcGmv1AAnKhsXEdJwARFnLNsAWvVr2PTEbH3gSDLDQH5+qBhHm6G8Wgc4lgB9Kzy
-	WpP4V5a3Z2Sgne5RcvpLTiaKrMcPZvTQMe2tOkGd9o+ZROlTMIjSMQXG3FJqQdIduLBwlm
-	PY2VVUhz1CVezESrHw8anXGIkVG5DSs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-425-oWDhlWURNlG0XsQwBVrUTg-1; Fri, 06 Jun 2025 05:14:41 -0400
-X-MC-Unique: oWDhlWURNlG0XsQwBVrUTg-1
-X-Mimecast-MFC-AGG-ID: oWDhlWURNlG0XsQwBVrUTg_1749201280
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43e9b0fd00cso10228095e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 06 Jun 2025 02:14:41 -0700 (PDT)
+ us-mta-340-uKnAk8dENq-zKwu5W6SBAw-1; Fri, 06 Jun 2025 05:18:08 -0400
+X-MC-Unique: uKnAk8dENq-zKwu5W6SBAw-1
+X-Mimecast-MFC-AGG-ID: uKnAk8dENq-zKwu5W6SBAw_1749201488
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-451ac1b43c4so10985335e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 06 Jun 2025 02:18:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749201280; x=1749806080;
+        d=1e100.net; s=20230601; t=1749201487; x=1749806287;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=oCj6+Sxcxs0auBfeuChSwk33Y3pn/sByOGMCDkMC3UA=;
-        b=aNfWmZnJtVthHGtoIpcGYn0zNk+ft8TCpVxBbwZqyMdkUZkgdxwu4D+XQp4dkoVVsO
-         aBo80vETN/tYwSWG50mseOUgfxKwvnFCRxMgD6uGdNOCMWmE/eP/ay/46H1jVdiXKPtP
-         L2l/RlE62nvssy3f3zp1jNnwuzHtnbjKwAiF+kTEnVikUF2H3wSKyYJXFl3OsuEU7YUL
-         +GAvQtsa2glexLif0U4we/WMJocrTCsDO05YcUNMLMj+p3Fkp5ax3b9lC65UZNfYz6/0
-         4WoNXCwoR39/c75PzEaOBEVW3EJePasPnlqYyXFos8HrSeD7jVQCKmsKo8LNQsACIo85
-         ZJPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXi62K47nmahWvN8SjEIaJBz+pieiHVsQ1Sfgp9CyYEPM/3xyaKaUA+jzCldaqYQCIJm7O69M0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzNRzTqdv1lGBI4iF4ZDVJcDb4SZ2ETkgn+6QKpmKlCYkgZE1st
-	pYg39XREKvcZn7pxJUnfMCIudVhxplTaDRVI2zu9g2TKcaQYehNelhsJKPPsFoBvzdKMRtcdvXW
-	UIwGI7eK1lKW3K5WW3od6dUDBcQrsXJUQWnkj8Ye3YtemelCrCgRiiDqCkg==
-X-Gm-Gg: ASbGncvE/8x605ZWYlk17Hv37i1N5/WmSavemgT7XfDjvgN1B2a2lFEpAkYK5Tuve7v
-	+rJGDDZc5JBRRAs/Pq9wBbqgrbWk00BpDGu5q1U7js1mSEjdrSPgdqL+Utc4YdlBNNaeUUESUEl
-	lcJLd9D13yBzVxor4ifD9bg7nylaO+xXpqdzwfIILeLhiAGC3LELLkLRP55OT8Hg3HnIZm0JdVA
-	mwMflw7vexKCFN9BbLIFKyKafJbdPzxg32m4IOEYscnYROLqq3FdzECF9ZOj+38iaPDaKSdV6X+
-	Yi0BZcO9P382yujZsal5kAR7gQiagAQmrBZRkKS4KID8NH8IQk3+32/TAjFeHIsAsbqr/fgzJfV
-	tQGnhSq3tUEVOs6E9KSs+7XWCA4Y8Ns8=
-X-Received: by 2002:a05:600c:3510:b0:43c:f509:2bbf with SMTP id 5b1f17b1804b1-451f88d836amr75147675e9.15.1749201280325;
-        Fri, 06 Jun 2025 02:14:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFkpLXinHXWxiSI+4PvEC2BPCocHHNYP7TvdS/sSVKr19ttFoE6Pj4byntHDslgrPmFOZSX+A==
-X-Received: by 2002:a05:600c:3510:b0:43c:f509:2bbf with SMTP id 5b1f17b1804b1-451f88d836amr75147145e9.15.1749201279824;
-        Fri, 06 Jun 2025 02:14:39 -0700 (PDT)
+        bh=Jj58XfJATL0B+GEQPXpt1/s2cxBgD2Nu15jBPdy+PsA=;
+        b=kdG9/yk9YYI7jZN5vgHkAT9914EFP4AJkZSup+TwDK6e7zlnVwoLeJCYcsF6mP1wA5
+         hNx1bc5vJbFZHFwImB3OFRoSbBQR4VXqfExN0RuZIq3QLxvAR7b17c/ZtgRzFIPhmsna
+         MZUToxpRlDrbm5nftycc/U97BZaKQeMqXdlOumWh+X+8exmAoc01vu0oc6PhtPuIWmOQ
+         7dWyXn681VjRa+CqDTs8efwCEmiWp5pZkSc72FW0sgQ8LphkT/OjRiX0s8szlBzdFNs6
+         Tdu42cy8cgG5kyU+Vy8myTUhjef+nbRLgbnl6nzQJD0kkgJgHWTF62Pb0QW7xoV4lD/I
+         Ypbg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/D0CePBc9MZSyiMSNBakhVeWx3M8mKGhVkF8DsFBvLpbntwvPoGRzBTSgKXTijjkf6daf7ek=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyoJwfRP9kcJxcmEqVuin+Ym+X9TZsQS73i2abUyAaofFLuaccM
+	DfYj8jTpLTozSuJ+6K1ua1L9IXWYcUoorH7LPq4usXdPKGK6xsh9LVy888X8nhps8XkHsxA29S+
+	2w3XBysQWhhe9AezKILbH8dN8AYLD1pAKmY5TJlbgzYj2FnSS3XDG25qO4g==
+X-Gm-Gg: ASbGncsRwTv3XiI9RxAUHMx4R/ZsFacfrI872Ho7sbIvWS81gWLBOhmPX2DwKvdAiZx
+	mKUgXzBhcfvHKnXJMUfv5KM8aqVhONNJeyKlbWHYUDa3xaSQGcaAmV3Z9fXKFqmV/NmrLcgblUn
+	Xj14edWPnjeA+LgxKJZ0c/1twW0EJ3FxbupRa/sVu+0pAp9KRcCqvUh/u5bAE601MOMIMs/J1Eh
+	wJ4bNg/gVyU55sJv7vQsA3A+51+M7f3/yGsrTZDex30ZZjyrNKPWuPLcTTWLPWL7IxB3S84kB3y
+	6cEWQZpB/Idb0JGgMvsKHw3h/dRIDLjblE/YhIpdQnBMo+a9IuUgy/NI988UqxgFJGZaf1EuM2U
+	18N5PEaHyTpZJN4+ssKTdQ9AlPpzTm3EAb++vZ+D8wg==
+X-Received: by 2002:a05:600c:1c99:b0:44a:b793:9e4f with SMTP id 5b1f17b1804b1-4520143724fmr22882015e9.19.1749201487321;
+        Fri, 06 Jun 2025 02:18:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGXHxPEab+pPqx+rT1qPLZUVdURglPsCFidzht7Kh/mmEEi+EL5y02Ki6Q7IFWhAT0wjRNTiQ==
+X-Received: by 2002:a05:600c:1c99:b0:44a:b793:9e4f with SMTP id 5b1f17b1804b1-4520143724fmr22881395e9.19.1749201486711;
+        Fri, 06 Jun 2025 02:18:06 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f19:9c00:568:7df7:e1:293d? (p200300d82f199c0005687df700e1293d.dip0.t-ipconnect.de. [2003:d8:2f19:9c00:568:7df7:e1:293d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45209ce1afasm17541465e9.10.2025.06.06.02.14.37
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45209bc6d50sm17630415e9.5.2025.06.06.02.18.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Jun 2025 02:14:39 -0700 (PDT)
-Message-ID: <aa9701b7-a550-46bf-bb2f-b73462671c7d@redhat.com>
-Date: Fri, 6 Jun 2025 11:14:36 +0200
+        Fri, 06 Jun 2025 02:18:06 -0700 (PDT)
+Message-ID: <870d1f85-840b-40ba-9eeb-14d3a5b7f169@redhat.com>
+Date: Fri, 6 Jun 2025 11:18:03 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,8 +63,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 11/18] KVM: x86: Consult guest_memfd when computing
- max_mapping_level
+Subject: Re: [PATCH v11 00/18] KVM: Mapping guest_memfd backed memory at the
+ host for software protected VMs
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -100,7 +88,6 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250605153800.557144-1-tabba@google.com>
- <20250605153800.557144-12-tabba@google.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -147,81 +134,62 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250605153800.557144-12-tabba@google.com>
+In-Reply-To: <20250605153800.557144-1-tabba@google.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: jGPhTL5CUEWRzn3dtBJrlNetU1Q7As26To3cfsgJI0Y_1749201280
+X-Mimecast-MFC-PROC-ID: HIXbIGH16PfRCuOX_GIIHowlqmn7rnZ728DohkocgtE_1749201488
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 05.06.25 17:37, Fuad Tabba wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
+> Main changes since v10 [1]:
+> - Added bounds checking when faulting a shared page into the host, along
+>    with a selftest to verify the check.
+> - Refactored KVM/arm64's handling of guest faults (user_mem_abort()).
+>    I've dropped the Reviewed-by tags from "KVM: arm64: Refactor
+>    user_mem_abort()..." since it has changed significantly.
+> - Handled nested virtualization in KVM/arm64 when faulting guest_memfd
+>    backed pages into the guest.
+> - Addressed various points of feedback from the last revision.
+> - Still based on Linux 6.15
 > 
-> This patch adds kvm_gmem_max_mapping_level(), which always returns
-> PG_LEVEL_4K since guest_memfd only supports 4K pages for now.
+> This patch series enables the mapping of guest_memfd backed memory in
+> the host. This is useful for VMMs like Firecracker that aim to run
+> guests entirely backed by guest_memfd [2]. When combined with Patrick's
+> series for direct map removal [3], this provides additional hardening
+> against Spectre-like transient execution attacks.
 > 
-> When guest_memfd supports shared memory, max_mapping_level (especially
-> when recovering huge pages - see call to __kvm_mmu_max_mapping_level()
-> from recover_huge_pages_range()) should take input from
-> guest_memfd.
+> This series also lays the groundwork for restricted mmap() support for
+> guest_memfd backed memory in the host for Confidential Computing
+> platforms that permit in-place sharing of guest memory with the host
+> [4].
 > 
-> Input from guest_memfd should be taken in these cases:
+> Patch breakdown:
 > 
-> + if the memslot supports shared memory (guest_memfd is used for
->    shared memory, or in future both shared and private memory) or
-> + if the memslot is only used for private memory and that gfn is
->    private.
+> Patches 1-7: Primarily refactoring and renaming to decouple the concept
+> of guest memory being "private" from it being backed by guest_memfd.
 > 
-> If the memslot doesn't use guest_memfd, figure out the
-> max_mapping_level using the host page tables like before.
+> Patches 8-9: Add support for in-place shared memory and the ability for
+> the host to map it. This is gated by a new configuration option, toggled
+> by a new flag, and advertised to userspace by a new capability
+> (introduced in patch 16).
 > 
-> This patch also refactors and inlines the other call to
-> __kvm_mmu_max_mapping_level().
+> Patches 10-15: Implement the x86 and arm64 support for this feature.
 > 
-> In kvm_mmu_hugepage_adjust(), guest_memfd's input is already
-> provided (if applicable) in fault->max_level. Hence, there is no need
-> to query guest_memfd.
+> Patch 16: Introduces the new capability to advertise this support and
+> updates the documentation.
 > 
-> lpage_info is queried like before, and then if the fault is not from
-> guest_memfd, adjust fault->req_level based on input from host page
-> tables.
+> Patches 17-18: Add and fix selftests for the new functionality.
 > 
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Co-developed-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
+> For details on how to test this patch series, and on how to boot a guest
+> that uses the new features, please refer to v8 [5].
 
-[...]
+Paolo Et. al,
 
->   static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->   {
->   	return false;
-> @@ -2561,6 +2565,7 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->   int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
->   		     gfn_t gfn, kvm_pfn_t *pfn, struct page **page,
->   		     int *max_order);
-> +int kvm_gmem_mapping_order(const struct kvm_memory_slot *slot, gfn_t gfn);
->   #else
->   static inline int kvm_gmem_get_pfn(struct kvm *kvm,
->   				   struct kvm_memory_slot *slot, gfn_t gfn,
-> @@ -2570,6 +2575,12 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
->   	KVM_BUG_ON(1, kvm);
->   	return -EIO;
->   }
-> +static inline int kvm_gmem_mapping_order(const struct kvm_memory_slot *slot,
-> +					 gfn_t gfn)
-> +{
-> +	BUG();
-> +	return 0;
+I only found some smaller things, this is looking mostly good to me.
 
-As raised, no BUG(). If this is unreachable for these configs,
-
-BUILD_BUG() might do.
-
-Apart from that
-
-Acked-by: David Hildenbrand <david@redhat.com>
+... worth having a look ;)
 
 -- 
 Cheers,
