@@ -1,72 +1,238 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E2D2874F2
-	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 10:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4D32C3242
+	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 10:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749205053; cv=none; b=g4Kb30efWfvdHu+vfiHYOKXvZ68DKPhawHK+GVIKvU7ppmJZF9ciPTGaOf/63Av6wvCloEblowHsH8wIgbKTznY/od7dhd9vwRt+LzDWOr41FVpKT+wZHQTfr6KvTypMA8ngOCvDZtjGF3RiCN1i2JpIrS1qc7wOFMKdLLQ8SqQ=
+	t=1749206041; cv=none; b=g10FHQx66WbDZpI9nDlJiM3qlipL8sgE6zUmUiR0fc52QvEy2ktuUCPr6omvyK8TyOqhiGKHuLzPQqk1to+cjTHQ3W6Js6vJhxE2kluS8EyYTvjzMWvHq7+VXA8j+PqpTK3aiiN9MeQjKy9yTiZ4GYV59ByD6TfgmMlaV2URm/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749205053; c=relaxed/simple;
-	bh=HvZ3st1eSAe4qQ4PYDvR0i4s2aynIXGqIl9oaBmrwB8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eww2oNMgStEED28DNcZLT4+Q1yFTnLoEtkMlLqtFVzD+r2vay+PZ3o4su4QaApDljL9jDrUj1UqGIHaU/G9FUjgucIfK6xbKgSnjRcqOlePOUVMrqy6Sp/3gCkwR/JtpSD1m4PAtI1JFR6AORrNlGjfWo4ZDCwxBZdg2UPc/iro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E978153B;
-	Fri,  6 Jun 2025 03:17:12 -0700 (PDT)
-Received: from [10.57.49.177] (unknown [10.57.49.177])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8A4E33F673;
-	Fri,  6 Jun 2025 03:17:23 -0700 (PDT)
-Message-ID: <4fb8327f-a3e7-4127-9fa7-754c4e6cbdcc@arm.com>
-Date: Fri, 6 Jun 2025 11:17:22 +0100
+	s=arc-20240116; t=1749206041; c=relaxed/simple;
+	bh=P8BWQX0eac2EiocmBjT+eabK9bdjkAT+CvP9MQzx+nA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tlvr+ar0YPUafQWZSvuDbs7QiFCUJx4kr82IQg3rzp4lWWQknPUr6Qs4TvrE8SsuBR/Jgtxi9RUWQUQH5A0iMzDimtomiXvS2VXcxYvBlUN9Tl7Y1rP9dOgFFHHOtlRnSIdm44L04Sk58CZCYQulysw8CRDtKy51wkBDqXyDKk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tSicdUtb; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tSicdUtb"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4a58ef58a38so171111cf.0
+        for <kvmarm@lists.linux.dev>; Fri, 06 Jun 2025 03:33:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749206038; x=1749810838; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fAw4qUBOEhITQZ6BbLDNViptraoja2RZKd2zTaQIUtM=;
+        b=tSicdUtb/7rTxirlyoMfcnULvfF4N0/w37S6aRzi3LNhBROJT6ckt+ngLF8RH8sM+J
+         LM3IfirL9y59nAqGE1y8S7gAf5wcb2Eo4t6wmGPpO6JAQwBoF5cU//ikrE2PiuG6vdF+
+         1KIGdEFCREhvFRHJe9qlignefLij5FXIYhFyEAYYY5rF1sjzHTvaWsDdNT5e6vdDdKZb
+         dsRopr3QABTjtIIhRM64t4QY4vVu6oJXALZ2nu/yQdNnXmfryTP+Ds7BqWmhm5ZWViP5
+         VsvgpQboXYbagmIKR72NWZoRs2wYQJ5g/AqotWeaUdvBO0xpouF+Dr4hYPKzywtcUhli
+         6Rrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749206038; x=1749810838;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fAw4qUBOEhITQZ6BbLDNViptraoja2RZKd2zTaQIUtM=;
+        b=M5m2FuFPTiwQodY5mLdnmuG041F9H5Z3136dhmMIjhQmnDnxlem5IgOT1goMF3SWgP
+         MZUZMpgRHB6YQW0XMRuyO034fdO82scSIXMuiEGiHYFox7ZIeiBeqeSRWQmBTbDXw7TU
+         c83UvR41SbQeyGd04FJOKXXg4ocoBMU5R0ECASdouLf/NubwObBd38pzIDA8oD5sgaF7
+         KjkVMt6x1ADrVdP3FR2Gw7Fe+816yS3fnmQeh0M5Dmeevp4X/u+1DMIljSUHRwq6ccOj
+         Byn6F7x4WcfjOLlMJVMZVQJAhtZ7welxolbsD/k93hzHfAF+80JzK9E5llsPIgj2QpHs
+         H8lw==
+X-Forwarded-Encrypted: i=1; AJvYcCXT37xvkEiU/bQ/Nob92CEUoTQCtZPgjXVak9SavxFcsUB27PcMo9skaQvCF/gt7OTLlKwWHVA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyhybIBUUDPi2zTOjQNGciXisS6w9EecnulVwh0eTKljQCb99Ms
+	gYP3+pp3oAWMgOhJ1JMkgWlyvPOYj2i+FCRZ0P9cqySHZndaMMQVMLDmv47oZitv/TtCTLIdrEU
+	JdX4Dkt/WhaGf0DYVGDPcoOTVczIZiZbNRDP9tblT
+X-Gm-Gg: ASbGncsdfqSEu55QWUStl7CIqEfEmZIoRpBWliPh+DcdrJQzrIcv7DMZx0sCn+mtCJY
+	i9RfGPf9W0VV3pWq9wlagRSAiuY/I4CGNRp2WwKJgOC2M77Hn/kjOnL2dCHmf0vdxB9V+I3QJnK
+	yWC9Csdqj9GeVFR86YISS7a/OVl842R+vG2Mydganh3SA=
+X-Google-Smtp-Source: AGHT+IEybTYvddL3yeh6SARztEENsK1RXfYm9brRfTxtTO2Kl9vo26csUL8xa8F7wu3xTgkSSmdtK6BhfPfymu5hxfQ=
+X-Received: by 2002:a05:622a:1a14:b0:477:9a4:d7ea with SMTP id
+ d75a77b69052e-4a643bafd8emr2595461cf.13.1749206037998; Fri, 06 Jun 2025
+ 03:33:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 2/9] arm64: efi: initialise SCTLR_ELx
- fully
-Content-Language: en-GB
-To: Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org
-Cc: alexandru.elisei@arm.com, andrew.jones@linux.dev, kvmarm@lists.linux.dev,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-References: <20250529135557.2439500-1-joey.gouly@arm.com>
- <20250529135557.2439500-3-joey.gouly@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250529135557.2439500-3-joey.gouly@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-9-tabba@google.com>
+ <ad4157a1-6e38-46df-ae24-76d036972fbc@redhat.com> <CA+EHjTziHb5kbY-aA1HPKYpg6iAPcQ19=51pLQ05JRJKeOZ8=A@mail.gmail.com>
+ <6cf86edb-1e7e-4b44-93d0-f03f9523c24a@redhat.com>
+In-Reply-To: <6cf86edb-1e7e-4b44-93d0-f03f9523c24a@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 6 Jun 2025 11:33:21 +0100
+X-Gm-Features: AX0GCFuEdbWcKuv4eOpkPUf0dGJeJL5f_PxO8xkAnzeoLueKsdz0dynDzzOLB0Q
+Message-ID: <CA+EHjTz8Q+X5==ym-WCSveNkfHd0id03nY1OYtoMchc5AUWDqQ@mail.gmail.com>
+Subject: Re: [PATCH v11 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 29/05/2025 14:55, Joey Gouly wrote:
-> Don't rely on the value of SCTLR_ELx when booting via EFI.
-> 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> ---
->   lib/arm/setup.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 67b5db07..0a22dbab 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -349,6 +349,11 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
->   {
->   	efi_status_t status;
->   
-> +
-> +	// EFI exits boot services with SCTLR_ELx.M=1, so keep
-> +	// the MMU enabled.
-> +	write_sysreg(INIT_SCTLR_EL1_MMU_OFF | SCTLR_EL1_M, sctlr_el1);
+On Fri, 6 Jun 2025 at 10:55, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 06.06.25 11:30, Fuad Tabba wrote:
+> > Hi David,
+> >
+> > On Fri, 6 Jun 2025 at 10:12, David Hildenbrand <david@redhat.com> wrote:
+> >>
+> >> On 05.06.25 17:37, Fuad Tabba wrote:
+> >>> This patch enables support for shared memory in guest_memfd, including
+> >>> mapping that memory from host userspace.
+> >>>
+> >>> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
+> >>> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
+> >>> flag at creation time.
+> >>>
+> >>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> >>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> >>> Signed-off-by: Fuad Tabba <tabba@google.com>
+> >>> ---
+> >>
+> >> [...]
+> >>
+> >>> +static bool kvm_gmem_supports_shared(struct inode *inode)
+> >>> +{
+> >>> +     u64 flags;
+> >>> +
+> >>> +     if (!IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM))
+> >>> +             return false;
+> >>> +
+> >>> +     flags = (u64)inode->i_private;
+> >>
+> >> Can probably do above
+> >>
+> >> const u64 flags = (u64)inode->i_private;
+> >>
+> >
+> > Ack.
+> >
+> >>> +
+> >>> +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> >>> +}
+> >>> +
+> >>> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> >>> +{
+> >>> +     struct inode *inode = file_inode(vmf->vma->vm_file);
+> >>> +     struct folio *folio;
+> >>> +     vm_fault_t ret = VM_FAULT_LOCKED;
+> >>> +
+> >>> +     if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
+> >>> +             return VM_FAULT_SIGBUS;
+> >>> +
+> >>> +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> >>> +     if (IS_ERR(folio)) {
+> >>> +             int err = PTR_ERR(folio);
+> >>> +
+> >>> +             if (err == -EAGAIN)
+> >>> +                     return VM_FAULT_RETRY;
+> >>> +
+> >>> +             return vmf_error(err);
+> >>> +     }
+> >>> +
+> >>> +     if (WARN_ON_ONCE(folio_test_large(folio))) {
+> >>> +             ret = VM_FAULT_SIGBUS;
+> >>> +             goto out_folio;
+> >>> +     }
+> >>> +
+> >>> +     if (!folio_test_uptodate(folio)) {
+> >>> +             clear_highpage(folio_page(folio, 0));
+> >>> +             kvm_gmem_mark_prepared(folio);
+> >>> +     }
+> >>> +
+> >>> +     vmf->page = folio_file_page(folio, vmf->pgoff);
+> >>> +
+> >>> +out_folio:
+> >>> +     if (ret != VM_FAULT_LOCKED) {
+> >>> +             folio_unlock(folio);
+> >>> +             folio_put(folio);
+> >>> +     }
+> >>> +
+> >>> +     return ret;
+> >>> +}
+> >>> +
+> >>> +static const struct vm_operations_struct kvm_gmem_vm_ops = {
+> >>> +     .fault = kvm_gmem_fault_shared,
+> >>> +};
+> >>> +
+> >>> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> >>> +{
+> >>> +     if (!kvm_gmem_supports_shared(file_inode(file)))
+> >>> +             return -ENODEV;
+> >>> +
+> >>> +     if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
+> >>> +         (VM_SHARED | VM_MAYSHARE)) {
+> >>> +             return -EINVAL;
+> >>> +     }
+> >>> +
+> >>> +     vma->vm_ops = &kvm_gmem_vm_ops;
+> >>> +
+> >>> +     return 0;
+> >>> +}
+> >>> +
+> >>>    static struct file_operations kvm_gmem_fops = {
+> >>> +     .mmap           = kvm_gmem_mmap,
+> >>>        .open           = generic_file_open,
+> >>>        .release        = kvm_gmem_release,
+> >>>        .fallocate      = kvm_gmem_fallocate,
+> >>> @@ -428,6 +500,7 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+> >>>        }
+> >>>
+> >>>        file->f_flags |= O_LARGEFILE;
+> >>> +     allow_write_access(file);
+> >>
+> >> Why is that required?
+> >>
+> >> As the docs mention, it must be paired with a previous deny_write_access().
+> >>
+> >> ... and I don't find similar usage anywhere else.
+> >
+> > This is to address Gavin's concern [*] regarding MADV_COLLAPSE, which
+> > isn't an issue until hugepage support is enabled. Should we wait until
+> > we have hugepage support?
+>
+> If we keep this, we *definitely* need a comment why we do something
+> nobody else does.
+>
+> But I don't think allow_write_access() would ever be the way we want to
+> fence off MADV_COLLAPSE. :) Maybe AS_INACCESSIBLE or sth. like that
+> could fence it off in file_thp_enabled().
+>
+> Fortunately, CONFIG_READ_ONLY_THP_FOR_FS might vanish at some point ...
+> so I've been told.
+>
+> So if it's not done for secretmem for now or others, we also shouldn't
+> be doing it for now I think.
 
-minor nit: Given this is in a common file for arm/arm64, may be worth 
-adding a helper function that does this on arm64. I understand EFI
-cannot enabled for arm32, still keeping this file generic would be
-cleaner. e.g.,
+I'll remove it.
 
-mmu_on(); or even  setup_sctlr();
+Thanks!
+/fuad
 
-Suzuki
-
+> --
+> Cheers,
+>
+> David / dhildenb
+>
