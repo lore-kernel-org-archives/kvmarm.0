@@ -1,100 +1,111 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FB323F42A
-	for <kvmarm@lists.linux.dev>; Fri,  6 Jun 2025 23:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7B9A927
+	for <kvmarm@lists.linux.dev>; Sun,  8 Jun 2025 09:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749254217; cv=none; b=pjqwFTql/ERSELpIgb+NeNxyHNbhmwkfoTsjlXUbY9S5JzB6q/LF6fkbztgdTmvCmS4jJFraxnPmy9Ior0+bqgvkBx1coNK+iqiSVnx+z/H2F0RqV29PYRIcxjlObqMy/iAY93w56Xg+fFRNqlRLm4ag6Q19938C9Wf7rGeBhZg=
+	t=1749376459; cv=none; b=jnLbIqDw64bMc1xU3c+FJL1QXWFRMJ2BPm13/RwiyYH88ku+W5BaSCOri0us9wuR+o8yVG/EtxdhvOfXsAUx4/cxunq2Yrl9LB51xoFE8M/iJnDv3EBI39YQqLPx3zboNB8SHmWXrB8VZMaE9JicgM4HDvo1t9NV8LRykGOr+Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749254217; c=relaxed/simple;
-	bh=FfZjBFrJnHL5qXqPJ52iFYwiecqXQgGEH17UAzM8jjw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O1EVwJRrTMccdmlF/GKJ4Ctas+pP2LbnfwvxRLVBEYPzPVrjJlhR2LpS2KdQJbxZQ9g/AGu3AlddT4lpN7X8u3jIdGVy/2pWbCZw0re3fR0dvoKp5bAzJWyuI8qmwc8x++wQdg8dT1B6NRd/M/Kfz/rQhdofbXtj/D50G7ehja4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1JdaNYtm; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1JdaNYtm"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-747d143117eso2090037b3a.3
-        for <kvmarm@lists.linux.dev>; Fri, 06 Jun 2025 16:56:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749254215; x=1749859015; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rQsDpgf8u91vw/WrLSGz0iJXQ6JiA2bq0U/tEH5QJI8=;
-        b=1JdaNYtm5KUSK2WI3rLFpELKrGcsiI4A/ZCD7JE3iEm80Ql3kIjEatqcFVvlRXtzVW
-         CThA+k3AxyES6HNBcDRSYjeGCnJ9Zl7SAE36/w+6g071uHo/GF57G8vKKLDc2CGDYrfA
-         9NcbV/dFocUAv72Bq2TNLCNNCxSgySUzYZ0eY2JDxsgefjjz2U9tQDC27QVHnlmLLk6k
-         XuPuUpqmJaCUgpseY5julRQGtmYqyNxowQgdpHmuiE/jPTWgcQjRe7HFk+3vJdXsNURA
-         SyyAM7brWAjCR6g+93iIESUbrpL9YMlzH4TOnhizoIOpjNhbJglAjwxtn2F/bjfxd0R2
-         A8gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749254215; x=1749859015;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rQsDpgf8u91vw/WrLSGz0iJXQ6JiA2bq0U/tEH5QJI8=;
-        b=U3eU5HgYiPj3TzeIlCyY16Icxd99MJ3fVyCyEU74hl+xpLxHkyZvcVabzvuTn4oOAt
-         g2H1BklCSsct8MVPw7xYWHR5p93NMGKYrATxCllqR7yZ2SQPEufegvA0JePWJwQnkFKV
-         9v6qbEwm/2jiV47yyN/KPVNwxVErXOhJsYCZwhjJHBh/E3kr3Er24Vlcj+AFDvVZdsfo
-         1YR88fuBIaXneDQMLW4V73voEme3PsJopECdbiv/ckOTVoC/aCg8L/Cgd1IRRpjxcer6
-         GVCH3dCfOBAUrpjJNcN3yyIe5MGQZcrdZ0jeCalAM6ENKfWDZqUItIHkLHLWrT3usbr0
-         DwDg==
-X-Forwarded-Encrypted: i=1; AJvYcCX4QQqRMRgb9uENgp4IMdq5mlfesK/Y7VyKfE/wmBHsMBIqSKOi82n4+knLIzIxyc1OHk7F92M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwIme2lfLb/tk7YTXDz3v05Ag2yeiksimq5ihYS7/WRPe41UB2O
-	gAesllABDft/Xc5Mcs6IEZKW2I9UHm+CejfVJyLXuhzX2CpMXOEDvw4dQAdO+mDdGJ+px8MyteT
-	9T+smZ6FrzQ==
-X-Google-Smtp-Source: AGHT+IGyp1ZByaQWclr+E1KDubTeknVJBEMfz1Flqb1492oOI1nXyfJVxjejhM42yZAw1MjGchfJyqOnrrck
-X-Received: from pfiu22.prod.google.com ([2002:a05:6a00:1256:b0:747:b608:3d8e])
- (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6009:b0:218:c22:e3e6
- with SMTP id adf61e73a8af0-21ee2555021mr6804011637.12.1749254215203; Fri, 06
- Jun 2025 16:56:55 -0700 (PDT)
-Date: Fri,  6 Jun 2025 16:56:19 -0700
-In-Reply-To: <20250606235619.1841595-1-vipinsh@google.com>
+	s=arc-20240116; t=1749376459; c=relaxed/simple;
+	bh=dnTNFvMnQgqWU1Z4xBX61EOnld4DfGmVKEYPsd/5rKw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZmuSoigTcGhL4rFQxYI98FOEgD5u6xnILjY4EoeJw9VlH8jKY+of75/eivKSqrIHg4iIZArXgTsK2haZbAE/34KBu/Qzi6Ln4qCwNw/cGEZA41W5AGIScyJeMDPisrRMH5SDPNzykvLmanjlo8Vedfopk16rsXaUhcsITvo6CWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4bFVjF3T3sz1fy4l;
+	Sun,  8 Jun 2025 17:52:49 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9AD96140155;
+	Sun,  8 Jun 2025 17:54:05 +0800 (CST)
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sun, 8 Jun 2025 17:54:04 +0800
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
+CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <joey.gouly@arm.com>,
+	<suzuki.poulose@arm.com>, <wanghaibin.wang@huawei.com>, Zenghui Yu
+	<yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: selftests: Close the GIC FD in arch_timer_edge_cases
+Date: Sun, 8 Jun 2025 17:54:02 +0800
+Message-ID: <20250608095402.1131-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250606235619.1841595-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.50.0.rc0.604.gd4ff7b7c86-goog
-Message-ID: <20250606235619.1841595-16-vipinsh@google.com>
-Subject: [PATCH v2 15/15] KVM: selftests: Add riscv auto generated test files
- for KVM Selftests Runner
-From: Vipin Sharma <vipinsh@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org
-Cc: seanjc@google.com, pbonzini@redhat.com, anup@brainfault.org, 
-	borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, 
-	maz@kernel.org, oliver.upton@linux.dev, dmatlack@google.com, 
-	Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-Add auto generated test files for s390 platforms.
+Close the GIC FD to free the reference it holds to the VM so that we can
+correctly clean up the VM. This also gets rid of the
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
+	"KVM: debugfs: duplicate directory 395722-4"
+
+warning when running arch_timer_edge_cases.
+
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 ---
- tools/testing/selftests/kvm/tests/riscv/ebreak_test/default.test | 1 +
- .../testing/selftests/kvm/tests/riscv/sbi_pmu_test/default.test  | 1 +
- 2 files changed, 2 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/tests/riscv/ebreak_test/default.test
- create mode 100644 tools/testing/selftests/kvm/tests/riscv/sbi_pmu_test/default.test
+ .../selftests/kvm/arm64/arch_timer_edge_cases.c  | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/tests/riscv/ebreak_test/default.test b/tools/testing/selftests/kvm/tests/riscv/ebreak_test/default.test
-new file mode 100644
-index 000000000000..d34b4b9b77ae
---- /dev/null
-+++ b/tools/testing/selftests/kvm/tests/riscv/ebreak_test/default.test
-@@ -0,0 +1 @@
-+riscv/ebreak_test
-diff --git a/tools/testing/selftests/kvm/tests/riscv/sbi_pmu_test/default.test b/tools/testing/selftests/kvm/tests/riscv/sbi_pmu_test/default.test
-new file mode 100644
-index 000000000000..5abb62c51097
---- /dev/null
-+++ b/tools/testing/selftests/kvm/tests/riscv/sbi_pmu_test/default.test
-@@ -0,0 +1 @@
-+riscv/sbi_pmu_test
+diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+index ad882ec8ff7b..b75e506324ce 100644
+--- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
++++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+@@ -954,6 +954,8 @@ static void test_init_timer_irq(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ 	pr_debug("ptimer_irq: %d; vtimer_irq: %d\n", ptimer_irq, vtimer_irq);
+ }
+ 
++static int gic_fd;
++
+ static void test_vm_create(struct kvm_vm **vm, struct kvm_vcpu **vcpu,
+ 			   enum arch_timer timer)
+ {
+@@ -968,12 +970,20 @@ static void test_vm_create(struct kvm_vm **vm, struct kvm_vcpu **vcpu,
+ 	vcpu_args_set(*vcpu, 1, timer);
+ 
+ 	test_init_timer_irq(*vm, *vcpu);
+-	vgic_v3_setup(*vm, 1, 64);
++	gic_fd = vgic_v3_setup(*vm, 1, 64);
++	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
++
+ 	sync_global_to_guest(*vm, test_args);
+ 	sync_global_to_guest(*vm, CVAL_MAX);
+ 	sync_global_to_guest(*vm, DEF_CNT);
+ }
+ 
++static void test_vm_cleanup(struct kvm_vm *vm)
++{
++	close(gic_fd);
++	kvm_vm_free(vm);
++}
++
+ static void test_print_help(char *name)
+ {
+ 	pr_info("Usage: %s [-h] [-b] [-i iterations] [-l long_wait_ms] [-p] [-v]\n"
+@@ -1060,13 +1070,13 @@ int main(int argc, char *argv[])
+ 	if (test_args.test_virtual) {
+ 		test_vm_create(&vm, &vcpu, VIRTUAL);
+ 		test_run(vm, vcpu);
+-		kvm_vm_free(vm);
++		test_vm_cleanup(vm);
+ 	}
+ 
+ 	if (test_args.test_physical) {
+ 		test_vm_create(&vm, &vcpu, PHYSICAL);
+ 		test_run(vm, vcpu);
+-		kvm_vm_free(vm);
++		test_vm_cleanup(vm);
+ 	}
+ 
+ 	return 0;
 -- 
-2.50.0.rc0.604.gd4ff7b7c86-goog
+2.33.0
 
