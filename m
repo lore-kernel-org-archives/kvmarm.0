@@ -1,194 +1,243 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436D82163BB
-	for <kvmarm@lists.linux.dev>; Mon,  9 Jun 2025 17:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749489924; cv=none; b=ELcQuj6ytF+uofNELG/aQI7WRpdatJUgSOweHNi9joLvBd052WHInVPngsAiaBrPQvPLOPOjaKUNW+D2xi74L5O1TIco2R/SCLuSw2mrwS/ZJWDcxB/dRWPKLE+oIsiMYOnx9hyN/BrCPcAPYvO8XjnvJZy7YHwgahT0Mm6CUK4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749489924; c=relaxed/simple;
-	bh=iKCzbFO1u3OBxISKMxioVdcXjsf1HtEXffACIwjwKWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SfxtOMHfs1YIUyOy2wDLp+BUB01RmS2mEkX+oDWfGGiGkk9WopKVJij6d5tmxHztKR7THzw6BnejXXlNBeCIqPWjiCyqkkuQirBHuJlKTmvHTOwhx/8lIcIK04BbFPAICx+MiRaGDxcnSOB3o789GxxhnLWA4WREyzJZ9nzjw7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DV3kaBK0; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450BE4A3C
+	for <kvmarm@lists.linux.dev>; Mon,  9 Jun 2025 17:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749490016; cv=fail; b=B1E9Nggf74QjmgG76HIkA9jCdqUgLxGrbbTh6XMMyom0QhvwLtvVLSfDNBD5aYcHqHK2s7y0SsZmDyzRuzA2EF05fbCBHi9QTsgk2+gC0+m5Hkm+J49l/FD4GbDEClqaZ2NVloF9klGKbhem5tM0ONHJFIGHqgELOb5m+t8qr6Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749490016; c=relaxed/simple;
+	bh=n93ryYOZ4X5W+jNB7Y5OZYzg0zWRr/M6TYtZUanVbdY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kv82HJcVmLTNXsyVepKl1BfH3LPUaXYcJVhyQWKhVkmhghCghH5lhXHTItiTLbgJoMqigoKkP/nLApFu97BjVwcKSpHj/DunwYlL+XAgFwAafYOlGTnjmwEJa7BXqb5XF+ZpFnBROjPCO7m7n75qihCEwk1UeuUazOqlu9/JaqM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=L8jgiQPy; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=wFH8kEWt; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DV3kaBK0"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-450d726f61aso4895e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 09 Jun 2025 10:25:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="L8jgiQPy";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="wFH8kEWt"
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 559Fdioq005981;
+	Mon, 9 Jun 2025 17:26:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-id:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=n93ryYOZ4X5W+jNB7Y5OZYzg0zWRr/M6TYtZUanVbdY=; b=
+	L8jgiQPy1lUMKLbHi3GsNJHFRw8g9J6hV0c1eVx7deI1qmiQuRxQ1zeRj848pNys
+	XI0Im85x0aeT/j8jj5ZY61/YUR9HaYpO37+ViBeCuDPo6NN2ikKF7EO1YugbOVPL
+	lOXiQb7HlVkVWN7kOJH23ZKyMIYISn0g87Db/3io4WLn4FJLbZk6VMhbebgvZMIm
+	mFrykrpNkzqKGr0ghILjQUTzFI1CdSjdElRUR+xHgcEHhEokUFDPG9IOp2D2WVEc
+	WZMEFJP7OXQ29SeVrVaH9V8DtUlVJQsMzX6+ZekmmjSp8vHatXYWTivz683B3oyG
+	0vTksJJKg9Bdzk32BUDEew==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 474dad2k3v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 09 Jun 2025 17:26:38 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 559Fb497007427;
+	Mon, 9 Jun 2025 17:26:37 GMT
+Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazon11011039.outbound.protection.outlook.com [52.101.62.39])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 474bv7f9x0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 09 Jun 2025 17:26:37 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tzq7xK/p7YGKoagpJF2LDXvjFEWt7q0+fEKFlBlvpCm5ceB5gqU/FHIKBaDsV61AZNYlcpm14OAK3TUmFjwFp0S6O0CbygHN94eUAV6q1CHlR4Hh0nNQ4qheLkh0vm5pn6NDak8iSAQxwksI0X3ZEeYqp+EevYLjnLjbaGv/jifzdd3DLwICWiaRriQ7f1vwFxEXuVIEVihIxNberlDfqAA7ywrSOqSH1KoQ0khA2SJxG+oIUzZunQeKOSU3LFMwpNBa9CG1XH54AG1gfSecVWiF4G4XfiTu/dAnFrF0Yha+ymNEAsXtMs6M2QX+zqwiu7g+Vd0PZ7wF8PEv0IihmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n93ryYOZ4X5W+jNB7Y5OZYzg0zWRr/M6TYtZUanVbdY=;
+ b=I2wrHNXnbExQGhBQ788tqbCFbHkWcMZ1Tl/zlmg7ajkn8ecJodCGKqDeuyoLjXiO1436i2E7CcD72P/t5T/ar0+igkUvBdSJ3SJDCeT3OE+neP8/cZR7pkwFP9RcEauRy4olGcw/ta4I/bNMwEF26NBcsqYbIpZzjJoZsxX3C/wr7mzjWF5fbbS/8lcFcMf9wJGb8HHLW0nFeO81O6nP6r9SptVgtVYc4M9lOeduR5T+F/jMy8gdgUgv/0Fl+r22YrL0QBH24a59gvXkx9K+ZplZoloZhlh213jSMz2m9C4h5ZZnG19Q3eGsIhG/pNy+LtJC4ejvVyhDUkLCqE4xjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749489920; x=1750094720; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EgfIn5pyXrhKDKyy/DFnRR/WDzU1LorI0fXEYQK34SI=;
-        b=DV3kaBK0zhIkEV32qKTjf674wcG1yj1tCgB2+AIstrw32vXijrr4JpcT/p7sB/McIm
-         ZnJxHGX9jLu59Vm+pav4rtHRGGTUUbCQ4I0m2Ao8X2ZY+gaWIaV0G0M37RFPORvS6Xtq
-         XnL93+oUiEYbhhTJtBNHV4t2hiE2shzrHyD6ezwEIpQUYOYOWeTGOJOSn3Q0H3GAL1Pv
-         s3oSmvL9OcDqS6wdFI4NnzJNdNuxmj2QUaauF5Qvh5PhdRrIiEOEYyiIrT54PJ6ZJJs7
-         US6Qdinm0mJ9pzdUR8Q0hJdKMgTTAWREABWJWyZVlkEuy3p7I6JE7f+xfrBJhvYoeHjs
-         +GSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749489920; x=1750094720;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EgfIn5pyXrhKDKyy/DFnRR/WDzU1LorI0fXEYQK34SI=;
-        b=Jnir51PKKPBkQLSFnAFzZ2MbAPTiG+A5ghNlweWFyS4Pv4V050ErO890zCAbDV+SYD
-         cEo8AtFoyCvIhdppmKOgT1jtXPk02uFD91pgnr0IVKlZl5/e+0KCy3Smm2x9lT3B5sI2
-         qQrAA6FqbTsx+VG6G9bs6Sy3c9n+PNfzpOyQH/krisp5+JfGZ5w2RkRt1Qw4ngsBO36D
-         T9OlcA6xEkv5Fl215n7g4GnchiY2sSlXu74C+y7k+aB9smpSTUe3bU6ltOcYjwlGEXA1
-         +KH648B0A5fIC9XHC6/VblBLS2ozkki3byru+rUepVpVucQXTR2JwhgCBIwm+uA0QcUJ
-         DEeQ==
-X-Gm-Message-State: AOJu0YxVLHfgyDtUvqu4t1oTYBs9rCW3K1tLVuYiheElKXIUIxGmyGjo
-	+1L9ikA11JPVKKOOXHVeqrZrGObWJURzLj6g6WX69QjA4UOgYJgO+wYi6j6t9/h+BxlcKQpUyS3
-	/s/6Rrw==
-X-Gm-Gg: ASbGncvp3+COJwY+lEs+41e9tSlQTnVzUzZhH1pJ1MlDRpCgFUUtJNer1Yhhgd/WG3o
-	QErbRbe4ADZDvQohrsbHBMex/59/2wdC+1o5TTk/+VuuS5eE4MIfLIRkZvVw2A8Ak1CegdBhgcE
-	6jVEvn9DxGGBMRmu7Yy3iWXqutD1rWYki2VEGTVaF4wa1Pvirx/LgDg9mj68CIITQFE+SkRuhgu
-	kzGIqZWDu24LqR429i4uyekUXeC4uST/TrIgqPRou0vx88jH3Y3y2A7iZPzkNAPYUU0YA+IFNxl
-	OmKGiBrubNRo2ykjgeYxywvIW1VnmhRCXyHZFEO/4uv7icMy1hwUuzocrhlTN3HsdzXOPiZeQMb
-	6q0ijk62lsSA0Le9jnnODqct/e5lzWIws8UM=
-X-Google-Smtp-Source: AGHT+IG7OEe8XVakf5BvT9bg/McMQlULLBqgoAc16jrn6FPrhelDc4EcTlGxudh7v7+LVuW7I6SDmQ==
-X-Received: by 2002:a05:600c:cc:b0:450:cb25:ead with SMTP id 5b1f17b1804b1-4530111b3cbmr2535815e9.7.1749489920354;
-        Mon, 09 Jun 2025 10:25:20 -0700 (PDT)
-Received: from google.com (206.39.187.35.bc.googleusercontent.com. [35.187.39.206])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4526e163447sm112959465e9.17.2025.06.09.10.25.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 10:25:19 -0700 (PDT)
-Date: Mon, 9 Jun 2025 17:25:15 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Quentin Perret <qperret@google.com>
-Subject: Re: pkvm boot failures
-Message-ID: <aEcY-1Iv8S-e8LVi@google.com>
-References: <yq5ah60pkq03.fsf@kernel.org>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n93ryYOZ4X5W+jNB7Y5OZYzg0zWRr/M6TYtZUanVbdY=;
+ b=wFH8kEWtxSOESNtZ/tohZXzt/ZiMb2w3NcmR2C9FdYYR/xLbccXgmWCRFUgavEtQrqdBNy4d78yj70i9c5oV7sWbjyR5TEf9wx9PmouVHOE2vnQhy/Vr7YVdVy1t/xEPazB5KTN1LkrN/Xb2o37ACC95MvJ2ksmBa8IDxZhN/4A=
+Received: from CO6PR10MB5426.namprd10.prod.outlook.com (2603:10b6:5:35e::22)
+ by PH7PR10MB7783.namprd10.prod.outlook.com (2603:10b6:510:2ff::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.30; Mon, 9 Jun
+ 2025 17:26:35 +0000
+Received: from CO6PR10MB5426.namprd10.prod.outlook.com
+ ([fe80::7845:9ba4:7ad2:374]) by CO6PR10MB5426.namprd10.prod.outlook.com
+ ([fe80::7845:9ba4:7ad2:374%3]) with mapi id 15.20.8813.024; Mon, 9 Jun 2025
+ 17:26:35 +0000
+From: Miguel Luis <miguel.luis@oracle.com>
+To: Sebastian Ott <sebott@redhat.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>,
+        Ricardo Koller <ricarkol@google.com>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, Shuah Khan <shuah@kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH v3 0/4] KVM: arm64: selftests: arch_timer_edge_cases fixes
+Thread-Topic: [PATCH v3 0/4] KVM: arm64: selftests: arch_timer_edge_cases
+ fixes
+Thread-Index: AQHb1gXQUi/kh5tGIUGVLYOISj2taLP7GzMA
+Date: Mon, 9 Jun 2025 17:26:35 +0000
+Message-ID: <B77F70F2-EECA-4E10-9F00-972F6AE27831@oracle.com>
+References: <20250605103613.14544-1-sebott@redhat.com>
+In-Reply-To: <20250605103613.14544-1-sebott@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO6PR10MB5426:EE_|PH7PR10MB7783:EE_
+x-ms-office365-filtering-correlation-id: 89107cdf-b582-4610-f7a1-08dda77ac8b1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?OU5BcnpOK2I3emt5dnpMbTRGSjdOQ2xCd3ZqeTA1T20zYU8rSFJiTlJ4TGVN?=
+ =?utf-8?B?aG0vOENmNGlMTndyTXpsZENEaVNvcExZd3orenFzNUY1bVc0QUdOYTFWNzli?=
+ =?utf-8?B?bDBUenpXS2hZRzBVQklCR2QwMWdneENEQ2E1WVlXdURVbjkyRXBzNHZLeDBS?=
+ =?utf-8?B?MjkydUEzNFBPQ2lpb0JINTRFWm1lZk5XcERacnVZL3Q3OEF5cExENTFIK3hV?=
+ =?utf-8?B?MnlhbVRZYjcyZEdWdHZLdUY1VWoxMlpJYjhaelAvdTBrREd6UHBKZE5yZ1hC?=
+ =?utf-8?B?UXBFY3d1WHhVTGtpM0o2MUdyWkhzczJYWlZwVXJoTEpBWGlHYlpDZGhvZE9j?=
+ =?utf-8?B?cCtkZVZ4eFpwN00rSzlOUE5JbXFoaTROeG5zSzZiNWFyTVdWcUFYdnVKVGRz?=
+ =?utf-8?B?UDdPMEtndmtHVmp3cGxJaFN3V3ExN0ZJd3kxSFc0Y2NDMHlmeG5oa2J3dmNF?=
+ =?utf-8?B?NEVhM01Bcnl0SzViaCs0WHBsRExGZ0VqRThwdmNVWUJEOUYvbjlTVnlXWGw5?=
+ =?utf-8?B?cXM2S2Rqa3NqVEx6YzUrdDlyck1hZldwSXBPdHJzbGt2NU9QV1hCUUZTRkNj?=
+ =?utf-8?B?TkE2bEtEQXllRU5sbnNwcWltRjVWTWU4OWNwU0E5TnVIcUUwUERuenY1TnE4?=
+ =?utf-8?B?UktXaDFER3pMaXBpRGcvL3h6dTUyRHRoWEluOTNQcnJYUEVPcEVPd3ZsOW9O?=
+ =?utf-8?B?UTg1YUdVMXFGY3lMcVVzOUx5ZE1QNUNKWXdidzVTTnJ5UHdXUUUxZE9tQi9n?=
+ =?utf-8?B?dlYrem03SE1PU2IvbUxUcWVRZngxZkV0U1lMaiticUFPcWNuVkVISjRabFpm?=
+ =?utf-8?B?NHN0bTlKUm1JaDJ0a0tBaG0zNUQ2Q2E1QitseDNZb0NEUUlVR0dGbUduWmtK?=
+ =?utf-8?B?UFlXQ29nK0d0dk1wVzBwcytZdDFhSlFxa3hHNHNYS0tDNGhMaExxZlZZaFVL?=
+ =?utf-8?B?K2tERzVKbkZSQjIxcVlkZFc3TFp1alRHakk5dk9sUWZnVmpGcjdhN0pDdUxo?=
+ =?utf-8?B?K1p4U1ZJYXBES2JhQ24vd2dsZHpBWTdFMGs1QjlPOE95TmEwVW9SNklnL3Zu?=
+ =?utf-8?B?VzMyNkRvbDlWVlV5dzNUL0dKNEo0bzEycWFIdGVlZldqRmY1Ym9qTUtzQUhV?=
+ =?utf-8?B?ZE1mSkZMMEFYS21Pem40a2M4cExGM0V4bkdLQURCcWU5YjAzcDZrTDZhekc4?=
+ =?utf-8?B?VFF1bENRVEI2dVJXdjlkcUg1UFRMd2V0eHdVQlJoYkxxdUpsNmZqUzRmM3V5?=
+ =?utf-8?B?Q1VydWNvYkNFR0c1QzAyZXkvOXhWcGdYVkdKaTMzMmpTY1ppd3hUQkswN2Mr?=
+ =?utf-8?B?OHpqWG1lM0ZGNHdYaU9nNEtzWnNITXZTa3c5NHU2Q3NmVlk2azJ3WnJjMGM3?=
+ =?utf-8?B?NkY4enhqMjZaYVlXT29QdTg1Qm9XUHFCQS9wWU11R2JPRDJ0UDZwenJkakta?=
+ =?utf-8?B?MmFobUpFZkFFYU93bzFieGlJZk1qQWFEeXZxa3hmWlRmOUNnMEVEaG9DZFdD?=
+ =?utf-8?B?MnJPQ2RlcnF0ZGJnM2hKRnNldkduVFV0dHd5TEh2YXRLdDhXZFYySWlxbTV1?=
+ =?utf-8?B?NVNMazNkck9vejlSZ05CY0ozNXo0SStoTmdIUVltZmZ0enFVT3F4ekF2bUUv?=
+ =?utf-8?B?aGJJTWlWTldKUlFXVDFmSlBONjFjcmlzb0ZvMUpabEZJa3IzT1A1MWgxZXpM?=
+ =?utf-8?B?emlNSW12VUhKNXcwZnF5emltZ2d5SGNma3BqT2ovdEt4UEJGeVBSc2pNcE92?=
+ =?utf-8?B?V3IzSHBDWWN1VDNsMkI0VjFuOGxwc2Rra3FMcExMc3gyWGdlUlZOakRRTzN2?=
+ =?utf-8?B?b2tMVVEwTVdLVlh4U1hubnhFQnZSaGZEUVFoQjdSOG5ERjdWUzk4dmtybzJM?=
+ =?utf-8?B?N2tyRmpUclRXc2ZmY3NHcW1YZUVpcFkxeXNUTlRLNWdJdWNtRUJySXFDd2tr?=
+ =?utf-8?B?eVZDYVh5cmk2NHZ5b21uM0xhSys5UkZNekh3YW4zdHpsVWw2MG85MU5RMm9U?=
+ =?utf-8?Q?EPAsnVM5P3gLFF0zMU8NCxB0XDgfUg=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR10MB5426.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?YllUWlNzczJzZ1pCbnpOb2JlMGd5dVlvTFl5cHFwQzRJT21veFFqS1VPVEJu?=
+ =?utf-8?B?a20rSW5XRGQrNS9jTnR6c2JoT0cvVGg2VnJ2TUQrYlh5dEhhTWRGdnVuaGU2?=
+ =?utf-8?B?b004YWIzQWVLSzM2SER1amtyMzhYRUVLclJ6QWxnUXJZaG1OUUpPQmtFdXZS?=
+ =?utf-8?B?SFplREo0c3RhQTVOL1d5THBNTCtlYWFDd2JobFR2UnM2RWs3WVZiWmtQTlpF?=
+ =?utf-8?B?TGg5b1A1L2VTRjVPR1piUWtBYXZqdURoWWJiMFh3V3c1Ymt6WVVDMGlWMGEr?=
+ =?utf-8?B?eHdwUnVkZzZnZlpvbzgra1hFdFZmZVVscTZiWUZGTkZWQkRsVkxOVkpqUDBI?=
+ =?utf-8?B?bFpVMGxad3drREVGN0NVUjBnV2dvaEU0V0tna2RXc1JLajkyNVZrbHg3S1BM?=
+ =?utf-8?B?ZUlpajNtbHU2VHBsUjQ0MklqMjVuYXNEN0hIWUY1YXVFZzBsMVNiYitUN1po?=
+ =?utf-8?B?amxLUkVKUXBIanBwMXFTY25oZ3huRXdZdU1ybzJaVlFvZm5KaldQaVJQb3V4?=
+ =?utf-8?B?enZRZ3d2U1c1ZU1qNm9GOVpuSVJEZWtrUWdiWE5tYWNWWlNNUG8wcDVUZSth?=
+ =?utf-8?B?QjRodkhuUmxFb0dwU3lxY2oxTjJOZ0NtZUIzcHUyL3dOMnlhSWF2K0FYQXM0?=
+ =?utf-8?B?YXVwdDNDeTVNU3JwMmY2Qk81aklTNmRXVmM1aWxwaWRCQ20wS3ZMUmVIN1Bz?=
+ =?utf-8?B?Qnlhc2NsMFhhOTVDdWxLdWVNejhHQnZlaTU0aWhyM3JaSENDdWNOc1pVVkZk?=
+ =?utf-8?B?TE1oZVBXOGZJdCtUSXpsZDN4ZC9kb2NnZGFjZFcrc2N5dVMxVHVqQzVWZHVm?=
+ =?utf-8?B?emVzT2xSUnhKU29yYi85YWxZQ1JVMjVYTmVSUmJVRXR4Zis2OWc5akpsamJM?=
+ =?utf-8?B?Y0tGR3Jjd29rZk1DcTN3Rk1JcVgxaXJ3WG5ZcklCQXNmN1JQU21TS1lmOHFJ?=
+ =?utf-8?B?Vk9MZy9Lc1pIeXdxcEJDVXhHd1JnTURLMFdaVEFnVUV4NUNkQUt5VzZkdGtI?=
+ =?utf-8?B?c2dGVGZnUThuRjFrVzZWMjhtek5WdFhQYTFvQ0F6SUM0ZTMyVS9vTGU5TVdy?=
+ =?utf-8?B?aHZNU3FwWGRQTENTUVp5TTFjT0E0ZDhxQlo5aUNTNFNrTWJLNU9icE9LWTBQ?=
+ =?utf-8?B?NnVuVFVZZUxxazcrNHZsVnJUamRVK1ZEd21DTElENmVNQ2ZOMGVNOEl2T1li?=
+ =?utf-8?B?MHBvOFBGMkpORHFOUzd0b1N6VTZNbEQzMGM5am5LRnVTUGxqV25JZ0dVVXBG?=
+ =?utf-8?B?T05GdnZLNzE5V2pCQ25YMkNZQjJJTTZpUHFrVHR2Z2NUSkI3U2VUWjRSSS9s?=
+ =?utf-8?B?b0FLVkprZkZKYklKL3ZZcFFuUFFqcEN3bDRFN0ZCVG5SckRkYXUrd1F4azJv?=
+ =?utf-8?B?RXFzMkNKYmNqYS9sSzlRL0dTeXZuWEpCaktrY0VkSU9sdlNHa0pjc1FJczZN?=
+ =?utf-8?B?REFkRFZSbGFCaHpERytZUk5ZOUhUVEY5VVl1MngvaU5pV1ZBUG1WeWM3dXVm?=
+ =?utf-8?B?WGhYeHlRZUd3cTEvQ2tGVHZNNWJGdzg1ekdHVUxQQlJRdWZYZmc3UU5lZTE3?=
+ =?utf-8?B?aXhxRGhHUlNVV1oySDU5NGlsTzRqR1FUd3B4WkZmUWZzVzk5Z3h1SWVlSTJ0?=
+ =?utf-8?B?Q3pucVlxWGJwdTc0SzVNV2MwcFBYMEpFbHlvMDVCN3FTUlRzbWhFRFFmV05w?=
+ =?utf-8?B?eHNIcm1NRHVqNURKdUZFeFo3OU1OZmhQbEV0aEhwWEppdDdGeWZDbHFLdjJJ?=
+ =?utf-8?B?UWwvMjRPS2FURFNkMFhhTWUvU0dZYUl3QnJ3TW9JTE5Yem43NDRpUXIzNXIy?=
+ =?utf-8?B?bFlKQWsyRjI1d3hMd2tNUzNCZ285NzVlajdDWjh5bExxbWdLN0JTZDlKc2tS?=
+ =?utf-8?B?cXkzMVQxQjJXVTllYlF3VWptdkVENWwwbnhJT013SmFlT00zNzZodEl2L3Nj?=
+ =?utf-8?B?M2w3VzFjSFNmYjVVdXZvcFBSbGE5cXhWdFRqa3RncVJac0RiSE5Na3VZLzhR?=
+ =?utf-8?B?eEF2cy9HaktGa2VGUmUzMlpHZjV6WXZGZkFFRGwzOThScXc3MFJxaTF1Z0lT?=
+ =?utf-8?B?RUVNZzlDN21ZaDFwTlgwbEVUL0NMOExSRldtZVgyRHBSQVQ4QzFxVXUwbkYx?=
+ =?utf-8?B?WmIwRURBRGVBaGZKeTVuaEc2elRBbk5wZ212T1hpeklTQ2kzWGRDNVVzUEpF?=
+ =?utf-8?B?bWc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7A6E9E92AA9D074DB8E37D87C28CB045@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <yq5ah60pkq03.fsf@kernel.org>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	ZAV1Zs+bfdJuT15i5NWeMlhAIogx+mZMw+M7tUzGIXsgs2vpeSZGqWKXWHxtI40oaaU1X5ouZQKGb80GwDjLeksSpZ1Is9fx+dSd3c5SBgvGzHXp+Qe4dWXl4YT1ZFB0Me3nXXzZ4gDMq0ncEb4rYvlM8njimw4Tw52elp59p6B52bHWMq+wKTRYWr3dpIyJb2TLy5cb7VHxn+SiQTvrIgyVMedE5Q5QYs6xzpL+Xm014+uMZ3ki2uW+pqEeP2KSjAYIq3aGJXRziK1xOUCciIGe0bNDMiW/BECK82GCtRCiYL4pDhAJRsTqDe3xQR0ZHJ73bfhcTIxDkMy22M2DcA1/fn8aBjOt8yoylUsNJXQut5P8mWJfliF1S3bMdRjg0vtGPZRXmGDS6m6F1OrGjtebK1ievvdkt4VJbnu4mQWKcanQQc/d/4nWguRtSifABH36Om2mQYwiDlqCkDsVF1B++LLwGTvR8C1jJYr04PuDhlzmNyajOZv9qcs+rOtzmys2vm/209CPf5jlG/ZwiDbmbaVqe7yUAgbst/In8u86xet/FycoJAcpUEfO/IOoUin/lCvCOM3IHhOEcw9GGa4rX/UpYDyt1Uq7sW8lRCo=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO6PR10MB5426.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89107cdf-b582-4610-f7a1-08dda77ac8b1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jun 2025 17:26:35.1104
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dFwdKvse80oC7jJXLBBs9KdwyMIM2RwWEYcyB9yhKZLon0pKVTHjitIYnYVSdmF0cROT2ZbR6IE04NqNyRQN7Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB7783
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-09_06,2025-06-09_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 mlxscore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2506090131
+X-Proofpoint-ORIG-GUID: zL3ox9r1y5OVi7ZGkfSjv78DOhN57XSc
+X-Authority-Analysis: v=2.4 cv=EJwG00ZC c=1 sm=1 tr=0 ts=6847194e cx=c_pps a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10
+ a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=nQstowge16nhZK8uYrUA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDEzMSBTYWx0ZWRfX9qiiQJsl5xIw H3BLmN5bi3OrSaIMtCTz7jxxVKF55lr85Wsz2ykNDwZx20xlUO89GIaxspDTDX6r/5djWunjYZf tXMzFpR0b/T4r7V00l7Ww4Ew8NRNrlMGngAQbMeoAV5Z1XlbaMUohMDl1KtcNoj9Jq8agS6rmWw
+ 1SAeIUm8k9gHgTLvYQfhVwBqcRNMl1nYyfxOg/xBgcAzeJCCsqSqONLhAkiZE/g8RdpYUYFKIBJ e3Zq8O7ay9kEx63VM00qaxfzZr67KP0evwuHy/3G9Z3aoE2YY550McihXcSqmXQwj0OeWqtHUHd t87u0veGbz9GWykd4eJWSf20PbOnUbQrnnYeyjuf3uM21iVNWoBRvQLMJJ2VRrS/ilWXECXTiJh
+ ONz5z02QA6FDiu8bZtXJi9xcES85j+Lg2I7/VsNTxJU8OE7FRM9Rs4Yco4NKc2fOMbkB3d1e
+X-Proofpoint-GUID: zL3ox9r1y5OVi7ZGkfSjv78DOhN57XSc
 
-On Mon, Jun 09, 2025 at 06:53:40PM +0530, Aneesh Kumar K.V wrote:
-> 
-> I am hitting the below failure with v6.15 (I tried other kernel versions
-> with similar results). I disabled CONFIG_PROTECTED_NVHE_STACKTRACE
-> because with CONFIG_NVHE_EL2_DEBUG, the stack was pointing at
-> hyp_assert_lock_held() .
-> 
-> [    0.664457] kvm [1]: nVHE hyp panic at: [<ffff80008050b10c>] __kvm_nvhe_handle_trap+0x34/0x10c!
-> [    0.664538] kvm [1]: Cannot dump pKVM nVHE stacktrace: !CONFIG_PROTECTED_NVHE_STACKTRACE
-> [    0.664566] kvm [1]: Hyp Offset: 0xffff000007c00000
-> [    0.664631] Kernel panic - not syncing: HYP panic:
-> [    0.664631] PS:614023c9 PC:000080007890b10c ESR:0000000096000007
-> [    0.664631] FAR:0000800078c252f0 HPFAR:0000000000000000 PAR:0000000000000000
-> [    0.664631] VCPU:0000000000000000
-> [    0.664938] CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.15.0-rc1 #594 NONE 
-> [    0.665068] Hardware name: FVP Base RevC (DT)
-> [    0.665140] Call trace:
-> [    0.665196]  show_stack+0x18/0x24 (C)
-> [    0.665346]  dump_stack_lvl+0x3c/0x80
-> [    0.665468]  dump_stack+0x18/0x24
-> [    0.665588]  panic+0x124/0x2d8
-> [    0.665699]  nvhe_hyp_panic_handler+0x108/0x180
-> [    0.665825]  do_pkvm_init+0xb0/0x124
-> [    0.665957]  do_pkvm_init+0xb0/0x124
-> [    0.666089]  kvm_hyp_init_protection+0x5c/0x6c
-> [    0.666226]  init_hyp_mode+0x760/0x790
-> [    0.666362]  kvm_arm_init+0xac/0x23c
-> [    0.666492]  do_one_initcall+0xa0/0x1f0
-> [    0.666617]  do_initcall_level+0x8c/0xac
-> [    0.666753]  do_initcalls+0x54/0x94
-> [    0.666885]  do_basic_setup+0x18/0x24
-> [    0.667019]  kernel_init_freeable+0xc0/0x10c
-> [    0.667157]  kernel_init+0x20/0x118
-> [    0.667271]  ret_from_fork+0x10/0x20
-> [    0.667400] SMP: stopping secondary CPUs
-> [    0.667475] Kernel Offset: disabled
-> [    0.667534] CPU features: 0x0000,00000140,064dc298,cb7a552f
-> [    0.667619] Memory Limit: none
-> [    0.667681] ---[ end Kernel panic - not syncing: HYP panic:
-> [    0.667681] PS:614023c9 PC:000080007890b10c ESR:0000000096000007
-> [    0.667681] FAR:0000800078c252f0 HPFAR:0000000000000000 PAR:0000000000000000
-> [    0.667681] VCPU:0000000000000000 ]
-> 
-> I was able to locate a .config that make the pkvm work, But i am not
-> able to identify which config dependency is making the difference. I am
-> attaching below the working and non working kernel configs. I am using
-> FVP to test this.
-> 
-
-I had a look at this and tracked the issue to "CONFIG_JUMP_LABEL=n"
-It seems that it panics at
-	if (static_branch_unlikely(&kvm_protected_mode_initialized))
-Where "kvm_protected_mode_initialized" is mapped in the initial PGD for the
-hypervisor, but not mapped in the hypervisor created one.
-As the variable is defined outside the hypervisor namespace, it doesn’t exist
-in the hyp bss section.
-And in case of "CONFIG_JUMP_LABEL=n" it  won't be patched in this case, causing
-next access to read the variable and panicking.
-
-I guess moving this key to hyp would cause problems with kernel access after
-de-privilege as cases from kvm_share_hyp(), So I can only think of having a
-different key for the hypervisor as
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 8e8848de4d47..8945b335bcea 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -21,6 +21,7 @@
- #include <nvhe/trap_handler.h>
- 
- DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-+DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized_hyp);
- 
- void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
- 
-@@ -626,7 +627,7 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
- 	 * basis. This is all fine, however, since __pkvm_prot_finalize
- 	 * returns -EPERM after the first call for a given CPU.
- 	 */
--	if (static_branch_unlikely(&kvm_protected_mode_initialized))
-+	if (static_branch_unlikely(&kvm_protected_mode_initialized_hyp))
- 		hcall_min = __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize;
- 
- 	id &= ~ARM_SMCCC_CALL_HINTS;
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index fcd70bfe44fb..af0854e98902 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -17,6 +17,7 @@
- #include "hyp_constants.h"
- 
- DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-+DECLARE_STATIC_KEY_FALSE(kvm_nvhe_sym(kvm_protected_mode_initialized_hyp));
- 
- static struct memblock_region *hyp_memory = kvm_nvhe_sym(hyp_memory);
- static unsigned int *hyp_memblock_nr_ptr = &kvm_nvhe_sym(hyp_memblock_nr);
-@@ -229,6 +230,7 @@ static int __init pkvm_drop_host_privileges(void)
- 	 * once the host stage 2 is installed.
- 	 */
- 	static_branch_enable(&kvm_protected_mode_initialized);
-+	static_branch_enable(&kvm_nvhe_sym(kvm_protected_mode_initialized_hyp));
- 	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
- 	return ret;
- }
-
---
-
-Can you please check if that helps in your case?
-
-Thanks,
-Mostafa
-
-> 
-> -aneesh
-
+SGkgU2ViYXN0aWFuLA0KDQpUaGFua3MgaW4gYWR2YW5jZS4NCg0KPiBPbiA1IEp1biAyMDI1LCBh
+dCAxMDozNiwgU2ViYXN0aWFuIE90dCA8c2Vib3R0QHJlZGhhdC5jb20+IHdyb3RlOg0KPiANCj4g
+U29tZSBzbWFsbCBmaXhlcyBmb3IgYXJjaF90aW1lcl9lZGdlX2Nhc2VzIHRoYXQgSSBzdHVtYmxl
+ZCB1cG9uDQo+IHdoaWxlIGRlYnVnZ2luZyBmYWlsdXJlcyBmb3IgdGhpcyBzZWxmdGVzdCBvbiBh
+bXBlcmUtb25lLg0KPiANCg0KSeKAmXZlIHRlc3RlZCB0aGlzIHRlc3QgdW5kZXIgdGhyZWUgY2ly
+Y3Vtc3RhbmNlczoNCg0KMSkgT3JpZ2luYWwgKCFIQVNfRUwyICYmICFIQVNfRUwyX0UySDApDQoN
+CjIpIEhBU19FTDIgJiYgSEFTX0VMMl9FMkgwDQoNCjMpIEhBU19FTDIgJiYgIUhBU19FTDJfRTJI
+MA0KDQoNClRlc3RzIDEpIGFuZCAyKSByZXR1cm5lZCBpbiBhcHByb3guIHRoZSBzYW1lIGFtb3Vu
+dCBvZiByZWFsIHRpbWUgKGFib3V0IDEycykgYWx0aG91Z2ggMykgZG9lc27igJl0DQpzZWVtIHRv
+IHJldHVybiBhdCBhbGwuDQoNCknigJl2ZSB0ZXN0ZWQgaXQgb24gYW1wZXJlLW9uZS4NCg0KTWln
+dWVsDQoNCj4gQ2hhbmdlcyBzaW5jZSB2MToNCj4gKiBkZXRlcm1pbmUgZWZmZWN0aXZlIGNvdW50
+ZXIgd2lkdGggYmFzZWQgb24gc3VnZ2VzdGlvbnMgZnJvbSBNYXJjDQo+IENoYW5nZXMgc2luY2Ug
+djI6DQo+ICogbmV3IHBhdGNoIHRvIGZpeCB4dmFsIGluaXRpYWxpemF0aW9uDQo+IA0KPiBJJ3Zl
+IGRvbmUgdGVzdHMgd2l0aCB0aGlzIG9uIHZhcmlvdXMgbWFjaGluZXMgLSBubyBpc3N1ZXMgZHVy
+aW5nDQo+IHNldmVyYWwgaHVuZHJlZHMgb2YgdGVzdCBydW5zLg0KPiANCj4gdjE6IGh0dHBzOi8v
+bG9yZS5rZXJuZWwub3JnL2t2bWFybS8yMDI1MDUwOTE0MzMxMi4zNDIyNC0xLXNlYm90dEByZWRo
+YXQuY29tLw0KPiB2MjogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3ZtYXJtLzIwMjUwNTI3MTQy
+NDM0LjI1MjA5LTEtc2Vib3R0QHJlZGhhdC5jb20vDQo+IA0KPiBTZWJhc3RpYW4gT3R0ICg0KToN
+Cj4gIEtWTTogYXJtNjQ6IHNlbGZ0ZXN0czogZml4IGhlbHAgdGV4dCBmb3IgYXJjaF90aW1lcl9l
+ZGdlX2Nhc2VzDQo+ICBLVk06IGFybTY0OiBzZWxmdGVzdHM6IGZpeCB0aHJlYWQgbWlncmF0aW9u
+IGluIGFyY2hfdGltZXJfZWRnZV9jYXNlcw0KPiAgS1ZNOiBhcm02NDogc2VsZnRlc3RzOiBhcmNo
+X3RpbWVyX2VkZ2VfY2FzZXMgLSBmaXggeHZhbCBpbml0DQo+ICBLVk06IGFybTY0OiBzZWxmdGVz
+dHM6IGFyY2hfdGltZXJfZWRnZV9jYXNlcyAtIGRldGVybWluZSBlZmZlY3RpdmUgY291bnRlciB3
+aWR0aA0KPiANCj4gLi4uL2t2bS9hcm02NC9hcmNoX3RpbWVyX2VkZ2VfY2FzZXMuYyAgICAgICAg
+IHwgMzkgKysrKysrKysrKysrLS0tLS0tLQ0KPiAxIGZpbGUgY2hhbmdlZCwgMjUgaW5zZXJ0aW9u
+cygrKSwgMTQgZGVsZXRpb25zKC0pDQo+IA0KPiANCj4gYmFzZS1jb21taXQ6IDBmZjQxZGYxY2Iy
+NjhmYzY5ZTcwM2EwOGE1N2VlMTRhZTk2N2QwY2ENCj4gLS0gDQo+IDIuNDkuMA0KPiANCj4gDQoN
+Cg==
