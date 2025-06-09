@@ -1,128 +1,145 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDE41362
-	for <kvmarm@lists.linux.dev>; Mon,  9 Jun 2025 00:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561B326F471
+	for <kvmarm@lists.linux.dev>; Mon,  9 Jun 2025 03:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749428996; cv=none; b=GGWNw+Fma5TDJ2I/WzqDanVKxwCQSvv174FdAykCxM9NWkt+Wc9cEyeXSDmkHvRVEI7+4zKVsjT9ZCRX23Z2SpWOB5burn3PgyLUB2dThzqVSgaWsizayj+BGE8u6jbOlgoTZueiJbfCLdtoU+BqrqnLjXd3ej/ZEanaVtFuqUo=
+	t=1749438889; cv=none; b=KF1WOqW0UvV4oZr9tN9OJaW2cyW64p7rZsZtq1aax7UXNRLNlDcGvslsOAl6x5irweVBSGzvln9y67AzQlFWL7Ts3CNgGppUzSO2DkAagXDBsHxJ2hCcqF/JjGwF2U5nsEV3xAcmcILkL7TrU3nGAYH7vKAKhBtHVWeQoDoyJTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749428996; c=relaxed/simple;
-	bh=DndXz279didVTDDBPj10bwY/XQ3srYBXtm7PwGKhlsk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dV8PS+RijP8oQYDvxgwF3by9176sVOBLDX/pUdC40N+RVGgy/D8fNwpDrvwfr21Df/CZr3GuzoFOA2YCMmcWxPdmPZs7/zRlW3ucbAhniYMVcuxuLgYc8gH/DLtcJPxheD20wYULkuKoATVWL6ICQEBjy7XoMP2UnFboHfdQdIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ElSWk85n; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749438889; c=relaxed/simple;
+	bh=xRlqgqO+PBZjgD2LQSpsqgv4NWJcwV3apOdFBq34//4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EY9/uVWts48KPypnMcEhpTjKquzUB7PwrNmAaVdtjXJKRSbgDJ5k/7Aa7XGxBbI1tsh435yR27pEGdMv3x+esHuHZHRXjsJ49yOPrGk2ckfsCQygmpfVf0chTQ4MvHoByW1OllYlnHCKG4A7JfrQxAwt367vMa2ruHF4ermCXww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wjAcwwkK; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ElSWk85n"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749428993;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wjAcwwkK"
+Date: Mon, 9 Jun 2025 12:14:36 +0900
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749438885;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zWLcc9JilgS7Cncp/Oc4IwhgNWLN/WG8IqO7PXvDI+0=;
-	b=ElSWk85nk/FJZuR+KLJOs2QAtNLhL0/4dBWM3l8ZDoeDrBihzZQp59jacLGyT7JcoV5eWv
-	VXVsqJyzQylNx2iBbdtuCKHyPgrm88ge1R5kVJkamIAcGf+TXbKy9jsJWxBE9NoxHjlOar
-	1znvCUASfzQgiGfE2VT2mH6dyrhI0Zo=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-446-lfuHdFjJPmK1tDHANV-XQw-1; Sun, 08 Jun 2025 20:29:52 -0400
-X-MC-Unique: lfuHdFjJPmK1tDHANV-XQw-1
-X-Mimecast-MFC-AGG-ID: lfuHdFjJPmK1tDHANV-XQw_1749428991
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-742b6705a52so5881543b3a.1
-        for <kvmarm@lists.linux.dev>; Sun, 08 Jun 2025 17:29:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749428991; x=1750033791;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zWLcc9JilgS7Cncp/Oc4IwhgNWLN/WG8IqO7PXvDI+0=;
-        b=uOLapnejXHKmlHKbfOo0pl8bJ7oLLyNAqAbLICNLm6bwMb9sAUC1Xp9z6WSbBU0cun
-         lD+JhpYTFLL1f+8XztKyAKzv8wuMJwbQdp2tciHOSM9ftCHD9sjVl6UgzNEEB6PF81ds
-         SuKVLVnp7BIGgwmZzaV6WpJcL3i3ScxShVcb2RFIlFXZwl+tehnhDiBnm6T1FW5DQoEH
-         qy8ks2izu+eu4I7QLsilpG1KdenIFIXcYqRF2f661GndDpfcveKsYdNaVgYeAyMK+dHc
-         v1R1b6EX3i85W0u2VTVomW08tN4SOnGtTQoYk2vHASG2dMdNx+wPOPH4DCTVVv7h8Uwq
-         mjKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/YjjdEafpKVCrW/e/IuXxVWyGYwcpydFKsMbaw/im8fC8DlzwUueVEImJ+WBaO6brYkEdeHY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzRuS7GHNKdOKg3WlZ+d/eAsVZtLI7TmoN/tKNxS4h4t7PpflEf
-	80N/lR7PjyRv6HdayH04tvjkLFrf3HlENsNAKup/BT5RFnqU2+LhjsCDLtjYs6u7TGutYKqod9d
-	s4qKwvqwUWVMBmW0JIP+vGSTraGWpAco5gO3VACJYpoTysro4qT3rEA8Zig==
-X-Gm-Gg: ASbGncv5RSfwgk4DaPcH0MFA9AFRZ78NpF+PCNWeljoXgQ+cSEwVs5mKyR7LBZFrkHj
-	RuXTF1A5zMI4oyydCefL2Y9l61+YFFLBDBLxQXFx9QByQYWyP9eAi2DG2lkJoBwvLUJYqS5z63j
-	SFg79tvS308z6a5zDBNokavln+cIcxdQX8z+KERwjaWngrNAwflEWgrb1Vu8i+5neaWrrr74gYf
-	hpi9u8esjRiHYWWXisgAvedxJd+f7GxW9PXT0/8UXT+LAd1v7b1wrcHnRmobpR9EGxiMbOZng5n
-	bT0YYXUPK3J7PNheWfxA6zapVQfkN2VAr+W29WC/qQliRI88sm8Tlo2nMXfVHQ==
-X-Received: by 2002:a05:6a20:1595:b0:210:4397:82a5 with SMTP id adf61e73a8af0-21ee68c8a34mr16623976637.21.1749428991496;
-        Sun, 08 Jun 2025 17:29:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFINCLkeeM7uiQsUy2zEm0wbd522yAG1P7DJCZj34b2eGZNRzbL4+KX+dNqfXF3CZRxH1g4JA==
-X-Received: by 2002:a05:6a20:1595:b0:210:4397:82a5 with SMTP id adf61e73a8af0-21ee68c8a34mr16623956637.21.1749428991023;
-        Sun, 08 Jun 2025 17:29:51 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7482af7ad57sm4659019b3a.65.2025.06.08.17.29.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 08 Jun 2025 17:29:50 -0700 (PDT)
-Message-ID: <ea372927-08eb-4b07-b444-8985f7710894@redhat.com>
-Date: Mon, 9 Jun 2025 10:29:29 +1000
+	bh=lmdoW92ozb614B0US2yeVMuGdKGqmA8u64UZkV8QgO0=;
+	b=wjAcwwkKVcWrOHIi2Zd49lxWYxwFo3SnglOJzz6JfAtOcYly83irJO2lauQQFNmENpiz/9
+	LFfPgOmdGgBBM48jiWDlEOvZBd4ScN8oeriDbny02luqN7D27nTJOV8yRC1M3YcXNhKVGu
+	V6EG1lawUnRAc88TO/+QQiLXVieN+vQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com,
+	darren@os.amperecomputing.com
+Subject: Re: [RFC PATCH v2 2/9] KVM: arm64: nv: selftests: Add simple test to
+ run guest code in vEL2
+Message-ID: <aEZRnBK7pD4rkgdi@vm4>
+References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
+ <20250512105251.577874-3-gankulkarni@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 15/18] KVM: arm64: Enable host mapping of shared
- guest_memfd memory
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250605153800.557144-1-tabba@google.com>
- <20250605153800.557144-16-tabba@google.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250605153800.557144-16-tabba@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 1Pqeo6ywR18FaOVA0klM4j5nQQkSnvbO3Ty7_fK7lKw_1749428991
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250512105251.577874-3-gankulkarni@os.amperecomputing.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 6/6/25 1:37 AM, Fuad Tabba wrote:
-> Enable the host mapping of guest_memfd-backed memory on arm64.
+On Mon, May 12, 2025 at 03:52:44AM -0700, Ganapatrao Kulkarni wrote:
+> Add simple test to run guest code with NV enabled. With NV enabled,
+> guest code runs in vEL2 context.
 > 
-> This applies to all current arm64 VM types that support guest_memfd.
-> Future VM types can restrict this behavior via the
-> kvm_arch_gmem_supports_shared_mem() hook if needed.
-> 
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 > ---
->   arch/arm64/include/asm/kvm_host.h | 5 +++++
->   arch/arm64/kvm/Kconfig            | 1 +
->   arch/arm64/kvm/mmu.c              | 7 +++++++
->   3 files changed, 13 insertions(+)
+>  .../selftests/kvm/arm64/nv_guest_hypervisor.c | 68 +++++++++++++++++++
+>  1 file changed, 68 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/arm64/nv_guest_hypervisor.c
 > 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+> diff --git a/tools/testing/selftests/kvm/arm64/nv_guest_hypervisor.c b/tools/testing/selftests/kvm/arm64/nv_guest_hypervisor.c
+> new file mode 100644
+> index 000000000000..7d7b3944e229
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/arm64/nv_guest_hypervisor.c
+> @@ -0,0 +1,68 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2025 Ampere Computing LLC
+> + */
+> +#include <kvm_util.h>
+> +#include <nv_util.h>
+> +#include <processor.h>
+> +
+> +static void guest_code(void)
+> +{
+> +	if (read_sysreg(CurrentEL) == CurrentEL_EL2)
+> +		GUEST_PRINTF("Test PASS\n");
+> +	else
+> +		GUEST_FAIL("Fail to run in vEL2\n");
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static void guest_undef_handler(struct ex_regs *regs)
+> +{
+> +	GUEST_FAIL("Unexpected exception far_el1 = 0x%lx", read_sysreg(far_el1));
+> +}
+> +
+> +static void test_run_vcpu(struct kvm_vcpu *vcpu)
+> +{
+> +	struct ucall uc;
+> +
+> +	do {
+> +		vcpu_run(vcpu);
+> +
+> +		switch (get_ucall(vcpu, &uc)) {
+> +		case UCALL_ABORT:
+> +			REPORT_GUEST_ASSERT(uc);
+> +			break;
+> +		case UCALL_PRINTF:
+> +			printf("%s", uc.buffer);
+> +			break;
+> +		case UCALL_DONE:
+> +			break;
+> +		default:
+> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
+> +		}
+> +	} while (uc.cmd != UCALL_DONE);
+> +}
+> +
+> +static void test_nv_guest_hypervisor(void)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	int gic_fd = -1;
+> +
+> +	vm = nv_vm_create_with_vcpus_gic(1, &vcpu, &gic_fd, guest_code);
+> +	vm_init_descriptor_tables(vm);
+> +	vcpu_init_descriptor_tables(vcpu);
+> +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+> +				ESR_ELx_EC_UNKNOWN, guest_undef_handler);
+> +
+> +	test_run_vcpu(vcpu);
+> +
+> +	vgic_v3_close(gic_fd);
+> +	kvm_vm_free(vm);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	test_nv_guest_hypervisor();
+> +	return 0;
+> +}
 
+The kernel this v2 series applied is based off of the latest kvmarm-next 
+and tested this on QEMU TCG mode with the kvm-arm.mode=nested option added at boot.
+
+Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+
+> -- 
+> 2.48.1
+> 
