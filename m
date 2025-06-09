@@ -1,255 +1,315 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB75813AC1
-	for <kvmarm@lists.linux.dev>; Mon,  9 Jun 2025 04:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF3325A353
+	for <kvmarm@lists.linux.dev>; Mon,  9 Jun 2025 07:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749442138; cv=none; b=EPjQ178gkFuFELtIWRrjSg3dLGxR4yYO07P2L5p7n3qq1JiVMvSTGY6Vab+fqdL28GVj4Ri/45sckYHI7WmcL2c10duOqkNdizGEwVOWb2Um61lUyaPN1UoCUx8Qe13bLjkKGE79yepBkv5DGGmaZQq7pjxtbvhA3TqV5tVPFSw=
+	t=1749452519; cv=none; b=kc0HEJOX6mmCxdiYpHJPdG1/2rG7IIl0TpvMCHIl0MrhIt35k6yyS54xYkGO5IGiuYxKmMNea/BXzT0Ku6l7FnvOLahZwYkHcWxnh7MF68/rgVfBGp0CCgaT0nmqwS4eSd8cOUccxZYxS/F4UZwFrZpYfCFMoA9NJ+XYVS+biqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749442138; c=relaxed/simple;
-	bh=iqnb+ZB/2oTCUBhWTrXa/vqr3Uz8tsvhBI9pDkDNIrw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dnV19hh4A25blqp2KzGeBLvxGRQaKLfEPZewdGqTy8k+y+07bzFyinGEAZU6bG2LN8iBfxpNJF1aVXv7MYWlxVCN2ZqQKaw1xU3VJMGm9nNlQV7s/Nkjtbj9KX2BA0auCo20ZgllRSYN3+Wb0sDzNHffratLGipi0bFexh8sS0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DuTTgJh5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749452519; c=relaxed/simple;
+	bh=aRx90mh4DBsB382qZLbUgE6k75728wG4XEm7SKbHgaU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G/IjsTi3M3iZz5V7r7IbO9f8IxIMS8DjjLr6em6xNWts+PRiK0a0x0Ch3MCBA3Hp7ZE28wrxDjw37U89V7QXKXSv/5Z1IamOzVIREykc8peiaTm69rfHtKONU39ltk2QEMheNOXZCUZ7i0da6SbCcQttg0aLG4CEN8CoOCQ91BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sOsVT1ZJ; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DuTTgJh5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749442135;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=znSV+kVarM376WETpFG5vxmhQ7lGKQs0oHqrXu/evqo=;
-	b=DuTTgJh5mU6sc0wFuyLgBk1o2THkQ4slMsQaknxRi8Ti7Mw3TBtnAhXpciRG2aTLq1IOPx
-	+q6M4ZQib55/6JWYUvixPLm2L8ibLRLx4KgwZJsrOsI6narV4cLvJXFTKZlFbTvaLXbphN
-	PXP8Sa67bju1ZvliA365XqIal8RU6yY=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-480-oSEbCswVNYStsXIcijHjdw-1; Mon, 09 Jun 2025 00:08:54 -0400
-X-MC-Unique: oSEbCswVNYStsXIcijHjdw-1
-X-Mimecast-MFC-AGG-ID: oSEbCswVNYStsXIcijHjdw_1749442133
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-7395d07a3dcso2858376b3a.3
-        for <kvmarm@lists.linux.dev>; Sun, 08 Jun 2025 21:08:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sOsVT1ZJ"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a58ef58a38so322931cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 09 Jun 2025 00:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749452515; x=1750057315; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qd1ChU4RfLFVxxmL2KzsgjziSyYF1OUEgK3hVJNjklY=;
+        b=sOsVT1ZJFiIMQIjVxZbg/TOXl/CNRtxpEmROt/gXfubkIeKEOWaVQzzLYc9+q4Eqwj
+         0c4bOX2Ny3nrgR08C175at3H9jgCJMQS1L18mJxkH7OFBLP8+mmKCFzwEpyRmQyPM6ZW
+         HduGaqhEwV4W6GTj8uTyeGK/2W+XZBkyk7OOe7/0/PtSf5EBA+QngNIl8CP9nQ/wGcax
+         C3rlTRYmI/Ry3PdiZGSj4vlqkjxbvu+IjknC5+je6ZSOpBzbtkjGyJ8UbuR9wvBbg6dt
+         Et+XWTNO3Lm0E+RVT/2v2NUjXl2nzOdmsZjpq6zOjinL3SfA4aP0qCIsB4GjGpK9DnEr
+         RIFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749442133; x=1750046933;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=znSV+kVarM376WETpFG5vxmhQ7lGKQs0oHqrXu/evqo=;
-        b=iMGxrTpS2PRZUyDuFKggmSQzkteizJjU8e+fckA9F72czy0rfBwxRjDcHFpNltwh2n
-         9iZN53qZg88vauPM7TYa7RSWgmQpIyluyXXs8FNmEGPi/A/Z+ecBXxBbbcr7dm5JKi2E
-         +Fwj9UJHhVT8CFp2qL7R8EkYtN1v5Nt2jg2eLv0wGgQerel7/W8Hvw6kc/yZeXEDKwud
-         Ldd3+/iHuVIJbuHOSzK6/wiXQUJ++PAuXoK9B8AKZZrTGRfE04j/hhdY7KJjU580HRz8
-         EVlC6XKnrxwHEKRyKp4XWKQctvQzBxU8+zJSjmqpXLRDtDp748KK8lQld4vWurnIuFzV
-         Nvqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVcbzBVPC8Ak8rygmkc23KYYSOmSiJL+veiFySq0UwDfIBhMFHdIXYJWsl0nDkEUQSbHr5AoKg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyfJ0D/Z6eWskMkPZMrqopSPeHpIjc2KzK+8WypLzPclYn86Uh8
-	1u03mStUdifT89frxBhHUxnQQifCZMUtaMZz7HdgoReyOdft7yLqByT5l5qbyvrhRvLRqu6rV4X
-	L/Zp7EbPrzvd8RqWzk7pUSMo824WSKirLjnnH6m3p6rrKDwaOLnrG+QTBtQ==
-X-Gm-Gg: ASbGncuo6k5yDYVXP2XzrDG/AAnJcad0q2t11DdWkghIFwukH9i60vv2k//ie6fapDH
-	8WRxlAMBFAknmKyUWVVWv2GSCHwoUZu9kKy9wAaW7cAhnGLE34AcjebRitvNNt8hjjfDYjPImdX
-	7S5dJxjZSxo/uAR71A9ctZnuKo0XftnDpSnbXHEE5BnvklK9yZjY4OlLEE3IamKHo95tgtpJH3/
-	TiXnGxcJGxNIieevrfKBQ0H37b8dwrjK0lIeDHcLciYuWIEDhGns3rtxOICTQ2zSDrvVo7Kb0Tj
-	k0g4ZNn1ViGYHnlfX54k0oIohxl8QjRbAEtv+n+J1uqa5NyvTp8=
-X-Received: by 2002:a05:6a00:1caa:b0:740:596b:4a7f with SMTP id d2e1a72fcca58-74827f10b78mr13424985b3a.16.1749442133329;
-        Sun, 08 Jun 2025 21:08:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH7m/zTCGkEamABNbzON01NHA2JLBsIZ9H30Axsha6qHcMH8sLupDXiKBcrqXD+K67xykgA3w==
-X-Received: by 2002:a05:6a00:1caa:b0:740:596b:4a7f with SMTP id d2e1a72fcca58-74827f10b78mr13424895b3a.16.1749442132715;
-        Sun, 08 Jun 2025 21:08:52 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7482af382fcsm4806740b3a.28.2025.06.08.21.08.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 08 Jun 2025 21:08:52 -0700 (PDT)
-Message-ID: <3d9a15ff-fbb2-4e9a-b97b-c0e40eb23043@redhat.com>
-Date: Mon, 9 Jun 2025 14:08:30 +1000
+        d=1e100.net; s=20230601; t=1749452515; x=1750057315;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qd1ChU4RfLFVxxmL2KzsgjziSyYF1OUEgK3hVJNjklY=;
+        b=CbChFYoazu3oE6/oWK1VKHmCjspkGtSh+03InRENzKcpOdSidved4VAPdhi0hAlRjr
+         OLMuFJfokFshx9un9LVlbtqVfZMh6e9MV9JKprti3UA3MBkvgg1cGhXOpw2RSfbPVj6I
+         rPANW8UaKi16XwX5F9xRXSXghv1drmVTZ9ceG9v/owE4tlG5tF+/ySncBD1bKC9qn+r5
+         kN9SMMoaQXFHxEnugBPloFYL0J2rLeCPTQshkBsgWzNeLHvFFogKlw1KOASPtXRqLJlR
+         MfAX2o2OOCr2Drdylsm5V2jq8ZM4SW1vqHUlLm5o1GkNStQ3qIi2Etw7pCHtJeR0EDfu
+         y8bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWsfx4cwl39mHl/abRl8SBIylKvQ1Q//zv3FjkvfizupN5Bn+wMnpeg17Um0v6Oz3HdtavmJK0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx1/AW+gSb58S9nicLejXaX7LAikrGBCW97jA2A9fz8cxRAx+jM
+	KGhBtdVEQhD4k5KhUT2kt3o5h6XwSR6CPpZAGiTRMY17waprzPvaWjnI2KQd7C7SOB97DMIFuDv
+	KGXpLJyMOMCUSLPYHMLaOZzrM8hlIjYHgcVYU/E+u
+X-Gm-Gg: ASbGncvQWbVs3o9EVtKw9kWSelmWzk0QU8XHFEzOSgVn84HCsoJgTG/4pY1mbvZUaSh
+	uolJui9k+ugZUeNLsgkIdt1q/kE+dJiM/xIoAN74cFyz/lcc2NP7QAjaFQEPdRImSIWj5J1tXUr
+	zL7ia3Kqk2clBYZh2CajOlXjXpkvCa8xv3Asz7C3FzZMi0ImvuDL/waw==
+X-Google-Smtp-Source: AGHT+IEYTjTPB44LdkojWXh1DgFtqgfjL8IG40gv9XwgF99n42jhj0tJV9OMy0pM+Kly1ld8fJ7D+mY65UKD6ViNkf0=
+X-Received: by 2002:a05:622a:189a:b0:494:4aa0:ad5b with SMTP id
+ d75a77b69052e-4a6ef9d0503mr6371521cf.2.1749452514924; Mon, 09 Jun 2025
+ 00:01:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 14/18] KVM: arm64: Handle guest_memfd-backed guest
- page faults
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250605153800.557144-1-tabba@google.com>
- <20250605153800.557144-15-tabba@google.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250605153800.557144-15-tabba@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: X1cUcPv3fkBZY3hUunVpvDcXIjr9YnU5JhwwaZk4F00_1749442133
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-14-tabba@google.com>
+ <a4e63374-8b4f-4800-a638-35ff343f78d2@redhat.com>
+In-Reply-To: <a4e63374-8b4f-4800-a638-35ff343f78d2@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 9 Jun 2025 08:01:17 +0100
+X-Gm-Features: AX0GCFtueCmazOgupVxtUqJ3eDLk0zaHqIaK1R7EMlVz70IKr0ZL8XxR8nJ_svw
+Message-ID: <CA+EHjTzYSZSQxh+97SSU7kg+S59CFMisF437wfAxnFRkfgUeFg@mail.gmail.com>
+Subject: Re: [PATCH v11 13/18] KVM: arm64: Refactor user_mem_abort()
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Fuad,
+Hi Gavin,
 
-On 6/6/25 1:37 AM, Fuad Tabba wrote:
-> Add arm64 support for handling guest page faults on guest_memfd backed
-> memslots. Until guest_memfd supports huge pages, the fault granule is
-> restricted to PAGE_SIZE.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->   arch/arm64/kvm/mmu.c | 93 ++++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 90 insertions(+), 3 deletions(-)
-> 
+On Mon, 9 Jun 2025 at 01:27, Gavin Shan <gshan@redhat.com> wrote:
+>
+> Hi Fuad,
+>
+> On 6/6/25 1:37 AM, Fuad Tabba wrote:
+> > To simplify the code and to make the assumptions clearer,
+> > refactor user_mem_abort() by immediately setting force_pte to
+> > true if the conditions are met.
+> >
+> > Remove the comment about logging_active being guaranteed to never be
+> > true for VM_PFNMAP memslots, since it's not actually correct.
+> >
+> > Move code that will be reused in the following patch into separate
+> > functions.
+> >
+> > Other small instances of tidying up.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >   arch/arm64/kvm/mmu.c | 100 ++++++++++++++++++++++++-------------------
+> >   1 file changed, 55 insertions(+), 45 deletions(-)
+> >
+>
+> One nitpick below in case v12 is needed. In either way, it looks good to me:
+>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index eeda92330ade..ce80be116a30 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1466,13 +1466,56 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+> >       return vma->vm_flags & VM_MTE_ALLOWED;
+> >   }
+> >
+> > +static int prepare_mmu_memcache(struct kvm_vcpu *vcpu, bool topup_memcache,
+> > +                             void **memcache)
+> > +{
+> > +     int min_pages;
+> > +
+> > +     if (!is_protected_kvm_enabled())
+> > +             *memcache = &vcpu->arch.mmu_page_cache;
+> > +     else
+> > +             *memcache = &vcpu->arch.pkvm_memcache;
+> > +
+> > +     if (!topup_memcache)
+> > +             return 0;
+> > +
+>
+> It's unnecessary to initialize 'memcache' when topup_memcache is false.
 
-One comment below. Otherwise, it looks good to me.
-
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index ce80be116a30..f14925fe6144 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1508,6 +1508,89 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
->   	*prot |= kvm_encode_nested_level(nested);
->   }
->   
-> +#define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
-> +
-> +static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> +		      struct kvm_s2_trans *nested,
-> +		      struct kvm_memory_slot *memslot, bool is_perm)
-> +{
-> +	bool logging, write_fault, exec_fault, writable;
-> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> +	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-> +	struct page *page;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	void *memcache;
-> +	kvm_pfn_t pfn;
-> +	gfn_t gfn;
-> +	int ret;
-> +
-> +	ret = prepare_mmu_memcache(vcpu, !is_perm, &memcache);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (nested)
-> +		gfn = kvm_s2_trans_output(nested) >> PAGE_SHIFT;
-> +	else
-> +		gfn = fault_ipa >> PAGE_SHIFT;
-> +
-> +	logging = memslot_is_logging(memslot);
-> +	write_fault = kvm_is_write_fault(vcpu);
-> +	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> +
-> +	if (write_fault && exec_fault) {
-> +		kvm_err("Simultaneous write and execution fault\n");
-> +		return -EFAULT;
-> +	}
-> +
-> +	if (is_perm && !write_fault && !exec_fault) {
-> +		kvm_err("Unexpected L2 read permission error\n");
-> +		return -EFAULT;
-> +	}
-> +
-> +	ret = kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &page, NULL);
-> +	if (ret) {
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, PAGE_SIZE,
-> +					      write_fault, exec_fault, false);
-> +		return ret;
-> +	}
-> +
-
--EFAULT or -EHWPOISON shall be returned, as documented in virt/kvm/api.rst. Besides,
-kvm_send_hwpoison_signal() should be executed when -EHWPOISON is returned from
-kvm_gmem_get_pfn()? :-)
+I thought about this before, and I _think_ you're right. However, I
+couldn't completely convince myself that that's always the case for
+the code to be functionally equivalent (looking at the condition for
+kvm_pgtable_stage2_relax_perms() at the end of the function). Which is
+why, if I were to do that, I'd do it as a separate patch.
 
 Thanks,
-Gavin
+/fuad
 
-> +	writable = !(memslot->flags & KVM_MEM_READONLY) &&
-> +		   (!logging || write_fault);
-> +
-> +	if (nested)
-> +		adjust_nested_fault_perms(nested, &prot, &writable);
-> +
-> +	if (writable)
-> +		prot |= KVM_PGTABLE_PROT_W;
-> +
-> +	if (exec_fault ||
-> +	    (cpus_have_final_cap(ARM64_HAS_CACHE_DIC) &&
-> +	     (!nested || kvm_s2_trans_executable(nested))))
-> +		prot |= KVM_PGTABLE_PROT_X;
-> +
-> +	kvm_fault_lock(kvm);
-> +	if (is_perm) {
-> +		/*
-> +		 * Drop the SW bits in favour of those stored in the
-> +		 * PTE, which will be preserved.
-> +		 */
-> +		prot &= ~KVM_NV_GUEST_MAP_SZ;
-> +		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, fault_ipa, prot, flags);
-> +	} else {
-> +		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, PAGE_SIZE,
-> +					     __pfn_to_phys(pfn), prot,
-> +					     memcache, flags);
-> +	}
-> +	kvm_release_faultin_page(kvm, page, !!ret, writable);
-> +	kvm_fault_unlock(kvm);
-> +
-> +	if (writable && !ret)
-> +		mark_page_dirty_in_slot(kvm, memslot, gfn);
-> +
-> +	return ret != -EAGAIN ? ret : 0;
-> +}
-> +
->   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   			  struct kvm_s2_trans *nested,
->   			  struct kvm_memory_slot *memslot, unsigned long hva,
-> @@ -1532,7 +1615,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
->   	struct kvm_pgtable *pgt;
->   	struct page *page;
-> -	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
-> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
->   
->   	if (fault_is_perm)
->   		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
-> @@ -1959,8 +2042,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->   		goto out_unlock;
->   	}
->   
-> -	ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> -			     esr_fsc_is_permission_fault(esr));
-> +	if (kvm_slot_has_gmem(memslot))
-> +		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
-> +				 esr_fsc_is_permission_fault(esr));
-> +	else
-> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> +				     esr_fsc_is_permission_fault(esr));
->   	if (ret == 0)
->   		ret = 1;
->   out:
-
+>         if (!topup_memcache)
+>                 return 0;
+>
+>         min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+>         if (!is_protected_kvm_enabled())
+>                 *memcache = &vcpu->arch.mmu_page_cache;
+>         else
+>                 *memcache = &vcpu->arch.pkvm_memcache;
+>
+> Thanks,
+> Gavin
+>
+> > +     min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+> > +
+> > +     if (!is_protected_kvm_enabled())
+> > +             return kvm_mmu_topup_memory_cache(*memcache, min_pages);
+> > +
+> > +     return topup_hyp_memcache(*memcache, min_pages);
+> > +}
+> > +
+> > +/*
+> > + * Potentially reduce shadow S2 permissions to match the guest's own S2. For
+> > + * exec faults, we'd only reach this point if the guest actually allowed it (see
+> > + * kvm_s2_handle_perm_fault).
+> > + *
+> > + * Also encode the level of the original translation in the SW bits of the leaf
+> > + * entry as a proxy for the span of that translation. This will be retrieved on
+> > + * TLB invalidation from the guest and used to limit the invalidation scope if a
+> > + * TTL hint or a range isn't provided.
+> > + */
+> > +static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
+> > +                                   enum kvm_pgtable_prot *prot,
+> > +                                   bool *writable)
+> > +{
+> > +     *writable &= kvm_s2_trans_writable(nested);
+> > +     if (!kvm_s2_trans_readable(nested))
+> > +             *prot &= ~KVM_PGTABLE_PROT_R;
+> > +
+> > +     *prot |= kvm_encode_nested_level(nested);
+> > +}
+> > +
+> >   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >                         struct kvm_s2_trans *nested,
+> >                         struct kvm_memory_slot *memslot, unsigned long hva,
+> >                         bool fault_is_perm)
+> >   {
+> >       int ret = 0;
+> > -     bool write_fault, writable, force_pte = false;
+> > +     bool topup_memcache;
+> > +     bool write_fault, writable;
+> >       bool exec_fault, mte_allowed;
+> >       bool device = false, vfio_allow_any_uc = false;
+> >       unsigned long mmu_seq;
+> > @@ -1484,6 +1527,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >       gfn_t gfn;
+> >       kvm_pfn_t pfn;
+> >       bool logging_active = memslot_is_logging(memslot);
+> > +     bool force_pte = logging_active || is_protected_kvm_enabled();
+> >       long vma_pagesize, fault_granule;
+> >       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+> >       struct kvm_pgtable *pgt;
+> > @@ -1501,28 +1545,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >               return -EFAULT;
+> >       }
+> >
+> > -     if (!is_protected_kvm_enabled())
+> > -             memcache = &vcpu->arch.mmu_page_cache;
+> > -     else
+> > -             memcache = &vcpu->arch.pkvm_memcache;
+> > -
+> >       /*
+> >        * Permission faults just need to update the existing leaf entry,
+> >        * and so normally don't require allocations from the memcache. The
+> >        * only exception to this is when dirty logging is enabled at runtime
+> >        * and a write fault needs to collapse a block entry into a table.
+> >        */
+> > -     if (!fault_is_perm || (logging_active && write_fault)) {
+> > -             int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+> > -
+> > -             if (!is_protected_kvm_enabled())
+> > -                     ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
+> > -             else
+> > -                     ret = topup_hyp_memcache(memcache, min_pages);
+> > -
+> > -             if (ret)
+> > -                     return ret;
+> > -     }
+> > +     topup_memcache = !fault_is_perm || (logging_active && write_fault);
+> > +     ret = prepare_mmu_memcache(vcpu, topup_memcache, &memcache);
+> > +     if (ret)
+> > +             return ret;
+> >
+> >       /*
+> >        * Let's check if we will get back a huge page backed by hugetlbfs, or
+> > @@ -1536,16 +1568,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >               return -EFAULT;
+> >       }
+> >
+> > -     /*
+> > -      * logging_active is guaranteed to never be true for VM_PFNMAP
+> > -      * memslots.
+> > -      */
+> > -     if (logging_active || is_protected_kvm_enabled()) {
+> > -             force_pte = true;
+> > +     if (force_pte)
+> >               vma_shift = PAGE_SHIFT;
+> > -     } else {
+> > +     else
+> >               vma_shift = get_vma_page_shift(vma, hva);
+> > -     }
+> >
+> >       switch (vma_shift) {
+> >   #ifndef __PAGETABLE_PMD_FOLDED
+> > @@ -1597,7 +1623,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >                       max_map_size = PAGE_SIZE;
+> >
+> >               force_pte = (max_map_size == PAGE_SIZE);
+> > -             vma_pagesize = min(vma_pagesize, (long)max_map_size);
+> > +             vma_pagesize = min_t(long, vma_pagesize, max_map_size);
+> >       }
+> >
+> >       /*
+> > @@ -1626,7 +1652,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >        * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
+> >        * with the smp_wmb() in kvm_mmu_invalidate_end().
+> >        */
+> > -     mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+> > +     mmu_seq = kvm->mmu_invalidate_seq;
+> >       mmap_read_unlock(current->mm);
+> >
+> >       pfn = __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
+> > @@ -1661,24 +1687,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >       if (exec_fault && device)
+> >               return -ENOEXEC;
+> >
+> > -     /*
+> > -      * Potentially reduce shadow S2 permissions to match the guest's own
+> > -      * S2. For exec faults, we'd only reach this point if the guest
+> > -      * actually allowed it (see kvm_s2_handle_perm_fault).
+> > -      *
+> > -      * Also encode the level of the original translation in the SW bits
+> > -      * of the leaf entry as a proxy for the span of that translation.
+> > -      * This will be retrieved on TLB invalidation from the guest and
+> > -      * used to limit the invalidation scope if a TTL hint or a range
+> > -      * isn't provided.
+> > -      */
+> > -     if (nested) {
+> > -             writable &= kvm_s2_trans_writable(nested);
+> > -             if (!kvm_s2_trans_readable(nested))
+> > -                     prot &= ~KVM_PGTABLE_PROT_R;
+> > -
+> > -             prot |= kvm_encode_nested_level(nested);
+> > -     }
+> > +     if (nested)
+> > +             adjust_nested_fault_perms(nested, &prot, &writable);
+> >
+> >       kvm_fault_lock(kvm);
+> >       pgt = vcpu->arch.hw_mmu->pgt;
+>
