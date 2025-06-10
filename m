@@ -1,99 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5494C1FBEB9
-	for <kvmarm@lists.linux.dev>; Tue, 10 Jun 2025 15:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599681386C9
+	for <kvmarm@lists.linux.dev>; Tue, 10 Jun 2025 15:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749569502; cv=none; b=s77Z+uBcmbk+btqFLsLEyV5GhQaI8+aa7Jdhxp5PoKWbV601w49vpAns9ZXrqncwWsgKQdlAbmFc8nWOYXihrXznTLDOe8IOu01tMF6FfSUhsQf8UbfhAp6p1iXel+myyG7RHwPJVCKkF99cgvfHdpIWca4ONOFNXm98VehicDw=
+	t=1749570539; cv=none; b=WTYOlUrWG1DpQ+sIHYZfncCNDjpOboXLE0FNENMUzc2KUnLwziGZjJNOJquszvZHiRr2KD4jJqOZx3cFquFJrT+YQAbfJlm68+GpIt7ZFjQB2HSS2BIWYhsKUg8sI8KrkZyJhBytosoumeZlObt6JYrNQE6/RFkCF4QluM7N6Mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749569502; c=relaxed/simple;
-	bh=Ox5GBTvCCW7kGknUT060ZPDyK8iefVA4qWfSBUeFf7w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k6Cfs2xE/h6ngVgduQtzF3z1ds00BjPTI6yxYiYnVa00GOcaBKGTOSsE3Xjrs4/+X1zcznc6w2HqbpVmTEQfQ006GTG2Uyg+3fFpK9yPxQBGjWoy3ESN8aNo73e3PKqHwcGQyNbffpKahGqo+p+4fA0FwH9ZPxkfovPKciXqcOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mu9R74qb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749570539; c=relaxed/simple;
+	bh=Hz//LFo8t9c/PCWUgBzJFKXWDpEvmiywNeajS1B4WAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hH7aKXu/yYv0DUOR00qp/H2QopDVBlMdp5aCjQlLxf+Nr3Z5ud2lTyEaqqiDfzBeIqIQMU0lrbq1ZvbalDocbH9j/b7rLJoOhEx2We7kgw87wTXPtdFBlOu70WvHiFDlduF7C5kczXIGJuHqDZwyrDR9Ys6fSnvaXD/LP9M/3YA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AkttoMwV; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mu9R74qb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F1BC4CEED;
-	Tue, 10 Jun 2025 15:31:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749569502;
-	bh=Ox5GBTvCCW7kGknUT060ZPDyK8iefVA4qWfSBUeFf7w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Mu9R74qb8DcaGHOtFdEKLxv5NdEJa53jO9BrheSeEIeNVE8qY0NLlftp20sjRIZdK
-	 gm+IjavFBFZf39e5Xptim86ue7ROm6H6T6Y5VjD5ArVxS0C0RTdkw+YSRnsGqACt0q
-	 gtEOgtumMTBTx0Haf18bCZsg7It3CVzP/FbTue3+xEBxImSZVI+2AdegX/zvL7s4sL
-	 opiIWltnxj0T9ODvhqJfRCuT835vm48icGKMTUNy4UBYBdPj5l0DSQFT/s2bTqy4E8
-	 XKKrtNgavby3C+VEeraUuDEJpDMCXHLo0ZJlqxcCsYxJh1KV4q22qCVJMdKWZC3Laj
-	 4bHbnXqHHHdyw==
-Received: from 91-161-240-24.subs.proxad.net ([91.161.240.24] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uP0wt-005YWt-Ty;
-	Tue, 10 Jun 2025 16:31:39 +0100
-Date: Tue, 10 Jun 2025 16:31:39 +0100
-Message-ID: <87jz5jfw9w.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AkttoMwV"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a525eee2e3so4252001f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 10 Jun 2025 08:48:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749570536; x=1750175336; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ky2PNbqrD+9D6VM37eni3Xt9ljO7lJYVSeVmqVOIB2E=;
+        b=AkttoMwVExBdAcaNzGa76OzPEOvbP3mFRZUp9KWoUDajbocj88BHIN9u2YEHoYlNlw
+         EkarFAt2CJiI9o3OQJuR1CIVF+8pNmxZjZ7B/s4ZKfLSfzYP+U53VWgBypgvv2emjuPL
+         Wlfa6MTIh3P44em2Us3psd42X5V50U6357EF+ZLmXkIxvjUAzoWxv3wlAsBgWOLokVey
+         AAwtncihoC4lBBrxmj1w5qkSO/mJvBuS4kM/tjwjqdDnUnaaVVfy3b2VWrvzoLp/9I2o
+         1FitmRLDi+sNZmg0RG8z7gU5JVFv4ZzQVSKSLekrdAMp0qkkftWOStjBz9nWB2dhDGOZ
+         dYaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749570536; x=1750175336;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ky2PNbqrD+9D6VM37eni3Xt9ljO7lJYVSeVmqVOIB2E=;
+        b=Dk9lzBaryboe9oiHTN+tvnbeUkrCrofPj1UzoYlqKwvS0Apei1j51K9VdH/VqLXdhE
+         K/uS3ttr6F3AiT/Wxoo1wv9hJ6GcQFho7BvjyMZUjKmTBAccjnfhZtIiY0fZ3Ak09Tac
+         7tRLQRWsEte72cGcDxtBzuFJeVW+wWXnIWfBCVpDmLTPmUnBoHiEJSZKlO2X86gJjztD
+         Y1Ma1EaxvY6eUtcycDHyL6k6VmPvjCatPGn8+LP249Kg3ljFJO6DaOnzQa9XTaS2PAQc
+         M868WfCmC/4XY7ehosuUYKuZDWpqTP5wmuvdUyNGXQl2TlLtTZPiyZ1QOxyQh5F6mzVH
+         R90A==
+X-Forwarded-Encrypted: i=1; AJvYcCWNQljdYbjwgscRio9BUujF1AlS1V7xZWp/+dNFUrSLcg+JGxWDcjbN8d3+A5I88oUmUzfFyjI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwRy5v2tw41YKskBkc+vsjGc+oIlwyh4IrKhGREufMPL+rxKUk8
+	3l69xU90UA5U4uY6N9AzYLsOoNwvBPQYINX2R5aPu+JElO/Nc3FSBhNWjHo7yA96Gg==
+X-Gm-Gg: ASbGncuHObisAvHxDrHf4Ibny+fGyjMxSQAJpKjRoe4Ud1P71PDZ9+ICYJW0IiSpst2
+	UlyFuafaX46qCFg4TFXSjURt3qjQeqCo/sAeiZ7B6STVWBTnvC+trUxUa4cnFVoc6vhnBx2U4s2
+	L3H4EKRoRYEUO2uzhIi4IUGbYtzaORuOCsJFLcbqCQZAoYAaPynVmPJpMiBaZOCdiW3s9aEqz16
+	HPow9GBkkpmcZOMgRXXklqcQS90J7xl7z0ZJD7T09dcOT/qiiX3bAd97MWNZLwNvz3wgbhNWetD
+	CnqB42YSUsfuTujTP7sykpnw5JfsCs8VoQJWlsABlnWSY6J6AmaT/TthhlfeilDoPxt7RdxOPNH
+	CEbBJuJ+nxmj6zHskVbFGEQ4kYXiykg==
+X-Google-Smtp-Source: AGHT+IGMAEWY0uqwpIwPc7AQMrD49vRT8Zf8Ox11v7143hyb0bFhP3wlqkf5ZIizyj4fRGyoAGb6Mw==
+X-Received: by 2002:a5d:5f55:0:b0:3a5:2465:c0c8 with SMTP id ffacd0b85a97d-3a53178421fmr13397903f8f.7.1749570535460;
+        Tue, 10 Jun 2025 08:48:55 -0700 (PDT)
+Received: from google.com (210.162.187.35.bc.googleusercontent.com. [35.187.162.210])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a53229dc33sm12478035f8f.20.2025.06.10.08.48.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Jun 2025 08:48:55 -0700 (PDT)
+Date: Tue, 10 Jun 2025 16:48:51 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>
 Subject: Re: [PATCH] KVM: arm64: nvhe: Fix build failure with gcc
-In-Reply-To: <20250610151132.1758206-1-aneesh.kumar@kernel.org>
+Message-ID: <aEhT4zYOkY-cUXRD@google.com>
 References: <20250610151132.1758206-1-aneesh.kumar@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <87jz5jfw9w.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 91.161.240.24
-X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87jz5jfw9w.wl-maz@kernel.org>
 
-On Tue, 10 Jun 2025 16:11:32 +0100,
-"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+On Tue, Jun 10, 2025 at 04:31:39PM +0100, Marc Zyngier wrote:
+> On Tue, 10 Jun 2025 16:11:32 +0100,
+> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+> > 
+> > Address a build failure encountered with aarch64-linux-gnu-gcc version
+> > 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)
+> > 
+> > /usr/bin/aarch64-linux-gnu-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__clock_mult_uint128':
+> > /linux/work/arch/arm64/kvm/hyp/nvhe/clock.c:27:(.hyp.text+0x120d8): undefined reference to `__kvm_nvhe___lshrti3'
+> > /linux/work/arch/arm64/kvm/hyp/nvhe/clock.c:27:(.hyp.text+0x120d8): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `__kvm_nvhe___lshrti3'
 > 
-> Address a build failure encountered with aarch64-linux-gnu-gcc version
-> 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)
-> 
-> /usr/bin/aarch64-linux-gnu-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__clock_mult_uint128':
-> /linux/work/arch/arm64/kvm/hyp/nvhe/clock.c:27:(.hyp.text+0x120d8): undefined reference to `__kvm_nvhe___lshrti3'
-> /linux/work/arch/arm64/kvm/hyp/nvhe/clock.c:27:(.hyp.text+0x120d8): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `__kvm_nvhe___lshrti3'
+> $ ls -l arch/arm64/kvm/hyp/nvhe/clock.c
+> ls: cannot access 'arch/arm64/kvm/hyp/nvhe/clock.c': No such file or directory
 
-$ ls -l arch/arm64/kvm/hyp/nvhe/clock.c
-ls: cannot access 'arch/arm64/kvm/hyp/nvhe/clock.c': No such file or directory
+Hum, this file is for the pKVM tracing support and is not upstream yet:
+
+https://lore.kernel.org/all/20250516134031.661124-18-vdonnefort@google.com/
 
 > 
-> Similar to commit 9bfe7553fadb ("arm64: Implement __lshrti3 library function"),
-> this change use the added helper.
+> > 
+> > Similar to commit 9bfe7553fadb ("arm64: Implement __lshrti3 library function"),
+> > this change use the added helper.
+> > 
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Oliver Upton <oliver.upton@linux.dev>
+> > Cc: Joey Gouly <joey.gouly@arm.com>
+> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Cc: Zenghui Yu <yuzenghui@huawei.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > 
+> > Suggested-by: Mark Rutland <mark.rutland@arm.com>
+> > Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 > 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: Joey Gouly <joey.gouly@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Zenghui Yu <yuzenghui@huawei.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
+> What was recently introduced that triggers this? I'd like to
+> understand what mandates it, and avoid it of at all possible.
 > 
-> Suggested-by: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-
-What was recently introduced that triggers this? I'd like to
-understand what mandates it, and avoid it of at all possible.
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+> 	M.
+> 
+> -- 
+> Jazz isn't dead. It just smells funny.
+> 
