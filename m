@@ -1,125 +1,90 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1383929290A
-	for <kvmarm@lists.linux.dev>; Tue, 10 Jun 2025 13:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E9923506A
+	for <kvmarm@lists.linux.dev>; Tue, 10 Jun 2025 15:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749563462; cv=none; b=dWBtkgXSqmfW1DL1uU1+W1uS8GebVIAQ1sn86mINHPkqt4pIfZFSKgbCawJX3u6tEEw9DDQTQXc4TKcqb3SB4bv1XpKD4pO6VWSiGFF4U9cNKnxElPSVbHN++L3hV+I5M40Iiwn9nhFPhUrRem4TlNTnlCb+hlo7AIjIDT1BOXM=
+	t=1749568300; cv=none; b=Mr6eUPNmgKf1V+/U2skeGpy6+yPe7TEkLNd/jTVSKxAg3MtFW1dKVdEqT+LMSPZZgNUDEzI0CKkYqPU3NuK3W3nlc/cax8iMWaZI4p9M48Qv0q8/gLlGeV/matiPAiBc+O3+ZD6feqg8C+zo/QaSMsxCUUyIqClyzzHgRi+0cK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749563462; c=relaxed/simple;
-	bh=fCWo4p6w2JPe7ViveNlz3g71884eQAB+OoO7SI2RnyM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=rBL9MYYGMiwbzYmjR/HEhj7kwOR6OFVfr4uzG2u2X7fT+2G4InUD4giFQk4E8We4zHGqMJijMDPCqVxq2NimSAtN4ODxEg3iZS+2J/ZIoMR6ofUf+CGMqLLKAD7TKoVLdMNAPRUf/lJL1+D/OFl/637U5PAW+qlc4dFSW6xcD5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nt38qrD/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749568300; c=relaxed/simple;
+	bh=KhXdvP/n6Pr3uERJTqt+/VZUjJ+mmGB8cHIouf8VUQE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iXgk92fqYoX9q8tx5CHBYjnVjuasYDoT33OJ+lSLt7YXkqea5QO9oZ69STLtxb8YHItCgQBU8+UK/0wHOJdV42COzLDXTKrl7UUZ1fDOR27iwrBzCx7Ppau/YOjP9IoSIh4+SDKGV3DnPJS+SEsUy1Pkou0ZACgJj0kAD/1tov0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vGjbXw5F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nt38qrD/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749563459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HJqiqUuKDfLyn4xBaXlEtsThAwLIgSsxyIFy+RU8IDE=;
-	b=Nt38qrD/VVET1UdY9BcuTegvw+ORfLQ61IquKw2uAlvFY+UcvB4RgZHcB4CjN5JyiG7Crw
-	4EKNnMzUMe/w7MxMDct3wa+E6ceNfOLK8iKrCvLQmw5ORKZdWil2Cth5nc09FMpKpYTkmN
-	GcLEjqCWFEOywjzXIZP3lpXWDv9dUeU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-663-Bv7EE2iIMEq2Pzb6retojw-1; Tue, 10 Jun 2025 09:50:56 -0400
-X-MC-Unique: Bv7EE2iIMEq2Pzb6retojw-1
-X-Mimecast-MFC-AGG-ID: Bv7EE2iIMEq2Pzb6retojw_1749563456
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a4f8fd1856so2270351f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 10 Jun 2025 06:50:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749563455; x=1750168255;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8AZiv2BWFM4GhtysbZzbwwVGm/Lo1Gm6qrn3+2ylp4E=;
-        b=XE4KwfsMHmbHe1dt0HcIYVdhEK5LFeIuan+7t/kQh1i9y78TPdk6YknEeqlGDXWW/L
-         hbQtenz7BeRLrvZrGtlDil5L9ItAUilDP0MUn7pwmhflm8/Sxi1rEmEUQRpeXOrqrFHT
-         ehP7K3ZXpAPJ9Tm7KV+1PY3f08F4RmRakbi3HZ6NzgoKo5aYQeJCqRjumxJvmi4wpS6h
-         qCuawUdIf20aygTyEIaZtl9AXCFsrIxDSXvAq9kagqD8DvYuNpPXwT4UF97mo7wbEQLB
-         BkscnYhn//0QKHQSsQ1xoqaP/XumcrYXxNkEzkzlAfEDgLg3IzSZwCvSQLteGm36KrAb
-         8uNw==
-X-Forwarded-Encrypted: i=1; AJvYcCVG4lQkbA9du5NQRFo4fkvvEOWYUB5viMVF7OqsxUbga4erE+dW2Hi66t0unVLtYPzPeEh0TPw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxHKn53TKYs6zYzKZE2pRw0HfIDKsRK6vJCgY4u2X0LCDahLO4b
-	X+u5sdGxbXJ4+ENOf1/2NZGWqTo20x/NwSkb/0BXwGe/bE8bvn6dFPa5RBBqJxqBjKMy9uHR+k0
-	5qXxpxjNpbjDACPD7VlNUaH2XsZy9LtA1UC5XJRX2/qRzE/sebRPGfu/fcQ==
-X-Gm-Gg: ASbGnctZCOatQqWSzlGyWtzdEi2kLdcutQ52bEuCIFoH6Z+0+Ym/hZH+lfGb1pVD0sn
-	ntyozrNJl9T6UqyBi8JOoMXpUiEYStK+MMF711S+8KAPLj+FeZpdNnc/irNbn8AUkZMlo2phyCK
-	LNbN1NsJirKlTYetGXz3NSJ2eXZsKfQ4onJ8cQvGB7zEnxCjJROgbouqIybUGjY8UJX55rUWcSk
-	0T12OvM1KyqUW37/EweVrR9WWn68/qxVFeMBjccg8fT0F4nC8EwGW5QeGNnHDVnbJyPbOYiM524
-	RfCalbsKDZelDuydSfm9MUHhFVTF8601ythNpLnk+DB4pi+R3g3iKcDtn9EsAz2ZBpjaJJs=
-X-Received: by 2002:a05:6000:2389:b0:3a4:f786:4fa1 with SMTP id ffacd0b85a97d-3a5316841c4mr14614315f8f.2.1749563455524;
-        Tue, 10 Jun 2025 06:50:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHJKrB4JYjJGiymCLMDjzBOek1jTekdNGl4zWkT4PdFepViV8CQdeLU5rPmaZjMcFcjiosmIg==
-X-Received: by 2002:a05:6000:2389:b0:3a4:f786:4fa1 with SMTP id ffacd0b85a97d-3a5316841c4mr14614288f8f.2.1749563455083;
-        Tue, 10 Jun 2025 06:50:55 -0700 (PDT)
-Received: from rh (p200300f6af1bce00e6fe5f11c0a7f4a1.dip0.t-ipconnect.de. [2003:f6:af1b:ce00:e6fe:5f11:c0a7:f4a1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-452fba4621csm131448645e9.13.2025.06.10.06.50.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 06:50:54 -0700 (PDT)
-Date: Tue, 10 Jun 2025 15:50:53 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Miguel Luis <miguel.luis@oracle.com>
-cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-    Colton Lewis <coltonlewis@google.com>, 
-    Ricardo Koller <ricarkol@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-    Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Zenghui Yu <yuzenghui@huawei.com>, Shuah Khan <shuah@kernel.org>, 
-    "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-    "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-    "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH v3 0/4] KVM: arm64: selftests: arch_timer_edge_cases
- fixes
-In-Reply-To: <B77F70F2-EECA-4E10-9F00-972F6AE27831@oracle.com>
-Message-ID: <8f15a5d6-0f73-194a-8fa2-b7ba8cc8c5b2@redhat.com>
-References: <20250605103613.14544-1-sebott@redhat.com> <B77F70F2-EECA-4E10-9F00-972F6AE27831@oracle.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vGjbXw5F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B7FCC4CEF0;
+	Tue, 10 Jun 2025 15:11:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749568299;
+	bh=KhXdvP/n6Pr3uERJTqt+/VZUjJ+mmGB8cHIouf8VUQE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=vGjbXw5Fpp4cwCsu76hZdvuR/hkGijhY97Zo1KC9+NKMrljZ9LPcgIOvTgKO0y+Tl
+	 spMei1D2h+2xhaG1sMDyUFKSdN1L7de4njilgzpGD2J4rWqWVIiGC8Aa8ZqRTtFIQu
+	 NEetHtqpKPs4LTMNla/U+aU+sFJWDav9EYpQqWu7vf+CRBWFGVPzriYVIFOnXKK9xF
+	 Okfh0D7m9tLA8qK/8G6RvN1BRqbs8hinWWXMUspcvPYGfTu7ou5RniRDwnO3FVLy55
+	 tspumz6pfAB5PPN/cfA9yXF/42rofglmiq9hEyFCVkpPIIcUBczp4ooS4UktJ237Pq
+	 k2FMDlsm24w5g==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH] KVM: arm64: nvhe: Fix build failure with gcc
+Date: Tue, 10 Jun 2025 20:41:32 +0530
+Message-ID: <20250610151132.1758206-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: nL4WDNCTyRmqfk2AntpNjjL0fYVfX5a9lWRHComtITw_1749563456
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed; boundary="-1463806286-426200590-1749563454=:18875"
+Content-Transfer-Encoding: 8bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
----1463806286-426200590-1749563454=:18875
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+Address a build failure encountered with aarch64-linux-gnu-gcc version
+13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)
 
-Hej Miguel,
+/usr/bin/aarch64-linux-gnu-ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__clock_mult_uint128':
+/linux/work/arch/arm64/kvm/hyp/nvhe/clock.c:27:(.hyp.text+0x120d8): undefined reference to `__kvm_nvhe___lshrti3'
+/linux/work/arch/arm64/kvm/hyp/nvhe/clock.c:27:(.hyp.text+0x120d8): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `__kvm_nvhe___lshrti3'
 
-On Mon, 9 Jun 2025, Miguel Luis wrote:
->> On 5 Jun 2025, at 10:36, Sebastian Ott <sebott@redhat.com> wrote:
->>
->> Some small fixes for arch_timer_edge_cases that I stumbled upon
->> while debugging failures for this selftest on ampere-one.
->>
->
-> I’ve tested this test under three circumstances:
->
-> 1) Original (!HAS_EL2 && !HAS_EL2_E2H0)
->
-> 2) HAS_EL2 && HAS_EL2_E2H0
->
-> 3) HAS_EL2 && !HAS_EL2_E2H0
->
-> Tests 1) and 2) returned in approx. the same amount of real time (about 12s) although 3) doesn’t
-> seem to return at all.
+Similar to commit 9bfe7553fadb ("arm64: Implement __lshrti3 library function"),
+this change use the added helper.
 
-I've never really looked at nested stuff, I'll try to set smth up and see
-if I can reproduce that..
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
 
-Thanks,
-Sebastian
----1463806286-426200590-1749563454=:18875--
+Suggested-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+---
+ arch/arm64/kvm/hyp/nvhe/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index a76522d63c3e..3dd2c780bbfc 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -17,7 +17,7 @@ ccflags-y += -fno-stack-protector	\
+ hostprogs := gen-hyprel
+ HOST_EXTRACFLAGS += -I$(objtree)/include
+ 
+-lib-objs := clear_page.o copy_page.o memcpy.o memset.o
++lib-objs := clear_page.o copy_page.o memcpy.o memset.o tishift.o
+ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+ 
+ CFLAGS_switch.nvhe.o += -Wno-override-init
+-- 
+2.43.0
 
