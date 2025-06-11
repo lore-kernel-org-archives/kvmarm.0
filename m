@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E77A2E58A8;
-	Wed, 11 Jun 2025 10:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028D22E58A5;
+	Wed, 11 Jun 2025 10:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749639100; cv=none; b=XytOmkFzxMFbxDWcukAY9U0o9xkGIAGzXEKySe7U/bCzCdSOnwa5PTNl3ftjmNS1FBuc/6LkoTZiyVSVS3evbLCwdQXGBiBVazUWtKw6jzzasvL+Hk1cG3bWFp1by+nc0ApoE1/wfApsUKVWz1tRc4r99kOPTnM1u9cekyP17CY=
+	t=1749639103; cv=none; b=rivz7trYnDDl89G2WHBegeGV/DEfH9X+/LajOO7I8MOfersBt7SFxHng+MKwpMytnWOwGOd+IGcnsa4X8KRm5TJFEcbk6JE1fTX0Ku2LlVzUHwYUxRF+k6jpNhpPfyMv/Flo76hpddcJcMvdYa1H0uF4JZtGWX5yq1ygCbdFP1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749639100; c=relaxed/simple;
-	bh=DbU/3eOmCUpqhoyVYu5oICt2Gwg/+xKFjP3C/f6c0XU=;
+	s=arc-20240116; t=1749639103; c=relaxed/simple;
+	bh=zoNX4sBTDp0zwte8yk215/K83SIoYWcajdpA/0WShoQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lr5lsS5CY/cwzz/77DQt8HT3RdWftICdWfM7ln/6zGVfeZUEcRs1aW0wl9e8M0o4ldIkSuFFBy+ciS6sSHfLebO/MTmH0eZBSDHNIvBlyRm+mcVOxOX4OCmnOT3praRN9IXS30fGLR1YjRRmlijtIODLTUL5r7oGtVdm8qbDqYk=
+	 MIME-Version; b=nAK7y2j4rZ2XiZoHGfyvj+qoP/posCh7EqmY81DfyV9n+TH7QcgcSExYhIP7YR/uKjOhUInJ3uLBzuJknGJUl/QyE8Y0tOltSLoDtLd3sGlxkMFbA7E7O5p5fN9GYmW8SFOMTMZwBZe7PxbLKBRyEhg3JsfeMaid1qwGIlGc9p4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2942B2BC2;
-	Wed, 11 Jun 2025 03:51:18 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CAC92BC4;
+	Wed, 11 Jun 2025 03:51:22 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.67.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 59B633F59E;
-	Wed, 11 Jun 2025 03:51:34 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D63C3F59E;
+	Wed, 11 Jun 2025 03:51:37 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -42,9 +42,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Alper Gun <alpergun@google.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>
-Subject: [PATCH v9 41/43] KVM: arm64: Expose support for private memory
-Date: Wed, 11 Jun 2025 11:48:38 +0100
-Message-ID: <20250611104844.245235-42-steven.price@arm.com>
+Subject: [PATCH v9 42/43] KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
+Date: Wed, 11 Jun 2025 11:48:39 +0100
+Message-ID: <20250611104844.245235-43-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250611104844.245235-1-steven.price@arm.com>
 References: <20250611104844.245235-1-steven.price@arm.com>
@@ -56,89 +56,31 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Select KVM_GENERIC_PRIVATE_MEM and provide the necessary support
-functions.
+Increment KVM_VCPU_MAX_FEATURES to expose the new capability to user
+space.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 ---
-Changes since v2:
- * Switch kvm_arch_has_private_mem() to a macro to avoid overhead of a
-   function call.
- * Guard definitions of kvm_arch_{pre,post}_set_memory_attributes() with
-   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
- * Early out in kvm_arch_post_set_memory_attributes() if the WARN_ON
-   should trigger.
+Changes since v8:
+ * Since NV is now merged and enabled, this no longer conflicts with it.
 ---
- arch/arm64/include/asm/kvm_host.h |  6 ++++++
- arch/arm64/kvm/Kconfig            |  1 +
- arch/arm64/kvm/mmu.c              | 24 ++++++++++++++++++++++++
- 3 files changed, 31 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a1857802db64..9903b0e8ef3f 100644
+index 9903b0e8ef3f..d16483f9d358 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1514,6 +1514,12 @@ struct kvm *kvm_arch_alloc_vm(void);
+@@ -40,7 +40,7 @@
  
- #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
+ #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
  
-+#ifdef CONFIG_KVM_PRIVATE_MEM
-+#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
-+#else
-+#define kvm_arch_has_private_mem(kvm) false
-+#endif
-+
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+-#define KVM_VCPU_MAX_FEATURES 9
++#define KVM_VCPU_MAX_FEATURES 10
+ #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
  
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 713248f240e0..3a04b040869d 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -37,6 +37,7 @@ menuconfig KVM
- 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
-+	select KVM_GENERIC_PRIVATE_MEM
- 	help
- 	  Support hosting virtualized guest machines.
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 580ed362833c..c866891fd8f9 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2384,6 +2384,30 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	return ret;
- }
- 
-+#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-+bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
-+					struct kvm_gfn_range *range)
-+{
-+	WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
-+	return false;
-+}
-+
-+bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-+					 struct kvm_gfn_range *range)
-+{
-+	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
-+		return false;
-+
-+	if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
-+		range->attr_filter = KVM_FILTER_SHARED;
-+	else
-+		range->attr_filter = KVM_FILTER_PRIVATE;
-+	kvm_unmap_gfn_range(kvm, range);
-+
-+	return false;
-+}
-+#endif
-+
- void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
- {
- }
+ #define KVM_REQ_SLEEP \
 -- 
 2.43.0
 
