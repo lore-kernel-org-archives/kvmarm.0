@@ -1,113 +1,135 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD3B2820DE;
-	Wed, 11 Jun 2025 10:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77628283136;
+	Wed, 11 Jun 2025 12:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749639107; cv=none; b=HU9e9TaVFFJOHF2W8hau+TYfvoEpgfovAj5rdqvBDxbrrazrOqxpvqkkgVtrqv1JtjNBNKm+mqykxNTGcIdvW3Ihl682xGGyFzHF/UU4ndAAFh71/jh/WAOMADTsd62AgAoKGqCrZ2TwuMShytBTaVd8bd0JYh+A+6cZPtG+MgA=
+	t=1749646366; cv=none; b=iVJFqc3wvMSCU/ZeKnK7jYMFXPiIUlRTDgXt5xJ+DzouLr9CMhbXJ8azbRW8440kRpPXNTLg1cPjuACtlD4k76/ICDUG6+oXQmb6t3viqMh9wHZbZCXYaO7v9r+IeMYrE/DsEPXqnvdzMjlyEB5HWz1/jXoUk6xKqJi+NubdPBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749639107; c=relaxed/simple;
-	bh=Q6rKcvEK3JD2FRQ36VpTV1lBtdavkrHrxZ1+rXKEr7M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YxCcAqYIj6QvTboefV30Vvt0hxaBcIw7N8jX170F3KwKWW/pOXoFzS5AE7DXN1eefOBRJP7miPlNeZKxpIjEd/ejVUsiRn1/96Fc+IE+oFhBAjAe0beF82EmpvqaZdQ/lf/oxw5bR6rVPF6q9bIY75oXf8rSE6EVSZOSS2EUajg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A5F92BC6;
-	Wed, 11 Jun 2025 03:51:26 -0700 (PDT)
-Received: from e122027.arm.com (unknown [10.57.67.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAEA93F59E;
-	Wed, 11 Jun 2025 03:51:41 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
+	s=arc-20240116; t=1749646366; c=relaxed/simple;
+	bh=xS5CjjPOWei09By745+NFla9rsFISSD/pc+6jDHaYFc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nauqoEAIavqI7VGe5QkiSq+NLYyi/nP4KL10ROcb6VqIIarPnKFfnXAAyKyZdS/3Wd1TbguFYEPYLxGtTMbxnSkYrgb1bg8oTGpN74DlxBaWpbJBlud/m5dBHsNd8yhMDFi5Wznicsln7kwYlWzZrXLzcyaIjaUUUmFefnl3O10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SzxtGcgj; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SzxtGcgj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 069EEC4CEF5;
+	Wed, 11 Jun 2025 12:52:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749646365;
+	bh=xS5CjjPOWei09By745+NFla9rsFISSD/pc+6jDHaYFc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SzxtGcgjtlqJTLeJJj91O7ONtIXqWBzum2CK7b8fc734uTwS/L0Zf0mKIVTOccSzL
+	 JdQtSzMqQoMgbKJBdoxIy76e8rb1iOfHr8I4hnAH4f+U4v1OwR7b3vddxiQagtLau0
+	 zr7mZY5sEIrdRYuVWjjLc9kYBN0zX13eHdUjYIbPJEvIQinHKxJg6aoHLQQuctZiRK
+	 Q/pF6itXmvvCicWAKSCZL/ChYpNfC6Ep8VKxq+mkkVg6UPn3JgEPNPXZ/t3y1E0JwM
+	 RJPhJHQ0j1t3ldqHeRZ5Izu+P6yiyaPvuLLarxg9pRTMRlEYdkF/DowSni9B5USMGs
+	 RHokKKcxx1rXQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uPKwc-005rNW-Jo;
+	Wed, 11 Jun 2025 13:52:42 +0100
+Date: Wed, 11 Jun 2025 13:52:41 +0100
+Message-ID: <8634c6e8yu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ada Couprie Diaz <ada.coupriediaz@arm.com>,
 	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>
-Subject: [PATCH v9 43/43] KVM: arm64: Allow activating realms
-Date: Wed, 11 Jun 2025 11:48:40 +0100
-Message-ID: <20250611104844.245235-44-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250611104844.245235-1-steven.price@arm.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH V3 2/2] KVM: selftests: Change MDSCR_EL1 register holding variables as uint64_t
+In-Reply-To: <9b378582-44eb-4fbb-a03a-40eb317daebd@arm.com>
+References: <20250610053128.4118784-1-anshuman.khandual@arm.com>
+	<20250610053128.4118784-3-anshuman.khandual@arm.com>
+	<864iwnedjk.wl-maz@kernel.org>
+	<9b378582-44eb-4fbb-a03a-40eb317daebd@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the ioctl to activate a realm and set the static branch to enable
-access to the realm functionality if the RMM is detected.
+On Wed, 11 Jun 2025 04:45:10 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> 
+> 
+> 
+> On 10/06/25 10:31 PM, Marc Zyngier wrote:
+> > On Tue, 10 Jun 2025 06:31:28 +0100,
+> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> >>
+> >> Change MDSCR_EL1 register holding local variables as uint64_t that reflects
+> >> its true register width as well.
+> >>
+> >> Cc: Marc Zyngier <maz@kernel.org>
+> >> Cc: Oliver Upton <oliver.upton@linux.dev>
+> >> Cc: Joey Gouly <joey.gouly@arm.com>
+> >> Cc: kvm@vger.kernel.org
+> >> Cc: kvmarm@lists.linux.dev
+> >> Cc: linux-kernel@vger.kernel.org
+> >> Cc: linux-kselftest@vger.kernel.org
+> >> Cc: linux-arm-kernel@lists.infradead.org
+> >> Reviewed-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
+> >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> >> ---
+> >>  tools/testing/selftests/kvm/arm64/debug-exceptions.c | 4 ++--
+> >>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/tools/testing/selftests/kvm/arm64/debug-exceptions.c b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> >> index c7fb55c9135b..e34963956fbc 100644
+> >> --- a/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> >> +++ b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> >> @@ -140,7 +140,7 @@ static void enable_os_lock(void)
+> >>  
+> >>  static void enable_monitor_debug_exceptions(void)
+> >>  {
+> >> -	uint32_t mdscr;
+> >> +	uint64_t mdscr;
+> >>  
+> >>  	asm volatile("msr daifclr, #8");
+> >>  
+> >> @@ -223,7 +223,7 @@ void install_hw_bp_ctx(uint8_t addr_bp, uint8_t ctx_bp, uint64_t addr,
+> >>  
+> >>  static void install_ss(void)
+> >>  {
+> >> -	uint32_t mdscr;
+> >> +	uint64_t mdscr;
+> >>  
+> >>  	asm volatile("msr daifclr, #8");
+> >>  
+> > 
+> > Why change this in the place that matters *the least*?
+> > 
+> > arch/arm64/kernel/debug-monitors.c is full of 32bit manipulation of
+> > this register, and that's only one example of it. So if you are going
+> > to change this, please do it fully, not as a random change in a random
+> > file.
+> 
+> The first patch in this series changes mdscr system register to 64 bit
+> in the mentioned file (i.e arch/arm64/kernel/debug-monitors.c).
 
-Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/kvm/rme.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+Then please Cc me on the series, and not patches at random. Context matters.
 
-diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 635d22825a70..a25f57387e3e 100644
---- a/arch/arm64/kvm/rme.c
-+++ b/arch/arm64/kvm/rme.c
-@@ -1250,6 +1250,20 @@ static int kvm_init_ipa_range_realm(struct kvm *kvm,
- 	return realm_init_ipa_state(kvm, addr, end);
- }
- 
-+static int kvm_activate_realm(struct kvm *kvm)
-+{
-+	struct realm *realm = &kvm->arch.realm;
-+
-+	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
-+		return -EINVAL;
-+
-+	if (rmi_realm_activate(virt_to_phys(realm->rd)))
-+		return -ENXIO;
-+
-+	WRITE_ONCE(realm->state, REALM_STATE_ACTIVE);
-+	return 0;
-+}
-+
- /* Protects access to rme_vmid_bitmap */
- static DEFINE_SPINLOCK(rme_vmid_lock);
- static unsigned long *rme_vmid_bitmap;
-@@ -1397,6 +1411,9 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		r = kvm_populate_realm(kvm, &args);
- 		break;
- 	}
-+	case KVM_CAP_ARM_RME_ACTIVATE_REALM:
-+		r = kvm_activate_realm(kvm);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -1722,5 +1739,5 @@ void kvm_init_rme(void)
- 	if (rme_vmid_init())
- 		return;
- 
--	/* Future patch will enable static branch kvm_rme_is_available */
-+	static_branch_enable(&kvm_rme_is_available);
- }
+	M.
+
 -- 
-2.43.0
-
+Without deviation from the norm, progress is not possible.
