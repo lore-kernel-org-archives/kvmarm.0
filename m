@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04E2295502
-	for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 13:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C9228BA95
+	for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 13:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749648826; cv=none; b=i27j4+sGhMdawdM1cOqKlnAMWU25LRu/E3QkAQlWjNmHuj4RXA30NVGH6gGP/fQelzJ/jEgWRSUY2gYJsNilbLhFeHNZzXtqIqEnAOPAwabGRC0b4CdVwLZN7Ww4O/XE3luAM9j+uaiJ2TjoDJm0fFYRozMcrlZLcRHRzAuq0LY=
+	t=1749648827; cv=none; b=hMOVTmgKRYwVT6dsJEesUKTOJ6kLBq+Zez9vNbPAvV6EFEUfv7kzwR5juEVJXpS+7lB0PV1/E1Bp3cCpQhInOqQ5c8AuiEQZ/iqK0+6h3UejdRVi90NVz933yM2ASAyfGLSGTOB2vEiHsbsLcpwD/DJzDciKBbDWrubZonviXpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749648826; c=relaxed/simple;
-	bh=7vn2LKz0DiGnSIDDs2V2kh5rysZiTSTz3Ly2sXV4SD0=;
+	s=arc-20240116; t=1749648827; c=relaxed/simple;
+	bh=YGKWeS/02fp1ZvntQjnXiLE+15TL6ZwC9xQKq/URy3c=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YlzY8nyFW/Laz4rnr6UfdwDjcjIbnt1lAJo8xjZPXYzeMhWdNcqmE4OJXvq/mNBqdMkCbhkbLUtuarpQChG+lNL7MNHjeA7BlldgeMfJkU6V1kmesxDzQcj007x9+aYVjaI7xHOSfK6SOPRdwq0w9/n0YrTzLlDZ6aqm1RzJcLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BEgQv61Z; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=SbYwvwuoNiEwfFe71j3umuGKJt/bDe4SnxibKxC7QxHDs0eOVCgt5FesuX1h8j7j4TSZIzSBhmdKqPAWIY6Cqg0xlqunEbrgl3NGJokfUb2JHMK1+t2y8/WFWUDh5z2V1VbLUkIF/PdM98FpFTJZZfRfakgTeJF/VifYMlMcxfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VUBHBKGb; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BEgQv61Z"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-451d5600a54so50517955e9.2
-        for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 06:33:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VUBHBKGb"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45311704d1fso20929455e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 06:33:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749648822; x=1750253622; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1749648824; x=1750253624; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fHa8ecXiFjILMVX7ljzeBm36pfeRCdeP+Tg7zuffq3M=;
-        b=BEgQv61ZdojG32V2VoYPYUGEBgGEHCiGvne1lysKZm6H5WcIZHvgvziyV2gwTY1gtO
-         QTxJuY56li5QI9a3eyWYGh2NI/WBd+Ib35UlBx3bgNa0bjdxre0OTUbomzk0KpuQf4ff
-         0jlSWXsPQ9PivMA2grTY/IRKRc/0JAjWL9DVV96NUILtp85U2GY9GCJW7tDZR+rLMqn1
-         lSHlPfWmG7wWDvhsQ5i2xpUj6HVy4cDRnUA1AJlTY7kq4vnIFyUPPj913zAcujmZgDbb
-         3NHAUzsg4lt38gX8Mt7PmVdKppbaqkf/I/tIVqqZNyEW6xfF8ojQRjwsCJtuADgh1p5h
-         fMCQ==
+        bh=8aR8d2ohKDYUtwqlUQwft9/8cX0oCVtZ+VCOgpKfhcs=;
+        b=VUBHBKGbI6XfLxMbGUsg8Mk3U1GZZEmSreKFobvHbgDIKHxwzbyrb+3PSt+wO5+NzQ
+         Nmn45ThZpfz5X0YEAUq/hrR//tWiXotZrmUj1iULeacnWKc3W2iEC6pjynOzOqLb4BoL
+         F0Y6aOFCIcIMCJuTEZG35EuCz0BbyY5Jd3xEHD93wjzyeQNM922clvlFiuI4OH7fQl2w
+         HnTXkWcgO+dCrqByNRF0IX4gwOrncgcYHqWwaSfpmjT05z//HkH+b9QgnW/RU9fJPVHR
+         J52teqCS11ZIqbBdxM98glIMT3JdhYsQMT/l9EGUjolB4eWBwvn8fZdX4ibxa5ltq6zy
+         3SBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749648822; x=1750253622;
+        d=1e100.net; s=20230601; t=1749648824; x=1750253624;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fHa8ecXiFjILMVX7ljzeBm36pfeRCdeP+Tg7zuffq3M=;
-        b=TEYt7DEMBsY1/Kj6gSRbdHEHDzKIr0ZSc+SXJPv3V7tZgdb2j3EK+I6NQUtXf98LHQ
-         t1b8ZihR2JvBXU1houWxRms6HDpwMfmPdOQCuci/ea0fFPXnkv5iGNWXeMg2IBuEXthJ
-         2axkJXeDJn/6aMJY2TYu5qOJGupviXdQnRj2zWfFW8ccz2EzIltzbqTwPnkF6FGgkuAO
-         9zkVJ4/J9EFY0Le2Kud5d64GKXGqcclutp/dEmtrdgeAFpBTcjh+KBfPVOYm7AAW3rid
-         kCcjHHSoJ974o0IBD7Q/9FuPVaj/ensnV4Zdxob50TyJvzNua2HbINSBtNgb+6dufFeV
-         2jSw==
-X-Forwarded-Encrypted: i=1; AJvYcCU8oMCJ3VOWlfU6OmGOlv8U2fgtMTDsViXMw9acGnWgGqMbp8kCxluZFx8koe4bXePwBq++Z8Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzRo/3E4PhLP4yus3LydZ/CMcWpQb7T9HXGgyCa/YeMlpwxoqOT
-	cgyJjJRRlILQEz+zJm5gjZa0fuKxVSWlF8jpAaNTpzoGb6VZhvXTYRulB2hkTXg7iGI6WhY3ss/
-	n7A==
-X-Google-Smtp-Source: AGHT+IFWFQPWCUEP2H/3glpy9tz6msJlvW+obnyNE3/UG7wTeYJGX28sYe2VOsbPe4n9KYugqPuHFDfSAA==
-X-Received: from wmqe17.prod.google.com ([2002:a05:600c:4e51:b0:450:d104:29f8])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:c08e:b0:453:a95:f07d
- with SMTP id 5b1f17b1804b1-4532487b287mr27952385e9.10.1749648822211; Wed, 11
- Jun 2025 06:33:42 -0700 (PDT)
-Date: Wed, 11 Jun 2025 14:33:17 +0100
+        bh=8aR8d2ohKDYUtwqlUQwft9/8cX0oCVtZ+VCOgpKfhcs=;
+        b=KWkf5BbiODiaMI0g+WBqxyHgRGFohmupLbSOcw1jFmaOYURNf3+Aw3S1oPjKCa22Ru
+         Pf7uvIzLaiVjqi2WY9MuC1vllQVAc1uGOc0O9cKxx+BITrg5GzxMqcXPYkMudrhlcglN
+         8/boR62nAktUXjjMTbI1SgTLOApqYlhwjOiXx3U1cmXqxWuUYDHL5dRivJPSKDbclpAU
+         x29o0ijzEupKEr9pF20duiRELoTY/AfDpCr2FhP/A+r3PSZNVZ8IzQdYmK1CK+GzRUB+
+         Av6VW6bV6pK3AgvgoWJhdNW40euq3IdOey4UyYRU3QmH/n8YyQVEfot6EBLULK9MDJgg
+         /l/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWa4+Hc45D0uEK6iZPSKTzYFdw+d8lY/y3v2NhZHKxMnjbTBW6txTASKXBMq7ZHKey9H2ssfN4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwH18PnfUVzav45Yf/I9A7H+DPwUVH4a+5pAmcsuzbCwTOi5deX
+	BxPWeFBQHsdoYIeiFna+qQdfgcTN3aWdoPciZ4A1KU9lOFzlmLbc3CdgW3hUvnBb1uoFVoRbDB1
+	Cug==
+X-Google-Smtp-Source: AGHT+IFCb8jHeuPCB7LEmI7avFCyTPGfgQduPiszdiF9PVCb/8oC0jpiLuFzDzkO8e+SWuappNsS6C6Y4A==
+X-Received: from wmbez14.prod.google.com ([2002:a05:600c:83ce:b0:450:d422:69f9])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3b9b:b0:44a:b9e4:4e6f
+ with SMTP id 5b1f17b1804b1-4532956d50bmr9767915e9.16.1749648824195; Wed, 11
+ Jun 2025 06:33:44 -0700 (PDT)
+Date: Wed, 11 Jun 2025 14:33:18 +0100
 In-Reply-To: <20250611133330.1514028-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250611133330.1514028-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <20250611133330.1514028-6-tabba@google.com>
-Subject: [PATCH v12 05/18] KVM: Rename kvm_slot_can_be_private() to kvm_slot_has_gmem()
+Message-ID: <20250611133330.1514028-7-tabba@google.com>
+Subject: [PATCH v12 06/18] KVM: Fix comments that refer to slots_lock
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev
@@ -86,94 +86,46 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	ira.weiny@intel.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The function kvm_slot_can_be_private() is used to check whether a memory
-slot is backed by guest_memfd. Rename it to kvm_slot_has_gmem() to make
-that clearer and to decouple memory being private from guest_memfd.
+Fix comments so that they refer to slots_lock instead of slots_locks
+(remove trailing s).
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Shivank Garg <shivankg@amd.com>
 Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-Co-developed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c   | 4 ++--
- arch/x86/kvm/svm/sev.c   | 4 ++--
  include/linux/kvm_host.h | 2 +-
- virt/kvm/guest_memfd.c   | 2 +-
- 4 files changed, 6 insertions(+), 6 deletions(-)
+ virt/kvm/kvm_main.c      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c4e10797610c..75b7b02cfcb7 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3285,7 +3285,7 @@ static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
- int kvm_mmu_max_mapping_level(struct kvm *kvm,
- 			      const struct kvm_memory_slot *slot, gfn_t gfn)
- {
--	bool is_private = kvm_slot_can_be_private(slot) &&
-+	bool is_private = kvm_slot_has_gmem(slot) &&
- 			  kvm_mem_is_private(kvm, gfn);
- 
- 	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM, is_private);
-@@ -4498,7 +4498,7 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
- {
- 	int max_order, r;
- 
--	if (!kvm_slot_can_be_private(fault->slot)) {
-+	if (!kvm_slot_has_gmem(fault->slot)) {
- 		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
- 		return -EFAULT;
- 	}
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 5a69b657dae9..ed85634eb2bd 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2319,7 +2319,7 @@ static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	mutex_lock(&kvm->slots_lock);
- 
- 	memslot = gfn_to_memslot(kvm, params.gfn_start);
--	if (!kvm_slot_can_be_private(memslot)) {
-+	if (!kvm_slot_has_gmem(memslot)) {
- 		ret = -EINVAL;
- 		goto out;
- 	}
-@@ -4644,7 +4644,7 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
- 	}
- 
- 	slot = gfn_to_memslot(kvm, gfn);
--	if (!kvm_slot_can_be_private(slot)) {
-+	if (!kvm_slot_has_gmem(slot)) {
- 		pr_warn_ratelimited("SEV: Unexpected RMP fault, non-private slot for GPA 0x%llx\n",
- 				    gpa);
- 		return;
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index a0e661aa3f8a..76b85099da99 100644
+index 76b85099da99..aec8e4182a65 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -614,7 +614,7 @@ struct kvm_memory_slot {
+@@ -859,7 +859,7 @@ struct kvm {
+ 	struct notifier_block pm_notifier;
  #endif
- };
- 
--static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot *slot)
-+static inline bool kvm_slot_has_gmem(const struct kvm_memory_slot *slot)
- {
- 	return slot && (slot->flags & KVM_MEM_GUEST_MEMFD);
- }
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index befea51bbc75..6db515833f61 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -654,7 +654,7 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
- 		return -EINVAL;
- 
- 	slot = gfn_to_memslot(kvm, start_gfn);
--	if (!kvm_slot_can_be_private(slot))
-+	if (!kvm_slot_has_gmem(slot))
- 		return -EINVAL;
- 
- 	file = kvm_gmem_get_file(slot);
+ #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+-	/* Protected by slots_locks (for writes) and RCU (for reads) */
++	/* Protected by slots_lock (for writes) and RCU (for reads) */
+ 	struct xarray mem_attr_array;
+ #endif
+ 	char stats_id[KVM_STATS_NAME_SIZE];
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6efbea208fa6..d41bcc6a78b0 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -331,7 +331,7 @@ void kvm_flush_remote_tlbs_memslot(struct kvm *kvm,
+ 	 * All current use cases for flushing the TLBs for a specific memslot
+ 	 * are related to dirty logging, and many do the TLB flush out of
+ 	 * mmu_lock. The interaction between the various operations on memslot
+-	 * must be serialized by slots_locks to ensure the TLB flush from one
++	 * must be serialized by slots_lock to ensure the TLB flush from one
+ 	 * operation is observed by any other operation on the same memslot.
+ 	 */
+ 	lockdep_assert_held(&kvm->slots_lock);
 -- 
 2.50.0.rc0.642.g800a2b2222-goog
 
