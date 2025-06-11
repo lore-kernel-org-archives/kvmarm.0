@@ -1,114 +1,195 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A325D227581
-	for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 09:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17B39256C81;
+	Wed, 11 Jun 2025 10:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749635954; cv=none; b=PUa7ksOjmI9Hl6Ot77E+zLwzsfl8aydDihahUAkyilLT436Fml4gS8WbTmCFUFHDi9/ZxlYYu2+/Kq8FM6K44udr2Ld+8KdhIfofz8Zd7xv192ALjXAyGs4v/rsbDYFAYnQOvZ2k8vAXpJ9+utGmcOhGlMwSnL0GUy9uyuzsh80=
+	t=1749638945; cv=none; b=nJDE8/D6WVkLBrVJQiZH+NVpfCt9PXVUEO3QQIdG1B6cD+6/rNsDqNYSc057b5PSvSaXZ8ijbZl9VxMBIydFUxsFXH/cEchBj4MYAWb7aC7PdBSyYghW+Sr2sHXma+9whvZKpm0XVg65x+GhM9oTTljoUspkEYAqKDCOxGuyo3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749635954; c=relaxed/simple;
-	bh=HwXs6qp3W7EZHA1+yzvKN6nMOhRAgv4bEYIrYnnhwjU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O/sXy8AsghOHelsubfvbgYGNIYYzqjcZerTFFGhhYHmFQhbx9S6OY2BJDzoYciZGYeqwIi/k7Nwqk33lMQBImJqTatD9R9kkCyY85JmLZe6/UxoLxj9AhmPPBmuWZ7Dm9y8CAEQcIWaD1+NvZ4BM6q42GH4N2ixR1TQl/dI3bl0=
+	s=arc-20240116; t=1749638945; c=relaxed/simple;
+	bh=+CCc2cgggN1cIIsglK1Jh57whCPvKcR8B8t0gnebBTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D1LkXstof+eICNSiSE70FH4SV4u7MFfAOQ7PoljMC6d+kYbUPMloKr2uX5unAPtpymDlzhFu1BoyOlW+kSVzTo1yS1ZIfZd8KV5dgBhsoKFXkyMSzRjSeJPcZuBk9zexigf8/d/OKsQ/dLDJf/oO5Zkz6WKyEzr1yn6YlulPJlw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7E2651596;
-	Wed, 11 Jun 2025 02:58:52 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 999603F673;
-	Wed, 11 Jun 2025 02:59:09 -0700 (PDT)
-Date: Wed, 11 Jun 2025 10:59:06 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCFFF15A1;
+	Wed, 11 Jun 2025 03:48:42 -0700 (PDT)
+Received: from e122027.arm.com (unknown [10.57.67.107])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 605143F673;
+	Wed, 11 Jun 2025 03:48:58 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
-	Ada Couprie Diaz <ada.coupriediaz@arm.com>,
-	linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH V3 2/2] KVM: selftests: Change MDSCR_EL1 register holding
- variables as uint64_t
-Message-ID: <aElTaqOqzAi17H2b@J2N7QTR9R3>
-References: <20250610053128.4118784-1-anshuman.khandual@arm.com>
- <20250610053128.4118784-3-anshuman.khandual@arm.com>
- <864iwnedjk.wl-maz@kernel.org>
- <9b378582-44eb-4fbb-a03a-40eb317daebd@arm.com>
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>
+Subject: [PATCH v9 00/43] arm64: Support for Arm CCA in KVM
+Date: Wed, 11 Jun 2025 11:47:57 +0100
+Message-ID: <20250611104844.245235-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b378582-44eb-4fbb-a03a-40eb317daebd@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 11, 2025 at 09:15:10AM +0530, Anshuman Khandual wrote:
-> 
-> 
-> On 10/06/25 10:31 PM, Marc Zyngier wrote:
-> > On Tue, 10 Jun 2025 06:31:28 +0100,
-> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> >>
-> >> Change MDSCR_EL1 register holding local variables as uint64_t that reflects
-> >> its true register width as well.
-> >>
-> >> Cc: Marc Zyngier <maz@kernel.org>
-> >> Cc: Oliver Upton <oliver.upton@linux.dev>
-> >> Cc: Joey Gouly <joey.gouly@arm.com>
-> >> Cc: kvm@vger.kernel.org
-> >> Cc: kvmarm@lists.linux.dev
-> >> Cc: linux-kernel@vger.kernel.org
-> >> Cc: linux-kselftest@vger.kernel.org
-> >> Cc: linux-arm-kernel@lists.infradead.org
-> >> Reviewed-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
-> >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> >> ---
-> >>  tools/testing/selftests/kvm/arm64/debug-exceptions.c | 4 ++--
-> >>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/tools/testing/selftests/kvm/arm64/debug-exceptions.c b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
-> >> index c7fb55c9135b..e34963956fbc 100644
-> >> --- a/tools/testing/selftests/kvm/arm64/debug-exceptions.c
-> >> +++ b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
-> >> @@ -140,7 +140,7 @@ static void enable_os_lock(void)
-> >>  
-> >>  static void enable_monitor_debug_exceptions(void)
-> >>  {
-> >> -	uint32_t mdscr;
-> >> +	uint64_t mdscr;
-> >>  
-> >>  	asm volatile("msr daifclr, #8");
-> >>  
-> >> @@ -223,7 +223,7 @@ void install_hw_bp_ctx(uint8_t addr_bp, uint8_t ctx_bp, uint64_t addr,
-> >>  
-> >>  static void install_ss(void)
-> >>  {
-> >> -	uint32_t mdscr;
-> >> +	uint64_t mdscr;
-> >>  
-> >>  	asm volatile("msr daifclr, #8");
-> >>  
-> > 
-> > Why change this in the place that matters *the least*?
-> > 
-> > arch/arm64/kernel/debug-monitors.c is full of 32bit manipulation of
-> > this register, and that's only one example of it. So if you are going
-> > to change this, please do it fully, not as a random change in a random
-> > file.
-> 
-> The first patch in this series changes mdscr system register to 64 bit
-> in the mentioned file (i.e arch/arm64/kernel/debug-monitors.c). 
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA).
 
-You did not Cc Marc on oatch 1 or the cover letter. KVM folk are only
-Cc'd on patch 2.
+The related guest support was merged for v6.14-rc1 so you no longer need
+that separately.
 
-Marc, for context the series is:
+There are a few changes since v8, many thanks for the review
+comments. The highlights are below, and individual patches have a changelog.
 
-  https://lore.kernel.org/linux-arm-kernel/20250610053128.4118784-1-anshuman.khandual@arm.com/
+ * NV support is now upstream, so this series no longer conflicts.
 
-... and I've asked Anshuman to better describe the rationale.
+ * Tidied up RTT accounting by providing wrapper functions to call
+   kvm_account_pgtable_pages() only when appropriate.
 
-Mark.
+ * Propagate the 'may_block' flag to enable cond_resched calls only when
+   appropriate.
+
+ * Reduce code duplication between INIT_RIPAS and SET_RIPAS.
+
+ * Various code improvements from the reviews - many thanks!
+
+ * Rebased onto v6.16-rc1.
+
+Things to note:
+
+ * The magic numbers for capabilities and ioctls have been updated. So
+   you'll need to update your VMM. See below for update kvmtool branch.
+
+ * Patch 42 increases KVM_VCPU_MAX_FEATURES to expose the new feature.
+
+The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[1].
+
+This series is based on v6.16-rc1. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v9
+
+Work in progress changes for kvmtool are available from the git
+repository below:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v7
+
+[1] https://developer.arm.com/documentation/den0137/1-0rel0/
+
+Jean-Philippe Brucker (7):
+  arm64: RME: Propagate number of breakpoints and watchpoints to
+    userspace
+  arm64: RME: Set breakpoint parameters through SET_ONE_REG
+  arm64: RME: Initialize PMCR.N with number counter supported by RMM
+  arm64: RME: Propagate max SVE vector length from RMM
+  arm64: RME: Configure max SVE vector length for a Realm
+  arm64: RME: Provide register list for unfinalized RME RECs
+  arm64: RME: Provide accurate register list
+
+Joey Gouly (2):
+  arm64: RME: allow userspace to inject aborts
+  arm64: RME: support RSI_HOST_CALL
+
+Steven Price (31):
+  arm64: RME: Handle Granule Protection Faults (GPFs)
+  arm64: RME: Add SMC definitions for calling the RMM
+  arm64: RME: Add wrappers for RMI calls
+  arm64: RME: Check for RME support at KVM init
+  arm64: RME: Define the user ABI
+  arm64: RME: ioctls to create and configure realms
+  KVM: arm64: Allow passing machine type in KVM creation
+  arm64: RME: RTT tear down
+  arm64: RME: Allocate/free RECs to match vCPUs
+  KVM: arm64: vgic: Provide helper for number of list registers
+  arm64: RME: Support for the VGIC in realms
+  KVM: arm64: Support timers in realm RECs
+  arm64: RME: Allow VMM to set RIPAS
+  arm64: RME: Handle realm enter/exit
+  arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
+  KVM: arm64: Handle realm MMIO emulation
+  arm64: RME: Allow populating initial contents
+  arm64: RME: Runtime faulting of memory
+  KVM: arm64: Handle realm VCPU load
+  KVM: arm64: Validate register access for a Realm VM
+  KVM: arm64: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  arm64: Don't expose stolen time for realm guests
+  arm64: RME: Always use 4k pages for realms
+  arm64: RME: Prevent Device mappings for Realms
+  arm_pmu: Provide a mechanism for disabling the physical IRQ
+  arm64: RME: Enable PMU support with a realm guest
+  arm64: RME: Hide KVM_CAP_READONLY_MEM for realm guests
+  KVM: arm64: Expose support for private memory
+  KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
+  KVM: arm64: Allow activating realms
+
+Suzuki K Poulose (3):
+  kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  kvm: arm64: Don't expose debug capabilities for realm guests
+  arm64: RME: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |   94 +-
+ arch/arm64/include/asm/kvm_emulate.h |   40 +
+ arch/arm64/include/asm/kvm_host.h    |   17 +-
+ arch/arm64/include/asm/kvm_rme.h     |  139 ++
+ arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
+ arch/arm64/include/asm/rmi_smc.h     |  268 ++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/include/uapi/asm/kvm.h    |   49 +
+ arch/arm64/kvm/Kconfig               |    1 +
+ arch/arm64/kvm/Makefile              |    3 +-
+ arch/arm64/kvm/arch_timer.c          |   48 +-
+ arch/arm64/kvm/arm.c                 |  168 ++-
+ arch/arm64/kvm/guest.c               |  108 +-
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    5 +-
+ arch/arm64/kvm/mmio.c                |   16 +-
+ arch/arm64/kvm/mmu.c                 |  207 ++-
+ arch/arm64/kvm/pmu-emul.c            |    6 +
+ arch/arm64/kvm/psci.c                |   30 +
+ arch/arm64/kvm/reset.c               |   23 +-
+ arch/arm64/kvm/rme-exit.c            |  207 +++
+ arch/arm64/kvm/rme.c                 | 1743 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   53 +-
+ arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
+ arch/arm64/kvm/vgic/vgic-v3.c        |    6 +-
+ arch/arm64/kvm/vgic/vgic.c           |   60 +-
+ arch/arm64/mm/fault.c                |   31 +-
+ drivers/perf/arm_pmu.c               |   15 +
+ include/kvm/arm_arch_timer.h         |    2 +
+ include/kvm/arm_pmu.h                |    4 +
+ include/kvm/arm_psci.h               |    2 +
+ include/linux/perf/arm_pmu.h         |    5 +
+ include/uapi/linux/kvm.h             |   29 +-
+ 33 files changed, 3790 insertions(+), 104 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rme.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rmi_smc.h
+ create mode 100644 arch/arm64/kvm/rme-exit.c
+ create mode 100644 arch/arm64/kvm/rme.c
+
+-- 
+2.43.0
+
