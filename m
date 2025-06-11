@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C094FA50;
-	Wed, 11 Jun 2025 18:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B68262FD8;
+	Wed, 11 Jun 2025 18:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749664886; cv=none; b=TmDj8I9hAa3atuI6Y0RlEIIztFh2Rb260abIrHylqnQdJb5DOJsbk+7q5jnF3yDoTEmlWnhRN0wyf/hTFIZoJ2vA316xzPlFE2XewnnsnQ2xHJuia/jR8TeokhaYCba3sUsfKfc0iGZmReb1w2HvYmqNF8A5nipxWtpQh2unc30=
+	t=1749664888; cv=none; b=fVl00x8ZZ67gxAwxmMRhVbxh/DBHzvQXAgYfygSEenSFjzYUkb0/eRrR7UL/liXerknApFEhwFE1KmFXqoxQFr87ju92PZPdNXZTsQ78muYYk9WluXiXZRb2RtnWkO++s+pqCt5rhetow4NWrsNef/8/IInWwJHZwxWmPGXIW4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749664886; c=relaxed/simple;
-	bh=1ueyvC8/mCJFw9JuGdrNLssNoMYyC/92vpBFO+JeLC0=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VHEpBd+8RPFLI3mIPZSWeQ6Rrc7eFCKfokREm6qY6cdaWVUqy2OsZd0X/vmG40SYHqeMgcahmkzrKQygOFd3yfWuWiiJjtx/3Rx+pi8vHK0Yvp0ozLCDOlh9pyUgHxoeq/Jp95m/UEvOkvDLwdBxTFtCceWxuipOLz5J9kfT9IA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPFcmaGF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749664888; c=relaxed/simple;
+	bh=fJXo/tJsH8MjxxKpmMQXW/r5YZGqrSF+of8RKE+gE98=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Hi2TPTV4UnHswRC6BwLa2JkStc+jsQ5Be+AJG1FvR3k9tG0rblgQpVmInnIsLvoR2IbTX++dT54xPyN2oikRCD7q1KVw26QAohTDjomexsxPpqpxGgWHHRjui9F943Sb2gk3S+14Vocc1ojW+sok78DqFA2cud0LU6Jt5aquG4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHzrkJHc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPFcmaGF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D83BC4CEEA;
-	Wed, 11 Jun 2025 18:01:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHzrkJHc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A36C4CEEA;
+	Wed, 11 Jun 2025 18:01:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749664886;
-	bh=1ueyvC8/mCJFw9JuGdrNLssNoMYyC/92vpBFO+JeLC0=;
-	h=From:Subject:Date:To:Cc:From;
-	b=BPFcmaGFRTtopyRxTH7ClVtgpG9UO5hMbqtKHdZ43Lkqf49KdenbiYvigOSdVKxfk
-	 gsxkF5MaZ1in1Jbgk7SxoCK+3k460w/bZe4qKU0jQ5Md8QEjBnnS6HZXwsW/9fYTl5
-	 NFXpIHyEAssjZT48SJ0XTyfgSbxY1Hj1S44F0h5BPYd19fzI9XCJ2Ymw2BK+yo+O9S
-	 cKOawkuPvA5O5K3OhP19AWXYHzr+wawzwvoCS/0u6Dp/F2Jp5U2Bx7y8FhmV2rPGnS
-	 Jm3HyDZHC/hjjchmnTDHiWLXln8rGFuQXuHYI+CCd6Oo+bsBXcCpuMO2rhjFcHGWeH
-	 85FmMBTLzP+Qg==
+	s=k20201202; t=1749664887;
+	bh=fJXo/tJsH8MjxxKpmMQXW/r5YZGqrSF+of8RKE+gE98=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=QHzrkJHc8DOuhuS24FB5uJncBaMVzkTV/Qk5LuOXc7yyP1IDgri+Y8v7HS88e7bbx
+	 6x7qvxX8EAztqky6Z/ezii3rkpTevgue8PtcC6iMjbd6zJaZfJJLaWaFnzehZJE+7C
+	 iSnZAHCJ/2L29D7DUf4N0xY/7lF7Flw3p810T+STLFQFSmO74NDBn+bOsVgFDJ+wXY
+	 5x/sqAZace9feUb5EG/oqPMX/rrVnAAxJHV1FWQRRArvUQmS2ObefBhhz8MnDw/T6C
+	 zTKhk2mN2oWq5qKuX0iJKda3CL3FeklX1PyeIKhU/T8fnaz5G7Xdm8tT0S2qydmh+t
+	 hOhGd7Cy5Nshg==
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Subject: [PATCH v23 0/4] arm64/perf: Enable branch stack sampling
-Date: Wed, 11 Jun 2025 13:01:10 -0500
-Message-Id: <20250611-arm-brbe-v19-v23-0-e7775563036e@kernel.org>
+Date: Wed, 11 Jun 2025 13:01:11 -0500
+Subject: [PATCH v23 1/4] arm64/sysreg: Add BRBE registers and fields
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,12 +37,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAGbESWgC/2XNwW7CMAyA4VdBOS/Idpo24cR7oB0gcSDa1qIUV
- Uyo7z6XHUrLIZFs5fvzUD2XzL3abR6q8JD73LUykPnYqHA5tmfWOcpCEZAFJK+P5Uefyon1gF5
- TFW30bLkmo4RcC6d8f/YOnzJfcn/ryu8zL++n9X9JrmVpOqAxoAFwQMbZ/ReXlr+3XTmrqTUQv
- Hh0K08gvmLviVIgdvzucfYVNGuP4lNC16RUB0/u3dPsrXy38iQ+YIyRjeMmLf04jn/gFR5/bAE
- AAA==
-X-Change-ID: 20250129-arm-brbe-v19-24d5d9e5e623
+Message-Id: <20250611-arm-brbe-v19-v23-1-e7775563036e@kernel.org>
+References: <20250611-arm-brbe-v19-v23-0-e7775563036e@kernel.org>
+In-Reply-To: <20250611-arm-brbe-v19-v23-0-e7775563036e@kernel.org>
 To: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
  Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
  Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -54,118 +51,217 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
  kvmarm@lists.linux.dev, Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.15-dev
 
-This series enables perf branch stack sampling support on arm64 via a 
-v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details 
-on BRBE can be found in the Arm ARM[1] chapter D18.
+From: Anshuman Khandual <anshuman.khandual@arm.com>
 
-I've picked up this series from Anshuman. v19 and later versions have 
-been reworked quite a bit by Mark and myself. The bulk of those changes 
-are in patch 5.
+This patch adds definitions related to the Branch Record Buffer Extension
+(BRBE) as per ARM DDI 0487K.a. These will be used by KVM and a BRBE driver
+in subsequent patches.
 
-A git branch is here[2].
+Some existing BRBE definitions in asm/sysreg.h are replaced with equivalent
+generated definitions.
 
-[1] https://developer.arm.com/documentation/ddi0487/latest/
-[2] git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git arm/brbe-v23
-
-v23:
- - Rebase on v6.16-rc1 dropping already applied el2_setup.h clean-ups
- - Drop the SYSCALL fixup and convert all BRBE CALL events to SYSCALL
-
-v22:
- - https://lore.kernel.org/all/20250520-arm-brbe-v19-v22-0-c1ddde38e7f8@kernel.org/
- - New patch reworking the labels in el2_setup.h
- - Move branch stack disabling after armpmu_stop() in armpmu_del()
- - Fix branch_records_alloc() to work on heterogeneous systems
- - Make setting .sched_task function ptr conditional on BRBE support
- - Reword booting.rst section name (s/feature/the/) and move next to
-   other PMU related features instead of in the middle of SME features.
- - Drop setting SYS_BRBCR_EL1
- - Drop CONFIG_ARM64_BRBE ifdef
- - Rework initialization of HFGITR_EL2
-
-v21:
- - https://lore.kernel.org/r/20250407-arm-brbe-v19-v21-0-ff187ff6c928@kernel.org
- - Drop clean-up patches 1-7 already applied
- - Rebase on v6.15-rc1
-
-v20:
- - https://lore.kernel.org/r/20250218-arm-brbe-v19-v20-0-4e9922fc2e8e@kernel.org
- - Added back some of the arm64 specific exception types. The x86 IRQ 
-   branches also include other exceptions like page faults. On arm64, we 
-   can distinguish the exception types, so we do. Also, to better 
-   align with x86, we convert 'call' branches which are user to kernel 
-   to 'syscall'.
- - Only enable exceptions and exception returns if recording kernel
-   branches (matching x86)
- - Drop requiring event and branch privileges to match
- - Add "branches" caps sysfs attribute like x86
- - Reword comment about FZP and MDCR_EL2.HPMN interaction
- - Rework BRBE invalidation to avoid invalidating in interrupt handler
-   when no handled events capture the branch stack (i.e. when there are 
-   multiple users).
- - Also clear BRBCR_ELx bits in brbe_disable(). This is for KVM nVHE 
-   checks if BRBE is enabled.
- - Document that MDCR_EL3.SBRBE can be 0b01 also
-
-v19:
- - https://lore.kernel.org/all/20250202-arm-brbe-v19-v19-0-1c1300802385@kernel.org/
- - Drop saving of branch records when task scheduled out (Mark). Make 
-   sched_task() callback actually get called. Enabling requires a call 
-   to perf_sched_cb_inc(). So the saving of branch records never 
-   happened.
- - Got rid of added armpmu ops. All BRBE support is contained within 
-   pmuv3 code.
- - Fix freeze on overflow for VHE
- - The cycle counter doesn't freeze BRBE on overflow, so avoid assigning
-   it when BRBE is enabled.
- - Drop all the Arm specific exception branches. Not a clear need for
-   them.
- - Fix handling of branch 'cycles' reading. CC field is
-   mantissa/exponent, not an integer.
- - Rework s/w filtering to better match h/w filtering
- - Reject events with disjoint event filter and branch filter or with 
-   exclude_host set
- - Dropped perf test patch which has been applied for 6.14
- - Dropped patch "KVM: arm64: Explicitly handle BRBE traps as UNDEFINED"
-   which has been applied for 6.14
-
-v18:
- - https://lore.kernel.org/all/20240613061731.3109448-1-anshuman.khandual@arm.com/
-
-For v1-v17, see the above link. Not going to duplicate it all here...
-
+Cc: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Tested-by: James Clark <james.clark@linaro.org>
+Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: "Rob Herring (Arm)" <robh@kernel.org>
 ---
+v19:
+- split BRBINF.CC field into mantissa and exponent
 ---
-Anshuman Khandual (3):
-      arm64/sysreg: Add BRBE registers and fields
-      arm64: Handle BRBE booting requirements
-      KVM: arm64: nvhe: Disable branch generation in nVHE guests
+ arch/arm64/include/asm/sysreg.h |  16 ++---
+ arch/arm64/tools/sysreg         | 132 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 138 insertions(+), 10 deletions(-)
 
-Rob Herring (Arm) (1):
-      perf: arm_pmuv3: Add support for the Branch Record Buffer Extension (BRBE)
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index f1bb0d10c39a..ef76a4b9e240 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -202,16 +202,8 @@
+ #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)
+ 
+ #define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))
+-#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)
+ #define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))
+-#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)
+ #define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))
+-#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)
+-#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)
+-
+-#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)
+-#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)
+-#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)
+ 
+ #define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+ #define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))
+@@ -277,8 +269,6 @@
+ /* ETM */
+ #define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
+ 
+-#define SYS_BRBCR_EL2			sys_reg(2, 4, 9, 0, 0)
+-
+ #define SYS_MIDR_EL1			sys_reg(3, 0, 0, 0, 0)
+ #define SYS_MPIDR_EL1			sys_reg(3, 0, 0, 0, 5)
+ #define SYS_REVIDR_EL1			sys_reg(3, 0, 0, 0, 6)
+@@ -821,6 +811,12 @@
+ #define OP_COSP_RCTX			sys_insn(1, 3, 7, 3, 6)
+ #define OP_CPP_RCTX			sys_insn(1, 3, 7, 3, 7)
+ 
++/*
++ * BRBE Instructions
++ */
++#define BRB_IALL_INSN	__emit_inst(0xd5000000 | OP_BRB_IALL | (0x1f))
++#define BRB_INJ_INSN	__emit_inst(0xd5000000 | OP_BRB_INJ  | (0x1f))
++
+ /* Common SCTLR_ELx flags. */
+ #define SCTLR_ELx_ENTP2	(BIT(60))
+ #define SCTLR_ELx_DSSBS	(BIT(44))
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 8a8cf6874298..81c4e214ba33 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -1329,6 +1329,138 @@ UnsignedEnum	3:0	MTEPERM
+ EndEnum
+ EndSysreg
+ 
++
++SysregFields BRBINFx_EL1
++Res0	63:47
++Field	46	CCU
++Field	45:40	CC_EXP
++Field	39:32	CC_MANT
++Res0	31:18
++Field	17	LASTFAILED
++Field	16	T
++Res0	15:14
++Enum	13:8		TYPE
++	0b000000	DIRECT_UNCOND
++	0b000001	INDIRECT
++	0b000010	DIRECT_LINK
++	0b000011	INDIRECT_LINK
++	0b000101	RET
++	0b000111	ERET
++	0b001000	DIRECT_COND
++	0b100001	DEBUG_HALT
++	0b100010	CALL
++	0b100011	TRAP
++	0b100100	SERROR
++	0b100110	INSN_DEBUG
++	0b100111	DATA_DEBUG
++	0b101010	ALIGN_FAULT
++	0b101011	INSN_FAULT
++	0b101100	DATA_FAULT
++	0b101110	IRQ
++	0b101111	FIQ
++	0b110000	IMPDEF_TRAP_EL3
++	0b111001	DEBUG_EXIT
++EndEnum
++Enum	7:6	EL
++	0b00	EL0
++	0b01	EL1
++	0b10	EL2
++	0b11	EL3
++EndEnum
++Field	5	MPRED
++Res0	4:2
++Enum	1:0	VALID
++	0b00	NONE
++	0b01	TARGET
++	0b10	SOURCE
++	0b11	FULL
++EndEnum
++EndSysregFields
++
++SysregFields	BRBCR_ELx
++Res0	63:24
++Field	23 	EXCEPTION
++Field	22 	ERTN
++Res0	21:10
++Field	9	FZPSS
++Field	8 	FZP
++Res0	7
++Enum	6:5	TS
++	0b01	VIRTUAL
++	0b10	GUEST_PHYSICAL
++	0b11	PHYSICAL
++EndEnum
++Field	4	MPRED
++Field	3	CC
++Res0	2
++Field	1	ExBRE
++Field	0	E0BRE
++EndSysregFields
++
++Sysreg	BRBCR_EL1	2	1	9	0	0
++Fields	BRBCR_ELx
++EndSysreg
++
++Sysreg	BRBFCR_EL1	2	1	9	0	1
++Res0	63:30
++Enum	29:28	BANK
++	0b00	BANK_0
++	0b01	BANK_1
++EndEnum
++Res0	27:23
++Field	22	CONDDIR
++Field	21	DIRCALL
++Field	20	INDCALL
++Field	19	RTN
++Field	18	INDIRECT
++Field	17	DIRECT
++Field	16	EnI
++Res0	15:8
++Field	7	PAUSED
++Field	6	LASTFAILED
++Res0	5:0
++EndSysreg
++
++Sysreg	BRBTS_EL1	2	1	9	0	2
++Field	63:0	TS
++EndSysreg
++
++Sysreg	BRBINFINJ_EL1	2	1	9	1	0
++Fields BRBINFx_EL1
++EndSysreg
++
++Sysreg	BRBSRCINJ_EL1	2	1	9	1	1
++Field	63:0 ADDRESS
++EndSysreg
++
++Sysreg	BRBTGTINJ_EL1	2	1	9	1	2
++Field	63:0 ADDRESS
++EndSysreg
++
++Sysreg	BRBIDR0_EL1	2	1	9	2	0
++Res0	63:16
++Enum	15:12	CC
++	0b0101	20_BIT
++EndEnum
++Enum	11:8	FORMAT
++	0b0000	FORMAT_0
++EndEnum
++Enum	7:0		NUMREC
++	0b00001000	8
++	0b00010000	16
++	0b00100000	32
++	0b01000000	64
++EndEnum
++EndSysreg
++
++Sysreg	BRBCR_EL2	2	4	9	0	0
++Fields	BRBCR_ELx
++EndSysreg
++
++Sysreg	BRBCR_EL12	2	5	9	0	0
++Fields	BRBCR_ELx
++EndSysreg
++
+ Sysreg	ID_AA64ZFR0_EL1	3	0	0	4	4
+ Res0	63:60
+ UnsignedEnum	59:56	F64MM
 
- Documentation/arch/arm64/booting.rst |  21 +
- arch/arm64/include/asm/el2_setup.h   |  71 +++-
- arch/arm64/include/asm/kvm_host.h    |   2 +
- arch/arm64/include/asm/sysreg.h      |  16 +-
- arch/arm64/kvm/debug.c               |   4 +
- arch/arm64/kvm/hyp/nvhe/debug-sr.c   |  32 ++
- arch/arm64/kvm/hyp/nvhe/switch.c     |   2 +-
- arch/arm64/tools/sysreg              | 132 ++++++
- drivers/perf/Kconfig                 |  11 +
- drivers/perf/Makefile                |   1 +
- drivers/perf/arm_brbe.c              | 798 +++++++++++++++++++++++++++++++++++
- drivers/perf/arm_brbe.h              |  47 +++
- drivers/perf/arm_pmu.c               |  16 +-
- drivers/perf/arm_pmuv3.c             | 125 +++++-
- include/linux/perf/arm_pmu.h         |   8 +
- 15 files changed, 1265 insertions(+), 21 deletions(-)
----
-base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
-change-id: 20250129-arm-brbe-v19-24d5d9e5e623
-
-Best regards,
 -- 
-Rob Herring (Arm) <robh@kernel.org>
+2.47.2
 
