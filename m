@@ -1,144 +1,168 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D1C1B21AD
-	for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 18:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907851A9B32
+	for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 18:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749666054; cv=none; b=DaWvfOmbRc/0u65s/8qz1+LABsJ1oD+3guaFFpDG8wPy21q74B0aK9ssY0TmWuy+iD//yo5nWp8ZI7jPrNJHBeu9Stlbv6+Mvvlt+9fVvTqhL0wL/UCFbW800XtsNKdhcjFrercY1DHPcSbNok8dnbfZ0dTkg4yCHj0qG960SqQ=
+	t=1749666355; cv=none; b=jYQKu3sNetWM2m1oW9s8bRu3BCLYGTMPTQU8vicwszVSBKAKlx5BZV361xbRvRr2O7ZTduRRDEWRpuyuv7dvC4lVpEEfUnbKIs+tmpK550wQ9zqporMtclhPU+sS3bh3uKE7tWnMTa3Ltg7/afLN9I73B/1w+HnB8H+cRX5b59s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749666054; c=relaxed/simple;
-	bh=L+PQ8oC5SKj2Pvt3GVWZzPVy8l1E6eCuxqGGzJ4Ezoc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bGp6PnnbtUbSQCxV5gs6OjsQqt8h+Ao2DDfDbXbRXBuJJm8qbQCZF5pQ3bDrb09HyS0nCmnxLF37kIL5PLS0YbQBRUDuf2mQemxUDUom+3t7vRu7QjoCCWiHP1YunIjgjtIjMYPcdpJ4hy0K7mmmktQYMu7WA1tCpbuObOSoKI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xIrcLz2O; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1749666355; c=relaxed/simple;
+	bh=QGXUcJIhIQ30ANDc0g0NUebN9lT2jTMPVVFunQbRRKU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EOrc2qnRRas1B3Wyj/fugNKQ8q26PIe2p2mxlRkSCJB+kOUpHaILHvPYSY1h0mdphhXQXXbjzRANtkVNiD0L4cJO69thXqyMmVgUx0xnmwtW08nqyP4nlAaXdNMSUxA9dkterTTANmuWa23DUboHQj1TaHwjD7PyFnPAz5EalDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bpo2y7fZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xIrcLz2O"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-745e89b0c32so261440b3a.3
-        for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 11:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749666052; x=1750270852; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L+PQ8oC5SKj2Pvt3GVWZzPVy8l1E6eCuxqGGzJ4Ezoc=;
-        b=xIrcLz2Opvbo1HLDfiV4weq/ICn5JiaoLQOKMAHRfcgetv1/N0oLJFiUDyZbDp9hV9
-         zmC/cmFDkEhOhnV2Prp3bBgWIQoMib2xblP1aj93BbL8UkA7ZrZoU+Amj1hP+AmaWiX7
-         2qsl1liWa8EtFM/06hwm+RPdESPxBbmtbh9UyGKhyNRyCCHhWOJv6skLF+t1l7O/mxD0
-         DInZff7fBxDWmagX1Q7xuMgvYPRIkwpVyFECnAITo1t9Omy4vJEC80vjVpMQqCk1vhT5
-         sjSBBBXi04UfLGvqQybNjskGcOG5OttnHPzC9Wj55VXRRM1ZbU0o8Tqh+EMHlyczpGay
-         K4YQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bpo2y7fZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749666352;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OOOIslp7Z9nXASpzhAXfaGcmmRlsRSek7f7fvNs7EhY=;
+	b=Bpo2y7fZwjlIfMH5DBPIDfVZgRtEghb0WbH3foldo2TdYQOaFt5KYf/YjuqdTqnHwzVv97
+	1mD3RI14Upa5UUqRlvsevZ5zgsXsziNFrYazYHIv64lWBM+bF7F7+43eA5/6guZRmGYaaC
+	cz3UGX3Pvl0+k52O+ExRlSvfCxbbZEI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-681-VvlomgJ5O-yCKdT6RK-DVg-1; Wed, 11 Jun 2025 14:25:51 -0400
+X-MC-Unique: VvlomgJ5O-yCKdT6RK-DVg-1
+X-Mimecast-MFC-AGG-ID: VvlomgJ5O-yCKdT6RK-DVg_1749666350
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4fabcafecso104529f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Jun 2025 11:25:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749666052; x=1750270852;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=L+PQ8oC5SKj2Pvt3GVWZzPVy8l1E6eCuxqGGzJ4Ezoc=;
-        b=hTZmctqOT0ENHJmSHW+c8eFhqDbgMDVhav0XJtnuJgYsxd8oe3Zkrt1DoDpN3jvLRO
-         UGIxUtTRvR8ivocB6gBVExsU6BruczRLIvFpnaKk1yIN8KK3X0UKxyvcPqHSJBPYM2s5
-         nt538v81vlLs7In2suSLNsR4b6fTMbDOrklTk92MnNKFGlXuDzX1S+pikSSZA/WE/OJX
-         8YMvoYQ/P9S3u1YWTJAiGW9kbt/jQPA804tXzrfeKO+4trrY7qXk+gxolLWM80cU5Pjd
-         Vellph6w7G6uJ/tLqwdfxFwbAo+UjDQk0Jeypj29Dryo1ef+r0uL0B++9igHeGBO235g
-         Drzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUswCBbYBhAfsIyUAhH8ZM9X0SlzqBmEQGWLMH/zwql++pcUCGUZXIOi+s8ejjA6pa9VmzVoF8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzsJ0MEDch8WheWRLRrOfTyfteNFbL8bxCym1mUMQpM7L7+FVCD
-	7809fW+y3Y+UNfu4QbjHuZ4mM07/OeM4f/uuxVYz7kgvbM0bLQ6GhhNRhMmTyJyH5OoFEs8N6Fn
-	2tmGb0ObdSmW/qJav/K9RTcYRYQ==
-X-Google-Smtp-Source: AGHT+IF9dOmPoH3f/Yv0MDUAXNH7QyABROACGGNRSdkVBP3APUAHFDt+InrBgJ0rMfVnQW8MeeLtIRfDXx/Of21iag==
-X-Received: from pfnx17.prod.google.com ([2002:aa7:84d1:0:b0:746:27ff:87f8])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6300:41:b0:1ee:d418:f764 with SMTP id adf61e73a8af0-21f978c4298mr1110324637.38.1749666051578;
- Wed, 11 Jun 2025 11:20:51 -0700 (PDT)
-Date: Wed, 11 Jun 2025 11:20:49 -0700
-In-Reply-To: <95fe5d24-560b-4c20-b988-6d7072ed2293@amd.com>
+        d=1e100.net; s=20230601; t=1749666350; x=1750271150;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OOOIslp7Z9nXASpzhAXfaGcmmRlsRSek7f7fvNs7EhY=;
+        b=Zu7p7QyaM4ilN3sFdesY2qmL4Kg16JUMaCwmSnSSey9XgY6KLfw07EcO/w30RI+CS3
+         IvrLZUAAL0sh/gVviXyTKHZeoTMdFvy3D2qdzVwCbCeQKnznMAy1ZqW+c40XmOgwqk6e
+         3Tr6a32oW15f22kz+8iLsuCzwYWh9qY3NxovIfe1BDd1bk7VCSZqfIU5AR1GuViqp36f
+         Q1rN4PRYaSJ/wH/zK2nohK98a6w4q8LMcRSkK/ZJtx7L/OcZWSpEYr2UyUSR3PvSe1NX
+         Tx61fsPJziuJi+dINrduarsAWy1EP8vCc4MNw0RPPPHbB5Z/rm/BJCdDBLJazZBDOcbX
+         zqDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/qz4d1NeeVwZlV8L0kt5fViDBgs+FXE56GOlqDrkzWD3LdJx11fJDNG5mjI0h83oXnQ1pQGE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzbLD6uxuM2LiknSuPRw2tv+MXyp6gwHphBGOQwXiZzCDqLDxWZ
+	+a9W/DFtzjPGm2E7UT1xRmgdoC5lpkz3wbr9vkLyy+QDQixAFL+Sj5bcaH4B5h1tPw4ReVPVu6T
+	3goKqdogvgznXTgBpvpIR9lxuuj+q6PryFIMDzctwMzScmk8o45iHO3or66LSu7SW9OL3NXww0K
+	+8Keeqy/l4N32CuNfpziFVtLUYuExUIkjF
+X-Gm-Gg: ASbGncsn/iPaKjB5rV6dN4TTyuRnZ0oRfI1VsD+3shXNihKGf6SYkbqNQ+dMT74DvAY
+	f982ItC58MHi8IAC2ysL0ogBiEmMrEWB5MR/FqoJ0lPHYz8jD/P61iUMZxc10ucLwJecUaDEDAU
+	TX+A==
+X-Received: by 2002:a05:6000:420f:b0:3a5:2f23:3783 with SMTP id ffacd0b85a97d-3a55869b8e1mr3427924f8f.24.1749666350203;
+        Wed, 11 Jun 2025 11:25:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFw1W0p/OeOmX200drwAxajGEghfRNt/CGI93zVm1UqIQ+I2s8lkCVrViNK/rTG856Z88dFFfkE8v1yeaf2mxA=
+X-Received: by 2002:a05:6000:420f:b0:3a5:2f23:3783 with SMTP id
+ ffacd0b85a97d-3a55869b8e1mr3427915f8f.24.1749666349830; Wed, 11 Jun 2025
+ 11:25:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-9-tabba@google.com>
- <ad4157a1-6e38-46df-ae24-76d036972fbc@redhat.com> <95fe5d24-560b-4c20-b988-6d7072ed2293@amd.com>
-Message-ID: <diqz4iwmw35q.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v11 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Shivank Garg <shivankg@amd.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20250606094350.1318309-1-maz@kernel.org>
+In-Reply-To: <20250606094350.1318309-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 11 Jun 2025 20:25:37 +0200
+X-Gm-Features: AX0GCFsgTrXBmCEi1cZ9vmBCByY8mT5dVXknZ_pqZHoWTAQJcrp5JqwyhfcBkUo
+Message-ID: <CABgObfbd=Jx4UdXKXyCb+8bQotLk-rc8P_BD-Aafx_rttgHMYA@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.16, take #2
+To: Marc Zyngier <maz@kernel.org>
+Cc: Miguel Luis <miguel.luis@oracle.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Sebastian Ott <sebott@redhat.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 0HwawxoQJKwLfoZOmCHkEO1z-qyXkipMYy2dhofpWWI_1749666350
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Shivank Garg <shivankg@amd.com> writes:
-
-> On 6/6/2025 2:42 PM, David Hildenbrand wrote:
->> On 05.06.25 17:37, Fuad Tabba wrote:
->>> This patch enables support for shared memory in guest_memfd, including
->>> mapping that memory from host userspace.
->>>
->>> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
->>> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
->>> flag at creation time.
->>>
->>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
->>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->>> Signed-off-by: Fuad Tabba <tabba@google.com>
->>> ---
->>=20
->> [...]
->>=20
->>> +static bool kvm_gmem_supports_shared(struct inode *inode)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 u64 flags;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (!IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM))
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 flags =3D (u64)inode->i_private;
->>=20
->> Can probably do above
->>=20
->> const u64 flags =3D (u64)inode->i_private;
->>=20
->>> +
->>> +=C2=A0=C2=A0=C2=A0 return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
->>> +}
->>> +
+On Fri, Jun 6, 2025 at 11:44=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
 >
-> I agree on using const will have some safety, clarity and optimization.
-> I did not understand why don't we directly check the flags like...
+> Paolo,
 >
-> return (u64)inode->i_private & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> Here the second batch of fixes for 6.16. We have a significant rework
+> of our system register accessors so that the RES0/RES1 sanitisation
+> gets applied at the right time, and a bunch of fixes for a single
+> selftest that really *never* worked.
 >
-> ...which is more concise.
+> Please pull,
 
-Imo having an explicit variable name here along with the cast is useful
-in reinforcing and repeating that guest_memfd is using inode->i_private
-to store flags.
+Pulled, thanks.
 
-I would rather retain the explicit variable name, and looks like in v11
-it was retained.
+Paolo
 
+>         M.
 >
-> Thanks,
-> Shivank
+> The following changes since commit 4d62121ce9b58ea23c8d62207cbc604e98ecdc=
+0a:
+>
+>   KVM: arm64: vgic-debug: Avoid dereferencing NULL ITE pointer (2025-05-3=
+0 10:24:49 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.16-2
+>
+> for you to fetch changes up to fad4cf944839da7f5c3376243aa353295c88f588:
+>
+>   KVM: arm64: selftests: Determine effective counter width in arch_timer_=
+edge_cases (2025-06-05 14:28:44 +0100)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.16, take #2
+>
+> - Rework of system register accessors for system registers that are
+>   directly writen to memory, so that sanitisation of the in-memory
+>   value happens at the correct time (after the read, or before the
+>   write). For convenience, RMW-style accessors are also provided.
+>
+> - Multiple fixes for the so-called "arch-timer-edge-cases' selftest,
+>   which was always broken.
+>
+> ----------------------------------------------------------------
+> Marc Zyngier (4):
+>       KVM: arm64: Add assignment-specific sysreg accessor
+>       KVM: arm64: Add RMW specific sysreg accessor
+>       KVM: arm64: Don't use __vcpu_sys_reg() to get the address of a sysr=
+eg
+>       KVM: arm64: Make __vcpu_sys_reg() a pure rvalue operand
+>
+> Sebastian Ott (4):
+>       KVM: arm64: selftests: Fix help text for arch_timer_edge_cases
+>       KVM: arm64: selftests: Fix thread migration in arch_timer_edge_case=
+s
+>       KVM: arm64: selftests: Fix xVAL init in arch_timer_edge_cases
+>       KVM: arm64: selftests: Determine effective counter width in arch_ti=
+mer_edge_cases
+>
+>  arch/arm64/include/asm/kvm_host.h                  | 32 ++++++++++--
+>  arch/arm64/kvm/arch_timer.c                        | 18 +++----
+>  arch/arm64/kvm/debug.c                             |  4 +-
+>  arch/arm64/kvm/fpsimd.c                            |  4 +-
+>  arch/arm64/kvm/hyp/exception.c                     |  4 +-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h            |  4 +-
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  6 +--
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |  4 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c                    |  4 +-
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 | 48 ++++++++--------=
+-
+>  arch/arm64/kvm/nested.c                            |  2 +-
+>  arch/arm64/kvm/pmu-emul.c                          | 24 ++++-----
+>  arch/arm64/kvm/sys_regs.c                          | 60 +++++++++++-----=
+------
+>  arch/arm64/kvm/sys_regs.h                          |  4 +-
+>  arch/arm64/kvm/vgic/vgic-v3-nested.c               | 10 ++--
+>  .../selftests/kvm/arm64/arch_timer_edge_cases.c    | 39 +++++++++-----
+>  16 files changed, 151 insertions(+), 116 deletions(-)
+>
+
