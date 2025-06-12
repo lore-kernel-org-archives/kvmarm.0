@@ -1,198 +1,164 @@
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E14029DB6E
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 15:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E822B2D0267;
+	Thu, 12 Jun 2025 15:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749742196; cv=none; b=QH7zujzhiZisaJSnEi4XEELWKYZwwsC0xMyatiSJP5kWRA1Ei+rDg0vus13UxXGXqQR2d2ad0vWdc5S/WyhyVxqimo3gdKSORMH9QdgWt2IOY/dnRvIEmQh49Ihjv766CSc0ZMtXPAbjs4NgyJToWCoL5Ybx5NOw6Jp+IQ19Oto=
+	t=1749742340; cv=none; b=UHeW6Y/nP6Cc6odVdIJPJc8bispbhAydbYF53vDUM2Eljn36+QBTsPFk4hX4C79uesQ1IR03jBn3v/5fGmP8jzum2MN2DDnrgTXsw7PzATTTf3DYkN/BY2bmk2MssJTl7D8j2S1VDrq64bf2Chl643zbpZUYsHmxf3csAK8uHaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749742196; c=relaxed/simple;
-	bh=t1IqK6p7nBIDP6T9YM9E3mMQ9+httXSZAipBfvbCnaM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cPa4PzA4M1UGIyeyL8POFoHDLoCrTyZDpn6vistw06j7L6GV5hI72FXcIJLnaXeEKNkZS4H7onoRHgAXoiFAWQ0xIQ28atwmnzalzaf2XieQuLyg+6/2qjxG8/PAzQqLSuRgdm/bz3EqT2/K9Yl44YYiJywT8TvMgihDvmT+w4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PWb+1w0F; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PWb+1w0F"
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e740a09eb00so918343276.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 08:29:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1749742193; x=1750346993; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=geYJAPYMrYCt/FNmyMs6RoHZ9I62sqBam9PO+m4TAek=;
-        b=PWb+1w0FQv8zSZh9kKxSZG11pb8DY43lup8YJBwKf4vG89A1jVQ04KBHzwc8of+WzM
-         xn0MBaWxnZUopyZJa5YwGw+e4I+JwWdTkWV0rbBncmfHUyC8QZdyYqe0MM4owlKpZ9Pr
-         QpHJ2q8fM+ukhb5MADswLuheIbnsZky4irNymsvE14kwXLoI0AkbWzh1SIvN6bcOdY43
-         8BgFsTkjjqmBvflRFvDZaapw7KgfTPFikKMCs+uyGyeRsF1LKCRnxqYvOixGjnfeUuiK
-         9eSVG6lPczmaD8scAfebWmV7zZl/vsYL/LnV+BCx5KVA/N60fANvvnA+qdgeRb34tDaV
-         OoQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749742193; x=1750346993;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=geYJAPYMrYCt/FNmyMs6RoHZ9I62sqBam9PO+m4TAek=;
-        b=lQPC9svzIEKisQ4HFkQ63/dHTv8ctgvl7f/xBhMLpVIF70vGAyzGuiPc8a4ni8/NaV
-         0ZghaZHMf0YJBLA/E8+nud6odeJK3QYMaW6btEX5SHhFgF9PXakGnaROHG8+3In2V5Wu
-         2/esFrYqhcM5js99Cyti3ZvRj86Ty+Ija1tuy58uf9uOQHr+xcNvhG8RJ20YdnY9HFYU
-         F7enJFJVhpvTUpkrlnUYQi8AiaRmoFFB7IUg+vrVaTx0xn+SiCrfhK9Nb4iIiMTkvxwG
-         mySO/LfdcRKBxS7tFF+P3e8N/9RoRLON0RPml9SwBtOjLFchfjBO3wDGXbDIjAQ+efmO
-         uzmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWpsiNYBF5mpL/UNdj5/OtAIuL6ooUoOAmzQ4/5kaG+lecX/vz/VxC/TK3ch68E+fRH34lwcXk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwEXboVKviPEq2X6Oo3OtU1UYpBFtNPy6eZAiyltZfwtWKMS1cW
-	dTqVsbC6QTG81ps1tvidJ34gYSjy1vrrSn0p5N57AKyaqCRuP43HUILQgdRdW2T6QGy4SFKAICg
-	JmeQg5aFbrL65Mtprlh/SSi+afzY/fnngcb10/9U/cg==
-X-Gm-Gg: ASbGncvW5CKwG801DagaXpvTVbUPLwtSSQEJgiFqXrv6EgZbfDy6HDq9bgy77Tbr6J/
-	H9FgV+SrN87zgwscfkb/U/9gzFjEHRNGY5A8Cnlvnk2cmXkiMQiigmpmRV6kjLE3YO1dLW0gszp
-	zuoTzuTA9ZOHnhbC8r/aB8DLyWC+G+mOwTe+eUgT/rZ0kw
-X-Google-Smtp-Source: AGHT+IENjmqyi7346POaDkGZR6RfoGXIVitfUyfSfUlXG98lTBAK4TulNP1eC5vKMUT/0qOqM92Y6Hx33E5GW3olJ4A=
-X-Received: by 2002:a05:690c:7483:b0:70e:73ae:766c with SMTP id
- 00721157ae682-71161effb98mr5173077b3.22.1749742193383; Thu, 12 Jun 2025
- 08:29:53 -0700 (PDT)
+	s=arc-20240116; t=1749742340; c=relaxed/simple;
+	bh=DOUOGbeZ0qQ4DsAqlWdYIHJzRPjWZMq7jRdHVK2GQQo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cFFfWJC6xRxin5GpjeAiAyiB+odpk19vXbDBs3V/S3ya1VOmQtJ7pdlDqLpt0qRzuxQX3rzVh6xsLJio7DfYNffdsC7l9ExPxcAQOPq5xngqEx0fA7x3PrvK2iufT4YhSRYwepklg/Usw3EaDRBNuMdlS22Jr2pEcL031mqSrGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13E69153B;
+	Thu, 12 Jun 2025 08:31:57 -0700 (PDT)
+Received: from [10.1.37.36] (e122027.cambridge.arm.com [10.1.37.36])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8784E3F66E;
+	Thu, 12 Jun 2025 08:32:14 -0700 (PDT)
+Message-ID: <8817e2bf-2283-4536-8a5f-9c32173b3a61@arm.com>
+Date: Thu, 12 Jun 2025 16:32:13 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250515153907.151174-1-cohuck@redhat.com> <20250515153907.151174-13-cohuck@redhat.com>
-In-Reply-To: <20250515153907.151174-13-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jun 2025 16:29:41 +0100
-X-Gm-Features: AX0GCFu9aivLSnaUx6RMU2aaTzhZKVbQDpI7U6eisLoQVjKLj6ZZzS6PLa-nZE4
-Message-ID: <CAFEAcA-xDxoRLWZCMrAEeSb3NvyyOPzYgFQbbEzGALujOOG-3g@mail.gmail.com>
-Subject: Re: [PATCH v7 12/14] arm/cpu: Add sysreg generation scripts
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, 
-	qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org, 
-	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev, 
-	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, 
-	berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, 
-	agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 41/43] KVM: arm64: Expose support for private memory
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-42-steven.price@arm.com>
+ <20250612151427.GA1913753@e124191.cambridge.arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20250612151427.GA1913753@e124191.cambridge.arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 15 May 2025 at 16:40, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> From: Eric Auger <eric.auger@redhat.com>
->
-> Introduce scripts that automate the generation of system register
-> definitions from a given linux source tree arch/arm64/tools/sysreg.
->
-> Invocation of
-> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
-> in scripts directory generates target/arm/cpu-sysregs.h.inc
-> containing defines for all system registers.
->
-> [CH: update to handle current kernel sysregs structure, and to emit
->      the re-worked register structures; cpu properties will be added
->      later]
-> Reviewed-by: Sebastian Ott <sebott@redhat.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
+On 12/06/2025 16:14, Joey Gouly wrote:
+> Hi Steven,
+> 
+> On Wed, Jun 11, 2025 at 11:48:38AM +0100, Steven Price wrote:
+>> Select KVM_GENERIC_PRIVATE_MEM and provide the necessary support
+>> functions.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>> Changes since v2:
+>>  * Switch kvm_arch_has_private_mem() to a macro to avoid overhead of a
+>>    function call.
+>>  * Guard definitions of kvm_arch_{pre,post}_set_memory_attributes() with
+>>    #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
+>>  * Early out in kvm_arch_post_set_memory_attributes() if the WARN_ON
+>>    should trigger.
+>> ---
+>>  arch/arm64/include/asm/kvm_host.h |  6 ++++++
+>>  arch/arm64/kvm/Kconfig            |  1 +
+>>  arch/arm64/kvm/mmu.c              | 24 ++++++++++++++++++++++++
+>>  3 files changed, 31 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index a1857802db64..9903b0e8ef3f 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -1514,6 +1514,12 @@ struct kvm *kvm_arch_alloc_vm(void);
+>>  
+>>  #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
+>>  
+>> +#ifdef CONFIG_KVM_PRIVATE_MEM
+>> +#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
+>> +#else
+>> +#define kvm_arch_has_private_mem(kvm) false
+>> +#endif
+> 
+> I don't understand the ifdef here (or below). In the Kconfig you 'select
+> KVM_GENERIC_PRIVATE_MEM', so it will always be on/defined? Unless I'm
+> misunderstanding something.
 
-> diff --git a/scripts/gen-cpu-sysregs-header.awk b/scripts/gen-cpu-sysregs-header.awk
-> new file mode 100755
-> index 000000000000..452e51035d52
-> --- /dev/null
-> +++ b/scripts/gen-cpu-sysregs-header.awk
+I have to admit this is somewhat cargo-culted from x86. And I think they
+have more build configurations which don't include KVM_GENERIC_PRIVATE_MEM.
 
-This should probably have 'arm' in the filename somewhere, unless
-it's really architecture-agnostic, which I don't think it is.
+It is possible to build without KVM_GENERIC_PRIVATE_MEM (by disabling
+CONFIG_KVM). But that's probably not very interesting here - the
+definition shouldn't actually matter in that case.
 
-> @@ -0,0 +1,35 @@
-> +#!/bin/awk -f
+So I think you're right - there's no need for the #ifdeffery here.
 
-Does this really need to be in awk? Our standard scripting
-language is python. This isn't run at build time so there's
-no "extra dependency" issue, but we currently use awk only
-minimally and almost always for trivial stuff.
+Thanks,
+Steve
 
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +# gen-cpu-sysregs-header.awk: arm64 sysreg header include generator
-> +#
-> +# Usage: awk -f gen-cpu-sysregs-header.awk $LINUX_PATH/arch/arm64/tools/sysreg
-> +
-> +BEGIN {
-> +    print ""
-> +} END {
-> +    print ""
-> +}
-> +
-> +# skip blank lines and comment lines
-> +/^$/ { next }
-> +/^[\t ]*#/ { next }
-> +
-> +/^Sysreg\t/ || /^Sysreg /{
-> +
-> +       reg = $2
-> +       op0 = $3
-> +       op1 = $4
-> +       crn = $5
-> +       crm = $6
-> +       op2 = $7
-> +
-> +       if (op0 == 3 && (op1>=0 && op1<=3) && crn==0 && (crm>=0 && crm<=7) && (op2>=0 && op2<=7)) {
-> +           print "DEF("reg", "op0", "op1", "crn", "crm", "op2")"
-> +       }
-> +       next
-> +}
-> +
-> +{
-> +       /* skip all other lines */
-> +       next
-> +}
+>> +
+>>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+>>  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>>  
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 713248f240e0..3a04b040869d 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -37,6 +37,7 @@ menuconfig KVM
+>>  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+>>  	select SCHED_INFO
+>>  	select GUEST_PERF_EVENTS if PERF_EVENTS
+>> +	select KVM_GENERIC_PRIVATE_MEM
+>>  	help
+>>  	  Support hosting virtualized guest machines.
+>>  
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 580ed362833c..c866891fd8f9 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -2384,6 +2384,30 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>  	return ret;
+>>  }
+>>  
+>> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+>> +					struct kvm_gfn_range *range)
+>> +{
+>> +	WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
+>> +	return false;
+>> +}
+>> +
+>> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+>> +					 struct kvm_gfn_range *range)
+>> +{
+>> +	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
+>> +		return false;
+>> +
+>> +	if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
+>> +		range->attr_filter = KVM_FILTER_SHARED;
+>> +	else
+>> +		range->attr_filter = KVM_FILTER_PRIVATE;
+>> +	kvm_unmap_gfn_range(kvm, range);
+>> +
+>> +	return false;
+>> +}
+>> +#endif
+>> +
+>>  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+>>  {
+>>  }
+>> -- 
+>> 2.43.0
+>>
+> 
+> Thanks,
+> Joey
 
-Generated source files should have a comment at the top
-noting that they're autogenerated and how to regenerate
-them, please.
-
-> diff --git a/scripts/update-aarch64-sysreg-code.sh b/scripts/update-aarch64-sysreg-code.sh
-> new file mode 100755
-> index 000000000000..e34538887dd8
-> --- /dev/null
-> +++ b/scripts/update-aarch64-sysreg-code.sh
-> @@ -0,0 +1,26 @@
-> +#!/bin/sh -e
-> +#
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +# Update target/arm/cpu-sysregs.h
-> +# from a linux source tree (arch/arm64/tools/sysreg)
-> +#
-> +# Copyright Red Hat, Inc. 2024
-> +#
-> +# Authors:
-> +#          Eric Auger <eric.auger@redhat.com>
-> +#
-> +
-> +linux="$1"
-> +output="$PWD"
-
-We seem to set this but then not use it.
-
-> +
-> +if [ -z "$linux" ] || ! [ -d "$linux" ]; then
-> +    cat << EOF
-> +usage: update-aarch64-sysreg-code.sh LINUX_PATH
-> +
-> +LINUX_PATH      Linux kernel directory to obtain the headers from
-> +EOF
-> +    exit 1
-> +fi
-> +
-> +awk -f gen-cpu-sysregs-header.awk \
-> +    $linux/arch/arm64/tools/sysreg > ../target/arm/cpu-sysregs.h.inc
-
-This looks like it is assuming that the user runs the script
-from within the scripts/ directory ?
-
-Following the same command line conventions as our existing
-scripts/update-linux-headers.sh is probably the least
-surprising thing.
-
-thanks
--- PMM
