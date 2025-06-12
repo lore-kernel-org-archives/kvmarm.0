@@ -1,97 +1,151 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2F724A07A
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 15:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D31E2853E0;
+	Thu, 12 Jun 2025 15:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749740665; cv=none; b=RH0YHM22Nq99HUz4fEWzM17YXa25x1nTV9OmlCseNvwCjdSOORhLyWe/ezI+DmiwgnFKbUotkS3VnRc8ZowCXXy0ld4ave3Ixr8ltH0xO6y5RWTd3w2eOnyj3x+ywD2B+IKbzuwXx5asdlsis0L75nyrbXyJ6wS0L/C9P13CY50=
+	t=1749741279; cv=none; b=grMUR/d4xfvKgBDKDOmxfLBGBACzxpSW6HWGqTZ1T4kFnelg8UwHUtOq3wB2JBYxQSnTINi2Oql+H1XCQfbwPsKDpwpmzVcQAsAy6OWL6EOxjl67W5OgPyZZ0w6QmnnhmoLn6m7F9VhWkxOPDbiJQM9+u95K80a2+pKzLYsZhqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749740665; c=relaxed/simple;
-	bh=6ox6qol7qTgR/EJWov483eQuOYpxLV5X1nNbmR8zEuU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XyJQn9e1KcuEvzbaFTBuLkL1dJE5wcFQYo/43rskTpHZp5FxUSBrDZi16jwwQvjd+hSLeZ+S/nxXFuyTr8cp1WMpbcYWHXGzprC+Swp2UPQAt9HQ7KXdvfi0quAS4KuvUcBnLDFwflHthIAMnWMvmX0+TO+jsMT9aflKSAbEAOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RqhIMR8A; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RqhIMR8A"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-70e77831d68so10119597b3.2
-        for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 08:04:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1749740662; x=1750345462; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mwRohgyatrsnok8RQFXYdLlHld9AUTUpziIQUj48/Fk=;
-        b=RqhIMR8ABmjG5tiG7Rf2JSPDv1V1yJ37QOU51ug1AwyZsyQVlqLlKXtHnf+WK0x+ad
-         gcPZbu+8WzUN2z8wizuolIkJ1SEyPW62mzXQZZCnOroZiK/DbBDyx5yyK9t4kv9wDI/C
-         X6oOIa8wml5BSy5YFr2+Ty3QTKYA1Lh3PwIzbrHNeWV942R0tw6YlWgJ5VUQvnL7C+sx
-         SEJZrvo0k5RnPJAvnuuaJeLkPp8RDTxmnVaFVutphfUZW36WgA+5S3BNG9wFDLqQrSZS
-         phM8PRuSm28rFTv2ETCcUM6Wp8WNvwvbNV2AbMZ/ghbireoq16qSHED8SsUkeOVW8W7u
-         Mo7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749740662; x=1750345462;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mwRohgyatrsnok8RQFXYdLlHld9AUTUpziIQUj48/Fk=;
-        b=XULKS5uKrouseKqRrEpIMB88W/TPHrZdbjt9ZYHB2fuPyV31fG/TSTIptsQZYd7+aA
-         hBBZ0b/x0eHliTYRwgNep1XGZGhapZBr85xZqQQuqsBiUmkfavuq+DxDG0pbI6EsYsEy
-         i2kNhlcROWmE+W3EmP+A8uYfTg3GPpvyjLN5cGhoiHBVrqXMRX0AtgNdZO8Mi0sQ+MNQ
-         EIg6E+iYDKwXCmRy/OWU8gK/BNfgbD9GNktWFp5wiCHfcRKqusOIYgWBFtfHlu4mvJl7
-         +DZdWoFszHkniSv0MIOAVhbgASbXKgzBKZ44k/FT+TgMQDok7EqzPpjqh2LSTeXZOf7H
-         klZw==
-X-Forwarded-Encrypted: i=1; AJvYcCU9uXg5Q1rooff8RbTa3Nly/OUsiZoT9cfYNb2xnMm8naHRuYcJCkY8eErUgnozR1GXlhWZltU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyTBg8F+tpa2p/1qSPikZ3XVZOEDoT/CEuNCtLXy8xHavve7iQW
-	0/E26zEA2wgQXp8r+UaE5ojd3F6P8Oso6SfmbnbXyObL8hhL6/9UgGV/jLjV4L6IYKtksRaQvwr
-	TOi3EmwQ1SwgL4vZDX4s0Z99eFncJIQoR21zA/bhDkg==
-X-Gm-Gg: ASbGncshdGZ3XyhLRiSBa6cFpg54AhNDQ2eBVqathhXJGCk6H375MN2rCSznCzfG1d5
-	t2jDEqHIrYRDvymhDsFPqn2ESkokk5O0kCNM4oNgWduWSJPLMx0Khh//hGICmDQX27dgKzQNuV3
-	ikFTSNKXVMKPWT5eEP4+fQvKE0zKgPn46aorOobZ9gI19r
-X-Google-Smtp-Source: AGHT+IGkwf3AJrycbkaLsXCktxf09YCtxZ4zQIpiVu3XRTDHJMzFJzu0b0P9/VzPi89aVoUmCtZ/VVXUpqdEnylPPMc=
-X-Received: by 2002:a05:690c:498d:b0:710:f46d:cee0 with SMTP id
- 00721157ae682-7114edcb04fmr56567777b3.33.1749740662363; Thu, 12 Jun 2025
- 08:04:22 -0700 (PDT)
+	s=arc-20240116; t=1749741279; c=relaxed/simple;
+	bh=XipgtzNNDlXpQtTflFkk/N7lOsqTfvwkLoXG2kqL59E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N+pxjtXOEGwLxgJHBJ0MV4N+weiYnp6a5DDOLm8tetUQx5OE7/ZsyVGpIDOmZ/FiVms77ehS7GR8DTxsG47EbWhxjr6A+vSPZgOzbrVqoiKS/wjIJSHzh1BR+HLz8VG9br25HdSxV7kze5J4iVYfnRPFfa4vjUkG2cqg2SMIkrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A5D0153B;
+	Thu, 12 Jun 2025 08:14:16 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 223A43F66E;
+	Thu, 12 Jun 2025 08:14:32 -0700 (PDT)
+Date: Thu, 12 Jun 2025 16:14:27 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>
+Subject: Re: [PATCH v9 41/43] KVM: arm64: Expose support for private memory
+Message-ID: <20250612151427.GA1913753@e124191.cambridge.arm.com>
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-42-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250515153907.151174-1-cohuck@redhat.com> <20250515153907.151174-3-cohuck@redhat.com>
-In-Reply-To: <20250515153907.151174-3-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jun 2025 16:04:09 +0100
-X-Gm-Features: AX0GCFtWVVUEsGciOpuhQYdpTNAk5ugyqKk3hjsV_bBetoONUXe_HXNhehSuotE
-Message-ID: <CAFEAcA8y_wwZPoqkyPrNscRNTEwiOQm5Or9C=aiSNMGcZmq8CQ@mail.gmail.com>
-Subject: Re: [PATCH v7 02/14] arm/cpu: Store aa64isar0/aa64zfr0 into the
- idregs arrays
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, 
-	qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org, 
-	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev, 
-	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, 
-	berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, 
-	agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611104844.245235-42-steven.price@arm.com>
 
-On Thu, 15 May 2025 at 16:39, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> From: Eric Auger <eric.auger@redhat.com>
->
-> Also add kvm accessors for storing host features into idregs.
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Sebastian Ott <sebott@redhat.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Hi Steven,
 
+On Wed, Jun 11, 2025 at 11:48:38AM +0100, Steven Price wrote:
+> Select KVM_GENERIC_PRIVATE_MEM and provide the necessary support
+> functions.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> ---
+> Changes since v2:
+>  * Switch kvm_arch_has_private_mem() to a macro to avoid overhead of a
+>    function call.
+>  * Guard definitions of kvm_arch_{pre,post}_set_memory_attributes() with
+>    #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
+>  * Early out in kvm_arch_post_set_memory_attributes() if the WARN_ON
+>    should trigger.
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  6 ++++++
+>  arch/arm64/kvm/Kconfig            |  1 +
+>  arch/arm64/kvm/mmu.c              | 24 ++++++++++++++++++++++++
+>  3 files changed, 31 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a1857802db64..9903b0e8ef3f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1514,6 +1514,12 @@ struct kvm *kvm_arch_alloc_vm(void);
+>  
+>  #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
+>  
+> +#ifdef CONFIG_KVM_PRIVATE_MEM
+> +#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
+> +#else
+> +#define kvm_arch_has_private_mem(kvm) false
+> +#endif
 
->      if (!cpu->has_neon && !cpu->has_vfp) {
-> -        uint64_t t;
-> +        unit64_t t;
+I don't understand the ifdef here (or below). In the Kconfig you 'select
+KVM_GENERIC_PRIVATE_MEM', so it will always be on/defined? Unless I'm
+misunderstanding something.
 
-This doesn't compile :-)
+> +
+>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+>  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 713248f240e0..3a04b040869d 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -37,6 +37,7 @@ menuconfig KVM
+>  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+>  	select SCHED_INFO
+>  	select GUEST_PERF_EVENTS if PERF_EVENTS
+> +	select KVM_GENERIC_PRIVATE_MEM
+>  	help
+>  	  Support hosting virtualized guest machines.
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 580ed362833c..c866891fd8f9 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2384,6 +2384,30 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>  	return ret;
+>  }
+>  
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+> +					struct kvm_gfn_range *range)
+> +{
+> +	WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
+> +	return false;
+> +}
+> +
+> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> +					 struct kvm_gfn_range *range)
+> +{
+> +	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
+> +		return false;
+> +
+> +	if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
+> +		range->attr_filter = KVM_FILTER_SHARED;
+> +	else
+> +		range->attr_filter = KVM_FILTER_PRIVATE;
+> +	kvm_unmap_gfn_range(kvm, range);
+> +
+> +	return false;
+> +}
+> +#endif
+> +
+>  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+>  {
+>  }
+> -- 
+> 2.43.0
+> 
 
--- PMM
+Thanks,
+Joey
