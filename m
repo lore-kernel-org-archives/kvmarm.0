@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86B81DDC37
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 06:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46FA91F5435
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 07:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749710702; cv=none; b=k3FJvoNplcyNFR5baRtUFu6CRStBunSTzmAkc7p/cYurbJBvACYWUHc/8j8gfFS0RJ8MMSSCbp/s/wZAQoYzjE8KejvZv99gxPi5BTLo3TXIVx3oKba3ULCOR/oLagQndp21UyXz5ErUP17jpWzEWER0LeXbLMKnLrY2QE5T6cM=
+	t=1749713740; cv=none; b=DVBV2CRdtA3Sjx72l8wQ1nlYj2YLyx7hMVqbJjmjo/733/PbenOFmw5hchckEBuyng8fj0sDG/xms4IWGjlKd/VettuGMfYdvPss2PVwtFZEeuTTe1UATUEmxSHiWw4KZjLnjAfJNceEdxvrczLob4GHizGa7WbeFnYjBnZ0JEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749710702; c=relaxed/simple;
-	bh=rxKO1BKV4hODD1SbaLCwVicmOFDO4mKDfQbwr7D0Nvo=;
+	s=arc-20240116; t=1749713740; c=relaxed/simple;
+	bh=KCX0a7J/dQCLi8OUq7jTcNS7abTSEHutYT5eX0F9dO4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=grSw3Up1apbebXP6w933EFPVxd0E1AbXSQOtlquhCNN/d4OqyS5X2HVeoQpkcR60NtVP9cM0Ul2KgTjO4XYcEecYWD7CTbquIKmDvddAazZQ3zCpJeLive563fyxQiLyAcC/XfmFYZsX/lfWa1xAI8B0sFnAwfvGbmip9JYn1n0=
+	 In-Reply-To:Content-Type; b=cEcHg/38BMwl/hN7FyAvfDf2OxdDR2eLO4+31eVWFy23nvk5Kk4P3VrWtgv9vO6cugOlfX63hT7p9emdAjSbbOM1aO9/H6HtPFTPZ+8IkjoYJt4x48nSDFPTAgYpe/k1+vLFEHXEYgSa4zCqSlg6KD2xShy2R8m9hmjPwW9KAMA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 11DE014BF;
-	Wed, 11 Jun 2025 23:44:40 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B280F1595;
+	Thu, 12 Jun 2025 00:35:17 -0700 (PDT)
 Received: from [10.163.33.129] (unknown [10.163.33.129])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 711AB3F59E;
-	Wed, 11 Jun 2025 23:44:52 -0700 (PDT)
-Message-ID: <f89faeb2-1091-41af-ae06-f49bd2d4866a@arm.com>
-Date: Thu, 12 Jun 2025 12:14:49 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F4223F66E;
+	Thu, 12 Jun 2025 00:35:29 -0700 (PDT)
+Message-ID: <10f63976-afa7-4e1c-bec1-d9f2447d9c13@arm.com>
+Date: Thu, 12 Jun 2025 13:05:27 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/10] arm64: sysreg: Add new PMSFCR_EL1 fields and
- PMSDSFR_EL1 register
+Subject: Re: [PATCH v3 02/10] perf: arm_spe: Support FEAT_SPEv1p4 filters
 To: James Clark <james.clark@linaro.org>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Mark Rutland <mark.rutland@arm.com>, Jonathan Corbet <corbet@lwn.net>,
@@ -44,53 +43,79 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
  kvmarm@lists.linux.dev
 References: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
- <20250605-james-perf-feat_spe_eft-v3-1-71b0c9f98093@linaro.org>
+ <20250605-james-perf-feat_spe_eft-v3-2-71b0c9f98093@linaro.org>
 Content-Language: en-US
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20250605-james-perf-feat_spe_eft-v3-1-71b0c9f98093@linaro.org>
+In-Reply-To: <20250605-james-perf-feat_spe_eft-v3-2-71b0c9f98093@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 05/06/25 4:18 PM, James Clark wrote:
-> Add new fields and register that are introduced for the features
-> FEAT_SPE_EFT (extended filtering) and FEAT_SPE_FDS (data source
-> filtering).
+On 05/06/25 4:19 PM, James Clark wrote:
+> FEAT_SPEv1p4 (optional from Armv8.8) adds some new filter bits, so
+> remove them from the previous version's RES0 bits using
+> PMSEVFR_EL1_RES0_V1P4_EXCL. It also makes some previously available bits
+> unavailable again, so add those back using PMSEVFR_EL1_RES0_V1P4_INCL.
+
+Just wondering - why cannot all the new applicable filter bits be added
+explicitly for PMSEVFR_EL1_RES0_V1P4 without using exclude and include
+intermediaries.
+
+> E.g:
 > 
+>   E[30], bit [30]
+>   When FEAT_SPEv1p4 is _not_ implemented ...
+> 
+> FEAT_SPE_V1P3 has the same filters as V1P2 so explicitly add it to the
+> switch.
+A small nit - should FEAT_SPE_V1P3 addition be done in a previous patch
+as it is an already existing thing ?
+
+> 
+> Reviewed-by: Leo Yan <leo.yan@arm.com>
 > Tested-by: Leo Yan <leo.yan@arm.com>
 > Signed-off-by: James Clark <james.clark@linaro.org>
 > ---
->  arch/arm64/tools/sysreg | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
+>  arch/arm64/include/asm/sysreg.h | 7 +++++++
+>  drivers/perf/arm_spe_pmu.c      | 5 ++++-
+>  2 files changed, 11 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 8a8cf6874298..2e897d8a4040 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2859,11 +2859,20 @@ Field	0	RND
->  EndSysreg
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index f1bb0d10c39a..880090df3efc 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -358,6 +358,13 @@
+>  	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
+>  #define PMSEVFR_EL1_RES0_V1P2	\
+>  	(PMSEVFR_EL1_RES0_V1P1 & ~BIT_ULL(6))
+> +#define PMSEVFR_EL1_RES0_V1P4_EXCL \
+> +	(BIT_ULL(2) | BIT_ULL(4) | GENMASK_ULL(10, 8) | GENMASK_ULL(23, 19))
+> +#define PMSEVFR_EL1_RES0_V1P4_INCL \
+> +	(GENMASK_ULL(31, 26))> +#define PMSEVFR_EL1_RES0_V1P4	\
+> +	(PMSEVFR_EL1_RES0_V1P4_INCL | \
+> +	(PMSEVFR_EL1_RES0_V1P2 & ~PMSEVFR_EL1_RES0_V1P4_EXCL))
 >  
->  Sysreg	PMSFCR_EL1	3	0	9	9	4
-> -Res0	63:19
-> +Res0	63:53
-> +Field	52	SIMDm
-> +Field	51	FPm
-> +Field	50	STm
-> +Field	49	LDm
-> +Field	48	Bm
-> +Res0	47:21
-> +Field	20	SIMD
-> +Field	19	FP
->  Field	18	ST
->  Field	17	LD
->  Field	16	B
-> -Res0	15:4
-> +Res0	15:5
-> +Field	4	FDS
->  Field	3	FnE
->  Field	2	FL
->  Field	1	FT
+>  /* Buffer error reporting */
+>  #define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
+> diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
+> index 3efed8839a4e..d9f6d229dce8 100644
+> --- a/drivers/perf/arm_spe_pmu.c
+> +++ b/drivers/perf/arm_spe_pmu.c
+> @@ -701,9 +701,12 @@ static u64 arm_spe_pmsevfr_res0(u16 pmsver)
+>  	case ID_AA64DFR0_EL1_PMSVer_V1P1:
+>  		return PMSEVFR_EL1_RES0_V1P1;
+>  	case ID_AA64DFR0_EL1_PMSVer_V1P2:
+> +	case ID_AA64DFR0_EL1_PMSVer_V1P3:
+> +		return PMSEVFR_EL1_RES0_V1P2;
+> +	case ID_AA64DFR0_EL1_PMSVer_V1P4:
+>  	/* Return the highest version we support in default */
+>  	default:
+> -		return PMSEVFR_EL1_RES0_V1P2;
+> +		return PMSEVFR_EL1_RES0_V1P4;
+>  	}
+>  }
+>  
 > 
 
-These register fields checks out against ARM ARM DDI 0487 (L.b)
 
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+
+
