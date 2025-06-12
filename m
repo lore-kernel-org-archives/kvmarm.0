@@ -1,49 +1,49 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5960246BD6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58FE245023
 	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 13:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749736024; cv=none; b=Si3czD5oVUHpCKx2gMybr+Thu8+IbR+HrYNPF9nGidd616/YQjbDd5bs0OyO4NfIpo0P4Ks42WfqDlKUItR/YdAoyPn2ti9YhngwcaUe0PjTxMBxI3/sqoHt5f0/HCVMIueoJ/nzwj/2sFKC+XuShyP7QwIK+chFBidxxl35PCk=
+	t=1749736025; cv=none; b=rm3/8H1HvspJvkoXngyxOIL/YUVs3CxX58Vhs9tZO+JVmfPdhw9YNRhezAMBaIQgPr82HhRtGPPqR9FB8v2qgKliDt62Bk/4VmGxGTDzg+TIOGcbFKM7med+aPqZrOeawSYr5CWEURofxt1cP6LSSeJN4SQy8BwMStkfvCtpyDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749736024; c=relaxed/simple;
-	bh=W/ahaZ49s/QUKZlkADLnL22LdnI5S7Mvd9H7G4IoQdc=;
+	s=arc-20240116; t=1749736025; c=relaxed/simple;
+	bh=RQ6JRVRsPYGnPD/Etf5zFYsGdfK+yVXW3fMdn2fe+PA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=OTmded4HoOLafZ5kHX4Zri5ruLAdnpkhjFbAsfZQUjUAdzhSdQculAD8OHFNuddnz81Nzy4IENNvOZ0F8kJCM0cgFgIDgejzwbwPnYmqX2oSrxQF2g7x8/5fyAGm1nY+bIPQudLVwZKs9AsP3ull4u5h54H2zfJ3UVcIoFFxL38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=DI+vGVfG; arc=none smtp.client-ip=205.220.168.131
+	 In-Reply-To:To:CC; b=g/D4wpXL4+VRAWFRlmEN4zAkx84Dkm5w9+WC7P8airh2QEd4gaYaox2ZJz3nfuiLI1Ta7yB1DxgASKosHa9kwiayzmAPc1J8PgB8ogmyWT+LV712v5XMh1NCmeZUitxy4rOJDcKOWO3LakxOUZ5GRDm6S/B2LZZRsuczaTTxBWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=dZoZFanL; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DI+vGVfG"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55C7t2tK029227;
-	Thu, 12 Jun 2025 13:46:42 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="dZoZFanL"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55C7klnb019621;
+	Thu, 12 Jun 2025 13:46:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	X8GgE2nPNPiJlYy8ohdXyvSbBqN//6odlSN5nqekQ1s=; b=DI+vGVfG2tsbpW7e
-	c1Maclxn21evjKUoE3EtsxjIF7+zgCBH47M4CinLcXu8VQr22xo+yf2Wux3QoEV0
-	PuOh4zglhd8v6+gZ6j+eJyw3g8EpKQMHW76MJsHSAL5QWT23Th7NLgjV8QzHiAe2
-	yA0vhzTcdFFWV2IjlzEhrrZVpfBzUVGF2LcQBo8VrP2cRUuRv4pbdwC5AvSYpF3Z
-	M43OXs801E/IQFFiI/THPmZH1LjyFjlhM4peUhT6DJMmq5Ad+Eq3gTr7Knbymh61
-	2xXMZGkCHWECPt/imV0Cg56uCXci6Smtuzeo1matngyeEklowkVtzHuhmyf3cDHw
-	o+ngbw==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 474dn6gq38-1
+	AtRFh0Ey70hl6l/1Ltvy8lBRLOlLz+gnmfGfYWjxjc8=; b=dZoZFanLuvbFrqGn
+	nlshuUO+Fjc9ySmmkn4wfLXL//mXLFOQGubK39WKbEBheMRSur7xC1Wrnh18YAbX
+	jUT4nA74pv5r641DAUfnKLy/w7aiVqKDvbxGbAYmOX69MVi/p7y+eZ/ZkIBW7A2i
+	TgRlylq+5SENpBxkMxXtggorGcsRk2QS6bv3CNh9W3lA8vL0fK2xKL1uSlRG3A+1
+	OSeFGA3nj+PweML5fB1gMny7BkUtaPDsRH1Cx6Y1voq6EXK3U2a253yEBd5ulhR2
+	dR7c5bLq8YsJ2fDJVy5UwsCoXB2gdfSDENHPdijXI/+RoYQbY1qhtMf1tnQ5yqx0
+	9cI+0w==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 474eqcrq9p-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Jun 2025 13:46:41 +0000 (GMT)
+	Thu, 12 Jun 2025 13:46:32 +0000 (GMT)
 Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 55CDkfF2008186
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 55CDkVpr030855
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Jun 2025 13:46:41 GMT
+	Thu, 12 Jun 2025 13:46:31 GMT
 Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
  nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 12 Jun 2025 06:46:36 -0700
+ 15.2.1544.9; Thu, 12 Jun 2025 06:46:27 -0700
 From: Luo Jie <quic_luoj@quicinc.com>
-Date: Thu, 12 Jun 2025 21:46:12 +0800
-Subject: [PATCH v4 5/5] arm64: mm: Convert the opencoded field modify
+Date: Thu, 12 Jun 2025 21:46:10 +0800
+Subject: [PATCH v4 3/5] arm64: nvhe: Convert the opencoded field modify
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20250612-field_modify-v4-5-ae4f74da45a6@quicinc.com>
+Message-ID: <20250612-field_modify-v4-3-ae4f74da45a6@quicinc.com>
 References: <20250612-field_modify-v4-0-ae4f74da45a6@quicinc.com>
 In-Reply-To: <20250612-field_modify-v4-0-ae4f74da45a6@quicinc.com>
 To: Yury Norov <yury.norov@gmail.com>,
@@ -76,38 +76,38 @@ CC: <linux-kernel@vger.kernel.org>, <cocci@inria.fr>,
         <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
         Luo Jie <quic_luoj@quicinc.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1749735973; l=1011;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1749735973; l=1055;
  i=quic_luoj@quicinc.com; s=20250209; h=from:subject:message-id;
- bh=W/ahaZ49s/QUKZlkADLnL22LdnI5S7Mvd9H7G4IoQdc=;
- b=hel6wCcdA56WnGWVTAMEcD0oSXQ+ePCdhntzG9esVw3qUoy/BSILo7hV+c3qvZLRv3e5XgxZl
- XtsGVslBdZJDopMC5XZYgzgtQ76pihmggA6fVfcaWuuBKEtb5v/FH1y
+ bh=RQ6JRVRsPYGnPD/Etf5zFYsGdfK+yVXW3fMdn2fe+PA=;
+ b=py8dXdWMApFsDGHzCOE0AYnCD+LUzkA/muQQlvUJ+EaQlNIZoez3TpPULkEfohxYbuOBf3qty
+ kFUx4wH1c0kBVGx9VaRbm5yEKsI3AMjifEQNFYsElAby9wDyim1cdlI
 X-Developer-Key: i=quic_luoj@quicinc.com; a=ed25519;
  pk=pzwy8bU5tJZ5UKGTv28n+QOuktaWuriznGmriA9Qkfc=
 X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nasanex01b.na.qualcomm.com (10.46.141.250)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEyMDEwNiBTYWx0ZWRfX8f2PlBQBhUyc
- jA6I1zp59iHWJ18qmXDABq2XSM+kvLWUmj1aDU76cEj4pD7xCFcRf1iF2DpkjUqXLKUEoEjUQCy
- 7am7u0lIVsVQtqT5aqZbmdkyAkZlu1gPg90JKYqgOPsl0bBZSN9FZTElSOT5/vjCwX4fGXf/yDn
- /MKPQrhqU2QMJXsSFFX9kbzoQAMCWUDaxFK7O9c05mvMWoA6gknd+7rwR/DbpSo2a8MstYioH8N
- BPq1KzuUd4CdbjXEK8TmsamjxVbyf4ZKl3iaUyVucfmsycKyeT6+oVsq5QD/2nzSu0EgoLzdE4G
- wsoTuYUHlTriip12hTyXDz9bHu80JR5H83mziMPPFoTGyh0BlzpYqXh2wdLMj/PJbREk+RmDSLX
- aUy0NchoVJaX7E5KQVRPrYvpAqAId6/TQWcCGkUbJBeEbUdCP0iGMPHim+qdnDTqXr0ZASGg
-X-Proofpoint-GUID: 8bi3BmivY8GHEm5ykXFVLbLnIhfr2nai
-X-Authority-Analysis: v=2.4 cv=FaQ3xI+6 c=1 sm=1 tr=0 ts=684ada41 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEyMDEwNiBTYWx0ZWRfX3X8eZjf1IM2j
+ +i7Jxhwn+k2R6uhBlqGl8860OQv4nlDvTaw0oOnlXb80b7zuU+hK5LwZwR7ZBywcr8ug4WcvfVf
+ nUyTXYxvj7xt8Adffx6reBcpOFmEgJ+o40utzrPH+ktVDwDLXZ5Djo3gW8egwP+GQD70RyruSmS
+ AsJMirRy5tt7xUDNfplcPwM8vQMdk1dmMpPYJl6PDGbl8Uojy1ph2SR53+a2u+plsQOrgvB3fO2
+ hTVBu8abzTdGcbHHyw+o0S87Kg0NUpdQ995jrJ8aCCCNzd3aI6lVm4Oyti/ugUQLe2KZPHPchkt
+ 0J6gkWHJOIRC6JUBpdd7BPjn69bgKxlGF6SgwyHzDMdiFjHGF5DVUlEeNfjUipt7DLI4n7aDLXW
+ DSatKW8VGAKBortwJ25DJjZMKg3+PqRN38O/+kT8TVzUP39iugvYJ4/sAUMaGwvFzuloftj2
+X-Authority-Analysis: v=2.4 cv=Q7TS452a c=1 sm=1 tr=0 ts=684ada38 cx=c_pps
+ a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
  a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=YgwN3AOMAAAA:8
- a=COk6AnOGAAAA:8 a=eT1jO_uuukyntfU6EpwA:9 a=QEXdDO2ut3YA:10
+ a=COk6AnOGAAAA:8 a=SCSGtF1BeqTgPpDbPWsA:9 a=QEXdDO2ut3YA:10
  a=ztR1XV6QG-NWxUt1dNgd:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: 8bi3BmivY8GHEm5ykXFVLbLnIhfr2nai
+X-Proofpoint-GUID: hWeRRxSRKAV1XyHXXPfUuaQiuUBA0QZT
+X-Proofpoint-ORIG-GUID: hWeRRxSRKAV1XyHXXPfUuaQiuUBA0QZT
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-06-12_09,2025-06-12_02,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 adultscore=0
- mlxlogscore=621 mlxscore=0 spamscore=0 suspectscore=0 malwarescore=0
- priorityscore=1501 clxscore=1015 classifier=spam authscore=0 authtc=n/a
+ suspectscore=0 phishscore=0 mlxscore=0 spamscore=0 mlxlogscore=434
+ bulkscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0 impostorscore=0
+ priorityscore=1501 malwarescore=0 classifier=spam authscore=0 authtc=n/a
  authcc= route=outbound adjust=0 reason=mlx scancount=1
  engine=8.19.0-2505280000 definitions=main-2506120106
 
@@ -122,23 +122,23 @@ http://coccinelle.lip6.fr/
 
 Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 ---
- arch/arm64/mm/context.c | 3 +--
+ arch/arm64/kvm/hyp/include/nvhe/memory.h | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/arm64/mm/context.c b/arch/arm64/mm/context.c
-index b2ac06246327..4fbac8e74149 100644
---- a/arch/arm64/mm/context.c
-+++ b/arch/arm64/mm/context.c
-@@ -361,8 +361,7 @@ void cpu_do_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm)
- 		ttbr0 |= FIELD_PREP(TTBR_ASID_MASK, asid);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+index dee1a406b0c2..c1dbea320131 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+@@ -37,8 +37,7 @@ enum pkvm_page_state {
+ static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
+ 						 enum pkvm_page_state state)
+ {
+-	prot &= ~PKVM_PAGE_STATE_PROT_MASK;
+-	prot |= FIELD_PREP(PKVM_PAGE_STATE_PROT_MASK, state);
++	FIELD_MODIFY(PKVM_PAGE_STATE_PROT_MASK, &prot, state);
+ 	return prot;
+ }
  
- 	/* Set ASID in TTBR1 since TCR.A1 is set */
--	ttbr1 &= ~TTBR_ASID_MASK;
--	ttbr1 |= FIELD_PREP(TTBR_ASID_MASK, asid);
-+	FIELD_MODIFY(TTBR_ASID_MASK, &ttbr1, asid);
- 
- 	cpu_set_reserved_ttbr0_nosync();
- 	write_sysreg(ttbr1, ttbr1_el1);
 
 -- 
 2.34.1
