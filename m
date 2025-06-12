@@ -1,64 +1,25 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE157221DB1
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 08:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277C2229B2E
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 10:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749717766; cv=none; b=dLm2RbIwH9Zq+8wcjBgCx58VGb1iXeT9Z4iyHpk7bO5phcrXINDxCiedESgOrPRRA7/5k1VYlOOV8g2JCcupFVfsc0uiiiOJAi4OfpEJlEcyVLl7HARTfC6ZDq9izFIHSCO7et0DZ9aNh896PZ2EEz3/l+o08k/tJxY2GGsXjec=
+	t=1749723853; cv=none; b=WvNh5fJfYdbqcxFq+pgMBguCGLii8Q85Gne0p46yx/arEon05FRrVfF1uZ4qwmtDTU1o+suKcNZXH9SR2H9K+X2qfAdmsjaqQPwvR+Vr9sUjp4+I/VtrgswzDjRoOJOIPWceRmCn9G7T/CvxpWwSLwIflhF9Ff7ULpRa3xojaU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749717766; c=relaxed/simple;
-	bh=w6yjx7Dori93CG6sK3ncvH9uiqhy4vTnBe+XPdGSOr0=;
+	s=arc-20240116; t=1749723853; c=relaxed/simple;
+	bh=EfoxGGZwPx0kqgJcWRywOxMTyMFiOL3+lrM4IfhKDB0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a3GR4tpSTGL0F/I6KO9I/q8QUM6Z/jg0g+Oso4l3IerflhEGtIDb9MbQDxOMQ7FCapKU3jLyxFoplCkC6k2HYXmiolKe1yiDGLiBLEQmQDUTFVqg+fuOddAe1ctK6eEDfyWwY1H/Hxkljw9ER7DPSjLnu8idoTc5ZcLSSn4Kcno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kEyTW+3B; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kEyTW+3B"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3a503d9ef59so626344f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 01:42:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1749717761; x=1750322561; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MXXMkVVqt6xR4uvFmH/ZMvt5aZcIpXe/yS2Xx6mdmS8=;
-        b=kEyTW+3B9DnJd1mva1FJh23SMKFDEGZFcQwiasGlO+izyzBpFxRwoJhQ5x3YK5CkWx
-         MienEhIbkA/NzYqe3xRI4ui2ZLSmu3bAR5kAQR6iGFyDVAz4+4bKexQlbu3qPZkP4Fg3
-         JM/QN0QyLJEBz+sdfxYHZxk8eV64XIMoO1JCw9qI/OC5uiBKYlUDC7gG/uA6WC5z5BXt
-         7sa2/QE35fQRVBb05SpatLtsfAmHyRgREA3JLQ7BDpsTKhKkAFiKhcbp8eT4K3A5We9C
-         VHU6rKBAIwoXkCYxaLwZYSUbd13RcNtsPctUEdzVZVlvm++v8Yu8CMB7V3cKBNHKhkHZ
-         gJow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749717761; x=1750322561;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MXXMkVVqt6xR4uvFmH/ZMvt5aZcIpXe/yS2Xx6mdmS8=;
-        b=M7sVB1NXVBD/G2gX0viwJa6f9+pq4GZV2oKWakyGxFEpJo0BpLJvP47spojyH29qW4
-         ID7fZZsWjMFPX+7TZYBNFOCbNah6LVSnxB2Wt3wGd5SHMWyiiXq5uBCuJCBQCLvcmLI6
-         tPmzBGMTLfSNbFBjO15i5kNGLhGmYhFH+8Z+xomlmqH+9mTl0A8NdecrCayAMrXmK6DX
-         TUTJ1jp/Z8o4OW3IUOoDe5H7H3kEfAa+gWsbejr25WBWsiTMKp6PMbZ/aQnn9uFUcT0O
-         0sf08du4MzdLKXfJRkr7R3ogd/0ST+qAlUkSoHZKM+5BMwqt/DwpgU1ELkUdvxozoNOu
-         8iew==
-X-Forwarded-Encrypted: i=1; AJvYcCWIQkEoquLwoSIA+tEUMz15z2p81v3LyVWTnO9U7RNTCMsJiSJVnEZqIjygdzOIkgDPD+m9DQc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyeQlxXe5UT00n3BCZBccaNOQAaSZxuT/VkN3wFJhtd7XzF6voX
-	5b8DJTZc6rPIcv/TGYkphbZOcrwqaJnbeHrH4L1gHg0FD5JNjmAWn6Ie3L8kd9EiMVE=
-X-Gm-Gg: ASbGncsOCZflMQLJeNO4oZKUrS4O2IgvBuuB8RZs3j7Btbj55kDdGspbGoZOMq5iiic
-	aMdQ3HrwlK+0DJpTe3Q4LeLdywcFJR0HuEm0JGyaoDN3bfGHB9BgGBkvYD7+bXjrAQWB/dT0W27
-	79HPL2WywUTDp2Zv6uTXpT/IFFJ7I4msqFuAMH8d0tTgy1l3UQc2LnQiGG5TN1tgOyq36JCE6A8
-	zryttXkW1PDP1tE75+z9nSSp8XNDKxtCvqxgaSqAXYME38D7UaJTpIoQiuqvLDAlmRaZM6wpKII
-	Mnxn1+Kj8ou9sJb+tiS6LiYXAZtmXjWKRjLaSIchjfCmosgTWg/yPtvjHDb7Lm8Y1MY=
-X-Google-Smtp-Source: AGHT+IHRFPEqNYv7rElVTsM+/O2Bep9AczSNG7lUyxK1KtND+mFBsYtU9egUwJboJsW4Mk1sSOYf4w==
-X-Received: by 2002:a05:6000:2411:b0:3a5:2fb2:35ac with SMTP id ffacd0b85a97d-3a5612946a2mr1683069f8f.24.1749717761081;
-        Thu, 12 Jun 2025 01:42:41 -0700 (PDT)
-Received: from [192.168.1.3] ([37.18.136.128])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a5619ab86dsm1296971f8f.44.2025.06.12.01.42.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jun 2025 01:42:40 -0700 (PDT)
-Message-ID: <7b080e97-375d-4521-b167-d0c4256dc464@linaro.org>
-Date: Thu, 12 Jun 2025 09:42:39 +0100
+	 In-Reply-To:Content-Type; b=YsuKJMKh7GZyH4qWAAdem7lSpVmAjeBeKTBt9S8/mEa3ne5aslMIMtHBSNZizxZ2esvJOaIkmybue2vmldQQzzsTWGHW5xC+Bl4Vn8BaCbEGGuPI/JyWVSCgsujwUJesOkrvsbXjxecX6kUobduK/ytkQV32Wlnnyr9v0IwnQ9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 34AA51424;
+	Thu, 12 Jun 2025 03:23:51 -0700 (PDT)
+Received: from [10.163.33.129] (unknown [10.163.33.129])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7033F3F59E;
+	Thu, 12 Jun 2025 03:24:07 -0700 (PDT)
+Message-ID: <ddc006af-3084-4fef-b822-144fb404bc8d@arm.com>
+Date: Thu, 12 Jun 2025 15:54:04 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,114 +27,230 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/10] perf: arm_spe: Support FEAT_SPEv1p4 filters
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
- kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+Subject: Re: [PATCH V4 1/2] arm64/debug: Drop redundant DBG_MDSCR_* macros
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Ada Couprie Diaz <ada.coupriediaz@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, leo.yan@arm.com
-References: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
- <20250605-james-perf-feat_spe_eft-v3-2-71b0c9f98093@linaro.org>
- <10f63976-afa7-4e1c-bec1-d9f2447d9c13@arm.com>
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+References: <20250612033547.480952-1-anshuman.khandual@arm.com>
+ <20250612033547.480952-2-anshuman.khandual@arm.com>
+ <86wm9hcr14.wl-maz@kernel.org>
 Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <10f63976-afa7-4e1c-bec1-d9f2447d9c13@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <86wm9hcr14.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
 
-On 12/06/2025 8:35 am, Anshuman Khandual wrote:
-> On 05/06/25 4:19 PM, James Clark wrote:
->> FEAT_SPEv1p4 (optional from Armv8.8) adds some new filter bits, so
->> remove them from the previous version's RES0 bits using
->> PMSEVFR_EL1_RES0_V1P4_EXCL. It also makes some previously available bits
->> unavailable again, so add those back using PMSEVFR_EL1_RES0_V1P4_INCL.
-> 
-> Just wondering - why cannot all the new applicable filter bits be added
-> explicitly for PMSEVFR_EL1_RES0_V1P4 without using exclude and include
-> intermediaries.
-> 
-
-They could but there would be a lot of duplication. Each version tended 
-to add only a few bits to the previous version. Also for consistency, 
-they were already defined in this way. I didn't think there was much to 
-gain by redefining the whole bitset just for this one, it's probably 
-going to look just as messy.
-
->> E.g:
+On 12/06/25 1:47 PM, Marc Zyngier wrote:
+> On Thu, 12 Jun 2025 04:35:46 +0100,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 >>
->>    E[30], bit [30]
->>    When FEAT_SPEv1p4 is _not_ implemented ...
+>> MDSCR_EL1 has already been defined in tools sysreg format and hence can be
+>> used in all debug monitor related call paths. But using generated sysreg
+>> definitions causes build warnings because there is a mismatch between mdscr
+>> variable (u32) and GENMASK() based masks (long unsigned int). Convert all
+>> variables handling MDSCR_EL1 register as u64 which also reflects its true
+>> width as well.
 >>
->> FEAT_SPE_V1P3 has the same filters as V1P2 so explicitly add it to the
->> switch.
-> A small nit - should FEAT_SPE_V1P3 addition be done in a previous patch
-> as it is an already existing thing ?
-> 
-
-It's related to this patch because I change the default case. Before 
-V1P3 hits 'default:' and returns PMSEVFR_EL1_RES0_V1P2. But now the 
-highest supported is PMSEVFR_EL1_RES0_V1P4 for the default case so I 
-need to add a case for V1P3 to keep it returning PMSEVFR_EL1_RES0_V1P2 
-filters. There's no bug.
-
+>> --------------------------------------------------------------------------
+>> arch/arm64/kernel/debug-monitors.c: In function ‘disable_debug_monitors’:
+>> arch/arm64/kernel/debug-monitors.c:108:13: warning: conversion from ‘long
+>> unsigned int’ to ‘u32’ {aka ‘unsigned int’} changes value from
+>> ‘18446744073709518847’ to ‘4294934527’ [-Woverflow]
+>>   108 |   disable = ~MDSCR_EL1_MDE;
+>>       |             ^
+>> --------------------------------------------------------------------------
 >>
->> Reviewed-by: Leo Yan <leo.yan@arm.com>
->> Tested-by: Leo Yan <leo.yan@arm.com>
->> Signed-off-by: James Clark <james.clark@linaro.org>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Reviewed-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 >> ---
->>   arch/arm64/include/asm/sysreg.h | 7 +++++++
->>   drivers/perf/arm_spe_pmu.c      | 5 ++++-
->>   2 files changed, 11 insertions(+), 1 deletion(-)
+>>  arch/arm64/include/asm/assembler.h      |  4 ++--
+>>  arch/arm64/include/asm/debug-monitors.h |  6 ------
+>>  arch/arm64/kernel/debug-monitors.c      | 22 +++++++++++-----------
+>>  arch/arm64/kernel/entry-common.c        |  4 ++--
+>>  4 files changed, 15 insertions(+), 21 deletions(-)
 >>
->> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->> index f1bb0d10c39a..880090df3efc 100644
->> --- a/arch/arm64/include/asm/sysreg.h
->> +++ b/arch/arm64/include/asm/sysreg.h
->> @@ -358,6 +358,13 @@
->>   	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
->>   #define PMSEVFR_EL1_RES0_V1P2	\
->>   	(PMSEVFR_EL1_RES0_V1P1 & ~BIT_ULL(6))
->> +#define PMSEVFR_EL1_RES0_V1P4_EXCL \
->> +	(BIT_ULL(2) | BIT_ULL(4) | GENMASK_ULL(10, 8) | GENMASK_ULL(23, 19))
->> +#define PMSEVFR_EL1_RES0_V1P4_INCL \
->> +	(GENMASK_ULL(31, 26))> +#define PMSEVFR_EL1_RES0_V1P4	\
->> +	(PMSEVFR_EL1_RES0_V1P4_INCL | \
->> +	(PMSEVFR_EL1_RES0_V1P2 & ~PMSEVFR_EL1_RES0_V1P4_EXCL))
->>   
->>   /* Buffer error reporting */
->>   #define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
->> diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
->> index 3efed8839a4e..d9f6d229dce8 100644
->> --- a/drivers/perf/arm_spe_pmu.c
->> +++ b/drivers/perf/arm_spe_pmu.c
->> @@ -701,9 +701,12 @@ static u64 arm_spe_pmsevfr_res0(u16 pmsver)
->>   	case ID_AA64DFR0_EL1_PMSVer_V1P1:
->>   		return PMSEVFR_EL1_RES0_V1P1;
->>   	case ID_AA64DFR0_EL1_PMSVer_V1P2:
->> +	case ID_AA64DFR0_EL1_PMSVer_V1P3:
->> +		return PMSEVFR_EL1_RES0_V1P2;
->> +	case ID_AA64DFR0_EL1_PMSVer_V1P4:
->>   	/* Return the highest version we support in default */
->>   	default:
->> -		return PMSEVFR_EL1_RES0_V1P2;
->> +		return PMSEVFR_EL1_RES0_V1P4;
->>   	}
->>   }
->>   
->>
+>> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+>> index ad63457a05c5..f229d96616e5 100644
+>> --- a/arch/arm64/include/asm/assembler.h
+>> +++ b/arch/arm64/include/asm/assembler.h
+>> @@ -53,7 +53,7 @@
+>>  	.macro	disable_step_tsk, flgs, tmp
+>>  	tbz	\flgs, #TIF_SINGLESTEP, 9990f
+>>  	mrs	\tmp, mdscr_el1
+>> -	bic	\tmp, \tmp, #DBG_MDSCR_SS
+>> +	bic	\tmp, \tmp, #MDSCR_EL1_SS
+>>  	msr	mdscr_el1, \tmp
+>>  	isb	// Take effect before a subsequent clear of DAIF.D
+>>  9990:
+>> @@ -63,7 +63,7 @@
+>>  	.macro	enable_step_tsk, flgs, tmp
+>>  	tbz	\flgs, #TIF_SINGLESTEP, 9990f
+>>  	mrs	\tmp, mdscr_el1
+>> -	orr	\tmp, \tmp, #DBG_MDSCR_SS
+>> +	orr	\tmp, \tmp, #MDSCR_EL1_SS
+>>  	msr	mdscr_el1, \tmp
+>>  9990:
+>>  	.endm
+>> diff --git a/arch/arm64/include/asm/debug-monitors.h b/arch/arm64/include/asm/debug-monitors.h
+>> index 8f6ba31b8658..1f37dd01482b 100644
+>> --- a/arch/arm64/include/asm/debug-monitors.h
+>> +++ b/arch/arm64/include/asm/debug-monitors.h
+>> @@ -13,14 +13,8 @@
+>>  #include <asm/ptrace.h>
+>>  
+>>  /* Low-level stepping controls. */
+>> -#define DBG_MDSCR_SS		(1 << 0)
+>>  #define DBG_SPSR_SS		(1 << 21)
+>>  
+>> -/* MDSCR_EL1 enabling bits */
+>> -#define DBG_MDSCR_KDE		(1 << 13)
+>> -#define DBG_MDSCR_MDE		(1 << 15)
+>> -#define DBG_MDSCR_MASK		~(DBG_MDSCR_KDE | DBG_MDSCR_MDE)
+>> -
+>>  #define	DBG_ESR_EVT(x)		(((x) >> 27) & 0x7)
+>>  
+>>  /* AArch64 */
+>> diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
+>> index 58f047de3e1c..08f1d02507cd 100644
+>> --- a/arch/arm64/kernel/debug-monitors.c
+>> +++ b/arch/arm64/kernel/debug-monitors.c
+>> @@ -34,7 +34,7 @@ u8 debug_monitors_arch(void)
+>>  /*
+>>   * MDSCR access routines.
+>>   */
+>> -static void mdscr_write(u32 mdscr)
+>> +static void mdscr_write(u64 mdscr)
+>>  {
+>>  	unsigned long flags;
+>>  	flags = local_daif_save();
+>> @@ -43,7 +43,7 @@ static void mdscr_write(u32 mdscr)
+>>  }
+>>  NOKPROBE_SYMBOL(mdscr_write);
+>>  
+>> -static u32 mdscr_read(void)
+>> +static u64 mdscr_read(void)
+>>  {
+>>  	return read_sysreg(mdscr_el1);
+>>  }
+>> @@ -79,16 +79,16 @@ static DEFINE_PER_CPU(int, kde_ref_count);
+>>  
+>>  void enable_debug_monitors(enum dbg_active_el el)
+>>  {
+>> -	u32 mdscr, enable = 0;
+>> +	u64 mdscr, enable = 0;
+>>  
+>>  	WARN_ON(preemptible());
+>>  
+>>  	if (this_cpu_inc_return(mde_ref_count) == 1)
+>> -		enable = DBG_MDSCR_MDE;
+>> +		enable = MDSCR_EL1_MDE;
+>>  
+>>  	if (el == DBG_ACTIVE_EL1 &&
+>>  	    this_cpu_inc_return(kde_ref_count) == 1)
+>> -		enable |= DBG_MDSCR_KDE;
+>> +		enable |= MDSCR_EL1_KDE;
+>>  
+>>  	if (enable && debug_enabled) {
+>>  		mdscr = mdscr_read();
+>> @@ -100,16 +100,16 @@ NOKPROBE_SYMBOL(enable_debug_monitors);
+>>  
+>>  void disable_debug_monitors(enum dbg_active_el el)
+>>  {
+>> -	u32 mdscr, disable = 0;
+>> +	u64 mdscr, disable = 0;
+>>  
+>>  	WARN_ON(preemptible());
+>>  
+>>  	if (this_cpu_dec_return(mde_ref_count) == 0)
+>> -		disable = ~DBG_MDSCR_MDE;
+>> +		disable = ~MDSCR_EL1_MDE;
+>>  
+>>  	if (el == DBG_ACTIVE_EL1 &&
+>>  	    this_cpu_dec_return(kde_ref_count) == 0)
+>> -		disable &= ~DBG_MDSCR_KDE;
+>> +		disable &= ~MDSCR_EL1_KDE;
+>>  
+>>  	if (disable) {
+>>  		mdscr = mdscr_read();
+>> @@ -415,7 +415,7 @@ void kernel_enable_single_step(struct pt_regs *regs)
+>>  {
+>>  	WARN_ON(!irqs_disabled());
+>>  	set_regs_spsr_ss(regs);
+>> -	mdscr_write(mdscr_read() | DBG_MDSCR_SS);
+>> +	mdscr_write(mdscr_read() | MDSCR_EL1_SS);
+>>  	enable_debug_monitors(DBG_ACTIVE_EL1);
+>>  }
+>>  NOKPROBE_SYMBOL(kernel_enable_single_step);
+>> @@ -423,7 +423,7 @@ NOKPROBE_SYMBOL(kernel_enable_single_step);
+>>  void kernel_disable_single_step(void)
+>>  {
+>>  	WARN_ON(!irqs_disabled());
+>> -	mdscr_write(mdscr_read() & ~DBG_MDSCR_SS);
+>> +	mdscr_write(mdscr_read() & ~MDSCR_EL1_SS);
+>>  	disable_debug_monitors(DBG_ACTIVE_EL1);
+>>  }
+>>  NOKPROBE_SYMBOL(kernel_disable_single_step);
+>> @@ -431,7 +431,7 @@ NOKPROBE_SYMBOL(kernel_disable_single_step);
+>>  int kernel_active_single_step(void)
+>>  {
+>>  	WARN_ON(!irqs_disabled());
+>> -	return mdscr_read() & DBG_MDSCR_SS;
+>> +	return mdscr_read() & MDSCR_EL1_SS;
+>>  }
+>>  NOKPROBE_SYMBOL(kernel_active_single_step);
+>>  
+>> diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
+>> index 7c1970b341b8..171f93f2494b 100644
+>> --- a/arch/arm64/kernel/entry-common.c
+>> +++ b/arch/arm64/kernel/entry-common.c
+>> @@ -344,7 +344,7 @@ static DEFINE_PER_CPU(int, __in_cortex_a76_erratum_1463225_wa);
+>>  
+>>  static void cortex_a76_erratum_1463225_svc_handler(void)
+>>  {
+>> -	u32 reg, val;
+>> +	u64 reg, val;
+>>  
+>>  	if (!unlikely(test_thread_flag(TIF_SINGLESTEP)))
+>>  		return;
+>> @@ -354,7 +354,7 @@ static void cortex_a76_erratum_1463225_svc_handler(void)
+>>  
+>>  	__this_cpu_write(__in_cortex_a76_erratum_1463225_wa, 1);
+>>  	reg = read_sysreg(mdscr_el1);
+>> -	val = reg | DBG_MDSCR_SS | DBG_MDSCR_KDE;
+>> +	val = reg | MDSCR_EL1_SS | MDSCR_EL1_KDE;
+>>  	write_sysreg(val, mdscr_el1);
+>>  	asm volatile("msr daifclr, #8");
+>>  	isb();
 > 
-> 
-> 
-> 
+> Whilst you're at it, please also change the open-coded constant in
+> __cpu_setup to MDSCR_EL1_TDCC.
+
+I believe you are suggesting about the following change, will fold
+in the patch. But I guess 'mov' would still be preferred compared
+to 'mov_q' as MDSCR_EL1_TDCC is a 32 bit constant (atleast the non
+zero portion) ?
+
+--- a/arch/arm64/mm/proc.S
++++ b/arch/arm64/mm/proc.S
+@@ -454,7 +454,7 @@ SYM_FUNC_START(__cpu_setup)
+        dsb     nsh
+
+        msr     cpacr_el1, xzr                  // Reset cpacr_el1
+-       mov     x1, #1 << 12                    // Reset mdscr_el1 and disable
++       mov     x1, MDSCR_EL1_TDCC              // Reset mdscr_el1 and disable
+        msr     mdscr_el1, x1                   // access to the DCC from EL0
+        reset_pmuserenr_el0 x1                  // Disable PMU access from EL0
+        reset_amuserenr_el0 x1                  // Disable AMU access from EL0
+
 
