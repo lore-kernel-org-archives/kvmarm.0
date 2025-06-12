@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C1229B76C
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 15:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2F9298CB2
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 16:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749743601; cv=none; b=IarbyS6X4IKSi1nE/dx2y+8P6pXP1x5WO1lYXQBWN/K5lNnIIWti0PfYT4djuqNosvBcJPxNZu3HEntvAq0G+awEgK/aEa/2JdrTZGOeW7nYMLaHQMMIu7GCfFg9XDJuPgjsHxrBaHnAoFLry/QK/sf1ekY+CB58YoselPGI1cg=
+	t=1749744474; cv=none; b=IFZkIjcg5i+nKAxIpMfbv9tKsYTUp+9Reg/tnQ2XMiF8Op3NcO58YbG6uJjXDJd8QFCBKFGKI1P6xnnOWUmK3iSHsg/IsSPfVDMZ8WIzVHvPAIaVt0GljzUn872kqWnLSjhoorjPgzzJRk7Y1Il3n8G8IzofyYs7onU26sAgj6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749743601; c=relaxed/simple;
-	bh=UQrVYsGc6/MyapNa6tWxlij5FlBMTrwN8q2oOiwMZCU=;
+	s=arc-20240116; t=1749744474; c=relaxed/simple;
+	bh=+uVuub5Ky1bzhq7P2Mnf0OieKw5ECMBGCTcKWAjvVoM=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jh6ihyNbnke4XDhLKMrfBkXnjLu0CJmyoDuT6DmY+propYWZ0KtrjVFCnpzdZcwtc3wocPcut6Gq+znC3TnsvcuZYiznwm54BiaipWeYw6qnOlfK3rp3qn0N4y8KeSjtLLK0lIENqAG7RR+NKtLn5FcBSFkfziS3kUXKXjB7lvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SnSWtPvA; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=BzKijFoXta/heQjf47VYENOtjnwg2ONQN2sKwa3l2axzcXi+p9eNxIFj0y/DuFUPpOxjCaUdpGRRifVUJoOH+KJIg0LDlGVdWljDlJ3yCP6E+nIU3cLuN7Yd9gMqJi4ps600holHntH9fMySvYZb3rZuMbJBVE+UmKZQMIYCh40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jxq75ve3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SnSWtPvA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jxq75ve3"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749743598;
+	s=mimecast20190719; t=1749744471;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mUI+8vjhhSyqNoE3QrTGQqAzBmNIFi2uvoVlnXIO0eY=;
-	b=SnSWtPvAtdkpD1TDdcyn7ofhWcTK++7YgzFNpIXdm0M1YpqKnxlxfVha1EJyYc8H8DXUlG
-	sl4MibHhN4D3Yi5A3xpN9mcVJRDTlrJajx3KYeveISAQeBmscmSthG54j/dELVBx1b8FlG
-	iZZycncfTjH2UHWR4AHpCJqtta7tZnI=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=+uVuub5Ky1bzhq7P2Mnf0OieKw5ECMBGCTcKWAjvVoM=;
+	b=Jxq75ve3uT/zw7rYPtls0LnkVB3Vlrz1uMiHpU2Mug11/N2tP4S9/KCCCxTC+UBDqX1Szg
+	BesElSeY4v6Sf9q9dAFNzlCCsH2PwoKIp3Y3cge76IAcXNl5rPeGd+hdOvBsQzyFry5Izj
+	tO+NOxK7SjpAjKl38SGuDgmKvs5rh7Y=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-5BU_AqztPBOJLHDrdiDD7Q-1; Thu,
- 12 Jun 2025 11:53:15 -0400
-X-MC-Unique: 5BU_AqztPBOJLHDrdiDD7Q-1
-X-Mimecast-MFC-AGG-ID: 5BU_AqztPBOJLHDrdiDD7Q_1749743593
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-55-Uv3enwPvPyq8CXgvFQds9w-1; Thu,
+ 12 Jun 2025 12:07:47 -0400
+X-MC-Unique: Uv3enwPvPyq8CXgvFQds9w-1
+X-Mimecast-MFC-AGG-ID: Uv3enwPvPyq8CXgvFQds9w_1749744465
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B97CF1956089;
-	Thu, 12 Jun 2025 15:53:12 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D1B818001D1;
+	Thu, 12 Jun 2025 16:07:44 +0000 (UTC)
 Received: from localhost (unknown [10.45.224.54])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7EAD118003FC;
-	Thu, 12 Jun 2025 15:53:10 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED9A019560AF;
+	Thu, 12 Jun 2025 16:07:42 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
@@ -50,21 +50,19 @@ Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  armbru@redhat.com, berrange@redhat.com, abologna@redhat.com,
  jdenemar@redhat.com, agraf@csgraf.de, shahuang@redhat.com,
  mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-Subject: Re: [PATCH v7 08/14] arm/cpu: Store id_isar0-7 into the idregs array
-In-Reply-To: <CAFEAcA-rYNaaZ3LFFkhek0duptPeMXUBbPbBnWa7teNPM+c6ug@mail.gmail.com>
+Subject: Re: [PATCH v7 13/14] arm/cpu: switch to a generated cpu-sysregs.h.inc
+In-Reply-To: <CAFEAcA_Ju4QBUwiOyt9thPxuAFMcm6jVTZHpE8FFJeed5cJgsg@mail.gmail.com>
 Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
  Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
  153243,
  =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
  Avril Crosse O'Flaherty"
 References: <20250515153907.151174-1-cohuck@redhat.com>
- <20250515153907.151174-9-cohuck@redhat.com>
- <CAFEAcA-c=EaE-Y4DMVz_meVd2cbxuCyFGFOXET-COOgMWHXWWA@mail.gmail.com>
- <87a56d9dlb.fsf@redhat.com>
- <CAFEAcA-rYNaaZ3LFFkhek0duptPeMXUBbPbBnWa7teNPM+c6ug@mail.gmail.com>
+ <20250515153907.151174-14-cohuck@redhat.com>
+ <CAFEAcA_Ju4QBUwiOyt9thPxuAFMcm6jVTZHpE8FFJeed5cJgsg@mail.gmail.com>
 User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Thu, 12 Jun 2025 17:53:07 +0200
-Message-ID: <874iwl9ct8.fsf@redhat.com>
+Date: Thu, 12 Jun 2025 18:07:40 +0200
+Message-ID: <871prp9c4z.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -72,73 +70,33 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
 On Thu, Jun 12 2025, Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> On Thu, 12 Jun 2025 at 16:36, Cornelia Huck <cohuck@redhat.com> wrote:
+> On Thu, 15 May 2025 at 16:40, Cornelia Huck <cohuck@redhat.com> wrote:
 >>
->> On Thu, Jun 12 2025, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Generated against Linux 6.14-rc1.
 >>
->> > On Thu, 15 May 2025 at 16:40, Cornelia Huck <cohuck@redhat.com> wrote:
->> >>
->> >> From: Eric Auger <eric.auger@redhat.com>
->> >>
->> >> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> >> Reviewed-by: Sebastian Ott <sebott@redhat.com>
->> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> >> ---
->> >>  hw/intc/armv7m_nvic.c     |  12 ++--
->> >>  target/arm/cpu-features.h |  36 +++++-----
->> >>  target/arm/cpu.c          |  24 +++----
->> >>  target/arm/cpu.h          |   7 --
->> >>  target/arm/cpu64.c        |  28 ++++----
->> >>  target/arm/helper.c       |  14 ++--
->> >>  target/arm/kvm.c          |  21 ++----
->> >>  target/arm/tcg/cpu-v7m.c  |  90 +++++++++++++-----------
->> >>  target/arm/tcg/cpu32.c    | 144 +++++++++++++++++++++-----------------
->> >>  target/arm/tcg/cpu64.c    | 108 ++++++++++++++--------------
->> >>  10 files changed, 243 insertions(+), 241 deletions(-)
->> >
->> > This doesn't compile:
->> >
->> > ../../target/arm/tcg/cpu-v7m.c:70:5: error: incompatible pointer types
->> > initializing 'ARMISARe
->> > gisters *' (aka 'struct ARMISARegisters *') with an expression of type
->> > 'uint64_t *' (aka 'unsigned long *')
->> > [-Werror,-Wincompatible-pointer-types]
->> >    70 |     SET_IDREG(idregs, ID_ISAR0, 0x01141110);
->> >       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> > ../../target/arm/cpu.h:875:26: note: expanded from macro 'SET_IDREG'
->> >   875 |         ARMISARegisters *i_ = (ISAR);
->> >          \
->> >       |                          ^    ~~~~~~
->> > ../../target/arm/tcg/cpu-v7m.c:71:5: error: incompatible pointer types
->> > initializing 'ARMISARegisters *' (aka 'struct ARMISARegisters *') with
->> > an expression of type 'uint64_t *' (aka 'unsigned long *')
->> > [-Werror,-Wincompatible-pointer-types]
->> >    71 |     SET_IDREG(idregs, ID_ISAR1, 0x02111000);
->> >       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> > ../../target/arm/cpu.h:875:26: note: expanded from macro 'SET_IDREG'
->> >   875 |         ARMISARegisters *i_ = (ISAR);
->> >          \
->> >       |                          ^    ~~~~~~
->> >
->> > (and more similar errors until the compiler gives up).
->>
->> What configs/compiler are you using? I obviously would have fixed that
->> if I had hit it...
+>> Reviewed-by: Sebastian Ott <sebott@redhat.com>
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
 >
-> This is clang 18.1.3 (1ubuntu1) on x86-64 Linux, configured with
->
-> '../../configure' '--cc=clang' '--cxx=clang++' '--enable-ubsan'
-> '--target-list=arm-softmmu,arm-linux-user,aarch64-softmmu,aarch64-linux-user'
->
-> Whatever the problem is, it goes away on a later patch, so probably
-> it's just that some fragment in a later patch needs to move into
-> this one.
+> Does it make sense to include all these extra registers?
+> Some of them are not simple ID registers at all,
+> for example ID_CCSIDR_EL1 is an array of registers, not
+> a single value (in QEMU, stored in cpu->ccsidr[]),
+> and CSSELR_EL1 is not an ID register at all, it's a
+> normal read/write sysreg.
 
-Ok, I should do more automated builds after every patch, because I
-forget to do that too often. (I usually build with gcc.)
+Oops, I think the generator needs to check for op1=={0,1,3} instead of
+including op1==2...
+
+[Another issue that came up in recent discussions for the cpu model
+series is that recent kernels have made {MIDR,REVIDR,AIDR}_EL1 writable,
+but even though they are in the range the kernel reports writable
+registers in, the source sysreg file does not include them. I've changed
+the script to add them manually so far, but not sure if that is the
+best solution here.]
 
