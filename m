@@ -1,164 +1,99 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E822B2D0267;
-	Thu, 12 Jun 2025 15:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7EB2BD004
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 15:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749742340; cv=none; b=UHeW6Y/nP6Cc6odVdIJPJc8bispbhAydbYF53vDUM2Eljn36+QBTsPFk4hX4C79uesQ1IR03jBn3v/5fGmP8jzum2MN2DDnrgTXsw7PzATTTf3DYkN/BY2bmk2MssJTl7D8j2S1VDrq64bf2Chl643zbpZUYsHmxf3csAK8uHaM=
+	t=1749742481; cv=none; b=nPml02YRXq1UkRL2tVVqpyQ6lIqF5IdAkZue9eAsRgjMaJmCokBSdZAXgurk6VIV8i8DrwJve9Vw6WCN+mIILc0rHZmrl6wCxndM9fTESiOfRAOs6j/6slqxeaybnAXqkieN+sY8GYnIA4kSqYp0f9Tp6Bq3hnuEHDd+JdHfiC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749742340; c=relaxed/simple;
-	bh=DOUOGbeZ0qQ4DsAqlWdYIHJzRPjWZMq7jRdHVK2GQQo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cFFfWJC6xRxin5GpjeAiAyiB+odpk19vXbDBs3V/S3ya1VOmQtJ7pdlDqLpt0qRzuxQX3rzVh6xsLJio7DfYNffdsC7l9ExPxcAQOPq5xngqEx0fA7x3PrvK2iufT4YhSRYwepklg/Usw3EaDRBNuMdlS22Jr2pEcL031mqSrGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13E69153B;
-	Thu, 12 Jun 2025 08:31:57 -0700 (PDT)
-Received: from [10.1.37.36] (e122027.cambridge.arm.com [10.1.37.36])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8784E3F66E;
-	Thu, 12 Jun 2025 08:32:14 -0700 (PDT)
-Message-ID: <8817e2bf-2283-4536-8a5f-9c32173b3a61@arm.com>
-Date: Thu, 12 Jun 2025 16:32:13 +0100
+	s=arc-20240116; t=1749742481; c=relaxed/simple;
+	bh=PUt6jW+0YbqVKRq1vGu3eyen6i33GlcPDLpnOk4BvJk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hKVl0V0K7y14JooS5i9e6q/98GUiseB/ql2gtWuAoMHa1FL/nC8c9v3/BGrVQ9oeYMNQ1k+Qtn4GMb0/VUhzq59meK9lX1SWRnzh18hqGFPk8kEnpr1wxqqRxpPhwCfUs0/zDQQZu6ejzyuoBUhk0J/BGD9r2Xam/MPeZ483fuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QZIsp1Mp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZIsp1Mp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749742478;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zjWEWalRhjt+Jmg9fJ1nInmzuE3X/VWFJ2VSJWP1rn8=;
+	b=QZIsp1MpPbzdtZkUTQBrJaboDm3U85z+eBiWd85yaWPCn+MtLXLBvf60dE7xtj0fyOMgPE
+	6iuEdBSfH4xWtP1bBIXe2a83CNkQQWKi/cYGjBd2B4NB7ja9VGqu0kCnn3y6bjLj7W4T7F
+	+oDYYzmtHTw+e08RHuPdSL2KcmXbqKA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-tRi18R-kMvCLwqUtRyyPkQ-1; Thu,
+ 12 Jun 2025 11:34:34 -0400
+X-MC-Unique: tRi18R-kMvCLwqUtRyyPkQ-1
+X-Mimecast-MFC-AGG-ID: tRi18R-kMvCLwqUtRyyPkQ_1749742471
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 90A1E1801BD8;
+	Thu, 12 Jun 2025 15:34:30 +0000 (UTC)
+Received: from localhost (unknown [10.45.224.54])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3D58B18003FC;
+	Thu, 12 Jun 2025 15:34:27 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org,
+ alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+ sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
+ armbru@redhat.com, berrange@redhat.com, abologna@redhat.com,
+ jdenemar@redhat.com, agraf@csgraf.de, shahuang@redhat.com,
+ mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
+Subject: Re: [PATCH v7 02/14] arm/cpu: Store aa64isar0/aa64zfr0 into the
+ idregs arrays
+In-Reply-To: <CAFEAcA8y_wwZPoqkyPrNscRNTEwiOQm5Or9C=aiSNMGcZmq8CQ@mail.gmail.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Avril Crosse O'Flaherty"
+References: <20250515153907.151174-1-cohuck@redhat.com>
+ <20250515153907.151174-3-cohuck@redhat.com>
+ <CAFEAcA8y_wwZPoqkyPrNscRNTEwiOQm5Or9C=aiSNMGcZmq8CQ@mail.gmail.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Thu, 12 Jun 2025 17:34:25 +0200
+Message-ID: <87cyb99doe.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 41/43] KVM: arm64: Expose support for private memory
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <20250611104844.245235-42-steven.price@arm.com>
- <20250612151427.GA1913753@e124191.cambridge.arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20250612151427.GA1913753@e124191.cambridge.arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 12/06/2025 16:14, Joey Gouly wrote:
-> Hi Steven,
-> 
-> On Wed, Jun 11, 2025 at 11:48:38AM +0100, Steven Price wrote:
->> Select KVM_GENERIC_PRIVATE_MEM and provide the necessary support
->> functions.
+On Thu, Jun 12 2025, Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> On Thu, 15 May 2025 at 16:39, Cornelia Huck <cohuck@redhat.com> wrote:
 >>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->> ---
->> Changes since v2:
->>  * Switch kvm_arch_has_private_mem() to a macro to avoid overhead of a
->>    function call.
->>  * Guard definitions of kvm_arch_{pre,post}_set_memory_attributes() with
->>    #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
->>  * Early out in kvm_arch_post_set_memory_attributes() if the WARN_ON
->>    should trigger.
->> ---
->>  arch/arm64/include/asm/kvm_host.h |  6 ++++++
->>  arch/arm64/kvm/Kconfig            |  1 +
->>  arch/arm64/kvm/mmu.c              | 24 ++++++++++++++++++++++++
->>  3 files changed, 31 insertions(+)
+>> From: Eric Auger <eric.auger@redhat.com>
 >>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index a1857802db64..9903b0e8ef3f 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -1514,6 +1514,12 @@ struct kvm *kvm_arch_alloc_vm(void);
->>  
->>  #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
->>  
->> +#ifdef CONFIG_KVM_PRIVATE_MEM
->> +#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
->> +#else
->> +#define kvm_arch_has_private_mem(kvm) false
->> +#endif
-> 
-> I don't understand the ifdef here (or below). In the Kconfig you 'select
-> KVM_GENERIC_PRIVATE_MEM', so it will always be on/defined? Unless I'm
-> misunderstanding something.
-
-I have to admit this is somewhat cargo-culted from x86. And I think they
-have more build configurations which don't include KVM_GENERIC_PRIVATE_MEM.
-
-It is possible to build without KVM_GENERIC_PRIVATE_MEM (by disabling
-CONFIG_KVM). But that's probably not very interesting here - the
-definition shouldn't actually matter in that case.
-
-So I think you're right - there's no need for the #ifdeffery here.
-
-Thanks,
-Steve
-
->> +
->>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
->>  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
->>  
->> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index 713248f240e0..3a04b040869d 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -37,6 +37,7 @@ menuconfig KVM
->>  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
->>  	select SCHED_INFO
->>  	select GUEST_PERF_EVENTS if PERF_EVENTS
->> +	select KVM_GENERIC_PRIVATE_MEM
->>  	help
->>  	  Support hosting virtualized guest machines.
->>  
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 580ed362833c..c866891fd8f9 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -2384,6 +2384,30 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->>  	return ret;
->>  }
->>  
->> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
->> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
->> +					struct kvm_gfn_range *range)
->> +{
->> +	WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
->> +	return false;
->> +}
->> +
->> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
->> +					 struct kvm_gfn_range *range)
->> +{
->> +	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
->> +		return false;
->> +
->> +	if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
->> +		range->attr_filter = KVM_FILTER_SHARED;
->> +	else
->> +		range->attr_filter = KVM_FILTER_PRIVATE;
->> +	kvm_unmap_gfn_range(kvm, range);
->> +
->> +	return false;
->> +}
->> +#endif
->> +
->>  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
->>  {
->>  }
->> -- 
->> 2.43.0
+>> Also add kvm accessors for storing host features into idregs.
 >>
-> 
-> Thanks,
-> Joey
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> Reviewed-by: Sebastian Ott <sebott@redhat.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>
+>
+>>      if (!cpu->has_neon && !cpu->has_vfp) {
+>> -        uint64_t t;
+>> +        unit64_t t;
+>
+> This doesn't compile :-)
+>
+> -- PMM
+
+Hum... weird that my compile didn't hit it.
 
