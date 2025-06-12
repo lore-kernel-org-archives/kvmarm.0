@@ -1,70 +1,70 @@
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57DCB1BC2A
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 15:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E14029DB6E
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 15:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749741416; cv=none; b=S8peYo3wxLp2tLq9kMZRZVLoe3F0U5k2VTkpPK+d1vvvOR1ylGAdl0HjcEVPrrghxs0zikwCB2hW5GxoS6egXGCnlwd2hVdSSYC/YryNYC9I/RXIqmE0xJ+VPE9C4D492wDn1AKqVX4PP1JFe6TvOPWt9RGf1czZiGNtIxj4zRQ=
+	t=1749742196; cv=none; b=QH7zujzhiZisaJSnEi4XEELWKYZwwsC0xMyatiSJP5kWRA1Ei+rDg0vus13UxXGXqQR2d2ad0vWdc5S/WyhyVxqimo3gdKSORMH9QdgWt2IOY/dnRvIEmQh49Ihjv766CSc0ZMtXPAbjs4NgyJToWCoL5Ybx5NOw6Jp+IQ19Oto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749741416; c=relaxed/simple;
-	bh=VHtWmZvNEEluK5e3KkLcIqngznyWAjhm6ToignebZu0=;
+	s=arc-20240116; t=1749742196; c=relaxed/simple;
+	bh=t1IqK6p7nBIDP6T9YM9E3mMQ9+httXSZAipBfvbCnaM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NxMpsy2Z30Erm2x3kuRYWshx0Hk/+UpIiUKyv1oO3cIoUYhiJ6gCZG8kbXQCYDkd0DQYUrTxPzoxFyROVO4DtLfNSs6xqTXzlYM3lxw3RwguGNsZrS32iI9n1l84W8iODHcIWsA6rlvdhxcmWVGaYYn8bEKH++k/omHtvAPjBIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HJowRHUJ; arc=none smtp.client-ip=209.85.128.177
+	 To:Cc:Content-Type; b=cPa4PzA4M1UGIyeyL8POFoHDLoCrTyZDpn6vistw06j7L6GV5hI72FXcIJLnaXeEKNkZS4H7onoRHgAXoiFAWQ0xIQ28atwmnzalzaf2XieQuLyg+6/2qjxG8/PAzQqLSuRgdm/bz3EqT2/K9Yl44YYiJywT8TvMgihDvmT+w4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PWb+1w0F; arc=none smtp.client-ip=209.85.219.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HJowRHUJ"
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-70e3c6b88dbso7363277b3.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 08:16:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PWb+1w0F"
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e740a09eb00so918343276.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Jun 2025 08:29:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1749741413; x=1750346213; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1749742193; x=1750346993; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=pynYP3g1x7bEvnpKVAJ2PfUrR08T2TE/exFWGnDSM3k=;
-        b=HJowRHUJnCdBBX7a3anEB1c1FjMMI2oS0PAPV/1Hx9WCioBAycltIxSKF+d3pMlnef
-         qZfT5M2PTxH2c00I5ddIEfumZrOha5B/COWsmOd2/O2Szg6jE50Oo+VpS+bb50KhZy6V
-         p4OWOHk293QdmVgaaotb+DJ0DG8rd30UZouZXva3OJ3fBcDcbp9wKQMx9skaugctkv53
-         tFx16oMvrpRiKivJHNfAOJZhvR9xlPrAaEMmdb8CRn/JmH7QlPAyoCe4/g+YjtUn07g+
-         P3F8OV06Sbv9Cjn+O/JoYr9FsKwiZsgazqp4RC2Tf00IFXg+Pp3SHjrv+Ahq74dpSMgt
-         qwDA==
+        bh=geYJAPYMrYCt/FNmyMs6RoHZ9I62sqBam9PO+m4TAek=;
+        b=PWb+1w0FQv8zSZh9kKxSZG11pb8DY43lup8YJBwKf4vG89A1jVQ04KBHzwc8of+WzM
+         xn0MBaWxnZUopyZJa5YwGw+e4I+JwWdTkWV0rbBncmfHUyC8QZdyYqe0MM4owlKpZ9Pr
+         QpHJ2q8fM+ukhb5MADswLuheIbnsZky4irNymsvE14kwXLoI0AkbWzh1SIvN6bcOdY43
+         8BgFsTkjjqmBvflRFvDZaapw7KgfTPFikKMCs+uyGyeRsF1LKCRnxqYvOixGjnfeUuiK
+         9eSVG6lPczmaD8scAfebWmV7zZl/vsYL/LnV+BCx5KVA/N60fANvvnA+qdgeRb34tDaV
+         OoQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749741413; x=1750346213;
+        d=1e100.net; s=20230601; t=1749742193; x=1750346993;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pynYP3g1x7bEvnpKVAJ2PfUrR08T2TE/exFWGnDSM3k=;
-        b=CkyARDnKJ2B+3Ft3SNGeaua2uadXJpgXUPBA+E74K574ujujcLsbNeOZWUsZXcYz6i
-         Y2oDj0xpJP3elgqljb5lYohN7L8iAGkc6PNVFq6s/my5rSkePrcxf+vAtJORlI3+dwfy
-         rTSzYKcH84/PIitcReKHpE1YQhBUUdnWV+8mEWLETFII/ybSFkcce5562+kCfSxsvDJj
-         4F2B9Y1z4C3IYD7iw5d+/syjPrNBTrS9vftV8haCD9tWaesGvcC5Kt57yz7lPUnOh9Ei
-         SnfoYc+LHuMlwBdvMsFOZ+j1AH7yIzASkn8XfLTTLX9FCPeBogV4kO8hrc35a/fnZd+p
-         L0yA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+ztnDroepQbugIauZpvsuo2xqm0orlBpBX4TpPtXm0Gc+fmz9fS11lxfQvi2IVYswlTj/TzA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzAShpVNcu4dYwEtQUzD1KBg0ZYlaPWHp3+o+C04VUs7lsSbUlj
-	f0gMR75cnLbQUEAb3ehXqi/OjayyDPs7nD9eGSTP198VSsZPgQs5wzuraDRBEuQRh1eMzw5wb9/
-	UsUPkAu3jLeNM5lSEuOrKLHNmxNWiW/xcX//ZRYXeoA==
-X-Gm-Gg: ASbGncvAO37LoxijEvLYD7kBfHUaabTeu24bRXioBxDYKqartHGcEnEItFef7OfMSYm
-	T/08h2w0JWMs7TcuNF5VlkN9q36uaHOb7l/U+j9689XcZxhubHP2PbIHmUFAVRE+BC0C4/8ife4
-	Lasz4YE1XzLx0ximQjHwBfLPjLvmzJehbuLP+vYemrT8U3
-X-Google-Smtp-Source: AGHT+IGYiecPIEGI+SJaCfuiYeexAAl9RgvSgy2FQZTT1sSnvIQJSJ8BM7RWlCmuhu4n7BWqsMQg6VdmdcMZ9NIZDqM=
-X-Received: by 2002:a05:690c:39b:b0:6fb:b37f:2072 with SMTP id
- 00721157ae682-71140ab6714mr108064287b3.22.1749741413249; Thu, 12 Jun 2025
- 08:16:53 -0700 (PDT)
+        bh=geYJAPYMrYCt/FNmyMs6RoHZ9I62sqBam9PO+m4TAek=;
+        b=lQPC9svzIEKisQ4HFkQ63/dHTv8ctgvl7f/xBhMLpVIF70vGAyzGuiPc8a4ni8/NaV
+         0ZghaZHMf0YJBLA/E8+nud6odeJK3QYMaW6btEX5SHhFgF9PXakGnaROHG8+3In2V5Wu
+         2/esFrYqhcM5js99Cyti3ZvRj86Ty+Ija1tuy58uf9uOQHr+xcNvhG8RJ20YdnY9HFYU
+         F7enJFJVhpvTUpkrlnUYQi8AiaRmoFFB7IUg+vrVaTx0xn+SiCrfhK9Nb4iIiMTkvxwG
+         mySO/LfdcRKBxS7tFF+P3e8N/9RoRLON0RPml9SwBtOjLFchfjBO3wDGXbDIjAQ+efmO
+         uzmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWpsiNYBF5mpL/UNdj5/OtAIuL6ooUoOAmzQ4/5kaG+lecX/vz/VxC/TK3ch68E+fRH34lwcXk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwEXboVKviPEq2X6Oo3OtU1UYpBFtNPy6eZAiyltZfwtWKMS1cW
+	dTqVsbC6QTG81ps1tvidJ34gYSjy1vrrSn0p5N57AKyaqCRuP43HUILQgdRdW2T6QGy4SFKAICg
+	JmeQg5aFbrL65Mtprlh/SSi+afzY/fnngcb10/9U/cg==
+X-Gm-Gg: ASbGncvW5CKwG801DagaXpvTVbUPLwtSSQEJgiFqXrv6EgZbfDy6HDq9bgy77Tbr6J/
+	H9FgV+SrN87zgwscfkb/U/9gzFjEHRNGY5A8Cnlvnk2cmXkiMQiigmpmRV6kjLE3YO1dLW0gszp
+	zuoTzuTA9ZOHnhbC8r/aB8DLyWC+G+mOwTe+eUgT/rZ0kw
+X-Google-Smtp-Source: AGHT+IENjmqyi7346POaDkGZR6RfoGXIVitfUyfSfUlXG98lTBAK4TulNP1eC5vKMUT/0qOqM92Y6Hx33E5GW3olJ4A=
+X-Received: by 2002:a05:690c:7483:b0:70e:73ae:766c with SMTP id
+ 00721157ae682-71161effb98mr5173077b3.22.1749742193383; Thu, 12 Jun 2025
+ 08:29:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250515153907.151174-1-cohuck@redhat.com> <20250515153907.151174-9-cohuck@redhat.com>
-In-Reply-To: <20250515153907.151174-9-cohuck@redhat.com>
+References: <20250515153907.151174-1-cohuck@redhat.com> <20250515153907.151174-13-cohuck@redhat.com>
+In-Reply-To: <20250515153907.151174-13-cohuck@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jun 2025 16:16:41 +0100
-X-Gm-Features: AX0GCFuBHrJGT1DhrRgfURJ0MalgsW4xYAj3mIR8h1lKcbEjMTHrKhv4wIVn_nY
-Message-ID: <CAFEAcA-c=EaE-Y4DMVz_meVd2cbxuCyFGFOXET-COOgMWHXWWA@mail.gmail.com>
-Subject: Re: [PATCH v7 08/14] arm/cpu: Store id_isar0-7 into the idregs array
+Date: Thu, 12 Jun 2025 16:29:41 +0100
+X-Gm-Features: AX0GCFu9aivLSnaUx6RMU2aaTzhZKVbQDpI7U6eisLoQVjKLj6ZZzS6PLa-nZE4
+Message-ID: <CAFEAcA-xDxoRLWZCMrAEeSb3NvyyOPzYgFQbbEzGALujOOG-3g@mail.gmail.com>
+Subject: Re: [PATCH v7 12/14] arm/cpu: Add sysreg generation scripts
 To: Cornelia Huck <cohuck@redhat.com>
 Cc: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, 
 	qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org, 
@@ -79,47 +79,120 @@ On Thu, 15 May 2025 at 16:40, Cornelia Huck <cohuck@redhat.com> wrote:
 >
 > From: Eric Auger <eric.auger@redhat.com>
 >
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Introduce scripts that automate the generation of system register
+> definitions from a given linux source tree arch/arm64/tools/sysreg.
+>
+> Invocation of
+> ./update-aarch64-sysreg-code.sh $PATH_TO_LINUX_SOURCE_TREE
+> in scripts directory generates target/arm/cpu-sysregs.h.inc
+> containing defines for all system registers.
+>
+> [CH: update to handle current kernel sysregs structure, and to emit
+>      the re-worked register structures; cpu properties will be added
+>      later]
 > Reviewed-by: Sebastian Ott <sebott@redhat.com>
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  hw/intc/armv7m_nvic.c     |  12 ++--
->  target/arm/cpu-features.h |  36 +++++-----
->  target/arm/cpu.c          |  24 +++----
->  target/arm/cpu.h          |   7 --
->  target/arm/cpu64.c        |  28 ++++----
->  target/arm/helper.c       |  14 ++--
->  target/arm/kvm.c          |  21 ++----
->  target/arm/tcg/cpu-v7m.c  |  90 +++++++++++++-----------
->  target/arm/tcg/cpu32.c    | 144 +++++++++++++++++++++-----------------
->  target/arm/tcg/cpu64.c    | 108 ++++++++++++++--------------
->  10 files changed, 243 insertions(+), 241 deletions(-)
 
-This doesn't compile:
+> diff --git a/scripts/gen-cpu-sysregs-header.awk b/scripts/gen-cpu-sysregs-header.awk
+> new file mode 100755
+> index 000000000000..452e51035d52
+> --- /dev/null
+> +++ b/scripts/gen-cpu-sysregs-header.awk
 
-../../target/arm/tcg/cpu-v7m.c:70:5: error: incompatible pointer types
-initializing 'ARMISARe
-gisters *' (aka 'struct ARMISARegisters *') with an expression of type
-'uint64_t *' (aka 'unsigned long *')
-[-Werror,-Wincompatible-pointer-types]
-   70 |     SET_IDREG(idregs, ID_ISAR0, 0x01141110);
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../../target/arm/cpu.h:875:26: note: expanded from macro 'SET_IDREG'
-  875 |         ARMISARegisters *i_ = (ISAR);
-         \
-      |                          ^    ~~~~~~
-../../target/arm/tcg/cpu-v7m.c:71:5: error: incompatible pointer types
-initializing 'ARMISARegisters *' (aka 'struct ARMISARegisters *') with
-an expression of type 'uint64_t *' (aka 'unsigned long *')
-[-Werror,-Wincompatible-pointer-types]
-   71 |     SET_IDREG(idregs, ID_ISAR1, 0x02111000);
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../../target/arm/cpu.h:875:26: note: expanded from macro 'SET_IDREG'
-  875 |         ARMISARegisters *i_ = (ISAR);
-         \
-      |                          ^    ~~~~~~
+This should probably have 'arm' in the filename somewhere, unless
+it's really architecture-agnostic, which I don't think it is.
 
-(and more similar errors until the compiler gives up).
+> @@ -0,0 +1,35 @@
+> +#!/bin/awk -f
 
+Does this really need to be in awk? Our standard scripting
+language is python. This isn't run at build time so there's
+no "extra dependency" issue, but we currently use awk only
+minimally and almost always for trivial stuff.
+
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +# gen-cpu-sysregs-header.awk: arm64 sysreg header include generator
+> +#
+> +# Usage: awk -f gen-cpu-sysregs-header.awk $LINUX_PATH/arch/arm64/tools/sysreg
+> +
+> +BEGIN {
+> +    print ""
+> +} END {
+> +    print ""
+> +}
+> +
+> +# skip blank lines and comment lines
+> +/^$/ { next }
+> +/^[\t ]*#/ { next }
+> +
+> +/^Sysreg\t/ || /^Sysreg /{
+> +
+> +       reg = $2
+> +       op0 = $3
+> +       op1 = $4
+> +       crn = $5
+> +       crm = $6
+> +       op2 = $7
+> +
+> +       if (op0 == 3 && (op1>=0 && op1<=3) && crn==0 && (crm>=0 && crm<=7) && (op2>=0 && op2<=7)) {
+> +           print "DEF("reg", "op0", "op1", "crn", "crm", "op2")"
+> +       }
+> +       next
+> +}
+> +
+> +{
+> +       /* skip all other lines */
+> +       next
+> +}
+
+Generated source files should have a comment at the top
+noting that they're autogenerated and how to regenerate
+them, please.
+
+> diff --git a/scripts/update-aarch64-sysreg-code.sh b/scripts/update-aarch64-sysreg-code.sh
+> new file mode 100755
+> index 000000000000..e34538887dd8
+> --- /dev/null
+> +++ b/scripts/update-aarch64-sysreg-code.sh
+> @@ -0,0 +1,26 @@
+> +#!/bin/sh -e
+> +#
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +# Update target/arm/cpu-sysregs.h
+> +# from a linux source tree (arch/arm64/tools/sysreg)
+> +#
+> +# Copyright Red Hat, Inc. 2024
+> +#
+> +# Authors:
+> +#          Eric Auger <eric.auger@redhat.com>
+> +#
+> +
+> +linux="$1"
+> +output="$PWD"
+
+We seem to set this but then not use it.
+
+> +
+> +if [ -z "$linux" ] || ! [ -d "$linux" ]; then
+> +    cat << EOF
+> +usage: update-aarch64-sysreg-code.sh LINUX_PATH
+> +
+> +LINUX_PATH      Linux kernel directory to obtain the headers from
+> +EOF
+> +    exit 1
+> +fi
+> +
+> +awk -f gen-cpu-sysregs-header.awk \
+> +    $linux/arch/arm64/tools/sysreg > ../target/arm/cpu-sysregs.h.inc
+
+This looks like it is assuming that the user runs the script
+from within the scripts/ directory ?
+
+Following the same command line conventions as our existing
+scripts/update-linux-headers.sh is probably the least
+surprising thing.
+
+thanks
 -- PMM
