@@ -1,114 +1,73 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1DA293C5C
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 13:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0132E2E11CD;
+	Fri, 13 Jun 2025 14:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749823043; cv=none; b=D0HXEapojblXqK3U9h9edO6Ma+6KySO8ZGV9vqhSOf6Nozxmgu4GSeg80n9LdWI+MDEojuh9RV3oUhe/icA0RngtHLmD4w/HZyawDgcEPnBmXKsG5GnwMNv3gXGDqFxTuAiwuto8B+Tc/JfM8HXhDvouVd2ZZwZtu2XeiHRLWQQ=
+	t=1749824434; cv=none; b=ZpovKod8C1WYMNinYJoLABNSkh1CrTh6K1ttxVgi8+UsobdCYJH8ZvUTYEh6OsYzLRzO528yJiJAVSQ587aWxZA9RzjJbN93d4YoSKFxk+qnLrx26EEL09LO21YYgA5Y0eD5JB+KrFpiXMpnyAB2gIiKUCtbvGLMHTo9s/tR0AI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749823043; c=relaxed/simple;
-	bh=j/eRngj8H8ZbdpnO0fFDIsk8hiEYRjMNb+L170l84M4=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=puAj14ufZ9Fbdojk+GfIQgNCnAoQooWY+vRpI6Zq7tf7r8cPbR07LbSyRsd9YYtM99eLAvuk6i5z/8oWB8rXlIG7ZuP13cy593LzSBuuw7cLvplg7UjYZFIeyyK9TZPrB/ybSUb9KnQY92uYohYdm4yGNPUGZL/Jouh0BEVl0Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DvowhBNM; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1749824434; c=relaxed/simple;
+	bh=EPKHkNW/pWvGSKzvuK+zaYdXAKILaYuidguqxeIk4Yw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ya/jATSekTqHmbFZiKIQ4xVTjBQo3jYMxUeOVsyi4uWuqMZEXzyNUeU1mYjmjHb9zWpC95/OwE3rJjDwkLAikuibzaAK5yRdqAXWYhmShh6FGMdzOIVG0NK8SpP1Gc1MbtIK/llzt1ObYRS0wkpXpEi90yqsnN1g0yHGEqbWk48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ve6FZ8Al; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DvowhBNM"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-234dbbc4899so30989615ad.2
-        for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 06:57:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749823041; x=1750427841; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dkuRqqw31HUjS3f3ozaxg1qfTggthracEAgq5uGUxWg=;
-        b=DvowhBNMZ/FiiFchNNzZghpr/xzEan7xRl7OjPidJJg9Esgye/wW9uD79VZawU8DZF
-         +U2ubZuFuTC69B7EOI0e85mTBgpYtjH9F5NHRm/bj7uk6fscWnHKlAfOiU8STpL8sfqW
-         zhssFW4lPzm9RZt5X1KJsz1YQTJ35HBWR4nNwh+O/3t/JwhgHJIJquEmVpHQ7t4zq36z
-         1nf0c0zALSJR5TnJOe9gkF89qPiTvc2HPdcpUpbI8r1HPwbgrnUlVDrfcswE9RNi/qR1
-         H1IQCahFc9jqF6AUIe/O0YAMI9vGGjnqJqVwDZNBi1o4ED5QSwrE2Ppspx6QWuT4xcyK
-         z3PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749823041; x=1750427841;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dkuRqqw31HUjS3f3ozaxg1qfTggthracEAgq5uGUxWg=;
-        b=Whd84ygl/VxncM7pOLNS/gPEEmTP5MeMIWaNsro9fwsZk8JXQ1qDVUwaODWFYQDBBm
-         qW6aXBjev1q1wSdvfiw3IaIjo+cuv8AlYzPWs9GQHeQdDxPkqfN0lGawD7o6Zwx6Uvwp
-         oMgnLe0S9oVoUX3iJ9y+iCZL7sGZOXhNjsgfi9E0IBmOHyJLAmZxkLXjSbySt9tx6Qfm
-         OVpciUj345eWc7a8HNE8qig3PvTcyPN014+D1sU4Zw1WuT/l1hhtuyBG7xsZkRoMIiSi
-         fe4DjuwfQosSsr+coljECpylA52q8RR6CcS/R18KV1XKY3LMSoqboV/NtWXS4jGq9jjX
-         5dxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWG6+A5OfM5lm6Wgx5rqkHL9Xdxo3NHjMY2gKv6acogN+V3e1wgWkrmoYlbRzscI4I7pcTgqCU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxkc6vxugyVfLpbGk1wGkNzcR8IzTkVz5VnstbpHfZtIhV0HO9o
-	OvFSwGY7tO+4YLmKWMXiiLFdna66m0r2M2jgNdvTC8Tj2Yv9YbA4xEuKQ9QKPGwIkqc9lw04E6Y
-	fxL/bFfdXBwXeRi8ex8mMZ7cuWg==
-X-Google-Smtp-Source: AGHT+IE4pdDA+YU0xuWw2bZwqNNa/bw6PDc1eh7mNKACvMbud4eEJ6Hw9B3p1LPkjrd3WQIzMQtFfcUKJ8Y+9UsC3w==
-X-Received: from pgbfm22.prod.google.com ([2002:a05:6a02:4996:b0:b29:82be:c692])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:fc44:b0:234:c549:da14 with SMTP id d9443c01a7336-2365dc0d163mr46118995ad.29.1749823040963;
- Fri, 13 Jun 2025 06:57:20 -0700 (PDT)
-Date: Fri, 13 Jun 2025 06:57:19 -0700
-In-Reply-To: <20250611133330.1514028-5-tabba@google.com> (message from Fuad
- Tabba on Wed, 11 Jun 2025 14:33:16 +0100)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ve6FZ8Al"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2B14C4CEED;
+	Fri, 13 Jun 2025 14:20:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749824433;
+	bh=EPKHkNW/pWvGSKzvuK+zaYdXAKILaYuidguqxeIk4Yw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ve6FZ8Alf9SI1sYrlPynorHq3vd7XO0hctfD/FwFi1Yr570jgszY/sWUWJFbKLuPM
+	 nQu71s/Hul7EmxbxouGX5T+wjrRTxgKeiFEW+bs5rkJCsFxcwHU759DXQlTabuPT5G
+	 PxDjtDGhNA7kvKkd2UzQA8HlsRM8T/eu+E+TSoKOFPtdjGyfJ5fxBxWqQP/vDzNKLr
+	 oD0dnXeWr2CjqBr5qLfbFaASn2OOi+AW791J7XUTflq3fgp8foITPixPCD2A4VIN4d
+	 G1byFjPOeultEOPjaOsp5MWi85kGbs7/Mu2645Oib8V07SqMlETiiDgfkafiy09YOZ
+	 U5tjo5xm+nn/A==
+Date: Fri, 13 Jun 2025 19:45:10 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v3 08/62] KVM: SVM: Drop pointless masking of default
+ APIC base when setting V_APIC_BAR
+Message-ID: <7kz6bvwpnsbth4puaivtygdzygqmcippdgkihieqcy5ua5rlpr@biu2qjtzraxz>
+References: <20250611224604.313496-2-seanjc@google.com>
+ <20250611224604.313496-10-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <diqzv7ozvj5s.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v12 04/18] KVM: x86: Rename kvm->arch.has_private_mem to kvm->arch.supports_gmem
-From: Ackerley Tng <ackerleytng@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611224604.313496-10-seanjc@google.com>
 
-Fuad Tabba <tabba@google.com> writes:
-
-> The bool has_private_mem is used to indicate whether guest_memfd is
-> supported. Rename it to supports_gmem to make its meaning clearer and to
-> decouple memory being private from guest_memfd.
->
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Shivank Garg <shivankg@amd.com>
-> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-> Co-developed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+On Wed, Jun 11, 2025 at 03:45:11PM -0700, Sean Christopherson wrote:
+> Drop VMCB_AVIC_APIC_BAR_MASK, it's just a regurgitation of the maximum
+> theoretical 4KiB-aligned physical address, i.e. is not novel in any way,
+> and its only usage is to mask the default APIC base, which is 4KiB aligned
+> and (obviously) a legal physical address.
+> 
+> No functional change intended.
+> 
+> Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/include/asm/kvm_host.h | 4 ++--
->  arch/x86/kvm/mmu/mmu.c          | 2 +-
->  arch/x86/kvm/svm/svm.c          | 4 ++--
->  arch/x86/kvm/x86.c              | 3 +--
->  4 files changed, 6 insertions(+), 7 deletions(-)
->
+>  arch/x86/include/asm/svm.h | 2 --
+>  arch/x86/kvm/svm/avic.c    | 2 +-
+>  2 files changed, 1 insertion(+), 3 deletions(-)
 
-This [1] is one recently-merged usage of arch.has_private_mem which
-needs to be renamed too.
+Reviewed-by: Naveen N Rao (AMD) <naveen@kernel.org>
 
-[1] https://github.com/torvalds/linux/blob/27605c8c0f69e319df156b471974e4e223035378/arch/x86/kvm/vmx/tdx.c#L627
+- Naveen
 
-[...]
