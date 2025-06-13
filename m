@@ -1,87 +1,271 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E936C24A069
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 20:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D1325A355
+	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 21:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749848004; cv=none; b=LrDY2Qa1G619JPOuiZThMG3amGM7kt+kW9RF1U2KQOvMYepSrrLJzkJS8MPoxaN9qRGUZ9zgsIkheLY/+Y7jjSnZW/xqELwC+XUn3+80NvYa0I2liKygQWGXJENhKoqzo4V8EnAtv8i5izoeVgeBOVRqFqOa7yp8LpQr3d6B9Kk=
+	t=1749848597; cv=none; b=hbAjNfDpaCmnidPWWL+n9WUwgcUeGp5CtAZ0EfOom1f4UIxV6XEhFNWVOYe3LF3IYjPOnRcCQz2h9DVGHpE7O5F7NHjHc/tu2bhroVrEb16GVD3AuBDz7PTbobB+81E6xvtjvpD/1jSdJSxN4v7EZ28crPsQTsRrBfw0p3J9vjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749848004; c=relaxed/simple;
-	bh=B5/IFja4RVVEVHRpLRymgFk1+5qawt7Y2fr5pwUM4K4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hRm8pOHxPLs4cxOdn6DI4Un+zY4NBudHEbmYGXA6DzQpXvF6+hf1FVAPQ7MBLMH1SR6DOM6ytnTs2QbTv2k3vQ/M0G7GGyr3mW/bgO/pnJsEPyotVY3mrKPao/6nCxbB1/G8+XSr7kt35DM2nS2/hSd+nYtbBKephbQV9Xdnb6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pVR5GWgk; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1749848597; c=relaxed/simple;
+	bh=lT7Zcp8p6wA3KAogKquAqZSGA7HSCm6dNohixcuq6/I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eB6V0KTc4AKWRjXu8uBxZKFENm08TCnYhmw+KT4Bgh7gLlmLBUdFJJH7RcWdw0PeOjEiOLXszn62zzBUNB3rB3TCRu7VcTrIdpa5Rn1C0lO6P1VJtv7Wm8AztpRsggK7wYm+Jz1mXfe14KugowWUR1twxIkYViMB41EJj3ZhgBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kS67FIAK; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pVR5GWgk"
-Date: Fri, 13 Jun 2025 13:53:07 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1749847991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fKlTMyrwwqDx/wAU3aYigDU8KWuXM98SDm/vlqdsd+M=;
-	b=pVR5GWgkNqzsvtdbkN7JjzMCt22LvsxgOGhb/+msVanV1s7cBRUoJZ6bsNyRtYMjiXXiS3
-	Jq95S+FMYqTB1feRQVAKEXu5wBaWE70jcJPnTo+rKRHdUgxmCbgd5muA55kq8S8KAcj3Ev
-	bzi2e9zImCp9gL0sj9glDsWQV/2sN1A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] KVM: arm64: Add attribute to control
- GICD_TYPER2.nASSGIcap
-Message-ID: <aEyPswyvfJ2-oC3l@linux.dev>
-References: <20250613155239.2029059-1-rananta@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kS67FIAK"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-af59547f55bso1547063a12.0
+        for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 14:03:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749848593; x=1750453393; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A3Wch+x3uNF1XdTWEOPRulvN+JzipLoRE2aMsLqF+rU=;
+        b=kS67FIAKQIMQYkIYHEUWCmiZ1opS8xGG9OcpH42VkwSSryEgzwjWJLT4+4amplaYvG
+         AgMrGq5lJr8J1p5pMo+LrZakEKWo1CDQxiOoReqPCnBAgqAqDyLkzkA2fbnOEBjzPcmp
+         WUpux2FEv1i0mhk6Bn/8RW8S/qrwKTXzPjNuM1zyOEB/axKpBXVxvtFhWNo+3gxKBDY7
+         7Ly0U7eG4Il7MVCSeL0LT5/MYZBZ9UWTAuBGYV0/ItrS/KBOfEyljLdPfPZLo0HR19PH
+         rM6pjv7+DPcSoHuRDuvpfzdVRVItWWQ1VQudhS5GmnaIMVuiEebgLlQFj7gFSL6M3yRR
+         XmaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749848593; x=1750453393;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A3Wch+x3uNF1XdTWEOPRulvN+JzipLoRE2aMsLqF+rU=;
+        b=OhL5QGKGdQsTK8zpxFCjbehYlrgMk6+I2qs8YQwLZcYhPdpuvpWt8/fwToA4goocbg
+         pOZCvglKCEy/0au+4Ioup8XrdMXgS4o2ocGz/wnG21ft1BiBsD8wmrNdBSX8krcW/rb8
+         CzrAGLy3wJR/VU/JXU3MekQflaPo0sjam/a3SCijn0nrzz9sExnw+2Gb5BN+Qg3LTAQF
+         8SatX94DCBwpwMSrAa3fMOIXQGG08M9INZYGhgxBOIEpYerrgW6LCGu6rebp+RjzxRQT
+         WZKWxbHYzAksWyLxvwVs21GhY6YeBwUOGaBqazLj7c9jwnftCBwGxl+tciVt8ebq78hU
+         u1wg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNj2Yi7LrZQ3iWZvGZb7Q33k4BoAbONDFAFve5UDz1c9o1GIo2CTpaaAqt9JzX0fONok+gIzY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YweyBcAO2icvHBfy9PpCowhd7EnYzPM7Q3hsNdvSKUEPn7jtf68
+	8AjCzcBGozr+xhN5/0+HlIWhv11Ishwej+DCoHGxGwl81SCGgeC0k0PTNmX3gLrycARfgT3PBR9
+	xHMOFiA==
+X-Google-Smtp-Source: AGHT+IFCqUrg4V9bdDrybRc7q8t0EQEaXYwnc3flICr7EMgc9UCftl1VaSgXOwrdPngPPXCTz+jIrKW0iLY=
+X-Received: from pfbch3.prod.google.com ([2002:a05:6a00:2883:b0:746:22b3:4c0d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3a48:b0:1f3:2e85:c052
+ with SMTP id adf61e73a8af0-21fbd634e55mr1185002637.35.1749848592921; Fri, 13
+ Jun 2025 14:03:12 -0700 (PDT)
+Date: Fri, 13 Jun 2025 14:03:11 -0700
+In-Reply-To: <20250611133330.1514028-9-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613155239.2029059-1-rananta@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-9-tabba@google.com>
+Message-ID: <aEySD5XoxKbkcuEZ@google.com>
+Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jun 13, 2025 at 03:52:34PM +0000, Raghavendra Rao Ananta wrote:
-> A shortcoming of the GIC architecture is that there's an absolute limit on
-> the number of vPEs that can be tracked by the ITS. It is possible that
-> an operator is running a mix of VMs on a system, only wanting to provide
-> a specific class of VMs with hardware interrupt injection support.
-> 
-> The series introduces KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap vGIC attribute to allow
-> the userspace to control GICD_TYPER2.nASSGIcap (GICv4.1) on a per-VM basis.
-> 
-> v1: https://lore.kernel.org/kvmarm/20250514192159.1751538-1-rananta@google.com/
-> 
-> v1 -> v2: https://lore.kernel.org/all/20250531012545.709887-1-oliver.upton@linux.dev/
->  - Drop all use of GICv4 in the UAPI and KVM-internal helpers in favor
->    of nASSGIcap. This changes things around to model a guest feature,
->    not a host feature.
-> 
->  - Consolidate UAPI into a single attribute and expect userspace to use
->    to read the attribute for discovery, much like we do with the ID
->    registers
-> 
->  - Squash documentation together with implementation
-> 
->  - Clean up maintenance IRQ attribute handling, which I ran into as part
->    of reviewing this series
-> 
-> v2 -> v3:
->  - Update checks in vgic-v3.c and vgic-v4.c to also include nASSGIcap (via
->    vgic_supports_direct_sgis()) that's configured by the userspace. (Oliver)
-> 
-> Oliver Upton (2):
->   KVM: arm64: Disambiguate support for vSGIs v. vLPIs
->   KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
+On Wed, Jun 11, 2025, Fuad Tabba wrote:
+> This patch enables support for shared memory in guest_memfd, including
 
-Make sure you run checkpatch next time before sending out, it should've
-warned you about sending patches w/o including your SOB.
+Please don't lead with with "This patch", simply state what changes are being
+made as a command.
 
-Thanks,
-Oliver
+> mapping that memory from host userspace.
+
+> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
+> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
+> flag at creation time.
+
+Why?  I can see that from the patch.
+
+This changelog is way, way, waaay too light on details.  Sorry for jumping in at
+the 11th hour, but we've spent what, 2 years working on this? 
+
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d00b85cb168c..cb19150fd595 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1570,6 +1570,7 @@ struct kvm_memory_attributes {
+>  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+>  
+>  #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
+> +#define GUEST_MEMFD_FLAG_SUPPORT_SHARED	(1ULL << 0)
+
+I find the SUPPORT_SHARED terminology to be super confusing.  I had to dig quite
+deep to undesrtand that "support shared" actually mean "userspace explicitly
+enable sharing on _this_ guest_memfd instance".  E.g. I was surprised to see
+
+IMO, GUEST_MEMFD_FLAG_SHAREABLE would be more appropriate.  But even that is
+weird to me.  For non-CoCo VMs, there is no concept of shared vs. private.  What's
+novel and notable is that the memory is _mappable_.  Yeah, yeah, pKVM's use case
+is to share memory, but that's a _use case_, not the property of guest_memfd that
+is being controlled by userspace.
+
+And kvm_gmem_memslot_supports_shared() is even worse.  It's simply that the
+memslot is bound to a mappable guest_memfd instance, it's that the guest_memfd
+instance is the _only_ entry point to the memslot.
+
+So my vote would be "GUEST_MEMFD_FLAG_MAPPABLE", and then something like
+KVM_MEMSLOT_GUEST_MEMFD_ONLY.  That will make code like this:
+
+	if (kvm_slot_has_gmem(slot) &&
+	    (kvm_gmem_memslot_supports_shared(slot) ||
+	     kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
+		return kvm_gmem_max_mapping_level(slot, gfn, max_level);
+	}
+
+much more intutive:
+
+	if (kvm_is_memslot_gmem_only(slot) ||
+	    kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE))
+		return kvm_gmem_max_mapping_level(slot, gfn, max_level);
+
+And then have kvm_gmem_mapping_order() do:
+
+	WARN_ON_ONCE(!kvm_slot_has_gmem(slot));
+	return 0;
+
+>  struct kvm_create_guest_memfd {
+>  	__u64 size;
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 559c93ad90be..e90884f74404 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -128,3 +128,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+>  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+>         bool
+>         depends on KVM_GMEM
+> +
+> +config KVM_GMEM_SHARED_MEM
+> +       select KVM_GMEM
+> +       bool
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 6db515833f61..06616b6b493b 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -312,7 +312,77 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+>  	return gfn - slot->base_gfn + slot->gmem.pgoff;
+>  }
+>  
+> +static bool kvm_gmem_supports_shared(struct inode *inode)
+> +{
+> +	const u64 flags = (u64)inode->i_private;
+> +
+> +	if (!IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM))
+> +		return false;
+> +
+> +	return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> +}
+> +
+> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+
+And to my point about "shared", this is also very confusing, because there are
+zero checks in here about shared vs. private.
+
+> +{
+> +	struct inode *inode = file_inode(vmf->vma->vm_file);
+> +	struct folio *folio;
+> +	vm_fault_t ret = VM_FAULT_LOCKED;
+> +
+> +	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
+> +		return VM_FAULT_SIGBUS;
+> +
+> +	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> +	if (IS_ERR(folio)) {
+> +		int err = PTR_ERR(folio);
+> +
+> +		if (err == -EAGAIN)
+> +			return VM_FAULT_RETRY;
+> +
+> +		return vmf_error(err);
+> +	}
+> +
+> +	if (WARN_ON_ONCE(folio_test_large(folio))) {
+> +		ret = VM_FAULT_SIGBUS;
+> +		goto out_folio;
+> +	}
+> +
+> +	if (!folio_test_uptodate(folio)) {
+> +		clear_highpage(folio_page(folio, 0));
+> +		kvm_gmem_mark_prepared(folio);
+> +	}
+> +
+> +	vmf->page = folio_file_page(folio, vmf->pgoff);
+> +
+> +out_folio:
+> +	if (ret != VM_FAULT_LOCKED) {
+> +		folio_unlock(folio);
+> +		folio_put(folio);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct vm_operations_struct kvm_gmem_vm_ops = {
+> +	.fault = kvm_gmem_fault_shared,
+> +};
+> +
+> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> +{
+> +	if (!kvm_gmem_supports_shared(file_inode(file)))
+> +		return -ENODEV;
+> +
+> +	if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
+> +	    (VM_SHARED | VM_MAYSHARE)) {
+
+And the SHARED terminology gets really confusing here, due to colliding with the
+existing notion of SHARED file mappings.
+
+> +		return -EINVAL;
+> +	}
+> +
+> +	vma->vm_ops = &kvm_gmem_vm_ops;
+> +
+> +	return 0;
+> +}
+> +
+>  static struct file_operations kvm_gmem_fops = {
+> +	.mmap		= kvm_gmem_mmap,
+>  	.open		= generic_file_open,
+>  	.release	= kvm_gmem_release,
+>  	.fallocate	= kvm_gmem_fallocate,
+> @@ -463,6 +533,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+>  	u64 flags = args->flags;
+>  	u64 valid_flags = 0;
+>  
+> +	if (kvm_arch_supports_gmem_shared_mem(kvm))
+> +		valid_flags |= GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> +
+>  	if (flags & ~valid_flags)
+>  		return -EINVAL;
+>  
+> -- 
+> 2.50.0.rc0.642.g800a2b2222-goog
+> 
