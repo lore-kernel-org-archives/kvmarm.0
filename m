@@ -1,199 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7402B2356C0
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 21:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406FB2397A4
+	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 21:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749849502; cv=none; b=BDg80T6NuHIF2l6n5ihCEaZDZoiIbWlAeIAdORsyc3bPH0jyKNwpYxCOmRrDQhCd/xWVe/giNS5oVaw40ZZ/FNH6H6PahgwCScl6hLjVCkZP/Hej7+hQUilNDx20e8Ps/FGm6qS3HYiqJcXtqKTGiKZk4lYRpja2kqYZ8T3H0UQ=
+	t=1749849941; cv=none; b=HMj8c0o4WfKy84mp95kmEhT+1qnL+1C880LFYk2GqJQU4S++LG46y7zi/mplvECpUZLqdDzSvhvLf7yBWqNgMVB7XTECyAiOaFYHPWrb6tKaEtJhM8eoyo55CWMTEsxjkqXGb7elPgSJkSH9D80FY1x5i3ZZ9mzrE+tmZfEPYw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749849502; c=relaxed/simple;
-	bh=cjS1R/h5yYqj8F/QZF4nccCyoFcjDNQc4ZKgUarS9ts=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ua7PkBjbMJJy2+RKcLt9OsiGgvSsWYLyCurB7Lm5WZHNrjkOzZDsrX9/WmeEyf6T9DvWhU4e5umA6ZTwl2AeNZcXnUYXfWr8FkN6BsInu7b8DAt0iQSTM8Nk9eAjhDlvbxN6cfd05iUFGSMpuHENJ6gcXMv2v2nXjXpLPmm+f6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FnwFW4yq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1749849941; c=relaxed/simple;
+	bh=sHV8yx62yol9Bk56YKbLE0IVF5sfS+vZdmV+r8o63x0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ILUgKQ6XbmLbF/MAS1ZpPTlO9cfKmugpnLQRZgSCDe+3kQHaQCEF40Osb4VyqCe3f25c02ZF9C/tLV6i6HZ3aKkvT/krkWt1x4377cNdXfqjdGyrhVAdUlXWDJRUjUolx0uG3fDHD3PUZ5Do8vKGpVoi+pmoJLfb7ZMfNCm1aiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lo1Pvri7; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FnwFW4yq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749849499;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ufscstiQHCbS9G1pdl0dbNIBD2ajGNOtHVKChNRSU3k=;
-	b=FnwFW4yqajHp9CCUEdq2M8QVguhLJtgcgUz205/E76fRSVE6Cbj8G87fMl1bUahldefFtn
-	vdMjjQJ9qwlobEAFf8KUHTYou59+QOgaOmtTLJbvDpzr8LdNNkG9dqeXWK36Wymi6qHGya
-	WUvnUnQ4zGc1hg9ZnItlqjyqP8iZSKU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-70-ooF2hkutOlu9fBJZ4bZaQg-1; Fri, 13 Jun 2025 17:18:18 -0400
-X-MC-Unique: ooF2hkutOlu9fBJZ4bZaQg-1
-X-Mimecast-MFC-AGG-ID: ooF2hkutOlu9fBJZ4bZaQg_1749849497
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-450de98b28eso20174235e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 14:18:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lo1Pvri7"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a5ac8fae12so114071cf.0
+        for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 14:25:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749849939; x=1750454739; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TPUzIppHcu65DcXjx+xmQ4p2o7TM+1lbGXLpXn/D90M=;
+        b=lo1Pvri7kP7jfi/gvpHy8xDL7eIITXqfKRtzVmil1/bVNuDCFAxTlHwogFEvQdgZc4
+         b7vkgdjubPCY1/IhkjFiSJExPQIPBPfW1yAYhjmtwGFG1qVo4UCe/Q6GUomms+00iPeL
+         hwXI+Xb6RwH29RtCJrpKKRVsEd6p99N9I5yHT/42P5FP6Ulp+oTZnqAoVasACcKCcvzH
+         S/TkyEf0dh1VIG5+6q16HQ1qp2OMNbzn/B4MsVwO542+rZKKBNIedjV6aRwidVUns2zl
+         4AX1LblAoXB7OhbG3lM58+miSMLfrHyytexc5PulZ05e8IfgGImh6Cm9Yp4O/vcLSbLS
+         L3Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749849497; x=1750454297;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ufscstiQHCbS9G1pdl0dbNIBD2ajGNOtHVKChNRSU3k=;
-        b=twCX2dmZSmawxkt1aT4ELFW44L1WMkmxdtToziukvclS/5Zp6y74BWmcz5M4rmY6qr
-         9oE4s0gxRx8mI2bojHu4vhHCNsr344MXZkKV7PpgOoM6RKYLdL6O7O0rOPasjt7a7BFd
-         aRZZD71f2VZTZSS/OEUn0ERAjIRqe5mU4E9WFjRAidrUH3Q6x1ZPZ+whjVwmeYrhsPuW
-         Gv4ZbGR+MrIM4niDwP3FGWy6gIvY0P7cCLRHEXNOUPzTN1sE04auQH552henaD0Pj1aa
-         YCVxa/MHN3Navex7QoWOd0GYtpT9VlmElWKHRMe+lh21tNZQHJmyd9pyLVI3OWSWCo+K
-         y23w==
-X-Forwarded-Encrypted: i=1; AJvYcCVD0Gl8xkdS1m2FnpKD0frQHwcyAp14OlJrEKRq3YHqdFgQEX8GYBmVPUi5USnQ6jYiE05w0EE=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx1gvBbfTT7YNcbvhhahbWwMxRFRTWis85zDqsZRGQQhj9gkI4e
-	mFcsVk1dWG1xYOeomEM+yC6KmTd+suFCJvOw4llS1DAyW463U0ZEjG1Sti1nwUBPRdesX6/dcpV
-	C1mrsy/tj4z6xITTd+V8f/PYhykvObZMq8Zl0mD0NZFEOqnX13PxZGtvaJQ==
-X-Gm-Gg: ASbGncvwlByyP9KLTQT6f0ENjpjFqHgof+OL7apjIBorJagNiw2h+02d+2xPeunAkDU
-	DL4082tlfKE75kn4+Fs1/roSnmMFk/gtF4c1CC2FvUENhJJxnIg7M2oAYqrQ0yOl7qPe0UM9fNA
-	Nnj3jF8QFPFNsDBfbPzjGgPxOyxrVmBEB3Dx2AyCrTzaCK3zhI4DwDqm0lbsVk1dMbGm5gFTdYP
-	CQIpCZi5bfmLdVc3rEQ5r0n0GOKKz8tay0D2i9Gs22VJIZ3BXeZoEVuKbW4514Nz0AZuuDTUJ0G
-	3NRwD4/vKdhBwXlWICH2Xow5UJBZ3YxffF8ZDSdZQYr+BhiReavjTgNXVwZmeVI+iYmuGq/dAfB
-	XOobNBT67h5V3V8tHMpw3zr7LSqi2lhcqWKGRu7/egI23xCD/Lg==
-X-Received: by 2002:a05:600c:8b45:b0:43b:c6a7:ac60 with SMTP id 5b1f17b1804b1-4533c92e57bmr12391215e9.10.1749849496944;
-        Fri, 13 Jun 2025 14:18:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEOB0FovDmJMWiAczOt+st9w/YGQAhqOEOsMFMcs9zkOeNn6NLpFPp2mWC5LMWJqaHx++tm7w==
-X-Received: by 2002:a05:600c:8b45:b0:43b:c6a7:ac60 with SMTP id 5b1f17b1804b1-4533c92e57bmr12390675e9.10.1749849496527;
-        Fri, 13 Jun 2025 14:18:16 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f1a:3700:2982:b5f7:a04e:4cb4? (p200300d82f1a37002982b5f7a04e4cb4.dip0.t-ipconnect.de. [2003:d8:2f1a:3700:2982:b5f7:a04e:4cb4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e172b03sm63129605e9.36.2025.06.13.14.18.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Jun 2025 14:18:15 -0700 (PDT)
-Message-ID: <09b66a3f-e7f9-43b2-be9a-bbf6310b3c43@redhat.com>
-Date: Fri, 13 Jun 2025 23:18:12 +0200
+        d=1e100.net; s=20230601; t=1749849939; x=1750454739;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TPUzIppHcu65DcXjx+xmQ4p2o7TM+1lbGXLpXn/D90M=;
+        b=DRQcND+yBPAoNXYN+FtMhwrDTKG9BRnop6oFVnBpN8uJn1/HnhQDl2UAnwG1M8zxEk
+         2Knqoq3AqOFzdVivORKLyyX2VxNIkZOWskAXo4RjfWGTEtWmz/U0XfmnxWzTlzlO9yCe
+         eCYmiYged/Qn0l6KCaIBg4BW7eStRbRaxyH2UYXqCh3SSVIaJKjVlio8sRBeUrBOVIrg
+         U9kz/GeZ2DkjLZRJuts4HFO5J5wC4+VJQAsAu3nyy1FBkIyne62oihyrk1Q3vPGQbqoO
+         MffWWuig/ShtCmCLoO33TB+bGXrX0aWn476yofmjnqZinVuKqh92Cqef7Ta42vKp+qLr
+         Dltw==
+X-Forwarded-Encrypted: i=1; AJvYcCUYkmOn0ygzFq33tmSn7GsDABdgL7DRGWpS0M+2sIrI1Rsr9Uy+HXaLX4xwN0SVjE3eFkNwAJY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwuHrlb1DwVpur8t+TMQgNo1DsiPvsxuqVDebUGAOe/mI1sX7hW
+	I8vTNw12pi/QjU87YnVl/4gZPiboVu2fs5HxM6rczbyvm5hmofj7Yjt875BYZvTuowmoJvFz+J6
+	E44+43BkkKBtvHZh2kK78thgObbkp12qs+zdZrIVk
+X-Gm-Gg: ASbGnctC8+a3rdLLd/Wgopi1WioCppEO5vB+L0LDzc58yzSzAEeSV7YwxJaRcXLQSgW
+	X1mDCxIrmn+fQetsTKQeCykbEoZZPoZXUKoMjpRQS9zBpIUGfssRFOGwmRf4iybPzZifI+aggGY
+	me3Bg5t7P+qSyMM7rrsTV1vunCLzoarxw7m25s/tnyBVJ/3ic2selFjQ==
+X-Google-Smtp-Source: AGHT+IHRTXKzQVq2KTm0RSt5qVgrnPAP0bkIbd607Uu6/KmOUX6+sJKqoHDdBmms0U0ufq7rNkEH/UqGIKX1Oa8Sr14=
+X-Received: by 2002:a05:622a:610d:b0:498:e884:7ca9 with SMTP id
+ d75a77b69052e-4a73da5803emr310651cf.13.1749849938737; Fri, 13 Jun 2025
+ 14:25:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd
- pages
-To: Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
- mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250611133330.1514028-1-tabba@google.com>
- <20250611133330.1514028-9-tabba@google.com> <aEySD5XoxKbkcuEZ@google.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <aEySD5XoxKbkcuEZ@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: yoWtdDJ0bxX9dOJzeG_bhIRc_OGUmIpZFL6gNRlo4vs_1749849497
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250613155239.2029059-1-rananta@google.com> <aEyPswyvfJ2-oC3l@linux.dev>
+In-Reply-To: <aEyPswyvfJ2-oC3l@linux.dev>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Fri, 13 Jun 2025 14:25:26 -0700
+X-Gm-Features: AX0GCFvCkuSdtDxaxbaw03np7924c6ya2dvq2vPeL3lenyiqTkrCE5acxgbNPCk
+Message-ID: <CAJHc60yacW7-1K3Uw9RT7a8qH9JyTXouiP=6VP3gifqzHgMaQQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] KVM: arm64: Add attribute to control GICD_TYPER2.nASSGIcap
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 13.06.25 23:03, Sean Christopherson wrote:
-> On Wed, Jun 11, 2025, Fuad Tabba wrote:
->> This patch enables support for shared memory in guest_memfd, including
-> 
-> Please don't lead with with "This patch", simply state what changes are being
-> made as a command.
+On Fri, Jun 13, 2025 at 1:53=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Fri, Jun 13, 2025 at 03:52:34PM +0000, Raghavendra Rao Ananta wrote:
+> > A shortcoming of the GIC architecture is that there's an absolute limit=
+ on
+> > the number of vPEs that can be tracked by the ITS. It is possible that
+> > an operator is running a mix of VMs on a system, only wanting to provid=
+e
+> > a specific class of VMs with hardware interrupt injection support.
+> >
+> > The series introduces KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap vGIC attribute=
+ to allow
+> > the userspace to control GICD_TYPER2.nASSGIcap (GICv4.1) on a per-VM ba=
+sis.
+> >
+> > v1: https://lore.kernel.org/kvmarm/20250514192159.1751538-1-rananta@goo=
+gle.com/
+> >
+> > v1 -> v2: https://lore.kernel.org/all/20250531012545.709887-1-oliver.up=
+ton@linux.dev/
+> >  - Drop all use of GICv4 in the UAPI and KVM-internal helpers in favor
+> >    of nASSGIcap. This changes things around to model a guest feature,
+> >    not a host feature.
+> >
+> >  - Consolidate UAPI into a single attribute and expect userspace to use
+> >    to read the attribute for discovery, much like we do with the ID
+> >    registers
+> >
+> >  - Squash documentation together with implementation
+> >
+> >  - Clean up maintenance IRQ attribute handling, which I ran into as par=
+t
+> >    of reviewing this series
+> >
+> > v2 -> v3:
+> >  - Update checks in vgic-v3.c and vgic-v4.c to also include nASSGIcap (=
+via
+> >    vgic_supports_direct_sgis()) that's configured by the userspace. (Ol=
+iver)
+> >
+> > Oliver Upton (2):
+> >   KVM: arm64: Disambiguate support for vSGIs v. vLPIs
+> >   KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
+>
+> Make sure you run checkpatch next time before sending out, it should've
+> warned you about sending patches w/o including your SOB.
+>
+Hmm, I do run checkpatch before sending, but I don't see any warning as suc=
+h.
 
-Agrred.
+Example:
+$ ./scripts/checkpatch.pl
+v3-0001-KVM-arm64-Disambiguate-support-for-vSGIs-v.-vLPIs.patch
+total: 0 errors, 0 warnings, 107 lines checked
 
-> 
->> mapping that memory from host userspace.
-> 
->> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
->> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
->> flag at creation time.
-> 
-> Why?  I can see that from the patch.
-> 
-> This changelog is way, way, waaay too light on details.
+v3-0001-KVM-arm64-Disambiguate-support-for-vSGIs-v.-vLPIs.patch has no
+obvious style problems and is ready for submission.
 
-Agreed.
+I do see an option to tell the script to ignore the check:
+--no-signoff, so I'm guessing it should check by default? Or is there
+any other option?
 
-   Sorry for jumping in at
-> the 11th hour, but we've spent what, 2 years working on this?
-
-It's late in Germany on a Friday, so I am probably grumpy, but most of 
-what you raise (terminology ...) was been discussed plenty of times 
-before either during review here or during the upstream calls ... :(
-
-Anyhow, happy for your review feedback on this series at this point, but 
-this is just the perfect time to shutdown my computer on a Friday 
-evening, knowing we will need another 2 years until this is finally 
-upstream if we keep going like that.
-
-(again, sorry to be grumpy, but this is not the stuff I want to be 
-reading at the 11th hour)
-
--- 
-Cheers,
-
-David / dhildenb
-
+Thank you.
+Raghavendra
