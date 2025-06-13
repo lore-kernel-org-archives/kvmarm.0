@@ -1,140 +1,305 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406FB2397A4
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 21:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407772853E0
+	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 22:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749849941; cv=none; b=HMj8c0o4WfKy84mp95kmEhT+1qnL+1C880LFYk2GqJQU4S++LG46y7zi/mplvECpUZLqdDzSvhvLf7yBWqNgMVB7XTECyAiOaFYHPWrb6tKaEtJhM8eoyo55CWMTEsxjkqXGb7elPgSJkSH9D80FY1x5i3ZZ9mzrE+tmZfEPYw8=
+	t=1749852523; cv=none; b=Rd86ctxdri3Yl7VTfPWOHYHGusfUEcSplbagK2zfK7+GI8FsdyxhThEt97fmF8Bm8VcZBLtXAyOSLBjhPa3nRlsViZJWQWnnvouBn54CXIdsJP/7xU3RCRoZS446hwsaAoy1V3gGlT1yzxvwwWwzRfz2V1G58Lz++nhNfBI7Lhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749849941; c=relaxed/simple;
-	bh=sHV8yx62yol9Bk56YKbLE0IVF5sfS+vZdmV+r8o63x0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ILUgKQ6XbmLbF/MAS1ZpPTlO9cfKmugpnLQRZgSCDe+3kQHaQCEF40Osb4VyqCe3f25c02ZF9C/tLV6i6HZ3aKkvT/krkWt1x4377cNdXfqjdGyrhVAdUlXWDJRUjUolx0uG3fDHD3PUZ5Do8vKGpVoi+pmoJLfb7ZMfNCm1aiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lo1Pvri7; arc=none smtp.client-ip=209.85.160.179
+	s=arc-20240116; t=1749852523; c=relaxed/simple;
+	bh=fkr4HJOJpy9exfwJGhkn9TQt7LDzat+z9jZTC9JW58k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aF9sKTFwWF2m4EFsrZUt8HMTAknVSxkRwUjBmDAfUfh3iat1UDHqshsVpWWsKHpEHZWbORXA1VncMvXba2TvxBwBGJQU7M1B4PdG+9Uq+iPr6jcJ/SL01vVDSRroQ4JcLXNNs74Hi54ZbVsvVda/ESiGcLTE7+ybiu2ks6bQWyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ppTlxlWa; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lo1Pvri7"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a5ac8fae12so114071cf.0
-        for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 14:25:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ppTlxlWa"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2eeff19115so3167054a12.0
+        for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 15:08:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749849939; x=1750454739; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TPUzIppHcu65DcXjx+xmQ4p2o7TM+1lbGXLpXn/D90M=;
-        b=lo1Pvri7kP7jfi/gvpHy8xDL7eIITXqfKRtzVmil1/bVNuDCFAxTlHwogFEvQdgZc4
-         b7vkgdjubPCY1/IhkjFiSJExPQIPBPfW1yAYhjmtwGFG1qVo4UCe/Q6GUomms+00iPeL
-         hwXI+Xb6RwH29RtCJrpKKRVsEd6p99N9I5yHT/42P5FP6Ulp+oTZnqAoVasACcKCcvzH
-         S/TkyEf0dh1VIG5+6q16HQ1qp2OMNbzn/B4MsVwO542+rZKKBNIedjV6aRwidVUns2zl
-         4AX1LblAoXB7OhbG3lM58+miSMLfrHyytexc5PulZ05e8IfgGImh6Cm9Yp4O/vcLSbLS
-         L3Mw==
+        d=google.com; s=20230601; t=1749852521; x=1750457321; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wb4jmnBC8sBuVz3+2UsGpTIRs7ejQyw5kumAZcoTVsA=;
+        b=ppTlxlWayVAGb/tNbOGnfT8kZXEwpYP0gpuuHYG9w9mx94viZyoc54LGmhQjMYRjXB
+         hKtF1Zqs1U1dn3NEXhT1k34P8E7yB6Xa903Nbwy3zzQieVEfIDGahAT+fp8O79cXx45E
+         3Imou7if6W/VUmn7wPRHWTEk1r1lxhJbCXBxlBTJ9A0Gszn2HumF2VKWCO+TBZQDRMQw
+         qUwTk4kTAj6LAEdxN/LYzGMgffIRQbaoVSC2sHYcvuWzWFbs33hQcceznalNMZU84/1s
+         KboTD+UfNDiQFZ20J7KtQdEZ3sxwe59Ke/xyd3KZ23ywqCMcsuFe9AeAgHdcz028vZlR
+         TpUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749849939; x=1750454739;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TPUzIppHcu65DcXjx+xmQ4p2o7TM+1lbGXLpXn/D90M=;
-        b=DRQcND+yBPAoNXYN+FtMhwrDTKG9BRnop6oFVnBpN8uJn1/HnhQDl2UAnwG1M8zxEk
-         2Knqoq3AqOFzdVivORKLyyX2VxNIkZOWskAXo4RjfWGTEtWmz/U0XfmnxWzTlzlO9yCe
-         eCYmiYged/Qn0l6KCaIBg4BW7eStRbRaxyH2UYXqCh3SSVIaJKjVlio8sRBeUrBOVIrg
-         U9kz/GeZ2DkjLZRJuts4HFO5J5wC4+VJQAsAu3nyy1FBkIyne62oihyrk1Q3vPGQbqoO
-         MffWWuig/ShtCmCLoO33TB+bGXrX0aWn476yofmjnqZinVuKqh92Cqef7Ta42vKp+qLr
-         Dltw==
-X-Forwarded-Encrypted: i=1; AJvYcCUYkmOn0ygzFq33tmSn7GsDABdgL7DRGWpS0M+2sIrI1Rsr9Uy+HXaLX4xwN0SVjE3eFkNwAJY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwuHrlb1DwVpur8t+TMQgNo1DsiPvsxuqVDebUGAOe/mI1sX7hW
-	I8vTNw12pi/QjU87YnVl/4gZPiboVu2fs5HxM6rczbyvm5hmofj7Yjt875BYZvTuowmoJvFz+J6
-	E44+43BkkKBtvHZh2kK78thgObbkp12qs+zdZrIVk
-X-Gm-Gg: ASbGnctC8+a3rdLLd/Wgopi1WioCppEO5vB+L0LDzc58yzSzAEeSV7YwxJaRcXLQSgW
-	X1mDCxIrmn+fQetsTKQeCykbEoZZPoZXUKoMjpRQS9zBpIUGfssRFOGwmRf4iybPzZifI+aggGY
-	me3Bg5t7P+qSyMM7rrsTV1vunCLzoarxw7m25s/tnyBVJ/3ic2selFjQ==
-X-Google-Smtp-Source: AGHT+IHRTXKzQVq2KTm0RSt5qVgrnPAP0bkIbd607Uu6/KmOUX6+sJKqoHDdBmms0U0ufq7rNkEH/UqGIKX1Oa8Sr14=
-X-Received: by 2002:a05:622a:610d:b0:498:e884:7ca9 with SMTP id
- d75a77b69052e-4a73da5803emr310651cf.13.1749849938737; Fri, 13 Jun 2025
- 14:25:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749852521; x=1750457321;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wb4jmnBC8sBuVz3+2UsGpTIRs7ejQyw5kumAZcoTVsA=;
+        b=JMvg6EUNx4Xg4uvf3nFNkYiwMwl2PEzZMVGTJybDfdccmyr38sfZ3sHTzm6L9x/ift
+         QyMvmuwzzr0DKwIasnJYCpx3UNmLcD3yPzvfYD6Ga+aRG8R6fKfk7LMi7aJPiAdhyxEH
+         YdImH5/CCh05evFBcbVrKBGXAwjXlze8mWDFfvUSICu3qNwsXxUeNlXGsQkN9lI/1R+F
+         HZXTIYR+sdtE0Y8JWbPV1BHuq80aQdYmqDECfGLLf3lZ1Va+b+SAIXC0XyM7cAdNNOVv
+         HK3ZNuj4TNbMo3neEv4Pzm9srGdyuFQERqdJ331cZsMRK543ghVfPFkLI0sLNoUe1H44
+         +k+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUjmy1L+ipobDeXQRWZamGt7wKkPdidLloiQhhHyTmx6gvnCln9C28a4A688nDSJZlgmnRuJEs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyUyBKEUL2qVYwwkp/RIyElJD2L9+QECFl11tDPh0QE/qOURS0g
+	CkVQWb86JBnuDSMRC6xWVDPK0WV6EtKxn86cpoB10b7LnscqDH7Yx6H1zGpVS1FgZC1cYK+L06n
+	/x+A6aQ==
+X-Google-Smtp-Source: AGHT+IGdSPExuUA1/ibuJO19NsPM4/rKLVlAf2LsB0b+mN/T6vNzkkutRovkAexiqJtYBe7+n13vgpVYIl8=
+X-Received: from pfm6.prod.google.com ([2002:a05:6a00:726:b0:746:19fc:f077])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:7316:b0:21f:8817:f695
+ with SMTP id adf61e73a8af0-21fbd5590a9mr1355927637.25.1749852521334; Fri, 13
+ Jun 2025 15:08:41 -0700 (PDT)
+Date: Fri, 13 Jun 2025 15:08:39 -0700
+In-Reply-To: <20250611133330.1514028-11-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250613155239.2029059-1-rananta@google.com> <aEyPswyvfJ2-oC3l@linux.dev>
-In-Reply-To: <aEyPswyvfJ2-oC3l@linux.dev>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Fri, 13 Jun 2025 14:25:26 -0700
-X-Gm-Features: AX0GCFvCkuSdtDxaxbaw03np7924c6ya2dvq2vPeL3lenyiqTkrCE5acxgbNPCk
-Message-ID: <CAJHc60yacW7-1K3Uw9RT7a8qH9JyTXouiP=6VP3gifqzHgMaQQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] KVM: arm64: Add attribute to control GICD_TYPER2.nASSGIcap
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-11-tabba@google.com>
+Message-ID: <aEyhHgwQXW4zbx-k@google.com>
+Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
+ guest_memfd with shared memory
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jun 13, 2025 at 1:53=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Fri, Jun 13, 2025 at 03:52:34PM +0000, Raghavendra Rao Ananta wrote:
-> > A shortcoming of the GIC architecture is that there's an absolute limit=
- on
-> > the number of vPEs that can be tracked by the ITS. It is possible that
-> > an operator is running a mix of VMs on a system, only wanting to provid=
-e
-> > a specific class of VMs with hardware interrupt injection support.
-> >
-> > The series introduces KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap vGIC attribute=
- to allow
-> > the userspace to control GICD_TYPER2.nASSGIcap (GICv4.1) on a per-VM ba=
-sis.
-> >
-> > v1: https://lore.kernel.org/kvmarm/20250514192159.1751538-1-rananta@goo=
-gle.com/
-> >
-> > v1 -> v2: https://lore.kernel.org/all/20250531012545.709887-1-oliver.up=
-ton@linux.dev/
-> >  - Drop all use of GICv4 in the UAPI and KVM-internal helpers in favor
-> >    of nASSGIcap. This changes things around to model a guest feature,
-> >    not a host feature.
-> >
-> >  - Consolidate UAPI into a single attribute and expect userspace to use
-> >    to read the attribute for discovery, much like we do with the ID
-> >    registers
-> >
-> >  - Squash documentation together with implementation
-> >
-> >  - Clean up maintenance IRQ attribute handling, which I ran into as par=
-t
-> >    of reviewing this series
-> >
-> > v2 -> v3:
-> >  - Update checks in vgic-v3.c and vgic-v4.c to also include nASSGIcap (=
-via
-> >    vgic_supports_direct_sgis()) that's configured by the userspace. (Ol=
-iver)
-> >
-> > Oliver Upton (2):
-> >   KVM: arm64: Disambiguate support for vSGIs v. vLPIs
-> >   KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
->
-> Make sure you run checkpatch next time before sending out, it should've
-> warned you about sending patches w/o including your SOB.
->
-Hmm, I do run checkpatch before sending, but I don't see any warning as suc=
-h.
+On Wed, Jun 11, 2025, Fuad Tabba wrote:
+> From: Ackerley Tng <ackerleytng@google.com>
+> 
+> For memslots backed by guest_memfd with shared mem support, the KVM MMU
+> must always fault in pages from guest_memfd, and not from the host
+> userspace_addr. Update the fault handler to do so.
 
-Example:
-$ ./scripts/checkpatch.pl
-v3-0001-KVM-arm64-Disambiguate-support-for-vSGIs-v.-vLPIs.patch
-total: 0 errors, 0 warnings, 107 lines checked
+And with a KVM_MEMSLOT_GUEST_MEMFD_ONLY flag, this becomes super obvious.
 
-v3-0001-KVM-arm64-Disambiguate-support-for-vSGIs-v.-vLPIs.patch has no
-obvious style problems and is ready for submission.
+> This patch also refactors related function names for accuracy:
 
-I do see an option to tell the script to ignore the check:
---no-signoff, so I'm guessing it should check by default? Or is there
-any other option?
+This patch.  And phrase changelogs as commands.
 
-Thank you.
-Raghavendra
+> kvm_mem_is_private() returns true only when the current private/shared
+> state (in the CoCo sense) of the memory is private, and returns false if
+> the current state is shared explicitly or impicitly, e.g., belongs to a
+> non-CoCo VM.
+
+Again, state changes as commands.  For the above, it's not obvious if you're
+talking about the existing code versus the state of things after "this patch".
+
+
+> kvm_mmu_faultin_pfn_gmem() is updated to indicate that it can be used to
+> fault in not just private memory, but more generally, from guest_memfd.
+
+> +static inline u8 kvm_max_level_for_order(int order)
+
+Do not use "inline" for functions that are visible only to the local compilation
+unit.  "inline" is just a hint, and modern compilers are smart enough to inline
+functions when appropriate without a hint.
+
+A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
+
+> +static inline int kvm_gmem_max_mapping_level(const struct kvm_memory_slot *slot,
+> +					     gfn_t gfn, int max_level)
+> +{
+> +	int max_order;
+>  
+>  	if (max_level == PG_LEVEL_4K)
+>  		return PG_LEVEL_4K;
+
+This is dead code, the one and only caller has *just* checked for this condition.
+>  
+> -	host_level = host_pfn_mapping_level(kvm, gfn, slot);
+> -	return min(host_level, max_level);
+> +	max_order = kvm_gmem_mapping_order(slot, gfn);
+> +	return min(max_level, kvm_max_level_for_order(max_order));
+>  }
+
+...
+
+> -static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+> -					u8 max_level, int gmem_order)
+> +static u8 kvm_max_level_for_fault_and_order(struct kvm *kvm,
+
+This is comically verbose.  C ain't Java.  And having two separate helpers makes
+it *really* hard to (a) even see there are TWO helpers in the first place, and
+(b) understand how they differ.
+
+Gah, and not your bug, but completely ignoring the RMP in kvm_mmu_max_mapping_level()
+is wrong.  It "works" because guest_memfd doesn't (yet) support dirty logging,
+no one enables the NX hugepage mitigation on AMD hosts.
+
+We could plumb in the pfn and private info, but I don't really see the point,
+at least not at this time.
+
+> +					    struct kvm_page_fault *fault,
+> +					    int order)
+>  {
+> -	u8 req_max_level;
+> +	u8 max_level = fault->max_level;
+>  
+>  	if (max_level == PG_LEVEL_4K)
+>  		return PG_LEVEL_4K;
+>  
+> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+> +	max_level = min(kvm_max_level_for_order(order), max_level);
+>  	if (max_level == PG_LEVEL_4K)
+>  		return PG_LEVEL_4K;
+>  
+> -	req_max_level = kvm_x86_call(private_max_mapping_level)(kvm, pfn);
+> -	if (req_max_level)
+> -		max_level = min(max_level, req_max_level);
+> +	if (fault->is_private) {
+> +		u8 level = kvm_x86_call(private_max_mapping_level)(kvm, fault->pfn);
+
+Hmm, so the interesting thing here is that (IIRC) the RMP restrictions aren't
+just on the private pages, they also apply to the HYPERVISOR/SHARED pages.  (Don't
+quote me on that).
+
+Regardless, I'm leaning toward dropping the "private" part, and making SNP deal
+with the intricacies of the RMP:
+
+	/* Some VM types have additional restrictions, e.g. SNP's RMP. */
+	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
+	if (req_max_level)
+		max_level = min(max_level, req_max_level);
+
+Then we can get to something like:
+
+static int kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
+				      struct kvm_page_fault *fault)
+{
+	int max_level, req_max_level;
+
+	max_level = kvm_max_level_for_order(order);
+	if (max_level == PG_LEVEL_4K)
+		return PG_LEVEL_4K;
+
+	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
+	if (req_max_level)
+		max_level = min(max_level, req_max_level);
+
+	return max_level;
+}
+
+int kvm_mmu_max_mapping_level(struct kvm *kvm,
+			      const struct kvm_memory_slot *slot, gfn_t gfn)
+{
+	int max_level;
+
+	max_level = kvm_lpage_info_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM);
+	if (max_level == PG_LEVEL_4K)
+		return PG_LEVEL_4K;
+
+	/* TODO: Comment goes here about KVM not supporting this path (yet). */
+	if (kvm_mem_is_private(kvm, gfn))
+		return PG_LEVEL_4K;
+
+	if (kvm_is_memslot_gmem_only(slot)) {
+		int order = kvm_gmem_mapping_order(slot, gfn);
+
+		return min(max_level, kvm_gmem_max_mapping_level(kvm, order, NULL));
+	}
+
+	return min(max_level, host_pfn_mapping_level(kvm, gfn, slot));
+}
+
+static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
+				    struct kvm_page_fault *fault)
+{
+	struct kvm *kvm = vcpu->kvm;
+	int order, r;
+
+	if (!kvm_slot_has_gmem(fault->slot)) {
+		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+		return -EFAULT;
+	}
+
+	r = kvm_gmem_get_pfn(kvm, fault->slot, fault->gfn, &fault->pfn,
+			     &fault->refcounted_page, &order);
+	if (r) {
+		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+		return r;
+	}
+
+	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+	fault->max_level = kvm_gmem_max_mapping_level(kvm, order, fault);
+
+	return RET_PF_CONTINUE;
+}
+
+int sev_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault)
+{
+	int level, rc;
+	bool assigned;
+
+	if (!sev_snp_guest(kvm))
+		return 0;
+
+	if (WARN_ON_ONCE(!fault) || !fault->is_private)
+		return 0;
+
+	rc = snp_lookup_rmpentry(fault->pfn, &assigned, &level);
+	if (rc || !assigned)
+		return PG_LEVEL_4K;
+
+	return level;
+}
+> +/*
+> + * Returns true if the given gfn's private/shared status (in the CoCo sense) is
+> + * private.
+> + *
+> + * A return value of false indicates that the gfn is explicitly or implicitly
+> + * shared (i.e., non-CoCo VMs).
+> + */
+>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>  {
+> -	return IS_ENABLED(CONFIG_KVM_GMEM) &&
+> -	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> +	struct kvm_memory_slot *slot;
+> +
+> +	if (!IS_ENABLED(CONFIG_KVM_GMEM))
+> +		return false;
+> +
+> +	slot = gfn_to_memslot(kvm, gfn);
+> +	if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot)) {
+> +		/*
+> +		 * Without in-place conversion support, if a guest_memfd memslot
+> +		 * supports shared memory, then all the slot's memory is
+> +		 * considered not private, i.e., implicitly shared.
+> +		 */
+> +		return false;
+
+Why!?!?  Just make sure KVM_MEMORY_ATTRIBUTE_PRIVATE is mutually exclusive with
+mappable guest_memfd.  You need to do that no matter what.  Then you don't need
+to sprinkle special case code all over the place.
+
+> +	}
+> +
+> +	return kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>  }
+>  #else
+>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> -- 
+> 2.50.0.rc0.642.g800a2b2222-goog
+> 
