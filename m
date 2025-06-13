@@ -1,159 +1,100 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEF125BEF0
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 20:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0A4224AE0
+	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 20:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749846937; cv=none; b=DSC8H4i7QSejBU/ioLGnOSy5GRG9ZCxcwi371RzGwGyVOc0w5PiWJCUxV78eYv0/zOGFHAgoM0SHInVAyzB6+iCd0Z8QCuI4KNoJWYnmo1IlRx/nuHOcUkbgGSmRMm6E9Ii36QRLBpf8G9xEUkmA8uK43MGi7HwCLITmpzPEhI4=
+	t=1749847677; cv=none; b=s7rTnquJqNUV8otx8EbplNGJxT0Jtqq1V1taV660Y2x7lyXqIxWTaXosJepRrjH095lF5mSTEV5yyAxoe7POqmyjL6VyU2Nbj3WFnI4pwLxXPN0vlpo5a8fBv9pLmbzg2nFEo5Yeo5WBkZrKHs5elCgCsyJ2vjJPZFux77HHbrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749846937; c=relaxed/simple;
-	bh=TCA/bkZV1eOXGd9TQy3i5G9neadJfD5XdVh30uDYjMM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kdFFXS33azCOtM0KEF+GCPvV3RvDLmO9lgIpUfHHRGDtPh3g218w51+ODOP9sgBTbfsRyybj+IKxxyqCFfSmMgJS2NrODegwUm9PNiu7sE5vdefbjZLYSDbA62Zj2sfldUNkFeRxKD5YS5wOBTgtqBEmEFhijdEgqDIrNsWb6dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0t3Gg4/7; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1749847677; c=relaxed/simple;
+	bh=3scu/ROOszjXP8l+ZNlZwQryx02bu/GUqC4buj307io=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HUcB4fLkBej9FuO1mh1jWd/cxzUQwZ7gyWV21Q6uHnNW/BJvw2c2QtlxBK2hIp2JSuQXYQdxMIjEdUix10QT6cMYV2fp5gIVvWuYRotne7nQKyq3uHkWg2Kjf4Bd/m0hrfdYamdXsdB094B4nkW0RUY9o9c/bU904XdzHFLEUgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AqDvl1P8; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0t3Gg4/7"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-73bfc657aefso1876069b3a.1
-        for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 13:35:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749846935; x=1750451735; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aD6EYmSk/zIl2SjxJRx3+64lAlSQfo57iDrafX9vuYg=;
-        b=0t3Gg4/7xe5FKJHvjrycNMD05B8gM6seIq8MceVeYi0FhyNLwn8rXLAzm5sdXjvBlN
-         M4TgrI6TI6Zos2+uYGlRVfm9F2/Dccdx7sqex5s61p2XRZ00S1BosbU/hHNYNtvytm0V
-         uCPrXBipD85dPVzWqi/3hiUxJecc3Juj4MmxA4/WZ4YXtAJBMvN05VNmKLkQxSpYa2zl
-         QV1vQQNeOENmEoaGfb1INv4Vdkt3ZJqylRYdlWwJXU9PZlN7DgABfrdrA7x6hP+NQsM7
-         CKH6VGUsoWjZEGDj6u0HU55Z1RheBNRCcAaz8koduyiiZCc3+3u47F6n8QBy1gZswsb8
-         sSbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749846935; x=1750451735;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aD6EYmSk/zIl2SjxJRx3+64lAlSQfo57iDrafX9vuYg=;
-        b=Kha/3eXfFOZS4sHNDX12MCwBhJpYENVhZUSI3Bfw7vdC7iLJOZVfQ7vQw2cjPo5AgJ
-         hJZMvrhNtjV1h5IvzptWOCL5zqn7lJqymclU/aEgLif+mLvj+nXzQ/7pNQgiaHUJwaM3
-         2fO62/lwdUtRsgOgxKL8KIChNjldAfJiNAJ+kqIRtcHGJ+gwOjrf9tnIarCODpmFZYxk
-         /VmCEn+ysHZf/4+Ov1WQQw9ga1wVzXqMwaFVgHiZBZc9TclNld8M26GMdlAsFY8QKXnI
-         ys3iF2BXQleEzmQ1csYfkbcFcruPlmWDITwfIN0mJjlYU/hantcfhxU9MMz78yISCpi0
-         rPYA==
-X-Forwarded-Encrypted: i=1; AJvYcCUU6V1oEukVmG1tzZhFV8hPgYPYyUPkUh2zi7dXXh1ORRRUoQcd/+8Tq2OV6lWLeMPlLnisyVY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwuX7uRonwxAIanyKVjYcbHRi0b6zBrV+1tnp8PhrLCzVeyr5zD
-	Q3PRnPq0xHqDKuH0FbaocXGiqvSMSvn1KAxvYrTBZHDkZTiWMJiOsvqYy33A6EN9oXy3GoIjmyU
-	XR3wDlg==
-X-Google-Smtp-Source: AGHT+IFQyKC+fuYoxxZ60HlL1zbUz9ZwG4ryuK7MxSum1tmaUoFCTmYa27wuTrzB35IdSIo2hT+LP8d31ms=
-X-Received: from pfmm18.prod.google.com ([2002:a05:6a00:2492:b0:748:4f7c:c605])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2ea6:b0:747:ee09:1fdf
- with SMTP id d2e1a72fcca58-7489cf6aaf9mr933541b3a.4.1749846934794; Fri, 13
- Jun 2025 13:35:34 -0700 (PDT)
-Date: Fri, 13 Jun 2025 13:35:33 -0700
-In-Reply-To: <20250611133330.1514028-5-tabba@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AqDvl1P8"
+Date: Fri, 13 Jun 2025 13:47:44 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749847671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g3QpAmNx5DNk1sdY/iNHtbL5cVsrP4TaKvA4vwlUxSU=;
+	b=AqDvl1P8NSuH5w8c2k3rrqa4tztuUbtzwZhM8R58zilGZUEQn3cguoYb3i7WeQil7suGSN
+	TUl3XKReXwAFZSIE40AuXO/BLTeer3hKffnbZb/Q2xvuMFJgLwLYcVAtx4dcUND5W926Fm
+	Nikn5r4AiputfvGWyYEK/a9eli+bP1g=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Francesco Lavra <francescolavra.fl@gmail.com>,
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v3 02/62] KVM: arm64: WARN if unmapping vLPI fails
+Message-ID: <aEyOcJJsys9mm_Xs@linux.dev>
+References: <20250611224604.313496-2-seanjc@google.com>
+ <20250611224604.313496-4-seanjc@google.com>
+ <86tt4lcgs3.wl-maz@kernel.org>
+ <aErlezuoFJ8u0ue-@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-5-tabba@google.com>
-Message-ID: <aEyLlbyMmNEBCAVj@google.com>
-Subject: Re: [PATCH v12 04/18] KVM: x86: Rename kvm->arch.has_private_mem to kvm->arch.supports_gmem
-From: Sean Christopherson <seanjc@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aErlezuoFJ8u0ue-@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 11, 2025, Fuad Tabba wrote:
-> The bool has_private_mem is used to indicate whether guest_memfd is
-> supported.
+On Thu, Jun 12, 2025 at 07:34:35AM -0700, Sean Christopherson wrote:
+> On Thu, Jun 12, 2025, Marc Zyngier wrote:
+> > On Wed, 11 Jun 2025 23:45:05 +0100,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> > > 
+> > > WARN if unmapping a vLPI in kvm_vgic_v4_unset_forwarding() fails, as
+> > > failure means an IRTE has likely been left in a bad state, i.e. IRQs
+> > > won't go where they should.
+> > 
+> > I have no idea what an IRTE is.
+> 
+> Sorry, x86 IOMMU terminology (Interrupt Remapping Table Entry).  I think the GIC
+> terminology would be ITS entry?  Or maybe ITS mapping?
 
-No?  This is at best weird, and at worst flat out wrong:
+We tend to just call it a 'vLPI mapping', which under the hood implies
+a couple other translations have been wired up as well (vPE + Device).
 
-	if (kvm->arch.supports_gmem &&
-	    fault->is_private !=3D kvm_mem_is_private(kvm, fault->gfn))
-		return false;
+> > But not having an VLPI mapping for an interrupt at the point where we're
+> > tearing down the forwarding is pretty benign. IRQs *still* go where they
+> > should, and we don't lose anything.
 
-ditto for this code:
+The VM may not actually be getting torn down, though. The series of
+fixes [*] we took for 6.16 addressed games that VMMs might be playing on
+irqbypass for a live VM.
 
-	if (kvm_arch_supports_gmem(vcpu->kvm) &&
-	    kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(range->gpa)))i
-		error_code |=3D PFERR_PRIVATE_ACCESS;
+[*] https://lore.kernel.org/kvmarm/20250523194722.4066715-1-oliver.upton@linux.dev/
 
-and for the memory_attributes code.  E.g. IIRC, with guest_memfd() mmap sup=
-port,
-private vs. shared will become a property of the guest_memfd inode, i.e. th=
-is will
-become wrong:
+> All of those failure scenario seem like warnable offences when KVM thinks it has
+> configured the IRQ to be forwarded to a vCPU.
 
-static u64 kvm_supported_mem_attributes(struct kvm *kvm)
-{
-	if (!kvm || kvm_arch_supports_gmem(kvm))
-		return KVM_MEMORY_ATTRIBUTE_PRIVATE;
+I tend to agree here, especially considering how horribly fragile GICv4
+has been in some systems. I know of a couple implementations where ITS
+command failures and/or unmapped MSIs are fatal for the entire machine.
+Debugging them has been a genuine pain in the ass.
 
-	return 0;
-}
+WARN'ing when state tracking for vLPIs is out of whack would've made it
+a little easier.
 
-Instead of renaming kvm_arch_has_private_mem() =3D> kvm_arch_supports_gmem(=
-), *add*
-kvm_arch_supports_gmem() and then kill off kvm_arch_has_private_mem() once =
-non-x86
-usage is gone (i.e. query kvm->arch.has_private_mem directly).
-
-And then rather than rename has_private_mem, either add supports_gmem or do=
- what
-you did for kvm_arch_supports_gmem_shared_mem() and explicitly check the VM=
- type.
-
-> Rename it to supports_gmem to make its meaning clearer and to decouple me=
-mory
-> being private from guest_memfd.
->=20
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Shivank Garg <shivankg@amd.com>
-> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-> Co-developed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 4 ++--
->  arch/x86/kvm/mmu/mmu.c          | 2 +-
->  arch/x86/kvm/svm/svm.c          | 4 ++--
->  arch/x86/kvm/x86.c              | 3 +--
->  4 files changed, 6 insertions(+), 7 deletions(-)
-
-This missed the usage in TDX (it's not a staleness problem, because this se=
-ries
-was based on 6.16-rc1, which has the relevant code).
-
-arch/x86/kvm/vmx/tdx.c: In function =E2=80=98tdx_vm_init=E2=80=99:
-arch/x86/kvm/vmx/tdx.c:627:18: error: =E2=80=98struct kvm_arch=E2=80=99 has=
- no member named =E2=80=98has_private_mem=E2=80=99
-  627 |         kvm->arch.has_private_mem =3D true;
-      |                  ^
-make[5]: *** [scripts/Makefile.build:287: arch/x86/kvm/vmx/tdx.o] Error 1
+Thanks,
+Oliver
