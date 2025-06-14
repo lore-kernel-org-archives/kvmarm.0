@@ -1,122 +1,126 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05502664C6
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 22:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3282E336D
+	for <kvmarm@lists.linux.dev>; Sat, 14 Jun 2025 14:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749854894; cv=none; b=BK5k+CoojexnT5Cnzj8Qkl0jp39QeQUv/VqheQpOO/SQy4MZPLOQLtbtPoxB3yVu5hx94ZpUb7mdIlCq41T7bwalnuugxzfLGLEXyhPWhkV49x0823ojwGoCbbyP+ulbm4EjuqdpgFRv7xGu4Gc4XLM/BMv9rYNZCvGemfrrdFI=
+	t=1749912968; cv=none; b=k8EFXb1CahZ/13cxDqGW+DzVYy/ZCmIRJp+oshFaZwJi0WRm056ausnrbUQrYfB6EttGyujDQz4y17ee/o6gmqWjotwMIas0l7R3Wi1pyQW+ZN6gD3Sdr4Kc58L7qztGjyH4UXkcNQNdFygFfnnHy60+lYcvecvWji16L7yao5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749854894; c=relaxed/simple;
-	bh=b2f4UfTd6Ie3E6DBleQTiYYTSPeearnB2GRwzHGTHi4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DcYEDz9gKPXbWMrhXB/bjU7tnHv4oxkmCg1UP/UbdGoP4caU3e6p4AtRRO7oGq1DPECl9HknRiLzKACgh+5UCPWvPLVZ/+YnSaA8r+WLbMVCpX+O/kpcNA2rG+/+109jbM1SvDF769S+3iAkdPmglQIOXtm6HISUBjngoAknfQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k7Lg5IaJ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1749912968; c=relaxed/simple;
+	bh=V2dnmXkpmQkFeGJ0/9lY8APfUTddRrtiX6o9oiKsl98=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KkBdVCn0fmOL/NT6/YgyRtWGL6MAyZIOu/UYZq/Y3RhcOnArJtZOTATeWuitUe4dOaVqoU4LTEmV6qx1XwmcqSZUUyMKqYZHmMk2YJVwJs6w7kG0La5mXqrNsRC3PdRg7uvgRLX6nlyGbzW0QyNmmn2XpStdyXcp1rmoZWtI12M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=XbaJElQJ; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k7Lg5IaJ"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311a6b43ed7so2164438a91.1
-        for <kvmarm@lists.linux.dev>; Fri, 13 Jun 2025 15:48:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="XbaJElQJ"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-748a42f718aso260195b3a.2
+        for <kvmarm@lists.linux.dev>; Sat, 14 Jun 2025 07:56:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749854892; x=1750459692; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I0pEZjx6fVkzLwzb7Tf4p6SavBE34NRSvbWnq2Fu6u8=;
-        b=k7Lg5IaJ4JUp4Ut7bgbLmmpJSVNObZaxvSvN2UwiGUTINCuY5l0VUDdJ9sSd3tuFHn
-         MULgsuzB8yzShaduEqxAZTkQwROkDqCdnE5ZGsmQL1E0VVV/lfb/GH5s2rTzJX35TfNq
-         2vgNRQi49eqV0ToBfLqjC+/ewKNgQZs9gcLTGihRedZzbbij9XiRxBW6RgMmGLprwCTE
-         uRseBtdr6typOfXe7Z16k3sosph3Z7pV7qsKnDhCfvt4YrZ2XwCcoXzOMlwTK47VC43H
-         WArT7wTlYY6rQwh6RD3+desGsBpj5DoQ1lQoswRiqgdLEnOOBz15zHQO5B+ovJ1uleCJ
-         rPcA==
+        d=csie.ntu.edu.tw; s=google; t=1749912963; x=1750517763; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FdwgAOcCxW8xP65CJHYSviC4hBZAI2hMwMKg/94ld5s=;
+        b=XbaJElQJtvoQz3zq1Qg5hCoard05wVZnbB6N2Wc4qAXv8LGiXYhNAJkjOPWQ+1DyU6
+         ywIzgGhO5sQx+95lnFphXCXGMqunLdYyyRESvApB1jRfXj5bwdnUkWiHW6LZyfMoIZHM
+         69JErk5110te5xLZqTsqQ4nG5UVsfNgdPRGxUrzCDlV4/qT9Rho94tg2zX8eCM2UPEXc
+         faZiZQY/FPEsXi/dDOpWhQmPreE8RGxnaKwP6hz4xCcO2XBJ1NbquBqT4tdmAlbwe13f
+         j0FYMlMKkvaDr+PgAJlajRUPiTI7whsPI3gytY0AfeXuedFoW2+Is4AjSb6Cd+t5pqVg
+         Ny/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749854892; x=1750459692;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I0pEZjx6fVkzLwzb7Tf4p6SavBE34NRSvbWnq2Fu6u8=;
-        b=vtM4XtW5m3oS4zheC+9giN15BBrsni0/LZG37a8DnNcPQq6iZBobiJt0EJw7uiZbw/
-         YqW2c8Ps+qooxsofgUt/M0VoHUv2a13B7cnYtV1oYWkSYe7yEFnZDbJuO+VlzLQg3RtZ
-         jrhVxQo5KmcJTa68WPPCvLPZtvb4ZfXBf+ID615knBOMA3KCDJAGyjFf3EFg5++WzOoG
-         /CDzpJncdQ1/8EK9vxFtEd5PBoTrSq6mdo7TOg6pHtnt2nO+DGlgujowPbBuVIqK8uqZ
-         v7mxbk318P7pUPh45MUQ98f/0XrxNDvhkOoozn1vZaSDwDgg+eXluHYRf/MpPXiowKtE
-         g3/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUezAJbrYKw9fwE2FLxmhIatKTFVuYQqrI5xn8CYfJdD7JfirBL0xdDNrKVgOzuzHMjT1irSXs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YziXsO9yWFDzrFHObRfk2vy8ss8KqAffCQCtDUL2KMN4QaJivCP
-	L8l2uRei0MsAfJI/WJsIvLkkUFVkmLC2X2UzNVYE0I5HlduUe4WvN2GjGbN4G/XYlic5kb3WHos
-	9Z1NktA==
-X-Google-Smtp-Source: AGHT+IFmVbuER09bqe0w/t1NnKGFZRyDNJUVfxGfFpjqY6vikPqb0P4dso4PSiLkCEX/Cq6o353w4bjW7uU=
-X-Received: from pjbdy14.prod.google.com ([2002:a17:90b:6ce:b0:313:274d:3007])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7c6:b0:312:b4a:6342
- with SMTP id 98e67ed59e1d1-313f1dd5483mr2147790a91.33.1749854892347; Fri, 13
- Jun 2025 15:48:12 -0700 (PDT)
-Date: Fri, 13 Jun 2025 15:48:10 -0700
-In-Reply-To: <aEySD5XoxKbkcuEZ@google.com>
+        d=1e100.net; s=20230601; t=1749912963; x=1750517763;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FdwgAOcCxW8xP65CJHYSviC4hBZAI2hMwMKg/94ld5s=;
+        b=JJ6UmpUBmiFKn9IvJ42GXob240vNEtZC/5MCOr9SHhFu64abUC6tuAY0NjJqANcy9S
+         imL235jRUxHvq6DxlHfAocTtCw7Is00BIqiEMXw+1iIeh97kDe3oGPQOEAvV2XHgKN8P
+         LhxAPiOxlDCpMpdnjR+DF1Yn/9MufOxNTHPzpNzpTdLs2HoNTOVHoqFvvNe7tC/2vHWK
+         /ZHhqizou/ncLJFFSDssK0YbyAH1XRaXH231GVnCh6EsfGfIh5G4oUwbwjoJUd8wLkS2
+         PHhf18fB4D5p0vdclEyboExeU7o74tc4NuNMm4HAxXJIAcGxBtfrrgmcIIkuIh7LtQSh
+         Czrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVaBg8yRUNBPQj2/qnCnRG/nBuExuCBp0EX8v5U9D0I+KScG48EUPekXVV6/clEDUMdS7b2vu4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwhPNLV+SQX7LdoEH3J3fVQ7M4EDRJvGN7PK6Lo7JDsXs6ZF+Vx
+	V0oE9jdZW8QoCNiLf/IuW1A/qbMoRVVhtqyQThcKc24OYyzibD+IDpMStHop3+N8/9hI7zaUQqA
+	r3PXkZgCWTtKiPKoiB7iARbNtbIApRdcA8BKZtPyn/g3VMPYdjxg=
+X-Gm-Gg: ASbGnct9QEQY+aUbvFa5yJnl8DO0AGDNmGxEDnrWv1Yx2anAVz1h1p1hy318NAYs2i8
+	M4ohOzQj9a3km1+YZeNfqv/Ysc6h9CPY93ZmfKLDjv/jrwJin0xegNmD7Zc8nRQaufIt4MSj0Gf
+	+UAtwDcmk8o0QZcwWli66bjPsTw7emO1ALrhGLu4chrjYCPIEQWhYlVy3/Gx6IZkvL+Y9wA3Kzq
+	RVpW1gMKRn5o2R+Zr2YMyMD8SQr3CNwfM9jfjFVZNKtW2jTz43oKRDZGnsylvchXlFZs95VfxrJ
+	uCB6m3N+6MRwlO436MrQevK6OQ5caZ48eAtNjPArWS2PyTUgyp7lttydZTJC/pbFw3jmPT+4Sf9
+	YeBpFEmfOSE96GJeMaKPTZIylBuDvkQWoEkD9a/aQFAM=
+X-Google-Smtp-Source: AGHT+IEEnn/ufz6mqS8sNhhi17+pqZj6OB0ZO/xLcIsqqzhVrA8tKi9dLivhuV4/wirpHZNz/ivObw==
+X-Received: by 2002:a05:6a00:3e10:b0:72d:9cbc:730d with SMTP id d2e1a72fcca58-7489cffbf39mr4211820b3a.11.1749912963480;
+        Sat, 14 Jun 2025 07:56:03 -0700 (PDT)
+Received: from localhost.localdomain (36-228-20-239.dynamic-ip.hinet.net. [36.228.20.239])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74890006059sm3565303b3a.55.2025.06.14.07.55.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Jun 2025 07:56:02 -0700 (PDT)
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
+	Will Deacon <will@kernel.org>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH] KVM: arm64: nv: Fix s_cpu_if->vgic_lr[] indexing in vgic_v3_put_nested()
+Date: Sat, 14 Jun 2025 22:57:21 +0800
+Message-ID: <20250614145721.2504524-1-r09922117@csie.ntu.edu.tw>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-9-tabba@google.com>
- <aEySD5XoxKbkcuEZ@google.com>
-Message-ID: <aEyqqj77hIAZy8FL@google.com>
-Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
-From: Sean Christopherson <seanjc@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On Fri, Jun 13, 2025, Sean Christopherson wrote:
-> On Wed, Jun 11, 2025, Fuad Tabba wrote:
+s_cpu_if->vgic_lr[] is filled continuously from index 0 to
+s_cpu_if->used_lrs - 1, but vgic_v3_put_nested() is indexing it using
+the positions of the set bits in shadow_if->lr_map. So correct it.
 
-...
+Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+---
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-> > +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
-> 
-> And to my point about "shared", this is also very confusing, because there are
-> zero checks in here about shared vs. private.
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 4f6954c30674..29741e3f077b 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -343,7 +343,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 	struct shadow_if *shadow_if = get_shadow_if();
+ 	struct vgic_v3_cpu_if *s_cpu_if = &shadow_if->cpuif;
+ 	u64 val;
+-	int i;
++	int i, index = 0;
+ 
+ 	__vgic_v3_save_vmcr_aprs(s_cpu_if);
+ 	__vgic_v3_deactivate_traps(s_cpu_if);
+@@ -368,10 +368,11 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 		val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
+ 
+ 		val &= ~ICH_LR_STATE;
+-		val |= s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
++		val |= s_cpu_if->vgic_lr[index] & ICH_LR_STATE;
+ 
+ 		__vcpu_sys_reg(vcpu, ICH_LRN(i)) = val;
+-		s_cpu_if->vgic_lr[i] = 0;
++		s_cpu_if->vgic_lr[index] = 0;
++		index++;
+ 	}
+ 
+ 	shadow_if->lr_map = 0;
+-- 
+2.49.0
 
-Heh, and amusingly (to me at least), I was the one that suggested this name[*]:
-
- : >  static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
- :
- : This should be something like kvm_gmem_fault_shared() make it abundantly clear
- : what's being done.  Because it too me a few looks to realize this is faulting
- : memory into host userspace, not into the guest.
-
-Though I don't think my two statements are contradictory.  A bare kvm_gmem_fault()
-is confusing because it's ambigous.  kvm_gmem_fault_shared() is confusing because
-"shared" is (IMO) bad terminology.
-
-E.g. to me, this is much more obvious:
-
-  static vm_fault_t kvm_gmem_fault_user(struct vm_fault *vmf)
-
-or even
-
-  static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
-
-if we're worried about "user" getting confused with supervisor vs. user in the
-guest.
-
-[*] https://lore.kernel.org/all/Z-3UGmcCwJtaP-yF@google.com
