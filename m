@@ -1,316 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC6D20B80D;
-	Mon, 16 Jun 2025 10:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07F6280308;
+	Mon, 16 Jun 2025 11:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750071301; cv=none; b=jH5elLZ+Wp4M96Y86V42OPe9gKLF4MMpVip4g3gy/qkAp/kMyGGs2i8FlKyLw4Z7kaDnam7LVa2Rk05+nvSo6O6nEnh3ZDTPyfjFi5J17O3M2fFBPNdiXR55+Aq+tVDfDVbhjX1VdlyxdOLe+Xa22nrKzuit8tGkvjRMXjAUOfg=
+	t=1750072212; cv=none; b=EtJtMNO6LctNn2EuuNW5jY5p2ODj9yIVj/HwqFu1rCY0hE7nj+jrbQBCmH1OtJo0u1cnzf/NYlvsMgaaGkjTRdoUP90pjbc1HjiPqlx6dO5NBOjWZHFug+k4287SM2FZQY7vKYDHsSse6VvcRKW+a3SuXg5erdfLdzNfPdfTAfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750071301; c=relaxed/simple;
-	bh=9qI7UdCi7n9CK2wqk4VuCHt+Q/KIMMELhBVBtp0x7hE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K8MNPFYlXskbxezyVCpW72P7V/w6PZx9R7uePoGMjXlQK9l5kBFONsyTgOxYwmyjCU3etIT9kl9PuRH7CovFy4j2L8sahTQNDIM4rNEh44YU5EWngxyr6Zp1TrhFIQ2G2rfaxsIR/YmDT686klx1Q00IIy3sS7kEWe7vcyJrZJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9NnLWv+; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9NnLWv+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90C20C4CEEE;
-	Mon, 16 Jun 2025 10:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750071300;
-	bh=9qI7UdCi7n9CK2wqk4VuCHt+Q/KIMMELhBVBtp0x7hE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z9NnLWv+TPhnP0+1PZVTClIhlA4UtFV8WyWkxOCqTYIWWaGRjn60Nyh9+dhMhJiSq
-	 qeqfbWTzprGaircC07qj4yqZaW2qGubKcgWxaFMT/HRSdUrkVEHdg058gFmmaTnIVU
-	 3K7XATDo3LaHlaaZnlvXVGZdx2xyaecW+aYnQNdXpJnANhTnU9/CtQ7hBQSFeqPdUE
-	 SyR5CHgXja9aLZo6ZUDU3r0d7jScpLLdqcfOe+Ex8g01dx8Tjf6QLR3iLNwf34k2Sn
-	 LEnUUmOrB0BM5DyVxDnYHzUNdovx9ukVEH38Z7pe3d+FGOJkOWl5EErAfCXu+QpTII
-	 Pn7TFkaU3kc/Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uR7UP-007CpO-Sx;
-	Mon, 16 Jun 2025 11:54:58 +0100
-Date: Mon, 16 Jun 2025 11:54:57 +0100
-Message-ID: <86qzzkc5xa.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Fix s_cpu_if->vgic_lr[] indexing in vgic_v3_put_nested()
-In-Reply-To: <20250614145721.2504524-1-r09922117@csie.ntu.edu.tw>
-References: <20250614145721.2504524-1-r09922117@csie.ntu.edu.tw>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1750072212; c=relaxed/simple;
+	bh=061tTKCW1Z+wM95im2rlDKaggm8fXWjifaAXtUl0CiM=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=VMjKRH5XeytYwqLPEaOOAhbISRjqLwS8dQwhA/gXoxGMyjlXWH96jhO0cj/TR1GqxA+bRRRRBdYv5c9BDXUbo51npx5jVs9eunxR36R7XXY4NwogD7WC5PY4p7o/oAOZ5COaHFZCgR8j2Ep67oviW9lf6iAzQrZTwO2wlCrQki0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bLRzy28PLz1V43x;
+	Mon, 16 Jun 2025 19:07:42 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 287C3180044;
+	Mon, 16 Jun 2025 19:10:06 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 16 Jun 2025 19:10:04 +0800
+Subject: Re: [PATCH 3/8] KVM: arm64: Move ARM specific headers in include/kvm
+ to arch directory
+To: Sean Christopherson <seanjc@google.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan
+	<maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley
+	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+	<aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda
+	<imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, Anish Ghulati <aghulati@google.com>, Colton
+ Lewis <coltonlewis@google.com>, Thomas Huth <thuth@redhat.com>
+References: <20250611001042.170501-1-seanjc@google.com>
+ <20250611001042.170501-4-seanjc@google.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <a5032f01-9f54-eff9-ee72-b159ed56ca70@huawei.com>
+Date: Mon, 16 Jun 2025 19:10:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack@cs.columbia.edu, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <20250611001042.170501-4-seanjc@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-On Sat, 14 Jun 2025 15:57:21 +0100,
-Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
->=20
-> s_cpu_if->vgic_lr[] is filled continuously from index 0 to
-> s_cpu_if->used_lrs - 1, but vgic_v3_put_nested() is indexing it using
-> the positions of the set bits in shadow_if->lr_map. So correct it.
->=20
-> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+On 2025/6/11 8:10, Sean Christopherson wrote:
+> Move kvm/arm_{arch_timer,pmu,vgic}.h to arch/arm64/include/asm and drop
+> the "arm" prefix from all file names.  Now that KVM no longer supports
+> 32-bit ARM, there is no reason to expose ARM specific headers to other
+> architectures beyond arm64.
+> 
+> Cc: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-v3-nested.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->=20
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/v=
-gic-v3-nested.c
-> index 4f6954c30674..29741e3f077b 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> @@ -343,7 +343,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
->  	struct shadow_if *shadow_if =3D get_shadow_if();
->  	struct vgic_v3_cpu_if *s_cpu_if =3D &shadow_if->cpuif;
->  	u64 val;
-> -	int i;
-> +	int i, index =3D 0;
-> =20
->  	__vgic_v3_save_vmcr_aprs(s_cpu_if);
->  	__vgic_v3_deactivate_traps(s_cpu_if);
-> @@ -368,10 +368,11 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
->  		val =3D __vcpu_sys_reg(vcpu, ICH_LRN(i));
-> =20
->  		val &=3D ~ICH_LR_STATE;
-> -		val |=3D s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
-> +		val |=3D s_cpu_if->vgic_lr[index] & ICH_LR_STATE;
-> =20
->  		__vcpu_sys_reg(vcpu, ICH_LRN(i)) =3D val;
-> -		s_cpu_if->vgic_lr[i] =3D 0;
-> +		s_cpu_if->vgic_lr[index] =3D 0;
-> +		index++;
->  	}
-> =20
->  	shadow_if->lr_map =3D 0;
+>  .../arm64/include/asm/kvm_arch_timer.h                     | 0
+>  arch/arm64/include/asm/kvm_host.h                          | 7 +++----
+>  include/kvm/arm_pmu.h => arch/arm64/include/asm/kvm_pmu.h  | 0
+>  .../kvm/arm_vgic.h => arch/arm64/include/asm/kvm_vgic.h    | 0
+>  arch/arm64/kvm/arch_timer.c                                | 5 ++---
+>  arch/arm64/kvm/arm.c                                       | 3 +--
+>  arch/arm64/kvm/pmu-emul.c                                  | 4 ++--
+>  arch/arm64/kvm/reset.c                                     | 3 +--
+>  arch/arm64/kvm/trace_arm.h                                 | 2 +-
+>  arch/arm64/kvm/vgic/vgic-debug.c                           | 2 +-
+>  arch/arm64/kvm/vgic/vgic-init.c                            | 2 +-
+>  arch/arm64/kvm/vgic/vgic-irqfd.c                           | 2 +-
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c                      | 2 +-
+>  arch/arm64/kvm/vgic/vgic-mmio-v2.c                         | 2 +-
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c                         | 2 +-
+>  arch/arm64/kvm/vgic/vgic-mmio.c                            | 4 ++--
+>  arch/arm64/kvm/vgic/vgic-v2.c                              | 2 +-
+>  arch/arm64/kvm/vgic/vgic-v3-nested.c                       | 3 +--
+>  arch/arm64/kvm/vgic/vgic-v3.c                              | 2 +-
+>  19 files changed, 21 insertions(+), 26 deletions(-)
+>  rename include/kvm/arm_arch_timer.h => arch/arm64/include/asm/kvm_arch_timer.h (100%)
+>  rename include/kvm/arm_pmu.h => arch/arm64/include/asm/kvm_pmu.h (100%)
+>  rename include/kvm/arm_vgic.h => arch/arm64/include/asm/kvm_vgic.h (100%)
 
-Nice catch, thanks a lot for tracking it down.
+Nitpick:
 
-However, I think we should get rid of this double-indexing altogether,
-or at least make it less error-prone. This thing is extremely fragile,
-and it isn't the first time we are getting bitten with it.
+|F:	include/kvm/arm_*
 
-Looking at the code, it becomes pretty obvious that the shadow index
-is always the number of bits set in lr_map, and that we could
-completely drop the 'index' thing if we simply counted these bits
-(which isn't that expensive).
+can be deleted from the KVM/arm64 MAINTAINERS entry now.
 
-I came up with the (admittedly much bigger) following fix.
-
-Thoughts?
-
-	M.
-
-=46rom 2484950b8fc3b36cca32bf5e86ffe7975a43e0e7 Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Sun, 15 Jun 2025 16:11:38 +0100
-Subject: [PATCH] KVM: arm64: nv: Fix tracking of shadow list registers
-
-Wei-Lin reports that the tracking of shadow list registers is
-majorly broken when resync'ing the L2 state after a run, as
-we confuse the guest's LR index with the host's, potentially
-losing the interrupt state.
-
-While this could be fixed by adding yet another side index to
-track it (Wei-Lin's fix), it may be better to refactor this
-code to avoid having a side index altogether, limiting the
-risk to introduce this class of bugs.
-
-A key observation is that the shadow index is always the number
-of bits in the lr_map bitmap. With that, the parallel indexing
-scheme can be completely dropped.
-
-While doing this, introduce a couple of helpers that abstract
-the index conversion and some of the LR repainting, making the
-whole exercise much simpler.
-
-Reported-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20250614145721.2504524-1-r09922117@csie.ntu=
-.edu.tw
----
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 81 ++++++++++++++--------------
- 1 file changed, 42 insertions(+), 39 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgi=
-c-v3-nested.c
-index d22a8ad7bcc51..bd22e42ce9112 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -36,6 +36,11 @@ struct shadow_if {
-=20
- static DEFINE_PER_CPU(struct shadow_if, shadow_if);
-=20
-+static int lr_map_idx_to_shadow_idx(struct shadow_if *shadow_if, int idx)
-+{
-+	return hweight64(shadow_if->lr_map & (BIT(idx) - 1));
-+}
-+
- /*
-  * Nesting GICv3 support
-  *
-@@ -209,6 +214,29 @@ u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu)
- 	return reg;
- }
-=20
-+static u64 translate_lr_hw_bit(struct kvm_vcpu *vcpu, u64 lr)
-+{
-+	struct vgic_irq *irq;
-+
-+	if (!(lr & ICH_LR_HW))
-+		return lr;
-+
-+	/* We have the HW bit set, check for validity of pINTID */
-+	irq =3D vgic_get_vcpu_irq(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
-+	/* If there was no real mapping, nuke the HW bit */
-+	if (!irq || !irq->hw || irq->intid > VGIC_MAX_SPI)
-+		lr &=3D ~ICH_LR_HW;
-+
-+	/* Translate the virtual mapping to the real one, even if invalid */
-+	if (irq) {
-+		lr &=3D ~ICH_LR_PHYS_ID_MASK;
-+		lr |=3D FIELD_PREP(ICH_LR_PHYS_ID_MASK, (u64)irq->hwintid);
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+
-+	return lr;
-+}
-+
- /*
-  * For LRs which have HW bit set such as timer interrupts, we modify them =
-to
-  * have the host hardware interrupt number instead of the virtual one prog=
-rammed
-@@ -217,58 +245,37 @@ u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu)
- static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu,
- 				     struct vgic_v3_cpu_if *s_cpu_if)
- {
--	unsigned long lr_map =3D 0;
--	int index =3D 0;
-+	struct shadow_if *shadow_if;
-+
-+	shadow_if =3D container_of(s_cpu_if, struct shadow_if, cpuif);
-+	shadow_if->lr_map =3D 0;
-=20
- 	for (int i =3D 0; i < kvm_vgic_global_state.nr_lr; i++) {
- 		u64 lr =3D __vcpu_sys_reg(vcpu, ICH_LRN(i));
--		struct vgic_irq *irq;
-=20
- 		if (!(lr & ICH_LR_STATE))
--			lr =3D 0;
--
--		if (!(lr & ICH_LR_HW))
--			goto next;
--
--		/* We have the HW bit set, check for validity of pINTID */
--		irq =3D vgic_get_vcpu_irq(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
--		if (!irq || !irq->hw || irq->intid > VGIC_MAX_SPI ) {
--			/* There was no real mapping, so nuke the HW bit */
--			lr &=3D ~ICH_LR_HW;
--			if (irq)
--				vgic_put_irq(vcpu->kvm, irq);
--			goto next;
--		}
--
--		/* Translate the virtual mapping to the real one */
--		lr &=3D ~ICH_LR_PHYS_ID_MASK;
--		lr |=3D FIELD_PREP(ICH_LR_PHYS_ID_MASK, (u64)irq->hwintid);
-+			continue;
-=20
--		vgic_put_irq(vcpu->kvm, irq);
-+		lr =3D translate_lr_hw_bit(vcpu, lr);
-=20
--next:
--		s_cpu_if->vgic_lr[index] =3D lr;
--		if (lr) {
--			lr_map |=3D BIT(i);
--			index++;
--		}
-+		s_cpu_if->vgic_lr[hweight64(shadow_if->lr_map)] =3D lr;
-+		shadow_if->lr_map |=3D BIT(i);
- 	}
-=20
--	container_of(s_cpu_if, struct shadow_if, cpuif)->lr_map =3D lr_map;
--	s_cpu_if->used_lrs =3D index;
-+	s_cpu_if->used_lrs =3D hweight64(shadow_if->lr_map);
- }
-=20
- void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- {
- 	struct shadow_if *shadow_if =3D get_shadow_if();
--	int i, index =3D 0;
-+	int i;
-=20
- 	for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
- 		u64 lr =3D __vcpu_sys_reg(vcpu, ICH_LRN(i));
- 		struct vgic_irq *irq;
-=20
- 		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
--			goto next;
-+			continue;
-=20
- 		/*
- 		 * If we had a HW lr programmed by the guest hypervisor, we
-@@ -277,15 +284,13 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- 		 */
- 		irq =3D vgic_get_vcpu_irq(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
- 		if (WARN_ON(!irq)) /* Shouldn't happen as we check on load */
--			goto next;
-+			continue;
-=20
--		lr =3D __gic_v3_get_lr(index);
-+		lr =3D __gic_v3_get_lr(lr_map_idx_to_shadow_idx(shadow_if, i));
- 		if (!(lr & ICH_LR_STATE))
- 			irq->active =3D false;
-=20
- 		vgic_put_irq(vcpu->kvm, irq);
--	next:
--		index++;
- 	}
- }
-=20
-@@ -368,13 +373,11 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 		val =3D __vcpu_sys_reg(vcpu, ICH_LRN(i));
-=20
- 		val &=3D ~ICH_LR_STATE;
--		val |=3D s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
-+		val |=3D s_cpu_if->vgic_lr[lr_map_idx_to_shadow_idx(shadow_if, i)] & ICH=
-_LR_STATE;
-=20
- 		__vcpu_assign_sys_reg(vcpu, ICH_LRN(i), val);
--		s_cpu_if->vgic_lr[i] =3D 0;
- 	}
-=20
--	shadow_if->lr_map =3D 0;
- 	vcpu->arch.vgic_cpu.vgic_v3.used_lrs =3D 0;
- }
-=20
---=20
-2.39.2
-
-
---=20
-Without deviation from the norm, progress is not possible.
+Thanks,
+Zenghui
