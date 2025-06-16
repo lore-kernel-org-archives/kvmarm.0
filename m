@@ -1,71 +1,72 @@
 Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AFB1E2614
-	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 06:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504BA1F4701
+	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 07:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750056803; cv=none; b=OwASEjeCnu685SuwL7zqA1s5aCWww9J45T2qS5sKDvHKMGa66RRUiU8mi+L62kCkVZ0H0p8F9xiudNhsPcUK2K+xi3dAsOQuZbyo/zMctoeVUaaaKdDMaSfEBUkt6f2mf6P9sTdrLWIET9PrTRa/fvd/kQNMcksWTL7QpRmvi2c=
+	t=1750058057; cv=none; b=tHIIiOX1q2WxMjGQuhbcAonHnKjOUnEF3Wwmj5FBqFeFmcDaLS5hND7zYp1OMI8F/50EgRURQadKda+xp+zL8pmtDanpfI9UIvYjNBxXKsxLqeDkldDtxDtfAIDm/q6w1QNL2bvWVc/+TP+TXNe7uTX0FwKxgl6hnjmkCeGQoHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750056803; c=relaxed/simple;
-	bh=ho9O6twFOJCkqdITUQ83uLD4KiqtndrdH4zc780Tgc8=;
+	s=arc-20240116; t=1750058057; c=relaxed/simple;
+	bh=5B+m8LJRszE/eOQ7rN2wxVR0e0sQd7dvBxHZtcWiquo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JKoFVKz7/pAxjjSWiCqMBa9VrkALExjs0oKGv2yPaJivPrzUcIMXJf+25PoNFGlh59eHWhggTYus1wdW6MvfOMVPQMYjIIDHXoIV6Dzzteg1pKL3Ej8899taxyxYpBeSmPCRneCN41DGQfSwQPOy5pLUoeoVip+4MHtkXDrT9/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TZqIe8b6; arc=none smtp.client-ip=209.85.160.178
+	 To:Cc:Content-Type; b=DdFgzZZouxPVUXvnmKmCmKg+jK1U5xbO8FXlB5uuNnca04r01osZheZVOMPZrW15gYAWsTpu9WrwfC3VCKYrMrXO3dq0SBeWSF5hC7zVrAuqZzuZbXsZPuGVYQMOlLnfNqL3n4RiBc+e3hbWkOD/sv+cc9KF2Z5gHFZkLmoe83o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DtBFM9QI; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TZqIe8b6"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47e9fea29easo450081cf.1
-        for <kvmarm@lists.linux.dev>; Sun, 15 Jun 2025 23:53:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DtBFM9QI"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a58ef58a38so293401cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 00:14:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750056800; x=1750661600; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FVEqVirFg5i6MzjRVG1snzVj/JgYlsQG5VsPw3Lo4N4=;
-        b=TZqIe8b6LPcqPcHiogCa1MpZeFi0L5P95p3EfdHe/qZnHKh8Axff07n2k7VxcFMs+g
-         A+wHY0lytoVCaRcC5Tu7w11r9aKZYOi6FLPWn2KNIh3kzig1fQqx4GHyP7fpY8db6Lum
-         XMUYxZpPXR8BeQHuQGrTACZ6e28CConplK/VbNETLVrgmDkhdcHT5Cwdipma7EugkZNa
-         vvdidWJ2l2M8cOaECw5VTlDYfdv+Jth0EhWHZsjTiD7DEi3LLEarFr/D6lvOFc2nc2FX
-         9IQN1xlQewrIrJtfeXPcJFmhAEjfmU+/LV00fk9xAQqOB9bA9ZUpFZoopoIcxnRGy2BP
-         UsDA==
+        d=google.com; s=20230601; t=1750058054; x=1750662854; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G4dscraCi99Sxb2AdbSI/1exeAb4GQbHQ2olocOXtjo=;
+        b=DtBFM9QI1/lK7IVtpugmHmJZoRVVpismt6IoF8/LuzOm8H9AmpZja3XcUuyDyGnxrX
+         UUkngKWHhxpAYLADNOUGn2bQ29tvSk6Y3tqUwjiUc9I7tZqTmpyGYOdR8RWH19qJrkJS
+         /Wr06UMY2G0rKTYFVEs5JjrbjXk8KZPFQxb/w8wssLQhSybPlV+BZxtAYStD4APKT/hS
+         oJmyWOIuVmW60X1k+LV4ySIcQw9+LK+G3Tdss3hso91z4EX2baTCgs/DZAh/iuAL5ewI
+         DXVLJitzY9ghk1133Bp7c7IWO14N6IZ7hbuGhemO4rVp58hBGef5h4YKJv+ZXYH2i9tH
+         K/1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750056800; x=1750661600;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FVEqVirFg5i6MzjRVG1snzVj/JgYlsQG5VsPw3Lo4N4=;
-        b=gluakQAp51hjCBkPUtBCuemmFbdcFXX2g0D6n1ZllfChznAvFgmGv1IQPovU8o5wfL
-         3G1yXRjwFXXUTV+aSXCRgvWru5S3aIc9baOZKHcyLJcUIh2wPbjzT4ShuMfinGo8YAxF
-         5qZjdTt6JQDo0lVuLFk+Og33/Qq9Q9fLHqbEDRRCbceCNYTmHkeNSe+cEXVxtxm8XBvi
-         c2vrCAfghFyULrIhe4ebz67CBosdEIMJCOhUpjthPKUsWgBKLJaerjUj7IJmFI7NVODQ
-         QwGYTDF4BR3HjGByVXDb1RJkTA97zaMvun7BNb3e37cbxB2vOkTqPPVILZDOwNk23q5s
-         Kdmw==
-X-Forwarded-Encrypted: i=1; AJvYcCWUKs87pPDuESGEQUfS84CDK17fTPRPMzK7CxClDBk/NzsWVsD3IUc3QAL61WAwR6cziDeKF7Q=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxy4LhYvgYCPkqsixxnauvXuf5U3oKpEMYfyVPhzcEjKr0u9kmN
-	/EMKbQJ0mlXfYYOzVQ2IqH43Ai4CDARypIZ6kF64DxX5AI875InNsByMZkSZ9QE8yoiqRhpxbSK
-	MesHUJNXRD2XXygOSGJOa0n8gPl8nNWwWXNLc2joO
-X-Gm-Gg: ASbGncvdqF2AXNl7w88o7SUCYr+0f9QHQabu3KBYNRw5+4HjSCwdgtyAsV9QMnVJ7lo
-	mfXFzX27fsDqv5ZblKjEB473fpHm6dntOmZnwiICTEpV5KNIEukVlWekNVho/rZ984pNCLY9sF0
-	VMVQzAYoKXYgkZzCabnqttAepBR0SJnWT6lpwoCCaXjY4=
-X-Google-Smtp-Source: AGHT+IE5hWQwTwh7MP9Du/GPZsQBHV+avpYUx4eqkYI8R99l7WlPl8ufgRsSCv2pUxGqQWRSQb1g5/J6MZjLIVn1B3Q=
-X-Received: by 2002:a05:622a:1213:b0:476:f1a6:d8e8 with SMTP id
- d75a77b69052e-4a73f3c4871mr4666031cf.11.1750056799453; Sun, 15 Jun 2025
- 23:53:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750058054; x=1750662854;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G4dscraCi99Sxb2AdbSI/1exeAb4GQbHQ2olocOXtjo=;
+        b=rE+blxHddKokf36INYL4Fl1atNTULjSwAE/menMPU8l8VZd5lHR0viO7r0+pp/wROx
+         UNqbrFNNW6h0F+tsmPJa15dzXTNvhcrSAF8GqAfFB5Qv5FxkG2d495yP1r0PwTX/i9uJ
+         WwvlA2VfYgBYtjWli2Lbfk4klbf5/rgYDAG8+a5OK9ffEuOcasgYZXcX3+Ixd2x0c7nZ
+         03vzKZ7qroI1LY8eYfGpcfFTslt+kzsZrNyigOFCED4yV8rgJ07xLMyr7MVLzI8c4OX+
+         S0ZlL/CAJBGj5lWbcYRjrKOLssRW3lqE2Mvooo2Uoxaj+IRSkfGhhJ39s+CoV4twD07z
+         wdAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhT/yMC+xQaxoHn+ShfZCcIzKdXuiwG5WpoTPd25WRjSmdZq7hXHpypHlv5dKTP7Pw7v6cXvQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxjVdVjYkBtNMobCE64DvNbFwjuKyXHGNzPg4uEUmKBZu+4keON
+	lmvwUHqhncpz7XYpbAgc9EutwRbS9B0hr9Wc8tWwdOA8e6NZGbCq0qrYVY2J4n8qhe2XLhJGnLr
+	9YnMibvGoRcCXV/cmDqD9lD+CH4jmRbT0598fljVX
+X-Gm-Gg: ASbGncuoxuqTve6Ee67ql5hpsE5AUZuBn3eeui0oX58HfbYy/9Uved2ptC3k4EJ3Xas
+	kNOhW+BXDQBsR8tKk/wo0Pv6mBjXFA5hbnaYm9qhkZwpD1NQ5nArSaWeO0SxaYIzT+ulu/gKyER
+	V7ZzUmrLLcn6uxR9ATtPh/LsqwMGdr/Z0SytCd1TtGmWuEXTHP3NSb/w==
+X-Google-Smtp-Source: AGHT+IHRP1CpUCig8F7p0iqSMmnDgYVd+hSQrG9KB86uiC6pnZNQNaE6PPvaROhLDIFwY0y51UIij5JffUL2jbFDWys=
+X-Received: by 2002:ac8:58c8:0:b0:4a5:9b0f:a150 with SMTP id
+ d75a77b69052e-4a73d63d978mr5025451cf.16.1750058053808; Mon, 16 Jun 2025
+ 00:14:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-9-tabba@google.com>
- <aEySD5XoxKbkcuEZ@google.com>
-In-Reply-To: <aEySD5XoxKbkcuEZ@google.com>
+References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-5-tabba@google.com>
+ <aEyLlbyMmNEBCAVj@google.com>
+In-Reply-To: <aEyLlbyMmNEBCAVj@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 16 Jun 2025 07:52:43 +0100
-X-Gm-Features: AX0GCFvGKRmaMT01Ibh3HhY56fkma50qiBLdK32HOEYHz0uSWpQ07u962UNyKuk
-Message-ID: <CA+EHjTyO1tP1uiVkoReZxvV6h2VwfX+1qxBT15JcP3+AXdB8fA@mail.gmail.com>
-Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
+Date: Mon, 16 Jun 2025 08:13:37 +0100
+X-Gm-Features: AX0GCFulb2IhkWValvX9vFqGHI2nVg_Dnrs5LCKRKWUrkMeevUaVx5iPDic8k40
+Message-ID: <CA+EHjTz=j==9evN7n1sGfTwxi5DKSr5k0yzXhDGzvwk7UawSGA@mail.gmail.com>
+Subject: Re: [PATCH v12 04/18] KVM: x86: Rename kvm->arch.has_private_mem to kvm->arch.supports_gmem
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
@@ -89,223 +90,94 @@ Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
 	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
 	ira.weiny@intel.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
 Hi Sean,
 
-On Fri, 13 Jun 2025 at 22:03, Sean Christopherson <seanjc@google.com> wrote:
+On Fri, 13 Jun 2025 at 21:35, Sean Christopherson <seanjc@google.com> wrote=
+:
 >
 > On Wed, Jun 11, 2025, Fuad Tabba wrote:
-> > This patch enables support for shared memory in guest_memfd, including
+> > The bool has_private_mem is used to indicate whether guest_memfd is
+> > supported.
 >
-> Please don't lead with with "This patch", simply state what changes are being
-> made as a command.
-
-Ack.
-
-> > mapping that memory from host userspace.
+> No?  This is at best weird, and at worst flat out wrong:
 >
-> > This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
-> > and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
-> > flag at creation time.
+>         if (kvm->arch.supports_gmem &&
+>             fault->is_private !=3D kvm_mem_is_private(kvm, fault->gfn))
+>                 return false;
 >
-> Why?  I can see that from the patch.
+> ditto for this code:
+>
+>         if (kvm_arch_supports_gmem(vcpu->kvm) &&
+>             kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(range->gpa)))i
+>                 error_code |=3D PFERR_PRIVATE_ACCESS;
+>
+> and for the memory_attributes code.  E.g. IIRC, with guest_memfd() mmap s=
+upport,
+> private vs. shared will become a property of the guest_memfd inode, i.e. =
+this will
+> become wrong:
+>
+> static u64 kvm_supported_mem_attributes(struct kvm *kvm)
+> {
+>         if (!kvm || kvm_arch_supports_gmem(kvm))
+>                 return KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>
+>         return 0;
+> }
+>
+> Instead of renaming kvm_arch_has_private_mem() =3D> kvm_arch_supports_gme=
+m(), *add*
+> kvm_arch_supports_gmem() and then kill off kvm_arch_has_private_mem() onc=
+e non-x86
+> usage is gone (i.e. query kvm->arch.has_private_mem directly).
+>
+> And then rather than rename has_private_mem, either add supports_gmem or =
+do what
+> you did for kvm_arch_supports_gmem_shared_mem() and explicitly check the =
+VM type.
 
-It's in the patch series, not this patch. Would it help if I rephrase
-it along the lines of:
+Will do.
 
-This functionality isn't enabled until the introduction of the
-KVM_GMEM_SHARED_MEM Kconfig option, and enabled for a given instance
-by the GUEST_MEMFD_FLAG_SUPPORT_SHARED flag at creation time. Both of
-which are introduced in a subsequent patch.
+To make sure we're on the same page, we should add `supports_gmem` and
+keep `has_private_mem`, and continue using it for x86 code by querying
+it directly once the helpers are added.
 
-> This changelog is way, way, waaay too light on details.  Sorry for jumping in at
-> the 11th hour, but we've spent what, 2 years working on this?
-
-I'll expand this. Just to make sure that I include the right details,
-are you looking for implementation details, motivation, use cases?
-
+> > Rename it to supports_gmem to make its meaning clearer and to decouple =
+memory
+> > being private from guest_memfd.
+> >
+> > Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 > > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Acked-by: David Hildenbrand <david@redhat.com>
-> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Reviewed-by: Shivank Garg <shivankg@amd.com>
+> > Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+> > Co-developed-by: David Hildenbrand <david@redhat.com>
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
 > > Signed-off-by: Fuad Tabba <tabba@google.com>
 > > ---
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index d00b85cb168c..cb19150fd595 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1570,6 +1570,7 @@ struct kvm_memory_attributes {
-> >  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> >
-> >  #define KVM_CREATE_GUEST_MEMFD       _IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
-> > +#define GUEST_MEMFD_FLAG_SUPPORT_SHARED      (1ULL << 0)
+> >  arch/x86/include/asm/kvm_host.h | 4 ++--
+> >  arch/x86/kvm/mmu/mmu.c          | 2 +-
+> >  arch/x86/kvm/svm/svm.c          | 4 ++--
+> >  arch/x86/kvm/x86.c              | 3 +--
+> >  4 files changed, 6 insertions(+), 7 deletions(-)
 >
-> I find the SUPPORT_SHARED terminology to be super confusing.  I had to dig quite
-> deep to undesrtand that "support shared" actually mean "userspace explicitly
-> enable sharing on _this_ guest_memfd instance".  E.g. I was surprised to see
+> This missed the usage in TDX (it's not a staleness problem, because this =
+series
+> was based on 6.16-rc1, which has the relevant code).
 >
-> IMO, GUEST_MEMFD_FLAG_SHAREABLE would be more appropriate.  But even that is
-> weird to me.  For non-CoCo VMs, there is no concept of shared vs. private.  What's
-> novel and notable is that the memory is _mappable_.  Yeah, yeah, pKVM's use case
-> is to share memory, but that's a _use case_, not the property of guest_memfd that
-> is being controlled by userspace.
->
-> And kvm_gmem_memslot_supports_shared() is even worse.  It's simply that the
-> memslot is bound to a mappable guest_memfd instance, it's that the guest_memfd
-> instance is the _only_ entry point to the memslot.
->
-> So my vote would be "GUEST_MEMFD_FLAG_MAPPABLE", and then something like
-> KVM_MEMSLOT_GUEST_MEMFD_ONLY.  That will make code like this:
->
->         if (kvm_slot_has_gmem(slot) &&
->             (kvm_gmem_memslot_supports_shared(slot) ||
->              kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
->                 return kvm_gmem_max_mapping_level(slot, gfn, max_level);
->         }
->
-> much more intutive:
->
->         if (kvm_is_memslot_gmem_only(slot) ||
->             kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE))
->                 return kvm_gmem_max_mapping_level(slot, gfn, max_level);
->
-> And then have kvm_gmem_mapping_order() do:
->
->         WARN_ON_ONCE(!kvm_slot_has_gmem(slot));
->         return 0;
+> arch/x86/kvm/vmx/tdx.c: In function =E2=80=98tdx_vm_init=E2=80=99:
+> arch/x86/kvm/vmx/tdx.c:627:18: error: =E2=80=98struct kvm_arch=E2=80=99 h=
+as no member named =E2=80=98has_private_mem=E2=80=99
+>   627 |         kvm->arch.has_private_mem =3D true;
+>       |                  ^
+> make[5]: *** [scripts/Makefile.build:287: arch/x86/kvm/vmx/tdx.o] Error 1
 
-I have no preference really. To me this was intuitive, but I guess I
-have been staring at this way too long. If you and all the
-stakeholders are happy with your suggested changes, then I am happy
-making them :)
+I did test and run this before submitting the series. Building it on
+x86 with x86_64_defconfig and with allmodconfig pass (I obviously
+missed TDX though, apologies for that). I should have grepped for
+has_private_mem. That said, if I understood your suggestion correctly,
+this problem wouldn't happen again.
 
-
-> >  struct kvm_create_guest_memfd {
-> >       __u64 size;
-> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> > index 559c93ad90be..e90884f74404 100644
-> > --- a/virt/kvm/Kconfig
-> > +++ b/virt/kvm/Kconfig
-> > @@ -128,3 +128,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
-> >  config HAVE_KVM_ARCH_GMEM_INVALIDATE
-> >         bool
-> >         depends on KVM_GMEM
-> > +
-> > +config KVM_GMEM_SHARED_MEM
-> > +       select KVM_GMEM
-> > +       bool
-> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> > index 6db515833f61..06616b6b493b 100644
-> > --- a/virt/kvm/guest_memfd.c
-> > +++ b/virt/kvm/guest_memfd.c
-> > @@ -312,7 +312,77 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
-> >       return gfn - slot->base_gfn + slot->gmem.pgoff;
-> >  }
-> >
-> > +static bool kvm_gmem_supports_shared(struct inode *inode)
-> > +{
-> > +     const u64 flags = (u64)inode->i_private;
-> > +
-> > +     if (!IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM))
-> > +             return false;
-> > +
-> > +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
-> > +}
-> > +
-> > +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
->
-> And to my point about "shared", this is also very confusing, because there are
-> zero checks in here about shared vs. private.
-
-As you noted in a later email, it was you who suggested this name, but
-like I said, I am happy to change it.
-
-> > +{
-> > +     struct inode *inode = file_inode(vmf->vma->vm_file);
-> > +     struct folio *folio;
-> > +     vm_fault_t ret = VM_FAULT_LOCKED;
-> > +
-> > +     if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
-> > +             return VM_FAULT_SIGBUS;
-> > +
-> > +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-> > +     if (IS_ERR(folio)) {
-> > +             int err = PTR_ERR(folio);
-> > +
-> > +             if (err == -EAGAIN)
-> > +                     return VM_FAULT_RETRY;
-> > +
-> > +             return vmf_error(err);
-> > +     }
-> > +
-> > +     if (WARN_ON_ONCE(folio_test_large(folio))) {
-> > +             ret = VM_FAULT_SIGBUS;
-> > +             goto out_folio;
-> > +     }
-> > +
-> > +     if (!folio_test_uptodate(folio)) {
-> > +             clear_highpage(folio_page(folio, 0));
-> > +             kvm_gmem_mark_prepared(folio);
-> > +     }
-> > +
-> > +     vmf->page = folio_file_page(folio, vmf->pgoff);
-> > +
-> > +out_folio:
-> > +     if (ret != VM_FAULT_LOCKED) {
-> > +             folio_unlock(folio);
-> > +             folio_put(folio);
-> > +     }
-> > +
-> > +     return ret;
-> > +}
-> > +
-> > +static const struct vm_operations_struct kvm_gmem_vm_ops = {
-> > +     .fault = kvm_gmem_fault_shared,
-> > +};
-> > +
-> > +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-> > +{
-> > +     if (!kvm_gmem_supports_shared(file_inode(file)))
-> > +             return -ENODEV;
-> > +
-> > +     if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
-> > +         (VM_SHARED | VM_MAYSHARE)) {
->
-> And the SHARED terminology gets really confusing here, due to colliding with the
-> existing notion of SHARED file mappings.
-
-Ack.
-
-Before I respin, let's make sure we're all on the same page in terms
-of terminology. Hopefully David can chime in again now that he's had
-the weekend to ponder over the latest exchange :)
-
-Thanks,
+Cheers,
 /fuad
-
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     vma->vm_ops = &kvm_gmem_vm_ops;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  static struct file_operations kvm_gmem_fops = {
-> > +     .mmap           = kvm_gmem_mmap,
-> >       .open           = generic_file_open,
-> >       .release        = kvm_gmem_release,
-> >       .fallocate      = kvm_gmem_fallocate,
-> > @@ -463,6 +533,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
-> >       u64 flags = args->flags;
-> >       u64 valid_flags = 0;
-> >
-> > +     if (kvm_arch_supports_gmem_shared_mem(kvm))
-> > +             valid_flags |= GUEST_MEMFD_FLAG_SUPPORT_SHARED;
-> > +
-> >       if (flags & ~valid_flags)
-> >               return -EINVAL;
-> >
-> > --
-> > 2.50.0.rc0.642.g800a2b2222-goog
-> >
