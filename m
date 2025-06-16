@@ -1,76 +1,311 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCFC15DBC1
-	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 05:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AFB1E2614
+	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 06:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750053334; cv=none; b=pqxn87ze95ytUQY6hcMdDqjmBw1MyZ9oVOVAwdzibGyPEwoehVAKhoWkWxiNo5zwF8s7jUM1MXFnUQl4jjBayLOT7SMUgXb+p2QImtRgwtymoh03amygO1Kv4ZEaXKTTCCD+r0MHzc3sLvWH1vZ4VtiXZYshoNX1qNY4/WAfK6M=
+	t=1750056803; cv=none; b=OwASEjeCnu685SuwL7zqA1s5aCWww9J45T2qS5sKDvHKMGa66RRUiU8mi+L62kCkVZ0H0p8F9xiudNhsPcUK2K+xi3dAsOQuZbyo/zMctoeVUaaaKdDMaSfEBUkt6f2mf6P9sTdrLWIET9PrTRa/fvd/kQNMcksWTL7QpRmvi2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750053334; c=relaxed/simple;
-	bh=0WlCw1kWmn+BwzaXsYcqHtP+tCAqKJVKSkhSVmkxpoY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZFRooZTE9BQZWB8lUtlzEh+S9xUksg4fVMqo2wseDF9bZAEf7bbpeDlTGz0kiZy67s3LLa5X7bTjWvC0Bpux16GK5Z61WXRg8fSCsxTnCshFWba473NNzhmlQQHNOIbgugYdRTm772Ubi7lg6f7iqx/JeO8ZLVNRq0dL7PLI84U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZWVWV3p4; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1750056803; c=relaxed/simple;
+	bh=ho9O6twFOJCkqdITUQ83uLD4KiqtndrdH4zc780Tgc8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JKoFVKz7/pAxjjSWiCqMBa9VrkALExjs0oKGv2yPaJivPrzUcIMXJf+25PoNFGlh59eHWhggTYus1wdW6MvfOMVPQMYjIIDHXoIV6Dzzteg1pKL3Ej8899taxyxYpBeSmPCRneCN41DGQfSwQPOy5pLUoeoVip+4MHtkXDrT9/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TZqIe8b6; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZWVWV3p4"
-Date: Sun, 15 Jun 2025 22:55:20 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750053329;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+kz97nTQZlnksCETF2OO3FxTKc75UDfdQVAlEutLyMk=;
-	b=ZWVWV3p4mOCIZ6vd1VtWMmbvFOZ/gc24FpyWZDUAQ7axxp1+7BwXiIHMiyV/URDGODXbgC
-	YopKxt2lnCASWFo3uAQN0bAllHo7N1ZdWaB+xZZswK5kpTtpPcId3bWYvqYk95ILqv/mBX
-	YxvQVQczSf7I6VeKWacsG0us+Mx5H+c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Fix s_cpu_if->vgic_lr[] indexing in
- vgic_v3_put_nested()
-Message-ID: <aE-xyGGpHXdJ_pcF@linux.dev>
-References: <20250614145721.2504524-1-r09922117@csie.ntu.edu.tw>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TZqIe8b6"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47e9fea29easo450081cf.1
+        for <kvmarm@lists.linux.dev>; Sun, 15 Jun 2025 23:53:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750056800; x=1750661600; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FVEqVirFg5i6MzjRVG1snzVj/JgYlsQG5VsPw3Lo4N4=;
+        b=TZqIe8b6LPcqPcHiogCa1MpZeFi0L5P95p3EfdHe/qZnHKh8Axff07n2k7VxcFMs+g
+         A+wHY0lytoVCaRcC5Tu7w11r9aKZYOi6FLPWn2KNIh3kzig1fQqx4GHyP7fpY8db6Lum
+         XMUYxZpPXR8BeQHuQGrTACZ6e28CConplK/VbNETLVrgmDkhdcHT5Cwdipma7EugkZNa
+         vvdidWJ2l2M8cOaECw5VTlDYfdv+Jth0EhWHZsjTiD7DEi3LLEarFr/D6lvOFc2nc2FX
+         9IQN1xlQewrIrJtfeXPcJFmhAEjfmU+/LV00fk9xAQqOB9bA9ZUpFZoopoIcxnRGy2BP
+         UsDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750056800; x=1750661600;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FVEqVirFg5i6MzjRVG1snzVj/JgYlsQG5VsPw3Lo4N4=;
+        b=gluakQAp51hjCBkPUtBCuemmFbdcFXX2g0D6n1ZllfChznAvFgmGv1IQPovU8o5wfL
+         3G1yXRjwFXXUTV+aSXCRgvWru5S3aIc9baOZKHcyLJcUIh2wPbjzT4ShuMfinGo8YAxF
+         5qZjdTt6JQDo0lVuLFk+Og33/Qq9Q9fLHqbEDRRCbceCNYTmHkeNSe+cEXVxtxm8XBvi
+         c2vrCAfghFyULrIhe4ebz67CBosdEIMJCOhUpjthPKUsWgBKLJaerjUj7IJmFI7NVODQ
+         QwGYTDF4BR3HjGByVXDb1RJkTA97zaMvun7BNb3e37cbxB2vOkTqPPVILZDOwNk23q5s
+         Kdmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWUKs87pPDuESGEQUfS84CDK17fTPRPMzK7CxClDBk/NzsWVsD3IUc3QAL61WAwR6cziDeKF7Q=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxy4LhYvgYCPkqsixxnauvXuf5U3oKpEMYfyVPhzcEjKr0u9kmN
+	/EMKbQJ0mlXfYYOzVQ2IqH43Ai4CDARypIZ6kF64DxX5AI875InNsByMZkSZ9QE8yoiqRhpxbSK
+	MesHUJNXRD2XXygOSGJOa0n8gPl8nNWwWXNLc2joO
+X-Gm-Gg: ASbGncvdqF2AXNl7w88o7SUCYr+0f9QHQabu3KBYNRw5+4HjSCwdgtyAsV9QMnVJ7lo
+	mfXFzX27fsDqv5ZblKjEB473fpHm6dntOmZnwiICTEpV5KNIEukVlWekNVho/rZ984pNCLY9sF0
+	VMVQzAYoKXYgkZzCabnqttAepBR0SJnWT6lpwoCCaXjY4=
+X-Google-Smtp-Source: AGHT+IE5hWQwTwh7MP9Du/GPZsQBHV+avpYUx4eqkYI8R99l7WlPl8ufgRsSCv2pUxGqQWRSQb1g5/J6MZjLIVn1B3Q=
+X-Received: by 2002:a05:622a:1213:b0:476:f1a6:d8e8 with SMTP id
+ d75a77b69052e-4a73f3c4871mr4666031cf.11.1750056799453; Sun, 15 Jun 2025
+ 23:53:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250614145721.2504524-1-r09922117@csie.ntu.edu.tw>
-X-Migadu-Flow: FLOW_OUT
+References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-9-tabba@google.com>
+ <aEySD5XoxKbkcuEZ@google.com>
+In-Reply-To: <aEySD5XoxKbkcuEZ@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 16 Jun 2025 07:52:43 +0100
+X-Gm-Features: AX0GCFvGKRmaMT01Ibh3HhY56fkma50qiBLdK32HOEYHz0uSWpQ07u962UNyKuk
+Message-ID: <CA+EHjTyO1tP1uiVkoReZxvV6h2VwfX+1qxBT15JcP3+AXdB8fA@mail.gmail.com>
+Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Jun 14, 2025 at 10:57:21PM +0800, Wei-Lin Chang wrote:
-> s_cpu_if->vgic_lr[] is filled continuously from index 0 to
-> s_cpu_if->used_lrs - 1, but vgic_v3_put_nested() is indexing it using
-> the positions of the set bits in shadow_if->lr_map. So correct it.
+Hi Sean,
 
-The changelog is a bit too mechanical and doesn't actually add anything
-to the diff. Maybe:
+On Fri, 13 Jun 2025 at 22:03, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Jun 11, 2025, Fuad Tabba wrote:
+> > This patch enables support for shared memory in guest_memfd, including
+>
+> Please don't lead with with "This patch", simply state what changes are being
+> made as a command.
 
-  Shadow LRs may exist at different indices from the corresponding LRs
-  in the guest hypervisor's vgic, as the shadow LRs are populated
-  contiguously in vgic_v3_create_shadow_lr().
+Ack.
 
-  Use the correct shadow LR index when forwarding vIRQ state back to the
-  guest hypervisor's vgic in vgic_v3_put_nested().
+> > mapping that memory from host userspace.
+>
+> > This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
+> > and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
+> > flag at creation time.
+>
+> Why?  I can see that from the patch.
 
-Diff itself LGTM.
+It's in the patch series, not this patch. Would it help if I rephrase
+it along the lines of:
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+This functionality isn't enabled until the introduction of the
+KVM_GMEM_SHARED_MEM Kconfig option, and enabled for a given instance
+by the GUEST_MEMFD_FLAG_SUPPORT_SHARED flag at creation time. Both of
+which are introduced in a subsequent patch.
+
+> This changelog is way, way, waaay too light on details.  Sorry for jumping in at
+> the 11th hour, but we've spent what, 2 years working on this?
+
+I'll expand this. Just to make sure that I include the right details,
+are you looking for implementation details, motivation, use cases?
+
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > Acked-by: David Hildenbrand <david@redhat.com>
+> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index d00b85cb168c..cb19150fd595 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1570,6 +1570,7 @@ struct kvm_memory_attributes {
+> >  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> >
+> >  #define KVM_CREATE_GUEST_MEMFD       _IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
+> > +#define GUEST_MEMFD_FLAG_SUPPORT_SHARED      (1ULL << 0)
+>
+> I find the SUPPORT_SHARED terminology to be super confusing.  I had to dig quite
+> deep to undesrtand that "support shared" actually mean "userspace explicitly
+> enable sharing on _this_ guest_memfd instance".  E.g. I was surprised to see
+>
+> IMO, GUEST_MEMFD_FLAG_SHAREABLE would be more appropriate.  But even that is
+> weird to me.  For non-CoCo VMs, there is no concept of shared vs. private.  What's
+> novel and notable is that the memory is _mappable_.  Yeah, yeah, pKVM's use case
+> is to share memory, but that's a _use case_, not the property of guest_memfd that
+> is being controlled by userspace.
+>
+> And kvm_gmem_memslot_supports_shared() is even worse.  It's simply that the
+> memslot is bound to a mappable guest_memfd instance, it's that the guest_memfd
+> instance is the _only_ entry point to the memslot.
+>
+> So my vote would be "GUEST_MEMFD_FLAG_MAPPABLE", and then something like
+> KVM_MEMSLOT_GUEST_MEMFD_ONLY.  That will make code like this:
+>
+>         if (kvm_slot_has_gmem(slot) &&
+>             (kvm_gmem_memslot_supports_shared(slot) ||
+>              kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
+>                 return kvm_gmem_max_mapping_level(slot, gfn, max_level);
+>         }
+>
+> much more intutive:
+>
+>         if (kvm_is_memslot_gmem_only(slot) ||
+>             kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE))
+>                 return kvm_gmem_max_mapping_level(slot, gfn, max_level);
+>
+> And then have kvm_gmem_mapping_order() do:
+>
+>         WARN_ON_ONCE(!kvm_slot_has_gmem(slot));
+>         return 0;
+
+I have no preference really. To me this was intuitive, but I guess I
+have been staring at this way too long. If you and all the
+stakeholders are happy with your suggested changes, then I am happy
+making them :)
+
+
+> >  struct kvm_create_guest_memfd {
+> >       __u64 size;
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 559c93ad90be..e90884f74404 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -128,3 +128,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+> >  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+> >         bool
+> >         depends on KVM_GMEM
+> > +
+> > +config KVM_GMEM_SHARED_MEM
+> > +       select KVM_GMEM
+> > +       bool
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index 6db515833f61..06616b6b493b 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -312,7 +312,77 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+> >       return gfn - slot->base_gfn + slot->gmem.pgoff;
+> >  }
+> >
+> > +static bool kvm_gmem_supports_shared(struct inode *inode)
+> > +{
+> > +     const u64 flags = (u64)inode->i_private;
+> > +
+> > +     if (!IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM))
+> > +             return false;
+> > +
+> > +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> > +}
+> > +
+> > +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+>
+> And to my point about "shared", this is also very confusing, because there are
+> zero checks in here about shared vs. private.
+
+As you noted in a later email, it was you who suggested this name, but
+like I said, I am happy to change it.
+
+> > +{
+> > +     struct inode *inode = file_inode(vmf->vma->vm_file);
+> > +     struct folio *folio;
+> > +     vm_fault_t ret = VM_FAULT_LOCKED;
+> > +
+> > +     if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
+> > +             return VM_FAULT_SIGBUS;
+> > +
+> > +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> > +     if (IS_ERR(folio)) {
+> > +             int err = PTR_ERR(folio);
+> > +
+> > +             if (err == -EAGAIN)
+> > +                     return VM_FAULT_RETRY;
+> > +
+> > +             return vmf_error(err);
+> > +     }
+> > +
+> > +     if (WARN_ON_ONCE(folio_test_large(folio))) {
+> > +             ret = VM_FAULT_SIGBUS;
+> > +             goto out_folio;
+> > +     }
+> > +
+> > +     if (!folio_test_uptodate(folio)) {
+> > +             clear_highpage(folio_page(folio, 0));
+> > +             kvm_gmem_mark_prepared(folio);
+> > +     }
+> > +
+> > +     vmf->page = folio_file_page(folio, vmf->pgoff);
+> > +
+> > +out_folio:
+> > +     if (ret != VM_FAULT_LOCKED) {
+> > +             folio_unlock(folio);
+> > +             folio_put(folio);
+> > +     }
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +static const struct vm_operations_struct kvm_gmem_vm_ops = {
+> > +     .fault = kvm_gmem_fault_shared,
+> > +};
+> > +
+> > +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> > +{
+> > +     if (!kvm_gmem_supports_shared(file_inode(file)))
+> > +             return -ENODEV;
+> > +
+> > +     if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
+> > +         (VM_SHARED | VM_MAYSHARE)) {
+>
+> And the SHARED terminology gets really confusing here, due to colliding with the
+> existing notion of SHARED file mappings.
+
+Ack.
+
+Before I respin, let's make sure we're all on the same page in terms
+of terminology. Hopefully David can chime in again now that he's had
+the weekend to ponder over the latest exchange :)
 
 Thanks,
-Oliver
+/fuad
+
+> > +             return -EINVAL;
+> > +     }
+> > +
+> > +     vma->vm_ops = &kvm_gmem_vm_ops;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> >  static struct file_operations kvm_gmem_fops = {
+> > +     .mmap           = kvm_gmem_mmap,
+> >       .open           = generic_file_open,
+> >       .release        = kvm_gmem_release,
+> >       .fallocate      = kvm_gmem_fallocate,
+> > @@ -463,6 +533,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+> >       u64 flags = args->flags;
+> >       u64 valid_flags = 0;
+> >
+> > +     if (kvm_arch_supports_gmem_shared_mem(kvm))
+> > +             valid_flags |= GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> > +
+> >       if (flags & ~valid_flags)
+> >               return -EINVAL;
+> >
+> > --
+> > 2.50.0.rc0.642.g800a2b2222-goog
+> >
