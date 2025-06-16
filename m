@@ -1,32 +1,32 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D50217709
-	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4F43BB44
+	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750115021; cv=none; b=DheFKxL5JqoH85nxvSSoAcW/YLJW54+SfFWdEBjLeEzpKQ1H6xvQU3eEGIYAONLizaZoE4w3uqDOdwMIA6pC8hIkhllu+OfUuCSXIaHGKFPhqbw+si2An6nhb+3QZYEcLKGvn/hmYQw4xmpMPNxf4LxiWOYLGI6CRvShEq3Zca0=
+	t=1750115099; cv=none; b=Ed4q3BYkmBcwjipd9LYn2DixB2gVP/rBChf5dhTQkV5ObXoEmQgIsD/ST85zn6QuvVfAQ4N+xRHY4s5E5sGVsOnuUrszpG9WwqVQTgdSCSpzg7LI4KCavmjmNyUPOBzDgMmPx8A7wPP4reWDXJ3lsj0c+aDZPZVUe+HSaAv/fjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750115021; c=relaxed/simple;
-	bh=Zuk9wHx+2NXTfbreEBBHNHX2ywKgmbAI6rQjK7DP9Qc=;
+	s=arc-20240116; t=1750115099; c=relaxed/simple;
+	bh=wH0Cf9qY04NmHWZnTJroCkiibXKENn5oxDSqUteZ2aw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cPeJGD414u+CClGOw2CMCF9oCYtm83ZA7MHHemJUhUXuvdA5bwyYfHMpBa8qbuDkww+JxCY+GaQiyP/rh9bZd3MC5AbSkdpxQjbL6mjtrMOk59rCdrAReTePq8I396ww8TSryQ/zcnJnoxhx9IO9iJqQDFdH5KS4wQQ9wg7W0pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tgBk3yf9; arc=none smtp.client-ip=95.215.58.188
+	 MIME-Version; b=b3xCR//4o/n7LRHvEXDPEQTnbb4Wt6NJHBxaPxUyG2UwDUQ3Iapli9yLVyny/OGRsIzM3PCDO8v1Q4OcSknKMWmRzaZnFvthwmrtQNsoKCGpEdSZtSraDHC3D+KJY+C4wIY2QCHSCpF7yqzTjWhwC+5hpJnwYelzZ/6Sys0MhgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w+76ZfY9; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tgBk3yf9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w+76ZfY9"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750115016;
+	t=1750115095;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TNGVLWPt8OOGwhyuC7N5e7Zf3gBMwbkGBru66OsuXJk=;
-	b=tgBk3yf9uCDGloI6BvPapd/WniyZhoXKhXa5yWBCWgK4Zi2kVCgq0ndjHjzkEbLYT/t+zd
-	egmSApkiCi9QhVXv/vnPE9WPKtAjHs8u2yYlz+vrykuSvVO1V2vUnIVAEgFxtOMgyigscn
-	n/MlP3Fb5T8rsNUQMFr7GGRyM7O8d8M=
+	bh=XegHDCoUUdoqY8Yiwa9ONCPhnxctWgiSPUWvist/8k0=;
+	b=w+76ZfY9JBE7fIFaTU2shzi9wsmFFXpbeLsSjyR6JXs1VRPNWAKpSajz7C1fpHNbdijQze
+	oUwApyQmz8eKIE/ysB09ROmM81uaXIJVSukVrI/fL0zgMW10RD4ImUmPd21M0H83FenTwd
+	Ovdqr96xT0eI0NgwfnLsdbzcfAEOg3g=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 09/27] KVM: arm64: nv: Advertise support for FEAT_RAS
-Date: Mon, 16 Jun 2025 16:02:50 -0700
-Message-Id: <20250616230308.1192565-10-oliver.upton@linux.dev>
+Subject: [PATCH v2 10/27] KVM: arm64: nv: Describe trap behavior of SCTLR2_EL1
+Date: Mon, 16 Jun 2025 16:02:51 -0700
+Message-Id: <20250616230308.1192565-11-oliver.upton@linux.dev>
 In-Reply-To: <20250616230308.1192565-1-oliver.upton@linux.dev>
 References: <20250616230308.1192565-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,32 +48,72 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Now that the missing bits for vSError injection/deferral have been added
-we can merrily claim support for FEAT_RAS.
+Add the complete trap description for SCTLR2_EL1, including FGT and the
+inverted HCRX bit.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/nested.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 54de7a712251..4c1458cc61be 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1424,12 +1424,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 		break;
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index c2873f6f980d..86c9a48fc8b6 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -88,6 +88,7 @@ enum cgt_group_id {
  
- 	case SYS_ID_AA64PFR0_EL1:
--		/* No RME, AMU, MPAM, S-EL2, or RAS */
-+		/* No RME, AMU, MPAM, or S-EL2 */
- 		val &= ~(ID_AA64PFR0_EL1_RME	|
- 			 ID_AA64PFR0_EL1_AMU	|
- 			 ID_AA64PFR0_EL1_MPAM	|
- 			 ID_AA64PFR0_EL1_SEL2	|
--			 ID_AA64PFR0_EL1_RAS	|
- 			 ID_AA64PFR0_EL1_EL3	|
- 			 ID_AA64PFR0_EL1_EL2	|
- 			 ID_AA64PFR0_EL1_EL1	|
+ 	CGT_HCRX_EnFPM,
+ 	CGT_HCRX_TCR2En,
++	CGT_HCRX_SCTLR2En,
+ 
+ 	CGT_CNTHCTL_EL1TVT,
+ 	CGT_CNTHCTL_EL1TVCT,
+@@ -108,6 +109,7 @@ enum cgt_group_id {
+ 	CGT_HCR_TTLB_TTLBOS,
+ 	CGT_HCR_TVM_TRVM,
+ 	CGT_HCR_TVM_TRVM_HCRX_TCR2En,
++	CGT_HCR_TVM_TRVM_HCRX_SCTLR2En,
+ 	CGT_HCR_TPU_TICAB,
+ 	CGT_HCR_TPU_TOCU,
+ 	CGT_HCR_NV1_nNV2_ENSCXT,
+@@ -398,6 +400,12 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.mask		= HCRX_EL2_TCR2En,
+ 		.behaviour	= BEHAVE_FORWARD_RW,
+ 	},
++	[CGT_HCRX_SCTLR2En] = {
++		.index		= HCRX_EL2,
++		.value		= 0,
++		.mask		= HCRX_EL2_SCTLR2En,
++		.behaviour	= BEHAVE_FORWARD_RW,
++	},
+ 	[CGT_CNTHCTL_EL1TVT] = {
+ 		.index		= CNTHCTL_EL2,
+ 		.value		= CNTHCTL_EL1TVT,
+@@ -449,6 +457,8 @@ static const enum cgt_group_id *coarse_control_combo[] = {
+ 	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
+ 	MCB(CGT_HCR_TVM_TRVM_HCRX_TCR2En,
+ 					CGT_HCR_TVM, CGT_HCR_TRVM, CGT_HCRX_TCR2En),
++	MCB(CGT_HCR_TVM_TRVM_HCRX_SCTLR2En,
++					CGT_HCR_TVM, CGT_HCR_TRVM, CGT_HCRX_SCTLR2En),
+ 	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
+ 	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
+ 	MCB(CGT_HCR_NV1_nNV2_ENSCXT,	CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
+@@ -782,6 +792,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(OP_TLBI_RVALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
+ 	SR_TRAP(OP_TLBI_RVAALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
+ 	SR_TRAP(SYS_SCTLR_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_SCTLR2_EL1,		CGT_HCR_TVM_TRVM_HCRX_SCTLR2En),
+ 	SR_TRAP(SYS_TTBR0_EL1,		CGT_HCR_TVM_TRVM),
+ 	SR_TRAP(SYS_TTBR1_EL1,		CGT_HCR_TVM_TRVM),
+ 	SR_TRAP(SYS_TCR_EL1,		CGT_HCR_TVM_TRVM),
+@@ -1354,6 +1365,7 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+ 	SR_FGT(SYS_SCXTNUM_EL0,		HFGRTR, SCXTNUM_EL0, 1),
+ 	SR_FGT(SYS_SCXTNUM_EL1, 	HFGRTR, SCXTNUM_EL1, 1),
+ 	SR_FGT(SYS_SCTLR_EL1, 		HFGRTR, SCTLR_EL1, 1),
++	SR_FGT(SYS_SCTLR2_EL1,		HFGRTR, SCTLR_EL1, 1),
+ 	SR_FGT(SYS_REVIDR_EL1, 		HFGRTR, REVIDR_EL1, 1),
+ 	SR_FGT(SYS_PAR_EL1, 		HFGRTR, PAR_EL1, 1),
+ 	SR_FGT(SYS_MPIDR_EL1, 		HFGRTR, MPIDR_EL1, 1),
 -- 
 2.39.5
 
