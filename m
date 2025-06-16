@@ -1,94 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5781A8F84;
-	Mon, 16 Jun 2025 17:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E9B212B2B
+	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750093255; cv=none; b=mAYX43ZGIyyID2AyET8/h6kiGiJRFq5ff+qzCUKqsxlV+XxCdTC7teiYCyKJmrRAYRvs+tZ09aNQMJ+b8+5TiENN7dOM3jv/hVFjI01XPMro1FYkafQGi9S8N7b2BoAzPHYLjCVuYa3yb9jF+9MFL42BxiiroAUMjGH487PtqDE=
+	t=1750115004; cv=none; b=fusZc3PQb4cJ7n3h/rw8PoQ/ayRDC4VLuvdNCuUhMvvuRE83sJI1esN0O3c+9z/83L+UWRXg3ZD4km2zGEIK7jOydEpOjUxUkTl7F40oDqYjFSJnaDMMCE3vVetD8WL4n1qI0Gz6m8tiSRFk59glZMBuB0pORlr9WVTiLVrNF1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750093255; c=relaxed/simple;
-	bh=w8kwfakgTDDq+gZlHITNqncq9RlH3vHKlobIKGrM2HU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sDbR8Q5YEJlIr1mzeAm4ZOYJjexvMToGS0/E5nvjo+oA253Xefd9Ge7BxfYeL9Lpz3JeC0nb/UO1iC0zYFVIaeRTqK5iHyGhw37Lce+KiGhlZts7lMYzikbpPuAdn/DYb959UAk9sHvcJYX13xIXpOOb7EY7TnE28WbQNsPyeHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j+wz1jK1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750115004; c=relaxed/simple;
+	bh=Fh5NF7uHwuk2lK9bE5Et9fCch5Uk0H62c+UiYAK3ZJA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=V1fTUXiTYt1FWk/SDZon+lT/cuQhZfk1KXMFX0xCHaK9GquOPRAz/yOj8zjBtZH1/bq/ovs71Fdp12aVRqJg6oLfqC0Czbxg2EazqnMKdv9EXmvAk7lz1VlIeFYh6EReFDp6ZBqxNfUirHs/HCdVekD6P5fkOYGn3s5IOBS4Xf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cHgOo1XW; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j+wz1jK1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30221C4CEEA;
-	Mon, 16 Jun 2025 17:00:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750093255;
-	bh=w8kwfakgTDDq+gZlHITNqncq9RlH3vHKlobIKGrM2HU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j+wz1jK1RwBlSRkPRl6X9pdsDwe5fl7ilQFCi54NDyJ/JnFvvdsV2qj9MoAOJX5gA
-	 Hp5G10SkiKrJYlykC+fpR/zZANvcY1CbHYVAFyBLEf9yXHK774dBvMEayJ/jpCsMEp
-	 ozBtdY1Y76EXYSRTizbtlsm1ybSZbZbbHr00MVSKXIbFaRrzdax10ydqndUnp/r70A
-	 CB5dDvxpf5EMA8XOmRFQjg2mH2NYhObtL9Whyr+trTlCc1OxjJpHrVF7uly5a9G5ZV
-	 anXZVkI5dgTYxMkfofzrPDnI1Cce/7jYcODkVM2es86kqv+Z9Eimx4apFnsn3ToyR7
-	 4dpvZF43h9UBQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uRDCW-007JGE-O0;
-	Mon, 16 Jun 2025 18:00:52 +0100
-Date: Mon, 16 Jun 2025 18:00:52 +0100
-Message-ID: <86plf3d3jv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cHgOo1XW"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750114999;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eOznNCXBzz7XoBUE1zXg+wTYe+2JEDn0vgwwc9afuNQ=;
+	b=cHgOo1XWqDAvw/Y8SvHDttw+s108n0T5fCaU3XM032A8TxBSrY9Ln66tiLekh/ZPAGSNmH
+	ype0djE8OtCsho1C5J3/G+Ejn5lyCzunZ7+zr5TIUFTE5Rr1CbPe6eknFQtZ+kMspiE7Lk
+	jy7tPioW/Gndeh/zb8ZCgEbWOjKLsF8=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Fix s_cpu_if->vgic_lr[] indexing in vgic_v3_put_nested()
-In-Reply-To: <2p4urq6ij5zq77c7viydmqqaj2doeyja43khvcjgn5pkpe7saz@eyfvuykscn22>
-References: <20250614145721.2504524-1-r09922117@csie.ntu.edu.tw>
-	<86qzzkc5xa.wl-maz@kernel.org>
-	<2p4urq6ij5zq77c7viydmqqaj2doeyja43khvcjgn5pkpe7saz@eyfvuykscn22>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v2 00/27] KVM: arm64: SCTLR2, DoubleFault2, and NV external abort fixes
+Date: Mon, 16 Jun 2025 16:02:41 -0700
+Message-Id: <20250616230308.1192565-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack@cs.columbia.edu, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 16 Jun 2025 15:34:58 +0100,
-Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
-> 
-> On Mon, Jun 16, 2025 at 11:54:57AM +0100, Marc Zyngier wrote:
->
-> > +static u64 translate_lr_hw_bit(struct kvm_vcpu *vcpu, u64 lr)
-> 
-> I believe translate_lr_pintid() better describes what this function is
-> doing.
+Well... this series grew a bit. Thanks to some leading review feedback
+in v1, I went about implementing FEAT_RAS, FEAT_SCLTR2, and
+FEAT_DoubleFault2 for NV (and non-NV, where applicable).
 
-Ah, you too noticed that I am terrible at naming things? ;-)
+The most annoying addition of the whole bunch is certainly TMEA, which
+has the effect of enabling vSErrors and potentially making 'physical'
+SErrors deliverable to the same context.
 
-Agreed, this is a better name, and I'll gladly apply your suggestion.
+v1: https://lore.kernel.org/kvmarm/20250530230623.650888-1-oliver.upton@linux.dev/
 
-> 
-> For everything else, I don't spot any issues after review.
-> 
-> Reviewed-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+v1 -> v2:
+ - Only use kvm_inject_nested_*() for literal nested exceptions (i.e.
+   EL1&0 => EL2&0 regime) (Marc)
+ - Take Marc's is_nested_ctxt() helper (thanks!)
+ - Delegate vSError context to guest hypervisor when appropriate, in
+   turn implementing FEAT_RAS
+ - Handle state for FEAT_SCTLR2
+ - Route "masked" aborts to EL2 when HCR_EL2.TMEA is set
+ - Always perform emulated SError injection when SErrors are unmasked
+ - Tests
 
-Thanks again!
+Marc Zyngier (1):
+  KVM: arm64: Add helper to identify a nested context
 
-	M.
+Oliver Upton (26):
+  arm64: Detect FEAT_SCTLR2
+  arm64: Detect FEAT_DoubleFault2
+  KVM: arm64: Treat vCPU with pending SError as runnable
+  KVM: arm64: nv: Respect exception routing rules for SEAs
+  KVM: arm64: nv: Honor SError exception routing / masking
+  KVM: arm64: nv: Add FEAT_RAS vSError sys regs to table
+  KVM: arm64: nv: Use guest hypervisor's vSError state
+  KVM: arm64: nv: Advertise support for FEAT_RAS
+  KVM: arm64: nv: Describe trap behavior of SCTLR2_EL1
+  KVM: arm64: Wire up SCTLR2_ELx sysreg descriptors
+  KVM: arm64: Context switch SCTLR2_ELx when advertised to the guest
+  KVM: arm64: Enable SCTLR2 when advertised to the guest
+  KVM: arm64: Describe SCTLR2_ELx RESx masks
+  KVM: arm64: Factor out helper for selecting exception target EL
+  KVM: arm64: nv: Ensure Address size faults affect correct ESR
+  KVM: arm64: Route SEAs to the SError vector when EASE is set
+  KVM: arm64: nv: Handle effects of HCRX_EL2.TMEA on SError injection
+  KVM: arm64: Take "masked" SEAs to EL2 when TMEA is set
+  KVM: arm64: nv: Enable vSErrors when HCRX_EL2.TMEA is set
+  KVM: arm64: Advertise support for FEAT_SCTLR2
+  KVM: arm64: Advertise support for FEAT_DoubleFault2
+  KVM: arm64: Don't retire MMIO instruction w/ pending (emulated) SError
+  KVM: arm64: selftests: Add basic SError injection test
+  KVM: arm64: selftests: Test SEAs are taken to SError vector when
+    EASE=1
+  KVM: arm64: selftests: Add SCTLR2_EL1 to get-reg-list
+  KVM: arm64: selftests: Catch up set_id_regs with the kernel
 
+ arch/arm64/include/asm/kvm_emulate.h          |  51 +++-
+ arch/arm64/include/asm/kvm_host.h             |  31 ++-
+ arch/arm64/include/asm/kvm_nested.h           |   2 +
+ arch/arm64/include/asm/vncr_mapping.h         |   2 +
+ arch/arm64/kernel/cpufeature.c                |   9 +
+ arch/arm64/kvm/arch_timer.c                   |   2 +-
+ arch/arm64/kvm/arm.c                          |   9 +-
+ arch/arm64/kvm/config.c                       |  28 +++
+ arch/arm64/kvm/emulate-nested.c               |  41 +++-
+ arch/arm64/kvm/guest.c                        |  36 +--
+ arch/arm64/kvm/handle_exit.c                  |  24 +-
+ arch/arm64/kvm/hyp/exception.c                |  10 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  46 +++-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |  31 ++-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |   2 +-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c            |   6 +
+ arch/arm64/kvm/inject_fault.c                 | 222 ++++++++++++------
+ arch/arm64/kvm/mmio.c                         |  12 +-
+ arch/arm64/kvm/mmu.c                          |  17 +-
+ arch/arm64/kvm/nested.c                       |  45 +++-
+ arch/arm64/kvm/sys_regs.c                     |  31 ++-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          |   2 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   2 +-
+ .../arm64/{mmio_abort.c => external_aborts.c} | 159 ++++++++++++-
+ .../selftests/kvm/arm64/get-reg-list.c        |   7 +
+ .../testing/selftests/kvm/arm64/set_id_regs.c |  14 +-
+ .../selftests/kvm/include/arm64/processor.h   |  10 +
+ 28 files changed, 683 insertions(+), 169 deletions(-)
+ rename tools/testing/selftests/kvm/arm64/{mmio_abort.c => external_aborts.c} (50%)
+
+
+base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.5
+
