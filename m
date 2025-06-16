@@ -1,32 +1,32 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D00921FF5E
-	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6763BB44
+	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750115194; cv=none; b=Eowz+gmV95hgJSRT3KOpBEbY/tjTMSf6N5U8ZElKKtrgvrBtH0dO9oQDhCDRKw4ZfxDkJ3gVE4ibU1rtCJhD2hNipXLHvYeMNyGoypsx2wFkMSa+Mr8LiRnIRoTj6Rc7OpNz8wSSYj5ZsVpgrveIOH0gk+pBjgYPPRjbJtFd03E=
+	t=1750115198; cv=none; b=PXusSejooBg3VdGC+40W+ojtANXJBs8kiJjyrkF8M8oaEvd7RQhOq/IHgRXq74F4Pp62nNf+mNLVaxuAQm5fAsCWzxQxO8w8hAc8kFNuErywkkYzSnHCSJa+EHgHFIL8JzMBwHsEwu2+xfNQzRmElb6fnOM0f0Qy12V7iwKq+qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750115194; c=relaxed/simple;
-	bh=7tjebPH0//f/Yy+4Tvv6yJO8vU80RRFMcwRtwyVpD4k=;
+	s=arc-20240116; t=1750115198; c=relaxed/simple;
+	bh=+8ikEHpZHahS2On2pbE/2znSsbHpcn8CgoXkknwrMzk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sNNRPhUQDEARAB+Q0/iW3TDM0hQZ/zkSeEoJ0NLW2tkkol7xEq4Qpw0C8Pd+7f68r6ymg1hh3/ff6QJxBx84IGMTYjvJn1IdoVaERFcvGzqTaq/e4Rdyf/Vix7Bz54YGlYisVqtLOzId5LZcf1Qh5r0KEuMZhFSVgloMK1b2LCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CSxXJA8r; arc=none smtp.client-ip=91.218.175.183
+	 MIME-Version; b=mtaQI2tx/q5bdOZBLYaPCL/w441aY1eAYM4eStrsVOnP4JEfC/Nst6pIwhyrK0Vq7qISoRIztv4rxuw+/VW8BQyHYMcPW33MdHkFGF2nNP0H4gl9XhD5e2P/sW3aZLyEcyG9c+NXuvUiwEcDfy6sz3Wpws1CbHqQ9K8rv4JYC6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CGVfymlN; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CSxXJA8r"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CGVfymlN"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750115190;
+	t=1750115195;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8UAbw7xk8aVUUhEL5H+VqxMMcaGFE0JNxvWGrMPYlhw=;
-	b=CSxXJA8rwWhHnav/g8PLkdmSnInXfTSC2C3mHcCj44qb9fCNAIN6lHBvTCqRIGAsPl4wfl
-	cPR7vXBGE+JGFZImJsXi+PRrwPGL4gwyyDJo/uyU3EfPgPbJBgKDWktlGHdrIlK5H6h91u
-	JIffA2Rifd8KIFQQ9XT+GFY2AjNd/+Q=
+	bh=TbmlIFHdX2zja8dqoQ2q1BuDOoG23G30svsnocIKAyQ=;
+	b=CGVfymlNR2GAn8CUqDinl6u3wzooVm777k0Wnwz6xHhyM4/dzNZVJayUDoalKKy4fcrhZ7
+	UG3ZGTVO3XhKupaN8+F5FS0YcQSG9jqKgFeaNYbGGbHQqukdWZ3nu48lupKZw3bqK3CUrH
+	a5HOsUT2/CMAFy3XuuTC8Gc+RUkrMsg=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 25/27] KVM: arm64: selftests: Test SEAs are taken to SError vector when EASE=1
-Date: Mon, 16 Jun 2025 16:03:06 -0700
-Message-Id: <20250616230308.1192565-26-oliver.upton@linux.dev>
+Subject: [PATCH v2 26/27] KVM: arm64: selftests: Add SCTLR2_EL1 to get-reg-list
+Date: Mon, 16 Jun 2025 16:03:07 -0700
+Message-Id: <20250616230308.1192565-27-oliver.upton@linux.dev>
 In-Reply-To: <20250616230308.1192565-1-oliver.upton@linux.dev>
 References: <20250616230308.1192565-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,79 +48,39 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Ensure KVM routes SEAs to the correct vector depending on
-SCTLR2_EL1.EASE.
+Handle SCTLR2_EL1 specially as it is only visible to userspace when
+FEAT_SCTLR2 is implemented for the VM.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- .../selftests/kvm/arm64/external_aborts.c     | 42 ++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/arm64/get-reg-list.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
-index f49c98bda60e..ec7e30776a0e 100644
---- a/tools/testing/selftests/kvm/arm64/external_aborts.c
-+++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
-@@ -86,7 +86,7 @@ static void vcpu_run_expect_sync(struct kvm_vcpu *vcpu)
+diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+index d01798b6b3b4..684c52b1b881 100644
+--- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+@@ -52,6 +52,12 @@ static struct feature_id_reg feat_id_regs[] = {
+ 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
+ 		16,
+ 		1
++	},
++	{
++		KVM_ARM64_SYS_REG(SYS_SCTLR2_EL1),
++		KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR3_EL1),
++		ID_AA64MMFR3_EL1_SCTLRX_SHIFT,
++		ID_AA64MMFR3_EL1_SCTLRX_IMP
+ 	}
+ };
  
- extern char test_mmio_abort_insn;
- 
--static void test_mmio_abort_guest(void)
-+static noinline void test_mmio_abort_guest(void)
- {
- 	WRITE_ONCE(expected_abort_pc, (u64)&test_mmio_abort_insn);
- 
-@@ -251,6 +251,45 @@ static void test_serror_emulated(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void test_mmio_ease_guest(void)
-+{
-+	sysreg_clear_set_s(SYS_SCTLR2_EL1, 0, SCTLR2_EL1_EASE);
-+	isb();
-+
-+	test_mmio_abort_guest();
-+}
-+
-+/*
-+ * Test that KVM doesn't complete MMIO emulation when userspace has made an
-+ * external abort pending for the instruction.
-+ */
-+static void test_mmio_ease(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_mmio_ease_guest,
-+							unexpected_dabt_handler);
-+	struct kvm_run *run = vcpu->run;
-+	u64 pfr1;
-+
-+	pfr1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
-+	if (!SYS_FIELD_GET(ID_AA64PFR1_EL1, DF2, pfr1)) {
-+		pr_debug("Skipping %s\n", __func__);
-+		return;
-+	}
-+
-+	vm_install_exception_handler(vm, VECTOR_ERROR_CURRENT, expect_serror_handler);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_MMIO);
-+	TEST_ASSERT_EQ(run->mmio.phys_addr, MMIO_ADDR);
-+	TEST_ASSERT_EQ(run->mmio.len, sizeof(unsigned long));
-+	TEST_ASSERT(!run->mmio.is_write, "Expected MMIO read");
-+
-+	vcpu_inject_sea(vcpu);
-+	vcpu_run_expect_done(vcpu);
-+	kvm_vm_free(vm);
-+}
-+
- int main(void)
- {
- 	test_mmio_abort();
-@@ -259,4 +298,5 @@ int main(void)
- 	test_serror();
- 	test_serror_masked();
- 	test_serror_emulated();
-+	test_mmio_ease();
- }
+@@ -469,6 +475,7 @@ static __u64 base_regs[] = {
+ 	ARM64_SYS_REG(3, 0, 1, 0, 0),	/* SCTLR_EL1 */
+ 	ARM64_SYS_REG(3, 0, 1, 0, 1),	/* ACTLR_EL1 */
+ 	ARM64_SYS_REG(3, 0, 1, 0, 2),	/* CPACR_EL1 */
++	KVM_ARM64_SYS_REG(SYS_SCTLR2_EL1),
+ 	ARM64_SYS_REG(3, 0, 2, 0, 0),	/* TTBR0_EL1 */
+ 	ARM64_SYS_REG(3, 0, 2, 0, 1),	/* TTBR1_EL1 */
+ 	ARM64_SYS_REG(3, 0, 2, 0, 2),	/* TCR_EL1 */
 -- 
 2.39.5
 
