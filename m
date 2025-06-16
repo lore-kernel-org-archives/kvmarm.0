@@ -1,32 +1,32 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284863BB44
-	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A75A21FF5E
+	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750115115; cv=none; b=Y5Dg+rC5WOC14vCbI9TrslCg6zL9T1ArvesTBfxr3kmyjb9wFzqnjeVImrum5+8ryQdHjDU/v/CpvFQ4CLVj5Ju5GQqjm4bsPXC5PkWa/5HGQ1K86xhMuhiS3L6DXswjsn61QX4ZXf1kW5i1y3qhpv7Tt3Bzb9OHX7eqg/UtumM=
+	t=1750115116; cv=none; b=qgf9Cu37sAwk2O5nk7T6xUSUFBog2Oc+SMP2YZ6xCnGv18DcS2DJ0aDOa0w3NWsDYtV0MXQ+yfCnhYIcJ//8FqibPkgq8+A2jDJOc3Eucyqg3TR0+wZd50mUMgO7JeIhyJ+K6j2l4XZMsggQ0rurLy0qSDEysIk20X6Ul6IXZdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750115115; c=relaxed/simple;
-	bh=wDMRyaGnjZJp0mmsgfuSHRPxhxxF5+yrG3T0dpjJZJo=;
+	s=arc-20240116; t=1750115116; c=relaxed/simple;
+	bh=VfZe7js5+sVe/8ZOiMZ1+CRxb0jJJk5sh2L3GNPv0a8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r0USe0JW3dK3t8H2wCJRDGEtI84tQ+c1glF1GYo0KBpKdzFRhjYl15tCFfQ7g70Hc4h402kf0gzIHp8kBgc59VRzCdSpoUUco4IRu3F52hR4i0OhWhcz8BJ7Po43vvu+8vWjOkzEWJn1WZ3hGA4+y6vHq7NmhLeKaTq+QEs2igs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HW9BWKH7; arc=none smtp.client-ip=91.218.175.179
+	 MIME-Version; b=VoYUuV497jWToi+KbajB6fqeBfJlOo0vPKCL+iJvg+fHi8LDEnX7X78Epq1MMGYyvlEf5mQdVV60+35yabeAofHUNf1TKCVjsv6Yr5qm7NteFt0GuWPRwGsOCZjhN/JHHYop1VM6F6K31UxuOOrAwohyLS8xugc2HbjQVKok2wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KUox+PW/; arc=none smtp.client-ip=91.218.175.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HW9BWKH7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KUox+PW/"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750115111;
+	t=1750115112;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KNNaO6QF8J7FNSD8yD1YOGHYrOr+cZk9OYkV2IkmTFA=;
-	b=HW9BWKH7OdsuWWe2Dzv3ebSkZ9+DBYNiJFm7MJBCiuMLt6SyGKloXMtwt7VFXF7x3u++iI
-	taUyrejq8bMYsTzD4nPeUFRg2wDbfBeYrwC1x8s00flPHKeQpomAiqQlX3pGfVZ/yjVQvb
-	bgQ332MPeRFPqdwCUukjcThzR7WALYE=
+	bh=Gcyb4RfcDKGBBmk8zESVIXW8SnVy2osTgAHQnICzIuY=;
+	b=KUox+PW/iFDG1ZNcrSnQ49bG5HVUQre8ZpCk+yUbq/2ZCpZHuNO3KOEjtr88txfFtAAdgF
+	SPs440UIA9meDw22ZTiUI2yQZPXhoicp6R/tXydy2jl1U0jxi+qRMrzSUzoFZlu0q2nfEu
+	AbDeflwvfMK17Eprg89RQc6rD3YOFsQ=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 18/27] KVM: arm64: nv: Handle effects of HCRX_EL2.TMEA on SError injection
-Date: Mon, 16 Jun 2025 16:02:59 -0700
-Message-Id: <20250616230308.1192565-19-oliver.upton@linux.dev>
+Subject: [PATCH v2 19/27] KVM: arm64: Take "masked" SEAs to EL2 when TMEA is set
+Date: Mon, 16 Jun 2025 16:03:00 -0700
+Message-Id: <20250616230308.1192565-20-oliver.upton@linux.dev>
 In-Reply-To: <20250616230308.1192565-1-oliver.upton@linux.dev>
 References: <20250616230308.1192565-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,97 +48,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-HCRX_EL2.TMEA further modifies the physical SError behavior where
-unmasked SErrors are taken to EL1 and masked SErrors are taken to EL2.
-This gets a bit hairy when considering the fact that TMEA also enables
-vSErrors, i.e. KVM has delegated the HW vSError context to the guest
-hypervisor.
-
-We can keep the vSError context ownership by taking advantage of a
-couple properties:
-
- - If SErrors are unmasked, the 'physical' SError can be taken
-   in-context immediately. In other words, KVM can emulate the EL1
-   SError while preserving vEL2's ownership of the vSError context.
-
- - If SErrors are masked, the 'physical' SError is taken to EL2 and
-   needs the usual nested exception entry.
-
-Note that the new in-context handling has the benign effect where
-unmasked SError injections are emulated even for non-nested VMs.
+SEAs can never actually be masked (they're synchronous after all), but
+the value of PSTATE.A used as a proxy for whether software might be in
+the middle of an SEA handler. And, when TMEA is set, these "masked" SEAs
+are actually routed to EL2.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/inject_fault.c | 36 +++++++++++++++++++++++++++++++++--
- 1 file changed, 34 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/inject_fault.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index cab14a926bc6..e689002f10b6 100644
+index e689002f10b6..3eab7690c54e 100644
 --- a/arch/arm64/kvm/inject_fault.c
 +++ b/arch/arm64/kvm/inject_fault.c
-@@ -97,6 +97,11 @@ static bool effective_sctlr2_ease(struct kvm_vcpu *vcpu)
- 	return __effective_sctlr2_bit(vcpu, SCTLR2_EL1_EASE_SHIFT);
- }
+@@ -209,7 +209,14 @@ static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
  
-+static bool effective_sctlr2_nmea(struct kvm_vcpu *vcpu)
-+{
-+	return __effective_sctlr2_bit(vcpu, SCTLR2_EL1_NMEA_SHIFT);
-+}
-+
- static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+ static bool kvm_sea_target_is_el2(struct kvm_vcpu *vcpu)
  {
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
-@@ -258,14 +263,29 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- 		inject_undef64(vcpu);
- }
- 
-+static bool serror_is_masked(struct kvm_vcpu *vcpu)
-+{
-+	bool masked = *vcpu_cpsr(vcpu) & PSR_A_BIT;
-+
-+	if (!vcpu_mode_priv(vcpu))
-+		masked |= effective_sctlr2_nmea(vcpu);
-+
-+	return masked;
-+}
-+
- static bool kvm_serror_target_is_el2(struct kvm_vcpu *vcpu)
- {
--	return is_hyp_ctxt(vcpu) || vcpu_el2_amo_is_set(vcpu);
-+	if (is_hyp_ctxt(vcpu) || vcpu_el2_amo_is_set(vcpu))
+-	return __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_TGE | HCR_TEA);
++	if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_TGE | HCR_TEA))
 +		return true;
 +
-+	return serror_is_masked(vcpu) &&
++	if (!vcpu_mode_priv(vcpu))
++		return false;
++
++	return (*vcpu_cpsr(vcpu) & PSR_A_BIT) &&
 +	       (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TMEA);
  }
  
- static bool kvm_serror_undeliverable_at_el2(struct kvm_vcpu *vcpu)
- {
--	return !(vcpu_el2_tge_is_set(vcpu) || vcpu_el2_amo_is_set(vcpu));
-+	return !(vcpu_el2_tge_is_set(vcpu) || vcpu_el2_amo_is_set(vcpu) ||
-+		 effective_sctlr2_nmea(vcpu));
- }
- 
- int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
-@@ -281,6 +301,18 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
- 		return 1;
- 	}
- 
-+	/*
-+	 * Emulate the exception entry if SErrors are unmasked. This is useful if
-+	 * the vCPU is in a nested context w/ vSErrors enabled then we've already
-+	 * delegated he hardware vSError context (i.e. HCR_EL2.VSE, VSESR_EL2,
-+	 * VDISR_EL2) to the guest hypervisor.
-+	 */
-+	if (!serror_is_masked(vcpu)) {
-+		pend_serror_exception(vcpu);
-+		vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-+		return 1;
-+	}
-+
- 	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
- 	*vcpu_hcr(vcpu) |= HCR_VSE;
- 	return 1;
+ int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
 -- 
 2.39.5
 
