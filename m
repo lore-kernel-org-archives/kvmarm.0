@@ -1,32 +1,32 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33083BB44
-	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740AD223DD5
+	for <kvmarm@lists.linux.dev>; Mon, 16 Jun 2025 23:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750115111; cv=none; b=E3cb9k9kpgFZHS7o/WSzNfCDUhHNLJ6CVoP5yGZN2G9wkE+8TJLAs6RxFGgs+Ku7g0TAAMMxih2nDgyj/clSVoGlkLJ3/wCDfYTyrPLm2ZBL+oXsctv8cHMsgW4FaJsmL3IOu1wkJ+vafuMIfpBGeiL6XkOPELO8gGMfxGoboRQ=
+	t=1750115113; cv=none; b=fxKoVisVIZOIA1HP/MaQeC2zSIOehuBNkwKimYPSpi5mwmFBi1icuOfwTWGP03lDt/huD5R5Fc6qqrpsiojDZNHe/Q5NLMMAwjPWwA79xGP370BYEBHelDqjrpJnUFFvimGOLl6CtmqcXwT8JDE79cSmEgqq5LefS7SNeuJbVKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750115111; c=relaxed/simple;
-	bh=cIbbb9R26S/VpcN4qy/Hc3Hb3zN7CSXi4ypJeWjBL5k=;
+	s=arc-20240116; t=1750115113; c=relaxed/simple;
+	bh=Mm4Jkd+MlL/0YSVfqtJlrTLhB5UuWK09/hfrFoukMNc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=csjqPlgVgwEk9FXqDI5+1nnlIQK9TAuR6wh6phSJmVBuZTwMiAaY4NvRKZ1Jt4jGTDci11cN8OQgdGeKF7AVx34FjypYtZDDojntZ0+B/4MwjgLeJF7CTMmNVIxkKq+cMha05Nh/hEXb5tEFWMgUWLWPB3M8iTLw56Skx5GgAuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DvXL8rWh; arc=none smtp.client-ip=91.218.175.179
+	 MIME-Version; b=ladAxq4qnSIqYyC18wP6x12IEI6gG2/YgFNHZgbjQW+5YRL2ZYK2iJN7k5L3dHEcRVGjXFLTg1kgsWEBdEyjnMRIy/bKM4oK1CObB/vo3eNh9lD4LJO5cpFiJ0e6Z1QkFG1US7CNEFA2Y3Bcpz+lEwhD4wP2yeKGSAEC4Z5LGVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Tflem15h; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DvXL8rWh"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Tflem15h"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750115108;
+	t=1750115109;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CDMJ31HyMqOwJEEf2M7gk9FkOO5Tj/VEmJkDbUeK7cc=;
-	b=DvXL8rWhfioRpf9cgsIOPKX0Fl549SYyLYrtf24q6UptKgTNFNyFglX7dNDKoDpU11e434
-	Kq2eLw3FWouTxFXeVlqdRhcoB8aFT2efBPd7lsPhVf7zuL+MVf/W6qWSQHYDpasLPyZdCa
-	4IqpMJ0/Btx2HjrnPXo1jqq7MfvO6do=
+	bh=HS3SivDosd/LQIGzKUg9H+gZzxS7J1UO2bnNm7gHs3Q=;
+	b=Tflem15hYiI7DyAdO2RumFFbeKR41hiTKVvz82Ez3BvwWL8QeMRyQGMLlHvN5Yl62BA2OD
+	teRXR8YSxHsNWmfq6mrIT++MHIZjdqepQWt6MGISOWa0gwnToOirHjmptdXCVDEPZ9hd1W
+	d6afkRhWR+34PnmL54GcpJjByZnL4Mk=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 16/27] KVM: arm64: nv: Ensure Address size faults affect correct ESR
-Date: Mon, 16 Jun 2025 16:02:57 -0700
-Message-Id: <20250616230308.1192565-17-oliver.upton@linux.dev>
+Subject: [PATCH v2 17/27] KVM: arm64: Route SEAs to the SError vector when EASE is set
+Date: Mon, 16 Jun 2025 16:02:58 -0700
+Message-Id: <20250616230308.1192565-18-oliver.upton@linux.dev>
 In-Reply-To: <20250616230308.1192565-1-oliver.upton@linux.dev>
 References: <20250616230308.1192565-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,95 +48,113 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-For historical reasons, Address size faults are first injected into the
-guest as an SEA and ESR_EL1 is subsequently modified to reflect the
-correct FSC. Of course, when dealing with a vEL2 this should poke
-ESR_EL2.
+One of the finest additions of FEAT_DoubleFault2 is the ability for
+software to request *synchronous* external aborts be taken to the
+SError vector, which of coure are *asynchronous* in nature.
+
+Opinions be damned, implement the architecture and send SEAs to the
+SError vector if EASE is set for the target context.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/inject_fault.c | 39 +++++++++++++++++++----------------
- 1 file changed, 21 insertions(+), 18 deletions(-)
+ arch/arm64/kvm/emulate-nested.c |  3 +++
+ arch/arm64/kvm/hyp/exception.c  |  6 +++++-
+ arch/arm64/kvm/inject_fault.c   | 38 ++++++++++++++++++++++++++++++++-
+ 3 files changed, 45 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 4df42a41d0ab..88bc85ecdbb0 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -41,6 +41,22 @@ static unsigned int exception_target_el(struct kvm_vcpu *vcpu)
- 	}
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 86c9a48fc8b6..7f9081c6ab11 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2833,6 +2833,9 @@ int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+ 			     iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW);
+ 	esr |= ESR_ELx_FSC_EXTABT | ESR_ELx_IL;
+ 
++	if (__vcpu_sys_reg(vcpu, SCTLR2_EL2) & SCTLR2_EL1_EASE)
++		return kvm_inject_nested(vcpu, esr, except_type_serror);
++
+ 	return kvm_inject_s2_fault(vcpu, esr);
  }
  
-+static enum vcpu_sysreg exception_esr_elx(struct kvm_vcpu *vcpu)
-+{
-+	if (exception_target_el(vcpu) == PSR_MODE_EL2h)
-+		return ESR_EL2;
+diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+index 592adc78b149..7dafd10e52e8 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -339,6 +339,10 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+ 			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+ 			break;
+ 
++		case unpack_vcpu_flag(EXCEPT_AA64_EL1_SERR):
++			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_serror);
++			break;
 +
-+	return ESR_EL1;
-+}
-+
-+static enum vcpu_sysreg exception_far_elx(struct kvm_vcpu *vcpu)
-+{
-+	if (exception_target_el(vcpu) == PSR_MODE_EL2h)
-+		return FAR_EL2;
-+
-+	return FAR_EL1;
-+}
-+
- static void pend_sync_exception(struct kvm_vcpu *vcpu)
- {
- 	if (exception_target_el(vcpu) == PSR_MODE_EL1h)
-@@ -49,11 +65,6 @@ static void pend_sync_exception(struct kvm_vcpu *vcpu)
+ 		case unpack_vcpu_flag(EXCEPT_AA64_EL2_SYNC):
+ 			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_sync);
+ 			break;
+@@ -353,7 +357,7 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+ 
+ 		default:
+ 			/*
+-			 * Only EL1_SYNC and EL2_{SYNC,IRQ,SERR} makes
++			 * Only EL1_{SYNC,SERR} and EL2_{SYNC,IRQ,SERR} makes
+ 			 * sense so far. Everything else gets silently
+ 			 * ignored.
+ 			 */
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 88bc85ecdbb0..cab14a926bc6 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -65,13 +65,49 @@ static void pend_sync_exception(struct kvm_vcpu *vcpu)
  		kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SYNC);
  }
  
--static bool match_target_el(struct kvm_vcpu *vcpu, unsigned long target)
--{
--	return (vcpu_get_flag(vcpu, EXCEPT_MASK) == target);
--}
--
++static void pend_serror_exception(struct kvm_vcpu *vcpu)
++{
++	if (exception_target_el(vcpu) == PSR_MODE_EL1h)
++		kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SERR);
++	else
++		kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
++}
++
++static bool __effective_sctlr2_bit(struct kvm_vcpu *vcpu, unsigned int idx)
++{
++	u64 sctlr2;
++
++	if (!kvm_has_sctlr2(vcpu->kvm))
++		return false;
++
++	if (is_nested_ctxt(vcpu) &&
++	    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_SCTLR2En))
++		return false;
++
++	if (exception_target_el(vcpu) == PSR_MODE_EL1h)
++		sctlr2 = vcpu_read_sys_reg(vcpu, SCTLR2_EL1);
++	else
++		sctlr2 = vcpu_read_sys_reg(vcpu, SCTLR2_EL2);
++
++	return sctlr2 & BIT(idx);
++}
++
++static bool effective_sctlr2_ease(struct kvm_vcpu *vcpu)
++{
++	return __effective_sctlr2_bit(vcpu, SCTLR2_EL1_EASE_SHIFT);
++}
++
  static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
  {
  	unsigned long cpsr = *vcpu_cpsr(vcpu);
-@@ -83,13 +94,8 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
+ 	u64 esr = 0;
  
- 	esr |= ESR_ELx_FSC_EXTABT;
+-	pend_sync_exception(vcpu);
++	/* This delight is brought to you by FEAT_DoubleFault2. */
++	if (effective_sctlr2_ease(vcpu))
++		pend_serror_exception(vcpu);
++	else
++		pend_sync_exception(vcpu);
  
--	if (match_target_el(vcpu, unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC))) {
--		vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
--		vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
--	} else {
--		vcpu_write_sys_reg(vcpu, addr, FAR_EL2);
--		vcpu_write_sys_reg(vcpu, esr, ESR_EL2);
--	}
-+	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
-+	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
- }
- 
- static void inject_undef64(struct kvm_vcpu *vcpu)
-@@ -105,10 +111,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	if (kvm_vcpu_trap_il_is32bit(vcpu))
- 		esr |= ESR_ELx_IL;
- 
--	if (match_target_el(vcpu, unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC)))
--		vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
--	else
--		vcpu_write_sys_reg(vcpu, esr, ESR_EL2);
-+	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
- }
- 
- #define DFSR_FSC_EXTABT_LPAE	0x10
-@@ -199,9 +202,9 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
- 	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
- 		return;
- 
--	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
-+	esr = vcpu_read_sys_reg(vcpu, exception_esr_elx(vcpu));
- 	esr &= ~GENMASK_ULL(5, 0);
--	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-+	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
- }
- 
- /**
+ 	/*
+ 	 * Build an {i,d}abort, depending on the level and the
 -- 
 2.39.5
 
