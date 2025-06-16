@@ -1,110 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF88277C98;
-	Mon, 16 Jun 2025 10:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0432980A1;
+	Mon, 16 Jun 2025 10:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750070478; cv=none; b=N3o6jGiaN9eQa5udAVcg4rRoBogjuAv4zvYJF/Kg3GeDSIdBrzjdSmDa8QHpagqgFccjtbr6163W0K1xxCBM/LMdbnra8Yf+nXdG3u1xYnrfDC25lzHUBNwSnt3777MveS6ynnhJAj5+P5fCv1Vu+in1RDJQSZqXy5KrMOxKpBU=
+	t=1750070496; cv=none; b=exe5ot2DWHUuiyIJyGiaZMgsBcmESvpTh3O9RuIIhGlcrqK03WIJKJSgJnDpFbl/oGqx4TtX7LA3pqw4XZkjn82TOT0SNvJthbd617guuVfz7bNfbIHRN2mBkXR92sxMWgLvKWmiDq9/qFduP36aE8SgBrcvPLPTepqVW+PWpR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750070478; c=relaxed/simple;
-	bh=pg18VEj3ZOXpTjNRyCe0pJvFJwwasJGT6wPYPZGNhSU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XWuLPdJZnO6vme+vLIbBPQE9rv8KFq+M5Z/GUcPeOqHUoxF0EFwmyctn7mio3o2e+odo6WuKCpt/68DuRgi87TLtvjfe/qpoJsOQ02K/hFTyMknxJnOWgzBSJiO11oeqe3jEeIq41nDtgorSqBX+s4huh1fhxFpHSm/iDYfalNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U8PzwpYA; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U8PzwpYA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB6BC4CEEA;
-	Mon, 16 Jun 2025 10:41:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750070476;
-	bh=pg18VEj3ZOXpTjNRyCe0pJvFJwwasJGT6wPYPZGNhSU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U8PzwpYAvDvaIa7H1kNw9v61ca9f8UyaoWqOiWCr14p/pj0VRYYDKk/NL7ypvwgWF
-	 Hdjp9nIqIgTS1GDoKSo4mLh9wr/IncyFNGWVkBnnVmWsInaTdPwISrakcvJtlxQW8Z
-	 FBHrt2KNsPgl9LM75hIMTnsXvakjUusHfNfrthp68AsBUOtNPJC4NXX+og9QpN8kC2
-	 HAm//f+0EZ0ggJ6xKQEC+Q2j27G3ghCOGxLKay0gVPOG8Rvpvw756AwQZ0TWlL3MFw
-	 vkUnzXCf+HHnYY/KjmtHGIrikcbbtkm888u/qAOMalZTORXYBBymwfPjlSthf9ovr+
-	 wwnzsS1ShO3eA==
-Date: Mon, 16 Jun 2025 11:41:09 +0100
-From: Will Deacon <will@kernel.org>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Markus Elfring <Markus.Elfring@web.de>, cocci@inria.fr,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Andrew Lunn <andrew@lunn.ch>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	"Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>,
-	Lei Wei <quic_leiwei@quicinc.com>, Marc Zyngier <maz@kernel.org>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Pavithra R <quic_pavir@quicinc.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Suruchi Agarwal <quic_suruchia@quicinc.com>,
-	Suzuki Poulose <suzuki.poulose@arm.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, quic_linchen@quicinc.com
-Subject: Re: [cocci] [PATCH v4 2/5] arm64: tlb: Convert the opencoded field
- modify
-Message-ID: <20250616104109.GA17500@willie-the-truck>
-References: <20250612-field_modify-v4-0-ae4f74da45a6@quicinc.com>
- <20250612-field_modify-v4-2-ae4f74da45a6@quicinc.com>
- <3537a4ce-b5e8-44d5-a884-70a81562068d@web.de>
- <94b40ff2-9e9e-4eea-8a66-87d8976aeb70@quicinc.com>
+	s=arc-20240116; t=1750070496; c=relaxed/simple;
+	bh=Lw2dE+P+MII1mRCnkvkm+zkgPFhWavrLZBJGcO21axg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NTCojAZ29koW7fTNp9q0J4Y4QMjoH0jfH4J6QR6VOpNbfsY1I99XYyeDQkGuLCMOLq6vBUyPSibVuXpgDyimmQCxEwNm56WJHwz6g11XJ0AG9wXTsNTfqPyZQlcl8UsqghELzn+HWuI7o4qBpvygzO8YSDOW1i8MzMZQuzi4grE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27592150C;
+	Mon, 16 Jun 2025 03:41:12 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 31E963F58B;
+	Mon, 16 Jun 2025 03:41:31 -0700 (PDT)
+Message-ID: <b39ce0e3-5d44-4334-b739-2af07a24a668@arm.com>
+Date: Mon, 16 Jun 2025 11:41:28 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <94b40ff2-9e9e-4eea-8a66-87d8976aeb70@quicinc.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 10/43] arm64: RME: RTT tear down
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-11-steven.price@arm.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250611104844.245235-11-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 16, 2025 at 06:37:41PM +0800, Luo Jie wrote:
+Hi Steven
+
+On 11/06/2025 11:48, Steven Price wrote:
+> The RMM owns the stage 2 page tables for a realm, and KVM must request
+> that the RMM creates/destroys entries as necessary. The physical pages
+> to store the page tables are delegated to the realm as required, and can
+> be undelegated when no longer used.
 > 
+> Creating new RTTs is the easy part, tearing down is a little more
+> tricky. The result of realm_rtt_destroy() can be used to effectively
+> walk the tree and destroy the entries (undelegating pages that were
+> given to the realm).
 > 
-> On 6/13/2025 4:15 AM, Markus Elfring wrote:
-> > I see further refinement possibilities for such a change description.
-> > 
-> > 
-> > > Replace below code with the wrapper FIELD_MODIFY(MASK, &reg, val)
-> > > - reg &= ~MASK;
-> > > - reg |= FIELD_PREP(MASK, val);
-> > 
-> > * How do you think about to omit leading minus characters?
-> > 
-> > * Subsequent blank line?
-> > 
-> > 
-> > > More information about semantic patching is available at
-> > > http://coccinelle.lip6.fr/
-> > 
-> > I suggest to omit this information here (and in similar patches).
-> > 
-> > Regards,
-> > Markus
-> 
-> Thank you for your suggestions. The current commit message was generated
-> by the following patch mode command:
-> ```
-> make coccicheck MODE=patch COCCI=scripts/coccinelle/misc/field_modify.cocci
-> V=1
-> ```
-> However, as I understand, the discussion on the ARM patches (between
-> Russel/Marc/Yury) has concluded that the ARM arch changes may not be
-> adding value over the current code, so I will drop the ARM patches
-> in the next version.
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-Well, hang on a second. From what I can tell, the objections haven't
-been specific to arch/arm{,64}/. You haven't really explained why this
-new helper is needed and what value it brings over the existing set of
-functionality.
+A couple of minor nits below. Should have spotted earlier, apologies.
+...
 
-So maybe start there, rather than dropping the parts that attracted the
-comments to start with?
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index 73261b39f556..0f89295fa59c 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -17,6 +17,22 @@ static unsigned long rmm_feat_reg0;
+>   #define RMM_PAGE_SHIFT		12
+>   #define RMM_PAGE_SIZE		BIT(RMM_PAGE_SHIFT)
+>   
+> +#define RMM_RTT_BLOCK_LEVEL	2
+> +#define RMM_RTT_MAX_LEVEL	3
+> +
+> +/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
+> +#define RMM_RTT_LEVEL_SHIFT(l)	\
+> +	((RMM_PAGE_SHIFT - 3) * (4 - (l)) + 3)
+> +#define RMM_L2_BLOCK_SIZE	BIT(RMM_RTT_LEVEL_SHIFT(2))
+> +
+> +static inline unsigned long rme_rtt_level_mapsize(int level)
+> +{
+> +	if (WARN_ON(level > RMM_RTT_MAX_LEVEL))
+> +		return RMM_PAGE_SIZE;
+> +
+> +	return (1UL << RMM_RTT_LEVEL_SHIFT(level));
+> +}
+> +
+>   static bool rme_has_feature(unsigned long feature)
+>   {
+>   	return !!u64_get_bits(rmm_feat_reg0, feature);
+> @@ -82,6 +98,126 @@ static int free_delegated_granule(phys_addr_t phys)
+>   	return 0;
+>   }
+>   
+> +static void free_rtt(phys_addr_t phys)
+> +{
+> +	if (free_delegated_granule(phys))
+> +		return;
+> +
+> +	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
+> +}
+> +
+> +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
+> +			     int level, phys_addr_t *rtt_granule,
+> +			     unsigned long *next_addr)
+> +{
+> +	unsigned long out_rtt;
+> +	int ret;
+> +
+> +	ret = rmi_rtt_destroy(virt_to_phys(realm->rd), addr, level,
+> +			      &out_rtt, next_addr);
+> +
+> +	*rtt_granule = out_rtt;
+> +
+> +	return ret;
 
-Will
+ultra minor nit: this could simply be :
+
+	return rmi_rtt_destroy(virt_to_phys(realm->rd), addr, level, 
+rtt_granule, next_addr);
+
+
+...
+
+> +
+> +static int realm_tear_down_rtt_range(struct realm *realm,
+> +				     unsigned long start, unsigned long end)
+> +{
+
+minor nit: Is it worth adding a comment here, why we start from 
+start_level + 1 and downwards ? Something like:
+
+	/*
+	 * Root level RTTs can only be destroyed after the RD is
+	 * destroyed. So tear down everything below the root level.
+	 */
+
+Similarly, we may be able to clarify a comment in kvm_free_stage2_pgd()
+
+Suzuki
+
