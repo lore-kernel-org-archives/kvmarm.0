@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CBB18DB35;
-	Tue, 17 Jun 2025 14:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E708D2E889A;
+	Tue, 17 Jun 2025 15:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750171821; cv=none; b=lracx+VKubQyh4P+F36eoezzwzoBFB5fdqpHls6MtnaexLF+ZCxpdnpnrxV2TcHT4FGxFmhzFV+uFEzz4diTf3EL8sqjwRq3C3aURB/h+uxEl5id+thk7GZHFXwdK6wPNcLkpyDJcEed428rbBk2pHLeXY/MdgFPfFbWAlVaOQo=
+	t=1750173019; cv=none; b=uusAlsXv7o5kGjlmAy/aYeWxh51aOhZB3g6LnDFupEC7ZKgerjTjnM7wAPLpeRyZVLNbFIaIHH86Pb/nAAfvFBDs6Un01EpRJVacj8FKEeNC4UdI94HEOg3nw8p0Xn7GJq+JCuQxK74dbGVTuzgVylTYllY2LuaeNy8RUe+DHps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750171821; c=relaxed/simple;
-	bh=vcZN/uU0Z+D8+9jFTvc1z2F6ONl+fjkhBpzf5Kdq9CU=;
+	s=arc-20240116; t=1750173019; c=relaxed/simple;
+	bh=TZcOBjPsqZfGB1DMcUTuXivLLt+YrMUoZ3nRg9JcutA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G7HBF/JBbayHSucvbKjWsVxZyaLa+h6cSYSyfbeki/HHHYe1+Py/2uuCRLaVNwIc2mqjRrv2IBSaZj/jGGmxLRomXH5U1WYZNAd47yB2vs8xZaGg+CAjT+4IM9aQdcNkpzTcERuX+0vYoIF1HKjhk7zUrw63CaZHgDv2uVlqdi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A0+YY0EV; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qs+b4vVpu/W53/PM0eF8RBOs228FmQ3E+JAFQSqQvyLa8pAwgxdA6SYmYhjz3rd5YlNUSm/pnOd/zmiIfEjHhrlDLcNMRtjiROfTJvmaUoEVMFQ0YSYFMv0EFfZ7AtoaX1fUYKFXmzXcLJPVRL1PnqcnBah9FgWr5/B5NBMwru0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1V8IgRl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A0+YY0EV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55311C4CEE3;
-	Tue, 17 Jun 2025 14:50:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1V8IgRl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB254C4CEE3;
+	Tue, 17 Jun 2025 15:10:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750171820;
-	bh=vcZN/uU0Z+D8+9jFTvc1z2F6ONl+fjkhBpzf5Kdq9CU=;
+	s=k20201202; t=1750173018;
+	bh=TZcOBjPsqZfGB1DMcUTuXivLLt+YrMUoZ3nRg9JcutA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A0+YY0EVIITtA40tAwzQzDmH/iGvRkWodYkM2BCdZc1UB2XNmBqOxD/1GWCYFwdjZ
-	 f83THZKNo3sMSBPUtmNm2BIgcsk+Yysf/zFnJ2anqIxIeIjFrDZpCS5oaLfKu07v71
-	 BHKqvPyjGlD/cUOttYS6tEdIS3gzTsfP6rjS6lQgjEXQYe7KwqCuHAWr+m+8Q1i7DL
-	 32yRoA3HxlAoPkZ48bhAlXHf/kinoOQmlUcaC+rhhnbSBRMS9de8WTz94GF9EaR3oT
-	 IdR56IFaIRJT+mCKsvqqQDINhRs0UDN7UncakMdcUV/d8nnPCWs5GWFUfUiXiZm2EB
-	 jSu365NQOVUug==
-Date: Tue, 17 Jun 2025 20:19:00 +0530
+	b=l1V8IgRlHTwSpqeHPfwcab6KJbWP4sgrPRjDiY5mVBfW1R1Ysf8BUTKEIPao3PYyQ
+	 lI3B1+Mj6q5O5kBypRlQzoI0+zeVg+I1fwkDRbujK5PcEnZUMljlB8yEQocCjbqlXl
+	 vSAD4DY6nXirSVMcaqOWWV5d61j6LRHxZvTg8UArFI6hBYa6KarYXR+JTOG3pMWy0Q
+	 ltpk+JEFpn0LUZuzNOniyP0LlW9VNrfuBZo8dxB8XEJHh8d8DFdgtkHUqCD/RXZq2Z
+	 BcjKScmmFE7bQHLs4S3AgeqqmssrlnkLDTG7lQ7nEMwFC1/4FwVhOyJn3+Gi8b0qI6
+	 q+AdRLx1gSiEA==
+Date: Tue, 17 Jun 2025 20:31:36 +0530
 From: Naveen N Rao <naveen@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -37,11 +37,11 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
 	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
 	David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 13/62] KVM: SVM: Drop redundant check in AVIC code on
- ID during vCPU creation
-Message-ID: <qusmkqqsvc7hyuemddv66mooach7mdq66mxbk7qbr6if6spguj@k57k5lqmvt5u>
+Subject: Re: [PATCH v3 14/62] KVM: SVM: Track AVIC tables as natively sized
+ pointers, not "struct pages"
+Message-ID: <a7j5yllrxxzaqzjcmpfu3oxh775xgzx7h7nrkw53rmucnrbspy@zlwzwgfd7uke>
 References: <20250611224604.313496-2-seanjc@google.com>
- <20250611224604.313496-15-seanjc@google.com>
+ <20250611224604.313496-16-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,36 +50,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250611224604.313496-15-seanjc@google.com>
+In-Reply-To: <20250611224604.313496-16-seanjc@google.com>
 
-On Wed, Jun 11, 2025 at 03:45:16PM -0700, Sean Christopherson wrote:
->  static int avic_init_backing_page(struct kvm_vcpu *vcpu)
->  {
-> -	u64 *entry, new_entry;
-> -	int id = vcpu->vcpu_id;
-> +	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> +	u32 id = vcpu->vcpu_id;
-> +	u64 *table, new_entry;
->  
->  	/*
->  	 * Inhibit AVIC if the vCPU ID is bigger than what is supported by AVIC
-> @@ -291,6 +277,9 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
+On Wed, Jun 11, 2025 at 03:45:17PM -0700, Sean Christopherson wrote:
+> @@ -277,8 +265,8 @@ static int avic_init_backing_page(struct kvm_vcpu 
+> *vcpu)
 >  		return 0;
 >  	}
 >  
-> +	BUILD_BUG_ON((AVIC_MAX_PHYSICAL_ID + 1) * sizeof(*table) > PAGE_SIZE ||
-> +		     (X2AVIC_MAX_PHYSICAL_ID + 1) * sizeof(*table) > PAGE_SIZE);
-						    ^^^^^^^^^^^^^^
-Renaming new_entry to just 'entry' and using sizeof(entry) makes this 
-more readable for me. Otherwise, for this patch:
-Reviewed-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> -	BUILD_BUG_ON((AVIC_MAX_PHYSICAL_ID + 1) * sizeof(*table) > PAGE_SIZE ||
+> -		     (X2AVIC_MAX_PHYSICAL_ID + 1) * sizeof(*table) > PAGE_SIZE);
+> +	BUILD_BUG_ON((AVIC_MAX_PHYSICAL_ID + 1) * sizeof(new_entry) > PAGE_SIZE ||
+> +		     (X2AVIC_MAX_PHYSICAL_ID + 1) * sizeof(new_entry) > PAGE_SIZE);
 
+Ah, you change to 'new_entry' here. Would be good to rename it to just 
+'entry', but that's a minor nit. Ignore my comment on the previous 
+patch.
 
-As an aside, there are a few static asserts to validate some of the 
-related macros. Can this also be a static_assert(), or is there is 
-reason to prefer BUILD_BUG_ON()?
+For this patch:
+Acked-by: Naveen N Rao (AMD) <naveen@kernel.org>
 
 
 - Naveen
-
