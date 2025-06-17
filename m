@@ -1,169 +1,146 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C118B2E265C
-	for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 13:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26842EF664;
+	Tue, 17 Jun 2025 14:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750167470; cv=none; b=pgcs8e5Fn3mZReIJERD9hSOEXnOXtaSyuK8UVe0Zd420c7aXW7Fzn3oEFXm+zKt04S+On6dt1T6PqNqAk/JjN9RwRSe7q3Hes0pWoQKsA5eswFGtbL1G1Ns5ttl+vIP3FYP8xQFYnr/6RbwuR4Ohw2XO+bEunmkyes6uWXtuX9c=
+	t=1750170618; cv=none; b=CQY6n1YPYARtAGB2q9QQ2BLFMZldH3n9YjLDKtHTQgosdZMInxBpF2KO7SxKGyP0P2sfKK3VG/AyX1O5Nxm23FnljWyG4g2SJKAyd6MAdQvxyI7bQSDofwHc93nRHjhEiP2dcxP82Y4j2H86kz6MWwlJW6H/MBOfXKqxhP5JolY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750167470; c=relaxed/simple;
-	bh=2iaCJJBTqxr+2KL/te1yL3ZXEzoh66oh0r70FcAmms4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Hx+XPMyZtei8ZOYDbXkObpcU/9arJm8SxRSnVdpD95p/dKebHLDH7o1mRe0S2FUZa++Kn2e30O12IZvlW3e6mB96eDcFxJ09cwDa6sy8qUaUkfCJQ7bSRBECpFk1wFZLDuda+l9VjhNNOyB2yi/0mDoFxbTWJzo65bxLx9nx4HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1E95F1596;
-	Tue, 17 Jun 2025 06:37:26 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 657653F673;
-	Tue, 17 Jun 2025 06:37:45 -0700 (PDT)
-From: Mark Rutland <mark.rutland@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: broonie@kernel.org,
-	catalin.marinas@arm.com,
-	kvmarm@lists.linux.dev,
-	mark.rutland@arm.com,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	stable@vger.kernel.org,
-	tabba@google.com,
-	will@kernel.org
-Subject: [PATCH 7/7] KVM: arm64: VHE: Centralize ISBs when returning to host
-Date: Tue, 17 Jun 2025 14:37:18 +0100
-Message-Id: <20250617133718.4014181-8-mark.rutland@arm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250617133718.4014181-1-mark.rutland@arm.com>
-References: <20250617133718.4014181-1-mark.rutland@arm.com>
+	s=arc-20240116; t=1750170618; c=relaxed/simple;
+	bh=fr2XMAsOts3e2z91VRBihiSkUtLYOX60usFN8g0EWAQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S2+RdkCtpMA6XlGtruNHEVsWhzfbYMtTVstXkLHtbIFNmfL1q+QuHynAz3JviQw7yMz4gWkJqhavOB/vfQ6Re92STD3+o/i9iyOTRnFtXj70aJy+6ggPjizYnbGTA9LgD8vqPUSOsWTSIbph/y14LEZajEyvpn9qDHNEOMtJAVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QDe3FgWK; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QDe3FgWK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9838C4CEE7;
+	Tue, 17 Jun 2025 14:30:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750170618;
+	bh=fr2XMAsOts3e2z91VRBihiSkUtLYOX60usFN8g0EWAQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QDe3FgWKdRYt+BIzMKBQF3t5wcdsgovRo8kcvLAZPRvtxyXl1IvJ1uNlEJh8U4szk
+	 WfnBWWcVDZzqXI61sDtZK990vZVY38xyHXdM8ZsdmGlYrWlwx9hSAd5jzQh+JAMcXz
+	 4UEuHs04KEVpn53uSj9FF9SyIfJ2TnYQ0oGXkwZw7S2c7eR/8u3FrqK1UJ/EVyn7J2
+	 FFrE/9UrKWA1xYiEFfIF+1CF254i3hvfP53fi2s9JlXyyKs/yG9t+uET8HDMiY7EM9
+	 lWYelt+tdc7MIPGZhMbltC42Afg6OnmSi0RmZVMPObkuYfe1NmfQf1XhBBxdk4SbUw
+	 0Rrk2MzTfwCJA==
+Date: Tue, 17 Jun 2025 19:55:01 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v3 12/62] KVM: SVM: Inhibit AVIC if ID is too big instead
+ of rejecting vCPU creation
+Message-ID: <bmx43lru6mwdyun3ktcmoeezqw6baih7vgtykolsrmu5q2x7vu@xp5jrbbqwzej>
+References: <20250611224604.313496-2-seanjc@google.com>
+ <20250611224604.313496-14-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611224604.313496-14-seanjc@google.com>
 
-The VHE hyp code has recently gained a few ISBs. Simplify this to one
-unconditional ISB in __kvm_vcpu_run_vhe(), and remove the unnecessary
-ISB from the kvm_call_hyp_ret() macro.
+On Wed, Jun 11, 2025 at 03:45:15PM -0700, Sean Christopherson wrote:
+> Inhibit AVIC with a new "ID too big" flag if userspace creates a vCPU with
+> an ID that is too big, but otherwise allow vCPU creation to succeed.
+> Rejecting KVM_CREATE_VCPU with EINVAL violates KVM's ABI as KVM advertises
+> that the max vCPU ID is 4095, but disallows creating vCPUs with IDs bigger
+> than 254 (AVIC) or 511 (x2AVIC).
+> 
+> Alternatively, KVM could advertise an accurate value depending on which
+> AVIC mode is in use, but that wouldn't really solve the underlying problem,
+> e.g. would be a breaking change if KVM were to ever try and enable AVIC or
+> x2AVIC by default.
+> 
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  9 ++++++++-
+>  arch/x86/kvm/svm/avic.c         | 14 ++++++++++++--
+>  arch/x86/kvm/svm/svm.h          |  3 ++-
+>  3 files changed, 22 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 2a6ef1398da7..a9b709db7c59 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1314,6 +1314,12 @@ enum kvm_apicv_inhibit {
+>  	 */
+>  	APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED,
+>  
+> +	/*
+> +	 * AVIC is disabled because the vCPU's APIC ID is beyond the max
+> +	 * supported by AVIC/x2AVIC, i.e. the vCPU is unaddressable.
+> +	 */
+> +	APICV_INHIBIT_REASON_PHYSICAL_ID_TOO_BIG,
+> +
+>  	NR_APICV_INHIBIT_REASONS,
+>  };
+>  
+> @@ -1332,7 +1338,8 @@ enum kvm_apicv_inhibit {
+>  	__APICV_INHIBIT_REASON(IRQWIN),			\
+>  	__APICV_INHIBIT_REASON(PIT_REINJ),		\
+>  	__APICV_INHIBIT_REASON(SEV),			\
+> -	__APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED)
+> +	__APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED),	\
+> +	__APICV_INHIBIT_REASON(PHYSICAL_ID_TOO_BIG)
+>  
+>  struct kvm_arch {
+>  	unsigned long n_used_mmu_pages;
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index ab228872a19b..f0a74b102c57 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -277,9 +277,19 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
+>  	int id = vcpu->vcpu_id;
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+> +	/*
+> +	 * Inhibit AVIC if the vCPU ID is bigger than what is supported by AVIC
+> +	 * hardware.  Immediately clear apicv_active, i.e. don't wait until the
+> +	 * KVM_REQ_APICV_UPDATE request is processed on the first KVM_RUN, as
+> +	 * avic_vcpu_load() expects to be called if and only if the vCPU has
+> +	 * fully initialized AVIC.
+> +	 */
+>  	if ((!x2avic_enabled && id > AVIC_MAX_PHYSICAL_ID) ||
+> -	    (id > X2AVIC_MAX_PHYSICAL_ID))
+> -		return -EINVAL;
+> +	    (id > X2AVIC_MAX_PHYSICAL_ID)) {
+> +		kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_PHYSICAL_ID_TOO_BIG);
+> +		vcpu->arch.apic->apicv_active = false;
 
-While kvm_call_hyp_ret() is also used to invoke
-__vgic_v3_get_gic_config(), but no ISB is necessary in that case either.
+This bothers me a bit. kvm_create_lapic() does this:
+          if (enable_apicv) {
+                  apic->apicv_active = true;
+                  kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
+	  }
 
-For the moment, an ISB is left in kvm_call_hyp(), as there are many more
-users, and removign the ISB would require a more thorough audit.
+But, setting apic->apicv_active to false here means KVM_REQ_APICV_UPDATE 
+is going to be a no-op.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Will Deacon <will@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h         |  6 ++----
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  3 ---
- arch/arm64/kvm/hyp/vhe/switch.c           | 25 +++++++++++------------
- 3 files changed, 14 insertions(+), 20 deletions(-)
+This does not look to be a big deal given that kvm_create_lapic() itself 
+is called just a bit before svm_vcpu_create() (which calls the above 
+function through avic_init_vcpu()) in kvm_arch_vcpu_create(), so there 
+isn't that much done before apicv_active is toggled.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 382b382d14dac..2e3c152668eb8 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1289,9 +1289,8 @@ void kvm_arm_resume_guest(struct kvm *kvm);
- 	})
- 
- /*
-- * The couple of isb() below are there to guarantee the same behaviour
-- * on VHE as on !VHE, where the eret to EL1 acts as a context
-- * synchronization event.
-+ * The isb() below is there to guarantee the same behaviour on VHE as on !VHE,
-+ * where the eret to EL1 acts as a context synchronization event.
-  */
- #define kvm_call_hyp(f, ...)						\
- 	do {								\
-@@ -1309,7 +1308,6 @@ void kvm_arm_resume_guest(struct kvm *kvm);
- 									\
- 		if (has_vhe()) {					\
- 			ret = f(__VA_ARGS__);				\
--			isb();						\
- 		} else {						\
- 			ret = kvm_call_hyp_nvhe(f, ##__VA_ARGS__);	\
- 		}							\
-diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-index 73881e1dc2679..502a5b73ee70c 100644
---- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-@@ -167,9 +167,6 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
- 
- 	__debug_save_state(guest_dbg, guest_ctxt);
- 	__debug_restore_state(host_dbg, host_ctxt);
--
--	if (has_vhe())
--		isb();
- }
- 
- #endif /* __ARM64_KVM_HYP_DEBUG_SR_H__ */
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 32b4814eb2b7a..477f1580ffeaa 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -558,10 +558,10 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	host_ctxt = host_data_ptr(host_ctxt);
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
--	sysreg_save_host_state_vhe(host_ctxt);
--
- 	fpsimd_lazy_switch_to_guest(vcpu);
- 
-+	sysreg_save_host_state_vhe(host_ctxt);
-+
- 	/*
- 	 * Note that ARM erratum 1165522 requires us to configure both stage 1
- 	 * and stage 2 translation for the guest context before we clear
-@@ -586,18 +586,23 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	__deactivate_traps(vcpu);
- 
--	/* Ensure CPTR trap deactivation has taken effect */
-+	sysreg_restore_host_state_vhe(host_ctxt);
-+
-+	__debug_switch_to_host(vcpu);
-+
-+	/*
-+	 * Ensure that all system register writes above have taken effect
-+	 * before returning to the host. In VHE mode, CPTR traps for
-+	 * FPSIMD/SVE/SME also apply to EL2, so FPSIMD/SVE/SME state must be
-+	 * manipulated after the ISB.
-+	 */
- 	isb();
- 
- 	fpsimd_lazy_switch_to_host(vcpu);
- 
--	sysreg_restore_host_state_vhe(host_ctxt);
--
- 	if (guest_owns_fp_regs())
- 		__fpsimd_save_fpexc32(vcpu);
- 
--	__debug_switch_to_host(vcpu);
--
- 	return exit_code;
- }
- NOKPROBE_SYMBOL(__kvm_vcpu_run_vhe);
-@@ -627,12 +632,6 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	local_daif_restore(DAIF_PROCCTX_NOIRQ);
- 
--	/*
--	 * When we exit from the guest we change a number of CPU configuration
--	 * parameters, such as traps.  We rely on the isb() in kvm_call_hyp*()
--	 * to make sure these changes take effect before running the host or
--	 * additional guests.
--	 */
- 	return ret;
- }
- 
--- 
-2.30.2
+But, this made me wonder if introducing a kvm_x86_op to check and 
+enable/disable apic->apicv_active in kvm_create_lapic() might be cleaner 
+overall. Maybe even have it be the initialization point for APICv: 
+apicv_init(), so we can invoke avic_init_vcpu() right away?
+
+
+- Naveen
 
