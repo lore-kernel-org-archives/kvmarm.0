@@ -1,112 +1,108 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70FC2ED872
-	for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 15:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE592F2C41;
+	Tue, 17 Jun 2025 15:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750175136; cv=none; b=pJetfEtCAjsosbxyPHLstl2cHQ7cyneMrA2QhNfn6d5xq8ZvptuByJwJKkq4hVx1PYUh/8ip/HkIG2bs9ncjf2hvni7xqgGYUBHXSywoBZjrF9JdiKsD8KaRWJ8XAzjzQbKmc08ewGgKsExCprr5bhabmTMaxoo2ks9rxhiEa6Q=
+	t=1750175419; cv=none; b=fVNBghu7mfJqh+kLjyKVUb5KLhIdZ5rl8j/rS5eT4EEf/hUYRvmbx5l/XYCOiEBok6+yGTEPLzczsOpx3rkCSdQN44JKq96OIHzF65hXfGWInoa8B1ERhdBZ0uzTpxlcdB9E2enBdIac8rvSvmiwCzyJgD6NO6FgbHtLkELzTlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750175136; c=relaxed/simple;
-	bh=dgGieE0z6G/5uJYgTJf+H3e0UA7uV1V+O2tj/bT4n/c=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oVZo9oznBotKEowgoaK1ORy3yF3SCfHGdzuFiXzhZMDRNhPzmqfg25ra5w6Dzh+ZlpkcrzDS3O63mjDTgqJ76geojHoXLG8JBXKNkaGaEhWE4cC3jpMFamjITGoAy7w3ubbhCsqH4ZgESNYTsuXKBUZybnBxlk+r72YYAkl4PFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZzhkYJtK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750175419; c=relaxed/simple;
+	bh=LNC2w8LSdPeWSFo7aYqjVJu6bohSIps4pbr6GI4K0BA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMub4BeFW7RTCF/MG/FI76+WPR0OR7kB8tCKaFQRfYxgysqufziL/r+XXMNNoLP5hyfzZwzYs2hlT/6RKFwByLClXn2yRx1YUTaf28J9pA5RupmDjXwyTOZ7Ju0uEge/YG0u6AYZaoIw/nzJMKT1h2kR81DygTY4Hm6pZt1YJq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8ybcfpx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzhkYJtK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750175133;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pimc7ToHXzj5NjsL3cnFa44sV45BUXzhB1gmiO8PNfc=;
-	b=ZzhkYJtKoAecutdOyLuKOYUiWwdqHbd6sSoxfvBYddaKy9IoLOwPaq5mlyibyEkbeNKnDO
-	VuF/U73m0ktSkcktg75u7k1BU4qIV9W4QidMj2tg2HeteUAt4Awe6VNbOHTiJhCKSnAumR
-	+/cwrCaibWUDK8BSgEhNBy9fI2+XVws=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-642-KFe1QetPPQC4DZGrfoLaKw-1; Tue,
- 17 Jun 2025 11:45:27 -0400
-X-MC-Unique: KFe1QetPPQC4DZGrfoLaKw-1
-X-Mimecast-MFC-AGG-ID: KFe1QetPPQC4DZGrfoLaKw_1750175119
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 37CE81800284;
-	Tue, 17 Jun 2025 15:45:19 +0000 (UTC)
-Received: from localhost (pixel-6a.str.redhat.com [10.33.192.205])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 257B130001B1;
-	Tue, 17 Jun 2025 15:45:17 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
- richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
- oliver.upton@linux.dev, sebott@redhat.com,
- shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
- agraf@csgraf.de
-Cc: shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
- pbonzini@redhat.com
-Subject: Re: [PATCH v8 12/14] arm/cpu: Add sysreg generation scripts
-In-Reply-To: <20250617153931.1330449-13-cohuck@redhat.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Avril Crosse O'Flaherty"
-References: <20250617153931.1330449-1-cohuck@redhat.com>
- <20250617153931.1330449-13-cohuck@redhat.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Tue, 17 Jun 2025 17:45:15 +0200
-Message-ID: <87h60e1ies.fsf@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8ybcfpx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B85CC4CEE3;
+	Tue, 17 Jun 2025 15:50:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750175419;
+	bh=LNC2w8LSdPeWSFo7aYqjVJu6bohSIps4pbr6GI4K0BA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g8ybcfpxWV2OtWW99thzTjWTfLwKsYYyaqcTvP7aHzalyqXMXPorjLvVi6xHimaHF
+	 eJsTaSqfWINmIeb2EWU2+/1+1jmxVvUKxnQVRhZUALS1HDkfjHe1OCSVKeKD6cMpT1
+	 jD8uwP4U1MtAJpojwUNjP8SJAr9bp+FteCTVASwSS77HmIqjK1cEtysYmef1wfU7Um
+	 EURHWiaOCN3HV7rbcHdsJDcgHHmGnmyc9SHUZ/5P92AhI2AZ2xt4gPLhtJUX1WHsCu
+	 TGiAuinoczfD8wisKatLD5XmFhJtiY/HaD0eXCqDoVmrX4+TYH5y5xXYeQNZ+BGEeO
+	 3mSt/BnDa6lwA==
+Date: Tue, 17 Jun 2025 21:12:58 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v3 38/62] KVM: SVM: Take and hold ir_list_lock across
+ IRTE updates in IOMMU
+Message-ID: <qhvns5twcxwzrz2fhp7njmyqb5x5icgiz4iszwvwmeoxhw7ycv@3we3xqqaqeib>
+References: <20250611224604.313496-2-seanjc@google.com>
+ <20250611224604.313496-40-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611224604.313496-40-seanjc@google.com>
 
-On Tue, Jun 17 2025, Cornelia Huck <cohuck@redhat.com> wrote:
+On Wed, Jun 11, 2025 at 03:45:41PM -0700, Sean Christopherson wrote:
+> Now that svm_ir_list_add() isn't overloaded with all manner of weird
+> things, fold it into avic_pi_update_irte(), and more importantly take
+> ir_list_lock across the irq_set_vcpu_affinity() calls to ensure the info
+> that's shoved into the IRTE is fresh.  While preemption (and IRQs) is
+> disabled on the task performing the IRTE update, thanks to irqfds.lock,
+> that task doesn't hold the vCPU's mutex, i.e. preemption being disabled
+> is irrelevant.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 55 +++++++++++++++++------------------------
+>  1 file changed, 22 insertions(+), 33 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index f1e9f0dd43e8..4747fb09aca4 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -769,32 +769,6 @@ static void svm_ir_list_del(struct kvm_kernel_irqfd *irqfd)
+>  	spin_unlock_irqrestore(&to_svm(vcpu)->ir_list_lock, flags);
+>  }
+>  
+> -static void svm_ir_list_add(struct vcpu_svm *svm,
+> -			    struct kvm_kernel_irqfd *irqfd,
+> -			    struct amd_iommu_pi_data *pi)
+> -{
+> -	unsigned long flags;
+> -	u64 entry;
+> -
+> -	irqfd->irq_bypass_data = pi->ir_data;
+> -
+> -	spin_lock_irqsave(&svm->ir_list_lock, flags);
+> -
+> -	/*
+> -	 * Update the target pCPU for IOMMU doorbells if the vCPU is running.
+> -	 * If the vCPU is NOT running, i.e. is blocking or scheduled out, KVM
+> -	 * will update the pCPU info when the vCPU awkened and/or scheduled in.
+> -	 * See also avic_vcpu_load().
+> -	 */
+> -	entry = svm->avic_physical_id_entry;
+> -	if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
+> -		amd_iommu_update_ga(entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK,
+> -				    true, pi->ir_data);
+> -
+> -	list_add(&irqfd->vcpu_list, &svm->ir_list);
+> -	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
+> -}
+> -
 
-> diff --git a/scripts/arm-gen-cpu-sysregs-header.awk b/scripts/arm-gen-cpu-sysregs-header.awk
-> new file mode 100755
-> index 000000000000..f92bbbafa727
-> --- /dev/null
-> +++ b/scripts/arm-gen-cpu-sysregs-header.awk
-> @@ -0,0 +1,37 @@
-> +#!/bin/awk -f
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +# arm-gen-cpu-sysregs-header.awk: arm64 sysreg header include generator
-> +#
-> +# Usage: awk -f arm-gen-cpu-sysregs-header.awk $LINUX_PATH/arch/arm64/tools/sysreg
-> +
-> +BEGIN {
-> +    print "/* SPDX-License-Identifier: GPL-2.0-or-later */"
+There are a few comments in avic_vcpu_load() and avic_vcpu_put() which 
+still refer to svm_ir_list_add(). Would be good to update those.
 
-FWIW, checkpatch.pl chokes on this:
-
-^* matches null string many times in regex; marked by <-- HERE in m/^* <-- HERE /"$/ at scripts/checkpatch.pl line 1389.
-ERROR: Saw unacceptable licenses '*/"', valid choices for QEMU are:
-GPL-2.0-or-later
-GPL-2.0-only
-LGPL-2.1-only
-LGPL-2.1-or-later
-BSD-2-Clause
-BSD-3-Clause
-MIT
-total: 1 errors, 0 warnings, 76 lines checked
-
-
-> +    print "/* GENERATED FILE, DO NOT EDIT */"
-> +    print "/* use arm-gen-cpu-sysregs-header.awk to regenerate */"
-> +} END {
-> +    print ""
-> +}
-> +
+- Naveen
 
