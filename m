@@ -1,171 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1FD293C44;
-	Tue, 17 Jun 2025 09:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAB72DF3E4
+	for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 12:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750152365; cv=none; b=RHSNwPwzZQCzln9giNY4/ro+n44IZ0oyhgtr3mIX8R2s8qhrH7tfrFrv+ItAnCBTduV9fTty8oZfxnyHlgGiqajBdNi0xr9ZUfWXrxQyQ4VV2DZSE1QS7ylGRaLeQW332qmTkqzrfqZ7dCPKd5ld3l9CMdrdXiONdBDWzmctJ3g=
+	t=1750164578; cv=none; b=EAylLOPuYR6vpprbTCT+o6tx8MJrW6bVBj/Cg9cYYfI7zxvPaTj6bOklwFSWnvJp25OKvn/f4nF5PE4DYED2D9kgDz9ShMoEU8uTlRQJd7GaIN821WiGvxOGh0nhBPto/vGrPG8oiNiC5x/TDIga108N7Ak3IT5EyKGJoRch3rM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750152365; c=relaxed/simple;
-	bh=509oFDJsX668fKPGdjbyh5L2PGfXeFpMvKv1Grb7Y8o=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hL0gw0A3TU05RsfYg42WVKUfsW4EQxQmYhc9OdPc6qxPEZbVZogeGhJw/CnIiyS2htS1lshK7VJIa1J7sVRtpxOQEiN3nJtvdxqTdpBR7KqXxmd/BbCwveU2ElvXEGabUE535Rdp4KJLfUai9d0JeGbatvi1dCNfC0g6GstdhZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMsp1WQl; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMsp1WQl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C74DC4CEED;
-	Tue, 17 Jun 2025 09:26:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750152364;
-	bh=509oFDJsX668fKPGdjbyh5L2PGfXeFpMvKv1Grb7Y8o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kMsp1WQlwp82qX7zNZQ4+yUHnPKW+hDFrmlW7cO36ZQg0IapfK517gxwI+Axju/gP
-	 n6skSLqGX/BYdTWCUnqSHsN6t4ElOAiK59dLcImppTVZrx4hN34tdkEhgLFzmQwiUD
-	 54GrJbg4Dv7P7y7QKHCqlGJ4rSdWD/2ZGIZoMTcuUQNvddfsZB8QfIfSx8PhsdN7SK
-	 Cm4tXGBfIFxfuhkT4y33CPx5OZ/COfcOFwsVMiH7y4wmSGsdQdJaAcAo0sBL5tFhVI
-	 Q8YI19rm48aPtoP4Ail9WULuGp6eR6y4AQTfh8o3mzJBOnfhbnVijOyIf6lARlz/ua
-	 QMbzkvyqq56Dw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uRSZu-007Vpa-3l;
-	Tue, 17 Jun 2025 10:26:02 +0100
-Date: Tue, 17 Jun 2025 10:26:01 +0100
-Message-ID: <86o6umd8ie.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Fix s_cpu_if->vgic_lr[] indexing in vgic_v3_put_nested()
-In-Reply-To: <aFD0wHqZ-8CRWIW-@linux.dev>
-References: <20250614145721.2504524-1-r09922117@csie.ntu.edu.tw>
-	<86qzzkc5xa.wl-maz@kernel.org>
-	<aFD0wHqZ-8CRWIW-@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1750164578; c=relaxed/simple;
+	bh=imEetcTRPsXXLXqOXUC7u4cjKKD+hALiTz3xfb/29sU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mZRTOhnN4YeSNt6EiDbeIcGT6juZkE8Bzz0u9NtFMDbNb5TlHaku0LdruoWewm9dpY8mxo6hqFuy/rRriH7E5LaQCCwZG9ZPW17QVa+gb+/sYbWSXJajLfKZHBvj72OkMTemKF690hq9xInI1Vx9dt72PATwgy2KcuM75SAsgaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E1977150C;
+	Tue, 17 Jun 2025 05:49:14 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C66F83F58B;
+	Tue, 17 Jun 2025 05:49:34 -0700 (PDT)
+Date: Tue, 17 Jun 2025 13:49:29 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, andrew.jones@linux.dev, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v2 0/9] arm64: support EL2
+Message-ID: <20250617124929.GA2576881@e124191.cambridge.arm.com>
+References: <20250529135557.2439500-1-joey.gouly@arm.com>
+ <aFAPSSHJunx1Ecz2@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack@cs.columbia.edu, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aFAPSSHJunx1Ecz2@arm.com>
 
-On Tue, 17 Jun 2025 05:53:20 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, Jun 16, 2025 at 01:34:17PM +0100, Alexandru Elisei wrote:
+> Hi Joey,
 > 
-> On Mon, Jun 16, 2025 at 11:54:57AM +0100, Marc Zyngier wrote:
-> > On Sat, 14 Jun 2025 15:57:21 +0100,
-> > Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
-> > > 
-> > > s_cpu_if->vgic_lr[] is filled continuously from index 0 to
-> > > s_cpu_if->used_lrs - 1, but vgic_v3_put_nested() is indexing it using
-> > > the positions of the set bits in shadow_if->lr_map. So correct it.
-> > > 
-> > > Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-> > > ---
-> > >  arch/arm64/kvm/vgic/vgic-v3-nested.c | 7 ++++---
-> > >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> > > index 4f6954c30674..29741e3f077b 100644
-> > > --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> > > +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> > > @@ -343,7 +343,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
-> > >  	struct shadow_if *shadow_if = get_shadow_if();
-> > >  	struct vgic_v3_cpu_if *s_cpu_if = &shadow_if->cpuif;
-> > >  	u64 val;
-> > > -	int i;
-> > > +	int i, index = 0;
-> > >  
-> > >  	__vgic_v3_save_vmcr_aprs(s_cpu_if);
-> > >  	__vgic_v3_deactivate_traps(s_cpu_if);
-> > > @@ -368,10 +368,11 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
-> > >  		val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
-> > >  
-> > >  		val &= ~ICH_LR_STATE;
-> > > -		val |= s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
-> > > +		val |= s_cpu_if->vgic_lr[index] & ICH_LR_STATE;
-> > >  
-> > >  		__vcpu_sys_reg(vcpu, ICH_LRN(i)) = val;
-> > > -		s_cpu_if->vgic_lr[i] = 0;
-> > > +		s_cpu_if->vgic_lr[index] = 0;
-> > > +		index++;
-> > >  	}
-> > >  
-> > >  	shadow_if->lr_map = 0;
+> On Thu, May 29, 2025 at 02:55:48PM +0100, Joey Gouly wrote:
+> > Hi all,
 > > 
-> > Nice catch, thanks a lot for tracking it down.
+> > This series is for adding support to running the kvm-unit-tests at EL2. These
+> > have been tested with Marc Zyngier's Linux kvm-arm64/nv-next branch [1] and
+> > kvmtool branch arm64/nv-6.13 [2]
 > > 
-> > However, I think we should get rid of this double-indexing altogether,
-> > or at least make it less error-prone. This thing is extremely fragile,
-> > and it isn't the first time we are getting bitten with it.
+> > The goal is to later extend and add new tests for Nested Virtualisation,
+> > however they should also work with bare metal as well.
 > > 
-> > Looking at the code, it becomes pretty obvious that the shadow index
-> > is always the number of bits set in lr_map, and that we could
-> > completely drop the 'index' thing if we simply counted these bits
-> > (which isn't that expensive).
+> > Changes since v1[3]:
+> > 	- Authorship fixed on 2 patches
+> > 	- Tested and fixed EFI support
+> > 	- Recactored assembly and added init_el macro
+> > 	- Clear trap registers, trying to avoid relying on default register
+> > 	  state
+> > 	- Cleaned up PMU changes
 > > 
-> > I came up with the (admittedly much bigger) following fix.
-> > 
-> > Thoughts?
-> > 
-> > 	M.
-> > 
-> > From 2484950b8fc3b36cca32bf5e86ffe7975a43e0e7 Mon Sep 17 00:00:00 2001
-> > From: Marc Zyngier <maz@kernel.org>
-> > Date: Sun, 15 Jun 2025 16:11:38 +0100
-> > Subject: [PATCH] KVM: arm64: nv: Fix tracking of shadow list registers
-> > 
-> > Wei-Lin reports that the tracking of shadow list registers is
-> > majorly broken when resync'ing the L2 state after a run, as
-> > we confuse the guest's LR index with the host's, potentially
-> > losing the interrupt state.
-> > 
-> > While this could be fixed by adding yet another side index to
-> > track it (Wei-Lin's fix), it may be better to refactor this
-> > code to avoid having a side index altogether, limiting the
-> > risk to introduce this class of bugs.
-> > 
-> > A key observation is that the shadow index is always the number
-> > of bits in the lr_map bitmap. With that, the parallel indexing
-> > scheme can be completely dropped.
-> > 
-> > While doing this, introduce a couple of helpers that abstract
-> > the index conversion and some of the LR repainting, making the
-> > whole exercise much simpler.
-> > 
-> > Reported-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Link: https://lore.kernel.org/r/20250614145721.2504524-1-r09922117@csie.ntu.edu.tw
+> > The debug tests fail with --nested, but pass with --nested --e2h0, I
+> > need to investigate this.
 > 
-> Besides Wei-Lin's comments, LGTM.
+> That's because the code does not check for the absence of FEAT_E2H0, and it sets
+> HCR_EL2.E2H to 0 when writing INIT_HCR_EL2_EL1_ONLY even if KVM doesn't support
+> that.
+
+INIT_HCR_EL2_EL1_ONLY is only used if VHE is not supported, and if VHE is not
+supported it's RES0. Patch 9 adds that.
+
 > 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> Have you considered using parts of el2_setup.h as-is instead of rolling out your
+> own EL2 init code? When I was looking at the init_el macro I was comparing it
+> with el2_setup.h, and having some of the code shared would make things easier
+> with updates and fixes too.
+> 
+> Either way, not a deal breaker if you want to write your own init code.
 
-Thanks!
+I'll look into it, making our own simplified el2_setup.h based on Linux's.
 
-For the record, I've since amended the patch to use hweight16()
-instead of hweight64(), which saves us a MUL instruction. We can do
-that since there is a hard limit of 16 LRs in the architecture.
+Thanks,
+Joey
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> Thanks,
+> Alex
+> 
+> > 
+> > Thanks,
+> > Joey
+> > 
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/nv-next (commit a35d752b17f4)
+> > [2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git arm64/nv-6.13 (commit 5b6fe295ea7)
+> > [3] https://lore.kernel.org/kvmarm/20250220141354.2565567-1-joey.gouly@arm.com/
+> > 
+> > Alexandru Elisei (2):
+> >   arm64: micro-bench: use smc when at EL2
+> >   arm64: selftest: update test for running at EL2
+> > 
+> > Joey Gouly (7):
+> >   arm64: drop to EL1 if booted at EL2
+> >   arm64: efi: initialise SCTLR_ELx fully
+> >   arm64: efi: initialise the EL
+> >   arm64: timer: use hypervisor timers when at EL2
+> >   arm64: micro-bench: fix timer IRQ
+> >   arm64: pmu: count EL2 cycles
+> >   arm64: run at EL2 if supported
+> > 
+> >  arm/cstart64.S             | 56 ++++++++++++++++++++++++++++++++++++--
+> >  arm/efi/crt0-efi-aarch64.S |  5 ++++
+> >  arm/micro-bench.c          | 26 ++++++++++++++++--
+> >  arm/pmu.c                  | 13 ++++++---
+> >  arm/selftest.c             | 18 ++++++++----
+> >  arm/timer.c                | 10 +++++--
+> >  lib/acpi.h                 |  2 ++
+> >  lib/arm/asm/setup.h        |  1 +
+> >  lib/arm/asm/timer.h        | 11 ++++++++
+> >  lib/arm/setup.c            |  6 ++++
+> >  lib/arm/timer.c            | 19 +++++++++++--
+> >  lib/arm64/asm/sysreg.h     | 19 +++++++++++++
+> >  12 files changed, 167 insertions(+), 19 deletions(-)
+> > 
+> > -- 
+> > 2.25.1
+> > 
