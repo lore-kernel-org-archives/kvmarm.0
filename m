@@ -1,55 +1,55 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004E11EE7B9
-	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 04:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738C21FBCAD
+	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 04:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750220672; cv=none; b=LoW6U1grVSUu61nlL/z/TrrEr+ornbO3Lk5C53FfzqsZtIfUInvkohgy/QIak5dtdQlHELGQBLm/e4zC0ZyVZIZEtmgNioSyeM5GQtxJMobmba2QVgRc7VBshkK+tBn/4GxpyK8xxkXv/He30hsvXAeC1VpNNf2nyj8muzCj/Gg=
+	t=1750220674; cv=none; b=V63fb5pXd5SJv3CeRWPvze4gaJqcFixYwYl+LWUd0PiGr7IyNzwbruasvZ/LR2FBpyHkIi6nR6/rmt3djpIvl1mw9QmKx4XRwIYVR4K/Ln7Y0pHD8QR8ItdlCK54vZJ9sDmpuDZ7t0ZowsrNDqy+BC+WYc2mJvYDIeJPL9wHrkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750220672; c=relaxed/simple;
-	bh=jJzFpMIoMXrFEbFfMZHeGhQ7EoGOH6MxXy/6a5t1jZg=;
+	s=arc-20240116; t=1750220674; c=relaxed/simple;
+	bh=gpLnCbZ2QT66InCL+IQSfKdjaE0VlJUfUrY2ZyIBHpg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nR/aTTgQFE2wGtZ+hwboRRMIXWa+WG4I8RBP7iP40SAnvVJDJlJO6DBpfSeUXoY60qhOIJYNcfuD3vSlBwzumgibmqNX+w78OZfaGdPz79J9MxgMXDtFKkRDkEBPxdj/+HcdjhxSbyOuqgP6+cwtKEc+5kYz0LYA6L7HJuU10K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x4M5jis0; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=KDbX2FxgoR9G8+XhLNOA+/kEbQbU3yok1JHyMPtx1bF2U277jFBZ12OGa4UbUp0L1WvV/qXZDCU4JmLILxIoKDHkgPnaejeiy0KDyUGtGU6+OHxIw9wI6SMDuKsWymr1gFLeKGB4+ttM07mnMZehC+Lmnh/58WC5jakNMpwlb3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=10kAouNa; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x4M5jis0"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748e1e474f8so1022260b3a.2
-        for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 21:24:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="10kAouNa"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748a4f5e735so2928991b3a.3
+        for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 21:24:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750220670; x=1750825470; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750220672; x=1750825472; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JanEUXOf1XWVs3kpYfHVyTXFyH+qIidbAMdFV6akegY=;
-        b=x4M5jis0tqlTXoBPZMSlUaWvNZCKq7cFOlIi4Ckp1N48fth5W/GiSOsLnWYuEqhiET
-         1eRIVd7BE9wZ+DaTajYbjOmQO0P95+M7Joz/VKS8ZCEKG8E70vvViy0beVlnIDm03nG9
-         Vou6tZN8bwSgnOWm8YKd9ntWCfrJdkcMmLVHT/6TvTNEDcp0kf5XdhO/HceFz3DwcQzO
-         eEIrcugHDjMi/BV4jTyjjD94kGfCIdBAIdvGMCHkCq9d1KV2NJpI53Dv5NbUMveZwK4+
-         jGbWcTIWCBqwb5U1QjnxlcH3LkN6Mpc8bdF+EEf9O5TxT2iq4kXksuAfJceEcuWI8w0t
-         XEHw==
+        bh=lAANK9EatRgM8qlVuTkHcUTTaZtpLq75H6hzaPLeuxs=;
+        b=10kAouNaI4EBugeFa7T8OVKVEqJOaCRypmm+j0vjjsu11O4pDNwcPaP6bK06CqmCU0
+         PF81+E2Ee0x19Qo3d7ektVQgxjCOvaywZEJGhGzzLtwj7HSG2No0mGa1jeSpIhkUMWK0
+         ObTB+/EnO1sQHudiHsV0ixPODUNMRsOYQmEjbciL5FloCfPh9TZprywvyIr7wXgGCJg6
+         zwA2jawdhJjAM/n7MYIVqQ7fQScabqUUC0sD7Z0+4j/FHchRF4sPKH7kF4DN2EC2FgvU
+         4nLLdF2QXf1HlxnlAO1+Apxls9RixKQL1OnBB3Fu/YShzQwgERDfaLaNZvl4TaSb19wv
+         H9sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750220670; x=1750825470;
+        d=1e100.net; s=20230601; t=1750220672; x=1750825472;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JanEUXOf1XWVs3kpYfHVyTXFyH+qIidbAMdFV6akegY=;
-        b=HX5qzt07UsDknu7AVPR4txuN6w9xjoNCdv4Sa3CVQOE9wLi33RorsGCoFE1UgaQgie
-         YXdrdt3M43YDAHJ2Oa4qSy0mWCNPPXjXxeCt3MrdfRMgK6tsWhI2RmKDDrgftMrdm1B/
-         Qwry0LRGdGx9cve6O4l6djtKg+i7oic/JkHHOIKif/QX/9V2w0Z+AUIVxeiG2FN1/4pE
-         8krsWnUEHVopS8ilbkfh+Z5ApxzPWnvGpkwwO9xmsr39uLrGDxZdNqnURkN77gHNq5bU
-         5qv1veOb6dGiv81foLC8DuC8itYw1lJ8Zn1frjYuHuR0EKZlnXhZrJIuF+nI9XAg7zgg
-         ZlSw==
-X-Forwarded-Encrypted: i=1; AJvYcCU12mwyS+JpDnzrg4QQv5aF9jHDruORWa4gclLyF9yBrMh0mWW7K0HcS1rsnQZPdC5kERLWycg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YymDg3a8e4gQnLjjY91D5oE8vF82vCWKfLryIQz4JVs7iuK+HLS
-	Kja0wSH2VbCgb7iRE1hs5Ci5s2OI++7mo68QUwakPwBccupQlKXc50LP8wFAyzFkqRdALi4R5oe
-	jqrLu82rDP7g9Kks7RPD05w==
-X-Google-Smtp-Source: AGHT+IGhGlpakj0eJizLYc0gxiQ3hQXVWEsMAv964wrGEVgAjsjBPQA9RJtsv4jH/rvULsmo/zU/Pq4mbBOQ1uSF
-X-Received: from pfhp23.prod.google.com ([2002:a05:6a00:a17:b0:746:21fd:3f7a])
+        bh=lAANK9EatRgM8qlVuTkHcUTTaZtpLq75H6hzaPLeuxs=;
+        b=OMrKzTb82sTJgkPs8p+8BzlpKzUyG/wiIWf1Ewp0ENFyVWfVyskDkAAGdayORFNXo0
+         D6tgJl3vCIrDl2RDG1koGC1nQ6xHkLmsAz5C6O6XwT2hX+KA8wFxKasdpbFxMJU76Apx
+         4/bT7ub5a3ZxrtI7HLyUNrvBpNWNFrmD+fTsMNoE7gc0xJho38Rv8rTjoaoV5Ck3MbxD
+         BhKingK/ejb/fnmA/5tQOSL4BP9KoumMXuJwIEjxfMIU7oIp9hbtmzkIRoujh6PR2CZp
+         1aqq4FUe/9TklCwjSMP6NENjQFVLRnvxPp1rF8jX9JdseiWLnGqwtgBMi4ok9nrEAAxG
+         7uRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUG6QM0d+lGILQ4wLDFSIxh5/dlWbz8KcxF+U/zbehLsIacOT68tBv9I2Lim0mEWP1aobnY1so=@lists.linux.dev
+X-Gm-Message-State: AOJu0YybNigmESWYi0UelhSbxLDz6n+zlzA5i+/xMqIUSWpNk5y1my3D
+	kaaKB+Epd/WI4qEePmmOeIHAwV3UuXGGAymKL88g4l8hbFTMME00EckpEYqm/wWdhEkruQta0yc
+	bn9IrzRyd9PCim/UJP7XCtw==
+X-Google-Smtp-Source: AGHT+IGfw/fuYp0YvoE+rn33nARlIYiN3aa5M590yzdjQSAaiecYqF5p0spxRmCeRQgOGDvJLrq4ZeRSCV3QEL3v
+X-Received: from pfjw27.prod.google.com ([2002:aa7:9a1b:0:b0:748:de42:3b4])
  (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:3a06:b0:748:e1e4:71d9 with SMTP id d2e1a72fcca58-748e1e475a6mr2959042b3a.22.1750220670239;
- Tue, 17 Jun 2025 21:24:30 -0700 (PDT)
-Date: Wed, 18 Jun 2025 04:24:11 +0000
+ 2002:a05:6a00:a86:b0:732:2923:b70f with SMTP id d2e1a72fcca58-7489d00631fmr17847993b3a.11.1750220671791;
+ Tue, 17 Jun 2025 21:24:31 -0700 (PDT)
+Date: Wed, 18 Jun 2025 04:24:12 +0000
 In-Reply-To: <20250618042424.330664-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250618042424.330664-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.50.0.rc2.696.g1fc2a0284f-goog
-Message-ID: <20250618042424.330664-3-jthoughton@google.com>
-Subject: [PATCH v3 02/15] KVM: arm64: Add "struct kvm_page_fault" to gather
- common fault variables
+Message-ID: <20250618042424.330664-4-jthoughton@google.com>
+Subject: [PATCH v3 03/15] KVM: arm64: x86: Require "struct kvm_page_fault" for
+ memory fault exits
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Oliver Upton <oliver.upton@linux.dev>
@@ -75,149 +75,178 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Sean Christopherson <seanjc@google.com>
 
-Introduce "struct kvm_page_fault" and use it in user_mem_abort() in lieu
-of a collection of local variables.  Providing "struct kvm_page_fault"
-will allow common KVM to provide APIs to take in said structure, e.g. when
-preparing memory fault exits.
+Now that both arm64 and x86 define "struct kvm_page_fault" with a base set
+of fields, rework kvm_prepare_memory_fault_exit() to take a kvm_page_fault
+structure instead of passing in a pile of parameters.  Guard the related
+code with CONFIG_KVM_GENERIC_PAGE_FAULT to play nice with architectures
+that don't yet support kvm_page_fault.
+
+Rather than define a common kvm_page_fault and kvm_arch_page_fault child,
+simply assert that the handful of required fields are provided by the
+arch-defined structure.  Unlike vCPU and VMs, the number of common fields
+is expected to be small, and letting arch code fully define the structure
+allows for maximum flexibility with respect to const, layout, etc.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  9 +++++++++
- arch/arm64/kvm/mmu.c              | 32 +++++++++++++++++--------------
- 2 files changed, 27 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/Kconfig          |  1 +
+ arch/x86/kvm/Kconfig            |  1 +
+ arch/x86/kvm/mmu/mmu.c          |  8 ++++----
+ arch/x86/kvm/mmu/mmu_internal.h | 10 +---------
+ include/linux/kvm_host.h        | 26 ++++++++++++++++++++------
+ virt/kvm/Kconfig                |  3 +++
+ 6 files changed, 30 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6ce2c51734820..ae83d95d11b74 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -413,6 +413,15 @@ struct kvm_vcpu_fault_info {
- 	u64 disr_el1;		/* Deferred [SError] Status Register */
- };
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 713248f240e03..3c299735b1668 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -37,6 +37,7 @@ menuconfig KVM
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
++	select KVM_GENERIC_PAGE_FAULT
+ 	help
+ 	  Support hosting virtualized guest machines.
  
-+struct kvm_page_fault {
-+	const bool exec;
-+	const bool write;
-+	const bool is_private;
-+
-+	gfn_t gfn;
-+	struct kvm_memory_slot *slot;
-+};
-+
- /*
-  * VNCR() just places the VNCR_capable registers in the enum after
-  * __VNCR_START__, and the value (after correction) to be an 8-byte offset
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2942ec92c5a4a..0c209f2e1c7b2 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1476,8 +1476,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  bool fault_is_perm)
- {
- 	int ret = 0;
--	bool write_fault, writable, force_pte = false;
--	bool exec_fault, mte_allowed;
-+	bool writable, force_pte = false;
-+	bool mte_allowed;
- 	bool device = false, vfio_allow_any_uc = false;
- 	unsigned long mmu_seq;
- 	phys_addr_t ipa = fault_ipa;
-@@ -1485,7 +1485,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct vm_area_struct *vma;
- 	short vma_shift;
- 	void *memcache;
--	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
- 	long vma_pagesize, fault_granule;
-@@ -1494,13 +1493,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct page *page;
- 	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 2eeffcec53828..2d5966f15738d 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -48,6 +48,7 @@ config KVM_X86
+ 	select KVM_GENERIC_PRE_FAULT_MEMORY
+ 	select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
+ 	select KVM_WERROR if WERROR
++	select KVM_GENERIC_PAGE_FAULT
  
-+	struct kvm_page_fault fault = {
-+		.write = kvm_is_write_fault(vcpu),
-+		.exec = kvm_vcpu_trap_is_exec_fault(vcpu),
-+
-+		.slot = memslot,
-+	};
-+
- 	if (fault_is_perm)
- 		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
--	write_fault = kvm_is_write_fault(vcpu);
--	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
--	VM_BUG_ON(write_fault && exec_fault);
-+	VM_BUG_ON(fault.write && fault.exec);
+ config KVM
+ 	tristate "Kernel-based Virtual Machine (KVM) support"
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index cbc84c6abc2e3..a4439e9e07268 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3429,7 +3429,7 @@ static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
+ 	gva_t gva = fault->is_tdp ? 0 : fault->addr;
  
--	if (fault_is_perm && !write_fault && !exec_fault) {
-+	if (fault_is_perm && !fault.write && !fault.exec) {
- 		kvm_err("Unexpected L2 read permission error\n");
+ 	if (fault->is_private) {
+-		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
++		kvm_prepare_memory_fault_exit(vcpu, fault);
  		return -EFAULT;
  	}
-@@ -1516,7 +1520,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * only exception to this is when dirty logging is enabled at runtime
- 	 * and a write fault needs to collapse a block entry into a table.
+ 
+@@ -4499,14 +4499,14 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
+ 	int max_order, r;
+ 
+ 	if (!kvm_slot_can_be_private(fault->slot)) {
+-		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
++		kvm_prepare_memory_fault_exit(vcpu, fault);
+ 		return -EFAULT;
+ 	}
+ 
+ 	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
+ 			     &fault->refcounted_page, &max_order);
+ 	if (r) {
+-		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
++		kvm_prepare_memory_fault_exit(vcpu, fault);
+ 		return r;
+ 	}
+ 
+@@ -4586,7 +4586,7 @@ static int kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
+ 	 * private vs. shared mismatch.
  	 */
--	if (!fault_is_perm || (logging_active && write_fault)) {
-+	if (!fault_is_perm || (logging_active && fault.write)) {
- 		int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
- 
- 		if (!is_protected_kvm_enabled())
-@@ -1614,7 +1618,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		ipa &= ~(vma_pagesize - 1);
+ 	if (fault->is_private != kvm_mem_is_private(kvm, fault->gfn)) {
+-		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
++		kvm_prepare_memory_fault_exit(vcpu, fault);
+ 		return -EFAULT;
  	}
  
--	gfn = ipa >> PAGE_SHIFT;
-+	fault.gfn = ipa >> PAGE_SHIFT;
- 	mte_allowed = kvm_vma_mte_allowed(vma);
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 384fc4d0bfec0..c15060ed6e8be 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -269,14 +269,6 @@ enum {
+  */
+ static_assert(RET_PF_CONTINUE == 0);
  
- 	vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
-@@ -1633,7 +1637,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
- 	mmap_read_unlock(current->mm);
- 
--	pfn = __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
-+	pfn = __kvm_faultin_pfn(memslot, fault.gfn, fault.write ? FOLL_WRITE : 0,
- 				&writable, &page);
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
- 		kvm_send_hwpoison_signal(hva, vma_shift);
-@@ -1654,7 +1658,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		 * change things at the last minute.
- 		 */
- 		device = true;
--	} else if (logging_active && !write_fault) {
-+	} else if (logging_active && !fault.write) {
- 		/*
- 		 * Only actually map the page as writable if this was a write
- 		 * fault.
-@@ -1662,7 +1666,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		writable = false;
+-static inline void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+-						     struct kvm_page_fault *fault)
+-{
+-	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
+-				      PAGE_SIZE, fault->write, fault->exec,
+-				      fault->is_private);
+-}
+-
+ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 					u64 err, bool prefetch,
+ 					int *emulation_type, u8 *level)
+@@ -329,7 +321,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	 */
+ 	if (r == RET_PF_EMULATE && fault.is_private) {
+ 		pr_warn_ratelimited("kvm: unexpected emulation request on private memory\n");
+-		kvm_mmu_prepare_memory_fault_exit(vcpu, &fault);
++		kvm_prepare_memory_fault_exit(vcpu, &fault);
+ 		return -EFAULT;
  	}
  
--	if (exec_fault && device)
-+	if (fault.exec && device)
- 		return -ENOEXEC;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 3bde4fb5c6aa4..9a85500cd5c50 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2497,20 +2497,34 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+ /* Max number of entries allowed for each kvm dirty ring */
+ #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
  
- 	/*
-@@ -1722,7 +1726,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (writable)
- 		prot |= KVM_PGTABLE_PROT_W;
++#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
++
++#define KVM_ASSERT_TYPE_IS(type_t, x)					\
++do {									\
++	type_t __maybe_unused tmp;					\
++									\
++	BUILD_BUG_ON(!__types_ok(tmp, x) || !__typecheck(tmp, x));	\
++} while (0)
++
+ static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+-						 gpa_t gpa, gpa_t size,
+-						 bool is_write, bool is_exec,
+-						 bool is_private)
++						 struct kvm_page_fault *fault)
+ {
++	KVM_ASSERT_TYPE_IS(gfn_t, fault->gfn);
++	KVM_ASSERT_TYPE_IS(bool, fault->exec);
++	KVM_ASSERT_TYPE_IS(bool, fault->write);
++	KVM_ASSERT_TYPE_IS(bool, fault->is_private);
++	KVM_ASSERT_TYPE_IS(struct kvm_memory_slot *, fault->slot);
++
+ 	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+-	vcpu->run->memory_fault.gpa = gpa;
+-	vcpu->run->memory_fault.size = size;
++	vcpu->run->memory_fault.gpa = fault->gfn << PAGE_SHIFT;
++	vcpu->run->memory_fault.size = PAGE_SIZE;
  
--	if (exec_fault)
-+	if (fault.exec)
- 		prot |= KVM_PGTABLE_PROT_X;
- 
- 	if (device) {
-@@ -1759,7 +1763,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret)
--		mark_page_dirty_in_slot(kvm, memslot, gfn);
-+		mark_page_dirty_in_slot(kvm, memslot, fault.gfn);
- 
- 	return ret != -EAGAIN ? ret : 0;
+ 	/* RWX flags are not (yet) defined or communicated to userspace. */
+ 	vcpu->run->memory_fault.flags = 0;
+-	if (is_private)
++	if (fault->is_private)
+ 		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
  }
++#endif
+ 
+ #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+ static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 727b542074e7e..28ed6b241578b 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -128,3 +128,6 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+ config HAVE_KVM_ARCH_GMEM_INVALIDATE
+        bool
+        depends on KVM_PRIVATE_MEM
++
++config KVM_GENERIC_PAGE_FAULT
++       bool
 -- 
 2.50.0.rc2.692.g299adb8693-goog
 
