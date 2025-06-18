@@ -1,276 +1,346 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2087.outbound.protection.outlook.com [40.107.93.87])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA672580F2
-	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 06:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750229775; cv=fail; b=NIWIZz4TDX/GXdEPhZtZGP5spOweQqdBnLIxY9+3b/f0htI1hNCUPqlB3MH2uKD1o/Szk83ZQDcH3SQN9kdGZwDuOuSnJgqj1McDDEowGHXMIEz+PxNS+doS9JsEQaXXikdv6PlbOEMqKEYADDoniClhjwwoR7ffsLJLjQOzOZs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750229775; c=relaxed/simple;
-	bh=PUf5xxUlMPLk10Hr9bQhidj+22898dKKyoPbPmjwRCE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=teqGcNuoWreuHdUZ8NtJDaOGv1TRd77LjYnxW6LUardf4lGWIyPCDsw0Xhaq2btMg4DySv69M7ut1lGqoorfuGi0KnK83HYyN2QcITbX9lQJSducRc6yTyAFHlG4vfu6O7J9g9dSfY25I8qDoRiQjiiMlY9ZUXu4chAIXtbgd+I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MMZxd5Pr; arc=fail smtp.client-ip=40.107.93.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D0F1BCA0E
+	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 08:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750234635; cv=none; b=Td0SvTTxK1zAUBITzc1REHxPVOJoXjdDj6DDbJbreiCuwyS4x/r6MhR6RoOx7y0PRUKObK/AMgYWChuQBJWv/Ds2A2i5a/sYbCWgAVgTGtjGK83AZPa3DdG63dlOEobM9FdDzkVzlT+dEpEbI0gVW/MtIushwE9/CEhU1oKPLE0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750234635; c=relaxed/simple;
+	bh=W56tEEwIaLYy2gB/tGyxNxHHWEulCSPBBNoAeSq/4lo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=URg6Tb1hAgBSuMJjWNcS8yG1vpdMH2+C6wzqoZsk0dLblfSBZ6t+j3AvuVhYktMtM+i5Vs/s5NLso0wfx8lCR72yHauXOZI8TDsz+Y6nBQ34pynOscnPm4C2IeKlrE0SHphzq8pSJDtIb8yhoquuBqqwwcpcOv00RF+l04LiGDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=itElWmcg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MMZxd5Pr"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pNKD24fLFUVBM4d6U7FSFa3ST4KCEkDGugtdfDAwGRY6XcehSQ9E5pXFi8lwf4BacVlfVHGckrDFr2Q+9pvQWOwGfjMKpIXrZFEoDa3lf3/x0W9LbJYY4mnKbbuNUysl6yla6xm6OZHnGzmxNEHA+4fD4on5vPz8YvVORwPCas5ef0uGP8XsE1BJJErbFKcaw8KZ4aMCh2KiWfOcOC8I6ree0PVmgdubFInu047THLNvDWxjDRAAr40FH2slNGOltnfTyWDuyA0UyyCaEUYi1kpa31T4x2DAIDtgWhkzMgifKvfDZY/Dpzr/KOwcPm4nG5NfCmOYoICyrzOWM3PAPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MesUWoiAZo2LyHB6wUWcW9RdXMbvgLXxTKGSdwx+U48=;
- b=m+6j83CEd6VNSjNzoDnfhgGR2X29fOBNKD/egB0F9eC/1sxAocVrLfInGFV7UTUEIHcp7n++dt5OHTXkGBb2nIYdkYum+4JB/l8rcdPpFHZI7HmigOnq3ghFB3D7QCd9tm8XHvLahhnVdSFiY8OuwQZmHO8RoncMAtU4sIsRC613ixFirNYGY5KT+LHG1f3YP+NkZ02AQjIME6arEZV2JzpHVmydK1GYvOjBz754J/V52/cLmBJz7BGvyNl5I13ewUCuaRZy7rDPtV56lTGfGAc7Lkuw/JrvB6AIzFnhLzmrbRZvdLd2uwHpipC8AqAUqdT8lRsHxJupOrOvYfKHyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MesUWoiAZo2LyHB6wUWcW9RdXMbvgLXxTKGSdwx+U48=;
- b=MMZxd5PrZv34yRi6f0oiXYiFsd06y0rcRuh5XNLJu9BnFH5tBNIFykt1BpeCqaPvdbFy276yPJbcsfmF7MymAUUFgdMwSS+n/X98S7aHRtklLJDTNZ3VB2w5OXdkxfm16JS4iWCOnbXXOIbkuL6R5Km2aM/103EYRIA86AAbjZqTWAVusgX7Ex23ba2X4KMvfTzSi37g6GtjXRKGmct3HNdjRXQkawBopxKY1m9eIthna5nspe2+abutv9fflgm8j80ESctFx4iunN+fyWRr41OseAKynWpdZe6EKlKJndUEr+sGZHffVenQIBKWwASmGTvuuoIOJjzWG9qP6ScEQg==
-Received: from PH8PR02CA0009.namprd02.prod.outlook.com (2603:10b6:510:2d0::22)
- by DM6PR12MB4481.namprd12.prod.outlook.com (2603:10b6:5:2af::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.20; Wed, 18 Jun
- 2025 06:56:07 +0000
-Received: from CO1PEPF000044F6.namprd21.prod.outlook.com
- (2603:10b6:510:2d0:cafe::5a) by PH8PR02CA0009.outlook.office365.com
- (2603:10b6:510:2d0::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.33 via Frontend Transport; Wed,
- 18 Jun 2025 06:56:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1PEPF000044F6.mail.protection.outlook.com (10.167.241.196) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8880.0 via Frontend Transport; Wed, 18 Jun 2025 06:56:07 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 17 Jun
- 2025 23:55:49 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 17 Jun
- 2025 23:55:49 -0700
-Received: from localhost.nvidia.com (10.127.8.12) by mail.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14 via Frontend
- Transport; Tue, 17 Jun 2025 23:55:47 -0700
-From: <ankita@nvidia.com>
-To: <ankita@nvidia.com>, <jgg@nvidia.com>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<ryan.roberts@arm.com>, <shahuang@redhat.com>, <lpieralisi@kernel.org>,
-	<david@redhat.com>, <ddutile@redhat.com>, <seanjc@google.com>
-CC: <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
-	<kjaju@nvidia.com>, <targupta@nvidia.com>, <vsethi@nvidia.com>,
-	<acurrid@nvidia.com>, <apopple@nvidia.com>, <jhubbard@nvidia.com>,
-	<danw@nvidia.com>, <zhiw@nvidia.com>, <mochs@nvidia.com>,
-	<udhoke@nvidia.com>, <dnigam@nvidia.com>, <alex.williamson@redhat.com>,
-	<sebastianene@google.com>, <coltonlewis@google.com>, <kevin.tian@intel.com>,
-	<yi.l.liu@intel.com>, <ardb@kernel.org>, <akpm@linux-foundation.org>,
-	<gshan@redhat.com>, <linux-mm@kvack.org>, <tabba@google.com>,
-	<qperret@google.com>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<maobibo@loongson.cn>
-Subject: [PATCH v7 4/5] KVM: arm64: Allow cacheable stage 2 mapping using VMA flags
-Date: Wed, 18 Jun 2025 06:55:40 +0000
-Message-ID: <20250618065541.50049-5-ankita@nvidia.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250618065541.50049-1-ankita@nvidia.com>
-References: <20250618065541.50049-1-ankita@nvidia.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="itElWmcg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750234632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bOZoNJaujjdVlfR2AIdKYM54IJ4MIY01a/D0TQW0tiA=;
+	b=itElWmcgQ5r+OMAdRdfDYvo+lUSN910AuGmT0mwP973ZdrCP2BjMfZmEZAekwRiopFzyIh
+	Kf5Zlwf89uwCdaiGFBrzvji+KQqIY5fuIo4ydYSoMOxwlbzaxIQZSn03GwBjwTtrBQpYCf
+	D5Yt3ySPd7nhQgh8PtbSwoRW+PhNB5Y=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-508-33H5mz30N9SrVAekhnvMTQ-1; Wed, 18 Jun 2025 04:16:01 -0400
+X-MC-Unique: 33H5mz30N9SrVAekhnvMTQ-1
+X-Mimecast-MFC-AGG-ID: 33H5mz30N9SrVAekhnvMTQ_1750234560
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a4f8192e2cso3217905f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 01:16:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750234560; x=1750839360;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bOZoNJaujjdVlfR2AIdKYM54IJ4MIY01a/D0TQW0tiA=;
+        b=AnK3945/Mj1S5cvosI492rN/i+AOheFDGxy3TgPGWFcVLLaIC2vKrLi1iDcsCHrv68
+         kJ6g/oWTo3N5QGBboNQ3iB+XlTcCa8QlL9za0dN+AsJ4D7VtWptiUTq1MNr6rlhw++1D
+         mIC1DlhVIoHR0zmEJ2c7Fp8oyoNWYHOq4iM6nsnnpDTxt8B1uKwlEipUV+jVMYE4WiuC
+         dRK94osnXzyMfEPIvvXJEliIUiDeDIBlLBaRlSWTQrT5SDLlJxAhsfw/0JeFBytRRKpU
+         iAryUfEurwuB3HvI/e0uedWTRJptIhYuHkM/ZRjF2wlLFYS8b3J4i8abXCtKWBHtgPMN
+         2qmA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXHYEfAd0OuAhCtO00b1GXpjdN+ym/0fmcAB9MA7NYEZtnXHxGmCvpGDMhfIT8/0WuQyD4R5E=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzif8Rl2qP6Mdu3HUyNH3/5AGhiPJArGmsVRn3v5AqR20pCrwQA
+	8DfFfBKrV8id6/FfOKuO5Pq8AENoFqi0p4jt6z0U9UEFdSe9bYslQYR9FiqQTjIc6WI8iWT2GPS
+	5LxtF0oZuESKwNuxX8cg1N9W3ZlQFp7gU5fHMz2sK5hOtGlLzo76QyX8nNA==
+X-Gm-Gg: ASbGncu8brOID7+QFKD7RzAs9IElMbPtEJdWi9k6byf3Epy+FGdxQwjMA0zYDOtvusT
+	APMU13ba4kV2lgWQFjgshjr8XNJT2Iwl0GXmksAzVXGeC+SeldG+I0+haySnKuvQc80H2z0e06w
+	AMpHdw2u8EUGmbN4bEk7chT1FUq0ACs7TGTU6qoFA7auhktCOb0iw67DShE0FIlv818ej4Vp19q
+	zI4H3lVsTPVVhL2MR1djq7Y4AHdy4kscR0x6oVyGvK8PorBs53ubeR/1Rtd8HnRj4sHf0kEvDNq
+	46SgVysvpxhfhqczx+P7gZXvuo+6Z1NhVH7eFVGer5/Jk7TfrmWbBSl27oYIBjw+zn8EedR6j2Q
+	LNzuJcJ+VLgK0Fxdwrsv9v9+zINvo18l5g61h7rxF8g5Usjw=
+X-Received: by 2002:a05:6000:4702:b0:3a4:f7e3:c63c with SMTP id ffacd0b85a97d-3a571894b7bmr15128789f8f.0.1750234559793;
+        Wed, 18 Jun 2025 01:15:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGULgOxtyBoShvE9JSoEwQhPgXEf5lkCjWUOo2bSd3nW0M1xu6HvPbfcWE5OJ17ZOLdT+0Hgw==
+X-Received: by 2002:a05:6000:4702:b0:3a4:f7e3:c63c with SMTP id ffacd0b85a97d-3a571894b7bmr15128720f8f.0.1750234559159;
+        Wed, 18 Jun 2025 01:15:59 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f2d:2400:4052:3b5:fff9:4ed0? (p200300d82f2d2400405203b5fff94ed0.dip0.t-ipconnect.de. [2003:d8:2f2d:2400:4052:3b5:fff9:4ed0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a547d2sm16556533f8f.19.2025.06.18.01.15.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Jun 2025 01:15:58 -0700 (PDT)
+Message-ID: <3fb0e82b-f4ef-402d-a33c-0b12e8aa990c@redhat.com>
+Date: Wed, 18 Jun 2025 10:15:55 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F6:EE_|DM6PR12MB4481:EE_
-X-MS-Office365-Filtering-Correlation-Id: 775cec07-d50f-4102-b06e-08ddae35334f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|7416014|376014|36860700013|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kyFiEKxCLFMtscrUCiJpMozUd6VglBaFN5hpBInbwMr0OxtHx3bTW4gOCbGR?=
- =?us-ascii?Q?WnF2ahfq0RNQ8TZSRDOWWUHo2LCCyRb2C5sUOYg9UNYQdQljzRsH4NGP4IXI?=
- =?us-ascii?Q?pO4NWqPNMQsjgH4cHMu8sTe43Bpsam1qexSlhaNYcrMTvfvL6yxzWPoz+/HV?=
- =?us-ascii?Q?lyO0TWxhpRzTOl3QtDIRnefQQffoNdFAJ18MkbNC37sL0KmC+yXKk6lAugOu?=
- =?us-ascii?Q?SJ0+cz7fhwiqbI74cLfmF9DjD8/n57pxCw/wNdZ0//66674q9WQ7y57NJ8T9?=
- =?us-ascii?Q?vsXldz59RzwEbWq6CstuMbWnbP5inpRhXl5HxmnXBgcldO6T1vsQfkfQLVDN?=
- =?us-ascii?Q?HqS3QehFnu8QZEDUPpp6jXUvFoNr0f6EtKQk0StaAXUjBEZSjwY+gs9ffUs/?=
- =?us-ascii?Q?/XBjbyrNzQU9O98oCPGxz2AF89kdth3GGahXc83Th4WX4astP1PfbDYcV+Np?=
- =?us-ascii?Q?9rfnsI7aRTqu11SbNJVx94dH/m9mYkl1Tdz1qJabGFehgU+xJThhnXFE2AsD?=
- =?us-ascii?Q?B6kOiQlWBvqGgYYybWcKqw1KFTLxtYxRalgJqch2FJ5RjpedFyv1BSz3gGa5?=
- =?us-ascii?Q?Lz9xr+KhYunziBScdvdodCZsiMSDnoneQ8UwbaGEHuRIhu4lDMcU9n00hHwm?=
- =?us-ascii?Q?TpouiSJi5Ipa/L1LDmI8/Z9a0k76uBhmKVcde7gsIE0CZ7+sxaXLTlhAloSS?=
- =?us-ascii?Q?6k9/nXITax5cQX15MtVDlEKtD8U473YFuRsb+9cnmN45tm5eMWP4FsFksnYI?=
- =?us-ascii?Q?I7yCa9CCAI7QMCr64xKc77LRVR3N6sR3XLIOyML4zMTd1GkUwGeJeH/67sox?=
- =?us-ascii?Q?aIDl3iBh+THdFldfgjb1mUZBkAWaimGw+peUTMavn5mc34ftTDySbvGjpZal?=
- =?us-ascii?Q?KtaRfqZK7coCpi8XuqV2yXVw2GR/ZJFofFi8dPH/PEGSshfS6h86coYzJe6v?=
- =?us-ascii?Q?/f4RBaqHXdOwGGlGABDY30xrdEwsMqMgSz3yCTGNvp7myR+PV1ovHYRLqWT/?=
- =?us-ascii?Q?Csei+Mvzp1ophTOoQRpMSRVqJM+g+d+GFWVIqYCnmjBeVpFZnTxsDPjIQtX/?=
- =?us-ascii?Q?zkFdZniFtl4eG9Z5J7AuQWLp6EaO5+3mHf8oZWd2tJU5/XMbSCZ5D0aBlZ50?=
- =?us-ascii?Q?jSir1LFvikTyGsjAoZ3E0cw7O4oPgSU/QD1OWXI4fq39eNqCBfDzsjJLvC6o?=
- =?us-ascii?Q?lxYevvRz59TmhnLRk/e1JrDsQoSOtPprj9cnnYM1HHwVyZvXIcccQvjWiK0t?=
- =?us-ascii?Q?Ptc0flMmUj3DTu6UAPK5FvprKeUNlgv+PR68ZqXY5yR5grNyHWVek+JjQ22z?=
- =?us-ascii?Q?85EH7eQytDoMvPFq9F4Zg8Sf0egaw63WlUAdzHobhVCAwAxS4IxHhoUlH8H1?=
- =?us-ascii?Q?BoB/3gq5i1yO6XxBc53VSTQBk+20MpVUa8m19jtZ6fd+FuITvu1AwlX/gWbJ?=
- =?us-ascii?Q?WNC+yNBJUd3E+KNR4f+FDzE4rmQs7ku3NqYny+f1NOsIODTUXIWKnGhDm9Mu?=
- =?us-ascii?Q?R1Vzwj0/sckhX8KnYBJ8cUAvvJCGRKHRxlwyCJcVyo6KC/hrt2lwZj93LQ?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(7416014)(376014)(36860700013)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2025 06:56:07.3237
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 775cec07-d50f-4102-b06e-08ddae35334f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F6.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4481
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd
+ pages
+To: Sean Christopherson <seanjc@google.com>
+Cc: Fuad Tabba <tabba@google.com>, Ira Weiny <ira.weiny@intel.com>,
+ kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+References: <20250611133330.1514028-1-tabba@google.com>
+ <20250611133330.1514028-9-tabba@google.com> <aEySD5XoxKbkcuEZ@google.com>
+ <68501fa5dce32_2376af294d1@iweiny-mobl.notmuch>
+ <bbc213c3-bc3d-4f57-b357-a79a9e9290c5@redhat.com>
+ <CA+EHjTxvqDr1tavpx7d9OyC2VfUqAko864zH9Qn5+B0UQiM93g@mail.gmail.com>
+ <701c8716-dd69-4bf6-9d36-4f8847f96e18@redhat.com>
+ <aFIK9l6H7qOG0HYB@google.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <aFIK9l6H7qOG0HYB@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: S0lxL7VFbenSqECqIN5d-3WOlb3tdI7dlJ0hhZM6xeU_1750234560
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Ankit Agrawal <ankita@nvidia.com>
+On 18.06.25 02:40, Sean Christopherson wrote:
+> On Mon, Jun 16, 2025, David Hildenbrand wrote:
+>> On 16.06.25 16:16, Fuad Tabba wrote:
+>>> On Mon, 16 Jun 2025 at 15:03, David Hildenbrand <david@redhat.com> wrote:
+>>>>>> IMO, GUEST_MEMFD_FLAG_SHAREABLE would be more appropriate.  But even that is
+>>>>>> weird to me.  For non-CoCo VMs, there is no concept of shared vs. private.  What's
+>>>>>> novel and notable is that the memory is _mappable_.  Yeah, yeah, pKVM's use case
+>>>>>> is to share memory, but that's a _use case_, not the property of guest_memfd that
+>>>>>> is being controlled by userspace.
+>>>>>>
+>>>>>> And kvm_gmem_memslot_supports_shared() is even worse.  It's simply that the
+>>>>>> memslot is bound to a mappable guest_memfd instance, it's that the guest_memfd
+>>>>>> instance is the _only_ entry point to the memslot.
+>>>>>>
+>>>>>> So my vote would be "GUEST_MEMFD_FLAG_MAPPABLE", and then something like
+>>>>>
+>>>>> If we are going to change this; FLAG_MAPPABLE is not clear to me either.
+>>>>> The guest can map private memory, right?  I see your point about shared
+>>>>> being overloaded with file shared but it would not be the first time a
+>>>>> term is overloaded.  kvm_slot_has_gmem() does makes a lot of sense.
+>>>>>
+>>>>> If it is going to change; how about GUEST_MEMFD_FLAG_USER_MAPPABLE?
+>>>>
+>>>> If "shared" is not good enough terminology ...
+>>>>
+>>>> ... can we please just find a way to name what this "non-private" memory
+>>>> is called?
+> 
+> guest_memfd?  Not trying to be cheeky, I genuinely don't understand the need
+> to come up with a different name.  Before CoCo came along, I can't think of a
+> single time where we felt the need to describe guest memory.  There have been
+> *many* instances of referring to the underlying backing store (e.g. HugeTLB vs.
+> THP), and many instances where we've needed to talk about the types of mappings
+> for guest memory, but I can't think of any cases where describing the state of
+> guest memory itself was ever necessary or even useful.
+ >   >>>> That something is mappable into $whatever is not the right
+>>>> way to look at this IMHO.
+> 
+> Why not?  Honest question.  USER_MAPPABLE is very literal, but I think it's the
+> right granularity.  E.g. we _could_ support read()/write()/etc, but it's not
+> clear to me that we need/want to.  And so why bundle those under SHARED, or any
+> other one-size-fits-all flag?
 
-Today KVM forces the memory to either NORMAL or DEVICE_nGnRE
-based on pfn_is_map_memory (which tracks whether the device memory
-is in the kernel map) and ignores the per-VMA flags that indicates the
-memory attributes. The KVM code is thus restrictive and allows only for
-the memory that is added to the kernel to be marked as cacheable.
+Let's take a step back. There are various ways to look at this:
 
-The device memory such as on the Grace Hopper/Blackwell systems
-is interchangeable with DDR memory and retains properties such as
-cacheability, unaligned accesses, atomics and handling of executable
-faults. This requires the device memory to be mapped as NORMAL in
-stage-2.
 
-Given that the GPU device memory is not added to the kernel (but is rather
-VMA mapped through remap_pfn_range() in nvgrace-gpu module which sets
-VM_PFNMAP), pfn_is_map_memory() is false and thus KVM prevents such memory
-to be mapped Normal cacheable. The patch aims to solve this use case.
+1) Indicate support for guest_memfd operations:
 
-Note when FWB is not enabled, the kernel expects to trivially do
-cache management by flushing the memory by linearly converting a
-kvm_pte to phys_addr to a KVA, see kvm_flush_dcache_to_poc(). The
-cache management thus relies on memory being mapped. Moreover
-ARM64_HAS_CACHE_DIC CPU cap allows KVM to avoid flushing the icache
-and turns icache_inval_pou() into a NOP. These two capabilities
-are thus a requirement of the cacheable PFNMAP feature. Make use of
-kvm_arch_supports_cacheable_pfnmap() to check them.
+"GUEST_MEMFD_FLAG_MMAP": we support the mmap() operation
+"GUEST_MEMFD_FLAG_WRITE": we support the write() operation
+"GUEST_MEMFD_FLAG_READ": we support the read() operation
+...
+"GUEST_MEMFD_FLAG_UFFD": we support userfaultfd operations
 
-A cachebility check is made by consulting the VMA pgprot value.
-If the pgprot mapping type is cacheable, it is safe to be mapped S2
-cacheable as the KVM S2 will have the same Normal memory type as the
-VMA has in the S1 and KVM has no additional responsibility for safety.
-Checking pgprot as NORMAL is thus a KVM sanity check.
 
-Add check for COW VM_PFNMAP and refuse such mapping.
+Absolutely fine with me. In this series, we'd be advertising 
+GUEST_MEMFD_FLAG_MMAP. Because we support the mmap operation.
 
-No additional checks for MTE are needed as kvm_arch_prepare_memory_region()
-already tests it at an early stage during memslot creation. There would
-not even be a fault if the memslot is not created.
+If the others are ever required remains to be seen [1].
 
-CC: Oliver Upton <oliver.upton@linux.dev>
-CC: Sean Christopherson <seanjc@google.com>
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-Suggested-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
----
- arch/arm64/kvm/mmu.c | 35 +++++++++++++++++++++++++++++------
- 1 file changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index a71b77df7c96..6a3955e07b5e 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1660,6 +1660,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 
- 	is_vma_cacheable = kvm_vma_is_cacheable(vma);
- 
-+	/* Reject COW VM_PFNMAP */
-+	if ((vma->vm_flags & VM_PFNMAP) && is_cow_mapping(vma->vm_flags))
-+		return -EINVAL;
-+
- 	/* Don't use the VMA after the unlock -- it may have vanished */
- 	vma = NULL;
- 
-@@ -1684,9 +1688,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 
- 	if (!kvm_can_use_cmo_pfn(pfn)) {
--		if (is_vma_cacheable)
--			return -EINVAL;
--
- 		/*
- 		 * If the page was identified as device early by looking at
- 		 * the VMA flags, vma_pagesize is already representing the
-@@ -1696,8 +1697,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		 *
- 		 * In both cases, we don't let transparent_hugepage_adjust()
- 		 * change things at the last minute.
-+		 *
-+		 * Do not set device as the device memory is cacheable. Note
-+		 * that such mapping is safe as the KVM S2 will have the same
-+		 * Normal memory type as the VMA has in the S1.
- 		 */
--		disable_cmo = true;
-+		if (!is_vma_cacheable)
-+			disable_cmo = true;
- 	} else if (logging_active && !write_fault) {
- 		/*
- 		 * Only actually map the page as writable if this was a write
-@@ -1784,6 +1790,19 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		prot |= KVM_PGTABLE_PROT_X;
- 	}
- 
-+	/*
-+	 *  When FWB is unsupported KVM needs to do cache flushes
-+	 *  (via dcache_clean_inval_poc()) of the underlying memory. This is
-+	 *  only possible if the memory is already mapped into the kernel map.
-+	 *
-+	 *  Outright reject as the cacheable device memory is not present in
-+	 *  the kernel map and not suitable for cache management.
-+	 */
-+	if (is_vma_cacheable && !kvm_arch_supports_cacheable_pfnmap()) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
-+
- 	/*
- 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
-@@ -2271,8 +2290,12 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				break;
- 			}
- 
--			/* Cacheable PFNMAP is not allowed */
--			if (kvm_vma_is_cacheable(vma)) {
-+			/*
-+			 * Cacheable PFNMAP is allowed only if the hardware
-+			 * supports it.
-+			 */
-+			if (kvm_vma_is_cacheable(vma) &&
-+			    !kvm_arch_supports_cacheable_pfnmap()) {
- 				ret = -EINVAL;
- 				break;
- 			}
+2) Indicating the mmap mapping type (support for MMAP flags)
+
+As you write below, one could indicate that we support 
+"mmap(MAP_SHARED)" vs "mmap(MAP_PRIVATE)".
+
+I don't think that's required for now, as MAP_SHARED is really the 
+default that anything that supports mmap() supports. If someone ever 
+needs MAP_PRIVATE (CoW) support they can add such a flag 
+(GUEST_MEMFD_FLAG_MMAP_MAP_PRIVATE). I doubt we want that, but who knows.
+
+As expressed elsewhere, the mmap mapping type was never what the 
+"SHARED" in KVM_GMEM_SHARED_MEM implied.
+
+
+3) *guest-memfd specific* memory access characteristics
+
+"private (non-accessible, private, secure, protected, ...) vs. 
+"non-private".
+
+Traditionally, all was memory in guest-memfd was private, now we will 
+make guest_memfd also support non-private memory. As this memory is 
+"inaccessible" from a host point of view, any access to read/write it 
+(fault it into user page tables, read(), write(), etc) will fail.
+
+
+
+Mempolicy support wanted to support mmap() without that, though [2], 
+which was one of the reasons I agreed that exposing the access 
+characteristics (that affect what you can actually mmap() ) made sense.
+
+In the last upstream meeting we agreed that we will not do that, but 
+rather built up on MMAP+support for non-private memory support.
+
+
+[1] 
+https://lore.kernel.org/kvm/20250303130838.28812-1-kalyazin@amazon.com/T/
+[2] 
+https://lore.kernel.org/linux-mm/20250408112402.181574-1-shivankg@amd.com/
+
+[...]
+
+>>>> I'll further note that in the doc of KVM_SET_USER_MEMORY_REGION2 we talk
+>>>> about "private" vs "shared" memory ... so that would have to be improved
+>>>> as well.
+>>>
+>>> To add to what David just wrote, V1 of this series used the term
+>>> "mappable" [1].  After a few discussions, I thought the consensus was
+>>> that "shared" was a more accurate description --- i.e., mappability
+>>> was a side effect of it being shared with the host.
+> 
+> As I mentioned in the other thread with respect to sharing between other
+> entities, simply SHARED doesn't provide sufficient granularity.  HOST_SHAREABLE
+> gets us closer, but I still don't like that because it implies the memory is
+> 100% shareable, e.g. can be accessed just like normal memory.
+> 
+> And for non-CoCo x86 VMs, sharing with host userspace isn't even necessarily the
+> goal, i.e. "sharing" is a side effect of needing to allow mmap() so that KVM can
+> continue to function.
+
+Does mmap() support imply "support for non-private" memory or does 
+"support for non-private" imply mmap() support? :)
+
+In this series we went for the latter. If I got you correctly, you argue 
+for the former.
+
+Maybe both things should simply be separated.
+
+> 
+>>> One could argue that non-CoCo VMs have no concept of "shared" vs
+>>> "private".
+> 
+> I am that one :-)
+
+Well, if the concept of "private" does not exist, I'd argue everything 
+is "non-private" :)
+
+> 
+>> A different way of looking at it is, non-CoCo VMs have
+>>> their state as shared by default.
+> 
+> Eh, there has to be another state for there to be a default.
+> 
+>> All memory of these VMs behaves similar to other memory-based shared memory
+>> backends (memfd, shmem) in the system, yes. You can map it into multiple
+>> processes and use it like shmem/memfd.
+> 
+> Ya, but that's more because guest_memfd only supports MAP_SHARED, versus KVM
+> really wanting to truly share the memory with the entire system.
+ > > Of course, that's also an argument to some extent against 
+USER_MAPPABLE, because
+> that name assumes we'll never want to support MAP_PRIVATE.  But letting userspace
+> MAP_PRIVATE guest_memfd would completely defeat the purpose of guest_memfd, so
+> unless I'm forgetting a wrinkle with MAP_PRIVATE vs. MAP_SHARED, that's an
+> assumption I'm a-ok making.
+
+So, first important question, are we okay with adding:
+
+"GUEST_MEMFD_FLAG_MMAP": we support the mmap() operation
+
+> 
+> If we are really dead set on having SHARED in the name, it could be
+> GUEST_MEMFD_FLAG_USER_MAPPABLE_SHARED or GUEST_MEMFD_FLAG_USER_MAP_SHARED?  But
+> to me that's _too_ specific and again somewhat confusing given the unfortunate
+> private vs. shared usage in CoCo-land.  And just playing the odds, I'm fine taking
+> a risk of ending up with GUEST_MEMFD_FLAG_USER_MAPPABLE_PRIVATE or whatever,
+> because I think that is comically unlikely to happen.
+
+I think in addition to GUEST_MEMFD_FLAG_MMAP we want something to 
+express "this is not your old guest_memfd that only supports private 
+memory". And that's what I am struggling with.
+
+Now, if you argue "support for mmap() implies support for non-private 
+memory", I'm probably okay for that.
+
+I could envision support for non-private memory even without mmap() 
+support, how useful that might be, I don't know. But that's why I was 
+arguing that we mmap() is just one way to consume non-private memory.
+
 -- 
-2.34.1
+Cheers,
+
+David / dhildenb
 
