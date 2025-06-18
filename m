@@ -1,31 +1,31 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C9019DF7A
-	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 19:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1841C2192EF
+	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 20:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750275664; cv=none; b=pH+hSRwKFesBa/biX2UPfh4lWDBJYUV84tT53JQIc5R0ndltG8L+Xf6nvYP7J4UpduhFKcA+OT21xLy7XP4sfeh+KDkbEUMAFp1+ijtlnk+Y98qzr5tW28iOSVLmtlL5OU2iAT4nE2rM+WnQ82W0yzIjkcjeeEo8nQ8g4xfFrWQ=
+	t=1750276821; cv=none; b=JqV/jDANrZM09EQXDglR09s+gz56sgg5r6MToQn0DU+7L/txJi03efSjUz1UdV5tShDTIto0KQs2ei80ny6JX6oRFPIZ3OZ2msHaioMgyPCOAozpEqxlvMBbeqzLXQVyjRroqa9qI0OrjkDkWM8i1bgHkPvGrJQow1YE4GXP0aM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750275664; c=relaxed/simple;
-	bh=pUjBkPGAeywR5zxlE4sDl27rsxA0kyDlilz2o9WFtRM=;
+	s=arc-20240116; t=1750276821; c=relaxed/simple;
+	bh=nL6yW4jkRLM9ujb92vCw/h/BiAWER2Zgw78Ihcoel3I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fOdxjyRsAFfh5Xue86uso/9SSt+Qy/MWSzq8Tk5BX+XCajeTnzIU+62L0chZVShYpwYJPHSgdBDqoEos9u2ekCBrPQK9pqD6+YCogLYwo8YiR0DrHawcOtgUGFg8UUmJFLogs//b/rEZ1sQpTNMxz3Yw48706XDNXQV5HBGEscQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rkr7lOkw; arc=none smtp.client-ip=91.218.175.180
+	 Content-Type:Content-Disposition:In-Reply-To; b=iOCHtQPD8rA9HZs6hxwlEvNsQdUwaMvKQusxcMBdjme7u4HYMEjVSOdhUFgJhzpSXXXlmfvafrTbFEg/dhMajg9Ao9ILr5h5pDa695ZWdV1oZqw/DVJaj9fNx3LHmq8mAYEUjYR/fJb14JM3PJ42SkpNIJciXatAqYeKu/RfGYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JiYBbEb2; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rkr7lOkw"
-Date: Wed, 18 Jun 2025 12:40:51 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JiYBbEb2"
+Date: Wed, 18 Jun 2025 13:00:06 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750275658;
+	t=1750276815;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kJ28BX1PGmEsOK66iRJR9ufuVy9us1fhYiSSQpunOdI=;
-	b=rkr7lOkw8dMr4j4t/vQfAQjKcKL1YrnIOUw/TNGMed4UVCLGOe2tByQPKXjqmKmSRGBCKX
-	Uo3l7kVm8ztcoaZdGh2Zr542A6B8QeL3//5VJoC6eb4GDCMyaXyop7Bo5wD9xH8emEMYnu
-	P2MDpIUYfbIHfUp9bpGvn+TU2rq9YbE=
+	bh=A+Dm5oYqWDH4EBRKuoUENfY0iH02fdrPbML4KrtAoQ0=;
+	b=JiYBbEb2aglrXadwd8672PZMcInYhyXyrnzula6TGfNJSEFIyKtU038Tqyb8BobbBBu9qh
+	B5ndenDDZwJjqoM1lUiF8Mw3SOuJf5QdA7kZDOgvvmF34OQGBa5ZKIUxhB0Vj7eMRJ+8Zf
+	tXAdy9DLItnEhRcHHn0AGW2v8RxKayI=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: James Houghton <jthoughton@google.com>
@@ -40,11 +40,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 04/15] KVM: Add common infrastructure for KVM
- Userfaults
-Message-ID: <aFMWQ5_zMXGTCE98@linux.dev>
+Subject: Re: [PATCH v3 03/15] KVM: arm64: x86: Require "struct
+ kvm_page_fault" for memory fault exits
+Message-ID: <aFMaxi5LDr4HHbMR@linux.dev>
 References: <20250618042424.330664-1-jthoughton@google.com>
- <20250618042424.330664-5-jthoughton@google.com>
+ <20250618042424.330664-4-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,68 +53,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250618042424.330664-5-jthoughton@google.com>
+In-Reply-To: <20250618042424.330664-4-jthoughton@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 18, 2025 at 04:24:13AM +0000, James Houghton wrote:
-> KVM Userfault consists of a bitmap in userspace that describes which
-> pages the user wants exits on (when KVM_MEM_USERFAULT is enabled). To
-> get those exits, the memslot where KVM_MEM_USERFAULT is being enabled
-> must drop (at least) all of the translations that the bitmap says should
-> generate faults. Today, simply drop all translations for the memslot. Do
-> so with a new arch interface, kvm_arch_userfault_enabled(), which can be
-> specialized in the future by any architecture for which optimizations
-> make sense.
-> 
-> Make some changes to kvm_set_memory_region() to support setting
-> KVM_MEM_USERFAULT on KVM_MEM_GUEST_MEMFD memslots, including relaxing
-> the retrictions on guest_memfd memslots from only deletion to no moving.
-> 
-> Signed-off-by: James Houghton <jthoughton@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-
+On Wed, Jun 18, 2025 at 04:24:12AM +0000, James Houghton wrote:
 > +#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
-> +bool kvm_do_userfault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-
-The polarity of the return here feels weird. If we want a value of 0 to
-indicate success then int is a better return type.
-
-> +{
-> +	struct kvm_memory_slot *slot = fault->slot;
-> +	unsigned long __user *user_chunk;
-> +	unsigned long chunk;
-> +	gfn_t offset;
 > +
-> +	if (!kvm_is_userfault_memslot(slot))
-> +		return false;
+> +#define KVM_ASSERT_TYPE_IS(type_t, x)					\
+> +do {									\
+> +	type_t __maybe_unused tmp;					\
+> +									\
+> +	BUILD_BUG_ON(!__types_ok(tmp, x) || !__typecheck(tmp, x));	\
+> +} while (0)
 > +
-> +	offset = fault->gfn - slot->base_gfn;
-> +	user_chunk = slot->userfault_bitmap + (offset / BITS_PER_LONG);
-> +
-> +	if (__get_user(chunk, user_chunk))
-> +		return true;
-> +
-
-I see that the documentation suggests userspace perform a store-release
-to update the bitmap. That's the right idea but we need a load-acquire
-on the consumer side for that to do something meaningful.
-
-> +	if (!test_bit(offset % BITS_PER_LONG, &chunk))
-> +		return false;
-> +
-> +	kvm_prepare_memory_fault_exit(vcpu, fault);
-> +	vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_USERFAULT;
-> +	return true;
-> +}
-> +#endif
-> +
->  int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  						  struct kvm_enable_cap *cap)
+>  static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+> -						 gpa_t gpa, gpa_t size,
+> -						 bool is_write, bool is_exec,
+> -						 bool is_private)
+> +						 struct kvm_page_fault *fault)
 >  {
-> -- 
-> 2.50.0.rc2.692.g299adb8693-goog
->
+> +	KVM_ASSERT_TYPE_IS(gfn_t, fault->gfn);
+> +	KVM_ASSERT_TYPE_IS(bool, fault->exec);
+> +	KVM_ASSERT_TYPE_IS(bool, fault->write);
+> +	KVM_ASSERT_TYPE_IS(bool, fault->is_private);
+> +	KVM_ASSERT_TYPE_IS(struct kvm_memory_slot *, fault->slot);
+> +
+>  	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> -	vcpu->run->memory_fault.gpa = gpa;
+> -	vcpu->run->memory_fault.size = size;
+> +	vcpu->run->memory_fault.gpa = fault->gfn << PAGE_SHIFT;
+> +	vcpu->run->memory_fault.size = PAGE_SIZE;
+>  
+>  	/* RWX flags are not (yet) defined or communicated to userspace. */
+>  	vcpu->run->memory_fault.flags = 0;
+> -	if (is_private)
+> +	if (fault->is_private)
+>  		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
+>  }
+> +#endif
+
+This *is not* the right direction of travel for arm64. Stage-2 aborts /
+EPT violations / etc. are extremely architecture-specific events.
+
+What I would like to see on arm64 is that for every "KVM_EXIT_MEMORY_FAULT"
+we provide as much syndrome information as possible. That could imply
+some combination of a sanitised view of ESR_EL2 and, where it is
+unambiguous, common fault flags that have shared definitions with x86.
+This could incur some minor code duplication, but even then we can share
+helpers for the software bits (like userfault).
+
+FEAT_MTE_PERM is a very good example for this. There exists a "Tag"
+permission at stage-2 which is unrelated to any of the 'normal'
+read/write permissions. There's also the MostlyReadOnly permission from
+FEAT_THE which grants write permission to a specific set of instructions.
+
+I don't want to paper over these nuances and will happily maintain an
+arm64-specific flavor of "kvm_prepare_memory_fault_exit()"/
 
 Thanks,
 Oliver
