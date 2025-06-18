@@ -1,55 +1,55 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DD020409A
-	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 04:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A658B2185B8
+	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 04:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750220680; cv=none; b=qpiwoNM6FzD9T0/8e28PwcyAE9FlsSLBhYWYu4jSk5QXE2OY5iKBokQqX9v4kZjz9BkLngJ4GO1OzQzv0J2+kEUZgJOVVtxjSW3xaS/xBnldrO+7QTPRPWnI6KP2EhcaN+0nik2VHY5QZIfb0KQg8dsXjvSinBvZyGg8uMcjtnk=
+	t=1750220681; cv=none; b=SODcVijY2E8KhfkAAtEHYLVMjucmktk8/W+Z8J4/1Yy7OFIEXzuw/p4uxfXCCzk7ieGXtJEo8ECBXPjnyjWrv4wpeV5tyugMWohK2Pk4KZakAXe3DTgTGrwvsrkshDmZpfBiHhNOkyZFFV4uXnbE/j1qh2eJps9RLad2Zo6/Yl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750220680; c=relaxed/simple;
-	bh=RjOGGjzo1gz+MJ4XHnzV65K+mX6uQwTz9v2uyBR8F74=;
+	s=arc-20240116; t=1750220681; c=relaxed/simple;
+	bh=M4cA5QCIbC4IC69I7rkdIXP2+hXIfCYUAcCljeAUiHs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DuHRKTmtYrUm9KdwGuOdDykIQL0W4+K391JrkNcGZKTsvacOq+gRLsCZ3xnQs1zNBpdAx9O67f16PEgAtdnpXtuVacY91SLdZxsNYnyaxxmB5MzsG0AazXv8oxnPRCbZbL4ajCt4ezTGkcK9bzsyf2cc2K/csMfUuq7WFNQttUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uoNJz5fL; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=YSRGMQdMpAxL+1q+coaA/cjMjl1kop+TZ5XaRGO/AneJC9NvE7RmUIfft+Z3r2yljFxbXXtqxFnwLzDB1iEcNx9Fjvgb9ZZW395FlZktOrYW6qWKAPHpP8GbZRIq6+hFcg/yBZIdeAwAak4L63zz82Nv8isnX/sHiMHCvgNGxU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ONhaT982; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uoNJz5fL"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3138c50d2a0so8960688a91.2
-        for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 21:24:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ONhaT982"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2356ce66d7cso105770145ad.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 21:24:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750220678; x=1750825478; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750220679; x=1750825479; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u7uDKQXpUwdrzKwoUkA90P4kaViu0b/lAOUYW7NM+2o=;
-        b=uoNJz5fLbIKSu3OiPdAGBpLo48elwu/GCeBVwZbQznt2UiKt4VYFWZsk6T1dkLIdzI
-         fuJLwm2bqWDrarhW7vEn6dI4NBsR4v/WvZP+OtnRXCtt5z+7CptOVsy9enNNtjGKyP2H
-         FkuhCMt5w8JlqiQ5JidZucavilXjyMxvaxp7QfK/9ibe24Zpn8hA5HenwMBcuC1mipw8
-         wdtvpogDVvkq4epIdZhjsqSrm8IuKEIcurK1rxMk95K3wvGZo3keWf+dDb0pNPJe7f+B
-         u4h/jtOV9vLDiBNgJk39YzpPQ+VqXQ0wj3wz+HPD9CfMXEfdwuwc9bck4MwcvOmT9x8r
-         jDnQ==
+        bh=7EMNAB7VqggYskY7+oMW704PIZytljaHYvhJuoy4xGs=;
+        b=ONhaT982bd6jlsMSiuurUDalmUKBKjcxUZZjui7U9XtgoLie9lLTx+BQHsreI9Kj51
+         sAHIGEfikwWkzJjgF2oBZN8rRarZtQ0OO+z709Khp8sj8Q5r3GzyDyKlDNDkh/xJRzT/
+         Cxz9Z41STE2Y51iQgHe4Bb8p2BWoZT5Fq6XgvFfqr8YvRbsmXVf1E0Cdz/TzcJ2VeHPS
+         LpmaLxdMBEF3bj68YuZ5WrD1QNOMCEtMkv84GVDc32o+s9ypMruBqOEh/NGJdS0LktBi
+         hlwRZSgmi/nTBZiYymGSIfRCt7twO+X7f8oCc/9ngFoXof5xkj9ZmId/boqAeT67iLh4
+         /zVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750220678; x=1750825478;
+        d=1e100.net; s=20230601; t=1750220679; x=1750825479;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u7uDKQXpUwdrzKwoUkA90P4kaViu0b/lAOUYW7NM+2o=;
-        b=xBY1gapxESWfdsDhAzx60pUsOgMFxXrLOTdJAPKSCVSA+lyynq5Hqq6fGLXeuG6cub
-         K+oWj1vi4k2tpS4NGranz/X3Ptm8moG5ImEAQQUk+ZfvriYuoNM3xIlYzU8pU09xDvPs
-         URWMfo56x44E3FCI4CnWPV3htRbaMjWQ/84EbGpia5cvkUb8FJJgadm7QTXLIdPL1qWQ
-         PnS+4el1Yj7+eP98O+qykeYDwYOKnLs/T3fk05jkqFxVHEF21ci7YEITvGI3X0IZxnVN
-         odr1GGfEpWH5+DYc63T30xnedwNaSxIIIZEux08CsBYeHp1VSzHldknOHgtIukD6oz7L
-         0r1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVWjqjqfLSDL7JvTZRWLa9jbWqirZs5Mbn+7FenvuegwDEur5h2CcKwlm9MTfKraFj+BUSRgUM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwdPFOZYWaJzsm6bgoEmDdv7yWOz23nfq4mtViCadqVnC7tV+dF
-	eISuRzUz2pavbLUbrend+UC+1pCRB63qaYNz5RgWpeJYNt3cMxBCPM5EVUWOoaww9PvRIOjI6zx
-	e9sV5jmTL/HsTaCyZcZgk4Q==
-X-Google-Smtp-Source: AGHT+IEsvRhaA+pgvEn2VcIt6EZL6lLvB8OQlgHyuSOj5NMOQERsIQvH6ATMkLPJIOGQBvW8tdGSJDJWdEvdsdMB
-X-Received: from pjbsm7.prod.google.com ([2002:a17:90b:2e47:b0:312:f650:c7aa])
+        bh=7EMNAB7VqggYskY7+oMW704PIZytljaHYvhJuoy4xGs=;
+        b=KUhhO6IT2oT3QtHamNvYMB3WMpgYyAMoSAsZkgo+oJiUUR9MCRdFCe9agY8tbB+u4l
+         LXum7sC10qmYhQnGdb63hQ3w0TH4YVFCRZFArjooeWWvos8tPNTfEkeHqBhBE0BXbTFk
+         PiAIEihjUYsZ68jvvi2UZqfUOfeRSwcODB8S6aDyHa9yfC2nHbkLw2LUbzfmoMLecUFs
+         3H+u4rgOCpkFy+3G1GI0K/EQ03MqKHI6vziMdc4nmlydILrJg+Mw2yvcEDZaieS2TJUd
+         ig2zfdVaeJN0Pj1jb3XkAN6a9BbC2ptZTRiKJnqfylwEfZj/0Kr5pXWPUT8wZxtKY5Vx
+         EDsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVo/LQa2WeuIevPcx/l7D8nVGOWzJbXW/MroHaSWj1BJIhWaIEOI/8oSKca+6Q6yIMOZsuC9uM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxxSlNEV+rAF8xQ+qnRJb8qW6lS4VINhqmU0Zdep4UnP78K7GPS
+	IhtcCyStEA2gL7XQGT8LqeQZED17IlbQp2olcwyjkvseqbY4mLFg4lgH9jSmFclxbbEMYey5pFi
+	t1GQnA1/aP6fk1XlT1fQo2w==
+X-Google-Smtp-Source: AGHT+IHf6vnwz6tnrJF7nGJhTQOliXFukjknoI4nKYkvX84klDeaakiCUnur6sPI4XGwPrQLqZt03lOgVrYxLq6x
+X-Received: from plbks6.prod.google.com ([2002:a17:903:846:b0:231:c831:9520])
  (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2d47:b0:312:db8f:9a09 with SMTP id 98e67ed59e1d1-313f1c380f7mr29459716a91.14.1750220677882;
- Tue, 17 Jun 2025 21:24:37 -0700 (PDT)
-Date: Wed, 18 Jun 2025 04:24:16 +0000
+ 2002:a17:902:d2c9:b0:224:23be:c569 with SMTP id d9443c01a7336-2366b32a5a5mr279237755ad.22.1750220679165;
+ Tue, 17 Jun 2025 21:24:39 -0700 (PDT)
+Date: Wed, 18 Jun 2025 04:24:17 +0000
 In-Reply-To: <20250618042424.330664-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250618042424.330664-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.50.0.rc2.696.g1fc2a0284f-goog
-Message-ID: <20250618042424.330664-8-jthoughton@google.com>
-Subject: [PATCH v3 07/15] KVM: Enable and advertise support for KVM userfault exits
+Message-ID: <20250618042424.330664-9-jthoughton@google.com>
+Subject: [PATCH v3 08/15] KVM: selftests: Fix vm_mem_region_set_flags docstring
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Oliver Upton <oliver.upton@linux.dev>
@@ -72,53 +72,26 @@ Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Yan Zhao <y
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-Now that all architectures (arm64 and x86) that utilize "generic" page
-faults also support userfault exits, advertise support for
-KVM_CAP_USERFAULT and let userspace set KVM_MEM_USERFAULT in memslots.
+`flags` is what region->region.flags gets set to.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/uapi/linux/kvm.h | 1 +
- virt/kvm/kvm_main.c      | 6 ++++++
- 2 files changed, 7 insertions(+)
+ tools/testing/selftests/kvm/lib/kvm_util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index e3b871506ec85..0ba265f99f033 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -937,6 +937,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_ARM_EL2 240
- #define KVM_CAP_ARM_EL2_E2H0 241
- #define KVM_CAP_RISCV_MP_STATE_RESET 242
-+#define KVM_CAP_USERFAULT 243
- 
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index bef6760cd1c0e..2962be09d5ebf 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1604,6 +1604,9 @@ static int check_memory_region_flags(struct kvm *kvm,
- 	    !(mem->flags & KVM_MEM_GUEST_MEMFD))
- 		valid_flags |= KVM_MEM_READONLY;
- 
-+	if (IS_ENABLED(CONFIG_KVM_GENERIC_PAGE_FAULT))
-+		valid_flags |= KVM_MEM_USERFAULT;
-+
- 	if (mem->flags & ~valid_flags)
- 		return -EINVAL;
- 
-@@ -4881,6 +4884,9 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- 	case KVM_CAP_CHECK_EXTENSION_VM:
- 	case KVM_CAP_ENABLE_CAP_VM:
- 	case KVM_CAP_HALT_POLL:
-+#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
-+	case KVM_CAP_USERFAULT:
-+#endif
- 		return 1;
- #ifdef CONFIG_KVM_MMIO
- 	case KVM_CAP_COALESCED_MMIO:
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index a055343a7bf75..ca1aa1699f8aa 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1200,7 +1200,7 @@ memslot2region(struct kvm_vm *vm, uint32_t memslot)
+  *
+  * Input Args:
+  *   vm - Virtual Machine
+- *   flags - Starting guest physical address
++ *   flags - Flags for the memslot
+  *
+  * Output Args: None
+  *
 -- 
 2.50.0.rc2.692.g299adb8693-goog
 
