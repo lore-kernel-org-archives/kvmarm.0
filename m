@@ -1,325 +1,271 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717BC2EA16A;
-	Wed, 18 Jun 2025 12:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38532E8DE7
+	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 13:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750250054; cv=none; b=ZSKL1twLLnS9UO9IF2hvf1x2PBi5nXuTyxH586+CeAvCWvdaPqQPHFWrZ/RbwdJpqMIQhFqrSudTmVJuuRreZQJcRCL51IBXmLzMdN790b9jH/K4m6OCIFAqt65oRiRLzbYU19REM9PoCg0UAEHz0ThvZ7klvWLb9wx0y915JPY=
+	t=1750252594; cv=none; b=bsPiBjDe+2o6gGomRVk4/yakqf6HdqiwTy+ZQbEMPOg+u8+AGKj3PBCipVw3Sa03H1Hv5K44bPflFfWYqbmMOrVuLSbcch5fNqRdgLmJG1/TF0sz1vM5owoGjhKQh/s2a8w46Nkdvu/4DQRY32Cue+6d0JKemC89ZZ8wQKapQe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750250054; c=relaxed/simple;
-	bh=82jJoSKNfDCk8X5+WmO81pBflXQZP7LLoe+PJ7aYcb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FHcvC5HBO92fPWvT6NlsBongNz4c1rOqDvCQvCS/HGkmH1+X5/YH1nFW4imdfLlcKshgT6hnsMnYhEECbdIhnYjb4rLZ2fRfM856+JdGodoG8cr9ieTAYqLNe7nw0N+sLl3fq0VhEqrZ4zv9opTF5jKd2mwPlGUygJXNzfo29fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0365C14BF;
-	Wed, 18 Jun 2025 05:33:49 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 08B5B3F66E;
-	Wed, 18 Jun 2025 05:34:05 -0700 (PDT)
-Date: Wed, 18 Jun 2025 13:33:55 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Catalin Marinas
- <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
- <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver Upton
- <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
- <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev, Ganapatrao Kulkarni
- <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi
- Kisanuki <fj0570is@fujitsu.com>
-Subject: Re: [PATCH v9 15/43] arm64: RME: Allow VMM to set RIPAS
-Message-ID: <20250618133355.2af1dcc4@donnerap.manchester.arm.com>
-In-Reply-To: <20250611104844.245235-16-steven.price@arm.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
-	<20250611104844.245235-16-steven.price@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1750252594; c=relaxed/simple;
+	bh=8J9KAhlWf5co3iUUu4FPJNVpTzmF1Oipo85JzD2iQw8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QiYwvcww7VlFcl/Ff6WqFBBuPn2BmL6YG8E65COqJFLGWzsTAHG7UrLp1v+eGP0FFQ2E9rZRLAcDzieJtkedgrYJ2WHUk7HA5bo4TLcOW/mt5f2RIfw8mejjA0tcyuPSXWG5au7TCRYf5+lqhBnUOyu8GlumDHt0/CDivJ15BJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fG7Q2ggN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fG7Q2ggN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750252592;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=HF/h5iERcRiAWZcVo6GzXQXrMZ2C+pgVCc623GzbLyU=;
+	b=fG7Q2ggNJhBvak40MWNTBmxWbU9xoulg1doLTQBrb2t7UXPTM5wnz09PxTR8WKMgMF4sU/
+	8SgQuqC/JZaJ1YKTGIY6WHOvu94g7HAS850BdQ3FVwBTyNDixOAyDJn79JZQIP2szfSYA1
+	DzW5eX17uziZs4T/khexkGt6LpwEC9w=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-300-3BiijSUqPbiIqd9_WNqtqw-1; Wed, 18 Jun 2025 09:16:31 -0400
+X-MC-Unique: 3BiijSUqPbiIqd9_WNqtqw-1
+X-Mimecast-MFC-AGG-ID: 3BiijSUqPbiIqd9_WNqtqw_1750252587
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450d244bfabso57032195e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 06:16:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750252586; x=1750857386;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HF/h5iERcRiAWZcVo6GzXQXrMZ2C+pgVCc623GzbLyU=;
+        b=UE4DwVaqMs384D43b/WmIE7WRBv/2ir810iQWY//19huY27v5AJ3aL4+zixVz5YtPu
+         LZIYeMVnNdogY1z5Q33qMhAvA+1RVSrR5nykDCyWfni/mGAll8FPFiOx8ouaDllMBwCP
+         9bSzTrdQLGMtdqYl/HVeEcNin7yVK+xBPwnJiw+oCkpn1+ofEJkAWoDZvk+KMEjhEvRn
+         x/JP+uusGObhKOjZPNE4A3nGQwqQeVlnVtYBzi6Zij33LXjT+WNzEj9xXFG8WlzqsQg4
+         0Zov3RTe96T1VZe6rv7OIG1ucNh03Q6afENiYeVUbkl0Oa2DwriffZwD14IrZtCNOmLm
+         1WqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXoOgcSNeQ2Q+L9ih+xvyGM4Qk0ayqnVwM0mSA+GniQopgHN/hMszMWL2kSw2QaJi4oX+uOT0A=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz9NVHxXNHdQwNTHLRshiVtJ7/6IjCeTRpCa3Pa40zoIqTR0Fqu
+	vxXlI7b1tya/lYLOolPF0CKzeclXuFd81+DbvJ9OEc56pcOIvVAxBSE9Q8OisKkWU89h9WHRvum
+	vPhIKw9ZbvtjXy6OVk7qTxLixdoIf96y6U0RAKpq7j+AiTgR97q8ieYz27w==
+X-Gm-Gg: ASbGncvWppdPUdQ4aEh3/fuoBBZ2q3SosbexkXcChrklVAbbUhgVxUPl6aSt4LjnZGy
+	oBCuXbwj8kLzDJwneeJfQjkBy3/WTbxjyPbHjsa6z+IR63f2Zwmzk9yR5EsJNpt1gQ5/st50xda
+	PdUXLgdcnICE+9QT2IEtk/vOd7QTPHzdloCYf9960Vle4sNmruxg79DBXha7inAoZ2XhuFg4qyv
+	66Ytz0LUPTZ8kTcfAKpP4hdZ5kdXWYv7bF6rhPCpjP+VBd24n4aYlBTKgZWL5IBCt3pUuBzYm84
+	r1OCkPmETRz3cTpfsLEN/73pzmWWNKpWv9I+tiDkB8QaLXOs2O9jImAdQknENcVpGjkaGxKNVeq
+	OJzLsk8BvCJfwVjVP5ZiPhONRfhli/NXrGkXUMUMvqypmn+4=
+X-Received: by 2002:a05:600c:4e02:b0:43d:ac5:11e8 with SMTP id 5b1f17b1804b1-4533caaeb57mr146639125e9.21.1750252586511;
+        Wed, 18 Jun 2025 06:16:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFjSUUqdc83WhSU0K6mVnps9+N/GTCXXKIMqt/yKtrTCHClblot/wii0/9onwg7tf1gxoVdxA==
+X-Received: by 2002:a05:600c:4e02:b0:43d:ac5:11e8 with SMTP id 5b1f17b1804b1-4533caaeb57mr146638745e9.21.1750252586082;
+        Wed, 18 Jun 2025 06:16:26 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f2d:2400:4052:3b5:fff9:4ed0? (p200300d82f2d2400405203b5fff94ed0.dip0.t-ipconnect.de. [2003:d8:2f2d:2400:4052:3b5:fff9:4ed0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e232219sm204383145e9.9.2025.06.18.06.16.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Jun 2025 06:16:25 -0700 (PDT)
+Message-ID: <80cb9936-416f-42c4-96c2-416304bd9262@redhat.com>
+Date: Wed, 18 Jun 2025 15:16:22 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd
+ pages
+To: Xiaoyao Li <xiaoyao.li@intel.com>, Sean Christopherson <seanjc@google.com>
+Cc: Fuad Tabba <tabba@google.com>, Ira Weiny <ira.weiny@intel.com>,
+ kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
+ amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
+ ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com,
+ wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+References: <20250611133330.1514028-1-tabba@google.com>
+ <20250611133330.1514028-9-tabba@google.com> <aEySD5XoxKbkcuEZ@google.com>
+ <68501fa5dce32_2376af294d1@iweiny-mobl.notmuch>
+ <bbc213c3-bc3d-4f57-b357-a79a9e9290c5@redhat.com>
+ <CA+EHjTxvqDr1tavpx7d9OyC2VfUqAko864zH9Qn5+B0UQiM93g@mail.gmail.com>
+ <701c8716-dd69-4bf6-9d36-4f8847f96e18@redhat.com>
+ <aFIK9l6H7qOG0HYB@google.com>
+ <3fb0e82b-f4ef-402d-a33c-0b12e8aa990c@redhat.com>
+ <5ee9bbb8-d100-408c-ac07-ea9c5b603545@intel.com>
+ <5a55d95e-5e32-4239-a445-be13228ea80b@redhat.com>
+ <45af2c0d-a416-49bc-8011-4ec57a56d6f5@intel.com>
+ <40a5903b-f747-4eab-8959-06ddd6e88f82@redhat.com>
+ <fa3cea2a-d005-44fd-8a2f-2bcea1dc9042@intel.com>
+ <38101158-4475-4885-83e7-654045ca0f9b@redhat.com>
+ <3031b949-c42a-49bc-be0c-f95a62c792e2@intel.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <3031b949-c42a-49bc-be0c-f95a62c792e2@intel.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 7xk7tc_0cNqS1uKft8ciRqbUsp37cz_4-ceVjqlo6NM_1750252587
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 11 Jun 2025 11:48:12 +0100
-Steven Price <steven.price@arm.com> wrote:
+On 18.06.25 14:17, Xiaoyao Li wrote:
+> On 6/18/2025 7:14 PM, David Hildenbrand wrote:
+>> On 18.06.25 12:42, Xiaoyao Li wrote:
+>>> On 6/18/2025 5:59 PM, David Hildenbrand wrote:
+>>>> On 18.06.25 11:44, Xiaoyao Li wrote:
+>>>>> On 6/18/2025 5:27 PM, David Hildenbrand wrote:
+>>>>>> On 18.06.25 11:20, Xiaoyao Li wrote:
+>>>>>>> On 6/18/2025 4:15 PM, David Hildenbrand wrote:
+>>>>>>>>> If we are really dead set on having SHARED in the name, it could be
+>>>>>>>>> GUEST_MEMFD_FLAG_USER_MAPPABLE_SHARED or
+>>>>>>>>> GUEST_MEMFD_FLAG_USER_MAP_SHARED?  But
+>>>>>>>>> to me that's _too_ specific and again somewhat confusing given the
+>>>>>>>>> unfortunate
+>>>>>>>>> private vs. shared usage in CoCo-land.  And just playing the odds,
+>>>>>>>>> I'm
+>>>>>>>>> fine taking
+>>>>>>>>> a risk of ending up with GUEST_MEMFD_FLAG_USER_MAPPABLE_PRIVATE or
+>>>>>>>>> whatever,
+>>>>>>>>> because I think that is comically unlikely to happen.
+>>>>>>>>
+>>>>>>>> I think in addition to GUEST_MEMFD_FLAG_MMAP we want something to
+>>>>>>>> express "this is not your old guest_memfd that only supports private
+>>>>>>>> memory". And that's what I am struggling with.
+>>>>>>>
+>>>>>>> Sorry for chiming in.
+>>>>>>>
+>>>>>>> Per my understanding, (old) guest memfd only means it's the memory
+>>>>>>> that
+>>>>>>> cannot be accessed by userspace. There should be no shared/private
+>>>>>>> concept on it.
+>>>>>>>
+>>>>>>> And "private" is the concept of KVM. Guest memfd can serve as private
+>>>>>>> memory, is just due to the character of it cannot be accessed from
+>>>>>>> userspace.
+>>>>>>>
+>>>>>>> So if the guest memfd can be mmap'ed, then it become userspace
+>>>>>>> accessable and cannot serve as private memory.
+>>>>>>>
+>>>>>>>> Now, if you argue "support for mmap() implies support for non-
+>>>>>>>> private
+>>>>>>>> memory", I'm probably okay for that.
+>>>>>>>
+>>>>>>> I would say, support for mmap() implies cannot be used as private
+>>>>>>> memory.
+>>>>>>
+>>>>>> That's not where we're heading with in-place conversion support: you
+>>>>>> will have private (ianccessible) and non-private (accessible)
+>>>>>> parts, and
+>>>>>> while guest_memfd will support mmap() only the accessible parts can
+>>>>>> actually be accessed (faulted in etc).
+>>>>>
+>>>>> That's OK. The guestmemfd can be fine-grained, i.e., different
+>>>>> range/part of it can have different access property. But one rule never
+>>>>> change: only the sub-range is not accessible by userspace can it be
+>>>>> serve as private memory.
+>>>>
+>>>> I'm sorry, I don't understand what you are getting at.
+>>>>
+>>>> You said "So if the guest memfd can be mmap'ed, then it become userspace
+>>>> accessable and cannot serve as private memory." and I say, with in-place
+>>>> conversion support you are wrong.
+>>>>
+>>>> The whole file can be mmaped(), that does not tell us anything about
+>>>> which parts can be private or not.
+>>>
+>>> So there is nothing prevent userspace from accessing it after a range is
+>>> converted to private via KVM_GMEM_CONVERT_PRIVATE since the whole file
+>>> can be mmaped()?
+>>>
+>>> If so, then for TDX case, userspace can change the TD-owner bit of the
+>>> private part by accessing it and later guest access will poison it and
+>>> trigger #MC. If the #MC is only delivered to the PCPU that triggers it,
+>>> it just leads to the TD guest being killed. If the #MC is broadcasted,
+>>> it affects other in the system.
+>>>
+>>> I just give it a try on real TDX system with in-place conversion. The TD
+>>> is killed due to SIGBUS (host kernel handles the #MC and sends the
+>>> SIGBUS). It seems OK if only the TD guest being affected due to
+>>> userspace accesses the private memory. But I'm not sure if there is any
+>>> corner case that will affect the host.
+>>
+>> I suggest you go ahead and read all about in-place conversion support,
+>> and how it all relates to the #MC problem you mention here.
+>>
+>> Long story short: SIGBUS is triggered by the fault handler, not by the
+>> #MC, because private pages cannot be faulted in and accessed.
+>>
+> 
+> Sorry for the wrong information and thanks for your patience!
 
-Hi Steven,
+No problem. As raised, it would all be clearer if we started out with 
+guest_memfd behaving just like memfd (mmap() support etc) and then added 
+support for "private" memory on top.
 
-one build error below, on my machine (with GCC10):
+But that's not how it happened :)
 
-> Each page within the protected region of the realm guest can be marked
-> as either RAM or EMPTY. Allow the VMM to control this before the guest
-> has started and provide the equivalent functions to change this (with
-> the guest's approval) at runtime.
->=20
-> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
-> unmapped from the guest and undelegated allowing the memory to be reused
-> by the host. When transitioning to RIPAS RAM the actual population of
-> the leaf RTTs is done later on stage 2 fault, however it may be
-> necessary to allocate additional RTTs to allow the RMM track the RIPAS
-> for the requested range.
->=20
-> When freeing a block mapping it is necessary to temporarily unfold the
-> RTT which requires delegating an extra page to the RMM, this page can
-> then be recovered once the contents of the block mapping have been
-> freed.
->=20
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes from v8:
->  * Propagate the 'may_block' flag to allow conditional calls to
->    cond_resched_rwlock_write().
->  * Introduce alloc_rtt() to wrap alloc_delegated_granule() and
->    kvm_account_pgtable_pages() and use when allocating RTTs.
->  * Code reorganisation to allow init_ipa_state and set_ipa_state to
->    share a common ripas_change() function,
->  * Other minor changes following review.
-> Changes from v7:
->  * Replace use of "only_shared" with the upstream "attr_filter" field
->    of struct kvm_gfn_range.
->  * Clean up the logic in alloc_delegated_granule() for when to call
->    kvm_account_pgtable_pages().
->  * Rename realm_destroy_protected_granule() to
->    realm_destroy_private_granule() to match the naming elsewhere. Also
->    fix the return codes in the function to be descriptive.
->  * Several other minor changes to names/return codes.
-> Changes from v6:
->  * Split the code dealing with the guest triggering a RIPAS change into
->    a separate patch, so this patch is purely for the VMM setting up the
->    RIPAS before the guest first runs.
->  * Drop the useless flags argument from alloc_delegated_granule().
->  * Account RTTs allocated for a guest using kvm_account_pgtable_pages().
->  * Deal with the RMM granule size potentially being smaller than the
->    host's PAGE_SIZE. Although note alloc_delegated_granule() currently
->    still allocates an entire host page for every RMM granule (so wasting
->    memory when PAGE_SIZE>4k).
-> Changes from v5:
->  * Adapt to rebasing.
->  * Introduce find_map_level()
->  * Rename some functions to be clearer.
->  * Drop the "spare page" functionality.
-> Changes from v2:
->  * {alloc,free}_delegated_page() moved from previous patch to this one.
->  * alloc_delegated_page() now takes a gfp_t flags parameter.
->  * Fix the reference counting of guestmem pages to avoid leaking memory.
->  * Several misc code improvements and extra comments.
-> ---
->  arch/arm64/include/asm/kvm_rme.h |   6 +
->  arch/arm64/kvm/mmu.c             |   8 +-
->  arch/arm64/kvm/rme.c             | 447 +++++++++++++++++++++++++++++++
->  3 files changed, 458 insertions(+), 3 deletions(-)
->=20
-
-[ ... ]
-
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 25705da6f153..fe75c41d6ac3 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-
-[ ... ]
-
-> @@ -318,6 +619,140 @@ static int realm_create_rd(struct kvm *kvm)
->  	return r;
->  }
-> =20
-> +static void realm_unmap_private_range(struct kvm *kvm,
-> +				      unsigned long start,
-> +				      unsigned long end,
-> +				      bool may_block)
-> +{
-> +	struct realm *realm =3D &kvm->arch.realm;
-> +	unsigned long next_addr, addr;
-> +	int ret;
-> +
-> +	for (addr =3D start; addr < end; addr =3D next_addr) {
-> +		ret =3D realm_unmap_private_page(realm, addr, &next_addr);
-> +
-> +		if (ret)
-> +			break;
-> +
-> +		if (may_block)
-> +			cond_resched_rwlock_write(&kvm->mmu_lock);
-> +	}
-> +
-> +	realm_fold_rtt_level(realm, get_start_level(realm) + 1,
-> +			     start, end);
-> +}
-> +
-> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
-> +			   unsigned long size, bool unmap_private,
-> +			   bool may_block)
-> +{
-> +	unsigned long end =3D start + size;
-> +	struct realm *realm =3D &kvm->arch.realm;
-> +
-> +	end =3D min(BIT(realm->ia_bits - 1), end);
-> +
-> +	if (!kvm_realm_is_created(kvm))
-> +		return;
-> +
-> +	realm_unmap_shared_range(kvm, find_map_level(realm, start, end),
-> +				 start, end, may_block);
-> +	if (unmap_private)
-> +		realm_unmap_private_range(kvm, start, end, may_block);
-> +}
-> +
-> +enum ripas_action {
-> +	RIPAS_INIT,
-> +	RIPAS_SET,
-> +};
-> +
-> +static int ripas_change(struct kvm *kvm,
-> +			struct kvm_vcpu *vcpu,
-> +			unsigned long ipa,
-> +			unsigned long end,
-> +			enum ripas_action action,
-> +			unsigned long *top_ipa)
-> +{
-> +	struct realm *realm =3D &kvm->arch.realm;
-> +	phys_addr_t rd_phys =3D virt_to_phys(realm->rd);
-> +	phys_addr_t rec_phys;
-> +	struct kvm_mmu_memory_cache *memcache =3D NULL;
-> +	int ret =3D 0;
-> +
-> +	if (vcpu) {
-> +		rec_phys =3D virt_to_phys(vcpu->arch.rec.rec_page);
-> +		memcache =3D &vcpu->arch.mmu_page_cache;
-> +
-> +		WARN_ON(action !=3D RIPAS_SET);
-> +	} else {
-> +		WARN_ON(action !=3D RIPAS_INIT);
-> +	}
-> +
-> +	while (ipa < end) {
-> +		unsigned long next;
-> +
-> +		switch (action) {
-> +		case RIPAS_INIT:
-> +			ret =3D rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
-> +			break;
-> +		case RIPAS_SET:
-> +			ret =3D rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end,
-> +						&next);
-> +			break;
-> +		}
-> +
-> +		switch (RMI_RETURN_STATUS(ret)) {
-> +		case RMI_SUCCESS:
-> +			ipa =3D next;
-> +			break;
-> +		case RMI_ERROR_RTT:
-> +			int err_level =3D RMI_RETURN_INDEX(ret);
-
-This breaks the build on GCC <=3D v10:
-
-/src/linux/arch/arm64/kvm/rme.c: In function =E2=80=98ripas_change=E2=80=99:
-/src/linux/arch/arm64/kvm/rme.c:1190:4: error: a label can only be part of =
-a statement and a declaration is not a statement
- 1190 |    int err_level =3D RMI_RETURN_INDEX(ret);
-      |    ^~~
-/src/linux/arch/arm64/kvm/rme.c:1191:4: error: expected expression before i=
-nt=E2=80=99
- 1191 |    int level =3D find_map_level(realm, ipa, end);
-      |    ^~~
-/src/linux/arch/arm64/kvm/rme.c:1193:21: error: =E2=80=98level=E2=80=99 und=
-eclared (first use in this function)
- 1193 |    if (err_level >=3D level)
-      |                     ^~~~~
-
-With GCC 11 and later I see this still as a warning when using -Wpedantic,
-but it vanishes when also paired with -std=3Dgnu2x.
-
-So either hoist the variable declaration up, or use brackets, this worked
-for me as well, and I see it in other places:
-
-		case RMI_ERROR_RTT: {
-			....
-		}
-		default:
-
+-- 
 Cheers,
-Andre
 
-
-> +			int level =3D find_map_level(realm, ipa, end);
-> +
-> +			if (err_level >=3D level)
-> +				return -EINVAL;
-> +
-> +			ret =3D realm_create_rtt_levels(realm, ipa,
-> err_level,
-> +						      level, memcache);
-> +			if (ret)
-> +				return ret;
-> +			/* Retry with the RTT levels in place */
-> +			break;
-> +		default:
-> +			WARN_ON(1);
-> +			return -ENXIO;
-> +		}
-> +	}
-> +
-> +	if (top_ipa)
-> +		*top_ipa =3D ipa;
-> +
-> +	return 0;
-> +}
-> +
-> +static int realm_init_ipa_state(struct kvm *kvm,
-> +				unsigned long ipa,
-> +				unsigned long end)
-> +{
-> +	return ripas_change(kvm, NULL, ipa, end, RIPAS_INIT, NULL);
-> +}
-> +
-> +static int kvm_init_ipa_range_realm(struct kvm *kvm,
-> +				    struct arm_rme_init_ripas *args)
-> +{
-> +	gpa_t addr, end;
-> +
-> +	addr =3D args->base;
-> +	end =3D addr + args->size;
-> +
-> +	if (end < addr)
-> +		return -EINVAL;
-> +
-> +	if (kvm_realm_state(kvm) !=3D REALM_STATE_NEW)
-> +		return -EPERM;
-> +
-> +	return realm_init_ipa_state(kvm, addr, end);
-> +}
-> +
->  /* Protects access to rme_vmid_bitmap */
->  static DEFINE_SPINLOCK(rme_vmid_lock);
->  static unsigned long *rme_vmid_bitmap;
-> @@ -441,6 +876,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct
-> kvm_enable_cap *cap) case KVM_CAP_ARM_RME_CREATE_REALM:
->  		r =3D kvm_create_realm(kvm);
->  		break;
-> +	case KVM_CAP_ARM_RME_INIT_RIPAS_REALM: {
-> +		struct arm_rme_init_ripas args;
-> +		void __user *argp =3D u64_to_user_ptr(cap->args[1]);
-> +
-> +		if (copy_from_user(&args, argp, sizeof(args))) {
-> +			r =3D -EFAULT;
-> +			break;
-> +		}
-> +
-> +		r =3D kvm_init_ipa_range_realm(kvm, &args);
-> +		break;
-> +	}
->  	default:
->  		r =3D -EINVAL;
->  		break;
+David / dhildenb
 
