@@ -1,55 +1,55 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A658B2185B8
-	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 04:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A2A21A455
+	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 04:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750220681; cv=none; b=SODcVijY2E8KhfkAAtEHYLVMjucmktk8/W+Z8J4/1Yy7OFIEXzuw/p4uxfXCCzk7ieGXtJEo8ECBXPjnyjWrv4wpeV5tyugMWohK2Pk4KZakAXe3DTgTGrwvsrkshDmZpfBiHhNOkyZFFV4uXnbE/j1qh2eJps9RLad2Zo6/Yl4=
+	t=1750220683; cv=none; b=TOO+ijxmcWhu8qvAi6bZjOW0ape/IjJ2agPmE5nyeLToJGZU9NToZL78ChgkE25HZraFuNNJ8vc05H5fucG4nb8/WhBZYhaiBJJe+7G+DEuedqagP97OJg9XxbWetk5SNALLvKkFuQPP4tEyuPJ7GcwpHmeX1XZcAT14XximZ5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750220681; c=relaxed/simple;
-	bh=M4cA5QCIbC4IC69I7rkdIXP2+hXIfCYUAcCljeAUiHs=;
+	s=arc-20240116; t=1750220683; c=relaxed/simple;
+	bh=2bZIqpioQGHINFU/EiphRLQAzeRmXnkDiiTDnIIiQmI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YSRGMQdMpAxL+1q+coaA/cjMjl1kop+TZ5XaRGO/AneJC9NvE7RmUIfft+Z3r2yljFxbXXtqxFnwLzDB1iEcNx9Fjvgb9ZZW395FlZktOrYW6qWKAPHpP8GbZRIq6+hFcg/yBZIdeAwAak4L63zz82Nv8isnX/sHiMHCvgNGxU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ONhaT982; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=hOoidbKwEPnUM8YoVn42gO9aN+dxGEpX5vPhRijltdY0WrcA+m+msscJDb/sMhIoDjBe85KIVRUM4o/2on+v6Z++CGULogRStDOCLbdImPqiyscPq4/BdswbsiTwO+W6TI6MtOKQkJTtFJdZ/XV2tVaYJLTFSO1VHfanXFGzj+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=llfiJDLn; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ONhaT982"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2356ce66d7cso105770145ad.1
-        for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 21:24:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="llfiJDLn"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-235e7550f7bso59124295ad.3
+        for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 21:24:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750220679; x=1750825479; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750220681; x=1750825481; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7EMNAB7VqggYskY7+oMW704PIZytljaHYvhJuoy4xGs=;
-        b=ONhaT982bd6jlsMSiuurUDalmUKBKjcxUZZjui7U9XtgoLie9lLTx+BQHsreI9Kj51
-         sAHIGEfikwWkzJjgF2oBZN8rRarZtQ0OO+z709Khp8sj8Q5r3GzyDyKlDNDkh/xJRzT/
-         Cxz9Z41STE2Y51iQgHe4Bb8p2BWoZT5Fq6XgvFfqr8YvRbsmXVf1E0Cdz/TzcJ2VeHPS
-         LpmaLxdMBEF3bj68YuZ5WrD1QNOMCEtMkv84GVDc32o+s9ypMruBqOEh/NGJdS0LktBi
-         hlwRZSgmi/nTBZiYymGSIfRCt7twO+X7f8oCc/9ngFoXof5xkj9ZmId/boqAeT67iLh4
-         /zVg==
+        bh=mIb2ZAeP1IApX8KajcoQdMg+K+X03gdKKVOXgy4uxAM=;
+        b=llfiJDLn6yQ5aQcMZ48EOBOaGBRlnSC7TkKz1k8aMuqneICm1JUg1npbi5rDsB34Wy
+         elUgyKvydxsok6nPNDqmpPyZpzcW4034Ty0tRJl4FfMHL2Lf5BZWZiY2/PZotQ81rGmc
+         iTnQvnphBcaH2FEQeTvnLl8YH/LilvfGccZ4zj4P1u9ngeuO/TppUHqr6DQ0uqE4G3rC
+         wxyxq+Egkc89m78V1TtZ8r0Nfq799MCTlUli/6/yFURTL//1qFNu3h6rGJqdHk+bFAWZ
+         Uwv4jhZ049gap4rPiiP8o3v1ypBvZ3HL7O3iLEw5/9XJVX2uNRt0m94nbSGbFxzyi7FE
+         XgGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750220679; x=1750825479;
+        d=1e100.net; s=20230601; t=1750220681; x=1750825481;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7EMNAB7VqggYskY7+oMW704PIZytljaHYvhJuoy4xGs=;
-        b=KUhhO6IT2oT3QtHamNvYMB3WMpgYyAMoSAsZkgo+oJiUUR9MCRdFCe9agY8tbB+u4l
-         LXum7sC10qmYhQnGdb63hQ3w0TH4YVFCRZFArjooeWWvos8tPNTfEkeHqBhBE0BXbTFk
-         PiAIEihjUYsZ68jvvi2UZqfUOfeRSwcODB8S6aDyHa9yfC2nHbkLw2LUbzfmoMLecUFs
-         3H+u4rgOCpkFy+3G1GI0K/EQ03MqKHI6vziMdc4nmlydILrJg+Mw2yvcEDZaieS2TJUd
-         ig2zfdVaeJN0Pj1jb3XkAN6a9BbC2ptZTRiKJnqfylwEfZj/0Kr5pXWPUT8wZxtKY5Vx
-         EDsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVo/LQa2WeuIevPcx/l7D8nVGOWzJbXW/MroHaSWj1BJIhWaIEOI/8oSKca+6Q6yIMOZsuC9uM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxxSlNEV+rAF8xQ+qnRJb8qW6lS4VINhqmU0Zdep4UnP78K7GPS
-	IhtcCyStEA2gL7XQGT8LqeQZED17IlbQp2olcwyjkvseqbY4mLFg4lgH9jSmFclxbbEMYey5pFi
-	t1GQnA1/aP6fk1XlT1fQo2w==
-X-Google-Smtp-Source: AGHT+IHf6vnwz6tnrJF7nGJhTQOliXFukjknoI4nKYkvX84klDeaakiCUnur6sPI4XGwPrQLqZt03lOgVrYxLq6x
-X-Received: from plbks6.prod.google.com ([2002:a17:903:846:b0:231:c831:9520])
+        bh=mIb2ZAeP1IApX8KajcoQdMg+K+X03gdKKVOXgy4uxAM=;
+        b=XJHaEw9ZSyfonodiwPUJG+8KrYJ5mcTfNiSUXNiC3EjAGF7ze1GoV7RysW4THY7Rf1
+         yb8xWT6hO9R0Nhss3aUP3Xxq0p5p6FbrHTTheCig8lzOVn6WwI/NuOP1pTQg0DbQayhM
+         h6M2T0GXVK3CxyLBVd7aR9KugPJ8fe2vRYWKWziBQsL9927XCixyqHga4+ZG/09AmQb9
+         4Cs0NnAgq8hvUY1TFULl2MrbfqTPMf7AiGdt4ljZvm0G3gFsUpwSWJmDsY3IQpKBxaRx
+         TlvYchp1rvYklDVgUMjNk+hNt4+eIU8Z3ZSZiNKoRF5tynERwAMKO5u0HLrpKiG/EEFJ
+         w6dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWEtSRXQfaYM5WKZ/WfQkOZwy9pv4ib+fOjXO5krYN6kk7+3wOwjSnMxYXCFq0QkpfJs7Azyr8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw0yCDSs1vRXsULzQrIZBBBRL8rnpRcyMvo2Ni3BK/oBxGe2y8w
+	JHKGKxY89u0jUiUEmt23aqcL57lzHhC79CfmyOuHDd+i5s4DFRnimyjkN65ZTPjwul/vxdro1+1
+	iLqFYYv1q/Q4dhxfOw0q9Rw==
+X-Google-Smtp-Source: AGHT+IHIvgUZR0zBF5d+sewo95QOsT/HjDVkEn+tDLrOgLskqZ9xDvbZRR23CwdW2Cit9o8BMVaShYmHas3nnjqN
+X-Received: from pjbmf13.prod.google.com ([2002:a17:90b:184d:b0:312:eaf7:aa0d])
  (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:d2c9:b0:224:23be:c569 with SMTP id d9443c01a7336-2366b32a5a5mr279237755ad.22.1750220679165;
- Tue, 17 Jun 2025 21:24:39 -0700 (PDT)
-Date: Wed, 18 Jun 2025 04:24:17 +0000
+ 2002:a17:903:228b:b0:235:655:11aa with SMTP id d9443c01a7336-2366b17b16bmr234970365ad.39.1750220680638;
+ Tue, 17 Jun 2025 21:24:40 -0700 (PDT)
+Date: Wed, 18 Jun 2025 04:24:18 +0000
 In-Reply-To: <20250618042424.330664-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250618042424.330664-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.50.0.rc2.696.g1fc2a0284f-goog
-Message-ID: <20250618042424.330664-9-jthoughton@google.com>
-Subject: [PATCH v3 08/15] KVM: selftests: Fix vm_mem_region_set_flags docstring
+Message-ID: <20250618042424.330664-10-jthoughton@google.com>
+Subject: [PATCH v3 09/15] KVM: selftests: Fix prefault_mem logic
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Oliver Upton <oliver.upton@linux.dev>
@@ -72,26 +72,35 @@ Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Yan Zhao <y
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-`flags` is what region->region.flags gets set to.
+The previous logic didn't handle the case where memory was partitioned
+AND we were using a single userfaultfd. It would only prefault the first
+vCPU's memory and not the rest.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/demand_paging_test.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index a055343a7bf75..ca1aa1699f8aa 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1200,7 +1200,7 @@ memslot2region(struct kvm_vm *vm, uint32_t memslot)
-  *
-  * Input Args:
-  *   vm - Virtual Machine
-- *   flags - Starting guest physical address
-+ *   flags - Flags for the memslot
-  *
-  * Output Args: None
-  *
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 0202b78f8680a..315f5c9037b40 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -172,11 +172,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	memset(guest_data_prototype, 0xAB, demand_paging_size);
+ 
+ 	if (p->uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
+-		num_uffds = p->single_uffd ? 1 : nr_vcpus;
+-		for (i = 0; i < num_uffds; i++) {
++		for (i = 0; i < nr_vcpus; i++) {
+ 			vcpu_args = &memstress_args.vcpu_args[i];
+ 			prefault_mem(addr_gpa2alias(vm, vcpu_args->gpa),
+ 				     vcpu_args->pages * memstress_args.guest_page_size);
++			if (!p->partition_vcpu_memory_access)
++				/* We prefaulted everything */
++				break;
+ 		}
+ 	}
+ 
 -- 
 2.50.0.rc2.692.g299adb8693-goog
 
