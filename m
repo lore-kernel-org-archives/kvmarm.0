@@ -1,55 +1,55 @@
 Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738C21FBCAD
-	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 04:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC78D202C3A
+	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 04:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750220674; cv=none; b=V63fb5pXd5SJv3CeRWPvze4gaJqcFixYwYl+LWUd0PiGr7IyNzwbruasvZ/LR2FBpyHkIi6nR6/rmt3djpIvl1mw9QmKx4XRwIYVR4K/Ln7Y0pHD8QR8ItdlCK54vZJ9sDmpuDZ7t0ZowsrNDqy+BC+WYc2mJvYDIeJPL9wHrkE=
+	t=1750220675; cv=none; b=Lki+pBUXWiHTQbqMADo0w6Xmg7I2aFIHG4fc/Os3it/KX7wFJKKkz2v7YD3Wqjm5LMxVw2vquf6UNoXJ6Hamj3R63fliqRFJF8vrONFmCzVmMB0PdkhH7PpsZJ5HWV0xPuJBuOBJcraYl1EpqGNVGgJe5aprfMc+uJRLQ48I2TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750220674; c=relaxed/simple;
-	bh=gpLnCbZ2QT66InCL+IQSfKdjaE0VlJUfUrY2ZyIBHpg=;
+	s=arc-20240116; t=1750220675; c=relaxed/simple;
+	bh=ktpeP3vGqvb2VrKVgvEJ+JbvYtkH68vgsXA6IZugPJ8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KDbX2FxgoR9G8+XhLNOA+/kEbQbU3yok1JHyMPtx1bF2U277jFBZ12OGa4UbUp0L1WvV/qXZDCU4JmLILxIoKDHkgPnaejeiy0KDyUGtGU6+OHxIw9wI6SMDuKsWymr1gFLeKGB4+ttM07mnMZehC+Lmnh/58WC5jakNMpwlb3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=10kAouNa; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=c72RnoDppgtjbOJB+45CsMZD9FuNBYW1gD7G8oPR0hO5LnIgyQgdx+HGC7gXTbLGngb3jNP2Vl27RzObcv43ABm9nQOghGKDg3RnUpjzN+l7NXZaMPp1yvKwb/SGf2CjxFrBNC2KodMRKwkvrHfj0fLKdAzEcq0IzSudlm0fcAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GCgEvE39; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="10kAouNa"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748a4f5e735so2928991b3a.3
-        for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 21:24:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GCgEvE39"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748cf01de06so2320609b3a.3
+        for <kvmarm@lists.linux.dev>; Tue, 17 Jun 2025 21:24:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750220672; x=1750825472; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750220673; x=1750825473; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lAANK9EatRgM8qlVuTkHcUTTaZtpLq75H6hzaPLeuxs=;
-        b=10kAouNaI4EBugeFa7T8OVKVEqJOaCRypmm+j0vjjsu11O4pDNwcPaP6bK06CqmCU0
-         PF81+E2Ee0x19Qo3d7ektVQgxjCOvaywZEJGhGzzLtwj7HSG2No0mGa1jeSpIhkUMWK0
-         ObTB+/EnO1sQHudiHsV0ixPODUNMRsOYQmEjbciL5FloCfPh9TZprywvyIr7wXgGCJg6
-         zwA2jawdhJjAM/n7MYIVqQ7fQScabqUUC0sD7Z0+4j/FHchRF4sPKH7kF4DN2EC2FgvU
-         4nLLdF2QXf1HlxnlAO1+Apxls9RixKQL1OnBB3Fu/YShzQwgERDfaLaNZvl4TaSb19wv
-         H9sw==
+        bh=oFoW3AOc+QuFugacj5s9TiS04hgfBImIEFygFMt/Gog=;
+        b=GCgEvE39BAtfzSm5qJPHcjnf61rWwlNuiTuDLW9wQlfBrlQRJzaxUQf8SorqXrnu05
+         7uZF/Gxt2nwE7yMXRCNIv1Rqmb/7uZ5iUA76JzwFpaoKjdWVVyMHBkBsBs5il0EMnYxi
+         oLxu4odmc1s/3zbCc02h5oIzOjUm66vZ5cBMf09Ijf/9rLfL5w9usoY6qYyK/a034tGv
+         +JihZXrPgw3WMfDXr5/RDpKzTFViFGHbLgQZDOb05NF4EhGWXAs/ySlKXqEvig82akVJ
+         MYa0UJgafK7WBUfy3nfYK3cUL6LfYsJD9aos+HzT+Y67W5WlCrZOr1CQM/8gseN//VhA
+         U+TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750220672; x=1750825472;
+        d=1e100.net; s=20230601; t=1750220673; x=1750825473;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lAANK9EatRgM8qlVuTkHcUTTaZtpLq75H6hzaPLeuxs=;
-        b=OMrKzTb82sTJgkPs8p+8BzlpKzUyG/wiIWf1Ewp0ENFyVWfVyskDkAAGdayORFNXo0
-         D6tgJl3vCIrDl2RDG1koGC1nQ6xHkLmsAz5C6O6XwT2hX+KA8wFxKasdpbFxMJU76Apx
-         4/bT7ub5a3ZxrtI7HLyUNrvBpNWNFrmD+fTsMNoE7gc0xJho38Rv8rTjoaoV5Ck3MbxD
-         BhKingK/ejb/fnmA/5tQOSL4BP9KoumMXuJwIEjxfMIU7oIp9hbtmzkIRoujh6PR2CZp
-         1aqq4FUe/9TklCwjSMP6NENjQFVLRnvxPp1rF8jX9JdseiWLnGqwtgBMi4ok9nrEAAxG
-         7uRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUG6QM0d+lGILQ4wLDFSIxh5/dlWbz8KcxF+U/zbehLsIacOT68tBv9I2Lim0mEWP1aobnY1so=@lists.linux.dev
-X-Gm-Message-State: AOJu0YybNigmESWYi0UelhSbxLDz6n+zlzA5i+/xMqIUSWpNk5y1my3D
-	kaaKB+Epd/WI4qEePmmOeIHAwV3UuXGGAymKL88g4l8hbFTMME00EckpEYqm/wWdhEkruQta0yc
-	bn9IrzRyd9PCim/UJP7XCtw==
-X-Google-Smtp-Source: AGHT+IGfw/fuYp0YvoE+rn33nARlIYiN3aa5M590yzdjQSAaiecYqF5p0spxRmCeRQgOGDvJLrq4ZeRSCV3QEL3v
-X-Received: from pfjw27.prod.google.com ([2002:aa7:9a1b:0:b0:748:de42:3b4])
+        bh=oFoW3AOc+QuFugacj5s9TiS04hgfBImIEFygFMt/Gog=;
+        b=Bdw5fojy30mGFABNBFiTM7+o7wiUF607UWqmIYBU0yDcm2sJhB2E/bMFIQUASX5REU
+         IJipz/a8AymDTbedJFqDl2I/kIRXbe8PE4ecb3JhMfvOg6RNe21N1YaSStlJHp8V8wbD
+         DDk54FruPWwwwPWySq9Nr9a4PNZ5qmLz05zJ+w7Is3CWmo09kUcCpzPzIjcNUQHTcppV
+         yGe35Y5eucIYOKTJz15dSrbiXCwa/CUY08PDqfPWqkVIzwAg/T0K/R8wAxZgq/s1iad6
+         gTuXqT4YnotlLr/5gXZwolx0/vuhlyBKklXXq2cm2M97dxRla3A/NrFZhQl5DlNemQKb
+         ZHrA==
+X-Forwarded-Encrypted: i=1; AJvYcCVVuS5oBGmnNmL/F33ZmAAw4se4lRkthIlbPfCww9Y9ZcGe2dwljU86V8kokyBA7wopq9G4mTM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwnK5wMeC97SW1Ay0xzxU+l+NuPSQw7QKwTVzVlM61O4B29wpNZ
+	CxlpzjRHLyX8/BiqqoLOPA0BaFrM8zkXhT+sr2m4nCzU7xweGZbv0WP4tgkwXmCx6JqhvRxzfpq
+	E4MBJNYD9uAprwGm8cITU5Q==
+X-Google-Smtp-Source: AGHT+IFbfVtTMrlDGyQ0S31hA6FZ725AcPC2U4LvoTBYCTExhfd2YSckOKywCjqOOmu17hz/wpGpnzKXQhdQJMVq
+X-Received: from pgan185.prod.google.com ([2002:a63:40c2:0:b0:b31:cd5e:6d0e])
  (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:a86:b0:732:2923:b70f with SMTP id d2e1a72fcca58-7489d00631fmr17847993b3a.11.1750220671791;
- Tue, 17 Jun 2025 21:24:31 -0700 (PDT)
-Date: Wed, 18 Jun 2025 04:24:12 +0000
+ 2002:a05:6a20:e687:b0:1f5:9330:29fe with SMTP id adf61e73a8af0-21fbd4c7e08mr20135116637.17.1750220673296;
+ Tue, 17 Jun 2025 21:24:33 -0700 (PDT)
+Date: Wed, 18 Jun 2025 04:24:13 +0000
 In-Reply-To: <20250618042424.330664-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250618042424.330664-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.50.0.rc2.696.g1fc2a0284f-goog
-Message-ID: <20250618042424.330664-4-jthoughton@google.com>
-Subject: [PATCH v3 03/15] KVM: arm64: x86: Require "struct kvm_page_fault" for
- memory fault exits
+Message-ID: <20250618042424.330664-5-jthoughton@google.com>
+Subject: [PATCH v3 04/15] KVM: Add common infrastructure for KVM Userfaults
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Oliver Upton <oliver.upton@linux.dev>
@@ -73,180 +72,204 @@ Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Yan Zhao <y
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-From: Sean Christopherson <seanjc@google.com>
+KVM Userfault consists of a bitmap in userspace that describes which
+pages the user wants exits on (when KVM_MEM_USERFAULT is enabled). To
+get those exits, the memslot where KVM_MEM_USERFAULT is being enabled
+must drop (at least) all of the translations that the bitmap says should
+generate faults. Today, simply drop all translations for the memslot. Do
+so with a new arch interface, kvm_arch_userfault_enabled(), which can be
+specialized in the future by any architecture for which optimizations
+make sense.
 
-Now that both arm64 and x86 define "struct kvm_page_fault" with a base set
-of fields, rework kvm_prepare_memory_fault_exit() to take a kvm_page_fault
-structure instead of passing in a pile of parameters.  Guard the related
-code with CONFIG_KVM_GENERIC_PAGE_FAULT to play nice with architectures
-that don't yet support kvm_page_fault.
+Make some changes to kvm_set_memory_region() to support setting
+KVM_MEM_USERFAULT on KVM_MEM_GUEST_MEMFD memslots, including relaxing
+the retrictions on guest_memfd memslots from only deletion to no moving.
 
-Rather than define a common kvm_page_fault and kvm_arch_page_fault child,
-simply assert that the handful of required fields are provided by the
-arch-defined structure.  Unlike vCPU and VMs, the number of common fields
-is expected to be small, and letting arch code fully define the structure
-allows for maximum flexibility with respect to const, layout, etc.
-
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: James Houghton <jthoughton@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/Kconfig          |  1 +
- arch/x86/kvm/Kconfig            |  1 +
- arch/x86/kvm/mmu/mmu.c          |  8 ++++----
- arch/x86/kvm/mmu/mmu_internal.h | 10 +---------
- include/linux/kvm_host.h        | 26 ++++++++++++++++++++------
- virt/kvm/Kconfig                |  3 +++
- 6 files changed, 30 insertions(+), 19 deletions(-)
+ include/linux/kvm_host.h | 23 ++++++++++++++++++
+ include/uapi/linux/kvm.h |  5 +++-
+ virt/kvm/kvm_main.c      | 51 ++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 74 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 713248f240e03..3c299735b1668 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -37,6 +37,7 @@ menuconfig KVM
- 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
-+	select KVM_GENERIC_PAGE_FAULT
- 	help
- 	  Support hosting virtualized guest machines.
- 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 2eeffcec53828..2d5966f15738d 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -48,6 +48,7 @@ config KVM_X86
- 	select KVM_GENERIC_PRE_FAULT_MEMORY
- 	select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
- 	select KVM_WERROR if WERROR
-+	select KVM_GENERIC_PAGE_FAULT
- 
- config KVM
- 	tristate "Kernel-based Virtual Machine (KVM) support"
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index cbc84c6abc2e3..a4439e9e07268 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3429,7 +3429,7 @@ static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
- 	gva_t gva = fault->is_tdp ? 0 : fault->addr;
- 
- 	if (fault->is_private) {
--		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-+		kvm_prepare_memory_fault_exit(vcpu, fault);
- 		return -EFAULT;
- 	}
- 
-@@ -4499,14 +4499,14 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
- 	int max_order, r;
- 
- 	if (!kvm_slot_can_be_private(fault->slot)) {
--		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-+		kvm_prepare_memory_fault_exit(vcpu, fault);
- 		return -EFAULT;
- 	}
- 
- 	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
- 			     &fault->refcounted_page, &max_order);
- 	if (r) {
--		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-+		kvm_prepare_memory_fault_exit(vcpu, fault);
- 		return r;
- 	}
- 
-@@ -4586,7 +4586,7 @@ static int kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
- 	 * private vs. shared mismatch.
- 	 */
- 	if (fault->is_private != kvm_mem_is_private(kvm, fault->gfn)) {
--		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-+		kvm_prepare_memory_fault_exit(vcpu, fault);
- 		return -EFAULT;
- 	}
- 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 384fc4d0bfec0..c15060ed6e8be 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -269,14 +269,6 @@ enum {
-  */
- static_assert(RET_PF_CONTINUE == 0);
- 
--static inline void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
--						     struct kvm_page_fault *fault)
--{
--	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
--				      PAGE_SIZE, fault->write, fault->exec,
--				      fault->is_private);
--}
--
- static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 					u64 err, bool prefetch,
- 					int *emulation_type, u8 *level)
-@@ -329,7 +321,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	 */
- 	if (r == RET_PF_EMULATE && fault.is_private) {
- 		pr_warn_ratelimited("kvm: unexpected emulation request on private memory\n");
--		kvm_mmu_prepare_memory_fault_exit(vcpu, &fault);
-+		kvm_prepare_memory_fault_exit(vcpu, &fault);
- 		return -EFAULT;
- 	}
- 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 3bde4fb5c6aa4..9a85500cd5c50 100644
+index 9a85500cd5c50..bd5fb5ae10d05 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -2497,20 +2497,34 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
- /* Max number of entries allowed for each kvm dirty ring */
- #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+@@ -597,6 +597,7 @@ struct kvm_memory_slot {
+ 	unsigned long *dirty_bitmap;
+ 	struct kvm_arch_memory_slot arch;
+ 	unsigned long userspace_addr;
++	unsigned long __user *userfault_bitmap;
+ 	u32 flags;
+ 	short id;
+ 	u16 as_id;
+@@ -1236,6 +1237,20 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm);
+ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 				   struct kvm_memory_slot *slot);
  
-+#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
++#ifndef __KVM_HAVE_ARCH_USERFAULT_ENABLED
++static inline void kvm_arch_userfault_enabled(struct kvm *kvm,
++					      struct kvm_memory_slot *slot)
++{
++	/*
++	 * kvm_arch_userfault_enabled() must ensure that new faults on pages
++	 * marked as userfault will exit to userspace. Dropping all
++	 * translations is sufficient; architectures may choose to optimize
++	 * this.
++	 */
++	return kvm_arch_flush_shadow_memslot(kvm, slot);
++}
++#endif
 +
-+#define KVM_ASSERT_TYPE_IS(type_t, x)					\
-+do {									\
-+	type_t __maybe_unused tmp;					\
-+									\
-+	BUILD_BUG_ON(!__types_ok(tmp, x) || !__typecheck(tmp, x));	\
-+} while (0)
-+
- static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
--						 gpa_t gpa, gpa_t size,
--						 bool is_write, bool is_exec,
--						 bool is_private)
-+						 struct kvm_page_fault *fault)
- {
-+	KVM_ASSERT_TYPE_IS(gfn_t, fault->gfn);
-+	KVM_ASSERT_TYPE_IS(bool, fault->exec);
-+	KVM_ASSERT_TYPE_IS(bool, fault->write);
-+	KVM_ASSERT_TYPE_IS(bool, fault->is_private);
-+	KVM_ASSERT_TYPE_IS(struct kvm_memory_slot *, fault->slot);
-+
- 	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
--	vcpu->run->memory_fault.gpa = gpa;
--	vcpu->run->memory_fault.size = size;
-+	vcpu->run->memory_fault.gpa = fault->gfn << PAGE_SHIFT;
-+	vcpu->run->memory_fault.size = PAGE_SIZE;
+ int kvm_prefetch_pages(struct kvm_memory_slot *slot, gfn_t gfn,
+ 		       struct page **pages, int nr_pages);
  
- 	/* RWX flags are not (yet) defined or communicated to userspace. */
- 	vcpu->run->memory_fault.flags = 0;
--	if (is_private)
-+	if (fault->is_private)
+@@ -2524,6 +2539,14 @@ static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+ 	if (fault->is_private)
  		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
  }
-+#endif
++
++bool kvm_do_userfault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
++
++static inline bool kvm_is_userfault_memslot(struct kvm_memory_slot *memslot)
++{
++	return memslot && memslot->flags & KVM_MEM_USERFAULT;
++}
++
+ #endif
  
  #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
- static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 727b542074e7e..28ed6b241578b 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -128,3 +128,6 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
- config HAVE_KVM_ARCH_GMEM_INVALIDATE
-        bool
-        depends on KVM_PRIVATE_MEM
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d00b85cb168c3..e3b871506ec85 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -40,7 +40,8 @@ struct kvm_userspace_memory_region2 {
+ 	__u64 guest_memfd_offset;
+ 	__u32 guest_memfd;
+ 	__u32 pad1;
+-	__u64 pad2[14];
++	__u64 userfault_bitmap;
++	__u64 pad2[13];
+ };
+ 
+ /*
+@@ -51,6 +52,7 @@ struct kvm_userspace_memory_region2 {
+ #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+ #define KVM_MEM_READONLY	(1UL << 1)
+ #define KVM_MEM_GUEST_MEMFD	(1UL << 2)
++#define KVM_MEM_USERFAULT	(1UL << 3)
+ 
+ /* for KVM_IRQ_LINE */
+ struct kvm_irq_level {
+@@ -443,6 +445,7 @@ struct kvm_run {
+ 		/* KVM_EXIT_MEMORY_FAULT */
+ 		struct {
+ #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
++#define KVM_MEMORY_EXIT_FLAG_USERFAULT	(1ULL << 4)
+ 			__u64 flags;
+ 			__u64 gpa;
+ 			__u64 size;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index eec82775c5bfb..bef6760cd1c0e 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1747,6 +1747,14 @@ static void kvm_commit_memory_region(struct kvm *kvm,
+ 		if (old->dirty_bitmap && !new->dirty_bitmap)
+ 			kvm_destroy_dirty_bitmap(old);
+ 
++		/*
++		 * If KVM_MEM_USERFAULT is being enabled for the slot, drop the
++		 * translations that are marked as userfault.
++		 */
++		if (!(old_flags & KVM_MEM_USERFAULT) &&
++		    (new_flags & KVM_MEM_USERFAULT))
++			kvm_arch_userfault_enabled(kvm, old);
 +
-+config KVM_GENERIC_PAGE_FAULT
-+       bool
+ 		/*
+ 		 * The final quirk.  Free the detached, old slot, but only its
+ 		 * memory, not any metadata.  Metadata, including arch specific
+@@ -2039,6 +2047,12 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 	if (id < KVM_USER_MEM_SLOTS &&
+ 	    (mem->memory_size >> PAGE_SHIFT) > KVM_MEM_MAX_NR_PAGES)
+ 		return -EINVAL;
++	if (mem->flags & KVM_MEM_USERFAULT &&
++	    ((mem->userfault_bitmap != untagged_addr(mem->userfault_bitmap)) ||
++	     !access_ok(u64_to_user_ptr(mem->userfault_bitmap),
++			DIV_ROUND_UP(mem->memory_size >> PAGE_SHIFT, BITS_PER_LONG)
++			 * sizeof(long))))
++		return -EINVAL;
+ 
+ 	slots = __kvm_memslots(kvm, as_id);
+ 
+@@ -2071,14 +2085,15 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
+ 			return -EINVAL;
+ 	} else { /* Modify an existing slot. */
+-		/* Private memslots are immutable, they can only be deleted. */
+-		if (mem->flags & KVM_MEM_GUEST_MEMFD)
+-			return -EINVAL;
+ 		if ((mem->userspace_addr != old->userspace_addr) ||
+ 		    (npages != old->npages) ||
+ 		    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
+ 			return -EINVAL;
+ 
++		/* Moving a guest_memfd memslot isn't supported. */
++		if (base_gfn != old->base_gfn && mem->flags & KVM_MEM_GUEST_MEMFD)
++			return -EINVAL;
++
+ 		if (base_gfn != old->base_gfn)
+ 			change = KVM_MR_MOVE;
+ 		else if (mem->flags != old->flags)
+@@ -2102,11 +2117,13 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 	new->npages = npages;
+ 	new->flags = mem->flags;
+ 	new->userspace_addr = mem->userspace_addr;
+-	if (mem->flags & KVM_MEM_GUEST_MEMFD) {
++	if (mem->flags & KVM_MEM_GUEST_MEMFD && change == KVM_MR_CREATE) {
+ 		r = kvm_gmem_bind(kvm, new, mem->guest_memfd, mem->guest_memfd_offset);
+ 		if (r)
+ 			goto out;
+ 	}
++	if (mem->flags & KVM_MEM_USERFAULT)
++		new->userfault_bitmap = u64_to_user_ptr(mem->userfault_bitmap);
+ 
+ 	r = kvm_set_memslot(kvm, old, new, change);
+ 	if (r)
+@@ -4980,6 +4997,32 @@ static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
+ 	return cleared;
+ }
+ 
++#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
++bool kvm_do_userfault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
++{
++	struct kvm_memory_slot *slot = fault->slot;
++	unsigned long __user *user_chunk;
++	unsigned long chunk;
++	gfn_t offset;
++
++	if (!kvm_is_userfault_memslot(slot))
++		return false;
++
++	offset = fault->gfn - slot->base_gfn;
++	user_chunk = slot->userfault_bitmap + (offset / BITS_PER_LONG);
++
++	if (__get_user(chunk, user_chunk))
++		return true;
++
++	if (!test_bit(offset % BITS_PER_LONG, &chunk))
++		return false;
++
++	kvm_prepare_memory_fault_exit(vcpu, fault);
++	vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_USERFAULT;
++	return true;
++}
++#endif
++
+ int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 						  struct kvm_enable_cap *cap)
+ {
 -- 
 2.50.0.rc2.692.g299adb8693-goog
 
