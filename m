@@ -1,36 +1,36 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9AE27E064
-	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 23:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597A927E04A
+	for <kvmarm@lists.linux.dev>; Wed, 18 Jun 2025 23:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750288466; cv=none; b=E7tn2ViUb+9PmHb1eUbrEnyo7GmPhFSv/lJfmvqPDIYzKeUcioaPvecl/oIwbD6PBFhj/iq8JCmnQygFcy13OSMBq57rnVlJTldXzLYjrYnD3YLkiVa15tu/hBwm1NESclpx493YWh9wg2ht2p5Lr3JGlEq7xFBI4AGa+wIwIsM=
+	t=1750289101; cv=none; b=HvB7u2yBa2lzAzxBMUQ4b7f+jBlogzhgx8cqVWJ/7p1pH1IjI1NC9B/RMce8M5YJbFK6H1wgOyZsWXAo8uyPRGkgqVfuJQy5ZCyMIQ9asf21RXG8nmIyWdhEumJLzYIPFK2+5qL7NhrMc3DHp7gfuqnAvGSj3nNOBAbjOBb6Vvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750288466; c=relaxed/simple;
-	bh=i1l/wHmMl5v9/5hDL69xn16QG5060/zhsjh31N+rMMQ=;
+	s=arc-20240116; t=1750289101; c=relaxed/simple;
+	bh=mpsyaZM6A/eruigZ3NSJqal62PMFICXzeTz3pckdd6c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iHz0mTkGiYRhYHsPOF+bhNjRVyZaXrjystE7mBItF2s2TyL7VchRCjakDd8t15WnOJWh36hCpp4JtkZUaKWsQ/5YFQdPtV3Q6PySB7XPzA+Le+b5ig7MTcxWw6WwJzAlPMTL8TXFR4GBj+Zo2LtHRBV79P3e+cQ9/Z8RI6FCifk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fJj+vEfc; arc=none smtp.client-ip=95.215.58.189
+	 Content-Type:Content-Disposition:In-Reply-To; b=V9gtL28muDXdEIsX7Poc0+DhutLEfGEBPhzW7L1ZZHwaQWkefgXOsMnrEveiWCZjgw9UgcFECTpNYQ3XXk/DpgEpkfdNnOLUOi2XHGBjPAiLjj2QtWwSniQk8Vb89mD/lS91G7ivM0LvmmyKlHlBGr4Fu29hCIUOPydWL84hODQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nOQhMYcg; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fJj+vEfc"
-Date: Wed, 18 Jun 2025 16:14:05 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nOQhMYcg"
+Date: Wed, 18 Jun 2025 16:24:40 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750288461;
+	t=1750289087;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aVP3DiB3HvKNlxTLG6+nr+sih4i6SPT2KS137bqEj/Y=;
-	b=fJj+vEfcdZsyWbaYG30vNEKCtdWDHf3g/Ygtj0VNq6V4fzpOclefHU3KyXH2CvANdlmjNK
-	KXUHjfjWAYGVPuitRWmnlr44c7tykStb3daT7iXyVWr7i8HlcdTbOqEYIaSPjBClT5iSGs
-	GXLmADF9YQYmQOiFGcADjtlYqs4zKUs=
+	bh=qrxD2n0/TPw17Uc8nkUtK6jXpsmer9Xjurk1Z29eM00=;
+	b=nOQhMYcgxS/j4foBRzM8x72Ps/2vwu3podTsW2GdwB6L5WptAFrt2zoVmkn7ZjE2CtMxwI
+	Ke3zJFXq2P7kMgU6W800fjEMmLCr8l1IMicqSUwXSi5dq+M0rO/X3yznPChqY0NlwTkFdL
+	Qqvfl1RmsbEX+p3fnUWdHkfvrghENe4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: James Houghton <jthoughton@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
 	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	Yan Zhao <yan.y.zhao@intel.com>,
 	Nikita Kalyazin <kalyazin@amazon.com>,
@@ -40,13 +40,9 @@ Cc: James Houghton <jthoughton@google.com>,
 	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 03/15] KVM: arm64: x86: Require "struct
- kvm_page_fault" for memory fault exits
-Message-ID: <aFNIPXoEb5iCjt_L@linux.dev>
+Subject: Re: [PATCH v3 00/15] KVM: Introduce KVM Userfault
+Message-ID: <aFNKuGVWGn0dzKuV@linux.dev>
 References: <20250618042424.330664-1-jthoughton@google.com>
- <20250618042424.330664-4-jthoughton@google.com>
- <aFMaxi5LDr4HHbMR@linux.dev>
- <aFMl6DOcKfH6ampb@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,125 +51,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aFMl6DOcKfH6ampb@google.com>
+In-Reply-To: <20250618042424.330664-1-jthoughton@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 18, 2025 at 01:47:36PM -0700, Sean Christopherson wrote:
-> On Wed, Jun 18, 2025, Oliver Upton wrote:
-> > On Wed, Jun 18, 2025 at 04:24:12AM +0000, James Houghton wrote:
-> > > +#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
-> > > +
-> > > +#define KVM_ASSERT_TYPE_IS(type_t, x)					\
-> > > +do {									\
-> > > +	type_t __maybe_unused tmp;					\
-> > > +									\
-> > > +	BUILD_BUG_ON(!__types_ok(tmp, x) || !__typecheck(tmp, x));	\
-> > > +} while (0)
-> > > +
-> > >  static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> > > -						 gpa_t gpa, gpa_t size,
-> > > -						 bool is_write, bool is_exec,
-> > > -						 bool is_private)
-> > > +						 struct kvm_page_fault *fault)
-> > >  {
-> > > +	KVM_ASSERT_TYPE_IS(gfn_t, fault->gfn);
-> > > +	KVM_ASSERT_TYPE_IS(bool, fault->exec);
-> > > +	KVM_ASSERT_TYPE_IS(bool, fault->write);
-> > > +	KVM_ASSERT_TYPE_IS(bool, fault->is_private);
-> > > +	KVM_ASSERT_TYPE_IS(struct kvm_memory_slot *, fault->slot);
-> > > +
-> > >  	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
-> > > -	vcpu->run->memory_fault.gpa = gpa;
-> > > -	vcpu->run->memory_fault.size = size;
-> > > +	vcpu->run->memory_fault.gpa = fault->gfn << PAGE_SHIFT;
-> > > +	vcpu->run->memory_fault.size = PAGE_SIZE;
-> > >  
-> > >  	/* RWX flags are not (yet) defined or communicated to userspace. */
-> > >  	vcpu->run->memory_fault.flags = 0;
-> > > -	if (is_private)
-> > > +	if (fault->is_private)
-> > >  		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
-> > >  }
-> > > +#endif
-> > 
-> > This *is not* the right direction of travel for arm64. Stage-2 aborts /
-> > EPT violations / etc. are extremely architecture-specific events.
+On Wed, Jun 18, 2025 at 04:24:09AM +0000, James Houghton wrote:
+> Hi Sean, Paolo, Oliver, + others,
 > 
-> Yes and no.  100% agreed there are arch/vendor specific aspects of stage-2 faults,
-> but there are most definitely commonalites as well.
+> Here is a v3 of KVM Userfault. Thanks for all the feedback on the v2,
+> Sean. I realize it has been 6 months since the v2; I hope that isn't an
+> issue.
 
-And I agree those commonalities should be expressed with the same flags
-where possible.
+Not one bit. The only thing I look for in patch frequency is the urgency
+with which the author wants to get something in.
 
-> > What I would like to see on arm64 is that for every "KVM_EXIT_MEMORY_FAULT"
-> > we provide as much syndrome information as possible. That could imply
-> > some combination of a sanitised view of ESR_EL2 and, where it is
-> > unambiguous, common fault flags that have shared definitions with x86.
-> 
-> Me confused, this is what the above does?  "struct kvm_page_fault" is arch
-> specific, e.g. x86 has a whole pile of stuff in there beyond gfn, exec, write,
-> is_private, and slot.
+> I am working on the QEMU side of the changes as I get time. Let me know
+> if it's important for me to send those patches out for this series to be
+> merged.
 
-Right, but now I need to remember that some of the hardware syndrome
-(exec, write) is handled in the arch-neutral code and the rest belongs
-to the arch.
+It'd be good to know we have line of sight on a functional
+implementation here, i.e. uffd-based handling of non-vCPU accesses. I'm
+not expecting surprises here, but patches always speak louder than
+words.
 
-> The approach is non-standard, but I think my justification/reasoning for having
-> the structure be arch-defined still holds:
-> 
->  : Rather than define a common kvm_page_fault and kvm_arch_page_fault child,
->  : simply assert that the handful of required fields are provided by the
->  : arch-defined structure.  Unlike vCPU and VMs, the number of common fields
->  : is expected to be small, and letting arch code fully define the structure
->  : allows for maximum flexibility with respect to const, layout, etc.
-> 
-> If we could use anonymous struct field, i.e. could embed a kvm_arch_page_fault
-> without having to bounce through an "arch" field, I would vote for the approach.
-> Sadly, AFAIK, we can't yet use those in the kernel.
+Don't want to block the kernel pieces if that's a time sink though. And
+FWIW, besides the nitpicking I'm quite happy with the way this is
+shaping up.
 
-The general impression is that this is an unnecessary amount of
-complexity for doing something trivial (computing flags).
+> Be aware that this series will have non-trivial conflicts with Fuad's
+> user mapping support for guest_memfd series[1]. For example, for the
+> arm64 change he is making, the newly introduced gmem_abort() would need
+> to be enlightened to handle KVM Userfault exits.
 
-> > This could incur some minor code duplication, but even then we can share
-> > helpers for the software bits (like userfault).
-> 
-> Again, that is what is proposed here.
-> 
-> > FEAT_MTE_PERM is a very good example for this. There exists a "Tag"
-> > permission at stage-2 which is unrelated to any of the 'normal'
-> > read/write permissions. There's also the MostlyReadOnly permission from
-> > FEAT_THE which grants write permission to a specific set of instructions.
-> > 
-> > I don't want to paper over these nuances and will happily maintain an
-> > arm64-specific flavor of "kvm_prepare_memory_fault_exit()"
-> 
-> Nothing prevents arm64 (or any arch) from wrapping kvm_prepare_memory_fault_exit()
-> and/or taking action after it's invoked.  That's not an accident; the "prepare
-> exit" helpers (x86 has a few more) were specifically designed to not be used as
-> the "return" to userspace.  E.g. this one returns "void" instead of -EFAULT
-> specifically so that the callers isn't "required" to ignore the return if the
-> caller wants to populate (or change, but hopefully that's never the case) fields
-> after calling kvm_prepare_memory_fault_exit), and so that arch can return an
-> entirely different error code, e.g. -EHWPOISON when appropriate.
-
-IMO, this does not achieve the desired layering / ownership of memory
-fault triage. This would be better organized as the arch code computing
-all of the flags relating to the hardware syndrome (even boring ones
-like RWX) and arch-neutral code potentially lending a hand with the
-software bits.
-
-With this I either need to genericize the horrors of the Arm
-architecture in the common thing or keep track of what parts of the
-hardware flags are owned by arch v. non-arch. SW v. HW fault context is
-a cleaner split, IMO.
-
-> And it's not just kvm_prepare_memory_fault_exit() that I want to use kvm_page_fault;
-> kvm_faultin_pfn() is another case where having a common "struct kvm_page_fault"
-> would clean up some ugly/annoying boilerplate.
-
-That might be a better starting point for unifying these things, esp.
-since kvm_faultin_pfn() doesn't have UAPI implications hiding behind it
-and is already using common parameters.
+Appreciate the heads up!
 
 Thanks,
 Oliver
