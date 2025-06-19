@@ -1,61 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E21023E33D;
-	Thu, 19 Jun 2025 12:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B66223D2A0
+	for <kvmarm@lists.linux.dev>; Thu, 19 Jun 2025 12:36:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750336569; cv=none; b=mGTMSG3BuA2psz81howi1myt+3/ZGiCxuIKCgeiqakQ6b4ML5Z9Trs/RFwuzwdnhs6iuSYVBcHpvroHceRRNIab1Kysl3PLMv3/ICw86JGagQdn9S1soV773tPahiH7lGIA2swbRleIM68pETmvQnBc1MDHwMw4ng4VDwyqq0zg=
+	t=1750336597; cv=none; b=KLKl56lm3ft8M1PB+U80UVvs5ikZsg9ALp/tV7iCEGU/sOJeHnFvd3wuGkdvkYROJEfzmvtYd5Pt6IIVnpIdJnX2iqjiRvAyEDBN6u7fbtT0/ly7W668Q58fvGhZMLdN4bN22ZtD0tlLGZ9DTVWjDXA2jr+xZoeoUWWNizUBOTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750336569; c=relaxed/simple;
-	bh=/VJpImzxCawSJoEGcFeP8vUU7BIQ4dI0KhLFtoTx7bc=;
+	s=arc-20240116; t=1750336597; c=relaxed/simple;
+	bh=+P5g+5CJj1UdYWKc1Wje0xjLDaJqzX/jUZTSky6aLjQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IXrzHpB/P8PIjbN/a4UWqyAzgBdHRBAGVz/Yic35gb1cIpiOPrXDKhVP8MKpT1Zo9EVSUE9jvhu+RdvT0lbwJSvnWGgHp2zgtAR6MD62YZpjbsSPNtKwflb62tzby6A4Cx9ameXzr2L7lVBsqw/Qe+Kov+raQG4rnaTEVdjz9/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1Y/hTGy; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=gQa9p1MLSx23KqbmVZ4tR6QPqg3V4BbLqhO9WXg15fpi2+iy7w5P5CKBNo5btKrEKZmj1X4UCsfraR7kaVStPHZaxtJB5O8682oQCo9Rq36l7oadHOtrcH2A/PtL2+aFofF+neIovjc/y5O7FQ5R8SwIFVAjSjToxInHLpfyliY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rkQNS+WR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1Y/hTGy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E63BAC4CEEF;
-	Thu, 19 Jun 2025 12:36:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rkQNS+WR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3C2FC4CEEA;
+	Thu, 19 Jun 2025 12:36:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750336568;
-	bh=/VJpImzxCawSJoEGcFeP8vUU7BIQ4dI0KhLFtoTx7bc=;
+	s=k20201202; t=1750336595;
+	bh=+P5g+5CJj1UdYWKc1Wje0xjLDaJqzX/jUZTSky6aLjQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c1Y/hTGyqUZJGUEUZUgtVqR3Lm17+BC5/oGuq7U0MY9mRxFOpx8TksxBQFWzwj+wt
-	 jEy76Nl7yxYCsizm6p1ACyoakPYuXbaHyea8vjawdVUwUEXB67cLo2mywRNSRPnZZR
-	 jLvvtZc3noD9GTNNvl/P2i9D4sEs9Glcc1Hos1IRliawpbMyMzUncJM2dRGOg1R+wi
-	 WDyRAmJPSXOpjxL5i1hijcLxC1hQjvyrbcSxVaD0s8v3p9iR2sytHkUnZOi7d/HRBt
-	 0JzkIRCsINQ33XXUgJXpOXUCnrVVnQMN3OBk33vSIgVcw/c7e0wtYxln1z+nKqk7J2
-	 Hp79FJ1Q3IldQ==
+	b=rkQNS+WRrR5CjzTSUZC0ctjimPVyr9bwAvZAWedYzd1dNL9JCxRmzGVaMpA5tGfeS
+	 Lx7P1eVk0KDuf8hXiIw96t3zbmxcrQN0tWwbmX/mjYB9cKnzrGptTV9pDONMe7Vu5U
+	 dDAQ5PXqKQEGJddOtnR0h62aZOV+cI8D2eJqhUSZzDMRbrxBUf+wQpaiPwEFuqtPV8
+	 Nw/Wf4YynIJ+ul2spXKUZYNTEDSZTKfZKzoWdwvIDh4PSjaGqSbuvyXYyRBI+3BpMY
+	 e7XEXIt03L3zNAYlomvnq4x3IXENLpfPmFyvcuobtJkcWQObQKg2JyCAnsJA2d+bS7
+	 5x/ErqPxT3wFg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uSEUw-008Fdk-8C;
-	Thu, 19 Jun 2025 13:36:06 +0100
+	id 1uSEVN-008FeH-Eb;
+	Thu, 19 Jun 2025 13:36:33 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Sairaj Kodilkar <sarunkod@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	David Matlack <dmatlack@google.com>
-Subject: Re: (subset) [PATCH v3 01/62] KVM: arm64: Explicitly treat routing entry type changes as changes
-Date: Thu, 19 Jun 2025 13:36:02 +0100
-Message-Id: <175033652435.3069576.5168060744496766238.b4-ty@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Zenghui Yu <yuzenghui@huawei.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	wanghaibin.wang@huawei.com
+Subject: Re: [PATCH] KVM: arm64: selftests: Close the GIC FD in arch_timer_edge_cases
+Date: Thu, 19 Jun 2025 13:36:30 +0100
+Message-Id: <175033657717.3069674.5241246284273591125.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250611224604.313496-3-seanjc@google.com>
-References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-3-seanjc@google.com>
+In-Reply-To: <20250608095402.1131-1-yuzenghui@huawei.com>
+References: <20250608095402.1131-1-yuzenghui@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -65,24 +55,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, pbonzini@redhat.com, joro@8bytes.org, dwmw2@infradead.org, baolu.lu@linux.intel.com, seanjc@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, sarunkod@amd.com, vasant.hegde@amd.com, mlevitsk@redhat.com, joao.m.martins@oracle.com, francescolavra.fl@gmail.com, dmatlack@google.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, yuzenghui@huawei.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 11 Jun 2025 15:45:04 -0700, Sean Christopherson wrote:
-> Explicitly treat type differences as GSI routing changes, as comparing MSI
-> data between two entries could get a false negative, e.g. if userspace
-> changed the type but left the type-specific data as-
+On Sun, 08 Jun 2025 17:54:02 +0800, Zenghui Yu wrote:
+> Close the GIC FD to free the reference it holds to the VM so that we can
+> correctly clean up the VM. This also gets rid of the
 > 
-> Note, the same bug was fixed in x86 by commit bcda70c56f3e ("KVM: x86:
-> Explicitly treat routing entry type changes as changes").
+> 	"KVM: debugfs: duplicate directory 395722-4"
+> 
+> warning when running arch_timer_edge_cases.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[01/62] KVM: arm64: Explicitly treat routing entry type changes as changes
-        commit: 1fbe6861a6d9a942fb8ab8677ddf1ecb86b1af60
+[1/1] KVM: arm64: selftests: Close the GIC FD in arch_timer_edge_cases
+      commit: 56a14984505b11674df5e01407748236bc4bc8f8
 
 Cheers,
 
