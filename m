@@ -1,239 +1,137 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E57C11712;
-	Thu, 19 Jun 2025 15:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463E41DACA1
+	for <kvmarm@lists.linux.dev>; Thu, 19 Jun 2025 16:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750348238; cv=none; b=iWZtD/OdWeumqlWR0mft6fF6IdHutxaap7ZrIjUZlXzXfJ+9tmNDkMPakXo7C4CMCkEtsC8Hp+J/UNKKtUvJZKI9KHK4IokmMFtoIJ26QvyG26O3cxeonsZNVGCrct69jr2JhsePnaskP8d44Q3ljjTq2zIYGq4dzGVvmRtSkoQ=
+	t=1750349092; cv=none; b=MgxNgLKtmQpB3Qevt0UgwM34kl1hFyqejav7BB1IHfcYZZwziIF7T7y6ZpsJ+fZrpZhH8uJqjeWcQIAF8tk/VPT2bPLUnd7tuzJkPg0RBGH+pIYoGPTzXzspPG0+ePe8vLChJ8uT8WVmOOgm52TNZAT8jtQl8mhq4Y2QDs2KRaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750348238; c=relaxed/simple;
-	bh=OKsVibEkSv+hfR4J2CvdJJEcDJm0d1G4pRgyEnSM5co=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jl7Lg0aSc3Hn76/ad1gysn6TqUz78OB+LvHeJRH2jdv4ZaIBPt4e7FC99MT+CKHF0IZtvdxiAOE9lf2sCfDURdByTBAnPkss0cYRkqSKAcT7qJcrJe+jAt+kOJ/P9FtZpUvWBR2aWQCzLiUosRs93rirtEsln/qw7UDxHlHZZi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Bw9meWho; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+	s=arc-20240116; t=1750349092; c=relaxed/simple;
+	bh=BmQIXJ4BAJNwBIu08HfxrKR1bQ1VXWznNY5Rva3+ZCs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SfXSKJzsTC0he6v+6hjeriKk/Jj7n+6AKKcD7oA5cVqSJwbvMJ0mTTBszAfvyTj//4+fSf9E4CEN00qlUxdxaY6v7xgAbaGntOjmU9aInZpqNc4KYk+O6xK7VZkRQIvnykR94lsZE9t1zudFiVNpJ19pANdaS1WiYaWJscS75pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QwWvj73d; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Bw9meWho"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=OKsVibEkSv+hfR4J2CvdJJEcDJm0d1G4pRgyEnSM5co=; b=Bw9meWhos1tgAIc+K/544bWYY7
-	TSrs4qSCCLwK/G59yXQbgmv2lmkCuMkvZxk0hrTtkOpznc9r9pAlYHynY14uNOPuXmJB9OwLNvUcI
-	elmJR9YNWGf2mKdlNASMm/a1xOeU4qwTD53xc4HCErLoupHHCLNV6sLfS/JKHukPTXn8u0Ne2c922
-	zlvIs92esqPKGhjpXeteV0mf8YVWXMzWxaR7TBu4Qc6iFEwFrNIuSf9SW1Pvh6LVrFCB9HWPqvWkI
-	NBuMIBtV0y3/yxRkY0iNJMEu8uJCBtlNxR6m78RVbQ/tXU7Yly1mqDneI+6opUUl0VPDw/pix9OXz
-	zQZno7uA==;
-Received: from [2001:8b0:10b:5:748f:d833:d81c:4c8f] (helo=u09cd745991455d.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uSHX4-00000009LhR-2ep8;
-	Thu, 19 Jun 2025 15:50:30 +0000
-Message-ID: <b1db820e965996b4d236caf15736162f161223e6.camel@infradead.org>
-Subject: Re: [RFC PATCH 00/34] Running Qualcomm's Gunyah Guests via KVM in
- EL1
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>, Karim Manaouil
- <karim.manaouil@linaro.org>,  Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, Alexander Graf <graf@amazon.com>, Alex Elder
- <elder@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba
- <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, Jonathan Corbet
- <corbet@lwn.net>, Mark Brown <broonie@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Prakruthi
- Deepak Heragu <quic_pheragu@quicinc.com>, Quentin Perret
- <qperret@google.com>, Rob Herring <robh@kernel.org>,  Srinivas Kandagatla
- <srini@kernel.org>, Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>, Will
- Deacon <will@kernel.org>, Haripranesh S <haripran@qti.qualcomm.com>, Carl
- van Schaik <cvanscha@qti.qualcomm.com>, Murali Nalajala
- <mnalajal@quicinc.com>,  Sreenivasulu Chalamcharla
- <sreeniva@qti.qualcomm.com>, Trilok Soni <tsoni@quicinc.com>, Stefan
- Schmidt <stefan.schmidt@linaro.org>
-Date: Thu, 19 Jun 2025 16:50:29 +0100
-In-Reply-To: <86ikmtjy51.wl-maz@kernel.org>
-References: <20250424141341.841734-1-karim.manaouil@linaro.org>
-	 <aApaGnFPhsWBZoQ2@linux.dev> <86ikmtjy51.wl-maz@kernel.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-8oYh6WC82njjqP/La6PW"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QwWvj73d"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750349090;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jnOhBasCiJjIhYRxZYUdwPDMPuwY0WvKyYdO2+gnZTM=;
+	b=QwWvj73d102xS1o3/h1Sx6+9r0TYj+nr+ChEcPrQpXwRrRuAMGtX1P5iWY8SJQBJXNwJlf
+	eSt9ObpsmzVGggppkLCwZ5Cih1wBJ9Y4RekipPl8LgpfqmMmMWYrYyfA4qe/dQvnAq9Nxp
+	ksR/ioJxMT8mSiAly/P35D4atd9ZL78=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-321-5eeFtE4OOT-jNb3mViLspw-1; Thu, 19 Jun 2025 12:04:48 -0400
+X-MC-Unique: 5eeFtE4OOT-jNb3mViLspw-1
+X-Mimecast-MFC-AGG-ID: 5eeFtE4OOT-jNb3mViLspw_1750349088
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-234fedd3e51so10019155ad.1
+        for <kvmarm@lists.linux.dev>; Thu, 19 Jun 2025 09:04:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750349088; x=1750953888;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jnOhBasCiJjIhYRxZYUdwPDMPuwY0WvKyYdO2+gnZTM=;
+        b=gSbw+CDL0bYVYJg0nRHKTzyDLtFWnlHq8sg5LiyLzv5/Kg7/K+JJ1q22LDh5clHa4X
+         1DPbwGiRlquxoRW61A6O049DkvBYBrw6TfsoOVRc8k2XleenuNkC1YxYdXv2MRDNfAvm
+         52Q7xMx5ny796yOTGA2kbuQK+wnenJzWAkGT/I1EtTYSyrCDoKXUtzl22mihfH7TcCTJ
+         OXnW5Cxr1hhePJySZ4pXL+kwiTusNMEv0WUG9tvkHUbAF4IEAYSjojI7o1JmW77569l4
+         wGVsqs/MGr/E8D4pNPxYtM53E9WoPn6+hE54fxHNL3nRAN14tS7RmjK0rJ0nZ6FRA39b
+         EOIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPud53q0HsC7Z62VGo6E6PZvOFVbxBvk+PLj2IfS23qogsNOjGsfym2lnY0GWvJtjS6ITtX+A=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzObNVlex20vIcqT0G/Nupj4h7G/oB+qOLPujY4lyv9XgJkQgqS
+	zejNvz8TAWyUIznRDKlMBEeyihoZUKM8bXhHzdWVltqrPVMFLsL3BxyrROc97uwGL5/B/m+2c/Z
+	ZgesLqw3e9+kEXLDMLppjjxW7Jpvo+CNPEH6Ms/VK2D5cD77icPqiN+6M4A==
+X-Gm-Gg: ASbGncsMrm0S/2dRJO4qLUQApkirmyb8j/tvAdnVfx2dEgQ/aKkUodr+sIZkFt+JIiZ
+	DUaTi/UUxfE9ihuQLX/a8p6sV2QZnhdPqpXAkXITmmh57pD9TJPbLv4kNY+NvdETQlKBuL4fQZf
+	4IE2qOKpas7WNtNzN0mJVfKv6GE9SqK/iFDrK6o2G9aNLmA+ZbD1RgwRvx+DPSSTgWVUOadilvu
+	JjrA8dLB/SyYShKAJeYE01rRFamsuoU7cfv4fC/dXtzq3R+Jx0ww8LdTR1200AoHJnRozYG30js
+	U5vqsoD2pGNaHIreG1PJ6/E=
+X-Received: by 2002:a17:902:ecce:b0:22f:b6d6:2737 with SMTP id d9443c01a7336-2366b32e726mr380403635ad.10.1750349087771;
+        Thu, 19 Jun 2025 09:04:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEjJXAklTpU4bxpt+jnWBfHNJB4kATINyoW2fUcIAggJV9+NymIlKk9BuBUHb5XP9WcmOt80w==
+X-Received: by 2002:a17:902:ecce:b0:22f:b6d6:2737 with SMTP id d9443c01a7336-2366b32e726mr380403205ad.10.1750349087399;
+        Thu, 19 Jun 2025 09:04:47 -0700 (PDT)
+Received: from [192.168.40.164] ([70.105.235.240])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365deca379sm121411835ad.210.2025.06.19.09.04.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jun 2025 09:04:46 -0700 (PDT)
+Message-ID: <18151eb8-60ec-438b-b9fb-026efc8b848d@redhat.com>
+Date: Thu, 19 Jun 2025 12:03:29 -0400
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 4/5] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+To: Ankit Agrawal <ankita@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Catalin Marinas <catalin.marinas@arm.com>
+Cc: "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "will@kernel.org" <will@kernel.org>,
+ "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+ "shahuang@redhat.com" <shahuang@redhat.com>,
+ "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ "david@redhat.com" <david@redhat.com>, "seanjc@google.com"
+ <seanjc@google.com>, Aniket Agashe <aniketa@nvidia.com>,
+ Neo Jia <cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>,
+ Krishnakant Jaju <kjaju@nvidia.com>,
+ "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+ Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
+ Alistair Popple <apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>,
+ Dan Williams <danw@nvidia.com>, Zhi Wang <zhiw@nvidia.com>,
+ Matt Ochs <mochs@nvidia.com>, Uday Dhoke <udhoke@nvidia.com>,
+ Dheeraj Nigam <dnigam@nvidia.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "sebastianene@google.com" <sebastianene@google.com>,
+ "coltonlewis@google.com" <coltonlewis@google.com>,
+ "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "ardb@kernel.org"
+ <ardb@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "gshan@redhat.com" <gshan@redhat.com>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "tabba@google.com" <tabba@google.com>,
+ "qperret@google.com" <qperret@google.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "maobibo@loongson.cn" <maobibo@loongson.cn>
+References: <20250618065541.50049-1-ankita@nvidia.com>
+ <20250618065541.50049-5-ankita@nvidia.com> <aFLqiAyXZLoOTepi@arm.com>
+ <20250618163836.GA1629589@nvidia.com>
+ <SA1PR12MB7199835E63E1EF48C7C7638DB07DA@SA1PR12MB7199.namprd12.prod.outlook.com>
+From: Donald Dutile <ddutile@redhat.com>
+In-Reply-To: <SA1PR12MB7199835E63E1EF48C7C7638DB07DA@SA1PR12MB7199.namprd12.prod.outlook.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: pZYdiJjm8TtbhAaYnjj0stvzdi6RFa_Nk1v3l2D6IKc_1750349088
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---=-8oYh6WC82njjqP/La6PW
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2025-04-24 at 17:57 +0100, Marc Zyngier wrote:
-> On Thu, 24 Apr 2025 16:34:50 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> >=20
-> > On Thu, Apr 24, 2025 at 03:13:07PM +0100, Karim Manaouil wrote:
-> > > This series introduces the capability of running Gunyah guests via KV=
-M on
-> > > Qualcomm SoCs shipped with Gunyah hypervisor [1] (e.g. RB3 Gen2).
-> > >=20
-> > > The goal of this work is to port the existing Gunyah hypervisor suppo=
-rt from a
-> > > standalone driver interface [2] to KVM, with the aim of leveraging as=
- much of the
-> > > existing KVM infrastructure as possible to reduce duplication of effo=
-rt around
-> > > memory management (e.g. guest_memfd), irqfd, and other core component=
-s.
-> > >=20
-> > > In short, Gunyah is a Type-1 hypervisor, meaning that it runs indepen=
-dently of any
-> > > high-level OS kernel such as Linux and runs in a higher CPU privilege=
- level than VMs.
-> > > Gunyah is shipped as firmware and guests typically talk with Gunyah v=
-ia hypercalls.
-> > > KVM is designed to run as Type-2 hypervisor. This port allows KVM to =
-run in EL1 and
-> > > serve as the interface for VM lifecycle management,while offloading v=
-irtualization
-> > > to Gunyah.
-> >=20
-> > If you're keen on running your own hypervisor then I'm sorry, you get t=
-o
-> > deal with it soup to nuts. Other hypervisors (e.g. mshv) have their own
-> > kernel drivers for managing the host / UAPI parts of driving VMs.
-> >=20
-> > The KVM arch interface is *internal* to KVM, not something to be
-> > (ab)used for cramming in a non-KVM hypervisor. KVM and other hypervisor=
-s
-> > can still share other bits of truly common infrastructure, like
-> > guest_memfd.
-> >=20
-> > I understand the value in what you're trying to do, but if you want it
-> > to smell like KVM you may as well just let the user run it at EL2.
->=20
-> +1. KVM is not a generic interface for random third party hypervisors.
+On 6/19/25 8:14 AM, Ankit Agrawal wrote:
+> Considering the feedback, I think we may do the following here: 
+> 1. Rename the device variable to S2_noncacheable to represent if the S2 is going to be marked non cacheable. Otherwise S2 will be mapped NORMAL. 
+> 2. Detect what PFN has to be marked S2_noncacheable. If a PFN is not in the kernel map, mark as S2 except for PFNMAP + VMA cacheable.
+   Q: 'mark as S2 except'... should be 'mark as S2_noncacheable' ?
+  
+> 3. Prohibit cacheable PFNMAP if hardware doesn't support FWB and CACHE DIC. 
+> 4. Prohibit S2 non cached mapping for cacheable VMA for all cases, whether pre-FWB hardware or not.
 
-I don't think that should be true in the general case. At least, it
-depends on whether you mean the literal implementation in
-arch/arm64/kvm/ vs. the userspace API and set of ioctls on /dev/kvm.
-
-The kernel exists to provide a coherent userspace API for all kinds of
-hardware. That's what it's *for*. It provides users with a consistent
-interface to all kinds of network cards, serial ports, etc. =E2=80=94 and t=
-hat
-includes firmware/platform features too.=20
-
-There's no reason that shouldn't be the same for virtualisation. If the
-kernel cannot provide an API which supports *all* kinds of
-virtualization, then it seems like we've done something wrong.
-
-On x86 we have /dev/kvm backed by different vendor-specific support for
-Intel vs. AMD. And in recent years we've retrofitted confidential
-compute to it too, with SEV-SNP, TDX, etc.
-
-We haven't resorted to saying "no, sorry, KVM doesn't support that".
-
-We shouldn't say that for Arm either.
-
-
---=-8oYh6WC82njjqP/La6PW
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYxOTE1NTAy
-OVowLwYJKoZIhvcNAQkEMSIEII/fZn4RSpkWjs+K1CouaBN+lFLTetGT/HGblcvfb9w1MGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAZF3UeKEp1fX1
-qb4qMwFxPp240pSrWPJnjtAd+C45wLNgy0rvxM4a/SoZW03xflK6K8Fl2sIaPepLERERF9k/SLN+
-sGKrsSCE0JHDTjq9lRalv1UHVEgnrQe9JaVa/2Jcu33rllcOv0y0v+h8xuhyEY4JoqwCwsfh2RS/
-USZn9vxQnGeHPMJrQf/+avyLlRhzalNkQKst0yavMILRv7dtNS3yZifd0zWKDbka2nLfGRASnDks
-dYRXre7Ya2jJ2HT330wE+IzCUaFxW9jVr9Cs0+ODC5NreKR7ZIfmx+/9nak7UDPY2mcArLtOEjE4
-xr0q0POAiRD76lBIZxaUir34RsV+JesrNyvTOA5Ev0X2uGiSSgcJdESLKwdePjEWbUJL+ypcCHGY
-hr7pzpHQ11iGqk8P3pX2y/kMGk1Q2RTScOpGUB0kZsR3KpH5Dlfwi8e9oikKP4dDYgq86D5lXQlr
-yNT/iOP4fEtLYBDYePqZkgXLuECgWM6R1/91np3XXQKMa0YBiRMsbm4YUcpBQFExMtSyWVLXF7dS
-pdWKfJqV3UFbFsXf7UKtLLcxmnxSaDA69q4aJG+2zoYgTz07rJT2+KKi1DWTIeezUQIVoeegb+Ln
-gxTTxHkByue0WwZXarUb40fMbnMLt3JKR42IXHV74n6fslQNv5kwC9rDvP/Kj/gAAAAAAAA=
-
-
---=-8oYh6WC82njjqP/La6PW--
