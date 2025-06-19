@@ -1,147 +1,184 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0032C217737;
-	Thu, 19 Jun 2025 11:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4864921FF31;
+	Thu, 19 Jun 2025 11:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750333535; cv=none; b=VuQMTgJXNfHlHpc2rjBi2PmSJ033bx+bz5RJBQFmmIH2YSPfxsNkc6jH7v0a6VzfHSrv8vc5DfnOnbcRAvsisIVSq+mu2YHbIEn6jXb+6dvLFxF1w+5AXDWlnL93ekmVYAW6cKryxGV30ToSljuoF/UO4BLi2I5WQRi1LABneu0=
+	t=1750333548; cv=none; b=LugsCo/TaVVqrPCS8kIAtJM2oD4vQpxwkonrZd4MXxGxGHoPK5ENYE/cAjWLd6aJ3D3cvElht2LopNfF80/X+5UpZwDrFNLBdmaPOXthuAf+CTApOZg7MdAMUdzXPVK0NU7ouogzuKgVVNWbMvTPqZhFFjVDiAOMJqB2s7FhgEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750333535; c=relaxed/simple;
-	bh=XhR2GRxUYANy2ZjZ4aWduKFRjBbNRnBBbV5m0iHoHGs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G/sImjCMQU3aCV/3Xmy+Ozx8QQxYhUkj/idQC3nXgoabZJ43QoKveTrlrwW3NUh5xMFjPen4JXq8nBDMTuYeI/rSW9j0a+CxoP8osbJ/ecB65E4UJljAcz0ZgH2Yz98gCQgRlc1JZ6I8gPMiaAwAgKESnRaoa8hqBIC0jh9t5fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJVagwiB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750333548; c=relaxed/simple;
+	bh=vHD3lkaGKBaHMp6CdM1wZKNCsSPyM5DrFzrbeCyGBAY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b3iZUGqImRA0KJyG2SPO7VB8uEahqGHe+ABRKjzyCMpr1lcyT/Sbh52gSvrS1VmGuErtcc8nUkvgdjjqrL0xgIDIr8OVjEj6LsVAACR9zXDzSuc8vqZgKfS+VngqZH8L4m8E6n2gsmg8exQvT+k4+ebGFroKhY7KiMqB1zjdmpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sAQ/3Twk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJVagwiB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66832C4CEEA;
-	Thu, 19 Jun 2025 11:45:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sAQ/3Twk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1D00C4CEEA;
+	Thu, 19 Jun 2025 11:45:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750333533;
-	bh=XhR2GRxUYANy2ZjZ4aWduKFRjBbNRnBBbV5m0iHoHGs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qJVagwiBKkGWrKNGo+bnqpyiVCRj09ly2FQh74U1iltN4oFewlKg0aWp3FH62dDm3
-	 JUybYirHDPvejdTha/QyCLBWvcR/RLcctMTTQosXPO6HgtQvvNM5M2H8Sgpp+e184U
-	 ZbJRYTDhle32cGbXvjM0B//CnzhMs8Jg5H3WjRd051AyDYOUjK5PSFRlfgZgyFnagZ
-	 4ABokr+2fZJIiflKaMGwSWjVavgoZUZyGIF1pNHvkslU/BF8zU3zcMLfSs6lvX3Qm3
-	 OFqyVkkvnMN4fY3QHDAJoXui+ZoBkBjnhIwMHj+1nFKgIe7+z7/p83SmTBlHwZtvRS
-	 DbHw59axHZeEg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uSDhy-008EQG-NY;
-	Thu, 19 Jun 2025 12:45:30 +0100
-Date: Thu, 19 Jun 2025 12:45:30 +0100
-Message-ID: <86jz58c5ut.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Eric Auger <eauger@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	seanjc@google.com,
-	darren@os.amperecomputing.com
-Subject: Re: [RFC PATCH v2 0/9] KVM: Enable Nested Virt selftests
-In-Reply-To: <3be548bf-aee4-46ab-bcbf-15bf629b24da@os.amperecomputing.com>
-References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
-	<92c7e99c-5574-422c-92f1-62d5cde58fec@redhat.com>
-	<7bf7bd52-7553-42a7-afdb-a5e95f8699b5@os.amperecomputing.com>
-	<86a56veiyy.wl-maz@kernel.org>
-	<3be548bf-aee4-46ab-bcbf-15bf629b24da@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1750333547;
+	bh=vHD3lkaGKBaHMp6CdM1wZKNCsSPyM5DrFzrbeCyGBAY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sAQ/3TwkHh4tQny7cI0HaO5x3reXpZGwght1TNFGLHkVqT2VcLfQwYoafTXZdKJ8E
+	 pkEwQMfdQXLe9JopRJuwqPlDxDGVzpMStLRBs+PzCYRKs2iR7Tg48zGsuYtVaR1XMK
+	 P/U2Rohl3rmIQPiwEa70bQ3kqvJIz9Xbg8QHgFWkwfXfP1N8Cutc0AHM/HrVFk2qYD
+	 LQ5UZeix+K8IGaOplmtbU8EyaB2TDRexl+WovO2T/vvpbwxuxsvsESbp5bDJSesFrT
+	 9RgAJDhuRJxatju67tTg932hwF/eHBvcS+QL/D3qKE0lA7w1iyk458gB3R9tpDEqNn
+	 HwWiUp9bNwWyg==
+Date: Thu, 19 Jun 2025 17:01:30 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v3 17/62] KVM: SVM: Add enable_ipiv param, never set
+ IsRunning if disabled
+Message-ID: <2eqjnjnszlmhlnvw6kcve4exjnpy7skguypwtmxutb2gecs3an@gcou53thsqww>
+References: <20250611224604.313496-2-seanjc@google.com>
+ <20250611224604.313496-19-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, eauger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, darren@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611224604.313496-19-seanjc@google.com>
 
-On Thu, 19 Jun 2025 10:40:15 +0100,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Wed, Jun 11, 2025 at 03:45:20PM -0700, Sean Christopherson wrote:
+> From: Maxim Levitsky <mlevitsk@redhat.com>
 > 
+> Let userspace "disable" IPI virtualization for AVIC via the enable_ipiv
+> module param, by never setting IsRunning.  SVM doesn't provide a way to
+> disable IPI virtualization in hardware, but by ensuring CPUs never see
+> IsRunning=1, every IPI in the guest (except for self-IPIs) will generate a
+> VM-Exit.
+
+I think this is good to have regardless of the erratum. Not sure about VMX,
+but does it make sense to intercept writes to the self-ipi MSR as well?
+
 > 
-> [Sorry for late reply]
+> To avoid setting the real IsRunning bit, while still allowing KVM to use
+> each vCPU's entry to update GA log entries, simply maintain a shadow of
+> the entry, without propagating IsRunning updates to the real table when
+> IPI virtualization is disabled.
 > 
-> On 5/29/2025 5:18 PM, Marc Zyngier wrote:
-> > On Thu, 29 May 2025 11:29:58 +0100,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >> 
-> >> 
-> >> Hi Eric,
-> >> 
-> >> On 5/28/2025 6:58 PM, Eric Auger wrote:
-> >>> Hi Ganapatrao,
-> >>> 
-> >>> On 5/12/25 12:52 PM, Ganapatrao Kulkarni wrote:
-> >>>> This patch series makes the selftest work with NV enabled. The guest code
-> >>>> is run in vEL2 instead of EL1. We add a command line option to enable
-> >>>> testing of NV. The NV tests are disabled by default.
-> >>> 
-> >>> For commodity, I would add in the coverletter that for all tests
-> >>> enhanced with vEL2 testing "-g 1" option shall be added to force that mode.
-> >> 
-> >> Sure, will do.
-> >> 
-> >>> 
-> >>> I don't really get how you chose tests capable to run at vEL2 and
-> >>> excluded others? Wouldn't it make sense to have a way to run all tests
-> >>> in either mode?
-> >> There is no selection as such. I have worked on around 50% of the tests and sent for the early review.
-> >> Yes, almost all tests can/should run in vEL2 except few.
-> > 
-> > Define EL2. You are so far assuming a E2H RES1 guest, and I don't see
-> > anything that is even trying E2H RES0. After all the complaining that
+> Providing a way to effectively disable IPI virtualization will allow KVM
+> to safely enable AVIC on hardware that is susceptible to erratum #1235,
+> which causes hardware to sometimes fail to detect that the IsRunning bit
+> has been cleared by software.
 > 
-> Sure, I will mention that default test code runs in EL2 with E2H enabled.
-> The tests code is in vEL2 with E2H RES1 by default, since host is booted with VHE.
-
-Sight... You are still confused with what KVM does. With NV, the host
-is *always* VHE. The guest can be VHE (E2H RES1) or nVHE (E2H RES0).
-
-> > E2H0 wasn't initially supported, this is a bit... disappointing.
-> IIRC, I was mentioning about L1 switching between arch mmu table and guest mmu table(VMID 0).
-> I don't remember why It was switching.
-
--ENOPARSE.
-
->  > 
-> > Also, running EL2 is the least of our worries, because that's pretty
-> > easy to deal with. It is running at EL1/0 when EL2 is present that is
-> > interesting, and I see no coverage on that front.
+> Note, the table _must_ be fully populated, as broadcast IPIs skip invalid
+> entries, i.e. won't generate VM-Exit if every entry is invalid, and so
+> simply pointing the VMCB at a common dummy table won't work.
 > 
-> Sorry, I did not get this comment fully.
-> When we run selftest on Host with -g option, the guest code will run in vEL2 as L1.
-> This is implemented as per comment in V1.
+> Alternatively, KVM could allocate a shadow of the entire table, but that'd
+> be a waste of 4KiB since the per-vCPU entry doesn't actually consume an
+> additional 8 bytes of memory (vCPU structures are large enough that they
+> are backed by order-N pages).
 > 
-> When we run same selftest from L1 shell, then guest_code will be running in EL0/1 like running from L0.
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> [sean: keep "entry" variables, reuse enable_ipiv, split from erratum]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 32 ++++++++++++++++++++++++++------
+>  arch/x86/kvm/svm/svm.c  |  2 ++
+>  arch/x86/kvm/svm/svm.h  |  8 ++++++++
+>  3 files changed, 36 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 0c0be274d29e..48c737e1200a 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -292,6 +292,13 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
+>  	/* Setting AVIC backing page address in the phy APIC ID table */
+>  	new_entry = avic_get_backing_page_address(svm) |
+>  		    AVIC_PHYSICAL_ID_ENTRY_VALID_MASK;
+> +	svm->avic_physical_id_entry = new_entry;
+> +
+> +	/*
+> +	 * Initialize the real table, as vCPUs must have a valid entry in order
+> +	 * for broadcast IPIs to function correctly (broadcast IPIs ignore
+> +	 * invalid entries, i.e. aren't guaranteed to generate a VM-Exit).
+> +	 */
+>  	WRITE_ONCE(kvm_svm->avic_physical_id_table[id], new_entry);
+>  
+>  	return 0;
+> @@ -769,8 +776,6 @@ static int svm_ir_list_add(struct vcpu_svm *svm,
+>  			   struct amd_iommu_pi_data *pi)
+>  {
+>  	struct kvm_vcpu *vcpu = &svm->vcpu;
+> -	struct kvm *kvm = vcpu->kvm;
+> -	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
+>  	unsigned long flags;
+>  	u64 entry;
+>  
+> @@ -788,7 +793,7 @@ static int svm_ir_list_add(struct vcpu_svm *svm,
+>  	 * will update the pCPU info when the vCPU awkened and/or scheduled in.
+>  	 * See also avic_vcpu_load().
+>  	 */
+> -	entry = READ_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id]);
+> +	entry = svm->avic_physical_id_entry;
+>  	if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
+>  		amd_iommu_update_ga(entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK,
+>  				    true, pi->ir_data);
+> @@ -998,14 +1003,26 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	 */
+>  	spin_lock_irqsave(&svm->ir_list_lock, flags);
+>  
+> -	entry = READ_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id]);
+> +	entry = svm->avic_physical_id_entry;
+>  	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
+>  
+>  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
+>  	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
+>  	entry |= AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+>  
+> +	svm->avic_physical_id_entry = entry;
+> +
+> +	/*
+> +	 * If IPI virtualization is disabled, clear IsRunning when updating the
+> +	 * actual Physical ID table, so that the CPU never sees IsRunning=1.
+> +	 * Keep the APIC ID up-to-date in the entry to minimize the chances of
+> +	 * things going sideways if hardware peeks at the ID.
+> +	 */
+> +	if (!enable_ipiv)
+> +		entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+> +
+>  	WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
+> +
+>  	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, true);
+>  
+>  	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
+> @@ -1030,7 +1047,7 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+>  	 * can't be scheduled out and thus avic_vcpu_{put,load}() can't run
+>  	 * recursively.
+>  	 */
+> -	entry = READ_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id]);
+> +	entry = svm->avic_physical_id_entry;
+>  
+>  	/* Nothing to do if IsRunning == '0' due to vCPU blocking. */
+>  	if (!(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK))
+> @@ -1049,7 +1066,10 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+>  	avic_update_iommu_vcpu_affinity(vcpu, -1, 0);
+>  
+>  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+> -	WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
+> +	svm->avic_physical_id_entry = entry;
+> +
+> +	if (enable_ipiv)
+> +		WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
 
-What good does this bring us if we need to boot a full guest OS to run
-tests? What we need is synthetic tests that implement the whole stack:
+If enable_ipiv is false, then isRunning bit will never be set and we 
+would have bailed out earlier. So, the check for enable_ipiv can be 
+dropped here (or converted into an assert).
 
-- L1 guest hypervisor
-- L2 guest hypervisor
-- L2 guest
-- L3 guest hypervisor
-- L3 guest
-- [...]
+- Naveen
 
-This is *one* test. Not a test that runs in a guest. That's what I've
-been asking since day one.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
