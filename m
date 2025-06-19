@@ -1,75 +1,147 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F258822756A;
-	Thu, 19 Jun 2025 11:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0032C217737;
+	Thu, 19 Jun 2025 11:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750331773; cv=none; b=Cn02xStyC0hyHXZB+tSkdHRBQVntTkFf5GIobq//SVIyYhOYWwJVgVlFob1QbAOe5wYqMNx48N2qDpGbLAU67ZMEiKUN4cIotu52VPOavYMAjxKZx0lq27+SXJMzPFmU+9FySKVHmhvlFZfJQknq1Gk64UVhpGRJR+mUcFq2w0g=
+	t=1750333535; cv=none; b=VuQMTgJXNfHlHpc2rjBi2PmSJ033bx+bz5RJBQFmmIH2YSPfxsNkc6jH7v0a6VzfHSrv8vc5DfnOnbcRAvsisIVSq+mu2YHbIEn6jXb+6dvLFxF1w+5AXDWlnL93ekmVYAW6cKryxGV30ToSljuoF/UO4BLi2I5WQRi1LABneu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750331773; c=relaxed/simple;
-	bh=jea73dDCsJTbDnvK9qLSZgHnRvFrbqUdo+tNLbeXebg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pSk8nsCAUPl63ktknm1zTf4EtcIlVPDA285sDsARt75LFA+MlXnAuTvUxxbGYeehoKzd8u6YRn5Uhe/GYmKWHwkTw8QciCpG8VsH4rIjcTWjk/EhHR3/87aXOOtkmu2BqQSd2JPf0EODDvBlF6CzdhXVFIUjk/3TN8/tY58qRbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NpjDXNnv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750333535; c=relaxed/simple;
+	bh=XhR2GRxUYANy2ZjZ4aWduKFRjBbNRnBBbV5m0iHoHGs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G/sImjCMQU3aCV/3Xmy+Ozx8QQxYhUkj/idQC3nXgoabZJ43QoKveTrlrwW3NUh5xMFjPen4JXq8nBDMTuYeI/rSW9j0a+CxoP8osbJ/ecB65E4UJljAcz0ZgH2Yz98gCQgRlc1JZ6I8gPMiaAwAgKESnRaoa8hqBIC0jh9t5fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJVagwiB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NpjDXNnv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4900C4CEF2;
-	Thu, 19 Jun 2025 11:16:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJVagwiB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66832C4CEEA;
+	Thu, 19 Jun 2025 11:45:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750331772;
-	bh=jea73dDCsJTbDnvK9qLSZgHnRvFrbqUdo+tNLbeXebg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NpjDXNnvhgyelNAPwYMk/Zg6boRmLZoy4OsyTJJvgCN53kEJ9bOHRqd5nFt+KWe5A
-	 Jzx9eI/IHaFsxchjXd5uRkht7+rd0bI3lHnzNGwivbQnlb4LKJBZg0eEGvGOWoB3+t
-	 xzA5+CHkxoUeF6quvSATgOx0jdlJDhrqNDB3nLr8AAthJO+mv/t8757yq3HiOmgamE
-	 eBZm0yFwN+Awj17xBCsdjw3mTq0pMD6WTc5r+McIlDma/9a8i62AwBcpfydl3NEh39
-	 XdXxlzenW3/Oa+qXV+ktyUCxWwRwEkWoqRlblB8ZU6MBUUD7bHrRENd5Vd39PcEkSQ
-	 EKtChBTGgVlow==
-Date: Thu, 19 Jun 2025 16:39:37 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
-	David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 15/62] KVM: SVM: Drop superfluous "cache" of AVIC
- Physical ID entry pointer
-Message-ID: <bknceu6nswhlz2c6lx3zc4afnrmq63dsriqctexincvs5jjk6v@7wlm2lf4czlh>
-References: <20250611224604.313496-2-seanjc@google.com>
- <20250611224604.313496-17-seanjc@google.com>
+	s=k20201202; t=1750333533;
+	bh=XhR2GRxUYANy2ZjZ4aWduKFRjBbNRnBBbV5m0iHoHGs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qJVagwiBKkGWrKNGo+bnqpyiVCRj09ly2FQh74U1iltN4oFewlKg0aWp3FH62dDm3
+	 JUybYirHDPvejdTha/QyCLBWvcR/RLcctMTTQosXPO6HgtQvvNM5M2H8Sgpp+e184U
+	 ZbJRYTDhle32cGbXvjM0B//CnzhMs8Jg5H3WjRd051AyDYOUjK5PSFRlfgZgyFnagZ
+	 4ABokr+2fZJIiflKaMGwSWjVavgoZUZyGIF1pNHvkslU/BF8zU3zcMLfSs6lvX3Qm3
+	 OFqyVkkvnMN4fY3QHDAJoXui+ZoBkBjnhIwMHj+1nFKgIe7+z7/p83SmTBlHwZtvRS
+	 DbHw59axHZeEg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uSDhy-008EQG-NY;
+	Thu, 19 Jun 2025 12:45:30 +0100
+Date: Thu, 19 Jun 2025 12:45:30 +0100
+Message-ID: <86jz58c5ut.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: Eric Auger <eauger@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	seanjc@google.com,
+	darren@os.amperecomputing.com
+Subject: Re: [RFC PATCH v2 0/9] KVM: Enable Nested Virt selftests
+In-Reply-To: <3be548bf-aee4-46ab-bcbf-15bf629b24da@os.amperecomputing.com>
+References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
+	<92c7e99c-5574-422c-92f1-62d5cde58fec@redhat.com>
+	<7bf7bd52-7553-42a7-afdb-a5e95f8699b5@os.amperecomputing.com>
+	<86a56veiyy.wl-maz@kernel.org>
+	<3be548bf-aee4-46ab-bcbf-15bf629b24da@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611224604.313496-17-seanjc@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, eauger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, darren@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jun 11, 2025 at 03:45:18PM -0700, Sean Christopherson wrote:
-> Drop the vCPU's pointer to its AVIC Physical ID entry, and simply index
-> the table directly.  Caching a pointer address is completely unnecessary
-> for performance, and while the field technically caches the result of the
-> pointer calculation, it's all too easy to misinterpret the name and think
-> that the field somehow caches the _data_ in the table.
+On Thu, 19 Jun 2025 10:40:15 +0100,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> No functional change intended.
 > 
-> Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 27 +++++++++++++++------------
->  arch/x86/kvm/svm/svm.h  |  1 -
->  2 files changed, 15 insertions(+), 13 deletions(-)
+> [Sorry for late reply]
+> 
+> On 5/29/2025 5:18 PM, Marc Zyngier wrote:
+> > On Thu, 29 May 2025 11:29:58 +0100,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> Hi Eric,
+> >> 
+> >> On 5/28/2025 6:58 PM, Eric Auger wrote:
+> >>> Hi Ganapatrao,
+> >>> 
+> >>> On 5/12/25 12:52 PM, Ganapatrao Kulkarni wrote:
+> >>>> This patch series makes the selftest work with NV enabled. The guest code
+> >>>> is run in vEL2 instead of EL1. We add a command line option to enable
+> >>>> testing of NV. The NV tests are disabled by default.
+> >>> 
+> >>> For commodity, I would add in the coverletter that for all tests
+> >>> enhanced with vEL2 testing "-g 1" option shall be added to force that mode.
+> >> 
+> >> Sure, will do.
+> >> 
+> >>> 
+> >>> I don't really get how you chose tests capable to run at vEL2 and
+> >>> excluded others? Wouldn't it make sense to have a way to run all tests
+> >>> in either mode?
+> >> There is no selection as such. I have worked on around 50% of the tests and sent for the early review.
+> >> Yes, almost all tests can/should run in vEL2 except few.
+> > 
+> > Define EL2. You are so far assuming a E2H RES1 guest, and I don't see
+> > anything that is even trying E2H RES0. After all the complaining that
+> 
+> Sure, I will mention that default test code runs in EL2 with E2H enabled.
+> The tests code is in vEL2 with E2H RES1 by default, since host is booted with VHE.
 
-Reviewed-by: Naveen N Rao (AMD) <naveen@kernel.org>
+Sight... You are still confused with what KVM does. With NV, the host
+is *always* VHE. The guest can be VHE (E2H RES1) or nVHE (E2H RES0).
 
-- Naveen
+> > E2H0 wasn't initially supported, this is a bit... disappointing.
+> IIRC, I was mentioning about L1 switching between arch mmu table and guest mmu table(VMID 0).
+> I don't remember why It was switching.
 
+-ENOPARSE.
+
+>  > 
+> > Also, running EL2 is the least of our worries, because that's pretty
+> > easy to deal with. It is running at EL1/0 when EL2 is present that is
+> > interesting, and I see no coverage on that front.
+> 
+> Sorry, I did not get this comment fully.
+> When we run selftest on Host with -g option, the guest code will run in vEL2 as L1.
+> This is implemented as per comment in V1.
+> 
+> When we run same selftest from L1 shell, then guest_code will be running in EL0/1 like running from L0.
+
+What good does this bring us if we need to boot a full guest OS to run
+tests? What we need is synthetic tests that implement the whole stack:
+
+- L1 guest hypervisor
+- L2 guest hypervisor
+- L2 guest
+- L3 guest hypervisor
+- L3 guest
+- [...]
+
+This is *one* test. Not a test that runs in a guest. That's what I've
+been asking since day one.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
