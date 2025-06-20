@@ -1,55 +1,55 @@
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F63241105
-	for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 22:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C89242D77
+	for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 22:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750457922; cv=none; b=OJNJQMU1N1boTvGLLF48fGHULliLKW6syGjmAJmt1UsDAPlsaNqnqBii2giNBs8nLzrBrWESA0Qkk79qhyhw+NEwc29CitBCnKV+iNoB21OZpb37sxHtBhPIjH+w4yNXsx5UX0DyirUwgmAdkW50YtTB0XoYWwn4OyiGvzad0R8=
+	t=1750457924; cv=none; b=j4pygjeuZ9LBOYKyyoSzw8RsoIfQwDIaGwjkzvXcfp6m9tLK/qLvcS8OoQMPd82YqKX3lS/623ThcFeaxdyASrJYC9RG0rhmyxbQK+wxFj+oqU/98dgE3yvkxbi35C1OkQWfZw3I+gpmFGftuYpZyChS0hZduMAwJZtAfxtfFJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750457922; c=relaxed/simple;
-	bh=hEI+Ws5Ed4T0XYMyDeyGmT0ZhHqtHUDKeUxZmkH++E0=;
+	s=arc-20240116; t=1750457924; c=relaxed/simple;
+	bh=I3e4uNmpE9tSGaln+NGHh3+Y0TBXHnLrzFPU+vvpM20=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AY/YFlDzIqOBhd+l/DYG9wVLJ/ANCL3IOLCbIvZxOmPyuz07UQxrYeOfljvjhWNRHSfJzpXta5P99UfvGA+4y+feT8MpE3CifPAKOZggeUwiyOVOF057cLHIVgE2rd71p1+Xmwe2eh2glbUXcoFgmnum15+BhS0fWdK8N4iEdEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h8fz16Te; arc=none smtp.client-ip=209.85.166.201
+	 To:Cc:Content-Type; b=Yx6w5Xk/Iwv+1fKlmJRdFwTpi0cwxuAB4qyQcPbBrXU5YJimeVhUjtDawPJNsb+AqYC9jbETN1YhaaqQk84qJgpl3zpu+ZL7+zhbJzlnJnuGqiXhZjUq9HYQSPS+AyGbITLfOGVC391eO8OJAGP4Qh5Jtd475WdU8SwJAHQja0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IkiNiFiU; arc=none smtp.client-ip=209.85.167.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h8fz16Te"
-Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3ddc1af1e5bso53318615ab.0
-        for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 15:18:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IkiNiFiU"
+Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-40a72c039e3so728527b6e.1
+        for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 15:18:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750457919; x=1751062719; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750457921; x=1751062721; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tzpL3Ld7f3Wg7N4Mr5qllGNQ06XKr05fHXYYgZEl88s=;
-        b=h8fz16Te3eyVCuOFt8Rjqt7zdSjouLULGyNJMX/CPRkGxxvb61xGOE2mTT7YzOsknM
-         sAzfKPhvjcnVfrHN9hUJn74rrvoXV8MpS0Pk7jgDvfAw4g8yzWblyd2OrpX2npHtU1Ms
-         gYRW1/a7qIFCAh8/35c7Ahm+wgeQnrHWVcecuBKDk6bOrNsw2uiahXPv6TH8Xu3t4USO
-         r1/nm/8CaSObxwpYv7o5UYQi0m3FPkLICXcvJFIAhOTTJVDKhxFRN45y+9WOaZbxlHSt
-         dcNnxxVlAw8atmVzEGyxmMGiG0n6XuHOdsQ+BA0RUXKtQ1eYUPRsbA5CgPFFXSziNpD8
-         oxYA==
+        bh=GWHD159eEkEd2RVAASCwDxR2pqbhwMR1y9w3LokBHQQ=;
+        b=IkiNiFiUXYuTsLKs8hb3x/ZYTDX5qXp4dH0Lt8TcTCeKsZZxAqhQsELXN5VCLzIcFu
+         pumMp+u3bQmR3iznK8A/PgCbE5GDXhh5mqL9nNo+hscQyaestXWBaZMNpPX5YfxrMt9J
+         NOTMKnOB3oAHgmIZbF68B0AmjCWd1m7gXSY/qd0KN8jdZc1kXfn/mDT/3y01ENVUTgJk
+         +X2dUwhM+fAaB4N08SRPpuvrONbqtwScXKW7Se0hO/OxR115t5nkYvLAyildRWfrh/ob
+         MYwsPCdVmocvErDWdFTEqeaCD+mrIWsGZa8Ra7BL0melpd7HiR6zJyPN8a8PhpGg209g
+         bkrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750457919; x=1751062719;
+        d=1e100.net; s=20230601; t=1750457921; x=1751062721;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tzpL3Ld7f3Wg7N4Mr5qllGNQ06XKr05fHXYYgZEl88s=;
-        b=Nw8/s/9S+3LvOEaVn3OOuuIdrcaFEUyWkHTZspF4TGfgNuivXcjGTr+ZXi0rBRqgnQ
-         104RgbsUpL9zu8A/Kyampj1W70Xu8FfKYluDy41VtljMQD+D+15lPTl+nAHWVmLOz+/q
-         OA4zQSIxges8taz2kUZ020fSN/fmbAgeKG8/u0hf/FY0U1kxuEdiQzLPcL97O5KK0bKp
-         n+gFypgv33o1eLRDLB3i87D291GpknDyR105PEURSq9u3Y0aMXKdEwgvhk93koK8yg+c
-         lvL2eJXAP5Al6jdszZZroua5mjDDgDL1P6kApv7rVE4DjbpoY/H9J5S47DT1NfIaOnsB
-         gb3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU0hAfYdrqbqcAWcM8lF93unOHm8Ow5R3wu0vuhmm4AMAzBQ1Q60JQWCwtBXD/SDj2jNh5045M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxDfynHSFyjMYNJob1PutZhYba41jEpuOoPM7sstW6iFFN8msH4
-	P1hW79oZ9wUwjFEPuNQwlitOPU+Q0dPgYWgMC29NIi6q3+W6OGy/QMWh+aEtsdq8/KH9GAGCdAo
-	vQ0KwFtSrMI5ArhFBCMxnUOCXvg==
-X-Google-Smtp-Source: AGHT+IGe+i459NmOZi236cX8Bur8HwnWegO6n5YG8V2oQ3pdTXQJfj8y4MrKY8v3FuSI+vF/XixyV2nwOspzfQufmQ==
-X-Received: from ilbea3.prod.google.com ([2002:a05:6e02:4503:b0:3dd:d24f:26bc])
+        bh=GWHD159eEkEd2RVAASCwDxR2pqbhwMR1y9w3LokBHQQ=;
+        b=bEJO4CzknYO+MM3wS/E1YPqOWrAX7XQXcAL+CaTJC1ONt6fpmJtqTMtbNcTJ9AJXZE
+         9mmrVlPNrVjpe1CVVQbCRMgpO68bCpai+vSs4y3F9UknJkhHqLWrHehimNSLoQNtvTfo
+         0nhjr1/VWGQ8xI7l/icXH8PcQE0NVixN8AKBmuR0LhwISgpYW5QqZ3eBjAfVr9cZGO14
+         I9/9HWSOD6pae8PzgRJpzLpbPzJkUns51Tc+Xk2uZ17Sn3Tz46ss1PB2LuNHbzzjYVM/
+         MXNupo7V8Z9KuHB/QyY8bpkKHNw98qx3OXuSgUi+gf6bAvdVqGGu2upy+CKm49J/7hLK
+         8pOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWKIKQDrlP6t7eo9AmCO1tZQL13Zt7hY5cZ7I6S/q15ug21R/6Am8YHMHwHP8v4qG+voJgjWgo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzAt6Mlr6T9ewDq4JOXxK4Iiv1YGR4+qJAPVaM46rS7hMMDihiP
+	DkDYuM6UvM04S9wNbpsOCoF9SE+G388ws9l7gmL5MsxJk7E8HDHeDKD6gQ068K5EDAdfC8jT4ct
+	qrbIC9lusCrhRbUonOH8Zs9HmhQ==
+X-Google-Smtp-Source: AGHT+IF2OKmMZlYWXREsJ8oFrgMGWLo7kWe5ClPilcLSMHKtRvIA2tl/nLM95GtmJ2ppZK9UqlnZUllLoCroliosBg==
+X-Received: from oibko5.prod.google.com ([2002:a05:6808:6905:b0:407:ab9e:f086])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a92:cd83:0:b0:3dd:cdea:8f85 with SMTP id e9e14a558f8ab-3de38cc7adbmr52345645ab.20.1750457919574;
- Fri, 20 Jun 2025 15:18:39 -0700 (PDT)
-Date: Fri, 20 Jun 2025 22:13:04 +0000
+ 2002:a05:6808:1584:b0:406:6fd3:ff18 with SMTP id 5614622812f47-40ac7141518mr3848175b6e.34.1750457920632;
+ Fri, 20 Jun 2025 15:18:40 -0700 (PDT)
+Date: Fri, 20 Jun 2025 22:13:05 +0000
 In-Reply-To: <20250620221326.1261128-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250620221326.1261128-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
-Message-ID: <20250620221326.1261128-5-coltonlewis@google.com>
-Subject: [PATCH v2 04/23] arm64: Define PMI{CNTR,FILTR}_EL0 as undef_access
+Message-ID: <20250620221326.1261128-6-coltonlewis@google.com>
+Subject: [PATCH v2 05/23] KVM: arm64: Cleanup PMU includes
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -74,28 +74,241 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Because KVM isn't fully prepared to support these yet even though the
-host PMUv3 driver does, define them as undef_access for now.
+From: Marc Zyngier <maz@kernel.org>
 
+asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
+which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
+causes compilation problems why trying to use anything defined in any
+of the headers in any other headers.
+
+Reorganize these tangled headers. In particular:
+
+* Move the declarations defining the interface between KVM and PMU to
+  its own header asm/kvm_pmu.h that can be used without the problem
+  described above.
+
+* Delete kvm/arm_pmu.h. These functions are mostly internal to KVM and
+  should go in asm/kvm_host.h.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/include/asm/arm_pmuv3.h      |  2 +-
+ arch/arm64/include/asm/kvm_host.h       | 15 +--------------
+ arch/arm64/include/asm/kvm_pmu.h        |  9 +++++++++
+ arch/arm64/kvm/debug.c                  |  1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  1 +
+ arch/arm64/kvm/pmu-emul.c               |  4 +++-
+ arch/arm64/kvm/pmu.c                    |  2 ++
+ arch/arm64/kvm/sys_regs.c               |  1 +
+ include/linux/perf/arm_pmu.h            | 14 ++++++++------
+ virt/kvm/kvm_main.c                     |  1 +
+ 10 files changed, 28 insertions(+), 22 deletions(-)
 
+diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
+index 8a777dec8d88..32c003a7b810 100644
+--- a/arch/arm64/include/asm/arm_pmuv3.h
++++ b/arch/arm64/include/asm/arm_pmuv3.h
+@@ -6,7 +6,7 @@
+ #ifndef __ASM_PMUV3_H
+ #define __ASM_PMUV3_H
+ 
+-#include <asm/kvm_host.h>
++#include <asm/kvm_pmu.h>
+ 
+ #include <asm/cpufeature.h>
+ #include <asm/sysreg.h>
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 27ed26bd4381..2df76689381a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -14,6 +14,7 @@
+ #include <linux/arm-smccc.h>
+ #include <linux/bitmap.h>
+ #include <linux/types.h>
++#include <linux/irq_work.h>
+ #include <linux/jump_label.h>
+ #include <linux/kvm_types.h>
+ #include <linux/maple_tree.h>
+@@ -1487,25 +1488,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+ 
+-static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
+-{
+-	return (!has_vhe() && attr->exclude_host);
+-}
+-
+ #ifdef CONFIG_KVM
+-void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+-void kvm_clr_pmu_events(u64 clr);
+-bool kvm_set_pmuserenr(u64 val);
+ void kvm_enable_trbe(void);
+ void kvm_disable_trbe(void);
+ void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
+ #else
+-static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
+-static inline void kvm_clr_pmu_events(u64 clr) {}
+-static inline bool kvm_set_pmuserenr(u64 val)
+-{
+-	return false;
+-}
+ static inline void kvm_enable_trbe(void) {}
+ static inline void kvm_disable_trbe(void) {}
+ static inline void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest) {}
+diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
+index baf028d19dfc..a44f712668b5 100644
+--- a/arch/arm64/include/asm/kvm_pmu.h
++++ b/arch/arm64/include/asm/kvm_pmu.h
+@@ -14,6 +14,11 @@
+ 
+ #define KVM_ARMV8_PMU_MAX_COUNTERS	32
+ 
++#define kvm_pmu_counter_deferred(attr)			\
++	({						\
++		!has_vhe() && (attr)->exclude_host;	\
++	})
++
+ #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
+ struct kvm_pmc {
+ 	u8 idx;	/* index into the pmu->pmc array */
+@@ -68,9 +73,13 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
+ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+ 
+ struct kvm_pmu_events *kvm_get_pmu_events(void);
++void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
++void kvm_clr_pmu_events(u64 clr);
++bool kvm_set_pmuserenr(u64 val);
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_resync_el0(void);
++void kvm_host_pmu_init(struct arm_pmu *pmu);
+ 
+ #define kvm_vcpu_has_pmu(vcpu)					\
+ 	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index 1a7dab333f55..a554c3e368dc 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -9,6 +9,7 @@
+ 
+ #include <linux/kvm_host.h>
+ #include <linux/hw_breakpoint.h>
++#include <linux/perf/arm_pmuv3.h>
+ 
+ #include <asm/debug-monitors.h>
+ #include <asm/kvm_asm.h>
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 7599844908c0..825b81749972 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -14,6 +14,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/types.h>
+ #include <linux/jump_label.h>
++#include <linux/perf/arm_pmuv3.h>
+ #include <uapi/linux/psci.h>
+ 
+ #include <asm/barrier.h>
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index dcdd80ffd49d..b9882085394e 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -8,8 +8,8 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/list.h>
+-#include <linux/perf_event.h>
+ #include <linux/perf/arm_pmu.h>
++#include <linux/perf/arm_pmuv3.h>
+ #include <linux/uaccess.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_pmu.h>
+@@ -24,6 +24,8 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc);
+ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc);
+ static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc);
+ 
++#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
++
+ bool kvm_supports_guest_pmuv3(void)
+ {
+ 	guard(mutex)(&arm_pmus_lock);
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index 6b48a3d16d0d..8bfc6b0a85f6 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -8,6 +8,8 @@
+ #include <linux/perf/arm_pmu.h>
+ #include <linux/perf/arm_pmuv3.h>
+ 
++#include <asm/kvm_pmu.h>
++
+ static DEFINE_PER_CPU(struct kvm_pmu_events, kvm_pmu_events);
+ 
+ /*
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 76c2f0da821f..99fdbe174202 100644
+index 99fdbe174202..eaff6d63ef77 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -3092,6 +3092,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
- 	{ SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
+@@ -18,6 +18,7 @@
+ #include <linux/printk.h>
+ #include <linux/uaccess.h>
+ #include <linux/irqchip/arm-gic-v3.h>
++#include <linux/perf/arm_pmuv3.h>
  
-+	{ SYS_DESC(SYS_PMICNTR_EL0), undef_access },
-+	{ SYS_DESC(SYS_PMICFILTR_EL0), undef_access },
+ #include <asm/arm_pmuv3.h>
+ #include <asm/cacheflush.h>
+diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+index 6dc5e0cd76ca..1de206b09616 100644
+--- a/include/linux/perf/arm_pmu.h
++++ b/include/linux/perf/arm_pmu.h
+@@ -13,6 +13,9 @@
+ #include <linux/platform_device.h>
+ #include <linux/sysfs.h>
+ #include <asm/cputype.h>
++#ifdef CONFIG_ARM64
++#include <asm/kvm_pmu.h>
++#endif
+ 
+ #ifdef CONFIG_ARM_PMU
+ 
+@@ -25,6 +28,11 @@
+ #else
+ #define ARMPMU_MAX_HWEVENTS		33
+ #endif
 +
- 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
- 	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
- 	{ PMU_SYS_REG(PMCNTENSET_EL0),
++#ifdef CONFIG_ARM
++#define kvm_host_pmu_init(_x) { (void)_x; }
++#endif
++
+ /*
+  * ARM PMU hw_event flags
+  */
+@@ -170,12 +178,6 @@ int arm_pmu_acpi_probe(armpmu_init_fn init_fn);
+ static inline int arm_pmu_acpi_probe(armpmu_init_fn init_fn) { return 0; }
+ #endif
+ 
+-#ifdef CONFIG_KVM
+-void kvm_host_pmu_init(struct arm_pmu *pmu);
+-#else
+-#define kvm_host_pmu_init(x)	do { } while(0)
+-#endif
+-
+ bool arm_pmu_irq_is_nmi(void);
+ 
+ /* Internal functions only for core arm_pmu code */
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e2f6344256ce..25259fcf3115 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -48,6 +48,7 @@
+ #include <linux/lockdep.h>
+ #include <linux/kthread.h>
+ #include <linux/suspend.h>
++#include <linux/perf_event.h>
+ 
+ #include <asm/processor.h>
+ #include <asm/ioctl.h>
 -- 
 2.50.0.714.g196bf9f422-goog
 
