@@ -1,105 +1,109 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344EE28DB4A
-	for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 13:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED24A28E56B
+	for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 14:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750427005; cv=none; b=bUAZkep6F8P1b2Fusb7H/gErGboQe5b0hNGawPYIVlhC3xXLTD5BRslZkbnpgtz1cn5JcgoDka7NGPyvvaT1fdZvhj7OniTKl924vxpZK743C4gSgr8Rfs1sBLfeARdz/yBwcZu3d0D3q6b+162FJKST3FXdXLIIElSoQt6bNlc=
+	t=1750430360; cv=none; b=sfYOxX09eOn/eJ5ZfyBlpynu54WXvrzPP4myG71FpUmXMto47/nlp43BaW5GNlzRPepBHGtqGFsA9cAVPDbT5ukpWwy2mCn+0Gf6jblLLVJHdMr1281WkoiKQbzCviLRtRZx1v6azTKnebyGiNTNdbVWLJrj8rTK8bT8mL3iLeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750427005; c=relaxed/simple;
-	bh=lrcNUHtlReWoZSxDZS/NaNmUP4pH6w+Aw1Kv5g7uJcM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ffW2bnQ3B3bOrkqLy4I65thHntnLj1nARNFR43R4B8xsy6aHrnRy+VnCof057EyI9dA3Th2xHuy5l4qm9RdbaCQDbfwxse7hgJXa1sioMENMMxWq8wKUZEISuaSJ6ebBnrJ4o5816MUfOK0Zq5/395CacKV+CbBIpkMvjrs7SxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ECABE16F2;
-	Fri, 20 Jun 2025 06:43:02 -0700 (PDT)
-Received: from arm.com (unknown [10.57.84.252])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E18063F673;
-	Fri, 20 Jun 2025 06:43:20 -0700 (PDT)
-Date: Fri, 20 Jun 2025 14:43:16 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH kvmtool 2/3] arm64: Initial nested virt support
-Message-ID: <aFVldEvilsGrM34y@arm.com>
-References: <20250620104454.1384132-1-andre.przywara@arm.com>
- <20250620104454.1384132-3-andre.przywara@arm.com>
- <aFVBckcGYQgF+UXO@arm.com>
- <86h60ad40n.wl-maz@kernel.org>
+	s=arc-20240116; t=1750430360; c=relaxed/simple;
+	bh=f0ERDdgXgTFaM2bAnZ1S200y/0WNSgNRatRYt7yg6uI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dcOO5pSRpOun7Dg+KQ2y3Ddsnx4y3qo7z3uPcaB70nJGgSU7fVPUeMN3PkSrp63EiWUpPQbOf8k27yLrIJXV40FopInfCv0/DAAZ6VlWomedpv8rs505dDP6Fm8vFYoB+lKCaoxEr0x6ceI9/j25RDLLJELXBAkGLLesqhG3MeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SJ1fh/it; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SJ1fh/it"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313c3915345so2805292a91.3
+        for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 07:39:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750430358; x=1751035158; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9hYeG/lN/dobWu+WOAuHe6WhQ/AJqqM1f1NumulS6iw=;
+        b=SJ1fh/it3Ryt81NUbfdR2zA8gWR9yEEU4da8FArqM61LGAFH41Olod2FVcqOZhYIiw
+         HNQEXk5p9XxS7nHDoZORTWa/i96I8vbElb8nxsxKD/kEC52FdYdbfdjELqaPx97ZVJYR
+         ubPuHuqmf6oKmdxsPVSSr4HW79x0D+PIja6lu0mKXMLXiLMzZFttdtZiQQzLwLp9gsGE
+         N3aAVz2Jfx2Fqt6pFuhixR0zKxCHCBECl/L1GmeQvxbvut0OdZaGF3sI/+kuhTggYZJ3
+         jP/aVglZTX/SL+466HipL232YwsOjbNiAK1egG2S1NtUodbkzyhYDL7SCYVSmhZL1o4S
+         DQ/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750430358; x=1751035158;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9hYeG/lN/dobWu+WOAuHe6WhQ/AJqqM1f1NumulS6iw=;
+        b=knRqvjHzxooASGCFhifI1nFKhAW/3UXIs+GFUoLOcxizKuAugQHT4j1j7SgMjNDaFS
+         yUw+Ta1Ht3E04Z20lbjXYPlHpkwF3CVMBbmVitx8Kr6cC+8SW0UhN5NUmQ9UZY9QeLOH
+         8bNX1NWyFNp9FuZNE+XkIf85affG1oBzKVh0kxxrvc29+Ovu7hwQQuOuP4ZEchR/1vrz
+         JQ7saZUkpMjusOfOLccrQzB4uHkVXd+10l+QUr3ZsGg46yLlm0sxxXpmUWKJGJwq6xcb
+         41fWSL7wtmWbYdLVnioYzAxHU2XYQRf7lR1FFV4m1Zn19GFFrdm7fpqaf7QmSRoqiIRn
+         J8+A==
+X-Forwarded-Encrypted: i=1; AJvYcCVJe4TMJAqKLwqfQe2KqsCSOjNaaeUwitSpzwF0EtSTILZVZF2q4uJOVpoOPeovEqL9caPyvUc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxPsTBnjrMQUEINb7QrA8tGBjaQel9kGNX/odtRzfbP/iJ7lFfk
+	dFT3mTp3YcHG1xTnmS7Bjz2PcGso6LLqcYbQ25iXCVoFkWp1lDZEFiIUogrDyoJC2Mruf6eTmVq
+	np/cNkQ==
+X-Google-Smtp-Source: AGHT+IEu/kAyF65SAfQsKleZ41Vg0owDojNFVAMM/0F6gElDwFbB1sj7AbPvBVKqQ3YY8zBgnoMiSm1QDmM=
+X-Received: from pjbee15.prod.google.com ([2002:a17:90a:fc4f:b0:314:d44:4108])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e87:b0:312:51a9:5d44
+ with SMTP id 98e67ed59e1d1-3159d61a5c5mr5175181a91.5.1750430358355; Fri, 20
+ Jun 2025 07:39:18 -0700 (PDT)
+Date: Fri, 20 Jun 2025 07:39:16 -0700
+In-Reply-To: <2eqjnjnszlmhlnvw6kcve4exjnpy7skguypwtmxutb2gecs3an@gcou53thsqww>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86h60ad40n.wl-maz@kernel.org>
+Mime-Version: 1.0
+References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-19-seanjc@google.com>
+ <2eqjnjnszlmhlnvw6kcve4exjnpy7skguypwtmxutb2gecs3an@gcou53thsqww>
+Message-ID: <aFVylP1XzMoqocOx@google.com>
+Subject: Re: [PATCH v3 17/62] KVM: SVM: Add enable_ipiv param, never set
+ IsRunning if disabled
+From: Sean Christopherson <seanjc@google.com>
+To: Naveen N Rao <naveen@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
+	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Thu, Jun 19, 2025, Naveen N Rao wrote:
+> On Wed, Jun 11, 2025 at 03:45:20PM -0700, Sean Christopherson wrote:
+> > From: Maxim Levitsky <mlevitsk@redhat.com>
+> >=20
+> > Let userspace "disable" IPI virtualization for AVIC via the enable_ipiv
+> > module param, by never setting IsRunning.  SVM doesn't provide a way to
+> > disable IPI virtualization in hardware, but by ensuring CPUs never see
+> > IsRunning=3D1, every IPI in the guest (except for self-IPIs) will gener=
+ate a
+> > VM-Exit.
+>=20
+> I think this is good to have regardless of the erratum. Not sure about VM=
+X,
+> but does it make sense to intercept writes to the self-ipi MSR as well?
 
-On Fri, Jun 20, 2025 at 12:52:08PM +0100, Marc Zyngier wrote:
-> On Fri, 20 Jun 2025 12:09:38 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Andre,
-> > 
-> > Thanks for doing this, it was needed. Haven't given this a proper look (I'm
-> > planning to do that though!), but something jumped at me, below.
-> > 
-> > On Fri, Jun 20, 2025 at 11:44:53AM +0100, Andre Przywara wrote:
-> > > The ARMv8.3 architecture update includes support for nested
-> > > virtualization. Allow the user to specify "--nested" to start a guest in
-> > 
-> > './vm help run' shows:
-> > 
-> > --pmu             Create PMUv3 device
-> > --disable-mte     Disable Memory Tagging Extension
-> > --no-pvtime       Disable stolen time
-> > 
-> > Where:
-> > 
-> > --pmu checks for KVM_CAP_ARM_PMU_V3.
-> > --disable-mte is there because MTE is enabled automatically for a guest when
-> > KVM_CAP_ARM_MTE is present.
-> > --no-pvtime is there because pvtime is enabled automatically; no capability
-> > check is needed, but the control group for pvtime is called
-> > KVM_ARM_VCPU_PVTIME_CTRL.
-> > 
-> > What I'm trying to get at is that the name for the kvmtool command line option
-> > matches KVM's name for the capability. What do you think about naming the
-> > parameter --el2 to match KVM_CAP_ARM_EL2 instead of --nested?
-> > 
-> >  Also, I seem to remember that the command line option for enabling
-> >  KVM_CAP_ARM_EL2_E2H0 in Marc's repo is --e2h0, so having --el2 instead of
-> >  --nested looks somewhat more consistent to me.
-> > 
-> >  Thoughts?
-> 
-> I think --el2 describes the wrong thing. We don't only expose EL2 to a
-> guest, but we also expose FEAT_NV2 by default. So "nested" is IMO
-> closer to the effects of the capability. If anything, it is
-> KVM_CAP_ARM_EL2 that is badly named (yes, there is some history here,
-> but I'm not going to entertain changing the #define after 8 years).
-> 
-> Similarly, QEMU has "virtualization=on" as an indication that it
-> should engage NV, and not "el2=on".
-> 
-> If you wanted a pure --el2 flag, then it should engage NV just like
-                                                         ^^
-							 EL2?
-> --nested does, but disable FEAT_NV2 in the idregs. This would give you
-> EL2 without recursive NV and HCR_EL2.E2H RES1.
+That doesn't work for AVIC, i.e. if the guest is MMIO to access the virtual=
+ APIC.
 
-That's a very interesting perspective. My comment was from the point of view of
-what kvmtool does when the option is present - it sets the *_EL2 VCPU flag, not
-what effect the flag has on a virtual machine.
+Regardless, I don't see any reason to manually intercept self-IPIs when IPI
+virtualization is disabled.  AFAIK, there's no need to do so for correctnes=
+s,
+and Intel's self-IPI virtualization isn't tied to IPI virtualization either=
+.
+Self-IPI virtualization is enabled by virtual interrupt delivery, which in =
+turn
+is enabled by KVM when enable_apicv is true:
 
-I can see what you're saying, --nested looks fine.
-
-Thanks,
-Alex
+  Self-IPI virtualization occurs only if the =E2=80=9Cvirtual-interrupt del=
+ivery=E2=80=9D
+  VM-execution control is 1.
