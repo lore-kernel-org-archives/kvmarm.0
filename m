@@ -1,213 +1,229 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A47920127D
-	for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 17:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C2930E830;
+	Fri, 20 Jun 2025 18:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750440156; cv=none; b=mhxBcjTiKnhsbJiD+OiEvn9MKJetasqgSR0v5M3wNLRZh0v1gy+lnovfZPlbBvSXG9ugBFBpdRj8tB7UCvfBF5KKvM4h2JyL+C+EZdUiu1P78uEEwsJGyhYjTHJELEtsJCPWRlKOGKgd2Qe5Gz09U6uZsbeBv7l0Uum+Vmdg0R4=
+	t=1750442427; cv=none; b=ZTyJXBFUTGQfmi+B7Il9KWxEZS4iDMVVqxqiI+IxU4orzK30i1AMZLVE+VAjxyqaNrHN/+JqvUdDp6Wpac1J8UtkHxtxe+oeRPHpMBVA/8WHv6K9xr7DeG1T9+H0WDT5vHPYPmt2Y8Kpk5elRaDVx4mFtPBDHvvVuWfjZoMhvmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750440156; c=relaxed/simple;
-	bh=6ISGtVsG/IWGFssbzjNwBrProURsy368G0H6yNcnXt4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=f7pSQPCULi+giViTH66mLrMcAYpUsPVsgSJRaBt+1kxiF40OsgTSz5C1/Ni5NPpePn9Qg+6vQjx2uytOdjWfojjWCV9ctuy/dvjVDoUSIu+zzixl6JcO0vBqzhRouR/HKctescrPCidHoOAk4Ia7z7zf6S0kjL5rIkBY2w3AJwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fR/hqiRi; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1750442427; c=relaxed/simple;
+	bh=V4BtGj5IM9fOMsL9rGEeYG0L2bnwTk/mzU1tC5NhGAw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=YOgVFYskY2P/NjfX/C7SEf7FRPdiJzGXNrznWd6Hzv2nVYhuDZ/SzIBwUIsUtpOgs1SSSorceCaFibEHbStEdsD1sqTS0wF8y5xKezELuY9n9+MOmNcyrpIhpH2nDnD1OLlelWnXx6L3EeTqt6YDehImvm09h7ZG8nmkqUf3brE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FpDJ0ppU; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fR/hqiRi"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31218e2d5b0so3307385a91.2
-        for <kvmarm@lists.linux.dev>; Fri, 20 Jun 2025 10:22:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750440153; x=1751044953; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NErYkcwCW0ofBX6e5hYOIbXlxwjpJ4sRagkANyVcFH4=;
-        b=fR/hqiRiJ7CS3FrAe/umN/LHMa0/c0AXdaiVLYt+9aLjr3YFaWVtx8z7I6HxBxbmmo
-         Tf0Bmx/4ZLjRQs1qOhsT9MYvwkvWG4yzTicTDBRGAIT6Gz9qjaZXLj7yUikI8agZnXwV
-         GPaPT5M+p3hIoVKPQVe1l/0BiUVz8lJQJDaQV/GlDVjOAYEGrQXPPdKFqyuRF4LqH6oJ
-         Iv3s3NSp1sHIuqn0scsvtnnVjDr8fkUvn7svlLJM/O9yaPW58Zw3aZOvqYW5B7yeFVvR
-         rTMd13vRMEKTJJyoWVHVJdX4uytGn74XGO88RTpvhpeyYsMrCtiEwaTqPYM+bxK25xLj
-         kitQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750440153; x=1751044953;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NErYkcwCW0ofBX6e5hYOIbXlxwjpJ4sRagkANyVcFH4=;
-        b=RHTpc3EDo9vyJXUqdIeCqbJcdl7t5KRsnKLBdlEyz9UYQft9aZLqe2dIOTlTtDqr7u
-         Mc4Q1xoO2p6Kigh4JbtTxLBUjHAGN9WWmhY8fNrOicDpYuwD+Rtad2SPU2gveUl7kXpa
-         ZA0edfvhA+n2zcPpjLNL+58lYCiTWQ6QOeWJubeSJK1y/5XEKghyr9kH700WS//m3Jjo
-         QIWcRNMN2JiZMQVO9RI6Wwwusu5kWUSD5I1LCDeNrGT7HqIWtpL5MIhQIDXQRlobu2p1
-         uLP0cs+EU1pxRHbf0ZMmVLK64SR0rjgoGXQxgTB1c1sI59/7tvRfNBhAGjqdryIfaKMc
-         xQtA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAEYQtpkzM4J8DO1REGid4JgEOkpVgrHbSQtQCyHZFZ86jcl6ov5oIgFzvHfH90jvXc+WJEso=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxEOoEqspa1T6C9OxBVFSTjcndVtu0CHbhC4XPtTWVGSIDMn43N
-	A5P+RZGvcTlmhC7UWebPNxNOd784XZZ7a3wj3X8AWXrnrADlGDgWvUhi88FD20mccEoIFLrIlyS
-	Jx+4EVg==
-X-Google-Smtp-Source: AGHT+IHXGxBdpxT88k3O204/zN4ifc12tJw1aK+nMcKj7rx2Ml8z17hcOCexso6J6CnRpxLft2px3MEAX6w=
-X-Received: from pjbpl17.prod.google.com ([2002:a17:90b:2691:b0:311:4aa8:2179])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c883:b0:311:ab20:159a
- with SMTP id 98e67ed59e1d1-3159d8d9098mr6199506a91.29.1750440153664; Fri, 20
- Jun 2025 10:22:33 -0700 (PDT)
-Date: Fri, 20 Jun 2025 10:22:32 -0700
-In-Reply-To: <aEyOcJJsys9mm_Xs@linux.dev>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FpDJ0ppU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=V4BtGj5IM9fOMsL9rGEeYG0L2bnwTk/mzU1tC5NhGAw=; b=FpDJ0ppU2cz+Gy7OZxO+YydSmq
+	4NsQe9Y22p5v6Fnl8tm3NpgRLAUsfB+z5YsNATk+Jnh65F2c4qzeS9l7XB+BDhRHiWlQvWTdgjJPH
+	pSNBZEniC6s6WuWi8T5N5qM1v+KpgjiNZ6aJaMXclCbH//+Ud0DuFcr4lYSwq+eNMRkbvuJe36RGS
+	moWsCTeWo2deuOQ1mC1iCLlLYScqVCwtt40ZNmQv2qnFQma7794kGicaNGyLXjObXqtiQJ1MB4SP1
+	hNGaI5T8fASvuePTlRhYKk4QCu8SjvRSv1Ln3zXRq1AgsC6l7JdYq+71jamf51mph5YpkpcFQxUWn
+	IdNDGoJQ==;
+Received: from [2001:8b0:10b:5:92ee:a97b:9346:ea1d] (helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uSg2A-0000000DGwR-0nHH;
+	Fri, 20 Jun 2025 18:00:14 +0000
+Message-ID: <5ab7c4684b0a81a4078701518f2a9786e2b8c7fc.camel@infradead.org>
+Subject: Re: [PATCH v3 02/62] KVM: arm64: WARN if unmapping vLPI fails
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>, Oliver Upton
+	 <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+ Joerg Roedel <joro@8bytes.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, iommu@lists.linux.dev,  linux-kernel@vger.kernel.org,
+ Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins
+ <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>,
+  David Matlack <dmatlack@google.com>
+Date: Fri, 20 Jun 2025 19:00:12 +0100
+In-Reply-To: <aFWY2LTVIxz5rfhh@google.com>
+References: <20250611224604.313496-2-seanjc@google.com>
+	 <20250611224604.313496-4-seanjc@google.com> <86tt4lcgs3.wl-maz@kernel.org>
+	 <aErlezuoFJ8u0ue-@google.com> <aEyOcJJsys9mm_Xs@linux.dev>
+	 <aFWY2LTVIxz5rfhh@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-N2ILD2/GdREWZxl5A43d"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-4-seanjc@google.com>
- <86tt4lcgs3.wl-maz@kernel.org> <aErlezuoFJ8u0ue-@google.com> <aEyOcJJsys9mm_Xs@linux.dev>
-Message-ID: <aFWY2LTVIxz5rfhh@google.com>
-Subject: Re: [PATCH v3 02/62] KVM: arm64: WARN if unmapping vLPI fails
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
-	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Jun 13, 2025, Oliver Upton wrote:
-> On Thu, Jun 12, 2025 at 07:34:35AM -0700, Sean Christopherson wrote:
-> > On Thu, Jun 12, 2025, Marc Zyngier wrote:
-> > > But not having an VLPI mapping for an interrupt at the point where we're
-> > > tearing down the forwarding is pretty benign. IRQs *still* go where they
-> > > should, and we don't lose anything.
-> 
-> The VM may not actually be getting torn down, though. The series of
-> fixes [*] we took for 6.16 addressed games that VMMs might be playing on
-> irqbypass for a live VM.
-> 
-> [*] https://lore.kernel.org/kvmarm/20250523194722.4066715-1-oliver.upton@linux.dev/
-> 
-> > All of those failure scenario seem like warnable offences when KVM thinks it has
-> > configured the IRQ to be forwarded to a vCPU.
-> 
-> I tend to agree here, especially considering how horribly fragile GICv4
-> has been in some systems. I know of a couple implementations where ITS
-> command failures and/or unmapped MSIs are fatal for the entire machine.
-> Debugging them has been a genuine pain in the ass.
-> 
-> WARN'ing when state tracking for vLPIs is out of whack would've made it
-> a little easier.
 
-Marc, does this look and read better?
+--=-N2ILD2/GdREWZxl5A43d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I'd really, really like to get this sorted out asap, as it's the only thing
-blocking the series, and I want to get the series into linux-next early next
-week, before I go OOO for ~10 days.
+On Fri, 2025-06-20 at 10:22 -0700, Sean Christopherson wrote:
+> On Fri, Jun 13, 2025, Oliver Upton wrote:
+> > On Thu, Jun 12, 2025 at 07:34:35AM -0700, Sean Christopherson wrote:
+> > > On Thu, Jun 12, 2025, Marc Zyngier wrote:
+> > > > But not having an VLPI mapping for an interrupt at the point where =
+we're
+> > > > tearing down the forwarding is pretty benign. IRQs *still* go where=
+ they
+> > > > should, and we don't lose anything.
+> >=20
+> > The VM may not actually be getting torn down, though. The series of
+> > fixes [*] we took for 6.16 addressed games that VMMs might be playing o=
+n
+> > irqbypass for a live VM.
+> >=20
+> > [*] https://lore.kernel.org/kvmarm/20250523194722.4066715-1-oliver.upto=
+n@linux.dev/
+> >=20
+> > > All of those failure scenario seem like warnable offences when KVM th=
+inks it has
+> > > configured the IRQ to be forwarded to a vCPU.
+> >=20
+> > I tend to agree here, especially considering how horribly fragile GICv4
+> > has been in some systems. I know of a couple implementations where ITS
+> > command failures and/or unmapped MSIs are fatal for the entire machine.
+> > Debugging them has been a genuine pain in the ass.
+> >=20
+> > WARN'ing when state tracking for vLPIs is out of whack would've made it
+> > a little easier.
+>=20
+> Marc, does this look and read better?
+>=20
+> I'd really, really like to get this sorted out asap, as it's the only thi=
+ng
+> blocking the series, and I want to get the series into linux-next early n=
+ext
+> week, before I go OOO for ~10 days.
+>=20
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Thu, 12 Jun 2025 16:51:47 -0700
+> Subject: [PATCH] KVM: arm64: WARN if unmapping a vLPI fails in any path
+>=20
+> When unmapping a vLPI, WARN if nullifying vCPU affinity fails, not just i=
+f
+> failure occurs when freeing an ITE.=C2=A0 If undoing vCPU affinity fails,=
+ then
+> odds are very good that vLPI state tracking has has gotten out of whack,
+> i.e. that KVM and the GIC disagree on the state of an IRQ/vLPI.=C2=A0 At =
+best,
+> inconsistent state means there is a lurking bug/flaw somewhere.=C2=A0 At =
+worst,
+> the inconsistency could eventually be fatal to the host, e.g. if an ITS
+> command fails because KVM's view of things doesn't match reality/hardware=
+.
 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 12 Jun 2025 16:51:47 -0700
-Subject: [PATCH] KVM: arm64: WARN if unmapping a vLPI fails in any path
+Btw, we finally figured out the reason some machines were just going
+dark on kexec, with the new kernel being corrupted. It turns out the
+GIC is still scribbling on the vLPI Pending Table even after it isn't
+the vLPI Pending Table any more, and is now part of the new kernel's
+text.
 
-When unmapping a vLPI, WARN if nullifying vCPU affinity fails, not just if
-failure occurs when freeing an ITE.  If undoing vCPU affinity fails, then
-odds are very good that vLPI state tracking has has gotten out of whack,
-i.e. that KVM and the GIC disagree on the state of an IRQ/vLPI.  At best,
-inconsistent state means there is a lurking bug/flaw somewhere.  At worst,
-the inconsistency could eventually be fatal to the host, e.g. if an ITS
-command fails because KVM's view of things doesn't match reality/hardware.
+In my queue I have a patch to call unmap_all_vpes() =E2=88=80 kvm on kexec,
+which makes the problem go away.
 
-Note, only the call from kvm_arch_irq_bypass_del_producer() by way of
-kvm_vgic_v4_unset_forwarding() doesn't already WARN.  Common KVM's
-kvm_irq_routing_update() WARNs if kvm_arch_update_irqfd_routing() fails.
-For that path, if its_unmap_vlpi() fails in kvm_vgic_v4_unset_forwarding(),
-the only possible causes are that the GIC doesn't have a v4 ITS (from
-its_irq_set_vcpu_affinity()):
+--=-N2ILD2/GdREWZxl5A43d
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-        /* Need a v4 ITS */
-        if (!is_v4(its_dev->its))
-                return -EINVAL;
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYyMDE4MDAx
+MlowLwYJKoZIhvcNAQkEMSIEIIyFvPcwbS1Vs7ZJA4/YgpmenZ12652b2+hXdccFnroEMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAM2H61fFbhMLR
+OzqkJlEp279nrOR12jsAN4XKX9ZURyFfSWmeDqzu1Szt3hNdQolYyehVXNRDEzdKbluyBel9UeOS
+xYeXsMHmdQ8FZ8FWkUAWWhb8xVRFmnzYm5aPNoZ4D4L9k29I3vaTnj9lsJ7kxg8eaVqxMA8Aqp6F
+011xwwibujrG838ALsJRHFYYriHKUOKe8H6SC8akGmLItSMDN0j1N9ipYzO/xSH+KJF9YBmUAi1n
+LJ/BeWTRGrfDIy6PIWLWcdhKROnFyUDCiU04huCRTe+/0LGRPxWizzwQbx5ufFqDqiOUCEaQzKqH
+Wd/qYXwmoiomLYzRteVZ7I5FflxS9N1osg7jjHjdmEPSKE85N6U6D86kBFTy7emwDnJe805w058E
+5wthOQACVxFbcyvL7MyRj5Ad5OUAz6cn6+ykrbBI6+QzmqoYO5M2M7IWyTyAPoA2ujcDFgrUn60O
+bww4VICeFJlZRmv86VjJX7jLY+e9XA0JJXfW2VVPAHgceP9gmufL4Wos8DEPJ1VbL7A3bBx1ujKh
+znPvB6MBNLEQBiFl1ONFlotGsz827BbupDhiHMlbop5L9d+ib6GkChz0iKo9TTIvZmjQH50maWAK
+g2uAvxO7Frfd0NVzovfpsk///+zFHxhrOhygr3OQJVtfXB7juNO38jh0YbJAsi8AAAAAAAA=
 
-        guard(raw_spinlock)(&its_dev->event_map.vlpi_lock);
 
-        /* Unmap request? */
-        if (!info)
-                return its_vlpi_unmap(d);
-
-or that KVM has gotten out of sync with the GIC/ITS (from its_vlpi_unmap()):
-
-        if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d))
-                return -EINVAL;
-
-All of the above failure scenarios are warnable offences, as they should
-never occur absent a kernel/KVM bug.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/arm64/kvm/vgic/vgic-its.c     | 2 +-
- arch/arm64/kvm/vgic/vgic-v4.c      | 4 ++--
- drivers/irqchip/irq-gic-v4.c       | 4 ++--
- include/linux/irqchip/arm-gic-v4.h | 2 +-
- 4 files changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 534049c7c94b..98630dae910d 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -758,7 +758,7 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- 	if (irq) {
- 		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
- 			if (irq->hw)
--				WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
-+				its_unmap_vlpi(ite->irq->host_irq);
- 
- 			irq->hw = false;
- 		}
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 193946108192..911170d4a9c8 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -545,10 +545,10 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int host_irq)
- 	if (irq->hw) {
- 		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
- 		irq->hw = false;
--		ret = its_unmap_vlpi(host_irq);
-+		its_unmap_vlpi(host_irq);
- 	}
- 
- 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- 	vgic_put_irq(kvm, irq);
--	return ret;
-+	return 0;
- }
-diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index 58c28895f8c4..8455b4a5fbb0 100644
---- a/drivers/irqchip/irq-gic-v4.c
-+++ b/drivers/irqchip/irq-gic-v4.c
-@@ -342,10 +342,10 @@ int its_get_vlpi(int irq, struct its_vlpi_map *map)
- 	return irq_set_vcpu_affinity(irq, &info);
- }
- 
--int its_unmap_vlpi(int irq)
-+void its_unmap_vlpi(int irq)
- {
- 	irq_clear_status_flags(irq, IRQ_DISABLE_UNLAZY);
--	return irq_set_vcpu_affinity(irq, NULL);
-+	WARN_ON_ONCE(irq_set_vcpu_affinity(irq, NULL));
- }
- 
- int its_prop_update_vlpi(int irq, u8 config, bool inv)
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index 7f1f11a5e4e4..0b0887099fd7 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -146,7 +146,7 @@ int its_commit_vpe(struct its_vpe *vpe);
- int its_invall_vpe(struct its_vpe *vpe);
- int its_map_vlpi(int irq, struct its_vlpi_map *map);
- int its_get_vlpi(int irq, struct its_vlpi_map *map);
--int its_unmap_vlpi(int irq);
-+void its_unmap_vlpi(int irq);
- int its_prop_update_vlpi(int irq, u8 config, bool inv);
- int its_prop_update_vsgi(int irq, u8 priority, bool group);
- 
-
-base-commit: 4fc39a165c70a49991b7cc29be3a19eddcd9e5b9
---
+--=-N2ILD2/GdREWZxl5A43d--
