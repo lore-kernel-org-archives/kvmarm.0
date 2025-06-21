@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76B419A2A3
-	for <kvmarm@lists.linux.dev>; Sat, 21 Jun 2025 11:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C69C1F3BAE
+	for <kvmarm@lists.linux.dev>; Sat, 21 Jun 2025 11:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750504171; cv=none; b=mNtlapJROdg8sBWUx1vylcj9eFog3bLzjf9IClmbZxgQBSK0wRRXwx/w51X1k5JPjB4KeHtbGqe4/k77+jiELTOYeJo574LIasXXjdkq4OzKD9CwzCUDKihgxIsjHEROB+cW49J0opjHBpjvsUGBXpbhlebl4tmOvPzbgDCewJM=
+	t=1750505658; cv=none; b=Ppucq6ezywztrPiXRJ2AlFfUozgexHoXtwXoOhdYl8v7LTP6FtB7KD+0cU3tvnMjfx3R9khOJ3ZCjPtTS3VV/q6nR7tYHZ45aKzm4HSMFLiF1opX73qzlBgqXCt/+e30VrIx3EfQ686WI5okLycRG+fiB/4wcgJaJDQ89lzOg74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750504171; c=relaxed/simple;
-	bh=r96vZsLXTy2ZIyuBicHdS0679OLDnmF7qKiUY1GxkzE=;
+	s=arc-20240116; t=1750505658; c=relaxed/simple;
+	bh=9l5F57l5XT9qcuTDRaflhG1AFy3rJPJGxrV+T73Ea0g=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vFnjc+bSBLrwpJGqAO5nVlsPv96MzjUfyQ9C4/C3y1fXAZC0/ZasVlSTp+yTIn7tSiV5D/exME2Vh4EmZUcG86Mbhec2fVhkgJAOWwpHV0qqQMUcA5QiezFZ0fJxZ6X7lVxH99PvGmD0OP7pWR49gxNrT6QxlYaMArg5bwQGF18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fJu5g3Of; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=eL9+rUX46WcBmz8p8RS0ZzX68AlMkc84lLklx998xhiCUEqPy2sK8CyuBQCfvp5opjmgX8ZlFM4WK/eFScKsLIP5GkF0aAVba1d2oWFoeBBLpDiNGbcGsJh2oI6VxppHM267kRXVdLe5FGSi7jtKcEPmFzq4CthPFI1dJSqgjkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0pEcXgq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fJu5g3Of"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45342C4CEE7;
-	Sat, 21 Jun 2025 11:09:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0pEcXgq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3B2EC4CEE7;
+	Sat, 21 Jun 2025 11:34:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750504171;
-	bh=r96vZsLXTy2ZIyuBicHdS0679OLDnmF7qKiUY1GxkzE=;
+	s=k20201202; t=1750505656;
+	bh=9l5F57l5XT9qcuTDRaflhG1AFy3rJPJGxrV+T73Ea0g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fJu5g3OfB8ISbHOrlXJtabK4FysbF8sMD+KOhW7a2tRGjNb1vjqpxvkl9Xg7fMhEl
-	 H8GehRv37T+vBuTzcsTGrQYZPn40p/f2SlPM9oOeF/PyAAQKNr5MPMiPz5am3dq+CR
-	 HjEDKY4SrVCvsj+9SSDRYgUjfCZ5DqCVcWQKMW55Nit8vqrH6KnWq3FbNZWYLXhM1t
-	 LXYKoSyu2ltTAVQUMAEHTokBYUpmYiLK+zKbPmLsO2elVSdux1X14MzXFXGmXQ5ic0
-	 7H7rkQNjXfpu/DEN5rQT68dZYLZf8lBkpgtYVcTgQ4bG3bAV/UAfSMD+sQDwzcbK2w
-	 k0g0Pxvp30NuQ==
+	b=Q0pEcXgqrPZ9obS9pd0xGq1avYm8+FcVk8EqA3buCqg/xNBb7vSPL6w6bbhaRB1Ap
+	 h29wiVQha6Ty/+mgRTcHIhSR91OGRnAq8ugw+WR5/5IXbWiJRHvmWKj27Um6zcxhRn
+	 VgbT5rEaXWo/bfKP5SvbBdzrTz4tEETE1h6IuEeTgXLDO8hHxtGfRQVaSjmm3QP3kP
+	 uppgBVmHUmYVetF0HaB3nVpDSyJV7/XQKNuo2SL0V7fZFEfGZCqtdSBzL7vFKQ0lpd
+	 c4ylYDUSLSomqeeD6GlQGrBgzxT616w1bpbIBqUUas4qJkyNa0JWP2Ze2dp8qIoLZk
+	 xS0baMZF1jRFQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uSw6C-008nMX-V6;
-	Sat, 21 Jun 2025 12:09:29 +0100
-Date: Sat, 21 Jun 2025 12:09:28 +0100
-Message-ID: <86cyaxcpw7.wl-maz@kernel.org>
+	id 1uSwUA-008nXi-KR;
+	Sat, 21 Jun 2025 12:34:14 +0100
+Date: Sat, 21 Jun 2025 12:34:14 +0100
+Message-ID: <86bjqhcoqx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 08/27] KVM: arm64: nv: Use guest hypervisor's vSError state
-In-Reply-To: <20250616230308.1192565-9-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 14/27] KVM: arm64: Describe SCTLR2_ELx RESx masks
+In-Reply-To: <20250616230308.1192565-15-oliver.upton@linux.dev>
 References: <20250616230308.1192565-1-oliver.upton@linux.dev>
-	<20250616230308.1192565-9-oliver.upton@linux.dev>
+	<20250616230308.1192565-15-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,132 +59,80 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Jun 2025 00:02:49 +0100,
+On Tue, 17 Jun 2025 00:02:55 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> When HCR_EL2.AMO is set, physical SErrors are routed to EL2 and virtual
-> SError injection is enabled for EL1. Conceptually treating
-> host-initiated SErrors as 'physical', this means we can delegate control
-> of the vSError injection context to the guest hypervisor when nesting &&
-> AMO is set.
+> External abort injection will soon rely on a sanitised view of
+> SCTLR2_ELx to determine exception routing. Compute the RESx masks.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h       |  5 +++
->  arch/arm64/kvm/hyp/include/hyp/switch.h    | 38 +++++++++++++++++++---
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 14 ++++++--
->  3 files changed, 50 insertions(+), 7 deletions(-)
+>  arch/arm64/kvm/config.c | 28 ++++++++++++++++++++++++++++
+>  arch/arm64/kvm/nested.c |  6 ++++++
+>  2 files changed, 34 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 45029dd5e9c7..3ac11effed7d 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -257,6 +257,11 @@ static inline bool is_nested_ctxt(struct kvm_vcpu *vcpu)
->  	return vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
->  }
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 54911a93b001..e8a33e91e665 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -131,6 +131,8 @@ struct reg_bits_to_feat_map {
+>  #define FEAT_SPMU		ID_AA64DFR1_EL1, SPMU, IMP
+>  #define FEAT_SPE_nVM		ID_AA64DFR2_EL1, SPE_nVM, IMP
+>  #define FEAT_STEP2		ID_AA64DFR2_EL1, STEP, IMP
+> +#define FEAT_SYSREG128		ID_AA64ISAR2_EL1, SYSREG_128, IMP
+> +#define FEAT_CPA2		ID_AA64ISAR3_EL1, CPA, CPA2
 >  
-> +static inline bool vserror_state_is_nested(struct kvm_vcpu *vcpu)
-> +{
-> +	return is_nested_ctxt(vcpu) && vcpu_el2_amo_is_set(vcpu);
-> +}
-> +
->  /*
->   * The layout of SPSR for an AArch32 state is different when observed from an
->   * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 71a66c910ab2..6a6ebc824aba 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -346,21 +346,49 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
->  
->  	write_sysreg_hcr(hcr);
->  
-> -	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
-> -		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-> +	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE)) {
-> +		u64 vsesr;
-> +
-> +		/*
-> +		 * When HCR_EL2.AMO is set, physical SErrors are taken to EL2
-> +		 * and vSError injection is enabled for EL1. Conveniently, for
-> +		 * NV this means that it is never the case where a 'physical'
-> +		 * SError (injected by KVM or userspace) and vSError are
-> +		 * deliverable to the same context.
-> +		 *
-> +		 * As such, we can trivially select between the host or guest's
-> +		 * VSESR_EL2.
-> +		 */
-> +		if (vserror_state_is_nested(vcpu))
-> +			vsesr = __vcpu_sys_reg(vcpu, VSESR_EL2);
-> +		else
-> +			vsesr = vcpu->arch.vsesr_el2;
-> +
-> +		write_sysreg_s(vsesr, SYS_VSESR_EL2);
-> +	}
->  }
->  
->  static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
+>  static bool not_feat_aa64el3(struct kvm *kvm)
 >  {
-> +	u64 *hcr;
+> @@ -832,6 +834,23 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
+>  	NEEDS_FEAT_FIXED(HCR_EL2_E2H, compute_hcr_e2h),
+>  };
+>  
+> +static const struct reg_bits_to_feat_map sctlr2_feat_map[] = {
+> +	NEEDS_FEAT(SCTLR2_EL1_NMEA	|
+> +		   SCTLR2_EL1_EASE,
+> +		   FEAT_DoubleFault2),
+> +	NEEDS_FEAT(SCTLR2_EL1_EnADERR, feat_aderr),
+> +	NEEDS_FEAT(SCTLR2_EL1_EnANERR, feat_anerr),
+> +	NEEDS_FEAT(SCTLR2_EL1_EnIDCP128, FEAT_SYSREG128),
+> +	NEEDS_FEAT(SCTLR2_EL1_EnPACM	|
+> +		   SCTLR2_EL1_EnPACM0,
+> +		   feat_pauth_lr),
+> +	NEEDS_FEAT(SCTLR2_EL1_CPTA	|
+> +		   SCTLR2_EL1_CPTA0	|
+> +		   SCTLR2_EL1_CPTM	|
+> +		   SCTLR2_EL1_CPTM0,
+> +		   FEAT_CPA2),
+> +};
 > +
-> +	if (vserror_state_is_nested(vcpu))
-> +		hcr = __ctxt_sys_reg(&vcpu->arch.ctxt, HCR_EL2);
-> +	else
-> +		hcr = &vcpu->arch.hcr_el2;
-> +
->  	/*
->  	 * If we pended a virtual abort, preserve it until it gets
->  	 * cleared. See D1.14.3 (Virtual Interrupts) for details, but
->  	 * the crucial bit is "On taking a vSError interrupt,
->  	 * HCR_EL2.VSE is cleared to 0."
-> +	 *
-> +	 * Additionally, when in a nested context we need to propagate the
-> +	 * updated state to the guest hypervisor's HCR_EL2.
->  	 */
-> -	if (vcpu->arch.hcr_el2 & HCR_VSE) {
-> -		vcpu->arch.hcr_el2 &= ~HCR_VSE;
-> -		vcpu->arch.hcr_el2 |= read_sysreg(hcr_el2) & HCR_VSE;
-> +	if (*hcr & HCR_VSE) {
-> +		*hcr &= ~HCR_VSE;
-> +		*hcr |= read_sysreg(hcr_el2) & HCR_VSE;
->  	}
+>  static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
+>  				  int map_size, u64 res0, const char *str)
+>  {
+> @@ -863,6 +882,8 @@ void __init check_feature_map(void)
+>  		       __HCRX_EL2_RES0, "HCRX_EL2");
+>  	check_feat_map(hcr_feat_map, ARRAY_SIZE(hcr_feat_map),
+>  		       HCR_EL2_RES0, "HCR_EL2");
+> +	check_feat_map(sctlr2_feat_map, ARRAY_SIZE(sctlr2_feat_map),
+> +		       SCTLR2_EL1_RES0, "SCTLR2_EL1");
 >  }
 >  
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index 4d0dbea4c56f..7fffeaf71dec 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -159,7 +159,12 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
->  	if (!has_vhe() && ctxt->__hyp_running_vcpu)
->  		ctxt->regs.pstate	= read_sysreg_el2(SYS_SPSR);
->  
-> -	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-> +	if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-> +		return;
-> +
-> +	if (vserror_state_is_nested(ctxt_to_vcpu(ctxt)))
-> +		ctxt_sys_reg(ctxt, VDISR_EL2) = read_sysreg_s(SYS_VDISR_EL2);
-> +	else
->  		ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
->  }
->  
-> @@ -293,7 +298,12 @@ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctx
->  	write_sysreg_el2(ctxt->regs.pc,			SYS_ELR);
->  	write_sysreg_el2(pstate,			SYS_SPSR);
->  
-> -	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-> +	if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-> +		return;
-> +
-> +	if (vserror_state_is_nested(ctxt_to_vcpu(ctxt)))
-> +		write_sysreg_s(ctxt_sys_reg(ctxt, VDISR_EL2), SYS_VDISR_EL2);
-> +	else
->  		write_sysreg_s(ctxt_sys_reg(ctxt, DISR_EL1), SYS_VDISR_EL2);
->  }
->  
+>  static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
+> @@ -1077,6 +1098,13 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+>  		*res0 |= HCR_EL2_RES0 | (mask & ~fixed);
+>  		*res1 = HCR_EL2_RES1 | (mask & fixed);
+>  		break;
+> +	case SCTLR2_EL1:
+> +	case SCTLR2_EL2:
+> +		*res0 = compute_res0_bits(kvm, sctlr2_feat_map,
+> +					  ARRAY_SIZE(sctlr2_feat_map), 0, 0);
+> +		*res0 |= SCTLR2_EL1_RES0;
+> +		*res1 = SCTLR2_EL1_RES1;
+> +		break;
 
-I have the same question as for one of the previous patches: should
-this also be gated on RAS being exposed to the guest?
+This is potentially mis-describing SCTLR2_EL2.EMEC, which is
+conditioned on FEAT_MEC. This isn't a huge deal at this stage, but may
+become useful if MEC gets expanded to non-Realm PAS. I think it'd be
+worth adding a SCTLR2_EL2-specific table for this.
 
 Thanks,
 
