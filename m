@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C69C1F3BAE
-	for <kvmarm@lists.linux.dev>; Sat, 21 Jun 2025 11:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EB71DDE9
+	for <kvmarm@lists.linux.dev>; Sat, 21 Jun 2025 11:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750505658; cv=none; b=Ppucq6ezywztrPiXRJ2AlFfUozgexHoXtwXoOhdYl8v7LTP6FtB7KD+0cU3tvnMjfx3R9khOJ3ZCjPtTS3VV/q6nR7tYHZ45aKzm4HSMFLiF1opX73qzlBgqXCt/+e30VrIx3EfQ686WI5okLycRG+fiB/4wcgJaJDQ89lzOg74=
+	t=1750506849; cv=none; b=T3NalUEuwGj/WXsjyqHLCaAYGMZkju8J8HTvI1cjTd1J/xaGDtEekta/bHeZpFEI2gixy1DNhFpqIejp35lp/nhML/usPwMBiQF91WzF1duqKgL7Rruskzxf6JXoCud2UvHcGrIGnqXsWC4PSVjSFUGSmS4pdHSfSFQS3NBNMcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750505658; c=relaxed/simple;
-	bh=9l5F57l5XT9qcuTDRaflhG1AFy3rJPJGxrV+T73Ea0g=;
+	s=arc-20240116; t=1750506849; c=relaxed/simple;
+	bh=K5eMLdq6YOvf+mUwulmhL57qHFMKXEpckqXJdVb7+QU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eL9+rUX46WcBmz8p8RS0ZzX68AlMkc84lLklx998xhiCUEqPy2sK8CyuBQCfvp5opjmgX8ZlFM4WK/eFScKsLIP5GkF0aAVba1d2oWFoeBBLpDiNGbcGsJh2oI6VxppHM267kRXVdLe5FGSi7jtKcEPmFzq4CthPFI1dJSqgjkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0pEcXgq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=a39IUltD3XOUkduR4hSlXMxyoZmn3ORwPxVXJmurb6M3yoGvappCsUGiMY3WiAKTWubpmi1IEl3v6nmcPiMlbhXeQ2xNaUXMjqpywWlw4/ePqlqzj7W8hDRHe5agsG1lOIOk5GwiAsK82j1JnAM+asm8lvKM4WKq9T7NdeZ/Hks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Urh14lZT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0pEcXgq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3B2EC4CEE7;
-	Sat, 21 Jun 2025 11:34:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Urh14lZT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9576BC4CEE7;
+	Sat, 21 Jun 2025 11:54:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750505656;
-	bh=9l5F57l5XT9qcuTDRaflhG1AFy3rJPJGxrV+T73Ea0g=;
+	s=k20201202; t=1750506848;
+	bh=K5eMLdq6YOvf+mUwulmhL57qHFMKXEpckqXJdVb7+QU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q0pEcXgqrPZ9obS9pd0xGq1avYm8+FcVk8EqA3buCqg/xNBb7vSPL6w6bbhaRB1Ap
-	 h29wiVQha6Ty/+mgRTcHIhSR91OGRnAq8ugw+WR5/5IXbWiJRHvmWKj27Um6zcxhRn
-	 VgbT5rEaXWo/bfKP5SvbBdzrTz4tEETE1h6IuEeTgXLDO8hHxtGfRQVaSjmm3QP3kP
-	 uppgBVmHUmYVetF0HaB3nVpDSyJV7/XQKNuo2SL0V7fZFEfGZCqtdSBzL7vFKQ0lpd
-	 c4ylYDUSLSomqeeD6GlQGrBgzxT616w1bpbIBqUUas4qJkyNa0JWP2Ze2dp8qIoLZk
-	 xS0baMZF1jRFQ==
+	b=Urh14lZTgLBF0tvR5L1bbNR8pWx0J0NKhvxC0Bjv1Tvn+M12EvFRjtyYmcDkqAFbI
+	 ausWVBcnouAJwVZAHSp1OV+g50boEgnDGoBXv+azZuv17VyhFv24+HEThch/wrMy+6
+	 /zL9iL4zxnM1MfPNkyF4kYT7haqOG+owL9hj8EPknPUOoiT7ak91K8goMvf4zdy6w0
+	 fdbPaOfSDvmpbVYxomMtYRi79d7aOZoVn/dMOKtJ59ikxohl1EgtXzRdMtziOq1Avn
+	 7oSNYB5LWlRTDVNHR/1mGSAfYbCNl9RB+k75jHl4tF4+tN4hv+Hq1ppwmZK8tR0mJh
+	 joa0jOM8uwD5A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uSwUA-008nXi-KR;
-	Sat, 21 Jun 2025 12:34:14 +0100
-Date: Sat, 21 Jun 2025 12:34:14 +0100
-Message-ID: <86bjqhcoqx.wl-maz@kernel.org>
+	id 1uSwnO-008ngP-Go;
+	Sat, 21 Jun 2025 12:54:06 +0100
+Date: Sat, 21 Jun 2025 12:54:06 +0100
+Message-ID: <86a561cntt.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 14/27] KVM: arm64: Describe SCTLR2_ELx RESx masks
-In-Reply-To: <20250616230308.1192565-15-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 17/27] KVM: arm64: Route SEAs to the SError vector when EASE is set
+In-Reply-To: <20250616230308.1192565-18-oliver.upton@linux.dev>
 References: <20250616230308.1192565-1-oliver.upton@linux.dev>
-	<20250616230308.1192565-15-oliver.upton@linux.dev>
+	<20250616230308.1192565-18-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,80 +59,42 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Jun 2025 00:02:55 +0100,
+On Tue, 17 Jun 2025 00:02:58 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> External abort injection will soon rely on a sanitised view of
-> SCTLR2_ELx to determine exception routing. Compute the RESx masks.
+> One of the finest additions of FEAT_DoubleFault2 is the ability for
+> software to request *synchronous* external aborts be taken to the
+> SError vector, which of coure are *asynchronous* in nature.
+> 
+> Opinions be damned, implement the architecture and send SEAs to the
+> SError vector if EASE is set for the target context.
+
+As they say, there is no accounting for taste! :)
+
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/config.c | 28 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/nested.c |  6 ++++++
->  2 files changed, 34 insertions(+)
+>  arch/arm64/kvm/emulate-nested.c |  3 +++
+>  arch/arm64/kvm/hyp/exception.c  |  6 +++++-
+>  arch/arm64/kvm/inject_fault.c   | 38 ++++++++++++++++++++++++++++++++-
+>  3 files changed, 45 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 54911a93b001..e8a33e91e665 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -131,6 +131,8 @@ struct reg_bits_to_feat_map {
->  #define FEAT_SPMU		ID_AA64DFR1_EL1, SPMU, IMP
->  #define FEAT_SPE_nVM		ID_AA64DFR2_EL1, SPE_nVM, IMP
->  #define FEAT_STEP2		ID_AA64DFR2_EL1, STEP, IMP
-> +#define FEAT_SYSREG128		ID_AA64ISAR2_EL1, SYSREG_128, IMP
-> +#define FEAT_CPA2		ID_AA64ISAR3_EL1, CPA, CPA2
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 86c9a48fc8b6..7f9081c6ab11 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2833,6 +2833,9 @@ int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+>  			     iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW);
+>  	esr |= ESR_ELx_FSC_EXTABT | ESR_ELx_IL;
 >  
->  static bool not_feat_aa64el3(struct kvm *kvm)
->  {
-> @@ -832,6 +834,23 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
->  	NEEDS_FEAT_FIXED(HCR_EL2_E2H, compute_hcr_e2h),
->  };
->  
-> +static const struct reg_bits_to_feat_map sctlr2_feat_map[] = {
-> +	NEEDS_FEAT(SCTLR2_EL1_NMEA	|
-> +		   SCTLR2_EL1_EASE,
-> +		   FEAT_DoubleFault2),
-> +	NEEDS_FEAT(SCTLR2_EL1_EnADERR, feat_aderr),
-> +	NEEDS_FEAT(SCTLR2_EL1_EnANERR, feat_anerr),
-> +	NEEDS_FEAT(SCTLR2_EL1_EnIDCP128, FEAT_SYSREG128),
-> +	NEEDS_FEAT(SCTLR2_EL1_EnPACM	|
-> +		   SCTLR2_EL1_EnPACM0,
-> +		   feat_pauth_lr),
-> +	NEEDS_FEAT(SCTLR2_EL1_CPTA	|
-> +		   SCTLR2_EL1_CPTA0	|
-> +		   SCTLR2_EL1_CPTM	|
-> +		   SCTLR2_EL1_CPTM0,
-> +		   FEAT_CPA2),
-> +};
-> +
->  static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
->  				  int map_size, u64 res0, const char *str)
->  {
-> @@ -863,6 +882,8 @@ void __init check_feature_map(void)
->  		       __HCRX_EL2_RES0, "HCRX_EL2");
->  	check_feat_map(hcr_feat_map, ARRAY_SIZE(hcr_feat_map),
->  		       HCR_EL2_RES0, "HCR_EL2");
-> +	check_feat_map(sctlr2_feat_map, ARRAY_SIZE(sctlr2_feat_map),
-> +		       SCTLR2_EL1_RES0, "SCTLR2_EL1");
->  }
->  
->  static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
-> @@ -1077,6 +1098,13 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
->  		*res0 |= HCR_EL2_RES0 | (mask & ~fixed);
->  		*res1 = HCR_EL2_RES1 | (mask & fixed);
->  		break;
-> +	case SCTLR2_EL1:
-> +	case SCTLR2_EL2:
-> +		*res0 = compute_res0_bits(kvm, sctlr2_feat_map,
-> +					  ARRAY_SIZE(sctlr2_feat_map), 0, 0);
-> +		*res0 |= SCTLR2_EL1_RES0;
-> +		*res1 = SCTLR2_EL1_RES1;
-> +		break;
+> +	if (__vcpu_sys_reg(vcpu, SCTLR2_EL2) & SCTLR2_EL1_EASE)
+> +		return kvm_inject_nested(vcpu, esr, except_type_serror);
 
-This is potentially mis-describing SCTLR2_EL2.EMEC, which is
-conditioned on FEAT_MEC. This isn't a huge deal at this stage, but may
-become useful if MEC gets expanded to non-Realm PAS. I think it'd be
-worth adding a SCTLR2_EL2-specific table for this.
+Are we allowed to not set FAR_EL2 here? My reading of R_RYXCL is that
+only the exception vector changes, not what is reported.
+
+But the spec is clear as mud, and I wonder if I'm reading too much
+into it.
 
 Thanks,
 
