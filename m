@@ -1,69 +1,69 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2048.outbound.protection.outlook.com [40.107.94.48])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2063.outbound.protection.outlook.com [40.107.236.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA60514AD0D
-	for <kvmarm@lists.linux.dev>; Sat, 21 Jun 2025 04:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F151898E9
+	for <kvmarm@lists.linux.dev>; Sat, 21 Jun 2025 04:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750479687; cv=fail; b=GXMI6FqCfl5YXPrrtWFAvmapo4ZIjAA13lRRmkWVEQVmYQv3m3FIRgwZxrhw/66nF54ZpGLORQygcoWsDhaEYglyBBlO3SzCLjJwk1qjzC1OnvT/41Ylz9Q9P55kNAm7UK40/BMM+DftKSTI4P7w7twU6vCIkS5bSPq1vwbqV6k=
+	t=1750479688; cv=fail; b=BpWTnMvRiIRnKAQ41K8onv6wdyoFaY/vzqA3U4N+EjvPIyYwYtsMF7b0RHU6w9tbDPUnLM1QGTBjhDrZtHpaKor3wANlSsSKv+XWKL49kGm2B8U631q3H9zRREHncqMV0vGFtoJQ6jF4FXF2oNRgCWytRLn+KEE0cIIp6FoPyq0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750479687; c=relaxed/simple;
-	bh=bpP9rW3lvV9nr/dSewocHmVkezFfLIi1Hd+YohIapqU=;
+	s=arc-20240116; t=1750479688; c=relaxed/simple;
+	bh=dysODe5K/JGNI1C99eWlAizNObXue0iQlOqwbJoo9H4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RU/Za5JuR16KZz7ekTrmgpXRvZ2+ks46zJPTb0grwT7hrr1ZgFeD/IBc46F8YgBdI0/GsDOETI2z6tFRsafIulSbr1dhpWidprL+pxgrAPBBgeOHCpVLBJwnFE1j9ikJZfQ3+iV7gEArqjKvEBeanCmg5Eh3mxBW6COyD2P0Jf0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nAaUh3sr; arc=fail smtp.client-ip=40.107.94.48
+	 MIME-Version:Content-Type; b=SjA8PL5qcTzIs+oHLoFjHJiMEBMDfqsmIAV+9NmXw/ktpDjz61zUApyzFumwg5zVoHzcGdF1ZezuWVUFZt6qx7V3mslCZEDDn/4t/bS3p4alg8OhCSmGZm9LnE++j/O8tVQ6+KYjcc9rMRQ3dC8AW4o/CxeXNgBL4CTVhybddBM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HgufHmTl; arc=fail smtp.client-ip=40.107.236.63
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nAaUh3sr"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HgufHmTl"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ypzl6rAvP2eo+sUdf40V2PJdqlViSvzGLR128b8piXJX0unjWEFrl49khCRUUPHF7ESjzrG/JxPc13O2vdTnVff9o1TzpSbDX6Xx4OjauSLTwmK8sPxj5kTYhzcjlJ8I5qYj17zBioU1S2izIEG+j9H96PcFt13umWnf5wLO8Ws4nBGbuYq7gTGImSICI9d/Yp2AHlikUjQ7yMTg/AjzSfQ2m2sgkx9nAI9qZHSmmWxpcoPvNjHBe1btFKlQVGXrnMFjvpGwgXzZXVRvrDwyJKKIp8fHIERmM0sV2X0kX/E4xRUYwozRbPYYzHcQ9wQIGUe3S26PKFxprvclacAwoQ==
+ b=IXnrnzsDF9GQYwTMB0qg06WyT0F6dPEDELgF6CeoNRIRsqmN7G70eQ7xtOdpmrK+6XEG3yG9I+loEGfCWPz2q2zsocz+10ioN8yTbHyxp16SSjghFmanad8q0RXSU2vuNGmmPg3QOxIxl//K3GpWH5jAHeFlKc12cNaSyCCVdaM+SroKLLSi3OJhLp5OcVziZWpftpAfjjdN2S+RKGdZpSUR85OACALOQawZ+UBAY20rSfkhAbw+NFEIUhoiOFkj2L2/6QBd+bndcd08M76tacvaj9MQTQvyASVCoi0cL/lMPTBQNnwQ+C15PcDmC0O75DnqkovCILChgdoriOOslg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GkCBJLwsMBLjSVGWzfhuFJx+agdzxNGx1pRR5Z/t82s=;
- b=WGtdFaDuq7ty+eo2K7LAkKkac4yscewALDvhXbFBVclaDSwYhtxIZ4D21CDrSH/Gw/KaMa4NNC7qWb8WEfMQnElK66UyJRNR2YCGIyHqX/ijrYRGMTWE2br69XzIa0emp5/VzaMihPvE90dsZDSfUiXnzqzwTmyMH+KR+NL+ETD2+yt8yBylDDXsJ2gFgZx2S/ppCv2V2sBBFTmhwhKpn/uQtO8sDpjj9htBJ/dA/CM14sF8hnQoEG/zYhwaH1AqwPPNMRrMy9i1Dnd6ekTsVM2uP84hoAAIKmlRNYlWk3IT9weAJEpelICJV3Xdc8m25liWoPnHv+AIHwVCn7f2zA==
+ bh=YhbLla8v0WDPidQ8Xb23ycVc5S2jFjFD3o4RNS8/GHA=;
+ b=dt8tN/DFihmk4SX4LOfoRVuQIbcTW2lDi4aZz1Vfg+Vp5fqihHmupYBa6Ptfe90mvSDRzbd7XymHPOtFACua4LQlc3IuySo3wpTgHqqonqNPbH8u1JTIKm5UEHr5IM8QmfCeDJwfkJ8WEmYf5BOo2OHQJtT87tGA1o3qY31dxVGEk1InXkEk6WnE3tleqOkf9bM7/+atSfo6MhNhq5ptzccUBKF5C884ayPRjjdjEoLuTEFf06Yd2+KgWBI8t619adzPWtkg3ooC/XqW2bi5Oq8Is+IHgk9C3AT5MUPMQocMqaIIn5vsB45y5fQKNJEchqvyxwrT5aMA91/YLFUEJA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GkCBJLwsMBLjSVGWzfhuFJx+agdzxNGx1pRR5Z/t82s=;
- b=nAaUh3srnN6JMQAlIfvGFO5BEBlgbJk0GR0Ofkqvi56trEdsePpVK+cH9FHXDKrss1JkSkstmcgbfwEPH/VHXFK6dNCvjv9ziqkjqeRk/FbkkU0NBUjmlC7/3b51hI7LhFvizclDW5NYmknXNLi25elhtzLAt/GNQQjAIOzWhHQyXkIpz30JHBD+sSTbT0/GOj7ncQmwia5sWqNDo5i07W/aklsjBQcyLpAHVReuNEmpW75fN+0dP/KKjH6jHXfhQdgfxu3pPb/KImrrjTf6zokPiUnyiB06THVCiYMWHxNL3BHMrDKMyXAzXIDd8bgQQdzOPSO+6d9Uk4rwQkpqjw==
-Received: from MW4PR03CA0116.namprd03.prod.outlook.com (2603:10b6:303:b7::31)
- by IA1PR12MB6212.namprd12.prod.outlook.com (2603:10b6:208:3e4::7) with
+ bh=YhbLla8v0WDPidQ8Xb23ycVc5S2jFjFD3o4RNS8/GHA=;
+ b=HgufHmTlm54OHu62Osn8IrhjCAcUOih/yjT7UHl5eaJnu/9iA5Q5lLDFX7HeABjs/+saLL3a+/jC5PWlJu7lP9rVdjg9rFrK9sCPmcwFcJf5FlQxrxMeS+1FXpz1y8wyKdW+TAFitnqdiq9nMcocbGFANVU9sllfA4Txo0HPxXzD51THrGYA/C7Wg59SUaNBgQ9XTPxdcAVsDFNFULbny4z4IMR/BsxfOeKxl+wFfPYVQQqfL95EVSOIfcfdrsjbHxk4/3ZR73rk2DuhOtvUKqr4aR8U4jSLjn6HN8jjRNgjJtfSATcRRTF7p1rpzrs+lVzuQEjpIGkR95CZieSFHw==
+Received: from CH2PR14CA0040.namprd14.prod.outlook.com (2603:10b6:610:56::20)
+ by PH7PR12MB8054.namprd12.prod.outlook.com (2603:10b6:510:27f::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.20; Sat, 21 Jun
- 2025 04:21:20 +0000
-Received: from SJ5PEPF000001EF.namprd05.prod.outlook.com
- (2603:10b6:303:b7:cafe::67) by MW4PR03CA0116.outlook.office365.com
- (2603:10b6:303:b7::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.23 via Frontend Transport; Sat,
- 21 Jun 2025 04:21:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.28; Sat, 21 Jun
+ 2025 04:21:22 +0000
+Received: from CH2PEPF0000013F.namprd02.prod.outlook.com
+ (2603:10b6:610:56:cafe::5f) by CH2PR14CA0040.outlook.office365.com
+ (2603:10b6:610:56::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8857.26 via Frontend Transport; Sat,
+ 21 Jun 2025 04:21:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- SJ5PEPF000001EF.mail.protection.outlook.com (10.167.242.203) with Microsoft
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CH2PEPF0000013F.mail.protection.outlook.com (10.167.244.71) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8857.21 via Frontend Transport; Sat, 21 Jun 2025 04:21:19 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.8857.21 via Frontend Transport; Sat, 21 Jun 2025 04:21:22 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 20 Jun
- 2025 21:21:14 -0700
+ 2025 21:21:12 -0700
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 20 Jun 2025 21:21:13 -0700
+ 15.2.1544.14; Fri, 20 Jun 2025 21:21:12 -0700
 Received: from localhost.nvidia.com (10.127.8.12) by mail.nvidia.com
  (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14 via Frontend
- Transport; Fri, 20 Jun 2025 21:21:13 -0700
+ Transport; Fri, 20 Jun 2025 21:21:12 -0700
 From: <ankita@nvidia.com>
 To: <ankita@nvidia.com>, <jgg@nvidia.com>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
@@ -81,9 +81,9 @@ CC: <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
 	<qperret@google.com>, <kvmarm@lists.linux.dev>,
 	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<maobibo@loongson.cn>
-Subject: [PATCH v9 4/6] KVM: arm64: New function to determine hardware cache management support
-Date: Sat, 21 Jun 2025 04:21:09 +0000
-Message-ID: <20250621042111.3992-5-ankita@nvidia.com>
+Subject: [PATCH v9 1/6] KVM: arm64: Rename the device variable to s2_force_noncacheable
+Date: Sat, 21 Jun 2025 04:21:06 +0000
+Message-ID: <20250621042111.3992-2-ankita@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250621042111.3992-1-ankita@nvidia.com>
 References: <20250621042111.3992-1-ankita@nvidia.com>
@@ -98,150 +98,135 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: AnonymousSubmission
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EF:EE_|IA1PR12MB6212:EE_
-X-MS-Office365-Filtering-Correlation-Id: ec2712af-1997-4163-46b8-08ddb07b12d2
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000013F:EE_|PH7PR12MB8054:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd868bd5-cd79-42b9-9fd9-08ddb07b1439
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|7416014|82310400026|1800799024|376014|921020;
+	BCL:0;ARA:13230040|7416014|36860700013|82310400026|376014|1800799024|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vBC4AdlCFGc/3zhsere8qGdwgoAAGHB5zS9EsEAp+s5QgbMU/YFS/yW0njyS?=
- =?us-ascii?Q?vqImOqqn9i4UE5+BHwt4gsucRlbK/ddXZCZXPljSi4eR/qUdUo3CQf/TIPkX?=
- =?us-ascii?Q?zkyhlWLzDTES8C103LnL5PZYYh1gB5AwRzVEgH4PyshiFkfkrcg41BBxrPtP?=
- =?us-ascii?Q?DI8ia5y7SPw0LcixFoDuvT/kfgGCUEN/bDcbJGQBH4+XlOw4AkVUt2S6lZGC?=
- =?us-ascii?Q?TeYleB9gzImSbQVrOvI+GuPVcTkHN2Vgt0ytPCHRD+oclDJINsLl8bSYq8q8?=
- =?us-ascii?Q?9gzkFBQS19yxOxZnP6xbt3Rd1qiRKhPd8FvmL4MPE3qqhev2CebVuOHvvT5E?=
- =?us-ascii?Q?x8dwUfNBIiayzvkSbwk/Zs8aqrI2fShDBslgJc79OBtJ1I0tkBcNl+Np0+I+?=
- =?us-ascii?Q?siCdg9j7E6pY2Bie9SRy4nfZIDUxMGRQKmOPEETzYnJSXkLeC8RpEkswt3iI?=
- =?us-ascii?Q?x0jrMLeSRzcN9H8EVLjcb0zZtvK8fgCBo9xVo4+7fpdky25FB1Kp9GyKSaRl?=
- =?us-ascii?Q?jzTLtLSO8igT3G7Umnfrnm2DEfkt7TMlz05tUHVpVwwBBhasOuR+klrQPtzo?=
- =?us-ascii?Q?OZLwzpqJOOJcQHtBNEKeux+NFdPl8ObqNzclHYYOVSlAJVm3aEVGpSHktkZa?=
- =?us-ascii?Q?gX2cofK4133P7vXwzu1+9wBJGFJfNtC7xIlIzGrjMSUsI5kUzJugyM+dAQh5?=
- =?us-ascii?Q?UF2PZhQT4zWD8GKAAgZ55FPANGY/SIhPCy8yZ3GskQ1thRQZWjO1IObMvhuZ?=
- =?us-ascii?Q?ZtzGM582RsPngYWw2z9SoTt6sk195GszDKUlI7WYUsBT18W54J3E6GDcbfjU?=
- =?us-ascii?Q?031o3rMumpzyoQZoQgzGiXAF4n2X739ovLWq372PTsa1Pxx4L+K5y+NMqMuY?=
- =?us-ascii?Q?M2rLjw34ymyfbnvqnAhmxiyth03b8Qu1RdRhYSIWvD41JddoyQ1dRr0p1PdQ?=
- =?us-ascii?Q?MAwNE6ItKHTrCOBjWJ3arGRMTjxYzXbU9U3WUmxuOdwYXbEsUCIpxpwsr+kb?=
- =?us-ascii?Q?jsh6uFmP+S+iKsaNnEptoDAC75YXYszZCCSkQiJbbGIV7rBXnZ1zEMsaP+CH?=
- =?us-ascii?Q?ED47y9sUlHHTZQ+EZMwdwBg5j8umEgm9NCk6szbuxpqBqnF2CUq9LEMkgbgM?=
- =?us-ascii?Q?eufNiNL99UtRqfzu5ga+0Yp8yf4BWDwvdpcUPXKms01AC8jnJVpMsqo9OeVE?=
- =?us-ascii?Q?njXMpJbldPER3PnnNbIGgQ49eRZn0+N7m1ErenhegZmtlRtfCea69aIOmgEE?=
- =?us-ascii?Q?NqIiODuLvQcKZPLi4twTXHfFe0EcBlvtwOXQbf49APbnrGPwqBMdYKPRNwTq?=
- =?us-ascii?Q?32cW9BUGE5FuUnXbSAVNpWgELg5nwaCATwsGvsetowo3HdTGdkl+YceD4rLQ?=
- =?us-ascii?Q?fVLyQXf6omdOEXKBavnDvE+nrU84A/HMnnvMtkMg20X54IN4hejEoAmjIhof?=
- =?us-ascii?Q?6/35hcxV/e9TDB9tC1vu6s3W3fkkjxfrWvwHgVER51iL0qdfvniRwOvUpUh0?=
- =?us-ascii?Q?wKT1G0lxk31gNLB42dJ9iwv2q7RdXXOC7Dzpt61a8rTZlEmhGFbG+FFobg?=
+	=?us-ascii?Q?h7XfiP380ukc7G2ma364RMyIbo326GSC0voP3DzjhiO/vP4I556/uYu3adJU?=
+ =?us-ascii?Q?mpi9sOKZbvpiU5tbs+XYBjMa5ENI1w+gvRvf6Jd/avWGOj/sOQSWGb0sus2E?=
+ =?us-ascii?Q?82wsjs4eDwGVwk+Gko2bwQu9OqPN2eD2vobCp6fem4fnDWo6xt4DijWg7bQ5?=
+ =?us-ascii?Q?40WS9UA+Xzj4oAEWYMV9cfvRtQmIsJDTyIqJqBwQJFQOY8Yr0eIWcga35GKo?=
+ =?us-ascii?Q?Ew2yUjz4EPhafBYkkvlUfM9e6Wa7Nw33przg7B7iHczDmoccf7VHEpb4RG+F?=
+ =?us-ascii?Q?l+Tam+S8OJdakvCva/Mu5DC4eMWxWt4A1CV7yLBa8tyTheKW2EnH5Erj//Bp?=
+ =?us-ascii?Q?Iesr2Sp3X0Mr6+YGDrBUCoec7AJFFaIBxXMMgo9dVsUcsvfM6QKoSWhvcnn+?=
+ =?us-ascii?Q?SQ2fostevbUQ4R8gALwLtd/SntWPw7IpwvovxHdhZZoQwj+2+z1ueGBQBIY9?=
+ =?us-ascii?Q?b9FXBjUHbS02OtVPIqSRZ8adAW8ZhXZtSFoWpqJvqG//Pr3nIz6CeIYhcosF?=
+ =?us-ascii?Q?oX6zmpcbGFPmbObguZ2HO3pCVNg2RkIYDg88B/4CtmmIR2yDO5kP3TSP92UP?=
+ =?us-ascii?Q?vxE7K7/UsJchaMwM4oxvyeDlWPhBJ81shEqkJDR/JEYdBZS5nBS/Zo9vfwe1?=
+ =?us-ascii?Q?OJSTKz41seK+kzDVqLAUB2YFit1gSsbr87ABX2UHU/Wc/3MQ7y2V/kG83dQQ?=
+ =?us-ascii?Q?0FXhCHEjYelwGfsyGaPVJm6n0a61jToY7vLcWVtYv6tbXrS1p5NpB077G3fS?=
+ =?us-ascii?Q?rNsXbzCP0K1mIA6ckRIYqzWTCecuNN03P5iqKmvTG9EqZnFWKqHi1qkrgKGB?=
+ =?us-ascii?Q?DtsdnjBgjIhH+uPztWj1h2X/Kdm7ROG1OIyzs+xkdw8Op1fnT0m2Es7NiRdl?=
+ =?us-ascii?Q?P9oYINCUE43T7CYHnaSmhm6r/GGJQToyaB1nhbOUrYs14f0FI7oOUSgYXl9c?=
+ =?us-ascii?Q?2TSgYVMo5qAjdZ99uSGRj4znnAmDC80cKTmAkcTZZHt3MvV4U1a94fj2Pxld?=
+ =?us-ascii?Q?miHEFf/t1Uhf9hLo3BE2e3SFJApXUwAYuhmYJBHCAnoeX4fqXSNQV1q1dOMY?=
+ =?us-ascii?Q?xJpcxjVIilTGlFdCR7yedoppTEcZ8GASttOlBfE3J9smQWXMiWeDO/64rnWi?=
+ =?us-ascii?Q?dN1rVohvPi+4DKaWY4P5K9M9+qvr7aErWeRaXWA/DFII2HgRRfzkp7794Q9h?=
+ =?us-ascii?Q?Uhi6eUrZ4U+raI6JcCwKjrznF7oi8+9cYuldlFOXvPcBn1NJYbCc9fTt3AB2?=
+ =?us-ascii?Q?vH/hlYz2UPXYp+WWq971iL6HgD9Iv7ajLqIaNzD4M4Bj6b6flw4EYFruuXS8?=
+ =?us-ascii?Q?CrY+ibMOY/kQQyNVhFScWpTISr+pJz839QMIMtfZ3dp0NKDmK3OhUUswfUld?=
+ =?us-ascii?Q?8dgVkzqiaW90oo7dZgJMIyq7W51etroTC76qeQuFeloUE0rPVWi3orPCnSmL?=
+ =?us-ascii?Q?soW1k6LPR94th7FyNxbInYLma6/cXrhCB7PJ3anH1O6iwqEtb1s4aEqXtywh?=
+ =?us-ascii?Q?ybvM03iSH6P7btTJSP94GzjRAZ8lUkuMJpGRjT6n9oalpUXvyInDhIJlWg?=
  =?us-ascii?Q?=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(82310400026)(1800799024)(376014)(921020);DIR:OUT;SFP:1101;
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(36860700013)(82310400026)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2025 04:21:19.9567
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2025 04:21:22.2607
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec2712af-1997-4163-46b8-08ddb07b12d2
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd868bd5-cd79-42b9-9fd9-08ddb07b1439
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001EF.namprd05.prod.outlook.com
+	CH2PEPF0000013F.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6212
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8054
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-VM_PFNMAP VMA's are allowed to contain PTE's which point to physical
-addresses that does not have a struct page and may not be in the kernel
-direct map.
+For cache maintenance on a region, ARM KVM relies on that
+region to be mapped to the Kernal virtual address as CMOs
+operate on VA.
 
-However ARM64 KVM relies on a simple conversion from physaddr to a
-kernel virtual address when it does cache maintenance as the CMO
-instructions work on virtual addresses. This simple approach does not
-work for physical addresses from VM_PFNMAP since those addresses may
-not have a kernel virtual address, or it may be difficult to find it.
+Currently the device variable is effectively trying to setup
+the S2 mapping as non cacheable for memory regions that are
+not mapped in the Kernel VA. This could be either device or
+Normal_NC depending on the VM_ALLOW_ANY_UNCACHED flag in the
+VMA.
 
-Fortunately if the ARM64 CPU has two features, S2FWB and CACHE DIC,
-then KVM no longer needs to do cache flushing and NOP's all the
-CMOs. This has the effect of no longer requiring a KVA for addresses
-mapped into the S2.
+Thus "device" could be better renamed to s2_force_noncacheable
+which implies that it is ensuring that region be mapped as
+non-cacheable.
 
-Add a new function, kvm_arch_supports_cacheable_pfnmap(), to report
-this capability. From a core prespective it means the arch can accept
-a cachable VM_PFNMAP as a memslot. From an ARM64 perspective it means
-that no KVA is required.
-
-CC: Jason Gunthorpe <jgg@nvidia.com>
-CC: David Hildenbrand <david@redhat.com>
-CC: Donald Dutile <ddutile@redhat.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+CC: Catalin Marinas <catalin.marinas@arm.com>
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 ---
- arch/arm64/kvm/mmu.c     | 23 +++++++++++++++++++++++
- include/linux/kvm_host.h |  2 ++
- virt/kvm/kvm_main.c      |  5 +++++
- 3 files changed, 30 insertions(+)
+ arch/arm64/kvm/mmu.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 68c0f1c25dec..d8d2eb8a409e 100644
+index 2942ec92c5a4..1601ab9527d4 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1282,6 +1282,29 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 	kvm_nested_s2_wp(kvm);
- }
+@@ -1478,7 +1478,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	int ret = 0;
+ 	bool write_fault, writable, force_pte = false;
+ 	bool exec_fault, mte_allowed;
+-	bool device = false, vfio_allow_any_uc = false;
++	bool s2_force_noncacheable = false, vfio_allow_any_uc = false;
+ 	unsigned long mmu_seq;
+ 	phys_addr_t ipa = fault_ipa;
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -1653,7 +1653,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		 * In both cases, we don't let transparent_hugepage_adjust()
+ 		 * change things at the last minute.
+ 		 */
+-		device = true;
++		s2_force_noncacheable = true;
+ 	} else if (logging_active && !write_fault) {
+ 		/*
+ 		 * Only actually map the page as writable if this was a write
+@@ -1662,7 +1662,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		writable = false;
+ 	}
  
-+/**
-+ * kvm_arch_supports_cacheable_pfnmap() - Determine whether hardware
-+ *      supports cache management.
-+ *
-+ * ARM64 KVM relies on a simple conversion from physaddr to a kernel
-+ * virtual address (KVA) when it does cache maintenance as the CMO
-+ * instructions work on virtual addresses. This is incompatible with
-+ * VM_PFNMAP VMAs which may not have a kernel direct mapping to a
-+ * virtual address.
-+ *
-+ * With S2FWB and CACHE DIC features, KVM need not do cache flushing
-+ * and CMOs are NOP'd. This has the effect of no longer requiring a
-+ * KVA for addresses mapped into the S2. The presence of these features
-+ * are thus necessary to support cacheable S2 mapping of VM_PFNMAP.
-+ *
-+ * Return: True if FWB and DIC is supported.
-+ */
-+bool kvm_arch_supports_cacheable_pfnmap(void)
-+{
-+	return cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) &&
-+	       cpus_have_final_cap(ARM64_HAS_CACHE_DIC);
-+}
-+
- static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
- {
- 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 3bde4fb5c6aa..c91d5b5f8c39 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1235,6 +1235,8 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm);
- /* flush memory translations pointing to 'slot' */
- void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot);
-+/* hardware supports cache management */
-+bool kvm_arch_supports_cacheable_pfnmap(void);
+-	if (exec_fault && device)
++	if (exec_fault && s2_force_noncacheable)
+ 		return -ENOEXEC;
  
- int kvm_prefetch_pages(struct kvm_memory_slot *slot, gfn_t gfn,
- 		       struct page **pages, int nr_pages);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index eec82775c5bf..feacfb203a70 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1583,6 +1583,11 @@ static void kvm_replace_memslot(struct kvm *kvm,
- #define KVM_SET_USER_MEMORY_REGION_V1_FLAGS \
- 	(KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)
+ 	/*
+@@ -1695,7 +1695,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * If we are not forced to use page mapping, check if we are
+ 	 * backed by a THP and thus use block mapping if possible.
+ 	 */
+-	if (vma_pagesize == PAGE_SIZE && !(force_pte || device)) {
++	if (vma_pagesize == PAGE_SIZE && !(force_pte || s2_force_noncacheable)) {
+ 		if (fault_is_perm && fault_granule > PAGE_SIZE)
+ 			vma_pagesize = fault_granule;
+ 		else
+@@ -1709,7 +1709,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		}
+ 	}
  
-+bool __weak kvm_arch_supports_cacheable_pfnmap(void)
-+{
-+	return false;
-+}
-+
- static int check_memory_region_flags(struct kvm *kvm,
- 				     const struct kvm_userspace_memory_region2 *mem)
- {
+-	if (!fault_is_perm && !device && kvm_has_mte(kvm)) {
++	if (!fault_is_perm && !s2_force_noncacheable && kvm_has_mte(kvm)) {
+ 		/* Check the VMM hasn't introduced a new disallowed VMA */
+ 		if (mte_allowed) {
+ 			sanitise_mte_tags(kvm, pfn, vma_pagesize);
+@@ -1725,7 +1725,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (exec_fault)
+ 		prot |= KVM_PGTABLE_PROT_X;
+ 
+-	if (device) {
++	if (s2_force_noncacheable) {
+ 		if (vfio_allow_any_uc)
+ 			prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+ 		else
 -- 
 2.34.1
 
