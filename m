@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EB71DDE9
-	for <kvmarm@lists.linux.dev>; Sat, 21 Jun 2025 11:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597C815C158
+	for <kvmarm@lists.linux.dev>; Sat, 21 Jun 2025 13:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750506849; cv=none; b=T3NalUEuwGj/WXsjyqHLCaAYGMZkju8J8HTvI1cjTd1J/xaGDtEekta/bHeZpFEI2gixy1DNhFpqIejp35lp/nhML/usPwMBiQF91WzF1duqKgL7Rruskzxf6JXoCud2UvHcGrIGnqXsWC4PSVjSFUGSmS4pdHSfSFQS3NBNMcs=
+	t=1750510996; cv=none; b=UH29oGygo3LF6Y66iK0sGsYR/dEd0UXkEF+7L908HAg6Kl9UAtB6wJhnqtpdXmSsRmtymnwtlUrwrd889K+pO2cJFInrUc9/Xnk/GxwlJUTksu3Gml/FiSlBmEXYqREtwvZrtsIu8JdCKYwqB1nxyJNF38WQd5yXEGfrVNLKvjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750506849; c=relaxed/simple;
-	bh=K5eMLdq6YOvf+mUwulmhL57qHFMKXEpckqXJdVb7+QU=;
+	s=arc-20240116; t=1750510996; c=relaxed/simple;
+	bh=GvXnRAjD9za2tagNxRYQeAW0l7mHQMgeeL4ezDkBu+8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a39IUltD3XOUkduR4hSlXMxyoZmn3ORwPxVXJmurb6M3yoGvappCsUGiMY3WiAKTWubpmi1IEl3v6nmcPiMlbhXeQ2xNaUXMjqpywWlw4/ePqlqzj7W8hDRHe5agsG1lOIOk5GwiAsK82j1JnAM+asm8lvKM4WKq9T7NdeZ/Hks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Urh14lZT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=N5oZ5GCwucN6HXTiOnLM5j5TT4ctB227El+ckb1wf6hu6XcIxK9z/Sh72Ol4//lqROkr7LW4kEvJQKrvpGMqlQwCY5ImeoE1ww0UgTTsuX3h220aY9hRKERAllH4eycqXx0CAL/8L64XeRzdCCMhvdeN0Est9loW/lZuKB51dsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzq/m45V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Urh14lZT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9576BC4CEE7;
-	Sat, 21 Jun 2025 11:54:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzq/m45V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E75BDC4CEE7;
+	Sat, 21 Jun 2025 13:03:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750506848;
-	bh=K5eMLdq6YOvf+mUwulmhL57qHFMKXEpckqXJdVb7+QU=;
+	s=k20201202; t=1750510995;
+	bh=GvXnRAjD9za2tagNxRYQeAW0l7mHQMgeeL4ezDkBu+8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Urh14lZTgLBF0tvR5L1bbNR8pWx0J0NKhvxC0Bjv1Tvn+M12EvFRjtyYmcDkqAFbI
-	 ausWVBcnouAJwVZAHSp1OV+g50boEgnDGoBXv+azZuv17VyhFv24+HEThch/wrMy+6
-	 /zL9iL4zxnM1MfPNkyF4kYT7haqOG+owL9hj8EPknPUOoiT7ak91K8goMvf4zdy6w0
-	 fdbPaOfSDvmpbVYxomMtYRi79d7aOZoVn/dMOKtJ59ikxohl1EgtXzRdMtziOq1Avn
-	 7oSNYB5LWlRTDVNHR/1mGSAfYbCNl9RB+k75jHl4tF4+tN4hv+Hq1ppwmZK8tR0mJh
-	 joa0jOM8uwD5A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	b=uzq/m45VMelvH/OvirQ5NdtpITCg19SUcLf9CbcBjLt2tr1B/Cfla17Mts1FcnRT1
+	 dHOQFSJvUvn+C4IWn3CZi5wZ9WkAMUR74ChaJpvc2Zx+2l6U4TsWpmlw8+T4yG7sdr
+	 AmGofnaIxUey71g00aDx5UHXkx208w4vEt7dnMhZhzWrC2FT++SExcyHFvw/YK+Xlo
+	 Gu4/oGUrZBFvqqWASYLzLwwv3B7CJ8HQcI7+RMVD078gP4ohv9SCjo/XzImdAjWCdD
+	 fhu8TIwelzUKTOmAf+FVx3KmPM6nk8Ntyot0pC1mUrrKQGUDFnMTL7pY5sFWbObrwJ
+	 bZ8FgLU8kzIZg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uSwnO-008ngP-Go;
-	Sat, 21 Jun 2025 12:54:06 +0100
-Date: Sat, 21 Jun 2025 12:54:06 +0100
-Message-ID: <86a561cntt.wl-maz@kernel.org>
+	id 1uSxsH-008o5P-Rm;
+	Sat, 21 Jun 2025 14:03:13 +0100
+Date: Sat, 21 Jun 2025 14:03:13 +0100
+Message-ID: <87ecvdfdri.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 17/27] KVM: arm64: Route SEAs to the SError vector when EASE is set
-In-Reply-To: <20250616230308.1192565-18-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 18/27] KVM: arm64: nv: Handle effects of HCRX_EL2.TMEA on SError injection
+In-Reply-To: <20250616230308.1192565-19-oliver.upton@linux.dev>
 References: <20250616230308.1192565-1-oliver.upton@linux.dev>
-	<20250616230308.1192565-18-oliver.upton@linux.dev>
+	<20250616230308.1192565-19-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,46 +59,122 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Jun 2025 00:02:58 +0100,
+On Tue, 17 Jun 2025 00:02:59 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> One of the finest additions of FEAT_DoubleFault2 is the ability for
-> software to request *synchronous* external aborts be taken to the
-> SError vector, which of coure are *asynchronous* in nature.
+> HCRX_EL2.TMEA further modifies the physical SError behavior where
+> unmasked SErrors are taken to EL1 and masked SErrors are taken to EL2.
+> This gets a bit hairy when considering the fact that TMEA also enables
+> vSErrors, i.e. KVM has delegated the HW vSError context to the guest
+> hypervisor.
 > 
-> Opinions be damned, implement the architecture and send SEAs to the
-> SError vector if EASE is set for the target context.
+> We can keep the vSError context ownership by taking advantage of a
+> couple properties:
+> 
+>  - If SErrors are unmasked, the 'physical' SError can be taken
+>    in-context immediately. In other words, KVM can emulate the EL1
+>    SError while preserving vEL2's ownership of the vSError context.
+> 
+>  - If SErrors are masked, the 'physical' SError is taken to EL2 and
+>    needs the usual nested exception entry.
+> 
+> Note that the new in-context handling has the benign effect where
+> unmasked SError injections are emulated even for non-nested VMs.
 
-As they say, there is no accounting for taste! :)
+This patch isn't *just* about HCRX_EL2.TMEA, right? Clearly,
+SCTLR2_ELx.NMEA plays a role. One is about routing, while the other is
+about bypassing PSTATE.A (NM stands for Non-Maskable). Also, TMEA
+affects both SEA and SError, while NMEA is SError only.
+
+For the sake of making things a bit clearer, it might be worth either
+describing the effects of NMEA here, or split the NMEA handling to
+another patch.
 
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/emulate-nested.c |  3 +++
->  arch/arm64/kvm/hyp/exception.c  |  6 +++++-
->  arch/arm64/kvm/inject_fault.c   | 38 ++++++++++++++++++++++++++++++++-
->  3 files changed, 45 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/inject_fault.c | 36 +++++++++++++++++++++++++++++++++--
+>  1 file changed, 34 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 86c9a48fc8b6..7f9081c6ab11 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2833,6 +2833,9 @@ int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
->  			     iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW);
->  	esr |= ESR_ELx_FSC_EXTABT | ESR_ELx_IL;
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index cab14a926bc6..e689002f10b6 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -97,6 +97,11 @@ static bool effective_sctlr2_ease(struct kvm_vcpu *vcpu)
+>  	return __effective_sctlr2_bit(vcpu, SCTLR2_EL1_EASE_SHIFT);
+>  }
 >  
-> +	if (__vcpu_sys_reg(vcpu, SCTLR2_EL2) & SCTLR2_EL1_EASE)
-> +		return kvm_inject_nested(vcpu, esr, except_type_serror);
+> +static bool effective_sctlr2_nmea(struct kvm_vcpu *vcpu)
+> +{
+> +	return __effective_sctlr2_bit(vcpu, SCTLR2_EL1_NMEA_SHIFT);
+> +}
+> +
+>  static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+>  {
+>  	unsigned long cpsr = *vcpu_cpsr(vcpu);
+> @@ -258,14 +263,29 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+>  		inject_undef64(vcpu);
+>  }
+>  
+> +static bool serror_is_masked(struct kvm_vcpu *vcpu)
+> +{
+> +	bool masked = *vcpu_cpsr(vcpu) & PSR_A_BIT;
+> +
+> +	if (!vcpu_mode_priv(vcpu))
+> +		masked |= effective_sctlr2_nmea(vcpu);
+> +
+> +	return masked;
+> +}
+> +
+>  static bool kvm_serror_target_is_el2(struct kvm_vcpu *vcpu)
+>  {
+> -	return is_hyp_ctxt(vcpu) || vcpu_el2_amo_is_set(vcpu);
+> +	if (is_hyp_ctxt(vcpu) || vcpu_el2_amo_is_set(vcpu))
+> +		return true;
+> +
+> +	return serror_is_masked(vcpu) &&
+> +	       (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TMEA);
+>  }
+>  
+>  static bool kvm_serror_undeliverable_at_el2(struct kvm_vcpu *vcpu)
+>  {
+> -	return !(vcpu_el2_tge_is_set(vcpu) || vcpu_el2_amo_is_set(vcpu));
+> +	return !(vcpu_el2_tge_is_set(vcpu) || vcpu_el2_amo_is_set(vcpu) ||
+> +		 effective_sctlr2_nmea(vcpu));
+>  }
+>  
+>  int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
+> @@ -281,6 +301,18 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
+>  		return 1;
+>  	}
+>  
+> +	/*
+> +	 * Emulate the exception entry if SErrors are unmasked. This is useful if
+> +	 * the vCPU is in a nested context w/ vSErrors enabled then we've already
+> +	 * delegated he hardware vSError context (i.e. HCR_EL2.VSE, VSESR_EL2,
+> +	 * VDISR_EL2) to the guest hypervisor.
+> +	 */
+> +	if (!serror_is_masked(vcpu)) {
+> +		pend_serror_exception(vcpu);
+> +		vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> +		return 1;
+> +	}
+> +
+>  	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
+>  	*vcpu_hcr(vcpu) |= HCR_VSE;
+>  	return 1;
 
-Are we allowed to not set FAR_EL2 here? My reading of R_RYXCL is that
-only the exception vector changes, not what is reported.
+I see that the handling of TMEA affecting the routing of SEAs is in a
+follow-up patch, but it'd be good to either call out the split in the
+commit message, or have a single patch addressing all of the TMEA
+effects.
 
-But the spec is clear as mud, and I wonder if I'm reading too much
-into it.
+None of that affects the code, which seems correct (well, I think -- I
+can sense a headache coming!).
 
 Thanks,
 
 	M.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz isn't dead. It just smells funny.
