@@ -1,134 +1,226 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1C92EAE5
-	for <kvmarm@lists.linux.dev>; Sun, 22 Jun 2025 12:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A69EED7;
+	Sun, 22 Jun 2025 13:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750595872; cv=none; b=neUg36z553Q7HMbV0p1n7g5OnPgXZ40hY0BVvL+uklnQ0pniK+si5MIZJ0ljJEdIdZ3oZkFrUZh90BRIgOTP7pal7j7r+rHd9WxJkTrJM0pKSziUb4xhGupS/lCiUvTM3U51qgJ1zVF/BthMiAfHN7SDZehWysV7L4+o2rNe8bk=
+	t=1750597285; cv=none; b=WGYwASU9yDzOFMmuqjibDVC4IZSEZ+FjTrv+9ScEw4s3/hB9HLuaMBgvEIiJ4NB3MPrrDBZD3QeRadPfR/T+93XC1GHap09I7LhOnDQ9UcD1tpOhjVHzpgrhu+z1nI1NXqXYirzSvOa3sqBWNhhG8f9huoTNVOunwMbl08R9Zzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750595872; c=relaxed/simple;
-	bh=r2TLNHjXaxZ9qUZ1DaLfD5bMfQRPRiHSifyWV5+2nV8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNOT7H4PueRimjBkvr/qqBhC4wr2w1/iOvWmdTaZ9wMK5ybQmwOYWsRHFS3EBYV/rSSw3GxVSVYMhFcc4+wJhnqW3U+5ps14+iYjIALuEL/S3xpwEZwQofYN7ma8FnGKB1l4k9jNOOs9vcRNc1NXtMUFsM+muSO3mUAZ10bw69Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hryIEMqT; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1750597285; c=relaxed/simple;
+	bh=qLkw/Q/EM8Dh1Jv3fjeRRfrI8ZV5UvvY6GtQl0d2ph8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BvNm8hikkaG1VCWdFwlwJOCNehRwV2u+w/qQutjkjhx/ksq/4yoF2a1l4RRe+Wlwb8l9gxznM5NgoyyIPy4CXgSkNliSf2jEYpFp3Dzy+zx+5TFz6CqG5jt4zBFz9lzlqLDH3tfcrv3ANWkT8uGxZUhyXPeSi46ExXr8Nbh8t1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=svhYhSBY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hryIEMqT"
-Date: Sun, 22 Jun 2025 05:37:37 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750595866;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G39kGGdgOel5ks2KWoZBvfJhe96q0aex/pRGhaP2C9A=;
-	b=hryIEMqT69op4L3cD0N+MNzE3Zcl3j93X5eviPv4N/kD4wosCzZHFO4+k+yidbkKl1X2Ml
-	dRmyMpTYrBM4k1BgLFLAfx+/A/U2efpcJ4JpnChuBkpWs8OpuN7BkD8BSEfx2gMFLk8dCk
-	npfA2UPVzonkTcQe9i5LKkkIrpK1Yzs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 4/5] KVM: arm64: gic-v5: Support GICv3 compat
-Message-ID: <aFf5EYvF3NVr9MKm@linux.dev>
-References: <20250620160741.3513940-1-sascha.bischoff@arm.com>
- <20250620160741.3513940-5-sascha.bischoff@arm.com>
- <aFXClKQRG3KNAD2y@linux.dev>
- <87a560ezpa.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="svhYhSBY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA79FC4CEE3;
+	Sun, 22 Jun 2025 13:01:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750597284;
+	bh=qLkw/Q/EM8Dh1Jv3fjeRRfrI8ZV5UvvY6GtQl0d2ph8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=svhYhSBYlgsO6WqFP4DG4Ibuoyfs7mZ3VZaQyyfK3cYXuQ0TQD35EJCeO/Mpshh2H
+	 xI3l7iAcoH8Bf8iRZBWccJ5GrzMaRZJILNtjGG8VtbXhy54gQylP0dOS2Jk2MuACPE
+	 FSjdjYJOaGghCEmOzMtN6Ft7E+xIzfIbS/VSO6KdArui1yqYKZMzQcvBPftqt1JGaj
+	 DOfGCNspTpHwq9QYr0pbpKOvajO6/24wPJroJuPcoDb/YwD3OlYCt3/QBw3mlKH/ye
+	 MaVsl12q7zVD78TW1ZmNS7u/jjPQwfMbEKC8MgP4Q/mIIzN1y1u6/H+ij3K4dPwhFC
+	 XvKYae1nDy1yw==
+Received: from [213.123.58.114] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uTKK2-008y5h-Af;
+	Sun, 22 Jun 2025 14:01:22 +0100
+Date: Sun, 22 Jun 2025 14:01:21 +0100
+Message-ID: <878qlkexr2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: perlarsen@google.com
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 3/6] KVM: arm64: Use SMCCC 1.2 in host FF-A handler
+In-Reply-To: <20250619-virtio-msg-ffa-v5-3-412c98558807@google.com>
+References: <20250619-virtio-msg-ffa-v5-0-412c98558807@google.com>
+	<20250619-virtio-msg-ffa-v5-3-412c98558807@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a560ezpa.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 213.123.58.114
+X-SA-Exim-Rcpt-To: perlarsen@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, Jun 22, 2025 at 01:19:13PM +0100, Marc Zyngier wrote:
-> On Fri, 20 Jun 2025 21:20:36 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > Hi Sascha,
-> > 
-> > Thank you for posting this. Very excited to see the GICv5 enablement get
-> > started.
-> > 
-> > On Fri, Jun 20, 2025 at 04:07:51PM +0000, Sascha Bischoff wrote:
-> > > Add support for GICv3 compat mode (FEAT_GCIE_LEGACY) which allows a
-> > > GICv5 host to run GICv3-based VMs. This change enables the
-> > > VHE/nVHE/hVHE/protected modes, but does not support nested
-> > > virtualization.
-> > 
-> > Can't we just load the shadow state into the compat VGICv3? I'm worried
-> > this has sharp edges on the UAPI side as well as users wanting to
-> > migrate VMs to new hardware.
-> >
-> > The guest hypervisor should only see GICv3-only or GICv5-only, we can
-> > pretend FEAT_GCIE_LEGACY never existed :)
+On Thu, 19 Jun 2025 10:02:56 +0100,
+Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org> wrote:
 > 
-> That's exactly what this does. And the only reason NV isn't supported
-> yet is the current BET0 spec makes ICC_SRE_EL2 UNDEF at EL1 with NV,
-> which breaks NV in a spectacular way.
-
-Gee, I wonder how... :)
-
-> This will be addressed in a future revision of the architecture, and
-> no HW will actually be built with this defect. As such, there is no
-> UAPI to break.
-
-That's fine by me. TBH, when I left this comment I hadn't fully read the
-patch yet and was more curious about the intent.
-
-> > > +void __vgic_v3_compat_mode_disable(void)
-> > > +{
-> > > +	sysreg_clear_set_s(SYS_ICH_VCTLR_EL2, ICH_VCTLR_EL2_V3, 0);
-> > > +	isb();
-> > > +}
-> > > +
-> > 
-> > It isn't clear to me what these ISBs are synchonizing against. AFAICT,
-> > the whole compat thing is always visible and we can restore the rest of
-> > the VGICv3 context before guaranteeing the enable bit has been observed.
+> From: Per Larsen <perlarsen@google.com>
 > 
-> No, some registers have a behaviour that is dependent on the status of
-> the V3 bit (ICH_VMCR_EL2 being one), so that synchronisation is
-> absolutely needed before accessing this register.
-
-Yeah, I had followed up on this after reading the spec, modal registers
-are great. Putting all the constituent registers together in the common
-load/put helpers will clear that up.
-
-> The disabling is probably the wrong way around though, and I'd expect
-> the clearing of V3 to have an ISB *before* the write to the sysreg,
+> SMCCC 1.1 and prior allows four registers to be sent back as a result
+> of an FF-A interface. SMCCC 1.2 increases the number of results that can
+> (and often must) be sent back to 8 and 16 for 32-bit and 64-bit SMC/HVCs
+> respectively.
 > 
-> > Can we consolidate this into a single hyp call along with
-> > __vgic_v3_*_vmcr_aprs()?
+> FF-A 1.0 references SMCCC 1.2 (reference [4] on page xi) and FF-A 1.2
+> explicitly requires SMCCC 1.2 so it should be safe to use this version
+> unconditionally. Moreover, it is simpler to implement FF-A features
+> without having to worry about compatibility with SMCCC 1.1 and older.
 > 
-> I agree that we should be able to move this to be driven by
-> load/put entirely.
+> Add SMCCC 1.2 helper routines and use this version unconditionally.
+
+Well, the previous patch already mandates that, so I wonder why you
+have two patches tackling the same thing.
+
 > 
-> But we first need to fix the whole WFI sequencing first, because this
-> is a bit of a train wreck at the moment (entering the WFI emulation
-> results in *two* "put" sequences on the vgic, and exiting WFI results
-> in two loads).
+> Signed-off-by: Per Larsen <perlarsen@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 297 ++++++++++++++++++++++++------------------
+>  1 file changed, 173 insertions(+), 124 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 51bbe8f9c94584e9001ee769cbfd608d930ff723..23b75b9f0bcc62724f0d0d185ac2ed2526375da4 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -71,36 +71,55 @@ static u32 hyp_ffa_version;
+>  static bool has_version_negotiated;
+>  static hyp_spinlock_t version_lock;
+>  
+> -static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
+> +static void ffa_to_smccc_1_2_error(struct arm_smccc_1_2_regs *regs, u64 ffa_errno)
+>  {
+> -	*res = (struct arm_smccc_res) {
+> +	*regs = (struct arm_smccc_1_2_regs) {
+>  		.a0	= FFA_ERROR,
+>  		.a2	= ffa_errno,
+>  	};
+>  }
+>  
+> -static void ffa_to_smccc_res_prop(struct arm_smccc_res *res, int ret, u64 prop)
+> +static void ffa_to_smccc_regs_prop(struct arm_smccc_1_2_regs *regs, int ret,
+> +				   u64 prop)
+>  {
+>  	if (ret == FFA_RET_SUCCESS) {
+> -		*res = (struct arm_smccc_res) { .a0 = FFA_SUCCESS,
+> -						.a2 = prop };
+> +		*regs = (struct arm_smccc_1_2_regs) { .a0 = FFA_SUCCESS,
+> +						      .a2 = prop };
+>  	} else {
+> -		ffa_to_smccc_error(res, ret);
+> +		ffa_to_smccc_1_2_error(regs, ret);
+>  	}
+>  }
+>  
+> -static void ffa_to_smccc_res(struct arm_smccc_res *res, int ret)
+> +static void ffa_to_smccc_regs(struct arm_smccc_1_2_regs *regs, int ret)
+>  {
+> -	ffa_to_smccc_res_prop(res, ret, 0);
+> +	ffa_to_smccc_regs_prop(regs, ret, 0);
+>  }
+>  
+>  static void ffa_set_retval(struct kvm_cpu_context *ctxt,
+> -			   struct arm_smccc_res *res)
+> +			   struct arm_smccc_1_2_regs *regs)
+>  {
+> -	cpu_reg(ctxt, 0) = res->a0;
+> -	cpu_reg(ctxt, 1) = res->a1;
+> -	cpu_reg(ctxt, 2) = res->a2;
+> -	cpu_reg(ctxt, 3) = res->a3;
+> +	cpu_reg(ctxt, 0) = regs->a0;
+> +	cpu_reg(ctxt, 1) = regs->a1;
+> +	cpu_reg(ctxt, 2) = regs->a2;
+> +	cpu_reg(ctxt, 3) = regs->a3;
+> +	cpu_reg(ctxt, 4) = regs->a4;
+> +	cpu_reg(ctxt, 5) = regs->a5;
+> +	cpu_reg(ctxt, 6) = regs->a6;
+> +	cpu_reg(ctxt, 7) = regs->a7;
+> +
 
-You're talking about the case where halt polling fails and we do a
-put/load on the whole vCPU to schedule right? i.e. in addition to the
-explicit put on the vgic for faithful emulation.
+But my main problem with this patch is this sort of pointless
+churn. Changing "res" to "regs" just for the sake of it is completely
+pointless, and makes everything harder to read.
 
-Thanks,
-Oliver
+Please do yourself (and everybody else) a favour by keeping the
+variable name the same.
+
+> +	/* DEN0028C 2.6: SMC32/HVC32 call from aarch64 must preserve x8-x30 */
+> +	if (ARM_SMCCC_IS_64(regs->a0)) {
+
+This is the *return value*, right? Not the function number. How can
+you tell about the 64-bitness of the function number based on that?
+
+> +		cpu_reg(ctxt, 8) = regs->a8;
+> +		cpu_reg(ctxt, 9) = regs->a9;
+> +		cpu_reg(ctxt, 10) = regs->a10;
+> +		cpu_reg(ctxt, 11) = regs->a11;
+> +		cpu_reg(ctxt, 12) = regs->a12;
+> +		cpu_reg(ctxt, 13) = regs->a13;
+> +		cpu_reg(ctxt, 14) = regs->a14;
+> +		cpu_reg(ctxt, 15) = regs->a15;
+> +		cpu_reg(ctxt, 16) = regs->a16;
+> +		cpu_reg(ctxt, 17) = regs->a17;
+> +	}
+>  }
+>  
+>  static bool is_ffa_call(u64 func_id)
+> @@ -113,82 +132,104 @@ static bool is_ffa_call(u64 func_id)
+>  
+>  static int ffa_map_hyp_buffers(u64 ffa_page_count)
+>  {
+> -	struct arm_smccc_res res;
+> +	struct arm_smccc_1_2_regs regs;
+>  
+> -	arm_smccc_1_1_smc(FFA_FN64_RXTX_MAP,
+> -			  hyp_virt_to_phys(hyp_buffers.tx),
+> -			  hyp_virt_to_phys(hyp_buffers.rx),
+> -			  ffa_page_count,
+> -			  0, 0, 0, 0,
+> -			  &res);
+> +	regs = (struct arm_smccc_1_2_regs) {
+> +		.a0 = FFA_FN64_RXTX_MAP,
+> +		.a1 = hyp_virt_to_phys(hyp_buffers.tx),
+> +		.a2 = hyp_virt_to_phys(hyp_buffers.rx),
+> +		.a3 = ffa_page_count,
+> +	};
+> +	arm_smccc_1_2_smc(&regs, &regs);
+
+To expand on my previous comment about this res/regs repainting, I'd
+rather see something like:
+
+	struct arm_smccc_1_2_regs res;
+
+	arm_smccc_1_2_smc(&(struct arm_smccc_1_2_regs){
+			 .a0 = FFA_FN64_RXTX_MAP,
+			 .a1 = hyp_virt_to_phys(hyp_buffers.tx),
+ 	 		 .a2 = hyp_virt_to_phys(hyp_buffers.rx),
+			 .a3 = ffa_page_count,
+	}, &res);
+
+
+> +	if (regs.a0 != FFA_SUCCESS)
+> +		return regs.a2;
+>  
+> -	return res.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : res.a2;
+> +	return regs.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : regs.a2;
+
+Why are you writing the same thing twice?
+
+I stopped reading here.
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
