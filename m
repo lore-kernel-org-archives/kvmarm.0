@@ -1,49 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53FAA3597E
-	for <kvmarm@lists.linux.dev>; Sun, 22 Jun 2025 08:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF12347C7
+	for <kvmarm@lists.linux.dev>; Sun, 22 Jun 2025 09:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750581593; cv=none; b=qIufx5Cci85N+VAgIq49C8PuCxTnrBtfPFBoJfsgJB0ZBs9DnUK14dLWYFo8oci2MkUiL6mGS6R0eCCpb34hgc+FhVvYZNfrVSspkJkErYmYZuw4NJ1N6pI0+4JPHUoUAsWiIVwhXmlT5rglKq70m8Iqjq8/1NC/aCs86IMwndw=
+	t=1750584355; cv=none; b=J+sTnYviBAgtObj5NJCMJ+Sjdup5+whM4Y+VxRVuAesDnud7rC6y6G7dtlERrUj1xQygk1lPoPHUcx5YbLr0YQ4jO4sm+P3noYYa8WDph8qR5j2/OunWnWrlmXZ6Fqz5A3jp8TccJhEdpMu2xPdX2Hvp3JsVPPEW2QNIG8QviE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750581593; c=relaxed/simple;
-	bh=DVYkLF5dA8i0pfLGB/1f6MWOMREtNvojBTWbzvce0oo=;
+	s=arc-20240116; t=1750584355; c=relaxed/simple;
+	bh=UdTcPDJUW3/44nRktdZOWI3AHEtLWMuVpKI9m6EmvoQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DGGZIR6RPIeK01LrHUNQWb79OOuVMFA/H9KP9v4qt52NVsGZ6K8pyFeTvOOlsMdSmFlO981iQUGX7Gp9VKfl118ov6xt47w0RmFWcH+E0GrBaRpL4gEtYSRgcy7S8JzhrQ4zBNwECvaUcePDM1JHhjaPwXFyZgc57VHT0DV3Dik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSQB7vBi; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=beDZYaJbxEuTL182WYQivLs9GhiwBujUsr83i3rX8Tul0UeXtBOxvsCxx+2W/39KjsmcXhpZuHxtFqQhnZXj7JEvamYbUXnUw6tyLUvTQeYM2DkxOzw+vhpCGQ+iYv6WdNM4dIRpiBzWg5yOiutdVm4+msnNdKA2JrOJgbLUBEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mMdWak7E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSQB7vBi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D045CC4CEE3;
-	Sun, 22 Jun 2025 08:39:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mMdWak7E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D651C4CEE3;
+	Sun, 22 Jun 2025 09:25:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750581592;
-	bh=DVYkLF5dA8i0pfLGB/1f6MWOMREtNvojBTWbzvce0oo=;
+	s=k20201202; t=1750584354;
+	bh=UdTcPDJUW3/44nRktdZOWI3AHEtLWMuVpKI9m6EmvoQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uSQB7vBiXzuG0cUEgk9C8CDqLcnizfkQLmVFwCmSkSePb7oyegwD9Z7n4CEEboxjN
-	 68ndp+mu2i4dFUrwyUJV2Cn+Qy5Bt7Kxr864wf1vCS2SiGtXUN1U3wvt0XKmhPGZxb
-	 7O9Df8MhRN5nHy8CWlMfIRwKsrwlBYnKlmohKxfSZXf1NSINpWs0WseDuj3nHbvnjK
-	 aUKORZ+IxG4b8D3MfK1JJ4HwIoE+e5RW4O03ZX7W3WKtbk0/EvPLIw6GYg4MEoCIYt
-	 rVpeER7elnKoPkkK2OFDakardEgOP0n4Kj/ETxiMhSrGSXBxIeLdFWFBjiAnu3yj7Q
-	 vNuIcxO1UPYZw==
+	b=mMdWak7E77ZW6aUqXs3CmC4BD6JjQf3V/MYwN3YJHpGpsJF2vgGaA6fVtAHuzyFDZ
+	 9FxUy/jYVX8ITP4p8EoY7nBdd3HI+93A0uCxkIl8fAB5P+ZSv4nIReJJfkPBC+2j2F
+	 Ft4ExJi78n3tC1oG/EA4g1h7G+YdQpc+gtmplJ4eW6mNEtn9ew8XQwPIS4gkFTxpeW
+	 hyFGim0431Z2NLeqRZfv7+bMcIZg0+V0Byvax7b/wvfSEDWN9jH13+Q/AkcgQmQ8Lu
+	 /MLWqN60R3DRQ9LPoHCcnj4mWHdqd2ADy799NfJ0WFrQ/rf+6tMVw2JrfAmJWc1fec
+	 BdZld0JDdKbRg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uTGEw-008wJ6-Dx;
-	Sun, 22 Jun 2025 09:39:50 +0100
-Date: Sun, 22 Jun 2025 09:39:50 +0100
-Message-ID: <87cyawf9ux.wl-maz@kernel.org>
+	id 1uTGxU-008wdR-8X;
+	Sun, 22 Jun 2025 10:25:52 +0100
+Date: Sun, 22 Jun 2025 10:25:51 +0100
+Message-ID: <87bjqgf7q8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 19/27] KVM: arm64: Take "masked" SEAs to EL2 when TMEA is set
-In-Reply-To: <20250616230308.1192565-20-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 00/27] KVM: arm64: SCTLR2, DoubleFault2, and NV external abort fixes
+In-Reply-To: <20250616230308.1192565-1-oliver.upton@linux.dev>
 References: <20250616230308.1192565-1-oliver.upton@linux.dev>
-	<20250616230308.1192565-20-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,46 +58,24 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Jun 2025 00:03:00 +0100,
+On Tue, 17 Jun 2025 00:02:41 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> SEAs can never actually be masked (they're synchronous after all), but
-> the value of PSTATE.A used as a proxy for whether software might be in
-> the middle of an SEA handler. And, when TMEA is set, these "masked" SEAs
-> are actually routed to EL2.
+> Well... this series grew a bit. Thanks to some leading review feedback
+> in v1, I went about implementing FEAT_RAS, FEAT_SCLTR2, and
+> FEAT_DoubleFault2 for NV (and non-NV, where applicable).
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/inject_fault.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index e689002f10b6..3eab7690c54e 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -209,7 +209,14 @@ static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
->  
->  static bool kvm_sea_target_is_el2(struct kvm_vcpu *vcpu)
->  {
-> -	return __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_TGE | HCR_TEA);
-> +	if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_TGE | HCR_TEA))
-> +		return true;
-> +
-> +	if (!vcpu_mode_priv(vcpu))
-> +		return false;
-> +
-> +	return (*vcpu_cpsr(vcpu) & PSR_A_BIT) &&
-> +	       (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TMEA);
->  }
->  
->  int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+> The most annoying addition of the whole bunch is certainly TMEA, which
+> has the effect of enabling vSErrors and potentially making 'physical'
+> SErrors deliverable to the same context.
 
-Only tangentially related to this patch and the previous one: what
-should a hypervisor do when inheriting an SEA/SError from its guest? I
-can't see a good way to handle that other than either terminating the
-guest, or ignoring the problem altogether.
+Apart from a small number of minor issues, this looks really good.
+Thanks a lot for going the extra mile and posting a consistent set of
+features!
 
-But maybe that's what the design point is (eyes roll...).
+With these issues addressed:
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
