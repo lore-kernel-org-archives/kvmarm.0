@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E8024169B;
-	Mon, 23 Jun 2025 15:14:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7607E262FFD;
+	Mon, 23 Jun 2025 15:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750691682; cv=none; b=EDC1kz8YAHsUEmGfY97wo4TMxYSuCHxXDWx68GVCktKk7ILSRrTRi5aTUv2NVhMEtj4409qEC8p2jegZPwRpW9dflbm7Jglb+tgLfHysKmXhEH/3lx+FcqzZA+S0udVzzUYWciQNtFUxwZSRZaqCGHI8rjjB3Nc4hk+DyC1KCyw=
+	t=1750692073; cv=none; b=ignYex5P0y09Ngp/5bsTKBvHJnWja8WcSqMQP11mwYQ1CrlMPsMSgMCdYOyiwU3gJWZDcs3Y+9O5ItfuS8D3fve+mzytPd+GIYrs9F3CDIMxpyDw6+/7dWc1seMaUmLIWQb2q/6UxnR8Mn4aYAoVgFPEIlHqac+cYxsnOectUAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750691682; c=relaxed/simple;
-	bh=XSDrVBVnhyxYp1JMKvQx3EG0b0XeZk8MBikoZoNvSPA=;
+	s=arc-20240116; t=1750692073; c=relaxed/simple;
+	bh=AO8oR9iVOI3X3E2H+YguT8JIoUYuH/+e9B86cY82fto=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gTt5US/p+FpBDBl5nTTkrAobqpG3uNMKJUEOyigjsSyRlVHa5iMda7eTIGtL0glqRn8VeICOxvjihT6DmmWz+Op1Mk3AFaFUFxYOvDBoJHLqqbgGAr7AIQWWHrY78csfa8xfifd/y2R5px5pZYJClQa3idZdx55/evQ3cFTqkus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OmCoXbQf; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=RJJDWtmEYPGFKqgJpWouw/taq2TBBTN/q5PbY2AIWQsG828WIMVt0jYzLjMr9vOlyjlcKK8aZDwCixSUrN4EAWm4XsmwwdCP4buVEtLBtOED/M0783ZJXlTXb89cOanV60sL4fV0eY4iyhheQYzxGUBiuWloDASkeM5N25e/wWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sa+E3D8P; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OmCoXbQf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2742EC4CEEA;
-	Mon, 23 Jun 2025 15:14:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sa+E3D8P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A034C4CEEA;
+	Mon, 23 Jun 2025 15:21:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750691681;
-	bh=XSDrVBVnhyxYp1JMKvQx3EG0b0XeZk8MBikoZoNvSPA=;
+	s=k20201202; t=1750692073;
+	bh=AO8oR9iVOI3X3E2H+YguT8JIoUYuH/+e9B86cY82fto=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OmCoXbQf/tjUIpINpxj6vwdUqDZybUpwjdWVlsS76SySfStDAGZ61o1ANRZoqQjPG
-	 8PB+6z/OaL3uYgFT3hzwwpRGKnIvCLqf1FLbvHBugmzjEoSWyBnDNLNnVnK18oEqQo
-	 NJPa/wbKeZsV6TTtEDYn2s+KrdSCTmNs6ejzDIQC/vtygeq6/S4gez8uy6/kyvlHLD
-	 SGGhZr2G7/86WqxshFSb/HYHgENdhplZMRLtlRMIQDJfa5WqDGYugWqqCT0YdUJ2l4
-	 ap8E3G7oamo2KDrBMaPSTGXdgJWyPgcjLr6F3YDdKQW8I82pgl//a8FozORPIpQJlA
-	 rEGxf3sYaX2sA==
-Date: Mon, 23 Jun 2025 17:14:35 +0200
+	b=Sa+E3D8P4hEplewoicY3Mvfbf4eR2Yo3VUfGk+HHCP5ZBEVNk5ilpjQhWbrsTiCdC
+	 j+CngHKTkWWRmYVxRaRrX1dqJlq8EeMIknsiE6xq5D9SzAYt4IIP4Z8HUbgKTbs4FN
+	 qVOM08civmJRGvOsffFXSJgKDJXDyBmWxsuDHhgkFPG5qTLQjZPM9K9dQV2S+XBBo2
+	 vQrWZASrHOvgjJvjtHT+QNTIxyK+F8tW9SRonKLYT+KfivTmEPxjX3B1kx+Fe7yId5
+	 30TZvOO+kK50QC7CP3ShJLMiph/awnZRvDul3fzpWj6qrsdVKn3aMSkQDbS8yQKRkk
+	 P0xUF1/W8G/oQ==
+Date: Mon, 23 Jun 2025 17:21:06 +0200
 From: Lorenzo Pieralisi <lpieralisi@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
@@ -41,10 +41,11 @@ Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org
 	"will@kernel.org" <will@kernel.org>,
 	"tglx@linutronix.de" <tglx@linutronix.de>,
 	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 2/5] irqchip/gic-v5: Populate struct gic_kvm_info
-Message-ID: <aFlvW2FNCyCi3h3Y@lpieralisi>
+Subject: Re: [PATCH 1/5] irqchip/gic-v5: Skip deactivate for forwarded PPI
+ interrupts
+Message-ID: <aFlw4lOj8tUGrSTb@lpieralisi>
 References: <20250620160741.3513940-1-sascha.bischoff@arm.com>
- <20250620160741.3513940-3-sascha.bischoff@arm.com>
+ <20250620160741.3513940-2-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,110 +54,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250620160741.3513940-3-sascha.bischoff@arm.com>
+In-Reply-To: <20250620160741.3513940-2-sascha.bischoff@arm.com>
 
-On Fri, Jun 20, 2025 at 04:07:51PM +0000, Sascha Bischoff wrote:
-> Populate the gic_kvm_info struct based on support for
-> FEAT_GCIE_LEGACY.  The struct is used by KVM to probe for a compatible
-> GIC.
+On Fri, Jun 20, 2025 at 04:07:50PM +0000, Sascha Bischoff wrote:
+> If a PPI interrupt is forwarded to a guest, skip the deactivate and
+> only EOI. Rely on the guest deactivating the both the virtual and
+
+"deactivating both"
+
+> physical interrupts (due to ICH_LRx_EL2.HW being set) later on as part
+> of handling the injected interrupt. This mimics the behaviour seen on
+> native GICv3.
+> 
+> This is part of adding support for the GICv3 compatibility mode on a
+> GICv5 host.
 > 
 > Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  drivers/irqchip/irq-gic-v5.c          | 34 +++++++++++++++++++++++++++
->  include/linux/irqchip/arm-vgic-info.h |  4 ++++
->  2 files changed, 38 insertions(+)
-> 
+>  drivers/irqchip/irq-gic-v5.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+
+Reviewed-by: Lorenzo Pieralisi <lpieralisi@kernel.org>
+
 > diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
-> index 28853d51a2ea..6aecd2343fee 100644
+> index 4a0990f46358..28853d51a2ea 100644
 > --- a/drivers/irqchip/irq-gic-v5.c
 > +++ b/drivers/irqchip/irq-gic-v5.c
-> @@ -13,6 +13,7 @@
+> @@ -213,6 +213,12 @@ static void gicv5_hwirq_eoi(u32 hwirq_id, u8 hwirq_type)
 >  
->  #include <linux/irqchip.h>
->  #include <linux/irqchip/arm-gic-v5.h>
-> +#include <linux/irqchip/arm-vgic-info.h>
->  
->  #include <asm/cpufeature.h>
->  #include <asm/exception.h>
-> @@ -1049,6 +1050,37 @@ static void gicv5_set_cpuif_idbits(void)
->  	}
->  }
->  
-> +#ifdef CONFIG_KVM
-> +static struct gic_kvm_info gic_v5_kvm_info __initdata;
-> +
-> +static bool gicv5_cpuif_has_gcie_legacy(void)
-
-__init ?
-
-> +{
-> +	u64 idr0 = read_sysreg_s(SYS_ICC_IDR0_EL1);
-> +
-> +	return !!FIELD_GET(ICC_IDR0_EL1_GCIE_LEGACY, idr0);
-> +}
-> +
-> +static void __init gic_of_setup_kvm_info(struct device_node *node)
-> +{
-> +	gic_v5_kvm_info.type = GIC_V5;
-> +	gic_v5_kvm_info.has_gcie_v3_compat = gicv5_cpuif_has_gcie_legacy();
-> +
-> +	/* GIC Virtual CPU interface maintenance interrupt */
-> +	gic_v5_kvm_info.no_maint_irq_mask = false;
-> +	gic_v5_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
-> +	if (!gic_v5_kvm_info.maint_irq) {
-> +		pr_warn("cannot find GICv5 virtual CPU interface maintenance interrupt\n");
+>  static void gicv5_ppi_irq_eoi(struct irq_data *d)
+>  {
+> +	/* Skip deactivate for forwarded PPI interrupts */
+> +	if (irqd_is_forwarded_to_vcpu(d)) {
+> +		gic_insn(0, CDEOI);
 > +		return;
 > +	}
 > +
-> +	vgic_set_kvm_info(&gic_v5_kvm_info);
-> +}
-> +#else
-> +static void __init gic_of_setup_kvm_info(struct device_node *node)
-
-static inline
-
-Thanks,
-Lorenzo
-
+>  	gicv5_hwirq_eoi(d->hwirq, GICV5_HWIRQ_TYPE_PPI);
+>  }
+>  
+> @@ -494,6 +500,16 @@ static bool gicv5_ppi_irq_is_level(irq_hw_number_t hwirq)
+>  	return !!(read_ppi_sysreg_s(hwirq, PPI_HM) & bit);
+>  }
+>  
+> +static int gicv5_ppi_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
 > +{
+> +	if (vcpu)
+> +		irqd_set_forwarded_to_vcpu(d);
+> +	else
+> +		irqd_clr_forwarded_to_vcpu(d);
+> +
+> +	return 0;
 > +}
-> +#endif // CONFIG_KVM
 > +
->  static int __init gicv5_of_init(struct device_node *node, struct device_node *parent)
->  {
->  	int ret = gicv5_irs_of_probe(node);
-> @@ -1081,6 +1113,8 @@ static int __init gicv5_of_init(struct device_node *node, struct device_node *pa
->  
->  	gicv5_irs_its_probe();
->  
-> +	gic_of_setup_kvm_info(node);
-> +
->  	return 0;
->  out_int:
->  	gicv5_cpu_disable_interrupts();
-> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
-> index a75b2c7de69d..ca1713fac6e3 100644
-> --- a/include/linux/irqchip/arm-vgic-info.h
-> +++ b/include/linux/irqchip/arm-vgic-info.h
-> @@ -15,6 +15,8 @@ enum gic_type {
->  	GIC_V2,
->  	/* Full GICv3, optionally with v2 compat */
->  	GIC_V3,
-> +	/* Full GICv5, optionally with v3 compat */
-> +	GIC_V5,
+>  static const struct irq_chip gicv5_ppi_irq_chip = {
+>  	.name			= "GICv5-PPI",
+>  	.irq_mask		= gicv5_ppi_irq_mask,
+> @@ -501,6 +517,7 @@ static const struct irq_chip gicv5_ppi_irq_chip = {
+>  	.irq_eoi		= gicv5_ppi_irq_eoi,
+>  	.irq_get_irqchip_state	= gicv5_ppi_irq_get_irqchip_state,
+>  	.irq_set_irqchip_state	= gicv5_ppi_irq_set_irqchip_state,
+> +	.irq_set_vcpu_affinity	= gicv5_ppi_irq_set_vcpu_affinity,
+>  	.flags			= IRQCHIP_SKIP_SET_WAKE	  |
+>  				  IRQCHIP_MASK_ON_SUSPEND,
 >  };
->  
->  struct gic_kvm_info {
-> @@ -34,6 +36,8 @@ struct gic_kvm_info {
->  	bool		has_v4_1;
->  	/* Deactivation impared, subpar stuff */
->  	bool		no_hw_deactivation;
-> +	/* v3 compat support (GICv5 hosts, only) */
-> +	bool		has_gcie_v3_compat;
->  };
->  
->  #ifdef CONFIG_KVM
 > -- 
 > 2.34.1
