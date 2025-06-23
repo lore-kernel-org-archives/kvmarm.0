@@ -1,337 +1,162 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C65A26E6F9;
-	Mon, 23 Jun 2025 14:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E8024169B;
+	Mon, 23 Jun 2025 15:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750689946; cv=none; b=VZ2F0oA4n+c3zutQA0IKTyIEBrkT03aI8TxzQetLxKt4r0du6BLe3HCWeGs/Mj+6UrHL/a84ySAtQ2si7c0rlK6saB95WbqzARdalVkHfoNWH9G13LOXenGBENwAXWLEV4GGQVFjjOKga5ycfEEtOhMXGUWRHKxkCThIWOn/L5c=
+	t=1750691682; cv=none; b=EDC1kz8YAHsUEmGfY97wo4TMxYSuCHxXDWx68GVCktKk7ILSRrTRi5aTUv2NVhMEtj4409qEC8p2jegZPwRpW9dflbm7Jglb+tgLfHysKmXhEH/3lx+FcqzZA+S0udVzzUYWciQNtFUxwZSRZaqCGHI8rjjB3Nc4hk+DyC1KCyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750689946; c=relaxed/simple;
-	bh=9PtIFxfbF87dTDTypxZfGEj9DfZhGdyBYnPLpKurM1U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kVj158LT9RSFcywNAmRtl6XH3NwArH7QBPX5/3FBKAkcK55L8AnIqGSiBJ22sj3m+l29zcxVdZ4Vo4CoScO1AOrom8A4KgeN/GAuD62gCUR8TSXk97uaenyauMt6qFWP2iZkIl5I24Y3jvLCjfMSXvfXwf7yYz8UN23BKBpfevQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C94D113E;
-	Mon, 23 Jun 2025 07:45:26 -0700 (PDT)
-Received: from [10.57.29.183] (unknown [10.57.29.183])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C19EE3F66E;
-	Mon, 23 Jun 2025 07:45:38 -0700 (PDT)
-Message-ID: <c96eb50e-eee6-4589-894a-6e10613f6dfb@arm.com>
-Date: Mon, 23 Jun 2025 15:45:28 +0100
+	s=arc-20240116; t=1750691682; c=relaxed/simple;
+	bh=XSDrVBVnhyxYp1JMKvQx3EG0b0XeZk8MBikoZoNvSPA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gTt5US/p+FpBDBl5nTTkrAobqpG3uNMKJUEOyigjsSyRlVHa5iMda7eTIGtL0glqRn8VeICOxvjihT6DmmWz+Op1Mk3AFaFUFxYOvDBoJHLqqbgGAr7AIQWWHrY78csfa8xfifd/y2R5px5pZYJClQa3idZdx55/evQ3cFTqkus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OmCoXbQf; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OmCoXbQf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2742EC4CEEA;
+	Mon, 23 Jun 2025 15:14:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750691681;
+	bh=XSDrVBVnhyxYp1JMKvQx3EG0b0XeZk8MBikoZoNvSPA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OmCoXbQf/tjUIpINpxj6vwdUqDZybUpwjdWVlsS76SySfStDAGZ61o1ANRZoqQjPG
+	 8PB+6z/OaL3uYgFT3hzwwpRGKnIvCLqf1FLbvHBugmzjEoSWyBnDNLNnVnK18oEqQo
+	 NJPa/wbKeZsV6TTtEDYn2s+KrdSCTmNs6ejzDIQC/vtygeq6/S4gez8uy6/kyvlHLD
+	 SGGhZr2G7/86WqxshFSb/HYHgENdhplZMRLtlRMIQDJfa5WqDGYugWqqCT0YdUJ2l4
+	 ap8E3G7oamo2KDrBMaPSTGXdgJWyPgcjLr6F3YDdKQW8I82pgl//a8FozORPIpQJlA
+	 rEGxf3sYaX2sA==
+Date: Mon, 23 Jun 2025 17:14:35 +0200
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 2/5] irqchip/gic-v5: Populate struct gic_kvm_info
+Message-ID: <aFlvW2FNCyCi3h3Y@lpieralisi>
+References: <20250620160741.3513940-1-sascha.bischoff@arm.com>
+ <20250620160741.3513940-3-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 15/43] arm64: RME: Allow VMM to set RIPAS
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <20250611104844.245235-16-steven.price@arm.com>
- <20250618133355.2af1dcc4@donnerap.manchester.arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20250618133355.2af1dcc4@donnerap.manchester.arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250620160741.3513940-3-sascha.bischoff@arm.com>
 
-On 18/06/2025 13:33, Andre Przywara wrote:
-> On Wed, 11 Jun 2025 11:48:12 +0100
-> Steven Price <steven.price@arm.com> wrote:
+On Fri, Jun 20, 2025 at 04:07:51PM +0000, Sascha Bischoff wrote:
+> Populate the gic_kvm_info struct based on support for
+> FEAT_GCIE_LEGACY.  The struct is used by KVM to probe for a compatible
+> GIC.
 > 
-> Hi Steven,
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  drivers/irqchip/irq-gic-v5.c          | 34 +++++++++++++++++++++++++++
+>  include/linux/irqchip/arm-vgic-info.h |  4 ++++
+>  2 files changed, 38 insertions(+)
 > 
-> one build error below, on my machine (with GCC10):
-> 
->> Each page within the protected region of the realm guest can be marked
->> as either RAM or EMPTY. Allow the VMM to control this before the guest
->> has started and provide the equivalent functions to change this (with
->> the guest's approval) at runtime.
->>
->> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
->> unmapped from the guest and undelegated allowing the memory to be reused
->> by the host. When transitioning to RIPAS RAM the actual population of
->> the leaf RTTs is done later on stage 2 fault, however it may be
->> necessary to allocate additional RTTs to allow the RMM track the RIPAS
->> for the requested range.
->>
->> When freeing a block mapping it is necessary to temporarily unfold the
->> RTT which requires delegating an extra page to the RMM, this page can
->> then be recovered once the contents of the block mapping have been
->> freed.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes from v8:
->>  * Propagate the 'may_block' flag to allow conditional calls to
->>    cond_resched_rwlock_write().
->>  * Introduce alloc_rtt() to wrap alloc_delegated_granule() and
->>    kvm_account_pgtable_pages() and use when allocating RTTs.
->>  * Code reorganisation to allow init_ipa_state and set_ipa_state to
->>    share a common ripas_change() function,
->>  * Other minor changes following review.
->> Changes from v7:
->>  * Replace use of "only_shared" with the upstream "attr_filter" field
->>    of struct kvm_gfn_range.
->>  * Clean up the logic in alloc_delegated_granule() for when to call
->>    kvm_account_pgtable_pages().
->>  * Rename realm_destroy_protected_granule() to
->>    realm_destroy_private_granule() to match the naming elsewhere. Also
->>    fix the return codes in the function to be descriptive.
->>  * Several other minor changes to names/return codes.
->> Changes from v6:
->>  * Split the code dealing with the guest triggering a RIPAS change into
->>    a separate patch, so this patch is purely for the VMM setting up the
->>    RIPAS before the guest first runs.
->>  * Drop the useless flags argument from alloc_delegated_granule().
->>  * Account RTTs allocated for a guest using kvm_account_pgtable_pages().
->>  * Deal with the RMM granule size potentially being smaller than the
->>    host's PAGE_SIZE. Although note alloc_delegated_granule() currently
->>    still allocates an entire host page for every RMM granule (so wasting
->>    memory when PAGE_SIZE>4k).
->> Changes from v5:
->>  * Adapt to rebasing.
->>  * Introduce find_map_level()
->>  * Rename some functions to be clearer.
->>  * Drop the "spare page" functionality.
->> Changes from v2:
->>  * {alloc,free}_delegated_page() moved from previous patch to this one.
->>  * alloc_delegated_page() now takes a gfp_t flags parameter.
->>  * Fix the reference counting of guestmem pages to avoid leaking memory.
->>  * Several misc code improvements and extra comments.
->> ---
->>  arch/arm64/include/asm/kvm_rme.h |   6 +
->>  arch/arm64/kvm/mmu.c             |   8 +-
->>  arch/arm64/kvm/rme.c             | 447 +++++++++++++++++++++++++++++++
->>  3 files changed, 458 insertions(+), 3 deletions(-)
->>
-> 
-> [ ... ]
-> 
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> index 25705da6f153..fe75c41d6ac3 100644
->> --- a/arch/arm64/kvm/rme.c
->> +++ b/arch/arm64/kvm/rme.c
-> 
-> [ ... ]
-> 
->> @@ -318,6 +619,140 @@ static int realm_create_rd(struct kvm *kvm)
->>  	return r;
->>  }
->>  
->> +static void realm_unmap_private_range(struct kvm *kvm,
->> +				      unsigned long start,
->> +				      unsigned long end,
->> +				      bool may_block)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +	unsigned long next_addr, addr;
->> +	int ret;
->> +
->> +	for (addr = start; addr < end; addr = next_addr) {
->> +		ret = realm_unmap_private_page(realm, addr, &next_addr);
->> +
->> +		if (ret)
->> +			break;
->> +
->> +		if (may_block)
->> +			cond_resched_rwlock_write(&kvm->mmu_lock);
->> +	}
->> +
->> +	realm_fold_rtt_level(realm, get_start_level(realm) + 1,
->> +			     start, end);
->> +}
->> +
->> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->> +			   unsigned long size, bool unmap_private,
->> +			   bool may_block)
->> +{
->> +	unsigned long end = start + size;
->> +	struct realm *realm = &kvm->arch.realm;
->> +
->> +	end = min(BIT(realm->ia_bits - 1), end);
->> +
->> +	if (!kvm_realm_is_created(kvm))
->> +		return;
->> +
->> +	realm_unmap_shared_range(kvm, find_map_level(realm, start, end),
->> +				 start, end, may_block);
->> +	if (unmap_private)
->> +		realm_unmap_private_range(kvm, start, end, may_block);
->> +}
->> +
->> +enum ripas_action {
->> +	RIPAS_INIT,
->> +	RIPAS_SET,
->> +};
->> +
->> +static int ripas_change(struct kvm *kvm,
->> +			struct kvm_vcpu *vcpu,
->> +			unsigned long ipa,
->> +			unsigned long end,
->> +			enum ripas_action action,
->> +			unsigned long *top_ipa)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +	phys_addr_t rd_phys = virt_to_phys(realm->rd);
->> +	phys_addr_t rec_phys;
->> +	struct kvm_mmu_memory_cache *memcache = NULL;
->> +	int ret = 0;
->> +
->> +	if (vcpu) {
->> +		rec_phys = virt_to_phys(vcpu->arch.rec.rec_page);
->> +		memcache = &vcpu->arch.mmu_page_cache;
->> +
->> +		WARN_ON(action != RIPAS_SET);
->> +	} else {
->> +		WARN_ON(action != RIPAS_INIT);
->> +	}
->> +
->> +	while (ipa < end) {
->> +		unsigned long next;
->> +
->> +		switch (action) {
->> +		case RIPAS_INIT:
->> +			ret = rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
->> +			break;
->> +		case RIPAS_SET:
->> +			ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end,
->> +						&next);
->> +			break;
->> +		}
->> +
->> +		switch (RMI_RETURN_STATUS(ret)) {
->> +		case RMI_SUCCESS:
->> +			ipa = next;
->> +			break;
->> +		case RMI_ERROR_RTT:
->> +			int err_level = RMI_RETURN_INDEX(ret);
-> 
-> This breaks the build on GCC <= v10:
-> 
-> /src/linux/arch/arm64/kvm/rme.c: In function ‘ripas_change’:
-> /src/linux/arch/arm64/kvm/rme.c:1190:4: error: a label can only be part of a statement and a declaration is not a statement
->  1190 |    int err_level = RMI_RETURN_INDEX(ret);
->       |    ^~~
-> /src/linux/arch/arm64/kvm/rme.c:1191:4: error: expected expression before int’
->  1191 |    int level = find_map_level(realm, ipa, end);
->       |    ^~~
-> /src/linux/arch/arm64/kvm/rme.c:1193:21: error: ‘level’ undeclared (first use in this function)
->  1193 |    if (err_level >= level)
->       |                     ^~~~~
-> 
-> With GCC 11 and later I see this still as a warning when using -Wpedantic,
-> but it vanishes when also paired with -std=gnu2x.
-> 
-> So either hoist the variable declaration up, or use brackets, this worked
-> for me as well, and I see it in other places:
-> 
-> 		case RMI_ERROR_RTT: {
-> 			....
-> 		}
-> 		default:
+> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+> index 28853d51a2ea..6aecd2343fee 100644
+> --- a/drivers/irqchip/irq-gic-v5.c
+> +++ b/drivers/irqchip/irq-gic-v5.c
+> @@ -13,6 +13,7 @@
+>  
+>  #include <linux/irqchip.h>
+>  #include <linux/irqchip/arm-gic-v5.h>
+> +#include <linux/irqchip/arm-vgic-info.h>
+>  
+>  #include <asm/cpufeature.h>
+>  #include <asm/exception.h>
+> @@ -1049,6 +1050,37 @@ static void gicv5_set_cpuif_idbits(void)
+>  	}
+>  }
+>  
+> +#ifdef CONFIG_KVM
+> +static struct gic_kvm_info gic_v5_kvm_info __initdata;
+> +
+> +static bool gicv5_cpuif_has_gcie_legacy(void)
 
+__init ?
 
-I'm surprised my compiler didn't complain - variable declarations in
-switch statements can often be dodgy because it can cause subtle cases
-where the variable is used without being set. Although perhaps Duff's
-Device means the compiler is hard pressed to generate meaningful warnings.
+> +{
+> +	u64 idr0 = read_sysreg_s(SYS_ICC_IDR0_EL1);
+> +
+> +	return !!FIELD_GET(ICC_IDR0_EL1_GCIE_LEGACY, idr0);
+> +}
+> +
+> +static void __init gic_of_setup_kvm_info(struct device_node *node)
+> +{
+> +	gic_v5_kvm_info.type = GIC_V5;
+> +	gic_v5_kvm_info.has_gcie_v3_compat = gicv5_cpuif_has_gcie_legacy();
+> +
+> +	/* GIC Virtual CPU interface maintenance interrupt */
+> +	gic_v5_kvm_info.no_maint_irq_mask = false;
+> +	gic_v5_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
+> +	if (!gic_v5_kvm_info.maint_irq) {
+> +		pr_warn("cannot find GICv5 virtual CPU interface maintenance interrupt\n");
+> +		return;
+> +	}
+> +
+> +	vgic_set_kvm_info(&gic_v5_kvm_info);
+> +}
+> +#else
+> +static void __init gic_of_setup_kvm_info(struct device_node *node)
 
-I think in this case the extra brackets is probably cleanest.
+static inline
 
 Thanks,
-Steve
+Lorenzo
 
-> Cheers,
-> Andre
-> 
-> 
->> +			int level = find_map_level(realm, ipa, end);
->> +
->> +			if (err_level >= level)
->> +				return -EINVAL;
->> +
->> +			ret = realm_create_rtt_levels(realm, ipa,
->> err_level,
->> +						      level, memcache);
->> +			if (ret)
->> +				return ret;
->> +			/* Retry with the RTT levels in place */
->> +			break;
->> +		default:
->> +			WARN_ON(1);
->> +			return -ENXIO;
->> +		}
->> +	}
->> +
->> +	if (top_ipa)
->> +		*top_ipa = ipa;
->> +
->> +	return 0;
->> +}
->> +
->> +static int realm_init_ipa_state(struct kvm *kvm,
->> +				unsigned long ipa,
->> +				unsigned long end)
->> +{
->> +	return ripas_change(kvm, NULL, ipa, end, RIPAS_INIT, NULL);
->> +}
->> +
->> +static int kvm_init_ipa_range_realm(struct kvm *kvm,
->> +				    struct arm_rme_init_ripas *args)
->> +{
->> +	gpa_t addr, end;
->> +
->> +	addr = args->base;
->> +	end = addr + args->size;
->> +
->> +	if (end < addr)
->> +		return -EINVAL;
->> +
->> +	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
->> +		return -EPERM;
->> +
->> +	return realm_init_ipa_state(kvm, addr, end);
->> +}
->> +
->>  /* Protects access to rme_vmid_bitmap */
->>  static DEFINE_SPINLOCK(rme_vmid_lock);
->>  static unsigned long *rme_vmid_bitmap;
->> @@ -441,6 +876,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct
->> kvm_enable_cap *cap) case KVM_CAP_ARM_RME_CREATE_REALM:
->>  		r = kvm_create_realm(kvm);
->>  		break;
->> +	case KVM_CAP_ARM_RME_INIT_RIPAS_REALM: {
->> +		struct arm_rme_init_ripas args;
->> +		void __user *argp = u64_to_user_ptr(cap->args[1]);
->> +
->> +		if (copy_from_user(&args, argp, sizeof(args))) {
->> +			r = -EFAULT;
->> +			break;
->> +		}
->> +
->> +		r = kvm_init_ipa_range_realm(kvm, &args);
->> +		break;
->> +	}
->>  	default:
->>  		r = -EINVAL;
->>  		break;
-> 
-
+> +{
+> +}
+> +#endif // CONFIG_KVM
+> +
+>  static int __init gicv5_of_init(struct device_node *node, struct device_node *parent)
+>  {
+>  	int ret = gicv5_irs_of_probe(node);
+> @@ -1081,6 +1113,8 @@ static int __init gicv5_of_init(struct device_node *node, struct device_node *pa
+>  
+>  	gicv5_irs_its_probe();
+>  
+> +	gic_of_setup_kvm_info(node);
+> +
+>  	return 0;
+>  out_int:
+>  	gicv5_cpu_disable_interrupts();
+> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
+> index a75b2c7de69d..ca1713fac6e3 100644
+> --- a/include/linux/irqchip/arm-vgic-info.h
+> +++ b/include/linux/irqchip/arm-vgic-info.h
+> @@ -15,6 +15,8 @@ enum gic_type {
+>  	GIC_V2,
+>  	/* Full GICv3, optionally with v2 compat */
+>  	GIC_V3,
+> +	/* Full GICv5, optionally with v3 compat */
+> +	GIC_V5,
+>  };
+>  
+>  struct gic_kvm_info {
+> @@ -34,6 +36,8 @@ struct gic_kvm_info {
+>  	bool		has_v4_1;
+>  	/* Deactivation impared, subpar stuff */
+>  	bool		no_hw_deactivation;
+> +	/* v3 compat support (GICv5 hosts, only) */
+> +	bool		has_gcie_v3_compat;
+>  };
+>  
+>  #ifdef CONFIG_KVM
+> -- 
+> 2.34.1
