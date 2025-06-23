@@ -1,140 +1,122 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5F724E019;
-	Mon, 23 Jun 2025 13:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2F078F5E;
+	Mon, 23 Jun 2025 14:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750685251; cv=none; b=dUMVCIWWphIDxw7JqniyWVQJw90VIzyEFi1IHm0ECnIUS7UkoWDpshjbYyCPAAOG2zPzNhs5/YL03fhL2LqbnL+eEbMmysaNwyAyoyRpIa23MeUt6e8XHMsYMMsw7tuiQiShZwFj6ar9WQ5ucZANqdCRWlacLWEvX/w3BPW8gUo=
+	t=1750687745; cv=none; b=KfhX2yV/R2RffX0OOKbs/BXbyVpm24m5FBn3FdYEPyCitlBbvNSA9mXE2EVpxU9exY6HS0ijMlFtR5r4jUnEAv5kwdhAuxiocsFaPA+HdzbtOgpyiA3JTULtAcGaRDkm3tOg5Nf//87V/uhrkksmso+ozzKQn6BeeeXsa9ozon4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750685251; c=relaxed/simple;
-	bh=OAFTThjQbfy9nAc9ifWeL04/k1E7jUOp5koyzmWAnrs=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cXxyONYUPmYTkw4OPU7uich1SEJdzgwPYzJ29q6fDF4uK8eXI96rnyNpWiDxj6ShoWGiaURB3W/MN9mapiYDmpym5yhNGnwJwkxAGpWns90SG7n5I0A5vtQu2yDVHyAgORZcNbczDo0FelvwKuqsBwlGBThKbjzNIegfT/fBFvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ecprC0Be; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+	s=arc-20240116; t=1750687745; c=relaxed/simple;
+	bh=sIqaqHwoR/cVtxIhgcxx2ZVcUkiubyrehXo3GcWtKOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a54f/YTdWB2sid64AGzDYpyRwNPl84i52Rq2NKJK7iDDe/Gv6t7/kAPZuA87AT7Fqvx4lfjmjqx4sO5hvaY1wcZPJ4rr+fvs7qIZT8lj23T3G8MvokgeX9vsS7237mYuufnLW/l4sPfKldD4aEBRmKvJ0RggPquky1j+J2QKfK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dHdsPhym; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ecprC0Be"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
-	Cc:Content-Type:Content-ID:Content-Description;
-	bh=tLS0jqGrb3MS8d9+Zqocfz6+iEasSrP5hi+kiaqEmQE=; b=ecprC0BeB4NxOfTFqXpdgg1LEM
-	5eXgD9f0C3XYq+pHcYoq7Ztl/bJbw5L9Ch82IPn1W2+iVqy2FpMiHLpJjsRJn3bdhg1fDd9N3wJkh
-	mJTSuhvs45tGnJfLS5od6lE4qCOKvDGKgmLoT9QPOivFufL4Qto8OSTjbV99CmbqR1AvmpewxgC3T
-	psnj+n7fKFLeFmMh1AxIr+lMPltlUZG2lQkWFny+SguVW32kM/5bqVwBLDlE3DBfRl20ZrrcIH5ER
-	3kUZe24CFUFJlR4w1QiNfiX34Lbnumd3K2za9rylJ5nk5SDruYpFlogA1Moq4wsFnomxa51OEmwg7
-	5CFdaX2Q==;
-Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uThCe-00000005Du5-1SQN;
-	Mon, 23 Jun 2025 13:27:16 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1uThCc-000000043AO-2kz9;
-	Mon, 23 Jun 2025 14:27:14 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [RFC PATCH 2/2] KVM: arm64: vgic-its: Unmap all vPEs on shutdown
-Date: Mon, 23 Jun 2025 14:27:14 +0100
-Message-ID: <20250623132714.965474-2-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250623132714.965474-1-dwmw2@infradead.org>
-References: <20250623132714.965474-1-dwmw2@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dHdsPhym"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D9D1C4CEEA;
+	Mon, 23 Jun 2025 14:08:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750687744;
+	bh=sIqaqHwoR/cVtxIhgcxx2ZVcUkiubyrehXo3GcWtKOc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dHdsPhymHpCpP1L1rpiiuVh9anWKDbUGp+dOsOPmO4OQHE+kU+Zi18fE4bLaexYrK
+	 gUoN90qEMebw6mZqVEPlvabq2eThh8jpVLRCedMrM9eSnmX3GOFuVtEOseL+YdN3wn
+	 X8qzapUuQcmNdjX6GIaf4OcqNHI+q8NPq1HMYd9eexsJ6bIMOSDISjUzkr6ThA2YxS
+	 ISPmeyDa0Yn46UlCpcxQuo8fPxQ1748dOTKvenwn7VFifTenNUleH0JxjjCZ6KgFWh
+	 1JCXZsmFMs7pcYZDFQqjcAOKf3JPAOwPWPTW1qjaoHn3i8f4SdJWqCkjKdFaxTYuQu
+	 SKrtpjjYZZkKA==
+Date: Mon, 23 Jun 2025 19:35:32 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v3 18/62] KVM: SVM: Disable (x2)AVIC IPI virtualization
+ if CPU has erratum #1235
+Message-ID: <jskiyda3defofthrtniugcdbcoftx4o5yvgt47koswq64qf7d7@2pzrr5v5yssy>
+References: <20250611224604.313496-2-seanjc@google.com>
+ <20250611224604.313496-20-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611224604.313496-20-seanjc@google.com>
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Wed, Jun 11, 2025 at 03:45:21PM -0700, Sean Christopherson wrote:
+> From: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Disable IPI virtualization on AMD Family 17h CPUs (Zen2 and Zen1), as
+> hardware doesn't reliably detect changes to the 'IsRunning' bit during ICR
+> write emulation, and might fail to VM-Exit on the sending vCPU, if
+> IsRunning was recently cleared.
+> 
+> The absence of the VM-Exit leads to KVM not waking (or triggering nested
+> VM-Exit) of the target vCPU(s) of the IPI, which can lead to hung vCPUs,
+  ^^^^^^^^^^^
+  VM-Exit of)
 
-We observed systems going dark on kexec, due to corruption of the new
-kernel's text (and sometimes the initrd). This was eventually determined
-to be caused by the vLPI pending tables used by the GIC in the previous
-kernel, which were not being quiesced properly.
+> unbounded delays in L2 execution, etc.
+> 
+> To workaround the erratum, simply disable IPI virtualization, which
+> prevents KVM from setting IsRunning and thus eliminates the race where
+> hardware sees a stale IsRunning=1.  As a result, all ICR writes (except
+> when "Self" shorthand is used) will VM-Exit and therefore be correctly
+> emulated by KVM.
+> 
+> Disabling IPI virtualization does carry a performance penalty, but
+> benchmarkng shows that enabling AVIC without IPI virtualization is still
+> much better than not using AVIC at all, because AVIC still accelerates
+> posted interrupts and the receiving end of the IPIs.
+> 
+> Note, when virtualizaing Self-IPIs, the CPU skips reading the physical ID
+	     ^^^^^^^^^^^^^
+	     virtualizing
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/arm64/kvm/arm.c          |  5 +++++
- arch/arm64/kvm/vgic/vgic-v3.c | 14 ++++++++++++++
- include/kvm/arm_vgic.h        |  2 ++
- 3 files changed, 21 insertions(+)
+> table and updates the vIRR directly (because the vCPU is by definition
+> actively running), i.e. Self-IPI isn't susceptible to the erratum *and*
+> is still accelerated by hardware.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> [sean: rebase, massage changelog, disallow user override]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 48c737e1200a..bf8b59556373 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -1187,6 +1187,14 @@ bool avic_hardware_setup(void)
+>  	if (x2avic_enabled)
+>  		pr_info("x2AVIC enabled\n");
+>  
+> +	/*
+> +	 * Disable IPI virtualization for AMD Family 17h CPUs (Zen1 and Zen2)
+> +	 * due to erratum 1235, which results in missed GA log events and thus
+							^^^^^^^^^^^^^
+Not sure I understand the reference to GA log events here -- those are 
+only for device interrupts and not IPIs.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 38a91bb5d4c7..2b76f506bc2d 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2164,6 +2164,11 @@ void kvm_arch_disable_virtualization_cpu(void)
- 		cpu_hyp_uninit(NULL);
- }
- 
-+void kvm_arch_shutdown(void)
-+{
-+	kvm_vgic_v3_shutdown();
-+}
-+
- #ifdef CONFIG_CPU_PM
- static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
- 				    unsigned long cmd,
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index b9ad7c42c5b0..6591e8d84855 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -382,6 +382,20 @@ static void map_all_vpes(struct kvm *kvm)
- 						dist->its_vm.vpes[i]->irq));
- }
- 
-+void kvm_vgic_v3_shutdown(void)
-+{
-+	struct kvm *kvm;
-+
-+	if (!kvm_vgic_global_state.has_gicv4_1)
-+		return;
-+
-+	mutex_lock(&kvm_lock);
-+	list_for_each_entry(kvm, &vm_list, vm_list) {
-+		unmap_all_vpes(kvm);
-+	}
-+	mutex_unlock(&kvm_lock);
-+}
-+
- /*
-  * vgic_v3_save_pending_tables - Save the pending tables into guest RAM
-  * kvm lock and all vcpu lock must be held
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 4a34f7f0a864..e850ee860238 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -442,6 +442,8 @@ int vgic_v4_put(struct kvm_vcpu *vcpu);
- 
- bool vgic_state_is_nested(struct kvm_vcpu *vcpu);
- 
-+void kvm_vgic_v3_shutdown(void);
-+
- /* CPU HP callbacks */
- void kvm_vgic_cpu_up(void);
- void kvm_vgic_cpu_down(void);
--- 
-2.49.0
+> +	 * missed wake events for blocking vCPUs due to the CPU failing to see
+> +	 * a software update to clear IsRunning.
+> +	 */
+> +	enable_ipiv = enable_ipiv && boot_cpu_data.x86 != 0x17;
+> +
+
+Apart from the above, this LGTM.
+Acked-by: Naveen N Rao (AMD) <naveen@kernel.org>
+
+
+- Naveen
 
