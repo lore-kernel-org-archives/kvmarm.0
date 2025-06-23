@@ -1,237 +1,94 @@
-Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com [209.85.167.201])
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D094229C323
-	for <kvmarm@lists.linux.dev>; Mon, 23 Jun 2025 18:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A74E2236E9
+	for <kvmarm@lists.linux.dev>; Mon, 23 Jun 2025 22:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750703206; cv=none; b=XbBDeoQQAWAGSFhKbEiuld3dwVRIjCoEMOnP6NsHud4ipaNgv3iRAGXBlfyIOEwFztybud2abXV2qNOPbKbvepJlXmHJ41DmrfH+Q5odaKjC0mNGthN0PM6GHXKTDvrAwbBIrx0sDbU9ZKoFAIG0U3Bmc7EhlIQm6XJvhXolkj4=
+	t=1750716272; cv=none; b=BvOhIDrwgIaFG8vA3sQOs1FKXFSMVM4a8VRfDghf2PkbkVP/vjuXPW8YN+1jfb/NqwxM9eEBsZ/aTB9OE4UxW1sgvgp8fSXq4UCp5QjpnP4FG6YidqVinhhuto1aQNl4+daA/6iR3KBgENSlwG0ZS8LwC2IfAKykWQkaS8tzwEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750703206; c=relaxed/simple;
-	bh=TJbyCjpQUTgcNzSy2LbHi3jtU+JgR5DmqnRNp0zwnzU=;
+	s=arc-20240116; t=1750716272; c=relaxed/simple;
+	bh=f/UyJP6vQx4TVd+AM6JjhbEHevJGuFxqlVA/YhTlF/s=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=YWT9PTXApun3p7lyPsaNCo/ITa7C0oQqpf8DTNxqFlxE2txXQx2QlkjWGiK3GXZqmuevQRIRh6yWYlRnYdJO8DIe7TD2hW/xV1FgSKKO1vbDdBIs794uMpF/sVawxnUuQqehJjUzRECXjz2Yo55VW40ruDJYe20QE5ZnvOtulfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XHNi650Y; arc=none smtp.client-ip=209.85.167.201
+	 Content-Type; b=JPbb4DClVRQdPgm25JQIlMV5leiIT1H2BkjW2NVbYyJ46suLMOFlAGijSBFGR9Xen5xdCAOGpt+65ICSr6j+ZN+H4Ykrc+LlqqVMEXaqYzdwv8xAvFxUSd01FYZ/Zt16n7UCQi/aOXfvmDSG6cZqkBGvG5YU15lr3IlF8z3oyRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cnavarL5; arc=none smtp.client-ip=209.85.210.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XHNi650Y"
-Received: by mail-oi1-f201.google.com with SMTP id 5614622812f47-4066a4d2d31so823327b6e.2
-        for <kvmarm@lists.linux.dev>; Mon, 23 Jun 2025 11:26:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cnavarL5"
+Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-735a87c1601so3273185a34.1
+        for <kvmarm@lists.linux.dev>; Mon, 23 Jun 2025 15:04:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750703204; x=1751308004; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750716270; x=1751321070; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=iJHuSuwyngESt8WBCKXgeOnblRRUSgRFggwy+8QiK3Q=;
-        b=XHNi650YvyoPCjx743Wy9oBy0vQjviLYENO/JdU1FG1A+ZWVeTTgmtJ/8dtYlPhVA+
-         XGTJZ2rqkbGCYT+Z7t447w+SaGjG+sTb67aVHODrPmxBCr5WebPotbpJFwVpiLVVb357
-         V31H2XUe51lgqbtOP3IBMcKCH7dxUD+ccp/d1bJaFKhQv6lfdh6DM+xIPK3bMoCHzf+t
-         7IfZGBpw7kQqKH4on7pX9kWax0p9dUano4v94nhDdNiDcxJ6xymtdDElZozYtW2/nONU
-         EOqyNR1umP1du8+WA0dim1VM/v/fHurNPZCC7ypjYH4Dhf5iLebIvyC/sjtJ2cKSCiTO
-         Gi/g==
+        bh=XtLVtTxbmHrCBpSNsrNTm3SDGLbs218ttvI0elQ1Q/A=;
+        b=cnavarL5BmELpOR+Ks4jMdECtFvci0MB0jC6C6tvIspvsxZ1NUvvVk4L2AunBNE+uy
+         bAfBSYezrCsS8mFbymMW2g5IxVg8aNlAFCoC+xPmNRKDi/CYTf7AkRG/q9lIrM2MRc2X
+         YKSUwJBvF6dulKyTv72vMeX9Gwzl5aYZkmHO6jHjIs3IrjewHPV1cfm6ilp4rBy1FceW
+         2zlBH+2eRNYs08m5oFLyZhQrW/ibc8ccnbJTK9QO3qCoPT5tmgQsQgZ2Bt4ndzxfyXI/
+         /0++FwRdJ2DOUplObW/LFI4jAeIG68I54+tb5vvg6H3ZclQ4zT7Srg0g0UGq4mEYJ5AN
+         u0eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750703204; x=1751308004;
+        d=1e100.net; s=20230601; t=1750716270; x=1751321070;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iJHuSuwyngESt8WBCKXgeOnblRRUSgRFggwy+8QiK3Q=;
-        b=en1IcelNCjYlZFa6gZYzrxdd12zNQoSGkRXPC7VEzkhKu0F+/2tfpeue91oHgcNr+J
-         r28XK/LWVe79e5KECrSs9Z5rbTem3dZdcEskv2NlbPWobsIFX13jOOzvJ9vhgS+AjuFC
-         rQbxJz4dWsZgW2foZdPcSrSMRNZrvtjJULE9ntTZkGn0+Ca8YQrjxFJ3Yt53CbiG8J0L
-         V8H13+GZ8YzkDCk4/8QYlSsaS+/ecs6bt55p9YADM7Gbj9HiYUmphoj0VrXq6c0gqOQJ
-         K8NzDPu+kxx92CuehXDUaQYQjJ+XbNElwh9KMR0IRE5igih6H1TgcJW0qFX9WPVdIKb5
-         3how==
-X-Forwarded-Encrypted: i=1; AJvYcCU/YyP+sgz1WEbvNeT16AO4ArODjFehT6a/Ju+RhVZvuwB9OlNlageR5hXkM3PERwgH6A/8hGI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxAKI3HQ/9FqndNrZd7+hl4kv933Uom+301ZNxCRj7cFc+4cEQz
-	bfQvC5LAVG0ezChqm2C5zbWQiBVKXxj3hl7igpkpgsOeejgzGYtA6N0Yy8Joto0mKlDeQQhFgRH
-	o3GcEzIQAkRBFF7vVQaHn8cU1hg==
-X-Google-Smtp-Source: AGHT+IGC715JfAZ6bB+MUmt3e2UkqjENUKLIOq46BUMkNYiBZaTpU+l16Sml2Ik55e/lBKhpSWes9ItyhVpKmkS24Q==
-X-Received: from oirr11.prod.google.com ([2002:a05:6808:840b:b0:40a:c991:8f3c])
+        bh=XtLVtTxbmHrCBpSNsrNTm3SDGLbs218ttvI0elQ1Q/A=;
+        b=YY3VGTnyjDnslgGwdZ2QWYbm+kjti8tpwbr7F1HRKyKC14TisBOSPzDMONrunfoEef
+         iBTZRyQQBBQQIP+msb7gAZDfPaHEt47N/6z+ZOuaSiS5mMh5e2RuBSiQsbuc3W5ViZ4L
+         s+8bPSQ8ZxsTxIeddFXexzppa22IR7EzgWV4SK+Vo+ip0KF+fKGHtuIg/Dzzzz8Scjhf
+         dju74gtH4+lXsX4ES2uBKL1qmGj+Gi5+QME123C16Ob3OS7fHWQJ8zY/t/4whDPHKhLQ
+         nNqCAjA0uwAAyKxUijNpfF9L37rAFYz2Zh+8VZ/04eloZKOAlUV8IL/1wgg6rODa0ok5
+         t87A==
+X-Forwarded-Encrypted: i=1; AJvYcCW2/x3EJTVCO5yDwMcDCVyY8nQGD+gUR/VOop9EPBXp56isfnmMmh5esIws/pwE3PE/Pdn3OBc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxzSfza5sqoybF1lkYkBsCFm9liBbeuYMMNP1za28MbkV18MGdc
+	3cVLwUqudpfshx3jKntPo19tYm2PWPXcC/1A6zsCu1thnij1IZLEGAy82nitAqGjQQbx4hbIfBy
+	DBI4EgIIkavYf7pTzlz4rno2T/A==
+X-Google-Smtp-Source: AGHT+IFkDmfiUvq4ze8ArvjRNaiH+ZXYtlXJVVDDWXvRxwvqUxfAjNMLJj1dksngCu/MtTNVejcjEvPTGswxYjYzFQ==
+X-Received: from otbbx10.prod.google.com ([2002:a05:6830:600a:b0:72b:88be:33e6])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:1645:b0:401:918a:5b89 with SMTP id 5614622812f47-40ac6ef30e6mr10779472b6e.26.1750703203710;
- Mon, 23 Jun 2025 11:26:43 -0700 (PDT)
-Date: Mon, 23 Jun 2025 18:26:42 +0000
-In-Reply-To: <aFYFqrYRsmCi6oii@linux.dev> (message from Oliver Upton on Fri,
- 20 Jun 2025 18:06:50 -0700)
+ 2002:a05:6830:d8a:b0:73a:8d4d:426f with SMTP id 46e09a7af769-73acbd8e287mr1029204a34.2.1750716270304;
+ Mon, 23 Jun 2025 15:04:30 -0700 (PDT)
+Date: Mon, 23 Jun 2025 22:04:29 +0000
+In-Reply-To: <202506212205.NmAR3sAH-lkp@intel.com> (message from kernel test
+ robot on Sat, 21 Jun 2025 22:56:09 +0800)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsntpleu9uvx.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v2 07/23] perf: arm_pmuv3: Introduce method to partition
- the PMU
+Message-ID: <gsntjz529ksy.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 05/23] KVM: arm64: Cleanup PMU includes
 From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+To: kernel test robot <lkp@intel.com>
+Cc: kvm@vger.kernel.org, oe-kbuild-all@lists.linux.dev, pbonzini@redhat.com, 
+	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
+	will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
+	skhan@linuxfoundation.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+>     drivers/perf/arm_pmuv3.c: In function 'armv8pmu_enable_event_counter':
+>>> drivers/perf/arm_pmuv3.c:680:2: error: implicit declaration of  
+>>> function 'kvm_set_pmu_events' [-Werror=implicit-function-declaration]
+>       680 |  kvm_set_pmu_events(mask, attr);
+>           |  ^~~~~~~~~~~~~~~~~~
+>     drivers/perf/arm_pmuv3.c: In function 'armv8pmu_disable_event_counter':
+>>> drivers/perf/arm_pmuv3.c:702:2: error: implicit declaration of  
+>>> function 'kvm_clr_pmu_events' [-Werror=implicit-function-declaration]
+>       702 |  kvm_clr_pmu_events(mask);
+>           |  ^~~~~~~~~~~~~~~~~~
+>     drivers/perf/arm_pmuv3.c: In function 'update_pmuserenr':
+>>> drivers/perf/arm_pmuv3.c:757:6: error: implicit declaration of  
+>>> function 'kvm_set_pmuserenr' [-Werror=implicit-function-declaration]
+>       757 |  if (kvm_set_pmuserenr(val))
+>           |      ^~~~~~~~~~~~~~~~~
+>     cc1: some warnings being treated as errors
 
-> On Fri, Jun 20, 2025 at 10:13:07PM +0000, Colton Lewis wrote:
->> For PMUv3, the register field MDCR_EL2.HPMN partitiones the PMU
->> counters into two ranges where counters 0..HPMN-1 are accessible by
->> EL1 and, if allowed, EL0 while counters HPMN..N are only accessible by
->> EL2.
+Looks like some dummy definitions didn't make it into a non-KVM config.
 
->> Create module parameters partition_pmu and reserved_guest_counters to
->> reserve a number of counters for the guest. These numbers are set at
->> boot because the perf subsystem assumes the number of counters will
->> not change after the PMU is probed.
-
->> Introduce the function armv8pmu_partition() to modify the PMU driver's
->> cntr_mask of available counters to exclude the counters being reserved
->> for the guest and record reserved_guest_counters as the maximum
->> allowable value for HPMN.
-
->> Due to the difficulty this feature would create for the driver running
->> at EL1 on the host, partitioning is only allowed in VHE mode. Working
->> on nVHE mode would require a hypercall for every counter access in the
->> driver because the counters reserved for the host by HPMN are only
->> accessible to EL2.
-
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>   arch/arm/include/asm/arm_pmuv3.h   | 10 ++++
->>   arch/arm64/include/asm/arm_pmuv3.h |  5 ++
->>   drivers/perf/arm_pmuv3.c           | 95 +++++++++++++++++++++++++++++-
->>   include/linux/perf/arm_pmu.h       |  1 +
->>   4 files changed, 109 insertions(+), 2 deletions(-)
-
->> diff --git a/arch/arm/include/asm/arm_pmuv3.h  
->> b/arch/arm/include/asm/arm_pmuv3.h
->> index 2ec0e5e83fc9..9dc43242538c 100644
->> --- a/arch/arm/include/asm/arm_pmuv3.h
->> +++ b/arch/arm/include/asm/arm_pmuv3.h
->> @@ -228,6 +228,11 @@ static inline bool kvm_set_pmuserenr(u64 val)
-
->>   static inline void kvm_vcpu_pmu_resync_el0(void) {}
-
->> +static inline bool has_vhe(void)
->> +{
->> +	return false;
->> +}
->> +
-
-> This has nothing to do with PMUv3, I'm a bit surprised to see you're
-> touching 32-bit ARM. Can you just gate the whole partitioning thing on
-> arm64?
-
-The PMUv3 driver also has to compile on 32-bit ARM.
-
-My first series had the partitioning code in arch/arm64 but you asked me
-to move it to the PMUv3 driver.
-
-How are you suggesting I square those two requirements?
-
->> +static bool partition_pmu __read_mostly;
->> +static u8 reserved_guest_counters __read_mostly;
->> +
->> +module_param(partition_pmu, bool, 0);
->> +MODULE_PARM_DESC(partition_pmu,
->> +		 "Partition the PMU into host and guest VM counters [y/n]");
->> +
->> +module_param(reserved_guest_counters, byte, 0);
->> +MODULE_PARM_DESC(reserved_guest_counters,
->> +		 "How many counters to reserve for guest VMs [0-$NR_COUNTERS]");
->> +
-
-> This is confusing and not what we discussed offline.
-
-> Please use a single parameter that describes the number of counters used
-> by the *host*. This affects the *host* PMU driver, KVM can discover (and
-> use) the leftovers.
-
-> If the single module parameter goes unspecified the user did not ask for
-> PMU partitioning.
-
-I understand what we discussed offline, but I had a dilemma.
-
-If we do a single module parameter for number of counters used by the
-host, then it defaults to 0 if unset and there is no way to distinguish
-between no partitioning and a request for partitioning reserving 0
-counters to the host which I also thought you requested. Would you be
-happy leaving no way to specify that?
-
-In any case, I think the usage is more self explainatory if
-partitition=[y/n] is a separate bit. The other parameter for guest
-reservation is then based on a consideration of what an unset parameter
-should mean and I decided it's a more sane default if partition=y
-[other-param]=0/unset gives 0 counters to the guest.
-
-It does affect the host, but by default the host owns everything. The
-only people who will be tweaking these parameters are going to be
-concerned with how many counters the guest gets and I think the
-parameters should reflect that intent.
-
->> +/**
->> + * armv8pmu_reservation_is_valid() - Determine if reservation is allowed
->> + * @guest_counters: Number of host counters to reserve
->> + *
->> + * Determine if the number of host counters in the argument is
->> + * allowed. It is allowed if it will produce a valid value for
->> + * register field MDCR_EL2.HPMN.
->> + *
->> + * Return: True if reservation allowed, false otherwise
->> + */
->> +static bool armv8pmu_reservation_is_valid(u8 guest_counters)
->> +{
->> +	return guest_counters <= armv8pmu_pmcr_n_read();
->> +}
->> +
->> +/**
->> + * armv8pmu_partition_supported() - Determine if partitioning is  
->> possible
->> + *
->> + * Partitioning is only supported in VHE mode (with PMUv3, assumed
->> + * since we are in the PMUv3 driver)
->> + *
->> + * Return: True if partitioning is possible, false otherwise
->> + */
->> +static bool armv8pmu_partition_supported(void)
->> +{
->> +	return has_vhe();
->> +}
->> +
->> +/**
->> + * armv8pmu_partition() - Partition the PMU
->> + * @pmu: Pointer to pmu being partitioned
->> + * @guest_counters: Number of host counters to reserve
->> + *
->> + * Partition the given PMU by taking a number of host counters to
->> + * reserve and, if it is a valid reservation, recording the
->> + * corresponding HPMN value in the hpmn field of the PMU and clearing
->> + * the guest-reserved counters from the counter mask.
->> + *
->> + * Passing 0 for @guest_counters has the effect of disabling  
->> partitioning.
->> + *
->> + * Return: 0 on success, -ERROR otherwise
->> + */
->> +static int armv8pmu_partition(struct arm_pmu *pmu, u8 guest_counters)
->> +{
->> +	u8 nr_counters;
->> +	u8 hpmn;
->> +
->> +	if (!armv8pmu_reservation_is_valid(guest_counters))
->> +		return -EINVAL;
->> +
->> +	nr_counters = armv8pmu_pmcr_n_read();
->> +	hpmn = guest_counters;
->> +
->> +	pmu->hpmn_max = hpmn;
-
-> I'm not sure the host driver needs this for anything, KVM just needs to
-> know what's potentially in use by the host.
-
->> +	/* Inform host driver of available counters */
-
-> ... said the driver to itself :)
-
-I can delete that comment now :)
+I fixed this and a similar problem I found with kvm_host_pmu_init().
