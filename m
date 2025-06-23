@@ -1,122 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2F078F5E;
-	Mon, 23 Jun 2025 14:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228DD5FEE6;
+	Mon, 23 Jun 2025 14:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750687745; cv=none; b=KfhX2yV/R2RffX0OOKbs/BXbyVpm24m5FBn3FdYEPyCitlBbvNSA9mXE2EVpxU9exY6HS0ijMlFtR5r4jUnEAv5kwdhAuxiocsFaPA+HdzbtOgpyiA3JTULtAcGaRDkm3tOg5Nf//87V/uhrkksmso+ozzKQn6BeeeXsa9ozon4=
+	t=1750687866; cv=none; b=dNWc7ZvgusJkrKsNG9+abomXlbPTrrYLl4+qbm8ikWCRqYG8HbEGyazUCz1y0MJK2Vn5zau8veGfy4bwTpqDS03Qw/p+Jlb1xiWumM91eRoYtW07SkRZc810a8cLNLxUhShWE/WIQT0/tIYr21/+OSGTNTja3SdXdHspeN9o3Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750687745; c=relaxed/simple;
-	bh=sIqaqHwoR/cVtxIhgcxx2ZVcUkiubyrehXo3GcWtKOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a54f/YTdWB2sid64AGzDYpyRwNPl84i52Rq2NKJK7iDDe/Gv6t7/kAPZuA87AT7Fqvx4lfjmjqx4sO5hvaY1wcZPJ4rr+fvs7qIZT8lj23T3G8MvokgeX9vsS7237mYuufnLW/l4sPfKldD4aEBRmKvJ0RggPquky1j+J2QKfK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dHdsPhym; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750687866; c=relaxed/simple;
+	bh=S2l2sY8x6ARHJCtqhLtvEeZM+BBhQzDuZlxOYaXKcro=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EF8f8iiVJhfseadHt1DcPrJxCvP71li6sGQrc05KgMszGmztZEfaT8/SDrP4vOvi3qHRSaTqWKawEnNj0HwHjCuYYu9Qk7znGKy41u3AKWljybavHTe6xZasf4Bu34zCrgy+QNcnuJ8BRWRB211odoEYMOcGTIHodQjX8MZdaT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mndeAcmi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dHdsPhym"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D9D1C4CEEA;
-	Mon, 23 Jun 2025 14:08:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mndeAcmi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A196EC4CEEA;
+	Mon, 23 Jun 2025 14:11:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750687744;
-	bh=sIqaqHwoR/cVtxIhgcxx2ZVcUkiubyrehXo3GcWtKOc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dHdsPhymHpCpP1L1rpiiuVh9anWKDbUGp+dOsOPmO4OQHE+kU+Zi18fE4bLaexYrK
-	 gUoN90qEMebw6mZqVEPlvabq2eThh8jpVLRCedMrM9eSnmX3GOFuVtEOseL+YdN3wn
-	 X8qzapUuQcmNdjX6GIaf4OcqNHI+q8NPq1HMYd9eexsJ6bIMOSDISjUzkr6ThA2YxS
-	 ISPmeyDa0Yn46UlCpcxQuo8fPxQ1748dOTKvenwn7VFifTenNUleH0JxjjCZ6KgFWh
-	 1JCXZsmFMs7pcYZDFQqjcAOKf3JPAOwPWPTW1qjaoHn3i8f4SdJWqCkjKdFaxTYuQu
-	 SKrtpjjYZZkKA==
-Date: Mon, 23 Jun 2025 19:35:32 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
-	David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 18/62] KVM: SVM: Disable (x2)AVIC IPI virtualization
- if CPU has erratum #1235
-Message-ID: <jskiyda3defofthrtniugcdbcoftx4o5yvgt47koswq64qf7d7@2pzrr5v5yssy>
-References: <20250611224604.313496-2-seanjc@google.com>
- <20250611224604.313496-20-seanjc@google.com>
+	s=k20201202; t=1750687865;
+	bh=S2l2sY8x6ARHJCtqhLtvEeZM+BBhQzDuZlxOYaXKcro=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mndeAcmiY8OItl4Ckcb2czE0f2tEwgc3Cau0eEXESzK/XDwyuIwW0rhXkL+s0pwBY
+	 9Ud3mGQwNkC738m+R6Tsbc8fQ5gAF4v4Cudno6MaO+TV/UTxzMqAywc7h7+8MrT9I9
+	 JyB4gLClWPxobJjjk6yf/Tps6oJKt3p4dRABaopcFAqrUCOwpIdA5c4rG0RWplbL8P
+	 yO0Exd2e313f3404E0BbmIjKW87GovUfFAmAXYofrbqD7m2rjH2bGk8fqKmuE26uxm
+	 8b1tO3NrRaKmViaTf5qKh6tiS/cqmrA1ModCeRVuafw2Duvx7iQtZaX/2+xPO52UXy
+	 c13lMLJ3DN/zQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uTht1-009Dbr-6F;
+	Mon, 23 Jun 2025 15:11:03 +0100
+Date: Mon, 23 Jun 2025 15:11:02 +0100
+Message-ID: <867c12czux.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: Eric Auger <eauger@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	seanjc@google.com,
+	darren@os.amperecomputing.com
+Subject: Re: [RFC PATCH v2 0/9] KVM: Enable Nested Virt selftests
+In-Reply-To: <9d5d82f1-b488-4b0a-98c2-27e95d63fc5c@os.amperecomputing.com>
+References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
+	<92c7e99c-5574-422c-92f1-62d5cde58fec@redhat.com>
+	<7bf7bd52-7553-42a7-afdb-a5e95f8699b5@os.amperecomputing.com>
+	<86a56veiyy.wl-maz@kernel.org>
+	<3be548bf-aee4-46ab-bcbf-15bf629b24da@os.amperecomputing.com>
+	<86jz58c5ut.wl-maz@kernel.org>
+	<9d5d82f1-b488-4b0a-98c2-27e95d63fc5c@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611224604.313496-20-seanjc@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, eauger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, darren@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jun 11, 2025 at 03:45:21PM -0700, Sean Christopherson wrote:
-> From: Maxim Levitsky <mlevitsk@redhat.com>
+On Mon, 23 Jun 2025 11:31:32 +0100,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> Disable IPI virtualization on AMD Family 17h CPUs (Zen2 and Zen1), as
-> hardware doesn't reliably detect changes to the 'IsRunning' bit during ICR
-> write emulation, and might fail to VM-Exit on the sending vCPU, if
-> IsRunning was recently cleared.
+> On 6/19/2025 5:15 PM, Marc Zyngier wrote:
+> >>   >
+> >>> Also, running EL2 is the least of our worries, because that's pretty
+> >>> easy to deal with. It is running at EL1/0 when EL2 is present that is
+> >>> interesting, and I see no coverage on that front.
+> >> 
+> >> Sorry, I did not get this comment fully.
+> >> When we run selftest on Host with -g option, the guest code will run in vEL2 as L1.
+> >> This is implemented as per comment in V1.
+> >> 
+> >> When we run same selftest from L1 shell, then guest_code will be running in EL0/1 like running from L0.
+> > 
+> > What good does this bring us if we need to boot a full guest OS to run
+> > tests? What we need is synthetic tests that implement the whole stack:
+> > 
+> > - L1 guest hypervisor
+> > - L2 guest hypervisor
+> > - L2 guest
+> > - L3 guest hypervisor
+> > - L3 guest
+> > - [...]
 > 
-> The absence of the VM-Exit leads to KVM not waking (or triggering nested
-> VM-Exit) of the target vCPU(s) of the IPI, which can lead to hung vCPUs,
-  ^^^^^^^^^^^
-  VM-Exit of)
+> IIUC, selftest leverages host OS support and uses various IOCTLs to
+> support the guest_code run. Are you saying to implement all this
+> again (without OS help) in guest_code to run it as hypervisor and
+> launch guest_code2 as NestedVM?.
 
-> unbounded delays in L2 execution, etc.
-> 
-> To workaround the erratum, simply disable IPI virtualization, which
-> prevents KVM from setting IsRunning and thus eliminates the race where
-> hardware sees a stale IsRunning=1.  As a result, all ICR writes (except
-> when "Self" shorthand is used) will VM-Exit and therefore be correctly
-> emulated by KVM.
-> 
-> Disabling IPI virtualization does carry a performance penalty, but
-> benchmarkng shows that enabling AVIC without IPI virtualization is still
-> much better than not using AVIC at all, because AVIC still accelerates
-> posted interrupts and the receiving end of the IPIs.
-> 
-> Note, when virtualizaing Self-IPIs, the CPU skips reading the physical ID
-	     ^^^^^^^^^^^^^
-	     virtualizing
+The whole point of having small selftests is to run something that is
+simpler several orders of magnitude simpler than the full blown
+OS/hypervisor. So indeed, I'm asking for selftests that build chains
+of guests up to some level and verify that the nesting, as described
+in the architecture, works correctly.
 
-> table and updates the vIRR directly (because the vCPU is by definition
-> actively running), i.e. Self-IPI isn't susceptible to the erratum *and*
-> is still accelerated by hardware.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> [sean: rebase, massage changelog, disallow user override]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 48c737e1200a..bf8b59556373 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -1187,6 +1187,14 @@ bool avic_hardware_setup(void)
->  	if (x2avic_enabled)
->  		pr_info("x2AVIC enabled\n");
->  
-> +	/*
-> +	 * Disable IPI virtualization for AMD Family 17h CPUs (Zen1 and Zen2)
-> +	 * due to erratum 1235, which results in missed GA log events and thus
-							^^^^^^^^^^^^^
-Not sure I understand the reference to GA log events here -- those are 
-only for device interrupts and not IPIs.
+> It seems to be complicated, doesn't it?
 
-> +	 * missed wake events for blocking vCPUs due to the CPU failing to see
-> +	 * a software update to clear IsRunning.
-> +	 */
-> +	enable_ipiv = enable_ipiv && boot_cpu_data.x86 != 0x17;
-> +
+Yes, it is complicated. What did you expect?
 
-Apart from the above, this LGTM.
-Acked-by: Naveen N Rao (AMD) <naveen@kernel.org>
+	M.
 
-
-- Naveen
-
+-- 
+Without deviation from the norm, progress is not possible.
