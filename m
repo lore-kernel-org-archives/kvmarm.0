@@ -1,61 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228DD5FEE6;
-	Mon, 23 Jun 2025 14:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2AF260591;
+	Mon, 23 Jun 2025 14:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750687866; cv=none; b=dNWc7ZvgusJkrKsNG9+abomXlbPTrrYLl4+qbm8ikWCRqYG8HbEGyazUCz1y0MJK2Vn5zau8veGfy4bwTpqDS03Qw/p+Jlb1xiWumM91eRoYtW07SkRZc810a8cLNLxUhShWE/WIQT0/tIYr21/+OSGTNTja3SdXdHspeN9o3Pw=
+	t=1750689463; cv=none; b=fgKsg7CGQniOhDq3ZB0Nht0gDQJ1JhIkYhF83ebRsfOi1OdNtXi+eGl1X+9RYBIP/rUA542FERd0BPv75AeV2L4RXyWhaOmSq2vKFqXbXYsoVnWuNr3But5dnJRyN10ZmItPrdIPltMK2A34R6MB8NEwc1t96AguOKw12CDkwHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750687866; c=relaxed/simple;
-	bh=S2l2sY8x6ARHJCtqhLtvEeZM+BBhQzDuZlxOYaXKcro=;
+	s=arc-20240116; t=1750689463; c=relaxed/simple;
+	bh=LkXLA8jsAZ04YeCznvkOb8RamvDKLqS/ZHmbnRhwhQk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EF8f8iiVJhfseadHt1DcPrJxCvP71li6sGQrc05KgMszGmztZEfaT8/SDrP4vOvi3qHRSaTqWKawEnNj0HwHjCuYYu9Qk7znGKy41u3AKWljybavHTe6xZasf4Bu34zCrgy+QNcnuJ8BRWRB211odoEYMOcGTIHodQjX8MZdaT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mndeAcmi; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=r+kos3sD83ZrpdtsNugNPtm3XfUaaH+9h3Y8GTuso92TpYOQlYCzCC6nmyY2YjzoFc8qlzMLF8vWnYhd+jWOUXy73HIrHxNZgEMJ0Ixu40aEEVdZWVJWZOjZGBczjXCb0brIfwiJJxFeeLFmopR2jmrMMVfuVtt6YJ1SRRwtERc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Niq4LtXj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mndeAcmi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A196EC4CEEA;
-	Mon, 23 Jun 2025 14:11:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Niq4LtXj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2F0AC4CEEA;
+	Mon, 23 Jun 2025 14:37:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750687865;
-	bh=S2l2sY8x6ARHJCtqhLtvEeZM+BBhQzDuZlxOYaXKcro=;
+	s=k20201202; t=1750689462;
+	bh=LkXLA8jsAZ04YeCznvkOb8RamvDKLqS/ZHmbnRhwhQk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mndeAcmiY8OItl4Ckcb2czE0f2tEwgc3Cau0eEXESzK/XDwyuIwW0rhXkL+s0pwBY
-	 9Ud3mGQwNkC738m+R6Tsbc8fQ5gAF4v4Cudno6MaO+TV/UTxzMqAywc7h7+8MrT9I9
-	 JyB4gLClWPxobJjjk6yf/Tps6oJKt3p4dRABaopcFAqrUCOwpIdA5c4rG0RWplbL8P
-	 yO0Exd2e313f3404E0BbmIjKW87GovUfFAmAXYofrbqD7m2rjH2bGk8fqKmuE26uxm
-	 8b1tO3NrRaKmViaTf5qKh6tiS/cqmrA1ModCeRVuafw2Duvx7iQtZaX/2+xPO52UXy
-	 c13lMLJ3DN/zQ==
+	b=Niq4LtXjHbHUjFfDP3moHzC6rmL9DvzHA9l14hHgXw1W3QEyGBfVqs4grTOUCBiVM
+	 AFXW1j6vnMOeJl/W9lOAUkyGixW4NYRu8oKnb8+EVrKsaStr0qz5Uebsi+S7E7Dxt0
+	 s9YycwCBlWTosGNlGb85BxP4KA5RZLgYxrbbxcrwDq1OcnTV3zjyz7cD9y6+huKxXJ
+	 MYdqaavAgh4uPBQdTd7hTKcPJVcd926U4u6deLBtVlgpZj6k0jaYF+1pjzg3d4mpOg
+	 5uJ/jxAgD8WcfqSCQXT2F3N/vbIslu8c8yRJfOUCH/U0HBDAzfa/wrd/W//cgjT8mL
+	 9xEtBkweg+MhA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uTht1-009Dbr-6F;
-	Mon, 23 Jun 2025 15:11:03 +0100
-Date: Mon, 23 Jun 2025 15:11:02 +0100
-Message-ID: <867c12czux.wl-maz@kernel.org>
+	id 1uTiIm-009EAI-8S;
+	Mon, 23 Jun 2025 15:37:40 +0100
+Date: Mon, 23 Jun 2025 15:37:39 +0100
+Message-ID: <865xgmcymk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Eric Auger <eauger@redhat.com>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Raghavendra Rao Ananta <rananta@google.com>,
+	Mingwei Zhang <mizhang@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	seanjc@google.com,
-	darren@os.amperecomputing.com
-Subject: Re: [RFC PATCH v2 0/9] KVM: Enable Nested Virt selftests
-In-Reply-To: <9d5d82f1-b488-4b0a-98c2-27e95d63fc5c@os.amperecomputing.com>
-References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
-	<92c7e99c-5574-422c-92f1-62d5cde58fec@redhat.com>
-	<7bf7bd52-7553-42a7-afdb-a5e95f8699b5@os.amperecomputing.com>
-	<86a56veiyy.wl-maz@kernel.org>
-	<3be548bf-aee4-46ab-bcbf-15bf629b24da@os.amperecomputing.com>
-	<86jz58c5ut.wl-maz@kernel.org>
-	<9d5d82f1-b488-4b0a-98c2-27e95d63fc5c@os.amperecomputing.com>
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] KVM: arm64: Introduce attribute to control GICD_TYPER2.nASSGIcap
+In-Reply-To: <aFkdofSolis53JgO@linux.dev>
+References: <20250613155239.2029059-1-rananta@google.com>
+	<20250613155239.2029059-4-rananta@google.com>
+	<87frftfpg7.wl-maz@kernel.org>
+	<aFkTDmj9u1ERnvHO@linux.dev>
+	<868qliddzt.wl-maz@kernel.org>
+	<aFkdofSolis53JgO@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,49 +61,72 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, eauger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, darren@os.amperecomputing.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, rananta@google.com, mizhang@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 23 Jun 2025 11:31:32 +0100,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Mon, 23 Jun 2025 10:25:53 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On 6/19/2025 5:15 PM, Marc Zyngier wrote:
-> >>   >
-> >>> Also, running EL2 is the least of our worries, because that's pretty
-> >>> easy to deal with. It is running at EL1/0 when EL2 is present that is
-> >>> interesting, and I see no coverage on that front.
-> >> 
-> >> Sorry, I did not get this comment fully.
-> >> When we run selftest on Host with -g option, the guest code will run in vEL2 as L1.
-> >> This is implemented as per comment in V1.
-> >> 
-> >> When we run same selftest from L1 shell, then guest_code will be running in EL0/1 like running from L0.
+> On Mon, Jun 23, 2025 at 10:05:42AM +0100, Marc Zyngier wrote:
+> > On Mon, 23 Jun 2025 09:40:46 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > On Sat, Jun 21, 2025 at 09:50:48AM +0100, Marc Zyngier wrote:
+> > > > On Fri, 13 Jun 2025 16:52:37 +0100, Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > > > @@ -683,8 +714,14 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+> > > > >  			return 0;
+> > > > >  		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
+> > > > >  			return 0;
+> > > > > +		default:
+> > > > > +			return -ENXIO;
+> > > > >  		}
+> > > > > +	case KVM_DEV_ARM_VGIC_GRP_FEATURES:
+> > > > > +		return attr->attr != KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap ?
+> > > > > +		       -ENXIO : 0;
+> > > > 
+> > > > Do we really want to advertise KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap even
+> > > > when we don't have GICv4.1? This seems rather odd. My take on this API
+> > > > is that this should report whether the feature is configurable, making
+> > > > it backward compatible with older versions of KVM.
+> > > 
+> > > So this was because of me, as I wanted nASSGIcap to behave exactly like
+> > > the ID registers. I do think exposing the capability unconditionally is
+> > > useful, as otherwise there's no way to definitively say whether or not
+> > > the underlying platform supports GICv4.1.
+> > > 
+> > > KVM_HAS_DEVICE_ATTR can't be used alone for probing since old kernels
+> > > use GICv4.1 but don't expose the attribute.
+> > > 
+> > > Does that make sense?
 > > 
-> > What good does this bring us if we need to boot a full guest OS to run
-> > tests? What we need is synthetic tests that implement the whole stack:
+> > My own reasoning is that if we expose the capability, userspace is
+> > able to use it and rely on it to take effect (VPE allocation error
+> > notwithstanding). This is not the case with this approach, and that's
+> > at odds with the other attributes.
 > > 
-> > - L1 guest hypervisor
-> > - L2 guest hypervisor
-> > - L2 guest
-> > - L3 guest hypervisor
-> > - L3 guest
-> > - [...]
+> > But taking a step back: if we want to control the nASSGIcap bit, why
+> > don't we allow writing to GICD_TYPER2 from userspace? This does
+> > matches your view that we treat it as an ID register (GICD_TYPER2
+> > matches this definition if you squint hard enough). It also avoids
+> > adding new UAPI with unusual semantics.
 > 
-> IIUC, selftest leverages host OS support and uses various IOCTLs to
-> support the guest_code run. Are you saying to implement all this
-> again (without OS help) in guest_code to run it as hypervisor and
-> launch guest_code2 as NestedVM?.
+> This approach would bring its own set of complications. At least right
+> now we allocate vPEs at vgic_init() but prevent register accesses prior
+> to initialization. If we want to bake this thing into GICD_TYPER2
+> directly we either need to relax this register to be accessed before
+> init or defer the vPE allocation later on.
+> 
+> I'm worried that the latter approach is gonna be a mess, and the
+> attribute was done to avoid a one-off accessor in the VGIC state. But if
+> you'd like to see it done that way then that's OK with me.
 
-The whole point of having small selftests is to run something that is
-simpler several orders of magnitude simpler than the full blown
-OS/hypervisor. So indeed, I'm asking for selftests that build chains
-of guests up to some level and verify that the nesting, as described
-in the architecture, works correctly.
+I'm not convinced we need to change much. For example, we already
+allow userspace writes to GICD_IIDR to set the version of the
+emulation prior to vgic_init(). It doesn't feel like allowing TYPER2
+writes to occur in a similar spot require anything invasive.
 
-> It seems to be complicated, doesn't it?
-
-Yes, it is complicated. What did you expect?
+Thanks,
 
 	M.
 
