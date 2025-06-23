@@ -1,226 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A69EED7;
-	Sun, 22 Jun 2025 13:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6318222DA13
+	for <kvmarm@lists.linux.dev>; Mon, 23 Jun 2025 08:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750597285; cv=none; b=WGYwASU9yDzOFMmuqjibDVC4IZSEZ+FjTrv+9ScEw4s3/hB9HLuaMBgvEIiJ4NB3MPrrDBZD3QeRadPfR/T+93XC1GHap09I7LhOnDQ9UcD1tpOhjVHzpgrhu+z1nI1NXqXYirzSvOa3sqBWNhhG8f9huoTNVOunwMbl08R9Zzg=
+	t=1750668069; cv=none; b=WrSkdiYiGezuTCzgE9QBhxbBHmfaLkFEDtBsc3xU0VxgZ6Njva5byy7qanNGsPjdNIqJrwEDT6CKtQGntu22MPnK/aEX9Tm97bL6XxLNejpuA0g79kCGFOq7KSeqzOtDRLSrUqLZINznC1Tf1ptFaaQAXZJa22JKaByQ5unMi6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750597285; c=relaxed/simple;
-	bh=qLkw/Q/EM8Dh1Jv3fjeRRfrI8ZV5UvvY6GtQl0d2ph8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BvNm8hikkaG1VCWdFwlwJOCNehRwV2u+w/qQutjkjhx/ksq/4yoF2a1l4RRe+Wlwb8l9gxznM5NgoyyIPy4CXgSkNliSf2jEYpFp3Dzy+zx+5TFz6CqG5jt4zBFz9lzlqLDH3tfcrv3ANWkT8uGxZUhyXPeSi46ExXr8Nbh8t1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=svhYhSBY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750668069; c=relaxed/simple;
+	bh=dK2/nk5Dk95inlWUhVxlyOVlxm1wOh6kKl2zKSksdrE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GcENUjDeznL+DMA57vuLjoTXlWL7M8GKBMfLV7ORVNihyRpFRQVXTa/TqBfrvIrjkIZUyNt+RJLBGzjpXkJELkMFmE0AV26sYWrlplzx1+qk7JcaVDM/Fh6Sv1ypUN19EBUmaaFsHr0FsyN7QA/MllZr3a+rgCYxoFsCUCwzdx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vXhgy8BI; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="svhYhSBY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA79FC4CEE3;
-	Sun, 22 Jun 2025 13:01:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750597284;
-	bh=qLkw/Q/EM8Dh1Jv3fjeRRfrI8ZV5UvvY6GtQl0d2ph8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=svhYhSBYlgsO6WqFP4DG4Ibuoyfs7mZ3VZaQyyfK3cYXuQ0TQD35EJCeO/Mpshh2H
-	 xI3l7iAcoH8Bf8iRZBWccJ5GrzMaRZJILNtjGG8VtbXhy54gQylP0dOS2Jk2MuACPE
-	 FSjdjYJOaGghCEmOzMtN6Ft7E+xIzfIbS/VSO6KdArui1yqYKZMzQcvBPftqt1JGaj
-	 DOfGCNspTpHwq9QYr0pbpKOvajO6/24wPJroJuPcoDb/YwD3OlYCt3/QBw3mlKH/ye
-	 MaVsl12q7zVD78TW1ZmNS7u/jjPQwfMbEKC8MgP4Q/mIIzN1y1u6/H+ij3K4dPwhFC
-	 XvKYae1nDy1yw==
-Received: from [213.123.58.114] (helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uTKK2-008y5h-Af;
-	Sun, 22 Jun 2025 14:01:22 +0100
-Date: Sun, 22 Jun 2025 14:01:21 +0100
-Message-ID: <878qlkexr2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: perlarsen@google.com
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 3/6] KVM: arm64: Use SMCCC 1.2 in host FF-A handler
-In-Reply-To: <20250619-virtio-msg-ffa-v5-3-412c98558807@google.com>
-References: <20250619-virtio-msg-ffa-v5-0-412c98558807@google.com>
-	<20250619-virtio-msg-ffa-v5-3-412c98558807@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vXhgy8BI"
+Date: Mon, 23 Jun 2025 01:40:46 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750668060;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r16EnTRqICp2s4o/VmEbqOJZDlq1jQbD4/5SrPKHiGk=;
+	b=vXhgy8BI2eQT3nYZFNPvge0v3pNI+5OHueB5YbHaYwCW+TT9AQHY0yJHWTYeBTTKK+bXVc
+	oi5EsbsszqVgdBVJtFUje6uy4RYpnmR43FqwM9HnWzxpkObe9VzrsPqZmevtpEJmO2Wy/Y
+	zdyKSvNt+gzmZ8O3Ny3eRiR0q/supVI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Raghavendra Rao Ananta <rananta@google.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] KVM: arm64: Introduce attribute to control
+ GICD_TYPER2.nASSGIcap
+Message-ID: <aFkTDmj9u1ERnvHO@linux.dev>
+References: <20250613155239.2029059-1-rananta@google.com>
+ <20250613155239.2029059-4-rananta@google.com>
+ <87frftfpg7.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 213.123.58.114
-X-SA-Exim-Rcpt-To: perlarsen@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87frftfpg7.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 19 Jun 2025 10:02:56 +0100,
-Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org> wrote:
+On Sat, Jun 21, 2025 at 09:50:48AM +0100, Marc Zyngier wrote:
+> On Fri, 13 Jun 2025 16:52:37 +0100, Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > @@ -683,8 +714,14 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+> >  			return 0;
+> >  		case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
+> >  			return 0;
+> > +		default:
+> > +			return -ENXIO;
+> >  		}
+> > +	case KVM_DEV_ARM_VGIC_GRP_FEATURES:
+> > +		return attr->attr != KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap ?
+> > +		       -ENXIO : 0;
 > 
-> From: Per Larsen <perlarsen@google.com>
-> 
-> SMCCC 1.1 and prior allows four registers to be sent back as a result
-> of an FF-A interface. SMCCC 1.2 increases the number of results that can
-> (and often must) be sent back to 8 and 16 for 32-bit and 64-bit SMC/HVCs
-> respectively.
-> 
-> FF-A 1.0 references SMCCC 1.2 (reference [4] on page xi) and FF-A 1.2
-> explicitly requires SMCCC 1.2 so it should be safe to use this version
-> unconditionally. Moreover, it is simpler to implement FF-A features
-> without having to worry about compatibility with SMCCC 1.1 and older.
-> 
-> Add SMCCC 1.2 helper routines and use this version unconditionally.
+> Do we really want to advertise KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap even
+> when we don't have GICv4.1? This seems rather odd. My take on this API
+> is that this should report whether the feature is configurable, making
+> it backward compatible with older versions of KVM.
 
-Well, the previous patch already mandates that, so I wonder why you
-have two patches tackling the same thing.
+So this was because of me, as I wanted nASSGIcap to behave exactly like
+the ID registers. I do think exposing the capability unconditionally is
+useful, as otherwise there's no way to definitively say whether or not
+the underlying platform supports GICv4.1.
 
-> 
-> Signed-off-by: Per Larsen <perlarsen@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 297 ++++++++++++++++++++++++------------------
->  1 file changed, 173 insertions(+), 124 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 51bbe8f9c94584e9001ee769cbfd608d930ff723..23b75b9f0bcc62724f0d0d185ac2ed2526375da4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -71,36 +71,55 @@ static u32 hyp_ffa_version;
->  static bool has_version_negotiated;
->  static hyp_spinlock_t version_lock;
->  
-> -static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
-> +static void ffa_to_smccc_1_2_error(struct arm_smccc_1_2_regs *regs, u64 ffa_errno)
->  {
-> -	*res = (struct arm_smccc_res) {
-> +	*regs = (struct arm_smccc_1_2_regs) {
->  		.a0	= FFA_ERROR,
->  		.a2	= ffa_errno,
->  	};
->  }
->  
-> -static void ffa_to_smccc_res_prop(struct arm_smccc_res *res, int ret, u64 prop)
-> +static void ffa_to_smccc_regs_prop(struct arm_smccc_1_2_regs *regs, int ret,
-> +				   u64 prop)
->  {
->  	if (ret == FFA_RET_SUCCESS) {
-> -		*res = (struct arm_smccc_res) { .a0 = FFA_SUCCESS,
-> -						.a2 = prop };
-> +		*regs = (struct arm_smccc_1_2_regs) { .a0 = FFA_SUCCESS,
-> +						      .a2 = prop };
->  	} else {
-> -		ffa_to_smccc_error(res, ret);
-> +		ffa_to_smccc_1_2_error(regs, ret);
->  	}
->  }
->  
-> -static void ffa_to_smccc_res(struct arm_smccc_res *res, int ret)
-> +static void ffa_to_smccc_regs(struct arm_smccc_1_2_regs *regs, int ret)
->  {
-> -	ffa_to_smccc_res_prop(res, ret, 0);
-> +	ffa_to_smccc_regs_prop(regs, ret, 0);
->  }
->  
->  static void ffa_set_retval(struct kvm_cpu_context *ctxt,
-> -			   struct arm_smccc_res *res)
-> +			   struct arm_smccc_1_2_regs *regs)
->  {
-> -	cpu_reg(ctxt, 0) = res->a0;
-> -	cpu_reg(ctxt, 1) = res->a1;
-> -	cpu_reg(ctxt, 2) = res->a2;
-> -	cpu_reg(ctxt, 3) = res->a3;
-> +	cpu_reg(ctxt, 0) = regs->a0;
-> +	cpu_reg(ctxt, 1) = regs->a1;
-> +	cpu_reg(ctxt, 2) = regs->a2;
-> +	cpu_reg(ctxt, 3) = regs->a3;
-> +	cpu_reg(ctxt, 4) = regs->a4;
-> +	cpu_reg(ctxt, 5) = regs->a5;
-> +	cpu_reg(ctxt, 6) = regs->a6;
-> +	cpu_reg(ctxt, 7) = regs->a7;
-> +
+KVM_HAS_DEVICE_ATTR can't be used alone for probing since old kernels
+use GICv4.1 but don't expose the attribute.
 
-But my main problem with this patch is this sort of pointless
-churn. Changing "res" to "regs" just for the sake of it is completely
-pointless, and makes everything harder to read.
+Does that make sense?
 
-Please do yourself (and everybody else) a favour by keeping the
-variable name the same.
-
-> +	/* DEN0028C 2.6: SMC32/HVC32 call from aarch64 must preserve x8-x30 */
-> +	if (ARM_SMCCC_IS_64(regs->a0)) {
-
-This is the *return value*, right? Not the function number. How can
-you tell about the 64-bitness of the function number based on that?
-
-> +		cpu_reg(ctxt, 8) = regs->a8;
-> +		cpu_reg(ctxt, 9) = regs->a9;
-> +		cpu_reg(ctxt, 10) = regs->a10;
-> +		cpu_reg(ctxt, 11) = regs->a11;
-> +		cpu_reg(ctxt, 12) = regs->a12;
-> +		cpu_reg(ctxt, 13) = regs->a13;
-> +		cpu_reg(ctxt, 14) = regs->a14;
-> +		cpu_reg(ctxt, 15) = regs->a15;
-> +		cpu_reg(ctxt, 16) = regs->a16;
-> +		cpu_reg(ctxt, 17) = regs->a17;
-> +	}
->  }
->  
->  static bool is_ffa_call(u64 func_id)
-> @@ -113,82 +132,104 @@ static bool is_ffa_call(u64 func_id)
->  
->  static int ffa_map_hyp_buffers(u64 ffa_page_count)
->  {
-> -	struct arm_smccc_res res;
-> +	struct arm_smccc_1_2_regs regs;
->  
-> -	arm_smccc_1_1_smc(FFA_FN64_RXTX_MAP,
-> -			  hyp_virt_to_phys(hyp_buffers.tx),
-> -			  hyp_virt_to_phys(hyp_buffers.rx),
-> -			  ffa_page_count,
-> -			  0, 0, 0, 0,
-> -			  &res);
-> +	regs = (struct arm_smccc_1_2_regs) {
-> +		.a0 = FFA_FN64_RXTX_MAP,
-> +		.a1 = hyp_virt_to_phys(hyp_buffers.tx),
-> +		.a2 = hyp_virt_to_phys(hyp_buffers.rx),
-> +		.a3 = ffa_page_count,
-> +	};
-> +	arm_smccc_1_2_smc(&regs, &regs);
-
-To expand on my previous comment about this res/regs repainting, I'd
-rather see something like:
-
-	struct arm_smccc_1_2_regs res;
-
-	arm_smccc_1_2_smc(&(struct arm_smccc_1_2_regs){
-			 .a0 = FFA_FN64_RXTX_MAP,
-			 .a1 = hyp_virt_to_phys(hyp_buffers.tx),
- 	 		 .a2 = hyp_virt_to_phys(hyp_buffers.rx),
-			 .a3 = ffa_page_count,
-	}, &res);
-
-
-> +	if (regs.a0 != FFA_SUCCESS)
-> +		return regs.a2;
->  
-> -	return res.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : res.a2;
-> +	return regs.a0 == FFA_SUCCESS ? FFA_RET_SUCCESS : regs.a2;
-
-Why are you writing the same thing twice?
-
-I stopped reading here.
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+Thanks,
+Oliver
