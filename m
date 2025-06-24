@@ -1,68 +1,67 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55767238C3B
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 20:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265C325D20D
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 23:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750798308; cv=none; b=nls75lJlr9gjBKBi/uPOsh8GCYYxan0PFKPKrYR5FiEqC8y9QkSxSnzqZ0X159kGRaTVeElBTcAkfOA367X2eRY9Ixh1vxLOkXXuTG5TSEWw5hpxu5vuY2QF9vYDeolCos3iX/BcMWfGvVKqyeti+3w4wj3opKgR/cZU/JRz46U=
+	t=1750808422; cv=none; b=bgSInOdh53kn2DWSJ99VGXwiK2X5OmiXOdYGDaZ9f2IwKzibhJ2vozlfP1q8Xn74ciI1Zo/fPu4BnzKnXnCGwj83HoO6b5e1IUPeRI43kyCs/pOyl81dw2QBZ7XUjAi/iw4KBJBSseMG0cZgmEbghVTB1gWDndlTUkO6WxY0hOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750798308; c=relaxed/simple;
-	bh=8x9qXP/S5UEvRdHC20B9d77FLYlNsihh3C+6w9hyTis=;
+	s=arc-20240116; t=1750808422; c=relaxed/simple;
+	bh=LIdhiyJGm7RTUcB4viLUYQSJXjLC+R/ykcyrk54oCoM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hBSfPgTt/MnetyTPuFqN4NQaRpkTcvC7RkHsRkzhCYSO7kyqAldEl1aiy6i6zyMUpP8nUkWqdZz5ult5+jsiU18oC/cSlDDSu4sWDCar66a8qJjzXabgo52GG15VIzypLKK1ZA8Gu9tWXL5ZIVIIGol1/gILqyEXMEeyzAur3Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yiuS8vRL; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=p8s0L4Q5cmHfjuvH1Bph+zu33A/Xs3S/AZH45yN5mTxW8KQyln4gD1/jYN48k1fZfGG04tNCWWQ1RspFodI1Rb01yVZ0KHNHWaMmNJXz2mcUduo72lKCYWyy4egIId9ZBJmX6zCAMjh2E6++bS5eDIh17E3byT2sfxGcezIYnTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fVaABsXa; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yiuS8vRL"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-748f3613e6aso2344894b3a.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 13:51:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fVaABsXa"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2fb347b3e6so1062764a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 16:40:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750798306; x=1751403106; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d8YBsgCuhiB1KQsfplkqu8KemDkiwvQdckbWSfdb9ME=;
-        b=yiuS8vRLADnclDfjhl+Tg0WViq7Yul77HsPiw9PIkshJHAJwKNtszJXm4oJJLRePCR
-         KO4Kkro23OAIS6QoQSOD5yJSpy3PDAM9AoH0g7nrOn51kh5hC4Vpxt83avfpGwWaE+Rl
-         fH48CvJqxZygyt6rgRX6MC9fSJF03EBGep4wLUUSFZuO35BTaW9fxwGHH+XvRjLyNa/4
-         jQtT02dAQVZOi9X6DTsMOXjOnjBdHZ+1EK8jftq09N/SukGvYnTIuCDjT1DrgvlrpGoi
-         t2ZemMGTw2+on7HT2rHaYfPNrUC3elSqBTgGPO6RGlmJGPCyF50eKl/NoN/sy5OXYkDp
-         5zKg==
+        d=google.com; s=20230601; t=1750808420; x=1751413220; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wtBKhjYCaIRhlGRFPITFm9XwgDffPGPWmrBo0vWLUKo=;
+        b=fVaABsXaZLZ2UF2dpQr/J5I4lGT5FEOSF/5maxTh3vRg8nIZFgm41HR2nAeg9xi7nX
+         vmV9tVvlnZamWRNo18aCFCfanoqSoAu+e6AE2suTMkgNb5wibcuCLGrEwL9G7skCgljF
+         QqLznWf8hxHt/Nk+HFPXGzOcCuENma3PgfHoSOnvoLkPShfc3bFcaIPPbZl4kRZyGE3O
+         079ei4V0k4Ll3gMYciwPy0n2ySoyZ/ulXij+r1nM168LCZwi/va9B0F3FoYnJ0qyT9rK
+         so/eBCHPkHy9UYsjfkkebC5HJ7UMb6t4Qynr0YzyPJS5Aabmc/exqIJMtZzzMbz9QZID
+         HT2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750798306; x=1751403106;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=d8YBsgCuhiB1KQsfplkqu8KemDkiwvQdckbWSfdb9ME=;
-        b=nEhKnydl7jlc3dXaBXuJyFzddaws6NPbl+7S/qqmqSDnbof4hyMZxItS3Jf15k2Evg
-         iXpPD2xwxzeXm49s/giMnB4T645z2+Jqd193AvGuRINehUrtNqSgIbYmgBpNt7Lj6hW/
-         g1BAvvBKNbxemLDB5VcjchHCNcOfe7HAwg6JY8w7/cx+El4V/GFyKEUDtxumyIgpJTqP
-         Ghrp/Ya4g9orj0XxReEMkb3Mv7yxC7rA7Kl6RDAOT4n3o3LgddLl0o/FcPYwH0ouRTWr
-         nDicVcJcJCFFg+J3eA+nyTO/lP6Jew6Cq3OlZLJl9tH/XBCI2kgBVKGTFTp0kB0lEA7+
-         Y7dg==
-X-Forwarded-Encrypted: i=1; AJvYcCULNcv2b3YRKO95CZC5uNcCzT1f02hm8NMoqF+EQvq4QrlbnE7GIjkG8uphDD5fDVoy/WS5nzM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyoUlBn8jJsPYE4p7Ug680H04FKqHG2l6vx+tQnt9o5zpScvlhb
-	TvJSA+d3ecanDecNx8PgqZsmyHk2R1T5xJ9rV5TQi4QUEYT9dcW7IEyCNspvnoSbK+RJIkEFRXr
-	pGnYTTl63kb8szQiF+t169C5yxA==
-X-Google-Smtp-Source: AGHT+IEjeeOkKZSbarts0EPQ1w+PWi2DaN3IHfHv2xkdKjbiLXsr1Pi5Gbvd6S1gibHhYGyDPXVynsSmZ7Iue9O3cQ==
-X-Received: from pfbly4.prod.google.com ([2002:a05:6a00:7584:b0:749:d28:4ca2])
+        d=1e100.net; s=20230601; t=1750808420; x=1751413220;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wtBKhjYCaIRhlGRFPITFm9XwgDffPGPWmrBo0vWLUKo=;
+        b=IYwSy9w7cJsJJqxfS/BOyKFsncNWiAE01FuBuvHsO+2Oo0Zoz6PXJb9sJ+ko7wBele
+         2CMMMsmqfcOE67KV9NsVVLdCwGQUgP7MEt4sBp+KkGz3fEed3KppThWIr7xU4hgpb7IR
+         bQKiPypoAQKyhssSBFm1N4yCnKYv1jyRRw+BeBzpT6E4QTu0NVGwMUeC4qHpenQHAPOq
+         X2VXlGnoHukfERuKhtxcK+LknPRDeGUBDyr4EbP/CiU1cjPifFImwKGdkD0wcDnxpKRC
+         gmchKerEqBY8agyctvXl78lPyhuSVIgbGe9+eAUKtjPUKkOZ6I0qA029OKb3lgN/I9ej
+         ue+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXRWlj3eSlaov4nJ2zgLy1oppbnpLYKTs2sW+aTJ4mktiRTpF+3E6SfQZjG57o5Q0HFMnTUj+U=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxvAZ64CA3bgbQkHdcMUD+pZSagftpvxHItZkqO/r0AFwu93JEc
+	glLgxZjJJAidx9XAjhmE8EifxkBqmfIXCTTc2S5RjViDr1Ke4a4Jomb+UiOtcOxJ4ewqyClkmDw
+	SHmuqqN335XUPAyfqcLLkngoPbg==
+X-Google-Smtp-Source: AGHT+IHgSUmIGUTP1cRXfKE/+aw5IRkLF9VVq5UcZdV1pOiUg7sF4uqUMGUdcbKxDyQplXXCwSktIYqGZpB8BdsqFQ==
+X-Received: from pfux8.prod.google.com ([2002:a05:6a00:bc8:b0:746:1a7b:a39a])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:170b:b0:748:f74f:6d27 with SMTP id d2e1a72fcca58-74ad45e0092mr913336b3a.24.1750798305552;
- Tue, 24 Jun 2025 13:51:45 -0700 (PDT)
-Date: Tue, 24 Jun 2025 13:51:44 -0700
-In-Reply-To: <aEyLlbyMmNEBCAVj@google.com>
+ 2002:a05:6a20:2588:b0:1f5:717b:46dc with SMTP id adf61e73a8af0-2207f25dd7amr1308677637.27.1750808420299;
+ Tue, 24 Jun 2025 16:40:20 -0700 (PDT)
+Date: Tue, 24 Jun 2025 16:40:18 -0700
+In-Reply-To: <aEyhHgwQXW4zbx-k@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-5-tabba@google.com>
- <aEyLlbyMmNEBCAVj@google.com>
-Message-ID: <diqzh604lv6n.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v12 04/18] KVM: x86: Rename kvm->arch.has_private_mem to kvm->arch.supports_gmem
+References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-11-tabba@google.com>
+ <aEyhHgwQXW4zbx-k@google.com>
+Message-ID: <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
+ guest_memfd with shared memory
 From: Ackerley Tng <ackerleytng@google.com>
 To: Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>
 Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
@@ -85,365 +84,297 @@ Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
 	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
 	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
 	pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 
 Sean Christopherson <seanjc@google.com> writes:
 
 > On Wed, Jun 11, 2025, Fuad Tabba wrote:
->> The bool has_private_mem is used to indicate whether guest_memfd is
->> supported.
+>> From: Ackerley Tng <ackerleytng@google.com>
+>> 
+>> For memslots backed by guest_memfd with shared mem support, the KVM MMU
+>> must always fault in pages from guest_memfd, and not from the host
+>> userspace_addr. Update the fault handler to do so.
 >
-> No?  This is at best weird, and at worst flat out wrong:
+> And with a KVM_MEMSLOT_GUEST_MEMFD_ONLY flag, this becomes super obvious.
 >
-> 	if (kvm->arch.supports_gmem &&
-> 	    fault->is_private !=3D kvm_mem_is_private(kvm, fault->gfn))
-> 		return false;
+>> This patch also refactors related function names for accuracy:
 >
-> ditto for this code:
+> This patch.  And phrase changelogs as commands.
 >
-> 	if (kvm_arch_supports_gmem(vcpu->kvm) &&
-> 	    kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(range->gpa)))i
-> 		error_code |=3D PFERR_PRIVATE_ACCESS;
+>> kvm_mem_is_private() returns true only when the current private/shared
+>> state (in the CoCo sense) of the memory is private, and returns false if
+>> the current state is shared explicitly or impicitly, e.g., belongs to a
+>> non-CoCo VM.
 >
-> and for the memory_attributes code.  E.g. IIRC, with guest_memfd() mmap s=
-upport,
-> private vs. shared will become a property of the guest_memfd inode, i.e. =
-this will
-> become wrong:
+> Again, state changes as commands.  For the above, it's not obvious if you're
+> talking about the existing code versus the state of things after "this patch".
 >
-> static u64 kvm_supported_mem_attributes(struct kvm *kvm)
+>
+
+Will fix these, thanks!
+
+>> kvm_mmu_faultin_pfn_gmem() is updated to indicate that it can be used to
+>> fault in not just private memory, but more generally, from guest_memfd.
+>
+>> +static inline u8 kvm_max_level_for_order(int order)
+>
+> Do not use "inline" for functions that are visible only to the local compilation
+> unit.  "inline" is just a hint, and modern compilers are smart enough to inline
+> functions when appropriate without a hint.
+>
+> A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
+>
+
+Will fix this!
+
+>> +static inline int kvm_gmem_max_mapping_level(const struct kvm_memory_slot *slot,
+>> +					     gfn_t gfn, int max_level)
+>> +{
+>> +	int max_order;
+>>  
+>>  	if (max_level == PG_LEVEL_4K)
+>>  		return PG_LEVEL_4K;
+>
+> This is dead code, the one and only caller has *just* checked for this condition.
+>>  
+>> -	host_level = host_pfn_mapping_level(kvm, gfn, slot);
+>> -	return min(host_level, max_level);
+>> +	max_order = kvm_gmem_mapping_order(slot, gfn);
+>> +	return min(max_level, kvm_max_level_for_order(max_order));
+>>  }
+>
+> ...
+>
+>> -static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+>> -					u8 max_level, int gmem_order)
+>> +static u8 kvm_max_level_for_fault_and_order(struct kvm *kvm,
+>
+> This is comically verbose.  C ain't Java.  And having two separate helpers makes
+> it *really* hard to (a) even see there are TWO helpers in the first place, and
+> (b) understand how they differ.
+>
+> Gah, and not your bug, but completely ignoring the RMP in kvm_mmu_max_mapping_level()
+> is wrong.  It "works" because guest_memfd doesn't (yet) support dirty logging,
+> no one enables the NX hugepage mitigation on AMD hosts.
+>
+> We could plumb in the pfn and private info, but I don't really see the point,
+> at least not at this time.
+>
+>> +					    struct kvm_page_fault *fault,
+>> +					    int order)
+>>  {
+>> -	u8 req_max_level;
+>> +	u8 max_level = fault->max_level;
+>>  
+>>  	if (max_level == PG_LEVEL_4K)
+>>  		return PG_LEVEL_4K;
+>>  
+>> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+>> +	max_level = min(kvm_max_level_for_order(order), max_level);
+>>  	if (max_level == PG_LEVEL_4K)
+>>  		return PG_LEVEL_4K;
+>>  
+>> -	req_max_level = kvm_x86_call(private_max_mapping_level)(kvm, pfn);
+>> -	if (req_max_level)
+>> -		max_level = min(max_level, req_max_level);
+>> +	if (fault->is_private) {
+>> +		u8 level = kvm_x86_call(private_max_mapping_level)(kvm, fault->pfn);
+>
+> Hmm, so the interesting thing here is that (IIRC) the RMP restrictions aren't
+> just on the private pages, they also apply to the HYPERVISOR/SHARED pages.  (Don't
+> quote me on that).
+>
+> Regardless, I'm leaning toward dropping the "private" part, and making SNP deal
+> with the intricacies of the RMP:
+>
+> 	/* Some VM types have additional restrictions, e.g. SNP's RMP. */
+> 	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
+> 	if (req_max_level)
+> 		max_level = min(max_level, req_max_level);
+>
+> Then we can get to something like:
+>
+> static int kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
+> 				      struct kvm_page_fault *fault)
 > {
-> 	if (!kvm || kvm_arch_supports_gmem(kvm))
-> 		return KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> 	int max_level, req_max_level;
 >
-> 	return 0;
+> 	max_level = kvm_max_level_for_order(order);
+> 	if (max_level == PG_LEVEL_4K)
+> 		return PG_LEVEL_4K;
+>
+> 	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
+> 	if (req_max_level)
+> 		max_level = min(max_level, req_max_level);
+>
+> 	return max_level;
 > }
 >
-> Instead of renaming kvm_arch_has_private_mem() =3D> kvm_arch_supports_gme=
-m(), *add*
-> kvm_arch_supports_gmem() and then kill off kvm_arch_has_private_mem() onc=
-e non-x86
-> usage is gone (i.e. query kvm->arch.has_private_mem directly).
+> int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> 			      const struct kvm_memory_slot *slot, gfn_t gfn)
+> {
+> 	int max_level;
 >
-> And then rather than rename has_private_mem, either add supports_gmem or =
-do what
-> you did for kvm_arch_supports_gmem_shared_mem() and explicitly check the =
-VM type.
+> 	max_level = kvm_lpage_info_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM);
+> 	if (max_level == PG_LEVEL_4K)
+> 		return PG_LEVEL_4K;
 >
+> 	/* TODO: Comment goes here about KVM not supporting this path (yet). */
 
-IIUC Fuad will be adding bool supports_gmem instead of renaming, but we
-haven't discussed which usages will start using the new function.
+Which path does KVM not support?
 
-Let me go over all the changes/usages related to has_private_mem and
-supports_gmem.
-
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 6e0bbf4c2202..3d69da6d2d9e 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2270,9 +2270,9 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_for=
-ced_root_level,
-> =20
-> =20
->  #ifdef CONFIG_KVM_GMEM
-> -#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.has_private_mem)
-> +#define kvm_arch_supports_gmem(kvm) ((kvm)->arch.has_private_mem)
->  #else
-> -#define kvm_arch_has_private_mem(kvm) false
-> +#define kvm_arch_supports_gmem(kvm) false
->  #endif
+> 	if (kvm_mem_is_private(kvm, gfn))
+> 		return PG_LEVEL_4K;
 >
 
-*The* renaming vs adding-new-function change.
+Just making sure - this suggestion does take into account that
+kvm_mem_is_private() will be querying guest_memfd for memory privacy
+status, right? So the check below for kvm_is_memslot_gmem_only() will
+only be handling the cases where the memory is shared, and only
+guest_memfd is used for this gfn?
 
->  #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state=
-)
-> @@ -2325,8 +2325,8 @@ enum {
->  #define HF_SMM_INSIDE_NMI_MASK	(1 << 2)
-> =20
->  # define KVM_MAX_NR_ADDRESS_SPACES	2
-> -/* SMM is currently unsupported for guests with private memory. */
-> -# define kvm_arch_nr_memslot_as_ids(kvm) (kvm_arch_has_private_mem(kvm) =
-? 1 : 2)
-> +/* SMM is currently unsupported for guests with guest_memfd (esp private=
-) memory. */
-> +# define kvm_arch_nr_memslot_as_ids(kvm) (kvm_arch_supports_gmem(kvm) ? =
-1 : 2)
->  # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_M=
-ASK ? 1 : 0)
->  # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role=
-).smm)
->  #else
+> 	if (kvm_is_memslot_gmem_only(slot)) {
+> 		int order = kvm_gmem_mapping_order(slot, gfn);
+>
+> 		return min(max_level, kvm_gmem_max_mapping_level(kvm, order, NULL));
+> 	}
+>
+> 	return min(max_level, host_pfn_mapping_level(kvm, gfn, slot));
+> }
+>
+> static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
+> 				    struct kvm_page_fault *fault)
+> {
+> 	struct kvm *kvm = vcpu->kvm;
+> 	int order, r;
+>
+> 	if (!kvm_slot_has_gmem(fault->slot)) {
+> 		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> 		return -EFAULT;
+> 	}
+>
+> 	r = kvm_gmem_get_pfn(kvm, fault->slot, fault->gfn, &fault->pfn,
+> 			     &fault->refcounted_page, &order);
+> 	if (r) {
+> 		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> 		return r;
+> 	}
+>
+> 	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+> 	fault->max_level = kvm_gmem_max_mapping_level(kvm, order, fault);
+>
+> 	return RET_PF_CONTINUE;
+> }
+>
+> int sev_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault)
+> {
+> 	int level, rc;
+> 	bool assigned;
+>
+> 	if (!sev_snp_guest(kvm))
+> 		return 0;
+>
+> 	if (WARN_ON_ONCE(!fault) || !fault->is_private)
+> 		return 0;
+>
+> 	rc = snp_lookup_rmpentry(fault->pfn, &assigned, &level);
+> 	if (rc || !assigned)
+> 		return PG_LEVEL_4K;
+>
+> 	return level;
+> }
 
-IIUC from the discussion at guest_memfd call on 2025-05-15, SMM can't be
-supported because SMM relies on memory being shared.
+I like this. Thanks for the suggestion, I'll pass Fuad some patch(es)
+for v13.
 
-This should remain as kvm_arch_has_private_mem() - as long as the VM
-supports private memory at all, kvm_arch_nr_memslot_as_ids() should
-return 1 (no SMM support).
+>> +/*
+>> + * Returns true if the given gfn's private/shared status (in the CoCo sense) is
+>> + * private.
+>> + *
+>> + * A return value of false indicates that the gfn is explicitly or implicitly
+>> + * shared (i.e., non-CoCo VMs).
+>> + */
+>>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>>  {
+>> -	return IS_ENABLED(CONFIG_KVM_GMEM) &&
+>> -	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>> +	struct kvm_memory_slot *slot;
+>> +
+>> +	if (!IS_ENABLED(CONFIG_KVM_GMEM))
+>> +		return false;
+>> +
+>> +	slot = gfn_to_memslot(kvm, gfn);
+>> +	if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot)) {
+>> +		/*
+>> +		 * Without in-place conversion support, if a guest_memfd memslot
+>> +		 * supports shared memory, then all the slot's memory is
+>> +		 * considered not private, i.e., implicitly shared.
+>> +		 */
+>> +		return false;
+>
+> Why!?!?  Just make sure KVM_MEMORY_ATTRIBUTE_PRIVATE is mutually exclusive with
+> mappable guest_memfd.  You need to do that no matter what. 
 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index cbc84c6abc2e..e7ecf089780a 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4910,7 +4910,7 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu=
- *vcpu,
->  	if (r)
->  		return r;
-> =20
-> -	if (kvm_arch_has_private_mem(vcpu->kvm) &&
-> +	if (kvm_arch_supports_gmem(vcpu->kvm) &&
->  	    kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(range->gpa)))
->  		error_code |=3D PFERR_PRIVATE_ACCESS;
-> =20
+Thanks, I agree that setting KVM_MEMORY_ATTRIBUTE_PRIVATE should be
+disallowed for gfn ranges whose slot is guest_memfd-only. Missed that
+out. Where do people think we should check the mutual exclusivity?
 
-If the VM supports private mem and KVM knows the gfn to be private
-(whether based on memory attributes or in future, guest_memfd's
-shareability), prefault it as private.
+In kvm_supported_mem_attributes() I'm thiking that we should still allow
+the use of KVM_MEMORY_ATTRIBUTE_PRIVATE for other non-guest_memfd-only
+gfn ranges. Or do people think we should just disallow
+KVM_MEMORY_ATTRIBUTE_PRIVATE for the entire VM as long as one memslot is
+a guest_memfd-only memslot?
 
-Here technically the kvm_arch_has_private_mem() check just helps
-short-circuit to save deeper lookups, but if kvm_arch_has_private_mem()
-is false, kvm_mem_is_private() always return false anyway.
+If we check mutually exclusivity when handling
+kvm_vm_set_memory_attributes(), as long as part of the range where
+KVM_MEMORY_ATTRIBUTE_PRIVATE is requested to be set intersects a range
+whose slot is guest_memfd-only, the ioctl will return EINVAL.
 
-This should remain as kvm_arch_has_private_mem().
+> Then you don't need
+> to sprinkle special case code all over the place.
+>
 
-> @@ -7707,7 +7707,7 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm =
-*kvm,
->  	 * Zapping SPTEs in this case ensures KVM will reassess whether or not
->  	 * a hugepage can be used for affected ranges.
->  	 */
-> -	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
-> +	if (WARN_ON_ONCE(!kvm_arch_supports_gmem(kvm)))
->  		return false;
-> =20
->  	if (WARN_ON_ONCE(range->end <=3D range->start))
+That's true, thanks.
 
-Skip setting memory attributes if this kvm doesn't support private
-memory.
+I guess the special-casing will come back when guest_memfd supports
+conversions (and stores shareability). After guest_memfd supports
+conversions, if guest_memfd-only memslot, check with guest_memfd. Else,
+look up memory attributes with kvm_get_memory_attributes().
 
-This should remain as kvm_arch_has_private_mem().
+>> +	}
+>> +
+>> +	return kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>>  }
+>>  #else
+>>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>> -- 
+>> 2.50.0.rc0.642.g800a2b2222-goog
+>> 
 
-> @@ -7786,7 +7786,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm=
- *kvm,
->  	 * a range that has PRIVATE GFNs, and conversely converting a range to
->  	 * SHARED may now allow hugepages.
->  	 */
-> -	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
-> +	if (WARN_ON_ONCE(!kvm_arch_supports_gmem(kvm)))
->  		return false;
-> =20
->  	/*
 
-Skip setting memory attributes if this kvm doesn't support private
-memory.
 
-This should remain as kvm_arch_has_private_mem().
 
-> @@ -7842,7 +7842,7 @@ void kvm_mmu_init_memslot_memory_attributes(struct =
-kvm *kvm,
->  {
->  	int level;
-> =20
-> -	if (!kvm_arch_has_private_mem(kvm))
-> +	if (!kvm_arch_supports_gmem(kvm))
->  		return;
-> =20
->  	for (level =3D PG_LEVEL_2M; level <=3D KVM_MAX_HUGEPAGE_LEVEL; level++)=
- {
 
-Skip initializing memory attributes if this kvm doesn't support private
-memory, since for now KVM_MEMORY_ATTRIBUTE_PRIVATE is the only memory
-attribute.
 
-This should remain as kvm_arch_has_private_mem().
 
-Or perhaps (separately from this series) this check can be changed to
-kvm_supported_mem_attributes() !=3D 0.
 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 7700efc06e35..a0e661aa3f8a 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -719,11 +719,11 @@ static inline int kvm_arch_vcpu_memslots_id(struct =
-kvm_vcpu *vcpu)
->  #endif
-> =20
->  /*
-> - * Arch code must define kvm_arch_has_private_mem if support for private=
- memory
-> + * Arch code must define kvm_arch_supports_gmem if support for guest_mem=
-fd
->   * is enabled.
->   */
-> -#if !defined(kvm_arch_has_private_mem) && !IS_ENABLED(CONFIG_KVM_GMEM)
-> -static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
-> +#if !defined(kvm_arch_supports_gmem) && !IS_ENABLED(CONFIG_KVM_GMEM)
-> +static inline bool kvm_arch_supports_gmem(struct kvm *kvm)
->  {
->  	return false;
->  }
 
-*The* renaming vs adding-new-function change.
 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 898c3d5a7ba8..6efbea208fa6 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1588,7 +1588,7 @@ static int check_memory_region_flags(struct kvm *kv=
-m,
->  {
->  	u32 valid_flags =3D KVM_MEM_LOG_DIRTY_PAGES;
-> =20
-> -	if (kvm_arch_has_private_mem(kvm))
-> +	if (kvm_arch_supports_gmem(kvm))
->  		valid_flags |=3D KVM_MEM_GUEST_MEMFD;
-> =20
->  	/* Dirty logging private memory is not currently supported. */
 
-This should be renamed - the flag is valid only if guest_memfd is
-supported and squarely matches kvm_arch_supports_gmem().
 
-> @@ -2419,7 +2419,7 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm =
-*kvm,
->  #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
->  static u64 kvm_supported_mem_attributes(struct kvm *kvm)
->  {
-> -	if (!kvm || kvm_arch_has_private_mem(kvm))
-> +	if (!kvm || kvm_arch_supports_gmem(kvm))
->  		return KVM_MEMORY_ATTRIBUTE_PRIVATE;
-> =20
->  	return 0;
 
-This should remain as kvm_arch_has_private_mem().
 
-There's a little issue when mmap support is added: generally for the VM
-(for non-guest_memfd memslots in this VM), KVM_MEMORY_ATTRIBUTE_PRIVATE
-should be supported, but specifically for some ranges that belong to
-guest_memfd-only memslots, KVM_MEMORY_ATTRIBUTE_PRIVATE should not be
-supported?
 
-I think kvm_supported_mem_attributes() respond generically for the
-entire VM, so leaving this as kvm_arch_has_private_mem() is correct.
 
-> @@ -4912,7 +4912,7 @@ static int kvm_vm_ioctl_check_extension_generic(str=
-uct kvm *kvm, long arg)
->  #endif
->  #ifdef CONFIG_KVM_GMEM
->  	case KVM_CAP_GUEST_MEMFD:
-> -		return !kvm || kvm_arch_has_private_mem(kvm);
-> +		return !kvm || kvm_arch_supports_gmem(kvm);
->  #endif
->  	default:
->  		break;
 
-This should be renamed - the CAP is valid only if guest_memfd is
-supported and squarely matches kvm_arch_supports_gmem().
 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 3d69da6d2d9e..4bc50c1e21bd 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1341,7 +1341,7 @@ struct kvm_arch {
->  	unsigned int indirect_shadow_pages;
->  	u8 mmu_valid_gen;
->  	u8 vm_type;
-> -	bool has_private_mem;
-> +	bool supports_gmem;
->  	bool has_protected_state;
->  	bool pre_fault_allowed;
->  	struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
-> @@ -2270,7 +2270,7 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_for=
-ced_root_level,
-> =20
-> =20
->  #ifdef CONFIG_KVM_GMEM
-> -#define kvm_arch_supports_gmem(kvm) ((kvm)->arch.has_private_mem)
-> +#define kvm_arch_supports_gmem(kvm) ((kvm)->arch.supports_gmem)
->  #else
->  #define kvm_arch_supports_gmem(kvm) false
->  #endif
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e7ecf089780a..c4e10797610c 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3488,7 +3488,7 @@ static bool page_fault_can_be_fast(struct kvm *kvm,=
- struct kvm_page_fault *fault
->  	 * on RET_PF_SPURIOUS until the update completes, or an actual spurious
->  	 * case might go down the slow path. Either case will resolve itself.
->  	 */
-> -	if (kvm->arch.has_private_mem &&
-> +	if (kvm->arch.supports_gmem &&
->  	    fault->is_private !=3D kvm_mem_is_private(kvm, fault->gfn))
->  		return false;
-> =20
 
-This check should remain as a check on has_private_mem.
 
-If the VM supports private memory, skip fast page faults on fault type
-and KVM memory privacy status mismatches.
 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index ab9b947dbf4f..67ab05fd3517 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -5180,8 +5180,8 @@ static int svm_vm_init(struct kvm *kvm)
->  			(type =3D=3D KVM_X86_SEV_ES_VM || type =3D=3D KVM_X86_SNP_VM);
->  		to_kvm_sev_info(kvm)->need_init =3D true;
-> =20
-> -		kvm->arch.has_private_mem =3D (type =3D=3D KVM_X86_SNP_VM);
-> -		kvm->arch.pre_fault_allowed =3D !kvm->arch.has_private_mem;
-> +		kvm->arch.supports_gmem =3D (type =3D=3D KVM_X86_SNP_VM);
-> +		kvm->arch.pre_fault_allowed =3D !kvm->arch.supports_gmem;
->  	}
-> =20
->  	if (!pause_filter_count || !pause_filter_thresh)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b58a74c1722d..401256ee817f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12778,8 +12778,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lo=
-ng type)
->  		return -EINVAL;
-> =20
->  	kvm->arch.vm_type =3D type;
-> -	kvm->arch.has_private_mem =3D
-> -		(type =3D=3D KVM_X86_SW_PROTECTED_VM);
-> +	kvm->arch.supports_gmem =3D (type =3D=3D KVM_X86_SW_PROTECTED_VM);
->  	/* Decided by the vendor code for other VM types.  */
->  	kvm->arch.pre_fault_allowed =3D
->  		type =3D=3D KVM_X86_DEFAULT_VM || type =3D=3D KVM_X86_SW_PROTECTED_VM;
 
-and
 
-> arch/x86/kvm/vmx/tdx.c: In function =E2=80=98tdx_vm_init=E2=80=99:
-> arch/x86/kvm/vmx/tdx.c:627:18: error: =E2=80=98struct kvm_arch=E2=80=99 h=
-as no member named =E2=80=98has_private_mem=E2=80=99
->   627 |         kvm->arch.has_private_mem =3D true;
->       |                  ^
-> make[5]: *** [scripts/Makefile.build:287: arch/x86/kvm/vmx/tdx.o] Error 1
 
-These three changes make me think that maybe .has_private_mem shouldn't
-be a field at all and can be removed.
 
-What if kvm_arch_has_private_mem() for x86 always checks for a specific
-list of VM types? Something like this: on x86,
 
-* kvm_arch_has_private_mem() will return true for
-  KVM_X86_SW_PROTECTED_VM, KVM_X86_SNP_VM and KVM_X86_TDX_VM.
- =20
-* kvm_arch_supports_gmem() will return true for KVM_X86_SW_PROTECTED_VM,
-  KVM_X86_SNP_VM and KVM_X86_TDX_VM as well.
 
-After mmap support, kvm_arch_supports_gmem() also return true for
-KVM_X86_DEFAULT_VM, in addition to the original SW_PROTECTED, SNP and
-TDX.
-
-Patrick, Nikita, am I right that for KVM_X86_DEFAULT_VM to work with
-mmap-able guest_memfd, the usage in page_fault_can_be_fast() need not be
-updated, and that patch 10/18 in this series will be sufficient?
-
->> [...]
 
