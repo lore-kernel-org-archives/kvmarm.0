@@ -1,121 +1,220 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379772E6D23
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 19:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4942EA48D
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 19:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750794087; cv=none; b=rgLKLWximtv36V/zdy26vvXXxvYRUdC3vc8o+iglqNGUAmI7wcclS14pZJELZUVBRnxCRIJIEmsThzt2jtAGNcZixHJVnqHLjZbFtVXlm4aVFcClGx7urk0Dmo1uMFctYQesNIphARafK8FfzmY+x7QyXqtaT/IqLVIWb33qofE=
+	t=1750794095; cv=none; b=ntzuQ/JqdWD8MKLocjptQeCWFoWEgJn7JpY3BIueVpTUau1mwuIHfRAkYuRVondh84W45pL1ResmzcQ38usaaih4R5ACsdTVlANtiKSIPQ/T4V6DeBTbltCAcMvhY5VRhuRCelbKZdj6DLOOLMAQjlJrTUpE/tGBu4VOo3YDgvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750794087; c=relaxed/simple;
-	bh=vQBizulpamY6aAnwr2Udqj2t0ugWwP7/x4nvzsw17Cw=;
+	s=arc-20240116; t=1750794095; c=relaxed/simple;
+	bh=W9p5RNOwWK4ssw+w9Icf1zfU8LG1axNqXqJIcyLf8rg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sDOGbKd8/GXa/UEpIbTkSVwDr9OGevgF3eXCNmZfVc8Z5sDTN0e1pqX2bG5DTEwcNb+bPJHyocjdMDSunvJXZI7tDwwQVgRBg2acl1elxNMdtuAgIZCzn/2pTeAcy229cEPx/PYas0mpVaJBExzLP4a7y+c/WkUtc2w6EVaMRko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nwVZgfwu; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=tIh9dJhRzU2+JNMI+fQr0f62BxRTLyb2QIobQtxTU+v/TQrnA6THmJqQw5tDy3Uj7CBIa3y0zx97lnJGvULPJB4Xm/pkwFLXzUpxE6Hv0ukTC6/Z9YMqmz1oIYslCh3Bmi9/DMgrYZZ11Bs1dOUyPbt/KAeSksSdK3rSyLOc6Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B7xNf/ZK; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nwVZgfwu"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7491423658cso3144800b3a.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 12:41:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B7xNf/ZK"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b31e1ef8890so3658245a12.2
+        for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 12:41:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750794085; x=1751398885; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750794093; x=1751398893; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FUFFiUTwDIQTjkS/XGuKJUupkz/Ptibx0+U0nupMqZk=;
-        b=nwVZgfwukqCPruUJrYyjezJ7LXTI9ArcZufrcGA0DMGDh+6hJPZUfF+1C8RZxorA7v
-         FqqN8qHog11X+Z+6fWWvYDvk6Lpe1GFOODQYPHmCO+DVVvS/WtvQ6Ob6v8+MAmW6LEMX
-         Hrney5sIZxF+p2kopeoaLgbuo7UPGgiB2MCr77XKjLP/EyXlFQ/i7/dm7ZlQpve7fmht
-         hIwvhTvaVaQTMtlVwvDDvQ8OTUhLpOc/9fc3Um/TYic+2EG0v1drt/AJn8YYSszP4cxw
-         KwVsQcMXW2Bdhs0DXxgZxSu3h1csBHWTrJiOTrbVGan/OAx+/wQiqL2n64c9BkfoRd6J
-         lWVQ==
+        bh=aaVL2fuBIJO5Ef+1Bh7kERwUg+3qZZc0hFGc7zd55Fo=;
+        b=B7xNf/ZK7k/RjhVJeIQxehH+UvN6P0BqHVn8u+OHDb0tUzayM+Poh1QqUUvPA9SVFM
+         lleryP2l4YSpwojPNbL1zD3B95XohxA5BjcvNb0/WSw4Un60S8asOQ0wMyd40t7lFv5G
+         xxE1o5NcV5Nq1S6CzTTZdLQ/hub8SOaROzTV4ywaXG89XjsjBgYdHxoL+u/CCirTdLND
+         G9H0v+pzW5Xtr5f2DB8UvXsurQ6jJeFX0FW+JCkMW61hope/JekLsTKoYvpbaNWpmigG
+         maXxd6/e/CeyAFrfB/zG5kdOg3/2ebsRG80IUMBs/Jjn08EKl9N7TXxpcIE3HhUzFBsA
+         wS/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750794085; x=1751398885;
+        d=1e100.net; s=20230601; t=1750794093; x=1751398893;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FUFFiUTwDIQTjkS/XGuKJUupkz/Ptibx0+U0nupMqZk=;
-        b=oUE674J3w7ZH5gSXUQN31/P8ngWGSUvTY+Gr8BYtoEVjst2MVVZvxac2dra/VtFLbf
-         JGEM6VlNRyCIQgPtNOBT9Guatf2QsRDxWcgnPNsdZAuPMBYv5UR4bwEx6523h2dSi83M
-         wrhaQT+fNK3afts2QCcUtCmQKux50qFr0jt/jPAwzHrcBnKwvxnmIFm4EZfjUp4S6Jq0
-         PMKgxW+XW+fF60rydjviFN23TWTYZV3R152LKGwpXG8AQI4p7+Z55IQrpRGQnWaDqkpV
-         F3XEEeuOtFIBB0CB+R0bb6/xncsxz29SoAwbUGYa1i9/jrMeQ0K9hOo+AzTIlE9c6j7V
-         m08g==
-X-Forwarded-Encrypted: i=1; AJvYcCXiSqpev662w6Xoyhgq0antVML5VAQw3+5gWnbMtLVNhDnztiMiiYFlIzdYCGLn4RCixHBZ5wc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyYC+Naut8UOM344TNqEDBdhS9x33m7UsXGd6oEE9YJYC7dIdd1
-	B62U3GcVwlv49EqlZHGNR+JHvcsdRcqX9ZlHbaeT7q1m7H6q0rywEBJ7GHNRDE7Mq0rgzdtkyjB
-	zeEdWEQ==
-X-Google-Smtp-Source: AGHT+IHYexPIgCTXbHegrNWRwV9PAsICfBY+CW50dlQj/EuWE5JzEYSKqjcY5P3xX5xOKDb9+UElHwxg8eM=
-X-Received: from pfrb8.prod.google.com ([2002:aa7:8ec8:0:b0:746:32ae:99d5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:170d:b0:748:1bac:ad5f
- with SMTP id d2e1a72fcca58-74ad455d619mr461113b3a.12.1750794085384; Tue, 24
- Jun 2025 12:41:25 -0700 (PDT)
-Date: Tue, 24 Jun 2025 12:38:26 -0700
-In-Reply-To: <20250522235223.3178519-1-seanjc@google.com>
+        bh=aaVL2fuBIJO5Ef+1Bh7kERwUg+3qZZc0hFGc7zd55Fo=;
+        b=YogZVNtdq1a7k8D2pEqSu7wWPBMdtfF2NZSNdD5H/XqFqO8/tyrYssI9HjUn/Z2EaO
+         9LS5NcbPwNeWHb6KdSocl7TDd4Eol39inAaYHqiwpoFxTddiTbY/ZKqVd5SVHKjx+LJg
+         FSd2O0gP2zy7wtkiNZ+3ORc+GdeQ+ft4PsSy4+0u4ZwuGMtfYS/8k5cTSwnE/ZfAP9yg
+         kNJUwW6y4RGTqgz7WAi2vDLBozG0xEruxVkGixBvIHnY1rLVUu0Vkj4teih7NixwSFWI
+         H2C3ceyfa0JXlChfhhLXXk0jvzFrdsYKuf8drEmH5ZOGGssC6LahnMT48mJglHLGZlSw
+         3dWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUzPTw1Iy6ST8Pa1OhBUuXUOxv6T5AcOV0T1uePQ//NsBsKdO66hcfpaqRF0oSLfVGYdKcKp7c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxQd55LdEFIP4KI5RaZSidyMtj0GxfGNiySIsBrQ7J2B3KRvFJf
+	+8iZd9eXAeD7zTz61aBeuo4ZyKgnnsbsnGdNGYTgYmcRQPNijU92uTywkT14eHGfKh4nGlQrV5v
+	w+Shabw==
+X-Google-Smtp-Source: AGHT+IHP9vOochqphY6FRyMUtnNwry/oUJ8HZ/RRTAcAwoVKCsmUWny7XjH7CX4MaTRoKG3ozmiT8bd7+Ro=
+X-Received: from pjbcz13.prod.google.com ([2002:a17:90a:d44d:b0:311:d79d:e432])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2cc6:b0:311:e8cc:4255
+ with SMTP id 98e67ed59e1d1-315f26a123emr109300a91.31.1750794092933; Tue, 24
+ Jun 2025 12:41:32 -0700 (PDT)
+Date: Tue, 24 Jun 2025 12:38:28 -0700
+In-Reply-To: <20250611224604.313496-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250522235223.3178519-1-seanjc@google.com>
+References: <20250611224604.313496-2-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
-Message-ID: <175079267460.517177.7949210108988821172.b4-ty@google.com>
-Subject: Re: [PATCH v3 00/13] KVM: Make irqfd registration globally unique
+Message-ID: <175079326267.521591.2714927527330062591.b4-ty@google.com>
+Subject: Re: [PATCH v3 00/62] KVM: iommu: Overhaul device posted IRQs support
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Juergen Gross <jgross@suse.com>, 
-	Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	xen-devel@lists.xenproject.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, K Prateek Nayak <kprateek.nayak@amd.com>, 
-	David Matlack <dmatlack@google.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
+	Lu Baolu <baolu.lu@linux.intel.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
+	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 22 May 2025 16:52:10 -0700, Sean Christopherson wrote:
-> Non-KVM folks,
+On Wed, Jun 11, 2025, Sean Christopherson wrote:
+> TL;DR: Overhaul device posted interrupts in KVM and IOMMU, and AVIC in
+>        general.
 > 
-> I am hoping to route this through the KVM tree (6.17 or later), as the non-KVM
-> changes should be glorified nops.  Please holler if you object to that idea.
+> This applies on the series to add CONFIG_KVM_IOAPIC (and to kill irq_comm.c):
 > 
-> Hyper-V folks in particular, let me know if you want a stable topic branch/tag,
-> e.g. on the off chance you want to make similar changes to the Hyper-V code,
-> and I'll make sure that happens.
+>   https://lore.kernel.org/all/20250611213557.294358-1-seanjc@google.com
 > 
 > [...]
 
-Applied to kvm-x86 irqs, thanks!
+Applied to kvm-x86 irqs (except for patch 1, which is already in Linus' tree),
+with minor massaging (comments and changelogs) to address feedback.
 
-[01/13] KVM: Use a local struct to do the initial vfs_poll() on an irqfd
-        https://github.com/kvm-x86/linux/commit/283ed5001d68
-[02/13] KVM: Acquire SCRU lock outside of irqfds.lock during assignment
-        https://github.com/kvm-x86/linux/commit/140768a7bf03
-[03/13] KVM: Initialize irqfd waitqueue callback when adding to the queue
-        https://github.com/kvm-x86/linux/commit/b5c543518ae9
-[04/13] KVM: Add irqfd to KVM's list via the vfs_poll() callback
-        https://github.com/kvm-x86/linux/commit/5f8ca05ea991
-[05/13] KVM: Add irqfd to eventfd's waitqueue while holding irqfds.lock
-        https://github.com/kvm-x86/linux/commit/86e00cd162a7
-[06/13] sched/wait: Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority()
-        https://github.com/kvm-x86/linux/commit/867347bb21e1
-[07/13] xen: privcmd: Don't mark eventfd waiter as EXCLUSIVE
-        https://github.com/kvm-x86/linux/commit/a52664134a24
-[08/13] sched/wait: Add a waitqueue helper for fully exclusive priority waiters
-        https://github.com/kvm-x86/linux/commit/0d09582b3a60
-[09/13] KVM: Disallow binding multiple irqfds to an eventfd with a priority waiter
-        https://github.com/kvm-x86/linux/commit/2cdd64cbf990
-[10/13] KVM: Drop sanity check that per-VM list of irqfds is unique
-        https://github.com/kvm-x86/linux/commit/b599d44a71f1
-[11/13] KVM: selftests: Assert that eventfd() succeeds in Xen shinfo test
-        https://github.com/kvm-x86/linux/commit/033b76bc7f06
-[12/13] KVM: selftests: Add utilities to create eventfds and do KVM_IRQFD
-        https://github.com/kvm-x86/linux/commit/74e5e3fb0dd7
-[13/13] KVM: selftests: Add a KVM_IRQFD test to verify uniqueness requirements
-        https://github.com/kvm-x86/linux/commit/7e9b231c402a
+Note, in the branch, the arm64 vLPI is split quite far from the rest of the
+series.  This is by design so that I can provide a stable branch/tag for arm64
+if a conflict or dependency crops up, without the arm64 patch inheriting all of
+the dependencies and prep work for the series at large.
+
+[01/62] KVM: arm64: Explicitly treat routing entry type changes as changes
+        (already in Linus' tree)
+[02/62] KVM: arm64: WARN if unmapping a vLPI fails in any path
+        https://github.com/kvm-x86/linux/commit/cd4178d19420
+[03/62] KVM: Pass new routing entries and irqfd when updating IRTEs
+        https://github.com/kvm-x86/linux/commit/cb210737675e
+[04/62] KVM: SVM: Track per-vCPU IRTEs using kvm_kernel_irqfd structure
+        https://github.com/kvm-x86/linux/commit/05c5e23657e1
+[05/62] KVM: SVM: Delete IRTE link from previous vCPU before setting new IRTE
+        https://github.com/kvm-x86/linux/commit/0a917e9d4b70
+[06/62] iommu/amd: KVM: SVM: Delete now-unused cached/previous GA tag fields
+        https://github.com/kvm-x86/linux/commit/1da19c5ce053
+[07/62] KVM: SVM: Delete IRTE link from previous vCPU irrespective of new routing
+        https://github.com/kvm-x86/linux/commit/a0ca34bb1aad
+[08/62] KVM: SVM: Drop pointless masking of default APIC base when setting V_APIC_BAR
+        https://github.com/kvm-x86/linux/commit/430579577892
+[09/62] KVM: SVM: Drop pointless masking of kernel page pa's with AVIC HPA masks
+        https://github.com/kvm-x86/linux/commit/2e002ddc8966
+[10/62] KVM: SVM: Add helper to deduplicate code for getting AVIC backing page
+        https://github.com/kvm-x86/linux/commit/3338c639da15
+[11/62] KVM: SVM: Drop vcpu_svm's pointless avic_backing_page field
+        https://github.com/kvm-x86/linux/commit/d8527f133c0a
+[12/62] KVM: SVM: Inhibit AVIC if ID is too big instead of rejecting vCPU creation
+        https://github.com/kvm-x86/linux/commit/1aa6e256e46f
+[13/62] KVM: SVM: Drop redundant check in AVIC code on ID during vCPU creation
+        https://github.com/kvm-x86/linux/commit/c24ed209c474
+[14/62] KVM: SVM: Track AVIC tables as natively sized pointers, not "struct pages"
+        https://github.com/kvm-x86/linux/commit/26baab4eea4c
+[15/62] KVM: SVM: Drop superfluous "cache" of AVIC Physical ID entry pointer
+        https://github.com/kvm-x86/linux/commit/d29433336a7b
+[16/62] KVM: VMX: Move enable_ipiv knob to common x86
+        https://github.com/kvm-x86/linux/commit/bafddc70001d
+[17/62] KVM: SVM: Add enable_ipiv param, never set IsRunning if disabled
+        https://github.com/kvm-x86/linux/commit/d921665e01ba
+[18/62] KVM: SVM: Disable (x2)AVIC IPI virtualization if CPU has erratum #1235
+        https://github.com/kvm-x86/linux/commit/8de4a1c8164e
+[19/62] KVM: VMX: Suppress PI notifications whenever the vCPU is put
+        https://github.com/kvm-x86/linux/commit/6737557442e5
+[20/62] KVM: SVM: Add a comment to explain why avic_vcpu_blocking() ignores IRQ blocking
+        https://github.com/kvm-x86/linux/commit/52d826c9e54c
+[21/62] iommu/amd: KVM: SVM: Use pi_desc_addr to derive ga_root_ptr
+        https://github.com/kvm-x86/linux/commit/c4cdbaf9d81c
+[22/62] iommu/amd: KVM: SVM: Pass NULL @vcpu_info to indicate "not guest mode"
+        https://github.com/kvm-x86/linux/commit/95d50ebe6df8
+[23/62] KVM: SVM: Stop walking list of routing table entries when updating IRTE
+        https://github.com/kvm-x86/linux/commit/1e663ed23992
+[24/62] KVM: VMX: Stop walking list of routing table entries when updating IRTE
+        https://github.com/kvm-x86/linux/commit/23ca102e6fb2
+[25/62] KVM: SVM: Extract SVM specific code out of get_pi_vcpu_info()
+        https://github.com/kvm-x86/linux/commit/0a64c447f6f8
+[26/62] KVM: x86: Move IRQ routing/delivery APIs from x86.c => irq.c
+        https://github.com/kvm-x86/linux/commit/f5369619f7f8
+[27/62] KVM: x86: Nullify irqfd->producer after updating IRTEs
+        https://github.com/kvm-x86/linux/commit/9517aedecd0e
+[28/62] KVM: x86: Dedup AVIC vs. PI code for identifying target vCPU
+        https://github.com/kvm-x86/linux/commit/cf04ec393ed0
+[29/62] KVM: x86: Move posted interrupt tracepoint to common code
+        https://github.com/kvm-x86/linux/commit/c5af31698d71
+[30/62] KVM: SVM: Clean up return handling in avic_pi_update_irte()
+        https://github.com/kvm-x86/linux/commit/803928483669
+[31/62] iommu: KVM: Split "struct vcpu_data" into separate AMD vs. Intel structs
+        https://github.com/kvm-x86/linux/commit/53527ea1b702
+[32/62] KVM: Don't WARN if updating IRQ bypass route fails
+        https://github.com/kvm-x86/linux/commit/b33252b9d172
+[33/62] KVM: Fold kvm_arch_irqfd_route_changed() into kvm_arch_update_irqfd_routing()
+        https://github.com/kvm-x86/linux/commit/77bb184ab880
+[34/62] KVM: x86: Track irq_bypass_vcpu in common x86 code
+        https://github.com/kvm-x86/linux/commit/511754bc548b
+[35/62] KVM: x86: Skip IOMMU IRTE updates if there's no old or new vCPU being targeted
+        https://github.com/kvm-x86/linux/commit/dc6adb13046a
+[36/62] KVM: x86: Don't update IRTE entries when old and new routes were !MSI
+        https://github.com/kvm-x86/linux/commit/cc8b13105eac
+[37/62] KVM: SVM: Revert IRTE to legacy mode if IOMMU doesn't provide IR metadata
+        https://github.com/kvm-x86/linux/commit/71d6b3b8e69d
+[38/62] KVM: SVM: Take and hold ir_list_lock across IRTE updates in IOMMU
+        https://github.com/kvm-x86/linux/commit/c3d591c91f9c
+[39/62] iommu/amd: Document which IRTE fields amd_iommu_update_ga() can modify
+        https://github.com/kvm-x86/linux/commit/3be405e89f3d
+[40/62] iommu/amd: KVM: SVM: Infer IsRun from validity of pCPU destination
+        https://github.com/kvm-x86/linux/commit/08d9ccdd1a5c
+[41/62] iommu/amd: Factor out helper for manipulating IRTE GA/CPU info
+        https://github.com/kvm-x86/linux/commit/0b2b541fa3cd
+[42/62] iommu/amd: KVM: SVM: Set pCPU info in IRTE when setting vCPU affinity
+        https://github.com/kvm-x86/linux/commit/f965255dc503
+[43/62] iommu/amd: KVM: SVM: Add IRTE metadata to affined vCPU's list if AVIC is inhibited
+        https://github.com/kvm-x86/linux/commit/6df262f915ab
+[44/62] KVM: SVM: Don't check for assigned device(s) when updating affinity
+        https://github.com/kvm-x86/linux/commit/f5998661ff73
+[45/62] KVM: SVM: Don't check for assigned device(s) when activating AVIC
+        https://github.com/kvm-x86/linux/commit/fe0213923dd9
+[46/62] KVM: SVM: WARN if (de)activating guest mode in IOMMU fails
+        https://github.com/kvm-x86/linux/commit/16562766f171
+[47/62] KVM: SVM: Process all IRTEs on affinity change even if one update fails
+        https://github.com/kvm-x86/linux/commit/48f79c6c86b3
+[48/62] KVM: SVM: WARN if updating IRTE GA fields in IOMMU fails
+        https://github.com/kvm-x86/linux/commit/cd86240fea26
+[49/62] KVM: x86: Drop superfluous "has assigned device" check in kvm_pi_update_irte()
+        https://github.com/kvm-x86/linux/commit/04c4ca0ae479
+[50/62] KVM: x86: WARN if IRQ bypass isn't supported in kvm_pi_update_irte()
+        https://github.com/kvm-x86/linux/commit/d1bccaa1793d
+[51/62] KVM: x86: WARN if IRQ bypass routing is updated without in-kernel local APIC
+        https://github.com/kvm-x86/linux/commit/25ef059e8bc5
+[52/62] KVM: SVM: WARN if ir_list is non-empty at vCPU free
+        https://github.com/kvm-x86/linux/commit/99836eb9c5dc
+[53/62] KVM: x86: Decouple device assignment from IRQ bypass
+        https://github.com/kvm-x86/linux/commit/77e1b8332d1d
+[54/62] KVM: VMX: WARN if VT-d Posted IRQs aren't possible when starting IRQ bypass
+        https://github.com/kvm-x86/linux/commit/ce9d54f41be0
+[55/62] KVM: SVM: Use vcpu_idx, not vcpu_id, for GA log tag/metadata
+        https://github.com/kvm-x86/linux/commit/11a60455d4c9
+[56/62] iommu/amd: WARN if KVM calls GA IRTE helpers without virtual APIC support
+        https://github.com/kvm-x86/linux/commit/a23480fe21de
+[57/62] KVM: SVM: Fold avic_set_pi_irte_mode() into its sole caller
+        https://github.com/kvm-x86/linux/commit/f2bc961d383b
+[58/62] KVM: SVM: Don't check vCPU's blocking status when toggling AVIC on/off
+        https://github.com/kvm-x86/linux/commit/6eab2340f339
+[59/62] KVM: SVM: Consolidate IRTE update when toggling AVIC on/off
+        https://github.com/kvm-x86/linux/commit/5f3d06b1648e
+[60/62] iommu/amd: KVM: SVM: Allow KVM to control need for GA log interrupts
+        https://github.com/kvm-x86/linux/commit/b9e53f9ff4a8
+[61/62] KVM: SVM: Generate GA log IRQs only if the associated vCPUs is blocking
+        https://github.com/kvm-x86/linux/commit/b03500f03ea0
+[62/62] KVM: x86: Rename kvm_set_msi_irq() => kvm_msi_to_lapic_irq()
+        https://github.com/kvm-x86/linux/commit/6f343724837b
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
