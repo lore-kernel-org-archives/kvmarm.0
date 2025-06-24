@@ -1,191 +1,172 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35BA291894
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 11:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD3528851A;
+	Tue, 24 Jun 2025 12:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750766336; cv=none; b=Ifmuvs354Y3/4y50sRvG5B3odXqzmEell1YJMMUxv55p4fbjgHFWGk1pt/pS2yPa30OZMqxWOtLrMEqUirwK66t8RfAfGlbG5k/QqZIG8919CesdLqIP7COkrMWEt4PSLwxtXpxpO+RNDiG/VEf08xu9FFnMVM6IIC+1PFmTlX0=
+	t=1750768286; cv=none; b=CF91aJM9eoAtj7S5DwK8poP9aWiO2G0Jm2Eo1n2OGwAZKgtCaggTejQ5IVRhQRQVrC0CI/bRs/uPlwM45xhdre195LNxAyHYJ1r4zuZcSpPrT8H++5Xg6B0eaNVpt2yFUbz9JJwwM3XLSgtEuo215tDsMwKoYHqKSpRzYGhR990=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750766336; c=relaxed/simple;
-	bh=uskxUuB6YcOdbnKLw5g8SxZDF6K9gBPzBY4kiD0YoM0=;
+	s=arc-20240116; t=1750768286; c=relaxed/simple;
+	bh=A1vlO/L1VKH8WOeSv/ouj3ncracjwzpEiurRYiS/ALg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BA/1klVWCj+f4ce8mTiUe58RKkivg8blJISJ6Lq1h7BJViV8ua8u6ZLWAJ7rpi2lCdJDKczFKwJfOYIHt+RttOi0HPXkUWgifdkCMABVjLcuTb4566f/oXQcvRObuo0BRZ5PUJ7ZAYOuOkvp41bMmzNvS8ySw79yYiXIHiEcqJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0fOWSGBW; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=EHpbbJp1/bWy7Kw08U3o1KmEOGioMOByrf7E1WLg1Mnk327tQ2rRBfuuW2Qn7vTzcdO2oFn7NUucwjZdiAtkbsGKy3JgE0OO8lS5l7wLL6zbirQaV3HUYtHxH+MooueTQBBst0HzFOIxujZiYMqvOz8s5zsZXTXx+3e6vEBCCNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eu9htEvB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0fOWSGBW"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4a58ef58a38so146171cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 04:58:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750766333; x=1751371133; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zAkKzBT9Oi47cUQVFAqBKpPqCgRXO9n1TGoSSjrcRig=;
-        b=0fOWSGBWY06h9mOk94afrFP/UOXMlxADJYHt2YwhviKOgwfmY2d7eGlGpsvf3Pmjd3
-         +PQlnpVWqTf2lZteQ1arT4zepe3sR//F7jSPWv8BvvungcBRvCh5NJv0GSId8Wx1Ojsr
-         NBfXEZ7WolBRKyOdb3ejDjdP0BZigJGxCdQlZAwduo8vlWYAU6NxxE7yXhe0LwKd0WMm
-         s3UKJvCXSTnzJ8+3yieb3LlPS1jXOsBouoYIJDD5HqQbfGC+32RqA7ZtiYXgNLhCcxGc
-         Vwpme0d3RTbRyQknWNRvZLq3jzp9XFxifLO6GQVRKxV0TatRtitnpmoOaHaRxEGGV5xy
-         RPwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750766333; x=1751371133;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zAkKzBT9Oi47cUQVFAqBKpPqCgRXO9n1TGoSSjrcRig=;
-        b=YKr/ANKApUvVZqisj46cec6sjMyidvtoBwmttfv7tAhpRZRx19+O8CnPsyL0fYo9Ag
-         Zl8EkXOd/YAyyeJz6GVtMSiZDaZhCSN/d6aEwM24XpRpJXGamXHC0bDsOwwEUb98ZFYY
-         cVWlNu7vnXO1fXqZa9JcZWjmKybVy5kZ1SoObeGsE/7C36PUY0fQsK/grZl+YquAKl5Q
-         V9J+W+K9BFP+NfgG2ywXaj5coWt6QXGlaMCfkCbMDzbPE83ERHe0yjGyYP30tgvQAQKN
-         d0fxPLambni2pxeQ60NYovLVCzi65TcvNH8OgPkIC+bbUe3obnENKVU1sn5Nnn4MXTtv
-         m2BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW+cNJid6nUHfIOyRL9csPhdQtEQ9KhRzrnOSywS4++Td4Fu3YJPtFEIf8m43FG8MIDdTLoiII=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx/JRaeWMRLetB2KLm7GIqEQ+Yvx+4mlNm1STpk3IyP1+gmDTt7
-	9ZA9wDVPpeHZOPvoSBmtKv91mbxrvPUNwPEp38UU+zfz+K8pwQtMbygDPPgl33ehgs5+ANLVH3a
-	VrOFceTio6siolMbZpGQDh5exqlNHlHJizo08aS4q
-X-Gm-Gg: ASbGnctM9FzTcAX70nH0NZibPhf3uD0ZMMj1/tg59z1StZWC62a1EhA3y0BZaEaK2Wt
-	aq1BSzqZY/mECR9CW3R5Z11lQcXzqcJzNKwu1UpPfZ/NXhIAAsfagChS7d0iaeWMdHsCcIFtkZm
-	31xjDYq8cWhYsRM3Sc88u/0Qt4pJGyWD9/J7tW8IsfCqgWX+0ceb7rI0Kws3QMGaZoHpUXyw==
-X-Google-Smtp-Source: AGHT+IFItWaOUEnQWqkCr0iMJsyetgQtFozSIRuqtaWWAUjmia/GJg3tAAHgb8EkJpgaZINqlaKB1Ek0kcCYr/IuJ+k=
-X-Received: by 2002:a05:622a:1983:b0:4a7:26ba:bc2a with SMTP id
- d75a77b69052e-4a7b16ece18mr3011891cf.15.1750766332945; Tue, 24 Jun 2025
- 04:58:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eu9htEvB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 104F6C4CEE3;
+	Tue, 24 Jun 2025 12:31:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750768286;
+	bh=A1vlO/L1VKH8WOeSv/ouj3ncracjwzpEiurRYiS/ALg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=eu9htEvBiVbL44j/hDA/XL5IHMVRkTjREoK+yoJofVs3i2H7zYeWM4nuOEa8lvA1q
+	 draOJBWRmasaODlA4846qtfnrHoWcfrlpN7SdkOAt9CRDuKgz+Jijdfb0hME3v4zjT
+	 vySbdesGJCidQHCf0M229vamBtjKXpnwatmAh49jUKp+nVNq+/QlhEUFGI/3hC6dpM
+	 MBpiZpEieyvMUEHttV5HVCNFcwOz97BYbHpUnESxPT0XUV2ac4VY/kC4HNi3iT2U1C
+	 nndDqpkUc6Rj2nldXF12iLWnmS6e5StbWpsEaS9jarXC/+el4cuLLpnkbs9yytEYsC
+	 jjsFUJ19nZmUg==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-60179d8e65fso738004a12.0;
+        Tue, 24 Jun 2025 05:31:25 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWY5M4/jkbxcaO/SwxIGdzU8xh+J04LiQxBJF2afgFnQU9mqpOcZ+Qv+MjPgJ9xc2NS76lOtIY=@lists.linux.dev, AJvYcCWrrJY63LVpWqubDttzu44pCH4xnidhFEOInYSLRge1ZvLWs4yMAgeEY0Ef8N7iWT0E++jqDg4hs0dK@lists.linux.dev, AJvYcCXFDoC0vnxXZMe40TlZFgIA5S75qA/r9jkL1SJMRSC8Dpj4ItiICN2sgBXZSAtqxmqOxxnxZA==@lists.linux.dev
+X-Gm-Message-State: AOJu0YxQ3y7fGvxggu3fR+qnqRGkD+VRoptysoffWCXq7j5jjGDReHNq
+	2LrMLYs9Ei9j1QhoOlIPYefG4YVVtpaw9o6dAis4HGkd8SmBqt0gg6tV10qIxOhFaWbZ3mBuOXv
+	/MKlI0y1NdWypYSDYInMr90TYXUxrNhs=
+X-Google-Smtp-Source: AGHT+IG78TOJtNBgPo6KUbppTtQyUVPXosqjkC+mjKzFM6GuMzZpIE/4mn6DMDsxVG8gc/mo29CZZDSg4K3moyGLako=
+X-Received: by 2002:a50:9e07:0:b0:607:5987:5ba1 with SMTP id
+ 4fb4d7f45d1cf-60a1d1676eamr10402408a12.20.1750768284578; Tue, 24 Jun 2025
+ 05:31:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <80e062dd-2445-45a6-ba4a-8f5fe3286909@redhat.com>
- <CA+EHjTx2MUq98=j=5J+GwSJ1gd7ax-RrpS8WhEJg4Lk9_USUmA@mail.gmail.com>
- <372bbfa5-1869-4bf2-9c16-0b828cdb86f5@redhat.com> <CA+EHjTyxwdu5YhtZRcwb-iR7aaEq1beV+4VWSsv7-X2tDVBkrA@mail.gmail.com>
- <11b23ea3-cadd-442b-88d7-491bba99dabe@redhat.com>
-In-Reply-To: <11b23ea3-cadd-442b-88d7-491bba99dabe@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 24 Jun 2025 12:58:16 +0100
-X-Gm-Features: Ac12FXxIR7DmWnStmYreR1cKwqZETUwJ47Ed0F1LblD3zm6eL8DVUB8Z-pOLCcg
-Message-ID: <CA+EHjTyginj74a+A58aAODZ72q9bye5Gm=pTxMmLHrqrRxaSww@mail.gmail.com>
-Subject: Re: [PATCH v12 00/18] KVM: Mapping guest_memfd backed memory at the
- host for software protected VMs
-To: David Hildenbrand <david@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
+References: <20250523043251.it.550-kees@kernel.org> <20250523043935.2009972-10-kees@kernel.org>
+ <CAAhV-H4WxAwXTYVFOnphgHN80-_6jt77YZ_rw-sOBoBjjiN-yQ@mail.gmail.com>
+In-Reply-To: <CAAhV-H4WxAwXTYVFOnphgHN80-_6jt77YZ_rw-sOBoBjjiN-yQ@mail.gmail.com>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 24 Jun 2025 20:31:12 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5oHPG+etNawAmVwyDtg80iKUrAM_m3Vj57bBO0scHqvQ@mail.gmail.com>
+X-Gm-Features: AX0GCFsgXJm0uAqj4ZcBCmgCp5XFBS8cfA5fjKZVFWrLP2ySZYpAIUKeGDxIJgs
+Message-ID: <CAAhV-H5oHPG+etNawAmVwyDtg80iKUrAM_m3Vj57bBO0scHqvQ@mail.gmail.com>
+Subject: Re: [PATCH v2 10/14] loongarch: Handle KCOV __init vs inline mismatches
+To: Kees Cook <kees@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, WANG Xuerui <kernel@xen0n.name>, 
+	Thomas Gleixner <tglx@linutronix.de>, Tianyang Zhang <zhangtianyang@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Jiaxun Yang <jiaxun.yang@flygoat.com>, loongarch@lists.linux.dev, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Christoph Hellwig <hch@lst.de>, Marco Elver <elver@google.com>, 
+	Andrey Konovalov <andreyknvl@gmail.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, sparclinux@vger.kernel.org, 
+	llvm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 24 Jun 2025 at 12:44, David Hildenbrand <david@redhat.com> wrote:
->
-> On 24.06.25 12:25, Fuad Tabba wrote:
-> > Hi David,
-> >
-> > On Tue, 24 Jun 2025 at 11:16, David Hildenbrand <david@redhat.com> wrote:
-> >>
-> >> On 24.06.25 12:02, Fuad Tabba wrote:
-> >>> Hi,
-> >>>
-> >>> Before I respin this, I thought I'd outline the planned changes for
-> >>> V13, especially since it involves a lot of repainting. I hope that
-> >>> by presenting this first, we could reduce the number of times I'll
-> >>> need to respin it.
-> >>>
-> >>> In struct kvm_arch: add bool supports_gmem instead of renaming
-> >>> has_private_mem
-> >>>
-> >>> The guest_memfd flag GUEST_MEMFD_FLAG_SUPPORT_SHARED should be
-> >>> called GUEST_MEMFD_FLAG_MMAP
-> >>>
-> >>> The memslot internal flag KVM_MEMSLOT_SUPPORTS_GMEM_SHARED should be
-> >>> called KVM_MEMSLOT_SUPPORTS_GMEM_MMAP
-> >>>
-> >>> kvm_arch_supports_gmem_shared_mem() should be called
-> >>> kvm_arch_supports_gmem_mmap()
-> >>>
-> >>> kvm_gmem_memslot_supports_shared() should be called
-> >>> kvm_gmem_memslot_supports_mmap()
-> >>>
-> >>> kvm_gmem_fault_shared(struct vm_fault *vmf) should be called
-> >>> kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
-> >>>
-> >>> The capability KVM_CAP_GMEM_SHARED_MEM should be called
-> >>> KVM_CAP_GMEM_MMAP
-> >>>
-> >>> The Kconfig CONFIG_KVM_GMEM_SHARED_MEM should be called
-> >>> CONFIG_KVM_GMEM_SUPPORTS_MMAP
-> >>
-> >> Works for me.
-> >>
-> >>>
-> >>> Also, what (unless you disagree) will stay the same as V12:
-> >>>
-> >>> Rename CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM: Since private
-> >>> implies gmem, and we will have additional flags for MMAP support
-> >>
-> >> Agreed.
-> >>
-> >>>
-> >>> Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
-> >>> CONFIG_KVM_GENERIC_GMEM_POPULATE
-> >>
-> >> Agreed.
-> >>
-> >>>
-> >>> Rename  kvm_slot_can_be_private() to kvm_slot_has_gmem(): since
-> >>> private does imply that it has gmem
-> >>
-> >> Right. It's a little more tricky in reality at least with this series:
-> >> without in-place conversion, not all gmem can have private memory. But
-> >> the places that check kvm_slot_can_be_private() likely only care about
-> >> if this memslot is backed by gmem.
-> >
-> > Exactly. Reading the code, all the places that check
-> > kvm_slot_can_be_private() are really checking whether the slot has
-> > gmem. After this series, if a caller is interested in finding out
-> > whether a slot can be private could achieve the same effect by
-> > checking that a gmem slot doesn't support mmap (i.e.,
-> > kvm_slot_has_gmem() && kvm_arch_supports_gmem_mmap() ). If that
-> > happens, we can reintroduce kvm_slot_can_be_private() as such.
-> >
-> > Otherwise, I could keep it and already define it as so. What do you think?
-> >
-> >> Sean also raised a "kvm_is_memslot_gmem_only()", how did you end up
-> >> calling that?
-> >
-> > Good point, I'd missed that. Isn't it true that
-> > kvm_is_memslot_gmem_only() is synonymous (at least for now) with
-> > kvm_gmem_memslot_supports_mmap()?
->
-> Yes. I think having a simple kvm_is_memslot_gmem_only() helper might
-> make fault handling code easier to read, though.
+Hi, Kees,
 
-Ack. So, with that, at least the two of us are in agreement about what
-needs to be done for V13. I'll wait until I hear from Sean and
-potentially the others before I respin.
-
-Thanks!
-/fuad
-
-> --
-> Cheers,
+On Thu, Jun 19, 2025 at 4:55=E2=80=AFPM Huacai Chen <chenhuacai@kernel.org>=
+ wrote:
 >
-> David / dhildenb
+> Hi, Kees,
 >
+> On Fri, May 23, 2025 at 12:39=E2=80=AFPM Kees Cook <kees@kernel.org> wrot=
+e:
+> >
+> > When KCOV is enabled all functions get instrumented, unless
+> > the __no_sanitize_coverage attribute is used. To prepare for
+> > __no_sanitize_coverage being applied to __init functions, we have to
+> > handle differences in how GCC's inline optimizations get resolved. For
+> > loongarch this exposed several places where __init annotations were
+> > missing but ended up being "accidentally correct". Fix these cases and
+> > force one function to be inline with __always_inline.
+> >
+> > Signed-off-by: Kees Cook <kees@kernel.org>
+> > ---
+> > Cc: Huacai Chen <chenhuacai@kernel.org>
+> > Cc: WANG Xuerui <kernel@xen0n.name>
+> > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > Cc: Tianyang Zhang <zhangtianyang@loongson.cn>
+> > Cc: Bibo Mao <maobibo@loongson.cn>
+> > Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > Cc: <loongarch@lists.linux.dev>
+> > ---
+> >  arch/loongarch/include/asm/smp.h | 2 +-
+> >  arch/loongarch/kernel/time.c     | 2 +-
+> >  arch/loongarch/mm/ioremap.c      | 4 ++--
+> >  3 files changed, 4 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/loongarch/include/asm/smp.h b/arch/loongarch/include/=
+asm/smp.h
+> > index ad0bd234a0f1..88e19d8a11f4 100644
+> > --- a/arch/loongarch/include/asm/smp.h
+> > +++ b/arch/loongarch/include/asm/smp.h
+> > @@ -39,7 +39,7 @@ int loongson_cpu_disable(void);
+> >  void loongson_cpu_die(unsigned int cpu);
+> >  #endif
+> >
+> > -static inline void plat_smp_setup(void)
+> > +static __always_inline void plat_smp_setup(void)
+> Similar to x86 and arm, I prefer to mark it as __init rather than
+> __always_inline.
+If you have no objections, I will apply this patch with the above modificat=
+ion.
+
+
+Huacai
+
+>
+> Huacai
+>
+> >  {
+> >         loongson_smp_setup();
+> >  }
+> > diff --git a/arch/loongarch/kernel/time.c b/arch/loongarch/kernel/time.=
+c
+> > index bc75a3a69fc8..367906b10f81 100644
+> > --- a/arch/loongarch/kernel/time.c
+> > +++ b/arch/loongarch/kernel/time.c
+> > @@ -102,7 +102,7 @@ static int constant_timer_next_event(unsigned long =
+delta, struct clock_event_dev
+> >         return 0;
+> >  }
+> >
+> > -static unsigned long __init get_loops_per_jiffy(void)
+> > +static unsigned long get_loops_per_jiffy(void)
+> >  {
+> >         unsigned long lpj =3D (unsigned long)const_clock_freq;
+> >
+> > diff --git a/arch/loongarch/mm/ioremap.c b/arch/loongarch/mm/ioremap.c
+> > index 70ca73019811..df949a3d0f34 100644
+> > --- a/arch/loongarch/mm/ioremap.c
+> > +++ b/arch/loongarch/mm/ioremap.c
+> > @@ -16,12 +16,12 @@ void __init early_iounmap(void __iomem *addr, unsig=
+ned long size)
+> >
+> >  }
+> >
+> > -void *early_memremap_ro(resource_size_t phys_addr, unsigned long size)
+> > +void * __init early_memremap_ro(resource_size_t phys_addr, unsigned lo=
+ng size)
+> >  {
+> >         return early_memremap(phys_addr, size);
+> >  }
+> >
+> > -void *early_memremap_prot(resource_size_t phys_addr, unsigned long siz=
+e,
+> > +void * __init early_memremap_prot(resource_size_t phys_addr, unsigned =
+long size,
+> >                     unsigned long prot_val)
+> >  {
+> >         return early_memremap(phys_addr, size);
+> > --
+> > 2.34.1
+> >
