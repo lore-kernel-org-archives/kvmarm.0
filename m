@@ -1,146 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF1C2D6626;
-	Wed, 25 Jun 2025 11:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B4638DDB
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 11:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750850790; cv=none; b=rLYdPqpk8aO3QBiO/Ok5r8IYB+sCH9OBKwnq0easTxMigtgvrR1U1X9m1o6ojEXnOSyAGUTyuPociOHKJFEjT1NDTq66SBXUITo1Z0cneD2dQ1FvDyCkpizUXIpIMlzq3fQ780t9QvSwpdizcLKMOSLbfHHBAB8teJBWyZM3nLw=
+	t=1750851205; cv=none; b=e+ORGdhRT+ZdFuZjeCfY6knccXGNyvxoe6UkITZDEsgDvCEq3ieZ3zcVXM5ozIK5difv8zOh7M16VHNKQ7+BW4b1/SdU6BPnLUzpLIsSpDWXEvgDDR+/5uRzDbcY2Iy+mmW/Cb/h0piLNkrjwbH0iTzwNoToz0nlTOJC/3jzEWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750850790; c=relaxed/simple;
-	bh=/AEnPXo1dA8qwf5CIu0xk7I0CHglYXCtZ9CYRjry6l8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bM71cLpXArBVW0iou1IM8hJjKAhnddu9gHaqaiBvLG4/64H8S10Y2hblgpErE5wwtQ1IiJfzhYMPpfxJOAp7i0RvyNjLDArZ3A3Qj2WPQTp600U7UNjODRN04Crh9n/bKESmX0Miri8rJdcm1M6qq07aiqm7VWudQGB174tDbNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1VhB4oC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750851205; c=relaxed/simple;
+	bh=/cwfe7cQie7eRGu4mTNSb1C1PMIa0UZgfLu+KikXDvc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oSP3NbCB8wn47d7Z3kn8InPNRHg5Qxk51DNC6lvUv24ZHcTceDO1+1diUDJ6BvG8nnSG8HUqzUB0KMq8854STOhtrg+Qu6UduC+Zlhdnp3EN7RTM7o3RNjG3dsKphqkwiev8IiTp3w7bBDI+4rnPY7y5RNPhC+AC9QCRJM3LP2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n2tHAFUy; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1VhB4oC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87511C4CEEA;
-	Wed, 25 Jun 2025 11:26:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750850789;
-	bh=/AEnPXo1dA8qwf5CIu0xk7I0CHglYXCtZ9CYRjry6l8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=S1VhB4oCwFp56rekUgYKd6f+8Wpmbr1vhPQmFkmjzZWBo9cfOlamDTba3WcN1HzF8
-	 KyIrkF3AdsMCAFP0CeMnAAeR4YtgqgAS8be615FtRpYgL4if3hzsfIySkCvAi6jQDB
-	 p5JhLn9bMlCuAz1kbk+DrJSgfvlaZrY3QMlmFFI/81Go2iJ5/O+VRES/Zo85m54t5a
-	 exDhD/l/CHYWuofJTk20OFqeRyuqrOF2nQzhFCsIlOye0erW6/vLyHrWjB2NCIWrwW
-	 oODvwyoRBIG818bZKoFEeet6vU25aCj7Nw0GFaw0H+IRy3jYxh0WLbqqFbJSwW+CBS
-	 Rfh3xkZuV2VNA==
-From: Mark Brown <broonie@kernel.org>
-Date: Wed, 25 Jun 2025 11:48:19 +0100
-Subject: [PATCH v6 28/28] KVM: arm64: selftests: Add SME to set_id_regs
- test
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n2tHAFUy"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4532ff43376so52013855e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 04:33:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750851202; x=1751456002; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2NIlOMIrjnVsdM2AHEMlWacU0EQa3pY5nigk/W+dUCk=;
+        b=n2tHAFUyOQvewHLZHeAPx6b4bysYsEK5g5vlNb3Y79lMol7HLPCW5xsyvVeEGRQn9J
+         KYHBsRyX8GQqkAzKIQ+RuFa4kBFgWr7gL4vmEfBA/xzKjalBZ1LFN4Rh7vWsZ3g2XCQt
+         HoGl4OP5DNuYRyGdx4T3xk7nF//ykBlpSRRQSyth2jHFUhKB96ypcZ01KnsaYVqU3wCY
+         V4wd7JTqwlB33hbzKMPhadcKSBNFNayQFkYrnDxMyp4cPWK42poDcCcxyILIjW2mWrhr
+         hNOKCLaXFNJxakOIFyyW2NQcwTbHVCSIJ9R42xQTl0z5ihlMEfu3DPng9VYGwpfaou5a
+         arAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750851202; x=1751456002;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2NIlOMIrjnVsdM2AHEMlWacU0EQa3pY5nigk/W+dUCk=;
+        b=Uo90zQmd6c4dRRRbXTwxRbKfSkZ6SwhE/JdtpYeoxbKxaazr6rozJA+qzYWdoJH4d3
+         PmjExNHBas+oLQ9xibY0Oycp7h0Hg/I2B5uuxKbprwJTkA6at8+3VA9UNgBLId6+K6T1
+         du/ggnCgl1xo+F9/NK1W24a+Ja4RGhc3GX6p5nPeSdJhxKLqEj7tqQZxfnMsHOhY7iNe
+         3Ngjq45CUfmNWqLl9e+S9vUPAri/wIwwCZ76fWT9HvGpJ6cEZVEQbTs+y+/P5YVvMzuC
+         U4EnBLTqEsCdjL9k6fir7HDMbBTLCZIxzOlZC7MFTxGPU/+2alGv+swPKqf+QqdB1X+T
+         XFIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+hHELj+NANy5Bc7SERUPHncpbcuujL8R13CZBXfMISinIJPe/f7eWxaoUULdgRsBz7n+vfY8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwswCZu0sLOQCfmG4vRbp6sFLBx/cfNlsk6104TIPxfPwDJvjdz
+	Zcx7LzKi75vZpVo/+M6lgOGpHH8LWPnN16MSCpj921/F2i5hnQAeLla/bnsSRL63Fy+IM7RjY8A
+	nW2WLFk7fR5mJBA==
+X-Google-Smtp-Source: AGHT+IFOs0Gi4knoSxkuw3WEzWTeg5pmNz2XOZ2P1IvG2UaOypTfCATZEtKucsPAekJhdqLV//IPLmdoJn1rpQ==
+X-Received: from wmbfs5.prod.google.com ([2002:a05:600c:3f85:b0:450:cfda:ece7])
+ (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:674a:b0:441:b076:fce8 with SMTP id 5b1f17b1804b1-45381ab25e9mr28886085e9.14.1750851201981;
+ Wed, 25 Jun 2025 04:33:21 -0700 (PDT)
+Date: Wed, 25 Jun 2025 11:33:01 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250625-kvm-arm64-sme-v6-28-114cff4ffe04@kernel.org>
-References: <20250625-kvm-arm64-sme-v6-0-114cff4ffe04@kernel.org>
-In-Reply-To: <20250625-kvm-arm64-sme-v6-0-114cff4ffe04@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>, 
- Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-08c49
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3742; i=broonie@kernel.org;
- h=from:subject:message-id; bh=/AEnPXo1dA8qwf5CIu0xk7I0CHglYXCtZ9CYRjry6l8=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoW9x6rNqzz5sGrNiRrIXrOWy+bwyOVKM58C21N
- 8UQF1abh0qJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaFvcegAKCRAk1otyXVSH
- 0N0DB/9C9EuLoP1QX+nQpinl3+RPQkVA/LC6ibKQ/ADrljxkUPGGGzPd1i6TvLlJknrU6Vc4Nax
- WDtdGQKNgnTPy3sCEyI4C3+FgSGlHdBbbkgADugt9SKjXOL10CHbhQf+JMHP21/CLhiM70rXc1k
- zcC+isN7mi3oeWRgEXnU3koSXtr0NEPvmPdvraSFOd0YEvH9BdMPw5ucfSK+PBIXLcIGPng/i4A
- 5eWSFYfsbv8Dgk61y2B/4VJqJPcuIvTihfFprFmrQovxnackxM2n4xpiD64Ufm59EZEYbJBIzuO
- jVunrH2tpAizaubCJdtSHop4CQE7fKYbG96ae0Xij6ouEAoH
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
+Message-ID: <20250625113301.580253-1-smostafa@google.com>
+Subject: [PATCH] KVM: arm64: Fix error path in init_hyp_mode()
+From: Mostafa Saleh <smostafa@google.com>
+To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, qperret@google.com, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Add coverage of the SME ID registers to set_id_regs, ID_AA64PFR1_EL1.SME
-becomes writable and we add ID_AA64SMFR_EL1 and it's subfields.
+In the unlikely case pKVM failed to allocate carveout, the error path
+tries to access NULL ptr when it de-reference the SVE state from the
+uninitialized nVHE per-cpu base.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
+[    1.575420] pstate: 61400005 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+[    1.576010] pc : teardown_hyp_mode+0xe4/0x180
+[    1.576920] lr : teardown_hyp_mode+0xd0/0x180
+[    1.577308] sp : ffff8000826fb9d0
+[    1.577600] x29: ffff8000826fb9d0 x28: 0000000000000000 x27: ffff80008209b000
+[    1.578383] x26: ffff800081dde000 x25: ffff8000820493c0 x24: ffff80008209eb00
+[    1.579180] x23: 0000000000000040 x22: 0000000000000001 x21: 0000000000000000
+[    1.579881] x20: 0000000000000002 x19: ffff800081d540b8 x18: 0000000000000000
+[    1.580544] x17: ffff800081205230 x16: 0000000000000152 x15: 00000000fffffff8
+[    1.581183] x14: 0000000000000008 x13: fff00000ff7f6880 x12: 000000000000003e
+[    1.581813] x11: 0000000000000002 x10: 00000000000000ff x9 : 0000000000000000
+[    1.582503] x8 : 0000000000000000 x7 : 7f7f7f7f7f7f7f7f x6 : 43485e525851ff30
+[    1.583140] x5 : fff00000ff6e9030 x4 : fff00000ff6e8f80 x3 : 0000000000000000
+[    1.583780] x2 : 0000000000000000 x1 : 0000000000000002 x0 : 0000000000000000
+[    1.584526] Call trace:
+[    1.584945]  teardown_hyp_mode+0xe4/0x180 (P)
+[    1.585578]  init_hyp_mode+0x920/0x994
+[    1.586005]  kvm_arm_init+0xb4/0x25c
+[    1.586387]  do_one_initcall+0xe0/0x258
+[    1.586819]  do_initcall_level+0xa0/0xd4
+[    1.587224]  do_initcalls+0x54/0x94
+[    1.587606]  do_basic_setup+0x1c/0x28
+[    1.587998]  kernel_init_freeable+0xc8/0x130
+[    1.588409]  kernel_init+0x20/0x1a4
+[    1.588768]  ret_from_fork+0x10/0x20
+[    1.589568] Code: f875db48 8b1c0109 f100011f 9a8903e8 (f9463100)
+[    1.590332] ---[ end trace 0000000000000000 ]---
+
+It seems also in other cases, it can try to free NULL ptrs, so add the
+proper NULL checks in teardown_hyp_mode(), we can skip the loop early
+if any of the ptrs is NULL as the order of free matches the order of
+initialization.
+
+I initially observed this on 6.12, but I could also repro in master.
+
+Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 29 +++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/arm.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 8f422bfdfcb9..f41c4e7da3e8 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -140,6 +140,7 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 38a91bb5d4c7..5bb36c3b06b5 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2344,15 +2344,22 @@ static void __init teardown_hyp_mode(void)
+ 	int cpu;
  
- static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, CSV2_frac, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, SME, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, SSBS, ID_AA64PFR1_EL1_SSBS_NI),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, BT, 0),
- 	REG_FTR_END,
-@@ -187,6 +188,28 @@ static const struct reg_ftr_bits ftr_id_aa64mmfr2_el1[] = {
- 	REG_FTR_END,
- };
- 
-+static const struct reg_ftr_bits ftr_id_aa64smfr0_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, FA64, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, LUTv2, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, SMEver, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, I16I64, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F64F64, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, I16I32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, B16B16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F16F16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F8F16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F8F32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, I8I32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F16F32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, B16F32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, BI32I32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, F32F32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, SF8FMA, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, SF8DP4, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64SMFR0_EL1, SF8DP2, 0),
-+	REG_FTR_END,
-+};
+ 	free_hyp_pgds();
++	/* Order matches the order of initialization init_hyp_mode() */
+ 	for_each_possible_cpu(cpu) {
++		if (!per_cpu(kvm_arm_hyp_stack_base, cpu))
++			continue;
+ 		free_pages(per_cpu(kvm_arm_hyp_stack_base, cpu), NVHE_STACK_SHIFT - PAGE_SHIFT);
 +
- static const struct reg_ftr_bits ftr_id_aa64zfr0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, F64MM, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, F32MM, 0),
-@@ -217,6 +240,7 @@ static struct test_feature_reg test_regs[] = {
- 	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
- 	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
-+	TEST_REG(SYS_ID_AA64SMFR0_EL1, ftr_id_aa64smfr0_el1),
- 	TEST_REG(SYS_ID_AA64ZFR0_EL1, ftr_id_aa64zfr0_el1),
- };
++		if (!kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu])
++			continue;
+ 		free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
  
-@@ -233,6 +257,7 @@ static void guest_code(void)
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64SMFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
- 	GUEST_REG_SYNC(SYS_CTR_EL0);
- 	GUEST_REG_SYNC(SYS_MIDR_EL1);
-@@ -774,8 +799,8 @@ int main(void)
- 		   ARRAY_SIZE(ftr_id_aa64isar2_el1) + ARRAY_SIZE(ftr_id_aa64pfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64pfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr0_el1) +
- 		   ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr2_el1) +
--		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) - ARRAY_SIZE(test_regs) + 3 +
--		   MPAM_IDREG_TEST + MTE_IDREG_TEST;
-+		   ARRAY_SIZE(ftr_id_aa64zfr0_el1) + ARRAY_SIZE(ftr_id_aa64smfr0_el1) -
-+		   ARRAY_SIZE(test_regs) + 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
+ 		if (free_sve) {
+ 			struct cpu_sve_state *sve_state;
  
- 	ksft_set_plan(test_cnt);
- 
-
+ 			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
+-			free_pages((unsigned long) sve_state, pkvm_host_sve_state_order());
++			if (sve_state)
++				free_pages((unsigned long) sve_state, pkvm_host_sve_state_order());
+ 		}
+ 	}
+ }
 -- 
-2.39.5
+2.50.0.714.g196bf9f422-goog
 
