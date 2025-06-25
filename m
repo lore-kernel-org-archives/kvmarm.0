@@ -1,380 +1,184 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265C325D20D
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 23:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2472AD58;
+	Wed, 25 Jun 2025 01:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750808422; cv=none; b=bgSInOdh53kn2DWSJ99VGXwiK2X5OmiXOdYGDaZ9f2IwKzibhJ2vozlfP1q8Xn74ciI1Zo/fPu4BnzKnXnCGwj83HoO6b5e1IUPeRI43kyCs/pOyl81dw2QBZ7XUjAi/iw4KBJBSseMG0cZgmEbghVTB1gWDndlTUkO6WxY0hOA=
+	t=1750813757; cv=none; b=YfbjfnCbhUHL5kQrj8xgS5x0DIyWhhVbGI2r48aDF1QWXvRfaBJLE0qhdJIHzpY1Ica2isWjyiCNOUxbTdtAAdFoXfyg8LqaCiQdSc/pwwiJQ2W/L19BiKYTUQYfqH3hOo0TL2nci6Wwv+KMH2xdNSelMezmrMaAo7jMYJNd1Gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750808422; c=relaxed/simple;
-	bh=LIdhiyJGm7RTUcB4viLUYQSJXjLC+R/ykcyrk54oCoM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=p8s0L4Q5cmHfjuvH1Bph+zu33A/Xs3S/AZH45yN5mTxW8KQyln4gD1/jYN48k1fZfGG04tNCWWQ1RspFodI1Rb01yVZ0KHNHWaMmNJXz2mcUduo72lKCYWyy4egIId9ZBJmX6zCAMjh2E6++bS5eDIh17E3byT2sfxGcezIYnTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fVaABsXa; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1750813757; c=relaxed/simple;
+	bh=ar+M7uOS6NGMBXnGsSfhmdY2/NIrFzzFwB2vQ2UdzzU=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=Lqkw544z7nEnHYzbIOoMDtLajewAAV6RVrA7tDGQIOxWtcHK+kuLIn2j5w49sDUwlY2fCCaAkXRrufDWM5+1fUlgrmkCoJAkav6C/qgM142QAEVwLSQ9P9He8RAMJBXXqkUtLot5U/m+ZfFjCq/TFqEb325RvAZrTecsNXhdw7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=si3Mv9bY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fVaABsXa"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2fb347b3e6so1062764a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jun 2025 16:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750808420; x=1751413220; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wtBKhjYCaIRhlGRFPITFm9XwgDffPGPWmrBo0vWLUKo=;
-        b=fVaABsXaZLZ2UF2dpQr/J5I4lGT5FEOSF/5maxTh3vRg8nIZFgm41HR2nAeg9xi7nX
-         vmV9tVvlnZamWRNo18aCFCfanoqSoAu+e6AE2suTMkgNb5wibcuCLGrEwL9G7skCgljF
-         QqLznWf8hxHt/Nk+HFPXGzOcCuENma3PgfHoSOnvoLkPShfc3bFcaIPPbZl4kRZyGE3O
-         079ei4V0k4Ll3gMYciwPy0n2ySoyZ/ulXij+r1nM168LCZwi/va9B0F3FoYnJ0qyT9rK
-         so/eBCHPkHy9UYsjfkkebC5HJ7UMb6t4Qynr0YzyPJS5Aabmc/exqIJMtZzzMbz9QZID
-         HT2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750808420; x=1751413220;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wtBKhjYCaIRhlGRFPITFm9XwgDffPGPWmrBo0vWLUKo=;
-        b=IYwSy9w7cJsJJqxfS/BOyKFsncNWiAE01FuBuvHsO+2Oo0Zoz6PXJb9sJ+ko7wBele
-         2CMMMsmqfcOE67KV9NsVVLdCwGQUgP7MEt4sBp+KkGz3fEed3KppThWIr7xU4hgpb7IR
-         bQKiPypoAQKyhssSBFm1N4yCnKYv1jyRRw+BeBzpT6E4QTu0NVGwMUeC4qHpenQHAPOq
-         X2VXlGnoHukfERuKhtxcK+LknPRDeGUBDyr4EbP/CiU1cjPifFImwKGdkD0wcDnxpKRC
-         gmchKerEqBY8agyctvXl78lPyhuSVIgbGe9+eAUKtjPUKkOZ6I0qA029OKb3lgN/I9ej
-         ue+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXRWlj3eSlaov4nJ2zgLy1oppbnpLYKTs2sW+aTJ4mktiRTpF+3E6SfQZjG57o5Q0HFMnTUj+U=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxvAZ64CA3bgbQkHdcMUD+pZSagftpvxHItZkqO/r0AFwu93JEc
-	glLgxZjJJAidx9XAjhmE8EifxkBqmfIXCTTc2S5RjViDr1Ke4a4Jomb+UiOtcOxJ4ewqyClkmDw
-	SHmuqqN335XUPAyfqcLLkngoPbg==
-X-Google-Smtp-Source: AGHT+IHgSUmIGUTP1cRXfKE/+aw5IRkLF9VVq5UcZdV1pOiUg7sF4uqUMGUdcbKxDyQplXXCwSktIYqGZpB8BdsqFQ==
-X-Received: from pfux8.prod.google.com ([2002:a05:6a00:bc8:b0:746:1a7b:a39a])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:2588:b0:1f5:717b:46dc with SMTP id adf61e73a8af0-2207f25dd7amr1308677637.27.1750808420299;
- Tue, 24 Jun 2025 16:40:20 -0700 (PDT)
-Date: Tue, 24 Jun 2025 16:40:18 -0700
-In-Reply-To: <aEyhHgwQXW4zbx-k@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="si3Mv9bY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F5E3C4CEE3;
+	Wed, 25 Jun 2025 01:09:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750813756;
+	bh=ar+M7uOS6NGMBXnGsSfhmdY2/NIrFzzFwB2vQ2UdzzU=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=si3Mv9bYY/8kBwTkVAcQqZoJK6oPCfQbERzoeHQNnnjouaaju9cDPj5M/XH+LGCGf
+	 sutZ2TLPTDRMtEiUcTLAfcucjlB1tBOK027s1ZYe+qpQm8YtBXVVCggwf2H8yIixe+
+	 IDVtaRLnE7OYk8omFmO1wVvMArdpG+qU6ghcCXqwDH3eSeR/zt8PJr47crwpodU4K/
+	 +SdYth5GpIqN7Rkz05vHh/vtCMrcnD2wmTD+63kR8qXgeUEYggdfeNmyLdKPgxxZY0
+	 Z7hF7LuReE6Xw0PlrdhJ4M022p1QhH6fci9WuRh8Uql2D6xK1hPUmyC7uoJ+Q8UvXd
+	 gbu4rtou3gcJw==
+Date: Tue, 24 Jun 2025 18:09:18 -0700
+From: Kees Cook <kees@kernel.org>
+To: Huacai Chen <chenhuacai@kernel.org>
+CC: Arnd Bergmann <arnd@arndb.de>, WANG Xuerui <kernel@xen0n.name>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Tianyang Zhang <zhangtianyang@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, loongarch@lists.linux.dev,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Marco Elver <elver@google.com>,
+ Andrey Konovalov <andreyknvl@gmail.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Masahiro Yamada <masahiroy@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nicolas.schier@linux.dev>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-kernel@vger.kernel.org, x86@kernel.org, kasan-dev@googlegroups.com,
+ linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ sparclinux@vger.kernel.org, llvm@lists.linux.dev
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_10/14=5D_loongarch=3A_Han?=
+ =?US-ASCII?Q?dle_KCOV_=5F=5Finit_vs_inline_mismatches?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <CAAhV-H5oHPG+etNawAmVwyDtg80iKUrAM_m3Vj57bBO0scHqvQ@mail.gmail.com>
+References: <20250523043251.it.550-kees@kernel.org> <20250523043935.2009972-10-kees@kernel.org> <CAAhV-H4WxAwXTYVFOnphgHN80-_6jt77YZ_rw-sOBoBjjiN-yQ@mail.gmail.com> <CAAhV-H5oHPG+etNawAmVwyDtg80iKUrAM_m3Vj57bBO0scHqvQ@mail.gmail.com>
+Message-ID: <B5A11282-CB0E-46E0-A5D7-EF4D8BFC23B4@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-11-tabba@google.com>
- <aEyhHgwQXW4zbx-k@google.com>
-Message-ID: <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
- guest_memfd with shared memory
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> On Wed, Jun 11, 2025, Fuad Tabba wrote:
->> From: Ackerley Tng <ackerleytng@google.com>
->> 
->> For memslots backed by guest_memfd with shared mem support, the KVM MMU
->> must always fault in pages from guest_memfd, and not from the host
->> userspace_addr. Update the fault handler to do so.
+
+On June 24, 2025 5:31:12 AM PDT, Huacai Chen <chenhuacai@kernel=2Eorg> wro=
+te:
+>Hi, Kees,
 >
-> And with a KVM_MEMSLOT_GUEST_MEMFD_ONLY flag, this becomes super obvious.
+>On Thu, Jun 19, 2025 at 4:55=E2=80=AFPM Huacai Chen <chenhuacai@kernel=2E=
+org> wrote:
+>>
+>> Hi, Kees,
+>>
+>> On Fri, May 23, 2025 at 12:39=E2=80=AFPM Kees Cook <kees@kernel=2Eorg> =
+wrote:
+>> >
+>> > When KCOV is enabled all functions get instrumented, unless
+>> > the __no_sanitize_coverage attribute is used=2E To prepare for
+>> > __no_sanitize_coverage being applied to __init functions, we have to
+>> > handle differences in how GCC's inline optimizations get resolved=2E =
+For
+>> > loongarch this exposed several places where __init annotations were
+>> > missing but ended up being "accidentally correct"=2E Fix these cases =
+and
+>> > force one function to be inline with __always_inline=2E
+>> >
+>> > Signed-off-by: Kees Cook <kees@kernel=2Eorg>
+>> > ---
+>> > Cc: Huacai Chen <chenhuacai@kernel=2Eorg>
+>> > Cc: WANG Xuerui <kernel@xen0n=2Ename>
+>> > Cc: Thomas Gleixner <tglx@linutronix=2Ede>
+>> > Cc: Tianyang Zhang <zhangtianyang@loongson=2Ecn>
+>> > Cc: Bibo Mao <maobibo@loongson=2Ecn>
+>> > Cc: Jiaxun Yang <jiaxun=2Eyang@flygoat=2Ecom>
+>> > Cc: <loongarch@lists=2Elinux=2Edev>
+>> > ---
+>> >  arch/loongarch/include/asm/smp=2Eh | 2 +-
+>> >  arch/loongarch/kernel/time=2Ec     | 2 +-
+>> >  arch/loongarch/mm/ioremap=2Ec      | 4 ++--
+>> >  3 files changed, 4 insertions(+), 4 deletions(-)
+>> >
+>> > diff --git a/arch/loongarch/include/asm/smp=2Eh b/arch/loongarch/incl=
+ude/asm/smp=2Eh
+>> > index ad0bd234a0f1=2E=2E88e19d8a11f4 100644
+>> > --- a/arch/loongarch/include/asm/smp=2Eh
+>> > +++ b/arch/loongarch/include/asm/smp=2Eh
+>> > @@ -39,7 +39,7 @@ int loongson_cpu_disable(void);
+>> >  void loongson_cpu_die(unsigned int cpu);
+>> >  #endif
+>> >
+>> > -static inline void plat_smp_setup(void)
+>> > +static __always_inline void plat_smp_setup(void)
+>> Similar to x86 and arm, I prefer to mark it as __init rather than
+>> __always_inline=2E
+>If you have no objections, I will apply this patch with the above modific=
+ation=2E
+
+That's fine by me; thank you! I didn't have a chance yet to verify that it=
+ actually fixes the mismatches I saw, but if it looks good to you, yes plea=
+se=2E :)
+
+-Kees
+
 >
->> This patch also refactors related function names for accuracy:
 >
-> This patch.  And phrase changelogs as commands.
+>Huacai
 >
->> kvm_mem_is_private() returns true only when the current private/shared
->> state (in the CoCo sense) of the memory is private, and returns false if
->> the current state is shared explicitly or impicitly, e.g., belongs to a
->> non-CoCo VM.
->
-> Again, state changes as commands.  For the above, it's not obvious if you're
-> talking about the existing code versus the state of things after "this patch".
->
->
+>>
+>> Huacai
+>>
+>> >  {
+>> >         loongson_smp_setup();
+>> >  }
+>> > diff --git a/arch/loongarch/kernel/time=2Ec b/arch/loongarch/kernel/t=
+ime=2Ec
+>> > index bc75a3a69fc8=2E=2E367906b10f81 100644
+>> > --- a/arch/loongarch/kernel/time=2Ec
+>> > +++ b/arch/loongarch/kernel/time=2Ec
+>> > @@ -102,7 +102,7 @@ static int constant_timer_next_event(unsigned lon=
+g delta, struct clock_event_dev
+>> >         return 0;
+>> >  }
+>> >
+>> > -static unsigned long __init get_loops_per_jiffy(void)
+>> > +static unsigned long get_loops_per_jiffy(void)
+>> >  {
+>> >         unsigned long lpj =3D (unsigned long)const_clock_freq;
+>> >
+>> > diff --git a/arch/loongarch/mm/ioremap=2Ec b/arch/loongarch/mm/iorema=
+p=2Ec
+>> > index 70ca73019811=2E=2Edf949a3d0f34 100644
+>> > --- a/arch/loongarch/mm/ioremap=2Ec
+>> > +++ b/arch/loongarch/mm/ioremap=2Ec
+>> > @@ -16,12 +16,12 @@ void __init early_iounmap(void __iomem *addr, uns=
+igned long size)
+>> >
+>> >  }
+>> >
+>> > -void *early_memremap_ro(resource_size_t phys_addr, unsigned long siz=
+e)
+>> > +void * __init early_memremap_ro(resource_size_t phys_addr, unsigned =
+long size)
+>> >  {
+>> >         return early_memremap(phys_addr, size);
+>> >  }
+>> >
+>> > -void *early_memremap_prot(resource_size_t phys_addr, unsigned long s=
+ize,
+>> > +void * __init early_memremap_prot(resource_size_t phys_addr, unsigne=
+d long size,
+>> >                     unsigned long prot_val)
+>> >  {
+>> >         return early_memremap(phys_addr, size);
+>> > --
+>> > 2=2E34=2E1
+>> >
 
-Will fix these, thanks!
-
->> kvm_mmu_faultin_pfn_gmem() is updated to indicate that it can be used to
->> fault in not just private memory, but more generally, from guest_memfd.
->
->> +static inline u8 kvm_max_level_for_order(int order)
->
-> Do not use "inline" for functions that are visible only to the local compilation
-> unit.  "inline" is just a hint, and modern compilers are smart enough to inline
-> functions when appropriate without a hint.
->
-> A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
->
-
-Will fix this!
-
->> +static inline int kvm_gmem_max_mapping_level(const struct kvm_memory_slot *slot,
->> +					     gfn_t gfn, int max_level)
->> +{
->> +	int max_order;
->>  
->>  	if (max_level == PG_LEVEL_4K)
->>  		return PG_LEVEL_4K;
->
-> This is dead code, the one and only caller has *just* checked for this condition.
->>  
->> -	host_level = host_pfn_mapping_level(kvm, gfn, slot);
->> -	return min(host_level, max_level);
->> +	max_order = kvm_gmem_mapping_order(slot, gfn);
->> +	return min(max_level, kvm_max_level_for_order(max_order));
->>  }
->
-> ...
->
->> -static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
->> -					u8 max_level, int gmem_order)
->> +static u8 kvm_max_level_for_fault_and_order(struct kvm *kvm,
->
-> This is comically verbose.  C ain't Java.  And having two separate helpers makes
-> it *really* hard to (a) even see there are TWO helpers in the first place, and
-> (b) understand how they differ.
->
-> Gah, and not your bug, but completely ignoring the RMP in kvm_mmu_max_mapping_level()
-> is wrong.  It "works" because guest_memfd doesn't (yet) support dirty logging,
-> no one enables the NX hugepage mitigation on AMD hosts.
->
-> We could plumb in the pfn and private info, but I don't really see the point,
-> at least not at this time.
->
->> +					    struct kvm_page_fault *fault,
->> +					    int order)
->>  {
->> -	u8 req_max_level;
->> +	u8 max_level = fault->max_level;
->>  
->>  	if (max_level == PG_LEVEL_4K)
->>  		return PG_LEVEL_4K;
->>  
->> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
->> +	max_level = min(kvm_max_level_for_order(order), max_level);
->>  	if (max_level == PG_LEVEL_4K)
->>  		return PG_LEVEL_4K;
->>  
->> -	req_max_level = kvm_x86_call(private_max_mapping_level)(kvm, pfn);
->> -	if (req_max_level)
->> -		max_level = min(max_level, req_max_level);
->> +	if (fault->is_private) {
->> +		u8 level = kvm_x86_call(private_max_mapping_level)(kvm, fault->pfn);
->
-> Hmm, so the interesting thing here is that (IIRC) the RMP restrictions aren't
-> just on the private pages, they also apply to the HYPERVISOR/SHARED pages.  (Don't
-> quote me on that).
->
-> Regardless, I'm leaning toward dropping the "private" part, and making SNP deal
-> with the intricacies of the RMP:
->
-> 	/* Some VM types have additional restrictions, e.g. SNP's RMP. */
-> 	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
-> 	if (req_max_level)
-> 		max_level = min(max_level, req_max_level);
->
-> Then we can get to something like:
->
-> static int kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
-> 				      struct kvm_page_fault *fault)
-> {
-> 	int max_level, req_max_level;
->
-> 	max_level = kvm_max_level_for_order(order);
-> 	if (max_level == PG_LEVEL_4K)
-> 		return PG_LEVEL_4K;
->
-> 	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
-> 	if (req_max_level)
-> 		max_level = min(max_level, req_max_level);
->
-> 	return max_level;
-> }
->
-> int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> 			      const struct kvm_memory_slot *slot, gfn_t gfn)
-> {
-> 	int max_level;
->
-> 	max_level = kvm_lpage_info_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM);
-> 	if (max_level == PG_LEVEL_4K)
-> 		return PG_LEVEL_4K;
->
-> 	/* TODO: Comment goes here about KVM not supporting this path (yet). */
-
-Which path does KVM not support?
-
-> 	if (kvm_mem_is_private(kvm, gfn))
-> 		return PG_LEVEL_4K;
->
-
-Just making sure - this suggestion does take into account that
-kvm_mem_is_private() will be querying guest_memfd for memory privacy
-status, right? So the check below for kvm_is_memslot_gmem_only() will
-only be handling the cases where the memory is shared, and only
-guest_memfd is used for this gfn?
-
-> 	if (kvm_is_memslot_gmem_only(slot)) {
-> 		int order = kvm_gmem_mapping_order(slot, gfn);
->
-> 		return min(max_level, kvm_gmem_max_mapping_level(kvm, order, NULL));
-> 	}
->
-> 	return min(max_level, host_pfn_mapping_level(kvm, gfn, slot));
-> }
->
-> static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
-> 				    struct kvm_page_fault *fault)
-> {
-> 	struct kvm *kvm = vcpu->kvm;
-> 	int order, r;
->
-> 	if (!kvm_slot_has_gmem(fault->slot)) {
-> 		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> 		return -EFAULT;
-> 	}
->
-> 	r = kvm_gmem_get_pfn(kvm, fault->slot, fault->gfn, &fault->pfn,
-> 			     &fault->refcounted_page, &order);
-> 	if (r) {
-> 		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> 		return r;
-> 	}
->
-> 	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-> 	fault->max_level = kvm_gmem_max_mapping_level(kvm, order, fault);
->
-> 	return RET_PF_CONTINUE;
-> }
->
-> int sev_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault)
-> {
-> 	int level, rc;
-> 	bool assigned;
->
-> 	if (!sev_snp_guest(kvm))
-> 		return 0;
->
-> 	if (WARN_ON_ONCE(!fault) || !fault->is_private)
-> 		return 0;
->
-> 	rc = snp_lookup_rmpentry(fault->pfn, &assigned, &level);
-> 	if (rc || !assigned)
-> 		return PG_LEVEL_4K;
->
-> 	return level;
-> }
-
-I like this. Thanks for the suggestion, I'll pass Fuad some patch(es)
-for v13.
-
->> +/*
->> + * Returns true if the given gfn's private/shared status (in the CoCo sense) is
->> + * private.
->> + *
->> + * A return value of false indicates that the gfn is explicitly or implicitly
->> + * shared (i.e., non-CoCo VMs).
->> + */
->>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->>  {
->> -	return IS_ENABLED(CONFIG_KVM_GMEM) &&
->> -	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
->> +	struct kvm_memory_slot *slot;
->> +
->> +	if (!IS_ENABLED(CONFIG_KVM_GMEM))
->> +		return false;
->> +
->> +	slot = gfn_to_memslot(kvm, gfn);
->> +	if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot)) {
->> +		/*
->> +		 * Without in-place conversion support, if a guest_memfd memslot
->> +		 * supports shared memory, then all the slot's memory is
->> +		 * considered not private, i.e., implicitly shared.
->> +		 */
->> +		return false;
->
-> Why!?!?  Just make sure KVM_MEMORY_ATTRIBUTE_PRIVATE is mutually exclusive with
-> mappable guest_memfd.  You need to do that no matter what. 
-
-Thanks, I agree that setting KVM_MEMORY_ATTRIBUTE_PRIVATE should be
-disallowed for gfn ranges whose slot is guest_memfd-only. Missed that
-out. Where do people think we should check the mutual exclusivity?
-
-In kvm_supported_mem_attributes() I'm thiking that we should still allow
-the use of KVM_MEMORY_ATTRIBUTE_PRIVATE for other non-guest_memfd-only
-gfn ranges. Or do people think we should just disallow
-KVM_MEMORY_ATTRIBUTE_PRIVATE for the entire VM as long as one memslot is
-a guest_memfd-only memslot?
-
-If we check mutually exclusivity when handling
-kvm_vm_set_memory_attributes(), as long as part of the range where
-KVM_MEMORY_ATTRIBUTE_PRIVATE is requested to be set intersects a range
-whose slot is guest_memfd-only, the ioctl will return EINVAL.
-
-> Then you don't need
-> to sprinkle special case code all over the place.
->
-
-That's true, thanks.
-
-I guess the special-casing will come back when guest_memfd supports
-conversions (and stores shareability). After guest_memfd supports
-conversions, if guest_memfd-only memslot, check with guest_memfd. Else,
-look up memory attributes with kvm_get_memory_attributes().
-
->> +	}
->> +
->> +	return kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
->>  }
->>  #else
->>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->> -- 
->> 2.50.0.rc0.642.g800a2b2222-goog
->> 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+--=20
+Kees Cook
