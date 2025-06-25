@@ -1,124 +1,145 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6A2266B41
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 14:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EA81E1C3F;
+	Wed, 25 Jun 2025 15:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750860426; cv=none; b=upkITPUMN8uSdoDlnOPUCUB88VuHgA9Iddqqa1H4JLm5mU2h2OLbHh2sFozvp9RGBfa2fmT4AhRj7AqYW2vlwOCNbLQpbX91gF6JnzsNiRaV3RZke0Xu0YMBBiBVCS4BipYlttefujZXA0FPRKkHIgUaQpCJoLzgWumpackLO6w=
+	t=1750865896; cv=none; b=b/Wg/IN/mn4/+de3F+T3m0Et3x60NCw2uUY+xwQgdHhKXmCD0Gwy+f5c5n38bFizbGe9hfJlkHalyzjRfDhYlYRX9UDi7Wa8ipJzSp7WKgXUhecoBgDS2RH4ykXPlZ3nY/HSEvlaE2YKY8PqXIpr22PomH0wmYDBlOUpflPl5as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750860426; c=relaxed/simple;
-	bh=Sd9sNznzUEi5EJ+sne6IkjefYfHIjOxnBuf3fVCoFaM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZgO+GsOE9CUtjus7qQOsU3VQ10TE8SDFl7H+leH8kkHEJPnSMXIWWxwPUvLtV6NMZ2JHxhDWUTasoQNLmt9cS1QcO6OSwHwLeEtFu0RfTPpBPuD7DUnRHQM2JaH12FfSzpUd5PcJjDGa5o1rxeDugcyrEI7nvkGXD9Pa5QEFkt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qAGjFsLd; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1750865896; c=relaxed/simple;
+	bh=DdxS8fK+k+4jJXT/e+VE5Z7hLWA+bNaknSmckFwX8wo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MtGExylV9Ra2BlnH4Ne3hHHkyGaZyGmZedANE6flFXYg40Mxa7NkPoTFreAVgcJq2OTyFLlJjBZP9H2pDgDAyghdVjJP4rs4iOMc4Y7JkR5ukfRX+DRI5gf0t49aRkbC/TfhV8+9lLpvmYO2nJX6CH51eavpH5bxX3jdpofxU8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dv2z/It3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qAGjFsLd"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2369dd58602so59974125ad.1
-        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 07:07:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750860424; x=1751465224; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8f5KlzP2CK1JfKkyCSpzd2kQ9IT6Pxr3cya4YkMOEY8=;
-        b=qAGjFsLducsFdrrOLOQtY7tpRxLjxrCdExXQ5ZfD8ctjja88YAixGLWaJ6mzEadaet
-         hXDPFlc6Gtt5tSUpW//LCk8nT6ntsBw+2mTkEQTuRMrGYPwOeXAPTzQkEFAVK8BcfJkX
-         b2s+vrPFTTfzvUDBM5xaZ9FQSiRp+b367jAw6CCQr1wrWFoWW83rDhDpvlXUYZJ3TwWT
-         rUbRpTKYS+TxQhBfH/QLHY0tfB2xsKVIqIuIAQOCTFxw4hv3y4yWZsSpBrRvPUOhjwtl
-         cXEhmrlTx0vcnZTWBjgIw3faxPmZVLeaLc0v9YnrGImJuo/cFFMs6Y+xez2+ZUIScfDZ
-         8flA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750860424; x=1751465224;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8f5KlzP2CK1JfKkyCSpzd2kQ9IT6Pxr3cya4YkMOEY8=;
-        b=P1y0Yenx9jJSDhCwS/gyUCEeE164l83TfEuVI1nVRM+5cxI4nCQyWTcT8c+W100fvv
-         ZazOK6IZZS+82xTJXPXBSS7kbDlqIkmKWq03y6m/iZTYi4VwnFrHUI1AtuPHa+wtBYj5
-         ipJiH2y+FawDBiy7ZTqDYrOrK/8sK7R1DR7AFvwJdB3WOVGmyL2UyqBUxkf6xgZMNyAN
-         /qbnM5JAfyZAZgRnYPm2442Kl5ny81Yfs4IXpLPUax8Eh+aZ5pIbe3jov/Ey+UqQKtde
-         Lo/VP4MBflPd0/Xt8VCZEdmTcXWL8c1vDxdiI4aUcMl1MmMKFZrv8Af4afz5R25MIFJp
-         OQMg==
-X-Forwarded-Encrypted: i=1; AJvYcCXTMOzB0zxZgonkwzlhUVhWIITepz1Wg2yRF0KTUk3WKMfH+yMoFJCt3CYYNHWi64vv7MGYFFM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyx6qITweYfsIUcnuZurHWG0Ku3nHAtlqfirWbPKjcrRyQmWUUo
-	RH04DW5e3DYOehIsF89KQnoA3sEC7f+owRiBw0MG+AdMY3HXctHTYKbPGxtVr5lzYFkdWv/1K4F
-	wo1aS7g==
-X-Google-Smtp-Source: AGHT+IEApMeiGDIZ/SFpUW2e3JmrB7W0fF4MD+T+mdNXkLycwiEroA69CQKBQvTSE7/cFMGNJoFgS1F9IcQ=
-X-Received: from pjbof11.prod.google.com ([2002:a17:90b:39cb:b0:311:ef56:7694])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:19eb:b0:235:f3df:bc1f
- with SMTP id d9443c01a7336-2382406877amr54160135ad.36.1750860424524; Wed, 25
- Jun 2025 07:07:04 -0700 (PDT)
-Date: Wed, 25 Jun 2025 07:07:02 -0700
-In-Reply-To: <CA+EHjTygKUN8xYM10sVHFDpV5GDZJLGK2JaFPbLhB1pHU7jAkw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dv2z/It3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74CC2C4CEEA;
+	Wed, 25 Jun 2025 15:38:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750865895;
+	bh=DdxS8fK+k+4jJXT/e+VE5Z7hLWA+bNaknSmckFwX8wo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dv2z/It31S17vagV0qD/YG5Cs2xuaGCisG/MbnWq93zzaUaUrXfiITmuJmPyJHwj2
+	 nuYNJ9rGhpx/rmwcVlVvK8JVPDARGPgUOiSjlIwptVSwOUXYz20nLXVgoGzjl4GnvY
+	 LPtfY5IWEoNiJ/TJy+BqTqea3mtmXtFONVvBzy5/xqT4jDN2G40iQOremK7E9wCqTi
+	 DBbEfJsTzL8nVPUCssNUtOU8I2AXv63MDwg9llG0CBQd5uCbM7k5iAmGPdjPLhACi3
+	 r9Pk4sC1SWmvJqzefP6200Jp81E1uqxJnpuzPsYH+VL/KdRMihIBWKc8gyvuQ25wFq
+	 alh8oPqaYSR9w==
+Date: Wed, 25 Jun 2025 20:58:16 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
+	David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v3 20/62] KVM: SVM: Add a comment to explain why
+ avic_vcpu_blocking() ignores IRQ blocking
+Message-ID: <ha3rq3ybk4c63bov2ix6yyajggep6zdulsd2e44vqw4ctufeiq@env4pl5m3wz6>
+References: <20250611224604.313496-2-seanjc@google.com>
+ <20250611224604.313496-22-seanjc@google.com>
+ <pxtvegopzsyhn7lelksclxiiee7tumppu76553rax7octqpy7i@giclgo667htf>
+ <aFl-ZYyf9guxSkHE@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <80e062dd-2445-45a6-ba4a-8f5fe3286909@redhat.com>
- <CA+EHjTx2MUq98=j=5J+GwSJ1gd7ax-RrpS8WhEJg4Lk9_USUmA@mail.gmail.com>
- <372bbfa5-1869-4bf2-9c16-0b828cdb86f5@redhat.com> <CA+EHjTyxwdu5YhtZRcwb-iR7aaEq1beV+4VWSsv7-X2tDVBkrA@mail.gmail.com>
- <11b23ea3-cadd-442b-88d7-491bba99dabe@redhat.com> <CA+EHjTyginj74a+A58aAODZ72q9bye5Gm=pTxMmLHrqrRxaSww@mail.gmail.com>
- <aFrlcYYM5k5kstUO@google.com> <CA+EHjTygKUN8xYM10sVHFDpV5GDZJLGK2JaFPbLhB1pHU7jAkw@mail.gmail.com>
-Message-ID: <aFwChljXL5QJYLM_@google.com>
-Subject: Re: [PATCH v12 00/18] KVM: Mapping guest_memfd backed memory at the
- host for software protected VMs
-From: Sean Christopherson <seanjc@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aFl-ZYyf9guxSkHE@google.com>
 
-On Wed, Jun 25, 2025, Fuad Tabba wrote:
-> Got it. So, to summarize again:
+On Mon, Jun 23, 2025 at 09:18:45AM -0700, Sean Christopherson wrote:
+> On Mon, Jun 23, 2025, Naveen N Rao wrote:
+> > On Wed, Jun 11, 2025 at 03:45:23PM -0700, Sean Christopherson wrote:
+> > > Add a comment to explain why KVM clears IsRunning when putting a vCPU,
+> > > even though leaving IsRunning=1 would be ok from a functional perspective.
+> > > Per Maxim's experiments, a misbehaving VM could spam the AVIC doorbell so
+> > > fast as to induce a 50%+ loss in performance.
+> > > 
+> > > Link: https://lore.kernel.org/all/8d7e0d0391df4efc7cb28557297eb2ec9904f1e5.camel@redhat.com
+> > > Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/kvm/svm/avic.c | 31 ++++++++++++++++++-------------
+> > >  1 file changed, 18 insertions(+), 13 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > > index bf8b59556373..3cf929ac117f 100644
+> > > --- a/arch/x86/kvm/svm/avic.c
+> > > +++ b/arch/x86/kvm/svm/avic.c
+> > > @@ -1121,19 +1121,24 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
+> > >  	if (!kvm_vcpu_apicv_active(vcpu))
+> > >  		return;
+> > >  
+> > > -       /*
+> > > -        * Unload the AVIC when the vCPU is about to block, _before_
+> > > -        * the vCPU actually blocks.
+> > > -        *
+> > > -        * Any IRQs that arrive before IsRunning=0 will not cause an
+> > > -        * incomplete IPI vmexit on the source, therefore vIRR will also
+> > > -        * be checked by kvm_vcpu_check_block() before blocking.  The
+> > > -        * memory barrier implicit in set_current_state orders writing
+> > > -        * IsRunning=0 before reading the vIRR.  The processor needs a
+> > > -        * matching memory barrier on interrupt delivery between writing
+> > > -        * IRR and reading IsRunning; the lack of this barrier might be
+> > > -        * the cause of errata #1235).
+> > > -        */
+> > > +	/*
+> > > +	 * Unload the AVIC when the vCPU is about to block, _before_ the vCPU
+> > > +	 * actually blocks.
+> > > +	 *
+> > > +	 * Note, any IRQs that arrive before IsRunning=0 will not cause an
+> > > +	 * incomplete IPI vmexit on the source; kvm_vcpu_check_block() handles
+> > > +	 * this by checking vIRR one last time before blocking.  The memory
+> > > +	 * barrier implicit in set_current_state orders writing IsRunning=0
+> > > +	 * before reading the vIRR.  The processor needs a matching memory
+> > > +	 * barrier on interrupt delivery between writing IRR and reading
+> > > +	 * IsRunning; the lack of this barrier might be the cause of errata #1235).
+> > > +	 *
+> > > +	 * Clear IsRunning=0 even if guest IRQs are disabled, i.e. even if KVM
+> > > +	 * doesn't need to detect events for scheduling purposes.  The doorbell
+> > 
+> > Nit: just IsRunning (you can drop the =0 part).
 > 
->     In struct kvm_arch: add `bool supports_gmem` instead of renaming
-> `bool has_private_mem`
+> Hmm, not really.  It could be:
 > 
->     The guest_memfd flag GUEST_MEMFD_FLAG_SUPPORT_SHARED becomes
-> GUEST_MEMFD_FLAG_MMAP
+> 	/* Note, any IRQs that arrive while IsRunning is set will not cause an
 > 
->     The memslot internal flag KVM_MEMSLOT_SUPPORTS_GMEM_SHARED becomes
-> KVM_MEMSLOT_GMEM_ONLY
+> or
 > 
->     kvm_gmem_memslot_supports_shared() becomes kvm_memslot_is_gmem_only()
+> 	/* Note, any IRQs that arrive while IsRunning=1 will not cause an
 > 
->     kvm_arch_supports_gmem_shared_mem() becomes kvm_arch_supports_gmem_mmap()
-> 
->     kvm_gmem_fault_shared(struct vm_fault *vmf) becomes
-> kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
-> 
->     The capability KVM_CAP_GMEM_SHARED_MEM becomes KVM_CAP_GMEM_MMAP
-> 
->     The Kconfig CONFIG_KVM_GMEM_SHARED_MEM becomes CONFIG_KVM_GMEM_SUPPORTS_MMAP
-> 
-> What will stay the same as V12:
-> 
->     CONFIG_KVM_PRIVATE_MEM becomes CONFIG_KVM_GMEM
-> 
->     CONFIG_KVM_GENERIC_PRIVATE_MEM becomes CONFIG_KVM_GENERIC_GMEM_POPULATE
-> 
->     kvm_slot_can_be_private() becomes kvm_slot_has_gmem()
+> but that's just regurgitating the spec.  The slightly more interesting scenario
+> that's being described here is what will happen if an IRQ arrives _just_ before
+> the below code toggle IsRunning from 1 => 0.
 
-LGTM!
+Oh, you're right. I was referring to the last paragraph starting with 
+"Clear IsRunning=0 even if", which to me feels like a double negation. 
+It reads better if it is "Clear IsRunning even if ..."
+
+> 
+> > Trying to understand the significance of IRQs being disabled here. Is 
+> > that a path KVM tries to optimize?
+> 
+> Yep.  KVM doesn't need a notification for the undelivered (virtual) IRQ, because
+> it won't be handled by the vCPU until the vCPU enables IRQs, and thus it's not a
+> valid wake event for the vCPU.
+> 
+> So, *if* spurious doorbells didn't affect performance or functionality, then
+> ideally KVM would leave IsRunning=1, e.g. so that the IOMMU doesn't need to
+> generate GA log events, and so that other vCPUs aren't forced to VM-Exit when
+> sending an IPI.  Unfortunately, spurious doorbells are quite intrusive, and so
+> KVM "needs" to clear IsRunning.
+
+Ok, got that. kvm_arch_vcpu_blocking() looks like it exists precisely 
+for this reason.
+
+Thanks,
+Naveen
+
