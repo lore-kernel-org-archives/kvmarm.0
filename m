@@ -1,126 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DCB1459FA;
-	Wed, 25 Jun 2025 16:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC45215191
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 21:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750869909; cv=none; b=D0KILTmPwg3Wq3+iRLKAyNtkf7phoXr9fTaWyeO75iYh0h8IX/DQs+1vbc+ndiLZ92w3CK0uMNm2nZ2hOAKFdgMPA9uAVXWsj+gayKtMS9Rn01G3dJuOtMh2IUzfHUb7pVCWsQBmlt4oB9TNNfBMsE6t1ZJa9PkfoLIVltbvmps=
+	t=1750888030; cv=none; b=uqAct3CAPRfspH32LNXni2bjEs9npdb291/HmPVpnjYt2fNKH3RvM1GeuS7FfRAayjjbP0saqU5i3u76dPPwRvlUNFRPS0M9FQzliphEmsWr/uI6NkG2pUMWtKXnJbaa9OGUfKOSF6i1wd2ie8vLg3TG6qD1HCv9xHmQ0T5W6PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750869909; c=relaxed/simple;
-	bh=eHt7/sdhBm2wrbfo5b0J8+QgVHCBsUd1GoFda8/mRSc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P+4s1z5wKuPC9TJ4AQ88XUwJAamE+oiyeqv7UDcnbxByeohYzjRyo+H4DtOI2a5iPXkYj+rpyUXZKoZjVZmXdnciRXfleyoAMSKDl/rDhyNEZwqWWxvCHl9UlXGhRrkDx1aNrlDfbtg2Yha2+KfSWcym7/dh2ewK/1fIi+KuvyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9GKGrT3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750888030; c=relaxed/simple;
+	bh=JAsyW8eZE863eaSb5j9l0uHjRmiL/MJIXmfT/tJtisw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=byH0UXQxFWyhV0zp91VuhlM+wbEC0pUxZyUkMbqT5OzxRKawOm1tO7qHTpgQF8rWfZOhCUBppDJYgWXGn/lrgavHg3YbysxNAKs2U84M7VgGwblQyTxF6qSMq37Pm+AgBXmQzeDFM3lGdqSwyzY2gcy6Ew9LyAOWZcjVrrfSvGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3M2flUCY; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9GKGrT3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 398E5C4CEEA;
-	Wed, 25 Jun 2025 16:45:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750869909;
-	bh=eHt7/sdhBm2wrbfo5b0J8+QgVHCBsUd1GoFda8/mRSc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q9GKGrT3HeuuBaZWhCu55yO6hFWUgZ/cQ+j5PCUiakBE2ABS86kqUWg+8/BqpkJr/
-	 hl4j9mOnMVadU8WXJuNm3BQ/fjaPx4B13//DEJU/hxyqZPad89TEL4zfsaA5cKMvrm
-	 BI2lSzhdJdsyookX3FSqyx2ASMzYwYXvD3zCoSJIa0BEn6TbdRftT1mYKa6u24QgA3
-	 IDPBX9cXJpYFw3GUxLSaEDXQvwh6e/0M5Vwosi8njgwImWGTkqzTM25T2+HqHu993X
-	 R5egqU0E3VS41dzlwqodzZtYHgUhdS/yw+qwct1KvX6xIG61nVmFPN5VmpbWK3iNRt
-	 tPNkqBoN8lrTQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uUTFC-009xzP-Iu;
-	Wed, 25 Jun 2025 17:45:06 +0100
-Date: Wed, 25 Jun 2025 17:45:06 +0100
-Message-ID: <864iw3db3h.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Fix MI line level calculation in vgic_v3_nested_update_mi()
-In-Reply-To: <20250625084709.3968844-1-r09922117@csie.ntu.edu.tw>
-References: <20250625084709.3968844-1-r09922117@csie.ntu.edu.tw>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3M2flUCY"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-311e7337f26so188375a91.3
+        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 14:47:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750888028; x=1751492828; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JaElZIlxs13I2jfOVX0lSC6FgKZKsuNp0z88behp5kM=;
+        b=3M2flUCYbxBVlXFXa6CMcZHpTfp15x0xSWyAKC7aWoJfBPns7XRcqL4hvitxBdLrQf
+         FxOcG8uzUhD9OqbJBQDFZCsiiS1r8ZAlbqbuJzkiImh4pFngX5/Eehggga5EFaLifaYz
+         C1hwMWa4cqHRGhA9WPvIRwp89TuN6HUP1z52eidN84CCUps8HBzQCXt9pP6oNmyyBFmz
+         4rsjA/Y4hN2Aw/A9FJdSZlkg6H6Fvj6DXVEpAdTeQe2lHbhPFRoo3adNe1ccGJIdQztL
+         6jk4OIaQp9wlTN4BkrMGKK0Px7BUCkrexafEdEVGMh1BeuYGDM5GVL2Vfrh8F6YQxHHZ
+         bwUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750888028; x=1751492828;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JaElZIlxs13I2jfOVX0lSC6FgKZKsuNp0z88behp5kM=;
+        b=EAJUzW5lkw6800bwnGsp/Ma+ny1fJ7GZp3woIUUDt9D1CRGOPlrRYmZIqj6gNKlnkv
+         NlPmqpD+z4Et/taRUWCHxLeS91Kab7XhTLoXIETqQzkjL0aBcBf9MZ3e/uPF2yoyahii
+         XqxvUkQ0sIHZ5lqbXbbszP3dL1bwBTteFs+b5eedJHZR/G2GV66RihtYKlqd85v2qg64
+         jusSCUWSwbT8mSTrZwhx0Bd+XNUjLqDh2VJ2mCxNeyLfk3Aa2BRivw8uDPFQ+nTiWjN2
+         DN5/byxHUMqVQSLDE1qD0FJZ6kvwx5Qoy4eLL20vEwb0mgsbHzS17v8fku2TMx1XrX0r
+         qM1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWrlbE2E1g1pmkcnvvaEeqPYRRBCaPghQE48okcyfd1jq8qwdbs2ehZkoj8ffPYj/7VwhR8Sk4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxucNp9wBv5+SrvIDrQjvVLffEkMFaLwPufAARPhxM75fn6YXb2
+	crMKa2tiUiwjwq+V9vewZHlbrlghUmT+8lsJw3VuaxV+Mi3ls2/j7WHIvvKnfFBWiyHusrbxpuh
+	EPaue9db1zp7ijdBzDHF2F19KMQ==
+X-Google-Smtp-Source: AGHT+IHaFOtDsXjNCK8tDRGRC6rpZnF1ravk4aYWxE7y5fg1ChEv8b8QXDGShjJ5f1IXZEq0lP4YBKq+9E7DssxT5w==
+X-Received: from pjm6.prod.google.com ([2002:a17:90b:2fc6:b0:312:e266:f849])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:5388:b0:312:e1ec:de44 with SMTP id 98e67ed59e1d1-315f268f485mr5936687a91.27.1750888028344;
+ Wed, 25 Jun 2025 14:47:08 -0700 (PDT)
+Date: Wed, 25 Jun 2025 14:47:06 -0700
+In-Reply-To: <20250611133330.1514028-9-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack@cs.columbia.edu, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-9-tabba@google.com>
+Message-ID: <diqzv7ojjxyd.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
+From: Ackerley Tng <ackerleytng@google.com>
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
+	pankaj.gupta@amd.com, ira.weiny@intel.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 25 Jun 2025 09:47:09 +0100,
-Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
-> 
-> The state of the vcpu's MI line should be asserted when its
-> ICH_HCR_EL2.En is set and ICH_MISR_EL2 is non-zero. Using bitwise AND
-> (&=) directly for this calculation will not give us the correct result
-> when the LSB of the vcpu's ICH_MISR_EL2 isn't set. Correct this by first
-> adjusting the return value of vgic_v3_get_misr() into 1 if it is
-> non-zero.
-> 
-> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Fuad Tabba <tabba@google.com> writes:
+
+> This patch enables support for shared memory in guest_memfd, including
+> mapping that memory from host userspace.
+>
+> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
+> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
+> flag at creation time.
+>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-v3-nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> index 4f6954c30674..ebffad632fd2 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> @@ -400,7 +400,7 @@ void vgic_v3_nested_update_mi(struct kvm_vcpu *vcpu)
->  
->  	level  = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_EL2_En;
->  	if (level)
-> -		level &= vgic_v3_get_misr(vcpu);
-> +		level &= !!vgic_v3_get_misr(vcpu);
->  	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
->  			    vcpu->kvm->arch.vgic.mi_intid, level, vcpu);
->  }
+>  include/linux/kvm_host.h | 13 +++++++
+>  include/uapi/linux/kvm.h |  1 +
+>  virt/kvm/Kconfig         |  4 +++
+>  virt/kvm/guest_memfd.c   | 73 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 91 insertions(+)
+>
+> [...]
+>
 
-Very well spotted, once more. Where were you when I posted all these
-patches? ;-)
+Just want to call out here that I believe HWpoison handling (and
+kvm_gmem_error_folio()) remains correct after this patch. Would still
+appreciate a review of the following!
 
-We could make it even clearer with this:
+> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> +{
+> +	struct inode *inode = file_inode(vmf->vma->vm_file);
+> +	struct folio *folio;
+> +	vm_fault_t ret = VM_FAULT_LOCKED;
+> +
+> +	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
+> +		return VM_FAULT_SIGBUS;
+> +
+> +	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> +	if (IS_ERR(folio)) {
+> +		int err = PTR_ERR(folio);
+> +
+> +		if (err == -EAGAIN)
+> +			return VM_FAULT_RETRY;
+> +
+> +		return vmf_error(err);
+> +	}
+> +
+> +	if (WARN_ON_ONCE(folio_test_large(folio))) {
+> +		ret = VM_FAULT_SIGBUS;
+> +		goto out_folio;
+> +	}
+> +
+> +	if (!folio_test_uptodate(folio)) {
+> +		clear_highpage(folio_page(folio, 0));
+> +		kvm_gmem_mark_prepared(folio);
+> +	}
+> +
+> +	vmf->page = folio_file_page(folio, vmf->pgoff);
+> +
+> +out_folio:
+> +	if (ret != VM_FAULT_LOCKED) {
+> +		folio_unlock(folio);
+> +		folio_put(folio);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> [...]
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index a50fb7e6841f7..679aafe77de2e 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -401,9 +401,7 @@ void vgic_v3_nested_update_mi(struct kvm_vcpu *vcpu)
- {
- 	bool level;
- 
--	level  = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_EL2_En;
--	if (level)
--		level &= vgic_v3_get_misr(vcpu);
-+	level = (__vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_EL2_En) && vgic_v3_get_misr(vcpu);
- 	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
- 			    vcpu->kvm->arch.vgic.mi_intid, level, vcpu);
- }
+This ->fault() callback does not explicitly check for
+folio_test_hwpoison(), but up the call tree, __do_fault() checks for
+HWpoison.
 
-If you're OK with it, I'll use this, keeping your authorship of
-course.
+If the folio is clean, the folio is removed from the filemap. Fault is
+eventually retried and (hopefully) another non-HWpoison folio will be
+faulted in.
 
-Thanks,
+If the folio is dirty, userspace gets a SIGBUS.
 
-	M.
+kvm_gmem_error_folio() calls kvm_gmem_invalidate_begin(), which only
+unmaps KVM_FILTER_PRIVATE, but IIUC that's okay since after mmap is
+introduced,
 
--- 
-Without deviation from the norm, progress is not possible.
+* non-Coco VMs will always zap KVM_DIRECT_ROOTS anyway so the HWpoison
+  folio is still zapped from guest page tables
+    * Unmapping from host userspace page tables is handled in
+      memory_failure(), so the next access will lead to a fault, which
+      is handled using a SIGBUS in __do_fault()
+* Coco VMs can only use guest_memfd for private pages, so there's no
+  change there since private pages still get zapped.
