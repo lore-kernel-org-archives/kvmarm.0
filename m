@@ -1,72 +1,73 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F33025BF0F
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 12:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A1A25E477
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 12:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750854177; cv=none; b=N6kv41f0Emuhehcu0NA+SLCOoCwIrtCjdfrxkXZdM8vGumQE8rujfzOx5+qe4Enq40sfi+UmO3vXHc0awdPHhlwwHMIDp3d7p83vqEOJNFfx4PUMRaHnIIoJ5GW1bFU2o+0tJt0OdoNSJ9Dei9znAdKNljKgrtc1wUsP5b6dvt0=
+	t=1750854355; cv=none; b=CIxk4yuBC8dB9VnJdm3OWQdLWhHSfVoo107NfsQZ7pYEP7MT+02RKpPRtL7TnjL2+SqtnJZvE98gO69vNjJpoWZmEnBh7WMqsL4hYmSSINlKK4eJHLpEfEBrcOnR1xXPgZIqT6YMk1bLvDr5VVDT1zl8MPm6GQaFwrmTRV+fMok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750854177; c=relaxed/simple;
-	bh=PsQfHCEp6q5tQuX0x3zpsjWToWnh6oGziT5EQjTRAgU=;
+	s=arc-20240116; t=1750854355; c=relaxed/simple;
+	bh=g7tVhWNQEWOrEFO+Wx+fLCWSoQW9KQpcO66Pz2aMF+U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h0ZRBuwl9lnRRCb3W5CptLfwzrbZn/Ymn7Uyu0ZZxFd8z5zaD9XsVIYiqODksZaLu0fOCyaAufCsUQhSe1knLm+xGR4h5LR99qOBPaGWGYuwZvlukrXf1/OPoU/oHyIyXXxmgeu+3MfxsFLdfq3xaYvffNUQnu5BpnTz3t348tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hp75OQMI; arc=none smtp.client-ip=209.85.208.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=k7Tk58QDkLlKAzaqUQuz/Fq3Pa42i8Q8iJ39x9xWDISbOxj5ahHGDZEy9/YFToCfe7adjOliIDTSvfjWjfYoDWQzUgwOQ0hdzWOEkYMxgM2bZCAqbMB8mNVK2a0vtlVlfbZntXIEHMP5P1EpsuNOEjfa/XWMxl1/Yu9t4IYQHjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WNkZLjo5; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hp75OQMI"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-604bff84741so3155094a12.2
-        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 05:22:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WNkZLjo5"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-453663b7bf1so76305e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 05:25:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750854174; x=1751458974; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750854351; x=1751459151; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OiG8sr1KaclHSbf6egC7naRu8LsxzyFDngHY6EqehU8=;
-        b=Hp75OQMI02QY+5XthQ35N9+Iyft36E5yY59/nvxVTorXS6SGOWBKcaXKxMMMcxmTqa
-         uHvjT1VoZHFPb7CX+5ZY2NcIb+c/Y4d3EUeLp/Q+1sQcJiHAXIgG4Dw9RjToU4E2Zc4G
-         mpHk++RqEjSoELA1RYCi/N6339rWYnGakwVdyqrscYP1Zsp/2rTU6cB+r3iOKjgc3b33
-         K0Vy/5J2t0J5tDNbVH8VOZPKBmIs40Ub0vPLZp3LQi9k8b0AnLLZX364V5odyZ96L8m8
-         PISn1dVaOctzGmDO62qey9sDTBE9+JTjMSWShlI9IV7yVRp0qCRG6M3tkTiwN2fkt7vh
-         FTDA==
+        bh=ORz82HmG8MePjwyhjUnw+YyKg1bZgQsmMoLl2/yzhQE=;
+        b=WNkZLjo5E/gIyc+ureWo2zZy95dHQMWouUtp5UvxZFjr4FtoOoiAv82mYAox+B3vPQ
+         8jnzi6pCgKlkct0UA1D4Vywj+tqWNNkkh0m/3ENpFybS4NINvQYaPM6L6NNoagV5/XTx
+         cKTaxHXgRLedQ7SfwrBkDGiAPTit/822dbqYMGCfT99x1dOiFj7YWg04UROgUuUkKEcz
+         QB3toyGScbLd/ANQ0M/0/cHOjtDFRCNerib7wpBPzl5pVgEpHGyiLeU51bvIlI5RAsO1
+         eslWus45qCbl9QQxlf2xVmXnkuX/eRflaGLzKCwTd+q4MEcS4RJNxZ5u086KFL1TjX56
+         28gA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750854174; x=1751458974;
+        d=1e100.net; s=20230601; t=1750854351; x=1751459151;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OiG8sr1KaclHSbf6egC7naRu8LsxzyFDngHY6EqehU8=;
-        b=an9FB8gGziLHi60k3DbhQmLm/KAUIIV+4ffddStybLTud7Z3jnhejFw1tQe6N5RqBu
-         BTrgWv4Wl7hoNl49fDdmH4oblZBP4lBsUnSwut3opeY3s07oUl21VsE8E7thSVoEqPuN
-         YQzvZDrMUuIoEin+SXAf92Fdalh4u9IA7IxiGI4CUiMHMbA5q1SREFj6CpLtzBKfSwj+
-         MvanRz5SRnAEz2Nzr/QaR3WUp5v0r2Grtsl0EmO/dRFyDxa9C+/FnwD50NlLADvTQ8ji
-         IsnNTmP1PxIWxtZdM/Lm6s1/XdjaOxakipl9SfuvCYBWgQanI+EuEwaj1SNB2cMZIKqy
-         Trmg==
-X-Forwarded-Encrypted: i=1; AJvYcCWzSWjwCmjNwsGn+Rv8pX8I49l8gB/7T5AmVkw9sFHmgiTOcIdpIKPjEzFtngXCQAN7obgPogI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwN6zEm4caOMBBDQqHdMLw5+e0BPb9FBj6ZYbXYh47aoq+iAe2T
-	Pd6CrIxWbvP4HcfOqN4cXhL+QnFzoZbTbTWYgnb6EgYhIrwvk9sIjwP2PZ3ybIQcKw==
-X-Gm-Gg: ASbGncsGKpVVBOlyLXJHUkgzotMR1r3rRnG0JcsGXbHXWxwI3wyW3hi9+qmm/T67baX
-	6eHV/VrOsLjDyXcMaooOPv98pLSf392ThPVU+H/TckLMNPK6PZoTrBZ+5WpqoamzJ8sf9zuNsLq
-	/mcbzU+6dTPzPK/Zof/Swg7jUqz6YTwb0Ii2nX1FZFxcWckUou6JH1bIf12OzjPP3szEiZJEAjt
-	C1/SQwJxAK7U7uykdfXZM0nzAuycOLSfcvDHTqMoJ0/WMtA2fFEC3O9FTPZxByV9H9MYisi7HQj
-	4wYGW8a9J4jAYG723f9PAS0/c42grkM5/4x/8/6sccUjKl1tccjShBmTm975TZN0rV9Co15CYnV
-	OHJ7uqkhROT/7NEN9OrJK
-X-Google-Smtp-Source: AGHT+IGcp1aoFc2EzYV/tl3RR8TA0Ug87fzOHVR52rNGNEdbDQoI9r/5HqWjJE0hOyK5C5jflubayA==
-X-Received: by 2002:a05:6402:27d2:b0:607:ea0c:65b2 with SMTP id 4fb4d7f45d1cf-60c4de78e8amr1953498a12.31.1750854173425;
-        Wed, 25 Jun 2025 05:22:53 -0700 (PDT)
-Received: from google.com (8.239.204.35.bc.googleusercontent.com. [35.204.239.8])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c2f4681a8sm2391073a12.38.2025.06.25.05.22.50
+        bh=ORz82HmG8MePjwyhjUnw+YyKg1bZgQsmMoLl2/yzhQE=;
+        b=ALLmMOH2n/749f7gRmJv8t27KVsh1Kt/DJzmAp/4zNVQPr2t8SO3/kSebKRKISBgBq
+         jNErrKAxh+gNBoyqXORMAAbm+Jqk4G4qbm/jPieISjOT6BGpmBRcfnKEvpjqw/yYwTsS
+         5gQZ+QuOBvwi7RvqKjn6utCqLtrU138gDWg+PfHmprCZSlLY6xOMxXzvjBx7AV4AWj57
+         9337endU9SVX/xdGxBsCcUpb++i9MxceeyhnEcs1ZqwNYG5lYTEaLYJ0hYD2yXRZdRig
+         g3IYgB/FdvOhthfAgd0zfKlm2eFpYgFg3N6nvWswXAjNcdpBHW9Wv65g8daiCfUgS5B7
+         KFcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrHYeGxGD8Ng8uo13C3MsVMssoeOISfvmV85Os/jeeo6QDamJca3axfwKFcCPYvIVvVpFzSYY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzC+JzI74m2NB/j5BTZrNX5B1FapEYMChbU3ytQedj4PB8hSGu8
+	tBbCx1aOi1N1CvtYVc5etwhnaYex7rbWitN0zCsoNN4pI/MkhZcuO3piBR4VLDf+sw==
+X-Gm-Gg: ASbGncuK5S2xSbFBiYQl2DYDOEdnhIz8aOVzsgfOeLr+GuQdAveBWGeEH2biyX4qYTU
+	OAOlKXdcUfpTtvE9PvTGN5JdvsBhos2FnCsdamNHFLh7OFjZVOdsn5fQr5/DpqaR8xXjJ4d4Zp9
+	w3VAQc1eoOikRfo6tSNvA73dFRb1xzkUbhMxYz4uFI9zuSB31gcxSbpfFonyOcrP91ezJvHBR8w
+	rjnMfypGGoU72ko8gTBbJSuIqOvGNzrKq3j7LCGKMyI9gs2JM1HD3crg+yOQUV0G0SMr+yi/hrG
+	13BGlwuZol1VRvJRYKmzLpuF5edDXssD7Vs9Z9GKB9heWndkdHzAk12YGe2W1hChCHZRw1LWm2e
+	dkn996Bgeq1dg3Ptqj59mwvTXzpTF9DwPniQ=
+X-Google-Smtp-Source: AGHT+IHPyu4K7DFqX3gLjlWDl8SuaCVRLnWxYtuvRdiGcRhqnltdTavombWZNicSNu6nwKbmjbZ0JQ==
+X-Received: by 2002:a05:600c:c04f:b0:453:65f4:f4c8 with SMTP id 5b1f17b1804b1-45383195f5emr555595e9.3.1750854350879;
+        Wed, 25 Jun 2025 05:25:50 -0700 (PDT)
+Received: from google.com (206.39.187.35.bc.googleusercontent.com. [35.187.39.206])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e8069467sm4409880f8f.42.2025.06.25.05.25.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 05:22:51 -0700 (PDT)
-Date: Wed, 25 Jun 2025 12:22:45 +0000
-From: Quentin Perret <qperret@google.com>
-To: Mostafa Saleh <smostafa@google.com>
+        Wed, 25 Jun 2025 05:25:50 -0700 (PDT)
+Date: Wed, 25 Jun 2025 12:25:46 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Quentin Perret <qperret@google.com>
 Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
 	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
 	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
 Subject: Re: [PATCH] KVM: arm64: Fix error path in init_hyp_mode()
-Message-ID: <aFvqFdwNYI0-3zWY@google.com>
+Message-ID: <aFvqyl-Xquuoyvh1@google.com>
 References: <20250625113301.580253-1-smostafa@google.com>
+ <aFvqFdwNYI0-3zWY@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,45 +76,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250625113301.580253-1-smostafa@google.com>
+In-Reply-To: <aFvqFdwNYI0-3zWY@google.com>
 
-On Wednesday 25 Jun 2025 at 11:33:01 (+0000), Mostafa Saleh wrote:
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 38a91bb5d4c7..5bb36c3b06b5 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2344,15 +2344,22 @@ static void __init teardown_hyp_mode(void)
->  	int cpu;
->  
->  	free_hyp_pgds();
-> +	/* Order matches the order of initialization init_hyp_mode() */
->  	for_each_possible_cpu(cpu) {
-> +		if (!per_cpu(kvm_arm_hyp_stack_base, cpu))
-> +			continue;
->  		free_pages(per_cpu(kvm_arm_hyp_stack_base, cpu), NVHE_STACK_SHIFT - PAGE_SHIFT);
-> +
-> +		if (!kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu])
-> +			continue;
->  		free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
->  
->  		if (free_sve) {
->  			struct cpu_sve_state *sve_state;
->  
->  			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
-> -			free_pages((unsigned long) sve_state, pkvm_host_sve_state_order());
-> +			if (sve_state)
-> +				free_pages((unsigned long) sve_state, pkvm_host_sve_state_order());
+On Wed, Jun 25, 2025 at 12:22:45PM +0000, Quentin Perret wrote:
+> On Wednesday 25 Jun 2025 at 11:33:01 (+0000), Mostafa Saleh wrote:
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 38a91bb5d4c7..5bb36c3b06b5 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -2344,15 +2344,22 @@ static void __init teardown_hyp_mode(void)
+> >  	int cpu;
+> >  
+> >  	free_hyp_pgds();
+> > +	/* Order matches the order of initialization init_hyp_mode() */
+> >  	for_each_possible_cpu(cpu) {
+> > +		if (!per_cpu(kvm_arm_hyp_stack_base, cpu))
+> > +			continue;
+> >  		free_pages(per_cpu(kvm_arm_hyp_stack_base, cpu), NVHE_STACK_SHIFT - PAGE_SHIFT);
+> > +
+> > +		if (!kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu])
+> > +			continue;
+> >  		free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
+> >  
+> >  		if (free_sve) {
+> >  			struct cpu_sve_state *sve_state;
+> >  
+> >  			sve_state = per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)->sve_state;
+> > -			free_pages((unsigned long) sve_state, pkvm_host_sve_state_order());
+> > +			if (sve_state)
+> > +				free_pages((unsigned long) sve_state, pkvm_host_sve_state_order());
+> 
+> I'm a bit confused by these extra checks -- free_pages() should be safe
+> to call on NULL?
 
-I'm a bit confused by these extra checks -- free_pages() should be safe
-to call on NULL?
+Yes, I surprised in my testing I didn't see an issue with freeing NULL, I
+though it might be config related, but I should have looked more.
 
-IIUC correctly, the actual issue is that per_cpu_ptr_nvhe_sym() will
-dereference the per-cpu pages to find the sve state, which is entirely
-bogus if the per-cpu pages have not been allocated. Now, looking at
-this, it looks like the bigger problem is that we literally free the
-per-cpu pages right before the sve state...
+> 
+> IIUC correctly, the actual issue is that per_cpu_ptr_nvhe_sym() will
+> dereference the per-cpu pages to find the sve state, which is entirely
+> bogus if the per-cpu pages have not been allocated. Now, looking at
+> this, it looks like the bigger problem is that we literally free the
+> per-cpu pages right before the sve state...
+> 
+> Should we at least change the freeing order here?
 
-Should we at least change the freeing order here?
+Make sense, I will fix that in v2.
 
 Thanks,
-Quentin
+Mostafa
+
+> 
+> Thanks,
+> Quentin
