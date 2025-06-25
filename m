@@ -1,144 +1,126 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B48128935A
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 16:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DCB1459FA;
+	Wed, 25 Jun 2025 16:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750869491; cv=none; b=OgIJnNJQiEZ1L87WTUzDF2wdgv2MPiT5KPJ04UPl9a5W8AiIQiAdLk18YQbKhEAZyf6G/XsZKRSCXjahopfcZyadISheqpa4wPl5Vt2cbMT6kzN6NmMjsglDn+uZxyqOU6yb0ajRVo6A/91d4Fq2ERly71EdhkJtDcsw86E5Hxk=
+	t=1750869909; cv=none; b=D0KILTmPwg3Wq3+iRLKAyNtkf7phoXr9fTaWyeO75iYh0h8IX/DQs+1vbc+ndiLZ92w3CK0uMNm2nZ2hOAKFdgMPA9uAVXWsj+gayKtMS9Rn01G3dJuOtMh2IUzfHUb7pVCWsQBmlt4oB9TNNfBMsE6t1ZJa9PkfoLIVltbvmps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750869491; c=relaxed/simple;
-	bh=Z9ERmhepHwBvJ47JpkRd2f7oSMVE2aRZTimVKUdwW/M=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=W9GgFdc80YYN0VErzeFoPBsWW2fbcPfyDnKMmCnbvQ/TB9CCFQKUZBfsXZiESVkqLzsjNa+Rg2GBf+GpBkiNo9TnuumzixJjX0H/eR/s9cE7GroqunYh1nxAEouWLGEKrXmA1agMiE6xDL2q4ULKAM9YdE/ZHeX8t2a6xqwt3HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=guS8dz6t; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750869909; c=relaxed/simple;
+	bh=eHt7/sdhBm2wrbfo5b0J8+QgVHCBsUd1GoFda8/mRSc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P+4s1z5wKuPC9TJ4AQ88XUwJAamE+oiyeqv7UDcnbxByeohYzjRyo+H4DtOI2a5iPXkYj+rpyUXZKoZjVZmXdnciRXfleyoAMSKDl/rDhyNEZwqWWxvCHl9UlXGhRrkDx1aNrlDfbtg2Yha2+KfSWcym7/dh2ewK/1fIi+KuvyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9GKGrT3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="guS8dz6t"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750869488;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oGUU/IPrSry2Fwx2P5b8O9w0u3Wyi69gqhC1KaKfI04=;
-	b=guS8dz6tAhRd1aONf7FHgjpgZwkV+upD2Vel+m6aqyygwQDtLyHs4/lsotr35YIgLk04oX
-	UYc9gwX/YmwKMtk3uYHNnzmG3fFuik9q6F63id2qWc3OjlvppfdNY2tacW8t3ioB2VVsTq
-	dLjW8wRBLUCMdh2w5oyrqG+diDAJNXI=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-67-zT2ApMJhOfizHJsQaD8EkA-1; Wed,
- 25 Jun 2025 12:38:05 -0400
-X-MC-Unique: zT2ApMJhOfizHJsQaD8EkA-1
-X-Mimecast-MFC-AGG-ID: zT2ApMJhOfizHJsQaD8EkA_1750869483
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 119CB19560BA;
-	Wed, 25 Jun 2025 16:38:02 +0000 (UTC)
-Received: from localhost (mschlens-int.str.redhat.com [10.33.192.203])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AD52F1956096;
-	Wed, 25 Jun 2025 16:37:59 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, eric.auger@redhat.com
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev, richard.henderson@linaro.org,
- alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
- sebott@redhat.com, shameerali.kolothum.thodi@huawei.com,
- armbru@redhat.com, berrange@redhat.com, abologna@redhat.com,
- jdenemar@redhat.com, agraf@csgraf.de, shahuang@redhat.com,
- mark.rutland@arm.com, philmd@linaro.org, pbonzini@redhat.com
-Subject: Re: [PATCH v8 00/14] arm: rework id register storage
-In-Reply-To: <CAFEAcA95vCKpk1wXQh49xAWnqY=JZnKdr8NEQuYaRJr=jrKWyA@mail.gmail.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Avril Crosse O'Flaherty"
-References: <20250617153931.1330449-1-cohuck@redhat.com>
- <05e903b3-02bf-4c04-ac2b-cdec0b45fe3f@redhat.com>
- <CAFEAcA95vCKpk1wXQh49xAWnqY=JZnKdr8NEQuYaRJr=jrKWyA@mail.gmail.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Wed, 25 Jun 2025 18:37:57 +0200
-Message-ID: <87y0tfhj4q.fsf@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9GKGrT3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 398E5C4CEEA;
+	Wed, 25 Jun 2025 16:45:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750869909;
+	bh=eHt7/sdhBm2wrbfo5b0J8+QgVHCBsUd1GoFda8/mRSc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q9GKGrT3HeuuBaZWhCu55yO6hFWUgZ/cQ+j5PCUiakBE2ABS86kqUWg+8/BqpkJr/
+	 hl4j9mOnMVadU8WXJuNm3BQ/fjaPx4B13//DEJU/hxyqZPad89TEL4zfsaA5cKMvrm
+	 BI2lSzhdJdsyookX3FSqyx2ASMzYwYXvD3zCoSJIa0BEn6TbdRftT1mYKa6u24QgA3
+	 IDPBX9cXJpYFw3GUxLSaEDXQvwh6e/0M5Vwosi8njgwImWGTkqzTM25T2+HqHu993X
+	 R5egqU0E3VS41dzlwqodzZtYHgUhdS/yw+qwct1KvX6xIG61nVmFPN5VmpbWK3iNRt
+	 tPNkqBoN8lrTQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uUTFC-009xzP-Iu;
+	Wed, 25 Jun 2025 17:45:06 +0100
+Date: Wed, 25 Jun 2025 17:45:06 +0100
+Message-ID: <864iw3db3h.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Fix MI line level calculation in vgic_v3_nested_update_mi()
+In-Reply-To: <20250625084709.3968844-1-r09922117@csie.ntu.edu.tw>
+References: <20250625084709.3968844-1-r09922117@csie.ntu.edu.tw>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jintack@cs.columbia.edu, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jun 25 2025, Peter Maydell <peter.maydell@linaro.org> wrote:
+On Wed, 25 Jun 2025 09:47:09 +0100,
+Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
+> 
+> The state of the vcpu's MI line should be asserted when its
+> ICH_HCR_EL2.En is set and ICH_MISR_EL2 is non-zero. Using bitwise AND
+> (&=) directly for this calculation will not give us the correct result
+> when the LSB of the vcpu's ICH_MISR_EL2 isn't set. Correct this by first
+> adjusting the return value of vgic_v3_get_misr() into 1 if it is
+> non-zero.
+> 
+> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v3-nested.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> index 4f6954c30674..ebffad632fd2 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+> @@ -400,7 +400,7 @@ void vgic_v3_nested_update_mi(struct kvm_vcpu *vcpu)
+>  
+>  	level  = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_EL2_En;
+>  	if (level)
+> -		level &= vgic_v3_get_misr(vcpu);
+> +		level &= !!vgic_v3_get_misr(vcpu);
+>  	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
+>  			    vcpu->kvm->arch.vgic.mi_intid, level, vcpu);
+>  }
 
-> On Wed, 25 Jun 2025 at 10:10, Eric Auger <eric.auger@redhat.com> wrote:
->> However there are other checkpatch errors besides the one you reported, in
->> 52873a54ad arm/cpu: Store aa64isar0/aa64zfr0 into the idregs arrays
->> ERROR: line over 90 characters
->> #388: FILE: target/arm/kvm.c:225:
->> +    return ARM64_SYS_REG((sysreg & CP_REG_ARM64_SYSREG_OP0_MASK) >>
->> CP_REG_ARM64_SYSREG_OP0_SHIFT,
->>
->> ERROR: line over 90 characters
->> #389: FILE: target/arm/kvm.c:226:
->> +                         (sysreg & CP_REG_ARM64_SYSREG_OP1_MASK) >>
->> CP_REG_ARM64_SYSREG_OP1_SHIFT,
->>
->> ERROR: line over 90 characters
->> #390: FILE: target/arm/kvm.c:227:
->> +                         (sysreg & CP_REG_ARM64_SYSREG_CRN_MASK) >>
->> CP_REG_ARM64_SYSREG_CRN_SHIFT,
->>
->> ERROR: line over 90 characters
->> #391: FILE: target/arm/kvm.c:228:
->> +                         (sysreg & CP_REG_ARM64_SYSREG_CRM_MASK) >>
->> CP_REG_ARM64_SYSREG_CRM_SHIFT,
->>
->> ERROR: line over 90 characters
->> #392: FILE: target/arm/kvm.c:229:
->> +                         (sysreg & CP_REG_ARM64_SYSREG_OP2_MASK) >>
->> CP_REG_ARM64_SYSREG_OP2_SHIFT);
->>
->> WARNING: line over 80 characters
->> #396: FILE: target/arm/kvm.c:233:
->> +static int get_host_cpu_reg(int fd, ARMHostCPUFeatures *ahcf,
->> ARMIDRegisterIdx index)
->
-> The last one of those is probably easily fixed, but note the general
-> remark in style.rst that it's better to have an overlong line than
-> one with an awkward and unreadable wrapping. (We ought to fix
-> checkpatch and style.rst to agree on whether to warn or error and
-> whether that should be at 90 chars or 100 chars, but that would require
-> reopening an old style argument and it's too much effort.)
+Very well spotted, once more. Where were you when I posted all these
+patches? ;-)
 
-I would not disagree with fixing the last one if wanted, but I think the
-others are more readable if we do not try to break them up.
+We could make it even clearer with this:
 
->
->> 5f15ebdf3f arm/cpu: Add sysreg definitions in cpu-sysregs.h
->> ERROR: Macros with complex values should be enclosed in parenthesis
->> #56: FILE: target/arm/cpu-sysregs.h:21:
->> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2) NAME##_IDX,
->>
->> ERROR: Macros with complex values should be enclosed in parenthesis
->> #64: FILE: target/arm/cpu-sysregs.h:29:
->> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2) \
->> +    SYS_##NAME = ENCODE_ID_REG(OP0, OP1, CRN, CRM, OP2),
->>
->> ERROR: Macros with complex values should be enclosed in parenthesis
->> #203: FILE: target/arm/cpu64.c:40:
->> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2)      \
->> +    [NAME##_IDX] = SYS_##NAME,
->
-> This is checkpatch not being able to cope with more complex
-> uses of the preprocessor; the warning only makes sense for
-> "acts like a function" macros.
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index a50fb7e6841f7..679aafe77de2e 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -401,9 +401,7 @@ void vgic_v3_nested_update_mi(struct kvm_vcpu *vcpu)
+ {
+ 	bool level;
+ 
+-	level  = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_EL2_En;
+-	if (level)
+-		level &= vgic_v3_get_misr(vcpu);
++	level = (__vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_EL2_En) && vgic_v3_get_misr(vcpu);
+ 	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
+ 			    vcpu->kvm->arch.vgic.mi_intid, level, vcpu);
+ }
 
-Yep, that's why I ignored it.
+If you're OK with it, I'll use this, keeping your authorship of
+course.
 
-In general, should we mention that we intentionally ignored
-checkpatch.pl feedback, or would that be just noise?
+Thanks,
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
