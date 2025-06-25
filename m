@@ -1,151 +1,137 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92270178372
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 09:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DD027E059
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 10:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750843905; cv=none; b=a8jW5RNEkknTN0Jldpvmq8PCE1ETqRlyecRtoxrwWQPN4KdIeje68NyDfFOs06rAOt+6dWQ1BvqYHpnvv8fE6yWipfFb0ao4U2L7WEXbHWoLKv9UH6TBD49u8l279DlseFcRsmCy+7+32euPe0IONAL2RkIyNvdtFW7IvebLDkE=
+	t=1750846471; cv=none; b=ZYaNkQzjwetZYt7EgeDMNqRzL8GU3sSmMli4RSlOTkolvRPT/lCtF34fuSA2Sbm/cgLXdTHLRzUuWmlJnRkJh7GSMGLcyzfoWxQwOcHqiSyTiM4rWkZZH93o1x4Hu4mUOhu8M1Tq1id1FO2N7xyYvzemUslZlOC3oS4mEPpowiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750843905; c=relaxed/simple;
-	bh=Vj/KOXTkG519rVMchOgKDL/7skO2f/c7WLHDVPAFGY8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hotEXemxI0iV0JFgzNtkJJY3hlSEFzK1ViP1VwKnj6uUtyXanwEVdUdREh32O+HG0qqmOYv77bErKTlqwi8oZ+0DKo+8beYrhHLjkRSYA/iR36FRf2Q7SaCXN68yeBJ4ZuP4+2BcJsQikZiTEASSt/9nhJgXAnoYYLrslF7IdDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NiKbfKUI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750846471; c=relaxed/simple;
+	bh=Z6ttgkt2ZLAVD2+Rc1hUOiBz5Jxrr7nBEEcPUbxS2h4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IYywW3fh740bjQG/u1fR4/9yDGIhBdcldK1d9MXdV7yDI51qsiesd7EghiLVSVcyFWAV2nltDq3yvDW5DPMXap4P9t65IyucXUFF8rMHC5ZzYBcIrKorwoB/wkcPoSHtR+DMTbmeM2E5es3yeybJK1yevzbu4vswE4mbVbB+DGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=x1hQyWfa; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NiKbfKUI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750843901;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d4kb+ErCz0mhW0bKU7GDl25eFlTih4IPbtlUUppkujA=;
-	b=NiKbfKUIeJRzAYJBgAjIEYxr9QRhN6pXSBL0QWjjhKYgNJA/ViQbZ/GV1OgC55dAij2PFV
-	ZJ+mqDdASV1EEYmSOBoN88776b5+eGZdfjoeD07BK+xLOaW9M20gMPuQCRg2Dj4E4f1tte
-	XLeUQnUaSd8lIEQMD9o2NrIppGsnrbM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-498-dfjJrLV7Pvqt1jT_GviMNQ-1; Wed, 25 Jun 2025 05:31:39 -0400
-X-MC-Unique: dfjJrLV7Pvqt1jT_GviMNQ-1
-X-Mimecast-MFC-AGG-ID: dfjJrLV7Pvqt1jT_GviMNQ_1750843898
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-450de98b28eso3426165e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 02:31:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x1hQyWfa"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-70e3c6b88dbso10759507b3.0
+        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 03:14:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1750846468; x=1751451268; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WHpZf1BrPFAlqXFuHdOtTQ7ioXief2ue4zEdYR2QIM4=;
+        b=x1hQyWfa13Fco/EfhjXI+dKiDDH01JdR77uWGj8lrs1pz99X3jjt5p+OU/AHqcBYFn
+         iixNk6klJskPEdFuvP0gwz/jmNy+7oTfLDtdgLd9WpVIuCwNEKpKW6b5CaJWYZ7JXMU6
+         wnq9OiOEzsaJiI4pXZt1GqLaKtCpWCYTZTHiWJ/2yZ8lRkBT46TLCzbu3/9ANEKqGZau
+         XycKMcm1MhG8im4zvkUCutUfwmxnssGDcUHGn388XWGxtX5ewKSkzGq74WX+oOgPQG1+
+         l8UDpm1CxDBs9TqxLYCNg8Hq/xTS2esuOaCAxLBVBGjn55x6cfxvGnDWxZuxthXqYUCQ
+         XUrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750843898; x=1751448698;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1750846468; x=1751451268;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=d4kb+ErCz0mhW0bKU7GDl25eFlTih4IPbtlUUppkujA=;
-        b=oM1HbAMon/HKGXnPPPZM3YyDIISXdSoTK/+0snwQvD7QfX9txhV00e0tuQ7xXjyUJW
-         D37QS0nk8TevEryTyWW5h0QXjSRekrnftqrRKZtuieA6cLSAsWpKN1OISEh7UZv8qBVS
-         ojHcHiokEZFewh426k9KWaOABS4roFNLEFwHP6qIsH45ilb42BmQQjM4B8CltA5przPN
-         WK6mHCMWzS6uBJGJV9XTejnmwEe+txzbS6KwNnVmz3KmE8m3yqCmbPo3z4t0nvWwHqIO
-         qpHfUfuYHO5W1+juhPEbGTDbwtMsCjDJw6QBLzzh2AXlypYPkoXY02dGkg68pvkuA4BL
-         DZ/g==
-X-Forwarded-Encrypted: i=1; AJvYcCXAd2Q71tRwjpN/RFKTLPmFtqmS8ByV4DgTFhpHn1w1v0DVEDj8HCKsI/a2J0UT+Ym+kXHzNUo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwW4yOEDrZeRGuLJuNnnx4CBePOhuJyz7tIEZRwf6MqPeqhuoEd
-	MPe4yZ603q6/o/gOmM4zV36h9BgIYOcqsJEy3ywnt/P9zhybQ0sKceBYFGGOWqAaz8UuDSi/3GB
-	Wo0L8eYfRHgAw9KGGGFUtLx9+6XxLozkOtLyFYVXwNUCB0RxIIkHGx+qVXQ==
-X-Gm-Gg: ASbGncsAtiuCo6zYY7AQ5LRL2wn6EcHY6kgswqLITSOCsrY8xJI3LVMAsmXPReWPX5M
-	mFXDLd1qUa5+1iak9Wz3SUgKKTWL91K9BQbaknmUCl04vT1YTRZhi006tJ3zEbxzA2FRb95M8Zg
-	yR56Gpo6hz3KTUEzC9IboTQ0Bd0qfRrlL6woenDiZvrEKcmefX2yX0XeyTwxcrBBS/zZLmkYjwf
-	ETePO95VoLQ9gI5ntD2qWSCHKTMhQ/EsBWab3JdnehhqNVZ5eDe+QTpyPQ8UIqgMkl5PvTd8XWl
-	OaeI4iVDzi/FS5iKpo6SUpUOsQodEz7aEImvUi97YFnmCkfgLsMaHJDkJV2jmwEXx54JfQ==
-X-Received: by 2002:a05:600d:108:10b0:453:79cb:7c86 with SMTP id 5b1f17b1804b1-4537b722e5cmr41194875e9.3.1750843898169;
-        Wed, 25 Jun 2025 02:31:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEUXitgn9o5HGaBbsL83/BsZlB9vIxZ2oB5zHbv3/LG2dAPZPrsPMW3HFNeDWIB+0JpmJcK0Q==
-X-Received: by 2002:a05:600d:108:10b0:453:79cb:7c86 with SMTP id 5b1f17b1804b1-4537b722e5cmr41194605e9.3.1750843897660;
-        Wed, 25 Jun 2025 02:31:37 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538236694esm14290065e9.28.2025.06.25.02.31.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Jun 2025 02:31:36 -0700 (PDT)
-Message-ID: <3bf1b8eb-4ce2-4d33-9aa0-9c9f4c1afa17@redhat.com>
-Date: Wed, 25 Jun 2025 11:31:35 +0200
+        bh=WHpZf1BrPFAlqXFuHdOtTQ7ioXief2ue4zEdYR2QIM4=;
+        b=d4CiSpE5VXfIy/2NxaQyJfnjbasHvfiLaLLHaiVaefDctAg7Og2kzCz3qq/PV5MGb5
+         WVhLAb74Gydfw/mgAbjq8jspn7pbysHPLhd1yWVNqKKpRV5F1HRpLKO+cISQkWUWKFvH
+         x3S3XhG/3I/62wyDY7q6oZOIzNq0Slcf5sa85E19kXZme9p7Xn08kPSCNPcjRBNgXjkQ
+         gC/AHFo5I7ip0mMZSuHQ3GRsar+M/34Vz6mXgy1jstexGqguNMwGQNrTBpdJgMUJF6h7
+         ZDxPsYERug+ZYU8eCwBUtBV5Yt2GyTlhBERyTB0i7bi+/+oG9Bi9uIB4V4vHbaVYDkhK
+         X2GA==
+X-Forwarded-Encrypted: i=1; AJvYcCWRNoZt2HkNcXKEATZrUXqsGNRvVxopP/QZTy7WsngYLddrU2Ct93HWOXdjtZrdEONL674OHlY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwB3w1AaVIvw/NC+rLPfxxmHeUwrF995l7N9goyVeP/dIwwuaSN
+	b2B8qTnttcfY8T2pRyISNaGI4qRTMzSNv/lgBFabctDySnEjlIPTUuWqNbMfrJq8dJRB7xmIEnw
+	Pk3IwlCpoNFUxL1ZqNGQRQ8CN8nRLz7gY9XdDXeCGWA==
+X-Gm-Gg: ASbGncvfub1bs5qLOS+g9Giu+dsHiNvsz6wb87N5qo/JruI+ewMw60sbSvvH3+ug54N
+	E2LhOUHjnW9ye3IZl7d1MLO+Fnx8TWWxj4vtKXm5Bvrq3gsaPEMHHhZCOAPbtiZEXazuRUp39hd
+	GnMZ45Za6ndAl1GgruJQUjeQMM6Flf2xVCfLJMBTaRuTZ7
+X-Google-Smtp-Source: AGHT+IE1SVnC+PVyHxDE/ir8P+FbDaCZU32E1YBr9BGc5xKyUSgOrtzXwikzEk8hRx34R5EMJ5iKsQAo35GChbuPeag=
+X-Received: by 2002:a05:690c:3682:b0:6fb:1c5a:80ea with SMTP id
+ 00721157ae682-71406dd8d3dmr34791687b3.32.1750846468296; Wed, 25 Jun 2025
+ 03:14:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v8 12/14] arm/cpu: Add sysreg generation scripts
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev,
- peter.maydell@linaro.org, richard.henderson@linaro.org,
- alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
- sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
- abologna@redhat.com, jdenemar@redhat.com, agraf@csgraf.de,
- shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org,
- pbonzini@redhat.com
-References: <20250617153931.1330449-1-cohuck@redhat.com>
- <20250617153931.1330449-13-cohuck@redhat.com> <87h60e1ies.fsf@redhat.com>
- <de402ecb-8d45-4e42-a805-cd3aaef8dc93@redhat.com>
- <aFvAEXWi7PUbVAud@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <aFvAEXWi7PUbVAud@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: esbVUqP7-5FKQllMjBXFo_Vp9WqRQHDEHU7TS1jaDd0_1750843898
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250617153931.1330449-1-cohuck@redhat.com> <05e903b3-02bf-4c04-ac2b-cdec0b45fe3f@redhat.com>
+In-Reply-To: <05e903b3-02bf-4c04-ac2b-cdec0b45fe3f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 25 Jun 2025 11:14:17 +0100
+X-Gm-Features: AX0GCFvttrY59WLT4gA3ZgqOqf9rMqxv_AGCgjo_0gmHPt678YKqjDvK8cpzp6o
+Message-ID: <CAFEAcA95vCKpk1wXQh49xAWnqY=JZnKdr8NEQuYaRJr=jrKWyA@mail.gmail.com>
+Subject: Re: [PATCH v8 00/14] arm: rework id register storage
+To: eric.auger@redhat.com
+Cc: Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, 
+	qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org, 
+	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev, 
+	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, 
+	berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, 
+	agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, 
+	pbonzini@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Daniel,
-
-On 6/25/25 11:23 AM, Daniel P. Berrangé wrote:
-> On Wed, Jun 25, 2025 at 11:16:22AM +0200, Eric Auger wrote:
->> Hi Connie,
->>
->> On 6/17/25 5:45 PM, Cornelia Huck wrote:
->>> On Tue, Jun 17 2025, Cornelia Huck <cohuck@redhat.com> wrote:
->>>
->>>> diff --git a/scripts/arm-gen-cpu-sysregs-header.awk b/scripts/arm-gen-cpu-sysregs-header.awk
->>>> new file mode 100755
->>>> index 000000000000..f92bbbafa727
->>>> --- /dev/null
->>>> +++ b/scripts/arm-gen-cpu-sysregs-header.awk
->>>> @@ -0,0 +1,37 @@
->>>> +#!/bin/awk -f
->>>> +# SPDX-License-Identifier: GPL-2.0-or-later
->>>> +# arm-gen-cpu-sysregs-header.awk: arm64 sysreg header include generator
->>>> +#
->>>> +# Usage: awk -f arm-gen-cpu-sysregs-header.awk $LINUX_PATH/arch/arm64/tools/sysreg
->>>> +
->>>> +BEGIN {
->>>> +    print "/* SPDX-License-Identifier: GPL-2.0-or-later */"
->>> FWIW, checkpatch.pl chokes on this:
->>>
->>> ^* matches null string many times in regex; marked by <-- HERE in m/^* <-- HERE /"$/ at scripts/checkpatch.pl line 1389.
->>> ERROR: Saw unacceptable licenses '*/"', valid choices for QEMU are:
->>> GPL-2.0-or-later
->>> GPL-2.0-only
->>> LGPL-2.1-only
->>> LGPL-2.1-or-later
->>> BSD-2-Clause
->>> BSD-3-Clause
->>> MIT
->>> total: 1 errors, 0 warnings, 76 lines checked
->> so don't we need to improve checkpatch.pl to silence this error?
-> Its regex gets confused by the trailing " after the comment end. We
-> could fix it, but ignoring the error is also valid as this is a
-> highly unusual file that's not likely to be common through our
-> source tree.
-Makes sense. We are good then.
-
-Thanks!
-
-Eric
+On Wed, 25 Jun 2025 at 10:10, Eric Auger <eric.auger@redhat.com> wrote:
+> However there are other checkpatch errors besides the one you reported, in
+> 52873a54ad arm/cpu: Store aa64isar0/aa64zfr0 into the idregs arrays
+> ERROR: line over 90 characters
+> #388: FILE: target/arm/kvm.c:225:
+> +    return ARM64_SYS_REG((sysreg & CP_REG_ARM64_SYSREG_OP0_MASK) >>
+> CP_REG_ARM64_SYSREG_OP0_SHIFT,
 >
+> ERROR: line over 90 characters
+> #389: FILE: target/arm/kvm.c:226:
+> +                         (sysreg & CP_REG_ARM64_SYSREG_OP1_MASK) >>
+> CP_REG_ARM64_SYSREG_OP1_SHIFT,
 >
-> With regards,
-> Daniel
+> ERROR: line over 90 characters
+> #390: FILE: target/arm/kvm.c:227:
+> +                         (sysreg & CP_REG_ARM64_SYSREG_CRN_MASK) >>
+> CP_REG_ARM64_SYSREG_CRN_SHIFT,
+>
+> ERROR: line over 90 characters
+> #391: FILE: target/arm/kvm.c:228:
+> +                         (sysreg & CP_REG_ARM64_SYSREG_CRM_MASK) >>
+> CP_REG_ARM64_SYSREG_CRM_SHIFT,
+>
+> ERROR: line over 90 characters
+> #392: FILE: target/arm/kvm.c:229:
+> +                         (sysreg & CP_REG_ARM64_SYSREG_OP2_MASK) >>
+> CP_REG_ARM64_SYSREG_OP2_SHIFT);
+>
+> WARNING: line over 80 characters
+> #396: FILE: target/arm/kvm.c:233:
+> +static int get_host_cpu_reg(int fd, ARMHostCPUFeatures *ahcf,
+> ARMIDRegisterIdx index)
 
+The last one of those is probably easily fixed, but note the general
+remark in style.rst that it's better to have an overlong line than
+one with an awkward and unreadable wrapping. (We ought to fix
+checkpatch and style.rst to agree on whether to warn or error and
+whether that should be at 90 chars or 100 chars, but that would require
+reopening an old style argument and it's too much effort.)
+
+> 5f15ebdf3f arm/cpu: Add sysreg definitions in cpu-sysregs.h
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> #56: FILE: target/arm/cpu-sysregs.h:21:
+> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2) NAME##_IDX,
+>
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> #64: FILE: target/arm/cpu-sysregs.h:29:
+> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2) \
+> +    SYS_##NAME = ENCODE_ID_REG(OP0, OP1, CRN, CRM, OP2),
+>
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> #203: FILE: target/arm/cpu64.c:40:
+> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2)      \
+> +    [NAME##_IDX] = SYS_##NAME,
+
+This is checkpatch not being able to cope with more complex
+uses of the preprocessor; the warning only makes sense for
+"acts like a function" macros.
+
+-- PMM
