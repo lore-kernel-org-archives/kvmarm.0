@@ -1,137 +1,136 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DD027E059
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 10:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4F72BEFE4
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 10:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750846471; cv=none; b=ZYaNkQzjwetZYt7EgeDMNqRzL8GU3sSmMli4RSlOTkolvRPT/lCtF34fuSA2Sbm/cgLXdTHLRzUuWmlJnRkJh7GSMGLcyzfoWxQwOcHqiSyTiM4rWkZZH93o1x4Hu4mUOhu8M1Tq1id1FO2N7xyYvzemUslZlOC3oS4mEPpowiM=
+	t=1750848954; cv=none; b=aDLUAyASbzVNkz6xHLkoO02VVjajPU39QsgmnVYG9oFSDH8aa2aPtQm1DDLJGiEe87HNJxbIVk4hLcSaBIMcFfQIojzrJebWAvjob+JitCPf5cFuTblsYeQz0JXJGVWnQ1Qsd7L9IXeKh0qKnjZn03LIUoQmK8lIzZNsm1F+fb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750846471; c=relaxed/simple;
-	bh=Z6ttgkt2ZLAVD2+Rc1hUOiBz5Jxrr7nBEEcPUbxS2h4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IYywW3fh740bjQG/u1fR4/9yDGIhBdcldK1d9MXdV7yDI51qsiesd7EghiLVSVcyFWAV2nltDq3yvDW5DPMXap4P9t65IyucXUFF8rMHC5ZzYBcIrKorwoB/wkcPoSHtR+DMTbmeM2E5es3yeybJK1yevzbu4vswE4mbVbB+DGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=x1hQyWfa; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1750848954; c=relaxed/simple;
+	bh=Y+NflATt1BbVg4AJe27l0CDfySeQP4HOlxRLdzEDkE4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uSp+3MQt2qRenM+HFLYifodyOz44zyP0X/3BfeLYcc10e2MUINYi2EZz7Eq4qbbKhjs0Q8mPFALaLMIWr8/VmYqx8yUJWv4SMGAI0nrRk8dZd7k52HsHCFc+1kOYr3+gPizZC/ZwFD2whoNtkTqi+kpGZ17eMYgCFXnrTnxzMOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NIFAMT2s; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x1hQyWfa"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-70e3c6b88dbso10759507b3.0
-        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 03:14:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NIFAMT2s"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-60724177a1fso1460276a12.3
+        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 03:55:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750846468; x=1751451268; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WHpZf1BrPFAlqXFuHdOtTQ7ioXief2ue4zEdYR2QIM4=;
-        b=x1hQyWfa13Fco/EfhjXI+dKiDDH01JdR77uWGj8lrs1pz99X3jjt5p+OU/AHqcBYFn
-         iixNk6klJskPEdFuvP0gwz/jmNy+7oTfLDtdgLd9WpVIuCwNEKpKW6b5CaJWYZ7JXMU6
-         wnq9OiOEzsaJiI4pXZt1GqLaKtCpWCYTZTHiWJ/2yZ8lRkBT46TLCzbu3/9ANEKqGZau
-         XycKMcm1MhG8im4zvkUCutUfwmxnssGDcUHGn388XWGxtX5ewKSkzGq74WX+oOgPQG1+
-         l8UDpm1CxDBs9TqxLYCNg8Hq/xTS2esuOaCAxLBVBGjn55x6cfxvGnDWxZuxthXqYUCQ
-         XUrg==
+        d=google.com; s=20230601; t=1750848951; x=1751453751; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=V1GXLq2HqBHIx1U8RtZLo2I2pqPpplv4UNHwKqoIWBU=;
+        b=NIFAMT2sbPPmFbS8O5I1J2yqaca3/VFm6ZKsTjyzK3qDSpuJTGLnYh8SGVCUO4uHCH
+         wVm6nkTvEVTZ/Zu2/34JZi1sKk1IsyhwjkqG5sdVC20yOCOOj9CaV5oc4mtxOfX0XJtz
+         BilNOGCPZ32muvVWXX79zkXKgmUDKPGXsCX3N5tUoown6FMQKR1Y3fQOMYjZGElBtpwv
+         HHjSrkC0GG/0jH4O2V8ow6i1FngZ3+mDz4RA812AyDsFlLSZZFoCvFzF2mbKW8WNUu61
+         D2es7/ihMP5odfje8gjzC8QAd0sWEpaDTEgYm56t4mk5hQCar7Gl3IxrZf8uAMktBng8
+         jn0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750846468; x=1751451268;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WHpZf1BrPFAlqXFuHdOtTQ7ioXief2ue4zEdYR2QIM4=;
-        b=d4CiSpE5VXfIy/2NxaQyJfnjbasHvfiLaLLHaiVaefDctAg7Og2kzCz3qq/PV5MGb5
-         WVhLAb74Gydfw/mgAbjq8jspn7pbysHPLhd1yWVNqKKpRV5F1HRpLKO+cISQkWUWKFvH
-         x3S3XhG/3I/62wyDY7q6oZOIzNq0Slcf5sa85E19kXZme9p7Xn08kPSCNPcjRBNgXjkQ
-         gC/AHFo5I7ip0mMZSuHQ3GRsar+M/34Vz6mXgy1jstexGqguNMwGQNrTBpdJgMUJF6h7
-         ZDxPsYERug+ZYU8eCwBUtBV5Yt2GyTlhBERyTB0i7bi+/+oG9Bi9uIB4V4vHbaVYDkhK
-         X2GA==
-X-Forwarded-Encrypted: i=1; AJvYcCWRNoZt2HkNcXKEATZrUXqsGNRvVxopP/QZTy7WsngYLddrU2Ct93HWOXdjtZrdEONL674OHlY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwB3w1AaVIvw/NC+rLPfxxmHeUwrF995l7N9goyVeP/dIwwuaSN
-	b2B8qTnttcfY8T2pRyISNaGI4qRTMzSNv/lgBFabctDySnEjlIPTUuWqNbMfrJq8dJRB7xmIEnw
-	Pk3IwlCpoNFUxL1ZqNGQRQ8CN8nRLz7gY9XdDXeCGWA==
-X-Gm-Gg: ASbGncvfub1bs5qLOS+g9Giu+dsHiNvsz6wb87N5qo/JruI+ewMw60sbSvvH3+ug54N
-	E2LhOUHjnW9ye3IZl7d1MLO+Fnx8TWWxj4vtKXm5Bvrq3gsaPEMHHhZCOAPbtiZEXazuRUp39hd
-	GnMZ45Za6ndAl1GgruJQUjeQMM6Flf2xVCfLJMBTaRuTZ7
-X-Google-Smtp-Source: AGHT+IE1SVnC+PVyHxDE/ir8P+FbDaCZU32E1YBr9BGc5xKyUSgOrtzXwikzEk8hRx34R5EMJ5iKsQAo35GChbuPeag=
-X-Received: by 2002:a05:690c:3682:b0:6fb:1c5a:80ea with SMTP id
- 00721157ae682-71406dd8d3dmr34791687b3.32.1750846468296; Wed, 25 Jun 2025
- 03:14:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750848951; x=1751453751;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V1GXLq2HqBHIx1U8RtZLo2I2pqPpplv4UNHwKqoIWBU=;
+        b=Vcp8uRAQLZSl82RV1Hpz2kOFoWvhbvTjPJG7cKsnn0NTSpZD+9z6Ua3ehXtAXjfr/w
+         MdXJrrY5JCCNVsd34lOBtSROR5x/JtwWKKi8FevRzt03QjdGr8BU4XeAuZkWfFwpWPop
+         ODJpE6jDdTovdbod4DBbL3UWTE1sN98/r9QNJ4TaBCCDvA38FqYolYsNtlwHkSrWdPbU
+         CC5kkZ69/f3n/vnANjWTmlxxWRtW+j4W4zpIgSSwSARqmclcZAp+9eAE0fuUgaS4ksRW
+         FJx4CGG9WUdJNKeBbpESR0ctf4O/p+aMBGqXqqqtHKS+JHBIafBMLwO0BPLrxDfhSeh8
+         /Gzg==
+X-Forwarded-Encrypted: i=1; AJvYcCVl8+yboQJIY8FCze5+wUPLbx647eX23v755hr1zDMR4Y7MmwE+8bzQHUwAnt3qRMXMdxGwpF0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxJC6MSpKSsVJB3cI7dzCz7BLHGvWsDyRcCL/If0TbM2xhO4Dvn
+	gRNs/hkn8ccyis2ty8AX73dyY+M9vJU2AdO8J8q4rH6DJ7Wz4MQdwYvRiDEGUEGaZZC6MicnIOz
+	IMLpu/053ag==
+X-Google-Smtp-Source: AGHT+IHUR8NzJ9FFoX9Hr5oMdShDNs6NRkAE3kBsnjpl89mkWn7cGms6VUHj8zcgECBy48WdUiyOSlbMzG/D
+X-Received: from edtb19.prod.google.com ([2002:aa7:c913:0:b0:60c:5b8e:e20b])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:35d3:b0:608:8204:c600
+ with SMTP id 4fb4d7f45d1cf-60c4d31789amr2084880a12.3.1750848951221; Wed, 25
+ Jun 2025 03:55:51 -0700 (PDT)
+Date: Wed, 25 Jun 2025 10:55:48 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250617153931.1330449-1-cohuck@redhat.com> <05e903b3-02bf-4c04-ac2b-cdec0b45fe3f@redhat.com>
-In-Reply-To: <05e903b3-02bf-4c04-ac2b-cdec0b45fe3f@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 25 Jun 2025 11:14:17 +0100
-X-Gm-Features: AX0GCFvttrY59WLT4gA3ZgqOqf9rMqxv_AGCgjo_0gmHPt678YKqjDvK8cpzp6o
-Message-ID: <CAFEAcA95vCKpk1wXQh49xAWnqY=JZnKdr8NEQuYaRJr=jrKWyA@mail.gmail.com>
-Subject: Re: [PATCH v8 00/14] arm: rework id register storage
-To: eric.auger@redhat.com
-Cc: Cornelia Huck <cohuck@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, 
-	qemu-arm@nongnu.org, kvmarm@lists.linux.dev, richard.henderson@linaro.org, 
-	alex.bennee@linaro.org, maz@kernel.org, oliver.upton@linux.dev, 
-	sebott@redhat.com, shameerali.kolothum.thodi@huawei.com, armbru@redhat.com, 
-	berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com, 
-	agraf@csgraf.de, shahuang@redhat.com, mark.rutland@arm.com, philmd@linaro.org, 
-	pbonzini@redhat.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
+Message-ID: <20250625105548.984572-1-qperret@google.com>
+Subject: [PATCH] KVM: arm64: Adjust range correctly during host stage-2 faults
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: Quentin Perret <qperret@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 25 Jun 2025 at 10:10, Eric Auger <eric.auger@redhat.com> wrote:
-> However there are other checkpatch errors besides the one you reported, in
-> 52873a54ad arm/cpu: Store aa64isar0/aa64zfr0 into the idregs arrays
-> ERROR: line over 90 characters
-> #388: FILE: target/arm/kvm.c:225:
-> +    return ARM64_SYS_REG((sysreg & CP_REG_ARM64_SYSREG_OP0_MASK) >>
-> CP_REG_ARM64_SYSREG_OP0_SHIFT,
->
-> ERROR: line over 90 characters
-> #389: FILE: target/arm/kvm.c:226:
-> +                         (sysreg & CP_REG_ARM64_SYSREG_OP1_MASK) >>
-> CP_REG_ARM64_SYSREG_OP1_SHIFT,
->
-> ERROR: line over 90 characters
-> #390: FILE: target/arm/kvm.c:227:
-> +                         (sysreg & CP_REG_ARM64_SYSREG_CRN_MASK) >>
-> CP_REG_ARM64_SYSREG_CRN_SHIFT,
->
-> ERROR: line over 90 characters
-> #391: FILE: target/arm/kvm.c:228:
-> +                         (sysreg & CP_REG_ARM64_SYSREG_CRM_MASK) >>
-> CP_REG_ARM64_SYSREG_CRM_SHIFT,
->
-> ERROR: line over 90 characters
-> #392: FILE: target/arm/kvm.c:229:
-> +                         (sysreg & CP_REG_ARM64_SYSREG_OP2_MASK) >>
-> CP_REG_ARM64_SYSREG_OP2_SHIFT);
->
-> WARNING: line over 80 characters
-> #396: FILE: target/arm/kvm.c:233:
-> +static int get_host_cpu_reg(int fd, ARMHostCPUFeatures *ahcf,
-> ARMIDRegisterIdx index)
+host_stage2_adjust_range() tries to find the largest block mapping that
+fits within a memory or mmio region (represented by a kvm_mem_range in
+this function) during host stage-2 faults under pKVM. To do so, it walks
+the host stage-2 page-table, finds the faulting PTE and its level, and
+then progressively increments the level until it finds a granule of the
+appropriate size. However, the condition in the loop implementing the
+above is broken as it checks kvm_level_supports_block_mapping() for the
+next level instead of the current, so pKVM may attempt to map a region
+larger than can be covered with a single block.
 
-The last one of those is probably easily fixed, but note the general
-remark in style.rst that it's better to have an overlong line than
-one with an awkward and unreadable wrapping. (We ought to fix
-checkpatch and style.rst to agree on whether to warn or error and
-whether that should be at 90 chars or 100 chars, but that would require
-reopening an old style argument and it's too much effort.)
+This is not a security problem and is quite rare in practice (the
+kvm_mem_range check usually forces host_stage2_adjust_range() to choose a
+smaller granule), but this is clearly not the expected behaviour.
 
-> 5f15ebdf3f arm/cpu: Add sysreg definitions in cpu-sysregs.h
-> ERROR: Macros with complex values should be enclosed in parenthesis
-> #56: FILE: target/arm/cpu-sysregs.h:21:
-> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2) NAME##_IDX,
->
-> ERROR: Macros with complex values should be enclosed in parenthesis
-> #64: FILE: target/arm/cpu-sysregs.h:29:
-> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2) \
-> +    SYS_##NAME = ENCODE_ID_REG(OP0, OP1, CRN, CRM, OP2),
->
-> ERROR: Macros with complex values should be enclosed in parenthesis
-> #203: FILE: target/arm/cpu64.c:40:
-> +#define DEF(NAME, OP0, OP1, CRN, CRM, OP2)      \
-> +    [NAME##_IDX] = SYS_##NAME,
+Refactor the loop to fix the bug and improve readability.
 
-This is checkpatch not being able to cope with more complex
-uses of the preprocessor; the warning only makes sense for
-"acts like a function" macros.
+Fixes: c4f0935e4d95 ("KVM: arm64: Optimize host memory aborts")
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
--- PMM
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 95d7534c9679..8957734d6183 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -479,6 +479,7 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
+ {
+ 	struct kvm_mem_range cur;
+ 	kvm_pte_t pte;
++	u64 granule;
+ 	s8 level;
+ 	int ret;
+ 
+@@ -496,18 +497,21 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
+ 		return -EPERM;
+ 	}
+ 
+-	do {
+-		u64 granule = kvm_granule_size(level);
++	for (; level <= KVM_PGTABLE_LAST_LEVEL; level++) {
++		if (!kvm_level_supports_block_mapping(level))
++			continue;
++		granule = kvm_granule_size(level);
+ 		cur.start = ALIGN_DOWN(addr, granule);
+ 		cur.end = cur.start + granule;
+-		level++;
+-	} while ((level <= KVM_PGTABLE_LAST_LEVEL) &&
+-			!(kvm_level_supports_block_mapping(level) &&
+-			  range_included(&cur, range)));
++		if (!range_included(&cur, range))
++			continue;
++		*range = cur;
++		return 0;
++	}
+ 
+-	*range = cur;
++	WARN_ON(1);
+ 
+-	return 0;
++	return -EINVAL;
+ }
+ 
+ int host_stage2_idmap_locked(phys_addr_t addr, u64 size,
+-- 
+2.50.0.714.g196bf9f422-goog
+
