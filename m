@@ -1,33 +1,33 @@
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A20A25CC72
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 08:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6805C25B693
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 08:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750925372; cv=none; b=C7POxDV3HEvrRP589uXMza4n1Bf/E/nRS50P7IZNC4o6lzWqACcOhmMNyimMMkpv65qVq0Fwp/OuTBvvLM8sEhlW1g2dPjoTbOmALv+BLJnA1iGQIHwliSvW4qUsn91W00IepLgZcE1epyn6E0CixGnxgxeruLvnbxuz82vkXCA=
+	t=1750925373; cv=none; b=TDLDPhEQM/2WJ0/zNsQbtz/E8MpejKkSLfez51fecJ06OHNEsKsdey3zSCvJJ4kIpsGuBLUVB341ObzR4BCa2FVzqz2fPgW1D1MaSEpBMtmYU0KwL9nE8dVoUFEjenqdkdlxyWLkJ0zJULCmovNz4hAjjWLmUsWUYistb3Dw9IE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750925372; c=relaxed/simple;
-	bh=kTlZ/uD7aKUJUorAuI9FVfO8yt7PdldS3cmMNC1Y5jI=;
+	s=arc-20240116; t=1750925373; c=relaxed/simple;
+	bh=1to+6Re5XzNP0G8MpXklYpgSSc6qCSqh3o1RjakbtDA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jrNo7oYd5sYknw9OSs3bF7X766y0gBSCvNw1XS4sjjRk2zu+WBX8FV3cV00fJwV2eUlSltNDjbT4VeUrIg3hDUwjKfyO2tTT7AP291Oyy/9l0G1UjDTnSMqnm0rXz+55eUm/3M/XLHwdmDh7RLOt8izDTKbn37T5t/l55kLrFTs=
+	 MIME-Version:Content-Type; b=N5+Zl+7v/M07sa1o5hLbrAC46DXFWf7QZONMUk/32ZMd8Sm3yQrAUiOh8WgluPFRTzAzSs6unwMMx1HmE6IB4DBewnxxpugnI+wM5PiWHomOJ3pbC4u/Jl5K8mnNXZIXAWawLDU7H9xdYNOCrcPYTuUXt+ajvw6HxrOiRogUqIo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bSWWg2Zjbz2BdVV;
-	Thu, 26 Jun 2025 16:07:43 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 679711A0188;
-	Thu, 26 Jun 2025 16:09:21 +0800 (CST)
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bSWVk4rjzz1W3XT;
+	Thu, 26 Jun 2025 16:06:54 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 00F611A0188;
+	Thu, 26 Jun 2025 16:09:23 +0800 (CST)
 Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 26 Jun 2025 16:09:21 +0800
+ 15.2.1544.11; Thu, 26 Jun 2025 16:09:22 +0800
 Received: from localhost.localdomain (10.50.165.33) by
  kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 26 Jun 2025 16:09:20 +0800
+ 15.2.1544.11; Thu, 26 Jun 2025 16:09:21 +0800
 From: Yicong Yang <yangyicong@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <corbet@lwn.net>,
@@ -38,9 +38,9 @@ CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
 	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>,
 	<tangchengchang@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH v3 4/7] KVM: arm/arm64: Allow user injection of unsupported exclusive/atomic DABT
-Date: Thu, 26 Jun 2025 16:09:03 +0800
-Message-ID: <20250626080906.64230-5-yangyicong@huawei.com>
+Subject: [PATCH v3 6/7] arm64: Add support for FEAT_{LS64, LS64_V}
+Date: Thu, 26 Jun 2025 16:09:05 +0800
+Message-ID: <20250626080906.64230-7-yangyicong@huawei.com>
 X-Mailer: git-send-email 2.31.0
 In-Reply-To: <20250626080906.64230-1-yangyicong@huawei.com>
 References: <20250626080906.64230-1-yangyicong@huawei.com>
@@ -57,108 +57,201 @@ X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
 
 From: Yicong Yang <yangyicong@hisilicon.com>
 
-The unsupported exclusive/atomic DABT exception is hand to the
-userspace. Provide a way for the userspace to inject this DABT
-to the guest if they want to imitate how this is handled on the
-host.
+Armv8.7 introduces single-copy atomic 64-byte loads and stores
+instructions and its variants named under FEAT_{LS64, LS64_V}.
+These features are identified by ID_AA64ISAR1_EL1.LS64 and the
+use of such instructions in userspace (EL0) can be trapped. In
+order to support the use of corresponding instructions in userspace:
+- Make ID_AA64ISAR1_EL1.LS64 visbile to userspace
+- Add identifying and enabling in the cpufeature list
+- Expose these support of these features to userspace through HWCAP3
+  and cpuinfo
 
 Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  1 +
- arch/arm64/include/uapi/asm/kvm.h    |  3 ++-
- arch/arm64/kvm/guest.c               |  4 ++++
- arch/arm64/kvm/inject_fault.c        | 29 ++++++++++++++++++++++++++++
- 4 files changed, 36 insertions(+), 1 deletion(-)
+ Documentation/arch/arm64/booting.rst    | 12 ++++++
+ Documentation/arch/arm64/elf_hwcaps.rst |  6 +++
+ arch/arm64/include/asm/hwcap.h          |  2 +
+ arch/arm64/include/uapi/asm/hwcap.h     |  2 +
+ arch/arm64/kernel/cpufeature.c          | 51 +++++++++++++++++++++++++
+ arch/arm64/kernel/cpuinfo.c             |  2 +
+ arch/arm64/tools/cpucaps                |  2 +
+ 7 files changed, 77 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 0720898f563e..df141ae77019 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -47,6 +47,7 @@ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
- void kvm_inject_undefined(struct kvm_vcpu *vcpu);
- void kvm_inject_vabt(struct kvm_vcpu *vcpu);
- void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
-+void kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, unsigned long addr);
- void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
- void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+index ee9b790c0d72..837823d49212 100644
+--- a/Documentation/arch/arm64/booting.rst
++++ b/Documentation/arch/arm64/booting.rst
+@@ -483,6 +483,18 @@ Before jumping into the kernel, the following conditions must be met:
  
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index ed5f3892674c..69985acda668 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -184,8 +184,9 @@ struct kvm_vcpu_events {
- 		__u8 serror_pending;
- 		__u8 serror_has_esr;
- 		__u8 ext_dabt_pending;
-+		__u8 ext_dabt_excl_atom_pending;
- 		/* Align it to 8 bytes */
--		__u8 pad[5];
-+		__u8 pad[4];
- 		__u64 serror_esr;
- 	} exception;
- 	__u32 reserved[12];
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 2196979a24a3..47bc09ea50c3 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -839,6 +839,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 	bool serror_pending = events->exception.serror_pending;
- 	bool has_esr = events->exception.serror_has_esr;
- 	bool ext_dabt_pending = events->exception.ext_dabt_pending;
-+	bool ext_dabt_excl_atom_pending = events->exception.ext_dabt_excl_atom_pending;
+    - MDCR_EL3.TPM (bit 6) must be initialized to 0b0
  
- 	if (serror_pending && has_esr) {
- 		if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-@@ -855,6 +856,9 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 	if (ext_dabt_pending)
- 		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
- 
-+	if (ext_dabt_excl_atom_pending)
-+		kvm_inject_dabt_excl_atomic(vcpu, kvm_vcpu_get_hfar(vcpu));
++  For CPUs support for 64-byte loads and stores without status (FEAT_LS64):
 +
- 	return 0;
- }
++  - If the kernel is entered at EL1 and EL2 is present:
++
++    - HCRX_EL2.EnALS (bit 1) must be initialised to 0b1.
++
++  For CPUs support for 64-byte loads and stores with status (FEAT_LS64_V):
++
++  - If the kernel is entered at EL1 and EL2 is present:
++
++    - HCRX_EL2.EnASR (bit 2) must be initialised to 0b1.
++
+ The requirements described above for CPU mode, caches, MMUs, architected
+ timers, coherency and system registers apply to all CPUs.  All CPUs must
+ enter the kernel in the same exception level.  Where the values documented
+diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
+index 69d7afe56853..9e6db258ff48 100644
+--- a/Documentation/arch/arm64/elf_hwcaps.rst
++++ b/Documentation/arch/arm64/elf_hwcaps.rst
+@@ -435,6 +435,12 @@ HWCAP2_SME_SF8DP4
+ HWCAP2_POE
+     Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
  
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index a640e839848e..d64650a1aefe 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -171,6 +171,35 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
- 		inject_abt64(vcpu, false, addr);
- }
++HWCAP3_LS64
++    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001.
++
++HWCAP3_LS64_V
++    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010.
++
+ 4. Unused AT_HWCAP bits
+ -----------------------
  
-+/**
-+ * kvm_inject_dabt_excl_atomic - inject a data abort for unsupported exclusive
-+ *				 or atomic access
-+ * @vcpu: The VCPU to receive the data abort
-+ * @addr: The address to report in the DFAR
-+ *
-+ * It is assumed that this code is called from the VCPU thread and that the
-+ * VCPU therefore is not currently executing guest code.
-+ */
-+void kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, unsigned long addr)
+diff --git a/arch/arm64/include/asm/hwcap.h b/arch/arm64/include/asm/hwcap.h
+index 1c3f9617d54f..f45ab66d3466 100644
+--- a/arch/arm64/include/asm/hwcap.h
++++ b/arch/arm64/include/asm/hwcap.h
+@@ -176,6 +176,8 @@
+ #define KERNEL_HWCAP_POE		__khwcap2_feature(POE)
+ 
+ #define __khwcap3_feature(x)		(const_ilog2(HWCAP3_ ## x) + 128)
++#define KERNEL_HWCAP_LS64              __khwcap3_feature(LS64)
++#define KERNEL_HWCAP_LS64_V            __khwcap3_feature(LS64_V)
+ 
+ /*
+  * This yields a mask that user programs can use to figure out what
+diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
+index 705a7afa8e58..88579dad778d 100644
+--- a/arch/arm64/include/uapi/asm/hwcap.h
++++ b/arch/arm64/include/uapi/asm/hwcap.h
+@@ -143,5 +143,7 @@
+ /*
+  * HWCAP3 flags - for AT_HWCAP3
+  */
++#define HWCAP3_LS64		(1UL << 0)
++#define HWCAP3_LS64_V		(1UL << 1)
+ 
+ #endif /* _UAPI__ASM_HWCAP_H */
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index b34044e20128..5e730a522c76 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -238,6 +238,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar0[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_LS64_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_XS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_I8MM_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_DGH_SHIFT, 4, 0),
+@@ -2291,6 +2292,38 @@ static void cpu_enable_e0pd(struct arm64_cpu_capabilities const *cap)
+ }
+ #endif /* CONFIG_ARM64_E0PD */
+ 
++static bool has_ls64(const struct arm64_cpu_capabilities *entry, int __unused)
 +{
-+	u64 esr = 0;
++	u64 ls64;
 +
-+	/* Reuse the general DABT injection routine and modify the DFSC */
-+	kvm_inject_dabt(vcpu, addr);
++	ls64 = cpuid_feature_extract_field(__read_sysreg_by_encoding(entry->sys_reg),
++					   entry->field_pos, entry->sign);
 +
-+	if (match_target_el(vcpu, unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC))) {
-+		esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
-+		esr &= ~ESR_ELx_FSC;
-+		esr |= ESR_ELx_FSC_EXCL_ATOMIC;
-+		vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-+	} else {
-+		esr = vcpu_read_sys_reg(vcpu, ESR_EL2);
-+		esr &= ~ESR_ELx_FSC;
-+		esr |= ESR_ELx_FSC_EXCL_ATOMIC;
-+		vcpu_write_sys_reg(vcpu, esr, ESR_EL2);
-+	}
++	if (ls64 == ID_AA64ISAR1_EL1_LS64_NI ||
++	    ls64 > ID_AA64ISAR1_EL1_LS64_LS64_ACCDATA)
++		return false;
++
++	if (entry->capability == ARM64_HAS_LS64 &&
++	    ls64 >= ID_AA64ISAR1_EL1_LS64_LS64)
++		return true;
++
++	if (entry->capability == ARM64_HAS_LS64_V &&
++	    ls64 >= ID_AA64ISAR1_EL1_LS64_LS64_V)
++		return true;
++
++	return false;
 +}
 +
- /**
-  * kvm_inject_pabt - inject a prefetch abort into the guest
-  * @vcpu: The VCPU to receive the prefetch abort
++static void cpu_enable_ls64(struct arm64_cpu_capabilities const *cap)
++{
++	sysreg_clear_set(sctlr_el1, SCTLR_EL1_EnALS, SCTLR_EL1_EnALS);
++}
++
++static void cpu_enable_ls64_v(struct arm64_cpu_capabilities const *cap)
++{
++	sysreg_clear_set(sctlr_el1, SCTLR_EL1_EnASR, SCTLR_EL1_EnASR);
++}
++
+ #ifdef CONFIG_ARM64_PSEUDO_NMI
+ static bool can_use_gic_priorities(const struct arm64_cpu_capabilities *entry,
+ 				   int scope)
+@@ -3061,6 +3094,22 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_pmuv3,
+ 	},
+ #endif
++	{
++		.desc = "LS64",
++		.capability = ARM64_HAS_LS64,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_ls64,
++		.cpu_enable = cpu_enable_ls64,
++		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LS64, LS64)
++	},
++	{
++		.desc = "LS64_V",
++		.capability = ARM64_HAS_LS64_V,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_ls64,
++		.cpu_enable = cpu_enable_ls64_v,
++		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LS64, LS64_V)
++	},
+ 	{},
+ };
+ 
+@@ -3173,6 +3222,8 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
+ 	HWCAP_CAP(ID_AA64ISAR1_EL1, BF16, EBF16, CAP_HWCAP, KERNEL_HWCAP_EBF16),
+ 	HWCAP_CAP(ID_AA64ISAR1_EL1, DGH, IMP, CAP_HWCAP, KERNEL_HWCAP_DGH),
+ 	HWCAP_CAP(ID_AA64ISAR1_EL1, I8MM, IMP, CAP_HWCAP, KERNEL_HWCAP_I8MM),
++	HWCAP_CAP(ID_AA64ISAR1_EL1, LS64, LS64, CAP_HWCAP, KERNEL_HWCAP_LS64),
++	HWCAP_CAP(ID_AA64ISAR1_EL1, LS64, LS64_V, CAP_HWCAP, KERNEL_HWCAP_LS64_V),
+ 	HWCAP_CAP(ID_AA64ISAR2_EL1, LUT, IMP, CAP_HWCAP, KERNEL_HWCAP_LUT),
+ 	HWCAP_CAP(ID_AA64ISAR3_EL1, FAMINMAX, IMP, CAP_HWCAP, KERNEL_HWCAP_FAMINMAX),
+ 	HWCAP_CAP(ID_AA64MMFR2_EL1, AT, IMP, CAP_HWCAP, KERNEL_HWCAP_USCAT),
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index c1f2b6b04b41..3cca8d0a36f1 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -81,6 +81,8 @@ static const char *const hwcap_str[] = {
+ 	[KERNEL_HWCAP_PACA]		= "paca",
+ 	[KERNEL_HWCAP_PACG]		= "pacg",
+ 	[KERNEL_HWCAP_GCS]		= "gcs",
++	[KERNEL_HWCAP_LS64]		= "ls64",
++	[KERNEL_HWCAP_LS64_V]		= "ls64_v",
+ 	[KERNEL_HWCAP_DCPODP]		= "dcpodp",
+ 	[KERNEL_HWCAP_SVE2]		= "sve2",
+ 	[KERNEL_HWCAP_SVEAES]		= "sveaes",
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 10effd4cff6b..8930208a1b07 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -43,6 +43,8 @@ HAS_HCX
+ HAS_LDAPR
+ HAS_LPA2
+ HAS_LSE_ATOMICS
++HAS_LS64
++HAS_LS64_V
+ HAS_MOPS
+ HAS_NESTED_VIRT
+ HAS_PAN
 -- 
 2.24.0
 
