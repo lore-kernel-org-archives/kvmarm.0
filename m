@@ -1,139 +1,129 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E562B266EEA
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 08:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7CB21CA0E
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 10:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750928349; cv=none; b=hfPB657ENmO9/kAW0M2nOx7/qPWSAg9JREcXrGtxazVPsDuebxvmXL0Q4NOnhRwvhNS/ReAA2wiVKdji4KgRgyMGYilGmHJIzqpoSL7D9khIoInYicPmB9S3ln6eNwz4qr3RnrAW7GdE47dDcb5H+Zu0+OBzOpnmmTJsHfz9qhU=
+	t=1750932620; cv=none; b=lONgJ3nULN1sFP580w+igpiGXLPSiBW8QHR1YVmtkOgCfH4jruDBO1mln15SyKTBmDhKnbpbOihmKeEo/c8Ao6akYKqPXcRrhspv2fOAcwcRXByN0dHQNhFvrS3LJXb820lm/0KEVCXK+98Bk25adUnh7dhEx5nYe4lVVRGJAW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750928349; c=relaxed/simple;
-	bh=vz8yrG7TsUr+PK7JlGaU9k8zdE+Zt3hQF4t9uML7Scs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lshuYHU/qKbcPbCkEItyf61P2X7SabKJz0LEaAqYYbx3zypXN1efEPATBbfEpcaInHfZrVbTEbK6keP2/UYnb7kMugx/b5iKkoKwI1sQMXc4CpA9441qc39vDKRSakGgWWerNP6pny5qgNNmO2fU40zR1xhIEI0sr1GHlYjPv2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iJhUcXn6; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1750932620; c=relaxed/simple;
+	bh=DKVjNysQiPg44WHFvqc/jybFh9qT2hEaqcBWlu8MgG4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SQy4l8VeUNXjnsrEDkvz2bqQPJB4znIxaHg8Bls+bzHt6A4MYhuLKtPTCo5A7M7fBbwuk3i0Nd4fmxgb7/xAXJ3JGhAulfaDmBEtXhhTuf3GTYBUKNF7aV7l6jjzMBnGuLzyNJao71xu1AYj6kjnJQ5qzgSbgGMas5FhQJRVkjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1/jISB9c; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--qperret.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iJhUcXn6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750928348; x=1782464348;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vz8yrG7TsUr+PK7JlGaU9k8zdE+Zt3hQF4t9uML7Scs=;
-  b=iJhUcXn6nGwDWEBHZTIjWu0ece+aBVTNpIDw5Q5K0UTu0jxeWp6HEgtf
-   6I1iOY2xfsEvWLK/e40jTKz5Wgq5+Bm7sgza0uHlqBEpS828sgw1nciDc
-   mZXCnrFYT/omJRfIv10rpRIeLJ88QHQgiDCS0NmJtN8XvSRZb+zDkW0fh
-   E7UvPgrHoUC1SbH7/q18IiYi8wQgU9LbdJxU+O8CKxXeyAqYjMPx0tcz2
-   hHmAjyEwi/O4YdZbIjFNO9crcMREAtwFGWgOPhwnbIsnTWwf9OXCkhDUo
-   J9eYAlWQv4Rks6bLz6E5WdpwkMYIXEpcYfJ6hJVV6Vj60EyTTvC2VgOAd
-   A==;
-X-CSE-ConnectionGUID: 5hjqbnf2QROpYNodhNYqoA==
-X-CSE-MsgGUID: J0ncqRZOTi6hiKPPoQGtDA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="64649962"
-X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="64649962"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 01:59:08 -0700
-X-CSE-ConnectionGUID: PSt5q9rgRv23Z+qWHnxY4g==
-X-CSE-MsgGUID: 1ZRIWUhETUuNPdnq4pMsGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="152632462"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 01:59:05 -0700
-Message-ID: <bc7aea45-f254-4cbc-8dc0-5435417d8577@intel.com>
-Date: Thu, 26 Jun 2025 16:59:00 +0800
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1/jISB9c"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-607142010bcso626902a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 03:10:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750932617; x=1751537417; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TP7OERsBD0AIL6q0/hWWV2FPerGoaJHuU25B69zEssI=;
+        b=1/jISB9cNtD4ojc/juT/mPEPEGU2snXJtJJkO/mIn8YE97MxsCiI7OmcTLZzyIsQJx
+         8wlvRcbhhiqnGQ0/qAyfOilIZ9IFMvrWQV8XQilg6h8bSnMkiILSZr86d1yaF0MtM+f+
+         kvhCY/enmazsVdHwAQcKFfYM39XC7k4zl0yVI/sgQIZBZhcdPQeJgirM8jGzJhzrkdrK
+         ry/2h5K6WFduHOLoe80k7wmtMMYiNAHGKrKi4kvIfkqDPgbGly+ZXkwn2qOdVfHsuLNO
+         KDet9XWnYydhx9UzrbXJMREY1E9a36cru5enZRvZHZqR++iz3QETcp4QJF4d8LvbiNji
+         8LLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750932617; x=1751537417;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TP7OERsBD0AIL6q0/hWWV2FPerGoaJHuU25B69zEssI=;
+        b=UBNxkOiCIannAbaFp6m2AwwGjB4iEGmeOQmrIGRSqr7oRwYfYF6+Y6g/0MlbBO/kEF
+         MMG/yKnFJQkXsgF8T1wv075lYExRaHW/JU1M2+obj7xGWQJ7sLn1JsJc0DbZ3xJYXPsr
+         9IIH5bUDOjWqzjAcY/oocDsmttW7l6fHTMPvaYxnsfEeUy+QeKLeunpzbhIYDffMxsqA
+         MpOxVRY4Fqn30NEUs6v1VJgSI9cgwLAO1ljPI/kvfBuilRvoDyiR+sKquE1KCojr7feq
+         LPbcl5rbqfaj5FrliUou4CBwh9tJIV/Z2yF5fwGLgfDDHsTBN8JQ7MB75M7eMfHqRBQr
+         Qtww==
+X-Forwarded-Encrypted: i=1; AJvYcCWPw3o/ZAa5cAVDhwJY+NoxyzybJHJXd8bDtcnj2oCiSr1YNeYuoHiEySErm6oK3G58HXjoChw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx+uWEgJzy/zG1Oq3gBYYL9P20bt7OiC7GcGqn0+li4Ls8MbtyE
+	KAgCD6VQKe3DYKDA0IN0PRIH1X+bs3PzPc/Mj0h4KYNO+zgeth/klt51gBcqEkU2yvR+BD11p5o
+	RAbQfrEIN5A==
+X-Google-Smtp-Source: AGHT+IEep39DiT0nAnVXFppD+aWUwOIVpbsw7STELNO8ls+qxpoksuLe5NaSudBMyzv7SiB61C4OREGYZWCw
+X-Received: from edvo20.prod.google.com ([2002:a05:6402:394:b0:606:e3fd:b317])
+ (user=qperret job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:4309:b0:608:48b0:5e88
+ with SMTP id 4fb4d7f45d1cf-60c4dd42daamr6239997a12.18.1750932617018; Thu, 26
+ Jun 2025 03:10:17 -0700 (PDT)
+Date: Thu, 26 Jun 2025 10:10:14 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/5] KVM: x86: Provide a capability to disable
- APERF/MPERF read intercepts
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- Jim Mattson <jmattson@google.com>
-References: <20250626001225.744268-1-seanjc@google.com>
- <20250626001225.744268-3-seanjc@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250626001225.744268-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250626101014.1519345-1-qperret@google.com>
+Subject: [PATCH] KVM: arm64: Don't free hyp pages with pKVM on GICv2
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: Mostafa Saleh <smostafa@google.com>, Quentin Perret <qperret@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 6/26/2025 8:12 AM, Sean Christopherson wrote:
-> From: Jim Mattson <jmattson@google.com>
-> 
-> Allow a guest to read the physical IA32_APERF and IA32_MPERF MSRs
-> without interception.
-> 
-> The IA32_APERF and IA32_MPERF MSRs are not virtualized. Writes are not
-> handled at all. The MSR values are not zeroed on vCPU creation, saved
-> on suspend, or restored on resume. No accommodation is made for
-> processor migration or for sharing a logical processor with other
-> tasks. No adjustments are made for non-unit TSC multipliers. The MSRs
-> do not account for time the same way as the comparable PMU events,
-> whether the PMU is virtualized by the traditional emulation method or
-> the new mediated pass-through approach.
-> 
-> Nonetheless, in a properly constrained environment, this capability
-> can be combined with a guest CPUID table that advertises support for
-> CPUID.6:ECX.APERFMPERF[bit 0] to induce a Linux guest to report the
-> effective physical CPU frequency in /proc/cpuinfo. Moreover, there is
-> no performance cost for this capability.
-> 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Link: https://lore.kernel.org/r/20250530185239.2335185-3-jmattson@google.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
->   arch/x86/kvm/svm/nested.c      |  4 +++-
->   arch/x86/kvm/svm/svm.c         |  5 +++++
->   arch/x86/kvm/vmx/nested.c      |  6 ++++++
->   arch/x86/kvm/vmx/vmx.c         |  4 ++++
->   arch/x86/kvm/x86.c             |  6 +++++-
->   arch/x86/kvm/x86.h             |  5 +++++
->   include/uapi/linux/kvm.h       |  1 +
->   tools/include/uapi/linux/kvm.h |  1 +
->   9 files changed, 53 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 43ed57e048a8..27ced3ee2b53 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7844,6 +7844,7 @@ Valid bits in args[0] are::
->     #define KVM_X86_DISABLE_EXITS_HLT              (1 << 1)
->     #define KVM_X86_DISABLE_EXITS_PAUSE            (1 << 2)
->     #define KVM_X86_DISABLE_EXITS_CSTATE           (1 << 3)
-> +  #define KVM_X86_DISABLE_EXITS_APERFMPERF       (1 << 4)
->   
->   Enabling this capability on a VM provides userspace with a way to no
->   longer intercept some instructions for improved latency in some
-> @@ -7854,6 +7855,28 @@ all such vmexits.
->   
->   Do not enable KVM_FEATURE_PV_UNHALT if you disable HLT exits.
->   
-> +Virtualizing the ``IA32_APERF`` and ``IA32_MPERF`` MSRs requires more
-> +than just disabling APERF/MPERF exits. While both Intel and AMD
-> +document strict usage conditions for these MSRs--emphasizing that only
-> +the ratio of their deltas over a time interval (T0 to T1) is
-> +architecturally defined--simply passing through the MSRs can still
-> +produce an incorrect ratio.
-> +
-> +This erroneous ratio can occur if, between T0 and T1:
-> +
-> +1. The vCPU thread migrates between logical processors.
-> +2. Live migration or suspend/resume operations take place.
-> +3. Another task shares the vCPU's logical processor.
-> +4. C-states lower thean C0 are emulated (e.g., via HLT interception).
+Marc reported that enabling protected mode on a device with GICv2
+doesn't fail gracefully as one would expect, and leads to a host
+kernel crash.
 
-s/thean/than/
+As it turns out, the first half of pKVM init happens before the vgic
+probe, and so by the time we find out we have a GICv2 we're already
+committed to keeping the pKVM vectors installed at EL2 -- pKVM rejects
+stub HVCs for obvious security reasons. However, the error path on KVM
+init leads to teardown_hyp_mode() which unconditionally frees hypervisor
+allocations (including the EL2 stacks and per-cpu pages) under the
+assumption that a previous cpu_hyp_uninit() execution has reset the
+vectors back to the stubs, which is false with pKVM.
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Interestingly, host stage-2 protection is not enabled yet at this point,
+so this use-after-free may go unnoticed for a while. The issue becomes
+more obvious after the finalize_pkvm() call.
+
+Fix this by keeping track of the CPUs on which pKVM is initialized in
+the kvm_hyp_initialized per-cpu variable, and use it from
+teardown_hyp_mode() to skip freeing pages that are in fact used.
+
+Fixes: a770ee80e662 ("KVM: arm64: pkvm: Disable GICv2 support")
+Reported-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+
+This patch depends on Mostafa's recent fix for teardown_hyp_mode():
+
+  https://lore.kernel.org/kvmarm/20250625123058.875179-1-smostafa@google.com/
+---
+ arch/arm64/kvm/arm.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 6bdf79bc5d95..b223d21c063c 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2129,7 +2129,7 @@ static void cpu_hyp_init(void *discard)
+ 
+ static void cpu_hyp_uninit(void *discard)
+ {
+-	if (__this_cpu_read(kvm_hyp_initialized)) {
++	if (!is_protected_kvm_enabled() && __this_cpu_read(kvm_hyp_initialized)) {
+ 		cpu_hyp_reset();
+ 		__this_cpu_write(kvm_hyp_initialized, 0);
+ 	}
+@@ -2345,6 +2345,9 @@ static void __init teardown_hyp_mode(void)
+ 
+ 	free_hyp_pgds();
+ 	for_each_possible_cpu(cpu) {
++		if (per_cpu(kvm_hyp_initialized, cpu))
++			continue;
++
+ 		free_pages(per_cpu(kvm_arm_hyp_stack_base, cpu), NVHE_STACK_SHIFT - PAGE_SHIFT);
+ 
+ 		if (!kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu])
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
