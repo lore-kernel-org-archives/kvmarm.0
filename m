@@ -1,291 +1,155 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CE41D9A70
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 16:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD142F004F
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 20:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750956502; cv=none; b=iaWcNuQPyYmMfRbzImaC9MkOTeFAE0mm4LBSHW+5qIGG08RaoNkK3XsXfw2mg1GR8zOf766CnNxeLzwaxQKW7H56nN194Y+TlyR0cz3WZ7YQpkY/r6uuou4+yxnmSkDpvEwZW36wLVsdEPl+92F8GAKUvUGLHSA7RjhUG6urwoY=
+	t=1750968354; cv=none; b=H0j783nqPOB2LIVtIoMhi8VF59E9WJ2vC5lab/a5LqVfrK9sX+If9yeokDUWdNTjzMKidZyeT0+dO1xcZknPw96m93zuKbhbhnOAW+Qm39K9//FASScl37ZhEGyFQ1x+1V+WQ1YM/mN2xSVGFNc7D2cNhEJGgEaV34a9nsT5sD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750956502; c=relaxed/simple;
-	bh=rXG1VmI52bgOEzfzNKDyC0QwO+1lTdrdIOX5QIbme0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CLg2hHGr0hvVQN2GW40OnJtYdHQKAXTXmNdm0x6RKjQwPf1TMile+r3GOQxtKA4yPY6Ize+42jVvCh8wCQz6/48ICDX5IiaYmjgRCBGNrDwjbh7zGIeONCF/nptBCUH/C370lLhKM2qilg3VMOY+FA5sVljAZM84Nsws8Gf0Qzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D19971758;
-	Thu, 26 Jun 2025 09:48:02 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B45F3F66E;
-	Thu, 26 Jun 2025 09:48:15 -0700 (PDT)
-Date: Thu, 26 Jun 2025 17:48:03 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com,
-	shahuang@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 00/13] arm/arm64: Add kvmtool to the
- runner script
-Message-ID: <aF15wzSHKxYZig3N@raptor>
-References: <20250625154813.27254-1-alexandru.elisei@arm.com>
- <20250626-f9239a18e811ef67ae5a9686@orel>
+	s=arc-20240116; t=1750968354; c=relaxed/simple;
+	bh=Eks9aCTcXYvbdNVmdIGtwvOLNkf6fFcYgMML3qNUFtA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Cmp1GsSzUVftXsXARASpQ4Xc2lEyTC/Hdnpvu/ydi9fa/8kS6pyXa5B6AkErpr+ZcB9u5sFdo574DNY+svFIDzA5rl0282zx66udAkirKhCgFGMBLyAoJUGu1XM54J0Z/X2F+/gCisA/DK7FAuW3chhgvQVu3OY96wTmoHUEsIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PWXmvWEQ; arc=none smtp.client-ip=209.85.166.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PWXmvWEQ"
+Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3ddd03db21cso19202355ab.1
+        for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 13:05:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750968351; x=1751573151; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bfd4g4oyzgO9BbMd8TfR5LoagbwDLdjqmGt8yskowpw=;
+        b=PWXmvWEQeP7nA9yWB2/R0nUp7F3VViRtShm7hgG4RQ94D+NCM80BgxPe5osOBwLm/j
+         VVLGsN3K1NdDe61Fu0SB2jg1lebDydPKLAxeehgziDfAYqbvUbkxrC9HFsg5LfpPn1MK
+         FkVsTuHLPoZE3g3Oi6FPchipUK6UD0lv9pHpxNhDEQ4N8eFe+8JjYm1bB08dTvOn+jAm
+         mzKTXfyCOpsREPu108p97FAwmFe7vzqYO05rFjGAj+jct43Sjn1Oc+8A26OZGyq1QUk6
+         y3r+TmzW9HODqPwoyH/u0tLMytOHwPg0AvEEv07biRZPmZjtyqng7gr2XpxeBVzNWb9P
+         hDSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750968351; x=1751573151;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bfd4g4oyzgO9BbMd8TfR5LoagbwDLdjqmGt8yskowpw=;
+        b=YVI41e3jtCU9fcHVqZvJyydINcwZEZWY8BNLuLF2sGVaSVKRVk+NUP/B3dujwqTWEf
+         Av/HIcihtazlZHkBId66P0cZ1C7h7eZ0Fexqqc0njMRNYSui5kx+l9gMCV5c8S+WNlB2
+         W6YZIYj0xkff5Cy2Cv29t41k++DnfUz7JI48G93RgaySKt9ZaRiRi5pxHjgQcKJRkaVf
+         97t4tUJ62t+pcQo0Bxwyz9/z6XxXRxeOs7krfE8SR11qH8JiFX/UmXC5Z1EYM/aYmwGc
+         ZVfV7dpZoIqkhe2INOn5VZ6YtWrrIRh3Sm/19mNC0RX5iQu7ozywcKxJmqoo9jUPePcK
+         UYpA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpj+8CN/nRIkEuHnN39+Nnc7HInnL70lIoupxKWcAS9fJ/BrO2CuJ/nY6Z2gI48V7ZD6CWcYs=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx8uChEZmvyUD7o1wSLr5HP7MCi6pQiSayF3luaIu7/rnUCIimS
+	Erev5GG4Mjn1FAqNXOfakShrfcFHnreE+Fz2piizz4TLzWr1F+sGBMcbMEC56fgmJXHru+X4KPr
+	kEIkcAHm4qjkkxjLTaknBhr1sBg==
+X-Google-Smtp-Source: AGHT+IG6G2rFRPWkpOW41Pi9fBc/Fkgk+vgjVkKLSP9f2QAlLB5ktW9y9VyZ03BDZAOiaFnbG271ZNfhQM9Y4i+b9Q==
+X-Received: from ilbed13.prod.google.com ([2002:a05:6e02:480d:b0:3dd:a3df:9d57])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6e02:174f:b0:3dd:c04e:49af with SMTP id e9e14a558f8ab-3df4ab4eec8mr12720745ab.3.1750968351198;
+ Thu, 26 Jun 2025 13:05:51 -0700 (PDT)
+Date: Thu, 26 Jun 2025 20:04:36 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250626-f9239a18e811ef67ae5a9686@orel>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250626200459.1153955-1-coltonlewis@google.com>
+Subject: [PATCH v3 00/22] ARM64 PMU Partitioning
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Drew,
+This series creates a new PMU scheme on ARM, a partitioned PMU that
+allows reserving a subset of counters for more direct guest access,
+significantly reducing overhead. More details, including performance
+benchmarks, can be read in the v1 cover letter linked below.
 
-On Thu, Jun 26, 2025 at 06:42:01PM +0200, Andrew Jones wrote:
-> On Wed, Jun 25, 2025 at 04:48:00PM +0100, Alexandru Elisei wrote:
-> > v3 can be found here [1]. Based on top of the series that add qemu_params and
-> > test_args [2].
-> > 
-> > To goal is to allow the user to do:
-> > 
-> > $ ./configure --target=kvmtool
-> > $ make clean && make
-> > $ ./run_tests.sh
-> > 
-> > to run all the tests automatically with kvmtool.
-> > 
-> > Reasons to use kvmtool:
-> > 
-> > * kvmtool is smaller and a lot easier to modify compared to qemu, which
-> > means developers may prefer it when adding or prototyping new features to
-> > KVM, and being able to run all the tests reliably and automatically is very
-> > useful.
-> > 
-> > * kvmtool is faster to run the tests (a couple of times faster on
-> > my rockpro64), making for a quick turnaround. But do keep in mind that not
-> > all tests work on kvmtool because of missing features compared to qemu.
-> > 
-> > * kvmtool does things differently than qemu: different memory layout,
-> > different uart, PMU emulation is disabled by default, etc. This makes it a
-> > good testing vehicule for kvm-unit-tests itself.
-> 
-> Thanks for this Alex! I didn't test it on arm yet, but I did test it on
-> riscv with the quick patch below. It works great.
+v3:
 
-From a glance, the patch looks ok to me.
+* Return to using one kernel command line parameter for reserved host
+  counters, but set the default value meaning no partitioning to -1 so
+  0 isn't ambiguous. Adjust checks for partitioning accordingly.
 
-> 
-> Applied to arm/queue
-> 
-> https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/arm/queue
+* Move the function kvm_pmu_partition_supported() back out of the
+  driver to avoid subbing has_vhe in 32-bit ARM code.
 
-Thanks!
+* Fix the kernel test robot build failures, one with KVM and no PMU,
+  and one with PMU and no KVM.
 
-Alex
+* Scan entire series to remove vestigial changes and update comments.
 
-> 
-> drew
-> 
-> 
-> diff --git a/README.md b/README.md
-> index 723ce04cd978..cbd8a9940ec4 100644
-> --- a/README.md
-> +++ b/README.md
-> @@ -65,8 +65,8 @@ or:
->  
->  to run them all.
->  
-> -All tests can be run using QEMU. On arm and arm64, tests can also be run using
-> -kvmtool.
-> +All tests can be run using QEMU. On arm, arm64, riscv32, and riscv64 tests can
-> +also be run using kvmtool.
->  
->  By default the runner script searches for a suitable QEMU binary in the system.
->  To select a specific QEMU binary though, specify the QEMU=path/to/binary
-> @@ -97,8 +97,7 @@ variable. kvmtool supports only kvm as the accelerator.
->  
->  Check [x86/efi/README.md](./x86/efi/README.md).
->  
-> -On arm and arm64, this is only supported with QEMU; kvmtool cannot run the
-> -tests under UEFI.
-> +This is only supported with QEMU; kvmtool cannot run the tests under UEFI.
->  
->  # Tests configuration file
->  
-> diff --git a/configure b/configure
-> index 470f9d7cdb3b..4a9af4e0af30 100755
-> --- a/configure
-> +++ b/configure
-> @@ -90,7 +90,7 @@ usage() {
->  	                           selects the best value based on the host system and the
->  	                           test configuration.
->  	    --target=TARGET        target platform that the tests will be running on (qemu or
-> -	                           kvmtool, default is qemu) (arm/arm64 only)
-> +	                           kvmtool, default is qemu) (arm/arm64 and riscv32/riscv64 only)
->  	    --cross-prefix=PREFIX  cross compiler prefix
->  	    --cc=CC                c compiler to use ($cc)
->  	    --cflags=FLAGS         extra options to be passed to the c compiler
-> @@ -284,7 +284,8 @@ fi
->  if [ -z "$target" ]; then
->      target="qemu"
->  else
-> -    if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
-> +    if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ] &&
-> +       [ "$arch" != "riscv32" ] && [ "$arch" != "riscv64" ]; then
->          echo "--target is not supported for $arch"
->          usage
->      fi
-> @@ -393,6 +394,10 @@ elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
->      testdir=riscv
->      arch_libdir=riscv
->      : "${uart_early_addr:=0x10000000}"
-> +    if [ "$target" != "qemu" ] && [ "$target" != "kvmtool" ]; then
-> +        echo "--target must be one of 'qemu' or 'kvmtool'!"
-> +        usage
-> +    fi
->  elif [ "$arch" = "s390x" ]; then
->      testdir=s390x
->  else
-> @@ -519,7 +524,8 @@ EFI_DIRECT=$efi_direct
->  CONFIG_WERROR=$werror
->  GEN_SE_HEADER=$gen_se_header
->  EOF
-> -if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-> +if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ] ||
-> +   [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
->      echo "TARGET=$target" >> config.mak
->  fi
->  
-> diff --git a/riscv/efi/run b/riscv/efi/run
-> index 5a72683a6ef5..b9b75440c659 100755
-> --- a/riscv/efi/run
-> +++ b/riscv/efi/run
-> @@ -11,6 +11,12 @@ if [ ! -f config.mak ]; then
->  fi
->  source config.mak
->  source scripts/arch-run.bash
-> +source scripts/vmm.bash
-> +
-> +if [[ $(vmm_get_target) == "kvmtool" ]]; then
-> +	echo "kvmtool does not support EFI tests."
-> +	exit 2
-> +fi
->  
->  if [ -f RISCV_VIRT_CODE.fd ]; then
->  	DEFAULT_UEFI=RISCV_VIRT_CODE.fd
-> diff --git a/riscv/run b/riscv/run
-> index 0f000f0d82c6..3c242923412c 100755
-> --- a/riscv/run
-> +++ b/riscv/run
-> @@ -10,35 +10,75 @@ if [ -z "$KUT_STANDALONE" ]; then
->  	source scripts/vmm.bash
->  fi
->  
-> -# Allow user overrides of some config.mak variables
-> -mach=$MACHINE_OVERRIDE
-> -qemu_cpu=$TARGET_CPU_OVERRIDE
-> -firmware=$FIRMWARE_OVERRIDE
-> -
-> -: "${mach:=virt}"
-> -: "${qemu_cpu:=$TARGET_CPU}"
-> -: "${qemu_cpu:=$DEFAULT_QEMU_CPU}"
-> -: "${firmware:=$FIRMWARE}"
-> -[ "$firmware" ] && firmware="-bios $firmware"
-> -
-> -set_qemu_accelerator || exit $?
-> -[ "$ACCEL" = "kvm" ] && QEMU_ARCH=$HOST
-> -acc="-accel $ACCEL$ACCEL_PROPS"
-> -
-> -qemu=$(search_qemu_binary) || exit $?
-> -if [ "$mach" = 'virt' ] && ! $qemu -machine '?' | grep -q 'RISC-V VirtIO board'; then
-> -	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
-> -	exit 2
-> -fi
-> -mach="-machine $mach"
-> +vmm_check_supported
->  
-> -command="$qemu -nodefaults -nographic -serial mon:stdio"
-> -command+=" $mach $acc $firmware -cpu $qemu_cpu "
-> -command="$(migration_cmd) $(timeout_cmd) $command"
-> +function arch_run_qemu()
-> +{
-> +	# Allow user overrides of some config.mak variables
-> +	mach=$MACHINE_OVERRIDE
-> +	qemu_cpu=$TARGET_CPU_OVERRIDE
-> +	firmware=$FIRMWARE_OVERRIDE
->  
-> -if [ "$UEFI_SHELL_RUN" = "y" ]; then
-> -	ENVIRON_DEFAULT=n run_test_status $command "$@"
-> -else
-> -	# We return the exit code via stdout, not via the QEMU return code
-> -	run_test_status $command -kernel "$@"
-> -fi
-> +	: "${mach:=virt}"
-> +	: "${qemu_cpu:=$TARGET_CPU}"
-> +	: "${qemu_cpu:=$DEFAULT_QEMU_CPU}"
-> +	: "${firmware:=$FIRMWARE}"
-> +	[ "$firmware" ] && firmware="-bios $firmware"
-> +
-> +	set_qemu_accelerator || exit $?
-> +	[ "$ACCEL" = "kvm" ] && QEMU_ARCH=$HOST
-> +	acc="-accel $ACCEL$ACCEL_PROPS"
-> +
-> +	qemu=$(search_qemu_binary) || exit $?
-> +	if [ "$mach" = 'virt' ] && ! $qemu -machine '?' | grep -q 'RISC-V VirtIO board'; then
-> +		echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
-> +		exit 2
-> +	fi
-> +	mach="-machine $mach"
-> +
-> +	command="$qemu -nodefaults -nographic -serial mon:stdio"
-> +	command+=" $mach $acc $firmware -cpu $qemu_cpu "
-> +	command="$(migration_cmd) $(timeout_cmd) $command"
-> +
-> +	if [ "$UEFI_SHELL_RUN" = "y" ]; then
-> +		ENVIRON_DEFAULT=n run_test_status $command "$@"
-> +	else
-> +		# We return the exit code via stdout, not via the QEMU return code
-> +		run_test_status $command -kernel "$@"
-> +	fi
-> +}
-> +
-> +function arch_run_kvmtool()
-> +{
-> +	local command
-> +
-> +	kvmtool=$(search_kvmtool_binary) ||
-> +		exit $?
-> +
-> +	if [ "$ACCEL" ] && [ "$ACCEL" != "kvm" ]; then
-> +		echo "kvmtool does not support $ACCEL" >&2
-> +		exit 2
-> +	fi
-> +
-> +	if ! kvm_available; then
-> +		echo "kvmtool requires KVM but not available on the host" >&2
-> +		exit 2
-> +	fi
-> +
-> +	command="$(timeout_cmd) $kvmtool run"
-> +	if [ "$HOST" = "riscv64" ] && [ "$ARCH" = "riscv32" ]; then
-> +		echo "Cannot run riscv32 on riscv64" >&2
-> +		exit 2
-> +	else
-> +		run_test_status $command --kernel "$@"
-> +	fi
-> +}
-> +
-> +case $(vmm_get_target) in
-> +qemu)
-> +	arch_run_qemu "$@"
-> +	;;
-> +kvmtool)
-> +	arch_run_kvmtool "$@"
-> +	;;
-> +esac
+v2:
+https://lore.kernel.org/kvm/20250620221326.1261128-1-coltonlewis@google.com/
+
+v1:
+https://lore.kernel.org/kvm/20250602192702.2125115-1-coltonlewis@google.com/
+
+Colton Lewis (21):
+  arm64: cpufeature: Add cpucap for HPMN0
+  arm64: Generate sign macro for sysreg Enums
+  KVM: arm64: Define PMI{CNTR,FILTR}_EL0 as undef_access
+  KVM: arm64: Reorganize PMU functions
+  perf: arm_pmuv3: Introduce method to partition the PMU
+  perf: arm_pmuv3: Generalize counter bitmasks
+  perf: arm_pmuv3: Keep out of guest counter partition
+  KVM: arm64: Correct kvm_arm_pmu_get_max_counters()
+  KVM: arm64: Set up FGT for Partitioned PMU
+  KVM: arm64: Writethrough trapped PMEVTYPER register
+  KVM: arm64: Use physical PMSELR for PMXEVTYPER if partitioned
+  KVM: arm64: Writethrough trapped PMOVS register
+  KVM: arm64: Write fast path PMU register handlers
+  KVM: arm64: Setup MDCR_EL2 to handle a partitioned PMU
+  KVM: arm64: Account for partitioning in PMCR_EL0 access
+  KVM: arm64: Context swap Partitioned PMU guest registers
+  KVM: arm64: Enforce PMU event filter at vcpu_load()
+  perf: arm_pmuv3: Handle IRQs for Partitioned PMU guest counters
+  KVM: arm64: Inject recorded guest interrupts
+  KVM: arm64: Add ioctl to partition the PMU when supported
+  KVM: arm64: selftests: Add test case for partitioned PMU
+
+Marc Zyngier (1):
+  KVM: arm64: Cleanup PMU includes
+
+ Documentation/virt/kvm/api.rst                |  21 +
+ arch/arm/include/asm/arm_pmuv3.h              |  38 +
+ arch/arm64/include/asm/arm_pmuv3.h            |  61 +-
+ arch/arm64/include/asm/kvm_host.h             |  18 +-
+ arch/arm64/include/asm/kvm_pmu.h              | 100 +++
+ arch/arm64/kernel/cpufeature.c                |   8 +
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arm.c                          |  22 +
+ arch/arm64/kvm/debug.c                        |  24 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       | 233 ++++++
+ arch/arm64/kvm/pmu-emul.c                     | 674 +----------------
+ arch/arm64/kvm/pmu-part.c                     | 378 ++++++++++
+ arch/arm64/kvm/pmu.c                          | 702 ++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c                     |  79 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/arm64/tools/gen-sysreg.awk               |   1 +
+ arch/arm64/tools/sysreg                       |   6 +-
+ drivers/perf/arm_pmuv3.c                      | 123 ++-
+ include/linux/perf/arm_pmu.h                  |   6 +
+ include/linux/perf/arm_pmuv3.h                |  14 +-
+ include/uapi/linux/kvm.h                      |   4 +
+ tools/include/uapi/linux/kvm.h                |   2 +
+ .../selftests/kvm/arm64/vpmu_counter_access.c |  62 +-
+ virt/kvm/kvm_main.c                           |   1 +
+ 24 files changed, 1828 insertions(+), 752 deletions(-)
+ create mode 100644 arch/arm64/kvm/pmu-part.c
+
+
+base-commit: 79150772457f4d45e38b842d786240c36bb1f97f
+--
+2.50.0.727.gbf7dc18ff4-goog
