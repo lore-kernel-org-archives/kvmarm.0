@@ -1,57 +1,57 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5905E1494D8
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 00:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F356B17A317
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 00:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750896755; cv=none; b=RYmuq1Y9ZnEzANuDlclmx8Qoq0K1U8IcRuJrvcI4OKfTdFmLVWTf6LGDJOTW4YfvlG2vwngvr52Kn3tuQna5otZypLCvGFm9CshETY2I/C70kjztm6TrOhd1rFIvWTM9nLRf2xqcKeIJrkrv+FQSCWdnVCfBLYJ2zXtom2UhIl8=
+	t=1750896757; cv=none; b=TkEjUAQChVMXXUhUJYdga9rga7rfF46vfZ/WAPoETOwQbSpzWyTOo1Xtbwdx49IlvAu359ugXCjgscTknT8qREgKwjBCW93x9c3CxGSbSINdDt3rkU8+5N9JVsRAdm3b2tqmqBD5wKzv8dhDAYJ+B00O4gNJpYCaQJr9uuwzqcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750896755; c=relaxed/simple;
-	bh=64rymz2Kz4S/Z4aZF2H6eAnIafN/041V9v/2O/McSuM=;
+	s=arc-20240116; t=1750896757; c=relaxed/simple;
+	bh=S8YepjEcxw5aH+WyUJggwrBoMjNRQccpLKuukAOR0KI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oYO/X07WLZKlQGP1c+Z/GDB9GOXX3ECzb0pBOoZ5X5+ahSZUcPtZk+d6Zer8sNTJ39/fzjGiLnBXaTKo9X2c5NvSSc4JpaC0yO8xXGYJY6KrqviH9iJGbtwqVWdMsZDagsk12ZtAllexi81XQ802WWmbmXvUh3SMVIN4SjuAvt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GQHvngGd; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=AyT0JPGuIV8n1OBVa3/0SWC7rVDOjFQdDxO40VyLOkTq7JeTo0/k+AKVnu52y1fzM7zCEO5/LWfiT8U4oosq1GZpcK8NjJL40EPyW7GW8ZPlkkR66QW68JMpm87Kow4mKjdA4/BZ3EAwjmulsuXAA6g9VOPbu8PKcGB1yCesAwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CF1Fbi5z; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GQHvngGd"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2358de17665so3695855ad.3
-        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 17:12:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CF1Fbi5z"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313d346dc8dso363295a91.1
+        for <kvmarm@lists.linux.dev>; Wed, 25 Jun 2025 17:12:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750896753; x=1751501553; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750896755; x=1751501555; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=7jYV3TYqsZyydz0IjaYFSoLu2pCs+jwctwQKh0JY6aA=;
-        b=GQHvngGdzfFtaGQrgV7kxcqgAwvoI7lfiz9f9Zcl9JKiPtLYnsOfx/PN821TG2vr+i
-         AJ86TJhRBY9ovhedeMhmG1sJUYBOZVU7Jfwz/lzj0rqImimTEvjwd4MJI+NeqNVQbxO+
-         WQjLgt10MICEtWw97M7wNuJ0c4iF1vWhw10ijay6pMZXDxR3fx575y2JKebsW7//Vqa4
-         v++EM5YET1NamGXTtfj5Af2F4cWZ3+xDf9S+rND5wGfDAEkGaX5Mx0TztolK1TS3Z1uv
-         pb3RpyRKm2I2t3NdCPxoE9xov/bswQxKqpCP0T5nYuR5+AcOj7D+wev3YdRC5wG9oooy
-         QlgQ==
+        bh=yHMfQhJxDmXXWypElOJUlq66wLvvI9/lh/NpqNUW0Yc=;
+        b=CF1Fbi5zwrdqVIpMSuo81ecE1VwpS+K+A6fOGsZ4Zv7dJdB2CVjG4TmAvywvduCQZv
+         XV4iIHRr/c5bTVvg0AYlvffDGFN8kWiWhxJmZlS7XM/h5a8xEkmBkcGIzFqStEJmnx65
+         VFhLRNhCj3aBCfd/IF8LK8ln55IGXYTU2KGSFI9lOVfn4keo7tvlpBSTW1ryXYVLLNUR
+         zagNfp2XJNtOOwDEhHsYmxvLlPzeCH9h+QhM9BGCwr1Q47ckX/uxyHT01r+ixb5qrdXD
+         Hb5JT7EdkAA2fsoxgVHHp3mm+v16w+Ft3yYMqv+ibPay9Yg4MeIYexG04InzT0po4rhe
+         bl5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750896753; x=1751501553;
+        d=1e100.net; s=20230601; t=1750896755; x=1751501555;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7jYV3TYqsZyydz0IjaYFSoLu2pCs+jwctwQKh0JY6aA=;
-        b=GvyR9uiCazn1fA0NjfOS2LSXWPXu2WtVWece8pS6/mRysjI5GofdNm8vR9xb3sCy37
-         KqEr/oAfpLJtNmKSj6w+IiUzE8QgFyi43i7fzFPydglM6heMSIJJMOwsb89NnhPrvEuY
-         Xbh/SVCreC5w9BgNfyL9ZKdWMNb5BdGKJboEp+ZZoXgs9o41ZUoJfACDYqQuFWI9mcn0
-         pFyHhPDT6KKbW/URSRqsfASg8GlxUQnjvJrgbepkXRZxUajMhvA+k5It/hqFf0OhoYCW
-         8XODNifqY/bs1Z8xA30wWb7nM8fexQfbqWNaX4UzNxPlJpPCsLvQGHAsymgHEvhvNl3d
-         vdeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWsW8/1vQaxxXVmetX6l9fsmOrGZAbvEsX0XVUP+jbfbRcwyxM/+044Qsd89CHZbFpdbSV0piw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx6lOKLYfg4g9iEkLNUyjn3T6gMuiav2Krn7dFtPZ3neBYjcUgt
-	oankCB087yZlMs2Cy4S2K/Yx0F6Mb3D8oa76h504BZ28NVqSUsyUJBzvR2RL46lIAfZAUhWxgYK
-	2xFPz2Q==
-X-Google-Smtp-Source: AGHT+IEokWeu3xZE8pF2I2mOTnRiQq8sbkVZWMeUSzDfllmerKjnZZu1jBEaneetis5nr35QOidy+TLEhOA=
-X-Received: from pjbta6.prod.google.com ([2002:a17:90b:4ec6:b0:312:e5dd:9248])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2f10:b0:223:f9a4:3f99
- with SMTP id d9443c01a7336-23824044733mr89766355ad.29.1750896753599; Wed, 25
- Jun 2025 17:12:33 -0700 (PDT)
+        bh=yHMfQhJxDmXXWypElOJUlq66wLvvI9/lh/NpqNUW0Yc=;
+        b=fLRRN86Nw5rn5azhtX4440LvLd5G5vFKu5/X/jihbepK+pcvnlX9a4M4DJ+nk/If4+
+         Td3bYhr+d9ZAHyrCGcIN1cw93anPoBxg6ettGSz4IDxx951mUZbxuxvmih3jqe57FqOV
+         uqzTP7agp/dCs3TjrIrEoo25++LuHSpAxd7CrppnjX0busmKGN+IPV0swyc4lJFlVh0v
+         /BOaGUg6cztg7QVDlrSHzvpONqulLhcMtemRKCZf+36xyasKRYx9nly4/HgSotLiARcF
+         MujN1D1EmMPPYdngqXQXimFYek7d3wAw2EFt4hcuvu/F0s7DGSy6ZH/MeYqnImvrZeGM
+         xY6g==
+X-Forwarded-Encrypted: i=1; AJvYcCWhhbwsZ9nwLZrgAh8IF8qqA0nBBzmb7YtmhJRX9V6lFvjpDOXC3WQwX0we2ExG+5zio0wbyi0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz4NETUTeE2WDE13NRbTOugIHiL8N5zlnlT5KjaDDWHy4MNqrhs
+	iJYDYTMnOOb4GM/T2iQh1Ibf/Afjkg2LelzJpSdOpFHemZwGFDF7Jrgg2TbQOwh4YPHN67U/IvG
+	Xxbh4sw==
+X-Google-Smtp-Source: AGHT+IFowPBB2GQmhp5GlgAqt6FlhUMcLhBMaNbsbDieOoJyK6IVevkDm0adw8K1pYlNDs+iSlSqacu2PHU=
+X-Received: from pjbnd12.prod.google.com ([2002:a17:90b:4ccc:b0:2e0:915d:d594])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:350e:b0:312:f54e:ba28
+ with SMTP id 98e67ed59e1d1-315f2689fa0mr7190023a91.24.1750896755366; Wed, 25
+ Jun 2025 17:12:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 25 Jun 2025 17:12:23 -0700
+Date: Wed, 25 Jun 2025 17:12:24 -0700
 In-Reply-To: <20250626001225.744268-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250626001225.744268-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250626001225.744268-4-seanjc@google.com>
-Subject: [PATCH v5 3/5] KVM: selftests: Expand set of APIs for pinning tasks
- to a single CPU
+Message-ID: <20250626001225.744268-5-seanjc@google.com>
+Subject: [PATCH v5 4/5] KVM: selftests: Test behavior of KVM_X86_DISABLE_EXITS_APERFMPERF
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
@@ -72,117 +71,256 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Expand kvm_pin_this_task_to_pcpu() into a set of APIs to allow pinning a
-task (or self) to a CPU (any or specific).  This will allow deduplicating
-code throughout a variety of selftests.
+From: Jim Mattson <jmattson@google.com>
 
-Opportunistically use "self" instead of "this_task" as it is both more
-concise and less ambiguous.
+For a VCPU thread pinned to a single LPU, verify that interleaved host
+and guest reads of IA32_[AM]PERF return strictly increasing values when
+APERFMPERF exiting is disabled.
 
+Run the test in both L1 and L2 to verify that KVM passes through the
+APERF and MPERF MSRs when L1 doesn't want to intercept them (or any MSRs).
+
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Link: https://lore.kernel.org/r/20250530185239.2335185-4-jmattson@google.com
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  | 31 ++++++++++++++++++-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 15 +++++----
- tools/testing/selftests/kvm/lib/memstress.c   |  2 +-
- 3 files changed, 38 insertions(+), 10 deletions(-)
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/aperfmperf_test.c       | 213 ++++++++++++++++++
+ 2 files changed, 214 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86/aperfmperf_test.c
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 91908d4a6edf..23a506d7eca3 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -21,6 +21,8 @@
- #include <sys/eventfd.h>
- #include <sys/ioctl.h>
- 
-+#include <pthread.h>
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 028456f1aae1..40920445bfbe 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -135,6 +135,7 @@ TEST_GEN_PROGS_x86 += x86/amx_test
+ TEST_GEN_PROGS_x86 += x86/max_vcpuid_cap_test
+ TEST_GEN_PROGS_x86 += x86/triple_fault_event_test
+ TEST_GEN_PROGS_x86 += x86/recalc_apic_map_test
++TEST_GEN_PROGS_x86 += x86/aperfmperf_test
+ TEST_GEN_PROGS_x86 += access_tracking_perf_test
+ TEST_GEN_PROGS_x86 += coalesced_io_test
+ TEST_GEN_PROGS_x86 += dirty_log_perf_test
+diff --git a/tools/testing/selftests/kvm/x86/aperfmperf_test.c b/tools/testing/selftests/kvm/x86/aperfmperf_test.c
+new file mode 100644
+index 000000000000..8b15a13df939
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86/aperfmperf_test.c
+@@ -0,0 +1,213 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Test for KVM_X86_DISABLE_EXITS_APERFMPERF
++ *
++ * Copyright (C) 2025, Google LLC.
++ *
++ * Test the ability to disable VM-exits for rdmsr of IA32_APERF and
++ * IA32_MPERF. When these VM-exits are disabled, reads of these MSRs
++ * return the host's values.
++ *
++ * Note: Requires read access to /dev/cpu/<lpu>/msr to read host MSRs.
++ */
 +
- #include "kvm_util_arch.h"
- #include "kvm_util_types.h"
- #include "sparsebit.h"
-@@ -1054,7 +1056,34 @@ struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm);
- 
- void kvm_set_files_rlimit(uint32_t nr_vcpus);
- 
--void kvm_pin_this_task_to_pcpu(uint32_t pcpu);
-+int __pin_task_to_cpu(pthread_t task, int cpu);
++#include <fcntl.h>
++#include <limits.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdint.h>
++#include <unistd.h>
++#include <asm/msr-index.h>
 +
-+static inline void pin_task_to_cpu(pthread_t task, int cpu)
++#include "kvm_util.h"
++#include "processor.h"
++#include "svm_util.h"
++#include "test_util.h"
++#include "vmx.h"
++
++#define NUM_ITERATIONS 10000
++
++static int open_dev_msr(int cpu)
 +{
-+	int r;
++	char path[PATH_MAX];
 +
-+	r = __pin_task_to_cpu(task, cpu);
-+	TEST_ASSERT(!r, "Failed to set thread affinity to pCPU '%u'", cpu);
++	snprintf(path, sizeof(path), "/dev/cpu/%d/msr", cpu);
++	return open_path_or_exit(path, O_RDONLY);
 +}
 +
-+static inline int pin_task_to_any_cpu(pthread_t task)
++static uint64_t read_dev_msr(int msr_fd, uint32_t msr)
 +{
-+	int cpu = sched_getcpu();
++	uint64_t data;
++	ssize_t rc;
 +
-+	pin_task_to_cpu(task, cpu);
-+	return cpu;
++	rc = pread(msr_fd, &data, sizeof(data), msr);
++	TEST_ASSERT(rc == sizeof(data), "Read of MSR 0x%x failed", msr);
++
++	return data;
 +}
 +
-+static inline void pin_self_to_cpu(int cpu)
++static void guest_read_aperf_mperf(void)
 +{
-+	pin_task_to_cpu(pthread_self(), cpu);
++	int i;
++
++	for (i = 0; i < NUM_ITERATIONS; i++)
++		GUEST_SYNC2(rdmsr(MSR_IA32_APERF), rdmsr(MSR_IA32_MPERF));
 +}
 +
-+static inline int pin_self_to_any_cpu(void)
++#define L2_GUEST_STACK_SIZE	64
++
++static void l2_guest_code(void)
 +{
-+	return pin_task_to_any_cpu(pthread_self());
++	guest_read_aperf_mperf();
++	GUEST_DONE();
 +}
 +
- void kvm_print_vcpu_pinning_help(void);
- void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
- 			    int nr_vcpus);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 90f90f1c194f..c3f5142b0a54 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -620,15 +620,14 @@ struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm)
- 	return vm_vcpu_recreate(vm, 0);
- }
- 
--void kvm_pin_this_task_to_pcpu(uint32_t pcpu)
-+int __pin_task_to_cpu(pthread_t task, int cpu)
- {
--	cpu_set_t mask;
--	int r;
-+	cpu_set_t cpuset;
- 
--	CPU_ZERO(&mask);
--	CPU_SET(pcpu, &mask);
--	r = sched_setaffinity(0, sizeof(mask), &mask);
--	TEST_ASSERT(!r, "sched_setaffinity() failed for pCPU '%u'.", pcpu);
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(cpu, &cpuset);
++static void l1_svm_code(struct svm_test_data *svm)
++{
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	struct vmcb *vmcb = svm->vmcb;
 +
-+	return pthread_setaffinity_np(task, sizeof(cpuset), &cpuset);
- }
- 
- static uint32_t parse_pcpu(const char *cpu_str, const cpu_set_t *allowed_mask)
-@@ -682,7 +681,7 @@ void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
- 
- 	/* 2. Check if the main worker needs to be pinned. */
- 	if (cpu) {
--		kvm_pin_this_task_to_pcpu(parse_pcpu(cpu, &allowed_mask));
-+		pin_self_to_cpu(parse_pcpu(cpu, &allowed_mask));
- 		cpu = strtok(NULL, delim);
- 	}
- 
-diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/selftests/kvm/lib/memstress.c
-index 313277486a1d..557c0a0a5658 100644
---- a/tools/testing/selftests/kvm/lib/memstress.c
-+++ b/tools/testing/selftests/kvm/lib/memstress.c
-@@ -265,7 +265,7 @@ static void *vcpu_thread_main(void *data)
- 	int vcpu_idx = vcpu->vcpu_idx;
- 
- 	if (memstress_args.pin_vcpus)
--		kvm_pin_this_task_to_pcpu(memstress_args.vcpu_to_pcpu[vcpu_idx]);
-+		pin_self_to_cpu(memstress_args.vcpu_to_pcpu[vcpu_idx]);
- 
- 	WRITE_ONCE(vcpu->running, true);
- 
++	generic_svm_setup(svm, l2_guest_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++	run_guest(vmcb, svm->vmcb_gpa);
++}
++
++static void l1_vmx_code(struct vmx_pages *vmx)
++{
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++
++	GUEST_ASSERT_EQ(prepare_for_vmx_operation(vmx), true);
++	GUEST_ASSERT_EQ(load_vmcs(vmx), true);
++
++	prepare_vmcs(vmx, NULL, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++	/*
++	 * Enable MSR bitmaps (the bitmap itself is allocated, zeroed, and set
++	 * in the VMCS by prepare_vmcs()), as MSR exiting mandatory on Intel.
++	 */
++	vmwrite(CPU_BASED_VM_EXEC_CONTROL,
++		vmreadz(CPU_BASED_VM_EXEC_CONTROL) | CPU_BASED_USE_MSR_BITMAPS);
++
++	GUEST_ASSERT(!vmwrite(GUEST_RIP, (u64)l2_guest_code));
++	GUEST_ASSERT(!vmlaunch());
++}
++
++static void guest_code(void *nested_test_data)
++{
++	guest_read_aperf_mperf();
++
++	if (this_cpu_has(X86_FEATURE_SVM))
++		l1_svm_code(nested_test_data);
++	else if (this_cpu_has(X86_FEATURE_VMX))
++		l1_vmx_code(nested_test_data);
++	else
++		GUEST_DONE();
++
++	TEST_FAIL("L2 should have signaled 'done'");
++}
++
++static void guest_no_aperfmperf(void)
++{
++	uint64_t msr_val;
++	uint8_t vector;
++
++	vector = rdmsr_safe(MSR_IA32_APERF, &msr_val);
++	GUEST_ASSERT(vector == GP_VECTOR);
++
++	vector = rdmsr_safe(MSR_IA32_APERF, &msr_val);
++	GUEST_ASSERT(vector == GP_VECTOR);
++
++	GUEST_DONE();
++}
++
++int main(int argc, char *argv[])
++{
++	const bool has_nested = kvm_cpu_has(X86_FEATURE_SVM) || kvm_cpu_has(X86_FEATURE_VMX);
++	uint64_t host_aperf_before, host_mperf_before;
++	vm_vaddr_t nested_test_data_gva;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	int msr_fd, cpu, i;
++
++	/* Sanity check that APERF/MPERF are unsupported by default. */
++	vm = vm_create_with_one_vcpu(&vcpu, guest_no_aperfmperf);
++	vcpu_run(vcpu);
++	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++	kvm_vm_free(vm);
++
++	cpu = pin_self_to_any_cpu();
++
++	msr_fd = open_dev_msr(cpu);
++
++	/*
++	 * This test requires a non-standard VM initialization, because
++	 * KVM_ENABLE_CAP cannot be used on a VM file descriptor after
++	 * a VCPU has been created.
++	 */
++	vm = vm_create(1);
++
++	TEST_REQUIRE(vm_check_cap(vm, KVM_CAP_X86_DISABLE_EXITS) &
++		     KVM_X86_DISABLE_EXITS_APERFMPERF);
++
++	vm_enable_cap(vm, KVM_CAP_X86_DISABLE_EXITS,
++		      KVM_X86_DISABLE_EXITS_APERFMPERF);
++
++	vcpu = vm_vcpu_add(vm, 0, guest_code);
++
++	if (!has_nested)
++		nested_test_data_gva = NONCANONICAL;
++	else if (kvm_cpu_has(X86_FEATURE_SVM))
++		vcpu_alloc_svm(vm, &nested_test_data_gva);
++	else
++		vcpu_alloc_vmx(vm, &nested_test_data_gva);
++
++	vcpu_args_set(vcpu, 1, nested_test_data_gva);
++
++	host_aperf_before = read_dev_msr(msr_fd, MSR_IA32_APERF);
++	host_mperf_before = read_dev_msr(msr_fd, MSR_IA32_MPERF);
++
++	for (i = 0; i <= NUM_ITERATIONS * (1 + has_nested); i++) {
++		uint64_t host_aperf_after, host_mperf_after;
++		uint64_t guest_aperf, guest_mperf;
++		struct ucall uc;
++
++		vcpu_run(vcpu);
++		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_DONE:
++			goto done;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++		case UCALL_SYNC:
++			guest_aperf = uc.args[0];
++			guest_mperf = uc.args[1];
++
++			host_aperf_after = read_dev_msr(msr_fd, MSR_IA32_APERF);
++			host_mperf_after = read_dev_msr(msr_fd, MSR_IA32_MPERF);
++
++			TEST_ASSERT(host_aperf_before < guest_aperf,
++				    "APERF: host_before (0x%" PRIx64 ") >= guest (0x%" PRIx64 ")",
++				    host_aperf_before, guest_aperf);
++			TEST_ASSERT(guest_aperf < host_aperf_after,
++				    "APERF: guest (0x%" PRIx64 ") >= host_after (0x%" PRIx64 ")",
++				    guest_aperf, host_aperf_after);
++			TEST_ASSERT(host_mperf_before < guest_mperf,
++				    "MPERF: host_before (0x%" PRIx64 ") >= guest (0x%" PRIx64 ")",
++				    host_mperf_before, guest_mperf);
++			TEST_ASSERT(guest_mperf < host_mperf_after,
++				    "MPERF: guest (0x%" PRIx64 ") >= host_after (0x%" PRIx64 ")",
++				    guest_mperf, host_mperf_after);
++
++			host_aperf_before = host_aperf_after;
++			host_mperf_before = host_mperf_after;
++
++			break;
++		}
++	}
++	TEST_FAIL("Didn't receive UCALL_DONE\n");
++done:
++	kvm_vm_free(vm);
++	close(msr_fd);
++
++	return 0;
++}
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
