@@ -1,31 +1,31 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006D735975
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 15:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FF82E92D9
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 15:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750951773; cv=none; b=B51CabclAa+SxvzOXajXm5NV2gn+iq/O97daeaz9KB/pLgMkGM3DLV0jtU1NmGj7uqU3IKLl77bYIObz7faQbtQC39Ju261nJtNGIa487/WK/gZv7p1boB+7gAEf3Z6DFBZh9LyTM3v9fKChZKDZR72FNoYHNt+FqZ59KWuiYF8=
+	t=1750952054; cv=none; b=HLvRR3MRGLZlIu26u6z6Q5Hw8cjNtG5l4wlZptkEgZbqjXzToDt4yp3/xQPYuxdo6jZe2GYz+MJ3Da/9BNs3nvDZAX5u5sEDdEiHyfoYkQ3Hgit036E6YVdUVmPonCkGSwyjxKqKl0dbcBwDyEDnZ2cfoxy8d8GtPxo30yM2f1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750951773; c=relaxed/simple;
-	bh=PlhIbg0CrqBxUdRfXHwXe7RPphROJFXda3eZtMsfFrY=;
+	s=arc-20240116; t=1750952054; c=relaxed/simple;
+	bh=TVKzSZRjlY5EYqP0AReu/maVg9DLheRgLATIJiDAUWA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ficgHDFtGvUWj8XYGQUaK1jS3t74wNoHlpkP75ce7uaArxejK6ivQV0i5Y3LX7Wy93kYO13QqMapqt/rShxiEFLyfNbfXKTdC1XCruvljJcKr6dY+ogwaZ1c6LYYkZwtedRa0qgciFJjJKIuo4NW2fcx64oHQk6/clkNV5//C8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U45XfFqA; arc=none smtp.client-ip=95.215.58.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=rgTHet2MRbfuQLaayjjq24QObDmsf6DHMqrk91Lox25ptcnL5PXg25QiAMD1Q1nN+jJHljRgYzl+U3BhkEh/24Lc4k5hR7/jHUgsahq7uLR7ZFNeViQW+Dx5E2O7o9OdwQYeSRh47mpZLIxwlQgRGwhEXAzu+lYMOPG4Ao3meFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VbAk0zVY; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U45XfFqA"
-Date: Thu, 26 Jun 2025 17:29:21 +0200
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VbAk0zVY"
+Date: Thu, 26 Jun 2025 17:34:05 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750951769;
+	t=1750952049;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=B7njsQqS9+YDhVOAJu3gcu6bWM9s+UemRcmSG7r3Qvs=;
-	b=U45XfFqA2ERqttsJj+PAHPpQC2ZDqBxFOMZkRVL0AKADe70nTLxOPuIU65WzUbbUkfsd+b
-	5F4Vl+NzEJJXuyUPzkvbfiUTJcyprTFO9NS8GCkwKwzbJoV8XZN2iwQViQVZoVEXuKzyna
-	Yg50+iFSUL3/OH0CegRsxadieDifpF4=
+	bh=MTzNaxET0ChI04GPtqPBTqvxpAjkYbCN9vCfFYsRF38=;
+	b=VbAk0zVY3LpVMPdjT1q9dlT77cCaKVIQfwS+uoJPiRLBafmsyB2B1R08LAelYTxPDUkXf7
+	aTDYMyOKol3oE7o8dx41P4mNEt1G45xZFYhNxQwHmo17JA3igEXvGaxKvBnRBgIQW62Av8
+	/NfH0hk9/ARpm/tHc9wIWCUNV6u6hzI=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
@@ -36,11 +36,11 @@ Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
 	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
 	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
 	andre.przywara@arm.com, shahuang@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 04/13] scripts: Use an associative
- array for qemu argument names
-Message-ID: <20250626-5cba2905b81b7a5b3a016bfa@orel>
+Subject: Re: [kvm-unit-tests PATCH v4 05/13] scripts: Add 'kvmtool_params' to
+ test definition
+Message-ID: <20250626-536c0af00aa655d6e647df44@orel>
 References: <20250625154813.27254-1-alexandru.elisei@arm.com>
- <20250625154813.27254-5-alexandru.elisei@arm.com>
+ <20250625154813.27254-6-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,121 +49,308 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250625154813.27254-5-alexandru.elisei@arm.com>
+In-Reply-To: <20250625154813.27254-6-alexandru.elisei@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 25, 2025 at 04:48:04PM +0100, Alexandru Elisei wrote:
-> Move away from hardcoded qemu arguments and use instead an associative
-> array to get the needed arguments. This paves the way for adding kvmtool
-> support to the scripts, which has a different syntax for the same VM
-> configuration parameters.
+On Wed, Jun 25, 2025 at 04:48:05PM +0100, Alexandru Elisei wrote:
+> arm/arm64 supports running tests under kvmtool, but kvmtool's syntax for
+> running and configuring a virtual machine is different to qemu. To run
+> tests using the automated test infrastructure, add a new test parameter,
+> 'kvmtool_params'. The parameter serves the exact purpose as 'qemu_params',
+> but using kvmtool's syntax.
 > 
-> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
 > 
 > Changes v3->v4:
 > 
-> * Renamed vmm_opts to vmm_optname.
-> * Dropped entries for 'kernel' and 'initrd' in vmm_optname because they weren't
-> used in this patch.
-> * Use vmm_optname_nr_cpus() and vmm_optname_args() instead of directly indexing
-> into vmm_optname.
-> * Dropped the check for empty $test_args in scripts/runtime.bash::run() by
-> having $test_args already contain --append if not empty in
-> scripts/common.bash::for_each_unittest().
+> * Added params_name in scripts/common.bash::for_each_unittest() to avoid
+> checking for $TARGET when deciding to parse kvmtool_params or
+> {qemu,extra}_params.
+> * Dropped factoring out parse_opts() in for_each_unittest().
 > 
->  scripts/common.bash  | 11 ++++++++---
->  scripts/runtime.bash |  7 +------
->  scripts/vmm.bash     | 15 +++++++++++++++
->  3 files changed, 24 insertions(+), 9 deletions(-)
+>  arm/unittests.cfg   | 24 ++++++++++++++++++++++++
+>  docs/unittests.txt  |  8 ++++++++
+>  scripts/common.bash | 11 +++++++----
+>  scripts/vmm.bash    | 16 ++++++++++++++++
+>  4 files changed, 55 insertions(+), 4 deletions(-)
 > 
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 384af983cd88..343c14567f27 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -17,6 +17,7 @@ file = selftest.flat
+>  smp = 2
+>  test_args = 'setup smp=2 mem=256'
+>  qemu_params = -m 256
+> +kvmtool_params = --mem 256
+>  groups = selftest
+>  
+>  # Test vector setup and exception handling (kernel mode).
+> @@ -48,66 +49,77 @@ groups = pci
+>  file = pmu.flat
+>  groups = pmu
+>  test_args = "cycle-counter 0"
+> +kvmtool_params = --pmu
+>  
+>  [pmu-event-introspection]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-event-introspection
+> +kvmtool_params = --pmu
+>  
+>  [pmu-event-counter-config]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-event-counter-config
+> +kvmtool_params = --pmu
+>  
+>  [pmu-basic-event-count]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-basic-event-count
+> +kvmtool_params = --pmu
+>  
+>  [pmu-mem-access]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-mem-access
+> +kvmtool_params = --pmu
+>  
+>  [pmu-mem-access-reliability]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-mem-access-reliability
+> +kvmtool_params = --pmu
+>  
+>  [pmu-sw-incr]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-sw-incr
+> +kvmtool_params = --pmu
+>  
+>  [pmu-chained-counters]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-chained-counters
+> +kvmtool_params = --pmu
+>  
+>  [pmu-chained-sw-incr]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-chained-sw-incr
+> +kvmtool_params = --pmu
+>  
+>  [pmu-chain-promotion]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-chain-promotion
+> +kvmtool_params = --pmu
+>  
+>  [pmu-overflow-interrupt]
+>  file = pmu.flat
+>  groups = pmu
+>  arch = arm64
+>  test_args = pmu-overflow-interrupt
+> +kvmtool_params = --pmu
+>  
+>  # Test PMU support (TCG) with -icount IPC=1
+>  #[pmu-tcg-icount-1]
+> @@ -131,6 +143,7 @@ file = gic.flat
+>  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+>  test_args = ipi
+>  qemu_params = -machine gic-version=2
+> +kvmtool_params = --irqchip=gicv2
+>  groups = gic
+>  
+>  [gicv2-mmio]
+> @@ -138,6 +151,7 @@ file = gic.flat
+>  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+>  test_args = mmio
+>  qemu_params = -machine gic-version=2
+> +kvmtool_params = --irqchip=gicv2
+>  groups = gic
+>  
+>  [gicv2-mmio-up]
+> @@ -145,6 +159,7 @@ file = gic.flat
+>  smp = 1
+>  test_args = mmio
+>  qemu_params = -machine gic-version=2
+> +kvmtool_params = --irqchip=gicv2
+>  groups = gic
+>  
+>  [gicv2-mmio-3p]
+> @@ -152,6 +167,7 @@ file = gic.flat
+>  smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
+>  test_args = mmio
+>  qemu_params = -machine gic-version=2
+> +kvmtool_params = --irqchip=gicv2
+>  groups = gic
+>  
+>  [gicv3-ipi]
+> @@ -159,6 +175,7 @@ file = gic.flat
+>  smp = $MAX_SMP
+>  test_args = ipi
+>  qemu_params = -machine gic-version=3
+> +kvmtool_params = --irqchip=gicv3
+>  groups = gic
+>  
+>  [gicv2-active]
+> @@ -166,6 +183,7 @@ file = gic.flat
+>  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+>  test_args = active
+>  qemu_params = -machine gic-version=2
+> +kvmtool_params = --irqchip=gicv2
+>  groups = gic
+>  
+>  [gicv3-active]
+> @@ -173,6 +191,7 @@ file = gic.flat
+>  smp = $MAX_SMP
+>  test_args = active
+>  qemu_params = -machine gic-version=3
+> +kvmtool_params = --irqchip=gicv3
+>  groups = gic
+>  
+>  [its-introspection]
+> @@ -180,6 +199,7 @@ file = gic.flat
+>  smp = $MAX_SMP
+>  test_args = its-introspection
+>  qemu_params = -machine gic-version=3
+> +kvmtool_params = --irqchip=gicv3-its
+>  groups = its
+>  arch = arm64
+>  
+> @@ -188,6 +208,7 @@ file = gic.flat
+>  smp = $MAX_SMP
+>  test_args = its-trigger
+>  qemu_params = -machine gic-version=3
+> +kvmtool_params = --irqchip=gicv3-its
+>  groups = its
+>  arch = arm64
+>  
+> @@ -196,6 +217,7 @@ file = gic.flat
+>  smp = $MAX_SMP
+>  test_args = its-migration
+>  qemu_params = -machine gic-version=3
+> +kvmtool_params = --irqchip=gicv3
+>  groups = its migration
+>  arch = arm64
+>  
+> @@ -204,6 +226,7 @@ file = gic.flat
+>  smp = $MAX_SMP
+>  test_args = its-pending-migration
+>  qemu_params = -machine gic-version=3
+> +kvmtool_params = --irqchip=gicv3
+>  groups = its migration
+>  arch = arm64
+>  
+> @@ -212,6 +235,7 @@ file = gic.flat
+>  smp = $MAX_SMP
+>  test_args = its-migrate-unmapped-collection
+>  qemu_params = -machine gic-version=3
+> +kvmtool_params = --irqchip=gicv3
+>  groups = its migration
+>  arch = arm64
+>  
+> diff --git a/docs/unittests.txt b/docs/unittests.txt
+> index ea0da959f008..a9164bccc24c 100644
+> --- a/docs/unittests.txt
+> +++ b/docs/unittests.txt
+> @@ -78,6 +78,14 @@ extra_params
+>  Alias for 'qemu_params', supported for compatibility purposes. Use
+>  'qemu_params' for new tests.
+>  
+> +kvmtool_params
+> +--------------
+> +Extra parameters supplied to the kvmtool process. Works similarly to
+> +'qemu_params', but uses kvmtool's syntax for command line arguments. The
+> +example for 'qemu_params', applied to kvmtool, would be:
+> +
+> +kvmtool_params = --mem 256
+> +
+>  groups
+>  ------
+>  groups = <group_name1> <group_name2> ...
 > diff --git a/scripts/common.bash b/scripts/common.bash
-> index 9deb87d4050d..ae127bd4e208 100644
+> index ae127bd4e208..7c1b89f1b3c2 100644
 > --- a/scripts/common.bash
 > +++ b/scripts/common.bash
-> @@ -1,4 +1,5 @@
->  source config.mak
-> +source scripts/vmm.bash
+> @@ -18,6 +18,9 @@ function for_each_unittest()
+>  	local timeout
+>  	local rematch
 >  
->  function for_each_unittest()
->  {
-> @@ -26,8 +27,12 @@ function for_each_unittest()
->  				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$test_args" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
->  			fi
->  			testname=$rematch
-> -			smp=1
-> +			smp="$(vmm_optname_nr_cpus) 1"
->  			kernel=""
-> +			# Intentionally don't use -append if test_args is empty
-> +			# because qemu interprets the first word after
-> +			# -append as a kernel parameter instead of a command
-> +			# line option.
->  			test_args=""
->  			opts=""
->  			groups=""
-> @@ -39,9 +44,9 @@ function for_each_unittest()
->  		elif [[ $line =~ ^file\ *=\ *(.*)$ ]]; then
->  			kernel=$TEST_DIR/${BASH_REMATCH[1]}
->  		elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
-> -			smp=${BASH_REMATCH[1]}
-> +			smp="$(vmm_optname_nr_cpus) ${BASH_REMATCH[1]}"
+> +	# shellcheck disable=SC2155
+> +	local params_name=$(vmm_unittest_params_name)
+> +
+>  	exec {fd}<"$unittests"
+>  
+>  	while read -r -u $fd line; do
+> @@ -47,8 +50,8 @@ function for_each_unittest()
+>  			smp="$(vmm_optname_nr_cpus) ${BASH_REMATCH[1]}"
 >  		elif [[ $line =~ ^test_args\ *=\ *(.*)$ ]]; then
-> -			test_args=${BASH_REMATCH[1]}
-> +			test_args="$(vmm_optname_args) ${BASH_REMATCH[1]}"
->  		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
->  			opts=${BASH_REMATCH[2]}$'\n'
+>  			test_args="$(vmm_optname_args) ${BASH_REMATCH[1]}"
+> -		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
+> -			opts=${BASH_REMATCH[2]}$'\n'
+> +		elif [[ $line =~ ^$params_name\ *=\ *'"""'(.*)$ ]]; then
+> +			opts=${BASH_REMATCH[1]}$'\n'
 >  			while read -r -u $fd; do
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index bc17b89f4ff5..86d8a2cd8528 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -34,7 +34,7 @@ premature_failure()
->  get_cmdline()
->  {
->      local kernel=$1
-> -    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
-> +    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel $smp $test_args $opts"
->  }
->  
->  skip_nodefault()
-> @@ -88,11 +88,6 @@ function run()
->      local accel="${10}"
->      local timeout="${11:-$TIMEOUT}" # unittests.cfg overrides the default
->  
-> -    # If $test_args is empty, qemu will interpret the first option after -append
-> -    # as a test argument instead of a qemu option, so make sure that doesn't
-> -    # happen.
-> -    [ -n "$test_args" ] && opts="-append $test_args $opts"
-> -
->      if [ "${CONFIG_EFI}" == "y" ]; then
->          kernel=${kernel/%.flat/.efi}
->      fi
+>  				#escape backslash newline, but not double backslash
+>  				if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
+> @@ -63,8 +66,8 @@ function for_each_unittest()
+>  					opts+=$REPLY$'\n'
+>  				fi
+>  			done
+> -		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *(.*)$ ]]; then
+> -			opts=${BASH_REMATCH[2]}
+> +		elif [[ $line =~ ^$params_name\ *=\ *(.*)$ ]]; then
+> +			opts=${BASH_REMATCH[1]}
+>  		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
+>  			groups=${BASH_REMATCH[1]}
+>  		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
 > diff --git a/scripts/vmm.bash b/scripts/vmm.bash
-> index 8365c1424a3f..7629b2b9146e 100644
+> index 7629b2b9146e..9a2608eb3fd4 100644
 > --- a/scripts/vmm.bash
 > +++ b/scripts/vmm.bash
-> @@ -1,3 +1,18 @@
-> +declare -A vmm_optname=(
-> +	[qemu,args]='-append'
-> +	[qemu,nr_cpus]='-smp'
-> +)
+> @@ -38,3 +38,19 @@ function vmm_check_supported()
+>  		;;
+>  	esac
+>  }
 > +
-> +function vmm_optname_args()
+> +function vmm_unittest_params_name()
 > +{
-> +	echo ${vmm_optname[$(vmm_get_target),args]}
-> +}
+> +	# shellcheck disable=SC2155
+> +	local target=$(vmm_get_target)
 > +
-> +function vmm_optname_nr_cpus()
-> +{
-> +	echo ${vmm_optname[$(vmm_get_target),nr_cpus]}
-> +}
-> +
->  function vmm_get_target()
->  {
->  	if [[ -z "$TARGET" ]]; then
-> -- 
-> 2.50.0
->
+> +	case "$target" in
+> +	qemu)
+> +		echo "extra_params|qemu_params"
+> +		;;
+> +	*)
+> +		echo "$0 does not support '$target'"
+> +		exit 2
+> +		;;
+
+It seems a bit odd that we've introduced kvmtool_params and applied it to
+arm in this patch, but we still don't support it. Not a huge deal, though.
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+
+> +	esac
+> +}
+> -- 
+> 2.50.0
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
