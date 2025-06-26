@@ -1,55 +1,55 @@
-Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
+Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222472F547A
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 20:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C2A2FA62C
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 20:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750968369; cv=none; b=mVwFShOVb5QT4rThrBBj3jqa/Q5/qVp5NjQezrRLOPucJxGtSyVvK/daog1QLkOxJNKvbsqUsj/uOU4k9oEnCnay64hoR1bLeb77ELQsVVeMVVn0nVx01yDp8PnGh2Wx2sVzAPvaDLADp8eTx6Qh5L6W8FJMQOzWJ+DBvbQXX9A=
+	t=1750968372; cv=none; b=kcdcJl84Spgj1cxpMxoKXMUVCnLbjPh8gauF2q65hEAVcinghKOle38QfIm9YiDxJqT+Xs4ibgVVrv/iU0b6m04RXEjGEMUe3O4VpwP63A8u9VwvQX2+RyHBrRFF8rJ/XO8XIOV8pdX1NaENQGhXJeBNDamDDdt7sgcB4WSVIyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750968369; c=relaxed/simple;
-	bh=Sugt0ZAWw0whdfnB19zyTKRQsY2Z9PQHTBS1EdvqwWo=;
+	s=arc-20240116; t=1750968372; c=relaxed/simple;
+	bh=0aGOUAxvYj03Qeu8/55DTv+on9abe7K5kCyx7QQqG+o=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Xy1xs8k1xOfr7Kr6q9qKsaT2Stq4OymBPhCEzrm0pnNJtglwNk79jNll1ZRgGqPrJ2/ihRRcuAN4HoDRmzr2Pqr2Bb/flURH0Ud4aiAEkZPzIHkSCzA0vaOFntbEfzdLEFzyC6sf8c+BEOgcyVQnjB2WOj27jDxJTxkQKTFBnnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r265lbHz; arc=none smtp.client-ip=209.85.167.202
+	 To:Cc:Content-Type; b=DvreBlR2FNBEfaPbcOlfKmwu/320sRVne+QoCiVwDzLEmHLIFEVju0I46qM5K4GDTk6AaO7lr6ciT8qu7ch0uY2KfQp1xJ/5xZx5SxQBHxROmmYFMxVui7iyw/qPMYpDc5KdlGKk6BLw75EMiSLZVFvJT6GC31hWYo7Mhz43Uco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tvbi1f/h; arc=none smtp.client-ip=209.85.161.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r265lbHz"
-Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-40b2c2e52easo646101b6e.0
-        for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 13:06:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tvbi1f/h"
+Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-60eda518f7fso120583eaf.3
+        for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 13:06:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750968365; x=1751573165; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750968366; x=1751573166; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oR9vFP5SFauEza8dTMYPljjE6wfKaScNOs3wNYF4UAU=;
-        b=r265lbHzWA7KuYCfvH5GvqMNPWym7CvTa9gyxBPEUZbkCPgfcx4iDIq2cd3fZTIt0v
-         ZuOPhT6Zv2UckJLfmi3Pml3Dhsu54E8sipl7isqI/44NL8qdZrJuYkqcXGKiUEnkPz2D
-         XXZ6YJBECao7yqz+jYhMYmeo6RbrAYgRXf5EkfNBVd5K0V9DMtRX3iPA1lgkhgNcU9mM
-         4OE158wdNZRcOMm7e1NB6qycoVDeCOBAFqIYL2E4qq6HFBSAOGvET+m6OMGKqmRiz2G9
-         PfC6HiSVA5jPhyHG8sQhUodOZkGSMF4NmRQg2VAc70NNcKvEpR3y3oKEMuCGQUr/V8Sq
-         yO+g==
+        bh=KpklIyqnpbKB9v5Fxsk87TZdEI2UnkxleUzjYw0ct2A=;
+        b=tvbi1f/hrnlPf8H5V3/JrYb1H6qFNXp00JdA3OMZZotyjvDm6LEnmmzcqFMFF3AWe/
+         +e2NVh9UaIyXCcacBh0jRKQNzhBMspNNnx2mG8MPJluuVP5bVOJAvvF7s1onbDt+sYTu
+         bCuK38t35r43yo1sPudtksEy3hhL+/jVoygYcIRcE1m9bNgxzvY9QiImUtOZi8niLoxm
+         ui2DPxFxhQ83Duq4VozyAOKJxNVYl4N6pQJNYRwcR+lJUO8Sz310tOOlclT3V0Gy4g8e
+         wyzZbR1duHdvetbKXWNac0QdfOYh2goEhmYxBfRhgbmFT3FkWFwQVZI1Vm4QytiC0vYO
+         XGbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750968365; x=1751573165;
+        d=1e100.net; s=20230601; t=1750968366; x=1751573166;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oR9vFP5SFauEza8dTMYPljjE6wfKaScNOs3wNYF4UAU=;
-        b=vsDqO5HsDFnKc3MZUQGtXbF8czpNkgVXqoo5VLYoNwmVi6JiUYnZO/X090W2Kmt988
-         nxzzSGdFF0x0o0e05h13Lp9xniZ3wsJpYnXb5GwWkTZhpbtTSOl60mQPtdNloEY0fUiZ
-         Hglur8IhiEDe2sQsWQte22cpRMB1ze8GtIqE3ee6U42LpPlg/ygL0t0c1e3Ns4il4QY+
-         pZ49+pmYmJkSNBWBfdHrGD5f07zGYncmUfQGcRfda/r3f5KW9+xPl8yUNFIvOGbVqUKk
-         cKiCv+/vaUU7nVp5CE+23tU//yMM9nBkQ85ygpYHACEJoIuEgLA5VHoj1fduj7QkuOSN
-         6TaA==
-X-Forwarded-Encrypted: i=1; AJvYcCV0MCnxxDl+ApqQ4NLNFiqeyz5M9BqXTT5AAWJWDJJXi3XqBumt+94LVihiIzSUosNbdeqCVzs=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz1+5UgkMRKI+wxQ5KxCFPsVzlR/0RvCdzyY4fS4fqluXhmGNnL
-	aAPHbmDkNXhgaVPQr627oDnYLW206ITn3AbiemZ1RtHiFy03MnTfdkPdbYTUVGMPvYcV+VAhz0S
-	+iKh5UKunhLV6i2NmlarvH9Eeig==
-X-Google-Smtp-Source: AGHT+IHKPzqyXuHjLhNaVF48d4dlM1ddP8qVK1Z3JzzP3RzzSVDOilpZen/JKG4nnFQT/I6NY42YIxRN76XnpGTzTw==
-X-Received: from oobbq3.prod.google.com ([2002:a05:6820:1a03:b0:60e:fcff:daa1])
+        bh=KpklIyqnpbKB9v5Fxsk87TZdEI2UnkxleUzjYw0ct2A=;
+        b=rO+VxEgbM5en321X0+JCRnIXlDX/jxy8KLRqXHvG1pmFyj9hMOypa20SK6BcaIGAYe
+         RKdrDq3ogRWqiGf+clTlAXo5nVAMzC79JV/5gkmM2sgWrJv4I0YCWMFGSKxbUkkz1n9f
+         ovIAF78ZWK3C6kkG5la4Chfa06dvcRdB27NtR5ZCGlI+0eR2ZJjaRAH89bajV56YRdZS
+         rsBQPd4ykS+YWURxsOoqbURSUNVRU+xAXJ2IefaRQntpIAQFjvdSsKiLFua+n2xanuMG
+         5ondp/RXbJxN2gKhWt9MfK+h/GdD14SxR9Ai7tkQ+6sSpOquahAtXvYa0527icLSmXvp
+         gMLw==
+X-Forwarded-Encrypted: i=1; AJvYcCVmMcYuwJAXyLXHKqMj2ZokIGT4czLyvtKZUNLC8zHcJW2il3ZJ1Q/581ApZK+JsLbWBTt1FYU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzAflPsTd0xM3EkRReZjkbORoJvklStST0XL8HWbgkiwV0X+u1K
+	DDw3wOKC6SbvDdFiwRlJwe+lMIu+BKbWL84q7bPQuu9N5D9XdNCDbAMc0yLb6MOB7voWMXGV4Zg
+	czioJctIjNB+LoZ4ukJb/tchO8w==
+X-Google-Smtp-Source: AGHT+IG4toCaf6FKWI2t1gXzS9UewnHgKU58nuszLZDDrTg7T5QNDlzEcsa7wLKXQQUN/AxzQPP1VurrCS0Sc6lf5Q==
+X-Received: from oaclx11.prod.google.com ([2002:a05:6871:50cb:b0:2c1:6943:e919])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:3196:b0:401:e721:8b48 with SMTP id 5614622812f47-40b33c31cf5mr524973b6e.8.1750968364756;
- Thu, 26 Jun 2025 13:06:04 -0700 (PDT)
-Date: Thu, 26 Jun 2025 20:04:49 +0000
+ 2002:a05:6871:36c2:b0:2d9:8578:9478 with SMTP id 586e51a60fabf-2efed4305b8mr279482fac.4.1750968365927;
+ Thu, 26 Jun 2025 13:06:05 -0700 (PDT)
+Date: Thu, 26 Jun 2025 20:04:50 +0000
 In-Reply-To: <20250626200459.1153955-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250626200459.1153955-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250626200459.1153955-14-coltonlewis@google.com>
-Subject: [PATCH v3 13/22] KVM: arm64: Writethrough trapped PMOVS register
+Message-ID: <20250626200459.1153955-15-coltonlewis@google.com>
+Subject: [PATCH v3 14/22] KVM: arm64: Write fast path PMU register handlers
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -74,72 +74,385 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-With FGT in place, the remaining trapped registers need to be written
-through to the underlying physical registers as well as the virtual
-ones. Failing to do this means delaying when guest writes take effect.
+We may want a partitioned PMU but not have FEAT_FGT to untrap the
+specific registers that would normally be. Add a handler for those
+registers in the fast path so we can still get a performance boost
+from partitioning.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/include/asm/arm_pmuv3.h | 10 ++++++++++
- arch/arm64/kvm/sys_regs.c          | 17 ++++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/arm_pmuv3.h      |  37 ++++-
+ arch/arm64/include/asm/kvm_pmu.h        |  10 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 174 ++++++++++++++++++++++++
+ arch/arm64/kvm/pmu.c                    |  16 +++
+ arch/arm64/kvm/sys_regs.c               |  16 ---
+ 5 files changed, 236 insertions(+), 17 deletions(-)
 
 diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
-index 1880e426a559..3bddde5f4ebb 100644
+index 3bddde5f4ebb..12004fd04018 100644
 --- a/arch/arm64/include/asm/arm_pmuv3.h
 +++ b/arch/arm64/include/asm/arm_pmuv3.h
-@@ -142,6 +142,16 @@ static inline u64 read_pmicfiltr(void)
- 	return read_sysreg_s(SYS_PMICFILTR_EL0);
+@@ -41,6 +41,16 @@ static inline unsigned long read_pmevtypern(int n)
+ 	return 0;
  }
  
-+static inline void write_pmovsset(u64 val)
++static inline void write_pmxevcntr(u64 val)
 +{
-+	write_sysreg(val, pmovsset_el0);
++	write_sysreg(val, pmxevcntr_el0);
 +}
 +
-+static inline u64 read_pmovsset(void)
++static inline u64 read_pmxevcntr(void)
 +{
-+	return read_sysreg(pmovsset_el0);
++	return read_sysreg(pmxevcntr_el0);
 +}
 +
- static inline void write_pmovsclr(u64 val)
+ static inline unsigned long read_pmmir(void)
  {
- 	write_sysreg(val, pmovsclr_el0);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 771d73451b9a..cfbce4537b4c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1173,6 +1173,19 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return read_cpuid(PMMIR_EL1);
+@@ -107,21 +117,41 @@ static inline void write_pmcntenset(u64 val)
+ 	write_sysreg(val, pmcntenset_el0);
+ }
+ 
++static inline u64 read_pmcntenset(void)
++{
++	return read_sysreg(pmcntenset_el0);
++}
++
+ static inline void write_pmcntenclr(u64 val)
+ {
+ 	write_sysreg(val, pmcntenclr_el0);
+ }
+ 
++static inline u64 read_pmcntenclr(void)
++{
++	return read_sysreg(pmcntenclr_el0);
++}
++
+ static inline void write_pmintenset(u64 val)
+ {
+ 	write_sysreg(val, pmintenset_el1);
+ }
+ 
++static inline u64 read_pmintenset(void)
++{
++	return read_sysreg(pmintenset_el1);
++}
++
+ static inline void write_pmintenclr(u64 val)
+ {
+ 	write_sysreg(val, pmintenclr_el1);
+ }
+ 
++static inline u64 read_pmintenclr(void)
++{
++	return read_sysreg(pmintenclr_el1);
++}
++
+ static inline void write_pmccfiltr(u64 val)
+ {
+ 	write_sysreg(val, pmccfiltr_el0);
+@@ -162,11 +192,16 @@ static inline u64 read_pmovsclr(void)
+ 	return read_sysreg(pmovsclr_el0);
+ }
+ 
+-static inline void write_pmuserenr(u32 val)
++static inline void write_pmuserenr(u64 val)
+ {
+ 	write_sysreg(val, pmuserenr_el0);
+ }
+ 
++static inline u64 read_pmuserenr(void)
++{
++	return read_sysreg(pmuserenr_el0);
++}
++
+ static inline void write_pmuacr(u64 val)
+ {
+ 	write_sysreg_s(val, SYS_PMUACR_EL1);
+diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
+index 73b7161e3f4e..62c8032a548f 100644
+--- a/arch/arm64/include/asm/kvm_pmu.h
++++ b/arch/arm64/include/asm/kvm_pmu.h
+@@ -81,6 +81,8 @@ struct kvm_pmu_events *kvm_get_pmu_events(void);
+ void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+ void kvm_clr_pmu_events(u64 clr);
+ bool kvm_set_pmuserenr(u64 val);
++bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags);
++bool pmu_access_el0_disabled(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_resync_el0(void);
+@@ -214,6 +216,14 @@ static inline bool kvm_set_pmuserenr(u64 val)
+ {
+ 	return false;
+ }
++static inline bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
++{
++	return false;
++}
++static inline bool pmu_access_el0_disabled(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
+ static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_vcpu_reload_pmu(struct kvm_vcpu *vcpu) {}
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 47d2db8446df..4920b7da9ce8 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -25,12 +25,14 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/kvm_pmu.h>
+ #include <asm/kvm_nested.h>
+ #include <asm/fpsimd.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/processor.h>
+ #include <asm/traps.h>
+ 
++#include <../../sys_regs.h>
+ #include "arm_psci.h"
+ 
+ struct kvm_exception_table_entry {
+@@ -782,6 +784,175 @@ static bool handle_ampere1_tcr(struct kvm_vcpu *vcpu)
  	return true;
  }
  
-+static void writethrough_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p, bool set)
++/**
++ * handle_pmu_reg() - Handle fast access to most PMU regs
++ * @vcpu: Ponter to kvm_vcpu struct
++ * @p: System register parameters (read/write, Op0, Op1, CRm, CRn, Op2)
++ * @reg: VCPU register identifier
++ * @rt: Target general register
++ * @val: Value to write
++ * @readfn: Sysreg read function
++ * @writefn: Sysreg write function
++ *
++ * Handle fast access to most PMU regs. Writethrough to the physical
++ * register. This function is a wrapper for the simplest case, but
++ * sadly there aren't many of those.
++ *
++ * Always return true. The boolean makes usage more consistent with
++ * similar functions.
++ *
++ * Return: True
++ */
++static bool handle_pmu_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			   enum vcpu_sysreg reg, u8 rt, u64 val,
++			   u64 (*readfn)(void), void (*writefn)(u64))
 +{
-+	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
-+
-+	if (set) {
-+		__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=, (p->regval & mask));
-+		write_pmovsset(p->regval & mask);
++	if (p->is_write) {
++		__vcpu_assign_sys_reg(vcpu, reg, val);
++		writefn(val);
 +	} else {
-+		__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, &=, ~(p->regval & mask));
-+		write_pmovsclr(p->regval & mask);
++		vcpu_set_reg(vcpu, rt, readfn());
 +	}
++
++	return true;
 +}
 +
- static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			 const struct sys_reg_desc *r)
++/**
++ * kvm_hyp_handle_pmu_regs() - Fast handler for PMU registers
++ * @vcpu: Pointer to vcpu struct
++ *
++ * This handler immediately writes through certain PMU registers when
++ * we have a partitioned PMU (that is, MDCR_EL2.HPMN is set to reserve
++ * a range of counters for the guest) but the machine does not have
++ * FEAT_FGT to selectively untrap the registers we want.
++ *
++ * Return: True if the exception was successfully handled, false otherwise
++ */
++static bool kvm_hyp_handle_pmu_regs(struct kvm_vcpu *vcpu)
++{
++	struct sys_reg_params p;
++	u64 esr;
++	u32 sysreg;
++	u8 rt;
++	u64 val;
++	u8 idx;
++	bool ret;
++
++	if (!kvm_vcpu_pmu_is_partitioned(vcpu)
++	    || pmu_access_el0_disabled(vcpu))
++		return false;
++
++	esr = kvm_vcpu_get_esr(vcpu);
++	p = esr_sys64_to_params(esr);
++	sysreg = esr_sys64_to_sysreg(esr);
++	rt = kvm_vcpu_sys_get_rt(vcpu);
++	val = vcpu_get_reg(vcpu, rt);
++
++	switch (sysreg) {
++	case SYS_PMCR_EL0:
++		val &= ARMV8_PMU_PMCR_MASK;
++
++		if (p.is_write) {
++			write_pmcr(val);
++			__vcpu_assign_sys_reg(vcpu, PMCR_EL0, read_pmcr());
++		} else {
++			val = u64_replace_bits(
++				read_pmcr(),
++				vcpu->kvm->arch.nr_pmu_counters,
++				ARMV8_PMU_PMCR_N);
++			vcpu_set_reg(vcpu, rt, val);
++		}
++
++		ret = true;
++		break;
++	case SYS_PMUSERENR_EL0:
++		val &= ARMV8_PMU_USERENR_MASK;
++		ret = handle_pmu_reg(vcpu, &p, PMUSERENR_EL0, rt, val,
++				     &read_pmuserenr, &write_pmuserenr);
++		break;
++	case SYS_PMSELR_EL0:
++		val &= PMSELR_EL0_SEL_MASK;
++		ret = handle_pmu_reg(vcpu, &p, PMSELR_EL0, rt, val,
++				     &read_pmselr, &write_pmselr);
++		break;
++	case SYS_PMINTENCLR_EL1:
++		val &= kvm_pmu_accessible_counter_mask(vcpu);
++		if (p.is_write) {
++			__vcpu_rmw_sys_reg(vcpu, PMINTENSET_EL1, &=, ~val);
++			write_pmintenclr(val);
++		} else {
++			vcpu_set_reg(vcpu, rt, read_pmintenclr());
++		}
++		ret = true;
++		break;
++	case SYS_PMINTENSET_EL1:
++		val &= kvm_pmu_accessible_counter_mask(vcpu);
++		if (p.is_write) {
++			__vcpu_rmw_sys_reg(vcpu, PMINTENSET_EL1, |=, val);
++			write_pmintenset(val);
++		} else {
++			vcpu_set_reg(vcpu, rt, read_pmintenset());
++		}
++		ret = true;
++		break;
++	case SYS_PMCNTENCLR_EL0:
++		val &= kvm_pmu_accessible_counter_mask(vcpu);
++		if (p.is_write) {
++			__vcpu_rmw_sys_reg(vcpu, PMCNTENSET_EL0, &=, ~val);
++			write_pmcntenclr(val);
++		} else {
++			vcpu_set_reg(vcpu, rt, read_pmcntenclr());
++		}
++		ret = true;
++		break;
++	case SYS_PMCNTENSET_EL0:
++		val &= kvm_pmu_accessible_counter_mask(vcpu);
++		if (p.is_write) {
++			__vcpu_rmw_sys_reg(vcpu, PMCNTENSET_EL0, |=, val);
++			write_pmcntenset(val);
++		} else {
++			vcpu_set_reg(vcpu, rt, read_pmcntenset());
++		}
++		ret = true;
++		break;
++	case SYS_PMCCNTR_EL0:
++		ret = handle_pmu_reg(vcpu, &p, PMCCNTR_EL0, rt, val,
++				     &read_pmccntr, &write_pmccntr);
++		break;
++	case SYS_PMXEVCNTR_EL0:
++		idx = FIELD_GET(PMSELR_EL0_SEL, read_pmselr());
++
++		if (idx >= vcpu->kvm->arch.nr_pmu_counters)
++			return false;
++
++		ret = handle_pmu_reg(vcpu, &p, PMEVCNTR0_EL0 + idx, rt, val,
++				     &read_pmxevcntr, &write_pmxevcntr);
++		break;
++	case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
++		idx = ((p.CRm & 3) << 3) | (p.Op2 & 7);
++
++		if (idx >= vcpu->kvm->arch.nr_pmu_counters)
++			return false;
++
++		if (p.is_write) {
++			write_pmevcntrn(idx, val);
++			__vcpu_assign_sys_reg(vcpu, PMEVCNTR0_EL0 + idx, val);
++		} else {
++			vcpu_set_reg(vcpu, rt, read_pmevcntrn(idx));
++		}
++
++		ret = true;
++		break;
++	default:
++		ret = false;
++	}
++
++	if (ret)
++		__kvm_skip_instr(vcpu);
++
++	return ret;
++}
++
+ static inline bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
  {
-@@ -1181,7 +1194,9 @@ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (pmu_access_el0_disabled(vcpu))
- 		return false;
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
+@@ -799,6 +970,9 @@ static inline bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	if (kvm_handle_cntxct(vcpu))
+ 		return true;
  
--	if (p->is_write) {
-+	if (kvm_vcpu_pmu_is_partitioned(vcpu) && p->is_write) {
-+		writethrough_pmovs(vcpu, p, r->CRm & 0x2);
-+	} else if (p->is_write) {
- 		if (r->CRm & 0x2)
- 			/* accessing PMOVSSET_EL0 */
- 			__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=, (p->regval & mask));
++	if (kvm_hyp_handle_pmu_regs(vcpu))
++		return true;
++
+ 	return false;
+ }
+ 
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index 67216451b8ce..338e7eebf0d1 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -891,3 +891,19 @@ u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
+ 
+ 	return u64_replace_bits(pmcr, n, ARMV8_PMU_PMCR_N);
+ }
++
++bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
++{
++	u64 reg = __vcpu_sys_reg(vcpu, PMUSERENR_EL0);
++	bool enabled = (reg & flags) || vcpu_mode_priv(vcpu);
++
++	if (!enabled)
++		kvm_inject_undefined(vcpu);
++
++	return !enabled;
++}
++
++bool pmu_access_el0_disabled(struct kvm_vcpu *vcpu)
++{
++	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_EN);
++}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index cfbce4537b4c..b80cf6194fa3 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -842,22 +842,6 @@ static u64 reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	return __vcpu_sys_reg(vcpu, r->reg);
+ }
+ 
+-static bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
+-{
+-	u64 reg = __vcpu_sys_reg(vcpu, PMUSERENR_EL0);
+-	bool enabled = (reg & flags) || vcpu_mode_priv(vcpu);
+-
+-	if (!enabled)
+-		kvm_inject_undefined(vcpu);
+-
+-	return !enabled;
+-}
+-
+-static bool pmu_access_el0_disabled(struct kvm_vcpu *vcpu)
+-{
+-	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_EN);
+-}
+-
+ static bool pmu_write_swinc_el0_disabled(struct kvm_vcpu *vcpu)
+ {
+ 	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_SW | ARMV8_PMU_USERENR_EN);
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
