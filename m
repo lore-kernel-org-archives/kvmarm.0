@@ -1,127 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8A528DEE0
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 13:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB102ED847
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 14:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750944478; cv=none; b=cS5ZZqEghsLz6EuJj3O/5BnbU1PYun41GkFw5WSC7F6dS+gpEKq03P9bsOvwzhDE+x1eYSzt4vv+i9nQtMl6T6jxZPrHo/EpEYPaYIntVfSQYiD5IwTnN5MlezqkflIp5dBgpvXOhcXUHHmQpQ57EWx6RQIwB1HoICrgl0B+jgw=
+	t=1750949916; cv=none; b=k3zGGeEjBRzFEel8V0eJvFUtcvzBdCyp5cMsTYTSYso2fLP0bYQ0p4zkferdEtCbRUT7JCBXJISTfJC8FaM+l7QanHUJFQT7YGypNu2yg340xQaXgm/tnsrU2YctaojXQo6+zOz9vCpp9+w033vNzIbcEvBrGcXomdyHN+KwsBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750944478; c=relaxed/simple;
-	bh=fBIEve8FP/YE7Iq/R715WvXVTfrpSD/qYWNCmxcUlmQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FckFmxaMEelLTZAlPf3LWZ4i3luAthliQ8cFkjwbH0GUUXpGVWsrtNfE0TaF10XriLz29BQTUDaRAVO5iAQfSQ2cfgehazgTP/kTPP5pL2QL6TjKV+bOIiObdlUpHDCFL2JXaya24D1iyxtth+yiiXptHpLabfD3jjWZppOgNCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7bZdzrX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750949916; c=relaxed/simple;
+	bh=vaZ/wVKOO9ojZRN/4yT7HwIlbkw23fQlbABMb7bbVK4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uSBD8zURJb8cH+5lIK2aHsvyA4UBmOho8XEfXIVsnbSxtPEquC8D4bg57Do6eIoUj7BnYxF9fu7f43tLXKk1MGWcvPnjpMbfavf47j1vOZPCgZRE223UjjhoZtw4dl9OMcjYqSS2TNU0Gwdq/ynu5uh2+nFZRRjW4J+iaRVOc9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hdcm05Qg; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7bZdzrX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D22C3C4CEEB;
-	Thu, 26 Jun 2025 13:27:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750944477;
-	bh=fBIEve8FP/YE7Iq/R715WvXVTfrpSD/qYWNCmxcUlmQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p7bZdzrXMwycmZIXNjYpAAmP5+Cxx+FcQn1boX5m386Cr5YZQHoRelMG568JBe8Oj
-	 W2lfN0xWB1pkah06qvlTHjVPQ/oEjuNH1PgGNV5uHnp4wNOLSVf/h6Sad0E+JI7scv
-	 GcLjcAxhCwmZapf6kJ1yC6tppcSmMESdySBHKp163/9vJJawoH/bOKzyRhh6O+Zlpk
-	 +Ncor7OxWpaJGOTDRpsSOp4K/kdVzt/akMBngWVO48+bX0qvW+3+qYvLQjBISB2deh
-	 90i7/Ncz1ty81n/YXPvFfeeXzzOf4ymDqui9TWY1ag/mNcSFcMjYa5M1+UKXY4YsCl
-	 ztZLHcUde1LEw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uUmdv-00AEV3-Ll;
-	Thu, 26 Jun 2025 14:27:55 +0100
-Date: Thu, 26 Jun 2025 14:27:54 +0100
-Message-ID: <86wm8ybpk5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	"Will Deacon" <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<tangnianyao@huawei.com>,
-	<wangwudi@hisilicon.com>
-Subject: Re: [PATCH] ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200803
-In-Reply-To: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
-References: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hdcm05Qg"
+Date: Thu, 26 Jun 2025 16:58:27 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750949911;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vOuqCH7ZkoqL6Tmn+B/nDaPgtnCP16MSLY5lnskHQ2I=;
+	b=Hdcm05Qg5nhxSkz6prIahnkUcmTzr4XBzlqKZwTKI+O0waJiu8QBcOqtbuiiz7N3zgVQTI
+	aT89w1gTaPPCYyF2OYUY7oikqbtLehQyk8wEXK6m4nhEacEyITBn1wp8BWDeLgZ2Y+f5cN
+	ZieXTzWrL6MSbpDr3Cw5IfxXCLqc7GE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, pbonzini@redhat.com, 
+	eric.auger@redhat.com, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, david@redhat.com, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 0/2] scripts: extra_params rework
+Message-ID: <20250626-b638cf6a9cc5fa8b21da8418@orel>
+References: <20250625154354.27015-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, tangnianyao@huawei.com, wangwudi@hisilicon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625154354.27015-1-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 26 Jun 2025 13:41:42 +0100,
-Zhou Wang <wangzhou1@hisilicon.com> wrote:
+On Wed, Jun 25, 2025 at 04:43:52PM +0100, Alexandru Elisei wrote:
+> This series was split from the series that adds support to use kvmtool when
+> using the scripts to run the tests [1]. kvmtool will be supported only for arm
+> and arm64, as they are the only architectures that compile the tests to run with
+> kvmtool.
 > 
-> For GICv4.0 of Hip10 and Hip10C, it has a SoC bug with vPE schedule:
-> when multiple vPEs are sending vpe schedule/deschedule commands
-> concurrently and repeatedly, some vPE schedule command may not be
-> scheduled, and it will cause the command timeout.
+> The justification for these changes is to be able to introduce
+> kvmtool_params for kvmtool specific command line options, and to make a
+> clear distinction between the qemu options and the kvmtool options. This is
+> why qemu_params was added as a replacement for extra_params. extra_params
+> was kept for compatibility purposes for user's custom test definitions.
 > 
-> The hardware implementation is that there is one GIC hardware in one CPU die,
-> which handles all vPE schedule operations one by one in all CPUs of this die.
-> The bug is that if the number of queued vPE schedule operations is more
-> than a certain value, the last vPE schedule operation will be lost.
+> To avoid duplication of the arguments that are passed to a test's main()
+> function, test_args has been split from qemu_params. The same test_args
+> will be used by both qemu and kvmtool.
 > 
-> One possible way to solve this problem is to limit the number of vLPIs, so
-> the hardware could spend less time to scan virtual pending table when it
-> handles the vPE schedule operations, so the queued vPE schedule operations
-> will never be more than above certain value.
+> [1] https://lore.kernel.org/kvm/20250507151256.167769-1-alexandru.elisei@arm.com/
 > 
-> Given the number of CPUs of die, and imagine there is 100 vPE schedule
-> operations per second one CPU, it can be calculated that we can limit
-> the number of vLPI to 4096 for virtual machine to avoid the issue.
+> Alexandru Elisei (2):
+>   scripts: unittests.cfg: Rename 'extra_params' to 'qemu_params'
+>   scripts: Add 'test_args' test definition parameter
 > 
-> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> ---
->  Documentation/arch/arm64/silicon-errata.rst |  2 ++
->  arch/arm64/Kconfig                          | 12 ++++++++++++
->  arch/arm64/include/asm/cputype.h            |  4 ++++
->  arch/arm64/kernel/cpu_errata.c              | 15 +++++++++++++++
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c          |  5 +++++
->  arch/arm64/tools/cpucaps                    |  1 +
->  include/linux/irqchip/arm-gic-v3.h          |  1 +
->  7 files changed, 40 insertions(+)
+>  arm/unittests.cfg     |  94 ++++++++++++++----------
+>  docs/unittests.txt    |  30 +++++---
+>  powerpc/unittests.cfg |  21 +++---
+>  riscv/unittests.cfg   |   2 +-
+>  s390x/unittests.cfg   |  53 +++++++-------
+>  scripts/common.bash   |  16 +++--
+>  scripts/runtime.bash  |  24 ++++---
+>  x86/unittests.cfg     | 164 ++++++++++++++++++++++++------------------
+>  8 files changed, 237 insertions(+), 167 deletions(-)
 > 
+> 
+> base-commit: 507612326c9417b6330b91f7931678a4c6866395
+> -- 
+> 2.50.0
+>
 
-[...]
+This is already reviewed by me, but in order to encourage other arch
+maintainers to also ack, then I'll state
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index ae4c0593d114..495a56e9dc4b 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -81,6 +81,11 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
->  		if (vgic_has_its(vcpu->kvm)) {
->  			value |= (INTERRUPT_ID_BITS_ITS - 1) << 19;
->  			value |= GICD_TYPER_LPIS;
-> +			/* Limit the number of vlpis to 4096 */
-> +			if (cpus_have_final_cap(ARM64_WORKAROUND_HISI_162200803) &&
-> +			    kvm_vgic_global_state.has_gicv4 &&
-> +			    !kvm_vgic_global_state.has_gicv4_1)
-> +				value |= 11 << GICD_TYPER_NUM_LPIS_SHIFT;
+ACK for arm and riscv
 
-This really doesn't solve your problem. Yes, the guest *may* honor
-this limit. But KVM doesn't care and will happily allocate 2^16 vLPIs
-if the guest asks -- there is no code enforcing this limit.
-
-And even if we did. What would we do on a MAPTI command that tries to
-map a vLPI outside of the allowed range? Do we need to tell the guest
-it has screwed up?
+again.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+drew
