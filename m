@@ -1,27 +1,27 @@
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC66325CC7B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A20A25CC72
 	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 08:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750925371; cv=none; b=bM/8Yp6/umRWHfgtbZ9x1hGef0FhuSusJis2gOyjA6ix1HlgW9RCIo3fl8qmiH2UElFWz2uVlNMeih/Y4FhlF/ffwhwc6kb1QiNs+DsOuVWaqUjgD7bFy52V/xxwKjg/0mlwcHiRp9cxOdRhE1y1qHDC3scsRTHDZv76Cvl/Ilc=
+	t=1750925372; cv=none; b=C7POxDV3HEvrRP589uXMza4n1Bf/E/nRS50P7IZNC4o6lzWqACcOhmMNyimMMkpv65qVq0Fwp/OuTBvvLM8sEhlW1g2dPjoTbOmALv+BLJnA1iGQIHwliSvW4qUsn91W00IepLgZcE1epyn6E0CixGnxgxeruLvnbxuz82vkXCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750925371; c=relaxed/simple;
-	bh=pGX3E0zY30TE7pkp9tFkBxJiFsgJCDP/20s36ZEkaVA=;
+	s=arc-20240116; t=1750925372; c=relaxed/simple;
+	bh=kTlZ/uD7aKUJUorAuI9FVfO8yt7PdldS3cmMNC1Y5jI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I+2ApkCV2wl/YMo1z1pls06z+h9bP1COyBl+vd4LcaN+rgrOocTfLRwQ7Q0nhR23kAS2hujaUm9OpuhZOnvWmKsUWlcvoK2bLop8XVhsRggHVUOugfEuOIwzAdknuQ48PgpeGrlASjOMClGDONDKd+q0YBI8YbJLFl7eSoRBOaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+	 MIME-Version:Content-Type; b=jrNo7oYd5sYknw9OSs3bF7X766y0gBSCvNw1XS4sjjRk2zu+WBX8FV3cV00fJwV2eUlSltNDjbT4VeUrIg3hDUwjKfyO2tTT7AP291Oyy/9l0G1UjDTnSMqnm0rXz+55eUm/3M/XLHwdmDh7RLOt8izDTKbn37T5t/l55kLrFTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bSWZd3pBtz27hmb;
-	Thu, 26 Jun 2025 16:10:17 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3939814027A;
-	Thu, 26 Jun 2025 16:09:22 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bSWWg2Zjbz2BdVV;
+	Thu, 26 Jun 2025 16:07:43 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 679711A0188;
+	Thu, 26 Jun 2025 16:09:21 +0800 (CST)
 Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.2.1544.11; Thu, 26 Jun 2025 16:09:21 +0800
 Received: from localhost.localdomain (10.50.165.33) by
@@ -38,9 +38,9 @@ CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
 	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>,
 	<tangchengchang@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH v3 5/7] arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
-Date: Thu, 26 Jun 2025 16:09:04 +0800
-Message-ID: <20250626080906.64230-6-yangyicong@huawei.com>
+Subject: [PATCH v3 4/7] KVM: arm/arm64: Allow user injection of unsupported exclusive/atomic DABT
+Date: Thu, 26 Jun 2025 16:09:03 +0800
+Message-ID: <20250626080906.64230-5-yangyicong@huawei.com>
 X-Mailer: git-send-email 2.31.0
 In-Reply-To: <20250626080906.64230-1-yangyicong@huawei.com>
 References: <20250626080906.64230-1-yangyicong@huawei.com>
@@ -57,47 +57,108 @@ X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
 
 From: Yicong Yang <yangyicong@hisilicon.com>
 
-Instructions introduced by FEAT_{LS64, LS64_V} is controlled by
-HCRX_EL2.{EnALS, EnASR}. Configure all of these to allow usage
-at EL0/1.
-
-This doesn't mean these instructions are always available in
-EL0/1 if provided. The hypervisor still have the control at
-runtime.
+The unsupported exclusive/atomic DABT exception is hand to the
+userspace. Provide a way for the userspace to inject this DABT
+to the guest if they want to imitate how this is handled on the
+host.
 
 Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 ---
-For note, Will raise the question HCRX setting here won't retain after a
-world switch. This is fine now after commit ffea7c73d181 ("KVM: arm64: Properly save/restore HCRX_EL2")
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/include/uapi/asm/kvm.h    |  3 ++-
+ arch/arm64/kvm/guest.c               |  4 ++++
+ arch/arm64/kvm/inject_fault.c        | 29 ++++++++++++++++++++++++++++
+ 4 files changed, 36 insertions(+), 1 deletion(-)
 
- arch/arm64/include/asm/el2_setup.h | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index ba5df0df02a4..9a0ab7dc9db1 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -57,9 +57,19 @@
-         /* Enable GCS if supported */
- 	mrs_s	x1, SYS_ID_AA64PFR1_EL1
- 	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
--	cbz	x1, .Lset_hcrx_\@
-+	cbz	x1, .Lskip_gcs_hcrx_\@
- 	orr	x0, x0, #HCRX_EL2_GCSEn
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 0720898f563e..df141ae77019 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -47,6 +47,7 @@ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
++void kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
  
-+.Lskip_gcs_hcrx_\@:
-+	/* Enable LS64, LS64_V if supported */
-+	mrs_s	x1, SYS_ID_AA64ISAR1_EL1
-+	ubfx	x1, x1, #ID_AA64ISAR1_EL1_LS64_SHIFT, #4
-+	cbz	x1, .Lset_hcrx_\@
-+	orr	x0, x0, #HCRX_EL2_EnALS
-+	cmp	x1, #ID_AA64ISAR1_EL1_LS64_LS64_V
-+	b.lt	.Lset_hcrx_\@
-+	orr	x0, x0, #HCRX_EL2_EnASR
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index ed5f3892674c..69985acda668 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -184,8 +184,9 @@ struct kvm_vcpu_events {
+ 		__u8 serror_pending;
+ 		__u8 serror_has_esr;
+ 		__u8 ext_dabt_pending;
++		__u8 ext_dabt_excl_atom_pending;
+ 		/* Align it to 8 bytes */
+-		__u8 pad[5];
++		__u8 pad[4];
+ 		__u64 serror_esr;
+ 	} exception;
+ 	__u32 reserved[12];
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 2196979a24a3..47bc09ea50c3 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -839,6 +839,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	bool serror_pending = events->exception.serror_pending;
+ 	bool has_esr = events->exception.serror_has_esr;
+ 	bool ext_dabt_pending = events->exception.ext_dabt_pending;
++	bool ext_dabt_excl_atom_pending = events->exception.ext_dabt_excl_atom_pending;
+ 
+ 	if (serror_pending && has_esr) {
+ 		if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+@@ -855,6 +856,9 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	if (ext_dabt_pending)
+ 		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+ 
++	if (ext_dabt_excl_atom_pending)
++		kvm_inject_dabt_excl_atomic(vcpu, kvm_vcpu_get_hfar(vcpu));
 +
- .Lset_hcrx_\@:
- 	msr_s	SYS_HCRX_EL2, x0
- .Lskip_hcrx_\@:
+ 	return 0;
+ }
+ 
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index a640e839848e..d64650a1aefe 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -171,6 +171,35 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ 		inject_abt64(vcpu, false, addr);
+ }
+ 
++/**
++ * kvm_inject_dabt_excl_atomic - inject a data abort for unsupported exclusive
++ *				 or atomic access
++ * @vcpu: The VCPU to receive the data abort
++ * @addr: The address to report in the DFAR
++ *
++ * It is assumed that this code is called from the VCPU thread and that the
++ * VCPU therefore is not currently executing guest code.
++ */
++void kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, unsigned long addr)
++{
++	u64 esr = 0;
++
++	/* Reuse the general DABT injection routine and modify the DFSC */
++	kvm_inject_dabt(vcpu, addr);
++
++	if (match_target_el(vcpu, unpack_vcpu_flag(EXCEPT_AA64_EL1_SYNC))) {
++		esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
++		esr &= ~ESR_ELx_FSC;
++		esr |= ESR_ELx_FSC_EXCL_ATOMIC;
++		vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
++	} else {
++		esr = vcpu_read_sys_reg(vcpu, ESR_EL2);
++		esr &= ~ESR_ELx_FSC;
++		esr |= ESR_ELx_FSC_EXCL_ATOMIC;
++		vcpu_write_sys_reg(vcpu, esr, ESR_EL2);
++	}
++}
++
+ /**
+  * kvm_inject_pabt - inject a prefetch abort into the guest
+  * @vcpu: The VCPU to receive the prefetch abort
 -- 
 2.24.0
 
