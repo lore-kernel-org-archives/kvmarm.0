@@ -1,55 +1,55 @@
-Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
+Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CEF2F0E50
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 20:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C1C2F234C
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 20:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750968356; cv=none; b=TmggRYqCMTZoKWWQjS61wYMN46/5eYUr8n/oYH6ETW8U9XuILnD3HWinfUr7aBsBlGZTXfnjTPQVyeCIXtW1NQ00nsTYUBIIG5D6Mv7i3MumzbxsEI28i1GKoeUYkZXtzQYmoCYJY4+pKZGusapwmHt3HsdPtYNHiBNUqCiOMF0=
+	t=1750968357; cv=none; b=qu4M2ykLacPwgUxkaTiDEPeMt36J3YIJ5SPiw5mXBU0ux4Y/tfemtyAaCTSL7Mh5uB/1ld+JVzmMSEbFfrSyisH0S/g5P2wnyHhP9UCEUBzIRlwe974uMJtn4btOmpRJmKjpWEEtxCF1D0AXJZ7z1gfkqbVQIHcRf9ybCyKJEK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750968356; c=relaxed/simple;
-	bh=T2AAAwNCvFAm9YUhWYISU/OAnWzXdQk+10RnZrJqatc=;
+	s=arc-20240116; t=1750968357; c=relaxed/simple;
+	bh=bO4sw7/hINJdmJB2o7i6RovRyFWviPuCwq5wxaiI8Bs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B3Kc6KSIoVfxuOWd7GZSOZWNrFWIIaSiGRZyLmFE9cjskRXtbt/5a+Q8LFysQLmojQjK3IoBThxvLvNXEj4n3aeiJG88HSzHBrq95+2WPuBjArlYR/18Qmy7DgX7YIk6TsYXFZ/j9YcilirH3Xn0FcKy2ZarHKoaCdQ5MdRN1rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g3ZzX8u8; arc=none smtp.client-ip=209.85.167.202
+	 To:Cc:Content-Type; b=lpDQCPiXzQxIk5wiMWKi9/gxymSLOM46eoVRKCnakGRS6R5Xzm3flvZxpqT51Tie75ko78IIvg9XUR4Ewa9A4OGt/km/VnA72SxMCBSpgNfmSdMCyFmNdyIvaUt5Y/aYnHsiceV2kKVie93ftUbfXsCOnQUSfJoKHQ2YSOr9X+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BREiA4z2; arc=none smtp.client-ip=209.85.160.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g3ZzX8u8"
-Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-40b2c2e52easo645866b6e.0
-        for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 13:05:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BREiA4z2"
+Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-2e954a1d239so1213353fac.1
+        for <kvmarm@lists.linux.dev>; Thu, 26 Jun 2025 13:05:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750968353; x=1751573153; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1750968354; x=1751573154; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHt9BrBIYqZp5kZ5sjlL9mrhswYvvwFRhl772iB1+XY=;
-        b=g3ZzX8u8i3NnlPEfNiLDAh8pd0CWUGMZ4CANJOK60wrTLfwYIZIsD+//cJ7KRHmjhp
-         I2HSIWx9XqYIyEm8nLqqrNGcUJKXsVv6J1plqYTaXrt6Jbj9LBRC4GtIH7shD0sveYeb
-         DAwvn4ccpStx5vLns9iDuhtegWwLaXg1ip1Z7x9IGpcWsqBrpG1oxnMlqTSURvykGpj2
-         OtMY7RY89dmnEdGOczd7tzgAM9G+1HhhDZEbyS6wKQ5GP0cI0ha1AAk9Tm4gdTlwtPk5
-         bpgv9OMYzVt9NHuVPM5vHAHGow3uSKMAIfiZuWQy8YxMZ0Vnsni7C66NS+dJis8N5ZgI
-         rfnQ==
+        bh=zPJCCS28P/ht0GkmQnG+3GK0DAvT59T6hS3LwMCctEw=;
+        b=BREiA4z2C23AhI9MbHiEw0GUhgd/vpZf+7CUTrelfyxHhfQBmDB8352up187aiBx1G
+         vjdT58hxL71WQg1UeBf5YHC218f1OQk5UgVI3AZTqMTQiv8Vx67N/yWQbo2Tpx838ZB7
+         Chb7Zbn6muvzsDE4pDO1ukPVDSEmYzlICGpT2M5ld5stA7tJOqupE1Z5Og5izAZssidC
+         2uNiOqbBZH6I7hftK64qScW3424CU0XUtrzuVx/yCEuESYuX06aCzFFoXSujw5iR7l7C
+         zayV8AO+EuvnTfaCfSgSDD4kb0CCIxiMURsmb/oCNYnNLWC5geTsEBRVKuDmQnDUJuIi
+         nFNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750968353; x=1751573153;
+        d=1e100.net; s=20230601; t=1750968354; x=1751573154;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHt9BrBIYqZp5kZ5sjlL9mrhswYvvwFRhl772iB1+XY=;
-        b=qKvY37ZcO7LOiT9ayNyBioZAZe/kA8jfCtP3geUArk+TEfovw1sLIvq+KmEJP816wD
-         tcc/ES8c6ZNi3w2aH4slxpDmGfNMTvDuVd86DO1Dh85DvteskUSIV61Wo4WBhc6UQQZG
-         u4nCG3f5i/Fq3JxyaRleIKNYSSIyqQRQrJFN5HRKs2oIxBtFsJ20O8Hty9kXO3HT0oRJ
-         mJHdJARYQbvvCFiqE+50+oW1DG+HXFfeK0H1qqRf4EXelORtafjYpii/px52NMNlfCp6
-         7HNmSXrkQv1DJgGr7HwHK7OJ2Eh53Mqv65zh0g03yafyakZJ2bc/wSEtWm9bDvsIwyNT
-         DGmg==
-X-Forwarded-Encrypted: i=1; AJvYcCXDgH15hUhQu4Go/4777/vUhCOY6L202cNqWx9BG3wc7lf6sA0xB3DEujdJRCReEjfZOpohJUM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz9rHoo4fFMOF5bdx1Bqr8Xl3Nmgz/xrRinA4IwQtJCE5aF4Gt3
-	8j/h8IR20L8nXzauDZLyu2SQo/i2aeSD3M4Oh1Gn1m97jolsns8Pbmh6umxlVBPhQdso2mipuPm
-	mKJpSUGjpXsWfckvLnU+4YKApKQ==
-X-Google-Smtp-Source: AGHT+IFlRtE1eWK/FMjUnULxroCH+ZQKYqxRY5qaFdZ+f+SoiV9KEwtPmc0HwZMn2/GT2thgfmq4kS9LjJKIm6e5aQ==
-X-Received: from oibcj14.prod.google.com ([2002:a05:6808:1b8e:b0:40a:c2da:1f99])
+        bh=zPJCCS28P/ht0GkmQnG+3GK0DAvT59T6hS3LwMCctEw=;
+        b=asvKSkAWkbonrZE/qJNyS0IEnHUrzZ4Ox1ya+/42hSVCTl/5qvLVZ8G15Pq228pCr0
+         41kGCCWCkVbvy8MedHo8zCNSqqP9BbeksUGXZAQMWE9kJ7BAzUpXGn1zUIqvx1LLhk7y
+         Cirr9E/TEIdDRtRxflg4BkstYqgE3WKXQ42imxZaxFtnhFM8ujY+QzCWeRTYUEwIaLgI
+         2xuGci653z9nrwWNiKYaRkpGfZ27UanxxR+VAZLRKNnHjF8KPxhlZnFmuHG9S4+YTw7b
+         sIbmPbWpvu2tBG56PQq5HfJ+u04KOdN8oHBfy8RydDk3dR91QG9An6+RbrE1EvHc3cVw
+         awQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVA4mcoyDJ9gJf9O/8Yef9cjypfMGfi6mko4zsvwqvu1w/zxaN8hsVnowW7nJXOsZCDMSzkq10=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw3yPEYboV66A9RPwoS22oyd6Y539GJr9XHufTwM71TdrIH9IUN
+	WZLn+ALSxHzWwNeImsSmjtRxjoJ1Y3S/ebAtTpta+4+Ht83PapFaD2+1LA3JS5ArlqeD7LK6Y8f
+	7eMyFDL69HQsx55h7KjWJBV0Vgg==
+X-Google-Smtp-Source: AGHT+IEAValjLvIQUTTrl0WGiv7qDA/VK+W0m1ZQUDRoDH/VSaq0CR37ZF/2z6Fxf5GRvTFbBupf/JJhqDdR5wa1WQ==
+X-Received: from oabxc6.prod.google.com ([2002:a05:6870:ce06:b0:2e8:ed52:15c9])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:6a87:b0:409:59d:2fb with SMTP id 5614622812f47-40b33c77bfdmr516313b6e.11.1750968353579;
- Thu, 26 Jun 2025 13:05:53 -0700 (PDT)
-Date: Thu, 26 Jun 2025 20:04:38 +0000
+ 2002:a05:6870:7050:10b0:2ef:eddd:690d with SMTP id 586e51a60fabf-2efeddd6bf1mr119143fac.24.1750968354720;
+ Thu, 26 Jun 2025 13:05:54 -0700 (PDT)
+Date: Thu, 26 Jun 2025 20:04:39 +0000
 In-Reply-To: <20250626200459.1153955-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250626200459.1153955-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250626200459.1153955-3-coltonlewis@google.com>
-Subject: [PATCH v3 02/22] arm64: Generate sign macro for sysreg Enums
+Message-ID: <20250626200459.1153955-4-coltonlewis@google.com>
+Subject: [PATCH v3 03/22] KVM: arm64: Define PMI{CNTR,FILTR}_EL0 as undef_access
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -74,27 +74,28 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-There's no reason Enums shouldn't be equivalent to UnsignedEnums and
-explicitly specify they are unsigned. This will avoid the annoyance I
-had with HPMN0.
+Because KVM isn't fully prepared to support these yet even though the
+host PMUv3 driver does, define them as undef_access for now.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/tools/gen-sysreg.awk | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kvm/sys_regs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
-index f2a1732cb1f6..fa21a632d9b7 100755
---- a/arch/arm64/tools/gen-sysreg.awk
-+++ b/arch/arm64/tools/gen-sysreg.awk
-@@ -308,6 +308,7 @@ $1 == "Enum" && (block_current() == "Sysreg" || block_current() == "SysregFields
- 	parse_bitdef(reg, field, $2)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 76c2f0da821f..99fdbe174202 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3092,6 +3092,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
+ 	{ SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
  
- 	define_field(reg, field, msb, lsb)
-+	define_field_sign(reg, field, "false")
- 
- 	next
- }
++	{ SYS_DESC(SYS_PMICNTR_EL0), undef_access },
++	{ SYS_DESC(SYS_PMICFILTR_EL0), undef_access },
++
+ 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
+ 	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
+ 	{ PMU_SYS_REG(PMCNTENSET_EL0),
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
