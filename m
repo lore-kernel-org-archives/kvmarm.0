@@ -1,234 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4866E1B78F3;
-	Fri, 27 Jun 2025 15:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3EE12E5D;
+	Fri, 27 Jun 2025 17:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751036499; cv=none; b=BjW5QoASlRnFhUkAr5BR1/y2dcek1K+j2+A02FeH1PETdggnqZxlfH4QJZwZs6f7CfvIE0BrlO0OX+1qBJkXL1WmwjWpn8H9dbMH1RZ89T9pbYIyooS/+B9qN1P6jWv5W5nR+Iy4mHE7jDJevk/a5gWRnfVDg8IOPQgCmVt69As=
+	t=1751045108; cv=none; b=f1ULHMsD+ZGTZi7o6unqWw1HDhL1mIt0xUG5VkX189MjdfhVHS9x0/7DTTF4/ETIs6L/BTw+R/zy+VJcHWLNfJZx5I/8WGwR/TNR29Y4+KF/80YKZXnmI/7N/s+HP8xiagheI+L0n8sa4BDC2W5PKJ2wdKuXcyRtbfppCZC1cEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751036499; c=relaxed/simple;
-	bh=G83basSwJmom/UjEsv3A4K0YpUbhyHGDHOVGor+sYC8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rc9xHsOraq7u5c9eFYhQDfulGzgP3dcYYKa+KIWESZjwymlELHkrFeBFjjTMZt9AHL08P9IDXpnvNcqGVL4UqBN0nU36JOXEFKEqpynPdfaAyFyg3CnWtap1u9Jo+9FIAB7qMzu0/TxUFmZ9ojDvBkXUieDoxZd121px0wmoU6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GC8BTwZ5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751045108; c=relaxed/simple;
+	bh=TjGWey8FcBbGmqOInU155Db/0s5SY/hzFhuW5NLF6cI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YRUJnsyjUt76M0vW3zMJFLSogMKxbJhztT5o+vJ1UMVk0K5SLlER+D/Op5IW8ahfLjFuws0NrYVOUgQQjE5guCfg+5Ui0l1JDkHXxpszcrDc1berRUvSAYoOptNJvUA2+7A+sf+m010Vs1FPiQhD2idodd446QrnlD0aadWmHJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMTMx71v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GC8BTwZ5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 225C5C4CEE3;
-	Fri, 27 Jun 2025 15:01:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMTMx71v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB940C4CEE3;
+	Fri, 27 Jun 2025 17:25:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751036499;
-	bh=G83basSwJmom/UjEsv3A4K0YpUbhyHGDHOVGor+sYC8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GC8BTwZ5Zhns9//KZQl3at71K9DS6LTMDhoYTzHFzghg48sXazqO+X3knNNUE/Wkd
-	 DW0jneRafgrniYuJvtTSzpDyk/bUWDGVIoCikzZ9Tu664NlEwFbvFz6euiYSBRgTSG
-	 Wh5oJA3UEjrvGkaWL7cWhOianNhSnzRwMeYBknMl6D6ptHkOVH6VJHebxSbEMkKaG2
-	 8qPtskrpQbe4f8P0x5IV1Rt2MkEc0p0hfWa4k3KM7AJxj5sg8KQzl05iarRY+VVxJx
-	 d9ol4offvylbZFfhsdQFJzcZJQfPi/vB2ZXAhdCfnIch4/3oYUSO1h1A9/Eg/8uvSm
-	 cOo30SqgmoG9A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uVAa8-00Ab1s-Ur;
-	Fri, 27 Jun 2025 16:01:37 +0100
-Date: Fri, 27 Jun 2025 16:01:36 +0100
-Message-ID: <86plepb54f.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 10/22] KVM: arm64: Set up FGT for Partitioned PMU
-In-Reply-To: <20250626200459.1153955-11-coltonlewis@google.com>
-References: <20250626200459.1153955-1-coltonlewis@google.com>
-	<20250626200459.1153955-11-coltonlewis@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1751045107;
+	bh=TjGWey8FcBbGmqOInU155Db/0s5SY/hzFhuW5NLF6cI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=kMTMx71v6QM/OXAP+Y0vfh2Ir0lcOSak7ALprCXKwUgIF0uKebxCPcQU3Vf13aR0z
+	 iWz+WSzDHeQLfrNGqlER6Rf4D3Bovf/AJuGCl9acOgWDuA77RUScEDfaZbxwwq14qs
+	 lTqZ86zTd+r68HGYzkYHlGSqa5tCYH9qZU2FMMbjKq0O4JryKCEtChOERdVS6BKhOX
+	 ramNyYWQ+rKpWs0nL511bBvEVdCI6R8bEyEAt/ptDzqk999Rzbr/2gy9YuVDmUy0Wk
+	 Ke78hj90sRZRzfBm8Uiho/4VvA7tQx7kI0kG5lNDMAstg+qLC9PhZpzUJuxhLnr7zz
+	 CjJbpZqTNijXg==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH 0/3] arm64: Support FEAT_LSFE (Large System Float
+ Extension)
+Date: Fri, 27 Jun 2025 18:20:43 +0100
+Message-Id: <20250627-arm64-lsfe-v1-0-68351c4bf741@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOvSXmgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDMyNT3cSiXDMT3ZzitFRdAwtDg+Q0S4vElGQjJaCGgqLUtMwKsGHRsbW
+ 1AFdTkTtcAAAA
+X-Change-ID: 20250625-arm64-lsfe-0810cf98adc2
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+ linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-cff91
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1081; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=TjGWey8FcBbGmqOInU155Db/0s5SY/hzFhuW5NLF6cI=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoXtPt0FftV/nPMAp/n+4AWdmZOj6LgUFaBlaA+
+ 4ex33utcbSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaF7T7QAKCRAk1otyXVSH
+ 0MOSB/9s8wuMp+MQz7BhZa2kE2BZucnu98xD581nSGlh0NygznHU5GiBt16nWyR/96xsxh7X6Pt
+ 4GqJqm3TQyyYBj0V8GK9ZeBDgyW64FmjYSzvn3WcCt0rdcyzWPTBUPfGXx4YPu5I4o3HL3fz5uH
+ 2W+Mkl10sFSBiJGJzoWlagqg/Z392OpdPSXq7ZK8BlLER1n5zicMpw50tXZK8g3aVZaa8Ozt7E8
+ F4PUCjnn4hk/WchuQi3P+ohPmnHYzEWIrdxC+61y0Gop+0m1esJufi4ZQxUk3QSf5EEZgxbL1dp
+ JoIe4+SkFWRhJtRFXoKtJKFQTN6WKUWtZahW7oABwkMAPHfZ
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Thu, 26 Jun 2025 21:04:46 +0100,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> In order to gain the best performance benefit from partitioning the
-> PMU, utilize fine grain traps (FEAT_FGT and FEAT_FGT2) to avoid
-> trapping common PMU register accesses by the guest to remove that
-> overhead.
-> 
-> There should be no information leaks between guests as all these
-> registers are context swapped by a later patch in this series.
-> 
-> Untrapped:
-> * PMCR_EL0
-> * PMUSERENR_EL0
-> * PMSELR_EL0
-> * PMCCNTR_EL0
-> * PMINTEN_EL0
-> * PMEVCNTRn_EL0
-> 
-> Trapped:
-> * PMOVS_EL0
-> * PMEVTYPERn_EL0
-> * PMCCFILTR_EL0
-> * PMICNTR_EL0
-> * PMICFILTR_EL0
-> 
-> PMOVS remains trapped so KVM can track overflow IRQs that will need to
-> be injected into the guest.
-> 
-> PMICNTR remains trapped because KVM is not handling that yet.
-> 
-> PMEVTYPERn remains trapped so KVM can limit which events guests can
-> count, such as disallowing counting at EL2. PMCCFILTR and PMCIFILTR
-> are the same.
+FEAT_LSFE is optional from v9.5, it adds new instructions for atomic
+memory operations with floating point values.  We have no immediate use
+for it in kernel, provide a hwcap so userspace can discover it and allow
+the ID register field to be exposed to KVM guests.
 
-I'd rather you explain why it is safe not to trap the rest.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Mark Brown (3):
+      arm64/hwcap: Add hwcap for FEAT_LSFE
+      KVM: arm64: Expose FEAT_LSFE to guests
+      kselftest/arm64: Add lsfe to the hwcaps test
 
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  arch/arm64/include/asm/kvm_pmu.h        | 23 ++++++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 58 +++++++++++++++++++++++++
->  arch/arm64/kvm/pmu-part.c               | 32 ++++++++++++++
->  3 files changed, 113 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
-> index 6328e90952ba..73b7161e3f4e 100644
-> --- a/arch/arm64/include/asm/kvm_pmu.h
-> +++ b/arch/arm64/include/asm/kvm_pmu.h
-> @@ -94,6 +94,21 @@ u64 kvm_pmu_guest_counter_mask(struct arm_pmu *pmu);
->  void kvm_pmu_host_counters_enable(void);
->  void kvm_pmu_host_counters_disable(void);
->  
-> +#if !defined(__KVM_NVHE_HYPERVISOR__)
-> +bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu);
-> +bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu);
-> +#else
-> +static inline bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +
->  /*
->   * Updates the vcpu's view of the pmu events for this cpu.
->   * Must be called before every vcpu run after disabling interrupts, to ensure
-> @@ -133,6 +148,14 @@ static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
->  {
->  	return 0;
->  }
-> +static inline bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +static inline bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
->  static inline void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu,
->  					     u64 select_idx, u64 val) {}
->  static inline void kvm_pmu_set_counter_value_user(struct kvm_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 825b81749972..47d2db8446df 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -191,6 +191,61 @@ static inline bool cpu_has_amu(void)
->                 ID_AA64PFR0_EL1_AMU_SHIFT);
->  }
->  
-> +/**
-> + * __activate_pmu_fgt() - Activate fine grain traps for partitioned PMU
-> + * @vcpu: Pointer to struct kvm_vcpu
-> + *
-> + * Clear the most commonly accessed registers for a partitioned
-> + * PMU. Trap the rest.
-> + */
-> +static inline void __activate_pmu_fgt(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
-> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> +	u64 set;
-> +	u64 clr;
-> +
-> +	set = HDFGRTR_EL2_PMOVS
-> +		| HDFGRTR_EL2_PMCCFILTR_EL0
-> +		| HDFGRTR_EL2_PMEVTYPERn_EL0;
-> +	clr = HDFGRTR_EL2_PMUSERENR_EL0
-> +		| HDFGRTR_EL2_PMSELR_EL0
-> +		| HDFGRTR_EL2_PMINTEN
-> +		| HDFGRTR_EL2_PMCNTEN
-> +		| HDFGRTR_EL2_PMCCNTR_EL0
-> +		| HDFGRTR_EL2_PMEVCNTRn_EL0;
-> +
-> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR_EL2, clr, set);
-> +
-> +	set = HDFGWTR_EL2_PMOVS
-> +		| HDFGWTR_EL2_PMCCFILTR_EL0
-> +		| HDFGWTR_EL2_PMEVTYPERn_EL0;
-> +	clr = HDFGWTR_EL2_PMUSERENR_EL0
-> +		| HDFGWTR_EL2_PMCR_EL0
-> +		| HDFGWTR_EL2_PMSELR_EL0
-> +		| HDFGWTR_EL2_PMINTEN
-> +		| HDFGWTR_EL2_PMCNTEN
-> +		| HDFGWTR_EL2_PMCCNTR_EL0
-> +		| HDFGWTR_EL2_PMEVCNTRn_EL0;
-> +
-> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR_EL2, clr, set);
-> +
-> +	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
-> +		return;
-> +
-> +	set = HDFGRTR2_EL2_nPMICFILTR_EL0
-> +		| HDFGRTR2_EL2_nPMICNTR_EL0;
-> +	clr = 0;
-> +
-> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR2_EL2, clr, set);
-> +
-> +	set = HDFGWTR2_EL2_nPMICFILTR_EL0
-> +		| HDFGWTR2_EL2_nPMICNTR_EL0;
-> +	clr = 0;
-> +
-> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR2_EL2, clr, set);
+ Documentation/arch/arm64/elf_hwcaps.rst   |  4 ++++
+ arch/arm64/include/asm/hwcap.h            |  1 +
+ arch/arm64/include/uapi/asm/hwcap.h       |  1 +
+ arch/arm64/kernel/cpufeature.c            |  2 ++
+ arch/arm64/kernel/cpuinfo.c               |  1 +
+ arch/arm64/kvm/sys_regs.c                 |  4 +++-
+ tools/testing/selftests/arm64/abi/hwcap.c | 21 +++++++++++++++++++++
+ 7 files changed, 33 insertions(+), 1 deletion(-)
+---
+base-commit: 86731a2a651e58953fc949573895f2fa6d456841
+change-id: 20250625-arm64-lsfe-0810cf98adc2
 
-This feels wrong. There should be one place to populate the FGTs that
-apply to a guest as set from the host, not two or more.
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
-There is such a construct in the SME series, and maybe you could have
-a look at it, specially if the trap configuration is this static.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
