@@ -1,193 +1,234 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC1D22F75C
-	for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 15:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4866E1B78F3;
+	Fri, 27 Jun 2025 15:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751036466; cv=none; b=rq2oOBkwaW2ZlLt4ba352pawngDPfjPPwnlzSfqkEMOggaB52Js7K8YyzwLHNZmT/cD8qAJaE17/MRC+4PTQc4oHhn/x4T4JexpU7pcO+YGEo5dNIXgXVf6nI0SsB5N3giEDFYkrmtnL6q26agecCKc1UvqI/VPsUR/9NLjlexI=
+	t=1751036499; cv=none; b=BjW5QoASlRnFhUkAr5BR1/y2dcek1K+j2+A02FeH1PETdggnqZxlfH4QJZwZs6f7CfvIE0BrlO0OX+1qBJkXL1WmwjWpn8H9dbMH1RZ89T9pbYIyooS/+B9qN1P6jWv5W5nR+Iy4mHE7jDJevk/a5gWRnfVDg8IOPQgCmVt69As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751036466; c=relaxed/simple;
-	bh=6ujoqmRO5RyKRytqvKPKVslFAEvxQPuN+1xFG8o9Fcg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=k6whmkcO8t1JmIp/5xI8wuOhR+VRSuKXau0bPc0gx+JQQ9l1LyWCvqVKpWA9ZkPzWXLxQaaYMCunoV5ZYCXRmQgp4Hde2fRAj/3EHOZIZgTZYTR8QPFj0lfy/oTNybSaTDW/JLTIvQY1qTPni0tKjxwIfTSrp4m0JKIsCC756Iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zf+uZXDc; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1751036499; c=relaxed/simple;
+	bh=G83basSwJmom/UjEsv3A4K0YpUbhyHGDHOVGor+sYC8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rc9xHsOraq7u5c9eFYhQDfulGzgP3dcYYKa+KIWESZjwymlELHkrFeBFjjTMZt9AHL08P9IDXpnvNcqGVL4UqBN0nU36JOXEFKEqpynPdfaAyFyg3CnWtap1u9Jo+9FIAB7qMzu0/TxUFmZ9ojDvBkXUieDoxZd121px0wmoU6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GC8BTwZ5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zf+uZXDc"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c00e965d0so1646195a12.2
-        for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 08:01:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751036464; x=1751641264; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aRAl9wI634BPGjcu8H/zKu0rYl19B+V87gNfnSSPISY=;
-        b=Zf+uZXDcTsYuyk7eUD+ndkVf8MJrORMwZnPJAWObzboWzePXudeZ70qg6CqvBfYFxT
-         m7kW9NqGdJ93kyCi4YYDOPMmg4vFOVn7yGEP/89KvyIrIcmu32nQWfEH8vksIZIJBqTi
-         Ubo1AdFzUr/eHK2t4x3+sqD1dxmN81I/61B09G+WPRoibcdw+D70VULfu7QuB5UuAg/F
-         EdONqzMUtLKRFehGPKdYAhyWO30RhWyx/ileJtdGysLXNA1wdiav6b6u9LsdIFfZMFtF
-         q/KSBrLpU3y0aLb883Bu/AC82eKLGJrNHYhNFaivflSFjRMFH60D8MY1tqESMSKOcdOB
-         p7rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751036464; x=1751641264;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aRAl9wI634BPGjcu8H/zKu0rYl19B+V87gNfnSSPISY=;
-        b=YEEUraFzQP0kBTj3qt/cOxkIyKMHbuQD1UOn92x80wsika2w+yimnoiWSQmvZSGvX4
-         Qq7isKW095tRF1C9Dr8HOfsq8jhdb0gCq/0Hu3PKutG00appGEnQEPYtFuFSVvzkxLpV
-         W4uhhnc68uoSCvEkVZibdZ34QUFz6m8uADAqkzqnxpGYb5i/Uc3ZcIjiuws9zxROV5en
-         BXLKyQRhUBlWi7WmC+/G56HpOyFOGnk0uzuKgv5/H0eJSlyt3YZywwb48JizX7pW6GNk
-         3rpV5biXkON7N2EcbgZqUiymCzysrEQacWXxbnKfUKU6Y8lA9ywdp/ic7iJnUdAVgcd9
-         Vzcw==
-X-Forwarded-Encrypted: i=1; AJvYcCUklhAz2jivi/Y4rbvLM8X2seFLdwBEUy5Paym5Y4rlqV+jHkDKVIWbMOWiT2x0Tw+I7nacEGI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx6/OV/rZBoNDuFYI64vjRnTxek2XEt8Lvj0ZROGvGn0eiXQuaC
-	+oUjBp6TaAHrir/8EgsE+j49f3Xq+GowdHpjqp1Sib32HDegZWXvKRhOSEeMvI3Ygetx+/ngS9i
-	Uu+dh6IGG+u3Tg0ZtgNN/a+I3wg==
-X-Google-Smtp-Source: AGHT+IGurS1FeZxjPsUkkgX6nLcb9gWPD1RB81LRFHPYYM11l8SKTEFiNYBAYv1ewEvWIoDgL2ZOZLZLlNTHAJWkEw==
-X-Received: from pjbnb6.prod.google.com ([2002:a17:90b:35c6:b0:311:8076:14f1])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2c90:b0:312:ec3b:82c0 with SMTP id 98e67ed59e1d1-318c9314d79mr4816447a91.29.1751036464315;
- Fri, 27 Jun 2025 08:01:04 -0700 (PDT)
-Date: Fri, 27 Jun 2025 08:01:02 -0700
-In-Reply-To: <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GC8BTwZ5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 225C5C4CEE3;
+	Fri, 27 Jun 2025 15:01:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751036499;
+	bh=G83basSwJmom/UjEsv3A4K0YpUbhyHGDHOVGor+sYC8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GC8BTwZ5Zhns9//KZQl3at71K9DS6LTMDhoYTzHFzghg48sXazqO+X3knNNUE/Wkd
+	 DW0jneRafgrniYuJvtTSzpDyk/bUWDGVIoCikzZ9Tu664NlEwFbvFz6euiYSBRgTSG
+	 Wh5oJA3UEjrvGkaWL7cWhOianNhSnzRwMeYBknMl6D6ptHkOVH6VJHebxSbEMkKaG2
+	 8qPtskrpQbe4f8P0x5IV1Rt2MkEc0p0hfWa4k3KM7AJxj5sg8KQzl05iarRY+VVxJx
+	 d9ol4offvylbZFfhsdQFJzcZJQfPi/vB2ZXAhdCfnIch4/3oYUSO1h1A9/Eg/8uvSm
+	 cOo30SqgmoG9A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uVAa8-00Ab1s-Ur;
+	Fri, 27 Jun 2025 16:01:37 +0100
+Date: Fri, 27 Jun 2025 16:01:36 +0100
+Message-ID: <86plepb54f.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Mingwei Zhang <mizhang@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 10/22] KVM: arm64: Set up FGT for Partitioned PMU
+In-Reply-To: <20250626200459.1153955-11-coltonlewis@google.com>
+References: <20250626200459.1153955-1-coltonlewis@google.com>
+	<20250626200459.1153955-11-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-11-tabba@google.com>
- <aEyhHgwQXW4zbx-k@google.com> <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
-Message-ID: <diqza55tjkk1.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
- guest_memfd with shared memory
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Ackerley Tng <ackerleytng@google.com> writes:
+On Thu, 26 Jun 2025 21:04:46 +0100,
+Colton Lewis <coltonlewis@google.com> wrote:
+> 
+> In order to gain the best performance benefit from partitioning the
+> PMU, utilize fine grain traps (FEAT_FGT and FEAT_FGT2) to avoid
+> trapping common PMU register accesses by the guest to remove that
+> overhead.
+> 
+> There should be no information leaks between guests as all these
+> registers are context swapped by a later patch in this series.
+> 
+> Untrapped:
+> * PMCR_EL0
+> * PMUSERENR_EL0
+> * PMSELR_EL0
+> * PMCCNTR_EL0
+> * PMINTEN_EL0
+> * PMEVCNTRn_EL0
+> 
+> Trapped:
+> * PMOVS_EL0
+> * PMEVTYPERn_EL0
+> * PMCCFILTR_EL0
+> * PMICNTR_EL0
+> * PMICFILTR_EL0
+> 
+> PMOVS remains trapped so KVM can track overflow IRQs that will need to
+> be injected into the guest.
+> 
+> PMICNTR remains trapped because KVM is not handling that yet.
+> 
+> PMEVTYPERn remains trapped so KVM can limit which events guests can
+> count, such as disallowing counting at EL2. PMCCFILTR and PMCIFILTR
+> are the same.
 
-> [...]
+I'd rather you explain why it is safe not to trap the rest.
 
->>> +/*
->>> + * Returns true if the given gfn's private/shared status (in the CoCo sense) is
->>> + * private.
->>> + *
->>> + * A return value of false indicates that the gfn is explicitly or implicitly
->>> + * shared (i.e., non-CoCo VMs).
->>> + */
->>>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->>>  {
->>> -	return IS_ENABLED(CONFIG_KVM_GMEM) &&
->>> -	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
->>> +	struct kvm_memory_slot *slot;
->>> +
->>> +	if (!IS_ENABLED(CONFIG_KVM_GMEM))
->>> +		return false;
->>> +
->>> +	slot = gfn_to_memslot(kvm, gfn);
->>> +	if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot)) {
->>> +		/*
->>> +		 * Without in-place conversion support, if a guest_memfd memslot
->>> +		 * supports shared memory, then all the slot's memory is
->>> +		 * considered not private, i.e., implicitly shared.
->>> +		 */
->>> +		return false;
->>
->> Why!?!?  Just make sure KVM_MEMORY_ATTRIBUTE_PRIVATE is mutually exclusive with
->> mappable guest_memfd.  You need to do that no matter what. 
->
-> Thanks, I agree that setting KVM_MEMORY_ATTRIBUTE_PRIVATE should be
-> disallowed for gfn ranges whose slot is guest_memfd-only. Missed that
-> out. Where do people think we should check the mutual exclusivity?
->
-> In kvm_supported_mem_attributes() I'm thiking that we should still allow
-> the use of KVM_MEMORY_ATTRIBUTE_PRIVATE for other non-guest_memfd-only
-> gfn ranges. Or do people think we should just disallow
-> KVM_MEMORY_ATTRIBUTE_PRIVATE for the entire VM as long as one memslot is
-> a guest_memfd-only memslot?
->
-> If we check mutually exclusivity when handling
-> kvm_vm_set_memory_attributes(), as long as part of the range where
-> KVM_MEMORY_ATTRIBUTE_PRIVATE is requested to be set intersects a range
-> whose slot is guest_memfd-only, the ioctl will return EINVAL.
->
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pmu.h        | 23 ++++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 58 +++++++++++++++++++++++++
+>  arch/arm64/kvm/pmu-part.c               | 32 ++++++++++++++
+>  3 files changed, 113 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
+> index 6328e90952ba..73b7161e3f4e 100644
+> --- a/arch/arm64/include/asm/kvm_pmu.h
+> +++ b/arch/arm64/include/asm/kvm_pmu.h
+> @@ -94,6 +94,21 @@ u64 kvm_pmu_guest_counter_mask(struct arm_pmu *pmu);
+>  void kvm_pmu_host_counters_enable(void);
+>  void kvm_pmu_host_counters_disable(void);
+>  
+> +#if !defined(__KVM_NVHE_HYPERVISOR__)
+> +bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu);
+> +bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu);
+> +#else
+> +static inline bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +#endif
+> +
+>  /*
+>   * Updates the vcpu's view of the pmu events for this cpu.
+>   * Must be called before every vcpu run after disabling interrupts, to ensure
+> @@ -133,6 +148,14 @@ static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+>  {
+>  	return 0;
+>  }
+> +static inline bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +static inline bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+>  static inline void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu,
+>  					     u64 select_idx, u64 val) {}
+>  static inline void kvm_pmu_set_counter_value_user(struct kvm_vcpu *vcpu,
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 825b81749972..47d2db8446df 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -191,6 +191,61 @@ static inline bool cpu_has_amu(void)
+>                 ID_AA64PFR0_EL1_AMU_SHIFT);
+>  }
+>  
+> +/**
+> + * __activate_pmu_fgt() - Activate fine grain traps for partitioned PMU
+> + * @vcpu: Pointer to struct kvm_vcpu
+> + *
+> + * Clear the most commonly accessed registers for a partitioned
+> + * PMU. Trap the rest.
+> + */
+> +static inline void __activate_pmu_fgt(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> +	u64 set;
+> +	u64 clr;
+> +
+> +	set = HDFGRTR_EL2_PMOVS
+> +		| HDFGRTR_EL2_PMCCFILTR_EL0
+> +		| HDFGRTR_EL2_PMEVTYPERn_EL0;
+> +	clr = HDFGRTR_EL2_PMUSERENR_EL0
+> +		| HDFGRTR_EL2_PMSELR_EL0
+> +		| HDFGRTR_EL2_PMINTEN
+> +		| HDFGRTR_EL2_PMCNTEN
+> +		| HDFGRTR_EL2_PMCCNTR_EL0
+> +		| HDFGRTR_EL2_PMEVCNTRn_EL0;
+> +
+> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR_EL2, clr, set);
+> +
+> +	set = HDFGWTR_EL2_PMOVS
+> +		| HDFGWTR_EL2_PMCCFILTR_EL0
+> +		| HDFGWTR_EL2_PMEVTYPERn_EL0;
+> +	clr = HDFGWTR_EL2_PMUSERENR_EL0
+> +		| HDFGWTR_EL2_PMCR_EL0
+> +		| HDFGWTR_EL2_PMSELR_EL0
+> +		| HDFGWTR_EL2_PMINTEN
+> +		| HDFGWTR_EL2_PMCNTEN
+> +		| HDFGWTR_EL2_PMCCNTR_EL0
+> +		| HDFGWTR_EL2_PMEVCNTRn_EL0;
+> +
+> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR_EL2, clr, set);
+> +
+> +	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
+> +		return;
+> +
+> +	set = HDFGRTR2_EL2_nPMICFILTR_EL0
+> +		| HDFGRTR2_EL2_nPMICNTR_EL0;
+> +	clr = 0;
+> +
+> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR2_EL2, clr, set);
+> +
+> +	set = HDFGWTR2_EL2_nPMICFILTR_EL0
+> +		| HDFGWTR2_EL2_nPMICNTR_EL0;
+> +	clr = 0;
+> +
+> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR2_EL2, clr, set);
 
-At yesterday's (2025-06-26) guest_memfd upstream call discussion,
+This feels wrong. There should be one place to populate the FGTs that
+apply to a guest as set from the host, not two or more.
 
-* Fuad brought up a possible use case where within the *same* VM, we
-  want to allow both memslots that supports and does not support mmap in
-  guest_memfd.
-* Shivank suggested a concrete use case for this: the user wants a
-  guest_memfd memslot that supports mmap just so userspace addresses can
-  be used as references for specifying memory policy.
-* Sean then added on that allowing both types of guest_memfd memslots
-  (support and not supporting mmap) will allow the user to have a second
-  layer of protection and ensure that for some memslots, the user
-  expects never to be able to mmap from the memslot.
+There is such a construct in the SME series, and maybe you could have
+a look at it, specially if the trap configuration is this static.
 
-I agree it will be useful to allow both guest_memfd memslots that
-support and do not support mmap in a single VM.
+	M.
 
-I think I found an issue with flags, which is that GUEST_MEMFD_FLAG_MMAP
-should not imply that the guest_memfd will provide memory for all guest
-faults within the memslot's gfn range (KVM_MEMSLOT_GMEM_ONLY).
-
-For the use case Shivank raised, if the user wants a guest_memfd memslot
-that supports mmap just so userspace addresses can be used as references
-for specifying memory policy for legacy Coco VMs where shared memory
-should still come from other sources, GUEST_MEMFD_FLAG_MMAP will be set,
-but KVM can't fault shared memory from guest_memfd. Hence,
-GUEST_MEMFD_FLAG_MMAP should not imply KVM_MEMSLOT_GMEM_ONLY.
-
-Thinking forward, if we want guest_memfd to provide (no-mmap) protection
-even for non-CoCo VMs (such that perhaps initial VM image is populated
-and then VM memory should never be mmap-ed at all), we will want
-guest_memfd to be the source of memory even if GUEST_MEMFD_FLAG_MMAP is
-not set.
-
-I propose that we should have a single VM-level flag to solve this (in
-line with Sean's guideline that we should just move towards what we want
-and not support non-existent use cases): something like
-KVM_CAP_PREFER_GMEM.
-
-If KVM_CAP_PREFER_GMEM_MEMORY is set,
-
-* memory for any gfn range in a guest_memfd memslot will be requested
-  from guest_memfd
-* any privacy status queries will also be directed to guest_memfd
-* KVM_MEMORY_ATTRIBUTE_PRIVATE will not be a valid attribute
-
-KVM_CAP_PREFER_GMEM_MEMORY will be orthogonal with no validation on
-GUEST_MEMFD_FLAG_MMAP, which should just purely guard mmap support in
-guest_memfd.
-
-Here's a table that I set up [1]. I believe the proposed
-KVM_CAP_PREFER_GMEM_MEMORY (column 7) lines up with requirements
-(columns 1 to 4) correctly.
-
-[1] https://lpc.events/event/18/contributions/1764/attachments/1409/3710/guest_memfd%20use%20cases%20vs%20guest_memfd%20flags%20and%20privacy%20tracking.pdf
-
-> [...]
-
+-- 
+Without deviation from the norm, progress is not possible.
