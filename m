@@ -1,213 +1,169 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83F52989AD;
-	Fri, 27 Jun 2025 10:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058821DFE1;
+	Fri, 27 Jun 2025 13:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751020671; cv=none; b=cB22uGRpSSpS8OLRaMEum/etpYa1JtlKKlVJz+4aR3x6WcCPMubq8DQ7pAvUAUPFJjZDGOJnaUjNkGhqvwKLCymFKALYn9Ad7+Bv/tMMgHB9JueKOA461580HHZ9YgJk8R5W3TZTy5Q7Knvxzh13FsElaORvwFhNzFrJ+jFa+E0=
+	t=1751029953; cv=none; b=o0xoDAi0Kfl4ummYP+C+zSAUCFOVRzx4TGjcq1womL+ZzWmUlzha+Mj0/PaTert/lX6G1gZ1tbCtRY6zwm0ZFWJ2gujctG4zFtrPRGhR6jM8ubTv1TMfu8HUaTp/QkbVp7K/PP4ebEux5ubnagvF8pBMEFskPgd0AALosrXKxtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751020671; c=relaxed/simple;
-	bh=3O52TgpgRoSKwiLFYIvR9/AgjAWdfHaU9zTqfIjOXU8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MP58kKkSKRlDRFw88DNzqIXvrWdOS7Byb/cC02iZsUvHAEpE/YltOeUjgw0qqlyIjbpCWTm2WM6/iWJ0iFDost2OUQGXYmP8MyLscSLzSCTx9N2mjHE7fm4j5olXLDiMIlJErFPJJi3DNkkPCvWEjICugM3B/v6xB+goNTyMnqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 023AB1A00;
-	Fri, 27 Jun 2025 03:37:32 -0700 (PDT)
-Received: from [10.1.31.20] (e122027.cambridge.arm.com [10.1.31.20])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A43443F58B;
-	Fri, 27 Jun 2025 03:37:44 -0700 (PDT)
-Message-ID: <f1cdef31-1427-48ea-a741-a48e8b366093@arm.com>
-Date: Fri, 27 Jun 2025 11:37:38 +0100
+	s=arc-20240116; t=1751029953; c=relaxed/simple;
+	bh=Q6l1BxiwXFJKVXwA6TiA3L7Wf54iRrkNwkTuo2v5rJo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=exSIYv3qR0FylJJQp0CeNccSNFvkmlSlxtKoNktJ/+6srk62ndJwkMLniQ/cBp1bmxQ7ySBoxb2ciXsHk5DdN18GiT/iCH4F1Q55WAekUkhx78KTrNVkbWuHTSElwn7aQvg9RuJl4kbpIGXJSWHlZAPLPOpsBHwN7DbX1mvJ1QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SyxSP074; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SyxSP074"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A07ECC4CEE3;
+	Fri, 27 Jun 2025 13:12:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751029952;
+	bh=Q6l1BxiwXFJKVXwA6TiA3L7Wf54iRrkNwkTuo2v5rJo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SyxSP074QoZcLTurytGAT4H9kzsOKMb6JhCvcMlKX4gwoPYlWBro+g8Vxdnrez6fS
+	 kRiHcTukK7xhlhSLD1z5fRXgfAPBmR+aolbdZ928nb0z3DE9kwpbPA8K9yUNph4dMA
+	 dV+jS1fD248e2GrFEBQbn+LG7GwNDempn63G92ZwflvZiDHuwuvhYFPXzub+0HwxaF
+	 5897rGDwtPwmAbJ1fhQQWwe7P1WKGoI3Uu5EKSwcLZE/5h1Xyx5Jw9lTIpYxPcMMSz
+	 8c6EcDYOgOxVIK2A52aqI0+xt38dznPiX0JFl8KENbUqi3d9MUjFhTArFC7WxhNc0J
+	 DZhakMlatKyiw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uV8sY-00AZLe-8g;
+	Fri, 27 Jun 2025 14:12:30 +0100
+Date: Fri, 27 Jun 2025 14:12:29 +0100
+Message-ID: <86v7ohba6a.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: <oliver.upton@linux.dev>, Yicong Yang <yangyicong@huawei.com>
+Cc: 	<yangyicong@hisilicon.com>,
+	<catalin.marinas@arm.com>,
+	<will@kernel.org>,
+	<corbet@lwn.net>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>,
+	<joey.gouly@arm.com>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<shuah@kernel.org>,
+	<jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>,
+	<linuxarm@huawei.com>,
+	<prime.zeng@hisilicon.com>,
+	<xuwei5@huawei.com>,
+	<tangchengchang@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v3 3/7] KVM: arm64: Handle DABT caused by LS64* instructions on unsupported memory
+In-Reply-To: <44993060-7eb1-400c-9887-3d438aeb8ee9@huawei.com>
+References: <20250626080906.64230-1-yangyicong@huawei.com>
+	<20250626080906.64230-4-yangyicong@huawei.com>
+	<86zfduc2ca.wl-maz@kernel.org>
+	<44993060-7eb1-400c-9887-3d438aeb8ee9@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 00/43] arm64: Support for Arm CCA in KVM
-To: "Emi Kisanuki (Fujitsu)" <fj0570is@fujitsu.com>,
- "'kvm@vger.kernel.org'" <kvm@vger.kernel.org>,
- "'kvmarm@lists.linux.dev'" <kvmarm@lists.linux.dev>
-Cc: 'Catalin Marinas' <catalin.marinas@arm.com>,
- 'Marc Zyngier' <maz@kernel.org>, 'Will Deacon' <will@kernel.org>,
- 'James Morse' <james.morse@arm.com>, 'Oliver Upton'
- <oliver.upton@linux.dev>, 'Suzuki K Poulose' <suzuki.poulose@arm.com>,
- 'Zenghui Yu' <yuzenghui@huawei.com>,
- "'linux-arm-kernel@lists.infradead.org'"
- <linux-arm-kernel@lists.infradead.org>,
- "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
- 'Joey Gouly' <joey.gouly@arm.com>,
- 'Alexandru Elisei' <alexandru.elisei@arm.com>,
- 'Christoffer Dall' <christoffer.dall@arm.com>,
- 'Fuad Tabba' <tabba@google.com>,
- "'linux-coco@lists.linux.dev'" <linux-coco@lists.linux.dev>,
- 'Ganapatrao Kulkarni' <gankulkarni@os.amperecomputing.com>,
- 'Gavin Shan' <gshan@redhat.com>,
- 'Shanker Donthineni' <sdonthineni@nvidia.com>,
- 'Alper Gun' <alpergun@google.com>,
- "'Aneesh Kumar K . V'" <aneesh.kumar@kernel.org>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <TYXPR01MB1886280D98B07E971424D62BC37BA@TYXPR01MB1886.jpnprd01.prod.outlook.com>
-Content-Language: en-GB
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <TYXPR01MB1886280D98B07E971424D62BC37BA@TYXPR01MB1886.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, yangyicong@huawei.com, yangyicong@hisilicon.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, shuah@kernel.org, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, linuxarm@huawei.com, prime.zeng@hisilicon.com, xuwei5@huawei.com, tangchengchang@huawei.com, wangzhou1@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 25/06/2025 02:51, Emi Kisanuki (Fujitsu) wrote:
-> We tested this patch in our internal simulator which is a hardware simulator for Fujitsu's next generation CPU known as Monaka. and it produced the expected results.
+On Thu, 26 Jun 2025 12:39:41 +0100,
+Yicong Yang <yangyicong@huawei.com> wrote:
 > 
-> I have verified the following
-> 1. Launching the realm VM using Internal simulator -> Successfully launched by disabling MPAM support in the ID register.
-> 2. Running kvm-unit-tests (with lkvm) -> All tests passed except for PMU (as expected, since PMU is not supported by the Internal simulator).[1]
+> On 2025/6/26 16:51, Marc Zyngier wrote:
+> > On Thu, 26 Jun 2025 09:09:02 +0100,
+> > Yicong Yang <yangyicong@huawei.com> wrote:
+
+[...]
+
+> >>
+> >> +	/*
+> >> +	 * Target address is normal memory on the Host. We come here
+> >> +	 * because:
+> >> +	 * 1) Guest map it as device memory and perform LS64 operations
+> >> +	 * 2) VMM report it as device memory mistakenly
+> >> +	 * Hand it to the userspace.
+> >> +	 */
+> >> +	if (esr_fsc_is_excl_atomic_fault(kvm_vcpu_get_esr(vcpu))) {
+> >> +		struct kvm_run *run = vcpu->run;
+> >> +
+> >> +		run->exit_reason = KVM_EXIT_ARM_LDST64B;
+> >> +		run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
+> >> +		run->arm_nisv.fault_ipa = fault_ipa |
+> >> +			(kvm_vcpu_get_hfar(vcpu) & (vma_pagesize - 1));
+> >> +
+> >> +		return -EAGAIN;
+> >> +	}
+> > 
+> > I'm not sure that's the right thing to do.
+> > 
+> > If:
+> > 
+> > - the guest was told it doesn't have LS64WB,
+> > 
+> > - it was told that some range is memory,
+> > 
+> > - it uses that range as device,
+> > 
+> > - thanks to FWB the resulting memory type is "Normal-Cacheable"
+> > 
+> > - which results in an Unsupported Atomic exception
+> > 
+> > why would we involve the VMM at all? The VMM clearly said it didn't
+> > want to be involved in this (we have a memslot).
+> > 
 > 
-> Tested-by: Emi Kisanuki <fj0570is@fujitsu.com> [1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca cca/latest
-
-Thank you for testing!
-
-Regards,
-Steve
-
+> ok I thought we should make VMM do the decision in all the cases(both
+> here and emulated MMIO) based on the last discussion[*], I may
+> misunderstand it. If this is the case...
 > 
->> This series adds support for running protected VMs using KVM under the Arm
->> Confidential Compute Architecture (CCA).
->>
->> The related guest support was merged for v6.14-rc1 so you no longer need that
->> separately.
->>
->> There are a few changes since v8, many thanks for the review comments. The
->> highlights are below, and individual patches have a changelog.
->>
->>  * NV support is now upstream, so this series no longer conflicts.
->>
->>  * Tidied up RTT accounting by providing wrapper functions to call
->>    kvm_account_pgtable_pages() only when appropriate.
->>
->>  * Propagate the 'may_block' flag to enable cond_resched calls only when
->>    appropriate.
->>
->>  * Reduce code duplication between INIT_RIPAS and SET_RIPAS.
->>
->>  * Various code improvements from the reviews - many thanks!
->>
->>  * Rebased onto v6.16-rc1.
->>
->> Things to note:
->>
->>  * The magic numbers for capabilities and ioctls have been updated. So
->>    you'll need to update your VMM. See below for update kvmtool branch.
->>
->>  * Patch 42 increases KVM_VCPU_MAX_FEATURES to expose the new feature.
->>
->> The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[1].
->>
->> This series is based on v6.16-rc1. It is also available as a git
->> repository:
->>
->> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v9
->>
->> Work in progress changes for kvmtool are available from the git repository below:
->>
->> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v7
->>
->> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
->>
->> Jean-Philippe Brucker (7):
->>   arm64: RME: Propagate number of breakpoints and watchpoints to
->>     userspace
->>   arm64: RME: Set breakpoint parameters through SET_ONE_REG
->>   arm64: RME: Initialize PMCR.N with number counter supported by RMM
->>   arm64: RME: Propagate max SVE vector length from RMM
->>   arm64: RME: Configure max SVE vector length for a Realm
->>   arm64: RME: Provide register list for unfinalized RME RECs
->>   arm64: RME: Provide accurate register list
->>
->> Joey Gouly (2):
->>   arm64: RME: allow userspace to inject aborts
->>   arm64: RME: support RSI_HOST_CALL
->>
->> Steven Price (31):
->>   arm64: RME: Handle Granule Protection Faults (GPFs)
->>   arm64: RME: Add SMC definitions for calling the RMM
->>   arm64: RME: Add wrappers for RMI calls
->>   arm64: RME: Check for RME support at KVM init
->>   arm64: RME: Define the user ABI
->>   arm64: RME: ioctls to create and configure realms
->>   KVM: arm64: Allow passing machine type in KVM creation
->>   arm64: RME: RTT tear down
->>   arm64: RME: Allocate/free RECs to match vCPUs
->>   KVM: arm64: vgic: Provide helper for number of list registers
->>   arm64: RME: Support for the VGIC in realms
->>   KVM: arm64: Support timers in realm RECs
->>   arm64: RME: Allow VMM to set RIPAS
->>   arm64: RME: Handle realm enter/exit
->>   arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
->>   KVM: arm64: Handle realm MMIO emulation
->>   arm64: RME: Allow populating initial contents
->>   arm64: RME: Runtime faulting of memory
->>   KVM: arm64: Handle realm VCPU load
->>   KVM: arm64: Validate register access for a Realm VM
->>   KVM: arm64: Handle Realm PSCI requests
->>   KVM: arm64: WARN on injected undef exceptions
->>   arm64: Don't expose stolen time for realm guests
->>   arm64: RME: Always use 4k pages for realms
->>   arm64: RME: Prevent Device mappings for Realms
->>   arm_pmu: Provide a mechanism for disabling the physical IRQ
->>   arm64: RME: Enable PMU support with a realm guest
->>   arm64: RME: Hide KVM_CAP_READONLY_MEM for realm guests
->>   KVM: arm64: Expose support for private memory
->>   KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
->>   KVM: arm64: Allow activating realms
->>
->> Suzuki K Poulose (3):
->>   kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
->>   kvm: arm64: Don't expose debug capabilities for realm guests
->>   arm64: RME: Allow checking SVE on VM instance
->>
->>  Documentation/virt/kvm/api.rst       |   94 +-
->>  arch/arm64/include/asm/kvm_emulate.h |   40 +
->>  arch/arm64/include/asm/kvm_host.h    |   17 +-
->>  arch/arm64/include/asm/kvm_rme.h     |  139 ++
->>  arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
->>  arch/arm64/include/asm/rmi_smc.h     |  268 ++++
->>  arch/arm64/include/asm/virt.h        |    1 +
->>  arch/arm64/include/uapi/asm/kvm.h    |   49 +
->>  arch/arm64/kvm/Kconfig               |    1 +
->>  arch/arm64/kvm/Makefile              |    3 +-
->>  arch/arm64/kvm/arch_timer.c          |   48 +-
->>  arch/arm64/kvm/arm.c                 |  168 ++-
->>  arch/arm64/kvm/guest.c               |  108 +-
->>  arch/arm64/kvm/hypercalls.c          |    4 +-
->>  arch/arm64/kvm/inject_fault.c        |    5 +-
->>  arch/arm64/kvm/mmio.c                |   16 +-
->>  arch/arm64/kvm/mmu.c                 |  207 ++-
->>  arch/arm64/kvm/pmu-emul.c            |    6 +
->>  arch/arm64/kvm/psci.c                |   30 +
->>  arch/arm64/kvm/reset.c               |   23 +-
->>  arch/arm64/kvm/rme-exit.c            |  207 +++
->>  arch/arm64/kvm/rme.c                 | 1743
->> ++++++++++++++++++++++++++
->>  arch/arm64/kvm/sys_regs.c            |   53 +-
->>  arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
->>  arch/arm64/kvm/vgic/vgic-v3.c        |    6 +-
->>  arch/arm64/kvm/vgic/vgic.c           |   60 +-
->>  arch/arm64/mm/fault.c                |   31 +-
->>  drivers/perf/arm_pmu.c               |   15 +
->>  include/kvm/arm_arch_timer.h         |    2 +
->>  include/kvm/arm_pmu.h                |    4 +
->>  include/kvm/arm_psci.h               |    2 +
->>  include/linux/perf/arm_pmu.h         |    5 +
->>  include/uapi/linux/kvm.h             |   29 +-
->>  33 files changed, 3790 insertions(+), 104 deletions(-)  create mode 100644
->> arch/arm64/include/asm/kvm_rme.h  create mode 100644
->> arch/arm64/include/asm/rmi_cmds.h  create mode 100644
->> arch/arm64/include/asm/rmi_smc.h  create mode 100644
->> arch/arm64/kvm/rme-exit.c  create mode 100644 arch/arm64/kvm/rme.c
->>
->> --
->> 2.43.0
+> > I think we should simply inject the corresponding S1 fault back into
+> > the guest.
+> > 
 > 
+> let's simply inject a corresponding DABT back here and only make the VMM
+> handle the emulated MMIO case. will update if no further comment.
 
+A permission fault at S2 for a R/O memslot should definitely be
+relayed to userspace. But the question is whether the HW would report
+a permission fault or an unsupported atomic or exclusive fault (UAoEF
+for short).
+
+If the HW supports LS64WB, I'd fully expect to get a permission fault,
+not an UAoEF, and we can perfectly report this to userspace with full
+decode information (though this doesn't fit in the KVM_EXIT_MMIO
+structure -- that's "only" an ABI problem).
+
+If it doesn't, then we have a much bigger issue, and I don't think we
+can realistically triage the exception in a meaningful way -- we just
+can't know the reason why we failed, and we don't even know whether
+this was a load or store.
+
+Overall, I can see two options here:
+
+- we limit the LS64 support to HW that supports LS64WB (too bad for
+  the other implementations, which is 100% of them). We can always
+  triage the exception correctly, and we're unlikely to ever take an
+  UAoEF in this context.
+
+- we define that R/O memslots do not support LS64 accesses at all,
+  which is always a valid implementation -- the architecture makes no
+  provision of which pieces of addressable memory supports an access
+  type or another. With that, we can always inject the UAoEF back into
+  the guest without any further triaging.
+
+Oliver, what do you think?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
