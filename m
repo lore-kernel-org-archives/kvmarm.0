@@ -1,130 +1,104 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF9F2F1FDF;
-	Fri, 27 Jun 2025 13:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D1A8460;
+	Fri, 27 Jun 2025 13:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751031373; cv=none; b=Ux+pjzNsvCCG6qobpvgUcpfd8/AKksmUCw8p9z8N9bz3q0zZ4a0xHnZ39h+/I6q1LdVhYOq5Y1rlqHKhqX3dhpHuc+cRyXDsNL5RD3Kh9a1JJ/P7i+M/sWqvB2pKE7/N7hJ4Hf8bW6mUCJ8p/j8xbXjp6bztH0g2iRn7mjkpH3w=
+	t=1751032182; cv=none; b=W4DMe0w8FLzHh4/DvABW2DVeQ01KDWUSLdePGL40V/J6L5D5HNzBezBIDNpoSmr9x8Xq+B7sopchYr7YH24CNYqiANRoi7BbEZUhpWdnNtk9t01mQ6bf3V9Y5awsblsCYezCkbNwNZ6aIm/ySM1Mqc2gT8p1uhaxdtg5w/vUujk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751031373; c=relaxed/simple;
-	bh=b+AqKL/t2Y57F7SFIeF2uOilMxYgh+4DSlllHo4mbfo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mV83OEHy2NTsaAwbWwOtNlk3bwZkl6iyEL1aMCa5ugbbyOKAKDH8hUUv2ZjS/TBaRH9Bi2Hxt0kvVNs477lnNcW7GYXYP38ZhiyCVMfKKi9E8F6hCD4PWhG6PlfIub7ce0C0QKTNjLCcipahkA0YzUa2GCWI0TTvMIXuRHHrTHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AJDDw55M; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751032182; c=relaxed/simple;
+	bh=x75YqVVzzS7TCKzUXIRVofETxdXNt/UoDPIixGWr9DU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N5jRby6Fkt2YTgtG29lG2JfXtoMyFJGoh+kRIxY/r0Bt4pT9yBUog68kPSErq0DDOTd31Zx/s50/0d18+AFzq2F8VAGd1qhMqRr5MVwhcWQ7c90azcELKK7jX5oK53AcUNmfPqgj7SOBGZEcMAClykGqwGlHYuGG1PE0003A12E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tXym3Q84; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AJDDw55M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E2F3C4CEE3;
-	Fri, 27 Jun 2025 13:36:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tXym3Q84"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F9DC4CEE3;
+	Fri, 27 Jun 2025 13:49:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751031373;
-	bh=b+AqKL/t2Y57F7SFIeF2uOilMxYgh+4DSlllHo4mbfo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AJDDw55MJlOCVvTFjNTI1frKXCVh8blcEuVXrNyCokvJAG1kOtlsiSCic2uxm/G58
-	 BrO+Bxxc3pu2lbtt/kDFxhoI3I/Jayc9I8UXOt/zVMasJmI7ZSMEvccLpRS3W2ftKz
-	 vMjX5+nOFC+dlKksOVew1jaDQGTANoYxW54i4uqYAtJAOpT/QPU8bkfmFRKyvO5Z82
-	 OBVExL/AQvGJPwrZmOfv/uLSLHjfEP9SnTogY6JSz7a6Mof3pQ1ypdnBiFhJl5xYqZ
-	 K5yUAUals6BoMVo6oBjiZj6o8Fd79QHkP4M1Nsw6w8w00SrbjZM77B1tghvy3iPl3S
-	 QddlGxg2/VoWg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uV9FS-00AZpT-Nm;
-	Fri, 27 Jun 2025 14:36:11 +0100
-Date: Fri, 27 Jun 2025 14:36:10 +0100
-Message-ID: <86qzz5b92t.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 09/22] KVM: arm64: Correct kvm_arm_pmu_get_max_counters()
-In-Reply-To: <20250626200459.1153955-10-coltonlewis@google.com>
-References: <20250626200459.1153955-1-coltonlewis@google.com>
-	<20250626200459.1153955-10-coltonlewis@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1751032181;
+	bh=x75YqVVzzS7TCKzUXIRVofETxdXNt/UoDPIixGWr9DU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tXym3Q84Zf5oFf0O8EIrMHuqj8aZsOo5LS+tasIcYOyNV1khV4muUgzsIgJhypT36
+	 LLxDOmfCdp6MIbkQDAnE1hcu7PbIR0VP7FdZsnBfmnQ4Xqo4NYv9iCMS08w1+bVDxr
+	 yuNxbf2j+dHfJpPSA04KrChBV4Xn62IrSg945Ia0hLhO41fapaoHJmX0IRs+2u4NE3
+	 cPAv+OaowQcbaQgJc6Phkf8ZvLtmgvSK8UUmB7GNUOFN5pzKsefuYrgYP6vpfXqV4m
+	 OpPp7UlHxPHT7TfN1DGpsNUCACNbloluxbWOaIHkZNQ2pQWlTwp1s9gZXE54ndx3mT
+	 v5m+3RqiBEbpA==
+Date: Fri, 27 Jun 2025 14:49:30 +0100
+From: Will Deacon <will@kernel.org>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, ryan.roberts@arm.com, shahuang@redhat.com,
+	lpieralisi@kernel.org, david@redhat.com, ddutile@redhat.com,
+	seanjc@google.com, aniketa@nvidia.com, cjia@nvidia.com,
+	kwankhede@nvidia.com, kjaju@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, zhiw@nvidia.com,
+	mochs@nvidia.com, udhoke@nvidia.com, dnigam@nvidia.com,
+	alex.williamson@redhat.com, sebastianene@google.com,
+	coltonlewis@google.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+	ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com,
+	linux-mm@kvack.org, tabba@google.com, qperret@google.com,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, maobibo@loongson.cn,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v9 3/6] KVM: arm64: Block cacheable PFNMAP mapping
+Message-ID: <aF6hamOI7YVDP1Cp@willie-the-truck>
+References: <20250621042111.3992-1-ankita@nvidia.com>
+ <20250621042111.3992-4-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250621042111.3992-4-ankita@nvidia.com>
 
-On Thu, 26 Jun 2025 21:04:45 +0100,
-Colton Lewis <coltonlewis@google.com> wrote:
+On Sat, Jun 21, 2025 at 04:21:08AM +0000, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> Since cntr_mask is modified when the PMU is partitioned to remove some
-> bits, make sure the missing counters are added back to get the right
-> total.
-
-Please fix the subject of the patch to be more descriptive. It is
-worded like a bug fix, while it really is only a step in the patch
-series.
-
-Something like "Take partitioning into account for max number of
-counters" would go a long way.
-
+> Fixes a security bug due to mismatched attributes between S1 and
+> S2 mapping.
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> Currently, it is possible for a region to be cacheable in the userspace
+> VMA, but mapped non cached in S2. This creates a potential issue where
+> the VMM may sanitize cacheable memory across VMs using cacheable stores,
+> ensuring it is zeroed. However, if KVM subsequently assigns this memory
+> to a VM as uncached, the VM could end up accessing stale, non-zeroed data
+> from a previous VM, leading to unintended data exposure. This is a security
+> risk.
+> 
+> Block such mismatch attributes case by returning EINVAL when userspace
+> try to map PFNMAP cacheable. Only allow NORMAL_NC and DEVICE_*.
+> 
+> CC: Oliver Upton <oliver.upton@linux.dev>
+> CC: Catalin Marinas <catalin.marinas@arm.com>
+> CC: Sean Christopherson <seanjc@google.com>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->  arch/arm64/kvm/pmu.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index 79b7ea037153..67216451b8ce 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
-> @@ -533,6 +533,8 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
->  u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
->  {
->  	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
-> +	u8 counters;
-> +
+>  arch/arm64/kvm/mmu.c | 34 +++++++++++++++++++++++++++++++++-
+>  1 file changed, 33 insertions(+), 1 deletion(-)
 
-nit: superfluous blank line.
->  
->  	/*
->  	 * PMUv3 requires that all event counters are capable of counting any
-> @@ -545,7 +547,12 @@ u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
->  	 * The arm_pmu->cntr_mask considers the fixed counter(s) as well.
->  	 * Ignore those and return only the general-purpose counters.
->  	 */
-> -	return bitmap_weight(arm_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS);
-> +	counters = bitmap_weight(arm_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS);
-> +
-> +	if (kvm_pmu_is_partitioned(arm_pmu))
-> +		counters += arm_pmu->hpmn_max;
+Sorry for the drive-by comment, but I was looking at this old series from
+Paolo (look at the cover letter and patch 5):
 
-Why the check? Why can't we rely on hpmn_max to always give us the
-correct value?
+https://lore.kernel.org/r/20250109133817.314401-1-pbonzini@redhat.com
 
-Thanks,
+in which he points out that the arm64 get_vma_page_shift() function
+incorrectly assumes that a VM_PFNMAP VMA is physically contiguous, which
+may not be the case if a driver calls remap_pfn_range() to mess around
+with mappings within the VMA. I think that implies that the optimisation
+in 2aa53d68cee6 ("KVM: arm64: Try stage2 block mapping for host device
+MMIO") is unsound.
 
-	M.
+But it got me thinking -- given that remap_pfn_range() also takes a 'prot'
+argument, how do we ensure that this is reflected in the guest? It feels
+a bit dodgy to rely on drivers always passing 'vma->vm_page_prot'.
 
--- 
-Without deviation from the norm, progress is not possible.
+Will
