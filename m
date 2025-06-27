@@ -1,137 +1,169 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263AC2F3E
-	for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 06:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB4D1E9919;
+	Fri, 27 Jun 2025 07:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751006210; cv=none; b=D2b9yscP9TEIzeTt3szCCKPf4N5PIsjLZHlqsCB6FGu+itJIi9DtP6DUmLYaPo8f0TFjVQwyX55l8LOCMRNR9G4Jl7H7r60ij9O79/f7Z7kC0hR3zCeChe31EilzrAsBP5fVPDdRD6BI29uYN6i1LlFgtNCeJHJoIQnrt0Za1VA=
+	t=1751008381; cv=none; b=AreZvu0zqRNR4Rl9+Bn7SAThpGUsJElzCpV76aeyUMs1pTmsDn35Bol+grhu+Uc1Cd1aTUDRu0y/zUJYupHc7bJ0i8ZdMSFXm0kIhrMkq5ZDcDoA1P3DinfQuLqgmwTxZtoI+LbgZjjMeD4waUhw+R8zIjlaMeusBgb/4lCjJws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751006210; c=relaxed/simple;
-	bh=yfoxD1mvMpT0kdTLMcyGUJHKtOqp1CDhSIEAAz9GMpw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=UZETSZD0ew5wJ1HfYnrQOJfKZkJZoXRDU/4epj3o+4+0kDhFJeaaWUwz5QJNSiIV6gVwcLakmbjx1yIA8ovOR2TqnQ7YYCqSPzI09rD14VABXvvnSz3nAmS98Ow6lGc7GrP8h9rcUix2QtR1vKFV41YCTpDZM/wkugrsMhwyeWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bT5MW08hzz2CfnR;
-	Fri, 27 Jun 2025 14:32:39 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 688091A0188;
-	Fri, 27 Jun 2025 14:36:37 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 27 Jun 2025 14:36:37 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 27 Jun 2025 14:36:36 +0800
-Message-ID: <0b54db94-8a6f-cea0-a6f7-dbe8650d66dd@hisilicon.com>
-Date: Fri, 27 Jun 2025 14:36:31 +0800
+	s=arc-20240116; t=1751008381; c=relaxed/simple;
+	bh=vacyOvH9yiqinENGzTmGsKooNswCrtZiKq9q4IMB0VM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=r78zasEiRip/sTIQ9oriXNi1oeoMph3JzkyCmSe6o+9BmkHs8U3HNA3De5xfAkZYLwqdX7s/4a55xGynYAc1j6McLrc6QhQZO7YKAhG5c8HJi8kOQt8rcFO48Z1o41wJ9RPiJSvfPUikidNnpBZqoiYxH1zJU7/QGfPFI1wOqQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hwoiTNxX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hwoiTNxX"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A1E84C4CEE3;
+	Fri, 27 Jun 2025 07:13:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751008380;
+	bh=vacyOvH9yiqinENGzTmGsKooNswCrtZiKq9q4IMB0VM=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=hwoiTNxXnZxp+3WDWqDnX1S9La0EcUnSMotlqKJGKmw3hGdYMANeLwFciZbQKvm3a
+	 oSnF1VxKpXBmS4RJezt1f/QFZ2jM2TKXeUL87PDWMSDhOI/7mGYxhBoaMM1oEuFNZk
+	 JGaFeIWYH4AK9oI7h4yGD1ub2TR4Tky1iwh1PVwB7CpgarwkAlAytWjA6vcpvfU3kD
+	 hkp0LFnxwJMs0BLK37pXa9hFUrxq8jBdhr+vGLryf0JGa68IZix4vWLgDnI+er4GYu
+	 ZEG2fY2Vsrf27PqPM8ZXf51i5HJCI9i3cnsCT0GKpwsBToQ+Hl0PwB9oedVZLXUq1C
+	 ikUdHb/MDIbLA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9069AC77B7F;
+	Fri, 27 Jun 2025 07:13:00 +0000 (UTC)
+From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
+Subject: [PATCH v6 0/5] KVM: arm64: Support FF-A 1.2 and SEND_DIRECT2 ABI
+Date: Fri, 27 Jun 2025 07:12:24 +0000
+Message-Id: <20250627-virtio-msg-ffa-v6-0-8c02fd94edac@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] ARM64: errata: Add workaround for HIP10/HIP10C erratum
- 162200803
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<tangnianyao@huawei.com>, <wangwudi@hisilicon.com>
-References: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
- <86wm8ybpk5.wl-maz@kernel.org>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <86wm8ybpk5.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+X-B4-Tracking: v=1; b=H4sIAFhEXmgC/2XQTW6DMBCG4atEXtfRePyDySr3qLKgMAZLAUc2t
+ VJF3L0GqSoty1k8rz7NiyWKnhK7nF4sUvbJh6kc5u3E2qGZeuK+KzdDQA0aDM8+zj7wMfXcuYY
+ jNq7CtkahgRX0iOT8cwu+38rtYhj5PERq9hmEAsCeJaKSSnDBHxTvVz+On1Mzzec2jGts8GkO8
+ Wsbl3FN/gTs/x0ZOXDqrHIWtKyNvvYh9HfaUuuQLHdeyIOXxXfGtJVxTnxge/Bq7w9/yKp4bYG
+ oAir7xMHrX29EffC6eCXKJ63W1kL1xy/L8g2E76xxqgEAAA==
+X-Change-ID: 20250506-virtio-msg-ffa-22af72c92150
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Sudeep Holla <sudeep.holla@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, ahomescu@google.com, armellel@google.com, 
+ arve@android.com, ayrton@google.com, qperret@google.com, 
+ sebastianene@google.com, qwandor@google.com, 
+ Per Larsen <perlarsen@google.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1751008380; l=4411;
+ i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
+ bh=vacyOvH9yiqinENGzTmGsKooNswCrtZiKq9q4IMB0VM=;
+ b=w839cQqnyWmglZ8jeIakq6lQsI/V5KMO1oi2OfuHqE9mO6UhcjWBbFmuCcycaP6cYfyRQG9q8
+ GHwRQfWcpAvD0cvudfVz7u2XI1hFHFqwbk0aou+S5Jfof7UREVGVbC9
+X-Developer-Key: i=perlarsen@google.com; a=ed25519;
+ pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
+X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
+ auth_id=402
+X-Original-From: Per Larsen <perlarsen@google.com>
+Reply-To: perlarsen@google.com
 
-On 2025/6/26 21:27, Marc Zyngier wrote:
-> On Thu, 26 Jun 2025 13:41:42 +0100,
-> Zhou Wang <wangzhou1@hisilicon.com> wrote:
->>
->> For GICv4.0 of Hip10 and Hip10C, it has a SoC bug with vPE schedule:
->> when multiple vPEs are sending vpe schedule/deschedule commands
->> concurrently and repeatedly, some vPE schedule command may not be
->> scheduled, and it will cause the command timeout.
->>
->> The hardware implementation is that there is one GIC hardware in one CPU die,
->> which handles all vPE schedule operations one by one in all CPUs of this die.
->> The bug is that if the number of queued vPE schedule operations is more
->> than a certain value, the last vPE schedule operation will be lost.
->>
->> One possible way to solve this problem is to limit the number of vLPIs, so
->> the hardware could spend less time to scan virtual pending table when it
->> handles the vPE schedule operations, so the queued vPE schedule operations
->> will never be more than above certain value.
->>
->> Given the number of CPUs of die, and imagine there is 100 vPE schedule
->> operations per second one CPU, it can be calculated that we can limit
->> the number of vLPI to 4096 for virtual machine to avoid the issue.
->>
->> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
->> ---
->>  Documentation/arch/arm64/silicon-errata.rst |  2 ++
->>  arch/arm64/Kconfig                          | 12 ++++++++++++
->>  arch/arm64/include/asm/cputype.h            |  4 ++++
->>  arch/arm64/kernel/cpu_errata.c              | 15 +++++++++++++++
->>  arch/arm64/kvm/vgic/vgic-mmio-v3.c          |  5 +++++
->>  arch/arm64/tools/cpucaps                    |  1 +
->>  include/linux/irqchip/arm-gic-v3.h          |  1 +
->>  7 files changed, 40 insertions(+)
->>
-> 
-> [...]
-> 
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> index ae4c0593d114..495a56e9dc4b 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> @@ -81,6 +81,11 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
->>  		if (vgic_has_its(vcpu->kvm)) {
->>  			value |= (INTERRUPT_ID_BITS_ITS - 1) << 19;
->>  			value |= GICD_TYPER_LPIS;
->> +			/* Limit the number of vlpis to 4096 */
->> +			if (cpus_have_final_cap(ARM64_WORKAROUND_HISI_162200803) &&
->> +			    kvm_vgic_global_state.has_gicv4 &&
->> +			    !kvm_vgic_global_state.has_gicv4_1)
->> +				value |= 11 << GICD_TYPER_NUM_LPIS_SHIFT;
-> 
-> This really doesn't solve your problem. Yes, the guest *may* honor
-> this limit. But KVM doesn't care and will happily allocate 2^16 vLPIs
-> if the guest asks -- there is no code enforcing this limit.
+Hi,
 
-Hi Marc,
+The FF-A 1.2 specification introduces a new SEND_DIRECT2 ABI which
+allows registers x4-x17 to be used for the message payload. This patch
+set prevents the host from using a lower FF-A version than what has
+already been negotiated with the hypervisor. This is necessary because
+the hypervisor does not have the necessary compatibility paths to
+translate from the hypervisor FF-A version to a previous version.
 
-I am not sure if there is any other place guest can ask vLPI over
-the limitation except for MAPTI/MAPT below?
+Support for FF-A 1.2 in the hypervisor is added as a precursor to the
+addition of the FFA_MSG_SEND_DIRECT_REQ2 messaging interface. The bulk
+of this change has to do with the upgrade to SMCCC 1.2 required by
+FF-A 1.2. Additionally, unimplemented FF-A 1.2 interfaces are added to
+the list of unsupported functions.
 
-> And even if we did. What would we do on a MAPTI command that tries to
-> map a vLPI outside of the allowed range? Do we need to tell the guest
-> it has screwed up?
+Tested by booting Android under QEMU and loading Trusty as the guest
+VM and observing the SEND_DIRECT2 ABI being used successfully during
+guest boot.
 
-Thanks for pointing this. Yes, we miss the lpi_nr checking in vgic_its_cmd_handle_mapi.
-In fact, the fix of this errata introduces the usage of GICD.num_LPI,
-so we need make related logic right as well.
+Changes since v5:
+- 3/6 -> 2/5: Merged with parent patch as they were closely related
+              Don't rename variables from "res" to "regs" to avoid churn
+              Update and clarify reasoning for condition added to ffa_set_retval
+              Adopt style suggested by Marc when passing regs to arm_smccc_1_2_smc
+              Fix inadvertent duplicate statements in ffa_{map,unmap}_hyp_buffers
+- Link to v5: https://lore.kernel.org/r/20250619-virtio-msg-ffa-v5-0-412c98558807@google.com
 
-I am not sure that if we could add related checking for lpi_nr in MAPTI/MAPI
-as part of this errata fix, or we should add the basic support for
-GICD.num_LPI before adding this errata?
+Changes since v4:
+- 1/5 -> 1/6: Added Acked-by: Will Deacon <will@kernel.org>
+              Reworded patch subject and description
+- 2/5:        Dropped patch: zero x4-x7 in ffa_set_retval
+-        2/6: New: use SMCCC 1.2 during hyp init
+-        3/6: New: use SMCCC 1.2 in host FF-A handler
+- 3/5 -> 4/6: No change; can revisit denylist design in later patchset
+              Added Acked-by: Will Deacon <will@kernel.org>
+- 4/5 -> 5/6: No change
+- 5/5 -> 6/6: No change
+- Link to v4: https://lore.kernel.org/r/20250516-virtio-msg-ffa-v4-0-580ee70e5081@google.com
+
+Changes since v3:
+- all:        Remove Signed-off-by: Per Larsen <perl@immunant.com>
+- 2/5:        Split out from 2/3, zero x4-x7 in set_ffa_retval
+- 3/5:        Split out from 2/3, Mark FFA_NOTIFICATION_* calls as
+              unsupported
+- 2/3 -> 4/5: Drop ffa_get_hypervisor_version, access hyp_ffa_version
+              directly when version negotiation is complete.
+- 3/3 -> 5/5: Call ffa_to_smccc_1_2_error directly in
+              do_do_ffa_direct_msg2
+              Push call to ffa_call_needs_smccc_1_2 lower down by adding
+              ffa_get_func_id and ffa_set_retval_smccc_1_x.
+              Drop ffa_to_smccc_1_2_regs and ffa_to_smccc_1_2_regs_prop
+              as they are no longer used.
+- Link to v3: https://lore.kernel.org/r/20250513-virtio-msg-ffa-v3-0-d66c76ff1b2c@google.com 
+
+Changes since v2:
+- 2/3: Removed files added by mistake.
+       Add and use ffa_get_hypervisor_version to access hyp_ffa_version
+- 3/3: Use ffa_get_hypervisor_version to access hyp_ffa_version safely
+- Link to v2: https://lore.kernel.org/r/20250508-virtio-msg-ffa-v2-0-ed84f8053965@google.com
+
+Changes since v1:
+- 1/3: Simplify commit message; drop long comment in do_ffa_version
+- 2/3: Correct use of Co-developed-by: footer
+       s/arm_smccc_1_2_smc_fallback/arm_smccc_1_x_smc/
+       Always access hyp_ffa_version w/lock held
+       Remove superfluous comments in ffa_call_supported
+       Add and use FFA_FEAT_RXTX_MIN_SZ_MASK instead of constant
+       Add FFA_PARTITION_INFO_GET_REGS to calls that require SMCCC 1.2
+- 3/3: Always access hyp_ffa_version w/lock held
+       Correct formatting
 
 Thanks,
-Zhou
+Per Larsen
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+--
+2.49.0
+
+---
+Per Larsen (5):
+      KVM: arm64: Correct return value on host version downgrade attempt
+      KVM: arm64: Use SMCCC 1.2 for FF-A initialization and in host handler
+      KVM: arm64: Mark FFA_NOTIFICATION_* calls as unsupported
+      KVM: arm64: Bump the supported version of FF-A to 1.2
+      KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in host handler
+
+ arch/arm64/kvm/hyp/nvhe/Makefile |   1 +
+ arch/arm64/kvm/hyp/nvhe/ffa.c    | 240 +++++++++++++++++++++++++++------------
+ include/linux/arm_ffa.h          |   3 +
+ 3 files changed, 171 insertions(+), 73 deletions(-)
+---
+base-commit: 67a993863163cb88b1b68974c31b0d84ece4293e
+change-id: 20250506-virtio-msg-ffa-22af72c92150
+
+Best regards,
+-- 
+Per Larsen <perlarsen@google.com>
+
+
