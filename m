@@ -1,120 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com [209.85.167.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551392EBBA8;
-	Fri, 27 Jun 2025 17:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237E220D509
+	for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 20:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751045116; cv=none; b=UQrOeNJXoWkDxMhZHVOJvzoj3ZnxCkTgtU16RqoPNANqRb3eLe1gVgn6a3gwI2lYzezelqAbrwC5GFsy0Fqwncu+5YKebmSXoquYdMfbeNnDbFqgMXfEHChtX/LnnVLyxj0piuZwvMjLkJwBeK1U6erVWZgN4qY20nQCZQIJUuA=
+	t=1751057142; cv=none; b=R4dQpWEKVwUEdmCxGxD4uJuKniNdDA4bWnDz+nSNEMaUj61KDDFX+LBV3oFrf5UciPqC2NKhUIl6ec9BNxbumh8y5pgFzHR34AZXRXqJSqckFvcupuF/e3Py24jvMjtMyonrI5EdmyM7Lci6Go81KKjV7FHO015Zc85+GMddp44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751045116; c=relaxed/simple;
-	bh=lH2UPYp6QCoEhr4YOD4G34RicJOUqUNXtxpfpE/H2hQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hX0V6KxvJ9zhWAY348ZJjaJZ+pTyH5T3WTaWIFX/6xTPYnW4r14IoPVJHYwj4sJ2eeySlEwLx42CkOeOe089Pn7qUMk9H7oTzzz8NolRhJk7Mqz8ptiZoVpCHMNA8vsd68GM+6kAm5mskSmyhPEzxl3+gVDuQXi6CgtC+G3wffQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mkF1UUJ/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751057142; c=relaxed/simple;
+	bh=tdvLWFsh/wI9WWSqIsGVNp6UW8sVmmyQUHoavqrwGBE=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=SJLSTCqim/OnxUrExt07U4By7dx3yzTDc6pCKvlyt14Ggc+pLWWLNfs+EMErRG+P0UWY/FzXNCW8fkFx+KVuFUVmqHOcYaeOIfwOnqfkWIn4LR4UIE3tz4KRcJY/zOVYW598XeXitJU6oVpJR/TI9XgDTgC30o7Vo5JupvfaFGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CixRjDmA; arc=none smtp.client-ip=209.85.167.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mkF1UUJ/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD342C4CEF1;
-	Fri, 27 Jun 2025 17:25:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751045116;
-	bh=lH2UPYp6QCoEhr4YOD4G34RicJOUqUNXtxpfpE/H2hQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=mkF1UUJ/jF5LyPnV9B8BJwjRIGHIl8zLQkLQBsrWZKEGb8SBkvLa8jRSNa6qgMQZv
-	 pBIIc0622B0Gw2SQ6vVqwWr6289TmMZxjXrA8ZuvvVzIZhVCUMnvrUrlfjbx7S2d+2
-	 AXYocZpqY0qZ4cr1S1ADPeQtAkLpSFYRyS054D8waAKCBQtXM7w5snKxUdq/J/bWAc
-	 GsCeURDU6QpyBmLMKdN5n8+cWrLRckFu5MeZCXfBXDFkAMZM+jE6/HIzfm6LHdJJhE
-	 6k079+yJOD0zdKdDxb6RqMnUbktSjcbBjN9KoxQR+yJHbShOXQ9kkzSSDort40GUxK
-	 9++ZdvO+uSIrg==
-From: Mark Brown <broonie@kernel.org>
-Date: Fri, 27 Jun 2025 18:20:46 +0100
-Subject: [PATCH 3/3] kselftest/arm64: Add lsfe to the hwcaps test
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CixRjDmA"
+Received: by mail-oi1-f201.google.com with SMTP id 5614622812f47-40b27ae3317so255979b6e.1
+        for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 13:45:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751057140; x=1751661940; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RtzxPj829hxx6a8LNGtfeNdfTNyEQAZxil+yeQpRBG4=;
+        b=CixRjDmAzLpuBAjy/cm0Dv4nmZb9DzVpz+kkxrucQlwfGtYREvvc803Xa+4SzScsOP
+         uiLJiK2P/YbEQm7kIQeBXk55nQIrwidR8heAuh4o10wjkIez/JKcTL7Ww9xpA5bk6fe6
+         hGxTd+cB1PCQ7yTjKm+8Aqygsz9jjrbpC1l+peFwedfdmg13SsXx6e0AU497Z4nlJOSD
+         rmR7Cw7QKBExpepc1KW6DuTHm1/1rxERf9kO0d6ZjgQSpnO4Y+5UQuwtCL8WAo4jM0dg
+         IYhchJfRAZJI82q2pusDkcG+kUPiQCWPROQGHwV3BpeLPJG0whzSjngSB24Rh7Wu7cN6
+         co9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751057140; x=1751661940;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RtzxPj829hxx6a8LNGtfeNdfTNyEQAZxil+yeQpRBG4=;
+        b=bSjAFbCwS6U9FQ9/rDxUTo9wAxLo5CtwI1iFRXpWM09pHYfr1lWMpfkM5teDqPX7HF
+         ekOEO8iE+MF3SqUawoGZmYOOL7UH7ElECIFAdcm7qIl+oyj/OT/gpaRFbfiszutBbJte
+         cC112nj2cTtAH7o20dUmgW5JdcQ0/mtwBGYxc/2I9DfOC81mecggxKy9VunC2BrchacD
+         oiIN2gIGQoLUfmb0mzQnQ9BV5e/SQEzUOpW5T1kjMIAO9/GehS08ws7n5kpWycfBpAjN
+         UqGABu/HwkBKHUX/RcI+2gzskeWu0SNuGyHK+EjbNduJo7C+QFRx42y8u5jUS2njGYWA
+         UtnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDgig0lnyZSvDl2bXdEzP1U08U+J1aGsg04Kpq22ySD2tK1AVCJCOxLk1tWIUVenY/EGHYb5s=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy2STzutntm1Dzh5dedW1YCjtvuCmj3oiWmC3asYf+HlIadQdYt
+	4YTO9bjomcK4oNKzpwovsiiLYgY4qQYtmPYzO26yDkSXO5xRyiIlpV0WjPsDyFk8CtaX4uRgsiq
+	p09JDYqu/+aJnucIbwbnBOfmDCg==
+X-Google-Smtp-Source: AGHT+IEVJG2F41QRpFsQcHOZM3LLETHwJl5cQHVqdrJwuBS7mGDCrIIEijxTBzEQVHHKwtJ80l+vFT15a5JN0DRDMA==
+X-Received: from oiu5.prod.google.com ([2002:a05:6808:80a5:b0:3f9:9583:af9b])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6808:21a7:b0:406:6e4b:bd91 with SMTP id 5614622812f47-40b33c489d6mr3625383b6e.7.1751057140014;
+ Fri, 27 Jun 2025 13:45:40 -0700 (PDT)
+Date: Fri, 27 Jun 2025 20:45:38 +0000
+In-Reply-To: <603eb4c7-5570-438c-b747-cdcc67b09ea6@arm.com> (message from Ben
+ Horgan on Fri, 27 Jun 2025 10:04:21 +0100)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250627-arm64-lsfe-v1-3-68351c4bf741@kernel.org>
-References: <20250627-arm64-lsfe-v1-0-68351c4bf741@kernel.org>
-In-Reply-To: <20250627-arm64-lsfe-v1-0-68351c4bf741@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
- linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-cff91
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1403; i=broonie@kernel.org;
- h=from:subject:message-id; bh=lH2UPYp6QCoEhr4YOD4G34RicJOUqUNXtxpfpE/H2hQ=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoXtPvHdrwxtM6K55h9ibmBPuatpZ0f6ZPAQ+ii
- cvW6CW1ddaJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaF7T7wAKCRAk1otyXVSH
- 0IQKB/0TOvdgLavdQtvO6QYDy5rzRWcJ2bv8jmEwtiA6ZLIXdyI8DSOJnxX6gJP6juqegfqPfTz
- iLvcK7uYQGzTs868wXkYC1LgUVJMX0f3gKSX0wJ6p8cGOduRvD5ZO3MB0ve0CdNP4hgxvaxM2ov
- Mdv05y+jtfzgNxJht4TI3X4PXwstUNqvphKdetij0jZiV/m+t5l6gLmYbkAJEoAz3kf+p0hkT8k
- Z9D17eNlB5ptmsmq13v1Qlnz9ya3zr1irOCD5nTMjkpRLXucuLLcrOCmKiwV0a8T7ZApbNJbXsR
- CHp5ZsrGCMS5LRNT1pH78PzHtRSp4Fpsr4huWOw/79Rkf+LD
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Mime-Version: 1.0
+Message-ID: <gsntecv49aml.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v3 02/22] arm64: Generate sign macro for sysreg Enums
+From: Colton Lewis <coltonlewis@google.com>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, shuah@kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-This feature has no traps associated with it so the SIGILL is not reliable.
+Hi Ben. Thanks for the review.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/abi/hwcap.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+Ben Horgan <ben.horgan@arm.com> writes:
 
-diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-index 35f521e5f41c..9dfca2eb7c41 100644
---- a/tools/testing/selftests/arm64/abi/hwcap.c
-+++ b/tools/testing/selftests/arm64/abi/hwcap.c
-@@ -17,6 +17,8 @@
- #include <asm/sigcontext.h>
- #include <asm/unistd.h>
- 
-+#include <linux/auxvec.h>
-+
- #include "../../kselftest.h"
- 
- #define TESTS_PER_HWCAP 3
-@@ -165,6 +167,18 @@ static void lse128_sigill(void)
- 		     : "cc", "memory");
- }
- 
-+static void lsfe_sigill(void)
-+{
-+	float __attribute__ ((aligned (16))) mem = 0;
-+	register float *memp asm ("x0") = &mem;
-+
-+	/* LDFADD H0, H0, [X0] */
-+	asm volatile(".inst 0x7c600000"
-+		     : "+r" (memp)
-+		     :
-+		     : "cc", "memory");
-+}
-+
- static void lut_sigill(void)
- {
- 	/* LUTI2 V0.16B, { V0.16B }, V[0] */
-@@ -758,6 +772,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "lse128",
- 		.sigill_fn = lse128_sigill,
- 	},
-+	{
-+		.name = "LSFE",
-+		.at_hwcap = AT_HWCAP3,
-+		.hwcap_bit = HWCAP3_LSFE,
-+		.cpuinfo = "lsfe",
-+		.sigill_fn = lsfe_sigill,
-+	},
- 	{
- 		.name = "LUT",
- 		.at_hwcap = AT_HWCAP2,
+> Hi Colton,
 
--- 
-2.39.5
+> On 6/26/25 21:04, Colton Lewis wrote:
+>> There's no reason Enums shouldn't be equivalent to UnsignedEnums and
+>> explicitly specify they are unsigned. This will avoid the annoyance I
+>> had with HPMN0.
+> An Enum can be annotated with the field's sign by updating it to
+> UnsignedEnum or SignedEnum. This is explained in [1].
 
+> With this change ID_AA64PFR1_EL1.MTE_frac would be marked as unsigned
+> when it should really be considered signed.
+
+> Enum	43:40	MTE_frac
+> 	0b0000	ASYNC
+> 	0b1111	NI
+> EndEnum
+
+Thanks for the explanation. I made this a separate commit because I
+considered people might object and HPMN0 is already an UnsignedEnum in
+my previous commit.
+
+Do you think it would be a good idea to make plain Enums signed by
+default or should I just remove this commit from the series?
+
+
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>    arch/arm64/tools/gen-sysreg.awk | 1 +
+>>    1 file changed, 1 insertion(+)
+
+>> diff --git a/arch/arm64/tools/gen-sysreg.awk  
+>> b/arch/arm64/tools/gen-sysreg.awk
+>> index f2a1732cb1f6..fa21a632d9b7 100755
+>> --- a/arch/arm64/tools/gen-sysreg.awk
+>> +++ b/arch/arm64/tools/gen-sysreg.awk
+>> @@ -308,6 +308,7 @@ $1 == "Enum" && (block_current() == "Sysreg" ||  
+>> block_current() == "SysregFields
+>>    	parse_bitdef(reg, field, $2)
+
+>>    	define_field(reg, field, msb, lsb)
+>> +	define_field_sign(reg, field, "false")
+
+>>    	next
+>>    }
+
+> Thanks,
+
+> Ben
+
+> [1]
+> https://lore.kernel.org/all/20221207-arm64-sysreg-helpers-v4-1-25b6b3fb9d18@kernel.org/
