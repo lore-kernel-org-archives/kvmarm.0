@@ -1,251 +1,118 @@
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97295221DA8
-	for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 20:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBEC2ECD32
+	for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 20:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751057161; cv=none; b=R1zgskNmWX81oFCLk18Z6sqfjE+yevuYp2R3Y5xt+rc7kB7t95482fYc927HT20G3gcP6Bz6vb8h37W9YEBJd9mTErmfWTGNMis3KSNx73rgKuPJ2Zg9xHBnv4HlQ0T9qVv4HDQ5+vfSFI2kmZC1ONtG1HxzVt0FWNfclUeInE8=
+	t=1751057742; cv=none; b=hvOHCYzTPYTIHnKtk80YswDrKKVrlBwDJ/6C38Hfl+Xuh6LPN2NSYTXrEkDoP8HUkVNopNQBJppz39PompiTx24pXqYHWtFXbML6brPeIduGv54o8eLg+uJpHl6chWQaqjmMfUVPSZUYB7aRtZ+TfLlXVsZ+Gc0afQJkbMeUWeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751057161; c=relaxed/simple;
-	bh=Dbw6vfXTIcPD2nnOiddnC76ZVYtHdIwQERNCs5CZ+AM=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=e+fwUw1yQIKK93C/ZLQ3inrVLybbvsyQJO7KBOxP7GDZ9+EwHptU7An5j2ZxC/2lsH/HHFMKBOrgMt5/3KCRIU56dXN/LsAM/mO9bZ1S8SeuyZqiSTYWE2Jm3HpogkXoBJDOShdx7/5oZ2o9bDex+I4fuM/IUHOoulfdMZU9mSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PSBDDHV6; arc=none smtp.client-ip=209.85.210.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1751057742; c=relaxed/simple;
+	bh=38GaMaW/B7zHBvh1tFU9ANgBBdPtUjqbBkbeYoWb7Go=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rS5QcNTrT69JpSRr830CvL+RD1AdniORYBD0pZ23NqktuKy0inK7rk5GTtYo37PW10jjJfsTmfboDihFsAMDqBTgHyrjPlnevXgMFIoZxTVmnyb70g5jLKZbicq8MlxZGcbchHZpRlY9hlI7IvQF+oJmjRYrEWO2ruE/4v7dLMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ryxq9xyO; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PSBDDHV6"
-Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-736f88d8e02so82317a34.2
-        for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 13:45:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751057159; x=1751661959; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vCwkQeNvJFmRc91Gk8T3YA4HoLg8Wg847EVfC3MKwm0=;
-        b=PSBDDHV6Y+IqM1O+sDPbJY3HqaahLCdJw8lP2u+vxM4ekmTbdxpBNL29lSFEAFoRbi
-         /yJixsNMboVD2xtm6wLZk5pO3mvUDp2s8ht26e0NZ9zb0CaVAoa4r2tiKC1kcZ/kEHg3
-         zEU1O0MaNgpNIEInCMGhRja2fU1YurC6qPg1msC7x8ZzKL11G16SUHVjr2LA8T8S+Un2
-         exeTGP52kJWYcDJBkRW6wNmod5Hun7om7qKYwDaecw4jyDgnu8SHKNGmkYKE2u/pKbGF
-         Tp5Six7AJH+8yueQOyYFccnN5rJyJxfpQLKHBRO8BzW77o9YlvJV5J03wKQKMR7acuLe
-         rCSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751057159; x=1751661959;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vCwkQeNvJFmRc91Gk8T3YA4HoLg8Wg847EVfC3MKwm0=;
-        b=mUJM9xPXmMhsrMtQljzNfglhNqE/8FOuFvOaYARZoKXnDsTRYpN6jfimOLjKeTocDs
-         bCYxA2ORKaLqPC9w7ZQSoD6YsrbyJeLSbosG73U5+QhgXPwfd1sztaV7HmpXcO8a4I0l
-         YzDas95kVt90y2tpdvD/D3n6TdExmpGLalBxaLo5kfeyrDeT+Aj/o8ZiSUEuJEq+O7Kt
-         OApANzozxILDBhLm8l49SDjvx/amzKwQaJ8VEWXhUfjs5wQnlVjbfsdFVCGBhMK5vhYS
-         YZLIqUx4zsY5bZOCwRSgNuNJqZ6/GTB60Ma1AfJC02MMraUX5D4jooxD9NGaJaI6IMtO
-         nt0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVyrC65eCUZ+xkkaavIthedyG9eDUtTh8geGei8CLAYnZFFuZzOYTqHNCvEmvsGNLN4E2ura2w=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yych69VOiMg4Fl6b78PW+JB/nfeGILEnq8eYll80W9q9oxAApid
-	ILgXW0hL8hOfkyI0rFJFuLPd252l0yECAm8NF66+yFFUOVuI3xyv0t36E+bIdHxiSnocHowDWiV
-	lSC/bnrJEH7qWpnLz46QD/IUjyg==
-X-Google-Smtp-Source: AGHT+IH2HpfAlrvSBQPMk62/RIc0nWzkxCoCzJycTm56dna3SUVLdeLNxUVR8JHlvZrOyIvBaFCfMBXjvOwVdkFbjg==
-X-Received: from otbby6.prod.google.com ([2002:a05:6830:6086:b0:72c:10e4:a953])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6830:2710:b0:727:4356:9f07 with SMTP id 46e09a7af769-73afc67b661mr3036914a34.14.1751057158815;
- Fri, 27 Jun 2025 13:45:58 -0700 (PDT)
-Date: Fri, 27 Jun 2025 20:45:57 +0000
-In-Reply-To: <86plepb54f.wl-maz@kernel.org> (message from Marc Zyngier on Fri,
- 27 Jun 2025 16:01:36 +0100)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ryxq9xyO"
+Date: Fri, 27 Jun 2025 13:55:25 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751057734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1AMsankqQ7fXut//cwhaRHpcwwLLJJgqr0ZblnCJIz0=;
+	b=ryxq9xyOHz5HcEmHKXHWirB5Xpi7L1zTlBdjMXx/7++C8tCcdl/h+rYXtM3iVSXvEC7B7P
+	11j/UAoaFs0ZNl9IKeMbblgKhnCbvPA0ZkwN1k+IBnrMoa6O9wiT7rXXgf42CoURxWxwZk
+	pXvRVVgsa3Hiney2sAnFfkyylePCAqU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: Ben Horgan <ben.horgan@arm.com>, kvm@vger.kernel.org,
+	pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 02/22] arm64: Generate sign macro for sysreg Enums
+Message-ID: <aF8FPTupC_VnAldN@linux.dev>
+References: <603eb4c7-5570-438c-b747-cdcc67b09ea6@arm.com>
+ <gsntecv49aml.fsf@coltonlewis-kvm.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntbjq89am2.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v3 10/22] KVM: arm64: Set up FGT for Partitioned PMU
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
-	shuah@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <gsntecv49aml.fsf@coltonlewis-kvm.c.googlers.com>
+X-Migadu-Flow: FLOW_OUT
 
-Marc Zyngier <maz@kernel.org> writes:
+On Fri, Jun 27, 2025 at 08:45:38PM +0000, Colton Lewis wrote:
+> Hi Ben. Thanks for the review.
+> 
+> Ben Horgan <ben.horgan@arm.com> writes:
+> 
+> > Hi Colton,
+> 
+> > On 6/26/25 21:04, Colton Lewis wrote:
+> > > There's no reason Enums shouldn't be equivalent to UnsignedEnums and
+> > > explicitly specify they are unsigned. This will avoid the annoyance I
+> > > had with HPMN0.
+> > An Enum can be annotated with the field's sign by updating it to
+> > UnsignedEnum or SignedEnum. This is explained in [1].
+> 
+> > With this change ID_AA64PFR1_EL1.MTE_frac would be marked as unsigned
+> > when it should really be considered signed.
+> 
+> > Enum	43:40	MTE_frac
+> > 	0b0000	ASYNC
+> > 	0b1111	NI
+> > EndEnum
+> 
+> Thanks for the explanation. I made this a separate commit because I
+> considered people might object and HPMN0 is already an UnsignedEnum in
+> my previous commit.
+> 
+> Do you think it would be a good idea to make plain Enums signed by
+> default or should I just remove this commit from the series?
 
-> On Thu, 26 Jun 2025 21:04:46 +0100,
-> Colton Lewis <coltonlewis@google.com> wrote:
+It is presumptive to associate a sign with an enumeration. Generally
+speaking, the only fields that can do signed / unsigned comparisons are
+the Feature ID register fields.
 
->> In order to gain the best performance benefit from partitioning the
->> PMU, utilize fine grain traps (FEAT_FGT and FEAT_FGT2) to avoid
->> trapping common PMU register accesses by the guest to remove that
->> overhead.
+So please drop this and only keep the change for HPMN0.
 
->> There should be no information leaks between guests as all these
->> registers are context swapped by a later patch in this series.
+Thanks,
+Oliver
 
->> Untrapped:
->> * PMCR_EL0
->> * PMUSERENR_EL0
->> * PMSELR_EL0
->> * PMCCNTR_EL0
->> * PMINTEN_EL0
->> * PMEVCNTRn_EL0
-
->> Trapped:
->> * PMOVS_EL0
->> * PMEVTYPERn_EL0
->> * PMCCFILTR_EL0
->> * PMICNTR_EL0
->> * PMICFILTR_EL0
-
->> PMOVS remains trapped so KVM can track overflow IRQs that will need to
->> be injected into the guest.
-
->> PMICNTR remains trapped because KVM is not handling that yet.
-
->> PMEVTYPERn remains trapped so KVM can limit which events guests can
->> count, such as disallowing counting at EL2. PMCCFILTR and PMCIFILTR
->> are the same.
-
-> I'd rather you explain why it is safe not to trap the rest.
-
-Okay, I will reverse my explanation.
-
-
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>   arch/arm64/include/asm/kvm_pmu.h        | 23 ++++++++++
->>   arch/arm64/kvm/hyp/include/hyp/switch.h | 58 +++++++++++++++++++++++++
->>   arch/arm64/kvm/pmu-part.c               | 32 ++++++++++++++
->>   3 files changed, 113 insertions(+)
-
->> diff --git a/arch/arm64/include/asm/kvm_pmu.h  
->> b/arch/arm64/include/asm/kvm_pmu.h
->> index 6328e90952ba..73b7161e3f4e 100644
->> --- a/arch/arm64/include/asm/kvm_pmu.h
->> +++ b/arch/arm64/include/asm/kvm_pmu.h
->> @@ -94,6 +94,21 @@ u64 kvm_pmu_guest_counter_mask(struct arm_pmu *pmu);
->>   void kvm_pmu_host_counters_enable(void);
->>   void kvm_pmu_host_counters_disable(void);
-
->> +#if !defined(__KVM_NVHE_HYPERVISOR__)
->> +bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu);
->> +bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu);
->> +#else
->> +static inline bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
->> +{
->> +	return false;
->> +}
->> +
->> +static inline bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu)
->> +{
->> +	return false;
->> +}
->> +#endif
->> +
->>   /*
->>    * Updates the vcpu's view of the pmu events for this cpu.
->>    * Must be called before every vcpu run after disabling interrupts, to  
->> ensure
->> @@ -133,6 +148,14 @@ static inline u64 kvm_pmu_get_counter_value(struct  
->> kvm_vcpu *vcpu,
->>   {
->>   	return 0;
->>   }
->> +static inline bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
->> +{
->> +	return false;
->> +}
->> +static inline bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu)
->> +{
->> +	return false;
->> +}
->>   static inline void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu,
->>   					     u64 select_idx, u64 val) {}
->>   static inline void kvm_pmu_set_counter_value_user(struct kvm_vcpu *vcpu,
->> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h  
->> b/arch/arm64/kvm/hyp/include/hyp/switch.h
->> index 825b81749972..47d2db8446df 100644
->> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
->> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
->> @@ -191,6 +191,61 @@ static inline bool cpu_has_amu(void)
->>                  ID_AA64PFR0_EL1_AMU_SHIFT);
->>   }
-
->> +/**
->> + * __activate_pmu_fgt() - Activate fine grain traps for partitioned PMU
->> + * @vcpu: Pointer to struct kvm_vcpu
->> + *
->> + * Clear the most commonly accessed registers for a partitioned
->> + * PMU. Trap the rest.
->> + */
->> +static inline void __activate_pmu_fgt(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
->> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->> +	u64 set;
->> +	u64 clr;
->> +
->> +	set = HDFGRTR_EL2_PMOVS
->> +		| HDFGRTR_EL2_PMCCFILTR_EL0
->> +		| HDFGRTR_EL2_PMEVTYPERn_EL0;
->> +	clr = HDFGRTR_EL2_PMUSERENR_EL0
->> +		| HDFGRTR_EL2_PMSELR_EL0
->> +		| HDFGRTR_EL2_PMINTEN
->> +		| HDFGRTR_EL2_PMCNTEN
->> +		| HDFGRTR_EL2_PMCCNTR_EL0
->> +		| HDFGRTR_EL2_PMEVCNTRn_EL0;
->> +
->> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR_EL2, clr, set);
->> +
->> +	set = HDFGWTR_EL2_PMOVS
->> +		| HDFGWTR_EL2_PMCCFILTR_EL0
->> +		| HDFGWTR_EL2_PMEVTYPERn_EL0;
->> +	clr = HDFGWTR_EL2_PMUSERENR_EL0
->> +		| HDFGWTR_EL2_PMCR_EL0
->> +		| HDFGWTR_EL2_PMSELR_EL0
->> +		| HDFGWTR_EL2_PMINTEN
->> +		| HDFGWTR_EL2_PMCNTEN
->> +		| HDFGWTR_EL2_PMCCNTR_EL0
->> +		| HDFGWTR_EL2_PMEVCNTRn_EL0;
->> +
->> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR_EL2, clr, set);
->> +
->> +	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
->> +		return;
->> +
->> +	set = HDFGRTR2_EL2_nPMICFILTR_EL0
->> +		| HDFGRTR2_EL2_nPMICNTR_EL0;
->> +	clr = 0;
->> +
->> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR2_EL2, clr, set);
->> +
->> +	set = HDFGWTR2_EL2_nPMICFILTR_EL0
->> +		| HDFGWTR2_EL2_nPMICNTR_EL0;
->> +	clr = 0;
->> +
->> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR2_EL2, clr, set);
-
-> This feels wrong. There should be one place to populate the FGTs that
-> apply to a guest as set from the host, not two or more.
-
-> There is such a construct in the SME series, and maybe you could have
-> a look at it, specially if the trap configuration is this static.
-
-> 	M.
-
-> --
-> Without deviation from the norm, progress is not possible.
-
-I'm assuming you are referring to Mark Brown's series [1], specifically
-patches 5 and 18 and I see what you mean.
-
-You are probably thinking configuration should happen from
-sys_regs.c:kvm_calculate_traps or thereabout and should be setting bits
-in the existing kvm->arch.fgt array.
-
-Correct me if I'm mistaken.
-
-[1]  
-https://lore.kernel.org/kvm/20250625-kvm-arm64-sme-v6-0-114cff4ffe04@kernel.org/
+> > > Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> > > ---
+> > >    arch/arm64/tools/gen-sysreg.awk | 1 +
+> > >    1 file changed, 1 insertion(+)
+> 
+> > > diff --git a/arch/arm64/tools/gen-sysreg.awk
+> > > b/arch/arm64/tools/gen-sysreg.awk
+> > > index f2a1732cb1f6..fa21a632d9b7 100755
+> > > --- a/arch/arm64/tools/gen-sysreg.awk
+> > > +++ b/arch/arm64/tools/gen-sysreg.awk
+> > > @@ -308,6 +308,7 @@ $1 == "Enum" && (block_current() == "Sysreg" ||
+> > > block_current() == "SysregFields
+> > >    	parse_bitdef(reg, field, $2)
+> 
+> > >    	define_field(reg, field, msb, lsb)
+> > > +	define_field_sign(reg, field, "false")
+> 
+> > >    	next
+> > >    }
+> 
+> > Thanks,
+> 
+> > Ben
+> 
+> > [1]
+> > https://lore.kernel.org/all/20221207-arm64-sysreg-helpers-v4-1-25b6b3fb9d18@kernel.org/
