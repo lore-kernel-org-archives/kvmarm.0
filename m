@@ -1,118 +1,169 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBEC2ECD32
-	for <kvmarm@lists.linux.dev>; Fri, 27 Jun 2025 20:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D387A7DA9C;
+	Sat, 28 Jun 2025 08:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751057742; cv=none; b=hvOHCYzTPYTIHnKtk80YswDrKKVrlBwDJ/6C38Hfl+Xuh6LPN2NSYTXrEkDoP8HUkVNopNQBJppz39PompiTx24pXqYHWtFXbML6brPeIduGv54o8eLg+uJpHl6chWQaqjmMfUVPSZUYB7aRtZ+TfLlXVsZ+Gc0afQJkbMeUWeM=
+	t=1751099140; cv=none; b=tklz3EeAZky6ZqhzWlMp1tGnGbnTiJnxGklCk0maqGqq3bAB1i7w28+xCeslL6/1RGld7K2dFkxmSLxNz/9rS9+QHXasKOIb+p8t0Qs+zcUhuysDH8A3eIAuMI8+Z0YhKhN6IgANaBx7SIzsEzbeDvCEipdpeFl1r8BRqhFbVXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751057742; c=relaxed/simple;
-	bh=38GaMaW/B7zHBvh1tFU9ANgBBdPtUjqbBkbeYoWb7Go=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rS5QcNTrT69JpSRr830CvL+RD1AdniORYBD0pZ23NqktuKy0inK7rk5GTtYo37PW10jjJfsTmfboDihFsAMDqBTgHyrjPlnevXgMFIoZxTVmnyb70g5jLKZbicq8MlxZGcbchHZpRlY9hlI7IvQF+oJmjRYrEWO2ruE/4v7dLMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ryxq9xyO; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1751099140; c=relaxed/simple;
+	bh=JRuHujpJLvDuTGnDYQujAWUeF9qBt6etY3etowHwHMc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NJD/mGqi0SUMd9qVrwsFVyKG2EI1egPUX2+oXIm7FRocjAKEARfMEnX8qZP2eTEFMBTYCJE/bCIqH2lS4PtQnmpNfbl1Y3EI/ychFmUc4WWR05PjVd1yKhC+DmF6fvx1LRnA3Lk1dkro8nezAQMjzVSyih72U49Srj366DaOVos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J4YjI3ky; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ryxq9xyO"
-Date: Fri, 27 Jun 2025 13:55:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751057734;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1AMsankqQ7fXut//cwhaRHpcwwLLJJgqr0ZblnCJIz0=;
-	b=ryxq9xyOHz5HcEmHKXHWirB5Xpi7L1zTlBdjMXx/7++C8tCcdl/h+rYXtM3iVSXvEC7B7P
-	11j/UAoaFs0ZNl9IKeMbblgKhnCbvPA0ZkwN1k+IBnrMoa6O9wiT7rXXgf42CoURxWxwZk
-	pXvRVVgsa3Hiney2sAnFfkyylePCAqU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J4YjI3ky"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D8C1C4CEEA;
+	Sat, 28 Jun 2025 08:25:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751099139;
+	bh=JRuHujpJLvDuTGnDYQujAWUeF9qBt6etY3etowHwHMc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=J4YjI3kyUvlGF9kiMiy8R2ZDlQlatNjRbS42jx+86DYS257jOgHRY8G5owUKHxt9U
+	 +PuUO1dBHZFg3lFyYcDmVgQD9xSmf/HDlcPjUmXtEjwUf+dKlJH34jLr31dGt4UQdU
+	 SICiNwyZpDxoqgasAugQuU9d07H61itg8DuAfeAQ51EQCnBs90roYqy8AD1Kv9S31n
+	 rYuI3Qrgv2inRLDWKDnLUdWXIhDMlA2W7hvouy4B/gpTCr/EaxpPkAF9lgthxP1yAb
+	 xrF3h9Yd68bT+oLgTSruyR6aUzZFGB609KKXzKQnHHG9WCjPaVePbiNgWMPb1ORStK
+	 WGm2LXTyutCyw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uVQsS-00AlqC-Iu;
+	Sat, 28 Jun 2025 09:25:36 +0100
+Date: Sat, 28 Jun 2025 09:25:35 +0100
+Message-ID: <871pr4ff28.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Colton Lewis <coltonlewis@google.com>
-Cc: Ben Horgan <ben.horgan@arm.com>, kvm@vger.kernel.org,
-	pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 02/22] arm64: Generate sign macro for sysreg Enums
-Message-ID: <aF8FPTupC_VnAldN@linux.dev>
-References: <603eb4c7-5570-438c-b747-cdcc67b09ea6@arm.com>
- <gsntecv49aml.fsf@coltonlewis-kvm.c.googlers.com>
+Cc: kvm@vger.kernel.org,
+	pbonzini@redhat.com,
+	corbet@lwn.net,
+	linux@armlinux.org.uk,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	oliver.upton@linux.dev,
+	mizhang@google.com,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	shuah@kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 10/22] KVM: arm64: Set up FGT for Partitioned PMU
+In-Reply-To: <gsntbjq89am2.fsf@coltonlewis-kvm.c.googlers.com>
+References: <86plepb54f.wl-maz@kernel.org>
+	<gsntbjq89am2.fsf@coltonlewis-kvm.c.googlers.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <gsntecv49aml.fsf@coltonlewis-kvm.c.googlers.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jun 27, 2025 at 08:45:38PM +0000, Colton Lewis wrote:
-> Hi Ben. Thanks for the review.
+On Fri, 27 Jun 2025 21:45:57 +0100,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> Ben Horgan <ben.horgan@arm.com> writes:
+> Marc Zyngier <maz@kernel.org> writes:
 > 
-> > Hi Colton,
+> > On Thu, 26 Jun 2025 21:04:46 +0100,
+> > Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> > On 6/26/25 21:04, Colton Lewis wrote:
-> > > There's no reason Enums shouldn't be equivalent to UnsignedEnums and
-> > > explicitly specify they are unsigned. This will avoid the annoyance I
-> > > had with HPMN0.
-> > An Enum can be annotated with the field's sign by updating it to
-> > UnsignedEnum or SignedEnum. This is explained in [1].
+> >> +static inline void __activate_pmu_fgt(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+> >> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> >> +	u64 set;
+> >> +	u64 clr;
+> >> +
+> >> +	set = HDFGRTR_EL2_PMOVS
+> >> +		| HDFGRTR_EL2_PMCCFILTR_EL0
+> >> +		| HDFGRTR_EL2_PMEVTYPERn_EL0;
+> >> +	clr = HDFGRTR_EL2_PMUSERENR_EL0
+> >> +		| HDFGRTR_EL2_PMSELR_EL0
+> >> +		| HDFGRTR_EL2_PMINTEN
+> >> +		| HDFGRTR_EL2_PMCNTEN
+> >> +		| HDFGRTR_EL2_PMCCNTR_EL0
+> >> +		| HDFGRTR_EL2_PMEVCNTRn_EL0;
+> >> +
+> >> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR_EL2, clr, set);
+> >> +
+> >> +	set = HDFGWTR_EL2_PMOVS
+> >> +		| HDFGWTR_EL2_PMCCFILTR_EL0
+> >> +		| HDFGWTR_EL2_PMEVTYPERn_EL0;
+> >> +	clr = HDFGWTR_EL2_PMUSERENR_EL0
+> >> +		| HDFGWTR_EL2_PMCR_EL0
+> >> +		| HDFGWTR_EL2_PMSELR_EL0
+> >> +		| HDFGWTR_EL2_PMINTEN
+> >> +		| HDFGWTR_EL2_PMCNTEN
+> >> +		| HDFGWTR_EL2_PMCCNTR_EL0
+> >> +		| HDFGWTR_EL2_PMEVCNTRn_EL0;
+> >> +
+> >> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR_EL2, clr, set);
+> >> +
+> >> +	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
+> >> +		return;
+> >> +
+> >> +	set = HDFGRTR2_EL2_nPMICFILTR_EL0
+> >> +		| HDFGRTR2_EL2_nPMICNTR_EL0;
+> >> +	clr = 0;
+> >> +
+> >> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR2_EL2, clr, set);
+> >> +
+> >> +	set = HDFGWTR2_EL2_nPMICFILTR_EL0
+> >> +		| HDFGWTR2_EL2_nPMICNTR_EL0;
+> >> +	clr = 0;
+> >> +
+> >> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR2_EL2, clr, set);
 > 
-> > With this change ID_AA64PFR1_EL1.MTE_frac would be marked as unsigned
-> > when it should really be considered signed.
+> > This feels wrong. There should be one place to populate the FGTs that
+> > apply to a guest as set from the host, not two or more.
 > 
-> > Enum	43:40	MTE_frac
-> > 	0b0000	ASYNC
-> > 	0b1111	NI
-> > EndEnum
+> > There is such a construct in the SME series, and maybe you could have
+> > a look at it, specially if the trap configuration is this static.
 > 
-> Thanks for the explanation. I made this a separate commit because I
-> considered people might object and HPMN0 is already an UnsignedEnum in
-> my previous commit.
+> > 	M.
 > 
-> Do you think it would be a good idea to make plain Enums signed by
-> default or should I just remove this commit from the series?
+> > --
+> > Without deviation from the norm, progress is not possible.
+> 
+> I'm assuming you are referring to Mark Brown's series [1], specifically
+> patches 5 and 18 and I see what you mean.
+> 
+> You are probably thinking configuration should happen from
+> sys_regs.c:kvm_calculate_traps or thereabout and should be setting bits
+> in the existing kvm->arch.fgt array.
+> 
+> Correct me if I'm mistaken.
 
-It is presumptive to associate a sign with an enumeration. Generally
-speaking, the only fields that can do signed / unsigned comparisons are
-the Feature ID register fields.
+I'm saying there should be exactly one place where we write to the
+individual trap registers, and that the source of these settings
+should be equally unique when they are immutable in the lifetime of
+the guest.
 
-So please drop this and only keep the change for HPMN0.
+That's the existing pattern for most trap configuration, including
+HCR_EL2, ICH_HCR_EL2, HCRX_EL2, and the FGU configuration that
+trickles into the actual trap registers, and I want to stick with it
+if at all possible.
 
-Thanks,
-Oliver
+The way it is done in the SME series may be reasonable, but I haven't
+reviewed this series at all. I'm merely pointing out that similar
+constructs exist for other features.
 
-> > > Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> > > ---
-> > >    arch/arm64/tools/gen-sysreg.awk | 1 +
-> > >    1 file changed, 1 insertion(+)
-> 
-> > > diff --git a/arch/arm64/tools/gen-sysreg.awk
-> > > b/arch/arm64/tools/gen-sysreg.awk
-> > > index f2a1732cb1f6..fa21a632d9b7 100755
-> > > --- a/arch/arm64/tools/gen-sysreg.awk
-> > > +++ b/arch/arm64/tools/gen-sysreg.awk
-> > > @@ -308,6 +308,7 @@ $1 == "Enum" && (block_current() == "Sysreg" ||
-> > > block_current() == "SysregFields
-> > >    	parse_bitdef(reg, field, $2)
-> 
-> > >    	define_field(reg, field, msb, lsb)
-> > > +	define_field_sign(reg, field, "false")
-> 
-> > >    	next
-> > >    }
-> 
-> > Thanks,
-> 
-> > Ben
-> 
-> > [1]
-> > https://lore.kernel.org/all/20221207-arm64-sysreg-helpers-v4-1-25b6b3fb9d18@kernel.org/
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
