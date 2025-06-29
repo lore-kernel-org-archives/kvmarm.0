@@ -1,64 +1,62 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D387A7DA9C;
-	Sat, 28 Jun 2025 08:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6317E1CA84;
+	Sun, 29 Jun 2025 09:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751099140; cv=none; b=tklz3EeAZky6ZqhzWlMp1tGnGbnTiJnxGklCk0maqGqq3bAB1i7w28+xCeslL6/1RGld7K2dFkxmSLxNz/9rS9+QHXasKOIb+p8t0Qs+zcUhuysDH8A3eIAuMI8+Z0YhKhN6IgANaBx7SIzsEzbeDvCEipdpeFl1r8BRqhFbVXw=
+	t=1751189546; cv=none; b=lqsmFGHppFJeGjs4KW7AMEs6588m8JXDfnNDrPlfcZ/hw7Y4QenhoKL1o4EBgZDdjZxhAPZdcO20w+IiJepi78cM0VdG9e63tJh98ssvK+Ne2rGV/Z38QZQN9ZF+H/uqHczawU1Ho3l99ZjOUkgDBwmvpbDRbE1tkWTAVlrmR/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751099140; c=relaxed/simple;
-	bh=JRuHujpJLvDuTGnDYQujAWUeF9qBt6etY3etowHwHMc=;
+	s=arc-20240116; t=1751189546; c=relaxed/simple;
+	bh=yNCv9zbwFgntqHfSMp5v8KPVRVjWxvT/Aql76n6YouY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NJD/mGqi0SUMd9qVrwsFVyKG2EI1egPUX2+oXIm7FRocjAKEARfMEnX8qZP2eTEFMBTYCJE/bCIqH2lS4PtQnmpNfbl1Y3EI/ychFmUc4WWR05PjVd1yKhC+DmF6fvx1LRnA3Lk1dkro8nezAQMjzVSyih72U49Srj366DaOVos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J4YjI3ky; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=rPTEgwpiQ3Jejb8HzlHl/Tspq9/zNjyglmcOhtFWTQGEVWkR7dQNAPkrp9yAZEbSif1FG4f7568YcvK3QD9OB4tV3CldRKIfwh4Yam33qscgVeInHEclZIRPzD9gL9KDVmxxZq7vvRcVRSymp/wRL6o/I8TFMryHA5sCEavyRck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vc0iiiu2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J4YjI3ky"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D8C1C4CEEA;
-	Sat, 28 Jun 2025 08:25:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vc0iiiu2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1580C4CEEB;
+	Sun, 29 Jun 2025 09:32:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751099139;
-	bh=JRuHujpJLvDuTGnDYQujAWUeF9qBt6etY3etowHwHMc=;
+	s=k20201202; t=1751189545;
+	bh=yNCv9zbwFgntqHfSMp5v8KPVRVjWxvT/Aql76n6YouY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J4YjI3kyUvlGF9kiMiy8R2ZDlQlatNjRbS42jx+86DYS257jOgHRY8G5owUKHxt9U
-	 +PuUO1dBHZFg3lFyYcDmVgQD9xSmf/HDlcPjUmXtEjwUf+dKlJH34jLr31dGt4UQdU
-	 SICiNwyZpDxoqgasAugQuU9d07H61itg8DuAfeAQ51EQCnBs90roYqy8AD1Kv9S31n
-	 rYuI3Qrgv2inRLDWKDnLUdWXIhDMlA2W7hvouy4B/gpTCr/EaxpPkAF9lgthxP1yAb
-	 xrF3h9Yd68bT+oLgTSruyR6aUzZFGB609KKXzKQnHHG9WCjPaVePbiNgWMPb1ORStK
-	 WGm2LXTyutCyw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	b=Vc0iiiu2h2TjlcBxYYznq8GU4Lf0uabMlQwcjb8ML7Va38x4dP8IfFB71L1mFSmyY
+	 DylAJPSoUOMe6TqVNxbfZ1neiEd2tZ1gQ+EYZcjBvGvD8fvcR85Hm8bFFee+Vz10MW
+	 ZQ6I+XKUHZKj7WlEzEJ0TXy5gr1VdlyiPHFZHY6UhyBgdE78bwezedsnF3huoE6Ata
+	 qCUO3UoMt0lkynr5VVMnG6EnIPk2C83LeWIteuElyYYIZVuABEMc/sH2budXIO5Kh9
+	 hC7HMXOiNTQAminzCBRWknUInQEJgeKp7IKNEoswv3DoSz/FfIt+N3SNXuuEuWatrv
+	 EeKapCAaqIigA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uVQsS-00AlqC-Iu;
-	Sat, 28 Jun 2025 09:25:36 +0100
-Date: Sat, 28 Jun 2025 09:25:35 +0100
-Message-ID: <871pr4ff28.wl-maz@kernel.org>
+	id 1uVoOd-00Avhg-Dw;
+	Sun, 29 Jun 2025 10:32:23 +0100
+Date: Sun, 29 Jun 2025 10:32:23 +0100
+Message-ID: <86o6u6c2qg.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	pbonzini@redhat.com,
-	corbet@lwn.net,
-	linux@armlinux.org.uk,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	oliver.upton@linux.dev,
-	mizhang@google.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	mark.rutland@arm.com,
-	shuah@kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 10/22] KVM: arm64: Set up FGT for Partitioned PMU
-In-Reply-To: <gsntbjq89am2.fsf@coltonlewis-kvm.c.googlers.com>
-References: <86plepb54f.wl-maz@kernel.org>
-	<gsntbjq89am2.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v6 18/28] KVM: arm64: Support SME priority registers
+In-Reply-To: <20250625-kvm-arm64-sme-v6-18-114cff4ffe04@kernel.org>
+References: <20250625-kvm-arm64-sme-v6-0-114cff4ffe04@kernel.org>
+	<20250625-kvm-arm64-sme-v6-18-114cff4ffe04@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,100 +68,131 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, Dave.Martin@arm.com, tabba@google.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 27 Jun 2025 21:45:57 +0100,
-Colton Lewis <coltonlewis@google.com> wrote:
+On Wed, 25 Jun 2025 11:48:09 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Marc Zyngier <maz@kernel.org> writes:
+> SME has optional support for configuring the relative priorities of PEs
+> in systems where they share a single SME hardware block, known as a
+> SMCU. Currently we do not have any support for this in Linux and will
+> also hide it from KVM guests, pending experience with practical
+> implementations. The interface for configuring priority support is via
+> two new system registers, these registers are always defined when SME is
+> available.
 > 
-> > On Thu, 26 Jun 2025 21:04:46 +0100,
-> > Colton Lewis <coltonlewis@google.com> wrote:
+> The register SMPRI_EL1 allows control of SME execution priorities. Since
+> we disable SME priority support for guests this register is RES0, define
+> it as such and enable fine grained traps for SMPRI_EL1 to ensure that
+> guests can't write to it even if the hardware supports priorites.  Since
+> the register should be readable with fixed contents we only trap writes,
+> not reads.
 > 
-> >> +static inline void __activate_pmu_fgt(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
-> >> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> >> +	u64 set;
-> >> +	u64 clr;
-> >> +
-> >> +	set = HDFGRTR_EL2_PMOVS
-> >> +		| HDFGRTR_EL2_PMCCFILTR_EL0
-> >> +		| HDFGRTR_EL2_PMEVTYPERn_EL0;
-> >> +	clr = HDFGRTR_EL2_PMUSERENR_EL0
-> >> +		| HDFGRTR_EL2_PMSELR_EL0
-> >> +		| HDFGRTR_EL2_PMINTEN
-> >> +		| HDFGRTR_EL2_PMCNTEN
-> >> +		| HDFGRTR_EL2_PMCCNTR_EL0
-> >> +		| HDFGRTR_EL2_PMEVCNTRn_EL0;
-> >> +
-> >> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR_EL2, clr, set);
-> >> +
-> >> +	set = HDFGWTR_EL2_PMOVS
-> >> +		| HDFGWTR_EL2_PMCCFILTR_EL0
-> >> +		| HDFGWTR_EL2_PMEVTYPERn_EL0;
-> >> +	clr = HDFGWTR_EL2_PMUSERENR_EL0
-> >> +		| HDFGWTR_EL2_PMCR_EL0
-> >> +		| HDFGWTR_EL2_PMSELR_EL0
-> >> +		| HDFGWTR_EL2_PMINTEN
-> >> +		| HDFGWTR_EL2_PMCNTEN
-> >> +		| HDFGWTR_EL2_PMCCNTR_EL0
-> >> +		| HDFGWTR_EL2_PMEVCNTRn_EL0;
-> >> +
-> >> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR_EL2, clr, set);
-> >> +
-> >> +	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
-> >> +		return;
-> >> +
-> >> +	set = HDFGRTR2_EL2_nPMICFILTR_EL0
-> >> +		| HDFGRTR2_EL2_nPMICNTR_EL0;
-> >> +	clr = 0;
-> >> +
-> >> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGRTR2_EL2, clr, set);
-> >> +
-> >> +	set = HDFGWTR2_EL2_nPMICFILTR_EL0
-> >> +		| HDFGWTR2_EL2_nPMICNTR_EL0;
-> >> +	clr = 0;
-> >> +
-> >> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HDFGWTR2_EL2, clr, set);
+> There is also an EL2 register SMPRIMAP_EL2 for virtualisation of
+> priorities, this is RES0 when priority configuration is not supported
+> but has no specific traps available.
 > 
-> > This feels wrong. There should be one place to populate the FGTs that
-> > apply to a guest as set from the host, not two or more.
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h     |  2 ++
+>  arch/arm64/include/asm/vncr_mapping.h |  1 +
+>  arch/arm64/kvm/sys_regs.c             | 23 ++++++++++++++++++++++-
+>  3 files changed, 25 insertions(+), 1 deletion(-)
 > 
-> > There is such a construct in the SME series, and maybe you could have
-> > a look at it, specially if the trap configuration is this static.
-> 
-> > 	M.
-> 
-> > --
-> > Without deviation from the norm, progress is not possible.
-> 
-> I'm assuming you are referring to Mark Brown's series [1], specifically
-> patches 5 and 18 and I see what you mean.
-> 
-> You are probably thinking configuration should happen from
-> sys_regs.c:kvm_calculate_traps or thereabout and should be setting bits
-> in the existing kvm->arch.fgt array.
-> 
-> Correct me if I'm mistaken.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 29b8697c8144..5ce9e06324b5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -495,6 +495,7 @@ enum vcpu_sysreg {
+>  	SVCR,
+>  	FPMR,
+>  	SMIDR_EL1,	/* Streaming Mode Identification Register */
+> +	SMPRI_EL1,	/* Streaming Mode Priority Register */
+>
 
-I'm saying there should be exactly one place where we write to the
-individual trap registers, and that the source of these settings
-should be equally unique when they are immutable in the lifetime of
-the guest.
+What is the point of making the sysreg file larger for the sole
+purpose of returning a value that is firmly always 0? Can't that be
+synthesised on the fly whenever needed?
 
-That's the existing pattern for most trap configuration, including
-HCR_EL2, ICH_HCR_EL2, HCRX_EL2, and the FGU configuration that
-trickles into the actual trap registers, and I want to stick with it
-if at all possible.
+>  	/* 32bit specific registers. */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+> @@ -547,6 +548,7 @@ enum vcpu_sysreg {
+>  	VNCR(CPACR_EL1),/* Coprocessor Access Control */
+>  	VNCR(ZCR_EL1),	/* SVE Control */
+>  	VNCR(SMCR_EL1),	/* SME Control */
+> +	VNCR(SMPRIMAP_EL2),	/* Streaming Mode Priority Mapping Register */
 
-The way it is done in the SME series may be reasonable, but I haven't
-reviewed this series at all. I'm merely pointing out that similar
-constructs exist for other features.
+This is slightly different, as there is no trap for this, and we rely
+on sanitisation.
+
+>  	VNCR(TTBR0_EL1),/* Translation Table Base Register 0 */
+>  	VNCR(TTBR1_EL1),/* Translation Table Base Register 1 */
+>  	VNCR(TCR_EL1),	/* Translation Control Register */
+> diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+> index aede5d6efad3..454e076b77cb 100644
+> --- a/arch/arm64/include/asm/vncr_mapping.h
+> +++ b/arch/arm64/include/asm/vncr_mapping.h
+> @@ -45,6 +45,7 @@
+>  #define VNCR_ZCR_EL1            0x1E0
+>  #define VNCR_HAFGRTR_EL2	0x1E8
+>  #define VNCR_SMCR_EL1		0x1F0
+> +#define VNCR_SMPRIMAP_EL2	0x1F0
+>  #define VNCR_TTBR0_EL1          0x200
+>  #define VNCR_TTBR1_EL1          0x210
+>  #define VNCR_FAR_EL1            0x220
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index b11bb95e9e35..1fee8e534615 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1828,6 +1828,15 @@ static unsigned int fp8_visibility(const struct kvm_vcpu *vcpu,
+>  	return REG_HIDDEN;
+>  }
+>  
+> +static unsigned int sme_raz_visibility(const struct kvm_vcpu *vcpu,
+> +				       const struct sys_reg_desc *rd)
+> +{
+> +	if (vcpu_has_sme(vcpu))
+> +		return REG_RAZ;
+> +
+> +	return REG_HIDDEN;
+> +}
+> +
+>  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  {
+>  	if (!vcpu_has_sve(vcpu))
+> @@ -3030,7 +3039,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
+>  	{ SYS_DESC(SYS_TRFCR_EL1), undef_access },
+> -	{ SYS_DESC(SYS_SMPRI_EL1), undef_access },
+> +
+> +	/*
+> +	 * SMPRI_EL1 is UNDEF when SME is disabled, the UNDEF is
+> +	 * handled via FGU which is handled without consulting this
+> +	 * table.
+> +	 */
+> +	{ SYS_DESC(SYS_SMPRI_EL1), trap_raz_wi, .visibility = sme_raz_visibility },
+> +
+>  	{ SYS_DESC(SYS_SMCR_EL1), NULL, reset_val, SMCR_EL1, 0, .visibility = sme_visibility },
+>  	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+>  	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+> @@ -3387,6 +3403,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	EL2_REG_VNCR(HCRX_EL2, reset_val, 0),
+>  
+> +	EL2_REG_FILTERED(SMPRIMAP_EL2, trap_raz_wi, reset_val, 0,
+> +			 sme_el2_visibility),
+
+Wut??? You clearly said it yourself: this register "has no specific
+traps available". If you end-up here from a guest access, this is a
+bug. So this "trap_raz_wi" makes no sense.
+
+I also cannot see where this register is properly configured to be
+fully RES0, as it should.
 
 	M.
 
 -- 
-Jazz isn't dead. It just smells funny.
+Without deviation from the norm, progress is not possible.
