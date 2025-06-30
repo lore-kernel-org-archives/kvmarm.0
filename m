@@ -1,158 +1,287 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA998285049
-	for <kvmarm@lists.linux.dev>; Mon, 30 Jun 2025 13:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D94028CF70
+	for <kvmarm@lists.linux.dev>; Mon, 30 Jun 2025 14:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751289980; cv=none; b=MIkU0NJVfW5M/fGkc4qWstpWmP+L1CLz8ygocde8bAFb7ECPXUHXJKyEihE8qSqMQHEYNbDNvTHvyPIZwOWLMmJNGvEG9ITY1AThJmAoxRkoItF9KjjrYEdWt6XaBa9zwG/04qPBkC4Y0gvOmDxUFBoUWHxWS6nymXykgv/n0cs=
+	t=1751294664; cv=none; b=sHlOtV6diE59U8m3FjqzPaPJNF7XmLstodbtpNAgzZH73/LIbK79eX6IzQeVfJLGxhnLB/L2P3fdmz8Xo+S9qzvcF+sXgFO533u7x+eP5vNfIBvQ6CpiTtfFvr5JCXar7vwW0hfm2kV+e1YcAmKqFar4Iy3pIHX8jNRAaDeuVcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751289980; c=relaxed/simple;
-	bh=zAp7B/cd+BfVWsSs8Ec9IsdTrIVawQH9FTL4oc9BjqQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j7XT1zXBkXbfxSOp0bmIxdSNbTRz+mLy6XAVYUzVxXnUPyMVzqFhyTGuJfMGCbrCeyGpwYKW5tKX43mHY39z7kZ8788ZHNe6yjCUzMNB9HiiXTesNoHdoB8C++ihxWvqV9b1vnVmxHFku/6K5JjpNG/wKMPihSqFQyfJ72SZmwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dXNMCQwK; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1751294664; c=relaxed/simple;
+	bh=Cpd21zH982h2AGMdmVSF+i8x16jkxQRASXJ7Tm/3Uxs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RXeA0Pcm0HYTvXY77yaCO8wgaldR08zy17Zk6FMtY+7mbSrGA1xpBdWP/DrxFkatbgcZcteqMSApW3FjYf1i2ljZFeeoOmcshd0kIrQhpxdBIa6DOA4FoXSKlS2cydKvrZPAP7gJyQBX6K9VIW+7SEjpcTKPh1uiAXRTz3p6Cek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LoNRnQx8; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dXNMCQwK"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-450cf0120cdso21489415e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 30 Jun 2025 06:26:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LoNRnQx8"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7492da755a1so1851637b3a.1
+        for <kvmarm@lists.linux.dev>; Mon, 30 Jun 2025 07:44:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751289977; x=1751894777; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1LR7G+ibD4rgaTIYMC1yKY14KOB6Bt7LBBCN91SJpVU=;
-        b=dXNMCQwK0w/B6qaJcTNkuC/3U+H230ZwIst35DlXlABcvA/LYx5D8C8ow8coENVopK
-         ugvwHsm4uAKypbiTorhQj58l8ovGaD3G7M64pCKfeDhVkQCdh0DlBQw/uSGLMQcHRFxb
-         NzBRothhaQBoJtdVaWpyC0VbAdNSXphW2y+mCqCcAJc7Fr1EUzr5q/+Jk8OtfJ6iw4Tz
-         mN3zQfS6TEINVOfazyqyR0SAYwWFGgbjj7ORLRGXyQMhgMCEN8YCuK5R8l4DC9VAc0o+
-         bfooXnMKZ9/58mp/JviiHBNcGG2y6KVLx5r3R+J2d3aIKUH039laFpVbptRYMcSVDbmR
-         YSrg==
+        d=google.com; s=20230601; t=1751294662; x=1751899462; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WDNBu9w19s+kAcSrRe9w5bRPZMQtJhhAx+mG+VBvNKk=;
+        b=LoNRnQx8ua5yWxuWk7ktmI8yegv00/JcVxsrQR7aKQ1w0hlLhfhYXtrqWeXO9u4F5p
+         gy2Ck0ntK13tZjJIawhMntbbW/lPXbrVKue5dZ0QH/bus3+D9Kbf3XPgLu1Xs6Q1il83
+         gyHXh0X+qEtucVDMjX+VKncpSNx4jfOuuugNN9XOG934o+5cPnJf4Kxh3oa1MJ9+U+qn
+         z2byEoeWDn9qSE9503/8dVTKWJ2rfeeiKGtZmSjnZzkMOKxaPgq0pWq7Egsot7RqAvna
+         symA2aRLc1MlRwW6Gf5C91wHMUn6BZo33aKbB3UQxJSQuMrch44KNwLBMNWevdD0Z173
+         NZHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751289977; x=1751894777;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1LR7G+ibD4rgaTIYMC1yKY14KOB6Bt7LBBCN91SJpVU=;
-        b=tEarD2PxjSqMQ/WrL/VAOVrQLmajERqRKO2rmNYDIHxw9ev28ijAQVTEn81E1RtdQY
-         226DMKHkLpIqyFzsF7aGc2FeEWCEkE6MPZq2RFp6Ootpv38+kyK92lJWXJDjm0ie2OoY
-         rRCyCm7zf0aZOlF2Pdv0X8BwIsyO1FxILqenl8DhUZLv1uNguNMujnX+tpvahw758T8S
-         Elbx5cVYzeHynqvsIzjtbGCcB7bbGB84lC6lJMyK/upLOAgb48KYdBgrAuY4/PaQh4nO
-         8KpNJoprvCUr5nzxguvzPNE2ToIv/fky+9E/tHefTgJcAGBt+nyISxmJtp/vCXjIO3Fx
-         yV1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWqoHb8eWFuU3zc43z6xYSOCYYvRAiI6ntmoFJDw8Oo8+qx6U/19VXwN6KIkg1W9aT3oFzYBEQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyMpNVKgY75Kf7677YopPFxSfTlwrEGCLKbAGUvS8ugIbE71nLR
-	FULP68jdqfL+F4d/4GpKqTK2dysPV3khEbnGMsSVQPBuqqd74taKj6T0ViK/+/ke/+U=
-X-Gm-Gg: ASbGncs+HCwinF3bJY+5t2b/SRae+oBPV27It/pjJrrm9VabjkdiLiijAWcWv+OiCyf
-	b06VoJQgx7tNw7opWNxt/qMN93rF+1fSzM8BGcs187Np/3irR1N+aktD/eFmmauFBfAN3DIB4Xj
-	7cHiwZns5X6qpZ2rwV0h9idZa8ND+BbGU20n5tEKr0nInGnXM3lJ9I9NpEl4ihoQdsNPNAtG1bl
-	ep3G4Q3xZxjzFarOigmlw6p7sPraQjA2UcIRMNmIrmm0Gsp2r4VPuvbUFzxlbr0fpE7uoQyGMj1
-	6xAtFLH1B0jldDVsoP5LFkmPD5hzaH78TnOtAr/e0QA1tJBJBfZQN4jhxuUGOUQK7nU=
-X-Google-Smtp-Source: AGHT+IHXyDPllAQfiCnHOhBWNnf3nw0YYqRMT7LLRAVDyR5oQC0yCAsnt4bSuJQio4g5UH+jS57AqA==
-X-Received: by 2002:a05:600c:3ba1:b0:450:d04e:22d6 with SMTP id 5b1f17b1804b1-4538ee565damr129693165e9.7.1751289976911;
-        Mon, 30 Jun 2025 06:26:16 -0700 (PDT)
-Received: from [192.168.1.3] ([37.18.136.128])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538a3fe592sm132598425e9.21.2025.06.30.06.26.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jun 2025 06:26:16 -0700 (PDT)
-Message-ID: <5ecf74f6-08a0-474c-b0ff-32075af7ae03@linaro.org>
-Date: Mon, 30 Jun 2025 14:26:14 +0100
+        d=1e100.net; s=20230601; t=1751294662; x=1751899462;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WDNBu9w19s+kAcSrRe9w5bRPZMQtJhhAx+mG+VBvNKk=;
+        b=DiLWAoGDaSPZfNxZwAjYwmMsWWDZdMgti4x9pDMnV4k9riQYVVGVLoh3jiT02ceAtL
+         owdmb8mq/CnwoA6enq2ZFAkDfYvV6wVpMKVtFol2gtYGyUHdJFxlgbcl4RZEmeTMZUBy
+         AePkYIlsLpgnvh5+KGfptw359oBJxmiDyURBwOdOJ4XeF0Mwxwg+CWLdoo3dOEiubSLN
+         epG5OhzDKqesaQvTpptZlc15OM363T8QGFWyDeiietI7QgBtrx0JfG1l6mcIXT+sOQfk
+         8/c/1oQ/uV2wyEsgqixG4Z/LJwem439AkQhuN0hFIe8O9StXWBNuVMkqIWSAOMn+3gde
+         qYyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBvgLcpgy2FgQxITUVhUz10DMOZb1nnrfmWzDendF3Hi+Mkt5yG93ITsDBvGWDjkRKrTi7hfY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw7ese/Neks8CrQjWqRQYOtCL9RhoRQ2eTaE/loldVcqp1cyAtl
+	szGA64IqP64lcki6MUG2+n2cAO/lXyAJJLyy42KKjenUAFY0/Ac1sD7/7R9XJUOiaN+7cEJ1+hI
+	FPgpy2tEdJJH/wsmCR0S1m5Ak9w==
+X-Google-Smtp-Source: AGHT+IFunOp0qoSe6XZoJHonOUytaiBByj0BZgN04binEVTRRYUnTm4vU2sNBIU0+S9DVAea3Y9BNG9BxDYxIWzIkQ==
+X-Received: from pghp6.prod.google.com ([2002:a63:fe06:0:b0:b34:c533:cd4e])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a21:4683:b0:220:245d:a30b with SMTP id adf61e73a8af0-220a17e9d75mr20279198637.38.1751294661741;
+ Mon, 30 Jun 2025 07:44:21 -0700 (PDT)
+Date: Mon, 30 Jun 2025 07:44:20 -0700
+In-Reply-To: <CA+EHjTxECJ3=ywbAPvpdA1-pm=stXWqU75mgG1epWaXiUr0raw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/10] perf: arm_spe: Armv8.8 SPE features
-To: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Marc Zyngier <maz@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
- kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, leo.yan@arm.com,
- Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>
-References: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-11-tabba@google.com>
+ <aEyhHgwQXW4zbx-k@google.com> <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
+ <diqza55tjkk1.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTxECJ3=ywbAPvpdA1-pm=stXWqU75mgG1epWaXiUr0raw@mail.gmail.com>
+Message-ID: <diqzv7odjnln.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
+ guest_memfd with shared memory
+From: Ackerley Tng <ackerleytng@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+Fuad Tabba <tabba@google.com> writes:
 
+> Hi Ackerley,
+>
+> On Fri, 27 Jun 2025 at 16:01, Ackerley Tng <ackerleytng@google.com> wrote=
+:
+>>
+>> Ackerley Tng <ackerleytng@google.com> writes:
+>>
+>> > [...]
+>>
+>> >>> +/*
+>> >>> + * Returns true if the given gfn's private/shared status (in the Co=
+Co sense) is
+>> >>> + * private.
+>> >>> + *
+>> >>> + * A return value of false indicates that the gfn is explicitly or =
+implicitly
+>> >>> + * shared (i.e., non-CoCo VMs).
+>> >>> + */
+>> >>>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>> >>>  {
+>> >>> -   return IS_ENABLED(CONFIG_KVM_GMEM) &&
+>> >>> -          kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUT=
+E_PRIVATE;
+>> >>> +   struct kvm_memory_slot *slot;
+>> >>> +
+>> >>> +   if (!IS_ENABLED(CONFIG_KVM_GMEM))
+>> >>> +           return false;
+>> >>> +
+>> >>> +   slot =3D gfn_to_memslot(kvm, gfn);
+>> >>> +   if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(=
+slot)) {
+>> >>> +           /*
+>> >>> +            * Without in-place conversion support, if a guest_memfd=
+ memslot
+>> >>> +            * supports shared memory, then all the slot's memory is
+>> >>> +            * considered not private, i.e., implicitly shared.
+>> >>> +            */
+>> >>> +           return false;
+>> >>
+>> >> Why!?!?  Just make sure KVM_MEMORY_ATTRIBUTE_PRIVATE is mutually excl=
+usive with
+>> >> mappable guest_memfd.  You need to do that no matter what.
+>> >
+>> > Thanks, I agree that setting KVM_MEMORY_ATTRIBUTE_PRIVATE should be
+>> > disallowed for gfn ranges whose slot is guest_memfd-only. Missed that
+>> > out. Where do people think we should check the mutual exclusivity?
+>> >
+>> > In kvm_supported_mem_attributes() I'm thiking that we should still all=
+ow
+>> > the use of KVM_MEMORY_ATTRIBUTE_PRIVATE for other non-guest_memfd-only
+>> > gfn ranges. Or do people think we should just disallow
+>> > KVM_MEMORY_ATTRIBUTE_PRIVATE for the entire VM as long as one memslot =
+is
+>> > a guest_memfd-only memslot?
+>> >
+>> > If we check mutually exclusivity when handling
+>> > kvm_vm_set_memory_attributes(), as long as part of the range where
+>> > KVM_MEMORY_ATTRIBUTE_PRIVATE is requested to be set intersects a range
+>> > whose slot is guest_memfd-only, the ioctl will return EINVAL.
+>> >
+>>
+>> At yesterday's (2025-06-26) guest_memfd upstream call discussion,
+>>
+>> * Fuad brought up a possible use case where within the *same* VM, we
+>>   want to allow both memslots that supports and does not support mmap in
+>>   guest_memfd.
+>> * Shivank suggested a concrete use case for this: the user wants a
+>>   guest_memfd memslot that supports mmap just so userspace addresses can
+>>   be used as references for specifying memory policy.
+>> * Sean then added on that allowing both types of guest_memfd memslots
+>>   (support and not supporting mmap) will allow the user to have a second
+>>   layer of protection and ensure that for some memslots, the user
+>>   expects never to be able to mmap from the memslot.
+>>
+>> I agree it will be useful to allow both guest_memfd memslots that
+>> support and do not support mmap in a single VM.
+>>
+>> I think I found an issue with flags, which is that GUEST_MEMFD_FLAG_MMAP
+>> should not imply that the guest_memfd will provide memory for all guest
+>> faults within the memslot's gfn range (KVM_MEMSLOT_GMEM_ONLY).
+>>
+>> For the use case Shivank raised, if the user wants a guest_memfd memslot
+>> that supports mmap just so userspace addresses can be used as references
+>> for specifying memory policy for legacy Coco VMs where shared memory
+>> should still come from other sources, GUEST_MEMFD_FLAG_MMAP will be set,
+>> but KVM can't fault shared memory from guest_memfd. Hence,
+>> GUEST_MEMFD_FLAG_MMAP should not imply KVM_MEMSLOT_GMEM_ONLY.
+>>
+>> Thinking forward, if we want guest_memfd to provide (no-mmap) protection
+>> even for non-CoCo VMs (such that perhaps initial VM image is populated
+>> and then VM memory should never be mmap-ed at all), we will want
+>> guest_memfd to be the source of memory even if GUEST_MEMFD_FLAG_MMAP is
+>> not set.
+>>
+>> I propose that we should have a single VM-level flag to solve this (in
+>> line with Sean's guideline that we should just move towards what we want
+>> and not support non-existent use cases): something like
+>> KVM_CAP_PREFER_GMEM.
+>>
+>> If KVM_CAP_PREFER_GMEM_MEMORY is set,
+>>
+>> * memory for any gfn range in a guest_memfd memslot will be requested
+>>   from guest_memfd
+>> * any privacy status queries will also be directed to guest_memfd
+>> * KVM_MEMORY_ATTRIBUTE_PRIVATE will not be a valid attribute
+>>
+>> KVM_CAP_PREFER_GMEM_MEMORY will be orthogonal with no validation on
+>> GUEST_MEMFD_FLAG_MMAP, which should just purely guard mmap support in
+>> guest_memfd.
+>>
+>> Here's a table that I set up [1]. I believe the proposed
+>> KVM_CAP_PREFER_GMEM_MEMORY (column 7) lines up with requirements
+>> (columns 1 to 4) correctly.
+>>
+>> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/3710=
+/guest_memfd%20use%20cases%20vs%20guest_memfd%20flags%20and%20privacy%20tra=
+cking.pdf
+>
+> I'm not sure this naming helps. What does "prefer" imply here? If the
+> caller from user space does not prefer, does it mean that they
+> mind/oppose?
+>
 
-On 05/06/2025 11:48 am, James Clark wrote:
-> Support 3 new SPE features: FEAT_SPEv1p4 filters, FEAT_SPE_EFT extended
-> filtering, and SPE_FEAT_FDS data source filtering. The features are
-> independent can be applied separately:
-> 
->    * Prerequisite sysreg changes - patches 1 - 2
->    * FEAT_SPEv1p4 - patch 3
->    * FEAT_SPE_EFT - patch 4
->    * FEAT_SPE_FDS - patches 5 - 8
->    * FEAT_SPE_FDS Perf tool changes - patches 9 - 11
-> 
-> The first two features will work with old Perfs but a Perf change to
-> parse the new config4 is required for the last feature.
-> 
-> To:
-> 
-> ---
-> Changes in v3:
-> - Use PMSIDR_EL1_FDS instead of 1 << PMSIDR_EL1_FDS_SHIFT
-> - Add VNCR offsets
-> - Link to v2: https://lore.kernel.org/r/20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org
-> 
-> Changes in v2:
-> - Fix detection of FEAT_SPE_FDS in el2_setup.h
-> - Pickup Marc Z's sysreg change instead which matches the json
-> - Restructure and expand docs changes
-> - Link to v1: https://lore.kernel.org/r/20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org
-> 
-> ---
-> James Clark (10):
->        arm64: sysreg: Add new PMSFCR_EL1 fields and PMSDSFR_EL1 register
->        perf: arm_spe: Support FEAT_SPEv1p4 filters
->        perf: arm_spe: Add support for FEAT_SPE_EFT extended filtering
->        arm64/boot: Enable EL2 requirements for SPE_FEAT_FDS
->        KVM: arm64: Add trap configs for PMSDSFR_EL1
->        perf: Add perf_event_attr::config4
->        perf: arm_spe: Add support for filtering on data source
->        tools headers UAPI: Sync linux/perf_event.h with the kernel sources
->        perf tools: Add support for perf_event_attr::config4
->        perf docs: arm-spe: Document new SPE filtering features
-> 
->   Documentation/arch/arm64/booting.rst      |  11 ++++
->   arch/arm64/include/asm/el2_setup.h        |  14 +++++
->   arch/arm64/include/asm/sysreg.h           |   7 +++
->   arch/arm64/include/asm/vncr_mapping.h     |   2 +
->   arch/arm64/kvm/emulate-nested.c           |   1 +
->   arch/arm64/kvm/sys_regs.c                 |   1 +
->   arch/arm64/tools/sysreg                   |  13 +++-
->   drivers/perf/arm_spe_pmu.c                | 100 +++++++++++++++++++++++++++++-
->   include/uapi/linux/perf_event.h           |   2 +
->   tools/include/uapi/linux/perf_event.h     |   2 +
->   tools/perf/Documentation/perf-arm-spe.txt |  97 ++++++++++++++++++++++++++---
->   tools/perf/tests/parse-events.c           |  14 ++++-
->   tools/perf/util/parse-events.c            |  11 ++++
->   tools/perf/util/parse-events.h            |   1 +
->   tools/perf/util/parse-events.l            |   1 +
->   tools/perf/util/pmu.c                     |   8 +++
->   tools/perf/util/pmu.h                     |   1 +
->   17 files changed, 273 insertions(+), 13 deletions(-)
-> ---
-> base-commit: ec7714e4947909190ffb3041a03311a975350fe0
-> change-id: 20250312-james-perf-feat_spe_eft-66cdf4d8fe99
-> 
-> Best regards,
+Sorry, bad naming.
 
-Gentle ping, thanks
+I used "prefer" because some memslots may not have guest_memfd at
+all. To clarify, a "guest_memfd memslot" is a memslot that has some
+valid guest_memfd fd and offset. The memslot may also have a valid
+userspace_addr configured, either mmap-ed from the same guest_memfd fd
+or from some other backing memory (for legacy CoCo VMs), or NULL for
+userspace_addr.
 
+I meant to have the CAP enable KVM_MEMSLOT_GMEM_ONLY of this patch
+series for all memslots that have some valid guest_memfd fd and offset,
+except if we have a VM-level CAP, KVM_MEMSLOT_GMEM_ONLY should be moved
+to the VM level.
+
+> Regarding the use case Shivank mentioned, mmaping for policy, while
+> the use case is a valid one, the raison d'=C3=AAtre of mmap is to map int=
+o
+> user space (i.e., fault it in). I would argue that if you opt into
+> mmap, you are doing it to be able to access it.
+
+The above is in conflict with what was discussed on 2025-06-26 IIUC.
+
+Shivank brought up the case of enabling mmap *only* to be able to set
+mempolicy using the VMAs, and Sean (IIUC) later agreed we should allow
+userspace to only enable mmap but still disable faults, so that userspace
+is given additional protection, such that even if a (compromised)
+userspace does a private-to-shared conversion, userspace is still not
+allowed to fault in the page.
+
+Hence, if we want to support mmaping just for policy and continue to
+restrict faulting, then GUEST_MEMFD_FLAG_MMAP should not imply
+KVM_MEMSLOT_GMEM_ONLY.
+
+> To me, that seems like
+> something that merits its own flag, rather than mmap. Also, I recall
+> that we said that later on, with inplace conversion, that won't be
+> even necessary.
+
+On x86, as of now I believe we're going with an ioctl that does *not*
+check what the guest prefers and will go ahead to perform the
+private-to-shared conversion, which will go ahead to update
+shareability.
+
+> In other words, this would also be trying to solve a
+> problem that we haven't yet encountered and that we have a solution
+> for anyway.
+>
+
+So we don't have a solution for the use case where userspace wants to
+mmap but never fault for userspace's protection from stray
+private-to-shared conversions, unless we decouple GUEST_MEMFD_FLAG_MMAP
+and KVM_MEMSLOT_GMEM_ONLY.
+
+> I think that, unless anyone disagrees, is to go ahead with the names
+> we discussed in the last meeting. They seem to be the ones that make
+> the most sense for the upcoming use cases.
+>
+
+We could also discuss if we really want to support the use case where
+userspace wants to mmap but never fault for userspace's protection from
+stray private-to-shared conversions.
+
+> Cheers,
+> /fuad
+>
+>
+>
+>> > [...]
+>>
