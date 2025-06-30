@@ -1,172 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1EE226165;
-	Mon, 30 Jun 2025 08:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2DC248F48
+	for <kvmarm@lists.linux.dev>; Mon, 30 Jun 2025 10:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751272873; cv=none; b=aKdgpkNRa3LKcMHou4FBLjwACm803BRbJhLgRk8y9dkIuIvltEmbMA+MQSZbnJmVrTSMG22vUf5FBExiACxV9OKwhXyHFzENfvJ5bkihqcMf+gpst++vDdiAYusfZtTRy2eEIDbcBH5LrGcwL7hG7AtjLGpJzleD57WwjdBn/bE=
+	t=1751277885; cv=none; b=YyWemxeJY3Fu8TWe25vHeRQ6BofKRiiVIx+S7lUaBhIvjZ35rIn0pApgpntAuh9Ho8aLHPseUN7AwDIuokpkEVMA2uxlCjdjB2l0mNqpMVZ6gb/RJVebDy3UNDmwqyqO7blR4etHGq3djvqtuiRdztFTUhV1kEh8Zp4olTJ4/aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751272873; c=relaxed/simple;
-	bh=GFMcwvHqQu6q6QWAz3DVJhxBQG7XyQqTZN85s49tnbM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VSnnmqOQ/bksAq4oI3VQ61BM/WG5KVnDhcccLwGVv0PEh3vRny/0aA1QDzyaRysJyQqsFOouURi+tY6UL8T7rF+Yx1tOjdaoVVup00KtH3ivdzEfpNedmSbf1nXUDviFiRHIGLhG+Le0VfJ1TG8J4sgjR8o0p4vBQ3Xrtg+JH3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KL7Yk92j; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751277885; c=relaxed/simple;
+	bh=U/hPt3HnxEXyebzfSxmkUb8PNFKGWn36uaYbFZYkdAc=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nIYIITUEbN05BaNeRL+BjC+WmRXIC+osD8tqFjFCq1U/YDO1+yGZeMpvt1NZTrXQoroj4LwhmJc6KmcC+/fCD42S9+tG4Qoq587M/pZL5E0VA1z17w2M4noO5XR8ssoH/YATYCg+2ca2QQVJI9JRpbePgVt0VIuLTbf+CRI7+2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jzq+aPp8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KL7Yk92j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76628C4CEE3;
-	Mon, 30 Jun 2025 08:41:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751272872;
-	bh=GFMcwvHqQu6q6QWAz3DVJhxBQG7XyQqTZN85s49tnbM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KL7Yk92jmI3hWHySdadSShj47zKUAdMNPSUGdu2mkgve36nntPf/tIItn35WCiToj
-	 mkxK8IlWKNdJ8MI6c2tiWDVH2xBLQ3Po/tavIuI9wrtRQhoKcX4jugguxQHQllTPCG
-	 Ud5a+t6f8vc/c6hEoz/Etsr1AjnSUIyI1ig9/YdGC9fXlPA6wd7WUZt0ubqwBCPgJv
-	 poiyTWz4ZUKSPc/KCCFPJpYI/isYOgzxeK0SXXd0iDUvzvF4ZCNS05pdVO413d4H48
-	 IGIghQKT9rdsXBiyFonw6/xuJWAwVxftVCac0nerVfNNCoIY+msxttFbptSFSpSSv6
-	 mYuSaupDO0ysQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uWA4c-00B9a3-5l;
-	Mon, 30 Jun 2025 09:41:10 +0100
-Date: Mon, 30 Jun 2025 09:41:09 +0100
-Message-ID: <86ldp9bp0a.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: perlarsen@google.com
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	ahomescu@google.com,
-	armellel@google.com,
-	arve@android.com,
-	ayrton@google.com,
-	qperret@google.com,
-	sebastianene@google.com,
-	qwandor@google.com
-Subject: Re: [PATCH v6 4/5] KVM: arm64: Bump the supported version of FF-A to 1.2
-In-Reply-To: <20250627-virtio-msg-ffa-v6-4-8c02fd94edac@google.com>
-References: <20250627-virtio-msg-ffa-v6-0-8c02fd94edac@google.com>
-	<20250627-virtio-msg-ffa-v6-4-8c02fd94edac@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jzq+aPp8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751277882;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rjChr4l7bDoOse0Y08kwZF8ENfM0mEbxnZ8orFyHQAs=;
+	b=Jzq+aPp8X2RzLLBvsWhjKmHnbxkBi2GI8mKe1CWG9jYytfYJFxruRnEnBwfjHj1xhudSMq
+	RntJgp4g3/zYnUOWn/C5GBlQc+HDhB5GsS09eNdDaldhjzoLngTElqtl4j9t8inTbFjEZS
+	EDSnPXw1zclffVzNjAQiXqIB3Ju5EZQ=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-597-dE_8xuvEPCeE7rJ1WeK2eg-1; Mon,
+ 30 Jun 2025 06:04:38 -0400
+X-MC-Unique: dE_8xuvEPCeE7rJ1WeK2eg-1
+X-Mimecast-MFC-AGG-ID: dE_8xuvEPCeE7rJ1WeK2eg_1751277877
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 03DB61978F63;
+	Mon, 30 Jun 2025 10:04:36 +0000 (UTC)
+Received: from localhost (dhcp-192-236.str.redhat.com [10.33.192.236])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7ABC918003FC;
+	Mon, 30 Jun 2025 10:04:33 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, alex.bennee@linaro.org, maz@kernel.org,
+ oliver.upton@linux.dev, sebott@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, armbru@redhat.com,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+ agraf@csgraf.de
+Subject: Re: [PATCH v8 00/14] arm: rework id register storage
+In-Reply-To: <20250617153931.1330449-1-cohuck@redhat.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Avril Crosse O'Flaherty"
+References: <20250617153931.1330449-1-cohuck@redhat.com>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 30 Jun 2025 12:04:30 +0200
+Message-ID: <87jz4tr1e9.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: perlarsen@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, ahomescu@google.com, armellel@google.com, arve@android.com, ayrton@google.com, qperret@google.com, sebastianene@google.com, qwandor@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Fri, 27 Jun 2025 08:12:28 +0100,
-Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org> wrote:
-> 
-> From: Per Larsen <perlarsen@google.com>
-> 
-> FF-A version 1.2 introduces the DIRECT_REQ2 ABI. Bump the FF-A version
-> preferred by the hypervisor as a precursor to implementing the 1.2-only
-> FFA_MSG_SEND_DIRECT_REQ2 and FFA_MSG_SEND_RESP2 messaging interfaces.
-> 
-> We must also use SMCCC 1.2 for 64-bit SMCs if hypervisor negotiated FF-A
-> 1.2, so ffa_set_retval is updated and a new function to call 64-bit smcs
-> using SMCCC 1.2 with fallback to SMCCC 1.1 is introduced.
-> 
-> Update ffa_call_supported to mark FF-A 1.2 interfaces as unsupported
-> lest they get forwarded.
-> 
-> Co-developed-by: Ayrton Munoz <ayrton@google.com>
-> Signed-off-by: Ayrton Munoz <ayrton@google.com>
-> Signed-off-by: Per Larsen <perlarsen@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 14 ++++++++++----
->  include/linux/arm_ffa.h       |  1 +
->  2 files changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 5fd6474d96ae4b90d99796ee81bb36373219afc4..d543d1f5ddd62fb15f8d39f4ff7d5bb0006da4a1 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -678,6 +678,12 @@ static bool ffa_call_supported(u64 func_id)
->  	case FFA_NOTIFICATION_SET:
->  	case FFA_NOTIFICATION_GET:
->  	case FFA_NOTIFICATION_INFO_GET:
-> +	/* Unimplemented interfaces added in FF-A 1.2 */
-> +	case FFA_MSG_SEND_DIRECT_REQ2:
-> +	case FFA_MSG_SEND_DIRECT_RESP2:
 
-Are those actually optional?
+On Tue, Jun 17 2025, Cornelia Huck <cohuck@redhat.com> wrote:
 
-> +	case FFA_CONSOLE_LOG:
-> +	case FFA_PARTITION_INFO_GET_REGS:
-> +	case FFA_EL3_INTR_HANDLE:
->  		return false;
->  	}
->  
-> @@ -734,7 +740,7 @@ static int hyp_ffa_post_init(void)
->  	if (res.a0 != FFA_SUCCESS)
->  		return -EOPNOTSUPP;
->  
-> -	switch (res.a2) {
-> +	switch (res.a2 & FFA_FEAT_RXTX_MIN_SZ_MASK) {
+> Mostly addressed Peter's feedback:
+> - make sure every inbetween stage compiles (also fixed some bonus issues)
+> - try to make the scripts more robust, add a note the generated file,
+>   and make sure to grab only registers we actually want
+>   - I did a half-hearted attempt to use python instead of awk, but I'm
+>     out of my depth, especially with the script that will be used for
+>     the register fields in the cpu models series
+>
+> Also available at
+> https://gitlab.com/cohuck/qemu/-/commits/arm-rework-idreg-storage-v8
 
-You should also check that the MBZ fields are still 0. Ideally, you'd
-also do that with x3.
+This still seems to apply cleanly... can it go in as-is, or should I
+respin to shorten the long line in kvm.c?
 
->  	case FFA_FEAT_RXTX_MIN_SZ_4K:
->  		min_rxtx_sz = SZ_4K;
->  		break;
-> @@ -931,7 +937,7 @@ int hyp_ffa_init(void *pages)
->  
->  	arm_smccc_1_2_smc(&(struct arm_smccc_1_2_regs) {
->  		.a0 = FFA_VERSION,
-> -		.a1 = FFA_VERSION_1_1,
-> +		.a1 = FFA_VERSION_1_2,
->  	}, &res);
->  	if (res.a0 == FFA_RET_NOT_SUPPORTED)
->  		return 0;
-> @@ -952,10 +958,10 @@ int hyp_ffa_init(void *pages)
->  	if (FFA_MAJOR_VERSION(res.a0) != 1)
->  		return -EOPNOTSUPP;
->  
-> -	if (FFA_MINOR_VERSION(res.a0) < FFA_MINOR_VERSION(FFA_VERSION_1_1))
-> +	if (FFA_MINOR_VERSION(res.a0) < FFA_MINOR_VERSION(FFA_VERSION_1_2))
->  		hyp_ffa_version = res.a0;
->  	else
-> -		hyp_ffa_version = FFA_VERSION_1_1;
-> +		hyp_ffa_version = FFA_VERSION_1_2;
->  
->  	tx = pages;
->  	pages += KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE;
-> diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
-> index 5bded24dc24fea8cdcbe42bf79c7c025c3fa5f4b..c0dd6183d956043192114a522b7eef465e7078ac 100644
-> --- a/include/linux/arm_ffa.h
-> +++ b/include/linux/arm_ffa.h
-> @@ -128,6 +128,7 @@
->  #define FFA_FEAT_RXTX_MIN_SZ_4K		0
->  #define FFA_FEAT_RXTX_MIN_SZ_64K	1
->  #define FFA_FEAT_RXTX_MIN_SZ_16K	2
-> +#define FFA_FEAT_RXTX_MIN_SZ_MASK	3
-
-nit: a mask is better expressed with GENMASK, making it obvious that
-this is not just another value.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
