@@ -1,59 +1,157 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D58926D4C1;
-	Tue,  1 Jul 2025 10:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7E2101DE
+	for <kvmarm@lists.linux.dev>; Tue,  1 Jul 2025 12:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751365216; cv=none; b=GjrDJy9Qr/Yq6lQ8C3uTh/8ItfFKaCBQzQ2T2uyiB39EF6CvxPoiGMMbuQ5RpOpdYX43/P4+bJ0u9bQ9/NRZ9jc7C/7WBowqqEB65vfgZILe4FFY+gJnjj1SKdibyoJzz3WZbER/V29ZUyGmOpOl7plGyXEHDKVSkF794/ouHaY=
+	t=1751373119; cv=none; b=Loi+0LKn2i1NbqkBKKuDKWjm+I+aFOtAlTFONbzf1w3QGvJVW43f+ILE9z5tkf8p7Djm4UBbj+OotxETPy1MhfYG45dIMuwlQmv/mecG3IQX2whuylp91TJtgOwhe++23VAz1p9IJyDv8hTlVFLasdTyxTYEILqKK5Syw3jS1bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751365216; c=relaxed/simple;
-	bh=4WJtE4nhA2VvUBLQSYh7cBemzHvMV3oZLqqgxiCXIyQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oaKmY6S9fBILHH1QNYt52RjLy3icsntXzdK4hjR6J0jPyoPZHg0/QRUjAWZP2hd03ptOhYYGzaxlm8zr37omqLXouFAouxBwLsbkDJUsPiJmpJnX5Ad/JJ9yri+IpZQvdsV3E8fHiVxBoHMze855zYMQc++68SKbTfNXsX3+91U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1BACB1595;
-	Tue,  1 Jul 2025 03:19:59 -0700 (PDT)
-Received: from [10.57.84.92] (unknown [10.57.84.92])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D4C3B3F58B;
-	Tue,  1 Jul 2025 03:20:10 -0700 (PDT)
-Message-ID: <d4fa3328-43c1-4f79-8634-fe045eb01ccc@arm.com>
-Date: Tue, 1 Jul 2025 11:20:09 +0100
+	s=arc-20240116; t=1751373119; c=relaxed/simple;
+	bh=zI4zaCsknmrGVjcy1jUzBAXE5CMQe6Jzw6o7GoAKO6E=;
+	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Jv8TpvisSUs8qJpzPGj7fwkdTEo5hXQ+R4iEQkdpbsmdNjnvfAu0duAqgIr8t7htOCvbMdr4AhLrWgiJa/GKXMEJJQ7TUENt3iXGO2kCbflod6En9GhZ68eyaGFwJ1NDJ1dPAIfkducGJIicgvD7iZyr7/80DTefeFGUN8efAmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bWj9F60Qmz27hvW;
+	Tue,  1 Jul 2025 20:32:49 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8F1EB1A0188;
+	Tue,  1 Jul 2025 20:31:53 +0800 (CST)
+Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 1 Jul 2025 20:31:53 +0800
+Received: from [10.67.121.177] (10.67.121.177) by
+ kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 1 Jul 2025 20:31:52 +0800
+CC: <yangyicong@hisilicon.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <shuah@kernel.org>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
+	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <tangchengchang@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v3 3/7] KVM: arm64: Handle DABT caused by LS64*
+ instructions on unsupported memory
+To: Marc Zyngier <maz@kernel.org>, <oliver.upton@linux.dev>
+References: <20250626080906.64230-1-yangyicong@huawei.com>
+ <20250626080906.64230-4-yangyicong@huawei.com> <86zfduc2ca.wl-maz@kernel.org>
+ <44993060-7eb1-400c-9887-3d438aeb8ee9@huawei.com>
+ <86v7ohba6a.wl-maz@kernel.org>
+From: Yicong Yang <yangyicong@huawei.com>
+Message-ID: <c87852dd-98d5-311f-9760-ea0b7c8b27a1@huawei.com>
+Date: Tue, 1 Jul 2025 20:31:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 13/43] arm64: RME: Support for the VGIC in realms
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <20250611104844.245235-14-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250611104844.245235-14-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <86v7ohba6a.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemq200018.china.huawei.com (7.202.195.108)
 
-On 11/06/2025 11:48, Steven Price wrote:
-> The RMM provides emulation of a VGIC to the realm guest but delegates
-> much of the handling to the host. Implement support in KVM for
-> saving/restoring state to/from the REC structure.
+On 2025/6/27 21:12, Marc Zyngier wrote:
+> On Thu, 26 Jun 2025 12:39:41 +0100,
+> Yicong Yang <yangyicong@huawei.com> wrote:
+>>
+>> On 2025/6/26 16:51, Marc Zyngier wrote:
+>>> On Thu, 26 Jun 2025 09:09:02 +0100,
+>>> Yicong Yang <yangyicong@huawei.com> wrote:
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> [...]
+> 
+>>>>
+>>>> +	/*
+>>>> +	 * Target address is normal memory on the Host. We come here
+>>>> +	 * because:
+>>>> +	 * 1) Guest map it as device memory and perform LS64 operations
+>>>> +	 * 2) VMM report it as device memory mistakenly
+>>>> +	 * Hand it to the userspace.
+>>>> +	 */
+>>>> +	if (esr_fsc_is_excl_atomic_fault(kvm_vcpu_get_esr(vcpu))) {
+>>>> +		struct kvm_run *run = vcpu->run;
+>>>> +
+>>>> +		run->exit_reason = KVM_EXIT_ARM_LDST64B;
+>>>> +		run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
+>>>> +		run->arm_nisv.fault_ipa = fault_ipa |
+>>>> +			(kvm_vcpu_get_hfar(vcpu) & (vma_pagesize - 1));
+>>>> +
+>>>> +		return -EAGAIN;
+>>>> +	}
+>>>
+>>> I'm not sure that's the right thing to do.
+>>>
+>>> If:
+>>>
+>>> - the guest was told it doesn't have LS64WB,
+>>>
+>>> - it was told that some range is memory,
+>>>
+>>> - it uses that range as device,
+>>>
+>>> - thanks to FWB the resulting memory type is "Normal-Cacheable"
+>>>
+>>> - which results in an Unsupported Atomic exception
+>>>
+>>> why would we involve the VMM at all? The VMM clearly said it didn't
+>>> want to be involved in this (we have a memslot).
+>>>
+>>
+>> ok I thought we should make VMM do the decision in all the cases(both
+>> here and emulated MMIO) based on the last discussion[*], I may
+>> misunderstand it. If this is the case...
+>>
+>>> I think we should simply inject the corresponding S1 fault back into
+>>> the guest.
+>>>
+>>
+>> let's simply inject a corresponding DABT back here and only make the VMM
+>> handle the emulated MMIO case. will update if no further comment.
+> 
+> A permission fault at S2 for a R/O memslot should definitely be
+> relayed to userspace. But the question is whether the HW would report
+> a permission fault or an unsupported atomic or exclusive fault (UAoEF
+> for short).
+> 
+> If the HW supports LS64WB, I'd fully expect to get a permission fault,
+> not an UAoEF, and we can perfectly report this to userspace with full
+> decode information (though this doesn't fit in the KVM_EXIT_MMIO
+> structure -- that's "only" an ABI problem).
+> 
+> If it doesn't, then we have a much bigger issue, and I don't think we
+> can realistically triage the exception in a meaningful way -- we just
+> can't know the reason why we failed, and we don't even know whether
+> this was a load or store.
+> 
+> Overall, I can see two options here:
+> 
+> - we limit the LS64 support to HW that supports LS64WB (too bad for
+>   the other implementations, which is 100% of them). We can always
+>   triage the exception correctly, and we're unlikely to ever take an
+>   UAoEF in this context.
+> 
+> - we define that R/O memslots do not support LS64 accesses at all,
+>   which is always a valid implementation -- the architecture makes no
+>   provision of which pieces of addressable memory supports an access
+>   type or another. With that, we can always inject the UAoEF back into
+>   the guest without any further triaging.
+> 
 
+I'd vote for 2nd solution. this is only the exception case unless trigger it
+purposely, the instructions are used for device memory in the normal
+cases. It's unfair to forbid the use of it on LS64WB lacked platforms and we
+do support LS64 but no LS64WB.
+
+Injecting the UAoEF back will make the handling consistent with host.
+
+thanks.
