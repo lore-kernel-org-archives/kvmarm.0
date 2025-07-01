@@ -1,73 +1,71 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B881C21ABA8
-	for <kvmarm@lists.linux.dev>; Mon, 30 Jun 2025 20:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D733257452
+	for <kvmarm@lists.linux.dev>; Tue,  1 Jul 2025 06:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751313802; cv=none; b=aRviEhPxmqhCUcMp93Ne0W9vYqpD7UCYPLfKacWfpW7OXLMS47ndpEFqW0sSLl3+f7obLF2KPUpaei350HBZqR/+qnOaLiWIEMOtK83j5g/AHzkVs9NFTHOnyALn6c7VcYj4ukOkA6bYOd6TgHXV0eYLTprIe+xuT009cw3LZ5g=
+	t=1751351361; cv=none; b=SDdB0khNow4ylt2B0ZLTRrmisklkxdRM2LoVa4VfVQhM1iX0Jhs0FjAbudNBsLPoE8wTMuCx+ywTCNsaMcZ693PfyAn6/fbjfsgVWZMkRmBe1WFNeqKLvronpdXtGWijkN9ymVAS4cSrw28Y0MefDm4gfv9UHUbADbvKXDynQQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751313802; c=relaxed/simple;
-	bh=mJJca1UpAXd+OKA3GelW6E+aEbzwJ9jP6ww/czyB0QQ=;
+	s=arc-20240116; t=1751351361; c=relaxed/simple;
+	bh=wPwMbaTNYVPpuLtF9kwK+jQrhw+TccxDKh96eVVowNQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JxYevo+Yq8WblJH5TeXkpD8lA5Tc+iepnFQqkMIyH/g4Q0BicmJJJym6tlL9q4s9/SEZQbke/tqp2TfBB5nUI53vUV8PSvTCwdeMW/a6JGcI1yAxiHXILsmoo4ZjA8FnoLCwps8hY1tcQGGfNOismcAPzpOlKxVBPy5X+B/C1pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HmuEjFpO; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Usok+rhtB7GwKLK8AS3cfI6nQpldWKTDtF+oRL/t0uoih1ULZBpjTaWpdEihs2r1UhfyDmJWL3OByoeCul5uPTYCJR0DENFHrEjnH8itBsFIIh3KxlYPdKikBzFOCxDCquiw57EbKtaJLp/vZTicDu00iHaSFwqI4pIjBItJPxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vgn2YrfL; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HmuEjFpO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vgn2YrfL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751313799;
+	s=mimecast20190719; t=1751351357;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0hu9yh42WohK7mI4Sf4ggRfCpQs4HP7pq5UzW8H06yY=;
-	b=HmuEjFpOsmsCqkI3iYlUPU93gJ9C+qm3afrUKe4Pi0j8DbJq/BQFxEp3B4e7pHwd0q+72a
-	th329gPuhRNIIUmPj9zOubpn9sMx20GtAKAjJM8ptUX22qecFaPRawwp+mK0q8dMl+lLg6
-	5ktFBNleN8p/5UtatggHDnvH7U0Dc0Q=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=3XQWfv7zNSIOP37t1HIUNsQ/ruDM0uRKKhFK+dc8Tj4=;
+	b=Vgn2YrfLTxNOg41+MfGlYWR/RhjyFg6ZIlGRkYh1fsLXhbqL0gVvMWi5SmLZ6dOctwvARN
+	EOvxpmTbh0tnrUSohJRyJ86uooW0KhxTm47XZAelzi9EaPFQsrywOuciYX6Qg6Jxtf7SpW
+	zgp0Jft895ASE9Bn2hoqJB6Rt/Vn+ng=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-EwJuHjHVNaG0PtfemX4jww-1; Mon, 30 Jun 2025 16:03:18 -0400
-X-MC-Unique: EwJuHjHVNaG0PtfemX4jww-1
-X-Mimecast-MFC-AGG-ID: EwJuHjHVNaG0PtfemX4jww_1751313796
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-450df53d461so20782565e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 30 Jun 2025 13:03:17 -0700 (PDT)
+ us-mta-547-WXX7vp6kNjGjMEzsLLi8fQ-1; Tue, 01 Jul 2025 02:29:16 -0400
+X-MC-Unique: WXX7vp6kNjGjMEzsLLi8fQ-1
+X-Mimecast-MFC-AGG-ID: WXX7vp6kNjGjMEzsLLi8fQ_1751351355
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-311ef4fb5eeso4320626a91.1
+        for <kvmarm@lists.linux.dev>; Mon, 30 Jun 2025 23:29:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751313796; x=1751918596;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0hu9yh42WohK7mI4Sf4ggRfCpQs4HP7pq5UzW8H06yY=;
-        b=HB0SR330jXQvDSuQA7mOLJtFntnbPF+uyLRR7XDANeA9ziEgpOo8nvZXq0yNMM8iqB
-         yGJFHgYIHk/Ft+iQqGT9fyM+7LuBhIHfGRtp+SwIiuARsijie5YRKYni3m6qUZdrY3hI
-         fh6TuFzpH/c60qm43rWa5CeICATMdEheGgQD5K+Vo4VBq6ZN9kfaEWxLY6fXFEp0fEGd
-         5qTgP/PdvbSSH5HN+dZK/MsYr2Kdjy8ldi1KVodg5L9CR62xXIVXZ3xqEO4Q4rIlbX0e
-         STZbLB0zHpUFx4ZXTcSAq1eo6K/94l0JXFWAQ2c1uPcZih3g5InglXFepl3i5GrcWNn3
-         JsWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULWa6KlWcwYanzS6N/CY+hWo612EiclzufnAnVYd+K9h04DjVLadWYbI6ZbHv7gaKy6hJeQQQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzHlusFWToMqwkIfR7A2Ekglj3IVyabdGPCSTYZWlUaYjLabOLm
-	LqNmt/TuUm1WYZ4gP9hj2O/ErcUsjvExnXm7KQowFKPy6V+QwZkxc2yIuPvc9XFKk/mHa+6BX6a
-	95utXMTTMlUbc1rXzJYEPbSQpp6DnLdG/fVYoyuF5U+Gk1QTTCYHj2GPK8Q==
-X-Gm-Gg: ASbGncvxMRX3OytwtlJtWj5tgdPMMkYMnHZZ1P2ZZFnEcqitbrXq+3acFafcs41s4uS
-	Yd5FUH9A08I2l0f6PGsqQ/P11GmrBM2tM9kE0o/bcLgQIs6b0gS6z3FhD197gOXOl6TigVVx64J
-	eaFuzg3TDTpVVMjpAqAkK/4b7WfQqfP+rE+EJTMgso5Bq7tqcskTvfybtQW1EqkGupMFh7LYmTG
-	5EPsQhMAZCkeIsJQVUoySMYElq5Vl2ugcJMVgqJCvqLrv9z1sPRBlxhgPecsNZZ4tDW/hVCYnow
-	YiJ9Db8FagKQW1cuufqz3PPfJn0ADCMxsmDDnudijYsYLnxPxGJdgkfm7d7aLqeGlKDXdw8yGCX
-	mNrLgLgCY+b2VsAr+lW3MB7HF0mXpCE9zkKzFfv1Mpwa/g8R3iw==
-X-Received: by 2002:a05:600c:8b52:b0:453:5c30:a2c2 with SMTP id 5b1f17b1804b1-4539069a242mr123408995e9.8.1751313795778;
-        Mon, 30 Jun 2025 13:03:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGnybVwqBu0Z5mba8MCleb7A5qkZUdaglXad5gWKw1rUpqmEJOjp84Tn3Pjrq4ajq9wmLYReg==
-X-Received: by 2002:a05:600c:8b52:b0:453:5c30:a2c2 with SMTP id 5b1f17b1804b1-4539069a242mr123408025e9.8.1751313795119;
-        Mon, 30 Jun 2025 13:03:15 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f40:b300:53f7:d260:aff4:7256? (p200300d82f40b30053f7d260aff47256.dip0.t-ipconnect.de. [2003:d8:2f40:b300:53f7:d260:aff4:7256])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5b2a7sm11265634f8f.69.2025.06.30.13.03.12
+        d=1e100.net; s=20230601; t=1751351355; x=1751956155;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3XQWfv7zNSIOP37t1HIUNsQ/ruDM0uRKKhFK+dc8Tj4=;
+        b=UqcA+/DNMxN6KfNqArvsiKeoXJr+aAHOEaf/bJphSPOc/GewBhaw16ikxUmpVxTh4J
+         FNsR8uXJ49GfhCMOjg5J2OS9Ojhcy5TD2zCPlt5RhI1nGhO8RThjY4TApRMxqHrfmLyE
+         Jwro8uzW23ADJ2BgIbmJxP1eMpUT3WO0aeLn4E8dhbXlNBmO+KT2kA/BiVKFcTIxPoBx
+         cKiuImoL8ouYeMYTbps1T9kqbs3O5RToNsTMLzF6TPoYpW+gTpet3E0H8r0YFaM3NSSO
+         y3v1BTreWTDfU/83j7Fm03jAWMZY6yyY0Z0nxdWoe1fuoavTr8RX4WhIeonSvIJQmsnp
+         qp4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUXmZFAluCruSBs1a4PQt7soCuy4gh7Hzfz/O5M44s/UPf7VFQ8moCNaRR3OTuR9YuDNfGRGWQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxqcszC7fKlouPABTp3P4nH6d55bT75QubYRT2ekwdjTrmy5/3B
+	GrnPJ/vucauyivz7+rJj8KwRxi0vG3xxIl3+gd2oEjSCtcFGg7oJq4Q7hkYIzyNm7uUlMH1Lx1x
+	p379wjBjmJGG0h8j3TMpkgGMvtY0NqiR1efVolT56maNOSz5qJij6XEmjRg==
+X-Gm-Gg: ASbGnctveDPT5STNBw93zpRjL0ev3V6KRxlZD9KQnKRnMqXXiAWEwX1QDJmKsKGEHeN
+	MRBw9H1pNUwHf0RP3hBvMs4NIvmV6q4ZvgCVbpaXeTBXmkuoerYiSDQ6d+JGgDBMcSuN2g3jGPU
+	ZNyan8ebyW2Wdy3viDP/jpCRAaBd4GarPiGuxUQDP3wlSWVNC8bonj6/6bWmMAD6bkA2WFWbjPt
+	vlDTGXA6AVMAuW8VVAa1+ay4w6nZ6bTcPQASFXm7WHqcV1IWzOSIoWBoZZNu8GCTi7z6K57iHYF
+	EEEgJppwU3pKupVYKuPpZAugyxQwmPYVj6YFMQqq55rMydsdhQqRSlRPqWVvQg==
+X-Received: by 2002:a17:90b:1e04:b0:315:f6d6:d29c with SMTP id 98e67ed59e1d1-31939b7c842mr3882738a91.15.1751351354718;
+        Mon, 30 Jun 2025 23:29:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFV59dFp5Bv5xxfg5s1htC6r8rxsnnWuAaKM+NdCPbEnHIq4j0m9QvOPuGsAf4a/budVvDMUA==
+X-Received: by 2002:a17:90b:1e04:b0:315:f6d6:d29c with SMTP id 98e67ed59e1d1-31939b7c842mr3882694a91.15.1751351354234;
+        Mon, 30 Jun 2025 23:29:14 -0700 (PDT)
+Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f53bdbf4sm15771349a91.22.2025.06.30.23.29.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jun 2025 13:03:14 -0700 (PDT)
-Message-ID: <923b1c02-407a-4689-a047-dd94e885b103@redhat.com>
-Date: Mon, 30 Jun 2025 22:03:11 +0200
+        Mon, 30 Jun 2025 23:29:13 -0700 (PDT)
+Message-ID: <60e5f88e-c8f1-40d9-a69c-e7da4fc1c953@redhat.com>
+Date: Tue, 1 Jul 2025 16:29:03 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,326 +73,284 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
- guest_memfd with shared memory
-To: Shivank Garg <shivankg@amd.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org,
- willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com,
- yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
- amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250611133330.1514028-1-tabba@google.com>
- <20250611133330.1514028-11-tabba@google.com> <aEyhHgwQXW4zbx-k@google.com>
- <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
- <diqza55tjkk1.fsf@ackerleytng-ctop.c.googlers.com>
- <CA+EHjTxECJ3=ywbAPvpdA1-pm=stXWqU75mgG1epWaXiUr0raw@mail.gmail.com>
- <diqzv7odjnln.fsf@ackerleytng-ctop.c.googlers.com>
- <CA+EHjTwqOwO2zVd4zTYF7w7reTWMNjmCV6XnKux2JtPwYCAoZQ@mail.gmail.com>
- <434ab5a3-fedb-4c9e-8034-8f616b7e5e52@amd.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <434ab5a3-fedb-4c9e-8034-8f616b7e5e52@amd.com>
+Subject: Re: [PATCH v9 06/43] arm64: RME: Define the user ABI
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-7-steven.price@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20250611104844.245235-7-steven.price@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: W_FvLVSQkRlD2RFWfebmtKA6in1YP2O5jBaSa31NAHE_1751313796
+X-Mimecast-MFC-PROC-ID: z1FhC_nzQuNvq_FPqn6I7fmfk8jJRRy-6a8Yy65svWQ_1751351355
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 30.06.25 21:26, Shivank Garg wrote:
-> On 6/30/2025 8:38 PM, Fuad Tabba wrote:
->> Hi Ackerley,
->>
->> On Mon, 30 Jun 2025 at 15:44, Ackerley Tng <ackerleytng@google.com> wrote:
->>>
->>> Fuad Tabba <tabba@google.com> writes:
->>>
->>>> Hi Ackerley,
->>>>
->>>> On Fri, 27 Jun 2025 at 16:01, Ackerley Tng <ackerleytng@google.com> wrote:
->>>>>
->>>>> Ackerley Tng <ackerleytng@google.com> writes:
->>>>>
->>>>>> [...]
->>>>>
->>>>>>>> +/*
->>>>>>>> + * Returns true if the given gfn's private/shared status (in the CoCo sense) is
->>>>>>>> + * private.
->>>>>>>> + *
->>>>>>>> + * A return value of false indicates that the gfn is explicitly or implicitly
->>>>>>>> + * shared (i.e., non-CoCo VMs).
->>>>>>>> + */
->>>>>>>>   static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->>>>>>>>   {
->>>>>>>> -   return IS_ENABLED(CONFIG_KVM_GMEM) &&
->>>>>>>> -          kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
->>>>>>>> +   struct kvm_memory_slot *slot;
->>>>>>>> +
->>>>>>>> +   if (!IS_ENABLED(CONFIG_KVM_GMEM))
->>>>>>>> +           return false;
->>>>>>>> +
->>>>>>>> +   slot = gfn_to_memslot(kvm, gfn);
->>>>>>>> +   if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot)) {
->>>>>>>> +           /*
->>>>>>>> +            * Without in-place conversion support, if a guest_memfd memslot
->>>>>>>> +            * supports shared memory, then all the slot's memory is
->>>>>>>> +            * considered not private, i.e., implicitly shared.
->>>>>>>> +            */
->>>>>>>> +           return false;
->>>>>>>
->>>>>>> Why!?!?  Just make sure KVM_MEMORY_ATTRIBUTE_PRIVATE is mutually exclusive with
->>>>>>> mappable guest_memfd.  You need to do that no matter what.
->>>>>>
->>>>>> Thanks, I agree that setting KVM_MEMORY_ATTRIBUTE_PRIVATE should be
->>>>>> disallowed for gfn ranges whose slot is guest_memfd-only. Missed that
->>>>>> out. Where do people think we should check the mutual exclusivity?
->>>>>>
->>>>>> In kvm_supported_mem_attributes() I'm thiking that we should still allow
->>>>>> the use of KVM_MEMORY_ATTRIBUTE_PRIVATE for other non-guest_memfd-only
->>>>>> gfn ranges. Or do people think we should just disallow
->>>>>> KVM_MEMORY_ATTRIBUTE_PRIVATE for the entire VM as long as one memslot is
->>>>>> a guest_memfd-only memslot?
->>>>>>
->>>>>> If we check mutually exclusivity when handling
->>>>>> kvm_vm_set_memory_attributes(), as long as part of the range where
->>>>>> KVM_MEMORY_ATTRIBUTE_PRIVATE is requested to be set intersects a range
->>>>>> whose slot is guest_memfd-only, the ioctl will return EINVAL.
->>>>>>
->>>>>
->>>>> At yesterday's (2025-06-26) guest_memfd upstream call discussion,
->>>>>
->>>>> * Fuad brought up a possible use case where within the *same* VM, we
->>>>>    want to allow both memslots that supports and does not support mmap in
->>>>>    guest_memfd.
->>>>> * Shivank suggested a concrete use case for this: the user wants a
->>>>>    guest_memfd memslot that supports mmap just so userspace addresses can
->>>>>    be used as references for specifying memory policy.
->>>>> * Sean then added on that allowing both types of guest_memfd memslots
->>>>>    (support and not supporting mmap) will allow the user to have a second
->>>>>    layer of protection and ensure that for some memslots, the user
->>>>>    expects never to be able to mmap from the memslot.
->>>>>
->>>>> I agree it will be useful to allow both guest_memfd memslots that
->>>>> support and do not support mmap in a single VM.
->>>>>
->>>>> I think I found an issue with flags, which is that GUEST_MEMFD_FLAG_MMAP
->>>>> should not imply that the guest_memfd will provide memory for all guest
->>>>> faults within the memslot's gfn range (KVM_MEMSLOT_GMEM_ONLY).
->>>>>
->>>>> For the use case Shivank raised, if the user wants a guest_memfd memslot
->>>>> that supports mmap just so userspace addresses can be used as references
->>>>> for specifying memory policy for legacy Coco VMs where shared memory
->>>>> should still come from other sources, GUEST_MEMFD_FLAG_MMAP will be set,
->>>>> but KVM can't fault shared memory from guest_memfd. Hence,
->>>>> GUEST_MEMFD_FLAG_MMAP should not imply KVM_MEMSLOT_GMEM_ONLY.
->>>>>
->>>>> Thinking forward, if we want guest_memfd to provide (no-mmap) protection
->>>>> even for non-CoCo VMs (such that perhaps initial VM image is populated
->>>>> and then VM memory should never be mmap-ed at all), we will want
->>>>> guest_memfd to be the source of memory even if GUEST_MEMFD_FLAG_MMAP is
->>>>> not set.
->>>>>
->>>>> I propose that we should have a single VM-level flag to solve this (in
->>>>> line with Sean's guideline that we should just move towards what we want
->>>>> and not support non-existent use cases): something like
->>>>> KVM_CAP_PREFER_GMEM.
->>>>>
->>>>> If KVM_CAP_PREFER_GMEM_MEMORY is set,
->>>>>
->>>>> * memory for any gfn range in a guest_memfd memslot will be requested
->>>>>    from guest_memfd
->>>>> * any privacy status queries will also be directed to guest_memfd
->>>>> * KVM_MEMORY_ATTRIBUTE_PRIVATE will not be a valid attribute
->>>>>
->>>>> KVM_CAP_PREFER_GMEM_MEMORY will be orthogonal with no validation on
->>>>> GUEST_MEMFD_FLAG_MMAP, which should just purely guard mmap support in
->>>>> guest_memfd.
->>>>>
->>>>> Here's a table that I set up [1]. I believe the proposed
->>>>> KVM_CAP_PREFER_GMEM_MEMORY (column 7) lines up with requirements
->>>>> (columns 1 to 4) correctly.
->>>>>
->>>>> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/3710/guest_memfd%20use%20cases%20vs%20guest_memfd%20flags%20and%20privacy%20tracking.pdf
->>>>
->>>> I'm not sure this naming helps. What does "prefer" imply here? If the
->>>> caller from user space does not prefer, does it mean that they
->>>> mind/oppose?
->>>>
->>>
->>> Sorry, bad naming.
->>>
->>> I used "prefer" because some memslots may not have guest_memfd at
->>> all. To clarify, a "guest_memfd memslot" is a memslot that has some
->>> valid guest_memfd fd and offset. The memslot may also have a valid
->>> userspace_addr configured, either mmap-ed from the same guest_memfd fd
->>> or from some other backing memory (for legacy CoCo VMs), or NULL for
->>> userspace_addr.
->>>
->>> I meant to have the CAP enable KVM_MEMSLOT_GMEM_ONLY of this patch
->>> series for all memslots that have some valid guest_memfd fd and offset,
->>> except if we have a VM-level CAP, KVM_MEMSLOT_GMEM_ONLY should be moved
->>> to the VM level.
->>
->> Regardless of the name, I feel that this functionality at best does
->> not belong in this series, and potentially adds more confusion.
->>
->> Userspace should be specific about what it wants, and they know what
->> kind of memslots there are in the VM: userspace creates them. In that
->> case, userspace can either create a legacy memslot, no need for any of
->> the new flags, or it can create a guest_memfd memslot, and then use
->> any new flags to qualify that. Having a flag/capability that means
->> something for guest_memfd memslots, but effectively keeps the same
->> behavior for legacy ones seems to add more confusion.
->>
->>>> Regarding the use case Shivank mentioned, mmaping for policy, while
->>>> the use case is a valid one, the raison d'être of mmap is to map into
->>>> user space (i.e., fault it in). I would argue that if you opt into
->>>> mmap, you are doing it to be able to access it.
->>>
->>> The above is in conflict with what was discussed on 2025-06-26 IIUC.
->>>
->>> Shivank brought up the case of enabling mmap *only* to be able to set
->>> mempolicy using the VMAs, and Sean (IIUC) later agreed we should allow
->>> userspace to only enable mmap but still disable faults, so that userspace
->>> is given additional protection, such that even if a (compromised)
->>> userspace does a private-to-shared conversion, userspace is still not
->>> allowed to fault in the page.
->>
->> I don't think there's a conflict :)  What I think is this is outside
->> of the scope of this series for a few reasons:
->>
->> - This is prior to the mempolicy work (and is the base for it)
->> - If we need to, we can add a flag later to restrict mmap faulting
->> - Once we get in-place conversion, the mempolicy work could use the
->> ability to disallow mapping for private memory
->>
->> By actually implementing something now, we would be restricting the
->> mempolicy work, rather than helping it, since we would effectively be
->> deciding now how that work should proceed. By keeping this the way it
->> is now, the mempolicy work can explore various alternatives.
->>
->> I think we discussed this in the guest_memfd sync of 2025-06-12, and I
->> think this was roughly our conclusion.
->>
->>> Hence, if we want to support mmaping just for policy and continue to
->>> restrict faulting, then GUEST_MEMFD_FLAG_MMAP should not imply
->>> KVM_MEMSLOT_GMEM_ONLY.
->>>
->>>> To me, that seems like
->>>> something that merits its own flag, rather than mmap. Also, I recall
->>>> that we said that later on, with inplace conversion, that won't be
->>>> even necessary.
->>>
->>> On x86, as of now I believe we're going with an ioctl that does *not*
->>> check what the guest prefers and will go ahead to perform the
->>> private-to-shared conversion, which will go ahead to update
->>> shareability.
->>
->> Here I think you're making my case that we're dragging more complexity
->> from future work/series into this series, since now we're going into
->> the IOCTLs for the conversion series :)
->>
->>>> In other words, this would also be trying to solve a
->>>> problem that we haven't yet encountered and that we have a solution
->>>> for anyway.
->>>>
->>>
->>> So we don't have a solution for the use case where userspace wants to
->>> mmap but never fault for userspace's protection from stray
->>> private-to-shared conversions, unless we decouple GUEST_MEMFD_FLAG_MMAP
->>> and KVM_MEMSLOT_GMEM_ONLY.
->>>
->>>> I think that, unless anyone disagrees, is to go ahead with the names
->>>> we discussed in the last meeting. They seem to be the ones that make
->>>> the most sense for the upcoming use cases.
->>>>
->>>
->>> We could also discuss if we really want to support the use case where
->>> userspace wants to mmap but never fault for userspace's protection from
->>> stray private-to-shared conversions.
->>
->> I would really rather defer that work to when it's needed. It seems
->> that we should aim to land this series as soon as possible, since it's
->> the one blocking much of the future work. As far as I can tell,
->> nothing here precludes introducing the mechanism of supporting the
->> case where userspace wants to mmap but never fault, once it's needed.
->> This was I believe what we had agreed on in the sync on 2025-06-26.
+On 6/11/25 8:48 PM, Steven Price wrote:
+> There is one (multiplexed) CAP which can be used to create, populate and
+> then activate the realm.
 > 
-> I support this approach.
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v8:
+>   * Minor improvements to documentation following review.
+>   * Bump the magic numbers to avoid conflicts.
+> Changes since v7:
+>   * Add documentation of new ioctls
+>   * Bump the magic numbers to avoid conflicts
+> Changes since v6:
+>   * Rename some of the symbols to make their usage clearer and avoid
+>     repetition.
+> Changes from v5:
+>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+> ---
+>   Documentation/virt/kvm/api.rst    | 73 ++++++++++++++++++++++++++++++-
+>   arch/arm64/include/uapi/asm/kvm.h | 49 +++++++++++++++++++++
+>   include/uapi/linux/kvm.h          | 10 +++++
+>   3 files changed, 131 insertions(+), 1 deletion(-)
+> 
 
-Agreed. Let's get this in with the changes requested by Sean applied.
+With below nitpicks addressed:
 
-How to use GUEST_MEMFD_FLAG_MMAP in combination with a CoCo VM with 
-legacy mem attributes (-> all memory in guest_memfd private) could be 
-added later on top, once really required.
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-As discussed, CoCo VMs that want to support GUEST_MEMFD_FLAG_MMAP will 
-have to disable legacy mem attributes using a new capability in stage-2.
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 1bd2d42e6424..65543289f75c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3542,6 +3542,11 @@ Possible features:
+>   	  Depends on KVM_CAP_ARM_EL2_E2H0.
+>   	  KVM_ARM_VCPU_HAS_EL2 must also be set.
+>   
+> +	- KVM_ARM_VCPU_REC: Allocate a REC (Realm Execution Context) for this
+> +	  VCPU. This must be specified on all VCPUs created in a Realm VM.
+> +	  Depends on KVM_CAP_ARM_RME.
+> +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_REC).
+> +
+>   4.83 KVM_ARM_PREFERRED_TARGET
+>   -----------------------------
+>   
+> @@ -5115,6 +5120,7 @@ Recognised values for feature:
+>   
+>     =====      ===========================================
+>     arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
+> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
+>     =====      ===========================================
+>   
+>   Finalizes the configuration of the specified vcpu feature.
+> @@ -6469,6 +6475,30 @@ the capability to be present.
+>   
+>   `flags` must currently be zero.
+>   
+> +4.144 KVM_ARM_VCPU_RMM_PSCI_COMPLETE
+> +------------------------------------
+> +
+> +:Capability: KVM_CAP_ARM_RME
+> +:Architectures: arm64
+> +:Type: vcpu ioctl
+> +:Parameters: struct kvm_arm_rmm_psci_complete (in)
+> +:Returns: 0 if successful, < 0 on error
+> +
+> +::
+> +
+> +  struct kvm_arm_rmm_psci_complete {
+> +	__u64 target_mpidr;
+> +	__u32 psci_status;
+> +	__u32 padding[3];
+> +  };
+> +
+> +Where PSCI functions are handled by user space, the RMM needs to be informed of
+> +the target of the operation using `target_mpidr`, along with the status
+> +(`psci_status`). The RMM v1.0 specification defines two functions that require
+> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+> +
+> +If the kernel is handling PSCI then this is done automatically and the VMM
+> +doesn't need to call this ioctl.
+>   
+>   .. _kvm_run:
+>   
+> @@ -8528,7 +8558,7 @@ ENOSYS for the others.
+>   When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
+>   type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
+>   
+> -7.37 KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
+> +7.42 KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
+>   -------------------------------------
+>   
+>   :Architectures: arm64
+> @@ -8557,6 +8587,47 @@ given VM.
+>   When this capability is enabled, KVM resets the VCPU when setting
+>   MP_STATE_INIT_RECEIVED through IOCTL.  The original MP_STATE is preserved.
+>   
+> +7.44 KVM_CAP_ARM_RME
+> +--------------------
+> +
+> +:Architectures: arm64
+> +:Target: VM
+> +:Parameters: args[0] provides an action, args[1] points to a structure in
+> +	     memory for some actions.
+           ^^^
+           Alignment
 
--- 
-Cheers,
+s/for some actions/for the action
 
-David / dhildenb
+> +:Returns: 0 on success, negative value on error
+> +
+> +Used to configure and set up the memory for a Realm. The available actions are:
+> +
+> +================================= =============================================
+> + KVM_CAP_ARM_RME_CONFIG_REALM     Takes struct arm_rme_config as args[1] and
+> +                                  configures realm parameters prior to it being
+> +                                  created.
+> +
+> +                                  Options are ARM_RME_CONFIG_RPV to set the
+> +                                  "Realm Personalization Value" and
+> +                                  ARM_RME_CONFIG_HASH_ALGO to set the hash
+> +                                  algorithm.
+> +
+> + KVM_CAP_ARM_RME_CREATE_REALM     Request the RMM to create the realm. The
+> +                                  realm's configuration parameters must be set
+> +                                  first.
+> +
+> + KVM_CAP_ARM_RME_INIT_RIPAS_REALM Takes struct arm_rme_init_ripas as args[1]
+> +                                  and sets the RIPAS (Realm IPA State) to
+> +                                  RIPAS_RAM of a specified area of the realm's
+> +                                  IPA.
+> +
+> + KVM_CAP_ARM_RME_POPULATE_REALM   Takes struct arm_rme_populate_realm as
+> +                                  args[1] and populates a region of protected
+> +                                  address space by copying the data from the
+> +                                  shared alias.
+> +
+> + KVM_CAP_ARM_RME_ACTIVATE_REALM   Request the RMM to activate the realm. No
+> +                                  changes can be made to the Realm's memory,
+> +                                  IPA state or configuration parameters.  No
+> +                                  new VCPUs should be created after this step.
+> +================================= =============================================
+> +
+
+The description about KVM_CAP_ARM_RME_ACTIVATE_REALM looks a bit confusing, maybe
+something as below is more clear:
+
+KVM_CAP_ARM_RME_ACTIVATE_REALM     Request the RMM to activate the realm. No changes
+                                    can be made to the Realm's populated memory, IPA state,
+                                    configuration parameters or vCPU addition after this
+                                    step.
+
+>   8. Other capabilities.
+>   ======================
+>   
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index ed5f3892674c..9b5d67ecbc5e 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -106,6 +106,7 @@ struct kvm_regs {
+>   #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
+>   #define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
+>   #define KVM_ARM_VCPU_HAS_EL2_E2H0	8 /* Limit NV support to E2H RES0 */
+> +#define KVM_ARM_VCPU_REC		9 /* VCPU REC state as part of Realm */
+>   
+>   struct kvm_vcpu_init {
+>   	__u32 target;
+> @@ -429,6 +430,54 @@ enum {
+>   #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
+>   #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
+>   
+> +/* KVM_CAP_ARM_RME on VM fd */
+> +#define KVM_CAP_ARM_RME_CONFIG_REALM		0
+> +#define KVM_CAP_ARM_RME_CREATE_REALM		1
+> +#define KVM_CAP_ARM_RME_INIT_RIPAS_REALM	2
+> +#define KVM_CAP_ARM_RME_POPULATE_REALM		3
+> +#define KVM_CAP_ARM_RME_ACTIVATE_REALM		4
+> +
+> +/* List of configuration items accepted for KVM_CAP_ARM_RME_CONFIG_REALM */
+> +#define ARM_RME_CONFIG_RPV			0
+> +#define ARM_RME_CONFIG_HASH_ALGO		1
+> +
+> +#define ARM_RME_CONFIG_HASH_ALGO_SHA256		0
+> +#define ARM_RME_CONFIG_HASH_ALGO_SHA512		1
+> +
+> +#define ARM_RME_CONFIG_RPV_SIZE 64
+> +
+> +struct arm_rme_config {
+> +	__u32 cfg;
+> +	union {
+> +		/* cfg == ARM_RME_CONFIG_RPV */
+> +		struct {
+> +			__u8	rpv[ARM_RME_CONFIG_RPV_SIZE];
+> +		};
+> +
+> +		/* cfg == ARM_RME_CONFIG_HASH_ALGO */
+> +		struct {
+> +			__u32	hash_algo;
+> +		};
+> +
+> +		/* Fix the size of the union */
+> +		__u8	reserved[256];
+> +	};
+> +};
+> +
+> +#define KVM_ARM_RME_POPULATE_FLAGS_MEASURE	(1 << 0)
+> +struct arm_rme_populate_realm {
+> +	__u64 base;
+> +	__u64 size;
+> +	__u32 flags;
+> +	__u32 reserved[3];
+> +};
+> +
+> +struct arm_rme_init_ripas {
+> +	__u64 base;
+> +	__u64 size;
+> +	__u64 reserved[2];
+> +};
+> +
+>   /* Device Control API on vcpu fd */
+>   #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+>   #define   KVM_ARM_VCPU_PMU_V3_IRQ		0
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d00b85cb168c..3690664e272c 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -934,6 +934,7 @@ struct kvm_enable_cap {
+>   #define KVM_CAP_ARM_EL2 240
+>   #define KVM_CAP_ARM_EL2_E2H0 241
+>   #define KVM_CAP_RISCV_MP_STATE_RESET 242
+> +#define KVM_CAP_ARM_RME 243
+>   
+>   struct kvm_irq_routing_irqchip {
+>   	__u32 irqchip;
+> @@ -1586,4 +1587,13 @@ struct kvm_pre_fault_memory {
+>   	__u64 padding[5];
+>   };
+>   
+> +/* Available with KVM_CAP_ARM_RME, only for VMs with KVM_VM_TYPE_ARM_REALM  */
+> +struct kvm_arm_rmm_psci_complete {
+> +	__u64 target_mpidr;
+> +	__u32 psci_status;
+> +	__u32 padding[3];
+> +};
+> +
+> +#define KVM_ARM_VCPU_RMM_PSCI_COMPLETE	_IOW(KVMIO, 0xd6, struct kvm_arm_rmm_psci_complete)
+> +
+>   #endif /* __LINUX_KVM_H */
+
+Thanks,
+Gavin
 
