@@ -1,463 +1,133 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81259278146
-	for <kvmarm@lists.linux.dev>; Tue,  1 Jul 2025 14:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4170C2C859
+	for <kvmarm@lists.linux.dev>; Tue,  1 Jul 2025 14:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751379341; cv=none; b=Hw82BJWPItzEzkou3hTiLPg65OVWb7O+jUh3lEpnCVpwehqR7AXydgfk0FV7CEpaFId/m5ZOIjDac1Om+PpZqxpGflJc+A54ldd/wxpXXWJzJMQ7PbWZ4ieSilaM60yGjMaxlX/fD9xfweq9nvMLwAJnUOMhe5nRka+g/c2R3Jk=
+	t=1751379761; cv=none; b=PP887zwjKN+fQcP66hcO5OUPStM+vHwceqC1mgIprcR9uQ3XDn3pHMyxipv6faS+4+glC+t/ofRZEBgVdrjwGx11vfMVI9/criSmjmAPICTIsZ6SfO1kBcIsSGECB5zOdPuMtKK1rLZg7jvutSnPEce0KPsXXR4cB7V2YG03xmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751379341; c=relaxed/simple;
-	bh=XJLGkDNXJ0JuowlKxlL3yp6HD/pyiftaQrvTUuD/YuI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lXjJxuT2Buq0UGDSgiN8jD5GYkay9haCuL/26h4RtI4BSKyeu4fDrY4Ar2m33Np8b9B/kU+55ajv4yf4RVLdtbX6XOn23/yz6QljNggFD7bfkObAQnZGm+U/wWfz4qE3N6SWc7V+97r2gJAK1e+barpKXDfFtEoRShKl+UPxYJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SgErd7JS; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1751379761; c=relaxed/simple;
+	bh=Wl4lyyrYUcT3WQOaPBwaLkFiqBgAhrV+nWS3JZrxsb4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=V1nCU56jWt8EiJhq4SVH435o3wac8LG7oWnkKFrJAtAAQzxEBJZ3rXd3I0gjlZFMKMmmTcgyw406+92ej+vDEW2gt1G6A1B0soUdqYusyIb/Twitra8DtF5aBms9cfEi+SS2V4xmQu6c7brulQ5HLSFavpFRxm6DzT/d65AR98g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1muoWW9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SgErd7JS"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-749177ad09fso1542516b3a.2
-        for <kvmarm@lists.linux.dev>; Tue, 01 Jul 2025 07:15:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751379339; x=1751984139; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vN/E7b0UOrsRNuPjjIBnTzqCIHznXhChVkNuGJXxsvs=;
-        b=SgErd7JSI3b/VjrUleEHzcu+Vb/RlNA5CqOps1uKTqERb8YKqW3fOyiEEkF7CuRjW4
-         Vk/dkQCn+bTuieMueaV+CIiZbMBiMM3e7dU+94bH7EkOUEnA/VM1PLrbx3P9YNbjKNa0
-         e+KNZbB/zo36qXq2H/MvJPN+AgUjrUAbkB7QSG5FYS/RnHn5iaqSulFBRlKPS7GJDP1t
-         pUwFSTmbO5t3iZGNGDfiLDCUSUaNxwxTmSSB1JPBzZ1GoRc8sXmlQxqqeXTLRkp7A41p
-         ETZm7IxEy1V+ZPU90nL/DxgnGJoochUbnHYieqiJ/9yMYoa0sD/EeVb5TWq24niNeC1s
-         3INw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751379339; x=1751984139;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vN/E7b0UOrsRNuPjjIBnTzqCIHznXhChVkNuGJXxsvs=;
-        b=kMkznP5dFlAi8KKwaWIrridFRVqO3e0CYBONDJbzaaLkuMQqDwXiatOGf5/TO+h88z
-         HWkSj7DqcUs6kha0NDa3tAUjz/AMwWgW4XC84Sb4Z8REkSBS2B4RDuxZ8ZmGCcNvhAQU
-         H7l/FaXrbx+VvO8ZY5RjfbDXVdcWxmJIoQRk/VXakAZEtVZ6V9ktfb0IYfZF/JayTfhB
-         hfPjcWOtlL1heUS2HjratvNTRGgL4qfjnu0T5nHFfgxUw1LuvR3UnpqP9We3p0cMqHXo
-         esBUz8vzQaKvZJdg4a3ftKw4oO/sVSEwgH8rUZKnvkqWTtgT9nJKbqolJogjZbWltDgi
-         QrUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVvJAuSxh/yKpGgtm2qYxAHiXrHIrMvrP5un8uBPaOc0aIPIt6VY7KqZUtIDpeyoLf+CRKDjzA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YypoIjuQw9nP79s9mhvIQMiHu2sUACrbugkNXLUxyUPelJjYuQw
-	DlM5ithXCjmaqetn06kwOWjsGPrK8iMm/VAynL1EWn+dgonW0aIldJuQhuoGJ22VQjHvGoJ2hul
-	iahbE5toV50/7cJ6PNH5zX+GQbA==
-X-Google-Smtp-Source: AGHT+IHMZR3wYB8ZZyCxXUTx1Jnjhbyg4vqWu+KzoOjmhZ9RCI6olxi5Hqf3ckApc0g71m/KsrOJSiWFthrldVVzeg==
-X-Received: from pfbhb2.prod.google.com ([2002:a05:6a00:8582:b0:748:f16c:14c5])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:c90:b0:742:4545:2d2b with SMTP id d2e1a72fcca58-74af6e39a7dmr24529506b3a.3.1751379338442;
- Tue, 01 Jul 2025 07:15:38 -0700 (PDT)
-Date: Tue, 01 Jul 2025 07:15:37 -0700
-In-Reply-To: <923b1c02-407a-4689-a047-dd94e885b103@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1muoWW9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFE16C4CEEB;
+	Tue,  1 Jul 2025 14:22:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751379760;
+	bh=Wl4lyyrYUcT3WQOaPBwaLkFiqBgAhrV+nWS3JZrxsb4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=T1muoWW9B/AVNJTOi1xuV0GGFtHeR+/s3BIaFKkSAeBVDkTCw8do064SOOFkbDIzs
+	 jnQ5ZueO5VbdDTgSSobJUO+p8axqMx9Oa/oakN22ZNBgR/Unyqw08C5LjNUaEJHf+j
+	 m0ECv6oBrCivuaYNsKIdFvdmjwCNPw7rWfXYphFkZm8EuMTftB3UUah2gD10ARbqSH
+	 1ohxeJgw6XWcNX9vf7eoFXaxtoGwQry9769LIJ5wDm7iegGfMMiyHOzK5iC9vjEFRK
+	 flr+hNNLZntlbzvxaWoOB8PKonYND+aTurHfviXqeIvtVtIxGJ8NVbW3WJEK8Ly0jf
+	 ePvlx8vQ1YkCg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uWbsc-00BbMO-Mr;
+	Tue, 01 Jul 2025 15:22:38 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: Fix handling of FEAT_GTG for unimplemented granule sizes
+Date: Tue,  1 Jul 2025 15:22:25 +0100
+Message-Id: <20250701142225.753984-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-11-tabba@google.com>
- <aEyhHgwQXW4zbx-k@google.com> <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
- <diqza55tjkk1.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTxECJ3=ywbAPvpdA1-pm=stXWqU75mgG1epWaXiUr0raw@mail.gmail.com>
- <diqzv7odjnln.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTwqOwO2zVd4zTYF7w7reTWMNjmCV6XnKux2JtPwYCAoZQ@mail.gmail.com>
- <434ab5a3-fedb-4c9e-8034-8f616b7e5e52@amd.com> <923b1c02-407a-4689-a047-dd94e885b103@redhat.com>
-Message-ID: <diqz34bg575i.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
- guest_memfd with shared memory
-From: Ackerley Tng <ackerleytng@google.com>
-To: David Hildenbrand <david@redhat.com>, Shivank Garg <shivankg@amd.com>, Fuad Tabba <tabba@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-David Hildenbrand <david@redhat.com> writes:
+Booting an EL2 guest on a system only supporting a subset of the
+possible page sizes leads to interesting situations.
 
-> On 30.06.25 21:26, Shivank Garg wrote:
->> On 6/30/2025 8:38 PM, Fuad Tabba wrote:
->>> Hi Ackerley,
->>>
->>> On Mon, 30 Jun 2025 at 15:44, Ackerley Tng <ackerleytng@google.com> wro=
-te:
->>>>
->>>> Fuad Tabba <tabba@google.com> writes:
->>>>
->>>>> Hi Ackerley,
->>>>>
->>>>> On Fri, 27 Jun 2025 at 16:01, Ackerley Tng <ackerleytng@google.com> w=
-rote:
->>>>>>
->>>>>> Ackerley Tng <ackerleytng@google.com> writes:
->>>>>>
->>>>>>> [...]
->>>>>>
->>>>>>>>> +/*
->>>>>>>>> + * Returns true if the given gfn's private/shared status (in the=
- CoCo sense) is
->>>>>>>>> + * private.
->>>>>>>>> + *
->>>>>>>>> + * A return value of false indicates that the gfn is explicitly =
-or implicitly
->>>>>>>>> + * shared (i.e., non-CoCo VMs).
->>>>>>>>> + */
->>>>>>>>>   static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gf=
-n)
->>>>>>>>>   {
->>>>>>>>> -   return IS_ENABLED(CONFIG_KVM_GMEM) &&
->>>>>>>>> -          kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRI=
-BUTE_PRIVATE;
->>>>>>>>> +   struct kvm_memory_slot *slot;
->>>>>>>>> +
->>>>>>>>> +   if (!IS_ENABLED(CONFIG_KVM_GMEM))
->>>>>>>>> +           return false;
->>>>>>>>> +
->>>>>>>>> +   slot =3D gfn_to_memslot(kvm, gfn);
->>>>>>>>> +   if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shar=
-ed(slot)) {
->>>>>>>>> +           /*
->>>>>>>>> +            * Without in-place conversion support, if a guest_me=
-mfd memslot
->>>>>>>>> +            * supports shared memory, then all the slot's memory=
- is
->>>>>>>>> +            * considered not private, i.e., implicitly shared.
->>>>>>>>> +            */
->>>>>>>>> +           return false;
->>>>>>>>
->>>>>>>> Why!?!?  Just make sure KVM_MEMORY_ATTRIBUTE_PRIVATE is mutually e=
-xclusive with
->>>>>>>> mappable guest_memfd.  You need to do that no matter what.
->>>>>>>
->>>>>>> Thanks, I agree that setting KVM_MEMORY_ATTRIBUTE_PRIVATE should be
->>>>>>> disallowed for gfn ranges whose slot is guest_memfd-only. Missed th=
-at
->>>>>>> out. Where do people think we should check the mutual exclusivity?
->>>>>>>
->>>>>>> In kvm_supported_mem_attributes() I'm thiking that we should still =
-allow
->>>>>>> the use of KVM_MEMORY_ATTRIBUTE_PRIVATE for other non-guest_memfd-o=
-nly
->>>>>>> gfn ranges. Or do people think we should just disallow
->>>>>>> KVM_MEMORY_ATTRIBUTE_PRIVATE for the entire VM as long as one memsl=
-ot is
->>>>>>> a guest_memfd-only memslot?
->>>>>>>
->>>>>>> If we check mutually exclusivity when handling
->>>>>>> kvm_vm_set_memory_attributes(), as long as part of the range where
->>>>>>> KVM_MEMORY_ATTRIBUTE_PRIVATE is requested to be set intersects a ra=
-nge
->>>>>>> whose slot is guest_memfd-only, the ioctl will return EINVAL.
->>>>>>>
->>>>>>
->>>>>> At yesterday's (2025-06-26) guest_memfd upstream call discussion,
->>>>>>
->>>>>> * Fuad brought up a possible use case where within the *same* VM, we
->>>>>>    want to allow both memslots that supports and does not support mm=
-ap in
->>>>>>    guest_memfd.
->>>>>> * Shivank suggested a concrete use case for this: the user wants a
->>>>>>    guest_memfd memslot that supports mmap just so userspace addresse=
-s can
->>>>>>    be used as references for specifying memory policy.
->>>>>> * Sean then added on that allowing both types of guest_memfd memslot=
-s
->>>>>>    (support and not supporting mmap) will allow the user to have a s=
-econd
->>>>>>    layer of protection and ensure that for some memslots, the user
->>>>>>    expects never to be able to mmap from the memslot.
->>>>>>
->>>>>> I agree it will be useful to allow both guest_memfd memslots that
->>>>>> support and do not support mmap in a single VM.
->>>>>>
->>>>>> I think I found an issue with flags, which is that GUEST_MEMFD_FLAG_=
-MMAP
->>>>>> should not imply that the guest_memfd will provide memory for all gu=
-est
->>>>>> faults within the memslot's gfn range (KVM_MEMSLOT_GMEM_ONLY).
->>>>>>
->>>>>> For the use case Shivank raised, if the user wants a guest_memfd mem=
-slot
->>>>>> that supports mmap just so userspace addresses can be used as refere=
-nces
->>>>>> for specifying memory policy for legacy Coco VMs where shared memory
->>>>>> should still come from other sources, GUEST_MEMFD_FLAG_MMAP will be =
-set,
->>>>>> but KVM can't fault shared memory from guest_memfd. Hence,
->>>>>> GUEST_MEMFD_FLAG_MMAP should not imply KVM_MEMSLOT_GMEM_ONLY.
->>>>>>
->>>>>> Thinking forward, if we want guest_memfd to provide (no-mmap) protec=
-tion
->>>>>> even for non-CoCo VMs (such that perhaps initial VM image is populat=
-ed
->>>>>> and then VM memory should never be mmap-ed at all), we will want
->>>>>> guest_memfd to be the source of memory even if GUEST_MEMFD_FLAG_MMAP=
- is
->>>>>> not set.
->>>>>>
->>>>>> I propose that we should have a single VM-level flag to solve this (=
-in
->>>>>> line with Sean's guideline that we should just move towards what we =
-want
->>>>>> and not support non-existent use cases): something like
->>>>>> KVM_CAP_PREFER_GMEM.
->>>>>>
->>>>>> If KVM_CAP_PREFER_GMEM_MEMORY is set,
->>>>>>
->>>>>> * memory for any gfn range in a guest_memfd memslot will be requeste=
-d
->>>>>>    from guest_memfd
->>>>>> * any privacy status queries will also be directed to guest_memfd
->>>>>> * KVM_MEMORY_ATTRIBUTE_PRIVATE will not be a valid attribute
->>>>>>
->>>>>> KVM_CAP_PREFER_GMEM_MEMORY will be orthogonal with no validation on
->>>>>> GUEST_MEMFD_FLAG_MMAP, which should just purely guard mmap support i=
-n
->>>>>> guest_memfd.
->>>>>>
->>>>>> Here's a table that I set up [1]. I believe the proposed
->>>>>> KVM_CAP_PREFER_GMEM_MEMORY (column 7) lines up with requirements
->>>>>> (columns 1 to 4) correctly.
->>>>>>
->>>>>> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/=
-3710/guest_memfd%20use%20cases%20vs%20guest_memfd%20flags%20and%20privacy%2=
-0tracking.pdf
->>>>>
->>>>> I'm not sure this naming helps. What does "prefer" imply here? If the
->>>>> caller from user space does not prefer, does it mean that they
->>>>> mind/oppose?
->>>>>
->>>>
->>>> Sorry, bad naming.
->>>>
->>>> I used "prefer" because some memslots may not have guest_memfd at
->>>> all. To clarify, a "guest_memfd memslot" is a memslot that has some
->>>> valid guest_memfd fd and offset. The memslot may also have a valid
->>>> userspace_addr configured, either mmap-ed from the same guest_memfd fd
->>>> or from some other backing memory (for legacy CoCo VMs), or NULL for
->>>> userspace_addr.
->>>>
->>>> I meant to have the CAP enable KVM_MEMSLOT_GMEM_ONLY of this patch
->>>> series for all memslots that have some valid guest_memfd fd and offset=
-,
->>>> except if we have a VM-level CAP, KVM_MEMSLOT_GMEM_ONLY should be move=
-d
->>>> to the VM level.
->>>
->>> Regardless of the name, I feel that this functionality at best does
->>> not belong in this series, and potentially adds more confusion.
->>>
->>> Userspace should be specific about what it wants, and they know what
->>> kind of memslots there are in the VM: userspace creates them. In that
->>> case, userspace can either create a legacy memslot, no need for any of
->>> the new flags, or it can create a guest_memfd memslot, and then use
->>> any new flags to qualify that. Having a flag/capability that means
->>> something for guest_memfd memslots, but effectively keeps the same
->>> behavior for legacy ones seems to add more confusion.
->>>
->>>>> Regarding the use case Shivank mentioned, mmaping for policy, while
->>>>> the use case is a valid one, the raison d'=C3=AAtre of mmap is to map=
- into
->>>>> user space (i.e., fault it in). I would argue that if you opt into
->>>>> mmap, you are doing it to be able to access it.
->>>>
->>>> The above is in conflict with what was discussed on 2025-06-26 IIUC.
->>>>
->>>> Shivank brought up the case of enabling mmap *only* to be able to set
->>>> mempolicy using the VMAs, and Sean (IIUC) later agreed we should allow
->>>> userspace to only enable mmap but still disable faults, so that usersp=
-ace
->>>> is given additional protection, such that even if a (compromised)
->>>> userspace does a private-to-shared conversion, userspace is still not
->>>> allowed to fault in the page.
->>>
->>> I don't think there's a conflict :)  What I think is this is outside
->>> of the scope of this series for a few reasons:
->>>
->>> - This is prior to the mempolicy work (and is the base for it)
->>> - If we need to, we can add a flag later to restrict mmap faulting
->>> - Once we get in-place conversion, the mempolicy work could use the
->>> ability to disallow mapping for private memory
->>>
->>> By actually implementing something now, we would be restricting the
->>> mempolicy work, rather than helping it, since we would effectively be
->>> deciding now how that work should proceed. By keeping this the way it
->>> is now, the mempolicy work can explore various alternatives.
->>>
->>> I think we discussed this in the guest_memfd sync of 2025-06-12, and I
->>> think this was roughly our conclusion.
->>>
->>>> Hence, if we want to support mmaping just for policy and continue to
->>>> restrict faulting, then GUEST_MEMFD_FLAG_MMAP should not imply
->>>> KVM_MEMSLOT_GMEM_ONLY.
->>>>
->>>>> To me, that seems like
->>>>> something that merits its own flag, rather than mmap. Also, I recall
->>>>> that we said that later on, with inplace conversion, that won't be
->>>>> even necessary.
->>>>
->>>> On x86, as of now I believe we're going with an ioctl that does *not*
->>>> check what the guest prefers and will go ahead to perform the
->>>> private-to-shared conversion, which will go ahead to update
->>>> shareability.
->>>
->>> Here I think you're making my case that we're dragging more complexity
->>> from future work/series into this series, since now we're going into
->>> the IOCTLs for the conversion series :)
->>>
->>>>> In other words, this would also be trying to solve a
->>>>> problem that we haven't yet encountered and that we have a solution
->>>>> for anyway.
->>>>>
->>>>
->>>> So we don't have a solution for the use case where userspace wants to
->>>> mmap but never fault for userspace's protection from stray
->>>> private-to-shared conversions, unless we decouple GUEST_MEMFD_FLAG_MMA=
-P
->>>> and KVM_MEMSLOT_GMEM_ONLY.
->>>>
->>>>> I think that, unless anyone disagrees, is to go ahead with the names
->>>>> we discussed in the last meeting. They seem to be the ones that make
->>>>> the most sense for the upcoming use cases.
->>>>>
->>>>
->>>> We could also discuss if we really want to support the use case where
->>>> userspace wants to mmap but never fault for userspace's protection fro=
-m
->>>> stray private-to-shared conversions.
->>>
->>> I would really rather defer that work to when it's needed. It seems
->>> that we should aim to land this series as soon as possible, since it's
->>> the one blocking much of the future work. As far as I can tell,
->>> nothing here precludes introducing the mechanism of supporting the
->>> case where userspace wants to mmap but never fault, once it's needed.
->>> This was I believe what we had agreed on in the sync on 2025-06-26.
->>=20
->> I support this approach.
->
-> Agreed. Let's get this in with the changes requested by Sean applied.
->
-> How to use GUEST_MEMFD_FLAG_MMAP in combination with a CoCo VM with=20
-> legacy mem attributes (-> all memory in guest_memfd private) could be=20
-> added later on top, once really required.
->
-> As discussed, CoCo VMs that want to support GUEST_MEMFD_FLAG_MMAP will=20
-> have to disable legacy mem attributes using a new capability in stage-2.
->
+For example, on a system that only supports 4kB and 64kB, and is
+booted with a 4kB kernel, we end-up advertising 16kB support at
+stage-2, which is pretty weird.
 
-I rewatched the guest_memfd meeting on 2025-06-12.  We do want to
-support the use case where userspace wants to have mmap (e.g. to set
-mempolicy) but does not want to allow faulting into the host.
+That's because we consider that any S2 bigger than our base granule
+is fair game, irrespective of what the HW actually supports.
 
-On 2025-06-12, the conclusion was that the problem will be solved once
-guest_memfd supports shareability, and that's because userspace can set
-shareability to GUEST, so the memory can't be faulted into the host.
+Add new checks that will verify that this granule size is actually
+supported before publishing it to the guest.
 
-On 2025-06-26, Sean said we want to let userspace have an extra layer of
-protection so that memory cannot be faulted in to the host, ever. IOW,
-we want to let userspace say that even if there is a stray
-private-to-shared conversion, *don't* allow faulting memory into the
-host.
+Fixes: e7ef6ed4583ea ("KVM: arm64: Enforce NV limits on a per-idregs basis")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/nested.c | 26 +++++++++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
 
-The difference is the "extra layer of protection", which should remain
-in effect even if there are (stray/unexpected) private-to-shared
-conversions to guest_memfd or to KVM. Here's a direct link to the point
-in the video where Sean brought this up [1]. I'm really hoping I didn't
-misinterpret this!
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 5b191f4dc5668..dc1d26559bfa3 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1402,6 +1402,21 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++#define has_tgran_2(__r, __sz)						\
++	({								\
++		u64 _s1, _s2, _mmfr0 = __r;				\
++									\
++		_s2 = SYS_FIELD_GET(ID_AA64MMFR0_EL1,			\
++				    TGRAN##__sz##_2, _mmfr0);		\
++									\
++		_s1 = SYS_FIELD_GET(ID_AA64MMFR0_EL1,			\
++				    TGRAN##__sz, _mmfr0);		\
++									\
++		((_s2 != ID_AA64MMFR0_EL1_TGRAN##__sz##_2_NI &&		\
++		  _s2 != ID_AA64MMFR0_EL1_TGRAN##__sz##_2_TGRAN##__sz) || \
++		 (_s2 == ID_AA64MMFR0_EL1_TGRAN##__sz##_2_TGRAN##__sz && \
++		  _s1 != ID_AA64MMFR0_EL1_TGRAN##__sz##_NI));		\
++	})
+ /*
+  * Our emulated CPU doesn't support all the possible features. For the
+  * sake of simplicity (and probably mental sanity), wipe out a number
+@@ -1411,6 +1426,8 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
+  */
+ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+ {
++	u64 orig_val = val;
++
+ 	switch (reg) {
+ 	case SYS_ID_AA64ISAR0_EL1:
+ 		/* Support everything but TME */
+@@ -1480,13 +1497,16 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+ 		 */
+ 		switch (PAGE_SIZE) {
+ 		case SZ_4K:
+-			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN4_2, IMP);
++			if (has_tgran_2(orig_val, 4))
++				val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN4_2, IMP);
+ 			fallthrough;
+ 		case SZ_16K:
+-			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN16_2, IMP);
++			if (has_tgran_2(orig_val, 16))
++				val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN16_2, IMP);
+ 			fallthrough;
+ 		case SZ_64K:
+-			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN64_2, IMP);
++			if (has_tgran_2(orig_val, 64))
++				val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN64_2, IMP);
+ 			break;
+ 		}
+ 
+-- 
+2.39.2
 
-Let me look ahead a little, since this involves use cases already
-brought up though I'm not sure how real they are. I just want to make
-sure that in a few patch series' time, we don't end up needing userspace
-to use a complex bunch of CAPs and FLAGs.
-
-In this series (mmap support, V12, patch 10/18) [2], to allow
-KVM_X86_DEFAULT_VMs to use guest_memfd, I added a `fault_from_gmem()`
-helper, which is defined as follows (before the renaming Sean requested):
-
-+static inline bool fault_from_gmem(struct kvm_page_fault *fault)
-+{
-+	return fault->is_private || kvm_gmem_memslot_supports_shared(fault->slot)=
-;
-+}
-
-The above is changeable, of course :). The intention is that if the
-fault is private, fault from guest_memfd. If GUEST_MEMFD_FLAG_MMAP is
-set (KVM_MEMSLOT_GMEM_ONLY will be set on the memslot), fault from
-guest_memfd.
-
-If we defer handling GUEST_MEMFD_FLAG_MMAP in combination with a CoCo VM
-with legacy mem attributes to the future, this helper will probably
-become
-
--static inline bool fault_from_gmem(struct kvm_page_fault *fault)
-+static inline bool fault_from_gmem(struct kvm *kvm, struct kvm_page_fault =
-*fault)
-+{
--	return fault->is_private || kvm_gmem_memslot_supports_shared(fault->slot)=
-;
-+	return fault->is_private || (kvm_gmem_memslot_supports_shared(fault->slot=
-) &&
-+	                             !kvm_arch_disable_legacy_private_tracking(kv=
-m));
-+}
-
-And on memslot binding we check
-
-if kvm_arch_disable_legacy_private_tracking(kvm) and not GUEST_MEMFD_FLAG_M=
-MAP
-	return -EINVAL;
-
-1. Is that what yall meant?
-
-2. Does this kind of not satisfy the "extra layer of protection"
-   requirement (if it is a requirement)?
-
-   A legacy CoCo VM using guest_memfd only for private memory (shared
-   memory from say, shmem) and needing to set mempolicy would
-  =20
-   * Set GUEST_MEMFD_FLAG_MMAP
-   * Leave KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaulted to false
-  =20
-   but still be able to send conversion ioctls directly to guest_memfd,
-   and then be able to fault guest_memfd memory into the host.
-
-3. Now for a use case I've heard of (feel free to tell me this will
-   never be supported or "we'll deal with it if it comes"): On a
-   non-CoCo VM, we want to use guest_memfd but not use mmap (and the
-   initial VM image will be written using write() syscall or something
-   else).
-
-   * Set GUEST_MEMFD_FLAG_MMAP to false
-   * Leave KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaulted to false
-     (it's a non-CoCo VM, weird to do anything to do with private
-     tracking)
-
-   And now we're stuck because fault_from_gmem() will return false all
-   the time and we can't use memory from guest_memfd.
-
-[1] https://youtu.be/7b5hgKHoZoY?t=3D1162s
-[2] https://lore.kernel.org/all/20250611133330.1514028-11-tabba@google.com/
-
-> --=20
-> Cheers,
->
-> David / dhildenb
