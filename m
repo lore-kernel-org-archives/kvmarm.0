@@ -1,231 +1,98 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3892B1DC9BB
-	for <kvmarm@lists.linux.dev>; Wed,  2 Jul 2025 09:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8F22D4B73
+	for <kvmarm@lists.linux.dev>; Wed,  2 Jul 2025 13:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751450245; cv=none; b=VesbvTUlt9XjiSzGeZB4nPc9TvQmb7vWGlTErU+9N8eF8241i3jprrk+0MwmQcXpX+rRt+b4ZvWv/sWsqGeGq74ZtEysK2SUeEAxWnGPc8cuiEgb/EET/jdK0Ts+rLtpB9cLynZdet81nVcQ4SKKqecFDsTJadnci4Zwy7dfhAI=
+	t=1751462648; cv=none; b=DZdBnYn41O2qhLN/FUTrFB25pYV0omDuDqoZZGwzgN9UVeYt7APwdxO0cGtYlPsAraXZWviAXS1eYvvEct74XlpBFpKTTl1f3MujOdUOGImUtWQmYnYNJaROmyCaAiIidQ1NVYsSR6OXXDSYLKe/q0m7kSr/WaWuIwtbQFdMpzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751450245; c=relaxed/simple;
-	bh=FkdINrlA0eo7SvKh7s2tvKbKo2s+1jDMW6zWH8K2N+A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Uex3x7s2S0a1S8j4RUs9BG0Mua1iwE0kPbmIK7/QaJvwKergN6aMDAIRzD4HiG3dKfYCpwpPYstnRzzBUnCyI7KbMmuINFvddcUsF+3md8GeXh5UzoIbq6KLlXpytrZwstQvtACYbn3kJUlsADaOzitUIilb05tf/MwLmG5Ozds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4bXFdD20wTz2Bcph;
-	Wed,  2 Jul 2025 17:55:28 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 471F11A0190;
-	Wed,  2 Jul 2025 17:57:15 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 2 Jul 2025 17:57:15 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 2 Jul 2025 17:57:14 +0800
-Message-ID: <ffd3fccc-af4a-6667-3cf6-a55e866f3057@hisilicon.com>
-Date: Wed, 2 Jul 2025 17:57:13 +0800
+	s=arc-20240116; t=1751462648; c=relaxed/simple;
+	bh=5EiOjds2vB+gMgLQ7AStKRdExlaGgzg2mi5kPwaDXMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OpEIwQkpZvg8OQziUULlJ2hhVzTJ9UBB28kACLbAYxdIeRzdr1CgxWRoetrdjmWdhmEbwsqA+nM1sWSULZCoPPEA+CZHLz+5sf5rPvW3MhKwFkwD7egTXF6YsgAiMrvzdlYseJEH0On3dRGoIvqCK7M3Kxztf3ftesWOkHDhZ8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=njUl/S1J; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="njUl/S1J"
+Date: Wed, 2 Jul 2025 15:23:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751462643;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NawVbpSzRrmU/5OP7w4Gd875xIZHo3tZ7VQMBiyqhsU=;
+	b=njUl/S1J5KSb4kx5muBTkGIWSbXrroDfp86PXT14WPw5N7Hu/x/hpj7G9kte4LDcww6tj1
+	sLFenV29ksanu71IRWzpzXNj3kRSc4qywDU4NFLZJM7H9cWGJsHjGlArX7DoAw9afh/IVk
+	ghR3vKM0KttIIQr6AY6akrhIyQ1vgu4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, pbonzini@redhat.com, 
+	eric.auger@redhat.com, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, david@redhat.com, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 0/2] scripts: extra_params rework
+Message-ID: <20250702-4e182ba58316d478d49a1ee3@orel>
+References: <20250625154354.27015-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] ARM64: errata: Add workaround for HIP10/HIP10C erratum
- 162200803
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<tangnianyao@huawei.com>, <wangwudi@hisilicon.com>
-References: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
- <86wm8ybpk5.wl-maz@kernel.org>
- <0b54db94-8a6f-cea0-a6f7-dbe8650d66dd@hisilicon.com>
- <86h5zwba5i.wl-maz@kernel.org>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <86h5zwba5i.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625154354.27015-1-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 2025/7/1 16:14, Marc Zyngier wrote:
-> On Fri, 27 Jun 2025 07:36:31 +0100,
-> Zhou Wang <wangzhou1@hisilicon.com> wrote:
->>
->> On 2025/6/26 21:27, Marc Zyngier wrote:
->>> On Thu, 26 Jun 2025 13:41:42 +0100,
->>> Zhou Wang <wangzhou1@hisilicon.com> wrote:
->>>>
->>>> For GICv4.0 of Hip10 and Hip10C, it has a SoC bug with vPE schedule:
->>>> when multiple vPEs are sending vpe schedule/deschedule commands
->>>> concurrently and repeatedly, some vPE schedule command may not be
->>>> scheduled, and it will cause the command timeout.
->>>>
->>>> The hardware implementation is that there is one GIC hardware in one CPU die,
->>>> which handles all vPE schedule operations one by one in all CPUs of this die.
->>>> The bug is that if the number of queued vPE schedule operations is more
->>>> than a certain value, the last vPE schedule operation will be lost.
->>>>
->>>> One possible way to solve this problem is to limit the number of vLPIs, so
->>>> the hardware could spend less time to scan virtual pending table when it
->>>> handles the vPE schedule operations, so the queued vPE schedule operations
->>>> will never be more than above certain value.
->>>>
->>>> Given the number of CPUs of die, and imagine there is 100 vPE schedule
->>>> operations per second one CPU, it can be calculated that we can limit
->>>> the number of vLPI to 4096 for virtual machine to avoid the issue.
->>>>
->>>> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
->>>> ---
->>>>  Documentation/arch/arm64/silicon-errata.rst |  2 ++
->>>>  arch/arm64/Kconfig                          | 12 ++++++++++++
->>>>  arch/arm64/include/asm/cputype.h            |  4 ++++
->>>>  arch/arm64/kernel/cpu_errata.c              | 15 +++++++++++++++
->>>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c          |  5 +++++
->>>>  arch/arm64/tools/cpucaps                    |  1 +
->>>>  include/linux/irqchip/arm-gic-v3.h          |  1 +
->>>>  7 files changed, 40 insertions(+)
->>>>
->>>
->>> [...]
->>>
->>>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->>>> index ae4c0593d114..495a56e9dc4b 100644
->>>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->>>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->>>> @@ -81,6 +81,11 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
->>>>  		if (vgic_has_its(vcpu->kvm)) {
->>>>  			value |= (INTERRUPT_ID_BITS_ITS - 1) << 19;
->>>>  			value |= GICD_TYPER_LPIS;
->>>> +			/* Limit the number of vlpis to 4096 */
->>>> +			if (cpus_have_final_cap(ARM64_WORKAROUND_HISI_162200803) &&
->>>> +			    kvm_vgic_global_state.has_gicv4 &&
->>>> +			    !kvm_vgic_global_state.has_gicv4_1)
->>>> +				value |= 11 << GICD_TYPER_NUM_LPIS_SHIFT;
->>>
->>> This really doesn't solve your problem. Yes, the guest *may* honor
->>> this limit. But KVM doesn't care and will happily allocate 2^16 vLPIs
->>> if the guest asks -- there is no code enforcing this limit.
->>
->> Hi Marc,
->>
->> I am not sure if there is any other place guest can ask vLPI over
->> the limitation except for MAPTI/MAPT below?
->>
->>> And even if we did. What would we do on a MAPTI command that tries to
->>> map a vLPI outside of the allowed range? Do we need to tell the guest
->>> it has screwed up?
->>
->> Thanks for pointing this. Yes, we miss the lpi_nr checking in vgic_its_cmd_handle_mapi.
->> In fact, the fix of this errata introduces the usage of GICD.num_LPI,
->> so we need make related logic right as well.
-> 
-> Exactly.
-> 
->>
->> I am not sure that if we could add related checking for lpi_nr in MAPTI/MAPI
->> as part of this errata fix, or we should add the basic support for
->> GICD.num_LPI before adding this errata?
-> 
-> You definitely need to handle that before allowing such limit to be
-> enforced. Which also means allowing the limit to be saved/restored
-> from userspace in order to support migration.
+Hi Paolo, Thomas, and others,
 
-Seems that in KVM we do not consider GICD_TYPER in migration. How about
-making GICD_TYPER.num_LPIs as a default configuration, when KVM version is
-same between source and destination during migration, the logic is still right.
-
-Something like:
-
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index eb1205654ac8..2071b1445b22 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -385,6 +385,7 @@ int vgic_init(struct kvm *kvm)
- 	/* freeze the number of spis */
- 	if (!dist->nr_spis)
- 		dist->nr_spis = VGIC_NR_IRQS_LEGACY - VGIC_NR_PRIVATE_IRQS;
-+	dist->nr_lpis = 2 ^ (INTERRUPT_NUM_LPIS + 1);
-
- 	ret = kvm_vgic_dist_init(kvm, dist->nr_spis);
- 	if (ret)
-@@ -433,6 +434,7 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 	kfree(dist->spis);
- 	dist->spis = NULL;
- 	dist->nr_spis = 0;
-+	dist->nr_lpis = 0;
- 	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
-
- 	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 534049c7c94b..c770eadc5188 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -1047,7 +1047,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	else
- 		lpi_nr = event_id;
- 	if (lpi_nr < GIC_LPI_OFFSET ||
--	    lpi_nr >= max_lpis_propbaser(kvm->arch.vgic.propbaser))
-+	    lpi_nr >= max_lpis_propbaser(kvm->arch.vgic.propbaser) ||
-+	    lpi_nr >= GIC_LPI_OFFSET + kvm->arch.vgic.nr_lpis)
- 		return E_ITS_MAPTI_PHYSICALID_OOR;
-
- 	/* If there is an existing mapping, behavior is UNPREDICTABLE. */
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index ae4c0593d114..224d0d88c823 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -81,6 +81,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 		if (vgic_has_its(vcpu->kvm)) {
- 			value |= (INTERRUPT_ID_BITS_ITS - 1) << 19;
- 			value |= GICD_TYPER_LPIS;
-+			value |= (ilog2(vgic->nr_lpis) - 1) << 11;
- 		} else {
- 			value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
- 		}
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 4349084cb9a6..e11792dafcdf 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -16,6 +16,7 @@
-
- #define INTERRUPT_ID_BITS_SPIS	10
- #define INTERRUPT_ID_BITS_ITS	16
-+#define INTERRUPT_NUM_LPIS	14
- #define VGIC_LPI_MAX_INTID	((1 << INTERRUPT_ID_BITS_ITS) - 1)
- #define VGIC_PRI_BITS		5
-
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 4a34f7f0a864..b637dc9460d9 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -296,6 +296,7 @@ struct vgic_dist {
- 	 * else.
- 	 */
- 	struct its_vm		its_vm;
-+	int			nr_lpis;
- };
-
-However，migration between different KVMs will be broken :(
-I am not sure that should we consider this case as well?
+Can I get an ack on this? I'd like to merge it.
 
 Thanks,
-Zhou
+drew
 
+On Wed, Jun 25, 2025 at 04:43:52PM +0100, Alexandru Elisei wrote:
+> This series was split from the series that adds support to use kvmtool when
+> using the scripts to run the tests [1]. kvmtool will be supported only for arm
+> and arm64, as they are the only architectures that compile the tests to run with
+> kvmtool.
 > 
-> I was really hoping to never have to support this thing (it really is
-> terrible), but if we have to introduce and honor it for correctness
-> reasons, then it has to be fully supported>
-> Thanks,
+> The justification for these changes is to be able to introduce
+> kvmtool_params for kvmtool specific command line options, and to make a
+> clear distinction between the qemu options and the kvmtool options. This is
+> why qemu_params was added as a replacement for extra_params. extra_params
+> was kept for compatibility purposes for user's custom test definitions.
 > 
-> 	M.
+> To avoid duplication of the arguments that are passed to a test's main()
+> function, test_args has been split from qemu_params. The same test_args
+> will be used by both qemu and kvmtool.
 > 
+> [1] https://lore.kernel.org/kvm/20250507151256.167769-1-alexandru.elisei@arm.com/
+> 
+> Alexandru Elisei (2):
+>   scripts: unittests.cfg: Rename 'extra_params' to 'qemu_params'
+>   scripts: Add 'test_args' test definition parameter
+> 
+>  arm/unittests.cfg     |  94 ++++++++++++++----------
+>  docs/unittests.txt    |  30 +++++---
+>  powerpc/unittests.cfg |  21 +++---
+>  riscv/unittests.cfg   |   2 +-
+>  s390x/unittests.cfg   |  53 +++++++-------
+>  scripts/common.bash   |  16 +++--
+>  scripts/runtime.bash  |  24 ++++---
+>  x86/unittests.cfg     | 164 ++++++++++++++++++++++++------------------
+>  8 files changed, 237 insertions(+), 167 deletions(-)
+> 
+> 
+> base-commit: 507612326c9417b6330b91f7931678a4c6866395
+> -- 
+> 2.50.0
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
