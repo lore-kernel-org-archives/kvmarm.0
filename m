@@ -1,55 +1,62 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5785924B26
-	for <kvmarm@lists.linux.dev>; Thu,  3 Jul 2025 10:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B526D2D9EF4;
+	Thu,  3 Jul 2025 12:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751539454; cv=none; b=FbAiy381PE7dZu/hR7IPGF5IzNPm+U3QiL5yaLfIJx17MijTOo5HeuCT5QH1aGUsxf5AlO7eQlIEmxl1lE1NddjvS79AojE3WKQ+jJ6nk/FL1E+wjsTMx3ARKKISjmjldpYJf1m4FsQCCN4GWwFku/Ach2XaJ6NeW+pTyKkJbaQ=
+	t=1751546296; cv=none; b=WsdULkBbyNwzQa4ldPyVmqmlsvnwFBIHYIA2CnfHqmfq4Q/K+zPuZKe4/q06f95mZ0vNcDjstYkIEuVpJYhiVijv/uB1CZwcS3HItRSwOYM6IIbrxPBu20pD3Z7tQbmB5juaOfz8aSl9/n33Kg1zdbykeEYLRc3lgYE1vQyPs8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751539454; c=relaxed/simple;
-	bh=3yKG6GVto6Q8McY6qTvWdt7LhY+zG3Z8PYTQ98/hf4s=;
+	s=arc-20240116; t=1751546296; c=relaxed/simple;
+	bh=hWvVF87EVM3mwOjPFZe4ew5uoKrcihEE8r7VGd37jSU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ntLhTquUXnidQ3QQccewRknsWVj8AQrMNLRwufYcHow5eRIQeq4oK6BGvdo44oAfehNMJDrG8aJhCC0qiCBoNjjCNxe4u68DXoOQ9Rp8JeWLK/3ItnCYcivJwix0gk77bZVjTODlSqKtJOa7PBi6PkLBhbLjNI+Lu7lPHmRTnVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oy8noB17; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=t2ONiX3i9jZGZP2Zuv9G4aGt/R5xPFfz8PMNgWll4QVGzhDLfhNAjhEcDKcNRc3yrMGdsiSoqzZydCLAYydc55XHXFAXl5eenEt9YwSYHB+jDiwkJ5HuFlKRWjSpIaANU+BXBWb97vbwtQEBKjM+8x7vGO69rxlMWUbhCdg4MEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4fGec5c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oy8noB17"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2870C4CEE3;
-	Thu,  3 Jul 2025 10:44:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4fGec5c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AA61C4CEE3;
+	Thu,  3 Jul 2025 12:38:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751539453;
-	bh=3yKG6GVto6Q8McY6qTvWdt7LhY+zG3Z8PYTQ98/hf4s=;
+	s=k20201202; t=1751546295;
+	bh=hWvVF87EVM3mwOjPFZe4ew5uoKrcihEE8r7VGd37jSU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oy8noB177HGbDejapW18F2KrmGcs7wP2vkd7AkkgRnrRtUTt10paZr+Rq/cmoT6wS
-	 f+zvjtvsiSJP5yZYMCiRNw4mU2JIrMtMV/9+/wNmA6FoN3ZnFE+H/D03+WJ4gAV7F2
-	 SqxaDJymmIf5epTrCFKs7HYqhAG+I8UW4/3qZPNi7Mcp6M6hSwLRivoHJtsOyYVOMq
-	 Xhzr+5fTUG6cNd+u2+YRL9wS6V80dTH8pzDHcD+THJyYus0iye+mAW0p8giwtkSjyi
-	 v2wVXD6iWHzvmQd6Hf9XyEDRd+8Xw1vWrR574wvfp1Q64ZADAKCLMyctcD/il2y6PD
-	 EM11bGANmuxIQ==
+	b=e4fGec5c+a5XsC3kgG1v/EdvTMJUV2gZBtLRlD9DGZLuyOij9qKsXlWe5wLzV4kYk
+	 7/kMUudklu19iKKFI6MbnQqZSYYoBS7qBGNYHsY/tfCRZd39OEHYsUdSD7oowWMAhd
+	 +6PE5W2ct1AlegAX6RQn+R8Qzlne6LKm4Qw8WAHLMBBk9IIUe2yA6IOBnYXQxIq2Ax
+	 OUBjV8Ws9cCncRJrNtt1YIYtMH19OwSqBi3QMC9mzzD050ap35SFtTts9OUear417j
+	 VWkykKtpqImYAZ3cfD+WzyFs3/02DcMarY3emCiEJq2dgTbhK89uBBRqGJG1+sLPMR
+	 foN3vbumvs9Zw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uXHQJ-00CH07-JP;
-	Thu, 03 Jul 2025 11:44:11 +0100
-Date: Thu, 03 Jul 2025 11:44:11 +0100
-Message-ID: <864ivtbll0.wl-maz@kernel.org>
+	id 1uXJCf-00CJgJ-5K;
+	Thu, 03 Jul 2025 13:38:13 +0100
+Date: Thu, 03 Jul 2025 13:38:12 +0100
+Message-ID: <8634bdbgaz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Zhou Wang <wangzhou1@hisilicon.com>
+To: perlarsen@google.com
 Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<tangnianyao@huawei.com>,
-	<wangwudi@hisilicon.com>
-Subject: Re: [PATCH] ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200803
-In-Reply-To: <ffd3fccc-af4a-6667-3cf6-a55e866f3057@hisilicon.com>
-References: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
-	<86wm8ybpk5.wl-maz@kernel.org>
-	<0b54db94-8a6f-cea0-a6f7-dbe8650d66dd@hisilicon.com>
-	<86h5zwba5i.wl-maz@kernel.org>
-	<ffd3fccc-af4a-6667-3cf6-a55e866f3057@hisilicon.com>
+	Will Deacon <will@kernel.org>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	ahomescu@google.com,
+	armellel@google.com,
+	arve@android.com,
+	ayrton@google.com,
+	qperret@google.com,
+	sebastianene@google.com,
+	qwandor@google.com
+Subject: Re: [PATCH v7 2/5] KVM: arm64: Use SMCCC 1.2 for FF-A initialization and in host handler
+In-Reply-To: <20250701-virtio-msg-ffa-v7-2-995afc3d385e@google.com>
+References: <20250701-virtio-msg-ffa-v7-0-995afc3d385e@google.com>
+	<20250701-virtio-msg-ffa-v7-2-995afc3d385e@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,214 +66,154 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, tangnianyao@huawei.com, wangwudi@hisilicon.com
+X-SA-Exim-Rcpt-To: perlarsen@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, ahomescu@google.com, armellel@google.com, arve@android.com, ayrton@google.com, qperret@google.com, sebastianene@google.com, qwandor@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 02 Jul 2025 10:57:13 +0100,
-Zhou Wang <wangzhou1@hisilicon.com> wrote:
+On Tue, 01 Jul 2025 23:06:35 +0100,
+Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org> wrote:
 >=20
-> On 2025/7/1 16:14, Marc Zyngier wrote:
-> > On Fri, 27 Jun 2025 07:36:31 +0100,
-> > Zhou Wang <wangzhou1@hisilicon.com> wrote:
-> >>
-> >> On 2025/6/26 21:27, Marc Zyngier wrote:
-> >>> On Thu, 26 Jun 2025 13:41:42 +0100,
-> >>> Zhou Wang <wangzhou1@hisilicon.com> wrote:
-> >>>>
-> >>>> For GICv4.0 of Hip10 and Hip10C, it has a SoC bug with vPE schedule:
-> >>>> when multiple vPEs are sending vpe schedule/deschedule commands
-> >>>> concurrently and repeatedly, some vPE schedule command may not be
-> >>>> scheduled, and it will cause the command timeout.
-> >>>>
-> >>>> The hardware implementation is that there is one GIC hardware in one=
- CPU die,
-> >>>> which handles all vPE schedule operations one by one in all CPUs of =
-this die.
-> >>>> The bug is that if the number of queued vPE schedule operations is m=
-ore
-> >>>> than a certain value, the last vPE schedule operation will be lost.
-> >>>>
-> >>>> One possible way to solve this problem is to limit the number of vLP=
-Is, so
-> >>>> the hardware could spend less time to scan virtual pending table whe=
-n it
-> >>>> handles the vPE schedule operations, so the queued vPE schedule oper=
-ations
-> >>>> will never be more than above certain value.
-> >>>>
-> >>>> Given the number of CPUs of die, and imagine there is 100 vPE schedu=
-le
-> >>>> operations per second one CPU, it can be calculated that we can limit
-> >>>> the number of vLPI to 4096 for virtual machine to avoid the issue.
-> >>>>
-> >>>> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> >>>> ---
-> >>>>  Documentation/arch/arm64/silicon-errata.rst |  2 ++
-> >>>>  arch/arm64/Kconfig                          | 12 ++++++++++++
-> >>>>  arch/arm64/include/asm/cputype.h            |  4 ++++
-> >>>>  arch/arm64/kernel/cpu_errata.c              | 15 +++++++++++++++
-> >>>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c          |  5 +++++
-> >>>>  arch/arm64/tools/cpucaps                    |  1 +
-> >>>>  include/linux/irqchip/arm-gic-v3.h          |  1 +
-> >>>>  7 files changed, 40 insertions(+)
-> >>>>
-> >>>
-> >>> [...]
-> >>>
-> >>>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgi=
-c/vgic-mmio-v3.c
-> >>>> index ae4c0593d114..495a56e9dc4b 100644
-> >>>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> >>>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> >>>> @@ -81,6 +81,11 @@ static unsigned long vgic_mmio_read_v3_misc(struc=
-t kvm_vcpu *vcpu,
-> >>>>  		if (vgic_has_its(vcpu->kvm)) {
-> >>>>  			value |=3D (INTERRUPT_ID_BITS_ITS - 1) << 19;
-> >>>>  			value |=3D GICD_TYPER_LPIS;
-> >>>> +			/* Limit the number of vlpis to 4096 */
-> >>>> +			if (cpus_have_final_cap(ARM64_WORKAROUND_HISI_162200803) &&
-> >>>> +			    kvm_vgic_global_state.has_gicv4 &&
-> >>>> +			    !kvm_vgic_global_state.has_gicv4_1)
-> >>>> +				value |=3D 11 << GICD_TYPER_NUM_LPIS_SHIFT;
-> >>>
-> >>> This really doesn't solve your problem. Yes, the guest *may* honor
-> >>> this limit. But KVM doesn't care and will happily allocate 2^16 vLPIs
-> >>> if the guest asks -- there is no code enforcing this limit.
-> >>
-> >> Hi Marc,
-> >>
-> >> I am not sure if there is any other place guest can ask vLPI over
-> >> the limitation except for MAPTI/MAPT below?
-> >>
-> >>> And even if we did. What would we do on a MAPTI command that tries to
-> >>> map a vLPI outside of the allowed range? Do we need to tell the guest
-> >>> it has screwed up?
-> >>
-> >> Thanks for pointing this. Yes, we miss the lpi_nr checking in vgic_its=
-_cmd_handle_mapi.
-> >> In fact, the fix of this errata introduces the usage of GICD.num_LPI,
-> >> so we need make related logic right as well.
-> >=20
-> > Exactly.
-> >=20
-> >>
-> >> I am not sure that if we could add related checking for lpi_nr in MAPT=
-I/MAPI
-> >> as part of this errata fix, or we should add the basic support for
-> >> GICD.num_LPI before adding this errata?
-> >=20
-> > You definitely need to handle that before allowing such limit to be
-> > enforced. Which also means allowing the limit to be saved/restored
-> > from userspace in order to support migration.
+> From: Per Larsen <perlarsen@google.com>
 >=20
-> Seems that in KVM we do not consider GICD_TYPER in migration.
-
-What do you mean by that?
-
-Today, we don't support anything being written to GICD_TYPER, just
-like on a HW implementation. If you want it to be writable from
-userspace (and I think you do), then it needs to be added.
-
-> How about making GICD_TYPER.num_LPIs as a default configuration,
-> when KVM version is same between source and destination during
-> migration, the logic is still right.
-
-The default configuration should be that GICD_TYPERR.num_LPIs is 0,
-indicating that the hypervisor doesn't limit anything at all.
-
->
-> Something like:
+> SMCCC 1.1 and prior allows four registers to be sent back as a result
+> of an FF-A interface. SMCCC 1.2 increases the number of results that can
+> be sent back to 8 and 16 for 32-bit and 64-bit SMC/HVCs respectively.
 >=20
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-i=
-nit.c
-> index eb1205654ac8..2071b1445b22 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -385,6 +385,7 @@ int vgic_init(struct kvm *kvm)
->  	/* freeze the number of spis */
->  	if (!dist->nr_spis)
->  		dist->nr_spis =3D VGIC_NR_IRQS_LEGACY - VGIC_NR_PRIVATE_IRQS;
-> +	dist->nr_lpis =3D 2 ^ (INTERRUPT_NUM_LPIS + 1);
+> FF-A 1.0 references SMCCC 1.2 (reference [4] on page xi) and FF-A 1.2
+> explicitly requires SMCCC 1.2 so it should be safe to use this version
+> unconditionally. Moreover, it is simpler to implement FF-A features
+> without having to worry about compatibility with SMCCC 1.1 and older.
+>=20
+> Update the FF-A initialization and host handler code to use SMCCC 1.2.
+>=20
+> Signed-off-by: Per Larsen <perlarsen@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/Makefile |   1 +
+>  arch/arm64/kvm/hyp/nvhe/ffa.c    | 193 +++++++++++++++++++++++++--------=
+------
+>  2 files changed, 125 insertions(+), 69 deletions(-)
+>=20
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/M=
+akefile
+> index a76522d63c3e630795db5972a99abc3d24bc5e26..f859a8fb41a25effea1edd977=
+bef889423153399 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -27,6 +27,7 @@ hyp-obj-y :=3D timer-sr.o sysreg-sr.o debug-sr.o switch=
+.o tlb.o hyp-init.o host.o
+>  	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
+>  hyp-obj-y +=3D ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../=
+entry.o \
+>  	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+> +hyp-obj-y +=3D ../../../kernel/smccc-call.o
+>  hyp-obj-$(CONFIG_LIST_HARDENED) +=3D list_debug.o
+>  hyp-obj-y +=3D $(lib-objs)
+> =20
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 2c199d40811efb5bfae199c4a67d8ae3d9307357..65d241ba32403d014b43cc4ef=
+4d5bf9693813809 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -71,36 +71,68 @@ static u32 hyp_ffa_version;
+>  static bool has_version_negotiated;
+>  static hyp_spinlock_t version_lock;
+> =20
+> -static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
+> +static void ffa_to_smccc_error(struct arm_smccc_1_2_regs *res, u64 ffa_e=
+rrno)
+>  {
+> -	*res =3D (struct arm_smccc_res) {
+> +	*res =3D (struct arm_smccc_1_2_regs) {
+>  		.a0	=3D FFA_ERROR,
+>  		.a2	=3D ffa_errno,
+>  	};
+>  }
+> =20
+> -static void ffa_to_smccc_res_prop(struct arm_smccc_res *res, int ret, u6=
+4 prop)
+> +static void ffa_to_smccc_res_prop(struct arm_smccc_1_2_regs *res, int re=
+t, u64 prop)
+>  {
+>  	if (ret =3D=3D FFA_RET_SUCCESS) {
+> -		*res =3D (struct arm_smccc_res) { .a0 =3D FFA_SUCCESS,
+> -						.a2 =3D prop };
+> +		*res =3D (struct arm_smccc_1_2_regs) { .a0 =3D FFA_SUCCESS,
+> +						      .a2 =3D prop };
+>  	} else {
+>  		ffa_to_smccc_error(res, ret);
+>  	}
+>  }
+> =20
+> -static void ffa_to_smccc_res(struct arm_smccc_res *res, int ret)
+> +static void ffa_to_smccc_res(struct arm_smccc_1_2_regs *res, int ret)
+>  {
+>  	ffa_to_smccc_res_prop(res, ret, 0);
+>  }
+> =20
+>  static void ffa_set_retval(struct kvm_cpu_context *ctxt,
+> -			   struct arm_smccc_res *res)
+> +			   struct arm_smccc_1_2_regs *res)
+>  {
+> +	DECLARE_REG(u64, func_id, ctxt, 0);
+>  	cpu_reg(ctxt, 0) =3D res->a0;
+>  	cpu_reg(ctxt, 1) =3D res->a1;
+>  	cpu_reg(ctxt, 2) =3D res->a2;
+>  	cpu_reg(ctxt, 3) =3D res->a3;
+> +	cpu_reg(ctxt, 4) =3D res->a4;
+> +	cpu_reg(ctxt, 5) =3D res->a5;
+> +	cpu_reg(ctxt, 6) =3D res->a6;
+> +	cpu_reg(ctxt, 7) =3D res->a7;
 
-No, this really should default to 0, and 0 being treated as "no limit
-other than the architectural one", as per the architecture spec.
+=46rom DEN0028G 2.6:
 
->=20
->  	ret =3D kvm_vgic_dist_init(kvm, dist->nr_spis);
->  	if (ret)
-> @@ -433,6 +434,7 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
->  	kfree(dist->spis);
->  	dist->spis =3D NULL;
->  	dist->nr_spis =3D 0;
-> +	dist->nr_lpis =3D 0;
->  	dist->vgic_dist_base =3D VGIC_ADDR_UNDEF;
->=20
->  	if (dist->vgic_model =3D=3D KVM_DEV_TYPE_ARM_VGIC_V3) {
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
-s.c
-> index 534049c7c94b..c770eadc5188 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -1047,7 +1047,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm=
-, struct vgic_its *its,
->  	else
->  		lpi_nr =3D event_id;
->  	if (lpi_nr < GIC_LPI_OFFSET ||
-> -	    lpi_nr >=3D max_lpis_propbaser(kvm->arch.vgic.propbaser))
-> +	    lpi_nr >=3D max_lpis_propbaser(kvm->arch.vgic.propbaser) ||
-> +	    lpi_nr >=3D GIC_LPI_OFFSET + kvm->arch.vgic.nr_lpis)
->  		return E_ITS_MAPTI_PHYSICALID_OOR;
->=20
->  	/* If there is an existing mapping, behavior is UNPREDICTABLE. */
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgi=
-c-mmio-v3.c
-> index ae4c0593d114..224d0d88c823 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -81,6 +81,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_=
-vcpu *vcpu,
->  		if (vgic_has_its(vcpu->kvm)) {
->  			value |=3D (INTERRUPT_ID_BITS_ITS - 1) << 19;
->  			value |=3D GICD_TYPER_LPIS;
-> +			value |=3D (ilog2(vgic->nr_lpis) - 1) << 11;
->  		} else {
->  			value |=3D (INTERRUPT_ID_BITS_SPIS - 1) << 19;
->  		}
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 4349084cb9a6..e11792dafcdf 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -16,6 +16,7 @@
->=20
->  #define INTERRUPT_ID_BITS_SPIS	10
->  #define INTERRUPT_ID_BITS_ITS	16
-> +#define INTERRUPT_NUM_LPIS	14
->  #define VGIC_LPI_MAX_INTID	((1 << INTERRUPT_ID_BITS_ITS) - 1)
->  #define VGIC_PRI_BITS		5
->=20
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 4a34f7f0a864..b637dc9460d9 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -296,6 +296,7 @@ struct vgic_dist {
->  	 * else.
->  	 */
->  	struct its_vm		its_vm;
-> +	int			nr_lpis;
->  };
->=20
-> However=EF=BC=8Cmigration between different KVMs will be broken :(
-> I am not sure that should we consider this case as well?
+<quote>
+Registers W4-W7 must be preserved unless they contain results, as
+specified in the function definition.
+</quote>
 
-This isn't optional. You cannot break migration on existing systems,
-and the only case that *must* break is to restore a VM that hasn't
-seen this limitation on a HW that enforces it.
+On what grounds can you blindly change these registers?
 
-Thanks,
+> +
+> +	/*
+> +	 * DEN0028C 2.6: SMC32/HVC32 call from aarch64 must preserve x8-x30.
+> +	 *
+> +	 * The most straightforward approach is to look at the function ID
+> +	 * sent by the caller. However, the caller could send FFA_MSG_WAIT
+> +	 * which is a 32-bit interface but the reply could very well be 64-bit
+> +	 * such as FFA_FN64_MSG_SEND_DIRECT_REQ or FFA_MSG_SEND_DIRECT_REQ2.
+> +	 *
+> +	 * Instead, we could look at the function ID in the response (a0) but
+> +	 * that doesn't work either as FFA_VERSION responses put the version
+> +	 * number (or error code) in w0.
+> +	 *
+> +	 * Set x8-x17 iff response contains 64-bit function ID in a0.
+> +	 */
+> +	if (func_id !=3D FFA_VERSION && ARM_SMCCC_IS_64(res->a0)) {
+> +		cpu_reg(ctxt, 8) =3D res->a8;
+> +		cpu_reg(ctxt, 9) =3D res->a9;
+> +		cpu_reg(ctxt, 10) =3D res->a10;
+> +		cpu_reg(ctxt, 11) =3D res->a11;
+> +		cpu_reg(ctxt, 12) =3D res->a12;
+> +		cpu_reg(ctxt, 13) =3D res->a13;
+> +		cpu_reg(ctxt, 14) =3D res->a14;
+> +		cpu_reg(ctxt, 15) =3D res->a15;
+> +		cpu_reg(ctxt, 16) =3D res->a16;
+> +		cpu_reg(ctxt, 17) =3D res->a17;
+> +	}
+>  }
+
+I don't see how that can ever work.
+
+Irrespective of how FFA_MSG_WAIT actually works (and I couldn't find
+anything in the spec that supports the above), the requester will
+fully expect its registers to be preserved based on the initial
+function type, and that alone. No ifs, no buts.
+
+If what you describe can happen (please provide a convincing example),
+then the spec is doomed.
 
 	M.
 
