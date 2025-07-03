@@ -1,127 +1,274 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D631D299A85;
-	Thu,  3 Jul 2025 10:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5785924B26
+	for <kvmarm@lists.linux.dev>; Thu,  3 Jul 2025 10:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751537274; cv=none; b=swqyKp94LPu/nqSrYQecGZSB3jzu6EGJG68/khicFIgNokv/F6EwQVjFRGKNuBkemF/c53ZUfejumCQVjsiRh6HwR8A/g88VzdYrUBSaJs+EckaFgjEDlfTHwwWhg0ZTE72Axmm1mYLWsfs9b02jCv/Sba2cGDcZ3k/YHqVuG64=
+	t=1751539454; cv=none; b=FbAiy381PE7dZu/hR7IPGF5IzNPm+U3QiL5yaLfIJx17MijTOo5HeuCT5QH1aGUsxf5AlO7eQlIEmxl1lE1NddjvS79AojE3WKQ+jJ6nk/FL1E+wjsTMx3ARKKISjmjldpYJf1m4FsQCCN4GWwFku/Ach2XaJ6NeW+pTyKkJbaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751537274; c=relaxed/simple;
-	bh=F/OkyKp+J6DRlUl/QwnUYqH016WngjOoTrYbS5ddsoQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IR/cSXpuL5iFmiiTyWva7XNanXXkA9rvtkaBJqBQgCvJMgFLfYA+afp+sg6DyftRrN32paW6wsPBJxWFQRRqDDrUNtfuX8gvVOSXQ1ip+b8w1S5f7V+j0wKkbSu9J0IXf+wKNZ8d5nc3er9uYgcVj1WIDf/Kk2624AC7kJRttks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tDh6RQ+G; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751539454; c=relaxed/simple;
+	bh=3yKG6GVto6Q8McY6qTvWdt7LhY+zG3Z8PYTQ98/hf4s=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ntLhTquUXnidQ3QQccewRknsWVj8AQrMNLRwufYcHow5eRIQeq4oK6BGvdo44oAfehNMJDrG8aJhCC0qiCBoNjjCNxe4u68DXoOQ9Rp8JeWLK/3ItnCYcivJwix0gk77bZVjTODlSqKtJOa7PBi6PkLBhbLjNI+Lu7lPHmRTnVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oy8noB17; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tDh6RQ+G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C768C4CEE3;
-	Thu,  3 Jul 2025 10:07:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oy8noB17"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2870C4CEE3;
+	Thu,  3 Jul 2025 10:44:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751537274;
-	bh=F/OkyKp+J6DRlUl/QwnUYqH016WngjOoTrYbS5ddsoQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=tDh6RQ+GnEb9Sr0A2319xxm6TfoOJdpr7LZSry7gSyoC0W4p6dWv4Zm4BENSOuXFi
-	 KQ4Tx+ww3cqm3iQ164Hn2fgEBYpUCCEGPxCtxCDXRO7/6nWoSbcWnu6y2f9Rt83vkR
-	 k+lw27QX1lE+Xkne73cGPepo5yIkj6feNwBM3OMmAIs/gE18xQdOPZzOwmLqfwH3Jr
-	 nyu24tIUiltzyHMAflxlkQpwFMGGTgokSh2nN1YWmoRxZWaaF5y4+AHNyijIPqfZCF
-	 lsxHJ5+mA2ab5XkG0WgNxstfx4qhxUzt0y7etKXi9nyR9921sjcqUDUcO686EgdBwJ
-	 toQFGmfiWRxSA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1751539453;
+	bh=3yKG6GVto6Q8McY6qTvWdt7LhY+zG3Z8PYTQ98/hf4s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oy8noB177HGbDejapW18F2KrmGcs7wP2vkd7AkkgRnrRtUTt10paZr+Rq/cmoT6wS
+	 f+zvjtvsiSJP5yZYMCiRNw4mU2JIrMtMV/9+/wNmA6FoN3ZnFE+H/D03+WJ4gAV7F2
+	 SqxaDJymmIf5epTrCFKs7HYqhAG+I8UW4/3qZPNi7Mcp6M6hSwLRivoHJtsOyYVOMq
+	 Xhzr+5fTUG6cNd+u2+YRL9wS6V80dTH8pzDHcD+THJyYus0iye+mAW0p8giwtkSjyi
+	 v2wVXD6iWHzvmQd6Hf9XyEDRd+8Xw1vWrR574wvfp1Q64ZADAKCLMyctcD/il2y6PD
+	 EM11bGANmuxIQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uXGpD-00CG4L-Q0;
-	Thu, 03 Jul 2025 11:07:51 +0100
+	id 1uXHQJ-00CH07-JP;
+	Thu, 03 Jul 2025 11:44:11 +0100
+Date: Thu, 03 Jul 2025 11:44:11 +0100
+Message-ID: <864ivtbll0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
+To: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.16, take #5
-Date: Thu,  3 Jul 2025 11:05:44 +0100
-Message-Id: <20250703100544.947908-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Catalin Marinas <catalin.marinas@arm.com>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<tangnianyao@huawei.com>,
+	<wangwudi@hisilicon.com>
+Subject: Re: [PATCH] ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200803
+In-Reply-To: <ffd3fccc-af4a-6667-3cf6-a55e866f3057@hisilicon.com>
+References: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
+	<86wm8ybpk5.wl-maz@kernel.org>
+	<0b54db94-8a6f-cea0-a6f7-dbe8650d66dd@hisilicon.com>
+	<86h5zwba5i.wl-maz@kernel.org>
+	<ffd3fccc-af4a-6667-3cf6-a55e866f3057@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, catalin.marinas@arm.com, tabba@google.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, tangnianyao@huawei.com, wangwudi@hisilicon.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+On Wed, 02 Jul 2025 10:57:13 +0100,
+Zhou Wang <wangzhou1@hisilicon.com> wrote:
+>=20
+> On 2025/7/1 16:14, Marc Zyngier wrote:
+> > On Fri, 27 Jun 2025 07:36:31 +0100,
+> > Zhou Wang <wangzhou1@hisilicon.com> wrote:
+> >>
+> >> On 2025/6/26 21:27, Marc Zyngier wrote:
+> >>> On Thu, 26 Jun 2025 13:41:42 +0100,
+> >>> Zhou Wang <wangzhou1@hisilicon.com> wrote:
+> >>>>
+> >>>> For GICv4.0 of Hip10 and Hip10C, it has a SoC bug with vPE schedule:
+> >>>> when multiple vPEs are sending vpe schedule/deschedule commands
+> >>>> concurrently and repeatedly, some vPE schedule command may not be
+> >>>> scheduled, and it will cause the command timeout.
+> >>>>
+> >>>> The hardware implementation is that there is one GIC hardware in one=
+ CPU die,
+> >>>> which handles all vPE schedule operations one by one in all CPUs of =
+this die.
+> >>>> The bug is that if the number of queued vPE schedule operations is m=
+ore
+> >>>> than a certain value, the last vPE schedule operation will be lost.
+> >>>>
+> >>>> One possible way to solve this problem is to limit the number of vLP=
+Is, so
+> >>>> the hardware could spend less time to scan virtual pending table whe=
+n it
+> >>>> handles the vPE schedule operations, so the queued vPE schedule oper=
+ations
+> >>>> will never be more than above certain value.
+> >>>>
+> >>>> Given the number of CPUs of die, and imagine there is 100 vPE schedu=
+le
+> >>>> operations per second one CPU, it can be calculated that we can limit
+> >>>> the number of vLPI to 4096 for virtual machine to avoid the issue.
+> >>>>
+> >>>> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> >>>> ---
+> >>>>  Documentation/arch/arm64/silicon-errata.rst |  2 ++
+> >>>>  arch/arm64/Kconfig                          | 12 ++++++++++++
+> >>>>  arch/arm64/include/asm/cputype.h            |  4 ++++
+> >>>>  arch/arm64/kernel/cpu_errata.c              | 15 +++++++++++++++
+> >>>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c          |  5 +++++
+> >>>>  arch/arm64/tools/cpucaps                    |  1 +
+> >>>>  include/linux/irqchip/arm-gic-v3.h          |  1 +
+> >>>>  7 files changed, 40 insertions(+)
+> >>>>
+> >>>
+> >>> [...]
+> >>>
+> >>>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgi=
+c/vgic-mmio-v3.c
+> >>>> index ae4c0593d114..495a56e9dc4b 100644
+> >>>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >>>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >>>> @@ -81,6 +81,11 @@ static unsigned long vgic_mmio_read_v3_misc(struc=
+t kvm_vcpu *vcpu,
+> >>>>  		if (vgic_has_its(vcpu->kvm)) {
+> >>>>  			value |=3D (INTERRUPT_ID_BITS_ITS - 1) << 19;
+> >>>>  			value |=3D GICD_TYPER_LPIS;
+> >>>> +			/* Limit the number of vlpis to 4096 */
+> >>>> +			if (cpus_have_final_cap(ARM64_WORKAROUND_HISI_162200803) &&
+> >>>> +			    kvm_vgic_global_state.has_gicv4 &&
+> >>>> +			    !kvm_vgic_global_state.has_gicv4_1)
+> >>>> +				value |=3D 11 << GICD_TYPER_NUM_LPIS_SHIFT;
+> >>>
+> >>> This really doesn't solve your problem. Yes, the guest *may* honor
+> >>> this limit. But KVM doesn't care and will happily allocate 2^16 vLPIs
+> >>> if the guest asks -- there is no code enforcing this limit.
+> >>
+> >> Hi Marc,
+> >>
+> >> I am not sure if there is any other place guest can ask vLPI over
+> >> the limitation except for MAPTI/MAPT below?
+> >>
+> >>> And even if we did. What would we do on a MAPTI command that tries to
+> >>> map a vLPI outside of the allowed range? Do we need to tell the guest
+> >>> it has screwed up?
+> >>
+> >> Thanks for pointing this. Yes, we miss the lpi_nr checking in vgic_its=
+_cmd_handle_mapi.
+> >> In fact, the fix of this errata introduces the usage of GICD.num_LPI,
+> >> so we need make related logic right as well.
+> >=20
+> > Exactly.
+> >=20
+> >>
+> >> I am not sure that if we could add related checking for lpi_nr in MAPT=
+I/MAPI
+> >> as part of this errata fix, or we should add the basic support for
+> >> GICD.num_LPI before adding this errata?
+> >=20
+> > You definitely need to handle that before allowing such limit to be
+> > enforced. Which also means allowing the limit to be saved/restored
+> > from userspace in order to support migration.
+>=20
+> Seems that in KVM we do not consider GICD_TYPER in migration.
 
-The one-fixes-PR-per-week trend continues, with ever decreasing levels
-of severity.
+What do you mean by that?
 
-This time, we drop some leftovers from past fixes, removing the EL1 S1
-mapping of the host FPSIMD state, and stop advertising bogus S2 base
-granule sizes to the guest.
+Today, we don't support anything being written to GICD_TYPER, just
+like on a HW implementation. If you want it to be writable from
+userspace (and I think you do), then it needs to be added.
 
-I expect you will bundle this with the kvmarm-fixes-6.16-4 PR from
-last week.
+> How about making GICD_TYPER.num_LPIs as a default configuration,
+> when KVM version is same between source and destination during
+> migration, the logic is still right.
 
-Please pull,
+The default configuration should be that GICD_TYPERR.num_LPIs is 0,
+indicating that the hypervisor doesn't limit anything at all.
+
+>
+> Something like:
+>=20
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-i=
+nit.c
+> index eb1205654ac8..2071b1445b22 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -385,6 +385,7 @@ int vgic_init(struct kvm *kvm)
+>  	/* freeze the number of spis */
+>  	if (!dist->nr_spis)
+>  		dist->nr_spis =3D VGIC_NR_IRQS_LEGACY - VGIC_NR_PRIVATE_IRQS;
+> +	dist->nr_lpis =3D 2 ^ (INTERRUPT_NUM_LPIS + 1);
+
+No, this really should default to 0, and 0 being treated as "no limit
+other than the architectural one", as per the architecture spec.
+
+>=20
+>  	ret =3D kvm_vgic_dist_init(kvm, dist->nr_spis);
+>  	if (ret)
+> @@ -433,6 +434,7 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+>  	kfree(dist->spis);
+>  	dist->spis =3D NULL;
+>  	dist->nr_spis =3D 0;
+> +	dist->nr_lpis =3D 0;
+>  	dist->vgic_dist_base =3D VGIC_ADDR_UNDEF;
+>=20
+>  	if (dist->vgic_model =3D=3D KVM_DEV_TYPE_ARM_VGIC_V3) {
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
+s.c
+> index 534049c7c94b..c770eadc5188 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -1047,7 +1047,8 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm=
+, struct vgic_its *its,
+>  	else
+>  		lpi_nr =3D event_id;
+>  	if (lpi_nr < GIC_LPI_OFFSET ||
+> -	    lpi_nr >=3D max_lpis_propbaser(kvm->arch.vgic.propbaser))
+> +	    lpi_nr >=3D max_lpis_propbaser(kvm->arch.vgic.propbaser) ||
+> +	    lpi_nr >=3D GIC_LPI_OFFSET + kvm->arch.vgic.nr_lpis)
+>  		return E_ITS_MAPTI_PHYSICALID_OOR;
+>=20
+>  	/* If there is an existing mapping, behavior is UNPREDICTABLE. */
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgi=
+c-mmio-v3.c
+> index ae4c0593d114..224d0d88c823 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -81,6 +81,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_=
+vcpu *vcpu,
+>  		if (vgic_has_its(vcpu->kvm)) {
+>  			value |=3D (INTERRUPT_ID_BITS_ITS - 1) << 19;
+>  			value |=3D GICD_TYPER_LPIS;
+> +			value |=3D (ilog2(vgic->nr_lpis) - 1) << 11;
+>  		} else {
+>  			value |=3D (INTERRUPT_ID_BITS_SPIS - 1) << 19;
+>  		}
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 4349084cb9a6..e11792dafcdf 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -16,6 +16,7 @@
+>=20
+>  #define INTERRUPT_ID_BITS_SPIS	10
+>  #define INTERRUPT_ID_BITS_ITS	16
+> +#define INTERRUPT_NUM_LPIS	14
+>  #define VGIC_LPI_MAX_INTID	((1 << INTERRUPT_ID_BITS_ITS) - 1)
+>  #define VGIC_PRI_BITS		5
+>=20
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 4a34f7f0a864..b637dc9460d9 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -296,6 +296,7 @@ struct vgic_dist {
+>  	 * else.
+>  	 */
+>  	struct its_vm		its_vm;
+> +	int			nr_lpis;
+>  };
+>=20
+> However=EF=BC=8Cmigration between different KVMs will be broken :(
+> I am not sure that should we consider this case as well?
+
+This isn't optional. You cannot break migration on existing systems,
+and the only case that *must* break is to restore a VM that hasn't
+seen this limitation on a HW that enforces it.
+
+Thanks,
 
 	M.
 
-Marc Zyngier (1):
-  KVM: arm64: Fix handling of FEAT_GTG for unimplemented granule sizes
-
-Mark Rutland (1):
-  KVM: arm64: Remove kvm_arch_vcpu_run_map_fp()
-
- arch/arm64/include/asm/kvm_host.h |  1 -
- arch/arm64/kvm/arm.c              |  4 ----
- arch/arm64/kvm/fpsimd.c           | 26 --------------------------
- arch/arm64/kvm/nested.c           | 26 +++++++++++++++++++++++---
- 4 files changed, 23 insertions(+), 34 deletions(-)
-
--- 
-2.39.2
-
-The following changes since commit 0e02219f9cf4f0c0aa3dbf3c820e6612bf3f0c8c:
-
-  KVM: arm64: Don't free hyp pages with pKVM on GICv2 (2025-06-26 11:39:15 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.16-5
-
-for you to fetch changes up to 42ce432522a17685f5a84529de49e555477c0a1f:
-
-  KVM: arm64: Remove kvm_arch_vcpu_run_map_fp() (2025-07-03 10:39:24 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.16, take #
-
-- Remove the last leftovers from the ill-fated FPSIMD host state
-  mapping at EL2 stage-1
-
-- Fix unexpected advertisement to the guest of unimplemented S2 base
-  granule sizes
-
-----------------------------------------------------------------
-Marc Zyngier (1):
-      KVM: arm64: Fix handling of FEAT_GTG for unimplemented granule sizes
-
-Mark Rutland (1):
-      KVM: arm64: Remove kvm_arch_vcpu_run_map_fp()
-
- arch/arm64/include/asm/kvm_host.h |  1 -
- arch/arm64/kvm/arm.c              |  4 ----
- arch/arm64/kvm/fpsimd.c           | 26 --------------------------
- arch/arm64/kvm/nested.c           | 26 +++++++++++++++++++++++---
- 4 files changed, 23 insertions(+), 34 deletions(-)
+--=20
+Without deviation from the norm, progress is not possible.
