@@ -1,120 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBB02550BA;
-	Thu,  3 Jul 2025 16:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57B625A2C6;
+	Thu,  3 Jul 2025 18:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751560017; cv=none; b=nnlsyNGcjzqmPlowdHZDGfiGMwjmJDH1cJvBbp6PCNTB7uaB1biXYhHIZajfFbMc0TDnXO9c9w1w9ovPGHdsbxLnyI3wNlqMoqb77fqZQQj6rqKhaUbWtrF2abhUQ/vOqwKg+sXVR12mQJ6jkJACB4qHPSGLk3XvuSL1LIqIk7o=
+	t=1751565802; cv=none; b=WhESsL2mQipfxrIGXq8VEDt9/Mu/i6l2x7CJUHjpBhSvMza/GqCV0/LPTmRBz2TZkgcG6D0yXa1dtY/smtZXOBlp9Gjitg3SNWRxSW/Q2j1m8pgBIeixTfilfveOrVr/zXA3F8fzOtW6WmMoKmy5njaseejeAVDr+pzGEYSr9ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751560017; c=relaxed/simple;
-	bh=0se/eq+gWDDz/zPGLfe64NetxynymgwpyPlKXYP8XIU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TRcCSWFJybUQIbCzOy3ZrmrDXtqxlSbUs/QRebW9ATKsjNU5UVoLXsaEamHlRhaQE52jJ+F/UaxUl/SEhUZNZJhk0jB2iuM+7PjVSuBgP8L9HcoCzZppBykxQvJ/ZalbbOsqtimh46AtfyFDLurVZUBb/AMHCOb4KAeGY0TID+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F9xYnMul; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751565802; c=relaxed/simple;
+	bh=DAlQxIcteaDn8QOHRzwZvy79winbFs5xEUAf0FyF0aw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QRxQfJSQHpMW4VMPfeNfr2q6qe7u74qqBNAx4xUoZnOwkjghPCUeyFsrgNylt7Pef7mzPTWHJNmrHUDXuwwX+KXWRLfdkPeCPWQ1zHydwzqxgP2/skGI/+NA2l81XxTl+slpAs+Flo/RlqVbDsMm2AsWjgrDTR3kOqn2MQ/5ess=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WDbd9qqu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F9xYnMul"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57858C4CEE3;
-	Thu,  3 Jul 2025 16:26:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WDbd9qqu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C95AAC4CEE3;
+	Thu,  3 Jul 2025 18:03:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751560015;
-	bh=0se/eq+gWDDz/zPGLfe64NetxynymgwpyPlKXYP8XIU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=F9xYnMulVuNGNvAGTBMpLlkUdOXV29MzVXEe033VuqVu/tGe+RWsJngzdz4IffUZF
-	 TlFfr0OzdjCXXzY5GuscScdCqMN4WdRq00y7yQ79g33zU0CeoS7fDu5zmWPpovhul5
-	 ZpqA/v/ijUwmYLGzJmt8RMJ2UuKToISDuzKDPkyqtBjsZ0ev9agFlQ4yyBi80TBfV+
-	 c9pcjON/ohz7/AITWDxJYIcAcipay9tALB0V3775LUsr27Z0zso2ElZBpm547GWVvL
-	 /Seqd/LMJsI+P9t4/SG/wnc32xVf9Rwn8YlZIaCiUv6D0bP+sqI5ZeiRE+LEbZPRwp
-	 cUgjf2kBSiWFA==
+	s=k20201202; t=1751565802;
+	bh=DAlQxIcteaDn8QOHRzwZvy79winbFs5xEUAf0FyF0aw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WDbd9qquuPLQ/EAUpln2smNPbxdrJ3tuUba8ONxsrbhMpdG/wrPKE29RjfbT84y8W
+	 wuQXP9hwff4X73xRuO6IWbzDVYI3hX/GTvsNJl5BXvlvPTMJwIppkiNib7uF8EdAgD
+	 jyDBtCmfRFvLyQxgSl0t1Z0Ze5UQyQqpSLMZjn+eebnyZuVEKbeXjNqZAH/FQG5vGm
+	 48aJVBD62eB0H8PxRK9DoGOXEPCOCUv36abG/uZwkawxyCR5IwFlOJzSwvn+n0t3Mh
+	 VFU0RO4QYYAK0ajkKCt556ks2Yf6OUH3hnT2L+cFTTJikcJajjFcAVUiExcd+YMRj+
+	 B9IeeM2LItFqw==
+Date: Thu, 3 Jul 2025 19:03:12 +0100
 From: Mark Brown <broonie@kernel.org>
-Date: Thu, 03 Jul 2025 17:23:24 +0100
-Subject: [PATCH v2 3/3] kselftest/arm64: Add lsfe to the hwcaps test
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v6 18/28] KVM: arm64: Support SME priority registers
+Message-ID: <3ada3079-6f01-41d5-927f-afbbd57d934b@sirena.org.uk>
+References: <20250625-kvm-arm64-sme-v6-0-114cff4ffe04@kernel.org>
+ <20250625-kvm-arm64-sme-v6-18-114cff4ffe04@kernel.org>
+ <86o6u6c2qg.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250703-arm64-lsfe-v2-3-eced80999cb4@kernel.org>
-References: <20250703-arm64-lsfe-v2-0-eced80999cb4@kernel.org>
-In-Reply-To: <20250703-arm64-lsfe-v2-0-eced80999cb4@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
- linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-cff91
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1403; i=broonie@kernel.org;
- h=from:subject:message-id; bh=0se/eq+gWDDz/zPGLfe64NetxynymgwpyPlKXYP8XIU=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoZq9DrX1z69CleuGaYuiPYfm4x17/sToCyk2zP
- Nm99VorSU2JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaGavQwAKCRAk1otyXVSH
- 0LtRB/45/MTmfubRL3pBtMgXgWZMq82PR/jkn5ACdHwS7IGViT7FD2ZmgEzsylFTLDfTmP4bjqb
- pbVkdOsCSZJylYyOKBy6J9aDXd7tjwVYbfLr1jFUylvwqe2j5aZ27QCwhe1PC+DOzTvNkqEzvEB
- UIUPledQkbmnZJXMySkE4RVNqUaTB8ws5T8BGrQjz+ncH0gVf+yZfXpkdxiXetLZ4QTqNj1FjDR
- ip9vM1mAiEyMlpLqJeNt0L/XcFLEWNFVgOO78k+oVlAMlESket+6r99C6oAxaBjOv9nmGxTRVCw
- 0i3NukLDRtFDCW/v6+sTv43stjBooDOAlxzXewZLYPF/ko5z
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pjNON9hcckQNbems"
+Content-Disposition: inline
+In-Reply-To: <86o6u6c2qg.wl-maz@kernel.org>
+X-Cookie: Uh-oh!!  I'm having TOO MUCH FUN!!
 
-This feature has no traps associated with it so the SIGILL is not reliable.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/abi/hwcap.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+--pjNON9hcckQNbems
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-index 35f521e5f41c..faa0f82f27e0 100644
---- a/tools/testing/selftests/arm64/abi/hwcap.c
-+++ b/tools/testing/selftests/arm64/abi/hwcap.c
-@@ -17,6 +17,8 @@
- #include <asm/sigcontext.h>
- #include <asm/unistd.h>
- 
-+#include <linux/auxvec.h>
-+
- #include "../../kselftest.h"
- 
- #define TESTS_PER_HWCAP 3
-@@ -165,6 +167,18 @@ static void lse128_sigill(void)
- 		     : "cc", "memory");
- }
- 
-+static void lsfe_sigill(void)
-+{
-+	float __attribute__ ((aligned (16))) mem = 0;
-+	register float *memp asm ("x0") = &mem;
-+
-+	/* LDFADD H0, H0, [X0] */
-+	asm volatile(".inst 0x7c200000"
-+		     : "+r" (memp)
-+		     :
-+		     : "cc", "memory");
-+}
-+
- static void lut_sigill(void)
- {
- 	/* LUTI2 V0.16B, { V0.16B }, V[0] */
-@@ -758,6 +772,13 @@ static const struct hwcap_data {
- 		.cpuinfo = "lse128",
- 		.sigill_fn = lse128_sigill,
- 	},
-+	{
-+		.name = "LSFE",
-+		.at_hwcap = AT_HWCAP3,
-+		.hwcap_bit = HWCAP3_LSFE,
-+		.cpuinfo = "lsfe",
-+		.sigill_fn = lsfe_sigill,
-+	},
- 	{
- 		.name = "LUT",
- 		.at_hwcap = AT_HWCAP2,
+On Sun, Jun 29, 2025 at 10:32:23AM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
--- 
-2.39.5
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -495,6 +495,7 @@ enum vcpu_sysreg {
+> >  	SVCR,
+> >  	FPMR,
+> >  	SMIDR_EL1,	/* Streaming Mode Identification Register */
+> > +	SMPRI_EL1,	/* Streaming Mode Priority Register */
 
+> What is the point of making the sysreg file larger for the sole
+> purpose of returning a value that is firmly always 0? Can't that be
+> synthesised on the fly whenever needed?
+
+This was patterned of what you'd done with SVCR, I'd formed the
+impression that the idea was that for registers that really exist like
+this one it was more robust and less code to set them up in the sysreg
+file and have everything look standard than do custom handling.  That
+case was a bit different as the arch FP code needs a variable to point
+at, I'll remove this and synthesise instead.
+
+> > +	EL2_REG_FILTERED(SMPRIMAP_EL2, trap_raz_wi, reset_val, 0,
+> > +			 sme_el2_visibility),
+
+> Wut??? You clearly said it yourself: this register "has no specific
+> traps available". If you end-up here from a guest access, this is a
+> bug. So this "trap_raz_wi" makes no sense.
+
+I see, so the callback should be NULL?  Access to the register will get
+trapped as part of the general trapping of EL2 access by a NV hypervisor
+so it wasn't clear to me that that we shouldn't have the handling.
+
+> I also cannot see where this register is properly configured to be
+> fully RES0, as it should.
+
+Me either now that you point it out, thanks.
+
+--pjNON9hcckQNbems
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmhmxd8ACgkQJNaLcl1U
+h9Cnigf9FOTIvLzH7nW4Ne5KezFk5Oy7PnPYWnqdug2uCPZ/c0vKArSLFLGgbaQC
+LNFKKt/Ki9NPakD73zenb2iRfQHst2Z/XNgHqvDVczgNsuJx4BVX5hsObCeIKdrj
+RCTmY9X9Jb4b6lHsM/BH6pEIysEYRA8zj5+KbHhi5vm9EgAoq6um6H1kW2kCEUXb
+10We2nKb5cHNobBonc54HhAgxOpEM52E+dE9MdDa9SoUWwKBzzaJHTv6FRIHomJN
+EhsF7DLO6ovjqOaXBLj9tGalSO4xXR+EPQdJSmhExqjSywYoQP0S6ncSlwwS0PdG
+W7906Lv0olpdyCLF/Cav9KCU4YU9AA==
+=/1vV
+-----END PGP SIGNATURE-----
+
+--pjNON9hcckQNbems--
