@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8436A156677
-	for <kvmarm@lists.linux.dev>; Fri,  4 Jul 2025 14:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1713E13BC0C
+	for <kvmarm@lists.linux.dev>; Fri,  4 Jul 2025 14:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751638175; cv=none; b=DWPFdJdk0iteoQ1KlkIquWDBV5/XcIEMW85Qf+68gMx/1L+YpRxV7RuFhqqzZ3zkyB+Yur98VB5cI/JB39lTyP4ujxfF2VrnaYaoUdq56I8ZbrtdG4MYzuKvLANlhjr/36gtRV4FQWmGa1dymQYSN/CFwQF9ttlb++NdbMYd0CA=
+	t=1751638240; cv=none; b=Bxvw3rhH2VVqpXiYsXVtjkaJYRyEj69AhbWPJT331ytZHxjL365vXqoUR2tIpTa+7Xa809fejS0JQLEtqlJ17FjZFVRA+201OlL9f2QVhlI4V+F4cq0NMWTuE5c2cPeEtzMJWIt7F5MDEUnonKY/zPexL/HsR0ienhY3YqfV0yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751638175; c=relaxed/simple;
-	bh=A6RBquJ08q+b65DHW+EnJEmaNBWoi7Aak/3WJ7xL7og=;
+	s=arc-20240116; t=1751638240; c=relaxed/simple;
+	bh=K6UHyJ8mrsEWqVNA8naSIk/yZTHQsZ2kPB2X5TAsiyM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RmOsubVWecUU0eosU0fIRheE8ZEYtDwLUWb/vAd01AHugJja/OP+jeKnT9N2wBHaTZ45TkFRTMbu5MaLM/gPLMQZYtR6ICknC4zL4H57Y46w1m2GI1m9Wm/36rYDPangTmTqjgNGnb2QSqZaee8uJjxP3aT6IwTaLm74ze5Ow6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ARyHvwE5; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=rr77YA8sNFy5Xbl03+r1+OmhiD+wQZhxfTN+u1SEjmuY2EYbavLIs0hnYbxp0um9Sf/tCMjYIOwSAlcgeZbXk5mBe6IrFRBcempiP9Fx0simrPCTLkYgMOHPa+eUdXexkj7huuPVKfZnDRh9QIErnGkbwTeu8/QlOC4IjA5Urv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VCXImboa; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ARyHvwE5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VCXImboa"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751638172;
+	s=mimecast20190719; t=1751638235;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nt7xUyaSY2bwlKzrDx5dkOnSZrDMwc3BRrdM7IQmPSg=;
-	b=ARyHvwE5G5jkmUhq7NoiJgjNdYWz8tVOKtrRiLqu+O2gZqshRgztgAK0eFXNT7+7N1QxnS
-	Z6Q+lHEbI+QcVWjqp3DwoB0HsoP0i4fXXihLWjzLbAGtytXRmjuab5RzuLsoR0XF6k406x
-	sJ84h3mZvyt1+rUotzoXErfNtWu6ubI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=xf17P1YALsimhDT+/HwyPfAob6T0qJHwLHeouZenqkI=;
+	b=VCXImboaWeLzwW0ZJv5IdytfajfM72IKMkQXSQxrgFm2N8sbxpoAZ+9Dr2C8yLh57JMi0R
+	DP4bTOdV6NXJ1cxOrYp5cwqgu0jTYVwWyR/tIGCvYuDS7ftW5uCd0dPYFh2tV91HTInif/
+	oQIUBrq2UD3Q7L3SRZgCOrTPkr0gWDg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-3PWrdkJkOdeTHlq7mYKNHw-1; Fri, 04 Jul 2025 10:09:31 -0400
-X-MC-Unique: 3PWrdkJkOdeTHlq7mYKNHw-1
-X-Mimecast-MFC-AGG-ID: 3PWrdkJkOdeTHlq7mYKNHw_1751638170
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a4f6ba526eso663577f8f.1
-        for <kvmarm@lists.linux.dev>; Fri, 04 Jul 2025 07:09:31 -0700 (PDT)
+ us-mta-632-gKlR1YMNMlKwMgGhCpFU-w-1; Fri, 04 Jul 2025 10:10:34 -0400
+X-MC-Unique: gKlR1YMNMlKwMgGhCpFU-w-1
+X-Mimecast-MFC-AGG-ID: gKlR1YMNMlKwMgGhCpFU-w_1751638234
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-454b907e338so937745e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 04 Jul 2025 07:10:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751638170; x=1752242970;
+        d=1e100.net; s=20230601; t=1751638233; x=1752243033;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=nt7xUyaSY2bwlKzrDx5dkOnSZrDMwc3BRrdM7IQmPSg=;
-        b=nB4DgWLhpNMwFMP8y7ImtFi/V7jSXICLiqlYBLofxBVKvSj8HdgZch5LEf580Drosz
-         +YfxaYMF97fSMDmrwwS3cOOhmbNFc4k/AnQqZDvme+7esPPxnT+s9gJnFR5bZzhiu3iq
-         z/U1/C5x5Bnrkn3tfFPp/8U5q2CnZ3WYxN5pSzAopcAbmVnMxjPelePZr4HWDj659m7B
-         avU0Tmy0ov5S+6pL7XwK7QTxVnCJhfxKvxIemN58VxfGXbv4OaTrp1BYJ5LeO972zSoJ
-         EYC3AM0esG9Dy3QBpVOC+L2xqFUmlyFPcXrnpfnKzx7+4Ycbg5jIDl9rB0pGyJHAorDz
-         CYEA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+a7PgE4iEl7QQpRHpNoduwhljXrKgWFdLBtXGpzE6hNs5zTGCMUfmPf9Zsv4pJFckA52xMKo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YznzklWz/n3hFpJdxAQEfbO/5eiaO4chdvpiwzqROlO2O7MwI9Z
-	fonBRNKBmnsxr/cM+hLhmkhocJOoO4vlduxtR8Asg+hjI53BSC54psAL2NdEkgHGB8LV+Cj8kfL
-	5t+eb0WKgYHy35rmmQYUOKhRZ9NsvdEERsLPU7I5A6wHy99mG130PYLbkwg==
-X-Gm-Gg: ASbGnctD+m9/Nu5gLIhVrsW0dO4WyCkGw+s27D8bqkFj9g7pZEHe6SiL7IBBRr1Cogt
-	DGb6R7nTyIFOjzQk8yknWsWRAQRdJIL1Kiapb9K7Ytact1EYOihWIuJXXN4GkIjJOIEGkkVkMho
-	m42ZMQ7Ojageb+zf497o/yUPLdXAXIWaI0gppUD9S1Qeek0Jwj1VChRmPArZIyDCrWbryyd4ZIJ
-	/GzA/7R2pC4J4lJ+o0dalNqWfNdP5t97/kUcP/x4t80yiUUi5MDMWsH2JKthB60+0hdQOMGGfv1
-	WtFqN1XkebH4dTVVpwHmJm9AmSaA9DPeSR4DZdLuFwxgELKn43pp6oAWsV96pzgVj2zneErk9nN
-	UObCRplmVBybCpqLhtzY97FCU8QCimLbAe2baEYeubaHQ228=
-X-Received: by 2002:a5d:584c:0:b0:3a4:e68e:d33c with SMTP id ffacd0b85a97d-3b49661da3fmr2465482f8f.47.1751638169935;
-        Fri, 04 Jul 2025 07:09:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHyZaHm3cvEEMqssF8essbFIJLOElulWn/9VcRsQbLa7wt2W+gUgffDY85V2Xx5K0zPawIpyw==
-X-Received: by 2002:a5d:584c:0:b0:3a4:e68e:d33c with SMTP id ffacd0b85a97d-3b49661da3fmr2465397f8f.47.1751638169344;
-        Fri, 04 Jul 2025 07:09:29 -0700 (PDT)
+        bh=xf17P1YALsimhDT+/HwyPfAob6T0qJHwLHeouZenqkI=;
+        b=jyp7qf77Ilgn6f5sbm1Mx8WokkfI+Jvc7Li/NvRfhaIILgTGao7bUoTH/LqAzp5JOl
+         nPeMDGNT1zZHFICiw6QBvSpC07xRloaAOgh3ZZdpV5ZtD6O7Va3WNgSj+j/aOOnzMFqO
+         HS62XVySozC6ND2779nkBxe5UDwo2F17f3jqM+br/C9VOa3UmotWO77Zis6YfE7Sg830
+         Ih5kWd8OkhvrJBaW0rUUjgRaFHJ+8voDLmSUhPGCrW9FlBILQXjbRvUdJUH8AN1l19Ut
+         Xh8t1HgVNeD08mjp/a50FJbD/peSaMf+uHVKDarUAz614uYf3Vq7FW/O9iZ26DV1oUE9
+         tLxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVyUOp2Wt5cngikuwBBp5cm0ShArP8cuzu1y6+zgxfyc1tGPW6N5eDHInJ+k8v0VEW1Ur2V3ag=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz3P3P8gAURJmJPbPsbDgVkE2VvvhzVAehJKbd3qYan1oYl1uiJ
+	iJj56B8CzxM2Hy0hPzT45L4DxBQlXex1my4ivqzmuP4g035mSDGNmKq1kmMWwy6iyDb3SJavgiU
+	tikH5U7QhAvHptSM7OHsmUanOXW6G7MWPzzUmnhaYnsZyoszsFmDBCyr05Q==
+X-Gm-Gg: ASbGncu5dvfC7rOTRzwzvwJEF3XTcht5RRJm8kJg4Qw6TrapVZk01y34DHbtVLQs7GA
+	M8STfJGFNPQctB7qaOg5GwCZGwcxZPuObi91Veaf7nmiYR75+qjVBh8H1SDSNUOkaiOug/ne/u6
+	JQyulo15HrlI3lEHhQ7Fp7xpQEwTaM100blszKQThs1sXWZooQ2ZKh1NoQ2z82BsVsrAU+SfQg8
+	aqEb6V9eUWApR2sTVriIR0+eqHd05ASbcj9cAE1Iq3rz6ieHIX5zNekb9dpKRrnvcAjCjEVV5Z1
+	Nal81B48hHw/qZSEfzzJQ7Vb3jjO98UE1Yip9QN/bugqOevxjSlLJS/5emNgkHurYOowZXluaPn
+	yMI+ZvBpjc9fSv243ALEgZGB2uDkt7cbAonjkOoyfuowCUvc=
+X-Received: by 2002:a05:600c:3ba5:b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-454b3b8a45emr27030705e9.27.1751638233337;
+        Fri, 04 Jul 2025 07:10:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHsqbZf4RF6qO+LIbhyPLm8ae++HUsMG9OIMJY26dMAgU/68GqU2/mlOykgqK3yE46NGChe4g==
+X-Received: by 2002:a05:600c:3ba5:b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-454b3b8a45emr27029925e9.27.1751638232755;
+        Fri, 04 Jul 2025 07:10:32 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f2c:5500:988:23f9:faa0:7232? (p200300d82f2c5500098823f9faa07232.dip0.t-ipconnect.de. [2003:d8:2f2c:5500:988:23f9:faa0:7232])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454b16865c2sm27363175e9.19.2025.07.04.07.09.27
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a997ae2esm56138585e9.9.2025.07.04.07.10.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jul 2025 07:09:28 -0700 (PDT)
-Message-ID: <9c45c671-9330-493f-9a8b-2c08062ea0f9@redhat.com>
-Date: Fri, 4 Jul 2025 16:09:26 +0200
+        Fri, 04 Jul 2025 07:10:32 -0700 (PDT)
+Message-ID: <7ccee3be-6438-462d-8dce-efa58238f28d@redhat.com>
+Date: Fri, 4 Jul 2025 16:10:30 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,7 +75,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 3/6] KVM: arm64: Block cacheable PFNMAP mapping
+Subject: Re: [PATCH v9 4/6] KVM: arm64: New function to determine hardware
+ cache management support
 To: ankita@nvidia.com, jgg@nvidia.com, maz@kernel.org,
  oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
  yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
@@ -92,7 +93,7 @@ Cc: aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
  kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, maobibo@loongson.cn
 References: <20250621042111.3992-1-ankita@nvidia.com>
- <20250621042111.3992-4-ankita@nvidia.com>
+ <20250621042111.3992-5-ankita@nvidia.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -139,9 +140,9 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250621042111.3992-4-ankita@nvidia.com>
+In-Reply-To: <20250621042111.3992-5-ankita@nvidia.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: xfBO2zgHsdS_lCTFBZay8xvrNAjtSEZ94WNKB9Pyy38_1751638170
+X-Mimecast-MFC-PROC-ID: P5muCcQj-7IQ0nBMSSWaMF-IZyVVZd7eoLesYW0EjRY_1751638234
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -150,24 +151,30 @@ Content-Transfer-Encoding: 7bit
 On 21.06.25 06:21, ankita@nvidia.com wrote:
 > From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> Fixes a security bug due to mismatched attributes between S1 and
-> S2 mapping.
+> VM_PFNMAP VMA's are allowed to contain PTE's which point to physical
+> addresses that does not have a struct page and may not be in the kernel
+> direct map.
 > 
-> Currently, it is possible for a region to be cacheable in the userspace
-> VMA, but mapped non cached in S2. This creates a potential issue where
-> the VMM may sanitize cacheable memory across VMs using cacheable stores,
-> ensuring it is zeroed. However, if KVM subsequently assigns this memory
-> to a VM as uncached, the VM could end up accessing stale, non-zeroed data
-> from a previous VM, leading to unintended data exposure. This is a security
-> risk.
+> However ARM64 KVM relies on a simple conversion from physaddr to a
+> kernel virtual address when it does cache maintenance as the CMO
+> instructions work on virtual addresses. This simple approach does not
+> work for physical addresses from VM_PFNMAP since those addresses may
+> not have a kernel virtual address, or it may be difficult to find it.
 > 
-> Block such mismatch attributes case by returning EINVAL when userspace
-> try to map PFNMAP cacheable. Only allow NORMAL_NC and DEVICE_*.
+> Fortunately if the ARM64 CPU has two features, S2FWB and CACHE DIC,
+> then KVM no longer needs to do cache flushing and NOP's all the
+> CMOs. This has the effect of no longer requiring a KVA for addresses
+> mapped into the S2.
 > 
-> CC: Oliver Upton <oliver.upton@linux.dev>
-> CC: Catalin Marinas <catalin.marinas@arm.com>
-> CC: Sean Christopherson <seanjc@google.com>
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Add a new function, kvm_arch_supports_cacheable_pfnmap(), to report
+> this capability. From a core prespective it means the arch can accept
+> a cachable VM_PFNMAP as a memslot. From an ARM64 perspective it means
+> that no KVA is required.
+> 
+> CC: Jason Gunthorpe <jgg@nvidia.com>
+> CC: David Hildenbrand <david@redhat.com>
+> CC: Donald Dutile <ddutile@redhat.com>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 > Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
 
