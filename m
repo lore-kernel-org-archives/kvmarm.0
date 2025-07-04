@@ -1,85 +1,88 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5CC260571
-	for <kvmarm@lists.linux.dev>; Fri,  4 Jul 2025 06:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698DD28AB0B
+	for <kvmarm@lists.linux.dev>; Fri,  4 Jul 2025 08:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751611486; cv=none; b=UuL6shkALhYBwZVUFxpfsB6qKkROs0zhnAZFKfYLtpkvsyNmDE8xYUswE3iiPi9VWmtZdiEh9xxoLnz4c2NMVWvkNygh3f5Aud1mo/YsueV4zVfheJTyPoZ/wXc1yUgrxF1Gmq0BsEywBBDbhysHHkhlsKU8VeWf42Vl03tz+gc=
+	t=1751618505; cv=none; b=cEr7PT1w4fKLWM2DtDqVdVNoZmdrJlGDDmWIwmE9DxRGpWFlEG2NihdOJVE5gUlghWbfzzHhgAi/7c0RRKVbkC5lj6tc0whccvfnzPGYDP5eSUk+FfKm0maTrdMefF7b7KzxMZw4mU5gFjJvKUssVMdbdPeznZbmcFYEv/caWiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751611486; c=relaxed/simple;
-	bh=4jqv/tFlSpCT9VBH8J464fArP8r5d9j/6sOOfWltQDo=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=DZV9bE+NGCXapwlGIN1xS/gPhIDZa6E0toTlM8+hFKVPHLXU+VcmAPKlbWhHugHymDxJQhoi2Rg5kRPnB4P+J836A2lOF03gym/IT7+VsbpIOudqh/ImgwABEM9O2Oos0QXxid1dcISGOOo/RdBRl91TPi6Z1ko0f36DvAXdSOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bYPG45GX2z2BdVd;
-	Fri,  4 Jul 2025 14:42:52 +0800 (CST)
-Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
-	by mail.maildlp.com (Postfix) with ESMTPS id F24791A016C;
-	Fri,  4 Jul 2025 14:44:40 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 4 Jul 2025 14:44:39 +0800
-Subject: Re: [PATCH 1/2] KVM: arm64: Fix enforcement of upper bound on
- MDCR_EL2.HPMN
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<yury.norov@gmail.com>, <linux@rasmusvillemoes.dk>,
-	<linux-kernel@vger.kernel.org>, <james.morse@arm.com>,
-	<stable@vger.kernel.org>
-References: <20250703135729.1807517-1-ben.horgan@arm.com>
- <20250703135729.1807517-2-ben.horgan@arm.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <ca3054b2-b053-3859-a992-09499809d4d4@huawei.com>
-Date: Fri, 4 Jul 2025 14:44:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	s=arc-20240116; t=1751618505; c=relaxed/simple;
+	bh=VOhSiAByamiB4oyTFHmBRwHSEfNL0guqyPCopBjK9Nw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z6PeZ4jP1MTC2q1e4j2QiGW3wqo6RfW++rbNYDNCqoAmdmstHZfS9CEyw8mBP3wgD8i15J7W4Hd9jKsgtI/npJ+C+nA/cohaUM27XN4CQnH1K6LD0gghpDxW6H3HgvK6as5XNPyMsYAIJli+ZyOEzoiBMHxKahksqYMWQgafzE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q7128TEG; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q7128TEG"
+Date: Fri, 4 Jul 2025 10:41:37 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751618501;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0nXKe78bJmwzJOAxzdkpWlH9hViLj7pZKD4QXBLZx/k=;
+	b=Q7128TEGQ2hcKvCx4yEy1Ahh3+yoiOVqN3TXOpexskc2XR+3JlQvpFTMJORpSn787fKPIK
+	ftl3NIwUqWE2TSzITeOG3myzVnDI9sE5cF3F1uacBZAaGUzzo9cNxASQ1HMVng2Mnk1DD0
+	Sbajc7oU/LN3U5XrBduq3ev575Q8MoA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, pbonzini@redhat.com, 
+	eric.auger@redhat.com, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, david@redhat.com, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 0/2] scripts: extra_params rework
+Message-ID: <20250704-d2d19c247731e5252e9c700e@orel>
+References: <20250625154354.27015-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20250703135729.1807517-2-ben.horgan@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemk200017.china.huawei.com (7.202.194.83)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625154354.27015-1-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 2025/7/3 21:57, Ben Horgan wrote:
-> Previously, u64_replace_bits() was used to no effect as the return value
-> was ignored. Convert to u64p_replace_bits() so the value is updated in
-> place.
+On Wed, Jun 25, 2025 at 04:43:52PM +0100, Alexandru Elisei wrote:
+> This series was split from the series that adds support to use kvmtool when
+> using the scripts to run the tests [1]. kvmtool will be supported only for arm
+> and arm64, as they are the only architectures that compile the tests to run with
+> kvmtool.
 > 
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> Fixes: efff9dd2fee7 ("KVM: arm64: Handle out-of-bound write to MDCR_EL2.HPMN")
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-> ---
->  arch/arm64/kvm/sys_regs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The justification for these changes is to be able to introduce
+> kvmtool_params for kvmtool specific command line options, and to make a
+> clear distinction between the qemu options and the kvmtool options. This is
+> why qemu_params was added as a replacement for extra_params. extra_params
+> was kept for compatibility purposes for user's custom test definitions.
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 76c2f0da821f..c20bd6f21e60 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2624,7 +2624,7 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
->  	 */
->  	if (hpmn > vcpu->kvm->arch.nr_pmu_counters) {
->  		hpmn = vcpu->kvm->arch.nr_pmu_counters;
-> -		u64_replace_bits(val, hpmn, MDCR_EL2_HPMN);
-> +		u64p_replace_bits(&val, hpmn, MDCR_EL2_HPMN);
->  	}
->  
->  	__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
+> To avoid duplication of the arguments that are passed to a test's main()
+> function, test_args has been split from qemu_params. The same test_args
+> will be used by both qemu and kvmtool.
+> 
+> [1] https://lore.kernel.org/kvm/20250507151256.167769-1-alexandru.elisei@arm.com/
+> 
+> Alexandru Elisei (2):
+>   scripts: unittests.cfg: Rename 'extra_params' to 'qemu_params'
+>   scripts: Add 'test_args' test definition parameter
+> 
+>  arm/unittests.cfg     |  94 ++++++++++++++----------
+>  docs/unittests.txt    |  30 +++++---
+>  powerpc/unittests.cfg |  21 +++---
+>  riscv/unittests.cfg   |   2 +-
+>  s390x/unittests.cfg   |  53 +++++++-------
+>  scripts/common.bash   |  16 +++--
+>  scripts/runtime.bash  |  24 ++++---
+>  x86/unittests.cfg     | 164 ++++++++++++++++++++++++------------------
+>  8 files changed, 237 insertions(+), 167 deletions(-)
+> 
+> 
+> base-commit: 507612326c9417b6330b91f7931678a4c6866395
+> -- 
+> 2.50.0
+>
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-
-Thanks!
+Merged. Thanks
