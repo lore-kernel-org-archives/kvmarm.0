@@ -1,42 +1,74 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B931DF75B
-	for <kvmarm@lists.linux.dev>; Mon,  7 Jul 2025 16:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D5F18035
+	for <kvmarm@lists.linux.dev>; Mon,  7 Jul 2025 16:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751904799; cv=none; b=m6N1paO4MxCa9/6ksWJRFR16rblHbYH+D0gmJXio6BnBTivfQvUkt8KGe8oeM333+v4QeWZyZazOQL7d/tLhGp7BjvyjRx36IDEGb+f9s4orYxOoCfgEBVD9CagWhOInod7HxjPlKSYTJUODEUFDh0tbCWff8cUfZ0WLv9Vjp9g=
+	t=1751905887; cv=none; b=nFo/HOnBuKgRFsK04Q3NuYUb5pReYhMrE4c1RIb/V0rkhv3fuM+BmVxwxb1Nj7F2FZE/OIvH2Gji1hHwsvlpIxQjc4RRLZU+h63qkWaaQk2CbRDXGzNXKO3UcSgJmXbPahLRNYHiz3Ck9065nHt74FUVWliizpjt7lFxAJEJGHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751904799; c=relaxed/simple;
-	bh=RSfPX5OlM5EPwWYG9glTngNgWsvp+E2YSiuIqQJ6RuY=;
+	s=arc-20240116; t=1751905887; c=relaxed/simple;
+	bh=CTGTIMfddBoIpV0RuG6mIYxA9hlfuIrcvXHD4cWlliI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ENM7xmgD+6rK28VsN//au7Vdbu21KQ+rwENQSWqXdsF0215aKeUTyvJDudHm7FojiXmImy7konIlwwGr+Xd4s+E1UzbQq0sf5rAZefkcRR8DVfobn5MOc1iwuhH7ESvIK0EYS60XPcK4E5oFP3mZVXXdhoC++KsV9+vt/MaCNEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30B30168F;
-	Mon,  7 Jul 2025 09:13:04 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E71B83F694;
-	Mon,  7 Jul 2025 09:13:12 -0700 (PDT)
-Date: Mon, 7 Jul 2025 17:13:10 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Shuah Khan <shuah@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 04/22] KVM: arm64: Cleanup PMU includes
-Message-ID: <aGvyFiyEEsMrhN0i@J2N7QTR9R3>
-References: <20250626200459.1153955-1-coltonlewis@google.com>
- <20250626200459.1153955-5-coltonlewis@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SeIpEvUyFLqDbDubUxJFXdoOntAQBpE90YDz4pO0FzbLQoYqStDU/7Mdozsig4KOQOGbrU2CZO0pjPiETB0ew8ZrNV2EMYaRpfCdqWeMgEE3/nmGqu53W6xgxh5F5V/O8l1B8+aE2EhAbGCJObQrNIfVZPm1AnnhB80JnXtloBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZNHNZ76x; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZNHNZ76x"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-749068b9b63so1955019b3a.0
+        for <kvmarm@lists.linux.dev>; Mon, 07 Jul 2025 09:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751905885; x=1752510685; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T65upEdCDY7gEQSF7YmZBvbMiIUrTEJa2opQbxpVZOA=;
+        b=ZNHNZ76xBNYS3+fyXEx8j//tqEy3/MVPn7jBDVUrsjpiYJq0BS4H50Je5qtPz1TzbS
+         cr98zKluPMF7VA5aN4M1j0MNS29XJ80bdWxVwEzlEPG+rfpfeSuxxNEqhwZxIugM/UG5
+         f0/SZJNXgE6mvlAK7izEptY2n2Ae75OMfpo2O/eOf550CeS5oQnCi+cWTSoqE3empRGv
+         bMX8MS5nEsV5x75sTBfCeyJQDvTAyn4dsOfxy6RNiuQ7NErUw7GAu4B8VDjIA9/Im3TA
+         7JTP2ReefNLX7uUtOlZVOU/boa9g3c+UkTpMMP+MODj3fn6ablz3ykoxj71/m5z8JLY0
+         hdnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751905885; x=1752510685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T65upEdCDY7gEQSF7YmZBvbMiIUrTEJa2opQbxpVZOA=;
+        b=wkBFIv6aDl+leZlC61iAAduZpUzbOe4DQ6m9LMkFoeLYt6gVsYMI6vSAvhUSsSowqg
+         5bO/WsYGhdwtb7nP4JNBdf7nvGyANXt3SNwlW0PJgR+lAyjgxV+6PjIurblBVUWHkTAb
+         /lnaqyetRw4zlAV70oECGatVNzhNhuWzOq2ey7uSzSu+rAaEvgjhQRt6qCMUImfV0VoP
+         PX538ja8Flej+hnu4YaV/g3vZIrwDfohHxyE5fbT7C7fJYYYuq11BStu67kI0IPBgM4f
+         tnsut5yNlnIkB/zjJs++foVXJMJhK4QV0KYuLwE3hh99FJROBvpzLE+vEdp0gUokv6X5
+         aLoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGcKD3nIz/ey0npvdNfonlSxQzV6p8xggA5q9LQLXATJl64Qo61V0fEcHBy53gpSxwIlr/jp4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyxN+4oP+NMrODHQ8ybDEp06wMLfO+BnlDkXishwv/SiVDaQDN8
+	vClBVXsls2ICCJqtTRb+b7Htq4/fJZ2YfgtyYSLvWx8YFIXd5x6ANSWCEvAHlw==
+X-Gm-Gg: ASbGncuCGLAIpaaJrVwYTMhXV4f5fNAFHinJP6P+owB4quW9uQeVWEzJfPynOrJ0U06
+	kBZ4NqTCrrjEoC7QhaJHTtLOdiybv8oDWolTiyqrz5AB9h3kfdnje+v4mBlA7WPBf23uR7qM2gT
+	/ZIYacATAj9Fuv1yWmRXOKj8f1yOTYkQlxGcnDi9tuqvJWwL+pcy2yKy1XFzYVG5AttfLYxLiWH
+	pQGQKHtK03/UWhkQtiEFNKwxv3b6pOZPZcw5dTIv0QMFvcRlngOYy9SJX5AZXL7+2VgYgnMvCKi
+	cqqlb7gLLp51ZS1wUR8oHG1UYmWVwi2HeG0x8lSW5ExVQy7avEE/RLYEnMvXSA==
+X-Google-Smtp-Source: AGHT+IE9LUw0GOAkRdv3EbKLvPJ2vN2Wm1zWt6kB2645lDr4uxnf9kEor2mDWupUMMQ9E1c4bRBisg==
+X-Received: by 2002:a05:6a00:2409:b0:749:112:c172 with SMTP id d2e1a72fcca58-74cf6fd8194mr11055113b3a.16.1751905885276;
+        Mon, 07 Jul 2025 09:31:25 -0700 (PDT)
+Received: from localhost ([216.228.127.130])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce417f765sm9231493b3a.75.2025.07.07.09.31.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jul 2025 09:31:24 -0700 (PDT)
+Date: Mon, 7 Jul 2025 12:31:22 -0400
+From: Yury Norov <yury.norov@gmail.com>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux@rasmusvillemoes.dk,
+	linux-kernel@vger.kernel.org, james.morse@arm.com
+Subject: Re: [PATCH 2/2] bitfield: Ensure the return value of
+ type##_replace_bits() is checked
+Message-ID: <aGv2WoAtxnEgqV4y@yury>
+References: <20250703135729.1807517-1-ben.horgan@arm.com>
+ <20250703135729.1807517-3-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,225 +77,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250626200459.1153955-5-coltonlewis@google.com>
+In-Reply-To: <20250703135729.1807517-3-ben.horgan@arm.com>
 
-On Thu, Jun 26, 2025 at 08:04:40PM +0000, Colton Lewis wrote:
-> From: Marc Zyngier <maz@kernel.org>
+Hi Ben,
+
+On Thu, Jul 03, 2025 at 02:57:29PM +0100, Ben Horgan wrote:
+> As type##_replace_bits() has no side effects it is only useful if its
+> return value is checked. Add __must_check to enforce this usage. To have
+> the bits replaced in-place typep##_replace_bits() can be used instead.
 > 
-> Reorganize these tangled headers.
-
-In prior versions of this series, there was some earlier text explaining that
-there was a circular header dependency. In v2:
-
-  https://lore.kernel.org/linux-arm-kernel/20250620221326.1261128-6-coltonlewis@google.com/
-
-... it said:
-
-| asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
-| which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
-| causes compilation problems why trying to use anything defined in any
-| of the headers in any other headers.
-
-Was there some reason for dropping that? It's a bit odd to start without a
-problem statement.
-
-> 
-> * Respect the move defining the interface between KVM and PMU in its
->   own header asm/kvm_pmu.h
-> 
-> * Define an empty struct arm_pmu so it is defined for those interface
->   functions when compiling with CONFIG_KVM but not CONFIG_ARM_PMU
-
-Which functions in particular are those? What prevents them from depending on
-CONFIG_ARM_PMU?
-
-Mark.
-
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 > ---
->  arch/arm64/include/asm/arm_pmuv3.h      |  2 +-
->  arch/arm64/include/asm/kvm_host.h       | 15 +--------------
->  arch/arm64/include/asm/kvm_pmu.h        | 15 +++++++++++++++
->  arch/arm64/kvm/debug.c                  |  1 +
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  1 +
->  arch/arm64/kvm/pmu.c                    |  2 ++
->  arch/arm64/kvm/sys_regs.c               |  1 +
->  include/linux/perf/arm_pmu.h            |  5 +++++
->  virt/kvm/kvm_main.c                     |  1 +
->  9 files changed, 28 insertions(+), 15 deletions(-)
+>  include/linux/bitfield.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
-> index 8a777dec8d88..32c003a7b810 100644
-> --- a/arch/arm64/include/asm/arm_pmuv3.h
-> +++ b/arch/arm64/include/asm/arm_pmuv3.h
-> @@ -6,7 +6,7 @@
->  #ifndef __ASM_PMUV3_H
->  #define __ASM_PMUV3_H
->  
-> -#include <asm/kvm_host.h>
-> +#include <asm/kvm_pmu.h>
->  
->  #include <asm/cpufeature.h>
->  #include <asm/sysreg.h>
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 27ed26bd4381..2df76689381a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -14,6 +14,7 @@
->  #include <linux/arm-smccc.h>
->  #include <linux/bitmap.h>
->  #include <linux/types.h>
-> +#include <linux/irq_work.h>
->  #include <linux/jump_label.h>
->  #include <linux/kvm_types.h>
->  #include <linux/maple_tree.h>
-> @@ -1487,25 +1488,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
->  
-> -static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
-> -{
-> -	return (!has_vhe() && attr->exclude_host);
-> -}
-> -
->  #ifdef CONFIG_KVM
-> -void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
-> -void kvm_clr_pmu_events(u64 clr);
-> -bool kvm_set_pmuserenr(u64 val);
->  void kvm_enable_trbe(void);
->  void kvm_disable_trbe(void);
->  void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
->  #else
-> -static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
-> -static inline void kvm_clr_pmu_events(u64 clr) {}
-> -static inline bool kvm_set_pmuserenr(u64 val)
-> -{
-> -	return false;
-> -}
->  static inline void kvm_enable_trbe(void) {}
->  static inline void kvm_disable_trbe(void) {}
->  static inline void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest) {}
-> diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
-> index baf028d19dfc..ad3247b46838 100644
-> --- a/arch/arm64/include/asm/kvm_pmu.h
-> +++ b/arch/arm64/include/asm/kvm_pmu.h
-> @@ -11,9 +11,15 @@
->  #include <linux/kvm_types.h>
->  #include <linux/perf_event.h>
->  #include <linux/perf/arm_pmuv3.h>
-> +#include <linux/perf/arm_pmu.h>
->  
->  #define KVM_ARMV8_PMU_MAX_COUNTERS	32
->  
-> +#define kvm_pmu_counter_deferred(attr)			\
-> +	({						\
-> +		!has_vhe() && (attr)->exclude_host;	\
-> +	})
-> +
->  #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
->  struct kvm_pmc {
->  	u8 idx;	/* index into the pmu->pmc array */
-> @@ -68,6 +74,9 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
->  int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
->  
->  struct kvm_pmu_events *kvm_get_pmu_events(void);
-> +void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
-> +void kvm_clr_pmu_events(u64 clr);
-> +bool kvm_set_pmuserenr(u64 val);
->  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_pmu_resync_el0(void);
-> @@ -161,6 +170,12 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->  
->  #define kvm_vcpu_has_pmu(vcpu)		({ false; })
->  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
-> +static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
-> +static inline void kvm_clr_pmu_events(u64 clr) {}
-> +static inline bool kvm_set_pmuserenr(u64 val)
-> +{
-> +	return false;
-> +}
->  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_vcpu_reload_pmu(struct kvm_vcpu *vcpu) {}
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 1a7dab333f55..a554c3e368dc 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -9,6 +9,7 @@
->  
->  #include <linux/kvm_host.h>
->  #include <linux/hw_breakpoint.h>
-> +#include <linux/perf/arm_pmuv3.h>
->  
->  #include <asm/debug-monitors.h>
->  #include <asm/kvm_asm.h>
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 7599844908c0..825b81749972 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -14,6 +14,7 @@
->  #include <linux/kvm_host.h>
->  #include <linux/types.h>
->  #include <linux/jump_label.h>
-> +#include <linux/perf/arm_pmuv3.h>
->  #include <uapi/linux/psci.h>
->  
->  #include <asm/barrier.h>
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index 6b48a3d16d0d..8bfc6b0a85f6 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
-> @@ -8,6 +8,8 @@
->  #include <linux/perf/arm_pmu.h>
->  #include <linux/perf/arm_pmuv3.h>
->  
-> +#include <asm/kvm_pmu.h>
-> +
->  static DEFINE_PER_CPU(struct kvm_pmu_events, kvm_pmu_events);
->  
->  /*
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 99fdbe174202..eaff6d63ef77 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -18,6 +18,7 @@
->  #include <linux/printk.h>
->  #include <linux/uaccess.h>
->  #include <linux/irqchip/arm-gic-v3.h>
-> +#include <linux/perf/arm_pmuv3.h>
->  
->  #include <asm/arm_pmuv3.h>
->  #include <asm/cacheflush.h>
-> diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
-> index 6dc5e0cd76ca..fb382bcd4f4b 100644
-> --- a/include/linux/perf/arm_pmu.h
-> +++ b/include/linux/perf/arm_pmu.h
-> @@ -187,6 +187,11 @@ void armpmu_free_irq(int irq, int cpu);
->  
->  #define ARMV8_PMU_PDEV_NAME "armv8-pmu"
->  
-> +#else
-> +
-> +struct arm_pmu {
-> +};
-> +
->  #endif /* CONFIG_ARM_PMU */
->  
->  #define ARMV8_SPE_PDEV_NAME "arm,spe-v1"
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e2f6344256ce..25259fcf3115 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -48,6 +48,7 @@
->  #include <linux/lockdep.h>
->  #include <linux/kthread.h>
->  #include <linux/suspend.h>
-> +#include <linux/perf_event.h>
->  
->  #include <asm/processor.h>
->  #include <asm/ioctl.h>
-> -- 
-> 2.50.0.727.gbf7dc18ff4-goog
-> 
+> diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
+> index 6d9a53db54b6..39333b80d22b 100644
+> --- a/include/linux/bitfield.h
+> +++ b/include/linux/bitfield.h
+> @@ -195,8 +195,8 @@ static __always_inline __##type type##_encode_bits(base v, base field)	\
+>  		__field_overflow();					\
+>  	return to((v & field_mask(field)) * field_multiplier(field));	\
+>  }									\
+> -static __always_inline __##type type##_replace_bits(__##type old,	\
+> -					base val, base field)		\
+> +static __always_inline __##type __must_check type##_replace_bits(__##type old,	\
+> +							base val, base field)	\
+>  {									\
+>  	return (old & ~to(field)) | type##_encode_bits(val, field);	\
+>  }									\
+
+So, would it make sense to mark _encode_bits() and _get_bits() as
+__must_check as well? At least from the point of unification, it
+would.
+
+How would we move this - with my bitmap-for next or with arm branch?
+
+Thanks,
+Yury
