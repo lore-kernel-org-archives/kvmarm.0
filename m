@@ -1,117 +1,92 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EA322B8A6
-	for <kvmarm@lists.linux.dev>; Mon,  7 Jul 2025 16:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520AE23027C
+	for <kvmarm@lists.linux.dev>; Mon,  7 Jul 2025 17:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751907526; cv=none; b=ZnjkqJaWwMffBrELW6NWRpBWUVucXYAS2zOKppmdvg5jtTpYoAY267lUt1znv0nAuhCpG7JwJnBScnXjNvjDhg+kzBsueJHFqBp54cqXYSR4w3I2b12moWN6A1y1lVOZ9qexYOcxrrFZedeKH/dv8Y0ExTlbnSS4PEiq76HF6KU=
+	t=1751910275; cv=none; b=A27eemRwfmofCCTvjPJut9HCV41w2Kp/5sQD5ZJzMHTVN8CvWOuroJSywEcXNY7oaFkQTTYLgZcplMIE2pK4b22jsoOHwD9Kvgw+ikXgXpPhq5qXse8OdxlPA4wD+hmjbQ0JKDS6KX7+fMuSTCwsUjmvEy7/CeGotkz12rzi2Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751907526; c=relaxed/simple;
-	bh=lY8irBtYxVyHLKyGJiGCmG2opDnFdh+FVadST8BlZQQ=;
+	s=arc-20240116; t=1751910275; c=relaxed/simple;
+	bh=Z4N7YYE0TGBrDEbSJWXXS73BAcEH4T6haqOEU7WEqSw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IsrxdTVZKhG9Pu66bilLrt0uEcY99X/K1d1tMKcYPlMUKDDPpRAFIGtEInZdNrvMMubeGTPRmjBpkigZbJdfTSihZAleR90hY8O74Na6jz+GT84WHz6v4AMbxYzjO5IEcF5CP5YoxHDkGglxuUwe7A9k1Yv4Le9d6mZzdnGks5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 405C6168F;
-	Mon,  7 Jul 2025 09:58:32 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 093CC3F66E;
-	Mon,  7 Jul 2025 09:58:40 -0700 (PDT)
-Date: Mon, 7 Jul 2025 17:58:38 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Shuah Khan <shuah@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v3 07/22] perf: arm_pmuv3: Generalize counter bitmasks
-Message-ID: <aGv8vgrZTET0aXjQ@J2N7QTR9R3>
-References: <20250626200459.1153955-1-coltonlewis@google.com>
- <20250626200459.1153955-8-coltonlewis@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q28ROvWwx1H/ocd0igA3b2IyPu5itKvP+J0nKGWN1Q8It+OZgxcyOfI4GpI8c728p7L4G6cL3+Z5GVr75PMaxGcYw+FpiMXjYwzR+kF7H3rgZx2rotvgWjX99os7/uUXj3ZpgtHS4HJiQUfk2lYwOGY7KlDjRsEBSvsOU9dYlRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i/Yg7aZ8; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i/Yg7aZ8"
+Date: Mon, 7 Jul 2025 19:44:21 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751910267;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bDUHijd7Ti9O17zyCdhODo2Lyk368Lrbom0BpvxiUD4=;
+	b=i/Yg7aZ876/AQ5JodBsxWooLMdVJqSThZmfMA1OCDworQ2VnK/uDFy8dalHu62qiMbZByg
+	ll0gEP/g1nQD9jhQg+V+UnwI+oqPYesg1m2Do+dJs0KCu//V2luZX12094ChwH/DaEiQL0
+	uP89BFd2VAfNpUI8VzMPTIfxjcACVZ8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Jesse Taube <jesse@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, alexandru.elisei@arm.com, cleger@rivosinc.com, 
+	jamestiotio@gmail.com, Atish Patra <atishp@rivosinc.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] riscv: Add kvmtool support
+Message-ID: <20250707-cdad2acc36fb5c313042bd86@orel>
+References: <20250704151254.100351-4-andrew.jones@linux.dev>
+ <20250704151254.100351-6-andrew.jones@linux.dev>
+ <CALSpo=YKMa142xhS8KSEenBLemaK6rqYKEd3FotQtCjpV5CciQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250626200459.1153955-8-coltonlewis@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALSpo=YKMa142xhS8KSEenBLemaK6rqYKEd3FotQtCjpV5CciQ@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jun 26, 2025 at 08:04:43PM +0000, Colton Lewis wrote:
-> The OVSR bitmasks are valid for enable and interrupt registers as well as
-> overflow registers. Generalize the names.
+On Mon, Jul 07, 2025 at 08:28:30AM -0700, Jesse Taube wrote:
+> On Fri, Jul 4, 2025 at 8:13 AM Andrew Jones <andrew.jones@linux.dev> wrote:
+> >
+> > arm/arm64 supports running tests with kvmtool as a first class citizen.
+> > Most the code to do that is in the common scripts, so just add the riscv
+> > specific bits needed to allow riscv to use kvmtool as a first class
+> > citizen too.
+> >
+> > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> Reviewed-by: Jesse Taube <jesse@rivosinc.com>
 
-FWIW, this looks fine to me, so:
+Thanks!
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-
-Mark.
-
-> ---
->  drivers/perf/arm_pmuv3.c       |  4 ++--
->  include/linux/perf/arm_pmuv3.h | 14 +++++++-------
->  2 files changed, 9 insertions(+), 9 deletions(-)
+...
+> >  else
+> > -    if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
+> > +    if [ "$arch" != "arm" ] && [ "$arch" != "arm64" ] &&
+> > +       [ "$arch" != "riscv32" ] && [ "$arch" != "riscv64" ]; then
 > 
-> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> index 6358de6c9fab..3bc016afea34 100644
-> --- a/drivers/perf/arm_pmuv3.c
-> +++ b/drivers/perf/arm_pmuv3.c
-> @@ -513,7 +513,7 @@ static u64 armv8pmu_pmcr_n_read(void)
->  
->  static int armv8pmu_has_overflowed(u64 pmovsr)
->  {
-> -	return !!(pmovsr & ARMV8_PMU_OVERFLOWED_MASK);
-> +	return !!(pmovsr & ARMV8_PMU_CNT_MASK_ALL);
->  }
->  
->  static int armv8pmu_counter_has_overflowed(u64 pmnc, int idx)
-> @@ -749,7 +749,7 @@ static u64 armv8pmu_getreset_flags(void)
->  	value = read_pmovsclr();
->  
->  	/* Write to clear flags */
-> -	value &= ARMV8_PMU_OVERFLOWED_MASK;
-> +	value &= ARMV8_PMU_CNT_MASK_ALL;
->  	write_pmovsclr(value);
->  
->  	return value;
-> diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-> index d698efba28a2..fd2a34b4a64d 100644
-> --- a/include/linux/perf/arm_pmuv3.h
-> +++ b/include/linux/perf/arm_pmuv3.h
-> @@ -224,14 +224,14 @@
->  				 ARMV8_PMU_PMCR_LC | ARMV8_PMU_PMCR_LP)
->  
->  /*
-> - * PMOVSR: counters overflow flag status reg
-> + * Counter bitmask layouts for overflow, enable, and interrupts
->   */
-> -#define ARMV8_PMU_OVSR_P		GENMASK(30, 0)
-> -#define ARMV8_PMU_OVSR_C		BIT(31)
-> -#define ARMV8_PMU_OVSR_F		BIT_ULL(32) /* arm64 only */
-> -/* Mask for writable bits is both P and C fields */
-> -#define ARMV8_PMU_OVERFLOWED_MASK	(ARMV8_PMU_OVSR_P | ARMV8_PMU_OVSR_C | \
-> -					ARMV8_PMU_OVSR_F)
-> +#define ARMV8_PMU_CNT_MASK_P		GENMASK(30, 0)
-> +#define ARMV8_PMU_CNT_MASK_C		BIT(31)
-> +#define ARMV8_PMU_CNT_MASK_F		BIT_ULL(32) /* arm64 only */
-> +#define ARMV8_PMU_CNT_MASK_ALL		(ARMV8_PMU_CNT_MASK_P | \
-> +					 ARMV8_PMU_CNT_MASK_C | \
-> +					 ARMV8_PMU_CNT_MASK_F)
->  
->  /*
->   * PMXEVTYPER: Event selection reg
-> -- 
-> 2.50.0.727.gbf7dc18ff4-goog
+> Are there plans to add i386 and x86_64 too?
+
+I don't have plans myself, at least not right now, but I think it'd be
+good to do it, so it'd be great if somebody would write the patch and
+do the testing.
+
+...
+> > +       command="$(timeout_cmd) $kvmtool run"
+> > +       if ( [ "$HOST" = "riscv64" ] && [ "$ARCH" = "riscv32" ] ) ||
+> > +          ( [ "$HOST" = "riscv32" ] && [ "$ARCH" = "riscv64" ] ); then
 > 
+> Shouldn't there be a check like this on arm for when  [ "$HOST" =
+> "arm" ] && [ "$ARCH" = "aarch64" ]?
+
+arm kvm has been long deprecated and removed from Linux so we should
+actually remove any references to HOST==arm throughout the framework
+too, since it can't happen (any more).
+
+Thanks,
+drew
