@@ -1,134 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462662116E9
-	for <kvmarm@lists.linux.dev>; Mon,  7 Jul 2025 15:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DCD13EFE3
+	for <kvmarm@lists.linux.dev>; Mon,  7 Jul 2025 16:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751903840; cv=none; b=SzbX9He15/a+xOk5pkVHWiqxLRei2fYq605qIa8ncW0iFnMppN8dVT64qZ+Sy5jIDSFcmSIjwwmP21zGqtibIzLaOqjWdiK/vFOLLfYqw+adqyiw97DKpdyEBsCVKf82S4XmYTOYTWwIxsHVwhOO5RfXGPDsfkAi7zyJNq/k2/I=
+	t=1751904315; cv=none; b=SYfZN/z80SfaP6fEISOalMQ7FRdgsSi+KoUrOKIxu6Iz3/DOiA075u98nZgrCdQwqZpyPRhNNNzvhRtHs+ZRV/zhGzxmgVCG1RVqClzNd9NG837P3TH3eA4RH87vSREc1cGz3q+ojlz9ZbhGn0ICPuYSB5l2DrI3zQp8SDwtVNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751903840; c=relaxed/simple;
-	bh=cOPqcxIf5X1X2HD8wmgQa984+uwttfeDa/9MRlym0cc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l7rLN7J6xTHJdpSwfwRtBeFEL509s7eGXNGJyy65Fo5vId++Pr3PHVU/54dtzXIZ+mhZDooW6S9zrhZnSph6mewcQglUPJRtmn5fAVeaGy+Q8Sb3CFWLZZ78mZcRRqHt6ImqQmjQhAbkFrNQJXlyQF0N3t04yTpRg1U93WLDJ5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mknh5w67; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mknh5w67"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D26F7C4CEF9
-	for <kvmarm@lists.linux.dev>; Mon,  7 Jul 2025 15:57:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751903839;
-	bh=cOPqcxIf5X1X2HD8wmgQa984+uwttfeDa/9MRlym0cc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Mknh5w67+oZcvYnxfTf5SObhpeuygcV7+wQz5THrA095mP+3YluTKI25/pX/5q7md
-	 xuS3Dtw4Itai3fUbwgqBdG58BnqHNU+JrduGTPp4lf5eDfCaBb71WZbJJx6x4EzQPq
-	 fbGVoqBexCC8dpSY+SNzDZGxYBOt1j4s1HA4iPykrdk+V6wW4npZqMi5vSaMuL2r0r
-	 rDByPDjxeZ9xDGVOyexH93aEtOFtbal35NL0LYFZvnR/chJYTL4xdPCTldNi7Y9R3G
-	 w2aGrnLdc/+FYZZzESNhltUKMTtiFQhGVn7Uak8e1zEIzblSNciqmosLm4sADWhFIF
-	 tjgy7FxVeXzaA==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ae223591067so557191366b.3
-        for <kvmarm@lists.linux.dev>; Mon, 07 Jul 2025 08:57:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVsNEseoadxaC0Ns7T5vkWHxwpCRFFkyueYuzWY4RNipLMVWGTVCWk6A4mUYNBDnuLN/uWV4Zc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy88hnQTRfzrvANF8xOIezqpNQwxv4yYe1NZy7yQQqoXQpQ1WOj
-	TQHHPQi/FNshg1kKwnHVwejixgHgQzr2pvReuhkBTwJKc6s/eeGGJEXNwSZKz1FIgdXluL4v1Pr
-	T/CCakcOd3ByKHao6LeEIdbAHtRAR9Q==
-X-Google-Smtp-Source: AGHT+IGROcI/rOerYv7nZXlhWEmc4bo4VMMhzIieXt0ir3fuJoe5yHNFs/XUqQmhE3pqqxvZ92DyoWse/8P+jtjd2j0=
-X-Received: by 2002:a17:906:6a08:b0:ae3:c6a3:f833 with SMTP id
- a640c23a62f3a-ae3fbcb576amr1339358466b.23.1751903838354; Mon, 07 Jul 2025
- 08:57:18 -0700 (PDT)
+	s=arc-20240116; t=1751904315; c=relaxed/simple;
+	bh=RtFr/cqQgHAVjVm38k71NKvlszLoElaLqQn9+ycjRsI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SSfuoxxCjs+nYUJNrcyi0RTT0rIOBC53XlNscCiwu2aeSumGc5hoOq7I2KOeQkmGdBlY+5k7PRVwexKwGUOiBjBHxDtBtWLuRW+cXKGf7iL2C/qVcR5XdXaE/EJNooERjZLKkvDdMSbUvZpzKR0d7ob4msnQZRTcYqMiGEP2edA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8501C168F;
+	Mon,  7 Jul 2025 09:05:00 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 426BA3F694;
+	Mon,  7 Jul 2025 09:05:09 -0700 (PDT)
+Date: Mon, 7 Jul 2025 17:05:00 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Shuah Khan <shuah@kernel.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 01/22] arm64: cpufeature: Add cpucap for HPMN0
+Message-ID: <aGvwLIAN8rhxtA_V@J2N7QTR9R3>
+References: <20250626200459.1153955-1-coltonlewis@google.com>
+ <20250626200459.1153955-2-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250611-arm-brbe-v19-v23-0-e7775563036e@kernel.org>
- <20250611-arm-brbe-v19-v23-4-e7775563036e@kernel.org> <aGgM4Pk5dU1LXd2I@J2N7QTR9R3>
-In-Reply-To: <aGgM4Pk5dU1LXd2I@J2N7QTR9R3>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 7 Jul 2025 10:57:06 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqKPjQE99d27pBHffo=K6stT1QaaeVyeqSeRKa9m8OSmxw@mail.gmail.com>
-X-Gm-Features: Ac12FXxiERhwrk8TwYBiCk2nTj5uV-39ekDgmaoI7v4X8_oFWq7oDAhMnIvdJ90
-Message-ID: <CAL_JsqKPjQE99d27pBHffo=K6stT1QaaeVyeqSeRKa9m8OSmxw@mail.gmail.com>
-Subject: Re: [PATCH v23 4/4] perf: arm_pmuv3: Add support for the Branch
- Record Buffer Extension (BRBE)
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, James Clark <james.clark@linaro.org>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>, Leo Yan <leo.yan@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250626200459.1153955-2-coltonlewis@google.com>
 
-On Fri, Jul 4, 2025 at 12:18=E2=80=AFPM Mark Rutland <mark.rutland@arm.com>=
- wrote:
->
-> Hi Rob,
->
-> Thanks for this; I think this is in good shape now. There's a couple of
-> thing I think we should fixup, described below and diff provided at the
-> end of this mail. That aside I reckon we should apply this shortly.
->
-> Will, are you happy to apply that diff when picking this up?
->
-> On Wed, Jun 11, 2025 at 01:01:14PM -0500, Rob Herring (Arm) wrote:
-> > +/*
-> > + * BRBE is assumed to be disabled/paused on entry
-> > + */
-> > +void brbe_enable(const struct arm_pmu *arm_pmu)
-> > +{
-> > +     struct pmu_hw_events *cpuc =3D this_cpu_ptr(arm_pmu->hw_events);
-> > +     u64 brbfcr =3D 0, brbcr =3D 0;
-> > +
-> > +     /*
-> > +      * Merge the permitted branch filters of all events.
-> > +      */
-> > +     for (int i =3D 0; i < ARMPMU_MAX_HWEVENTS; i++) {
-> > +             struct perf_event *event =3D cpuc->events[i];
-> > +
-> > +             if (event && has_branch_stack(event)) {
-> > +                     brbfcr |=3D event->hw.branch_reg.config;
-> > +                     brbcr |=3D event->hw.extra_reg.config;
-> > +             }
-> > +     }
->
-> I see that in v20 you moved the brbe_invaliate() form here into
-> brbe_read_filtered_entries(), when entries are read upon an event
-> overflowing. The changelog says:
->
-> | Rework BRBE invalidation to avoid invalidating in interrupt handler
-> | when no handled events capture the branch stack (i.e. when there are
-> | multiple users).
->
-> I don't think that's quite right. Since BRBCR_ELx.FZP causes a freeze
-> BRBFCR_EL1.PAUSE to be set when *any* event overflows, not discarding
-> across an overflow or other transient disable/enable can introduce a
-> discontinuity in the branch records.
+On Thu, Jun 26, 2025 at 08:04:37PM +0000, Colton Lewis wrote:
+> Add a capability for FEAT_HPMN0, whether MDCR_EL2.HPMN can specify 0
+> counters reserved for the guest.
+> 
+> This required changing HPMN0 to an UnsignedEnum in tools/sysreg
+> because otherwise not all the appropriate macros are generated to add
+> it to arm64_cpu_capabilities_arm64_features.
 
-My thought was the discontinuity is samples from the PMU interrupt
-which we don't want to sample anyways, so better to keep samples from
-prior to the unrelated interrupt.
+I agree it's appropriate to mark ID_AA64DFR0_EL1.HPMN0 as an
+UnsignedEnum. It follows the usual ID scheme per ARM DDI 0487 L.a
+section D24.1.3, and zero means not present, so it must be unsigned.
 
-> The rationale for doing the invalidation here was to avoid the
-> possiblity of any such discontinuity, and to do so simply, at the cost
-> of discarding records in some cases where we could theoretically keep
-> them around.
+Likewise, the value renames (UNPREDICTABLE => NI and DEF => IMP) look
+fine to me.
 
-That's fine by me as well. It probably doesn't really matter much in
-practice as you would have to get 2 PMU interrupts fairly close
-together to lose samples (from before the first interrupt).
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 
->
-> I would prefer the invalidate to be performed within brbe_enable()
-> (before the actual enable/unpause), and for armv8pmu_restart() to be
-> folded back into armv8pmu_start().
->
-> I've provided a diff/fixup at the end of this reply.
+I have one minor nit below, but either way:
 
-Thanks.
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 
-Rob
+> ---
+>  arch/arm64/kernel/cpufeature.c | 8 ++++++++
+>  arch/arm64/tools/cpucaps       | 1 +
+>  arch/arm64/tools/sysreg        | 6 +++---
+>  3 files changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index b34044e20128..73a7dac4b6f6 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -548,6 +548,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
+>  };
+>  
+>  static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_HPMN0_SHIFT, 4, 0),
+>  	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
+>  	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
+>  	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
+> @@ -2896,6 +2897,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.matches = has_cpuid_feature,
+>  		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, FGT2)
+>  	},
+> +	{
+> +		.desc = "FEAT_HPMN0",
+
+Minor nit, but we can drop the "FEAT_" prefix here, for consistency with
+other features (e.g. E0PD, FPMR).
+
+Mark.
+
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.capability = ARM64_HAS_HPMN0,
+> +		.matches = has_cpuid_feature,
+> +		ARM64_CPUID_FIELDS(ID_AA64DFR0_EL1, HPMN0, IMP)
+> +	},
+>  #ifdef CONFIG_ARM64_SME
+>  	{
+>  		.desc = "Scalable Matrix Extension",
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index 10effd4cff6b..5b196ba21629 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -39,6 +39,7 @@ HAS_GIC_CPUIF_SYSREGS
+>  HAS_GIC_PRIO_MASKING
+>  HAS_GIC_PRIO_RELAXED_SYNC
+>  HAS_HCR_NV1
+> +HAS_HPMN0
+>  HAS_HCX
+>  HAS_LDAPR
+>  HAS_LPA2
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 8a8cf6874298..d29742481754 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -1531,9 +1531,9 @@ EndEnum
+>  EndSysreg
+>  
+>  Sysreg	ID_AA64DFR0_EL1	3	0	0	5	0
+> -Enum	63:60	HPMN0
+> -	0b0000	UNPREDICTABLE
+> -	0b0001	DEF
+> +UnsignedEnum	63:60	HPMN0
+> +	0b0000	NI
+> +	0b0001	IMP
+>  EndEnum
+>  UnsignedEnum	59:56	ExtTrcBuff
+>  	0b0000	NI
+> -- 
+> 2.50.0.727.gbf7dc18ff4-goog
+> 
