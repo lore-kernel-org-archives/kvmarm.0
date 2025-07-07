@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656DE3234;
-	Mon,  7 Jul 2025 00:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8620E7E9;
+	Mon,  7 Jul 2025 00:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751849510; cv=none; b=FQCN9hKqc+HHrrV40ua0Ps6SxG76hmjWbyRy7BZdD3O6eNxiiOtD4S+34jQHG8f7cWnklFacQsijxxcPZAE0hJfkn8329BS0MmOKHtItALKyeqcnQosANy5rdZ40KD05c6qsPzqEPNoVv3iKqZP7LUgj6pmYwtjlUlIiXGN7/X8=
+	t=1751849607; cv=none; b=CFGqdqYVU8lrc64/hd9LbaWRh8gNs7ZMtNzc2HcqMML/mCewpvEe+zfj7NhNjq4iGi4s7T+L+Fm6p9Tv0V+a2ZBDbNvimzDs558FSNLIlTc2ny8wOy7BjacA4XV02ohcpbRyLpg+x2fzqqvu4zKPAw5KQJAuma/B6M3o3EswzTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751849510; c=relaxed/simple;
-	bh=jv3QWzqk9Kg7w0buyaPqmhl66AbIY/3Ak6kzrH8cUx0=;
+	s=arc-20240116; t=1751849607; c=relaxed/simple;
+	bh=pc6/4pTCRoJU0680dfIylpAEX56OLE3/Ve8SK9ZY5yI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=habPWiLhXLoiYOQfGhDGWQKnndQTYvw/IydD4iAyXuMswoEXQGwPjNEkGOT82dqh2d9T1OwyTrR5ZhOhKJ28UFvobmSUB8ccvqpTpnysxIY/WJNdVWq8+p6qiz3RCloYfT0qoLstsFkt7xK1CjIL1GtNNCkAESTof90/hM8VxmE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jl7M6DK1yfBwG4ClTjUzkb9zzoUVFcWgAtDj+gGMzQObWRMhr3gYU40AL8ugbfEiNTPAQbmK8AotLVLgUR0IoHG3LMiiaWZ9OMNAMbMu3dr+V1gXW9cfGC5fGH18eedHf9QdyPptdE3e6vlC0NRrb6wfSyKSP66T5wbcjFKmXO8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA322C4CEED;
-	Mon,  7 Jul 2025 00:51:14 +0000 (UTC)
-Date: Sun, 6 Jul 2025 19:51:13 -0500
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E581AC4CEED;
+	Mon,  7 Jul 2025 00:52:51 +0000 (UTC)
+Date: Sun, 6 Jul 2025 19:52:50 -0500
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: ankita@nvidia.com
 Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
@@ -32,11 +32,11 @@ Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
 	linux-mm@kvack.org, tabba@google.com, qperret@google.com,
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, maobibo@loongson.cn
-Subject: Re: [PATCH v10 1/6] KVM: arm64: Rename the device variable to
- s2_force_noncacheable
-Message-ID: <aGsaAXt1PhltCIXo@arm.com>
+Subject: Re: [PATCH v10 2/6] KVM: arm64: Update the check to detect device
+ memory
+Message-ID: <aGsaYlZXvpU0Cngg@arm.com>
 References: <20250705071717.5062-1-ankita@nvidia.com>
- <20250705071717.5062-2-ankita@nvidia.com>
+ <20250705071717.5062-3-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,26 +45,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250705071717.5062-2-ankita@nvidia.com>
+In-Reply-To: <20250705071717.5062-3-ankita@nvidia.com>
 
-On Sat, Jul 05, 2025 at 07:17:12AM +0000, ankita@nvidia.com wrote:
+On Sat, Jul 05, 2025 at 07:17:13AM +0000, ankita@nvidia.com wrote:
 > From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> For cache maintenance on a region, ARM KVM relies on that
-> region to be mapped to the Kernal virtual address as CMOs
-> operate on VA.
+> Currently, the kvm_is_device_pfn() detects if the memory is kernel
+> mapped through pfn_is_map_memory. It thus implies whether KVM can
+> use Cache Maintenance Operations (CMOs) on that PFN. It is a bit
+> of a misnomer as it does not necessarily detect whether a PFN
+> is for a device memory. Moreover, the function is only used at
+> one place.
 > 
-> Currently the device variable is effectively trying to setup
-> the S2 mapping as non cacheable for memory regions that are
-> not mapped in the Kernel VA. This could be either device or
-> Normal_NC depending on the VM_ALLOW_ANY_UNCACHED flag in the
-> VMA.
+> It would be better to directly call pfn_is_map_memory. Moreover
+> we should restrict this call to VM_PFNMAP or VM_MIXEDMAP. Non PFMAP
+> or MIXEDMAP VMA's must always contain normal pages which are
+> struct page backed, have KVA's and are cachable. So we should always
+> be able to go from phys to KVA to do a CMO.
 > 
-> Thus "device" could be better renamed to s2_force_noncacheable
-> which implies that it is ensuring that region be mapped as
-> non-cacheable.
-> 
-> CC: Catalin Marinas <catalin.marinas@arm.com>
 > Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 > Reviewed-by: David Hildenbrand <david@redhat.com>
