@@ -1,93 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F5D1548C;
-	Tue,  8 Jul 2025 18:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86EC21A421;
+	Tue,  8 Jul 2025 18:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751997793; cv=none; b=TCYrslMjcciy/tjl0sMFlbOCLOUUg8QBpmaNx2nJqSi6ySOEt9+r4I8n8JnjQ+Rn1DO3uwSpK4scse/Fd1spUSjLPdbdBaH7L2YF/D8f51ZkMAh/P2xFzdSPMFOFDLTqxx4Na3yW5XCJD8wRfp+Q+q2ZltYx1Tk6Sj7CZqkDGnE=
+	t=1751997986; cv=none; b=lgOJPDOrh3qd4BLzGkQDGmzyPnAJ18kd9znjoflixr/o62jSp+lOBEx8yDiF7p5DsLnyXYdWyJVEUWJqBIVVrF1m4AppQzrCPmZvYqBbJmqXovb65IfrSPg8WPSjH92AqAI/z19QQHOrk2Iw2fcCzYNOF9EkwT63TfgchOZsDYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751997793; c=relaxed/simple;
-	bh=VoEolaFTJNzpKG4M2/ParplG0VvzAYfss/xgoyqHWa0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=McpmJeS536i7oNyIRSqw74ox3Jn6NdTy6z7H9GVZfM7Gs9l65FVGsGwJ5VhEfurvLrJmvpEWhvJkAVWRjIMYD/y2CwwcndMwSxnvgWeA43IDTzSfWzcS3Aw8fELsh6Y6hhkI05YWycnzzHxot9t6fqRieDTCiC2DI+kn9sfqRnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tnX7/fT6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751997986; c=relaxed/simple;
+	bh=hWwlChXBEb11tKO8NRb0DWd/PBG5TyHbgMeKqhdK9Eo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gzfPWlCqamxAlNfhfBjcTBOZprquv3qW+Fz3l7KKdbKkL4Sugkb9AO7OET8PcyLYQqj2hVSVUZj98dKpWt7OZbnS87yCDbQrQQ49dbdKQ5iwYHrRAEvtADVSys9UBraqfrPPt7Me3vq+OsMNFHeA0NunC/f1iYNVOMdiGKYM8Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F86652zL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tnX7/fT6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D53A8C4CEED;
-	Tue,  8 Jul 2025 18:03:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F86652zL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 647F3C4CEED;
+	Tue,  8 Jul 2025 18:06:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751997792;
-	bh=VoEolaFTJNzpKG4M2/ParplG0VvzAYfss/xgoyqHWa0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tnX7/fT629zWKB7jluJEr8dLn9RwRvK1aJHFo/IkmlA6aVqpfizgL7O6bZywJyLMi
-	 9SykPdXaIGfB3CgTkDfn8za3yqKwowCGsz1fk6gol3kSRiC/ZLx4bL1kxFNtTVxyXn
-	 /7c7WCEid61YOWxnhpeqjGbKIFPGs/TT5KxoIKFY6/nJrVoEou/21YnVK1B99IYufi
-	 bjfseF6L/4FDvKB/tnj+4WfGgFVO4qOWzWO1iKG6hDImJnOAUm1qSnrk47UwDPS+C0
-	 +5cRPunQW9Etyk+dXooY5gwddqOJnpS4bUesJfTLtxtOwqhLYGIhRfiCmAobgJy1DM
-	 A1D1HAIe88iPg==
-From: Will Deacon <will@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1751997986;
+	bh=hWwlChXBEb11tKO8NRb0DWd/PBG5TyHbgMeKqhdK9Eo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=F86652zLNQGa8qmrpOHaD7sstesU6ejLOcta17FuUHNOctuotgvr/k9FJIEeEJ091
+	 dhLDqnofBs7BRxv59gDfn8uJjGDRw3xTVEJ5kDFM3dcNDNLMzS+8Pd2tURJHZV2yg+
+	 dJsiT7A8TjvEDlRnon4j6zCQclgbs9+MVietSLKxxb+GbPyo6FoDnDrGmxYFc9XO7y
+	 n1f27F7oMUekoH27nRmrAKgVxtNbYqj7c1k8VrUWY1xTTD+oX6nUQT3yqUl70eEvUR
+	 Io9yaA39GBZvj9yw7YoKYqiEJGmag+k4qgaREp2z0isV0P+XxOuqsnporrCvYVfW/n
+	 Wd6E6sfakCK5g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uZCi0-00DrJu-5d;
+	Tue, 08 Jul 2025 19:06:24 +0100
+Date: Tue, 08 Jul 2025 19:06:23 +0100
+Message-ID: <86o6tua76o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Mostafa Saleh <smostafa@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@linaro.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Leo Yan <leo.yan@arm.com>,
-	"Rob Herring (Arm)" <robh@kernel.org>
-Cc: kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v23 0/4] arm64/perf: Enable branch stack sampling
-Date: Tue,  8 Jul 2025 19:02:59 +0100
-Message-Id: <175198748936.383518.12260470313437607576.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250611-arm-brbe-v19-v23-0-e7775563036e@kernel.org>
-References: <20250611-arm-brbe-v19-v23-0-e7775563036e@kernel.org>
+	kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.16, take #4
+In-Reply-To: <CABgObfZ3RepTFAMVSB4v1cmuOg+JB7LAcqx04EZui6qF3q5QtA@mail.gmail.com>
+References: <20250626152023.192347-1-maz@kernel.org>
+	<CABgObfZ3RepTFAMVSB4v1cmuOg+JB7LAcqx04EZui6qF3q5QtA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, smostafa@google.com, qperret@google.com, r09922117@csie.ntu.edu.tw, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 11 Jun 2025 13:01:10 -0500, Rob Herring (Arm) wrote:
-> This series enables perf branch stack sampling support on arm64 via a
-> v9.2 arch feature called Branch Record Buffer Extension (BRBE). Details
-> on BRBE can be found in the Arm ARM[1] chapter D18.
-> 
-> I've picked up this series from Anshuman. v19 and later versions have
-> been reworked quite a bit by Mark and myself. The bulk of those changes
-> are in patch 5.
-> 
-> [...]
+On Tue, 08 Jul 2025 15:48:01 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On Thu, Jun 26, 2025 at 5:20=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
+te:
+> >
+> > Paolo,
+> >
+> > Another week, another set of fixes. Nothing major this time: allow
+> > pKVM to fail to initialise without taking the host down, make sure we
+> > are not mapping too much in the host S2 (another pKVM special), and a
+> > brown-paper-bag quality bug fix on the nested GICv3 emulation.
+> >
+> > Please pull,
+> >
+> >         M.
+> >
+> > The following changes since commit 04c5355b2a94ff3191ce63ab035fb7f04d03=
+6869:
+> >
+> >   KVM: arm64: VHE: Centralize ISBs when returning to host (2025-06-19 1=
+3:34:59 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/=
+kvmarm-fixes-6.16-4
+>=20
+> Done now, thanks!  Note that in the meanwhile git:// is not working
+> anymore, so you probably want https:// in there.
 
-Applied to will (for-next/perf), thanks!
+Really? That's... odd. Was this announced one way or another? I can
+definitely use git:// from where I seat:
 
-[1/4] arm64/sysreg: Add BRBE registers and fields
-      https://git.kernel.org/will/c/52e4a56ab8b8
-[2/4] arm64: Handle BRBE booting requirements
-      https://git.kernel.org/will/c/ae344bcb0d49
-[3/4] KVM: arm64: nvhe: Disable branch generation in nVHE guests
-      https://git.kernel.org/will/c/d7567e9b9ba5
-[4/4] perf: arm_pmuv3: Add support for the Branch Record Buffer Extension (BRBE)
-      https://git.kernel.org/will/c/58074a0fce66
+maz@valley-girl:~/hot-poop/tmp$ git clone git://git.kernel.org/pub/scm/linu=
+x/kernel/git/kvmarm/kvmarm.git
+Cloning into 'kvmarm'...
+remote: Enumerating objects: 11127073, done.
+remote: Counting objects: 100% (142/142), done.
+remote: Compressing objects: 100% (77/77), done.
+remote: Total 11127073 (delta 92), reused 77 (delta 65), pack-reused 111269=
+31
+Receiving objects: 100% (11127073/11127073), 3.13 GiB | 21.11 MiB/s, done.
+Resolving deltas:   4% (448909/9127084)
+[...]
 
-Cheers,
--- 
-Will
+What's occurring on your side?
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
