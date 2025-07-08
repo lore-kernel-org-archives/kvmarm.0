@@ -1,32 +1,32 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE8A2E6122
-	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920902E03E0
+	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751995637; cv=none; b=b45OkHrm0qLsAqmKHrynT60rlYKFt/2DcEEAy/MYGtktjUemFOpEe8pVY3javVJQLclmxacpL4ZLvP+1aDQuSaDipQNh+voc2TBci56EHH/1hYqpGqtgQzbhg/4Y8v21Yx5SIoLFOJsYr06i/TnKflL18YVcTIsP1jlUfIWFwFY=
+	t=1751995639; cv=none; b=dxgVoC9RJsQfxTj3MadtQpug0/8ZBDQiWgniV3ErjEXQ+dU35lvXbkwuyXZRaISpdt6T3iJ5vUcxxiVh4hjA7PIqv8+7cb48T17/mQboAVLW29H/8bshRRs0OtLuafpNBakIkT2vXkJ6OEBW1CcDkORjKmAg9yTCR9hJbcKXZ6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751995637; c=relaxed/simple;
-	bh=gAv2B+C5Q46Sww9ndqCy8K509jhzUFpHl01GReTK1qo=;
+	s=arc-20240116; t=1751995639; c=relaxed/simple;
+	bh=xpZczMgAiQEUCM+B3dItqQvrzwOmtKlHHexTJgrzOu0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DuwcJJ+HDq826CbR/cBBqRnnerctUxxr7ihUvQm1ufdJOAafFqZ/B5GBx7u9bbInviDSRb8gNtiM6477p8GTBlah/GjLfKXKJQG30kf0QtUmnRqfwiLczOCXeKHoJU5K3dFEW3wLJ36CsUdXbf98wSxcfg3GyrsG6RrH6idCy+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VumgbHXn; arc=none smtp.client-ip=95.215.58.188
+	 MIME-Version; b=SO+8wY1pV7NNABdaa602NfBN/CSXhC//fozT7ONhCcIktvCXP2w4OwG8RrOPd1MI/jOF9HxAJ0vFP/vxZVQUdVFc0EXif+vDex8xoq5pTIhGByvvBh/FaYk92mWRFMOqfmS/UPbopx5wMyuKYXvvdnxO3yTDCy661I0cHxBP/Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VCSGMY18; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VumgbHXn"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VCSGMY18"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751995633;
+	t=1751995636;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4XFIRTtD8wT7h7YwqJhesIEnNkqKm80HvEpnPT+S5y8=;
-	b=VumgbHXnVCoUEZeHllLYQkB0NhwNFES4Qyfg0U1UXfgkIIUUYy7niWujuytHPkXx4GA6Nf
-	qVSQLBVPtjX5MPoVfwO+fcWrM/l1r2RimQLR4q/CbkCvmxTA5eB8NPaUto+bvLphnmAbNJ
-	VbrJaw5xRW72U52M1Kd7I7rJKg7eyL4=
+	bh=32QET0TLhL3tM7oB60QGVk61oUKKQJ3b74DM1kljI50=;
+	b=VCSGMY184on/HiT7kRHqv+fbNLO9EsnsFhXDQX/h0SIfP7Xl+yiQ5KRgzpTWetI+A30uOZ
+	LY7AHih7xWyBwJ83tO0QU002qqs139ARuFiwcXK78Zc8J8lf7ikpgLBs7YTp0CTxsSRMcM
+	bkcVJFXLgssICL0czRGot2nhP2e56PA=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 13/27] KVM: arm64: Enable SCTLR2 when advertised to the guest
-Date: Tue,  8 Jul 2025 10:25:18 -0700
-Message-Id: <20250708172532.1699409-14-oliver.upton@linux.dev>
+Subject: [PATCH v3 14/27] KVM: arm64: Describe SCTLR2_ELx RESx masks
+Date: Tue,  8 Jul 2025 10:25:19 -0700
+Message-Id: <20250708172532.1699409-15-oliver.upton@linux.dev>
 In-Reply-To: <20250708172532.1699409-1-oliver.upton@linux.dev>
 References: <20250708172532.1699409-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,29 +48,93 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-HCRX_EL2.SCTLR2En needs to be set for SCTLR2_EL1 to take effect in
-hardware (in addition to disabling traps).
+External abort injection will soon rely on a sanitised view of
+SCTLR2_ELx to determine exception routing. Compute the RESx masks.
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/config.c | 28 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/nested.c |  6 ++++++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 1ff52e66514c..71ecdc20523e 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -665,6 +665,9 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 54911a93b001..e8a33e91e665 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -131,6 +131,8 @@ struct reg_bits_to_feat_map {
+ #define FEAT_SPMU		ID_AA64DFR1_EL1, SPMU, IMP
+ #define FEAT_SPE_nVM		ID_AA64DFR2_EL1, SPE_nVM, IMP
+ #define FEAT_STEP2		ID_AA64DFR2_EL1, STEP, IMP
++#define FEAT_SYSREG128		ID_AA64ISAR2_EL1, SYSREG_128, IMP
++#define FEAT_CPA2		ID_AA64ISAR3_EL1, CPA, CPA2
  
- 		if (kvm_has_fpmr(kvm))
- 			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
+ static bool not_feat_aa64el3(struct kvm *kvm)
+ {
+@@ -832,6 +834,23 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
+ 	NEEDS_FEAT_FIXED(HCR_EL2_E2H, compute_hcr_e2h),
+ };
+ 
++static const struct reg_bits_to_feat_map sctlr2_feat_map[] = {
++	NEEDS_FEAT(SCTLR2_EL1_NMEA	|
++		   SCTLR2_EL1_EASE,
++		   FEAT_DoubleFault2),
++	NEEDS_FEAT(SCTLR2_EL1_EnADERR, feat_aderr),
++	NEEDS_FEAT(SCTLR2_EL1_EnANERR, feat_anerr),
++	NEEDS_FEAT(SCTLR2_EL1_EnIDCP128, FEAT_SYSREG128),
++	NEEDS_FEAT(SCTLR2_EL1_EnPACM	|
++		   SCTLR2_EL1_EnPACM0,
++		   feat_pauth_lr),
++	NEEDS_FEAT(SCTLR2_EL1_CPTA	|
++		   SCTLR2_EL1_CPTA0	|
++		   SCTLR2_EL1_CPTM	|
++		   SCTLR2_EL1_CPTM0,
++		   FEAT_CPA2),
++};
 +
-+		if (kvm_has_sctlr2(kvm))
-+			vcpu->arch.hcrx_el2 |= HCRX_EL2_SCTLR2En;
- 	}
+ static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
+ 				  int map_size, u64 res0, const char *str)
+ {
+@@ -863,6 +882,8 @@ void __init check_feature_map(void)
+ 		       __HCRX_EL2_RES0, "HCRX_EL2");
+ 	check_feat_map(hcr_feat_map, ARRAY_SIZE(hcr_feat_map),
+ 		       HCR_EL2_RES0, "HCR_EL2");
++	check_feat_map(sctlr2_feat_map, ARRAY_SIZE(sctlr2_feat_map),
++		       SCTLR2_EL1_RES0, "SCTLR2_EL1");
  }
- #endif /* __ARM64_KVM_EMULATE_H__ */
+ 
+ static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
+@@ -1077,6 +1098,13 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+ 		*res0 |= HCR_EL2_RES0 | (mask & ~fixed);
+ 		*res1 = HCR_EL2_RES1 | (mask & fixed);
+ 		break;
++	case SCTLR2_EL1:
++	case SCTLR2_EL2:
++		*res0 = compute_res0_bits(kvm, sctlr2_feat_map,
++					  ARRAY_SIZE(sctlr2_feat_map), 0, 0);
++		*res0 |= SCTLR2_EL1_RES0;
++		*res1 = SCTLR2_EL1_RES1;
++		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		*res0 = *res1 = 0;
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index c7063f670187..096747a61bf6 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1690,6 +1690,12 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+ 		res0 |= SCTLR_EL1_EPAN;
+ 	set_sysreg_masks(kvm, SCTLR_EL1, res0, res1);
+ 
++	/* SCTLR2_ELx */
++	get_reg_fixed_bits(kvm, SCTLR2_EL1, &res0, &res1);
++	set_sysreg_masks(kvm, SCTLR2_EL1, res0, res1);
++	get_reg_fixed_bits(kvm, SCTLR2_EL2, &res0, &res1);
++	set_sysreg_masks(kvm, SCTLR2_EL2, res0, res1);
++
+ 	/* MDCR_EL2 */
+ 	res0 = MDCR_EL2_RES0;
+ 	res1 = MDCR_EL2_RES1;
 -- 
 2.39.5
 
