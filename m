@@ -1,94 +1,125 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3FB25C810
-	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 09:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5F82135D7;
+	Tue,  8 Jul 2025 09:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751967732; cv=none; b=P1oCxwuKevIsNd5qgTHorqs3TA2RyXslSLCHvPp4VHE15lefvHbn2mkSq5Nct9Q5ueY2YXOOiTaQMmDd9yXrbVsFbSyJaxucHaV1wx1rWDEQ4rjO7SNWjO1PrJKGEFrCIGwTIAtj2e7tk8rvF2i5vGEy7O5rBCerFvkdMrU6whU=
+	t=1751967955; cv=none; b=Arc8TL475NNN4eMD1QDE8pMUNSuJrry5RYS4JmWFvRC7SIEVjSr3D0qSM1BkMmXX420rqu3pZkk7ukjM3Z6um7mktDNHLpgErUGcOfPEtjY6SwRMf7MD+dMG7YhihI6zNDlMhtGTbYxOGf+vXZ8B68WpzQz0lAHp5lUNoVqxdog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751967732; c=relaxed/simple;
-	bh=se5x0yYrCUL+63fhhT38J9iOQc4ZRvtcA/JM8IxxtjI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BUgeiZET0vjeVCtlcHX8AaReBKvdIwBYkd003qpoVAS7EHr2sxD2TxZW+dUmlwvFb3TuKpbkYfRgtKUJeFkioirBEy7Lr1TF2YmJM59Fm77D4Ky2L7vTyiikDLABhSZZdtp3BcxQ6fhsUvJsNqQxIKPIkmccoLay1+61cjY6l/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 59DDF153B;
-	Tue,  8 Jul 2025 02:41:57 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB3413F77D;
-	Tue,  8 Jul 2025 02:42:07 -0700 (PDT)
-Message-ID: <03a76e9a-86ac-4791-9f0a-494b28c07fcc@arm.com>
-Date: Tue, 8 Jul 2025 10:42:06 +0100
+	s=arc-20240116; t=1751967955; c=relaxed/simple;
+	bh=AZAx/SltGk9pKwFXcrvSdtkd/H9XzQsZMgsKKBr+qU8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=avOeCIowJZ/v++qT1hkky1Y3NmWMAQlJlE5sVCIPTUEpbHEucDSj+WDap/WZwoxA+c++532Rs9P5UiQGheAF7jTPBThcXenLC2LthkC7He0JJNGJCY6H3gYuJefba3+9UDHwYNeCF2e3JrFmRQpACN9yIZ/7AlRJf3H3krTpuZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DToQVbtf; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DToQVbtf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B543BC4CEED;
+	Tue,  8 Jul 2025 09:45:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751967953;
+	bh=AZAx/SltGk9pKwFXcrvSdtkd/H9XzQsZMgsKKBr+qU8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DToQVbtfXKIHDKSnMySm5mj5DSPOv20/rvy9ocynafpbCBVOSW8wTh1Q+/9uXB45k
+	 3nhxcpaZ/O0inn06UmnecYO8WSW2mQM9ktiwCDOwIdRLXjCW9vM/w8H5m0KXPy9jPH
+	 zCRZQSfNMqE2xlMoXjncy9M0ruUukipp8ofy2RpdzZekcmFHm41BqRvdYPx/kTB47A
+	 3E1V8j3f6WL15nfmGsX4IMNeP5lP7P+0/wKcJehoKST6lxczACq9KKdbgxY+VatMNQ
+	 Nr0TkTidFMY/q33YVGPU1rzA9FUca83CSAx/67LuKrE9z9iygYLWi1UenAfBTKMGGi
+	 cjeEHiZw4oaqw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uZ4tb-00DhrB-0W;
+	Tue, 08 Jul 2025 10:45:51 +0100
+Date: Tue, 08 Jul 2025 10:45:50 +0100
+Message-ID: <86tt3n9fsh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: Yury Norov <yury.norov@gmail.com>,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux@rasmusvillemoes.dk,
+	linux-kernel@vger.kernel.org,
+	james.morse@arm.com
+Subject: Re: [PATCH 2/2] bitfield: Ensure the return value of type##_replace_bits() is checked
+In-Reply-To: <03a76e9a-86ac-4791-9f0a-494b28c07fcc@arm.com>
+References: <20250703135729.1807517-1-ben.horgan@arm.com>
+	<20250703135729.1807517-3-ben.horgan@arm.com>
+	<aGv2WoAtxnEgqV4y@yury>
+	<03a76e9a-86ac-4791-9f0a-494b28c07fcc@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] bitfield: Ensure the return value of
- type##_replace_bits() is checked
-To: Yury Norov <yury.norov@gmail.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
- oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux@rasmusvillemoes.dk,
- linux-kernel@vger.kernel.org, james.morse@arm.com
-References: <20250703135729.1807517-1-ben.horgan@arm.com>
- <20250703135729.1807517-3-ben.horgan@arm.com> <aGv2WoAtxnEgqV4y@yury>
-Content-Language: en-US
-From: Ben Horgan <ben.horgan@arm.com>
-In-Reply-To: <aGv2WoAtxnEgqV4y@yury>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, yury.norov@gmail.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux@rasmusvillemoes.dk, linux-kernel@vger.kernel.org, james.morse@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Yury,
+On Tue, 08 Jul 2025 10:42:06 +0100,
+Ben Horgan <ben.horgan@arm.com> wrote:
+> 
+> Hi Yury,
+> 
+> On 7/7/25 17:31, Yury Norov wrote:
+> > Hi Ben,
+> > 
+> > On Thu, Jul 03, 2025 at 02:57:29PM +0100, Ben Horgan wrote:
+> >> As type##_replace_bits() has no side effects it is only useful if its
+> >> return value is checked. Add __must_check to enforce this usage. To have
+> >> the bits replaced in-place typep##_replace_bits() can be used instead.
+> >> 
+> >> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> >> ---
+> >>   include/linux/bitfield.h | 4 ++--
+> >>   1 file changed, 2 insertions(+), 2 deletions(-)
+> >> 
+> >> diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
+> >> index 6d9a53db54b6..39333b80d22b 100644
+> >> --- a/include/linux/bitfield.h
+> >> +++ b/include/linux/bitfield.h
+> >> @@ -195,8 +195,8 @@ static __always_inline __##type type##_encode_bits(base v, base field)	\
+> >>   		__field_overflow();					\
+> >>   	return to((v & field_mask(field)) * field_multiplier(field));	\
+> >>   }									\
+> >> -static __always_inline __##type type##_replace_bits(__##type old,	\
+> >> -					base val, base field)		\
+> >> +static __always_inline __##type __must_check type##_replace_bits(__##type old,	\
+> >> +							base val, base field)	\
+> >>   {									\
+> >>   	return (old & ~to(field)) | type##_encode_bits(val, field);	\
+> >>   }									\
+> > 
+> > So, would it make sense to mark _encode_bits() and _get_bits() as
+> > __must_check as well? At least from the point of unification, it
+> > would.
+> Could do. It seems less important as there are no obvious foot-guns
+> that these would guards against. Would you like me to add this in a
+> v2?
+> > 
+> > How would we move this - with my bitmap-for next or with arm branch?
+> 
+> I'm not familiar with the branch machinery so can't comment on this.
 
-On 7/7/25 17:31, Yury Norov wrote:
-> Hi Ben,
-> 
-> On Thu, Jul 03, 2025 at 02:57:29PM +0100, Ben Horgan wrote:
->> As type##_replace_bits() has no side effects it is only useful if its
->> return value is checked. Add __must_check to enforce this usage. To have
->> the bits replaced in-place typep##_replace_bits() can be used instead.
->>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->>   include/linux/bitfield.h | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
->> index 6d9a53db54b6..39333b80d22b 100644
->> --- a/include/linux/bitfield.h
->> +++ b/include/linux/bitfield.h
->> @@ -195,8 +195,8 @@ static __always_inline __##type type##_encode_bits(base v, base field)	\
->>   		__field_overflow();					\
->>   	return to((v & field_mask(field)) * field_multiplier(field));	\
->>   }									\
->> -static __always_inline __##type type##_replace_bits(__##type old,	\
->> -					base val, base field)		\
->> +static __always_inline __##type __must_check type##_replace_bits(__##type old,	\
->> +							base val, base field)	\
->>   {									\
->>   	return (old & ~to(field)) | type##_encode_bits(val, field);	\
->>   }									\
-> 
-> So, would it make sense to mark _encode_bits() and _get_bits() as
-> __must_check as well? At least from the point of unification, it
-> would.
-Could do. It seems less important as there are no obvious foot-guns that 
-these would guards against. Would you like me to add this in a v2?
-> 
-> How would we move this - with my bitmap-for next or with arm branch?
-
-I'm not familiar with the branch machinery so can't comment on this.
-> 
-> Thanks,
-> Yury
-> 
+The first patch will definitely go in via the KVM/arm64 tree, probably
+as a fix for 6.16.
 
 Thanks,
 
-Ben
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
