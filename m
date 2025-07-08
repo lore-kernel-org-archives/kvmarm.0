@@ -1,58 +1,60 @@
-Received: from sg-1-31.ptr.blmpb.com (sg-1-31.ptr.blmpb.com [118.26.132.31])
+Received: from sg-3-20.ptr.tlmpb.com (sg-3-20.ptr.tlmpb.com [101.45.255.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599142B9B7
-	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 03:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE4D7464
+	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 03:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.45.255.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751946092; cv=none; b=UPZUdRVxMkpYcBpGnZXuXEs8znvNkIscRuMDf1j8Ijw0o7YdTxAr0e37RRdWLV+0V3xcAHaYfLX3IxCLAC0o8CzDHy6B2I9+PLMz0+yYMWLz21FIy1B4AJiok8zBA+7E7glJMJl3PTkZrh+T4UAkekcgru1Go6bWqp9GBZjoPcc=
+	t=1751946219; cv=none; b=eQdToZXQW4Ar6uQriUexzTfm+kBzUF2j+aGw2Jq52m1jWzWErH8rzptORLPys2uJxd/gNxrUh/BAXg+j6fUYU4CWexC/X9vHUqAegGURdCdC9XkstN6bMVsJd3SCDLY5WswZ32fY/3s56L17sh4WQDEi1YAlDhtyFUooR+ijs2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751946092; c=relaxed/simple;
-	bh=ELbn6HSTysOmlExJ2FWdeFqiEisNHyxTYOXRQyGs7zU=;
-	h=Subject:Date:Message-Id:Mime-Version:To:From:Cc:References:
-	 In-Reply-To:Content-Type; b=pWzuqgmIPoI7wy258R/LgOWsnmbn3z6msX7ryyd6JqxwdL2Qm9YXMxADbsELyK6vM+TxNU+R0YQ+OCY93jbQM8upqftyVe5hixDB9iu4c5fdcKwUU1/kaDodv9qIdCo60jevH5YB8/UkAFZvTdxBbDAJx2wE77usaCqeQvf8gPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com; spf=pass smtp.mailfrom=lanxincomputing.com; dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b=qS/gOdDt; arc=none smtp.client-ip=118.26.132.31
+	s=arc-20240116; t=1751946219; c=relaxed/simple;
+	bh=dlqjyOc5QFaRUTdJOcecWoOAlINKUDZQlIQVHK/D8UQ=;
+	h=Content-Type:Cc:Subject:Date:Message-Id:In-Reply-To:To:
+	 Mime-Version:References:From; b=C7ifGj8Il0NFJdaCn33gAIPWUYH9tH7PUF/CcsgXnCgBFFJpNzZ6oSqF1elyMH6dEmWgLCJxuL5bQTIujRqQC1oLC+ahkIgQGEnIIH+2cof2G/L6PgeD2G5OyEp4AP2x9i4lV6pHDiZETPV9U+p052xkDH971hAl4aQ+X0oGv9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com; spf=pass smtp.mailfrom=lanxincomputing.com; dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b=16478LQd; arc=none smtp.client-ip=101.45.255.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lanxincomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b="qS/gOdDt"
+	dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b="16478LQd"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=lanxincomputing-com.20200927.dkim.feishu.cn; t=1751946083;
+ s=s1; d=lanxincomputing-com.20200927.dkim.feishu.cn; t=1751946211;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=JIChZwtf7KFp0wUJEQAWGYcy6kZOQ3nX77/WhXlHmLk=;
- b=qS/gOdDtwms6MeuigxcdrMAhexKDt63xsVN66NCZu4lBk/5Hmx2IT77ogeTHKmNa0oSnwV
- 7AnzSYt61yRvXTMvSxz75bA05URXRqWgRMhh/qA5GMlhJ+23+xfC4vs5q9NsZhFx+U78XH
- ueUhxOC8RwojtzqXKAKqcZsoUvXXPhtIFwaZnEbVjyMifyWZqIGsLBzg0VCTKoWfWUkid3
- pKj/qfYoRN+FwuS9mLY7+75PsePxfKF8x6K5Te7eYLI70jgfYlctAMpLDkSOXi2KYqgmPi
- 3Dfhs4hTl1jLYNRsf1Y7mVtqjwHlHSNIXpqhNrGeSTzAsz8fDey3l2B09dsEew==
+ bh=uG5ka7LNUg6mP21RjQcaH3JCOJLOzMGM1lk9S67I8rE=;
+ b=16478LQdsNe1oE2zDqnLRLuAnQl1WUJTbYc4p6q4KwlntWA4xikASg7XBFlPBIwzVdVCst
+ 9r3gf+bdH25jTB59UGNruMsjyYomQha04beehqncs5u2lZvVZRtlPrlIVeGmkSj2rUsTP2
+ GNTcdEUDesMmv8EtROFn/SyfBKPYGbDe9sdtGRjWSzOVQoUjKtwDph4GrDYDAVjkxIwekv
+ LphHCk3Rf2HfSeIUCoDFhbPiEmRyg8REYAxpNiXwrYp0iUWmrGPhwXyRalefvEZLVXqlOl
+ zTsYirLsbYeR3Fx3sJDcWks+ChMUzCLAc28jfJeH9Nbouqr7w+LbIQHHaTzvHQ==
+Content-Type: text/plain; charset=UTF-8
+X-Lms-Return-Path: <lba+2686c93e1+77e426+lists.linux.dev+liujingqi@lanxincomputing.com>
+Cc: <alexandru.elisei@arm.com>, <cleger@rivosinc.com>, <jesse@rivosinc.com>, 
+	<jamestiotio@gmail.com>, "Atish Patra" <atishp@rivosinc.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] riscv: Add kvmtool support
+Date: Tue, 8 Jul 2025 11:43:26 +0800
+Message-Id: <285b7059-c64e-45e1-b923-eaafa1655b56@lanxincomputing.com>
+In-Reply-To: <20250704151254.100351-6-andrew.jones@linux.dev>
 Content-Transfer-Encoding: 7bit
-Subject: Re: [kvm-unit-tests PATCH 1/2] arm/arm64: Ensure proper host arch with kvmtool
-Date: Tue, 8 Jul 2025 11:41:18 +0800
-Message-Id: <2ccbb58b-1993-450e-b9c5-4b7fcb9c80a2@lanxincomputing.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>, 
+	<kvmarm@lists.linux.dev>, <kvm-riscv@lists.infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Received: from [127.0.0.1] ([116.237.111.137]) by smtp.feishu.cn with ESMTPS; Tue, 08 Jul 2025 11:41:20 +0800
-User-Agent: Mozilla Thunderbird
-To: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>, 
-	<kvmarm@lists.linux.dev>, <kvm-riscv@lists.infradead.org>
+References: <20250704151254.100351-4-andrew.jones@linux.dev> <20250704151254.100351-6-andrew.jones@linux.dev>
+Received: from [127.0.0.1] ([116.237.111.137]) by smtp.feishu.cn with ESMTPS; Tue, 08 Jul 2025 11:43:28 +0800
 From: "Nutty Liu" <liujingqi@lanxincomputing.com>
-Content-Language: en-US
 X-Original-From: Nutty Liu <liujingqi@lanxincomputing.com>
-Cc: <alexandru.elisei@arm.com>, <cleger@rivosinc.com>, <jesse@rivosinc.com>, 
-	<jamestiotio@gmail.com>, "Atish Patra" <atishp@rivosinc.com>
-X-Lms-Return-Path: <lba+2686c9361+a4b553+lists.linux.dev+liujingqi@lanxincomputing.com>
-References: <20250704151254.100351-4-andrew.jones@linux.dev> <20250704151254.100351-5-andrew.jones@linux.dev>
-In-Reply-To: <20250704151254.100351-5-andrew.jones@linux.dev>
-Content-Type: text/plain; charset=UTF-8
 
 On 7/4/2025 11:12 PM, Andrew Jones wrote:
-> When running on non-arm (e.g. an x86 machine) if the framework is
-> configured to use kvmtool then, unlike with QEMU, it can't work.
+> arm/arm64 supports running tests with kvmtool as a first class citizen.
+> Most the code to do that is in the common scripts, so just add the riscv
+> specific bits needed to allow riscv to use kvmtool as a first class
+> citizen too.
 >
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 Reviewed-by: Nutty Liu <liujingqi@lanxincomputing.com>
@@ -60,21 +62,213 @@ Reviewed-by: Nutty Liu <liujingqi@lanxincomputing.com>
 Thanks,
 Nutty
 > ---
->   arm/run | 5 +++++
->   1 file changed, 5 insertions(+)
+>   README.md     |   7 ++--
+>   configure     |  12 ++++--
+>   riscv/efi/run |   6 +++
+>   riscv/run     | 110 +++++++++++++++++++++++++++++++++++---------------
+>   4 files changed, 96 insertions(+), 39 deletions(-)
 >
-> diff --git a/arm/run b/arm/run
-> index 9ee795ae424c..858333fce465 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -97,6 +97,11 @@ function arch_run_kvmtool()
->   {
->   	local command
+> diff --git a/README.md b/README.md
+> index 723ce04cd978..cbd8a9940ec4 100644
+> --- a/README.md
+> +++ b/README.md
+> @@ -65,8 +65,8 @@ or:
 >   
-> +	if [ "$HOST" != "arm" ] && [ "$HOST" != "aarch64" ]; then
-> +		echo "kvmtool requires KVM but the host ('$HOST') is not arm" >&2
+>   to run them all.
+>   
+> -All tests can be run using QEMU. On arm and arm64, tests can also be run using
+> -kvmtool.
+> +All tests can be run using QEMU. On arm, arm64, riscv32, and riscv64 tests can
+> +also be run using kvmtool.
+>   
+>   By default the runner script searches for a suitable QEMU binary in the system.
+>   To select a specific QEMU binary though, specify the QEMU=path/to/binary
+> @@ -97,8 +97,7 @@ variable. kvmtool supports only kvm as the accelerator.
+>   
+>   Check [x86/efi/README.md](./x86/efi/README.md).
+>   
+> -On arm and arm64, this is only supported with QEMU; kvmtool cannot run the
+> -tests under UEFI.
+> +This is only supported with QEMU; kvmtool cannot run the tests under UEFI.
+>   
+>   # Tests configuration file
+>   
+> diff --git a/configure b/configure
+> index 470f9d7cdb3b..6d549d1ecb5b 100755
+> --- a/configure
+> +++ b/configure
+> @@ -90,7 +90,7 @@ usage() {
+>   	                           selects the best value based on the host system and the
+>   	                           test configuration.
+>   	    --target=TARGET        target platform that the tests will be running on (qemu or
+> -	                           kvmtool, default is qemu) (arm/arm64 only)
+> +	                           kvmtool, default is qemu) (arm/arm64 and riscv32/riscv64 only)
+>   	    --cross-prefix=PREFIX  cross compiler prefix
+>   	    --cc=CC                c compiler to use ($cc)
+>   	    --cflags=FLAGS         extra options to be passed to the c compiler
+> @@ -284,7 +284,8 @@ fi
+>   if [ -z "$target" ]; then
+>       target="qemu"
+>   else
+> -    if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
+> +    if [ "$arch" != "arm" ] && [ "$arch" != "arm64" ] &&
+> +       [ "$arch" != "riscv32" ] && [ "$arch" != "riscv64" ]; then
+>           echo "--target is not supported for $arch"
+>           usage
+>       fi
+> @@ -393,6 +394,10 @@ elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
+>       testdir=riscv
+>       arch_libdir=riscv
+>       : "${uart_early_addr:=0x10000000}"
+> +    if [ "$target" != "qemu" ] && [ "$target" != "kvmtool" ]; then
+> +        echo "--target must be one of 'qemu' or 'kvmtool'!"
+> +        usage
+> +    fi
+>   elif [ "$arch" = "s390x" ]; then
+>       testdir=s390x
+>   else
+> @@ -519,7 +524,8 @@ EFI_DIRECT=$efi_direct
+>   CONFIG_WERROR=$werror
+>   GEN_SE_HEADER=$gen_se_header
+>   EOF
+> -if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+> +if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ] ||
+> +   [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
+>       echo "TARGET=$target" >> config.mak
+>   fi
+>   
+> diff --git a/riscv/efi/run b/riscv/efi/run
+> index 5a72683a6ef5..b9b75440c659 100755
+> --- a/riscv/efi/run
+> +++ b/riscv/efi/run
+> @@ -11,6 +11,12 @@ if [ ! -f config.mak ]; then
+>   fi
+>   source config.mak
+>   source scripts/arch-run.bash
+> +source scripts/vmm.bash
+> +
+> +if [[ $(vmm_get_target) == "kvmtool" ]]; then
+> +	echo "kvmtool does not support EFI tests."
+> +	exit 2
+> +fi
+>   
+>   if [ -f RISCV_VIRT_CODE.fd ]; then
+>   	DEFAULT_UEFI=RISCV_VIRT_CODE.fd
+> diff --git a/riscv/run b/riscv/run
+> index 0f000f0d82c6..7bcf235fb645 100755
+> --- a/riscv/run
+> +++ b/riscv/run
+> @@ -10,35 +10,81 @@ if [ -z "$KUT_STANDALONE" ]; then
+>   	source scripts/vmm.bash
+>   fi
+>   
+> -# Allow user overrides of some config.mak variables
+> -mach=$MACHINE_OVERRIDE
+> -qemu_cpu=$TARGET_CPU_OVERRIDE
+> -firmware=$FIRMWARE_OVERRIDE
+> -
+> -: "${mach:=virt}"
+> -: "${qemu_cpu:=$TARGET_CPU}"
+> -: "${qemu_cpu:=$DEFAULT_QEMU_CPU}"
+> -: "${firmware:=$FIRMWARE}"
+> -[ "$firmware" ] && firmware="-bios $firmware"
+> -
+> -set_qemu_accelerator || exit $?
+> -[ "$ACCEL" = "kvm" ] && QEMU_ARCH=$HOST
+> -acc="-accel $ACCEL$ACCEL_PROPS"
+> -
+> -qemu=$(search_qemu_binary) || exit $?
+> -if [ "$mach" = 'virt' ] && ! $qemu -machine '?' | grep -q 'RISC-V VirtIO board'; then
+> -	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
+> -	exit 2
+> -fi
+> -mach="-machine $mach"
+> -
+> -command="$qemu -nodefaults -nographic -serial mon:stdio"
+> -command+=" $mach $acc $firmware -cpu $qemu_cpu "
+> -command="$(migration_cmd) $(timeout_cmd) $command"
+> -
+> -if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> -	ENVIRON_DEFAULT=n run_test_status $command "$@"
+> -else
+> -	# We return the exit code via stdout, not via the QEMU return code
+> -	run_test_status $command -kernel "$@"
+> -fi
+> +vmm_check_supported
+> +
+> +function arch_run_qemu()
+> +{
+> +	# Allow user overrides of some config.mak variables
+> +	mach=$MACHINE_OVERRIDE
+> +	qemu_cpu=$TARGET_CPU_OVERRIDE
+> +	firmware=$FIRMWARE_OVERRIDE
+> +
+> +	: "${mach:=virt}"
+> +	: "${qemu_cpu:=$TARGET_CPU}"
+> +	: "${qemu_cpu:=$DEFAULT_QEMU_CPU}"
+> +	: "${firmware:=$FIRMWARE}"
+> +	[ "$firmware" ] && firmware="-bios $firmware"
+> +
+> +	set_qemu_accelerator || exit $?
+> +	[ "$ACCEL" = "kvm" ] && QEMU_ARCH=$HOST
+> +	acc="-accel $ACCEL$ACCEL_PROPS"
+> +
+> +	qemu=$(search_qemu_binary) || exit $?
+> +	if [ "$mach" = 'virt' ] && ! $qemu -machine '?' | grep -q 'RISC-V VirtIO board'; then
+> +		echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
+> +		exit 2
+> +	fi
+> +	mach="-machine $mach"
+> +
+> +	command="$qemu -nodefaults -nographic -serial mon:stdio"
+> +	command+=" $mach $acc $firmware -cpu $qemu_cpu "
+> +	command="$(migration_cmd) $(timeout_cmd) $command"
+> +
+> +	if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> +		ENVIRON_DEFAULT=n run_test_status $command "$@"
+> +	else
+> +		# We return the exit code via stdout, not via the QEMU return code
+> +		run_test_status $command -kernel "$@"
+> +	fi
+> +}
+> +
+> +function arch_run_kvmtool()
+> +{
+> +	local command
+> +
+> +	if [ "$HOST" != "riscv32" ] && [ "$HOST" != "riscv64" ]; then
+> +		echo "kvmtool requires KVM but the host ('$HOST') is not riscv" >&2
 > +		exit 2
 > +	fi
 > +
->   	kvmtool=$(search_kvmtool_binary) ||
->   		exit $?
+> +	kvmtool=$(search_kvmtool_binary) ||
+> +		exit $?
+> +
+> +	if [ "$ACCEL" ] && [ "$ACCEL" != "kvm" ]; then
+> +		echo "kvmtool does not support $ACCEL" >&2
+> +		exit 2
+> +	fi
+> +
+> +	if ! kvm_available; then
+> +		echo "kvmtool requires KVM but not available on the host" >&2
+> +		exit 2
+> +	fi
+> +
+> +	command="$(timeout_cmd) $kvmtool run"
+> +	if ( [ "$HOST" = "riscv64" ] && [ "$ARCH" = "riscv32" ] ) ||
+> +	   ( [ "$HOST" = "riscv32" ] && [ "$ARCH" = "riscv64" ] ); then
+> +		echo "Cannot run guests with a different xlen than the host" >&2
+> +		exit 2
+> +	else
+> +		run_test_status $command --kernel "$@"
+> +	fi
+> +}
+> +
+> +case $(vmm_get_target) in
+> +qemu)
+> +	arch_run_qemu "$@"
+> +	;;
+> +kvmtool)
+> +	arch_run_kvmtool "$@"
+> +	;;
+> +esac
