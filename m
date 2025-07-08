@@ -1,113 +1,263 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8072DEA60
-	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 12:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119997E107
+	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 13:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751978872; cv=none; b=dsJ7Xc4tj/053FLw8m62U9WFKvKnzZkH26UWCMrALFSfNaE55frnVHVHMP+u/vFjAjAhdaGaULw2OjusBUwUpisGJu5gIuRIdiJqv/6gNkEDlXZwTybKWd+s3Qrhi9vophhDznIryz1C91ax2MUaIRBdOnonGVKFHAKes6rNY00=
+	t=1751982271; cv=none; b=J6yVM2v+JhFUcTnxcRQ2MFPko/1f8AtFWD69IrfTSP+y9etS4Mq7BYsa2mNpKYtDylSiQwg530Ji2Cb57pDW5zJP1hPbBYj3zUsl9bzSNA/wOIoOU5G1zUxu3413So9RGdLsW5oKgG3dmzRvgh6fl4lBcm5ZWprp58VtL66xwd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751978872; c=relaxed/simple;
-	bh=+wvoob8grI10NwfBtRPmsZFoGIB2FSIYS3UA5QZQBaQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o6XdaTpaB5kQFuMm+mUcGIDrBGDdrbpMWyvFYfoUuFtNFi6/CUlR56y4V+Zc6q980no6TO2BxYPE0Z5kLXoPVs9Xl+ygHa7BMjscIA4x9nBjN+0f27R5flmwrCesqfQ9dY7sNe4H4U9q5ByqslU/MtXLkDnJJKQF3+yTAP7SY1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IZBKe9yG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751982271; c=relaxed/simple;
+	bh=lT4bc9A4Lsn0nqUVzgXK7Wed3GJo0r97SeIaG5Tr1VE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=R6cOqHMCaIIKun9r7S5lc01g68rCDWbHd/mtslt9fhWoKq58UQ/95d55FXalTn3mthxnaelTvx69JM07Tn1MF93cL4LlBHZItQ6/xKlZ6X6o7e0qd47NiRM6fAduASk96ISl4x3s89JU9owPYfdipaUnD4pLJ7FRQR+AD47O4qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nO11pNOd; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IZBKe9yG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A74EAC4CEF6;
-	Tue,  8 Jul 2025 12:47:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751978872;
-	bh=+wvoob8grI10NwfBtRPmsZFoGIB2FSIYS3UA5QZQBaQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IZBKe9yGbPI51lmlJS++hmFbJmAWwkWsEVz1TBMfewPRDKrYdYYQnQP/miJTWuxOG
-	 V+0eYUNYYnSYp+m7DKwrGMFQN4lOigu6iXyVZi9IIS280lcjgKIebp5ab+7Y/sY86D
-	 mVM7A2iazCWytAxyFA6iV6reBBh/kYdSQhCeNeMKw69RbEFXqXyvl2TFIK7WkFf7Ad
-	 VEN/y9C466iGbFzBk7hK0oDbSBGZr78Xeu9C2e9KJDmxTHGP5TV3f9eSk56XVYnEBn
-	 4uasFO1iB+1PGlDkGK7QFJMdiY7LITb6GxPu+/IZQLRa3ZBNN+E703N3Pw10I6iXwR
-	 ZjdBjdb5dfsjA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uZ7jh-00DkqN-SY;
-	Tue, 08 Jul 2025 13:47:50 +0100
-Date: Tue, 08 Jul 2025 13:47:47 +0100
-Message-ID: <86sej6alxo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<tangnianyao@huawei.com>,
-	<wangwudi@hisilicon.com>
-Subject: Re: [PATCH] ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200803
-In-Reply-To: <73ee91b8-ba15-2534-ab76-f64e59261b1e@hisilicon.com>
-References: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
-	<86wm8ybpk5.wl-maz@kernel.org>
-	<0b54db94-8a6f-cea0-a6f7-dbe8650d66dd@hisilicon.com>
-	<86h5zwba5i.wl-maz@kernel.org>
-	<ffd3fccc-af4a-6667-3cf6-a55e866f3057@hisilicon.com>
-	<864ivtbll0.wl-maz@kernel.org>
-	<73ee91b8-ba15-2534-ab76-f64e59261b1e@hisilicon.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nO11pNOd"
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6fab979413fso80944146d6.2
+        for <kvmarm@lists.linux.dev>; Tue, 08 Jul 2025 06:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751982269; x=1752587069; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uhhghHOWkTnR0hLVF1kHakjup/7Sho01+bx/DM99C1g=;
+        b=nO11pNOdLCL5TD8Cx02DPBv4Pbodf/1ifTFCfdt7ENQrjeNOf6tdtCk1t7WlosFGjy
+         C07SapgofTv/mNRrAKugr6AaHO6iIEkoNtpp7W9NDP8+nEBNW200PTWONw8c1ru6Vvj0
+         G/3RXfjrUoFS9XNYsgegHiSGkql2CMzhYQ+HxJetgBVK5THGeygMjpRGqhOw558oWMn/
+         jx8AuFcnZyVicP2XKKTvj+RybbiUy46pi27AX9et3d0T1+WfPK84DIv9Hlouxhov2VeC
+         +DPTu/4s4bb8l5TvzLdKAfTQyS2tbTb9ha6TSay6Fl7A8/wrwnECHIkA0SJ7Ot5unaKs
+         3HFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751982269; x=1752587069;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uhhghHOWkTnR0hLVF1kHakjup/7Sho01+bx/DM99C1g=;
+        b=h17/hSjP4/YU9B9lEKY16gW9snZmDTZbNThZv20H+/ZWFOK3Vq9ASq1eMITp0+MKF+
+         b7kK+4J1Z7hwqvXkbg5mPjF3mD3jYGHrkK3ePMYUjNVhhHl3SUf71iHodjYOi3sgbLwq
+         pueI/UCn9sL05uSdUwK71K66PRn4lpZPFM7Kq1WAJHdY221BaoaSPg7unbKKFkZZTjqk
+         JiKq+pEoabtx5XogW3vPaW3qnJ8ubkkVgKPfdeUhq8nd1d19dnwx9KVOhyWXbR+9knkL
+         u4kBHH5zl9CrpzEHaDYKWQgEhY5OEY6WU9FBDPBLaSRbPr+z2+qHUQx+TTlR99xyHwgW
+         blGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRc9Cer64YdDP8MQz/70P23S4Jq+RwrtEEJI7akFmT5IGQSoHdf+FZ6qsNashXL7H7CaNAsvs=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy3+mh3Z0Ab/uL0WCVAmbk7A5smpxWRTwRe5uPq3R0n/z074++P
+	s+TBvnDaEMmDdJVzSVqS2jZ+9Q3NgnoEiH0NjChpJvPd06mjhD0ijz3L9lfUDeu8rFoPWiPYada
+	Q8jLFt4Wv7Bq3l6xozLSz8Syj6A==
+X-Google-Smtp-Source: AGHT+IG8mP9gY5/bBz/PPDZ950yjoWSdMml7V++iKYK1MlN+GfOj+Ia3LLbhfTBv0RJYHh5T/kuJRSivcI5DQlUR2Q==
+X-Received: from pjvf5.prod.google.com ([2002:a17:90a:da85:b0:311:a879:981f])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:3ec2:b0:311:fde5:c4be with SMTP id 98e67ed59e1d1-31aac544158mr19610623a91.35.1751982256358;
+ Tue, 08 Jul 2025 06:44:16 -0700 (PDT)
+Date: Tue, 08 Jul 2025 06:44:14 -0700
+In-Reply-To: <aGxgywrqiPAV7ruh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, tangnianyao@huawei.com, wangwudi@hisilicon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <aEyhHgwQXW4zbx-k@google.com> <diqz1pr8lndp.fsf@ackerleytng-ctop.c.googlers.com>
+ <diqza55tjkk1.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTxECJ3=ywbAPvpdA1-pm=stXWqU75mgG1epWaXiUr0raw@mail.gmail.com>
+ <diqzv7odjnln.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTwqOwO2zVd4zTYF7w7reTWMNjmCV6XnKux2JtPwYCAoZQ@mail.gmail.com>
+ <434ab5a3-fedb-4c9e-8034-8f616b7e5e52@amd.com> <923b1c02-407a-4689-a047-dd94e885b103@redhat.com>
+ <diqz34bg575i.fsf@ackerleytng-ctop.c.googlers.com> <0cdc7890-aade-4fa5-ad72-24cde6c7bce9@redhat.com>
+ <aGxgywrqiPAV7ruh@google.com>
+Message-ID: <diqzqzyqyez5.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
+ guest_memfd with shared memory
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>, David Hildenbrand <david@redhat.com>
+Cc: Shivank Garg <shivankg@amd.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 08 Jul 2025 13:05:24 +0100,
-Zhou Wang <wangzhou1@hisilicon.com> wrote:
->=20
-> On 2025/7/3 18:44, Marc Zyngier wrote:
-> > On Wed, 02 Jul 2025 10:57:13 +0100,
-> > Zhou Wang <wangzhou1@hisilicon.com> wrote:
-> >>
-> >> However=EF=BC=8Cmigration between different KVMs will be broken :(
-> >> I am not sure that should we consider this case as well?
-> >=20
-> > This isn't optional. You cannot break migration on existing systems,
-> > and the only case that *must* break is to restore a VM that hasn't
-> > seen this limitation on a HW that enforces it.
->=20
-> So the whole story is that we should let GICD_TYPE.num_LPIs as a
-> writable field, and set this field from VMM(e.g. QEMU). And it will
-> be failed if doing migration between VMs with different num_LPI
-> configurations.
+Sean Christopherson <seanjc@google.com> writes:
 
-Note that on a non-broken system, setting num_LPIs to any value should
-always work.
+> On Tue, Jul 01, 2025, David Hildenbrand wrote:
+>> > > > I support this approach.
+>> > > 
+>> > > Agreed. Let's get this in with the changes requested by Sean applied.
+>> > > 
+>> > > How to use GUEST_MEMFD_FLAG_MMAP in combination with a CoCo VM with
+>> > > legacy mem attributes (-> all memory in guest_memfd private) could be
+>> > > added later on top, once really required.
+>> > > 
+>> > > As discussed, CoCo VMs that want to support GUEST_MEMFD_FLAG_MMAP will
+>> > > have to disable legacy mem attributes using a new capability in stage-2.
+>> > > 
+>> > 
+>> > I rewatched the guest_memfd meeting on 2025-06-12.  We do want to
+>> > support the use case where userspace wants to have mmap (e.g. to set
+>> > mempolicy) but does not want to allow faulting into the host.
+>> > 
+>> > On 2025-06-12, the conclusion was that the problem will be solved once
+>> > guest_memfd supports shareability, and that's because userspace can set
+>> > shareability to GUEST, so the memory can't be faulted into the host.
+>> > 
+>> > On 2025-06-26, Sean said we want to let userspace have an extra layer of
+>> > protection so that memory cannot be faulted in to the host, ever. IOW,
+>> > we want to let userspace say that even if there is a stray
+>> > private-to-shared conversion, *don't* allow faulting memory into the
+>> > host.
+>
+> Eh, my comments were more along the lines of "it would be nice if we could have
+> such protections", not a "we must support this".  And I suspect that making the
+> behavior all-or-nothing for a given guest_memfd wouldn't be very useful, i.e.
+> that userspace would probably want to be able to prevent accessing a specific
+> chunk of the gmem instance.
+>
+> Actually, we can probably get that via mseal(), maybe even for free today?  E.g.
+> mmap() w/ PROT_NONE, mbind(), and then mseal().
+>
+> So yeah, I think we do nothing for now.
+>
+>> > The difference is the "extra layer of protection", which should remain
+>> > in effect even if there are (stray/unexpected) private-to-shared
+>> > conversions to guest_memfd or to KVM. Here's a direct link to the point
+>> > in the video where Sean brought this up [1]. I'm really hoping I didn't
+>> > misinterpret this!
+>> > 
+>> > Let me look ahead a little, since this involves use cases already
+>> > brought up though I'm not sure how real they are. I just want to make
+>> > sure that in a few patch series' time, we don't end up needing userspace
+>> > to use a complex bunch of CAPs and FLAGs.
+>> > 
+>> > In this series (mmap support, V12, patch 10/18) [2], to allow
+>> > KVM_X86_DEFAULT_VMs to use guest_memfd, I added a `fault_from_gmem()`
+>> > helper, which is defined as follows (before the renaming Sean requested):
+>> > 
+>> > +static inline bool fault_from_gmem(struct kvm_page_fault *fault)
+>> > +{
+>> > +	return fault->is_private || kvm_gmem_memslot_supports_shared(fault->slot);
+>> > +}
+>> > 
+>> > The above is changeable, of course :). The intention is that if the
+>> > fault is private, fault from guest_memfd. If GUEST_MEMFD_FLAG_MMAP is
+>> > set (KVM_MEMSLOT_GMEM_ONLY will be set on the memslot), fault from
+>> > guest_memfd.
+>> > 
+>> > If we defer handling GUEST_MEMFD_FLAG_MMAP in combination with a CoCo VM
+>> > with legacy mem attributes to the future, this helper will probably
+>> > become
+>> > 
+>> > -static inline bool fault_from_gmem(struct kvm_page_fault *fault)
+>> > +static inline bool fault_from_gmem(struct kvm *kvm, struct kvm_page_fault *fault)
+>> > +{
+>> > -	return fault->is_private || kvm_gmem_memslot_supports_shared(fault->slot);
+>> > +	return fault->is_private || (kvm_gmem_memslot_supports_shared(fault->slot) &&
+>> > +	                             !kvm_arch_disable_legacy_private_tracking(kvm));
+>> > +}
+>> > 
+>> > And on memslot binding we check
+>> > 
+>> > if kvm_arch_disable_legacy_private_tracking(kvm)
+>
+> I would invert the KVM-internal arch hook, and only have KVM x86's capability refer
+> to the private memory attribute as legacy (because it simply doesn't exist for
+> any thing else).
+>
+>> > and not GUEST_MEMFD_FLAG_MMAP
+>> > 	return -EINVAL;
+>> > 
+>> > 1. Is that what yall meant?
+>
+> I was thinking:
+>
+> 	if (kvm_arch_has_private_memory_attribute(kvm) ==
+> 	    kvm_gmem_mmap(...))
+> 		return -EINVAL;
+>
+> I.e. in addition to requiring mmap() when KVM doesn't track private/sahred via
+> memory attributes, also disallow mmap() when private/shared is tracked via memory
+> attributes.
+>
+>> My understanding:
+>> 
+>> CoCo VMs will initially (stage-1) only support !GUEST_MEMFD_FLAG_MMAP.
+>> 
+>> With stage-2, CoCo VMs will support GUEST_MEMFD_FLAG_MMAP only with
+>> kvm_arch_disable_legacy_private_tracking().
+>
+> Yep, and everything except x86 will unconditionally return true for
+> kvm_arch_disable_legacy_private_tracking() (or false if it's inverted as above).
+>
+>> Non-CoCo VMs will only support GUEST_MEMFD_FLAG_MMAP. (no concept of
+>> private)
+>> 
+>> > 
+>> > 2. Does this kind of not satisfy the "extra layer of protection"
+>> >     requirement (if it is a requirement)?
+>
+> It's not a requirement.
+>
+>> >     A legacy CoCo VM using guest_memfd only for private memory (shared
+>> >     memory from say, shmem) and needing to set mempolicy would
+>> >     * Set GUEST_MEMFD_FLAG_MMAP
+>
+> I think we should keep it simple as above, and not support mmap() (and therefore
+> mbind()) with legacy CoCo VMs.  Given the double allocation flaws with the legacy
+> approach, supporting mbind() seems like putting a bandaid on a doomed idea.
+>
+>> >     * Leave KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaulted to false
+>> >     but still be able to send conversion ioctls directly to guest_memfd,
+>> >     and then be able to fault guest_memfd memory into the host.
+>> 
+>> In that configuration, I would expect that all memory in guest_memfd is
+>> private and remains private.
+>> 
+>> guest_memfd without memory attributes cannot support in-place conversion.
+>> 
+>> How to achieve that might be interesting: the capability will affect
+>> guest_memfd behavior?
+>> 
+>> > 
+>> > 3. Now for a use case I've heard of (feel free to tell me this will
+>> >     never be supported or "we'll deal with it if it comes"): On a
+>> >     non-CoCo VM, we want to use guest_memfd but not use mmap (and the
+>> >     initial VM image will be written using write() syscall or something
+>> >     else).
+>> > 
+>> >     * Set GUEST_MEMFD_FLAG_MMAP to false
+>> >     * Leave KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaulted to false
+>> >       (it's a non-CoCo VM, weird to do anything to do with private
+>> >       tracking)
+>> > 
+>> >     And now we're stuck because fault_from_gmem() will return false all
+>> >     the time and we can't use memory from guest_memfd.
+>
+> Nah, don't support this scenario.  Or rather, use mseal() as above.  If someone
+> comes along with a concrete, strong use case for backing non-CoCo VMs and using
+> mseal() to wall off guest memory doesn't suffice, then they can have the honor
+> of justifying why KVM needs to take on more complexity.  :-)
+>
+>> I think I discussed that with Sean: we would have GUEST_MEMFD_FLAG_WRITE
+>> that will imply everything that GUEST_MEMFD_FLAG_MMAP would imply, except
+>> the actual mmap() support.
+>
+> Ya, for the write() access or whatever.  But there are bigger problems beyond
+> populating the memory, e.g. a non-CoCo VM won't support private memory, so without
+> many more changes to redirect KVM to gmem when faulting in guest memory, KVM won't
+> be able to map any memory into the guest.
 
-> After above done, this errata could be added.
-
-Which would be the only case where num_LPIs wouldn't be writable, and
-set to a fixed value.
-
-Note that an alternative would be to not have a kernel erratum, but to
-force num_LPIs from userspace when running on your platform. But that
-implies that: you have your own, non-upstream VMM, and that there is
-no opportunity for userspace to adversely impact the system as a whole.
-
-> Not sure my thought above is right? I will try to prepare a num_LPIs
-> writable patch if the direction is right.
-
-I think you got the gist of it.
-
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Thanks for clarifying everything above :). Next respin (with Fuad's
+help) coming soon!
