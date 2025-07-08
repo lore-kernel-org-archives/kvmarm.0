@@ -1,107 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8794F2DC33F
-	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 14:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B861F91C8
+	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751986146; cv=none; b=uxng/wGeom84zyyZNZACucEEoEyjSih4wNBZMPPHBcdlH3WeEEUu/qPTSjiX66IkzWQSniichEPTakomJjdEhq5jyTc8aldaE2YD/RdyOHoKYxcII0haglpiza4qT9V4qsJWPTGmo77qNY+1NHpYuwNuiWuMnTaAMRe+zc9VdIU=
+	t=1751995549; cv=none; b=QHfKybLofwvTiDoBT2aXe2tNGciZ1uSisuXpwzho6/p/Rk1FDPnLuu+nqOlPQ+0Zj9lqBB1khkVJ7E/ua9h9psCHoKNnf44n0lz3jWQGPGeONetk86VKsW7HrJfDqziafh052d6TutxhYHmE2d3rTOghfOAVPkGdQ/paLLzhqds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751986146; c=relaxed/simple;
-	bh=q8spVkoLv2r7TKyH2WL1jNBqws9fnH4WQcFK7oE9C1s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Az10tepqvzmnQWeuZe5lE+W9mWfOoxgSrSa2Q2lLYFGWuW/ie9vYDcNiuiGgL2iN4fHWss076lnHM5kfc9/pQXiCsTO21t9JuUr37kWI22EmYopUVcM9mmZusVfYGIio5jK2Hd7pIhAkM0nXFz1yJLfadE/xyVSJDu45mEwsr+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vc3FcvVV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1751995549; c=relaxed/simple;
+	bh=9tZ8J+05xrb9kwn74xN4M5hC6tpi7cS+cS1Sp36Zado=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hCUL0pnyl5ogXcLa1xmGTshqDrmksPxBETtufpeAOk5YZ2Ej09YeMwoNXEIULrNkHuVltVJv7iyCQwDzk+fzt3iLSwQFZAvUHgqnpjOTPcawLCFARjiJuiBhOfrn+cSwqVYKPYUGT+hskzsDuJQFwk6GAnXAVp7n4roLt7ZLC/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fTf0RHLy; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vc3FcvVV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751986143;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fTf0RHLy"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751995543;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ilLnM1nkDK5EG4IlWePIEBnogI1MpE46KJsgpSIvj2E=;
-	b=Vc3FcvVVuuNO2J1oh2SUHtg4W3P3QeaFz3+tRl1ds7+1dfG+ncsg6f9bqxRyxjUFmaVXXy
-	AYNGk94NKO1yVHK2IPkMYrAWQ23vjB32CyQ5iRnMEZis9/2n0U6q+QmguGIGCLGMFsfSX9
-	9pMmlYjW+D/3t4lI6EM4vIGPo+QnlgQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-96-76szLN-YNBO4WuXbFAoWWQ-1; Tue, 08 Jul 2025 10:49:02 -0400
-X-MC-Unique: 76szLN-YNBO4WuXbFAoWWQ-1
-X-Mimecast-MFC-AGG-ID: 76szLN-YNBO4WuXbFAoWWQ_1751986141
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4f7f1b932so2954450f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 08 Jul 2025 07:49:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751986141; x=1752590941;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ilLnM1nkDK5EG4IlWePIEBnogI1MpE46KJsgpSIvj2E=;
-        b=Zj3utkv3Cu3i+EUyUhC8zwK5MXkpTfxOF6kkHAIgq8cw4d4Jtty/jX/QbpZRUOltop
-         vOkEkZC/6RnTau9EvHWymy0BYLyDnx/C8aOLmckSXyaBztJjwTKQytJahtUnC4Ep7mt4
-         H+xMDVoGV0N4/j+GwDPHIQpw6zgiTuPB7263MPDZjvYeFP8tZ0rBDRXjE7kETsFrMPEC
-         cS/7gM6IAIE/Htehw3izWfhLkbHSJh7G9liNIxinUDfjOCSl3/1Mm4Cs0+oLOC1nebpw
-         UDKyvo3+Qeoe1uAzrCyoJ2pcQgZqUYvW7XSbd7+lOdaDkKn1YeQzenaiQdbZA59Ij55g
-         sDeg==
-X-Forwarded-Encrypted: i=1; AJvYcCXBkgmArs9YAH9i+Awe3AMCkB+AqpV7+iO9oHPcMSco8UEgS5agsII8BjH9qi+R8lr3f8LggjA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwXqDAu+Xb6ALG6DKiCTiW+sGW+J/DI1xwdpgyo6MG0L/LxR4zn
-	VHHKB92tGTUhS5xXzMdt2szBWGxfEmQ2u062qPF5fM4Z5o5EkmapqTv66WCAtYQxDE3/ZZ8GHAe
-	xZOEizbL56OxEY7aT12h+qagPDKIrDjigoVdwZ4hswM2DIedHxqGPZLv4nocXSvAKR8fuaNCwA8
-	7Bz1jR2Dp761ArA2lOxqZB9ovgUYBBsqBU
-X-Gm-Gg: ASbGncta1LP6HHd6ZMlCgql8KdvXqxg9vVyAZgdiRLKSMs8r8SsM0U4hU8yr8MSspeC
-	I/lQEh9ev6yJRenFgxuDtBy1xVySb+xpc4RIjuJHa2B7Ux673pjUyYS1xPsZqLkSscDvHiw4e8z
-	WLKw==
-X-Received: by 2002:a05:6000:2281:b0:3b4:4876:9088 with SMTP id ffacd0b85a97d-3b49702e7e1mr13523183f8f.46.1751986140859;
-        Tue, 08 Jul 2025 07:49:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHNmhF5tEibNLSO4zklVeukkffwYibjFI3qCmoKoreWsosWzDc7FRBfrG9K0f+Z6MixAgDUVST4ozCaCvN0Rx0=
-X-Received: by 2002:a05:6000:2281:b0:3b4:4876:9088 with SMTP id
- ffacd0b85a97d-3b49702e7e1mr13523163f8f.46.1751986140408; Tue, 08 Jul 2025
- 07:49:00 -0700 (PDT)
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oide9nfYxcIZY4KKksiPvCMi2cQY1AbSzfhrPyuWNSQ=;
+	b=fTf0RHLyjfTxSPzIoz8/kGkjY10/IcWXyDnq7aGBn++Zb285VmgPJfuHsECvtlFbpA8oF6
+	1i44nSyhbKOojZsMZINTw+OoyEoLan+Xm/i82FDWXXglHp3uTHqLaUdKBBDg2KxURTEa4T
+	NqwY0e5kqMLKnyDCGzkzZOq5dAI29cY=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 00/27] KVM: arm64: SCTLR2, DoubleFault2, and NV external abort fixes
+Date: Tue,  8 Jul 2025 10:25:05 -0700
+Message-Id: <20250708172532.1699409-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250703100544.947908-1-maz@kernel.org>
-In-Reply-To: <20250703100544.947908-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 8 Jul 2025 16:48:48 +0200
-X-Gm-Features: Ac12FXyc1eDwUfgvyIyyq8lMwH--Dkal7I5XoAdK2HIbjIFxeLbn23IfObIwnEg
-Message-ID: <CABgObfafDC6m303YirQvgYdfZxZ6fL0LmU4H0gKdkGGv9QvVeA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.16, take #5
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Mark Brown <broonie@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: UqUG2eqFhm9E8d8R3NHkZsNMAAfcNk0WCiOCV8DZeSs_1751986141
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jul 3, 2025 at 12:08=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> Paolo,
->
-> The one-fixes-PR-per-week trend continues, with ever decreasing levels
-> of severity.
->
-> This time, we drop some leftovers from past fixes, removing the EL1 S1
-> mapping of the host FPSIMD state, and stop advertising bogus S2 base
-> granule sizes to the guest.
->
-> I expect you will bundle this with the kvmarm-fixes-6.16-4 PR from
-> last week.
+v2: https://lore.kernel.org/kvmarm/20250616230308.1192565-1-oliver.upton@linux.dev/
 
-Indeed.  It'll get to Linus tomorrow after the KVM community call.
+v2 -> v3:
+ - Fix mask computation when SCLTR2_ELx.NMEA is set
+ - Consolidate TMEA handling for all aborts, spin off NMEA (Marc)
+ - Set up the fault context correctly for the injected abort (e.g.
+   not setting HPFAR_EL2 when UNKNOWN) (Marc)
+ - Don't use the guest hypervisor's VSESR when FEAT_RAS isn't
+   implemented for the guest (Marc)
 
-Paolo
+Marc Zyngier (1):
+  KVM: arm64: Add helper to identify a nested context
+
+Oliver Upton (26):
+  arm64: Detect FEAT_SCTLR2
+  arm64: Detect FEAT_DoubleFault2
+  KVM: arm64: Treat vCPU with pending SError as runnable
+  KVM: arm64: nv: Respect exception routing rules for SEAs
+  KVM: arm64: nv: Honor SError exception routing / masking
+  KVM: arm64: nv: Add FEAT_RAS vSError sys regs to table
+  KVM: arm64: nv: Use guest hypervisor's vSError state
+  KVM: arm64: nv: Advertise support for FEAT_RAS
+  KVM: arm64: nv: Describe trap behavior of SCTLR2_EL1
+  KVM: arm64: Wire up SCTLR2_ELx sysreg descriptors
+  KVM: arm64: Context switch SCTLR2_ELx when advertised to the guest
+  KVM: arm64: Enable SCTLR2 when advertised to the guest
+  KVM: arm64: Describe SCTLR2_ELx RESx masks
+  KVM: arm64: Factor out helper for selecting exception target EL
+  KVM: arm64: nv: Ensure Address size faults affect correct ESR
+  KVM: arm64: Route SEAs to the SError vector when EASE is set
+  KVM: arm64: nv: Take "masked" aborts to EL2 when HCRX_EL2.TMEA is set
+  KVM: arm64: nv: Honor SError routing effects of SCTLR2_ELx.NMEA
+  KVM: arm64: nv: Enable vSErrors when HCRX_EL2.TMEA is set
+  KVM: arm64: Advertise support for FEAT_SCTLR2
+  KVM: arm64: Advertise support for FEAT_DoubleFault2
+  KVM: arm64: Don't retire MMIO instruction w/ pending (emulated) SError
+  KVM: arm64: selftests: Add basic SError injection test
+  KVM: arm64: selftests: Test SEAs are taken to SError vector when
+    EASE=1
+  KVM: arm64: selftests: Add SCTLR2_EL1 to get-reg-list
+  KVM: arm64: selftests: Catch up set_id_regs with the kernel
+
+ arch/arm64/include/asm/kvm_emulate.h          |  51 +++-
+ arch/arm64/include/asm/kvm_host.h             |  32 ++-
+ arch/arm64/include/asm/kvm_nested.h           |   2 +
+ arch/arm64/include/asm/vncr_mapping.h         |   2 +
+ arch/arm64/kernel/cpufeature.c                |   9 +
+ arch/arm64/kvm/arch_timer.c                   |   2 +-
+ arch/arm64/kvm/arm.c                          |   9 +-
+ arch/arm64/kvm/config.c                       |  28 +++
+ arch/arm64/kvm/emulate-nested.c               |  49 +++-
+ arch/arm64/kvm/guest.c                        |  33 +--
+ arch/arm64/kvm/handle_exit.c                  |  24 +-
+ arch/arm64/kvm/hyp/exception.c                |  10 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  53 +++-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |  48 +++-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |   2 +-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c            |   6 +
+ arch/arm64/kvm/inject_fault.c                 | 231 ++++++++++++------
+ arch/arm64/kvm/mmio.c                         |  12 +-
+ arch/arm64/kvm/mmu.c                          |  17 +-
+ arch/arm64/kvm/nested.c                       |  49 +++-
+ arch/arm64/kvm/sys_regs.c                     |  31 ++-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          |   2 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   2 +-
+ .../arm64/{mmio_abort.c => external_aborts.c} | 159 +++++++++++-
+ .../selftests/kvm/arm64/get-reg-list.c        |   7 +
+ .../testing/selftests/kvm/arm64/set_id_regs.c |  14 +-
+ .../selftests/kvm/include/arm64/processor.h   |  10 +
+ 28 files changed, 725 insertions(+), 170 deletions(-)
+ rename tools/testing/selftests/kvm/arm64/{mmio_abort.c => external_aborts.c} (50%)
+
+
+base-commit: 86731a2a651e58953fc949573895f2fa6d456841
+-- 
+2.39.5
 
