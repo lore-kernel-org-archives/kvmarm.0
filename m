@@ -1,32 +1,32 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920902E03E0
-	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6552E03E0
+	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751995639; cv=none; b=dxgVoC9RJsQfxTj3MadtQpug0/8ZBDQiWgniV3ErjEXQ+dU35lvXbkwuyXZRaISpdt6T3iJ5vUcxxiVh4hjA7PIqv8+7cb48T17/mQboAVLW29H/8bshRRs0OtLuafpNBakIkT2vXkJ6OEBW1CcDkORjKmAg9yTCR9hJbcKXZ6A=
+	t=1751995642; cv=none; b=mYkYZeD6XwSu0+dlm8E7KU7dmver5a4IZ7WPvBGsdbP3qW75R/hHhwTy5W+3cxGmfO2WvOahWkTotBIjAvm3AaF3ZT9LNVLoBZuIlXgVDGcjc87ddHZ2sO1uVwS1f74AKeEQpV1XuRIXR1niuN9duuelHayRPhW4GIrhWlBDal4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751995639; c=relaxed/simple;
-	bh=xpZczMgAiQEUCM+B3dItqQvrzwOmtKlHHexTJgrzOu0=;
+	s=arc-20240116; t=1751995642; c=relaxed/simple;
+	bh=lm9v9eSP34WJjhNTYCJAWqElF7diCELRzN0g4U7w6Bc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SO+8wY1pV7NNABdaa602NfBN/CSXhC//fozT7ONhCcIktvCXP2w4OwG8RrOPd1MI/jOF9HxAJ0vFP/vxZVQUdVFc0EXif+vDex8xoq5pTIhGByvvBh/FaYk92mWRFMOqfmS/UPbopx5wMyuKYXvvdnxO3yTDCy661I0cHxBP/Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VCSGMY18; arc=none smtp.client-ip=95.215.58.176
+	 MIME-Version; b=aEI2pL5fXKsiH8l8l98BkODSjTLrcUXHu/OU+KMCulP4dFrkh7KydhwixL6AJWVahRNJzWAgT9egJ9YKSlqNgz7piA3+j0e5L1K+rT2iJBYbYwIpaJOclSlMU50OsXnP1/axhGX2z61riJmn5WHcfTaZS5Sn3LD2AZX1e2kDS04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ek0tXsJP; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VCSGMY18"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ek0tXsJP"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751995636;
+	t=1751995638;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=32QET0TLhL3tM7oB60QGVk61oUKKQJ3b74DM1kljI50=;
-	b=VCSGMY184on/HiT7kRHqv+fbNLO9EsnsFhXDQX/h0SIfP7Xl+yiQ5KRgzpTWetI+A30uOZ
-	LY7AHih7xWyBwJ83tO0QU002qqs139ARuFiwcXK78Zc8J8lf7ikpgLBs7YTp0CTxsSRMcM
-	bkcVJFXLgssICL0czRGot2nhP2e56PA=
+	bh=PsQMYlRPq0c0mGqV8NACsl2TVxohcumsyk7Axui/yXM=;
+	b=Ek0tXsJPoUcrNuY341NHIdVGgN1JRZaI1hjw0VgbXgwBsKHItGCliHQAZDtZXIUOLNX7tC
+	2OVE6ztPFnQcqMcobT1j1wmIpx5Wx4ejcfWhMLBplUL8m7orzlcB1vlaRfWFmQNPZJPlSt
+	VcPThvaEPKcCnt59zd6mABToTDqOFl0=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 14/27] KVM: arm64: Describe SCTLR2_ELx RESx masks
-Date: Tue,  8 Jul 2025 10:25:19 -0700
-Message-Id: <20250708172532.1699409-15-oliver.upton@linux.dev>
+Subject: [PATCH v3 15/27] KVM: arm64: Factor out helper for selecting exception target EL
+Date: Tue,  8 Jul 2025 10:25:20 -0700
+Message-Id: <20250708172532.1699409-16-oliver.upton@linux.dev>
 In-Reply-To: <20250708172532.1699409-1-oliver.upton@linux.dev>
 References: <20250708172532.1699409-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,93 +48,73 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-External abort injection will soon rely on a sanitised view of
-SCTLR2_ELx to determine exception routing. Compute the RESx masks.
+Pull out the exception target selection from pend_sync_exception() for
+general use. Use PSR_MODE_ELxh as a shorthand for the target EL, as
+SP_ELx selection is handled further along in the hyp's exception
+emulation.
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/config.c | 28 ++++++++++++++++++++++++++++
- arch/arm64/kvm/nested.c |  6 ++++++
- 2 files changed, 34 insertions(+)
+ arch/arm64/kvm/inject_fault.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 54911a93b001..e8a33e91e665 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -131,6 +131,8 @@ struct reg_bits_to_feat_map {
- #define FEAT_SPMU		ID_AA64DFR1_EL1, SPMU, IMP
- #define FEAT_SPE_nVM		ID_AA64DFR2_EL1, SPE_nVM, IMP
- #define FEAT_STEP2		ID_AA64DFR2_EL1, STEP, IMP
-+#define FEAT_SYSREG128		ID_AA64ISAR2_EL1, SYSREG_128, IMP
-+#define FEAT_CPA2		ID_AA64ISAR3_EL1, CPA, CPA2
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 10773a8ef4cb..4df42a41d0ab 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -15,13 +15,11 @@
+ #include <asm/kvm_nested.h>
+ #include <asm/esr.h>
  
- static bool not_feat_aa64el3(struct kvm *kvm)
+-static void pend_sync_exception(struct kvm_vcpu *vcpu)
++static unsigned int exception_target_el(struct kvm_vcpu *vcpu)
  {
-@@ -832,6 +834,23 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
- 	NEEDS_FEAT_FIXED(HCR_EL2_E2H, compute_hcr_e2h),
- };
+ 	/* If not nesting, EL1 is the only possible exception target */
+-	if (likely(!vcpu_has_nv(vcpu))) {
+-		kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
+-		return;
+-	}
++	if (likely(!vcpu_has_nv(vcpu)))
++		return PSR_MODE_EL1h;
  
-+static const struct reg_bits_to_feat_map sctlr2_feat_map[] = {
-+	NEEDS_FEAT(SCTLR2_EL1_NMEA	|
-+		   SCTLR2_EL1_EASE,
-+		   FEAT_DoubleFault2),
-+	NEEDS_FEAT(SCTLR2_EL1_EnADERR, feat_aderr),
-+	NEEDS_FEAT(SCTLR2_EL1_EnANERR, feat_anerr),
-+	NEEDS_FEAT(SCTLR2_EL1_EnIDCP128, FEAT_SYSREG128),
-+	NEEDS_FEAT(SCTLR2_EL1_EnPACM	|
-+		   SCTLR2_EL1_EnPACM0,
-+		   feat_pauth_lr),
-+	NEEDS_FEAT(SCTLR2_EL1_CPTA	|
-+		   SCTLR2_EL1_CPTA0	|
-+		   SCTLR2_EL1_CPTM	|
-+		   SCTLR2_EL1_CPTM0,
-+		   FEAT_CPA2),
-+};
-+
- static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
- 				  int map_size, u64 res0, const char *str)
- {
-@@ -863,6 +882,8 @@ void __init check_feature_map(void)
- 		       __HCRX_EL2_RES0, "HCRX_EL2");
- 	check_feat_map(hcr_feat_map, ARRAY_SIZE(hcr_feat_map),
- 		       HCR_EL2_RES0, "HCR_EL2");
-+	check_feat_map(sctlr2_feat_map, ARRAY_SIZE(sctlr2_feat_map),
-+		       SCTLR2_EL1_RES0, "SCTLR2_EL1");
+ 	/*
+ 	 * With NV, we need to pick between EL1 and EL2. Note that we
+@@ -32,23 +30,25 @@ static void pend_sync_exception(struct kvm_vcpu *vcpu)
+ 	switch(*vcpu_cpsr(vcpu) & PSR_MODE_MASK) {
+ 	case PSR_MODE_EL2h:
+ 	case PSR_MODE_EL2t:
+-		kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SYNC);
+-		break;
++		return PSR_MODE_EL2h;
+ 	case PSR_MODE_EL1h:
+ 	case PSR_MODE_EL1t:
+-		kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
+-		break;
++		return PSR_MODE_EL1h;
+ 	case PSR_MODE_EL0t:
+-		if (vcpu_el2_tge_is_set(vcpu))
+-			kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SYNC);
+-		else
+-			kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
+-		break;
++		return vcpu_el2_tge_is_set(vcpu) ? PSR_MODE_EL2h : PSR_MODE_EL1h;
+ 	default:
+ 		BUG();
+ 	}
  }
  
- static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
-@@ -1077,6 +1098,13 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
- 		*res0 |= HCR_EL2_RES0 | (mask & ~fixed);
- 		*res1 = HCR_EL2_RES1 | (mask & fixed);
- 		break;
-+	case SCTLR2_EL1:
-+	case SCTLR2_EL2:
-+		*res0 = compute_res0_bits(kvm, sctlr2_feat_map,
-+					  ARRAY_SIZE(sctlr2_feat_map), 0, 0);
-+		*res0 |= SCTLR2_EL1_RES0;
-+		*res1 = SCTLR2_EL1_RES1;
-+		break;
- 	default:
- 		WARN_ON_ONCE(1);
- 		*res0 = *res1 = 0;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index c7063f670187..096747a61bf6 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1690,6 +1690,12 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
- 		res0 |= SCTLR_EL1_EPAN;
- 	set_sysreg_masks(kvm, SCTLR_EL1, res0, res1);
- 
-+	/* SCTLR2_ELx */
-+	get_reg_fixed_bits(kvm, SCTLR2_EL1, &res0, &res1);
-+	set_sysreg_masks(kvm, SCTLR2_EL1, res0, res1);
-+	get_reg_fixed_bits(kvm, SCTLR2_EL2, &res0, &res1);
-+	set_sysreg_masks(kvm, SCTLR2_EL2, res0, res1);
++static void pend_sync_exception(struct kvm_vcpu *vcpu)
++{
++	if (exception_target_el(vcpu) == PSR_MODE_EL1h)
++		kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
++	else
++		kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SYNC);
++}
 +
- 	/* MDCR_EL2 */
- 	res0 = MDCR_EL2_RES0;
- 	res1 = MDCR_EL2_RES1;
+ static bool match_target_el(struct kvm_vcpu *vcpu, unsigned long target)
+ {
+ 	return (vcpu_get_flag(vcpu, EXCEPT_MASK) == target);
 -- 
 2.39.5
 
