@@ -1,32 +1,32 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565322BD590
-	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73172E6131
+	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751995550; cv=none; b=SV72qPhQ57UdPkgijXsckSt2lyVe4kmx9UN85TXyW8TVc2SaA2Rtm87J3Qy8pzMfvK8w0pC2aplwKQIgtoSLENAByZffiMIxnc2fMZm4aHcKF0z0aS6r07k85TPkhrHULaJ2cPxcGmXNj/TU7Tb7f651KcfWNHdZdH2yz81dcJU=
+	t=1751995550; cv=none; b=r4o9Ts5xCFym1NDRq9cXnU5Ou/KevfGkwX/FJDS+XYy1FohSd4Wxkxr/6hbiFlxpvZETIoMa323j7s9cMPH/8OuZvXdIf/M/yRRBkfEeHoalq2dr5YpnM3AGWQ/FpV0fvHahFMQlkDP2O7V+KUMpjm035XtsKoCodhF1pKWqBMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751995550; c=relaxed/simple;
-	bh=J+W/YRME/6z7rdimHRzYMyrANMlbJYNQMcuOHkgWRv4=;
+	bh=XYlcXBD/5fKs69wn28qAVbZ3a87bHsNrKcjPRVSFIi8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PVWdpeB/rWS6r88lKO+Gko6+jix2f3DB6hkzXAt43ehAkYtxojPINYqAq7sDLhTVafrgKk5Q+abk1Sks0nMljV5C2d3nSS4QoA10sq+vfoT1PCqsdHk9U8yuAt7k+8p/tD9KyxMleN4bzBmxJK7i5ZO+tWKMx47mkYKUKw4wxBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I7WY5nYd; arc=none smtp.client-ip=95.215.58.180
+	 MIME-Version; b=TgGWYnIS6cTBbhAnrZGP5l+g2llEHTC+HnJzvRIKxxA5voov3AE7sv2jtqMA4aKX2eZfbaiM1iAtOLTbqQkP2/H8ELWYmRf0qRMoVc1+83KzQWD/aJrtpfZdkVsGQydx5HGbbWzZF+2KFUePyiwL0xZxuobrnDkDDIqVOY2gQ40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nuZBQE86; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I7WY5nYd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nuZBQE86"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751995545;
+	t=1751995546;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2HSu4imeO8LlAkAanhdOBq5qrkZ0SRNChmsxMiROmkc=;
-	b=I7WY5nYdeGuSeJOR5vz7ECChfBOtw0j7zmEpf4727/zK6/sJAcxw9faS7nd1zhGN1dIz0H
-	E3Tg5YHwns/D6qZFUwPdmH66B11sy9I51IE/JQRory6IRUKVuKH8FOobi42zMiroQ3SWJd
-	feXKzIDbJMk5oc50hYkfrTQ9q4GmdFM=
+	bh=Q9NT4Qv4Sw15efEy4KJoPxcdCtGvI/D2ECJYpMNbzJc=;
+	b=nuZBQE86KZ9mvwHO7Ebo+Dx4beAf5nkbck+gylAW15h0TUf3zDyTOeqVKCHoIZ+CX+nsWL
+	/BYuafFZTBzA+fo0bdM9q0qhxteI8Nh55S1ODz1+K5v/VE0VBOJKRvK12BXNMdXhXUGbgr
+	Y8PY59bSj/Ob/ZhEY4M3ecC859FXLwc=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 01/27] arm64: Detect FEAT_SCTLR2
-Date: Tue,  8 Jul 2025 10:25:06 -0700
-Message-Id: <20250708172532.1699409-2-oliver.upton@linux.dev>
+Subject: [PATCH v3 02/27] arm64: Detect FEAT_DoubleFault2
+Date: Tue,  8 Jul 2025 10:25:07 -0700
+Message-Id: <20250708172532.1699409-3-oliver.upton@linux.dev>
 In-Reply-To: <20250708172532.1699409-1-oliver.upton@linux.dev>
 References: <20250708172532.1699409-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,54 +48,27 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-KVM is about to pick up support for SCTLR2. Add cpucap for later use in
-the guest/host context switch hot path.
+KVM will soon support FEAT_DoubleFault2. Add a descriptor for the
+corresponding ID register field.
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kernel/cpufeature.c | 8 ++++++++
- arch/arm64/tools/cpucaps       | 1 +
- 2 files changed, 9 insertions(+)
+ arch/arm64/kernel/cpufeature.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index b34044e20128..b85be598cb17 100644
+index b85be598cb17..72ccf9ed4d05 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -500,6 +500,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_POE),
- 		       FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_S1POE_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_S1PIE_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_SCTLRX_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_TCRX_SHIFT, 4, 0),
- 	ARM64_FTR_END,
- };
-@@ -3061,6 +3062,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_pmuv3,
- 	},
- #endif
-+	{
-+		.desc = "SCTLR2",
-+		.capability = ARM64_HAS_SCTLR2,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64MMFR3_EL1, SCTLRX, IMP)
-+	},
- 	{},
+@@ -303,6 +303,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
  };
  
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 10effd4cff6b..24d57e309f27 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -49,6 +49,7 @@ HAS_PAN
- HAS_PMUV3
- HAS_S1PIE
- HAS_S1POE
-+HAS_SCTLR2
- HAS_RAS_EXTN
- HAS_RNG
- HAS_SB
+ static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_DF2_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_GCS),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_GCS_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MTE_frac_SHIFT, 4, 0),
 -- 
 2.39.5
 
