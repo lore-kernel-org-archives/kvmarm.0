@@ -1,32 +1,32 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786C52E6122
-	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AAB2E6131
+	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 17:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751995556; cv=none; b=G6pIPLGkFmGxJOzIIzlyEUvy24Z/flliCBdptTTlJYeUvx0endaZeHM0SwYmXXVlMM+X0QZ4tvzEf7Xk2T4NEfYs7icxB3OCXCVzyoeeWzjX7s4WBlNDmAOznSL3ax0bWlw3QC+1E8xQWrCYbFpsXtyh+VByP5fmUE/sima2Ehk=
+	t=1751995558; cv=none; b=AE4Sbs9P6xqZ/HGU1W6W3zWWPL4mi89wzBCcY5qhetAwMWhmgBTAWhOZbrfTTB2Crpo57nCvqhy1TRUjp2tBXVG/sJ3thhKeywKgHw6a+LdvgPYt6YXU+9PfnXO1LWlFQz19aiMxLK3J/TeHtiHYrogQPrWQf+t/84CGCgd8n2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751995556; c=relaxed/simple;
-	bh=QjOoz0UJXSbMu5ltMbcyr+oUwnAiTiA7BKKXU+FEZlc=;
+	s=arc-20240116; t=1751995558; c=relaxed/simple;
+	bh=2D2dytMXk8j/uOtGvuwWTNYTRMEFHTQQ2j79HqfCO8g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=C343M/5OwMjwTRjVJdmYEa5cx/miaB6w8Qm/gZDg8yi4Q0q4hpgLUL+Bf+oZVOCSZOm71Mu2wcjtRBCmOhmmYHmhLrfe4yL2nHCJDo2fb65ofvm/virnBwKxq62ouyEz2n3vLkkSCKgDc1fGXbH3xKIRShjLNq7dsJW4O2TlxwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WP3HU5lX; arc=none smtp.client-ip=95.215.58.178
+	 MIME-Version; b=NR0iiCNi1IOOTnyaUo01+ycjP3B3FChqzdnpvabzynOWKsPXodrdU1f7fY9Vkhykw3bjoH+2dj6fgKNXLP4f0GCvaTu6ouj21Sr72qNT0LzinpkKcifWXm3TqdnHURhhxaSRCgne4xzzaZTC7lcPtQC7t4NgzV8wt5b6V3dYgus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EU2Cmk/f; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WP3HU5lX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EU2Cmk/f"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751995552;
+	t=1751995554;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gdDQYfiJqYW1D5HHnclNQ0dBCugfA72fNzeA3LC/smw=;
-	b=WP3HU5lXk0ziBXTW8Od5rPQjR9ncsMs9w/Qb6tuOYHMEpkUem0sZ93/ZwctfiLI2ORUdD0
-	IysbmHFt27Nxud6aXu74JMfpZrYZkOFuEYNFzyBQBBK2eHunAJh7xXtg1cNB68Q8Zn8gGP
-	sG5+WnP4O4O4dRBgkwcF7X4nDLE8yx8=
+	bh=ChtC57axq6uUGb7EQoxoRZV2W1Up9csgjnpaaL2CoEs=;
+	b=EU2Cmk/fpGaLhuWjYqHybNp9BAsbx4LNKwfVo0P1eU/+I8bMHG8/a4Q+LROmT2J+EcvLZY
+	LsLnFoOzq35Pozr5nDSFW8jFfHzyA0gH1iMtizsRo/EpgpdiiW5slThx6qPRRLNhH9dJVl
+	TU8S22EMDlWjEUirBugukdJi5Gl+CMw=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 05/27] KVM: arm64: nv: Respect exception routing rules for SEAs
-Date: Tue,  8 Jul 2025 10:25:10 -0700
-Message-Id: <20250708172532.1699409-6-oliver.upton@linux.dev>
+Subject: [PATCH v3 06/27] KVM: arm64: nv: Honor SError exception routing / masking
+Date: Tue,  8 Jul 2025 10:25:11 -0700
+Message-Id: <20250708172532.1699409-7-oliver.upton@linux.dev>
 In-Reply-To: <20250708172532.1699409-1-oliver.upton@linux.dev>
 References: <20250708172532.1699409-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,43 +48,67 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Synchronous external aborts are taken to EL2 if ELIsInHost() or
-HCR_EL2.TEA=1. Rework the SEA injection plumbing to respect the imposed
-routing of the guest hypervisor and opportunistically rephrase things to
-make their function a bit more obvious.
+To date KVM has used HCR_EL2.VSE to track the state of a pending SError
+for the guest. With this bit set, hardware respects the EL1 exception
+routing / masking rules and injects the vSError when appropriate.
+
+This isn't correct for NV guests as hardware is oblivious to vEL2's
+intentions for SErrors. Better yet, with FEAT_NV2 the guest can change
+the routing behind our back as HCR_EL2 is redirected to memory. Cope
+with this mess by:
+
+ - Using a flag (instead of HCR_EL2.VSE) to track the pending SError
+   state when SErrors are unconditionally masked for the current context
+
+ - Resampling the routing / masking of a pending SError on every guest
+   entry/exit
+
+ - Emulating exception entry when SError routing implies a translation
+   regime change
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 14 +++++++--
- arch/arm64/kvm/emulate-nested.c      | 10 +++++++
- arch/arm64/kvm/guest.c               |  5 ++--
- arch/arm64/kvm/inject_fault.c        | 45 +++++++++++-----------------
- arch/arm64/kvm/mmio.c                |  6 ++--
- arch/arm64/kvm/mmu.c                 | 15 +++-------
- 6 files changed, 48 insertions(+), 47 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 20 +++++++++++++-
+ arch/arm64/include/asm/kvm_host.h    | 18 ++++++++++---
+ arch/arm64/include/asm/kvm_nested.h  |  2 ++
+ arch/arm64/kvm/arm.c                 |  4 +++
+ arch/arm64/kvm/emulate-nested.c      | 14 ++++++++++
+ arch/arm64/kvm/guest.c               | 32 ++++++++++++----------
+ arch/arm64/kvm/handle_exit.c         |  4 +--
+ arch/arm64/kvm/hyp/exception.c       |  6 ++++-
+ arch/arm64/kvm/inject_fault.c        | 39 +++++++++++++++------------
+ arch/arm64/kvm/mmu.c                 |  2 +-
+ arch/arm64/kvm/nested.c              | 40 ++++++++++++++++++++++++++++
+ 11 files changed, 142 insertions(+), 39 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 8ba991b4bcfd..3a27ed4de9ac 100644
+index 3a27ed4de9ac..daa0410aaebf 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -46,15 +46,25 @@ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+@@ -45,7 +45,7 @@ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
  
  void kvm_inject_undefined(struct kvm_vcpu *vcpu);
- void kvm_inject_vabt(struct kvm_vcpu *vcpu);
--void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
--void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
-+int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+-void kvm_inject_vabt(struct kvm_vcpu *vcpu);
++int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr);
+ int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
  void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
  
-+static inline int kvm_inject_sea_dabt(struct kvm_vcpu *vcpu, u64 addr)
+@@ -59,12 +59,25 @@ static inline int kvm_inject_sea_iabt(struct kvm_vcpu *vcpu, u64 addr)
+ 	return kvm_inject_sea(vcpu, true, addr);
+ }
+ 
++static inline int kvm_inject_serror(struct kvm_vcpu *vcpu)
 +{
-+	return kvm_inject_sea(vcpu, false, addr);
-+}
-+
-+static inline int kvm_inject_sea_iabt(struct kvm_vcpu *vcpu, u64 addr)
-+{
-+	return kvm_inject_sea(vcpu, true, addr);
++	/*
++	 * ESR_ELx.ISV (later renamed to IDS) indicates whether or not
++	 * ESR_ELx.ISS contains IMPLEMENTATION DEFINED syndrome information.
++	 *
++	 * Set the bit when injecting an SError w/o an ESR to indicate ISS
++	 * does not follow the architected format.
++	 */
++	return kvm_inject_serror_esr(vcpu, ESR_ELx_ISV);
 +}
 +
  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
@@ -92,178 +116,350 @@ index 8ba991b4bcfd..3a27ed4de9ac 100644
  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
-+int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+ int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
++int kvm_inject_nested_serror(struct kvm_vcpu *vcpu, u64 esr);
  
  static inline void kvm_inject_nested_sve_trap(struct kvm_vcpu *vcpu)
  {
+@@ -205,6 +218,11 @@ static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
+ 	return ctxt_sys_reg(&vcpu->arch.ctxt, HCR_EL2) & HCR_TGE;
+ }
+ 
++static inline bool vcpu_el2_amo_is_set(const struct kvm_vcpu *vcpu)
++{
++	return ctxt_sys_reg(&vcpu->arch.ctxt, HCR_EL2) & HCR_AMO;
++}
++
+ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+ {
+ 	bool e2h, tge;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d27079968341..8af4a5d40077 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -817,7 +817,7 @@ struct kvm_vcpu_arch {
+ 	u8 iflags;
+ 
+ 	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+-	u8 sflags;
++	u16 sflags;
+ 
+ 	/*
+ 	 * Don't run the guest (internal implementation need).
+@@ -953,9 +953,21 @@ struct kvm_vcpu_arch {
+ 		__vcpu_flags_preempt_enable();			\
+ 	} while (0)
+ 
++#define __vcpu_test_and_clear_flag(v, flagset, f, m)		\
++	({							\
++		typeof(v->arch.flagset) set;			\
++								\
++		set = __vcpu_get_flag(v, flagset, f, m);	\
++		__vcpu_clear_flag(v, flagset, f, m);		\
++								\
++		set;						\
++	})
++
+ #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
+ #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
+ #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
++#define vcpu_test_and_clear_flag(v, ...)			\
++	__vcpu_test_and_clear_flag((v), __VA_ARGS__)
+ 
+ /* KVM_ARM_VCPU_INIT completed */
+ #define VCPU_INITIALIZED	__vcpu_single_flag(cflags, BIT(0))
+@@ -1015,6 +1027,8 @@ struct kvm_vcpu_arch {
+ #define IN_WFI			__vcpu_single_flag(sflags, BIT(6))
+ /* KVM is currently emulating a nested ERET */
+ #define IN_NESTED_ERET		__vcpu_single_flag(sflags, BIT(7))
++/* SError pending for nested guest */
++#define NESTED_SERROR_PENDING	__vcpu_single_flag(sflags, BIT(8))
+ 
+ 
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+@@ -1387,8 +1401,6 @@ static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
+ 	return (vcpu_arch->steal.base != INVALID_GPA);
+ }
+ 
+-void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
+-
+ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+ 
+ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 0bd07ea068a1..7fd76f41c296 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -80,6 +80,8 @@ extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+ extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+ 
+ extern void check_nested_vcpu_requests(struct kvm_vcpu *vcpu);
++extern void kvm_nested_flush_hwstate(struct kvm_vcpu *vcpu);
++extern void kvm_nested_sync_hwstate(struct kvm_vcpu *vcpu);
+ 
+ struct kvm_s2_trans {
+ 	phys_addr_t output;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index bbe7b98e1ce3..c664f3a7883a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1188,6 +1188,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 */
+ 		preempt_disable();
+ 
++		kvm_nested_flush_hwstate(vcpu);
++
+ 		if (kvm_vcpu_has_pmu(vcpu))
+ 			kvm_pmu_flush_hwstate(vcpu);
+ 
+@@ -1287,6 +1289,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		/* Exit types that need handling before we can be preempted */
+ 		handle_exit_early(vcpu, ret);
+ 
++		kvm_nested_sync_hwstate(vcpu);
++
+ 		preempt_enable();
+ 
+ 		/*
 diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 1de4a9001d9d..65a2471c5638 100644
+index 65a2471c5638..b01a482b41be 100644
 --- a/arch/arm64/kvm/emulate-nested.c
 +++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2811,3 +2811,13 @@ int kvm_inject_nested_irq(struct kvm_vcpu *vcpu)
- 	/* esr_el2 value doesn't matter for exits due to irqs. */
- 	return kvm_inject_nested(vcpu, 0, except_type_irq);
+@@ -2714,6 +2714,9 @@ static void kvm_inject_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 	case except_type_irq:
+ 		kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_IRQ);
+ 		break;
++	case except_type_serror:
++		kvm_pend_exception(vcpu, EXCEPT_AA64_EL2_SERR);
++		break;
+ 	default:
+ 		WARN_ONCE(1, "Unsupported EL2 exception injection %d\n", type);
+ 	}
+@@ -2821,3 +2824,14 @@ int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+ 	vcpu_write_sys_reg(vcpu, FAR_EL2, addr);
+ 	return kvm_inject_nested_sync(vcpu, esr);
  }
 +
-+int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
++int kvm_inject_nested_serror(struct kvm_vcpu *vcpu, u64 esr)
 +{
-+	u64 esr = FIELD_PREP(ESR_ELx_EC_MASK,
-+			     iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW);
-+	esr |= ESR_ELx_FSC_EXTABT | ESR_ELx_IL;
-+
-+	vcpu_write_sys_reg(vcpu, FAR_EL2, addr);
-+	return kvm_inject_nested_sync(vcpu, esr);
++	/*
++	 * Hardware sets up the EC field when propagating ESR as a result of
++	 * vSError injection. Manually populate EC for an emulated SError
++	 * exception.
++	 */
++	esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR);
++	return kvm_inject_nested(vcpu, esr, except_type_serror);
 +}
 diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 2196979a24a3..b4d2a1deec23 100644
+index b4d2a1deec23..75cb69db4d59 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -839,6 +839,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+@@ -818,8 +818,9 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+ 			      struct kvm_vcpu_events *events)
+ {
+-	events->exception.serror_pending = !!(vcpu->arch.hcr_el2 & HCR_VSE);
+ 	events->exception.serror_has_esr = cpus_have_final_cap(ARM64_HAS_RAS_EXTN);
++	events->exception.serror_pending = (vcpu->arch.hcr_el2 & HCR_VSE) ||
++					   vcpu_get_flag(vcpu, NESTED_SERROR_PENDING);
+ 
+ 	if (events->exception.serror_pending && events->exception.serror_has_esr)
+ 		events->exception.serror_esr = vcpu_get_vsesr(vcpu);
+@@ -839,24 +840,27 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
  	bool serror_pending = events->exception.serror_pending;
  	bool has_esr = events->exception.serror_has_esr;
  	bool ext_dabt_pending = events->exception.ext_dabt_pending;
-+	int ret = 0;
++	u64 esr = events->exception.serror_esr;
+ 	int ret = 0;
  
- 	if (serror_pending && has_esr) {
- 		if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-@@ -853,9 +854,9 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 	}
- 
+-	if (serror_pending && has_esr) {
+-		if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+-			return -EINVAL;
+-
+-		if (!((events->exception.serror_esr) & ~ESR_ELx_ISS_MASK))
+-			kvm_set_sei_esr(vcpu, events->exception.serror_esr);
+-		else
+-			return -EINVAL;
+-	} else if (serror_pending) {
+-		kvm_inject_vabt(vcpu);
+-	}
+-
  	if (ext_dabt_pending)
--		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+		ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+ 		ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
  
--	return 0;
-+	return ret;
+-	return ret;
++	if (ret || !serror_pending)
++		return ret;
++
++	if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && has_esr)
++		return -EINVAL;
++
++	if (has_esr && (esr & ~ESR_ELx_ISS_MASK))
++		return -EINVAL;
++
++	if (has_esr)
++		ret = kvm_inject_serror_esr(vcpu, esr);
++	else
++		ret = kvm_inject_serror(vcpu);
++
++	return (ret < 0) ? ret : 0;
  }
  
  u32 __attribute_const__ kvm_target_cpu(void)
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index c37c58d9d25d..a598072f36d2 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -32,7 +32,7 @@ typedef int (*exit_handle_fn)(struct kvm_vcpu *);
+ static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
+ {
+ 	if (!arm64_is_ras_serror(esr) || arm64_is_fatal_ras_serror(NULL, esr))
+-		kvm_inject_vabt(vcpu);
++		kvm_inject_serror(vcpu);
+ }
+ 
+ static int handle_hvc(struct kvm_vcpu *vcpu)
+@@ -490,7 +490,7 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+ 
+ 			kvm_handle_guest_serror(vcpu, disr_to_esr(disr));
+ 		} else {
+-			kvm_inject_vabt(vcpu);
++			kvm_inject_serror(vcpu);
+ 		}
+ 
+ 		return;
+diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+index 6a2a899a344e..592adc78b149 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -347,9 +347,13 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+ 			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_irq);
+ 			break;
+ 
++		case unpack_vcpu_flag(EXCEPT_AA64_EL2_SERR):
++			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_serror);
++			break;
++
+ 		default:
+ 			/*
+-			 * Only EL1_SYNC and EL2_{SYNC,IRQ} makes
++			 * Only EL1_SYNC and EL2_{SYNC,IRQ,SERR} makes
+ 			 * sense so far. Everything else gets silently
+ 			 * ignored.
+ 			 */
 diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index a640e839848e..d9fa4046b602 100644
+index d9fa4046b602..10773a8ef4cb 100644
 --- a/arch/arm64/kvm/inject_fault.c
 +++ b/arch/arm64/kvm/inject_fault.c
-@@ -155,36 +155,28 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
- 	vcpu_write_sys_reg(vcpu, far, FAR_EL1);
+@@ -219,25 +219,30 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ 		inject_undef64(vcpu);
+ }
+ 
+-void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 esr)
++static bool kvm_serror_target_is_el2(struct kvm_vcpu *vcpu)
+ {
+-	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
+-	*vcpu_hcr(vcpu) |= HCR_VSE;
++	return is_hyp_ctxt(vcpu) || vcpu_el2_amo_is_set(vcpu);
  }
  
 -/**
-- * kvm_inject_dabt - inject a data abort into the guest
-- * @vcpu: The VCPU to receive the data abort
-- * @addr: The address to report in the DFAR
+- * kvm_inject_vabt - inject an async abort / SError into the guest
+- * @vcpu: The VCPU to receive the exception
 - *
 - * It is assumed that this code is called from the VCPU thread and that the
 - * VCPU therefore is not currently executing guest code.
-- */
--void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
-+static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
- {
- 	if (vcpu_el1_is_32bit(vcpu))
--		inject_abt32(vcpu, false, addr);
-+		inject_abt32(vcpu, iabt, addr);
- 	else
--		inject_abt64(vcpu, false, addr);
-+		inject_abt64(vcpu, iabt, addr);
- }
- 
--/**
-- * kvm_inject_pabt - inject a prefetch abort into the guest
-- * @vcpu: The VCPU to receive the prefetch abort
-- * @addr: The address to report in the DFAR
 - *
-- * It is assumed that this code is called from the VCPU thread and that the
-- * VCPU therefore is not currently executing guest code.
+- * Systems with the RAS Extensions specify an imp-def ESR (ISV/IDS = 1) with
+- * the remaining ISS all-zeros so that this error is not interpreted as an
+- * uncategorized RAS error. Without the RAS Extensions we can't specify an ESR
+- * value, so the CPU generates an imp-def value.
 - */
--void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
-+static bool kvm_sea_target_is_el2(struct kvm_vcpu *vcpu)
+-void kvm_inject_vabt(struct kvm_vcpu *vcpu)
++static bool kvm_serror_undeliverable_at_el2(struct kvm_vcpu *vcpu)
  {
--	if (vcpu_el1_is_32bit(vcpu))
--		inject_abt32(vcpu, true, addr);
--	else
--		inject_abt64(vcpu, true, addr);
-+	return __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_TGE | HCR_TEA);
+-	kvm_set_sei_esr(vcpu, ESR_ELx_ISV);
++	return !(vcpu_el2_tge_is_set(vcpu) || vcpu_el2_amo_is_set(vcpu));
 +}
 +
-+int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
++int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
 +{
 +	lockdep_assert_held(&vcpu->mutex);
 +
-+	if (is_nested_ctxt(vcpu) && kvm_sea_target_is_el2(vcpu))
-+		return kvm_inject_nested_sea(vcpu, iabt, addr);
++	if (is_nested_ctxt(vcpu) && kvm_serror_target_is_el2(vcpu))
++		return kvm_inject_nested_serror(vcpu, esr);
 +
-+	__kvm_inject_sea(vcpu, iabt, addr);
++	if (vcpu_is_el2(vcpu) && kvm_serror_undeliverable_at_el2(vcpu)) {
++		vcpu_set_vsesr(vcpu, esr);
++		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
++		return 1;
++	}
++
++	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
++	*vcpu_hcr(vcpu) |= HCR_VSE;
 +	return 1;
  }
- 
- void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-@@ -194,10 +186,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
- 	addr  = kvm_vcpu_get_fault_ipa(vcpu);
- 	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
- 
--	if (kvm_vcpu_trap_is_iabt(vcpu))
--		kvm_inject_pabt(vcpu, addr);
--	else
--		kvm_inject_dabt(vcpu, addr);
-+	__kvm_inject_sea(vcpu, kvm_vcpu_trap_is_iabt(vcpu), addr);
- 
- 	/*
- 	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index ab365e839874..573a6ade2f4e 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -169,10 +169,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
- 				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
- 
--		if (vcpu_is_protected(vcpu)) {
--			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
--			return 1;
--		}
-+		if (vcpu_is_protected(vcpu))
-+			return kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
- 
- 		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
- 			     &vcpu->kvm->arch.flags)) {
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2942ec92c5a4..f05d70dd6d51 100644
+index f05d70dd6d51..2c3094181f9c 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1836,11 +1836,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		if (fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr))) {
- 			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+@@ -1808,7 +1808,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		 * There is no need to pass the error into the guest.
+ 		 */
+ 		if (kvm_handle_guest_sea())
+-			kvm_inject_vabt(vcpu);
++			return kvm_inject_serror(vcpu);
  
--			if (is_iabt)
--				kvm_inject_pabt(vcpu, fault_ipa);
--			else
--				kvm_inject_dabt(vcpu, fault_ipa);
--			return 1;
-+			return kvm_inject_sea(vcpu, is_iabt, fault_ipa);
- 		}
+ 		return 1;
  	}
- 
-@@ -1912,8 +1908,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		}
- 
- 		if (kvm_vcpu_abt_iss1tw(vcpu)) {
--			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
--			ret = 1;
-+			ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
- 			goto out_unlock;
- 		}
- 
-@@ -1958,10 +1953,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	if (ret == 0)
- 		ret = 1;
- out:
--	if (ret == -ENOEXEC) {
--		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
--		ret = 1;
--	}
-+	if (ret == -ENOEXEC)
-+		ret = kvm_inject_sea_iabt(vcpu, kvm_vcpu_get_hfar(vcpu));
- out_unlock:
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 	return ret;
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 5b191f4dc566..4218172ed1a4 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1782,3 +1782,43 @@ void check_nested_vcpu_requests(struct kvm_vcpu *vcpu)
+ 	if (kvm_check_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu))
+ 		kvm_inject_nested_irq(vcpu);
+ }
++
++/*
++ * One of the many architectural bugs in FEAT_NV2 is that the guest hypervisor
++ * can write to HCR_EL2 behind our back, potentially changing the exception
++ * routing / masking for even the host context.
++ *
++ * What follows is some slop to (1) react to exception routing / masking and (2)
++ * preserve the pending SError state across translation regimes.
++ */
++void kvm_nested_flush_hwstate(struct kvm_vcpu *vcpu)
++{
++	if (!vcpu_has_nv(vcpu))
++		return;
++
++	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
++		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
++}
++
++void kvm_nested_sync_hwstate(struct kvm_vcpu *vcpu)
++{
++	unsigned long *hcr = vcpu_hcr(vcpu);
++
++	if (!vcpu_has_nv(vcpu))
++		return;
++
++	/*
++	 * We previously decided that an SError was deliverable to the guest.
++	 * Reap the pending state from HCR_EL2 and...
++	 */
++	if (unlikely(__test_and_clear_bit(__ffs(HCR_VSE), hcr)))
++		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
++
++	/*
++	 * Re-attempt SError injection in case the deliverability has changed,
++	 * which is necessary to faithfully emulate WFI the case of a pending
++	 * SError being a wakeup condition.
++	 */
++	if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
++		kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
++}
 -- 
 2.39.5
 
