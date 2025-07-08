@@ -1,137 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C6F2DC327;
-	Tue,  8 Jul 2025 12:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8072DEA60
+	for <kvmarm@lists.linux.dev>; Tue,  8 Jul 2025 12:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751978871; cv=none; b=HAjDL30hBvyV3PdjSgO8B5HjSm7oa7lxNoMs9rzro2MC54Dcm3FGPGJj2oqk2gmARq6gnjqqINea/sP4RSSx0JVPxvEgBHtIL5cK4dq6Nrshuahwvk9vZXnRWvzkCIcMN8li7618Rmp+qoI03lv5pdSxUu2wUST5QGaykl/p0Yg=
+	t=1751978872; cv=none; b=dsJ7Xc4tj/053FLw8m62U9WFKvKnzZkH26UWCMrALFSfNaE55frnVHVHMP+u/vFjAjAhdaGaULw2OjusBUwUpisGJu5gIuRIdiJqv/6gNkEDlXZwTybKWd+s3Qrhi9vophhDznIryz1C91ax2MUaIRBdOnonGVKFHAKes6rNY00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751978871; c=relaxed/simple;
-	bh=osuOgrPS2qSqQveywb0omF1aib+vgM1aAsa1ykg2SH4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tNQ35tXkdXvOd7PWZ+JMayYHEvbswfK4rI5FAiT/oz7INqZoT9xiCxIy0mUboQP65tSW1aTS7+JY6ydBVu/rvNTt/g8cwE6574v+Rr2GYuu1Ar+0R7p09f8lrBftSLdRV7yI4W33iWVr9bEiIt5Gkx2lUhqXJ+JfUfFrV5jUyH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAMlhLI7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751978872; c=relaxed/simple;
+	bh=+wvoob8grI10NwfBtRPmsZFoGIB2FSIYS3UA5QZQBaQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o6XdaTpaB5kQFuMm+mUcGIDrBGDdrbpMWyvFYfoUuFtNFi6/CUlR56y4V+Zc6q980no6TO2BxYPE0Z5kLXoPVs9Xl+ygHa7BMjscIA4x9nBjN+0f27R5flmwrCesqfQ9dY7sNe4H4U9q5ByqslU/MtXLkDnJJKQF3+yTAP7SY1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IZBKe9yG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAMlhLI7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEA48C4CEED;
-	Tue,  8 Jul 2025 12:47:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IZBKe9yG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A74EAC4CEF6;
+	Tue,  8 Jul 2025 12:47:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751978870;
-	bh=osuOgrPS2qSqQveywb0omF1aib+vgM1aAsa1ykg2SH4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IAMlhLI7cory+R2Bv4G4I7BkDERGpi3VYc+VJGMY+ZmNiGrhtDEs5lgtn+8wiu4u6
-	 EZFwzSY16+e5Ji4D7Z6CjUvZ/aXOfk0tPqg+X7zkamPyn+7COaeDs9tzZNxW6e1Bde
-	 RDRJRPH4YlXqHDgCmiM5y9tWAtKbqTUdHFW/6cSunfJLTNzYsSBxUUuFjipdJmxqcw
-	 K7hhKc+761noYebQwzzUpbXXXpHiwdELTf7fK7AeLVsfnlClHKizMH3s0RzYNTa7lh
-	 cOMY4Vu2GYsVOri9ahMntePMKOUl0lTQF5na6epLFdZ7pqzS6A+Z0ZkjhA69R2BzK6
-	 PfXrRaTRRXXBg==
-Date: Tue, 8 Jul 2025 13:47:38 +0100
-From: Will Deacon <will@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: David Hildenbrand <david@redhat.com>, Ankit Agrawal <ankita@nvidia.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"ddutile@redhat.com" <ddutile@redhat.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	Krishnakant Jaju <kjaju@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"sebastianene@google.com" <sebastianene@google.com>,
-	"coltonlewis@google.com" <coltonlewis@google.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"tabba@google.com" <tabba@google.com>,
-	"qperret@google.com" <qperret@google.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>
-Subject: Re: [PATCH v9 3/6] KVM: arm64: Block cacheable PFNMAP mapping
-Message-ID: <aG0TaqOgKInyopW0@willie-the-truck>
-References: <20250621042111.3992-1-ankita@nvidia.com>
- <20250621042111.3992-4-ankita@nvidia.com>
- <aF6hamOI7YVDP1Cp@willie-the-truck>
- <SA1PR12MB7199144BBDA23C9A06DA12F9B046A@SA1PR12MB7199.namprd12.prod.outlook.com>
- <20250630122501.GQ167785@nvidia.com>
- <4b06b163-e1ce-4c20-b878-4593bc86bf53@redhat.com>
- <aGf7gfMjLhrqU5Kv@willie-the-truck>
- <20250704164750.GO1410929@nvidia.com>
+	s=k20201202; t=1751978872;
+	bh=+wvoob8grI10NwfBtRPmsZFoGIB2FSIYS3UA5QZQBaQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IZBKe9yGbPI51lmlJS++hmFbJmAWwkWsEVz1TBMfewPRDKrYdYYQnQP/miJTWuxOG
+	 V+0eYUNYYnSYp+m7DKwrGMFQN4lOigu6iXyVZi9IIS280lcjgKIebp5ab+7Y/sY86D
+	 mVM7A2iazCWytAxyFA6iV6reBBh/kYdSQhCeNeMKw69RbEFXqXyvl2TFIK7WkFf7Ad
+	 VEN/y9C466iGbFzBk7hK0oDbSBGZr78Xeu9C2e9KJDmxTHGP5TV3f9eSk56XVYnEBn
+	 4uasFO1iB+1PGlDkGK7QFJMdiY7LITb6GxPu+/IZQLRa3ZBNN+E703N3Pw10I6iXwR
+	 ZjdBjdb5dfsjA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uZ7jh-00DkqN-SY;
+	Tue, 08 Jul 2025 13:47:50 +0100
+Date: Tue, 08 Jul 2025 13:47:47 +0100
+Message-ID: <86sej6alxo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<tangnianyao@huawei.com>,
+	<wangwudi@hisilicon.com>
+Subject: Re: [PATCH] ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200803
+In-Reply-To: <73ee91b8-ba15-2534-ab76-f64e59261b1e@hisilicon.com>
+References: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
+	<86wm8ybpk5.wl-maz@kernel.org>
+	<0b54db94-8a6f-cea0-a6f7-dbe8650d66dd@hisilicon.com>
+	<86h5zwba5i.wl-maz@kernel.org>
+	<ffd3fccc-af4a-6667-3cf6-a55e866f3057@hisilicon.com>
+	<864ivtbll0.wl-maz@kernel.org>
+	<73ee91b8-ba15-2534-ab76-f64e59261b1e@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250704164750.GO1410929@nvidia.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, tangnianyao@huawei.com, wangwudi@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jul 04, 2025 at 01:47:50PM -0300, Jason Gunthorpe wrote:
-> On Fri, Jul 04, 2025 at 05:04:17PM +0100, Will Deacon wrote:
-> > On Fri, Jul 04, 2025 at 02:21:32PM +0200, David Hildenbrand wrote:
-> > > On 30.06.25 14:25, Jason Gunthorpe wrote:
-> > > > On Mon, Jun 30, 2025 at 01:56:43AM +0000, Ankit Agrawal wrote:
-> > > > > > Sorry for the drive-by comment, but I was looking at this old series from
-> > > > > > Paolo (look at the cover letter and patch 5):
-> > > > > > 
-> > > > > > https://lore.kernel.org/r/20250109133817.314401-1-pbonzini@redhat.com
-> > > > > > 
-> > > > > > in which he points out that the arm64 get_vma_page_shift() function
-> > > > > > incorrectly assumes that a VM_PFNMAP VMA is physically contiguous, which
-> > > > > > may not be the case if a driver calls remap_pfn_range() to mess around
-> > > > > > with mappings within the VMA. I think that implies that the optimisation
-> > > > > > in 2aa53d68cee6 ("KVM: arm64: Try stage2 block mapping for host device
-> > > > > > MMIO") is unsound.
-> > > > > 
-> > > > > Hm yeah, that does seem problematic. Perhaps we need a new
-> > > > > vma flag that could help the driver communicate to the KVM that the
-> > > > > mapping is contiguous and it can go ahead with the optimization?
-> > > > > E.g. something similar to VM_ALLOW_ANY_UNCACHED.
-> > > > 
-> > > > I think Paolo has the right direction - remove any attempts by KVM to
-> > > > expand contiguity, it should only copy the primary's PTEs and rely on
-> > > > the primary to discover contiguity. No new flags.
-> > > 
-> > > 100%
-> > 
-> > The part I don't understand, however, is that I can't see an MMU notifier
-> > anywhere on the successful remap_pfn_range() path. So if a driver is
-> > using that interface to change the mapping properties of a VM_PFNMAP VMA,
-> > how do we ensure that the guest doesn't use whatever stale mappings it's
-> > faulted in previously? Did I just miss something?
-> 
-> Generally mmu notifiers are for invalidation, not used when
-> establishing new mappings.
-> 
-> It is not legal to use remap_pfn_range() to replace already mapped
-> PTEs. It can only be used during a fop mmap callback to establish the
-> first mapping during VMA creation. Thus there can be no present
-> mapping cached in a secondary and no need to invalidate.
+On Tue, 08 Jul 2025 13:05:24 +0100,
+Zhou Wang <wangzhou1@hisilicon.com> wrote:
+>=20
+> On 2025/7/3 18:44, Marc Zyngier wrote:
+> > On Wed, 02 Jul 2025 10:57:13 +0100,
+> > Zhou Wang <wangzhou1@hisilicon.com> wrote:
+> >>
+> >> However=EF=BC=8Cmigration between different KVMs will be broken :(
+> >> I am not sure that should we consider this case as well?
+> >=20
+> > This isn't optional. You cannot break migration on existing systems,
+> > and the only case that *must* break is to restore a VM that hasn't
+> > seen this limitation on a HW that enforces it.
+>=20
+> So the whole story is that we should let GICD_TYPE.num_LPIs as a
+> writable field, and set this field from VMM(e.g. QEMU). And it will
+> be failed if doing migration between VMs with different num_LPI
+> configurations.
 
-Aha, thanks, I had completely missed that. I thought remap_pfn_range()
-was quietly unmapping any existing mapping it ran into, but that's not
-the case at all.
+Note that on a non-broken system, setting num_LPIs to any value should
+always work.
 
-Cheers,
+> After above done, this errata could be added.
 
-Will
+Which would be the only case where num_LPIs wouldn't be writable, and
+set to a fixed value.
+
+Note that an alternative would be to not have a kernel erratum, but to
+force num_LPIs from userspace when running on your platform. But that
+implies that: you have your own, non-upstream VMM, and that there is
+no opportunity for userspace to adversely impact the system as a whole.
+
+> Not sure my thought above is right? I will try to prepare a num_LPIs
+> writable patch if the direction is right.
+
+I think you got the gist of it.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
