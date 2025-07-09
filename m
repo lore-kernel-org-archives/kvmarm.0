@@ -1,246 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C472E7F07;
-	Wed,  9 Jul 2025 15:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E820B2E5B26
+	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 15:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752074988; cv=none; b=YGdMUPiHyU2Wivq3zgCKZxiqcrqGzAVaDiXKXALldTVCiKrvnXzRaTAe21jbVLreW4chQHHHPOzMpyLprwWQdvo3SKlwdPLmmcvsI+9rF8lycxxdN5YaXsuak+XTtydLKyONLHuClBeMdRIJICedMTbAWGJmxlTXk3DLMujlSBo=
+	t=1752075193; cv=none; b=HU1a+sRyAZg2c5nw8PVbU5bSPHdBAlg/jWAdnnRF9SiT8XQEJnMBwdIyaGNHgnJrAkSy9wvnLEaZbkNX9xz/6aop7s9BXKgoTG2M7jT1Nq/BVlQTXw0GO8Za5WeAYFSgRDw9lhY8M8P3ilDw1RGA0mCckmDSP4PJ4HXMEbo3kQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752074988; c=relaxed/simple;
-	bh=hxwENio9vqhZJqqfY5hcdmYC9aTUCi3OKuArnu64jOQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AY5FeSU84LazKzskLD4FmoiLcDPOtbGh/d0oziIUfuKe1W3Ur1SvSvBaNRxpCElzQKm7A2lk2WPrHJoqUxrKbOMm0sw5LjNQ9MN1it14Ea6mMEHEqrqJZJPijRG4yQnI/AD3PHiR4Eq2vm3Q2nYKooFNRN3m9PoKHXyW0VpcE40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1CE521424;
-	Wed,  9 Jul 2025 08:29:34 -0700 (PDT)
-Received: from [10.57.86.38] (unknown [10.57.86.38])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E72943F738;
-	Wed,  9 Jul 2025 08:29:41 -0700 (PDT)
-Message-ID: <8757342e-26e6-467c-a469-0ac1120bcdd9@arm.com>
-Date: Wed, 9 Jul 2025 16:29:39 +0100
+	s=arc-20240116; t=1752075193; c=relaxed/simple;
+	bh=zHPVg3osmCYyAy75qyrzcAxb6ctP4hFf1ZVxGGaCGUw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sBE4Hru0IuCXImFkLeDN1ZRCTCJNaxkEeeKjC/9fMg4bNY20NAtiK4VAj9vM4l23rw5j6eRfH5ZUoA7SWhAVfH9aMZZBl3N6rXhlRj8dWqFOIEDubu7CT9+T6GH8vWL3CsYuqG4oi1nPkZq78p0fWlla9s9m/VHXw7SKjNPqwbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DubfM9jm; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DubfM9jm"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-74b27c1481bso3531743b3a.2
+        for <kvmarm@lists.linux.dev>; Wed, 09 Jul 2025 08:33:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752075191; x=1752679991; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5h0vY+8yWR6d53ywzrllmdRVHS+9LkknzDUPnvu0s3A=;
+        b=DubfM9jmXCNQnpXwiLL7ZNYHB3ikQMKOedoHZSN0QXeP37vzwTzmX2rhlmKXgLoClV
+         Q0s6+o9Q4l08FxXvjUKGUf8KOBA5oLpoewFzW96cl6DOtMpf4AfztSH6JKKTLAGfywNA
+         4t+Nm4AY1eTMvtSM5KoT5/1JmxfQf/bD6TsjYJn8OP29oz26h8SIZTSFlXnPZvcx7rbv
+         eEhMCuL38xIA8YtfBHp95gW2DqQI2uw/SidoTQN2EQ0un40RpJR3U26THJLLtCR4Z3xz
+         9bkenQca525BH85PuaPc2FeExP6Cx/OiV1kltTyhkEilRBTQT8EdpUw/UDF1mKtjc8og
+         HdVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752075191; x=1752679991;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5h0vY+8yWR6d53ywzrllmdRVHS+9LkknzDUPnvu0s3A=;
+        b=L2MkT4RSeh7hCUFdiECuXgs5sKv3TEKHwM/HpMqHMifmiEeb+LFdZCZjDXrq/16Jqw
+         2p3SE9/YCAGLU4s12Hx8E81owCyY55tatvML5ojdw0IaXAXx8tF/qJ7Z3myrgGehbQx5
+         WFJVOQz9HWng1DWfJlr/kSXn3tMTJ2uYg19SZFp4186aokJf5woI/pLyN0XffveJVJeR
+         D15wYY4xcNfjbzA7C4b7hdVZbugqiGxSE9CCfWHv3k45jbIPbiZK/wYW9+YXNFNCH380
+         WueYtRHb31VnmEbvkzXYL4e79nALcYqpNOjBBN1cK1oXV8rkmjZUmRSgDi/wv4f+vWWL
+         vNEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXGCDceCVyVXEPh6uUyTBHGp/QmbtP4AG0PBo5pxfWSPioJhgrRnHRWhlHxaHlPB8m4spttkkw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzBCy+yUFSh+eIqSDI18SXS+IxH1JKF4hri0g0FaWjdEvt2FaNI
+	0j1s9yA+oLpQFm7AkBM8a8rU4ZWL0fPo7d5MruYMMVYmvqEM7MuBUiS+
+X-Gm-Gg: ASbGncthxIhJZ0hVxMUqccN2jA8rkhTXVmOfeV7W9qziw8nFARE9Xl8jc7AcL41WZbm
+	pXnEubH61R/nmfz8FnRtm+MjVIDBnhgJW6twPRBQgtPCTBlFkC3DImhl4QMCbx/fvV06qB/WXNO
+	tFEKFi7bk7gUY7kPZlSVU15ozrBvamrN/qmq6uE+dY0DAmLVLH2yxIf7CBvxxz+BcwgCO8hbyna
+	s8BWGVvLdoJirfDNBJVmGKZJwhZdlcIprRI/JgeNKcuvJIiDkg8sp4O+ziByfysHSWpxORU0knf
+	DDUS/kZ8Of2REIVmCylgO2GbAc/Tpj1MR81LL/IRIvIJr7rwB5plB0AeXdQq1g==
+X-Google-Smtp-Source: AGHT+IHZtURowHsYjnMJ5BnwtddfQEn1Fb18GjbXaV0krfOX1jJD/FS2hhGkqD/zQ8JNrPNyVELOKg==
+X-Received: by 2002:a05:6a00:ccc:b0:74d:247f:faf1 with SMTP id d2e1a72fcca58-74ea645f1b0mr4005899b3a.6.1752075190794;
+        Wed, 09 Jul 2025 08:33:10 -0700 (PDT)
+Received: from localhost ([216.228.127.130])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b38ee62bc54sm14821781a12.59.2025.07.09.08.33.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 08:33:10 -0700 (PDT)
+Date: Wed, 9 Jul 2025 11:33:08 -0400
+From: Yury Norov <yury.norov@gmail.com>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux@rasmusvillemoes.dk,
+	linux-kernel@vger.kernel.org, james.morse@arm.com
+Subject: Re: [PATCH v2 2/2] bitfield: Ensure the return values of helper
+ functions are checked
+Message-ID: <aG6LtJ2N1smBKHh1@yury>
+References: <20250709093808.920284-1-ben.horgan@arm.com>
+ <20250709093808.920284-3-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 14/43] KVM: arm64: Support timers in realm RECs
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <20250611104844.245235-15-steven.price@arm.com>
- <20250709144939.GA2753450@e124191.cambridge.arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20250709144939.GA2753450@e124191.cambridge.arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250709093808.920284-3-ben.horgan@arm.com>
 
-Hi Joey,
-
-On 09/07/2025 15:49, Joey Gouly wrote:
-> Hi Steven,
+On Wed, Jul 09, 2025 at 10:38:08AM +0100, Ben Horgan wrote:
+> As type##_replace_bits() has no side effects it is only useful if its
+> return value is checked. Add __must_check to enforce this usage. To have
+> the bits replaced in-place typep##_replace_bits() can be used instead.
 > 
-> On Wed, Jun 11, 2025 at 11:48:11AM +0100, Steven Price wrote:
->> The RMM keeps track of the timer while the realm REC is running, but on
->> exit to the normal world KVM is responsible for handling the timers.
->>
->> The RMM doesn't provide a mechanism to set the counter offset, so don't
->> expose KVM_CAP_COUNTER_OFFSET for a realm VM.
->>
->> A later patch adds the support for propagating the timer values from the
->> exit data structure and calling kvm_realm_timers_update().
->>
->> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v7:
->>  * Hide KVM_CAP_COUNTER_OFFSET for realm guests.
->> ---
->>  arch/arm64/kvm/arch_timer.c  | 48 +++++++++++++++++++++++++++++++++---
->>  arch/arm64/kvm/arm.c         |  2 +-
->>  include/kvm/arm_arch_timer.h |  2 ++
->>  3 files changed, 47 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->> index fdbc8beec930..7f8705d6fdf5 100644
->> --- a/arch/arm64/kvm/arch_timer.c
->> +++ b/arch/arm64/kvm/arch_timer.c
->> @@ -148,6 +148,13 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
->>  
->>  static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
->>  {
->> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
->> +
->> +	if (kvm_is_realm(vcpu->kvm)) {
->> +		WARN_ON(offset);
->> +		return;
->> +	}
->> +
->>  	if (!ctxt->offset.vm_offset) {
->>  		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
->>  		return;
->> @@ -462,6 +469,21 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
->>  			    timer_ctx);
->>  }
->>  
->> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
->> +{
->> +	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
->> +	int i;
->> +
->> +	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
->> +		struct arch_timer_context *timer = &arch_timer->timers[i];
->> +		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
->> +		bool level = kvm_timer_irq_can_fire(timer) && status;
->> +
->> +		if (level != timer->irq.level)
->> +			kvm_timer_update_irq(vcpu, level, timer);
->> +	}
->> +}
->> +
->>  /* Only called for a fully emulated timer */
->>  static void timer_emulate(struct arch_timer_context *ctx)
->>  {
->> @@ -870,6 +892,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->>  	if (unlikely(!timer->enabled))
->>  		return;
->>  
->> +	kvm_timer_unblocking(vcpu);
->> +
->>  	get_timer_map(vcpu, &map);
->>  
->>  	if (static_branch_likely(&has_gic_active_state)) {
->> @@ -883,8 +907,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->>  		kvm_timer_vcpu_load_nogic(vcpu);
->>  	}
->>  
->> -	kvm_timer_unblocking(vcpu);
->> -
+> Although, type_##_get_bits() and type_##_encode_bits() are harder to misuse
+> they are still only useful if the return value is checked. For
+> consistency, also add __must_check to these.
 > 
-> The change here to move kvm_timer_unblocking() looks unnecessary, as the change
-> to add an early return in kvm_timer_enable() causes timer->enable to never be
-> set to 1.  Since it is never set, kvm_timer_vcpu_load() will return early
-> before this call to kvm_timer_unblocking().
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 
-Good spot.
-
-Looking through the code it makes sense keeping the timer disabled
-because that also disables all the code for loading/unloading the timer
-state which we don't want for realms (because the RMM deals with that).
-So I think just reverting the above change to move
-kvm_timer_unblocking() is the correct approach.
+Applied.
 
 Thanks,
-Steve
-
-> Thanks,
-> Joey
-> 
->>  	timer_restore_state(map.direct_vtimer);
->>  	if (map.direct_ptimer)
->>  		timer_restore_state(map.direct_ptimer);
->> @@ -1065,7 +1087,9 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
->>  
->>  	ctxt->vcpu = vcpu;
->>  
->> -	if (timerid == TIMER_VTIMER)
->> +	if (kvm_is_realm(vcpu->kvm))
->> +		ctxt->offset.vm_offset = NULL;
->> +	else if (timerid == TIMER_VTIMER)
->>  		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
->>  	else
->>  		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
->> @@ -1087,13 +1111,19 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
->>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->>  {
->>  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
->> +	u64 cntvoff;
->>  
->>  	for (int i = 0; i < NR_KVM_TIMERS; i++)
->>  		timer_context_init(vcpu, i);
->>  
->> +	if (kvm_is_realm(vcpu->kvm))
->> +		cntvoff = 0;
->> +	else
->> +		cntvoff = kvm_phys_timer_read();
->> +
->>  	/* Synchronize offsets across timers of a VM if not already provided */
->>  	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
->> -		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
->> +		timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
->>  		timer_set_offset(vcpu_ptimer(vcpu), 0);
->>  	}
->>  
->> @@ -1633,6 +1663,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->>  		return -EINVAL;
->>  	}
->>  
->> +	/*
->> +	 * We don't use mapped IRQs for Realms because the RMI doesn't allow
->> +	 * us setting the LR.HW bit in the VGIC.
->> +	 */
->> +	if (vcpu_is_rec(vcpu))
->> +		return 0;
->> +
->>  	get_timer_map(vcpu, &map);
->>  
->>  	ret = kvm_vgic_map_phys_irq(vcpu,
->> @@ -1764,6 +1801,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
->>  	if (offset->reserved)
->>  		return -EINVAL;
->>  
->> +	if (kvm_is_realm(kvm))
->> +		return -EINVAL;
->> +
->>  	mutex_lock(&kvm->lock);
->>  
->>  	if (!kvm_trylock_all_vcpus(kvm)) {
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 0cdcc2ca4a88..6a5c9be4af2d 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -350,10 +350,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>  	case KVM_CAP_PTP_KVM:
->>  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
->>  	case KVM_CAP_IRQFD_RESAMPLE:
->> -	case KVM_CAP_COUNTER_OFFSET:
->>  	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
->>  		r = 1;
->>  		break;
->> +	case KVM_CAP_COUNTER_OFFSET:
->>  	case KVM_CAP_SET_GUEST_DEBUG:
->>  		r = !kvm_is_realm(kvm);
->>  		break;
->> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
->> index 681cf0c8b9df..f64e317c091b 100644
->> --- a/include/kvm/arm_arch_timer.h
->> +++ b/include/kvm/arm_arch_timer.h
->> @@ -113,6 +113,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->>  int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->>  int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->>  
->> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu);
->> +
->>  u64 kvm_phys_timer_read(void);
->>  
->>  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
->> -- 
->> 2.43.0
->>
-
+Yury
