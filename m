@@ -1,66 +1,65 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270685661
-	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 22:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70D1243954
+	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 22:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752098491; cv=none; b=WHaqqsT4eIDuXb0wiy+QiviIhBlc7P899p9AMBneQzrx2YiSxtrdj3DL+1/zOm6T1E5jHu2qPNPzGX1sbpi9TEejBO20IbctxceEgs8WkgJSPEhO9raQaNLmQGv2OSLpi92DpFeFkABSfmxd69qBUdvf9UJAbw3pNcU+8Sw1aoA=
+	t=1752099906; cv=none; b=IVwRL9fvirdMj/3giXXG3dSGdrE3pB/hdEC9cPZS0unetfAkcbe3whsEzG++n/1YvszRtfrKExoS+BRshHpzZuaI6lNfoBX9i6BR2PBYSKXlX3PjimCfh3onJx2v26lzScFA+jkOReFzIUkH1r6Xyu+KkV+4uotwVdGJBbqrbfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752098491; c=relaxed/simple;
-	bh=RaFKs7NUWtXcrGPuqdMmkXEZpFhssJ/jE72lMQUkE9c=;
+	s=arc-20240116; t=1752099906; c=relaxed/simple;
+	bh=k6chlFAB39Bw4VaZ8WHmomtZKbzCtN/a3uxy/AjJcyU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R8XSff7HyLJUv3nl7b2oV3fpgWDGjhnd7BEDdI1WBhP7k+VLmolVTyaIiZIBxA3MieL4/dJ076q55WSwVSBTWvXPCI/Gm0T8TJCCH21CwVbP9JfCw9ucMjPhjjVs0gWBYx/Vt8uLmMIreZvg3S9OCfnETTSOmr0qVupNQ/3Id+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DzHxF6C3; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=fupPCzJ4Q+//WlxG6sfg5KxcWdhi3UN+ciW8aJlbiVyr0Tc96xTPShVsoYQl8lqGPaaDylK9NoaMjj3l2cBa3wdyOOl/XIiJRecVqF8Q1EBRzRQuMmIe87/6ef8VeOilHFKjvjgPdrNAQODfiq2AMFa7ZdqCos5N1xBmB3mYp1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dUHFEfoh; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DzHxF6C3"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b31bc3128fcso511234a12.0
-        for <kvmarm@lists.linux.dev>; Wed, 09 Jul 2025 15:01:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dUHFEfoh"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313d346dc8dso548581a91.1
+        for <kvmarm@lists.linux.dev>; Wed, 09 Jul 2025 15:25:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752098489; x=1752703289; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1752099904; x=1752704704; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qPkxg71a8xKMOk7gRt6YiWOPIe8HfaUrT3StylJgAHI=;
-        b=DzHxF6C3rJiYuP0heLfxdWcnaSBCo01ZO/Mm1Yb6c6mTY4L0wzL9DOI7h3ZwKfZzzV
-         55THVLC1mVNykHRsOpnTOFrhdiFthWJM3hvY/s7/J8m3aMVUKkimzxuObNvn0z2mEeh7
-         QEIsnhy+ARvucxboKGvJ5QZ4nMx+v+pstI5jNl7k1qQ6L+xoTkzT+ffPYFY/cdNrbZGJ
-         rfSFjjKL8P+JyFXmJbiboMCY+4oEwzUczu+6qDQ/RmY++pqsylFDhQmtrAzx2K47zZO7
-         mXWjX+c6vU/uBvBpeVwg+Bs53f7aVHJGEkVrYWI6fYGg5PrXtKVbPTvB43CyJji9crTe
-         w87g==
+        bh=LGmhA3rLQPa628TNnZlIPG9dvF57QQRZaeK+cAtydPY=;
+        b=dUHFEfoheLFloQBriynMb4VmS+2ZjPGE4a5gmleAjRaC2PsprHqMiGS1hUuXRdHZAl
+         F+iyxmGPazbBtPwptjeqwIPq41fHP4gMGT9ckWIa2hMxuwYKHP87A97gIViGtZcPdBUr
+         5WRc27QYP4Ve2ITImEn+GHAX+ZMznSDnLR5mHz0tP+yWdPd0KacBGeGmB2ZPYLAjzMuQ
+         AGNdw0lfzLkfNy+yxwwGpp/j7UsWfli4BCamrWsRxEmlXXXufc42oS3ESbvDFBGtIle0
+         ZbhbQxuMvCOkJ2CM4xWXbBH8womW1Hm3ohMIx0gH466lafSe6Yxe2Zj0Z9boNl5o9PnE
+         9Y3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752098489; x=1752703289;
+        d=1e100.net; s=20230601; t=1752099904; x=1752704704;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qPkxg71a8xKMOk7gRt6YiWOPIe8HfaUrT3StylJgAHI=;
-        b=gQJxq5CmUUTVLJeuK02v4Mbj/ZfhlkjT4VZW4/Tqsl7u5usuB4+5dz/ja+GMp/HezV
-         XvoY9dvG4t3cvkeKmms8QSwvH3YMRVB5gMJUDjHSa9Y3Ou0BJZLjqOb7bI7dy6SVY00V
-         DNVycgKJv0xw3lvSmgYaSrjUvHmskSSICHC1TqO1XYz0XN5J70Y41LB0RwT3tGCZ31V8
-         5l0WxbCbo/EjFeGXEkuOp3fEnV7X8Q2Nznne5uRY5jKpuGjxLquof9hRCH5/42lSysY2
-         WC8fqTyn9vBOg3C/jutYAGuvft1VyUaZy5mON9de7GryhCCkIlK7Bmdt8Y9X71uJDFfs
-         X7Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCXW81Oqthc0ighqv4mdBCfchJloANvHyoW87yANbbDcwjpUOCkSTbwLxT+oxewKvpNEzCuybfk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxX6pFtJ1uYwLthnn7n/39spSzUeJjXs9CM5ZjCW4uPWn+dZvzk
-	2ct5IYf9uuxTzkOksPRCSDtLFMbFR4PuIjQMm8ki4Gk5IPBks1vEGvn7Tvi3flAT5Ra+I1x8Kqh
-	to7Y4xw==
-X-Google-Smtp-Source: AGHT+IGv5Auh5afur7rrmDtcmRu/ac16McioXeHVJV7IWM1fJ+YSaOB7uGrq5SXWMiQzxRu0kWJqhfgibQ4=
-X-Received: from pjblw1.prod.google.com ([2002:a17:90b:1801:b0:31c:2fe4:33b9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b43:b0:312:e279:9ccf
- with SMTP id 98e67ed59e1d1-31c3ef100acmr359390a91.5.1752098489536; Wed, 09
- Jul 2025 15:01:29 -0700 (PDT)
-Date: Wed, 9 Jul 2025 15:01:28 -0700
-In-Reply-To: <20250606235619.1841595-8-vipinsh@google.com>
+        bh=LGmhA3rLQPa628TNnZlIPG9dvF57QQRZaeK+cAtydPY=;
+        b=ux5KSlGI3WIf7YyayUNgGuYMeE4L9UO11IwSqxJWZA8kJv7bC3Tt2jvN2qQI3AELSZ
+         rhNySyduKJ4BMPS6dHKQxiS2JZF2XXT2+PzJmbusexbSNY+o+FGbUlshBKMQ0CGOUk0S
+         BYRQTBXO1Squw7qQqB94vXKyBh2ObJVJ7ydVp6THMcrFlgmd7qSeQzmAz43XaST6x/ZB
+         Rive+nBuFLOwsATkPn/PeIVOIcrFyOVBGnZEgDGpHmr/o6bzdWO0EG/XhzSZ0erBPU12
+         oT1v8fGt3Gab2IcioIhz5+avpixpwIzmNDCw7Man+1gW//QTaxJrPyMon3/VCLzEMo1/
+         FaoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbAxGuOuvewS+RV/UfD1xfiZQYM8lOCTPx8TTBM8cYWD/PjH+JSuCMCY+HI9czxEBIoqP/Hyw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxnLcui4RXEAhC+TsIhsnRKbKVTc5R25g31VmdTnbpIaiCUKuIn
+	GIcsm40nR5UtuDb7OrVSOn6Th5xFzBZcAXAPsxDwe0BM9O876qbXNg9Z55+jXR2oaaMPnvUzOwM
+	7q5gLhQ==
+X-Google-Smtp-Source: AGHT+IHmmYPiGtSUrTz1EJzl9bD7Pjb4B/t13dgcPFaFz3OSasa6nCLwDj6VggbGkffUZnKPlHqH62nN/z8=
+X-Received: from pja14.prod.google.com ([2002:a17:90b:548e:b0:313:274d:3007])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:558d:b0:313:db0b:75db
+ with SMTP id 98e67ed59e1d1-31c2fdf5ba3mr6480539a91.33.1752099904282; Wed, 09
+ Jul 2025 15:25:04 -0700 (PDT)
+Date: Wed, 9 Jul 2025 15:25:02 -0700
+In-Reply-To: <20250606235619.1841595-1-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250606235619.1841595-1-vipinsh@google.com> <20250606235619.1841595-8-vipinsh@google.com>
-Message-ID: <aG7muHNldvv8fRyH@google.com>
-Subject: Re: [PATCH v2 07/15] KVM: selftests: Add various print flags to KVM
- Selftest Runner
+References: <20250606235619.1841595-1-vipinsh@google.com>
+Message-ID: <aG7sPikxsI_ovhQq@google.com>
+Subject: Re: [PATCH v2 00/15] Add KVM Selftests runner
 From: Sean Christopherson <seanjc@google.com>
 To: Vipin Sharma <vipinsh@google.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
@@ -71,78 +70,334 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Jun 06, 2025, Vipin Sharma wrote:
-> Add various print flags to selectively print outputs on terminal based
-> on test execution status (passed, failed, timed out, skipped, no run).
-> 
-> Provide further options to print only particular execution status, like
-> print only status of failed tests.
-> 
-> Example: To print status, stdout and stderr for failed tests and only
-> print status of passed test:
-> 
->    python3 runner --test-dirs tests  --print-failed \
->    --print-passed-status
-> 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  .../testing/selftests/kvm/runner/__main__.py  | 114 ++++++++++++++++++
->  .../selftests/kvm/runner/test_runner.py       |  10 +-
->  2 files changed, 123 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/runner/__main__.py b/tools/testing/selftests/kvm/runner/__main__.py
-> index 3f11a20e76a9..4406d8e4847a 100644
-> --- a/tools/testing/selftests/kvm/runner/__main__.py
-> +++ b/tools/testing/selftests/kvm/runner/__main__.py
-> @@ -64,9 +64,115 @@ def cli():
->                          default=False,
->                          help="Print only test's status and avoid printing stdout and stderr of the tests")
->  
-> +    parser.add_argument("--print-passed",
-> +                        action="store_true",
-> +                        default=False,
-> +                        help="Print passed test's stdout, stderr and status."
-> +                        )
-> +
-> +    parser.add_argument("--print-passed-status",
-> +                        action="store_true",
-> +                        default=False,
-> +                        help="Print only passed test's status."
-> +                        )
+>  tools/testing/selftests/kvm/.gitignore        |   4 +-
+>  tools/testing/selftests/kvm/Makefile.kvm      |   8 +
+>  .../testing/selftests/kvm/runner/__main__.py  | 271 ++++++++++++++++++
+>  tools/testing/selftests/kvm/runner/command.py |  53 ++++
+>  .../testing/selftests/kvm/runner/selftest.py  |  66 +++++
+>  .../selftests/kvm/runner/test_runner.py       |  88 ++++++
 
-Waaay too many booleans :-)
+Overall, looks great!  I think the only significant feedback is on the command
+line options.
 
-And they don't provide the right granularity.  E.g. I don't want stdout for FAILED,
-I just want stderr for the assert.
+One thing we probably need is a README of some form, to explain how this works
+and to give some examples.  Outside of you and I, I doubt anyone will know how
+to use this :-)
 
-After some fiddling, I came up with this:
+Here's the full diff of the modifications I made to massage things to my liking.
+It's not complete, e.g. I punted on the help messages and didn't change to
+-p/--path, but otherwise it seems to work?
 
-    parser.add_argument("--print-passed", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
-                        help="blah"
-                        )
+---
+ .../testing/selftests/kvm/runner/__main__.py  | 86 +++----------------
+ tools/testing/selftests/kvm/runner/command.py | 53 ------------
+ .../testing/selftests/kvm/runner/selftest.py  | 39 +++++++--
+ .../selftests/kvm/runner/test_runner.py       | 20 ++---
+ 4 files changed, 53 insertions(+), 145 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/runner/command.py
 
-    parser.add_argument("--print-failed", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
-                        help="Full = print each test's stdout, stderr and status; status = only status."
-                        )
+diff --git a/tools/testing/selftests/kvm/runner/__main__.py b/tools/testing/selftests/kvm/runner/__main__.py
+index c02035a62873..0105835c557c 100644
+--- a/tools/testing/selftests/kvm/runner/__main__.py
++++ b/tools/testing/selftests/kvm/runner/__main__.py
+@@ -59,71 +59,26 @@ def cli():
+                         type=int,
+                         help="Maximum number of tests that can be run concurrently. (Default: 1)")
+ 
+-    parser.add_argument("--print-status",
+-                        action="store_true",
+-                        default=False,
+-                        help="Print only test's status and avoid printing stdout and stderr of the tests")
+-
+-    parser.add_argument("--print-passed",
+-                        action="store_true",
+-                        default=False,
+-                        help="Print passed test's stdout, stderr and status."
+-                        )
+-
+-    parser.add_argument("--print-passed-status",
+-                        action="store_true",
+-                        default=False,
+-                        help="Print only passed test's status."
+-                        )
+-
+-    parser.add_argument("--print-failed",
+-                        action="store_true",
+-                        default=False,
+-                        help="Print failed test's stdout, stderr and status."
++    parser.add_argument("--print-passed", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
++                        help="blah"
+                         )
+ 
+-    parser.add_argument("--print-failed-status",
+-                        action="store_true",
+-                        default=False,
+-                        help="Print only failed test's status."
++    parser.add_argument("--print-failed", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
++                        help="Full = print each test's stdout, stderr and status; status = only status."
+                         )
+ 
+-    parser.add_argument("--print-skipped",
+-                        action="store_true",
+-                        default=False,
++    parser.add_argument("--print-skipped", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
+                         help="Print skipped test's stdout, stderr and status."
+                         )
+ 
+-    parser.add_argument("--print-skipped-status",
+-                        action="store_true",
+-                        default=False,
+-                        help="Print only skipped test's status."
+-                        )
+-
+-    parser.add_argument("--print-timed-out",
+-                        action="store_true",
+-                        default=False,
++    parser.add_argument("--print-timed-out", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
+                         help="Print timed out test's stdout, stderr and status."
+                         )
+ 
+-    parser.add_argument("--print-timed-out-status",
+-                        action="store_true",
+-                        default=False,
+-                        help="Print only timed out test's status."
+-                        )
+-
+-    parser.add_argument("--print-no-runs",
+-                        action="store_true",
+-                        default=False,
++    parser.add_argument("--print-no-run", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
+                         help="Print stdout, stderr and status for tests which didn't run."
+                         )
+ 
+-    parser.add_argument("--print-no-runs-status",
+-                        action="store_true",
+-                        default=False,
+-                        help="Print only tests which didn't run."
+-                        )
+-
+     parser.add_argument("--sticky-summary-only",
+                         action="store_true",
+                         default=False,
+@@ -145,36 +100,19 @@ def level_filters(args):
+     if args.sticky_summary_only or args.quiet:
+         return levels
+ 
+-    if args.print_passed or args.print_passed_status or args.print_status:
++    if args.print_passed != "off":
+         levels.add(SelftestStatus.PASSED)
+ 
+-    if args.print_failed or args.print_failed_status or args.print_status:
++    if args.print_failed != "off":
+         levels.add(SelftestStatus.FAILED)
+ 
+-    if args.print_skipped or args.print_skipped_status or args.print_status:
++    if args.print_skipped != "off":
+         levels.add(SelftestStatus.SKIPPED)
+ 
+-    if args.print_timed_out or args.print_timed_out_status or args.print_status:
++    if args.print_timed_out != "off":
+         levels.add(SelftestStatus.TIMED_OUT)
+ 
+-    if args.print_no_runs or args.print_no_runs_status or args.print_status:
+-        levels.add(SelftestStatus.NO_RUN)
+-
+-    # Nothing set explicitly, enable all.
+-    if not levels:
+-        args.print_passed = True
+-        levels.add(SelftestStatus.PASSED)
+-
+-        args.print_failed = True
+-        levels.add(SelftestStatus.FAILED)
+-
+-        args.print_skipped = True
+-        levels.add(SelftestStatus.SKIPPED)
+-
+-        args.print_timed_out = True
+-        levels.add(SelftestStatus.TIMED_OUT)
+-
+-        args.print_no_runs = True
++    if args.print_no_run != "off":
+         levels.add(SelftestStatus.NO_RUN)
+ 
+     levels.add(logging.NOTSET)
+diff --git a/tools/testing/selftests/kvm/runner/command.py b/tools/testing/selftests/kvm/runner/command.py
+deleted file mode 100644
+index 6f6b1811b490..000000000000
+--- a/tools/testing/selftests/kvm/runner/command.py
++++ /dev/null
+@@ -1,53 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0
+-# Copyright 2025 Google LLC
+-#
+-# Author: vipinsh@google.com (Vipin Sharma)
+-
+-import subprocess
+-import pathlib
+-import contextlib
+-import os
+-
+-
+-class Command:
+-    """Executes a command in shell.
+-
+-    Returns the exit code, std output and std error of the command.
+-    """
+-
+-    def __init__(self, command, timeout, output_dir):
+-        self.command = command
+-        self.timeout = timeout
+-        self.output_dir = output_dir
+-
+-    def _run(self, output=None, error=None):
+-        run_args = {
+-            "universal_newlines": True,
+-            "shell": True,
+-            "timeout": self.timeout,
+-        }
+-
+-        if output is None and error is None:
+-            run_args.update({"capture_output": True})
+-        else:
+-            run_args.update({"stdout": output, "stderr": error})
+-
+-        proc = subprocess.run(self.command, **run_args)
+-        return proc.returncode, proc.stdout, proc.stderr
+-
+-    def run(self):
+-        if self.output_dir is not None:
+-            pathlib.Path(self.output_dir).mkdir(parents=True, exist_ok=True)
+-
+-        output = None
+-        error = None
+-        with contextlib.ExitStack() as stack:
+-            if self.output_dir is not None:
+-                output_path = os.path.join(self.output_dir, "stdout")
+-                output = stack.enter_context(
+-                    open(output_path, encoding="utf-8", mode="w"))
+-
+-                error_path = os.path.join(self.output_dir, "stderr")
+-                error = stack.enter_context(
+-                    open(error_path, encoding="utf-8", mode="w"))
+-            return self._run(output, error)
+diff --git a/tools/testing/selftests/kvm/runner/selftest.py b/tools/testing/selftests/kvm/runner/selftest.py
+index 664958c693e5..1ec1ddfbf034 100644
+--- a/tools/testing/selftests/kvm/runner/selftest.py
++++ b/tools/testing/selftests/kvm/runner/selftest.py
+@@ -3,7 +3,6 @@
+ #
+ # Author: vipinsh@google.com (Vipin Sharma)
+ 
+-import command
+ import pathlib
+ import enum
+ import os
+@@ -37,17 +36,18 @@ class Selftest:
+         if not test_command:
+             raise ValueError("Empty test command in " + test_path)
+ 
+-        test_command = os.path.join(executable_dir, test_command)
+-        self.exists = os.path.isfile(test_command.split(maxsplit=1)[0])
++        self.command = os.path.join(executable_dir, test_command)
++        self.exists = os.path.isfile(self.command.split(maxsplit=1)[0])
+         self.test_path = test_path
+ 
+         if output_dir is not None:
+             output_dir = os.path.join(output_dir, test_path.lstrip("/"))
+-        self.command = command.Command(test_command, timeout, output_dir)
+ 
+         self.status = SelftestStatus.NO_RUN
+         self.stdout = ""
+         self.stderr = ""
++        self.timeout = timeout
++        self.output_dir = output_dir
+ 
+     def run(self):
+         if not self.exists:
+@@ -55,12 +55,37 @@ class Selftest:
+             return
+ 
+         try:
+-            ret, self.stdout, self.stderr = self.command.run()
+-            if ret == 0:
++            run_args = {
++                "universal_newlines": True,
++                "shell": True,
++                "stdout": subprocess.PIPE,
++                "stderr": subprocess.PIPE,
++                "timeout": self.timeout,
++            }
++            proc = subprocess.run(self.command, **run_args)
++
++            self.stdout = proc.stdout
++            self.stderr = proc.stderr
++
++            if proc.returncode == 0:
+                 self.status = SelftestStatus.PASSED
+-            elif ret == 4:
++            elif proc.returncode == 4:
+                 self.status = SelftestStatus.SKIPPED
+             else:
+                 self.status = SelftestStatus.FAILED
+         except subprocess.TimeoutExpired as e:
++            self.stdout = e.stdout
++            self.stderr = e.stderr
++
+             self.status = SelftestStatus.TIMED_OUT
++
++        if self.output_dir is not None:
++            pathlib.Path(self.output_dir).mkdir(parents=True, exist_ok=True)
++
++            output_path = os.path.join(self.output_dir, "stdout")
++            with open(output_path, encoding="utf-8", mode="w") as f:
++                f.write(self.stdout)
++
++            error_path = os.path.join(self.output_dir, "stderr")
++            with open(error_path, encoding="utf-8", mode="w") as f:
++                f.write(self.stderr)
+diff --git a/tools/testing/selftests/kvm/runner/test_runner.py b/tools/testing/selftests/kvm/runner/test_runner.py
+index e7730880907d..a285a711a686 100644
+--- a/tools/testing/selftests/kvm/runner/test_runner.py
++++ b/tools/testing/selftests/kvm/runner/test_runner.py
+@@ -19,13 +19,12 @@ class TestRunner:
+         self.output_dir = args.output
+         self.jobs = args.jobs
+         self.quiet = args.quiet
+-        self.print_status = args.print_status
+         self.print_stds = {
+             SelftestStatus.PASSED: args.print_passed,
+             SelftestStatus.FAILED: args.print_failed,
+             SelftestStatus.SKIPPED: args.print_skipped,
+             SelftestStatus.TIMED_OUT: args.print_timed_out,
+-            SelftestStatus.NO_RUN: args.print_no_runs
++            SelftestStatus.NO_RUN: args.print_no_run
+         }
+ 
+         for test_file in test_files:
+@@ -52,15 +51,14 @@ class TestRunner:
+         # Clear the status line
+         self._print("\033[2K", end="\r")
+         logger.log(test_result.status,
+-                   f"[{test_result.status}] {test_result.test_path}")
+-        if (self.output_dir is None and self.print_status is False
+-                and self.print_stds.get(test_result.status, True)):
+-            logger.info("************** STDOUT BEGIN **************")
+-            logger.info(test_result.stdout)
+-            logger.info("************** STDOUT END **************")
+-            logger.info("************** STDERR BEGIN **************")
+-            logger.info(test_result.stderr)
+-            logger.info("************** STDERR END **************")
++                   f"[{test_result.status.name}] {test_result.test_path}")
++
++        print_level = self.print_stds.get(test_result.status);
++        if (print_level == "full" or print_level == "stdout"):
++            logger.info("*** stdout ***\n" + test_result.stdout)
++
++        if (print_level == "full" or print_level == "stderr"):
++            logger.info("*** stderr ***\n" + test_result.stderr)
+ 
+         self.status[test_result.status] += 1
+         # Sticky bottom line
 
-    parser.add_argument("--print-skipped", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
-                        help="Print skipped test's stdout, stderr and status."
-                        )
-
-    parser.add_argument("--print-timed-out", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
-                        help="Print timed out test's stdout, stderr and status."
-                        )
-
-    parser.add_argument("--print-no-run", default="full", const="full", nargs='?', choices=["off", "full", "stderr", "stdout", "status"],
-                        help="Print stdout, stderr and status for tests which didn't run."
-                        )
-
-The const+nargs magic makes a bare option equivalent to "full", e.g. --print-timed-out
-and --print-timed-out=full are the same.  That gives the user complete control
-over the output, with _less_ code in the runner.  E.g. to print stdout and/or stderr:
-
-        print_level = self.print_stds.get(test_result.status);
-        if (print_level == "full" or print_level == "stdout"):
-            logger.info("*** stdout ***\n" + test_result.stdout)
-
-        if (print_level == "full" or print_level == "stderr"):
-            logger.info("*** stderr ***\n" + test_result.stderr)
+base-commit: 611829e42fb47b99ff2b6c75637aec2410739611
+--
