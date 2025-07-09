@@ -1,107 +1,102 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A592459E0
-	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 21:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13944A92E
+	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 21:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752095682; cv=none; b=bcUQX/JwffHV0cPbsfUgMruVQ6K8p1EbEM8R9mEUvH8jpPzpbdKE4k9wpbHEm0bVLukdw85X35wopkUc283p9TrRIpxO5yKWeJHpr/ZIBEqVZjPU7rKDtKH+oD1/drEtYbAwUVpGsXbqR6rlz5fjCL+IAgZ/DsgyQvXwVvXvpS8=
+	t=1752097149; cv=none; b=VySQShF6sMdne7ls6xUiZPTHVA0qHK9Tvd/o43U4NHz2DKeNFue4pYGuIRKejW/LtgNrAlqOJnTatUvrM+v4OQBqRamWvILuqoVxiIfpcU6jWZzBPKvtwMUBiff1Zw/4G+JLANcUpQe0sFdjQ8ci1TD15TdR3PjhFXm+osozJxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752095682; c=relaxed/simple;
-	bh=IZ9rKwuY1EZI8ALKF+ef02e0GZwWxqUQPI4YkLWWRhs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kwpYUQuCovqrDcWj5Ow4M8tw/eLqqnRL3L+Uk8Ety3bPMfp87f+G0LIGYAChNE9q/RZF5PR/Mnxj7tFcp5VpG5s1wbim3O2Vr/Tr8GUguYrvX82rbEM4GiZLYQBL2PGW+nzN5CTSglfVaWDQHNFemh7AW/6cIov04BRGXwpzZ9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aoIEmqGG; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1752097149; c=relaxed/simple;
+	bh=GODhRmDiVJiCnZUnkaX8NW89MJRIIVn4pvNiMuRjOq8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sPyVVKhATW19+NCUIjL/izKROXGbQRwWRZHDCosJr0Iz7wfO6jyShjXjBSsXEn7rZgpDBTDAqGIZ75xF30WXitvcaQhfwHpHJM/zNNCniJp/WcxankE7jQSqO/qzKxBc17Z4gbylss+fkk/AiNBJxFWrAz0nEXzc5tN+a/303lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q5KUPtoY; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aoIEmqGG"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752095679;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wGPnF0nbI2y2qT0LV0cxxWHG8MM6SL3+1YP5lvmU1EM=;
-	b=aoIEmqGGHT4LpsodmpQMQQyNj19mamtNl8JPDHgDxyB9S9C9OaWLG4SE5XUHZylGK/Mc4r
-	Xjv1ukOObAbsDprAEAl56Tb2xWbeE0D+yi5+B6Pc9U0I93gHK+u4YwQuUokn1y0o92BrWs
-	hpVkuYdt4Q4zkFIL5+sWdiQgDtzSiVk=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Zhou Wang <wangzhou1@hisilicon.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 6/6] Documentation: KVM: arm64: Describe VGICv3 registers writable pre-init
-Date: Wed,  9 Jul 2025 14:14:17 -0700
-Message-Id: <20250709211417.2074487-7-oliver.upton@linux.dev>
-In-Reply-To: <20250709211417.2074487-1-oliver.upton@linux.dev>
-References: <20250709211417.2074487-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q5KUPtoY"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31215090074so602415a91.0
+        for <kvmarm@lists.linux.dev>; Wed, 09 Jul 2025 14:39:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752097147; x=1752701947; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tRjFnmCzYN+qn8kF+o9IzfpkXQ4+JquW4HupC73fftA=;
+        b=Q5KUPtoYXUP1TF4DmhpdlqvzyxV043jVb0Tzlkyt+xWGjcfr6Xti9RtvdFklAgfrOj
+         MlKJqp7B/SwsfIQcZQP3xXRF9Y7EOZ730WsaOd2xYAX0uIuoHbptU4KyR4wHbzgGVyOS
+         xe7E/tidQFPE1NgkkuE3VMUDXNmcXhp0Bd8dR/jbqLsBM6rXsHe6Rx8JpBpg9KBoSdtB
+         q8X65l4VYqk8syJxJ2+EyA3B95nnjZCRIHxCA5EY8vk2XSMEKaYRdAZs6DWQxZwa4og/
+         gtCASJRrrEnecHZW326YXqVpVXWAmSlp+tnNKrwZe6I9V/w6aRcZqGC1pHEYdxZdGm8I
+         mSng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752097147; x=1752701947;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tRjFnmCzYN+qn8kF+o9IzfpkXQ4+JquW4HupC73fftA=;
+        b=SlfZlzL5rniU+zVNYrXhwdTO93g651ZFrbg4zenMCrRhNIDVya15ohmXTRZpB1ezCi
+         Svqoufq65RkUJiBrAKMAbULpxN3ken1DrG2cZNownkbRqPvJy/mKnYQkA8THz6/q3v4f
+         t2mdSkJURUvkRthnCPDXUZouDNptSU1B33GiCOG5+eETu24mtkW+t2P6NGMQBb/BCHA7
+         I/L+ZksB2H4+3FpToDc0FhA75eeq1m4gUJUJuFIUbihPekRtnmYZSXh/rxjgm1RHC7Dr
+         RkcjEvExelK+bXkJQPHvtj8j255V3n0OdSg38XSyifJweXIDWEL77o58xs23qvgm+MDR
+         gtnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGbf5/crsAfHuin7jfA+Rg1QIRS78jGYRLsG6pRJc4YXFWz+Gkfo6ZJ9q4FvaYwkkKyOfNev4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxWqvWEVDov0Nlgih4sVFGc36fyBtF2uqeCxzTTzmm7w8OhQEnS
+	JgY6GJ4iwCwFujdv9gswDaraEVcoFQGbIY0lZNeoHQVf7pnuHomhfupfFkieyjFfw8gQuvqOFYE
+	eUTlskA==
+X-Google-Smtp-Source: AGHT+IGqLtd25jQcDPlbBnyHm57aZXVZqGANjf8aQ+PHIDAz5DerrzktIfl+GNc39oHL/0frC4tukw2+CLQ=
+X-Received: from pjbqn6.prod.google.com ([2002:a17:90b:3d46:b0:312:2b3:7143])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5344:b0:313:62ee:45a
+ with SMTP id 98e67ed59e1d1-31c3ef2308emr245837a91.13.1752097147476; Wed, 09
+ Jul 2025 14:39:07 -0700 (PDT)
+Date: Wed, 9 Jul 2025 14:39:05 -0700
+In-Reply-To: <20250606235619.1841595-3-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250606235619.1841595-1-vipinsh@google.com> <20250606235619.1841595-3-vipinsh@google.com>
+Message-ID: <aG7heUe_zBf83tlJ@google.com>
+Subject: Re: [PATCH v2 02/15] KVM: selftests: Enable selftests runner to find
+ executables in different path
+From: Sean Christopherson <seanjc@google.com>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, 
+	anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
+	imbrenda@linux.ibm.com, maz@kernel.org, oliver.upton@linux.dev, 
+	dmatlack@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-KVM allows userspace to control GICD_IIDR.Revision and
-GICD_TYPER2.nASSGIcap prior to initialization for the sake of
-provisioning the guest-visible feature set. Document the userspace
-expectations surrounding accesses to these registers.
+On Fri, Jun 06, 2025, Vipin Sharma wrote:
+> Add command line option, --executable/-e, to specify a directory where
+> test binaries are present. If this option is not provided then default
+> to the current directory.
+> 
+> Example:
+>   python3 runner --test-dirs test -e ~/build/selftests
+> 
+> This option enables executing tests from out-of-tree builds.
+> 
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+>  tools/testing/selftests/kvm/runner/__main__.py    | 8 +++++++-
+>  tools/testing/selftests/kvm/runner/selftest.py    | 4 ++--
+>  tools/testing/selftests/kvm/runner/test_runner.py | 4 ++--
+>  3 files changed, 11 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/runner/__main__.py b/tools/testing/selftests/kvm/runner/__main__.py
+> index b2c85606c516..599300831504 100644
+> --- a/tools/testing/selftests/kvm/runner/__main__.py
+> +++ b/tools/testing/selftests/kvm/runner/__main__.py
+> @@ -29,6 +29,12 @@ def cli():
+>                          default=[],
+>                          help="Run tests in the given directory and all of its sub directories. Provide the space separated paths to add multiple directories.")
+>  
+> +    parser.add_argument("-e",
+> +                        "--executable",
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- Documentation/virt/kvm/devices/arm-vgic-v3.rst | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index e860498b1e35..c7a1cd22d814 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -78,6 +78,8 @@ Groups:
-     -ENXIO   The group or attribute is unknown/unsupported for this device
-              or hardware support is missing.
-     -EFAULT  Invalid user pointer for attr->addr.
-+    -EBUSY   Attempt to write a register that is read-only after
-+             initialization
-     =======  =============================================================
- 
- 
-@@ -120,6 +122,15 @@ Groups:
-     Note that distributor fields are not banked, but return the same value
-     regardless of the mpidr used to access the register.
- 
-+    Userspace is allowed to write the following register fields prior to
-+    initialization of the VGIC:
-+
-+      =====================
-+      GICD_IIDR.Revision
-+      GICD_TYPER2.nASSGIcap
-+      =====================
-+
-+
-     GICD_IIDR.Revision is updated when the KVM implementation is changed in a
-     way directly observable by the guest or userspace.  Userspace should read
-     GICD_IIDR from KVM and write back the read value to confirm its expected
-@@ -128,6 +139,12 @@ Groups:
-     behavior.
- 
- 
-+    GICD_TYPER2.nASSGIcap allows userspace to control the support of SGIs
-+    without an active state. At VGIC creation the field resets to the
-+    maximum capability of the system. Userspace is expected to read the field
-+    to determine the supported value(s) before writing to the field.
-+
-+
-     The GICD_STATUSR and GICR_STATUSR registers are architecturally defined such
-     that a write of a clear bit has no effect, whereas a write with a set bit
-     clears that value.  To allow userspace to freely set the values of these two
--- 
-2.39.5
-
+"executable" is kinda odd to me, as that suggests a single, specific executable.
+-p/--path seems more aligned with how this concept is typically described in Linux.
