@@ -1,285 +1,232 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E0F2E5B0A;
-	Wed,  9 Jul 2025 14:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D162E6135;
+	Wed,  9 Jul 2025 14:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752072189; cv=none; b=OgSCHaZqY7yDmIPt9GLQUUvCxr39l3iKnu91ha3asI6Oghpgmt/OfYUdTJrrF5dRUcmdSOgkDiYj1C7BsgsLsmRLsFCcYcUeJObQGUCXQ2g98tdmYaYLX4/zF+jNK+FZIOSK9nRtV2h/ASpjByWLuu901265YUTLHABuQd6pxbg=
+	t=1752072591; cv=none; b=q1aRekb7H11t+ij8jB+LJVOnj+dotE2mBz3UttUgW/GR/O6Z4Ed4Q+BhcI2GENAiJdZPjSx/7Hkd4ofMS9KtyX5y69GI1BLk7r+hKjS7hJkinBu+jr/rCLEFSSjLj5qnTQkeqe9Qv3qW2VT0jLXHsDzIL8dqS7CqgrMV7BEwoRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752072189; c=relaxed/simple;
-	bh=bQMNFx6GOIIt/6c+Np8R4/r+qUvNC1doOK/fLJk48Jg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TZFlGrNbEbO4qhA+RgiUCMs/0eAtL+l4O5mt+osJIiJJzG1UTL18r/D4XIR9L5qjoKwYiKX+BkFd5l4Yh3idJf0pqU33M6E8/MNDfvdzDf68/jhuwDI1vLkU4BRn79nlbYIbstpyn677JSovdDkeKvARrdPkI8LbuZUTywyu7Pw=
+	s=arc-20240116; t=1752072591; c=relaxed/simple;
+	bh=CBaf9D1Y5jz2uqiBK+j/ZZJ39e77o1iEu4tYrP0yisE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f67PXMz+C5eeZ63syWYPSPPqwAx3Gkz6Wvc7iW6CEb3wKPkbkaM/l/4gf5vOGqtkIKrChv1M1wKIe4+IuirDkyRyPll5IqtvJLdn00O+nKkPUI1rzEDQi65vtSW/H12943ZlUQcqNLiunBO5LHCKB5xGviykx37+Enznt2auZvI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DA69153B;
-	Wed,  9 Jul 2025 07:42:55 -0700 (PDT)
-Received: from [10.57.86.38] (unknown [10.57.86.38])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D7B83F694;
-	Wed,  9 Jul 2025 07:43:03 -0700 (PDT)
-Message-ID: <b2f3ddac-956e-4779-9202-fc393266aa6c@arm.com>
-Date: Wed, 9 Jul 2025 15:42:59 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5D191339;
+	Wed,  9 Jul 2025 07:49:36 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 62BBD3F694;
+	Wed,  9 Jul 2025 07:49:44 -0700 (PDT)
+Date: Wed, 9 Jul 2025 15:49:39 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>
+Subject: Re: [PATCH v9 14/43] KVM: arm64: Support timers in realm RECs
+Message-ID: <20250709144939.GA2753450@e124191.cambridge.arm.com>
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-15-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 15/43] arm64: RME: Allow VMM to set RIPAS
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
- <20250611104844.245235-16-steven.price@arm.com>
- <60bb33b4-133e-4ebd-950c-e9e2ba8fc38b@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <60bb33b4-133e-4ebd-950c-e9e2ba8fc38b@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611104844.245235-15-steven.price@arm.com>
 
-Hi Gavin,
+Hi Steven,
 
-On 02/07/2025 01:37, Gavin Shan wrote:
-> On 6/11/25 8:48 PM, Steven Price wrote:
->> Each page within the protected region of the realm guest can be marked
->> as either RAM or EMPTY. Allow the VMM to control this before the guest
->> has started and provide the equivalent functions to change this (with
->> the guest's approval) at runtime.
->>
->> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
->> unmapped from the guest and undelegated allowing the memory to be reused
->> by the host. When transitioning to RIPAS RAM the actual population of
->> the leaf RTTs is done later on stage 2 fault, however it may be
->> necessary to allocate additional RTTs to allow the RMM track the RIPAS
->> for the requested range.
->>
->> When freeing a block mapping it is necessary to temporarily unfold the
->> RTT which requires delegating an extra page to the RMM, this page can
->> then be recovered once the contents of the block mapping have been
->> freed.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes from v8:
->>   * Propagate the 'may_block' flag to allow conditional calls to
->>     cond_resched_rwlock_write().
->>   * Introduce alloc_rtt() to wrap alloc_delegated_granule() and
->>     kvm_account_pgtable_pages() and use when allocating RTTs.
->>   * Code reorganisation to allow init_ipa_state and set_ipa_state to
->>     share a common ripas_change() function,
->>   * Other minor changes following review.
->> Changes from v7:
->>   * Replace use of "only_shared" with the upstream "attr_filter" field
->>     of struct kvm_gfn_range.
->>   * Clean up the logic in alloc_delegated_granule() for when to call
->>     kvm_account_pgtable_pages().
->>   * Rename realm_destroy_protected_granule() to
->>     realm_destroy_private_granule() to match the naming elsewhere. Also
->>     fix the return codes in the function to be descriptive.
->>   * Several other minor changes to names/return codes.
->> Changes from v6:
->>   * Split the code dealing with the guest triggering a RIPAS change into
->>     a separate patch, so this patch is purely for the VMM setting up the
->>     RIPAS before the guest first runs.
->>   * Drop the useless flags argument from alloc_delegated_granule().
->>   * Account RTTs allocated for a guest using kvm_account_pgtable_pages().
->>   * Deal with the RMM granule size potentially being smaller than the
->>     host's PAGE_SIZE. Although note alloc_delegated_granule() currently
->>     still allocates an entire host page for every RMM granule (so wasting
->>     memory when PAGE_SIZE>4k).
->> Changes from v5:
->>   * Adapt to rebasing.
->>   * Introduce find_map_level()
->>   * Rename some functions to be clearer.
->>   * Drop the "spare page" functionality.
->> Changes from v2:
->>   * {alloc,free}_delegated_page() moved from previous patch to this one.
->>   * alloc_delegated_page() now takes a gfp_t flags parameter.
->>   * Fix the reference counting of guestmem pages to avoid leaking memory.
->>   * Several misc code improvements and extra comments.
->> ---
->>   arch/arm64/include/asm/kvm_rme.h |   6 +
->>   arch/arm64/kvm/mmu.c             |   8 +-
->>   arch/arm64/kvm/rme.c             | 447 +++++++++++++++++++++++++++++++
->>   3 files changed, 458 insertions(+), 3 deletions(-)
->>
+On Wed, Jun 11, 2025 at 11:48:11AM +0100, Steven Price wrote:
+> The RMM keeps track of the timer while the realm REC is running, but on
+> exit to the normal world KVM is responsible for handling the timers.
 > 
-> With below nitpicks addressed. The changes looks good to me.
+> The RMM doesn't provide a mechanism to set the counter offset, so don't
+> expose KVM_CAP_COUNTER_OFFSET for a realm VM.
 > 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-Thanks, most the nitpicks I agree - thanks for raising. Just one below I
-wanted to comment on...
-
-[...]
->> +
->> +enum ripas_action {
->> +    RIPAS_INIT,
->> +    RIPAS_SET,
->> +};
->> +
->> +static int ripas_change(struct kvm *kvm,
->> +            struct kvm_vcpu *vcpu,
->> +            unsigned long ipa,
->> +            unsigned long end,
->> +            enum ripas_action action,
->> +            unsigned long *top_ipa)
->> +{
+> A later patch adds the support for propagating the timer values from the
+> exit data structure and calling kvm_realm_timers_update().
 > 
-> The 'enum ripas_action' is used in limited scope, I would replace it
-> with a 'bool'
-> parameter to ripas_change(), something like below. If we plan to support
-> more actions
-> in future, then the 'enum ripas_action' makes sense to me.
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v7:
+>  * Hide KVM_CAP_COUNTER_OFFSET for realm guests.
+> ---
+>  arch/arm64/kvm/arch_timer.c  | 48 +++++++++++++++++++++++++++++++++---
+>  arch/arm64/kvm/arm.c         |  2 +-
+>  include/kvm/arm_arch_timer.h |  2 ++
+>  3 files changed, 47 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index fdbc8beec930..7f8705d6fdf5 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -148,6 +148,13 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
+>  
+>  static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+>  {
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	if (kvm_is_realm(vcpu->kvm)) {
+> +		WARN_ON(offset);
+> +		return;
+> +	}
+> +
+>  	if (!ctxt->offset.vm_offset) {
+>  		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+>  		return;
+> @@ -462,6 +469,21 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>  			    timer_ctx);
+>  }
+>  
+> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
+> +	int i;
+> +
+> +	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
+> +		struct arch_timer_context *timer = &arch_timer->timers[i];
+> +		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
+> +		bool level = kvm_timer_irq_can_fire(timer) && status;
+> +
+> +		if (level != timer->irq.level)
+> +			kvm_timer_update_irq(vcpu, level, timer);
+> +	}
+> +}
+> +
+>  /* Only called for a fully emulated timer */
+>  static void timer_emulate(struct arch_timer_context *ctx)
+>  {
+> @@ -870,6 +892,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  	if (unlikely(!timer->enabled))
+>  		return;
+>  
+> +	kvm_timer_unblocking(vcpu);
+> +
+>  	get_timer_map(vcpu, &map);
+>  
+>  	if (static_branch_likely(&has_gic_active_state)) {
+> @@ -883,8 +907,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  		kvm_timer_vcpu_load_nogic(vcpu);
+>  	}
+>  
+> -	kvm_timer_unblocking(vcpu);
+> -
 
-The v1.1 spec[1] adds RMI_RTT_SET_S2AP (set stage 2 access permission).
-So that adds a third option to the enum. I agree the enum is a little
-clunky but it allows extension and at least spells out the action which
-is occurring.
-
-The part I'm not especially happy with is the 'vcpu' argument which is
-not applicable to RIPAS_INIT but otherwise required (and in those cases
-could replace 'kvm'). But I couldn't come up with a better solution for
-that.
-
-[1] Available from:
-https://developer.arm.com/documentation/den0137/latest (following the
-small "here" link near the end).
+The change here to move kvm_timer_unblocking() looks unnecessary, as the change
+to add an early return in kvm_timer_enable() causes timer->enable to never be
+set to 1.  Since it is never set, kvm_timer_vcpu_load() will return early
+before this call to kvm_timer_unblocking().
 
 Thanks,
-Steve
+Joey
 
-> static int ripas_change(struct kvm *kvm,
->             struct kvm_vcpu *vcpu,
->             unsigned long ipa,
->             unsigned long end,
->             bool set_ripas,
->             unsigned long *top_ipa)
+>  	timer_restore_state(map.direct_vtimer);
+>  	if (map.direct_ptimer)
+>  		timer_restore_state(map.direct_ptimer);
+> @@ -1065,7 +1087,9 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>  
+>  	ctxt->vcpu = vcpu;
+>  
+> -	if (timerid == TIMER_VTIMER)
+> +	if (kvm_is_realm(vcpu->kvm))
+> +		ctxt->offset.vm_offset = NULL;
+> +	else if (timerid == TIMER_VTIMER)
+>  		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
+>  	else
+>  		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
+> @@ -1087,13 +1111,19 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+> +	u64 cntvoff;
+>  
+>  	for (int i = 0; i < NR_KVM_TIMERS; i++)
+>  		timer_context_init(vcpu, i);
+>  
+> +	if (kvm_is_realm(vcpu->kvm))
+> +		cntvoff = 0;
+> +	else
+> +		cntvoff = kvm_phys_timer_read();
+> +
+>  	/* Synchronize offsets across timers of a VM if not already provided */
+>  	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+> -		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+> +		timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
+>  		timer_set_offset(vcpu_ptimer(vcpu), 0);
+>  	}
+>  
+> @@ -1633,6 +1663,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  		return -EINVAL;
+>  	}
+>  
+> +	/*
+> +	 * We don't use mapped IRQs for Realms because the RMI doesn't allow
+> +	 * us setting the LR.HW bit in the VGIC.
+> +	 */
+> +	if (vcpu_is_rec(vcpu))
+> +		return 0;
+> +
+>  	get_timer_map(vcpu, &map);
+>  
+>  	ret = kvm_vgic_map_phys_irq(vcpu,
+> @@ -1764,6 +1801,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+>  	if (offset->reserved)
+>  		return -EINVAL;
+>  
+> +	if (kvm_is_realm(kvm))
+> +		return -EINVAL;
+> +
+>  	mutex_lock(&kvm->lock);
+>  
+>  	if (!kvm_trylock_all_vcpus(kvm)) {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 0cdcc2ca4a88..6a5c9be4af2d 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -350,10 +350,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_PTP_KVM:
+>  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+>  	case KVM_CAP_IRQFD_RESAMPLE:
+> -	case KVM_CAP_COUNTER_OFFSET:
+>  	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
+>  		r = 1;
+>  		break;
+> +	case KVM_CAP_COUNTER_OFFSET:
+>  	case KVM_CAP_SET_GUEST_DEBUG:
+>  		r = !kvm_is_realm(kvm);
+>  		break;
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 681cf0c8b9df..f64e317c091b 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -113,6 +113,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  
+> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu);
+> +
+>  u64 kvm_phys_timer_read(void);
+>  
+>  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
+> -- 
+> 2.43.0
 > 
->> +    struct realm *realm = &kvm->arch.realm;
->> +    phys_addr_t rd_phys = virt_to_phys(realm->rd);
->> +    phys_addr_t rec_phys;
->> +    struct kvm_mmu_memory_cache *memcache = NULL;
->> +    int ret = 0;
->> +
->> +    if (vcpu) {
->> +        rec_phys = virt_to_phys(vcpu->arch.rec.rec_page);
->> +        memcache = &vcpu->arch.mmu_page_cache;
->> +
->> +        WARN_ON(action != RIPAS_SET);
->> +    } else {
->> +        WARN_ON(action != RIPAS_INIT);
->> +    }
->> +
->> +    while (ipa < end) {
->> +        unsigned long next;
->> +
->> +        switch (action) {
->> +        case RIPAS_INIT:
->> +            ret = rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
->> +            break;
->> +        case RIPAS_SET:
->> +            ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end,
->> +                        &next);
->> +            break;
->> +        }
->> +
-> 
-> if 'enum ripas_action' is replaced by 'bool set_ripas' as above, this needs
-> twist either.
-> 
->> +        switch (RMI_RETURN_STATUS(ret)) {
->> +        case RMI_SUCCESS:
->> +            ipa = next;
->> +            break;
->> +        case RMI_ERROR_RTT:
->> +            int err_level = RMI_RETURN_INDEX(ret);
->> +            int level = find_map_level(realm, ipa, end);
->> +
->> +            if (err_level >= level)
->> +                return -EINVAL;
->> +
->> +            ret = realm_create_rtt_levels(realm, ipa, err_level,
->> +                              level, memcache);
->> +            if (ret)
->> +                return ret;
->> +            /* Retry with the RTT levels in place */
->> +            break;
->> +        default:
->> +            WARN_ON(1);
->> +            return -ENXIO;
->> +        }
->> +    }
->> +
->> +    if (top_ipa)
->> +        *top_ipa = ipa;
->> +
->> +    return 0;
->> +}
->> +
->> +static int realm_init_ipa_state(struct kvm *kvm,
->> +                unsigned long ipa,
->> +                unsigned long end)
->> +{
->> +    return ripas_change(kvm, NULL, ipa, end, RIPAS_INIT, NULL);
->> +}
->> +
->> +static int kvm_init_ipa_range_realm(struct kvm *kvm,
->> +                    struct arm_rme_init_ripas *args)
->> +{
->> +    gpa_t addr, end;
->> +
->> +    addr = args->base;
->> +    end = addr + args->size;
->> +
->> +    if (end < addr)
->> +        return -EINVAL;
->> +
->> +    if (kvm_realm_state(kvm) != REALM_STATE_NEW)
->> +        return -EPERM;
->> +
->> +    return realm_init_ipa_state(kvm, addr, end);
->> +}
->> +
->>   /* Protects access to rme_vmid_bitmap */
->>   static DEFINE_SPINLOCK(rme_vmid_lock);
->>   static unsigned long *rme_vmid_bitmap;
->> @@ -441,6 +876,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct
->> kvm_enable_cap *cap)
->>       case KVM_CAP_ARM_RME_CREATE_REALM:
->>           r = kvm_create_realm(kvm);
->>           break;
->> +    case KVM_CAP_ARM_RME_INIT_RIPAS_REALM: {
->> +        struct arm_rme_init_ripas args;
->> +        void __user *argp = u64_to_user_ptr(cap->args[1]);
->> +
->> +        if (copy_from_user(&args, argp, sizeof(args))) {
->> +            r = -EFAULT;
->> +            break;
->> +        }
->> +
->> +        r = kvm_init_ipa_range_realm(kvm, &args);
->> +        break;
->> +    }
->>       default:
->>           r = -EINVAL;
->>           break;
-> 
-> Thanks,
-> Gavin
-> 
-
