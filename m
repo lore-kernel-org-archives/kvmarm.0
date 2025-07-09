@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346B828850D
-	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 09:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8625A289E38
+	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 09:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752053905; cv=none; b=J4sgAR/tU4wwfTTG5bbteOM1pgqj5YVD0e6vvr6+3K4DMwRg49isYz/P3oA+sXbD1v0Ru34+RiRc0DuMnq95uKl1BjOXmJ99XEtT07K9+beoPkLGdLmrhNh4/uoLaHYPvV5VyeZGDq0wqHR1em4PITz9qroN6dO2YX3xoDxt+1o=
+	t=1752053910; cv=none; b=l8NqjwsCaJjAtFk71qv+P5Wm0y2cINpQln9gRVTh1cZncvki+07oZGJWp8RlEvHFl7yu+0ymtX424Cs/ZXr62bRkDXZT8ORVuPBZoqNlJPwyrEnVvUpthMAtgiOCQPo1X9JFp+fg2q44Yzh0iney/vdgnU8BTVRHXAqqQ9+pKFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752053905; c=relaxed/simple;
-	bh=9HnbdpNhe8OY1hF6wbjnKkXFCcZmCwzgwNAa+SNHB1Q=;
+	s=arc-20240116; t=1752053910; c=relaxed/simple;
+	bh=Db9e+iXLe/WttAm6uqRxgVXYTlbnGiDEOFfbnzWYtmo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Cr2Jqi2FZfAeUfL8Zffy9KZRzU9bpzBNrGLJc6coi5F/uqWy1NHgCUYVI6FXmY2a0s/4C1eaPx4d0azpmiv019uVUllKsNXFtc5ai6jSjjD+lyHUM4uiTePePkPk0WwFyiFCv4ZUk3hLmXsrMshnsI15AH4irycltve1UtZuwmc=
+	 MIME-Version; b=J/lJqPM/X9Y05P94sVz0CAUE9oh2JZAT6djsCeVjO8640sQy82aW7m3gB07F0esUCa0yD2wkCvqu6ygkwheHDZr0YyiQb55eWEFWCmLC6pcM3t89+Q0p0pDE7RI+8OyQsnOPQ2/aox+0bGp089SiQ1IvjU68KM3fSnh7zw2LZIU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0854B1655;
-	Wed,  9 Jul 2025 02:38:12 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 62BCC153B;
+	Wed,  9 Jul 2025 02:38:17 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 77CE63F738;
-	Wed,  9 Jul 2025 02:38:21 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 067563F738;
+	Wed,  9 Jul 2025 02:38:26 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -32,11 +32,10 @@ To: catalin.marinas@arm.com,
 	linux@rasmusvillemoes.dk,
 	linux-kernel@vger.kernel.org
 Cc: james.morse@arm.com,
-	Ben Horgan <ben.horgan@arm.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 1/2] KVM: arm64: Fix enforcement of upper bound on MDCR_EL2.HPMN
-Date: Wed,  9 Jul 2025 10:38:07 +0100
-Message-ID: <20250709093808.920284-2-ben.horgan@arm.com>
+	Ben Horgan <ben.horgan@arm.com>
+Subject: [PATCH v2 2/2] bitfield: Ensure the return values of helper functions are checked
+Date: Wed,  9 Jul 2025 10:38:08 +0100
+Message-ID: <20250709093808.920284-3-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250709093808.920284-1-ben.horgan@arm.com>
 References: <20250709093808.920284-1-ben.horgan@arm.com>
@@ -48,32 +47,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Previously, u64_replace_bits() was used to no effect as the return value
-was ignored. Convert to u64p_replace_bits() so the value is updated in
-place.
+As type##_replace_bits() has no side effects it is only useful if its
+return value is checked. Add __must_check to enforce this usage. To have
+the bits replaced in-place typep##_replace_bits() can be used instead.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Although, type_##_get_bits() and type_##_encode_bits() are harder to misuse
+they are still only useful if the return value is checked. For
+consistency, also add __must_check to these.
+
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-Fixes: efff9dd2fee7 ("KVM: arm64: Handle out-of-bound write to MDCR_EL2.HPMN")
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
 ---
- arch/arm64/kvm/sys_regs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/bitfield.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 76c2f0da821f..c20bd6f21e60 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2624,7 +2624,7 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
- 	 */
- 	if (hpmn > vcpu->kvm->arch.nr_pmu_counters) {
- 		hpmn = vcpu->kvm->arch.nr_pmu_counters;
--		u64_replace_bits(val, hpmn, MDCR_EL2_HPMN);
-+		u64p_replace_bits(&val, hpmn, MDCR_EL2_HPMN);
- 	}
- 
- 	__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
+diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
+index 6d9a53db54b6..5355f8f806a9 100644
+--- a/include/linux/bitfield.h
++++ b/include/linux/bitfield.h
+@@ -189,14 +189,14 @@ static __always_inline u64 field_mask(u64 field)
+ }
+ #define field_max(field)	((typeof(field))field_mask(field))
+ #define ____MAKE_OP(type,base,to,from)					\
+-static __always_inline __##type type##_encode_bits(base v, base field)	\
++static __always_inline __##type __must_check type##_encode_bits(base v, base field)	\
+ {									\
+ 	if (__builtin_constant_p(v) && (v & ~field_mask(field)))	\
+ 		__field_overflow();					\
+ 	return to((v & field_mask(field)) * field_multiplier(field));	\
+ }									\
+-static __always_inline __##type type##_replace_bits(__##type old,	\
+-					base val, base field)		\
++static __always_inline __##type __must_check type##_replace_bits(__##type old,	\
++							base val, base field)	\
+ {									\
+ 	return (old & ~to(field)) | type##_encode_bits(val, field);	\
+ }									\
+@@ -205,7 +205,7 @@ static __always_inline void type##p_replace_bits(__##type *p,		\
+ {									\
+ 	*p = (*p & ~to(field)) | type##_encode_bits(val, field);	\
+ }									\
+-static __always_inline base type##_get_bits(__##type v, base field)	\
++static __always_inline base __must_check type##_get_bits(__##type v, base field)	\
+ {									\
+ 	return (from(v) & field)/field_multiplier(field);		\
+ }
 -- 
 2.43.0
 
