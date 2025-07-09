@@ -1,66 +1,65 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13944A92E
-	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 21:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A6E35897
+	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 21:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752097149; cv=none; b=VySQShF6sMdne7ls6xUiZPTHVA0qHK9Tvd/o43U4NHz2DKeNFue4pYGuIRKejW/LtgNrAlqOJnTatUvrM+v4OQBqRamWvILuqoVxiIfpcU6jWZzBPKvtwMUBiff1Zw/4G+JLANcUpQe0sFdjQ8ci1TD15TdR3PjhFXm+osozJxs=
+	t=1752097583; cv=none; b=TeK9vvPCuxj6bxpShUOcWLUa1w9l8VO72l9QPVldeiDa4NGDyUcmLE1csEzdhvHxvTcmUYZc4bf5sY/vTBVSuMF/v7qIcuH7Una5TfYP3dNzzA6EsUYGC9vx+CbMCi7ctN5cL7fCIkW659xiaET0zFRtGOnEvGwvqWmP16f60ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752097149; c=relaxed/simple;
-	bh=GODhRmDiVJiCnZUnkaX8NW89MJRIIVn4pvNiMuRjOq8=;
+	s=arc-20240116; t=1752097583; c=relaxed/simple;
+	bh=L9LVrS8VhpVhZDH5rGUCmQfvq+9qwn0aD/goPecosqs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sPyVVKhATW19+NCUIjL/izKROXGbQRwWRZHDCosJr0Iz7wfO6jyShjXjBSsXEn7rZgpDBTDAqGIZ75xF30WXitvcaQhfwHpHJM/zNNCniJp/WcxankE7jQSqO/qzKxBc17Z4gbylss+fkk/AiNBJxFWrAz0nEXzc5tN+a/303lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q5KUPtoY; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=dbMzbJLLPiI6iUEM6tNDCaBtOxELfQo6QaYqKdDk2HAtJ9Jj5aKfVlue3QxxjamzmCGvpD8elbYT8BHs26HOVx+358AyH53LwvmEqdiXOcV7OlhsFebYK9yLM0Huz1IJ+9DufZkoehp2iblVTX+QFA2JpIKBUxyACtU6uA5seJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cu/XtrE4; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q5KUPtoY"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31215090074so602415a91.0
-        for <kvmarm@lists.linux.dev>; Wed, 09 Jul 2025 14:39:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cu/XtrE4"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3138f5e8ff5so356710a91.3
+        for <kvmarm@lists.linux.dev>; Wed, 09 Jul 2025 14:46:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752097147; x=1752701947; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1752097582; x=1752702382; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRjFnmCzYN+qn8kF+o9IzfpkXQ4+JquW4HupC73fftA=;
-        b=Q5KUPtoYXUP1TF4DmhpdlqvzyxV043jVb0Tzlkyt+xWGjcfr6Xti9RtvdFklAgfrOj
-         MlKJqp7B/SwsfIQcZQP3xXRF9Y7EOZ730WsaOd2xYAX0uIuoHbptU4KyR4wHbzgGVyOS
-         xe7E/tidQFPE1NgkkuE3VMUDXNmcXhp0Bd8dR/jbqLsBM6rXsHe6Rx8JpBpg9KBoSdtB
-         q8X65l4VYqk8syJxJ2+EyA3B95nnjZCRIHxCA5EY8vk2XSMEKaYRdAZs6DWQxZwa4og/
-         gtCASJRrrEnecHZW326YXqVpVXWAmSlp+tnNKrwZe6I9V/w6aRcZqGC1pHEYdxZdGm8I
-         mSng==
+        bh=WaqfKSmh/HmFIuS+sSnBu07GpBGE4YrxsliW83zfkFo=;
+        b=Cu/XtrE4tczlf7JZUKOEB/YKdKR5Ms0CzyR59aUTUZc7NkB4JUiTugbiNZacYeYoVm
+         KZVXoPJSt2FDIURPVCKOLADfbTmjx5cIAq2bBdWxW3B3k4fQwk9GorMmE9YS/1Uz3zop
+         hzuRCOrsxdn1c9n1ofaWInipuxcoQsecszl26pm0Jffvav/sbOzHmg8zQmEmlJKn/uED
+         aRhSmuIy87ScnMXvlp41uVOSYRNfCTcdMUOfWdK8q7TsphJUpCLVyYshwgQvQNSsf7q0
+         Pgpc+htE5PEjg9rOFsDIW3vUovV9tIte6MFKpfppDmHIj7Q/9UJ1AvKUUbtQs9RtscXg
+         a6Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752097147; x=1752701947;
+        d=1e100.net; s=20230601; t=1752097582; x=1752702382;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRjFnmCzYN+qn8kF+o9IzfpkXQ4+JquW4HupC73fftA=;
-        b=SlfZlzL5rniU+zVNYrXhwdTO93g651ZFrbg4zenMCrRhNIDVya15ohmXTRZpB1ezCi
-         Svqoufq65RkUJiBrAKMAbULpxN3ken1DrG2cZNownkbRqPvJy/mKnYQkA8THz6/q3v4f
-         t2mdSkJURUvkRthnCPDXUZouDNptSU1B33GiCOG5+eETu24mtkW+t2P6NGMQBb/BCHA7
-         I/L+ZksB2H4+3FpToDc0FhA75eeq1m4gUJUJuFIUbihPekRtnmYZSXh/rxjgm1RHC7Dr
-         RkcjEvExelK+bXkJQPHvtj8j255V3n0OdSg38XSyifJweXIDWEL77o58xs23qvgm+MDR
-         gtnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGbf5/crsAfHuin7jfA+Rg1QIRS78jGYRLsG6pRJc4YXFWz+Gkfo6ZJ9q4FvaYwkkKyOfNev4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxWqvWEVDov0Nlgih4sVFGc36fyBtF2uqeCxzTTzmm7w8OhQEnS
-	JgY6GJ4iwCwFujdv9gswDaraEVcoFQGbIY0lZNeoHQVf7pnuHomhfupfFkieyjFfw8gQuvqOFYE
-	eUTlskA==
-X-Google-Smtp-Source: AGHT+IGqLtd25jQcDPlbBnyHm57aZXVZqGANjf8aQ+PHIDAz5DerrzktIfl+GNc39oHL/0frC4tukw2+CLQ=
-X-Received: from pjbqn6.prod.google.com ([2002:a17:90b:3d46:b0:312:2b3:7143])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5344:b0:313:62ee:45a
- with SMTP id 98e67ed59e1d1-31c3ef2308emr245837a91.13.1752097147476; Wed, 09
- Jul 2025 14:39:07 -0700 (PDT)
-Date: Wed, 9 Jul 2025 14:39:05 -0700
-In-Reply-To: <20250606235619.1841595-3-vipinsh@google.com>
+        bh=WaqfKSmh/HmFIuS+sSnBu07GpBGE4YrxsliW83zfkFo=;
+        b=p0Gf+CH3dryrLLxh9qy5BBnkkf/2bRCwdknbaUK1Mz4E1OJxlCUephJzPLtxwLjoQ8
+         lG0vbcDhBIuzww+cF8dv9LOS8uKvD5dPqtyiJvZAemmrGkSA9hbna6NcsoVcaBb1fRbf
+         JYwRtHa2jC8ZAGPyrA4cx6cgAO6dbOV7ldLhQBtdKWePKGlpFuM7JK34QLW+3fGD/Onx
+         YEVkr8MxWDOdFgw9YTrdr7P6KtZUYWt4HAC+ajwS0IR38lFKCtbNTBNlKTVxKQVX7V4z
+         THTFN2euchRffTPfdH4UeroAhG6/YC3Lq1KPPXqfTAGRQqZiQM5FJueY5i9zk7gY+vOK
+         mfeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUOqjIyUfk+0pGMKMR1y/oMRnKDQm72UjpyXLNesJ8STmFt/g/Mron2GuzOxsIPh2B4HEApBcU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxfSY4uQ4oFPiupuKUBgJ3LYopf5PjQcB1hJupI20ExbfU6StzJ
+	yygAiMQI/eA3ZN3jF/JNTLlTYzw1yu7SAb+M1KQISJQHHoa2+9KCKB2vGI/0rXknkPNKulbiErT
+	K2Fdfrg==
+X-Google-Smtp-Source: AGHT+IGcqFJmd+hfGvHB0iLaIOFTZC36nD5olbTkWzVffAwi5c8bazohN60XOEuv/ND8XITKiAvhLA/8GEg=
+X-Received: from pjboh12.prod.google.com ([2002:a17:90b:3a4c:b0:313:230:89ed])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2dcd:b0:311:b0ec:135f
+ with SMTP id 98e67ed59e1d1-31c3c2f158emr1976074a91.30.1752097581827; Wed, 09
+ Jul 2025 14:46:21 -0700 (PDT)
+Date: Wed, 9 Jul 2025 14:46:20 -0700
+In-Reply-To: <20250606235619.1841595-4-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250606235619.1841595-1-vipinsh@google.com> <20250606235619.1841595-3-vipinsh@google.com>
-Message-ID: <aG7heUe_zBf83tlJ@google.com>
-Subject: Re: [PATCH v2 02/15] KVM: selftests: Enable selftests runner to find
- executables in different path
+References: <20250606235619.1841595-1-vipinsh@google.com> <20250606235619.1841595-4-vipinsh@google.com>
+Message-ID: <aG7jLBAqo1F3SjCl@google.com>
+Subject: Re: [PATCH v2 03/15] KVM: selftests: Add timeout option in selftests runner
 From: Sean Christopherson <seanjc@google.com>
 To: Vipin Sharma <vipinsh@google.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
@@ -71,32 +70,73 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Jun 06, 2025, Vipin Sharma wrote:
-> Add command line option, --executable/-e, to specify a directory where
-> test binaries are present. If this option is not provided then default
-> to the current directory.
-> 
-> Example:
->   python3 runner --test-dirs test -e ~/build/selftests
-> 
-> This option enables executing tests from out-of-tree builds.
-> 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  tools/testing/selftests/kvm/runner/__main__.py    | 8 +++++++-
->  tools/testing/selftests/kvm/runner/selftest.py    | 4 ++--
->  tools/testing/selftests/kvm/runner/test_runner.py | 4 ++--
->  3 files changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/runner/__main__.py b/tools/testing/selftests/kvm/runner/__main__.py
-> index b2c85606c516..599300831504 100644
-> --- a/tools/testing/selftests/kvm/runner/__main__.py
-> +++ b/tools/testing/selftests/kvm/runner/__main__.py
-> @@ -29,6 +29,12 @@ def cli():
->                          default=[],
->                          help="Run tests in the given directory and all of its sub directories. Provide the space separated paths to add multiple directories.")
+> diff --git a/tools/testing/selftests/kvm/runner/command.py b/tools/testing/selftests/kvm/runner/command.py
+> index a63ff53a92b3..44c8e0875779 100644
+> --- a/tools/testing/selftests/kvm/runner/command.py
+> +++ b/tools/testing/selftests/kvm/runner/command.py
+> @@ -12,14 +12,16 @@ class Command:
+>      Returns the exit code, std output and std error of the command.
+>      """
 >  
-> +    parser.add_argument("-e",
-> +                        "--executable",
+> -    def __init__(self, command):
+> +    def __init__(self, command, timeout):
+>          self.command = command
+> +        self.timeout = timeout
+>  
+>      def run(self):
+>          run_args = {
+>              "universal_newlines": True,
+>              "shell": True,
+>              "capture_output": True,
+> +            "timeout": self.timeout,
+>          }
+> @@ -48,10 +50,13 @@ class Selftest:
+>              self.stderr = "File doesn't exists."
+>              return
+>  
+> -        ret, self.stdout, self.stderr = self.command.run()
+> -        if ret == 0:
+> -            self.status = SelftestStatus.PASSED
+> -        elif ret == 4:
+> -            self.status = SelftestStatus.SKIPPED
+> -        else:
+> -            self.status = SelftestStatus.FAILED
+> +        try:
+> +            ret, self.stdout, self.stderr = self.command.run()
 
-"executable" is kinda odd to me, as that suggests a single, specific executable.
--p/--path seems more aligned with how this concept is typically described in Linux.
+I don't see any value in having both command.py and selftest.py.  TimeoutExpired
+*really* should be handled by Command, especially with respect to stdout/stderr
+(more on that later), but that complicates converting return codes to SelftestStatus.
+
+And even if we do figure out a clean split, one of Command or Selftest would end
+but being little more than a wrapper or trampoline, with more boilerplate code
+than novel logic.
+
+I don't anticipate turning this into a general execution framework.  The entire
+purpose is to run a selftest, so I think it makes sense to scrap Command and just
+have Selftest deal with running the executable.
+
+> +            if ret == 0:
+> +                self.status = SelftestStatus.PASSED
+> +            elif ret == 4:
+> +                self.status = SelftestStatus.SKIPPED
+> +            else:
+> +                self.status = SelftestStatus.FAILED
+> +        except subprocess.TimeoutExpired as e:
+> +            self.status = SelftestStatus.TIMED_OUT
+> diff --git a/tools/testing/selftests/kvm/runner/test_runner.py b/tools/testing/selftests/kvm/runner/test_runner.py
+> index 104f0b4c2e4e..1409e1cfe7d5 100644
+> --- a/tools/testing/selftests/kvm/runner/test_runner.py
+> +++ b/tools/testing/selftests/kvm/runner/test_runner.py
+> @@ -15,7 +15,7 @@ class TestRunner:
+>          self.tests = []
+>  
+>          for test_file in test_files:
+> -            self.tests.append(Selftest(test_file, args.executable))
+> +            self.tests.append(Selftest(test_file, args.executable, args.timeout))
+>  
+>      def _log_result(self, test_result):
+>          logger.log(test_result.status,
+> -- 
+> 2.50.0.rc0.604.gd4ff7b7c86-goog
+> 
