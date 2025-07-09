@@ -1,114 +1,220 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A3E182
-	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 02:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AE4239E9E
+	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 08:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752026932; cv=none; b=lQnB9OrxhT9Ej2ZS6yZaPUN87v1M07932oiuazHEVQ3a5IATAU3ALbGpStcVBIB8N9GZHcOdAo/5WFAl8tu7is4hiIxDO4buJCGKXXnsBSBjnZ3PljLj1lzEwxitEywfCMewB/1ejLCGw8Zzs4RHUgDB3yIT1fWB4aFebVXnbko=
+	t=1752048750; cv=none; b=uw9q8tt0C7b+dqDbvQaCZOcW3QtE2IOFS9dle+qb7/u0gOmD6gLlPfIt3W8yeMWVOUibBqMc9LzBbayOce9kPQ8v4Na7IRek3bs/3VAraz+jZJwwqAmb2IHbYH57qNJn7vinc68BBV1e4hPmAZQJ3bMm1dzeLm9VYd0PLCCykTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752026932; c=relaxed/simple;
-	bh=666wrzJmzcf3+flfduB1n6PNzaeqDo4+8uaJkkv6hLw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sn4sM1D5nSh0maIDZ+4GBaNLn/D2tWUv9SSszj+WuPd8ntmmRcm9c/DZcmcFSZmjXaBvznNYY7VnL2HtcM5QUNW1TapQnpPpVxq2Dmv/WbDQ3KjN+EorKngH3PgyWbD8V162eOGtGMLdxNvmGHihLQRkakh46gawLiIRUQz4QqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4bcLvG3Ym0z2BcpJ;
-	Wed,  9 Jul 2025 10:06:50 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 142041800D0;
-	Wed,  9 Jul 2025 10:08:46 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+	s=arc-20240116; t=1752048750; c=relaxed/simple;
+	bh=zKSIKyAQfm7s+xvMcP8dCeHkRcSWeCevTGLrV4DJAsQ=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ngarcw6eDWbiEOT/ozEWI6vGiNVm97RH6v5FaCWuTtgVDq3GI+3haBW3AWpSqYloLRdNW+KucSHjb9zUUUrVGJXUdY5bskit4KFXM9sYUBLqjyaruYOdwRDkzRNZjsYHofGCGNzuvPCDhp5kwH1N2DtU6mdIhusVuyWexAhDlG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bcVy24B3xz13Mny;
+	Wed,  9 Jul 2025 16:09:46 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 513CD140203;
+	Wed,  9 Jul 2025 16:12:25 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 9 Jul 2025 10:08:45 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 9 Jul 2025 10:08:43 +0800
-Message-ID: <225bc7df-e08f-6bd9-4cb6-a2104b553823@hisilicon.com>
-Date: Wed, 9 Jul 2025 10:08:42 +0800
+ 15.2.1544.11; Wed, 9 Jul 2025 16:12:24 +0800
+Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset
+ without CNTPOFF_EL2
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton
+	<oliver.upton@linux.dev>, Ricardo Koller <ricarkol@google.com>, Simon Veith
+	<sveith@amazon.de>, Reiji Watanabe <reijiw@google.com>, Colton Lewis
+	<coltonlewis@google.com>, Joey Gouly <joey.gouly@arm.com>,
+	<dwmw2@infradead.org>
+References: <20230330174800.2677007-1-maz@kernel.org>
+ <20230330174800.2677007-6-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <460258be-0102-e922-c342-4e87cd94b9e5@huawei.com>
+Date: Wed, 9 Jul 2025 16:12:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] ARM64: errata: Add workaround for HIP10/HIP10C erratum
- 162200803
+In-Reply-To: <20230330174800.2677007-6-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oliver.upton@linux.dev>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<tangnianyao@huawei.com>, <wangwudi@hisilicon.com>
-References: <20250626124142.2035110-1-wangzhou1@hisilicon.com>
- <86wm8ybpk5.wl-maz@kernel.org>
- <0b54db94-8a6f-cea0-a6f7-dbe8650d66dd@hisilicon.com>
- <86h5zwba5i.wl-maz@kernel.org>
- <ffd3fccc-af4a-6667-3cf6-a55e866f3057@hisilicon.com>
- <864ivtbll0.wl-maz@kernel.org>
- <73ee91b8-ba15-2534-ab76-f64e59261b1e@hisilicon.com>
- <86sej6alxo.wl-maz@kernel.org>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <86sej6alxo.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-On 2025/7/8 20:47, Marc Zyngier wrote:
-> On Tue, 08 Jul 2025 13:05:24 +0100,
-> Zhou Wang <wangzhou1@hisilicon.com> wrote:
->>
->> On 2025/7/3 18:44, Marc Zyngier wrote:
->>> On Wed, 02 Jul 2025 10:57:13 +0100,
->>> Zhou Wang <wangzhou1@hisilicon.com> wrote:
->>>>
->>>> However，migration between different KVMs will be broken :(
->>>> I am not sure that should we consider this case as well?
->>>
->>> This isn't optional. You cannot break migration on existing systems,
->>> and the only case that *must* break is to restore a VM that hasn't
->>> seen this limitation on a HW that enforces it.
->>
->> So the whole story is that we should let GICD_TYPE.num_LPIs as a
->> writable field, and set this field from VMM(e.g. QEMU). And it will
->> be failed if doing migration between VMs with different num_LPI
->> configurations.
-> 
-> Note that on a non-broken system, setting num_LPIs to any value should
-> always work.
-> 
->> After above done, this errata could be added.
-> 
-> Which would be the only case where num_LPIs wouldn't be writable, and
-> set to a fixed value.
-> 
-> Note that an alternative would be to not have a kernel erratum, but to
-> force num_LPIs from userspace when running on your platform. But that
-> implies that: you have your own, non-upstream VMM, and that there is
-> no opportunity for userspace to adversely impact the system as a whole.
+[ Record some interesting bits noticed while testing
+  arch_timer_edge_cases. ]
 
-Got it. Seems it is better to have this erratum in kernel.
+On 2023/3/31 1:47, Marc Zyngier wrote:
+> CNTPOFF_EL2 is awesome, but it is mostly vapourware, and no publicly
+> available implementation has it. So for the common mortals, let's
+> implement the emulated version of this thing.
+> 
+> It means trapping accesses to the physical counter and timer, and
+> emulate some of it as necessary.
+> 
+> As for CNTPOFF_EL2, nobody sets the offset yet.
+> 
+> Reviewed-by: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h    |  2 +
+>  arch/arm64/kvm/arch_timer.c        | 98 +++++++++++++++++++++++-------
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 18 ++++--
+>  arch/arm64/kvm/sys_regs.c          |  9 +++
+>  4 files changed, 98 insertions(+), 29 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 9e3ecba3c4e6..f8da9e1b0c11 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -388,6 +388,7 @@
+>  
+>  #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+>  
+> +#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
+>  #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
+>  #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
+>  
+> @@ -400,6 +401,7 @@
+>  
+>  #define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
+>  #define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
+> +#define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
+>  #define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
+>  
+>  #define __PMEV_op2(n)			((n) & 0x7)
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 3118ea0a1b41..bb64a71ae193 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -458,6 +458,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  		goto out;
+>  
+>  	switch (index) {
+> +		u64 cval;
+> +
+>  	case TIMER_VTIMER:
+>  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
+>  		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
+> @@ -485,7 +487,12 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  		break;
+>  	case TIMER_PTIMER:
+>  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+> -		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
+> +		cval = read_sysreg_el0(SYS_CNTP_CVAL);
+> +
+> +		if (!has_cntpoff())
+> +			cval -= timer_get_offset(ctx);
+> +
+> +		timer_set_cval(ctx, cval);
+>  
+>  		/* Disable the timer */
+>  		write_sysreg_el0(0, SYS_CNTP_CTL);
+> @@ -555,6 +562,8 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  		goto out;
+>  
+>  	switch (index) {
+> +		u64 cval, offset;
+> +
+>  	case TIMER_VTIMER:
+>  		set_cntvoff(timer_get_offset(ctx));
+>  		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
+> @@ -562,8 +571,12 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+>  		break;
+>  	case TIMER_PTIMER:
+> -		set_cntpoff(timer_get_offset(ctx));
+> -		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
+> +		cval = timer_get_cval(ctx);
+> +		offset = timer_get_offset(ctx);
+> +		set_cntpoff(offset);
+> +		if (!has_cntpoff())
+> +			cval += offset;
+> +		write_sysreg_el0(cval, SYS_CNTP_CVAL);
+>  		isb();
+>  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+>  		break;
 
-> 
->> Not sure my thought above is right? I will try to prepare a num_LPIs
->> writable patch if the direction is right.
-> 
-> I think you got the gist of it.
+I tested arch_timer_edge_cases on my Kunpeng920 (has VHE, doesn't have
+ECV) and noticed that the test_timer_cval() below takes a long period to
+return when testing the _physical_ timer.
 
-Thanks a lot for the whole discussion, I will prepare the new patch.
+static void test_timers_in_the_past(enum arch_timer timer)
+{
+	[...]
 
-Best,
-Zhou
+	for (i = 0; i < ARRAY_SIZE(irq_wait_method); i++) {
+		irq_wait_method_t wm = irq_wait_method[i];
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+		[...]
+
+		/* Set a timer to counter=0 (in the past) */
+		test_timer_cval(timer, 0, wm, DEF_CNT);
+
+The comment is obviously wrong. It should say "Set a timer to CVAL=0".
+
+No physical timer interrupt ("kvm guest ptimer") was triggered when I
+executed it separately.
+
+Let me try to explain _this_ test_timer_cval() in a bit more detail.
+
+|Guest					KVM
+|-----					---
+|local_irq_disable()
+|
+|reset_timer_state()
+|   set_counter()			// SET_ONE_REG via user-space
+|					// for KVM_REG_ARM_PTIMER_CNT
+|					kvm_arm_timer_set_reg()
+|					   timer_set_offset()      [1]
+|   timer_set_ctl()
+|      MSR CNTP_CTL_EL0, IMASK
+|
+|set_xval_irq()
+|   timer_set_cval()
+|      MSR CNTP_CVAL_EL0, cval=0
+|   timer_set_ctl()
+|      MSR CNTP_CTL_EL0, ENABLE		// trap
+|					kvm_arm_timer_write_sysreg()
+|					   timer_save_state()
+|					   kvm_arm_timer_write()
+|					   timer_restore_state()   [2]
+|
+|/* This method re-enables IRQs to handle the one we're looking for. */
+|wm()
+|
+|assert_irqs_handled(1)
+|local_irq_enable()
+
+[1] kvm_phys_timer_read()			= 0x7895c0ab2
+    value					= 0x7fffffffffffff
+    offset = kvm_phys_timer_read() - value	= 0xff800007895c0ab3
+
+... which was observed in my test.
+
+[2] cval += offset;			// cval	= 0xff800007895c0ab3
+    kvm_phys_timer_read()			= 0x7895c1b86
+
+No ptimer interrupt was triggered with that. And we relied on the next
+kvm_timer_vcpu_load() to catch the timer expiration and inject an
+interrupt to the guest..
+
+It's apparent that this test case is not a practical use case. Not sure
+if we should (/can) emulate it properly. Or I may have already missed
+some obvious points.
+
+Thanks,
+Zenghui
