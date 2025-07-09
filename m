@@ -1,96 +1,122 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8625A289E38
-	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 09:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690832877F5
+	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 09:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752053910; cv=none; b=l8NqjwsCaJjAtFk71qv+P5Wm0y2cINpQln9gRVTh1cZncvki+07oZGJWp8RlEvHFl7yu+0ymtX424Cs/ZXr62bRkDXZT8ORVuPBZoqNlJPwyrEnVvUpthMAtgiOCQPo1X9JFp+fg2q44Yzh0iney/vdgnU8BTVRHXAqqQ9+pKFQ=
+	t=1752054893; cv=none; b=d5PrcF6zsD275tdBoZ3lS5Ajko+9NrQ3zai6a93EqoSWHr/XhWyYe/k7ADkpF1HmTGF4WBDzFYMjn0XFqbVnK3iPY9XMaajovMJm8SPggEc7XeOUn9n1X9J3HX64tMJZlPAEiTOJgQeZasxcfUFHFpBG10DCHY1zmSHkw+PJqnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752053910; c=relaxed/simple;
-	bh=Db9e+iXLe/WttAm6uqRxgVXYTlbnGiDEOFfbnzWYtmo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J/lJqPM/X9Y05P94sVz0CAUE9oh2JZAT6djsCeVjO8640sQy82aW7m3gB07F0esUCa0yD2wkCvqu6ygkwheHDZr0YyiQb55eWEFWCmLC6pcM3t89+Q0p0pDE7RI+8OyQsnOPQ2/aox+0bGp089SiQ1IvjU68KM3fSnh7zw2LZIU=
+	s=arc-20240116; t=1752054893; c=relaxed/simple;
+	bh=nFr811HkLUTfWvgeMmQs3NpQQAVr/xLDkDi7T+QTvIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o29hXQ4FXA2kIItzFp3Ahu6MLMozHdYu6Kj7Wh9ki8FcXzDB6svYLnUlACRgHf+06M+oDy1W7LIr/nJgkjlUEsrhH8EuMJvdCSWiR57VKu/TOQb0R8/pSpzqG6iJK2nQeEUe6Vl/CBdl38PbRamHONCRd5bPDH4TEPSHr/16fnQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 62BCC153B;
-	Wed,  9 Jul 2025 02:38:17 -0700 (PDT)
-Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 067563F738;
-	Wed,  9 Jul 2025 02:38:26 -0700 (PDT)
-From: Ben Horgan <ben.horgan@arm.com>
-To: catalin.marinas@arm.com,
-	will@kernel.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	yury.norov@gmail.com,
-	linux@rasmusvillemoes.dk,
-	linux-kernel@vger.kernel.org
-Cc: james.morse@arm.com,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v2 2/2] bitfield: Ensure the return values of helper functions are checked
-Date: Wed,  9 Jul 2025 10:38:08 +0100
-Message-ID: <20250709093808.920284-3-ben.horgan@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250709093808.920284-1-ben.horgan@arm.com>
-References: <20250709093808.920284-1-ben.horgan@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1CB3B153B;
+	Wed,  9 Jul 2025 02:54:40 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 17D243F694;
+	Wed,  9 Jul 2025 02:54:47 -0700 (PDT)
+Date: Wed, 9 Jul 2025 10:53:57 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: James Clark <james.clark@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>, leo.yan@arm.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 05/10] KVM: arm64: Add trap configs for PMSDSFR_EL1
+Message-ID: <20250709095357.GA2715835@e124191.cambridge.arm.com>
+References: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
+ <20250605-james-perf-feat_spe_eft-v3-5-71b0c9f98093@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250605-james-perf-feat_spe_eft-v3-5-71b0c9f98093@linaro.org>
 
-As type##_replace_bits() has no side effects it is only useful if its
-return value is checked. Add __must_check to enforce this usage. To have
-the bits replaced in-place typep##_replace_bits() can be used instead.
+Hi James!
 
-Although, type_##_get_bits() and type_##_encode_bits() are harder to misuse
-they are still only useful if the return value is checked. For
-consistency, also add __must_check to these.
+On Thu, Jun 05, 2025 at 11:49:03AM +0100, James Clark wrote:
+> SPE data source filtering (SPE_FEAT_FDS) adds a new register
+> PMSDSFR_EL1, add the trap configs for it. PMSNEVFR_EL1 was also missing
+> its VNCR offset so add it along with PMSDSFR_EL1.
+> 
 
-Signed-off-by: Ben Horgan <ben.horgan@arm.com>
----
- include/linux/bitfield.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+A (well behaving) guest won't try access this because:
+The presence of PMSDSFR_EL1 is checked by accessing PMSDSFR_EL1.FDS, which is
+currently `undef_access` and we hide SPE from the guest in
+read_sanitised_id_aa64dfr0_el1().
 
-diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-index 6d9a53db54b6..5355f8f806a9 100644
---- a/include/linux/bitfield.h
-+++ b/include/linux/bitfield.h
-@@ -189,14 +189,14 @@ static __always_inline u64 field_mask(u64 field)
- }
- #define field_max(field)	((typeof(field))field_mask(field))
- #define ____MAKE_OP(type,base,to,from)					\
--static __always_inline __##type type##_encode_bits(base v, base field)	\
-+static __always_inline __##type __must_check type##_encode_bits(base v, base field)	\
- {									\
- 	if (__builtin_constant_p(v) && (v & ~field_mask(field)))	\
- 		__field_overflow();					\
- 	return to((v & field_mask(field)) * field_multiplier(field));	\
- }									\
--static __always_inline __##type type##_replace_bits(__##type old,	\
--					base val, base field)		\
-+static __always_inline __##type __must_check type##_replace_bits(__##type old,	\
-+							base val, base field)	\
- {									\
- 	return (old & ~to(field)) | type##_encode_bits(val, field);	\
- }									\
-@@ -205,7 +205,7 @@ static __always_inline void type##p_replace_bits(__##type *p,		\
- {									\
- 	*p = (*p & ~to(field)) | type##_encode_bits(val, field);	\
- }									\
--static __always_inline base type##_get_bits(__##type v, base field)	\
-+static __always_inline base __must_check type##_get_bits(__##type v, base field)	\
- {									\
- 	return (from(v) & field)/field_multiplier(field);		\
- }
--- 
-2.43.0
+So makes sense it is just undef!
 
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks,
+Joey
+
+> Tested-by: Leo Yan <leo.yan@arm.com>
+> Signed-off-by: James Clark <james.clark@linaro.org>
+> ---
+>  arch/arm64/include/asm/vncr_mapping.h | 2 ++
+>  arch/arm64/kvm/emulate-nested.c       | 1 +
+>  arch/arm64/kvm/sys_regs.c             | 1 +
+>  3 files changed, 4 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+> index 6f556e993644..dba0e58a5fac 100644
+> --- a/arch/arm64/include/asm/vncr_mapping.h
+> +++ b/arch/arm64/include/asm/vncr_mapping.h
+> @@ -92,6 +92,8 @@
+>  #define VNCR_PMSICR_EL1         0x838
+>  #define VNCR_PMSIRR_EL1         0x840
+>  #define VNCR_PMSLATFR_EL1       0x848
+> +#define VNCR_PMSNEVFR_EL1       0x850
+> +#define VNCR_PMSDSFR_EL1        0x858
+>  #define VNCR_TRFCR_EL1          0x880
+>  #define VNCR_MPAM1_EL1          0x900
+>  #define VNCR_MPAMHCR_EL2        0x930
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 3a384e9660b8..60bd8b7f0e5b 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -1174,6 +1174,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+>  	SR_TRAP(SYS_PMSIRR_EL1,		CGT_MDCR_TPMS),
+>  	SR_TRAP(SYS_PMSLATFR_EL1,	CGT_MDCR_TPMS),
+>  	SR_TRAP(SYS_PMSNEVFR_EL1,	CGT_MDCR_TPMS),
+> +	SR_TRAP(SYS_PMSDSFR_EL1,	CGT_MDCR_TPMS),
+>  	SR_TRAP(SYS_TRFCR_EL1,		CGT_MDCR_TTRF),
+>  	SR_TRAP(SYS_TRBBASER_EL1,	CGT_MDCR_E2TB),
+>  	SR_TRAP(SYS_TRBLIMITR_EL1,	CGT_MDCR_E2TB),
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index a6cf2888d150..4a88ba15c7df 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3008,6 +3008,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_PMBLIMITR_EL1), undef_access },
+>  	{ SYS_DESC(SYS_PMBPTR_EL1), undef_access },
+>  	{ SYS_DESC(SYS_PMBSR_EL1), undef_access },
+> +	{ SYS_DESC(SYS_PMSDSFR_EL1), undef_access },
+>  	/* PMBIDR_EL1 is not trapped */
+>  
+>  	{ PMU_SYS_REG(PMINTENSET_EL1),
+> 
+> -- 
+> 2.34.1
+> 
