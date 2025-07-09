@@ -1,96 +1,73 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E820B2E5B26
-	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 15:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88DB2222D8
+	for <kvmarm@lists.linux.dev>; Wed,  9 Jul 2025 17:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752075193; cv=none; b=HU1a+sRyAZg2c5nw8PVbU5bSPHdBAlg/jWAdnnRF9SiT8XQEJnMBwdIyaGNHgnJrAkSy9wvnLEaZbkNX9xz/6aop7s9BXKgoTG2M7jT1Nq/BVlQTXw0GO8Za5WeAYFSgRDw9lhY8M8P3ilDw1RGA0mCckmDSP4PJ4HXMEbo3kQw=
+	t=1752080404; cv=none; b=YtMtzoP9Ci/s1z4dCi6Q36+SeZDcVWQG1n0c4HTvwHoOdeLsDXjtXwyj5GXO6ibtTK8sEmCvsmMenc26CtLnf1A4jIC3/Fe5sYph7MYhAo4Y6Mvh1TSmKCuQl9SUphzxAyFCo1iSqXdawlA6Pweu3RQXUm6whBfmfjiK1xjaAVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752075193; c=relaxed/simple;
-	bh=zHPVg3osmCYyAy75qyrzcAxb6ctP4hFf1ZVxGGaCGUw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sBE4Hru0IuCXImFkLeDN1ZRCTCJNaxkEeeKjC/9fMg4bNY20NAtiK4VAj9vM4l23rw5j6eRfH5ZUoA7SWhAVfH9aMZZBl3N6rXhlRj8dWqFOIEDubu7CT9+T6GH8vWL3CsYuqG4oi1nPkZq78p0fWlla9s9m/VHXw7SKjNPqwbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DubfM9jm; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752080404; c=relaxed/simple;
+	bh=HOY3HcQ5UzGLIpHrtPD8XDjz/4EnKPYbXfzUxGXP80s=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pkJfwPKyqPTfE8RuGYz+SiBPwGennCZLiLLHjoS8DW30UsvM52vGcK4Xjq7cNcKumk1WuwihODpN7WsKKg6rL26XZZZVvFRl/O8g/ZzZA1eW7dBf4jYN6tyedG0J9+xoCn7zoxN9RDehTa0iBNUwjOixAgS2n00Q64iMREHxSjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e+0h5sei; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DubfM9jm"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-74b27c1481bso3531743b3a.2
-        for <kvmarm@lists.linux.dev>; Wed, 09 Jul 2025 08:33:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752075191; x=1752679991; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5h0vY+8yWR6d53ywzrllmdRVHS+9LkknzDUPnvu0s3A=;
-        b=DubfM9jmXCNQnpXwiLL7ZNYHB3ikQMKOedoHZSN0QXeP37vzwTzmX2rhlmKXgLoClV
-         Q0s6+o9Q4l08FxXvjUKGUf8KOBA5oLpoewFzW96cl6DOtMpf4AfztSH6JKKTLAGfywNA
-         4t+Nm4AY1eTMvtSM5KoT5/1JmxfQf/bD6TsjYJn8OP29oz26h8SIZTSFlXnPZvcx7rbv
-         eEhMCuL38xIA8YtfBHp95gW2DqQI2uw/SidoTQN2EQ0un40RpJR3U26THJLLtCR4Z3xz
-         9bkenQca525BH85PuaPc2FeExP6Cx/OiV1kltTyhkEilRBTQT8EdpUw/UDF1mKtjc8og
-         HdVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752075191; x=1752679991;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5h0vY+8yWR6d53ywzrllmdRVHS+9LkknzDUPnvu0s3A=;
-        b=L2MkT4RSeh7hCUFdiECuXgs5sKv3TEKHwM/HpMqHMifmiEeb+LFdZCZjDXrq/16Jqw
-         2p3SE9/YCAGLU4s12Hx8E81owCyY55tatvML5ojdw0IaXAXx8tF/qJ7Z3myrgGehbQx5
-         WFJVOQz9HWng1DWfJlr/kSXn3tMTJ2uYg19SZFp4186aokJf5woI/pLyN0XffveJVJeR
-         D15wYY4xcNfjbzA7C4b7hdVZbugqiGxSE9CCfWHv3k45jbIPbiZK/wYW9+YXNFNCH380
-         WueYtRHb31VnmEbvkzXYL4e79nALcYqpNOjBBN1cK1oXV8rkmjZUmRSgDi/wv4f+vWWL
-         vNEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGCDceCVyVXEPh6uUyTBHGp/QmbtP4AG0PBo5pxfWSPioJhgrRnHRWhlHxaHlPB8m4spttkkw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzBCy+yUFSh+eIqSDI18SXS+IxH1JKF4hri0g0FaWjdEvt2FaNI
-	0j1s9yA+oLpQFm7AkBM8a8rU4ZWL0fPo7d5MruYMMVYmvqEM7MuBUiS+
-X-Gm-Gg: ASbGncthxIhJZ0hVxMUqccN2jA8rkhTXVmOfeV7W9qziw8nFARE9Xl8jc7AcL41WZbm
-	pXnEubH61R/nmfz8FnRtm+MjVIDBnhgJW6twPRBQgtPCTBlFkC3DImhl4QMCbx/fvV06qB/WXNO
-	tFEKFi7bk7gUY7kPZlSVU15ozrBvamrN/qmq6uE+dY0DAmLVLH2yxIf7CBvxxz+BcwgCO8hbyna
-	s8BWGVvLdoJirfDNBJVmGKZJwhZdlcIprRI/JgeNKcuvJIiDkg8sp4O+ziByfysHSWpxORU0knf
-	DDUS/kZ8Of2REIVmCylgO2GbAc/Tpj1MR81LL/IRIvIJr7rwB5plB0AeXdQq1g==
-X-Google-Smtp-Source: AGHT+IHZtURowHsYjnMJ5BnwtddfQEn1Fb18GjbXaV0krfOX1jJD/FS2hhGkqD/zQ8JNrPNyVELOKg==
-X-Received: by 2002:a05:6a00:ccc:b0:74d:247f:faf1 with SMTP id d2e1a72fcca58-74ea645f1b0mr4005899b3a.6.1752075190794;
-        Wed, 09 Jul 2025 08:33:10 -0700 (PDT)
-Received: from localhost ([216.228.127.130])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b38ee62bc54sm14821781a12.59.2025.07.09.08.33.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jul 2025 08:33:10 -0700 (PDT)
-Date: Wed, 9 Jul 2025 11:33:08 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux@rasmusvillemoes.dk,
-	linux-kernel@vger.kernel.org, james.morse@arm.com
-Subject: Re: [PATCH v2 2/2] bitfield: Ensure the return values of helper
- functions are checked
-Message-ID: <aG6LtJ2N1smBKHh1@yury>
-References: <20250709093808.920284-1-ben.horgan@arm.com>
- <20250709093808.920284-3-ben.horgan@arm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e+0h5sei"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752080400;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8M4dKwDdzBuhtVknYmpv+3WVQecIkQU3ZravJIyzeHQ=;
+	b=e+0h5seisTbLbUhE1ZcEn57OjAcoe32AqMwJwp8WZCaHOm2jvgrOOhH24kx6sK90NN9QIb
+	pBd9LM9weyiuIIJCGH5hbRZ8zkIKrOoLfjN1ZoRMPD7kv0hQGcaBTiv+xDFudYTAlGYhTc
+	JX4e9KmdiZ5snNPEwkQpN2bbtYnBmqg=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Fix + test for SError ESR
+Date: Wed,  9 Jul 2025 09:59:51 -0700
+Message-Id: <175208038505.2014187.17969325052997297935.b4-ty@linux.dev>
+In-Reply-To: <20250708230632.1954240-1-oliver.upton@linux.dev>
+References: <20250708230632.1954240-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250709093808.920284-3-ben.horgan@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 09, 2025 at 10:38:08AM +0100, Ben Horgan wrote:
-> As type##_replace_bits() has no side effects it is only useful if its
-> return value is checked. Add __must_check to enforce this usage. To have
-> the bits replaced in-place typep##_replace_bits() can be used instead.
+On Tue, 08 Jul 2025 16:06:30 -0700, Oliver Upton wrote:
+> VSESR_EL2 only provides an ESR_EL1.ISS value for the SError, not a
+> complete ESR. Namely, hardware sets the EC field to indicate an SError
+> (0x2F), meaning we need to do the same for our software-emulated SError
+> injection.
 > 
-> Although, type_##_get_bits() and type_##_encode_bits() are harder to misuse
-> they are still only useful if the return value is checked. For
-> consistency, also add __must_check to these.
+> Note that this behavior already exists for nested SError injection in
+> kvm_inject_nested_serror(). I also extended the external_aborts test to
+> assert the guest sees an expected ESR value for an SError.
 > 
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> [...]
 
-Applied.
+Applied to next, thanks!
 
-Thanks,
-Yury
+[1/2] KVM: arm64: Populate ESR_ELx.EC for emulated SError injection
+      https://git.kernel.org/kvmarm/kvmarm/c/f6e2262dfa1a
+[2/2] KVM: arm64: selftests: Test ESR propagation for vSError injection
+      https://git.kernel.org/kvmarm/kvmarm/c/f9e4e0a663d2
+
+--
+Best,
+Oliver
