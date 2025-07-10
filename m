@@ -1,93 +1,98 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9282027145E
-	for <kvmarm@lists.linux.dev>; Thu, 10 Jul 2025 16:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA34629E113
+	for <kvmarm@lists.linux.dev>; Thu, 10 Jul 2025 23:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752164581; cv=none; b=V1r3cTx2++CNWG++QTiH0oJVIBUZM1D0fZGZDn4WdkdUGE7XzJ2ePLRzWJKcdYYY/zqfDuZWvNTcPVeH2+nKsze4pppPjFpygNikcPwAM10DYe0XNIiDqg4I0TFMj/XDQ91oFTyTszVUAIjzgUdADerA6QpgaSqM+uwdpiETZt0=
+	t=1752188981; cv=none; b=TCOR0eZUHkgXXH2ttJZHi+txb8ZImcOQ32gbnzBAuQtCBMESCJFLRQRcI3aun6ob5P0OIWlgqGTtuxY8ky4pzIkm6qPl6s89a8UdMj5yfUV7/YC5e2uLgviroI9UQEn+BET8KhUwsM/6wXKOmrcs2mF05tZmlUuExepmmlSD6Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752164581; c=relaxed/simple;
-	bh=egXs/h6TJ5e0WNrsSuWm0qCC04MbxgUcU+n1LmpoCJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nKpBCa0NwWPJFJxjGT1t4TFcarrLGOp/UxuDpyh+RFSnxKKBz6PIepLMlpTrma1vVWHebv3jBlCeJ6XQKiZLlbM2CnBNKHff+mn3HcRlKHf/OS6C86PQIA1bWTJ34W4WaLRWjRxcdaLhL/JHIJ0bIKpukkkaV86PGfy0ZrUkOEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bu5W6y4J; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1752188981; c=relaxed/simple;
+	bh=Imhpk93MYLp8xwLOAgb07FPvQgj67wyrPnSesGvWOhg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MFIsJ4Wan9DID1KolyZB3d/te84X0TLXjie1X6qythbiB/je1HaJfQjvG5SFR8qhfJrw4HuQ9aHTDW1Xjm7lwITyx7Nrt+bLhdJ9FIljkIhfdWBnLdXKi0Igz8tEuweJwn27xgLGaD1SdZiTCBlvQzi09Lurc89cBFe3ll9Al2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sutu9nZc; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bu5W6y4J"
-Date: Thu, 10 Jul 2025 09:22:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752164576;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cUQo1M1Ufg0cd8GMAEIRN65VukqumJAMqw2POUQlyxI=;
-	b=bu5W6y4Jf7edtpwGc2xlQQAuCL7Ge/iP4NuAzUh31Bi9QCSxp3Rnb7yx9kEWJvp6sDFb5F
-	TMA3H5KQb6BX4cuwWSxXNJzI5PvF/s+6tNwMetwxhV/rSvUi0yn/77Dn8g2gGVGPFXnTY+
-	CqhMR8Qq5t6JP/IrZVwnj8paIFoKa8E=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Zhou Wang <wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v4 1/6] KVM: arm64: Disambiguate support for vSGIs v.
- vLPIs
-Message-ID: <aG_o11qaUwJYfvfE@linux.dev>
-References: <20250709211417.2074487-1-oliver.upton@linux.dev>
- <20250709211417.2074487-2-oliver.upton@linux.dev>
- <e421874a-322b-4da1-9fe9-f3a94e9036f5@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sutu9nZc"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b31cc625817so2100130a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 10 Jul 2025 16:09:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752188979; x=1752793779; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vc4gFx6otObzph4vmcdpjljmy/wmOvcgw6O6DXvqQUk=;
+        b=sutu9nZcAVQn5OtIq2TWRrrGnw0xnGsBOPy9nEYeYAvODEqa9l7fBx88JapAovkUqC
+         9pwLQd4mTQdwsGoVr27O2TBULL+iiGGK6ZeMIHK8AMfhFScnCY7rjW/NtSlttVBk39xy
+         wggpY3RIph5k1e3WkkcGU2kkC/LWw/XKuZbuxkNNhm/AhiLZULXYiDvMX4oAhI7Y81v4
+         RNEoMkwXkxTi/LLshdy2cSX8t7uj4PPtOubZrcQ/qieNYqzNtRUIH0DKEfV5XdQKOaHF
+         Z0rXY+PpMWoRadQaD8FQVBTcTFHBR7b6TUMFc8kmnJprxyYoJpiIRcsb7iPnS/u+mBlX
+         d9Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752188979; x=1752793779;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vc4gFx6otObzph4vmcdpjljmy/wmOvcgw6O6DXvqQUk=;
+        b=nwKXzxlXfLLfcx5AJYrZQOwa3TenE/MZTYzUoQbN8nLoUqyqbRnxLQpRNOx91vuYs/
+         gqlti0vYzQB61HVG/aXCrVvNafoUev5RKp7ErXLKasUW2m3dWuiDmQLJGuSqvP9C1hj0
+         y7c2S4TqJ1A2Dq9DZY5dqNfD94Lwrsh7sya0bNoEeFQx9ovtFdPNS5R48akcXXkICBaJ
+         IS5RTXBdmvLH2xTy5n2mnsfoblCxhMwkXkRYuwFAhIzX1Hzs7PMSdR64I926Wg7Ng2UK
+         ZYMocm1NgrnER8f6ix3qGrBQ6WInJ+eiY52xIacqHFcxfcyR30Rp0OkMZbuNCbJiYx19
+         kgjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNOKXIXVaxxHj4AMxyppqurD9lnP37bwklKfb3w6YJ3bNygrdzxpCv8F3KEkaQ1lGXzAmhv/w=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwN4omZr7ueWFsSploMdaJUUe3GU/IIckj4A/h5nJc6uW8LWxNb
+	BalvkPiaez5t1EXG0+qcSTCIGcs0zTY1RS98oTVdGJ4b6qTpMxCMK7wEfSfffCJ1kKYPDQXZItu
+	Cs1N4gw==
+X-Google-Smtp-Source: AGHT+IE+dyK2d0uR86qfpkwgq8AVI1vUVbhbMbwUukxTkGUUqxum4AWqrZhpfpFloZnZbssgldsJ/GbSzP4=
+X-Received: from pjbee8.prod.google.com ([2002:a17:90a:fc48:b0:31c:2fe4:33b4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:568f:b0:313:d7ec:b7b7
+ with SMTP id 98e67ed59e1d1-31c3d0c25b6mr8663625a91.13.1752188979183; Thu, 10
+ Jul 2025 16:09:39 -0700 (PDT)
+Date: Thu, 10 Jul 2025 16:08:50 -0700
+In-Reply-To: <20250626001225.744268-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e421874a-322b-4da1-9fe9-f3a94e9036f5@arm.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250626001225.744268-1-seanjc@google.com>
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <175218136720.1489574.7636607289998193683.b4-ty@google.com>
+Subject: Re: [PATCH v5 0/5] KVM: x86: Provide a cap to disable APERF/MPERF
+ read intercepts
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Thu, Jul 10, 2025 at 09:59:14AM +0100, Ben Horgan wrote:
-> Hi Oliver,
+On Wed, 25 Jun 2025 17:12:20 -0700, Sean Christopherson wrote:
+> arm64 folks, y'all got pulled in because of selftests changes.  I deliberately
+> put that patch at the end of the series so that it can be discarded/ignored
+> without interfering with the x86 stuff.
 > 
-> On 7/9/25 22:14, Oliver Upton wrote:
-> > vgic_supports_direct_msis() is a bit of a misnomer, as it returns true
-> > if either vSGIs or vLPIs are supported. Pick it apart into a few
-> > predicates and replace some open-coded checks for vSGIs.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >   arch/arm64/kvm/vgic/vgic-init.c    |  4 ++--
-> >   arch/arm64/kvm/vgic/vgic-mmio-v3.c | 16 ++++++++++------
-> >   arch/arm64/kvm/vgic/vgic-v4.c      |  4 ++--
-> >   arch/arm64/kvm/vgic/vgic.c         |  4 ++--
-> >   arch/arm64/kvm/vgic/vgic.h         |  7 +++++++
-> >   5 files changed, 23 insertions(+), 12 deletions(-)
-> > 
-> [snip]
-> >   		/* Dist stays enabled? nASSGIreq is RO */
-> > @@ -133,7 +137,7 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
-> >   		if (is_hwsgi != dist->nassgireq)
-> >   			vgic_v4_configure_vsgis(vcpu->kvm);
-> > -		if (kvm_vgic_global_state.has_gicv4_1 &&
-> > +		if (vgic_supports_direct_sgis(vcpu->kvm) &&
-> >   		    was_enabled != dist->enabled)
-> >   			kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_RELOAD_GICv4);
-> >   		else if (!was_enabled && dist->enabled)
-> > @@ -178,7 +182,7 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
-> >   		}
-> >   	case GICD_CTLR:
-> >   		/* Not a GICv4.1? No HW SGIs */
-> > -		if (!kvm_vgic_global_state.has_gicv4_1)
-> > +		if (vgic_supports_direct_sgis(vcpu->kvm))
-> Missing negation.
+> 
+> Jim's series to allow a guest to read IA32_APERF and IA32_MPERF, so that it
+> can determine the effective frequency multiplier for the physical LPU.
+> 
+> [...]
 
-Oops, very well spotted. Thanks Ben!
+Applied to kvm-x86 misc, with the thean typo fixed.  Thanks!
 
-Thanks,
-Oliver
+[1/5] KVM: x86: Replace growing set of *_in_guest bools with a u64
+      https://github.com/kvm-x86/linux/commit/6fbef8615d35
+[2/5] KVM: x86: Provide a capability to disable APERF/MPERF read intercepts
+      https://github.com/kvm-x86/linux/commit/a7cec20845a6
+[3/5] KVM: selftests: Expand set of APIs for pinning tasks to a single CPU
+      https://github.com/kvm-x86/linux/commit/e83ee6f76c33
+[4/5] KVM: selftests: Test behavior of KVM_X86_DISABLE_EXITS_APERFMPERF
+      https://github.com/kvm-x86/linux/commit/df98ce784aeb
+[5/5] KVM: selftests: Convert arch_timer tests to common helpers to pin task
+      https://github.com/kvm-x86/linux/commit/95826e1ed359
+
+--
+https://github.com/kvm-x86/linux/tree/next
