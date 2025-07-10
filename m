@@ -1,107 +1,93 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF89245005
-	for <kvmarm@lists.linux.dev>; Thu, 10 Jul 2025 10:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9282027145E
+	for <kvmarm@lists.linux.dev>; Thu, 10 Jul 2025 16:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752144526; cv=none; b=dvaB211NObK+L4SKQK620JlmOXsZyAVg9pxDDZkd5hNoDyZV0qzRZteOCDH0T1VWcuW0KDccumF4sHfXANfyGm3X8s4dsuysXyFCimoKH/mSm1FzSi5kK+r87unW+i+1rrYsnaBmDmm/YZAFaZ/HxWMhENuDro+okWwnI4ff4O8=
+	t=1752164581; cv=none; b=V1r3cTx2++CNWG++QTiH0oJVIBUZM1D0fZGZDn4WdkdUGE7XzJ2ePLRzWJKcdYYY/zqfDuZWvNTcPVeH2+nKsze4pppPjFpygNikcPwAM10DYe0XNIiDqg4I0TFMj/XDQ91oFTyTszVUAIjzgUdADerA6QpgaSqM+uwdpiETZt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752144526; c=relaxed/simple;
-	bh=reDJB+jVA2jze/Op4vAV+YAROelsnXkSfMwWLjC3sb0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a1cpoy7xwjosa5Ak8d2RciKk8yixxGZMQPuEj6Bc/ls6nt9tz17wSG+aQR9M+NSm1x/CquJ3Y22tIrlDKoBCD0Xb5ie25bUx1r3frC1SA64vmWIzWrxvMrSFhpFPB/oiMc94+OdtAwCaFDG0gz2E5O9AE/hwFOTUtaoTvoT/wMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dIkebAk1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1752164581; c=relaxed/simple;
+	bh=egXs/h6TJ5e0WNrsSuWm0qCC04MbxgUcU+n1LmpoCJQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nKpBCa0NwWPJFJxjGT1t4TFcarrLGOp/UxuDpyh+RFSnxKKBz6PIepLMlpTrma1vVWHebv3jBlCeJ6XQKiZLlbM2CnBNKHff+mn3HcRlKHf/OS6C86PQIA1bWTJ34W4WaLRWjRxcdaLhL/JHIJ0bIKpukkkaV86PGfy0ZrUkOEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bu5W6y4J; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIkebAk1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752144524;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bu5W6y4J"
+Date: Thu, 10 Jul 2025 09:22:47 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752164576;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lNmncl3vzJsUWRoJNZxmBhE+E8sb6lSPv1tCHk92ysY=;
-	b=dIkebAk1ZdzdUBJFPM4NbPa0JluLcJhoi4Eln2fHo+KiAgd680T7KCd/XrSa60gkaz09Xf
-	+meb8i0ckSiTzQ8u9acfeZzotQwu6eNkaMfIN57veLTL3zBosngCMIuXPmVHa7shnllFKO
-	Nmd3Ho1gD1y/Iwt24dQYFaU6wLCVzJ0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-45-GEizLHc4OMC3d3bGJ5ApNQ-1; Thu, 10 Jul 2025 06:48:40 -0400
-X-MC-Unique: GEizLHc4OMC3d3bGJ5ApNQ-1
-X-Mimecast-MFC-AGG-ID: GEizLHc4OMC3d3bGJ5ApNQ_1752144520
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3b4a0013c0dso388435f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 10 Jul 2025 03:48:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752144519; x=1752749319;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lNmncl3vzJsUWRoJNZxmBhE+E8sb6lSPv1tCHk92ysY=;
-        b=Y94Z3Lm+ujJRAop5vz+LIjFkuQAbUbw3JiVRGE3GZrdDdY4ysWgBJ9RZvqRpe2Vw6U
-         buz0zqwvGfKoPEtNFv1m9g1MgzqDv9QqyOmJc/aF+yI6QmJbGJWq3IsG49FhxQN+5UOj
-         iJY9PFqEO9+t5ltdgpyt3zQk2oTmIC/wryL8an+t0qKCfq/sWb0qEVYaxOSEevN0AR1D
-         /lsoH0lTj8No9hAoL4V84qIMzQARqpjB+dIIcoiY8d+TxF2glnF6Gn4MXbHkdv34Fy9e
-         vRRhYjyOG/D9u2jnh3CyaPUP1YSUL5gA02oRykwuZshB7q5yMR0ThS/LOYyiOiJhRKRx
-         um/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUqL9vIKIcGxRru21F1qB30D714+ot3tPSKT5CFfmemenlGKKd6sk1ojOMzU6nq6TjWR1Ybt6Q=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx/jfvchOWF9A+ZZsPBILPPlKFYBOethl9zQHuxlmZOx/Me7JCa
-	xAmI8oNvSxPzJ0eiYbNf2YApRmGP1T8vMVUzQdYNajoL1pncJLLR5kUG/Fg3t4IaHea/UdxFg49
-	toJvAgzzebIrmpKnJgi9ZUvLt8tVJhh0m65mi7KxjHZ6K/7e+fuq8gdkocn/Tqlm1NDEK/V6IYT
-	EjV7ZyJeqqpiMO9S7vyOHaaH1E78EN0DC6
-X-Gm-Gg: ASbGnctuz1NgnJdvd7qvC6sMbuOBQRMAtinjr9LStEpkD5q+nCjwA2xP3XiJrak1+Uv
-	MucprwWRgI6THGH8W1ER/WHlsgR2rK0TXjLF8avlFgqCPTeY9wXhB2Fdp8l/cttMwKfsxdn48tb
-	PaWiuV
-X-Received: by 2002:a05:6000:240e:b0:3b2:dfc6:2485 with SMTP id ffacd0b85a97d-3b5e866be37mr1530562f8f.4.1752144519475;
-        Thu, 10 Jul 2025 03:48:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHmY5FVV5iTS8z0YqIW6yODFY43cB2gfswppkDLC9lidIswhlzZ5Ms1OGnA8y43lftuWydzsAPcndaHukvYemo=
-X-Received: by 2002:a05:6000:240e:b0:3b2:dfc6:2485 with SMTP id
- ffacd0b85a97d-3b5e866be37mr1530551f8f.4.1752144519104; Thu, 10 Jul 2025
- 03:48:39 -0700 (PDT)
+	bh=cUQo1M1Ufg0cd8GMAEIRN65VukqumJAMqw2POUQlyxI=;
+	b=bu5W6y4Jf7edtpwGc2xlQQAuCL7Ge/iP4NuAzUh31Bi9QCSxp3Rnb7yx9kEWJvp6sDFb5F
+	TMA3H5KQb6BX4cuwWSxXNJzI5PvF/s+6tNwMetwxhV/rSvUi0yn/77Dn8g2gGVGPFXnTY+
+	CqhMR8Qq5t6JP/IrZVwnj8paIFoKa8E=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Zhou Wang <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v4 1/6] KVM: arm64: Disambiguate support for vSGIs v.
+ vLPIs
+Message-ID: <aG_o11qaUwJYfvfE@linux.dev>
+References: <20250709211417.2074487-1-oliver.upton@linux.dev>
+ <20250709211417.2074487-2-oliver.upton@linux.dev>
+ <e421874a-322b-4da1-9fe9-f3a94e9036f5@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250626152023.192347-1-maz@kernel.org> <CABgObfZ3RepTFAMVSB4v1cmuOg+JB7LAcqx04EZui6qF3q5QtA@mail.gmail.com>
- <86o6tua76o.wl-maz@kernel.org>
-In-Reply-To: <86o6tua76o.wl-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 10 Jul 2025 12:48:27 +0200
-X-Gm-Features: Ac12FXwkZUiiCJDC2HojeWiVZysisH16fFGmMHmUxWKm3vmZc3XEF7c6L-0RtaY
-Message-ID: <CABgObfa-1ee9ugHk2WmwYmqTqUtc5x1wOW2JPv9+5VigvSAkZA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.16, take #4
-To: Marc Zyngier <maz@kernel.org>
-Cc: Mostafa Saleh <smostafa@google.com>, Quentin Perret <qperret@google.com>, 
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: cVH00HlDCQv5m_hmV44u0bRUY0cwvT6e0Mjy5GZVH6k_1752144520
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e421874a-322b-4da1-9fe9-f3a94e9036f5@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 8, 2025 at 8:06=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
-> On Tue, 08 Jul 2025 15:48:01 +0100,
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > On Thu, Jun 26, 2025 at 5:20=E2=80=AFPM Marc Zyngier <maz@kernel.org> w=
-rote:
-> > >   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tag=
-s/kvmarm-fixes-6.16-4
-> >
-> > Done now, thanks!  Note that in the meanwhile git:// is not working
-> > anymore, so you probably want https:// in there.
->
-> Really? That's... odd. Was this announced one way or another? I can
-> definitely use git:// from where I seat:
+On Thu, Jul 10, 2025 at 09:59:14AM +0100, Ben Horgan wrote:
+> Hi Oliver,
+> 
+> On 7/9/25 22:14, Oliver Upton wrote:
+> > vgic_supports_direct_msis() is a bit of a misnomer, as it returns true
+> > if either vSGIs or vLPIs are supported. Pick it apart into a few
+> > predicates and replace some open-coded checks for vSGIs.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >   arch/arm64/kvm/vgic/vgic-init.c    |  4 ++--
+> >   arch/arm64/kvm/vgic/vgic-mmio-v3.c | 16 ++++++++++------
+> >   arch/arm64/kvm/vgic/vgic-v4.c      |  4 ++--
+> >   arch/arm64/kvm/vgic/vgic.c         |  4 ++--
+> >   arch/arm64/kvm/vgic/vgic.h         |  7 +++++++
+> >   5 files changed, 23 insertions(+), 12 deletions(-)
+> > 
+> [snip]
+> >   		/* Dist stays enabled? nASSGIreq is RO */
+> > @@ -133,7 +137,7 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+> >   		if (is_hwsgi != dist->nassgireq)
+> >   			vgic_v4_configure_vsgis(vcpu->kvm);
+> > -		if (kvm_vgic_global_state.has_gicv4_1 &&
+> > +		if (vgic_supports_direct_sgis(vcpu->kvm) &&
+> >   		    was_enabled != dist->enabled)
+> >   			kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_RELOAD_GICv4);
+> >   		else if (!was_enabled && dist->enabled)
+> > @@ -178,7 +182,7 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
+> >   		}
+> >   	case GICD_CTLR:
+> >   		/* Not a GICv4.1? No HW SGIs */
+> > -		if (!kvm_vgic_global_state.has_gicv4_1)
+> > +		if (vgic_supports_direct_sgis(vcpu->kvm))
+> Missing negation.
 
-And it works now for me too, so it must have been a fluke on
-git.kernel.org's side.
+Oops, very well spotted. Thanks Ben!
 
-Paolo
-
+Thanks,
+Oliver
