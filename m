@@ -1,292 +1,161 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1E3283141
-	for <kvmarm@lists.linux.dev>; Fri, 11 Jul 2025 11:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A582D373C;
+	Fri, 11 Jul 2025 13:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752233564; cv=none; b=QPOhdRxV/dO/aroCt/qCqphlVJQZRTIlb/Hyh4mI5BS9j3OW6R0eaxkeFT20TvLe/qJRuIcarXJm3kEh3BJbeUbv7AMowVTqyKE24twsViDEdTi4QZJr76fe9DsZiTAIZ503FUj35YsHp4dI2+9Or4UBkYAsYJZndxbJKR/vRgQ=
+	t=1752240354; cv=none; b=WYogRIKEkXCo2/EWKwS4tVpqdXdodYF+JfJo6IrRO58cDCtq28XUC0rpgIV/JSycEhQP+3itfugYGMPLvDpS25GQpjp4UHBUGgWraOwbrawHDcPtlo6lP1zyvjhTmOWoDNQaS1drwJ247cZJjKZnDFOAmqyFziZDuZD+Er+lgmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752233564; c=relaxed/simple;
-	bh=BZCvv/2hXsvGb//PtywPu9ICAftZQyJos5tYaQ8MH0U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uLuSUc7Uj2CTolV5bNCR5bKAkpzGorpROuAc0cViH/fRkNYLHguorOl41ILQx529L5Kx8hgKyvtujXkERIg8PvWkGaCDcSsIRp5fQ9OHLNoV2nQDrjZtVGoaNiFut/cNSZ8aQCGz1PuSLazU6qmP73kSiqtPrT9GErdTY7mxd+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dGdqqahn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1752240354; c=relaxed/simple;
+	bh=ElLDnp76WNWwDKvqu1oD1zoyAlrNJ4iqci+1Wx68bzk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fgSrbDF5EYU1YKrTZibpSKZiCRwBtD2lzPRbebhoDslMItnGtzfBmwBXwbCokmbPrBYGF0UJ90eaM5DarZOSBv64dSWWq9RDo6ppWdTz03+ZMlE0S5ise5GlzY4T2R8xuI5neiCMjc5MPkF4xVavTYZ7XftibdpwKZpEPTTKMsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFMgq/Nu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGdqqahn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752233561;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=rBaMeUalwqPGHF1pXuNNlqoOhLhH/XgvIyFgh+zaVmk=;
-	b=dGdqqahnT+55sIaJzyVnvaP3Yj4DUqKMxoY9/BJmcwhav20SFbpnZnaWWUwF8NbShO8eGO
-	HLEuDxFnv4In/dnGa7MDIQkRj/+7mbH5VlPGc5C6iL5OjDQ1h73NMQJ76UaUp284n4ZekX
-	h7ebaRqJc8Zv+oDG973Vb2fN1JKBWwk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-503-x8vwlHpoNQ2rOlre-mz3MA-1; Fri, 11 Jul 2025 07:32:38 -0400
-X-MC-Unique: x8vwlHpoNQ2rOlre-mz3MA-1
-X-Mimecast-MFC-AGG-ID: x8vwlHpoNQ2rOlre-mz3MA_1752233557
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4538f375e86so15711885e9.3
-        for <kvmarm@lists.linux.dev>; Fri, 11 Jul 2025 04:32:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752233557; x=1752838357;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rBaMeUalwqPGHF1pXuNNlqoOhLhH/XgvIyFgh+zaVmk=;
-        b=gqJu/JwzZ4fefS7nPe0uILdcHOOHoIg9N3jmBL7e64e5z8le9wYd9A2PbWCE9YTpbq
-         0hLy/VdNXSySbI58AXNSP7GoAI2mO7cs868KVKUCdHxkqCeehJ/MzJ7TzquRIFJhwrS8
-         gzC286z+cCjbgBwW9qIWRKDV1VmBdH0cklbSOBR75eRqu2CmDterid7+0UV2psqiLhJW
-         3JkBPZCD56HG44l0GK91fihJKPTZXWFXwHvstmsfDM8EU4NJFyBhwQqLpAYbOw26d0LZ
-         5l12/EgIuY1yPXvHOfK/u9FO6RGZn+BdIHX6OPObYkdkDILPgTbySz4DJQg2XLlBWyq6
-         C+mw==
-X-Forwarded-Encrypted: i=1; AJvYcCXcACIcTifJaFtyGNc8ZcHXTGLSCIZc99tXqnOwr6iksUm/ZVDvdK0RNpebzEA7Wl7Ja0WJG24=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw1jKmDGgSSyYwwtlDKaPKSvdtTWwLtyemEBalXTFNEL81br27X
-	NUj6FQ9zRhkcIWxq/tCqsfK7amHyoakTBu6s2meJk5+2LJQOUgFNfb4T9R00wbK79cRnoUvH2Sm
-	chbU0sJgdyt4vFssfVFk4iy6o0e06oLlbQxhWHtLbk8cIq15+hR5pD2tCCg==
-X-Gm-Gg: ASbGncsgSSfcqlqNRjKesxK8sbQNf50GSbHHs7gbZMDFkKON6TXd+5FHvZ5FrKfmJrD
-	jwqSq0XpaBx3yo61pHeFlg3Xf1RVCoj0BUt9nZ2dq9eGEJohj/LT7u/wGhs0OlfdIfH57llcfht
-	7EEawvDCk53RgZPDreC720NRo2ZVtqfcl8ec2S9Bz+dCEtwxWgqC9TkS38z5Tn0dS7s2NbKK5cH
-	WbgYQdEYTazcOkTbzcLJ9g70Uza1uT5D1n26Xs2IChkgXJyAl+C3pLRfw48EW6hNsCQOqvgUsus
-	7jBs+JCq+VHvB3QMjtnEbFNPI0NedreuOqExJLGGPn14riGFWUABJL+DsKA8lLOCyy74Czb3aUG
-	LwoSB
-X-Received: by 2002:a05:600c:1549:b0:43d:300f:fa1d with SMTP id 5b1f17b1804b1-454f425585amr28408785e9.31.1752233556763;
-        Fri, 11 Jul 2025 04:32:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE61oWTKweMEXZfo4uTm9GgpnpWiVgolfLMo+v8sGn4fN8oDtJ8j83cwuweqsXezmErlhJuKA==
-X-Received: by 2002:a05:600c:1549:b0:43d:300f:fa1d with SMTP id 5b1f17b1804b1-454f425585amr28408305e9.31.1752233556153;
-        Fri, 11 Jul 2025 04:32:36 -0700 (PDT)
-Received: from [192.168.0.6] (ltea-047-064-115-149.pools.arcor-ip.net. [47.64.115.149])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d5032ff4sm83722835e9.8.2025.07.11.04.32.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jul 2025 04:32:35 -0700 (PDT)
-Message-ID: <ce92db8c-6d26-4953-9f74-142d00d2bc2a@redhat.com>
-Date: Fri, 11 Jul 2025 13:32:33 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFMgq/Nu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CFB8C4CEED;
+	Fri, 11 Jul 2025 13:25:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752240353;
+	bh=ElLDnp76WNWwDKvqu1oD1zoyAlrNJ4iqci+1Wx68bzk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZFMgq/Nud9mlT2A/Ke4bhx0atcdEPWwejkPk1r1Jqekr8HUbwj0QBghb3auZMrwse
+	 fRSDnBrMddjw1ds1n/Oe4GnRfhmYF1RaYI64/NJ4LqEwvWBEu/JGinDi5w3onmcoK0
+	 jU/Rfjt0y4kFsOpOfLwPP6SRHY9kkpcegtCeY9IX9Uya59Abzr/nLn4luB6NrisESD
+	 oOiQ+6/02wIn4YcyhVc0AQ7MhfgxDvm+4KKH/fmhX8u+R/02boN6O33FluZ09k/uMB
+	 mFQzRONSNfN14uQ6jE7rdZhTbLtXk/Twi3t41PLnMJJeh8zNWHR5rV9NVLYN5B7MXm
+	 J+0TZOjxbhJeA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uaDl8-00EspX-Jy;
+	Fri, 11 Jul 2025 14:25:50 +0100
+Date: Fri, 11 Jul 2025 14:25:49 +0100
+Message-ID: <86bjpqamg2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-mm@kvack.org,
+	kvmarm@lists.linux.dev,
+	pbonzini@redhat.com,
+	chenhuacai@kernel.org,
+	mpe@ellerman.id.au,
+	anup@brainfault.org,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	seanjc@google.com,
+	viro@zeniv.linux.org.uk,
+	brauner@kernel.org,
+	willy@infradead.org,
+	akpm@linux-foundation.org,
+	xiaoyao.li@intel.com,
+	yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com,
+	jarkko@kernel.org,
+	amoorthy@google.com,
+	dmatlack@google.com,
+	isaku.yamahata@intel.com,
+	mic@digikod.net,
+	vbabka@suse.cz,
+	vannapurve@google.com,
+	ackerleytng@google.com,
+	mail@maciej.szmigiero.name,
+	david@redhat.com,
+	michael.roth@amd.com,
+	wei.w.wang@intel.com,
+	liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com,
+	kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com,
+	steven.price@arm.com,
+	quic_eberman@quicinc.com,
+	quic_mnalajal@quicinc.com,
+	quic_tsoni@quicinc.com,
+	quic_svaddagi@quicinc.com,
+	quic_cvanscha@quicinc.com,
+	quic_pderrin@quicinc.com,
+	quic_pheragu@quicinc.com,
+	catalin.marinas@arm.com,
+	james.morse@arm.com,
+	yuzenghui@huawei.com,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	qperret@google.com,
+	keirf@google.com,
+	roypat@amazon.co.uk,
+	shuah@kernel.org,
+	hch@infradead.org,
+	jgg@nvidia.com,
+	rientjes@google.com,
+	jhubbard@nvidia.com,
+	fvdl@google.com,
+	hughd@google.com,
+	jthoughton@google.com,
+	peterx@redhat.com,
+	pankaj.gupta@amd.com,
+	ira.weiny@intel.com
+Subject: Re: [PATCH v13 15/20] KVM: arm64: Refactor user_mem_abort()
+In-Reply-To: <20250709105946.4009897-16-tabba@google.com>
+References: <20250709105946.4009897-1-tabba@google.com>
+	<20250709105946.4009897-16-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 07/13] scripts: Add default arguments
- for kvmtool
-To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
- eric.auger@redhat.com, lvivier@redhat.com, frankja@linux.ibm.com,
- imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com,
- pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com,
- maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com,
- shahuang@redhat.com, Boqiao Fu <bfu@redhat.com>
-References: <20250625154813.27254-1-alexandru.elisei@arm.com>
- <20250625154813.27254-8-alexandru.elisei@arm.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20250625154813.27254-8-alexandru.elisei@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: JK3A5BnBVjHh2rv4snu2aX2LmKYuFI-yoxYIaoXtvqk_1752233557
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 25/06/2025 17.48, Alexandru Elisei wrote:
-> kvmtool, unless told otherwise, will do its best to make sure that a kernel
-> successfully boots in a virtual machine. It does things like automatically
-> creating a rootfs and adding extra parameters to the kernel command line.
-> This is actively harmful to kvm-unit-tests, because some tests parse the
-> kernel command line and they will fail if they encounter the options added
-> by kvmtool.
+On Wed, 09 Jul 2025 11:59:41 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Fortunately for us, kvmtool commit 5613ae26b998 ("Add --nodefaults command
-> line argument") addded the --nodefaults kvmtool parameter which disables
-> all the implicit virtual machine configuration that cannot be disabled by
-> using other parameters, like modifying the kernel command line. So always
-> use --nodefaults to allow a test to run.
+> Refactor user_mem_abort() to improve code clarity and simplify
+> assumptions within the function.
 > 
-> kvmtool can also be too verbose when running a virtual machine, and this is
-> controlled by several parameters. Add those to the default kvmtool command
-> line to reduce this verbosity to a minimum.
+> Key changes include:
 > 
-> Before:
+> * Immediately set force_pte to true at the beginning of the function if
+>   logging_active is true. This simplifies the flow and makes the
+>   condition for forcing a PTE more explicit.
 > 
-> $ vm run arm/selftest.flat --cpus 2 --mem 256 --params "setup smp=2 mem=256"
-> Info: # lkvm run -k arm/selftest.flat -m 256 -c 2 --name guest-5035
-> Unknown subtest
+> * Remove the misleading comment stating that logging_active is
+>   guaranteed to never be true for VM_PFNMAP memslots, as this assertion
+>   is not entirely correct.
 > 
-> EXIT: STATUS=127
-> Warning: KVM compatibility warning.
->      virtio-9p device was not detected.
->      While you have requested a virtio-9p device, the guest kernel did not initialize it.
->      Please make sure that the guest kernel was compiled with CONFIG_NET_9P_VIRTIO=y enabled in .config.
-> Warning: KVM compatibility warning.
->      virtio-net device was not detected.
->      While you have requested a virtio-net device, the guest kernel did not initialize it.
->      Please make sure that the guest kernel was compiled with CONFIG_VIRTIO_NET=y enabled in .config.
-> Info: KVM session ended normally.
+> * Extract reusable code blocks into new helper functions:
+>   * prepare_mmu_memcache(): Encapsulates the logic for preparing and
+>     topping up the MMU page cache.
+>   * adjust_nested_fault_perms(): Isolates the adjustments to shadow S2
+>     permissions and the encoding of nested translation levels.
 > 
-> After:
+> * Update min(a, (long)b) to min_t(long, a, b) for better type safety and
+>   consistency.
 > 
-> $ vm run arm/selftest.flat --nodefaults --network mode=none --loglevel=warning --cpus 2 --mem 256 --params "setup smp=2 mem=256"
-> PASS: selftest: setup: smp: number of CPUs matches expectation
-> INFO: selftest: setup: smp: found 2 CPUs
-> PASS: selftest: setup: mem: memory size matches expectation
-> INFO: selftest: setup: mem: found 256 MB
-> SUMMARY: 2 tests
+> * Perform other minor tidying up of the code.
 > 
-> EXIT: STATUS=1
+> These changes primarily aim to simplify user_mem_abort() and make its
+> logic easier to understand and maintain, setting the stage for future
+> modifications.
 > 
-> Note that KVMTOOL_DEFAULT_OPTS can be overwritten by an environment
-> variable with the same name, but it's not documented in the help string for
-> run_tests.sh. This has been done on purpose, since overwritting
-> KVMTOOL_DEFAULT_OPTS should only be necessary for debugging or development
-> purposes.
+> No functional change intended.
 > 
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> 
-> Changes v3->v4:
-> 
-> * Use vmm_default_opts() instead of indexing into vmm_optname
-> * Reworded the help test for --nodefaults as per Shaoqin's suggestion.
-> 
->   scripts/common.bash |  6 +++---
->   scripts/vmm.bash    | 18 ++++++++++++++++++
->   2 files changed, 21 insertions(+), 3 deletions(-)
-> 
-> diff --git a/scripts/common.bash b/scripts/common.bash
-> index 7c1b89f1b3c2..d5d3101c8089 100644
-> --- a/scripts/common.bash
-> +++ b/scripts/common.bash
-> @@ -37,7 +37,7 @@ function for_each_unittest()
->   			# -append as a kernel parameter instead of a command
->   			# line option.
->   			test_args=""
-> -			opts=""
-> +			opts="$(vmm_default_opts)"
->   			groups=""
->   			arch=""
->   			machine=""
-> @@ -51,7 +51,7 @@ function for_each_unittest()
->   		elif [[ $line =~ ^test_args\ *=\ *(.*)$ ]]; then
->   			test_args="$(vmm_optname_args) ${BASH_REMATCH[1]}"
->   		elif [[ $line =~ ^$params_name\ *=\ *'"""'(.*)$ ]]; then
-> -			opts=${BASH_REMATCH[1]}$'\n'
-> +			opts="$(vmm_defaults_opts) ${BASH_REMATCH[1]}$'\n'"
->   			while read -r -u $fd; do
->   				#escape backslash newline, but not double backslash
->   				if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
-> @@ -67,7 +67,7 @@ function for_each_unittest()
->   				fi
->   			done
->   		elif [[ $line =~ ^$params_name\ *=\ *(.*)$ ]]; then
-> -			opts=${BASH_REMATCH[1]}
-> +			opts="$(vmm_default_opts) ${BASH_REMATCH[1]}"
->   		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
->   			groups=${BASH_REMATCH[1]}
->   		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
-> diff --git a/scripts/vmm.bash b/scripts/vmm.bash
-> index 0dd3f971ecdf..368690d62473 100644
-> --- a/scripts/vmm.bash
-> +++ b/scripts/vmm.bash
-> @@ -1,3 +1,14 @@
-> +# The following parameters are enabled by default when running a test with
-> +# kvmtool:
-> +# --nodefaults: suppress VM configuration that cannot be disabled (like
-> +#               modifying the supplied kernel command line). Otherwise tests
-> +#               that use the command line will fail without this parameter.
-> +# --network mode=none: do not create a network device. kvmtool tries to help the
-> +#               user by automatically create one, and then prints a warning
-> +#               when the VM terminates if the device hasn't been initialized.
-> +# --loglevel=warning: reduce verbosity
-> +: "${KVMTOOL_DEFAULT_OPTS:="--nodefaults --network mode=none --loglevel=warning"}"
-> +
->   ##############################################################################
->   # qemu_fixup_return_code translates the ambiguous exit status in Table1 to that
->   # in Table2.  Table3 simply documents the complete status table.
-> @@ -82,11 +93,13 @@ function kvmtool_fixup_return_code()
->   
->   declare -A vmm_optname=(
->   	[qemu,args]='-append'
-> +	[qemu,default_opts]=''
->   	[qemu,fixup_return_code]=qemu_fixup_return_code
->   	[qemu,initrd]='-initrd'
->   	[qemu,nr_cpus]='-smp'
->   
->   	[kvmtool,args]='--params'
-> +	[kvmtool,default_opts]="$KVMTOOL_DEFAULT_OPTS"
->   	[kvmtool,fixup_return_code]=kvmtool_fixup_return_code
->   	[kvmtool,initrd]='--initrd'
->   	[kvmtool,nr_cpus]='--cpus'
-> @@ -97,6 +110,11 @@ function vmm_optname_args()
->   	echo ${vmm_optname[$(vmm_get_target),args]}
->   }
->   
-> +function vmm_default_opts()
-> +{
-> +	echo ${vmm_optname[$(vmm_get_target),default_opts]}
-> +}
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-This causes now a problem on s390x:
+	M.
 
-https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/jobs/10604334029#L591
-
-scripts/common.bash: line 56: vmm_defaults_opts: command not found
-
-... any ideas how to fix it?
-
-  Thomas
-
+-- 
+Without deviation from the norm, progress is not possible.
