@@ -1,147 +1,87 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B2046447;
-	Fri, 11 Jul 2025 01:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6E31EA7CE;
+	Fri, 11 Jul 2025 07:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752196470; cv=none; b=XB9a51GODHG0+VBA//J3ios9So1eXDYuXM5Aim7OHMxiyHdUZyskOuy6ozJs5N6wHl/VLmR+jX7y091SB5pPWkhD5SIQgPYfdQXuEWT7Lk0WdvstBpKhK5o4Omx5Tj0VimT8PTJ54z1jXLQaeOhEyu3PfmmsKikES0hewELCTGg=
+	t=1752218879; cv=none; b=YdAXktf2GZ08jOmEizWz1hWvFuteV7gqifGkct/MWiomNjSQT38Huv31XTRQcMA98BDZ8JdZ57FCpX2KVQXg5EB7o63lIwzFv8maGGHRXiClfw4kez7yddF4KmPrIj0Bh4JO/jR6WUeOXCnrDoNP69JOlm/6Zj8b9W6hiBA/0gY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752196470; c=relaxed/simple;
-	bh=DYCyMUrFWv8UxDeY8uzqr2IcSenrjZosj8k5QvYfXP0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AhVSAMeDiv7kI/kzELaZ8LhO3/FYCszbJtcQCzIaffreid0PfsBYUaY/D4aigXLNNrTeP5DQNywRjsz72CC4I4PHEDxUxHrMkH0VNCZynvJXFQyvzgHfl5QetUiBnvs+3hzHwK3fGF/COr2O8rFrg0jmnPNzrXHu6NnhXiuIG+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HNE6BeVP; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1752218879; c=relaxed/simple;
+	bh=1j6zpFS1DVxWS1hxIV2/OdRNBhbPf+kJqE3FRm4cKC4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rvpvbsq1DapEPCK/2UH3aIEHCKXFplVaM+WxwjdSdd+TP2UxYZqv6mLNW3JLyAe+JUZ1LkLe4mD36Vq4useAErbDg0FGTyChe9geU4W6jEzN9BdAPffjQDSdeGwRDJys0UMXG1hWBk61CTAhPh5heisYpJKwqQ3dCtPyEjWrvKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0OLdVU4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HNE6BeVP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752196469; x=1783732469;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DYCyMUrFWv8UxDeY8uzqr2IcSenrjZosj8k5QvYfXP0=;
-  b=HNE6BeVPTKdZrQdrJoXRgQti7RUOObEXJWOVA+2gchsE4ac0JNQrh6XT
-   qyWfn1Qk4WKCxv0gL9xOBWu+OmOYU69mfqYH7sEJLF0/BHjfVgcUwshqw
-   1d8wFkHHurWAjHJ5zoWoUHyKaWZvpheyvGymhQTETGt44JuDsbWiudbk+
-   pe/WCwlMgy7kIJJ51vEIWlDuBf1nIeT260os0kVVtPVyZV/Ma1V2f0pL6
-   viPkWFZgrAMz6Qa33Z8GOFJQBTrKD/ZzbGG7f2AYP38D9wcks35oa5dLn
-   gfWNBwNGlU3YrHfK4UFzriZE7kSBwzPTaL9k6JgRlW0dyFmA8Z+Fq5bQg
-   Q==;
-X-CSE-ConnectionGUID: Nu1oWZ8zTBeLurTMkMTn7A==
-X-CSE-MsgGUID: pHLfqmiwQnyCE2uIuzNNKg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="72072983"
-X-IronPort-AV: E=Sophos;i="6.16,302,1744095600"; 
-   d="scan'208";a="72072983"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 18:14:28 -0700
-X-CSE-ConnectionGUID: SdMKwLrVSoGO7g8IqZPS7g==
-X-CSE-MsgGUID: rUIlbZKsQDaO0ykbXJymng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,302,1744095600"; 
-   d="scan'208";a="156964041"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 10 Jul 2025 18:14:20 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ua2LC-0005hB-0n;
-	Fri, 11 Jul 2025 01:14:18 +0000
-Date: Fri, 11 Jul 2025 09:14:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
-	kvmarm@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, pbonzini@redhat.com,
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
-	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	willy@infradead.org, akpm@linux-foundation.org,
-	xiaoyao.li@intel.com, yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com
-Subject: Re: [PATCH v13 14/20] KVM: x86: Enable guest_memfd mmap for default
- VM type
-Message-ID: <202507110822.EaBBAGre-lkp@intel.com>
-References: <20250709105946.4009897-15-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0OLdVU4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0814C4CEED;
+	Fri, 11 Jul 2025 07:27:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752218877;
+	bh=1j6zpFS1DVxWS1hxIV2/OdRNBhbPf+kJqE3FRm4cKC4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=d0OLdVU4WW5AyI7Qx0K6WV7vTsCe8RYod5bHaEglGd68ShyZuQBsiCZKJbvDq8fG5
+	 /3rgIEMyKy/WVzx8LSE8c6JPNA9uwUr0p6mu7IKoGE7CalIEjtnquG9JmrjiXlGJde
+	 4kGmdSSbclD4AHFyAjRqLLHVDZI35/MEDvivwPaDcZo16v1dqpKqcBLNYnuz+iU8Gz
+	 W1JiLAd+rki6nEXs4bOzc1J8ppdazvdGKhfan6USczkBV8AqEMm4ETus9uh1Uihc7n
+	 O4xSnlwpG6n9H64HA3voGAMTgvH1zLlPva4hY+BUuS/jcbsaT+Lkq0lUN2GlxzfQJg
+	 WigyTZS+XaRaQ==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Brown <broonie@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: fix u64_replace_bits() usage
+Date: Fri, 11 Jul 2025 09:27:47 +0200
+Message-Id: <20250711072752.2781647-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250709105946.4009897-15-tabba@google.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Fuad,
+From: Arnd Bergmann <arnd@arndb.de>
 
-kernel test robot noticed the following build errors:
+u64_replace_bits() returns a modified word but does not actually modify
+its argument, as pointed out by this new warning:
 
-[auto build test ERROR on d7b8f8e20813f0179d8ef519541a3527e7661d3a]
+arch/arm64/kvm/sys_regs.c: In function 'access_mdcr':
+arch/arm64/kvm/sys_regs.c:2654:17: error: ignoring return value of 'u64_replace_bits' declared with attribute 'warn_unused_result' [-Werror=unused-result]
+ 2654 |                 u64_replace_bits(val, hpmn, MDCR_EL2_HPMN);
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Fuad-Tabba/KVM-Rename-CONFIG_KVM_PRIVATE_MEM-to-CONFIG_KVM_GMEM/20250709-190344
-base:   d7b8f8e20813f0179d8ef519541a3527e7661d3a
-patch link:    https://lore.kernel.org/r/20250709105946.4009897-15-tabba%40google.com
-patch subject: [PATCH v13 14/20] KVM: x86: Enable guest_memfd mmap for default VM type
-config: i386-randconfig-013-20250711 (https://download.01.org/0day-ci/archive/20250711/202507110822.EaBBAGre-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250711/202507110822.EaBBAGre-lkp@intel.com/reproduce)
+The intention here must have been to update 'val', so do that instead.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507110822.EaBBAGre-lkp@intel.com/
+Fixes: efff9dd2fee7 ("KVM: arm64: Handle out-of-bound write to MDCR_EL2.HPMN")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-All errors (new ones prefixed by >>):
-
-   arch/x86/kvm/../../../virt/kvm/guest_memfd.c: In function 'kvm_gmem_supports_mmap':
-   arch/x86/kvm/../../../virt/kvm/guest_memfd.c:317:27: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-     317 |         const u64 flags = (u64)inode->i_private;
-         |                           ^
-   In file included from <command-line>:
-   arch/x86/kvm/../../../virt/kvm/guest_memfd.c: In function 'kvm_gmem_bind':
->> include/linux/compiler_types.h:568:45: error: call to '__compiletime_assert_624' declared with attribute error: BUILD_BUG_ON failed: sizeof(gfn_t) != sizeof(slot->gmem.pgoff)
-     568 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:549:25: note: in definition of macro '__compiletime_assert'
-     549 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:568:9: note: in expansion of macro '_compiletime_assert'
-     568 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-         |         ^~~~~~~~~~~~~~~~
-   arch/x86/kvm/../../../virt/kvm/guest_memfd.c:558:9: note: in expansion of macro 'BUILD_BUG_ON'
-     558 |         BUILD_BUG_ON(sizeof(gfn_t) != sizeof(slot->gmem.pgoff));
-         |         ^~~~~~~~~~~~
-
-
-vim +/__compiletime_assert_624 +568 include/linux/compiler_types.h
-
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  554  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  555  #define _compiletime_assert(condition, msg, prefix, suffix) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  556  	__compiletime_assert(condition, msg, prefix, suffix)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  557  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  558  /**
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  559   * compiletime_assert - break build and emit msg if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  560   * @condition: a compile-time constant condition to check
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  561   * @msg:       a message to emit if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  562   *
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  563   * In tradition of POSIX assert, this macro will break the build if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  564   * supplied condition is *false*, emitting the supplied error message if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  565   * compiler has support to do so.
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  566   */
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  567  #define compiletime_assert(condition, msg) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21 @568  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  569  
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 33aa4f5071b8..793fb19bebd6 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2651,7 +2651,7 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
+ 	 */
+ 	if (hpmn > vcpu->kvm->arch.nr_pmu_counters) {
+ 		hpmn = vcpu->kvm->arch.nr_pmu_counters;
+-		u64_replace_bits(val, hpmn, MDCR_EL2_HPMN);
++		val = u64_replace_bits(val, hpmn, MDCR_EL2_HPMN);
+ 	}
+ 
+ 	__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.5
+
