@@ -1,202 +1,76 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D242D3756
-	for <kvmarm@lists.linux.dev>; Fri, 11 Jul 2025 14:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABF015533F
+	for <kvmarm@lists.linux.dev>; Fri, 11 Jul 2025 14:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752244532; cv=none; b=VymvTI99EVFYetrmChkCojl/c6UlBFOWMGGOx1QHr+Iq3PI2Q/ed14+OHo7VINoLyOhZi3l3D5IoqGEC/g4si8X46efqQ3RntwZnJCKAXMdUfnIdLm6wf4BXNaJKECH+xzaGqgFn50eJPzslERVXVZ/ib9hFofsgBbBKJY5Txp8=
+	t=1752244570; cv=none; b=XCpuCF3MbsO6YLRL6pUr/dLwYCGsfa9QETHg3EQw+XyQUjQrbECaCTeRS6H7A7nIh7mEGoPNwAHko9/jHAr1hYF0GaI6y0edybLEpM22Ba39j9CO4A8X1jG9PyFACmVhiyiXpWvEuORBT74E/Kk4TiZGWVWHVW376G65qSOWLX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752244532; c=relaxed/simple;
-	bh=3+YsQ5DYqKVY+sCSEKk64n7MH3GtivRvMp+hTl+36G4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IxtIEn5f1JoHyaE3MJuExX44LKgHsExnnxXn7YW1UaRXpgrEyjQ48EeRlz43jQ/irUFYV/l/eez+Gg+8amKkuKyjMLQHjbV3OZA8VKaqUYiEozxO83wt5zPHKCNJavrfYjIgFbdOfoxfKFFOiuU7LvdJfiOOXogXPRDIxop+89o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z1hWu/AV; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1752244570; c=relaxed/simple;
+	bh=Xkh+vWbuylyauziOzIzlKZxgnENPwPl00sBQxdB+ihg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dWu4oQy9ZdZPyZmMpIR36CSOPwUTEHN2K7YHJATaETPLnwiNabx0VI9K5zLdj+9rUFq4UQr8Xw0Mq0t7XRvGD7bFTeRa2XhusrXPrKGU0+YyxMvw0+WOb+IqVizJII2kSW1HQMyc6OGYbe38bq5q3yAGiNK/xgxZUJZDj5G3dYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V2Z1W6T5; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z1hWu/AV"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso174171cf.0
-        for <kvmarm@lists.linux.dev>; Fri, 11 Jul 2025 07:35:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752244529; x=1752849329; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lq9VKw2x/Ujw6EnIVfnsvSfkn8foGEThRri1rsKatHU=;
-        b=z1hWu/AVf1vtj5z5scIId1fS/cXa1rSIDWDxgGkUdHsZlOkHZqhuZYHmy1yOFHXW/W
-         QkVp+PlI6qCpaX7lV7wiiHsIK8XYpNk3bozZgO7j7XTQhK1u+DNPIAKLEqLv8wZiqlIU
-         4e6sE/ibEdfwt/pg76eyHdF3AF2NALnu/IgJK95r1e995QektLOzNih8BJjwogGG5Z0o
-         IFEbTb47pbq9kB3TPzgqvVOO7IU9rnuR/zcAelq0r4CbQOIvu3+oqknLTu7B+asbdUnH
-         tFWKPx7FJ8wJQyFocC28+UDadXLvxznNBN4Ukk5naEaq4vyzT+z33pJqdHa9iF5N77ZL
-         XYtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752244529; x=1752849329;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lq9VKw2x/Ujw6EnIVfnsvSfkn8foGEThRri1rsKatHU=;
-        b=YcucuIlZFd00PfLJMQz5GSZiC4gjM5O+vfVkU3e6rkEevVCvbo6P3GrpKNXBFMQWAH
-         7mi89dox+JvBH0iaG9AQLbl/FaJACZEiMdNctrqxuuJ3yhBGqjkxTxPFM3QBzb8z/Wzz
-         MpHVYDLdhmz+hA7Zsn0YKYkqjULhXUcXiP2nymmuRJ8DOOwn/ivt7Gp5wk5SBo8aQAgZ
-         iEByl64tVsBBAr0X1FqEIX39TciO7RxlX/uJ3VSz0ss+Qxj0FQKxLR5Ke9EN5jmx4EYN
-         O9pY+zidqEnFAGw/qhVg7b51K28Nk8X5JUvfgMIy5m3Nl9huPPuwqnvXycDhZeWq+yOo
-         OaGg==
-X-Forwarded-Encrypted: i=1; AJvYcCWW7JMBtPJFayHw0cAhmIB2dB10SSUQoPH/JHfcYYdOOlD4I/Bj8LHl/kOzJjBzkzV0CZGQgYY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzwNcY3g7sh5/MTUa3CtZdJ1MHwOx9qcTkZ1ypTbTXjwb3Ls19d
-	v22HlycY2I4PiVawgN519ppJzdo2sGhKexZTNGwujkVdqyhEjX8eAjrRN5sEvMjvwpA+GUZz7jC
-	/H2bu7oxGuZjGWnS9qOlFrTi9g7im2rvCbCdcAFk3
-X-Gm-Gg: ASbGncstvhctda5QRvhigwc6GWQ/Kp2v4/wcQpug4bpNwFmJJXpTCWSRvqg/5Cowt8y
-	P5glELUZirkN28gSJ56h3GD7SJ/Br+rKjvjrr7iZ8qc9jjGvuHulzm46fE2YnkZl2TqRU/iVnaz
-	G9/ktEJSIW7pBM84fK+BJvg4xBEgjO1JS/6xJsPadGTUb9+ITk6rrud/wiZtA+JpkVp7TJfqoBR
-	DWRg90=
-X-Google-Smtp-Source: AGHT+IEg2fONqFcuPbkvHSvdaQWL9AC5pLiTMJKYpsFoLYghSZ8SAhnIGrRn3LSgKjXg81dETxMVSTy5T/qS3dgr4ks=
-X-Received: by 2002:a05:622a:49:b0:4a9:d263:d983 with SMTP id
- d75a77b69052e-4a9fbf49438mr3781321cf.22.1752244528763; Fri, 11 Jul 2025
- 07:35:28 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V2Z1W6T5"
+Date: Fri, 11 Jul 2025 16:35:51 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752244561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=grsYows+9sHElnPNNTmSBrFWiRJY83TUzmMJ77We0PI=;
+	b=V2Z1W6T57gXqBL7P47kpAxJKjUb9twcwWPHGIJmXcPG5ZoU+rxoKrdN4pkXlQZ3VbFmDqT
+	dh18/YI2V2ixNx1Nn1GKxyWiDDf2S4jhhecmukG/j/K3En+iyWOiTYEHMl5YFwGrtgRb/k
+	u2yoV9Lr7ZFqZlAGHzN/orAyb9x2K2o=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, eric.auger@redhat.com, 
+	lvivier@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, 
+	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
+	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
+	andre.przywara@arm.com, shahuang@redhat.com, Boqiao Fu <bfu@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v4 07/13] scripts: Add default arguments
+ for kvmtool
+Message-ID: <20250711-357d520bb64154cbe119679b@orel>
+References: <20250625154813.27254-1-alexandru.elisei@arm.com>
+ <20250625154813.27254-8-alexandru.elisei@arm.com>
+ <ce92db8c-6d26-4953-9f74-142d00d2bc2a@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250709105946.4009897-1-tabba@google.com> <20250709105946.4009897-18-tabba@google.com>
- <868qkuajp2.wl-maz@kernel.org>
-In-Reply-To: <868qkuajp2.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 11 Jul 2025 15:34:52 +0100
-X-Gm-Features: Ac12FXzYWJsd6Iwz-ekA2LSj-AUmL9hUg1W3iguQuC8VOR_mqt0hoqU_djhQ6-A
-Message-ID: <CA+EHjTxa+8ec8rX5R2_AY76Eq0PSurB3k4oXJtx8D0eSCx6kVw@mail.gmail.com>
-Subject: Re: [PATCH v13 17/20] KVM: arm64: Enable host mapping of shared
- guest_memfd memory
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk, 
-	shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
-	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com, 
-	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ce92db8c-6d26-4953-9f74-142d00d2bc2a@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Marc,
+On Fri, Jul 11, 2025 at 01:32:33PM +0200, Thomas Huth wrote:
+...
+> > +function vmm_default_opts()
+> > +{
+> > +	echo ${vmm_optname[$(vmm_get_target),default_opts]}
+> > +}
+> 
+> 
+> This causes now a problem on s390x:
+> 
+> https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/jobs/10604334029#L591
+> 
+> scripts/common.bash: line 56: vmm_defaults_opts: command not found
+> 
+> ... any ideas how to fix it?
 
-On Fri, 11 Jul 2025 at 15:25, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 09 Jul 2025 11:59:43 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Enable host userspace mmap support for guest_memfd-backed memory on
-> > arm64. This change provides arm64 with the capability to map guest
-> > memory at the host directly from guest_memfd:
-> >
-> > * Define kvm_arch_supports_gmem_mmap() for arm64: The
-> >   kvm_arch_supports_gmem_mmap() macro is defined for arm64 to be true if
-> >   CONFIG_KVM_GMEM_SUPPORTS_MMAP is enabled. For existing arm64 KVM VM
-> >   types that support guest_memfd, this enables them to use guest_memfd
-> >   with host userspace mappings. This provides a consistent behavior as
-> >   there are currently no arm64 CoCo VMs that rely on guest_memfd solely
-> >   for private, non-mappable memory. Future arm64 VM types can override
-> >   or restrict this behavior via the kvm_arch_supports_gmem_mmap() hook
-> >   if needed.
-> >
-> > * Select CONFIG_KVM_GMEM_SUPPORTS_MMAP in arm64 Kconfig.
-> >
-> > * Enforce KVM_MEMSLOT_GMEM_ONLY for guest_memfd on arm64: Compile and
-> >   runtime checks are added to ensure that if guest_memfd is enabled on
-> >   arm64, KVM_GMEM_SUPPORTS_MMAP must also be enabled. This means
-> >   guest_memfd-backed memory slots on arm64 are currently only supported
-> >   if they are intended for shared memory use cases (i.e.,
-> >   kvm_memslot_is_gmem_only() is true). This design reflects the current
-> >   arm64 KVM ecosystem where guest_memfd is primarily being introduced
-> >   for VMs that support shared memory.
-> >
-> > Reviewed-by: James Houghton <jthoughton@google.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Acked-by: David Hildenbrand <david@redhat.com>
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 4 ++++
-> >  arch/arm64/kvm/Kconfig            | 1 +
-> >  arch/arm64/kvm/mmu.c              | 8 ++++++++
-> >  3 files changed, 13 insertions(+)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index d27079968341..bd2af5470c66 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1675,5 +1675,9 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
-> >  void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1);
-> >  void check_feature_map(void);
-> >
-> > +#ifdef CONFIG_KVM_GMEM
-> > +#define kvm_arch_supports_gmem(kvm) true
-> > +#define kvm_arch_supports_gmem_mmap(kvm) IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP)
-> > +#endif
-> >
-> >  #endif /* __ARM64_KVM_HOST_H__ */
-> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > index 713248f240e0..28539479f083 100644
-> > --- a/arch/arm64/kvm/Kconfig
-> > +++ b/arch/arm64/kvm/Kconfig
-> > @@ -37,6 +37,7 @@ menuconfig KVM
-> >       select HAVE_KVM_VCPU_RUN_PID_CHANGE
-> >       select SCHED_INFO
-> >       select GUEST_PERF_EVENTS if PERF_EVENTS
-> > +     select KVM_GMEM_SUPPORTS_MMAP
-> >       help
-> >         Support hosting virtualized guest machines.
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 71f8b53683e7..b92ce4d9b4e0 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -2274,6 +2274,14 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> >       if ((new->base_gfn + new->npages) > (kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT))
-> >               return -EFAULT;
-> >
-> > +     /*
-> > +      * Only support guest_memfd backed memslots with mappable memory, since
-> > +      * there aren't any CoCo VMs that support only private memory on arm64.
-> > +      */
-> > +     BUILD_BUG_ON(IS_ENABLED(CONFIG_KVM_GMEM) && !IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP));
-> > +     if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
-> > +             return -EINVAL;
-> > +
-> >       hva = new->userspace_addr;
-> >       reg_end = hva + (new->npages << PAGE_SHIFT);
-> >
->
-> Honestly, I don't see the point in making CONFIG_KVM_GMEM a buy in. We
-> have *no* configurability for KVM/arm64, the only exception being the
-> PMU support, and that has been a pain at every step of the way.
->
-> Either KVM is enabled, and it comes with "batteries included", or it's
-> not. Either way, we know exactly what we're getting, and it makes
-> reproducing problems much easier.
+This is fixed by https://lore.kernel.org/all/20250709085938.33254-2-andrew.jones@linux.dev/
+which I just pushed.
 
-Batteries included is always best I think (all the times I got
-disappointed as a kid..... sight :) ). I'll always enable guest_memfd
-when KVM is enabled on arm64.
-
-Cheers,
-/fuad
-
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Thanks,
+drew
