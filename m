@@ -1,110 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5F2218593;
-	Fri, 11 Jul 2025 08:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C05018D;
+	Fri, 11 Jul 2025 09:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752224025; cv=none; b=e95rU2Kltb7bOFnoLtuKXsHwMkUUOX/E4CWpdtqUlUkqHkKHo2cO8cm6Jj90CQ/KqWemNE7zHtGGa1by2jIQg3whH4Jfw528bl10/2c9l0SmEscX5PfoDUWFPhmJMxJBE0rNkzlesURli0kMOit7BtGVocPdYmmkQ/QXVKMzaL4=
+	t=1752225232; cv=none; b=qcK6C3Xe5gbtljFYzjOlsIXGefRlou5drZZrY/R7T5+9lV5pqLwrOyI7ZCxph0N9dLp71DgrnydE6hrmkgiZ0uonbUYsvsf/oGvIZDliya6azQz9UYf84z2slW/JQEiZ4GgNshPOG2dWUipsY5BrwGuLzeHgm/rw0jb3vZ28kPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752224025; c=relaxed/simple;
-	bh=mQI53t4QPyDABHATdUC2IVmzwHPIX8ZlllLvLCz6H0M=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NQNzpUTwx+OYvBOas4Ai++ToO3AzLkRh7MkM6NB1KncWL3Rrj+5rSvBL0IjwsYEXQkKKgq47neLSsmN9y8ALstrVDDBIiLNtf/jQKn4FoEu2d8RT43sbeJImXIdzgUf+rj99sb5LpNwk98YPZBpaPNZ9OzGmcnjR22r2OaS23j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CfqHolZk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752225232; c=relaxed/simple;
+	bh=D+J1UiQEH3Rtesh/EDPg41C9ly4Q28WAviDALAty324=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=evla+zZ801cRytjZRPLRcmd19ItDc+0s+308dcuHdYWSaQ5RV4fYnu0FxZlp8MGG+mXba7RCAJGN5oxycAtbasv2vQ2w3wUSDkOteIZDQhijV5QNX1bP2E3IOnnSUFYzTADaxXXTvpeLk97ELLyh/decfo5W8Vm3/U/H6qoEkHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rB7i/wSn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CfqHolZk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1515C4CEED;
-	Fri, 11 Jul 2025 08:53:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rB7i/wSn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A27C4CEED;
+	Fri, 11 Jul 2025 09:13:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752224024;
-	bh=mQI53t4QPyDABHATdUC2IVmzwHPIX8ZlllLvLCz6H0M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CfqHolZkPXR+eVlblNsPmPOjAM9RltC64m0ZnuoOMrqj+lWKEXbaARAOxSZPbw5ns
-	 5/g4+z5i4lFbgKFdUs/3Tb9ndkDOBvdnVVTl1FuAxiLMA1NpJ4qNHVgwfUFuBluSGC
-	 z8bIhaTB71FZLwgJv0F8gHt+eEiPYSVEfPdKGNVlgqJ3DhNwrZNlNiPAtft3vomFuQ
-	 ZtuSf1Hzne+NGq7ZDk0WSY82BTJZ/CZFJ/FFOf7ErKXTQWjfbUHhI1q1Ov/gDGju9b
-	 QTju/goVcwGqZAFpd262je5o8e0Cefxa9ispPSmXVSULlKAE1lhGCH25Fvv5k1cztH
-	 92v2iF/HCj3xw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ua9Vm-00EoED-Gl;
-	Fri, 11 Jul 2025 09:53:42 +0100
-Date: Fri, 11 Jul 2025 09:53:41 +0100
-Message-ID: <86frf39kh6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Arnd Bergmann" <arnd@arndb.de>
-Cc: "Arnd Bergmann" <arnd@kernel.org>,
-	"Oliver Upton" <oliver.upton@linux.dev>,
-	"Catalin Marinas" <catalin.marinas@arm.com>,
-	"Will Deacon" <will@kernel.org>,
-	"Joey Gouly" <joey.gouly@arm.com>,
-	"Suzuki K Poulose" <suzuki.poulose@arm.com>,
-	"Zenghui Yu" <yuzenghui@huawei.com>,
-	"Mark Brown" <broonie@kernel.org>,
-	"James Morse" <james.morse@arm.com>,
-	"Sebastian Ott" <sebott@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	s=k20201202; t=1752225232;
+	bh=D+J1UiQEH3Rtesh/EDPg41C9ly4Q28WAviDALAty324=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rB7i/wSnyCsoVTs9OQknYxwFVOVpM2CusWxCqIs1eVhOcPRvap/k39SzKRXhEt0FV
+	 Rfs0JSKM60g5cpuD+ce/+cBEUW1BFJsV9+17g+VaUk5mK7cJFZ0Giwai74c1aPg9RC
+	 +DAQjJKe5NcHKdmdAJ3wT5mTxTOLmawWsOZvD22RXuHgzrf7XIVGa98VywnGlWhtkV
+	 aEu+oCLzZ960iRceCHbj2JpvEyLL2/wVJHdF76NJLuPKe4mYlXTK7rYzdMqlHKI5dS
+	 p8c5b/Rh+v/3LhuC+VYqz6fcYoUL9SR5VxdESBR1vSvbsmJ3Qh5UgK8xn2BS2Aat7q
+	 24/CTHe93DLzA==
+Date: Fri, 11 Jul 2025 10:13:48 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Morse <james.morse@arm.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] KVM: arm64: fix u64_replace_bits() usage
-In-Reply-To: <4befb9eb-96e6-4a7c-9746-286144564f4e@app.fastmail.com>
+Message-ID: <aHDVzKnJ2Yb6kmAC@finisterre.sirena.org.uk>
 References: <20250711072752.2781647-1-arnd@kernel.org>
-	<86h5zj9laj.wl-maz@kernel.org>
-	<4befb9eb-96e6-4a7c-9746-286144564f4e@app.fastmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <86h5zj9laj.wl-maz@kernel.org>
+ <4befb9eb-96e6-4a7c-9746-286144564f4e@app.fastmail.com>
+ <86frf39kh6.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: arnd@arndb.de, arnd@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, broonie@kernel.org, james.morse@arm.com, sebott@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="8OlcYUwNPTX3vWXV"
+Content-Disposition: inline
+In-Reply-To: <86frf39kh6.wl-maz@kernel.org>
+X-Cookie: Do not cut switchbacks.
 
-On Fri, 11 Jul 2025 09:44:23 +0100,
-"Arnd Bergmann" <arnd@arndb.de> wrote:
-> 
-> On Fri, Jul 11, 2025, at 10:36, Marc Zyngier wrote:
-> > On Fri, 11 Jul 2025 08:27:47 +0100, Arnd Bergmann <arnd@kernel.org> wrote:
-> >>  	if (hpmn > vcpu->kvm->arch.nr_pmu_counters) {
-> >>  		hpmn = vcpu->kvm->arch.nr_pmu_counters;
-> >> -		u64_replace_bits(val, hpmn, MDCR_EL2_HPMN);
-> >> +		val = u64_replace_bits(val, hpmn, MDCR_EL2_HPMN);
-> >>  	}
-> >>  
-> >>  	__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
-> >
-> > This is only in -next, right? Because I have a fix for this already
-> > queued for 6.16, as per [1].
-> 
-> Yes, as far as I can tell, the warning only showed up in linux-next
-> after f66f9c3d09c1 ("bitfield: Ensure the return values of helper
-> functions are checked").
-> 
-> As far as I can tell, Ben added the check in linux/bitfield.h
-> when he sent you his version of the fix, they just ended up
-> in linux-next in the wrong order, so I ended up recreating his
-> original fix slightly differently.
 
-I don't think Ben's fix is in -next, as I queued it in the kvmarm
-fixes branch, which isn't pulled by -next.
+--8OlcYUwNPTX3vWXV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hopefully Paolo will send this to Linus shortly (pull request
-here[1]), and -next will be clean again.
+On Fri, Jul 11, 2025 at 09:53:41AM +0100, Marc Zyngier wrote:
+> "Arnd Bergmann" <arnd@arndb.de> wrote:
 
-Thanks,
+> > Yes, as far as I can tell, the warning only showed up in linux-next
+> > after f66f9c3d09c1 ("bitfield: Ensure the return values of helper
+> > functions are checked").
 
-	M.
+> > As far as I can tell, Ben added the check in linux/bitfield.h
+> > when he sent you his version of the fix, they just ended up
+> > in linux-next in the wrong order, so I ended up recreating his
+> > original fix slightly differently.
 
-[1] https://lore.kernel.org/r/20250711084835.2411230-1-maz@kernel.org
+> I don't think Ben's fix is in -next, as I queued it in the kvmarm
+> fixes branch, which isn't pulled by -next.
 
--- 
-Without deviation from the norm, progress is not possible.
+We should really get that added to -next, that'll ensure it gets covered
+in the pending-fixes testing coverage and avoid issues like this with
+the main -next tree.
+
+--8OlcYUwNPTX3vWXV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmhw1ckACgkQJNaLcl1U
+h9CYHQgAhW0ZGSJZA9yZmoehX8pya7ceC2yx43u8tF7XehnZB4F8M4KuYj+WWPBf
+e5XXehH+M4lv2LggQYFAoVOZtIvkIfKeiyYa67R5SHd0dgKATCWBvVCLg0JiFFil
+DuGffTyg6C5bZA4S+Q812aGk1XJsmycaDgwTHwb1fMTWvr+AUoAWGH4fWOvt2WtX
+6qw/gaEg3NdNAgMgWzCr5hJ2WJCEtA969vSm1vFPG6SvLxHnrLsMYhOkUCiePE4h
+GfbSce0UsS7U/S0qPU/a4l/05pWaRoGgu82sOvepjW48lqOFvsIuuaTcGs2+amJ7
+H+J2nbsIdT0rPC58X4TKumZDsOZcjw==
+=sUyb
+-----END PGP SIGNATURE-----
+
+--8OlcYUwNPTX3vWXV--
