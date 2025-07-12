@@ -1,80 +1,98 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C770B221F10
-	for <kvmarm@lists.linux.dev>; Sat, 12 Jul 2025 13:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B4D278767
+	for <kvmarm@lists.linux.dev>; Sat, 12 Jul 2025 13:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752327400; cv=none; b=jLEI2viRZ6QjDnvg97qWO7knubLxifeTED+iyRLjdrY0VXU/xZ8vOriQvxvOOxwi4bTWnKqkyT3QwqCv/qdxthdm2fJ4OcQozfL2pMnafTf7JMeo4Z2B5mhv7ELi99DwYZEjQD45d6nR5L4aQ0gGUKrI+Tqkq6mXy4rx1UtpX20=
+	t=1752328524; cv=none; b=mtzrL9zeP2FJszTFUkDh6D55W/tTG1+ab5WNbM5+8I4pkJgnKfAFC2O2HxpC5MJy9Bf8OVC5awCcNjaJWhdlOLwFmAQpkyW7E8+KlEptGjS0bB/U3kCCqW4Fe6znbHndfKzuOWjElVTcW9YBV38KBMmj3vguCdSGMEst88RBe00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752327400; c=relaxed/simple;
-	bh=YOndc6H20zxrD83nlreI1JYXNtXysRHFHOmt4DK1lus=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=sTeGmY5TDxMGDnNae5M5epOuJ5NrW9pT/8qUZPAXXj5Cy5BTpq6Am5cy1ROcBVu86veHMoDTe4B3ZBFjZsI2iUcnVqu4nqriSHBZSxvmWynP4u4X4Qzb3oqod94PPqOWw/9rlfudEUKHsR6CIAz4M9Ft/yXQdWc6Gr+OKYewvuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DBLeBaUK; arc=none smtp.client-ip=209.85.208.50
+	s=arc-20240116; t=1752328524; c=relaxed/simple;
+	bh=RKgGfotXYydNQpTmp9EldXAQ8RrwqhRJUaEpLQizexw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=JwrKwPhJCihLt2GaB2B8RMCiyOiKlj1pVtmz85DZEUt7er/kzXQSW+hRgyPi3eIO05FwcWh7gfKhXIChjAri6v7dTTKfGwCKfKJpaFn14THq3r9UP+0wzlZ1hJHfxQUEssIdKeVpNbJykZMYlQ2yOfSwltlltVdrNvdjU1SGXus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=civs1ts5; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DBLeBaUK"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60bf5a08729so5384348a12.0
-        for <kvmarm@lists.linux.dev>; Sat, 12 Jul 2025 06:36:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="civs1ts5"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-23694cec0feso27447465ad.2
+        for <kvmarm@lists.linux.dev>; Sat, 12 Jul 2025 06:55:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752327397; x=1752932197; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YOndc6H20zxrD83nlreI1JYXNtXysRHFHOmt4DK1lus=;
-        b=DBLeBaUK+7PUATLTVAZXU+d4oRa/v2ewNZjjK/MTYCNkF4m3rsPje5sjilxOGfelX1
-         EoW8wugrAsBlNB67Ah6Cm+ZEWz0TKap2W+9/YwEUsi6VpzkO2G6GiyRmvjcZ+7XFHqXl
-         3cp0c5Wp3oI6XCS7TER6Zrfo55bgp7GFigBbjgpAK+c6wyftaWM9g70CZtzioEgw6YMK
-         hOg1mnnDjkChl30YCAxcZXGpLeO84Umk3TJOdV/pyhfcx9LX26MB7JReLh2qBPqPQupw
-         kuREW13G8GCuLpVKyj9E/B2+nyZ6rq+Qtqu34RRPlrIXhDtxzmu4kVUdea8ygW44LcfG
-         o2lA==
+        d=gmail.com; s=20230601; t=1752328522; x=1752933322; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RKgGfotXYydNQpTmp9EldXAQ8RrwqhRJUaEpLQizexw=;
+        b=civs1ts5qlUENy/tGv05Mye2czqnjcIW/xhoL6zipFlzkEk00dJfkH2T099ebeXNoy
+         OKwtxZV8dlxnd6jvbG7YFil7F7b7ytyunwlim0CHEvc6C+M+sJMPa1E+o57Ci+BtbUqO
+         r1p1xFsJZsTOHQURnJmsi4HvIU8tbqazl+L6wL/tTB20gYQJU9hpkd1sqO2DWDcBpWfc
+         dntMyM6FviWSXWa0/R9OOzSNH1Y+2dObJbWB+c+EucpVv19bwmmKujOYIRTm43yp0BUq
+         Tt6trkcBlL3FWTm86u1+esA6BXXdQyMtRKX0hxjvc3f0bLX7KW7jIOmANeFipGdhsiVl
+         rTdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752327397; x=1752932197;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YOndc6H20zxrD83nlreI1JYXNtXysRHFHOmt4DK1lus=;
-        b=DmOg1UZdltCzOIa6HTQPsMFjVMjV0BbC6M8j2yUPbMK8TfcS8aYrEJteaUjuTynQNf
-         jOs8wYaiFfu/Pgmnu4M2OlBVsirZ5F2VbpK023M3QiloxNQdhofwz4fMrqmYY1gH35oa
-         qub9XiB0NjsTfcCVbWsci1dsGVgFGeOx9OQWdkWk7rwzAVRILaD6yjjTle+9tQBon22O
-         wLZvcIIKf88HsXQEsanQtvHHNqtVOyO652zFR9qoH7eEVEotREqNZsWYTga49I7cAK8M
-         bV783oBI4Wb3uBgJQlpsXHcHvZrS7zwI5sPwAPVVZ9qa5tC23ArmSbOMtfr7wbmK1Ci7
-         2bjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX29CLtwXS84vl02uRtmJ4ndd9eVzY00/I5W6laeuW8J+sAfoBVLGvd2ihSSnIyj9glR5qBras=@lists.linux.dev
-X-Gm-Message-State: AOJu0YynMWphMIGKkWXLD5sv0os/vWFWXpm4+t4P3dhm2E+rbXIcWuxR
-	WtKTNrzLXDoSfV1T3apKfbdi1Gtdps5ymVl+SzdV52yscyEEdM8kRtMCwtUQrlXTk8A67r6Z+Wz
-	QLjlYFXR4myI8FRZxLKLznGUTEuUohJU=
-X-Gm-Gg: ASbGncsPKHztHH45HJs7XIBU6TJEdxFYcfD0a2JxJdY/kVi0bA1LJlxaWjFLk92A+P5
-	1wdP+26V/ofXU84F+QfUrBSWsZQWa6gY6Lnb7e8OYB/x9hJsKa4TJ4gRwJ71KJVvFxZceoIFZWf
-	ociskjypYqao01WvFqZdbutNIeJtq15JooEEV7U8m1d39uLiThCP8nT6LBecjgDLBJQS2stIhYK
-	qrmqzo=
-X-Google-Smtp-Source: AGHT+IEYYVDKFxeAmqYv/dICV+GSZ7NGwda3BVuEnt5qwx1dGs/ArLr/yc+9i00C+YaXs5Wgw2E53bDwXUiXusMMIMY=
-X-Received: by 2002:a17:906:4fca:b0:adf:f82f:fe0a with SMTP id
- a640c23a62f3a-ae6fca48ec3mr847213666b.16.1752327396767; Sat, 12 Jul 2025
- 06:36:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752328522; x=1752933322;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RKgGfotXYydNQpTmp9EldXAQ8RrwqhRJUaEpLQizexw=;
+        b=Nv2z9TuTJtyPdro9Rf4uSlqBq4HwnqljxovjyItjIpI45YnthW/K4Ps2HYWJ714D1o
+         tvS+Fzte7jixjwcSEuzESkFF+w97yxL4EWxCQjCZrj1RdEFsyxPnBnryEkRgHsEdZak7
+         nH5ncT6cu9vWXZNnPzm8EThmKzhx9Y6j0XabhqAiJcADr/fvGrWy8dDPded01ZOlZBAg
+         cupxh/sF21RzXXQYVm86t9jK46ALGJzidO1bJzZlWKDY4YD5j7yV1f2hUw7h228wYOo+
+         lfz1pBJaNFQkCCyqmBdzwvGagy0Bo5JCsJu/92jj+E2o9EJmpeJF/FkyzOZg6sdDvzR/
+         Ywfw==
+X-Forwarded-Encrypted: i=1; AJvYcCULZMxOthZsoxpVBFc0gWLT+KKlI+W5J3QYyS/zYSY5JssaqBoDUXeFHwsIMIB8upVjbfYKFh0=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yws5ViVm8vhuUiRNQ1Mbiyc2jBcy/QmwapbnbVxNbvBH77DdDk4
+	R9dvTA+RULt7hKCFIgaCDrE6uyrzmC942BF78MHV9niDlXBLC9KvyvOR
+X-Gm-Gg: ASbGncuElZJBInhmKDro6tYOe2hbgRqwNnwmnxjiu/73wqXWIbsb3p8CF6TBXzbfqH7
+	lm7uTtbGD1y8o9jmikTDQLgzaejn6Dr9vdVsth4iv0RFQ738gbKHknYT1+3JU0KXhLDm3V4BWQ2
+	YMM/xWDzRHQeeXg4V2VwngzBZovPwcY1LLqbrQYeqGMXT/kmeU9Kwjg+jrxDnJC6HYNeW15tiSZ
+	7ZSmKYl5twvhoO/q6bPFuMaM7JmmGEflWS8LB0tzn0FH0824ufECFm4vv8H1lJZxkCRZleXwC8D
+	bHp8NKmRWijc76UUla1uVHfHRBSLRYnQVsBCM+qyjDeWcjHxZQzRvhg9FWQG+M5mp0zu/B13z/B
+	slFnK2KwKeys5XALvYVUxv/WdjgOg0qz9gd/B
+X-Google-Smtp-Source: AGHT+IH6HY+p7Hp/Yk/auxux6EFH/0htf4yyEg33W/v6Shc5j9xmPAHiObaFWd+rVZyTMTg5E1r2zw==
+X-Received: by 2002:a17:903:fa7:b0:234:11f9:a72b with SMTP id d9443c01a7336-23dede96972mr84775955ad.50.1752328521616;
+        Sat, 12 Jul 2025 06:55:21 -0700 (PDT)
+Received: from daerolee-Swift-SF316-51.. ([49.142.96.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de43227acsm65559485ad.124.2025.07.12.06.55.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Jul 2025 06:55:20 -0700 (PDT)
+From: daeroro <skseofh@gmail.com>
+X-Google-Original-From: daeroro <skseofh@naver.com>
+To: will@kernel.org
+Cc: alexandru.elisei@arm.com,
+	james.morse@arm.com,
+	kernel-team@android.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	qperret@google.com,
+	sebastianene@google.com,
+	sudeep.holla@arm.com,
+	suzuki.poulose@arm.com,
+	tabba@google.com
+Subject: [QUESTION] KVM: arm64: Handle FFA_MEM_LEND calls from the host
+Date: Sat, 12 Jul 2025 22:55:13 +0900
+Message-Id: <20250712135513.608609-1-skseofh@naver.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230523101828.7328-9-will@kernel.org>
+References: <20230523101828.7328-9-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: DaeRo Lee <skseofh@gmail.com>
-Date: Sat, 12 Jul 2025 22:36:24 +0900
-X-Gm-Features: Ac12FXw0aLWNnHyHALX6gaR9lKxOPPuPtN0qv8Vl0yjKm2nmq9nN-7vEBGiChn0
-Message-ID: <CAATEi5=y6w3jziwKbrnUkWGy=RTGh=+jKdrXEnOdAiEcH=npOQ@mail.gmail.com>
-Subject: Re: [PATCH v3 08/10] KVM: arm64: Handle FFA_MEM_LEND calls from the host
-To: will@kernel.org
-Cc: alexandru.elisei@arm.com, james.morse@arm.com, kernel-team@android.com, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, 
-	oliver.upton@linux.dev, qperret@google.com, sebastianene@google.com, 
-	sudeep.holla@arm.com, suzuki.poulose@arm.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
 > Handle FFA_MEM_LEND calls from the host by treating them identically to
 > FFA_MEM_SHARE calls for the purposes of the host stage-2 page-table, but
 > forwarding on the original request to EL3.
 
-Hi, Will.
-
+Hello Will,
 I have a question about your patch.
-Does treating FFA_MEM_LEND as identical to FFA_MEM_SHARE imply that
-the host can still access the memory even after it has been lent?
+
+Does treating FFA_MEM_LEND as identical to FFA_MEM_SHARE imply that the host
+can still access the memory even after it has been 'lent'?
