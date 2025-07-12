@@ -1,98 +1,120 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B4D278767
-	for <kvmarm@lists.linux.dev>; Sat, 12 Jul 2025 13:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9675228D8F7
+	for <kvmarm@lists.linux.dev>; Sat, 12 Jul 2025 19:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752328524; cv=none; b=mtzrL9zeP2FJszTFUkDh6D55W/tTG1+ab5WNbM5+8I4pkJgnKfAFC2O2HxpC5MJy9Bf8OVC5awCcNjaJWhdlOLwFmAQpkyW7E8+KlEptGjS0bB/U3kCCqW4Fe6znbHndfKzuOWjElVTcW9YBV38KBMmj3vguCdSGMEst88RBe00=
+	t=1752349663; cv=none; b=WhcYW12Z0srjVl9nSlL+hkOL79ofNrzvm8FXfRfxYNR8P21JgiyoscUCJ6LjtA1Mbh/YpXHnGA00DOEptXWlOYiI/viA5ezz+AJGaKznAF3Mo3bL8zmMx5M48XC/Ewc2r49xSVgbCuHB/7lljl3j36bJ75kGJ5VXJIfcV1h3SDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752328524; c=relaxed/simple;
-	bh=RKgGfotXYydNQpTmp9EldXAQ8RrwqhRJUaEpLQizexw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JwrKwPhJCihLt2GaB2B8RMCiyOiKlj1pVtmz85DZEUt7er/kzXQSW+hRgyPi3eIO05FwcWh7gfKhXIChjAri6v7dTTKfGwCKfKJpaFn14THq3r9UP+0wzlZ1hJHfxQUEssIdKeVpNbJykZMYlQ2yOfSwltlltVdrNvdjU1SGXus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=civs1ts5; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752349663; c=relaxed/simple;
+	bh=f7jirJngtZPmjp6nUuToVUR1+33dys87/8xXFSMeddQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OL/cEoRh6aYITZ8yjkDgaIpGhNDxSvwyWM9IxxVVLraSWd3AeknKMDYIWHWEdp2uDtZ+xLYJGizQYRgEfdq0UJ5zFxoKq+XL/HhFk9zIA0ktIoFfPNedGASPVWysWGLoIPuZYRPxQQecUKCTqD0Ke5fHyAj2dJUanicnTvwz5oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ri65r+c5; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="civs1ts5"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-23694cec0feso27447465ad.2
-        for <kvmarm@lists.linux.dev>; Sat, 12 Jul 2025 06:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752328522; x=1752933322; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RKgGfotXYydNQpTmp9EldXAQ8RrwqhRJUaEpLQizexw=;
-        b=civs1ts5qlUENy/tGv05Mye2czqnjcIW/xhoL6zipFlzkEk00dJfkH2T099ebeXNoy
-         OKwtxZV8dlxnd6jvbG7YFil7F7b7ytyunwlim0CHEvc6C+M+sJMPa1E+o57Ci+BtbUqO
-         r1p1xFsJZsTOHQURnJmsi4HvIU8tbqazl+L6wL/tTB20gYQJU9hpkd1sqO2DWDcBpWfc
-         dntMyM6FviWSXWa0/R9OOzSNH1Y+2dObJbWB+c+EucpVv19bwmmKujOYIRTm43yp0BUq
-         Tt6trkcBlL3FWTm86u1+esA6BXXdQyMtRKX0hxjvc3f0bLX7KW7jIOmANeFipGdhsiVl
-         rTdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752328522; x=1752933322;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RKgGfotXYydNQpTmp9EldXAQ8RrwqhRJUaEpLQizexw=;
-        b=Nv2z9TuTJtyPdro9Rf4uSlqBq4HwnqljxovjyItjIpI45YnthW/K4Ps2HYWJ714D1o
-         tvS+Fzte7jixjwcSEuzESkFF+w97yxL4EWxCQjCZrj1RdEFsyxPnBnryEkRgHsEdZak7
-         nH5ncT6cu9vWXZNnPzm8EThmKzhx9Y6j0XabhqAiJcADr/fvGrWy8dDPded01ZOlZBAg
-         cupxh/sF21RzXXQYVm86t9jK46ALGJzidO1bJzZlWKDY4YD5j7yV1f2hUw7h228wYOo+
-         lfz1pBJaNFQkCCyqmBdzwvGagy0Bo5JCsJu/92jj+E2o9EJmpeJF/FkyzOZg6sdDvzR/
-         Ywfw==
-X-Forwarded-Encrypted: i=1; AJvYcCULZMxOthZsoxpVBFc0gWLT+KKlI+W5J3QYyS/zYSY5JssaqBoDUXeFHwsIMIB8upVjbfYKFh0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yws5ViVm8vhuUiRNQ1Mbiyc2jBcy/QmwapbnbVxNbvBH77DdDk4
-	R9dvTA+RULt7hKCFIgaCDrE6uyrzmC942BF78MHV9niDlXBLC9KvyvOR
-X-Gm-Gg: ASbGncuElZJBInhmKDro6tYOe2hbgRqwNnwmnxjiu/73wqXWIbsb3p8CF6TBXzbfqH7
-	lm7uTtbGD1y8o9jmikTDQLgzaejn6Dr9vdVsth4iv0RFQ738gbKHknYT1+3JU0KXhLDm3V4BWQ2
-	YMM/xWDzRHQeeXg4V2VwngzBZovPwcY1LLqbrQYeqGMXT/kmeU9Kwjg+jrxDnJC6HYNeW15tiSZ
-	7ZSmKYl5twvhoO/q6bPFuMaM7JmmGEflWS8LB0tzn0FH0824ufECFm4vv8H1lJZxkCRZleXwC8D
-	bHp8NKmRWijc76UUla1uVHfHRBSLRYnQVsBCM+qyjDeWcjHxZQzRvhg9FWQG+M5mp0zu/B13z/B
-	slFnK2KwKeys5XALvYVUxv/WdjgOg0qz9gd/B
-X-Google-Smtp-Source: AGHT+IH6HY+p7Hp/Yk/auxux6EFH/0htf4yyEg33W/v6Shc5j9xmPAHiObaFWd+rVZyTMTg5E1r2zw==
-X-Received: by 2002:a17:903:fa7:b0:234:11f9:a72b with SMTP id d9443c01a7336-23dede96972mr84775955ad.50.1752328521616;
-        Sat, 12 Jul 2025 06:55:21 -0700 (PDT)
-Received: from daerolee-Swift-SF316-51.. ([49.142.96.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de43227acsm65559485ad.124.2025.07.12.06.55.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Jul 2025 06:55:20 -0700 (PDT)
-From: daeroro <skseofh@gmail.com>
-X-Google-Original-From: daeroro <skseofh@naver.com>
-To: will@kernel.org
-Cc: alexandru.elisei@arm.com,
-	james.morse@arm.com,
-	kernel-team@android.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	qperret@google.com,
-	sebastianene@google.com,
-	sudeep.holla@arm.com,
-	suzuki.poulose@arm.com,
-	tabba@google.com
-Subject: [QUESTION] KVM: arm64: Handle FFA_MEM_LEND calls from the host
-Date: Sat, 12 Jul 2025 22:55:13 +0900
-Message-Id: <20250712135513.608609-1-skseofh@naver.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230523101828.7328-9-will@kernel.org>
-References: <20230523101828.7328-9-will@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ri65r+c5"
+Date: Sat, 12 Jul 2025 12:47:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752349649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t/KO7cxY55TZXEuxm/aJMlnOT2I2d5MUZFj4P6QELUY=;
+	b=Ri65r+c54bI2Dx0vVIuVeDzldrENr3nFiK2CbHP8HII66ewc/paI3WssyPiPfNrGcdB//4
+	Z14A96Kb4SwBP+zq6/FtDPWBPhETyDJXYfATv3PnpWMTj34Qn4ihFcM7hWAG6/gm0+ONYp
+	AgolM6pN6cUvnHKnZ+EXg6jN/91qaTg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Jiaqi Yan <jiaqiyan@google.com>
+Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	duenwen@google.com, rananta@google.com, jthoughton@google.com
+Subject: Re: [PATCH v2 3/6] KVM: arm64: Allow userspace to inject external
+ instruction aborts
+Message-ID: <aHK7w4TTEm7a1mco@linux.dev>
+References: <20250604050902.3944054-1-jiaqiyan@google.com>
+ <20250604050902.3944054-4-jiaqiyan@google.com>
+ <aHFpIpIfqVCQZVgG@linux.dev>
+ <CACw3F51xRWr5LXz4-JhK+mjizY7D7Oa+GrJ-OZHktfPzFGKeiw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACw3F51xRWr5LXz4-JhK+mjizY7D7Oa+GrJ-OZHktfPzFGKeiw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-> Handle FFA_MEM_LEND calls from the host by treating them identically to
-> FFA_MEM_SHARE calls for the purposes of the host stage-2 page-table, but
-> forwarding on the original request to EL3.
+On Fri, Jul 11, 2025 at 04:58:57PM -0700, Jiaqi Yan wrote:
+> On Fri, Jul 11, 2025 at 12:42 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > On Wed, Jun 04, 2025 at 05:08:58AM +0000, Jiaqi Yan wrote:
+> > > From: Raghavendra Rao Ananta <rananta@google.com>
+> > >
+> > > When KVM returns to userspace for KVM_EXIT_ARM_SEA, the userspace is
+> > > encouraged to inject the abort into the guest via KVM_SET_VCPU_EVENTS.
+> > >
+> > > KVM_SET_VCPU_EVENTS currently only allows injecting external data aborts.
+> > > However, the synchronous external abort that caused KVM_EXIT_ARM_SEA
+> > > is possible to be an instruction abort. Userspace is already able to
+> > > tell if an abort is due to data or instruction via kvm_run.arm_sea.esr,
+> > > by checking its Exception Class value.
+> > >
+> > > Extend the KVM_SET_VCPU_EVENTS ioctl to allow injecting instruction
+> > > abort into the guest.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> >
+> > Hmm. Since we expose an ESR value to userspace I get the feeling that we
+> > should allow the user to supply an ISS for the external abort, similar
+> > to what we already do for SErrors.
+> 
+> Oh, I will create something in v3, by extending kvm_vcpu_events to
+> something like:
+> 
+> struct {
+>   __u8 serror_pending;
+>   __u8 serror_has_esr;
+>   __u8 ext_dabt_pending;
+>   __u8 ext_iabt_pending;
+>   __u8 ext_abt_has_esr;  // <= new
+>   /* Align it to 8 bytes */
+>   __u8 pad[3];
+>   union {
+>     __u64 serror_esr;
+>     __u64 ext_abt_esr;  // <= new
 
-Hello Will,
-I have a question about your patch.
+This doesn't work. The ABI allows userspace to pend both an SError and
+SEA, so we can't use the same storage for the ESR.
 
-Does treating FFA_MEM_LEND as identical to FFA_MEM_SHARE imply that the host
-can still access the memory even after it has been 'lent'?
+>   };
+> } exception;
+> 
+> One question about the naming since we cannot change it once
+> committed. Taking the existing SError injection as example, although
+> the name in kvm_vcpu_events is serror_has_esr, it is essentially just
+> the ISS fields of the ESR (which is also written in virt/kvm/api.rst).
+> Why named after "esr" instead of "iss"? The only reason I can think of
+> is, KVM wants to leave the room to accept more fields than ISS from
+> userspace. Does this reason apply to external aborts? Asking in case
+> if "iss" is a better name in kvm_vcpu_events, maybe for external
+> aborts, we should use ext_abt_has_iss?
+
+We will probably need to include more ESR fields in the future, like
+ESR_ELx.ISS2. So let's just keep the existing naming if that's OK with
+you.
+
+Thanks,
+Oliver
