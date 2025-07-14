@@ -1,88 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8B619D09C
-	for <kvmarm@lists.linux.dev>; Sun, 13 Jul 2025 20:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684FE41C72
+	for <kvmarm@lists.linux.dev>; Mon, 14 Jul 2025 01:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752436879; cv=none; b=HRYIZFxR3mm6vQboHXmFIMFEaIp8hgKzQNo38103zE4o5RW5a1rgm8BgW4dshcfmB+RaHxPuN/JDNJe2y6WnOdGHTEImSG72YsCP7VmL2rIQnCoXWvkRqww2SR51FON3aiTNgjRFr7NnL9tJDptr+dJ90qJR7U/1t9jLxkclG70=
+	t=1752457772; cv=none; b=Wb22dymfKUriejFLRLiln6uIB6sD7Ax+8sDlyIM78ig+bv/QM1XwaQuqh9cknSuhFZr54k/IDIWPlmFk6+MfygXBeyfrAPTGlfcYopwqR1hH1b5ic3PgUMPJ0lJItM7DXs9QGVQXcWekx39ZOkg7OzJxuF+ARXVrGFff0/3sL8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752436879; c=relaxed/simple;
-	bh=2zr47mFpEIUp6+WoMgmh+bczIGgMGmEmW+H3pXP+Vcg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aD9KugfqWIZrcNkvoq9JbLYPG2rCZdh4tt2wyV+YlnzF4aoG0r9loYidHMDk4Sm2XljJVMK+MV2wBqZcA8FLQOBrRH7smYGOzzAQy5hgGrUbluWyOouaZGvYLgQZnMlKu5OnQ7oWJsSUIFRuOGIGI6WEemSazo/Ekm1KEmEX7O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YwN2eEvt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752457772; c=relaxed/simple;
+	bh=f28NzlPclTUQrm9z8qWDo9K5sejEm68bwyiiU26NRcs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=h6J5dP0nJDXH+hi7JldD++K1Box/yARXSFNt6Ll2DERZKCQBL93YTbszopZ37lvWxd1AyKihKhGKybQ757vOLLU3BWar5gnFXxl+KafGD+qhnFRXSh/D+CyJztjpDUJAj50/aOtUE771CZM/rExk1BYFFjtZ0LeMXAJ6NBEVLsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ma6AafZb; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YwN2eEvt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E933C4CEE3;
-	Sun, 13 Jul 2025 20:01:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752436877;
-	bh=2zr47mFpEIUp6+WoMgmh+bczIGgMGmEmW+H3pXP+Vcg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YwN2eEvtsmiwgZQkmgiaqQbNqM8MNGEksgicOAw3CXZyNWVJCTtiO/rOFa59iocTw
-	 oeiCaQWneW4Ladp8vl2yc+tvSHl7lvf8dzfHHR8fSvEFpxAlg+hk05j/zHVcDxx5Pe
-	 yjFXCSKC0y/hF5H5gb/+yiiC1ks8N9/w96abk/KQn/yy6lj4hZy3GKIB5uofoEC09k
-	 oooE/Og0l1GzZi4wxZw1Z+rT88bBDEEVRA8nAaDDWJS3hVJ3WzLpTFjnHyuRlya7/m
-	 jwFecGhR7ON4O82hNPiUIaaoIH4VyLZYZ0Dp1pdw1CGdOaxbsUuVwp/YjgS0XTlg+E
-	 SNA15WlKueFaw==
-Date: Sun, 13 Jul 2025 21:01:12 +0100
-From: Will Deacon <will@kernel.org>
-To: DaeRo Lee <skseofh@gmail.com>
-Cc: alexandru.elisei@arm.com, james.morse@arm.com, kernel-team@android.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
-	sebastianene@google.com, sudeep.holla@arm.com,
-	suzuki.poulose@arm.com, tabba@google.com
-Subject: Re: [PATCH v3 08/10] KVM: arm64: Handle FFA_MEM_LEND calls from the
- host
-Message-ID: <aHQQiJr2xLe9KotP@willie-the-truck>
-References: <aHOXzUvGaQ1Bz3jG@willie-the-truck>
- <20250713145957.623842-1-skseofh@naver.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ma6AafZb"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b31e0ead80eso2897069a12.0
+        for <kvmarm@lists.linux.dev>; Sun, 13 Jul 2025 18:49:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752457771; x=1753062571; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f28NzlPclTUQrm9z8qWDo9K5sejEm68bwyiiU26NRcs=;
+        b=Ma6AafZbEWhzX1J13vzSSHnD8nVxfXnZAV63LVKV8L9bdJ1OerKLK0aTKPCPr5bImq
+         oIKY8TMwxarhyFLHSGJtx/QW7f6ZktyBiAwx3VBIIA5zcBbO74JYJmL2rdAG3L+0kis0
+         T3Uw99LBqtMaBQO9FnmIrlPy+1VDesJ8aofRSZUcIo1IkKdHR5AkYv/O+aTxt4d0bA6T
+         Os7U+L96ntjLD/im6GIQQJhq9EzEI/IQaaQnXV/QIA8Pf7YuCAGauDfaH2HKzSacuIrs
+         SPip+qePZX3WRmYdsjzdgP/8T0HyRCRtYUX2dk5Pzpiob4ZWdXKXWk7HHx6eCchtlD6p
+         DEkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752457771; x=1753062571;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f28NzlPclTUQrm9z8qWDo9K5sejEm68bwyiiU26NRcs=;
+        b=YIQgzLPs5TQczkkEuMS6e9QQzCDGA9LMpVJ92944NW3x3treGOlgPlyHC9inHpClP1
+         mZgCGxRmXOFOE1PeU4CBO+R1FE339lsvZMd4LkKU01a0OBttpL5XPf+6SIEY2Q/E47Nv
+         Zd20wPFdgpJpP/RsGn7snkOTGiqosDKI8uEhli1sM2dI4TunpTdMOCOjf3bcDDiWptZc
+         xmn31JOnWn+dN+6jWvSuooDQH856N81IK7qxXWrWr9+1kI6Vw0RdiQd/T9m0oq6Thack
+         VP+G3SE52eq6LGfc/M/QasvLcs97Qxt+a/eWYgdvvt6cPsE9WW5rMnkefbefY6f1dt+0
+         4xrg==
+X-Forwarded-Encrypted: i=1; AJvYcCVsk7dgFRcX51+XvE9b6P2gJePU5zoa4JjTCFyC4iavkj03OOqXOTTkNWzhQqs97Z9vGYf7QNE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwqPrR5mbv/R4G/xfB4ugaK1CRJpryvwaNepSlCia2OfzWXtjKj
+	qSw9xix2wZ/zKZvCnDOmufmz+DJnS8DPBAIg8DMBqIxOpXMuOOsnDddY
+X-Gm-Gg: ASbGncudygAbfnJAuqbVPexJiML29PmeylfKdUsNTof7e05qgEJd7pw5QBBv1/lT1Kb
+	v14yCzhoaoDw0mU+bu4UjcOU2pfNKlTKZgHwzfNJAzB479sfX1aCNLwhG1xiao55kxf32PFzJRd
+	d0WRbpZWNzwM2YPV1SoivGTbi3LDvCHEjbfA868zwtD8G6DLdU8JW9X7enRcbsk50p8G0k8r59f
+	A9BtL9ZdlyMrslWwSefd5iPo1TVcR47P/InKCNAiK+3zd57DT6qx+HiPas+LYGrZWSH+qDl+1MM
+	1Xq2/3pB3FCKHePBg5ooBz9fjUk7MwIRSpVRkFQD91aBOy1WdfxLeXZjO0Yw0sNDcngqnDgd7+k
+	vAo8NY2c+ZCL0qorrSNiQsn6LMjQ8hCtkj56w
+X-Google-Smtp-Source: AGHT+IHAMVWJ1KHm6k5TxxbRXzqXkJA2F6PqS1WMTG6K5vCCF+qJ3iHYsumiXDEgPzlsNAggJSgYLA==
+X-Received: by 2002:a17:90b:5868:b0:312:29e:9ed5 with SMTP id 98e67ed59e1d1-31c4cd9c12cmr16262763a91.23.1752457770526;
+        Sun, 13 Jul 2025 18:49:30 -0700 (PDT)
+Received: from daerolee-Swift-SF316-51.. ([49.142.96.162])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3eb7e362sm9289765a91.44.2025.07.13.18.49.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Jul 2025 18:49:29 -0700 (PDT)
+From: DaeRo Lee <skseofh@gmail.com>
+X-Google-Original-From: DaeRo Lee <skseofh@naver.com>
+To: will@kernel.org
+Cc: alexandru.elisei@arm.com,
+	=james.morse@arm.com,
+	kernel-team@android.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	qperret@google.com,
+	sebastianene@google.com,
+	skseofh@gmail.com,
+	sudeep.holla@arm.com,
+	suzuki.poulose@arm.com,
+	tabba@google.com
+Subject: Re: [PATCH v3 08/10] KVM: arm64: Handle FFA_MEM_LEND calls from the host
+Date: Mon, 14 Jul 2025 10:49:22 +0900
+Message-Id: <20250714014922.631551-1-skseofh@naver.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <aHQQiJr2xLe9KotP@while-the-truck>
+References: <aHQQiJr2xLe9KotP@while-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250713145957.623842-1-skseofh@naver.com>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jul 13, 2025 at 11:59:57PM +0900, DaeRo Lee wrote:
-> > > > Handle FFA_MEM_LEND calls from the host by treating them identically to
-> > > > FFA_MEM_SHARE calls for the purposes of the host stage-2 page-table, but
-> > > > forwarding on the original request to EL3.
-> > > 
-> > > I have a question about your patch.
-> > > Does treating FFA_MEM_LEND as identical to FFA_MEM_SHARE imply that
-> > > the host can still access the memory even after it has been lent?
-> >
-> > Only if your TZ implementation is broken and relies on the NS hypervisor
-> > for isolation.
-> 
-> I believe pKVM is managing stage 2 isolation between Host and Non-secure Guest
-> VMs or between Non-secure Guest VMs
-> 
-> <Quote DEN0140_FF-A_Memory Management Protocol>
-> 2.2.1.2 Relayer responsibilities
-> 10. Unmap the memory region from the translation regime of the Lender, if
-> managed by the Relayer as specified in 1.2 Address translation regimes. This 
-> must be done only if the memory region is in the Owner-EA state. This includes
-> removing access to the memory region from any DMA capable devices assigned to 
-> the Lender.
-> 
-> From the content, it seems that when performing a Lend operation, it's
-> necessary to perform a Stage 2 unmap of the host memory area. Am I understanding
-> this correctly?
+Is it pKVM's policy to not manage Non-secure memory using FF-A, while the FF-A
+specification supports memory management between Host/Guest within Non-secure
+hypervisors?
 
-No.
-
-pKVM doesn't use FF-A to manage host/guest page ownership.
-
-FF-A is only used for memory management with the Secure world, in which
-case a LEND transaction will mean that the Secure world must prevent
-Non-Secure access to the memory itself and not rely on pKVM to unmap
-at stage-2.
-
-Will
+Then, how does someone lend memory to a Guest from the Host/Guest via FF-A? Can
+pKVM prevent this? Or should Host/Guest developers use it with caution?
