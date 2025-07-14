@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD022472B0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0722475E3;
 	Mon, 14 Jul 2025 12:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752496004; cv=none; b=XDwnL153kTbH5J/5ae2zjDWEeIiVy+7EtOltIdOKWmMX+X7sWKpi38pxVTHqMC7LFfOW/53iK0wE3WSOmO7x46k1aKyl36/X6e4VAoPzH/uXg/gPxM5qMzedW4pGf68XjAV+xM/JLMV+niqWVdGeFogyair0yJW99kmNFeiSPb8=
+	t=1752496004; cv=none; b=rA4typlThfkEyW/ucs0qOYOkRs6oCBR26uk7jCr0AOELtdvy4qP7NpEdJfgmUkRLYqJ7GLPAwKH08LiQZpa4+5i3d1NyXJajdddbztf24yO6QgNk6tpy8AerYrXfRk/UrSRJtUCx5IndrGybRWN8WGYjD/OipuzNg93M5xzVXeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752496004; c=relaxed/simple;
-	bh=/vMk69jugUdux6Iyc4dtdLKZPTxMcIyoAC9mmbKItVQ=;
+	bh=ncwASAA1qi99xaHllmrz6NR9vRZXa0OXO/G8CF9AaoA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gVmZXKE/MtmggHIlnvui07D7tqd3WUpVa0LuYjx/JaBjThphwb1iUkiZC0hlS9F+4QXQdD1pnviVkBbvA1GuKvv8dm1rwru2IcOydllUDQtX5LoxC3U4rxY7VDzEW4OQeVHyWi3vp3J8Os3rn32no6lb8qWVwFLxHWSxisd9LL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hT19ib0g; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=XjcWPTn9rdhTnmpJ2iyAlsKWUC9Q7fBTxmhVaTYPwPDT5VyIZGhjKN9SefUHI8/IyKh/Cui7w10rOuTuoYdMqBXxTmU9DzzBNITgrVXjwpAHG/tUJV+sTECTg58szN/EsfEWxUKhgYccBFUWbbShbEEROk9l4sz9EdH760dVl50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkjN7X8l; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hT19ib0g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 058B8C4CEF7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkjN7X8l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3A2C4CEED;
 	Mon, 14 Jul 2025 12:26:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1752496004;
-	bh=/vMk69jugUdux6Iyc4dtdLKZPTxMcIyoAC9mmbKItVQ=;
+	bh=ncwASAA1qi99xaHllmrz6NR9vRZXa0OXO/G8CF9AaoA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hT19ib0gB87CTcvOTQ4J+9fgrUgk+vestQGaCqyq/xZZYAR4lwnYqUB2IFqSMv24L
-	 li3/fefTutw4HDawhjeZ8UOD6rIOHv/aHqpBwXjc00h8CoJGIFa1RlKf4zjT+pw4vr
-	 0drrzucrITtmTWMtIH2E6WWa7YKZRCGe26zMle03PpeBKtHQala/PBxU0FTH2Q/rKa
-	 RES+P1rBUubCQIv4Y3Dl63/d1jvNgMuvzgomg6IAxymdfRAAgyqlL0q40uVPxAipKj
-	 I7zqvYQPtGTDckqC21QoiC+WUkmVVEMf84+cOn2NYLe1KI326hiYGqEIw+MxY0MFbE
-	 s61ZSssSzqGcg==
+	b=SkjN7X8lo/gUYjopp59OGVBV5OTYpP6g/nojuQ/EmEgJOt5mwhl+qccDIrpWMqo4L
+	 bobBG+h4fu7rVhecD+De3hwcF31M2VRVGoAlNNOwtiR3V/vGmXm/WjQ1IPpxyilevm
+	 y5Z4dInppH7HI8yR/2nCMlv7+GzrC06E7+ufXeaHo52yNrzLPXAsKy+Mr1HIQ1sZB+
+	 0kQkVtGVBzrPIuolUax1AlVbr5V4/uVRzMsqK+x7oxyxj+l+E5mYXuyh1dUwyFW4rx
+	 R/GHkKM5ACGJ93H18ZP/lMHAv4jU/vJlPIeR7zlKyrILcp4ZFWrX0hLq7HMQMZ0BLb
+	 JxO8kCVm8pJDg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ubIGY-00FW7V-6t;
+	id 1ubIGY-00FW7V-JG;
 	Mon, 14 Jul 2025 13:26:42 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 03/11] KVM: arm64: Define constant value for ICC_SRE_EL2
-Date: Mon, 14 Jul 2025 13:26:26 +0100
-Message-Id: <20250714122634.3334816-4-maz@kernel.org>
+Subject: [PATCH 05/11] KVM: arm64: Let GICv3 save/restore honor visibility attribute
+Date: Mon, 14 Jul 2025 13:26:28 +0100
+Message-Id: <20250714122634.3334816-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250714122634.3334816-1-maz@kernel.org>
 References: <20250714122634.3334816-1-maz@kernel.org>
@@ -60,43 +60,34 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Move the bag of bits defining the value of ICC_SRE_EL2 to a common
-spot so that it can be reused by the save/restore code.
+The GICv3 save/restore code never needed any visibility attribute,
+but that's about to change. Make vgic_v3_has_cpu_sysregs_attr()
+check the visibility in case a register is hidden.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c  | 3 +--
- arch/arm64/kvm/vgic/vgic.h | 3 +++
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/vgic-sys-reg-v3.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index dceb4f8f242a7..6981c1b34c2c4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -532,8 +532,7 @@ static bool access_gic_sre(struct kvm_vcpu *vcpu,
- 		return ignore_write(vcpu, p);
+diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
+index 5eacb4b3250a1..6f40225c4a3ff 100644
+--- a/arch/arm64/kvm/vgic-sys-reg-v3.c
++++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
+@@ -341,8 +341,12 @@ static u64 attr_to_id(u64 attr)
  
- 	if (p->Op1 == 4) {	/* ICC_SRE_EL2 */
--		p->regval = (ICC_SRE_EL2_ENABLE | ICC_SRE_EL2_SRE |
--			     ICC_SRE_EL1_DIB | ICC_SRE_EL1_DFB);
-+		p->regval = KVM_ICC_SRE_EL2;
- 	} else {		/* ICC_SRE_EL1 */
- 		p->regval = vcpu->arch.vgic_cpu.vgic_v3.vgic_sre;
- 	}
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 4349084cb9a6c..af4bf80b785c3 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -64,6 +64,9 @@
- 				      KVM_REG_ARM_VGIC_SYSREG_CRM_MASK | \
- 				      KVM_REG_ARM_VGIC_SYSREG_OP2_MASK)
- 
-+#define KVM_ICC_SRE_EL2		(ICC_SRE_EL2_ENABLE | ICC_SRE_EL2_SRE |	\
-+				 ICC_SRE_EL1_DIB | ICC_SRE_EL1_DFB)
+ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
+-	if (get_reg_by_id(attr_to_id(attr->attr), gic_v3_icc_reg_descs,
+-			  ARRAY_SIZE(gic_v3_icc_reg_descs)))
++	const struct sys_reg_desc *r;
 +
- /*
-  * As per Documentation/virt/kvm/devices/arm-vgic-its.rst,
-  * below macros are defined for ITS table entry encoding.
++	r = get_reg_by_id(attr_to_id(attr->attr), gic_v3_icc_reg_descs,
++			  ARRAY_SIZE(gic_v3_icc_reg_descs));
++
++	if (r && !sysreg_hidden(vcpu, r))
+ 		return 0;
+ 
+ 	return -ENXIO;
 -- 
 2.39.2
 
