@@ -1,217 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680F723A9B1;
-	Mon, 14 Jul 2025 08:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BFA243964
+	for <kvmarm@lists.linux.dev>; Mon, 14 Jul 2025 09:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752480293; cv=none; b=fBHWBNG0ij6jdCxJfP0lBmSXsLJGFRCYnLQ28evUNgTrBCqS7Vu/dUGXvPHY+7Q2xyu+cpk9ruiNL8vtInOGdAwKxR/XIawzwiuZbxW8Qfr7VlTm5GIu28TZN46w+uDzVQFVxSebwdqsgo72+EHkzkgKYJIGJNXahyGw59a+eG4=
+	t=1752487109; cv=none; b=SitEUB/HrFyvYZSPBU3Pd31LUuFoUmFTahbqCQQMQh8q2gTB73UlQM5eQ/Wc4k0uzaXcN6D2lM5T3zob+lPUizUsTwjTMa+zpVjMbuiLFs96kf9BWenJPAauNzbAChOFOoh+zbwDKC/T3PwS7aXGIRCgQn/OfZlXOsbRrt75+kM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752480293; c=relaxed/simple;
-	bh=H9kiQECWZOW5ov4j9VoAQjWYSxSJ36A7Y3M4vXz83Ng=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lkDf3E3gMa9FLCIi3SGpLJhWzzgFYe59uxdCIcT+jo8FdiWj4BvF3M+qN07zsHDixcGeNR7YFakCUO7TLqNaQ4lHeTaOevNd4gkGJEALrinwhUiFRIQWQQuGLndgdgrllT8xVvnFVi4B+taAimMjkSdteSbgO0zyZXPEfZAIUD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZgZvm7Ec; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752487109; c=relaxed/simple;
+	bh=6QNF2IYiYqPBBrAD5MOXPmWbh+lwfMKKPRRBenmPnKQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lg+NR4X4o61PfdWHtraBWwOIzxrwW6Aw+dJ23SGUVFxCiY76CpVat1gAQ+WDkc/3ici+oV6+rUnehJpNxkJtPAsH3ZwhqRrGtr4iQx/H7teUHyg3CNctJG9wPEooH4BKVJm+EjcLs56/FoaqFlv9uOo15vUZkaIk4bS/GSBVAKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ums9ayJN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZgZvm7Ec"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6E3DC4CEED;
-	Mon, 14 Jul 2025 08:04:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ums9ayJN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E74C4CEED;
+	Mon, 14 Jul 2025 09:58:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752480292;
-	bh=H9kiQECWZOW5ov4j9VoAQjWYSxSJ36A7Y3M4vXz83Ng=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZgZvm7EcBxADHZBQMVcToBi9IJWjthwxrTPdhAE/knyvKBJkroL+lV5qMFJz3wrMA
-	 A4HmA7y1rIf2i3QUgaAIRSXmQ17NnpT5FPyZD7vFLnZ26kC0OFnn43mERJBs9ofwwr
-	 yOdUqvtFjlg4wqotMBl7ccKC+oxc3HTqi/dDF/o8sWlbaN9EkXlRQiEFciSxWkUj2e
-	 jJ3KGix/mc3uzs3L2NXz/xJfFpFgPBgXN6sY6fu173EQiCxvi2dpQTytSHVvGfUI7x
-	 oWdb7O+ohBYxSP05RYHuFCVU/FozUF11ITg+lSUa6b5aZemek9hMYIh4815xVVzdNC
-	 CqzORr7Fxyliw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ubEB7-00FR6s-FO;
-	Mon, 14 Jul 2025 09:04:49 +0100
-Date: Mon, 14 Jul 2025 09:04:48 +0100
-Message-ID: <8634az9p0f.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-mm@kvack.org,
-	kvmarm@lists.linux.dev,
-	pbonzini@redhat.com,
-	chenhuacai@kernel.org,
-	mpe@ellerman.id.au,
-	anup@brainfault.org,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	seanjc@google.com,
-	viro@zeniv.linux.org.uk,
-	brauner@kernel.org,
-	willy@infradead.org,
-	akpm@linux-foundation.org,
-	xiaoyao.li@intel.com,
-	yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com,
-	jarkko@kernel.org,
-	amoorthy@google.com,
-	dmatlack@google.com,
-	isaku.yamahata@intel.com,
-	mic@digikod.net,
-	vbabka@suse.cz,
-	vannapurve@google.com,
-	ackerleytng@google.com,
-	mail@maciej.szmigiero.name,
-	david@redhat.com,
-	michael.roth@amd.com,
-	wei.w.wang@intel.com,
-	liam.merwick@oracle.com,
-	isaku.yamahata@gmail.com,
-	kirill.shutemov@linux.intel.com,
-	suzuki.poulose@arm.com,
-	steven.price@arm.com,
-	quic_eberman@quicinc.com,
-	quic_mnalajal@quicinc.com,
-	quic_tsoni@quicinc.com,
-	quic_svaddagi@quicinc.com,
-	quic_cvanscha@quicinc.com,
-	quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com,
-	catalin.marinas@arm.com,
-	james.morse@arm.com,
-	yuzenghui@huawei.com,
-	oliver.upton@linux.dev,
-	will@kernel.org,
-	qperret@google.com,
-	keirf@google.com,
-	roypat@amazon.co.uk,
-	shuah@kernel.org,
-	hch@infradead.org,
-	jgg@nvidia.com,
-	rientjes@google.com,
-	jhubbard@nvidia.com,
-	fvdl@google.com,
-	hughd@google.com,
-	jthoughton@google.com,
-	peterx@redhat.com,
-	pankaj.gupta@amd.com,
-	ira.weiny@intel.com
-Subject: Re: [PATCH v13 16/20] KVM: arm64: Handle guest_memfd-backed guest page faults
-In-Reply-To: <CA+EHjTyJGWJ0Pj-jPjriFjy3JHpVUa0PW0vQz4o8UPdLbMV7pg@mail.gmail.com>
-References: <20250709105946.4009897-1-tabba@google.com>
-	<20250709105946.4009897-17-tabba@google.com>
-	<865xfyadjv.wl-maz@kernel.org>
-	<CA+EHjTyJGWJ0Pj-jPjriFjy3JHpVUa0PW0vQz4o8UPdLbMV7pg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1752487109;
+	bh=6QNF2IYiYqPBBrAD5MOXPmWbh+lwfMKKPRRBenmPnKQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ums9ayJN5n832EVbsV69MWCMFHIkAtW87SJM8xhoU99WdXpmOoi01pg9sXFG35BQS
+	 aemOss8YmGLTKcVZME8JuPe0FdkYnSVBD1HdZecjl2w2e7vKAKutLFr3E7F3bicd5+
+	 9avX8BMP5vaoKP+RN35dD7u12iVolLIZDw4tpncBqTA7E/v7xxgFzTq7yaqVan8JTP
+	 aiU4E6arkoWr1hRxCAVVg+HPdswYptXzXyA6cSqLZZDPSSszrgttAO5Y1iHpF4pQHQ
+	 UN7wUd2CHCpbhrA9HFwRNP9EDFwfGeKyhjzoB2IzipZUDUkeBEAUBDNmPkrtlaguFS
+	 Jjw/Am5jCSaZA==
+Date: Mon, 14 Jul 2025 10:58:23 +0100
+From: Will Deacon <will@kernel.org>
+To: DaeRo Lee <skseofh@gmail.com>
+Cc: alexandru.elisei@arm.com, james.morse@arm.com, kernel-team@android.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
+	sebastianene@google.com, sudeep.holla@arm.com,
+	suzuki.poulose@arm.com, tabba@google.com
+Subject: Re: [PATCH v3 08/10] KVM: arm64: Handle FFA_MEM_LEND calls from the
+ host
+Message-ID: <aHTUv5kOE4z8tlEK@willie-the-truck>
+References: <aHQQiJr2xLe9KotP@willie-the-truck>
+ <20250714021400.631762-1-skseofh@naver.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714021400.631762-1-skseofh@naver.com>
 
-On Mon, 14 Jul 2025 08:42:00 +0100,
-Fuad Tabba <tabba@google.com> wrote:
+On Mon, Jul 14, 2025 at 11:14:00AM +0900, DaeRo Lee wrote:
+> Is it pKVM's policy to not manage Non-secure memory using FF-A, while the FF-A
+> specification supports memory management between Host/Guest within Non-secure
+> hypervisors?
 > 
-> Hi Marc,
-> 
-> 
-> On Fri, 11 Jul 2025 at 17:38, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Wed, 09 Jul 2025 11:59:42 +0100,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > Add arm64 architecture support for handling guest page faults on memory
-> > > slots backed by guest_memfd.
-> > >
-> > > This change introduces a new function, gmem_abort(), which encapsulates
-> > > the fault handling logic specific to guest_memfd-backed memory. The
-> > > kvm_handle_guest_abort() entry point is updated to dispatch to
-> > > gmem_abort() when a fault occurs on a guest_memfd-backed memory slot (as
-> > > determined by kvm_slot_has_gmem()).
-> > >
-> > > Until guest_memfd gains support for huge pages, the fault granule for
-> > > these memory regions is restricted to PAGE_SIZE.
-> > >
-> > > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > > Reviewed-by: James Houghton <jthoughton@google.com>
-> > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > ---
-> > >  arch/arm64/kvm/mmu.c | 82 ++++++++++++++++++++++++++++++++++++++++++--
-> > >  1 file changed, 79 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index 58662e0ef13e..71f8b53683e7 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -1512,6 +1512,78 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
-> > >       *prot |= kvm_encode_nested_level(nested);
-> > >  }
-> > >
-> > > +#define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
-> > > +
-> > > +static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > > +                   struct kvm_s2_trans *nested,
-> > > +                   struct kvm_memory_slot *memslot, bool is_perm)
-> > > +{
-> > > +     bool write_fault, exec_fault, writable;
-> > > +     enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-> > > +     enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> > > +     struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-> > > +     struct page *page;
-> > > +     struct kvm *kvm = vcpu->kvm;
-> > > +     void *memcache;
-> > > +     kvm_pfn_t pfn;
-> > > +     gfn_t gfn;
-> > > +     int ret;
-> > > +
-> > > +     ret = prepare_mmu_memcache(vcpu, true, &memcache);
-> > > +     if (ret)
-> > > +             return ret;
-> > > +
-> > > +     if (nested)
-> > > +             gfn = kvm_s2_trans_output(nested) >> PAGE_SHIFT;
-> > > +     else
-> > > +             gfn = fault_ipa >> PAGE_SHIFT;
-> > > +
-> > > +     write_fault = kvm_is_write_fault(vcpu);
-> > > +     exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> > > +
-> > > +     if (write_fault && exec_fault) {
-> > > +             kvm_err("Simultaneous write and execution fault\n");
-> > > +             return -EFAULT;
-> > > +     }
-> >
-> > I don't think we need to cargo-cult this stuff. This cannot happen
-> > architecturally (data and instruction aborts are two different
-> > exceptions, so you can't have both at the same time), and is only
-> > there because we were young and foolish when we wrote this crap.
-> >
-> > Now that we (the royal We) are only foolish, we can save a few bits by
-> > dropping it. Or turn it into a VM_BUG_ON() if you really want to keep
-> > it.
-> 
-> Will do, but if you agree, I'll go with a VM_WARN_ON_ONCE() since
-> VM_BUG_ON is going away [1][2]
-> 
-> [1] https://lore.kernel.org/all/b247be59-c76e-4eb8-8a6a-f0129e330b11@redhat.com/
-> [2] https://lore.kernel.org/all/20250604140544.688711-1-david@redhat.com/T/#u
+> Then, how does someone lend memory to a Guest from the Host/Guest via FF-A? Can
+> pKVM prevent this? Or should Host/Guest developers use it with caution?
 
-Ah, sure. We've never seen these anyway in any situation other than
-"I've mutated this kernel so badly it's closer to a hamster".
 
-Thanks,
+Perhaps you could read the code and find out.
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
