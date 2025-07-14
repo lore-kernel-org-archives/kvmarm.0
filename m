@@ -1,143 +1,77 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEFA246767;
-	Mon, 14 Jul 2025 13:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D421A2475E3;
+	Mon, 14 Jul 2025 13:32:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752499769; cv=none; b=Z1x/KXRX1BmmF6+rF6Q1H/gth7LiCCoyaii/8T8wC++Kcn6ex3WLMLU0EfX0IqTJTLtvDVQb+zqvXeQco7FX39xOAv7lfzFAzjTIEaM4blI+XozQQGjnPmoxeDVmoys/P6lpXE/HPsDR7Qvo10iqh3ydDuWUgugDAmrFshFBgoM=
+	t=1752499966; cv=none; b=br146vWfPxtf1ch9Tvj2EoMwQBcmVc2G+OqANluPvyRKtwxousE6qFtMp/G/nuAz5559efePyycwLU6R12hL8YKn5+pl6G++ckYNUqAdaFvEtwOTZK4YcvqiEpTFinKf03tUdOxY6eWzNm7JXLUX5g2sb2NZ+uR53uJffvmy6Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752499769; c=relaxed/simple;
-	bh=q2ArqOrD99umJqG1o/bJ4D7H01aAcZ2g/okByrrMjxo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oUNP2SEqOgQ6WJ8CO7ZxRv1ph+EmZBomv2D3nEZ3M1gTEPeal6idk6UiLQx+rTIiYr94YxUm0TtF10xHHPCB7Vc7lroL2TFBwEaffDM2K6kdt3uRyDHKc8kJCc0MLaTN1eCCSq6ZoIPtNRCMxcvHltdSFkYxw7PWYOvPsHQbYVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aH6cGN1o; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752499966; c=relaxed/simple;
+	bh=zYLFg0UGybuPu0kCXHDSNl+grvOFE2zIo70Nf4XZjj4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CoPoKukXtVnkoZnsdtaDkCdn6ZGAcNcdGzdzcAZRgbc7u0X5EXGyAkwSfM16kIQ9VyVUw7g1UIB36bwpjQ4tDPcV4M4kGDXp+ZQvlAhf3foN9Eaq4O2HGYFNZauZEbZbzr00QOAiV93yjEX76//RhW4/EFevX9HzleZCsVYmgBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=touKXH+Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aH6cGN1o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27770C4CEED;
-	Mon, 14 Jul 2025 13:29:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="touKXH+Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BCD2C4CEF6;
+	Mon, 14 Jul 2025 13:32:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752499769;
-	bh=q2ArqOrD99umJqG1o/bJ4D7H01aAcZ2g/okByrrMjxo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aH6cGN1o9ME+TeE3lhLvwdOUZAXzJb6tukmPvUJJ89cEUyvCqlPfwoGFq6ThdQ8sG
-	 SEdScqfnmxB6xh41zW5B+rMtz93o8ZJ9sv4h1umtunQMSw42GEXg7cQNuJYRUY+eLw
-	 Fx0YCDtID0aCj4xIs5E50CODQ+QQypo34wdoxo8ALIDCnrv1f+IX5AC+wqBcOHPlFE
-	 SvpzoRfWwH12bR853oe29tZFE8LRyJsu1fbEQsy04velnHpsPrEIQamOpMfjIygmHq
-	 0QedsDbR9js/AtXpA4Xet8mo5iho9A6gcp9VbbaGDi8Lb3u28dNgt5x5hFmlkbG4M5
-	 Nua1AnEO1D6zA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ubJFG-00FX9b-T0;
-	Mon, 14 Jul 2025 14:29:27 +0100
-Date: Mon, 14 Jul 2025 14:29:26 +0100
-Message-ID: <861pqiaojt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: syzbot <syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com>
-Cc: catalin.marinas@arm.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	suzuki.poulose@arm.com,
-	syzkaller-bugs@googlegroups.com,
-	will@kernel.org,
-	yuzenghui@huawei.com
-Subject: Re: [syzbot] [kvmarm?] WARNING in pend_sync_exception
-In-Reply-To: <68730fbb.a70a0220.3b380f.001a.GAE@google.com>
-References: <68730fbb.a70a0220.3b380f.001a.GAE@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1752499965;
+	bh=zYLFg0UGybuPu0kCXHDSNl+grvOFE2zIo70Nf4XZjj4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=touKXH+Qb7rjyg66pw1fVCbvQAzWsmxh7egKqLtOjYEBZTBcu2FM0jsxz01I+6I+W
+	 qpx2dBxkQUHNwnTr8g1wySB0VzzJkWQ1HkEjzP4H8qQMlmS3GYAOFlQtFBEfgwfD7f
+	 h9qKA82Xbb2GMrrQe4yEps7c9OUXrT0CB4zDSq9VuSMxBa2jpXnFQy32+n0EtlT9Rx
+	 vR8aRyRhZVeIpSYKNV9CsRLZMcKy721QXGwV6BIr/1tB5qXF4dJDGrsZ3FEHOGaUbF
+	 51B6L3i/YubBnIfdXnO/Z1yeEBc84d8Fn4m5sKHweSjgXUhqzUH/jqTes+x+lxunU9
+	 cvDEhaNXyyZyA==
+Date: Mon, 14 Jul 2025 14:32:37 +0100
+From: Will Deacon <will@kernel.org>
+To: James Clark <james.clark@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>, leo.yan@arm.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 01/10] arm64: sysreg: Add new PMSFCR_EL1 fields and
+ PMSDSFR_EL1 register
+Message-ID: <aHUG9bVy9pdwfumh@willie-the-truck>
+References: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
+ <20250605-james-perf-feat_spe_eft-v3-1-71b0c9f98093@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com, catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250605-james-perf-feat_spe_eft-v3-1-71b0c9f98093@linaro.org>
 
-On Sun, 13 Jul 2025 02:45:31 +0100,
-syzbot <syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com> wrote:
+On Thu, Jun 05, 2025 at 11:48:59AM +0100, James Clark wrote:
+> Add new fields and register that are introduced for the features
+> FEAT_SPE_EFT (extended filtering) and FEAT_SPE_FDS (data source
+> filtering).
 > 
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    15724a984643 Merge branch 'kvm-arm64/doublefault2' into kv..
-> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=13e26a8c580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=82bd3cd421993314
-> dashboard link: https://syzkaller.appspot.com/bug?extid=4e09b1432de3774b86ae
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> userspace arch: arm64
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17137582580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17e26a8c580000
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-15724a98.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/ec0f03d375a1/vmlinux-15724a98.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/a36232f8c6dd/Image-15724a98.gz.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 3595 at arch/arm64/kvm/inject_fault.c:63 pend_sync_exception+0x198/0x5ac arch/arm64/kvm/inject_fault.c:63
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 3595 Comm: syz.2.16 Not tainted 6.16.0-rc3-syzkaller-g15724a984643 #0 PREEMPT 
-> Hardware name: linux,dummy-virt (DT)
-> pstate: 81402009 (Nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-> pc : pend_sync_exception+0x198/0x5ac arch/arm64/kvm/inject_fault.c:63
-> lr : pend_sync_exception+0x198/0x5ac arch/arm64/kvm/inject_fault.c:63
-> sp : ffff80008e7378c0
-> x29: ffff80008e7378c0 x28: 0000000000000063 x27: 63f000001d7702a8
-> x26: 0000000000000063 x25: 0000000000000000 x24: 0000000000000000
-> x23: 0000000000000000 x22: 0000000000000063 x21: 63f000001d770e81
-> x20: 0000000000000007 x19: efff800000000000 x18: 0000000000000000
-> x17: 0000000000000041 x16: ffff800080011d9c x15: 00000000200000c0
-> x14: ffffffffffffffff x13: 0000000000000028 x12: 00000000000000cc
-> x11: ccf000001d756de4 x10: 0000000000ff0100 x9 : 0000000000000000
-> x8 : ccf000001d755880 x7 : ffff800080b08704 x6 : ffff80008e737a88
-> x5 : ffff80008e737a88 x4 : 0000000000000001 x3 : ffff8000801a2e80
-> x2 : 0000000000000000 x1 : 0000000000000002 x0 : 0000000000000000
-> Call trace:
->  pend_sync_exception+0x198/0x5ac arch/arm64/kvm/inject_fault.c:63 (P)
->  inject_abt64 arch/arm64/kvm/inject_fault.c:115 [inline]
->  __kvm_inject_sea+0x268/0x96c arch/arm64/kvm/inject_fault.c:207
->  kvm_inject_sea+0x98/0x72c arch/arm64/kvm/inject_fault.c:229
->  kvm_inject_sea_dabt arch/arm64/include/asm/kvm_emulate.h:54 [inline]
->  __kvm_arm_vcpu_set_events+0x134/0x238 arch/arm64/kvm/guest.c:847
->  kvm_arm_vcpu_set_events arch/arm64/kvm/arm.c:1698 [inline]
->  kvm_arch_vcpu_ioctl+0xed8/0x16b0 arch/arm64/kvm/arm.c:1810
->  kvm_vcpu_ioctl+0x5c4/0xc2c virt/kvm/kvm_main.c:4632
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:907 [inline]
->  __se_sys_ioctl fs/ioctl.c:893 [inline]
->  __arm64_sys_ioctl+0x18c/0x244 fs/ioctl.c:893
->  __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
->  invoke_syscall+0x90/0x2b4 arch/arm64/kernel/syscall.c:49
->  el0_svc_common+0x180/0x2f4 arch/arm64/kernel/syscall.c:132
->  do_el0_svc+0x58/0x74 arch/arm64/kernel/syscall.c:151
->  el0_svc+0x58/0x160 arch/arm64/kernel/entry-common.c:767
->  el0t_64_sync_handler+0x78/0x108 arch/arm64/kernel/entry-common.c:786
->  el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
-> irq event stamp: 2626
-> hardirqs last  enabled at (2625): [<ffff80008653cb88>] __raw_read_unlock_irqrestore include/linux/rwlock_api_smp.h:241 [inline]
-> hardirqs last  enabled at (2625): [<ffff80008653cb88>] _raw_read_unlock_irqrestore+0x44/0xbc kernel/locking/spinlock.c:268
-> hardirqs last disabled at (2626): [<ffff800086517e08>] el1_dbg+0x24/0x80 arch/arm64/kernel/entry-common.c:511
-> softirqs last  enabled at (2576): [<ffff8000800c988c>] local_bh_enable+0x10/0x34 include/linux/bottom_half.h:32
-> softirqs last disabled at (2574): [<ffff8000800c9858>] local_bh_disable+0x10/0x34 include/linux/bottom_half.h:19
-> ---[ end trace 0000000000000000 ]---
+> Tested-by: Leo Yan <leo.yan@arm.com>
+> Signed-off-by: James Clark <james.clark@linaro.org>
+> ---
+>  arch/arm64/tools/sysreg | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/df-2-fixes
+Acked-by: Will Deacon <will@kernel.org>
 
--- 
-Without deviation from the norm, progress is not possible.
+Will
