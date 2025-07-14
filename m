@@ -1,55 +1,55 @@
 Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF23A20D4FF
-	for <kvmarm@lists.linux.dev>; Mon, 14 Jul 2025 22:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D34F285C9F
+	for <kvmarm@lists.linux.dev>; Mon, 14 Jul 2025 22:59:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752533982; cv=none; b=ttewMqQb0PiIpIv+YiEh3vOyqHdus/5jvU3bwU3NAtzkgxuxgFSnwx/lMoVUvRXNwlXUKGsAlSWJcn0nOsPA60kSbwXotx7Pla5gWN8aX+1p2ocJq9t/YTDQQm5lfRbp1FTLAddAPNF7GSSu2JSGUEqU3XzXOM7+6Qyus1QzT2Q=
+	t=1752533983; cv=none; b=hzPAb7pR4elWs/+nVwLxPxYynNnNCrrECU1O+fGdD0KK4/Zbulz+cXQHHi1LMGDKsMicGG77EeNakq0Ck0Z0mSg5ilWLFmA7AuFpYdPWw4aLPIEmT+oSozanWkIQmiqb7Rqvu/yILkjDZit+bDjyP2T3+IaJrqQ/4EZ/QH/ldaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752533982; c=relaxed/simple;
-	bh=JP8zf6L3hflAD9DfHgHhFb+z9U9XgJ/aXorJou5xHMY=;
+	s=arc-20240116; t=1752533983; c=relaxed/simple;
+	bh=v8A7OTNElLp9NjEON3srySP/azHIcZU0IjsZoZmUJ/c=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Sdd8NGtGxh9MqiA/YLdkKzIjgLDip9g6DT7DbZspcRFLM3Ac6qt+tti4PJeW6ajnuo6yP0cr94Hb6wUaJJNMm13wJYOPsRnU2Lm0dgpuDFmTZaS/G4fbd5fIQ1ng9Qbzljc7DVKrbtThXPVxntUU9wvVc81WCopEjP0ORHb2SJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g6oqZntm; arc=none smtp.client-ip=209.85.166.73
+	 To:Cc:Content-Type; b=pujzDKq2Ndfh4DdU7teqUcvHQaZoa7y1Nm9KFescpBgZTSQ+WQD99kC3XAWIAv9uY9ZJyLlb9QePJCaGybhG9h3xV+ZzjDkZUxOYQVr5UHp2dRD6cj4IWeuQi+kurQJeXKnYqexvsM1i7yoU2aSW3aUpHeBKeYIJakOSaEQjw0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oh+ijMzW; arc=none smtp.client-ip=209.85.166.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g6oqZntm"
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-86cfff5669bso475195839f.0
-        for <kvmarm@lists.linux.dev>; Mon, 14 Jul 2025 15:59:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oh+ijMzW"
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-86cf9bad8e9so508329339f.2
+        for <kvmarm@lists.linux.dev>; Mon, 14 Jul 2025 15:59:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752533978; x=1753138778; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1752533980; x=1753138780; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SJZ+xwDjyMIGIgaKCFQ3UPZ4fJ+Lh0B/3NWWuRP6Bzw=;
-        b=g6oqZntmcJsSXpBI1DRRUCv2oKqqpnaqREJ7ND8nRi5AOunR7wQIC+xHuiS1/4/dSw
-         oSRZwBEwM8Ei2gaeGIetstsF2oFLnMhiKI7O28Hb0qy8W3UE83XRyvgdd78Lm0noThWS
-         yJ51Q0yw9vLbT/ukCKGcUrxl+ZywqLWYVAJgMOmo3Bt7UoHugGUBb/zyR0x3a2vkR3zm
-         yXfz3V5Sj3vtDMHo9M24kv2siDdyGXspdwMIGq6coi4WHL1m7sLvc2HzQAssoDpfzDOU
-         78rQR9w7L95i3LqyWugKDK8MXpJx/FP2a5Ajb07mBCnsk4nSW7VvHB5PqhlTc4+iuzsP
-         NBUg==
+        bh=BZ8dG4IcFoEafWjbI5Tl7HqmjBNXuoxF6820bVcH07Q=;
+        b=oh+ijMzWv03yV7S1wzecoOpnI8eVRdoJKPRRdb9suZwFZKXPHj9gnh1vDO4LK6b3fH
+         ouWj+K3E5BkaohmntK4ryO6S9yWh/hhujPOz05GsfHqZv1Lazyd7APqc2N98ilWnIwrZ
+         MnrGFRPG6EDEJYTS63vfrL3PUKthNZLXvEmd/PFca6o3QNK0d7B7SxeyaoswyR6oOqHC
+         SYbMBC4q5jWYeioWSp4SsqRa7hDBIGLEWWfG8HJQcNyKlr/Qg38/M9kVs//of4Ff0LCU
+         Hk5jFPfEimRhoun80WYBi7fkSERVHeVYYDqo24lRaxva5FyhDxiJv2J3WX3X2tYefGbV
+         JJmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752533978; x=1753138778;
+        d=1e100.net; s=20230601; t=1752533980; x=1753138780;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SJZ+xwDjyMIGIgaKCFQ3UPZ4fJ+Lh0B/3NWWuRP6Bzw=;
-        b=ToLa1pshNeAkzWdFWh/OzL1w03bv2jfJLArr7xBEzwb2FbW+AEAjr574FlxvM8nW1x
-         l7WG2hK2BI91NNFnGgjAecAS4O0I1Z9+Bvztx5KGh9DAnD+T1N4hBliBZ1+dhvzuDhMO
-         8Yk+QHbXIvEoTxLwiiJqDcbOFOpa+8HD3bpU4siNgm09hx3Ghgtq8c/OE5+PRRjolILd
-         aIYdGeD7WxsUBW1B2MO1I74lZWJwRgBvN4KsYONTRMxqYmzHlanvCVUIhwWviZEe+cVj
-         fSHYTc7ZzzTQrpaBW90lp/tztQyWWiQOIsr5s2XU5kszj4bRBnbEuP9gqNQbzPQ9iavF
-         +j0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVhdIxAkyMFLgl+ox5sBAi/9UEmpeVj9p1tfO4Jwvh84Hy/nGUoeSEdFwJAtFJ1hASs5bIDtqg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyVj6N8LXoXSECq/Rw0j4MBJheMQ1CY+RDWV5UUsJLD3wJg2KUK
-	bFCLo6H4oCKj8n2htfKfkwg9F29If+xFXHFxLmAewEcW7FcoEwhiiqhJtqh7BAglEBY6wwFewsY
-	9HJb0LIKcrDbe5sQwGPWJdCdCjA==
-X-Google-Smtp-Source: AGHT+IGcsfYXq37Q6WkECHaXfuTpZ4xUC2MHD5EzXhz1ZNa8q/Bm5uigtDkeVAlpUUfariaZ73ybTmOi3F0pZZ07NA==
-X-Received: from ioxw3.prod.google.com ([2002:a05:6602:5c3:b0:86c:9981:d21d])
+        bh=BZ8dG4IcFoEafWjbI5Tl7HqmjBNXuoxF6820bVcH07Q=;
+        b=hOt6WDntvj6oHSiGwVkfkHiyvevHHLv93+ufCpUwsffqtR0OIJQaIT1MRB7iH3d5pk
+         GjAzjwOb43kjG0gj6M/6MZqRdfREZ4+Y2qUKn34kuN8hdFIvvSKB1Ne4tzv5r+PxyXFK
+         8qy2xp3bhFv97col8b1ZGZCbjChcnPb2uqOQzvo0OYBTpGdzADP8W3mHINyIDPMZH8Q9
+         +EFrPWs2OX6/R3s2DBLaOpvfzPPVj+odbhcP5vr6qe6saD/74lWrecnfT+n1pDerJhn/
+         dAf5f4GeKrj+0OqGXXNhbtcMLt/+e0t7bHfJmOu2j9QPx69TY9L1c2qM9mhB/TLIFpy8
+         Ixiw==
+X-Forwarded-Encrypted: i=1; AJvYcCUnJsZ74XFqOb1tb+F35VXZEH4bY16FbyPWFk+q3rRNgFaPHeSIY/Q/FVl3KI70vZJ6eVJvXwg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxhjWcZ45TbSafzcHasc/3YF5d/nYwk0Y4FHDHvv+SOWziyP2xF
+	EoJe2ePZuimmqgDhGr1Mz8eIDWsC/17c4B9IJSkyyI5/KjmqsVkAr7nCLWMCqnSpP2r+wbl75Jk
+	32s2YvK8Yzn1gwJTGDctyB7rDBA==
+X-Google-Smtp-Source: AGHT+IGJW+F7N+Qps6LoDsgu+dPhKH89vA9SG/aNNYSKUKGt/XO72mo40SLlz3/qQJipXch8VyxKlGUxhSMvINEeyA==
+X-Received: from iove26.prod.google.com ([2002:a05:6602:45a:b0:861:c7b1:d848])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6602:3411:b0:876:b17c:dec3 with SMTP id ca18e2360f4ac-879af05ab13mr188823039f.8.1752533978200;
- Mon, 14 Jul 2025 15:59:38 -0700 (PDT)
-Date: Mon, 14 Jul 2025 22:59:02 +0000
+ 2002:a05:6602:6d03:b0:86c:cf7e:d85d with SMTP id ca18e2360f4ac-8797888c692mr1676383639f.12.1752533980153;
+ Mon, 14 Jul 2025 15:59:40 -0700 (PDT)
+Date: Mon, 14 Jul 2025 22:59:04 +0000
 In-Reply-To: <20250714225917.1396543-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250714225917.1396543-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250714225917.1396543-9-coltonlewis@google.com>
-Subject: [PATCH v4 08/23] KVM: arm64: Introduce non-UNDEF FGT control
+Message-ID: <20250714225917.1396543-11-coltonlewis@google.com>
+Subject: [PATCH v4 10/23] KVM: arm64: Writethrough trapped PMEVTYPER register
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -71,80 +71,64 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
-	Colton Lewis <coltonlewis@google.com>
+	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Mark Brown <broonie@kernel.org>
+With FGT in place, the remaining trapped registers need to be written
+through to the underlying physical registers as well as the virtual
+ones. Failing to do this means delaying when guest writes take effect.
 
-We have support for determining a set of fine grained traps to enable for
-the guest which is tied to the support for injecting UNDEFs for undefined
-features. This means that we can't use the mechanism for system registers
-which should be present but need emulation, such as SMPRI_EL1 which should
-be accessible when SME is present but if SME priority support is absent
-SMPRI_EL1.Priority should be RAZ.
-
-Add an additional set of fine grained traps fgt, mirroring the existing fgu
-array. We use the same format where we always set the bit for the trap in
-the array as for FGU. This makes it clear what is being explicitly managed
-and keeps the code consistent.
-
-We do not convert the handling of ARM_WORKAROUND_AMPERE_ACO3_CPU_38 to this
-mechanism since this only enables a write trap and when implementing the
-existing UNDEF that we would share the read and write trap enablement (this
-being the overwhelmingly common case).
-
-Signed-off-by: Mark Brown <broonie@kernel.org>
-[Removed unused vcpu argument from macro]
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h       | 6 ++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 7 ++++---
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 92d672429233..f705eb4538c3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -301,6 +301,12 @@ struct kvm_arch {
- 	 */
- 	u64 fgu[__NR_FGT_GROUP_IDS__];
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index b3f97980b11f..704e5d45ce52 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1036,6 +1036,30 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
  
-+	/*
-+	 * Additional FGTs to enable for the guests, eg. for emulated
-+	 * registers,
-+	 */
-+	u64 fgt[__NR_FGT_GROUP_IDS__];
++static bool writethrough_pmevtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++				   u64 reg, u64 idx)
++{
++	u64 eventsel;
 +
- 	/*
- 	 * Stage 2 paging state for VMs with nested S2 using a virtual
- 	 * VMID.
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 7599844908c0..7fe5b087c95a 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -153,9 +153,9 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- 		id;							\
- 	})
++	if (idx == ARMV8_PMU_CYCLE_IDX)
++		eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
++	else
++		eventsel = p->regval & kvm_pmu_evtyper_mask(vcpu->kvm);
++
++	if (vcpu->kvm->arch.pmu_filter &&
++	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
++		return false;
++
++	__vcpu_assign_sys_reg(vcpu, reg, eventsel);
++
++	if (idx == ARMV8_PMU_CYCLE_IDX)
++		write_pmccfiltr(eventsel);
++	else
++		write_pmevtypern(idx, eventsel);
++
++	return true;
++}
++
+ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			       const struct sys_reg_desc *r)
+ {
+@@ -1062,7 +1086,9 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	if (!pmu_counter_idx_valid(vcpu, idx))
+ 		return false;
  
--#define compute_undef_clr_set(vcpu, kvm, reg, clr, set)			\
-+#define compute_trap_clr_set(kvm, trap, reg, clr, set)			\
- 	do {								\
--		u64 hfg = kvm->arch.fgu[reg_to_fgt_group_id(reg)];	\
-+		u64 hfg = kvm->arch.trap[reg_to_fgt_group_id(reg)];	\
- 		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
- 		set |= hfg & m->mask;					\
- 		clr |= hfg & m->nmask;					\
-@@ -171,7 +171,8 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- 		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu))		\
- 			compute_clr_set(vcpu, reg, c, s);		\
- 									\
--		compute_undef_clr_set(vcpu, kvm, reg, c, s);		\
-+		compute_trap_clr_set(kvm, fgu, reg, c, s);		\
-+		compute_trap_clr_set(kvm, fgt, reg, c, s);		\
- 									\
- 		val = m->nmask;						\
- 		val |= s;						\
+-	if (p->is_write) {
++	if (kvm_vcpu_pmu_is_partitioned(vcpu) && p->is_write) {
++		writethrough_pmevtyper(vcpu, p, reg, idx);
++	} else if (p->is_write) {
+ 		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
+ 		kvm_vcpu_pmu_restore_guest(vcpu);
+ 	} else {
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
