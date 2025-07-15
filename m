@@ -1,190 +1,194 @@
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1ABB2749DA
-	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 08:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060671D5ABA;
+	Tue, 15 Jul 2025 08:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752567275; cv=none; b=oZcpUkv5QB7ITbT/mKIYNzDDWBLSKZ9+cHWc/FpaiMd7BQcoim7d7udl7m+Qr0BHAgeECDc7wl1TXVy59egEHAvJkdStPZ1rpZBubITJav9/JfRuI4vAekPn1CBdl+e+0l56jXIKm5p22HE7Iom7S6pV+pHuhzC557Y3ZD1wz/0=
+	t=1752568282; cv=none; b=u8SR3XxCSa8wI3xSW3RqfsdydfawdCwdPJ0vHQuRPiVFQSZemSRYpJ/mbsvWXH2dMR+/emEynpOnr0AM3Tnx4D9uX6ca+DkVnuBeQ69liK3MZGeLqzHIRMhK8y275Ds2AumYoiL2g2kcG3odNin+HFPLcP41B0dv6IjdiaTJEaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752567275; c=relaxed/simple;
-	bh=YX5yK9dgZEEpUwn+6ePHgBtfY/+RAMpBL6wfjM/LHK8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OhxVaYuZcjTJ3cYEmY7X1jKOYA3hchdc0NvVyJFYWTc9e8BPLeehkhbe+eUTecoYkWZ+PTr0ipay52+HSzAU5p9rvm27mySVqX2ymx4EooZhoDSQkN9+igalht7JJcYqhdMME9JZDvOTc+T/CmNFoKYFGTVLID55dkbvoq5hwWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bhBnm5VgXz27j0j;
-	Tue, 15 Jul 2025 16:15:24 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id F36541A016C;
-	Tue, 15 Jul 2025 16:14:25 +0800 (CST)
-Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 15 Jul 2025 16:14:25 +0800
-Received: from localhost.localdomain (10.50.165.33) by
- kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 15 Jul 2025 16:14:24 +0800
-From: Yicong Yang <yangyicong@huawei.com>
-To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <corbet@lwn.net>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, <linux-doc@vger.kernel.org>
-CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
-	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>,
-	<tangchengchang@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH v4 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
-Date: Tue, 15 Jul 2025 16:13:56 +0800
-Message-ID: <20250715081356.12442-8-yangyicong@huawei.com>
-X-Mailer: git-send-email 2.31.0
-In-Reply-To: <20250715081356.12442-1-yangyicong@huawei.com>
-References: <20250715081356.12442-1-yangyicong@huawei.com>
+	s=arc-20240116; t=1752568282; c=relaxed/simple;
+	bh=vc8sRdp2JkS0f6MKjzIVxwH/P9BFLMdE+QPnjQlwYQI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kiAzgo9VlsuAL7xvw52fDaRjjWcfKS2XOR67QmG+pyE+c0inFb5phMcFYS3V/jNsz04HPSzbGQTjrQNuWRDeM2ZvnLs/MoPo2/ieatIgBF1/Zydpq/2tfph5npuEgJlDaHSXP3SCPzuDKHOnubyE6ADVM6PM0Ocpaj4M8dWwn8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlNIijNk; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlNIijNk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3FCC4CEE3;
+	Tue, 15 Jul 2025 08:31:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752568281;
+	bh=vc8sRdp2JkS0f6MKjzIVxwH/P9BFLMdE+QPnjQlwYQI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LlNIijNklPQOePOENYJKmMSyRYEpLVgmZUM+p2trP4XEl+EVWsWzniSK914ybz6Nq
+	 Kndd87u/GPxZMCK7WuuBwYoQrdwOPrFPUML6HFiUF4+is3D/ZJJF4wXUgGx/Si4DL5
+	 /RUg6+TYDFsEDievEqzV1QD6KK6WFMXGvzAoICOrl7tBLpxzexv0vx0eDFbk+LWzsQ
+	 nURsAZx2+jLx7hWOKZ4vU+Qkh8zpyelO/M+3Kt3xcJGXmY833vC4p7+T6WhmNMIa1Q
+	 GJNmYJpk4A7p6L7iOJWUIk1T2Pi4FcXwUVw5+EQfV7g0fUd5wCJQm1e47XHvt4S87z
+	 VEJjqpPrdWBkQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ubb4I-00Fndi-N4;
+	Tue, 15 Jul 2025 09:31:18 +0100
+Date: Tue, 15 Jul 2025 09:31:18 +0100
+Message-ID: <86zfd597op.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
+Subject: Re: [PATCH] KVM: arm64: Clear pending exception state before injecting a new one
+In-Reply-To: <aHX6XXhSSnHL_T1d@linux.dev>
+References: <20250714144636.3569479-1-maz@kernel.org>
+	<aHX6XXhSSnHL_T1d@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemq200018.china.huawei.com (7.202.195.108)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Yicong Yang <yangyicong@hisilicon.com>
+On Tue, 15 Jul 2025 07:51:09 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey,
+> 
+> On Mon, Jul 14, 2025 at 03:46:36PM +0100, Marc Zyngier wrote:
+> > Repeatedly injecting an exception from userspace without running
+> > the vcpu between calls results in a nasty warning, as we're not
+> > really keen on losing already pending exceptions.
+> > 
+> > But this precaution doesn't really apply to userspace, who can
+> > do whatever it wants (within reason). So let's simply clear any
+> > previous exception state before injecting a new one.
+> > 
+> > Note that this is done unconditionally, even if the injection
+> > ultimately fails.
+> > 
+> > Reported-by: syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Thanks for taking a look at this. I think the correct fix is a bit more
+> involved, as:
+> 
+>  - ABI prior to my patches allowed dumb things like injecting both an
+>    SEA and SError from the same ioctl. With your patch I think you could
+>    still get the warning to fire with serror_pending && ext_dabt_pending
+> 
+>  - KVM_GET_VCPU_EVENTS is broken for 'pending' SEAs, as we assume
+>    they're committed in the vCPU state immediately when they're actually
+>    deferred to the next KVM_RUN.
+> 
+> I thoroughly hate the fix I have but it should address both of these
+> issues. Although the pending PC adjustment flags seem more like a
+> liability than anything else if ioctls need to flush them before
+> returning to userspace. Might look at a larger cleanup down the road.
+> 
+> Thanks,
+> Oliver
+> 
+> From 149262689dfe881542f5c5b60f9ee308a00f0596 Mon Sep 17 00:00:00 2001
+> From: Oliver Upton <oliver.upton@linux.dev>
+> Date: Mon, 14 Jul 2025 23:25:07 -0700
+> Subject: [PATCH] KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS
+>  immediately
+> 
+> syzkaller has found that it can trip a warning in KVM's exception
+> emulation infrastructure by repeatedly injecting exceptions into the
+> guest.
+> 
+> While it's unlikely that a reasonable VMM will do this, further
+> investigation of the issue reveals that KVM can potentially discard the
+> "pending" SEA state. While the handling of KVM_GET_VCPU_EVENTS presumes
+> that userspace-injected SEAs are realized immediately, in reality the
+> emulated exception entry is deferred until the next call to KVM_RUN.
+> 
+> Hack-a-fix the immediate issues by committing the pending exceptions to
+> the vCPU's architectural state immediately in KVM_SET_VCPU_EVENTS. This
+> is no different to the way KVM-injected exceptions are handled in
+> KVM_RUN where we potentially call __kvm_adjust_pc() before returning to
+> userspace.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/guest.c | 28 +++++++++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index e2702718d56d..16ba5e9ac86c 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -834,6 +834,19 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +static void commit_pending_events(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
+> +		return;
+> +
+> +	/*
+> +	 * Reset the MMIO emulation state to avoid stepping PC after emulating
+> +	 * the exception entry.
+> +	 */
+> +	vcpu->mmio_needed = false;
+> +	kvm_call_hyp(__kvm_adjust_pc, vcpu);
+> +}
+> +
+>  int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  			      struct kvm_vcpu_events *events)
+>  {
+> @@ -843,8 +856,15 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  	u64 esr = events->exception.serror_esr;
+>  	int ret = 0;
+>  
+> -	if (ext_dabt_pending)
+> +	/*
+> +	 * Immediately commit the pending SEA to the vCPU's architectural
+> +	 * state which is necessary since we do not return a pending SEA
+> +	 * to userspace via KVM_GET_VCPU_EVENTS.
+> +	 */
+> +	if (ext_dabt_pending) {
+>  		ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +		commit_pending_events(vcpu);
+> +	}
+>  
+>  	if (ret < 0)
+>  		return ret;
+> @@ -863,6 +883,12 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  	else
+>  		ret = kvm_inject_serror(vcpu);
+>  
+> +	/*
+> +	 * We could've decided that the SError is due for immediate software
+> +	 * injection; commit the exception in case userspace decides it wants
+> +	 * to inject more exceptions for some strange reason.
+> +	 */
+> +	commit_pending_events(vcpu);
+>  	return (ret < 0) ? ret : 0;
+>  }
 
-Add tests for FEAT_{LS64, LS64_V}. Issue related instructions
-if feature presents, no SIGILL should be received. When such
-instructions operate on Device memory or non-cacheable memory,
-we may received a SIGBUS during the test (w/o FEAT_LS64WB).
-Just ignore it since we only tested whether the instruction
-itself can be issued as expected on platforms declaring the
-support of such features.
+Yup, this seems looks reasonable. I would have liked the commit helper
+to be used just before vcpu_put(), but obviously, that's not the right
+thing to do because of the mmio_needed field.
 
-Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
----
- tools/testing/selftests/arm64/abi/hwcap.c | 90 +++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-index 35f521e5f41c..e1724f038cc1 100644
---- a/tools/testing/selftests/arm64/abi/hwcap.c
-+++ b/tools/testing/selftests/arm64/abi/hwcap.c
-@@ -11,6 +11,8 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
-+#include <linux/auxvec.h>
-+#include <linux/compiler.h>
- #include <sys/auxv.h>
- #include <sys/prctl.h>
- #include <asm/hwcap.h>
-@@ -578,6 +580,78 @@ static void lrcpc3_sigill(void)
- 	              : "=r" (data0), "=r" (data1) : "r" (src) :);
- }
- 
-+static void ignore_signal(int sig, siginfo_t *info, void *context)
-+{
-+	ucontext_t *uc = context;
-+
-+	uc->uc_mcontext.pc += 4;
-+}
-+
-+static void ls64_sigill(void)
-+{
-+	struct sigaction ign, old;
-+	char src[64] __aligned(64) = { 1 };
-+
-+	/*
-+	 * LS64, LS64_V require target memory to be Device/Non-cacheable (if
-+	 * FEAT_LS64WB not supported) and the completer supports these
-+	 * instructions, otherwise we'll receive a SIGBUS. Since we are only
-+	 * testing the ABI here, so just ignore the SIGBUS and see if we can
-+	 * execute the instructions without receiving a SIGILL. Restore the
-+	 * handler of SIGBUS after this test.
-+	 */
-+	ign.sa_sigaction = ignore_signal;
-+	ign.sa_flags = SA_SIGINFO | SA_RESTART;
-+	sigemptyset(&ign.sa_mask);
-+	sigaction(SIGBUS, &ign, &old);
-+
-+	register void *xn asm ("x8") = src;
-+	register u64 xt_1 asm ("x0");
-+	register u64 __maybe_unused xt_2 asm ("x1");
-+	register u64 __maybe_unused xt_3 asm ("x2");
-+	register u64 __maybe_unused xt_4 asm ("x3");
-+	register u64 __maybe_unused xt_5 asm ("x4");
-+	register u64 __maybe_unused xt_6 asm ("x5");
-+	register u64 __maybe_unused xt_7 asm ("x6");
-+	register u64 __maybe_unused xt_8 asm ("x7");
-+
-+	/* LD64B x0, [x8] */
-+	asm volatile(".inst 0xf83fd100" : "=r" (xt_1) : "r" (xn));
-+
-+	/* ST64B x0, [x8] */
-+	asm volatile(".inst 0xf83f9100" : : "r" (xt_1), "r" (xn));
-+
-+	sigaction(SIGBUS, &old, NULL);
-+}
-+
-+static void ls64_v_sigill(void)
-+{
-+	struct sigaction ign, old;
-+	char dst[64] __aligned(64);
-+
-+	/* See comment in ls64_sigill() */
-+	ign.sa_sigaction = ignore_signal;
-+	ign.sa_flags = SA_SIGINFO | SA_RESTART;
-+	sigemptyset(&ign.sa_mask);
-+	sigaction(SIGBUS, &ign, &old);
-+
-+	register void *xn asm ("x8") = dst;
-+	register u64 xt_1 asm ("x0") = 1;
-+	register u64 __maybe_unused xt_2 asm ("x1") = 2;
-+	register u64 __maybe_unused xt_3 asm ("x2") = 3;
-+	register u64 __maybe_unused xt_4 asm ("x3") = 4;
-+	register u64 __maybe_unused xt_5 asm ("x4") = 5;
-+	register u64 __maybe_unused xt_6 asm ("x5") = 6;
-+	register u64 __maybe_unused xt_7 asm ("x6") = 7;
-+	register u64 __maybe_unused xt_8 asm ("x7") = 8;
-+	register u64 st   asm ("x9");
-+
-+	/* ST64BV x9, x0, [x8] */
-+	asm volatile(".inst 0xf829b100" : "=r" (st) : "r" (xt_1), "r" (xn));
-+
-+	sigaction(SIGBUS, &old, NULL);
-+}
-+
- static const struct hwcap_data {
- 	const char *name;
- 	unsigned long at_hwcap;
-@@ -1098,6 +1172,22 @@ static const struct hwcap_data {
- 		.sigill_fn = hbc_sigill,
- 		.sigill_reliable = true,
- 	},
-+	{
-+		.name = "LS64",
-+		.at_hwcap = AT_HWCAP3,
-+		.hwcap_bit = HWCAP3_LS64,
-+		.cpuinfo = "ls64",
-+		.sigill_fn = ls64_sigill,
-+		.sigill_reliable = true,
-+	},
-+	{
-+		.name = "LS64_V",
-+		.at_hwcap = AT_HWCAP3,
-+		.hwcap_bit = HWCAP3_LS64_V,
-+		.cpuinfo = "ls64_v",
-+		.sigill_fn = ls64_v_sigill,
-+		.sigill_reliable = true,
-+	},
- };
- 
- typedef void (*sighandler_fn)(int, siginfo_t *, void *);
+	M.
+
 -- 
-2.24.0
-
+Without deviation from the norm, progress is not possible.
