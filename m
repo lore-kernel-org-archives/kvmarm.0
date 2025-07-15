@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93054275AF2
-	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 09:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833372DE6E3
+	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 09:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752572071; cv=none; b=Mj4L6JG/byidA3ogxmlPrQqL7KC4hVflE2qmBxvFZYpUJJZabxYRh3owy0uRCZZ6ZkzWAthCWBNbG5ClbnE6+Uf8HoOWnTKB24aUTn6JA3/dgyTOH0HA4mI31qmrZt7OF5zKnao/qGgjbXf8JyLrx5/3Yym/wjY0ZbTGOag4hhM=
+	t=1752572073; cv=none; b=upaM6Q+xvYSofuHDtaKbIGNI9hGA5Upa4ckHjYYiIlE1TxjjX3KPEdUi2b5CJ91wPH5N6EnQ5TRSdWW01Gw2j2Zg9n2MumcTZqvF/kN8X2Y4wFZ2nPe9FtS8RU2fntaRfmlqERY9xb6lPujtEX1wRNkumf/l4OAEdAKDsdMpPeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752572071; c=relaxed/simple;
-	bh=1w8Rf4FIk8UShH9xK6GMjNGhBeuY0pcttrOoAcb/Rxk=;
+	s=arc-20240116; t=1752572073; c=relaxed/simple;
+	bh=C3B/tCKG6OjtxxQwarA8/8UYBN4CjZQGHU0NMrczuD4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VN7r3bWePgZwsr3jaL0jMF+Z/eVmnyqcBaAwIaqeB7ZFLdOFqew/ilvzsJrsC3v4rpinigQHe6EuLvlyOvQmqXsB3t797AEEml73ihN5hO0d1GFvY1LpPK0nbHAq4aU5TY2+F06f3wKruFz5Tnvh+JnuQqkZmz3bGv6X3NGB7zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F6kZCad7; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=Bp0vnZO3rOKZ8wy9EyOrBHBvt+45GA/htiXTmKEXekM0YBJWRzBtfHZx5j6Qzvf9+oPGQ60Ym1eEU0HUW5VYEYwfIlMJ4BBWu4lS5DXej7Yhc++v7q8XL9UWkMnXBPCpvXHasDb0cioRKc8k6HBB1mDZWO0JeMs8fGJm/uYa/L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=auKnNLIg; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F6kZCad7"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45624f0be48so4830005e9.3
-        for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 02:34:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="auKnNLIg"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4561dbbcc7eso6365925e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 02:34:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752572068; x=1753176868; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1752572070; x=1753176870; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ed5EKdzH3JskFWB3i3+fISnWrXK1xmjcG1/JKwjT7fs=;
-        b=F6kZCad7LyIUD0uwCqIVcAWuH7XSJctKx5AtvQ0HMi1VT27WkyBoLNaBJ6vRkaot6+
-         HUoVs0AS5AHcfqnjbUZurLFBsU46jbDBTzdjyHmfFgoLy4ViZXwvNlOaK/q6599gePHV
-         k+q8fBDKZW/79yH4oGQedRT9KGIWFMiugVYaa4JlMsu8uzU3NSX4E7nlrbUnE3ss42SR
-         CunwIxE7N40WG68syluRSvhSOLXX4PiFM6G03VXnX8+h72ZVsbXMoPVmNxUAnGV5fKjt
-         GTEs7iFrgwZ2XIC1ds1RAHcysR+FIzZgFSOfbfiVueWJqBWXx2o+VNPMcWJ5UCpRRUAQ
-         ViQg==
+        bh=47rVlr8Uc/SdJ5Y2yETdFZUDua/sXacoe643TNgwpkI=;
+        b=auKnNLIgNC+F+Y0LQ0ziyzKXe6FunfRxHZsDx4S0prMesRBMwmclS7LYhOFN0kXGdV
+         36O8uB11aly6MVTSwu7rYAAkWJWODgGgUDhSqSnsgUBFdetrvxeejQ44LV+mz4JoreoX
+         Lzr6BpbcLSD56jUoi6FcoCo3PKsA92MJv59o+gyfnq3m/JAYYKn99WK0Ny9TXtQm4mvf
+         6v/4wIMWoJNeRM/VgBb63cGERVJARJHzDP18bkf1kyE+GvqPa/YuRFfrmb2fZgGboT9z
+         Wga1RV6oCEmm4umqMkh+EVOHPGRIAVctK9eyRZJv4bCo0B2CW7jQX3tiewJ2SA7+r+gr
+         Gktg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752572068; x=1753176868;
+        d=1e100.net; s=20230601; t=1752572070; x=1753176870;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ed5EKdzH3JskFWB3i3+fISnWrXK1xmjcG1/JKwjT7fs=;
-        b=Mo0cGMj6efQjqGGcGpjD9kiG06zo9e8O+EPH/FdcfhqkGFAx0pzPobBx3bpJC1qrYp
-         xECYeJoF6NP0ESj2ndk0HKW4Zy760y0BZbqomTzdBrcigwoKQoizUpq0JKri+QSZB+j1
-         FpPGoF/9NfSlj29F+nxaio1qmKI4FHBkvD2S3LTD8+e79f0zKSn+GAvTOb003hH4n09U
-         qHZ5U2GN37fs0BReahlwh5AY1mcV6Ntbgy9bZEyUWozymVDX3ef1iq0dYrF1OicrKRxh
-         J5/kK2Cj/saZaaeo8CZ4I1Np6P56CtqSx1VH1V4vQ+j3GCtneFTxh0HvcMjtrEVDo6vv
-         pueA==
-X-Forwarded-Encrypted: i=1; AJvYcCXsznV4Ovrb7dPA1+rLaFlMFSshF4RkGN8XxMFCwgGUbrcdACrg42aXUpO/ZLFBaSk6rGcjsSk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxlIc3Olhzp18EXGqYyKtLfit3hEgaHpdUIWOhXcBrS96QtKXTl
-	yDAqnKOxETZX8j0zs2/N96DXoH9Ap2tB46VWRo5vJTQcmWyWyZ+GUaj1hzHMnRMcGPIEbpEDYtp
-	8bQ==
-X-Google-Smtp-Source: AGHT+IGBogaOn/a2nRCbQgtEGBqaMIjNeCnMyNgJrpcQg8cMebuy76dboaZmnJsfg8PNbJXBbdCUps7GZQ==
-X-Received: from wmbes26.prod.google.com ([2002:a05:600c:811a:b0:456:217f:2625])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:34c5:b0:43c:fe5e:f040
- with SMTP id 5b1f17b1804b1-45565edc8f4mr129943955e9.23.1752572067858; Tue, 15
- Jul 2025 02:34:27 -0700 (PDT)
-Date: Tue, 15 Jul 2025 10:33:46 +0100
+        bh=47rVlr8Uc/SdJ5Y2yETdFZUDua/sXacoe643TNgwpkI=;
+        b=rcXExamGssrnxckHTJEdHl2h1DLn6jDxD5mM2GzZYvZANg3PlIDgFf7hghAX750Fu0
+         kKyDFn+PNauerQsQEHVMc9ZU4nVOhQNlMaxdvBXQfstwacF2WEFufW40miP1yOoKNnNQ
+         FtYBL5giiAuS4ZeaQNpHTJOItIj54gZaKTqp73ZtRxIFaVqCUqPt579UFwcH0dNBYnnH
+         Yvhcvr85TOBheIy7rNTggQZVIMrn/uhaTj0M0zz688Coq+lXWrB+Z5tUv5K/xJ3Zre2S
+         dH8bf+O3tht+DR0uPl80h2NkC4hGEnDXkuMc3o/RzJUkjU8QiZEqBjbe0EfoyMp7Cs0b
+         6faQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV1N9jsSvOL9hUHH8x4bvRAUc+zNXXNJxTfqxuds/97zlSkpx70XsJTV/RWt+9wcwshRuaRP7o=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy2JqILbn/FuNIfKeD5VJQIy34byK6L0z70g+gbSrjalIs01VpV
+	iH9OiS3BAVBEMafZFWE1GVKR1zEUxtG668TJXbO8303CcWQjfaYrdcdHLcBu+uptuu6eKX2dhRJ
+	pSA==
+X-Google-Smtp-Source: AGHT+IGZGGp1NFdrhGIBj0xIFeHETS5Eg5RNZf/7w6Lo5N/3yqifjyWC27FTYp2tf115ynIZyMvpUL2uow==
+X-Received: from wmbdr14.prod.google.com ([2002:a05:600c:608e:b0:456:15bd:a297])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3b17:b0:455:fc16:9eb3
+ with SMTP id 5b1f17b1804b1-455fc16a2ccmr100761475e9.33.1752572070039; Tue, 15
+ Jul 2025 02:34:30 -0700 (PDT)
+Date: Tue, 15 Jul 2025 10:33:47 +0100
 In-Reply-To: <20250715093350.2584932-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250715093350.2584932-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250715093350.2584932-18-tabba@google.com>
-Subject: [PATCH v14 17/21] KVM: arm64: nv: Handle VNCR_EL2-triggered faults
- backed by guest_memfd
+Message-ID: <20250715093350.2584932-19-tabba@google.com>
+Subject: [PATCH v14 18/21] KVM: arm64: Enable host mapping of shared
+ guest_memfd memory
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev
@@ -87,107 +87,86 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	ira.weiny@intel.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Handle faults for memslots backed by guest_memfd in arm64 nested
-virtualization triggerred by VNCR_EL2.
+Enable host userspace mmap support for guest_memfd-backed memory on
+arm64. This change provides arm64 with the capability to map guest
+memory at the host directly from guest_memfd:
 
-* Introduce is_gmem output parameter to kvm_translate_vncr(), indicating
-  whether the faulted memory slot is backed by guest_memfd.
+* Define kvm_arch_supports_gmem_mmap() for arm64: The
+  kvm_arch_supports_gmem_mmap() macro is defined for arm64 to be true if
+  CONFIG_KVM_GMEM_SUPPORTS_MMAP is enabled. For existing arm64 KVM VM
+  types that support guest_memfd, this enables them to use guest_memfd
+  with host userspace mappings. This provides a consistent behavior as
+  there are currently no arm64 CoCo VMs that rely on guest_memfd solely
+  for private, non-mappable memory. Future arm64 VM types can override
+  or restrict this behavior via the kvm_arch_supports_gmem_mmap() hook
+  if needed.
 
-* Dispatch faults backed by guest_memfd to kvm_gmem_get_pfn().
+* Select CONFIG_KVM_GMEM_SUPPORTS_MMAP in arm64 Kconfig.
 
-* Update kvm_handle_vncr_abort() to handle potential guest_memfd errors.
-  Some of the guest_memfd errors need to be handled by userspace,
-  instead of attempting to (implicitly) retry by returning to the guest.
+* Enforce KVM_MEMSLOT_GMEM_ONLY for guest_memfd on arm64: Checks are
+  added to ensure that if guest_memfd is enabled on arm64,
+  KVM_GMEM_SUPPORTS_MMAP must also be enabled. This means
+  guest_memfd-backed memory slots on arm64 are currently only supported
+  if they are intended for shared memory use cases (i.e.,
+  kvm_memslot_is_gmem_only() is true). This design reflects the current
+  arm64 KVM ecosystem where guest_memfd is primarily being introduced
+  for VMs that support shared memory.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: James Houghton <jthoughton@google.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Acked-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/nested.c | 41 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 4 ++++
+ arch/arm64/kvm/Kconfig            | 2 ++
+ arch/arm64/kvm/mmu.c              | 7 +++++++
+ 3 files changed, 13 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index dc1d26559bfa..b3edd7f7c8cd 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1172,8 +1172,9 @@ static u64 read_vncr_el2(struct kvm_vcpu *vcpu)
- 	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 48);
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3e41a880b062..63f7827cfa1b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1674,5 +1674,9 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
+ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1);
+ void check_feature_map(void);
  
--static int kvm_translate_vncr(struct kvm_vcpu *vcpu)
-+static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- {
-+	struct kvm_memory_slot *memslot;
- 	bool write_fault, writable;
- 	unsigned long mmu_seq;
- 	struct vncr_tlb *vt;
-@@ -1216,10 +1217,25 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu)
- 	smp_rmb();
++#ifdef CONFIG_KVM_GMEM
++#define kvm_arch_supports_gmem(kvm) true
++#define kvm_arch_supports_gmem_mmap(kvm) IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP)
++#endif
  
- 	gfn = vt->wr.pa >> PAGE_SHIFT;
--	pfn = kvm_faultin_pfn(vcpu, gfn, write_fault, &writable, &page);
--	if (is_error_noslot_pfn(pfn) || (write_fault && !writable))
-+	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-+	if (!memslot)
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 713248f240e0..323b46b7c82f 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -37,6 +37,8 @@ menuconfig KVM
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
++	select KVM_GMEM
++	select KVM_GMEM_SUPPORTS_MMAP
+ 	help
+ 	  Support hosting virtualized guest machines.
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8c82df80a835..85559b8a0845 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2276,6 +2276,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	if ((new->base_gfn + new->npages) > (kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT))
  		return -EFAULT;
  
-+	*is_gmem = kvm_slot_has_gmem(memslot);
-+	if (!*is_gmem) {
-+		pfn = __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
-+					&writable, &page);
-+		if (is_error_noslot_pfn(pfn) || (write_fault && !writable))
-+			return -EFAULT;
-+	} else {
-+		ret = kvm_gmem_get_pfn(vcpu->kvm, memslot, gfn, &pfn, &page, NULL);
-+		if (ret) {
-+			kvm_prepare_memory_fault_exit(vcpu, vt->wr.pa, PAGE_SIZE,
-+					      write_fault, false, false);
-+			return ret;
-+		}
-+	}
++	/*
++	 * Only support guest_memfd backed memslots with mappable memory, since
++	 * there aren't any CoCo VMs that support only private memory on arm64.
++	 */
++	if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
++		return -EINVAL;
 +
- 	scoped_guard(write_lock, &vcpu->kvm->mmu_lock) {
- 		if (mmu_invalidate_retry(vcpu->kvm, mmu_seq))
- 			return -EAGAIN;
-@@ -1292,23 +1308,36 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
- 	if (esr_fsc_is_permission_fault(esr)) {
- 		inject_vncr_perm(vcpu);
- 	} else if (esr_fsc_is_translation_fault(esr)) {
--		bool valid;
-+		bool valid, is_gmem = false;
- 		int ret;
+ 	hva = new->userspace_addr;
+ 	reg_end = hva + (new->npages << PAGE_SHIFT);
  
- 		scoped_guard(read_lock, &vcpu->kvm->mmu_lock)
- 			valid = kvm_vncr_tlb_lookup(vcpu);
- 
- 		if (!valid)
--			ret = kvm_translate_vncr(vcpu);
-+			ret = kvm_translate_vncr(vcpu, &is_gmem);
- 		else
- 			ret = -EPERM;
- 
- 		switch (ret) {
- 		case -EAGAIN:
--		case -ENOMEM:
- 			/* Let's try again... */
- 			break;
-+		case -ENOMEM:
-+			/*
-+			 * For guest_memfd, this indicates that it failed to
-+			 * create a folio to back the memory. Inform userspace.
-+			 */
-+			if (is_gmem)
-+				return 0;
-+			/* Otherwise, let's try again... */
-+			break;
- 		case -EFAULT:
-+		case -EIO:
-+		case -EHWPOISON:
-+			if (is_gmem)
-+				return 0;
-+			fallthrough;
- 		case -EINVAL:
- 		case -ENOENT:
- 		case -EACCES:
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
