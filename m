@@ -1,33 +1,33 @@
 Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044BB26E70A
-	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 08:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1ABB2749DA
+	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 08:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752567274; cv=none; b=hCsaS9UbreSw3uzDHAw/tqtx8lWJGY9hgjxMlX4raEHFesTUBUVHPa1rqlH+LqR9vVOUg4NFGOsPvXVSaVVH4KVnPW+wjqENnDHt+mvET8OFr1aSgFlzvAurMar6wOSdWvyKVU6PPT3sePSogYuiWCNi/8RJiNI+ladWpbP6XxE=
+	t=1752567275; cv=none; b=oZcpUkv5QB7ITbT/mKIYNzDDWBLSKZ9+cHWc/FpaiMd7BQcoim7d7udl7m+Qr0BHAgeECDc7wl1TXVy59egEHAvJkdStPZ1rpZBubITJav9/JfRuI4vAekPn1CBdl+e+0l56jXIKm5p22HE7Iom7S6pV+pHuhzC557Y3ZD1wz/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752567274; c=relaxed/simple;
-	bh=2ABaFpblycNz033yfjoXuPdb0ZWsPgWDWDlb6tufOqw=;
+	s=arc-20240116; t=1752567275; c=relaxed/simple;
+	bh=YX5yK9dgZEEpUwn+6ePHgBtfY/+RAMpBL6wfjM/LHK8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pKoHTZREfengK9Ekrs3cQ9SLk+96SvppWpAyaEscBRi6kFU8noSGpA1AfYfmWMuBs/OhRbgLFFOFoJPIi4xsQoTs/+2Mc8paOsop+mHZq3lxVJyzTr8M/dl1JE62PZGiz/PaeNfOoqLX/hsOjfnG16w3U1r2DaCS3QoRwjR0Il4=
+	 MIME-Version:Content-Type; b=OhxVaYuZcjTJ3cYEmY7X1jKOYA3hchdc0NvVyJFYWTc9e8BPLeehkhbe+eUTecoYkWZ+PTr0ipay52+HSzAU5p9rvm27mySVqX2ymx4EooZhoDSQkN9+igalht7JJcYqhdMME9JZDvOTc+T/CmNFoKYFGTVLID55dkbvoq5hwWc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bhBnk4DH1z27j0b;
-	Tue, 15 Jul 2025 16:15:22 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bhBnm5VgXz27j0j;
+	Tue, 15 Jul 2025 16:15:24 +0800 (CST)
 Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id C9FF014022E;
-	Tue, 15 Jul 2025 16:14:23 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id F36541A016C;
+	Tue, 15 Jul 2025 16:14:25 +0800 (CST)
 Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
  dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 15 Jul 2025 16:14:23 +0800
+ 15.2.1544.11; Tue, 15 Jul 2025 16:14:25 +0800
 Received: from localhost.localdomain (10.50.165.33) by
  kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 15 Jul 2025 16:14:22 +0800
+ 15.2.1544.11; Tue, 15 Jul 2025 16:14:24 +0800
 From: Yicong Yang <yangyicong@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <corbet@lwn.net>,
@@ -38,9 +38,9 @@ CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
 	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>,
 	<tangchengchang@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH v4 4/7] arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
-Date: Tue, 15 Jul 2025 16:13:53 +0800
-Message-ID: <20250715081356.12442-5-yangyicong@huawei.com>
+Subject: [PATCH v4 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
+Date: Tue, 15 Jul 2025 16:13:56 +0800
+Message-ID: <20250715081356.12442-8-yangyicong@huawei.com>
 X-Mailer: git-send-email 2.31.0
 In-Reply-To: <20250715081356.12442-1-yangyicong@huawei.com>
 References: <20250715081356.12442-1-yangyicong@huawei.com>
@@ -57,44 +57,134 @@ X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
 
 From: Yicong Yang <yangyicong@hisilicon.com>
 
-Instructions introduced by FEAT_{LS64, LS64_V} is controlled by
-HCRX_EL2.{EnALS, EnASR}. Configure all of these to allow usage
-at EL0/1.
-
-This doesn't mean these instructions are always available in
-EL0/1 if provided. The hypervisor still have the control at
-runtime.
+Add tests for FEAT_{LS64, LS64_V}. Issue related instructions
+if feature presents, no SIGILL should be received. When such
+instructions operate on Device memory or non-cacheable memory,
+we may received a SIGBUS during the test (w/o FEAT_LS64WB).
+Just ignore it since we only tested whether the instruction
+itself can be issued as expected on platforms declaring the
+support of such features.
 
 Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 ---
- arch/arm64/include/asm/el2_setup.h | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tools/testing/selftests/arm64/abi/hwcap.c | 90 +++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 9f38340d24c2..46e085af7c98 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -57,9 +57,19 @@
-         /* Enable GCS if supported */
- 	mrs_s	x1, SYS_ID_AA64PFR1_EL1
- 	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
--	cbz	x1, .Lset_hcrx_\@
-+	cbz	x1, .Lskip_gcs_hcrx_\@
- 	orr	x0, x0, #HCRX_EL2_GCSEn
+diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
+index 35f521e5f41c..e1724f038cc1 100644
+--- a/tools/testing/selftests/arm64/abi/hwcap.c
++++ b/tools/testing/selftests/arm64/abi/hwcap.c
+@@ -11,6 +11,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <linux/auxvec.h>
++#include <linux/compiler.h>
+ #include <sys/auxv.h>
+ #include <sys/prctl.h>
+ #include <asm/hwcap.h>
+@@ -578,6 +580,78 @@ static void lrcpc3_sigill(void)
+ 	              : "=r" (data0), "=r" (data1) : "r" (src) :);
+ }
  
-+.Lskip_gcs_hcrx_\@:
-+	/* Enable LS64, LS64_V if supported */
-+	mrs_s	x1, SYS_ID_AA64ISAR1_EL1
-+	ubfx	x1, x1, #ID_AA64ISAR1_EL1_LS64_SHIFT, #4
-+	cbz	x1, .Lset_hcrx_\@
-+	orr	x0, x0, #HCRX_EL2_EnALS
-+	cmp	x1, #ID_AA64ISAR1_EL1_LS64_LS64_V
-+	b.lt	.Lset_hcrx_\@
-+	orr	x0, x0, #HCRX_EL2_EnASR
++static void ignore_signal(int sig, siginfo_t *info, void *context)
++{
++	ucontext_t *uc = context;
 +
- .Lset_hcrx_\@:
- 	msr_s	SYS_HCRX_EL2, x0
- .Lskip_hcrx_\@:
++	uc->uc_mcontext.pc += 4;
++}
++
++static void ls64_sigill(void)
++{
++	struct sigaction ign, old;
++	char src[64] __aligned(64) = { 1 };
++
++	/*
++	 * LS64, LS64_V require target memory to be Device/Non-cacheable (if
++	 * FEAT_LS64WB not supported) and the completer supports these
++	 * instructions, otherwise we'll receive a SIGBUS. Since we are only
++	 * testing the ABI here, so just ignore the SIGBUS and see if we can
++	 * execute the instructions without receiving a SIGILL. Restore the
++	 * handler of SIGBUS after this test.
++	 */
++	ign.sa_sigaction = ignore_signal;
++	ign.sa_flags = SA_SIGINFO | SA_RESTART;
++	sigemptyset(&ign.sa_mask);
++	sigaction(SIGBUS, &ign, &old);
++
++	register void *xn asm ("x8") = src;
++	register u64 xt_1 asm ("x0");
++	register u64 __maybe_unused xt_2 asm ("x1");
++	register u64 __maybe_unused xt_3 asm ("x2");
++	register u64 __maybe_unused xt_4 asm ("x3");
++	register u64 __maybe_unused xt_5 asm ("x4");
++	register u64 __maybe_unused xt_6 asm ("x5");
++	register u64 __maybe_unused xt_7 asm ("x6");
++	register u64 __maybe_unused xt_8 asm ("x7");
++
++	/* LD64B x0, [x8] */
++	asm volatile(".inst 0xf83fd100" : "=r" (xt_1) : "r" (xn));
++
++	/* ST64B x0, [x8] */
++	asm volatile(".inst 0xf83f9100" : : "r" (xt_1), "r" (xn));
++
++	sigaction(SIGBUS, &old, NULL);
++}
++
++static void ls64_v_sigill(void)
++{
++	struct sigaction ign, old;
++	char dst[64] __aligned(64);
++
++	/* See comment in ls64_sigill() */
++	ign.sa_sigaction = ignore_signal;
++	ign.sa_flags = SA_SIGINFO | SA_RESTART;
++	sigemptyset(&ign.sa_mask);
++	sigaction(SIGBUS, &ign, &old);
++
++	register void *xn asm ("x8") = dst;
++	register u64 xt_1 asm ("x0") = 1;
++	register u64 __maybe_unused xt_2 asm ("x1") = 2;
++	register u64 __maybe_unused xt_3 asm ("x2") = 3;
++	register u64 __maybe_unused xt_4 asm ("x3") = 4;
++	register u64 __maybe_unused xt_5 asm ("x4") = 5;
++	register u64 __maybe_unused xt_6 asm ("x5") = 6;
++	register u64 __maybe_unused xt_7 asm ("x6") = 7;
++	register u64 __maybe_unused xt_8 asm ("x7") = 8;
++	register u64 st   asm ("x9");
++
++	/* ST64BV x9, x0, [x8] */
++	asm volatile(".inst 0xf829b100" : "=r" (st) : "r" (xt_1), "r" (xn));
++
++	sigaction(SIGBUS, &old, NULL);
++}
++
+ static const struct hwcap_data {
+ 	const char *name;
+ 	unsigned long at_hwcap;
+@@ -1098,6 +1172,22 @@ static const struct hwcap_data {
+ 		.sigill_fn = hbc_sigill,
+ 		.sigill_reliable = true,
+ 	},
++	{
++		.name = "LS64",
++		.at_hwcap = AT_HWCAP3,
++		.hwcap_bit = HWCAP3_LS64,
++		.cpuinfo = "ls64",
++		.sigill_fn = ls64_sigill,
++		.sigill_reliable = true,
++	},
++	{
++		.name = "LS64_V",
++		.at_hwcap = AT_HWCAP3,
++		.hwcap_bit = HWCAP3_LS64_V,
++		.cpuinfo = "ls64_v",
++		.sigill_fn = ls64_v_sigill,
++		.sigill_reliable = true,
++	},
+ };
+ 
+ typedef void (*sighandler_fn)(int, siginfo_t *, void *);
 -- 
 2.24.0
 
