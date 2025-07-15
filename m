@@ -1,170 +1,160 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257DD26FA50
-	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 06:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC932741C6
+	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 08:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752562294; cv=none; b=ULCO3Wybxy1XM7MX2Hkb5aLRSHeZyV/l9Ri2tevabfpzdy2ClSdGSgDd3JkmSEUZAPTko8c4h0kc7UETDcux7f6PH2P06IuyYdWzMckL8smM7DkEtlSLA3qpT9xuNRp3QHCOtCfLTOUtNZnx3+eChZQt9bDTaZoAn8t3TAAeECU=
+	t=1752567266; cv=none; b=Hg6rwA9A27Zusr3J5BsTs3nVNgLRK24HMnb9JjIp9gsmFyW1jBcsTOqkTfWPZW5nrmVFNvmJAvk7mN+BEGGHgenN4vJDoNHQx7J1+RRm+QDmp9J3M+3wrDpH8O8WAY2KFL+P2cKpYuxKuroHLMKdh+hQrwIqbYNFM1ZtpS854ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752562294; c=relaxed/simple;
-	bh=ZknCB9lutQWkJ5ii+Y5PBOLYdmgluIDDdb/Wo6JJxgI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ddYc8Uy7Jnko9CeLg475ZVrB6KQmPWykVOPvbv9LuKA45jd5AgdaZlKNtvnv+0Skg1AcdAKm3HQdjgKbhdzZjhbrUAUcGYvPHLdr3vr+t5r9MuplJaegCaUXcM+7+cusVCR0F2bFrORByLQrPPtbbSyxBngyNl6GOnO/DpLacYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o0KlhbvB; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o0KlhbvB"
-Date: Mon, 14 Jul 2025 23:51:09 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752562280;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m2RK1i7+eBOT39Iv0WjoNburedSnmTk8yWXXCGmNFM4=;
-	b=o0KlhbvB7Rx6sbzPcsB0t7Br4dB5Nl/s1EXH8SzNQJbh2P6ADQSHaoveeud4N/4q4osw/w
-	Jn85v2eNN/1nHRO3b3NtwpAKyyNE/FnNdag1U9hkdpGCItiuhfs3I9aDZdlJTt+VYr7iji
-	LEuZ7j50hjD1AIHW1+GZxT2tF/11w+A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-Subject: Re: [PATCH] KVM: arm64: Clear pending exception state before
- injecting a new one
-Message-ID: <aHX6XXhSSnHL_T1d@linux.dev>
-References: <20250714144636.3569479-1-maz@kernel.org>
+	s=arc-20240116; t=1752567266; c=relaxed/simple;
+	bh=CozvtiMQto95cQtfhxgDc1OyvEQh2kQUE6fSMraS2/I=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XQSX5onKvEmOfy+CMmwciaDyyXrQgRYSjU7cAJEiiOn1ReTU2hogn5Rltiur0S9Fj5+OTx/PwTKHnMXslFASc15ptClse3zC1asy68Myy1Dcub+RU9846STjDAyqsHQfopT37FfFNrtCibSe/w7ClhE7HaQ+AXry/Tj3Wf6PmnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bhBjM1krcz13MlX;
+	Tue, 15 Jul 2025 16:11:35 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id BF08A180B63;
+	Tue, 15 Jul 2025 16:14:21 +0800 (CST)
+Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 15 Jul 2025 16:14:21 +0800
+Received: from localhost.localdomain (10.50.165.33) by
+ kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 15 Jul 2025 16:14:20 +0800
+From: Yicong Yang <yangyicong@huawei.com>
+To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
+	<oliver.upton@linux.dev>, <corbet@lwn.net>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>, <linux-doc@vger.kernel.org>
+CC: <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
+	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <yangyicong@hisilicon.com>,
+	<tangchengchang@huawei.com>, <wangzhou1@hisilicon.com>
+Subject: [PATCH v4 1/7] KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
+Date: Tue, 15 Jul 2025 16:13:50 +0800
+Message-ID: <20250715081356.12442-2-yangyicong@huawei.com>
+X-Mailer: git-send-email 2.31.0
+In-Reply-To: <20250715081356.12442-1-yangyicong@huawei.com>
+References: <20250715081356.12442-1-yangyicong@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714144636.3569479-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemq200018.china.huawei.com (7.202.195.108)
 
-Hey,
+From: Marc Zyngier <maz@kernel.org>
 
-On Mon, Jul 14, 2025 at 03:46:36PM +0100, Marc Zyngier wrote:
-> Repeatedly injecting an exception from userspace without running
-> the vcpu between calls results in a nasty warning, as we're not
-> really keen on losing already pending exceptions.
-> 
-> But this precaution doesn't really apply to userspace, who can
-> do whatever it wants (within reason). So let's simply clear any
-> previous exception state before injecting a new one.
-> 
-> Note that this is done unconditionally, even if the injection
-> ultimately fails.
-> 
-> Reported-by: syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+The main use of {LD,ST}64B* is to talk to a device, which is hopefully
+directly assigned to the guest and requires no additional handling.
 
-Thanks for taking a look at this. I think the correct fix is a bit more
-involved, as:
+However, this does not preclude a VMM from exposing a virtual device
+to the guest, and to allow 64 byte accesses as part of the programming
+interface. A direct consequence of this is that we need to be able
+to forward such access to userspace.
 
- - ABI prior to my patches allowed dumb things like injecting both an
-   SEA and SError from the same ioctl. With your patch I think you could
-   still get the warning to fire with serror_pending && ext_dabt_pending
+Given that such a contraption is very unlikely to ever exist, we choose
+to offer a limited service: userspace gets (as part of a new exit reason)
+the ESR, the IPA, and that's it. It is fully expected to handle the full
+semantics of the instructions, deal with ACCDATA, the return values and
+increment PC. Much fun.
 
- - KVM_GET_VCPU_EVENTS is broken for 'pending' SEAs, as we assume
-   they're committed in the vCPU state immediately when they're actually
-   deferred to the next KVM_RUN.
+A canonical implementation can also simply inject an abort and be done
+with it. Frankly, don't try to do anything else unless you have time
+to waste.
 
-I thoroughly hate the fix I have but it should address both of these
-issues. Although the pending PC adjustment flags seem more like a
-liability than anything else if ioctls need to flush them before
-returning to userspace. Might look at a larger cleanup down the road.
-
-Thanks,
-Oliver
-
-From 149262689dfe881542f5c5b60f9ee308a00f0596 Mon Sep 17 00:00:00 2001
-From: Oliver Upton <oliver.upton@linux.dev>
-Date: Mon, 14 Jul 2025 23:25:07 -0700
-Subject: [PATCH] KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS
- immediately
-
-syzkaller has found that it can trip a warning in KVM's exception
-emulation infrastructure by repeatedly injecting exceptions into the
-guest.
-
-While it's unlikely that a reasonable VMM will do this, further
-investigation of the issue reveals that KVM can potentially discard the
-"pending" SEA state. While the handling of KVM_GET_VCPU_EVENTS presumes
-that userspace-injected SEAs are realized immediately, in reality the
-emulated exception entry is deferred until the next call to KVM_RUN.
-
-Hack-a-fix the immediate issues by committing the pending exceptions to
-the vCPU's architectural state immediately in KVM_SET_VCPU_EVENTS. This
-is no different to the way KVM-injected exceptions are handled in
-KVM_RUN where we potentially call __kvm_adjust_pc() before returning to
-userspace.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 ---
- arch/arm64/kvm/guest.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/mmio.c    | 27 ++++++++++++++++++++++++++-
+ include/uapi/linux/kvm.h |  3 ++-
+ 2 files changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index e2702718d56d..16ba5e9ac86c 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -834,6 +834,19 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
-+static void commit_pending_events(struct kvm_vcpu *vcpu)
-+{
-+	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
-+		return;
+diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+index ab365e839874..04520f2f6010 100644
+--- a/arch/arm64/kvm/mmio.c
++++ b/arch/arm64/kvm/mmio.c
+@@ -157,6 +157,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 	bool is_write;
+ 	int len;
+ 	u8 data_buf[8];
++	u64 esr;
 +
-+	/*
-+	 * Reset the MMIO emulation state to avoid stepping PC after emulating
-+	 * the exception entry.
-+	 */
-+	vcpu->mmio_needed = false;
-+	kvm_call_hyp(__kvm_adjust_pc, vcpu);
-+}
-+
- int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events)
- {
-@@ -843,8 +856,15 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 	u64 esr = events->exception.serror_esr;
- 	int ret = 0;
++	esr = kvm_vcpu_get_esr(vcpu);
  
--	if (ext_dabt_pending)
+ 	/*
+ 	 * No valid syndrome? Ask userspace for help if it has
+@@ -166,7 +169,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 	 * though, so directly deliver an exception to the guest.
+ 	 */
+ 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
+-		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
++		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), esr,
+ 				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
+ 
+ 		if (vcpu_is_protected(vcpu)) {
+@@ -185,6 +188,28 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 		return -ENOSYS;
+ 	}
+ 
 +	/*
-+	 * Immediately commit the pending SEA to the vCPU's architectural
-+	 * state which is necessary since we do not return a pending SEA
-+	 * to userspace via KVM_GET_VCPU_EVENTS.
++	 * When (DFSC == 0b00xxxx || DFSC == 0b10101x) && DFSC != 0b0000xx
++	 * ESR_EL2[12:11] describe the Load/Store Type. This allows us to
++	 * punt the LD64B/ST64B/ST64BV/ST64BV0 instructions to luserspace,
++	 * which will have to provide a full emulation of these 4
++	 * instructions.  No, we don't expect this do be fast.
++	 *
++	 * We rely on traps being set if the corresponding features are not
++	 * enabled, so if we get here, userspace has promised us to handle
++	 * it already.
 +	 */
-+	if (ext_dabt_pending) {
- 		ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+		commit_pending_events(vcpu);
++	switch (kvm_vcpu_trap_get_fault(vcpu)) {
++	case 0b000100 ... 0b001111:
++	case 0b101010 ... 0b101011:
++		if (FIELD_GET(GENMASK(12, 11), esr)) {
++			run->exit_reason = KVM_EXIT_ARM_LDST64B;
++			run->arm_nisv.esr_iss = esr & ~(u64)ESR_ELx_FSC;
++			run->arm_nisv.fault_ipa = fault_ipa;
++			return 0;
++		}
 +	}
++
+ 	/*
+ 	 * Prepare MMIO operation. First decode the syndrome data we get
+ 	 * from the CPU. Then try if some in-kernel emulation feels
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 7a4c35ff03fe..7169d955c3ec 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -179,6 +179,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_LOONGARCH_IOCSR  38
+ #define KVM_EXIT_MEMORY_FAULT     39
+ #define KVM_EXIT_TDX              40
++#define KVM_EXIT_ARM_LDST64B      41
  
- 	if (ret < 0)
- 		return ret;
-@@ -863,6 +883,12 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 	else
- 		ret = kvm_inject_serror(vcpu);
- 
-+	/*
-+	 * We could've decided that the SError is due for immediate software
-+	 * injection; commit the exception in case userspace decides it wants
-+	 * to inject more exceptions for some strange reason.
-+	 */
-+	commit_pending_events(vcpu);
- 	return (ret < 0) ? ret : 0;
- }
- 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -401,7 +402,7 @@ struct kvm_run {
+ 		} eoi;
+ 		/* KVM_EXIT_HYPERV */
+ 		struct kvm_hyperv_exit hyperv;
+-		/* KVM_EXIT_ARM_NISV */
++		/* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
+ 		struct {
+ 			__u64 esr_iss;
+ 			__u64 fault_ipa;
 -- 
-2.39.5
+2.24.0
+
