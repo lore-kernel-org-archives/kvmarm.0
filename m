@@ -1,55 +1,55 @@
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37392D6401
-	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 09:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94662D9EF3
+	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 09:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752572058; cv=none; b=h1SlhtMvAhHhSdWF9+fJ04yZhg1pG3oDdP+es3XRmzhkd7b7j8n2I8NHIFqo3Y7gPnCh93INBMOnO2LnXYxnhYwYWEi293/zpWBFaUopNJmqj8Ywx0hWxeE6egB1yTKrxGNoqk1T75Rvc9XmOc0HVMji/kju73OIR7EXs0G+YIw=
+	t=1752572060; cv=none; b=nexIhVdXwpjKqfq7dwzgD+8qGFeRIi3J6u4zAyEEddkQLrydcMPPk6RGoim3HohOqmnp6IDPuEnUnlQCJnwwnQv2NgNCSRVPNXXrwi+Cyxd0F9TvlZL8wz7SPm0c9pKJtp+slH1/kaODMN5NY3J283callGjCb5XVqbvLlREvj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752572058; c=relaxed/simple;
-	bh=5SFcmIaZT18BqEoeZQIYRV1Aqypru/hVXQDtZkdpxP8=;
+	s=arc-20240116; t=1752572060; c=relaxed/simple;
+	bh=xurDWAtZkL6bObNk6B6ReVIsKjxDthfj6nKjWzzTH4k=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MLmyze9bdx8FTf43DkDnLRGOBftlqp2QaedQcMKBibu0VImdbXN0rsemTUmEQ8BY/8H23TACrlCSGJ64zivFtDVREZPXWv+Sn57tafKwZCBUfAyk6JDPyUCKr2vvBs5CeBo+zK1yZyoVz7U0k8y3Q+0//79Gm7yJMd8dhqQLo40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IMr6crA4; arc=none smtp.client-ip=209.85.208.73
+	 To:Cc:Content-Type; b=jznutnTg7m8Tm8BZkixks1iZ/lOQgL0dTKm7FzJI6v4dHx0Z6c1uv6xHBT3KNkz+M0skSO6bX9SMTBKWyhwPBUxu+DvoBZg5N5Z736WilTdoht9BO0V6o1zcC0ALdbknSIoZiEziYgg+08wsdESbx365AsTIzy7+Lv1TrzYB7zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U0OTkmkF; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IMr6crA4"
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-607142010bcso3908981a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 02:34:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U0OTkmkF"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-451d3f03b74so30168015e9.3
+        for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 02:34:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752572055; x=1753176855; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1752572057; x=1753176857; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NswHrgkdcqxmOhQmg+I1ZftODzAqq/smUBNc/8jSsg0=;
-        b=IMr6crA4FFSMJisxn9ynEGDDbVhibvswq66sM8sfW/xC7qEidz975Ydnt87vCEzIu7
-         m7wHwqhxya2YALTk9VEM2/vsV3WdjeIglkhootLwpVtUD93ybmf/U1XFbqdi6PhBJaTz
-         ELMVCPAHY3aKQUxLJP1DTI8fH0UkeQrJ0jHp8u+PXH+Ox5SGAPf0+9FI5Q5KbF/v62hV
-         X6qJA5G33sbRC5cwlxSRJas6ujpaoGrDzZWpqNm08w+wVNEhsdAM6TbGiPJn9n/J2qmw
-         9c0lcmt7C+f2jB5Trgha4+Hum9okf3WERTgmGlsxcz/kyV1uB0ernwH8e+ZPRee56tGO
-         2tLw==
+        bh=Vj4FcImTJCIyi98y1V49b83tOyghRW7/aml55WLH8OI=;
+        b=U0OTkmkF24CzSV52/vYOCMfJXguBL6BqonH7YSNqZMDIu6643KYkLK05/wy2r1z4I/
+         VaGr9Y97wz71GE1SEy1WC1HIUn5emSQnCYdl8OGxBulkyVrPaT8AhVHPfeLYa3sOEDb0
+         fAAZypYGKcBM6zFqKLuHt4Z0zIHHfVhA32kfjS+1tGtrfgzVyx6RDCtvotf6twoRC0M3
+         sbKYq8FAq2RjIFdFR3orjW/kgJcMdET4rwWZQ7T6mvZc3WjQIVL4aVxjqqRLplZEJKSF
+         Btq8n1FJNRCZmug0RqyYxXS2ivQcvhHNDLhRUhzG0r6GdbrF6xTuTEfdnosJVvtNHftS
+         6dig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752572055; x=1753176855;
+        d=1e100.net; s=20230601; t=1752572057; x=1753176857;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NswHrgkdcqxmOhQmg+I1ZftODzAqq/smUBNc/8jSsg0=;
-        b=eieADkbShuh1tYstuoNihyLk5/v76AHbtZAR1STZhKPu0BWC+11beO8wwwTt9DUzmr
-         sXyD7MFiZ9YDATI4sEOC3VviTDUjRhimU/i9xlZthVCxuT2JMjVOLahR61pHq+NMZbej
-         MqO3cQrgFW3f7tHqlSN2+xZ3L3CeUDxEpCKdKytoXlUOnMmTcYcOFvyjEvd9dkNQ67qL
-         i6F11Mu0v6Cfl7yj6y/NtEpz2ocZv4FLiaZMQBOCk6vOk+aE4nn0f1n3LxGAwXCgLPmx
-         lHM5hYepP/Q0apNTG2OYkUlDfpFj4142GRULQyehDdTgqTpInuLMi3Lz5Qc3Mzuxmbvk
-         ltkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWdbS+qzJdOCktxOBEe3nAJml1sXsuBn3xH4ebxaWbyNx71NuU3W9xts/m9OBpP7jUgbAZQBK8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz5eX6wJiCFs+2faJRFxwMO2DH5wYZsCjCA2HmO8YV1oixR4TBX
-	EkhyU61w8Cp+4y8D6dU5hbFD+R/r/l7ZxbGMJY0cfgn2BaTghKO0MqM0VeKf8isZJHWPXdhuVdN
-	reA==
-X-Google-Smtp-Source: AGHT+IEDLe189qOiRgDedu5bKfhg6mmUJkhqiiy6MmhlJTVyAYMWtzw6N/Xpnr+zd4xHJ/TAYV4yM5jmtg==
-X-Received: from edbev26.prod.google.com ([2002:a05:6402:541a:b0:609:287d:ce97])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:22ba:b0:607:7de4:598b
- with SMTP id 4fb4d7f45d1cf-611e7636978mr9326687a12.9.1752572055050; Tue, 15
- Jul 2025 02:34:15 -0700 (PDT)
-Date: Tue, 15 Jul 2025 10:33:40 +0100
+        bh=Vj4FcImTJCIyi98y1V49b83tOyghRW7/aml55WLH8OI=;
+        b=cclRwVedzUPk9QcyJ3grJejGdctps7313tBf9obYcKrwl6tCPyA2orbmnxxM+kqWNj
+         ZX8NsYWlTnwAN9u2M3o7VNLVrqnxR0sirnBlbU0zAFi36gp7MF8Qp/st0HobI2Bn0aSN
+         7KJmQhIITHTZeSAJ5Iid3NNc8GWr7LtEDk439vTvGOAJNHHat/qzIYpAOp4+GT6cAgb0
+         IBpkRk5WFbIb6FizL2zI+6LSpbK6wQJ4It7t6K6fmSFVV68maAjY9BctuuBbeQrLgPhg
+         gBotB2UHYKTPmeTs883xKMZdvcTBJcA93xcv4x4XIR1I1l8GIFdM7+vb287mGrmQbmM5
+         uabA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJ+8y1sgL3Bpy1lh9Wv9DAoxerrP25jFYyUjOGXa1AnmbZbryk4gY6dQtAAqx7m+EhOeDaZqo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyMhPHoqYwz1MQ+nHzSUR7iUcDx2IkGCNm4EHg0o5LceeGOANHK
+	5Ed9/thyUrgkdlPsf/2j+zEaQ2aW6hJ05np5RkoL6kgWTOC3PydeFFBmYrOZTa28YVpWjSTAqzR
+	DYw==
+X-Google-Smtp-Source: AGHT+IEyJ5h1JxYJfdwQzraAUkDVc/0m81Qa8ZAoEWQG0pPu2KC2KwcMTfd23Q8xPe+xGRzWwhfb6SO2ZA==
+X-Received: from wmbgz9-n1.prod.google.com ([2002:a05:600c:8889:10b0:456:1ceb:e66])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1d8b:b0:455:ed48:144f
+ with SMTP id 5b1f17b1804b1-455ed4815f8mr164308385e9.14.1752572057086; Tue, 15
+ Jul 2025 02:34:17 -0700 (PDT)
+Date: Tue, 15 Jul 2025 10:33:41 +0100
 In-Reply-To: <20250715093350.2584932-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250715093350.2584932-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250715093350.2584932-12-tabba@google.com>
-Subject: [PATCH v14 11/21] KVM: x86/mmu: Allow NULL-able fault in kvm_max_private_mapping_level
+Message-ID: <20250715093350.2584932-13-tabba@google.com>
+Subject: [PATCH v14 12/21] KVM: x86/mmu: Consult guest_memfd when computing max_mapping_level
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev
@@ -88,73 +88,209 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ackerley Tng <ackerleytng@google.com>
 
-Refactor kvm_max_private_mapping_level() to accept a NULL kvm_page_fault
-pointer and rename it to kvm_gmem_max_mapping_level().
+Modify kvm_mmu_max_mapping_level() to consult guest_memfd for memory
+regions backed by it when computing the maximum mapping level,
+especially during huge page recovery.
 
-The max_mapping_level x86 operation (previously private_max_mapping_level)
-is designed to potentially be called without an active page fault, for
-instance, when kvm_mmu_max_mapping_level() is determining the maximum
-mapping level for a gfn proactively.
+Previously, kvm_mmu_max_mapping_level() was designed primarily for
+host-backed memory and private pages. With guest_memfd now supporting
+non-private memory, it's necessary to factor in guest_memfd's influence
+on mapping levels for such memory.
 
-Allow NULL fault pointer: Modify kvm_max_private_mapping_level() to
-safely handle a NULL fault argument. This aligns its interface with the
-kvm_x86_ops.max_mapping_level operation it wraps, which can also be
-called with NULL.
+Since guest_memfd can now be used for non-private memory, make
+kvm_max_max_mapping_level, when recovering huge pages, take input from
+guest_memfd.
 
-Rename function to kvm_gmem_max_mapping_level(): This reinforces that
-the function's scope is for guest_memfd-backed memory, which can be
-either private or non-private, removing any remaining "private"
-connotation from its name.
+Input is taken from guest_memfd as long as a fault to that slot and gfn
+would have been served from guest_memfd. For now, take a shortcut if the
+slot and gfn points to memory that is private, since recovering huge
+pages aren't supported for private memory yet.
 
-Optimize max_level checks: Introduce a check in the caller to skip
-querying for max_mapping_level if the current max_level is already
-PG_LEVEL_4K, as no further reduction is possible.
+Since guest_memfd memory can also be faulted into host page tables,
+__kvm_mmu_max_mapping_level() still applies since consulting lpage_info
+and host page tables are required.
+
+Move functions kvm_max_level_for_order() and
+kvm_gmem_max_mapping_level() so kvm_mmu_max_mapping_level() can use
+those functions.
 
 Acked-by: David Hildenbrand <david@redhat.com>
-Suggested-by: Sean Christoperson <seanjc@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+Co-developed-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c   | 90 ++++++++++++++++++++++++----------------
+ include/linux/kvm_host.h |  7 ++++
+ virt/kvm/guest_memfd.c   | 17 ++++++++
+ 3 files changed, 79 insertions(+), 35 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index bb925994cbc5..6bd28fda0fd3 100644
+index 6bd28fda0fd3..94be15cde6da 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4467,17 +4467,13 @@ static inline u8 kvm_max_level_for_order(int order)
- 	return PG_LEVEL_4K;
+@@ -3282,13 +3282,67 @@ static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
+ 	return min(host_level, max_level);
  }
  
--static u8 kvm_max_private_mapping_level(struct kvm *kvm,
--					struct kvm_page_fault *fault,
--					int gmem_order)
++static u8 kvm_max_level_for_order(int order)
++{
++	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
++
++	KVM_MMU_WARN_ON(order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G) &&
++			order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M) &&
++			order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_4K));
++
++	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
++		return PG_LEVEL_1G;
++
++	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
++		return PG_LEVEL_2M;
++
++	return PG_LEVEL_4K;
++}
++
 +static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
 +				     struct kvm_page_fault *fault)
- {
--	u8 max_level = fault->max_level;
- 	u8 req_max_level;
++{
++	u8 req_max_level;
 +	u8 max_level;
++
++	max_level = kvm_max_level_for_order(order);
++	if (max_level == PG_LEVEL_4K)
++		return PG_LEVEL_4K;
++
++	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
++	if (req_max_level)
++		max_level = min(max_level, req_max_level);
++
++	return max_level;
++}
++
+ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+ 			      const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+ 	bool is_private = kvm_slot_has_gmem(slot) &&
+ 			  kvm_mem_is_private(kvm, gfn);
++	int max_level = PG_LEVEL_NUM;
++
++	/*
++	 * For now, kvm_mmu_max_mapping_level() is only called from
++	 * kvm_mmu_recover_huge_pages(), and that's not yet supported for
++	 * private memory, hence we can take a shortcut and return early.
++	 */
++	if (is_private)
++		return PG_LEVEL_4K;
  
+-	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM, is_private);
++	/*
++	 * For non-private pages that would have been faulted from guest_memfd,
++	 * let guest_memfd influence max_mapping_level.
++	 */
++	if (kvm_memslot_is_gmem_only(slot)) {
++		int order = kvm_gmem_mapping_order(slot, gfn);
++
++		max_level = min(max_level,
++				kvm_gmem_max_mapping_level(kvm, order, NULL));
++	}
++
++	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, max_level, is_private);
+ }
+ 
+ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+@@ -4450,40 +4504,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+ 		vcpu->stat.pf_fixed++;
+ }
+ 
+-static inline u8 kvm_max_level_for_order(int order)
+-{
+-	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
+-
+-	KVM_MMU_WARN_ON(order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G) &&
+-			order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M) &&
+-			order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_4K));
+-
+-	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
+-		return PG_LEVEL_1G;
+-
+-	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
+-		return PG_LEVEL_2M;
+-
+-	return PG_LEVEL_4K;
+-}
+-
+-static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
+-				     struct kvm_page_fault *fault)
+-{
+-	u8 req_max_level;
+-	u8 max_level;
+-
+-	max_level = kvm_max_level_for_order(order);
 -	if (max_level == PG_LEVEL_4K)
 -		return PG_LEVEL_4K;
 -
--	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
-+	max_level = kvm_max_level_for_order(order);
- 	if (max_level == PG_LEVEL_4K)
- 		return PG_LEVEL_4K;
- 
-@@ -4513,7 +4509,9 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
- 	}
- 
- 	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
--	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault, max_order);
-+	if (fault->max_level >= PG_LEVEL_4K)
-+		fault->max_level = kvm_gmem_max_mapping_level(vcpu->kvm,
-+							      max_order, fault);
- 
- 	return RET_PF_CONTINUE;
+-	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
+-	if (req_max_level)
+-		max_level = min(max_level, req_max_level);
+-
+-	return max_level;
+-}
+-
+ static void kvm_mmu_finish_page_fault(struct kvm_vcpu *vcpu,
+ 				      struct kvm_page_fault *fault, int r)
+ {
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d2218ec57ceb..662271314778 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2574,6 +2574,7 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		     gfn_t gfn, kvm_pfn_t *pfn, struct page **page,
+ 		     int *max_order);
++int kvm_gmem_mapping_order(const struct kvm_memory_slot *slot, gfn_t gfn);
+ #else
+ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+ 				   struct kvm_memory_slot *slot, gfn_t gfn,
+@@ -2583,6 +2584,12 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+ 	KVM_BUG_ON(1, kvm);
+ 	return -EIO;
  }
++static inline int kvm_gmem_mapping_order(const struct kvm_memory_slot *slot,
++					 gfn_t gfn)
++{
++	WARN_ONCE(1, "Unexpected call since gmem is disabled.");
++	return 0;
++}
+ #endif /* CONFIG_KVM_GMEM */
+ 
+ #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_PREPARE
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 2b00f8796a15..d01bd7a2c2bd 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -713,6 +713,23 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+ }
+ EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
+ 
++/**
++ * kvm_gmem_mapping_order() - Get the mapping order for this @gfn in @slot.
++ *
++ * @slot: the memslot that gfn belongs to.
++ * @gfn: the gfn to look up mapping order for.
++ *
++ * This is equal to max_order that would be returned if kvm_gmem_get_pfn() were
++ * called now.
++ *
++ * Return: the mapping order for this @gfn in @slot.
++ */
++int kvm_gmem_mapping_order(const struct kvm_memory_slot *slot, gfn_t gfn)
++{
++	return 0;
++}
++EXPORT_SYMBOL_GPL(kvm_gmem_mapping_order);
++
+ #ifdef CONFIG_KVM_GENERIC_GMEM_POPULATE
+ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long npages,
+ 		       kvm_gmem_populate_cb post_populate, void *opaque)
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
