@@ -1,194 +1,206 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060671D5ABA;
-	Tue, 15 Jul 2025 08:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966D22701A3
+	for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 09:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752568282; cv=none; b=u8SR3XxCSa8wI3xSW3RqfsdydfawdCwdPJ0vHQuRPiVFQSZemSRYpJ/mbsvWXH2dMR+/emEynpOnr0AM3Tnx4D9uX6ca+DkVnuBeQ69liK3MZGeLqzHIRMhK8y275Ds2AumYoiL2g2kcG3odNin+HFPLcP41B0dv6IjdiaTJEaw=
+	t=1752572035; cv=none; b=FhtMERnb+2q0lhV7aNZhxz3QEQ8wTjmJ2/WyzTh/HrcfC/TEx7jUgImd5hc6ueeUA9hzkvJcbdvpTRY/+yttUOs6YMSXOAzk+XwW53GvBYqW4ZHJbVaFLcbvGfcaTJqNkW8tP6tuUwM7V3KCDkYVgmbdxntAamsG4K/GYBmqGwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752568282; c=relaxed/simple;
-	bh=vc8sRdp2JkS0f6MKjzIVxwH/P9BFLMdE+QPnjQlwYQI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kiAzgo9VlsuAL7xvw52fDaRjjWcfKS2XOR67QmG+pyE+c0inFb5phMcFYS3V/jNsz04HPSzbGQTjrQNuWRDeM2ZvnLs/MoPo2/ieatIgBF1/Zydpq/2tfph5npuEgJlDaHSXP3SCPzuDKHOnubyE6ADVM6PM0Ocpaj4M8dWwn8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlNIijNk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752572035; c=relaxed/simple;
+	bh=8K4cyzXaTxVK0exe11kHjRbHaq5OiKRUEqbJ8e+exys=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=iDkd1f6jbY07T2P8W/x1csafrwZXbRQzrh22x186vfaWSno+5Ow5wnwcU85+kTNzgQ9JtfewEY6P9mqFqZvjTG9D1tGNJ49kD+nMm3Jz+rveLpLxrd4QONfVt/dRgDUClka2Khw/Uomhq/eCwvwT1RGrbKutaGUsl92Xay3XeSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sxe5n75g; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlNIijNk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3FCC4CEE3;
-	Tue, 15 Jul 2025 08:31:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752568281;
-	bh=vc8sRdp2JkS0f6MKjzIVxwH/P9BFLMdE+QPnjQlwYQI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LlNIijNklPQOePOENYJKmMSyRYEpLVgmZUM+p2trP4XEl+EVWsWzniSK914ybz6Nq
-	 Kndd87u/GPxZMCK7WuuBwYoQrdwOPrFPUML6HFiUF4+is3D/ZJJF4wXUgGx/Si4DL5
-	 /RUg6+TYDFsEDievEqzV1QD6KK6WFMXGvzAoICOrl7tBLpxzexv0vx0eDFbk+LWzsQ
-	 nURsAZx2+jLx7hWOKZ4vU+Qkh8zpyelO/M+3Kt3xcJGXmY833vC4p7+T6WhmNMIa1Q
-	 GJNmYJpk4A7p6L7iOJWUIk1T2Pi4FcXwUVw5+EQfV7g0fUd5wCJQm1e47XHvt4S87z
-	 VEJjqpPrdWBkQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ubb4I-00Fndi-N4;
-	Tue, 15 Jul 2025 09:31:18 +0100
-Date: Tue, 15 Jul 2025 09:31:18 +0100
-Message-ID: <86zfd597op.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-Subject: Re: [PATCH] KVM: arm64: Clear pending exception state before injecting a new one
-In-Reply-To: <aHX6XXhSSnHL_T1d@linux.dev>
-References: <20250714144636.3569479-1-maz@kernel.org>
-	<aHX6XXhSSnHL_T1d@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sxe5n75g"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a4fac7fa27so1935241f8f.0
+        for <kvmarm@lists.linux.dev>; Tue, 15 Jul 2025 02:33:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752572032; x=1753176832; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=j4t1n4nwyoQBKZNhO7jMcqNzHzTkyclHCojNDUTYuIc=;
+        b=Sxe5n75g6OaV2CvZfMooa2MZOo+OSGLZW212t8b/n7YwjigZiQ/TZKGWCSg1UtuyGZ
+         ZNV+8NE/kUG08ip+Ov7UsjgQ2baDP8YCo3ajjySO4UJh8uCyEcQAU/is9smLlKkSKO+J
+         8SXwqHzpkeVFjMQ9bL+pd/IaUB2tgduMeJ1ryNestkGr73qYn1LOTUkD/v9gPqDhYzer
+         80t/gbVv82bWJOm2aCMNB7hYMx0nnE96hENGUBeSQhHFZt9Lm2ivOseIzBXcvmo7FH0u
+         x2+Mz6a2ZVL/RzSUXbDBePeywi8rBJAmOVexvB/1LSO93ogtNlWGpH2BSqWrgevZ4UAf
+         jkig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752572032; x=1753176832;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j4t1n4nwyoQBKZNhO7jMcqNzHzTkyclHCojNDUTYuIc=;
+        b=LN2ba1f8Ln7gyvE7vlflcxJj06zOPSXjOMNb0s2L1n7UmSm9zLsMhJoS03w6XoCBLf
+         CtoC8ViySUD1dkRG5oDO3Qczwqpo4ipMl6Zltuu+a08qpd+B3uGQbrNFWiYTTt26EB6K
+         g7kn3fFj6DVxUQVDnVROTBMJ03uAC4g8OFUcx+TC3/dvrc8alNPvZnyiSqTSH/0bfM6U
+         teOxt9nhLGYM5ca+uA5OL/TKyrilQ0mnY599S6oOBQvbVfPenFZAzbLy8bVW1TF41Yft
+         XwXkQ7Z1+xfG4TlkTfqgxd4W0XTVfZ+Tfr12cUfH+g5ETi0/CUrV7Fu3sWwIUvqndIPi
+         VC5A==
+X-Forwarded-Encrypted: i=1; AJvYcCXnDmeeqiOzvNNuC3+fnJatNkOQmfUi30U0vOFac5+FNZFaX+eXa/G3dOyazLzKv8PxCD10ZGE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz0+5x18LbNz4W7dru46I1jCMYBK8iMEcW0ZZXwIldA3nVwqqAn
+	2OvT12AxIiYOhv5Xmgm1AWQTkYwEt+uAseym8CKkmBkbRP5GhbzpEukV6RtlFFnVIi8AH/RZ8+t
+	Xig==
+X-Google-Smtp-Source: AGHT+IGz/WL5Nm2M8E0afS2hsyGmPGgazwMmwD3sXKJKeTBCyM54UVdaP4fiGdQY16/I+BzGEw8xAOzLrQ==
+X-Received: from wrce6.prod.google.com ([2002:adf:9bc6:0:b0:3a5:7dbc:4d24])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5e8a:0:b0:3b5:e5c9:93c5
+ with SMTP id ffacd0b85a97d-3b5f2e28d8bmr10048876f8f.49.1752572031962; Tue, 15
+ Jul 2025 02:33:51 -0700 (PDT)
+Date: Tue, 15 Jul 2025 10:33:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250715093350.2584932-1-tabba@google.com>
+Subject: [PATCH v14 00/21] KVM: Enable host userspace mapping for
+ guest_memfd-backed memory for non-CoCo VMs
+From: Fuad Tabba <tabba@google.com>
+To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 15 Jul 2025 07:51:09 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Hey,
-> 
-> On Mon, Jul 14, 2025 at 03:46:36PM +0100, Marc Zyngier wrote:
-> > Repeatedly injecting an exception from userspace without running
-> > the vcpu between calls results in a nasty warning, as we're not
-> > really keen on losing already pending exceptions.
-> > 
-> > But this precaution doesn't really apply to userspace, who can
-> > do whatever it wants (within reason). So let's simply clear any
-> > previous exception state before injecting a new one.
-> > 
-> > Note that this is done unconditionally, even if the injection
-> > ultimately fails.
-> > 
-> > Reported-by: syzbot+4e09b1432de3774b86ae@syzkaller.appspotmail.com
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> Thanks for taking a look at this. I think the correct fix is a bit more
-> involved, as:
-> 
->  - ABI prior to my patches allowed dumb things like injecting both an
->    SEA and SError from the same ioctl. With your patch I think you could
->    still get the warning to fire with serror_pending && ext_dabt_pending
-> 
->  - KVM_GET_VCPU_EVENTS is broken for 'pending' SEAs, as we assume
->    they're committed in the vCPU state immediately when they're actually
->    deferred to the next KVM_RUN.
-> 
-> I thoroughly hate the fix I have but it should address both of these
-> issues. Although the pending PC adjustment flags seem more like a
-> liability than anything else if ioctls need to flush them before
-> returning to userspace. Might look at a larger cleanup down the road.
-> 
-> Thanks,
-> Oliver
-> 
-> From 149262689dfe881542f5c5b60f9ee308a00f0596 Mon Sep 17 00:00:00 2001
-> From: Oliver Upton <oliver.upton@linux.dev>
-> Date: Mon, 14 Jul 2025 23:25:07 -0700
-> Subject: [PATCH] KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS
->  immediately
-> 
-> syzkaller has found that it can trip a warning in KVM's exception
-> emulation infrastructure by repeatedly injecting exceptions into the
-> guest.
-> 
-> While it's unlikely that a reasonable VMM will do this, further
-> investigation of the issue reveals that KVM can potentially discard the
-> "pending" SEA state. While the handling of KVM_GET_VCPU_EVENTS presumes
-> that userspace-injected SEAs are realized immediately, in reality the
-> emulated exception entry is deferred until the next call to KVM_RUN.
-> 
-> Hack-a-fix the immediate issues by committing the pending exceptions to
-> the vCPU's architectural state immediately in KVM_SET_VCPU_EVENTS. This
-> is no different to the way KVM-injected exceptions are handled in
-> KVM_RUN where we potentially call __kvm_adjust_pc() before returning to
-> userspace.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/guest.c | 28 +++++++++++++++++++++++++++-
->  1 file changed, 27 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index e2702718d56d..16ba5e9ac86c 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -834,6 +834,19 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +static void commit_pending_events(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
-> +		return;
-> +
-> +	/*
-> +	 * Reset the MMIO emulation state to avoid stepping PC after emulating
-> +	 * the exception entry.
-> +	 */
-> +	vcpu->mmio_needed = false;
-> +	kvm_call_hyp(__kvm_adjust_pc, vcpu);
-> +}
-> +
->  int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  			      struct kvm_vcpu_events *events)
->  {
-> @@ -843,8 +856,15 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  	u64 esr = events->exception.serror_esr;
->  	int ret = 0;
->  
-> -	if (ext_dabt_pending)
-> +	/*
-> +	 * Immediately commit the pending SEA to the vCPU's architectural
-> +	 * state which is necessary since we do not return a pending SEA
-> +	 * to userspace via KVM_GET_VCPU_EVENTS.
-> +	 */
-> +	if (ext_dabt_pending) {
->  		ret = kvm_inject_sea_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +		commit_pending_events(vcpu);
-> +	}
->  
->  	if (ret < 0)
->  		return ret;
-> @@ -863,6 +883,12 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  	else
->  		ret = kvm_inject_serror(vcpu);
->  
-> +	/*
-> +	 * We could've decided that the SError is due for immediate software
-> +	 * injection; commit the exception in case userspace decides it wants
-> +	 * to inject more exceptions for some strange reason.
-> +	 */
-> +	commit_pending_events(vcpu);
->  	return (ret < 0) ? ret : 0;
->  }
+Main changes since v13 [1]:
+* Fixed handling of guest faults in case of invalidation in arm64
+* Handle VNCR_EL2-triggered faults backed by guest_memfd (arm64 nested
+  virt)
+* Applied suggestions from latest feedback
+* Rebase on Linux 6.16-rc6
 
-Yup, this seems looks reasonable. I would have liked the commit helper
-to be used just before vcpu_put(), but obviously, that's not the right
-thing to do because of the mmio_needed field.
+This patch series enables host userspace mapping of guest_memfd-backed
+memory for non-CoCo VMs. This is required for several evolving KVM use
+cases:
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+* Allows VMMs like Firecracker to run guests entirely backed by
+  guest_memfd [2]. This provides a unified memory management model for
+  both confidential and non-confidential guests, simplifying VMM design.
 
-	M.
+* Enhanced Security via direct map removal: When combined with Patrick's
+  series for direct map removal [3], this provides additional hardening
+  against Spectre-like transient execution attacks by eliminating the
+  need for host kernel direct maps of guest memory.
 
+* Lays the groundwork for *restricted* mmap() support for
+  guest_memfd-backed memory on CoCo platforms [4] that permit in-place
+  sharing of guest memory with the host.
+
+Patch breakdown:
+
+Patches 1-7: Primarily infrastructure refactorings and renames to decouple
+guest_memfd from the concept of "private" memory.
+
+Patches 8-9: Add support for the host to map guest_memfd backed memory
+for non-CoCo VMs, which includes support for mmap() and fault handling.
+This is gated by a new configuration option, toggled by a new flag, and
+advertised to userspace by a new capability (introduced in patch 18).
+
+Patches 10-14: Implement x86 guest_memfd mmap support.
+
+Patches 15-18: Implement arm64 guest_memfd mmap support.
+
+Patch 19: Introduce the new capability to advertise this support and
+update the documentation.
+
+Patches 20-21: Update and expand selftests for guest_memfd to include
+mmap functionality and improve portability.
+
+To test this patch series and boot a guest utilizing the new features,
+please refer to the instructions in v8 of the series [5]. Note that
+kvmtool for Linux 6.16 (available at [6]) is required, as the
+KVM_CAP_GMEM_MMAP capability number has changed, additionally, drop the
+--sw_protected kvmtool parameter to test with the default VM type.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20250709105946.4009897-1-tabba@google.com/
+[2] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
+[3] https://lore.kernel.org/all/20250221160728.1584559-1-roypat@amazon.co.uk/
+[4] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com/
+[5] https://lore.kernel.org/all/20250430165655.605595-1-tabba@google.com/
+[6] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba/guestmem-basic-6.16
+
+Ackerley Tng (4):
+  KVM: x86/mmu: Generalize private_max_mapping_level x86 op to
+    max_mapping_level
+  KVM: x86/mmu: Allow NULL-able fault in kvm_max_private_mapping_level
+  KVM: x86/mmu: Consult guest_memfd when computing max_mapping_level
+  KVM: x86/mmu: Handle guest page faults for guest_memfd with shared
+    memory
+
+Fuad Tabba (17):
+  KVM: Rename CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM
+  KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
+    CONFIG_KVM_GENERIC_GMEM_POPULATE
+  KVM: Introduce kvm_arch_supports_gmem()
+  KVM: x86: Introduce kvm->arch.supports_gmem
+  KVM: Rename kvm_slot_can_be_private() to kvm_slot_has_gmem()
+  KVM: Fix comments that refer to slots_lock
+  KVM: Fix comment that refers to kvm uapi header path
+  KVM: guest_memfd: Allow host to map guest_memfd pages
+  KVM: guest_memfd: Track guest_memfd mmap support in memslot
+  KVM: x86: Enable guest_memfd mmap for default VM type
+  KVM: arm64: Refactor user_mem_abort()
+  KVM: arm64: Handle guest_memfd-backed guest page faults
+  KVM: arm64: nv: Handle VNCR_EL2-triggered faults backed by guest_memfd
+  KVM: arm64: Enable host mapping of shared guest_memfd memory
+  KVM: Introduce the KVM capability KVM_CAP_GMEM_MMAP
+  KVM: selftests: Do not use hardcoded page sizes in guest_memfd test
+  KVM: selftests: guest_memfd mmap() test when mmap is supported
+
+ Documentation/virt/kvm/api.rst                |   9 +
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/kvm/Kconfig                        |   2 +
+ arch/arm64/kvm/mmu.c                          | 203 ++++++++++++-----
+ arch/arm64/kvm/nested.c                       |  41 +++-
+ arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+ arch/x86/include/asm/kvm_host.h               |  18 +-
+ arch/x86/kvm/Kconfig                          |   7 +-
+ arch/x86/kvm/mmu/mmu.c                        | 114 ++++++----
+ arch/x86/kvm/svm/sev.c                        |  12 +-
+ arch/x86/kvm/svm/svm.c                        |   3 +-
+ arch/x86/kvm/svm/svm.h                        |   4 +-
+ arch/x86/kvm/vmx/main.c                       |   6 +-
+ arch/x86/kvm/vmx/tdx.c                        |   6 +-
+ arch/x86/kvm/vmx/x86_ops.h                    |   2 +-
+ arch/x86/kvm/x86.c                            |   5 +-
+ include/linux/kvm_host.h                      |  64 +++++-
+ include/uapi/linux/kvm.h                      |   2 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/guest_memfd_test.c  | 208 +++++++++++++++---
+ virt/kvm/Kconfig                              |  14 +-
+ virt/kvm/Makefile.kvm                         |   2 +-
+ virt/kvm/guest_memfd.c                        |  96 +++++++-
+ virt/kvm/kvm_main.c                           |  14 +-
+ virt/kvm/kvm_mm.h                             |   4 +-
+ 25 files changed, 664 insertions(+), 179 deletions(-)
+
+
+base-commit: 347e9f5043c89695b01e66b3ed111755afcf1911
 -- 
-Without deviation from the norm, progress is not possible.
+2.50.0.727.gbf7dc18ff4-goog
+
