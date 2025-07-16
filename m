@@ -1,147 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431A8223301;
-	Wed, 16 Jul 2025 15:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D092F5333
+	for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 16:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752678504; cv=none; b=eSvl9Wxw5ZxB06gFgydNh3aQTFfP5SJkcZ+eRn9cN95d2OhRHPrMfxVY6w+xB5MZQhcrREa9PsQerenA02b4oYnJCcli8tjpJRxWpsWudNuBAeGYQJ7+z+bb30F4Yz3X88XUdkjJV7V/mKXyOEE31deTxoqpWUItxuyN+gr4mn4=
+	t=1752684498; cv=none; b=EW+XtYdwNT884POt8re+hX8LhVqz6kBhzKJYu7ZAfHOHLD1K0chNaEQ2mTSzTgxoClCg87gishFbV3qhME6c3FcUJfsGnrKjpkm2ZvpM5Hws/uLN+u8N+dID/AuUf4JqqqdAy5EsJQB4PQcz8xbP/nwJkI/FGlBYo0d9LUXp46A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752678504; c=relaxed/simple;
-	bh=xvi2l5ghTTIH9EH2CKcJOVCwTnyTxxYJYjbF2qW34Qg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WMBQ9N45+0c9L+0hSwRokFFbdD+iZ4k2ffNVz84cHwqUqv2m88nYZXPnx7kilEjWuARq2e0DK+tkqnVhHKcO5BIUVf6gP/UOlxcG4xXrLrceLe6ebi13vuCCU6mMInfCnK7R5bny9bammBNPsr8Z0Vy+6HTVzj6UB1vzyuLCWII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+AsWQSg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752684498; c=relaxed/simple;
+	bh=IU7/L5RxATOuX3yZF/QTSGN5yb2p79l4vw6T4rgjhWo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MM6r7k0ZLugFJpRUxauR2MSxWzycvpqV0tif+WShNCu4swKqH9lRDcBynYIxOwrax482QqBlISd3aRvv9eVyV7LFA5cP5tKc4CM44hjIIV5MR2s37NRck9rqSNiJt/VGsztJFv0X3CijuIyfwMjM2hllgJ8q0OeNObwnbKiwS9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pjt3hVxA; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+AsWQSg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B090BC4CEE7;
-	Wed, 16 Jul 2025 15:08:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752678503;
-	bh=xvi2l5ghTTIH9EH2CKcJOVCwTnyTxxYJYjbF2qW34Qg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z+AsWQSgn+VNalO3vBtg1zgV1GNqZj5ciXVkdEQbSthGfUjxN86sNtKDAoznNEOKI
-	 JURIJX2yZ6BWvVhkNmv9AunldjcdZefjGBQkI/0GoLCm2OFJ1oqHyTLiXd3SkhBaHW
-	 AhJ9EWNooUGxK0weNO/NYszgtXei1Gwahih6kZlJtUjYkd0uucFkuQTET7lAVTUYlh
-	 tcQBfS2bmSE5FU8b/B67/D8ueukaYykW6QMU81Mv65sK03YFyMJqyz3lUKlEJN8POq
-	 sP6QCPymMY0XdHc/l21pfal0J/fgt/XaxLMq/riK5wrPnti54scUOL7LdsigipPfPP
-	 lS4UCDsHGjGMQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uc3k4-00GJsc-9y;
-	Wed, 16 Jul 2025 16:08:20 +0100
-Date: Wed, 16 Jul 2025 16:08:19 +0100
-Message-ID: <86v7ns897g.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: David Hildenbrand <david@redhat.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pjt3hVxA"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752684493;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dLeTs7FZjD4WJ4kxGKwc0GaLx29L2ONQcpWFPljBYmo=;
+	b=Pjt3hVxAAPI5DQD3d/xhtNQ4TvfdzRo47XlJhBw1vrtwqkKb8QDYBQ7/GLI/fW0qfFmyn0
+	DI89u4nTkvomLnprtdtM5+l973E29Q6If40UREFo6ErK6LaLWqxHlkjZq/9yPNLpksBKmM
+	eBMmBrPqop+EWNuwcUKCqeXo1FxaveQ=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-mm@kvack.org,
-	kvmarm@lists.linux.dev,
-	pbonzini@redhat.com,
-	chenhuacai@kernel.org,
-	mpe@ellerman.id.au,
-	anup@brainfault.org,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	seanjc@google.com,
-	viro@zeniv.linux.org.uk,
-	brauner@kernel.org,
-	willy@infradead.org,
-	akpm@linux-foundation.org,
-	xiaoyao.li@intel.com,
-	yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com,
-	jarkko@kernel.org,
-	amoorthy@google.com,
-	dmatlack@google.com,
-	isaku.yamahata@intel.com,
-	mic@digikod.net,
-	vbabka@suse.cz,
-	vannapurve@google.com,
-	ackerleytng@google.com,
-	mail@maciej.szmigiero.name,
-	michael.roth@amd.com,
-	wei.w.wang@intel.com,
-	liam.merwick@oracle.com,
-	isaku.yamahata@gmail.com,
-	kirill.shutemov@linux.intel.com,
-	suzuki.poulose@arm.com,
-	steven.price@arm.com,
-	quic_eberman@quicinc.com,
-	quic_mnalajal@quicinc.com,
-	quic_tsoni@quicinc.com,
-	quic_svaddagi@quicinc.com,
-	quic_cvanscha@quicinc.com,
-	quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com,
-	catalin.marinas@arm.com,
-	james.morse@arm.com,
-	yuzenghui@huawei.com,
-	oliver.upton@linux.dev,
-	will@kernel.org,
-	qperret@google.com,
-	keirf@google.com,
-	roypat@amazon.co.uk,
-	shuah@kernel.org,
-	hch@infradead.org,
-	jgg@nvidia.com,
-	rientjes@google.com,
-	jhubbard@nvidia.com,
-	fvdl@google.com,
-	hughd@google.com,
-	jthoughton@google.com,
-	peterx@redhat.com,
-	pankaj.gupta@amd.com,
-	ira.weiny@intel.com
-Subject: Re: [PATCH v14 15/21] KVM: arm64: Refactor user_mem_abort()
-In-Reply-To: <CA+EHjTz=4PbF9yVQPO-ucjSq=n4fC+-QP_HGpWO4Wa1273fXtw@mail.gmail.com>
-References: <20250715093350.2584932-1-tabba@google.com>
-	<20250715093350.2584932-16-tabba@google.com>
-	<39a217c1-29a9-4497-b3b6-bc0459e75a91@redhat.com>
-	<CA+EHjTz=4PbF9yVQPO-ucjSq=n4fC+-QP_HGpWO4Wa1273fXtw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/5] KVM: arm64: Config driven dependencies for TCR2/SCTLR/MDCR
+Date: Wed, 16 Jul 2025 09:47:54 -0700
+Message-Id: <175268446558.2457435.12236491763380805714.b4-ty@linux.dev>
+In-Reply-To: <20250714115503.3334242-1-maz@kernel.org>
+References: <20250714115503.3334242-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, david@redhat.com, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 16 Jul 2025 12:26:13 +0100,
-Fuad Tabba <tabba@google.com> wrote:
+On Mon, 14 Jul 2025 12:54:58 +0100, Marc Zyngier wrote:
+> Here's a very short (and hopefully not too controversial) series
+> converting a few more registers to the config-driven sanitisation
+> framework (this is mostly a leftover from the corresponding 6.16
+> monster series).
 > 
-> On Wed, 16 Jul 2025 at 11:36, David Hildenbrand <david@redhat.com> wrote:
-
-[...]
-
-> > A note that on the KVM arm next tree
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/log/?h=next
-> >
-> > there are some user_mem_abort() changes. IIUC, only smaller conflicts.
+> Patches on top of -rc3.
 > 
-> Thanks for the heads up. I can work with Marc and Oliver to resolve
-> any conflicts once we get there.
+> [...]
 
-Yup. Ideally, a stable branch, based on an -rc tag, would do the trick
-and allow us to solve the conflicts ahead of this hitting -next. We
-can either take that in the kvmarm tree, or from the main kvm repo.
+Applied to next, thanks!
 
-Thanks,
+[1/5] arm64: sysreg: Add THE/ASID2 controls to TCR2_ELx
+      https://git.kernel.org/kvmarm/kvmarm/c/a3ed7da911c1
+[2/5] KVM: arm64: Convert TCR2_EL2 to config-driven sanitisation
+      https://git.kernel.org/kvmarm/kvmarm/c/001e032c0f3f
+[3/5] KVM: arm64: Convert SCTLR_EL1 to config-driven sanitisation
+      https://git.kernel.org/kvmarm/kvmarm/c/6bd4a274b026
+[4/5] KVM: arm64: Convert MDCR_EL2 to config-driven sanitisation
+      https://git.kernel.org/kvmarm/kvmarm/c/cd64587f10b1
+[5/5] KVM: arm64: Tighten the definition of FEAT_PMUv3p9
+      https://git.kernel.org/kvmarm/kvmarm/c/3096d238ec49
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--
+Best,
+Oliver
