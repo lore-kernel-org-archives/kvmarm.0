@@ -1,73 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D9F26FD8E
-	for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 10:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEC4233722
+	for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 10:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752661513; cv=none; b=tu7nBbygtgpu3/6O/NfubjUg0ZJmcGR2z+zNRKQT4azCSI0Tz5E1G87P1JtnwyB+H3qpPR6V2+YNja78odM49ihN4Ukii5KsDQFYPjNXgRC/97/PaPp/hhQZaFkC1BEyssceRPUbLjTQ4RHnzlO3EDSu/auf6NdhLYT7nm+qn+A=
+	t=1752661917; cv=none; b=OHQRjOkbG7iuZWcxyFZQCzHsjWZZnJv4M1SzJaOWrWXoM50dpqq1m3dzEShQFqX+Yg0v1kOu/+aoNX7ueeqvf/D5xQ3F5x4AAzQSFS02gbca96Z2E+kn4PWLarovm4BHOeIILo+itjy9BXLUUDGSGt0OUnHvhuCphHE00VPsHXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752661513; c=relaxed/simple;
-	bh=IasktCdfZwSD9de0kshHopspYwUyLF8x/PWEZuCW+uQ=;
+	s=arc-20240116; t=1752661917; c=relaxed/simple;
+	bh=eBnSzR02347AsyHY/I4LTH37Yk72UR2g0xbu6MS2Bsc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fJ/WuhLxTZ++nC0vOjzNRHWtWt+NkuQ5YwzV/BwHIBjkq+W8A+wicNRddslT3Z/HcTjvzYbKUMSy3UX3XjGESij8wO7CpXQAkHrQAcnI/9FpgMFFr2OnSX2i+7W8slNRAjZBACzg14HzDbU96ePl08V+5pZ/5fsdsFjgABjfchI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TAE/TH9/; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=AiDqpZAyPEz2mdhZykbUVtZV2QjglzYYze4IJ66FYNDppb/vGsxfRT7wfG84572uzQtnFkNwWJ11g2xg4ATI10oSo/iSluJDNsaDIXXqpNyuS313GeWshai6tcRl/jkg9PwKfAv7NXkWueJ9rZzzBFY7abCZPDVpfoK3Y1fzyds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TFGoDRvt; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TAE/TH9/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TFGoDRvt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752661511;
+	s=mimecast20190719; t=1752661914;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ojPiTGB0uO1S92U6FwE1qmBlbBFxe92SbIqLgPjYfxw=;
-	b=TAE/TH9/pHUenigWgjUXrZm5GRwDNhyLR77NrPnHM1rSzAQiD7Tz2tDT4Q5CWDzWGVR86J
-	bZ4znWKoEiZi73iRyG+PgmSxjRPkCaDigzEqSQb8qfjcJe0nftjauUJADKaOMUSt7v327P
-	e1Ew/QvFbqD3vw7Zm0YL5o7JvAaGVZk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QcznUuIcwG4nXt+4JQ0HOO8HtlWuNhZcwm0Vh8nXhEs=;
+	b=TFGoDRvtwiqPEk+T0mxYBNpbswSD3IO016+7Y+0SgMCiB+CH28j9qacr5de02yFVQCTxB0
+	yo4EB1+2uwELGyM5l4B1L1ZhO3oNferiPHXZzPudNPYP8No3qAqgFPBLF+8MEWDndJ2lT/
+	yjvRJ1zYSHj4Fs6oeg5SkToLWd4nP80=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-317-b4IncZ7SOuuaFdIBvHhU5A-1; Wed, 16 Jul 2025 06:25:10 -0400
-X-MC-Unique: b4IncZ7SOuuaFdIBvHhU5A-1
-X-Mimecast-MFC-AGG-ID: b4IncZ7SOuuaFdIBvHhU5A_1752661509
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-455e9daab1cso11314315e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 03:25:09 -0700 (PDT)
+ us-mta-496-pLPiCrWtMOSgch5mIi06bQ-1; Wed, 16 Jul 2025 06:31:53 -0400
+X-MC-Unique: pLPiCrWtMOSgch5mIi06bQ-1
+X-Mimecast-MFC-AGG-ID: pLPiCrWtMOSgch5mIi06bQ_1752661912
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-455f7b86aeeso24758685e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 03:31:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752661509; x=1753266309;
+        d=1e100.net; s=20230601; t=1752661912; x=1753266712;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=ojPiTGB0uO1S92U6FwE1qmBlbBFxe92SbIqLgPjYfxw=;
-        b=TN8gGA1cbD3/LkRRs+de2PEvGQzWRkqhlkG2gyPK/+/xqRRqnRAnMnrmzD/bXdWe/N
-         3CGk+EIPHaqHEtlCI4GV5SLPykVBhaHRt8c2kuvgwyxez0WqdRzcamOiZBgUk82ih3T2
-         zbqxlPGo7U2yNgoJGBbMU8AlXgGVQAKVZ9pIeUdvM1rL6rEgS42do6QkSlurX6InzX60
-         pKx/biMost0KU09i3QvqoHnNh2i8Sd0Dk8de/AVSuQWJZyRZ0oVQSAV+Zv7qqKGWsbbn
-         y+1ziMd+3B8VB1vOSS6mFqmqiRQkQvAikDuD6mQP5+KsFEAHBuWj/SazxWU/O5O/1lAH
-         pVFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXV/hcgFpunbYHyUngs3ucxc2Gw2IG9nBP7YCa3xkmYTYPpynrWVnhunbBziKWmHjsuhupWRdQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxKF3YL7FvyQW12YKExpj+j5VCMJ7IalrXxn4zj7R1yEeYh1+8m
-	hZYgWjNnWEUpW5tLTJKtojGZB6K3x9ZXEDFyhFyvoFnq0xaZikKDEheAxkB78Tz1XQVoCUxd6b2
-	xRW52VuQRkqDjFlRYpF6wFJdcO6RsPog9NX6T4BOG+w0RTm5lKpo1IrwoQA==
-X-Gm-Gg: ASbGnctKHS8fe2SvAKgaCWMHssIOIcxcsC8MIQA3SPoFcl3DgdWou87aj6guGEoodK9
-	w1uSfZp2NxukVSv1QZC2keJjUeBAXSrvzN0o/bLRWqeqallsPmXNX0lf3l6aWMIdfqoDykEPJug
-	nlqkzBYBMvBeUp0G1IHYL3Cie2Ms+uQ1oUC4PSB9dZY5DT6Pl0l3SByGmOtCSiVgx9AM1/SZAKh
-	LEbm7OTB5xywUvuo4GD1R4KUiy8F1nXBjmd2ayxL+VG9tRudMQyJaGz30nFg3dw61I14cLkTUOz
-	BUafeUEWkWbyb9KjIkZMOuvOAUoi0NK0hbCkXLEMttuC8mQcAfB+f1TEPilzmEuovYfOt88atir
-	5Gei5cNemsYHTe284OysL3I3lS88+DmEx7s65HlxwI6FWzju4VCmZNaXby3y22pgLKik=
-X-Received: by 2002:a05:600c:c042:b0:43d:745a:5a50 with SMTP id 5b1f17b1804b1-4562e5893f7mr13757255e9.19.1752661508741;
-        Wed, 16 Jul 2025 03:25:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGcxKB+PIip+FbZHyjFofyMfWBEFGOv/h9k5JBC6DcPQY+RjH+NEnKUQ+3Rz4fuDqwtShJzsQ==
-X-Received: by 2002:a05:600c:c042:b0:43d:745a:5a50 with SMTP id 5b1f17b1804b1-4562e5893f7mr13756875e9.19.1752661508192;
-        Wed, 16 Jul 2025 03:25:08 -0700 (PDT)
+        bh=QcznUuIcwG4nXt+4JQ0HOO8HtlWuNhZcwm0Vh8nXhEs=;
+        b=DLtqFByE4R58imgyeyIjtQXt4xy4SS3BKJ8d8rYp4XL1UX2pdfa+B7qRWsU/sRye7W
+         rdkqO8iFMJPSyKOpsxrhdr3u9E4XRqtAHlkkZ5YFaNNkZRMCV/qu6f3epQ+62HNSjUzk
+         esboYJf8nWsrRl6tgIUbsdJkM1zL7OC6hidrAbkk1HPkASkquIBSZ+MkZ+xoUSECqznn
+         BFHf4qnrll1oMUdnjfFiQo8uVTTT3x8/qJaDDTiZKR1Hv2Sxz6+Hf55eRJtEZ967Tlbj
+         Ful0qRAat33tbt4XIPFnITQBPnVqRvjsZb8vK4vsdmh3DugYJEAH9cmDq52lLXqMaJmw
+         S9RA==
+X-Forwarded-Encrypted: i=1; AJvYcCVvVbSlyZrJuOfLUk6O3ILbDteIcQunQyJnjdmcwIi8GBHKotkzwpbAbHnnSkP5zlmweXU087U=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz0jbXW19QLUhxrhSWmep2CoWKAFRG2eXWmbuJcY6UHpSzKVE3Y
+	Cxl6t30o1qHTjtJnOXVQCeIpWUAbfg2GSsXHaK+bP0MUoRQjBf188TB1zNTfWTg7MD3p5L4dMnS
+	p5Wqx5gpXijgdjuC4pXAKuzwQbJKr/YLMnfya5klLaRpPX4GZducdmfvQLA==
+X-Gm-Gg: ASbGnctphvcOYKrRrUQw5eUN+F1V4eMQNv1ucFgGwK4F56VuX7sQgV42VXA5m4OHC+g
+	Ti0N8J/04iRJqoY+njkN2XQYokClgJqmGuL2i+aMs8DRgz36h1fWFhnNmWNcbsGYc7H9ER/Cp8D
+	y6FlaavRXvBBUIyglSmXF5Oe7d3m/xoRz42jwpe7I0fb0Ygyhj0mfMf5atkyAPFGsbc8VXGnTPP
+	WECnTs7IPs3jWAok/0lMrer4EKPLu3MdyJ+7Rh+CE1Z1ZRFv/Cu0ZSq1hpN46pwmfA1qCKDlCCn
+	z0irXjVr50IZ+BRZ9M2yzT/uhd3TFOTeiVSuc2ynyhbsgRL01qwa3Us/9chMFn/55GPp1ojTmL+
+	BWz1nozBpdYmJuWeFKLgUHGN6+mTs+9nTaqk9VKtOwMKBL1GM7UKjPx/DdCxJKGmS+YY=
+X-Received: by 2002:a05:6000:2912:b0:3a4:e6e6:a026 with SMTP id ffacd0b85a97d-3b60e51c9aemr1507102f8f.28.1752661912003;
+        Wed, 16 Jul 2025 03:31:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGAxmPe8HjCZESgVq6F2BLQDo/y7yx6bnhMQEihIPWcHJ07P96sJQUTqU+xqhcxeC2KowpvcQ==
+X-Received: by 2002:a05:6000:2912:b0:3a4:e6e6:a026 with SMTP id ffacd0b85a97d-3b60e51c9aemr1507056f8f.28.1752661911437;
+        Wed, 16 Jul 2025 03:31:51 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f1d:ed00:1769:dd7c:7208:eb33? (p200300d82f1ded001769dd7c7208eb33.dip0.t-ipconnect.de. [2003:d8:2f1d:ed00:1769:dd7c:7208:eb33])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e7f363asm16820645e9.7.2025.07.16.03.25.05
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e14d07sm17694498f8f.66.2025.07.16.03.31.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Jul 2025 03:25:07 -0700 (PDT)
-Message-ID: <778ca011-1b2f-4818-80c6-ac597809ec77@redhat.com>
-Date: Wed, 16 Jul 2025 12:25:05 +0200
+        Wed, 16 Jul 2025 03:31:50 -0700 (PDT)
+Message-ID: <b7feea89-be2d-44a9-b116-fb07d16e3bd3@redhat.com>
+Date: Wed, 16 Jul 2025 12:31:47 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,9 +75,9 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
- CONFIG_KVM_GENERIC_GMEM_POPULATE
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v14 09/21] KVM: guest_memfd: Track guest_memfd mmap
+ support in memslot
+To: Fuad Tabba <tabba@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
  kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
  mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
@@ -100,10 +100,9 @@ Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250715093350.2584932-1-tabba@google.com>
- <20250715093350.2584932-3-tabba@google.com>
- <a4091b13-9c3b-48bf-a7f6-f56868224cf5@intel.com>
- <CA+EHjTy5zUJt5n5N1tRyHUQN6-P6CPqyC7+6Zqhokx-3=mvx+A@mail.gmail.com>
- <418ddbbd-c25e-4047-9317-c05735e02807@intel.com>
+ <20250715093350.2584932-10-tabba@google.com>
+ <eb9d39b4-0de8-4abb-b0f7-7180dc1aaee5@intel.com>
+ <CA+EHjTw8Pezyut+pjpRyT9R5ZWvjOZUes27SHJAEeygCOV_HQA@mail.gmail.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -150,51 +149,48 @@ Autocrypt: addr=david@redhat.com; keydata=
  WBe5lqcozu9LpNDH/brVSzHCSb7vjNGvvSVESDuoiHK8gNlf0v+epy5WYd7CGAgODPvDShGN
  g3eXuA==
 Organization: Red Hat
-In-Reply-To: <418ddbbd-c25e-4047-9317-c05735e02807@intel.com>
+In-Reply-To: <CA+EHjTw8Pezyut+pjpRyT9R5ZWvjOZUes27SHJAEeygCOV_HQA@mail.gmail.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: ZJP4Vqwo6BRYuJf0dZ0qwDqmGLAPDFYZTZfvW8-ft4k_1752661509
+X-Mimecast-MFC-PROC-ID: I02281-7yeNA5tkhrX7hHAdOarGnNE6fqH0kZLt-42M_1752661912
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16.07.25 10:31, Xiaoyao Li wrote:
-> On 7/16/2025 4:11 PM, Fuad Tabba wrote:
->> On Wed, 16 Jul 2025 at 05:09, Xiaoyao Li<xiaoyao.li@intel.com> wrote:
->>> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
->>>> The original name was vague regarding its functionality. This Kconfig
->>>> option specifically enables and gates the kvm_gmem_populate() function,
->>>> which is responsible for populating a GPA range with guest data.
->>> Well, I disagree.
->>>
->>> The config KVM_GENERIC_PRIVATE_MEM was introduced by commit 89ea60c2c7b5
->>> ("KVM: x86: Add support for "protected VMs" that can utilize private
->>> memory"), which is a convenient config for vm types that requires
->>> private memory support, e.g., SNP, TDX, and KVM_X86_SW_PROTECTED_VM.
->>>
->>> It was commit e4ee54479273 ("KVM: guest_memfd: let kvm_gmem_populate()
->>> operate only on private gfns") that started to use
->>> CONFIG_KVM_GENERIC_PRIVATE_MEM gates kvm_gmem_populate() function. But
->>> CONFIG_KVM_GENERIC_PRIVATE_MEM is not for kvm_gmem_populate() only.
->>>
->>> If using CONFIG_KVM_GENERIC_PRIVATE_MEM to gate kvm_gmem_populate() is
->>> vague and confusing, we can introduce KVM_GENERIC_GMEM_POPULATE to gate
->>> kvm_gmem_populate() and select KVM_GENERIC_GMEM_POPULATE under
->>> CONFIG_KVM_GENERIC_PRIVATE_MEM.
->>>
->>> Directly replace CONFIG_KVM_GENERIC_PRIVATE_MEM with
->>> KVM_GENERIC_GMEM_POPULATE doesn't look correct to me.
->> I'll quote David's reply to an earlier version of this patch [*]:
+On 16.07.25 10:21, Fuad Tabba wrote:
+> Hi Xiaoyao,
 > 
-> It's not related to my concern.
+> On Wed, 16 Jul 2025 at 07:11, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>
+>> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
+>>> Add a new internal flag, KVM_MEMSLOT_GMEM_ONLY, to the top half of
+>>> memslot->flags. This flag tracks when a guest_memfd-backed memory slot
+>>> supports host userspace mmap operations. It's strictly for KVM's
+>>> internal use.
+>>
+>> I would expect some clarification of why naming it with
+>> KVM_MEMSLOT_GMEM_ONLY, not something like KVM_MEMSLOT_GMEM_MMAP_ENABLED
+>>
+>> There was a patch to check the userspace_addr of the memslot refers to
+>> the same memory as guest memfd[1], but that patch was dropped. Without
+>> the background that when guest memfd is mmapable, userspace doesn't need
+>> to provide separate memory via userspace_addr, it's hard to understand
+>> and accept the name of GMEM_ONLY.
 > 
-> My point is that CONFIG_KVM_GENERIC_PRIVATE_MEM is used for selecting
-> the private memory support. Rename it to KVM_GENERIC_GMEM_POPULATE is
-> not correct.
+> The commit message could have clarified this a bit more. Regarding the
+> rationale for the naming, there have been various threads and live
+> discussions in the biweekly guest_memfd meeting . Instead of rehashing
+> the discussion here, I can refer you to a couple [1, 2].
 
-It protects a function that is called kvm_gmem_populate().
+Maybe clarify here:
 
-Can we stop the nitpicking?
+"Add a new internal flag, KVM_MEMSLOT_GMEM_ONLY, to the top half of
+memslot->flags. This flag tracks when a guest_memfd-backed memory slot
+supports host userspace mmap operations, which implies that all memory, 
+not just private memory for CoCo VMs, is consumed through guest_memfd: 
+"gmem only"
+
+And add a pointer to the list discussion.
 
 -- 
 Cheers,
