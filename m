@@ -1,336 +1,237 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78C62F49EB
-	for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 11:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BF020110B
+	for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 12:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752665215; cv=none; b=RL9logLJQ6tSNJwjnqYlV8bvldacyWf2m8Of3GUZEiHsaRQqgSKp2XWu6FO201B6ZOQ3TPTttFexIJyqwNR5wmOkCn+aPoYavu1DIkdAG7/XgPrwzhh8b/MI0j6HNX5Hfz+WZv7QZooFBxh8Lp2LcIGZm2Y643yE2krGQ+lNnR4=
+	t=1752667339; cv=none; b=Ay3CoQxs970UpyYxoANg0wCbKZaKHx5TrOzLCRtgaOzmyty63chVTZUNASFNyQJO+gGDFOAKkFU2/BmuK2GUXNq4LsjtaakR1DoXUW1PWwniGQVUCmPmjrsWwMX9hz3G87OIQNubORkU9J3mlqWA4AiKgYI4uF4I/Kx1Sw/7KIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752665215; c=relaxed/simple;
-	bh=mr+dFXLc7EQJb50d41UfRH1OK6wdQGe/ptcoS9odC9I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ReTEikOgMWTIuYxS6FhvXpS62xQRuQPC7yQRy9WVBRC1DqFx0fuLzfUaV7oPSVG8Wfqmc6Wp6SNqfFLwvcD6GsOHsUkk7EmvhJAE7yDvVhQySXzYoRMQdBSG5h/YxEd1dF8W+qrZDV0Bu+RwoKoIlWEA7McYy5CRFNf+Yy8zr9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vHuGpwl8; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1752667339; c=relaxed/simple;
+	bh=YDkjJ/FR4VY16/R/TYPixM7ci5vkGgf7C5bX+4c+lKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZcMLi7UCTV5HsElmFA7aoPmgrls8YdQtsBmxslho+UgHwiAU2eTgda6qUCX5gjnZ2cQyIFAhmeLkHuKdK/MBg3Edmj9f0WGO+Q5XV0UwYjNtxcHYUv20MVkN27/iST5ibNbxieJ4WKkPF/8oZM8ln3zZc/Up1L/IIq1+ThhNmK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OXcUZf79; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vHuGpwl8"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4aaf43cbbdcso164421cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 04:26:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752665211; x=1753270011; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=t5R7kWnWuNP4kHs3y3gQRpYRuK0llaSxBMJsJPZN3qQ=;
-        b=vHuGpwl8uh000v6Vq09/SUXc7MNnxqZ/KDrsGEnjDE+oL0pop0npV+gg2vvAumQa9Y
-         YGLrFHMVt4UMhzwm7CoXaweoGgRSjrl7DEWXLOQ5oOGzw/4YcnTQfskNT+yRaERqssJS
-         Ab3ksH6ivcgNGFBjml/xy7MjibKbjAY/TY5FO6QvRwGVcohLIlCeQJwryQsUTOoDvevu
-         kgMLig0DbeFCCtLXIKqnyWf8UPkhqS/9wzOM73KYkVnGoPxCGX7OlaX4ttIy1ILN13jY
-         LBm0hvyX3eyaglh6IkXHFWtpnoS7BT6sTMZkpxQzpgC73QAhmvUirh6gUN6Sa06LFGke
-         04xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752665211; x=1753270011;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t5R7kWnWuNP4kHs3y3gQRpYRuK0llaSxBMJsJPZN3qQ=;
-        b=G6+0b+NCVoTAkqDP0+3WOFczWE7dHOV36J1nNsppVsjCi4RCTMK8sGSHtm+6k7mMgu
-         AA5YI7O20ca0a4XzudFQzTZTmjKHyzJrCkd79wNdkRhfRlOaOEFci+oZh4RljVJLLQTX
-         4VG+b+DfgrzNmvZZN0goCAiW9QO3Sf4MwzpllObGDiaweVgDMsACRLXdXnAS8HNarbE6
-         IxHBPOwz+0UefX03JNjDcaIZRV0nyOFvunMOWuEbq1ceMzZw6dcrbThyBj5TW7AP1KpT
-         D8RVwMDy/FSuFsVlz3ptgvSvkFJ/Pl4TuvbxY7pKmp/yhtv35Bol1ncNkzUgwaFSvQ/E
-         YryA==
-X-Forwarded-Encrypted: i=1; AJvYcCXr9CpbktZeegPJ39xybLfC1xsuM4dGU1rVleY6xFkEv3jdXuO9Ce6+4xVMFMjr4TK4glBIYrE=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz7RhMfDa2mN3ynLADerv1RmpDmCBGJEahHY3rz4m4koo5iq7bu
-	NFsf8xpR7Dq49THRHp3TAbScWe/6SAYiecisHRBNXgh91Kg85JfVlI2TT4jTZwTSOJnhCh6weth
-	6gu1oXWMOwZB3jmgzNy8lcAtPOfPuhZlrMWU1qHCU
-X-Gm-Gg: ASbGncvcOZc2scgrceGa/oiiHFN3dPCquM//ggz6H3vPQ0hnj1CM55OFzwb4hc1bkEH
-	jzzU7MNeANSC9Tf0ARDe094sP8E37gG2/lxAG3Po3GhLsNSaN/lYzNy1omi1e7RTUPp4YVzRlm5
-	qXcHHpeijZkRTbDSUeMsCllOL6znHmVUU7ouxyxhoAWzb2ep1R4CzOYtGFUpM7w5X+mCT8kOhQp
-	LXRcNjm24qli9WyYfENReDs1gyFVdT94IYN
-X-Google-Smtp-Source: AGHT+IHaGYFlj+5UQCP3ycOWBKRQbIDwdhMKRPNIGN5Zyy7RYQr7ya7fA0vyRBNNF6bOnwvE+TY/1VOezg6wIMY0dnM=
-X-Received: by 2002:a05:622a:a28d:b0:4a7:26d2:5a38 with SMTP id
- d75a77b69052e-4ab97e14cb6mr1763881cf.19.1752665210038; Wed, 16 Jul 2025
- 04:26:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OXcUZf79"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752667338; x=1784203338;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=YDkjJ/FR4VY16/R/TYPixM7ci5vkGgf7C5bX+4c+lKQ=;
+  b=OXcUZf79GDPATZzFd/d92yWOEDge2Y7XHZBEO9F4J4RuTDsq5tRlp3GR
+   14WC7qyk844l+N9mvG+U8kn3FBKxdTkLNUwhyvpOnYz65ww4NZDZolQWU
+   9BmrRU2D+0BBiIR+298Plhcn83EYZsOpFlxMAzle3GihvB4NMAW9IJz6+
+   JM/QXq2IyN2sRA926VgCc5ZPIp7PcpgK0EQY0YntJbO8Stoo3o8fXyh6e
+   nXCKM5iakU9jdbvoXHQLiXDv/grI9SxbLk8ev5svgJ1ce1R4hTSOu6+Yp
+   BP+3nQhkIaWFTPkCrErC9Ba2icvCfeJMcB8DxUO0WjVe87/vJhJ37L3GP
+   g==;
+X-CSE-ConnectionGUID: kSIbl7AmSSKqVaUlRBl4Ww==
+X-CSE-MsgGUID: zVgOxAQPSTmR5y4TR8NP6Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="77443286"
+X-IronPort-AV: E=Sophos;i="6.16,316,1744095600"; 
+   d="scan'208";a="77443286"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 05:02:17 -0700
+X-CSE-ConnectionGUID: 145ZkuStQ2SYn8mHxjRkqw==
+X-CSE-MsgGUID: 7cPaGUvRRmOhozspvimeJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,316,1744095600"; 
+   d="scan'208";a="157973432"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2025 05:02:01 -0700
+Message-ID: <fa1ccce7-40d3-45d2-9865-524f4b187963@intel.com>
+Date: Wed, 16 Jul 2025 20:01:58 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250715093350.2584932-1-tabba@google.com> <20250715093350.2584932-16-tabba@google.com>
- <39a217c1-29a9-4497-b3b6-bc0459e75a91@redhat.com>
-In-Reply-To: <39a217c1-29a9-4497-b3b6-bc0459e75a91@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 16 Jul 2025 12:26:13 +0100
-X-Gm-Features: Ac12FXyf7dM4gwpjCXZKsFe03i-IhUXKmydFOHr4OJpO94k0Jnlho20N3Z_JVzU
-Message-ID: <CA+EHjTz=4PbF9yVQPO-ucjSq=n4fC+-QP_HGpWO4Wa1273fXtw@mail.gmail.com>
-Subject: Re: [PATCH v14 15/21] KVM: arm64: Refactor user_mem_abort()
-To: David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
+ CONFIG_KVM_GENERIC_GMEM_POPULATE
+To: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+ akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250715093350.2584932-1-tabba@google.com>
+ <20250715093350.2584932-3-tabba@google.com>
+ <a4091b13-9c3b-48bf-a7f6-f56868224cf5@intel.com>
+ <CA+EHjTy5zUJt5n5N1tRyHUQN6-P6CPqyC7+6Zqhokx-3=mvx+A@mail.gmail.com>
+ <418ddbbd-c25e-4047-9317-c05735e02807@intel.com>
+ <778ca011-1b2f-4818-80c6-ac597809ec77@redhat.com>
+ <6927a67b-cd2e-45f1-8e6b-019df7a7417e@intel.com>
+ <CA+EHjTz7C4WgS2-Dw0gywHy+zguSNXKToukPiRfsdiY8+Eq6KA@mail.gmail.com>
+ <47395660-79ad-4d22-87b0-c5bf891f708c@redhat.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <47395660-79ad-4d22-87b0-c5bf891f708c@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 16 Jul 2025 at 11:36, David Hildenbrand <david@redhat.com> wrote:
->
-> On 15.07.25 11:33, Fuad Tabba wrote:
-> > Refactor user_mem_abort() to improve code clarity and simplify
-> > assumptions within the function.
-> >
-> > Key changes include:
-> >
-> > * Immediately set force_pte to true at the beginning of the function if
-> >    logging_active is true. This simplifies the flow and makes the
-> >    condition for forcing a PTE more explicit.
-> >
-> > * Remove the misleading comment stating that logging_active is
-> >    guaranteed to never be true for VM_PFNMAP memslots, as this assertion
-> >    is not entirely correct.
-> >
-> > * Extract reusable code blocks into new helper functions:
-> >    * prepare_mmu_memcache(): Encapsulates the logic for preparing and
-> >      topping up the MMU page cache.
-> >    * adjust_nested_fault_perms(): Isolates the adjustments to shadow S2
-> >      permissions and the encoding of nested translation levels.
-> >
-> > * Update min(a, (long)b) to min_t(long, a, b) for better type safety and
-> >    consistency.
-> >
-> > * Perform other minor tidying up of the code.
-> >
-> > These changes primarily aim to simplify user_mem_abort() and make its
-> > logic easier to understand and maintain, setting the stage for future
-> > modifications.
-> >
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >   arch/arm64/kvm/mmu.c | 110 +++++++++++++++++++++++--------------------
-> >   1 file changed, 59 insertions(+), 51 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 2942ec92c5a4..b3eacb400fab 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1470,13 +1470,56 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
-> >       return vma->vm_flags & VM_MTE_ALLOWED;
-> >   }
-> >
-> > +static int prepare_mmu_memcache(struct kvm_vcpu *vcpu, bool topup_memcache,
-> > +                             void **memcache)
-> > +{
-> > +     int min_pages;
-> > +
-> > +     if (!is_protected_kvm_enabled())
-> > +             *memcache = &vcpu->arch.mmu_page_cache;
-> > +     else
-> > +             *memcache = &vcpu->arch.pkvm_memcache;
-> > +
-> > +     if (!topup_memcache)
-> > +             return 0;
-> > +
-> > +     min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
-> > +
-> > +     if (!is_protected_kvm_enabled())
-> > +             return kvm_mmu_topup_memory_cache(*memcache, min_pages);
-> > +
-> > +     return topup_hyp_memcache(*memcache, min_pages);
-> > +}
-> > +
-> > +/*
-> > + * Potentially reduce shadow S2 permissions to match the guest's own S2. For
-> > + * exec faults, we'd only reach this point if the guest actually allowed it (see
-> > + * kvm_s2_handle_perm_fault).
-> > + *
-> > + * Also encode the level of the original translation in the SW bits of the leaf
-> > + * entry as a proxy for the span of that translation. This will be retrieved on
-> > + * TLB invalidation from the guest and used to limit the invalidation scope if a
-> > + * TTL hint or a range isn't provided.
-> > + */
-> > +static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
-> > +                                   enum kvm_pgtable_prot *prot,
-> > +                                   bool *writable)
-> > +{
-> > +     *writable &= kvm_s2_trans_writable(nested);
-> > +     if (!kvm_s2_trans_readable(nested))
-> > +             *prot &= ~KVM_PGTABLE_PROT_R;
-> > +
-> > +     *prot |= kvm_encode_nested_level(nested);
-> > +}
-> > +
-> >   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >                         struct kvm_s2_trans *nested,
-> >                         struct kvm_memory_slot *memslot, unsigned long hva,
-> >                         bool fault_is_perm)
-> >   {
-> >       int ret = 0;
-> > -     bool write_fault, writable, force_pte = false;
-> > +     bool topup_memcache;
-> > +     bool write_fault, writable;
-> >       bool exec_fault, mte_allowed;
-> >       bool device = false, vfio_allow_any_uc = false;
-> >       unsigned long mmu_seq;
-> > @@ -1488,6 +1531,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >       gfn_t gfn;
-> >       kvm_pfn_t pfn;
-> >       bool logging_active = memslot_is_logging(memslot);
-> > +     bool force_pte = logging_active;
-> >       long vma_pagesize, fault_granule;
-> >       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> >       struct kvm_pgtable *pgt;
-> > @@ -1498,17 +1542,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >               fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
-> >       write_fault = kvm_is_write_fault(vcpu);
-> >       exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> > -     VM_BUG_ON(write_fault && exec_fault);
-> > -
-> > -     if (fault_is_perm && !write_fault && !exec_fault) {
-> > -             kvm_err("Unexpected L2 read permission error\n");
-> > -             return -EFAULT;
-> > -     }
-> > -
-> > -     if (!is_protected_kvm_enabled())
-> > -             memcache = &vcpu->arch.mmu_page_cache;
-> > -     else
-> > -             memcache = &vcpu->arch.pkvm_memcache;
-> > +     VM_WARN_ON_ONCE(write_fault && exec_fault);
-> >
-> >       /*
-> >        * Permission faults just need to update the existing leaf entry,
-> > @@ -1516,17 +1550,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >        * only exception to this is when dirty logging is enabled at runtime
-> >        * and a write fault needs to collapse a block entry into a table.
-> >        */
-> > -     if (!fault_is_perm || (logging_active && write_fault)) {
-> > -             int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
-> > -
-> > -             if (!is_protected_kvm_enabled())
-> > -                     ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
-> > -             else
-> > -                     ret = topup_hyp_memcache(memcache, min_pages);
-> > -
-> > -             if (ret)
-> > -                     return ret;
-> > -     }
-> > +     topup_memcache = !fault_is_perm || (logging_active && write_fault);
-> > +     ret = prepare_mmu_memcache(vcpu, topup_memcache, &memcache);
-> > +     if (ret)
-> > +             return ret;
-> >
-> >       /*
-> >        * Let's check if we will get back a huge page backed by hugetlbfs, or
-> > @@ -1540,16 +1567,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >               return -EFAULT;
-> >       }
-> >
-> > -     /*
-> > -      * logging_active is guaranteed to never be true for VM_PFNMAP
-> > -      * memslots.
-> > -      */
-> > -     if (logging_active) {
-> > -             force_pte = true;
-> > +     if (force_pte)
-> >               vma_shift = PAGE_SHIFT;
-> > -     } else {
-> > +     else
-> >               vma_shift = get_vma_page_shift(vma, hva);
-> > -     }
-> >
-> >       switch (vma_shift) {
-> >   #ifndef __PAGETABLE_PMD_FOLDED
-> > @@ -1601,7 +1622,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >                       max_map_size = PAGE_SIZE;
-> >
-> >               force_pte = (max_map_size == PAGE_SIZE);
-> > -             vma_pagesize = min(vma_pagesize, (long)max_map_size);
-> > +             vma_pagesize = min_t(long, vma_pagesize, max_map_size);
-> >       }
-> >
-> >       /*
-> > @@ -1630,7 +1651,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >        * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
-> >        * with the smp_wmb() in kvm_mmu_invalidate_end().
-> >        */
-> > -     mmu_seq = vcpu->kvm->mmu_invalidate_seq;
-> > +     mmu_seq = kvm->mmu_invalidate_seq;
-> >       mmap_read_unlock(current->mm);
-> >
-> >       pfn = __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
-> > @@ -1665,24 +1686,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >       if (exec_fault && device)
-> >               return -ENOEXEC;
-> >
-> > -     /*
-> > -      * Potentially reduce shadow S2 permissions to match the guest's own
-> > -      * S2. For exec faults, we'd only reach this point if the guest
-> > -      * actually allowed it (see kvm_s2_handle_perm_fault).
-> > -      *
-> > -      * Also encode the level of the original translation in the SW bits
-> > -      * of the leaf entry as a proxy for the span of that translation.
-> > -      * This will be retrieved on TLB invalidation from the guest and
-> > -      * used to limit the invalidation scope if a TTL hint or a range
-> > -      * isn't provided.
-> > -      */
-> > -     if (nested) {
-> > -             writable &= kvm_s2_trans_writable(nested);
-> > -             if (!kvm_s2_trans_readable(nested))
-> > -                     prot &= ~KVM_PGTABLE_PROT_R;
-> > -
-> > -             prot |= kvm_encode_nested_level(nested);
-> > -     }
-> > +     if (nested)
-> > +             adjust_nested_fault_perms(nested, &prot, &writable);
-> >
-> >       kvm_fault_lock(kvm);
-> >       pgt = vcpu->arch.hw_mmu->pgt;
-> > @@ -1953,6 +1958,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >               goto out_unlock;
-> >       }
-> >
-> > +     VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
-> > +                     !write_fault && !kvm_vcpu_trap_is_exec_fault(vcpu));
-> > +
-> >       ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> >                            esr_fsc_is_permission_fault(esr));
-> >       if (ret == 0)
->
->
-> A note that on the KVM arm next tree
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/log/?h=next
->
-> there are some user_mem_abort() changes. IIUC, only smaller conflicts.
+On 7/16/2025 7:15 PM, David Hildenbrand wrote:
+> On 16.07.25 13:05, Fuad Tabba wrote:
+>> On Wed, 16 Jul 2025 at 12:02, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>>
+>>> On 7/16/2025 6:25 PM, David Hildenbrand wrote:
+>>>> On 16.07.25 10:31, Xiaoyao Li wrote:
+>>>>> On 7/16/2025 4:11 PM, Fuad Tabba wrote:
+>>>>>> On Wed, 16 Jul 2025 at 05:09, Xiaoyao Li<xiaoyao.li@intel.com> wrote:
+>>>>>>> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
+>>>>>>>> The original name was vague regarding its functionality. This 
+>>>>>>>> Kconfig
+>>>>>>>> option specifically enables and gates the kvm_gmem_populate()
+>>>>>>>> function,
+>>>>>>>> which is responsible for populating a GPA range with guest data.
+>>>>>>> Well, I disagree.
+>>>>>>>
+>>>>>>> The config KVM_GENERIC_PRIVATE_MEM was introduced by commit
+>>>>>>> 89ea60c2c7b5
+>>>>>>> ("KVM: x86: Add support for "protected VMs" that can utilize private
+>>>>>>> memory"), which is a convenient config for vm types that requires
+>>>>>>> private memory support, e.g., SNP, TDX, and KVM_X86_SW_PROTECTED_VM.
+>>>>>>>
+>>>>>>> It was commit e4ee54479273 ("KVM: guest_memfd: let 
+>>>>>>> kvm_gmem_populate()
+>>>>>>> operate only on private gfns") that started to use
+>>>>>>> CONFIG_KVM_GENERIC_PRIVATE_MEM gates kvm_gmem_populate() 
+>>>>>>> function. But
+>>>>>>> CONFIG_KVM_GENERIC_PRIVATE_MEM is not for kvm_gmem_populate() only.
+>>>>>>>
+>>>>>>> If using CONFIG_KVM_GENERIC_PRIVATE_MEM to gate 
+>>>>>>> kvm_gmem_populate() is
+>>>>>>> vague and confusing, we can introduce KVM_GENERIC_GMEM_POPULATE 
+>>>>>>> to gate
+>>>>>>> kvm_gmem_populate() and select KVM_GENERIC_GMEM_POPULATE under
+>>>>>>> CONFIG_KVM_GENERIC_PRIVATE_MEM.
+>>>>>>>
+>>>>>>> Directly replace CONFIG_KVM_GENERIC_PRIVATE_MEM with
+>>>>>>> KVM_GENERIC_GMEM_POPULATE doesn't look correct to me.
+>>>>>> I'll quote David's reply to an earlier version of this patch [*]:
+>>>>>
+>>>>> It's not related to my concern.
+>>>>>
+>>>>> My point is that CONFIG_KVM_GENERIC_PRIVATE_MEM is used for selecting
+>>>>> the private memory support. Rename it to KVM_GENERIC_GMEM_POPULATE is
+>>>>> not correct.
+>>>>
+>>>> It protects a function that is called kvm_gmem_populate().
+>>>>
+>>>> Can we stop the nitpicking?
+>>>
+>>> I don't think it's nitpicking.
+>>>
+>>> Could you loot into why it was named as KVM_GENERIC_PRIVATE_MEM in the
+>>> first place, and why it was picked to protect kvm_gmem_populate()?
+>>
+>> That is, in part, the point of this patch. This flag protects
+>> kvm_gmem_populate(), and the name didn't reflect that. Now it does. It
+>> is the only thing it protects.
+> 
+> I'll note that the kconfig makes it clear that it depends on 
+> KVM_GENERIC_MEMORY_ATTRIBUTES -- having support for private memory.
+> 
+> In any case, CONFIG_KVM_GENERIC_PRIVATE_MEM is a bad name: what on earth 
+> is generic private memory.
 
-Thanks for the heads up. I can work with Marc and Oliver to resolve
-any conflicts once we get there.
+"gmem" + "memory_attribute" is the generic private memory.
 
-Cheers,
-/fuad
+If KVM_GENERIC_PRIVATE_MEM is a bad name, we can drop it, but not rename 
+it to CONFIG_KVM_GENERIC_GMEM_POPULATE.
 
+> If CONFIG_KVM_GENERIC_GMEM_POPULATE is for some reason I don't 
+> understand yet not the right name, can we have something that better 
+> expresses that is is about KVM .. GMEM ... and POPULATE?
 
-> --
-> Cheers,
->
-> David / dhildenb
->
+I'm not objecting the name of CONFIG_KVM_GENERIC_GMEM_POPULATE, but 
+objecting the simple rename. Does something below look reasonable?
+
+---
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 2eeffcec5382..3f87dcaaae83 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -135,6 +135,7 @@ config KVM_INTEL_TDX
+         bool "Intel Trust Domain Extensions (TDX) support"
+         default y
+         depends on INTEL_TDX_HOST
++       select KVM_GENERIC_GMEM_POPULATE
+         help
+           Provides support for launching Intel Trust Domain Extensions 
+(TDX)
+           confidential VMs on Intel processors.
+@@ -158,6 +159,7 @@ config KVM_AMD_SEV
+         depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
+         select ARCH_HAS_CC_PLATFORM
+         select KVM_GENERIC_PRIVATE_MEM
++       select KVM_GENERIC_GMEM_POPULATE
+         select HAVE_KVM_ARCH_GMEM_PREPARE
+         select HAVE_KVM_ARCH_GMEM_INVALIDATE
+         help
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 755b09dcafce..359baaae5e9f 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2556,7 +2556,7 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+  int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, 
+int max_order);
+  #endif
+
+-#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
++#ifdef CONFIG_KVM_GENERIC_GMEM_POPULATE
+  /**
+   * kvm_gmem_populate() - Populate/prepare a GPA range with guest data
+   *
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 49df4e32bff7..9b37ca009a22 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -121,6 +121,10 @@ config KVM_GENERIC_PRIVATE_MEM
+         select KVM_GMEM
+         bool
+
++config KVM_GENERIC_GMEM_POPULATE
++       bool
++       depends on KVM_GMEM && KVM_GENERIC_MEMORY_ATTRIBUTES
++
+  config HAVE_KVM_ARCH_GMEM_PREPARE
+         bool
+         depends on KVM_GMEM
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index b2aa6bf24d3a..befea51bbc75 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -638,7 +638,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct 
+kvm_memory_slot *slot,
+  }
+  EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
+
+-#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
++#ifdef CONFIG_KVM_GENERIC_GMEM_POPULATE
+  long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user 
+*src, long npages,
+                        kvm_gmem_populate_cb post_populate, void *opaque)
+  {
+
