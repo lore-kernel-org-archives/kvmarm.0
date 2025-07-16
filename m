@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72FE2E762D
-	for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 05:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CD327281D
+	for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 06:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752644445; cv=none; b=d9vIBKcVAYDkHOE0TxSsAMHtMy6bnl3RJPdQv4w4Wt5U3TWirajIsDpgw9OYVrl2ag7DZBfnpBtg6c9m3m4OqzkQIWi+zRccoNRQfoJLbxh8/vN+YwpcMH6JEpkwZQuH0l2vroop/+Np5Np2PijWbB/kflzmwy3LEx89jIlwF+s=
+	t=1752646297; cv=none; b=cKUfGubV/iofbj2TZHhu+7/pM20GC5ed1xaCdBYq/Xm9tOisqy/c3pxwSwaAnSuRiDX0vtyQBt66egwdSI1dmquQHKbgEMfueYOwIiGtfaLwx1w8qr0rV4FHQUqjJyJ5M3vEJuk/arvk607WP6ILBOuZAsB8gXMiQdKphzn65Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752644445; c=relaxed/simple;
-	bh=6iNgYxoqxx120NDW9X1toiGHqvZp6/FTcvKcQv2ACAo=;
+	s=arc-20240116; t=1752646297; c=relaxed/simple;
+	bh=c6u/3ojwb9CcAkBXSLSNnkBgcofV6SgyFH8EacCPr78=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CW9OHWwUkS18wSftbFZ9ROYxV7KhIX+oKwsKx4jHpXiokV+whkO++Rin9le1A6pOeSft52ODCuBO1e2vS3ntfZ1/Mhi3cPKZpnrljDsIvsx0N6yV5hajjXI1Gw/C8aiLTo2+roCwG2ZTqMhwQJiyGjaLCJtT40LCnMoLefvGeJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eSaF8QKC; arc=none smtp.client-ip=198.175.65.12
+	 In-Reply-To:Content-Type; b=AwkFyAmXdUUQZeHHTELdtHl7Z4bcKXGnv1nKGi7DwXFUQojjlU7RMYPcMdSk51whzMaV6kgJqATjV50rlNvYuiyUDcA+LJXl6FuBxuz8btPIZ13kAuOueQXU+FbZNlfhT1ksqH6NkEbaBJ5x9qOmHdpbcWT00zP+2jXMSFOu3EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T0ykiRQU; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eSaF8QKC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T0ykiRQU"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752644444; x=1784180444;
+  t=1752646296; x=1784182296;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=6iNgYxoqxx120NDW9X1toiGHqvZp6/FTcvKcQv2ACAo=;
-  b=eSaF8QKCczFrzEUuXk0aXXFxNfQ6LJ18+jYBHCC0Guzriy78AKPDQVcd
-   F2Qx2JB35NwqlCQ4r0m44JFCURZwC3EPlaqs2z/eqpt7KWfqvcm93VkYF
-   vWjt4BZL1cNCQNcNaVmPC0MGkN5z0dbTWbP/lZczpsMd5Q7zcgS3rFDWy
-   2h2qHUfygnvfIX/Jj8R1k5djhVkXRvX/89l46Mxex4QNSrV5uMPxEMqyU
-   4+x/M3SllrxPOZtT7FW5lhAH12KpRi88BjaeSSf+wf8Q9XkuJdM5LV9Ko
-   WSS1LZqi/mWamQQHs6Ju6Q9/YQC2JarhJKoqtIT9heM4rboUrD5w+SmSl
+  bh=c6u/3ojwb9CcAkBXSLSNnkBgcofV6SgyFH8EacCPr78=;
+  b=T0ykiRQUohAPHUG9Zn8/TwJtiGMKP/jb83670CYBV/yguF/B8Xk81nKG
+   HqVh+NBOlQCtWZ99cOWrMPYRIuS7zqdOK7GgXw+uy1oCpJO26zfcvn5Vz
+   FTvSCc+5iAkjLl8NNLLkj8UXaUtRNj8CzGWoCFxt8O2zymkgq3g3BVcIP
+   gDSeqdA1Ouq/YoHdXjM52FfIY6pWYdVhYk82P7W4octfPhBn9TVY3v4pL
+   fWuFu/HLUuZ+xCqvPfrB0nGUaHb1kdFXxlDStBkAbaji5XDvazQU6k4zS
+   cXVem5mriREFZKbz5Z1ZDdmbOq1ExKgfaZnIVXo0Tm6Rdj3LLKJohpJIz
    Q==;
-X-CSE-ConnectionGUID: 7pVWZ/t7RB6Ra662IJgyoQ==
-X-CSE-MsgGUID: inLSqhdXSv2Y2FJE9mVAcQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="66325478"
+X-CSE-ConnectionGUID: 3GuGIKWoRI26U5rN+Q8+Ew==
+X-CSE-MsgGUID: tuMliPqVSLmc4z3hG6PwXA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11493"; a="80329688"
 X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
-   d="scan'208";a="66325478"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 22:40:43 -0700
-X-CSE-ConnectionGUID: Oos/aMvwSTGdgishWHK1Pg==
-X-CSE-MsgGUID: E5t7ldu8TNOtPDSeoiR4uA==
+   d="scan'208";a="80329688"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 23:11:25 -0700
+X-CSE-ConnectionGUID: jZPozQdBTsOjGre4uRsADw==
+X-CSE-MsgGUID: jcMR3HMmTvCVSp7FSE7gIQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,315,1744095600"; 
-   d="scan'208";a="157215046"
+   d="scan'208";a="188386724"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 22:40:23 -0700
-Message-ID: <e1470c54-fe2b-4fdf-9b4b-ce9ef0d04a1b@intel.com>
-Date: Wed, 16 Jul 2025 13:40:20 +0800
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2025 23:10:59 -0700
+Message-ID: <eb9d39b4-0de8-4abb-b0f7-7180dc1aaee5@intel.com>
+Date: Wed, 16 Jul 2025 14:10:56 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 08/21] KVM: guest_memfd: Allow host to map guest_memfd
- pages
+Subject: Re: [PATCH v14 09/21] KVM: guest_memfd: Track guest_memfd mmap
+ support in memslot
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -77,123 +77,86 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250715093350.2584932-1-tabba@google.com>
- <20250715093350.2584932-9-tabba@google.com>
+ <20250715093350.2584932-10-tabba@google.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250715093350.2584932-9-tabba@google.com>
+In-Reply-To: <20250715093350.2584932-10-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 7/15/2025 5:33 PM, Fuad Tabba wrote:
-> Introduce the core infrastructure to enable host userspace to mmap()
-> guest_memfd-backed memory. This is needed for several evolving KVM use
-> cases:
-> 
-> * Non-CoCo VM backing: Allows VMMs like Firecracker to run guests
->    entirely backed by guest_memfd, even for non-CoCo VMs [1]. This
->    provides a unified memory management model and simplifies guest memory
->    handling.
-> 
-> * Direct map removal for enhanced security: This is an important step
->    for direct map removal of guest memory [2]. By allowing host userspace
->    to fault in guest_memfd pages directly, we can avoid maintaining host
->    kernel direct maps of guest memory. This provides additional hardening
->    against Spectre-like transient execution attacks by removing a
->    potential attack surface within the kernel.
-> 
-> * Future guest_memfd features: This also lays the groundwork for future
->    enhancements to guest_memfd, such as supporting huge pages and
->    enabling in-place sharing of guest memory with the host for CoCo
->    platforms that permit it [3].
-> 
-> Therefore, enable the basic mmap and fault handling logic within
-> guest_memfd. However, this functionality is not yet exposed to userspace
-> and remains inactive until two conditions are met in subsequent patches:
-> 
-> * Kconfig Gate (CONFIG_KVM_GMEM_SUPPORTS_MMAP): A new Kconfig option,
->    KVM_GMEM_SUPPORTS_MMAP, is introduced later in this series. 
+> Add a new internal flag, KVM_MEMSLOT_GMEM_ONLY, to the top half of
+> memslot->flags. This flag tracks when a guest_memfd-backed memory slot
+> supports host userspace mmap operations. It's strictly for KVM's
+> internal use.
 
-Well, KVM_GMEM_SUPPORTS_MMAP is actually introduced by *this* patch, not 
-other patches later.
+I would expect some clarification of why naming it with 
+KVM_MEMSLOT_GMEM_ONLY, not something like KVM_MEMSLOT_GMEM_MMAP_ENABLED
 
-> This
->    option gates the compilation and availability of this mmap
->    functionality at a system level. 
+There was a patch to check the userspace_addr of the memslot refers to 
+the same memory as guest memfd[1], but that patch was dropped. Without 
+the background that when guest memfd is mmapable, userspace doesn't need 
+to provide separate memory via userspace_addr, it's hard to understand 
+and accept the name of GMEM_ONLY.
 
-Well, at least from this patch, it doesn't gate the compilation.
+[1] https://lore.kernel.org/all/20250513163438.3942405-9-tabba@google.com/
 
-> While the code changes in this patch
->    might seem small, the Kconfig option is introduced to explicitly
->    signal the intent to enable this new capability and to provide a clear
->    compile-time switch for it. It also helps ensure that the necessary
->    architecture-specific glue (like kvm_arch_supports_gmem_mmap) is
->    properly defined.
-> 
-> * Per-instance opt-in (GUEST_MEMFD_FLAG_MMAP): On a per-instance basis,
->    this functionality is enabled by the guest_memfd flag
->    GUEST_MEMFD_FLAG_MMAP, which will be set in the KVM_CREATE_GUEST_MEMFD
->    ioctl. This flag is crucial because when host userspace maps
->    guest_memfd pages, KVM must *not* manage the these memory regions in
->    the same way it does for traditional KVM memory slots. The presence of
->    GUEST_MEMFD_FLAG_MMAP on a guest_memfd instance allows mmap() and
->    faulting of guest_memfd memory to host userspace. Additionally, it
->    informs KVM to always consume guest faults to this memory from
->    guest_memfd, regardless of whether it is a shared or a private fault.
->    This opt-in mechanism ensures compatibility and prevents conflicts
->    with existing KVM memory management. This is a per-guest_memfd flag
->    rather than a per-memslot or per-VM capability because the ability to
->    mmap directly applies to the specific guest_memfd object, regardless
->    of how it might be used within various memory slots or VMs.
-> 
-> [1] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
-> [2] https://lore.kernel.org/linux-mm/cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com
-> [3] https://lore.kernel.org/all/c1c9591d-218a-495c-957b-ba356c8f8e09@redhat.com/T/#u
+> This optimization avoids repeatedly checking the underlying guest_memfd
+> file for mmap support, which would otherwise require taking and
+> releasing a reference on the file for each check. By caching this
+> information directly in the memslot, we reduce overhead and simplify the
+> logic involved in handling guest_memfd-backed pages for host mappings.
 > 
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > Reviewed-by: Shivank Garg <shivankg@amd.com>
 > Acked-by: David Hildenbrand <david@redhat.com>
-> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Suggested-by: David Hildenbrand <david@redhat.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->   include/linux/kvm_host.h | 13 +++++++
->   include/uapi/linux/kvm.h |  1 +
->   virt/kvm/Kconfig         |  4 +++
->   virt/kvm/guest_memfd.c   | 73 ++++++++++++++++++++++++++++++++++++++++
->   4 files changed, 91 insertions(+)
+>   include/linux/kvm_host.h | 11 ++++++++++-
+>   virt/kvm/guest_memfd.c   |  2 ++
+>   2 files changed, 12 insertions(+), 1 deletion(-)
 > 
 > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 1ec71648824c..9ac21985f3b5 100644
+> index 9ac21985f3b5..d2218ec57ceb 100644
 > --- a/include/linux/kvm_host.h
 > +++ b/include/linux/kvm_host.h
-> @@ -740,6 +740,19 @@ static inline bool kvm_arch_supports_gmem(struct kvm *kvm)
->   }
->   #endif
+> @@ -54,7 +54,8 @@
+>    * used in kvm, other bits are visible for userspace which are defined in
+>    * include/uapi/linux/kvm.h.
+>    */
+> -#define KVM_MEMSLOT_INVALID	(1UL << 16)
+> +#define KVM_MEMSLOT_INVALID			(1UL << 16)
+> +#define KVM_MEMSLOT_GMEM_ONLY			(1UL << 17)
 >   
-> +/*
-> + * Returns true if this VM supports mmap() in guest_memfd.
-> + *
-> + * Arch code must define kvm_arch_supports_gmem_mmap if support for guest_memfd
-> + * is enabled.
-
-It describes the similar requirement as kvm_arch_has_private_mem and 
-kvm_arch_supports_gmem, but it doesn't have the check of
-
-	&& !IS_ENABLED(CONFIG_KVM_GMEM)
-
-So it's straightforward for people to wonder why.
-
-I would suggest just adding the check of !IS_ENABLED(CONFIG_KVM_GMEM) 
-like what for kvm_arch_has_private_mem and kvm_arch_supports_gmem. So it 
-will get compilation error if any ARCH enables CONFIG_KVM_GMEM without 
-defining kvm_arch_supports_gmem_mmap.
-
-
-> + */
-> +#if !defined(kvm_arch_supports_gmem_mmap)
-> +static inline bool kvm_arch_supports_gmem_mmap(struct kvm *kvm)
+>   /*
+>    * Bit 63 of the memslot generation number is an "update in-progress flag",
+> @@ -2536,6 +2537,14 @@ static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+>   		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
+>   }
+>   
+> +static inline bool kvm_memslot_is_gmem_only(const struct kvm_memory_slot *slot)
 > +{
-> +	return false;
-> +}
-> +#endif
+> +	if (!IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP))
+> +		return false;
 > +
+> +	return slot->flags & KVM_MEMSLOT_GMEM_ONLY;
+> +}
+> +
+>   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>   static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
+>   {
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 07a4b165471d..2b00f8796a15 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -592,6 +592,8 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+>   	 */
+>   	WRITE_ONCE(slot->gmem.file, file);
+>   	slot->gmem.pgoff = start;
+> +	if (kvm_gmem_supports_mmap(inode))
+> +		slot->flags |= KVM_MEMSLOT_GMEM_ONLY;
+>   
+>   	xa_store_range(&gmem->bindings, start, end - 1, slot, GFP_KERNEL);
+>   	filemap_invalidate_unlock(inode->i_mapping);
+
