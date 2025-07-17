@@ -1,57 +1,55 @@
 Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7934D23FC4C
-	for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 23:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE86248871
+	for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 23:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752796078; cv=none; b=FBoINxRv0c9aOe+jnnCXQv/dmAegFyUKddhTLG+pAmuRXSXivyJUsp62BwJQweXfdVcOW6WR6zm8dbt74XHdk2ZasBpTT5JfDUZS3XAjqf7syDGGsE1lL7B8PSjI+a6UliC6FR0IDUiaBAJR8/+wxH6XEb77tSY5Bgbdf0hrz30=
+	t=1752796079; cv=none; b=Gu/jEKuwILl5ADdhwraX3c04Z4TzFK5nfAQo1PCJ68LlnHAUZI7W6jy5YIgfTvvUofVqROF90x0zixYNFSkZ4s/OeLjcoS9L0w+PCdp2uIGgrgAsDpomLvLgUQrZGeZgit3fJzKumFozlkWEbPSqPleSpq7yzXM7uk7Chzrb97A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752796078; c=relaxed/simple;
-	bh=tdO3rvbLSuTpzfP82KhIVxFo9mNfKAFeekY7qAlj770=;
+	s=arc-20240116; t=1752796079; c=relaxed/simple;
+	bh=4Lm6rMZZKj9i8zZ/NnoVMfxriOkG8OOdGzwZV10mDmc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aqvNsNr4fgrAPr7Lp8g4b/7yp0K/cwFTPOwLrXDAWbAjH7CZoU01lCMBXzIvVvHnqPUG+Bt/yiJmw3rWBAyeq57xBouOMRLrA9jvIsBtRVyN7b67QZP72o/7YXuG+DP+KEAFV4nffoJa13E1Ti5DgC3ZQjqxXcsq/icki1wnlFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YtPN9dwV; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=L66YtGdOkxfhwn1U1PZsbUGqgpI6AXOrGwOR8y2zqsNCdPwYLWue0Ov6j0VvVGmAKeEeBqS7qj2i+88U4vBcbnPMM5NLvlKNheveWg+s/1vMcbfeWHrvu/Q4Bi7d6l1BaTbcpnaCSnW3PHAfC6GfWrSHXGqbeNAO0hIvbFCsbHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bHNcxV4K; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YtPN9dwV"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a4f858bc5eso1106855f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 16:47:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bHNcxV4K"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a6d1394b07so996206f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 16:47:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752796075; x=1753400875; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LvbtjEj18PWGX0x1t0phF/x8ckso/td4YZy4kcOPVcw=;
-        b=YtPN9dwVUAtLvwB/zv67IPyIwB3Z/Nb47TMmTGjtdowtPENWullvU/OzQi4AoiCTIc
-         9ZkvJTouOYPUAPpjNQ56YN6R2qbZjwpbzBUCfrNM7Sb7ogn75uKaEkhRxzjQSYM3wyOz
-         MPUEJPZFKx9A0UCsZOpHwGg4yYTVz9p6xTxrxbjEHHkZH2Nov9snhldaLwZ4zaoLmBmA
-         82aY+oWPw3sreuVI52wG95I8UVJMXgnt28tLHLOJtwy4hopy/F07FRb4yhdqsx6FJrfs
-         g7CIc4+mbsbYAZP5bfwaNe6bqxFKbT0MptoyviJ9ZBSX+ejaNoZZ7Sf6jCVyHbhU2oNU
-         mvdg==
+        d=google.com; s=20230601; t=1752796076; x=1753400876; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i36b1JU3bh8bkcjM27fcG1Vv3a5VEOWwHxSUo3VGonw=;
+        b=bHNcxV4Kh9kvO1SJLIlg+GxRysUnljQHmPVfvmw+Y+JMBtei3Do4T/MZdumjODCXKA
+         ZXY/bEgYOOcJGRNJa+Eo92rtSjc91XlKIL8LXouWhCSVBa9Qq0nObUNKHMAy2gOZGnRC
+         NENhFSfih+LqsOIkTQB/G+Yk+w8KmQBYZhvH4TPVF3lqCUvZMl4wFX70MWHidJtQztIy
+         M1xf7MTAGqkUrEwSGRa3YSGGweJZlp6Uf4PQOvxtAttc47ikkosT3L6LDgLi2I9Iw5cl
+         z73KC7hj6ef9J9qCNJBXnNvLTLzSim1Bcau6qeCojL4yozCwSIgpM9XhKEjNhXp6yZ7s
+         545g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752796075; x=1753400875;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LvbtjEj18PWGX0x1t0phF/x8ckso/td4YZy4kcOPVcw=;
-        b=nzQsICH5HytOqBZmB+Z+EV1cWGO/LeUdTxfJfxXanex8DWML199ZnN7D05hig3J8us
-         qZgb7zprn7C0WZ0YUpm020F6xZ/CJJD1iO0nTPDIWR3D5hbJdUK1a7CPRNKoRrgWjpyf
-         4UDzgkPiQbTFvmRVstsdzpwix5pDt3aolyu1hQO4Zx2T7+uuVzXlAbKdQR+E4bmyfkTW
-         pHYDnSK9UNna41dBt190x45M3lPP2hqSlLnjCLfmv9FEkUHm8VGEq8GKySgWtqnuYEmV
-         a4SzS04KYA156aJvUKp2hfZVZdS7dhT0GI1bgCqyqphmLWM8v6ulP6mr/NwNfDKnHx/4
-         jHjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXtRSb07lfX3NdYMcNdhsBFYbAXe7q3UZeirbdgNN33VwnoN1TaalRF4aUsw0eAvuk1N8S6iY8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywk67JmmoTAtVouKQB9Ue1xoX+8uHZ1DVXSUEvISorlkWs6lxDX
-	n07yWr4d/zMKL8lCA4yfLn5qH3KKuEr6pF7Hqs8wHsi3kdgaplYFRZoyOeWPYFXQM9cRnxpGRQ5
-	Kr4OIBcrs19qM1g==
-X-Google-Smtp-Source: AGHT+IEqpHOI0zrJb9yR1cFU4cC/jK8HJFkKzvKnqDRgTErFGhbJbdyVNV2Vo7dJPqX0P3eL6UZg+etWnzq0eA==
-X-Received: from wmbek11.prod.google.com ([2002:a05:600c:3ecb:b0:450:def3:7fc6])
+        d=1e100.net; s=20230601; t=1752796076; x=1753400876;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i36b1JU3bh8bkcjM27fcG1Vv3a5VEOWwHxSUo3VGonw=;
+        b=U0wfEAyvmxbIbrfaReRkS+wfLxEkJl6tVO2eGjh7xi+UvrAa3Tz5a8+Q2KVuxFeyq4
+         fbknS1HhfxlKNfqQcPupaQUaEDXYNEm671tKjcHeQ83lYmpa8hGy5+hgoxwIMb+AH9ec
+         dXaBCipQVJSAnxlzpA1ygprnOuHMGQAkE/BiMC99++4gnz+1CNaxXJ8e1Wn6bcNRKuv4
+         +EfHrW5NumP8a5BcTG4S4tdu9T8Ve/7xbCm97rlp0C++asNA0TIVQ/ul67WA7Ip42gq4
+         QvzRODWOfX1Sa1D4mSqMnN1H2Cm4aP7a6r+xcp8bI7GiGGQejXY7GtaWZjOk0jGHQ+9V
+         b3Kw==
+X-Forwarded-Encrypted: i=1; AJvYcCVA+hoZAkITyMWOZCqHEprvboYUv9HL+USw1onyRdiiqOAmR5NmNnjX/BT9wdfoIvohHjWFqtY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwS0PV1W0pG+B79h3sMil2uzG+wnP3OqppmILTTX0gEZBVEGewn
+	zsak1KRMXLQOoyBNnsr6ZU6rVHEtpqr0Ve+oWBh8q27NXpLEVErRkYpqBIe4D9CyCHbGz9rn2rr
+	p1f3B80iPgRNNow==
+X-Google-Smtp-Source: AGHT+IHKyMuHhag8ZOByJFmk1Ifp+SWFFmJZZLFql4fjdBJ3bTCSJXcxMK4YsTuE1B/9R5Fp15TBOEDcXOc6wQ==
+X-Received: from wmbdz10.prod.google.com ([2002:a05:600c:670a:b0:450:cf3f:2a89])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:430f:b0:3a5:2e84:cc7b with SMTP id ffacd0b85a97d-3b60e4c94b7mr6619655f8f.11.1752796074851;
- Thu, 17 Jul 2025 16:47:54 -0700 (PDT)
-Date: Thu, 17 Jul 2025 23:47:43 +0000
+ 2002:a5d:5d10:0:b0:3a5:5270:c38f with SMTP id ffacd0b85a97d-3b60dd0db62mr8326635f8f.0.1752796076663;
+ Thu, 17 Jul 2025 16:47:56 -0700 (PDT)
+Date: Thu, 17 Jul 2025 23:47:44 +0000
 In-Reply-To: <20250717234744.2254371-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250717234744.2254371-1-smostafa@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250717234744.2254371-2-smostafa@google.com>
-Subject: [PATCH 1/2] KVM: arm64: Dump instruction on hyp panic
+Message-ID: <20250717234744.2254371-3-smostafa@google.com>
+Subject: [PATCH 2/2] KVM: arm64: Map hyp text as RO and dump instr on panic
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev
@@ -71,110 +69,67 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	yuzenghui@huawei.com, qperret@google.com, keirf@google.com, 
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Similar to the kernel panic, where the instruction code is printed,
-we can do the same for hypervisor panics.
+Map the hyp text section as RO, there are no secrets there
+and that allows the kernel extract info for debugging.
 
-This patch does that only in case of =E2=80=9CCONFIG_NVHE_EL2_DEBUG=E2=80=
-=9D or nvhe.
-
-The next patch adds support for pKVM.
-
-Also, remove the hardcoded argument dump_kernel_instr().
+As in case of panic we can now dump the faulting instructions
+similar to the kernel.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- arch/arm64/include/asm/traps.h |  1 +
- arch/arm64/kernel/traps.c      | 20 +++++++++++++-------
- arch/arm64/kvm/handle_exit.c   |  5 +++++
- 3 files changed, 19 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/handle_exit.c    |  4 +---
+ arch/arm64/kvm/hyp/nvhe/setup.c | 12 ++++++++++--
+ 2 files changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/traps.h b/arch/arm64/include/asm/traps.=
-h
-index 82cf1f879c61..0d7e86a95d62 100644
---- a/arch/arm64/include/asm/traps.h
-+++ b/arch/arm64/include/asm/traps.h
-@@ -30,6 +30,7 @@ void arm64_force_sig_mceerr(int code, unsigned long far, =
-short lsb, const char *
- void arm64_force_sig_ptrace_errno_trap(int errno, unsigned long far, const=
- char *str);
-=20
- int early_brk64(unsigned long addr, unsigned long esr, struct pt_regs *reg=
-s);
-+void dump_instr(unsigned long addr);
-=20
- /*
-  * Move regs->pc to next instruction and do necessary setup before it
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index 9bfa5c944379..d692c05e3686 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -149,15 +149,11 @@ pstate_check_t * const aarch32_opcode_cond_checks[16]=
- =3D {
-=20
- int show_unhandled_signals =3D 0;
-=20
--static void dump_kernel_instr(const char *lvl, struct pt_regs *regs)
-+void dump_instr(unsigned long addr)
- {
--	unsigned long addr =3D instruction_pointer(regs);
- 	char str[sizeof("00000000 ") * 5 + 2 + 1], *p =3D str;
- 	int i;
-=20
--	if (user_mode(regs))
--		return;
--
- 	for (i =3D -4; i < 1; i++) {
- 		unsigned int val, bad;
-=20
-@@ -169,7 +165,17 @@ static void dump_kernel_instr(const char *lvl, struct =
-pt_regs *regs)
- 			p +=3D sprintf(p, i =3D=3D 0 ? "(????????) " : "???????? ");
- 	}
-=20
--	printk("%sCode: %s\n", lvl, str);
-+	printk(KERN_EMERG "Code: %s\n", str);
-+}
-+
-+static void dump_kernel_instr(struct pt_regs *regs)
-+{
-+	unsigned long addr =3D instruction_pointer(regs);
-+
-+	if (user_mode(regs))
-+		return;
-+
-+	dump_instr(addr);
- }
-=20
- #define S_SMP " SMP"
-@@ -190,7 +196,7 @@ static int __die(const char *str, long err, struct pt_r=
-egs *regs)
- 	print_modules();
- 	show_regs(regs);
-=20
--	dump_kernel_instr(KERN_EMERG, regs);
-+	dump_kernel_instr(regs);
-=20
- 	return ret;
- }
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 453266c96481..de12b4d4bccd 100644
+index de12b4d4bccd..d59f33c40767 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -565,6 +565,11 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr,=
- u64 spsr,
- 	/* Dump the nVHE hypervisor backtrace */
+@@ -566,9 +566,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
  	kvm_nvhe_dump_backtrace(hyp_offset);
-=20
-+	/* Dump the faulting instruction */
-+	if (!is_protected_kvm_enabled() ||
-+	    IS_ENABLED(CONFIG_NVHE_EL2_DEBUG))
-+		dump_instr(panic_addr + kaslr_offset());
-+
+ 
+ 	/* Dump the faulting instruction */
+-	if (!is_protected_kvm_enabled() ||
+-	    IS_ENABLED(CONFIG_NVHE_EL2_DEBUG))
+-		dump_instr(panic_addr + kaslr_offset());
++	dump_instr(panic_addr + kaslr_offset());
+ 
  	/*
  	 * Hyp has panicked and we're going to handle that by panicking the
- 	 * kernel. The kernel offset will be revealed in the panic so we're
---=20
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index a48d3f5a5afb..90bd014e952f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -192,6 +192,7 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	enum pkvm_page_state state;
+ 	struct hyp_page *page;
+ 	phys_addr_t phys;
++	enum kvm_pgtable_prot prot;
+ 
+ 	if (!kvm_pte_valid(ctx->old))
+ 		return 0;
+@@ -210,11 +211,18 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	 * configured in the hypervisor stage-1, and make sure to propagate them
+ 	 * to the hyp_vmemmap state.
+ 	 */
+-	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(ctx->old));
++	prot = kvm_pgtable_hyp_pte_prot(ctx->old);
++	state = pkvm_getstate(prot);
+ 	switch (state) {
+ 	case PKVM_PAGE_OWNED:
+ 		set_hyp_state(page, PKVM_PAGE_OWNED);
+-		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
++		/* hyp text is RO in the host stage-2 to be inspected on panic. */
++		if (prot == PAGE_HYP_EXEC) {
++			set_host_state(page, PKVM_NOPAGE);
++			return host_stage2_idmap_locked(phys, PAGE_SIZE, KVM_PGTABLE_PROT_R);
++		} else {
++			return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
++		}
+ 	case PKVM_PAGE_SHARED_OWNED:
+ 		set_hyp_state(page, PKVM_PAGE_SHARED_OWNED);
+ 		set_host_state(page, PKVM_PAGE_SHARED_BORROWED);
+-- 
 2.50.0.727.gbf7dc18ff4-goog
 
