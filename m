@@ -1,191 +1,238 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9452FCFC9
-	for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 16:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E122FCE30
+	for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 16:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752770562; cv=none; b=AwtLl2i6kttgAZQ4TpxO46MQEjCoMOkCh/+ALIl9K99FWikqzIYvlPJIdjtydBVRBzkUbJWGtKkMV4ED27/EfTHhPjlPd381ESIgKNd5OK5Fo8MSHBBvSI3/s50hNLd4hFzu1LXSXamOWI64BM3URzL8sLxII1YMJFgCK6xQJxM=
+	t=1752771012; cv=none; b=D3en/N0qkP8t/D0Q7otbDThGzPuHHZ9LvzPsOSMZP0QlND3SWVQs1tWvmGQPPfUWDKpYoPtlOaKe3IQ4nQwmYrlPvMsphDQEvwwwI14PUhQTAZkouCEbnnTU88R5dsVfqKKHLB1EZqyeOhiD4m/GcYa6teQhf8xF63Y6X56BBuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752770562; c=relaxed/simple;
-	bh=Zp+bqdk2AUV+SBqOdeWsNgo02TfpUX044tCk09JCCZY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZKXLJ+b2twB3cCirvmrkjAl5yX6620VaT6HKRZ8xZYtHKaV0L6HnqLLRkPPolIL9muAFJ0ySwFGaIkIRDCy0b51hpd4TCjiSUazpNWPJByzmnWcxkzTGqCLRPMRfLSIX6hJpo/cfdR/YEz8dSNbllMrkSt24cr0nRcitObOevfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ttqkTl/L; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1752771012; c=relaxed/simple;
+	bh=TyxGO/XUQe6bmOsTjL4WMUSu82dVkBc++MRqd2R27FY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=d1Y9Lya0O7Qbj83PuM7QE7ODNWIOqga2WBlE7OQyvQYtMaiqFJA3FP7IB2Qv+0BbNM9er335Y58JFbfY5TnZWZojcl6YNQshC6eNJBYfowCSXN3/xpjzrmc/KCknv8FOCY0ue6hD/boUM6s5ION5nr8kRSMSLLA+csVQ862lkEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XjzYoh3Q; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ttqkTl/L"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4560add6cd2so9994195e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 09:42:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XjzYoh3Q"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3122368d82bso1613870a91.0
+        for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 09:50:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1752770559; x=1753375359; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0KIZvn3WMN/D9GaYJuL0YNSf8jbAXvNffTD/qUx3PrA=;
-        b=ttqkTl/Lgx1LMxIj+2OKM5EmdCdr9vqxDFzO3NL9air4Eaxj+rZfkrybXdjo2Oyfim
-         6JYKuzcsqV9hvXVg07HlltAsKoSDAhaK+R1MkfmP+SHAyeLWftG8K3jd0by9WHgVZPHT
-         +UAzMQ5zKinI5zR+81lXBJQ44IydjPZ4a/hjkeFppN9yrSQbNhCzIHJNBIPyrm+He7qH
-         wM+NsEm8V88jgQQeNuzTSl4KwsUEtWWkDdqUQR6nPb4O+ECi6z0fGimnU88Ze93rU6Ia
-         8asCpajPW7AJ416aiypNgcCY1LK6vS/t+8ZXoKgc9OFN3qV1OLwvYQF08r0cv3sU2wPz
-         g0Gw==
+        d=google.com; s=20230601; t=1752771011; x=1753375811; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WBAzc7UgvLX+B8PzHVBbV8hcGwtUEb1k8RUWx3wr7P8=;
+        b=XjzYoh3Qv3RowDBfo4PiSIHuSSnV/dYJxGws1K/6AH+eEjEzrmEKPGLdxNqzivS3nD
+         9qvNJKsP6aq/+LGJWQNf6ZLItqt2/ZL4ySXGCuS6JEByd6XVTAYSH7zNwL1u0+g74NEv
+         mj5bqyQi5Z9ID7mg8t75V39+MPWNsepIulnHKJk0/XiW/DNePzkHuvC9eCJs+7FRAWc3
+         6gzByQ4lHA1VNQN19mFl9/RlCU44P+cRdomKp7Zfjy4brBEE27M09TbHVYY0SX5M+R0z
+         WHeZ2vvLrv6WMk2OaG/k9ZX0SvICiT1RziWASAMOyjOVNFcSKCCaA0QVCBQzvfzX26C9
+         g3Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752770559; x=1753375359;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0KIZvn3WMN/D9GaYJuL0YNSf8jbAXvNffTD/qUx3PrA=;
-        b=DvSBtWWbCOFqhR2ApCUfWmDjnuvzbElagMESseqIuq3chT/DjQKcn1IHHTSOUutRII
-         01H8XMDk/CQlKHTfNGcVWYmG3bGtLOtyIA6Rb/Eiy60PHD6tv3C28lIH0XO4lfLUhZ5Y
-         3yvjmQ+Pbk0sqXe9NlPexPiUZWLHMpgYGA9TELQMkGZHNl0HMFWcmOtqR5oBpXGcdvqb
-         e2L3N6eRgOC81IcvBuUtdDAkbXxvkHjYO1s9S8XXpMGVBcsjexTMz+cQBngzsVjZIBtd
-         pQ3+74tysSWZDI+tcjCFus7P2J92O2M0hPo6S8nhSrlMl+OdKByyIW/sncOioInjr/f+
-         tQ3A==
-X-Forwarded-Encrypted: i=1; AJvYcCU5uNbQOrZHB9K7DkQaI6tS+Du3YBsnsnfmPRnSiowWiYSTP3W33lccUpwy0PixkbL1h6eGYc4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzlS2Q99tFWLAw5btuS+DF7vStwxSfIdi04Dr6NR+97Az6jhGH9
-	fYeKaU+wNEBteFb2nkJigWkqSyPp5TGTlNt7TZNFZDIEejNzaxH9ZIIOGGPzvz5XXJU=
-X-Gm-Gg: ASbGncu3f/xJKF6hX9YInsqoblNkbqrpaL9S8PsTinO0LVrheZPmepsAPHkwFXzfXqq
-	ydgakDD3OMSTBhpaD7WQ7h5gXD6t8IqhDXQJV38PDg515EYNfJuC5eweBfXJQ7Z2kS+enBcEd87
-	JYUonX/mmGJ0EiGrqQrIq7ipctZJrtEpEsI54N2Kdyr4HbDMl7D0wQfjU4T1R1MV+qxaSyRtttO
-	FlljJuftSpecyQnfhIF7AziarNbtlvhMcXZOscO5h0yXidBkoAdPeq0sdITU+xaNEWyjaTzWIgx
-	P6XE+buqWaLiXm7ZmO3cNzSw8G2ahpiX7SuRXpIhtM+q7eWDAmoz0btGp6JKtdYi65ZBa0+44iX
-	O67IjFXjWho6RDMI3lVifOUWqOQ0=
-X-Google-Smtp-Source: AGHT+IHw2GCF56hApJyEmdx/xTKHHH5iV9N7ia+pyQS/X4tv7tXWZh4hCv08eoEvqDhMJOVRwHk5hg==
-X-Received: by 2002:a05:600c:3f12:b0:456:1ab0:d566 with SMTP id 5b1f17b1804b1-456348cbdb0mr41924525e9.16.1752770558925;
-        Thu, 17 Jul 2025 09:42:38 -0700 (PDT)
-Received: from [192.168.1.3] ([185.48.76.109])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45634f5dd61sm28041015e9.11.2025.07.17.09.42.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jul 2025 09:42:38 -0700 (PDT)
-Message-ID: <95468171-a09d-4b6b-a0bd-189d83ff33a6@linaro.org>
-Date: Thu, 17 Jul 2025 17:42:37 +0100
+        d=1e100.net; s=20230601; t=1752771011; x=1753375811;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WBAzc7UgvLX+B8PzHVBbV8hcGwtUEb1k8RUWx3wr7P8=;
+        b=azq6mOrgbd3ASOBwTyZjv/+Q717IqV0CX/Wnz9WMu5PrmtaHftpQYNGevocfwYRK3E
+         T3W+CWk5mptzA86ydHHn4sSy/xre1APl4oVlR4LKFZgyEIq58Zy/zJuhm3mVX8Yi5bUn
+         s40FgerREMjpFjNDLjHCkUYSvGPk1LMNA+dsRH2JEnzJvSg1eoyw3csQwtIYpPZlbSd+
+         tjY9ixLG3Z4s4xmuRyPf3CCujACpqcaGVz2uJkFIohrjRlxKdfMPMH59HPj2avTnOyIQ
+         uo9cohXG/lVjViFGzOl9FqAGiF29DCsFvx1wkwEtVGvuc8ZEkdqHlr7/Kb7OZELUad6g
+         9gjg==
+X-Forwarded-Encrypted: i=1; AJvYcCXl7JAgPOfNzpgYOWrowOEpZ1yUhv0mkrheg/d5YY78JeuMltFM3KmURNUALlvne8frXb7ZPmw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwIhJ5uJi7VZevdQ56POXjMM5fEQgemKEcQFstpLMzHSRbVsnsg
+	PJmlHLTot0hThmeWiH3mtohDg3mpnI8Ock5QYr02T2FaO5WTpOBzgefccwmgcXQMYJ+CDJDIEBM
+	9YOz+j2mdZkRsOyT1Xz1QrxUXHg==
+X-Google-Smtp-Source: AGHT+IEhDg9xNtK2OOevEaVdQD/8F/x32XlKvxnbxDiNek4tVELQY02FrDg+/mKgpmUj0DqZBQWsfDifCuQhasqQTg==
+X-Received: from pjbqo11.prod.google.com ([2002:a17:90b:3dcb:b0:311:7d77:229f])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:270b:b0:311:df4b:4b94 with SMTP id 98e67ed59e1d1-31c9f3ee9dcmr9740819a91.4.1752771010723;
+ Thu, 17 Jul 2025 09:50:10 -0700 (PDT)
+Date: Thu, 17 Jul 2025 09:50:09 -0700
+In-Reply-To: <fef1d856-8c13-4d97-ba8b-f443edb9beac@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/10] perf: arm_spe: Add support for filtering on data
- source
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Mark Rutland <mark.rutland@arm.com>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, leo.yan@arm.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
- <20250605-james-perf-feat_spe_eft-v3-7-71b0c9f98093@linaro.org>
- <aHUOig-kaRo15ZH5@willie-the-truck>
- <7f51d4f9-7e08-49b5-ab43-8bc765bb2ca8@linaro.org>
- <aHkI5_IOV35L4YJa@willie-the-truck>
- <ca99af3b-e358-4c2b-8d62-0b6c29984391@linaro.org>
- <aHkWTlaRKdXbnA0r@willie-the-truck>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <aHkWTlaRKdXbnA0r@willie-the-truck>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250715093350.2584932-1-tabba@google.com> <20250715093350.2584932-5-tabba@google.com>
+ <b5fe8f54-64df-4cfa-b86f-eed1cbddca7a@intel.com> <diqzwm87fzfc.fsf@ackerleytng-ctop.c.googlers.com>
+ <fef1d856-8c13-4d97-ba8b-f443edb9beac@intel.com>
+Message-ID: <diqztt3ag3su.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v14 04/21] KVM: x86: Introduce kvm->arch.supports_gmem
+From: Ackerley Tng <ackerleytng@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
+Xiaoyao Li <xiaoyao.li@intel.com> writes:
 
-
-On 17/07/2025 4:27 pm, Will Deacon wrote:
-> On Thu, Jul 17, 2025 at 04:16:32PM +0100, James Clark wrote:
->>
->>
->> On 17/07/2025 3:29 pm, Will Deacon wrote:
->>> On Tue, Jul 15, 2025 at 02:04:18PM +0100, James Clark wrote:
->>>> On 14/07/2025 3:04 pm, Will Deacon wrote:
->>>>> On Thu, Jun 05, 2025 at 11:49:05AM +0100, James Clark wrote:
->>>>>> @@ -406,6 +416,9 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
->>>>>>     	if (ATTR_CFG_GET_FLD(attr, inv_event_filter))
->>>>>>     		reg |= PMSFCR_EL1_FnE;
->>>>>> +	if (ATTR_CFG_GET_FLD(attr, data_src_filter))
->>>>>> +		reg |= PMSFCR_EL1_FDS;
->>>>>
->>>>> Is the polarity correct here? The description of PMSDSFR_EL1.S<m> suggests
->>>>> that setting bits to 1 _excludes_ the FDS filtering.
->>>>>
+> On 7/17/2025 8:12 AM, Ackerley Tng wrote:
+>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>> 
+>>> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
+>>>> Introduce a new boolean member, supports_gmem, to kvm->arch.
 >>>>
->>>> Setting filter bits to 1 means that samples matching are included. Setting
->>>> bits to 0 means that they are excluded. And PMSFCR_EL1.FDS enables filtering
->>>> as a whole, so if the user sets any filter bit to 1 we want to enable
->>>> filtering:
+>>>> Previously, the has_private_mem boolean within kvm->arch was implicitly
+>>>> used to indicate whether guest_memfd was supported for a KVM instance.
+>>>> However, with the broader support for guest_memfd, it's not exclusively
+>>>> for private or confidential memory. Therefore, it's necessary to
+>>>> distinguish between a VM's general guest_memfd capabilities and its
+>>>> support for private memory.
 >>>>
->>>>     PMSDSFR_EL1.S<m>
+>>>> This new supports_gmem member will now explicitly indicate guest_memfd
+>>>> support for a given VM, allowing has_private_mem to represent only
+>>>> support for private memory.
 >>>>
->>>>     0b0  If PMSFCR_EL1.FDS is 1, do not record load operations that have
->>>>          bits [5:0] of the Data Source packet set to <m>.
->>>>
->>>>     0b1  Load operations with Data Source <m> are unaffected by
->>>>          PMSFCR_EL1.FDS.
->>>>
->>>> I think it's all the right way around and it ends up being the same as the
->>>> other filters in SPE. Because we're using any bit being set to enable the
->>>> filtering, the only thing you can't do is enable filtering with a 0 filter,
->>>> but I didn't think that was useful. See the previous discussion on this
->>>> here:
->>>> https://lore.kernel.org/all/5752f039-51c1-4452-b5df-03ff06da7be3@linaro.org/
->>>>
->>>> Reading the "Data source filtering" section in the docs change at the end
->>>> might help too.
+>>>> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+>>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>>> Reviewed-by: Shivank Garg <shivankg@amd.com>
+>>>> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+>>>> Co-developed-by: David Hildenbrand <david@redhat.com>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> Signed-off-by: Fuad Tabba <tabba@google.com>
 >>>
->>> Sorry, but I still don't get it :/
+>>> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 >>>
->>> afaict, if any of the bits in 'data_src_filter' are _zero_ then we
->>> should set PMSFCR_EL1.FDS. That also means that a mask of zero means all
->>> loads are filtered, which is what the architecture says and is what we
->>> should provide to userspace.
+>>> Btw, it seems that supports_gmem can be enabled for all the types of VM?
 >>>
->>> Will
->>
->> We'd have to add another format flag to enable data source filtering then,
->> because otherwise the default would be zero and people's samples would
->> disappear.
->>
->> But the only use cases I could think of were more like "I want to see
->> samples from data source 1":
->>
->>    -e arm_spe/data_src_filter=0x1/
->>
->> Or "I want to see all data sources except 1":
->>
->>    -e arm_spe/data_src_filter=0xfffffffe/
->>
->> Filtering out all samples with any data source didn't seem to make sense to
->> me, and I think you can already do that with the other filters (remove loads
->> etc).
->>
->> It would be a shame to be inconsistent and to add an enable flag just for
->> that one case because the other filters in SPE are auto enabled for non-zero
->> values. Although to be fair for PMSFCR.FT and others, zero filters are
->> explicitly not allowed:
->>
->>    If this field is set to 1 and the PMSFCR_EL1.{ST, LD, B} bits are all
->>    set to zero, it is CONSTRAINED UNPREDICTABLE whether no samples are
->>    recorded or the PE behaves as if PMSFCR_EL1.FT is set to 0
->>
->> Seems like FDS doesn't end up as neat as the others, but IMO I can't see
->> anyone needing a zero filter. I did discuss it with Leo and we decided that
->> we could always add the enable flag at a later date if a use case turned up
->> and it wouldn't be a breaking change.
->>
->> But if you think it's there so it should be exposed I can add it.
-> 
-> What about if we expose the inverse of PMSDSFR_EL1 to userspace instead?
-> 
-> Will
+>> 
+>> For now, not really, because supports_gmem allows mmap support, and mmap
+>> support enables KVM_MEMSLOT_GMEM_ONLY, and KVM_MEMSLOT_GMEM_ONLY will
+>> mean that shared faults also get faulted from guest_memfd.
+>
+> No, mmap support is checked by kvm_arch_supports_gmem_mmap() which is 
+> independent to whether gmem is supported.
+>
+>> A TDX VM that wants to use guest_memfd for private memory and some other
+>> backing memory for shared memory (let's call this use case "legacy CoCo
+>> VMs") will not work if supports_gmem is just enabled for all types of
+>> VMs, because then shared faults will also go to kvm_gmem_get_pfn().
+>
+> This is not what this patch does. Please go back read this patch.
+>
+> This patch sets kvm->arch.supports_gmem to true for 
+> KVM_X86_SNP_VM/tdx/KVM_X86_SW_PROTECTED_VM.
+>
+> Further in patch 14, it sets kvm->arch.supports_gmem for KVM_X86_DEFAULT_VM.
+>
+> After this series, supports_gmem remains false only for KVM_X86_SEV_VM 
+> and KVM_X86_SEV_ES_VM. And I don't see why cannot enable supports_gmem 
+> for them.
+>
 
-That's exactly what I was thinking. It does seem a bit weird, but I can 
-call it inv_data_src_filter and document it appropriately so it should 
-be fine.
+My bad, my explanation was actually for
+kvm_arch_supports_gmem_mmap(). Could the confusion on this thread be
+showing that the .supports_gmem is actually kind of confusing?
 
+If there's nothing dynamic about .supports_gmem, what have we remove the
+.supports_gmem field and have kvm_arch_supports_gmem_mmap() decide based
+on VM type? 
+
+>> This will be cleaned up when guest_memfd supports conversion
+>> (guest_memfd stage 2). There, a TDX VM will have .supports_gmem = true.
+>> 
+>> With guest_memfd stage-2 there will also be a
+>> KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING.
+>> KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaults to false, so for legacy
+>> CoCo VMs, shared faults will go to the other non-guest_memfd memory
+>> source that is configured in userspace_addr as before.
+>> 
+>> With guest_memfd stage-2, KVM_MEMSLOT_GMEM_ONLY will direct all EPT
+>> faults to kvm_gmem_get_pfn(), but KVM_MEMSLOT_GMEM_ONLY will only be
+>> allowed if KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING is true. TDX VMs
+>> wishing to use guest_memfd as the only source of memory for the guest
+>> should set KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING to true before
+>> creating the guest_memfd.
+>> 
+>>> Even without mmap support, allow all the types of VM to create
+>>> guest_memfd seems not something wrong. It's just that the guest_memfd
+>>> allocated might not be used, e.g., for KVM_X86_DEFAULT_VM.
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> 
+>> p
