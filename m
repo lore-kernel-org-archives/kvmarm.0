@@ -1,392 +1,191 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C04730112B
-	for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 16:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9452FCFC9
+	for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 16:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752769678; cv=none; b=FX4Jrru0AzDAdH2lg7L5sUManvbJU4oHAHK759ZCgiHNi9VWMi9ugNZLLojXL0FjYsd77EfeYyq3T9qzEHNtH1xscPMXqjWrhlnMfYf+q0x19TLg7LpmU39q2BUpPqfGh0uemeX7FBpEcAU+NWHzlsR+AGiexICnwYyvIH6Jdzs=
+	t=1752770562; cv=none; b=AwtLl2i6kttgAZQ4TpxO46MQEjCoMOkCh/+ALIl9K99FWikqzIYvlPJIdjtydBVRBzkUbJWGtKkMV4ED27/EfTHhPjlPd381ESIgKNd5OK5Fo8MSHBBvSI3/s50hNLd4hFzu1LXSXamOWI64BM3URzL8sLxII1YMJFgCK6xQJxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752769678; c=relaxed/simple;
-	bh=ieE9uakSkbHoNeSHVGqSyQEMtw9HWe5ggnyvIaywshE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q7v94H4u3EhUUqXfz72irQaUA27KiavIK003SAg7I99G9sTqd1bzW8T2nT0N9RKGnGNpTJtr13orKI0bASvMmnKQH/8jev8hjmP+UfCdWoRD4Aq1mMasFHiFIndLo6pyU/yI8VmURIftfADc6mupB38qBVkee/AQ+aUOTkqVhu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X32DDwri; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1752770562; c=relaxed/simple;
+	bh=Zp+bqdk2AUV+SBqOdeWsNgo02TfpUX044tCk09JCCZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZKXLJ+b2twB3cCirvmrkjAl5yX6620VaT6HKRZ8xZYtHKaV0L6HnqLLRkPPolIL9muAFJ0ySwFGaIkIRDCy0b51hpd4TCjiSUazpNWPJByzmnWcxkzTGqCLRPMRfLSIX6hJpo/cfdR/YEz8dSNbllMrkSt24cr0nRcitObOevfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ttqkTl/L; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X32DDwri"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4561611dc2aso10246025e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 09:27:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ttqkTl/L"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4560add6cd2so9994195e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 09:42:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752769674; x=1753374474; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=thCPZ9YOQBveI+hJX+S0duGcG+bqAQLlDkhewk99Mu4=;
-        b=X32DDwriI3TnE7MqhQ8aaJdfyFUCkyV1pdD3sOJpeCxncLboBgIa8/LYkeYB+z5ja2
-         9G5M5GUrE5VHUxhxO8jzOVjNohIICfpk0tzVqx+IelOZD3r+iKxeIzB5GzIKqfJCYQrV
-         +rDP0w8DjBKZwtiaz3R5i7+VmSjwc47nB8KsI5WQUYfI60/Czp/b5dbTVnYUDKbgHgxm
-         c/VKkhm6svRqd7iy2Q7hLZrmGZUbQI9diCTfZF1ZOzMZP/rXpFlFuZiS6X9KN2vl7nCs
-         SdIfslCLOKrnduSDsmESSgQAii7sBkqNMWpNt0wbuvdyhAVD6JZm+Q632Hj8z7rOaxlT
-         DiZA==
+        d=linaro.org; s=google; t=1752770559; x=1753375359; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0KIZvn3WMN/D9GaYJuL0YNSf8jbAXvNffTD/qUx3PrA=;
+        b=ttqkTl/Lgx1LMxIj+2OKM5EmdCdr9vqxDFzO3NL9air4Eaxj+rZfkrybXdjo2Oyfim
+         6JYKuzcsqV9hvXVg07HlltAsKoSDAhaK+R1MkfmP+SHAyeLWftG8K3jd0by9WHgVZPHT
+         +UAzMQ5zKinI5zR+81lXBJQ44IydjPZ4a/hjkeFppN9yrSQbNhCzIHJNBIPyrm+He7qH
+         wM+NsEm8V88jgQQeNuzTSl4KwsUEtWWkDdqUQR6nPb4O+ECi6z0fGimnU88Ze93rU6Ia
+         8asCpajPW7AJ416aiypNgcCY1LK6vS/t+8ZXoKgc9OFN3qV1OLwvYQF08r0cv3sU2wPz
+         g0Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752769674; x=1753374474;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=thCPZ9YOQBveI+hJX+S0duGcG+bqAQLlDkhewk99Mu4=;
-        b=bqHxQfxH7BaCAARaTPvdpOb24dS6w3lKDyVtQkTV2wMN+b/JW3Adf8bnR3Tj+7L1Yq
-         bIIwKWetoW0xNu3lAOeWzOUsJz9dWLCLQ8+NZrp7N2abOEVdtbyIdgpigX0ey/g4PRcF
-         0/0b2aFaQULhxo2uNLGC6ma0rExUdYpi/Xv4862o5zOBTZ9lgsu0y6e3JZa1Hu4lqrPP
-         an9ays91P1QW7yTyTJmhaoscQ+Yl+cx92+PUAsbvtTPS1l0zJHmKIcb1YDhn5alyhPAM
-         7beJUAEPqTTo8Phuz981ISPyLZu1/AuzXJSaSn8oubWhnjFXp4KPCWHgHDYzra+9esEz
-         wo1w==
-X-Forwarded-Encrypted: i=1; AJvYcCVG+qi5qB7/HrWqa0b3VYeq50/lHowIcpuGQ4QqmxTFqSXWe68k+z6RfMg/uS2SfW42eJEXOpo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxnkUbr9NZnsrKSw/bu5TRQMzCRcXvZQogntJQYpg4iwm+/lgpP
-	wRDrZUnR/1worUYJZEW9lXCwW+/iTF96iTYbacsw8xmB0MHnIUM0iQ8v4i1Q86RPltFShjEwfo+
-	evA==
-X-Google-Smtp-Source: AGHT+IH7oJ1KHh6yMBhoDfXjjf64O/Ui0QhpAzyHDjjiRpmwywwCDjm3H9vP0MJkVAcNH1ujInxUfXLCPw==
-X-Received: from wmbbi16.prod.google.com ([2002:a05:600c:3d90:b0:456:217f:2625])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4e51:b0:456:2000:2f3f
- with SMTP id 5b1f17b1804b1-4562e28586emr66192285e9.23.1752769674455; Thu, 17
- Jul 2025 09:27:54 -0700 (PDT)
-Date: Thu, 17 Jul 2025 17:27:31 +0100
-In-Reply-To: <20250717162731.446579-1-tabba@google.com>
+        d=1e100.net; s=20230601; t=1752770559; x=1753375359;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0KIZvn3WMN/D9GaYJuL0YNSf8jbAXvNffTD/qUx3PrA=;
+        b=DvSBtWWbCOFqhR2ApCUfWmDjnuvzbElagMESseqIuq3chT/DjQKcn1IHHTSOUutRII
+         01H8XMDk/CQlKHTfNGcVWYmG3bGtLOtyIA6Rb/Eiy60PHD6tv3C28lIH0XO4lfLUhZ5Y
+         3yvjmQ+Pbk0sqXe9NlPexPiUZWLHMpgYGA9TELQMkGZHNl0HMFWcmOtqR5oBpXGcdvqb
+         e2L3N6eRgOC81IcvBuUtdDAkbXxvkHjYO1s9S8XXpMGVBcsjexTMz+cQBngzsVjZIBtd
+         pQ3+74tysSWZDI+tcjCFus7P2J92O2M0hPo6S8nhSrlMl+OdKByyIW/sncOioInjr/f+
+         tQ3A==
+X-Forwarded-Encrypted: i=1; AJvYcCU5uNbQOrZHB9K7DkQaI6tS+Du3YBsnsnfmPRnSiowWiYSTP3W33lccUpwy0PixkbL1h6eGYc4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzlS2Q99tFWLAw5btuS+DF7vStwxSfIdi04Dr6NR+97Az6jhGH9
+	fYeKaU+wNEBteFb2nkJigWkqSyPp5TGTlNt7TZNFZDIEejNzaxH9ZIIOGGPzvz5XXJU=
+X-Gm-Gg: ASbGncu3f/xJKF6hX9YInsqoblNkbqrpaL9S8PsTinO0LVrheZPmepsAPHkwFXzfXqq
+	ydgakDD3OMSTBhpaD7WQ7h5gXD6t8IqhDXQJV38PDg515EYNfJuC5eweBfXJQ7Z2kS+enBcEd87
+	JYUonX/mmGJ0EiGrqQrIq7ipctZJrtEpEsI54N2Kdyr4HbDMl7D0wQfjU4T1R1MV+qxaSyRtttO
+	FlljJuftSpecyQnfhIF7AziarNbtlvhMcXZOscO5h0yXidBkoAdPeq0sdITU+xaNEWyjaTzWIgx
+	P6XE+buqWaLiXm7ZmO3cNzSw8G2ahpiX7SuRXpIhtM+q7eWDAmoz0btGp6JKtdYi65ZBa0+44iX
+	O67IjFXjWho6RDMI3lVifOUWqOQ0=
+X-Google-Smtp-Source: AGHT+IHw2GCF56hApJyEmdx/xTKHHH5iV9N7ia+pyQS/X4tv7tXWZh4hCv08eoEvqDhMJOVRwHk5hg==
+X-Received: by 2002:a05:600c:3f12:b0:456:1ab0:d566 with SMTP id 5b1f17b1804b1-456348cbdb0mr41924525e9.16.1752770558925;
+        Thu, 17 Jul 2025 09:42:38 -0700 (PDT)
+Received: from [192.168.1.3] ([185.48.76.109])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45634f5dd61sm28041015e9.11.2025.07.17.09.42.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jul 2025 09:42:38 -0700 (PDT)
+Message-ID: <95468171-a09d-4b6b-a0bd-189d83ff33a6@linaro.org>
+Date: Thu, 17 Jul 2025 17:42:37 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250717162731.446579-22-tabba@google.com>
-Subject: [PATCH v15 21/21] KVM: selftests: guest_memfd mmap() test when mmap
- is supported
-From: Fuad Tabba <tabba@google.com>
-To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 07/10] perf: arm_spe: Add support for filtering on data
+ source
+To: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, leo.yan@arm.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
+ <20250605-james-perf-feat_spe_eft-v3-7-71b0c9f98093@linaro.org>
+ <aHUOig-kaRo15ZH5@willie-the-truck>
+ <7f51d4f9-7e08-49b5-ab43-8bc765bb2ca8@linaro.org>
+ <aHkI5_IOV35L4YJa@willie-the-truck>
+ <ca99af3b-e358-4c2b-8d62-0b6c29984391@linaro.org>
+ <aHkWTlaRKdXbnA0r@willie-the-truck>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <aHkWTlaRKdXbnA0r@willie-the-truck>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Expand the guest_memfd selftests to comprehensively test host userspace
-mmap functionality for guest_memfd-backed memory when supported by the
-VM type.
 
-Introduce new test cases to verify the following:
 
-* Successful mmap operations: Ensure that MAP_SHARED mappings succeed
-  when guest_memfd mmap is enabled.
+On 17/07/2025 4:27 pm, Will Deacon wrote:
+> On Thu, Jul 17, 2025 at 04:16:32PM +0100, James Clark wrote:
+>>
+>>
+>> On 17/07/2025 3:29 pm, Will Deacon wrote:
+>>> On Tue, Jul 15, 2025 at 02:04:18PM +0100, James Clark wrote:
+>>>> On 14/07/2025 3:04 pm, Will Deacon wrote:
+>>>>> On Thu, Jun 05, 2025 at 11:49:05AM +0100, James Clark wrote:
+>>>>>> @@ -406,6 +416,9 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
+>>>>>>     	if (ATTR_CFG_GET_FLD(attr, inv_event_filter))
+>>>>>>     		reg |= PMSFCR_EL1_FnE;
+>>>>>> +	if (ATTR_CFG_GET_FLD(attr, data_src_filter))
+>>>>>> +		reg |= PMSFCR_EL1_FDS;
+>>>>>
+>>>>> Is the polarity correct here? The description of PMSDSFR_EL1.S<m> suggests
+>>>>> that setting bits to 1 _excludes_ the FDS filtering.
+>>>>>
+>>>>
+>>>> Setting filter bits to 1 means that samples matching are included. Setting
+>>>> bits to 0 means that they are excluded. And PMSFCR_EL1.FDS enables filtering
+>>>> as a whole, so if the user sets any filter bit to 1 we want to enable
+>>>> filtering:
+>>>>
+>>>>     PMSDSFR_EL1.S<m>
+>>>>
+>>>>     0b0  If PMSFCR_EL1.FDS is 1, do not record load operations that have
+>>>>          bits [5:0] of the Data Source packet set to <m>.
+>>>>
+>>>>     0b1  Load operations with Data Source <m> are unaffected by
+>>>>          PMSFCR_EL1.FDS.
+>>>>
+>>>> I think it's all the right way around and it ends up being the same as the
+>>>> other filters in SPE. Because we're using any bit being set to enable the
+>>>> filtering, the only thing you can't do is enable filtering with a 0 filter,
+>>>> but I didn't think that was useful. See the previous discussion on this
+>>>> here:
+>>>> https://lore.kernel.org/all/5752f039-51c1-4452-b5df-03ff06da7be3@linaro.org/
+>>>>
+>>>> Reading the "Data source filtering" section in the docs change at the end
+>>>> might help too.
+>>>
+>>> Sorry, but I still don't get it :/
+>>>
+>>> afaict, if any of the bits in 'data_src_filter' are _zero_ then we
+>>> should set PMSFCR_EL1.FDS. That also means that a mask of zero means all
+>>> loads are filtered, which is what the architecture says and is what we
+>>> should provide to userspace.
+>>>
+>>> Will
+>>
+>> We'd have to add another format flag to enable data source filtering then,
+>> because otherwise the default would be zero and people's samples would
+>> disappear.
+>>
+>> But the only use cases I could think of were more like "I want to see
+>> samples from data source 1":
+>>
+>>    -e arm_spe/data_src_filter=0x1/
+>>
+>> Or "I want to see all data sources except 1":
+>>
+>>    -e arm_spe/data_src_filter=0xfffffffe/
+>>
+>> Filtering out all samples with any data source didn't seem to make sense to
+>> me, and I think you can already do that with the other filters (remove loads
+>> etc).
+>>
+>> It would be a shame to be inconsistent and to add an enable flag just for
+>> that one case because the other filters in SPE are auto enabled for non-zero
+>> values. Although to be fair for PMSFCR.FT and others, zero filters are
+>> explicitly not allowed:
+>>
+>>    If this field is set to 1 and the PMSFCR_EL1.{ST, LD, B} bits are all
+>>    set to zero, it is CONSTRAINED UNPREDICTABLE whether no samples are
+>>    recorded or the PE behaves as if PMSFCR_EL1.FT is set to 0
+>>
+>> Seems like FDS doesn't end up as neat as the others, but IMO I can't see
+>> anyone needing a zero filter. I did discuss it with Leo and we decided that
+>> we could always add the enable flag at a later date if a use case turned up
+>> and it wouldn't be a breaking change.
+>>
+>> But if you think it's there so it should be exposed I can add it.
+> 
+> What about if we expose the inverse of PMSDSFR_EL1 to userspace instead?
+> 
+> Will
 
-* Data integrity: Validate that data written to the mmap'd region is
-  correctly persistent and readable.
-
-* fallocate interaction: Test that fallocate(FALLOC_FL_PUNCH_HOLE)
-  correctly zeros out mapped pages.
-
-* Out-of-bounds access: Verify that accessing memory beyond the
-  guest_memfd's size correctly triggers a SIGBUS signal.
-
-* Unsupported mmap: Confirm that mmap attempts fail as expected when
-  guest_memfd mmap support is not enabled for the specific guest_memfd
-  instance or VM type.
-
-* Flag validity: Introduce test_vm_type_gmem_flag_validity() to
-  systematically test that only allowed guest_memfd creation flags are
-  accepted for different VM types (e.g., GUEST_MEMFD_FLAG_MMAP for
-  default VMs, no flags for CoCo VMs).
-
-The existing tests for guest_memfd creation (multiple instances, invalid
-sizes), file read/write, file size, and invalid punch hole operations
-are integrated into the new test_with_type() framework to allow testing
-across different VM types.
-
-Reviewed-by: James Houghton <jthoughton@google.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Shivank Garg <shivankg@amd.com>
-Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- .../testing/selftests/kvm/guest_memfd_test.c  | 197 ++++++++++++++++--
- 1 file changed, 176 insertions(+), 21 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 341ba616cf55..1252e74fbb8f 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -13,6 +13,8 @@
- 
- #include <linux/bitmap.h>
- #include <linux/falloc.h>
-+#include <setjmp.h>
-+#include <signal.h>
- #include <sys/mman.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-@@ -34,12 +36,83 @@ static void test_file_read_write(int fd)
- 		    "pwrite on a guest_mem fd should fail");
- }
- 
--static void test_mmap(int fd, size_t page_size)
-+static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
-+{
-+	const char val = 0xaa;
-+	char *mem;
-+	size_t i;
-+	int ret;
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
-+	TEST_ASSERT(mem == MAP_FAILED, "Copy-on-write not allowed by guest_memfd.");
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap() for guest_memfd should succeed.");
-+
-+	memset(mem, val, total_size);
-+	for (i = 0; i < total_size; i++)
-+		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-+			page_size);
-+	TEST_ASSERT(!ret, "fallocate the first page should succeed.");
-+
-+	for (i = 0; i < page_size; i++)
-+		TEST_ASSERT_EQ(READ_ONCE(mem[i]), 0x00);
-+	for (; i < total_size; i++)
-+		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
-+
-+	memset(mem, val, page_size);
-+	for (i = 0; i < total_size; i++)
-+		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
-+
-+	ret = munmap(mem, total_size);
-+	TEST_ASSERT(!ret, "munmap() should succeed.");
-+}
-+
-+static sigjmp_buf jmpbuf;
-+void fault_sigbus_handler(int signum)
-+{
-+	siglongjmp(jmpbuf, 1);
-+}
-+
-+static void test_fault_overflow(int fd, size_t page_size, size_t total_size)
-+{
-+	struct sigaction sa_old, sa_new = {
-+		.sa_handler = fault_sigbus_handler,
-+	};
-+	size_t map_size = total_size * 4;
-+	const char val = 0xaa;
-+	char *mem;
-+	size_t i;
-+	int ret;
-+
-+	mem = mmap(NULL, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap() for guest_memfd should succeed.");
-+
-+	sigaction(SIGBUS, &sa_new, &sa_old);
-+	if (sigsetjmp(jmpbuf, 1) == 0) {
-+		memset(mem, 0xaa, map_size);
-+		TEST_ASSERT(false, "memset() should have triggered SIGBUS.");
-+	}
-+	sigaction(SIGBUS, &sa_old, NULL);
-+
-+	for (i = 0; i < total_size; i++)
-+		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
-+
-+	ret = munmap(mem, map_size);
-+	TEST_ASSERT(!ret, "munmap() should succeed.");
-+}
-+
-+static void test_mmap_not_supported(int fd, size_t page_size, size_t total_size)
- {
- 	char *mem;
- 
- 	mem = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
- 	TEST_ASSERT_EQ(mem, MAP_FAILED);
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT_EQ(mem, MAP_FAILED);
- }
- 
- static void test_file_size(int fd, size_t page_size, size_t total_size)
-@@ -120,26 +193,19 @@ static void test_invalid_punch_hole(int fd, size_t page_size, size_t total_size)
- 	}
- }
- 
--static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
-+static void test_create_guest_memfd_invalid_sizes(struct kvm_vm *vm,
-+						  uint64_t guest_memfd_flags,
-+						  size_t page_size)
- {
--	size_t page_size = getpagesize();
--	uint64_t flag;
- 	size_t size;
- 	int fd;
- 
- 	for (size = 1; size < page_size; size++) {
--		fd = __vm_create_guest_memfd(vm, size, 0);
--		TEST_ASSERT(fd == -1 && errno == EINVAL,
-+		fd = __vm_create_guest_memfd(vm, size, guest_memfd_flags);
-+		TEST_ASSERT(fd < 0 && errno == EINVAL,
- 			    "guest_memfd() with non-page-aligned page size '0x%lx' should fail with EINVAL",
- 			    size);
- 	}
--
--	for (flag = BIT(0); flag; flag <<= 1) {
--		fd = __vm_create_guest_memfd(vm, page_size, flag);
--		TEST_ASSERT(fd == -1 && errno == EINVAL,
--			    "guest_memfd() with flag '0x%lx' should fail with EINVAL",
--			    flag);
--	}
- }
- 
- static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
-@@ -171,30 +237,119 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
- 	close(fd1);
- }
- 
--int main(int argc, char *argv[])
-+static bool check_vm_type(unsigned long vm_type)
- {
--	size_t page_size;
-+	/*
-+	 * Not all architectures support KVM_CAP_VM_TYPES. However, those that
-+	 * support guest_memfd have that support for the default VM type.
-+	 */
-+	if (vm_type == VM_TYPE_DEFAULT)
-+		return true;
-+
-+	return kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type);
-+}
-+
-+static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
-+			   bool expect_mmap_allowed)
-+{
-+	struct kvm_vm *vm;
- 	size_t total_size;
-+	size_t page_size;
- 	int fd;
--	struct kvm_vm *vm;
- 
--	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
-+	if (!check_vm_type(vm_type))
-+		return;
- 
- 	page_size = getpagesize();
- 	total_size = page_size * 4;
- 
--	vm = vm_create_barebones();
-+	vm = vm_create_barebones_type(vm_type);
- 
--	test_create_guest_memfd_invalid(vm);
- 	test_create_guest_memfd_multiple(vm);
-+	test_create_guest_memfd_invalid_sizes(vm, guest_memfd_flags, page_size);
- 
--	fd = vm_create_guest_memfd(vm, total_size, 0);
-+	fd = vm_create_guest_memfd(vm, total_size, guest_memfd_flags);
- 
- 	test_file_read_write(fd);
--	test_mmap(fd, page_size);
-+
-+	if (expect_mmap_allowed) {
-+		test_mmap_supported(fd, page_size, total_size);
-+		test_fault_overflow(fd, page_size, total_size);
-+
-+	} else {
-+		test_mmap_not_supported(fd, page_size, total_size);
-+	}
-+
- 	test_file_size(fd, page_size, total_size);
- 	test_fallocate(fd, page_size, total_size);
- 	test_invalid_punch_hole(fd, page_size, total_size);
- 
- 	close(fd);
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_vm_type_gmem_flag_validity(unsigned long vm_type,
-+					    uint64_t expected_valid_flags)
-+{
-+	size_t page_size = getpagesize();
-+	struct kvm_vm *vm;
-+	uint64_t flag = 0;
-+	int fd;
-+
-+	if (!check_vm_type(vm_type))
-+		return;
-+
-+	vm = vm_create_barebones_type(vm_type);
-+
-+	for (flag = BIT(0); flag; flag <<= 1) {
-+		fd = __vm_create_guest_memfd(vm, page_size, flag);
-+
-+		if (flag & expected_valid_flags) {
-+			TEST_ASSERT(fd >= 0,
-+				    "guest_memfd() with flag '0x%lx' should be valid",
-+				    flag);
-+			close(fd);
-+		} else {
-+			TEST_ASSERT(fd < 0 && errno == EINVAL,
-+				    "guest_memfd() with flag '0x%lx' should fail with EINVAL",
-+				    flag);
-+		}
-+	}
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_gmem_flag_validity(void)
-+{
-+	uint64_t non_coco_vm_valid_flags = 0;
-+
-+	if (kvm_has_cap(KVM_CAP_GMEM_MMAP))
-+		non_coco_vm_valid_flags = GUEST_MEMFD_FLAG_MMAP;
-+
-+	test_vm_type_gmem_flag_validity(VM_TYPE_DEFAULT, non_coco_vm_valid_flags);
-+
-+#ifdef __x86_64__
-+	test_vm_type_gmem_flag_validity(KVM_X86_SW_PROTECTED_VM, 0);
-+	test_vm_type_gmem_flag_validity(KVM_X86_SEV_VM, 0);
-+	test_vm_type_gmem_flag_validity(KVM_X86_SEV_ES_VM, 0);
-+	test_vm_type_gmem_flag_validity(KVM_X86_SNP_VM, 0);
-+	test_vm_type_gmem_flag_validity(KVM_X86_TDX_VM, 0);
-+#endif
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
-+
-+	test_gmem_flag_validity();
-+
-+	test_with_type(VM_TYPE_DEFAULT, 0, false);
-+	if (kvm_has_cap(KVM_CAP_GMEM_MMAP)) {
-+		test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP,
-+			       true);
-+	}
-+
-+#ifdef __x86_64__
-+	test_with_type(KVM_X86_SW_PROTECTED_VM, 0, false);
-+#endif
- }
--- 
-2.50.0.727.gbf7dc18ff4-goog
+That's exactly what I was thinking. It does seem a bit weird, but I can 
+call it inv_data_src_filter and document it appropriately so it should 
+be fine.
 
