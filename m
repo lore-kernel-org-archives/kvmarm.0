@@ -1,94 +1,211 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DF82F4A1E
-	for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 16:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA01B17E0
+	for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 00:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752684500; cv=none; b=VaW3L8igsRCjcWGDpkqqKE43yWaUB2KezcM0vWdXVHrY2F0pOFEI1SIC4PqLPIT/RlGS1oKcNn7GlBUvmCNETJtpbCBaE9okWY/gNNwlAlp/vUJnO2aZ+O2UNNbwgA9vh1qodpnEkx30oviEKK/nwSfPiNDVJKomiEWHsSqdmJM=
+	t=1752711147; cv=none; b=BfNkyv9TYeKP6wAOP2LGUvMLytUIt+hsDBqWJ1i2ERF+1t8sTWaibPNBOl9QvMWpC2lDLM/A+pbChfNdlDXr7CGoUmJvIeq8xrAEBX1DdtmZX+dgC0SZLSq9SWcmdmrvSkmoc8ZJkcIGbBqIf3trjieR77sW02+6YqEVG8XWpp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752684500; c=relaxed/simple;
-	bh=XCVfG6ZkyVEDKGlKSVWf2BHFHJKjwS7JtldMWSV4aFE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aMJd80RDKpwEgwP1uGlPkZjBCDz+o48O6w0IG8T5oXp+JG4caQ5EuYYKNSWAOTk6pk0cAQwGJDlWzW3BMDuS0qNuxADQZ1LamtQ2VQd43BRR1JvCn1/YFspbS23PA/Us74dcmMg6cBiaKvSD5DsgxkOImqBNRp+V2AfPc8WTHBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XdKcKA4x; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1752711147; c=relaxed/simple;
+	bh=64u7gplaNw1kunyC5ugvI4yrr4rxsuaT3qUlLaDC6K4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=XaN+FMIbJdujfDMU7CU4fG6G9/ExqOX0h6SJlIf3cygnPE96QSzH+vZGpvkGkOmoLnwqirpTLGBvJqA/bXRSWm4+lg97SjGzGbG8FKXPNM4NWyn4AM/reQMy3If/V+sP6RsKWXnqtpCKIo1ictsVvTJ2LEGclfwYCUNKtnswjSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KUyfrpcD; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XdKcKA4x"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752684491;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PwYPcyN5ffSu6lALOEsqaBZ3FmFPW1VuXsd8RNbGzSg=;
-	b=XdKcKA4xgGAt3A6fo5ngf0BR2gFrXXau0lYlMPXtXv9fYNMeizRPx3BtirSZpS3Fzgynj7
-	94v5kU/L4aZtL1RqBkHuVCRMQfi+xtp5en5lP2iI/fY8rneDjz1X5UlO8r7p6GHre0GYWb
-	eXt/1pnHJ1oMb5UESn8dFTRn4WUa3So=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 00/11] KVM: arm64: nv: Userspace register visibility fixes
-Date: Wed, 16 Jul 2025 09:47:53 -0700
-Message-Id: <175268446557.2457435.15867128559478190522.b4-ty@linux.dev>
-In-Reply-To: <20250714122634.3334816-1-maz@kernel.org>
-References: <20250714122634.3334816-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KUyfrpcD"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313f8835f29so537180a91.3
+        for <kvmarm@lists.linux.dev>; Wed, 16 Jul 2025 17:12:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752711145; x=1753315945; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gk6wLLhT1qqsQx1vsq1Ga7hHjoZDrrbu+Mlqiv/jJEw=;
+        b=KUyfrpcDCDP+y1Su6tUjEE0LBO7B1XikfhlrZZTBSDdpqY0h8eDRX4m5qQRJk0D5fN
+         dyoQetPl4uR6TfEcD4ayu94yK3sReQd+NMgtH/FObnAwr03icoCgZufBXUk4ihFxasWF
+         5olUCVPrpTqKtGpsx7x4yNcvVuXELxkZDzXN+g5dAov1OnWijTrnT9UcXDfF9RW36evr
+         uE6m3+xXNwWuaLvj93eOuYJ8uvLULMVFmcLc+zlkdUmf7dR7x6R3jf64vJppFp2aa91h
+         lh9lKOHE9ljGWmYHI7r2AWTBExZzBtELXM0RzQJO5ZUDDy5mXwaD3wTass3jxIXrwRdA
+         HznQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752711145; x=1753315945;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gk6wLLhT1qqsQx1vsq1Ga7hHjoZDrrbu+Mlqiv/jJEw=;
+        b=vfCrOQrAUd9b6QTizw27KCjGJHgpgRLOUfX14GNpwD+9cwfJApMV8a7KFJQGZUODfv
+         Nqfb3Os+NeY0Yh+oKu7V8QRGOvmYh0dfptk/dOtZYjrMWPCNuaEz1KatCw8riRmPW/GL
+         YwWhAuZJNr4uMsdkyPQZhnIoiXDYCuWivDFEh3CFUX/ptB7nIxoKgUzUg/mA0ktXakIh
+         LDfdDKsDyKV92PpUjPG2jDuk+hsLqYcMCLKTI2i0hXaaZsdWoGaslxWbaq3uAhZoWfzz
+         m16Y867BAdONAVSPx9e6lnb5LTI1vuot2NKASZ/51+YY9IegyNy1/+8MRZYwH7B4Faw3
+         RglA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxQVZx4E1YjEhH59yxVAeTrZGZBXNMgvxZnRqzGaG9+wCUnqo+aemwDczqShxJiRgj+ogkYTo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwpQow85lsebReCVBDt/ui4cgQxSG7OQgvhGwTjq3M9z4enQ9Qu
+	s2OPGS0Pp+BVxMwpfeXIFNpNSwrSIvY9pWohwbIxJrY1z0H+Fw3EpqyClGWbCrVyy3MIwYS+KAn
+	l+1j3EMY9rxCg0VbRmYDJLk2iaQ==
+X-Google-Smtp-Source: AGHT+IHYqkhidL9ADNIxka/sw9kZlySMvbshPs2sml34P69NiRa5nonm2zXm4PkWmozfaq0ESGY7q3V4+4cqMYXu2A==
+X-Received: from pjbsd11.prod.google.com ([2002:a17:90b:514b:b0:311:c5d3:c7d0])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:5307:b0:313:db0b:75e4 with SMTP id 98e67ed59e1d1-31c9f48a241mr8160755a91.33.1752711145174;
+ Wed, 16 Jul 2025 17:12:25 -0700 (PDT)
+Date: Wed, 16 Jul 2025 17:12:23 -0700
+In-Reply-To: <b5fe8f54-64df-4cfa-b86f-eed1cbddca7a@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250715093350.2584932-1-tabba@google.com> <20250715093350.2584932-5-tabba@google.com>
+ <b5fe8f54-64df-4cfa-b86f-eed1cbddca7a@intel.com>
+Message-ID: <diqzwm87fzfc.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH v14 04/21] KVM: x86: Introduce kvm->arch.supports_gmem
+From: Ackerley Tng <ackerleytng@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 14 Jul 2025 13:26:23 +0100, Marc Zyngier wrote:
-> Peter recently pointed out that we don't expose the EL2 GICv3
-> registers in a consistent manner, as they are presented through the
-> ONE_REG interface instead of KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS, despite
-> the latter already exposing the EL1 GICv3 regs.
-> 
-> While I was looking at this, I ended up finding a small number of
-> equally small problems:
-> 
-> [...]
+Xiaoyao Li <xiaoyao.li@intel.com> writes:
 
-Applied to next, thanks!
+> On 7/15/2025 5:33 PM, Fuad Tabba wrote:
+>> Introduce a new boolean member, supports_gmem, to kvm->arch.
+>> 
+>> Previously, the has_private_mem boolean within kvm->arch was implicitly
+>> used to indicate whether guest_memfd was supported for a KVM instance.
+>> However, with the broader support for guest_memfd, it's not exclusively
+>> for private or confidential memory. Therefore, it's necessary to
+>> distinguish between a VM's general guest_memfd capabilities and its
+>> support for private memory.
+>> 
+>> This new supports_gmem member will now explicitly indicate guest_memfd
+>> support for a given VM, allowing has_private_mem to represent only
+>> support for private memory.
+>> 
+>> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Reviewed-by: Shivank Garg <shivankg@amd.com>
+>> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+>> Co-developed-by: David Hildenbrand <david@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> Signed-off-by: Fuad Tabba <tabba@google.com>
+>
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>
+> Btw, it seems that supports_gmem can be enabled for all the types of VM?
+>
 
-[01/11] KVM: arm64: Make RVBAR_EL2 accesses UNDEF
-        https://git.kernel.org/kvmarm/kvmarm/c/1095b32665cf
-[02/11] KVM: arm64: Don't advertise ICH_*_EL2 registers through GET_ONE_REG
-        https://git.kernel.org/kvmarm/kvmarm/c/c70a4027f5f3
-[03/11] KVM: arm64: Define constant value for ICC_SRE_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/c6ef46861080
-[04/11] KVM: arm64: Define helper for ICH_VTR_EL2
-        https://git.kernel.org/kvmarm/kvmarm/c/ce7a1cff2e4c
-[05/11] KVM: arm64: Let GICv3 save/restore honor visibility attribute
-        https://git.kernel.org/kvmarm/kvmarm/c/1d14c9714562
-[06/11] KVM: arm64: Expose GICv3 EL2 registers via KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
-        https://git.kernel.org/kvmarm/kvmarm/c/9fe9663e47e2
-[07/11] KVM: arm64: Condition FGT registers on feature availability
-        https://git.kernel.org/kvmarm/kvmarm/c/72c62700b279
-[08/11] KVM: arm64: Advertise FGT2 registers to userspace
-        https://git.kernel.org/kvmarm/kvmarm/c/a0aae0a9a70e
-[09/11] KVM: arm64: selftests: get-reg-list: Simplify feature dependency
-        https://git.kernel.org/kvmarm/kvmarm/c/9a4071807909
-[10/11] KVM: arm64: selftests: get-reg-list: Add base EL2 registers
-        https://git.kernel.org/kvmarm/kvmarm/c/3a90b6f27964
-[11/11] KVM: arm64: Document registers exposed via KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
-        https://git.kernel.org/kvmarm/kvmarm/c/f68df3aee7d1
+For now, not really, because supports_gmem allows mmap support, and mmap
+support enables KVM_MEMSLOT_GMEM_ONLY, and KVM_MEMSLOT_GMEM_ONLY will
+mean that shared faults also get faulted from guest_memfd.
 
---
-Best,
-Oliver
+A TDX VM that wants to use guest_memfd for private memory and some other
+backing memory for shared memory (let's call this use case "legacy CoCo
+VMs") will not work if supports_gmem is just enabled for all types of
+VMs, because then shared faults will also go to kvm_gmem_get_pfn().
+
+This will be cleaned up when guest_memfd supports conversion
+(guest_memfd stage 2). There, a TDX VM will have .supports_gmem = true.
+
+With guest_memfd stage-2 there will also be a
+KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING.
+KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING defaults to false, so for legacy
+CoCo VMs, shared faults will go to the other non-guest_memfd memory
+source that is configured in userspace_addr as before.
+
+With guest_memfd stage-2, KVM_MEMSLOT_GMEM_ONLY will direct all EPT
+faults to kvm_gmem_get_pfn(), but KVM_MEMSLOT_GMEM_ONLY will only be
+allowed if KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING is true. TDX VMs
+wishing to use guest_memfd as the only source of memory for the guest
+should set KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING to true before
+creating the guest_memfd.
+
+> Even without mmap support, allow all the types of VM to create 
+> guest_memfd seems not something wrong. It's just that the guest_memfd 
+> allocated might not be used, e.g., for KVM_X86_DEFAULT_VM.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+p
