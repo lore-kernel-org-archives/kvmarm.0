@@ -1,186 +1,187 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A10729ACC6;
-	Thu, 17 Jul 2025 11:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0082BCF73;
+	Thu, 17 Jul 2025 12:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752753174; cv=none; b=fjnftJ5VVQcsCS0YPMuBHUqZI1FYGIdLeAtbpIgic/yJpnVMYDKzJ1C/i4rwuTP/KAHlN4kU/TMBAoRxJWH0EGCTvOsPEz+IPu4LudQ1QXDUBsi9BNurk/p6bS7A//CoFOJbkKKKgGGKZbdLNvTaiAqM7Lhx92ZDx9j7cqr7hZI=
+	t=1752755001; cv=none; b=mRrmksUSxy5PUkkSYcOtp5v9DaVFVZj+PvW0ahcxCdygOWUYtfw7+LaS7o1blg1tcQjZVqFvv4F9wUgtBlbxiymFBSugCO9QaxFAHZs7NfRLisN+rCoqOH3RsimEuMK5zjRL0cDttK2wnLk3fELBV9G1EtT9lxFVtToTwTVKDWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752753174; c=relaxed/simple;
-	bh=768jnmLVmr/V6ZyVJm0rYYFSz76GLOLtXyYMf0pndCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cRl+QNEmBjST2nZuAfvO6PUwY6ttP1UDtgGn7LfvvmwH07M8I0BWsugzxrRNHmVT07l+9fcRKRUEYDVMDIn6iHx2RdejXQdLSpPhOTzz4/G0NtdYhZPA4VMR9zhevAzDaL6suy+2oZC1YukZtvx0KQU+JCGupD2BtPFSvYSRYuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O7UGW1d3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752755001; c=relaxed/simple;
+	bh=M53rRLCNKkngAVcTP3yYjTLxPORb3dP838zH8c0EAeo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BS//vzPgx97LPpYaxSKF9UFjX4IVN50q1IhBRKb061hr/33a+wy3/Q/8UVAbZS+48jQoIHdgUGdU//dXm/SHIfY27wXpznAQIVXC74cHQLZ4hzxOG+MjQQOIqH+NUBvGLgYWeFcALe0OuqGS8GFOfNLmoY2CGdo+QAGnBSjt+zE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KIvQ2uOK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O7UGW1d3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 276E6C4CEF6;
-	Thu, 17 Jul 2025 11:52:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KIvQ2uOK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3341C4CEE3;
+	Thu, 17 Jul 2025 12:23:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752753173;
-	bh=768jnmLVmr/V6ZyVJm0rYYFSz76GLOLtXyYMf0pndCk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O7UGW1d3rjbTWkmaRHwUuO+4xw8pbVWJb/FnZE7jAYa9Rk8FiEZuhmIoIdcRiu4mP
-	 mvKD5TYzhiaeMPUaszLAa+1ep6tyzZSBcGwilCx7XZjbTF0FZ3ZxEbC4SvfYJKkYwc
-	 DIDM5QDywPSAo2EGXHsTDJUBRSkSyf8dlB49GC5QeXSpNnH9nObwZU0RWPX5heiSTK
-	 NijJp76wqTWn3Ogf7f7IALBu523yGOa1QJlgPBzKU/WbmKrDX3x8l32U7JtoH+889G
-	 BV3VLFNA0U1UeQXSHf7wGX5P44vMv6wJYnnZNe0fJO/lbdi//0Sh3GKTSbm00oul2K
-	 knMskkyRTSktw==
-Date: Thu, 17 Jul 2025 12:52:46 +0100
-From: Will Deacon <will@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	s=k20201202; t=1752754998;
+	bh=M53rRLCNKkngAVcTP3yYjTLxPORb3dP838zH8c0EAeo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KIvQ2uOKfGL0kJgBh6WZe8351GfcqhX+SDK0dvb5rejhE1JIRzdyY5E5Eay5nEDpk
+	 CMz/b0BBTYI69yYDIisErqoi5pxj+SNE/oop0dmaw4WPhN2DqIExZl53iPs0t0m4zR
+	 hCtuT7MnE5ql5Qe7ajFPG0M9d/OZvW1Pkm6S/o8YqhMYKfymjdzd9SBgtIXCCSkzrT
+	 4gdtKdhPycjFBYtefrbcN1qgUrwKa78vw3Cme0CSfzQNO+y6ccAcP571k9DCg3RS/Y
+	 iBsWkA2NLV3qtxyvRVXf7c7aGU/0lwBKSOi5/GXa6PLLg1OInhNi+Ta3xDUhp7+Jal
+	 a/9l4sTg3Dyxw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ucNdr-00Gbkc-CY;
+	Thu, 17 Jul 2025 13:23:15 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Breno Leitao <leitao@debian.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Sascha Bischoff <sascha.bischoff@arm.com>,
+	Timothy Hayes <timothy.hayes@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>, leo.yan@arm.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 04/10] arm64/boot: Enable EL2 requirements for
- SPE_FEAT_FDS
-Message-ID: <aHjkDl7TXX9UjVmo@willie-the-truck>
-References: <20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org>
- <20250605-james-perf-feat_spe_eft-v3-4-71b0c9f98093@linaro.org>
- <aHUMMk9JUdK6luLN@willie-the-truck>
- <04d52182-6043-4eaf-a898-9f8ccc893e5f@linaro.org>
- <aHZQH7QGhi5pbXU8@willie-the-truck>
- <e1210c84-69d1-4fb2-88c2-a6a1bcb179c5@linaro.org>
- <80b7c29e-83b9-46a4-826e-d252ad425d4d@linaro.org>
+Subject: [GIT PULL] irqchip: Add GICv5 support
+Date: Thu, 17 Jul 2025 13:23:06 +0100
+Message-Id: <20250717122306.4043011-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <80b7c29e-83b9-46a4-826e-d252ad425d4d@linaro.org>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tglx@linutronix.de, leitao@debian.org, catalin.marinas@arm.com, conor+dt@kernel.org, Jonathan.Cameron@huawei.com, krzk+dt@kernel.org, lpieralisi@kernel.org, mark.rutland@arm.com, robh@kernel.org, sascha.bischoff@arm.com, timothy.hayes@arm.com, will@kernel.org, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Jul 15, 2025 at 02:28:19PM +0100, James Clark wrote:
-> 
-> 
-> On 15/07/2025 2:10 pm, James Clark wrote:
-> > 
-> > 
-> > On 15/07/2025 1:57 pm, Will Deacon wrote:
-> > > On Tue, Jul 15, 2025 at 01:48:03PM +0100, James Clark wrote:
-> > > > 
-> > > > 
-> > > > On 14/07/2025 2:54 pm, Will Deacon wrote:
-> > > > > On Thu, Jun 05, 2025 at 11:49:02AM +0100, James Clark wrote:
-> > > > > > SPE data source filtering (optional from Armv8.8)
-> > > > > > requires that traps to
-> > > > > > the filter register PMSDSFR be disabled. Document the requirements and
-> > > > > > disable the traps if the feature is present.
-> > > > > > 
-> > > > > > Tested-by: Leo Yan <leo.yan@arm.com>
-> > > > > > Signed-off-by: James Clark <james.clark@linaro.org>
-> > > > > > ---
-> > > > > >    Documentation/arch/arm64/booting.rst | 11 +++++++++++
-> > > > > >    arch/arm64/include/asm/el2_setup.h   | 14 ++++++++++++++
-> > > > > >    2 files changed, 25 insertions(+)
-> > > > > > 
-> > > > > > diff --git a/Documentation/arch/arm64/booting.rst
-> > > > > > b/Documentation/ arch/arm64/booting.rst
-> > > > > > index dee7b6de864f..abd75085a239 100644
-> > > > > > --- a/Documentation/arch/arm64/booting.rst
-> > > > > > +++ b/Documentation/arch/arm64/booting.rst
-> > > > > > @@ -404,6 +404,17 @@ Before jumping into the kernel, the
-> > > > > > following conditions must be met:
-> > > > > >        - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be
-> > > > > > initialised to 0b1.
-> > > > > >        - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
-> > > > > > +  For CPUs with SPE data source filtering (FEAT_SPE_FDS):
-> > > > > > +
-> > > > > > +  - If EL3 is present:
-> > > > > > +
-> > > > > > +    - MDCR_EL3.EnPMS3 (bit 42) must be initialised to 0b1.
-> > > > > > +
-> > > > > > +  - If the kernel is entered at EL1 and EL2 is present:
-> > > > > > +
-> > > > > > +    - HDFGRTR2_EL2.nPMSDSFR_EL1 (bit 19) must be initialised to 0b1.
-> > > > > > +    - HDFGWTR2_EL2.nPMSDSFR_EL1 (bit 19) must be initialised to 0b1.
-> > > > > > +
-> > > > > >      For CPUs with Memory Copy and Memory Set
-> > > > > > instructions (FEAT_MOPS):
-> > > > > >      - If the kernel is entered at EL1 and EL2 is present:
-> > > > > > diff --git a/arch/arm64/include/asm/el2_setup.h
-> > > > > > b/arch/arm64/ include/asm/el2_setup.h
-> > > > > > index 1e7c7475e43f..02b4a7fc016e 100644
-> > > > > > --- a/arch/arm64/include/asm/el2_setup.h
-> > > > > > +++ b/arch/arm64/include/asm/el2_setup.h
-> > > > > > @@ -279,6 +279,20 @@
-> > > > > >        orr    x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
-> > > > > >        orr    x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
-> > > > > >    .Lskip_pmuv3p9_\@:
-> > > > > > +    mrs    x1, id_aa64dfr0_el1
-> > > > > > +    ubfx    x1, x1, #ID_AA64DFR0_EL1_PMSVer_SHIFT, #4
-> > > > > > +    /* If SPE is implemented, */
-> > > > > > +    cmp    x1, #ID_AA64DFR0_EL1_PMSVer_IMP
-> > > > > > +    b.lt    .Lskip_spefds_\@
-> > > > > > +    /* we can read PMSIDR and */
-> > > > > > +    mrs_s    x1, SYS_PMSIDR_EL1
-> > > > > > +    and    x1, x1,  #PMSIDR_EL1_FDS
-> > > > > > +    /* if FEAT_SPE_FDS is implemented, */
-> > > > > > +    cbz    x1, .Lskip_spefds_\@
-> > > > > > +    /* disable traps to PMSDSFR. */
-> > > > > > +    orr    x0, x0, #HDFGRTR2_EL2_nPMSDSFR_EL1
-> > > > > 
-> > > > > Why is this being done here rather than alongside the existing SPE
-> > > > > configuration of HDFGRTR_EL2 and HDFGWTR_EL2 near the start of
-> > > > > __init_el2_fgt?
-> > > > > 
-> > > > I thought everything was separated by which trap configs it writes to,
-> > > > rather than the feature. This SPE feature is in HDFGRTR2 so I put it in
-> > > > __init_el2_fgt2 rather than __init_el2_fgt.
-> > > 
-> > > That's fair; __init_el2_fgt isn't the right place. But the redundancy of
-> > > re-reading PMSVer from DFR0 is a little jarring.
-> > > 
-> > > > I suppose we could have a single __init_el2_spe that writes to
-> > > > both HDFGRTR
-> > > > and HDFGRTR2 but we'd have to be careful to not overwrite what
-> > > > was already
-> > > > done in the other sections.
-> > > 
-> > > Right, perhaps it would be clearer to have trap-preserving macros for
-> > > features in a specific ID register rather than per-trap configuration
-> > > register macros.
-> > > 
-> > > In other words, we have something like __init_fgt_aa64dfr0 which would
-> > > configure the FGT and FGT2 registers based on features in aa64dfr0. I
-> > > think you'd need to have a play to see how it ends up looking but the
-> > > main thing to avoid is having duplicate ID register parsing code for
-> > > setting up FGT and FGT2 traps.
-> > > 
-> > 
-> > I'll give it a go but that could end up being fragile to something that
-> > is dependent on two different ID registers in the future. Then we'd end
-> > up in the same situation for a different reason.
-> > 
-> 
-> I think I've run into it already. Wouldn't checking for FGT and FGT2 have to
-> be repeated when doing each ID register? Now we only do that once at the
-> start of __init_el2_fgt and __init_el2_fgt2, even if we might sometimes
-> check a different ID register twice. But if we flipped it we'd always have
-> to repeat those.
+Thomas,
 
-Bah, this is quite horrible! Maybe the best we can do for now is have a
-macro for safely getting at PMBIDR?
+After some time simmering in -next without much catching fire (only a
+single regression has been reported, which was promptly fixed), here's
+the pull request for the GICv5 core infrastructure.
 
-At some point, I suspect this whole FGT-configuration logic will need
-reworking but at the moment it's hard to see what the best approach
-would be.
+There are still a couple of patches on the list (mostly addressing
+error paths, and actively being reviewed), but I don't see anything
+that would warrant holding this any longer, and these fixes can be
+added down the line. If anything, this work has allowed us to
+pipe-clean a number of issues in the tree.
 
-Will
+Please note that the kvmarm tree also carries this branch, as this is
+a dependency for enabling GICv3 compatibility for guests on a GICv5
+host.
+
+Please pull,
+
+	M.
+
+The following changes since commit 86731a2a651e58953fc949573895f2fa6d456841:
+
+  Linux 6.16-rc3 (2025-06-22 13:30:08 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git tags/irqchip-gic-v5-host
+
+for you to fetch changes up to 65a5520a27570787b17e6f0b093829fc7e0514e2:
+
+  arm64: smp: Fix pNMI setup after GICv5 rework (2025-07-15 18:11:12 +0100)
+
+----------------------------------------------------------------
+GICv5 initial host support
+
+Add host kernel support for the new arm64 GICv5 architecture, which is
+quite a departure from the previous ones.
+
+Include support for the full gamut of the architecture (interrupt
+routing and delivery to CPUs, wired interrupts, MSIs, and interrupt
+translation).
+
+----------------------------------------------------------------
+Lorenzo Pieralisi (30):
+      dt-bindings: interrupt-controller: Add Arm GICv5
+      arm64/sysreg: Add GCIE field to ID_AA64PFR2_EL1
+      arm64/sysreg: Add ICC_PPI_PRIORITY<n>_EL1
+      arm64/sysreg: Add ICC_ICSR_EL1
+      arm64/sysreg: Add ICC_PPI_HMR<n>_EL1
+      arm64/sysreg: Add ICC_PPI_ENABLER<n>_EL1
+      arm64/sysreg: Add ICC_PPI_{C/S}ACTIVER<n>_EL1
+      arm64/sysreg: Add ICC_PPI_{C/S}PENDR<n>_EL1
+      arm64/sysreg: Add ICC_CR0_EL1
+      arm64/sysreg: Add ICC_PCR_EL1
+      arm64/sysreg: Add ICC_IDR0_EL1
+      arm64/sysreg: Add ICH_HFGRTR_EL2
+      arm64/sysreg: Add ICH_HFGWTR_EL2
+      arm64/sysreg: Add ICH_HFGITR_EL2
+      arm64: Disable GICv5 read/write/instruction traps
+      arm64: cpucaps: Rename GICv3 CPU interface capability
+      arm64: cpucaps: Add GICv5 CPU interface (GCIE) capability
+      arm64: Add support for GICv5 GSB barriers
+      irqchip/gic-v5: Add GICv5 PPI support
+      irqchip/gic-v5: Add GICv5 IRS/SPI support
+      irqchip/gic-v5: Add GICv5 LPI/IPI support
+      irqchip/gic-v5: Enable GICv5 SMP booting
+      of/irq: Add of_msi_xlate() helper function
+      PCI/MSI: Add pci_msi_map_rid_ctlr_node() helper function
+      irqchip/gic-v3: Rename GICv3 ITS MSI parent
+      irqchip/msi-lib: Add IRQ_DOMAIN_FLAG_FWNODE_PARENT handling
+      irqchip/gic-v5: Add GICv5 ITS support
+      irqchip/gic-v5: Add GICv5 IWB support
+      docs: arm64: gic-v5: Document booting requirements for GICv5
+      arm64: Kconfig: Enable GICv5
+
+Marc Zyngier (2):
+      arm64: smp: Support non-SGIs for IPIs
+      arm64: smp: Fix pNMI setup after GICv5 rework
+
+ Documentation/arch/arm64/booting.rst               |   41 +
+ .../interrupt-controller/arm,gic-v5-iwb.yaml       |   78 ++
+ .../bindings/interrupt-controller/arm,gic-v5.yaml  |  267 +++++
+ MAINTAINERS                                        |   10 +
+ arch/arm64/Kconfig                                 |    1 +
+ arch/arm64/include/asm/barrier.h                   |    3 +
+ arch/arm64/include/asm/el2_setup.h                 |   45 +
+ arch/arm64/include/asm/smp.h                       |   24 +-
+ arch/arm64/include/asm/sysreg.h                    |   71 +-
+ arch/arm64/kernel/cpufeature.c                     |   17 +-
+ arch/arm64/kernel/smp.c                            |  142 ++-
+ arch/arm64/tools/cpucaps                           |    3 +-
+ arch/arm64/tools/sysreg                            |  495 +++++++-
+ drivers/irqchip/Kconfig                            |   12 +
+ drivers/irqchip/Makefile                           |    5 +-
+ drivers/irqchip/irq-gic-common.h                   |    2 -
+ ...3-its-msi-parent.c => irq-gic-its-msi-parent.c} |  168 ++-
+ drivers/irqchip/irq-gic-its-msi-parent.h           |   12 +
+ drivers/irqchip/irq-gic-v3-its.c                   |    1 +
+ drivers/irqchip/irq-gic-v5-irs.c                   |  822 +++++++++++++
+ drivers/irqchip/irq-gic-v5-its.c                   | 1228 ++++++++++++++++++++
+ drivers/irqchip/irq-gic-v5-iwb.c                   |  284 +++++
+ drivers/irqchip/irq-gic-v5.c                       | 1087 +++++++++++++++++
+ drivers/irqchip/irq-gic.c                          |    2 +-
+ drivers/irqchip/irq-msi-lib.c                      |    5 +-
+ drivers/of/irq.c                                   |   22 +-
+ drivers/pci/msi/irqdomain.c                        |   20 +
+ include/asm-generic/msi.h                          |    1 +
+ include/linux/irqchip/arm-gic-v5.h                 |  394 +++++++
+ include/linux/irqdomain.h                          |    3 +
+ include/linux/msi.h                                |    1 +
+ include/linux/of_irq.h                             |    5 +
+ 32 files changed, 5199 insertions(+), 72 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/interrupt-controller/arm,gic-v5-iwb.yaml
+ create mode 100644 Documentation/devicetree/bindings/interrupt-controller/arm,gic-v5.yaml
+ rename drivers/irqchip/{irq-gic-v3-its-msi-parent.c => irq-gic-its-msi-parent.c} (59%)
+ create mode 100644 drivers/irqchip/irq-gic-its-msi-parent.h
+ create mode 100644 drivers/irqchip/irq-gic-v5-irs.c
+ create mode 100644 drivers/irqchip/irq-gic-v5-its.c
+ create mode 100644 drivers/irqchip/irq-gic-v5-iwb.c
+ create mode 100644 drivers/irqchip/irq-gic-v5.c
+ create mode 100644 include/linux/irqchip/arm-gic-v5.h
