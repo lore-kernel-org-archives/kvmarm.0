@@ -1,145 +1,150 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DC0221F1A
-	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 22:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28838224AF7;
+	Fri, 18 Jul 2025 22:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752876110; cv=none; b=Sctx1oUawksD7ZSBRbFn+41JAZVVaBWfSu4qtd94bgiHGXgnBecvA8mau764EWkrQ7AJJqrs4+JiZKMnqX+s4TJnj5nIY+Yivg0oTFO5rRH7iNBIuURxeSJ/dwKqeqZvV6Qj6Kz3r7vud+Mmxkw24jE0S890DoPZTEqisSfloOI=
+	t=1752879089; cv=none; b=S3MILflS8Cf19q+M1ugUM9nr3hCErwhnmRs4Qeh2HM2Uy7IPGii8uqPCudEWjUEtX34LZYs8qH0Je5AYBSPGWhdV7Dv74trvZCru2ggaDKIwSKz1pXODf+sM16Hfs8Im8guWp4c7ereH5PUKWbcy3d1LTGyZZCKapX9NeBORdq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752876110; c=relaxed/simple;
-	bh=hXuCQQJ/aBYxr9xdPI3GXwnfAYmOgsrm4RW3Xdli+5A=;
+	s=arc-20240116; t=1752879089; c=relaxed/simple;
+	bh=9wq1gPYvCplHPaY4Wm5XgoLMe+aODde2O7VcmHcmk98=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rkyamnvubrt38//iT+DSgtQAYK9EFMYQ+AbUAXXCuKzT7RJCeP0Lpxd1KvEFQQjormiKHmamzPQedmoXHyUCanOrFONSvYXYw1b1fUmI3vhlfhE+JgcqzZQ5PF+WVd7zENH+QwWZFyxBjVgkaWfpdbpbT/ftSLqUs0MmNgykVts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PA0UGopi; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=uPLgdyUatVim0CECah6F4FPsKF/Ls5gb4V26IYBlQ1t173MdwVyCoWuoCPsOvoYdTionaiaKpw/1zEypEwH8hQ3ac8ZeL+s+ZrJ3IowNbuL9fEz1xfQN0oSbLJgtdU8JIsb0nKL4BcNLpdplupJAQ+SQ37o8H60Ag8plhzcuNkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VmiVcikE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PA0UGopi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01B3DC4CEF1;
-	Fri, 18 Jul 2025 22:01:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VmiVcikE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A58ABC4CEEB;
+	Fri, 18 Jul 2025 22:51:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752876110;
-	bh=hXuCQQJ/aBYxr9xdPI3GXwnfAYmOgsrm4RW3Xdli+5A=;
+	s=k20201202; t=1752879088;
+	bh=9wq1gPYvCplHPaY4Wm5XgoLMe+aODde2O7VcmHcmk98=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PA0UGopic/T6ZhAUp2bfPw71SpMUKCAk1QYO2jhw/yTpgLxMS+Hq37gg0rKtsJ+J4
-	 CmOblSDgXWoMgiKJyK9VXOotpjcCL/46vfIS4XA8A+mI/aOjfUr+7+nB7a7PG8vAUI
-	 dFtJYY0nTqv34+ePCe54nzVgKC9RwRlfZxySbm/iV0mwlG4uXklEe0x5py9+r/G7n6
-	 tmRYbclG2KllKO1BHAwU7zRHfSvB9snN7fwIv5z9Mk4oaVKHaRjd6rbnJ83CqiKj/X
-	 +o6a9ecC4xa+VVPMNR0Zxlc+BOS+icCgptfgDebZwY3vVfvwPPJ+CRS/YxHGpVA86T
-	 lRls25ILisHEA==
-Date: Fri, 18 Jul 2025 23:01:46 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v3 18/27] KVM: arm64: nv: Take "masked" aborts to EL2
- when HCRX_EL2.TMEA is set
-Message-ID: <18535df8-e647-4643-af9a-bb780af03a70@sirena.org.uk>
-References: <20250708172532.1699409-1-oliver.upton@linux.dev>
- <20250708172532.1699409-19-oliver.upton@linux.dev>
+	b=VmiVcikElcqZk72BFs7/zWioNVg/RlBsEZTqUIs6HsScTtVwOS6j7B3ua7R/5a+8f
+	 B/Xx/QRZM/EQh/lO2RicrfWNUj4TspYI7v5C1esxaGnMy5qNgSFrlaLuHCW1KuRQE/
+	 vwjy0/1yadEDESYc6Jup2r2d1g6hRKk98N3uI9FiR3pIjtw/6N8d9/1A9DF/kI7Ptp
+	 /KtF2y8xo3+DKYzmZGh9ileKlyQIK4tsMmB+vc1VQguKTRnI0Md6sJRL9kCLGWssqH
+	 x60/sDs7wvwXbxMyYV4GlknlF8akcqkSZPz9pRU1nNtV+O7XtlJK1/hNvPy3K6SwqK
+	 vqLjSPHvQBQpQ==
+Date: Fri, 18 Jul 2025 15:51:28 -0700
+From: Kees Cook <kees@kernel.org>
+To: Mike Rapoport <rppt@kernel.org>, Will Deacon <will@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Michal Wilczynski <michal.wilczynski@intel.com>,
+	Juergen Gross <jgross@suse.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Roger Pau Monne <roger.pau@citrix.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Usama Arif <usama.arif@bytedance.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>,
+	kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net,
+	platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-mm@kvack.org, Ingo Molnar <mingo@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
+	kasan-dev@googlegroups.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, sparclinux@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH v3 04/13] x86: Handle KCOV __init vs inline mismatches
+Message-ID: <202507181541.B8CFAC7E@keescook>
+References: <20250717231756.make.423-kees@kernel.org>
+ <20250717232519.2984886-4-kees@kernel.org>
+ <aHoHkDvvp4AHIzU1@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fIi54NbSaRe3rg+P"
-Content-Disposition: inline
-In-Reply-To: <20250708172532.1699409-19-oliver.upton@linux.dev>
-X-Cookie: What UNIVERSE is this, please??
-
-
---fIi54NbSaRe3rg+P
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <aHoHkDvvp4AHIzU1@kernel.org>
 
-On Tue, Jul 08, 2025 at 10:25:23AM -0700, Oliver Upton wrote:
-> HCRX_EL2.TMEA further modifies the external abort behavior where
-> unmasked aborts are taken to EL1 and masked aborts are taken to EL2.
-> It's rather weird when you consider that SEAs are, well, *synchronous*
-> and therefore not actually maskable. However, for the purposes of
-> exception routing, they're considered "masked" if the A flag is set.
+On Fri, Jul 18, 2025 at 11:36:32AM +0300, Mike Rapoport wrote:
+> Hi Kees,
+> 
+> On Thu, Jul 17, 2025 at 04:25:09PM -0700, Kees Cook wrote:
+> > When KCOV is enabled all functions get instrumented, unless the
+> > __no_sanitize_coverage attribute is used. To prepare for
+> > __no_sanitize_coverage being applied to __init functions, we have to
+> > handle differences in how GCC's inline optimizations get resolved. For
+> > x86 this means forcing several functions to be inline with
+> > __always_inline.
+> > 
+> > Signed-off-by: Kees Cook <kees@kernel.org>
+> 
+> ...
+> 
+> > diff --git a/include/linux/memblock.h b/include/linux/memblock.h
+> > index bb19a2534224..b96746376e17 100644
+> > --- a/include/linux/memblock.h
+> > +++ b/include/linux/memblock.h
+> > @@ -463,7 +463,7 @@ static inline void *memblock_alloc_raw(phys_addr_t size,
+> >  					  NUMA_NO_NODE);
+> >  }
+> >  
+> > -static inline void *memblock_alloc_from(phys_addr_t size,
+> > +static __always_inline void *memblock_alloc_from(phys_addr_t size,
+> >  						phys_addr_t align,
+> >  						phys_addr_t min_addr)
+> 
+> I'm curious why from all memblock_alloc* wrappers this is the only one that
+> needs to be __always_inline?
 
-For the past few days the external_aborts KVM selftest has been failing
-in -next on a number of platforms with:
+Thread-merge[1], adding Will Deacon, who was kind of asking the same
+question.
 
-# selftests: kvm: external_aborts
-# Random seed: 0x6b8b4567
-# ==== Test Assertion Failure ====
-#   arm64/external_aborts.c:19: regs->pc == expected_abort_pc
-#   pid=2598 tid=2598 errno=4 - Interrupted system call
-#      1	0x0000000000402f93: __vcpu_run_expect at external_aborts.c:85
-#      2	0x0000000000402197: vcpu_run_expect_done at external_aborts.c:97
-#      3	 (inlined by) test_mmio_abort at external_aborts.c:136
-#      4	 (inlined by) main at external_aborts.c:323
-#      5	0x0000ffffacbd7543: ?? ??:0
-#      6	0x0000ffffacbd7617: ?? ??:0
-#      7	0x000000000040272f: _start at ??:?
-#   0x0 != 0x4028f8 (regs->pc != expected_abort_pc)
-not ok 14 selftests: kvm: external_aborts # exit=254
+Based on what I can tell, GCC has kind of fragile inlining logic, in the
+sense that it can change whether or not it inlines something based on
+optimizations. It looks like the kcov instrumentation being added (or in
+this case, removed) from a function changes the optimization results,
+and some functions marked "inline" are _not_ inlined. In that case, we end up
+with __init code calling a function not marked __init, and we get the
+build warnings I'm trying to eliminate.
 
-This appears to be happening on many, possibly all, VHE platforms being
-tested - nVHE appears fine.  I ran a bisect, fixing the selftests
-version at the one in -next due to the renaming of this test, which
-pointed at this commit.
+So, to Will's comment, yes, the problem is somewhat fragile (though
+using either __always_inline or __init will deterministically solve it).
+We've tripped over this before with GCC and the solution has usually
+been to just use __always_inline and move on.
 
-Full log:
+For memblock_alloc*, it appears to be that the heuristic GCC uses
+resulted in only memblock_alloc_from() being a problem in this case. I
+can certainly mark them all as __always_inline if that is preferred.
 
-   https://lava.sirena.org.uk/scheduler/job/1585350#L3418
+Some maintainers have wanted things marked __init, some have wanted
+__always_inline. I opted for __always_inline since that was basically
+the intent of marking a function "inline" in the first place. I am happy
+to do whatever. :)
 
-bisect log:
+-Kees
 
-git bisect start
-# status: waiting for both good and bad commits
-# bad: [d086c886ceb9f59dea6c3a9dae7eb89e780a20c9] Add linux-next specific files for 20250718
-git bisect bad d086c886ceb9f59dea6c3a9dae7eb89e780a20c9
-# status: waiting for good commit(s), bad commit known
-# good: [04991f9d52f128b90c39e4e26c27a2bb03f82eba] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
-git bisect good 04991f9d52f128b90c39e4e26c27a2bb03f82eba
-# good: [04df9b7af77fe92aac33c006e8d48dfcdf12bd47] Merge branch 'main' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
-git bisect good 04df9b7af77fe92aac33c006e8d48dfcdf12bd47
-# good: [ef3a80d9cf6739dcb358b47052470a474ca9202e] Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/ulfh/mmc.git
-git bisect good ef3a80d9cf6739dcb358b47052470a474ca9202e
-# bad: [a4ff72f2a847bbec65a94387fd64e9673fd3d997] Merge branch 'usb-next' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git
-git bisect bad a4ff72f2a847bbec65a94387fd64e9673fd3d997
-# good: [eb7455bf812f1ce0f91f3e6d64726d821bab0f15] Merge branch 'edac-for-next' of git://git.kernel.org/pub/scm/linux/kernel/git/ras/ras.git
-git bisect good eb7455bf812f1ce0f91f3e6d64726d821bab0f15
-# bad: [31a02958732db752412d656c35689a1bac43b86d] Merge branch 'next' of https://github.com/kvm-x86/linux.git
-git bisect bad 31a02958732db752412d656c35689a1bac43b86d
-# good: [c10f79ba55517270cb35953ac2f82a56cf9dbf74] Merge branch 'selftests'
-git bisect good c10f79ba55517270cb35953ac2f82a56cf9dbf74
-# good: [b7ba58c6c588667934ca3738f84b439ec0c4a075] Merge branch 'non-rcu/next' of git://git.kernel.org/pub/scm/linux/kernel/git/paulmck/linux-rcu.git
-git bisect good b7ba58c6c588667934ca3738f84b439ec0c4a075
-# bad: [a826c1169d283ed62a5eaa7872d763545d263b60] Merge remote-tracking branch 'kernel/maz/irq/gic-v5-host' into kvmarm/next
-git bisect bad a826c1169d283ed62a5eaa7872d763545d263b60
-# bad: [da53a2014ebb996e07218d1491ac8e12ed770780] Merge branch 'kvm-arm64/doublefault2' into kvmarm/next
-git bisect bad da53a2014ebb996e07218d1491ac8e12ed770780
-# good: [fff97df2a0bd215979ae224b97e3e4075030a953] KVM: arm64: Route SEAs to the SError vector when EASE is set
-git bisect good fff97df2a0bd215979ae224b97e3e4075030a953
-# bad: [a90aac55324920de988cc447f4227c04ad769351] KVM: arm64: selftests: Test SEAs are taken to SError vector when EASE=1
-git bisect bad a90aac55324920de988cc447f4227c04ad769351
-# bad: [075c2dc7367e7e80d83adae8db597e48ceb7ba94] KVM: arm64: Advertise support for FEAT_SCTLR2
-git bisect bad 075c2dc7367e7e80d83adae8db597e48ceb7ba94
-# bad: [59b6d08666f0424f3e0ade08ab664fac65a09c5d] KVM: arm64: nv: Honor SError routing effects of SCTLR2_ELx.NMEA
-git bisect bad 59b6d08666f0424f3e0ade08ab664fac65a09c5d
-# bad: [ce66109cec867c9afd2ee1ecf1aff8d73cdb2f89] KVM: arm64: nv: Take "masked" aborts to EL2 when HCRX_EL2.TMEA is set
-git bisect bad ce66109cec867c9afd2ee1ecf1aff8d73cdb2f89
-# first bad commit: [ce66109cec867c9afd2ee1ecf1aff8d73cdb2f89] KVM: arm64: nv: Take "masked" aborts to EL2 when HCRX_EL2.TMEA is set
+[1] https://lore.kernel.org/lkml/aHouXI5-tyQw78Ht@willie-the-truck/
 
---fIi54NbSaRe3rg+P
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmh6xEkACgkQJNaLcl1U
-h9Dt0Qf/SErbdg12z9NvpyRypTvRU7C7Nl4qe25cjMUyqiyIXAGwBuSSg6otIkOm
-LZoXmtzin6CrraGdpi7fr+zwUOUROp3FRjA6Gr74W+dgxotivMhhVxat3mCCbxxD
-pAuo/f23SKNGfuXTwSn1YBKZgSp7U6Z0YbLjTJW4tJTPM6D465XkLyaQtxHUcsAy
-4QL4vbWGCEdB4OTdCNVi5c8Zzc+8pwjt33uu4MP4aY27MKv8p+WiGOCgr7jHA0vR
-8/exywm5AlT6v2CafckSNQKBJ0HzYUldLyoOtr+f0YgD0xVNZB1us/FLLjCCO3aJ
-Cai+4qFtFg979B1HdDYyQBQjCHk4UA==
-=B6cG
------END PGP SIGNATURE-----
-
---fIi54NbSaRe3rg+P--
+-- 
+Kees Cook
