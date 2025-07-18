@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1791A1CAA85
-	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 03:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C76191F9C
+	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 05:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752809608; cv=none; b=sjDvmOAq0xC/ldJivhjgykp+Lu9sNL41PNHgp1duwj71xOslRhF+ug8Pguaf6DZI8psNI/W5dXxe5UoH3LiA859TsroFFQby5IdpQcghDr5VAsmjLgf6BCZa38SZyxJ8QOQmT22igFmB49UiGQ4p1VPaVgT3paPZ370nJxlxeVw=
+	t=1752815423; cv=none; b=rBxyXe9tm+FzbpxlXx93iXjDkr9zQ0DUSCMU+jev/HsxDw4FyEv1A5T4SRdpoNYi8VbML9xx/+MTm3DHpRVLH204wk4CoNGa5vWsyCVBv+DNv1AP1algmPw85OCySjBjgeQeEdQm454IDoSQoVj3IJrPu43G+mbHKQ/RMiZ8JUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752809608; c=relaxed/simple;
-	bh=D8AGor2dq/npc0EvnMPgCs9khQ5Ob0CiUc1XMT/N94M=;
+	s=arc-20240116; t=1752815423; c=relaxed/simple;
+	bh=b7MC4xw+aWrHxKCyUGT5BCdoygo0xZwVblE3fF3ETJ4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=et+xVH8Mlto0/DyMMP7OVNRkO0u3GHrmR43oej0XEzT5BuG5uW7J/Y/WIFwdwDyUZ6WaxtkFrsRUO7YGr307FObjfmjtUyxpG0xOOhLtgiwnmY81uNLbbfYHyvSjJcRwWKPVlJB29gGfUzPx3GlPdsdaf0SE8x2axXObbIGdphA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dfr5iBJh; arc=none smtp.client-ip=192.198.163.18
+	 In-Reply-To:Content-Type; b=JY4hQUONRaOIQlJ7yXw5caUzXEa5obZq7ngNoKeyVlJvVe7XDgPADZVAqzsIT4Mhm5vbcxTVWPh0NlS0cPPuHmm+YQAOJO4QAyjJcHyvNlkV7Zl8YTlXVHGkLSTttlmyn0RHu9PAebvAoBavk2U0DVcQ52e9Yv68YuemiDrqJI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JfHHYYGG; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dfr5iBJh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JfHHYYGG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752809607; x=1784345607;
+  t=1752815422; x=1784351422;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=D8AGor2dq/npc0EvnMPgCs9khQ5Ob0CiUc1XMT/N94M=;
-  b=dfr5iBJhzg50WbAELtF3aK7I4sz042NUKaS9mUbBjIDC0xaBHRGafBEE
-   L2VDHeJRMU+GbVSb1AocPN9QZLoL7DbwWlGjurVg0B+xX5e8BbtDeTWpf
-   w0wHDUjn+hKUAWhiW25VRUAOW8R4g5oV7a9rzKpUZQTmljt6XUYMDEbxq
-   Rq67uWCx9UnSjQFJvv16Ee7bri9jNIK0TpuMHe3rTKrZNC6TCf4aPwppn
-   RzLyDC4Bz99dcDWtcMa7uCyI/IOsT5fwoxvF3Yg8qwuXO5W1aeTOy0r0X
-   jEIxoldQaSRmwJoku6b4sDCeMbm3Q7InetmEgiPENWBmt0H5X9BSu8hkC
-   w==;
-X-CSE-ConnectionGUID: HXI2P0nKTceGhEkSSjAtBA==
-X-CSE-MsgGUID: VnhrjQVtTW6CDoTjMvcsNA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="54313059"
+  bh=b7MC4xw+aWrHxKCyUGT5BCdoygo0xZwVblE3fF3ETJ4=;
+  b=JfHHYYGGNUnzmLk5AemuQUuAgSPAcmkkLS3WSmUJTrq+s7Izyz8scLES
+   UVDCCLhs5lcSHML5o2gBJJ39R6/tNsSOz/zciV/x6eC2OWJ19MgDuZfGX
+   uCPFT1ytcu/B2HsEPBh98YnIgkDz+UHJ5T86bBWeVwKhz/A+NUSNGig+/
+   Aj0BoF/Lnyu3OzBhdzMr+1Ir/GSeWmRuD4AyCrCU5zdveL6KeNkLy6YdI
+   CX1ZthXW2Tc3dUzrlk0EnKEnNJBBsqDeqkmctATd9XAkdfNLHrPgsHyBg
+   KPM5FC+NliKIOJaQmdoTsO+wB7KQMSHctu8UNPMzNY/bY3jrGWTxF6Qxu
+   Q==;
+X-CSE-ConnectionGUID: SR0OGj93Tw+hWbNoetexgA==
+X-CSE-MsgGUID: wS4Jz9qkQ0+Mm8iY+/kAqg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="55228330"
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="54313059"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 20:33:26 -0700
-X-CSE-ConnectionGUID: /scvanS6Sx+UV2IV+v5vuQ==
-X-CSE-MsgGUID: JlCfL47DR5aRJITyOXDjvg==
+   d="scan'208";a="55228330"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 22:10:21 -0700
+X-CSE-ConnectionGUID: a9b4WvSRTtaaMhuxuVj91Q==
+X-CSE-MsgGUID: TqPVZm1bRiiCBhRpewpQBA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="162232198"
+   d="scan'208";a="158671869"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 20:33:12 -0700
-Message-ID: <d8b0fa0f-b9f5-4435-8602-bd6a2d375ca4@intel.com>
-Date: Fri, 18 Jul 2025 11:33:08 +0800
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 22:10:04 -0700
+Message-ID: <8340ec70-1c44-47a7-8c48-89e175501e89@intel.com>
+Date: Fri, 18 Jul 2025 13:10:00 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 09/21] KVM: guest_memfd: Track guest_memfd mmap
- support in memslot
+Subject: Re: [PATCH v15 11/21] KVM: x86/mmu: Allow NULL-able fault in
+ kvm_max_private_mapping_level
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -77,31 +77,89 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-10-tabba@google.com>
+ <20250717162731.446579-12-tabba@google.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250717162731.446579-10-tabba@google.com>
+In-Reply-To: <20250717162731.446579-12-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> Add a new internal flag, KVM_MEMSLOT_GMEM_ONLY, to the top half of
-> memslot->flags (which makes it strictly for KVM's internal use). This
-> flag tracks when a guest_memfd-backed memory slot supports host
-> userspace mmap operations, which implies that all memory, not just
-> private memory for CoCo VMs, is consumed through guest_memfd: "gmem
-> only".
+> From: Ackerley Tng <ackerleytng@google.com>
 > 
-> This optimization avoids repeatedly checking the underlying guest_memfd
-> file for mmap support, which would otherwise require taking and
-> releasing a reference on the file for each check. By caching this
-> information directly in the memslot, we reduce overhead and simplify the
-> logic involved in handling guest_memfd-backed pages for host mappings.
+> Refactor kvm_max_private_mapping_level() to accept a NULL kvm_page_fault
+> pointer and rename it to kvm_gmem_max_mapping_level().
 > 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Shivank Garg <shivankg@amd.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+> The max_mapping_level x86 operation (previously private_max_mapping_level)
+> is designed to potentially be called without an active page fault, for
+> instance, when kvm_mmu_max_mapping_level() is determining the maximum
+> mapping level for a gfn proactively.
+> 
+> Allow NULL fault pointer: Modify kvm_max_private_mapping_level() to
+> safely handle a NULL fault argument. This aligns its interface with the
+> kvm_x86_ops.max_mapping_level operation it wraps, which can also be
+> called with NULL.
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+are you sure of it?
+
+The patch 09 just added the check of fault->is_private for TDX and SEV.
+
+> Rename function to kvm_gmem_max_mapping_level(): This reinforces that
+> the function's scope is for guest_memfd-backed memory, which can be
+> either private or non-private, removing any remaining "private"
+> connotation from its name.
+> 
+> Optimize max_level checks: Introduce a check in the caller to skip
+> querying for max_mapping_level if the current max_level is already
+> PG_LEVEL_4K, as no further reduction is possible.
+> 
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Suggested-by: Sean Christoperson <seanjc@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 16 +++++++---------
+>   1 file changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index bb925994cbc5..6bd28fda0fd3 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4467,17 +4467,13 @@ static inline u8 kvm_max_level_for_order(int order)
+>   	return PG_LEVEL_4K;
+>   }
+>   
+> -static u8 kvm_max_private_mapping_level(struct kvm *kvm,
+> -					struct kvm_page_fault *fault,
+> -					int gmem_order)
+> +static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
+> +				     struct kvm_page_fault *fault)
+>   {
+> -	u8 max_level = fault->max_level;
+>   	u8 req_max_level;
+> +	u8 max_level;
+>   
+> -	if (max_level == PG_LEVEL_4K)
+> -		return PG_LEVEL_4K;
+> -
+> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+> +	max_level = kvm_max_level_for_order(order);
+>   	if (max_level == PG_LEVEL_4K)
+>   		return PG_LEVEL_4K;
+>   
+> @@ -4513,7 +4509,9 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
+>   	}
+>   
+>   	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+> -	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault, max_order);
+> +	if (fault->max_level >= PG_LEVEL_4K)
+> +		fault->max_level = kvm_gmem_max_mapping_level(vcpu->kvm,
+> +							      max_order, fault);
+
+I cannot understand why this change is required. In what case will 
+fault->max_level < PG_LEVEL_4K?
+
+
+>   	return RET_PF_CONTINUE;
+>   }
+
