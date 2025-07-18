@@ -1,124 +1,120 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6178A1E521B
-	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 06:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D450EEDE;
+	Fri, 18 Jul 2025 08:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752819572; cv=none; b=rPLo40ViNfvWkzfvnnKleoR48IPzZIf7162FqVCxs7rIdzcc7ElDpP8E6b7oae//3V3lHO0jEHJDK348yLFFsiKHSWvzrXQx7Pen/Mnt99HMg7IIRiKd20Q8ShhCCwVvMFAB8qAVa3mSbfQbuPZ56lDJnrORC7oX0euQ9DYQKWo=
+	t=1752827814; cv=none; b=eyntYJaOy4gIbuISg5O630Y3+5gvaeJoIPU5cSsM1zFktkufsRKTpjqpx2pgpt+IPwN7XBU8WWtLt0tmjLElX0aObU4eKT+vhvg5ZmeV+wp+xWFYOduL2bGAPGrdT5VPR/k8Tp5GEKT31wuC57UESjfPK1YoN/M9qoGuEDP9WlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752819572; c=relaxed/simple;
-	bh=h6fTbzxB8EZ1LSr41gvQc07pwMx3ZFCzi8pYHbC1bNk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iv65IB0gJzsI70ScJze7Om/9GFuNQ04BYAN5Helnn0XKJf8A9KnUk9zA0bte3p1wSXz84je5XH1F/yzF/nnXLe8jP053buVwkr1KmML0cq7fC0a2tZ83w/x8UZhONOctcPdgebbWFZE/kEGmLItxCoQFNJH9EonreqoXluJSJTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Eivs3cUq; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1752827814; c=relaxed/simple;
+	bh=HL/2nr+vhFKcEcF58riyFRNQttwiCB/9fGbm+q71Dgg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S+ghDL96vtdztCGorIA7DWIOOdf3DXo+Wqg5kLolqXr6ayiQzjOmRia/r8q4X1I14CjPThK4ekcYbFzW8537oqCW9rsqJ8wtvZcqT91ucl1IZaajfkMJtQqhTCr7hJw42ia2cDlSM1WIbLcEyX3ka6/I+xVulGxVk8ujaDDQRhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GmH8kuFD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eivs3cUq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752819571; x=1784355571;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=h6fTbzxB8EZ1LSr41gvQc07pwMx3ZFCzi8pYHbC1bNk=;
-  b=Eivs3cUqRS80GmiY1eIaskY9QNMkBIMBsdtIJKWW9poIdX3CWCoIFw5S
-   T9W+rirC2rRNdLFtTmGiXOBTMjZnYPn/gVnjzV1cPbMGt5bhjh2RqVgoz
-   j8I/X70GFRM19nI7vKHg/3eR9jU5ekBYg1czGoVnZXEnRpDhUIB5o+Y0w
-   XIS/YmkGUt9QwY/e6+dOmUUAVATMLpfDIbL59Flzc9b5s6rgGpszX+mnk
-   IKMKvnqWK0IenVh65gA0ZBjOJY63svODvgZ/0FX8jSbQTV+ESo/GuZ5kY
-   E4kUapeTnmi6rePbWzstswI2Xopd25viWuSwr4ZP+BbWuDhldq830a04b
-   A==;
-X-CSE-ConnectionGUID: q6Zj4oAYRPm5RPNCnRyoOg==
-X-CSE-MsgGUID: 5CJuKte+SBO8etl9Wn0bEw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="80553618"
-X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="80553618"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:19:31 -0700
-X-CSE-ConnectionGUID: WVyscegLRjOjWNORncxODw==
-X-CSE-MsgGUID: ytwcFLY5SsuuOC44yR5wMw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="157797786"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:19:15 -0700
-Message-ID: <39dccffe-ac30-45e2-9146-e26e958ef9d9@intel.com>
-Date: Fri, 18 Jul 2025 14:19:12 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GmH8kuFD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E585C4CEEB;
+	Fri, 18 Jul 2025 08:36:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752827813;
+	bh=HL/2nr+vhFKcEcF58riyFRNQttwiCB/9fGbm+q71Dgg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GmH8kuFDP69wLkOjDvdpYL8g4oErm+tCxzSYFjNficaE3yVU2VDi2CVybyh3k2vzL
+	 ktrs4o3SmHh9+Ti01m0+zENfWaUVs3rPEOFccIDJ8JzUuMBm7vzDhfYqgJjGzyUfX2
+	 tzprzSBZDHn6R6ZCy1S+ooHnVTZn0aRQWwJVACdL/lb02WuONW5CmJoAQ+l6IEgvXV
+	 YUoaFOXIVofvTGsxJhTxgxblsj38dHI42GL2cErPbWSgZ0WyDVaDQIEbTqk0zRmB/4
+	 6UGfFtVoeLA7gIVsJdymOjI/f87nJMUh+D/2j397DUryS3KRRsJ57CDJHeSOO9dNdu
+	 VnRo0rjVmoxGg==
+Date: Fri, 18 Jul 2025 11:36:32 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Michal Wilczynski <michal.wilczynski@intel.com>,
+	Juergen Gross <jgross@suse.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Roger Pau Monne <roger.pau@citrix.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Usama Arif <usama.arif@bytedance.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>,
+	kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net,
+	platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-mm@kvack.org, Ingo Molnar <mingo@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
+	kasan-dev@googlegroups.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, sparclinux@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH v3 04/13] x86: Handle KCOV __init vs inline mismatches
+Message-ID: <aHoHkDvvp4AHIzU1@kernel.org>
+References: <20250717231756.make.423-kees@kernel.org>
+ <20250717232519.2984886-4-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 10/21] KVM: x86/mmu: Generalize
- private_max_mapping_level x86 op to max_mapping_level
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
- amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-11-tabba@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250717162731.446579-11-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250717232519.2984886-4-kees@kernel.org>
 
-On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
-> 
-> Generalize the private_max_mapping_level x86 operation to
-> max_mapping_level.
-> 
-> The private_max_mapping_level operation allows platform-specific code to
-> limit mapping levels (e.g., forcing 4K pages for certain memory types).
-> While it was previously used exclusively for private memory, guest_memfd
-> can now back both private and non-private memory. Platforms may have
-> specific mapping level restrictions that apply to guest_memfd memory
-> regardless of its privacy attribute. Therefore, generalize this
-> operation.
-> 
-> Rename the operation: Removes the "private" prefix to reflect its
-> broader applicability to any guest_memfd-backed memory.
-> 
-> Pass kvm_page_fault information: The operation is updated to receive a
-> struct kvm_page_fault object instead of just the pfn. This provides
-> platform-specific implementations (e.g., for TDX or SEV) with additional
-> context about the fault, such as whether it is private or shared,
-> allowing them to apply different mapping level rules as needed.
-> 
-> Enforce "private-only" behavior (for now): Since the current consumers
-> of this hook (TDX and SEV) still primarily use it to enforce private
-> memory constraints, platform-specific implementations are made to return
-> 0 for non-private pages. A return value of 0 signals to callers that
-> platform-specific input should be ignored for that particular fault,
-> indicating no specific platform-imposed mapping level limits for
-> non-private pages. This allows the core MMU to continue determining the
-> mapping level based on generic rules for such cases.
-> 
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Suggested-by: Sean Christoperson <seanjc@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+Hi Kees,
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+On Thu, Jul 17, 2025 at 04:25:09PM -0700, Kees Cook wrote:
+> When KCOV is enabled all functions get instrumented, unless the
+> __no_sanitize_coverage attribute is used. To prepare for
+> __no_sanitize_coverage being applied to __init functions, we have to
+> handle differences in how GCC's inline optimizations get resolved. For
+> x86 this means forcing several functions to be inline with
+> __always_inline.
+> 
+> Signed-off-by: Kees Cook <kees@kernel.org>
+
+...
+
+> diff --git a/include/linux/memblock.h b/include/linux/memblock.h
+> index bb19a2534224..b96746376e17 100644
+> --- a/include/linux/memblock.h
+> +++ b/include/linux/memblock.h
+> @@ -463,7 +463,7 @@ static inline void *memblock_alloc_raw(phys_addr_t size,
+>  					  NUMA_NO_NODE);
+>  }
+>  
+> -static inline void *memblock_alloc_from(phys_addr_t size,
+> +static __always_inline void *memblock_alloc_from(phys_addr_t size,
+>  						phys_addr_t align,
+>  						phys_addr_t min_addr)
+
+I'm curious why from all memblock_alloc* wrappers this is the only one that
+needs to be __always_inline?
+
+-- 
+Sincerely yours,
+Mike.
