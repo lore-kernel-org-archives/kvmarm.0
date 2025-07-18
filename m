@@ -1,136 +1,90 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E62DD29B22F
-	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 10:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480CF28B41A;
+	Fri, 18 Jul 2025 11:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752834972; cv=none; b=R93HNvVyhvJo+4FRXmKL768Z/Q0H5caPTSkQukaGtGtytnj+IwErwwlJv6Mstu3uisDL/AItTHiC6W8N2EnWDwU8PoOPx3Tbfyx/X7REKi5fshRAeo/FeOAyQ/Caz8p74p0FB91e6AFV0Pi4BIl0Cr5GAG0lLzlInuiS7XKEELI=
+	t=1752837137; cv=none; b=LmVOzniMAYP09OSUQN+RDKYQ0znGuTPGZ3OeB2VFS/IJMpykp0zOsS+/I/M0TbaU3ZjANT27p+9EU/EuacWtnHJVFcSCSzcm9Z2bbm/eFer13eSFE6wBOnFIaU+gZHvZbfSZmUGjuSPTMxmNi8Yif9XWDGGD9Ntef1A4ZfCM7kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752834972; c=relaxed/simple;
-	bh=m3yGFkStv2dCYBfm0tFx+7tY/z6BYh+9F2TCemhKWcY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RrxTtUEfh5Usf7V3585oUxOmGzHt2CeMve9HrZEYSF5jXPOWmzK307ISttvppIhiZikxiJNzSVpt7V91ii1iK+PGAAtPmrZetMy6Yl1t4rMGAFdv/c4rlROUqNnK1xqgB2g+UqDaj730ZFN8Xu/Kd+LwQMojxsi1kjZu4T1NKXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 04AAE176C;
-	Fri, 18 Jul 2025 03:35:56 -0700 (PDT)
-Received: from [10.57.87.202] (unknown [10.57.87.202])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9BE213F694;
-	Fri, 18 Jul 2025 03:36:00 -0700 (PDT)
-Message-ID: <5f171093-93fc-4f86-98ef-048b15890e7c@arm.com>
-Date: Fri, 18 Jul 2025 11:35:59 +0100
+	s=arc-20240116; t=1752837137; c=relaxed/simple;
+	bh=cX7YrwMk2OOPZPPCwE1KB9e5hHTXFD0hbpP7g6YdzPw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=W0eEhP9hVlVXWtc711w6qZIHQvzI3K4ojiGqHIHJ+R0goB0BR+dEYUdgKYIeZqJFRqGKOM9wO57y0tmD1aUsCahuz7s0+I/CpmHPatJK03ym2smQJPiTTp3YgVo3hbgPmxsO4PJQECcsxzsNeOE+C6YoiMUESrXNFl26JA/KOWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJ7kTBPR; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJ7kTBPR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB32AC4CEF4;
+	Fri, 18 Jul 2025 11:12:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752837136;
+	bh=cX7YrwMk2OOPZPPCwE1KB9e5hHTXFD0hbpP7g6YdzPw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jJ7kTBPRDROH/KI3582LtM6d9J6KQ0gQsSxx3MEZetOTzsOg8oOzKErcFR6QkQGk8
+	 hLzsoTnLHdc68T4VFoAYv9u8ncqD0Zrp7UQ+/HyTlXn4+xOVs7eDjhGg1ixVWUAPj+
+	 nlPtloQbq5RXpXPPRG+MGtUkiRgBruqMnvmFN5c9g4eLDEkig+6qp8KPUBQlIDrU/U
+	 3kihL/fkb6zb3c7cXhmhgx8TUBx+gJsS4OwphygGGba/tThOxRHhjjBTvIBacVUiKt
+	 8YVYNcjrlTmDl1a5UHdXhSSCXgQOB5j5hbAoYVbknDgzUK4a844w5FjPVG0a4N1t1P
+	 HaV8jY9Cks8Ng==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ucj0g-00Gt2B-Nu;
+	Fri, 18 Jul 2025 12:12:14 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH 1/4] KVM: arm64: vgic-v3: Fix ordering of ICH_HCR_EL2
+Date: Fri, 18 Jul 2025 12:11:51 +0100
+Message-Id: <20250718111154.104029-2-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250718111154.104029-1-maz@kernel.org>
+References: <20250718111154.104029-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: arm64: Map hyp text as RO and dump instr on
- panic
-Content-Language: en-GB
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
- maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com,
- keirf@google.com
-References: <20250717234744.2254371-1-smostafa@google.com>
- <20250717234744.2254371-3-smostafa@google.com>
- <38b08607-b9d9-425b-81c4-b227dda427b3@arm.com> <aHogf50CvjeSklRo@google.com>
-From: Ben Horgan <ben.horgan@arm.com>
-In-Reply-To: <aHogf50CvjeSklRo@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Mostafa,
+The sysreg tables are supposed to be sorted so that a binary search
+can easily find them. However, ICH_HCR_EL2 is obviously at the wrong
+spot.
 
-On 18/07/2025 11:22, Mostafa Saleh wrote:
-> Hi Ben,
-> 
-> On Fri, Jul 18, 2025 at 11:16:18AM +0100, Ben Horgan wrote:
->> Hi Mostafa,
->>
->> On 18/07/2025 00:47, Mostafa Saleh wrote:
->>> Map the hyp text section as RO, there are no secrets there
->>> and that allows the kernel extract info for debugging.
->>>
->>> As in case of panic we can now dump the faulting instructions
->>> similar to the kernel.
->>>
->>> Signed-off-by: Mostafa Saleh <smostafa@google.com>
->>> ---
->>>    arch/arm64/kvm/handle_exit.c    |  4 +---
->>>    arch/arm64/kvm/hyp/nvhe/setup.c | 12 ++++++++++--
->>>    2 files changed, 11 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->>> index de12b4d4bccd..d59f33c40767 100644
->>> --- a/arch/arm64/kvm/handle_exit.c
->>> +++ b/arch/arm64/kvm/handle_exit.c
->>> @@ -566,9 +566,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
->>>    	kvm_nvhe_dump_backtrace(hyp_offset);
->>>    	/* Dump the faulting instruction */
->>> -	if (!is_protected_kvm_enabled() ||
->>> -	    IS_ENABLED(CONFIG_NVHE_EL2_DEBUG))
->>> -		dump_instr(panic_addr + kaslr_offset());
->>> +	dump_instr(panic_addr + kaslr_offset());
->> This makes the dumping in nvhe no longer conditional on
->> CONFIG_NVHE_EL2_DEBUG. A change from what you introduced in the patch.
->> Perhaps it makes sense to reorder the patches; do the preparatory work for
->> instruction dumping before the enabling.>
-> 
-> Yes, I thought about squashing both patches, but I was worried this patch
-> might be more controversial, so I split the code into 2 patches, where the
-> first one can be merged separately if needed. But no strong opinion.
+Move it where it belongs.
 
-My concern was you were changing the non-pkvm case too in this patch but 
-I see now that you weren't. Sorry, my mistake. I'm ok with this patch 
-split.>
-> Thanks,
-> Mostafa
-> 
->>>    	/*
->>>    	 * Hyp has panicked and we're going to handle that by panicking the
->>> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
->>> index a48d3f5a5afb..90bd014e952f 100644
->>> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
->>> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
->>> @@ -192,6 +192,7 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
->>>    	enum pkvm_page_state state;
->>>    	struct hyp_page *page;
->>>    	phys_addr_t phys;
->>> +	enum kvm_pgtable_prot prot;
->>>    	if (!kvm_pte_valid(ctx->old))
->>>    		return 0;
->>> @@ -210,11 +211,18 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
->>>    	 * configured in the hypervisor stage-1, and make sure to propagate them
->>>    	 * to the hyp_vmemmap state.
->>>    	 */
->>> -	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(ctx->old));
->>> +	prot = kvm_pgtable_hyp_pte_prot(ctx->old);
->>> +	state = pkvm_getstate(prot);
->>>    	switch (state) {
->>>    	case PKVM_PAGE_OWNED:
->>>    		set_hyp_state(page, PKVM_PAGE_OWNED);
->>> -		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
->>> +		/* hyp text is RO in the host stage-2 to be inspected on panic. */
->>> +		if (prot == PAGE_HYP_EXEC) {
->>> +			set_host_state(page, PKVM_NOPAGE);
->>> +			return host_stage2_idmap_locked(phys, PAGE_SIZE, KVM_PGTABLE_PROT_R);
->>> +		} else {
->>> +			return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
->>> +		}
->>>    	case PKVM_PAGE_SHARED_OWNED:
->>>    		set_hyp_state(page, PKVM_PAGE_SHARED_OWNED);
->>>    		set_host_state(page, PKVM_PAGE_SHARED_BORROWED);
->> -- 
->> Thanks,
->>
->> Ben
->>
-Thanks,
+Fixes: 9fe9663e47e21 ("KVM: arm64: Expose GICv3 EL2 registers via KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic-sys-reg-v3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ben
+diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
+index 75aee0148936f..1850f1727eb93 100644
+--- a/arch/arm64/kvm/vgic-sys-reg-v3.c
++++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
+@@ -421,8 +421,8 @@ static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
+ 	EL2_REG(ICH_AP1R1_EL2, ich_apr),
+ 	EL2_REG(ICH_AP1R2_EL2, ich_apr),
+ 	EL2_REG(ICH_AP1R3_EL2, ich_apr),
+-	EL2_REG(ICH_HCR_EL2, ich_reg),
+ 	EL2_REG_RO(ICC_SRE_EL2, icc_sre),
++	EL2_REG(ICH_HCR_EL2, ich_reg),
+ 	EL2_REG_RO(ICH_VTR_EL2, ich_vtr),
+ 	EL2_REG(ICH_VMCR_EL2, ich_reg),
+ 	EL2_REG(ICH_LR0_EL2, ich_reg),
+-- 
+2.39.2
 
