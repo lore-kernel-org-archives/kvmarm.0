@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F201E0DCB
-	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 06:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BE71EF092
+	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 06:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752819070; cv=none; b=b5Drj3HjVwZc8P1eIQM9oTvby0pHD3iigeDFTlobqP9va3MAdrR3bicc5CUyxVqBKEMCLbb/R83sXbKP4oD9xutzUw4l8unJA4pFhtK5NypkNKd3op+Xem5BeSrLkIRjU1eEke7DaePFEEGMfIfAlVxWxxQ3uCSvae4s51XO1sg=
+	t=1752819280; cv=none; b=qIEz9jDkjGvwirTdgPluHYOPLAb33sU42yI5SxLBqWvnsHAJF4JFGm2m+i0EzXyWm2tBmFiKrESAaPdAHTNG/v7Erevos31arCBuKcm0TljiVUA2xpnSrSqolLhpfMy+zEZDlv1/KHyysssTcoaDS/ZF1B1kxdduJ4z0+YFQA8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752819070; c=relaxed/simple;
-	bh=MUDYFfWZtE5SRJTEHysqovvMYxw7yMedHOfGB0dOsQg=;
+	s=arc-20240116; t=1752819280; c=relaxed/simple;
+	bh=XcJZ6mYKjvZl9/FELeN8l47ZXRZ5CIivhly0oeD5djo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ItNYbXvsfOnQy3C3gFp1LZpSlUJQu8AnCkRyXRmlbAPO2UsqVS1DfAjbbVlDTqO9p51DW/aCIfFTBjS0hZxCKw9ggVTjwdu8jU8J/Bs3RT36PRIInfwr5hbsI145dI8GLzpsrW+oWeBzXbjTvtYr4+kw+MdSpXcrsOOjQvnV3W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A4HzCY8n; arc=none smtp.client-ip=192.198.163.17
+	 In-Reply-To:Content-Type; b=a1PUWCpXngWjlELhaizrUQvBvjfPPzjaKlzCygN9hsQeNeiNYw+6E65zMCR/bqjolREN0ItzzVN8KEfMigGJKryqUmA2UKWvdal6grhdU0GjqfK0yRVFprs8XM0oTrjU/Eh7FAN52T80bVSHK/cQANHPelgMpGRLsaPyw2QJqVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k5Dbznuf; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A4HzCY8n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k5Dbznuf"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752819069; x=1784355069;
+  t=1752819280; x=1784355280;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=MUDYFfWZtE5SRJTEHysqovvMYxw7yMedHOfGB0dOsQg=;
-  b=A4HzCY8nClu6jZk5NmRvdXuppnEuo91i9GpRSmN0UAtrJPyemvtLtvdo
-   DuohfwojFiRNVSsTw+IfRCKBGGfPtLIbmM769swGVBNRHqyu2cyGx6V1b
-   Mif1uHmd8DTPZG4wzQXb/8lSuh54+0wcMzqrd6y/dF2dh75+UaFIxWB9a
-   uIJWZHjUGT2mUJjUHUo3fyQNosIS3p7TPDejdKfGyGr4eRwGpz3yjist9
-   bQqXrYUeU8yG8qvGT1kvHpnFLdRfbgankiWZR+C6XUun7nqSrG+9csVah
-   +TPNlIHsC2Uc/r9AzvBuN8IUt+NGUEGBPkl5erL6BXvp1STuTAGzxq9Wm
+  bh=XcJZ6mYKjvZl9/FELeN8l47ZXRZ5CIivhly0oeD5djo=;
+  b=k5DbznufScE0dHBblibrPyEYkIfBvh+8wtxAx7kVey85ThGBqc8v6dyZ
+   dnrK9l5/sn2tyPYv5p7U7KEdtvkqY6Iow35X469RTxobqoZZ3RrVI/vfP
+   QzV+KEbPJB0FTOCkPBA99ZanNs2/Y8tviB0ofm45e2JwECU/epvm25keq
+   9vMYO87ExYmPJTMf+Rg+UdSoemKcwYHlsiFOVTQ+HOOaPJz1SgO92Qhg5
+   wrTTPrHR29WbuM2A2EHH4UHM0F21cBW/lSfgmO8Ww1kyXGR8+9GPe7iMU
+   zlM4t9/G6w4nf4zWhNrHov1xaYa9xGfx4/ks80eVPXT+H1dz8+saTIMeJ
    A==;
-X-CSE-ConnectionGUID: LHAeYXP+TVCvj/oCIohi0g==
-X-CSE-MsgGUID: 0fRkOfDLT+W0CjBWgSpfDA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="55047810"
+X-CSE-ConnectionGUID: iadc4L04RsGU7SmvSMvUhA==
+X-CSE-MsgGUID: tZ/1YKfPQnysSBPQkl5K8g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="55231638"
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="55047810"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:11:08 -0700
-X-CSE-ConnectionGUID: suLoPW0jRu6qTo6awwoYtg==
-X-CSE-MsgGUID: VMK2N62LTaahlHPocZSdbw==
+   d="scan'208";a="55231638"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:14:39 -0700
+X-CSE-ConnectionGUID: QjMd2QMOTIW9uNutYiZLDg==
+X-CSE-MsgGUID: tZgUpPdKQHO9i74VxV/2pg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="162280252"
+   d="scan'208";a="158062418"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:10:54 -0700
-Message-ID: <7e70c7b9-294b-4e39-a4b6-8357a146dc78@intel.com>
-Date: Fri, 18 Jul 2025 14:10:51 +0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:14:23 -0700
+Message-ID: <0f31ab50-e30a-40d5-96ae-ee54742d98f9@intel.com>
+Date: Fri, 18 Jul 2025 14:14:17 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 14/21] KVM: x86: Enable guest_memfd mmap for default
- VM type
+Subject: Re: [PATCH v15 19/21] KVM: Introduce the KVM capability
+ KVM_CAP_GMEM_MMAP
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -77,45 +77,33 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-15-tabba@google.com>
+ <20250717162731.446579-20-tabba@google.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250717162731.446579-15-tabba@google.com>
+In-Reply-To: <20250717162731.446579-20-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> Enable host userspace mmap support for guest_memfd-backed memory when
-> running KVM with the KVM_X86_DEFAULT_VM type:
+> Introduce the new KVM capability KVM_CAP_GMEM_MMAP. This capability
+> signals to userspace that a KVM instance supports host userspace mapping
+> of guest_memfd-backed memory.
 > 
-> * Define kvm_arch_supports_gmem_mmap() for KVM_X86_DEFAULT_VM: Introduce
->    the architecture-specific kvm_arch_supports_gmem_mmap() macro,
->    specifically enabling mmap support for KVM_X86_DEFAULT_VM instances.
->    This macro, gated by CONFIG_KVM_GMEM_SUPPORTS_MMAP, ensures that only
->    the default VM type can leverage guest_memfd mmap functionality on
->    x86. This explicit enablement prevents CoCo VMs, which use guest_memfd
->    primarily for private memory and rely on hardware-enforced privacy,
->    from accidentally exposing guest memory via host userspace mappings.
+> The availability of this capability is determined per architecture, and
+> its enablement for a specific guest_memfd instance is controlled by the
+> GUEST_MEMFD_FLAG_MMAP flag at creation time.
 > 
-> * Select CONFIG_KVM_GMEM_SUPPORTS_MMAP in KVM_X86: Enable the
->    CONFIG_KVM_GMEM_SUPPORTS_MMAP Kconfig option when KVM_X86 is selected.
->    This ensures that the necessary code for guest_memfd mmap support
->    (introduced earlier) is compiled into the kernel for x86. This Kconfig
->    option acts as a system-wide gate for the guest_memfd mmap capability.
->    It implicitly enables CONFIG_KVM_GMEM, making guest_memfd available,
->    and then layers the mmap capability on top specifically for the
->    default VM.
+> Update the KVM API documentation to detail the KVM_CAP_GMEM_MMAP
+> capability, the associated GUEST_MEMFD_FLAG_MMAP, and provide essential
+> information regarding support for mmap in guest_memfd.
 > 
-> These changes make guest_memfd a more versatile memory backing for
-> standard KVM guests, allowing VMMs to use a unified guest_memfd model
-> for both private (CoCo) and non-private (default) VMs. This is a
-> prerequisite for use cases such as running Firecracker guests entirely
-> backed by guest_memfd and implementing direct map removal for non-CoCo
-> VMs.
-> 
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Shivank Garg <shivankg@amd.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 
 Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+Though I have comments on some patches, the general functionality for 
+x86 seems to be work. I plan to do a POC with QEMU to test non-coco VM 
+with guest_memfd with mmap support as the memory backend.
