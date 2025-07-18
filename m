@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67CF3C1F
-	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 05:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FC4A930
+	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 05:57:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752816789; cv=none; b=JTuw2yOJyuqfNDWreTMZs4ENLjmUtmkijRPDvtTKA2pdMzhrjgEeAW37eFk/1XaPUAAi9mZu6hJ0iUD5K6reRW1wHIvJuP7bwZkjaDuhdKBNO2Z78msrj09SIMjaV7FRtGsgHcuJk21PsJkmxIsKJMsTAGFZc5Qttxk7nd4SPmw=
+	t=1752818266; cv=none; b=YS8Jvp348/D8jdsRKxpHwLw+b9eXyZ4K0b/As8ADyKdcsjePoiCcpI/vzpRumKy0qGolCbcGvVZCwTaA7YlxB5Em2vcBaGRu2K27IOU7KKUD1fGqpSxtIJUj8eWH8HG1bKgf8+i4GAra2fVC86o9o+59ztbUN2SWzMLOBjeDdpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752816789; c=relaxed/simple;
-	bh=skKA5qufp6yfNZDuBB5caSttx/BReKJ+preOQVYf5lE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qNVFzMdE/Y/p0cBq26i9zAOw097PuT+FeO9843vybbrGAs7evVll6hMRDZ4DhAfaFaLLMh6beh1cJycAvg1FchymR2x/PI5Ms2wq0ZvG5xQO0K48jUXr3s9sfJJt5+NZ/1xFjMN+IdYTOOvzZLiM6O56IFfkP2p82GszlPJ8jc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JYqnjROV; arc=none smtp.client-ip=192.198.163.11
+	s=arc-20240116; t=1752818266; c=relaxed/simple;
+	bh=6HyipH6ZGn2eTCwtX/8w8N8MbCivU7M119JVojMbDow=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=UMStaDm6g7+EtD7TXGsmhf1CAh4IkGvxgjr128OELegC4cWrUnf1NaZq4erHA2Pyyr6pek2j9wVJcPmoK/kcPCprUaeQixPOR1iMMOw+nQKC8mDvEVfs96H5bfk8H/YIdGoK2+srDBmBOpKW4mr29gonQrEiyt8v2I94SIo6nhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g/yu3qE0; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JYqnjROV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g/yu3qE0"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752816788; x=1784352788;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=skKA5qufp6yfNZDuBB5caSttx/BReKJ+preOQVYf5lE=;
-  b=JYqnjROVmZs+DasIvJH1YzfI29lCkDv+AffPFGYZNUqpat/do1VbkZCi
-   ZifulmWHMm8HdLq5Xe5+f+VIJRhS1CvGAx30I/A5Z5seeYdlt+dWr3KF0
-   3jbXEmb//cpDZuY61a6jC+jZ7FElGCsrc2F6ZXzPiqXj2PlKYCijZFEeM
-   OcPMY2gCNG0FtEmZaUPTeL6Kom2TkjyFIZZJDZyBYKI8LFpIW6h89/Y8a
-   qomiPz0+k46atPPvzm79DsC/eTRz6j0LRARFw4xPCOMyJ4c2OD+mNeNqo
-   47YcG1rMNMSgXB5ZVqA9oZFGttf68k6XMiztWAFx2FPh0bTTGx7x5npI7
-   Q==;
-X-CSE-ConnectionGUID: ZeE63EQYREiRiV85ECYOAA==
-X-CSE-MsgGUID: pljckvqSQyW9udnGpa5G5g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="65678680"
+  t=1752818264; x=1784354264;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=6HyipH6ZGn2eTCwtX/8w8N8MbCivU7M119JVojMbDow=;
+  b=g/yu3qE005OQnYf9YgH/Z1RaiMHznwySxFQmv10EQJUBtjktnx+UNhvH
+   wzrnh/lXVeszP3TKacpkmTTkwhABckWrS606oQgaUzTi9Eb0rRKDaoRj5
+   IBz9TfJT0dVlc2JNA1Gu/6PL0MKl8nbqqq6wIByqpTcNU+4tOUXnmNSOU
+   /K2cgdaf7kXyAzYLc6gFNBk2UAFMfdSQ1YWjEPZlwek5UYo7KAf/ORBli
+   8nzhgAmzqB482spHtNl/34JzM48M7WU75CMHDpMzkAFRPWnQ14oWOUJ8o
+   cfBVW7I/KNAodnVD/78zGx+6ucA7A0Q9tyQWgmHnbsN5Mre39Oy9Z4tKW
+   A==;
+X-CSE-ConnectionGUID: R8ta24ZtTe2ymr5403VpGQ==
+X-CSE-MsgGUID: bo783LFaRjWVvGQo17pkqg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="54963631"
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="65678680"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 22:33:07 -0700
-X-CSE-ConnectionGUID: n0aEyWgCQzm9pzjS33gCdA==
-X-CSE-MsgGUID: Km5RZh//Seue6XSZKZzFQw==
+   d="scan'208";a="54963631"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 22:57:43 -0700
+X-CSE-ConnectionGUID: gGSQjf1oTiKmkpHzD1CHqg==
+X-CSE-MsgGUID: 7MpZdOhSSiy/G0j+1Lk4Jw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="181687772"
+   d="scan'208";a="188960541"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 22:32:51 -0700
-Message-ID: <9b425918-1858-47d6-a1cd-1b44d5898ab4@intel.com>
-Date: Fri, 18 Jul 2025 13:32:48 +0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 22:57:28 -0700
+Message-ID: <8db83e78-8e18-4cdb-b8eb-80351c5273fc@intel.com>
+Date: Fri, 18 Jul 2025 13:57:25 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,6 +54,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v15 12/21] KVM: x86/mmu: Consult guest_memfd when
  computing max_mapping_level
+From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -78,22 +79,40 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  ira.weiny@intel.com
 References: <20250717162731.446579-1-tabba@google.com>
  <20250717162731.446579-13-tabba@google.com>
+ <9b425918-1858-47d6-a1cd-1b44d5898ab4@intel.com>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250717162731.446579-13-tabba@google.com>
+In-Reply-To: <9b425918-1858-47d6-a1cd-1b44d5898ab4@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
+On 7/18/2025 1:32 PM, Xiaoyao Li wrote:
+> On 7/18/2025 12:27 AM, Fuad Tabba wrote:
+>> From: Ackerley Tng <ackerleytng@google.com>
+>>
+>> Modify kvm_mmu_max_mapping_level() to consult guest_memfd for memory
+>> regions backed by it when computing the maximum mapping level,
+>> especially during huge page recovery.
 > 
-> Modify kvm_mmu_max_mapping_level() to consult guest_memfd for memory
-> regions backed by it when computing the maximum mapping level,
-> especially during huge page recovery.
+> IMHO, we need integrate the consultation of guest_memfd into 
+> __kvm_mmu_max_mapping_level, not kvm_mmu_max_mapping_level().
+> 
+> __kvm_mmu_max_mapping_level() (called by kvm_mmu_hugepage_adjust()) is 
+> the function KVM X86 uses to determine the final mapping level,
+> fault->goal_level.
+> 
 
-IMHO, we need integrate the consultation of guest_memfd into 
-__kvm_mmu_max_mapping_level, not kvm_mmu_max_mapping_level().
+I think I can understand the patch now.
 
-__kvm_mmu_max_mapping_level() (called by kvm_mmu_hugepage_adjust()) is 
-the function KVM X86 uses to determine the final mapping level,
-fault->goal_level.
+For normal TDP page fault that requires KVM to setup the TDP page table 
+to map the guest memory. The max page level of guest memfd is consulted 
+when faulting in the pfn in kvm_mmu_faultin_pfn_private() and update 
+fault->max_level accordingly. So skip consultation in 
+__kvm_mmu_max_mapping_level() is OK.
+
+But for recover_huge_pages_range() and kvm_mmu_zap_collapsible_spte() 
+(this patch misses this case) which call kvm_mmu_max_mapping_level() and 
+without information of the max page level of guest memfd. So we need to 
+consult guest memfd separately.
+
+But the changelog doesn't clarify it such way.
+
