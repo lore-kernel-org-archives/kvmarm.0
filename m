@@ -1,37 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4814E2BF011;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481BE2BF012;
 	Fri, 18 Jul 2025 11:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752837137; cv=none; b=ClnMpzHqOFIfWu8evvUnCCFL85MMTRnOqXuuIyRFrkJzutBkc2hYxSCTKXo6oI9dhSdzaPZcSscD3dVxvHYZTxK6uX6/GVqHWPfKY4CcEH5YFJXAuwQVGtFHkThTqOyFp60EGtsDf+98FN2wk9MzTqRSqRQUpB8pUuYnICRfMl4=
+	t=1752837137; cv=none; b=XTBtMBHYl4cwQwDRwK/bpJSSnxzheWiCTxHVqny5vIMZr6rZWILDehqEjuT8ocu9eHlfGDd7c+5ONppFHBXt6GvHruvE5HO18ce8MfgVccYnoYF0c2MDooDJIGCSIB3SP29S6M5WmDGuyk6RAMc6LW8zKPSeoyTxHSCApxsDPz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752837137; c=relaxed/simple;
-	bh=24+36KjjrD0NWHFuhivqLnbkQAQ1TArPFkrRpr8pj5g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hBJS5UDfUdNCbDc5uIb+KHxvHlpFd5HPI3Mvz4wBWb0BIvb/mFV+j520SAk2Vdv9KJuVDvsM0Pjjgsn1Y/njcl+jfQ4yTnTkNIsqZkIKRsjDPv4IFAy8D4wwA8H+RA+oO36DCpUDcCNyhGlWfAZQGq8taC6gPO6ajuC5h8S6w8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R33nzHIy; arc=none smtp.client-ip=10.30.226.201
+	bh=7Ipn0X7vVw04ZDLhQLIqE9uJ4GWphQGneKdbxPUSTh8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ktOxi1/e1ekTXxXq7F1FAgWO9IJSyEeR9wIeiD1LOhAKBeg/8Khd30gQrVEZGA5kdmY5JDG3aIhgw4MWz+4VTMkEAWMurn09VHN4dTgwgsW3blSn/6z1voUFwx3kuxBMl5UEPxv3Na2+QbeqsOsYQhRYVEuYCT+JzPjUGKuuEX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HJUB4OwL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R33nzHIy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFF00C4CEF6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HJUB4OwL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3B86C4CEF8;
 	Fri, 18 Jul 2025 11:12:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1752837136;
-	bh=24+36KjjrD0NWHFuhivqLnbkQAQ1TArPFkrRpr8pj5g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=R33nzHIyLv9AcgRjbXDMPz6PgR+4A1Li7+48f5b1sAgJYu9/fWJTkOu53F9AZePSv
-	 3jRSnNtZimbz4wu22en5eZD9jqnCbx5kYs+DpL0PwVw9KNzM+sTPwjMHbT/DggAbv/
-	 AvnC3S1suKWCtQrtvgdtASh5w+uk3IggRNy4ocLiWQVEwDO55/++6On1RjzoWNw/XS
-	 szI4BdxAbeTGEIqebNZH6JEH5K/jhpEVGaG5taxhjY2Jc3RrLh5kH+CFuiQH4iBsCn
-	 UhJ5aRXpIe0X+WG5LIPfXLk2x87z/a8nA/IjHqkajkdDvNFEFljagNaxCu5Zuydao8
-	 EqXL3ZWhQ3giw==
+	bh=7Ipn0X7vVw04ZDLhQLIqE9uJ4GWphQGneKdbxPUSTh8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HJUB4OwLxY/Pj1xU7RZuTtL+UEJ3qC13FcTRSoPsgA1sR6QmuufR0Ty40PqHpz/9c
+	 LwpDUBDlwyvBmXntDmn+ZxdXZnt5j5LUXV14k9EKkYZahi5Y5wiUPy8JioJkKpeCyB
+	 9Et9h9s/WsRdIFSqd1HSYsV0GCUPZi8F5Mfd+3NB5R3MZLgKzyFG2GPB0EOiJuwXU9
+	 kPax9y7+Ckc757MlqEiUqtoLaSSZD39v6r6Tg05Wjz9llTCkyrghNk/mWwXghfSCKt
+	 NAlQVftxIj54vkD0YUEM1rxuscIm+hHC0+mxS95rSMTQWhUeSSYAE3BQ7FbOhOZVL8
+	 8kqYDibD2NLjQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ucj0g-00Gt2B-UD;
-	Fri, 18 Jul 2025 12:12:15 +0100
+	id 1ucj0g-00Gt2B-By;
+	Fri, 18 Jul 2025 12:12:14 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -41,12 +40,10 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 2/4] KVM: arm64: Clarify the check for reset callback in check_sysreg_table()
-Date: Fri, 18 Jul 2025 12:11:52 +0100
-Message-Id: <20250718111154.104029-3-maz@kernel.org>
+Subject: [PATCH 0/4] KVM: arm64: Userspace GICv3 sysreg access fixes and testing
+Date: Fri, 18 Jul 2025 12:11:50 +0100
+Message-Id: <20250718111154.104029-1-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250718111154.104029-1-maz@kernel.org>
-References: <20250718111154.104029-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,55 +56,32 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-check_sysreg_table() has a wonky 'is_32" parameter, which is really
-an indication that we should enforce the presence of a reset helper.
+As a follow-up to my earlier series at [1], here's a small set of
+fixes to address an annoying bug that made ICH_HCR_EL2 unreachable
+from userspace -- not something you'd expect.
 
-Clean this up by naming the variable accordingly and inverting the
-condition. Contrary to popular belief, system instructions don't
-have a reset value (duh!), and therefore do not need to be checked
-for reset (they escaped the check through luck...).
+So the first patch fixes the ordering the the sysreg table, which had
+ICH_HCR_EL2 at the wrong spot. The next two ensure that we now check
+for the table to be sorted (just like all the other tables). Finally,
+the last patch augments the vgic_init selftest to actually check that
+we can access these registers
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+[1] https://lore.kernel.org/r/20250714122634.3334816-1-maz@kernel.org
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index af743494538a2..f8b10966d0c3e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4335,12 +4335,12 @@ static const struct sys_reg_desc cp15_64_regs[] = {
- };
- 
- static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
--			       bool is_32)
-+			       bool reset_check)
- {
- 	unsigned int i;
- 
- 	for (i = 0; i < n; i++) {
--		if (!is_32 && table[i].reg && !table[i].reset) {
-+		if (reset_check && table[i].reg && !table[i].reset) {
- 			kvm_err("sys_reg table %pS entry %d (%s) lacks reset\n",
- 				&table[i], i, table[i].name);
- 			return false;
-@@ -5334,11 +5334,11 @@ int __init kvm_sys_reg_table_init(void)
- 	int ret = 0;
- 
- 	/* Make sure tables are unique and in order. */
--	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
--	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
--	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
--	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
--	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
-+	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), true);
-+	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), false);
-+	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), false);
-+	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), false);
-+	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), false);
- 	valid &= check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false);
- 
- 	if (!valid)
+Marc Zyngier (4):
+  KVM: arm64: vgic-v3: Fix ordering of ICH_HCR_EL2
+  KVM: arm64: Clarify the check for reset callback in
+    check_sysreg_table()
+  KVM: arm64: Enforce the sorting of the GICv3 system register table
+  KVM: arm64: selftest: vgic-v3: Add basic GICv3 sysreg userspace access
+    test
+
+ arch/arm64/kvm/sys_regs.c                     |  20 +-
+ arch/arm64/kvm/vgic-sys-reg-v3.c              |   8 +-
+ arch/arm64/kvm/vgic/vgic.h                    |   1 +
+ tools/testing/selftests/kvm/arm64/vgic_init.c | 219 +++++++++++++++++-
+ 4 files changed, 237 insertions(+), 11 deletions(-)
+
 -- 
 2.39.2
 
