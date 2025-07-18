@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BE71EF092
-	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 06:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6178A1E521B
+	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 06:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752819280; cv=none; b=qIEz9jDkjGvwirTdgPluHYOPLAb33sU42yI5SxLBqWvnsHAJF4JFGm2m+i0EzXyWm2tBmFiKrESAaPdAHTNG/v7Erevos31arCBuKcm0TljiVUA2xpnSrSqolLhpfMy+zEZDlv1/KHyysssTcoaDS/ZF1B1kxdduJ4z0+YFQA8k=
+	t=1752819572; cv=none; b=rPLo40ViNfvWkzfvnnKleoR48IPzZIf7162FqVCxs7rIdzcc7ElDpP8E6b7oae//3V3lHO0jEHJDK348yLFFsiKHSWvzrXQx7Pen/Mnt99HMg7IIRiKd20Q8ShhCCwVvMFAB8qAVa3mSbfQbuPZ56lDJnrORC7oX0euQ9DYQKWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752819280; c=relaxed/simple;
-	bh=XcJZ6mYKjvZl9/FELeN8l47ZXRZ5CIivhly0oeD5djo=;
+	s=arc-20240116; t=1752819572; c=relaxed/simple;
+	bh=h6fTbzxB8EZ1LSr41gvQc07pwMx3ZFCzi8pYHbC1bNk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a1PUWCpXngWjlELhaizrUQvBvjfPPzjaKlzCygN9hsQeNeiNYw+6E65zMCR/bqjolREN0ItzzVN8KEfMigGJKryqUmA2UKWvdal6grhdU0GjqfK0yRVFprs8XM0oTrjU/Eh7FAN52T80bVSHK/cQANHPelgMpGRLsaPyw2QJqVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k5Dbznuf; arc=none smtp.client-ip=198.175.65.18
+	 In-Reply-To:Content-Type; b=Iv65IB0gJzsI70ScJze7Om/9GFuNQ04BYAN5Helnn0XKJf8A9KnUk9zA0bte3p1wSXz84je5XH1F/yzF/nnXLe8jP053buVwkr1KmML0cq7fC0a2tZ83w/x8UZhONOctcPdgebbWFZE/kEGmLItxCoQFNJH9EonreqoXluJSJTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Eivs3cUq; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k5Dbznuf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eivs3cUq"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752819280; x=1784355280;
+  t=1752819571; x=1784355571;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=XcJZ6mYKjvZl9/FELeN8l47ZXRZ5CIivhly0oeD5djo=;
-  b=k5DbznufScE0dHBblibrPyEYkIfBvh+8wtxAx7kVey85ThGBqc8v6dyZ
-   dnrK9l5/sn2tyPYv5p7U7KEdtvkqY6Iow35X469RTxobqoZZ3RrVI/vfP
-   QzV+KEbPJB0FTOCkPBA99ZanNs2/Y8tviB0ofm45e2JwECU/epvm25keq
-   9vMYO87ExYmPJTMf+Rg+UdSoemKcwYHlsiFOVTQ+HOOaPJz1SgO92Qhg5
-   wrTTPrHR29WbuM2A2EHH4UHM0F21cBW/lSfgmO8Ww1kyXGR8+9GPe7iMU
-   zlM4t9/G6w4nf4zWhNrHov1xaYa9xGfx4/ks80eVPXT+H1dz8+saTIMeJ
+  bh=h6fTbzxB8EZ1LSr41gvQc07pwMx3ZFCzi8pYHbC1bNk=;
+  b=Eivs3cUqRS80GmiY1eIaskY9QNMkBIMBsdtIJKWW9poIdX3CWCoIFw5S
+   T9W+rirC2rRNdLFtTmGiXOBTMjZnYPn/gVnjzV1cPbMGt5bhjh2RqVgoz
+   j8I/X70GFRM19nI7vKHg/3eR9jU5ekBYg1czGoVnZXEnRpDhUIB5o+Y0w
+   XIS/YmkGUt9QwY/e6+dOmUUAVATMLpfDIbL59Flzc9b5s6rgGpszX+mnk
+   IKMKvnqWK0IenVh65gA0ZBjOJY63svODvgZ/0FX8jSbQTV+ESo/GuZ5kY
+   E4kUapeTnmi6rePbWzstswI2Xopd25viWuSwr4ZP+BbWuDhldq830a04b
    A==;
-X-CSE-ConnectionGUID: iadc4L04RsGU7SmvSMvUhA==
-X-CSE-MsgGUID: tZ/1YKfPQnysSBPQkl5K8g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="55231638"
+X-CSE-ConnectionGUID: q6Zj4oAYRPm5RPNCnRyoOg==
+X-CSE-MsgGUID: 5CJuKte+SBO8etl9Wn0bEw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="80553618"
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="55231638"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:14:39 -0700
-X-CSE-ConnectionGUID: QjMd2QMOTIW9uNutYiZLDg==
-X-CSE-MsgGUID: tZgUpPdKQHO9i74VxV/2pg==
+   d="scan'208";a="80553618"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:19:31 -0700
+X-CSE-ConnectionGUID: WVyscegLRjOjWNORncxODw==
+X-CSE-MsgGUID: ytwcFLY5SsuuOC44yR5wMw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="158062418"
+   d="scan'208";a="157797786"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:14:23 -0700
-Message-ID: <0f31ab50-e30a-40d5-96ae-ee54742d98f9@intel.com>
-Date: Fri, 18 Jul 2025 14:14:17 +0800
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 23:19:15 -0700
+Message-ID: <39dccffe-ac30-45e2-9146-e26e958ef9d9@intel.com>
+Date: Fri, 18 Jul 2025 14:19:12 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 19/21] KVM: Introduce the KVM capability
- KVM_CAP_GMEM_MMAP
+Subject: Re: [PATCH v15 10/21] KVM: x86/mmu: Generalize
+ private_max_mapping_level x86 op to max_mapping_level
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -77,33 +77,48 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-20-tabba@google.com>
+ <20250717162731.446579-11-tabba@google.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250717162731.446579-20-tabba@google.com>
+In-Reply-To: <20250717162731.446579-11-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> Introduce the new KVM capability KVM_CAP_GMEM_MMAP. This capability
-> signals to userspace that a KVM instance supports host userspace mapping
-> of guest_memfd-backed memory.
+> From: Ackerley Tng <ackerleytng@google.com>
 > 
-> The availability of this capability is determined per architecture, and
-> its enablement for a specific guest_memfd instance is controlled by the
-> GUEST_MEMFD_FLAG_MMAP flag at creation time.
+> Generalize the private_max_mapping_level x86 operation to
+> max_mapping_level.
 > 
-> Update the KVM API documentation to detail the KVM_CAP_GMEM_MMAP
-> capability, the associated GUEST_MEMFD_FLAG_MMAP, and provide essential
-> information regarding support for mmap in guest_memfd.
+> The private_max_mapping_level operation allows platform-specific code to
+> limit mapping levels (e.g., forcing 4K pages for certain memory types).
+> While it was previously used exclusively for private memory, guest_memfd
+> can now back both private and non-private memory. Platforms may have
+> specific mapping level restrictions that apply to guest_memfd memory
+> regardless of its privacy attribute. Therefore, generalize this
+> operation.
 > 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Shivank Garg <shivankg@amd.com>
+> Rename the operation: Removes the "private" prefix to reflect its
+> broader applicability to any guest_memfd-backed memory.
+> 
+> Pass kvm_page_fault information: The operation is updated to receive a
+> struct kvm_page_fault object instead of just the pfn. This provides
+> platform-specific implementations (e.g., for TDX or SEV) with additional
+> context about the fault, such as whether it is private or shared,
+> allowing them to apply different mapping level rules as needed.
+> 
+> Enforce "private-only" behavior (for now): Since the current consumers
+> of this hook (TDX and SEV) still primarily use it to enforce private
+> memory constraints, platform-specific implementations are made to return
+> 0 for non-private pages. A return value of 0 signals to callers that
+> platform-specific input should be ignored for that particular fault,
+> indicating no specific platform-imposed mapping level limits for
+> non-private pages. This allows the core MMU to continue determining the
+> mapping level based on generic rules for such cases.
+> 
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Suggested-by: Sean Christoperson <seanjc@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 
 Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-
-Though I have comments on some patches, the general functionality for 
-x86 seems to be work. I plan to do a POC with QEMU to test non-coco VM 
-with guest_memfd with mmap support as the memory backend.
