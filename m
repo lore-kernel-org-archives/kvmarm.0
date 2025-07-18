@@ -1,135 +1,95 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE86248871
-	for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 23:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A953814A0BC
+	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 01:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752796079; cv=none; b=Gu/jEKuwILl5ADdhwraX3c04Z4TzFK5nfAQo1PCJ68LlnHAUZI7W6jy5YIgfTvvUofVqROF90x0zixYNFSkZ4s/OeLjcoS9L0w+PCdp2uIGgrgAsDpomLvLgUQrZGeZgit3fJzKumFozlkWEbPSqPleSpq7yzXM7uk7Chzrb97A=
+	t=1752802977; cv=none; b=McH/YJ/0hfWK3oeCJDFoPAV4R0dqAqtwfqDARkeI8wf8P+/WjhikG3rylRH7a/s+BeO3wyXkZB98LvxEn/OKtIbHlHq30Msw8l9D4u6uEH1Wdo2DQ3dOQnlnUbB0/ezK2MBgqJiu+V+5INAEB5K0GIfuugZkrDCrmJTTrrlKLA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752796079; c=relaxed/simple;
-	bh=4Lm6rMZZKj9i8zZ/NnoVMfxriOkG8OOdGzwZV10mDmc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L66YtGdOkxfhwn1U1PZsbUGqgpI6AXOrGwOR8y2zqsNCdPwYLWue0Ov6j0VvVGmAKeEeBqS7qj2i+88U4vBcbnPMM5NLvlKNheveWg+s/1vMcbfeWHrvu/Q4Bi7d6l1BaTbcpnaCSnW3PHAfC6GfWrSHXGqbeNAO0hIvbFCsbHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bHNcxV4K; arc=none smtp.client-ip=209.85.221.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	s=arc-20240116; t=1752802977; c=relaxed/simple;
+	bh=nALzQ13/hKtBqXb8rfNtCTmHGGtFpFLO/y5dIAkAQfY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KL8s4feO58b6yW98UR/Fba96jIKcqu2Jk8zM+6/ffNL+9eIrSf00nyXnf3SCJcn3ep7CxBGP2gM/eYtcqqaqybJEC3BC+rI9r2RhGhe52vevR9OVp7NlHYoFDVWY78Pa+xDFbYsiHg2Rj39wYxNaszIX0HnW53Mp+/vYIJ27rE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GeiZKkhg; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bHNcxV4K"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a6d1394b07so996206f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 17 Jul 2025 16:47:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752796076; x=1753400876; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i36b1JU3bh8bkcjM27fcG1Vv3a5VEOWwHxSUo3VGonw=;
-        b=bHNcxV4Kh9kvO1SJLIlg+GxRysUnljQHmPVfvmw+Y+JMBtei3Do4T/MZdumjODCXKA
-         ZXY/bEgYOOcJGRNJa+Eo92rtSjc91XlKIL8LXouWhCSVBa9Qq0nObUNKHMAy2gOZGnRC
-         NENhFSfih+LqsOIkTQB/G+Yk+w8KmQBYZhvH4TPVF3lqCUvZMl4wFX70MWHidJtQztIy
-         M1xf7MTAGqkUrEwSGRa3YSGGweJZlp6Uf4PQOvxtAttc47ikkosT3L6LDgLi2I9Iw5cl
-         z73KC7hj6ef9J9qCNJBXnNvLTLzSim1Bcau6qeCojL4yozCwSIgpM9XhKEjNhXp6yZ7s
-         545g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752796076; x=1753400876;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i36b1JU3bh8bkcjM27fcG1Vv3a5VEOWwHxSUo3VGonw=;
-        b=U0wfEAyvmxbIbrfaReRkS+wfLxEkJl6tVO2eGjh7xi+UvrAa3Tz5a8+Q2KVuxFeyq4
-         fbknS1HhfxlKNfqQcPupaQUaEDXYNEm671tKjcHeQ83lYmpa8hGy5+hgoxwIMb+AH9ec
-         dXaBCipQVJSAnxlzpA1ygprnOuHMGQAkE/BiMC99++4gnz+1CNaxXJ8e1Wn6bcNRKuv4
-         +EfHrW5NumP8a5BcTG4S4tdu9T8Ve/7xbCm97rlp0C++asNA0TIVQ/ul67WA7Ip42gq4
-         QvzRODWOfX1Sa1D4mSqMnN1H2Cm4aP7a6r+xcp8bI7GiGGQejXY7GtaWZjOk0jGHQ+9V
-         b3Kw==
-X-Forwarded-Encrypted: i=1; AJvYcCVA+hoZAkITyMWOZCqHEprvboYUv9HL+USw1onyRdiiqOAmR5NmNnjX/BT9wdfoIvohHjWFqtY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwS0PV1W0pG+B79h3sMil2uzG+wnP3OqppmILTTX0gEZBVEGewn
-	zsak1KRMXLQOoyBNnsr6ZU6rVHEtpqr0Ve+oWBh8q27NXpLEVErRkYpqBIe4D9CyCHbGz9rn2rr
-	p1f3B80iPgRNNow==
-X-Google-Smtp-Source: AGHT+IHKyMuHhag8ZOByJFmk1Ifp+SWFFmJZZLFql4fjdBJ3bTCSJXcxMK4YsTuE1B/9R5Fp15TBOEDcXOc6wQ==
-X-Received: from wmbdz10.prod.google.com ([2002:a05:600c:670a:b0:450:cf3f:2a89])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a5d:5d10:0:b0:3a5:5270:c38f with SMTP id ffacd0b85a97d-3b60dd0db62mr8326635f8f.0.1752796076663;
- Thu, 17 Jul 2025 16:47:56 -0700 (PDT)
-Date: Thu, 17 Jul 2025 23:47:44 +0000
-In-Reply-To: <20250717234744.2254371-1-smostafa@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GeiZKkhg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752802976; x=1784338976;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nALzQ13/hKtBqXb8rfNtCTmHGGtFpFLO/y5dIAkAQfY=;
+  b=GeiZKkhggLMerCycTOca4mSA4KOxmxrdEONrl2zKF3g3xD4otfEdMle1
+   NIt2nk0haMu/yj1TGz+fh11XWEp4heA6mdfXp+2aLkGjJhNn5iSA0kRIb
+   QXyBWo6FdvAlhXU1qJRzqws7bScOdqZ+MOrvgFjZNYaN7GM5yKQkLPWBS
+   aI4QtGWnBuEGGStLnIl/GVFbUKFr8suKLTp38UgfGW8Vx+c30xm2PilIr
+   xmADptvaG7Yp3hgUDZrDKytnsNw87J+0tzhhISEXsGEz/yUcWdHIM2I25
+   8j1zQgCRm3qnN0S1mkOXhZCPTCDakvIRWFtkg30rbOhZhKJweKIB6QpzR
+   w==;
+X-CSE-ConnectionGUID: egNUi4d4SWOcUsc9pZhkbg==
+X-CSE-MsgGUID: IeM9wTMgSNCeXO6oel+z5A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="77632269"
+X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
+   d="scan'208";a="77632269"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 18:42:55 -0700
+X-CSE-ConnectionGUID: ZkS0VEoES4W3YCuvt7mYLA==
+X-CSE-MsgGUID: koIEcje3TW2XcXgRJ6Mvag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
+   d="scan'208";a="157754551"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 18:42:40 -0700
+Message-ID: <ffb23653-058a-426e-9571-51784a77ad3d@intel.com>
+Date: Fri, 18 Jul 2025 09:42:36 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250717234744.2254371-1-smostafa@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250717234744.2254371-3-smostafa@google.com>
-Subject: [PATCH 2/2] KVM: arm64: Map hyp text as RO and dump instr on panic
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, qperret@google.com, keirf@google.com, 
-	Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 03/21] KVM: Introduce kvm_arch_supports_gmem()
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
+ amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
+ ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250717162731.446579-1-tabba@google.com>
+ <20250717162731.446579-4-tabba@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250717162731.446579-4-tabba@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Map the hyp text section as RO, there are no secrets there
-and that allows the kernel extract info for debugging.
+On 7/18/2025 12:27 AM, Fuad Tabba wrote:
+> -/* SMM is currently unsupported for guests with private memory. */
+> +/* SMM is currently unsupported for guests with guest_memfd private memory. */
+>   # define kvm_arch_nr_memslot_as_ids(kvm) (kvm_arch_has_private_mem(kvm) ? 1 : 2)
 
-As in case of panic we can now dump the faulting instructions
-similar to the kernel.
+As I commented in the v14, please don't change the comment.
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
- arch/arm64/kvm/handle_exit.c    |  4 +---
- arch/arm64/kvm/hyp/nvhe/setup.c | 12 ++++++++++--
- 2 files changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index de12b4d4bccd..d59f33c40767 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -566,9 +566,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 	kvm_nvhe_dump_backtrace(hyp_offset);
- 
- 	/* Dump the faulting instruction */
--	if (!is_protected_kvm_enabled() ||
--	    IS_ENABLED(CONFIG_NVHE_EL2_DEBUG))
--		dump_instr(panic_addr + kaslr_offset());
-+	dump_instr(panic_addr + kaslr_offset());
- 
- 	/*
- 	 * Hyp has panicked and we're going to handle that by panicking the
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index a48d3f5a5afb..90bd014e952f 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -192,6 +192,7 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	enum pkvm_page_state state;
- 	struct hyp_page *page;
- 	phys_addr_t phys;
-+	enum kvm_pgtable_prot prot;
- 
- 	if (!kvm_pte_valid(ctx->old))
- 		return 0;
-@@ -210,11 +211,18 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	 * configured in the hypervisor stage-1, and make sure to propagate them
- 	 * to the hyp_vmemmap state.
- 	 */
--	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(ctx->old));
-+	prot = kvm_pgtable_hyp_pte_prot(ctx->old);
-+	state = pkvm_getstate(prot);
- 	switch (state) {
- 	case PKVM_PAGE_OWNED:
- 		set_hyp_state(page, PKVM_PAGE_OWNED);
--		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
-+		/* hyp text is RO in the host stage-2 to be inspected on panic. */
-+		if (prot == PAGE_HYP_EXEC) {
-+			set_host_state(page, PKVM_NOPAGE);
-+			return host_stage2_idmap_locked(phys, PAGE_SIZE, KVM_PGTABLE_PROT_R);
-+		} else {
-+			return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
-+		}
- 	case PKVM_PAGE_SHARED_OWNED:
- 		set_hyp_state(page, PKVM_PAGE_SHARED_OWNED);
- 		set_host_state(page, PKVM_PAGE_SHARED_BORROWED);
--- 
-2.50.0.727.gbf7dc18ff4-goog
+It is checking kvm_arch_has_private_mem(), *not* 
+kvm_arch_supports_gmem(). So why bother mentioning guest_memfd here?
 
