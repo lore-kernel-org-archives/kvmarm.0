@@ -1,109 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD6C22D79F;
-	Fri, 18 Jul 2025 13:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615E821D3D9
+	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 21:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752846787; cv=none; b=rNIqp67FiG01mxCOAOxaXVBPyZ4Lx/DAhdXTT+oPNUzXDOMEpVsqr3PljiUaPif9Ae/Tu4AqDTv5bkGKqbh2o7XypyHB/dCLXVrt2ZudB4wYNJMimEkNWHD7yf4DlaGtZ1P48aGdqmXnmkdgsE6Gs/ovoew91F9UwIZTO60xpPA=
+	t=1752874024; cv=none; b=kPSHzcuQXUsHgIVsA5aoobIAx5bxlxM6DTYrUPC2bqT5PdzNnkwAwWTpoUiBm5dZSTgn7O1pmaEBOZqBZl21weM/e2pTbmpjOurGz2xzGhjD0LlmY/8bC3LV4fcfxOCnyckMk2hTLFUy46itBDiDBAnt3qx5pAwNllvJsmpEbfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752846787; c=relaxed/simple;
-	bh=B4SnE+zQQYrXoOXSH3uh52tXSCyHrejJfwt5H9FxdM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GG/lMV+a2XlIeGS8ZRlKbBjXxDqYc3eiNtzZJbylaT7+rVX9SQgXFFd8ERHLAA/3/WgL3Nra3bFtgMcmCpcjlgj3HZEPso2uOpr9pMRUz6Q/vcs9yCviNCD4e5HVDRGybkvOO/ihStLB31NnqTeJdsOHOj1uAEzxfyxd2ZFLvF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NlGGxUof; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752874024; c=relaxed/simple;
+	bh=2CM4PM4YcNwNTDoDpIwtc5IwfgnCElSJzdiwNdBTOB0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=caIL8l7mwOsOKHOexXUJHo37B6LN2F1lkkDx67M6J2WkPQvQzsUV/kMfjqxk+bmRP29UEK0jBnL6NnZeBYj+p1dcLz9aaY7p21iwa4GEs5fN9BDqP95uK0FhUSz4aSiSlR71YYJ3G9C7WZHjLBcnzTGNiPxZrcaZTZv3DR6L8fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1k3SEokf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XTTfwGcf; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NlGGxUof"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3169C4CEEB;
-	Fri, 18 Jul 2025 13:53:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752846786;
-	bh=B4SnE+zQQYrXoOXSH3uh52tXSCyHrejJfwt5H9FxdM8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NlGGxUof11Zehi8WBXyY/8GR05FhcOVGptIke0qiu0pQfbjWDF4kH235O8293aR2d
-	 YvWNzcgzpoYL1rmqDAQ3XTk5/0gadDntr+1tTU1Z7YMmwlmqqe/K/vPbLQIMGcg6NQ
-	 wZMibR8oYCiKzHRN1TwApjuzcj+ry5jE4DvLD/aQMtQdhO9lbq5DOiQvdFOwiq5J9+
-	 /9QbvorA4qw/MObr/WO8ycsIoxPnGfDOnk8M6XCCgPvZDpkNJjlXMTuS2UH8XU/sTm
-	 JIpt36PkfH6ZQOjQsmN8OnDI24KpPaYKKVfouIPA7lqNgK3GRNm7Nhg9VvowAU7lnN
-	 dC4BzIdNfmnZQ==
-Date: Fri, 18 Jul 2025 14:53:00 +0100
-From: Will Deacon <will@kernel.org>
-To: perlarsen@google.com
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, ahomescu@google.com,
-	armellel@google.com, arve@android.com, ayrton@google.com,
-	qperret@google.com, sebastianene@google.com, qwandor@google.com
-Subject: Re: [PATCH v7 5/5] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in
- host handler
-Message-ID: <aHpRvBO864x1vvqP@willie-the-truck>
-References: <20250701-virtio-msg-ffa-v7-0-995afc3d385e@google.com>
- <20250701-virtio-msg-ffa-v7-5-995afc3d385e@google.com>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1k3SEokf";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XTTfwGcf"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1752874020;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HNzdv87a/rWq9tLSyEQPN0gDEde6E0UtRnippuxMHZM=;
+	b=1k3SEokf2DBVJWgiF+T/xnJOe2eEqWGJLJ00C8SsTwH8x1nM5SZiBDmLZUebOhfii+iVuG
+	s4+tESctQnG48CFtQHqPgJwTltmpCoGIi2OyV/1oz6yHpnLeulrQnGooaWGSkHpY97elqF
+	InEmN3BmvnWJfTfz45eaVaHk6La2pBV3EkfKx5fZcSwca6eNLFm62SJJiOaBxlZcpCzbYg
+	F14bdVOShusu5A7bNHEUESC4troKiGYNlYfZHIlCSEsEvyHEM94Q3CRWKsE7NscCOwM2bo
+	4maJC7nsozVTPffITe3MFsv8Phg/ZQJ/8iR76dyJuWP6JP39vHxYHCpfCb0ZpA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1752874020;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HNzdv87a/rWq9tLSyEQPN0gDEde6E0UtRnippuxMHZM=;
+	b=XTTfwGcffydfGuv9QlkDzZ39VMlTjrkghsf4EOfBdgI7BhVW6CZYXQHAY0fGzaXv/laho9
+	ZnSs1FsFSv4KQoDA==
+To: Marc Zyngier <maz@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Conor Dooley <conor+dt@kernel.org>, Jonathan
+ Cameron <Jonathan.Cameron@huawei.com>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Lorenzo Pieralisi <lpieralisi@kernel.org>, Mark
+ Rutland <mark.rutland@arm.com>, Rob Herring <robh@kernel.org>, Sascha
+ Bischoff <sascha.bischoff@arm.com>, Timothy Hayes <timothy.hayes@arm.com>,
+ Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+Subject: Re: [GIT PULL] irqchip: Add GICv5 support
+In-Reply-To: <20250717122306.4043011-1-maz@kernel.org>
+References: <20250717122306.4043011-1-maz@kernel.org>
+Date: Fri, 18 Jul 2025 23:26:58 +0200
+Message-ID: <87y0slur4t.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250701-virtio-msg-ffa-v7-5-995afc3d385e@google.com>
+Content-Type: text/plain
 
-On Tue, Jul 01, 2025 at 10:06:38PM +0000, Per Larsen via B4 Relay wrote:
-> From: Per Larsen <perlarsen@google.com>
-> 
-> FF-A 1.2 adds the DIRECT_REQ2 messaging interface which is similar to
-> the existing FFA_MSG_SEND_DIRECT_{REQ,RESP} functions except that it
-> uses the SMC calling convention v1.2 which allows calls to use x4-x17 as
-> argument and return registers. Add support for FFA_MSG_SEND_DIRECT_REQ2
-> in the host ffa handler.
-> 
-> Signed-off-by: Per Larsen <perlarsen@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 24 +++++++++++++++++++++++-
->  include/linux/arm_ffa.h       |  2 ++
->  2 files changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 79d834120a3f3d26e17e9170c60012b60c6f5a5e..21225988a9365219ccfd69e8e599d7403b5cdf05 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -679,7 +679,6 @@ static bool ffa_call_supported(u64 func_id)
->  	case FFA_NOTIFICATION_GET:
->  	case FFA_NOTIFICATION_INFO_GET:
->  	/* Optional interfaces added in FF-A 1.2 */
-> -	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
+Marc!
 
-I think that's the only change needed. In fact, maybe just don't add it
-in the earlier patch?
+On Thu, Jul 17 2025 at 13:23, Marc Zyngier wrote:
 
->  	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
->  	case FFA_CONSOLE_LOG:			/* Optional per 13.1: not in Table 13.1 */
->  	case FFA_PARTITION_INFO_GET_REGS:	/* Optional for virtual instances per 13.1 */
-> @@ -862,6 +861,22 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
->  	hyp_spin_unlock(&host_buffers.lock);
->  }
->  
-> +static void do_ffa_direct_msg2(struct arm_smccc_1_2_regs *regs,
-> +			       struct kvm_cpu_context *ctxt,
-> +			       u64 vm_handle)
-> +{
-> +	DECLARE_REG(u32, endp, ctxt, 1);
-> +
-> +	struct arm_smccc_1_2_regs *args = (void *)&ctxt->regs.regs[0];
-> +
-> +	if (FIELD_GET(FFA_SRC_ENDPOINT_MASK, endp) != vm_handle) {
-> +		ffa_to_smccc_error(regs, FFA_RET_INVALID_PARAMETERS);
-> +		return;
-> +	}
+> Thomas,
+>
+> After some time simmering in -next without much catching fire (only a
+> single regression has been reported, which was promptly fixed), here's
+> the pull request for the GICv5 core infrastructure.
+>
+> There are still a couple of patches on the list (mostly addressing
+> error paths, and actively being reviewed), but I don't see anything
+> that would warrant holding this any longer, and these fixes can be
+> added down the line. If anything, this work has allowed us to
+> pipe-clean a number of issues in the tree.
+>
+> Please note that the kvmarm tree also carries this branch, as this is
+> a dependency for enabling GICv3 compatibility for guests on a GICv5
+> host.
 
-Why do we care about checking the src id? We don't check that for
-FFA_MSG_SEND_DIRECT_REQ and I don't think we need to care about it here
-either.
+I'm fine with keeping this in the kvmarm tree only if that is intended
+to hit the next merge window. There is no point to carry this
+redundantly in two trees, unless there is some conflict to resolve in my
+tree.
 
-Will
+If the kvmarm stuff is not ready yet, then please let me know and I
+happily pull in the pile.
+
+Thanks,
+
+        tglx
