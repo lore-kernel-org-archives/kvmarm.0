@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6929CA923
-	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 02:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1791A1CAA85
+	for <kvmarm@lists.linux.dev>; Fri, 18 Jul 2025 03:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752807429; cv=none; b=i77MIqRFtHn1AfS1OVUvyoPS6eNJnT8BnEPBSoL/VvGvDMODFq0f9EyMtxk46LKGL3Um8CvGJH6ByGWkWzX7W3SlMxw8IZ7LSaNeTtcEETmA+HzEo71/Z1wRlLu94IdBK3inNJjEP6e+8S/8T8vFmthiVVzUD1eJS8yySWmisaE=
+	t=1752809608; cv=none; b=sjDvmOAq0xC/ldJivhjgykp+Lu9sNL41PNHgp1duwj71xOslRhF+ug8Pguaf6DZI8psNI/W5dXxe5UoH3LiA859TsroFFQby5IdpQcghDr5VAsmjLgf6BCZa38SZyxJ8QOQmT22igFmB49UiGQ4p1VPaVgT3paPZ370nJxlxeVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752807429; c=relaxed/simple;
-	bh=VNm2yIjyNR+4MfYbdw7jgNE502i3pDkkpT5hsJAXhcQ=;
+	s=arc-20240116; t=1752809608; c=relaxed/simple;
+	bh=D8AGor2dq/npc0EvnMPgCs9khQ5Ob0CiUc1XMT/N94M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TsmyT3DqZSZkrwsDggx74jEiBOWP7itNmrZlT6DwHXrurz5Cjcr3rQ3IzLIEkPzxUtFMMxuQJLl+he9/bGKhWJl/NxX7m7xlWW20HJZdGQ+04LvI8V0aOiPV19MvY7cBRvFUoFyweMH5hfHStlfZtDs6m37e016oiKmtWMU9hpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Liyy2nFE; arc=none smtp.client-ip=198.175.65.21
+	 In-Reply-To:Content-Type; b=et+xVH8Mlto0/DyMMP7OVNRkO0u3GHrmR43oej0XEzT5BuG5uW7J/Y/WIFwdwDyUZ6WaxtkFrsRUO7YGr307FObjfmjtUyxpG0xOOhLtgiwnmY81uNLbbfYHyvSjJcRwWKPVlJB29gGfUzPx3GlPdsdaf0SE8x2axXObbIGdphA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dfr5iBJh; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Liyy2nFE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dfr5iBJh"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752807427; x=1784343427;
+  t=1752809607; x=1784345607;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=VNm2yIjyNR+4MfYbdw7jgNE502i3pDkkpT5hsJAXhcQ=;
-  b=Liyy2nFELVMIHEAHmvpKLLfZQy8xqkXINx8KYsi56ehNzu34T2NTC8jr
-   Q+iOyxWJDH6QhUtA4kSjc6Xq71SolJ8VNc18XvB+oKV839HTa+XKfIPCb
-   /uFbxvDCcaV2zv6AhZ+RJkhE/SnG+OGtTk1A5Y7JQyAio1ZbshTC31Oyb
-   8Uv+CezNwOC/Ax4rODTrbTNV2DxNJN8uyaBiAY43XvI437uZ7BEMBJrpZ
-   siNJiJ+8vjUjdp/4hmBm2IKYTCsuWs8IlptyMRFu084+odk6g5j+X3+Xe
-   FViA90ve6ucVC1c2lRh1cU/HTa0WijqSu6aPDY3aNPK6OaRwT91y7aLcz
-   g==;
-X-CSE-ConnectionGUID: B1oPw1IjR1G8AgK37+1MRw==
-X-CSE-MsgGUID: NACSQGsASGujHisr4Sy4dg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="54977948"
+  bh=D8AGor2dq/npc0EvnMPgCs9khQ5Ob0CiUc1XMT/N94M=;
+  b=dfr5iBJhzg50WbAELtF3aK7I4sz042NUKaS9mUbBjIDC0xaBHRGafBEE
+   L2VDHeJRMU+GbVSb1AocPN9QZLoL7DbwWlGjurVg0B+xX5e8BbtDeTWpf
+   w0wHDUjn+hKUAWhiW25VRUAOW8R4g5oV7a9rzKpUZQTmljt6XUYMDEbxq
+   Rq67uWCx9UnSjQFJvv16Ee7bri9jNIK0TpuMHe3rTKrZNC6TCf4aPwppn
+   RzLyDC4Bz99dcDWtcMa7uCyI/IOsT5fwoxvF3Yg8qwuXO5W1aeTOy0r0X
+   jEIxoldQaSRmwJoku6b4sDCeMbm3Q7InetmEgiPENWBmt0H5X9BSu8hkC
+   w==;
+X-CSE-ConnectionGUID: HXI2P0nKTceGhEkSSjAtBA==
+X-CSE-MsgGUID: VnhrjQVtTW6CDoTjMvcsNA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11495"; a="54313059"
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="54977948"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 19:57:06 -0700
-X-CSE-ConnectionGUID: 4aAcsyaETE28nvuGRlN+zw==
-X-CSE-MsgGUID: BbAsaMudTLW2zflXrSC6Ng==
+   d="scan'208";a="54313059"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 20:33:26 -0700
+X-CSE-ConnectionGUID: /scvanS6Sx+UV2IV+v5vuQ==
+X-CSE-MsgGUID: JlCfL47DR5aRJITyOXDjvg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,320,1744095600"; 
-   d="scan'208";a="157340783"
+   d="scan'208";a="162232198"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 19:56:52 -0700
-Message-ID: <cfa96c5a-3301-4f57-b14a-1243d0556e64@intel.com>
-Date: Fri, 18 Jul 2025 10:56:49 +0800
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2025 20:33:12 -0700
+Message-ID: <d8b0fa0f-b9f5-4435-8602-bd6a2d375ca4@intel.com>
+Date: Fri, 18 Jul 2025 11:33:08 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 08/21] KVM: guest_memfd: Allow host to map guest_memfd
- pages
+Subject: Re: [PATCH v15 09/21] KVM: guest_memfd: Track guest_memfd mmap
+ support in memslot
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -77,54 +77,31 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-9-tabba@google.com>
+ <20250717162731.446579-10-tabba@google.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250717162731.446579-9-tabba@google.com>
+In-Reply-To: <20250717162731.446579-10-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 1ec71648824c..9ac21985f3b5 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -740,6 +740,19 @@ static inline bool kvm_arch_supports_gmem(struct kvm *kvm)
->   }
->   #endif
->   
-> +/*
-> + * Returns true if this VM supports mmap() in guest_memfd.
-> + *
-> + * Arch code must define kvm_arch_supports_gmem_mmap if support for guest_memfd
-> + * is enabled.
-> + */
-> +#if !defined(kvm_arch_supports_gmem_mmap)
+> Add a new internal flag, KVM_MEMSLOT_GMEM_ONLY, to the top half of
+> memslot->flags (which makes it strictly for KVM's internal use). This
+> flag tracks when a guest_memfd-backed memory slot supports host
+> userspace mmap operations, which implies that all memory, not just
+> private memory for CoCo VMs, is consumed through guest_memfd: "gmem
+> only".
+> 
+> This optimization avoids repeatedly checking the underlying guest_memfd
+> file for mmap support, which would otherwise require taking and
+> releasing a reference on the file for each check. By caching this
+> information directly in the memslot, we reduce overhead and simplify the
+> logic involved in handling guest_memfd-backed pages for host mappings.
+> 
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Shivank Garg <shivankg@amd.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 
-Unless being given a reason or you change it to
-
-#if !defined(kvm_arch_supports_gmem_mmap) && !IS_ENABLED(CONFIG_KVM_GMEM)
-
-I will repeat my opinion as what on v14[*]
-
-* It describes the similar requirement as kvm_arch_has_private_mem and
-* kvm_arch_supports_gmem, but it doesn't have the check of
-*
-*	&& !IS_ENABLED(CONFIG_KVM_GMEM)
-*
-* So it's straightforward for people to wonder why.
-*
-* I would suggest just adding the check of !IS_ENABLED(CONFIG_KVM_GMEM)
-* like what for kvm_arch_has_private_mem and kvm_arch_supports_gmem.
-* So it will get compilation error if any ARCH enables CONFIG_KVM_GMEM
-* without defining kvm_arch_supports_gmem_mmap.
-
-[*] 
-https://lore.kernel.org/all/e1470c54-fe2b-4fdf-9b4b-ce9ef0d04a1b@intel.com/
-  > +static inline bool kvm_arch_supports_gmem_mmap(struct kvm *kvm)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +
-
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
