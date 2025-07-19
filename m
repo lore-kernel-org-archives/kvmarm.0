@@ -1,65 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804293FF1;
-	Sat, 19 Jul 2025 07:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCC32629C;
+	Sat, 19 Jul 2025 12:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752910367; cv=none; b=p6fdgnetjJOH9f6ifFvJOY0n68GcTIPheh1e2+Wjw7LczGfsU3tFcuqSQ37G3Wls1hrjfJ7JX71eQP8kg1nWNcaEeNgmcnu++ZVRKbRojfHj3egAU9XxbjQeHvwNtwiKBnVcN48/BwXFCbjhUEfzaqRIKVHMHH1RcW4toTtGZF8=
+	t=1752926688; cv=none; b=iAQ4xaweYhurLzjQsb1JTHnIMbC80CvB+dAuIErTDSraCHZbq5Fr6uIg4QrTeHvlVDSYjvYdvCqOR6LC3mRFX9ZbXKc8H/ltYAyF+xWgOQ90tSJ3Aizzv/KkoJNjvpLCqwmFpMVSWJdzDJUEVGwQiEd6YkDPuY+ks3jF5jRkXck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752910367; c=relaxed/simple;
-	bh=3okCywEiRAfiPc0V+sQrLLC8jO3tbsXEziFC7deoXkI=;
+	s=arc-20240116; t=1752926688; c=relaxed/simple;
+	bh=ke51KIB9NWjtgPYjsJ/LrpJY5gyL7OuTgeKtaW3v/T8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hi/lLZMF2CVmXqHAdMO7bWpigR0qng2bNb2M48HIbyBR99dg9yZSHthYHcZXVfIkBzf/gC80KVcGMd2uM6l7jT9HEIo9Y2rnHZCbI0JkrqUD2u5AyIRZnepyo+kUEQcXLOAyhNRHg8YxbWnZBL6qII4adNrlICWTV4/RnNwkZT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vNNsDzJN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=NGG9wBu3JlglawZdQWvXxIiTCs67bIdyN+EwneQBB0ohEAULheogvnSzU3Udx2+ALaRtYtMp7PogV3OXwtyVz0nFzIqIFsO7eQ/UunaWwkHwwVxalYBWUa+bl3OC0idROf/NH7QiSONsvSestjdGopMdMLp4D5EmBZYBmGTaO/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SE4leeio; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vNNsDzJN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5EA5C4CEE3;
-	Sat, 19 Jul 2025 07:32:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SE4leeio"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1694C4CEE3;
+	Sat, 19 Jul 2025 12:04:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752910367;
-	bh=3okCywEiRAfiPc0V+sQrLLC8jO3tbsXEziFC7deoXkI=;
+	s=k20201202; t=1752926687;
+	bh=ke51KIB9NWjtgPYjsJ/LrpJY5gyL7OuTgeKtaW3v/T8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vNNsDzJNK7v3xrvsFVsX0mOLPKUeTiuU6Xp7tpV27SrLYZ8XKxExSzG0bfm9p0Bgu
-	 oOWimXRHcqHYsTclwCH81HMC4N2kBlJ919kS9NYxB7HscTZw2Ag2xiDVSyIPDIIqOy
-	 aFIAaOGC1uKoNO6RCxkkbSbe8iXMi822RTvpGduyIdBhCXHHqw4f1+q5XWPFnfl/zD
-	 fmbw79XmD7jokZu/2KinKexcCFXb4y9FFV7J+N9/2MpVSw8a0ktzrdLR1Y9RuJ9d4V
-	 bxWqIeLONZf8nx5KTr7CwO33XVPGCwHjSvpqCrW02k+64UjD9iAmZMQQgN3ISrYrxY
-	 Yrj0RBq0VJu+w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	b=SE4leeiozu7wB4uf4WqS2CUXxWLMC46HIkpRRltIUxVkCTlDEVoC1emo8Xo8yIsAy
+	 0dhrfhlDgucjyo13+4A49w6RsFVfaW7PwljA/NbhufsFEcZMPpV4u9C7wBzNyGn5im
+	 e3B76R4WFhG9XuxEsssZ6J+II07LE/RlfJ1a3ZRcreSLLX00u5j00qfIyU/LwWvxyM
+	 j6BgZfya5faxu+q8PrREUmgfG+bHiO3nduIEXWtw++LKup78baY9tzTGIiDypNe6hH
+	 PzKLe5z6zCzBwaMHJKMbqvGIzYvT7egJ6ZnEcVonRtppAfOixezVLXqPE9TvqXcV4w
+	 sauzbq+Q+F9tw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ud23o-00H6q5-EB;
-	Sat, 19 Jul 2025 08:32:44 +0100
-Date: Sat, 19 Jul 2025 08:32:43 +0100
-Message-ID: <86seis8wkk.wl-maz@kernel.org>
+	id 1ud6J3-00H8ep-6T;
+	Sat, 19 Jul 2025 13:04:45 +0100
+Date: Sat, 19 Jul 2025 13:04:43 +0100
+Message-ID: <87zfd0e690.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Breno Leitao <leitao@debian.org>,
-	Catalin Marinas
- <catalin.marinas@arm.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jonathan
- Cameron <Jonathan.Cameron@huawei.com>,
-	Krzysztof Kozlowski
- <krzk+dt@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Mark
- Rutland <mark.rutland@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Sascha
- Bischoff <sascha.bischoff@arm.com>,
-	Timothy Hayes <timothy.hayes@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [GIT PULL] irqchip: Add GICv5 support
-In-Reply-To: <87y0slur4t.ffs@tglx>
-References: <20250717122306.4043011-1-maz@kernel.org>
-	<87y0slur4t.ffs@tglx>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton
+	<oliver.upton@linux.dev>,
+	Ricardo Koller <ricarkol@google.com>,
+	Simon Veith
+	<sveith@amazon.de>,
+	Reiji Watanabe <reijiw@google.com>,
+	Colton Lewis
+	<coltonlewis@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	<dwmw2@infradead.org>
+Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2
+In-Reply-To: <460258be-0102-e922-c342-4e87cd94b9e5@huawei.com>
+References: <20230330174800.2677007-1-maz@kernel.org>
+	<20230330174800.2677007-6-maz@kernel.org>
+	<460258be-0102-e922-c342-4e87cd94b9e5@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -71,50 +67,193 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tglx@linutronix.de, leitao@debian.org, catalin.marinas@arm.com, conor+dt@kernel.org, Jonathan.Cameron@huawei.com, krzk+dt@kernel.org, lpieralisi@kernel.org, mark.rutland@arm.com, robh@kernel.org, sascha.bischoff@arm.com, timothy.hayes@arm.com, will@kernel.org, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 18 Jul 2025 22:26:58 +0100,
-Thomas Gleixner <tglx@linutronix.de> wrote:
+On Wed, 09 Jul 2025 09:12:18 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> Marc!
+> [ Record some interesting bits noticed while testing
+>   arch_timer_edge_cases. ]
 > 
-> On Thu, Jul 17 2025 at 13:23, Marc Zyngier wrote:
+> On 2023/3/31 1:47, Marc Zyngier wrote:
+> > CNTPOFF_EL2 is awesome, but it is mostly vapourware, and no publicly
+> > available implementation has it. So for the common mortals, let's
+> > implement the emulated version of this thing.
+> > 
+> > It means trapping accesses to the physical counter and timer, and
+> > emulate some of it as necessary.
+> > 
+> > As for CNTPOFF_EL2, nobody sets the offset yet.
+> > 
+> > Reviewed-by: Colton Lewis <coltonlewis@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h    |  2 +
+> >  arch/arm64/kvm/arch_timer.c        | 98 +++++++++++++++++++++++-------
+> >  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 18 ++++--
+> >  arch/arm64/kvm/sys_regs.c          |  9 +++
+> >  4 files changed, 98 insertions(+), 29 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 9e3ecba3c4e6..f8da9e1b0c11 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -388,6 +388,7 @@
+> >  
+> >  #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
+> >  
+> > +#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
+> >  #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
+> >  #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
+> >  
+> > @@ -400,6 +401,7 @@
+> >  
+> >  #define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
+> >  #define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
+> > +#define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
+> >  #define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
+> >  
+> >  #define __PMEV_op2(n)			((n) & 0x7)
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 3118ea0a1b41..bb64a71ae193 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
+> > @@ -458,6 +458,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+> >  		goto out;
+> >  
+> >  	switch (index) {
+> > +		u64 cval;
+> > +
+> >  	case TIMER_VTIMER:
+> >  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
+> >  		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
+> > @@ -485,7 +487,12 @@ static void timer_save_state(struct arch_timer_context *ctx)
+> >  		break;
+> >  	case TIMER_PTIMER:
+> >  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+> > -		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
+> > +		cval = read_sysreg_el0(SYS_CNTP_CVAL);
+> > +
+> > +		if (!has_cntpoff())
+> > +			cval -= timer_get_offset(ctx);
+> > +
+> > +		timer_set_cval(ctx, cval);
+> >  
+> >  		/* Disable the timer */
+> >  		write_sysreg_el0(0, SYS_CNTP_CTL);
+> > @@ -555,6 +562,8 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+> >  		goto out;
+> >  
+> >  	switch (index) {
+> > +		u64 cval, offset;
+> > +
+> >  	case TIMER_VTIMER:
+> >  		set_cntvoff(timer_get_offset(ctx));
+> >  		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
+> > @@ -562,8 +571,12 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+> >  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+> >  		break;
+> >  	case TIMER_PTIMER:
+> > -		set_cntpoff(timer_get_offset(ctx));
+> > -		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
+> > +		cval = timer_get_cval(ctx);
+> > +		offset = timer_get_offset(ctx);
+> > +		set_cntpoff(offset);
+> > +		if (!has_cntpoff())
+> > +			cval += offset;
+> > +		write_sysreg_el0(cval, SYS_CNTP_CVAL);
+> >  		isb();
+> >  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+> >  		break;
 > 
-> > Thomas,
-> >
-> > After some time simmering in -next without much catching fire (only a
-> > single regression has been reported, which was promptly fixed), here's
-> > the pull request for the GICv5 core infrastructure.
-> >
-> > There are still a couple of patches on the list (mostly addressing
-> > error paths, and actively being reviewed), but I don't see anything
-> > that would warrant holding this any longer, and these fixes can be
-> > added down the line. If anything, this work has allowed us to
-> > pipe-clean a number of issues in the tree.
-> >
-> > Please note that the kvmarm tree also carries this branch, as this is
-> > a dependency for enabling GICv3 compatibility for guests on a GICv5
-> > host.
+> I tested arch_timer_edge_cases on my Kunpeng920 (has VHE, doesn't have
+> ECV) and noticed that the test_timer_cval() below takes a long period to
+> return when testing the _physical_ timer.
 > 
-> I'm fine with keeping this in the kvmarm tree only if that is intended
-> to hit the next merge window. There is no point to carry this
-> redundantly in two trees, unless there is some conflict to resolve in my
-> tree.
+> static void test_timers_in_the_past(enum arch_timer timer)
+> {
+> 	[...]
+> 
+> 	for (i = 0; i < ARRAY_SIZE(irq_wait_method); i++) {
+> 		irq_wait_method_t wm = irq_wait_method[i];
+> 
+> 		[...]
+> 
+> 		/* Set a timer to counter=0 (in the past) */
+> 		test_timer_cval(timer, 0, wm, DEF_CNT);
+> 
+> The comment is obviously wrong. It should say "Set a timer to CVAL=0".
+> 
+> No physical timer interrupt ("kvm guest ptimer") was triggered when I
+> executed it separately.
+> 
+> Let me try to explain _this_ test_timer_cval() in a bit more detail.
+> 
+> |Guest					KVM
+> |-----					---
+> |local_irq_disable()
+> |
+> |reset_timer_state()
+> |   set_counter()			// SET_ONE_REG via user-space
+> |					// for KVM_REG_ARM_PTIMER_CNT
+> |					kvm_arm_timer_set_reg()
+> |					   timer_set_offset()      [1]
+> |   timer_set_ctl()
+> |      MSR CNTP_CTL_EL0, IMASK
+> |
+> |set_xval_irq()
+> |   timer_set_cval()
+> |      MSR CNTP_CVAL_EL0, cval=0
+> |   timer_set_ctl()
+> |      MSR CNTP_CTL_EL0, ENABLE		// trap
+> |					kvm_arm_timer_write_sysreg()
+> |					   timer_save_state()
+> |					   kvm_arm_timer_write()
+> |					   timer_restore_state()   [2]
+> |
+> |/* This method re-enables IRQs to handle the one we're looking for. */
+> |wm()
+> |
+> |assert_irqs_handled(1)
+> |local_irq_enable()
+> 
+> [1] kvm_phys_timer_read()			= 0x7895c0ab2
+>     value					= 0x7fffffffffffff
+>     offset = kvm_phys_timer_read() - value	= 0xff800007895c0ab3
+> 
+> ... which was observed in my test.
 
-Thanks for that, I'll keep the branch around anyway, should you need
-to pull it to resolve some last minute conflict.
+I think this denotes the same problem that was "fixed" in this test
+recently: the arithmetic in the kernel is done on a 64bit value, while
+we have no idea what the number of significant bits actually is. We
+therefore end-up with some outlandish values, and since the timer is
+more or less emulated, we end-up doing the wrong thing.
 
-> If the kvmarm stuff is not ready yet, then please let me know and I
-> happily pull in the pile.
+> 
+> [2] cval += offset;			// cval	= 0xff800007895c0ab3
+>     kvm_phys_timer_read()			= 0x7895c1b86
+> 
+> No ptimer interrupt was triggered with that. And we relied on the next
+> kvm_timer_vcpu_load() to catch the timer expiration and inject an
+> interrupt to the guest..
+> 
+> It's apparent that this test case is not a practical use case. Not sure
+> if we should (/can) emulate it properly. Or I may have already missed
+> some obvious points.
 
-The kvmarm stuff is ready to go, has been simmering in -next for the
-same time, and is also aiming for 6.17.
+Overall, I think the "set a counter value to compute an offset"
+paradigm isn't really practical when we get to the limits. At least,
+the VM_COUNTER_OFFSET approach is consistent, and avoids the above
+calculations.
 
-Thanks again,
+I really wish someone would teach QEMU to use it (and maybe even add a
+test for it...).
+
+Thanks,
 
 	M.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz isn't dead. It just smells funny.
