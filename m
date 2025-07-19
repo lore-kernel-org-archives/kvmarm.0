@@ -1,150 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28838224AF7;
-	Fri, 18 Jul 2025 22:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021B7801;
+	Sat, 19 Jul 2025 02:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752879089; cv=none; b=S3MILflS8Cf19q+M1ugUM9nr3hCErwhnmRs4Qeh2HM2Uy7IPGii8uqPCudEWjUEtX34LZYs8qH0Je5AYBSPGWhdV7Dv74trvZCru2ggaDKIwSKz1pXODf+sM16Hfs8Im8guWp4c7ereH5PUKWbcy3d1LTGyZZCKapX9NeBORdq0=
+	t=1752891114; cv=none; b=XJzwK76s6XhLkBZ9iq9zcjuQqPUkldmmuYqBXc49xIaEn7UVoGnlPxJ3NG/TOf+i32yTBIEsg6WWQiwoT5kQnnlzVH+7t9WhQAwabqJNsxFeHTg/vfE/s6nk9n5PM9umKz5Y7QOSTBaRr0BGE/B1XhfdiSEmafAeNqVywT9tORw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752879089; c=relaxed/simple;
-	bh=9wq1gPYvCplHPaY4Wm5XgoLMe+aODde2O7VcmHcmk98=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uPLgdyUatVim0CECah6F4FPsKF/Ls5gb4V26IYBlQ1t173MdwVyCoWuoCPsOvoYdTionaiaKpw/1zEypEwH8hQ3ac8ZeL+s+ZrJ3IowNbuL9fEz1xfQN0oSbLJgtdU8JIsb0nKL4BcNLpdplupJAQ+SQ37o8H60Ag8plhzcuNkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VmiVcikE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752891114; c=relaxed/simple;
+	bh=z9zKqXOSztmepElhFfcFd2r9dFNNAVlWOFmeg8346cA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Ee7hFqBeWVCXK5jiroLeNW4psx5qIK3Cdd4NaGpZfIDjnCGd7JVhqwgVcJVMWi98QjFApQWJsi5Q2+qJRe0KO+IC+lCn7Nyfw0tFp35gnAWncW82UT2AxUFGnjy1RwE1BKW0ppfge+5uGvz2WazOZNuzt9IyIZLTVkxg5iAW3sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FfDonPwy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VmiVcikE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A58ABC4CEEB;
-	Fri, 18 Jul 2025 22:51:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FfDonPwy"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BB13FC4CEF6;
+	Sat, 19 Jul 2025 02:11:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752879088;
-	bh=9wq1gPYvCplHPaY4Wm5XgoLMe+aODde2O7VcmHcmk98=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VmiVcikElcqZk72BFs7/zWioNVg/RlBsEZTqUIs6HsScTtVwOS6j7B3ua7R/5a+8f
-	 B/Xx/QRZM/EQh/lO2RicrfWNUj4TspYI7v5C1esxaGnMy5qNgSFrlaLuHCW1KuRQE/
-	 vwjy0/1yadEDESYc6Jup2r2d1g6hRKk98N3uI9FiR3pIjtw/6N8d9/1A9DF/kI7Ptp
-	 /KtF2y8xo3+DKYzmZGh9ileKlyQIK4tsMmB+vc1VQguKTRnI0Md6sJRL9kCLGWssqH
-	 x60/sDs7wvwXbxMyYV4GlknlF8akcqkSZPz9pRU1nNtV+O7XtlJK1/hNvPy3K6SwqK
-	 vqLjSPHvQBQpQ==
-Date: Fri, 18 Jul 2025 15:51:28 -0700
-From: Kees Cook <kees@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>, Will Deacon <will@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Michal Wilczynski <michal.wilczynski@intel.com>,
-	Juergen Gross <jgross@suse.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Roger Pau Monne <roger.pau@citrix.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Usama Arif <usama.arif@bytedance.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>,
-	kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net,
-	platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-mm@kvack.org, Ingo Molnar <mingo@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
-	kasan-dev@googlegroups.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, sparclinux@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH v3 04/13] x86: Handle KCOV __init vs inline mismatches
-Message-ID: <202507181541.B8CFAC7E@keescook>
-References: <20250717231756.make.423-kees@kernel.org>
- <20250717232519.2984886-4-kees@kernel.org>
- <aHoHkDvvp4AHIzU1@kernel.org>
+	s=k20201202; t=1752891113;
+	bh=z9zKqXOSztmepElhFfcFd2r9dFNNAVlWOFmeg8346cA=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=FfDonPwyTC2Vyi3OA/+yHSTNM5VcNAmFnRbfzYriv8wyrt/BTZgzYSzuveG6qgiXK
+	 JWQbc4FWknlEvm1+Qif9urxFj1yf8JX8pWUb4WHwmEpmHLZgHWhsGdyCNlcIJNyvcl
+	 ZyAAF8eBc9W/FQvQinThwYu6IpBxzKHDSa20oXh2NDF7Udm9nvScEnEhEXkESKH/hg
+	 +O40X+G7qj6byZBmsOL6R28TtPJ4c9cp1Vi1oZLxlZ5DxJi9nAME3RruzI3NEjqxUN
+	 q6cpJIEduMKEjq3tsN/qOm7y8cNMQd4IFMzXdKIpqXBi8ClF7bg777VGGrLr3syTHE
+	 tG6cLODrRRFKA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B086AC83F17;
+	Sat, 19 Jul 2025 02:11:53 +0000 (UTC)
+From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
+Date: Sat, 19 Jul 2025 02:11:25 +0000
+Subject: [PATCH v8 3/7] KVM: arm64: Mark FFA_NOTIFICATION_* calls as
+ unsupported
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aHoHkDvvp4AHIzU1@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250719-virtio-msg-ffa-v8-3-03e8e8dbe856@google.com>
+References: <20250719-virtio-msg-ffa-v8-0-03e8e8dbe856@google.com>
+In-Reply-To: <20250719-virtio-msg-ffa-v8-0-03e8e8dbe856@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Sudeep Holla <sudeep.holla@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, ahomescu@google.com, armellel@google.com, 
+ arve@android.com, ayrton@google.com, qperret@google.com, 
+ sebastianene@google.com, qwandor@google.com, 
+ Per Larsen <perlarsen@google.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1752891112; l=1008;
+ i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
+ bh=eQvexLnYoTcxsrnl0Pu9EhkGFuUrJCQc4aSj6eFtezc=;
+ b=ApBsC/BlD81Hz0BWfbZYdBl0BwB/z9CBGvXFont7uPFbpjiEcaQFLI26mF0x2FqaERmhWlMst
+ 2ouZvB9XsInANbSCy3Islp4cVzYEtein+r3ifjM3lFZ9DUUuhiBshV3
+X-Developer-Key: i=perlarsen@google.com; a=ed25519;
+ pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
+X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
+ auth_id=402
+X-Original-From: Per Larsen <perlarsen@google.com>
+Reply-To: perlarsen@google.com
 
-On Fri, Jul 18, 2025 at 11:36:32AM +0300, Mike Rapoport wrote:
-> Hi Kees,
-> 
-> On Thu, Jul 17, 2025 at 04:25:09PM -0700, Kees Cook wrote:
-> > When KCOV is enabled all functions get instrumented, unless the
-> > __no_sanitize_coverage attribute is used. To prepare for
-> > __no_sanitize_coverage being applied to __init functions, we have to
-> > handle differences in how GCC's inline optimizations get resolved. For
-> > x86 this means forcing several functions to be inline with
-> > __always_inline.
-> > 
-> > Signed-off-by: Kees Cook <kees@kernel.org>
-> 
-> ...
-> 
-> > diff --git a/include/linux/memblock.h b/include/linux/memblock.h
-> > index bb19a2534224..b96746376e17 100644
-> > --- a/include/linux/memblock.h
-> > +++ b/include/linux/memblock.h
-> > @@ -463,7 +463,7 @@ static inline void *memblock_alloc_raw(phys_addr_t size,
-> >  					  NUMA_NO_NODE);
-> >  }
-> >  
-> > -static inline void *memblock_alloc_from(phys_addr_t size,
-> > +static __always_inline void *memblock_alloc_from(phys_addr_t size,
-> >  						phys_addr_t align,
-> >  						phys_addr_t min_addr)
-> 
-> I'm curious why from all memblock_alloc* wrappers this is the only one that
-> needs to be __always_inline?
+From: Per Larsen <perlarsen@google.com>
 
-Thread-merge[1], adding Will Deacon, who was kind of asking the same
-question.
+Prevent FFA_NOTIFICATION_* interfaces from being passed through to TZ.
 
-Based on what I can tell, GCC has kind of fragile inlining logic, in the
-sense that it can change whether or not it inlines something based on
-optimizations. It looks like the kcov instrumentation being added (or in
-this case, removed) from a function changes the optimization results,
-and some functions marked "inline" are _not_ inlined. In that case, we end up
-with __init code calling a function not marked __init, and we get the
-build warnings I'm trying to eliminate.
+Acked-by: Will Deacon <will@kernel.org>
+Signed-off-by: Per Larsen <perlarsen@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-So, to Will's comment, yes, the problem is somewhat fragile (though
-using either __always_inline or __init will deterministically solve it).
-We've tripped over this before with GCC and the solution has usually
-been to just use __always_inline and move on.
-
-For memblock_alloc*, it appears to be that the heuristic GCC uses
-resulted in only memblock_alloc_from() being a problem in this case. I
-can certainly mark them all as __always_inline if that is preferred.
-
-Some maintainers have wanted things marked __init, some have wanted
-__always_inline. I opted for __always_inline since that was basically
-the intent of marking a function "inline" in the first place. I am happy
-to do whatever. :)
-
--Kees
-
-[1] https://lore.kernel.org/lkml/aHouXI5-tyQw78Ht@willie-the-truck/
+diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+index 52ac3e2689f0c200ebbb57ec564f71a37b0ddc8f..50ec52bcce4b4443c2f3ffeda455594733f3a5a0 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ffa.c
++++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+@@ -663,6 +663,14 @@ static bool ffa_call_supported(u64 func_id)
+ 	case FFA_RXTX_MAP:
+ 	case FFA_MEM_DONATE:
+ 	case FFA_MEM_RETRIEVE_REQ:
++       /* Optional notification interfaces added in FF-A 1.1 */
++	case FFA_NOTIFICATION_BITMAP_CREATE:
++	case FFA_NOTIFICATION_BITMAP_DESTROY:
++	case FFA_NOTIFICATION_BIND:
++	case FFA_NOTIFICATION_UNBIND:
++	case FFA_NOTIFICATION_SET:
++	case FFA_NOTIFICATION_GET:
++	case FFA_NOTIFICATION_INFO_GET:
+ 		return false;
+ 	}
+ 
 
 -- 
-Kees Cook
+2.50.0.727.gbf7dc18ff4-goog
+
+
