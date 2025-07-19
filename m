@@ -1,259 +1,357 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCC32629C;
-	Sat, 19 Jul 2025 12:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6B8222584
+	for <kvmarm@lists.linux.dev>; Sat, 19 Jul 2025 21:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752926688; cv=none; b=iAQ4xaweYhurLzjQsb1JTHnIMbC80CvB+dAuIErTDSraCHZbq5Fr6uIg4QrTeHvlVDSYjvYdvCqOR6LC3mRFX9ZbXKc8H/ltYAyF+xWgOQ90tSJ3Aizzv/KkoJNjvpLCqwmFpMVSWJdzDJUEVGwQiEd6YkDPuY+ks3jF5jRkXck=
+	t=1752960300; cv=none; b=EPkp2ME+ewTxBme3cqNjkIFHkewkBAEMpBgr27VtDwnP+iOI7QByABfDkIiBSN4FcIovvt/UHvdYMJ/FbC2yF6Wb4i5R1p9dp+cebWJouN5vd8cLSSdyCJ04h+nyTEk7JXPMahtIa511BlPxFM7fP0TnK/MafGwc163XgcD9TdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752926688; c=relaxed/simple;
-	bh=ke51KIB9NWjtgPYjsJ/LrpJY5gyL7OuTgeKtaW3v/T8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NGG9wBu3JlglawZdQWvXxIiTCs67bIdyN+EwneQBB0ohEAULheogvnSzU3Udx2+ALaRtYtMp7PogV3OXwtyVz0nFzIqIFsO7eQ/UunaWwkHwwVxalYBWUa+bl3OC0idROf/NH7QiSONsvSestjdGopMdMLp4D5EmBZYBmGTaO/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SE4leeio; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752960300; c=relaxed/simple;
+	bh=LIFgOd38pCkeRHvZbSXGXVpB8+smYCZgUh7X5AR4KNc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BCyg4gGbiWGRwE+QBth7ZQa27if9w0P0z8XUM0mmItZJ+ZHO0Y/pxLH1tHEgxVBbm35UJ0hE8aVdIoMtsqVPgxD2QHZWnaNx+l8lA00VsXABBcfIqtppCv0SnVOZ3sKhK8bRSAKeSI1tPyFTsqFoMitXI0PjUpvnrYl+AdAKq0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ajWTl8Ks; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SE4leeio"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1694C4CEE3;
-	Sat, 19 Jul 2025 12:04:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752926687;
-	bh=ke51KIB9NWjtgPYjsJ/LrpJY5gyL7OuTgeKtaW3v/T8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SE4leeiozu7wB4uf4WqS2CUXxWLMC46HIkpRRltIUxVkCTlDEVoC1emo8Xo8yIsAy
-	 0dhrfhlDgucjyo13+4A49w6RsFVfaW7PwljA/NbhufsFEcZMPpV4u9C7wBzNyGn5im
-	 e3B76R4WFhG9XuxEsssZ6J+II07LE/RlfJ1a3ZRcreSLLX00u5j00qfIyU/LwWvxyM
-	 j6BgZfya5faxu+q8PrREUmgfG+bHiO3nduIEXWtw++LKup78baY9tzTGIiDypNe6hH
-	 PzKLe5z6zCzBwaMHJKMbqvGIzYvT7egJ6ZnEcVonRtppAfOixezVLXqPE9TvqXcV4w
-	 sauzbq+Q+F9tw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ud6J3-00H8ep-6T;
-	Sat, 19 Jul 2025 13:04:45 +0100
-Date: Sat, 19 Jul 2025 13:04:43 +0100
-Message-ID: <87zfd0e690.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton
-	<oliver.upton@linux.dev>,
-	Ricardo Koller <ricarkol@google.com>,
-	Simon Veith
-	<sveith@amazon.de>,
-	Reiji Watanabe <reijiw@google.com>,
-	Colton Lewis
-	<coltonlewis@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	<dwmw2@infradead.org>
-Subject: Re: [PATCH v4 05/20] KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2
-In-Reply-To: <460258be-0102-e922-c342-4e87cd94b9e5@huawei.com>
-References: <20230330174800.2677007-1-maz@kernel.org>
-	<20230330174800.2677007-6-maz@kernel.org>
-	<460258be-0102-e922-c342-4e87cd94b9e5@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ajWTl8Ks"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-455b63bfa52so34305e9.0
+        for <kvmarm@lists.linux.dev>; Sat, 19 Jul 2025 14:24:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752960297; x=1753565097; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f63yjgIij2pyBbqiIUP1PemDCddIWdOXSdPqsmL/FZo=;
+        b=ajWTl8KstBVPX5eYlmcLOc51O30AB2gV3xw6AaSHW5g3lUIGhEDA/IHfYr5SdGrAeN
+         SsyFBSH3euub8IRpWDgYJLQdGK8P0VylulTQ2Iw03ERUo1N/ao4HG9qR6mfoT41t44wR
+         V8+EOEL8kphwOcqIu2hi43hML5aYgOVaUzSv6l+hgOmBaKv0+2oICoLQyzl0TzpvCdGY
+         Wi+0+oidCWRljFuizaCcT39WgYPT3prCDfu9zGjtEc1igrLLct+2poN75YysN3s2oxGl
+         KCUUdNNw9CmMIraxdj6MadUVU7G64vVh1EhtWI2APw9RV6hZga1xib2XkMDwV+66v0Gd
+         xBDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752960297; x=1753565097;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f63yjgIij2pyBbqiIUP1PemDCddIWdOXSdPqsmL/FZo=;
+        b=hPYXNXodegbyMldMs7iQ6+ZcUJ7NJ6kUA3lhUqvlY3DciWxYOG5/4kTqdA5G0JH3cz
+         7tOzvyrbf/Zhxb/Gsw+Q4fjyJGKXTGNnS/NY2mjaBHk/YOyw42Tc1bL3levXOEuRcTNu
+         3QeEXDR1YbYhmGOL3gzUzU4wGWtabHDNb2D7V711YyipDs2Cv+Dp50FrTgVDybNpZx/V
+         +aHAonp18YEwQgwFefDNNLLGfJ1i/I8ahyhOP6hrIDsIu0bq3GV9dBGz0N8OZDd1Pq1X
+         lAzRbWtKNCTmodHLo+HZuce3h4hnhY68bTQAtJW8Qbb7/Ej5qjOZiZVagc7v3p0uuR67
+         WjkA==
+X-Forwarded-Encrypted: i=1; AJvYcCWLuLdREG7pW9/tLAUQK+onR2WgqClS0Fr9OMcrtL3RSQRAiUPGJIDUDeuuorgyEUQZyH1A02Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzVil+zhU3uZ1s3efBgTzgnGz4UDH8wEghJGP+pbDpObZwlSF/7
+	sCkz85l0mI+cUAiVrNHPIOjpoOp8jnu4hGcifXvhYIO8rF7eR/ZwgaigmawIltWksYAkeqDVWq3
+	RlypjvZ7OlzZojyfLlh6gToKqZhoSJSUN0fp860gd
+X-Gm-Gg: ASbGncumjYvH5ELl82+14T2/PgZYt8JNBrKBrVhSZ3SzXs0ZUNFQxrdtpEg3s9TJZz6
+	anO4iPwhjt09ALzR9xkXDlmAtr9MXXngAdUJzQLDfU4xoa7a165eiFIIUB/HIM3Nk+QBdac8Hcd
+	0ASubxzj7HqsZojybEOcBMvRhMjbxpC+gC9yA8DaJC0cCrOU79Emt2RhsaU3g6j3RF7tSifIEF5
+	+d1LuC1wjUM0Eor3ZSTQwl1j/ymzEKXMQFDiEA3
+X-Google-Smtp-Source: AGHT+IGf1ot/GvGjlReGY+SCww1ADoVseIv3hxLBqFcbTNzIpVPHcI9COFFQzWlOdxVXxNyEqY0RfNdLiHfV8hIodns=
+X-Received: by 2002:a05:600c:4aa9:b0:453:6962:1a72 with SMTP id
+ 5b1f17b1804b1-45643860ddbmr900995e9.5.1752960296367; Sat, 19 Jul 2025
+ 14:24:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, ricarkol@google.com, sveith@amazon.de, reijiw@google.com, coltonlewis@google.com, joey.gouly@arm.com, dwmw2@infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20250604050902.3944054-1-jiaqiyan@google.com> <20250604050902.3944054-2-jiaqiyan@google.com>
+ <aHFohmTb9qR_JG1E@linux.dev> <CACw3F509B=AHhpaTcuH9O851rrDdHh1baC8uRYy7bDa7BSMhgg@mail.gmail.com>
+ <aHK-DPufhLy5Dtuk@linux.dev>
+In-Reply-To: <aHK-DPufhLy5Dtuk@linux.dev>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Sat, 19 Jul 2025 14:24:45 -0700
+X-Gm-Features: Ac12FXzgnQSCIAhMAANB86CLK2zchWpOFpLESitTVZg7mfd8m8UGK-lo3wLYbzg
+Message-ID: <CACw3F53TYZ1KFv0Yc-GCyOxn7TF3iYjTNSE8bd3nte=KaCN0UQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] KVM: arm64: VM exit to userspace to handle SEA
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, duenwen@google.com, rananta@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 09 Jul 2025 09:12:18 +0100,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
-> 
-> [ Record some interesting bits noticed while testing
->   arch_timer_edge_cases. ]
-> 
-> On 2023/3/31 1:47, Marc Zyngier wrote:
-> > CNTPOFF_EL2 is awesome, but it is mostly vapourware, and no publicly
-> > available implementation has it. So for the common mortals, let's
-> > implement the emulated version of this thing.
-> > 
-> > It means trapping accesses to the physical counter and timer, and
-> > emulate some of it as necessary.
-> > 
-> > As for CNTPOFF_EL2, nobody sets the offset yet.
-> > 
-> > Reviewed-by: Colton Lewis <coltonlewis@google.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/sysreg.h    |  2 +
-> >  arch/arm64/kvm/arch_timer.c        | 98 +++++++++++++++++++++++-------
-> >  arch/arm64/kvm/hyp/nvhe/timer-sr.c | 18 ++++--
-> >  arch/arm64/kvm/sys_regs.c          |  9 +++
-> >  4 files changed, 98 insertions(+), 29 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 9e3ecba3c4e6..f8da9e1b0c11 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -388,6 +388,7 @@
-> >  
-> >  #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
-> >  
-> > +#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
-> >  #define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
-> >  #define SYS_CNTVCTSS_EL0		sys_reg(3, 3, 14, 0, 6)
-> >  
-> > @@ -400,6 +401,7 @@
-> >  
-> >  #define SYS_AARCH32_CNTP_TVAL		sys_reg(0, 0, 14, 2, 0)
-> >  #define SYS_AARCH32_CNTP_CTL		sys_reg(0, 0, 14, 2, 1)
-> > +#define SYS_AARCH32_CNTPCT		sys_reg(0, 0, 0, 14, 0)
-> >  #define SYS_AARCH32_CNTP_CVAL		sys_reg(0, 2, 0, 14, 0)
-> >  
-> >  #define __PMEV_op2(n)			((n) & 0x7)
-> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index 3118ea0a1b41..bb64a71ae193 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
-> > @@ -458,6 +458,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
-> >  		goto out;
-> >  
-> >  	switch (index) {
-> > +		u64 cval;
-> > +
-> >  	case TIMER_VTIMER:
-> >  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
-> >  		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
-> > @@ -485,7 +487,12 @@ static void timer_save_state(struct arch_timer_context *ctx)
-> >  		break;
-> >  	case TIMER_PTIMER:
-> >  		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
-> > -		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
-> > +		cval = read_sysreg_el0(SYS_CNTP_CVAL);
-> > +
-> > +		if (!has_cntpoff())
-> > +			cval -= timer_get_offset(ctx);
-> > +
-> > +		timer_set_cval(ctx, cval);
-> >  
-> >  		/* Disable the timer */
-> >  		write_sysreg_el0(0, SYS_CNTP_CTL);
-> > @@ -555,6 +562,8 @@ static void timer_restore_state(struct arch_timer_context *ctx)
-> >  		goto out;
-> >  
-> >  	switch (index) {
-> > +		u64 cval, offset;
-> > +
-> >  	case TIMER_VTIMER:
-> >  		set_cntvoff(timer_get_offset(ctx));
-> >  		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
-> > @@ -562,8 +571,12 @@ static void timer_restore_state(struct arch_timer_context *ctx)
-> >  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
-> >  		break;
-> >  	case TIMER_PTIMER:
-> > -		set_cntpoff(timer_get_offset(ctx));
-> > -		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
-> > +		cval = timer_get_cval(ctx);
-> > +		offset = timer_get_offset(ctx);
-> > +		set_cntpoff(offset);
-> > +		if (!has_cntpoff())
-> > +			cval += offset;
-> > +		write_sysreg_el0(cval, SYS_CNTP_CVAL);
-> >  		isb();
-> >  		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
-> >  		break;
-> 
-> I tested arch_timer_edge_cases on my Kunpeng920 (has VHE, doesn't have
-> ECV) and noticed that the test_timer_cval() below takes a long period to
-> return when testing the _physical_ timer.
-> 
-> static void test_timers_in_the_past(enum arch_timer timer)
-> {
-> 	[...]
-> 
-> 	for (i = 0; i < ARRAY_SIZE(irq_wait_method); i++) {
-> 		irq_wait_method_t wm = irq_wait_method[i];
-> 
-> 		[...]
-> 
-> 		/* Set a timer to counter=0 (in the past) */
-> 		test_timer_cval(timer, 0, wm, DEF_CNT);
-> 
-> The comment is obviously wrong. It should say "Set a timer to CVAL=0".
-> 
-> No physical timer interrupt ("kvm guest ptimer") was triggered when I
-> executed it separately.
-> 
-> Let me try to explain _this_ test_timer_cval() in a bit more detail.
-> 
-> |Guest					KVM
-> |-----					---
-> |local_irq_disable()
-> |
-> |reset_timer_state()
-> |   set_counter()			// SET_ONE_REG via user-space
-> |					// for KVM_REG_ARM_PTIMER_CNT
-> |					kvm_arm_timer_set_reg()
-> |					   timer_set_offset()      [1]
-> |   timer_set_ctl()
-> |      MSR CNTP_CTL_EL0, IMASK
-> |
-> |set_xval_irq()
-> |   timer_set_cval()
-> |      MSR CNTP_CVAL_EL0, cval=0
-> |   timer_set_ctl()
-> |      MSR CNTP_CTL_EL0, ENABLE		// trap
-> |					kvm_arm_timer_write_sysreg()
-> |					   timer_save_state()
-> |					   kvm_arm_timer_write()
-> |					   timer_restore_state()   [2]
-> |
-> |/* This method re-enables IRQs to handle the one we're looking for. */
-> |wm()
-> |
-> |assert_irqs_handled(1)
-> |local_irq_enable()
-> 
-> [1] kvm_phys_timer_read()			= 0x7895c0ab2
->     value					= 0x7fffffffffffff
->     offset = kvm_phys_timer_read() - value	= 0xff800007895c0ab3
-> 
-> ... which was observed in my test.
+On Sat, Jul 12, 2025 at 12:57=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
+>
+> On Fri, Jul 11, 2025 at 04:59:11PM -0700, Jiaqi Yan wrote:
+> > >  - Add some detail about FEAT_RAS where we may still exit to userspac=
+e
+> > >    for host-controlled memory, as we cannot differentiate between a
+> > >    stage-1 or stage-2 TTW SEA when taken on the descriptor PA
+> >
+> > Ah, IIUC, you are saying even if the FSC code tells fault is on TTW
+> > (esr_fsc_is_secc_ttw or esr_fsc_is_sea_ttw), it can either be guest
+> > stage-1's or stage-2's descriptor PA, and we can tell which from
+> > which.
+> >
+> > However, if ESR_ELx_S1PTW is set, we can tell this is a sub-case of
+> > stage-2 descriptor PA, their usage is for stage-1 PTW but they are
+> > stage-2 memory.
+> >
+> > Is my current understanding right?
+>
+> Yep, that's exactly what I'm getting at. As you note, stage-2 aborts
+> during a stage-1 walk are sufficiently described, but not much else.
 
-I think this denotes the same problem that was "fixed" in this test
-recently: the arithmetic in the kernel is done on a 64bit value, while
-we have no idea what the number of significant bits actually is. We
-therefore end-up with some outlandish values, and since the timer is
-more or less emulated, we end-up doing the wrong thing.
+Got it, thanks!
 
-> 
-> [2] cval += offset;			// cval	= 0xff800007895c0ab3
->     kvm_phys_timer_read()			= 0x7895c1b86
-> 
-> No ptimer interrupt was triggered with that. And we relied on the next
-> kvm_timer_vcpu_load() to catch the timer expiration and inject an
-> interrupt to the guest..
-> 
-> It's apparent that this test case is not a practical use case. Not sure
-> if we should (/can) emulate it properly. Or I may have already missed
-> some obvious points.
+>
+> > > +/*
+> > > + * Returns true if the SEA should be handled locally within KVM if t=
+he abort is
+> > > + * caused by a kernel memory allocation (e.g. stage-2 table memory).
+> > > + */
+> > > +static bool host_owns_sea(struct kvm_vcpu *vcpu, u64 esr)
+> > > +{
+> > > +       /*
+> > > +        * Without FEAT_RAS HCR_EL2.TEA is RES0, meaning any external=
+ abort
+> > > +        * taken from a guest EL to EL2 is due to a host-imposed acce=
+ss (e.g.
+> > > +        * stage-2 PTW).
+> > > +        */
+> > > +       if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+> > > +               return true;
+> > > +
+> > > +       /* KVM owns the VNCR when the vCPU isn't in a nested context.=
+ */
+> > > +       if (is_hyp_ctxt(vcpu) && (esr & ESR_ELx_VNCR))
+> > > +               return true;
+> > > +
+> > > +       /*
+> > > +        * Determining if an external abort during a table walk happe=
+ned at
+> > > +        * stage-2 is only possible with S1PTW is set. Otherwise, sin=
+ce KVM
+> > > +        * sets HCR_EL2.TEA, SEAs due to a stage-1 walk (i.e. accessi=
+ng the PA
+> > > +        * of the stage-1 descriptor) can reach here and are reported=
+ with a
+> > > +        * TTW ESR value.
+> > > +        */
+> > > +       return esr_fsc_is_sea_ttw(esr) && (esr & ESR_ELx_S1PTW);
+> >
+> > Should we include esr_fsc_is_secc_ttw? like
+> >   (esr_fsc_is_sea_ttw(esr) || esr_fsc_is_secc_ttw(esr)) && (esr & ESR_E=
+Lx_S1PTW)
+>
+> Parity / ECC errors are not permitted if FEAT_RAS is implemented (which
+> is tested for up front).
 
-Overall, I think the "set a counter value to compute an offset"
-paradigm isn't really practical when we get to the limits. At least,
-the VM_COUNTER_OFFSET approach is consistent, and avoids the above
-calculations.
+Ah, thanks for pointing this out.
 
-I really wish someone would teach QEMU to use it (and maybe even add a
-test for it...).
+>
+> > > +}
+> > > +
+> > >  int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+> > >  {
+> > > +       u64 esr =3D kvm_vcpu_get_esr(vcpu);
+> > > +       struct kvm_run *run =3D vcpu->run;
+> > > +       struct kvm *kvm =3D vcpu->kvm;
+> > > +       u64 esr_mask =3D ESR_ELx_EC_MASK  |
+> > > +                      ESR_ELx_FnV      |
+> > > +                      ESR_ELx_EA       |
+> > > +                      ESR_ELx_CM       |
+> > > +                      ESR_ELx_WNR      |
+> > > +                      ESR_ELx_FSC;
+> >
+> > Do you (and why) exclude ESR_ELx_IL on purpose?
+>
+> Unintended :)
 
-Thanks,
+Will add into my patch.
 
-	M.
+>
+> > BTW, if my previous statement about TTW SEA is correct, then I also
+> > understand why we need to explicitly exclude ESR_ELx_S1PTW.
+>
+> Right, we shouldn't be exposing genuine stage-2 external aborts to usersp=
+ace.
+>
+> > > +       u64 ipa;
+> > > +
+> > > +
+> > >         /*
+> > >          * Give APEI the opportunity to claim the abort before handli=
+ng it
+> > >          * within KVM. apei_claim_sea() expects to be called with IRQ=
+s
+> > > @@ -1824,7 +1864,32 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu=
+)
+> > >         if (apei_claim_sea(NULL) =3D=3D 0)
+> >
+> > I assume kvm should still lockdep_assert_irqs_enabled(), right? That
+> > is, a WARN_ON_ONCE is still useful in case?
+>
+> Ah, this is diffed against my VNCR prefix which has this context. Yes, I
+> want to preserve the lockdep assertion.
 
--- 
-Jazz isn't dead. It just smells funny.
+Thanks for sharing the patch! Should I wait for you to send and queue
+to kvmarm/next and rebase my v3 to it? Or should I insert it into my
+v3 patch series with you as the commit author, and Signed-off-by you?
+
+BTW, while I am working on v3, I think it is probably better to
+decouple the current patchset into two. The first one for
+KVM_EXIT_ARM_SEA, and the second one for injecting (D|I)ABT with
+user-supplemented esr. This way may help KVM_EXIT_ARM_SEA, the more
+important feature, get reviewed and accepted sooner. I will send out a
+separate patchset for enhancing the guest SEA injection.
+
+>
+>
+> From eb63dbf07b3d1f42b059f5c94abd147d195299c8 Mon Sep 17 00:00:00 2001
+> From: Oliver Upton <oliver.upton@linux.dev>
+> Date: Thu, 10 Jul 2025 17:14:51 -0700
+> Subject: [PATCH] KVM: arm64: nv: Handle SEAs due to VNCR redirection
+>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h |  1 +
+>  arch/arm64/include/asm/kvm_ras.h | 25 -------------------------
+>  arch/arm64/kvm/mmu.c             | 30 ++++++++++++++++++------------
+>  arch/arm64/kvm/nested.c          |  3 +++
+>  4 files changed, 22 insertions(+), 37 deletions(-)
+>  delete mode 100644 arch/arm64/include/asm/kvm_ras.h
+>
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kv=
+m_mmu.h
+> index ae563ebd6aee..e4069f2ce642 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -180,6 +180,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>                           phys_addr_t pa, unsigned long size, bool writab=
+le);
+>
+> +int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
+>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+>
+>  phys_addr_t kvm_mmu_get_httbr(void);
+> diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kv=
+m_ras.h
+> deleted file mode 100644
+> index 9398ade632aa..000000000000
+> --- a/arch/arm64/include/asm/kvm_ras.h
+> +++ /dev/null
+> @@ -1,25 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> -/* Copyright (C) 2018 - Arm Ltd */
+> -
+> -#ifndef __ARM64_KVM_RAS_H__
+> -#define __ARM64_KVM_RAS_H__
+> -
+> -#include <linux/acpi.h>
+> -#include <linux/errno.h>
+> -#include <linux/types.h>
+> -
+> -#include <asm/acpi.h>
+> -
+> -/*
+> - * Was this synchronous external abort a RAS notification?
+> - * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
+> - */
+> -static inline int kvm_handle_guest_sea(void)
+> -{
+> -       /* apei_claim_sea(NULL) expects to mask interrupts itself */
+> -       lockdep_assert_irqs_enabled();
+> -
+> -       return apei_claim_sea(NULL);
+> -}
+> -
+> -#endif /* __ARM64_KVM_RAS_H__ */
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 1c78864767c5..6934f4acdc45 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -4,19 +4,20 @@
+>   * Author: Christoffer Dall <c.dall@virtualopensystems.com>
+>   */
+>
+> +#include <linux/acpi.h>
+>  #include <linux/mman.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/io.h>
+>  #include <linux/hugetlb.h>
+>  #include <linux/sched/signal.h>
+>  #include <trace/events/kvm.h>
+> +#include <asm/acpi.h>
+>  #include <asm/pgalloc.h>
+>  #include <asm/cacheflush.h>
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/kvm_pgtable.h>
+>  #include <asm/kvm_pkvm.h>
+> -#include <asm/kvm_ras.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/virt.h>
+> @@ -1811,6 +1812,20 @@ static void handle_access_fault(struct kvm_vcpu *v=
+cpu, phys_addr_t fault_ipa)
+>         read_unlock(&vcpu->kvm->mmu_lock);
+>  }
+>
+> +int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+> +{
+> +       /*
+> +        * Give APEI the opportunity to claim the abort before handling i=
+t
+> +        * within KVM. apei_claim_sea() expects to be called with IRQs
+> +        * enabled.
+> +        */
+> +       lockdep_assert_irqs_enabled();
+> +       if (apei_claim_sea(NULL) =3D=3D 0)
+> +               return 1;
+> +
+> +       return kvm_inject_serror(vcpu);
+> +}
+> +
+>  /**
+>   * kvm_handle_guest_abort - handles all 2nd stage aborts
+>   * @vcpu:      the VCPU pointer
+> @@ -1834,17 +1849,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>         gfn_t gfn;
+>         int ret, idx;
+>
+> -       /* Synchronous External Abort? */
+> -       if (kvm_vcpu_abt_issea(vcpu)) {
+> -               /*
+> -                * For RAS the host kernel may handle this abort.
+> -                * There is no need to pass the error into the guest.
+> -                */
+> -               if (kvm_handle_guest_sea())
+> -                       return kvm_inject_serror(vcpu);
+> -
+> -               return 1;
+> -       }
+> +       if (kvm_vcpu_abt_issea(vcpu))
+> +               return kvm_handle_guest_sea(vcpu);
+>
+>         esr =3D kvm_vcpu_get_esr(vcpu);
+>
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 096747a61bf6..38b0e3a9a6db 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1289,6 +1289,9 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
+>
+>         BUG_ON(!(esr & ESR_ELx_VNCR_SHIFT));
+>
+> +       if (kvm_vcpu_abt_issea(vcpu))
+> +               return kvm_handle_guest_sea(vcpu);
+> +
+>         if (esr_fsc_is_permission_fault(esr)) {
+>                 inject_vncr_perm(vcpu);
+>         } else if (esr_fsc_is_translation_fault(esr)) {
+> --
+> 2.39.5
+>
