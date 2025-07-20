@@ -1,177 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA17D18D643
-	for <kvmarm@lists.linux.dev>; Sun, 20 Jul 2025 10:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A334B29D0D;
+	Sun, 20 Jul 2025 11:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753007793; cv=none; b=kfPYezXJFsaoazi7pMnRcjFKKuwe7rZWdz9tmQt7pOdllK8oi16eTrk+tCN4oincAzWmkamIyD0qi99iRSs0VhoOVokr40y42AUr3tnRkL10j1WMMVkuUjOjEoz87o98tIyGh981cxdvtHLDp5oWPS0prWaY90L2QxGI+LSYI38=
+	t=1753011220; cv=none; b=MzkUd92fjRzHqtREzHD4AoLDHva149iL01MW66IAoaOn18fyEqqvr4d0/WbtzY1B0Z76hpadTGcPut5Z4WM1Zadtbqvwc5HrfmWxSUDWsjfG0Sbg8y4NVy3r9jlVuZhn7q6swXfPNTkNE+9Xt+DB9nCb1D6dtAOsWSHY+DfDL24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753007793; c=relaxed/simple;
-	bh=j9MchhT+Pgt6QeEN91gSOuaHtzh708ygnqFloploQuc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FaIYSgMtdP+uDt4rBaHn+8HoJ9ngykLxrW/XgbaCIZUQ2x29FIg9qnCHby4Pcjkq9cpoR2eXLMAZtZbx3EAt5aVZvk3rmLPheOpWkHAKAGascWwi7cyHNdZQvMVQCKD45YGREH6Q5BlfNTuDklc05l2iPQCgq3oiVX4ITd5I4rU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DWl1skE8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753011220; c=relaxed/simple;
+	bh=aNlr1NlJcqoKmB1Eu5/pybwfz6dmNDQJXqvLOcxCBrc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mavfVAGZsI+tobmxk68kXuVe4ekHuTjF4q/7g9qrZx3rPMfgUzRbOYI67ewNBowCVRoyIIao7Fh4SjqG5WNtQuun/pr6QkzqiU1Br/0KUuLn5htSmSlx5XWbp65qaUyDRTIgD9dochIE5KNr3Z/dKqk5/GBKSm78gw8XRvJumFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C1UPvIEQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DWl1skE8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D85EC4CEE7;
-	Sun, 20 Jul 2025 10:36:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C1UPvIEQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27123C4CEE7;
+	Sun, 20 Jul 2025 11:33:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753007793;
-	bh=j9MchhT+Pgt6QeEN91gSOuaHtzh708ygnqFloploQuc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DWl1skE86/VfUppPrtrzdk8dNvt6EE8MTb4XDhJkH6dSqM88eDedoRHETPxY5h7bY
-	 BnWeMkHdOlZMWUTapm80KpY+KR9LIKe8JrTWY1gzeDsikCiwMqnTdP+MeRLLgkHRpp
-	 W6+Gkg5SLz7Z6602GLEd18Utzqrs8Tkbmj7DVs+eUFzbrcI29hhyhUbQ7+jKM/L6gM
-	 EDO9qKhDVe+pdIDu2iaQXJESWCcIUpv6dNYil+CJy8BLpQK3F4afnd5Hy+7qMXCtQS
-	 Opd37G9Tgq64IP17PrhsdldaRgQXpKXel02xhi/Vh8EBnXWWPZoWxbCiEVZ2jKHRMX
-	 GHMwQwYYAUUWw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	s=k20201202; t=1753011220;
+	bh=aNlr1NlJcqoKmB1Eu5/pybwfz6dmNDQJXqvLOcxCBrc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=C1UPvIEQqayCRFPawjxP7cgtxJAPCCspLaUs4JXUbYzPjyz//7D9InKvv4jZ0qD64
+	 E5FWar+nu7BFWAVPyDSvXPnAwRXfgqpAuv/8lJcCyRwPUxt5wlVn9EoIRu6cYDGTNW
+	 lNtSjnyOwmxsR208jOlUcRF+1icMyHHuoDubsFebBT5APeYhPJVpPsnn78akoiVHWH
+	 2Mp0Ci7Tc3pO7zotiHs6MGCIJHCOltzvj8oW6jhwXRrbmUQi+soETBo7ATrW3KLKsi
+	 uiUGAyuE6eTGm1ExTFX5KRIVqZS6aggwPujDi6nA+aADkU0TWgw3neJBUmHhDgToUj
+	 Okhd9toOBXRXw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1udRPC-00HIHR-H7;
-	Sun, 20 Jul 2025 11:36:30 +0100
-Date: Sun, 20 Jul 2025 11:36:30 +0100
-Message-ID: <87v7nnup1t.wl-maz@kernel.org>
+	id 1udSIU-00HIzF-1g;
+	Sun, 20 Jul 2025 12:33:38 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: 	kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 18/27] KVM: arm64: nv: Take "masked" aborts to EL2 when HCRX_EL2.TMEA is set
-In-Reply-To: <18535df8-e647-4643-af9a-bb780af03a70@sirena.org.uk>
-References: <20250708172532.1699409-1-oliver.upton@linux.dev>
-	<20250708172532.1699409-19-oliver.upton@linux.dev>
-	<18535df8-e647-4643-af9a-bb780af03a70@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Filter out HCR_EL2.VSE when running in hypervisor context
+Date: Sun, 20 Jul 2025 12:33:34 +0100
+Message-Id: <20250720113334.218099-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-[Adding Zenghui to the list. In the future, please CC all reviewers
- listed in MAINTAINERS, not just an arbitrary selection]
+HCR_EL2.VSE is delivering a virtual SError to the guest, and does not
+affect EL2 itself. However, when computing the host's HCR_EL2 value,
+we take the guest's view of HCR_EL2.VSE at face value, and apply it
+irrespective of the guest's exception level we are returning to.
 
-On Fri, 18 Jul 2025 23:01:46 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Tue, Jul 08, 2025 at 10:25:23AM -0700, Oliver Upton wrote:
-> > HCRX_EL2.TMEA further modifies the external abort behavior where
-> > unmasked aborts are taken to EL1 and masked aborts are taken to EL2.
-> > It's rather weird when you consider that SEAs are, well, *synchronous*
-> > and therefore not actually maskable. However, for the purposes of
-> > exception routing, they're considered "masked" if the A flag is set.
-> 
-> For the past few days the external_aborts KVM selftest has been failing
-> in -next on a number of platforms with:
-> 
-> # selftests: kvm: external_aborts
-> # Random seed: 0x6b8b4567
-> # ==== Test Assertion Failure ====
-> #   arm64/external_aborts.c:19: regs->pc == expected_abort_pc
-> #   pid=2598 tid=2598 errno=4 - Interrupted system call
-> #      1	0x0000000000402f93: __vcpu_run_expect at external_aborts.c:85
-> #      2	0x0000000000402197: vcpu_run_expect_done at external_aborts.c:97
-> #      3	 (inlined by) test_mmio_abort at external_aborts.c:136
-> #      4	 (inlined by) main at external_aborts.c:323
-> #      5	0x0000ffffacbd7543: ?? ??:0
-> #      6	0x0000ffffacbd7617: ?? ??:0
-> #      7	0x000000000040272f: _start at ??:?
-> #   0x0 != 0x4028f8 (regs->pc != expected_abort_pc)
-> not ok 14 selftests: kvm: external_aborts # exit=254
-> 
-> This appears to be happening on many, possibly all, VHE platforms being
-> tested - nVHE appears fine.  I ran a bisect, fixing the selftests
-> version at the one in -next due to the renaming of this test, which
-> pointed at this commit.
+The result is that a L1 hypervisor injecting a virtual SError to an L2
+by setting its HCR_EL2.VSE to 1 results in itself getting the SError
+as if it was a physical one if it traps for any reason before returning
+to L2.
 
-Thanks for reporting this.
+Fix it by filtering HCR_EL2.VSE out when entering the L1 host context.
 
-It turns out that the exception entry code fully expects everything to
-be loaded on the CPU when processing the exception. However, this is
-no longer true when thins are injected from userspace. But really,
-this is a pretty fragile expectation, and this absolutely needs
-fixing.
+Fixes: 04ab519bb86df ("KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/kvm/hyp/vhe/switch.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-I've posted a potential fix at [1], but it appears that this series as
-further issues. If I run this very test in a nested guest (patch
-applied on both L0 and L1), I get this:
-
-bash-5.2# /host/home/maz/external_aborts 
-Random seed: 0x6b8b4567
-[    5.936631] PC = 402764
-[    5.942221] PC = 4027f4
-[    5.961351] SError Interrupt on CPU1, code 0x00000000be000000 -- SError
-[    5.961355] CPU: 1 UID: 0 PID: 64 Comm: external_aborts Not tainted 6.16.0-rc6-00163-ga03b7055c54b-dirty #4690 PREEMPT 
-[    5.961357] Hardware name: linux,dummy-virt (DT)
-[    5.961358] pstate: 604000c9 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[    5.961359] pc : __kvm_vcpu_run+0x30/0x70
-[    5.961364] lr : __kvm_vcpu_run+0x24/0x70
-[    5.961365] sp : ffff800080633ad0
-[    5.961366] x29: ffff800080633ad0 x28: ffff000004391280 x27: 0000000000000000
-[    5.961368] x26: 0000000000000000 x25: 0000000000000000 x24: ffff000004438048
-[    5.961369] x23: 0000000000000000 x22: ffff000002efc000 x21: 0000000000402820
-[    5.961371] x20: ffff000004391280 x19: ffff000004438000 x18: 0000000000000000
-[    5.961372] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-[    5.961373] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
-[    5.961374] x11: 0000000000000000 x10: 0000000000000000 x9 : ffffbf8cfc0a78f0
-[    5.961375] x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000000000
-[    5.961377] x5 : 0000000000001000 x4 : ffff407342580000 x3 : 0000000000000000
-[    5.961378] x2 : 0000000000000000 x1 : 00000000000000c0 x0 : 0000000000000000
-[    5.961379] Kernel panic - not syncing: Asynchronous SError Interrupt
-[    5.961381] CPU: 1 UID: 0 PID: 64 Comm: external_aborts Not tainted 6.16.0-rc6-00163-ga03b7055c54b-dirty #4690 PREEMPT 
-[    5.961382] Hardware name: linux,dummy-virt (DT)
-[    5.961383] Call trace:
-[    5.961384]  show_stack+0x20/0x38 (C)
-[    5.961388]  dump_stack_lvl+0xc8/0xf8
-[    5.961392]  dump_stack+0x18/0x28
-[    5.961393]  panic+0x380/0x3e8
-[    5.961395]  nmi_panic+0x48/0xa0
-[    5.961396]  arm64_serror_panic+0x6c/0x88
-[    5.961398]  arm64_is_fatal_ras_serror+0x8c/0x98
-[    5.961399]  do_serror+0x3c/0x68
-[    5.961401]  el1h_64_error_handler+0x38/0x60
-[    5.961404]  el1h_64_error+0x80/0x88
-[    5.961405]  __kvm_vcpu_run+0x30/0x70 (P)
-[    5.961406]  kvm_arm_vcpu_enter_exit+0x64/0x98
-[    5.961408]  kvm_arch_vcpu_ioctl_run+0x208/0x620
-[    5.961411]  kvm_vcpu_ioctl+0x14c/0x9f8
-[    5.961414]  __arm64_sys_ioctl+0x9c/0x100
-[    5.961416]  invoke_syscall+0x50/0x120
-[    5.961417]  el0_svc_common.constprop.0+0x48/0xf0
-[    5.961418]  do_el0_svc+0x24/0x38
-[    5.961419]  el0_svc+0x34/0xd8
-[    5.961421]  el0t_64_sync_handler+0x10c/0x138
-[    5.961422]  el0t_64_sync+0x1ac/0x1b0
-[    5.961425] SMP: stopping secondary CPUs
-[    5.961432] Kernel Offset: 0x3f8c7c000000 from 0xffff800080000000
-[    5.961433] PHYS_OFFSET: 0x80000000
-[    5.961433] CPU features: 0x01000,00000700,094f0d61,556ffea7
-[    5.961436] Memory Limit: none
-[    5.995295] ---[ end Kernel panic - not syncing: Asynchronous SError Interrupt ]---
-
-where the L1 crashes due to L0 having reinjected the exception in L1.
-
-Another thing is that a E2H==0 L1 never completes this test at all.
-Nothing bad happens, but this is another indication of something being
-off.
-
-I'll try to investigate both issues if I get the time.
-
-	M.
-
-[1] https://lore.kernel.org/r/20250720102229.179114-1-maz@kernel.org
-
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 477f1580ffeaa..eddda649d9ee1 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -68,6 +68,9 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+ 		if (!vcpu_el2_e2h_is_set(vcpu))
+ 			hcr |= HCR_NV1;
+ 
++		/* Virtual SErrors only apply to L2, not L1 */
++		guest_hcr &= ~HCR_VSE;
++
+ 		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
+ 	} else {
+ 		host_data_clear_flag(VCPU_IN_HYP_CONTEXT);
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
