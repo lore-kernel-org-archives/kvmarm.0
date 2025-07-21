@@ -1,90 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE952F2A;
-	Mon, 21 Jul 2025 17:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834A72E0B45
+	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 18:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753119957; cv=none; b=CYb2oy/f8lYg2eQtwKhBnI/jj05IFczZpD6NxLXWsYH36AxFh34o3C4sdpOV6vyY9hTDc/00BjRnoZKe20I3utkRwtvbECvgerSfIoF9eC5i1ruJCySKSrRoHxRqAfPGWtIi0JadxzOKuIl+vZa7YSztQ2Gu+WSEdDVZ7Lrwkh0=
+	t=1753120838; cv=none; b=PSDvgv3k+YPqlrkbX6gvSqMcK9ouSO7vsGyQqjwHQTK1fEHkpI4RSRPD0cgL6CLgnI78n0T+bCRsp5hfDRQHM4R0wrO1ArDRPHYUytC4WtryVRwPkLXVf6haLJy58V70FhqdZei9tQRYp2t3IT5Gm/4TTu38NNgV1j2NDQynwqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753119957; c=relaxed/simple;
-	bh=O0zfAfduBUbLbWf83/6krXEHER/tdRj0Hvvb37jb62A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DGLzojqOcClLNJXj9csEVVuK7DV2KpjU46/Wz0P4vPdUpkw+zwWu7sBYatUuTbwZMEftTyQLicaAd7pPc/CBvfxbNsgiCEFVsXSb/wuA/qcjsUmLpL0lDRaxb7CN4KG4D2hu5rDx16xS8uoLI8iljnT96roH9zRdbsKUfT9qa54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZ7FSTUa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753120838; c=relaxed/simple;
+	bh=ogWkNfeO1YSnAXmvtt1kCOSLkwjDSK4GK17SpTnnPdE=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=jUXlsW/lqcAOaKr2vXsRzjLQ6SBDrETANLGVxLsSaP1uRhPAa2RXlLW9m5w1hSgSq3D2GHf8YDcZqtztRSjH9lENCFqtJCbz6NHWm8u1fPn2D+iNTFTQ8VWR6zYjva2mrVw5iSfxe5c3RjXNkpy5V85k+C9ynYdrxeFY7xgr9ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A0v8jvou; arc=none smtp.client-ip=209.85.166.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZ7FSTUa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7B0AC4CEED;
-	Mon, 21 Jul 2025 17:45:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753119957;
-	bh=O0zfAfduBUbLbWf83/6krXEHER/tdRj0Hvvb37jb62A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HZ7FSTUaMx4xX7JIngOhQxfb2uAGgbPqHq804i0Xq4y5PjJO0yjHhC1oI/ja/QSQD
-	 bN0ingyjFKo29Hy8YjRrFW5E5oIGoL7j8JWCu637IvDHr7OORVsHK+R+j4yECPfWJn
-	 yoZlSaTLgvsukYPF09f36O2HYHGgO/MfMU6m+s136SVo9dHPrRYAZpGDO5eNoQapbz
-	 tPIZ/AvfbvzQLiJ8fqnOlvWVbQXqi/fS62P3unI00c9OrZsXMW95x4Euq62wtEe14o
-	 IfJScq1msWA4HF/UegjMgxjlpJIEVADTNm+gDqdTYEGT0w/lNAoOD+J+1yE4zGXRJM
-	 eredAQvF3Vv6w==
-From: Will Deacon <will@kernel.org>
-To: mark.rutland@arm.com,
-	lpieralisi@kernel.org,
-	sudeep.holla@arm.com,
-	arnd@arndb.de,
-	wei.liu@kernel.org,
-	romank@linux.microsoft.com,
-	mhklinux@outlook.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	kvmarm@lists.linux.dev,
-	Jack Thomson <jackabt.amazon@gmail.com>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	roypat@amazon.com,
-	Jack Thomson <jackabt@amazon.com>
-Subject: Re: [PATCH] arm64: kvm, smccc: Fix vendor uuid
-Date: Mon, 21 Jul 2025 18:45:48 +0100
-Message-Id: <175311813171.3793918.5949198639937646656.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250721130558.50823-1-jackabt.amazon@gmail.com>
-References: <20250721130558.50823-1-jackabt.amazon@gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A0v8jvou"
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-86f4e2434b6so533186439f.2
+        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 11:00:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753120835; x=1753725635; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2krLqXbrvL69zHTI+OSB0Sx07egWNgje2ekoJXV//wU=;
+        b=A0v8jvouTvjNcNZBKoRkgyeGgA9GBUu0QEWIE0ISary74TxNHatGS0EfnNMlnKEejC
+         ksTfK4kVl6vzgwClfHYOrSyq5IAelj+CdH+iMtKhfEtcHaYmZLeJPKqzAgQU820lI4vW
+         Z+BkMIBu2crXy0KqZyWr/cUnXDpsZdXNxfsiGllL56aAH7Mg5hpiikfOg7INtN+8NAdq
+         NSLkY5sjUksqOMGo9byj9WWmsienF41xMFbYIbDAxtGf/KrknHpw1DCDBCFv5Qx+l3rN
+         an+rklGkEcoFopAKW5FxhLnpMhPcmnSLW8vUcAqeIgQCih+GScZrhMyTrgWkqLfKkclA
+         +pug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753120835; x=1753725635;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2krLqXbrvL69zHTI+OSB0Sx07egWNgje2ekoJXV//wU=;
+        b=qp1OskaXNM/DWHAB8T8PK5LmI9aJfEnftWccvwmmMljbHhjOdQn7yuyEtlUH03Kvkj
+         nRBp0ew/91Iu1hv/994v/IP8jG6dbefCpztYSRglZlsHM09sx7CYyctZh+QhXdXUgfp4
+         fI/du95qQ8FLpzYKA3OW9bGYltlFEGeNvuLsPqiey0ZdKzSf908/X2FGgjvGp9g8tt9+
+         L4wHqwhcEW7wG8T/tkJ5olAqi5P6K8HjaYqKPKQnbE3xeWW33ld7d2LtG69p6Ggz1mi4
+         MW70YozbysdtzB8X9aSOKFg5ZLjK2y7ZJVCd+Lnq7I7HUqtpQlWEru8AFYivxdLWgSnr
+         4OIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUjD5/3rF363GefOpr2nE7DskoKnrmptVLlnhwHkj0vl4FVhDG+sZR69z/riA+BiOWRIwtSggA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzGR9MquwiQe3TYakhRWjJuPAo/QVGq4/eMkgbus8qYm5G8m02U
+	tS/S05BrjGK9BDqSFZ1Ag+6YzOKlXtc6AEErBOrbT7eKNphSuVGhs9+5XeLBP/gtJB2WFYDqwLP
+	S00qsgSgkc03BRUmiMBI/tC/xXg==
+X-Google-Smtp-Source: AGHT+IEfZ2MrsGDQt2Apr+GHWZROOgLVqxxVZM8uTrkAEn6W6ybAfMfVvl1rXs9CqPRl3bXlJpF5OsombirkZgJ7Gg==
+X-Received: from iobjk13.prod.google.com ([2002:a05:6602:720d:b0:87c:1d70:43be])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6602:2c0f:b0:86c:ee8b:c089 with SMTP id ca18e2360f4ac-879c291915bmr2390181339f.3.1753120835597;
+ Mon, 21 Jul 2025 11:00:35 -0700 (PDT)
+Date: Mon, 21 Jul 2025 18:00:34 +0000
+In-Reply-To: <153b5191-c585-433e-9cf5-1ed19b9a7f5c@arm.com> (message from
+ Suzuki K Poulose on Wed, 16 Jul 2025 00:22:16 +0100)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Message-ID: <gsntseipa0fx.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v4 01/23] arm64: cpufeature: Add cpucap for HPMN0
+From: Colton Lewis <coltonlewis@google.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
+	shuah@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Mon, 21 Jul 2025 14:05:58 +0100, Jack Thomson wrote:
-> Commit 13423063c7cb ("arm64: kvm, smccc: Introduce and use API for
-> getting hypervisor UUID") replaced the explicit register constants
-> with the UUID_INIT macro. However, there is an endian issue, meaning
-> the UUID generated and used in the handshake didn't match UUID prior to
-> the commit.
-> 
-> The change in UUID causes the SMCCC vendor handshake to fail with older
-> guest kernels, meaning devices such as PTP were not available in the
-> guest.
-> 
-> [...]
+Hi Suzuki. Thanks for the review.
 
-Applied to arm64 (for-next/fixes), thanks!
+Suzuki K Poulose <suzuki.poulose@arm.com> writes:
 
-[1/1] arm64: kvm, smccc: Fix vendor uuid
-      https://git.kernel.org/arm64/c/ab1612211532
+> On 14/07/2025 23:58, Colton Lewis wrote:
+>> Add a capability for FEAT_HPMN0, whether MDCR_EL2.HPMN can specify 0
+>> counters reserved for the guest.
 
-There was a stray "getting hypervisor UUID")" line in the original
-commit message after the Fixes: tag, so I dropped that bit.
+>> This required changing HPMN0 to an UnsignedEnum in tools/sysreg
+>> because otherwise not all the appropriate macros are generated to add
+>> it to arm64_cpu_capabilities_arm64_features.
 
-Cheers,
--- 
-Will
+>> Acked-by: Mark Rutland <mark.rutland@arm.com>
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>    arch/arm64/kernel/cpufeature.c | 8 ++++++++
+>>    arch/arm64/tools/cpucaps       | 1 +
+>>    arch/arm64/tools/sysreg        | 6 +++---
+>>    3 files changed, 12 insertions(+), 3 deletions(-)
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+>> diff --git a/arch/arm64/kernel/cpufeature.c  
+>> b/arch/arm64/kernel/cpufeature.c
+>> index b34044e20128..f38d7b5294ec 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -548,6 +548,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
+>>    };
+
+>>    static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
+>> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,  
+>> ID_AA64DFR0_EL1_HPMN0_SHIFT, 4, 0),
+
+> This doesn't have to be FTR_STRICT. The kernel can deal with
+> differences, by skipping to use HPMN0. We anyway rely on the
+> system wide cap for using the feature.
+
+Okay. I'll change it
+
+
+> Otherwise,
+
+> Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+
+
+Thanks
+>>    	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,  
+>> ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
+>>    	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE,  
+>> ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
+>>    	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,  
+>> ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
+>> @@ -2896,6 +2897,13 @@ static const struct arm64_cpu_capabilities  
+>> arm64_features[] = {
+>>    		.matches = has_cpuid_feature,
+>>    		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, FGT2)
+>>    	},
+>> +	{
+>> +		.desc = "HPMN0",
+>> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+>> +		.capability = ARM64_HAS_HPMN0,
+>> +		.matches = has_cpuid_feature,
+>> +		ARM64_CPUID_FIELDS(ID_AA64DFR0_EL1, HPMN0, IMP)
+>> +	},
+>>    #ifdef CONFIG_ARM64_SME
+>>    	{
+>>    		.desc = "Scalable Matrix Extension",
+>> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+>> index 10effd4cff6b..5b196ba21629 100644
+>> --- a/arch/arm64/tools/cpucaps
+>> +++ b/arch/arm64/tools/cpucaps
+>> @@ -39,6 +39,7 @@ HAS_GIC_CPUIF_SYSREGS
+>>    HAS_GIC_PRIO_MASKING
+>>    HAS_GIC_PRIO_RELAXED_SYNC
+>>    HAS_HCR_NV1
+>> +HAS_HPMN0
+>>    HAS_HCX
+>>    HAS_LDAPR
+>>    HAS_LPA2
+>> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+>> index 8a8cf6874298..d29742481754 100644
+>> --- a/arch/arm64/tools/sysreg
+>> +++ b/arch/arm64/tools/sysreg
+>> @@ -1531,9 +1531,9 @@ EndEnum
+>>    EndSysreg
+
+>>    Sysreg	ID_AA64DFR0_EL1	3	0	0	5	0
+>> -Enum	63:60	HPMN0
+>> -	0b0000	UNPREDICTABLE
+>> -	0b0001	DEF
+>> +UnsignedEnum	63:60	HPMN0
+>> +	0b0000	NI
+>> +	0b0001	IMP
+>>    EndEnum
+>>    UnsignedEnum	59:56	ExtTrcBuff
+>>    	0b0000	NI
