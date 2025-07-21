@@ -1,110 +1,160 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7091B2D5A0C
-	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 14:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128CF2DD5EB
+	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 14:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753106453; cv=none; b=UheSHTGXNQvigPimeDXM9fpqN3TMC0lwkV34aMkOWCjWXTKy6Z7J31hH6XeZxWeWqOAqupojnQVvJ+HO/LKeS6Zaq29dWROtkYgW2mmseQey2J6H7jse1HKbAi9A/StcJvZQJrIDc6z6ykHWy8KRWN6Mfr+tTYDibT+WqQdhcao=
+	t=1753108938; cv=none; b=DCloK7R8ec6sK5ENMMiqyL1u7+/oFrVZRNMN1Xi/R+JyYgVxJLtKyFStBg7T+H8JcnhfyFqGR4fEVN/EIgzbF0bRq+qFafrgP7mwZmENk4eOmkUskk/l2/4eRlaeRJkEKJPvD9a1/+Ihp+ecbH67RHyRFmSeC6gVrJ6NvvfC+N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753106453; c=relaxed/simple;
-	bh=1PQZ5wEHcoCEtER0af1nZDuJAWLlSAlkcq8MdPvmiaA=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=kB77WwaAMQNsysMR6g1KYnWn73Eq4HrZnH59X+y7e9JuVRfaE97WWoCUDBFSvn8axsMrcnSn3gPdX0r5xArB2280wgrbotZbxu1S3vAgIb+Pi6+GRZp4bQVPc0E4i+TL2u2G/fv9HDgxZSoESv8dcuVeU2Qxtt/sSDlSzmZMOsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DlcFocKC; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1753108938; c=relaxed/simple;
+	bh=fHFhQnz1d9jkIQy6+wvI0Utsmrj/cSx28cBy/0zuK7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KYjBbIjgeOgBpXHugr0Ol6NMQoMASqChbrVJhsUlr11hTXNgCtYpX+pydCHQ+3BoTQZP/906SwxEsyihM4fe0+fZIeXxcLHFyuP8mmJXgww5FSD6U4G1SEGshI/Nt9nBkDckwELlGvCVz5WJAcF6SmRXUHbVI9cYA78ehfFUwFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oI4S8zvx; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DlcFocKC"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-456007cfcd7so133255e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 07:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753106450; x=1753711250; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=r0VWK6cB9v+a0NyyEJgT96YS0NmW+Gj3bVw1g3G7ew4=;
-        b=DlcFocKCoCkN2L6G3ryc6Ef8PkPhrf+oYSk0QEzIiGruB3veID4je8tW62KbQ3di8j
-         jBdQEYTTbhYSazyFN+vRwqJZo/yAb9LgKySePEXEqcP8jf8747glySs3iSNhbAlnfg8z
-         SXkY0kPVQqC8r0QlwhNThsPwU2Ccr2dU5XIBXrjJqQ2FGtqXHUvuz0AP7p5DAEW95Njo
-         7sIchL9U6dbN47AWaoz2iX5U5Bu5s4nrWQIY/UVCw9tlW7RFiuTc/4Sa9FEtVbxx8MUN
-         Y6NER103fVAPo2g72zbGxtV4cNkTXOaHF4oRcnFc9UKr1qnUyDws0BxlbGyPi7wJH69c
-         LDvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753106450; x=1753711250;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r0VWK6cB9v+a0NyyEJgT96YS0NmW+Gj3bVw1g3G7ew4=;
-        b=CyPBSF+OOTUggs0y+HWpjdkDnhUp+f+ZBpDfWryYLkKsoJHsDr+dfOr98UavUMD8zc
-         pvEzIc2+5uuAcWxKWt8I2V9rJp6jxiexK2+Lqn70mr3+khqRcfpz8HEWj1oirXAzVP8t
-         aeDQ8edPW9fyg/Yj38h1ylcyZd2gP57Bw+5QmJ4/YFjnjZQvDW4WhNL96Q69j6+YPvub
-         8u57dmO+8U4WleZAD+SScDt6Zr4ua4gNEldmfuvwvypIzyUR5KEK9cKzkUIKphAR/zg4
-         j2nd1QK/XhhRv9lRno57QIhgosJjbPxzHhdfETG9onXO+DkZnCKwOwUqEBC8E8dtMu4Z
-         pqjA==
-X-Gm-Message-State: AOJu0YwM/CgZZQXOUMce3ufmbWxht8dI9i03AWrZ8O8zv9gA2+nuRxMB
-	cgizG0NDcYV+QYi83Zb4yBOFnke+Js5zZiBainj/Vh/iAFqkzh4CTrfYJoGu9ywcpsp2XLXTPA4
-	8P2Y3nM20UcP6c+BWlG4YG1TUOOc6O5QZauuQg+K2
-X-Gm-Gg: ASbGncv5HMI2IKLfeBwI+xd0tgdttPbEmr+nH7p3r74zvNvKQgOaEcYwFEGMKEhw6Gh
-	vjgjoTm+yGinF+NUMvEw8ok/untxHr1NLCi36VV14jof4BQHXG+SsbctcBKRwrqV8fu2Q73yM8u
-	LEE7TQuvhQCPFhUdoD8QrYw3WnIKv+QuYOZ69tXcGl4DKO3sPsP+QP+jfLuNOnjeGU83o5kBYEf
-	NdxGSK2J5VF9W/u7nmQPK+VqwFA9LHacawYF05v
-X-Google-Smtp-Source: AGHT+IHzrPlFuf9cksmZ/Es+Xf1aPI79vfvoqBBLKfiQw3E1U+weKYQAyTKorgpdHvEuDDhSlkSHEj7XF78SYKtS+o4=
-X-Received: by 2002:a05:600c:8b81:b0:453:65e6:b4a6 with SMTP id
- 5b1f17b1804b1-456428e598fmr3424825e9.6.1753106449459; Mon, 21 Jul 2025
- 07:00:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oI4S8zvx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753108937; x=1784644937;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fHFhQnz1d9jkIQy6+wvI0Utsmrj/cSx28cBy/0zuK7U=;
+  b=oI4S8zvxfXW1EoffdJ8g7WI1Rx2Qkj9BfIj5I48LaxMl3bPcpT2j2zPX
+   6C84lnmN6VOLdD6KLte9tgNZuEez+hdOnUiNrvoXxjrqu72zdxgKESMgu
+   HQ5D3w8OPwb/HTI4uxE4rV5YWI4Xg3u/zMTcGD1VxUDpSJpkenLSI0RKo
+   0MM3t3TOjLiVKI+0EnkyDpOGjB7BzWopd80h0ifJFwNwlzOk2Iocvg/vY
+   T16VdOtII1/s1ooJyMWb12S1k2+XcRQcbLrjF0wCbLf3Jk08spobEGbYM
+   PPlgD38PPBkWsDZehctl3JdZN8Pz2FlwzcGG46SgZNNN7px18Di0+gKfR
+   g==;
+X-CSE-ConnectionGUID: GZvyNwtUTleH1GtM6WAGfA==
+X-CSE-MsgGUID: FLYo4lqzQQmMHo6cBybCZQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11499"; a="58985262"
+X-IronPort-AV: E=Sophos;i="6.16,329,1744095600"; 
+   d="scan'208";a="58985262"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 07:42:16 -0700
+X-CSE-ConnectionGUID: qL0fP/21RrO2BIIqh5xu1g==
+X-CSE-MsgGUID: xd+ebKGrR4KwX8aDa1+/mA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,329,1744095600"; 
+   d="scan'208";a="159582796"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 07:42:02 -0700
+Message-ID: <131a3b2f-616f-428d-a41c-d490b9ca1b88@intel.com>
+Date: Mon, 21 Jul 2025 22:42:00 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Mon, 21 Jul 2025 07:00:00 -0700
-X-Gm-Features: Ac12FXxRlhkToUCbXGkOTjf1DAqkBtxHHrS7fMi_NmUO7y_c0p3cGBlWugT0e_w
-Message-ID: <CACw3F53VTDQeUbj3C75pkjz=iehbFCqbrTjYbUC3ViUbQJAhsg@mail.gmail.com>
-Subject: [Bug Report] external_aborts failure related to efa1368ba9f4 ("KVM:
- arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately")
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 14/21] KVM: x86: Enable guest_memfd mmap for default
+ VM type
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
+ amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
+ wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250717162731.446579-1-tabba@google.com>
+ <20250717162731.446579-15-tabba@google.com>
+ <505a30a3-4c55-434c-86a5-f86d2e9dc78a@intel.com>
+ <CAGtprH8swz6GjM57DBryDRD2c6VP=Ayg+dUh5MBK9cg1-YKCDg@mail.gmail.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <CAGtprH8swz6GjM57DBryDRD2c6VP=Ayg+dUh5MBK9cg1-YKCDg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Oliver,
+On 7/21/2025 9:45 PM, Vishal Annapurve wrote:
+> On Mon, Jul 21, 2025 at 5:22 AM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>
+>> On 7/18/2025 12:27 AM, Fuad Tabba wrote:
+>>> +/*
+>>> + * CoCo VMs with hardware support that use guest_memfd only for backing private
+>>> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
+>>> + */
+>>> +#define kvm_arch_supports_gmem_mmap(kvm)             \
+>>> +     (IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP) &&   \
+>>> +      (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM)
+>>
+>> I want to share the findings when I do the POC to enable gmem mmap in QEMU.
+>>
+>> Actually, QEMU can use gmem with mmap support as the normal memory even
+>> without passing the gmem fd to kvm_userspace_memory_region2.guest_memfd
+>> on KVM_SET_USER_MEMORY_REGION2.
+>>
+>> Since the gmem is mmapable, QEMU can pass the userspace addr got from
+>> mmap() on gmem fd to kvm_userspace_memory_region(2).userspace_addr. It
+>> works well for non-coco VMs on x86.
+>>
+>> Then it seems feasible to use gmem with mmap for the shared memory of
+>> TDX, and an additional gmem without mmap for the private memory. i.e.,
+>> For struct kvm_userspace_memory_region, the @userspace_addr is passed
+>> with the uaddr returned from gmem0 with mmap, while @guest_memfd is
+>> passed with another gmem1 fd without mmap.
+>>
+>> However, it fails actually, because the kvm_arch_suports_gmem_mmap()
+>> returns false for TDX VMs, which means userspace cannot allocate gmem
+>> with mmap just for shared memory for TDX.
+> 
+> Why do you want such a usecase to work?
+> 
+> If kvm allows mappable guest_memfd files for TDX VMs without
+> conversion support, userspace will be able to use those for backing
+> private memory unless:
+> 1) KVM checks at binding time if the guest_memfd passed during memslot
+> creation is not a mappable one and doesn't enforce "not mappable"
+> requirement for TDX VMs at creation time.
 
-I was doing some SEA injection dev work and found
-tools/testing/selftests/kvm/arm64/external_aborts.c is failing at the
-head of my locally-tracked kvmarm/next, commit 811ec70dcf9cc ("Merge
-branch 'kvm-arm64/config-masks' into kvmarm/next"):
+yes, this is the additional change required.
 
-vobeb33:/export/hda3/tmp/yjq# ./external_aborts
-Random seed: 0x6b8b4567
-test_mmio_abort <= fail
-==== Test Assertion Failure ====
-  arm64/external_aborts.c:19: regs->pc == expected_abort_pc
-  pid=25675 tid=25675 errno=4 - Interrupted system call
-  (stack trace empty)
-  0x0 != 0x21ed20 (regs->pc != expected_abort_pc)
-vobeb33:/export/hda3/tmp/yjq#
-vobeb33:/export/hda3/tmp/yjq#
-vobeb33:/export/hda3/tmp/yjq# ./external_aborts
-Random seed: 0x6b8b4567
-test_mmio_nisv       <= pass
-test_mmio_nisv_abort <=fail
-==== Test Assertion Failure ====
-  arm64/external_aborts.c:19: regs->pc == expected_abort_pc
-  pid=26153 tid=26153 errno=4 - Interrupted system call
-  (stack trace empty)
-  0x0 != 0x21eb18 (regs->pc != expected_abort_pc)
+> 2) KVM fetches shared faults through userspace page tables and not
+> guest_memfd directly.
 
-It looks like the PC in the guest register is lost / polluted. I only
-tested test_mmio_abort (fail), test_mmio_nisv (pass), and
-test_mmio_nisv_abort (fail), but from reading the code of
-test_mmio_nisv vs test_mmio_nisv_abort, I guess test failure is
-probably due to some bug in the code kvm injects SEA into guest.
+current KVM supports it already.
 
-If I revert a single commit efa1368ba9f4 ("KVM: arm64: Commit
-exceptions from KVM_SET_VCPU_EVENTS immediately"), all tests in
-tools/testing/selftests/kvm/arm64/external_aborts.c pass. I have not
-yet figured out the bug tho. Want to report since you are the author
-maybe you can (or already) spot something.
+And as I described above,  current userspace can just mmap the gmem and 
+pass the gotten addr to userspace_addr without passing guest_memfd, to 
+force KVM to fetch through userspace page tables.
 
-Thanks,
+So if we want KVM to fetch page from guest memfd directly, should we add 
+something in KVM to enforce it?
 
-Jiaqi
+> I don't see value in trying to go out of way to support such a usecase.
+
+ From my perspective, it's intuitive to think about this usecase when I 
+tried to enable gmem mmap in QEMU. It seems a little strange that 
+mmap'ed gmem can only serve as normal memory for non-CoCo VMs.
+
+If KVM mandates any gmem must be passed via 
+kvm_userspace_memory_region2.guest_memfd, no matter it's mmap'ed or not, 
+it would make more sense (to me) to not support such usecase, since 
+there is only one guest_memfd field in struct kvm_userspace_memory_region2.
+
+At last, I just put it on the table, so people can be aware of it and 
+make the call to support it or not. Either is OK to me.
+
+
+
