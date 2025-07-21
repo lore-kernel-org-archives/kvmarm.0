@@ -1,103 +1,90 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCB72E03F7
-	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 17:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE952F2A;
+	Mon, 21 Jul 2025 17:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753119198; cv=none; b=h0HhVZ1AAUUo87Ro9yHkmtWFPTGb4Z07dCmI3b80DbVD3YJTYJo6hvdePGYOekYNTH6wMYjAdSj1oXs1DT5+YyOLk5SSrL5sdHoby1MtZhiB0lMcYQ5rud6YBoyxbou4YxfiMSIujuGrQjKSSC/y2nc4TaT8ykBbpXMrWzZB8h4=
+	t=1753119957; cv=none; b=CYb2oy/f8lYg2eQtwKhBnI/jj05IFczZpD6NxLXWsYH36AxFh34o3C4sdpOV6vyY9hTDc/00BjRnoZKe20I3utkRwtvbECvgerSfIoF9eC5i1ruJCySKSrRoHxRqAfPGWtIi0JadxzOKuIl+vZa7YSztQ2Gu+WSEdDVZ7Lrwkh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753119198; c=relaxed/simple;
-	bh=mNDNOCM/MmTeG8bWN8KzikOsujHMksewTXy/RHZM/qE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PHqbZPJOYj6YxacpfDuZ0T0GfRHxhj2tBDDjNYPa1h7u51J4AUxLdChNhQC7ZCsb9lmoDvaqOSQr3iiYQwX+N/HDj7PP0S5a5/bcFrvrd7wn1tb2HsSkWqqZNF2Z0sGrQojMx3VJ7vU0X1AJ8tfc7VShB9XGbMOxlwNqoTsKs7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V4VRckvl; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1753119957; c=relaxed/simple;
+	bh=O0zfAfduBUbLbWf83/6krXEHER/tdRj0Hvvb37jb62A=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DGLzojqOcClLNJXj9csEVVuK7DV2KpjU46/Wz0P4vPdUpkw+zwWu7sBYatUuTbwZMEftTyQLicaAd7pPc/CBvfxbNsgiCEFVsXSb/wuA/qcjsUmLpL0lDRaxb7CN4KG4D2hu5rDx16xS8uoLI8iljnT96roH9zRdbsKUfT9qa54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZ7FSTUa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V4VRckvl"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3141f9ce4e2so6826229a91.1
-        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 10:33:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753119197; x=1753723997; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nZ4+t7dcQ2ZTieyIQcNf54MPM3Tf5VMEW4AFMPESUF4=;
-        b=V4VRckvld4D5cpkY7hYXjGe2FiBzUENVrsC/TIWXdAm+TRBsIsIp5aYAoxpsgWA63c
-         f7Y7WJ38WkDwviX1FkiJ00xgiQASrB515drXL/r6dbjGz27ySI5Pud6aeB/wRxGIDUhA
-         rhK5mYHmZg7c4Stpku/HtVDYNZFxxiKp6sofDk6fDpBk/Cf3/Xc/cOVWMOs38D508APe
-         VUsEcmtkoSg5x/hkYKtkgounkPPHUdOpxv/wwXroB54rzP2/C8ODAChhoTbbayYfWAqq
-         pcZnEl6fE17T0o9GZ2ivtns1iMGmmMofm+iHddwunAe7gqqCDbXn23l9S1BS2lbypWsn
-         +OcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753119197; x=1753723997;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nZ4+t7dcQ2ZTieyIQcNf54MPM3Tf5VMEW4AFMPESUF4=;
-        b=r2CAA11GI0AUrGVbCqoSZIivjo5jVUWeg27y3ApThlg30NCPgVnYuLYIamzRBiX10X
-         94wi4VO4ILVyVryBxn+QeEJGNrPZi+BJqPILF1ZMfG4Pd182hwYIIIkJ54cAKTKLGqLY
-         sQMSVyuZMY/O2cx4I9JF80XlYr/zwckCvVwnzLpaM+g7FocWwoh3fY2IAHUImLyxnhAx
-         T4A8Mtc6mX8KO4c1+QqpLg/ny46uiJqXipmC/FYzkQuxfSSQNnDBWEWM6t6AQqUeYnIs
-         lhYgp2bsvt/ReEgxHCbb+YioVeKhOB1BIc0Ruq8QQiBO7C2vj6oX9be4KM/K4g/QO7OL
-         5PrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV1jt00KOq+bUu5+m3yBBeGBlNhmEGBj4jtzClIgi7bw13WyPPsXcFZONs4++sv2dnSi0Slads=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyaLNkck6ALnkcJPAgmO4iKubTZMFbkXJh8fa38h5dY9w6+pQl1
-	IrSmvDrcbC0VvRWSiES73K7lj6ckKzVZqBcpLXKicnETF6PcBNFlJSLG5ylyJx9rr1mXtFWYZhl
-	Ff0SKFA==
-X-Google-Smtp-Source: AGHT+IFwe3ukJO/AwYaZYv00wIRNUUpc+AWlcSl6+/xV7rqHjeFmT15UCVZr+TsQ5cn11BlfaXrHgArz1CM=
-X-Received: from pjbrs12.prod.google.com ([2002:a17:90b:2b8c:b0:312:187d:382d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b06:b0:311:f2f6:44ff
- with SMTP id 98e67ed59e1d1-31c9f42400cmr34113055a91.17.1753119196635; Mon, 21
- Jul 2025 10:33:16 -0700 (PDT)
-Date: Mon, 21 Jul 2025 10:33:15 -0700
-In-Reply-To: <CA+EHjTxcgCLzwK5k+rTf2v_ufgsX0AcEzhy0EQL-pvmsg9QQeg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZ7FSTUa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7B0AC4CEED;
+	Mon, 21 Jul 2025 17:45:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753119957;
+	bh=O0zfAfduBUbLbWf83/6krXEHER/tdRj0Hvvb37jb62A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=HZ7FSTUaMx4xX7JIngOhQxfb2uAGgbPqHq804i0Xq4y5PjJO0yjHhC1oI/ja/QSQD
+	 bN0ingyjFKo29Hy8YjRrFW5E5oIGoL7j8JWCu637IvDHr7OORVsHK+R+j4yECPfWJn
+	 yoZlSaTLgvsukYPF09f36O2HYHGgO/MfMU6m+s136SVo9dHPrRYAZpGDO5eNoQapbz
+	 tPIZ/AvfbvzQLiJ8fqnOlvWVbQXqi/fS62P3unI00c9OrZsXMW95x4Euq62wtEe14o
+	 IfJScq1msWA4HF/UegjMgxjlpJIEVADTNm+gDqdTYEGT0w/lNAoOD+J+1yE4zGXRJM
+	 eredAQvF3Vv6w==
+From: Will Deacon <will@kernel.org>
+To: mark.rutland@arm.com,
+	lpieralisi@kernel.org,
+	sudeep.holla@arm.com,
+	arnd@arndb.de,
+	wei.liu@kernel.org,
+	romank@linux.microsoft.com,
+	mhklinux@outlook.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	kvmarm@lists.linux.dev,
+	Jack Thomson <jackabt.amazon@gmail.com>
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	roypat@amazon.com,
+	Jack Thomson <jackabt@amazon.com>
+Subject: Re: [PATCH] arm64: kvm, smccc: Fix vendor uuid
+Date: Mon, 21 Jul 2025 18:45:48 +0100
+Message-Id: <175311813171.3793918.5949198639937646656.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250721130558.50823-1-jackabt.amazon@gmail.com>
+References: <20250721130558.50823-1-jackabt.amazon@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-3-tabba@google.com>
- <aH5uY74Uev9hEWbM@google.com> <CA+EHjTxcgCLzwK5k+rTf2v_ufgsX0AcEzhy0EQL-pvmsg9QQeg@mail.gmail.com>
-Message-ID: <aH552woocYo1ueiU@google.com>
-Subject: Re: [PATCH v15 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to CONFIG_KVM_GENERIC_GMEM_POPULATE
-From: Sean Christopherson <seanjc@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 21, 2025, Fuad Tabba wrote:
-> > The below diff applies on top.  I'm guessing there may be some intermediate
-> > ugliness (I haven't mapped out exactly where/how to squash this throughout the
-> > series, and there is feedback relevant to future patches), but IMO this is a much
-> > cleaner resting state (see the diff stats).
+On Mon, 21 Jul 2025 14:05:58 +0100, Jack Thomson wrote:
+> Commit 13423063c7cb ("arm64: kvm, smccc: Introduce and use API for
+> getting hypervisor UUID") replaced the explicit register constants
+> with the UUID_INIT macro. However, there is an endian issue, meaning
+> the UUID generated and used in the handshake didn't match UUID prior to
+> the commit.
 > 
-> So just so that I am clear, applying the diff below to the appropriate
-> patches would address all the concerns that you have mentioned in this
-> email?
+> The change in UUID causes the SMCCC vendor handshake to fail with older
+> guest kernels, meaning devices such as PTP were not available in the
+> guest.
+> 
+> [...]
 
-Yes?  It should, I just don't want to pinky swear in case I botched something.
+Applied to arm64 (for-next/fixes), thanks!
 
-But goofs aside, yes, if the end result looks like what was the below, I'm happy.
-Again, things might get ugly in the process, i.e. might be temporariliy gross,
-but that's ok (within reason).
+[1/1] arm64: kvm, smccc: Fix vendor uuid
+      https://git.kernel.org/arm64/c/ab1612211532
+
+There was a stray "getting hypervisor UUID")" line in the original
+commit message after the Fixes: tag, so I dropped that bit.
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
