@@ -1,167 +1,161 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E8E2C15A8
-	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 15:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1ECA2E0919;
+	Mon, 21 Jul 2025 15:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753111602; cv=none; b=gtIigx3qIjNmo1Ogc4yHJoa2abJ/BmdUuHykuDFJE6rnl4wLDzgtBHAU6luacxBT/CI+VLlyUw2UPmPe+LgIvTNKU8b4I2IV450LYyHUAw2hMGurLgMYICXBxbwm5P0XHFtE3DC4E3JSlxMbmeJxYhpXGKUo4MOhA0W8FMv9L6U=
+	t=1753113107; cv=none; b=M4tJVmMM5QV3rnebWzFKHAFIYZfYz7NzXG880VFhkW0f67uFjjWcu38CYgQK+O1zq2AjqFhz/i63FsHruEVkfhY4RHmgFXrNAkqh1vRQuKiupFH49eO+1zgay8uR/NeiLjQ3RQGZSQtXhihNy5LtVHUroNm+XR5/843kfs7on7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753111602; c=relaxed/simple;
-	bh=8DwP3omhkAVQqs7IffAT+dALozWU0wdNIC142sQ97Ro=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=StqBJ3XJd+v6yttI7EzD7Yq5ciqXTsP8gN/S5/MQWeDylILHjuKZ07p4cmvN3NgLVRIIuJ8cG7H4cOuXN8BhJterTEHJMpdxrqTPdilarz+anlNhg1SuitddwnhT65eE0/TOGAsBr0UyNuz6ZDcLbZ4ck7yxQebjv0rmUQ638cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x4t5USbG; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1753113107; c=relaxed/simple;
+	bh=VorkCIfYnj7vmwv7ZzNhcKzHZkJ7O3RYK53j5I6L8r8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OrTjUuAG+uo+AIxtl005UleBwzm7/lyHqVCDC1+f87Gq+WhW1menbEvmE+oVAq8KY4guhawJtOiL3OvUKqNZyZc0nUZz71hz2TXK2n2t+y7TqIeLpuQacTjzdJ5eufY5pVcHuGbRgorlG3Zj3jlYCD0o7VZWODAH2yarVsx6KZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NdejrZHv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x4t5USbG"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso810061cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 08:26:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753111599; x=1753716399; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+zXX1Cs6v+OQFAHcUcXiOun/0OGx+sBx9HWHDVkm/fI=;
-        b=x4t5USbGyzKjY38gCSCcjcu12LCT9XUkQEYmccbyzdlkqEHqli7RFwoTZlP6jI0nBl
-         vRPRdqbuetQkjWJHdQOtCu9BjziPP0b65avLqjyHXzHJ9xnEdmHJiFim04QqArnAdvPH
-         /R5S57HIx3TUO0ORFdF4Z2x6cRRl6wBiLu4cT+uycUhsHhr17ip60LvdQHTXfNxMKLV4
-         Ph95iYWGz7XHxGZEqJhUGRbNXzCZHRRG4U10r0pwWu0zuC7B4Zg9LwGjX3PEgUHwNME7
-         LC9aqBvwdvIgaiTqDs/+Jlgw8P5efOwLzFUJmx5gVuXDtM64maWTagupPKMkBTvkhsDZ
-         geQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753111599; x=1753716399;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+zXX1Cs6v+OQFAHcUcXiOun/0OGx+sBx9HWHDVkm/fI=;
-        b=enAimYM28QXp7pSo/F9n00iJB25vWDk8ZPn0KnC/P860Ebtm+u9DR6DmViEM/RVLhh
-         xsuTGp1PJymtJ/NIx8PamApGm5ZsCwT0IUGzp+kTuBQ/Rkx7xdQdkoGqYXW/Fyn3iMFJ
-         Wu1Asx1vJCpDsBoUjQptBNP/AN/ByI2tyaw5CdkGf6HdNVmMBeQx7krhYKz1nh7uv77u
-         XIM9WapjMN0wfA1BMcId5LyQ+HzT9zpPeFZte/02C7cfChMXTIfWJ38fGklIBbdabEJa
-         VTGYbHuq0fwQ/25HCwJuT087qEoRH5u5Wj7hpFK9ZJlQRO+/Mev2t95BrUaM9xNvpGca
-         i6xg==
-X-Forwarded-Encrypted: i=1; AJvYcCVkDi4QtxG/a5/4kAL5h1Qbv8awQ+4z2v0embRUEugKvFw6oxDT/MPIzfqoEM13EPVBlexCqcU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YweAU68kzBxAVF5nrnNmlprswpp5vT5czeCPfH/sHcpu02c949q
-	70gVddAfl0gjNSqkbtzDkZeR9Lsqkm9j+mFiNHIE8slceB4kmYxsoID1j3QQAQ7kM1GJb0/FhOG
-	+i4evSD6qN0mqR0LVWpD91ObMw3cbo/l6d5ZbG1DQ
-X-Gm-Gg: ASbGnctaNtCcEmAMe032Bi9Zwws+PvU/39NRn/mxaD+STm+XXvXf0KBkfzXl08HdYZq
-	KZKFxrb2BdchPsKuGR6wbM95pFUk/SaB8qQdtr0G2+l880q3H/aRTa8m5LwJnKo5LbaQMRG1fMQ
-	oIC/v+zrcmyTZZfpISCNJ+0dLQdNI+C23o3HPHEBMxKf6thMrCmnpxc604rcZJ6eYtOfmNOMU34
-	uGVfuo=
-X-Google-Smtp-Source: AGHT+IEJ1agfPLztb2zu+kNSQrf+HNQSH/8YBV9oHV+GLXju3loOkIiAuNIEAfRphTYzBRJ1wUQtlA8Dhv1rRae6lKk=
-X-Received: by 2002:a05:622a:a18d:b0:494:4aa0:ad5b with SMTP id
- d75a77b69052e-4ae5ad66634mr161081cf.2.1753111599011; Mon, 21 Jul 2025
- 08:26:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NdejrZHv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6982CC4CEED;
+	Mon, 21 Jul 2025 15:51:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753113106;
+	bh=VorkCIfYnj7vmwv7ZzNhcKzHZkJ7O3RYK53j5I6L8r8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NdejrZHvsrvTqLWyUXBZrfvBkmifO+w7JV0xzvU559yvRrMC3HgIkI251X96cBhlX
+	 G/7QvuRzgMUnqFP01vKT10CGFvKzLZXyJA09oXTC5BR7PQQFES1WJH3r85MWuPDgf9
+	 C4lsKLiiPzBDFWkuLpQcd8/0Toxye0GMMEWuKfxVYYnJW5f9rH/9GV8sdAoUH7VP3v
+	 NxZyPA/ix3TmkT8ZjHONCXlldXtrSXENlzdqce9zWTMVqOkRv2bptD0ECE42Pcy8JC
+	 IdsfSrvwl/DnLAfzb/p4S3bZoXp8ONu62hDDRZnsJejcOjLRa50DIorxvi0qV2KZ30
+	 lSmgIv9zJ5c1A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1udsno-0004Du-F5;
+	Mon, 21 Jul 2025 16:51:44 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	jackabt@amazon.com
+Subject: [PATCH] KVM: arm64: selftest: Add standalone test checking for KVM's own UUID
+Date: Mon, 21 Jul 2025 16:51:36 +0100
+Message-Id: <20250721155136.892255-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-2-tabba@google.com>
- <aH5Z7edFZSPzmJ5w@google.com>
-In-Reply-To: <aH5Z7edFZSPzmJ5w@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 21 Jul 2025 16:26:02 +0100
-X-Gm-Features: Ac12FXxSI2fqE4AUgjZ2pvOx5zOwfObgBpuUEKoP_2mWQ6ddL7hqgwa3HEbqCBI
-Message-ID: <CA+EHjTzemPVuHnm8vZh2Lh25GpZL-CR3kqtFQ7uktKobkjNDUA@mail.gmail.com>
-Subject: Re: [PATCH v15 01/21] KVM: Rename CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, mark.rutland@arm.com, jackabt@amazon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Sean,
+Tinkering with UUIDs is a perilious task, and the KVM UUID gets
+broken at times. In order to spot this early enough, add a selftest
+that will shout if the expected value isn't found.
 
-On Mon, 21 Jul 2025 at 16:17, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Jul 17, 2025, Fuad Tabba wrote:
-> > Rename the Kconfig option CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM.
->
-> Please name this CONFIG_KVM_GUEST_MEMFD.  I'm a-ok using gmem as the namespace
-> for functions/macros/variables, but there's zero reason to shorten things like
-> Kconfigs.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20250721130558.50823-1-jackabt.amazon@gmail.com
+---
+ tools/testing/selftests/kvm/Makefile.kvm     |  1 +
+ tools/testing/selftests/kvm/arm64/kvm-uuid.c | 67 ++++++++++++++++++++
+ 2 files changed, 68 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/kvm-uuid.c
 
-Ack.
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index ce817a975e50a..e1eb1ba238a2a 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -167,6 +167,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+ TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+ TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+ TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
++TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
+ TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+ TEST_GEN_PROGS_arm64 += arch_timer
+ TEST_GEN_PROGS_arm64 += coalesced_io_test
+diff --git a/tools/testing/selftests/kvm/arm64/kvm-uuid.c b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+new file mode 100644
+index 0000000000000..89d9c8b182ae5
+--- /dev/null
++++ b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+@@ -0,0 +1,67 @@
++#include <errno.h>
++#include <linux/arm-smccc.h>
++#include <asm/kvm.h>
++#include <kvm_util.h>
++
++#include "processor.h"
++
++/*
++ * Do NOT redefine these constants, or try to replace them with some
++ * "common" version. They are hardcoded here to detect any potential
++ * breakage happening in the rest of the kernel.
++ *
++ * KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74
++ */
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
++
++static void guest_code(void)
++{
++	struct arm_smccc_res res = {};
++
++	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
++
++	__GUEST_ASSERT(res.a0 != SMCCC_RET_NOT_SUPPORTED, "a0 = %lx\n", res.a0);
++	__GUEST_ASSERT(res.a0 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 &&
++		       res.a1 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 &&
++		       res.a2 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 &&
++		       res.a3 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3,
++		       "Unexpected KVM-specific UID %lx %lx %lx %lx\n", res.a0, res.a1, res.a2, res.a3);
++	GUEST_DONE();
++}
++
++int main (int argc, char *argv[])
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	struct ucall uc;
++	bool guest_done = false;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	while (!guest_done) {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_SYNC:
++			break;
++		case UCALL_DONE:
++			guest_done = true;
++			break;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			break;
++		case UCALL_PRINTF:
++			printf("%s", uc.buffer);
++			break;
++		default:
++			TEST_FAIL("Unexpected guest exit");
++		}
++	}
++
++	kvm_vm_free(vm);
++
++	return 0;
++}
+-- 
+2.39.2
 
-> > @@ -719,10 +719,10 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
-> >  #endif
-> >
-> >  /*
-> > - * Arch code must define kvm_arch_has_private_mem if support for private memory
-> > - * is enabled.
-> > + * Arch code must define kvm_arch_has_private_mem if support for guest_memfd is
-> > + * enabled.
->
-> This is undesirable, and the comment is flat out wrong.  As evidenced by the lack
-> of a #define in arm64, arch does NOT need to #define kvm_arch_has_private_mem if
-> CONFIG_KVM_GUEST_MEMFD=y.  It "works" because the sole caller to kvm_arch_has_private_mem()
-> is guarded by CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES=y, and that's never selected
-> by arm64.
->
-> I.e. this needs to key off of CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES=y, not off of
-> CONFIG_KVM_GUEST_MEMFD=y.  And I would just drop the comment altogether at that
-> point, because it's all quite self-explanatory:
->
-> #ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
-> {
->         return false;
-> }
-> #endif
-
-Ack.
-
->
-> >   */
-> > -#if !defined(kvm_arch_has_private_mem) && !IS_ENABLED(CONFIG_KVM_PRIVATE_MEM)
-> > +#if !defined(kvm_arch_has_private_mem) && !IS_ENABLED(CONFIG_KVM_GMEM)
-> >  static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
-> >  {
-> >       return false;
-> > @@ -2527,7 +2527,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> >
-> >  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
-> >  {
-> > -     return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) &&
-> > +     return IS_ENABLED(CONFIG_KVM_GMEM) &&
->
-> And this is equally wrong.  The existing code checked CONFIG_KVM_PRIVATE_MEM,
-> because memory obviously can't be private if private memory is unsupported.
->
-> But that logic chain doesn't work as well for guest_memfd.  In a way, this is a
-> weird semantic change, e.g. it changes from "select guest_memfd if private memory
-> is supported" to "allow private memory if guest_memfd is select".   The former
-> existed because compiling in support for guest_memfd when it coulnd't possibly
-> be used was wasteful, but even then it was somewhat superfluous.
->
-> The latter is an arbitrary requirement that probably shouldn't exist, and if we
-> did want to make it a hard requirement, should be expressed in the Kconfig
-> dependency, not here.
->
-> TL;DR: drop the IS_ENABLED(CONFIG_KVM_GMEM) check.
-
-Ack.
-
-Thanks!
-/fuad
