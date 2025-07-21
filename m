@@ -1,107 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1299F1CA81;
-	Sun, 20 Jul 2025 17:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BD31DEFDB;
+	Mon, 21 Jul 2025 10:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753033182; cv=none; b=TXWmt98yRfI7uZaAtksLYbE8bMbWTTpMfSMyMx6fSqBZ3zP7RBZ8KRBtAiBl61XGLPiWmOCYSX1mlgEjD1gWHnroJXLJGQq4KsB5tapm2zysdILAVmY6yFqRek5Od9e+hLA0ptpOGEKnLgte/kEgVCVSedIFamCJVoVxXmC9GLs=
+	t=1753093207; cv=none; b=QXEZkJ7gA1t2l2NIPxxssOyBvQmhNe+C6x9rBSEkg5nB0LOwtC35CVnL1rweNly1Dulfw5vjOJCi76Gik1tTum6Rvat0LR1iFQmRLgN71BS6eroLl1Kv8Lu4IZBp9liJAWfoHaV+flykgjAY4tiUktLr5hYYEUKR/u44G4nBCwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753033182; c=relaxed/simple;
-	bh=kHdJnWMZ/uSXE2znXW0wKKZ9+EwYpTW2ogmdFfsxD/s=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=p9T0Yr993B59SYgT1MKRvXg67qj10hSa1GnvOm3rbfjyDrSBtgkFWQM6boYDzMdj/dJTbkQuLRAxKOs9L5bWKIwaxagvN3dNGcL81Z6dz6YENbK75PX2KbhWULObeHQm/bmEKWTW9OSGxD2+Mfel5vy4myOPxW73BhqN/Sj+DSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/YCS9sr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753093207; c=relaxed/simple;
+	bh=uZLZ0nK2M/lar7zqTQyEJsNemSM7m128SJkqJMrBgy8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VQiT3M3c4GuVqqnsqCSUH6N8YnVwcVIsvJ4ZnCklDDnxsyZTKvXo5qgQiiJ4rDdMOyFVBrqdT/xMxd484aQM97jD+7cm5kPlL8x+5YRiDMUT/T8ZyOa4iL98+sNGFGFJ5JyAcKJKVsvVs8I0hUFLp5saRAv9DRejTsFsELZfznU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fI9Pu2MT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N/YCS9sr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86834C4CEE7;
-	Sun, 20 Jul 2025 17:39:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fI9Pu2MT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D904C4CEED;
+	Mon, 21 Jul 2025 10:20:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753033181;
-	bh=kHdJnWMZ/uSXE2znXW0wKKZ9+EwYpTW2ogmdFfsxD/s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N/YCS9sr96beqAk3VqRCOHJ8lDgeb19X3LRh4clOUTA3bg1nh6Xglz5/7crHSwMLi
-	 l2eTe5SBAHQjB6gFSyF15O7Frw9DibTEuLntVliH3m0ij0Q95OrlTL8KFlLCaxPDbH
-	 yjhHylKFBaVnsdwLSmGWEYPwSfpkfURIF6qkvWtrSuw1K5/6ZT7+zOUDpOsvbws8Z6
-	 ZvjhRVQ1R+lwn5AzCwQDPT9FxN/D+WmFHhXuHzvID79QwFG49jgRwBJfeeUZSH+Epv
-	 a9ftMTp5KknEMwD0RjtYl/UMrMrTTgs56tQuST8fYIGevJSPXImkcRvGWUsbL/+cKg
-	 BUEkgiBGmlGQA==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
+	s=k20201202; t=1753093207;
+	bh=uZLZ0nK2M/lar7zqTQyEJsNemSM7m128SJkqJMrBgy8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=fI9Pu2MTK5r7Nsu7I0bujcKmQTkvEBebgLAfduxnAcr24BQHeJLlFU0bszlC2rNMh
+	 tcPJ6rDL60y67McSdZZK1jRVmSdoN0NZDC2EsYFFUOhciVKb29QTkxB0FKOnBd8QAz
+	 lwW6CMuSejyhC0vwdV3v2iRoJGiSWrkvbLQprQH2fmRVfyYkGUqkuhJPDzlmDpTd3c
+	 dHqGz4/9+DF+T96Ji30qCqZLZ4CrjQscTA+E3Mfvk+34tDYKhXSwfiR5q/exMGzuwN
+	 1ONtpLqAAoNo0te6Em7NDB639HAhys9lqfTreiM4APeAN03P7YwBv/pPk1/2vaBMis
+	 QVVF9rLo1X/pQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1udY0h-00HONo-4C;
-	Sun, 20 Jul 2025 18:39:39 +0100
+	id 1udncr-00HZDF-D0;
+	Mon, 21 Jul 2025 11:20:05 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: [PATCH 0/7] KVM: arm64: FEAT_RASv1p1 support and RAS selection
+Date: Mon, 21 Jul 2025 11:19:48 +0100
+Message-Id: <20250721101955.535159-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Sun, 20 Jul 2025 18:39:38 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu
- <yuzenghui@huawei.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Filter out HCR_EL2.VSE when running in
- hypervisor context
-In-Reply-To: <20250720113334.218099-1-maz@kernel.org>
-References: <20250720113334.218099-1-maz@kernel.org>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <7e78eca5652baa9f0fefd4242066c966@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, stable@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025-07-20 12:33, Marc Zyngier wrote:
-> HCR_EL2.VSE is delivering a virtual SError to the guest, and does not
-> affect EL2 itself. However, when computing the host's HCR_EL2 value,
-> we take the guest's view of HCR_EL2.VSE at face value, and apply it
-> irrespective of the guest's exception level we are returning to.
-> 
-> The result is that a L1 hypervisor injecting a virtual SError to an L2
-> by setting its HCR_EL2.VSE to 1 results in itself getting the SError
-> as if it was a physical one if it traps for any reason before returning
-> to L2.
-> 
-> Fix it by filtering HCR_EL2.VSE out when entering the L1 host context.
-> 
-> Fixes: 04ab519bb86df ("KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-> ---
->  arch/arm64/kvm/hyp/vhe/switch.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c 
-> b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 477f1580ffeaa..eddda649d9ee1 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -68,6 +68,9 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
->  		if (!vcpu_el2_e2h_is_set(vcpu))
->  			hcr |= HCR_NV1;
-> 
-> +		/* Virtual SErrors only apply to L2, not L1 */
-> +		guest_hcr &= ~HCR_VSE;
-> +
->  		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
->  	} else {
->  		host_data_clear_flag(VCPU_IN_HYP_CONTEXT);
+As I was debugging some RAS-related issues[1], I realised that:
 
-Actually, a better fix would be just nuke any bit that doesn't affect
-the HYP context. And that's almost all of them, bar the RES1 bits.
+- My test box is implementing RASv1p1
 
-I'll repost something once I am done dealing with the rest of the RAS
-enabling stuff.
+- We unconditionally advertise it to guests
 
-         M.
+- Issuing RASv1p1 accesses doesn't end very well
+
+- [...]
+
+- Profit?
+
+The overall goal of this is to allow the RAS support to be downgraded
+to not much, as we're not implementing anything interesting yet, while
+still offering the appearance of architecture compliance up to RASv1p1
+(everything is RAZ/WI). Along the way, we plug the most glaring holes
+(HCR_EL2 bits propagated at the wrong spot, HCR_EL2.FIEN not being
+filtered out).
+
+Unusually, this is on top of the DoubleFault2 series, as this is where
+the problems started.
+
+[1] https://lore.kernel.org/r/87tt37ulvf.wl-maz@kernel.org
+
+Marc Zyngier (7):
+  arm64: Add capability denoting FEAT_RASv1p1
+  KVM: arm64: Filter out HCR_EL2 bits when running in hypervisor context
+  KVM: arm64: Make RAS registers UNDEF when RAS isn't advertised
+  KVM: arm64: Handle RASv1p1 registers
+  KVM: arm64: Ignore HCR_EL2.FIEN set by L1 guest's EL2
+  KVM: arm64: Expose FEAT_RASv1p1 in a canonical manner
+  KVM: arm64: Make ID_AA64PFR0_EL1.RAS writable
+
+ arch/arm64/kernel/cpufeature.c  | 24 ++++++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c | 19 +++++++++--
+ arch/arm64/kvm/sys_regs.c       | 56 +++++++++++++++++++++++++++------
+ arch/arm64/tools/cpucaps        |  1 +
+ 4 files changed, 88 insertions(+), 12 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.39.2
+
