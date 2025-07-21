@@ -1,116 +1,109 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A7B2D373C
-	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 12:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500DD29E118
+	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 12:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753100558; cv=none; b=H3NfBGFwVHcMRTiIHqvZ+cp8oYUULIgxqdBfIcKbdxVH7GrScz0Op5jk6cdRe/TuEbBTIK67kzNb6E6jPlNV1j9yHlydvINe3Xrs+gh6mRtQevlKfcZMun5tkRgihKNuscD0F2lwUjmG+B2Ql3cVpobAMCmEPQVIEzWwsKSG+t8=
+	t=1753101145; cv=none; b=W7EjtD5NGsxg3LAzqCUJEoSi6BGY3mus93wHqCsAMdETs/btvoCta0STLzZLH/XCfFNTlsnuxovR3Vh4KdGkKw3ofl83fw7DmIP5H40gVH4TkbbB9W0781Os/2GWF/jvYe0O9lSj0DZyOg2KlAndbVF/EiWZAr6JbpZg0/R1z4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753100558; c=relaxed/simple;
-	bh=3C686h11jQ44cFqomlzZu2sYzUWPMKguhYLmZCUvRLM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G/Vs8eVT867MFhKom+F6UgXUnC86M23AZ5W9WeOzNOpbq0bSN941TBDH4z5MS7D3gX8k2k1UOJqUU5VU8wx/1DyMvytALBJhoOgnUIUECf65tP4yuQh+rFEHEi1bFnIRu0cEDnlR+e5i/HfIuqo8u4qtsKhC3xv+2uACUv5LHQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OxgnHD8G; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1753101145; c=relaxed/simple;
+	bh=ul28miSROjJXSzdS0Tc5CismYK18zOwVaBWkf5votxM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=bppbXviWEsnkY+f4KUJP7sxuiBDmz/4NXmbQY5VqW4JL69eg/OUw54b9ISMLI7EqKNAUVeyppLFQyvbdScwnNGH6y/J08XV2HNKnDLwO21D6eXQr5Istn1WWK3sxKnWDMpSL4aiSXDczEOcSKqgNMii5DWbc5dTKtWrBvaEfdxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XOXx8EbW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OxgnHD8G"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753100557; x=1784636557;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3C686h11jQ44cFqomlzZu2sYzUWPMKguhYLmZCUvRLM=;
-  b=OxgnHD8GAYxCx/uYKAhJqWwjBOmkgg7qXSaViR8/qCZDP1s/Dpy5EhOT
-   EzF7jjWJz2kEYRK0+WD6kTDmiMvzhqkKUZQHP4lCd7pfHSRgRgSlhVqa3
-   2h3nHyaPKZffGveoukI9AX9EovwmuTCqMTC//UGXxUbB1o0zC0ve9EnJc
-   WQ2EYkKIDGvtzsS7kD/ODZRy+wLULoajJ2W9lAq0fl8KEdR+7MTwGXs+7
-   /nDo1kA8pRBtM+DX4G7Z7gsijMw9kTlW/wVUN+hBJQNzbTti8PmKcfWHw
-   hjrOM9a30T0ulcmdXV2ZP95PN4uECHc86KHR9TP+W3AoRhkQjf6pZUQYK
-   g==;
-X-CSE-ConnectionGUID: 2C/rAKZ0QO6oWBC7PTuIRA==
-X-CSE-MsgGUID: CamrzmfySt+88JzHsozFPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11499"; a="65572953"
-X-IronPort-AV: E=Sophos;i="6.16,329,1744095600"; 
-   d="scan'208";a="65572953"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 05:22:36 -0700
-X-CSE-ConnectionGUID: 51MCPWwhTyuKi4jjJP9s+Q==
-X-CSE-MsgGUID: 4PAEh2SPTSe+Evo/JBggNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,329,1744095600"; 
-   d="scan'208";a="163048713"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2025 05:22:22 -0700
-Message-ID: <505a30a3-4c55-434c-86a5-f86d2e9dc78a@intel.com>
-Date: Mon, 21 Jul 2025 20:22:19 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XOXx8EbW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753101141;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F6yVoIizskpBbKdog3ktrLxGca0R5J425gZKVF8sBm8=;
+	b=XOXx8EbWpbSXn6JhlFsp3dFxTTnQNlN03srRbimsrAjdVRTExyN1OvNsLIdVdVnMexrNc3
+	JP+E4vVTbt1TXOluuHqO3zO71VmCDyJZFSPl4CJMvggTuFuuxR19bf8dXoWoPUt3fNhpma
+	uyGWWFt34Bb+cCMH/PPvW1XDEu3H9D8=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-lsDY9m-DMzyRevcE2smU0A-1; Mon,
+ 21 Jul 2025 08:32:15 -0400
+X-MC-Unique: lsDY9m-DMzyRevcE2smU0A-1
+X-Mimecast-MFC-AGG-ID: lsDY9m-DMzyRevcE2smU0A_1753101133
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 20FBC19560BB;
+	Mon, 21 Jul 2025 12:32:13 +0000 (UTC)
+Received: from localhost (pixel-6a.str.redhat.com [10.33.192.205])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B51D30001BC;
+	Mon, 21 Jul 2025 12:32:11 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui
+ Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>
+Subject: Re: [PATCH 6/7] KVM: arm64: Expose FEAT_RASv1p1 in a canonical manner
+In-Reply-To: <20250721101955.535159-7-maz@kernel.org>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Avril Crosse O'Flaherty"
+References: <20250721101955.535159-1-maz@kernel.org>
+ <20250721101955.535159-7-maz@kernel.org>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 21 Jul 2025 14:32:08 +0200
+Message-ID: <87seip67xz.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 14/21] KVM: x86: Enable guest_memfd mmap for default
- VM type
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
- amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-15-tabba@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250717162731.446579-15-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> +/*
-> + * CoCo VMs with hardware support that use guest_memfd only for backing private
-> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
-> + */
-> +#define kvm_arch_supports_gmem_mmap(kvm)		\
-> +	(IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP) &&	\
-> +	 (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM)
+On Mon, Jul 21 2025, Marc Zyngier <maz@kernel.org> wrote:
 
-I want to share the findings when I do the POC to enable gmem mmap in QEMU.
+> If we have RASv1p1 on the host, advertise it to the guest in the
+> "canonical way", by setting ID_AA64PFR0_EL1 to V1P1, rather than
+> the convoluted RAS+RAS_frac method.
 
-Actually, QEMU can use gmem with mmap support as the normal memory even 
-without passing the gmem fd to kvm_userspace_memory_region2.guest_memfd 
-on KVM_SET_USER_MEMORY_REGION2.
+Don't the two methods have slightly different semantics with RAS == V1P1
+possibly implying FEAT_DoubleFault, and RAS+RAS_frac not?
 
-Since the gmem is mmapable, QEMU can pass the userspace addr got from 
-mmap() on gmem fd to kvm_userspace_memory_region(2).userspace_addr. It 
-works well for non-coco VMs on x86.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 9fb2812106cb0..549766d7abca8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1800,6 +1800,15 @@ static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  	if (!vcpu_has_sve(vcpu))
+>  		val &= ~ID_AA64PFR0_EL1_SVE_MASK;
+>  
+> +	/*
+> +	 * Describe RASv1p1 in a canonical way -- ID_AA64PFR1_EL1.RAS_frac
+> +	 * is cleared separately.
+> +	 */
+> +	if (cpus_have_final_cap(ARM64_HAS_RASV1P1_EXTN)) {
+> +		val &= ~ID_AA64PFR0_EL1_RAS;
+> +		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, RAS, V1P1);
+> +	}
+> +
+>  	/*
+>  	 * The default is to expose CSV2 == 1 if the HW isn't affected.
+>  	 * Although this is a per-CPU feature, we make it global because
+> -- 
+> 2.39.2
 
-Then it seems feasible to use gmem with mmap for the shared memory of 
-TDX, and an additional gmem without mmap for the private memory. i.e.,
-For struct kvm_userspace_memory_region, the @userspace_addr is passed 
-with the uaddr returned from gmem0 with mmap, while @guest_memfd is 
-passed with another gmem1 fd without mmap.
-
-However, it fails actually, because the kvm_arch_suports_gmem_mmap() 
-returns false for TDX VMs, which means userspace cannot allocate gmem 
-with mmap just for shared memory for TDX.
-
-SO my question is do we want to support such case?
