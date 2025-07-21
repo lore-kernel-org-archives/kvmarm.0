@@ -1,166 +1,886 @@
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B48242D60
-	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 22:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975DF224AF9
+	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 23:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753137827; cv=none; b=nUtz5pYQXe59ADeN2EKtk9DU55jtfIb8LtRCMyU0kLYxkM1nSUMU3zAhSY6UNGF3ox7buidis2HrsE9B7gUSTOFCXOlxW81v78bYPVZ2loajL3v8hxXRcPoS/85sz3jSgSuNITpt6Z36zzqrg1OlMVpQdapqx27pnE9gBSSqpVY=
+	t=1753139848; cv=none; b=ghCwc7q9MYf2h1+Tfdt/g+c3ZpReH/4l0rJQKetbPWU/8f3uEhOillKgEkSoh51CfIArBKIap6lScNkqSi1hn2S4d03JQawAoMwOAj/J+DkkOVjF27DiGBWZUJr2D6gJxcDK8a5pADZNkL4b+TAv0bznyrnv8rAgCiCrxHMi6Mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753137827; c=relaxed/simple;
-	bh=7vCPTSGyCLREhkwADBBcRHlYWjmofVT+oCRCxeLlj8g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y5ekhwf6rKnqg0mohCPYEtlbNdurV7JzIlyxQf+oUMVUK64LkNBrWMfF6QF9a8VEANCid5eZMBmC9kpiT0tbdsOv7ONGUZaZQ0SucXhrwx/rXygoflAmT5S7J0J+Nq0V+0nVOTdpFzEiyFj1avKeYtWwIMJtKzlVLJWjanYrVug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=immunant.com; spf=none smtp.mailfrom=immunant.com; dkim=pass (2048-bit key) header.d=immunant-com.20230601.gappssmtp.com header.i=@immunant-com.20230601.gappssmtp.com header.b=EDcRpBpN; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=immunant.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=immunant.com
+	s=arc-20240116; t=1753139848; c=relaxed/simple;
+	bh=OKZZDT0xtWqQ79+WUoRdSY13estr6zaWYRIvETj5C+M=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=doV0TCpespQrtkW80URN4EpKy9FGwTAUXEO4fWS5CGOaBOeATGcf8l6y45I6dsqjwUZ8nY4BH115F1DsTusS4hM0sQViGyreZaLjDJPRORtZznoL4iU3PC+w9wcy1hXLA7XtwXH7qulPUNLgUogpTMJWyNJvhv/TXJxLjuxsf8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pdhQWdBh; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=immunant-com.20230601.gappssmtp.com header.i=@immunant-com.20230601.gappssmtp.com header.b="EDcRpBpN"
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e7311e66a8eso3960522276.2
-        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 15:43:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pdhQWdBh"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313c3915345so6882074a91.3
+        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 16:17:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=immunant-com.20230601.gappssmtp.com; s=20230601; t=1753137825; x=1753742625; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YDLiz8FMfzrfsb7Xo3AVv+D+VOndCOPqvNkFpYC+ujA=;
-        b=EDcRpBpNV7R5aMEn0HlxeBtYRQJwTr3FK3rofFRfKFPnF5CGX05e7G5QVLxtiRkmnJ
-         g6izVkOkavRi2OJyxHfsKzbZljFGq6xGSIbfQLuMwnA8pFmXVJGMOb0+OV+vcZqkzoHE
-         XE+XOTvaBfZaeHtDvF6ihSWJzHj6Tw0h7ZycXvvEXEt8wSsNBsHo09i5nyr6djVq35En
-         IfVpDRWwIYAmhL8UHKEdUINnrtFYgw1dH+algQeHnf00lCF582mQO/uD9V5wX84op932
-         b5tMDaQfgoMdBxwWfM9AqnTpXJ36tqbBczrtyguL5DpzAsNhosd9SKBNZ60DbcrdfO2t
-         s9bA==
+        d=google.com; s=20230601; t=1753139844; x=1753744644; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7cuSsFUNsSOrztQSkezq30RYVxqQmX1a26HKe97K8No=;
+        b=pdhQWdBhs5z9D9Ka4K4Cxn6jzI4w7aDHDV+j2tcDf8JYqZiUPRfrp0XK4Teilpq9V7
+         Rqd1sH0Cr+uE4OHD93mWQKsmeyP7t2oCG5FILMNoY+NQF5G4+YrGCa2OPwNMfjtg5N9Z
+         6V14VXr1AyEiFs3mnVGuAwRzUGqLbFuzQtJiO2TztVX/k+E1/KZf92txrY3H4DQUZzER
+         p8HQyYHyu8xg00p4ced16UpE4jra1MTuIfRDKEag2Gij18ni6OS/3NyMIHlzYAf99VTz
+         deSsnAS8WvNFM+13Xu9z3qfdOSyDdeBQu9afmjElCjZa4R5Vz5DYH9FQ/EJXzkolWtS3
+         MRgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753137825; x=1753742625;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YDLiz8FMfzrfsb7Xo3AVv+D+VOndCOPqvNkFpYC+ujA=;
-        b=BchtXAVKej7qDb+gG5yCXaaXdzfzFCfGqSSgd1txLiL2FHvOc9m1ktldE6rCeoqcVd
-         aKSPcHD42j/qZB9qBaAfGy533ZA4UQknMnlX1x1tA6ZkqBsBwqSVl1ITfxa6INP+2Fnc
-         gcsSgb3rH/HZhuJI7kF0CeJJBei5pmGeVymeD2ODG63ivaDDeCf/BfwnaczRd5MTBs9T
-         P+KHWUum1n/zvrwPyZWkiE140cxmvU6Tb/wvAg7wKlPliYQDJsw27pa8o9mSfu4fLqIr
-         D4Q9db6Iaxe0OGYnrmURjnrZS7ZwApIW3aSeTVkUt54DuxTi0eQVeRDiQcb6Jda2CiwM
-         m6yw==
-X-Forwarded-Encrypted: i=1; AJvYcCU8lwio404pKCo1hp/gaSXdO9jP9+tZIN3oQJiU+oBq8vwLlXuosxKDD4yxyVQayvjDxUtegrk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwtoWtQxlq0Aky4HpDp/mGIj8Wfs9wQx0dqjsumOXoZKuzGx9Pj
-	sZDnuiQ8eXBHlWb+e/r3DTipdOf+nPSXZac2hP5Nty8D56miNHF5BeuA1kFjvttzGHI=
-X-Gm-Gg: ASbGncsK3nZvKlMnN4RAanOJgf1WaBILHuwG8fiDktVAzAbHGb5VLlFe2nm/HYU80/2
-	bLuVWeBejGnW2M8/Sm7ueVnmm8DpjylwO0HHLULVpdfUGS7vFsWWc84HTGXAlNAK6EZy2BTNHnK
-	p0aoD4GdX0i5eao01AyadjWmndCV5UuFIdKIC7t8dOHFE4KC/1bazBkIYSMzT9GLdyfHhNv2+UZ
-	t5ipAE+BPGsc1zbeRNQxab8fvLpuPwjMwsg0/09vxJxFrZu/k0MzJlRKOhfNw++QOVB/fog34N9
-	/kE0O8xyfN6REQU4cUv+DEKU7O2s5YRkqP2d2ovPBJYvFuadPssR8MGSaBg6elGH8jBUW9lgHi9
-	gvvseP0xQy9zTKE7jvfd5/GdPKw==
-X-Google-Smtp-Source: AGHT+IEpyRag75hc7wIz2NAkH4ib5Oe2/59jHMeOSeAr7Vhqgp5XGFfjMhc7CtftjhemnWwEjA2myQ==
-X-Received: by 2002:a05:6902:2190:b0:e87:bdbe:103b with SMTP id 3f1490d57ef6-e8bc2433f8dmr26729859276.5.1753137824850;
-        Mon, 21 Jul 2025 15:43:44 -0700 (PDT)
-Received: from [10.10.1.14] ([12.9.190.3])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e8d7ce0e246sm2864343276.28.2025.07.21.15.43.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jul 2025 15:43:44 -0700 (PDT)
-Message-ID: <25ba5929-79c0-40b8-b529-79a37914605d@immunant.com>
-Date: Mon, 21 Jul 2025 15:43:42 -0700
+        d=1e100.net; s=20230601; t=1753139844; x=1753744644;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7cuSsFUNsSOrztQSkezq30RYVxqQmX1a26HKe97K8No=;
+        b=Y9Ze0hvwci5YnM8lrrTcWzDTJcbyQh8NxupwqYMA0ln4X7b7pk3Zcw0oNV4pijvxFt
+         Hh/6z07I8dqWOIIiv3TyTJOunyHzM+5WcGLyD9y9p9dD311WZDHihFW4xgdRDtevCWSV
+         r99gryliOFImzxp/c7VYyySfOfxgTyddssm2cOuNwmElvTYDs1MsKmMQgxf7uad0w0wv
+         +zycU7gt/7xfjKF2aCNUH55IlQoXgiGuSRZEHF8I7fNlQcu1/ybojhJGxbyYgNc4747X
+         V+sKs2R2dio2nCikE5vpQsY7cbgg+rVP3jcourvguM0wzYnmopx9/xnCE6zSvwOWwJgT
+         O1YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXwCmaw4uKVbue8UECGl05EoYpg1MZsjY3iQpIqTCZrUewSRU1r/IAPrOmlsKDY64vu3FTz9PQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx6svnQFgwZf2xOoKVwZauQHqRJDakfJwKXnD4tchLm9qeZQ9HM
+	1B6EhCcS+4U0lOvLayWD0L3K/gnBW7EzhjgZN6v9AANGUEnZ5G4aHJnCpPsIvjGLmE9P7RfGQJ3
+	5QnRHRA==
+X-Google-Smtp-Source: AGHT+IHAYzIZ1VFh15P8SYfAvAgswy7LRXJgzD44aaJ5MGCu6oteznQTVpzZUFGwvbhHACZaD/jsn13TO9I=
+X-Received: from pjboh16.prod.google.com ([2002:a17:90b:3a50:b0:301:1bf5:2f07])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c4f:b0:308:7270:d6ea
+ with SMTP id 98e67ed59e1d1-31caf91a2bamr22683304a91.30.1753139843810; Mon, 21
+ Jul 2025 16:17:23 -0700 (PDT)
+Date: Mon, 21 Jul 2025 16:17:22 -0700
+In-Reply-To: <8340ec70-1c44-47a7-8c48-89e175501e89@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 5/5] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in
- host handler
-To: Will Deacon <will@kernel.org>, perlarsen@google.com
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Sudeep Holla <sudeep.holla@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, ahomescu@google.com, armellel@google.com,
- arve@android.com, ayrton@google.com, qperret@google.com,
- sebastianene@google.com, qwandor@google.com
-References: <20250701-virtio-msg-ffa-v7-0-995afc3d385e@google.com>
- <20250701-virtio-msg-ffa-v7-5-995afc3d385e@google.com>
- <aHpRvBO864x1vvqP@willie-the-truck>
-Content-Language: en-US
-From: Per Larsen <perl@immunant.com>
-In-Reply-To: <aHpRvBO864x1vvqP@willie-the-truck>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-12-tabba@google.com>
+ <8340ec70-1c44-47a7-8c48-89e175501e89@intel.com>
+Message-ID: <aH7KghhsjaiIL3En@google.com>
+Subject: Re: [PATCH v15 11/21] KVM: x86/mmu: Allow NULL-able fault in kvm_max_private_mapping_level
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: multipart/mixed; charset="UTF-8"; boundary="BMscoaM2JkyRXR0e"
 
 
+--BMscoaM2JkyRXR0e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 7/18/25 6:53 AM, Will Deacon wrote:
-> On Tue, Jul 01, 2025 at 10:06:38PM +0000, Per Larsen via B4 Relay wrote:
->> From: Per Larsen <perlarsen@google.com>
->>
->> FF-A 1.2 adds the DIRECT_REQ2 messaging interface which is similar to
->> the existing FFA_MSG_SEND_DIRECT_{REQ,RESP} functions except that it
->> uses the SMC calling convention v1.2 which allows calls to use x4-x17 as
->> argument and return registers. Add support for FFA_MSG_SEND_DIRECT_REQ2
->> in the host ffa handler.
->>
->> Signed-off-by: Per Larsen <perlarsen@google.com>
->> ---
->>   arch/arm64/kvm/hyp/nvhe/ffa.c | 24 +++++++++++++++++++++++-
->>   include/linux/arm_ffa.h       |  2 ++
->>   2 files changed, 25 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
->> index 79d834120a3f3d26e17e9170c60012b60c6f5a5e..21225988a9365219ccfd69e8e599d7403b5cdf05 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
->> @@ -679,7 +679,6 @@ static bool ffa_call_supported(u64 func_id)
->>   	case FFA_NOTIFICATION_GET:
->>   	case FFA_NOTIFICATION_INFO_GET:
->>   	/* Optional interfaces added in FF-A 1.2 */
->> -	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
+On Fri, Jul 18, 2025, Xiaoyao Li wrote:
+> On 7/18/2025 12:27 AM, Fuad Tabba wrote:
+> > From: Ackerley Tng <ackerleytng@google.com>
+> > 
+> > Refactor kvm_max_private_mapping_level() to accept a NULL kvm_page_fault
+> > pointer and rename it to kvm_gmem_max_mapping_level().
+> > 
+> > The max_mapping_level x86 operation (previously private_max_mapping_level)
+> > is designed to potentially be called without an active page fault, for
+> > instance, when kvm_mmu_max_mapping_level() is determining the maximum
+> > mapping level for a gfn proactively.
+> > 
+> > Allow NULL fault pointer: Modify kvm_max_private_mapping_level() to
+> > safely handle a NULL fault argument. This aligns its interface with the
+> > kvm_x86_ops.max_mapping_level operation it wraps, which can also be
+> > called with NULL.
 > 
-> I think that's the only change needed. In fact, maybe just don't add it
-> in the earlier patch?
+> are you sure of it?
 > 
->>   	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
->>   	case FFA_CONSOLE_LOG:			/* Optional per 13.1: not in Table 13.1 */
->>   	case FFA_PARTITION_INFO_GET_REGS:	/* Optional for virtual instances per 13.1 */
->> @@ -862,6 +861,22 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
->>   	hyp_spin_unlock(&host_buffers.lock);
->>   }
->>   
->> +static void do_ffa_direct_msg2(struct arm_smccc_1_2_regs *regs,
->> +			       struct kvm_cpu_context *ctxt,
->> +			       u64 vm_handle)
->> +{
->> +	DECLARE_REG(u32, endp, ctxt, 1);
->> +
->> +	struct arm_smccc_1_2_regs *args = (void *)&ctxt->regs.regs[0];
->> +
->> +	if (FIELD_GET(FFA_SRC_ENDPOINT_MASK, endp) != vm_handle) {
->> +		ffa_to_smccc_error(regs, FFA_RET_INVALID_PARAMETERS);
->> +		return;
->> +	}
+> The patch 09 just added the check of fault->is_private for TDX and SEV.
+
++1, this isn't quite right.  That's largely my fault (no pun intended) though, as
+I suggested the basic gist of the NULL @fault handling, and it's a mess.  More at
+the bottom.
+
+> > Rename function to kvm_gmem_max_mapping_level(): This reinforces that
+> > the function's scope is for guest_memfd-backed memory, which can be
+> > either private or non-private, removing any remaining "private"
+> > connotation from its name.
+> > 
+> > Optimize max_level checks: Introduce a check in the caller to skip
+> > querying for max_mapping_level if the current max_level is already
+> > PG_LEVEL_4K, as no further reduction is possible.
+> > 
+> > Acked-by: David Hildenbrand <david@redhat.com>
+> > Suggested-by: Sean Christoperson <seanjc@google.com>
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c | 16 +++++++---------
+> >   1 file changed, 7 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index bb925994cbc5..6bd28fda0fd3 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4467,17 +4467,13 @@ static inline u8 kvm_max_level_for_order(int order)
+> >   	return PG_LEVEL_4K;
+> >   }
+> > -static u8 kvm_max_private_mapping_level(struct kvm *kvm,
+> > -					struct kvm_page_fault *fault,
+> > -					int gmem_order)
+> > +static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
+> > +				     struct kvm_page_fault *fault)
+> >   {
+> > -	u8 max_level = fault->max_level;
+> >   	u8 req_max_level;
+> > +	u8 max_level;
+> > -	if (max_level == PG_LEVEL_4K)
+> > -		return PG_LEVEL_4K;
+> > -
+> > -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+> > +	max_level = kvm_max_level_for_order(order);
+> >   	if (max_level == PG_LEVEL_4K)
+> >   		return PG_LEVEL_4K;
+> > @@ -4513,7 +4509,9 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
+> >   	}
+> >   	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+> > -	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault, max_order);
+> > +	if (fault->max_level >= PG_LEVEL_4K)
+> > +		fault->max_level = kvm_gmem_max_mapping_level(vcpu->kvm,
+> > +							      max_order, fault);
 > 
-> Why do we care about checking the src id? We don't check that for
-> FFA_MSG_SEND_DIRECT_REQ and I don't think we need to care about it here
-> either.
-FFA_MSG_SEND_DIRECT_REQ is handled by do_ffa_direct_msg [0] (in the 
-android common kernels, I'm not aware of efforts to upstream this).
+> I cannot understand why this change is required. In what case will
+> fault->max_level < PG_LEVEL_4K?
 
-I patterned the check in do_ffa_direct_msg2 off the checking done in 
-do_ffa_direct_msg. I pressume your reasoning is that this check can
-never fail since we pass in HOST_FFA_ID in kvm_host_ffa_handler. My
-thinking was that we do need to validate the source ID once we start
-using this function for requests that come from a guest VM. I could
-of course add the check in an android-specific patch, WDYT is best?
+Yeah, I don't get this code either.  I also don't think KVM should call
+kvm_gmem_max_mapping_level() *here*.  That's mostly a problem with my suggested
+NULL @fault handling.  Dealing with kvm_gmem_max_mapping_level() here leads to
+weirdness, because kvm_gmem_max_mapping_level() also needs to be invoked for the
+!fault path, and then we end up with multiple call sites and the potential for a
+redundant call (gmem only, is private).
 
-Also note that since do_ffa_direct_msg was switched to use SMCCC 1.2, I 
-think it can handle both FFA_MSG_SEND_DIRECT_REQ and 
-FFA_MSG_SEND_DIRECT_REQ2. If you agree, should we upstream 
-do_ffa_direct_msg and use it to handle both of these direct requests?
+Looking through surrounding patches, the ordering of things is also "off".
+"Generalize private_max_mapping_level x86 op to max_mapping_level" should just
+rename the helper; reacting to !is_private memory in TDX belongs in "Consult
+guest_memfd when computing max_mapping_level", because that's where KVM plays
+nice with non-private memory.
 
-[0] 
-https://cs.android.com/android/kernel/superproject/+/common-android16-6.12:common/arch/arm64/kvm/hyp/nvhe/ffa.c;l=1446
+But that patch is also doing too much, e.g. shuffling code around and short-circuting
+the non-fault case, which makes it confusing and hard to review.  Extending gmem
+hugepage support to shared memory should be "just" this:
 
-Thanks,
-Per
+@@ -3335,8 +3336,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+        if (max_level == PG_LEVEL_4K)
+                return PG_LEVEL_4K;
+ 
+-       if (is_private)
+-               host_level = kvm_max_private_mapping_level(kvm, fault, slot, gfn);
++       if (is_private || kvm_memslot_is_gmem_only(slot))
++               host_level = kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
++                                                       is_private);
+        else
+                host_level = host_pfn_mapping_level(kvm, gfn, slot);
+        return min(host_level, max_level);
+
+plus the plumbing and the small TDX change.  All the renames and code shuffling
+should be done in prep patches.
+
+The attached patches are compile-tested only, but I think they get use where we
+want to be, and without my confusing suggestion to try and punt on private mappings
+in the hugepage recovery paths.  They should slot it at the right patch numbers
+(relative to v15).
+
+Holler if the patches don't work, I'm happy to help sort things out so that v16
+is ready to go.
+
+--BMscoaM2JkyRXR0e
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0010-KVM-x86-mmu-Rename-.private_max_mapping_level-to-.gm.patch"
+
+From 10fc898f91ded6942f7db2c3b91acaaffd3a56ca Mon Sep 17 00:00:00 2001
+From: Ackerley Tng <ackerleytng@google.com>
+Date: Thu, 17 Jul 2025 17:27:20 +0100
+Subject: [PATCH 10/23] KVM: x86/mmu: Rename .private_max_mapping_level() to
+ .gmem_max_mapping_level()
+
+Rename kvm_x86_ops.private_max_mapping_level() to .gmem_max_mapping_level()
+in anticipation of extending guest_memfd support to non-private memory.
+
+No functional change intended.
+
+Suggested-by: Sean Christoperson <seanjc@google.com>
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+Signed-off-by: Fuad Tabba <tabba@google.com>
+[sean: rename only, rewrite changelog accordingly]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm-x86-ops.h | 2 +-
+ arch/x86/include/asm/kvm_host.h    | 2 +-
+ arch/x86/kvm/mmu/mmu.c             | 2 +-
+ arch/x86/kvm/svm/sev.c             | 2 +-
+ arch/x86/kvm/svm/svm.c             | 2 +-
+ arch/x86/kvm/svm/svm.h             | 4 ++--
+ arch/x86/kvm/vmx/main.c            | 6 +++---
+ arch/x86/kvm/vmx/tdx.c             | 2 +-
+ arch/x86/kvm/vmx/x86_ops.h         | 2 +-
+ 9 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 8d50e3e0a19b..17014d50681b 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -146,7 +146,7 @@ KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+ KVM_X86_OP_OPTIONAL(get_untagged_addr)
+ KVM_X86_OP_OPTIONAL(alloc_apic_backing_page)
+ KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
+-KVM_X86_OP_OPTIONAL_RET0(private_max_mapping_level)
++KVM_X86_OP_OPTIONAL_RET0(gmem_max_mapping_level)
+ KVM_X86_OP_OPTIONAL(gmem_invalidate)
+ 
+ #undef KVM_X86_OP
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 938b5be03d33..1569520e84d2 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1907,7 +1907,7 @@ struct kvm_x86_ops {
+ 	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+ 	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+ 	void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
+-	int (*private_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn);
++	int (*gmem_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn);
+ };
+ 
+ struct kvm_x86_nested_ops {
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 213904daf1e5..c5919fca9870 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4479,7 +4479,7 @@ static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+ 	if (max_level == PG_LEVEL_4K)
+ 		return PG_LEVEL_4K;
+ 
+-	req_max_level = kvm_x86_call(private_max_mapping_level)(kvm, pfn);
++	req_max_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
+ 	if (req_max_level)
+ 		max_level = min(max_level, req_max_level);
+ 
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 687392c5bf5d..81974ae2bc8c 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -4906,7 +4906,7 @@ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
+ 	}
+ }
+ 
+-int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+ {
+ 	int level, rc;
+ 	bool assigned;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d1c484eaa8ad..477dc1e3c622 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -5347,7 +5347,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 
+ 	.gmem_prepare = sev_gmem_prepare,
+ 	.gmem_invalidate = sev_gmem_invalidate,
+-	.private_max_mapping_level = sev_private_max_mapping_level,
++	.gmem_max_mapping_level = sev_gmem_max_mapping_level,
+ };
+ 
+ /*
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index e6f3c6a153a0..bd7445e0b521 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -787,7 +787,7 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
+ int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
+-int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
++int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
+ struct vmcb_save_area *sev_decrypt_vmsa(struct kvm_vcpu *vcpu);
+ void sev_free_decrypted_vmsa(struct kvm_vcpu *vcpu, struct vmcb_save_area *vmsa);
+ #else
+@@ -816,7 +816,7 @@ static inline int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, in
+ 	return 0;
+ }
+ static inline void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end) {}
+-static inline int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++static inline int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+ {
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index d1e02e567b57..0c5b66edbf49 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -871,10 +871,10 @@ static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	return tdx_vcpu_ioctl(vcpu, argp);
+ }
+ 
+-static int vt_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++static int vt_gmem_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+ {
+ 	if (is_td(kvm))
+-		return tdx_gmem_private_max_mapping_level(kvm, pfn);
++		return tdx_gmem_gmem_max_mapping_level(kvm, pfn);
+ 
+ 	return 0;
+ }
+@@ -1044,7 +1044,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.mem_enc_ioctl = vt_op_tdx_only(mem_enc_ioctl),
+ 	.vcpu_mem_enc_ioctl = vt_op_tdx_only(vcpu_mem_enc_ioctl),
+ 
+-	.private_max_mapping_level = vt_op_tdx_only(gmem_private_max_mapping_level)
++	.gmem_max_mapping_level = vt_op_tdx_only(gmem_gmem_max_mapping_level)
+ };
+ 
+ struct kvm_x86_init_ops vt_init_ops __initdata = {
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index a3db6df245ee..d867a210eba0 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -3322,7 +3322,7 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	return ret;
+ }
+ 
+-int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++int tdx_gmem_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+ {
+ 	return PG_LEVEL_4K;
+ }
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index b4596f651232..26c6de3d775c 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -163,7 +163,7 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
+ void tdx_flush_tlb_all(struct kvm_vcpu *vcpu);
+ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+-int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
++int tdx_gmem_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
+ #endif
+ 
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
+-- 
+2.50.0.727.gbf7dc18ff4-goog
 
 
+--BMscoaM2JkyRXR0e
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0011-KVM-x86-mmu-Hoist-guest_memfd-max-level-order-helper.patch"
 
+From 2ff69e6ce989468cb0f86b85ecbc94e2316f0096 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Mon, 21 Jul 2025 14:30:51 -0700
+Subject: [PATCH 11/23] KVM: x86/mmu: Hoist guest_memfd max level/order helpers
+ "up" in mmu.c
+
+Move kvm_max_level_for_order() and kvm_max_private_mapping_level() up in
+mmu.c so that they can be used by __kvm_mmu_max_mapping_level().
+
+Opportunistically drop the "inline" from kvm_max_level_for_order().
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 72 +++++++++++++++++++++---------------------
+ 1 file changed, 36 insertions(+), 36 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c5919fca9870..9a0c9b9473d9 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3258,6 +3258,42 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
+ 	return level;
+ }
+ 
++static u8 kvm_max_level_for_order(int order)
++{
++	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
++
++	KVM_MMU_WARN_ON(order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G) &&
++			order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M) &&
++			order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_4K));
++
++	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
++		return PG_LEVEL_1G;
++
++	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
++		return PG_LEVEL_2M;
++
++	return PG_LEVEL_4K;
++}
++
++static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
++					u8 max_level, int gmem_order)
++{
++	u8 req_max_level;
++
++	if (max_level == PG_LEVEL_4K)
++		return PG_LEVEL_4K;
++
++	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
++	if (max_level == PG_LEVEL_4K)
++		return PG_LEVEL_4K;
++
++	req_max_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
++	if (req_max_level)
++		max_level = min(max_level, req_max_level);
++
++	return max_level;
++}
++
+ static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
+ 				       const struct kvm_memory_slot *slot,
+ 				       gfn_t gfn, int max_level, bool is_private)
+@@ -4450,42 +4486,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+ 		vcpu->stat.pf_fixed++;
+ }
+ 
+-static inline u8 kvm_max_level_for_order(int order)
+-{
+-	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
+-
+-	KVM_MMU_WARN_ON(order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G) &&
+-			order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M) &&
+-			order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_4K));
+-
+-	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
+-		return PG_LEVEL_1G;
+-
+-	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
+-		return PG_LEVEL_2M;
+-
+-	return PG_LEVEL_4K;
+-}
+-
+-static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+-					u8 max_level, int gmem_order)
+-{
+-	u8 req_max_level;
+-
+-	if (max_level == PG_LEVEL_4K)
+-		return PG_LEVEL_4K;
+-
+-	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+-	if (max_level == PG_LEVEL_4K)
+-		return PG_LEVEL_4K;
+-
+-	req_max_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
+-	if (req_max_level)
+-		max_level = min(max_level, req_max_level);
+-
+-	return max_level;
+-}
+-
+ static void kvm_mmu_finish_page_fault(struct kvm_vcpu *vcpu,
+ 				      struct kvm_page_fault *fault, int r)
+ {
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
+
+--BMscoaM2JkyRXR0e
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0012-KVM-x86-mmu-Enforce-guest_memfd-s-max-order-when-rec.patch"
+
+From 8855789c66546df41744b500caa3207a67d5fbbc Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Mon, 21 Jul 2025 13:44:21 -0700
+Subject: [PATCH 12/23] KVM: x86/mmu: Enforce guest_memfd's max order when
+ recovering hugepages
+
+Rework kvm_mmu_max_mapping_level() to consult guest_memfd (and relevant)
+vendor code when recovering hugepages, e.g. after disabling live migration.
+The flaw has existed since guest_memfd was originally added, but has gone
+unnoticed due to lack of guest_memfd hupepage support.
+
+Get all information on-demand from the memslot and guest_memfd instance,
+even though KVM could pull the pfn from the SPTE.  The max order/level
+needs to come from guest_memfd, and using kvm_gmem_get_pfn() avoids adding
+a new gmem API, and avoids having to retrieve the pfn and plumb it into
+kvm_mmu_max_mapping_level() (the pfn is needed for SNP to consult the RMP).
+
+Note, calling kvm_mem_is_private() in the non-fault path is safe, so long
+as mmu_lock is held, as hugepage recovery operates on shadow-present SPTEs,
+i.e. calling kvm_mmu_max_mapping_level() with @fault=NULL is mutually
+exclusive with kvm_vm_set_mem_attributes() changing the PRIVATE attribute
+of the gfn.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c          | 87 +++++++++++++++++++--------------
+ arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
+ 3 files changed, 52 insertions(+), 39 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 9a0c9b9473d9..1ff7582d5fae 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3275,31 +3275,55 @@ static u8 kvm_max_level_for_order(int order)
+ 	return PG_LEVEL_4K;
+ }
+ 
+-static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+-					u8 max_level, int gmem_order)
++static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
++					const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+-	u8 req_max_level;
++	struct page *page;
++	kvm_pfn_t pfn;
++	u8 max_level;
+ 
+-	if (max_level == PG_LEVEL_4K)
+-		return PG_LEVEL_4K;
++	/* For faults, use the gmem information that was resolved earlier. */
++	if (fault) {
++		pfn = fault->pfn;
++		max_level = fault->max_level;
++	} else {
++		/* TODO: Constify the guest_memfd chain. */
++		struct kvm_memory_slot *__slot = (struct kvm_memory_slot *)slot;
++		int max_order, r;
+ 
+-	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+-	if (max_level == PG_LEVEL_4K)
+-		return PG_LEVEL_4K;
++		r = kvm_gmem_get_pfn(kvm, __slot, gfn, &pfn, &page, &max_order);
++		if (r)
++			return PG_LEVEL_4K;
++
++		if (page)
++			put_page(page);
+ 
+-	req_max_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
+-	if (req_max_level)
+-		max_level = min(max_level, req_max_level);
++		max_level = kvm_max_level_for_order(max_order);
++	}
++
++	if (max_level == PG_LEVEL_4K)
++		return max_level;
+ 
+-	return max_level;
++	return min(max_level,
++		   kvm_x86_call(gmem_max_mapping_level)(kvm, pfn));
+ }
+ 
+-static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
+-				       const struct kvm_memory_slot *slot,
+-				       gfn_t gfn, int max_level, bool is_private)
++int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
++			      const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+ 	struct kvm_lpage_info *linfo;
+-	int host_level;
++	int host_level, max_level;
++	bool is_private;
++
++	lockdep_assert_held(&kvm->mmu_lock);
++
++	if (fault) {
++		max_level = fault->max_level;
++		is_private = fault->is_private;
++	} else {
++		max_level = PG_LEVEL_NUM;
++		is_private = kvm_mem_is_private(kvm, gfn);
++	}
+ 
+ 	max_level = min(max_level, max_huge_page_level);
+ 	for ( ; max_level > PG_LEVEL_4K; max_level--) {
+@@ -3308,25 +3332,16 @@ static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
+ 			break;
+ 	}
+ 
++	if (max_level == PG_LEVEL_4K)
++		return PG_LEVEL_4K;
++
+ 	if (is_private)
+-		return max_level;
+-
+-	if (max_level == PG_LEVEL_4K)
+-		return PG_LEVEL_4K;
+-
+-	host_level = host_pfn_mapping_level(kvm, gfn, slot);
++		host_level = kvm_max_private_mapping_level(kvm, fault, slot, gfn);
++	else
++		host_level = host_pfn_mapping_level(kvm, gfn, slot);
+ 	return min(host_level, max_level);
+ }
+ 
+-int kvm_mmu_max_mapping_level(struct kvm *kvm,
+-			      const struct kvm_memory_slot *slot, gfn_t gfn)
+-{
+-	bool is_private = kvm_slot_has_gmem(slot) &&
+-			  kvm_mem_is_private(kvm, gfn);
+-
+-	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM, is_private);
+-}
+-
+ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+ 	struct kvm_memory_slot *slot = fault->slot;
+@@ -3347,9 +3362,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	 * Enforce the iTLB multihit workaround after capturing the requested
+ 	 * level, which will be used to do precise, accurate accounting.
+ 	 */
+-	fault->req_level = __kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+-						       fault->gfn, fault->max_level,
+-						       fault->is_private);
++	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, fault,
++						     fault->slot, fault->gfn);
+ 	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
+ 		return;
+ 
+@@ -4511,8 +4525,7 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
+ 	}
+ 
+ 	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+-	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault->pfn,
+-							 fault->max_level, max_order);
++	fault->max_level = kvm_max_level_for_order(max_order);
+ 
+ 	return RET_PF_CONTINUE;
+ }
+@@ -7102,7 +7115,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+ 		 * mapping if the indirect sp has level = 1.
+ 		 */
+ 		if (sp->role.direct &&
+-		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn)) {
++		    sp->role.level < kvm_mmu_max_mapping_level(kvm, NULL, slot, sp->gfn)) {
+ 			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
+ 
+ 			if (kvm_available_flush_remote_tlbs_range())
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index db8f33e4de62..21240e4f1b0d 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -408,7 +408,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	return r;
+ }
+ 
+-int kvm_mmu_max_mapping_level(struct kvm *kvm,
++int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+ 			      const struct kvm_memory_slot *slot, gfn_t gfn);
+ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_level);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 7f3d7229b2c1..740cb06accdb 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1813,7 +1813,7 @@ static void recover_huge_pages_range(struct kvm *kvm,
+ 		if (iter.gfn < start || iter.gfn >= end)
+ 			continue;
+ 
+-		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot, iter.gfn);
++		max_mapping_level = kvm_mmu_max_mapping_level(kvm, NULL, slot, iter.gfn);
+ 		if (max_mapping_level < iter.level)
+ 			continue;
+ 
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
+
+--BMscoaM2JkyRXR0e
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0013-KVM-x86-mmu-Extend-guest_memfd-s-max-mapping-level-t.patch"
+
+From 12a1dc374259e82efd19b930bfaf50ecb5ba9800 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Mon, 21 Jul 2025 14:56:50 -0700
+Subject: [PATCH 13/23] KVM: x86/mmu: Extend guest_memfd's max mapping level to
+ shared mappings
+
+Rework kvm_mmu_max_mapping_level() to consult guest_memfd for all mappings,
+not just private mappings, so that hugepage support plays nice with the
+upcoming support for backing non-private memory with guest_memfd.
+
+In addition to getting the max order from guest_memfd for gmem-only
+memslots, update TDX's hook to effectively ignore shared mappings, as TDX's
+restrictions on page size only apply to Secure EPT mappings.  Do nothing
+for SNP, as RMP restrictions apply to both private and shared memory.
+
+Suggested-by: Ackerley Tng <ackerleytng@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/mmu/mmu.c          | 12 +++++++-----
+ arch/x86/kvm/svm/sev.c          |  2 +-
+ arch/x86/kvm/svm/svm.h          |  4 ++--
+ arch/x86/kvm/vmx/main.c         |  7 ++++---
+ arch/x86/kvm/vmx/tdx.c          |  5 ++++-
+ arch/x86/kvm/vmx/x86_ops.h      |  2 +-
+ 7 files changed, 20 insertions(+), 14 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1569520e84d2..ae36973f48a6 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1907,7 +1907,7 @@ struct kvm_x86_ops {
+ 	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+ 	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+ 	void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
+-	int (*gmem_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn);
++	int (*gmem_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn, bool is_private);
+ };
+ 
+ struct kvm_x86_nested_ops {
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 1ff7582d5fae..2d1894ed1623 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3275,8 +3275,9 @@ static u8 kvm_max_level_for_order(int order)
+ 	return PG_LEVEL_4K;
+ }
+ 
+-static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+-					const struct kvm_memory_slot *slot, gfn_t gfn)
++static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
++				     const struct kvm_memory_slot *slot, gfn_t gfn,
++				     bool is_private)
+ {
+ 	struct page *page;
+ 	kvm_pfn_t pfn;
+@@ -3305,7 +3306,7 @@ static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *
+ 		return max_level;
+ 
+ 	return min(max_level,
+-		   kvm_x86_call(gmem_max_mapping_level)(kvm, pfn));
++		   kvm_x86_call(gmem_max_mapping_level)(kvm, pfn, is_private));
+ }
+ 
+ int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+@@ -3335,8 +3336,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+ 	if (max_level == PG_LEVEL_4K)
+ 		return PG_LEVEL_4K;
+ 
+-	if (is_private)
+-		host_level = kvm_max_private_mapping_level(kvm, fault, slot, gfn);
++	if (is_private || kvm_memslot_is_gmem_only(slot))
++		host_level = kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
++							is_private);
+ 	else
+ 		host_level = host_pfn_mapping_level(kvm, gfn, slot);
+ 	return min(host_level, max_level);
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 81974ae2bc8c..c28cf72aa7aa 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -4906,7 +4906,7 @@ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
+ 	}
+ }
+ 
+-int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private)
+ {
+ 	int level, rc;
+ 	bool assigned;
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index bd7445e0b521..118266bfa46b 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -787,7 +787,7 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
+ int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
+-int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
++int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private);
+ struct vmcb_save_area *sev_decrypt_vmsa(struct kvm_vcpu *vcpu);
+ void sev_free_decrypted_vmsa(struct kvm_vcpu *vcpu, struct vmcb_save_area *vmsa);
+ #else
+@@ -816,7 +816,7 @@ static inline int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, in
+ 	return 0;
+ }
+ static inline void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end) {}
+-static inline int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++static inline int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private)
+ {
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 0c5b66edbf49..1deeca587b39 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -871,10 +871,11 @@ static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	return tdx_vcpu_ioctl(vcpu, argp);
+ }
+ 
+-static int vt_gmem_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++static int vt_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
++				     bool is_private)
+ {
+ 	if (is_td(kvm))
+-		return tdx_gmem_gmem_max_mapping_level(kvm, pfn);
++		return tdx_gmem_max_mapping_level(kvm, pfn, is_private);
+ 
+ 	return 0;
+ }
+@@ -1044,7 +1045,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.mem_enc_ioctl = vt_op_tdx_only(mem_enc_ioctl),
+ 	.vcpu_mem_enc_ioctl = vt_op_tdx_only(vcpu_mem_enc_ioctl),
+ 
+-	.gmem_max_mapping_level = vt_op_tdx_only(gmem_gmem_max_mapping_level)
++	.gmem_max_mapping_level = vt_op_tdx_only(gmem_max_mapping_level)
+ };
+ 
+ struct kvm_x86_init_ops vt_init_ops __initdata = {
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index d867a210eba0..4a1f2c4bdb66 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -3322,8 +3322,11 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	return ret;
+ }
+ 
+-int tdx_gmem_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++int tdx_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private)
+ {
++	if (!is_private)
++		return 0;
++
+ 	return PG_LEVEL_4K;
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 26c6de3d775c..520d12c304d3 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -163,7 +163,7 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
+ void tdx_flush_tlb_all(struct kvm_vcpu *vcpu);
+ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+-int tdx_gmem_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
++int tdx_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private);
+ #endif
+ 
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
+
+--BMscoaM2JkyRXR0e--
