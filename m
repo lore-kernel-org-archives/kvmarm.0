@@ -1,78 +1,49 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DE1289804;
-	Mon, 21 Jul 2025 15:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712151917F1
+	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 16:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753113579; cv=none; b=DR6qiLNKYaSnYycijBMkw82u/fZDfTi2+Yx0Lb9OSS3VKUzneg2UeSaMErwyUYR9WZc23kGrSo5WHNSkAHtQ7WT9QJe745pqjJGVCqT6MTio9rcV3VsYN9hbt4xHMS1/gu27jT+6mYYLy3P+TY5NNY2J4+/LmVb+naEfWc+eOjA=
+	t=1753114553; cv=none; b=vBhh8OLXZHZRlSjVK6SLBVh9jvjcezYAWOgOU7VN0pvdlD6pHdx6VllRtyZlcczx4pzsKtlAecwgxSy59QBQT5XdbtExkzUXmefizY4xET2bdHGooVJKQbP7HWxlkc6JciNieoWG7/xkIJaUuG/w1QZlFTT/NH9LHBR5Agyi9jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753113579; c=relaxed/simple;
-	bh=Lf+4RT6jGk5ZpNNApLCEK/aUp80m/GUhV1ehwC8FCeI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rW7WdA/GFC+CcZGszULPiaVg9UQ1Wp7lhCJJ3Nb00iVxHQx+GJKZgvjBzr2WRrmBq0uS52um5MqauBC3KazzuvUvvbACyEr4egUkvIUhOH7JiN8FpfgF06WuL3iaZlWdDhFrhrJ0WiM+cjgbWZpXwzALtLzWpvYRikKvSpr05fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=St9cVnD8; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="St9cVnD8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4414C4CEED;
-	Mon, 21 Jul 2025 15:59:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753113578;
-	bh=Lf+4RT6jGk5ZpNNApLCEK/aUp80m/GUhV1ehwC8FCeI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=St9cVnD8v5yoaod05XQDQsHZOW7dyXgE3NSBuWzFHagmCg2MCcpap/3YFBkQNbCJJ
-	 AwqotXRjVRHOmZuDIwaWiyYcrQWhxlXvJ3lfAyV3+6A4vTPZaxUQc+ttOxh6PNxMUU
-	 zPyyQKpOs/eqlYRlbxIkXlSybZbSECYkvVkJzZg6uY2lS+bzcrxM80NB0gaQnp9YQk
-	 47qPOk7GKWmcLh+tc7B8eCx85JTA4zUZbnhgsdgziDvQGQbbAcVOvncHWfhdPRxluW
-	 95692scELV++ZwkoJoj6AogoIwB73+zehjt/G55cNDgvggrT/ioC6ndSyayoaxwGW0
-	 pZYJA9UvAaqNQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1udsvQ-0004MP-Iy;
-	Mon, 21 Jul 2025 16:59:36 +0100
-Date: Mon, 21 Jul 2025 16:59:36 +0100
-Message-ID: <86jz418rh3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jack Thomson <jackabt.amazon@gmail.com>,
-    Will Deacon <will@kernel.org>
-Cc: mark.rutland@arm.com,
-	lpieralisi@kernel.org,
-	sudeep.holla@arm.com,
-	arnd@arndb.de,
-	wei.liu@kernel.org,
-	romank@linux.microsoft.com,
-	mhklinux@outlook.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	kvmarm@lists.linux.dev,
-	roypat@amazon.com,
+	s=arc-20240116; t=1753114553; c=relaxed/simple;
+	bh=96HexAJ8pgw5xnYaIoy2RO1Cl3uPEp0grH7rEZj9CjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rvYvLzZYkd482cCF44uvQH0OHrxYpP+9DFylR6McF8xcF1ucOSuOpgjNFVIynqI6PsZw7ZXTDdD0cm/uN62mwIYl8DwoFsfbNVF0IYfHRIzmZXPcgPgWWtw5EdwObAKycY29GEiW62qGiW8P9XgMWhJc846B3xhDTk2jL3HMMWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFB2D153B;
+	Mon, 21 Jul 2025 09:15:45 -0700 (PDT)
+Received: from bogus (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 351323F66E;
+	Mon, 21 Jul 2025 09:15:49 -0700 (PDT)
+Date: Mon, 21 Jul 2025 17:15:46 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Jack Thomson <jackabt.amazon@gmail.com>
+Cc: mark.rutland@arm.com, lpieralisi@kernel.org, arnd@arndb.de,
+	wei.liu@kernel.org, romank@linux.microsoft.com,
+	mhklinux@outlook.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, maz@kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>, oliver.upton@linux.dev,
+	kvmarm@lists.linux.dev, roypat@amazon.com,
 	Jack Thomson <jackabt@amazon.com>
 Subject: Re: [PATCH] arm64: kvm, smccc: Fix vendor uuid
-In-Reply-To: <20250721130558.50823-1-jackabt.amazon@gmail.com>
+Message-ID: <20250721-proficient-carrot-cockatoo-393ae1@sudeepholla>
 References: <20250721130558.50823-1-jackabt.amazon@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jackabt.amazon@gmail.com, will@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com, arnd@arndb.de, wei.liu@kernel.org, romank@linux.microsoft.com, mhklinux@outlook.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, roypat@amazon.com, jackabt@amazon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250721130558.50823-1-jackabt.amazon@gmail.com>
 
-[+Will]
+(I can't see this original patch in my mailbox, got only Marc's response)
 
-On Mon, 21 Jul 2025 14:05:58 +0100,
-Jack Thomson <jackabt.amazon@gmail.com> wrote:
-> 
+On Mon, Jul 21, 2025 at 02:05:58PM +0100, Jack Thomson wrote:
 > From: Jack Thomson <jackabt@amazon.com>
 > 
 > Commit 13423063c7cb ("arm64: kvm, smccc: Introduce and use API for
@@ -89,43 +60,16 @@ Jack Thomson <jackabt.amazon@gmail.com> wrote:
 > matches the previous value, and re-establish backwards compatibility
 > with older guest kernels.
 > 
-> Fixes: 13423063c7cb ("arm64: kvm, smccc: Introduce and use API for getting hypervisor UUID")
-> getting hypervisor UUID")
-> Signed-off-by: Jack Thomson <jackabt@amazon.com>
-> ---
->  include/linux/arm-smccc.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-> index 784ebe4607a4..50b47eba7d01 100644
-> --- a/include/linux/arm-smccc.h
-> +++ b/include/linux/arm-smccc.h
-> @@ -113,7 +113,7 @@
->  
->  /* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
->  #define ARM_SMCCC_VENDOR_HYP_UID_KVM UUID_INIT(\
-> -	0xb66fb428, 0xc52e, 0xe911, \
-> +	0x28b46fb6, 0x2ec5, 0x11e9, \
->  	0xa9, 0xca, 0x4b, 0x56, \
->  	0x4d, 0x00, 0x3a, 0x74)
->  
-> 
 
-Irk. This is remarkably embarrassing, and needs to be addressed ASAP,
-before 6.16 ships. FWIW, I've just posted a quickly whipped selftest
-that shows the problem[1].
+Nice catch. This is result of classic confusion with UUID and GUID especially
+coming from Microsoft who tend to use GUID more.
 
-Will, is there a chance you can pick this up and ferry it to Linus?
-If you do, please add:
+Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Tested-by: Marc Zyngier <maz@kernel.org>
-
-Thanks,
-
-	M.
-
-[1] https://lore.kernel.org/r/20250721155136.892255-1-maz@kernel.org
+This also makes me wonder if the initialisation in arch/arm64/hyperv/mshyperv.c
+is also wrong or may be that's correct only MS guys can confirm as I couldn't
+find the UUID string for that.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards,
+Sudeep
