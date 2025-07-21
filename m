@@ -1,100 +1,149 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FA623770D
-	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 19:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29241223323
+	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 20:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753127217; cv=none; b=Ypnrqq/M3wdO8iqB/Z+zdXwfJIdJEG+NsTLSfNFVnasr805gTNytDqcqM2yY8eFUKy6x8JQey83V0+eXQIivnTfY2UO4SGSiPcpymu3CQ0komMSr07yqqLbnfVJQ4OEHKWyQiYCLNpX8qvKENrXmLGwQtHluSCVbvBD5dpiVXKM=
+	t=1753128167; cv=none; b=Q5bPwI3OLF1hImpHvW1p8T6pSVAJfxvoGxRuyMLYLlGKA0OAI0q+WKkpaf5Ba/BGaHySchiwvm7TrFeQrt1E1auha4Pa9O3+rHpLhb65sWcfUM6Q563HTcmmRsa8C/rlYznkSD9iiQUR679jJLUZ6tfQDxw7IqAGSEETPi99JJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753127217; c=relaxed/simple;
-	bh=ahaM8OfPRMeDGUWSbe2Ir10rA7XZXeQys+W1mU1oI/g=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EY2u4LNVFwkAEmGnPxLUIqGxVL+Xe7OiWK81t5WTZXcPI4FBGgCGQMpawCEwph+vW37nF4vrxBRe4bTxce1JCPEz9YOlPEYL5wPU4i/AiUGNsZj8USAvp0SHyzEZbtbfrOnnuDxAjpCUEFAi2iKGsdFW+My+oj8q/iSxQ2xUu1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vt8MvPfk; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1753128167; c=relaxed/simple;
+	bh=pXoWU9veiwZFqXfcQj4hfPSB156GlcTIOr4f0ulrhNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ddZZ8f5o+c9pAObpRuVFkf+3Eq8Kb84PoQO7k41JTrX9FH57y2AbvLExB/LTjyXj/k4tTrXzI8EOQWP1iLr78xo0R0LbN+lLkPWzL645FficG/ibsDv/im6wnoAbY/+2NLoCVkwxMoAkNKynXC9dtRxqJ5k1yCvHfzH5rneHxH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q8Bzke5+; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vt8MvPfk"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3141f9ce4e2so6969011a91.1
-        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 12:46:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753127215; x=1753732015; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eAzCPpfQMz1gzK4so/oBZateRTf7Y7I8QQ8KelEOi7Y=;
-        b=Vt8MvPfkZX6pbrha9BpSnQKa/jYE2cVknsmVLDA1DnF6lMzPCDAr1FpZi4hUAAZaXK
-         0LJnNguqIUrepFWdKUtPwERkrfcJnF4XompjTfOyApagfluRZyzQezVRhy8Xs549wTpM
-         ihDh82vYf04P4zwZiUqNBFoQJ290rjCn5rV8LvtbkWtSLWtCdD99gHyongSgA5ObuqtG
-         pBfuGMhKRLhRE8ER05YPqFImZi54BmWWpzAdjCpPyD+qou6LCakA0VIBLKumXdrFR0oY
-         PDtFYYTs5I+AO2zKKSHd5coHG0m8qw7+QGJtdahN8CDW3qOFaYRQSkTNHYIgZblCsO5K
-         WLaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753127215; x=1753732015;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eAzCPpfQMz1gzK4so/oBZateRTf7Y7I8QQ8KelEOi7Y=;
-        b=ANQ68BZlUYx21yswrs/llUJNIBdZPQ9IuKd8bNeX7494/V0Ty0iCu8cmRte3oS5RPI
-         YrnZRa6QnLR4CJozz/A0itMcZ0kHh/IW9Hv4JQtat+BFLRGP3km9z2Tz3QkKTJohD/WH
-         xAJdJSeG61ie9K0KvtyxO3HHERmGsCSyuZe7WeQOcD728qy70miVTBhkFj+uoy7uq1In
-         fE+MFoy1oTqmPdWYKp+60rGiQ2nNxOeRRsVzDA61IqBJr9LSkVBbaU7U9KwxP5FEXqpt
-         3XOlWw/Ft7hf9ZmN2gtQXaC5rk//eiLnnFAYRRkdaxU3g2f1GsS7t58owhFi5aZDq+Yv
-         Wd1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWW/r7V3+fkP5xZhaIYJdQOaXhzLfcsciNW7SbqFs5Xm7LD4xkHStcNwg5mT7EVsnJc3bHQPcU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwQ7Wfj/aRcWaM9ghGa4ufGBlk4BhdRmuyjdxMn7UFZPEDoHhT/
-	by9TkEEx7c/2dwkoCxdETHjHjR2/D6VPh+r79ltTubWrG2whkiATOveTNjnacUBMWlRr8D9MqSB
-	rXbP6vA==
-X-Google-Smtp-Source: AGHT+IHCdTRyaZvpqo+/OPaDQY8r+AbasdEQ23wkQlt2bLrH8q67zZ1ProzQYNVQGguXSMigXOn343oEtxk=
-X-Received: from pjbnw5.prod.google.com ([2002:a17:90b:2545:b0:313:17cf:434f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f91:b0:311:ea13:2e70
- with SMTP id 98e67ed59e1d1-31c9f3c612fmr34864736a91.14.1753127215555; Mon, 21
- Jul 2025 12:46:55 -0700 (PDT)
-Date: Mon, 21 Jul 2025 12:46:53 -0700
-In-Reply-To: <20250717162731.446579-11-tabba@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q8Bzke5+"
+Date: Mon, 21 Jul 2025 22:02:36 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753128162;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=faRHgN5I3SJaokyooR8tND95TU4Zl2EbUy+q1BeFqEE=;
+	b=Q8Bzke5+07H93rEHZBxSdaUZQO1HcSJZZbt3Y31GkjyWATtGLr9GYplTDdMz9XA5tI1+Qt
+	Mse4e9n9h6U8ANxFWVdiKbdr9BlxJ8bvJzeTJkJQtiXhOKptSQSGIlERkBNxVvepTZrk0w
+	VZSK32PGBIQJoDgradRp6NFwqNeMUhg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Nicolas Schier <nicolas.schier@linux.dev>
+To: Kees Cook <kees@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>,
+	x86@kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
+	kasan-dev@googlegroups.com, sparclinux@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH v3 01/13] stackleak: Rename STACKLEAK to KSTACK_ERASE
+Message-ID: <20250721-spiked-adamant-hyrax-eea284@lindesnes>
+References: <20250717231756.make.423-kees@kernel.org>
+ <20250717232519.2984886-1-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-11-tabba@google.com>
-Message-ID: <aH6ZLYgwK0EdIERg@google.com>
-Subject: Re: [PATCH v15 10/21] KVM: x86/mmu: Generalize private_max_mapping_level
- x86 op to max_mapping_level
-From: Sean Christopherson <seanjc@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="cgD5lPAL2MBjPn/0"
+Content-Disposition: inline
+In-Reply-To: <20250717232519.2984886-1-kees@kernel.org>
+X-Operating-System: Debian GNU/Linux 13.0
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jul 17, 2025, Fuad Tabba wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
-> 
-> Generalize the private_max_mapping_level x86 operation to
-> max_mapping_level.
 
-No, this is wrong.  The "private" part can be dropped, but it must not be a fully
-generic helper, it needs to be limited to gmem.  For mappings that follow the
-primary MMU, the primary MMU is the single source of truth.  It's not just a
-nitpick, I got royally confused by the name when looking at the next patch.
+--cgD5lPAL2MBjPn/0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-s/private_max_mapping_level/gmem_max_mapping_level and we're good.
+On Thu, Jul 17, 2025 at 04:25:06PM -0700, Kees Cook wrote:
+> In preparation for adding Clang sanitizer coverage stack depth tracking
+> that can support stack depth callbacks:
+>=20
+> - Add the new top-level CONFIG_KSTACK_ERASE option which will be
+>   implemented either with the stackleak GCC plugin, or with the Clang
+>   stack depth callback support.
+> - Rename CONFIG_GCC_PLUGIN_STACKLEAK as needed to CONFIG_KSTACK_ERASE,
+>   but keep it for anything specific to the GCC plugin itself.
+> - Rename all exposed "STACKLEAK" names and files to "KSTACK_ERASE" (named
+>   for what it does rather than what it protects against), but leave as
+>   many of the internals alone as possible to avoid even more churn.
+>=20
+> While here, also split "prev_lowest_stack" into CONFIG_KSTACK_ERASE_METRI=
+CS,
+> since that's the only place it is referenced from.
+>=20
+> Suggested-by: Ingo Molnar <mingo@kernel.org>
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: <x86@kernel.org>
+> Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+> Cc: <linux-doc@vger.kernel.org>
+> Cc: <linux-arm-kernel@lists.infradead.org>
+> Cc: <kvmarm@lists.linux.dev>
+> Cc: <linux-riscv@lists.infradead.org>
+> Cc: <linux-s390@vger.kernel.org>
+> Cc: <linux-efi@vger.kernel.org>
+> Cc: <linux-hardening@vger.kernel.org>
+> Cc: <linux-kbuild@vger.kernel.org>
+> Cc: <linux-security-module@vger.kernel.org>
+> Cc: <linux-kselftest@vger.kernel.org>
+> ---
+>  arch/Kconfig                                  |  4 +--
+>  arch/arm/Kconfig                              |  2 +-
+>  arch/arm64/Kconfig                            |  2 +-
+>  arch/riscv/Kconfig                            |  2 +-
+>  arch/s390/Kconfig                             |  2 +-
+>  arch/x86/Kconfig                              |  2 +-
+>  security/Kconfig.hardening                    | 36 ++++++++++---------
+>  arch/arm/boot/compressed/Makefile             |  2 +-
+>  arch/arm64/kernel/pi/Makefile                 |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/Makefile              |  2 +-
+>  arch/riscv/kernel/pi/Makefile                 |  2 +-
+>  arch/riscv/purgatory/Makefile                 |  2 +-
+>  arch/x86/purgatory/Makefile                   |  2 +-
+
+Did you miss arch/loongarch/Kconfig by accident?
+
+$ git grep -Hrne ARCH_STACKLEAK
+arch/loongarch/Kconfig:127:     select HAVE_ARCH_STACKLEAK
+
+Kind regards,
+Nicolas
+
+--cgD5lPAL2MBjPn/0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmh+nNwACgkQB1IKcBYm
+EmlaKg/+Oulyjlzl6ITiwJiV1weZc0KBlop49wW3/ilmJ9U/16ChNrQlv9S6c21O
+ytwj5NZ3lgiznFSMFUOkOxA6ctKIXVyGyNPSmJIUJ6Sqk9iHm3zMakHBxpr2uemy
+DP6Nb6zORIiNJiTd3lVcdz1XQJRGfHfoMpUoW+GRKqQMtw4NyankD/eCESFv6mKh
+T27cet3p0OMQg5S3lM/AD8uuhCxYlLXnD2LJ1XC7z5v9s2QMFnm2FKuEbwwRikgZ
+k4V5IQ6fVjZRe7AuIZpAgOC2mWYkumx3EriVPGKNQu7L0MSQfUAjDF83NE4CBwIO
+EKdR7rp9ZBpJXIQwG0SNnVDCG/xfryC0LzVorLlZOR65GUHYiONL5Eq+J2QE8zwZ
+ugfv15CDaABIA5Rc6VW655EQePy0grJb6wQRpZAQRtsg5HQQfPgWXewm+OetC6sk
+1yqSuYqUrmJ0j4usrxCxbZRrRcGzfdDuGAmg4XpUKrEJIZRxfsV5InrSJ+o2nA14
+yjqgSeDRliPvyePCLddpnDyye4RgIyNgDQSuYJoivHQryIdrYJE3LIk+EoQdw3dv
+c+5c9ea/sNADpeyyA/RAzDrLGAEXAh2qZFu/o71KZIUOwOLp6IjYtZ9MfI54KyhK
+0TTlmcFody1uFinctfOk+8zBzO/foM1hkNF9knW0vJmnEV4khOU=
+=dSeG
+-----END PGP SIGNATURE-----
+
+--cgD5lPAL2MBjPn/0--
