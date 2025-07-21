@@ -1,135 +1,150 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AB92D5C6C
-	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 12:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E424502F;
+	Mon, 21 Jul 2025 12:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753101723; cv=none; b=N/qw0dR9F/KnYPGDifS4WQsbmyIykdiGsnu+X0y2Ky9yVaG6iVeJn0f5pwD2W/4sKb1Lh2Usxx+YOV0fHW+fI7mu2xmBnUg8/EI5o9UdK8WIDN5zyqdnCTZNDGge1Giu4MVRKRxtPcYTvBAp9Xc2IhYX1uYgD1kmboomDuxvfpA=
+	t=1753102089; cv=none; b=E8jZoPuVMg3Fp8eB1JExRdlxpUXTxuyaHxIVIDqfiW1CnTqRG7QkKUnTN7AwmtWQTfvIh3DHlGy0G/ojCya/Yc2/lTCjfQgahjwWT41RMTZNNiR5xC9xuOpyFcKRS4dnHEf72GjmTsfDQcK6QtLQCxnW1/FEfqH3Ns72O2GwfWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753101723; c=relaxed/simple;
-	bh=FH6NOtN844idHZdK0Ri+r5hjSZq61hkeGP1rVZSSTzs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IpAoQ1R7934BWcGSU6EwzDgirTiPlXEfX183/0TaPvkBWVpwF8QxDwFkkveAL6daAAPDgpGylukd67RsLOZSbEMhXS4wb8NPvfMDtFmAcL/2HepWOAwGmGAB+MJP3cobDBcHqM8PotekPnCf7SaWFhAUOdNY54Dvo8ttnhfjaAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g4TD/lgr; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1753102089; c=relaxed/simple;
+	bh=fhUrUAac/iSii6E8bCY5/2OzAP/25KtTiniEKeJQXGA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PdSKdNjtBboMgd832HDbP+uXPaRLqk5gH43+jq8vlM1Hc4dWSbJ50xkdj0WNZbdnrejhlZFh0alyVYXwTE1HxqaXdlipy/qcX255Zo/Sd8XhRxZIm5OMID6J0an5xZ63VZTx10Wb++nILTSxyC0qtE01UAmwtUiiRLoJ/+c1UNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8evXuR+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g4TD/lgr"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso713531cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 05:42:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753101721; x=1753706521; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rIS8RtGx3BM3yP3QF7bgfk7fFz/ztOEu+IhwOpSASZw=;
-        b=g4TD/lgra17w8isXhc6ARS5JGTDe5guy2fg6DmE++IRpDp2p2fhYuliZxB7PZeH2fR
-         EUDWBsvHPlwTs+JCVjc5Yz6Rh2+XSlYyQ7UwLnf+o/4eLYFeaS7jD/XdQmOEcWRD1P3x
-         XOXXjnY/fc5i73HLVpiILEhOCBKx+pTM5LaxJnkxiryNWGra351AjqdAkdPNRR11mtFg
-         AEYNA23Ul8d6fjo12a60KDOIT9KcVUiPdwDPw9wr/k/68/XkXk9SZoK7Fnoh+W1MU6KE
-         UYxD+6As5vR1BG+dr/EOX9uIAThzEjr/BABj7IHu7MczGAYqIFyToHBEqYH1ivJ1DYZi
-         6keQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753101721; x=1753706521;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rIS8RtGx3BM3yP3QF7bgfk7fFz/ztOEu+IhwOpSASZw=;
-        b=aEGozCbvJYbtFKmHnvY6WciLntHylC21/hgKxW1WRYWeWZASM+/BIR9ivBqNfF/nCo
-         8R9Wfan+T6GyZNcqgQ9GE2kGukgUaz/lSOUQJZOF2L31m0ktXsokWmmfKkZammS6tbgI
-         TYQ7uXTKqwiVfihzYK9c/yJBhjeA+L4/xKArjmv24MnlHKzMeFImb7unDoUS61x7SHUB
-         CQ+ZJ9a9u0yM92LUW+BVUY4O6E3wMQIs3fKR0lOPyKpgeR02409RSBdE0y07Gy+c62bl
-         SnnN7KmX5mO3mZuO8bBZMmwhRPwZThPz6ln2aaUuZOM/F/kIX5Qyx/vTLLFXbIKP5l5x
-         PNrw==
-X-Forwarded-Encrypted: i=1; AJvYcCX3npVB3zBMmPRtkm0peFxOmPFzFxLr2dYbbvX5D0yUxIAMql3oUVmBck7qUSJsXfzSsIbqeM8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YweKrbhZT1ywt4Jo43jxc8HOvAx7230IKybVhUiZ8GD6anhjd/Q
-	KIv/pT3jCCJrhtYnyTpKGwlZGeTlYpmU08r4gQ9f2lNVdnM2CCtRIw14WTP+4y9gufEyz2hzfv1
-	xnIdsZ7p0kfXt72/0zznzF2eXSVdLxyP5pQJptQWm
-X-Gm-Gg: ASbGncvnOu6eVR1+JULIE7K+eQPwlQzGvgoP3u+Rg6iyX62B2qHM2P1z/NdcpcXwsIb
-	KpwvjcbFlwy2NinrBG+E3frFHRVIQngZ4TmRlbuc+3fUHs3EC/GTZhrjwpF//Q1weT0AgCA6FfD
-	0LTaV6mjHn7KuLf+8mT9u2/OW137w1Y0YGWkqHNbpj5XHIP21yZ6Z41RTbtQKh9zGMZOrnD7MdK
-	0C70/g=
-X-Google-Smtp-Source: AGHT+IHICvOHUdMlgc+MwG4TRplOdK0+NsvYnQSN7a8Q94vN9K19Iv4njTMi3Vqu6DpIpL1LZ7OPxQ3JKDjs7jxoPb4=
-X-Received: by 2002:a05:622a:8c19:b0:4ab:54d2:3666 with SMTP id
- d75a77b69052e-4abc2b37a63mr6227901cf.25.1753101720495; Mon, 21 Jul 2025
- 05:42:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8evXuR+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2550C4CEED;
+	Mon, 21 Jul 2025 12:47:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753102088;
+	bh=fhUrUAac/iSii6E8bCY5/2OzAP/25KtTiniEKeJQXGA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R8evXuR+wAan3GKqOPc31OKb0HXwT1fcr9RAvjn3iXq9AafrC9dr+uhqKKHXhydc/
+	 ommMgMhlPSa10h8tXea70KugAvoZCogNM+Xt21kS9UmsttjWDnOELNHjux+Ju59MNY
+	 /URVoorMncYyCzvX9VeofQFk7WldoN/Ri5qk6rB1XFXfi+hA14lKHW1R2sRPlxfo/E
+	 LGLDW2D8KsMU/Gla3tq/bXrtgsgK9NPEPhMAYMtEgjB4rEKVqgNW9ZLANwHmFPzbv2
+	 KyzNMpjT5XzFw+NFZx3vex8f/0R9leYdi3PuQeMO27/gBBOFaJYqsNHIsKj7h+b3pJ
+	 6c41KggZR4CKg==
+Date: Mon, 21 Jul 2025 13:47:55 +0100
+From: Will Deacon <will@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Kees Cook <kees@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+	Michal Wilczynski <michal.wilczynski@intel.com>,
+	Juergen Gross <jgross@suse.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Roger Pau Monne <roger.pau@citrix.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Usama Arif <usama.arif@bytedance.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Thomas Huth <thuth@redhat.com>, Brian Gerst <brgerst@gmail.com>,
+	kvm@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net,
+	platform-driver-x86@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-mm@kvack.org, Ingo Molnar <mingo@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
+	kasan-dev@googlegroups.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, sparclinux@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH v3 04/13] x86: Handle KCOV __init vs inline mismatches
+Message-ID: <aH42--h-ARsvX5Wk@willie-the-truck>
+References: <20250717231756.make.423-kees@kernel.org>
+ <20250717232519.2984886-4-kees@kernel.org>
+ <aHoHkDvvp4AHIzU1@kernel.org>
+ <202507181541.B8CFAC7E@keescook>
+ <CAMj1kXGAwjChyFvjQcTbL8dFXkFWnn9n47bkN7FP=+EsLNsJdg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-15-tabba@google.com>
- <505a30a3-4c55-434c-86a5-f86d2e9dc78a@intel.com>
-In-Reply-To: <505a30a3-4c55-434c-86a5-f86d2e9dc78a@intel.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 21 Jul 2025 13:41:23 +0100
-X-Gm-Features: Ac12FXwLO_dne2w1dGUUYLFktGe9s64wr0cEuXbxIsFFA8S3s8yrvlEfzoVjAQI
-Message-ID: <CA+EHjTxUpLU3-3dQY8O_SoQCmA8LR1y6w759xfYwisfxHec4aQ@mail.gmail.com>
-Subject: Re: [PATCH v15 14/21] KVM: x86: Enable guest_memfd mmap for default
- VM type
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGAwjChyFvjQcTbL8dFXkFWnn9n47bkN7FP=+EsLNsJdg@mail.gmail.com>
 
-Hi Xiaoyao,
+On Sun, Jul 20, 2025 at 04:10:01PM +1000, Ard Biesheuvel wrote:
+> On Sat, 19 Jul 2025 at 08:51, Kees Cook <kees@kernel.org> wrote:
+> > On Fri, Jul 18, 2025 at 11:36:32AM +0300, Mike Rapoport wrote:
+> > > On Thu, Jul 17, 2025 at 04:25:09PM -0700, Kees Cook wrote:
+> > > > When KCOV is enabled all functions get instrumented, unless the
+> > > > __no_sanitize_coverage attribute is used. To prepare for
+> > > > __no_sanitize_coverage being applied to __init functions, we have to
+> > > > handle differences in how GCC's inline optimizations get resolved. For
+> > > > x86 this means forcing several functions to be inline with
+> > > > __always_inline.
+> > > >
+> > > > Signed-off-by: Kees Cook <kees@kernel.org>
+> > >
+> > > ...
+> > >
+> > > > diff --git a/include/linux/memblock.h b/include/linux/memblock.h
+> > > > index bb19a2534224..b96746376e17 100644
+> > > > --- a/include/linux/memblock.h
+> > > > +++ b/include/linux/memblock.h
+> > > > @@ -463,7 +463,7 @@ static inline void *memblock_alloc_raw(phys_addr_t size,
+> > > >                                       NUMA_NO_NODE);
+> > > >  }
+> > > >
+> > > > -static inline void *memblock_alloc_from(phys_addr_t size,
+> > > > +static __always_inline void *memblock_alloc_from(phys_addr_t size,
+> > > >                                             phys_addr_t align,
+> > > >                                             phys_addr_t min_addr)
+> > >
+> > > I'm curious why from all memblock_alloc* wrappers this is the only one that
+> > > needs to be __always_inline?
+> >
+> > Thread-merge[1], adding Will Deacon, who was kind of asking the same
+> > question.
+> >
+> > Based on what I can tell, GCC has kind of fragile inlining logic, in the
+> > sense that it can change whether or not it inlines something based on
+> > optimizations. It looks like the kcov instrumentation being added (or in
+> > this case, removed) from a function changes the optimization results,
+> > and some functions marked "inline" are _not_ inlined. In that case, we end up
+> > with __init code calling a function not marked __init, and we get the
+> > build warnings I'm trying to eliminate.
 
-On Mon, 21 Jul 2025 at 13:22, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> On 7/18/2025 12:27 AM, Fuad Tabba wrote:
-> > +/*
-> > + * CoCo VMs with hardware support that use guest_memfd only for backing private
-> > + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
-> > + */
-> > +#define kvm_arch_supports_gmem_mmap(kvm)             \
-> > +     (IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP) &&   \
-> > +      (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM)
->
-> I want to share the findings when I do the POC to enable gmem mmap in QEMU.
->
-> Actually, QEMU can use gmem with mmap support as the normal memory even
-> without passing the gmem fd to kvm_userspace_memory_region2.guest_memfd
-> on KVM_SET_USER_MEMORY_REGION2.
->
-> Since the gmem is mmapable, QEMU can pass the userspace addr got from
-> mmap() on gmem fd to kvm_userspace_memory_region(2).userspace_addr. It
-> works well for non-coco VMs on x86.
->
-> Then it seems feasible to use gmem with mmap for the shared memory of
-> TDX, and an additional gmem without mmap for the private memory. i.e.,
-> For struct kvm_userspace_memory_region, the @userspace_addr is passed
-> with the uaddr returned from gmem0 with mmap, while @guest_memfd is
-> passed with another gmem1 fd without mmap.
->
-> However, it fails actually, because the kvm_arch_suports_gmem_mmap()
-> returns false for TDX VMs, which means userspace cannot allocate gmem
-> with mmap just for shared memory for TDX.
->
-> SO my question is do we want to support such case?
+Got it, thanks for the explanation!
 
-Thanks for sharing this. To answer your question, no, we explicitly do
-not want to support this feature for TDX, since TDX uses a completely
-different paradigm.
+> > So, to Will's comment, yes, the problem is somewhat fragile (though
+> > using either __always_inline or __init will deterministically solve it).
+> > We've tripped over this before with GCC and the solution has usually
+> > been to just use __always_inline and move on.
+> >
+> 
+> Given that 'inline' is already a macro in the kernel, could we just
+> add __attribute__((__always_inline__)) to it when KCOV is enabled?
 
-Cheers,
-/fuad
+That sounds like a more robust approach and, by the sounds of it, we
+could predicate it on GCC too. That would also provide a neat place for
+a comment describing the problem.
+
+Kees, would that work for you?
+
+Will
