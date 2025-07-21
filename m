@@ -1,127 +1,122 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236972D640E
-	for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 13:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296012D6617;
+	Mon, 21 Jul 2025 13:08:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753103257; cv=none; b=OwQFrlxq2uEMolvV7MOWGfrfHCB8ceVT95wOM1JB3Qm6VcJxUmbvnhdNLuMKUcWZoAGr6u1uUUtl5w9zArZJH/rNGprESv1QTnOQ9H+97jC9x7fQttsC3LfDAd6LhvUGRe03V8rJhXJEVz8e4JbOrauMEqW8kINWgY1HScSOCl0=
+	t=1753103297; cv=none; b=kPN/v7HXjqe6W/47mrBoJ62Owok8TQ0KhyvJJ5MQW7Vk9LZoZhptZxeZ7HUvcATEpeBB51yjcgPOzCfbqEPaVcRhrPVAnn0RAzgRVXyYgv2f7veVUEwWYYyMe+lERqkQJ+rpN8lwj/w9v3sLQibfCnnumRX7hVOPC+nXenuKlMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753103257; c=relaxed/simple;
-	bh=q6B21jNgjxNNbn1toxYsG2+TSTzsrfyP6+kfk/EB6Bg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gOL3EINILn7YWur35IGaul0H4SYHNPqOCc6qYktUdE9fFL3CEghYuTVsESolXRpdvf2wbGWDtDGDlt0iCXC0n/zWDdMYiuq9hv8x7qPd9IlLmb3tK+Mm72ESPXoA0YmDyx6zki5EjPEnv4KlYGKALULSVF0FJyHbnl2oFQuyFfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PmVHDGPb; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1753103297; c=relaxed/simple;
+	bh=2BOOQpaqd3T/K9munHgevbSZGIufTpM5Kwk8FYNDjm4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=snR3yusHP1NTOxEcEyuJi+WY+jE4MdTXmVMwmhLPhz1fxkzea1Rk7OM0ESeUAsoYWIASu0157fz/liCr8Oz6uzEZ7FFLj9CWWeXaMwSCYp6NQjJ13yO9pHl3OGMqGXrRS6W5fLIRrgn0E2hUUbBThjO5e9cZRExUzpGIMTaaY8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pkqG/l1Z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmVHDGPb"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-451d54214adso30729865e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 21 Jul 2025 06:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753103254; x=1753708054; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLCx+sqKyQ6H6n1t1Iho4DguHkaJ1c+mG90AYPKk4U0=;
-        b=PmVHDGPbb0uUmc6rgIVvlf5WNxqoLnSOOjUQNloLE3cPrdh31o9S4sHrWCDM3WsR82
-         vbEHOKepE0aw8/A2v5zwC9Kmnwani68u7p3Tfs/VzwqIJIt+MyGJrOeGuqi6x8ff5eTo
-         K2KCVuD/kEX0IaFrbCx8dBsPgs4qYEIk3ea0bZWDF7MiRc35VivBfoTrNu3yTnhORGep
-         iCbYkjyfXESFOCXOdiqtODGlwgq/uEDSq9fJmZMPSsnSBdm9FA2aOdDittARARfYBZuE
-         F92KU4srPOQZtjjkgre+kWlWn6Q1wmrxeRUHAtW7QpQfxQsNOhBl2A0uR0uduXrr3UfP
-         cstw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753103254; x=1753708054;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DLCx+sqKyQ6H6n1t1Iho4DguHkaJ1c+mG90AYPKk4U0=;
-        b=k2MZM7J0UhBvzFUGLgMAhTebutq9m1WlXPyPq+raR+ev5WGGxz/a9QppXWn8xvGbff
-         rU+kC5nynyIdiBhq4fGp1njGW4mn6VxGK2KJIwFPPgSBGterpMI1/XTFTrd83LyAM3Mu
-         Vku4WWOD7VUFdP4Ty5AVQWQBEbS/B6hHh/6SORcAfuiEyIbggSU1Dcv/OLXoBoxZ7KAN
-         3aiuFzKqRgSThPejcQXtZ2nD7kIGN/lVUJ7VPYH8avbPI6xiXRyvxA7e1QMysUlBY/f4
-         z3RS4A06h38YPIq5hQQ2vRwrVZeqGymOXctg686SgLHtxeAIewIHvAYiVCH16SHanjn7
-         4cxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVlSW9IFelJ1QFHmDZmV/VMXMIotWc8uEmHPpNH5wuU1GK2/YCpjO2i/7SuXGprs7GhCg/Vxos=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwhGCJeur0PZ5jHEPyacH01pB24X5wKISA599OGnUbkZYIs0+R2
-	YskgAvzJZmDxnlrU1cZhaBlwhcC3t+7d5EwpODUgL01R1qH5lncrzI9W4Dpwig==
-X-Gm-Gg: ASbGncs4Upn71leGvS4TcSEq/eYOXnoxjc+P7Xl16aDcuzfybP3sO3lKDtBKYj9R5mW
-	NLPMJt0EXhrn70Euyb66yRrJIG2bTGP9VTnu/ynMYDeG+MGtExazAmxw+61/x7UGxrVwwfdp66U
-	RFxVuaInCfVrNyDXt4FFliJ3+5VSJEqHwx+ryUodLsi9DnIG1sZNnpOZNDecnSj/LS8qpIF9lzq
-	1aEjez02Ki8shVHHPa7CajmfDHvx55ksyh0Z+uiqPHVNnZAGTmC1g0koc2L3Bp97bJnRl3ttKbx
-	F4gkK+Jj1sSADru3MBOTj3Q9q2pLaO/egITGIVT46g8jYAF18gaLJYyyoummfRCeDsXWjg+o/n4
-	ZZI3giBaR1kfJWVIL7yHqcx+FenxrT2wrhXsr+UOgkaJib0H8q5z+QMmSw1BpnGupL8US5/1gIQ
-	==
-X-Google-Smtp-Source: AGHT+IHmDCTmiGnsqtX1YVYWRcIXEER5wbunM4O6C5Aoi5lFM6U8OAVQsEhiHj1NA9lOUgYhy7795g==
-X-Received: by 2002:a05:600c:4f42:b0:456:eab:6344 with SMTP id 5b1f17b1804b1-456352f8f1emr129426955e9.15.1753103254113;
-        Mon, 21 Jul 2025 06:07:34 -0700 (PDT)
-Received: from f4d4888f22f2.ant.amazon.com.com ([15.248.2.234])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4562e7f2bb4sm157681365e9.8.2025.07.21.06.07.33
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 21 Jul 2025 06:07:33 -0700 (PDT)
-From: Jack Thomson <jackabt.amazon@gmail.com>
-To: mark.rutland@arm.com,
-	lpieralisi@kernel.org,
-	sudeep.holla@arm.com,
-	arnd@arndb.de,
-	wei.liu@kernel.org,
-	romank@linux.microsoft.com,
-	mhklinux@outlook.com,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pkqG/l1Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A16EC4CEED;
+	Mon, 21 Jul 2025 13:08:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753103296;
+	bh=2BOOQpaqd3T/K9munHgevbSZGIufTpM5Kwk8FYNDjm4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pkqG/l1Z1XlZMdwY5kVQVzqBNStrRr93vvyj9XKH4l0oj28Rb20RtsPMMxbBLW7et
+	 437IJr5NK/bMYleqJfiYypNDb5vHn6Y858Nnsz8aGpeakhgHNpMKDbhxlWHDBSIkgL
+	 5nHuXcDv0ioqzAFXjw7pQ7MYVaCWXgn/8CzUChHpzE2bOqvW9QmMyWbdHAYLz+r1ix
+	 T/j3MpEAJxYD/gh4K7WD1PUD9ZdW/xqiY1YFd1GgVcv5UP2iK2ObladvCXXR59HD7G
+	 zvfqZ4QbQrCA33YJeYCbyXxlyPi3DWdKurpcmZ5ExDu0COEn0fYvNYWvypRDNhfv9D
+	 ICefUSV2hanZQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1udqFa-0001EV-5I;
+	Mon, 21 Jul 2025 14:08:14 +0100
+Date: Mon, 21 Jul 2025 14:08:13 +0100
+Message-ID: <86ms8x8zeq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	kvmarm@lists.linux.dev
-Cc: roypat@amazon.com,
-	Jack Thomson <jackabt@amazon.com>
-Subject: [PATCH] arm64: kvm, smccc: Fix vendor uuid
-Date: Mon, 21 Jul 2025 14:05:58 +0100
-Message-ID: <20250721130558.50823-1-jackabt.amazon@gmail.com>
-X-Mailer: git-send-email 2.50.0
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 4/7] KVM: arm64: Handle RASv1p1 registers
+In-Reply-To: <20250721101955.535159-5-maz@kernel.org>
+References: <20250721101955.535159-1-maz@kernel.org>
+	<20250721101955.535159-5-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jack Thomson <jackabt@amazon.com>
+On Mon, 21 Jul 2025 11:19:52 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> FEAT_RASv1p1 system registeres are not handled at all so far.
+> KVM will give an embarassed warning on the console and inject
+> an UNDEF, despite RASv1p1 being exposed to the guest on suitable HW.
+> 
+> Handle these registers similarly to FEAT_RAS, with the added fun
+> that there are *two* way to indicate the presence of FEAT_RASv1p1.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index aea50870d9f11..9fb2812106cb0 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2695,6 +2695,16 @@ static bool access_ras(struct kvm_vcpu *vcpu,
+>  	struct kvm *kvm = vcpu->kvm;
+>  
+>  	switch(reg_to_encoding(r)) {
+> +	case SYS_ERXPFGCDN_EL1:
+> +	case SYS_ERXPFGCTL_EL1:
+> +	case SYS_ERXPFGF_EL1:
+> +		if (!(kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1) ||
+> +		      (kvm_has_feat_enum(kvm, ID_AA64PFR0_EL1, RAS, IMP) &&
+> +		       kvm_has_feat(kvm, ID_AA64PFR1_EL1, RAS_frac, RASv1p1)))) {
+> +			kvm_inject_undefined(vcpu);
+> +			return false;
+> +		}
+> +		break;
+>  	default:
+>  		if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
+>  			kvm_inject_undefined(vcpu);
+> @@ -3058,6 +3068,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_ERXCTLR_EL1), access_ras },
+>  	{ SYS_DESC(SYS_ERXSTATUS_EL1), access_ras },
+>  	{ SYS_DESC(SYS_ERXADDR_EL1), access_ras },
+> +	{ SYS_DESC(SYS_ERXPFGF_EL1), access_ras },
+> +	{ SYS_DESC(SYS_ERXPFGCTL_EL1), access_ras },
+> +	{ SYS_DESC(SYS_ERXPFGCDN_EL1), access_ras },
+>  	{ SYS_DESC(SYS_ERXMISC0_EL1), access_ras },
+>  	{ SYS_DESC(SYS_ERXMISC1_EL1), access_ras },
+>  
 
-Commit 13423063c7cb ("arm64: kvm, smccc: Introduce and use API for
-getting hypervisor UUID") replaced the explicit register constants
-with the UUID_INIT macro. However, there is an endian issue, meaning
-the UUID generated and used in the handshake didn't match UUID prior to
-the commit.
+This is obviously missing the ERXMISC{2,3}_EL1 registers, which I have
+now added as a fixup on top of the current series. I'll squash that
+before reposting.
 
-The change in UUID causes the SMCCC vendor handshake to fail with older
-guest kernels, meaning devices such as PTP were not available in the
-guest.
+Thanks,
 
-This patch updates the parameters to the macro to generate a UUID which
-matches the previous value, and re-establish backwards compatibility
-with older guest kernels.
+	M.
 
-Fixes: 13423063c7cb ("arm64: kvm, smccc: Introduce and use API for getting hypervisor UUID")
-getting hypervisor UUID")
-Signed-off-by: Jack Thomson <jackabt@amazon.com>
----
- include/linux/arm-smccc.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 784ebe4607a4..50b47eba7d01 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -113,7 +113,7 @@
- 
- /* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
- #define ARM_SMCCC_VENDOR_HYP_UID_KVM UUID_INIT(\
--	0xb66fb428, 0xc52e, 0xe911, \
-+	0x28b46fb6, 0x2ec5, 0x11e9, \
- 	0xa9, 0xca, 0x4b, 0x56, \
- 	0x4d, 0x00, 0x3a, 0x74)
- 
-
-base-commit: 89be9a83ccf1f88522317ce02f854f30d6115c41
 -- 
-2.43.0
-
+Without deviation from the norm, progress is not possible.
