@@ -1,242 +1,216 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3F82EA48A
-	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 12:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C98115DBC1
+	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 12:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753186816; cv=none; b=pKUU4Y2EDw96pKy2GPHVq+ow09gkrJeoWdzJMD5RZbHjmPY5b5IrhUZ7UVJaZs0bBO7kmE2XbVDBG9aVtvqjQWHUGEcfkCILeyvrMkvEkokgxgEun46cy4pLsadhjE1ihH0Uygda6ItZpRbz4CBNedvAt9Wpo+ixqGBcY6W9CAU=
+	t=1753187563; cv=none; b=D09f1BrPBJa4lPOh/6HSrlZ0W+eKYweYfks5gLug7pIM1Fegc42NBr0W30dgZWCL2tuFIKsunbWxq/t2VT4cgVTS/xp6BzfkmiwB1Tv6t3b3yAQiY/2E8CJj2bQiJquhxJ4Ff8bSnAp0tCEQVXVH/vZJBtIgY0rSm9fim9rgzaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753186816; c=relaxed/simple;
-	bh=R/uCGAFuKyk/yhRsJFbZFTF2BDn+0ZJdwuNVRlQb7rU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gwh14IlW60cFSMGfgSL4jsjf+PD/sTUMse8SAc2aWpGg/3i8DhFuaPYcuCyUY3obHQbz9A1JnEscNi02sI7FMBnFEy94MglraDTOplwx8SQimRUjuDQQbvzNs1I9KtCqH/Jh2Hq9rcwxGyRIaeii+FyhdIK16iX2CJgR0DGUB9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A5CE169E;
-	Tue, 22 Jul 2025 05:20:08 -0700 (PDT)
-Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8C9103F59E;
-	Tue, 22 Jul 2025 05:20:11 -0700 (PDT)
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: catalin.marinas@arm.com,
-	will@kernel.org,
-	broonie@kernel.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	shameerali.kolothum.thodi@huawei.com,
-	joey.gouly@arm.com,
-	james.morse@arm.com,
-	ardb@kernel.org,
-	scott@os.amperecomputing.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	mark.rutland@arm.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v5 5/5] arm64: futex: support futex with FEAT_LSUI
-Date: Tue, 22 Jul 2025 13:19:56 +0100
-Message-Id: <20250722121956.1509403-6-yeoreum.yun@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250722121956.1509403-1-yeoreum.yun@arm.com>
-References: <20250722121956.1509403-1-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1753187563; c=relaxed/simple;
+	bh=kfXCFB4M4r9Eu+Ta6xP8Saq4J9ai+mgIIVpmeC+Orzo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l40nrtKcJRbBuUOfEZLGlcry70YGjIpKsJDL7v+KQlO8ggZ2rMrwjNo2pIkrXDRsUM11TPKI/ibJVrYgyKvi8XcnKe972N06nNW8cLcqE29IfIYyJGrrlrApASO49fgNiOl7mEKNE89fhMIxV1fL/SBJbauT/eWBbImg8lP7HMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WeLHgmXx; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WeLHgmXx"
+Message-ID: <07976427-e5a4-4ca4-93e9-a428a962b0b2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753187549;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7MMMOAOPjOBlhMHrulLMPV/ml/XegyxT79zgI8vdaQc=;
+	b=WeLHgmXx0r97gR/zn1eWenIdriuOSpYVj9Enitmu+wk6hPYUCHXPbtDMke+K2iZ8CfIEli
+	L2PPPUlUHtpcnh+fY+glHgeelj+WuvAribXpZM+k/8swY851tIbGWUVGWzbcfzmko35xvp
+	bSykaR5ROyJfWZ7ZJwWd2TTVDWbPsEs=
+Date: Tue, 22 Jul 2025 20:31:34 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Subject: Re: [PATCH v15 16/21] KVM: arm64: Handle guest_memfd-backed guest
+ page faults
+Content-Language: en-US
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250717162731.446579-1-tabba@google.com>
+ <20250717162731.446579-17-tabba@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kunwu Chan <kunwu.chan@linux.dev>
+In-Reply-To: <20250717162731.446579-17-tabba@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Current futex atomic operations are implemented with ll/sc instructions
-and clearing PSTATE.PAN.
+On 2025/7/18 00:27, Fuad Tabba wrote:
+> Add arm64 architecture support for handling guest page faults on memory
+> slots backed by guest_memfd.
+>
+> This change introduces a new function, gmem_abort(), which encapsulates
+> the fault handling logic specific to guest_memfd-backed memory. The
+> kvm_handle_guest_abort() entry point is updated to dispatch to
+> gmem_abort() when a fault occurs on a guest_memfd-backed memory slot (as
+> determined by kvm_slot_has_gmem()).
+>
+> Until guest_memfd gains support for huge pages, the fault granule for
+> these memory regions is restricted to PAGE_SIZE.
 
-Since Armv9.6, FEAT_LSUI supplies not only load/store instructions but
-also atomic operation for user memory access in kernel it doesn't need
-to clear PSTATE.PAN bit anymore.
+Since huge pages are not currently supported, would it be more friendly 
+to define  sth like
 
-With theses instructions some of futex atomic operations don't need to
-be implmented with ldxr/stlxr pair instead can be implmented with
-one atomic operation supplied by FEAT_LSUI.
+"#define GMEM_PAGE_GRANULE PAGE_SIZE" at the top (rather than hardcoding 
+PAGE_SIZE)
 
-However, some of futex atomic operations still need to use ll/sc way
-via ldtxr/stltxr supplied by FEAT_LSUI since there is no correspondant
-atomic instruction or doesn't support word size operation.
-(i.e) eor, cas{mb}t
+  and make it easier to switch to huge page support later?
 
-But It's good to work without clearing PSTATE.PAN bit.
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: James Houghton <jthoughton@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>   arch/arm64/kvm/mmu.c | 86 ++++++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 83 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index b3eacb400fab..8c82df80a835 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1512,6 +1512,82 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
+>   	*prot |= kvm_encode_nested_level(nested);
+>   }
+>   
+> +#define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
+> +
+> +static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> +		      struct kvm_s2_trans *nested,
+> +		      struct kvm_memory_slot *memslot, bool is_perm)
+> +{
+> +	bool write_fault, exec_fault, writable;
+> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
+> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+> +	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
+> +	unsigned long mmu_seq;
+> +	struct page *page;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	void *memcache;
+> +	kvm_pfn_t pfn;
+> +	gfn_t gfn;
+> +	int ret;
+> +
+> +	ret = prepare_mmu_memcache(vcpu, true, &memcache);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (nested)
+> +		gfn = kvm_s2_trans_output(nested) >> PAGE_SHIFT;
+> +	else
+> +		gfn = fault_ipa >> PAGE_SHIFT;
+> +
+> +	write_fault = kvm_is_write_fault(vcpu);
+> +	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+> +
+> +	VM_WARN_ON_ONCE(write_fault && exec_fault);
+> +
+> +	mmu_seq = kvm->mmu_invalidate_seq;
+> +	/* Pairs with the smp_wmb() in kvm_mmu_invalidate_end(). */
+> +	smp_rmb();
+> +
+> +	ret = kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &page, NULL);
+> +	if (ret) {
+> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, PAGE_SIZE,
+> +					      write_fault, exec_fault, false);
+> +		return ret;
+> +	}
+> +
+> +	writable = !(memslot->flags & KVM_MEM_READONLY);
+> +
+> +	if (nested)
+> +		adjust_nested_fault_perms(nested, &prot, &writable);
+> +
+> +	if (writable)
+> +		prot |= KVM_PGTABLE_PROT_W;
+> +
+> +	if (exec_fault ||
+> +	    (cpus_have_final_cap(ARM64_HAS_CACHE_DIC) &&
+> +	     (!nested || kvm_s2_trans_executable(nested))))
+> +		prot |= KVM_PGTABLE_PROT_X;
+> +
+> +	kvm_fault_lock(kvm);
+> +	if (mmu_invalidate_retry(kvm, mmu_seq)) {
+> +		ret = -EAGAIN;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, PAGE_SIZE,
+> +						 __pfn_to_phys(pfn), prot,
+> +						 memcache, flags);
+> +
+> +out_unlock:
+> +	kvm_release_faultin_page(kvm, page, !!ret, writable);
+> +	kvm_fault_unlock(kvm);
+> +
+> +	if (writable && !ret)
+> +		mark_page_dirty_in_slot(kvm, memslot, gfn);
+> +
+> +	return ret != -EAGAIN ? ret : 0;
+> +}
+> +
+>   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   			  struct kvm_s2_trans *nested,
+>   			  struct kvm_memory_slot *memslot, unsigned long hva,
+> @@ -1536,7 +1612,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>   	struct kvm_pgtable *pgt;
+>   	struct page *page;
+> -	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
+> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
+>   
+>   	if (fault_is_perm)
+>   		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
+> @@ -1961,8 +2037,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>   	VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
+>   			!write_fault && !kvm_vcpu_trap_is_exec_fault(vcpu));
+>   
+> -	ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> -			     esr_fsc_is_permission_fault(esr));
+> +	if (kvm_slot_has_gmem(memslot))
+> +		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
+> +				 esr_fsc_is_permission_fault(esr));
+> +	else
+> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> +				     esr_fsc_is_permission_fault(esr));
+>   	if (ret == 0)
+>   		ret = 1;
+>   out:
+LGTM!
 
-Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
----
- arch/arm64/include/asm/futex.h | 142 ++++++++++++++++++++++++++++++++-
- 1 file changed, 141 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-index fdec4f3f2b15..38fc98f4af46 100644
---- a/arch/arm64/include/asm/futex.h
-+++ b/arch/arm64/include/asm/futex.h
-@@ -9,6 +9,8 @@
- #include <linux/uaccess.h>
- #include <linux/stringify.h>
- 
-+#include <asm/alternative.h>
-+#include <asm/alternative-macros.h>
- #include <asm/errno.h>
- 
- #define LLSC_MAX_LOOPS	128 /* What's the largest number you can think of? */
-@@ -115,11 +117,149 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
- 	return ret;
- }
- 
-+#ifdef CONFIG_AS_HAS_LSUI
-+
-+#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-+
-+#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
-+static __always_inline int						\
-+__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-+{									\
-+	int ret = 0;							\
-+	int val;							\
-+									\
-+	mte_enable_tco();						\
-+	uaccess_ttbr0_enable();						\
-+									\
-+	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
-+	__LSUI_PREAMBLE							\
-+	"1:	" #asm_op #mb "	%w3, %w2, %1\n"				\
-+	"2:\n"								\
-+	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)				\
-+	: "+r" (ret), "+Q" (*uaddr), "=r" (val)				\
-+	: "r" (oparg)							\
-+	: "memory");							\
-+									\
-+	mte_disable_tco();						\
-+	uaccess_ttbr0_disable();					\
-+									\
-+	if (!ret)							\
-+		*oval = val;						\
-+									\
-+	return ret;							\
-+}
-+
-+LSUI_FUTEX_ATOMIC_OP(add, ldtadd, al)
-+LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
-+LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
-+LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
-+
-+static __always_inline int
-+__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
-+{
-+	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
-+}
-+
-+static __always_inline int
-+__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
-+{
-+	unsigned int loops = LLSC_MAX_LOOPS;
-+	int ret, val, tmp;
-+
-+	mte_enable_tco();
-+	uaccess_ttbr0_enable();
-+
-+	/*
-+	 * there are no ldteor/stteor instructions...
-+	 */
-+	asm volatile("// __lsui_futex_atomic_eor\n"
-+	__LSUI_PREAMBLE
-+	"	prfm	pstl1strm, %2\n"
-+	"1:	ldtxr	%w1, %2\n"
-+	"	eor	%w3, %w1, %w5\n"
-+	"2:	stltxr	%w0, %w3, %2\n"
-+	"	cbz	%w0, 3f\n"
-+	"	sub	%w4, %w4, %w0\n"
-+	"	cbnz	%w4, 1b\n"
-+	"	mov	%w0, %w6\n"
-+	"3:\n"
-+	"	dmb	ish\n"
-+	_ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w0)
-+	_ASM_EXTABLE_UACCESS_ERR(2b, 3b, %w0)
-+	: "=&r" (ret), "=&r" (val), "+Q" (*uaddr), "=&r" (tmp),
-+	  "+r" (loops)
-+	: "r" (oparg), "Ir" (-EAGAIN)
-+	: "memory");
-+
-+	mte_disable_tco();
-+	uaccess_ttbr0_disable();
-+
-+	if (!ret)
-+		*oval = val;
-+
-+	return ret;
-+}
-+
-+static __always_inline int
-+__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-+{
-+	int ret = 0;
-+	unsigned int loops = LLSC_MAX_LOOPS;
-+	u32 val, tmp;
-+
-+	mte_enable_tco();
-+	uaccess_ttbr0_enable();
-+
-+	/*
-+	 * cas{al}t doesn't support word size...
-+	 */
-+	asm volatile("//__lsui_futex_cmpxchg\n"
-+	__LSUI_PREAMBLE
-+	"	prfm	pstl1strm, %2\n"
-+	"1:	ldtxr	%w1, %2\n"
-+	"	eor	%w3, %w1, %w5\n"
-+	"	cbnz	%w3, 4f\n"
-+	"2:	stltxr	%w3, %w6, %2\n"
-+	"	cbz	%w3, 3f\n"
-+	"	sub	%w4, %w4, %w3\n"
-+	"	cbnz	%w4, 1b\n"
-+	"	mov	%w0, %w7\n"
-+	"3:\n"
-+	"	dmb	ish\n"
-+	"4:\n"
-+	_ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)
-+	_ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)
-+	: "+r" (ret), "=&r" (val), "+Q" (*uaddr), "=&r" (tmp), "+r" (loops)
-+	: "r" (oldval), "r" (newval), "Ir" (-EAGAIN)
-+	: "memory");
-+
-+	mte_disable_tco();
-+	uaccess_ttbr0_disable();
-+
-+	if (!ret)
-+		*oval = oldval;
-+
-+	return ret;
-+}
-+
-+#define __lsui_llsc_body(op, ...)					\
-+({									\
-+	alternative_has_cap_likely(ARM64_HAS_LSUI) ?			\
-+		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
-+})
-+
-+#else	/* CONFIG_AS_HAS_LSUI */
-+
-+#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
-+
-+#endif	/* CONFIG_AS_HAS_LSUI */
-+
-+
- #define FUTEX_ATOMIC_OP(op)						\
- static __always_inline int						\
- __futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)		\
- {									\
--	return __llsc_futex_atomic_##op(oparg, uaddr, oval);		\
-+	return __lsui_llsc_body(futex_atomic_##op, oparg, uaddr, oval);	\
- }
- 
- FUTEX_ATOMIC_OP(add)
 -- 
-LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+Thanks,
+   Kunwu.Chan(Tao.Chan)
 
