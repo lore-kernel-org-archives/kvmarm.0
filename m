@@ -1,255 +1,234 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574BA279DA1
-	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 15:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD7C279DB7
+	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 15:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753199452; cv=none; b=PXo4Yuv6kzZSfdAhRWxCEMvQqzj1q769WEqTium3W2LFI/+vl9V/ZxQrMsBwLCZrx+KBPaGcpAx9iSGhVUZp+PnAfAuU60XwcKfBgiySzQD/dlwPv3i+gJzrwYxyqVbCWDpd/5zAMG3e0HzHH71YtYVdS1wwLa1HynPuqc/KB2Y=
+	t=1753199668; cv=none; b=lRvZCFqhf2uSQ8JvjI008JezT54danavlrLCjr4kqcsWwMhAZ0D6x0Sy3l3tF6VbjZXJGk8QVatS6c9Bar/HjWpRgQBnNAO3yJX1qSqUFo2922MU3CL1CRYH8hfM3AiE5X6Xszj/sJC/xa9pHhxzpnFC32myAQwFxrqisnHaOYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753199452; c=relaxed/simple;
-	bh=nCWGwF+dZTYHZWsZ5yUGhCF6+4z1EWHqmqJTiWnr9D0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jqbUAYBiysWTVKVZEPTPhn74EHAhFJ3f8bWogUjRFRd2uh57ahWxsirq6XsipbGN/yzPLkt57A2IEbfIcs2eabvW97kG50EIjkP7v4278/BY4RfwIbLj2U11v1SZKeKpHQqCxQDxE/4bcgWTgOWdg5wgavmg1yKQruVWN9BXQDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZEEiVkRe; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1753199668; c=relaxed/simple;
+	bh=IbxyI+d4DwDdJfWKyRK5YK5E+tDQKNfuGXF+3uEwdSQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Tu9uSsFx8CNl+AQpRhIo3yLpHsx9c3aJNVVD2h1dbDNv3dn1BZfGJyJCBsdIgwvawi7lXp+KS7zfXLLWo2NRkQfWyNIopmrm4CUM9/cypjhnz8ZOs2gdTqb22CAhiG0MfJx/XCQhc/nWv7XblJmueeIlfQwf/IgX3hUphPi0dKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DbXoSbVn; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZEEiVkRe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753199450;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=1d39bdqnItomRQBDSV5BhuZCnSF482IcxM6Ke6+QbMc=;
-	b=ZEEiVkReRFg5Oy2GLoqlHmAvLQ7uvznVOkzffkiS0LEvFqoTTWSQ80XGXagBZwPKrUODod
-	x/mOk2v/MQtmiY5kQkZMQbcDnwhFaPQ0V+QCg2PQ/EJpNUab6YYWC+vBjwVL8CHR5Bgh7U
-	isGpsdQzUDXVu5LP9+q2CxSrsH62wfs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-Ft91VaIuNOelXnsNH-WVmg-1; Tue, 22 Jul 2025 11:50:46 -0400
-X-MC-Unique: Ft91VaIuNOelXnsNH-WVmg-1
-X-Mimecast-MFC-AGG-ID: Ft91VaIuNOelXnsNH-WVmg_1753199445
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a54a8a0122so3288628f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 08:50:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DbXoSbVn"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31202bbaafaso4857555a91.1
+        for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 08:54:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753199667; x=1753804467; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2EB07ZZ1nZF+2zxBd27QnHrigr6tNVGhECi/rfOelmg=;
+        b=DbXoSbVnIBGV49uVF1PeSRHpz58H5D2hNglCiQDWHfBTop759ZdySDQJMSb2KbYGd7
+         32XUiYGlGgF2pBGOEQhKFBJLHRFURznA/DUeFUxsmXH0MAEzWAMi81goOS02SaaJLRQp
+         L6fQZmZfKB8Wo8yWF/VfbbE7dQXas6cRsvkZFJTRvR0L5P8NE71FzRnj0qD6emmrQVy+
+         72+M4jaJ0oyI/yedgh0Ji6ETmlktWGIes9LierK5BJ0Gg6gXz9s00zIGDF/oIH3sMyi1
+         fTk2Y8n/3ckr1NA8/ct/eI7nPdBVYCFiZkjoyb/3NayeSDVd+xIulSnofZQIS6fH6XRh
+         E2ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753199445; x=1753804245;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+        d=1e100.net; s=20230601; t=1753199667; x=1753804467;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=1d39bdqnItomRQBDSV5BhuZCnSF482IcxM6Ke6+QbMc=;
-        b=W6uf6WDSRBB0yftJyB5oHghB6u3ea9uNbYYGgDGwukfDnvAaZrUidVGjOV7yCHabjI
-         UMQRrlPaAdFBeQeDrTkML2XkztQOSB8guz8axchKE2szYG9zESxuPg4GdiGoyhv5UCaq
-         t853qXGYufbjxENkI+CKrGqFvZFZYwh1OYKtp6qVABsYDXQKm7R9ymtn+/C5PKOu/Waq
-         fabH1RRjaDL/SxDT0kzKLS7E4acdAMbTfZa3W0p/CacNZG+B0M6hu0FZUddUgCIC4N96
-         j/x02jqDSPd3UQ3TD2ymoPtYHn33EIg+QWC/r9L1uTlS0FO4yRHqI7u/jbnNNlTZYSwp
-         DSYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfp7KzPmwudLaOU7eVkds7JpBSiK58WxeuQnKYzy2ygXb3tySnYIWLnmi1VLtwVv0CcBXjIpQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz1kBJ+oDklQ2EF12dn0h7OI9xUPH1eoXODcyHRG4SZIHadIF/w
-	fMVhBW5JnIuoVU09N5jYx2OdLHivk3ZxZ7o/un79iW6fm0UPw/re6TbqAbkHsrpzv7ayeyksWbm
-	IujYs+gjLVgAJEM27Wc7X0UubtmwtbjwY7WfDdeCM17a9/dWy9wyG94KzBQ==
-X-Gm-Gg: ASbGncsfAk7p5aC5gcnf97Il3sfO9vp3ywqZvncELE9N6KFyZ2bXsTFYRvYL8gKjOZl
-	d2DSAzpTxeoVlYekJyxinsQQcSrZBtJART40ETtVYZwbCrldbvUDJlqNs+YwFbNMXIieBXL3lLC
-	B13fAHSSqkKFPOfl3ROlMEbDRuZ3oG2uDPci9VOzmruHLJWO4/6WeZC9ouDf/G+kVXutVkVFLTy
-	WukKZVR5bDnnLy2AAapn01pW81y216uM94I0Re7BYPg/5M8ueC1o0tuagSgxyZE6jKV6hUR3QFz
-	+R9Wf3Ckaagmk+RHJw0mi8i3l0rL/WrDPsAxtKxbcaj/DHimcSX6/aF8wkkopbLe8cF+7zx65qx
-	AJmMQ7rl+9b+k6ejDkzljtiTgSHXAHPb28QSpayVja0R2LZ/k6+Y0w3/hONZ+KATXetw=
-X-Received: by 2002:a05:6000:985:b0:3a4:ea8f:efe4 with SMTP id ffacd0b85a97d-3b61b0f1bd1mr10419470f8f.18.1753199445476;
-        Tue, 22 Jul 2025 08:50:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGm2frdCNOY1aH4JiQzplVhsf9wX7Yke0loRi54J0nEvdnAMQE71SJU05PcYhh7A1tnkUVGXQ==
-X-Received: by 2002:a05:6000:985:b0:3a4:ea8f:efe4 with SMTP id ffacd0b85a97d-3b61b0f1bd1mr10419384f8f.18.1753199444899;
-        Tue, 22 Jul 2025 08:50:44 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f28:de00:1efe:3ea4:63ba:1713? (p200300d82f28de001efe3ea463ba1713.dip0.t-ipconnect.de. [2003:d8:2f28:de00:1efe:3ea4:63ba:1713])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca5d018sm13686920f8f.90.2025.07.22.08.50.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Jul 2025 08:50:44 -0700 (PDT)
-Message-ID: <e7fee2b0-eb71-4556-a99b-ba9b44491519@redhat.com>
-Date: Tue, 22 Jul 2025 17:50:41 +0200
+        bh=2EB07ZZ1nZF+2zxBd27QnHrigr6tNVGhECi/rfOelmg=;
+        b=kCRQoJoxvylCCqs7GMYcucDnuR/EdZBiQpbELjcAFt1k8NwT/lOZi5NQa26RNJ6PZ1
+         ApuEym0i3K+uzBP6rssxvlafr8sQ3alIPKfbVlcZvBZxteROY6B65E4ZvGG4u4RrEHGD
+         oCMze5wb25Qd3bwAiTHR0p5AeBj7CUSRRdWMglAHOTYmDvvrnagD0AFJYn2kZ/A9+ZMd
+         SFDmKWW1Jd1uRZmcx0HuTI96f+uNDd6DjkbyI88T/u/E4yt0AcagQnUPaHAymHVggVam
+         d2RYAd6WBYI+ixkcP6l44OhkpEXHizEKRQrVcg9PVfQSLvSbfR3CW6SnSARVKHWx56po
+         AcBg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1VogGDqOO10HNKhB5RXyOHZdKr60BUL4xPqYeltPtVgpdsuQPClYPqefwG5RX8blnqZlF/4k=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw3wzbaZopx4iYV4IsZ8MmeZrgWgSjKGP7mO37DPHxHaqKHJBv5
+	o86O5FBezAsAu4E8m9ooflsVWJM009yI9pXTyXtB6EbeHsRud7RCK4Lp+8LUNyrbOygO+MsAocs
+	w/JbJBQ==
+X-Google-Smtp-Source: AGHT+IGD9GjUmk2mTKpI5WThiVPOreH1K6U86raMu0YkKxP22VhfLnDZ4ZgBcgSwwkWvRKO4X9OvNPQVInU=
+X-Received: from pjbqo11.prod.google.com ([2002:a17:90b:3dcb:b0:311:7d77:229f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:5d12:b0:31c:39c5:ffbd
+ with SMTP id 98e67ed59e1d1-31c9f4b4177mr29758044a91.24.1753199666565; Tue, 22
+ Jul 2025 08:54:26 -0700 (PDT)
+Date: Tue, 22 Jul 2025 08:54:25 -0700
+In-Reply-To: <13654746-3edc-4e4a-ac4f-fa281b83b2ae@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+Mime-Version: 1.0
+References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-15-tabba@google.com>
+ <505a30a3-4c55-434c-86a5-f86d2e9dc78a@intel.com> <608cc9a5-cf25-47fe-b4eb-bdaff7406c2e@intel.com>
+ <aH-iGMkP3Ad5yncW@google.com> <13654746-3edc-4e4a-ac4f-fa281b83b2ae@intel.com>
+Message-ID: <aH-0MdNJbH19Mhm3@google.com>
 Subject: Re: [PATCH v15 14/21] KVM: x86: Enable guest_memfd mmap for default
  VM type
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Sean Christopherson <seanjc@google.com>
-Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org,
- willy@infradead.org, akpm@linux-foundation.org, yilun.xu@intel.com,
- chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
- dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
- vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
- mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-15-tabba@google.com>
- <505a30a3-4c55-434c-86a5-f86d2e9dc78a@intel.com>
- <608cc9a5-cf25-47fe-b4eb-bdaff7406c2e@intel.com>
- <aH-iGMkP3Ad5yncW@google.com>
- <13654746-3edc-4e4a-ac4f-fa281b83b2ae@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- g3eXuA==
-Organization: Red Hat
-In-Reply-To: <13654746-3edc-4e4a-ac4f-fa281b83b2ae@intel.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: niM7f6s6ygU3vJ7trnJSozjWQPiEvibYYmb8eufI4qs_1753199445
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 22.07.25 17:31, Xiaoyao Li wrote:
+On Tue, Jul 22, 2025, Xiaoyao Li wrote:
 > On 7/22/2025 10:37 PM, Sean Christopherson wrote:
->> On Tue, Jul 22, 2025, Xiaoyao Li wrote:
->>> On 7/21/2025 8:22 PM, Xiaoyao Li wrote:
->>>> On 7/18/2025 12:27 AM, Fuad Tabba wrote:
->>>>> +/*
->>>>> + * CoCo VMs with hardware support that use guest_memfd only for
->>>>> backing private
->>>>> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping
->>>>> enabled.
->>>>> + */
->>>>> +#define kvm_arch_supports_gmem_mmap(kvm)        \
->>>>> +    (IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP) &&    \
->>>>> +     (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM)
->>>>
->>>> I want to share the findings when I do the POC to enable gmem mmap in QEMU.
->>>>
->>>> Actually, QEMU can use gmem with mmap support as the normal memory even
->>>> without passing the gmem fd to kvm_userspace_memory_region2.guest_memfd
->>>> on KVM_SET_USER_MEMORY_REGION2.
->>>>
->>>> Since the gmem is mmapable, QEMU can pass the userspace addr got from
->>>> mmap() on gmem fd to kvm_userspace_memory_region(2).userspace_addr. It
->>>> works well for non-coco VMs on x86.
->>>
->>> one more findings.
->>>
->>> I tested with QEMU by creating normal (non-private) memory with mmapable
->>> guest memfd, and enforcily passing the fd of the gmem to struct
->>> kvm_userspace_memory_region2 when QEMU sets up memory region.
->>>
->>> It hits the kvm_gmem_bind() error since QEMU tries to back different GPA
->>> region with the same gmem.
->>>
->>> So, the question is do we want to allow the multi-binding for shared-only
->>> gmem?
->>
->> Can you elaborate, maybe with code?  I don't think I fully understand the setup.
-> 
+> > On Tue, Jul 22, 2025, Xiaoyao Li wrote:
+> > > On 7/21/2025 8:22 PM, Xiaoyao Li wrote:
+> > > > On 7/18/2025 12:27 AM, Fuad Tabba wrote:
+> > > > > +/*
+> > > > > + * CoCo VMs with hardware support that use guest_memfd only for
+> > > > > backing private
+> > > > > + * memory, e.g., TDX, cannot use guest_memfd with userspace mapp=
+ing
+> > > > > enabled.
+> > > > > + */
+> > > > > +#define kvm_arch_supports_gmem_mmap(kvm)=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 \
+> > > > > +=C2=A0=C2=A0=C2=A0 (IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP) &&=
+=C2=A0=C2=A0=C2=A0 \
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0 (kvm)->arch.vm_type =3D=3D KVM_X86_DEFA=
+ULT_VM)
+> > > >=20
+> > > > I want to share the findings when I do the POC to enable gmem mmap =
+in QEMU.
+> > > >=20
+> > > > Actually, QEMU can use gmem with mmap support as the normal memory =
+even
+> > > > without passing the gmem fd to kvm_userspace_memory_region2.guest_m=
+emfd
+> > > > on KVM_SET_USER_MEMORY_REGION2.
+> > > >=20
+> > > > Since the gmem is mmapable, QEMU can pass the userspace addr got fr=
+om
+> > > > mmap() on gmem fd to kvm_userspace_memory_region(2).userspace_addr.=
+ It
+> > > > works well for non-coco VMs on x86.
+> > >=20
+> > > one more findings.
+> > >=20
+> > > I tested with QEMU by creating normal (non-private) memory with mmapa=
+ble
+> > > guest memfd, and enforcily passing the fd of the gmem to struct
+> > > kvm_userspace_memory_region2 when QEMU sets up memory region.
+> > >=20
+> > > It hits the kvm_gmem_bind() error since QEMU tries to back different =
+GPA
+> > > region with the same gmem.
+> > >=20
+> > > So, the question is do we want to allow the multi-binding for shared-=
+only
+> > > gmem?
+> >=20
+> > Can you elaborate, maybe with code?  I don't think I fully understand t=
+he setup.
+>=20
 > well, I haven't fully sorted it out. Just share what I get so far.
-> 
+>=20
 > the problem hit when SMM is enabled (which is enabled by default).
-> 
-> - The trace of "-machine q35,smm=off":
-> 
-> kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0x80000000
-> ua=0x7f5733fff000 guest_memfd=15 guest_memfd_offset=0x0 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#1 flags=0x4 gpa=0x100000000
-> size=0x80000000 ua=0x7f57b3fff000 guest_memfd=15
-> guest_memfd_offset=0x80000000 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#2 flags=0x2 gpa=0xffc00000
-> size=0x400000 ua=0x7f5840a00000 guest_memfd=-1 guest_memfd_offset=0x0 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x0 gpa=0x0 size=0x0
-> ua=0x7f5733fff000 guest_memfd=15 guest_memfd_offset=0x0 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0xc0000
-> ua=0x7f5733fff000 guest_memfd=15 guest_memfd_offset=0x0 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#3 flags=0x2 gpa=0xc0000
-> size=0x20000 ua=0x7f5841000000 guest_memfd=-1 guest_memfd_offset=0x0 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#4 flags=0x2 gpa=0xe0000
-> size=0x20000 ua=0x7f5840de0000 guest_memfd=-1
-> guest_memfd_offset=0x3e0000 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#5 flags=0x4 gpa=0x100000
-> size=0x7ff00000 ua=0x7f57340ff000 guest_memfd=15
-> guest_memfd_offset=0x100000 ret=0
-> 
+>=20
+> - The trace of "-machine q35,smm=3Doff":
+>=20
+> kvm_set_user_memory AddrSpace#0 Slot#0 flags=3D0x4 gpa=3D0x0 size=3D0x800=
+00000
+> ua=3D0x7f5733fff000 guest_memfd=3D15 guest_memfd_offset=3D0x0 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#1 flags=3D0x4 gpa=3D0x100000000
+> size=3D0x80000000 ua=3D0x7f57b3fff000 guest_memfd=3D15
+> guest_memfd_offset=3D0x80000000 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#2 flags=3D0x2 gpa=3D0xffc00000
+> size=3D0x400000 ua=3D0x7f5840a00000 guest_memfd=3D-1 guest_memfd_offset=
+=3D0x0 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#0 flags=3D0x0 gpa=3D0x0 size=3D0x0
+> ua=3D0x7f5733fff000 guest_memfd=3D15 guest_memfd_offset=3D0x0 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#0 flags=3D0x4 gpa=3D0x0 size=3D0xc00=
+00
+> ua=3D0x7f5733fff000 guest_memfd=3D15 guest_memfd_offset=3D0x0 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#3 flags=3D0x2 gpa=3D0xc0000 size=3D0=
+x20000
+> ua=3D0x7f5841000000 guest_memfd=3D-1 guest_memfd_offset=3D0x0 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#4 flags=3D0x2 gpa=3D0xe0000 size=3D0=
+x20000
+> ua=3D0x7f5840de0000 guest_memfd=3D-1 guest_memfd_offset=3D0x3e0000 ret=3D=
+0
+> kvm_set_user_memory AddrSpace#0 Slot#5 flags=3D0x4 gpa=3D0x100000
+> size=3D0x7ff00000 ua=3D0x7f57340ff000 guest_memfd=3D15 guest_memfd_offset=
+=3D0x100000
+> ret=3D0
+>=20
 > - The trace of "-machine q35"
-> 
-> kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0x80000000
-> ua=0x7f8faffff000 guest_memfd=15 guest_memfd_offset=0x0 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#1 flags=0x4 gpa=0x100000000
-> size=0x80000000 ua=0x7f902ffff000 guest_memfd=15
-> guest_memfd_offset=0x80000000 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#2 flags=0x2 gpa=0xffc00000
-> size=0x400000 ua=0x7f90bd000000 guest_memfd=-1 guest_memfd_offset=0x0 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#3 flags=0x4 gpa=0xfeda0000
-> size=0x20000 ua=0x7f8fb009f000 guest_memfd=15 guest_memfd_offset=0xa0000
-> ret=-22
-> qemu-system-x86_64: kvm_set_user_memory_region:
-> KVM_SET_USER_MEMORY_REGION2 failed, slot=3, start=0xfeda0000,
-> size=0x20000, flags=0x4, guest_memfd=15, guest_memfd_offset=0xa0000:
-> Invalid argument
+>=20
+> kvm_set_user_memory AddrSpace#0 Slot#0 flags=3D0x4 gpa=3D0x0 size=3D0x800=
+00000
+> ua=3D0x7f8faffff000 guest_memfd=3D15 guest_memfd_offset=3D0x0 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#1 flags=3D0x4 gpa=3D0x100000000
+> size=3D0x80000000 ua=3D0x7f902ffff000 guest_memfd=3D15
+> guest_memfd_offset=3D0x80000000 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#2 flags=3D0x2 gpa=3D0xffc00000
+> size=3D0x400000 ua=3D0x7f90bd000000 guest_memfd=3D-1 guest_memfd_offset=
+=3D0x0 ret=3D0
+> kvm_set_user_memory AddrSpace#0 Slot#3 flags=3D0x4 gpa=3D0xfeda0000 size=
+=3D0x20000
+> ua=3D0x7f8fb009f000 guest_memfd=3D15 guest_memfd_offset=3D0xa0000 ret=3D-=
+22
+> qemu-system-x86_64: kvm_set_user_memory_region: KVM_SET_USER_MEMORY_REGIO=
+N2
+> failed, slot=3D3, start=3D0xfeda0000, size=3D0x20000, flags=3D0x4, guest_=
+memfd=3D15,
+> guest_memfd_offset=3D0xa0000: Invalid argument
 > kvm_set_phys_mem: error registering slot: Invalid argument
+>=20
+>=20
+> where QEMU tries to setup the memory region for [0xfeda0000, +0x20000],
+> which is back'ed by gmem (fd is 15) allocated for normal RAM, from offset
+> 0xa0000.
+>=20
+> What I have tracked down in QEMU is mch_realize(), where it sets up some
+> memory region starting from 0xfeda0000.
 
-Weird. When splitting regions (I think that is what's happening), QEMU 
-should first remove the old slots to then insert the new slots.
+Oh yay, SMM.  The problem lies in memory regions that are aliased into low =
+memory
+(IIRC, there's at least one other such scenario, but don't quote me on that=
+).
+For SMRAM, when the "high" SMRAM location (0xfeda0000) is enabled, the "leg=
+acy"
+SMRAM location (0xa0000) gets remapped (aliased in QEMU's vernacular) to th=
+e
+high location, resulting in two CPU physical addresses pointing at the same
+underyling memory[*].  From KVM's perspective, that means two GPA ranges po=
+inting
+at the same HVA.
 
-Otherwise there would be GPA overlaps as well?
+As for whether or not we want to support such madness...  I'd definitely sa=
+y "not
+now", and probably not ever.  Emulating SMM puts the VMM *firmly* in the TC=
+B of
+the guest, and so guest_memfd benefits like not having to map guest memory =
+into
+userspace pretty much go out the window.  For such a use case, I don't thin=
+k it's
+unreasonable to require QEMU (or any other VMM) to map the aliases via HVA =
+only,
+i.e. to not take full advantage of guest_memfd.
 
--- 
-Cheers,
-
-David / dhildenb
-
+[*] https://opensecuritytraining.info/IntroBIOS_files/Day1_08_Advanced%20x8=
+6%20-%20BIOS%20and%20SMM%20Internals%20-%20SMRAM.pdf
