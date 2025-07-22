@@ -1,216 +1,145 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C98115DBC1
-	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 12:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5139FB667
+	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 12:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753187563; cv=none; b=D09f1BrPBJa4lPOh/6HSrlZ0W+eKYweYfks5gLug7pIM1Fegc42NBr0W30dgZWCL2tuFIKsunbWxq/t2VT4cgVTS/xp6BzfkmiwB1Tv6t3b3yAQiY/2E8CJj2bQiJquhxJ4Ff8bSnAp0tCEQVXVH/vZJBtIgY0rSm9fim9rgzaM=
+	t=1753189153; cv=none; b=cMoleEPTElBTLnNYVB7KZeUqlEHeelXRFiVo10szDw4PwcinLt9NIGUc81IaVS4B9CpwEr35Gf/6lco03cjy1upIIWaeRVxKKGNXJ+HBHmpPG9FG8/dGyAG/lFpPpwNaPFKh9GBm+Z4AKLbIHa8cvD7gJuCcwoPKL3qnOYbtUbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753187563; c=relaxed/simple;
-	bh=kfXCFB4M4r9Eu+Ta6xP8Saq4J9ai+mgIIVpmeC+Orzo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l40nrtKcJRbBuUOfEZLGlcry70YGjIpKsJDL7v+KQlO8ggZ2rMrwjNo2pIkrXDRsUM11TPKI/ibJVrYgyKvi8XcnKe972N06nNW8cLcqE29IfIYyJGrrlrApASO49fgNiOl7mEKNE89fhMIxV1fL/SBJbauT/eWBbImg8lP7HMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WeLHgmXx; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WeLHgmXx"
-Message-ID: <07976427-e5a4-4ca4-93e9-a428a962b0b2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753187549;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7MMMOAOPjOBlhMHrulLMPV/ml/XegyxT79zgI8vdaQc=;
-	b=WeLHgmXx0r97gR/zn1eWenIdriuOSpYVj9Enitmu+wk6hPYUCHXPbtDMke+K2iZ8CfIEli
-	L2PPPUlUHtpcnh+fY+glHgeelj+WuvAribXpZM+k/8swY851tIbGWUVGWzbcfzmko35xvp
-	bSykaR5ROyJfWZ7ZJwWd2TTVDWbPsEs=
-Date: Tue, 22 Jul 2025 20:31:34 +0800
+	s=arc-20240116; t=1753189153; c=relaxed/simple;
+	bh=736uIAHzyrcCRqCqAhExqhDC1+D7LWtMyOXmc0eNxLc=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=aVKUETCGo2MLUDdUinbLyDX5Kb/PwhBEZN+No6IJbT9GaTNnaJMErwweG/4/9nMqXKh2IJ7Tx044bZPQhJV01dMq0ONmtjg062RtwVXHciiTWYO0wN1O/hv5WKNCwejSFKnYlNe2kpiLJ+dyaKUyY1Uk+8m7MOVUX6Gq/WLQmfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 90713152B;
+	Tue, 22 Jul 2025 05:59:04 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 633153F6A8;
+	Tue, 22 Jul 2025 05:59:08 -0700 (PDT)
+Message-ID: <17b526ff-b824-4c24-8ac0-6821e5cc8900@arm.com>
+Date: Tue, 22 Jul 2025 13:59:06 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH v15 16/21] KVM: arm64: Handle guest_memfd-backed guest
- page faults
+User-Agent: Mozilla Thunderbird
 Content-Language: en-US
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-17-tabba@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kunwu Chan <kunwu.chan@linux.dev>
-In-Reply-To: <20250717162731.446579-17-tabba@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com >> Zenghui Yu" <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ qperret@google.com, vdonnefort@google.com, Fuad Tabba <tabba@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ Ryan.Roberts@arm.com
+From: Ben Horgan <ben.horgan@arm.com>
+Subject: [bug report] KVM: arm64: Add a range to __pkvm_host_unshare_guest()
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
 
-On 2025/7/18 00:27, Fuad Tabba wrote:
-> Add arm64 architecture support for handling guest page faults on memory
-> slots backed by guest_memfd.
->
-> This change introduces a new function, gmem_abort(), which encapsulates
-> the fault handling logic specific to guest_memfd-backed memory. The
-> kvm_handle_guest_abort() entry point is updated to dispatch to
-> gmem_abort() when a fault occurs on a guest_memfd-backed memory slot (as
-> determined by kvm_slot_has_gmem()).
->
-> Until guest_memfd gains support for huge pages, the fault granule for
-> these memory regions is restricted to PAGE_SIZE.
+Hi,
 
-Since huge pages are not currently supported, would it be more friendly 
-to define  sth like
+On trying to boot a pkvm guest when using transparent huge pages I see 
+the crash below. I'm using v6.6-rc7.
 
-"#define GMEM_PAGE_GRANULE PAGE_SIZE" at the top (rather than hardcoding 
-PAGE_SIZE)
+kvm [141]: nVHE hyp BUG at: arch/arm64/kvm/hyp/nvhe/mem_protect.c:1088!
 
-  and make it easier to switch to huge page support later?
+It looks pkvm_pgtable_stage_relax_perms() can be called with a block 
+mapping but in __pkvm_host_relax_perms_guest() it assumes page size for 
+the assert_host_shared_guest() check. With the following patch, I no 
+longer see the crash:
 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: James Houghton <jthoughton@google.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->   arch/arm64/kvm/mmu.c | 86 ++++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 83 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index b3eacb400fab..8c82df80a835 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1512,6 +1512,82 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
->   	*prot |= kvm_encode_nested_level(nested);
->   }
->   
-> +#define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
-> +
-> +static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> +		      struct kvm_s2_trans *nested,
-> +		      struct kvm_memory_slot *memslot, bool is_perm)
-> +{
-> +	bool write_fault, exec_fault, writable;
-> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> +	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-> +	unsigned long mmu_seq;
-> +	struct page *page;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	void *memcache;
-> +	kvm_pfn_t pfn;
-> +	gfn_t gfn;
-> +	int ret;
-> +
-> +	ret = prepare_mmu_memcache(vcpu, true, &memcache);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (nested)
-> +		gfn = kvm_s2_trans_output(nested) >> PAGE_SHIFT;
-> +	else
-> +		gfn = fault_ipa >> PAGE_SHIFT;
-> +
-> +	write_fault = kvm_is_write_fault(vcpu);
-> +	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> +
-> +	VM_WARN_ON_ONCE(write_fault && exec_fault);
-> +
-> +	mmu_seq = kvm->mmu_invalidate_seq;
-> +	/* Pairs with the smp_wmb() in kvm_mmu_invalidate_end(). */
-> +	smp_rmb();
-> +
-> +	ret = kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &page, NULL);
-> +	if (ret) {
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, PAGE_SIZE,
-> +					      write_fault, exec_fault, false);
-> +		return ret;
-> +	}
-> +
-> +	writable = !(memslot->flags & KVM_MEM_READONLY);
-> +
-> +	if (nested)
-> +		adjust_nested_fault_perms(nested, &prot, &writable);
-> +
-> +	if (writable)
-> +		prot |= KVM_PGTABLE_PROT_W;
-> +
-> +	if (exec_fault ||
-> +	    (cpus_have_final_cap(ARM64_HAS_CACHE_DIC) &&
-> +	     (!nested || kvm_s2_trans_executable(nested))))
-> +		prot |= KVM_PGTABLE_PROT_X;
-> +
-> +	kvm_fault_lock(kvm);
-> +	if (mmu_invalidate_retry(kvm, mmu_seq)) {
-> +		ret = -EAGAIN;
-> +		goto out_unlock;
-> +	}
-> +
-> +	ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, PAGE_SIZE,
-> +						 __pfn_to_phys(pfn), prot,
-> +						 memcache, flags);
-> +
-> +out_unlock:
-> +	kvm_release_faultin_page(kvm, page, !!ret, writable);
-> +	kvm_fault_unlock(kvm);
-> +
-> +	if (writable && !ret)
-> +		mark_page_dirty_in_slot(kvm, memslot, gfn);
-> +
-> +	return ret != -EAGAIN ? ret : 0;
-> +}
-> +
->   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   			  struct kvm_s2_trans *nested,
->   			  struct kvm_memory_slot *memslot, unsigned long hva,
-> @@ -1536,7 +1612,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
->   	struct kvm_pgtable *pgt;
->   	struct page *page;
-> -	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
-> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
->   
->   	if (fault_is_perm)
->   		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
-> @@ -1961,8 +2037,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->   	VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
->   			!write_fault && !kvm_vcpu_trap_is_exec_fault(vcpu));
->   
-> -	ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> -			     esr_fsc_is_permission_fault(esr));
-> +	if (kvm_slot_has_gmem(memslot))
-> +		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
-> +				 esr_fsc_is_permission_fault(esr));
-> +	else
-> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> +				     esr_fsc_is_permission_fault(esr));
->   	if (ret == 0)
->   		ret = 1;
->   out:
-LGTM!
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c 
+b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 8957734d6183..52c802da4172 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -1010,9 +1010,12 @@ static int __check_host_shared_guest(struct 
+pkvm_hyp_vm *vm, u64 *__phys, u64 ip
+                 return ret;
+         if (!kvm_pte_valid(pte))
+                 return -ENOENT;
+-       if (kvm_granule_size(level) != size)
++       if (size && kvm_granule_size(level) != size)
+                 return -E2BIG;
 
--- 
++       if (!size)
++               size = kvm_granule_size(level);
++
+         state = guest_get_page_state(pte, ipa);
+         if (state != PKVM_PAGE_SHARED_BORROWED)
+                 return -EPERM;
+@@ -1100,7 +1103,7 @@ int __pkvm_host_relax_perms_guest(u64 gfn, struct 
+pkvm_hyp_vcpu *vcpu, enum kvm_
+         if (prot & ~KVM_PGTABLE_PROT_RWX)
+                 return -EINVAL;
+
+-       assert_host_shared_guest(vm, ipa, PAGE_SIZE);
++       assert_host_shared_guest(vm, ipa, 0);
+         guest_lock_component(vm);
+         ret = kvm_pgtable_stage2_relax_perms(&vm->pgt, ipa, prot, 0);
+         guest_unlock_component(vm);
+
+
+  root@172:/# /share/lkvm run -k /share/arch/arm64/boot/Image
+   Info: # lkvm run -k /share/arch/arm64/boot/Image -m 704 -c 8 --name 
+guest-128
+   Info: Removed ghost socket file "/.lkvm//guest-128.sock".
+[ 1406.521757] kvm [141]: nVHE hyp BUG at: 
+arch/arm64/kvm/hyp/nvhe/mem_protect.c:1088!
+[ 1406.521804] kvm [141]: nVHE call trace:
+[ 1406.521828] kvm [141]:  [<ffff8000811676b4>] 
+__kvm_nvhe_hyp_panic+0xb4/0xe8
+[ 1406.521946] kvm [141]:  [<ffff80008116d12c>] 
+__kvm_nvhe_assert_host_shared_guest+0xb0/0x10c
+[ 1406.522049] kvm [141]:  [<ffff80008116f068>] 
+__kvm_nvhe___pkvm_host_relax_perms_guest+0x48/0x104
+[ 1406.522157] kvm [141]:  [<ffff800081169df8>] 
+__kvm_nvhe_handle___pkvm_host_relax_perms_guest+0x64/0x7c
+[ 1406.522250] kvm [141]:  [<ffff800081169f0c>] 
+__kvm_nvhe_handle_trap+0x8c/0x1a8
+[ 1406.522333] kvm [141]:  [<ffff8000811680fc>] 
+__kvm_nvhe___skip_pauth_save+0x4/0x4
+[ 1406.522454] kvm [141]: ---[ end nVHE call trace ]---
+[ 1406.522477] kvm [141]: Hyp Offset: 0xfffece8013600000
+[ 1406.522554] Kernel panic - not syncing: HYP panic:
+[ 1406.522554] PS:834003c9 PC:0000b1806db6d170 ESR:00000000f2000800
+[ 1406.522554] FAR:ffff8000804be420 HPFAR:0000000000804be0 
+PAR:0000000000000000
+[ 1406.522554] VCPU:0000000000000000
+[ 1406.523337] CPU: 3 UID: 0 PID: 141 Comm: kvm-vcpu-0 Not tainted 
+6.16.0-rc7 #97 PREEMPT
+[ 1406.523485] Hardware name: FVP Base RevC (DT)
+[ 1406.523566] Call trace:
+[ 1406.523629]  show_stack+0x18/0x24 (C)
+[ 1406.523753]  dump_stack_lvl+0xd4/0x108
+[ 1406.523899]  dump_stack+0x18/0x24
+[ 1406.524040]  panic+0x3d8/0x448
+[ 1406.524184]  nvhe_hyp_panic_handler+0x10c/0x23c
+[ 1406.524325]  kvm_handle_guest_abort+0x68c/0x109c
+[ 1406.524500]  handle_exit+0x60/0x17c
+[ 1406.524630]  kvm_arch_vcpu_ioctl_run+0x2e0/0x8c0
+[ 1406.524794]  kvm_vcpu_ioctl+0x1a8/0x9cc
+[ 1406.524919]  __arm64_sys_ioctl+0xac/0x104
+[ 1406.525067]  invoke_syscall+0x48/0x10c
+[ 1406.525189]  el0_svc_common.constprop.0+0x40/0xe0
+[ 1406.525322]  do_el0_svc+0x1c/0x28
+[ 1406.525441]  el0_svc+0x38/0x120
+[ 1406.525588]  el0t_64_sync_handler+0x10c/0x138
+[ 1406.525750]  el0t_64_sync+0x1ac/0x1b0
+[ 1406.525876] SMP: stopping secondary CPUs
+[ 1406.525965] Kernel Offset: disabled
+[ 1406.526032] CPU features: 0x0000,00000080,8e134ca1,9446773f
+[ 1406.526130] Memory Limit: none
+[ 1406.959099] ---[ end Kernel panic - not syncing: HYP panic:
+[ 1406.959099] PS:834003c9 PC:0000b1806db6d170 ESR:00000000f2000800
+[ 1406.959099] FAR:ffff8000804be420 HPFAR:0000000000804be0 
+PAR:0000000000000000
+[ 1406.959099] VCPU:0000000000000000 ]---
+
 Thanks,
-   Kunwu.Chan(Tao.Chan)
+
+Ben
 
