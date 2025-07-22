@@ -1,70 +1,75 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DE61E1DEE
-	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 14:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401AD2EA492
+	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 14:35:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753194747; cv=none; b=lhuetPua0nqiTr6DtbrN5DI7eztdFQN4nnaPKGVgxAOPCtjAjoAwMI1a4UJ9qcQTy1wbotrEWgiI/QDoP8qMfPdkCB1wySZMMWUUVv0UB+JIDbbbsz26QSkveEu1sjWNGR6oS74NhWmrUiKF53zWiNxoX3SSmc69eTEBY7APRm4=
+	t=1753194954; cv=none; b=HKlQF1gAMx+YlFRBHo/SVKZZ1yCVljlpaXpIfFzxKAkUdHtLm7Nac6Jc6fluil8Y69ZHMnp+7Sr6rLbJEo7DWVfJhZz7QQysf0pxem3UnfqvLdRUHnHVesmKuTZzou0QX/H7bhqORFFWdY6ypLPQ4Lw+JlxNk2ZsnU/rVQO12oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753194747; c=relaxed/simple;
-	bh=Dv6BrDzEnKemRZ1oJtfVg2+TPtO27uklV4NgxZkoI0M=;
+	s=arc-20240116; t=1753194954; c=relaxed/simple;
+	bh=NaNfX7QoGI/ejLumvvk9NJCH7rC9UvvllVGHooYztIg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hna2nGVRbXYKXFs0w7BduXvSjmdlqscFLYVyo9w86NulfFQ9vCHhIW2CzQlysDibuCYE40aGFTqn2wExRjjjSnguMuseO1cNd5kyZek3aI4E978KxfCshuHxExlQgblrDjmGshvzPS55wFJStyaSrRHOh3K9KGrhU01HT05DANA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aJb1B01D; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=XSJjYZC3B0n1Os5IlC9tBawIw2JcwbBHjIX8dJxb/cnblEH6GDcTuudFXpPHG2NVcixy0C9/hpdjx/eu8yqQM1K4edAkmx4pAragQqbOGdIEbU36nYbhAXonSM3sUq5V/rUg9Wz3WnB8kfhvsEj3y+AA+0xFd9V0+8Jk1B/ld38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RmCJ0EF1; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aJb1B01D"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3141f9ce4e2so8431938a91.1
-        for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 07:32:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RmCJ0EF1"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2365ab89b52so49683825ad.2
+        for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 07:35:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753194744; x=1753799544; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=se7GGG6+kEUdCY1BG7ucwwvP5WO24MC0HMwFM3DCv0c=;
-        b=aJb1B01DubgDfPU5zY6PQzAfANi7oiHSxGS0jUFJS2yGyRrUDq8mEYtyehJuwHoD8K
-         V1lCkgOc7g+nhgTYddgoZy05GMusLsVk7A2piDN+uytNr0zvMqWQfzMvE/pQkGNuNFXa
-         1sjsndk9tcZ+b0ThXD+JlNjmVvtqhEAPQ0ASGcpWfWZ5QqGFvms4udTZZ13K6Yu+k1Fm
-         xqE8nnx/45IXEoea5pN9qu3j93TI5IN77CqmNXo8NgXAZk0KaNwxI6DhxUBkipRMcG+6
-         ao99lRx6a1nD5scMkuPqJjPhGXwLPX2irmWLyyu1lUqmNGeUZIPAuNVCnf6YjjRIezxO
-         tNIw==
+        d=google.com; s=20230601; t=1753194952; x=1753799752; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KUCGvGmWdwg0m3EIpNIWNp9O4aLo9Fe5P7KfBDNlB2k=;
+        b=RmCJ0EF1R5enY2FSBmetSjeaRvVhpUADojnRYWquZNEwswnDo5EwszwlLkaICXqErN
+         aE+aGm2Erc1rDvpqzdJXNjwmoI086Ne2N/mHzxJjQgH8kC9Z+pgqOOxoKiAlAApm+l3B
+         cNbXWJDFeCr8jQWj6GMEAa12Sox6gUh/9PSURTCq5UV6gQNshIcbae4DlCNDiJl+wT8J
+         9Z0emE7SWWO75DTz2YrPxSdYl9rCxH4mH1UX/Mr5O/iI93hB9vs1QRXBD4Oj8o5S377h
+         msBdm1QkWgaw42ePo4k9K6CpRl8F5sBo3KTVDvl37arqNqdFUdQCqf57sIwuZl0LSwfe
+         xcDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753194744; x=1753799544;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=se7GGG6+kEUdCY1BG7ucwwvP5WO24MC0HMwFM3DCv0c=;
-        b=CGxTRltXQHQ/WSB/i282trlxRjRo3dU891U1Ksz5P0IKCpBcFYdIUwSbI4xsH3u2KJ
-         w+s9YHRhteEWVa33rOI+l+7ziaF9zqketZ6LNfMvGqUu84qK51kuEvlZyLXaAFJPWivE
-         xubsqo+swt9Ot87AH2LR1HEV3uuQZH4l4bg6KYJpLDFHnqKI5UPk4IVDux3s6Xhng2Ad
-         OORYSYtWZkIAN/OHB7gQZl46IslkzwgAQhVubUKwPpdKw0kS7WP2oanLM1WNzVdWn101
-         lJyGGwtg/DqpzpVD1Fzzb9b1y7eiZjo0511srZtkpGSNf6oFdB1pjyMEAUY8E/U9XrJp
-         9cVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUa83dU+EyU7BNBTgX9g2xBR4O8wpnLvVqNw9hUssI1pkBczrgvbXUNt6KoqUBfe9ESoXKziUU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy94FUPPyMK+EPaYqpwiNLmenom1dQ6LoHjZH5iiAX4w6yqMl/q
-	tWdgdw60EsIgiSIvgy0TpTxJ8HX2HJ+fL66+uW0hcqVxhR2VgAZ6MJTXoQkIiY/GjV5qodSUN3T
-	9zhtlwg==
-X-Google-Smtp-Source: AGHT+IFIvlEtw+vvXuklNdKzQemd9/qAa+tLiT5GFxA8ZHdhEreiJmuSQiQSjn9cwR/4RhPfN9d6Db/7dsE=
-X-Received: from pjbqd16.prod.google.com ([2002:a17:90b:3cd0:b0:31c:15e1:d04])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:134f:b0:312:639:a064
- with SMTP id 98e67ed59e1d1-31c9f43748bmr36022174a91.28.1753194744117; Tue, 22
- Jul 2025 07:32:24 -0700 (PDT)
-Date: Tue, 22 Jul 2025 07:32:22 -0700
-In-Reply-To: <CA+EHjTzNDrwzdpoEuiqvzk3-A7LAsdJ-6y-Gcj7h7+dUTh=6pw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1753194952; x=1753799752;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KUCGvGmWdwg0m3EIpNIWNp9O4aLo9Fe5P7KfBDNlB2k=;
+        b=vuX/WcdyYYFIqs+duIbBxYksbCDh+sP3HzU/jF0fdBWFZcn3ua9dElmmN8vaj1mmvm
+         1yz3fmcm1s6rciAxwRGwaIquvQSFBbNpAKmURS3CObZcwUX+whUGKdqzPa1nbEUh4IEM
+         cuEhRwjmNREzOpMVJEULfO+27CRyzgkA/UPMstuiCvzEryWXl3/QF3RIsdl7q+EJJifT
+         K0q0u0AlsKtIpjMSNMdIuUvXmCH+uMT0aPlfqfMJrXkwXX1dxn8Ou+5UjnBEHC/MBVtY
+         DEGwquULfFWXKvd7lmqlUYFLT4M6QAjJCApwPnOnf1Q/sUYK3dNAEgowHW5MSzC70Nav
+         SVrg==
+X-Forwarded-Encrypted: i=1; AJvYcCWk9mQFEt4H4DL/m5anvkI2TBDLzYHkFapHvOLtpQhGM1S1fp0zWDyMShuXHQQ2WlHuVYPYC90=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw/ZNHm5cuy62QdP8uJnts/DnPCXDyiFSO2kKr7NpWUehh3/bE3
+	L4d9zSVc/Ctz/L+O5DTCw4o16CmI2HzhEHdQcvLJYtHMjTkuEKMRTrt3EN1rl2pZ+FYqAe1uQhg
+	8WxHGig==
+X-Google-Smtp-Source: AGHT+IHc8QcIoTZ0c4wrEcszME7DPaA+xp/Za1q86kov57qJSFV6RsvFN0CRYQMoGS6Gqfb6Seefy3gIDqU=
+X-Received: from pjyr14.prod.google.com ([2002:a17:90a:e18e:b0:309:f831:28e0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ea0d:b0:23d:ed91:6142
+ with SMTP id d9443c01a7336-23e3b84e93cmr215232985ad.42.1753194952414; Tue, 22
+ Jul 2025 07:35:52 -0700 (PDT)
+Date: Tue, 22 Jul 2025 07:35:50 -0700
+In-Reply-To: <CAGtprH_r+eQjdi8q5LABz7LHEhK-xAMi4ciz83j3GnMm5EZRqQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-12-tabba@google.com>
- <8340ec70-1c44-47a7-8c48-89e175501e89@intel.com> <aH7KghhsjaiIL3En@google.com>
- <c35b8c34-2736-45fe-8a97-bfedbf72537e@intel.com> <CA+EHjTzNDrwzdpoEuiqvzk3-A7LAsdJ-6y-Gcj7h7+dUTh=6pw@mail.gmail.com>
-Message-ID: <aH-g9o5hSMvVRxAP@google.com>
-Subject: Re: [PATCH v15 11/21] KVM: x86/mmu: Allow NULL-able fault in kvm_max_private_mapping_level
+References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-15-tabba@google.com>
+ <505a30a3-4c55-434c-86a5-f86d2e9dc78a@intel.com> <CAGtprH8swz6GjM57DBryDRD2c6VP=Ayg+dUh5MBK9cg1-YKCDg@mail.gmail.com>
+ <aH5RxqcTXRnQbP5R@google.com> <1fe0f46a-152a-4b5b-99e2-2a74873dafdc@intel.com>
+ <aH55BLkx7UkdeBfT@google.com> <CAGtprH8H2c=bK-7rA1wC1-9f=g8mK3PNXja54bucZ8DnWF7z3g@mail.gmail.com>
+ <aH69a_CVJU0-P9wY@google.com> <CAGtprH_r+eQjdi8q5LABz7LHEhK-xAMi4ciz83j3GnMm5EZRqQ@mail.gmail.com>
+Message-ID: <aH-hxiD2DwovFpqg@google.com>
+Subject: Re: [PATCH v15 14/21] KVM: x86: Enable guest_memfd mmap for default
+ VM type
 From: Sean Christopherson <seanjc@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org, 
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
 	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, 
 	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
 	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
@@ -72,9 +77,9 @@ Cc: Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
 	willy@infradead.org, akpm@linux-foundation.org, yilun.xu@intel.com, 
 	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
 	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	vbabka@suse.cz, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
 	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
 	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
 	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
@@ -85,100 +90,53 @@ Cc: Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
 	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
 	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
 	ira.weiny@intel.com
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 22, 2025, Fuad Tabba wrote:
-> On Tue, 22 Jul 2025 at 06:36, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-> > - In 0010-KVM-x86-mmu-Rename-.private_max_mapping_level-to-.gm.patch,
-> > there is double gmem in the name of vmx/vt 's callback implementation:
+On Mon, Jul 21, 2025, Vishal Annapurve wrote:
+> On Mon, Jul 21, 2025 at 3:21=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
 > >
-> >      vt_gmem_gmem_max_mapping_level
-> >      tdx_gmem_gmem_max_mapping_level
-> >      vt_op_tdx_only(gmem_gmem_max_mapping_level)
-> 
-> Sean's patches do that, then he fixes it in a later patch. I'll fix
-> this at the source.
+> > On Mon, Jul 21, 2025, Vishal Annapurve wrote:
+> > > On Mon, Jul 21, 2025 at 10:29=E2=80=AFAM Sean Christopherson <seanjc@=
+google.com> wrote:
+> > > >
+> > > > >
+> > > > > > > 2) KVM fetches shared faults through userspace page tables an=
+d not
+> > > > > > > guest_memfd directly.
+> > > > > >
+> > > > > > This is also irrelevant.  KVM _already_ supports resolving shar=
+ed faults through
+> > > > > > userspace page tables.  That support won't go away as KVM will =
+always need/want
+> > > > > > to support mapping VM_IO and/or VM_PFNMAP memory into the guest=
+ (even for TDX).
+> > >
+> > > As a combination of [1] and [2], I believe we are saying that for
+> > > memslots backed by mappable guest_memfd files, KVM will always serve
+> > > both shared/private faults using kvm_gmem_get_pfn().
+> >
+> > No, KVM can't guarantee that with taking and holding mmap_lock across h=
+va_to_pfn(),
+> > and as I mentioned earlier in the thread, that's a non-starter for me.
+>=20
+> I think what you mean is that if KVM wants to enforce the behavior
+> that VMAs passed by the userspace are backed by the same guest_memfd
+> file as passed in the memslot then KVM will need to hold mmap_lock
+> across hva_to_pfn() to verify that.
 
-Dagnabbit.  I goofed a search+replace, caught it when re-reading things, and
-fixed-up the wrong commit.  Sorry :-(
+No, I'm talking about the case where userspace creates a memslot *without*
+KVM_MEM_GUEST_MEMFD, but with userspace_addr pointing at a mmap()'d guest_m=
+emfd
+instance.  That is the scenario Xiaoyao brought up:
 
-> > - In 0013-KVM-x86-mmu-Extend-guest_memfd-s-max-mapping-level-t.patch,
-> >    kvm_x86_call(gmem_max_mapping_level)(...) returns 0 for !private case.
-> >    It's not correct though it works without issue currently.
-> >
-> >    Because current gmem doesn't support hugepage so that the max_level
-> >    gotten from gmem is always PG_LEVEL_4K and it returns early in
-> >    kvm_gmem_max_mapping_level() on
-> >
-> >         if (max_level == PG_LEVEL_4K)
-> >                 return max_level;
-> >
-> >    But just look at the following case:
-> >
-> >      return min(max_level,
-> >         kvm_x86_call(gmem_max_mapping_level)(kvm, pfn, is_private));
-> >
-> >    For non-TDX case and non-SNP case, it will return 0, i.e.
-> >    PG_LEVEL_NONE eventually.
-> >
-> >    so either 1) return PG_LEVEL_NUM/PG_LEVEL_1G for the cases where
-> >    .gmem_max_mapping_level callback doesn't have specific restriction.
-> >
-> >    or 2)
-> >
-> >         tmp = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn, is_private);
-> >         if (tmp)
-> >                 return min(max_level, tmp);
-> >
-> >         return max-level;
-> 
-> Sean? What do you think?
-
-#2, because KVM uses a "ret0" static call when TDX is disabled (and KVM should
-do the same when SEV is disabled, but the SEV #ifdefs are still a bit messy).
-Switching to any other value would require adding a VMX stubs for the !TDX case.
-
-I think it makes sense to explicitly call that out as the "CoCo level", to help
-unfamiliar readers understand why vendor code has any say in the max
-mapping level.
-
-And I would say we adjust max_level instead of having an early return, e.g. to
-reduce the probability of future bugs due to adding code between the call to
-.gmem_max_mapping_level() and the final return.
-
-This as fixup? 
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index eead5dca6f72..a51013e0992a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3279,9 +3279,9 @@ static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fau
-                                     const struct kvm_memory_slot *slot, gfn_t gfn,
-                                     bool is_private)
- {
-+       u8 max_level, coco_level;
-        struct page *page;
-        kvm_pfn_t pfn;
--       u8 max_level;
- 
-        /* For faults, use the gmem information that was resolved earlier. */
-        if (fault) {
-@@ -3305,8 +3305,16 @@ static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fau
-        if (max_level == PG_LEVEL_4K)
-                return max_level;
- 
--       return min(max_level,
--                  kvm_x86_call(gmem_max_mapping_level)(kvm, pfn, is_private));
-+       /*
-+        * CoCo may influence the max mapping level, e.g. due to RMP or S-EPT
-+        * restrictions.  A return of '0' means "no additional restrictions",
-+        * to allow for using an optional "ret0" static call.
-+        */
-+       coco_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn, is_private);
-+       if (coco_level)
-+               max_level = min(max_level, coco_level);
-+
-+       return max_level;
- }
- 
- int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+ : Actually, QEMU can use gmem with mmap support as the normal memory even
+ : without passing the gmem fd to kvm_userspace_memory_region2.guest_memfd
+ : on KVM_SET_USER_MEMORY_REGION2.
+ :
+ : ...
+ :=20
+ : However, it fails actually, because the kvm_arch_suports_gmem_mmap()
+ : returns false for TDX VMs, which means userspace cannot allocate gmem
+ : with mmap just for shared memory for TDX.
