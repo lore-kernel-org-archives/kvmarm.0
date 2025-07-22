@@ -1,176 +1,128 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B4E268683
-	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 16:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29E327CB35
+	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 21:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753202235; cv=none; b=tl1aCQ4mTdvvO9TH5/UyuLu2llJqr4hTm9V+f0i4Q+JXHosxTovi5KVkBIbW3PLejsuywoRNwqAysjESqIrZYJccT2F5YnNQDIJwHilLHG2h8y3qFchrLuV13A6phfpmTp7SKW1VjH5b3CyTpz0XQb9Wb+YCk9ZfNUOSdvo+RX8=
+	t=1753220206; cv=none; b=tvxqGKby+f9/Rb2IWhRV005Qy5lhgZajQJ6zZ3/R5kNC5Tes8eqHCA1sCo3WYhudPhVr4iw13oVyc4k9PJ7Qyd5zTtvcPge2qYKGUfBjBXl626lfBaiv2H3J+vMUQa5EkYtXkbZhk22N6a0POSwfYqxdvVkgxc8wojTL3f8rZM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753202235; c=relaxed/simple;
-	bh=7nZg7NqjYH1H6JgtaArIT/6n27NslXHEFoJA+fbWTYI=;
+	s=arc-20240116; t=1753220206; c=relaxed/simple;
+	bh=ar26MvjIB/BOwHPrOjxmWzi7Qv0GZjyDJaqnU9Lo/to=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s5BGag6twH/D6c0vHMwu7Urph6VG3Iaj1uLh0Z5yKqx3Sl47IovSDs8CNwdHeoo6FfkgVUV+b9TMJl8OnA1OeThZX0NbbtN3nLhWEmZGpzTky13KSa7VCuxOwSSMZgviHCexwwmw9EkSXYmXxR8pcPlwKcZuDib4pm8Csg1uW6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6AEB01515;
-	Tue, 22 Jul 2025 09:37:07 -0700 (PDT)
-Received: from bogus (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B36AE3F5A1;
-	Tue, 22 Jul 2025 09:37:09 -0700 (PDT)
-Date: Tue, 22 Jul 2025 17:37:06 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Per Larsen <perl@immunant.com>, mark.rutland@arm.com,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
-	Marc Zyngier <maz@kernel.org>, perlarsen@google.com,
-	Oliver Upton <oliver.upton@linux.dev>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZsFLUkuaM6KsFFSxhGc//yn3KWD7JJQmXCzJk6oRuX3sFtATsUHEaUsvbHqz/Yd9RlytsIbp44T3P0JuOASv/sGNQ0VneJ1rWYGST6E30aTQ5hoiPvKcyUtIPgw//3FFthKWENvTXuASnoMBFOIRDVHHJUgA1Xpcpdd7E7bu03w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ASZTzEmZ; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ASZTzEmZ"
+Date: Tue, 22 Jul 2025 14:36:32 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753220201;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LiRSt3+98EGMgN3IxrWiHbm2Se5ENuudfER0VQONOHY=;
+	b=ASZTzEmZO4NJRCnsjCzONfIH1bE7fwzy/IgXsI7VjhyexHKhbnYOtAs4i4yndQosVFmhfO
+	CxanmV5eMHKDBN7PfFSVL6zhuo7BAOFYEvdMNHPdGjyy2lILsjLAQcJ0ub0edo0FmN43yF
+	cJhVJwOBNUV6I3YsaNrrsjA8xVm2PLI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Eric Auger <eauger@redhat.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, ahomescu@google.com,
-	armellel@google.com, ayrton@google.com, qperret@google.com,
-	sebastianene@google.com, qwandor@google.com
-Subject: Re: [PATCH v7 2/5] KVM: arm64: Use SMCCC 1.2 for FF-A initialization
- and in host handler
-Message-ID: <20250722-shrewd-hyena-from-saturn-dbcfc1@sudeepholla>
-References: <20250701-virtio-msg-ffa-v7-0-995afc3d385e@google.com>
- <20250701-virtio-msg-ffa-v7-2-995afc3d385e@google.com>
- <8634bdbgaz.wl-maz@kernel.org>
- <3b10fa81-bfdd-4325-a330-c79df2e21621@immunant.com>
- <aHpOClH1k-3NhI_y@willie-the-truck>
- <67cc6766-6493-4171-a6b1-2a105c3e6ff5@immunant.com>
- <CAMP5XgeUwDnf=PbySy6aoF_zc7dtxymDQZEp8DuRSOLg4WEnFQ@mail.gmail.com>
- <dd136db0-1ac7-4f75-b550-ccf7e14c032a@immunant.com>
- <aH-0cx9YhdWRe2nq@willie-the-truck>
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Zhou Wang <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v4 1/6] KVM: arm64: Disambiguate support for vSGIs v.
+ vLPIs
+Message-ID: <aIAEUU_1eCbuM9YT@linux.dev>
+References: <20250709211417.2074487-1-oliver.upton@linux.dev>
+ <20250709211417.2074487-2-oliver.upton@linux.dev>
+ <50eee3a2-55d5-4128-8b42-47a37306b8a1@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aH-0cx9YhdWRe2nq@willie-the-truck>
+In-Reply-To: <50eee3a2-55d5-4128-8b42-47a37306b8a1@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 22, 2025 at 04:55:31PM +0100, Will Deacon wrote:
-> [Sudeep & Mark to To:]
-> 
-> On Mon, Jul 21, 2025 at 05:20:01PM -0700, Per Larsen wrote:
-> > On 7/21/25 4:01 AM, Arve Hjønnevåg wrote:
-> > > On Fri, Jul 18, 2025 at 10:54 PM Per Larsen <perl@immunant.com> wrote:
-> > > > On 7/18/25 6:37 AM, Will Deacon wrote:
-> > > > > On Mon, Jul 07, 2025 at 05:06:23PM -0700, Per Larsen wrote:
-> > > > > > On 7/3/25 5:38 AM, Marc Zyngier wrote:
-> > > > > > > On Tue, 01 Jul 2025 23:06:35 +0100,
-> > > > > > > Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org> wrote:
-> > > > > > > > +  /*
-> > > > > > > > +   * DEN0028C 2.6: SMC32/HVC32 call from aarch64 must preserve x8-x30.
-> > > > > > > > +   *
-> > > > > > > > +   * The most straightforward approach is to look at the function ID
-> > > > > > > > +   * sent by the caller. However, the caller could send FFA_MSG_WAIT
-> > > > > > > > +   * which is a 32-bit interface but the reply could very well be 64-bit
-> > > > > > > > +   * such as FFA_FN64_MSG_SEND_DIRECT_REQ or FFA_MSG_SEND_DIRECT_REQ2.
-> > > > > > > > +   *
-> > > > > > > > +   * Instead, we could look at the function ID in the response (a0) but
-> > > > > > > > +   * that doesn't work either as FFA_VERSION responses put the version
-> > > > > > > > +   * number (or error code) in w0.
-> > > > > > > > +   *
-> > > > > > > > +   * Set x8-x17 iff response contains 64-bit function ID in a0.
-> > > > > > > > +   */
-> > > > > > > > +  if (func_id != FFA_VERSION && ARM_SMCCC_IS_64(res->a0)) {
-> > > > > > > > +          cpu_reg(ctxt, 8) = res->a8;
-> > > > > > > > +          cpu_reg(ctxt, 9) = res->a9;
-> > > > > > > > +          cpu_reg(ctxt, 10) = res->a10;
-> > > > > > > > +          cpu_reg(ctxt, 11) = res->a11;
-> > > > > > > > +          cpu_reg(ctxt, 12) = res->a12;
-> > > > > > > > +          cpu_reg(ctxt, 13) = res->a13;
-> > > > > > > > +          cpu_reg(ctxt, 14) = res->a14;
-> > > > > > > > +          cpu_reg(ctxt, 15) = res->a15;
-> > > > > > > > +          cpu_reg(ctxt, 16) = res->a16;
-> > > > > > > > +          cpu_reg(ctxt, 17) = res->a17;
-> > > > > > > > +  }
-> > > > > > > >     }
-> > > > > > > 
-> > > > > > > I don't see how that can ever work.
-> > > > > > > 
-> > > > > > > Irrespective of how FFA_MSG_WAIT actually works (and I couldn't find
-> > > > > > > anything in the spec that supports the above), the requester will
-> > > > > > > fully expect its registers to be preserved based on the initial
-> > > > > > > function type, and that alone. No ifs, no buts.
-> > > > > > > 
-> > > > > > > If what you describe can happen (please provide a convincing example),
-> > > > > > > then the spec is doomed.
-> > > > > > 
-> > > > > > DEN0077A 1.2 Section 8.2 (Runtime Model for FFA_RUN) and 8.3 (Runtime Model
-> > > > > > for Direct request ABIs) contains Figures 8.1 and 8.2. Each figure shows
-> > > > > > transitions between states "waiting", "blocked", "running", and "preempted".
-> > > > > > Key to my understanding is that the waiting state in Figure 8.1 and Figure
-> > > > > > 8.2 is the exact same state. This appears to be the case per Section 4.10.
-> > > > > > 
-> > > > > > So we have to consider the ways to get in and out of the waiting state by
-> > > > > > joining the state machines in Figures 8.1 and 8.2. Figure 8.1 has an edge
-> > > > > > between "running" and "waiting" caused by FFA_MSG_WAIT. Figure 8.2 has an
-> > > > > > edge between "waiting" and "running" caused by a "Direct request ABI".
-> > > > > > 
-> > > > > > Direct request ABIs include FFA_MSG_SEND_DIRECT_REQ2 which is why the FF-A
-> > > > > > 1.2 spec, in my read, permits the response to a 32-bit FFA_MSG_WAIT call can
-> > > > > > be a 64-bit FFA_MSG_SEND_DIRECT_REQ2 reply.
-> > > > > 
-> > > > > That seems bonkers to me and I agree with Marc's assessment above. The
-> > > > > SMCCC is crystal clear that a caller using the SM32/HVC32 calling
-> > > > > convention can rely on x8-x30 (as well as the stack pointers) being
-> > > > > preserved. If FF-A has a problem with that then it needs to be fixed
-> > > > > there and not bodged in Linux.
-> > > > Ack. Patchset v8 addresses Marc's feedback by using the func_id detect
-> > > > SMC64 instead.>
-> > > > > Setting that aside, I'm still not sure I follow this part of your check:
-> > > > > 
-> > > > >        if (... && ARM_SMCCC_IS_64(res->a0))
-> > > > > 
-> > > > > won't res->a0 contain something like FFA_SUCCESS? The FFA spec states:
-> > > > > 
-> > > > >     FFA_SUCCESS64, is used only if any result register encodes a 64-bit
-> > > > >     parameter.
-> > > > > 
-> > > > > which doesn't really seem related to whether or not the initial call
-> > > > > was using SMC32 or SMC64. What am I missing?I agree that we cannot use res->a0 to distinguish SMC32/SMC64 for the
-> > > > reason you stated.
-> > > 
-> > > I don't think using the function-id of the original call works
-> > > correctly in this context though. If you look at
-> > > drivers/firmware/arm_ffa/driver.c:ffa_msg_send_direct_req2 it has the
-> > > same problem as the FFA_MSG_WAIT example in your comment. In the
-> > > simple case it will use FFA_MSG_SEND_DIRECT_REQ2 for the call and
-> > > FFA_MSG_SEND_DIRECT_RESP2 for the response, both 64 bit opcodes, and
-> > > either approach here will have the same correct result. However if
-> > > FFA_MSG_SEND_DIRECT_REQ2 responds with FFA_INTERRUPT or FFA_YIELD,
-> > > then the driver will resume the call with FFA_RUN, a 32 bit opcode,
-> > > and still expect a 64 bit FFA_MSG_SEND_DIRECT_RESP2 response with a
-> > > full response in x4-17. If you use ARM_SMCCC_IS_64(func_id) here
-> > > instead of ARM_SMCCC_IS_64(res->a0), then the part of response in
-> > > x8-x17 will be lost.
-> 
-> Can't we just update the FF-A driver? This is clearly all the result of
-> a half-baked spec...
-> 
-> Sudeep -- any chance you can add support for the hot-off-the-press
-> 64-bit FFA_RUN call to the Linux driver, please? Without that, I don't
-> see how the REQ2/RESP2 calls can work properly.
-> 
+On Mon, Jul 14, 2025 at 12:20:14PM +0200, Eric Auger wrote:
+> Ho Oliver,
 
-Apologies for the delay in following up on this thread. Yes, we can certainly
-add the 64-bit FFA_RUN, but we'll need to align with the spec authors first.
-I'll follow up internally to ensure there's no conflict between how it's
-defined in the spec and how it's used in the kernel.
+Yo -- Eric! Sorry for the latency, ${WORK}.
 
-It looks like the change in the spec is already WIP which I was made aware
-just now, so I don't see any issue updating the driver.
+> On 7/9/25 11:14 PM, Oliver Upton wrote:
+> > vgic_supports_direct_msis() is a bit of a misnomer, as it returns true
+> > if either vSGIs or vLPIs are supported. Pick it apart into a few
+> > predicates and replace some open-coded checks for vSGIs.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-init.c    |  4 ++--
+> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 16 ++++++++++------
+> >  arch/arm64/kvm/vgic/vgic-v4.c      |  4 ++--
+> >  arch/arm64/kvm/vgic/vgic.c         |  4 ++--
+> >  arch/arm64/kvm/vgic/vgic.h         |  7 +++++++
+> >  5 files changed, 23 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > index eb1205654ac8..5e0e4559004b 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > @@ -395,7 +395,7 @@ int vgic_init(struct kvm *kvm)
+> >  	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
+> >  	 * enable it if we present a virtual ITS to the guest.
+> the above comment refers to vSGISs. While the below change looks OK, I
+> feel difficult to associate it to the code below.
 
--- 
-Regards,
-Sudeep
+I'm not sure the comment serves much purpose at this point. If anything,
+it should go with the implementation of vgic_supports_direct_irqs()
+
+> >  	 */
+> > -	if (vgic_supports_direct_msis(kvm)) {
+> > +	if (vgic_supports_direct_irqs(kvm)) {
+> >  		ret = vgic_v4_init(kvm);
+> >  		if (ret)
+> >  			goto out;
+> > @@ -443,7 +443,7 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+> >  		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+> >  	}
+> >  
+> > -	if (vgic_supports_direct_msis(kvm))
+> > +	if (vgic_supports_direct_irqs(kvm))
+> >  		vgic_v4_teardown(kvm);
+> >  
+> >  	xa_destroy(&dist->lpi_xa);
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > index ae4c0593d114..1a9c5b4418b2 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > @@ -50,8 +50,12 @@ bool vgic_has_its(struct kvm *kvm)
+> >  
+> >  bool vgic_supports_direct_msis(struct kvm *kvm)
+> >  {
+> > -	return (kvm_vgic_global_state.has_gicv4_1 ||
+> > -		(kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm)));
+> > +	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
+> > +}
+> > +
+> > +bool vgic_supports_direct_sgis(struct kvm *kvm)
+> > +{
+> > +	return kvm_vgic_global_state.has_gicv4_1 && gic_cpuif_has_vsgi();
+> In some checks we now have "&& gic_cpuif_has_vsgi()" added whereas we
+> previously only checked kvm_vgic_global_state.has_gicv4_1. This may be
+> described in the commit message too and explain whether this is a fix
+> for some configs.
+
+Happy to add a mention to the changelog since this is definitely a
+subtle bugfix. Although I hope there aren't any actual implementations
+like this (i.e. GICv4.1 ITS w/o ability to deliver vSGIs)
+
+Thanks for having a look,
+Oliver
