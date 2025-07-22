@@ -1,203 +1,223 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DB21DE3AB
-	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 08:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0BC21B191
+	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 09:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753173876; cv=none; b=ihQvABtH1Ki9qIae8W/Zl9UjNlCyWx863CAteZiqt0M5nDf434vPOeetX3WbhW28pXEu/Mtb1BJfGETefZRJPb+O2QqaVwPsn0E4ffqMxcpS5kbGzziu2y5B+N35JSEQBQMoJYmhoLMO8EU9syPdg5FYEfRt20nfgDbbP8Su31M=
+	t=1753175895; cv=none; b=W5e5q32bbrFHUDhHcxwNPZGYrTn8NHaqwtseJ5qPt3TyEcxTYZnkSABpjehYX9/krqVBN7T3EWotf6I95gfFrf/GONJP0rqTJIStHlsSxENALQSgdnhnB9bW4TEfHHpru8LzuuThQg3kb6XGppp+b5ihXTrBy+pjLVbEm2dPJyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753173876; c=relaxed/simple;
-	bh=oG+uGXiayq3wi+MQ+WXlyYFLXj87LJort2kb/5ueY80=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QQRoClmmjiF1PwVpdGX3kqz2XsHIHQWP9MPfyzcbUSBtbYmwvBru+iCwxgEDjIl3PEnlzt5z8h8MRoBaO6rdMpXEafv/GUrHq5WJIfCI8aJAl4QImUrHOF4b/3rm+niwzKW4huutlDNOfiERxo6JqvkdyzTKPbqotbNafio6Irc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BZRw3Crc; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1753175895; c=relaxed/simple;
+	bh=hhQufx2HD4Ts5oBIe9054Ablz+7kZBZZDBYP7X7WX8w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VaybuvNXo6ASlVDMynnONodak4wIDLc4eS7MvulEshEExHrmV9BI+hYxqFYm2kg6ZkP6gKt+V3QdBM7yZkExJ4GjRPSJ+5Yd63hnbCr2QXhgBjPSEssRJWkYogoHI4sjjXmCHiQ81omQijxkokYtDQDYgibNZGaCmAzn3HdVPNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=OTVQysmG; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BZRw3Crc"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ab3855fca3so185591cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 01:44:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="OTVQysmG"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3a6cdc27438so4225218f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 02:18:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753173874; x=1753778674; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dPBkvCcfAeL2dNZt7wG4lYGcQyDWbM6vpCIRnJhXb7E=;
-        b=BZRw3CrcKBhvg0eEEeIObEC3GVnPPrlvqejX7MVNirm9jNBDWM1w23NZXb6peQfE+e
-         ZXbVoApMiENJXpYaq2uXQPZk6li31NfIZYXiWVyaz9qgtkjm141Mh0ueh1M/4k9HjcgI
-         SUiACL3DfEooUYxKvHWG8+t4s+uOZ6SHHeSJw3FocLb2oetptW19P7Cj0/99urcRWTx3
-         B2JM4lxd9uSeNZz2e03fukqaF+Cl9wXddf/uAVqW9i7S624KV+jIBIyjXSb7xKi+z1jb
-         qCh4IPRgV7P9fI6w1DX9ao7XMUtfHBHlAJMlSFalUp4F9IJbN2zZhuzAwmDbbumyJeHq
-         qnoQ==
+        d=ventanamicro.com; s=google; t=1753175892; x=1753780692; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PHFy2ib8R7VJ1RgEKC7LoLc8P9a6wfUZ5RjA5auf7Xg=;
+        b=OTVQysmGrmuif6DmNRNFif9dKjwr87E10rSElsGtt0Q8txcxiAdpyq+AdKZSS7lkso
+         ut9dDjVPq9QcRNhwLbREY6Wmwo/W56qfWeR9GcdhQ5LatcJTG9szH3iaU/JU9MUE5dh/
+         knE5SjzwCb9yEgRtKh/IERZGeUIZuGKGhpKRPj93EkkX/XejsrNdIbvfDbOCEtJo2mE4
+         jg8iaaNDG1EpiAlZw5VqY3aypRT3IrwoKB02DVXzSts9diMuFTWlQJkPAImLVkAhIXQK
+         uOC2AKVDM7yks8mNWHQRXov76OkHNTyGoYTY5EjlTs4UBHravOwHRBeyLx16Zh+aQH83
+         DNzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753173874; x=1753778674;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dPBkvCcfAeL2dNZt7wG4lYGcQyDWbM6vpCIRnJhXb7E=;
-        b=eDMX8L+IlxgD/hd/HQ0IvPVTDNKX9JgjRyeHyskNjKO7KFFMJnCm6Ho9s9uVrCZw9b
-         7yXof8XwFvl9BYQictcHXPasIJuv50iC8kRzCIwX/3u+tMLg85j7QtNhq3jHn5XnSmxM
-         kodfahEelHOZVY07DBQScVeLwlwgmvGa+ca3Gn7luhnF0tkP665LAV2LjBzdNNUfLlKA
-         0xhuQx0UMGFFbjSz/rtaLEEiNZa/ncru6/QLOIDwzOTtbmuCdo84yl0mbS7Z+E6QoWaX
-         0/srtbEb6kVxMQX2WUf86IcZhDg0ZfkXFWedAv8H7k2uE2Rt6j8LRcmBo0Ca/7N6txXr
-         wBPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVIuZUXmiFmaeG6WCKgddcx1ms4Qd+Qnuj01OMtisn5SSumnJV4UFogv/9oIwSjJ6riPrJTOWo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzHc5zjeESEP77Xq2KDyPoTj3lZCLixpUS1VTwnVB9bHj/fD1mm
-	7oCSCDAU50cpEqaiWVzTJkpXLxEwUFIlPEBz1Fby/h1X9ju9Q69x2F5LBSWOnuQvFi2ZDRSEQhP
-	luAEKIoIN1SaGniP2Sx5lXgsKYdl+K6YgpgI1FL1K
-X-Gm-Gg: ASbGnctpD0sRp5qwmVM3Ov4CKu5Y0otuGastGUhzLDxIuCcmu2wdR62sXGAE0f5UDRg
-	izqzWlevGbYym0WLNUJEs37dGMX6xd/UYHU6kNFynuiuxpblnz1HkSH3X92JMr2gkEBnyTDA3ug
-	+ANP63NGH5mahUo3pbYAsnPEGlEZlTsiTN8H7WblBC7//fFdmkUZlxE5jRb0a9cVgcLru2hjgCa
-	6c3F8vrb+S/kLV+wfx1AMJ/A7vuP+GYd8jq
-X-Google-Smtp-Source: AGHT+IHY1bLajV8cSDSr07UxvUVPof2BdmEX/z7/v1iwlDELsaBXQa7JYlT3T+HwWsQDpoA/9fVIqN/RA0gQKf3OZbM=
-X-Received: by 2002:a05:622a:a916:b0:4aa:cba2:2e67 with SMTP id
- d75a77b69052e-4ae5f1c81b8mr2062111cf.21.1753173873334; Tue, 22 Jul 2025
- 01:44:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753175892; x=1753780692;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PHFy2ib8R7VJ1RgEKC7LoLc8P9a6wfUZ5RjA5auf7Xg=;
+        b=jD6PM9MMMTrCyR31d3dJfqT16VTfGdFY7wyamKaWjE0ff1A9bh8SZaZYZsimMOK+zU
+         PeohP00IaUGuHZGGvm3j/KzEA5Gxiec5FpMgXk4NJ6uHuja0hcU4yknS/NrS2mPHlv/r
+         H3fzvKxzLue/cRoUsxHwabaXeKlUtXjiTR+H4eDYoe/w8sLVFDe+sAytYMjIhIQxsaxn
+         vWRTRsis5GRPAsob/z0gxowhBI1ZE34urOMrppU0nongv9qNl6naunFhCxxWHzwvwceO
+         M8EwQ5pHpyIyMQeyWMd54JCjNWZp4h8bB9xPXozyVyGzlX93b8ywU8CWJ/e709AAjt9Q
+         WmKQ==
+X-Gm-Message-State: AOJu0Yys2MfMBmpoD1otDzZZI4xP+xwNIWfG/rrMtkZgNQxAY+o9xLGe
+	6B+sUGPabwB2Hab0C7cOwTxscXXhDLDgEdUpejUBD5e5oRhcPxR5MrI8d8IryXnuU1Y=
+X-Gm-Gg: ASbGncsoq5FDMyzfYLeAssbBtxzUl9KcxUQ4yW21VRwGffmI6qC81eaTeq1gH4i6zqD
+	nmMsnPpC/l4ABvHWM77NSeytHH/WzWE7kzskbZb1ChF4lR4XvkvopgLksK0tRCsuLwqf7lRZzYa
+	JSF5GWIL8UtPYlA5LHZMTnmXYRxMRJK1x6JxVouSbSq2fG1opmkLm9op1TIx+TN9JACPhLLvUxk
+	lKsDJL+lHO1XGTzllSkULOc6eCKpbHQiLYSz42zyQAKui/27+jL8gT+jIH8r6akmLRWKgCizPFY
+	a7pG2teWimGNspD+c0mGGOhWptHpVAnLhp7xDUOurAD5+SAgtgAPyEjUmuU8EgSXSvL6L6s+y0K
+	mYqXIfOjGfw==
+X-Google-Smtp-Source: AGHT+IHQBAZgY70xI+dtP0yh6yvLOKV0BlM/uTMSPEIciqVVZwMQSsJNaHFcQVjMoLC9XYi1w0Ju7g==
+X-Received: by 2002:a05:6000:2892:b0:3a4:f379:65bc with SMTP id ffacd0b85a97d-3b60e523efamr18492284f8f.40.1753175891891;
+        Tue, 22 Jul 2025 02:18:11 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200::f15c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b61ca48a2esm12946678f8f.51.2025.07.22.02.18.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 02:18:11 -0700 (PDT)
+Date: Tue, 22 Jul 2025 11:18:10 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, jackabt@amazon.com
+Subject: Re: [PATCH] KVM: arm64: selftest: Add standalone test checking for
+ KVM's own UUID
+Message-ID: <20250722-87ac9d7e0b27cf7c67a4fbd3@orel>
+References: <20250721155136.892255-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-14-tabba@google.com>
- <aH5vNqPrUFgtZCqU@google.com> <27ac6ed0-f58a-4926-a069-8d9d7d61a41c@intel.com>
-In-Reply-To: <27ac6ed0-f58a-4926-a069-8d9d7d61a41c@intel.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 22 Jul 2025 09:43:56 +0100
-X-Gm-Features: Ac12FXwo4G2roOXpkeQ9Jh58vNuaACeOHbQjO2y_a9aub1RVWWMkoayleVat1V8
-Message-ID: <CA+EHjTzUr4K8SsvwANTkg7yd5mFZLbY1aSUB85zvd7wooizf_A@mail.gmail.com>
-Subject: Re: [PATCH v15 13/21] KVM: x86/mmu: Handle guest page faults for
- guest_memfd with shared memory
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250721155136.892255-1-maz@kernel.org>
 
-On Tue, 22 Jul 2025 at 06:41, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> On 7/22/2025 12:47 AM, Sean Christopherson wrote:
-> > On Thu, Jul 17, 2025, Fuad Tabba wrote:
-> >> From: Ackerley Tng <ackerleytng@google.com>
-> >>
-> >> Update the KVM MMU fault handler to service guest page faults
-> >> for memory slots backed by guest_memfd with mmap support. For such
-> >> slots, the MMU must always fault in pages directly from guest_memfd,
-> >> bypassing the host's userspace_addr.
-> >>
-> >> This ensures that guest_memfd-backed memory is always handled through
-> >> the guest_memfd specific faulting path, regardless of whether it's for
-> >> private or non-private (shared) use cases.
-> >>
-> >> Additionally, rename kvm_mmu_faultin_pfn_private() to
-> >> kvm_mmu_faultin_pfn_gmem(), as this function is now used to fault in
-> >> pages from guest_memfd for both private and non-private memory,
-> >> accommodating the new use cases.
-> >>
-> >> Co-developed-by: David Hildenbrand <david@redhat.com>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> >> Co-developed-by: Fuad Tabba <tabba@google.com>
-> >> Signed-off-by: Fuad Tabba <tabba@google.com>
-> >> ---
-> >>   arch/x86/kvm/mmu/mmu.c | 13 +++++++++----
-> >>   1 file changed, 9 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> >> index 94be15cde6da..ad5f337b496c 100644
-> >> --- a/arch/x86/kvm/mmu/mmu.c
-> >> +++ b/arch/x86/kvm/mmu/mmu.c
-> >> @@ -4511,8 +4511,8 @@ static void kvm_mmu_finish_page_fault(struct kvm_vcpu *vcpu,
-> >>                               r == RET_PF_RETRY, fault->map_writable);
-> >>   }
-> >>
-> >> -static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> >> -                                   struct kvm_page_fault *fault)
-> >> +static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
-> >> +                                struct kvm_page_fault *fault)
-> >>   {
-> >>      int max_order, r;
-> >>
-> >> @@ -4536,13 +4536,18 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> >>      return RET_PF_CONTINUE;
-> >>   }
-> >>
-> >> +static bool fault_from_gmem(struct kvm_page_fault *fault)
-> >
-> > Drop the helper.  It has exactly one caller, and it makes the code *harder* to
-> > read, e.g. raises the question of what "from gmem" even means.  If a separate
-> > series follows and needs/justifies this helper, then it can/should be added then.
->
-> there is another place requires the same check introduced by your
-> "KVM: x86/mmu: Extend guest_memfd's max mapping level to shared
-> mappings" provided in [*]
->
-> [*] https://lore.kernel.org/kvm/aH7KghhsjaiIL3En@google.com/
+Hi Marc,
 
-I guess this is meant for the patch [*], which as far as I could tell,
-isn't in the latest (-rc7) yet.
+On Mon, Jul 21, 2025 at 04:51:36PM +0100, Marc Zyngier wrote:
+> Tinkering with UUIDs is a perilious task, and the KVM UUID gets
+> broken at times. In order to spot this early enough, add a selftest
+> that will shout if the expected value isn't found.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20250721130558.50823-1-jackabt.amazon@gmail.com
+> ---
+>  tools/testing/selftests/kvm/Makefile.kvm     |  1 +
+>  tools/testing/selftests/kvm/arm64/kvm-uuid.c | 67 ++++++++++++++++++++
+>  2 files changed, 68 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index ce817a975e50a..e1eb1ba238a2a 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -167,6 +167,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+>  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+>  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+>  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
+> +TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
+>  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+>  TEST_GEN_PROGS_arm64 += arch_timer
+>  TEST_GEN_PROGS_arm64 += coalesced_io_test
+> diff --git a/tools/testing/selftests/kvm/arm64/kvm-uuid.c b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> new file mode 100644
+> index 0000000000000..89d9c8b182ae5
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> @@ -0,0 +1,67 @@
+> +#include <errno.h>
+> +#include <linux/arm-smccc.h>
+> +#include <asm/kvm.h>
+> +#include <kvm_util.h>
+> +
+> +#include "processor.h"
+> +
+> +/*
+> + * Do NOT redefine these constants, or try to replace them with some
+> + * "common" version. They are hardcoded here to detect any potential
+> + * breakage happening in the rest of the kernel.
+> + *
+> + * KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74
+> + */
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
+> +
+> +static void guest_code(void)
+> +{
+> +	struct arm_smccc_res res = {};
+> +
+> +	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
+> +
+> +	__GUEST_ASSERT(res.a0 != SMCCC_RET_NOT_SUPPORTED, "a0 = %lx\n", res.a0);
+
+Should this check res.a0 == SMCCC_RET_SUCCESS instead?
+
+> +	__GUEST_ASSERT(res.a0 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 &&
+> +		       res.a1 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 &&
+> +		       res.a2 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 &&
+> +		       res.a3 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3,
+> +		       "Unexpected KVM-specific UID %lx %lx %lx %lx\n", res.a0, res.a1, res.a2, res.a3);
+> +	GUEST_DONE();
+> +}
+> +
+> +int main (int argc, char *argv[])
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	struct ucall uc;
+> +	bool guest_done = false;
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> +
+> +	while (!guest_done) {
+> +		vcpu_run(vcpu);
+> +
+> +		switch (get_ucall(vcpu, &uc)) {
+> +		case UCALL_SYNC:
+> +			break;
+> +		case UCALL_DONE:
+> +			guest_done = true;
+> +			break;
+> +		case UCALL_ABORT:
+> +			REPORT_GUEST_ASSERT(uc);
+> +			break;
+> +		case UCALL_PRINTF:
+> +			printf("%s", uc.buffer);
+> +			break;
+> +		default:
+> +			TEST_FAIL("Unexpected guest exit");
+> +		}
+> +	}
+
+This is becoming a very common and useful pattern. I wonder if it's time
+for a ucall helper
+
+static void ucall_vcpu_run(struct kvm_vcpu *vcpu,
+                           void (*sync_func)(struct kvm_vcpu *, void *),
+                           void *sync_data)
+{
+        bool guest_done = false;
+        struct ucall uc;
+
+        while (!guest_done) {
+                vcpu_run(vcpu);
+
+                switch (get_ucall(vcpu, &uc)) {
+                case UCALL_SYNC:
+                        if (sync_func)
+                                sync_func(vcpu, sync_data);
+                        break;
+                case UCALL_DONE:
+                        guest_done = true;
+                        break;
+                case UCALL_ABORT:
+                        REPORT_GUEST_ASSERT(uc);
+                        break;
+                case UCALL_PRINTF:
+                        printf("%s", uc.buffer);
+                        break;
+                default:
+                        TEST_FAIL("Unexpected guest exit");
+                }
+        }
+}
 
 Thanks,
-/fuad
+drew
 
-> ---
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 1ff7582d5fae..2d1894ed1623 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
->
-> @@ -3335,8 +3336,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> struct kvm_page_fault *fault,
->          if (max_level == PG_LEVEL_4K)
->                  return PG_LEVEL_4K;
->
-> -       if (is_private)
-> -               host_level = kvm_max_private_mapping_level(kvm, fault,
-> slot, gfn);
-> +       if (is_private || kvm_memslot_is_gmem_only(slot))
-> +               host_level = kvm_gmem_max_mapping_level(kvm, fault,
-> slot, gfn,
-> +                                                       is_private);
->          else
->                  host_level = host_pfn_mapping_level(kvm, gfn, slot);
->          return min(host_level, max_level);
->
-> >> +{
-> >> +    return fault->is_private || kvm_memslot_is_gmem_only(fault->slot);
-> >> +}
-> >> +
-> >>   static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
-> >>                               struct kvm_page_fault *fault)
-> >>   {
-> >>      unsigned int foll = fault->write ? FOLL_WRITE : 0;
-> >>
-> >> -    if (fault->is_private)
-> >> -            return kvm_mmu_faultin_pfn_private(vcpu, fault);
-> >> +    if (fault_from_gmem(fault))
-> >> +            return kvm_mmu_faultin_pfn_gmem(vcpu, fault);
-> >>
-> >>      foll |= FOLL_NOWAIT;
-> >>      fault->pfn = __kvm_faultin_pfn(fault->slot, fault->gfn, foll,
-> >> --
-> >> 2.50.0.727.gbf7dc18ff4-goog
-> >>
->
->
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
+> -- 
+> 2.39.2
+> 
