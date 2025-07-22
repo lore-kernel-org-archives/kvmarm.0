@@ -1,31 +1,31 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7096D6F06B
-	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 21:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C463C47B
+	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 21:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753220579; cv=none; b=ivT20tqw89nwyd9jKXbpSKIy1GqOmCVcs6Athk2esK4IuVNutgbqSAICXzWeAEywMXyTq9MAkU39TyzCmO3quxYGxkuCjXuwHeoyzm3qqk/bVLz3N39HRJ/8dYeV+hAFJxjdlWEPFqcl0QWQvcP9aksBPaLyHfF0JVKC3hbNrQ4=
+	t=1753220852; cv=none; b=I44vZZyz2TgO7Yikfgbjp2Sn52Lnu50V/w10cRSE3tibl8Y7CLZCTUUUWizwzYGxatz8JXQqFB+UHVs6p2ZyMkgA3s0FkbDlqWL2JiAsca4/fcvuFcTx/20ahtlaYkmbqQC7sU/t7UbutIdo20i2LH4rL30eQvehqG1swQZ1ZX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753220579; c=relaxed/simple;
-	bh=Z9JXQzUAHveRkO9iUbPGQndtuDfXipSIiVrT95HocNI=;
+	s=arc-20240116; t=1753220852; c=relaxed/simple;
+	bh=Jg0pv33wbFikITrBK27iyQWge0OvWyQ31dHcIGjgqzE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bnKxYH0r1M4UWMlhSB5W3SwWL+RW9BwGvPhHLAH3MBx7UOz6ol8NvSJatEJx6Ftj2CS5UJm+TkbqC6u6ihT1kweOHu8totGQpsEkyQDRyi2P3UJAr6fWdhATSmoMY8QjmNgmxN7fbdutfgdcpSI4oXRhtIBZOZ6IXv6QCcYqrV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=b9rWgfvd; arc=none smtp.client-ip=91.218.175.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=uq81CnQ9h3Pnz1MQx/wxlEZJJMWnhN2WoBYaWWEn2QTdMtQRKPIOYdRWZzFL0tXR/r+uId3GQoAfA5ylDQ76vsyiWY+dDj5kLLOkfiibm7Zj/rEaSwDBjdYofX9UkK5HbHswnc5BTDDtN5LLK/PHyBx9/3hB/b/aAzI57iG9VrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Sw0Zgbvh; arc=none smtp.client-ip=95.215.58.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="b9rWgfvd"
-Date: Tue, 22 Jul 2025 14:42:45 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Sw0Zgbvh"
+Date: Tue, 22 Jul 2025 14:47:23 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753220575;
+	t=1753220848;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QK8wV1XYziSthp+DI6Acrbf80c7vSVUfZhGuNStSa7Y=;
-	b=b9rWgfvdgU8yUWNWesfAo9mRkBwFU0WUauQXWH/7ZQ5xZHX0JWBtMCvNm8/w7xtB1TEMy9
-	Vh7nGzqLzHZSLxEa9pOaSb3csGed4zFBTZ1ATbJPKs7BWbUbdgJnByXY1ZerJpYJUyHPEr
-	eUDJq/1Conr5wNHKu/3mGJtVboSByP8=
+	bh=6vbIAZelYdDKJibgPB0CU58fZOd3CWgyntDpi6+7XTE=;
+	b=Sw0ZgbvhF5lfwZf9R0tzQTBTb9M+4+f/CRI52CDuHwJxfBr8bA3rJCWVRFk/oxmFeOUyPg
+	473gPzt4vs/jgvc2DHUZbORaKF2Q2oGVTsrOl+IIZPXilV0pZks5ux6KHgeCAFWEhH1vCL
+	XHQEQL9AJrl9vqKwF5uy4NxNz5/dDFw=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Eric Auger <eauger@redhat.com>
@@ -35,12 +35,12 @@ Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Zhou Wang <wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v4 2/6] KVM: arm64: vgic-v3: Consolidate MAINT_IRQ
- handling
-Message-ID: <aIAF1X7EL7ILbLvH@linux.dev>
+Subject: Re: [PATCH v4 3/6] KVM: arm64: vgic-v3: Allow access to GICD_IIDR
+ prior to initialization
+Message-ID: <aIAG60LuRlJjYA5o@linux.dev>
 References: <20250709211417.2074487-1-oliver.upton@linux.dev>
- <20250709211417.2074487-3-oliver.upton@linux.dev>
- <3ec89328-57e9-4527-8597-a1567f3ffe10@redhat.com>
+ <20250709211417.2074487-4-oliver.upton@linux.dev>
+ <aeb76627-41b2-4550-9010-de90b679bfd4@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,42 +49,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3ec89328-57e9-4527-8597-a1567f3ffe10@redhat.com>
+In-Reply-To: <aeb76627-41b2-4550-9010-de90b679bfd4@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jul 14, 2025 at 02:52:37PM +0200, Eric Auger wrote:
+On Mon, Jul 14, 2025 at 04:41:45PM +0200, Eric Auger wrote:
+> Hi Oliver,
+> 
 > On 7/9/25 11:14 PM, Oliver Upton wrote:
-> > @@ -630,8 +608,24 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
-> >  	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
-> >  	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
-> >  	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
-> > -	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
-> >  		return vgic_v3_attr_regs_access(dev, attr, true);
-> > +	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-> > +		u32 __user *uaddr = (u32 __user *)attr->addr;
-> > +		u32 val;
-> > +
-> > +		if (get_user(val, uaddr))
-> > +			return -EFAULT;
-> > +
-> > +		guard(mutex)(&dev->kvm->arch.config_lock);
-> Previously we had a more elaborate lock sequence in
-> vgic_v3_attr_regs_access() including
-> kvm_trylock_all_vcpus(dev->kvm) and mutex_lock(&dev->kvm->arch.config_lock);
-> Maybe worth to document in the commit msg why it is safe to remove that?
+> > KVM allows userspace to write GICD_IIDR for backwards-compatibility with
+> > older kernels, where new implementation revisions have new features.
+> > Unfortunately this is allowed to happen at runtime, and ripping features
+> > out from underneath a running guest is a terrible idea.
+> > 
+> > While we can't do anything about the ABI, prepare for more ID-like
+> > registers by allowing access to GICD_IIDR prior to VGIC initialization.
+> > Subsequent changes will allow the VMM to further provision the GIC
+> > feature set, e.g. the presence of nASSGIcap.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-init.c       |  9 +--------
+> >  arch/arm64/kvm/vgic/vgic-kvm-device.c | 20 +++++++++++++++++++-
+> >  2 files changed, 20 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > index 5e0e4559004b..487e902b040c 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > @@ -157,6 +157,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+> >  
+> >  	kvm->arch.vgic.in_kernel = true;
+> >  	kvm->arch.vgic.vgic_model = type;
+> > +	kvm->arch.vgic.implementation_rev = KVM_VGIC_IMP_REV_LATEST;
+> >  
+> >  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+> >  
+> > @@ -409,15 +410,7 @@ int vgic_init(struct kvm *kvm)
+> >  		goto out;
+> >  
+> >  	vgic_debug_init(kvm);
+> > -
+> > -	/*
+> > -	 * If userspace didn't set the GIC implementation revision,
+> > -	 * default to the latest and greatest. You know want it.
+> > -	 */
+> > -	if (!dist->implementation_rev)
+> > -		dist->implementation_rev = KVM_VGIC_IMP_REV_LATEST;
+> The change related to KVM_VGIC_IMP_REV_LATEST looks unrelated to the
+> commit title/msg, isn't it?
+
+It is deliberate here to make IIDR have a similar discovery model to the
+CPU feature ID registers where the value after creation represents the
+maximum feature set.
+
+> > @@ -552,7 +570,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+> >  
+> >  	mutex_lock(&dev->kvm->arch.config_lock);
+> >  
+> > -	if (!vgic_initialized(dev->kvm)) {
+> > +	if (!(vgic_initialized(dev->kvm) || reg_allowed_pre_init(attr))) {
+> nit: !vgic_initialized(dev->kvm) && !reg_allowed_pre_init() is easier to
+> compute for me
 > 
-
-Can do, just adding FTR here that kvm_vgic_vcpu_nv_init() only takes the
-config_lock so the rest is unneeded.
-
 > 
-> > +		if (vgic_initialized(dev->kvm))
-> > +			return -EBUSY;
-> > +
-> > +		if ((val < VGIC_NR_SGIS) || (val >= VGIC_NR_PRIVATE_IRQS))
-> nit: !irq_is_ppi()?
+> Besides
+> 
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Much nicer.
+Thanks!
 
-Thanks,
 Oliver
