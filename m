@@ -1,55 +1,55 @@
 Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7592DC33B
-	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 10:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAC428A407
+	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 10:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753267646; cv=none; b=S51xEJyg4ec1dSZOcdFGzPwpolhrPjbYKP3r6N60ySTfg4tOBpB9eE/TZqgXtZoNK0HpFGFfhU+qG1jKbaTkqdIoufHN4RLhSifKf552QBIs4wA+Nvpg1FABlN54uhqlPmMcr7z4s8kgeutlUIsM6lzzhtB+zGfRF8SzUy7/8uw=
+	t=1753267647; cv=none; b=etgKJQphfkfeX6bfZtPsslNhiKYsCKlhBfampwrfEeWssXXzX+lDRs+RJITCKg5RF61dxdt9AZbFJDpA6cgFrnsNCUE4BcZqewIlDcK5nXBf13qhFkVTVolnTsmOt7LfwYLCJjyvJW7s6nk+SMiei22jEsWGs7FK1vJnCEWptcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753267646; c=relaxed/simple;
-	bh=KZ7kqW7WvlgvVKw/xfxfioYYfD44i99u6AqHghZDBzk=;
+	s=arc-20240116; t=1753267647; c=relaxed/simple;
+	bh=X2UnKEstGo4dvjCoZ5gOAq//oBrh8730fp8cQehcNxQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pfsAcAdT8eqJ0hdBAnjv9XLzcLGgdOriZ6NT1lOQQ8euo4A/KZoKCxYqpOGcKq0/xcfVXMSLnDx158fc3XdTihLjt7uXcBZYji+DsvLX9+BdWgOTMsDkqc5Tl2L7vELqwbin1/2jHWG/yi6Sgn8fG+gi331nQu5BiDMVdeaFDnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gBtIfGYP; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=GyQjlv1zCc+lI9eeM4AIMFWWIOblb21MCR7F7haYCCPNkhWibipBEMR1kvD/g5MMk1X1qThFsWwzkaSiaMmdtHQ7ZrBfQmBB/SqBevM+vOrVyf9YAN+cB9MIurbboUQKiusNyA3Y7/0D1UZ4LilWlVOdeO1Re4jzKt+8rZ6QLMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CbwHYhA0; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gBtIfGYP"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a4ff581df3so417095f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 03:47:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CbwHYhA0"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a50049f8eeso3692381f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 03:47:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753267642; x=1753872442; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753267644; x=1753872444; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RA80cSFG8RloKjPCJxSK3bAiLUM98d+8AkAnyd7v+Q8=;
-        b=gBtIfGYPMDyMKa3OuDhl4kDwjiWhGc2Q3PIKAXmeU3yxmfC+7Ycjj+tvhAtW7q4gsM
-         jJvrDAJeQe25NaKLSok8aRiBvi2vSlPV6R7KB5ilvRysxLXK81tg8/uj6Mhpwsst+D3G
-         zJOcahW7Mtu8HML008vd/HrLGYPitTEeOyN7djCFiarfDQH3o/o92Jv/qhkFLKrncU5U
-         un1DVo63DcxdJqKeG31uhUK+UKIKVxVR2EXJY1q3oaLZNQ+xbAt1ag8Gtz+MacIlDWk6
-         M3cYGjbLfm0Za5DrCTJuG+qmJlMv+13koH3zeQgkg1WQXMfZFV24xVB5xPkFMSRkQH3T
-         x0Qw==
+        bh=++/QPN6SuFMfkHRmjrhS6+IMVKdQVW60svD12JCzsMw=;
+        b=CbwHYhA0fnG1bryJSJLcYQQRXbZXSyGKCNV6yfAE7KWywSJumuQH0ENqm5q3Zv1No7
+         A9c5pa1MPlyfGiUapt0WNtGSp0rFuLJFCmKlRtNDpdO94FqPZgNeAbRFYT52Pyjwcy2C
+         MpgqJ7ZfOOrFcT1l45lsetJvqGzUFP+IMybOHvRoWlPhCiWKcTRHw6nY6bHOr87q++RB
+         ht62jwwf2z6rbgM+nwj17vQnO9ma8lb0/30RCwZD3MM4/CKDDH7CIJ9NF2CH5aBpaMC1
+         zymy5RILJrKI0NPkY6vqomDujrB/m39iRxIFgys3VV08oZ3HR4E/OrDpInNkKHoxbnaV
+         vBqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753267642; x=1753872442;
+        d=1e100.net; s=20230601; t=1753267644; x=1753872444;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RA80cSFG8RloKjPCJxSK3bAiLUM98d+8AkAnyd7v+Q8=;
-        b=haAuJUM1kRAe8eE5Wl3gTO4+yRaQGUFxaTShlLbzYZepzA/O5iEoiUrobBibwzVxxT
-         riKmhRIJvH9NzVXsylax93ZNF/w9V4W8JpgB4QmBgl20P14HhN3EEh73SqcIEry9qX88
-         Wg9iGUb6oDN67TN4aOMYRmgo1I6meJFeb+Nk/ft1N8KELjKkx20vlUJQjGyXkCCSNZQ+
-         MLMuuhpMnyuLCO/3utykBeacwoc/3kK15+O5l6/+gKd11HLqw0vB0AcIHiLpnas/08z2
-         +WRgB4btCeejLWmS4LyRyE2cURmOUzNVehabtMAkiG1/ZnKa0utuFHOSlVXsNu1Jwqt/
-         brwA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2HX32vox6bR1+ClgplyojIte2dZZQFppg/IQ5DJKPjbtqiJwrOcTda/45zPYoolYENh/OUZs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyTLC5nW61G+l6SU3WHiksocUoLRfg9aBsFAaozYjchr0zHJ1OF
-	8m1nWcWBJblKzvKnnhRrLsT5qZBQqatAyybX25Y+HYt6GCv7Z7vkaPtEeLPoA0dNad5T/B/sgFa
-	jtA==
-X-Google-Smtp-Source: AGHT+IEHW8UPxyP3e+Y7vaygayrdzupiZRH2UQB8NKUanjQQg40Gzi7ntNOEJQk5x0u5UdSIscP/yEby6w==
-X-Received: from wrae21.prod.google.com ([2002:adf:a455:0:b0:3a5:7aac:4306])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:188b:b0:3a4:f7dd:6fad
- with SMTP id ffacd0b85a97d-3b7694dfebcmr2129935f8f.14.1753267642329; Wed, 23
- Jul 2025 03:47:22 -0700 (PDT)
-Date: Wed, 23 Jul 2025 11:46:59 +0100
+        bh=++/QPN6SuFMfkHRmjrhS6+IMVKdQVW60svD12JCzsMw=;
+        b=B3NvoPvk3y2jmiAyGUK0i5w6ddfkqbsuEZ02EBOP2e2q9mCpOnsxROIP1zdwb0Jod6
+         ZLEcIJI/RjsS6epdzoMJpNGNN3zCjh8K/1mkLxlm55cqH0gz4oD4QcxRQg9X/QQSSIV3
+         GzjU/7TuPjaZXSrgSaJlJ0xHr/b4UFrlDDwHfeM56eMG2bd89p8x/UWhBwUy779OIcaW
+         ljurZl+07WixOzlrrgKQbWA3+S9snfUdToKutItfDAEKNhmUPZMLWepuR/SQO0uG3n+G
+         qf7hMpUn4Fe8aQJgo4Y8eG9lL2aS5vfHxh/8lG1k419ci8Tv6eKadgK0aVNOaCKRsdH6
+         IYFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbPCoklX3Rx0BAX5DmIO4SPvAPX6jJaXqYqCOJ1yuQ8z/ujtlniSHKOr4xQtDGhrwHJQgmPDE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyRt4GQk16kL/+SN0N4d+mEo1YgjAcGI8vxGUD2ZkjshnEYHjAv
+	q83gY87PDyGBvlPlw0/RjGWsuMB3r59cA2EsA/uuIn2HhZODJKfog1G1LO3co8KSmTmuYGXi88F
+	qaw==
+X-Google-Smtp-Source: AGHT+IGh1e+V8SmScKMa7B9rDGNrVFkyz19g/99WYS3fME9s9rYU5XZGuebCy3D5fzuVYuNyo6dDcGaEqw==
+X-Received: from wrov11.prod.google.com ([2002:adf:edcb:0:b0:3a5:7883:6563])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1449:b0:3a5:1c71:432a
+ with SMTP id ffacd0b85a97d-3b768ee0916mr2198617f8f.14.1753267643374; Wed, 23
+ Jul 2025 03:47:23 -0700 (PDT)
+Date: Wed, 23 Jul 2025 11:47:00 +0100
 In-Reply-To: <20250723104714.1674617-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250723104714.1674617-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
-Message-ID: <20250723104714.1674617-8-tabba@google.com>
-Subject: [PATCH v16 07/22] KVM: Fix comments that refer to slots_lock
+Message-ID: <20250723104714.1674617-9-tabba@google.com>
+Subject: [PATCH v16 08/22] KVM: Fix comment that refers to kvm uapi header path
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev
@@ -86,11 +86,12 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	ira.weiny@intel.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Fix comments so that they refer to slots_lock instead of slots_locks
-(remove trailing s).
+The comment that points to the path where the user-visible memslot flags
+are refers to an outdated path and has a typo.
+
+Update the comment to refer to the correct path.
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Shivank Garg <shivankg@amd.com>
 Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
@@ -98,35 +99,21 @@ Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
  include/linux/kvm_host.h | 2 +-
- virt/kvm/kvm_main.c      | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4c5e0a898652..5c25b03d3d50 100644
+index 5c25b03d3d50..56ea8c862cfd 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -860,7 +860,7 @@ struct kvm {
- 	struct notifier_block pm_notifier;
- #endif
- #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
--	/* Protected by slots_locks (for writes) and RCU (for reads) */
-+	/* Protected by slots_lock (for writes) and RCU (for reads) */
- 	struct xarray mem_attr_array;
- #endif
- 	char stats_id[KVM_STATS_NAME_SIZE];
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 25a94eed75fd..aa86dfd757db 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -331,7 +331,7 @@ void kvm_flush_remote_tlbs_memslot(struct kvm *kvm,
- 	 * All current use cases for flushing the TLBs for a specific memslot
- 	 * are related to dirty logging, and many do the TLB flush out of
- 	 * mmu_lock. The interaction between the various operations on memslot
--	 * must be serialized by slots_locks to ensure the TLB flush from one
-+	 * must be serialized by slots_lock to ensure the TLB flush from one
- 	 * operation is observed by any other operation on the same memslot.
- 	 */
- 	lockdep_assert_held(&kvm->slots_lock);
+@@ -52,7 +52,7 @@
+ /*
+  * The bit 16 ~ bit 31 of kvm_userspace_memory_region::flags are internally
+  * used in kvm, other bits are visible for userspace which are defined in
+- * include/linux/kvm_h.
++ * include/uapi/linux/kvm.h.
+  */
+ #define KVM_MEMSLOT_INVALID	(1UL << 16)
+ 
 -- 
 2.50.1.470.g6ba607880d-goog
 
