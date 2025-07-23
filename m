@@ -1,113 +1,191 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF502E4989
-	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 11:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6280C2E7F2C
+	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 13:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753271108; cv=none; b=QgAUUyJFVcvz10oAXuw8KUPRJZVw+cm0i2TioIkr9p2vXKpImDXjf4Fee/tgql9VMd2TXtoqZlGxQUZ8HgD9s+o/ZEaHb6Y4f6kWZLDMgNAOGoBfUWMvT1EqYPLfJxfJPjPw0lGlBNVPdwRTkB9uLwOeemJqm0Vk59Kx/GhLK0Q=
+	t=1753275996; cv=none; b=Tja3lrZPnqsHJ+O4dgdO9JMHpPUjwU16Yyz1NtysBXL6fB53jwHzsqbFAdSKWsnJKdg0nMK3gvynDky3bdunXiOZgIhP7FptpDYANvOmyJXuCOLj41evj0AbnY7FIJJgMqWLhq+ERBZdc/YUVZBSyrHMaTWZN/3dc4/4ojG/gNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753271108; c=relaxed/simple;
-	bh=owZiUW8Siyx2lF0K51cV1c/Sdy6AymBUIZnkSBWXW5o=;
+	s=arc-20240116; t=1753275996; c=relaxed/simple;
+	bh=xpGnh9YJZRPC8hRQsB+1pAq5rzC1Pd9l2Hu5tdw8+wM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=luZZe/kQuYgFXgERdm/BN1ae6/tfV71VEgTlMkqncafsdKW5N9eTL0sKUpI4fuSqCZaqcVS/pkUijurJ4mmI+80b30osrkk1B9TUla/ChzzuuslK3aFcJblnctnGRB1oGkOKixqIyLZkfVkJX2oatJJGGXBFEtKH9gXjhKaPsYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V906kXSO; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=h/HnDEmV+SYvzgmTMR/9Tp2fuYXyHJXLILgMdyKKz/FA/uS/8m4YcAAr/j86lW98DpfafFieYlqRiKHnGiQNXG79cjb9q0FffFj1Ig+wZ945UBI1o3MdqGcAA2IZWJacYTzd+f671itym0ryIHGQ5iWM6UPe/xAAbYG5iXGIAxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=auuTjHx4; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V906kXSO"
-Message-ID: <63b70aa3-5b20-464f-83ac-97b6a78c99f9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753271102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l59cD6t8x/yYppwAMFqjuP0HYW8qoCrV0FHN2nRJB/Y=;
-	b=V906kXSOWuv2GItOcDK540WJ3tHmdbNrKADl+IxsddBmeLbJQzIDavJMyUe5zJ84UCrZ+p
-	/twn4ph0k0JIHqifJ4/aBEq9tMIzVjHm6gxNN3l5P+YcW81TP0J9XHd+QbgzDbPy/wLKf0
-	EssEmv7nn7aObEElJagRnU4R8JLKNsU=
-Date: Wed, 23 Jul 2025 19:44:09 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="auuTjHx4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753275996; x=1784811996;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xpGnh9YJZRPC8hRQsB+1pAq5rzC1Pd9l2Hu5tdw8+wM=;
+  b=auuTjHx4CuqZ833T2p/36RbUEPBu91NCq/xb1Wx8QtrnmBWj/SjTrvVG
+   zkoz//tz3pXzxqHvFcDkg3sqboWnSF3Q8T3VhBMID7wh7RsIP2u+6st3A
+   4WKrf9xtaCDuNnxVk0e6YcAmOFWYtOz2TWa5LFLgr77A3LRYyaiI6Ls85
+   Y77krAOzGe9jIA9co3PbPYFI9frQUlNq8ZgGy7JmjVYDPxHNJF0xHE8HZ
+   pgr/+QglEeLuzDFSQ+U2i4HIh8PUaTs/vkS1/FCM/7lp/rHJupbPqJdUU
+   0AGTpk454TEQnuf+zYnxWUuW1RbR02nBRIf0MfzXvuhFayLGK5kaoHuOZ
+   Q==;
+X-CSE-ConnectionGUID: 1umqBaTbTdu0617YsgIxGA==
+X-CSE-MsgGUID: e1viZVf8T9CdJykiFxbYmw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="66898741"
+X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
+   d="scan'208";a="66898741"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 06:06:34 -0700
+X-CSE-ConnectionGUID: o54KMjg3Q8eDVfJynjs12w==
+X-CSE-MsgGUID: W8NbhIYWSAWyZKxaUBNBxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
+   d="scan'208";a="159157117"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 06:06:20 -0700
+Message-ID: <18491db5-2e9b-4914-9464-87166a83ffde@intel.com>
+Date: Wed, 23 Jul 2025 21:06:17 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH v15 16/21] KVM: arm64: Handle guest_memfd-backed guest
- page faults
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 02/22] KVM: x86: Have all vendor neutral sub-configs
+ depend on KVM_X86, not just KVM
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
  aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
  brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, will@kernel.org,
- qperret@google.com, keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org,
- hch@infradead.org, jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com,
- fvdl@google.com, hughd@google.com, jthoughton@google.com, peterx@redhat.com,
- pankaj.gupta@amd.com, ira.weiny@intel.com
-References: <20250717162731.446579-1-tabba@google.com>
- <20250717162731.446579-17-tabba@google.com>
- <07976427-e5a4-4ca4-93e9-a428a962b0b2@linux.dev>
- <87pldrtj1o.wl-maz@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kunwu Chan <kunwu.chan@linux.dev>
-In-Reply-To: <87pldrtj1o.wl-maz@kernel.org>
+ yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
+ amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
+ ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250723104714.1674617-1-tabba@google.com>
+ <20250723104714.1674617-3-tabba@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250723104714.1674617-3-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
 
-On 2025/7/23 16:20, Marc Zyngier wrote:
-> On Tue, 22 Jul 2025 13:31:34 +0100,
-> Kunwu Chan <kunwu.chan@linux.dev> wrote:
->> On 2025/7/18 00:27, Fuad Tabba wrote:
->>> Add arm64 architecture support for handling guest page faults on memory
->>> slots backed by guest_memfd.
->>>
->>> This change introduces a new function, gmem_abort(), which encapsulates
->>> the fault handling logic specific to guest_memfd-backed memory. The
->>> kvm_handle_guest_abort() entry point is updated to dispatch to
->>> gmem_abort() when a fault occurs on a guest_memfd-backed memory slot (as
->>> determined by kvm_slot_has_gmem()).
->>>
->>> Until guest_memfd gains support for huge pages, the fault granule for
->>> these memory regions is restricted to PAGE_SIZE.
->> Since huge pages are not currently supported, would it be more
->> friendly to define  sth like
->>
->> "#define GMEM_PAGE_GRANULE PAGE_SIZE" at the top (rather than
->> hardcoding PAGE_SIZE)
->>
->>   and make it easier to switch to huge page support later?
-> No. PAGE_SIZE always has to be the fallback, no matter what. When (and
-> if) larger mappings get supported, there will be extra code for that
-> purpose, not just flipping a definition.
->
-> Thanks,
->
-> 	M.
+On 7/23/2025 6:46 PM, Fuad Tabba wrote:
+> From: Sean Christopherson <seanjc@google.com>
+> 
+> Make all vendor neutral KVM x86 configs depend on KVM_X86, not just KVM,
+> i.e. gate them on at least one vendor module being enabled and thus on
+> kvm.ko actually being built.  Depending on just KVM allows the user to
+> select the configs even though they won't actually take effect, and more
+> importantly, makes it all too easy to create unmet dependencies.  E.g.
+> KVM_GENERIC_PRIVATE_MEM can't be selected by KVM_SW_PROTECTED_VM, because
+> the KVM_GENERIC_MMU_NOTIFIER dependency is select by KVM_X86.
+> 
+> Hiding all sub-configs when neither KVM_AMD nor KVM_INTEL is selected also
+> helps communicate to the user that nothing "interesting" is going on, e.g.
+> 
+>    --- Virtualization
+>    <M>   Kernel-based Virtual Machine (KVM) support
+>    < >   KVM for Intel (and compatible) processors support
+>    < >   KVM for AMD processors support
 
-Got it, no questions here. Feel free to add my "Reviewed-by" tag to the 
-patch.
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Reviewed-by: Tao Chan <chentao@kylinos.cn>
-
-Thanks,
-	TAO.
----
-“Life finds a way.”
+> Fixes: ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module is requested")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>   arch/x86/kvm/Kconfig | 16 ++++++++--------
+>   1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 2c86673155c9..9895fc3cd901 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -74,7 +74,7 @@ config KVM_WERROR
+>   	# FRAME_WARN, i.e. KVM_WERROR=y with KASAN=y requires special tuning.
+>   	# Building KVM with -Werror and KASAN is still doable via enabling
+>   	# the kernel-wide WERROR=y.
+> -	depends on KVM && ((EXPERT && !KASAN) || WERROR)
+> +	depends on KVM_X86 && ((EXPERT && !KASAN) || WERROR)
+>   	help
+>   	  Add -Werror to the build flags for KVM.
+>   
+> @@ -83,7 +83,7 @@ config KVM_WERROR
+>   config KVM_SW_PROTECTED_VM
+>   	bool "Enable support for KVM software-protected VMs"
+>   	depends on EXPERT
+> -	depends on KVM && X86_64
+> +	depends on KVM_X86 && X86_64
+>   	help
+>   	  Enable support for KVM software-protected VMs.  Currently, software-
+>   	  protected VMs are purely a development and testing vehicle for
+> @@ -169,7 +169,7 @@ config KVM_AMD_SEV
+>   config KVM_IOAPIC
+>   	bool "I/O APIC, PIC, and PIT emulation"
+>   	default y
+> -	depends on KVM
+> +	depends on KVM_X86
+>   	help
+>   	  Provides support for KVM to emulate an I/O APIC, PIC, and PIT, i.e.
+>   	  for full in-kernel APIC emulation.
+> @@ -179,7 +179,7 @@ config KVM_IOAPIC
+>   config KVM_SMM
+>   	bool "System Management Mode emulation"
+>   	default y
+> -	depends on KVM
+> +	depends on KVM_X86
+>   	help
+>   	  Provides support for KVM to emulate System Management Mode (SMM)
+>   	  in virtual machines.  This can be used by the virtual machine
+> @@ -189,7 +189,7 @@ config KVM_SMM
+>   
+>   config KVM_HYPERV
+>   	bool "Support for Microsoft Hyper-V emulation"
+> -	depends on KVM
+> +	depends on KVM_X86
+>   	default y
+>   	help
+>   	  Provides KVM support for emulating Microsoft Hyper-V.  This allows KVM
+> @@ -203,7 +203,7 @@ config KVM_HYPERV
+>   
+>   config KVM_XEN
+>   	bool "Support for Xen hypercall interface"
+> -	depends on KVM
+> +	depends on KVM_X86
+>   	help
+>   	  Provides KVM support for the hosting Xen HVM guests and
+>   	  passing Xen hypercalls to userspace.
+> @@ -213,7 +213,7 @@ config KVM_XEN
+>   config KVM_PROVE_MMU
+>   	bool "Prove KVM MMU correctness"
+>   	depends on DEBUG_KERNEL
+> -	depends on KVM
+> +	depends on KVM_X86
+>   	depends on EXPERT
+>   	help
+>   	  Enables runtime assertions in KVM's MMU that are too costly to enable
+> @@ -228,7 +228,7 @@ config KVM_EXTERNAL_WRITE_TRACKING
+>   
+>   config KVM_MAX_NR_VCPUS
+>   	int "Maximum number of vCPUs per KVM guest"
+> -	depends on KVM
+> +	depends on KVM_X86
+>   	range 1024 4096
+>   	default 4096 if MAXSMP
+>   	default 1024
 
