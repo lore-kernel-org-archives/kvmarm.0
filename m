@@ -1,55 +1,55 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3882DE6EF
-	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 10:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FF22DFA46
+	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 10:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753267648; cv=none; b=VHHM8+Oa2B2OFOiYD5PE/9v65dn+NdAoIaj8jkZEXmOY6g63pvIr4PnyNUV2x6y7bkQw5a0CvdL0d2Pexw0AV+gfZV9XvW7w9BEIpCPS923a25TPQy9mryCmRlV7ghOEQHECmPXOL93DC0C7bzxCQv2uuGG/mLbPj2TnUqDzLJE=
+	t=1753267649; cv=none; b=noIWv9+2Q+bGMC1D43DNZWAGTn/lNSZVaxcJG/qRtwlERz6Y27akmaV8vCtWVfqQCrJNQotniWKbhKDuKhduyvOzSUwGmGENoNK5Kq49HbpC0FiY7JyX9CDwM3D+FUyePma3qya9UhoMcXXcpwlrxsobyFO2gc7H8a5DByxvobw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753267648; c=relaxed/simple;
-	bh=38ygdCilX8dT54YYL9NC1BWienHMT1RxG0kEfn+M4gk=;
+	s=arc-20240116; t=1753267649; c=relaxed/simple;
+	bh=QyxuUTWdkqfWwCRIlgMMsPpjhtM2I7WKCTsedQOzWL0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=e7Dq78oC7ahgrgcdV+OKjz/MOTJbkdMRC9erPRpyE3WU3tFAHuBpIWoiNYiVrlArwsVMu9WO/mh2Y0atjn4BXEDG8eOoGaQ+j/fFAxSioGK1ZTU/IoMTcuKPd2XKEptnn6GMXAxriTLRJ8gqb8wq5yjxl/a4ViLUbphugy+u6Gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4pVVnwTQ; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=giC2z5z2w+xaUfuZzmgh/JjmYbRrU/OAmrnShWui24FXvt+kPiRfoPmp9jRHusTAtLhH7fwaqogxdDK9cvUuCyTSzog6QgpvolDH4rwB9jTxvCbXgSWNmyGrG7wOYF1s8rTiNi48mC+bQGe+YZ4duwzYBhLvFHTVEGLk+Wa8MTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RSbBTEVi; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4pVVnwTQ"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a4eec544c6so2604411f8f.0
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RSbBTEVi"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a58939191eso2794976f8f.0
         for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 03:47:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20230601; t=1753267645; x=1753872445; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oVZMjpRm02pM+s1bH/p5kOhiKIrqbu4P3W/nBYdl9H0=;
-        b=4pVVnwTQYAp3EKc9X9hVHfaeHZ8onkTl9KNM2R7UoOycwvpllXCjnyv1iWYlk0HnAe
-         /jk5oO7VdQbwkPYI7FX6abF8zhFn4jbtAPB5q3z672jRjVKt8VakuNtakTve2zzHjR6w
-         GzdAR2fIE3n2JyJckAfnqBPn3t/W+SPRFOfFZFm/N2N9Vxb8NEFHAiL5iMxlIYvjhYDJ
-         CzL3kvVLAfQ8CSczXLQ+7IRbtEtouNmWbtplXATbvA6iQ/7WjuLNsVTMelAru4uhnkKV
-         kxjxRwTrpB6PZS+CY3VsDsp3hGg44412l7Wl2SlesA6DNKCsOo1tWJR4K7q4qyr/ZUKe
-         25UQ==
+        bh=fcETzHTWiEWR8GOIStOaS7XhZknr1voGGAhaPeQn9wI=;
+        b=RSbBTEVipKeQfV3I7Y0Edl/ZqHt6EUPW4wh/BSOU333+PRpKkLQAsKvHO5E6WjCgLL
+         5SJ1G1GeLAdtQCkydutJS6awn4V2JPhTp90KxcOj63P7Jq5GwGDYuHJDPzOIsfQJeX6r
+         c788YIYPrUm6cvOW6KvrahQ8ftFxikn8JfApzJ94HBAFhWDcS3fylrflJyOu8+SQdf4Y
+         sucAUm7MSyQZ9MK/U9Yv5r9n/wLLcahYXHyC6nd+hCQB6RCdyqU80+Q2s/RUraiU9mZV
+         D4qN6bTe8SrUr7I2hQI48lR/6SL1/KQxWzND2fhaMveGec2eJ0y65mG8BSBitTHb+3e2
+         4j+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1753267645; x=1753872445;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oVZMjpRm02pM+s1bH/p5kOhiKIrqbu4P3W/nBYdl9H0=;
-        b=UjDEsrCwOZ6nT81Kx8YVnaizp9vQ2izGhQvGCqRHSz5ZvMc2vaQpKooqrrHFGzUOVI
-         zR3OjWDMfaSnhw6475232v0juJg+WxRhpXqDv5pOx8pLvMfaPom41pQuC+D1m11A+mR8
-         rOEsRB0R0H6kYZGaB6L4u6kB7ZYnT70kEG9a5Ozmbl0n+Evn5dyA/93kUgiWPXJm4jtH
-         MVpuL9UFxhs7SC7pQMi2gTfyZEpCTWN+m/H9EvINfwOFRCDx64/JwHtGrZwf+Y86PTJR
-         cYGmo9gKu7fVTXH2ew2c3Qj/C8ExGwoA6S4VWe2JE4rQhbJuSZlBJ2NAX8JUzGjiDJgO
-         1B8g==
-X-Forwarded-Encrypted: i=1; AJvYcCWNdDQp5fLxDWA/Vf0jrmmi0yfV6NST9NUozwTvqesoAYx+gBLiWGK+rxVLa5xphHJTV9vHhSc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzVTHEHf2DFGV8m/GOxXtezK5CyCXYY5k91mOrFvgKueG8SK3Np
-	N+ww0sZZDmpUjuMmu04569gBDZ6zL/fvlEjhIrd5MxIWvSpMUyQ7dqOe/cK/9h3b6zbNisIHKDy
-	2Mg==
-X-Google-Smtp-Source: AGHT+IHLzuLINdJSWTguMGiWOg3ozLl75dp1Qprfo0bHjzS8AWsGSIsnNSxbTc+BmMB/sQkP4J6w00TZ8w==
-X-Received: from wrjb12.prod.google.com ([2002:adf:e30c:0:b0:3a4:e3a1:4e8e])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:64c5:0:b0:3a5:5270:a52c
- with SMTP id ffacd0b85a97d-3b768c6cbf4mr2019207f8f.0.1753267644477; Wed, 23
- Jul 2025 03:47:24 -0700 (PDT)
-Date: Wed, 23 Jul 2025 11:47:01 +0100
+        bh=fcETzHTWiEWR8GOIStOaS7XhZknr1voGGAhaPeQn9wI=;
+        b=jV5st0eqo6xCnaLO7lTTHV03RYQLUqdjbP0M0VZy4wOTRWa58Tsr7JeM7KPt4bNPMG
+         z33+CfN2lPkZaBAbkVhkpwifJkNmSASoBJWf+aYd39Waj9SzXcJcRf4b+fiK8f3HeVOX
+         SgeVmMpECq2ReKXjn6Xv5+hO/POov9m6bFR70ufUCRptqh1/aqEhNJD73h0dzzGnTgYz
+         KjJ0sIO8TkkQ6W3mhE0EkjUomDcdZmtR6NLpGyv2PSc9iX33lzcfh/d7jHSp1RVpRxgy
+         qbHuBKxkAPI91b2YdIWwaS8JLzfMOu7bK3TxX2SI+OhYWxRWRvLmMR5Zn8i+9f7GKozt
+         TqeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWl1Bw5njYbHHSl6MSnYuDtVnl7UwTE8DH34sEvniNqDES0ESZvilXj1ASFuWW52FDY/MyGh7s=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy+QarVRmaPU1nJDrbD4OQNQePDa1m6FYOTYnQYB100Tvxd1LKO
+	xtm1Ox2dawV6CSTJfYA7MOsnoV2MLIqfGvFwAz1sjRUaTwrrU65whYZOoqLs+AuUtLO1ktxuGRM
+	xEQ==
+X-Google-Smtp-Source: AGHT+IEe44MXl/ytA6bQwQoEc18ccfi02+HhAg/vYEYD6fmTIl5PZmuGxIaMa7BS20QwG080yszRIEU/kg==
+X-Received: from wrbfx9.prod.google.com ([2002:a05:6000:2d09:b0:3a5:2220:5be3])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:230d:b0:3b3:9c56:b834
+ with SMTP id ffacd0b85a97d-3b768c9d38dmr1845396f8f.1.1753267645473; Wed, 23
+ Jul 2025 03:47:25 -0700 (PDT)
+Date: Wed, 23 Jul 2025 11:47:02 +0100
 In-Reply-To: <20250723104714.1674617-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250723104714.1674617-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
-Message-ID: <20250723104714.1674617-10-tabba@google.com>
-Subject: [PATCH v16 09/22] KVM: x86: Enable KVM_GUEST_MEMFD for all 64-bit builds
+Message-ID: <20250723104714.1674617-11-tabba@google.com>
+Subject: [PATCH v16 10/22] KVM: guest_memfd: Add plumbing to host to map
+ guest_memfd pages
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev
@@ -86,139 +87,180 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	ira.weiny@intel.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Enable KVM_GUEST_MEMFD for all KVM x86 64-bit builds, i.e. for "default"
-VM types when running on 64-bit KVM.  This will allow using guest_memfd
-to back non-private memory for all VM shapes, by supporting mmap() on
-guest_memfd.
+Introduce the core infrastructure to enable host userspace to mmap()
+guest_memfd-backed memory. This is needed for several evolving KVM use
+cases:
 
-Opportunistically clean up various conditionals that become tautologies
-once x86 selects KVM_GUEST_MEMFD more broadly.  Specifically, because
-SW protected VMs, SEV, and TDX are all 64-bit only, private memory no
-longer needs to take explicit dependencies on KVM_GUEST_MEMFD, because
-it is effectively a prerequisite.
+* Non-CoCo VM backing: Allows VMMs like Firecracker to run guests
+  entirely backed by guest_memfd, even for non-CoCo VMs [1]. This
+  provides a unified memory management model and simplifies guest memory
+  handling.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+* Direct map removal for enhanced security: This is an important step
+  for direct map removal of guest memory [2]. By allowing host userspace
+  to fault in guest_memfd pages directly, we can avoid maintaining host
+  kernel direct maps of guest memory. This provides additional hardening
+  against Spectre-like transient execution attacks by removing a
+  potential attack surface within the kernel.
+
+* Future guest_memfd features: This also lays the groundwork for future
+  enhancements to guest_memfd, such as supporting huge pages and
+  enabling in-place sharing of guest memory with the host for CoCo
+  platforms that permit it [3].
+
+Enable the basic mmap and fault handling logic within guest_memfd, but
+hold off on allow userspace to actually do mmap() until the architecture
+support is also in place.
+
+[1] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
+[2] https://lore.kernel.org/linux-mm/cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com
+[3] https://lore.kernel.org/all/c1c9591d-218a-495c-957b-ba356c8f8e09@redhat.com/T/#u
+
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Shivank Garg <shivankg@amd.com>
+Acked-by: David Hildenbrand <david@redhat.com>
+Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  4 +---
- arch/x86/kvm/Kconfig            | 12 ++++--------
- include/linux/kvm_host.h        |  9 ++-------
- virt/kvm/kvm_main.c             |  4 ++--
- 4 files changed, 9 insertions(+), 20 deletions(-)
+ arch/x86/kvm/x86.c       | 11 +++++++
+ include/linux/kvm_host.h |  4 +++
+ virt/kvm/guest_memfd.c   | 70 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 85 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7b0f2b3e492d..50366a1ca192 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2276,10 +2276,8 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
- 		       int tdp_max_root_level, int tdp_huge_page_level);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a1c49bc681c4..e5cd54ba1eaa 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13518,6 +13518,16 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
  
- 
--#ifdef CONFIG_KVM_GUEST_MEMFD
-+#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
- #define kvm_arch_has_private_mem(kvm) ((kvm)->arch.has_private_mem)
--#else
--#define kvm_arch_has_private_mem(kvm) false
++#ifdef CONFIG_KVM_GUEST_MEMFD
++/*
++ * KVM doesn't yet support mmap() on guest_memfd for VMs with private memory
++ * (the private vs. shared tracking needs to be moved into guest_memfd).
++ */
++bool kvm_arch_supports_gmem_mmap(struct kvm *kvm)
++{
++	return !kvm_arch_has_private_mem(kvm);
++}
++
+ #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_PREPARE
+ int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order)
+ {
+@@ -13531,6 +13541,7 @@ void kvm_arch_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
+ 	kvm_x86_call(gmem_invalidate)(start, end);
+ }
  #endif
++#endif
  
- #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index c763446d9b9f..4e43923656d0 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -47,6 +47,7 @@ config KVM_X86
- 	select KVM_GENERIC_HARDWARE_ENABLING
- 	select KVM_GENERIC_PRE_FAULT_MEMORY
- 	select KVM_WERROR if WERROR
-+	select KVM_GUEST_MEMFD if X86_64
- 
- config KVM
- 	tristate "Kernel-based Virtual Machine (KVM) support"
-@@ -79,16 +80,11 @@ config KVM_WERROR
- 
- 	  If in doubt, say "N".
- 
--config KVM_X86_PRIVATE_MEM
--	select KVM_GENERIC_MEMORY_ATTRIBUTES
--	select KVM_GUEST_MEMFD
--	bool
--
- config KVM_SW_PROTECTED_VM
- 	bool "Enable support for KVM software-protected VMs"
- 	depends on EXPERT
- 	depends on KVM_X86 && X86_64
--	select KVM_X86_PRIVATE_MEM
-+	select KVM_GENERIC_MEMORY_ATTRIBUTES
- 	help
- 	  Enable support for KVM software-protected VMs.  Currently, software-
- 	  protected VMs are purely a development and testing vehicle for
-@@ -138,7 +134,7 @@ config KVM_INTEL_TDX
- 	bool "Intel Trust Domain Extensions (TDX) support"
- 	default y
- 	depends on INTEL_TDX_HOST
--	select KVM_X86_PRIVATE_MEM
-+	select KVM_GENERIC_MEMORY_ATTRIBUTES
- 	select HAVE_KVM_ARCH_GMEM_POPULATE
- 	help
- 	  Provides support for launching Intel Trust Domain Extensions (TDX)
-@@ -162,7 +158,7 @@ config KVM_AMD_SEV
- 	depends on KVM_AMD && X86_64
- 	depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
- 	select ARCH_HAS_CC_PLATFORM
--	select KVM_X86_PRIVATE_MEM
-+	select KVM_GENERIC_MEMORY_ATTRIBUTES
- 	select HAVE_KVM_ARCH_GMEM_PREPARE
- 	select HAVE_KVM_ARCH_GMEM_INVALIDATE
- 	select HAVE_KVM_ARCH_GMEM_POPULATE
+ int kvm_spec_ctrl_test_value(u64 value)
+ {
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 56ea8c862cfd..4d1c44622056 100644
+index 4d1c44622056..26bad600f9fa 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -719,11 +719,7 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
+@@ -726,6 +726,10 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
  }
  #endif
  
--/*
-- * Arch code must define kvm_arch_has_private_mem if support for guest_memfd is
-- * enabled.
-- */
--#if !defined(kvm_arch_has_private_mem) && !IS_ENABLED(CONFIG_KVM_GUEST_MEMFD)
-+#ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
- static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
++#ifdef CONFIG_KVM_GUEST_MEMFD
++bool kvm_arch_supports_gmem_mmap(struct kvm *kvm);
++#endif
++
+ #ifndef kvm_arch_has_readonly_mem
+ static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
  {
- 	return false;
-@@ -2505,8 +2501,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
- 
- static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
- {
--	return IS_ENABLED(CONFIG_KVM_GUEST_MEMFD) &&
--	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
-+	return kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index a99e11b8b77f..67e7cd7210ef 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -312,7 +312,72 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+ 	return gfn - slot->base_gfn + slot->gmem.pgoff;
  }
- #else
- static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index aa86dfd757db..4f57cb92e109 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1588,7 +1588,7 @@ static int check_memory_region_flags(struct kvm *kvm,
+ 
++static bool kvm_gmem_supports_mmap(struct inode *inode)
++{
++	return false;
++}
++
++static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
++{
++	struct inode *inode = file_inode(vmf->vma->vm_file);
++	struct folio *folio;
++	vm_fault_t ret = VM_FAULT_LOCKED;
++
++	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
++		return VM_FAULT_SIGBUS;
++
++	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
++	if (IS_ERR(folio)) {
++		int err = PTR_ERR(folio);
++
++		if (err == -EAGAIN)
++			return VM_FAULT_RETRY;
++
++		return vmf_error(err);
++	}
++
++	if (WARN_ON_ONCE(folio_test_large(folio))) {
++		ret = VM_FAULT_SIGBUS;
++		goto out_folio;
++	}
++
++	if (!folio_test_uptodate(folio)) {
++		clear_highpage(folio_page(folio, 0));
++		kvm_gmem_mark_prepared(folio);
++	}
++
++	vmf->page = folio_file_page(folio, vmf->pgoff);
++
++out_folio:
++	if (ret != VM_FAULT_LOCKED) {
++		folio_unlock(folio);
++		folio_put(folio);
++	}
++
++	return ret;
++}
++
++static const struct vm_operations_struct kvm_gmem_vm_ops = {
++	.fault = kvm_gmem_fault_user_mapping,
++};
++
++static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
++{
++	if (!kvm_gmem_supports_mmap(file_inode(file)))
++		return -ENODEV;
++
++	if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
++	    (VM_SHARED | VM_MAYSHARE)) {
++		return -EINVAL;
++	}
++
++	vma->vm_ops = &kvm_gmem_vm_ops;
++
++	return 0;
++}
++
+ static struct file_operations kvm_gmem_fops = {
++	.mmap		= kvm_gmem_mmap,
+ 	.open		= generic_file_open,
+ 	.release	= kvm_gmem_release,
+ 	.fallocate	= kvm_gmem_fallocate,
+@@ -391,6 +456,11 @@ static const struct inode_operations kvm_gmem_iops = {
+ 	.setattr	= kvm_gmem_setattr,
+ };
+ 
++bool __weak kvm_arch_supports_gmem_mmap(struct kvm *kvm)
++{
++	return true;
++}
++
+ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
  {
- 	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
- 
--	if (kvm_arch_has_private_mem(kvm))
-+	if (IS_ENABLED(CONFIG_KVM_GUEST_MEMFD))
- 		valid_flags |= KVM_MEM_GUEST_MEMFD;
- 
- 	/* Dirty logging private memory is not currently supported. */
-@@ -4917,7 +4917,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #endif
- #ifdef CONFIG_KVM_GUEST_MEMFD
- 	case KVM_CAP_GUEST_MEMFD:
--		return !kvm || kvm_arch_has_private_mem(kvm);
-+		return 1;
- #endif
- 	default:
- 		break;
+ 	const char *anon_name = "[kvm-gmem]";
 -- 
 2.50.1.470.g6ba607880d-goog
 
