@@ -1,54 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0962426C3A2;
-	Wed, 23 Jul 2025 08:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CB017BEBF;
+	Wed, 23 Jul 2025 08:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753258546; cv=none; b=huzw5as+KPn1IF7NryQa5GHU/w3IIQW/QhgklPn7ZUjvvVs5lSmyC1dBN7eIqKhENhOdFBkbMGnNqdx1MsTG6dAwHatFbzXyKq16n9hZEFnGMhS6pvZmf8IFstENUn57WenM8Gp9Il7Pypag7a9IIdHjviXXwgXpBxY1VsSfrfM=
+	t=1753258853; cv=none; b=j04cWt1O7jpAqK/VdFztCkqzcPPPRYU1EG++IWfyv41vkWEXaa+aFLuMRoAIHi9di0o5M11A5pjMDtMFYQJqW6Hz2xM+/sn2m+cvUf0lgjyyg3Tm6E2N9+MpNIFhTZlYWIccWYcbBchDq5x9k2mmYYuw9eRY+OwUOLVZYzsRmnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753258546; c=relaxed/simple;
-	bh=LOANSXNjao9DlLM6WkAOe+kFIJ2QNG6SQWQjfjQeWc8=;
+	s=arc-20240116; t=1753258853; c=relaxed/simple;
+	bh=Xsw3QoZiMPB8j16P6Zigy/0n3Pl6zL7Tf5S+EO6pdSc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ufZ2jGRg9eocS9hcCyqUl1m9vWJrR6uOC2MSwlYINJQrKyzcgHvVJwjowVG+hKbFYLpTedYqrTT3+PhYlpLAOSNEUs7xCNV7QGzbEKcL1H0XLJWs0dOifaB1eP+H4LdzRo+tYLMazY+bsUUMZM1Vr7+Dr1HCxFd1VhKiQ4Dl/p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aif8To8P; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=dZJPfapD25U4XiMHFQcCrnFFhe/KP1tAcvPH7r0KLFkLe+odzKlPiTMPjAP8leLjd8ySPi0eBalVYXsGkgd1PtK/sA+SyJA64imvHvK6yJdOvEIr+h5JnnSZ0NBXBBhGC8EMjD61gB9gjfA08xqyCPDhCgdKrL6AKI8Ea+w7v5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMvdhjIV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aif8To8P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B26FC4CEE7;
-	Wed, 23 Jul 2025 08:15:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMvdhjIV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68972C4CEE7;
+	Wed, 23 Jul 2025 08:20:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753258545;
-	bh=LOANSXNjao9DlLM6WkAOe+kFIJ2QNG6SQWQjfjQeWc8=;
+	s=k20201202; t=1753258852;
+	bh=Xsw3QoZiMPB8j16P6Zigy/0n3Pl6zL7Tf5S+EO6pdSc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aif8To8PAU+6nsiTwyGOaehSwMU+/RfleVl6mgNvderChLF5PX2vWaPpT2WsQevx6
-	 VWjYYg5CzVUCjaEO3uis6DzhF9UBlBfPba0R5WerzmJtKufKWQMbVRsucSogmUtfWv
-	 CfUCpbAP7Kek0Vx125KR5mxOvxHnZFDaPMsxF9li/Eht4qjxYytLN/VK0E/iXg8INe
-	 LSJBfqemz+QChuxX9+j13uPco2AchkxXXDnlbtJl6A+LzM5DiRfNdwWoBsEugiFXL7
-	 wceQcMsSc78DDUbEn9OKUR4xRcOnA7XkJd1Ha1/nZ+HBfIffg35OZr+VC/eJKqQenW
-	 /RXEv632AOKHw==
+	b=IMvdhjIVoTWOkOkifH69KUZdMExh3V0toaYm4XhvU5rQbUnqJ2W4/K9ljJhPpvAsJ
+	 vBFe7YZ7c6P90+WqFyAIQ35nBaxBfCMVfRbvZKe0RXzK4Pg8puy92WGPjZw1q2nHM4
+	 9p75I7HG1gZbDDrJGAwzy3lkgZcX5A9aPQ+yzory8QnE3mx4OJnwYOzkIbYUUjCxG9
+	 nABfhefve/uAggH7xD+fSFwbUUt3jyv6kbu13WY6dI/T2xfzpEiNCkAck5WNIWDK7t
+	 Ka4dWmv1gbJ5l/O0T8xz0hWbbZ5+BUREZl3UkbF1mM0CemYFKhUhQqrSQPcjIdoSln
+	 rlQCXtwYFzblw==
 Received: from 82-132-236-66.dab.02.net ([82.132.236.66] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ueUda-000bfX-UY;
-	Wed, 23 Jul 2025 09:15:43 +0100
-Date: Wed, 23 Jul 2025 09:15:34 +0100
-Message-ID: <87qzy7tja1.wl-maz@kernel.org>
+	id 1ueUiX-000bju-0K;
+	Wed, 23 Jul 2025 09:20:49 +0100
+Date: Wed, 23 Jul 2025 09:20:35 +0100
+Message-ID: <87pldrtj1o.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Itaru Kitayama <itaru.kitayama@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+To: Kunwu Chan <kunwu.chan@linux.dev>
+Cc: Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH 4/4] KVM: arm64: selftest: vgic-v3: Add basic GICv3 sysreg userspace access test
-In-Reply-To: <aIBseJ3aO+hMVAee@vm4>
-References: <20250718111154.104029-1-maz@kernel.org>
-	<20250718111154.104029-5-maz@kernel.org>
-	<aIBseJ3aO+hMVAee@vm4>
+	linux-arm-msm@vger.kernel.org,
+	linux-mm@kvack.org,
+	kvmarm@lists.linux.dev,
+	pbonzini@redhat.com,
+	chenhuacai@kernel.org,
+	mpe@ellerman.id.au,
+	anup@brainfault.org,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	seanjc@google.com,
+	viro@zeniv.linux.org.uk,
+	brauner@kernel.org,
+	willy@infradead.org,
+	akpm@linux-foundation.org,
+	xiaoyao.li@intel.com,
+	yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com,
+	jarkko@kernel.org,
+	amoorthy@google.com,
+	dmatlack@google.com,
+	isaku.yamahata@intel.com,
+	mic@digikod.net,
+	vbabka@suse.cz,
+	vannapurve@google.com,
+	ackerleytng@google.com,
+	mail@maciej.szmigiero.name,
+	david@redhat.com,
+	michael.roth@amd.com,
+	wei.w.wang@intel.com,
+	liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com,
+	kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com,
+	steven.price@arm.com,
+	quic_eberman@quicinc.com,
+	quic_mnalajal@quicinc.com,
+	quic_tsoni@quicinc.com,
+	quic_svaddagi@quicinc.com,
+	quic_cvanscha@quicinc.com,
+	quic_pderrin@quicinc.com,
+	quic_pheragu@quicinc.com,
+	catalin.marinas@arm.com,
+	james.morse@arm.com,
+	yuzenghui@huawei.com,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	qperret@google.com,
+	keirf@google.com,
+	roypat@amazon.co.uk,
+	shuah@kernel.org,
+	hch@infradead.org,
+	jgg@nvidia.com,
+	rientjes@google.com,
+	jhubbard@nvidia.com,
+	fvdl@google.com,
+	hughd@google.com,
+	jthoughton@google.com,
+	peterx@redhat.com,
+	pankaj.gupta@amd.com,
+	ira.weiny@intel.com
+Subject: Re: [PATCH v15 16/21] KVM: arm64: Handle guest_memfd-backed guest page faults
+In-Reply-To: <07976427-e5a4-4ca4-93e9-a428a962b0b2@linux.dev>
+References: <20250717162731.446579-1-tabba@google.com>
+	<20250717162731.446579-17-tabba@google.com>
+	<07976427-e5a4-4ca4-93e9-a428a962b0b2@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,47 +113,44 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 82.132.236.66
-X-SA-Exim-Rcpt-To: itaru.kitayama@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com
+X-SA-Exim-Rcpt-To: kunwu.chan@linux.dev, tabba@google.com, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 23 Jul 2025 06:00:40 +0100,
-Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
-> 
-> On Fri, Jul 18, 2025 at 12:11:54PM +0100, Marc Zyngier wrote:
-> > We have a lot of more or less useful vgic tests, but none of them
-> > tracks the availability of GICv3 system registers, which is a bit
-> > annoying.
-> > 
-> > Add one such test, which covers both EL1 and EL2 registers.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> I've tested this selftest on the RevC FVP with kvm-arm.mode=nested.
-> 
-> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> 
-> Running GIC_v3 tests.
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='657'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='682'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='682'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='657'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
-> __vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='657'
+On Tue, 22 Jul 2025 13:31:34 +0100,
+Kunwu Chan <kunwu.chan@linux.dev> wrote:
+>=20
+> On 2025/7/18 00:27, Fuad Tabba wrote:
+> > Add arm64 architecture support for handling guest page faults on memory
+> > slots backed by guest_memfd.
+> >=20
+> > This change introduces a new function, gmem_abort(), which encapsulates
+> > the fault handling logic specific to guest_memfd-backed memory. The
+> > kvm_handle_guest_abort() entry point is updated to dispatch to
+> > gmem_abort() when a fault occurs on a guest_memfd-backed memory slot (as
+> > determined by kvm_slot_has_gmem()).
+> >=20
+> > Until guest_memfd gains support for huge pages, the fault granule for
+> > these memory regions is restricted to PAGE_SIZE.
+>=20
+> Since huge pages are not currently supported, would it be more
+> friendly to define=C2=A0 sth like
+>=20
+> "#define GMEM_PAGE_GRANULE PAGE_SIZE" at the top (rather than
+> hardcoding PAGE_SIZE)
+>=20
+> =C2=A0and make it easier to switch to huge page support later?
 
-I have no idea what you tested it on, because I get none of this
-nonsense.
+No. PAGE_SIZE always has to be the fallback, no matter what. When (and
+if) larger mappings get supported, there will be extra code for that
+purpose, not just flipping a definition.
 
-Where is it coming from?
+Thanks,
 
 	M.
 
--- 
+--=20
 Jazz isn't dead. It just smells funny.
