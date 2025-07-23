@@ -1,149 +1,201 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E5C277C8B
-	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 08:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC3178F51
+	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 09:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753260401; cv=none; b=UUgSw9IgFE37D2VvFLYv+K0mKlIEEUv5cD2807cCeBm+EiEdw57CJfaNqmTXLwf13PFbuKN/i+PNTGfB+EDgnvQ9v4o1o7UpDxliysH78wPCo5E3eFk0dLjMcOleNpFp9RyyzQUfdX9vO4zLPDovFcYk6HAvL8Y8HrSKC+uAipU=
+	t=1753262344; cv=none; b=XYQ2JZ1Amy5964gZxFy7z6UOaEWuJPU1j6Qa35g94JiFKjWV6J0FJOdrEgTisnkptYi4m8gK180m3U+tQtvBlPB2PXYtzjQZp0aKHdCUP5nXQMdWMgQKcW6/4rMiMrheVifJcd3lioz5Xw6NOXUQGDNxpLYpRU7djhe25wPrHy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753260401; c=relaxed/simple;
-	bh=UjZ2hpup/T/Wn8vDi4LQ5YZvaZ3lTOBS5mcYZ2jtxn8=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=YqtxANVtE3IrPttPRBTjd3mNaSUZsVvImIQcHk6pV7S0mingGRfAaoM5chmXAEQPSpNov9vgvK3+65RkiKtLIwLHazeJEs3SBQVf2i02vpkfpkGbhuJpD5p3CRkNjaqZFMYHYdMVJ7Y8w59ekR6rQBVdabQ5Q1SW0dKcz3KOf0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PcNSGjeu; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1753262344; c=relaxed/simple;
+	bh=idmQmOpX6xjvfYbM56fP1LbrUFARTFTQP9VymBIxlTE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tRZWVUKwZ8T+AoDAU7fiTV76p+CnCnMZV5kZZ6/DqDQ7GDR1pEWo9Aeu7zUex8d0YtqFWIAS7rh6bcnOhKci11yRWWwcR2sy0BKgtUBgDihYTTL18sQ9HQ6uEb3RJbp5PKvWB/q+MHnoetTS/0Pzga0x6xlzCOa3e4qmn/Ea7GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hk75iM9z; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PcNSGjeu"
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753260395;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6oxB5PSG3rSVBd3uKBa9I0cO8eKhcw0Hi0sAamyaJ6w=;
-	b=PcNSGjeun8cNyHh7w9mXfz6xt7fkCyGGQ28JTMCbfNmUSyyQmZoR+CEfikjwPIwT3nrNZg
-	izoee36/x89idG0gpMz4tGLsZCKzotxd1wcCnaCY7GmIIGGowtBNw08PWtpUdLaH85v1QP
-	4+lqR8h1ReVVTIikO6ztayivqDq2AV0=
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hk75iM9z"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso348551cf.0
+        for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 02:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753262342; x=1753867142; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fFB2lKlzZGrzhbM4PzD3lroism4M1bEmsmifGbcd/Mo=;
+        b=hk75iM9zkvP3xz28PxiUwA+fNL6LBLuCBhzT4vKkEH7T4aren7SsoZIhySTe6DObz9
+         PO1Zxal79GBsI5r79Cg2U3g0XB9X/Krx7f0C8R6gtqEuUqCVBqmgLpPfbMtAuIXIkfEA
+         OG7EChV9UUll0mWv39lzfu2SckVBoyeqPzNmtQHUrjeiwqE2bMyTZ4ezc+W/h6PGI2LU
+         /vVfhmMiwLdXGMxJFZqK1aFIUHADg9WbPvfOdTooSsRtxSGm6g+AohWQ2X87l85IHz9d
+         7LgDwcmwKFsdMvoa9WFqy+Uq/UMvheyj7GZbYwGW9Fny2JW/PA+LBvP7VcCgQoQzpI5o
+         jebQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753262342; x=1753867142;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fFB2lKlzZGrzhbM4PzD3lroism4M1bEmsmifGbcd/Mo=;
+        b=JnUu4ZZAbnoYb/rj8n+u6gKrkX6+TJxmPZCEwSfQI5X1nx3Ru80jDeZWv4/2Runwjc
+         /LUvxP+BQ1p3uGxX1TXPYVfQBkXSXb1lSh1aDrTgeoplzzT7qoQQlDVLxgMEEYzOT6K3
+         zMlKrGSB9G/36/L/FWEVAOMR7zYPadH3c7RB4tm22n2IjQ0pVlI9iAXHJ0Y8qd82VYOC
+         bEYsu8S/9RtPS6EVM6yq/QE/tDzv1oKlLbZyZDNcJNQypyZnrM82bdDyTzetzRm5Qc76
+         sjZ4bFcbZmMMth/axIEpEog/bj1E9PSS93QP1vOflfi5E1fW7m88H984DwI1cgj50/nz
+         uuuw==
+X-Forwarded-Encrypted: i=1; AJvYcCUfufjP2UhZdU6i2O09OfdrFIxqlyJ+OrTvGXFe6Hu2z7dASQuatMrEAGMyFLqpZ9q5noQ47qU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzImYosGcpemGO8q46T8EKZIlr9xyCd2maUze99Yq737hn0owLl
+	JkJSJTqJl3GujQKHgzAAWRhH+7gkaAAYjAshxBsKeo2O7VUyWLuOIwCUBiDmviBBwIy20ilP/3w
+	hr9LpIiyTAB2NvxEkrDhbrvPFMPn5sZo8xiO8wnwmT1LJtZTSKgzco1wBM3I=
+X-Gm-Gg: ASbGncsPYTunURB9oQYuN/ohdWBBNXhGUlbVvwSQxnBH84w17dGnlMYXpbvCGx+2ZxY
+	ryhLjVmdbts9G2ZGJKlMQCvW8s5MZ8hRnU7w1b2VyJNwb1L9nix5Qf0C5a3RSW+uBvGwVsGEsRo
+	sYLIQpnfiaP3tJPYwAP2f4NlZoxlLPVBn1JhJG/1XhGSDeEXPq6zZAi2uHIDY1jvRh0fiI9jzaR
+	5vXDN94Ky/hcuX5ZockgzpOJLr38LW7xkX4
+X-Google-Smtp-Source: AGHT+IHdI2zc5g2uWgDeX7Xhmwb1mpmaFyW9th1coHtjrfDNoMegvkEq3o1bYX03LBqz87TbJvCehtEqjQU8oKdI5oI=
+X-Received: by 2002:a05:622a:a6d1:b0:476:f1a6:d8e8 with SMTP id
+ d75a77b69052e-4ae6f066f1dmr2244731cf.11.1753262341305; Wed, 23 Jul 2025
+ 02:19:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [PATCH 4/4] KVM: arm64: selftest: vgic-v3: Add basic GICv3 sysreg
- userspace access test
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-In-Reply-To: <87qzy7tja1.wl-maz@kernel.org>
-Date: Wed, 23 Jul 2025 17:46:14 +0900
-Cc: kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>,
- Eric Auger <eric.auger@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <576D387F-15E6-46C1-BA32-34FB64551CBA@linux.dev>
-References: <20250718111154.104029-1-maz@kernel.org>
- <20250718111154.104029-5-maz@kernel.org> <aIBseJ3aO+hMVAee@vm4>
- <87qzy7tja1.wl-maz@kernel.org>
+MIME-Version: 1.0
+References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-19-tabba@google.com>
+ <87ldoftifr.wl-maz@kernel.org>
+In-Reply-To: <87ldoftifr.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 23 Jul 2025 10:18:24 +0100
+X-Gm-Features: Ac12FXyK6HoWGYh74-rCEgCwyYrKUEnXSOccYJU3yg7243P0WML9CgqAKaoNvVc
+Message-ID: <CA+EHjTyD6kXBGF0QitHtALSmX5rVDe7Sew99dwEEPXzjnPzfXQ@mail.gmail.com>
+Subject: Re: [PATCH v15 18/21] KVM: arm64: Enable host mapping of shared
+ guest_memfd memory
 To: Marc Zyngier <maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk, 
+	shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
+	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com, 
+	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hi Marc,
 
+On Wed, 23 Jul 2025 at 09:33, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Thu, 17 Jul 2025 17:27:28 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Enable host userspace mmap support for guest_memfd-backed memory on
+> > arm64. This change provides arm64 with the capability to map guest
+> > memory at the host directly from guest_memfd:
+> >
+> > * Define kvm_arch_supports_gmem_mmap() for arm64: The
+> >   kvm_arch_supports_gmem_mmap() macro is defined for arm64 to be true if
+> >   CONFIG_KVM_GMEM_SUPPORTS_MMAP is enabled. For existing arm64 KVM VM
+> >   types that support guest_memfd, this enables them to use guest_memfd
+> >   with host userspace mappings. This provides a consistent behavior as
+> >   there are currently no arm64 CoCo VMs that rely on guest_memfd solely
+> >   for private, non-mappable memory. Future arm64 VM types can override
+> >   or restrict this behavior via the kvm_arch_supports_gmem_mmap() hook
+> >   if needed.
+> >
+> > * Select CONFIG_KVM_GMEM_SUPPORTS_MMAP in arm64 Kconfig.
+> >
+> > * Enforce KVM_MEMSLOT_GMEM_ONLY for guest_memfd on arm64: Checks are
+> >   added to ensure that if guest_memfd is enabled on arm64,
+> >   KVM_GMEM_SUPPORTS_MMAP must also be enabled. This means
+> >   guest_memfd-backed memory slots on arm64 are currently only supported
+> >   if they are intended for shared memory use cases (i.e.,
+> >   kvm_memslot_is_gmem_only() is true). This design reflects the current
+> >   arm64 KVM ecosystem where guest_memfd is primarily being introduced
+> >   for VMs that support shared memory.
+> >
+> > Reviewed-by: James Houghton <jthoughton@google.com>
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > Acked-by: David Hildenbrand <david@redhat.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 4 ++++
+> >  arch/arm64/kvm/Kconfig            | 2 ++
+> >  arch/arm64/kvm/mmu.c              | 7 +++++++
+> >  3 files changed, 13 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 3e41a880b062..63f7827cfa1b 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -1674,5 +1674,9 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
+> >  void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1);
+> >  void check_feature_map(void);
+> >
+> > +#ifdef CONFIG_KVM_GMEM
+> > +#define kvm_arch_supports_gmem(kvm) true
+> > +#define kvm_arch_supports_gmem_mmap(kvm) IS_ENABLED(CONFIG_KVM_GMEM_SUPPORTS_MMAP)
+> > +#endif
+>
+> nit: these two lines should be trivially 'true', and the #ifdef-ery
+> removed, since both KVM_GMEM and KVM_GMEM_SUPPORTS_MMAP are always
+> selected, no ifs, no buts.
 
-> On Jul 23, 2025, at 17:15, Marc Zyngier <maz@kernel.org> wrote:
->=20
-> On Wed, 23 Jul 2025 06:00:40 +0100,
-> Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
->>=20
->> On Fri, Jul 18, 2025 at 12:11:54PM +0100, Marc Zyngier wrote:
->>> We have a lot of more or less useful vgic tests, but none of them
->>> tracks the availability of GICv3 system registers, which is a bit
->>> annoying.
->>>=20
->>> Add one such test, which covers both EL1 and EL2 registers.
->>>=20
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>=20
->> I've tested this selftest on the RevC FVP with kvm-arm.mode=3Dnested.
->>=20
->> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
->>=20
->> Running GIC_v3 tests.
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'672'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'657'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'672'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'672'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'672'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'672'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'682'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'682'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'657'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'672'
->> __vm_create: mode=3D'PA-bits:40,  VA-bits:48,  4K pages' type=3D'0', =
-pages=3D'657'
->=20
-> I have no idea what you tested it on, because I get none of this
-> nonsense.
->=20
-> Where is it coming from?
+I'll fix these.
 
-=46rom lib/kvm_util.c file __vm_create()=E2=80=99s pr_debug().
+> >
+> >  #endif /* __ARM64_KVM_HOST_H__ */
+> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> > index 713248f240e0..323b46b7c82f 100644
+> > --- a/arch/arm64/kvm/Kconfig
+> > +++ b/arch/arm64/kvm/Kconfig
+> > @@ -37,6 +37,8 @@ menuconfig KVM
+> >       select HAVE_KVM_VCPU_RUN_PID_CHANGE
+> >       select SCHED_INFO
+> >       select GUEST_PERF_EVENTS if PERF_EVENTS
+> > +     select KVM_GMEM
+> > +     select KVM_GMEM_SUPPORTS_MMAP
+> >       help
+> >         Support hosting virtualized guest machines.
+> >
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 8c82df80a835..85559b8a0845 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -2276,6 +2276,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> >       if ((new->base_gfn + new->npages) > (kvm_phys_size(&kvm->arch.mmu) >> PAGE_SHIFT))
+> >               return -EFAULT;
+> >
+> > +     /*
+> > +      * Only support guest_memfd backed memslots with mappable memory, since
+> > +      * there aren't any CoCo VMs that support only private memory on arm64.
+> > +      */
+> > +     if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
+> > +             return -EINVAL;
+> > +
+> >       hva = new->userspace_addr;
+> >       reg_end = hva + (new->npages << PAGE_SHIFT);
+> >
+>
+> Otherwise,
+>
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Anyway, I rebuilt the kernel your recent two patch sets on top of =
-kvm-next/next and did the test.=20
+Thanks for the reviews!
 
-# ./arm64/vgic_init
-Random seed: 0x6b8b4567
-Running GIC_v3 tests.
-SKIP SYS_ICC_AP0R1_EL1 for read
-SKIP SYS_ICC_AP0R1_EL1 for write
-SKIP SYS_ICC_AP0R2_EL1 for read
-SKIP SYS_ICC_AP0R2_EL1 for write
-SKIP SYS_ICC_AP0R3_EL1 for read
-SKIP SYS_ICC_AP0R3_EL1 for write
-SKIP SYS_ICC_AP1R1_EL1 for read
-SKIP SYS_ICC_AP1R1_EL1 for write
-SKIP SYS_ICC_AP1R2_EL1 for read
-SKIP SYS_ICC_AP1R2_EL1 for write
-SKIP SYS_ICC_AP1R3_EL1 for read
-SKIP SYS_ICC_AP1R3_EL1 for write
-SKIP SYS_ICH_AP0R1_EL2 for read
-SKIP SYS_ICH_AP0R1_EL2 for write
-SKIP SYS_ICH_AP0R2_EL2 for read
-SKIP SYS_ICH_AP0R2_EL2 for write
-SKIP SYS_ICH_AP0R3_EL2 for read
-SKIP SYS_ICH_AP0R3_EL2 for write
-SKIP SYS_ICH_AP1R1_EL2 for read
-SKIP SYS_ICH_AP1R1_EL2 for write
-SKIP SYS_ICH_AP1R2_EL2 for read
-SKIP SYS_ICH_AP1R2_EL2 for write
-SKIP SYS_ICH_AP1R3_EL2 for read
-SKIP SYS_ICH_AP1R3_EL2 for write
+Cheers,
+/fuad
 
-Thanks,
-Itaru.
-
-> M.
->=20
-> --=20
+>         M.
+>
+> --
 > Jazz isn't dead. It just smells funny.
-
-
