@@ -1,250 +1,273 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FFCC205AB6
-	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 09:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9E72853E7;
+	Wed, 23 Jul 2025 09:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753262578; cv=none; b=S2hGoW59SLmNqeyoJfywKEqpxelk/z7yVKLxxQrPpX/vCagvvZ1++/4TcUlBQMNFSrK1v3YN3pj1e/V9IccisMtosQKJagjxe+xCbgFJiLjmaZ+QnKG6773SL39AQYjTG+Of4XWITEvVJVEongVz9hoRb20YeTO9v4dxlyMGVPk=
+	t=1753263759; cv=none; b=OyC6dyanz50ouCbaRYbTfjH98wl0jLO9wQY1dJ79TJ22VbPlP5BjkwIRqNVlcdA1FfPc2X/QpEyRUk7/bqUCz3lMSPsI/506fawRiXt4u36CHx1H0NkuRFEg7VVeG9tpOnYiAyCZAo5qu4388Qg2q0vUUUc7OU4Vkt6tO9uR7lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753262578; c=relaxed/simple;
-	bh=vAA1Lv7W544jmjXnmOIpPcLBsrN3AE3t7Hfl5SQXlKE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WKmteM4oQJxMKM0oF4eZJ4UulA8ZQdr8Uq/4Uh5ov4b0AzPkyhYgzAgv4VXxErX92Yh9hYn4AX8bN6wFE/nYZ0WT8RJt9jCHO3SMame/PBM1NdYDWHYqV1voXvZbAzIAbHgDvU5Wx2uKDpsnYuxOYmwR82/VyegHta+XIKmMLuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xvYl+QQp; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1753263759; c=relaxed/simple;
+	bh=vaLSVEk/I8c+AN22zxdA34oe9R4YxZV31UGdwncXb/w=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XJGGKaRys1xT9BT1C7J4VlFpVfA512Q9tYLZNKluDRFBCXYuE/4pbRSXXb/1IEawNBTvUmVkHuUnl15VNtuxupHCuK/ioJmtGtRVthpjxB/7OchnuBHpjR1WHD5YwJrNwVMQ8cpSA0qj1QcT0dPVO1iQTa14Vsl0nvHi/yML0B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XQfUwyXQ; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xvYl+QQp"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso349421cf.0
-        for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 02:22:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753262576; x=1753867376; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q1l9DC9s6bqSZlXl3hk+96usOVx+LGIZFtzxNIqVYEY=;
-        b=xvYl+QQpQKxqHTrr5Y0KhxjbHHbqE0hCSlU6oIyV3w2yJP/NOeSmdmJKRUbvDwnDfT
-         kAZlaUd6u9KPBV3V48nMgBiSUB6JfMeostZcqFSN4rFvcwBNbnzzbYLCjwI+gDn6GthC
-         MOCpbS/N/ZzEc/UV2f/YXNCvtWfGkJhlQ0vvKhLCUbendJQdDtvQuB/E/YsmE9GOdvap
-         5uuwp7VavlsUj5VDZdUfVTPQoI70NcuyFOsphWEg/4qWGRO5eUXWKMBrwi6TL+iWhJjn
-         +xT1MfPW0+tXonXZss7HDB7eJd0KCzw4YPfSRIC1SblAyeIgnY0fSOcILJhp2kHbeC2G
-         oebw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753262576; x=1753867376;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q1l9DC9s6bqSZlXl3hk+96usOVx+LGIZFtzxNIqVYEY=;
-        b=Kif51maMIPPp7e3A4/bXRA420P5voR8EaqG5AWBRf3Ywbda5gJDdq7rr5FOZxYcCLF
-         tEAxsGCkGVLkc1XaUFv4UW+Ikk43QBADX7xvKtS78NHUQb6Y3kPUwBsq0DAQuZ09Vh3B
-         Nge7NX/F1kFjB1N7ojIhvB92ruHdZ1ugaEde1WGomSw4pP3PslRz2hiYInGI8PbDy1PJ
-         pJtXn8xKDmvOdYP3abC9TmlKgvVZD48cBXEw3Ze70DEXSMFMkFTyENm8pnZ8gOwKyGui
-         ZfMms1n9igyyui6qSvi3rMCQ6WzGi8UXKOh/x1pJXrQX5taFnjfnNxosxIppyZRtg8pb
-         icfg==
-X-Forwarded-Encrypted: i=1; AJvYcCWy6cU2nrIC4+Clw7o8Na99R809mpr6iYeX1QSRQAql9ti6RUVyHkuK1TCU/FxLh94BXWSuczY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw83azbtTtNh3FRF0HcnMLRCP/l0OYlRjbvqwbiG7vky/iJATIo
-	khZMQyvY4FxOQBDH5VlBUTsWcBmvoQr/oAwYiP8eG4TUCIeM1HcAZtUXhFeCsn+sjdwNaU0X9Sl
-	kOXiBjoGTwIFxk281ZwD5xmZeCDSe5Vh1hNo626Qf
-X-Gm-Gg: ASbGncum/9ulLkOwINeLy4W2oeT1+LJGj8vttCzwlusoChdlgpGXak8zDXNIK1BCAt4
-	cCNtBRHkGN5z2/mA3hcOZU8yRhfCsjmY3YX4Kb+kDW4p2c/0t0LmYRO8FPw7To66cQzr1jVMXTR
-	rE+sl5WTv4CtLDUhKyW76bUVMS983WH81kx4GVNouoECjNgXDQxhMWZTSMXGPNQZh/DrcM5mbIb
-	h3L4R8qkGpU8EqR3t5LFCtFe1YnTzN9SEen
-X-Google-Smtp-Source: AGHT+IHpGSWUb20Op9Qp28Uz72zppWmO/fpdDBu9sBC5ToKI3zBiTnA4LkrTZ+17aXYm0O7UQ4tqXYX6jHbEEiExdf0=
-X-Received: by 2002:a05:622a:551a:b0:4a8:eb0:c528 with SMTP id
- d75a77b69052e-4ae6f066032mr2643391cf.15.1753262575605; Wed, 23 Jul 2025
- 02:22:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XQfUwyXQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=6c077I1RSBowU6xDJVwopXrSusY0xQYRPoalBYci8Aw=; b=XQfUwyXQ35eTM56dFmxc9++ViX
+	9+n6OB4zXy1yZ93MOahWNJA5IO6CmDX7dHGaQGJHLDC40ASazl8q8YITrJpafLoGOpMSgjEwSBceq
+	9maqKqtXQhsR0bYsakvjUT+8PqlFq800U6GQCn8WxUXy/mjSanMAb4iiFeoz18+AXX2SN0eOrZ5jr
+	B8wS6THjOG7cUIinzjFDTVbJ22T52Snz+4l2s0X29KRet38GOhbLCLwBgL0dsm9eXASBR3qVs1Zov
+	Pa6ALnOHdD2f2bJkDUbfSaTgG38rVKaTIsFVSop9umgGYOU/JVAefdomVekXVfNn7HSaklSK79Xr+
+	FOuAyY6g==;
+Received: from [54.239.6.190] (helo=edge-cache-169.e-lhr50.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ueVzY-00000008khV-1Hnr;
+	Wed, 23 Jul 2025 09:42:29 +0000
+Message-ID: <590aa43842aa1e6667d6a564cfdcb86a2ca02160.camel@infradead.org>
+Subject: Re: [RFC PATCH 2/2] KVM: arm64: vgic-its: Unmap all vPEs on shutdown
+From: David Woodhouse <dwmw2@infradead.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sebastian Ott <sebott@redhat.com>,
+ Andre Przywara <andre.przywara@arm.com>, Thorsten Blum
+ <thorsten.blum@linux.dev>, Shameer Kolothum
+ <shameerali.kolothum.thodi@huawei.com>,
+ linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,  "Saidi, Ali"
+ <alisaidi@amazon.com>
+Date: Wed, 23 Jul 2025 11:42:26 +0200
+In-Reply-To: <aIAUxarULx3vC2MO@linux.dev>
+References: <20250623132714.965474-1-dwmw2@infradead.org>
+	 <20250623132714.965474-2-dwmw2@infradead.org> <aIAUxarULx3vC2MO@linux.dev>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-cwbpnR8RpG6qtbrpv5c5"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-3-tabba@google.com>
- <aH5uY74Uev9hEWbM@google.com> <CA+EHjTxcgCLzwK5k+rTf2v_ufgsX0AcEzhy0EQL-pvmsg9QQeg@mail.gmail.com>
- <aH552woocYo1ueiU@google.com> <CA+EHjTwPnFLZ1OxKkV5gqk_kU_UU_KdupAGDoLbRyK__0J+YeQ@mail.gmail.com>
- <aH-1JeJH2cEvyEei@google.com> <CA+EHjTw46a+NCcgGXQ1HA+a3MSZD9Q97V8W-Xj5+pYuTh4Z2_w@mail.gmail.com>
- <aIAh3xkU52Z100xK@google.com>
-In-Reply-To: <aIAh3xkU52Z100xK@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 23 Jul 2025 10:22:19 +0100
-X-Gm-Features: Ac12FXy0a_zhWCTWrmc8iH91Uu03l4tlmUMT8pdCRl-WsFj9mim4tPfVNS6-H9U
-Message-ID: <CA+EHjTy_82ADyf05-ySq-+901bT+W30EXm7t4ppvVAd5Eds40Q@mail.gmail.com>
-Subject: Re: [PATCH v15 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to CONFIG_KVM_GENERIC_GMEM_POPULATE
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+
+
+--=-cwbpnR8RpG6qtbrpv5c5
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 23 Jul 2025 at 00:42, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Jul 22, 2025, Fuad Tabba wrote:
-> > On Tue, 22 Jul 2025 at 16:58, Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Tue, Jul 22, 2025, Fuad Tabba wrote:
-> > > > On Mon, 21 Jul 2025 at 18:33, Sean Christopherson <seanjc@google.com> wrote:
-> > > > >
-> > > > > On Mon, Jul 21, 2025, Fuad Tabba wrote:
-> > > > > > > The below diff applies on top.  I'm guessing there may be some intermediate
-> > > > > > > ugliness (I haven't mapped out exactly where/how to squash this throughout the
-> > > > > > > series, and there is feedback relevant to future patches), but IMO this is a much
-> > > > > > > cleaner resting state (see the diff stats).
-> > > > > >
-> > > > > > So just so that I am clear, applying the diff below to the appropriate
-> > > > > > patches would address all the concerns that you have mentioned in this
-> > > > > > email?
-> > > > >
-> > > > > Yes?  It should, I just don't want to pinky swear in case I botched something.
-> > > >
-> > > > Other than this patch not applying, nah, I think it's all good ;P. I
-> > > > guess base-commit: 9eba3a9ac9cd5922da7f6e966c01190f909ed640 is
-> > > > somewhere in a local tree of yours. There are quite a few conflicts
-> > > > and I don't think it would build even if based on the right tree,
-> > > > e.g.,  KVM_CAP_GUEST_MEMFD_MMAP is a rename of KVM_CAP_GMEM_MMAP,
-> > > > rather an addition of an undeclared identifier.
-> > > >
-> > > > That said, I think I understand what you mean, and I can apply the
-> > > > spirit of this patch.
-> > > >
-> > > > Stay tuned for v16.
-> > >
-> > > Want to point me at your branch?  I can run it through my battery of tests, and
-> > > maybe save you/us from having to spin a v17.
-> >
-> > That would be great. Here it is:
-> >
-> > https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/guestmem-basic-6.16-v16
-> >
-> > No known issues from my end. But can you have a look at the patch:
-> >
-> > KVM: guest_memfd: Consolidate Kconfig and guest_memfd enable checks
-> >
-> > In that I collected the changes to the config/enable checks that
-> > didn't seem to fit well in any of the other patches.
->
-> Regarding config stuff, patch 02, KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
-> CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE, is missing a KVM_GMEM => KVM_GUEST_MEMFD rename.
->
-> While playing with this, I also discovered why this code lives in the KVM_X86 config:
->
->   select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
->
-> Commit ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module
-> is requested") didn't have all the vendor netural configs depend on KVM_X86, and
-> so it's possible to end up with unmet dependencies.  E.g. KVM_SW_PROTECTED_VM can
-> be selected with KVM_X86=n, and thus with KVM_GUEST_MEMFD=n.
->
-> We could punt on that mess until after this series, but that'd be a even more
-> churn, and I'm not sure I could stomach giving acks for the continued addition
-> of ugly kconfig dependencies. :-)
->
-> Lastly, regarding "Consolidate Kconfig and guest_memfd enable checks", that needs
-> to land before f6a5f3a22bbe ("KVM: guest_memfd: Allow host to map guest_memfd pages"),
-> otherwise KVM will present a weird state where guest_memfd can be used for default
-> VMs, but if and only KVM_GUEST_MEMFD happens to be selected by something else.
-> That also provides a better shortlog: "KVM: x86: Enable KVM_GUEST_MEMFD for all
-> 64-bit builds".  The config cleanups and consolidations are a nice side effect,
-> but what that patch is really doing is enabling KVM_GUEST_MEMFD more broadly.
->
-> Actually, all of the arch patches need to come before f6a5f3a22bbe ("KVM: guest_memfd:
-> Allow host to map guest_memfd pages"), otherwise intermediate builds will have
-> half-baked support for guest_memfd mmap().  Or rather, KVM shouldn't let userspace
-> enable GUEST_MEMFD_FLAG_MMAP until all the plumbing is in place.  I suspect that
-> trying to shuffle the full patches around will create cyclical dependency hell.
-> It's easy enough to hold off on adding GUEST_MEMFD_FLAG_MMAP until KVM is fully
-> ready, so I think it makes sense to just add GUEST_MEMFD_FLAG_MMAP along with the
-> capability.
->
-> Rather than trying to pass partial patches around, I pushed a branch to:
->
->   https://github.com/sean-jc/linux.git x86/gmem_mmap
->
-> Outside of the x86 config crud, and deferring GUEST_MEMFD_FLAG_MMAP until KVM is
-> fully prepped, there _shouldn't_ be any changes relatively to what you have.
->
-> Note, it's based on:
->
->   https://github.com/kvm-x86/linux.git next
->
-> as there are x86 kconfig dependencies/conflicts with changes that are destined
-> for 6.17 (and I don't think landing this in 6.17 is realistic, i.e. this series
-> will effectively follow kvm-x86/next no matter what).
->
-> I haven't done a ton of runtime testing yet, but it passes all of my build tests
-> (I have far too many configs), so I'm reasonably confident all the kconfig stuff
-> isn't horribly broken.
->
-> Oh, and I also squashed this into the very last patch.  The curly braces, line
-> wrap, and hardcoded boolean are all superfluous.
+On Tue, 2025-07-22 at 15:46 -0700, Oliver Upton wrote:
+> On Mon, Jun 23, 2025 at 02:27:14PM +0100, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > We observed systems going dark on kexec, due to corruption of the
+> > new
+> > kernel's text (and sometimes the initrd). This was eventually
+> > determined
+> > to be caused by the vLPI pending tables used by the GIC in the
+> > previous
+> > kernel, which were not being quiesced properly.
+> >=20
+> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> > ---
+> > =C2=A0arch/arm64/kvm/arm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |=C2=A0 5 +++++
+> > =C2=A0arch/arm64/kvm/vgic/vgic-v3.c | 14 ++++++++++++++
+> > =C2=A0include/kvm/arm_vgic.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0 2 ++
+> > =C2=A03 files changed, 21 insertions(+)
+> >=20
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 38a91bb5d4c7..2b76f506bc2d 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -2164,6 +2164,11 @@ void
+> > kvm_arch_disable_virtualization_cpu(void)
+> > =C2=A0		cpu_hyp_uninit(NULL);
+> > =C2=A0}
+> > =C2=A0
+> > +void kvm_arch_shutdown(void)
+> > +{
+> > +	kvm_vgic_v3_shutdown();
+> > +}
+> > +
+> > =C2=A0#ifdef CONFIG_CPU_PM
+> > =C2=A0static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
+> > =C2=A0				=C2=A0=C2=A0=C2=A0 unsigned long cmd,
+> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c
+> > b/arch/arm64/kvm/vgic/vgic-v3.c
+> > index b9ad7c42c5b0..6591e8d84855 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> > @@ -382,6 +382,20 @@ static void map_all_vpes(struct kvm *kvm)
+> > =C2=A0						dist-
+> > >its_vm.vpes[i]->irq));
+> > =C2=A0}
+> > =C2=A0
+> > +void kvm_vgic_v3_shutdown(void)
+> > +{
+> > +	struct kvm *kvm;
+> > +
+> > +	if (!kvm_vgic_global_state.has_gicv4_1)
+> > +		return;
+> > +
+> > +	mutex_lock(&kvm_lock);
+> > +	list_for_each_entry(kvm, &vm_list, vm_list) {
+> > +		unmap_all_vpes(kvm);
+> > +	}
+> > +	mutex_unlock(&kvm_lock);
+> > +}
+> > +
+>=20
+> This presumes the vCPUs have already been quiesced which I'm guessing
+> is the case for you.
 
-Thank you for this. These patches look good to me.
+Yeah. With KHO we aspire to be able to do a kexec with some pCPUs
+actually still *running* guest vCPUs instead of pointlessly taking them
+offline just for *one* pCPU to do the kexec work. But that's a way off
+yet, and in that case all these tables will need to be in memory which
+persists across the kexec so we won't need to quiesce anything. But
+those fantasies are a way off for now...
 
-I've tested them on x86 and arm64, and everything runs fine. I'll have
-a closer look at them, and probably send v16 later today.
+> The vPEs need to be made nonresident from the
+> redistributors prior to unmapping from the ITS to avoid consuming
+> unknown vPE state (IHI0069H.b 8.6.2).
 
-I know that it's probably too late for 6.17, but it would be great if
-we could queue this for 6.18.
+Right, I think that's what's being done in the second patch I sent,
+saying, "FWIW this is a previous hack we attempted which *didn't work".
+To be clear, we do still *have* that hack, in addition to the explicit
+unmap_all_vpes() call.
 
-Cheers,
-/fuad
+I would love a definitive answer about what the hypervisor is
+*expected* to do here. It's very suboptimal that the GIC doesn't
+actually stop accessing memory when it is quiesced, and that the GIC
+doesn't live behind an IOMMU which would at least allow stray DMA to be
+prevented.
+
+> So we'd probably need to deschedule the vPE in
+> kvm_arch_disable_virtualization_cpu() along with some awareness of
+> 'kvm_rebooting'.
+
+Yeah, I also pondered doing it *all* from there, but it looked like it
+would have required some kind of counting to work out when the *last*
+CPU was taken down as there's only a per-CPU arch hook. So I didn't
+bother with that for the early RFC.
+
+Note that this issue with the GIC's scattershot DMA doesn't only affect
+KVM hosts and the vLPI pending tables. We *also* have similar issues on
+the guest side with hibernate. The boot kernel sends a MAPD command to
+set up an ITT, then transfers control back to the resumed kernel which
+had previously set up that ITT at a *different* address, and nobody
+ever tells the (v)GIC. Which means that if the host subsequently
+serializes that guest for LU/LM, it corrupts memory that the running
+kernel didn't expect it to. I guess this would happen for hibernate on
+real hardware too? And maybe even kexec but that one just hasn't bitten
+us yet?
 
 
-> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-> index 4cdccabc160c..a0c5db8fd72d 100644
-> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
-> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-> @@ -249,8 +249,7 @@ static bool check_vm_type(unsigned long vm_type)
->         return kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type);
->  }
->
-> -static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
-> -                          bool expect_mmap_allowed)
-> +static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags)
->  {
->         struct kvm_vm *vm;
->         size_t total_size;
-> @@ -272,7 +271,7 @@ static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
->
->         test_file_read_write(fd);
->
-> -       if (expect_mmap_allowed) {
-> +       if (guest_memfd_flags & GUEST_MEMFD_FLAG_MMAP) {
->                 test_mmap_supported(fd, page_size, total_size);
->                 test_fault_overflow(fd, page_size, total_size);
->
-> @@ -343,13 +342,11 @@ int main(int argc, char *argv[])
->
->         test_gmem_flag_validity();
->
-> -       test_with_type(VM_TYPE_DEFAULT, 0, false);
-> -       if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP)) {
-> -               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP,
-> -                              true);
-> -       }
-> +       test_with_type(VM_TYPE_DEFAULT, 0);
-> +       if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
-> +               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP);
->
->  #ifdef __x86_64__
-> -       test_with_type(KVM_X86_SW_PROTECTED_VM, 0, false);
-> +       test_with_type(KVM_X86_SW_PROTECTED_VM, 0);
->  #endif
->  }
+
+--=-cwbpnR8RpG6qtbrpv5c5
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDcyMzA5NDIy
+NlowLwYJKoZIhvcNAQkEMSIEINQAJXmn1zKH1aw3XR5fNyRKX4AqeY7yJpd1AcKh141sMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAI+MgZUXVZCtU
+hIGNVUXDBETy3DNPmjtJHnVEjIcGU4ZgQ/7sgK+c8hF7mi/5UhOsbQsTiB6vqI9dHGODvuVzFV2P
+vdD/0UOz6HPfke13MvWQ6jGqDmLf9WquJbeGhU12a4yDci6pMjL69U03VWH6HVoClFNX5NE9mG8s
+UCkUkZencwk1mjOASIlP0/WHu8qcBnW+5+pBAuegEJLZKmeB/mxY46AmdyXz+GK5bVqbgBmYkHaS
+0QU3IatTxtNRodl1YnYgCun6zwDmqlof451MVNOey7Xi5yPSZKHEKI+QlcxhSHpqQ8fcPMnOOhhf
+ECo5/htcmr61nNPq1sXNSgMpcm0iAdpH+nZZXtUeQ7Qb5y/XlSMgiubwKikIg6aAsD+3SrhZ8mLy
+37862KLtdVaZ96ppI7rOsy+rlF8wDrgzeRb2GcASs5GrX9ldu+r7jvNYHKDPLa1wrEhzguPeYcMc
+eFlieilD2HjmakBeD6tDehXVK+UBGcBrbkW9DaLLUvWIlUh6CSpmJT8SbPCZNkI1WjrTF0bz5c6U
+Cjb+eGxolB0dTCAj2ndndhaEfgCsCGerlNAOJzWAUPYU9/4Rltr8DQtcIxJz7XeTMRfqjtdld2HD
+uBUPXAgU/aWB22cVHpV4uJj0pOmEvLjc43xZjQAE2/jQqtGIPBbhNJ/calmc2yAAAAAAAAA=
+
+
+--=-cwbpnR8RpG6qtbrpv5c5--
