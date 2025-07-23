@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECBC33DF
-	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 13:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C632E7165
+	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 13:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753277251; cv=none; b=c9yUACzuXaw1u3z8Eg1DqrK7FMrt+ns8/0ZK31u2DS5jOpRe7F+l7ApfqmZG/pY9QJbG2c4xDzc7E1z+BGTqdY9TvcrzvXXnshsq0fwqQNrIluwWWF3LB+ZNrcJW80SDmPpyxYhR/SS8MCFQJushg/hb07AoU9/4j1B7W3lRE8I=
+	t=1753278172; cv=none; b=dCV5sclSG36yZ55aUv9yK7oYwq1oan7wZqPNwflImVBEQNYYTXUh8d/OdsTHfGbauY7t9Pr5jiWK+bIOTdVkGy9WPvjBn6G8ZvaCMy8tgvVqlIUvqnLW6wTjjj5YmQg7tVBOLpua7rJ6g3RhvRSa4bfxSja49Le89UK7O3dYvG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753277251; c=relaxed/simple;
-	bh=chDTWX5a3R65VeyMPmWT/vUkB2Kxq9PV37cbFxZXFmA=;
+	s=arc-20240116; t=1753278172; c=relaxed/simple;
+	bh=aTj4lm8xWfLVsbNbqAfL0zQElnzrlfjF/NquOyDaCJE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uvm68S4f7K3LIGSiL7nEcTwt5Q3hD6j5tlrS0t7UYdmRCbD8edvh99cjCBUzzPLhWb6bSZxkIhZinng6CvFYlzVnE8ln1AQ+gclSXjWfm9HZu2N1bkCz+0UnJbAIY81cFCC1Hsfm6igC5n3/K9YcbrH2QErpA5rFjAkRnqTLDGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n3K8z28X; arc=none smtp.client-ip=192.198.163.13
+	 In-Reply-To:Content-Type; b=hSx5yCC+/OUrBQRVWROA/J2hE9WS1hJkqpT4d6D4kWDdNzDoel267B489F45MUkHD7HiTpNAkdN1/jP7fPceCCMQzODJIC7XfIBYdeCjSk0/Z47h6JBuUsdyNDn05A+gv+yoVcChMu9CwBaOuu/H6k1bu2nl6IhcXpgDfLEiVRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NTu4uJZT; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n3K8z28X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NTu4uJZT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753277250; x=1784813250;
+  t=1753278171; x=1784814171;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=chDTWX5a3R65VeyMPmWT/vUkB2Kxq9PV37cbFxZXFmA=;
-  b=n3K8z28Xzx1cstO7O1SVcuJHj4aVOz91OVWiaUAMjCDyEAr73fmXIewR
-   tHp7CuxMnb4yongyhx0dIR6jBIJpACkoqlqzzbPkxzWu+wvy+hAav6lSv
-   7AwBYsZ7s6C5fO53po285GS9SCTdRGg/w2f8Y5YlzDR2VuDGv6omKDk8a
-   Y8WDmCz0s7WhEkEPN1C4vFvx1gItY02HcW4ofhUyipyWvBy/MF3m40TKc
-   ij1mivjpKYW68r3yOQYmz5xeiGpDXODwWvbzL/hRg20NC2Q2ahdlYO9xK
-   zt0pISLw2/f37EshziSGEMAkYIF2+qTaNT59bnBBe0qa4uRDF9c2dB5B3
-   A==;
-X-CSE-ConnectionGUID: xaj8K4buS1ape7CjB2hsJA==
-X-CSE-MsgGUID: LGOKjlfzRei8IPP1cSLJxQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="58173872"
+  bh=aTj4lm8xWfLVsbNbqAfL0zQElnzrlfjF/NquOyDaCJE=;
+  b=NTu4uJZTt/fjKW62f90E8oGtYHFmlXENtTXUwYec5WU0EeEKeoJo0N5N
+   bpqFJjy/1UJV4dAhdQSayYxvpagpz6UUP+KajrjWmwkxFnBqybDRVrPrj
+   HgHucvqpqFljVKfi7BL3pxEdJVjX0nK8Brocr8EyVO35qbdMFhwDL0hiH
+   GyyhkF3FaVq8qScuS9BqhlRW8zSDTmodtxOQ8sF2pgnbUp8tnw2KnqGvp
+   eunGqsLLDSPhvkMEJXNyM1iN9fnCJtK08MYA22E2Z4hUxNzgDQ78timbv
+   4ETyh8RBTvHbeGj7YglQX4NhkegTCr59TeyYkN8o8YUCK9lcV0iJqnF5X
+   g==;
+X-CSE-ConnectionGUID: V/zfxzWrRK+vFB7GeotTDg==
+X-CSE-MsgGUID: yQuoEtF3T2iN7sqfggiiyw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55407394"
 X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="58173872"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 06:27:29 -0700
-X-CSE-ConnectionGUID: SWccDMwzSMqd/Mz7ntxyHA==
-X-CSE-MsgGUID: rSy2YXBLRKqFAWkzayDTnw==
+   d="scan'208";a="55407394"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 06:42:50 -0700
+X-CSE-ConnectionGUID: yTIVkg39RNaz72vCTkFDrQ==
+X-CSE-MsgGUID: fJ/Nw4uCQcucq0aN5JJTDg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,333,1744095600"; 
-   d="scan'208";a="159275110"
+   d="scan'208";a="196630738"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 06:27:13 -0700
-Message-ID: <a438c189-4152-4ad4-977e-6a5291a7dd40@intel.com>
-Date: Wed, 23 Jul 2025 21:27:09 +0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2025 06:42:29 -0700
+Message-ID: <ab349c70-1d16-4203-a63d-3fa48b7286cd@intel.com>
+Date: Wed, 23 Jul 2025 21:42:25 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 05/22] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
- CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE
+Subject: Re: [PATCH v16 09/22] KVM: x86: Enable KVM_GUEST_MEMFD for all 64-bit
+ builds
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -77,149 +77,155 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250723104714.1674617-1-tabba@google.com>
- <20250723104714.1674617-6-tabba@google.com>
+ <20250723104714.1674617-10-tabba@google.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250723104714.1674617-6-tabba@google.com>
+In-Reply-To: <20250723104714.1674617-10-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/23/2025 6:46 PM, Fuad Tabba wrote:
-> The original name was vague regarding its functionality. This Kconfig
-> option specifically enables and gates the kvm_gmem_populate() function,
-> which is responsible for populating a GPA range with guest data.
+On 7/23/2025 6:47 PM, Fuad Tabba wrote:
+> Enable KVM_GUEST_MEMFD for all KVM x86 64-bit builds, i.e. for "default"
+> VM types when running on 64-bit KVM.  This will allow using guest_memfd
+> to back non-private memory for all VM shapes, by supporting mmap() on
+> guest_memfd.
 > 
-> The new name, HAVE_KVM_ARCH_GMEM_POPULATE, describes the purpose of the
-> option: to enable arch-specific guest_memfd population mechanisms. It
-> also follows the same pattern as the other HAVE_KVM_ARCH_* configuration
-> options.
+> Opportunistically clean up various conditionals that become tautologies
+> once x86 selects KVM_GUEST_MEMFD more broadly.  Specifically, because
+> SW protected VMs, SEV, and TDX are all 64-bit only, private memory no
+> longer needs to take explicit dependencies on KVM_GUEST_MEMFD, because
+> it is effectively a prerequisite.
 > 
-> This improves clarity for developers and ensures the name accurately
-> reflects the functionality it controls, especially as guest_memfd
-> support expands beyond purely "private" memory scenarios.
-> 
-> Note that the vm type KVM_X86_SW_PROTECTED_VM does not need the populate
-> function. Therefore, ensure that the correct configuration is selected
-> when KVM_SW_PROTECTED_VM is enabled.
-
-the changelog needs to be enhanced. At least it doesn't talk about 
-KVM_X86_PRIVATE_MEM at all.
-
-If Sean is going to queue this version, I think he can help refine it 
-when queuing.
-
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Shivank Garg <shivankg@amd.com>
-> Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-> Co-developed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 
 Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
+It matches with my thought on v14 that gmem can be allowed for all x86 
+VM types[*]. Get rid of .supports_gmem and achieve it through 
+CONFIG_KVM_GUEST_MEMFD looks much cleaner!
+
+[*] 
+https://lore.kernel.org/all/b5fe8f54-64df-4cfa-b86f-eed1cbddca7a@intel.com/
+
 > ---
->   arch/x86/kvm/Kconfig     | 14 ++++++++++----
->   include/linux/kvm_host.h |  2 +-
->   virt/kvm/Kconfig         |  9 ++++-----
->   virt/kvm/guest_memfd.c   |  2 +-
->   4 files changed, 16 insertions(+), 11 deletions(-)
+>   arch/x86/include/asm/kvm_host.h |  4 +---
+>   arch/x86/kvm/Kconfig            | 12 ++++--------
+>   include/linux/kvm_host.h        |  9 ++-------
+>   virt/kvm/kvm_main.c             |  4 ++--
+>   4 files changed, 9 insertions(+), 20 deletions(-)
 > 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 7b0f2b3e492d..50366a1ca192 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2276,10 +2276,8 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+>   		       int tdp_max_root_level, int tdp_huge_page_level);
+>   
+>   
+> -#ifdef CONFIG_KVM_GUEST_MEMFD
+> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>   #define kvm_arch_has_private_mem(kvm) ((kvm)->arch.has_private_mem)
+> -#else
+> -#define kvm_arch_has_private_mem(kvm) false
+>   #endif
+>   
+>   #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
 > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index 13ab7265b505..c763446d9b9f 100644
+> index c763446d9b9f..4e43923656d0 100644
 > --- a/arch/x86/kvm/Kconfig
 > +++ b/arch/x86/kvm/Kconfig
-> @@ -79,11 +79,16 @@ config KVM_WERROR
+> @@ -47,6 +47,7 @@ config KVM_X86
+>   	select KVM_GENERIC_HARDWARE_ENABLING
+>   	select KVM_GENERIC_PRE_FAULT_MEMORY
+>   	select KVM_WERROR if WERROR
+> +	select KVM_GUEST_MEMFD if X86_64
+>   
+>   config KVM
+>   	tristate "Kernel-based Virtual Machine (KVM) support"
+> @@ -79,16 +80,11 @@ config KVM_WERROR
 >   
 >   	  If in doubt, say "N".
 >   
-> +config KVM_X86_PRIVATE_MEM
-> +	select KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	select KVM_GUEST_MEMFD
-> +	bool
-> +
+> -config KVM_X86_PRIVATE_MEM
+> -	select KVM_GENERIC_MEMORY_ATTRIBUTES
+> -	select KVM_GUEST_MEMFD
+> -	bool
+> -
 >   config KVM_SW_PROTECTED_VM
 >   	bool "Enable support for KVM software-protected VMs"
 >   	depends on EXPERT
 >   	depends on KVM_X86 && X86_64
-> -	select KVM_GENERIC_PRIVATE_MEM
-> +	select KVM_X86_PRIVATE_MEM
+> -	select KVM_X86_PRIVATE_MEM
+> +	select KVM_GENERIC_MEMORY_ATTRIBUTES
 >   	help
 >   	  Enable support for KVM software-protected VMs.  Currently, software-
 >   	  protected VMs are purely a development and testing vehicle for
-> @@ -133,8 +138,8 @@ config KVM_INTEL_TDX
+> @@ -138,7 +134,7 @@ config KVM_INTEL_TDX
 >   	bool "Intel Trust Domain Extensions (TDX) support"
 >   	default y
 >   	depends on INTEL_TDX_HOST
-> -	select KVM_GENERIC_PRIVATE_MEM
-> -	select KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	select KVM_X86_PRIVATE_MEM
-> +	select HAVE_KVM_ARCH_GMEM_POPULATE
+> -	select KVM_X86_PRIVATE_MEM
+> +	select KVM_GENERIC_MEMORY_ATTRIBUTES
+>   	select HAVE_KVM_ARCH_GMEM_POPULATE
 >   	help
 >   	  Provides support for launching Intel Trust Domain Extensions (TDX)
->   	  confidential VMs on Intel processors.
-> @@ -157,9 +162,10 @@ config KVM_AMD_SEV
+> @@ -162,7 +158,7 @@ config KVM_AMD_SEV
 >   	depends on KVM_AMD && X86_64
 >   	depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
 >   	select ARCH_HAS_CC_PLATFORM
-> -	select KVM_GENERIC_PRIVATE_MEM
-> +	select KVM_X86_PRIVATE_MEM
+> -	select KVM_X86_PRIVATE_MEM
+> +	select KVM_GENERIC_MEMORY_ATTRIBUTES
 >   	select HAVE_KVM_ARCH_GMEM_PREPARE
 >   	select HAVE_KVM_ARCH_GMEM_INVALIDATE
-> +	select HAVE_KVM_ARCH_GMEM_POPULATE
->   	help
->   	  Provides support for launching encrypted VMs which use Secure
->   	  Encrypted Virtualization (SEV), Secure Encrypted Virtualization with
+>   	select HAVE_KVM_ARCH_GMEM_POPULATE
 > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 8cdc0b3cc1b1..ddfb6cfe20a6 100644
+> index 56ea8c862cfd..4d1c44622056 100644
 > --- a/include/linux/kvm_host.h
 > +++ b/include/linux/kvm_host.h
-> @@ -2534,7 +2534,7 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
->   int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order);
+> @@ -719,11 +719,7 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
+>   }
 >   #endif
 >   
-> -#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
-> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE
->   /**
->    * kvm_gmem_populate() - Populate/prepare a GPA range with guest data
->    *
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index e4b400feff94..1b7d5be0b6c4 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -116,11 +116,6 @@ config KVM_GUEST_MEMFD
->          select XARRAY_MULTI
->          bool
->   
-> -config KVM_GENERIC_PRIVATE_MEM
-> -       select KVM_GENERIC_MEMORY_ATTRIBUTES
-> -       select KVM_GUEST_MEMFD
-> -       bool
-> -
->   config HAVE_KVM_ARCH_GMEM_PREPARE
->          bool
->          depends on KVM_GUEST_MEMFD
-> @@ -128,3 +123,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
->   config HAVE_KVM_ARCH_GMEM_INVALIDATE
->          bool
->          depends on KVM_GUEST_MEMFD
-> +
-> +config HAVE_KVM_ARCH_GMEM_POPULATE
-> +       bool
-> +       depends on KVM_GUEST_MEMFD
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 7d85cc33c0bb..b2b50560e80e 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -627,7 +627,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
->   }
->   EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
->   
-> -#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
-> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE
->   long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long npages,
->   		       kvm_gmem_populate_cb post_populate, void *opaque)
+> -/*
+> - * Arch code must define kvm_arch_has_private_mem if support for guest_memfd is
+> - * enabled.
+> - */
+> -#if !defined(kvm_arch_has_private_mem) && !IS_ENABLED(CONFIG_KVM_GUEST_MEMFD)
+> +#ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>   static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
 >   {
+>   	return false;
+> @@ -2505,8 +2501,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+>   
+>   static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>   {
+> -	return IS_ENABLED(CONFIG_KVM_GUEST_MEMFD) &&
+> -	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> +	return kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>   }
+>   #else
+>   static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index aa86dfd757db..4f57cb92e109 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1588,7 +1588,7 @@ static int check_memory_region_flags(struct kvm *kvm,
+>   {
+>   	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+>   
+> -	if (kvm_arch_has_private_mem(kvm))
+> +	if (IS_ENABLED(CONFIG_KVM_GUEST_MEMFD))
+>   		valid_flags |= KVM_MEM_GUEST_MEMFD;
+>   
+>   	/* Dirty logging private memory is not currently supported. */
+> @@ -4917,7 +4917,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>   #endif
+>   #ifdef CONFIG_KVM_GUEST_MEMFD
+>   	case KVM_CAP_GUEST_MEMFD:
+> -		return !kvm || kvm_arch_has_private_mem(kvm);
+> +		return 1;
+>   #endif
+>   	default:
+>   		break;
 
