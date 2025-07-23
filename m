@@ -1,55 +1,55 @@
 Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9357D28466F
-	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 10:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A9924BC09
+	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 10:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753267641; cv=none; b=YG3fhtgc18grzot6AKEy4r7GTFjmT5c6+9RMaSMz1XkWl5yahO4d2QnQn/Qc1tsbgmeXYMmVWo2ynVR8SU4NyKf7Z2wlmF94QA4rkgYcK8AUi/l1KB/O6XnJcxhQK8f81NVEJeQDMmaMR4Bl3PQRdNm4cRqUcRytB5Qi/LeTQNQ=
+	t=1753267641; cv=none; b=UVIhFdIpCzk5xTdAHkX14f9wPy0C2QZ40comjsssoIklLIB/DapueKIK3BCyROWRut1dYrX5yDx+ZQzUcX/UDJCx5lg5h4x5qY1YxsqI3BoJ29iAR9wU/hpOu+TqLhgbC2vZMche/qM5dQIVy2V0lJTLPJDfHwxdV3z22IRCar8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753267641; c=relaxed/simple;
-	bh=c/XS5ewtaGuLKhzHP+5yEB/GdDuoY/+4kh1Qi+4FNro=;
+	bh=EH1IJuXG8Ao7tj1busmw6p1cNiHU5gyF41SXMJEr5/k=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MDN1u32Yrw27pAIP2n0nawQw/7BnlPbLdgPd3ObLFxjp9SPPehJquYkSiF/csyuvgGUEi5/x6wLsLQQw73tl1kuouLZar8Xmpqh76taYTMYbMHL+e7mPODgZxlIm8Y8BQkGjyJW0yc3pFlMuLJGD2meB5e8PuTxEOlX0vVJA37I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T9wazPSU; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=l8XYO20BzAROYLZoANyYzcq2vxGY+sEjkSKw6xLrAO2eJo6jz8rFxrvKW3eSFERGdZZ0f5j1yG4YNd6FqqT9tgVOqMmSA7EK//cMnhFBSOuvv4ASw0oRog2psRIP7NvZrn8JhxJCnkD+9H0PQaD1kFvEQW43kEPtkFaCTs2Vcx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WveJw4Xs; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T9wazPSU"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b6162a7abdso1909416f8f.2
-        for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 03:47:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WveJw4Xs"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a52bfda108so3147506f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 03:47:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753267637; x=1753872437; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753267638; x=1753872438; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=irM8qZtZs2OxjIAk0ctgU1D+7CU3BEq0B4YUNMOwj2s=;
-        b=T9wazPSUrJbAy8Ew6K80kEHI9jKLsuw2pte1bjpQE9G4NIxcd2rZVVgDHmlUttiXo+
-         JhTNTLeJqzC6AcyJiILMu2nbXb6hbbKd0kdP5Wxne88HKWun9c8GSxqz4f70Y+gPbtMZ
-         sQzVT+5DlVRdcGdbyOKrzWqobXf3zcjiPy0p2aH+veVlM2EmipUjN8jsbl+q4DMQCwOv
-         Z3DXOg3/Wr+MfDFFjRhAAaQWdXntSH4l5K5Ezh4IJMhcgvmTlAcfrkRMNCF6vnIzxfpk
-         5b7BmpTYxS51YYVd7RGIci/iJtwkbNKubqlbNaT+Scx59w9dcSDEkuxjWMfFORnT3cFg
-         44yA==
+        bh=tzfZi60oZ9UO8raD765xxT1ZFhO1WsdtivBMYCkRGQ0=;
+        b=WveJw4XsCaU/2Ct8qez2ixs05fO+YnjmvNJIaK+H5NLm+eT343u3/eq+W9LLVL0fpH
+         ++qNPe2ATeGY76L1Yuzt13IDusmwSaoNJMQbddc+S8ONGv28wmYsKxCCng9SpNA/p2Pk
+         BMkwV5RIS3zaZaM7Nt2w3n/LF7Tosv0J+HnSHrE3AQ7Opf1cneJoQ6IFDw8WvmLnFzgr
+         nvjfVxEsbAqBuS/N0nMtOEauiLhFttWvr6JTJl6iqyvlnZOiIQ8NppQz/7HytluueBZ9
+         j6YPBvX3t9d7N6r2FGMQYIHsOItqTcfmv/Sfj9v5Bqk1ym3z46FJmkTCm+kefnspWPK8
+         bYCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753267637; x=1753872437;
+        d=1e100.net; s=20230601; t=1753267638; x=1753872438;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=irM8qZtZs2OxjIAk0ctgU1D+7CU3BEq0B4YUNMOwj2s=;
-        b=VRsJv8++uuM+/VGiVn6YShI5co0L32RUQWeQDXX7z9Ok25Z3/DW0sDWeNiKH3QLfUg
-         DGK30zw+XCtCpveIbfJrsstGah4L+9NSQcX2G0u+EqdhD19DWIknMfPTRoA1WtDibpPm
-         Zhc3CMxLhX06fZB6XwHp/QSIbNTIz7FocxEniogd1BsLPVZu6Cq4pRyzPgJPtvh6LlvM
-         I0UGovbfFQOZ4derpMBGEjNNUm++mov+SLomOGr599gM79FuWHzBNgAM+SbVWdTd6ToE
-         XiQrfzt+W7rjJpCaZgit5P0H4yo2m1xsfWSUeAO44LOzaQHGb54oN4+QFDnJq4FYZIh/
-         FQJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUM1C7FqyzgiudfO2ZoBcRBYRmwzIvQNM9ieTctFaT63chHfRIlO3uNt96YjGiajYMPL8hGaSo=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywl3muhMPHNiTI8OPwlcPFu9tdetDZF7cGHr+c23XmoZ2V2xzQX
-	SciWWB0wxvCEFSTGBsW7Xpu50oclqa2dvNaqRkkMfWGFCCd8UQYrJLZqZa6ILStecfcyQGAbrcm
-	afA==
-X-Google-Smtp-Source: AGHT+IG5Z3A6R2I6Yt40IaTyInl4VZ3bw90RL9tNJeKgjFFghyeEaG3W+L0zG4oREWZmzmC9PH6Pnqlt3w==
-X-Received: from wmbjg14.prod.google.com ([2002:a05:600c:a00e:b0:456:365f:428b])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2312:b0:3b4:5a9d:8323
- with SMTP id ffacd0b85a97d-3b768ee082emr1858112f8f.7.1753267636987; Wed, 23
- Jul 2025 03:47:16 -0700 (PDT)
-Date: Wed, 23 Jul 2025 11:46:54 +0100
+        bh=tzfZi60oZ9UO8raD765xxT1ZFhO1WsdtivBMYCkRGQ0=;
+        b=rr3LMJD92crXoKeCFuGIk9A1hfAp5VNToA0KJEd69HAXuAS3Nb3rTtqDGEZf8OtNqJ
+         BRbexVka37fp42lMakqup5+qpG77aGgluhQnA/I0c/LjMkGXOMvPYNnHCQ5DZQkIrJRn
+         Oout+N5NdJcuImm80UW/fGGtfn+Il/HW5jNJkQN/G5KaYiNhRMmuQgqYeNxqVcKG/HWm
+         jSIHp8Z4IPTIAaRvL1beoNxfU2b1qM3UaLLr167hSEDqOK+ebeIcuGG1gUjCnA/SLHnJ
+         WKjMn6Wie+sX3Tu4tUZ9K4UwiTSoli7miDxT20pxwd53UjTQzLjamTiBB7tLiTja9UNZ
+         +0sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHb0EWLT4SxL/Gn5rTt5k7zv7Xp0A8jU/oP4na/ULk8QPvW6RACSIyzV5qPo+cRfpzYOp2yKg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YysRjTF8MnOnk1oUqd9VCa44ry0pWA+cWcKkiFMUqCZzw2opQ2J
+	RICf5jUcMtE7R7z1jIxRt8kwh14F2l48qiO+r/IFfHMNlUbuLqGcrLm6JAEqfLs6vAtkNMnWoc6
+	rgQ==
+X-Google-Smtp-Source: AGHT+IEo+s/VxPokXQ2vXolGdtsGLlmgFDoyNvmXKyvht3UuZi1/vOjCI4q8w/CILxGvMZbP18VFTQSgFQ==
+X-Received: from wmbhc10.prod.google.com ([2002:a05:600c:870a:b0:453:6ee6:e62a])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:26c9:b0:3a4:e393:11e2
+ with SMTP id ffacd0b85a97d-3b768ef9646mr2055449f8f.34.1753267637872; Wed, 23
+ Jul 2025 03:47:17 -0700 (PDT)
+Date: Wed, 23 Jul 2025 11:46:55 +0100
 In-Reply-To: <20250723104714.1674617-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250723104714.1674617-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
-Message-ID: <20250723104714.1674617-3-tabba@google.com>
-Subject: [PATCH v16 02/22] KVM: x86: Have all vendor neutral sub-configs
- depend on KVM_X86, not just KVM
+Message-ID: <20250723104714.1674617-4-tabba@google.com>
+Subject: [PATCH v16 03/22] KVM: x86: Select KVM_GENERIC_PRIVATE_MEM directly
+ from KVM_SW_PROTECTED_VM
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev
@@ -89,105 +89,38 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Sean Christopherson <seanjc@google.com>
 
-Make all vendor neutral KVM x86 configs depend on KVM_X86, not just KVM,
-i.e. gate them on at least one vendor module being enabled and thus on
-kvm.ko actually being built.  Depending on just KVM allows the user to
-select the configs even though they won't actually take effect, and more
-importantly, makes it all too easy to create unmet dependencies.  E.g.
-KVM_GENERIC_PRIVATE_MEM can't be selected by KVM_SW_PROTECTED_VM, because
-the KVM_GENERIC_MMU_NOTIFIER dependency is select by KVM_X86.
+Now that KVM_SW_PROTECTED_VM doesn't have a hidden dependency on KVM_X86,
+select KVM_GENERIC_PRIVATE_MEM from within KVM_SW_PROTECTED_VM instead of
+conditionally selecting it from KVM_X86.
 
-Hiding all sub-configs when neither KVM_AMD nor KVM_INTEL is selected also
-helps communicate to the user that nothing "interesting" is going on, e.g.
+No functional change intended.
 
-  --- Virtualization
-  <M>   Kernel-based Virtual Machine (KVM) support
-  < >   KVM for Intel (and compatible) processors support
-  < >   KVM for AMD processors support
-
-Fixes: ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module is requested")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/x86/kvm/Kconfig | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ arch/x86/kvm/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 2c86673155c9..9895fc3cd901 100644
+index 9895fc3cd901..402ba00fdf45 100644
 --- a/arch/x86/kvm/Kconfig
 +++ b/arch/x86/kvm/Kconfig
-@@ -74,7 +74,7 @@ config KVM_WERROR
- 	# FRAME_WARN, i.e. KVM_WERROR=y with KASAN=y requires special tuning.
- 	# Building KVM with -Werror and KASAN is still doable via enabling
- 	# the kernel-wide WERROR=y.
--	depends on KVM && ((EXPERT && !KASAN) || WERROR)
-+	depends on KVM_X86 && ((EXPERT && !KASAN) || WERROR)
- 	help
- 	  Add -Werror to the build flags for KVM.
+@@ -46,7 +46,6 @@ config KVM_X86
+ 	select HAVE_KVM_PM_NOTIFIER if PM
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	select KVM_GENERIC_PRE_FAULT_MEMORY
+-	select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
+ 	select KVM_WERROR if WERROR
  
-@@ -83,7 +83,7 @@ config KVM_WERROR
- config KVM_SW_PROTECTED_VM
+ config KVM
+@@ -84,6 +83,7 @@ config KVM_SW_PROTECTED_VM
  	bool "Enable support for KVM software-protected VMs"
  	depends on EXPERT
--	depends on KVM && X86_64
-+	depends on KVM_X86 && X86_64
+ 	depends on KVM_X86 && X86_64
++	select KVM_GENERIC_PRIVATE_MEM
  	help
  	  Enable support for KVM software-protected VMs.  Currently, software-
  	  protected VMs are purely a development and testing vehicle for
-@@ -169,7 +169,7 @@ config KVM_AMD_SEV
- config KVM_IOAPIC
- 	bool "I/O APIC, PIC, and PIT emulation"
- 	default y
--	depends on KVM
-+	depends on KVM_X86
- 	help
- 	  Provides support for KVM to emulate an I/O APIC, PIC, and PIT, i.e.
- 	  for full in-kernel APIC emulation.
-@@ -179,7 +179,7 @@ config KVM_IOAPIC
- config KVM_SMM
- 	bool "System Management Mode emulation"
- 	default y
--	depends on KVM
-+	depends on KVM_X86
- 	help
- 	  Provides support for KVM to emulate System Management Mode (SMM)
- 	  in virtual machines.  This can be used by the virtual machine
-@@ -189,7 +189,7 @@ config KVM_SMM
- 
- config KVM_HYPERV
- 	bool "Support for Microsoft Hyper-V emulation"
--	depends on KVM
-+	depends on KVM_X86
- 	default y
- 	help
- 	  Provides KVM support for emulating Microsoft Hyper-V.  This allows KVM
-@@ -203,7 +203,7 @@ config KVM_HYPERV
- 
- config KVM_XEN
- 	bool "Support for Xen hypercall interface"
--	depends on KVM
-+	depends on KVM_X86
- 	help
- 	  Provides KVM support for the hosting Xen HVM guests and
- 	  passing Xen hypercalls to userspace.
-@@ -213,7 +213,7 @@ config KVM_XEN
- config KVM_PROVE_MMU
- 	bool "Prove KVM MMU correctness"
- 	depends on DEBUG_KERNEL
--	depends on KVM
-+	depends on KVM_X86
- 	depends on EXPERT
- 	help
- 	  Enables runtime assertions in KVM's MMU that are too costly to enable
-@@ -228,7 +228,7 @@ config KVM_EXTERNAL_WRITE_TRACKING
- 
- config KVM_MAX_NR_VCPUS
- 	int "Maximum number of vCPUs per KVM guest"
--	depends on KVM
-+	depends on KVM_X86
- 	range 1024 4096
- 	default 4096 if MAXSMP
- 	default 1024
 -- 
 2.50.1.470.g6ba607880d-goog
 
