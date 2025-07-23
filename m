@@ -1,230 +1,365 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CF828B3FA
-	for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 23:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE82F13A265
+	for <kvmarm@lists.linux.dev>; Wed, 23 Jul 2025 05:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753227747; cv=none; b=s59RTFb4BfU9qGPN/pRwJNFv1N2waoYcHKZQSKvDcfzVNjZJSNlqf3ay+WUKjujG0OuMYzaHTH4tk7JH0gbVPDSl117xaXAhD6jI42AMVQMJ39D5hEOOYqxT8dPY/wteEf5MNy7rloPZfNVm39uoKEqerLFpbPxBBSddx6LyzRA=
+	t=1753246863; cv=none; b=CjLsh6esviWvb2XnyvBtc4xV9Cob/02uZgoF3SC8C/wNyIox+wgUQyRsO0y1HwSS8D9L+JPKBLvWwbbabZc+JidaAKQGD2bt37SNuaRWoy5phV0kKzQtG/w66tHQfUv0ykTamo/vdTBxHevRIYHfg7lz8yEFCOS3AA3+xDR5v0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753227747; c=relaxed/simple;
-	bh=KmdfdNUxjHfIoxf80hBqYjQ/1GKN1PEjgM/hjTKhDHc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=C1T6YCX+iqDhj1g8M8j1IljXXO12t33chijJgWZg6Z2nl3nUETwxCD8xbecb9iUbvTGhvrRJ0hKYHeMJjl80TnlTgI8wlXeEBeNBnonbkQaxJRLnEMjwlP9oHtSD/z2ClEloGdi+5GT9jJJqWuIJaKMS8tm/HfM9dXicuowBKCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iRWVP3ZM; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1753246863; c=relaxed/simple;
+	bh=bc9Gg+byUYjTZISkmIF8wLAYUPLodTCUMIMLQJwD39s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NyMg0NQcCB4mmx6GBjwxQ8yVpBGvdp+xrVPQKCudtV8MJcbHAB+BIboiTXwXZf+NAtOR+gZ8RZDFlAWF8tpFeaLCE5DLjeuduTrM4cj1RFy2Nr5a6+23u4j3uEdhoYIFs7rXRdoU9iNfL9dQ4zjYAvA9Iu8Rr8wySCnsw/p2sJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s24ZxwtL; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iRWVP3ZM"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b31bc3128fcso7907648a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Jul 2025 16:42:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753227745; x=1753832545; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C4436MwwaaGsBQYuGwPP46zP65nxhOyA9XxeTVRWwmU=;
-        b=iRWVP3ZMaraYHDGQWCuBwsTXxOrEqrBFy+tllVFHODiHabj/RUoioItzwz31YQGDfa
-         7hL1WjafmyhhC4Bv0p0s2U/TkogT4/p0Yn2uHpKbVGW0Hw3RdBIqU9BN7PXkvjKtVdy+
-         044XfLLjs8XDnWSQ2o1SDXsmpyzKk0wNKKcdaxOpt9lbOnm6yOfXwTJy9YnZ0ESfrZ/f
-         dbCBzI9yK1hzngtX6gGxHCr+Obx98yVp+y1eHuqiSh8wySMLkTmf4p/H6q3pPmG1bUPD
-         DUAj906l5yEoTCeSgK7CMZ2LPKkgYZTy/RaRp68PWU3Bc18lDhE09o4nCW1IXplAxZBJ
-         co6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753227745; x=1753832545;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C4436MwwaaGsBQYuGwPP46zP65nxhOyA9XxeTVRWwmU=;
-        b=HzNMNhTEFC0fo3OzlJiRqX+CE7NH0DJLiOMhm5K4e4KW8Sb1Bd5SRTv9Crpe0EV/uB
-         8AEm8zqDRMFi2ZntN49B5Evf3UO1s6j+DfbYbvs46rFVHRz+rc1Fv0/Rodvo9MPZxrjY
-         y3rHE887cH4W5dAOfgKp9GdmAd0fVL/yMMWxUMKmIXJebwiMWzA6jB6eIgbOl4/VgQ1m
-         I9uJpMnhEgUn0ub0fCIPs26+eNbvaiyF4A2YHmZj282dIM8jLNQ7USlbLCPl54a1312d
-         DsI7Vj5L6ftst3LCaUiPPlZ5/U2EDKwkbnMd2yofj0c/O5X4Jy8srm6Vl1rzSaBn5yrL
-         94Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCXifDXysRQpB06tQWICxGGG86nhQEh5z2AV1J2jvmeTK+IVpStu1rVxMEf3UzBC5Udc2ltqDSQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwYRLN6o30+t6t9CZuxUcsRnQTuXtVlyV+7zK2hf0ZwPkiRsUIg
-	0skkO5eQlLYonFyd9KnNHm3vEgz4C5a27H9OL0Nz22pfp4vhI2rIYTlwBAE/vwVrfJL4X9H1ypg
-	NmNVM3w==
-X-Google-Smtp-Source: AGHT+IHLrCrcEJh1eqR+2A2CsgZBx82DgvNUPV5JtUfEsyEi8WO/Hm3qnM3XnGuN+OWhk9ivI2YtpAQwcFU=
-X-Received: from plbjx8.prod.google.com ([2002:a17:903:1388:b0:234:c2e4:1e08])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf09:b0:235:ecf2:393
- with SMTP id d9443c01a7336-23f981de13dmr10817305ad.53.1753227744705; Tue, 22
- Jul 2025 16:42:24 -0700 (PDT)
-Date: Tue, 22 Jul 2025 16:42:23 -0700
-In-Reply-To: <CA+EHjTw46a+NCcgGXQ1HA+a3MSZD9Q97V8W-Xj5+pYuTh4Z2_w@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s24ZxwtL"
+Date: Wed, 23 Jul 2025 14:00:40 +0900
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753246848;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MA1e6tIe1q/f8YKsxu0RC4sJJPF8dFYdwsq0PAFgbro=;
+	b=s24ZxwtLfZeYsTN907uL220wg7rD/EG4VU9oloCdKKsdlq+BCt5WhZptejrfQeLnyriBpO
+	AKy6yuSGZoF3fe5UTqHUVSlh/X+q1UO64wPUjmRqaIR7LhamQSbmfiiJzJDftl/ZgILqod
+	Q25cNlqmmguuLt/oWXKNzRHObOLA1L4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: selftest: vgic-v3: Add basic GICv3
+ sysreg userspace access test
+Message-ID: <aIBseJ3aO+hMVAee@vm4>
+References: <20250718111154.104029-1-maz@kernel.org>
+ <20250718111154.104029-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250717162731.446579-1-tabba@google.com> <20250717162731.446579-3-tabba@google.com>
- <aH5uY74Uev9hEWbM@google.com> <CA+EHjTxcgCLzwK5k+rTf2v_ufgsX0AcEzhy0EQL-pvmsg9QQeg@mail.gmail.com>
- <aH552woocYo1ueiU@google.com> <CA+EHjTwPnFLZ1OxKkV5gqk_kU_UU_KdupAGDoLbRyK__0J+YeQ@mail.gmail.com>
- <aH-1JeJH2cEvyEei@google.com> <CA+EHjTw46a+NCcgGXQ1HA+a3MSZD9Q97V8W-Xj5+pYuTh4Z2_w@mail.gmail.com>
-Message-ID: <aIAh3xkU52Z100xK@google.com>
-Subject: Re: [PATCH v15 02/21] KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to CONFIG_KVM_GENERIC_GMEM_POPULATE
-From: Sean Christopherson <seanjc@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250718111154.104029-5-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 22, 2025, Fuad Tabba wrote:
-> On Tue, 22 Jul 2025 at 16:58, Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Tue, Jul 22, 2025, Fuad Tabba wrote:
-> > > On Mon, 21 Jul 2025 at 18:33, Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Mon, Jul 21, 2025, Fuad Tabba wrote:
-> > > > > > The below diff applies on top.  I'm guessing there may be some intermediate
-> > > > > > ugliness (I haven't mapped out exactly where/how to squash this throughout the
-> > > > > > series, and there is feedback relevant to future patches), but IMO this is a much
-> > > > > > cleaner resting state (see the diff stats).
-> > > > >
-> > > > > So just so that I am clear, applying the diff below to the appropriate
-> > > > > patches would address all the concerns that you have mentioned in this
-> > > > > email?
-> > > >
-> > > > Yes?  It should, I just don't want to pinky swear in case I botched something.
-> > >
-> > > Other than this patch not applying, nah, I think it's all good ;P. I
-> > > guess base-commit: 9eba3a9ac9cd5922da7f6e966c01190f909ed640 is
-> > > somewhere in a local tree of yours. There are quite a few conflicts
-> > > and I don't think it would build even if based on the right tree,
-> > > e.g.,  KVM_CAP_GUEST_MEMFD_MMAP is a rename of KVM_CAP_GMEM_MMAP,
-> > > rather an addition of an undeclared identifier.
-> > >
-> > > That said, I think I understand what you mean, and I can apply the
-> > > spirit of this patch.
-> > >
-> > > Stay tuned for v16.
-> >
-> > Want to point me at your branch?  I can run it through my battery of tests, and
-> > maybe save you/us from having to spin a v17.
+On Fri, Jul 18, 2025 at 12:11:54PM +0100, Marc Zyngier wrote:
+> We have a lot of more or less useful vgic tests, but none of them
+> tracks the availability of GICv3 system registers, which is a bit
+> annoying.
 > 
-> That would be great. Here it is:
+> Add one such test, which covers both EL1 and EL2 registers.
 > 
-> https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/guestmem-basic-6.16-v16
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+I've tested this selftest on the RevC FVP with kvm-arm.mode=nested.
+
+Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+
+Running GIC_v3 tests.
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='657'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='682'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='682'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='657'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='657'
+SKIP SYS_ICC_AP0R1_EL1 for read
+SKIP SYS_ICC_AP0R1_EL1 for write
+SKIP SYS_ICC_AP0R2_EL1 for read
+SKIP SYS_ICC_AP0R2_EL1 for write
+SKIP SYS_ICC_AP0R3_EL1 for read
+SKIP SYS_ICC_AP0R3_EL1 for write
+SKIP SYS_ICC_AP1R1_EL1 for read
+SKIP SYS_ICC_AP1R1_EL1 for write
+SKIP SYS_ICC_AP1R2_EL1 for read
+SKIP SYS_ICC_AP1R2_EL1 for write
+SKIP SYS_ICC_AP1R3_EL1 for read
+SKIP SYS_ICC_AP1R3_EL1 for write
+SKIP SYS_ICH_AP0R1_EL2 for read
+SKIP SYS_ICH_AP0R1_EL2 for write
+SKIP SYS_ICH_AP0R2_EL2 for read
+SKIP SYS_ICH_AP0R2_EL2 for write
+SKIP SYS_ICH_AP0R3_EL2 for read
+SKIP SYS_ICH_AP0R3_EL2 for write
+SKIP SYS_ICH_AP1R1_EL2 for read
+SKIP SYS_ICH_AP1R1_EL2 for write
+SKIP SYS_ICH_AP1R2_EL2 for read
+SKIP SYS_ICH_AP1R2_EL2 for write
+SKIP SYS_ICH_AP1R3_EL2 for read
+SKIP SYS_ICH_AP1R3_EL2 for write
+__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
+
+
+
+
+> ---
+>  tools/testing/selftests/kvm/arm64/vgic_init.c | 219 +++++++++++++++++-
+>  1 file changed, 217 insertions(+), 2 deletions(-)
 > 
-> No known issues from my end. But can you have a look at the patch:
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_init.c b/tools/testing/selftests/kvm/arm64/vgic_init.c
+> index b3b5fb0ff0a9a..7d508dcdbf23d 100644
+> --- a/tools/testing/selftests/kvm/arm64/vgic_init.c
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_init.c
+> @@ -9,6 +9,8 @@
+>  #include <asm/kvm.h>
+>  #include <asm/kvm_para.h>
+>  
+> +#include <arm64/gic_v3.h>
+> +
+>  #include "test_util.h"
+>  #include "kvm_util.h"
+>  #include "processor.h"
+> @@ -18,8 +20,6 @@
+>  
+>  #define REG_OFFSET(vcpu, offset) (((uint64_t)vcpu << 32) | offset)
+>  
+> -#define GICR_TYPER 0x8
+> -
+>  #define VGIC_DEV_IS_V2(_d) ((_d) == KVM_DEV_TYPE_ARM_VGIC_V2)
+>  #define VGIC_DEV_IS_V3(_d) ((_d) == KVM_DEV_TYPE_ARM_VGIC_V3)
+>  
+> @@ -715,6 +715,220 @@ int test_kvm_device(uint32_t gic_dev_type)
+>  	return 0;
+>  }
+>  
+> +struct sr_def {
+> +	const char	*name;
+> +	u32		encoding;
+> +};
+> +
+> +#define PACK_SR(r)						\
+> +	((sys_reg_Op0(r) << 14) |				\
+> +	 (sys_reg_Op1(r) << 11) |				\
+> +	 (sys_reg_CRn(r) << 7) |				\
+> +	 (sys_reg_CRm(r) << 3) |				\
+> +	 (sys_reg_Op2(r)))
+> +
+> +#define SR(r)							\
+> +	{							\
+> +		.name		= #r,				\
+> +		.encoding	= r,				\
+> +	}
+> +
+> +static const struct sr_def sysregs_el1[] = {
+> +	SR(SYS_ICC_PMR_EL1),
+> +	SR(SYS_ICC_BPR0_EL1),
+> +	SR(SYS_ICC_AP0R0_EL1),
+> +	SR(SYS_ICC_AP0R1_EL1),
+> +	SR(SYS_ICC_AP0R2_EL1),
+> +	SR(SYS_ICC_AP0R3_EL1),
+> +	SR(SYS_ICC_AP1R0_EL1),
+> +	SR(SYS_ICC_AP1R1_EL1),
+> +	SR(SYS_ICC_AP1R2_EL1),
+> +	SR(SYS_ICC_AP1R3_EL1),
+> +	SR(SYS_ICC_BPR1_EL1),
+> +	SR(SYS_ICC_CTLR_EL1),
+> +	SR(SYS_ICC_SRE_EL1),
+> +	SR(SYS_ICC_IGRPEN0_EL1),
+> +	SR(SYS_ICC_IGRPEN1_EL1),
+> +};
+> +
+> +static const struct sr_def sysregs_el2[] = {
+> +	SR(SYS_ICH_AP0R0_EL2),
+> +	SR(SYS_ICH_AP0R1_EL2),
+> +	SR(SYS_ICH_AP0R2_EL2),
+> +	SR(SYS_ICH_AP0R3_EL2),
+> +	SR(SYS_ICH_AP1R0_EL2),
+> +	SR(SYS_ICH_AP1R1_EL2),
+> +	SR(SYS_ICH_AP1R2_EL2),
+> +	SR(SYS_ICH_AP1R3_EL2),
+> +	SR(SYS_ICH_HCR_EL2),
+> +	SR(SYS_ICC_SRE_EL2),
+> +	SR(SYS_ICH_VTR_EL2),
+> +	SR(SYS_ICH_VMCR_EL2),
+> +	SR(SYS_ICH_LR0_EL2),
+> +	SR(SYS_ICH_LR1_EL2),
+> +	SR(SYS_ICH_LR2_EL2),
+> +	SR(SYS_ICH_LR3_EL2),
+> +	SR(SYS_ICH_LR4_EL2),
+> +	SR(SYS_ICH_LR5_EL2),
+> +	SR(SYS_ICH_LR6_EL2),
+> +	SR(SYS_ICH_LR7_EL2),
+> +	SR(SYS_ICH_LR8_EL2),
+> +	SR(SYS_ICH_LR9_EL2),
+> +	SR(SYS_ICH_LR10_EL2),
+> +	SR(SYS_ICH_LR11_EL2),
+> +	SR(SYS_ICH_LR12_EL2),
+> +	SR(SYS_ICH_LR13_EL2),
+> +	SR(SYS_ICH_LR14_EL2),
+> +	SR(SYS_ICH_LR15_EL2),
+> +};
+> +
+> +static void test_sysreg_array(int gic, const struct sr_def *sr, int nr,
+> +			      int (*check)(int, const struct sr_def *, const char *))
+> +{
+> +	for (int i = 0; i < nr; i++) {
+> +		u64 val;
+> +		u64 attr;
+> +		int ret;
+> +
+> +		/* Assume MPIDR_EL1.Aff*=0 */
+> +		attr = PACK_SR(sr[i].encoding);
+> +
+> +		/*
+> +		 * The API is braindead. A register can be advertised as
+> +		 * available, and yet not be readable or writable.
+> +		 * ICC_APnR{1,2,3}_EL1 are examples of such non-sense, and
+> +		 * ICH_APnR{1,2,3}_EL2 do follow suit for consistency.
+> +		 *
+> +		 * On the bright side, no known HW is implementing more than
+> +		 * 5 bits of priority, so we're safe. Sort of...
+> +		 */
+> +		ret = __kvm_has_device_attr(gic, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +					    attr);
+> +		TEST_ASSERT(ret == 0, "%s unavailable", sr[i].name);
+> +
+> +		/* Check that we can write back what we read */
+> +		ret = __kvm_device_attr_get(gic, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +					    attr, &val);
+> +		TEST_ASSERT(ret == 0 || !check(gic, &sr[i], "read"), "%s unreadable", sr[i].name);
+> +		ret = __kvm_device_attr_set(gic, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +					    attr, &val);
+> +		TEST_ASSERT(ret == 0 || !check(gic, &sr[i], "write"), "%s unwritable", sr[i].name);
+> +	}
+> +}
+> +
+> +static u8 get_ctlr_pribits(int gic)
+> +{
+> +	int ret;
+> +	u64 val;
+> +	u8 pri;
+> +
+> +	ret = __kvm_device_attr_get(gic, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +				    PACK_SR(SYS_ICC_CTLR_EL1), &val);
+> +	TEST_ASSERT(ret == 0, "ICC_CTLR_EL1 unreadable");
+> +
+> +	pri = FIELD_GET(ICC_CTLR_EL1_PRI_BITS_MASK, val) + 1;
+> +	TEST_ASSERT(pri >= 5 && pri <= 7, "Bad pribits %d", pri);
+> +
+> +	return pri;
+> +}
+> +
+> +static int check_unaccessible_el1_regs(int gic, const struct sr_def *sr, const char *what)
+> +{
+> +	switch (sr->encoding) {
+> +	case SYS_ICC_AP0R1_EL1:
+> +	case SYS_ICC_AP1R1_EL1:
+> +		if (get_ctlr_pribits(gic) >= 6)
+> +			return -EINVAL;
+> +		break;
+> +	case SYS_ICC_AP0R2_EL1:
+> +	case SYS_ICC_AP0R3_EL1:
+> +	case SYS_ICC_AP1R2_EL1:
+> +	case SYS_ICC_AP1R3_EL1:
+> +		if (get_ctlr_pribits(gic) == 7)
+> +			return 0;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	pr_info("SKIP %s for %s\n", sr->name, what);
+> +	return 0;
+> +}
+> +
+> +static u8 get_vtr_pribits(int gic)
+> +{
+> +	int ret;
+> +	u64 val;
+> +	u8 pri;
+> +
+> +	ret = __kvm_device_attr_get(gic, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +				    PACK_SR(SYS_ICH_VTR_EL2), &val);
+> +	TEST_ASSERT(ret == 0, "ICH_VTR_EL2 unreadable");
+> +
+> +	pri = FIELD_GET(ICH_VTR_EL2_PRIbits, val) + 1;
+> +	TEST_ASSERT(pri >= 5 && pri <= 7, "Bad pribits %d", pri);
+> +
+> +	return pri;
+> +}
+> +
+> +static int check_unaccessible_el2_regs(int gic, const struct sr_def *sr, const char *what)
+> +{
+> +	switch (sr->encoding) {
+> +	case SYS_ICH_AP0R1_EL2:
+> +	case SYS_ICH_AP1R1_EL2:
+> +		if (get_vtr_pribits(gic) >= 6)
+> +			return -EINVAL;
+> +		break;
+> +	case SYS_ICH_AP0R2_EL2:
+> +	case SYS_ICH_AP0R3_EL2:
+> +	case SYS_ICH_AP1R2_EL2:
+> +	case SYS_ICH_AP1R3_EL2:
+> +		if (get_vtr_pribits(gic) == 7)
+> +			return -EINVAL;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	pr_info("SKIP %s for %s\n", sr->name, what);
+> +	return 0;
+> +}
+> +
+> +static void test_v3_sysregs(void)
+> +{
+> +	struct kvm_vcpu_init init = {};
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	u32 feat = 0;
+> +	int gic;
+> +
+> +	if (kvm_check_cap(KVM_CAP_ARM_EL2))
+> +		feat |= BIT(KVM_ARM_VCPU_HAS_EL2);
+> +
+> +	vm = vm_create(1);
+> +
+> +	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	init.features[0] |= feat;
+> +
+> +	vcpu = aarch64_vcpu_add(vm, 0, &init, NULL);
+> +	TEST_ASSERT(vcpu, "Can't create a vcpu?");
+> +
+> +	gic = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3);
+> +	TEST_ASSERT(gic >= 0, "No GIC???");
+> +
+> +	kvm_device_attr_set(gic, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
+> +
+> +	test_sysreg_array(gic, sysregs_el1, ARRAY_SIZE(sysregs_el1), check_unaccessible_el1_regs);
+> +	if (feat)
+> +		test_sysreg_array(gic, sysregs_el2, ARRAY_SIZE(sysregs_el2), check_unaccessible_el2_regs);
+> +	else
+> +		pr_info("SKIP EL2 registers, not available\n");
+> +
+> +	close(gic);
+> +	kvm_vm_free(vm);
+> +}
+> +
+>  void run_tests(uint32_t gic_dev_type)
+>  {
+>  	test_vcpus_then_vgic(gic_dev_type);
+> @@ -730,6 +944,7 @@ void run_tests(uint32_t gic_dev_type)
+>  		test_v3_last_bit_single_rdist();
+>  		test_v3_redist_ipa_range_check_at_vcpu_run();
+>  		test_v3_its_region();
+> +		test_v3_sysregs();
+>  	}
+>  }
+>  
+> -- 
+> 2.39.2
 > 
-> KVM: guest_memfd: Consolidate Kconfig and guest_memfd enable checks
-> 
-> In that I collected the changes to the config/enable checks that
-> didn't seem to fit well in any of the other patches.
-
-Regarding config stuff, patch 02, KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
-CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE, is missing a KVM_GMEM => KVM_GUEST_MEMFD rename.
-
-While playing with this, I also discovered why this code lives in the KVM_X86 config:
-
-  select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
-
-Commit ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module
-is requested") didn't have all the vendor netural configs depend on KVM_X86, and
-so it's possible to end up with unmet dependencies.  E.g. KVM_SW_PROTECTED_VM can
-be selected with KVM_X86=n, and thus with KVM_GUEST_MEMFD=n.
-
-We could punt on that mess until after this series, but that'd be a even more
-churn, and I'm not sure I could stomach giving acks for the continued addition
-of ugly kconfig dependencies. :-)
-
-Lastly, regarding "Consolidate Kconfig and guest_memfd enable checks", that needs
-to land before f6a5f3a22bbe ("KVM: guest_memfd: Allow host to map guest_memfd pages"),
-otherwise KVM will present a weird state where guest_memfd can be used for default
-VMs, but if and only KVM_GUEST_MEMFD happens to be selected by something else.
-That also provides a better shortlog: "KVM: x86: Enable KVM_GUEST_MEMFD for all
-64-bit builds".  The config cleanups and consolidations are a nice side effect,
-but what that patch is really doing is enabling KVM_GUEST_MEMFD more broadly.
-
-Actually, all of the arch patches need to come before f6a5f3a22bbe ("KVM: guest_memfd:
-Allow host to map guest_memfd pages"), otherwise intermediate builds will have
-half-baked support for guest_memfd mmap().  Or rather, KVM shouldn't let userspace
-enable GUEST_MEMFD_FLAG_MMAP until all the plumbing is in place.  I suspect that
-trying to shuffle the full patches around will create cyclical dependency hell.
-It's easy enough to hold off on adding GUEST_MEMFD_FLAG_MMAP until KVM is fully
-ready, so I think it makes sense to just add GUEST_MEMFD_FLAG_MMAP along with the
-capability.
-
-Rather than trying to pass partial patches around, I pushed a branch to:
-
-  https://github.com/sean-jc/linux.git x86/gmem_mmap
-
-Outside of the x86 config crud, and deferring GUEST_MEMFD_FLAG_MMAP until KVM is
-fully prepped, there _shouldn't_ be any changes relatively to what you have.
-
-Note, it's based on:
-
-  https://github.com/kvm-x86/linux.git next
-
-as there are x86 kconfig dependencies/conflicts with changes that are destined
-for 6.17 (and I don't think landing this in 6.17 is realistic, i.e. this series
-will effectively follow kvm-x86/next no matter what).
-
-I haven't done a ton of runtime testing yet, but it passes all of my build tests
-(I have far too many configs), so I'm reasonably confident all the kconfig stuff
-isn't horribly broken.
-
-Oh, and I also squashed this into the very last patch.  The curly braces, line
-wrap, and hardcoded boolean are all superfluous.
-
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 4cdccabc160c..a0c5db8fd72d 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -249,8 +249,7 @@ static bool check_vm_type(unsigned long vm_type)
-        return kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type);
- }
- 
--static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
--                          bool expect_mmap_allowed)
-+static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags)
- {
-        struct kvm_vm *vm;
-        size_t total_size;
-@@ -272,7 +271,7 @@ static void test_with_type(unsigned long vm_type, uint64_t guest_memfd_flags,
- 
-        test_file_read_write(fd);
- 
--       if (expect_mmap_allowed) {
-+       if (guest_memfd_flags & GUEST_MEMFD_FLAG_MMAP) {
-                test_mmap_supported(fd, page_size, total_size);
-                test_fault_overflow(fd, page_size, total_size);
- 
-@@ -343,13 +342,11 @@ int main(int argc, char *argv[])
- 
-        test_gmem_flag_validity();
- 
--       test_with_type(VM_TYPE_DEFAULT, 0, false);
--       if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP)) {
--               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP,
--                              true);
--       }
-+       test_with_type(VM_TYPE_DEFAULT, 0);
-+       if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
-+               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_MMAP);
- 
- #ifdef __x86_64__
--       test_with_type(KVM_X86_SW_PROTECTED_VM, 0, false);
-+       test_with_type(KVM_X86_SW_PROTECTED_VM, 0);
- #endif
- }
