@@ -1,107 +1,77 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43AF71F560B
-	for <kvmarm@lists.linux.dev>; Thu, 24 Jul 2025 06:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074B672628
+	for <kvmarm@lists.linux.dev>; Thu, 24 Jul 2025 06:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753338515; cv=none; b=qt/9zyHtm302xY/Pls1DQyxuWyYv9Fe8sQdUaZ8QvDJr49d2DM4lZ1y0xErWr4+LYhBz50XYDgXmvxOAbsWK8/9jMZFEsSPUT2A5PLKM9o9d0bfCfuf7F/MPnEAIGa6tJMx/0+HUATz2CS9yoG4QA0UX6ngAFHnVNwCIQ8tXSlc=
+	t=1753339776; cv=none; b=gpLFzCc+iTY4Pm35DQ3Wh+ApICoj5WHFiekLve6kebTY0STJ6zg76fly7WnodB9MZGiIW21rABZtblhYvIVbXA1VbLUD4D23FsvzKhWTGjvT9r2T5T3baMVRoiXiHovQ4X3wZXT6M0vVfWLV+7Pq+JT5MFY7NxSburZAec3Yjhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753338515; c=relaxed/simple;
-	bh=IZ9rKwuY1EZI8ALKF+ef02e0GZwWxqUQPI4YkLWWRhs=;
+	s=arc-20240116; t=1753339776; c=relaxed/simple;
+	bh=y6gvWOKqn1VkBsT3jlz9WYen8QQOAewMeSoE2c1oUoo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XNKgZhx0fxEitfTOL7ii+FRBkeFhyeAfk+3Li39OV7F93TQ5/94cd7YqG5xePVqgNNdWUYAo0ynkrMz9ewl7qx1w9gqbQJdRsiOnNVkanikw3kI22zC1ycVcqM4HGq/+kOxzPh/Gs9SAzNydWXBNKUstU3MtdowBw5hrJh2sPR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VXeyVDlQ; arc=none smtp.client-ip=95.215.58.183
+	 MIME-Version:Content-Type; b=XFoVpYHeoZ1hr99oBV4tHP9oDm6yvEXvnN/lS9VjOVJ7F2/HyTycRtLSSyMWNF3c0NMM3N+1n6Wpjo+sYl88GCyKWgqYXPUkLXXaGhVd69l45aMJdT85AQuHClFvieD1Bnd7WELCdnN0eJj8mtU8VYFcdNOgScxNYMEruyf2yXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w4JNZ6Yx; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VXeyVDlQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w4JNZ6Yx"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753338511;
+	t=1753339770;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wGPnF0nbI2y2qT0LV0cxxWHG8MM6SL3+1YP5lvmU1EM=;
-	b=VXeyVDlQb6QPz8b5S1Yh4ZxgVbE1IJzsjLylYuFK5kRrg/yivM3S9bIclIup8OaKPFuO2t
-	HyG5O7zLi0MDb7/5m3Wt+8pJS738CoG90WJOscFbLF2ZM4A/IeIspAhGJMdWcr4zEXkRG2
-	Ak3dZeLbscjI/rT94q0JuGkiou+O6zQ=
+	bh=YdPhV1djSORdygNBzM+zW90AvMnoqU9gTbw9K3O79nM=;
+	b=w4JNZ6Yx5KIHPGvmSHnA9mjNs8BfRS+cx1o547/EFBYQ901cksc9I8GmD65dEvy3Cgfb2f
+	5OjCZrBdZJuj37MB1wjtzP+UBFNGYjKMUHbNqefIzapCKxhweYzWW12k07hrUJ+K6v15oH
+	CxXGvrrl1Di3Jqs0NcXBy0ePL3PJ5Dk=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+To: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eauger@redhat.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v5 6/6] Documentation: KVM: arm64: Describe VGICv3 registers writable pre-init
-Date: Wed, 23 Jul 2025 23:28:05 -0700
-Message-Id: <20250724062805.2658919-7-oliver.upton@linux.dev>
-In-Reply-To: <20250724062805.2658919-1-oliver.upton@linux.dev>
-References: <20250724062805.2658919-1-oliver.upton@linux.dev>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jing Zhang <jingzhangos@google.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	David Woodhouse <dwmw2@infradead.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: KVM: arm64: vgic-its: Return -ENXIO to invalid KVM_DEV_ARM_VGIC_GRP_CTRL attrs
+Date: Wed, 23 Jul 2025 23:49:13 -0700
+Message-Id: <175333974800.2689259.1785304263460558976.b4-ty@linux.dev>
+In-Reply-To: <bbbddd56135399baf699bc46ffb6e7f08d9f8c9f.camel@infradead.org>
+References: <bbbddd56135399baf699bc46ffb6e7f08d9f8c9f.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-KVM allows userspace to control GICD_IIDR.Revision and
-GICD_TYPER2.nASSGIcap prior to initialization for the sake of
-provisioning the guest-visible feature set. Document the userspace
-expectations surrounding accesses to these registers.
+On Mon, 23 Jun 2025 15:22:52 +0200, David Woodhouse wrote:
+> A preliminary version of a hack to invoke unmap_all_vpes() from an ioctl
+> didn't work very well. We eventually determined this was because we were
+> invoking it on the wrong file descriptor, but not getting an error.
+> 
+> 
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- Documentation/virt/kvm/devices/arm-vgic-v3.rst | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+Applied to next, thanks!
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index e860498b1e35..c7a1cd22d814 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -78,6 +78,8 @@ Groups:
-     -ENXIO   The group or attribute is unknown/unsupported for this device
-              or hardware support is missing.
-     -EFAULT  Invalid user pointer for attr->addr.
-+    -EBUSY   Attempt to write a register that is read-only after
-+             initialization
-     =======  =============================================================
- 
- 
-@@ -120,6 +122,15 @@ Groups:
-     Note that distributor fields are not banked, but return the same value
-     regardless of the mpidr used to access the register.
- 
-+    Userspace is allowed to write the following register fields prior to
-+    initialization of the VGIC:
-+
-+      =====================
-+      GICD_IIDR.Revision
-+      GICD_TYPER2.nASSGIcap
-+      =====================
-+
-+
-     GICD_IIDR.Revision is updated when the KVM implementation is changed in a
-     way directly observable by the guest or userspace.  Userspace should read
-     GICD_IIDR from KVM and write back the read value to confirm its expected
-@@ -128,6 +139,12 @@ Groups:
-     behavior.
- 
- 
-+    GICD_TYPER2.nASSGIcap allows userspace to control the support of SGIs
-+    without an active state. At VGIC creation the field resets to the
-+    maximum capability of the system. Userspace is expected to read the field
-+    to determine the supported value(s) before writing to the field.
-+
-+
-     The GICD_STATUSR and GICR_STATUSR registers are architecturally defined such
-     that a write of a clear bit has no effect, whereas a write with a set bit
-     clears that value.  To allow userspace to freely set the values of these two
--- 
-2.39.5
+[1/1] KVM: arm64: vgic-its: Return -ENXIO to invalid KVM_DEV_ARM_VGIC_GRP_CTRL attrs
+      https://git.kernel.org/kvmarm/kvmarm/c/4530256f3699
 
+--
+Best,
+Oliver
