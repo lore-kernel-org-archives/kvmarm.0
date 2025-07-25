@@ -1,139 +1,102 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40F32EE266
-	for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 14:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC891E766F
+	for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 14:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753454502; cv=none; b=DruQijVBQlXYCsUSlQWl4vYsUNIquzO0j7DlC9iybFDRMe9wbTqoh8prScQNIGBqXuoQVRAy2UtjgdDdFyYlp9gd6GRomVHiA2/X+q5TuXWwYyen0LKXlS4e9hRo+VBYcZwVC8/z0XejUgTX2Ojx9SiFdMGSqHOGNFOCR4ISVns=
+	t=1753455399; cv=none; b=DHDhpK6Y/iSz9yAqLvrgTvKT5buuJRnu/i1guTl39tdd8p+O6UkCUfV+7Dyym9uqNkUvlE8uok0AmtCseQODW7p6lzNpZOtfcLbofSlJB6yIhr5KM6ma2wHAA//JvImrvwQhezqfJVgWVvoulThCJySdS1jnMWvkgnrgmIKoxr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753454502; c=relaxed/simple;
-	bh=qO7Oxu4MghnFe89SQZSfyy3L7Fji0ufbNWOYNTXTM5c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LkvyjtRtH9Rl+4tQ1seQl9Vy3JRamWp9GLzsCy1EvH2nIqMBGf1Uuw2CqMDUs0lu8ohsmuGedyPz1HghrKY32f+j/BRllTGmiRJY0tGfUUz9iNePjfqfuvpr5Qwi1L/Oa7lqSzRTdVXIaAT/EtuGpdZi87TzQa6wohHCemKkr30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 778752C27;
-	Fri, 25 Jul 2025 07:41:33 -0700 (PDT)
-Received: from donnerap.arm.com (donnerap.manchester.arm.com [10.32.101.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10E843F778;
-	Fri, 25 Jul 2025 07:41:38 -0700 (PDT)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v2 6/6] arm64: Generate HYP timer interrupt specifiers
-Date: Fri, 25 Jul 2025 15:41:00 +0100
-Message-Id: <20250725144100.2944226-7-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250725144100.2944226-1-andre.przywara@arm.com>
-References: <20250725144100.2944226-1-andre.przywara@arm.com>
+	s=arc-20240116; t=1753455399; c=relaxed/simple;
+	bh=K3fLhkRTCvPWFzXF+RTlvEpWsEqZfAX/VnDQbwLix5I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DmHIbPOmTHyu07JPbFotcIob+MzQZ16OHw3bKFcuDaR63aLbWakfrP1jjPKdZkX9Kx1sFy81SCDGftQ/gG7BydDHUA8ALQSOvciD7qmErIjMnytY3VhLpS5x0rCwKXTqlFZtV3kGMpjmiwubZ+hWTBULC8EHwfA/YXPrlnBIdH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MGy/3ADM; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MGy/3ADM"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-235eefe6a8fso17304695ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 07:56:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753455398; x=1754060198; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M11ZItqJowsXWKLvHpygzI/Vvsnt9QVCd1UdBgcxgdM=;
+        b=MGy/3ADMt8IYsa+vX5Vj/U0G3trFjtKzuvocgYbMPBNKtR3mLO6ohVoTZynueuSQ95
+         R1hp8ydKVJJaDMycYxzAsd5xb21N5nKRMhvEh7YHXh21XXYQ6uAB6zw1PBwH/ozfS8Az
+         h38nnSdM94Xm4r2Hg+e0Gp8OUSlPm6sR7uZEjJ5kXTbhzmnMpymtpEneRUIaGmCsHnd6
+         iqczkj89wfwK1hiJsRSyn8YCPbE4TatkmyQuuFI/YJZV/7X3pB5xlzv/XA1WVzuaxdok
+         ZuIbpUudoem3WSeDevP5Cl6zimwIjzXksebh4y7OaNCrkWq/6GS4iobnLmPJSxWerMvK
+         0ydg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753455398; x=1754060198;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M11ZItqJowsXWKLvHpygzI/Vvsnt9QVCd1UdBgcxgdM=;
+        b=mDAIkRw0NNH1fFrzXaYBOoKe/i5jf/nSahbaVi/DG9fmDl0EFEb7UWHvqJ9+k23EZX
+         SSM/Z6HFBpBR3k1FZnOr6SubX5zg/Fq/0D3sFiBYZEFdnXBHFf2lk0WuWeYA9xSiNSvV
+         r67j2jCEbkmtbx359mW1M+RfPykCXUomaulDyCbXAvxJe3uMuxHSoIlKe7G138RuFlnv
+         Dy/vfwxRbPLLfdVOtDZ5ZPCIcIWj/R1LGJVSqq2yer+dYvGfDcWhO3eN2zZvMlRb0xQM
+         yAOdiI34fufrUWBk9cLQCWrBPH9SIpT1R/cPPJ0XxAW0rJhsyffYWTH+wy5vzEhrwAow
+         2LuA==
+X-Forwarded-Encrypted: i=1; AJvYcCXdTowZ07vKmwCMgMIf6n8A3AXdbnBfRrsGuwfyDAVzh35QdI5tK3tPfdTOPG6xN3x7OaMOi6E=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzxj4IEu9MyZ2NUyrS+dISGmboPTHYblrC0+/eNYzu+mvrNydyG
+	9XgMrspGdtPFaAulTr+Ii6eUZQfuf+TWzzCNL02LOXRE5MLuzq+LEqJjhYTpWZOLIer4SwyZ+qO
+	j0DVuag==
+X-Google-Smtp-Source: AGHT+IHSdqHbxeeeIonkSh5BY2m83Kk+wImCtE785oBEw0uVpGh4sf1S5Bqzy2yOyFZqFe/ReQAn+EAhx5g=
+X-Received: from pjvf3.prod.google.com ([2002:a17:90a:da83:b0:312:ea08:fa64])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ca8d:b0:23f:b954:eee
+ with SMTP id d9443c01a7336-23fb9541174mr15170785ad.35.1753455397682; Fri, 25
+ Jul 2025 07:56:37 -0700 (PDT)
+Date: Fri, 25 Jul 2025 07:56:36 -0700
+In-Reply-To: <diqz4iv1dudx.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250723104714.1674617-1-tabba@google.com> <diqz4iv1dudx.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <aIObJH439LQWjnqq@google.com>
+Subject: Re: [PATCH v16 00/22] KVM: Enable host userspace mapping for
+ guest_memfd-backed memory for non-CoCo VMs
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-From: Marc Zyngier <maz@kernel.org>
+On Thu, Jul 24, 2025, Ackerley Tng wrote:
+> Fuad Tabba <tabba@google.com> writes:
+> 
+> [snip]
+> 
+> Did the patch [1] for x86/mmu that actually allows faulting when
+> kvm_memslot_is_gmem_only() get dropped by accident?
 
-FEAT_VHE introduced a non-secure EL2 virtual timer, along with its
-interrupt line. Consequently the arch timer DT binding introduced a fifth
-interrupt to communicate this interrupt number.
+Ah shoot, it did get dropped.  I have a feeling Fuad read "drop the helper" as
+"drop the patch" :-)
 
-Refactor the interrupts property generation code to deal with a variable
-number of interrupts, and forward five interrupts instead of four in case
-nested virt is enabled.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm64/arm-cpu.c           |  4 +---
- arm64/include/kvm/timer.h |  2 +-
- arm64/timer.c             | 29 ++++++++++++-----------------
- 3 files changed, 14 insertions(+), 21 deletions(-)
-
-diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-index 1e456f2c6..abdd6324f 100644
---- a/arm64/arm-cpu.c
-+++ b/arm64/arm-cpu.c
-@@ -12,11 +12,9 @@
- 
- static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
--	int timer_interrupts[4] = {13, 14, 11, 10};
--
- 	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip,
- 				kvm->cfg.arch.nested_virt);
--	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
-+	timer__generate_fdt_nodes(fdt, kvm);
- 	pmu__generate_fdt_nodes(fdt, kvm);
- }
- 
-diff --git a/arm64/include/kvm/timer.h b/arm64/include/kvm/timer.h
-index 928e9ea7a..81e093e46 100644
---- a/arm64/include/kvm/timer.h
-+++ b/arm64/include/kvm/timer.h
-@@ -1,6 +1,6 @@
- #ifndef ARM_COMMON__TIMER_H
- #define ARM_COMMON__TIMER_H
- 
--void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs);
-+void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm);
- 
- #endif /* ARM_COMMON__TIMER_H */
-diff --git a/arm64/timer.c b/arm64/timer.c
-index 861f2d994..2ac6144f9 100644
---- a/arm64/timer.c
-+++ b/arm64/timer.c
-@@ -5,31 +5,26 @@
- #include "kvm/timer.h"
- #include "kvm/util.h"
- 
--void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
-+void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
- 	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
- 	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
--	u32 irq_prop[] = {
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[0]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-+	int irqs[5] = {13, 14, 11, 10, 12};
-+	int nr = ARRAY_SIZE(irqs);
-+	u32 irq_prop[nr * 3];
- 
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[1]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-+	if (!kvm->cfg.arch.nested_virt)
-+		nr--;
- 
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[2]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
--
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[3]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
--	};
-+	for (int i = 0; i < nr; i++) {
-+		irq_prop[i * 3 + 0] = cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI);
-+		irq_prop[i * 3 + 1] = cpu_to_fdt32(irqs[i]);
-+		irq_prop[i * 3 + 2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW);
-+	}
- 
- 	_FDT(fdt_begin_node(fdt, "timer"));
- 	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
--	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, nr * 3 * sizeof(irq_prop[0])));
- 	_FDT(fdt_property(fdt, "always-on", NULL, 0));
- 	if (kvm->cfg.arch.force_cntfrq > 0)
- 		_FDT(fdt_property_cell(fdt, "clock-frequency", kvm->cfg.arch.force_cntfrq));
--- 
-2.25.1
-
+Faud, given the growing list of x86-specific goofs, any objection to me sending
+v17?  I'd also like to tack on a selftest patch to verify that KVM can actually
+fault-in non-private memory via a guest_memfd fd.
