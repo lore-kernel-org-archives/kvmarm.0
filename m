@@ -1,100 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968912EE619
-	for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 16:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6CB2EE5F6;
+	Fri, 25 Jul 2025 17:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753462547; cv=none; b=eMPkUOc9Rk4+0TZOlKv10I7VngGnDLJMe9TwzHliH3q8/c+BwXyFdWesz6Fw3VajGtbwX7SbAd4EPv8a+tu44T8OQ5EqlMvkMXv8xPCO7Tb9KupgqR8fftYnBsWqw2aguw4L/a0PKXpGAyw/Um+HOuuH0RFjM58mXDpXnqdKJNM=
+	t=1753463288; cv=none; b=ro55/MtgOx3S05jvoy5lGfbrKKy4L4qJEX24L0nRacIM30M195EDAFkHerdwHHFsDJ3tIkbO9WEHF37bwkJsWXARd3Lfux54FdgEeHZQyxA+RxW8O3mr6xYMyr1eQnUmOg8iJj3/n4HoPK5FUxB1qktTM+pxitteOhkpdkLRu6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753462547; c=relaxed/simple;
-	bh=embWWfVgdg+hk6WHOpmeT/96SmWYHdiqd8vv3B0Ty04=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EKrkL7Kf/zVTV6pnXRMERRHMWopJynYvl0eNgLhV+/C1pgJV4hD2hvfmSuIFU5ErCxL/UO/RPYNrYuIh8w6cBVrxbEf4YT4wEq9BLnmd1W4SjdyKkoDksatF4nWYNOSyDKEAO7HcVLCj8v6gfZk3eay3L6FnFWop1TWBSLxkCPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AdOETbGC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753463288; c=relaxed/simple;
+	bh=eEiIL0rv55Mb2Vf0/AmSi7VJDqvdOD9ADdquhg19Z44=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c8kIN+/Y7k9o49XzpYBr36hhuFkXyvhjNPnQDHeqxJnCO0DNN4F2m9Y6JuvgxRzyD1JM6b096mUFzOKoOLjc8hmez4aGw4VISOekXZzJBVh+aVO3odW4nrpJ4QJukJdvJlEWAhdSOt+vjeG6hXO+gt4Vwxb6QMZhe2hPVrTuk2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=zqns/GEB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AdOETbGC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13114C4CEEB;
-	Fri, 25 Jul 2025 16:55:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753462546;
-	bh=embWWfVgdg+hk6WHOpmeT/96SmWYHdiqd8vv3B0Ty04=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AdOETbGCNjLUbcdRi3NF1+hwU0O0Ofzhjrhk52dpr6XDwmZBzXKJ0V2fm6APVzzgE
-	 o/UV88l1nVfeqZgH7EQH8bpdkT5yWdIZr196ukzvDD3ObvQvQP2TSqv3BEC+8MoPeN
-	 7gTk4IkmBkKJyf3HGxGLW36dx5fAbBtZh2ZLHBQXOMq6JfHGvJkKKIReo9rRZC2PAZ
-	 7aB/szB8lRugpp+AOp0IjDBusUwM/hZ/xgQiuFPUYQoKC+2MLYkUeIxoAbtCOSUVJO
-	 RuEbBm3yPV9J0hW0TC8oVaod+bv2o/RsQmuu9dgAgI7XY6pV63I5dLKoPPmjcItWvS
-	 lOcTR5c/k7hBg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ufLhw-001Okz-6L;
-	Fri, 25 Jul 2025 17:55:44 +0100
-Date: Fri, 25 Jul 2025 17:55:42 +0100
-Message-ID: <86a54s8b1t.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="zqns/GEB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3832BC4CEE7;
+	Fri, 25 Jul 2025 17:08:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1753463287;
+	bh=eEiIL0rv55Mb2Vf0/AmSi7VJDqvdOD9ADdquhg19Z44=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=zqns/GEB3bmWH+iIQWRad69gSqXISVZ56gvDEmAHEGZ+iO2A8kwbdAAR3JUSJ0Go6
+	 YBqyQFLrgTFdlcgFa21yjYMkzKEcJOXcZ2OgimQgjqA9jXUj5DTSMhEClqto1FqL0M
+	 b26HA8kAP3Y1At2Q4c6tVwgJufnh9R6TsVr//u8w=
+Date: Fri, 25 Jul 2025 19:08:03 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Justin Stitt <justinstitt@google.com>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eauger@redhat.com>,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v5 0/6] KVM: arm64: Allow userspace to write GICD_TYPER2.nASSGIcap
-In-Reply-To: <20250724062805.2658919-1-oliver.upton@linux.dev>
-References: <20250724062805.2658919-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Tom Rix <trix@redhat.com>,
+	Christopher Covington <cov@codeaurora.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH 6.1.y] KVM: arm64: silence -Wuninitialized-const-pointer
+ warning
+Message-ID: <2025072504-easel-propose-0474@gregkh>
+References: <20250724-b4-clidr-unint-const-ptr-v1-1-67c4d620b6b6@google.com>
+ <2025072553-chevy-starter-565e@gregkh>
+ <20250725163851.GB684490@ax162>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eauger@redhat.com, ben.horgan@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250725163851.GB684490@ax162>
 
-On Thu, 24 Jul 2025 07:27:59 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, Jul 25, 2025 at 09:38:51AM -0700, Nathan Chancellor wrote:
+> On Fri, Jul 25, 2025 at 10:58:05AM +0200, Greg KH wrote:
+> > On Thu, Jul 24, 2025 at 06:15:28PM -0700, Justin Stitt wrote:
+> > > A new warning in Clang 22 [1] complains that @clidr passed to
+> > > get_clidr_el1() is an uninitialized const pointer. get_clidr_el1()
+> > > doesn't really care since it casts away the const-ness anyways.
+> > 
+> > Is clang-22 somehow now a supported kernel for the 6.1.y tree?  Last I
+> > looked, Linus's tree doesn't even build properly for it, so why worry
+> > about this one just yet?
 > 
-> v4 -> v5:
->  - Fix polarity of nASSGIreq masking (Ben)
->  - Explicitly call out some subtle changes made in changelogs (Eric)
->  - Avoid open-coding irq_is_ppi() (Eric)
+> Our goal is to have tip of tree LLVM / clang be able to build any
+> supported branch of the kernel so that whenever it branches and
+> releases, the fixes for it are already present in released kernel
+> versions so users can just pick them up and go. We are going to have to
+> worry about this at some point since it is a stable-only issue so why
+> not tackle it now?
 > 
-> Oliver Upton (4):
->   KVM: arm64: Disambiguate support for vSGIs v. vLPIs
->   KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
->   KVM: arm64: vgic-v3: Allow access to GICD_IIDR prior to initialization
->   Documentation: KVM: arm64: Describe VGICv3 registers writable pre-init
+> > > Silence the warning by initializing the struct.
+> > 
+> > Why not fix the compiler not to do this instead?  We hate doing foolish
+> > work-arounds for broken compilers.
 > 
-> Raghavendra Rao Ananta (2):
->   KVM: arm64: vgic-v3: Allow userspace to write GICD_TYPER2.nASSGIcap
->   KVM: arm64: selftests: Add test for nASSGIcap attribute
-> 
->  .../virt/kvm/devices/arm-vgic-v3.rst          | 17 +++++
->  arch/arm64/kvm/vgic/vgic-init.c               | 21 +++---
->  arch/arm64/kvm/vgic/vgic-kvm-device.c         | 70 ++++++++++++-------
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c            | 33 +++++++--
->  arch/arm64/kvm/vgic/vgic-v4.c                 |  4 +-
->  arch/arm64/kvm/vgic/vgic.c                    |  4 +-
->  arch/arm64/kvm/vgic/vgic.h                    |  8 +++
->  include/kvm/arm_vgic.h                        |  3 +
->  tools/testing/selftests/kvm/arm64/vgic_init.c | 42 ++++++++++-
->  9 files changed, 150 insertions(+), 52 deletions(-)
-> 
-> 
-> base-commit: 86731a2a651e58953fc949573895f2fa6d456841
+> While casting away the const from the pointer in this case is "fine"
+> because the object it pointed to was not const, I am fairly certain it
+> is undefined behavior to cast away the const from a pointer to a const
+> object, see commit 12051b318bc3 ("mips: avoid explicit UB in assignment
+> of mips_io_port_base") for an exampile, so I am not sure the warning is
+> entirely unreasonable.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Hah, we've been doing that for _decades_ with container_of(), so if that
+is UB, and the compiler can't handle it, I'd declare that a broken
+compiler :)
 
-	M.
+Look at e78f70bad29c ("time/timecounter: Fix the lie that struct
+cyclecounter is const") in linux-next as one example of me trying to fix
+that mess up.  It's going to take a bunch of work to get there, but
+eventually we will.  We will not be backporting all of those patches
+though, that would be way too much work.
 
--- 
-Without deviation from the norm, progress is not possible.
+Anyway, as the maintainer doesn't seem to want this, I guess I'll just
+ignore it for now?
+
+thanks,
+
+greg k-h
