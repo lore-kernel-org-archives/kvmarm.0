@@ -1,127 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302D821C16E;
-	Fri, 25 Jul 2025 07:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435221FC3;
+	Fri, 25 Jul 2025 08:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753428626; cv=none; b=u76eaJSwrws7kqUUbbiCT8W1K9CIDnbIYL4ifF4FzQmZU5uACfmqf70DL7M5pYXZR/uwuCUtDVsShdKf29xfvCAVviOADhQdzS+N1U0+HmRMco7a/waJqtXuvd/5cZHPLzu8azGzqLgSjygkVGVLhzxOlXlWIXWSQ17qRUGBO2k=
+	t=1753433889; cv=none; b=gm5tTyKSAw3uBd8k74hUliBulMhGd1l8mjU3ALj44OG39fyQsDdy7Nq9pn5l71vd/Y7KUjj2dXfmpwD/FkR3ueUdrYCDQTGG7liNz2c9XvpwmCweZMR2bCrPnvo4ZcH04ZI2ri9XUC6h+8ULNr6J5gkg5gXkfVpnIjxE1iymy4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753428626; c=relaxed/simple;
-	bh=nua92x0daTGPAa9Lcxv8VEukL2BqG6YUkO/iJsGHqfA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KBc/sryH8pMjsxK2XUOPlkTgoVcXXsm8doMuafGRpx/v5a+H9c2s6a5zG5tvhUqLYn5a5tXmnSegc9TX7Q+fuNpNnig1cQhKXaJ7GvOwe9Q4gkSinYkHky98/DXrn4vfQLBrL99Dz6Jg9f/X+TOhb4+ZGFXchx1W1j74/M+HlVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PktTho9E; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753433889; c=relaxed/simple;
+	bh=QtxpewwK7kkW/Bjl18jPOJCT95GV3NoscW3glHHVwjo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YLf9T3D0hBX1q2vihXa/r9lR2d5IDu2f+zTDpxOpkAByKH0Os8XhwuHUByGRnaBTLADsJ1rpttPdi9tJXSyLMeJyObj9kEINyk9iHOSZsl+ksveDgwIiLD4pIdd1FHYxBzvZVn/UzPQS9XlmZ6qzc84eaI8hXy2qmAnZKCirtqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gF2Elkoq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PktTho9E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1BCCC4CEF7;
-	Fri, 25 Jul 2025 07:30:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753428625;
-	bh=nua92x0daTGPAa9Lcxv8VEukL2BqG6YUkO/iJsGHqfA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PktTho9E1qwbQ/oaxMdmeQZJbUc0K+8IsdTr+SwJFzoGdb0F6AeGY5Vqj4wuy38lH
-	 V23AMLL1R3Vn6AmmcLnifTbF6b/hkCJco73Njoa9ggokJklTYud+ujwle460wD7KAX
-	 DjJ2gEFn6v5RyCa1QrR9oSmtTXwEQtkP3xuy7DpNJJZ00olhAuIU/anO3JAeKbLO9W
-	 FTc2c0xKTsd6RDULQyZSrAiSFGdD+5X9rw/QPtOlr+Qqd1+jg4AawKXpgpP6NDf1lx
-	 y5i6bwaAHzg+gxvZLvK4hCxqKwuPoE0GGyAd9K+CtqwmECNBrVrhyPp2IdnlnqPih+
-	 o9LZ/32NZtH0Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ufCsp-001GT7-59;
-	Fri, 25 Jul 2025 08:30:23 +0100
-Date: Fri, 25 Jul 2025 08:30:21 +0100
-Message-ID: <86frek9182.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gF2Elkoq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFF9AC4CEE7;
+	Fri, 25 Jul 2025 08:58:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1753433889;
+	bh=QtxpewwK7kkW/Bjl18jPOJCT95GV3NoscW3glHHVwjo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gF2Elkoq1uITtu2enh9+w6hxDy4ixmMCri32Tk+lYTGc55W+GA27U4uo/vrR58cEC
+	 FTJGMvPiisjMIsM4NgIQn3h1mVx/YxhHsLdT/hYtj+mfSdhGujPxsBqUCi9KE0lMI/
+	 I0a8fMmmfi0/EQu/DWdI9edrPnNJHECQDhgEAaJU=
+Date: Fri, 25 Jul 2025 10:58:05 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
 To: Justin Stitt <justinstitt@google.com>
-Cc: James Morse <james.morse@arm.com>,
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Tom Rix <trix@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 6.1.y] KVM: arm64: silence -Wuninitialized-const-pointer warning
-In-Reply-To: <20250724-b4-clidr-unint-const-ptr-v1-1-67c4d620b6b6@google.com>
+	Nathan Chancellor <nathan@kernel.org>, Tom Rix <trix@redhat.com>,
+	Christopher Covington <cov@codeaurora.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH 6.1.y] KVM: arm64: silence -Wuninitialized-const-pointer
+ warning
+Message-ID: <2025072553-chevy-starter-565e@gregkh>
 References: <20250724-b4-clidr-unint-const-ptr-v1-1-67c4d620b6b6@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: justinstitt@google.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, nathan@kernel.org, trix@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250724-b4-clidr-unint-const-ptr-v1-1-67c4d620b6b6@google.com>
 
-[Dropping a few emails from the list, as they are very likely to
- simply bounce]
-
-On Fri, 25 Jul 2025 02:15:28 +0100,
-Justin Stitt <justinstitt@google.com> wrote:
-> 
+On Thu, Jul 24, 2025 at 06:15:28PM -0700, Justin Stitt wrote:
 > A new warning in Clang 22 [1] complains that @clidr passed to
 > get_clidr_el1() is an uninitialized const pointer. get_clidr_el1()
 > doesn't really care since it casts away the const-ness anyways.
-> 
+
+Is clang-22 somehow now a supported kernel for the 6.1.y tree?  Last I
+looked, Linus's tree doesn't even build properly for it, so why worry
+about this one just yet?
+
 > Silence the warning by initializing the struct.
-> 
-> This patch won't apply to anything past v6.1 as this code section was
-> reworked in Commit 7af0c2534f4c ("KVM: arm64: Normalize cache configuration").
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 7c8c5e6a9101e ("arm64: KVM: system register handling")
 
-No, this really doesn't fix anything other than paper over an
-overzealous warning.
+Why not fix the compiler not to do this instead?  We hate doing foolish
+work-arounds for broken compilers.
 
-> Link: https://github.com/llvm/llvm-project/commit/00dacf8c22f065cb52efb14cd091d441f19b319e [1]
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f4a7c5abcbca..d7ebd7387221 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2948,7 +2948,7 @@ int kvm_sys_reg_table_init(void)
->  {
->  	bool valid = true;
->  	unsigned int i;
-> -	struct sys_reg_desc clidr;
-> +	struct sys_reg_desc clidr = {0};
->  
->  	/* Make sure tables are unique and in order. */
->  	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
-> 
+thanks,
 
-Frankly, this sort of things is the worse you can do, as
-
-- it perpetuates a bad design
-
-- it is completely pointless, as you pointed out
-
-- it is only going to make it harder to backport other patches
-
-The correct fix would be to backport the series described in
-e8789ab7047a8, which should be easy enough to apply. it would also
-make 6.1 less of a terrible kernel.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+greg k-h
