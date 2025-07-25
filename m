@@ -1,150 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF9E2E5B32;
-	Fri, 25 Jul 2025 10:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442471D63C7
+	for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 13:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753441197; cv=none; b=Vj9vaOIrq5odjzBLXfPWCaJfzIAsc6SOTDaeRtEahmVZO+5XE+dRJjW76L/hQsrDmS6ApvLUW2CnYMUuKIUbsuMmvK3ltuM1eC2bWzn73okTfqCppr9HNn92UHdx/mTbA+L0PfBtwb1jOQ3O4Rc72s19UuucSSb0uPFKKPwt0Lk=
+	t=1753451588; cv=none; b=TiEyPkwJrNNR0K1uIPYpOykmwIACW6WPj/RdTsvsBn1dei7CkJUr1MshPj6qhiY+b3Lq8UZTXukhyAtd3CSOfyhFrcXE0fs1USF6mnzunNKVyRmHuiz/7UCsDHiUAYoLY0lMTICTzHnAl1vwzKuqf6e7yhPMAf4MMHG8UNlnN1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753441197; c=relaxed/simple;
-	bh=bUcU0cDobyQLiDEp8CMj60WJQEIv2TENj1HTo6Qkt9A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IKbBN5kk8dFo/6/sCjc5gDMTc/0rFYxiYroYzLaSea2n4ixFeACMfJ3Ie58IUlbTtqinAGckQS2Y3JBxa19z5d6/2OsIUdZfQiJWScblEPLj69+vWYZh9AKiggOyK3rx6VkERqlAULjWjthfYEeHvSZbU4SfBQVnDdLalbD/iY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LouPv15I; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753451588; c=relaxed/simple;
+	bh=N87jvq3BUY2gPXiuHgKyY6u8QFonP5K7Oiq3uLPHJa0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=JCsiVECXIhU5vIMa9wjPkNqrsOQMsgOJ3k6/aSuxGcnKujQ1r/8jCwB9SHeCeBDSEDLXifvrju7L2mZvv4HliIDrbAnt08tz9oggkulPNOgv/O6TI8Ll7niZ/szWUF/wG0akqq0B6NlUVgZJACtgy1peQTwNYRO0sLNf3ex1gX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E2SkudtI; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LouPv15I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98D28C4CEE7;
-	Fri, 25 Jul 2025 10:59:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753441196;
-	bh=bUcU0cDobyQLiDEp8CMj60WJQEIv2TENj1HTo6Qkt9A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LouPv15IyL7WQztlYQATxazBJpsdsDswdQ1iYdVQB47FExi3Dm+QBnsxhItQ0IiFS
-	 Hsk1jXWPip8IpipAwm4pGCQQK4YTIKep8GzyKNciqYHe5ZyTJDdWhhJh/ZpucUZGm6
-	 HBZPVLkjihDL11jcyUeLTnicx/K4Wqjwc+GGEZG74BnubN1vSE5s+4/a7ueysM9PB1
-	 RZbPaJ4W00Kfuam5WTmxs7iY12nWVUwlXCGk/ucYDYfKDOafO8twOA2QnZ7ABFzHpT
-	 J8E1/KWOzzU4aq1sE0Qpdu4GtGOuzLQf4W6TpoS4/goTfNbrEL+mFtCsIlBB96TJMu
-	 NsRa76FZ+ffbw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ufG9a-001JSg-4Q;
-	Fri, 25 Jul 2025 11:59:54 +0100
-Date: Fri, 25 Jul 2025 11:59:52 +0100
-Message-ID: <86ecu48riv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Eric Auger <eauger@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	seanjc@google.com,
-	darren@os.amperecomputing.com
-Subject: Re: [RFC PATCH v2 0/9] KVM: Enable Nested Virt selftests
-In-Reply-To: <ccd8caba-95b9-450e-afb1-deb0c42b781b@os.amperecomputing.com>
-References: <20250512105251.577874-1-gankulkarni@os.amperecomputing.com>
-	<92c7e99c-5574-422c-92f1-62d5cde58fec@redhat.com>
-	<7bf7bd52-7553-42a7-afdb-a5e95f8699b5@os.amperecomputing.com>
-	<86a56veiyy.wl-maz@kernel.org>
-	<3be548bf-aee4-46ab-bcbf-15bf629b24da@os.amperecomputing.com>
-	<86jz58c5ut.wl-maz@kernel.org>
-	<9d5d82f1-b488-4b0a-98c2-27e95d63fc5c@os.amperecomputing.com>
-	<867c12czux.wl-maz@kernel.org>
-	<ccd8caba-95b9-450e-afb1-deb0c42b781b@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E2SkudtI"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31332dc2b59so2181146a91.0
+        for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 06:53:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753451585; x=1754056385; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2IFcEZdb1xoyZWA8WbMS+NhaC+YIouhMl5iAhysDSTg=;
+        b=E2SkudtI8J5FDSKDuikfkywxFrwAEy/1VIF6SmmnZD8+F53L4CwMqMwPdabYLpQUG+
+         +pNlhRje5CsJVrr+5NwjqjtT2SV/z6Y1vYS6D7kS/9M65h51qcsem6qrQpljz0j99OyQ
+         m2VCUDB2kOrlgEkgU2iYe6UAz8oWiAMGujrUeJYWyFcQIfnas4ScJb1Rme+tOhrc+IH4
+         PgsL/dSqBX9RnIi7K9s+iV/MkVC5sc69MzV/b2A7j3YBkEcv5uOyS/B2aUGDAn5IPpER
+         F1DIcURJ4c25ZVuTxSQbX9u18EjE0W+OjU6+7DQv2tOoWGkgevYqrft7yVI+Ge6+KGQi
+         nGdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753451585; x=1754056385;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2IFcEZdb1xoyZWA8WbMS+NhaC+YIouhMl5iAhysDSTg=;
+        b=mBa9Vdp4NQOtFze/TfmmJQ7rkRvhpACaaXZRGWLW0Jt7gBoc36v/Sd1Og5AB6pUOl5
+         5/o1jRsJA4PrmpN3fC8XFg2aoLDzftXjrAeSIXppyJQwXgwnt5INORIrX8N5YRkzOVLi
+         jULBAp9svY+UfgTzUNie6VVpbstuNzMClLUdOMYoly/lqKGkiMMmpp+EJB6HQVHPrn8l
+         f9WIqfXktqNtZcD0aBhmDmuK7dG8rp6uqm/j3BZEbGy/srwHupEGDP7OtxAyQnSg5rco
+         D8Xbm55VgYVq10Q5uNty8QOHtqlo853XtUhT4aciEDFapLJSmhAiOWemfVm912qQyZc1
+         mvlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXnDhwUC2mH/RdW60kDUzkbDdbuT4nqNpLLDshf7IvMOMaZY5Butk6aFecAIhw5jhj/62nY/EU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyMVyyEbcyoNQryj8rq+VJHRDJk0yKUvDmkLEd6l3vGsEvWKKQF
+	l5eiRt8ZmHgOlUnazvggWb/1YqNzcS3X7k+dIhv7YO/pKVCv2qRfcbCxG4XHJxaObLro6iZM+6v
+	7tjmB8A==
+X-Google-Smtp-Source: AGHT+IFjGdSbLTJQeXBeF3KPsF2x5fp/wtnoZ2iNYJbBIB/HYs8Zqa8zIKSNCWliwPnicno1k0gnFATv6p4=
+X-Received: from pjbsp12.prod.google.com ([2002:a17:90b:52cc:b0:312:1af5:98c9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5804:b0:311:f99e:7f4e
+ with SMTP id 98e67ed59e1d1-31e779fa061mr2853030a91.16.1753451584187; Fri, 25
+ Jul 2025 06:53:04 -0700 (PDT)
+Date: Fri, 25 Jul 2025 06:53:02 -0700
+In-Reply-To: <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, eauger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com, darren@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-16-tabba@google.com>
+ <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <aIOMPpTWKWoM_O5J@google.com>
+Subject: Re: [PATCH v16 15/22] KVM: x86/mmu: Extend guest_memfd's max mapping
+ level to shared mappings
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 25 Jul 2025 11:01:05 +0100,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> 
-> Hi Marc,
-> 
-> On 6/23/2025 7:41 PM, Marc Zyngier wrote:
-> > On Mon, 23 Jun 2025 11:31:32 +0100,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >> 
-> >> On 6/19/2025 5:15 PM, Marc Zyngier wrote:
-> >>>>    >
-> >>>>> Also, running EL2 is the least of our worries, because that's pretty
-> >>>>> easy to deal with. It is running at EL1/0 when EL2 is present that is
-> >>>>> interesting, and I see no coverage on that front.
-> >>>> 
-> >>>> Sorry, I did not get this comment fully.
-> >>>> When we run selftest on Host with -g option, the guest code will run in vEL2 as L1.
-> >>>> This is implemented as per comment in V1.
-> >>>> 
-> >>>> When we run same selftest from L1 shell, then guest_code will be running in EL0/1 like running from L0.
-> >>> 
-> >>> What good does this bring us if we need to boot a full guest OS to run
-> >>> tests? What we need is synthetic tests that implement the whole stack:
-> >>> 
-> >>> - L1 guest hypervisor
-> >>> - L2 guest hypervisor
-> >>> - L2 guest
-> >>> - L3 guest hypervisor
-> >>> - L3 guest
-> >>> - [...]
-> >> 
-> >> IIUC, selftest leverages host OS support and uses various IOCTLs to
-> >> support the guest_code run. Are you saying to implement all this
-> >> again (without OS help) in guest_code to run it as hypervisor and
-> >> launch guest_code2 as NestedVM?.
-> > 
-> > The whole point of having small selftests is to run something that is
-> > simpler several orders of magnitude simpler than the full blown
-> > OS/hypervisor. So indeed, I'm asking for selftests that build chains
-> > of guests up to some level and verify that the nesting, as described
-> > in the architecture, works correctly.
-> > 
-> 
-> Do you see value in the patches as they are, without the changes to
-> support the bare-metal hypervisor in guest or will you only consider
-> them if they are first reworked to support the recursive guests?
+On Thu, Jul 24, 2025, Ackerley Tng wrote:
+> Fuad Tabba <tabba@google.com> writes:
+> >  int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *=
+fault,
+> > @@ -3362,8 +3371,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm, st=
+ruct kvm_page_fault *fault,
+> >  	if (max_level =3D=3D PG_LEVEL_4K)
+> >  		return PG_LEVEL_4K;
+> > =20
+> > -	if (is_private)
+> > -		host_level =3D kvm_max_private_mapping_level(kvm, fault, slot, gfn);
+> > +	if (is_private || kvm_memslot_is_gmem_only(slot))
+> > +		host_level =3D kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
+> > +							is_private);
+> >  	else
+> >  		host_level =3D host_pfn_mapping_level(kvm, gfn, slot);
+>=20
+> No change required now, would like to point out that in this change
+> there's a bit of an assumption if kvm_memslot_is_gmem_only(), even for
+> shared pages, guest_memfd will be the only source of truth.
 
-Running existing tests at EL2 may an interesting goal, but the way
-you've gone about it is really wrong. These tests are not about
-"nested", they are about running at EL2. So getting rid of all the
-"nested" nonsense in patch #1 and focusing on the *two* flavours of
-EL2 would be a good start.
+It's not an assumption, it's a hard requirement.
 
-Also, EL2 tests shouldn't be optional. If EL2 is available, the test
-should run, without any option, and things like
+> This holds now because shared pages are always split to 4K, but if
+> shared pages become larger, might mapping in the host actually turn out
+> to be smaller?
 
-+	if (is_nested)
-+		vm = nv_vm_create_with_vcpus_gic(1, &vcpu, &gic_fd, guest_main);
-+	else
-+		vm = vm_create_with_one_vcpu(&vcpu, guest_main);
+Yes, the host userspace mappens could be smaller, and supporting that scena=
+rio is
+very explicitly one of the design goals of guest_memfd.  From commit a7800a=
+a80ea4
+("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory=
+"):
 
-are just non-starters. You just need to either get rid of the whole
-vm_create_with_one_vcpu() nonsense, or teach it to take an execution
-context.
-
-But the real NV tests are not optional either. They need to happen,
-and I don't have the confidence that they will if I agree to what you
-are suggesting. Because it's been months since I asked for these
-things, and not much has happened in the interval.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+ : A guest-first memory subsystem allows for optimizations and enhancements
+ : that are kludgy or outright infeasible to implement/support in a generic
+ : memory subsystem.  With guest_memfd, guest protections and mapping sizes
+ : are fully decoupled from host userspace mappings.   E.g. KVM currently
+ : doesn't support mapping memory as writable in the guest without it also
+ : being writable in host userspace, as KVM's ABI uses VMA protections to
+ : define the allow guest protection.  Userspace can fudge this by
+ : establishing two mappings, a writable mapping for the guest and readable
+ : one for itself, but that=E2=80=99s suboptimal on multiple fronts.
+ :=20
+ : Similarly, KVM currently requires the guest mapping size to be a strict
+ : subset of the host userspace mapping size, e.g. KVM doesn=E2=80=99t supp=
+ort
+ : creating a 1GiB guest mapping unless userspace also has a 1GiB guest
+ : mapping.  Decoupling the mappings sizes would allow userspace to precise=
+ly
+ : map only what is needed without impacting guest performance, e.g. to
+ : harden against unintentional accesses to guest memory.
