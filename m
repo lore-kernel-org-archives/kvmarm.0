@@ -1,56 +1,56 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9621F541E
-	for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 22:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBBE24EF7F
+	for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 22:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753480877; cv=none; b=EWs9hTMFIoULP55O/2DWgvmQeelU+Y6gVSRH+L7p6Ne+Th8jl0OSHF0zTbPs3tkoqqodNCzGOfwkLtfnEMu4GZ6UHChISyqvwNIl3AxQI8NSd1ONfKNhpRozxk6hCvg0nCRp7XiV7gFlY9hEDZ+PDi1U9AK/Oo5SKx43GTmaUcI=
+	t=1753482362; cv=none; b=kLdcm8AeySZ977MJyly3w6iK3TlzbYzjA6tDhwnd9Q5eIMmZKo//GU6gvHvhrj6bs6DRe9i/Klx7wgM9XbqCnLdPssmjyavqZO/utk3MXogqwgxPybtVulH1qIlG47cdL+cNAPwoVZR7ySannRR8mTqpsK8ws35+HXldfLHrTmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753480877; c=relaxed/simple;
-	bh=ZVkE0eW5WS3kJhFfMGAaiYj5nZ5KOR05VaGSZwLtIr8=;
+	s=arc-20240116; t=1753482362; c=relaxed/simple;
+	bh=pEZGJ/+pn5DmA3NCmRo+S67yh6XKcvssc7owYYiGbk0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OKe24LMd7cNlszmFWW+lzQts2VmSSO3Qu+awB9eIWK82tAwCJYgvKRbQMbmzIHx1DIIUFLMlE5dS2TREqkKlFG2XBeAwBoEAJZvXqYEew2qHLokxcaVRqMIlh8tchiYpBQoMRvATyWy17/cg0rmMmgOa878/NBmGuE4PxVHw/80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x8+YLSXD; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=c3smUC/H10HsTkSRiImJiQL/HCOLnWfU/bgn9zOHq7sn5QkBfOQIIqohNz7f5wg6uMod28XlWA0y33PFTnPfM3ibLJdEYfPwY953DuRGpBxZEjd2UuhiRwqNeVe/+Eli84xpq6yNicLfVDQSFJDgtFDdJvyT4pCkm44xvt5P7Ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oHpMGw+W; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x8+YLSXD"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313ff01d2a6so2692599a91.3
-        for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 15:01:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oHpMGw+W"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-754f57d3259so3810745b3a.2
+        for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 15:26:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753480875; x=1754085675; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753482360; x=1754087160; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+zp+aFgZ7sosVHgE1JVBc/YF4k2nO+/CVzJ2Y2OlSXk=;
-        b=x8+YLSXDGhcFfHuKX4PbkjNY542cyY83KhtJuwBJ8u6swbSH4Li/ASd8LbyiDAZK+y
-         IpH3XBLIkAAGZrf0xUsDelq6wcMqDtjEo6tUXbLQaMuptrFZQrwuCzhKGrvW4n+Ik+43
-         3C/4w22/BPx5MH9PiBVKd30S9q4dsdAnSgUj21lDA6l6v9IHcCiVexdqBZFuNZWm4kwy
-         InpWJb4rFywVL987fTq866HiR3f+3bEBKe3FojjlJIUi1QDBtSDJuOYCTls6dZJwTBw9
-         +ACaCxa6bCffkj4MvincrechmUQReD+Uy7tXFGt+LKOBIbZxUrKW2nQF0H1lLW/YHZBp
-         ASaQ==
+        bh=0Lq9QQ8w3hMdR19q3/dpKc/mSw+VikFUTc+/jJzJxpA=;
+        b=oHpMGw+WRVhrZC4CjVuo8Eu1Q4vG1WVTTDWeD9TXbsPKJ44ulk9SxHABqP1VfUNnNx
+         WaK/PPqxHsgYMOuViH7DZJh50FfUc0Xq47msRYAz9yXAAIs9gm5oBKAvBS33JfDB/9n4
+         bv+TdnKs3lOhN+cZ2EeT9hBikwtO65X2PsvV9HYQJ/aKGKS9cHriyyvEWnUtC9SswFqm
+         XZZ6QWEpL+ZGySDueS87cHIXNhpgOF/QWL9CBAhIzmEwPKAKd/hOx4e+DpqrpeRZnTd5
+         fHiLoFGy85fo15azj3KD31E1knCI/NoGN9WoWOWvEuF5miy3C8lz3WjH60wApY2I45ie
+         iq5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753480875; x=1754085675;
+        d=1e100.net; s=20230601; t=1753482360; x=1754087160;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+zp+aFgZ7sosVHgE1JVBc/YF4k2nO+/CVzJ2Y2OlSXk=;
-        b=G8Y7w9zK0YYJwbDKj7anndT9mZTbEpDgGZ6LksIomkKrkhGMiXomJ+6agbyRL6GlDv
-         tsUYwelhFimb+uc5usZXj5klFvdJ4YQwm6XjcOLM6d5KE852hWZ1XC1fQhquk4hTuVeU
-         LmkPkvl4FPNS95A0C9IdKL1EnnBwUT8plr1M9NE6jPQ7g8ABYCmWZ/NinsiXyVJCn9fn
-         IEXMpKlZy6c4bv/Nsld122qKuhSsuj+dh1NSwFIq5nIdZHN25flFn6uPVpj2mn9W9tw8
-         uN1vMI5UpOxJripXi5aTColbcy3Ubp/PwdF2ZQKc+dDGjlcjjkJpdPYA+GjZzEf5xWSk
-         pr1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWd1Dd+RZLF7f20prY/9AYjKQYNQyezAMKAZyn3h8s8gjVfBgYMpGVdrDD+//W+RDAw4I7if4Q=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyl7FXo/Lo87Gyohk3nWSqr6XgsR10pVi1L8isMuRmnSMpZCTi3
-	YqNqdssfJR/y3LWT1WISJ7dg0Vf6omMY0R2O7KlM8ikVKgjG6YCZjUfyx2QTiR9Q8QJXpMPiYXf
-	o9HLvVQ==
-X-Google-Smtp-Source: AGHT+IFPjkF2xrZ/Gp6FwQl6jvIg14serRXFzYz5L/ExU8zpV9XgePnP6vcF1X9qmhlTmOaX+wV3Tt+ZntY=
-X-Received: from pjvf3.prod.google.com ([2002:a17:90a:da83:b0:312:ea08:fa64])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7c7:b0:31c:15d9:8aa
- with SMTP id 98e67ed59e1d1-31e77a45647mr3874947a91.34.1753480875031; Fri, 25
- Jul 2025 15:01:15 -0700 (PDT)
-Date: Fri, 25 Jul 2025 15:01:13 -0700
-In-Reply-To: <diqzpldoc5yq.fsf@ackerleytng-ctop.c.googlers.com>
+        bh=0Lq9QQ8w3hMdR19q3/dpKc/mSw+VikFUTc+/jJzJxpA=;
+        b=FE6p14M5Gvlm31NQyhEWUSOto+7PL4Q0arkK+vTxvAlORvY11zzYDxasMlEWc8D1DG
+         lwcWvu/XwKTMrC5lD9BEZShLi/cirJWx7SLYu8nccGvz60XUczS2QLoXpkG/wnW6g0vY
+         cDy4WfyAM/uHOI6z5OHF6v38tsHGxYOACkGOPNZdCGiDbPKFLVxtFzq4z1UcG5ZvuhxO
+         r7cf1mTT7aonTu4T42DV/0s/KAhjSrNW09LIwNeLZXgbBMSsyDG0hjWSqQ8x8DJWe/XQ
+         jANjILfw5sgu6u2ufJ+HwpKDjMmCf3BxUI/pqiJxzWzirbWk7UEVC8S0KAf50pojGoB6
+         CuYA==
+X-Forwarded-Encrypted: i=1; AJvYcCWnYDNZ6DU0CxsGfeHUPhTOrzrFUPY5HBNss0BPJwRYcF+Gx+FHpPw8B3HvPmryd7h/eoSED9M=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxMA563uCshxbkZakIqlItaghRt2i8y9EM8B9eX45mmOCMZy8eL
+	jC7VGksMs5tndktnRL+9oSTVVRoWpe29DJVbnHy5U8jK556gI9pP4RTYIh5o8WWR9z55Snlbk48
+	gDofLjRorpHT0UkVCR18M1U5tKQ==
+X-Google-Smtp-Source: AGHT+IEZxdfrdgDIlR5zUkMlJz/kBxt4HyXLAe0BLt5xpkZQemjoRXVB0UGSeGU8+zfIGfEMo0h1ofcgL6D2PyWz8A==
+X-Received: from pfmm16.prod.google.com ([2002:a05:6a00:2490:b0:746:3185:144e])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:84d:b0:74e:ac5b:17ff with SMTP id d2e1a72fcca58-763343da33dmr4952699b3a.13.1753482359896;
+ Fri, 25 Jul 2025 15:25:59 -0700 (PDT)
+Date: Fri, 25 Jul 2025 15:25:58 -0700
+In-Reply-To: <aIP-qSnH1jjuykmP@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -61,12 +61,12 @@ References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-
  <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com> <aIOMPpTWKWoM_O5J@google.com>
  <diqzy0sccjfz.fsf@ackerleytng-ctop.c.googlers.com> <aIO7PRBzpFqk8D13@google.com>
  <diqzseikcbef.fsf@ackerleytng-ctop.c.googlers.com> <aIPgjOLq8erW06gK@google.com>
- <diqzpldoc5yq.fsf@ackerleytng-ctop.c.googlers.com>
-Message-ID: <aIP-qSnH1jjuykmP@google.com>
+ <diqzpldoc5yq.fsf@ackerleytng-ctop.c.googlers.com> <aIP-qSnH1jjuykmP@google.com>
+Message-ID: <diqzms8rdi15.fsf@ackerleytng-ctop.c.googlers.com>
 Subject: Re: [PATCH v16 15/22] KVM: x86/mmu: Extend guest_memfd's max mapping
  level to shared mappings
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>
 Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
 	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
 	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
@@ -88,82 +88,88 @@ Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kerne
 	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
 	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
 	ira.weiny@intel.com
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jul 25, 2025, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Fri, Jul 25, 2025, Ackerley Tng wrote:
-> >> Sean Christopherson <seanjc@google.com> writes:
-> >> > Invoking host_pfn_mapping_level() isn't just undesirable, it's flat out wrong, as
-> >> > KVM will not verify slot->userspace_addr actually points at the (same) guest_memfd
-> >> > instance.
-> >> >
-> >> 
-> >> This is true too, that invoking host_pfn_mapping_level() could return
-> >> totally wrong information if slot->userspace_addr points somewhere else
-> >> completely.
-> >> 
-> >> What if slot->userspace_addr is set up to match the fd+offset in the
-> >> same guest_memfd, and kvm_gmem_max_mapping_level() returns 2M but it's
-> >> actually mapped into the host at 4K?
-> >> 
-> >> A little out of my depth here, but would mappings being recovered to the
-> >> 2M level be a problem?
-> >
-> > No, because again, by design, the host userspace mapping has _zero_ influence on
-> > the guest mapping.
-> 
-> Not trying to solve any problem but mostly trying to understand mapping
-> levels better.
-> 
-> Before guest_memfd, why does kvm_mmu_max_mapping_level() need to do
-> host_pfn_mapping_level()?
-> 
-> Was it about THP folios?
+Sean Christopherson <seanjc@google.com> writes:
 
-And HugeTLB, and Device DAX, and probably at least one other type of backing at
-this point.
+> On Fri, Jul 25, 2025, Ackerley Tng wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> 
+>> > On Fri, Jul 25, 2025, Ackerley Tng wrote:
+>> >> Sean Christopherson <seanjc@google.com> writes:
+>> >> > Invoking host_pfn_mapping_level() isn't just undesirable, it's flat out wrong, as
+>> >> > KVM will not verify slot->userspace_addr actually points at the (same) guest_memfd
+>> >> > instance.
+>> >> >
+>> >> 
+>> >> This is true too, that invoking host_pfn_mapping_level() could return
+>> >> totally wrong information if slot->userspace_addr points somewhere else
+>> >> completely.
+>> >> 
+>> >> What if slot->userspace_addr is set up to match the fd+offset in the
+>> >> same guest_memfd, and kvm_gmem_max_mapping_level() returns 2M but it's
+>> >> actually mapped into the host at 4K?
+>> >> 
+>> >> A little out of my depth here, but would mappings being recovered to the
+>> >> 2M level be a problem?
+>> >
+>> > No, because again, by design, the host userspace mapping has _zero_ influence on
+>> > the guest mapping.
+>> 
+>> Not trying to solve any problem but mostly trying to understand mapping
+>> levels better.
+>> 
+>> Before guest_memfd, why does kvm_mmu_max_mapping_level() need to do
+>> host_pfn_mapping_level()?
+>> 
+>> Was it about THP folios?
+>
+> And HugeTLB, and Device DAX, and probably at least one other type of backing at
+> this point.
+>
+> Without guest_memfd, guest mappings are a strict subset of the host userspace
+> mappings for the associated address space (i.e. process) (ignoring that the guest
+> and host mappings are separate page tables).
+>
+> When mapping memory into the guest, KVM manages a Secondary MMU (in mmu_notifier
+> parlance), where the Primary MMU is managed by mm/, and is for all intents and
+> purposes synonymous with the address space of the userspace VMM.
+>
+> To get a pfn to insert into the Secondary MMU's PTEs (SPTE, which was originally
+> "shadow PTEs", but has been retrofitted to "secondary PTEs" so that it's not an
+> outright lie when using stage-2 page tables), the pfn *must* be faulted into and
+> mapped in the Primary MMU.  I.e. under no circumstance can a SPTE point at memory
+> that isn't mapped into the Primary MMU.
+>
+> Side note, except for VM_EXEC, protections for Secondary MMU mappings must also
+> be a strict subset of the Primary MMU's mappings.  E.g. KVM can't create a
+> WRITABLE SPTE if the userspace VMA is read-only.  EXEC protections are exempt,
+> so that guest memory doesn't have to be mapped executable in the VMM, which would
+> basically make the VMM a CVE factory :-)
+>
+> All of that holds true for hugepages as well, because that rule is just a special
+> case of the general rule that all memory must be first mapped into the Primary
+> MMU.  Rather than query the backing store's allowed page size, KVM x86 simply
+> looks at the Primary MMU's userspace page tables.  Originally, KVM _did_ query
+> the VMA directly for HugeTLB, but when things like DAX came along, we realized
+> that poking into backing stores directly was going to be a maintenance nightmare.
+>
+> So instead, KVM was reworked to peek at the userspace page tables for everything,
+> and knock wood, that approach has Just Worked for all backing stores.
+>
+> Which actually highlights the brilliance of having KVM be a Secondary MMU that's
+> fully subordinate to the Primary MMU.  Modulo some terrible logic with respect to
+> VM_PFNMAP and "struct page" that has now been fixed, literally anything that can
+> be mapped into the VMM can be mapped into a KVM guest, without KVM needing to
+> know *anything* about the underlying memory.
+>
+> Jumping back to guest_memfd, the main principle of guest_memfd is that it allows
+> _KVM_ to be the Primary MMU (mm/ is now becoming another "primary" MMU, but I
+> would call KVM 1a and mm/ 1b).  Instead of the VMM's address space and page
+> tables being the source of truth, guest_memfd is the source of truth.  And that's
+> why I'm so adamant that host_pfn_mapping_level() is completely out of scope for
+> guest_memfd; that API _only_ makes sense when KVM is operating as a Seconary MMU.
 
-Without guest_memfd, guest mappings are a strict subset of the host userspace
-mappings for the associated address space (i.e. process) (ignoring that the guest
-and host mappings are separate page tables).
+Thanks! Appreciate the detailed response :)
 
-When mapping memory into the guest, KVM manages a Secondary MMU (in mmu_notifier
-parlance), where the Primary MMU is managed by mm/, and is for all intents and
-purposes synonymous with the address space of the userspace VMM.
-
-To get a pfn to insert into the Secondary MMU's PTEs (SPTE, which was originally
-"shadow PTEs", but has been retrofitted to "secondary PTEs" so that it's not an
-outright lie when using stage-2 page tables), the pfn *must* be faulted into and
-mapped in the Primary MMU.  I.e. under no circumstance can a SPTE point at memory
-that isn't mapped into the Primary MMU.
-
-Side note, except for VM_EXEC, protections for Secondary MMU mappings must also
-be a strict subset of the Primary MMU's mappings.  E.g. KVM can't create a
-WRITABLE SPTE if the userspace VMA is read-only.  EXEC protections are exempt,
-so that guest memory doesn't have to be mapped executable in the VMM, which would
-basically make the VMM a CVE factory :-)
-
-All of that holds true for hugepages as well, because that rule is just a special
-case of the general rule that all memory must be first mapped into the Primary
-MMU.  Rather than query the backing store's allowed page size, KVM x86 simply
-looks at the Primary MMU's userspace page tables.  Originally, KVM _did_ query
-the VMA directly for HugeTLB, but when things like DAX came along, we realized
-that poking into backing stores directly was going to be a maintenance nightmare.
-
-So instead, KVM was reworked to peek at the userspace page tables for everything,
-and knock wood, that approach has Just Worked for all backing stores.
-
-Which actually highlights the brilliance of having KVM be a Secondary MMU that's
-fully subordinate to the Primary MMU.  Modulo some terrible logic with respect to
-VM_PFNMAP and "struct page" that has now been fixed, literally anything that can
-be mapped into the VMM can be mapped into a KVM guest, without KVM needing to
-know *anything* about the underlying memory.
-
-Jumping back to guest_memfd, the main principle of guest_memfd is that it allows
-_KVM_ to be the Primary MMU (mm/ is now becoming another "primary" MMU, but I
-would call KVM 1a and mm/ 1b).  Instead of the VMM's address space and page
-tables being the source of truth, guest_memfd is the source of truth.  And that's
-why I'm so adamant that host_pfn_mapping_level() is completely out of scope for
-guest_memfd; that API _only_ makes sense when KVM is operating as a Seconary MMU.
+It fits together for me now.
