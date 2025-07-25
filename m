@@ -1,101 +1,300 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6CB2EE5F6;
-	Fri, 25 Jul 2025 17:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DD72EF66B
+	for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 17:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753463288; cv=none; b=ro55/MtgOx3S05jvoy5lGfbrKKy4L4qJEX24L0nRacIM30M195EDAFkHerdwHHFsDJ3tIkbO9WEHF37bwkJsWXARd3Lfux54FdgEeHZQyxA+RxW8O3mr6xYMyr1eQnUmOg8iJj3/n4HoPK5FUxB1qktTM+pxitteOhkpdkLRu6c=
+	t=1753463617; cv=none; b=sTlYjY0lKSsNb05O6g32I9Yfp1ubqA5esP91Kx6rkc3eZqaZ1iH0v6SfPtfnYQGwrpuPYTxuDugnyGNDJH6Y4BylIikeMdnZARAlnjt9J8JJrAHh/GCdlvLT05mDYq5fRPTnMHwWpxp8qhSyxNdMMsealm6BETv+/VM7p4GewBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753463288; c=relaxed/simple;
-	bh=eEiIL0rv55Mb2Vf0/AmSi7VJDqvdOD9ADdquhg19Z44=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c8kIN+/Y7k9o49XzpYBr36hhuFkXyvhjNPnQDHeqxJnCO0DNN4F2m9Y6JuvgxRzyD1JM6b096mUFzOKoOLjc8hmez4aGw4VISOekXZzJBVh+aVO3odW4nrpJ4QJukJdvJlEWAhdSOt+vjeG6hXO+gt4Vwxb6QMZhe2hPVrTuk2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=zqns/GEB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753463617; c=relaxed/simple;
+	bh=T/M2s2xVlYuh/GfNcs9lDBVRLTMpcwRQnMTAYRlWR5E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FCbrMmTiLY7fN1S3WxYgTl2pMEQVB43T6ovFjB+rRcwJ1x0JEe+eDM43NAfAYLdTXQjD2V0JqAftQZwVgZ9AHrlQUp9541PWGVJ/+PJzMTmFnaftRsOAyQfBr8n3x5O1WltVGQJXcAnwbamTLv2VkujhOUxTZbVaceKUd9K9hR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gA0u78Os; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="zqns/GEB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3832BC4CEE7;
-	Fri, 25 Jul 2025 17:08:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1753463287;
-	bh=eEiIL0rv55Mb2Vf0/AmSi7VJDqvdOD9ADdquhg19Z44=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=zqns/GEB3bmWH+iIQWRad69gSqXISVZ56gvDEmAHEGZ+iO2A8kwbdAAR3JUSJ0Go6
-	 YBqyQFLrgTFdlcgFa21yjYMkzKEcJOXcZ2OgimQgjqA9jXUj5DTSMhEClqto1FqL0M
-	 b26HA8kAP3Y1At2Q4c6tVwgJufnh9R6TsVr//u8w=
-Date: Fri, 25 Jul 2025 19:08:03 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Justin Stitt <justinstitt@google.com>, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Tom Rix <trix@redhat.com>,
-	Christopher Covington <cov@codeaurora.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, stable@vger.kernel.org
-Subject: Re: [PATCH 6.1.y] KVM: arm64: silence -Wuninitialized-const-pointer
- warning
-Message-ID: <2025072504-easel-propose-0474@gregkh>
-References: <20250724-b4-clidr-unint-const-ptr-v1-1-67c4d620b6b6@google.com>
- <2025072553-chevy-starter-565e@gregkh>
- <20250725163851.GB684490@ax162>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gA0u78Os"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b3f657b4badso1796468a12.0
+        for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 10:13:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753463615; x=1754068415; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E+f8ECMzvMCzX3pnQxw0jQaX7GgUHjg6TEwrbmrTx8k=;
+        b=gA0u78OsPwn86XAON3oDIWubpv4HHRIW70AzhBS0h8tu3vUDVxlrH2Jt+3TABzeOiv
+         SzMICxbRwC0VZBYEg1SQyw3fXzxnlQcAQcQUPxpxz1CfgG3lu40DCMthX788Sm38yohY
+         lZZ6OaebLnhe10U4Ik/o9Ia+4uYELJ0Hjw//QMrClEEAnAC+x2GXTqjY7OViVxmSIlSC
+         ei1VIu4y9nUhd0qBByBy321iA/1p1Nw16XXYffjBLCw0dv24TQu1XPF8qt2K8W81Ucja
+         kDSY/y+3uFcewPaJ0j0c5w2qVFWLO5E+cj8fx8z3yXPf10sM/SkYmJXNDl09XSkHzEWZ
+         3b5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753463615; x=1754068415;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=E+f8ECMzvMCzX3pnQxw0jQaX7GgUHjg6TEwrbmrTx8k=;
+        b=HUXXBRmR35aE0bdFpnBe+5Tsj9KThkTsFaekaJYPznju5v32ho8WIjUwKDqPc3NBsx
+         DVf3kdR1P5R2/edVC1ADidHsrTyMrqZx98+X5ag2WpihwxrnVJ2cWtSLGalakOYxZXa5
+         /miIDvioMWz2hRI1NlUmWPCeKjo+qw/Cn0/xWqPA8qQtw42atl9R0Uz1Q0egzHCkmsE6
+         HvHTIbkKZJ6kCV5zwcUFRmgJpaNMyQpihCwsjwh5QtWT0HnwfUu+l1e86OJZGjjrodcB
+         VHqr+E6EianEVmubrCL/juAF+4sSzoJoAE4I1nAGexdalT90mIDwvACZ92ikG7RQoYhM
+         upyA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1Ri8SgOswCSvz6oGwZLSycScGxeODU4kqz0by+Sboo04CgRgvaeEYbHRGiKanXzp27P1lWKk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzqH2LQnG1pspTMiYQYTxNoZfVPcLvX8bq/igDPWy/6hhc5ZF69
+	V/EkvelEcUOZvY2foOu5rj4cr5VXtPIRZJhk1pooiNOOZxPWzYRGl1E9/WCjlQ6cpcJ3jJEFqpb
+	NV163og==
+X-Google-Smtp-Source: AGHT+IEe50hQ5xJZE2cI6F06MC+m3pDOUnz2melqMbGj2/g8RniMBVJGng2MMVfHIVNM11FIsL6B6vGVcrc=
+X-Received: from pgbfq25.prod.google.com ([2002:a05:6a02:2999:b0:b31:dbad:8412])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:42a3:b0:234:c6a0:8a0f
+ with SMTP id adf61e73a8af0-23d701cd8b5mr4246329637.41.1753463615402; Fri, 25
+ Jul 2025 10:13:35 -0700 (PDT)
+Date: Fri, 25 Jul 2025 10:13:33 -0700
+In-Reply-To: <diqzy0sccjfz.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250725163851.GB684490@ax162>
+Mime-Version: 1.0
+References: <20250723104714.1674617-1-tabba@google.com> <20250723104714.1674617-16-tabba@google.com>
+ <diqza54tdv3p.fsf@ackerleytng-ctop.c.googlers.com> <aIOMPpTWKWoM_O5J@google.com>
+ <diqzy0sccjfz.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <aIO7PRBzpFqk8D13@google.com>
+Subject: Re: [PATCH v16 15/22] KVM: x86/mmu: Extend guest_memfd's max mapping
+ level to shared mappings
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 25, 2025 at 09:38:51AM -0700, Nathan Chancellor wrote:
-> On Fri, Jul 25, 2025 at 10:58:05AM +0200, Greg KH wrote:
-> > On Thu, Jul 24, 2025 at 06:15:28PM -0700, Justin Stitt wrote:
-> > > A new warning in Clang 22 [1] complains that @clidr passed to
-> > > get_clidr_el1() is an uninitialized const pointer. get_clidr_el1()
-> > > doesn't really care since it casts away the const-ness anyways.
-> > 
-> > Is clang-22 somehow now a supported kernel for the 6.1.y tree?  Last I
-> > looked, Linus's tree doesn't even build properly for it, so why worry
-> > about this one just yet?
-> 
-> Our goal is to have tip of tree LLVM / clang be able to build any
-> supported branch of the kernel so that whenever it branches and
-> releases, the fixes for it are already present in released kernel
-> versions so users can just pick them up and go. We are going to have to
-> worry about this at some point since it is a stable-only issue so why
-> not tackle it now?
-> 
-> > > Silence the warning by initializing the struct.
-> > 
-> > Why not fix the compiler not to do this instead?  We hate doing foolish
-> > work-arounds for broken compilers.
-> 
-> While casting away the const from the pointer in this case is "fine"
-> because the object it pointed to was not const, I am fairly certain it
-> is undefined behavior to cast away the const from a pointer to a const
-> object, see commit 12051b318bc3 ("mips: avoid explicit UB in assignment
-> of mips_io_port_base") for an exampile, so I am not sure the warning is
-> entirely unreasonable.
+On Fri, Jul 25, 2025, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+>=20
+> > On Thu, Jul 24, 2025, Ackerley Tng wrote:
+> >> Fuad Tabba <tabba@google.com> writes:
+> >> >  int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_faul=
+t *fault,
+> >> > @@ -3362,8 +3371,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,=
+ struct kvm_page_fault *fault,
+> >> >  	if (max_level =3D=3D PG_LEVEL_4K)
+> >> >  		return PG_LEVEL_4K;
+> >> > =20
+> >> > -	if (is_private)
+> >> > -		host_level =3D kvm_max_private_mapping_level(kvm, fault, slot, gf=
+n);
+> >> > +	if (is_private || kvm_memslot_is_gmem_only(slot))
+> >> > +		host_level =3D kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
+> >> > +							is_private);
+> >> >  	else
+> >> >  		host_level =3D host_pfn_mapping_level(kvm, gfn, slot);
+> >>=20
+> >> No change required now, would like to point out that in this change
+> >> there's a bit of an assumption if kvm_memslot_is_gmem_only(), even for
+> >> shared pages, guest_memfd will be the only source of truth.
+> >
+> > It's not an assumption, it's a hard requirement.
+> >
+> >> This holds now because shared pages are always split to 4K, but if
+> >> shared pages become larger, might mapping in the host actually turn ou=
+t
+> >> to be smaller?
+> >
+> > Yes, the host userspace mappens could be smaller, and supporting that s=
+cenario is
+> > very explicitly one of the design goals of guest_memfd.  From commit a7=
+800aa80ea4
+> > ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing me=
+mory"):
+> >
+> >  : A guest-first memory subsystem allows for optimizations and enhancem=
+ents
+> >  : that are kludgy or outright infeasible to implement/support in a gen=
+eric
+> >  : memory subsystem.  With guest_memfd, guest protections and mapping s=
+izes
+> >  : are fully decoupled from host userspace mappings.   E.g. KVM current=
+ly
+> >  : doesn't support mapping memory as writable in the guest without it a=
+lso
+> >  : being writable in host userspace, as KVM's ABI uses VMA protections =
+to
+> >  : define the allow guest protection.  Userspace can fudge this by
+> >  : establishing two mappings, a writable mapping for the guest and read=
+able
+> >  : one for itself, but that=E2=80=99s suboptimal on multiple fronts.
+> >  :=20
+> >  : Similarly, KVM currently requires the guest mapping size to be a str=
+ict
+> >  : subset of the host userspace mapping size, e.g. KVM doesn=E2=80=99t =
+support
+> >  : creating a 1GiB guest mapping unless userspace also has a 1GiB guest
+> >  : mapping.  Decoupling the mappings sizes would allow userspace to pre=
+cisely
+> >  : map only what is needed without impacting guest performance, e.g. to
+> >  : harden against unintentional accesses to guest memory.
+>=20
+> Let me try to understand this better. If/when guest_memfd supports
+> larger folios for shared pages, and guest_memfd returns a 2M folio from
+> kvm_gmem_fault_shared(), can the mapping in host userspace turn out
+> to be 4K?
 
-Hah, we've been doing that for _decades_ with container_of(), so if that
-is UB, and the compiler can't handle it, I'd declare that a broken
-compiler :)
+It can be 2M, 4K, or none.
 
-Look at e78f70bad29c ("time/timecounter: Fix the lie that struct
-cyclecounter is const") in linux-next as one example of me trying to fix
-that mess up.  It's going to take a bunch of work to get there, but
-eventually we will.  We will not be backporting all of those patches
-though, that would be way too much work.
+> If that happens, should kvm_gmem_max_mapping_level() return 4K for a
+> memslot with kvm_memslot_is_gmem_only() =3D=3D true?
 
-Anyway, as the maintainer doesn't seem to want this, I guess I'll just
-ignore it for now?
+No.
 
-thanks,
+> The above code would skip host_pfn_mapping_level() and return just what
+> guest_memfd reports, which is 2M.
 
-greg k-h
+Yes.
+
+> Or do you mean that guest_memfd will be the source of truth in that it
+> must also know/control, in the above scenario, that the host mapping is
+> also 2M?
+
+No.  The userspace mapping, _if_ there is one, is completely irrelevant.  T=
+he
+entire point of guest_memfd is eliminate the requirement that memory be map=
+ped
+into host userspace in order for that memory to be mapped into the guest.
+
+Invoking host_pfn_mapping_level() isn't just undesirable, it's flat out wro=
+ng, as
+KVM will not verify slot->userspace_addr actually points at the (same) gues=
+t_memfd
+instance.
+
+To demonstrate, this must pass (and does once "KVM: x86/mmu: Handle guest p=
+age
+faults for guest_memfd with shared memory" is added back).
+
+---
+ .../testing/selftests/kvm/guest_memfd_test.c  | 64 +++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing=
+/selftests/kvm/guest_memfd_test.c
+index 088053d5f0f5..b86bf89a71e0 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -13,6 +13,7 @@
+=20
+ #include <linux/bitmap.h>
+ #include <linux/falloc.h>
++#include <linux/sizes.h>
+ #include <setjmp.h>
+ #include <signal.h>
+ #include <sys/mman.h>
+@@ -21,6 +22,7 @@
+=20
+ #include "kvm_util.h"
+ #include "test_util.h"
++#include "ucall_common.h"
+=20
+ static void test_file_read_write(int fd)
+ {
+@@ -298,6 +300,66 @@ static void test_guest_memfd(unsigned long vm_type)
+ 	kvm_vm_free(vm);
+ }
+=20
++static void guest_code(uint8_t *mem, uint64_t size)
++{
++	size_t i;
++
++	for (i =3D 0; i < size; i++)
++		__GUEST_ASSERT(mem[i] =3D=3D 0xaa,
++			       "Guest expected 0xaa at offset %lu, got 0x%x", i, mem[i]);
++
++	memset(mem, 0xff, size);
++	GUEST_DONE();
++}
++
++static void test_guest_memfd_guest(void)
++{
++	/*
++	 * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
++	 * the guest's code, stack, and page tables, and low memory contains
++	 * the PCI hole and other MMIO regions that need to be avoided.
++	 */
++	const uint64_t gpa =3D SZ_4G;
++	const int slot =3D 1;
++
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	uint8_t *mem;
++	size_t size;
++	int fd, i;
++
++	if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
++		return;
++
++	vm =3D __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_=
+code);
++
++	TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
++		    "Default VM type should always support guest_memfd mmap()");
++
++	size =3D vm->page_size;
++	fd =3D vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
++	vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL=
+, fd, 0);
++
++	mem =3D mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT(mem !=3D MAP_FAILED, "mmap() on guest_memfd failed");
++	memset(mem, 0xaa, size);
++	munmap(mem, size);
++
++	virt_pg_map(vm, gpa, gpa);
++	vcpu_args_set(vcpu, 2, gpa, size);
++	vcpu_run(vcpu);
++
++	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++
++	mem =3D mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT(mem !=3D MAP_FAILED, "mmap() on guest_memfd failed");
++	for (i =3D 0; i < size; i++)
++		TEST_ASSERT_EQ(mem[i], 0xff);
++
++	close(fd);
++	kvm_vm_free(vm);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	unsigned long vm_types, vm_type;
+@@ -314,4 +376,6 @@ int main(int argc, char *argv[])
+=20
+ 	for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+ 		test_guest_memfd(vm_type);
++
++	test_guest_memfd_guest();
+ }
+
+base-commit: 9a82b11560044839b10b1fb83ff230d9a88785b8
+--=20
