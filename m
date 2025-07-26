@@ -1,374 +1,191 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62C82376F8
-	for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 22:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EB515746F
+	for <kvmarm@lists.linux.dev>; Sat, 26 Jul 2025 08:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753484065; cv=none; b=fQO1FS1npbTG/ZJ3G+yZDVl45Izz4PpUgp7LlI4qJFmwSmrYp0lCucD7d34Hska+eLEgs77Olnnv6gOl4EY7Z4I/Ynkvnt+4kp238Bx3C9RYXm7hmfTH87HjDooYyOIilxAS1uHocVy/nw6Dhe7MHJctdiHobwRFba3bJBctQWI=
+	t=1753520345; cv=none; b=Gh/kh3vWYFhAn0BzNvewzMMkbl04KgHmyqOI90ainE94LJOyQUu0B3hBEHYcyS0ExKyjJrTq3YOYQ+pxxkhQ/4XEUZpz6EKa1LoQVJds7RF1Xtc6UsXEriq47rgIJRTh/l/Swayw3btj2o/sU8VKNUXyuGyLoywG+I4Wab5pXqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753484065; c=relaxed/simple;
-	bh=DS26vaBRgwahRFAlqRPBAoUd6fSy9hPCYTaFg82VRkI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ak9sSaaEVbRUZjj12RVfcktdPEYd+Nt/2+ysxNexZcohLwM/L3Mk4Yx2QGo/1Y479rPf8C4uMtH25oKkGepiw+1mcsAWtn+SQq/oNuoK2Fi1PcmQgANsW+Hu0wDg0qUcuQi6nA9VJzSeq69D9elRQXk1Fkm8WgWhUt5cmaRD6ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lUTO4Nhy; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1753520345; c=relaxed/simple;
+	bh=BAlyNZBIlPoNcyJn72zqkAHVHCI4YLaoZhEYbwrktkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OoJE+jWmivlI72r3IDnT/Dr3yBuN+sTIJSEaTtHff98AXe449mgWl6Ah47JEH3Yg5SptO7EWbBiEvOtLduzZ0T+dP4f1BIXyUiS1ikLfB+Cbh+d1IiISjVpeK9blH/HByuASifiCm6imDezZRAd1GnJrr+OUgAOLhtO6xLdNBA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=D/PByF1L; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lUTO4Nhy"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4562b2d98bcso7915e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 25 Jul 2025 15:54:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="D/PByF1L"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-23636167b30so26937645ad.1
+        for <kvmarm@lists.linux.dev>; Sat, 26 Jul 2025 01:59:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753484062; x=1754088862; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SrH0YNsJJUyH6a6DVSuV6GhoCitszYqU7WFGsnyX9bU=;
-        b=lUTO4NhyZncwu86JsDW0+xlFo6OJkE7YbbggHpu0cYI2M9W3OEFvjZa1FvOOt9uftI
-         zrGd90dut9ef7AshNe0PqVsSbRw/PZJbnd/xsihvY6YDazTeZrODiSvi+ChUGG0VUh9W
-         yJuhU9pgHxfyNt13ilZIGgfX19iQWwLgzPqaTQEHVGtmQp03++s8tXg3ZE51PVvHgJNB
-         p1HO4BPH0XgU5/h9eBE0JC2BIYkVesstY56n8W/Jd2zv22dGeQXN5mN1TBM9IHRegnQe
-         L746Sd6Dv4g9wZegH5J+cQQSyTrPdj5R44O96Z0mEwOsMstzfnf0Gjj2tr4w3zJUNaJZ
-         pRkw==
+        d=csie.ntu.edu.tw; s=google; t=1753520340; x=1754125140; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IsSwfYx72SBzxWb7IltAxR/7pX8mu/ij+8zDC/fxnNE=;
+        b=D/PByF1L2W0wgEQKnVs0Om8vmxFsT6G8rKlgpawtF9cZZ2tZpP7dGoIG/mjniOKmWR
+         N5f5Wb43IIGyxc+aglX9jRXDGSfL2AjBHEEhcFn8vPp4v185Rz1N6wgtoWjD/7qangbg
+         iAhfvyfFjdLeIlhXaS7ICNp6vzonYEJMZNHj1KfSu0fFphIc97CKfyTs7xgvxny3SZRm
+         t7BIyrbGbQ76XZ3L6XFvEBX2cUTTj5Aa4OZtCb2Zv0pE7X2bH+TeWfsm5HB0kBZwuaZ2
+         fexuuDrpRsYAUywcw/Nq4EIJkeqjFfoGK1MqkZ/FvxGRK8MB2xcxdKYl3xoB76GQXxl2
+         AOMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753484062; x=1754088862;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SrH0YNsJJUyH6a6DVSuV6GhoCitszYqU7WFGsnyX9bU=;
-        b=NIZCbSDds1E+8oMkjF28QqOwuexk/VT+cqrZzsbTq3bDL4nmpNidCtt/SmXuOHutOU
-         vzrSgAHQlKZbSMWt9Nlrggn04eb4kSmqd2EHR15MJnbayV7nlqZQhJtdECxPW5VJgdVe
-         AuzbGHHB9SOkswABrl6gGAMc6W08Jg5glb3HZbHEztLDyl5QICddMQaT62y8rynoBVNI
-         y6voC7orrRVk2Jwa5COIzN3KC97FL19Lf87D4RgMabOVCQ6AS/eNDEkjxAv7n/wRoApY
-         ULg8pnuJgf6aEN+/ppBiEgREdf9ZkRW2dZds9H7PDKP0THLsn+x1OPSkiEyZJj+oqdXK
-         oGew==
-X-Forwarded-Encrypted: i=1; AJvYcCVp0Fk6tplENl818W9u/11GYS4sdpjVzYfUpfzroCptpmfAYNLdIUHXj/G3U5yThay0gHhoYMI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxu6Rf3a3VGLkEKMBdB7m7vaefwN/OgPmEqClBOoYT4U5gtuB9e
-	Pev9KamewakoH3gE9BtLJHlUSNH8H19ByCBKgIMaZhs32Pvxhoz5kMmiT/2P8KXeSBknyZJAWMo
-	RJ9R4+wZArgqwRjlAOu+2iUCZtQqylBGjnGOCKboJ
-X-Gm-Gg: ASbGncsp4DrYCS2/poD5+IJcWljRCBDD+EZep5w6yiwY6kTl33fj/QuyJ24IO+91Ek8
-	UaH9zSG8JZAmCOzXhN1sxTxz4QB8Xd49+juJSVQ9I/aqSIgEskGzC+6B2EwNjx5TDGlbJmYCzrC
-	sxxrGPoSfDuayj5ZDpvs6yjqV1UOVxJFVm9v9AYO8SPceY7sAz+dRcdyCVUiq8kBxbtac+4m5Mn
-	P6X4gdMGNRHKMh1uMkPQmASQ1aQwpBRB1ciXA==
-X-Google-Smtp-Source: AGHT+IEXVboywdhHKbB21FrYI19SVE/5eWAE9USxvMw9lAL1b7BTPdyv52TpToqz3CvoLCcmj+yjtDmKNzHRxga+43I=
-X-Received: by 2002:a05:600c:3ba3:b0:450:cb25:ead with SMTP id
- 5b1f17b1804b1-4587c99bf66mr125825e9.7.1753484061777; Fri, 25 Jul 2025
- 15:54:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753520340; x=1754125140;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IsSwfYx72SBzxWb7IltAxR/7pX8mu/ij+8zDC/fxnNE=;
+        b=gQyLjjcK6qRNdscLSjKh5QJZHfJeVPRmiLCMHjSSOtmd4X0aeWhz21GXF6vqmVcdjO
+         fy/lo33p2yog0TSZIIuyqStoBgsTMEE4Cqu2z4j0JVdJp4nbP7G06PCu83cAY17jzc1n
+         FYbC52SjNZjkVOABSl8c9+uVl9FTtzVqDjs6JZUhcLvGn3dZKqxG3rXJal435DuU+QND
+         BlJNVRyk8dezBdMkwgCRNuAozLC+jzFOaUN+3Zx3uL5GzwBwljkoH/wGZbgMnIExVPH8
+         qCKXIwgbtJR3rXj09PbSzoa/9hDGt3qEonPV+B9XXUunEHohNa4BbWkRC8SiRZaqmm4/
+         XTpA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsorNo22I+/C664X3zv4qnKPKBD8AJtCFT0mlIMIFVJKKu6TBfaL5aIVPCWmJjCQz4z80zwvE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxtqqtmEmJHRCfZ+s6Upf5X3Wsil6niblimTcAcErt1erzYgUN7
+	VHcmNJjLFHMYNyJVLp67+kSyZ2LmXEWIRTtXqPP5mxEocMw3XCospcGZ2nx9kP8rMQMQD48lp2I
+	7LKZbZXkdObKiG+yuOmGxBbfVL/DQTWBJXDHNVJgvNsTVciAqhfU=
+X-Gm-Gg: ASbGncvegeSW4sPxtahIukr1VBaT8iGs8wysjbwIUZTxnq5MnJ3Lq9/gmuIPJ3D+UKI
+	VjXx1v5Y8Hsqzvr1W2alC1gASm2hxCqLjnNfsZq6FlYoRwqxfBRL24Xj91dvU0w4L8uBNs8BrcJ
+	7/T2bWPFiaQWGGIbwKimQPf6mFMG8sFQenqwaZvqtD9Nx4kNL5S7+lSe6SG4mn8WuSuyYowWm+Z
+	DrF7h9f0JX2WJ5q5g3n/gUJdOQbu0+ItIUYKYrQP2NznIoa6KRtxG+2ZHOIUXsp8r3wrxFKV+72
+	SJN5YRODf3G+YBja8N4c7jrwhbSxvF1YDEqnUtliyyyIIJX3pbqoBHBr+5Wyi9aZx9yUswmLV9a
+	V+UHnaDTvz54Ak37yZe0LXidVD6dfks0yP0pU4z2CwI+gADBAfMs8reGGil6XX2Vrf9XjzM4=
+X-Google-Smtp-Source: AGHT+IGSfqKHy9SGFb/1/uiPQ8AY7vue0rGViceJfxWSMYoCR4FrxJn5LaDGauIUCkJl8iR0dcK/wA==
+X-Received: by 2002:a17:903:3bcc:b0:23f:adc0:8ccb with SMTP id d9443c01a7336-23fb3030e96mr62904435ad.16.1753520340556;
+        Sat, 26 Jul 2025 01:59:00 -0700 (PDT)
+Received: from zenbook (1-162-100-110.dynamic-ip.hinet.net. [1.162.100.110])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fbe4fc7dasm13280705ad.116.2025.07.26.01.58.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Jul 2025 01:59:00 -0700 (PDT)
+Date: Sat, 26 Jul 2025 17:01:25 +0800
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: Marc Zyngier <maz@kernel.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: Will Deacon <will@kernel.org>, 
+	Julien Thierry <julien.thierry.kdev@gmail.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool v2 5/6] arm64: add FEAT_E2H0 support (TBC)
+Message-ID: <zbgu6irpeytcpymaxpg55tvijeppfpdpwcju275g3h6bx4u5qn@35vb5ymt55hx>
+References: <20250725144100.2944226-1-andre.przywara@arm.com>
+ <20250725144100.2944226-6-andre.przywara@arm.com>
+ <86cy9o8bwn.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250604050902.3944054-1-jiaqiyan@google.com> <20250604050902.3944054-2-jiaqiyan@google.com>
- <aHFohmTb9qR_JG1E@linux.dev> <CACw3F509B=AHhpaTcuH9O851rrDdHh1baC8uRYy7bDa7BSMhgg@mail.gmail.com>
- <aHK-DPufhLy5Dtuk@linux.dev> <CACw3F53TYZ1KFv0Yc-GCyOxn7TF3iYjTNSE8bd3nte=KaCN0UQ@mail.gmail.com>
-In-Reply-To: <CACw3F53TYZ1KFv0Yc-GCyOxn7TF3iYjTNSE8bd3nte=KaCN0UQ@mail.gmail.com>
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Fri, 25 Jul 2025 15:54:10 -0700
-X-Gm-Features: Ac12FXyZ0np7ePqY2RtGzxlS12fDizdwLAcMXNFO9IJOKnf3jD-9veylvlP7J20
-Message-ID: <CACw3F50Q_G75wf2rBm-P-NkyyO72i1NKqR9se99QrgipfD62yg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/6] KVM: arm64: VM exit to userspace to handle SEA
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, duenwen@google.com, rananta@google.com, 
-	jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86cy9o8bwn.wl-maz@kernel.org>
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On Sat, Jul 19, 2025 at 2:24=E2=80=AFPM Jiaqi Yan <jiaqiyan@google.com> wro=
-te:
->
-> On Sat, Jul 12, 2025 at 12:57=E2=80=AFPM Oliver Upton <oliver.upton@linux=
-.dev> wrote:
-> >
-> > On Fri, Jul 11, 2025 at 04:59:11PM -0700, Jiaqi Yan wrote:
-> > > >  - Add some detail about FEAT_RAS where we may still exit to usersp=
-ace
-> > > >    for host-controlled memory, as we cannot differentiate between a
-> > > >    stage-1 or stage-2 TTW SEA when taken on the descriptor PA
-> > >
-> > > Ah, IIUC, you are saying even if the FSC code tells fault is on TTW
-> > > (esr_fsc_is_secc_ttw or esr_fsc_is_sea_ttw), it can either be guest
-> > > stage-1's or stage-2's descriptor PA, and we can tell which from
-> > > which.
-> > >
-> > > However, if ESR_ELx_S1PTW is set, we can tell this is a sub-case of
-> > > stage-2 descriptor PA, their usage is for stage-1 PTW but they are
-> > > stage-2 memory.
-> > >
-> > > Is my current understanding right?
-> >
-> > Yep, that's exactly what I'm getting at. As you note, stage-2 aborts
-> > during a stage-1 walk are sufficiently described, but not much else.
->
-> Got it, thanks!
->
-> >
-> > > > +/*
-> > > > + * Returns true if the SEA should be handled locally within KVM if=
- the abort is
-> > > > + * caused by a kernel memory allocation (e.g. stage-2 table memory=
-).
-> > > > + */
-> > > > +static bool host_owns_sea(struct kvm_vcpu *vcpu, u64 esr)
-> > > > +{
-> > > > +       /*
-> > > > +        * Without FEAT_RAS HCR_EL2.TEA is RES0, meaning any extern=
-al abort
-> > > > +        * taken from a guest EL to EL2 is due to a host-imposed ac=
-cess (e.g.
-> > > > +        * stage-2 PTW).
-> > > > +        */
-> > > > +       if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-> > > > +               return true;
-> > > > +
-> > > > +       /* KVM owns the VNCR when the vCPU isn't in a nested contex=
-t. */
-> > > > +       if (is_hyp_ctxt(vcpu) && (esr & ESR_ELx_VNCR))
-> > > > +               return true;
-> > > > +
-> > > > +       /*
-> > > > +        * Determining if an external abort during a table walk hap=
-pened at
-> > > > +        * stage-2 is only possible with S1PTW is set. Otherwise, s=
-ince KVM
-> > > > +        * sets HCR_EL2.TEA, SEAs due to a stage-1 walk (i.e. acces=
-sing the PA
-> > > > +        * of the stage-1 descriptor) can reach here and are report=
-ed with a
-> > > > +        * TTW ESR value.
-> > > > +        */
-> > > > +       return esr_fsc_is_sea_ttw(esr) && (esr & ESR_ELx_S1PTW);
-> > >
-> > > Should we include esr_fsc_is_secc_ttw? like
-> > >   (esr_fsc_is_sea_ttw(esr) || esr_fsc_is_secc_ttw(esr)) && (esr & ESR=
-_ELx_S1PTW)
-> >
-> > Parity / ECC errors are not permitted if FEAT_RAS is implemented (which
-> > is tested for up front).
->
-> Ah, thanks for pointing this out.
->
-> >
-> > > > +}
-> > > > +
-> > > >  int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
-> > > >  {
-> > > > +       u64 esr =3D kvm_vcpu_get_esr(vcpu);
-> > > > +       struct kvm_run *run =3D vcpu->run;
-> > > > +       struct kvm *kvm =3D vcpu->kvm;
-> > > > +       u64 esr_mask =3D ESR_ELx_EC_MASK  |
-> > > > +                      ESR_ELx_FnV      |
-> > > > +                      ESR_ELx_EA       |
-> > > > +                      ESR_ELx_CM       |
-> > > > +                      ESR_ELx_WNR      |
-> > > > +                      ESR_ELx_FSC;
-> > >
-> > > Do you (and why) exclude ESR_ELx_IL on purpose?
-> >
-> > Unintended :)
->
-> Will add into my patch.
->
-> >
-> > > BTW, if my previous statement about TTW SEA is correct, then I also
-> > > understand why we need to explicitly exclude ESR_ELx_S1PTW.
-> >
-> > Right, we shouldn't be exposing genuine stage-2 external aborts to user=
-space.
-> >
-> > > > +       u64 ipa;
-> > > > +
-> > > > +
-> > > >         /*
-> > > >          * Give APEI the opportunity to claim the abort before hand=
-ling it
-> > > >          * within KVM. apei_claim_sea() expects to be called with I=
-RQs
-> > > > @@ -1824,7 +1864,32 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vc=
-pu)
-> > > >         if (apei_claim_sea(NULL) =3D=3D 0)
-> > >
-> > > I assume kvm should still lockdep_assert_irqs_enabled(), right? That
-> > > is, a WARN_ON_ONCE is still useful in case?
-> >
-> > Ah, this is diffed against my VNCR prefix which has this context. Yes, =
-I
-> > want to preserve the lockdep assertion.
->
-> Thanks for sharing the patch! Should I wait for you to send and queue
-> to kvmarm/next and rebase my v3 to it? Or should I insert it into my
-> v3 patch series with you as the commit author, and Signed-off-by you?
+Hi all,
 
-Friendly ping for this question, my v3 is ready but want to confirm
-the best option here.
+On Fri, Jul 25, 2025 at 05:37:12PM +0100, Marc Zyngier wrote:
+> Hi Andre,
+> 
+> Thanks for picking this. A few nits below.
+> 
+> On Fri, 25 Jul 2025 15:40:59 +0100,
+> Andre Przywara <andre.przywara@arm.com> wrote:
+> > 
+> > From: Marc Zyngier <maz@kernel.org>
+> > 
+> > To reduce code complexity, KVM only supports nested virtualisation in
+> > VHE mode. So to allow recursive nested virtualisation, and be able to
+> > expose FEAT_NV2 to a guest, we must prevent a guest from turning off
+> > HCR_EL2.E2H, which is covered by not advertising the FEAT_E2H0 architecture
+> > feature.
+> > 
+> > To allow people to run a guest in non-VHE mode, KVM introduced the
+> > KVM_ARM_VCPU_HAS_EL2_E2H0 feature flag, which will allow control over
+> > HCR_EL2.E2H, but at the cost of turning off FEAT_NV2.
+> 
+> All of that has been captured at length in the kernel code, and I
+> think this is "too much information" for userspace. I'd rather we
+> stick to a pure description of what the various options mean to the
+> user.
+> 
+> > Add a kvmtool command line option "--e2h0" to set that feature bit when
+> > creating a guest, to gain non-VHE, but lose recursive nested virt.
+> 
+> How about:
+> 
+> "The --nested option allows a guest to boot at EL2 without FEAT_E2H0
+>  (i.e. mandating VHE support). While this is great for "modern"
+>  operating systems and hypervisors, a few legacy guests are stuck in a
+>  distant past.
+> 
+>  To support those, the --e2h0 option exposes FEAT_E2H0 to the guest,
+>  at the expense of a number of other features, such as FEAT_NV2. This
 
-Recently we found even the newer ARM64 platforms used by our org has
-to rely on KVM to more gracefully handle SEA (lacking support from
-APEI), so we would really want to work with upstream to lock down the
-proposed approach/UAPI asap.
+Just a very small thing:
 
-Thanks!
+Will only mentioning FEAT_NV2 here lead people to think that FEAT_NV is
+still available with --e2h0?
+Maybe s/FEAT_NV2/FEAT_NV/ makes it clearer?
 
->
-> BTW, while I am working on v3, I think it is probably better to
-> decouple the current patchset into two. The first one for
-> KVM_EXIT_ARM_SEA, and the second one for injecting (D|I)ABT with
-> user-supplemented esr. This way may help KVM_EXIT_ARM_SEA, the more
-> important feature, get reviewed and accepted sooner. I will send out a
-> separate patchset for enhancing the guest SEA injection.
->
-> >
-> >
-> > From eb63dbf07b3d1f42b059f5c94abd147d195299c8 Mon Sep 17 00:00:00 2001
-> > From: Oliver Upton <oliver.upton@linux.dev>
-> > Date: Thu, 10 Jul 2025 17:14:51 -0700
-> > Subject: [PATCH] KVM: arm64: nv: Handle SEAs due to VNCR redirection
-> >
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Thanks,
+Wei-Lin Chang
+
+>  is conditioned on the host itself supporting FEAT_E2H0."
+> 
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_mmu.h |  1 +
-> >  arch/arm64/include/asm/kvm_ras.h | 25 -------------------------
-> >  arch/arm64/kvm/mmu.c             | 30 ++++++++++++++++++------------
-> >  arch/arm64/kvm/nested.c          |  3 +++
-> >  4 files changed, 22 insertions(+), 37 deletions(-)
-> >  delete mode 100644 arch/arm64/include/asm/kvm_ras.h
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/=
-kvm_mmu.h
-> > index ae563ebd6aee..e4069f2ce642 100644
-> > --- a/arch/arm64/include/asm/kvm_mmu.h
-> > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> > @@ -180,6 +180,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
-> >  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >                           phys_addr_t pa, unsigned long size, bool writ=
-able);
-> >
-> > +int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
-> >  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
-> >
-> >  phys_addr_t kvm_mmu_get_httbr(void);
-> > diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/=
-kvm_ras.h
-> > deleted file mode 100644
-> > index 9398ade632aa..000000000000
-> > --- a/arch/arm64/include/asm/kvm_ras.h
-> > +++ /dev/null
-> > @@ -1,25 +0,0 @@
-> > -/* SPDX-License-Identifier: GPL-2.0 */
-> > -/* Copyright (C) 2018 - Arm Ltd */
-> > -
-> > -#ifndef __ARM64_KVM_RAS_H__
-> > -#define __ARM64_KVM_RAS_H__
-> > -
-> > -#include <linux/acpi.h>
-> > -#include <linux/errno.h>
-> > -#include <linux/types.h>
-> > -
-> > -#include <asm/acpi.h>
-> > -
-> > -/*
-> > - * Was this synchronous external abort a RAS notification?
-> > - * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
-> > - */
-> > -static inline int kvm_handle_guest_sea(void)
-> > -{
-> > -       /* apei_claim_sea(NULL) expects to mask interrupts itself */
-> > -       lockdep_assert_irqs_enabled();
-> > -
-> > -       return apei_claim_sea(NULL);
-> > -}
-> > -
-> > -#endif /* __ARM64_KVM_RAS_H__ */
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 1c78864767c5..6934f4acdc45 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -4,19 +4,20 @@
-> >   * Author: Christoffer Dall <c.dall@virtualopensystems.com>
-> >   */
-> >
-> > +#include <linux/acpi.h>
-> >  #include <linux/mman.h>
-> >  #include <linux/kvm_host.h>
-> >  #include <linux/io.h>
-> >  #include <linux/hugetlb.h>
-> >  #include <linux/sched/signal.h>
-> >  #include <trace/events/kvm.h>
-> > +#include <asm/acpi.h>
-> >  #include <asm/pgalloc.h>
-> >  #include <asm/cacheflush.h>
-> >  #include <asm/kvm_arm.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/kvm_pgtable.h>
-> >  #include <asm/kvm_pkvm.h>
-> > -#include <asm/kvm_ras.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/virt.h>
-> > @@ -1811,6 +1812,20 @@ static void handle_access_fault(struct kvm_vcpu =
-*vcpu, phys_addr_t fault_ipa)
-> >         read_unlock(&vcpu->kvm->mmu_lock);
-> >  }
-> >
-> > +int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
-> > +{
-> > +       /*
-> > +        * Give APEI the opportunity to claim the abort before handling=
- it
-> > +        * within KVM. apei_claim_sea() expects to be called with IRQs
-> > +        * enabled.
-> > +        */
-> > +       lockdep_assert_irqs_enabled();
-> > +       if (apei_claim_sea(NULL) =3D=3D 0)
-> > +               return 1;
-> > +
-> > +       return kvm_inject_serror(vcpu);
-> > +}
-> > +
-> >  /**
-> >   * kvm_handle_guest_abort - handles all 2nd stage aborts
-> >   * @vcpu:      the VCPU pointer
-> > @@ -1834,17 +1849,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu=
-)
-> >         gfn_t gfn;
-> >         int ret, idx;
-> >
-> > -       /* Synchronous External Abort? */
-> > -       if (kvm_vcpu_abt_issea(vcpu)) {
-> > -               /*
-> > -                * For RAS the host kernel may handle this abort.
-> > -                * There is no need to pass the error into the guest.
-> > -                */
-> > -               if (kvm_handle_guest_sea())
-> > -                       return kvm_inject_serror(vcpu);
-> > -
-> > -               return 1;
-> > -       }
-> > +       if (kvm_vcpu_abt_issea(vcpu))
-> > +               return kvm_handle_guest_sea(vcpu);
-> >
-> >         esr =3D kvm_vcpu_get_esr(vcpu);
-> >
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 096747a61bf6..38b0e3a9a6db 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1289,6 +1289,9 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
-> >
-> >         BUG_ON(!(esr & ESR_ELx_VNCR_SHIFT));
-> >
-> > +       if (kvm_vcpu_abt_issea(vcpu))
-> > +               return kvm_handle_guest_sea(vcpu);
-> > +
-> >         if (esr_fsc_is_permission_fault(esr)) {
-> >                 inject_vncr_perm(vcpu);
-> >         } else if (esr_fsc_is_translation_fault(esr)) {
-> > --
-> > 2.39.5
-> >
+> >  arm64/include/kvm/kvm-config-arch.h | 5 ++++-
+> >  arm64/kvm-cpu.c                     | 2 ++
+> >  2 files changed, 6 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+> > index 44c43367b..73bf4211a 100644
+> > --- a/arm64/include/kvm/kvm-config-arch.h
+> > +++ b/arm64/include/kvm/kvm-config-arch.h
+> > @@ -11,6 +11,7 @@ struct kvm_config_arch {
+> >  	bool		has_pmuv3;
+> >  	bool		mte_disabled;
+> >  	bool		nested_virt;
+> > +	bool		e2h0;
+> >  	u64		kaslr_seed;
+> >  	enum irqchip_type irqchip;
+> >  	u64		fw_addr;
+> > @@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+> >  	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
+> >  		"Specify the counter offset, defaulting to 0"),			\
+> >  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
+> > -		    "Start VCPUs in EL2 (for nested virt)"),
+> > +		    "Start VCPUs in EL2 (for nested virt)"),			\
+> > +	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
+> > +		    "Create guest without VHE support"),
+> >  
+> >  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
+> > diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> > index 42dc11dad..6eb76dff4 100644
+> > --- a/arm64/kvm-cpu.c
+> > +++ b/arm64/kvm-cpu.c
+> > @@ -76,6 +76,8 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
+> >  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
+> >  			die("EL2 (nested virt) is not supported");
+> >  		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
+> > +		if (kvm->cfg.arch.e2h0)
+> > +			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
+> 
+> This really should also check the capability in order to fail
+> gracefully on system that have no E2H0 support at all (or have it so
+> buggy that it is permanently disabled by the kernel):
+> 
+> +		if (kvm->cfg.arch.e2h0) {
+> +	  		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2_E2H0))
+> +				die("FEAT_E2H0 is not supported");
+> +			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
+> +		}
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
