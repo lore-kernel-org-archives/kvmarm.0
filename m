@@ -1,97 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [217.182.43.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6F720297C;
-	Sat, 26 Jul 2025 09:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628EB155326;
+	Sat, 26 Jul 2025 09:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.182.43.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753521918; cv=none; b=FXbf+vZZS00EdMH4K/3kbbnBuSGSOU0YbKLhP2vK2i8fsy2l5qbWct0FrHrtpn0MOIQqJF4bUGpPseCOK9sBzaTMqlK6xgbJjWNEpeaexhaV7gRiuF5bncFauETFRAwcQFpOrZTa8qTsXGXIpptvN1v2I3cBjtI3U4D/efVMsBc=
+	t=1753522876; cv=none; b=GUP3j3FjSkqb/1Uaw0v/QU8DFKftuv0U6vdS94NKqfVpH4jbtpBafyQgOWyk2echmj4yGerJKDzyLlRFItN2QGRP7Iat3KEV/aMSwqsQW0U4TxEme/gHX0hq9zvbQyUMcgA07Z2FyMhwVo+hR7rPN8V5fA28J4MkdCCsuknel9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753521918; c=relaxed/simple;
-	bh=G1zXDq+dSV8P5gQI8K1WrGYlMWHSTInEUb24jJWuUM0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aEtg/dStDjwJobRr7gayMiOpqUmsbqhvF2y2GyqY/tk56crg+4m0XJMKEidkYjTWhLcRx11D34260h1sLMnI6cGVSgHkbS5ZQmDpZp64i2gEQuKv2mK/HXEI+Ur+rLRFd34y3odx7afmBvl2Gusdx43CEq0iRxQ6b8YIc3agaR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUPRjgp+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753522876; c=relaxed/simple;
+	bh=iTeOoXqz6aZjo7q4ywLa9JVRykRGRnni71TCrYjwnQ8=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=pQWShrr75BkwpfWMBBU9rHGb2nurZFJuA1M57JR1t76TyODtKmxSHHI3fgOG58N55NQmjMexnmcYzAPkxHA8Gas0UBiID+1sS0ZXZ6PfWezknBW1DZMJiRmD7xJ+iIvLmdEfBJFw1aGFfNsCWj4MGbwcdg0RIg6FrND4P/xF1hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=misterjones.org; spf=pass smtp.mailfrom=misterjones.org; dkim=pass (2048-bit key) header.d=misterjones.org header.i=@misterjones.org header.b=ZK0kwYO5; arc=none smtp.client-ip=217.182.43.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=misterjones.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=misterjones.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUPRjgp+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD229C4CEED;
-	Sat, 26 Jul 2025 09:25:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753521916;
-	bh=G1zXDq+dSV8P5gQI8K1WrGYlMWHSTInEUb24jJWuUM0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GUPRjgp+BNT3teTB/i1ZeuS2ugfDmiE5OHjL9aSyor7zVLZxKJZzaApKwIQk0Cblc
-	 hKp7JswyygdYTz0UKzjPJrboEP3mLi9UcFTj9RqjkweTk1cHdkCvU8S61QjMqLZ2E8
-	 lZc4DDwJEmHQDStESsDPw/WgpLC7YOUnzQ++hrIVs1B36fps5EWqWLhpvKe/xldC6J
-	 VE1QLuUGLK2h4D/OwFXCyJPxN+R8VxSLYWLX4QYDKQb+TnDxAAlxntJKwPYT3Uiwg5
-	 xNMA8l+k+t0wfgLII45zb54MTGJsw8Zq85q5oYK6v1SRBdinvEKpanRQOIt+OeRQAg
-	 kfOda1TwK/OxA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	dkim=pass (2048-bit key) header.d=misterjones.org header.i=@misterjones.org header.b="ZK0kwYO5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=misterjones.org; s=dkim20211231; h=Content-Transfer-Encoding:Content-Type:
+	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=JysWCa0Hqsy7znjssgRaZ1cn+vL8ibKOc18iND2JFrY=; b=ZK0kwYO5YY4YLDT0BwT1S875gy
+	NRuXlWr7xpkliYRfvBMdYaeDsQtOIDE5aXbaxadaK/FfbuLXaUNh2FoH7Sumll3cS/B6H0LTRFzMa
+	PDPOAioxVIFzXAVbt/SokYiOC3N9IMfx8ZExs4rgrVCbZHhPXYnmQL8xB2bEzPHJuaOGro6Nra1AH
+	iJxMP9oOETrmtVEkrpXdDIoLptgCJLotjKC4oXihdeayNnT7AJ4AYA1dh2yta+WHDy58LbsDV47PM
+	jbAiB5OSUeRw7AclawwiAG9L/vpGGAixfJ3owwxHGdkvaOFhlLdmzNtD9MMqOqRTohRgms/iIZ5kV
+	RokT0oIg==;
+Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ufb9W-001aBM-8Y;
-	Sat, 26 Jul 2025 10:25:14 +0100
-Date: Sat, 26 Jul 2025 10:25:07 +0100
-Message-ID: <87ikjftibw.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH kvmtool v2 4/6] arm64: Add counter offset control
-In-Reply-To: <20250725144100.2944226-5-andre.przywara@arm.com>
-References: <20250725144100.2944226-1-andre.przywara@arm.com>
-	<20250725144100.2944226-5-andre.przywara@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	(envelope-from <maz@misterjones.org>)
+	id 1ufb33-001a9E-LL;
+	Sat, 26 Jul 2025 10:18:33 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
+MIME-Version: 1.0
+Date: Sat, 26 Jul 2025 10:18:33 +0100
+From: Marc Zyngier <maz@misterjones.org>
+To: Jiaqi Yan <jiaqiyan@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org
+Subject: Re: [Bug Report] external_aborts failure related to efa1368ba9f4
+ ("KVM: arm64: Commit exceptions from KVM_SET_VCPU_EVENTS immediately")
+In-Reply-To: <CACw3F50O9Z=hPFNzeatzr2k+1cKX_nnqdzKJOMEdmjmfy3LoUg@mail.gmail.com>
+References: <CACw3F53VTDQeUbj3C75pkjz=iehbFCqbrTjYbUC3ViUbQJAhsg@mail.gmail.com>
+ <CACw3F50O9Z=hPFNzeatzr2k+1cKX_nnqdzKJOMEdmjmfy3LoUg@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.15
+Message-ID: <18df01493fee0547d8b5902b986a2334@misterjones.org>
+X-Sender: maz@misterjones.org
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 217.182.43.188
+X-SA-Exim-Rcpt-To: jiaqiyan@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@misterjones.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 25 Jul 2025 15:40:58 +0100,
-Andre Przywara <andre.przywara@arm.com> wrote:
+On 2025-07-25 23:38, Jiaqi Yan wrote:
+> On Mon, Jul 21, 2025 at 7:00 AM Jiaqi Yan <jiaqiyan@google.com> wrote:
+>> 
+>> Hi Oliver,
+>> 
+>> I was doing some SEA injection dev work and found
+>> tools/testing/selftests/kvm/arm64/external_aborts.c is failing at the
+>> head of my locally-tracked kvmarm/next, commit 811ec70dcf9cc ("Merge
+>> branch 'kvm-arm64/config-masks' into kvmarm/next"):
+>> 
+>> vobeb33:/export/hda3/tmp/yjq# ./external_aborts
+>> Random seed: 0x6b8b4567
+>> test_mmio_abort <= fail
+>> ==== Test Assertion Failure ====
+>>   arm64/external_aborts.c:19: regs->pc == expected_abort_pc
+>>   pid=25675 tid=25675 errno=4 - Interrupted system call
+>>   (stack trace empty)
+>>   0x0 != 0x21ed20 (regs->pc != expected_abort_pc)
+>> vobeb33:/export/hda3/tmp/yjq#
+>> vobeb33:/export/hda3/tmp/yjq#
+>> vobeb33:/export/hda3/tmp/yjq# ./external_aborts
+>> Random seed: 0x6b8b4567
+>> test_mmio_nisv       <= pass
+>> test_mmio_nisv_abort <=fail
+>> ==== Test Assertion Failure ====
+>>   arm64/external_aborts.c:19: regs->pc == expected_abort_pc
+>>   pid=26153 tid=26153 errno=4 - Interrupted system call
+>>   (stack trace empty)
+>>   0x0 != 0x21eb18 (regs->pc != expected_abort_pc)
+>> 
+>> It looks like the PC in the guest register is lost / polluted. I only
+>> tested test_mmio_abort (fail), test_mmio_nisv (pass), and
+>> test_mmio_nisv_abort (fail), but from reading the code of
+>> test_mmio_nisv vs test_mmio_nisv_abort, I guess test failure is
+>> probably due to some bug in the code kvm injects SEA into guest.
+>> 
+>> If I revert a single commit efa1368ba9f4 ("KVM: arm64: Commit
+>> exceptions from KVM_SET_VCPU_EVENTS immediately"), all tests in
+>> tools/testing/selftests/kvm/arm64/external_aborts.c pass. I have not
+>> yet figured out the bug tho. Want to report since you are the author
+>> maybe you can (or already) spot something.
 > 
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> KVM now allows to offset the arch timer counter values reported to a
-> guest, via a per-VM ioctl. This is conceptually similar to the effects
-> of CNTVOFF_EL2, but applies to both the emulated physical and virtual
-> counter, and also to all VCPUs.
+> Friendly ping ;)
 
-Not really. Architecturally, there is only a single, global counter,
-and multiple *views* of that counter.
+Please check this:
 
-What this option does is to offset the global counter. Then, the
-various per-CPU offsets are applied on the views that can be affected
-by them. This is cumulative. So for example, CNTVCT_EL0 is affected by
-both the global offset and CNTVOFF_EL2 when read from EL0, EL1, and
-EL2 when E2H==0. Behind the scenes, this is of course implemented with
-CNTVOFF_EL2 (when it works), but that's not really relevant here.
+https://web.git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=next&id=c6e35dff58d348c1a9489e9b3b62b3721e62631d
 
-I'd suggest something along the lines of:
-
-"KVM allows the offsetting of the global counter in order to help with
- migration of a VM. This offset applies cumulatively with the offsets
- provided by the architecture.
-
- Although kvmtool doesn't provide a way to migrate a VM, controlling
- this offset is useful to test the timer subsystem."
-
-Thanks,
-
-	M.
-
+         M.
 -- 
-Jazz isn't dead. It just smells funny.
+Who you jivin' with that Cosmik Debris?
