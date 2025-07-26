@@ -1,147 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AEB241667;
-	Sat, 26 Jul 2025 10:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5244B9460
+	for <kvmarm@lists.linux.dev>; Sat, 26 Jul 2025 15:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753526070; cv=none; b=SrXWKdd/hTjjvt6RMUqbOTBjvO1cQOReGcA/QWrIjjJ+0QF/5yrfHzFI6RecgE58e7KlN7i1suo94ATUw8Gowj9Ru2Mkt1Leh4PxmUNWHYrYyaFoR9pmlW+OhN4+h/KtiH9b/quYH1zHI/LC1bA442wFBxGD8/WGIuVqIMm6m80=
+	t=1753544742; cv=none; b=IW1yxakbSByIECJvzAQ7zOaYbhqoxctf5oqmWOuJy2IguhCWjLHizwH9ys+TZ4Rf9cshEHPc86L1Si+rkaHVsv6wpmJj4dUB3CLF09JDcQZfd/4LjUhJO2MV0Nhs9dtfEbBnfHZI4spJp/UmBpdGyy0FrYCsnorOcm2J3dhfG8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753526070; c=relaxed/simple;
-	bh=FYJxXIsnGPguGntCrMrA8ZIl5Irvi5pt8i95/ZZPs3A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LfkkNajqEYd8t3fsQ1dXP5/hnFvy+BfkWL/SJF0CDOM6+EgOdvyD8Sh5ozOt0SwPz9bDIfwChz2w1+j/AFSu4TC1hzirveblYHrkFqOFOU0bxlTKaSIDB5voqs5QUemXOehz1D40JpKS3frHjt/hObGtU+278gY2KSntQUGQ/rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o6ueX9EK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753544742; c=relaxed/simple;
+	bh=2ZezxNf/ACEep1W7xV579Nt7sMMYBbyBFBlLoRMWdCQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hx1/WLCvJ2oTlnqo0OFNT8V8E0q80PjwQxUglxKvzKiPxalJhliEviZ66175+iFhQ6HaMKaTKzacSyXTJhgtoqg9y0nY6yX+deg66k6spD+0NYkS/0aUvyxKcg/S/O0mSyxEdjjLMuzNlRhNy7eoZ5dS5mzULKl/SsV/prHIUnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uS2JpY/4; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o6ueX9EK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89E13C4CEED;
-	Sat, 26 Jul 2025 10:34:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753526069;
-	bh=FYJxXIsnGPguGntCrMrA8ZIl5Irvi5pt8i95/ZZPs3A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o6ueX9EKPj4OmAp9prP4eOor1kcfzNTxNa6KCVmDf0wsD+rHkvdUvcnDu+D6uFG8t
-	 OT32rGJn+KqPyrrmhZU82EfKAo7fasSuaZ4/+Q4VUlL7CIV2uULjJTzAuZwYR0AzuQ
-	 I1i1U2Yv/TxWwK/l8LIgSltYzf5WSVH9tb4ibldmGAa9c0NZOplj8uV/oTMgSmOax4
-	 TrA1e0kK0wNkY2hjzhE71FKolHlTp0oDWMxaU5HNITr6ceegbkMoJz8zsUx3oOYYhv
-	 ryjYuh3szHf3LIptHEYTJ4QN7pVV+T7tqbBv3n5TOTe0PFptMDHISqmI1Wa+QXhsnH
-	 F+IukygPkMTcA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ufcEV-001adU-E7;
-	Sat, 26 Jul 2025 11:34:27 +0100
-Date: Sat, 26 Jul 2025 11:34:26 +0100
-Message-ID: <868qkb8clp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: Andre Przywara <andre.przywara@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH kvmtool v2 5/6] arm64: add FEAT_E2H0 support (TBC)
-In-Reply-To: <qm2d74s7sqxgzupnc73uuwgginuzjoqlrfzycripfpzgpvu4p7@nth2cmrodr53>
-References: <20250725144100.2944226-1-andre.przywara@arm.com>
-	<20250725144100.2944226-6-andre.przywara@arm.com>
-	<86cy9o8bwn.wl-maz@kernel.org>
-	<zbgu6irpeytcpymaxpg55tvijeppfpdpwcju275g3h6bx4u5qn@35vb5ymt55hx>
-	<87jz3vtils.wl-maz@kernel.org>
-	<qm2d74s7sqxgzupnc73uuwgginuzjoqlrfzycripfpzgpvu4p7@nth2cmrodr53>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uS2JpY/4"
+Date: Sat, 26 Jul 2025 08:45:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753544733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8BO+S3QnhY8a+UuXqlAG5cu72jUDR/q2m/Q+0iSC3y0=;
+	b=uS2JpY/4QNqZ9Ahl2+aNTVty2IQiWwXqV/2LWD9r0yGz5F5Z+RhDpBd3lUbN07Vtwba38c
+	tn2Q77Bsvj/wpvTcCWmxULkB7Ckg0L0VrXqz92w7eMf+qtDTVaanPQdaqhh97z+vQroF3a
+	0M85kFOvq2bddXeuhKHZ5jr+dTxTfyc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eauger@redhat.com>,
+	Ben Horgan <ben.horgan@arm.com>, Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 4/6] KVM: arm64: vgic-v3: Allow userspace to write
+ GICD_TYPER2.nASSGIcap
+Message-ID: <aIT4Ek_DqdioF0u1@linux.dev>
+References: <20250724062805.2658919-1-oliver.upton@linux.dev>
+ <20250724062805.2658919-5-oliver.upton@linux.dev>
+ <CAJHc60wXquZzFNP+ekWZeVKAYkrB8eG+16c-LWLYX75NpYd03g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJHc60wXquZzFNP+ekWZeVKAYkrB8eG+16c-LWLYX75NpYd03g@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 26 Jul 2025 11:11:43 +0100,
-Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
+On Fri, Jul 25, 2025 at 03:53:23PM -0700, Raghavendra Rao Ananta wrote:
+> Hi Oliver,
 > 
-> On Sat, Jul 26, 2025 at 10:19:11AM +0100, Marc Zyngier wrote:
-> > On Sat, 26 Jul 2025 10:01:25 +0100,
-> > Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
-> > > 
-> > > Hi all,
-> > > 
-> > > On Fri, Jul 25, 2025 at 05:37:12PM +0100, Marc Zyngier wrote:
-> > > > Hi Andre,
-> > > > 
-> > > > Thanks for picking this. A few nits below.
-> > > > 
-> > > > On Fri, 25 Jul 2025 15:40:59 +0100,
-> > > > Andre Przywara <andre.przywara@arm.com> wrote:
-> > > > > 
-> > > > > From: Marc Zyngier <maz@kernel.org>
-> > > > > 
-> > > > > To reduce code complexity, KVM only supports nested virtualisation in
-> > > > > VHE mode. So to allow recursive nested virtualisation, and be able to
-> > > > > expose FEAT_NV2 to a guest, we must prevent a guest from turning off
-> > > > > HCR_EL2.E2H, which is covered by not advertising the FEAT_E2H0 architecture
-> > > > > feature.
-> > > > > 
-> > > > > To allow people to run a guest in non-VHE mode, KVM introduced the
-> > > > > KVM_ARM_VCPU_HAS_EL2_E2H0 feature flag, which will allow control over
-> > > > > HCR_EL2.E2H, but at the cost of turning off FEAT_NV2.
-> > > > 
-> > > > All of that has been captured at length in the kernel code, and I
-> > > > think this is "too much information" for userspace. I'd rather we
-> > > > stick to a pure description of what the various options mean to the
-> > > > user.
-> > > > 
-> > > > > Add a kvmtool command line option "--e2h0" to set that feature bit when
-> > > > > creating a guest, to gain non-VHE, but lose recursive nested virt.
-> > > > 
-> > > > How about:
-> > > > 
-> > > > "The --nested option allows a guest to boot at EL2 without FEAT_E2H0
-> > > >  (i.e. mandating VHE support). While this is great for "modern"
-> > > >  operating systems and hypervisors, a few legacy guests are stuck in a
-> > > >  distant past.
-> > > > 
-> > > >  To support those, the --e2h0 option exposes FEAT_E2H0 to the guest,
-> > > >  at the expense of a number of other features, such as FEAT_NV2. This
-> > > 
-> > > Just a very small thing:
-> > > 
-> > > Will only mentioning FEAT_NV2 here lead people to think that FEAT_NV is
-> > > still available with --e2h0?
-> > > Maybe s/FEAT_NV2/FEAT_NV/ makes it clearer?
-> > 
-> > Maybe. On the other hand, we never advertise the old FEAT_NV as such,
-> > irrespective of the state of E2H. This is indicated by
-> > ID_AA64MMFR4_EL1.NV_frac==0b0001 when NV is advertised. So I'm not
-> > sure this changes anything, really.
-> 
-> Right, thanks for the input. Even if the user doesn't know what's up the L1
-> hypervisor will when it checks ID_AA64MMFR4_EL1 :)
+> On Wed, Jul 23, 2025 at 11:28 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > From: Raghavendra Rao Ananta <rananta@google.com>
+> >
+> > KVM unconditionally advertises GICD_TYPER2.nASSGIcap (which internally
+> > implies vSGIs) on GICv4.1 systems. Allow userspace to change whether a
+> > VM supports the feature. Only allow changes prior to VGIC initialization
+> > as at that point vPEs need to be allocated for the VM.
+> >
+> > For convenience, bundle support for vLPIs and vSGIs behind this feature,
+> > allowing userspace to control vPE allocation for VMs in environments
+> > that may be constrained on vPE IDs.
+> >
+> Is the "bundling vLPI and vSGI" part missing from this series? Unless
+> I'm using a wrong base, we call vgic_v4_init() if
+> vgic_supports_direct_irqs(), which will be true even if userspace
+> turned off GICD_TYPER2.nASSGIcap. Am I missing something?
 
-Exactly.
+Nope, squashing this into the patch:
 
-The idea behind this relaxation to the architecture was that SW that
-is relying on FEAT_NV being advertised through ID_AA64MMFR2_EL1 would
-find that the "old style NV" isn't supported, while SW that has
-followed the architecture would also look at NV_frac, and find that
-the support that matters actually exists.
-
-It means that we potentially leave behind some hypervisors that
-haven't caught up with NV_frac yet, but since we don't know of any
-other NV-capable hypervisor that could run under KVM, that's not
-really a problem! ;-)
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 96048ec59d0d..fb6d7c098ae6 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -375,7 +375,15 @@ bool vgic_supports_direct_sgis(struct kvm *kvm);
+ 
+ static inline bool vgic_supports_direct_irqs(struct kvm *kvm)
+ {
+-	return vgic_supports_direct_msis(kvm) || vgic_supports_direct_sgis(kvm);
++	/*
++	 * Deliberately conflate vLPI and vSGI support on GICv4.1 hardware,
++	 * indirectly allowing userspace to control whether or not vPEs are
++	 * allocated for the VM.
++	 */
++	if (system_supports_direct_sgis())
++		return vgic_supports_direct_sgis(kvm);
++
++	return vgic_supports_direct_msis(kvm);
+ }
+ 
+ int vgic_v4_init(struct kvm *kvm);
