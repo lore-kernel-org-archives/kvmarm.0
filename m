@@ -1,67 +1,67 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C959433C4
-	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 14:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5DE26B76D
+	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 14:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753711725; cv=none; b=bV4mwvsmRWU0wSsu7MPhhxZQ8Etw2cgQIwOJDmYFm3m8mgAFisaElCCpf4jR4duybdORdmR3Iui6qLaJ0LTKz6a0PIl5DN8ap73StVCiyuB2d0G0dqkaqdY/N8HdTOmPufPQmjz+cV/9gGnqXu9RLLkEbM4EJFr+GCA53FvMX4w=
+	t=1753711830; cv=none; b=B848OyATJp5OgMJcHs0GqrkbMSCU6uxDTGihzGubUtF18o6ugkAc2NiQs44YKidFoaWmhW1iica7pG5x+v2Yx9SS0qm3CtERBVdaxk6n9dgnBOu8DGPC3uNKo8VejW6BFGPfcnI4268OXx82V8igWufl05Ld4gRAv24cTeES22E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753711725; c=relaxed/simple;
-	bh=4kahnbCUUVK18hvpSBxURKB9raQB46M0iQ5FOKtQghE=;
+	s=arc-20240116; t=1753711830; c=relaxed/simple;
+	bh=I9ZeIDzhsLC+Rw6BB2ZpsuLCUCI15ECbtPmeNUTuSxk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OWvF2KnnCTvhQ510CBijGbIvbJEsCmoCjiIymrG/TdQfJfscWoYqz4VRnCBeR3kMsEROf+kYSa+zIHfoMmz3AKJim2aQpVJLj6mfgDhFFcuJCDp36puQfPWnVPHW0hD1STr43vNz4pi5noev3GZv6BFg6k11dPEnqMr4kVE7G48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=C559wDSm; arc=none smtp.client-ip=209.85.160.169
+	 Content-Type:Content-Disposition:In-Reply-To; b=TXNQUQZARz+rVpK5/R1+ZrAm2FMtoOtYnVPD5fNDt4cRChnZ9BkKVD6LuzhREkTT6rsbXBlux9oOlkNTKgo6Fmh+/U0w+1Plk4cCHamKe9+bmdka1WTQGDctYn6BnlWb3in/8XUJ8XQXKcRX7OGhwolJ8wzrJDymJ27RurOYX+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=XC44TTlI; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="C559wDSm"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4abd3627e7eso66132991cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 07:08:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="XC44TTlI"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7e32c5a174cso405775585a.1
+        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 07:10:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1753711723; x=1754316523; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1753711828; x=1754316628; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4kahnbCUUVK18hvpSBxURKB9raQB46M0iQ5FOKtQghE=;
-        b=C559wDSmPJulpG31WSKvuAZsusIH3s+Oj9hxMBMhOAXbmbElL9HwX1CuCuZrWvcxRu
-         XjvEbIMfaQivMPnuaUE08YQsMn0w+12LfhhdhRFADGmi1ZkG9X/CylgUvu90OiXReX7P
-         6L3S7t5y1/VjF77qjwD45dagL5pkQe3TBhKBQd7OF01tWUBrTdVqVVaF4zFn13iVA+AW
-         lZF0UM3xvuRk7rwX4AudOsinUzIBi9UZyQMSBBHlNrdcQshUFNRGH1fywca7WXcCte6C
-         lE7tvpj8WpagC4DDSkBjoOQTiLxwlHeos0eOwPZTy/z0HVYtgleZnn2eFA06sYuLInJn
-         uJdw==
+        bh=+eqiZhyg+ZCBOtjufQJyy2X2RHAGHLhNx9NLb+2h7ug=;
+        b=XC44TTlIi1jcD9qvsUzIoFEwxqP5vaRVQqY+RU49sjj458oEYNJKL5Jno9yMG1oQTW
+         COGlf/JPIzfmHt7FPvUc13K/0wdoPAarGoXOovObKjSxnVLvpE+mckVNsJjnARCuQkeZ
+         TLMEwwMnlSV1xSMdgW/ndGYMxmTglbCXm22jskT4L3kbxruiTNCkQd+00kgmbIbd/crY
+         BNvFjDAfWuvxmMVrutivfemHExljH+kBFXV4oeyMBPGQ9BTVMq52qzthPh3E+HAQjCRM
+         sVed7CW2ZI7k9s/Zk1eCb9Mgapxb48cJZAlUTulD7usxIVmX/Gvk6wTXq8M+a/fNCyuS
+         Cjfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753711723; x=1754316523;
+        d=1e100.net; s=20230601; t=1753711828; x=1754316628;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4kahnbCUUVK18hvpSBxURKB9raQB46M0iQ5FOKtQghE=;
-        b=AAbABeFcKwwJFtNUcLC/KBhjnWNYAHoANWSbXM70j/W5gqs+8rK6kNhyFMVp+kELFX
-         hVhqpEce1XRfCIpgFAKxz6XAzLYEBMzL4oe7aXor5jqy5BTrRMCrNuVmtaPBZCZfkCva
-         ono4lAW5HOS6XWnGHgeP5UpLX8P1+Er7zB3zFpqi8wQRumCv569c0jiE13NA6mZ9Wyub
-         Z2uClCS8Hbtbv1u7wzBJI5PpAMM8qt0/k57FWoeVUegJQYUYVv1HNi4xKbz1usb4VO3J
-         o9w/WZzWqvsgZI7NtKxa4Lv2HzDJowzNFj6TOe/PkfKbfSpXsRDDidRcvvHQHooDNuU1
-         xPfg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkPtawhN2MOLrptO3D743M4oFI4SD6XQRn32GMhgDglLdzbbGyIN9M7E8Ohkb4vV6KdeJ8Yg4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YztDGoJ16tnCQrh9HtSEbp1yS7rWTJupF+uXB/2ZSqsFc2/xg25
-	146aIcHoRL6L/q69PetZcj+uakRrAbxJjzNwK0Bn6VWwcRLAJpVbccKJ5VxJ7lEZkW8=
-X-Gm-Gg: ASbGncur3uWx/CGkj21oSxNiuE6UtO3XOm7bW/iuE4zsEhJWr5nwWspUSdSWk4gTMqH
-	NbatDQgmsHPG+IXABrbs1c9h0XfmZu0pmPtT2258xgwq1XNEFJDVsFpkGhxD4ub1meCcYk/0R83
-	0pb+naW1RXrDIixQZaqYDHqd76KWX346ruuSbavhbJfmPvqTyIPv6SfqNpw87R5FnxjbEq+7aAT
-	tb4NPFxaOsdM10paZaqegS6uK6siiZVzc4Lexwpx/UQvnes9xfPRXZ1iDVFC3hPBp3epupxMvat
-	6YtUwkq8f9aygy+Qz/DvL681sWvMqC+uzlBrihLSyVcost0sYbVt+OzqhFGGtOkYeBcw8eUXBSX
-	ftlK4dXMJnaB6Gr2tGXBpRRwo7HmuAk1vq4GtadLcaVYLsDivajoZH0ED4bcCht//orPF
-X-Google-Smtp-Source: AGHT+IGXQH54g+OEuDAZ//VEsPFOF0VZ1eCHZSsCk3KsPn6dRKNeXLVClWZB7Vwu63ig1wAqfFoyFQ==
-X-Received: by 2002:a05:6214:929:b0:707:4509:b6c1 with SMTP id 6a1803df08f44-7074509b794mr50900796d6.11.1753711722526;
-        Mon, 28 Jul 2025 07:08:42 -0700 (PDT)
+        bh=+eqiZhyg+ZCBOtjufQJyy2X2RHAGHLhNx9NLb+2h7ug=;
+        b=DMBPDDfhCMIha+FvbMbzD7E+zIMJoi672GQNTIDnXkzPiwOugPkkQGdOFN8qIEM7Up
+         WKNmy2Ddqs7mtJf+IO+CJCEA9+N9QRhf6igFqylMJoURoy5B7Q77TIu+uoaXn776h/us
+         HnT1mquAsTGqLTbp9tG8rzjPjxrnr3A1mq35JJlBqIZ3dKVKEkMC1+ZbriOhZqVioUpy
+         ame21jJSK0kM7A9NbJXZadWi8XF7TOaZJfNn6gUe8PeBJQydloxOCiAvVOpvdGLt4CmJ
+         OqtCXczXRWALrF5VszmzgD7+NAkekuzRbczMbq2s35oRwTuLhrQ8GXV8M8HqTUNnrCmo
+         1glQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0xpmshuI/pMm5UuCjyrFv3vF6+96BrZfu4+EC8iPaw/NIYQ/Fd5+IZXV9bKocx/lT9W0CZ88=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxRoVwEn00rr0W1j0eMu8MbRazG4MbSqVkcPi81WCCFym+CuI1k
+	DJqJqsxoIiV5ATQC3+MViT0l/RnXfoO2g7q6/qs0oC+yUj3lGHyDJdiDUTsUgzSA8Fk=
+X-Gm-Gg: ASbGnct3EfEmEaHhbfv0w9vLX5TGnX1cTD2vvxNe5DDzpphu7TvDHOHCwmM8i8g/zsB
+	Y/SSPQDuSVDhuJFzGue8z+mrAAiSr3CqaKZzijvW1CaLIr0HJwPpQJjt2EjmHsYhj5mdRLga4+X
+	swqo2u76vWRqysFRYS+If6BfD//RYodss9uJykeMuYvN5AZQ5AuM4iCeZTwOvR43am6VjDbJReG
+	S+cNCv/x6QW99oZf/Ha7iiDwgSIgPX1Un+QjTzc43lD7qrrkcmiUY7NzHuTy2RXYM+hBaMLt/I/
+	PNIWO7KEWFUTOFKFjx9HT7DyCErWjoFZNAZFxaXPMe6c/bncotZ63w4TKQd8yttoHeK9W3X7N3r
+	d+TNdLDgw0AYKID/XMz3OozINPvk6GqFrTGEprmI2dVspMKYa2P6cRKTrixnRnj0cVlXv
+X-Google-Smtp-Source: AGHT+IG4AMn3fFLDW2xb11IBx2YQ2BaQYNWmVWPx/pnTmFR/H2yiwHIFP+BF1HqcDvdzFfnmN7sa7w==
+X-Received: by 2002:a05:620a:2a11:b0:7e6:3c25:b69b with SMTP id af79cd13be357-7e63c25b6bbmr1410127285a.13.1753711827688;
+        Mon, 28 Jul 2025 07:10:27 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70729c70979sm30626156d6.86.2025.07.28.07.08.41
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e64327b33csm296288885a.3.2025.07.28.07.10.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jul 2025 07:08:41 -0700 (PDT)
+        Mon, 28 Jul 2025 07:10:27 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1ugOWv-00000000APv-1G4L;
-	Mon, 28 Jul 2025 11:08:41 -0300
-Date: Mon, 28 Jul 2025 11:08:41 -0300
+	id 1ugOYc-00000000AQN-25tk;
+	Mon, 28 Jul 2025 11:10:26 -0300
+Date: Mon, 28 Jul 2025 11:10:26 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
@@ -73,11 +73,11 @@ Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 06/38] iommufd: Add and option to request for bar
- mapping with IORESOURCE_EXCLUSIVE
-Message-ID: <20250728140841.GA26511@ziepe.ca>
+Subject: Re: [RFC PATCH v1 07/38] iommufd/viommu: Add support to associate
+ viommu with kvm instance
+Message-ID: <20250728141026.GB26511@ziepe.ca>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-7-aneesh.kumar@kernel.org>
+ <20250728135216.48084-8-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -86,16 +86,49 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250728135216.48084-7-aneesh.kumar@kernel.org>
+In-Reply-To: <20250728135216.48084-8-aneesh.kumar@kernel.org>
 
-On Mon, Jul 28, 2025 at 07:21:43PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+On Mon, Jul 28, 2025 at 07:21:44PM +0530, Aneesh Kumar K.V (Arm) wrote:
 
-Why would we need this?
+> +#if IS_ENABLED(CONFIG_KVM)
+> +#include <linux/kvm_host.h>
+> +
+> +static int viommu_get_kvm(struct iommufd_viommu *viommu, int kvm_vm_fd)
+> +{
+> +	int rc = -EBADF;
+> +	struct file *filp;
+> +
+> +	filp = fget(kvm_vm_fd);
+> +
+> +	if (!file_is_kvm(filp))
+> +		goto err_out;
+> +
+> +	/* hold the kvm reference via file descriptor */
+> +	viommu->kvm_filp = filp;
+> +	return 0;
+> +err_out:
+> +	viommu->kvm_filp = NULL;
+> +	fput(filp);
+> +	return rc;
+> +}
+> +
+> +static void viommu_put_kvm(struct iommufd_viommu *viommu)
+> +{
+> +	fput(viommu->kvm_filp);
+> +	viommu->kvm_filp = NULL;
+> +}
+> +#endif
 
-I can sort of understand why Intel would need it due to their issues
-with MCE, but ARM shouldn't care either way, should it?
+Missing stub functions for !CONFIG_KVM?
 
-But also why is it an iommufd option? That doesn't seem right..
+Looks like an OK design otherwise
+
+> @@ -1057,6 +1068,7 @@ struct iommu_viommu_alloc {
+>  	__u32 data_len;
+>  	__u32 __reserved;
+>  	__aligned_u64 data_uptr;
+> +	__u32 kvm_vm_fd;
+
+fds are __s32, they are signed numbers.
 
 Jason
