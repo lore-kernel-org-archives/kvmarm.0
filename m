@@ -1,55 +1,57 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258C1275864
-	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 17:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A1D273D6E
+	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 17:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753725216; cv=none; b=PZUtbwbZY6DyMAOZr6YKXFWw8D/hKHAARNCVZaEjYMw++3Q1+2EjhZ4i6IlAUqr8Z2j6GxE7f+Tst4q6qzh3ExRiXiOKEtzKxxPBEijDverAvEcxSSqLh6qAj5RYAvwHG/Z8IiaZIHCnfbuGPS+VubM2hgHBYWpekWab5bUVHmE=
+	t=1753725216; cv=none; b=g8EPC4X6PYoLD/t5eYJuvKj0Y5vElp7mojsrD646GpIORYkEW5JkncjAdfCPUeHpjA2aeBfUgjdfrRDNlWt26sXvOX/r8kOrgj30IaSiFjcN43VJG2hH8ma5iDBxlK+aUf+UC64wLQUzrxNOWHYyOIPwa7opauosARzUVxGvuiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753725216; c=relaxed/simple;
-	bh=nRn9Dsf3QfyBnEBl4Hr7BBBiduTa1EIYJ+DzHW4mP0E=;
+	bh=hP1ezwqITfAGTxjXJCCUqo8/yzlLtMVaX1yiItE74oY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UY9oA0tJtFrW3Gzupo5gdYJx3LmdKX5/KZJDcMVaw1W05LGq1LYoTzTmha6Du8V5uCzYRSEo3bp5suzadXGzEY0wsajhXitu0XQSJmrQfCIinGqZxhTa7A59iClRNBIOiFG3bChR5f9J0QO+Dwtcm9/1z8qpUHz6dbLks9QPbJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZjzUNSUE; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=EvhMgRGug2YsC1W1zMwDGGhUFGpheQyA8R2PQYXigQneFoZrnZHYV5xIHysiuldgbmFop+IoijZPUazNeQcsPDBytJsaX8S7YPCUf0kVNP8h2ExesPY7ctW/4TiJHL8t4CcDUCkNkMALf2wX7azBF38FICfREA0LIWCDZLC8Zfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fFyE0CoN; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZjzUNSUE"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a4fabcafecso1884615f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 10:53:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fFyE0CoN"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-456013b59c1so25259395e9.3
+        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 10:53:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753725213; x=1754330013; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UBRRf2ok05qV4V10RyprFxOV/7isNWPsP0/960vxN5o=;
-        b=ZjzUNSUELLJYwwejcJB9JtEoU0EIaAigohaBACm2hO3FkMRwxBw4G5DQseBlXyzVY5
-         nLCtfupONT4xtcgQ8nDEHILNo/zhkwuaHeKnzXc5i+spbg6rzEKvnbDiVOnApTh6SvnH
-         eyw/qKpxyEW+myIjn/to8pBiMku9Djsvuln3tlc1uBjt5D/z4dxypr+naE4zYk3i7PuX
-         9InLrRmW73yRv38dsoXRsF6VemjL6xMmH+oebe/nq8t4p5vdMJ7a9hQCv+EG8SU4n0/u
-         foVl+FrfFCIqkwVFCQ158XOtTaL6+n09NJ6yRHhebdXF0HMMwwr+6T03U5XcmdjN0aWG
-         Kjyg==
+        d=google.com; s=20230601; t=1753725212; x=1754330012; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LTlCwgzIOF5QQeq25ycyuKVefVmukIB/XqIN+TFnUGg=;
+        b=fFyE0CoNrhu69QSnoQJ0fnilQgCN1vPdxn4AF3t3tkeikfKIvC6UaQCf1AzKfZQ1a9
+         +txrcnfyH3TWMN5SQjxCvHnjZvGle1z359guvW+6RSsQ0JmIZFlMnHFI6kub/UvRyrwk
+         jAyMcoq8bDiAvFtRCrGCSIQA0Lt/clAEpRd11PV7UU7VIsyg35mZcojOeOSY9pGrarTW
+         E/JJpZCwg8kd6E6hJi5XCQw0k+Tw0+3R3+lMqVf7ebUs+UxTooal5PR2sJgfB8KZA8Yt
+         KIOKxp+YTcrx6NFIuwBPV6e5OxvgKvySxmn0mFuCUZCfkTAy4Lz3VYEl7E3nhT1GE1Oz
+         +X1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753725213; x=1754330013;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UBRRf2ok05qV4V10RyprFxOV/7isNWPsP0/960vxN5o=;
-        b=ctrx+fxM2KusjGhth60NEVMs7WSg7Q22Fb9dF8/qpZOJTjgfFdAAOHiquC8+R/hbyf
-         usCyLKzrWh+lif2JsEyqIaDVdNUQ8fYAARZ+uygQS7OiXo6+uP9D8Syd1JVtBWx7Wz+W
-         rKusRZKp36BPHq9A/eOU2xA6A40E8iGalF/iWDVlfrS82CgpdnSkekbhdEDQR9XLUWIH
-         tI2ERZ1seHVX8+BSC8WArdtmLKbxaxO6cwGiqvEQ6IQIFCvaT18MtoNsGy02pmND4i7t
-         dVSp9bcVr4ac8DQ3KNOoaZs9AxMGYvLDb7fzJ/jV7ACAEZIe+mvfm7QfZl8dWV6FnF8G
-         k+/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVC3qMN/hSooAQ8PoreIovEwRNFDJOzJA06yCRqCLHtpZ0vZa29gCTdjoqdLu5XXAqt7j6SpCg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz10bD1ufvH951KxZMo3wM8I+mIoMxk47EA6brfCum4z6jsbXPA
-	5RmKBd0bJp5hxOAelWXyGXOs/cfM2q76o1mYOtKS49m9PPXk7eTVPonNXZNPO3cHis3KGzQ02ET
-	hgg4BBsnum45czw==
-X-Google-Smtp-Source: AGHT+IEdo5UmQraGXTZJ9gCaHcWtxJIv/tFc5vNP8HwnzGiRANkg0buplE/XnYHC6sojxb0f1IZVCz/ntN1JZg==
-X-Received: from wmbji2.prod.google.com ([2002:a05:600c:a342:b0:456:214c:845d])
+        d=1e100.net; s=20230601; t=1753725212; x=1754330012;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LTlCwgzIOF5QQeq25ycyuKVefVmukIB/XqIN+TFnUGg=;
+        b=vpmS9IjkC55syL2dKrvtoUkZ847H4WyRQ51f9GvuiFjPQiwJHNgUSNSFJoY5PN7X+e
+         wl92Y2lQFLMgWCtyl0kAepD1SyS6Xme5todbkaNt+o3T3lx/512OL1enLNGsvh7aTnll
+         hLNJbQvjSx8IxgmuQY4PlCoAVgomItEIzuq+lGZpddv8xCrabsvwsdTp8kn5R3zmU0od
+         R2ShotcLE+uZfyoT9UwcGfHalx8w4Z0gLAGR8UqHv39zOQkGuNrWYcRoDr7+y4YR4Gyj
+         /Ozl002RIulBk+c1TO/lPHSlrIqybBZm/v+UHqKIWLHuHb4dCy+RZgqgVYN5PSfSIwbl
+         1qVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeE3KEghvGc/P96B1Hps1ul8z4/uo+lxGPQeu6M+JQOTp4gx17MU4N/AeIN1P9Uj51oEgAPsw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxJN0ElV6sgtPnW1btLfvuy4VYjV2tw1/opK/TCXZfURVqEiHt7
+	/7IlA4P/1hwbzRv66/jbPQXlgV7RGyH4eAsO7WRn5AiOLgcMCw5D+PKfl0e27mtl4aoz9YSe5ZU
+	voz09laEXW5V1dA==
+X-Google-Smtp-Source: AGHT+IFCITa28zMUxk5yrbhT5rLbfbzrHT5VY8BBjpTdvUFIiWEDdOt68tV9XBv1JfmpoFATXqpljTOFgxfv6g==
+X-Received: from wmbhj25.prod.google.com ([2002:a05:600c:5299:b0:456:1824:5884])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:290d:b0:3b5:f93a:bcc with SMTP id ffacd0b85a97d-3b77675be5amr9578336f8f.35.1753725213520;
- Mon, 28 Jul 2025 10:53:33 -0700 (PDT)
-Date: Mon, 28 Jul 2025 17:52:50 +0000
+ 2002:a05:600c:8218:b0:456:10a8:ff7 with SMTP id 5b1f17b1804b1-4587655b79cmr98218285e9.28.1753725212532;
+ Mon, 28 Jul 2025 10:53:32 -0700 (PDT)
+Date: Mon, 28 Jul 2025 17:52:49 +0000
 In-Reply-To: <20250728175316.3706196-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250728175316.3706196-1-smostafa@google.com>
 X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250728175316.3706196-4-smostafa@google.com>
-Subject: [PATCH v3 03/29] KVM: arm64: pkvm: Add pkvm_time_get()
+Message-ID: <20250728175316.3706196-3-smostafa@google.com>
+Subject: [PATCH v3 02/29] KVM: arm64: Donate MMIO to the hypervisor
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev
@@ -70,94 +72,157 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	qperret@google.com, tabba@google.com, jgg@ziepe.ca, mark.rutland@arm.com, 
 	praan@google.com, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a function to return time in us.
+Add a function to donate MMIO to the hypervisor so IOMMU hypervisor
+drivers can use that to protect the MMIO of IOMMU.
+The initial attempt to implement this was to have a new flag to
+"___pkvm_host_donate_hyp" to accept MMIO. However that had many problems,
+it was quite intrusive for host/hyp to check/set page state to make it
+aware of MMIO and to encode the state in the page table in that case.
+Which is called in paths that can be sensitive to performance (FFA, VMs..)
 
-This can be used from IOMMU drivers while waiting for conditions as
-for SMMUv3 TLB invalidation waiting for sync.
+As donating MMIO is very rare, and we don=E2=80=99t need to encode the full=
+ state,
+it=E2=80=99s reasonable to have a separate function to do this.
+It will init the host s2 page table with an invalid leaf with the owner ID
+to prevent the host from mapping the page on faults.
+
+Also, prevent kvm_pgtable_stage2_unmap() from removing owner ID from
+stage-2 PTEs, as this can be triggered from recycle logic under memory
+pressure. There is no code relying on this, as all ownership changes is
+done via kvm_pgtable_stage2_set_owner()
+
+For error path in IOMMU drivers, add a function to donate MMIO back
+from hyp to host.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 ++
- arch/arm64/kvm/hyp/nvhe/setup.c        |  4 ++++
- arch/arm64/kvm/hyp/nvhe/timer-sr.c     | 33 ++++++++++++++++++++++++++
- 3 files changed, 39 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 64 +++++++++++++++++++
+ arch/arm64/kvm/hyp/pgtable.c                  |  9 +--
+ 3 files changed, 68 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index ce31d3b73603..6c19691720cd 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -87,4 +87,6 @@ bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
- void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
- int kvm_check_pvm_sysreg_table(void);
- 
-+int pkvm_timer_init(void);
-+u64 pkvm_time_get(void);
- #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index a48d3f5a5afb..ee6435473204 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -304,6 +304,10 @@ void __noreturn __pkvm_init_finalise(void)
- 	};
- 	pkvm_pgtable.mm_ops = &pkvm_pgtable_mm_ops;
- 
-+	ret = pkvm_timer_init();
-+	if (ret)
-+		goto out;
-+
- 	ret = fix_host_ownership();
- 	if (ret)
- 		goto out;
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index ff176f4ce7de..e166cd5a56b8 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -11,6 +11,10 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- 
-+#include <nvhe/pkvm.h>
-+
-+static u32 timer_freq;
-+
- void __kvm_timer_set_cntvoff(u64 cntvoff)
- {
- 	write_sysreg(cntvoff, cntvoff_el2);
-@@ -68,3 +72,32 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
- 
- 	sysreg_clear_set(cnthctl_el2, clr, set);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm=
+/hyp/include/nvhe/mem_protect.h
+index 52d7ee91e18c..98e173da0f9b 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -37,6 +37,8 @@ int __pkvm_host_share_hyp(u64 pfn);
+ int __pkvm_host_unshare_hyp(u64 pfn);
+ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+ int ___pkvm_host_donate_hyp(u64 pfn, u64 nr_pages, enum kvm_pgtable_prot p=
+rot);
++int __pkvm_host_donate_hyp_mmio(u64 pfn);
++int __pkvm_hyp_donate_host_mmio(u64 pfn);
+ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+ int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvh=
+e/mem_protect.c
+index 861e448183fd..c9a15ef6b18d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -799,6 +799,70 @@ int ___pkvm_host_donate_hyp(u64 pfn, u64 nr_pages, enu=
+m kvm_pgtable_prot prot)
+ 	return ret;
  }
-+
-+static u64 pkvm_ticks_get(void)
+=20
++int __pkvm_host_donate_hyp_mmio(u64 pfn)
 +{
-+	return __arch_counter_get_cntvct();
++	u64 phys =3D hyp_pfn_to_phys(pfn);
++	void *virt =3D __hyp_va(phys);
++	int ret;
++	kvm_pte_t pte;
++
++	host_lock_component();
++	hyp_lock_component();
++
++	ret =3D kvm_pgtable_get_leaf(&host_mmu.pgt, phys, &pte, NULL);
++	if (ret)
++		goto unlock;
++
++	if (pte && !kvm_pte_valid(pte)) {
++		ret =3D -EPERM;
++		goto unlock;
++	}
++
++	ret =3D kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)virt, &pte, NULL);
++	if (ret)
++		goto unlock;
++	if (pte) {
++		ret =3D -EBUSY;
++		goto unlock;
++	}
++
++	ret =3D pkvm_create_mappings_locked(virt, virt + PAGE_SIZE, PAGE_HYP_DEVI=
+CE);
++	if (ret)
++		goto unlock;
++	/*
++	 * We set HYP as the owner of the MMIO pages in the host stage-2, for:
++	 * - host aborts: host_stage2_adjust_range() would fail for invalid non z=
+ero PTEs.
++	 * - recycle under memory pressure: host_stage2_unmap_dev_all() would cal=
+l
++	 *   kvm_pgtable_stage2_unmap() which will not clear non zero invalid pte=
+s (counted).
++	 * - other MMIO donation: Would fail as we check that the PTE is valid or=
+ empty.
++	 */
++	WARN_ON(host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.pgt, phys=
+,
++				PAGE_SIZE, &host_s2_pool, PKVM_ID_HYP));
++unlock:
++	hyp_unlock_component();
++	host_unlock_component();
++
++	return ret;
 +}
 +
-+#define SEC_TO_US 1000000
-+
-+int pkvm_timer_init(void)
++int __pkvm_hyp_donate_host_mmio(u64 pfn)
 +{
-+	timer_freq = read_sysreg(cntfrq_el0);
-+	/*
-+	 * TODO: The highest privileged level is supposed to initialize this
-+	 * register. But on some systems (which?), this information is only
-+	 * contained in the device-tree, so we'll need to find it out some other
-+	 * way.
-+	 */
-+	if (!timer_freq || timer_freq < SEC_TO_US)
-+		return -ENODEV;
++	u64 phys =3D hyp_pfn_to_phys(pfn);
++	u64 virt =3D (u64)__hyp_va(phys);
++	size_t size =3D PAGE_SIZE;
++
++	host_lock_component();
++	hyp_lock_component();
++
++	WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, virt, size) !=3D size);
++	WARN_ON(host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.pgt, phys=
+,
++				PAGE_SIZE, &host_s2_pool, PKVM_ID_HOST));
++	hyp_unlock_component();
++	host_unlock_component();
++
 +	return 0;
 +}
 +
-+#define pkvm_time_ticks_to_us(ticks) ((u64)(ticks) * SEC_TO_US / timer_freq)
-+
-+/* Return time in us. */
-+u64 pkvm_time_get(void)
-+{
-+	return pkvm_time_ticks_to_us(pkvm_ticks_get());
-+}
--- 
+ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
+ {
+ 	return ___pkvm_host_donate_hyp(pfn, nr_pages, PAGE_HYP);
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index c351b4abd5db..ba06b0c21d5a 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1095,13 +1095,8 @@ static int stage2_unmap_walker(const struct kvm_pgta=
+ble_visit_ctx *ctx,
+ 	kvm_pte_t *childp =3D NULL;
+ 	bool need_flush =3D false;
+=20
+-	if (!kvm_pte_valid(ctx->old)) {
+-		if (stage2_pte_is_counted(ctx->old)) {
+-			kvm_clear_pte(ctx->ptep);
+-			mm_ops->put_page(ctx->ptep);
+-		}
+-		return 0;
+-	}
++	if (!kvm_pte_valid(ctx->old))
++		return stage2_pte_is_counted(ctx->old) ? -EPERM : 0;
+=20
+ 	if (kvm_pte_table(ctx->old, ctx->level)) {
+ 		childp =3D kvm_pte_follow(ctx->old, mm_ops);
+--=20
 2.50.1.552.g942d659e1b-goog
 
