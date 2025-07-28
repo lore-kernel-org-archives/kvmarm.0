@@ -1,67 +1,67 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5DE26B76D
-	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 14:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6738926D4FB
+	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 14:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753711830; cv=none; b=B848OyATJp5OgMJcHs0GqrkbMSCU6uxDTGihzGubUtF18o6ugkAc2NiQs44YKidFoaWmhW1iica7pG5x+v2Yx9SS0qm3CtERBVdaxk6n9dgnBOu8DGPC3uNKo8VejW6BFGPfcnI4268OXx82V8igWufl05Ld4gRAv24cTeES22E=
+	t=1753712226; cv=none; b=ZW0HQUlQkMZ7RUlCBGWChKa4nu6IMVjnkRDIjPXAh+81ZcwurCZYpqpJLjUARsM47KL52kF17R4PpIybNUTVANa5iaRnUtED6IEMRXhFd7RxJY67NwgcdZa7XrIj/zl+HZ2YzFEB6mxhOdeqI8zDKigoH7iYwMywDenjbUwUcUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753711830; c=relaxed/simple;
-	bh=I9ZeIDzhsLC+Rw6BB2ZpsuLCUCI15ECbtPmeNUTuSxk=;
+	s=arc-20240116; t=1753712226; c=relaxed/simple;
+	bh=+sQ9t0gn5L4GrZDYwNd4uW4hApI7Q8x2B8KZ36bnLW8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TXNQUQZARz+rVpK5/R1+ZrAm2FMtoOtYnVPD5fNDt4cRChnZ9BkKVD6LuzhREkTT6rsbXBlux9oOlkNTKgo6Fmh+/U0w+1Plk4cCHamKe9+bmdka1WTQGDctYn6BnlWb3in/8XUJ8XQXKcRX7OGhwolJ8wzrJDymJ27RurOYX+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=XC44TTlI; arc=none smtp.client-ip=209.85.222.169
+	 Content-Type:Content-Disposition:In-Reply-To; b=lqFtcpH6K+H/SRQ+fVeqRfBSk/MCHsfqKkgcNPi676A3WYtiB5dv1Tcau4rAhkQCDhdoxdLtwR8ZkJzMYZ8NA+sWFLDATSmgRvbVSHhmP6DKpzMNGw7EJG8ywdelUaK5F8Zj6LlPCV/jA5+JS2F/H2oj4AvS/pVg513OuCSvO/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=dL+HajTc; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="XC44TTlI"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7e32c5a174cso405775585a.1
-        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 07:10:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dL+HajTc"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ab71ac933eso40336221cf.2
+        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 07:17:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1753711828; x=1754316628; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1753712223; x=1754317023; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+eqiZhyg+ZCBOtjufQJyy2X2RHAGHLhNx9NLb+2h7ug=;
-        b=XC44TTlIi1jcD9qvsUzIoFEwxqP5vaRVQqY+RU49sjj458oEYNJKL5Jno9yMG1oQTW
-         COGlf/JPIzfmHt7FPvUc13K/0wdoPAarGoXOovObKjSxnVLvpE+mckVNsJjnARCuQkeZ
-         TLMEwwMnlSV1xSMdgW/ndGYMxmTglbCXm22jskT4L3kbxruiTNCkQd+00kgmbIbd/crY
-         BNvFjDAfWuvxmMVrutivfemHExljH+kBFXV4oeyMBPGQ9BTVMq52qzthPh3E+HAQjCRM
-         sVed7CW2ZI7k9s/Zk1eCb9Mgapxb48cJZAlUTulD7usxIVmX/Gvk6wTXq8M+a/fNCyuS
-         Cjfg==
+        bh=+sQ9t0gn5L4GrZDYwNd4uW4hApI7Q8x2B8KZ36bnLW8=;
+        b=dL+HajTcPYW298bIf5D+tIQ0MNl8GCIrMNgW6Z+VnHsfd6YFV9HR5/hUfGonXZPhmn
+         gJjlXaegXxNv5IPiU/me3fjaifRO4FUFp8Xex21vGGR1QRHbrUnJLN3WjoMLZ0rSFOLZ
+         gjJjC6MFOmM9uWzXCkvhZPXGCGL8V81+hnocoGHmBJ20kSdBpbLrKzVrzPtGzZUllVjO
+         SEluEJzE9tLXfu9807ngz7xaSHa0T7DbHHR4CM6os6+Jh4PR+ffnXGNf5mDL4gBeAZAF
+         b8PZVegG0ACt5MMaGSettRiHxD2C/o6dUjuTCoF7cT5HNBEHYCqzmY7eNduYBO33jb9i
+         I57Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753711828; x=1754316628;
+        d=1e100.net; s=20230601; t=1753712223; x=1754317023;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+eqiZhyg+ZCBOtjufQJyy2X2RHAGHLhNx9NLb+2h7ug=;
-        b=DMBPDDfhCMIha+FvbMbzD7E+zIMJoi672GQNTIDnXkzPiwOugPkkQGdOFN8qIEM7Up
-         WKNmy2Ddqs7mtJf+IO+CJCEA9+N9QRhf6igFqylMJoURoy5B7Q77TIu+uoaXn776h/us
-         HnT1mquAsTGqLTbp9tG8rzjPjxrnr3A1mq35JJlBqIZ3dKVKEkMC1+ZbriOhZqVioUpy
-         ame21jJSK0kM7A9NbJXZadWi8XF7TOaZJfNn6gUe8PeBJQydloxOCiAvVOpvdGLt4CmJ
-         OqtCXczXRWALrF5VszmzgD7+NAkekuzRbczMbq2s35oRwTuLhrQ8GXV8M8HqTUNnrCmo
-         1glQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0xpmshuI/pMm5UuCjyrFv3vF6+96BrZfu4+EC8iPaw/NIYQ/Fd5+IZXV9bKocx/lT9W0CZ88=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxRoVwEn00rr0W1j0eMu8MbRazG4MbSqVkcPi81WCCFym+CuI1k
-	DJqJqsxoIiV5ATQC3+MViT0l/RnXfoO2g7q6/qs0oC+yUj3lGHyDJdiDUTsUgzSA8Fk=
-X-Gm-Gg: ASbGnct3EfEmEaHhbfv0w9vLX5TGnX1cTD2vvxNe5DDzpphu7TvDHOHCwmM8i8g/zsB
-	Y/SSPQDuSVDhuJFzGue8z+mrAAiSr3CqaKZzijvW1CaLIr0HJwPpQJjt2EjmHsYhj5mdRLga4+X
-	swqo2u76vWRqysFRYS+If6BfD//RYodss9uJykeMuYvN5AZQ5AuM4iCeZTwOvR43am6VjDbJReG
-	S+cNCv/x6QW99oZf/Ha7iiDwgSIgPX1Un+QjTzc43lD7qrrkcmiUY7NzHuTy2RXYM+hBaMLt/I/
-	PNIWO7KEWFUTOFKFjx9HT7DyCErWjoFZNAZFxaXPMe6c/bncotZ63w4TKQd8yttoHeK9W3X7N3r
-	d+TNdLDgw0AYKID/XMz3OozINPvk6GqFrTGEprmI2dVspMKYa2P6cRKTrixnRnj0cVlXv
-X-Google-Smtp-Source: AGHT+IG4AMn3fFLDW2xb11IBx2YQ2BaQYNWmVWPx/pnTmFR/H2yiwHIFP+BF1HqcDvdzFfnmN7sa7w==
-X-Received: by 2002:a05:620a:2a11:b0:7e6:3c25:b69b with SMTP id af79cd13be357-7e63c25b6bbmr1410127285a.13.1753711827688;
-        Mon, 28 Jul 2025 07:10:27 -0700 (PDT)
+        bh=+sQ9t0gn5L4GrZDYwNd4uW4hApI7Q8x2B8KZ36bnLW8=;
+        b=diH+sbuXBlnatOrn9oaFsBvp5vQbYiODVVYjgYjM2o5SPRAXMOCEFbrLjSCubPIrTt
+         2It2uiDb2l4FJsYppo+yiVyLC+GPpWWWn9PfkMBOKYxwN7Cwkvp+U1OhLSIm3ICa9IzO
+         qqwc27MxjouEBrDNWlHqGqb9LTPY06WpKc4V5IDIpeBS+Zu/CJduQ1wQI9sKJ+0ZXHPc
+         8ItOy51heLwMbIR4Xnu+htKlvh5HR9Sp3Ibru+HzUYw0PRIS4Gmp49xAc7gKMJAUO16D
+         huSU7Tg9/wQCx8JsUrWgp9jN0dPvaPeEWh94U5rRytQbhPpsSMZ+1vObJhf5eP2sG/8C
+         Rxyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUkb4ItejyxD7oBCitWEqllGyiZESHprjW2p1/1h+5ZqmIA8fMc62zH0PbFxRbtdvdSHXOHw48=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxGAEdOyTx3peuUpQgornvYpl6FnJZ5+uMKz8zl9tA4KC8keS5z
+	8Uq3LKCNzvzyrCMw9OP4mM8aXYFT+tF8OQ2A9viSe3R5YbsSQvL38b9euEiHvGsoAsY=
+X-Gm-Gg: ASbGncvagPbsCuCorRx6lvjU6tLGTjIgH5QpiWZgUo/e9TpFla3pMC79a0tPHoLOzBp
+	zlPnes8F1h5mFlXcHAEDDRtg1jrpsHjAO83ZLjnhHSCmjsu7K8pvPQx2D6/Rwpz+k6eRr8aHXIN
+	EqCNwwLNt6tlZ7GAUueuE423LzXdilBCW6KVcBadv/mJBhGYsHh/SuxzM0D0oB67lxWWyAFImXK
+	yLRBS262OTEsFijXtEzKQU3Qrslf3B3Br2YPUC8TT55BwZAq5YszQeuX6Ki1Yfv53OFJqgbdA9s
+	42TdqdxPfHMcb3ikvtxGEiktNrpxJNATZHDFmHoae6CFk3n1ZhVofsNoZMoPi5tDG8e5Bmfv0qT
+	l5dyudw7yGEDqMje/XFB12SaW1/tR9yGm08g3G7+sWK+re2eJYGlcdUWpbDTEjVkmdr5k
+X-Google-Smtp-Source: AGHT+IGJsSVbXjLNIqrlIEbk/gUzNYQYHSbjL32ASxGtiy6zgoFXF/rrvq7tro5LsCceIcXyRKliEg==
+X-Received: by 2002:a05:622a:1104:b0:4a3:fcc7:c72e with SMTP id d75a77b69052e-4ae8ef5c18emr158029941cf.9.1753712222972;
+        Mon, 28 Jul 2025 07:17:02 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e64327b33csm296288885a.3.2025.07.28.07.10.27
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ae99516fcesm35769401cf.9.2025.07.28.07.17.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jul 2025 07:10:27 -0700 (PDT)
+        Mon, 28 Jul 2025 07:17:02 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1ugOYc-00000000AQN-25tk;
-	Mon, 28 Jul 2025 11:10:26 -0300
-Date: Mon, 28 Jul 2025 11:10:26 -0300
+	id 1ugOez-00000000ATD-3mT3;
+	Mon, 28 Jul 2025 11:17:01 -0300
+Date: Mon, 28 Jul 2025 11:17:01 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
@@ -73,11 +73,10 @@ Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 07/38] iommufd/viommu: Add support to associate
- viommu with kvm instance
-Message-ID: <20250728141026.GB26511@ziepe.ca>
+Subject: Re: [RFC PATCH v1 10/38] iommufd/vdevice: Add TSM map ioctl
+Message-ID: <20250728141701.GC26511@ziepe.ca>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-8-aneesh.kumar@kernel.org>
+ <20250728135216.48084-11-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -86,49 +85,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250728135216.48084-8-aneesh.kumar@kernel.org>
+In-Reply-To: <20250728135216.48084-11-aneesh.kumar@kernel.org>
 
-On Mon, Jul 28, 2025 at 07:21:44PM +0530, Aneesh Kumar K.V (Arm) wrote:
+On Mon, Jul 28, 2025 at 07:21:47PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> With passthrough devices, we need to make sure private memory is
+> allocated and assigned to the secure guest before we can issue the DMA.
+> For ARM RMM, we only need to map and the secure SMMU management is
+> internal to RMM. For shared IPA, vfio/iommufd DMA MAP/UNMAP interface
+> does the equivalent
 
-> +#if IS_ENABLED(CONFIG_KVM)
-> +#include <linux/kvm_host.h>
-> +
-> +static int viommu_get_kvm(struct iommufd_viommu *viommu, int kvm_vm_fd)
-> +{
-> +	int rc = -EBADF;
-> +	struct file *filp;
-> +
-> +	filp = fget(kvm_vm_fd);
-> +
-> +	if (!file_is_kvm(filp))
-> +		goto err_out;
-> +
-> +	/* hold the kvm reference via file descriptor */
-> +	viommu->kvm_filp = filp;
-> +	return 0;
-> +err_out:
-> +	viommu->kvm_filp = NULL;
-> +	fput(filp);
-> +	return rc;
-> +}
-> +
-> +static void viommu_put_kvm(struct iommufd_viommu *viommu)
-> +{
-> +	fput(viommu->kvm_filp);
-> +	viommu->kvm_filp = NULL;
-> +}
-> +#endif
+I'm not really sure what this is about? It is about getting KVM to pin
+all the memory and commit it to the RMM so it can be used for DMA?
 
-Missing stub functions for !CONFIG_KVM?
+But it looks really strange to have an iommufd ioctl that just calls a
+KVM function. Feeling this should be a KVM function, or a guestmfd
+behavior??
 
-Looks like an OK design otherwise
-
-> @@ -1057,6 +1068,7 @@ struct iommu_viommu_alloc {
->  	__u32 data_len;
->  	__u32 __reserved;
->  	__aligned_u64 data_uptr;
-> +	__u32 kvm_vm_fd;
-
-fds are __s32, they are signed numbers.
+I was kind of thinking it would be nice to have a guestmemfd mode that
+was "pinned", meaning the memory is allocated and remains almost
+always mapped into the TSM's page tables automatically. VFIO using
+guests would set things this way.
 
 Jason
