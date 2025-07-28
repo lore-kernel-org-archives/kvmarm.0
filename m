@@ -1,128 +1,159 @@
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
+Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948A71FF603
-	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 21:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AFB22B8A6
+	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 22:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753736862; cv=none; b=rqJ1RMbrJsoyRVS8NzkzwIKXIDCI8iggBmt8p+z4zi+wNXWNskYsClHqAitgB2hBWPoypLtjuyuif/8DqmGkiXLDaT4xqxKUY41bwKwA3lkxSCoX+W6ZL3i3/OsjvBPTMpTBpDgnt24sO+H9qKDbB64J+NTHWDEvKar9TVPY6kg=
+	t=1753742236; cv=none; b=E/EegE+9oaNOV7nH71bj1q5bXOYpAQIObqE7yu3079uXYQjJVOiqeQnvlGeBMLsvK7S2WaBCyoNNM6dZbVxZIDi/gQuNRxUf3JSHGAx293wYTQeo9EseTvtIN1+NS+2v4d0juJReBJK3euq7gMDMLp0HpuoAALd4nQn+ij9sudM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753736862; c=relaxed/simple;
-	bh=VYvyAPR2rjDj8OeNJRruAu8npV1N/RHzlGka234BYnk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Yb0wUJTmr1LGPQQVlUgjULZCI/WKicjl9Ua7e7fEU9groaT/E8+z6csiaUsi33CG8zCpQYPBVGeYOIEpcxabH5uoa5UxF2uKVcUmmh+PcMIyTZieeIaEkUFUMS1OQmLjprMS51RgaimKzaRnd3gKuRkk6eGUTBUW6K3jTMmUAME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cJH4oTYL; arc=none smtp.client-ip=209.85.210.74
+	s=arc-20240116; t=1753742236; c=relaxed/simple;
+	bh=EF+nLZgKrgjhDmWSiOPghhkt5JHqMrkQ8+IPoUCfYaE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=apl/9dUAcSbN5/Jz/D8Pvdup1lfy+peyPoDjOPP0e7uvH6f1NTGTA6TVDIEDp1WjOPOcafGHl0isOkAV+8ccGahAEsrojCLj6hqOs3flHH8xupBOv8EKux4yBilj6IzPSc7tF5nszIDB/P5O/IflmrQYwgyWuDLHTUHhX0hRK30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MHNG5LA7; arc=none smtp.client-ip=209.85.160.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cJH4oTYL"
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-73d04d16ab0so4400709a34.3
-        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 14:07:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MHNG5LA7"
+Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-30254c60c4cso6114642fac.3
+        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 15:37:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753736859; x=1754341659; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753742234; x=1754347034; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=slHkTPTO23OubaoGcLALPC4EFvq2t1/SJARmRLWq8ek=;
-        b=cJH4oTYL35CUucg9hHjMBjTjgrESkSQOQBj4gVoi6/svTe5cCh+FnVUd6COWwnEik5
-         PUS8oLm2ZoUf/fnf9sTfAYpba+pUN1fEtsqAL60rx4RigJS4PP5NmEUKoS+yNUZkCOtb
-         YoN3ALNlCw00TXW2ADwNab2JvM1He4oPFsabhQgAx7PU9tgn+1E6NKr4FLU+1bdI4ybK
-         oCC8RIxPDk3ai0OfLRDMhe4dMFFKT80ijwce2FIYboC8GZ5kD6xTm5kGBXCb9P3d2I+g
-         fhnAtWmc3q1obWZ/Hg+49YIGxDn69qs3gBeNBlSKfCyA0pQkA91ZkEg4rHZTwQDTNGkJ
-         sR9A==
+        bh=g1ZZrV9iF8dYVdhyBL4d5b4ftcnLDouNaKEg4YWgOvI=;
+        b=MHNG5LA7c/NZz0+uN4mSeiRrTiGlLTghsBVSBOGk0c4DQuIBq071PQKbOHMErgSauS
+         gYDwjYAj5+/1GgHkgvr4aDFDKAGIldM59l9N6ieev7Udgf+Ue4L4kqMflCeSSel6mXSz
+         wop5fd7tBIYfZgGxl2o70aJmjg3qMQMmg4KRpHBxq1Ocon4ShBTOse1Q0MoXDk7kg6b7
+         ZqwBa8SGSRF461/zliNj+qf8gQOisMUnVFz65uZ1Bq32Wdogzv1Jt/vhrE7jtpLmZ2Pa
+         jl7BSwdacRvp2kp5IwEvc052+5EDHKyzzTdgSbtD0khCfYHSj/TkPyJM/+uMv107R1Mb
+         Mekg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753736859; x=1754341659;
+        d=1e100.net; s=20230601; t=1753742234; x=1754347034;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=slHkTPTO23OubaoGcLALPC4EFvq2t1/SJARmRLWq8ek=;
-        b=oAE4s6aDP/NrwM8v5l0uOI99/0SOdvlD3s1tNPZGEC3E/9w3nmiBoEcwIDmbmDKUvY
-         lgLmWp3jBjkBJO/TkHi3AHVKUSwcvDaOciB8fTmtXgu6KN6otGamNd8HUAJVOseboWb2
-         yvqjpIn74g8DIX6pg3G0MK4zEmmjiI/05MzIThFYAl99mwDgW64GsKfrxUivvOCxY1c+
-         gyjXk23z97ujTVsYRaG7+bJij743Cc39jbRAKbcn85+e3sYoLdBuED6WID6hMpSSlnst
-         J0a1N79akWv39CsdIaszChAA3TH04q7dH1NYDTbjvVuZQm/d+FRWA5DKSlwsvLl70ysr
-         lAVw==
-X-Forwarded-Encrypted: i=1; AJvYcCXB1mleb/xv+E9qrf1U6bDhzTndLT3SHZPU6hiOPJMEFlKriQQtGNNKaCACPyV6UHNQU80P3+8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyvHcmzLvT7ooTv3Pmm7++gtu7HjrUjtHbTEhIWSAqKAyCcEhQu
-	qpmyiWVXMXDvBG8LtH/eydWO4r2rPbpmQZEeUcl0ANVaWiKp6nQE5GdbcL+Mbcbxi6yOliwJSpU
-	zngNVvvnAvFSyNsz7Y6lU/1CZMQ==
-X-Google-Smtp-Source: AGHT+IE47Z4A3+D9s5HwxzIu2gGt99OXTdaSbCqZ0hKtmsL0LHdSzeDVlhRw2PjDnFeNQYwtxQNiod7Q3hr1gALGAw==
-X-Received: from otbca17.prod.google.com ([2002:a05:6830:6111:b0:73c:b634:7b70])
- (user=justinstitt job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6830:2641:b0:741:5d00:e86a with SMTP id 46e09a7af769-7415d00e9efmr3612294a34.8.1753736858551;
- Mon, 28 Jul 2025 14:07:38 -0700 (PDT)
-Date: Mon, 28 Jul 2025 14:07:36 -0700
+        bh=g1ZZrV9iF8dYVdhyBL4d5b4ftcnLDouNaKEg4YWgOvI=;
+        b=ML7v6PbCZ1P5vunB06MMqru0ir32C8ssS777zgTnTvvaDyroSwF6exyvVPYeAnS6nY
+         mQqbW/ylwm5rJNQcWNMHIpyX3g5TWB5uL1w5qOyj7Dme7pglC+kAxWlbNO4NbgowpbFg
+         Ozl13SR6qTTH12u3cN01HTNBa7hyLPLUtcdTuydV2u3t9R7cpODBGR6z+uEE0+62YqMn
+         72ty/osJs0BaE8W8hOR3Hm+ChelqiUcBxBkSOHFHcn4K9KkdhYIqDfdDgbg1h9HN4BDE
+         B/3fbDS/dNFmaToc12wlqcoxkMkwpuP6YRx33Z0tfdPbDQNaI/4eMytwQk3GY4cEyGcH
+         Y+Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOolq1k+XrZkEnD6Bm0XsM8UElzzNdGanAhbC/kiwnRHtLXdEGIEU9Pw2oYuqAt2wrnO2+x4g=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx9FKoMOSLK768QMiQEjYFKY0VdFkBUkTTOWBrm2GA0Xhmnfw2u
+	Id7D7eYg2LnyCBeUZurBV8jWSAy1nXEbNFhnCtvK42lcJt0qSg5P6Qu2xhH6eZ68w4QFZdnD9wA
+	pkOI36r0neg==
+X-Google-Smtp-Source: AGHT+IFMRJ908vvsWj70nTjQOvVm1PrziYCGSb3/MxBBTKnv0C5mcFnYcmNsuxDQFYN+4WMHi8+Bkj1Y0O5E
+X-Received: from oabld4.prod.google.com ([2002:a05:6870:2b04:b0:2bc:69a2:7ea5])
+ (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6870:1b83:b0:306:9f8e:6699
+ with SMTP id 586e51a60fabf-30701faa8b5mr8749981fac.30.1753742233877; Mon, 28
+ Jul 2025 15:37:13 -0700 (PDT)
+Date: Mon, 28 Jul 2025 22:37:10 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJfmh2gC/x3MQQqDQAxA0atI1o04EdtpryJdjBo1UKaSTFtFv
- HsHV5+3+TsYq7DBo9hB+Ssm75jhLgX0c4gTowzZQBU11Y08Wgrdi3EQO/uJknBJir+gEcm7kdl TU997yItFeZT13LdwLV25wfM4/t3NQ751AAAA
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1753736857; l=1926;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=VYvyAPR2rjDj8OeNJRruAu8npV1N/RHzlGka234BYnk=; b=HlGzpA+TYc3ck5X9eKZ/5YyDluZ21Hq1Gvc/SoBUkfkiAD8EgpqAOtMwdmCUD0dG6UEsL7Jja
- ZVx2abnVmotBHZV+zPnLise4jybp/uEsKfEPTnW+S6eenOBCzZVTrLu
-X-Mailer: b4 0.12.3
-Message-ID: <20250728-stable-disable-unit-ptr-warn-v1-1-958be9b66520@google.com>
-Subject: [PATCH 6.1.y] KVM: arm64: sys_regs: disable -Wuninitialized-const-pointer
- warning
-From: Justin Stitt <justinstitt@google.com>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Tom Rix <trix@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, stable@vger.kernel.org, 
-	Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
+X-Mailer: git-send-email 2.50.1.487.gc89ff58d15-goog
+Message-ID: <20250728223710.129440-1-rananta@google.com>
+Subject: [PATCH] KVM: arm64: Set/unset vGIC v4 forwarding if direct IRQs are supported
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Cc: Raghavendra Rao Anata <rananta@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-A new warning in Clang 22 [1] complains that @clidr passed to
-get_clidr_el1() is an uninitialized const pointer. get_clidr_el1()
-doesn't really care since it casts away the const-ness anyways -- it is
-a false positive.
+Commit <c652887a9288> ("KVM: arm64: vgic-v3: Allow userspace to write
+GICD_TYPER2.nASSGIcap") bundles the vLPIs and vSGIs behind the
+GICD_TYPER2.nASSGIcap field. While the vGIC v4 initialization and
+teardown is handled correctly, it erroneously left out the cases when
+KVM sets/unset vGIC v4 forwarding, which leads to a kernel panic of the
+following nature:
 
-|  ../arch/arm64/kvm/sys_regs.c:2978:23: warning: variable 'clidr' is uninitialized when passed as a const pointer argument here [-Wuninitialized-const-pointer]
-|   2978 |         get_clidr_el1(NULL, &clidr); /* Ugly... */
-|        |                              ^~~~~
+ Unable to handle kernel NULL pointer dereference at virtual address 00000000000000a8
+ Mem abort info:
+   ESR = 0x0000000096000044
+   EC = 0x25: DABT (current EL), IL = 32 bits
+   SET = 0, FnV = 0
+   EA = 0, S1PTW = 0
+   FSC = 0x04: level 0 translation fault
+ Data abort info:
+   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
+   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
+   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+ user pgtable: 4k pages, 48-bit VAs, pgdp=00000073a453b000
+ [00000000000000a8] pgd=0000000000000000, p4d=0000000000000000
+ Internal error: Oops: 0000000096000044 [#1] SMP
+ pstate: 23400009 (nzCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+ pc : its_irq_set_vcpu_affinity+0x58c/0x95c
+ lr : its_irq_set_vcpu_affinity+0x1e0/0x95c
+ sp : ffff8001029bb9e0
+ pmr_save: 00000060
+ x29: ffff8001029bba20 x28: ffff0001ca5e28c0 x27: 0000000000000000
+ x26: 0000000000000000 x25: ffff00019eee9f80 x24: ffff0001992b3f00
+ x23: ffff8001029bbab8 x22: ffff00001159fb80 x21: 00000000000024a7
+ x20: 00000000000024a7 x19: ffff00019eee9fb4 x18: 0000000000000494
+ x17: 000000000000000e x16: 0000000000000494 x15: 0000000000000002
+ x14: ffff0001a7f34600 x13: ffffccaad1203000 x12: 0000000000000018
+ x11: ffff000011991000 x10: 0000000000000000 x9 : 00000000000000a2
+ x8 : 00000000000020a8 x7 : 0000000000000000 x6 : 000000000000003f
+ x5 : 0000000000000040 x4 : 0000000000000000 x3 : 0000000000000004
+ x2 : 0000000000000000 x1 : ffff8001029bbab8 x0 : 00000000000000a8
+ Call trace:
+  its_irq_set_vcpu_affinity+0x58c/0x95c
+  irq_set_vcpu_affinity+0x74/0xc8
+  its_map_vlpi+0x4c/0x94
+  kvm_vgic_v4_set_forwarding+0x134/0x298
+  kvm_arch_irq_bypass_add_producer+0x28/0x34
+  irq_bypass_register_producer+0xf8/0x1d8
+  vfio_msi_set_vector_signal+0x2c8/0x308
+  vfio_pci_set_msi_trigger+0x198/0x2d4
+  vfio_pci_set_irqs_ioctl+0xf0/0x104
+  vfio_pci_core_ioctl+0x6ac/0xc5c
+  vfio_device_fops_unl_ioctl+0x128/0x370
+  __arm64_sys_ioctl+0x98/0xd0
+  el0_svc_common+0xd8/0x1d8
+  do_el0_svc+0x28/0x34
+  el0_svc+0x40/0xb8
+  el0t_64_sync_handler+0x70/0xbc
+  el0t_64_sync+0x1a8/0x1ac
+ Code: 321f0129 f940094a 8b080148 d1400900 (39000009)
+ ---[ end trace 0000000000000000 ]---
 
-Disable this warning for sys_regs.o with an iron fist as it doesn't make
-sense to waste maintainer's time or potentially break builds by
-backporting large changelists from 6.2+.
+Fix this by checking if vgic_supports_direct_irqs() while
+setting/unsetting vGIC v4 forwarding as well.
 
-This patch isn't needed for anything past 6.1 as this code section was
-reworked in Commit 7af0c2534f4c ("KVM: arm64: Normalize cache
-configuration").
-
-Cc: stable@vger.kernel.org
-Fixes: 7c8c5e6a9101e ("arm64: KVM: system register handling")
-Link: https://github.com/llvm/llvm-project/commit/00dacf8c22f065cb52efb14cd091d441f19b319e [1]
-Signed-off-by: Justin Stitt <justinstitt@google.com>
+Fixes: c652887a9288 ("KVM: arm64: vgic-v3: Allow userspace to write GICD_TYPER2.nASSGIcap")
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
-I've sent a similar patch for 5.15.
----
- arch/arm64/kvm/Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/vgic/vgic-v4.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 5e33c2d4645a..5fdb5331bfad 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -24,6 +24,9 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index e7e284d47a77..873a190bcff7 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -433,7 +433,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+ 	unsigned long flags;
+ 	int ret = 0;
  
- kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+-	if (!vgic_supports_direct_msis(kvm))
++	if (!vgic_supports_direct_irqs(kvm))
+ 		return 0;
  
-+# Work around a false positive Clang 22 -Wuninitialized-const-pointer warning
-+CFLAGS_sys_regs.o := $(call cc-disable-warning, uninitialized-const-pointer)
-+
- always-y := hyp_constants.h hyp-constants.s
+ 	/*
+@@ -533,7 +533,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int host_irq)
+ 	unsigned long flags;
+ 	int ret = 0;
  
- define rule_gen_hyp_constants
+-	if (!vgic_supports_direct_msis(kvm))
++	if (!vgic_supports_direct_irqs(kvm))
+ 		return 0;
+ 
+ 	irq = __vgic_host_irq_get_vlpi(kvm, host_irq);
 
----
-base-commit: 830b3c68c1fb1e9176028d02ef86f3cf76aa2476
-change-id: 20250728-stable-disable-unit-ptr-warn-281fee82539c
-
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
+base-commit: 18ec25dd0e97653cdb576bb1750c31acf2513ea7
+-- 
+2.50.1.487.gc89ff58d15-goog
 
