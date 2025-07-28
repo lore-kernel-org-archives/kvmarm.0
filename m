@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4606F25C711
-	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 17:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258C1275864
+	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 17:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753725214; cv=none; b=oXLLY+OFiM0XSTrSvpXn7FuRSRW399gYjO19LPF+vRIXbmywMe8vsEWa5+z8AyCAAC9M3NAZaXwW299h7Vnnitxfk9thvTDNCc5gSdOku6+49Rg2YyFhdVTylC70OZevVL4yKODYbhM3iurr05+Vmiw3/FhK8PXBSA/0sR3BbNE=
+	t=1753725216; cv=none; b=PZUtbwbZY6DyMAOZr6YKXFWw8D/hKHAARNCVZaEjYMw++3Q1+2EjhZ4i6IlAUqr8Z2j6GxE7f+Tst4q6qzh3ExRiXiOKEtzKxxPBEijDverAvEcxSSqLh6qAj5RYAvwHG/Z8IiaZIHCnfbuGPS+VubM2hgHBYWpekWab5bUVHmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753725214; c=relaxed/simple;
-	bh=J1SjK0vWeBplkdbTTJcUjjcnej2Z63ZcY6P/gYDg268=;
+	s=arc-20240116; t=1753725216; c=relaxed/simple;
+	bh=nRn9Dsf3QfyBnEBl4Hr7BBBiduTa1EIYJ+DzHW4mP0E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lTCsUQLC6V/QKmdKU+KIIWG/ju7GA2Xc/J3v1KqdweUxoZI/OTnKpf0Dq1AWdCXz5XEm0U4E86aGkm/j6KhafF0l091jH0Vx9MXcU3OFF7fxLSgCWDRLF+8LJzvyc6lxENt4yZ3/J96d8QL21mDhznOn6+VZvO8eCiHhOa12dNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XUdXQ9jd; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=UY9oA0tJtFrW3Gzupo5gdYJx3LmdKX5/KZJDcMVaw1W05LGq1LYoTzTmha6Du8V5uCzYRSEo3bp5suzadXGzEY0wsajhXitu0XQSJmrQfCIinGqZxhTa7A59iClRNBIOiFG3bChR5f9J0QO+Dwtcm9/1z8qpUHz6dbLks9QPbJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZjzUNSUE; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XUdXQ9jd"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4538f375e86so36587075e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 10:53:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZjzUNSUE"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a4fabcafecso1884615f8f.0
+        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 10:53:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753725211; x=1754330011; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753725213; x=1754330013; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZeRx7vP/138KQFxr0SX14a6MVSvUsa68vsZQFRiGNJw=;
-        b=XUdXQ9jdjgTr3NS7/crZLpUFUUwQig+gaPL+8X/h14yoDB6czlwQMz2ijka53QmDE6
-         e+RnPbk8CIkuTFqMz6EgwsLjymCNxb0pbgqFijQMAYIbv0EJ5L5HBTBrv54pyChRk4GR
-         0XJm5XWo/LLalf9/HjwtBhH1wf+NcplnjA6QO4RJyVtTTGfdFHPQyNce//gdvbvfYYuq
-         JstjVR5Cxj+ux9Q6bf8d8CM/OU38H+KBjxLYNen1Ax6C1LlsYTflUTBeMfaPXyWKiFWB
-         QQ8Y6jcwTdGUBQz1AS6Sl/DWo7DDnkZl6Sa/2dd1yutwSx9Eah/ne0ASoYiCU0q6LfpL
-         JNQQ==
+        bh=UBRRf2ok05qV4V10RyprFxOV/7isNWPsP0/960vxN5o=;
+        b=ZjzUNSUELLJYwwejcJB9JtEoU0EIaAigohaBACm2hO3FkMRwxBw4G5DQseBlXyzVY5
+         nLCtfupONT4xtcgQ8nDEHILNo/zhkwuaHeKnzXc5i+spbg6rzEKvnbDiVOnApTh6SvnH
+         eyw/qKpxyEW+myIjn/to8pBiMku9Djsvuln3tlc1uBjt5D/z4dxypr+naE4zYk3i7PuX
+         9InLrRmW73yRv38dsoXRsF6VemjL6xMmH+oebe/nq8t4p5vdMJ7a9hQCv+EG8SU4n0/u
+         foVl+FrfFCIqkwVFCQ158XOtTaL6+n09NJ6yRHhebdXF0HMMwwr+6T03U5XcmdjN0aWG
+         Kjyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753725211; x=1754330011;
+        d=1e100.net; s=20230601; t=1753725213; x=1754330013;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZeRx7vP/138KQFxr0SX14a6MVSvUsa68vsZQFRiGNJw=;
-        b=D/Y4DVuDg1DLYTO+Uemul7Nx40M4zezwfHpJ8cFUHPtsCoeIN84FMtyMXPm8ZiyVEe
-         JIR0eUnRDRPRSOn/sufk8r6ZrWAGf3DK+UWr7An7Q4eX3syxSTNZAenjA7S48CS/d/aV
-         Z+nZmu9EPFgbiy1SKMIy+jbPnEi8ehxnZ5ujjMnSW7KFuWyJxmqVQ2DlLzaECxjgemdV
-         MbJOdnEocywzH1yOI26U8+lLxuusPsww3/1LPrfvbtMzU5g/xD1h5HeP+Pfx/lFdqUhD
-         j4mBbkFDaVlEN/WIffODMb0bRBXKJdFGjUPzEoNXmFrCH+p8GKxCJQS6Ld0csi0nlOME
-         1e+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUOE754g28EILnl8g5JBZusBUucGBQ58Q6ylRHgSJwGNU0jUkkHY6dm21p5lakxjCcdn4TQ1Q8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwGxDeOIqmV+nnfrbptMEUsks4ZhWkggIYcrs9t6LJoim6PecrC
-	lrE35jv4GeiBbG7rLzAFx73AI6iq+5DkDEqk+Bt81wc7wzm/LSrNIXsNCW+4Px+f52DvidV4fBO
-	Q0g9wW3uPUU97+A==
-X-Google-Smtp-Source: AGHT+IE1QKRH8xd41th/Qwnod5XKPsVgVqg7Mv68PdXhnIKZKddzbjKbt+QRa+9zTDVfDxi6tBL2YQdZsrDI2Q==
-X-Received: from wmsp14.prod.google.com ([2002:a05:600c:1d8e:b0:456:c7c:3165])
+        bh=UBRRf2ok05qV4V10RyprFxOV/7isNWPsP0/960vxN5o=;
+        b=ctrx+fxM2KusjGhth60NEVMs7WSg7Q22Fb9dF8/qpZOJTjgfFdAAOHiquC8+R/hbyf
+         usCyLKzrWh+lif2JsEyqIaDVdNUQ8fYAARZ+uygQS7OiXo6+uP9D8Syd1JVtBWx7Wz+W
+         rKusRZKp36BPHq9A/eOU2xA6A40E8iGalF/iWDVlfrS82CgpdnSkekbhdEDQR9XLUWIH
+         tI2ERZ1seHVX8+BSC8WArdtmLKbxaxO6cwGiqvEQ6IQIFCvaT18MtoNsGy02pmND4i7t
+         dVSp9bcVr4ac8DQ3KNOoaZs9AxMGYvLDb7fzJ/jV7ACAEZIe+mvfm7QfZl8dWV6FnF8G
+         k+/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVC3qMN/hSooAQ8PoreIovEwRNFDJOzJA06yCRqCLHtpZ0vZa29gCTdjoqdLu5XXAqt7j6SpCg=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz10bD1ufvH951KxZMo3wM8I+mIoMxk47EA6brfCum4z6jsbXPA
+	5RmKBd0bJp5hxOAelWXyGXOs/cfM2q76o1mYOtKS49m9PPXk7eTVPonNXZNPO3cHis3KGzQ02ET
+	hgg4BBsnum45czw==
+X-Google-Smtp-Source: AGHT+IEdo5UmQraGXTZJ9gCaHcWtxJIv/tFc5vNP8HwnzGiRANkg0buplE/XnYHC6sojxb0f1IZVCz/ntN1JZg==
+X-Received: from wmbji2.prod.google.com ([2002:a05:600c:a342:b0:456:214c:845d])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:138c:b0:456:58e:318e with SMTP id 5b1f17b1804b1-458852534ecmr52353185e9.30.1753725211674;
- Mon, 28 Jul 2025 10:53:31 -0700 (PDT)
-Date: Mon, 28 Jul 2025 17:52:48 +0000
+ 2002:a05:6000:290d:b0:3b5:f93a:bcc with SMTP id ffacd0b85a97d-3b77675be5amr9578336f8f.35.1753725213520;
+ Mon, 28 Jul 2025 10:53:33 -0700 (PDT)
+Date: Mon, 28 Jul 2025 17:52:50 +0000
 In-Reply-To: <20250728175316.3706196-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250728175316.3706196-1-smostafa@google.com>
 X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250728175316.3706196-2-smostafa@google.com>
-Subject: [PATCH v3 01/29] KVM: arm64: Add a new function to donate memory with prot
+Message-ID: <20250728175316.3706196-4-smostafa@google.com>
+Subject: [PATCH v3 03/29] KVM: arm64: pkvm: Add pkvm_time_get()
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev
@@ -71,72 +71,93 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	praan@google.com, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Soon, IOMMU drivers running in the hypervisor might interact with
-non-coherent devices, so it needs a mechanism to map memory as
-non cacheable.
-Add ___pkvm_host_donate_hyp() which accepts a new argument for prot,
-so the driver can add KVM_PGTABLE_PROT_NORMAL_NC.
+Add a function to return time in us.
+
+This can be used from IOMMU drivers while waiting for conditions as
+for SMMUv3 TLB invalidation waiting for sync.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 11 +++++++++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 ++
+ arch/arm64/kvm/hyp/nvhe/setup.c        |  4 ++++
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c     | 33 ++++++++++++++++++++++++++
+ 3 files changed, 39 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 5f9d56754e39..52d7ee91e18c 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -36,6 +36,7 @@ int __pkvm_prot_finalize(void);
- int __pkvm_host_share_hyp(u64 pfn);
- int __pkvm_host_unshare_hyp(u64 pfn);
- int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
-+int ___pkvm_host_donate_hyp(u64 pfn, u64 nr_pages, enum kvm_pgtable_prot prot);
- int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
- int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
- int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 8957734d6183..861e448183fd 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -769,13 +769,15 @@ int __pkvm_host_unshare_hyp(u64 pfn)
- 	return ret;
- }
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index ce31d3b73603..6c19691720cd 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -87,4 +87,6 @@ bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
+ void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
+ int kvm_check_pvm_sysreg_table(void);
  
--int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
-+int ___pkvm_host_donate_hyp(u64 pfn, u64 nr_pages, enum kvm_pgtable_prot prot)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
- 	u64 size = PAGE_SIZE * nr_pages;
- 	void *virt = __hyp_va(phys);
- 	int ret;
++int pkvm_timer_init(void);
++u64 pkvm_time_get(void);
+ #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index a48d3f5a5afb..ee6435473204 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -304,6 +304,10 @@ void __noreturn __pkvm_init_finalise(void)
+ 	};
+ 	pkvm_pgtable.mm_ops = &pkvm_pgtable_mm_ops;
  
-+	WARN_ON(prot & KVM_PGTABLE_PROT_X);
++	ret = pkvm_timer_init();
++	if (ret)
++		goto out;
 +
- 	host_lock_component();
- 	hyp_lock_component();
+ 	ret = fix_host_ownership();
+ 	if (ret)
+ 		goto out;
+diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+index ff176f4ce7de..e166cd5a56b8 100644
+--- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+@@ -11,6 +11,10 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
  
-@@ -787,7 +789,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
- 		goto unlock;
++#include <nvhe/pkvm.h>
++
++static u32 timer_freq;
++
+ void __kvm_timer_set_cntvoff(u64 cntvoff)
+ {
+ 	write_sysreg(cntvoff, cntvoff_el2);
+@@ -68,3 +72,32 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
  
- 	__hyp_set_page_state_range(phys, size, PKVM_PAGE_OWNED);
--	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, PAGE_HYP));
-+	WARN_ON(pkvm_create_mappings_locked(virt, virt + size, prot));
- 	WARN_ON(host_stage2_set_owner_locked(phys, size, PKVM_ID_HYP));
- 
- unlock:
-@@ -797,6 +799,11 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
- 	return ret;
+ 	sysreg_clear_set(cnthctl_el2, clr, set);
  }
- 
-+int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
++
++static u64 pkvm_ticks_get(void)
 +{
-+	return ___pkvm_host_donate_hyp(pfn, nr_pages, PAGE_HYP);
++	return __arch_counter_get_cntvct();
 +}
 +
- int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
++#define SEC_TO_US 1000000
++
++int pkvm_timer_init(void)
++{
++	timer_freq = read_sysreg(cntfrq_el0);
++	/*
++	 * TODO: The highest privileged level is supposed to initialize this
++	 * register. But on some systems (which?), this information is only
++	 * contained in the device-tree, so we'll need to find it out some other
++	 * way.
++	 */
++	if (!timer_freq || timer_freq < SEC_TO_US)
++		return -ENODEV;
++	return 0;
++}
++
++#define pkvm_time_ticks_to_us(ticks) ((u64)(ticks) * SEC_TO_US / timer_freq)
++
++/* Return time in us. */
++u64 pkvm_time_get(void)
++{
++	return pkvm_time_ticks_to_us(pkvm_ticks_get());
++}
 -- 
 2.50.1.552.g942d659e1b-goog
 
