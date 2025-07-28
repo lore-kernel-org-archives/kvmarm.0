@@ -1,117 +1,228 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C66C220F5B
-	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 07:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27D9266EFA;
+	Mon, 28 Jul 2025 13:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753686344; cv=none; b=KuZEXrMWuzc8XfLtx+jGhRRR/4t0zsO/2lnxz95haLPMyi6kVTyO3J+ISHd7WKjS47w7t6nDmG6xCSmp9v0XAoGb+646+3gqAqSWan55WWwFu/gbLdl2FoO1Zp2yLtGEd9oTVpZT+PufOk/cvbXSX5B0tWb9U/mOCrLj4iH+mNA=
+	t=1753710755; cv=none; b=Ofe+8wZv2U8Eac3XazPe5Jl/PvkwVLMClCTm9IeXnNszHCm4cPQqfuWmFbyHL0OViy0lVLQ5etPsVgN4uCLDPb2B27h5Vj6tezStEu1KuYYhcUGIxB14r1eNKOhxkp8RwS4pchJx3/qIwgSzMX87fS5cJLSw8bWVbJDaCkDFvuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753686344; c=relaxed/simple;
-	bh=kQwpUu3pdIcVVkEM6j2jRU78dQ5txh+ni/j6a59ryYo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c3V4rsslHaLPTDUu1rSg0cc0G5E46IDOfrPwL5jkk1ita72HxqdWwgzPHeyT+j0IQSvlX7OiaRbrPNNOybfVZkV+t9F/5EJVSLByHXCXSYS1f7IkV8pcSvOZXU+B2MgrVNvepL3mxqk+nHeKTRa1O6vfposiix16c9XLPH7XV0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ElaUxiY/; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1753710755; c=relaxed/simple;
+	bh=zkVKVis6HtjW872Oo0WjCeFxIvs5TPmzZSBo1W+o4ic=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T9ct5SCiM3nBxNP8NVb7xNFIAkAd2sy2R6iftEQm/W9XL/JdGo0UHce2VDzJereVN/R2fu6TBqOEg5Wf1uS0hSBFG93HI+mvVU8pUYdGsBymyFwYSotc0uYmVs2J/OMoYkBtgmOvOmLqzr0pklWdeB+k9inzQ2hES0DYNz0ebag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VG35nO+2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ElaUxiY/"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-553a66c3567so6822e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 00:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753686341; x=1754291141; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ABzFGAudwjHSpGmDKnmCejI++sq8wZtuTDnQk4QEthU=;
-        b=ElaUxiY/SVKdfKNsO1vVfgoYV+0Py3m+ZiBkQLXj4TmV0iDotDaTcpBQYsKiopXggE
-         S68lPzdZC3ZDNjbcxFwo1OeG5t5v0r6oRKujywWXIiCClo3ejIpOpvnb1hGJPBj1LUDv
-         evvojcFAkWHVlFtMgEQQbqyMyYBzviMPPoT1T8daUX4l5GzzdIjDVWDMEgA5cYZGcJom
-         Ix1NlVoQfcvnfBMjj7M89e5h7sgnNIy3rlwGb1cVrLMJcDr0Byens7BrvOoZ64nJKuCp
-         F4smxqp9vrSZESITRkqFa1wFWcrf3ACcUdIUNm/d5qhRnug4qQi3+A9f5KhNyptrLtrw
-         8UxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753686341; x=1754291141;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ABzFGAudwjHSpGmDKnmCejI++sq8wZtuTDnQk4QEthU=;
-        b=UUh3QsFU5idVVQ+BD/UtWyNF9Vx0cK7R6i+6Li6m9mog3OlbOJ2IZP5flXcPk7W5j0
-         hSQDwQtpzCxQM56hnlGSqYQF3F3rMSx8DQD8ql+eZH8/XArRPEb+WvT0PXmg4ob82deC
-         3YmustrFr/YQRhUwtlwsFwXbsR8HN9jFoY+yEH5vWSV51pRgXHXUWeHwcpnVslFj+uhr
-         vgzMR+w9z7jGDubkeyypdc9Ap/YrpQyU/J5N1d9jrXTWr90jvFwlhDfEH260NXR4qEF+
-         ATylmDewgIZ2bgYNRk5BdSCcA32JRUQyUKDe2VlI+JTSPMYPvSk9xB5xqjWwSjM2tODB
-         0+8A==
-X-Forwarded-Encrypted: i=1; AJvYcCWMDsvK7vsCEU1PodahMSq9x/egAt6QwmG1kTHWuJJ2G9SzNPaIvqlQfxa7GwGxpJLzNwDhXJE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxkYNztD7yHgpRO1hRT5jfT2RVoOsAzAfB4TUgIsT2/J4Xf2FEx
-	w3HDLh0agAOCuwXz6yVkhDyP++Bi+ISdTu9oCXSCvzfRaR7r0Kd32ImXyFtriSOJ9FRuvoTy3W8
-	UYJX0xD7kUenzPLlVHTmm4eL83IYfZXqvhf2pufth
-X-Gm-Gg: ASbGnctLgCpGOMEgJJFHwej/kK6fesKP/MmWrtlqbo5Fq5KYgw9L29RgTVo1lc5/xY6
-	mbIz9YF2fvYUGks/dAuiicoqhZretBY987G3PY9yAcvmAYYN4wr35boaZI5r5CyvvJLoqkWunrn
-	mjjMYpjqJNxY+Nppd/TzSdCnhrDPlEQmhwhloGuScEJRkee7LxKBQ/367xU/bKmUX434G0616Fc
-	bsoULOeZ0E+ibSKzw==
-X-Google-Smtp-Source: AGHT+IH+nhG03vhszpw4SpGxLBcsItXrblXPXI/Z3jowcjOUQPpqAObstdzHVPgpSKZxUwqvLJJMux8lmEFM7MWk230=
-X-Received: by 2002:a05:6512:2117:b0:55b:5e22:dfb2 with SMTP id
- 2adb3069b0e04-55b63a96040mr246280e87.0.1753686340942; Mon, 28 Jul 2025
- 00:05:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VG35nO+2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A59A0C4CEE7;
+	Mon, 28 Jul 2025 13:52:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753710754;
+	bh=zkVKVis6HtjW872Oo0WjCeFxIvs5TPmzZSBo1W+o4ic=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VG35nO+2d+/un4WbUwCXEg3hfG6UFg/4vccdyCBui9FHuySJLRR1WlNng2oeS4Uzu
+	 zhcVa+OZMJftGoo4oglYzdYsIOKfdrxNuotOrC2WrT4EXdvd32/AHidDPWIIyvykxW
+	 v+7Bui1zb2m4C55IL9zRNr0mQkLJOwD2JkMRjzeUXCwbT1HCmUICP4wK7ZSaNsZUe1
+	 kC4NMF5XJDn7PbpjLpamSUXV1JtSMOq2a+A5I67E9zE3PE5hNyp+lou2J2K16gb1Ng
+	 UKJ+lOH68COHOxX+ELh4YDcTlqTvsm5YA0mYAcmGwQHEdYWnfn8962NYw+kLJW+LYs
+	 KEtxquiXzirrQ==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev
+Cc: linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	aik@amd.com,
+	lukas@wunner.de,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v1 00/38] ARM CCA Device Assignment support
+Date: Mon, 28 Jul 2025 19:21:37 +0530
+Message-ID: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250723104714.1674617-1-tabba@google.com> <diqz4iv1dudx.fsf@ackerleytng-ctop.c.googlers.com>
- <aIObJH439LQWjnqq@google.com>
-In-Reply-To: <aIObJH439LQWjnqq@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 28 Jul 2025 08:05:01 +0100
-X-Gm-Features: Ac12FXyVGBddx8pm5Wrn9wDW0AE2GoOgT_q7kkPWz9XW40HNA-igFWzzFSoA1tE
-Message-ID: <CA+EHjTyhSU0WiAc7GhwrdZjoUe0w5Uk-gGxd_AD6SRmezYNROQ@mail.gmail.com>
-Subject: Re: [PATCH v16 00/22] KVM: Enable host userspace mapping for
- guest_memfd-backed memory for non-CoCo VMs
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, 
-	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Sean,
+This patch series implements support for Device Assignment in the ARM CCA
+architecture. The code changes are based on Alp12 specification published here
+[1].
 
-On Fri, 25 Jul 2025 at 15:56, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Jul 24, 2025, Ackerley Tng wrote:
-> > Fuad Tabba <tabba@google.com> writes:
-> >
-> > [snip]
-> >
-> > Did the patch [1] for x86/mmu that actually allows faulting when
-> > kvm_memslot_is_gmem_only() get dropped by accident?
->
-> Ah shoot, it did get dropped.  I have a feeling Fuad read "drop the helper" as
-> "drop the patch" :-)
->
-> Faud, given the growing list of x86-specific goofs, any objection to me sending
-> v17?  I'd also like to tack on a selftest patch to verify that KVM can actually
-> fault-in non-private memory via a guest_memfd fd.
+The code builds on the TSM framework patches posted at [2]. We add extension to
+that framework so that TSM is now used in both the host and the guest.
 
-Whatever you prefer. No objection from me for you sending out a v17.
+A DA workflow can be summarized as below:
 
-Thanks!
-/fuad
+Host:
+step 1.
+echo ${DEVICE} > /sys/bus/pci/devices/${DEVICE}/driver/unbind
+echo vfio-pci > /sys/bus/pci/devices/${DEVICE}/driver_override
+echo ${DEVICE} > /sys/bus/pci/drivers_probe
+
+step 2.
+echo 1 > /sys/bus/pci/devices/$DEVICE/tsm/connect
+
+Now in the guest we follow the below steps
+
+step 1:
+echo ${DEVICE} > /sys/bus/pci/devices/${DEVICE}/driver/unbind
+
+step 2: Move the device to TDISP LOCK state
+echo 1 > /sys/bus/pci/devices/${DEVICE}/tsm/lock
+
+step 3: Moves the device to TDISP RUN state
+echo 1 > /sys/bus/pci/devices/${DEVICE}/tsm/accept
+
+step 4: Load the driver again.
+echo ${DEVICE} > /sys/bus/pci/drivers_probe
+
+I'm currently working against TSM v3, as TSM v4 lacks the necessary
+callbacks—bind, unbind, and guest_req—required for guest interactions.
+
+The implementation also makes use of RHI interfaces that fall outside the
+current RHI specification [5]. Once the spec is finalized, the code will be aligned
+accordingly.
+
+For now, I’ve retained validate_mmio and vdev_req exit handling within KVM. This
+will transition to a guest_req-based mechanism once the specification is
+updated.
+
+At that point, all device assignment (DA)-specific VM exits will exit directly
+to the VMM, and will use the guest_req ioctl to handle exit reasons. As part of
+this change, the handlers realm_exit_vdev_req_handler,
+realm_exit_vdev_comm_handler, and realm_exit_dev_mem_map_handler will be
+removed.
+
+Full patchset for the kernel and kvmtool can be found at [3] and [4]
+
+[1] https://developer.arm.com/-/cdn-downloads/permalink/Architectures/Armv9/DEN0137_1.1-alp12.zip
+
+[2] https://lore.kernel.org/all/20250516054732.2055093-1-dan.j.williams@intel.com
+
+[3] https://git.gitlab.arm.com/linux-arm/linux-cca.git cca/tdisp-upstream-post-v1
+[4] https://git.gitlab.arm.com/linux-arm/kvmtool-cca.git cca/tdisp-upstream-post-v1
+[5] https://developer.arm.com/documentation/den0148/latest/
+
+
+Aneesh Kumar K.V (Arm) (35):
+  tsm: Add tsm_bind/unbind helpers
+  tsm: Move tsm core outside the host directory
+  tsm: Move dsm_dev from pci_tdi to pci_tsm
+  tsm: Support DMA Allocation from private memory
+  tsm: Don't overload connect
+  iommufd: Add and option to request for bar mapping with
+    IORESOURCE_EXCLUSIVE
+  iommufd/viommu: Add support to associate viommu with kvm instance
+  iommufd/tsm: Add tsm_op iommufd ioctls
+  iommufd/vdevice: Add TSM Guest request uAPI
+  iommufd/vdevice: Add TSM map ioctl
+  KVM: arm64: CCA: register host tsm platform device
+  coco: host: arm64: CCA host platform device driver
+  coco: host: arm64: Create a PDEV with rmm
+  coco: host: arm64: Device communication support
+  coco: host: arm64: Stop and destroy the physical device
+  coco: host: arm64: set_pubkey support
+  coco: host: arm64: Add support for creating a virtual device
+  coco: host: arm64: Add support for virtual device communication
+  coco: host: arm64: Stop and destroy virtual device
+  coco: guest: arm64: Update arm CCA guest driver
+  arm64: CCA: Register guest tsm callback
+  cca: guest: arm64: Realm device lock support
+  KVM: arm64: Add exit handler related to device assignment
+  coco: host: arm64: add RSI_RDEV_GET_INSTANCE_ID related exit handler
+  coco: host: arm64: Add support for device communication exit handler
+  coco: guest: arm64: Add support for collecting interface reports
+  coco: host: arm64: Add support for realm host interface (RHI)
+  coco: guest: arm64: Add support for fetching interface report and
+    certificate chain from host
+  coco: guest: arm64: Add support for guest initiated TDI bind/unbind
+  KVM: arm64: CCA: handle dev mem map/unmap
+  coco: guest: arm64: Validate mmio range found in the interface report
+  coco: guest: arm64: Add Realm device start and stop support
+  KVM: arm64: CCA: enable DA in realm create parameters
+  coco: guest: arm64: Add support for fetching device measurements
+  coco: guest: arm64: Add support for fetching device info
+
+Lukas Wunner (3):
+  X.509: Make certificate parser public
+  X.509: Parse Subject Alternative Name in certificates
+  X.509: Move certificate length retrieval into new helper
+
+ arch/arm64/include/asm/kvm_rme.h              |   3 +
+ arch/arm64/include/asm/mem_encrypt.h          |   6 +-
+ arch/arm64/include/asm/rhi.h                  |  39 +
+ arch/arm64/include/asm/rmi_cmds.h             | 173 ++++
+ arch/arm64/include/asm/rmi_smc.h              | 210 ++++-
+ arch/arm64/include/asm/rsi.h                  |   5 +-
+ arch/arm64/include/asm/rsi_cmds.h             | 129 +++
+ arch/arm64/include/asm/rsi_smc.h              |  60 ++
+ arch/arm64/kernel/Makefile                    |   2 +-
+ arch/arm64/kernel/rhi.c                       |  35 +
+ arch/arm64/kernel/rsi.c                       |  26 +-
+ arch/arm64/kvm/mmu.c                          |  45 +
+ arch/arm64/kvm/rme-exit.c                     |  87 ++
+ arch/arm64/kvm/rme.c                          | 208 ++++-
+ arch/arm64/mm/mem_encrypt.c                   |  10 +
+ crypto/asymmetric_keys/x509_cert_parser.c     |   9 +
+ crypto/asymmetric_keys/x509_loader.c          |  38 +-
+ crypto/asymmetric_keys/x509_parser.h          |  40 +-
+ drivers/iommu/iommufd/device.c                |  54 ++
+ drivers/iommu/iommufd/iommufd_private.h       |   7 +
+ drivers/iommu/iommufd/main.c                  |  13 +
+ drivers/iommu/iommufd/viommu.c                | 178 +++-
+ drivers/pci/tsm.c                             | 229 ++++-
+ drivers/vfio/pci/vfio_pci_core.c              |  20 +-
+ drivers/virt/coco/Kconfig                     |   5 +-
+ drivers/virt/coco/Makefile                    |   7 +-
+ drivers/virt/coco/arm-cca-guest/Kconfig       |  10 +-
+ drivers/virt/coco/arm-cca-guest/Makefile      |   3 +
+ .../{arm-cca-guest.c => arm-cca.c}            | 175 +++-
+ drivers/virt/coco/arm-cca-guest/rsi-da.c      | 576 ++++++++++++
+ drivers/virt/coco/arm-cca-guest/rsi-da.h      |  73 ++
+ drivers/virt/coco/arm-cca-host/Kconfig        |  17 +
+ drivers/virt/coco/arm-cca-host/Makefile       |   5 +
+ drivers/virt/coco/arm-cca-host/arm-cca.c      | 384 ++++++++
+ drivers/virt/coco/arm-cca-host/rmm-da.c       | 857 ++++++++++++++++++
+ drivers/virt/coco/arm-cca-host/rmm-da.h       | 108 +++
+ drivers/virt/coco/host/Kconfig                |   6 -
+ drivers/virt/coco/host/Makefile               |   6 -
+ drivers/virt/coco/{host => }/tsm-core.c       |  27 +
+ include/keys/asymmetric-type.h                |   2 +
+ include/keys/x509-parser.h                    |  55 ++
+ include/linux/device.h                        |   1 +
+ include/linux/iommufd.h                       |   4 +
+ include/linux/kvm_host.h                      |   1 +
+ include/linux/pci-tsm.h                       |  37 +-
+ include/linux/swiotlb.h                       |   4 +
+ include/linux/tsm.h                           |  29 +
+ include/uapi/linux/iommufd.h                  |  69 ++
+ 48 files changed, 3887 insertions(+), 200 deletions(-)
+ create mode 100644 arch/arm64/include/asm/rhi.h
+ create mode 100644 arch/arm64/kernel/rhi.c
+ rename drivers/virt/coco/arm-cca-guest/{arm-cca-guest.c => arm-cca.c} (62%)
+ create mode 100644 drivers/virt/coco/arm-cca-guest/rsi-da.c
+ create mode 100644 drivers/virt/coco/arm-cca-guest/rsi-da.h
+ create mode 100644 drivers/virt/coco/arm-cca-host/Kconfig
+ create mode 100644 drivers/virt/coco/arm-cca-host/Makefile
+ create mode 100644 drivers/virt/coco/arm-cca-host/arm-cca.c
+ create mode 100644 drivers/virt/coco/arm-cca-host/rmm-da.c
+ create mode 100644 drivers/virt/coco/arm-cca-host/rmm-da.h
+ delete mode 100644 drivers/virt/coco/host/Kconfig
+ delete mode 100644 drivers/virt/coco/host/Makefile
+ rename drivers/virt/coco/{host => }/tsm-core.c (85%)
+ create mode 100644 include/keys/x509-parser.h
+
+-- 
+2.43.0
+
