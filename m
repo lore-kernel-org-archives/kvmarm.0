@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6D0279DC0
-	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 17:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AD3275AE8
+	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 17:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753725227; cv=none; b=Xrv96uLn5gBp2K7hUWlel73ILZOMg1ZYlkmq2XRFX955Fe1laF/VKoOlma2QuOIS05yjgjdSnjileLSWTLgirXQdZxPGO7+38gtupMMQgQIzFDF+VSB4U4SQii1DvUXxtqSwvewvoSmOaLkgt+wpfC315SbXM0k/I0uRObL/XEw=
+	t=1753725228; cv=none; b=grAnK3k5jNMCmxaG9tpPz9W7PbtMRmxddIRCsy0pjlIEuv/FSbQRXlm8U2woArT5/7CmJcS8GZ0QarUExVLKHn4lJSXmjVucSxErIxQVOJtGLXA+cgc2nfKMLNKq3o6nOx/UmlEX9Tn1mI5mkSYFu8C1+ZBqB6BJaIyxH0eB5FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753725227; c=relaxed/simple;
-	bh=DrD+ZWwEDs+4UwwUfkGMP6kz9KBpszpo0hluoKvZc2s=;
+	s=arc-20240116; t=1753725228; c=relaxed/simple;
+	bh=liFB2EO0mTS7ouQXAJr+MbUQE7dxgMTj1glZvyzpGXk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gO2eqnAsW8Erl6ywXYV+V9Pjb9v7yy9e1zWxD36h8XiE0jKs9WfGzUDOnG48tncfgCb+n/7Lyd1EmyNWQWir3+3Gq/62iDndbOzTmkzUZijKPDjaVDwyqvtjZjD3g6EMkYYJWOi05AUSQixtJXR+MhWk1YRgirAxqucHzR7jgbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R35Y8VDA; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=M4SqqIl8vAvGFJi0JbVk/YlxTmOK1I7giHPSG7Ls10PEnAswPlS4H6oDzEp+5A72M/26fPXQXl/+JKIR1RNJ+kgqORi3lROHP7rmWop9AW8yLpDFu58Do7YnryyTshBfxcW0vmcTcFtBBEKpy5JJlLPGueRwMXed7x/cEZHQggA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wQXJIqp1; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R35Y8VDA"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4588d178be2so750755e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 10:53:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wQXJIqp1"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4561611dc2aso33517785e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 10:53:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753725222; x=1754330022; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753725224; x=1754330024; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tt5m8i4QY0N1dfFhF7qHvvWc92n8Yu9ouTNwhUBFIh8=;
-        b=R35Y8VDAnc7bV1V2bOwHDSHUV0jPEePZ8b8RnB0CmSPQfnp0n1JkwfmCqJBW+iZ2z9
-         9lk0B9MYCmR15M3gVZ4Uvmbem7OJP/XMJJu63LE3xsC8dIsmUUfdPn4HIKmftgOHZ2qv
-         FbX7xy5imwclrylypsc8DcAWy9NtM0k5td42j3ySS1PyG7ZGNMWBv/7LRmUYRxQM0q6f
-         AyO21WjsV9rBG51MoeThVfAbr0KaIp0J0VRywq3wK0p5eodPHfQA9c2x4qfaI53mP7Qy
-         SRIYEX9tqCHqRnTQssVuSulyLm52xt4E4jrtDpSD5fkarp1LxqyT+kVgPfCC36kLsH86
-         i2sg==
+        bh=JNqiciGNbDvOVxE+CtY3bj2b4l2gg16t6NtA8moWKCo=;
+        b=wQXJIqp1Ahh8iR3ZSdgeaJOxd7Zb3Yuj23dKkEOEWJAB+7x5Qt7+8cWwIsU6eH74We
+         /JGKy2oTTy19B/pGA1BLNxy2m6lJuFq/X+R0yPFBzZZz5NZBb++oqGhYWzW0Ef4xulLz
+         KOJzUHvOaNh4/JMRE5ihw2nft7z4lNOoJprZJOajvKOOTqZmb4AloOfp0OPae2JrxsDj
+         DEdU3p5a7VOyI7wyI0OvhuLefDoG/lZOUObdzXQZWepYqs/278eWO9aEzuvpxJ1hdxeD
+         8nxyp8aixSG+FWsZT8gilBQvJ8eRFb/y6FFUBqwHgL47TnLmmVztkp3rE+KVINt/pgrI
+         Vg+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753725222; x=1754330022;
+        d=1e100.net; s=20230601; t=1753725224; x=1754330024;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tt5m8i4QY0N1dfFhF7qHvvWc92n8Yu9ouTNwhUBFIh8=;
-        b=TRWSxsiv9khrMEKWAU6uR/5CydUIMu1hmImGakOYibJR5ZRTKfjSo3k5oUgc2ii9T5
-         y0kOrOhSYfa9FS45a+hPkcIGGDOoNRieXDW7CZvRYj/4aSgCgd4B+gXshdDmOcbHri/B
-         gsVnerY+XTSbc84TjVmdehypfp16dAbxc1i36IbkvBCA+n7wWvcZXMBrkiqzaW+d7mpY
-         rV473YKQOWFyCMXGxf4e4AoqzW+sS84b7h87UNn1BUgSAgMhWIPx2W5ON/OLra8ltsBE
-         DLbmTEpAt3vcp8I7qKcRRpE0boUeue+8zLos0dmJAm2VVaVaEsziugeEhgovvNv1jILF
-         3cuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJY3Yn75OUvOEOd293NPThb+EQm+zmezSnLF3MXbg2+TZvY6R4FkNkxzHzUxkTqnHnFdBcUjU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzt27VbouXMJONzplisgcUT46gJVGK8NxDIl+7nVQWn8m1P/QnL
-	W78ljwOhvO+ll/2joauxS5qRRG2EwJJmEb0d7yn1li5dpfplFy78AMgjDIgOavieoRW/ubfg7Pa
-	jk62UCstnzPhJRg==
-X-Google-Smtp-Source: AGHT+IF8+izyk+caZjCV5IYrASgS5LYsOHMnHxHerMTimZGTVouHs7VB05sQiTCg3vY7AuqkXvZazJs9ITyX6g==
-X-Received: from wmbep11.prod.google.com ([2002:a05:600c:840b:b0:453:5e1:c32e])
+        bh=JNqiciGNbDvOVxE+CtY3bj2b4l2gg16t6NtA8moWKCo=;
+        b=UZ7qHZP47CIfhtewwGM4BA2c+uU8mdT4IKC7YpoP0vSkbUiCfzRfensm0ry5DnBs+h
+         q97cAc1motK6CXP+T8wsmK3tDg7fi+YpCOuQDApoCV7NiC9ckIDKvzhJihLqK/o7bht2
+         JUzx4/nG5b+p1sU3PDs3Y2RDu/ktHYzCLj3B/JIEcUCKQ0Pb1UJv4+4XuGQo8jVZM8i7
+         CP69lguPKT3aPfTxX9CQla7ucC7ZK7l2GdSjDpgnI1xMb83JaC0Gzqqo2bsyzmTD+Bu1
+         +xbBbYakhkaKMP56CAeH48LSEa3RbFDtLe9L/j9gI+gzieV+1tUI4RfvegNCPtNyMToR
+         t8xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWz8OqAmokqrm1laVL+Qyb8CyNZKpEGjWruzORDOqUEhX0VKhJIp7EQxVpHW20FoCd1T1N+uaI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzdnBSCjdnTZNj+Iba23+nxWqutFGpQnsJARqOZetMPBHT6yTCb
+	md4FulSWx76M1+ZtFc28cSVjHX6trNRIH0aJFTidvtUmLxuQ8Kg2YM77tpbaf85SyBuIOGHkDrF
+	zJXCoG502XtbO/g==
+X-Google-Smtp-Source: AGHT+IEz09KUv2OxAPyDlzfr699/1qziOwALIawld3qpvPOE7K8k/mL0W2XcO/kW0IXD9mKeU33jEW1uY9lkQw==
+X-Received: from wmbei27.prod.google.com ([2002:a05:600c:3f1b:b0:456:1b6f:c878])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1c90:b0:456:1dd9:943 with SMTP id 5b1f17b1804b1-4588b9b1154mr24802245e9.3.1753725222476;
- Mon, 28 Jul 2025 10:53:42 -0700 (PDT)
-Date: Mon, 28 Jul 2025 17:52:59 +0000
+ 2002:a05:600c:6748:b0:456:eab:633e with SMTP id 5b1f17b1804b1-4587dd0db72mr87600635e9.17.1753725224509;
+ Mon, 28 Jul 2025 10:53:44 -0700 (PDT)
+Date: Mon, 28 Jul 2025 17:53:01 +0000
 In-Reply-To: <20250728175316.3706196-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250728175316.3706196-1-smostafa@google.com>
 X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250728175316.3706196-13-smostafa@google.com>
-Subject: [PATCH v3 12/29] iommu/arm-smmu-v3: Split cmdq code with hyp
+Message-ID: <20250728175316.3706196-15-smostafa@google.com>
+Subject: [PATCH v3 14/29] KVM: arm64: iommu: Introduce IOMMU driver infrastructure
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev
@@ -71,462 +71,235 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	praan@google.com, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The KVM SMMUv3 driver would re-use some of the cmdq code inside
-the hypervisor, move these functions to a new common c file that
-is shared between the host kernel and the hypervisor.
+To establish DMA isolation, KVM needs an IOMMU driver which provide
+certain ops, these ops are defined outside of the iommu_ops,
+and has 2 components:
+- kvm_iommu_driver (kernel): Implements simple interaction with
+  the kernel (init, remove,...)
+- kvm_iommu_ops (hypervisor): Implements identity mapping for
+  the IOMMU page tables
+
+Only one driver can be used and is registered with
+kvm_iommu_register_driver() by passing pointers to both ops.
+
+The flow of the KVM IOMMU drivers works as follows:
+- The KVM IOMMU driver in the kernel after being loaded using an
+  initcall (before module_init) it would register with KVM both
+  the kernel and hypervisor ops.
+- KVM will initialise the driver after it initialises and before the
+  de-privilege point, which is a suitable point to establish trusted
+  interaction between the host and the hypervisor.
+  In this call the IOMMU kernel driver typically starts probing
+  the IOMMUs, parsing firmware tables and initialising hardware.
+- Then the hypervisor init will be called, to take over the IOMMUs
+  and initialise its data structures.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- drivers/iommu/arm/arm-smmu-v3/Makefile        |   2 +-
- .../arm/arm-smmu-v3/arm-smmu-v3-common-hyp.c  | 114 ++++++++++++++++
- .../arm/arm-smmu-v3/arm-smmu-v3-common.h      |  69 ++++++++++
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 128 ------------------
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  38 ------
- 5 files changed, 184 insertions(+), 167 deletions(-)
- create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-hyp.c
+ arch/arm64/include/asm/kvm_host.h       |  9 +++++
+ arch/arm64/kvm/Makefile                 |  3 +-
+ arch/arm64/kvm/arm.c                    |  8 +++-
+ arch/arm64/kvm/hyp/include/nvhe/iommu.h | 13 +++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile        |  3 +-
+ arch/arm64/kvm/hyp/nvhe/iommu/iommu.c   | 18 +++++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c         |  5 +++
+ arch/arm64/kvm/iommu.c                  | 49 +++++++++++++++++++++++++
+ 8 files changed, 105 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/iommu.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+ create mode 100644 arch/arm64/kvm/iommu.c
 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/Makefile b/drivers/iommu/arm/arm-smmu-v3/Makefile
-index 0bc0c116b851..16be1249000a 100644
---- a/drivers/iommu/arm/arm-smmu-v3/Makefile
-+++ b/drivers/iommu/arm/arm-smmu-v3/Makefile
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_ARM_SMMU_V3) += arm_smmu_v3.o
- arm_smmu_v3-y := arm-smmu-v3.o
--arm_smmu_v3-y += arm-smmu-v3-common.o
-+arm_smmu_v3-y += arm-smmu-v3-common.o arm-smmu-v3-common-hyp.o
- arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_IOMMUFD) += arm-smmu-v3-iommufd.o
- arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_SVA) += arm-smmu-v3-sva.o
- arm_smmu_v3-$(CONFIG_TEGRA241_CMDQV) += tegra241-cmdqv.o
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-hyp.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-hyp.c
-new file mode 100644
-index 000000000000..da41c5024a1c
---- /dev/null
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-hyp.c
-@@ -0,0 +1,114 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2015 ARM Limited
-+ *
-+ * Author: Will Deacon <will.deacon@arm.com>
-+ * Arm SMMUv3 driver functions shared with hypervisor.
-+ */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3e41a880b062..43f5a64bbd1d 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1674,5 +1674,14 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
+ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1);
+ void check_feature_map(void);
+ 
++struct kvm_iommu_driver {
++	int (*init_driver)(void);
++	void (*remove_driver)(void);
++};
 +
-+#include "arm-smmu-v3-common.h"
-+#include <asm-generic/errno-base.h>
-+
-+#include <linux/string.h>
-+
-+int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent)
-+{
-+	memset(cmd, 0, 1 << CMDQ_ENT_SZ_SHIFT);
-+	cmd[0] |= FIELD_PREP(CMDQ_0_OP, ent->opcode);
-+
-+	switch (ent->opcode) {
-+	case CMDQ_OP_TLBI_EL2_ALL:
-+	case CMDQ_OP_TLBI_NSNH_ALL:
-+		break;
-+	case CMDQ_OP_PREFETCH_CFG:
-+		cmd[0] |= FIELD_PREP(CMDQ_PREFETCH_0_SID, ent->prefetch.sid);
-+		break;
-+	case CMDQ_OP_CFGI_CD:
-+		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SSID, ent->cfgi.ssid);
-+		fallthrough;
-+	case CMDQ_OP_CFGI_STE:
-+		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
-+		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_LEAF, ent->cfgi.leaf);
-+		break;
-+	case CMDQ_OP_CFGI_CD_ALL:
-+		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
-+		break;
-+	case CMDQ_OP_CFGI_ALL:
-+		/* Cover the entire SID range */
-+		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_RANGE, 31);
-+		break;
-+	case CMDQ_OP_TLBI_NH_VA:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-+		fallthrough;
-+	case CMDQ_OP_TLBI_EL2_VA:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
-+		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_VA_MASK;
-+		break;
-+	case CMDQ_OP_TLBI_S2_IPA:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
-+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
-+		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_IPA_MASK;
-+		break;
-+	case CMDQ_OP_TLBI_NH_ASID:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-+		fallthrough;
-+	case CMDQ_OP_TLBI_NH_ALL:
-+	case CMDQ_OP_TLBI_S12_VMALL:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-+		break;
-+	case CMDQ_OP_TLBI_EL2_ASID:
-+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-+		break;
-+	case CMDQ_OP_ATC_INV:
-+		cmd[0] |= FIELD_PREP(CMDQ_0_SSV, ent->substream_valid);
-+		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_GLOBAL, ent->atc.global);
-+		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_SSID, ent->atc.ssid);
-+		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_SID, ent->atc.sid);
-+		cmd[1] |= FIELD_PREP(CMDQ_ATC_1_SIZE, ent->atc.size);
-+		cmd[1] |= ent->atc.addr & CMDQ_ATC_1_ADDR_MASK;
-+		break;
-+	case CMDQ_OP_PRI_RESP:
-+		cmd[0] |= FIELD_PREP(CMDQ_0_SSV, ent->substream_valid);
-+		cmd[0] |= FIELD_PREP(CMDQ_PRI_0_SSID, ent->pri.ssid);
-+		cmd[0] |= FIELD_PREP(CMDQ_PRI_0_SID, ent->pri.sid);
-+		cmd[1] |= FIELD_PREP(CMDQ_PRI_1_GRPID, ent->pri.grpid);
-+		switch (ent->pri.resp) {
-+		case PRI_RESP_DENY:
-+		case PRI_RESP_FAIL:
-+		case PRI_RESP_SUCC:
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+		cmd[1] |= FIELD_PREP(CMDQ_PRI_1_RESP, ent->pri.resp);
-+		break;
-+	case CMDQ_OP_RESUME:
-+		cmd[0] |= FIELD_PREP(CMDQ_RESUME_0_SID, ent->resume.sid);
-+		cmd[0] |= FIELD_PREP(CMDQ_RESUME_0_RESP, ent->resume.resp);
-+		cmd[1] |= FIELD_PREP(CMDQ_RESUME_1_STAG, ent->resume.stag);
-+		break;
-+	case CMDQ_OP_CMD_SYNC:
-+		if (ent->sync.msiaddr) {
-+			cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_IRQ);
-+			cmd[1] |= ent->sync.msiaddr & CMDQ_SYNC_1_MSIADDR_MASK;
-+		} else {
-+			cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_SEV);
-+		}
-+		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_MSH, ARM_SMMU_SH_ISH);
-+		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_MSIATTR, ARM_SMMU_MEMATTR_OIWB);
-+		break;
-+	default:
-+		return -ENOENT;
++struct kvm_iommu_ops;
++int kvm_iommu_register_driver(struct kvm_iommu_driver *kern_ops, struct kvm_iommu_ops *hyp_ops);
++int kvm_iommu_init_driver(void);
++void kvm_iommu_remove_driver(void);
+ 
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 7c329e01c557..5528704bfd72 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -23,7 +23,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+ 	 vgic/vgic-v3.o vgic/vgic-v4.o \
+ 	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+ 	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+-	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o
++	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
++	 iommu.o
+ 
+ kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+ kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 23dd3f3fc3eb..2f494f402c48 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2451,10 +2451,16 @@ static int __init kvm_hyp_init_protection(u32 hyp_va_bits)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = do_pkvm_init(hyp_va_bits);
++	ret = kvm_iommu_init_driver();
+ 	if (ret)
+ 		return ret;
+ 
++	ret = do_pkvm_init(hyp_va_bits);
++	if (ret) {
++		kvm_iommu_remove_driver();
++		return ret;
 +	}
 +
+ 	free_hyp_pgds();
+ 
+ 	return 0;
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/iommu.h b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
+new file mode 100644
+index 000000000000..1ac70cc28a9e
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __ARM64_KVM_NVHE_IOMMU_H__
++#define __ARM64_KVM_NVHE_IOMMU_H__
++
++#include <asm/kvm_host.h>
++
++struct kvm_iommu_ops {
++	int (*init)(void);
++};
++
++int kvm_iommu_init(void);
++
++#endif /* __ARM64_KVM_NVHE_IOMMU_H__ */
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index a76522d63c3e..393ff143f0be 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -24,7 +24,8 @@ CFLAGS_switch.nvhe.o += -Wno-override-init
+ 
+ hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+ 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
+-	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
++	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o \
++	 iommu/iommu.o
+ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+ hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
+diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+new file mode 100644
+index 000000000000..a01c036c55be
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * IOMMU operations for pKVM
++ *
++ * Copyright (C) 2022 Linaro Ltd.
++ */
++#include <nvhe/iommu.h>
++
++/* Only one set of ops supported */
++struct kvm_iommu_ops *kvm_iommu_ops;
++
++int kvm_iommu_init(void)
++{
++	if (!kvm_iommu_ops || !kvm_iommu_ops->init)
++		return -ENODEV;
++
++	return kvm_iommu_ops->init();
++}
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index ee6435473204..bdbc77395e03 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -13,6 +13,7 @@
+ #include <nvhe/early_alloc.h>
+ #include <nvhe/ffa.h>
+ #include <nvhe/gfp.h>
++#include <nvhe/iommu.h>
+ #include <nvhe/memory.h>
+ #include <nvhe/mem_protect.h>
+ #include <nvhe/mm.h>
+@@ -320,6 +321,10 @@ void __noreturn __pkvm_init_finalise(void)
+ 	if (ret)
+ 		goto out;
+ 
++	ret = kvm_iommu_init();
++	if (ret)
++		goto out;
++
+ 	ret = hyp_ffa_init(ffa_proxy_pages);
+ 	if (ret)
+ 		goto out;
+diff --git a/arch/arm64/kvm/iommu.c b/arch/arm64/kvm/iommu.c
+new file mode 100644
+index 000000000000..39465101074a
+--- /dev/null
++++ b/arch/arm64/kvm/iommu.c
+@@ -0,0 +1,49 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2023 Google LLC
++ * Author: Mostafa Saleh <smostafa@google.com>
++ */
++
++#include <asm/kvm_mmu.h>
++#include <linux/kvm_host.h>
++
++struct kvm_iommu_driver *iommu_driver;
++extern struct kvm_iommu_ops *kvm_nvhe_sym(kvm_iommu_ops);
++
++int kvm_iommu_register_driver(struct kvm_iommu_driver *kern_ops, struct kvm_iommu_ops *el2_ops)
++{
++	int ret;
++
++	if (WARN_ON(!kern_ops || !el2_ops))
++		return -EINVAL;
++
++	/*
++	 * Paired with smp_load_acquire(&iommu_driver)
++	 * Ensure memory stores happening during a driver
++	 * init are observed before executing kvm iommu callbacks.
++	 */
++	ret = cmpxchg_release(&iommu_driver, NULL, kern_ops) ? -EBUSY : 0;
++	if (ret)
++		return ret;
++
++	kvm_nvhe_sym(kvm_iommu_ops) = el2_ops;
 +	return 0;
 +}
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.h
-index 3bcb5d94f21a..f115ff9a547f 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.h
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/bits.h>
- #include <linux/bitfield.h>
-+#include <linux/cache.h>
- 
- /* MMIO registers */
- #define ARM_SMMU_IDR0			0x0
-@@ -460,6 +461,44 @@ struct arm_smmu_cmdq_ent {
- #define ARM_SMMU_FEAT_HD		(1 << 22)
- #define ARM_SMMU_FEAT_S2FWB		(1 << 23)
- 
-+struct arm_smmu_ll_queue {
-+	union {
-+		u64			val;
-+		struct {
-+			u32		prod;
-+			u32		cons;
-+		};
-+		struct {
-+			atomic_t	prod;
-+			atomic_t	cons;
-+		} atomic;
-+		u8			__pad[SMP_CACHE_BYTES];
-+	} ____cacheline_aligned_in_smp;
-+	u32				max_n_shift;
-+};
 +
-+struct arm_smmu_queue {
-+	struct arm_smmu_ll_queue	llq;
-+	int				irq; /* Wired interrupt */
-+
-+	__le64				*base;
-+	dma_addr_t			base_dma;
-+	u64				q_base;
-+
-+	size_t				ent_dwords;
-+
-+	u32 __iomem			*prod_reg;
-+	u32 __iomem			*cons_reg;
-+};
-+
-+#define Q_IDX(llq, p)			((p) & ((1 << (llq)->max_n_shift) - 1))
-+#define Q_WRP(llq, p)			((p) & (1 << (llq)->max_n_shift))
-+#define Q_OVERFLOW_FLAG			(1U << 31)
-+#define Q_OVF(p)			((p) & Q_OVERFLOW_FLAG)
-+#define Q_ENT(q, p)			((q)->base +			\
-+					 Q_IDX(&((q)->llq), p) *	\
-+					 (q)->ent_dwords)
-+
- static inline void arm_smmu_write_strtab_l1_desc(struct arm_smmu_strtab_l1 *dst,
- 						 dma_addr_t l2ptr_dma)
- {
-@@ -471,4 +510,34 @@ static inline void arm_smmu_write_strtab_l1_desc(struct arm_smmu_strtab_l1 *dst,
- 	/* The HW has 64 bit atomicity with stores to the L2 STE table */
- 	WRITE_ONCE(dst->l2ptr, cpu_to_le64(val));
- }
-+
-+int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent);
-+
-+
-+/* Queue functions shared between kernel and hyp. */
-+static inline bool queue_full(struct arm_smmu_ll_queue *q)
++int kvm_iommu_init_driver(void)
 +{
-+	return Q_IDX(q, q->prod) == Q_IDX(q, q->cons) &&
-+	       Q_WRP(q, q->prod) != Q_WRP(q, q->cons);
++	/* See kvm_iommu_register_driver() */
++	if (WARN_ON(!smp_load_acquire(&iommu_driver))) {
++		kvm_err("pKVM enabled without an IOMMU driver, do not run confidential workload in virtual machines\n");
++		return -ENODEV;
++	}
++
++	return iommu_driver->init_driver();
 +}
 +
-+static inline bool queue_empty(struct arm_smmu_ll_queue *q)
++void kvm_iommu_remove_driver(void)
 +{
-+	return Q_IDX(q, q->prod) == Q_IDX(q, q->cons) &&
-+	       Q_WRP(q, q->prod) == Q_WRP(q, q->cons);
++	/* See kvm_iommu_register_driver() */
++	if (smp_load_acquire(&iommu_driver))
++		iommu_driver->remove_driver();
 +}
-+
-+static inline u32 queue_inc_prod_n(struct arm_smmu_ll_queue *q, int n)
-+{
-+	u32 prod = (Q_WRP(q, q->prod) | Q_IDX(q, q->prod)) + n;
-+	return Q_OVF(q->prod) | Q_WRP(q, prod) | Q_IDX(q, prod);
-+}
-+
-+static inline void queue_write(__le64 *dst, u64 *src, size_t n_dwords)
-+{
-+	int i;
-+
-+	for (i = 0; i < n_dwords; ++i)
-+		*dst++ = cpu_to_le64(*src++);
-+}
- #endif /* _ARM_SMMU_V3_COMMON_H */
-\ No newline at end of file
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 8fbc7dd2a2db..066d9d9e8088 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -105,18 +105,6 @@ static bool queue_has_space(struct arm_smmu_ll_queue *q, u32 n)
- 	return space >= n;
- }
- 
--static bool queue_full(struct arm_smmu_ll_queue *q)
--{
--	return Q_IDX(q, q->prod) == Q_IDX(q, q->cons) &&
--	       Q_WRP(q, q->prod) != Q_WRP(q, q->cons);
--}
--
--static bool queue_empty(struct arm_smmu_ll_queue *q)
--{
--	return Q_IDX(q, q->prod) == Q_IDX(q, q->cons) &&
--	       Q_WRP(q, q->prod) == Q_WRP(q, q->cons);
--}
--
- static bool queue_consumed(struct arm_smmu_ll_queue *q, u32 prod)
- {
- 	return ((Q_WRP(q, q->cons) == Q_WRP(q, prod)) &&
-@@ -172,12 +160,6 @@ static int queue_sync_prod_in(struct arm_smmu_queue *q)
- 	return ret;
- }
- 
--static u32 queue_inc_prod_n(struct arm_smmu_ll_queue *q, int n)
--{
--	u32 prod = (Q_WRP(q, q->prod) | Q_IDX(q, q->prod)) + n;
--	return Q_OVF(q->prod) | Q_WRP(q, prod) | Q_IDX(q, prod);
--}
--
- static void queue_poll_init(struct arm_smmu_device *smmu,
- 			    struct arm_smmu_queue_poll *qp)
- {
-@@ -205,14 +187,6 @@ static int queue_poll(struct arm_smmu_queue_poll *qp)
- 	return 0;
- }
- 
--static void queue_write(__le64 *dst, u64 *src, size_t n_dwords)
--{
--	int i;
--
--	for (i = 0; i < n_dwords; ++i)
--		*dst++ = cpu_to_le64(*src++);
--}
--
- static void queue_read(u64 *dst, __le64 *src, size_t n_dwords)
- {
- 	int i;
-@@ -233,108 +207,6 @@ static int queue_remove_raw(struct arm_smmu_queue *q, u64 *ent)
- }
- 
- /* High-level queue accessors */
--static int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent)
--{
--	memset(cmd, 0, 1 << CMDQ_ENT_SZ_SHIFT);
--	cmd[0] |= FIELD_PREP(CMDQ_0_OP, ent->opcode);
--
--	switch (ent->opcode) {
--	case CMDQ_OP_TLBI_EL2_ALL:
--	case CMDQ_OP_TLBI_NSNH_ALL:
--		break;
--	case CMDQ_OP_PREFETCH_CFG:
--		cmd[0] |= FIELD_PREP(CMDQ_PREFETCH_0_SID, ent->prefetch.sid);
--		break;
--	case CMDQ_OP_CFGI_CD:
--		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SSID, ent->cfgi.ssid);
--		fallthrough;
--	case CMDQ_OP_CFGI_STE:
--		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
--		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_LEAF, ent->cfgi.leaf);
--		break;
--	case CMDQ_OP_CFGI_CD_ALL:
--		cmd[0] |= FIELD_PREP(CMDQ_CFGI_0_SID, ent->cfgi.sid);
--		break;
--	case CMDQ_OP_CFGI_ALL:
--		/* Cover the entire SID range */
--		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_RANGE, 31);
--		break;
--	case CMDQ_OP_TLBI_NH_VA:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
--		fallthrough;
--	case CMDQ_OP_TLBI_EL2_VA:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
--		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_VA_MASK;
--		break;
--	case CMDQ_OP_TLBI_S2_IPA:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_NUM, ent->tlbi.num);
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_SCALE, ent->tlbi.scale);
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TTL, ent->tlbi.ttl);
--		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_TG, ent->tlbi.tg);
--		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_IPA_MASK;
--		break;
--	case CMDQ_OP_TLBI_NH_ASID:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
--		fallthrough;
--	case CMDQ_OP_TLBI_NH_ALL:
--	case CMDQ_OP_TLBI_S12_VMALL:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
--		break;
--	case CMDQ_OP_TLBI_EL2_ASID:
--		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
--		break;
--	case CMDQ_OP_ATC_INV:
--		cmd[0] |= FIELD_PREP(CMDQ_0_SSV, ent->substream_valid);
--		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_GLOBAL, ent->atc.global);
--		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_SSID, ent->atc.ssid);
--		cmd[0] |= FIELD_PREP(CMDQ_ATC_0_SID, ent->atc.sid);
--		cmd[1] |= FIELD_PREP(CMDQ_ATC_1_SIZE, ent->atc.size);
--		cmd[1] |= ent->atc.addr & CMDQ_ATC_1_ADDR_MASK;
--		break;
--	case CMDQ_OP_PRI_RESP:
--		cmd[0] |= FIELD_PREP(CMDQ_0_SSV, ent->substream_valid);
--		cmd[0] |= FIELD_PREP(CMDQ_PRI_0_SSID, ent->pri.ssid);
--		cmd[0] |= FIELD_PREP(CMDQ_PRI_0_SID, ent->pri.sid);
--		cmd[1] |= FIELD_PREP(CMDQ_PRI_1_GRPID, ent->pri.grpid);
--		switch (ent->pri.resp) {
--		case PRI_RESP_DENY:
--		case PRI_RESP_FAIL:
--		case PRI_RESP_SUCC:
--			break;
--		default:
--			return -EINVAL;
--		}
--		cmd[1] |= FIELD_PREP(CMDQ_PRI_1_RESP, ent->pri.resp);
--		break;
--	case CMDQ_OP_RESUME:
--		cmd[0] |= FIELD_PREP(CMDQ_RESUME_0_SID, ent->resume.sid);
--		cmd[0] |= FIELD_PREP(CMDQ_RESUME_0_RESP, ent->resume.resp);
--		cmd[1] |= FIELD_PREP(CMDQ_RESUME_1_STAG, ent->resume.stag);
--		break;
--	case CMDQ_OP_CMD_SYNC:
--		if (ent->sync.msiaddr) {
--			cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_IRQ);
--			cmd[1] |= ent->sync.msiaddr & CMDQ_SYNC_1_MSIADDR_MASK;
--		} else {
--			cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_SEV);
--		}
--		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_MSH, ARM_SMMU_SH_ISH);
--		cmd[0] |= FIELD_PREP(CMDQ_SYNC_0_MSIATTR, ARM_SMMU_MEMATTR_OIWB);
--		break;
--	default:
--		return -ENOENT;
--	}
--
--	return 0;
--}
--
- static struct arm_smmu_cmdq *arm_smmu_get_cmdq(struct arm_smmu_device *smmu,
- 					       struct arm_smmu_cmdq_ent *ent)
- {
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-index e3c46b3344db..f9a496e0bd94 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-@@ -19,14 +19,6 @@ struct arm_smmu_device;
- 
- #include "arm-smmu-v3-common.h"
- 
--#define Q_IDX(llq, p)			((p) & ((1 << (llq)->max_n_shift) - 1))
--#define Q_WRP(llq, p)			((p) & (1 << (llq)->max_n_shift))
--#define Q_OVERFLOW_FLAG			(1U << 31)
--#define Q_OVF(p)			((p) & Q_OVERFLOW_FLAG)
--#define Q_ENT(q, p)			((q)->base +			\
--					 Q_IDX(&((q)->llq), p) *	\
--					 (q)->ent_dwords)
--
- /* Ensure DMA allocations are naturally aligned */
- #ifdef CONFIG_CMA_ALIGNMENT
- #define Q_MAX_SZ_SHIFT			(PAGE_SHIFT + CONFIG_CMA_ALIGNMENT)
-@@ -162,36 +154,6 @@ static inline unsigned int arm_smmu_cdtab_l2_idx(unsigned int ssid)
- #define MSI_IOVA_BASE			0x8000000
- #define MSI_IOVA_LENGTH			0x100000
- 
--struct arm_smmu_ll_queue {
--	union {
--		u64			val;
--		struct {
--			u32		prod;
--			u32		cons;
--		};
--		struct {
--			atomic_t	prod;
--			atomic_t	cons;
--		} atomic;
--		u8			__pad[SMP_CACHE_BYTES];
--	} ____cacheline_aligned_in_smp;
--	u32				max_n_shift;
--};
--
--struct arm_smmu_queue {
--	struct arm_smmu_ll_queue	llq;
--	int				irq; /* Wired interrupt */
--
--	__le64				*base;
--	dma_addr_t			base_dma;
--	u64				q_base;
--
--	size_t				ent_dwords;
--
--	u32 __iomem			*prod_reg;
--	u32 __iomem			*cons_reg;
--};
--
- struct arm_smmu_queue_poll {
- 	ktime_t				timeout;
- 	unsigned int			delay;
 -- 
 2.50.1.552.g942d659e1b-goog
 
