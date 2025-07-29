@@ -1,159 +1,111 @@
-Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AFB22B8A6
-	for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 22:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E104825DB1A;
+	Tue, 29 Jul 2025 06:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753742236; cv=none; b=E/EegE+9oaNOV7nH71bj1q5bXOYpAQIObqE7yu3079uXYQjJVOiqeQnvlGeBMLsvK7S2WaBCyoNNM6dZbVxZIDi/gQuNRxUf3JSHGAx293wYTQeo9EseTvtIN1+NS+2v4d0juJReBJK3euq7gMDMLp0HpuoAALd4nQn+ij9sudM=
+	t=1753771450; cv=none; b=UgbgK54B/pl3yg03tUB6dtUiq9DLWMtWYBOkm4tNrWH4Gs+Qt+9drgEcujy0OEu1SwXcssDYUIb5xV8uOdR5AHf98hLlWYIAA1iU5JTOGNfSoH5JqicJsODLI+Cyt4TituPxGCM5v/icRe/tdEsuNhWZPYMdcdaWSbI4Eij7YjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753742236; c=relaxed/simple;
-	bh=EF+nLZgKrgjhDmWSiOPghhkt5JHqMrkQ8+IPoUCfYaE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=apl/9dUAcSbN5/Jz/D8Pvdup1lfy+peyPoDjOPP0e7uvH6f1NTGTA6TVDIEDp1WjOPOcafGHl0isOkAV+8ccGahAEsrojCLj6hqOs3flHH8xupBOv8EKux4yBilj6IzPSc7tF5nszIDB/P5O/IflmrQYwgyWuDLHTUHhX0hRK30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MHNG5LA7; arc=none smtp.client-ip=209.85.160.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
+	s=arc-20240116; t=1753771450; c=relaxed/simple;
+	bh=i9ZlhH1fBGslVYkM5Xm9/MatOljq163+hNGBccJSA2s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sG5cWyK/LeYp6g3iLWR2+e8fCfyU2KhFMryRrGVT/yBj1+VSypfpef8CvEqAsOfw3naeXwu3ErOm5u1r5P9hVTNTn8QpcGAzjBXzCTjALD6VFGTPF7DhBkgVdsPj4GJ6W4vHhvJsjGpKx94ib3X+LbRfgkvezCwIv8U++dBRB6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aNnkBUsx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MHNG5LA7"
-Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-30254c60c4cso6114642fac.3
-        for <kvmarm@lists.linux.dev>; Mon, 28 Jul 2025 15:37:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753742234; x=1754347034; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=g1ZZrV9iF8dYVdhyBL4d5b4ftcnLDouNaKEg4YWgOvI=;
-        b=MHNG5LA7c/NZz0+uN4mSeiRrTiGlLTghsBVSBOGk0c4DQuIBq071PQKbOHMErgSauS
-         gYDwjYAj5+/1GgHkgvr4aDFDKAGIldM59l9N6ieev7Udgf+Ue4L4kqMflCeSSel6mXSz
-         wop5fd7tBIYfZgGxl2o70aJmjg3qMQMmg4KRpHBxq1Ocon4ShBTOse1Q0MoXDk7kg6b7
-         ZqwBa8SGSRF461/zliNj+qf8gQOisMUnVFz65uZ1Bq32Wdogzv1Jt/vhrE7jtpLmZ2Pa
-         jl7BSwdacRvp2kp5IwEvc052+5EDHKyzzTdgSbtD0khCfYHSj/TkPyJM/+uMv107R1Mb
-         Mekg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753742234; x=1754347034;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g1ZZrV9iF8dYVdhyBL4d5b4ftcnLDouNaKEg4YWgOvI=;
-        b=ML7v6PbCZ1P5vunB06MMqru0ir32C8ssS777zgTnTvvaDyroSwF6exyvVPYeAnS6nY
-         mQqbW/ylwm5rJNQcWNMHIpyX3g5TWB5uL1w5qOyj7Dme7pglC+kAxWlbNO4NbgowpbFg
-         Ozl13SR6qTTH12u3cN01HTNBa7hyLPLUtcdTuydV2u3t9R7cpODBGR6z+uEE0+62YqMn
-         72ty/osJs0BaE8W8hOR3Hm+ChelqiUcBxBkSOHFHcn4K9KkdhYIqDfdDgbg1h9HN4BDE
-         B/3fbDS/dNFmaToc12wlqcoxkMkwpuP6YRx33Z0tfdPbDQNaI/4eMytwQk3GY4cEyGcH
-         Y+Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCXOolq1k+XrZkEnD6Bm0XsM8UElzzNdGanAhbC/kiwnRHtLXdEGIEU9Pw2oYuqAt2wrnO2+x4g=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx9FKoMOSLK768QMiQEjYFKY0VdFkBUkTTOWBrm2GA0Xhmnfw2u
-	Id7D7eYg2LnyCBeUZurBV8jWSAy1nXEbNFhnCtvK42lcJt0qSg5P6Qu2xhH6eZ68w4QFZdnD9wA
-	pkOI36r0neg==
-X-Google-Smtp-Source: AGHT+IFMRJ908vvsWj70nTjQOvVm1PrziYCGSb3/MxBBTKnv0C5mcFnYcmNsuxDQFYN+4WMHi8+Bkj1Y0O5E
-X-Received: from oabld4.prod.google.com ([2002:a05:6870:2b04:b0:2bc:69a2:7ea5])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6870:1b83:b0:306:9f8e:6699
- with SMTP id 586e51a60fabf-30701faa8b5mr8749981fac.30.1753742233877; Mon, 28
- Jul 2025 15:37:13 -0700 (PDT)
-Date: Mon, 28 Jul 2025 22:37:10 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aNnkBUsx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 464B1C4CEEF;
+	Tue, 29 Jul 2025 06:44:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753771449;
+	bh=i9ZlhH1fBGslVYkM5Xm9/MatOljq163+hNGBccJSA2s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aNnkBUsxHrrC4jQ3xtGVMJ0PnkXXUrKnp6KG5e6T4/Jguv+pnMXnKk6joSjeb3iuz
+	 Bpw0QfHuqjQLeJCgDpUC8MJr94FXlNhqo/oE6CWuiVlT79OJVJE5FpuIjilCq0CGPb
+	 PU/tNtW49eTNPHH8HGy/LpZ2wyyWKW6H22K37U1ZeCw5KJCkm46X1xJfDSJ6qbv4IZ
+	 CMoTL87gFpkWbcdpPbajrrNcCU+/z8RRrcAWCILoaxUL72bKixIjv9ar1mHeex1X3v
+	 KaDFTYOiszVTkWKYNsv5VquiyXpHRnLZzcMtnCt5UzvwDbq9iCTHgxd3i82Ex3jDbn
+	 nKjCHu0is9LbQ==
+Message-ID: <c8da60f6-4083-4aac-b921-d57b767fa895@kernel.org>
+Date: Tue, 29 Jul 2025 08:44:03 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.1.487.gc89ff58d15-goog
-Message-ID: <20250728223710.129440-1-rananta@google.com>
-Subject: [PATCH] KVM: arm64: Set/unset vGIC v4 forwarding if direct IRQs are supported
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: Raghavendra Rao Anata <rananta@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 20/29] iommu/arm-smmu-v3-kvm: Setup command queue
+To: Mostafa Saleh <smostafa@google.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ iommu@lists.linux.dev
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
+ will@kernel.org, robin.murphy@arm.com, jean-philippe@linaro.org,
+ qperret@google.com, tabba@google.com, jgg@ziepe.ca, mark.rutland@arm.com,
+ praan@google.com
+References: <20250728175316.3706196-1-smostafa@google.com>
+ <20250728175316.3706196-21-smostafa@google.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250728175316.3706196-21-smostafa@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Commit <c652887a9288> ("KVM: arm64: vgic-v3: Allow userspace to write
-GICD_TYPER2.nASSGIcap") bundles the vLPIs and vSGIs behind the
-GICD_TYPER2.nASSGIcap field. While the vGIC v4 initialization and
-teardown is handled correctly, it erroneously left out the cases when
-KVM sets/unset vGIC v4 forwarding, which leads to a kernel panic of the
-following nature:
+On 28/07/2025 19:53, Mostafa Saleh wrote:
+> Map the command queue allocated by the host into the hypervisor address
+> space. When the host mappings are finalized, the queue is unmapped from
+> the host.
+> 
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
- Unable to handle kernel NULL pointer dereference at virtual address 00000000000000a8
- Mem abort info:
-   ESR = 0x0000000096000044
-   EC = 0x25: DABT (current EL), IL = 32 bits
-   SET = 0, FnV = 0
-   EA = 0, S1PTW = 0
-   FSC = 0x04: level 0 translation fault
- Data abort info:
-   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
-   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
- user pgtable: 4k pages, 48-bit VAs, pgdp=00000073a453b000
- [00000000000000a8] pgd=0000000000000000, p4d=0000000000000000
- Internal error: Oops: 0000000096000044 [#1] SMP
- pstate: 23400009 (nzCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
- pc : its_irq_set_vcpu_affinity+0x58c/0x95c
- lr : its_irq_set_vcpu_affinity+0x1e0/0x95c
- sp : ffff8001029bb9e0
- pmr_save: 00000060
- x29: ffff8001029bba20 x28: ffff0001ca5e28c0 x27: 0000000000000000
- x26: 0000000000000000 x25: ffff00019eee9f80 x24: ffff0001992b3f00
- x23: ffff8001029bbab8 x22: ffff00001159fb80 x21: 00000000000024a7
- x20: 00000000000024a7 x19: ffff00019eee9fb4 x18: 0000000000000494
- x17: 000000000000000e x16: 0000000000000494 x15: 0000000000000002
- x14: ffff0001a7f34600 x13: ffffccaad1203000 x12: 0000000000000018
- x11: ffff000011991000 x10: 0000000000000000 x9 : 00000000000000a2
- x8 : 00000000000020a8 x7 : 0000000000000000 x6 : 000000000000003f
- x5 : 0000000000000040 x4 : 0000000000000000 x3 : 0000000000000004
- x2 : 0000000000000000 x1 : ffff8001029bbab8 x0 : 00000000000000a8
- Call trace:
-  its_irq_set_vcpu_affinity+0x58c/0x95c
-  irq_set_vcpu_affinity+0x74/0xc8
-  its_map_vlpi+0x4c/0x94
-  kvm_vgic_v4_set_forwarding+0x134/0x298
-  kvm_arch_irq_bypass_add_producer+0x28/0x34
-  irq_bypass_register_producer+0xf8/0x1d8
-  vfio_msi_set_vector_signal+0x2c8/0x308
-  vfio_pci_set_msi_trigger+0x198/0x2d4
-  vfio_pci_set_irqs_ioctl+0xf0/0x104
-  vfio_pci_core_ioctl+0x6ac/0xc5c
-  vfio_device_fops_unl_ioctl+0x128/0x370
-  __arm64_sys_ioctl+0x98/0xd0
-  el0_svc_common+0xd8/0x1d8
-  do_el0_svc+0x28/0x34
-  el0_svc+0x40/0xb8
-  el0t_64_sync_handler+0x70/0xbc
-  el0t_64_sync+0x1a8/0x1ac
- Code: 321f0129 f940094a 8b080148 d1400900 (39000009)
- ---[ end trace 0000000000000000 ]---
 
-Fix this by checking if vgic_supports_direct_irqs() while
-setting/unsetting vGIC v4 forwarding as well.
+Your SoB must be the last one.
 
-Fixes: c652887a9288 ("KVM: arm64: vgic-v3: Allow userspace to write GICD_TYPER2.nASSGIcap")
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- arch/arm64/kvm/vgic/vgic-v4.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index e7e284d47a77..873a190bcff7 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -433,7 +433,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
- 	unsigned long flags;
- 	int ret = 0;
- 
--	if (!vgic_supports_direct_msis(kvm))
-+	if (!vgic_supports_direct_irqs(kvm))
- 		return 0;
- 
- 	/*
-@@ -533,7 +533,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int host_irq)
- 	unsigned long flags;
- 	int ret = 0;
- 
--	if (!vgic_supports_direct_msis(kvm))
-+	if (!vgic_supports_direct_irqs(kvm))
- 		return 0;
- 
- 	irq = __vgic_host_irq_get_vlpi(kvm, host_irq);
-
-base-commit: 18ec25dd0e97653cdb576bb1750c31acf2513ea7
--- 
-2.50.1.487.gc89ff58d15-goog
-
+Best regards,
+Krzysztof
