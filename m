@@ -1,49 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A0F287266;
-	Tue, 29 Jul 2025 15:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DC281749
+	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 15:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753804479; cv=none; b=WfjUxyp0o4f8nDLNIvo/02FXfDwMdRUkIWpgBcUjmN2IntvowtEKz1LhqZ64ttraqd554Lug3ut6OSkI3cvy17B8v1tzIknHqhJK8wbTeDglrNjdE30a8cBJDORSmrN/DGXdPw6bWe+R/cRXIqtJJp0KlSi4bb9RkDzrdT+oUtc=
+	t=1753804658; cv=none; b=U31QdhF/cE8+t5ggQ9m+9mY0Kk8gdQlFbTb1WV6Y2AqfmwNSzwONP32y8mGsYGCC/btHbCIEJvKLBdOnKB2fAhMxNCAlXKAoNPKcFjJaahGIZZuC/WJSMuZ/hn94NRWZBbUXc4FLWEhh6v+Uh5JvtDKpgZIaKfFfiiTQ/57Xcm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753804479; c=relaxed/simple;
-	bh=n3Jk+CPILaJYaCx7aTV41IfzLXf10369ycUvb31MdKc=;
+	s=arc-20240116; t=1753804658; c=relaxed/simple;
+	bh=YXXZKgxOwczQAtO2pLH8Ur8i1n4oleBXkSrXNhgJ48g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mFVFHhuwYUiiAFEanROPQYS7pSlxScALvP9fTSHAqNjsRcAY2UNocAp7iS+wh2jlXPPboEQnmBxyLxwmsiiALtnBcSPqahEt2QcG665Z/P6hQQHf1px8nSb2N4mMYwS55WHmWJvGtt7IFdqR3+gWKuK82NqbVe6Xrna/MVw8D/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYavHetW; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=b4N7IlqBb8b56mVvUJEbNwfrucWxlKQonx8xqc+BgVKDDreC2otk32dQaq8009FYdgnZgI5t40EWDv4f4B9D5miTfPKtnfP5e8gdS90jFsegAL8hE+FAnxbEzSdhXX/MXBrcOcIuAmdRBT6e7+0zmlPTAv6YAV1ecYnrKZM+lQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qDhRQfbv; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYavHetW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7B0C4CEEF;
-	Tue, 29 Jul 2025 15:54:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753804479;
-	bh=n3Jk+CPILaJYaCx7aTV41IfzLXf10369ycUvb31MdKc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SYavHetWDdRQrwYVwiIDQu/+5/kxpO6SdrYzb559IzsmNAvSyIhnYpjdQdEORxUT+
-	 JelpcInB+0Tstp+5et8taFYA9aj2ng6IwTqOAzuDl/W/2+E368U9x+PuMVvzinefWE
-	 KP+0J9bv/rtIoyV+GlZdej6VomTyj9k3DpF+DchtUYOoTfK0f6jFls4XjKOrIY+GwF
-	 YW0KXfdCSMyZyzm511WjZDHjph8iFbYapkgcTPuKMxYjAKJcx5GM/C7d6ncBJAcm69
-	 KIZqUly7CdiGPjfP9Ve9PUZLbwVJWvp5IsjOt/XPAz1LGXmEq5JdLAybekNIO47nVN
-	 +puzQQug3keTg==
-Date: Tue, 29 Jul 2025 16:54:33 +0100
-From: Will Deacon <will@kernel.org>
-To: perlarsen@google.com
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qDhRQfbv"
+Date: Tue, 29 Jul 2025 08:57:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753804650;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wlri4TImGK2Nq390bQXaKqOdz2FIIALuCIDn8HJtVIo=;
+	b=qDhRQfbvrQnB679V2u+y99NiCS4UGBDkb4hEi9ISnukmWBAlHwk4ngyyadfiZN6JcuEl2g
+	4TyqTbHXhqxPDRTeuhIgq71qJUptKzeOs9D52DBosEAlZs1O8d6w454t2nd7vEqRhBZ4mD
+	E5xPMb3TNhQ32Wwtr0RlB8jimsDkfhc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, ahomescu@google.com,
-	armellel@google.com, arve@android.com, ayrton@google.com,
-	qperret@google.com, sebastianene@google.com, qwandor@google.com
-Subject: Re: [PATCH v8 7/7] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in
- host handler
-Message-ID: <aIjuuTf2az25A7jW@willie-the-truck>
-References: <20250719-virtio-msg-ffa-v8-0-03e8e8dbe856@google.com>
- <20250719-virtio-msg-ffa-v8-7-03e8e8dbe856@google.com>
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Split kvm_pgtable_stage2_destroy()
+Message-ID: <aIjvYl474_6F9d9P@linux.dev>
+References: <20250724235144.2428795-1-rananta@google.com>
+ <20250724235144.2428795-2-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,52 +44,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250719-virtio-msg-ffa-v8-7-03e8e8dbe856@google.com>
+In-Reply-To: <20250724235144.2428795-2-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Jul 19, 2025 at 02:11:29AM +0000, Per Larsen via B4 Relay wrote:
-> From: Per Larsen <perlarsen@google.com>
+On Thu, Jul 24, 2025 at 11:51:43PM +0000, Raghavendra Rao Ananta wrote:
+> Split kvm_pgtable_stage2_destroy() into two:
+>   - kvm_pgtable_stage2_destroy_range(), that performs the
+>     page-table walk and free the entries over a range of addresses.
+>   - kvm_pgtable_stage2_destroy_pgd(), that frees the PGD.
 > 
-> FF-A 1.2 adds the DIRECT_REQ2 messaging interface which is similar to
-> the existing FFA_MSG_SEND_DIRECT_{REQ,RESP} functions except that it
-> uses the SMC calling convention v1.2 which allows calls to use x4-x17 as
-> argument and return registers. Add support for FFA_MSG_SEND_DIRECT_REQ2
-> in the host ffa handler.
+> This refactoring enables subsequent patches to free large page-tables
+> in chunks, calling cond_resched() between each chunk, to yield the CPU
+> as necessary.
 > 
-> Signed-off-by: Per Larsen <perlarsen@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+> Direct callers of kvm_pgtable_stage2_destroy() will continue to walk
+> the entire range of the VM as before, ensuring no functional changes.
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index f6d964df53c3e21ba85984f35cc7b6859012d1b0..363374408b354a5d65861b9cf140974d8914ff40 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -851,6 +851,15 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
->  	hyp_spin_unlock(&host_buffers.lock);
->  }
->  
-> +static void do_ffa_direct_msg2(struct arm_smccc_1_2_regs *regs,
-> +			       struct kvm_cpu_context *ctxt,
-> +			       u64 vm_handle)
+> Also, add equivalent pkvm_pgtable_stage2_*() stubs to maintain 1:1
+> mapping of the page-table functions.
+
+Uhh... We can't stub these functions out for protected mode, we already
+have a load-bearing implementation of pkvm_pgtable_stage2_destroy().
+Just reuse what's already there and provide a NOP for
+pkvm_pgtable_stage2_destroy_pgd().
+
+> +void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
 > +{
-> +	struct arm_smccc_1_2_regs *args = (void *)&ctxt->regs.regs[0];
-> +
-> +	arm_smccc_1_2_smc(args, regs);
+> +	/*
+> +	 * We aren't doing a pgtable walk here, but the walker struct is needed
+> +	 * for kvm_dereference_pteref(), which only looks at the ->flags.
+> +	 */
+> +	struct kvm_pgtable_walker walker = {0};
+
+This feels subtle and prone for error. I'd rather we have something that
+boils down to rcu_dereference_raw() (with the appropriate n/hVHE awareness)
+and add a comment why it is safe.
+
+> +void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+> +{
+> +	kvm_pgtable_stage2_destroy_range(pgt, 0, BIT(pgt->ia_bits));
+> +	kvm_pgtable_stage2_destroy_pgd(pgt);
 > +}
 > +
->  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
->  {
->  	struct arm_smccc_1_2_regs res;
-> @@ -909,11 +918,18 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
->  	case FFA_PARTITION_INFO_GET:
->  		do_ffa_part_get(&res, host_ctxt);
->  		goto out_handled;
-> +	case FFA_MSG_SEND_DIRECT_REQ2:
-> +		if (hyp_ffa_version >= FFA_VERSION_1_2) {
-> +			do_ffa_direct_msg2(&res, host_ctxt, HOST_FFA_ID);
-> +			goto out_handled;
 
-I think it would be cleaner if ffa_call_supported() returned false for
-this when the FFA version is < 1.2
+Move this to mmu.c as a static function and use KVM_PGT_FN()
 
-Will
+Thanks,
+Oliver
