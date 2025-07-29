@@ -1,105 +1,102 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69A21C3C04
-	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 09:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6C4287272
+	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 09:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753782962; cv=none; b=jxa+8DsIJLVx3nVtsozpn1GWRKzNlGtiTHM/NjGh+xmOyP3bAT6GO5pqcsWm/PczTr0JC3hcZ0tUV84JqKt3YzpXbuatxoy4Xv3FWQ0/LlH5D1Ag10Xcf/gg6y6GKRTFIyY9G65kBZ+vKD8Wx4XCCGrOvTEAlYVfOkHBsRCyhGo=
+	t=1753783079; cv=none; b=Q04SVcV7XeRgby8FCvtNT+lQSsIRGR3wXrIrHq5w7A5NpAoxfFkAwgsS52b2Vn3zWMSFLvZWVLVftJ2rrSwRjGAT6wwv8ZJtDP51Cs2wsADGmXYVO0DfbZOoNCa2JnQ39rfwR8Dg4+K2Kn7P2aSaWA7P/eCXgEFEft6/blyfA+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753782962; c=relaxed/simple;
-	bh=6J6O8lIPO8lPF6L2zLsyMC1bVxdBOnAwKLyRubhILW0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eavhvyM+pWvqMkv7r5agKqzNHZBlQ7SzBl9BF3Ikg48h6+WnOQ82Yjij75HaSwAspDrU4qSw/jDWvcA8pb1TKBZ9we8y9C+EOGI0qxVbog80sMeqDpbAg7w9eBbK/CTcvZeXTV3+6WQjdBZMPawmr3t5cVGliUjlK0loo+sOPoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w+nCUqu6; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w+nCUqu6"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4561b43de62so71285e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 02:55:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753782958; x=1754387758; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8BeCJxT0E9y6LqcrNbSOsYh4JRswSE7zt76fN7xljQ=;
-        b=w+nCUqu65Xxil6Ie+zqAw63dPVK5bf/4sEjm8SpBrZB6L2KH2weJtSKKwHnS5cYHJQ
-         jUl8ytAWD1ISlirnsRMDKnPeVsTQkz6GsGEAP6VR6gu+gocXsQGbnFHTzxXw5uvGk3n7
-         EjekMhEBL42wHJLiuk1jdSNu4SmdIp8rjmRZOcJy3raxiCwqXdn8kgPUyz63j07i23Hq
-         XJJZjdhLyH7GmvHDqKCUIgu8HHOEOAZDGfn4CUOa7bjNqS6nuIef0dBcYTzd/EQyulh5
-         eeoCCWSk34mSb7CSExZj5X2Ldc1Dz7Z0EBZcBeLWnI1UpjGa5elNLCR8VAYT2LRKco/e
-         +yww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753782958; x=1754387758;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y8BeCJxT0E9y6LqcrNbSOsYh4JRswSE7zt76fN7xljQ=;
-        b=I7gwgH7V2stMO5sFFA4skm5nbqw9RhNWQC3im3D1Cj4xt/FLoHOsb0IGnvTMGU15iE
-         ETamc4lxuN5RhXrGfFYrq/83/i4Pn9oTvU92hNBsk53oGwUpDo213nH3oJ51HnXxSG5j
-         JPKPJC/WWrE+V9EEPu5/AIgUoBQx32rDaoSvsTyNxMmTnj7IfNPAHY8pWaI47dngeLMl
-         hoYLNfPEiSKwOdCWFjjPVnMpN094rAdhWowszsslCTFJbXUXRzrbGm+oGoqF7cCZVmKk
-         0qCGvoVZsQeccMKq1LQBWq2kaQVZSjk1l1sc/sCLq+LhPcyHq/GKzw8UE/oGqgS+8Ujw
-         xWvw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+tkXIdp4oQm+HZK0QQnf4wlyu2w5uVSeWvnqvyuM6STRX0NP3H4x+4elYexApF68SzrzA3c8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yybom15g9cZFBWmEFwBX9qqaiASTA4PwQyB8ahPzkRMpZWg8FVG
-	Z1dbOdVz3dsXZ6QcACuOmU5BFWitPABNYdQ2iJ0KXJqL443KmIKTBccbRzqHpRxu3w==
-X-Gm-Gg: ASbGncutqqof691GnqdZ9R0B0axTBU0aR7UH8YpA1+vG3LZfxhXeuSzYZUf3WMwujuP
-	VzmKhoUXLRBRNvOfmMYKeG0jPWKgQdbUX1snSEB2+rZJpSeYipZK7NUuHfHZRpTARxXBGJrO+AL
-	dMlo2t6jMydRjweMECu1nJD55whQ+v/rwX+gYodtCIlunEUG41NOjWbdnBEYN6xOwAddvxu74r3
-	aXYyV/HIvjAOHKge/glqOb4KpdUWcN+feHMIRszWclOaXuGD82NFSfUi2W7zFbA6VltvlRbt2ZG
-	UdQDaFmt5teuVRpdwGAAUDSotFF2HJDNgtshlRCoWOuBgVtHJbkec+AhyEQODYjO1xYL2pXIyvK
-	1wwVre35GiKygdw08Ui4pG3YqffKcwf8557dQTlPawSYfhjYi2aa1T/TfgSHA
-X-Google-Smtp-Source: AGHT+IGzES6hqfjR1ngn6YMh6m2QMnuLZqGDQbq8stqciYuYMIFTwvOmpG+4EtUrCFw2V/nQTG/heg==
-X-Received: by 2002:a05:600d:17:b0:453:6133:2e96 with SMTP id 5b1f17b1804b1-4588d58f585mr1058175e9.0.1753782957791;
-        Tue, 29 Jul 2025 02:55:57 -0700 (PDT)
-Received: from google.com (232.38.195.35.bc.googleusercontent.com. [35.195.38.232])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4588e33f8a2sm19702345e9.0.2025.07.29.02.55.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jul 2025 02:55:57 -0700 (PDT)
-Date: Tue, 29 Jul 2025 09:55:53 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, robin.murphy@arm.com,
-	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v3 20/29] iommu/arm-smmu-v3-kvm: Setup command queue
-Message-ID: <aIiaqSVtSpX7hr8i@google.com>
-References: <20250728175316.3706196-1-smostafa@google.com>
- <20250728175316.3706196-21-smostafa@google.com>
- <c8da60f6-4083-4aac-b921-d57b767fa895@kernel.org>
+	s=arc-20240116; t=1753783079; c=relaxed/simple;
+	bh=8EOz5swPaoijvn9bEq3UkCoKOLcaDRTkNkUAm6nXlsM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I6N1A+V/pZHSMT/LxQ3BT8Ro2TN/nLnebrGB9tmkucQ5LtP2WIlvCMZq4FRZbxDv7SGPAQJBQEbGfsHI62PDKxk3LKixrkj3hbMldPv+y13EYUjZtiT6wXPs99JyRpVpWpvJXM2MTmLRcXSZ0Qz+XUjHiFbVDJKZ77DDiUDo9CY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CE41C1516;
+	Tue, 29 Jul 2025 02:57:43 -0700 (PDT)
+Received: from donnerap.arm.com (donnerap.manchester.arm.com [10.32.101.27])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9730E3F673;
+	Tue, 29 Jul 2025 02:57:50 -0700 (PDT)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool v3 0/6] arm64: Nested virtualization support
+Date: Tue, 29 Jul 2025 10:57:39 +0100
+Message-Id: <20250729095745.3148294-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c8da60f6-4083-4aac-b921-d57b767fa895@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 29, 2025 at 08:44:03AM +0200, Krzysztof Kozlowski wrote:
-> On 28/07/2025 19:53, Mostafa Saleh wrote:
-> > Map the command queue allocated by the host into the hypervisor address
-> > space. When the host mappings are finalized, the queue is unmapped from
-> > the host.
-> > 
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> 
-> 
-> Your SoB must be the last one.
+This is v3 of the nested virt support series, adjusting commit messages
+and adding a check that FEAT_E2H0 is really available.
+========================================================
 
-I see, thanks for pointing it out.
+Thanks to the imperturbable efforts from Marc, arm64 support for nested
+virtualization has now reached the mainline kernel, which means the
+respective kvmtool support should now be ready as well.
 
-Thanks,
-Mostafa
+Patch 1 updates the kernel headers, to get the new EL2 capability, and
+the VGIC device control to setup the maintenance IRQ.
+Patch 2 introduces the new "--nested" command line option, to let the
+VCPUs start in EL2. To allow KVM guests running in such a guest, we also
+need VGIC support, which patch 3 allows by setting the maintenance IRQ.
+Patch 4 to 6 are picked from Marc's repo, and allow to set the arch
+timer offset, enable non-VHE guests (at the cost of losing recursive
+nested virtualisation), and also advertise the virtual EL2 timer IRQ.
 
-> 
-> 
-> Best regards,
-> Krzysztof
+Tested on the FVP (with some good deal of patience), and some commercial
+(non-fruity) hardware, down to a guest's guest's guest.
+
+Cheers,
+Andre
+
+Changelog v2 ... v3:
+- adjust^Wreplace commit messages for E2H0 and counter-offset patch
+- check for KVM_CAP_ARM_EL2_E2H0 when --e2h0 is requested
+- update kernel headers to v6.16 release
+
+Changelog v1 ... 2:
+- add three patches from Marc:
+  - add --e2h0 command line option
+  - add --counter-offset command line option
+  - advertise all five arch timer interrupts in DT
+
+Andre Przywara (3):
+  Sync kernel UAPI headers with v6.16
+  arm64: Initial nested virt support
+  arm64: nested: add support for setting maintenance IRQ
+
+Marc Zyngier (3):
+  arm64: add counter offset control
+  arm64: add FEAT_E2H0 support
+  arm64: Generate HYP timer interrupt specifiers
+
+ arm64/arm-cpu.c                     |  7 ++-
+ arm64/fdt.c                         |  5 +-
+ arm64/gic.c                         | 21 +++++++-
+ arm64/include/asm/kvm.h             | 23 ++++++--
+ arm64/include/kvm/gic.h             |  2 +-
+ arm64/include/kvm/kvm-config-arch.h | 11 +++-
+ arm64/include/kvm/timer.h           |  2 +-
+ arm64/kvm-cpu.c                     | 17 +++++-
+ arm64/kvm.c                         | 17 ++++++
+ arm64/timer.c                       | 29 +++++------
+ include/linux/kvm.h                 | 31 +++++++++++
+ include/linux/virtio_net.h          | 13 +++++
+ include/linux/virtio_pci.h          |  1 +
+ riscv/include/asm/kvm.h             |  2 +
+ x86/include/asm/kvm.h               | 81 +++++++++++++++++++++++++++++
+ 15 files changed, 231 insertions(+), 31 deletions(-)
+
+-- 
+2.25.1
+
