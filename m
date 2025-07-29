@@ -1,63 +1,67 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72917235358
-	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 12:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531C94501A
+	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 12:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753790418; cv=none; b=lHv9OXsRS5vZ18etxXG4IZzhJdn1s1z5Co989QfTVO2OSYMXVqRXPfw3yfuOwA/nosk2Kmx8hRErczc9QIczlTbcM8HgwZ9ssgKp0rKWHtOLeY7Dsy3yVsNmnHlhG9Nqi9P1bTTEp7L5UabeIGsov3hPcW1eM0jPDowE8RmHtJg=
+	t=1753790421; cv=none; b=TABor8m15QJlvBMb9DDXXHuTPhswQ4UHKaZ0m0HUnleq/wbPEwL68SZsxOrPKDgTayOR7KRtdH8QE/LqqQCXxxZYFt1kGUzK10qehjTrG/vqEOBIW8NWvx+wkFCnuBXOpiNu6dBU/uHMSrQhrSBrZN1oMgPBzKZ6criGmorR2j8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753790418; c=relaxed/simple;
-	bh=VfaOBGhpT3ZBzs+ked0YdFd4+72zRdRXp8MERQ4WQ+Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=E37jwB06OVjxv5FQq37A8wgC7m9Tex26ZuBKFivjAqFBqoZ3c+ZQrs3HCpPfuiEnV8+ATqM05Ky3YH8Y8FxiX1+jScGIrRnKUk0F1pN7fBk1mWuqVGjbt6YotIst8U2CRaa3cAnWjmpZ5sIF4o4ZRWBGTEEAVtazub1QlpN3mcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=clWT+cNn; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1753790421; c=relaxed/simple;
+	bh=Dks8BvWEB5uW6mYmgWuYhqFGw4Mrrfi4NOPGlx+URgw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GAyNu28BMPLv3g1B/1bSSrrZrqdRi9/6BiXAa4pofit9pzP70wZOxKv+KzWg/0D5Ug5xIxkw7aIc2fCXiaroLW3f1mt+8Pi5rTnl3xw7lbgWdMJMSsKDBCGqOr4nz44F0JxYi9F7PXe/3q0+XFrjR8YE+4p1D35FK+UiMydVTqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2k4rVqz6; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="clWT+cNn"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4560b81ff9eso27887995e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 05:00:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2k4rVqz6"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-456175dba68so32988145e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 05:00:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753790415; x=1754395215; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=X4/83bWvjHcitzad3pCSz+7Zeg+jLiSHIOrBXMY9vQM=;
-        b=clWT+cNn6eBVpd9LSjs/QUhJUGoX7TRyjBaOEbWYMyPNdABtC66drh/eDp+rufTQAv
-         SY4li9r3qV57HUkfiIzw6dBRAA34H9/u5MDRIoXlus6eOCqBJKJohukqRvNzlAlv3hMn
-         ejHGkY8VlPYkqkgj8WA4TXm01yRJuFCwWO8Xa9gHYwx7+ibPbdx3zmubWOa9tCqAjpmO
-         xIZvErpL232vrOnkxiumU6WJaZV1lvSeIE3/gZNsM8cyFJyhUvqlFTBZ1KRyd9hQthft
-         kPkL9BmieRo0az4xz20C4R1ioosqjoH250p4DvplhKZigmUuEvEvaXyTc8kc/YF8QPv+
-         1fPA==
+        d=google.com; s=20230601; t=1753790418; x=1754395218; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yzOMi+9WhLFn5RsmaXLKQASfSh/9aYySv/FWLLLXXM0=;
+        b=2k4rVqz6Tz7F8Ep9LFRrOo1UWCFnblbfIlzHBbNYYoPtCB0IhCPjYWfVEatZ+SmGz5
+         jT/HNT+P14RLom8I7L1lH7C7L0U5b65eC6xwD0kE1xFlThBhwuBcZI1/cHp3eywPJwKM
+         cIw2y5hd2VBB+dtJu9cjiIWQ6nXEEnpX/uuX7TYBsr9I7IVxOdOSEJxaJ6dwgdSFHUep
+         0TfcZH1sprguCe8HMAvFjRakBB/iAwgDo1QLv/9QxbVcJuiQ4KcscZaCh/aJ1jJGchq/
+         QvHrsJJZEFDVz7x0t36Eu62CVSslMHGBuc34D/0aEULv2J47pyRd2Zn+dP3FgreaV3Pq
+         5jVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753790415; x=1754395215;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X4/83bWvjHcitzad3pCSz+7Zeg+jLiSHIOrBXMY9vQM=;
-        b=vzsgGCnSOmoO3NNZiOspoXeAJpNPGLkAPv11zfkbseWiwctwWyLI0MnqInT7VH7LJ5
-         L0vDuWnKCPojIA4IkhmzfNIFK4a1uHpjOPs0L1QxzX4fBRACPS2lrpqNIw95kfsfNERZ
-         jUeGMLi1nbH9p13XOvLx+LURZG7320RfG6BeEcaPenm9CWWb6UxO0+RcoZJpdG/aOaC6
-         uvUnIAt6iaaIypwJ0ss+7eTRzTRxYfzLEWTZhI+jRWIUyj6K0xSteXnxtBQ+UocQqCCq
-         kP7riK/afoe+l9FDv8dY7B0jSIcM2XhgUiUQtXZh+KhrZrjLGpFKTAhPC+J5WxlJB6O1
-         E+7g==
-X-Gm-Message-State: AOJu0Yw+BEfCeMlzIsW9Wjaa15AFsny8o86HLW4+xSKAsvzj1+9A41DT
-	FgrDsJpfD1KWq1Qm+CKtVWpy5toK1qkPcmNaibTQOmJ+X2oXt7/31tTBDIZus3UwodnTXNaTuhl
-	vkWtalVxG5Kip85zrlWEYufd43xd7xdJ41snTCeQnYsTGwMpDkdxSaQ4IA8wh+bazC/oSNp+P1c
-	Q4yrsueV0S9pUOh2TTH5t4lj2lGMKkTgI=
-X-Google-Smtp-Source: AGHT+IGueddsxal2939hNo7/TPjZYhCrBcl985PmCzKbFXvauW9HgNNhAeG9APmfm40qlT6512r7nhK46g==
-X-Received: from wmin6.prod.google.com ([2002:a7b:cbc6:0:b0:456:1bf2:2be2])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3f09:b0:456:1a69:94fd
- with SMTP id 5b1f17b1804b1-458855d3dbemr80179995e9.0.1753790414777; Tue, 29
- Jul 2025 05:00:14 -0700 (PDT)
-Date: Tue, 29 Jul 2025 13:00:05 +0100
+        d=1e100.net; s=20230601; t=1753790418; x=1754395218;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yzOMi+9WhLFn5RsmaXLKQASfSh/9aYySv/FWLLLXXM0=;
+        b=DMWcw8quqf8LpfYJ0JctIBP9oOJ9UjsdE07ROoCESPaHuCnNuXw+7O54ZdcidSkcoa
+         tZvkEzd1hqjgmSXWUbKuIx6l5ZiLShCIIVV/2AhB9wja95SNVq5zuo524HBg2i+1vmLf
+         g+9bsBab1htsoPdd9sleuPy77viuBRoz/UT5gSe3T6e4kcO2SKaK1rXl6jWHP4h68i2+
+         0KbiGn/rz6q+3QDi6HDp8SxM6lTU1ShR5Z4lZPGN15J4V/hX+w302eZmJ52Qx0jHNOXf
+         JJ9YLvMdCrcD14p6TQitt3/cwrcXB0WBOJTxQ0wlM3TwtBhiPsstitcpIWyQjrcVbSFt
+         Gbiw==
+X-Gm-Message-State: AOJu0YxUBydKh9/wrpkLGFWa/ckxilQp+IK2KZUt8yza0KiNbrBA919f
+	jEbDkf4IXxdmLaXTp6cMTt06gEBHF980QsuHpp662rPOft5RrWp1+RBYeHshUxiQ2ev/Ae6OeAL
+	vQ7rV8h6BEeAEcIU2FxBMjCUbR2HITwMOmCHc5/+IZdwjrCHV06iT+3d94zoaIIdZFtg0XFsN+v
+	n+OnZ8H+Y0bYXgz42bJhIUjzrOU+EZ46w=
+X-Google-Smtp-Source: AGHT+IF5m5Jas+Y1tjtFvJmfbbD63cNHNWbScBXNfx43vxxHKWugss/STe0rrrG6LluVj7J7814rLj4CZA==
+X-Received: from wmsd13.prod.google.com ([2002:a05:600c:3acd:b0:455:9043:a274])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:6088:b0:456:e39:ec1a
+ with SMTP id 5b1f17b1804b1-45883089729mr83764525e9.14.1753790417578; Tue, 29
+ Jul 2025 05:00:17 -0700 (PDT)
+Date: Tue, 29 Jul 2025 13:00:08 +0100
+In-Reply-To: <20250729120014.2799359-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250729120014.2799359-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.1.487.gc89ff58d15-goog
-Message-ID: <20250729120014.2799359-1-tabba@google.com>
-Subject: [PATCH v1 0/8] KVM: arm64: Reserve pKVM VM handle during initial VM setup
+Message-ID: <20250729120014.2799359-4-tabba@google.com>
+Subject: [PATCH v1 3/8] KVM: arm64: Clarify comments to distinguish pKVM mode
+ from protected VMs
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -67,60 +71,121 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	keirf@google.com, smostafa@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-All VMs in pKVM identified by their handle, a unique per-VM ID. This
-handle is shared between the host kernel and the hypvervisor, and used
-to track the VM across both.
+The hypervisor code for protected KVM contains comments that are
+imprecise and potentially flat-out wrong. They often refer to a
+"protected VM" in contexts where the code or data structure applies to
+any VM being managed by the hypervisor when pKVM is enabled.
 
-In pKVM, this handle is allocated when the VM is initialized at the
-hypervisor, which is on the first vCPU run. However, the host starts
-initializing the VM and setting up its data structures earlier. MMU
-notifiers for the VMs are also registered before VM identification at
-the hypervisor, which rely on the handle to identify the VM [1].
+For instance, the vm_table holds handles for all VMs known to the
+hypervisor, not exclusively for those that are configured as
+protected. This inaccurate terminology can make the code's scope
+harder to understand for future developers.
 
-Additionally, in the future, the host needs to communicate with
-TrustZone about the before the VM first run. Therefore, move handle
-creation to when the VM is first initialized at the host.
+Clarify the comments throughout the pKVM hypervisor code to make a clear
+distinction between the pKVM feature itself (i.e., "protected mode") and
+the VMs that are specifically configured to be protected. This involves
+replacing ambiguous uses of "protected VM" with more accurate phrasing.
 
-This patch series is divided into two parts:
+No functional change intended.
 
-- Patches 1-4: Renaming, refactoring, and tidying up to lay the
-  groundwork for moving handle initialization and to fix existing
-  issues.
-- Patches 5-8: Decouple handle creation from VM initialization at the
-  hypervisor and move the handle creation to VM initialization at the
-  host.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 25 +++++++++++--------------
+ 2 files changed, 12 insertions(+), 15 deletions(-)
 
-Based on Linux 6.16.
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20250303214947.GA30619@willie-the-truck/
-
-Fuad Tabba (8):
-  KVM: arm64: Rename pkvm.enabled to pkvm.is_protected
-  KVM: arm64: Rename 'host_kvm' to 'kvm' in pKVM host code
-  KVM: arm64: Clarify comments to distinguish pKVM mode from protected
-    VMs
-  KVM: arm64: Decouple hyp VM creation state from its handle
-  KVM: arm64: Separate allocation and insertion of pKVM VM table entries
-  KVM: arm64: Consolidate pKVM hypervisor VM initialization logic
-  KVM: arm64: Introduce separate hypercalls for pKVM VM reservation and
-    initialization
-  KVM: arm64: Reserve pKVM handle during pkvm_init_host_vm()
-
- arch/arm64/include/asm/kvm_asm.h       |   2 +
- arch/arm64/include/asm/kvm_host.h      |   5 +-
- arch/arm64/include/asm/kvm_pkvm.h      |   1 +
- arch/arm64/kvm/arm.c                   |  12 +-
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   4 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  14 ++
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 177 +++++++++++++++++++------
- arch/arm64/kvm/pkvm.c                  |  76 +++++++----
- 8 files changed, 217 insertions(+), 74 deletions(-)
-
-
-base-commit: 038d61fd642278bab63ee8ef722c50d10ab01e8f
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index ce31d3b73603..4540324b5657 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -29,7 +29,7 @@ struct pkvm_hyp_vcpu {
+ };
+ 
+ /*
+- * Holds the relevant data for running a protected vm.
++ * Holds the relevant data for running a vm in protected mode.
+  */
+ struct pkvm_hyp_vm {
+ 	struct kvm kvm;
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 6198c1d27b5b..abe173406c88 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -23,8 +23,8 @@ unsigned int kvm_arm_vmid_bits;
+ unsigned int kvm_host_sve_max_vl;
+ 
+ /*
+- * The currently loaded hyp vCPU for each physical CPU. Used only when
+- * protected KVM is enabled, but for both protected and non-protected VMs.
++ * The currently loaded hyp vCPU for each physical CPU. Used in protected mode
++ * for both protected and non-protected VMs.
+  */
+ static DEFINE_PER_CPU(struct pkvm_hyp_vcpu *, loaded_hyp_vcpu);
+ 
+@@ -135,7 +135,7 @@ static int pkvm_check_pvm_cpu_features(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 
+-	/* Protected KVM does not support AArch32 guests. */
++	/* No AArch32 support for protected guests. */
+ 	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL0, AARCH32) ||
+ 	    kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL1, AARCH32))
+ 		return -EINVAL;
+@@ -210,8 +210,8 @@ static pkvm_handle_t idx_to_vm_handle(unsigned int idx)
+ DEFINE_HYP_SPINLOCK(vm_table_lock);
+ 
+ /*
+- * The table of VM entries for protected VMs in hyp.
+- * Allocated at hyp initialization and setup.
++ * A table that tracks all VMs in protected mode.
++ * Allocated during hyp initialization and setup.
+  */
+ static struct pkvm_hyp_vm **vm_table;
+ 
+@@ -495,7 +495,7 @@ static int find_free_vm_table_entry(struct kvm *host_kvm)
+ /*
+  * Allocate a VM table entry and insert a pointer to the new vm.
+  *
+- * Return a unique handle to the protected VM on success,
++ * Return a unique handle to the VM on success,
+  * negative error code on failure.
+  */
+ static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
+@@ -594,10 +594,8 @@ static void unmap_donated_memory_noclear(void *va, size_t size)
+ }
+ 
+ /*
+- * Initialize the hypervisor copy of the protected VM state using the
+- * memory donated by the host.
+- *
+- * Unmaps the donated memory from the host at stage 2.
++ * Initialize the hypervisor copy of the VM state using host-donated memory.
++ * Unmap the donated memory from the host at stage 2.
+  *
+  * host_kvm: A pointer to the host's struct kvm.
+  * vm_hva: The host va of the area being donated for the VM state.
+@@ -606,7 +604,7 @@ static void unmap_donated_memory_noclear(void *va, size_t size)
+  *	    the VM. Must be page aligned. Its size is implied by the VM's
+  *	    VTCR.
+  *
+- * Return a unique handle to the protected VM on success,
++ * Return a unique handle to the VM on success,
+  * negative error code on failure.
+  */
+ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+@@ -668,10 +666,9 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+ }
+ 
+ /*
+- * Initialize the hypervisor copy of the protected vCPU state using the
+- * memory donated by the host.
++ * Initialize the hypervisor copy of the vCPU state using host-donated memory.
+  *
+- * handle: The handle for the protected vm.
++ * handle: The hypervisor handle for the vm.
+  * host_vcpu: A pointer to the corresponding host vcpu.
+  * vcpu_hva: The host va of the area being donated for the vcpu state.
+  *	     Must be page aligned. The size of the area must be equal to
 -- 
 2.50.1.487.gc89ff58d15-goog
 
