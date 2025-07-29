@@ -1,85 +1,69 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63E3286888
-	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 15:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44544F507;
+	Tue, 29 Jul 2025 15:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753802578; cv=none; b=rvisTGFB+rkbQQU+0l5KgK8nQgoK9bt+cfs08j+MutZ0lxy9h+IeE1PxjRAHCSzBlUVp90bOAHdhIZIpaCjvp3vccxkxVPLH/zTEhmuuA95R/k+V7Iqxnvvld8pCvPG3B89NptUTVMFeXbLU7HvwaDvUjO+mQaZuVConxDKBp48=
+	t=1753803963; cv=none; b=rRJWTJj9uDYb0F6GGqaB3q2nYcnyFILaZrBFpM5SGgaJlSiTqt3T3hCR6W6KLAjfRNNnyKqKb6bnkUIIflTWGV3MMTZliihRYTdlNaGlCAsfqMIozUrecLb239VUFrCSqf2SIDWkiNdD4HxZwj2mpf1VRuLUwJUB+6O7vmLypzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753802578; c=relaxed/simple;
-	bh=hseLBQTrEFB4f6fju4juY96z7OxzUECRpgGZJB3QsOQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A0b+JhGEMiZ6bSXKYiqndTl9HUTo1QmFHJzHokyQtS/18RdC7AHbHbUTRot1hL9Y2uUECzB9Wh9cY8PNavagOS4exygtXlt35oJs24aqmAnrUxezBf5WnXzAu3vXXU3XNb2YzoEMzlHOPd7QMp3JwblqFjKrRv9NVC6BtrmFxfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RY59qb/6; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1753803963; c=relaxed/simple;
+	bh=4YBP7bjTmcEyufPY9qHcuguK4GFCavlwRWIMbl06Fws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iEY5iKapK5q/GeSwlmY/9MkLLY66Ry6MS4cw7YHMLbFp4jrgGw9Izc0NABfURdN3t8narUgzN+Ak9z3lO41pj/GaYsrxqwhhSncDW+2ciOC8THQ549XMAjwZMyiL86y7IwQzdnRoHtoXZvaRaqtUU0Sq8boZCedqnNPVtITRt3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhtoCGBa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RY59qb/6"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753802573;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PJjx0QYTwr2JaB/Ge91SELT0olAPYlfXk5Hk+cKdnso=;
-	b=RY59qb/6MADi+e1J93VX1+8a0tYkXCCOoulvd88zSpRGRS9q94o6yCMfPVYvIQMVKeFVd+
-	xQNdGmVsQw5ceJNY15w2jRf/vFoZOHFdBKsbTwoP7UDcKyp6VCNFMnhGH3VrJTzEQr8I98
-	1iV/e3DzEQ6LTyLaOyzM+p2PkaYUPu4=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhtoCGBa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8581C4CEEF;
+	Tue, 29 Jul 2025 15:45:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753803962;
+	bh=4YBP7bjTmcEyufPY9qHcuguK4GFCavlwRWIMbl06Fws=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YhtoCGBap7n8cNG4zP6qLlRI20uQk5TgWxoGGHrnY5t4jncdHWAnQhas2rIbNv2fI
+	 /qTDwZWbw7Y1C22F4eJX8mx1Zl6dGXY3TbCEy4cNgEkrsQIztDR/tUdHt4bGyfhXWp
+	 oS3DhCkMamKECE3hWtgNzznDphfwhoFls/h+BOeeO/lptpwkx8nTjJzqJ7uIiqNWec
+	 E5CssrhjQeOLeBS8p+HApEEZ4nutWdGXIiUgpAduDD/m0xIMJ1yp0LR2RqccN2rgye
+	 tJh7IGVHqcTfs5soP4Gb9Sp/HyMLfWF4nvpWgfs9/RfRrEHn06XvZdDnC/MN5kGjnJ
+	 MITaUJ7vPj0OQ==
+Date: Tue, 29 Jul 2025 16:45:56 +0100
+From: Will Deacon <will@kernel.org>
+To: perlarsen@google.com
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH] Documentation: KVM: Use unordered list for pre-init VGIC registers
-Date: Tue, 29 Jul 2025 08:22:42 -0700
-Message-Id: <20250729152242.3232229-1-oliver.upton@linux.dev>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, ahomescu@google.com,
+	armellel@google.com, arve@android.com, ayrton@google.com,
+	qperret@google.com, sebastianene@google.com, qwandor@google.com
+Subject: Re: [PATCH v8 4/7] KVM: arm64: Mark optional FF-A 1.2 interfaces as
+ unsupported
+Message-ID: <aIjstHFfEoSqEy0F@willie-the-truck>
+References: <20250719-virtio-msg-ffa-v8-0-03e8e8dbe856@google.com>
+ <20250719-virtio-msg-ffa-v8-4-03e8e8dbe856@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250719-virtio-msg-ffa-v8-4-03e8e8dbe856@google.com>
 
-The intent was to create a single column table, however the markup used
-was actually for a header which led to docs build failures:
+On Sat, Jul 19, 2025 at 02:11:26AM +0000, Per Larsen via B4 Relay wrote:
+> From: Per Larsen <perlarsen@google.com>
+> 
+> Update ffa_call_supported to mark FF-A 1.2 interfaces as unsupported
+> lest they get forwarded. FFA_MSG_SEND_DIRECT_REQ2 is not marked as
+> unsupported because a later patch in this series adds support.
 
-  Sphinx parallel build error:
-  docutils.utils.SystemMessage: Documentation/virt/kvm/devices/arm-vgic-v3.rst:128: (SEVERE/4) Unexpected section title or transition.
+Please add it as unsupported as well. Then the subsequent patch which
+adds support can remove it again, that way the series is bisectable and
+if (for some reason) only this patch gets backported then it won't
+cause any problems.
 
-Fix the issue by converting the attempted table to an unordered list.
-
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Closes: https://lore.kernel.org/linux-next/20250729142217.0d4e64cd@canb.auug.org.au/
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- Documentation/virt/kvm/devices/arm-vgic-v3.rst | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index 72c4534b10a8..ff02102f7141 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -125,11 +125,8 @@ Groups:
-     Userspace is allowed to write the following register fields prior to
-     initialization of the VGIC:
- 
--      =====================
--      GICD_IIDR.Revision
--      GICD_TYPER2.nASSGIcap
--      =====================
--
-+      * GICD_IIDR.Revision
-+      * GICD_TYPER2.nASSGIcap
- 
-     GICD_IIDR.Revision is updated when the KVM implementation is changed in a
-     way directly observable by the guest or userspace.  Userspace should read
-
-base-commit: 18ec25dd0e97653cdb576bb1750c31acf2513ea7
--- 
-2.39.5
-
+Will
