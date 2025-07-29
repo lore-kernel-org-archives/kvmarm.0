@@ -1,122 +1,85 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83905482F2
-	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 14:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63E3286888
+	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 15:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753799847; cv=none; b=aqkcsxAaZBQbt5bLgzlg9AdwacNcTF+hAst54A4xEo7Fc7Y7ikfzG7aT7tCvZuUekwuSiuz2LO/uUoWoT97c+E/aLt49HBJO61F1qdA9Dv8Fueh1UKZIbZ6f7KTnyejjHeelOGhlgYFJCGKh6c/43UKMan2nuNcD3zx4uFn5yL0=
+	t=1753802578; cv=none; b=rvisTGFB+rkbQQU+0l5KgK8nQgoK9bt+cfs08j+MutZ0lxy9h+IeE1PxjRAHCSzBlUVp90bOAHdhIZIpaCjvp3vccxkxVPLH/zTEhmuuA95R/k+V7Iqxnvvld8pCvPG3B89NptUTVMFeXbLU7HvwaDvUjO+mQaZuVConxDKBp48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753799847; c=relaxed/simple;
-	bh=WcDBo56fYFqGtT23Tt4aeeploWz/hK7E2/sMoK4Evsk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=avUq4M19dqgxussLIA7Nv9jf7a826DeKYr10s6Vgz4bPy49U5Qm0MBldytnfX3WUw6ZmDzodpRgEz6s541+8A7Ah8CDexW4cEoiVvBQuHu6kGs9+PzBpRW9oMykA0Y55pZgJHEgoN9RiPrnCQMleoazpbT/BB9RTy+WJ82vyTOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tgFHkjL1; arc=none smtp.client-ip=95.215.58.174
+	s=arc-20240116; t=1753802578; c=relaxed/simple;
+	bh=hseLBQTrEFB4f6fju4juY96z7OxzUECRpgGZJB3QsOQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A0b+JhGEMiZ6bSXKYiqndTl9HUTo1QmFHJzHokyQtS/18RdC7AHbHbUTRot1hL9Y2uUECzB9Wh9cY8PNavagOS4exygtXlt35oJs24aqmAnrUxezBf5WnXzAu3vXXU3XNb2YzoEMzlHOPd7QMp3JwblqFjKrRv9NVC6BtrmFxfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RY59qb/6; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tgFHkjL1"
-Date: Tue, 29 Jul 2025 07:37:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753799842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7SkkcDNglAXfu0FPaIefArcN3O7d7Q9M6mkwEnU1wYQ=;
-	b=tgFHkjL1MUAkN7dMrvMKdcStfjJYcM4ebAA5sAdTDjfvIQEWiHLGWCSUsWvL0uV28S7XQ1
-	eIgJ5E1Qt1cTbsiu7xjOB+1Is3P/keuM343viJH8dUcSreCBvbbf71iiZ15IFVZ4/ZwNAn
-	N5QIg5/aQUhNFUpZfk3nhd91z6higeU=
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RY59qb/6"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753802573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PJjx0QYTwr2JaB/Ge91SELT0olAPYlfXk5Hk+cKdnso=;
+	b=RY59qb/6MADi+e1J93VX1+8a0tYkXCCOoulvd88zSpRGRS9q94o6yCMfPVYvIQMVKeFVd+
+	xQNdGmVsQw5ceJNY15w2jRf/vFoZOHFdBKsbTwoP7UDcKyp6VCNFMnhGH3VrJTzEQr8I98
+	1iV/e3DzEQ6LTyLaOyzM+p2PkaYUPu4=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Set/unset vGIC v4 forwarding if direct IRQs
- are supported
-Message-ID: <aIjcmquPNOdE5l4K@linux.dev>
-References: <20250728223710.129440-1-rananta@google.com>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: [PATCH] Documentation: KVM: Use unordered list for pre-init VGIC registers
+Date: Tue, 29 Jul 2025 08:22:42 -0700
+Message-Id: <20250729152242.3232229-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250728223710.129440-1-rananta@google.com>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Hi Raghu,
+The intent was to create a single column table, however the markup used
+was actually for a header which led to docs build failures:
 
-Thanks for reporting this so quickly :)
+  Sphinx parallel build error:
+  docutils.utils.SystemMessage: Documentation/virt/kvm/devices/arm-vgic-v3.rst:128: (SEVERE/4) Unexpected section title or transition.
 
-On Mon, Jul 28, 2025 at 10:37:10PM +0000, Raghavendra Rao Ananta wrote:
-> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-> index e7e284d47a77..873a190bcff7 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v4.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
-> @@ -433,7 +433,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->  	unsigned long flags;
->  	int ret = 0;
->  
-> -	if (!vgic_supports_direct_msis(kvm))
-> +	if (!vgic_supports_direct_irqs(kvm))
->  		return 0;
->  
->  	/*
-> @@ -533,7 +533,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int host_irq)
->  	unsigned long flags;
->  	int ret = 0;
->  
-> -	if (!vgic_supports_direct_msis(kvm))
-> +	if (!vgic_supports_direct_irqs(kvm))
->  		return 0;
+Fix the issue by converting the attempted table to an unordered list.
 
-I'm not sure this is what we want, since a precondition of actually
-doing vLPI injection is the guest having an ITS. Could you try the
-following?
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Closes: https://lore.kernel.org/linux-next/20250729142217.0d4e64cd@canb.auug.org.au/
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ Documentation/virt/kvm/devices/arm-vgic-v3.rst | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Thanks,
-Oliver
-
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index a3ef185209e9..70d50c77e5dc 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -50,6 +50,14 @@ bool vgic_has_its(struct kvm *kvm)
+diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+index 72c4534b10a8..ff02102f7141 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
++++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+@@ -125,11 +125,8 @@ Groups:
+     Userspace is allowed to write the following register fields prior to
+     initialization of the VGIC:
  
- bool vgic_supports_direct_msis(struct kvm *kvm)
- {
-+	/*
-+	 * Deliberately conflate vLPI and vSGI support on GICv4.1 hardware,
-+	 * indirectly allowing userspace to control whether or not vPEs are
-+	 * allocated for the VM.
-+	 */
-+	if (system_supports_direct_sgis() && !vgic_supports_direct_sgis(kvm))
-+		return false;
-+
- 	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
- }
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 1384a04c0784..de1c1d3261c3 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -396,15 +396,7 @@ bool vgic_supports_direct_sgis(struct kvm *kvm);
- 
- static inline bool vgic_supports_direct_irqs(struct kvm *kvm)
- {
--	/*
--	 * Deliberately conflate vLPI and vSGI support on GICv4.1 hardware,
--	 * indirectly allowing userspace to control whether or not vPEs are
--	 * allocated for the VM.
--	 */
--	if (system_supports_direct_sgis())
--		return vgic_supports_direct_sgis(kvm);
+-      =====================
+-      GICD_IIDR.Revision
+-      GICD_TYPER2.nASSGIcap
+-      =====================
 -
--	return vgic_supports_direct_msis(kvm);
-+	return vgic_supports_direct_msis(kvm) || vgic_supports_direct_sgis(kvm);
- }
++      * GICD_IIDR.Revision
++      * GICD_TYPER2.nASSGIcap
  
- int vgic_v4_init(struct kvm *kvm);
+     GICD_IIDR.Revision is updated when the KVM implementation is changed in a
+     way directly observable by the guest or userspace.  Userspace should read
+
+base-commit: 18ec25dd0e97653cdb576bb1750c31acf2513ea7
+-- 
+2.39.5
+
