@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DFE235358
-	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 12:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6115237164
+	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 12:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753790424; cv=none; b=Q6f0pevpF5iD3Mmuyt7mIIjkGfzmOObTo+0Lo+p04q2mIGBqIipU9HPMt/LU/dSDATzk9d1buRaBylbyWFio9wrgRwn2N6udyBKdcb17CNzUohqpCk/I400GfHTLmM1Wx19frKJKO5LMf4G8YZ6FI5YXgUYigibrSiZ1lb1mKDo=
+	t=1753790424; cv=none; b=gy1DttHJ6eD+224qhjvZhTlU1k2KMaYD2+kFvMqhu8fpg+++GxSISrWIfH9kOGoJQ5QzoH6bH/pAg7VnZDhgjyWPbEecTxJwssnOSAQppEy15DxWpbqPAayjZN4pfcO179BlQ1qQ0Herj/7SO7KEgO9289kq3u65BDrgd38fMdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1753790424; c=relaxed/simple;
-	bh=8fuHgeSitIFjDFF/OeLoBY9WnHmz+XtORNDs/n5fabU=;
+	bh=i+162c6Oo8mMIAIbIXMTwClrFX4h1Ifi6UaCmDwg3lk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dH0NbOKR7Mf42q03Xnmf0Kux+7QEr38oh91F9lWVKzCZ1SPYnVw3clDXC05nDqm6eTKZv1SKoKIXz4bKjUiQ07Myy7trm1c0Qn9oCsbRXIvlHwGrdptr+wq9obiL9LTA2ebF6SanxR+Rg6j1YQuac+e2vtv5bqbjmPygj8XzN80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S989Zs/Y; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=rcjBDQQqPp/c42DPDV2GTD6iJ2orcuQLxYg/SpqVCBVauLt3NZ4i0k58IE1Q0dCMvuuo6pwgaFN34WWTFT1NJ/qclkB1jCJwQvwS0NQItmbFKQx7B7/NQ/RnzRrOmTho2u02hp9l6KKUVfnqR0y6wUXTIYhEVH72+IPJwAx06VI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H23T488x; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S989Zs/Y"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45626e0d3e1so34330105e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 05:00:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H23T488x"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b7865dc367so1538351f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 05:00:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753790421; x=1754395221; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753790420; x=1754395220; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nzTlWySJCG78jq2IfrYfNkJ/pZ9aJEn2AikPiisxllU=;
-        b=S989Zs/Y05R/gF7PjIKlO23iFSTryj8EJLhahKq0pEUbbuzAphiSYPKeWVLtwitJu5
-         18EazcrDg9GcI9ijTWT6wTByIe0uPDpMqF+cuSuTe1sLMsnbuBGhzVVtmtNCFGdgJgfh
-         1NY3iYcC6xtgx71FFTBZPRl/f3DO+svFUUB1PJhGcKKzqcoWVsCiC8+eKVDwCdq/8G2w
-         e5ygAr8CoKrZ+aZaKvfd7U+E6h7X40EkCA8PibB8PzL2oJeN6+PEq7BPJNCgjZ/TwpCo
-         lSjS0d4ImnfVP4ykkpj/2LgYCtthwRp0VcexJ92azOKmbMhW1araaMwD2UEGxdCe0yik
-         HI1Q==
+        bh=oiFlDju6zyHaKAxwihJ7iowwkY2Ht9KG+A4iKs05oDQ=;
+        b=H23T488xypWsmuuSUxJLNUndeJ5MQkOOoU/zfCxgN5gyKSwq5rPuRPpKIeXb4Q6Uo4
+         Sw/0pfWmx8neiBwxxbIQ7DDkPvLFP4ytlQi4BgrQn8fw5SpWrwCDRfVYo0F5+3SODZt2
+         s9W+n/42AN6tExlzSVTOeNDw1T0Ar7iMfY7QKCkdKPHFPFMCLsx5pJwjRGRy06VoJfQ5
+         YpXhGWP6B2GOme/ojoJQkd+6EIfMrYoW0vxlRnJNggVC3lP2xplVwi2M2unoEqf31vZo
+         Uz/GJ9NjA9y0hAabZ9Du3I9CLng32gcZuG3S+m1hq331Uhz+wNwSbyIEcClQjUKvE1Fa
+         Xnng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753790421; x=1754395221;
+        d=1e100.net; s=20230601; t=1753790420; x=1754395220;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nzTlWySJCG78jq2IfrYfNkJ/pZ9aJEn2AikPiisxllU=;
-        b=vTWN2d2r/tBELQMJRQH9b1JjugR9tRRGjsr4EgBVpJi1eVianuLO+MD0Z9KENlbCJm
-         QA8aihCJP7MlKA9wfgMOx79POhmBfOANkLKluKJvm4odA1shn6H4cHtZEyeEINshRbqM
-         3wGr8/EH2MSjPyK1gajG3QQp9IH2Eknl94lUBiYtsG4iOnjC/Q1TGj/vX4hzEHeWr1zT
-         STRZN8usDUOhvZWO8Z66ksI7zhqyojJ3y5yM2Bfr26TfcCg2+3qLUgnOJ2v4DRacIovU
-         7YdOW6yGIMO14J21Jss2MId9VvmDV8nKG3JPgk5t5g1t8EoiJ3ZB3nSM+6J9vgyk+X0b
-         7Dsg==
-X-Gm-Message-State: AOJu0YzlzkPgC+/l2OEHeoXK7sETYN0kkXZEY3duwVZeYmH/fgkS1zoq
-	AtjGbF+KysTQIgKLmD9d1J67LSz4VejA0Q6LT4kIK9iC1Yp1qxTwh9mZJ1LI1zgRTwbHM8ZZxk2
-	wW80wR2tWsIwW0XEUs+gDCKk/DG1dmWQ51n536tKOV6AOFZRrxCfO66agWwBn9ELOF3hHzpufW2
-	y92EW6yJmQKaPC1Uuu9buqqvZAblD3xGE=
-X-Google-Smtp-Source: AGHT+IFejJUgHX+Z1CtNT5C8c6rHJGlUTyHBo3o4bob1n8JrSXQa6u68mJSZfdFMtBOpsqH/b8/i4YqXXQ==
-X-Received: from wmrn32.prod.google.com ([2002:a05:600c:5020:b0:456:1754:78e0])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:64ca:b0:456:11cb:b9c7
- with SMTP id 5b1f17b1804b1-458786424f8mr124021765e9.25.1753790420714; Tue, 29
- Jul 2025 05:00:20 -0700 (PDT)
-Date: Tue, 29 Jul 2025 13:00:11 +0100
+        bh=oiFlDju6zyHaKAxwihJ7iowwkY2Ht9KG+A4iKs05oDQ=;
+        b=ZLNGy1LIiUA5Gf74/2Qrqoqfmb8AQXKVKPBRfyBadIFp72AiZEIFxOmLDxBDq5WfrO
+         NcRcSPAEGmkjcpoyxScFnYCJTKNHd/4yWeTisMvlpAO3RsMJ7pyc7m5fU91+z6mCaMkQ
+         WoaR3j7V4H/FIKU1/MswdzUe4ey5L28snimR5WG8DStpB6ZfTeqZ3oV2rJvS6hOuDqxu
+         uQ5sEojSfAiyA+XAqABLDsTHsdWU2E3oRMDCviZHNXc9lL9iuomUlwbByhwpYWy41yUy
+         MM8KwFMRXv5Mr9+qXk8RaEPROQkofG28z6WeMhSthcFSQE3aOQIee0xmVi64Ue9A3RE6
+         TBDQ==
+X-Gm-Message-State: AOJu0YyrR1zDNYZrjZONYtky/K+2yR5FrD6J/eGf9P0AfdSUMQaf/N2t
+	YIJF/IxW9RyNZmeFHLW2vXr0YE93jQKQxanbl4W2egdLbXxhSiT1NK5YEF6lRvwkWlFjQDOBziu
+	VY4gzfnJiG3Zb2WV9FfIbZykl4Tr04kClzbEjSjyCUSNqsgUuxGKbMPwvmfQWy08YxqFI8ct6QN
+	VEGEaOzpuwr37hHLmydsvRX3yt7ntEMs8=
+X-Google-Smtp-Source: AGHT+IElS4MpP08Tme30k/8QQBtYX8Ukar2Q+S9Sok/Bv77P5UW9cBGFUS/j7P9rFXKjF9pDKUkQHzmBAA==
+X-Received: from wrur18.prod.google.com ([2002:a05:6000:1b92:b0:3a3:6eeb:2a27])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:26c1:b0:3b5:e714:9770
+ with SMTP id ffacd0b85a97d-3b776733877mr11735997f8f.14.1753790419878; Tue, 29
+ Jul 2025 05:00:19 -0700 (PDT)
+Date: Tue, 29 Jul 2025 13:00:10 +0100
 In-Reply-To: <20250729120014.2799359-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250729120014.2799359-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.1.487.gc89ff58d15-goog
-Message-ID: <20250729120014.2799359-7-tabba@google.com>
-Subject: [PATCH v1 6/8] KVM: arm64: Consolidate pKVM hypervisor VM
- initialization logic
+Message-ID: <20250729120014.2799359-6-tabba@google.com>
+Subject: [PATCH v1 5/8] KVM: arm64: Separate allocation and insertion of pKVM
+ VM table entries
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -71,142 +71,152 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	keirf@google.com, smostafa@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The insert_vm_table_entry() function was performing tasks beyond its
-primary responsibility. In addition to inserting a VM pointer into the
-vm_table, it was also initializing several fields within 'struct
-pkvm_hyp_vm', such as the VMID and stage-2 MMU pointers. This mixing of
-concerns made the code harder to follow.
+The current insert_vm_table_entry() function performs two actions at
+once: it finds a free slot in the pKVM VM table and populates it with
+the pkvm_hyp_vm pointer.
 
-As another preparatory step towards allowing a VM table entry to be
-reserved before the VM is fully created, this logic must be cleaned up.
-By separating table insertion from state initialization, we can control
-the timing of the initialization step more precisely in subsequent
-patches.
+Refactor this function as a preparatory step for future work that will
+require reserving a VM slot and its corresponding handle earlier in the
+VM lifecycle, before the pkvm_hyp_vm structure is initialized and ready
+to be inserted.
 
-Refactor the code to consolidate all initialization logic into
-init_pkvm_hyp_vm():
+Split the function into a two-phase process:
 
-- Move the initialization of the handle, VMID, and MMU fields from
-  insert_vm_table_entry() to init_pkvm_hyp_vm().
+- A new allocate_vm_table_entry() function finds an empty slot, marks it
+  as reserved with a RESERVED_ENTRY placeholder, and returns a handle
+  derived from the slot's index.
 
-- Simplify insert_vm_table_entry() to perform only one action: placing
-  the provided pkvm_hyp_vm pointer into the vm_table.
-
-- Update the calling sequence in __pkvm_init_vm() to first allocate an
-  entry in the VM table, initialize the VM, and then insert the VM into
-  the VM table. This is all protected by the vm_table_lock for now.
-  Subsequent patches will adjust the sequence and not hold the
-  vm_table_lock while initializing the VM at the hypervisor
-  (init_pkvm_hyp_vm()).
+- The insert_vm_table_entry() function is repurposed to take the handle,
+  validate that the corresponding slot is in the reserved state, and
+  then populate it with the pkvm_hyp_vm pointer.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 47 +++++++++++++++++-----------------
- 1 file changed, 24 insertions(+), 23 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 52 ++++++++++++++++++++++++++++------
+ 1 file changed, 43 insertions(+), 9 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index ea9df0b079f1..ff974290f144 100644
+index 969f6b293234..ea9df0b079f1 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -410,15 +410,26 @@ static void unpin_host_vcpus(struct pkvm_hyp_vcpu *hyp_vcpus[],
- }
+@@ -192,6 +192,11 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
+  */
+ #define HANDLE_OFFSET 0x1000
  
- static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
--			     unsigned int nr_vcpus)
-+			     unsigned int nr_vcpus, pkvm_handle_t handle)
++/*
++ * Marks a reserved but not yet used entry in the VM table.
++ */
++#define RESERVED_ENTRY ((void *) 0xa110ca7ed)
++
+ static unsigned int vm_handle_to_idx(pkvm_handle_t handle)
  {
-+	struct kvm_s2_mmu *mmu = &hyp_vm->kvm.arch.mmu;
-+	int idx = vm_handle_to_idx(handle);
+ 	return handle - HANDLE_OFFSET;
+@@ -231,6 +236,10 @@ static struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
+ 	if (unlikely(idx >= KVM_MAX_PVMS))
+ 		return NULL;
+ 
++	/* A reserved entry doesn't represent an initialized VM. */
++	if (unlikely(vm_table[idx] == RESERVED_ENTRY))
++		return NULL;
 +
-+	hyp_vm->kvm.arch.pkvm.handle = handle;
-+
- 	hyp_vm->host_kvm = host_kvm;
- 	hyp_vm->kvm.created_vcpus = nr_vcpus;
--	hyp_vm->kvm.arch.mmu.vtcr = host_mmu.arch.mmu.vtcr;
- 	hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
- 	hyp_vm->kvm.arch.pkvm.is_created = true;
- 	hyp_vm->kvm.arch.flags = 0;
- 	pkvm_init_features_from_host(hyp_vm, host_kvm);
-+
-+	/* VMID 0 is reserved for the host */
-+	atomic64_set(&mmu->vmid.id, idx + 1);
-+
-+	mmu->vtcr = host_mmu.arch.mmu.vtcr;
-+	mmu->arch = &hyp_vm->kvm.arch;
-+	mmu->pgt = &hyp_vm->pgt;
+ 	return vm_table[idx];
  }
  
- static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *host_vcpu)
-@@ -532,29 +543,19 @@ static int allocate_vm_table_entry(void)
+@@ -481,7 +490,7 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
+ 	return ret;
+ }
+ 
+-static int find_free_vm_table_entry(struct kvm *host_kvm)
++static int find_free_vm_table_entry(void)
+ {
+ 	int i;
+ 
+@@ -494,15 +503,13 @@ static int find_free_vm_table_entry(struct kvm *host_kvm)
  }
  
  /*
-- * Insert a pointer to the new VM into the VM table.
-+ * Insert a pointer to the initialized VM into the VM table.
+- * Allocate a VM table entry and insert a pointer to the new vm.
++ * Reserve a VM table entry.
   *
-  * Return 0 on success, or negative error code on failure.
+  * Return a unique handle to the VM on success,
+  * negative error code on failure.
   */
--static int insert_vm_table_entry(struct kvm *host_kvm,
--				 struct pkvm_hyp_vm *hyp_vm,
--				 pkvm_handle_t handle)
-+static int insert_vm_table_entry(pkvm_handle_t handle,
-+				 struct pkvm_hyp_vm *hyp_vm)
+-static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
+-					   struct pkvm_hyp_vm *hyp_vm)
++static int allocate_vm_table_entry(void)
  {
 -	struct kvm_s2_mmu *mmu = &hyp_vm->kvm.arch.mmu;
- 	unsigned int idx;
+ 	int idx;
  
  	hyp_assert_lock_held(&vm_table_lock);
--
- 	idx = vm_handle_to_idx(handle);
--	hyp_vm->kvm.arch.pkvm.handle = idx_to_vm_handle(idx);
--
--	/* VMID 0 is reserved for the host */
--	atomic64_set(&mmu->vmid.id, idx + 1);
--
--	mmu->arch = &hyp_vm->kvm.arch;
--	mmu->pgt = &hyp_vm->pgt;
--
- 	vm_table[idx] = hyp_vm;
+@@ -515,10 +522,30 @@ static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
+ 	if (unlikely(!vm_table))
+ 		return -EINVAL;
+ 
+-	idx = find_free_vm_table_entry(host_kvm);
+-	if (idx < 0)
++	idx = find_free_vm_table_entry();
++	if (unlikely(idx < 0))
+ 		return idx;
+ 
++	vm_table[idx] = RESERVED_ENTRY;
 +
- 	return 0;
++	return idx;
++}
++
++/*
++ * Insert a pointer to the new VM into the VM table.
++ *
++ * Return 0 on success, or negative error code on failure.
++ */
++static int insert_vm_table_entry(struct kvm *host_kvm,
++				 struct pkvm_hyp_vm *hyp_vm,
++				 pkvm_handle_t handle)
++{
++	struct kvm_s2_mmu *mmu = &hyp_vm->kvm.arch.mmu;
++	unsigned int idx;
++
++	hyp_assert_lock_held(&vm_table_lock);
++
++	idx = vm_handle_to_idx(handle);
+ 	hyp_vm->kvm.arch.pkvm.handle = idx_to_vm_handle(idx);
+ 
+ 	/* VMID 0 is reserved for the host */
+@@ -528,7 +555,7 @@ static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
+ 	mmu->pgt = &hyp_vm->pgt;
+ 
+ 	vm_table[idx] = hyp_vm;
+-	return hyp_vm->kvm.arch.pkvm.handle;
++	return 0;
  }
  
-@@ -668,8 +669,6 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
- 	if (!pgd)
- 		goto err_remove_mappings;
+ /*
+@@ -614,6 +641,7 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+ 	struct pkvm_hyp_vm *hyp_vm = NULL;
+ 	size_t vm_size, pgd_size;
+ 	unsigned int nr_vcpus;
++	pkvm_handle_t handle;
+ 	void *pgd = NULL;
+ 	int ret;
  
--	init_pkvm_hyp_vm(host_kvm, hyp_vm, nr_vcpus);
--
+@@ -643,10 +671,16 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+ 	init_pkvm_hyp_vm(host_kvm, hyp_vm, nr_vcpus);
+ 
  	hyp_spin_lock(&vm_table_lock);
- 	ret = allocate_vm_table_entry();
+-	ret = insert_vm_table_entry(host_kvm, hyp_vm);
++	ret = allocate_vm_table_entry();
  	if (ret < 0)
-@@ -677,19 +676,21 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+ 		goto err_unlock;
  
- 	handle = idx_to_vm_handle(ret);
- 
--	ret = insert_vm_table_entry(host_kvm, hyp_vm, handle);
--	if (ret)
--		goto err_unlock;
-+	init_pkvm_hyp_vm(host_kvm, hyp_vm, nr_vcpus, handle);
- 
- 	ret = kvm_guest_prepare_stage2(hyp_vm, pgd);
-+	if (ret)
-+		goto err_remove_vm_table_entry;
++	handle = idx_to_vm_handle(ret);
 +
-+	ret = insert_vm_table_entry(handle, hyp_vm);
++	ret = insert_vm_table_entry(host_kvm, hyp_vm, handle);
++	if (ret)
++		goto err_unlock;
++
+ 	ret = kvm_guest_prepare_stage2(hyp_vm, pgd);
  	if (ret)
  		goto err_remove_vm_table_entry;
- 	hyp_spin_unlock(&vm_table_lock);
- 
--	return hyp_vm->kvm.arch.pkvm.handle;
-+	return handle;
- 
- err_remove_vm_table_entry:
--	remove_vm_table_entry(hyp_vm->kvm.arch.pkvm.handle);
-+	remove_vm_table_entry(handle);
- err_unlock:
- 	hyp_spin_unlock(&vm_table_lock);
- err_remove_mappings:
 -- 
 2.50.1.487.gc89ff58d15-goog
 
