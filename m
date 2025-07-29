@@ -1,57 +1,57 @@
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0A125FA3B
-	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 19:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE0628727F
+	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 19:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753817632; cv=none; b=DsBXJ8QW2loFYyeoSmIDDt2sQ6xf2GFTIkA+IiHzrJ+yfuw0XqUft4sYH8LpIv0wp8+6Y/Ssy51b3V4OgfK+7yt3yoSQS+L6bkY6u7SkSs8qhuWwLU6K1ozNWd/zmU7HFyGqIoxgAntcHA2880neu+rLnCfxOhqmq5ERhd96FZY=
+	t=1753817634; cv=none; b=NT+u7JAtRC8ZPCJHM7YFm0sL7kXAooozFcM4UDgztC+ZC0jqdvtM0HJH3jxMIGEemCWLtR47UbwFVIEXqIJAKWGbtwWcBoQgMfwl3KJOuSWzLDkmk23xikL8MMUN9RGOUdkd0DZ1BYqI9u96RTK+g5XBb9UVL5BWUub0iONGgOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753817632; c=relaxed/simple;
-	bh=sqgm1EIxKlNrAgPRJQWz+ccC/dJ7P7wFp1H9ZQzuLhw=;
+	s=arc-20240116; t=1753817634; c=relaxed/simple;
+	bh=X6kSoWARgQhTBHyJo7xEWPtfNUe15LYs+m14KA9l8uM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iRdrfHNj4MnjAeewjTeQyLovO85FTWGrGPPXIyQkTRtJDal//a6GZyABYB1l+icqS+hQQwTEPCfkSM4UvDmYrtmbiUqrhrW1a9Rapp2C8bZZubQaC+W5GhPEVraaK/g/l2Hpr0u3V8lfxuZrbfZNKwvbL+k4fhXRYv2W+wrMMh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FhufQ6jF; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=jUxugBWf63p4X/bYN2qgTH1R3xBSfbNQ6ROfBjVTP2S+QoZBY9VOdoIrLFH6Ph38vSe6b7FLk2TIKFUbP7eiEeyJP0PMMDVuUfnrsqvhOJ+MfK6w73nF7QthgPe6BQrpqO3rrcYznLFxeC8tcEj/SMQ6WzkGZDnCR4xQdg+1GSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uZ/bcyok; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FhufQ6jF"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31ed2a7d475so2822224a91.1
-        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 12:33:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uZ/bcyok"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31ebadfb7f2so152821a91.1
+        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 12:33:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753817630; x=1754422430; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753817632; x=1754422432; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=JJX8dU8+n+0QNuI44F28R1+g564ctZSa7EPvc3ZFM1U=;
-        b=FhufQ6jFvPeno9wz/3ho1CQB11edjoq7YZPH1YHHq5/yf+Ame2wnUs55v7tXS5hSuB
-         D5wl35TCfsOztx8kZCt3Nzfbf9x3KooyTmLtkx8sRGZPKhlWYUG9QHTL0w8sUpJsaOSG
-         lTaFLH2lR///RZ5nyJIYZOMqgGQkBnvd/8tBHnKvGJTQea5AxlmqES+3+KHbuE+NLxt6
-         vr9uKh8N/PJluBcGjJ8F3c+c0XGSjbcrDrINtKH+NMzXMKzGVUu7OAFD6DLqOUtiz1tS
-         S8NHro/YFnyiPJPL6GVbk80TxSQa6gxurDvrHUQLewqAn0+sldfQEcO+RSlPhT/DKCRs
-         OPrw==
+        bh=ZdHlnZ98+ZVsmpjhh1EatY5FQnyPvSy7oQ52FgoL3AU=;
+        b=uZ/bcyokOriBfMUVp6CYg7p5h1eMMR3Pzr/hf5V2DJGkVFDy+fwM8PR9P0sZSl26wX
+         ekN0w4Fljz2lqvwpTBpSzcJmcUgwWFdXIXdyQwiuUX4t5bKAmJMJUGcQid/RlHHBIt1X
+         vOmw8YAY7dM+A0h5d6crbnINbKMIVYLGtWn+CI14Y2og8m/bUp8F9RG4kP/nzVvNA2QL
+         uT4P8GAosBZmfa0YfziOIpUxYvhkBQVyH8jBtRbk1/beuEpgoHX3C9oG2jx9KeTjUNtD
+         68cGZKGwoWBY8v16cQyX3p/Yla7u0AYIELThcSgCsrP1gzetIJedxAYNobSz7JiYhb6m
+         hxfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753817630; x=1754422430;
+        d=1e100.net; s=20230601; t=1753817632; x=1754422432;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=JJX8dU8+n+0QNuI44F28R1+g564ctZSa7EPvc3ZFM1U=;
-        b=ZHsgIIwcnOs5RJd0OnoREswy5u22onVkU74hnYNYSHdrKpvNiSMVqWZXCuJiUFfhZs
-         mbUhPFi3TST/jth3XWj8OqXWj5PARjUmqEyd6Uze126tDYu8xQ9fwA0QTNJ4KHXZZSEI
-         mej/eMGNQSNWFdD32b4SxIraOXwVch1qnr5QHuNvNp6/bxCuskXq7+C8xHb2pWuvfOJe
-         kxclaxi5Ni0lT6i7Nj7ws+N/ohGlof+53VoPtqWEaYOiyO58j/99Yei1mgAs5o9bO0mw
-         aiviHi7qZCnzr+fZJrGRVyGCKoYnb4VwOtOECcnDLXMMJJ1bp5W6UKG5jx0VLNSqyRHD
-         3xtA==
-X-Forwarded-Encrypted: i=1; AJvYcCXK9dnSDE2ZwIaXZgA0XNvPWw9r/VhZgKSZCfMjGXrCLyYB96rGvMfJW5Z+IJ6oJiv9y0AVdEA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzDumIOWBsVAiI4hfhzVRKvDe9hDIMyWotohouYspvzAYuF4/M1
-	JTMIDoApJhfHCEVGP1lR0atJi0ixnvWB/MT3B+kd6QPj30u4ihI3U+1WxzqXEBRsBFJlE+HagjM
-	T+bc82A==
-X-Google-Smtp-Source: AGHT+IHfEWMEuUfBMeiKYE9aLfHbALVYy3IIrBllmmLaQcn7q2hIwc6mBe+teoBHRd1eD2W+YlhcAuMLoXU=
-X-Received: from pjbpv8.prod.google.com ([2002:a17:90b:3c88:b0:31e:998f:7b79])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33d2:b0:31e:c8fc:e630
- with SMTP id 98e67ed59e1d1-31f5de73bf9mr824146a91.26.1753817630463; Tue, 29
- Jul 2025 12:33:50 -0700 (PDT)
+        bh=ZdHlnZ98+ZVsmpjhh1EatY5FQnyPvSy7oQ52FgoL3AU=;
+        b=BbTAm1ssXekAPi9km2mpFu5RCcbnHL5IlEanOLGbXp8mOQDkojCEKdh9OcHl+OiFEs
+         GkQ8ZWg8/SXZm42ZJu3ebYd3LVCUbM/MgnVtFYcbvi81EXqjRDTCad4ID16c3SnUQTpj
+         a1BgJH4w5CTfWctQ/HUAcf/+VJGD8hCvwCUYV6Th550PnH07u+5l4sJ/vGHwa4kM1ghW
+         2+Bfb7MT933DUYMCKc7HXqC82AIjASTLhdbOj3uq/gZRgqaQUhkKWSrPO00RdMzqGQgl
+         Q4J7lCtT31glgFeDaKZRJoeW/nfJPT2z1KOcQKL+WVUTKDLpBw9YTsaOoyUTWbZ8zNSo
+         iF3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWWWItipCbNN6ImhcqMz59Mz63zeCGW5M6zZtSHmTQ1IjY3ETBujwT9EkQsQZ/cN9iAXitFR3o=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxdhgc6awCGbU5d7z0kOaAg0KI/e7Cq+ueN9PBd85iwYSiM11UG
+	jS8ZfjxOKZAiI1ohfe09VOfVBgp09pGK+VMGrJyCI+P43GT35P88lLc2Hk4rh412OWmaEYFsJar
+	nripQ1A==
+X-Google-Smtp-Source: AGHT+IFFe8P3g6K0zh0qtvZDIKe8VSkXT7Rqbzi2+TCDvK005OkWz+Mz8UVq7jUspvUvHpMWKrpsZ+VbdgQ=
+X-Received: from pjbqc14.prod.google.com ([2002:a17:90b:288e:b0:31c:32f8:3f88])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17c2:b0:313:b1a:3939
+ with SMTP id 98e67ed59e1d1-31f5ddcd3c6mr813328a91.15.1753817631999; Tue, 29
+ Jul 2025 12:33:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 29 Jul 2025 12:33:37 -0700
+Date: Tue, 29 Jul 2025 12:33:38 -0700
 In-Reply-To: <20250729193341.621487-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250729193341.621487-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250729193341.621487-3-seanjc@google.com>
-Subject: [PATCH 2/5] KVM: TDX: Exit with MEMORY_FAULT on unexpected pending
- S-EPT Violation
+Message-ID: <20250729193341.621487-4-seanjc@google.com>
+Subject: [PATCH 3/5] KVM: Reject ioctls only if the VM is bugged, not simply
+ marked dead
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
@@ -74,42 +74,131 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Nikolay Borisov <nik.borisov@suse.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Exit to userspace with -EFAULT and a valid MEMORY_FAULT exit if a vCPU
-hits an unexpected pending S-EPT Violation instead of marking the VM dead.
-While it's unlikely the VM can continue on, whether or not to terminate
-the VM is not KVM's decision to make.
+Relax the protection against interacting with a buggy KVM to only reject
+ioctls if the VM is bugged, i.e. allow userspace to invoke ioctls if KVM
+deliberately terminated the VM.  Drop kvm.vm_dead as there are no longer
+any readers, and KVM shouldn't rely on vm_dead for functional correctness.
+The only functional guarantees provided by kvm_vm_dead() come by way of
+KVM_REQ_VM_DEAD, which ensures that vCPU won't re-enter the guest.
 
-Set memory_fault.size to zero to communicate to userspace that reported
-fault is "bad", and to effectively terminate the VM if userspace blindly
-treats the exit as a conversion attempt (KVM_SET_MEMORY_ATTRIBUTES will
-fail with -EINVAL if the size is zero).
+Practically speaking, this only affects x86, which uses kvm_vm_dead() to
+prevent running a VM whose resources have been partially freed or has run
+one or more of its vCPUs into an architecturally defined state.  In these
+cases, there is no (known) danger to KVM, the goal is purely to prevent
+entering the guest.
 
-Opportunistically delete the pr_warn(), which could be abused to spam the
-kernel log, and is largely useless outside of interact debug as it doesn't
-specify which VM encountered a failure.
+As evidenced by commit ecf371f8b02d ("KVM: SVM: Reject SEV{-ES} intra host
+migration if vCPU creation is in-flight"), the restriction on invoking
+ioctls only blocks _new_ ioctls.  I.e. KVM mustn't rely on blocking ioctls
+for functional safety (whereas KVM_REQ_VM_DEAD is guaranteed to prevent
+vCPUs from entering the guest).
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/vgic/vgic-init.c                     |  2 +-
+ include/linux/kvm_host.h                            |  2 --
+ tools/testing/selftests/kvm/x86/sev_migrate_tests.c |  5 +----
+ virt/kvm/kvm_main.c                                 | 10 +++++-----
+ 4 files changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 3e0d4edee849..c2ef03f39c32 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1937,10 +1937,8 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index eb1205654ac8..c2033bae73b2 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -612,7 +612,7 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+ 	mutex_unlock(&kvm->arch.config_lock);
+ out_slots:
+ 	if (ret)
+-		kvm_vm_dead(kvm);
++		kvm_vm_bugged(kvm);
  
- 	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa)) {
- 		if (tdx_is_sept_violation_unexpected_pending(vcpu)) {
--			pr_warn("Guest access before accepting 0x%llx on vCPU %d\n",
--				gpa, vcpu->vcpu_id);
--			kvm_vm_dead(vcpu->kvm);
--			return -EIO;
-+			kvm_prepare_memory_fault_exit(vcpu, gpa, 0, true, false, true);
-+			return -EFAULT;
- 		}
- 		/*
- 		 * Always treat SEPT violations as write faults.  Ignore the
+ 	mutex_unlock(&kvm->slots_lock);
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 627054d27222..fa97d71577b5 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -854,7 +854,6 @@ struct kvm {
+ 	u32 dirty_ring_size;
+ 	bool dirty_ring_with_bitmap;
+ 	bool vm_bugged;
+-	bool vm_dead;
+ 
+ #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+ 	struct notifier_block pm_notifier;
+@@ -894,7 +893,6 @@ struct kvm {
+ 
+ static inline void kvm_vm_dead(struct kvm *kvm)
+ {
+-	kvm->vm_dead = true;
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_VM_DEAD);
+ }
+ 
+diff --git a/tools/testing/selftests/kvm/x86/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
+index 0a6dfba3905b..0580bee5888e 100644
+--- a/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
++++ b/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
+@@ -87,10 +87,7 @@ static void test_sev_migrate_from(bool es)
+ 		sev_migrate_from(dst_vms[i], dst_vms[i - 1]);
+ 
+ 	/* Migrate the guest back to the original VM. */
+-	ret = __sev_migrate_from(src_vm, dst_vms[NR_MIGRATE_TEST_VMS - 1]);
+-	TEST_ASSERT(ret == -1 && errno == EIO,
+-		    "VM that was migrated from should be dead. ret %d, errno: %d", ret,
+-		    errno);
++	sev_migrate_from(src_vm, dst_vms[NR_MIGRATE_TEST_VMS - 1]);
+ 
+ 	kvm_vm_free(src_vm);
+ 	for (i = 0; i < NR_MIGRATE_TEST_VMS; ++i)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6c07dd423458..f1f69e10a371 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4408,7 +4408,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 	struct kvm_fpu *fpu = NULL;
+ 	struct kvm_sregs *kvm_sregs = NULL;
+ 
+-	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
++	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_bugged)
+ 		return -EIO;
+ 
+ 	if (unlikely(_IOC_TYPE(ioctl) != KVMIO))
+@@ -4651,7 +4651,7 @@ static long kvm_vcpu_compat_ioctl(struct file *filp,
+ 	void __user *argp = compat_ptr(arg);
+ 	int r;
+ 
+-	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
++	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_bugged)
+ 		return -EIO;
+ 
+ 	switch (ioctl) {
+@@ -4717,7 +4717,7 @@ static long kvm_device_ioctl(struct file *filp, unsigned int ioctl,
+ {
+ 	struct kvm_device *dev = filp->private_data;
+ 
+-	if (dev->kvm->mm != current->mm || dev->kvm->vm_dead)
++	if (dev->kvm->mm != current->mm || dev->kvm->vm_bugged)
+ 		return -EIO;
+ 
+ 	switch (ioctl) {
+@@ -5139,7 +5139,7 @@ static long kvm_vm_ioctl(struct file *filp,
+ 	void __user *argp = (void __user *)arg;
+ 	int r;
+ 
+-	if (kvm->mm != current->mm || kvm->vm_dead)
++	if (kvm->mm != current->mm || kvm->vm_bugged)
+ 		return -EIO;
+ 	switch (ioctl) {
+ 	case KVM_CREATE_VCPU:
+@@ -5403,7 +5403,7 @@ static long kvm_vm_compat_ioctl(struct file *filp,
+ 	struct kvm *kvm = filp->private_data;
+ 	int r;
+ 
+-	if (kvm->mm != current->mm || kvm->vm_dead)
++	if (kvm->mm != current->mm || kvm->vm_bugged)
+ 		return -EIO;
+ 
+ 	r = kvm_arch_vm_compat_ioctl(filp, ioctl, arg);
 -- 
 2.50.1.552.g942d659e1b-goog
 
