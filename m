@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93243287277
-	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 09:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41298288519
+	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 09:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753783080; cv=none; b=GaQKsUHLFPCtV41diaHfxn1CZ+mqhiKLIYyuXfRYb+wD2FILwVyfS5hqCzHM+9CfslEDQ8C81+XSkoD1TEKVcfwV1LpIj5PQiDJAtAqDq2S+Pu41LM0tTSYlF68WnpTlJ0hppqy4B26WdDIZh+81mFdDtYWsEWGkRJtifjKBQe8=
+	t=1753783081; cv=none; b=cWb4e9ZSSgrDAxvxBq5HTX1zfKv9/H352yAgHb44pSPek/sOTLKWmlOtFABZ5h591/sljMjA2k6Oe5yIWpYn7UdLd5FaTiUvpPYE5w3M/R3K19s6R2Bd0BMzQrzrnE65DLUN1VWc3pIGHemHkDYpSyNQG/sBjBV9oyWLvN3sV5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753783080; c=relaxed/simple;
-	bh=fwj77Slc/UheEdnhG71mLczgg896YD4CvQPGDebUc1c=;
+	s=arc-20240116; t=1753783081; c=relaxed/simple;
+	bh=Bfz3nltGgSOdWEwaV5RL1qE6Mh1cTW89qZ+FnPkbCSs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hcy/r9f+RG8en6i5NFLOJXIzldrUC/w8d/rFRjW6iBCfjdUhvEvlEHS+Nc9MUdJdluAWkguYtT8JsXyNexW/dhF26tlUhiPH2ojCMIaRqwNsVfi2UO8cMb5Th+ZtIwKsLUB4Rc4eWHpMYip7qBAdXHN8s0lrw0QSDEsBOYWwd6U=
+	 MIME-Version; b=MVejq5ZyHSMOwFok9sEzOjcjOvkTG63IFO+9SmUSLU66Y68N2yuzwz2rB09gvEeAHWcejG36gb/LAmWDLJd4/hhtYfOqTGiw8ith371vS9c4c35mizjL3l4+9JwUIgcLaPQfXNLY0Qkot+BZVqDQECxk/JPpVnnzc+397ed6oCQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB8F32437;
-	Tue, 29 Jul 2025 02:57:49 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 617592444;
+	Tue, 29 Jul 2025 02:57:51 -0700 (PDT)
 Received: from donnerap.arm.com (donnerap.manchester.arm.com [10.32.101.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A67F83F673;
-	Tue, 29 Jul 2025 02:57:56 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27C523F673;
+	Tue, 29 Jul 2025 02:57:58 -0700 (PDT)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
@@ -25,9 +25,9 @@ To: Will Deacon <will@kernel.org>,
 Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v3 4/6] arm64: add counter offset control
-Date: Tue, 29 Jul 2025 10:57:43 +0100
-Message-Id: <20250729095745.3148294-5-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v3 5/6] arm64: add FEAT_E2H0 support
+Date: Tue, 29 Jul 2025 10:57:44 +0100
+Message-Id: <20250729095745.3148294-6-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250729095745.3148294-1-andre.przywara@arm.com>
 References: <20250729095745.3148294-1-andre.przywara@arm.com>
@@ -41,79 +41,59 @@ Content-Transfer-Encoding: 8bit
 
 From: Marc Zyngier <maz@kernel.org>
 
-KVM allows the offsetting of the global counter in order to help with
-migration of a VM. This offset applies cumulatively with the offsets
-provided by the architecture.
+The --nested option allows a guest to boot at EL2 without FEAT_E2H0
+(i.e. mandating VHE support). While this is great for "modern" operating
+systems and hypervisors, a few legacy guests are stuck in a distant past.
 
-Although kvmtool doesn't provide a way to migrate a VM, controlling
-this offset is useful to test the timer subsystem.
-
-Add the command line option --counter-offset to allow setting this value
-when creating a VM.
+To support those, add the --e2h0 command line option, that exposes
+FEAT_E2H0 to the guest, at the expense of a number of other features, such
+as FEAT_NV2. This is conditioned on the host itself supporting FEAT_E2H0.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm64/include/kvm/kvm-config-arch.h |  3 +++
- arm64/kvm.c                         | 17 +++++++++++++++++
- 2 files changed, 20 insertions(+)
+ arm64/include/kvm/kvm-config-arch.h | 5 ++++-
+ arm64/kvm-cpu.c                     | 5 +++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-index a1dac28e6..44c43367b 100644
+index 44c43367b..73bf4211a 100644
 --- a/arm64/include/kvm/kvm-config-arch.h
 +++ b/arm64/include/kvm/kvm-config-arch.h
-@@ -14,6 +14,7 @@ struct kvm_config_arch {
+@@ -11,6 +11,7 @@ struct kvm_config_arch {
+ 	bool		has_pmuv3;
+ 	bool		mte_disabled;
+ 	bool		nested_virt;
++	bool		e2h0;
  	u64		kaslr_seed;
  	enum irqchip_type irqchip;
  	u64		fw_addr;
-+	u64		counter_offset;
- 	unsigned int	sve_max_vq;
- 	bool		no_pvtime;
- };
-@@ -59,6 +60,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 		     irqchip_parser, NULL),					\
- 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
- 		"Address where firmware should be loaded"),			\
-+	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
-+		"Specify the counter offset, defaulting to 0"),			\
+@@ -63,6 +64,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+ 	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
+ 		"Specify the counter offset, defaulting to 0"),			\
  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
- 		    "Start VCPUs in EL2 (for nested virt)"),
+-		    "Start VCPUs in EL2 (for nested virt)"),
++		    "Start VCPUs in EL2 (for nested virt)"),			\
++	OPT_BOOLEAN('\0', "e2h0", &(cfg)->e2h0,					\
++		    "Create guest without VHE support"),
  
-diff --git a/arm64/kvm.c b/arm64/kvm.c
-index 23b4dab1f..6e971dd78 100644
---- a/arm64/kvm.c
-+++ b/arm64/kvm.c
-@@ -119,6 +119,22 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
- 	pr_debug("MTE capability enabled");
+ #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
+diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+index 42dc11dad..5e4f3a7dd 100644
+--- a/arm64/kvm-cpu.c
++++ b/arm64/kvm-cpu.c
+@@ -76,6 +76,11 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
+ 		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
+ 			die("EL2 (nested virt) is not supported");
+ 		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
++		if (kvm->cfg.arch.e2h0) {
++			if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2_E2H0))
++				die("FEAT_E2H0 is not supported");
++			init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2_E2H0;
++		}
+ 	}
  }
  
-+static void kvm__arch_set_counter_offset(struct kvm *kvm)
-+{
-+	struct kvm_arm_counter_offset offset = {
-+		.counter_offset = kvm->cfg.arch.counter_offset,
-+	};
-+
-+	if (!kvm->cfg.arch.counter_offset)
-+		return;
-+
-+	if (!kvm__supports_extension(kvm, KVM_CAP_COUNTER_OFFSET))
-+		die("No support for global counter offset");
-+
-+	if (ioctl(kvm->vm_fd, KVM_ARM_SET_COUNTER_OFFSET, &offset))
-+		die_perror("KVM_ARM_SET_COUNTER_OFFSET");
-+}
-+
- void kvm__arch_init(struct kvm *kvm)
- {
- 	/* Create the virtual GIC. */
-@@ -126,6 +142,7 @@ void kvm__arch_init(struct kvm *kvm)
- 		die("Failed to create virtual GIC");
- 
- 	kvm__arch_enable_mte(kvm);
-+	kvm__arch_set_counter_offset(kvm);
- }
- 
- static u64 kvm__arch_get_payload_region_size(struct kvm *kvm)
 -- 
 2.25.1
 
