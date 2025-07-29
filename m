@@ -1,64 +1,68 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98810242D9B
-	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 19:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C23A2561A2
+	for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 19:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753817629; cv=none; b=PtJOd/3Y1NkTXfuxYIDUj3We9ql36RfmVwkQKb86UVWWeAOiObqmd5IPG7aWiCuiOvyZ5TbrBXXGbJghiED2XA/emzOXBvKVRiXuyHviPienmawTxe10PTCDGE9tUdW1cl9iAC7HuHr1BNUZK6bWMKbK1bA1rpndhFTsAixnZv0=
+	t=1753817630; cv=none; b=Xfdwwigr5tk7T0AZcZotKsIyo5wD3rs5LkTkvxUQ9Y4279C98eYOV055MN2A6YdYQTbIHYsg2YEGORTUVHuoCCqEmVtPbAGaAYwQErHqgjwk+AjXLo/92b8mcMqTYuBnuTtIknYJiqTSMLX5kQ60BrFk4RMRtY+bBpUsj9TFZKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753817629; c=relaxed/simple;
-	bh=uRUA1Dw0gwf9VF6IMVv4hpWTJUqHYnh2F1froOP8Hrc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jPSZ9+SyJ3sdYyiMDL/rW426cjy7hPxr2T3yEdur++OrL9O7DNJuZH7nvPEsYsuCIzlomI1ZjsKrtoRBn3s/JY4qejzFsPbjB0TWGWo3syshlEP1I70k4xsaLnsrQK7azb5vjJyLJL3SUED/FcATFQSBzPFVK7uD6N66p0kMJqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fHA1lPP5; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1753817630; c=relaxed/simple;
+	bh=L+2rXbfnP5UHLH6J8UIbSI41QWjZkhL1tyySVaOK3Ek=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=TFdPNAewlDoJtzCCEQOGkVTig1Nij9nqPcj5AoGfH0PBQDq1Yo+nOZd/blhTQc5nPdevtFRpLdrhbNksB8LDEnPzPg6fXciS3npS4M8hE7PUpZkqf6NBfIZvZa45BO+9Hwcdyx1cklKPAgu/+ue9Ro2GGR/SHD4kcB+ahvcmfWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K/fl3wBc; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fHA1lPP5"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31f3cfdd3d3so820702a91.3
-        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 12:33:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K/fl3wBc"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b38d8ee46a5so189025a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 29 Jul 2025 12:33:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753817627; x=1754422427; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vr2NEPUlMUbu3MZ3j1bjKONtMkJFv/DS/JUFQy2VOuc=;
-        b=fHA1lPP5mP1NL6FWM2V0p/1EatvoBlkFUuMeZM5qrDi0FWrt6WqG7hHkl7jbWk/4yB
-         xIySYA8qbpgQkT3NNOiuVZH8ui/rSLtsx4ZpvnI+dJ9Y/gmb4XPlpHiPE5cMzy0/0TK3
-         sdt2W3UMFOuka+dRARx6/UA9NOmdC+nyE6B62Nu3esZIX/cpjDv/DK0ZC/LW7sUA0Me2
-         ZUkLs7d/toWE0D4SXJIgJwRavrEBQM92vl0g9j5I3F+raIEDSJQcXVrlh9Wz9OYRUR1d
-         4N0Wx9SW9n3r13gn8D6rop6BxoBWkgt5qO/w1if8sLp6CtaJklXcJRCZMQNIlMJ1Lp9W
-         6X6A==
+        d=google.com; s=20230601; t=1753817628; x=1754422428; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=nK97iU3U8P3+PseGfflZpbVtPQJIWPB5aDB6ZsfbPi4=;
+        b=K/fl3wBcVHq8JqxZ+vFhd2C9yUsRTq8kJRWSYhD5ByZeRHQtRSK1e2CcQ1wQmeywmh
+         0mFCUk/w24iE2QqAJXHRS4cPbv1XAjccvOqrv2o9epPsDC9LjiUzAxGQ40KMuzXTBFwJ
+         pAt7oSuRbE0pTqbsmoGM4Z5hgfXC3h+WGgvDSAMxKwBLYrQNPuOlRbaFgHCwwISzuEkJ
+         CabbgqD5aEZUpovB9RpCzTNvjUVAM+DBmydzx5fgDZYX8oPPelkuSwSqF4en4JtZsB4d
+         Fjx3sGBPBcncOS2fKkN80j9avpPX6/fWZ7clUVdUlxK8+zptuNqTf/lmKlTLGdCRwKD0
+         e6pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753817627; x=1754422427;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vr2NEPUlMUbu3MZ3j1bjKONtMkJFv/DS/JUFQy2VOuc=;
-        b=w7vOSndOInx4Jn4MtHLYJR6riwd3sARzsuT870Oe40S2Tklo73picV4ooPaQ+OdFsD
-         Z2v5UnnRR22cU82x5l0sK2PVqZwtpntl325DQub3iB1KaJkHYljvyZSrfSezXSCXuVEL
-         zGWcMY9k/qfXp40hGAf8urBkJiGIycAAXHyK+hYGZ71dkeVkN6UppL4hVsWIvFOal3Dm
-         fuoIbg0oKZx08VkdVqH4aLY9TBt5h/MBvPrlZmyz6pBoVSDT+CTMIz9LRXBg901mHat4
-         pK1fC516IB84GuztUolItRhj2k0FvYnsXGKtxUZlgUoi7IBtsSodZxPLkmolBRHRIvRN
-         lIyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWavj4M9YIvus8vknpgnY1u4IEeKumK32KmWVcWPB7c7U7XXexla8NLmf3xzablcvRsITzhs0U=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxcNximSfsJn0RNCLVuS3U2cl80wbgIFC4jRmX6sLCpQt6Uxe1M
-	CXQMDXz7bJ9Zkzqb2QP2Z5aKQwhVTzpVe64qKhhOanJBu326sm2XCTRxu4/7tQ4y75PsOAva8rn
-	KqrMnLQ==
-X-Google-Smtp-Source: AGHT+IEpCUyIaefYP0YL7w8y1faaEZii0WVM++l9+v+mc/1ojeZtttZMEz40RX0OKzEWa3Hqy78BV9878sU=
-X-Received: from pja11.prod.google.com ([2002:a17:90b:548b:b0:313:17cf:434f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:562b:b0:31e:d9f0:9b96
- with SMTP id 98e67ed59e1d1-31f5ddb6641mr902917a91.14.1753817626768; Tue, 29
- Jul 2025 12:33:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753817628; x=1754422428;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nK97iU3U8P3+PseGfflZpbVtPQJIWPB5aDB6ZsfbPi4=;
+        b=tE1FafV49sl7PJQVk5aKyWYnyxvGeewW9gkwagAAltos7GxaWozHd2TeiDgYZ9ACM0
+         GjlPnGiub827ZH56/EVOou53KLd1NGeZAS+kMXxGJVBkrlQ21v3yEkPv6gh9yX60DEqp
+         6h/3nJx/nKdxUyak7Mw62sdT1RBzl99cTTK7dBXlLEnquupBkqiiRciQimzPtawDtrHX
+         DzB8LI7SYETJt8W/11tRJjCwR+ScdQ4BpJ/8aDiXJ+iq0nrQrSK3JQEuABF7/e3Cvnd6
+         5JKuA74UczVlWX5hA4rSmxMf12xP0A2ovKBOzB0ptrppWq3rKEKzr4i1jrnsQzbOYZvm
+         lFRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWpfJgEIs1loHVkv3XpM5bG1rWRH2dM5DDKJAGS0dDxuTWrrO07vMtsCiAGa1asnHDuyME1HM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yygu4r4eYyLIS6O6TaeiJHEnfQVlBTWRhdscHbocdY07rHPPzkM
+	vQHOLTpSggG/eja2C+sMOukX7mrMWBFyHMv+XFhOz+atnhyhCfL3jtkMnhliXTc5I7ms5R9Iic/
+	9IpZDvA==
+X-Google-Smtp-Source: AGHT+IH4QbqgK/rjqLq7feIazM0nAtyNNAHCeByH/06YNfkwg9k7lbaoNX81vVU/L2yD55+9XIqmw/waN38=
+X-Received: from pgac7.prod.google.com ([2002:a05:6a02:2947:b0:b36:36f4:9862])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:914f:b0:23d:659c:aadd
+ with SMTP id adf61e73a8af0-23dadeb68c0mr7268679637.22.1753817628625; Tue, 29
+ Jul 2025 12:33:48 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 29 Jul 2025 12:33:35 -0700
+Date: Tue, 29 Jul 2025 12:33:36 -0700
+In-Reply-To: <20250729193341.621487-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250729193341.621487-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250729193341.621487-1-seanjc@google.com>
-Subject: [PATCH 0/5] KVM: Drop vm_dead, pivot on vm_bugged for -EIO
+Message-ID: <20250729193341.621487-2-seanjc@google.com>
+Subject: [PATCH 1/5] KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
@@ -69,44 +73,104 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Nikolay Borisov <nik.borisov@suse.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop vm_dead and instead reject ioctls based only on vm_bugged.  Checking
-vm_dead (or vm_bugged) is inherently racy due as it's not protected by any
-locks.  For vm_bugged, imperfection is a-ok as the goal is purely to limit
-the damage done by a kernel/hardware bug.  But rejecting ioclts based on
-vm_dead is dangerous as it gives us a false sense of security, e.g. see the
-race found by syzbot in commit ecf371f8b02d ("KVM: SVM: Reject SEV{-ES}
-intra host migration if vCPU creation is in-flight").
+Use kvm_test_request() instead of kvm_check_request() when querying
+KVM_REQ_VM_DEAD, i.e. don't clear KVM_REQ_VM_DEAD, as the entire purpose
+of KVM_REQ_VM_DEAD is to prevent the vCPU from enterring the guest ever
+again, even if userspace insists on redoing KVM_RUN.
 
-This series was motivated by the last patch, a.k.a. KVM_TDX_TERMINATE_VM.
-I applied a slightly different version of that patch for 6.17[*], but I'm
-reposting it with the vm_dead changes due to Paolo's question about whether
-or not we should have a generic KVM_TERMINATE_VM; dropping vm_dead doesn't
-make much sense if we want to add KVM_TERMINATE_VM.
+Ensuring KVM_REQ_VM_DEAD is never cleared will allow relaxing KVM's rule
+that ioctls can't be invoked on dead VMs, to only disallow ioctls if the
+VM is bugged, i.e. if KVM hit a KVM_BUG_ON().
 
-[*] https://lore.kernel.org/all/20250725220713.264711-13-seanjc@google.com
+Opportunistically add compile-time assertions to guard against clearing
+KVM_REQ_VM_DEAD through the standard APIs.
 
-Sean Christopherson (5):
-  KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests
-  KVM: TDX: Exit with MEMORY_FAULT on unexpected pending S-EPT Violation
-  KVM: Reject ioctls only if the VM is bugged, not simply marked dead
-  KVM: selftests: Use for-loop to handle all successful SEV migrations
-  KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/arm64/kvm/arm.c     | 2 +-
+ arch/x86/kvm/mmu/mmu.c   | 2 +-
+ arch/x86/kvm/vmx/tdx.c   | 2 +-
+ arch/x86/kvm/x86.c       | 2 +-
+ include/linux/kvm_host.h | 9 +++++++--
+ 5 files changed, 11 insertions(+), 6 deletions(-)
 
- Documentation/virt/kvm/x86/intel-tdx.rst      | 22 ++++++++-
- arch/arm64/kvm/arm.c                          |  2 +-
- arch/arm64/kvm/vgic/vgic-init.c               |  2 +-
- arch/x86/include/uapi/asm/kvm.h               |  7 ++-
- arch/x86/kvm/mmu/mmu.c                        |  2 +-
- arch/x86/kvm/vmx/tdx.c                        | 45 +++++++++++++------
- arch/x86/kvm/vmx/tdx.h                        |  1 +
- arch/x86/kvm/x86.c                            |  2 +-
- include/linux/kvm_host.h                      | 11 +++--
- .../selftests/kvm/x86/sev_migrate_tests.c     | 34 ++++++--------
- virt/kvm/kvm_main.c                           | 10 ++---
- 11 files changed, 90 insertions(+), 48 deletions(-)
-
-
-base-commit: beafd7ecf2255e8b62a42dc04f54843033db3d24
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index f946926716b0..2fdc48c0fc4d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1013,7 +1013,7 @@ static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
+ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+ {
+ 	if (kvm_request_pending(vcpu)) {
+-		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu))
++		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu))
+ 			return -EIO;
+ 
+ 		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6e838cb6c9e1..d09bd236a92d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4915,7 +4915,7 @@ int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code, u8 *level
+ 		if (signal_pending(current))
+ 			return -EINTR;
+ 
+-		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu))
++		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu))
+ 			return -EIO;
+ 
+ 		cond_resched();
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 66744f5768c8..3e0d4edee849 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -2010,7 +2010,7 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
+ 		if (kvm_vcpu_has_events(vcpu) || signal_pending(current))
+ 			break;
+ 
+-		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
++		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
+ 			ret = -EIO;
+ 			break;
+ 		}
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a1c49bc681c4..1700df68f12a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10649,7 +10649,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	bool req_immediate_exit = false;
+ 
+ 	if (kvm_request_pending(vcpu)) {
+-		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
++		if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
+ 			r = -EIO;
+ 			goto out;
+ 		}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 15656b7fba6c..627054d27222 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2261,13 +2261,18 @@ static inline bool kvm_test_request(int req, struct kvm_vcpu *vcpu)
+ 	return test_bit(req & KVM_REQUEST_MASK, (void *)&vcpu->requests);
+ }
+ 
+-static inline void kvm_clear_request(int req, struct kvm_vcpu *vcpu)
++static __always_inline void kvm_clear_request(int req, struct kvm_vcpu *vcpu)
+ {
++	BUILD_BUG_ON(req == KVM_REQ_VM_DEAD);
++
+ 	clear_bit(req & KVM_REQUEST_MASK, (void *)&vcpu->requests);
+ }
+ 
+-static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
++static __always_inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
+ {
++	/* Once a VM is dead, it needs to stay dead. */
++	BUILD_BUG_ON(req == KVM_REQ_VM_DEAD);
++
+ 	if (kvm_test_request(req, vcpu)) {
+ 		kvm_clear_request(req, vcpu);
+ 
 -- 
 2.50.1.552.g942d659e1b-goog
 
