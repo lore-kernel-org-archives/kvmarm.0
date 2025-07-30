@@ -1,188 +1,89 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F61255F5C
-	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 08:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D7F481A3;
+	Wed, 30 Jul 2025 08:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753863655; cv=none; b=bV0IfII9dSMLofcPqpglO9YFUVIUDExw+utcqqK2vH7rnYV+DHPHBjzX5ZTnL+AV2/R/raS8Er7/k/7VLhRo/604C0zy+pPRrw7htiqzZtB+MCL9r12ewJ3pWBNKYZcqLdtjpLMNTp6tbFfnTz5PA4LiYjwLPTDiR4bV1C2En8w=
+	t=1753864954; cv=none; b=ao9hsAV+jo0qO+NK4IE3kB8V/o+dr62eMx3nnWcm73hRsTsthuRE+elE/5KBiqDRpFMuG3kizVOwunNpbQclAGIgQ/y5CW4zK7AqW5g8b7kmtarHTh2qIwClooPuTZMUF4B/u4Hd+ToHCyPRyqI0DKomXkGGMgKmwWkgpj+MfmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753863655; c=relaxed/simple;
-	bh=sMpVGob/1Mg4p+/qdsiXIOdlRZ53nvSriy4F/sWaKfA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oOlpU0FXy/+lehi5/4Ge1LThXNTHNiC9huMAULlMZATEOtniNBxJCRFlYl1tjgLedTp5y548swtDHvOzM9R5/nwnS61ms1+vRoJ9Fzs1MutHDhVKQ36i9Ro/XZ8rBusaLKbBxzPCXUNDY9jPHPIN0QtqDre5Zu5cs/weHgLHhQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TptkLNIX; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1753864954; c=relaxed/simple;
+	bh=9jwGQtcgoGblfYqhXaAV67vOauoqIhza/+dVv/5EcsY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XKhRyifYjJUFRTMgZ7YxjkwQN0K6GJ8kMgOdr4K6jDHAWf57h5Om0RAchhmI4L38Nof4v0/Nd0LqNASnkKzBPInfQl1hQm3Ki7XluZdJzDD1j3QgrmCstYm5bGOlhxHETtOw41ryzA0um1KEEKaFUFdzzLj8gY/KcJWshFBdlsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Go8lp2CB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TptkLNIX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753863653; x=1785399653;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=sMpVGob/1Mg4p+/qdsiXIOdlRZ53nvSriy4F/sWaKfA=;
-  b=TptkLNIXH7jpBg1/dx2GQLg3DGSHWhis2zaJfrasjo/ISah+Tc+WRGjq
-   ZJ13PgYF6zOjLfqFEhdFwE7KosxojDOHPBSTlDPVOWFtXua259+VqySEX
-   GEN1PSuhMHNV1NBzJGS98ud8ckeuJ8kaGACXIEn18oxVxEyvqQeS1Ykc8
-   5s9j7iBvfBIKP78uk1JVThPgqjm0zFKEb6yp5mLMtIgCsMZvXGOvYlKeA
-   hIKxR+KIL7KjIFbaAuNQ6mx/g+UT+qjZFkaSpu0H1YXLiVqTBQBN7lnfk
-   UPW/hSqWsFwMCaEel8ViFCv4MlVRV4rrWHCt7A3NZkgO+lN8FX/VqNth9
-   g==;
-X-CSE-ConnectionGUID: E0slB2ADRP2d/QvA8ygo6w==
-X-CSE-MsgGUID: LfAiUWvLTia12gHAxt0RTg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="43760841"
-X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="43760841"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 01:20:53 -0700
-X-CSE-ConnectionGUID: Ek445IxjTgK8rLEtsHGYDg==
-X-CSE-MsgGUID: m2qrEWuSTVaeqSuq+gdBEQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="168338717"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 01:20:48 -0700
-Message-ID: <42d840e5-d063-4a84-9028-e17a69fc7c91@intel.com>
-Date: Wed, 30 Jul 2025 16:20:45 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Go8lp2CB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D109FC4CEE7;
+	Wed, 30 Jul 2025 08:42:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753864954;
+	bh=9jwGQtcgoGblfYqhXaAV67vOauoqIhza/+dVv/5EcsY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Go8lp2CB+T4l9aWV40JjIjQz9FZO4AywDWuWNCU9YvLYUMCIrudTSDfUtpXxKdjM7
+	 5hgXa8GNJVppkhYV0Ixfxvw5FkHx8HfzQ9WdE8a8ADFQPdA0cEF5Yo5wAwyAXjub3t
+	 Awtm059fx20HyRQ6CIsralMYLVrmwBrNe4pcVGfgtieQS6wTaIcwuk1BcEX4EHX9ML
+	 26i1IGSdOd9CsoofII7f+W+9Ic7Di/gU6VnwZZOXLZBpGUYC9GO1yRQqXMKkNDU7vM
+	 uUrZJ1Mde6gytUo4MUD+lV5Vr+7xPSg0lbwTjUEFng6h3nssvndNAKV40CT0TAPXug
+	 7/HOZgOVF4g/g==
+X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Dan Williams <dan.j.williams@intel.com>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
+	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm
+ platform device
+In-Reply-To: <20250729231948.GJ26511@ziepe.ca>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-12-aneesh.kumar@kernel.org>
+ <20250729181045.0000100b@huawei.com> <20250729231948.GJ26511@ziepe.ca>
+Date: Wed, 30 Jul 2025 14:12:26 +0530
+Message-ID: <yq5aqzxy9ij1.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
- fault-in on !mmap()'d memory
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- Ira Weiny <ira.weiny@intel.com>, Gavin Shan <gshan@redhat.com>,
- Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>,
- David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>,
- James Houghton <jthoughton@google.com>
-References: <20250729225455.670324-1-seanjc@google.com>
- <20250729225455.670324-25-seanjc@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250729225455.670324-25-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 7/30/2025 6:54 AM, Sean Christopherson wrote:
-> Add a guest_memfd testcase to verify that a vCPU can fault-in guest_memfd
-> memory that supports mmap(), but that is not currently mapped into host
-> userspace and/or has a userspace address (in the memslot) that points at
-> something other than the target guest_memfd range.  Mapping guest_memfd
-> memory into the guest is supposed to operate completely independently from
-> any userspace mappings.
+Jason Gunthorpe <jgg@ziepe.ca> writes:
 
-Based on above, I suppose the userspace_address is not NULL but some 
-other separate userspace mapped memory.
+> On Tue, Jul 29, 2025 at 06:10:45PM +0100, Jonathan Cameron wrote:
+>
+>> > +static struct platform_device cca_host_dev = {
+>> Hmm. Greg is getting increasingly (and correctly in my view) grumpy with
+>> platform devices being registered with no underlying resources etc as glue
+>> layers.  Maybe some of that will come later.
+>
+> Is faux_device a better choice? I admit to not knowing entirely what
+> it is for..
+>
+> But alternatively, why do we need a dummy "hw" struct device at all?
+> Typically a subsystem like TSM should be structured to create its own
+> struct devices..
+>
+> I would expect this to just call 'register tsm' ?
+>
 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   .../testing/selftests/kvm/guest_memfd_test.c  | 64 +++++++++++++++++++
->   1 file changed, 64 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-> index 088053d5f0f5..b86bf89a71e0 100644
-> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
-> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-> @@ -13,6 +13,7 @@
->   
->   #include <linux/bitmap.h>
->   #include <linux/falloc.h>
-> +#include <linux/sizes.h>
->   #include <setjmp.h>
->   #include <signal.h>
->   #include <sys/mman.h>
-> @@ -21,6 +22,7 @@
->   
->   #include "kvm_util.h"
->   #include "test_util.h"
-> +#include "ucall_common.h"
->   
->   static void test_file_read_write(int fd)
->   {
-> @@ -298,6 +300,66 @@ static void test_guest_memfd(unsigned long vm_type)
->   	kvm_vm_free(vm);
->   }
->   
-> +static void guest_code(uint8_t *mem, uint64_t size)
-> +{
-> +	size_t i;
-> +
-> +	for (i = 0; i < size; i++)
-> +		__GUEST_ASSERT(mem[i] == 0xaa,
-> +			       "Guest expected 0xaa at offset %lu, got 0x%x", i, mem[i]);
-> +
-> +	memset(mem, 0xff, size);
-> +	GUEST_DONE();
-> +}
-> +
-> +static void test_guest_memfd_guest(void)
-> +{
-> +	/*
-> +	 * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
-> +	 * the guest's code, stack, and page tables, and low memory contains
-> +	 * the PCI hole and other MMIO regions that need to be avoided.
-> +	 */
-> +	const uint64_t gpa = SZ_4G;
-> +	const int slot = 1;
-> +
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +	uint8_t *mem;
-> +	size_t size;
-> +	int fd, i;
-> +
-> +	if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
-> +		return;
-> +
-> +	vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
-> +
-> +	TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
-> +		    "Default VM type should always support guest_memfd mmap()");
-> +
-> +	size = vm->page_size;
-> +	fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
-> +	vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
-> +
-> +	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
-> +	memset(mem, 0xaa, size);
-> +	munmap(mem, size);
-> +
-> +	virt_pg_map(vm, gpa, gpa);
-> +	vcpu_args_set(vcpu, 2, gpa, size);
-> +	vcpu_run(vcpu);
-> +
-> +	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
-> +
-> +	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
-> +	for (i = 0; i < size; i++)
-> +		TEST_ASSERT_EQ(mem[i], 0xff);
-> +
-> +	close(fd);
-> +	kvm_vm_free(vm);
-> +}
-> +
->   int main(int argc, char *argv[])
->   {
->   	unsigned long vm_types, vm_type;
-> @@ -314,4 +376,6 @@ int main(int argc, char *argv[])
->   
->   	for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
->   		test_guest_memfd(vm_type);
-> +
-> +	test_guest_memfd_guest();
+The goal is to have tsm class device to be parented by the platform
+device.
 
-First glance at the name, it leads me to think about something of nested.
+# ls -al
+total 0
+drwxr-xr-x    2 root     root             0 Jan 13 06:07 .
+drwxr-xr-x   23 root     root             0 Jan  1 00:00 ..
+lrwxrwxrwx    1 root     root             0 Jan 13 06:07 tsm0 -> ../../devices/platform/arm-rmi-dev/tsm/tsm0
+# pwd
+/sys/class/tsm
 
->   }
-
+-aneesh
