@@ -1,61 +1,59 @@
 Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501392253A1;
-	Wed, 30 Jul 2025 10:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFF8279783;
+	Wed, 30 Jul 2025 10:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753871919; cv=none; b=NgZbsvBVdNzi4ACcINAQAQHzCob6SZnWL9Ba6bDiZaoZnxYe3T28OBluPN+n3Nty5pTeN5EzVA7dXaSPjKbWXQgyGe8XVEKbrwBS1Cur8NOPYgCUUWPvI6U2rJZ1icaMGD6lnb1Eiabwj+wEEoEb/3G0WskyUOr4wT4vn9+y3wo=
+	t=1753872087; cv=none; b=Rl1zU4z3UhN7N5T/MxrSt6IK6fli9c//AVQrs6EJbDUFJFX8Zg4EWNk+LSBaHEfhqnSPnoWp8Y4sAjXgwUcuJwscI+WgIm76wFXAkm9RqFnIGIEfewWzdLH+f4H/7ZdonG+yxvcCypxIIJjOctRpa1XR0qw5ZSNPy/7M6YQJWvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753871919; c=relaxed/simple;
-	bh=a1bFVUSJNuMaRBg/bFJOzqjeINTdV1R6gNaDS47j1+4=;
+	s=arc-20240116; t=1753872087; c=relaxed/simple;
+	bh=udELr8i7MKBg+40QMi0znw8LgSQipPGw8KbLrBcK2oA=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CreBKhGttmNP3EzNkxLgT4nXVqTzOwidPxqwZO3vhLt2SDks9dJf9a43i9kQcoWgiAG0avdve7Vxrdrsvt/iSSXT8rS2YAWVRqAgL2k3aFd/3qdrj+Dfika64qDq1aiq2y1vlqnjOJnlaxChJh3xoPz7vtcARfIpCBCVAChLM58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jt6RaZC7; arc=none smtp.client-ip=119.8.177.38
+	 MIME-Version:Content-Type; b=kWhfgsL/JApxSM8exXmVXi0F+3CNRO1XvC45jOgaI9Olv2UXpYb6h1ZOXNx4MmGAwGrlMRJY02Gzyyp6pP803vc6KdHLp5Jc+qK0IbQEL32KItOj+PBzUkZnjps+nJh4EW9LuXJC6unyEMQlQu08UX22DL0PpTEJG7JGqrzSECc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=evOs+sUA; arc=none smtp.client-ip=119.8.177.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="jt6RaZC7"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="evOs+sUA"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=gLqk2qxCFUARFWqQEVNpkMZmoZM/0ZAoR38yaf9PwTU=;
-	b=jt6RaZC7kIjJyJMVlCOtACitLf8JL40ho9fTX8wMm/KMbpSmLAopP6PA1ORQpfIJgUqiyEf58
-	awdwdE0ECUeLW8vBz8YHG9RExOffdJhGEVtH7xnC/HBrmcYxVQKbOGujrZX6y9il/BzciNFEiOa
-	3FtP7EJ/5/BiFiJHq0atJT4=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.35])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4bsTDD75dnzMljM;
-	Wed, 30 Jul 2025 18:37:00 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bsTD636jqz6H8Rn;
-	Wed, 30 Jul 2025 18:36:54 +0800 (CST)
+	bh=7Vxid69zRfL2ebFFVMcUyZ2ZAjzALw8kkMHPdwmzWMc=;
+	b=evOs+sUAw6peOsbDefxFubI0yUyAT+MLdvPSgjTQ5rjBizTE2SYw+PMVHk2j/P5MmGeoqUzI+
+	WkYWolLFf/JT5uytenE1/nop0XHYpEs6m/56t7Ogq5/96i+TFjsXSbkWkgvHSweI+kduLylYUQ/
+	+4FyS5drV648YRaxKeFN+m0=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.36])
+	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4bsSxg12tSzN0MS;
+	Wed, 30 Jul 2025 18:24:22 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bsSx90Vb6z6L50d;
+	Wed, 30 Jul 2025 18:23:57 +0800 (CST)
 Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 370CA1402F3;
-	Wed, 30 Jul 2025 18:38:30 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 7A2921402F4;
+	Wed, 30 Jul 2025 18:25:52 +0800 (CST)
 Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
  (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 30 Jul
- 2025 12:38:29 +0200
-Date: Wed, 30 Jul 2025 11:38:27 +0100
+ 2025 12:25:51 +0200
+Date: Wed, 30 Jul 2025 11:25:49 +0100
 From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-CC: Jason Gunthorpe <jgg@ziepe.ca>, Dan Williams <dan.j.williams@intel.com>,
-	<linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
+CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
 	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <aik@amd.com>,
 	<lukas@wunner.de>, Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun
-	<yilun.xu@linux.intel.com>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven
- Price <steven.price@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc
- Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, Oliver Upton
-	<oliver.upton@linux.dev>, <gregkh@linuxfounation.org>
-Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm
- platform device
-Message-ID: <20250730113827.000032b8@huawei.com>
-In-Reply-To: <yq5aqzxy9ij1.fsf@kernel.org>
+	<yilun.xu@linux.intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, "Suzuki K
+ Poulose" <Suzuki.Poulose@arm.com>, Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 12/38] coco: host: arm64: CCA host platform
+ device driver
+Message-ID: <20250730112549.00003e7d@huawei.com>
+In-Reply-To: <yq5ao6t29hrk.fsf@kernel.org>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
-	<20250728135216.48084-12-aneesh.kumar@kernel.org>
-	<20250729181045.0000100b@huawei.com>
-	<20250729231948.GJ26511@ziepe.ca>
-	<yq5aqzxy9ij1.fsf@kernel.org>
+	<20250728135216.48084-13-aneesh.kumar@kernel.org>
+	<20250729182244.00002f4f@huawei.com>
+	<yq5ao6t29hrk.fsf@kernel.org>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -63,64 +61,67 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
  frapeml500008.china.huawei.com (7.182.85.71)
 
-On Wed, 30 Jul 2025 14:12:26 +0530
-"Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
+On Wed, 30 Jul 2025 14:28:55 +0530
+Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
 
-> Jason Gunthorpe <jgg@ziepe.ca> writes:
-> 
-> > On Tue, Jul 29, 2025 at 06:10:45PM +0100, Jonathan Cameron wrote:
-> >  
-> >> > +static struct platform_device cca_host_dev = {  
-> >> Hmm. Greg is getting increasingly (and correctly in my view) grumpy with
-> >> platform devices being registered with no underlying resources etc as glue
-> >> layers.  Maybe some of that will come later.  
+> Jonathan Cameron <Jonathan.Cameron@huawei.com> writes:
+>=20
+> > On Mon, 28 Jul 2025 19:21:49 +0530
+> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+> > =20
+>=20
+> ...
+>=20
+> >> +
+> >> +#include "rmm-da.h"
+> >> +
+> >> +/* Number of streams that we can support at the hostbridge level */
+> >> +#define CCA_HB_PLATFORM_STREAMS 4
+> >> +
+> >> +/* Total number of stream id supported at root port level */
+> >> +#define MAX_STREAM_ID	256
+> >> +
+> >> +DEFINE_FREE(vfree, void *, if (!IS_ERR_OR_NULL(_T)) vfree(_T))
+> >> +static struct pci_tsm *cca_tsm_pci_probe(struct pci_dev *pdev)
+> >> +{
+> >> +	int rc;
+> >> +	struct pci_host_bridge *hb;
+> >> +	struct cca_host_dsc_pf0 *dsc_pf0 __free(vfree) =3D NULL; =20
 > >
-> > Is faux_device a better choice? I admit to not knowing entirely what
-> > it is for..
-
-I'll go with a cautious yes to faux_device. This case of a glue device
-with no resources and no reason to be on a particular bus was definitely
-the intent but I'm not 100% sure without trying it that we don't run
-into any problems.
-
-Not that many examples yet, but cpuidle-psci.c looks like a vaguely similar
-case to this one.  
-
-All it really does is move the location of the device and
-smash together the device registration with probe/remove.
-That means the device disappears if probe() fails, which is cleaner
-in many ways than leaving a pointless stub behind.
-
-Maybe it isn't appropriate it if is actually useful to rmmod/modprobe the
-driver. 
-
-+CC Greg on basis I may have wrong end of the stick ;)
-
+> > Read the stuff in cleanup.h and work out why this needs
+> > changing to be inline below and not use this NULL pattern here
+> > (unless you like grumpy Linus ;)
 > >
-> > But alternatively, why do we need a dummy "hw" struct device at all?
-> > Typically a subsystem like TSM should be structured to create its own
-> > struct devices..
+> > Note that with the err_out, even if you do that you'll still be
+> > breaking with the guidance doc (and actually causing undefined
+> > behavior :)  Get rid of those gotos if you want to use __free()
 > >
-> > I would expect this to just call 'register tsm' ?
-> >  
-> 
-> The goal is to have tsm class device to be parented by the platform
-> device.
+> > =20
+>=20
+> I=E2=80=99ve already fixed up similar cases by removing the goto based on=
+ cleanup.h
+> docs in other functions.I must have missed this one.
+>=20
+> By the way, isn't using the `NULL` pattern acceptable when there are
+> no additional lock variables involved (ie, unwind order doesn't matter)?
+> Or should we always follow the pattern below regardless?
+>=20
+> 	struct cca_host_dsc_pf0 *dsc_pf0 __free(vfree) =3D
+> 		vcalloc(sizeof(*dsc_pf0), GFP_KERNEL);
 
-> 
-> # ls -al
-> total 0
-> drwxr-xr-x    2 root     root             0 Jan 13 06:07 .
-> drwxr-xr-x   23 root     root             0 Jan  1 00:00 ..
-> lrwxrwxrwx    1 root     root             0 Jan 13 06:07 tsm0 -> ../../devices/platform/arm-rmi-dev/tsm/tsm0
-> # pwd
-> /sys/class/tsm
-> 
+Always do this.  It's not really about what happens today but
+more what we might break by failing to notice a future patch causes
+problems.  Keeping the unwind ordering tightly couple with setup
+means we basically can't get it wrong (famous last words ;)
+
+Jonathan
+
+
+>=20
 > -aneesh
-> 
 
