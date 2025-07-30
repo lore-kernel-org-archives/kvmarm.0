@@ -1,184 +1,128 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3811B41760
-	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 21:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECDD22068F
+	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 21:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753911287; cv=none; b=XIJNZG2CJsmk9QPszS94YVzTYfAAzdAfy0B+gqqi4ySdc8oo33dg84X5pMm9c95DfgtxEtb76d1f0Y+B0ai3PUe4gdgA4Etv6CsW4tdBhpcr0jUCWKEv2WcdQzmpmY/ZqPaV0pjKxdGZMmlA6u4d6OAScb78LLYwkVUbs4y3cWY=
+	t=1753911630; cv=none; b=bdY5N8ZLKfuBB9t9x7KdeiGJPgsdAuwRYSdVr+fsAc7EKvV++qpqxDK0NVcrdGo8bszfXfR2ffQreG+8v9Bmev/SlSnircyVJ5ivk13rBgWdZRtekevrnQvaKeYpKFrtolZantVv4TnTHEX0oa/w582bO+Vcqb8b1NLuQ/fMKKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753911287; c=relaxed/simple;
-	bh=sDR2G1172uhe25DxV0gYE63aiNpaRb4ud1zD/6bxAk0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=alT+cZyB+JFvHeUQYfh+Od2Dy9842QwfW/N7Yg5KxNX+k9o+HUc055364JGaqhf7ddFQPMzOnszVImNNTwPd5lU/e456DhZ3f1uukDE8xpm91ykGk8Ys8psSvjfcfFKlY244EZts9oS3w5+CoG3GIsibRPn/4U6LU2p9VZfs0vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pn1YiT3g; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1753911630; c=relaxed/simple;
+	bh=EqNTguNzzyHbty71kWmNAoeehUysv/QpSqDH0n/jKZQ=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Q604pyy2XmfJspqQFhit5pBC2uc1aqxjOxluD6VOP4GNOxAhuW5oH5MOPYMHcFwJopbs8vsnz1d8RgqLuOUCUYjBw0ImqcUHQAcSbuuKZ6DmrprPIf00t6/fuyP3AM83f6yikLtXj7eVYNHpsSsJkq8D0Y+v3kWtbBY9uC82bqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T1X1luLh; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pn1YiT3g"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b321087b1cdso287283a12.2
-        for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 14:34:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753911285; x=1754516085; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AZoCrmESLbLCViBEraaeQvy8SUfzt9/XLBDROzjvgL4=;
-        b=Pn1YiT3g8UhM5dbXnkBrUJbz6dkyJ6goEBGSe9vfSw0+A3RN35BBcreKZagoBfgkTc
-         RfUUBLzcI1+0G7gx/IO7MCRLYpxDUxzHHOISaMW7OZ5R7JaU9mLuxfB+Lr4GLpVBzI9H
-         iVcrX7Beb88KZwc49oYNagUnFtIGik/xT9/or7A4A9+G1PfxIFaChl8MsLLvyljxZaeD
-         PYd5rxYVBh+jCbGMc9xcu6vETwJhHZuHwOaGTAeNj4e4B6riEUe6pqoClf552m/ygAta
-         8dvnisDtJFKr30ZjJKzVSsdulUFCBpK4mXRvcQcAoCwLygQ6OpS9S1bu+V7c/8VBrNkq
-         4uqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753911285; x=1754516085;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AZoCrmESLbLCViBEraaeQvy8SUfzt9/XLBDROzjvgL4=;
-        b=LpuqLPNlRCj4Opj/p92gnhWfeL3S+G9yjZIAa5J7NNGjRtMpAXSnKXdM+Tmu9iVDCX
-         cW6z0yYJrxVmtPqvswoxd0vXaIBjQxhFprx7fbziIzI5zTBkoHuDsk/eylgQt0hwCsdf
-         /7JaRXh1LSJKQ4Bv42wuLUAP0ZeF95teHzFoFOOk3uOc4US20c9yIqn/CXU44szAUekF
-         1nllABa4L6olZpAjn1U45Hr5n8Cn5ppcgSgWhyCp/VcvfwfXL3Gt78MYF0feMbUHc5Bz
-         UaYFpBXER1MiljhEHAKnIZzQ+Vv9BCKzz00HsCMfntmB22dnMZRB4h+rkpT8KWzDWueS
-         XzEg==
-X-Forwarded-Encrypted: i=1; AJvYcCX1p4djwXb0GPNAWUUTaAFXXOQwyBWesiAoJoKmuIlWkqx882kAo8k2U5kHuDhWZk3l3N5VJLQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx2+bgRAYF7G+7cB1OiHukuANuEqK5zbl2H18uU/+H6+ZitHHAX
-	forZly1ROzRkwasT7CQfI4hiXnUdbsV10rk66SlXRylQKk/jUI3NCxUO5AHJDknJzqIxbhcFow8
-	4jI1xTr3F5egHxcZd+S7uBtDiHQ==
-X-Google-Smtp-Source: AGHT+IE166c54Arspc6vUihH1B2IIMOPFqYhg0hEsHJt45VP/+caD/xvYgvBnOUC4GXLoFyR6oHwfyE2Q105ihyuUQ==
-X-Received: from pgar7.prod.google.com ([2002:a05:6a02:2e87:b0:b2c:4548:13d0])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:7283:b0:23d:bdb7:d9f9 with SMTP id adf61e73a8af0-23dc0ec1d54mr8719397637.31.1753911285429;
- Wed, 30 Jul 2025 14:34:45 -0700 (PDT)
-Date: Wed, 30 Jul 2025 14:34:44 -0700
-In-Reply-To: <20250729225455.670324-1-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T1X1luLh"
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753911625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TwoUYLD79wmrTWozxSEkOrFeJeo57/yFz1Jai3d4Dqc=;
+	b=T1X1luLheWKT/5Ie/RgvKDsGGc7yn/AWQVBgOwjhxowODYHuOJ1gO45ZHXYnMfUSJyToAf
+	NFDePW9hREL47eH3/SAFXE6WG3LJvIxJD0tlzW0ulnQLJ9UCHIUgYUGtOrdG2GDc71+XQj
+	y8aVPumm8iollypu9X512JtgiEXiUbI=
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250729225455.670324-1-seanjc@google.com>
-Message-ID: <diqzwm7pjrbf.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v17 00/24] KVM: Enable mmap() for guest_memfd
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Ira Weiny <ira.weiny@intel.com>, Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Tao Chan <chentao@kylinos.cn>, 
-	James Houghton <jthoughton@google.com>, Jiaqi Yan <jiaqiyan@google.com>, vannapurve@google.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: KVM selftest for L2 guest execution fails  
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+In-Reply-To: <861ppx9893.wl-maz@kernel.org>
+Date: Thu, 31 Jul 2025 06:40:05 +0900
+Cc: kvmarm@lists.linux.dev
+Content-Transfer-Encoding: 7bit
+Message-Id: <62C3AF76-E7B5-491E-AD1C-A8F9BF8C153F@linux.dev>
+References: <C37BCE4D-0958-4C74-BEFC-F3A7A689A848@linux.dev>
+ <861ppx9893.wl-maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Sean Christopherson <seanjc@google.com> writes:
+Hi Marc,
 
-> Paolo,
->
-> The arm64 patches have been Reviewed-by Marc, and AFAICT the x86 side of
-> things is a go.  Barring a screwup on my end, this just needs your approval.
->
-> Assuming everything looks good, it'd be helpful to get this into kvm/next
-> shortly after rc1.  The x86 Kconfig changes in particular create semantic
-> conflicts with in-flight series.
->
->
-> Add support for host userspace mapping of guest_memfd-backed memory for VM
-> types that do NOT use support KVM_MEMORY_ATTRIBUTE_PRIVATE (which isn't
-> precisely the same thing as CoCo VMs, since x86's SEV-MEM and SEV-ES have
-> no way to detect private vs. shared).
->
-> mmap() support paves the way for several evolving KVM use cases:
->
->  * Allows VMMs like Firecracker to run guests entirely backed by
->    guest_memfd [1]. This provides a unified memory management model for
->    both confidential and non-confidential guests, simplifying VMM design.
->
->  * Enhanced Security via direct map removal: When combined with Patrick's
->    series for direct map removal [2], this provides additional hardening
->    against Spectre-like transient execution attacks by eliminating the
->    need for host kernel direct maps of guest memory.
->
->  * Lays the groundwork for *restricted* mmap() support for guest_memfd-backed
->    memory on CoCo platforms [3] that permit in-place
->    sharing of guest memory with the host.
->
-> Based on kvm/queue.
->
-> [1] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
-> [2] https://lore.kernel.org/all/20250221160728.1584559-1-roypat@amazon.co.uk
-> [3] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com
->
-> [...snip...]
+> On Jul 30, 2025, at 21:24, Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Wed, 30 Jul 2025 07:44:48 +0100,
+> Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
+>> 
+>> Hi,
+>> My small kvm sefltest tested on the kvmarm/next with NV2+VHE on FVP fails:
+>> 
+>> # ./arm64/test5
+>> Random seed: 0x6b8b4567
+>> ==== Test Assertion Failure ====
+>>  lib/kvm_util.c:1746: !ret
+>>  pid=257 tid=257 errno=11 - Resource temporarily unavailable
+>> sh: line 1: addr2line: command not found
+>>  KVM_RUN failed, rc: -1 errno: 11 (Resource temporarily unavailable)
+>> 
+>> Below is the test code, am I doing still wrong?
+> 
+> Quite a lot is wrong there.
+> 
+>> 
+>> Thanks,
+>> Itaru.
+>> 
+>> // SPDX-License-Identifier: GPL-2.0-only
+>> 
+>> #include "test_util.h"
+>> #include "kvm_util.h"
+>> #include "processor.h"
+>> #include "ucall.h"
+>> 
+>> #define GUEST_SYNC_VAL 0x1234
+>> #define UCALL_GPA 0x500000
+>> 
+>> static void l1_guest_code(void)
+>> {
+>>        /*
+>>        * Set up HCR_EL2 to enable virtualization and nested support:
+>>        *   - HCR_EL2.VM  = 1 (enable stage-2 translation)
+>>        *   - HCR_EL2.NV  = 1 (trap to EL2 on guest HVC, SMC, WFI, etc.)
+>>        *   - HCR_EL2.TGE = 1 (trap general exceptions in EL1 to EL2)
+> 
+> You really want to read the spec again -- this is not what this means.
+> 
+>>        */
+>>       uint64_t hcr = (1UL << 0)   |  // VM
+>>                      (1UL << 27)  |  // TGE
+>>                      (1UL << 31);    // NV
+> 
+> - You enable S2 translation, and yet don't setup anything related to it
+> 
+> - You have TGE set, and yet (try to) return to EL1
+> 
+> - You set NV, and yet don't have a VNCR_EL2 populated
+> 
+> I don't know what you are trying to do here, but this is pretty badly
+> thought out.
+> 
+> I'd suggest you start by having a simple L2, without making use of NV
+> at all in the guest. You will still have to have a stage-2 and a
+> correct HCR_EL2 configuration -- none of which is as trivial as this
+> test suggests.
+> 
+> Once that is actually working, you can go wild and enable NV. But not
+> before.
 
-With this version, when guest_memfd memory is mmap-ed() and faulted to
-userspace, when there's a memory failure, the process does not get a
-SIGBUS. Specifically, this selftest fails with "MADV_HWPOISON should
-have triggered SIGBUS."
+Thanks for your comments. Will follow your suggestions.
 
-diff --git i/tools/testing/selftests/kvm/guest_memfd_test.c w/tools/testing/selftests/kvm/guest_memfd_test.c
-index b86bf89a71e04..70ef75a23bb60 100644
---- i/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ w/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -70,6 +70,10 @@ static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
- 
- 	ret = munmap(mem, total_size);
- 	TEST_ASSERT(!ret, "munmap() should succeed.");
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-+			total_size);
-+	TEST_ASSERT(!ret, "Truncate the entire file (cleanup) should succeed.");
- }
- 
- static sigjmp_buf jmpbuf;
-@@ -104,6 +108,47 @@ static void test_fault_overflow(int fd, size_t page_size, size_t total_size)
- 
- 	ret = munmap(mem, map_size);
- 	TEST_ASSERT(!ret, "munmap() should succeed.");
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-+			total_size);
-+	TEST_ASSERT(!ret, "Truncate the entire file (cleanup) should succeed.");
-+}
-+
-+static void test_memory_failure(int fd, size_t page_size, size_t total_size)
-+{
-+	struct sigaction sa_old, sa_new = {
-+		.sa_handler = fault_sigbus_handler,
-+	};
-+	void *memory_failure_addr;
-+	char *mem;
-+	int ret;
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap() for guest_memfd should succeed.");
-+
-+	memset(mem, 0xaa, page_size);
-+
-+	memory_failure_addr = mem + page_size;
-+	sigaction(SIGBUS, &sa_new, &sa_old);
-+	if (sigsetjmp(jmpbuf, 1) == 0) {
-+		madvise(memory_failure_addr, page_size, MADV_HWPOISON);
-+		TEST_ASSERT(false, "MADV_HWPOISON should have triggered SIGBUS.");
-+	}
-+	sigaction(SIGBUS, &sa_old, NULL);
-+
-+	ret = munmap(mem, total_size);
-+	TEST_ASSERT(!ret, "munmap() should succeed.");
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-+			total_size);
-+	TEST_ASSERT(!ret, "Truncate the entire file (cleanup) should succeed.");
- }
- 
- static void test_mmap_not_supported(int fd, size_t page_size, size_t total_size)
-@@ -286,6 +331,7 @@ static void test_guest_memfd(unsigned long vm_type)
- 	if (flags & GUEST_MEMFD_FLAG_MMAP) {
- 		test_mmap_supported(fd, page_size, total_size);
- 		test_fault_overflow(fd, page_size, total_size);
-+		test_memory_failure(fd, page_size, total_size);
- 	} else {
- 		test_mmap_not_supported(fd, page_size, total_size);
- 	}
+Itaru. 
 
-Is this by design or should some new memory_failure handling be added?
+> 
+> M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+
+
