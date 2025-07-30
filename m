@@ -1,220 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B99B2777E1
-	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 09:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7810723BCED;
+	Wed, 30 Jul 2025 10:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753869293; cv=none; b=LCUJLDORHohiFuyS34A5Cst1nOKkh6AxClXvTwZCH8/niDr6/1Nxm7l0d6s6ftBjkRrBb/RbXLN6onG7Ca5foQPj5iSiXJZbfHMhbts1ws+/NeG2X5VpK1l09RFQfndC84bUvMpGVae+ajW1P+lxM9Qp2YJERinsLbc3+i5XRiI=
+	t=1753870181; cv=none; b=TikqV5r7jhU/gYkdEqpTmou1vFDNW5gzUslAobC4NVGK64sCWGYhlb3HWiAjVc9FagtQJfuoVekvdJ60lrh6aHwEFOoGu48OXEdPGgAScBRTqPV3PXHxWZj4R+y8CLU4DYjDAko07H7E9SYF+Iyn9CSlDiWuXI3S78CvWLAQLnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753869293; c=relaxed/simple;
-	bh=rpLcOWERI/8Dk8pvmGHhEU9GP/nRnOClCltYR2JZsZU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EZ7O3aNP8oWcTmlJzV7753Lt/I3G/AuZfYL7V5ymmNmJQgnaJHFISb92XWt2JQOl3GxuW6DZhzjfRs0MC/87ncIvEM7iC0Ginr3BwJMPWvTiO6OiSLpOpipzZj8oKxbJtzRH2AO0q/SaSJOiWBGW4kWrws2hVQ4Z7L/wgrUOJto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVFGmrtn; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVFGmrtn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAE83C4CEFD;
-	Wed, 30 Jul 2025 09:54:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753869292;
-	bh=rpLcOWERI/8Dk8pvmGHhEU9GP/nRnOClCltYR2JZsZU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XVFGmrtnsRCkLpPfb5mcrbOtkewg8t/KgAYmAvzfnLdroVVlB9T5Hbk7wLqKVMqnY
-	 9qjbMr673cA0tmGgcSkz0M0nSZzDAZndwoH5M0cmjTsjcfK+bn60rzQyHURAoEd9Hq
-	 fb1N+UusPnOx+kYECP/U2XoRxOf9b7aITsGXnhdqHWOLvW+Sx5XY0QYslgQvEqqgri
-	 PUQaUNyf9Uq6XnkplEpd9PeA9gr7nfoPGcU7O+SM0d/vBrknbxMhNgn720V+fNH2Yh
-	 sEuEmEqwu/fbAnR4w+avUiyj1ZlqF+XFnsqVtYcpaV1m+/ZlFFqKjnGyxrUIgjuFw0
-	 V9goo8WkVkU7w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uh3WM-002ZuJ-E1;
-	Wed, 30 Jul 2025 10:54:50 +0100
-Date: Wed, 30 Jul 2025 10:54:50 +0100
-Message-ID: <8634ae80lx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jiaqi Yan <jiaqiyan@google.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Handle SEAs due to VNCR redirection
-In-Reply-To: <20250729182342.3281742-1-oliver.upton@linux.dev>
-References: <20250729182342.3281742-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1753870181; c=relaxed/simple;
+	bh=UCyVpLH87cSFpHt6B2Knjye0VwgeSGRgyWbokISmTG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HUSe4TC3PZHSMtF827crdhxmI+JcoTDCzU46oYdj605Qmnk2i3ozzJMk3k5GeHFHj9r7tD+Iz9X+jtpU/5KKjquLUgIcT4Mjq1GkEea/PtfFfPFxPAPG4eOfJOHKOZMUJiLWYVT7GJaXJ5xhDEsto4Y2796mCDJ4ezWM2kF7GzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D36201BC0;
+	Wed, 30 Jul 2025 03:09:30 -0700 (PDT)
+Received: from [10.57.3.117] (unknown [10.57.3.117])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 94F683F673;
+	Wed, 30 Jul 2025 03:09:36 -0700 (PDT)
+Message-ID: <bbe2a41a-8f72-4224-a0bc-225c1e35a180@arm.com>
+Date: Wed, 30 Jul 2025 11:09:35 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, jiaqiyan@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 04/38] tsm: Support DMA Allocation from private
+ memory
+Content-Language: en-GB
+To: Jason Gunthorpe <jgg@ziepe.ca>, "Aneesh Kumar K.V"
+ <aneesh.kumar@kernel.org>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+ linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
+ lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+ Xu Yilun <yilun.xu@linux.intel.com>, Steven Price <steven.price@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-5-aneesh.kumar@kernel.org>
+ <20250728143318.GD26511@ziepe.ca> <yq5a5xfbbe35.fsf@kernel.org>
+ <20250729143339.GH26511@ziepe.ca>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250729143339.GH26511@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 29 Jul 2025 19:23:42 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On 29/07/2025 15:33, Jason Gunthorpe wrote:
+> On Tue, Jul 29, 2025 at 01:53:10PM +0530, Aneesh Kumar K.V wrote:
+>> Jason Gunthorpe <jgg@ziepe.ca> writes:
+>>
+>>> On Mon, Jul 28, 2025 at 07:21:41PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>>>> @@ -48,3 +49,12 @@ int set_memory_decrypted(unsigned long addr, int numpages)
+>>>>   	return crypt_ops->decrypt(addr, numpages);
+>>>>   }
+>>>>   EXPORT_SYMBOL_GPL(set_memory_decrypted);
+>>>> +
+>>>> +bool force_dma_unencrypted(struct device *dev)
+>>>> +{
+>>>> +	if (dev->tdi_enabled)
+>>>> +		return false;
+>>>
+>>> Is this OK? I see code like this:
+>>>
+>>> static inline dma_addr_t phys_to_dma_direct(struct device *dev,
+>>> 		phys_addr_t phys)
+>>> {
+>>> 	if (force_dma_unencrypted(dev))
+>>> 		return phys_to_dma_unencrypted(dev, phys);
+>>> 	return phys_to_dma(dev, phys);
+>>>
+>>> What are the ARM rules for generating dma addreses?
+>>>
+>>> 1) Device is T=0, memory is unencrypted, call dma_addr_unencrypted()
+>>>     and do "top bit IBA set"
+>>>
+>>> 2) Device is T=1, memory is encrypted, use the phys_to_dma() normally
+>>>
+>>> 3) Device it T=1, memory is uncrypted, use the phys_to_dma()
+>>>     normally??? Seems odd, I would have guessed the DMA address sould
+>>>     be the same as case #1?
+>>>
+>>> Can you document this in a comment?
+>>>
+>>
+>> If a device is operating in secure mode (T=1), it is currently assumed
+>> that only access to private (encrypted) memory is supported.
 > 
-> System register accesses redirected to the VNCR page can also generate
-> external aborts just like any other form of memory access. Route to
-> kvm_handle_guest_sea() for potential APEI handling, falling back to a
-> vSError if the kernel didn't handle the abort.
+> No, this is no how the PCI specs were written as far as I
+> understand. The XT bit thing is supposed to add more fine grained
+> device side control over what memory the DMA can target. T alone does
+> not do that.
 > 
-> Take the opportunity to throw out the useless kvm_ras.h which provided a
-> helper with a single callsite...
+>> It is unclear whether devices would need to perform DMA to shared
+>> (unencrypted) memory while operating in this mode, as TLPs with T=1
+>> are generally expected to target private memory.
+> 
+> PCI SIG supports it, kernel should support it.
 
-Yay!
+ACK. On Arm CCA, the device can access shared IPA, with T=1 transaction
+as long as the mapping is active in the Stage2 managed by RMM.
+
+Rather than mapping the entire memory from the host, it would be ideal
+if the Coco vms have some sort of a callback to "make sure the DMA
+wouldn't fault for a device". e.g, it could be as simple as touching
+the page in Arm CCA (GFP_ZERO could do the trick, well one byte
+per Granule is good). or an ACCEPT a given page.
+
+Is this a problem for AMDE SNP / Intel TDX ?
+
+Suzuki
+
+
+
 
 > 
-> Cc: Jiaqi Yan <jiaqiyan@google.com>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_mmu.h |  1 +
->  arch/arm64/include/asm/kvm_ras.h | 25 -------------------------
->  arch/arm64/kvm/mmu.c             | 29 +++++++++++++++++------------
->  arch/arm64/kvm/nested.c          |  3 +++
->  4 files changed, 21 insertions(+), 37 deletions(-)
->  delete mode 100644 arch/arm64/include/asm/kvm_ras.h
-> 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index ae563ebd6aee..e4069f2ce642 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -180,6 +180,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
->  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  			  phys_addr_t pa, unsigned long size, bool writable);
->  
-> +int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
->  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
->  
->  phys_addr_t kvm_mmu_get_httbr(void);
-> diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
-> deleted file mode 100644
-> index 9398ade632aa..000000000000
-> --- a/arch/arm64/include/asm/kvm_ras.h
-> +++ /dev/null
-> @@ -1,25 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0 */
-> -/* Copyright (C) 2018 - Arm Ltd */
-> -
-> -#ifndef __ARM64_KVM_RAS_H__
-> -#define __ARM64_KVM_RAS_H__
-> -
-> -#include <linux/acpi.h>
-> -#include <linux/errno.h>
-> -#include <linux/types.h>
-> -
-> -#include <asm/acpi.h>
-> -
-> -/*
-> - * Was this synchronous external abort a RAS notification?
-> - * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
-> - */
-> -static inline int kvm_handle_guest_sea(void)
-> -{
-> -	/* apei_claim_sea(NULL) expects to mask interrupts itself */
-> -	lockdep_assert_irqs_enabled();
-> -
-> -	return apei_claim_sea(NULL);
-> -}
-> -
-> -#endif /* __ARM64_KVM_RAS_H__ */
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1c78864767c5..9a45daf817bf 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -4,19 +4,20 @@
->   * Author: Christoffer Dall <c.dall@virtualopensystems.com>
->   */
->  
-> +#include <linux/acpi.h>
->  #include <linux/mman.h>
->  #include <linux/kvm_host.h>
->  #include <linux/io.h>
->  #include <linux/hugetlb.h>
->  #include <linux/sched/signal.h>
->  #include <trace/events/kvm.h>
-> +#include <asm/acpi.h>
->  #include <asm/pgalloc.h>
->  #include <asm/cacheflush.h>
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_pgtable.h>
->  #include <asm/kvm_pkvm.h>
-> -#include <asm/kvm_ras.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/virt.h>
-> @@ -1811,6 +1812,19 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  	read_unlock(&vcpu->kvm->mmu_lock);
->  }
->  
-> +int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * Give APEI the opportunity to claim the abort before handling it
-> +	 * within KVM. apei_claim_sea() expects to be called with IRQs enabled.
-> +	 */
-> +	lockdep_assert_irqs_enabled();
-> +	if (apei_claim_sea(NULL) == 0)
-> +		return 1;
-> +
-> +	return kvm_inject_serror(vcpu);
-> +}
-> +
->  /**
->   * kvm_handle_guest_abort - handles all 2nd stage aborts
->   * @vcpu:	the VCPU pointer
-> @@ -1834,17 +1848,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  	gfn_t gfn;
->  	int ret, idx;
->  
-> -	/* Synchronous External Abort? */
-> -	if (kvm_vcpu_abt_issea(vcpu)) {
-> -		/*
-> -		 * For RAS the host kernel may handle this abort.
-> -		 * There is no need to pass the error into the guest.
-> -		 */
-> -		if (kvm_handle_guest_sea())
-> -			return kvm_inject_serror(vcpu);
-> -
-> -		return 1;
-> -	}
-> +	if (kvm_vcpu_abt_issea(vcpu))
-> +		return kvm_handle_guest_sea(vcpu);
->  
->  	esr = kvm_vcpu_get_esr(vcpu);
->  
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index efb37aad11ec..4f741ba24b48 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1289,6 +1289,9 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
->  
->  	BUG_ON(!(esr & ESR_ELx_VNCR_SHIFT));
+> Jason
 
-Urgh. This is hilarious. We don't trigger this thing by pure luck (13
-is a lucky number, apparently...). I'll post a separate fix for that.
-
->  
-> +	if (kvm_vcpu_abt_issea(vcpu))
-> +		return kvm_handle_guest_sea(vcpu);
-> +
->  	if (esr_fsc_is_permission_fault(esr)) {
->  		inject_vncr_perm(vcpu);
->  	} else if (esr_fsc_is_translation_fault(esr)) {
-> 
-
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
