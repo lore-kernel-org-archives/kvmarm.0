@@ -1,55 +1,55 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D841F4623;
-	Wed, 30 Jul 2025 06:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23CE71F1317;
+	Wed, 30 Jul 2025 07:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753858372; cv=none; b=DCvPEKohk3kajZS6iwcV5751u+Aorqpun9l6v0QK3U9SKqbPiZQ7qQBnofxGcIh3K7OR1JBWLplrcumj5he0Lk4OzQVkGS1I9xDOk+Rm0JnDo1/g6Mk4Hp8Caww2YPr1cM8btqUhHsfHHUKgxsf6O3WfNtg8n3sYyb3V6akzk4c=
+	t=1753859069; cv=none; b=ge7Hy+5VThIl0E/gLVtE66jguUtO/vW1Zs60BVjucpCzRNx+YDXXxWh8YIGbVY1OamMy8tCSQis3KndDKLuQ0fXdCOl/2mVZup392u4p+R806tqHcg+zDKDDQl8HWkqk3n606bOVaB9DwbeGPojzrPlufvd510MWGTAzZjHx2Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753858372; c=relaxed/simple;
-	bh=7OGyvNg7RATkxbxEUz2W1V8qPCkZTTFRPvx4rkkG0yo=;
+	s=arc-20240116; t=1753859069; c=relaxed/simple;
+	bh=hRRwxJjQE9wJHAhuatc6RMPSyGgs/xP53hoMSHC/2FU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uT808NluA9fkEQ9we07dql/zvFOjZTJQseAdEYBnCr/wzCsLA2ArXeuAQOekw9rLqWVlSKjceyZxjOsf6yT9zyO/grx8EGkB+oR64FQpCozvL6XyiY2ncczoTt547+gR5ZjC95cQj9uvRSu4Dc/37KxYYI48s3yE4l/gmbvZzmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A61U6QZB; arc=none smtp.client-ip=192.198.163.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=npO+xs0uamom6kz8omSeqBaPWlP3RFOn5sCAWZ/ZBjtiPBx2pGC1H63amckPeLldchdI1aeHsSwl9z4+HSvEBB23AbFvQSdFdOpFjWdSyHkJiVNv4uCJO42wS35F455ORNfyw1pBffg6t9ojlKRYwGtT1p90jiPGWhvlhXUW8NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d+FizXXU; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A61U6QZB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d+FizXXU"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753858371; x=1785394371;
+  t=1753859068; x=1785395068;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7OGyvNg7RATkxbxEUz2W1V8qPCkZTTFRPvx4rkkG0yo=;
-  b=A61U6QZBLpsAj81ChF5sPWV7UU9mxS4DNQXInrTl9Zz6mDlJI2y4YWbo
-   OzUJD8S3nH3cgACOACTa3cuHSniC+5ERi/9uEh7ztFz1LHFYl8rYUJfi/
-   ieJvhxOJT5ROitpan1td2sM5BSzoJO56vtxDP3qXBk95D3gyTx64SmAzT
-   yWAU3Md7nneb/ovBaGmWt9dLSFptIFPMrTIRHLWXWlx7oFML4MgMQC8bN
-   ppzXdljguomEqDngj7YP+TBj1Qd11NNb9za4m0y42S+sJiLEUiH7L1y2G
-   rBPzECFQLz2zCXIIoRQgVNYsQW4uFIJbxlnGxaR0hGJW1qLmMVJE5n7K1
-   A==;
-X-CSE-ConnectionGUID: 1+aWklvtSlmJaNCNSEcnyQ==
-X-CSE-MsgGUID: h6scArGvQYOSqoMWScu1qA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="56227441"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=hRRwxJjQE9wJHAhuatc6RMPSyGgs/xP53hoMSHC/2FU=;
+  b=d+FizXXUMwXt4JoZecJEYSTDfklMiN8MMtEkszEOlhIY5i7SHotKc2Wj
+   PpzTIR8FpbS96JQ7MOolvunHpUNeCs89NPFFYUO8cuc/SDGWqF5IOlNBr
+   3Yhg0XWQQx9xHSxXHACrEMsCJUr8nD1/WirBbvLF8DTLl6ATZVvugCwlZ
+   tjVWGS000pC7RBgINpKnTquuFYjMIy/uLZfjTiuTuDdbmUmILMP2rm6Ux
+   Eozdxz9hjSghUjyi6iHtIGZZwGapPhe7xpWslmbfhUURtsVwgTaGzMiCB
+   40/J3qgoU4exxAFdp+nNSgYrwT/P0Ids5ciaY65Gp63zKWOETqb7PkIBa
+   g==;
+X-CSE-ConnectionGUID: Z08Ji4LdRaaGB5oyJbaFeA==
+X-CSE-MsgGUID: PU045mxFSXuEaCZTaHbQpA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="56229394"
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="56227441"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2025 23:52:50 -0700
-X-CSE-ConnectionGUID: Hr79EHAhRQqjX7DKPUXkVA==
-X-CSE-MsgGUID: efddGYvwS96+x3Wq3Ik7ew==
+   d="scan'208";a="56229394"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:04:24 -0700
+X-CSE-ConnectionGUID: gxhRvuheTAG+uvZ6+T69iw==
+X-CSE-MsgGUID: kU6LqtksTKK5o0weRmGeTw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="200088693"
+   d="scan'208";a="167122521"
 Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa001.jf.intel.com with ESMTP; 29 Jul 2025 23:52:47 -0700
-Date: Wed, 30 Jul 2025 14:43:28 +0800
+  by orviesa003.jf.intel.com with ESMTP; 30 Jul 2025 00:04:21 -0700
+Date: Wed, 30 Jul 2025 14:55:02 +0800
 From: Xu Yilun <yilun.xu@linux.intel.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
 	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
@@ -57,57 +57,66 @@ Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
 Subject: Re: [RFC PATCH v1 06/38] iommufd: Add and option to request for bar
  mapping with IORESOURCE_EXCLUSIVE
-Message-ID: <aIm/EFCoGdNmhaou@yilunxu-OptiPlex-7050>
+Message-ID: <aInBxnVIu+lnkzlV@yilunxu-OptiPlex-7050>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
  <20250728135216.48084-7-aneesh.kumar@kernel.org>
+ <20250728140841.GA26511@ziepe.ca>
+ <yq5a34afbdtl.fsf@kernel.org>
+ <20250729142917.GF26511@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250728135216.48084-7-aneesh.kumar@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250729142917.GF26511@ziepe.ca>
 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 6328c3a05bcd..bee3cf3226e9 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1753,8 +1753,15 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
->  	 * we need to request the region and the barmap tracks that.
->  	 */
->  	if (!vdev->barmap[index]) {
-> -		ret = pci_request_selected_regions(pdev,
-> +
-> +		if (core_vdev->iommufd_device &&
-> +		    iommufd_device_need_exclusive_range(core_vdev->iommufd_device))
-> +			ret = pci_request_selected_regions_exclusive(pdev,
-> +							1 << index, "vfio-pci");
-> +		else
-> +			ret = pci_request_selected_regions(pdev,
->  						   1 << index, "vfio-pci");
-> +
->  		if (ret)
->  			return ret;
+On Tue, Jul 29, 2025 at 11:29:17AM -0300, Jason Gunthorpe wrote:
+> On Tue, Jul 29, 2025 at 01:58:54PM +0530, Aneesh Kumar K.V wrote:
+> > Jason Gunthorpe <jgg@ziepe.ca> writes:
+> > 
+> > > On Mon, Jul 28, 2025 at 07:21:43PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> > >> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> > >
+> > > Why would we need this?
+> > >
+> > > I can sort of understand why Intel would need it due to their issues
+> > > with MCE, but ARM shouldn't care either way, should it?
+> > >
+> > > But also why is it an iommufd option? That doesn't seem right..
+> > >
+> > > Jason
+> > 
+> > This is based on our previous discussion https://lore.kernel.org/all/20250606120919.GH19710@nvidia.com
+> 
+> I suggested a global option, this is a per-device option, and that
+> especially seems wrong for iommufd. If it is per-device that is vfio,
 
-I did't get the idea.
+I think this should be per-device. The original purpose of this
+pci_region_request_*() is to prevent further mmap/read/write against
+a vfio_cdev FD which would be used for private assignment. You shouldn't
+prevent all other devices from working with userspace APPs (e.g. DPDK)
+if there is one private assignment in system.
 
-The purpose of my original patch [1] is not to make VFIO choose between
-pci_request_regions_exclusive() or pci_request_regions(). It is mainly
-to prevent userspace mmap/read/write against a vfio_cdev FD. For
-example:
+> if it is global then vfio can pick it up during the early phases of
+> opening the device.
+> 
+> > IIUC, we intend to request the resource in exclusive mode for secure
+> > guests—regardless of whether the platform is Intel or ARM. Could you
+> > help clarify the MCE issue observed on Intel platforms in this context?
+> 
+> As I understand it Intel MCEs if the non-secure side ever reads from
+> secure'd address space. So there is alot of emphasis there to ensure
 
-  If pci_request_selected_regions() is succesfully executed on mmap(),
-  later TSM Bind would fail on its pci_request_regions_exclusive(). It
-  means userspace should not mmap otherwise you can't do private
-  assignment. Vice versa, if you've done TSM Bind, you cannot mmap
-  anymore.
-
-The _exclusive is just a bonus that further prevents "/dev/mem and the
-sysfs MMIO access"
-
-[1]: https://lore.kernel.org/all/20250529053513.1592088-20-yilun.xu@linux.intel.com/
+Yeah, Intel TDX doesn't have a lower access control table for CC. So if
+host reads, the TLP sends and MCE happens.
 
 Thanks,
 Yilun
+
+> there are no CPU mappings.
+> 
+> Jason
