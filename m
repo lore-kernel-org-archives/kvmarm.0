@@ -1,105 +1,396 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1E3DDC1;
-	Wed, 30 Jul 2025 13:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E5C2D8DBD;
+	Wed, 30 Jul 2025 13:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753880882; cv=none; b=uGTt0k93w/LYItR5IxP8/qoXBzvzz84i1nhEZ1PgEA1j2asE7/7EDN2IeF56yg09oCGi7r6PYp0rSi+awxlgs0Cw1iKItAlJ3VtCeuU6Ap9SY1ABbRR7W71oCnCmBMSbbacwK6MHbFVRSUVB3M6qwpf11T1kHv9Qfn+4PA8oB08=
+	t=1753883583; cv=none; b=B9juL3AB+h7/U3P/eVdnh0YEygz/Q13HkXnK6TvSTWmGSG4IBgHkio4Joht1Ek35j9SWrEnaz1Gqn0eki1SA5tHslE0caJJh//75O5fBpLuaDzoZNFdeAsf/CcVbHaXrB3+h+skBg1e6CO8zsaWf1Bbbyc9lTi2aiAbGHalXMmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753880882; c=relaxed/simple;
-	bh=pcptWvpGnZ0zEXWJBDt0MWQbVsZGKk578TFASBUhd5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DK7DgRYmPwZQ8sIM/lLB+5MHUh+coJeKeLFNyO7aLAHB5eY4kx2TjM3Hv6u5UYELqnIB5VKtdPjL9G/6vCTlcEdTtirwFwwL7FvwO9gBeZqTpN4pYITPnleN6itapuFDLn3uiJCu77+JXUG/GYiuqowc4jb+1hSN8WVAwwLPMkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DpcJM/S3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753883583; c=relaxed/simple;
+	bh=BAmHpzt4m8Wv2BX/UxN2/H8wSYy8eAJM1Q5ZEMU4sD8=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UI/Fz/b1jPBrrkrBJ4wFbCUc8aYR2+NekYHrWLugRPEedl5AqqoiPx9syWw3eKiD2I0zhiXBWNXFu/HEZhwFkzXMnhz6lE5WASjEGgdAm+MNCpqOE+JJzjOeKSVjT1WaRWF+J2PQiq4Ko3JK2Zd/ncoMN3iExinkTc/c1C4su7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kl8rDpUA; arc=none smtp.client-ip=119.8.177.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DpcJM/S3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64768C4CEE7;
-	Wed, 30 Jul 2025 13:08:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1753880882;
-	bh=pcptWvpGnZ0zEXWJBDt0MWQbVsZGKk578TFASBUhd5A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DpcJM/S3elZXvUohTZx6U84otLPd04tg6T+kNqTSjUWSV+OAaj6Kzwu+/klfkdoDS
-	 O8DeIC1aFKSuL7hhkTv189VYrWrGpLVXbnUXZWN1PWWBKS65ccLGbPNYIFhhqUisEi
-	 erVkIlidrLqiK6omApXBNwHSr8r5SAMR/p2IopAk=
-Date: Wed, 30 Jul 2025 15:07:58 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Dan Williams <dan.j.williams@intel.com>, linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
- device
-Message-ID: <2025073035-bulginess-rematch-b92e@gregkh>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kl8rDpUA"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Gc2QVYXne8v5Gr++1qUUckK9n0HJPpvU8JkrSwBdWJY=;
+	b=kl8rDpUAmErl49POLR1f51qhIzH8uaWx57folt5ziC+Yk0L9Vy+W+LgrcBqIeicr0in2V89e5
+	C0xhl98PNYVzJSJc5m/UIn4Qne6udShch5vpNQXVg0GOwo+Fjs3V391J73QzsM8t0t5GbQ4ERYo
+	ERvBUTHVGL99YlPj7Tlh4Y0=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.37])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4bsYXg5WS5z1P6lQ;
+	Wed, 30 Jul 2025 21:51:31 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bsYTL34dmz6HJcL;
+	Wed, 30 Jul 2025 21:48:38 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5ED311402EA;
+	Wed, 30 Jul 2025 21:52:51 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 30 Jul
+ 2025 15:52:50 +0200
+Date: Wed, 30 Jul 2025 14:52:48 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
+	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <aik@amd.com>,
+	<lukas@wunner.de>, Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun
+	<yilun.xu@linux.intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, "Suzuki K
+ Poulose" <Suzuki.Poulose@arm.com>, Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 14/38] coco: host: arm64: Device communication
+ support
+Message-ID: <20250730145248.000043be@huawei.com>
+In-Reply-To: <20250728135216.48084-15-aneesh.kumar@kernel.org>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-12-aneesh.kumar@kernel.org>
- <20250729181045.0000100b@huawei.com>
- <20250729231948.GJ26511@ziepe.ca>
- <yq5aqzxy9ij1.fsf@kernel.org>
- <20250730113827.000032b8@huawei.com>
- <20250730132333.00006fbf@huawei.com>
+	<20250728135216.48084-15-aneesh.kumar@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250730132333.00006fbf@huawei.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Wed, Jul 30, 2025 at 01:23:33PM +0100, Jonathan Cameron wrote:
-> On Wed, 30 Jul 2025 11:38:27 +0100
-> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+On Mon, 28 Jul 2025 19:21:51 +0530
+"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+
+> Add helpers for device communication from RMM
 > 
-> > On Wed, 30 Jul 2025 14:12:26 +0530
-> > "Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
-> > 
-> > > Jason Gunthorpe <jgg@ziepe.ca> writes:
-> > >   
-> > > > On Tue, Jul 29, 2025 at 06:10:45PM +0100, Jonathan Cameron wrote:
-> > > >    
-> > > >> > +static struct platform_device cca_host_dev = {    
-> > > >> Hmm. Greg is getting increasingly (and correctly in my view) grumpy with
-> > > >> platform devices being registered with no underlying resources etc as glue
-> > > >> layers.  Maybe some of that will come later.    
-> > > >
-> > > > Is faux_device a better choice? I admit to not knowing entirely what
-> > > > it is for..  
-> > 
-> > I'll go with a cautious yes to faux_device. This case of a glue device
-> > with no resources and no reason to be on a particular bus was definitely
-> > the intent but I'm not 100% sure without trying it that we don't run
-> > into any problems.
-> > 
-> > Not that many examples yet, but cpuidle-psci.c looks like a vaguely similar
-> > case to this one.  
-> > 
-> > All it really does is move the location of the device and
-> > smash together the device registration with probe/remove.
-> > That means the device disappears if probe() fails, which is cleaner
-> > in many ways than leaving a pointless stub behind.
-> > 
-> > Maybe it isn't appropriate it if is actually useful to rmmod/modprobe the
-> > driver. 
-> > 
-> > +CC Greg on basis I may have wrong end of the stick ;)
-> This time with at least one less typo in Greg's email address.
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  arch/arm64/include/asm/rmi_cmds.h        |  11 ++
+>  arch/arm64/include/asm/rmi_smc.h         |  49 ++++++
+>  drivers/virt/coco/arm-cca-host/arm-cca.c |  45 ++++++
+>  drivers/virt/coco/arm-cca-host/rmm-da.c  | 198 +++++++++++++++++++++++
+>  drivers/virt/coco/arm-cca-host/rmm-da.h  |  41 +++++
+>  5 files changed, 344 insertions(+)
+> 
 
-Yes, use faux_device if you need/want a struct device to represent
-something in the tree and it does NOT have any real platform resources
-behind it.  That's explicitly what it was designed for.
+>  #endif /* __ASM_RMI_CMDS_H */
+> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> index a84ed61e5001..8bece465b670 100644
+> --- a/arch/arm64/include/asm/rmi_smc.h
+> +++ b/arch/arm64/include/asm/rmi_smc.h
+> @@ -47,6 +47,7 @@
 
-thanks,
+>  
+> +#define RMI_DEV_COMM_EXIT_CACHE_REQ	BIT(0)
+> +#define RMI_DEV_COMM_EXIT_CACHE_RSP	BIT(1)
+> +#define RMI_DEV_COMM_EXIT_SEND		BIT(2)
+> +#define RMI_DEV_COMM_EXIT_WAIT		BIT(3)
+> +#define RMI_DEV_COMM_EXIT_MULTI		BIT(4)
+> +
+> +#define RMI_DEV_COMM_NONE	0
+> +#define RMI_DEV_COMM_RESPONSE	1
+> +#define RMI_DEV_COMM_ERROR	2
+> +
+> +#define RMI_PROTOCOL_SPDM		0
+> +#define RMI_PROTOCOL_SECURE_SPDM	1
+> +
+> +#define RMI_DEV_VCA			0
+> +#define RMI_DEV_CERTIFICATE		1
+> +#define RMI_DEV_MEASUREMENTS		2
+> +#define RMI_DEV_INTERFACE_REPORT	3
+> +
+> +struct rmi_dev_comm_enter {
+> +	u64 status;
+> +	u64 req_addr;
+> +	u64 resp_addr;
+> +	u64 resp_len;
+> +};
+> +
+> +struct rmi_dev_comm_exit {
+> +	u64 flags;
+> +	u64 cache_req_offset;
+> +	u64 cache_req_len;
+> +	u64 cache_rsp_offset;
+> +	u64 cache_rsp_len;
+> +	u64 cache_obj_id;
+> +	u64 protocol;
+> +	u64 req_len;
+> +	u64 timeout;
+In latest spec called rsp_timeout.
+Not sure we care that much but if no strong reason otherwise, should
+aim to match the spec text. (Maybe this got renamed?)
+> +};
 
-greg k-h
+> diff --git a/drivers/virt/coco/arm-cca-host/arm-cca.c b/drivers/virt/coco/arm-cca-host/arm-cca.c
+> index 84d97dd41191..294a6ef60d5f 100644
+> --- a/drivers/virt/coco/arm-cca-host/arm-cca.c
+> +++ b/drivers/virt/coco/arm-cca-host/arm-cca.c
+> @@ -85,6 +85,45 @@ static void cca_tsm_pci_remove(struct pci_tsm *tsm)
+>  	vfree(dsc_pf0);
+>  }
+>  
+> +static int init_dev_communication_buffers(struct cca_host_comm_data *comm_data)
+> +{
+> +	int ret = -ENOMEM;
+> +
+> +	comm_data->io_params = (struct rmi_dev_comm_data *)get_zeroed_page(GFP_KERNEL);
+
+Hmm. There isn't a DEFINE_FREE() yet for free_page().  Maybe time to add one.
+If we did then we'd use local variables until all allocations succeed then
+assign with no_free_ptr()
+
+
+> +	if (!comm_data->io_params)
+> +		goto err_out;
+> +
+> +	comm_data->resp_buff = (void *)__get_free_page(GFP_KERNEL);
+> +	if (!comm_data->resp_buff)
+> +		goto err_res_buff;
+> +
+> +	comm_data->req_buff = (void *)__get_free_page(GFP_KERNEL);
+> +	if (!comm_data->req_buff)
+> +		goto err_req_buff;
+> +
+> +
+> +	comm_data->io_params->enter.status = RMI_DEV_COMM_NONE;
+> +	comm_data->io_params->enter.resp_addr = virt_to_phys(comm_data->resp_buff);
+> +	comm_data->io_params->enter.req_addr  = virt_to_phys((void *)comm_data->req_buff);
+I think it's already a a void * and even if it were some other pointer type
+no cast would be necessary.
+
+> +	comm_data->io_params->enter.resp_len = 0;
+> +
+> +	return 0;
+> +
+> +err_req_buff:
+> +	free_page((unsigned long)comm_data->resp_buff);
+> +err_res_buff:
+> +	free_page((unsigned long)comm_data->io_params);
+> +err_out:
+> +	return ret;
+> +}
+> +
+
+> +
+>  /* per root port unique with multiple restrictions. For now global */
+>  static DECLARE_BITMAP(cca_stream_ids, MAX_STREAM_ID);
+>  
+> @@ -124,6 +163,7 @@ static int cca_tsm_connect(struct pci_dev *pdev)
+>  	rc = tsm_ide_stream_register(pdev, ide);
+>  	if (rc)
+>  		goto err_tsm;
+> +	init_dev_communication_buffers(&dsc_pf0->comm_data);
+>  	/*
+>  	 * Take a module reference so that we won't call unregister
+>  	 * without rme_unasign_device
+> @@ -133,6 +173,11 @@ static int cca_tsm_connect(struct pci_dev *pdev)
+>  		goto err_tsm;
+>  	}
+>  	rme_asign_device(pdev);
+	rme_assign_device() - I obviously missed this earlier!
+
+> +	/*
+> +	 * Schedule a work to fetch device certificate and setup IDE
+Single line comment probably fine here.  Though it perhaps doesn't add
+much over the function name.
+> +	 */
+> +	schedule_rme_ide_setup(pdev);
+> +
+>  	/*
+>  	 * Once ide is setup enable the stream at endpoint
+>  	 * Root port will be done by RMM
+> diff --git a/drivers/virt/coco/arm-cca-host/rmm-da.c b/drivers/virt/coco/arm-cca-host/rmm-da.c
+> index 426e530ac182..d123940ce82e 100644
+> --- a/drivers/virt/coco/arm-cca-host/rmm-da.c
+> +++ b/drivers/virt/coco/arm-cca-host/rmm-da.c
+> @@ -148,3 +148,201 @@ int rme_asign_device(struct pci_dev *pci_dev)
+>  err_out:
+>  	return ret;
+>  }
+> +
+> +static int doe_send_req_resp(struct pci_tsm *tsm)
+> +{
+> +	u8 protocol;
+> +	int ret, data_obj_type;
+> +	struct cca_host_comm_data *comm_data;
+> +	struct rmi_dev_comm_exit *io_exit;
+> +
+> +	comm_data = to_cca_comm_data(tsm->pdev);
+> +
+> +	io_exit = &comm_data->io_params->exit;
+> +	protocol = io_exit->protocol;
+
+For all these I'd combine with the declarations.
+
+> +
+> +	pr_debug("doe_req size:%lld doe_io_type=%d\n", io_exit->req_len, (int)protocol);
+> +
+> +	if (protocol == RMI_PROTOCOL_SPDM)
+> +		data_obj_type = PCI_DOE_PROTO_CMA;
+> +	else if (protocol == RMI_PROTOCOL_SECURE_SPDM)
+> +		data_obj_type = PCI_DOE_PROTO_SSESSION;
+> +	else
+> +		return -EINVAL;
+> +
+> +	ret = pci_tsm_doe_transfer(tsm->dsm_dev, data_obj_type,
+> +				   comm_data->req_buff, io_exit->req_len,
+> +				   comm_data->resp_buff, PAGE_SIZE);
+> +	pr_debug("doe returned:%d\n", ret);
+> +	return ret;
+> +}
+> +
+> +/* Parallel update for cca_dsc contents FIXME!! */
+> +static int __do_dev_communicate(int type, struct pci_tsm *tsm)
+> +{
+> +	int ret;
+> +	bool is_multi;
+> +	u8 *cache_buf;
+> +	int *cache_offset;
+> +	int nbytes, cache_remaining;
+> +	struct cca_host_dsc_pf0 *dsc_pf0;
+> +	struct rmi_dev_comm_exit *io_exit;
+> +	struct rmi_dev_comm_enter *io_enter;
+> +	struct cca_host_comm_data *comm_data;
+> +
+> +
+> +	comm_data = to_cca_comm_data(tsm->pdev);
+> +	io_enter = &comm_data->io_params->enter;
+> +	io_exit = &comm_data->io_params->exit;
+
+Might as well set these local variables as the declaration point
+above.  None of them will be very long lines.
+
+> +
+> +	dsc_pf0 = to_cca_dsc_pf0(tsm->dsm_dev);
+> +redo_communicate:
+> +	is_multi = false;
+> +
+> +	if (type == PDEV_COMMUNICATE)
+> +		ret = rmi_pdev_communicate(virt_to_phys(dsc_pf0->rmm_pdev),
+> +					   virt_to_phys(comm_data->io_params));
+> +	else
+> +		ret = RMI_ERROR_INPUT;
+
+I'd split this case out and return here farther than using the match below
+as it feels like the error message auto to be more specific. Something
+about type not matching.
+
+> +	if (ret != RMI_SUCCESS) {
+> +		pr_err("pdev communicate error\n");
+> +		return ret;
+> +	}
+> +
+> +	/* caching request from RMM */
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_RSP) {
+> +		switch (io_exit->cache_obj_id) {
+> +		case RMI_DEV_VCA:
+> +			cache_buf = dsc_pf0->vca.buf;
+> +			cache_offset = &dsc_pf0->vca.size;
+> +			cache_remaining = sizeof(dsc_pf0->vca.buf) - *cache_offset;
+> +			break;
+> +		case RMI_DEV_CERTIFICATE:
+> +			cache_buf = dsc_pf0->cert_chain.cache.buf;
+> +			cache_offset = &dsc_pf0->cert_chain.cache.size;
+> +			cache_remaining = sizeof(dsc_pf0->cert_chain.cache.buf) - *cache_offset;
+> +			break;
+> +		default:
+> +			/* FIXME!! depending on the DevComms status,
+> +			 * it might require to ABORT the communcation.
+> +			 */
+> +			return -EINVAL;
+> +		}
+> +
+> +		if (io_exit->cache_rsp_len > cache_remaining)
+> +			return -EINVAL;
+> +
+> +		memcpy(cache_buf + *cache_offset,
+> +		       (comm_data->resp_buff + io_exit->cache_rsp_offset), io_exit->cache_rsp_len);
+> +		*cache_offset += io_exit->cache_rsp_len;
+> +	}
+> +
+> +	/*
+> +	 * wait for last packet request from RMM.
+> +	 * We should not find this because our device communication in synchronous
+> +	 */
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_WAIT)
+> +		return -ENXIO;
+> +
+> +	is_multi = !!(io_exit->flags & RMI_DEV_COMM_EXIT_MULTI);
+
+!! doesn't add anything here that I can see over
+
+	is_multi = io_exit->flags & RMI_DEV_COMM_EXIT_MULTI;
+
+
+> +
+> +	/* next packet to send */
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_SEND) {
+> +		nbytes = doe_send_req_resp(tsm);
+> +		if (nbytes < 0) {
+> +			/* report error back to RMM */
+> +			io_enter->status = RMI_DEV_COMM_ERROR;
+> +		} else {
+> +			/* send response back to RMM */
+> +			io_enter->resp_len = nbytes;
+> +			io_enter->status = RMI_DEV_COMM_RESPONSE;
+> +		}
+> +	} else {
+> +		/* no data transmitted => no data received */
+> +		io_enter->resp_len = 0;
+> +	}
+> +
+> +	/* The call need to do multiple request/respnse */
+> +	if (is_multi)
+> +		goto redo_communicate;
+> +
+> +	return 0;
+> +}
+> +
+> +static int do_dev_communicate(int type, struct pci_tsm *tsm, int target_state)
+> +{
+> +	int ret;
+> +	unsigned long state;
+> +	unsigned long error_state;
+> +	struct cca_host_dsc_pf0 *dsc_pf0;
+> +	struct rmi_dev_comm_enter *io_enter;
+> +
+> +	dsc_pf0 = to_cca_dsc_pf0(tsm->dsm_dev);
+> +	io_enter = &dsc_pf0->comm_data.io_params->enter;
+> +	io_enter->resp_len = 0;
+> +	io_enter->status = RMI_DEV_COMM_NONE;
+> +
+> +	state = -1;
+> +	do {
+> +		ret = __do_dev_communicate(type, tsm);
+> +		if (ret != 0) {
+		if (ret)
+
+> +			pr_err("dev communication error\n");
+> +			break;
+
+I'd just return in error cases.
+
+> +		}
+> +
+> +		if (type == PDEV_COMMUNICATE) {
+> +			ret = rmi_pdev_get_state(virt_to_phys(dsc_pf0->rmm_pdev),
+> +						 &state);
+> +			error_state = RMI_PDEV_ERROR;
+> +		}
+> +		if (ret != 0) {
+> +			pr_err("Get dev state error\n");
+> +			break;
+> +		}
+> +	} while (state != target_state && state != error_state);
+> +
+> +	pr_info("dev_io_complete: status: %d state:%ld\n", ret, state);
+> +
+> +	return state;
+> +}
+
