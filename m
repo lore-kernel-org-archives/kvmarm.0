@@ -1,240 +1,173 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D34781732
-	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 06:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753855549; cv=fail; b=WD9htu3qlpKEir1akiCrxyHZXI2ES+Ib4Y+D11dHF2jRyBKH8DU+hLe6nAhSGY2miDAPp8c7GzEH+pMgcqp6tD+ENPpRrjRWd0TF7aLAInw6YWRIu6MA1AKdpYV6Wa3m5Y3peV0QGc27d30kysmToTFtNJhV6IOHclyKYDaw20E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753855549; c=relaxed/simple;
-	bh=ocOIb2jfPEWez1FX8dGyoBRIlGQxhm/O/p390wsEWs0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Q3MBTG8595RohPZAdULDhFZXUT8YkuFNd3nWTDDmKQX8tSiXqD3kvmUEXOZByuXNNleCuQ2/Dvae1IdGevnch5TgV0OWMpFy9iZro+aPPtDC1BmUjQkcYYa1+20QXrEKmtvWMd+NOLpm5CY+L4PMY5w/ylnfFqvoatuXFGEv8ps=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dtGeGZ3c; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18D51F78E0
+	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 06:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753857911; cv=none; b=urVXCWYiKMQ7xP+fkH3BAylVSKmCtUFciWxC4eMzb5HFrtyYv0b31JYQcyRrmz3A9bVeZAdPV7EIHxMte7wiuqFuj06Imb8kgGOjNe7R3w4DZvN3sD84VoyrC/cCAFrBL2NtrIIQhlIOYduhxxMo/Jcv3oM/3EbOAuHIxt/zi44=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753857911; c=relaxed/simple;
+	bh=jNVURA18k9N/tg357HCFv05U9rIUf2FI6eipsrsVGnw=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=BGBS/MEBcf7447W0sYKFgrINeOKviOZzv4VFljVjl9R4ol6tFKwpYiAz730wkVEvvo8tXgfrNFCZvINFYGagedc/M+OHDNM3CAziX+k+nWbgGf6TBxxQDZTF438XGOFgnvEADL414jtZltd5KJlxQVr7cT75d6gRDMxG67EY37E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LZterDdR; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dtGeGZ3c"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753855547; x=1785391547;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=ocOIb2jfPEWez1FX8dGyoBRIlGQxhm/O/p390wsEWs0=;
-  b=dtGeGZ3ceHqKwb2SbIyPx1mnzb7cfkRU1FCLvhR2qPa8I4sVpChvWiO7
-   TdW0AugcMHXGUdhsDQa0Oga6T98CHeHZ0EFnGUAYs277XqUjyqcbjPWqo
-   oHhpWurAV74h9JLzd9+EeSmVYh2SYRBxrd/aCv9qDqFU8v93Zv2o8Htpz
-   s70swCs19ViYjKwp+woGP9Eb2g8bBseN6vf7YkbMWYXlyFlA30nBSF8A9
-   UranXRFls4D7ALlkybfSwxXUfOzAdU1Ob0Hfz8Lsku8+4Ob5tFV7t1ajt
-   gEQALQADLBStaiPDEXUB7+WwmWs98ObmXhwxazPAvnEp5hs0gwvvlQxvk
-   g==;
-X-CSE-ConnectionGUID: 0xK45rUiTtmOR2YEC4GnQg==
-X-CSE-MsgGUID: vwbm8XvNQWyETvmm0q0Y7A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="43747865"
-X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="43747865"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2025 23:04:57 -0700
-X-CSE-ConnectionGUID: beWNylJQTbq8TO8MV92NJg==
-X-CSE-MsgGUID: CC7ZEvAmQLOQDak/YOmPBg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="167080689"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2025 23:04:56 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Tue, 29 Jul 2025 23:04:56 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Tue, 29 Jul 2025 23:04:56 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.89)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Tue, 29 Jul 2025 23:04:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yCz0uf97KVEl3d9cwyCouKkmYP/Jy3jA8kzg5HjR6V8udn9CG3Z/PO+DN96Ft+8jg6qg8t/s1X+5RX/3FJa92daQLMwNv/3XwQ71So3LPnqSVohZGkLphBZqN1Mrc9JoGkVUMynN8iZFd395LMJfmUZ6tlgF8Cj5FqnTU4M68j5rGK445qGEY9B+2CPX1AMC2f8AOXp+UFex6OBGkA+mAa7tMV5OawBSunESF8tnX086zFtBC9zaqWxQsK66B3c1Zx3f4i3aq6O+e9A5TabShkWQCYae1xHbU5kFzpyQznxAG7kv9nMCKjX4+bw1nxGxyKlvVSD1i0lMjYIw7/Np1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7qHOxrxNXm3HOZNN7/UCyNwtfbt5iz+ZDyawY2+bGFk=;
- b=Ea8uRvtpW09+XW/j9e/CIlX96AQ1tAM4qXMQkBNv+VBqFt5ZWexhKGcXzCPoRi44CDLSgSZZ6TeekMCbx+fBQLPlVY7+6BuICy8MCcoi6WBbaqjPHomH+ldpnkdkGZxH0zxubgcywDxaUFsP7bggTQ0VzO6QFYF3LmO+IP2aszKiNgBxUeHXIy5WSW2Ye3AJdZ6ynXy717UMQzR65STxD8vZQ1yMu1bE0HVupWaS4lHbrcgPYNiHtG0d3hu4xw5Dh0i2d29Uo9Kklb+uoBuWL0yFVqW5b7i7DbiXNKqU1q8u2zZdL6wC/bAKRyqE/CBXnWVu13wxZfNRPS3pavtplg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- PH7PR11MB6426.namprd11.prod.outlook.com (2603:10b6:510:1f6::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.27; Wed, 30 Jul
- 2025 06:04:46 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%7]) with mapi id 15.20.8989.010; Wed, 30 Jul 2025
- 06:04:46 +0000
-Date: Wed, 30 Jul 2025 14:04:13 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-CC: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Adrian Hunter
-	<adrian.hunter@intel.com>, Vishal Annapurve <vannapurve@google.com>, "Rick
- Edgecombe" <rick.p.edgecombe@intel.com>, Nikolay Borisov
-	<nik.borisov@suse.com>
-Subject: Re: [PATCH 2/5] KVM: TDX: Exit with MEMORY_FAULT on unexpected
- pending S-EPT Violation
-Message-ID: <aIm13dDJf4/jGxKv@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20250729193341.621487-1-seanjc@google.com>
- <20250729193341.621487-3-seanjc@google.com>
- <1b0ea352-c645-461b-9e19-5202791f8e2d@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1b0ea352-c645-461b-9e19-5202791f8e2d@intel.com>
-X-ClientProxiedBy: SI2P153CA0021.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::20) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LZterDdR"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753857905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JrAp38vK4enw6Q0yIyw2K+Bi1i0jWc5saQVy5NUb5F0=;
+	b=LZterDdRiOvHbh/nLmIL5GfVuVYwA8QXiL5o0QXO6h5a8yuZ+GbL6puDQNHNuL60cYnHcq
+	EVfc7saOzBKUhHbeBNUWbiQT7X4nNlj5L0DV23xUtRlUUEqE0VaF+cEmwX8W4Y1IVf5Zrm
+	P6du/rUlCp4LaNKlmtTHeJ7m3wunkww=
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB6426:EE_
-X-MS-Office365-Filtering-Correlation-Id: a9a25ea9-3dd7-41c9-6df6-08ddcf2efc56
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?l90mjnPdjScvXt64dWx076+xpuYPX2SCVq3zqfvFM8XaVY/S3k7EuOe3ljSu?=
- =?us-ascii?Q?vasHYCRfDTHuY4vWyQIZZIsUvZjfIT0pI5r/wkzSYGV+9p3LKnsD1Gol0OlY?=
- =?us-ascii?Q?1+6zElXyC8xxxMghXKAu1cxy5sBAy67lUPiC61KP+MLpJ4Ypjv6Ja1ElWwht?=
- =?us-ascii?Q?gtAJlxwcCWmx/XRN61UuuHHUF71rZD2zUl5m2mG0fEHi+IyEfLVEhJ45jalO?=
- =?us-ascii?Q?LnRIhdh7xS2t3gF6CGtUad3tjXOR7yB//syVapxHFlVDlKpy8BAWcyuHeX8m?=
- =?us-ascii?Q?2axFZpaRKdQe8YuF3pSeL47IR52MP7Qb31Y69Hk9ODbx3bw3jdmkxC3CcM41?=
- =?us-ascii?Q?u55/omMl4klXDjrmXKa5U9VSyT3S6G8X/auZDN8jt7JlSIRznHNGok5iw41V?=
- =?us-ascii?Q?UvduLiKCO2YQC3rqHB35uIjGMozZe9tqJnwFdNy04XRxtsd5CkTbhmXPzc3d?=
- =?us-ascii?Q?3hCOu9cWbleTVXhU9K7pF0+r+5UHgOhzzn41vtgbNm6JvMJELSU1OwBXsVoq?=
- =?us-ascii?Q?xE+9QGF/gRu1FwUymIJrDAsYAYcVmMPMX3V5Aa9rygqSwXNBVhvmcWCnL6Fl?=
- =?us-ascii?Q?WYX67hWVAspoarMM2fPL/Q+buokk1GbYaeXr2ITCi+6EEG0kGnb8/LHbCkB3?=
- =?us-ascii?Q?7xwkCZ6qLIodmhOCcQi1yYyahXoh40nOeaHh/Bv5g1I5fCc/3BLrkMGbpn0n?=
- =?us-ascii?Q?Ty5TKswSqmHRXXZoOvTnYDlBE2ONe9yZroCccmgnvGniLSpjOlMA98WY42mC?=
- =?us-ascii?Q?M+mgpbOMm0iyhgOQymOnxIM7F7JRDz5mm/XmOH9S9e5KA7nP2CTqi/ESSZbf?=
- =?us-ascii?Q?lX0NwmKkqt/7szzkECejnJnGxCVzTDDqu6Su/DZUNlt4ojVSREcSaXH9+4io?=
- =?us-ascii?Q?72ItQm9/NHkZif1Gr96esqzgeiPZKCE1dvKzdKtX/C4Ipo/KGhXyWRAoNXyJ?=
- =?us-ascii?Q?eQWMcACX+CYgx+kUjA19n1Rxv3086+bSXJfL/3DJcBbebden9kYZhAAymtZl?=
- =?us-ascii?Q?lPYXKEBi0bbdMc2iX9Y5Yk8gpwOzGrtavqh+KmNyhdflLeI0vp4jN4bQ8Onr?=
- =?us-ascii?Q?g4POZBYE+11jFzWY893bSGP2jI+cwSlXV3JgJm/SbY27lCJwQy3c7cpJwTAG?=
- =?us-ascii?Q?9BekcOPno5hBbPLBqcu7+ArD0kcILPvnFh/EwhEeAxzFNbHyXvm/V/8VEP0z?=
- =?us-ascii?Q?d3q0NBewLJfna4JMcxBqgouob/VE7LaL4UWMj5JbGTgY5/bRlj9udqa6grj7?=
- =?us-ascii?Q?J4aEpt4y7X2WnmNnLdafAohSiCAUGMHIUKOe1sgPe8P1aQxD4a4LUbJlzM91?=
- =?us-ascii?Q?Fh7WjM3zemmdBNSr2lQuNk/USiVg5k8gDqovvKlj2IyBluQDv7az/UdVmLOB?=
- =?us-ascii?Q?gd5t33tUaEuBFzK8GhreylBvwBAaR2B5ChpDYqFTG/rYBIO74r9DNqvxbJVF?=
- =?us-ascii?Q?XozscQxDsb8=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qeH5KUlGpEKoahCkSh5LX/ucya3f7dpoAz+w6SE6C3Ks8M/FBnqwap5Ds7c+?=
- =?us-ascii?Q?UFJBXa233TDYzqHZ4ZlZKndnPDXhwoKicokhxCi8bDO7Zqtbtw39iZmGA/1c?=
- =?us-ascii?Q?T/1azY5NV6ckmb1EN6jGM3p6Ky7257KtiozmAjoRSlz1n4iZnvOSy7hFTZJJ?=
- =?us-ascii?Q?be0ui5bXQUfK1MZFnoqAq1MwnzwrBmTj/I+88IxVnbUb3Og1oTKbLVlc+Zcr?=
- =?us-ascii?Q?lxiHt4ic9fjEE6lAtJyQsdOSuYiPmGLtmvT0mrSXU2XJB+BJ7xzcEmITD96I?=
- =?us-ascii?Q?G2NS7aYQfj5wX9p8jeWuhq4m1sGmED0NdQRH/h6oylJK132niQTYPhvglWIP?=
- =?us-ascii?Q?BUOmw1JZOgLHD7ymS9pIkTKtWe+uWgb8+TVxrB107/MvYWRn/mvRphAevu4t?=
- =?us-ascii?Q?bmZ7YAdS/0rezXjBRa8KMarGJl51pATqhQY4ORpK3RZ/BwFd4aAOayP60dkg?=
- =?us-ascii?Q?Gj7ia/ozsJdWgaXqwYGRF5mcG4LZm2uhnZK/9Aq0agbyFjYOS+abASYi1RrQ?=
- =?us-ascii?Q?kxG86hKAotjwjcVeHu2RDDpkbhC6CmtKQ2jEymNof39rWWs50EM5R7Arkhv4?=
- =?us-ascii?Q?chKKH3GhPnzE+VAP1nIXbtDLfBA8f867z6IMMOulcVldtPpwmuUntFiCfnPu?=
- =?us-ascii?Q?ah/UD+TBUDzIy9lPvHf+Q/ij9n1bpNc5qR7ES9SN+l9dxVv5FcyHirpQtKL8?=
- =?us-ascii?Q?lWQ5TbHvXaAwCZQIQGVbRGhWGOaniJkVdeFT94Fygu2R2SpYtRBTnIfKH+ou?=
- =?us-ascii?Q?aLlzzNvpRklrTGHbcUSpn+tp++TCYj0Ye6JOvxlJPajSG4MM2+8ToT4Pdx+j?=
- =?us-ascii?Q?7noeJcsSZ8OaxFAtT7fekugYYYs27lESKrF2zobLML+ExmY8WTrT6iNxPPRv?=
- =?us-ascii?Q?T+omcocstFnu76y+v4BKvjAwAIewLjiEOiau9u1zEDSX6C501I0Wqd5wXpwi?=
- =?us-ascii?Q?2S9L5kgWxLr0doH601Hi5X2Tqo7SRBHS7kZTpk140lIYUnmY8nDet5Zzc+Sm?=
- =?us-ascii?Q?WF8kPsSAo8VghXATuiIFSkbzf/QTnV7+jwu7f7LaIT5tw/06dCDmrBfceyEr?=
- =?us-ascii?Q?sJIqdcm8Db8AfuNBRjCazsgqyuWlXFOgB/a5YM0jfHXu/QB/q+Q31xgNA7/h?=
- =?us-ascii?Q?pY8Sb5wdLT1V5oSYeh564WaL91zGIakhCcI2BZlazKFgrsbrwcPkKxkJlSOG?=
- =?us-ascii?Q?OHJc9kPhN53kfcMYb7ZrZvOCMdxGAWGVemcPTBKr7c3MLgkZBJaIHSwXxEWS?=
- =?us-ascii?Q?jjiDoD5V8LjE1p9soInTuKL+E+5yj8F2Ve/QW+5/HBNNP/0w62rZtE/tK8WS?=
- =?us-ascii?Q?hqZdSWn7PU0v4x6WjXzujRfKSCJGuu2VrwS0Cr3aq93KnmgNydcufVyEyKUw?=
- =?us-ascii?Q?9426Tl59amTk0gWVpz9CtLBmhmVc7fLFNt4Ox1d854ltdZkY/k908kt09kl7?=
- =?us-ascii?Q?8frvDhsl+oGWYjnlmEc7OkNjY+VSgyTb3wUU9fppuKuiXg0sBX0/sT8Cz+/d?=
- =?us-ascii?Q?lcTtl76H361MMcQezpgk32jXGy+3kdhmjLpbEtAyf6shSM+o7+S2FS3bcUDJ?=
- =?us-ascii?Q?BCNbwEyLdLof1crgJe2Jz6QDR/pQ4RKCNcYG41VM?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9a25ea9-3dd7-41c9-6df6-08ddcf2efc56
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jul 2025 06:04:46.6802
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9uegpWwz7azO8M/J9jsn9EU/cCyhppMoY5cNKGF5Vgj/oifaRDNwjCy1eWXmX5S6rHh9O9woanatvBBJvqAc1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6426
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: KVM selftest for L2 guest execution fails  
+Message-Id: <C37BCE4D-0958-4C74-BEFC-F3A7A689A848@linux.dev>
+Date: Wed, 30 Jul 2025 15:44:48 +0900
+To: kvmarm@lists.linux.dev
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 30, 2025 at 10:07:36AM +0800, Xiaoyao Li wrote:
-> On 7/30/2025 3:33 AM, Sean Christopherson wrote:
-> > Exit to userspace with -EFAULT and a valid MEMORY_FAULT exit if a vCPU
-> > hits an unexpected pending S-EPT Violation instead of marking the VM dead.
-> > While it's unlikely the VM can continue on, whether or not to terminate
-> > the VM is not KVM's decision to make.
-> > 
-> > Set memory_fault.size to zero to communicate to userspace that reported
-> > fault is "bad", and to effectively terminate the VM if userspace blindly
-> > treats the exit as a conversion attempt (KVM_SET_MEMORY_ATTRIBUTES will
-> > fail with -EINVAL if the size is zero).
-> 
-> This sets a special contract on size zero.
-+1.
+Hi,
+My small kvm sefltest tested on the kvmarm/next with NV2+VHE on FVP =
+fails:
 
-Or would it be good to use pr_warn_once() to indicate that the VM termination
-reason is "Guest access before accepting" if a new exit type is not specified?
+# ./arm64/test5
+Random seed: 0x6b8b4567
+=3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+  lib/kvm_util.c:1746: !ret
+  pid=3D257 tid=3D257 errno=3D11 - Resource temporarily unavailable
+sh: line 1: addr2line: command not found
+  KVM_RUN failed, rc: -1 errno: 11 (Resource temporarily unavailable)
 
-This info is straightforward and helpful in cases when a TD is accidentally
-killed.
+Below is the test code, am I doing still wrong?
 
-> I had a patch internally, which introduce a new exit type:
-> 
-> +               /* KVM_EXIT_GUEST_ERROR */
-> +               struct {
-> +  #define KVM_GUEST_ERROR_TDX_ACCESS_PENDING_PAGE      0
-> +                       __u32 error_type;
-> +                       __u32 ndata;
-> +                       __u64 data[16];
-> +               } guest_error;
-> 
-> how about it?
-> 
-> > Opportunistically delete the pr_warn(), which could be abused to spam the
-> > kernel log, and is largely useless outside of interact debug as it doesn't
-> > specify which VM encountered a failure.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/vmx/tdx.c | 6 ++----
-> >   1 file changed, 2 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 3e0d4edee849..c2ef03f39c32 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -1937,10 +1937,8 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
-> >   	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa)) {
-> >   		if (tdx_is_sept_violation_unexpected_pending(vcpu)) {
-> > -			pr_warn("Guest access before accepting 0x%llx on vCPU %d\n",
-> > -				gpa, vcpu->vcpu_id);
-> > -			kvm_vm_dead(vcpu->kvm);
-> > -			return -EIO;
-> > +			kvm_prepare_memory_fault_exit(vcpu, gpa, 0, true, false, true);
-> > +			return -EFAULT;
-> >   		}
-> >   		/*
-> >   		 * Always treat SEPT violations as write faults.  Ignore the
-> 
-> 
+Thanks,
+Itaru.
+
+ // SPDX-License-Identifier: GPL-2.0-only
+
+#include "test_util.h"
+#include "kvm_util.h"
+#include "processor.h"
+#include "ucall.h"
+
+#define GUEST_SYNC_VAL 0x1234
+#define UCALL_GPA 0x500000
+
+static void l1_guest_code(void)
+{
+        /*
+        * Set up HCR_EL2 to enable virtualization and nested support:
+        *   - HCR_EL2.VM  =3D 1 (enable stage-2 translation)
+        *   - HCR_EL2.NV  =3D 1 (trap to EL2 on guest HVC, SMC, WFI, =
+etc.)
+        *   - HCR_EL2.TGE =3D 1 (trap general exceptions in EL1 to EL2)
+        */
+       uint64_t hcr =3D (1UL << 0)   |  // VM
+                      (1UL << 27)  |  // TGE
+                      (1UL << 31);    // NV
+
+       uint64_t spsr =3D 0x3c5;  // EL1h, AArch64, interrupts masked
+       uint64_t l2_pc =3D 0x500000;     // L2 guest entry address
+       uint64_t l2_sp =3D 0x510000;     // L2 guest stack
+
+       __asm__ volatile(
+               // Set up EL2 to EL1 return
+               "msr hcr_el2, %[hcr]\n"
+               "msr elr_el2, %[el1_pc]\n"
+               "msr spsr_el2, %[spsr]\n"
+               "mov sp, %[el1_sp]\n"
+               "eret\n"
+               :
+               : [hcr] "r"(hcr),
+                 [el1_pc] "r"(l2_pc),
+                 [spsr] "r"(spsr),
+                 [el1_sp] "r"(l2_sp)
+               : "memory"
+       );
+}
+
+static void l2_guest(void)
+{
+        asm volatile(
+                "mov x0, #0x2a\n\t"
+                "mov x1, %[ucall_sync]\n\t"
+                "hvc #0\n\t"
+                :
+                : [ucall_sync] "i"(UCALL_SYNC)
+                : "x0", "x1"
+        );
+}
+
+static void guest_code()
+{
+       GUEST_SYNC(42);
+}
+
+int main(void)
+{
+        struct kvm_vm *vm;
+        struct kvm_vcpu *vcpu;
+        struct kvm_vcpu_init init =3D {};
+        u64 feat =3D 0;
+
+        /* NV2 must be supported or we skip */
+        if (!kvm_check_cap(KVM_CAP_ARM_EL2))
+                exit(KSFT_SKIP);
+
+        feat |=3D BIT(KVM_ARM_VCPU_HAS_EL2); // Ask for virtual EL2
+
+        vm =3D vm_create(1);
+
+        vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+        init.features[0] =3D feat;
+
+        vcpu =3D aarch64_vcpu_add(vm, 0, &init, l1_guest_code);
+
+        // Backing memory for ucalls
+        virt_pg_map(vm, UCALL_GPA, UCALL_GPA);
+        ucall_init(vm, UCALL_GPA);
+
+#define L2_MEM_START  0x500000
+#define L2_MEM_SIZE   0x20000  // 128KB is enough
+
+        vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, =
+L2_MEM_START, 12, L2_MEM_SIZE / vm->page_size, KVM_MEM_LOG_DIRTY_PAGES);
+        virt_pg_map(vm, 0x500000, 0x500000); // L2 code
+        virt_pg_map(vm, 0x510000, 0x510000); // L2 stack
+        memcpy(addr_gpa2hva(vm, 0x500000), l2_guest, vm->page_size);
+
+        vcpu_run(vcpu);
+
+        printf("vcpu_run exited: reason =3D %u\n", =
+vcpu->run->exit_reason);
+
+        struct ucall uc;
+        switch (get_ucall(vcpu, &uc)) {
+                case UCALL_SYNC:
+                printf("Guest sync: val =3D 0x%lx\n", uc.args[1]);
+                break;
+                case UCALL_DONE:
+                printf("Guest done\n");
+                break;
+                default:
+                TEST_FAIL("Unknown ucall %lu\n", uc.cmd);
+        }
+
+        return 0;
+
+}=
