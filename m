@@ -1,122 +1,269 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23CE71F1317;
-	Wed, 30 Jul 2025 07:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6155C1DE8A8
+	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 07:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753859069; cv=none; b=ge7Hy+5VThIl0E/gLVtE66jguUtO/vW1Zs60BVjucpCzRNx+YDXXxWh8YIGbVY1OamMy8tCSQis3KndDKLuQ0fXdCOl/2mVZup392u4p+R806tqHcg+zDKDDQl8HWkqk3n606bOVaB9DwbeGPojzrPlufvd510MWGTAzZjHx2Wo=
+	t=1753860842; cv=none; b=P2OjOwDaiW00xMpYqvqBAw5LF3eYPMffIn1OqNn9goxJ0e5XH8/QeiQubuhYIZnVgtN2SS3LkrxwlNVjgGXIKdTvppr+ljhIPa1U3fnht1Dx3hkxnV9Ukdj6qzxbE/lYMdlrmbodbZZguosUasVHLE/DYLncllxwhb5RwvJUOvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753859069; c=relaxed/simple;
-	bh=hRRwxJjQE9wJHAhuatc6RMPSyGgs/xP53hoMSHC/2FU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=npO+xs0uamom6kz8omSeqBaPWlP3RFOn5sCAWZ/ZBjtiPBx2pGC1H63amckPeLldchdI1aeHsSwl9z4+HSvEBB23AbFvQSdFdOpFjWdSyHkJiVNv4uCJO42wS35F455ORNfyw1pBffg6t9ojlKRYwGtT1p90jiPGWhvlhXUW8NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d+FizXXU; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1753860842; c=relaxed/simple;
+	bh=2RgN0j+ENwauyGI9Svu9rEjlit08q6gOS10LSTOfkCM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fnMetgAmf95OCHzTrRsj+kjxtBbr3JziQcZQTy03LrOa2Kk+0+X0Q/jtnmTipMHTopgp9/kacb2nXUHGCLvU84fLZvRnZvCUOvrjGzngj0XYKj+9XaEb3zf0W/m/Cyl82hi9yb0JDAeUfHzIiBDRnqQ8aEzXqA7PTtnRVAjDqAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lPxWuQMt; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d+FizXXU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lPxWuQMt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753859068; x=1785395068;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=hRRwxJjQE9wJHAhuatc6RMPSyGgs/xP53hoMSHC/2FU=;
-  b=d+FizXXUMwXt4JoZecJEYSTDfklMiN8MMtEkszEOlhIY5i7SHotKc2Wj
-   PpzTIR8FpbS96JQ7MOolvunHpUNeCs89NPFFYUO8cuc/SDGWqF5IOlNBr
-   3Yhg0XWQQx9xHSxXHACrEMsCJUr8nD1/WirBbvLF8DTLl6ATZVvugCwlZ
-   tjVWGS000pC7RBgINpKnTquuFYjMIy/uLZfjTiuTuDdbmUmILMP2rm6Ux
-   Eozdxz9hjSghUjyi6iHtIGZZwGapPhe7xpWslmbfhUURtsVwgTaGzMiCB
-   40/J3qgoU4exxAFdp+nNSgYrwT/P0Ids5ciaY65Gp63zKWOETqb7PkIBa
-   g==;
-X-CSE-ConnectionGUID: Z08Ji4LdRaaGB5oyJbaFeA==
-X-CSE-MsgGUID: PU045mxFSXuEaCZTaHbQpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="56229394"
+  t=1753860841; x=1785396841;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2RgN0j+ENwauyGI9Svu9rEjlit08q6gOS10LSTOfkCM=;
+  b=lPxWuQMt/s10ym5f0bQaeubszvlX0gYS6Fb/DSPSzrZCoGql5qNxR5UN
+   qi8egKMVb+OFsI15dFx+nMuRG1/QEKb7rNRz38H0PuibmgCalntQyB4JJ
+   MMd1FlF1lhq/98y1Um0yHgrkZ55ccG7vqy4E2Rx+FqW9ZI23Kl7L2tPGp
+   yAVP6OMDd7O3jurz+OpVsIOr1k7o3ufA0Qh2Q33xZaWQVH3eZ1sHCDxij
+   H5NdXBX0z33M0m+POtqu+NA9fryRPdG5aZ2wsWTMSmX6tdEj82zLjAPZ/
+   BHAAHgQ7kAeZN51OUKjvLkPJd0qO3laR/x4wu9Smn6E4zyUfUkVcJbSIa
+   Q==;
+X-CSE-ConnectionGUID: 8UqDvGguSX+7SCMvgtAX9Q==
+X-CSE-MsgGUID: Y/2+VTFaQ/ad+CMoX+q8SA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="56240674"
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="56229394"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:04:24 -0700
-X-CSE-ConnectionGUID: gxhRvuheTAG+uvZ6+T69iw==
-X-CSE-MsgGUID: kU6LqtksTKK5o0weRmGeTw==
+   d="scan'208";a="56240674"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:34:00 -0700
+X-CSE-ConnectionGUID: H09GH9DDRK6iwMUT5DFTZA==
+X-CSE-MsgGUID: 9J0CZfBtR+i2FENGg5ZkzQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="167122521"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa003.jf.intel.com with ESMTP; 30 Jul 2025 00:04:21 -0700
-Date: Wed, 30 Jul 2025 14:55:02 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 06/38] iommufd: Add and option to request for bar
- mapping with IORESOURCE_EXCLUSIVE
-Message-ID: <aInBxnVIu+lnkzlV@yilunxu-OptiPlex-7050>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-7-aneesh.kumar@kernel.org>
- <20250728140841.GA26511@ziepe.ca>
- <yq5a34afbdtl.fsf@kernel.org>
- <20250729142917.GF26511@ziepe.ca>
+   d="scan'208";a="162636483"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:33:54 -0700
+Message-ID: <e67b0825-abcb-4bac-bc3c-2e8b513f1d57@intel.com>
+Date: Wed, 30 Jul 2025 15:33:51 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250729142917.GF26511@ziepe.ca>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 14/24] KVM: x86/mmu: Enforce guest_memfd's max order
+ when recovering hugepages
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Ira Weiny <ira.weiny@intel.com>, Gavin Shan <gshan@redhat.com>,
+ Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>,
+ David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>,
+ James Houghton <jthoughton@google.com>
+References: <20250729225455.670324-1-seanjc@google.com>
+ <20250729225455.670324-15-seanjc@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250729225455.670324-15-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 29, 2025 at 11:29:17AM -0300, Jason Gunthorpe wrote:
-> On Tue, Jul 29, 2025 at 01:58:54PM +0530, Aneesh Kumar K.V wrote:
-> > Jason Gunthorpe <jgg@ziepe.ca> writes:
-> > 
-> > > On Mon, Jul 28, 2025 at 07:21:43PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> > >> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-> > >
-> > > Why would we need this?
-> > >
-> > > I can sort of understand why Intel would need it due to their issues
-> > > with MCE, but ARM shouldn't care either way, should it?
-> > >
-> > > But also why is it an iommufd option? That doesn't seem right..
-> > >
-> > > Jason
-> > 
-> > This is based on our previous discussion https://lore.kernel.org/all/20250606120919.GH19710@nvidia.com
+On 7/30/2025 6:54 AM, Sean Christopherson wrote:
+> Rework kvm_mmu_max_mapping_level() to provide the plumbing to consult
+> guest_memfd (and relevant vendor code) when recovering hugepages, e.g.
+> after disabling live migration.  The flaw has existed since guest_memfd was
+> originally added, but has gone unnoticed due to lack of guest_memfd support
+> for hugepages or dirty logging.
 > 
-> I suggested a global option, this is a per-device option, and that
-> especially seems wrong for iommufd. If it is per-device that is vfio,
-
-I think this should be per-device. The original purpose of this
-pci_region_request_*() is to prevent further mmap/read/write against
-a vfio_cdev FD which would be used for private assignment. You shouldn't
-prevent all other devices from working with userspace APPs (e.g. DPDK)
-if there is one private assignment in system.
-
-> if it is global then vfio can pick it up during the early phases of
-> opening the device.
+> Don't actually call into guest_memfd at this time, as it's unclear as to
+> what the API should be.  Ideally, KVM would simply use kvm_gmem_get_pfn(),
+> but invoking kvm_gmem_get_pfn() would lead to sleeping in atomic context
+> if guest_memfd needed to allocate memory (mmu_lock is held).  Luckily,
+> the path isn't actually reachable, so just add a TODO and WARN to ensure
+> the functionality is added alongisde guest_memfd hugepage support, and
+> punt the guest_memfd API design question to the future.
 > 
-> > IIUC, we intend to request the resource in exclusive mode for secure
-> > guests—regardless of whether the platform is Intel or ARM. Could you
-> > help clarify the MCE issue observed on Intel platforms in this context?
+> Note, calling kvm_mem_is_private() in the non-fault path is safe, so long
+> as mmu_lock is held, as hugepage recovery operates on shadow-present SPTEs,
+> i.e. calling kvm_mmu_max_mapping_level() with @fault=NULL is mutually
+> exclusive with kvm_vm_set_mem_attributes() changing the PRIVATE attribute
+> of the gfn.
 > 
-> As I understand it Intel MCEs if the non-secure side ever reads from
-> secure'd address space. So there is alot of emphasis there to ensure
-
-Yeah, Intel TDX doesn't have a lower access control table for CC. So if
-host reads, the TLP sends and MCE happens.
-
-Thanks,
-Yilun
-
-> there are no CPU mappings.
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c          | 82 +++++++++++++++++++--------------
+>   arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+>   arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
+>   3 files changed, 49 insertions(+), 37 deletions(-)
 > 
-> Jason
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 20dd9f64156e..61eb9f723675 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3302,31 +3302,54 @@ static u8 kvm_max_level_for_order(int order)
+>   	return PG_LEVEL_4K;
+>   }
+>   
+> -static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+> -					u8 max_level, int gmem_order)
+> +static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+> +					const struct kvm_memory_slot *slot, gfn_t gfn)
+
+I don't see why slot and gfn are needed here. Just to keep consistent 
+with host_pfn_mapping_level()?
+
+>   {
+> -	u8 req_max_level;
+> +	u8 max_level, coco_level;
+> +	kvm_pfn_t pfn;
+>   
+> -	if (max_level == PG_LEVEL_4K)
+> -		return PG_LEVEL_4K;
+> +	/* For faults, use the gmem information that was resolved earlier. */
+> +	if (fault) {
+> +		pfn = fault->pfn;
+> +		max_level = fault->max_level;
+> +	} else {
+> +		/* TODO: Call into guest_memfd once hugepages are supported. */
+> +		WARN_ONCE(1, "Get pfn+order from guest_memfd");
+> +		pfn = KVM_PFN_ERR_FAULT;
+> +		max_level = PG_LEVEL_4K;
+> +	}
+>   
+> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+>   	if (max_level == PG_LEVEL_4K)
+> -		return PG_LEVEL_4K;
+> +		return max_level;
+>   
+> -	req_max_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
+> -	if (req_max_level)
+> -		max_level = min(max_level, req_max_level);
+> +	/*
+> +	 * CoCo may influence the max mapping level, e.g. due to RMP or S-EPT
+> +	 * restrictions.  A return of '0' means "no additional restrictions", to
+> +	 * allow for using an optional "ret0" static call.
+> +	 */
+> +	coco_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
+> +	if (coco_level)
+> +		max_level = min(max_level, coco_level);
+>   
+>   	return max_level;
+>   }
+>   
+> -static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
+> -				       const struct kvm_memory_slot *slot,
+> -				       gfn_t gfn, int max_level, bool is_private)
+> +int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+> +			      const struct kvm_memory_slot *slot, gfn_t gfn)
+>   {
+>   	struct kvm_lpage_info *linfo;
+> -	int host_level;
+> +	int host_level, max_level;
+> +	bool is_private;
+> +
+> +	lockdep_assert_held(&kvm->mmu_lock);
+> +
+> +	if (fault) {
+> +		max_level = fault->max_level;
+> +		is_private = fault->is_private;
+> +	} else {
+> +		max_level = PG_LEVEL_NUM;
+> +		is_private = kvm_mem_is_private(kvm, gfn);
+> +	}
+>   
+>   	max_level = min(max_level, max_huge_page_level);
+>   	for ( ; max_level > PG_LEVEL_4K; max_level--) {
+> @@ -3335,25 +3358,16 @@ static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
+>   			break;
+>   	}
+>   
+> +	if (max_level == PG_LEVEL_4K)
+> +		return PG_LEVEL_4K;
+> +
+>   	if (is_private)
+> -		return max_level;
+> -
+> -	if (max_level == PG_LEVEL_4K)
+> -		return PG_LEVEL_4K;
+> -
+> -	host_level = host_pfn_mapping_level(kvm, gfn, slot);
+> +		host_level = kvm_max_private_mapping_level(kvm, fault, slot, gfn);
+> +	else
+> +		host_level = host_pfn_mapping_level(kvm, gfn, slot);
+>   	return min(host_level, max_level);
+>   }
+>   
+> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> -			      const struct kvm_memory_slot *slot, gfn_t gfn)
+> -{
+> -	bool is_private = kvm_slot_has_gmem(slot) &&
+> -			  kvm_mem_is_private(kvm, gfn);
+> -
+> -	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM, is_private);
+> -}
+> -
+>   void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>   {
+>   	struct kvm_memory_slot *slot = fault->slot;
+> @@ -3374,9 +3388,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>   	 * Enforce the iTLB multihit workaround after capturing the requested
+>   	 * level, which will be used to do precise, accurate accounting.
+>   	 */
+> -	fault->req_level = __kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+> -						       fault->gfn, fault->max_level,
+> -						       fault->is_private);
+> +	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, fault,
+> +						     fault->slot, fault->gfn);
+>   	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
+>   		return;
+>   
+> @@ -4564,8 +4577,7 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
+>   	}
+>   
+>   	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+> -	fault->max_level = kvm_max_private_mapping_level(vcpu->kvm, fault->pfn,
+> -							 fault->max_level, max_order);
+> +	fault->max_level = kvm_max_level_for_order(max_order);
+>   
+>   	return RET_PF_CONTINUE;
+>   }
+> @@ -7165,7 +7177,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>   		 * mapping if the indirect sp has level = 1.
+>   		 */
+>   		if (sp->role.direct &&
+> -		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn)) {
+> +		    sp->role.level < kvm_mmu_max_mapping_level(kvm, NULL, slot, sp->gfn)) {
+>   			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
+>   
+>   			if (kvm_available_flush_remote_tlbs_range())
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 65f3c89d7c5d..b776be783a2f 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -411,7 +411,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>   	return r;
+>   }
+>   
+> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> +int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+>   			      const struct kvm_memory_slot *slot, gfn_t gfn);
+>   void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+>   void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_level);
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 7f3d7229b2c1..740cb06accdb 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1813,7 +1813,7 @@ static void recover_huge_pages_range(struct kvm *kvm,
+>   		if (iter.gfn < start || iter.gfn >= end)
+>   			continue;
+>   
+> -		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot, iter.gfn);
+> +		max_mapping_level = kvm_mmu_max_mapping_level(kvm, NULL, slot, iter.gfn);
+>   		if (max_mapping_level < iter.level)
+>   			continue;
+>   
+
