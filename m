@@ -1,104 +1,220 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F64292B48;
-	Wed, 30 Jul 2025 08:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B99B2777E1
+	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 09:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753865942; cv=none; b=j5FdC+P5ERNZe1qd2nYC32NCMr7kD54j8SneOogqNRa7nivtko4gkMMojuSMjfx19AOM7LFYkeEY5QwEBZC5FTDJZ3kc4W0xsgKqnlZXEoOfH6aPmDhKiF6pcWC91dade0Sx+rBUxukUkpqP27PBSBgPfslZfgfWtsPBBRa3bTI=
+	t=1753869293; cv=none; b=LCUJLDORHohiFuyS34A5Cst1nOKkh6AxClXvTwZCH8/niDr6/1Nxm7l0d6s6ftBjkRrBb/RbXLN6onG7Ca5foQPj5iSiXJZbfHMhbts1ws+/NeG2X5VpK1l09RFQfndC84bUvMpGVae+ajW1P+lxM9Qp2YJERinsLbc3+i5XRiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753865942; c=relaxed/simple;
-	bh=zT4NPRZ9FMf/6OItmdKPO5L1pWmoqk9QHmm4Af0TsIc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=WHSdK8luAZ2VKZtVvZIZZqUgr8oRByt9KTUw8SoPKiO8s9VShk95WhSLwT7pY2l2Xygra5ca9sSP6972pHk2kOzTfHrr/miCw+5pmHS8pwWBAJHj8padffXIzhmCwV6plKXrrH0F5gRVrHQN+2CAgoUU7rpcmjR1fbtt+ciMakg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m/5jUloS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753869293; c=relaxed/simple;
+	bh=rpLcOWERI/8Dk8pvmGHhEU9GP/nRnOClCltYR2JZsZU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EZ7O3aNP8oWcTmlJzV7753Lt/I3G/AuZfYL7V5ymmNmJQgnaJHFISb92XWt2JQOl3GxuW6DZhzjfRs0MC/87ncIvEM7iC0Ginr3BwJMPWvTiO6OiSLpOpipzZj8oKxbJtzRH2AO0q/SaSJOiWBGW4kWrws2hVQ4Z7L/wgrUOJto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVFGmrtn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m/5jUloS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 424B6C4CEE7;
-	Wed, 30 Jul 2025 08:58:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVFGmrtn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAE83C4CEFD;
+	Wed, 30 Jul 2025 09:54:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753865942;
-	bh=zT4NPRZ9FMf/6OItmdKPO5L1pWmoqk9QHmm4Af0TsIc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=m/5jUloSppv6eyK+1hX9XhjbR4IcMIsoyFre0AlROlWOpBerfvgINP56Ul0eWnUZg
-	 3NcPCO02sfLYFVo0ehYnns8qROTmr5G2oONIEIWLkN8LR4ojxNS0TyWmr/9awAxRmc
-	 7vVDlZ60VAvif2B3xGJIbqB6sUrq0Utxp7LTtCUIi+pDRoa7FdEOOPtWe36Mlce0fC
-	 8L0AM3W0J24SxOFvQjw7OqciPVOie6yjKho7AvST6r7kdcSK+L8/MZUVKqKnYXKB66
-	 bifB1pzxHbXedXKK/QQlTuBsIIv+JC1kZqyyt8tEttpdjYMBL5c17H829GJJaS7KBp
-	 xwvmQPTgP2Tcg==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
-	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 12/38] coco: host: arm64: CCA host platform
- device driver
-In-Reply-To: <20250729182244.00002f4f@huawei.com>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-13-aneesh.kumar@kernel.org>
- <20250729182244.00002f4f@huawei.com>
-Date: Wed, 30 Jul 2025 14:28:55 +0530
-Message-ID: <yq5ao6t29hrk.fsf@kernel.org>
+	s=k20201202; t=1753869292;
+	bh=rpLcOWERI/8Dk8pvmGHhEU9GP/nRnOClCltYR2JZsZU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XVFGmrtnsRCkLpPfb5mcrbOtkewg8t/KgAYmAvzfnLdroVVlB9T5Hbk7wLqKVMqnY
+	 9qjbMr673cA0tmGgcSkz0M0nSZzDAZndwoH5M0cmjTsjcfK+bn60rzQyHURAoEd9Hq
+	 fb1N+UusPnOx+kYECP/U2XoRxOf9b7aITsGXnhdqHWOLvW+Sx5XY0QYslgQvEqqgri
+	 PUQaUNyf9Uq6XnkplEpd9PeA9gr7nfoPGcU7O+SM0d/vBrknbxMhNgn720V+fNH2Yh
+	 sEuEmEqwu/fbAnR4w+avUiyj1ZlqF+XFnsqVtYcpaV1m+/ZlFFqKjnGyxrUIgjuFw0
+	 V9goo8WkVkU7w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uh3WM-002ZuJ-E1;
+	Wed, 30 Jul 2025 10:54:50 +0100
+Date: Wed, 30 Jul 2025 10:54:50 +0100
+Message-ID: <8634ae80lx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jiaqi Yan <jiaqiyan@google.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Handle SEAs due to VNCR redirection
+In-Reply-To: <20250729182342.3281742-1-oliver.upton@linux.dev>
+References: <20250729182342.3281742-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, jiaqiyan@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Jonathan Cameron <Jonathan.Cameron@huawei.com> writes:
+On Tue, 29 Jul 2025 19:23:42 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> System register accesses redirected to the VNCR page can also generate
+> external aborts just like any other form of memory access. Route to
+> kvm_handle_guest_sea() for potential APEI handling, falling back to a
+> vSError if the kernel didn't handle the abort.
+> 
+> Take the opportunity to throw out the useless kvm_ras.h which provided a
+> helper with a single callsite...
 
-> On Mon, 28 Jul 2025 19:21:49 +0530
-> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->
+Yay!
 
-...
+> 
+> Cc: Jiaqi Yan <jiaqiyan@google.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h |  1 +
+>  arch/arm64/include/asm/kvm_ras.h | 25 -------------------------
+>  arch/arm64/kvm/mmu.c             | 29 +++++++++++++++++------------
+>  arch/arm64/kvm/nested.c          |  3 +++
+>  4 files changed, 21 insertions(+), 37 deletions(-)
+>  delete mode 100644 arch/arm64/include/asm/kvm_ras.h
+> 
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index ae563ebd6aee..e4069f2ce642 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -180,6 +180,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  			  phys_addr_t pa, unsigned long size, bool writable);
+>  
+> +int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
+>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+>  
+>  phys_addr_t kvm_mmu_get_httbr(void);
+> diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
+> deleted file mode 100644
+> index 9398ade632aa..000000000000
+> --- a/arch/arm64/include/asm/kvm_ras.h
+> +++ /dev/null
+> @@ -1,25 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> -/* Copyright (C) 2018 - Arm Ltd */
+> -
+> -#ifndef __ARM64_KVM_RAS_H__
+> -#define __ARM64_KVM_RAS_H__
+> -
+> -#include <linux/acpi.h>
+> -#include <linux/errno.h>
+> -#include <linux/types.h>
+> -
+> -#include <asm/acpi.h>
+> -
+> -/*
+> - * Was this synchronous external abort a RAS notification?
+> - * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
+> - */
+> -static inline int kvm_handle_guest_sea(void)
+> -{
+> -	/* apei_claim_sea(NULL) expects to mask interrupts itself */
+> -	lockdep_assert_irqs_enabled();
+> -
+> -	return apei_claim_sea(NULL);
+> -}
+> -
+> -#endif /* __ARM64_KVM_RAS_H__ */
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 1c78864767c5..9a45daf817bf 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -4,19 +4,20 @@
+>   * Author: Christoffer Dall <c.dall@virtualopensystems.com>
+>   */
+>  
+> +#include <linux/acpi.h>
+>  #include <linux/mman.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/io.h>
+>  #include <linux/hugetlb.h>
+>  #include <linux/sched/signal.h>
+>  #include <trace/events/kvm.h>
+> +#include <asm/acpi.h>
+>  #include <asm/pgalloc.h>
+>  #include <asm/cacheflush.h>
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/kvm_pgtable.h>
+>  #include <asm/kvm_pkvm.h>
+> -#include <asm/kvm_ras.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/virt.h>
+> @@ -1811,6 +1812,19 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>  	read_unlock(&vcpu->kvm->mmu_lock);
+>  }
+>  
+> +int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * Give APEI the opportunity to claim the abort before handling it
+> +	 * within KVM. apei_claim_sea() expects to be called with IRQs enabled.
+> +	 */
+> +	lockdep_assert_irqs_enabled();
+> +	if (apei_claim_sea(NULL) == 0)
+> +		return 1;
+> +
+> +	return kvm_inject_serror(vcpu);
+> +}
+> +
+>  /**
+>   * kvm_handle_guest_abort - handles all 2nd stage aborts
+>   * @vcpu:	the VCPU pointer
+> @@ -1834,17 +1848,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	gfn_t gfn;
+>  	int ret, idx;
+>  
+> -	/* Synchronous External Abort? */
+> -	if (kvm_vcpu_abt_issea(vcpu)) {
+> -		/*
+> -		 * For RAS the host kernel may handle this abort.
+> -		 * There is no need to pass the error into the guest.
+> -		 */
+> -		if (kvm_handle_guest_sea())
+> -			return kvm_inject_serror(vcpu);
+> -
+> -		return 1;
+> -	}
+> +	if (kvm_vcpu_abt_issea(vcpu))
+> +		return kvm_handle_guest_sea(vcpu);
+>  
+>  	esr = kvm_vcpu_get_esr(vcpu);
+>  
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index efb37aad11ec..4f741ba24b48 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1289,6 +1289,9 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
+>  
+>  	BUG_ON(!(esr & ESR_ELx_VNCR_SHIFT));
 
->> +
->> +#include "rmm-da.h"
->> +
->> +/* Number of streams that we can support at the hostbridge level */
->> +#define CCA_HB_PLATFORM_STREAMS 4
->> +
->> +/* Total number of stream id supported at root port level */
->> +#define MAX_STREAM_ID	256
->> +
->> +DEFINE_FREE(vfree, void *, if (!IS_ERR_OR_NULL(_T)) vfree(_T))
->> +static struct pci_tsm *cca_tsm_pci_probe(struct pci_dev *pdev)
->> +{
->> +	int rc;
->> +	struct pci_host_bridge *hb;
->> +	struct cca_host_dsc_pf0 *dsc_pf0 __free(vfree) =3D NULL;
->
-> Read the stuff in cleanup.h and work out why this needs
-> changing to be inline below and not use this NULL pattern here
-> (unless you like grumpy Linus ;)
->
-> Note that with the err_out, even if you do that you'll still be
-> breaking with the guidance doc (and actually causing undefined
-> behavior :)  Get rid of those gotos if you want to use __free()
->
->
+Urgh. This is hilarious. We don't trigger this thing by pure luck (13
+is a lucky number, apparently...). I'll post a separate fix for that.
 
-I=E2=80=99ve already fixed up similar cases by removing the goto based on c=
-leanup.h
-docs in other functions.I must have missed this one.
+>  
+> +	if (kvm_vcpu_abt_issea(vcpu))
+> +		return kvm_handle_guest_sea(vcpu);
+> +
+>  	if (esr_fsc_is_permission_fault(esr)) {
+>  		inject_vncr_perm(vcpu);
+>  	} else if (esr_fsc_is_translation_fault(esr)) {
+> 
 
-By the way, isn't using the `NULL` pattern acceptable when there are
-no additional lock variables involved (ie, unwind order doesn't matter)?
-Or should we always follow the pattern below regardless?
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-	struct cca_host_dsc_pf0 *dsc_pf0 __free(vfree) =3D
-		vcalloc(sizeof(*dsc_pf0), GFP_KERNEL);
+	M.
 
--aneesh
+-- 
+Without deviation from the norm, progress is not possible.
