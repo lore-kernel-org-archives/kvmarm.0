@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9346128F958
-	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 07:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F61255F5C
+	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 08:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753861062; cv=none; b=VmXsFmWYWVW3XLwQIKsD00TyoHBwcCP/B8WH/xPAwRCimxa8SbR8iYgeaArqYeFJ3IX5mu5ku9a0sF8L9j7y75AbfzOjmoJFawLdDJFEQ2pMn47zGXYiCs5hfOTD8Kh8MMWI+WufqhyP+LYgkrEY8E6dfYWmHov0MOY8R8GdB7Y=
+	t=1753863655; cv=none; b=bV0IfII9dSMLofcPqpglO9YFUVIUDExw+utcqqK2vH7rnYV+DHPHBjzX5ZTnL+AV2/R/raS8Er7/k/7VLhRo/604C0zy+pPRrw7htiqzZtB+MCL9r12ewJ3pWBNKYZcqLdtjpLMNTp6tbFfnTz5PA4LiYjwLPTDiR4bV1C2En8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753861062; c=relaxed/simple;
-	bh=Wx/PGqRnErvPvMGDFamkrBsB3gh6iDSc0BGeARtBkZM=;
+	s=arc-20240116; t=1753863655; c=relaxed/simple;
+	bh=sMpVGob/1Mg4p+/qdsiXIOdlRZ53nvSriy4F/sWaKfA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fzZOQJUhMax4Z0MXGOCUt1lxyXJ+VMkjEaEUmKDXv/etx7L7aRU25i9NWeucb0komAwbkX2JODRjytDBKa4HK7v6+HrW7QjR9wH5FdCGworAyLGlbh+QD7E9tgblRyBVJPQPzENfnphrp4vRhmC72NdnFQoBQNc2ar+ZEXV7eXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hgM3Qo0g; arc=none smtp.client-ip=198.175.65.21
+	 In-Reply-To:Content-Type; b=oOlpU0FXy/+lehi5/4Ge1LThXNTHNiC9huMAULlMZATEOtniNBxJCRFlYl1tjgLedTp5y548swtDHvOzM9R5/nwnS61ms1+vRoJ9Fzs1MutHDhVKQ36i9Ro/XZ8rBusaLKbBxzPCXUNDY9jPHPIN0QtqDre5Zu5cs/weHgLHhQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TptkLNIX; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hgM3Qo0g"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TptkLNIX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753861061; x=1785397061;
+  t=1753863653; x=1785399653;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=Wx/PGqRnErvPvMGDFamkrBsB3gh6iDSc0BGeARtBkZM=;
-  b=hgM3Qo0g3Y+vzYNr0KC7dY8zfLzDbvdw/9zwn1y4WxD7OiaGlFSAxIJI
-   r5qCPADAAc7ssxCU29AjmViqXe3umfUJ/lGqpZfsKMSLxn0ItWDNrlc0H
-   Cou4FXeLgE2f1a8T4hgHtO99PJZlaXAwF6ub0PrhwsjJ9/uL+9EgsKiPH
-   +3uAIWQRfC7ZwgfJ1AovZdyB0w2ct836+wYEhMuCEU+I0SSFa6J0eAQly
-   x+Xko5DGOat6E+vyI6wKjovU1jMibrpBwaXQvETUSIjwasceoCBn7VmwE
-   iyeSmOXj+AVEHVe/pSWlLoKsFgbJkN9eqtKwh7b0ZBLdEQKDutw4w4W86
-   w==;
-X-CSE-ConnectionGUID: F8eXdvZ8TsqTpLuSPwgnzw==
-X-CSE-MsgGUID: nRpWfE3OSLWHl8jYp7Vq2g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="56037756"
+  bh=sMpVGob/1Mg4p+/qdsiXIOdlRZ53nvSriy4F/sWaKfA=;
+  b=TptkLNIXH7jpBg1/dx2GQLg3DGSHWhis2zaJfrasjo/ISah+Tc+WRGjq
+   ZJ13PgYF6zOjLfqFEhdFwE7KosxojDOHPBSTlDPVOWFtXua259+VqySEX
+   GEN1PSuhMHNV1NBzJGS98ud8ckeuJ8kaGACXIEn18oxVxEyvqQeS1Ykc8
+   5s9j7iBvfBIKP78uk1JVThPgqjm0zFKEb6yp5mLMtIgCsMZvXGOvYlKeA
+   hIKxR+KIL7KjIFbaAuNQ6mx/g+UT+qjZFkaSpu0H1YXLiVqTBQBN7lnfk
+   UPW/hSqWsFwMCaEel8ViFCv4MlVRV4rrWHCt7A3NZkgO+lN8FX/VqNth9
+   g==;
+X-CSE-ConnectionGUID: E0slB2ADRP2d/QvA8ygo6w==
+X-CSE-MsgGUID: LfAiUWvLTia12gHAxt0RTg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="43760841"
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="56037756"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:37:38 -0700
-X-CSE-ConnectionGUID: feCkmU4NS/GnJCZ7axVvKA==
-X-CSE-MsgGUID: yuXXeCjDTC2mBvEuGPXruA==
+   d="scan'208";a="43760841"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 01:20:53 -0700
+X-CSE-ConnectionGUID: Ek445IxjTgK8rLEtsHGYDg==
+X-CSE-MsgGUID: m2qrEWuSTVaeqSuq+gdBEQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="167395719"
+   d="scan'208";a="168338717"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 00:37:34 -0700
-Message-ID: <cf196e44-4ec1-45ab-9cd4-dd8cb10bd44f@intel.com>
-Date: Wed, 30 Jul 2025 15:37:31 +0800
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 01:20:48 -0700
+Message-ID: <42d840e5-d063-4a84-9028-e17a69fc7c91@intel.com>
+Date: Wed, 30 Jul 2025 16:20:45 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 16/24] KVM: x86/mmu: Handle guest page faults for
- guest_memfd with shared memory
+Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
+ fault-in on !mmap()'d memory
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oliver.upton@linux.dev>
@@ -65,68 +65,124 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>,
  James Houghton <jthoughton@google.com>
 References: <20250729225455.670324-1-seanjc@google.com>
- <20250729225455.670324-17-seanjc@google.com>
+ <20250729225455.670324-25-seanjc@google.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250729225455.670324-17-seanjc@google.com>
+In-Reply-To: <20250729225455.670324-25-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 7/30/2025 6:54 AM, Sean Christopherson wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
-> 
-> Update the KVM MMU fault handler to service guest page faults
-> for memory slots backed by guest_memfd with mmap support. For such
-> slots, the MMU must always fault in pages directly from guest_memfd,
-> bypassing the host's userspace_addr.
-> 
-> This ensures that guest_memfd-backed memory is always handled through
-> the guest_memfd specific faulting path, regardless of whether it's for
-> private or non-private (shared) use cases.
-> 
-> Additionally, rename kvm_mmu_faultin_pfn_private() to
-> kvm_mmu_faultin_pfn_gmem(), as this function is now used to fault in
-> pages from guest_memfd for both private and non-private memory,
-> accommodating the new use cases.
-> 
-> Co-developed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Co-developed-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> [sean: drop the helper]
+> Add a guest_memfd testcase to verify that a vCPU can fault-in guest_memfd
+> memory that supports mmap(), but that is not currently mapped into host
+> userspace and/or has a userspace address (in the memslot) that points at
+> something other than the target guest_memfd range.  Mapping guest_memfd
+> memory into the guest is supposed to operate completely independently from
+> any userspace mappings.
+
+Based on above, I suppose the userspace_address is not NULL but some 
+other separate userspace mapped memory.
+
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-
 > ---
->   arch/x86/kvm/mmu/mmu.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
+>   .../testing/selftests/kvm/guest_memfd_test.c  | 64 +++++++++++++++++++
+>   1 file changed, 64 insertions(+)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e83d666f32ad..56c80588efa0 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4561,8 +4561,8 @@ static void kvm_mmu_finish_page_fault(struct kvm_vcpu *vcpu,
->   				 r == RET_PF_RETRY, fault->map_writable);
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index 088053d5f0f5..b86bf89a71e0 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -13,6 +13,7 @@
+>   
+>   #include <linux/bitmap.h>
+>   #include <linux/falloc.h>
+> +#include <linux/sizes.h>
+>   #include <setjmp.h>
+>   #include <signal.h>
+>   #include <sys/mman.h>
+> @@ -21,6 +22,7 @@
+>   
+>   #include "kvm_util.h"
+>   #include "test_util.h"
+> +#include "ucall_common.h"
+>   
+>   static void test_file_read_write(int fd)
+>   {
+> @@ -298,6 +300,66 @@ static void test_guest_memfd(unsigned long vm_type)
+>   	kvm_vm_free(vm);
 >   }
 >   
-> -static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> -				       struct kvm_page_fault *fault)
-> +static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
-> +				    struct kvm_page_fault *fault)
+> +static void guest_code(uint8_t *mem, uint64_t size)
+> +{
+> +	size_t i;
+> +
+> +	for (i = 0; i < size; i++)
+> +		__GUEST_ASSERT(mem[i] == 0xaa,
+> +			       "Guest expected 0xaa at offset %lu, got 0x%x", i, mem[i]);
+> +
+> +	memset(mem, 0xff, size);
+> +	GUEST_DONE();
+> +}
+> +
+> +static void test_guest_memfd_guest(void)
+> +{
+> +	/*
+> +	 * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
+> +	 * the guest's code, stack, and page tables, and low memory contains
+> +	 * the PCI hole and other MMIO regions that need to be avoided.
+> +	 */
+> +	const uint64_t gpa = SZ_4G;
+> +	const int slot = 1;
+> +
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	uint8_t *mem;
+> +	size_t size;
+> +	int fd, i;
+> +
+> +	if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
+> +		return;
+> +
+> +	vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
+> +
+> +	TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
+> +		    "Default VM type should always support guest_memfd mmap()");
+> +
+> +	size = vm->page_size;
+> +	fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
+> +	vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
+> +
+> +	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
+> +	memset(mem, 0xaa, size);
+> +	munmap(mem, size);
+> +
+> +	virt_pg_map(vm, gpa, gpa);
+> +	vcpu_args_set(vcpu, 2, gpa, size);
+> +	vcpu_run(vcpu);
+> +
+> +	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
+> +
+> +	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
+> +	for (i = 0; i < size; i++)
+> +		TEST_ASSERT_EQ(mem[i], 0xff);
+> +
+> +	close(fd);
+> +	kvm_vm_free(vm);
+> +}
+> +
+>   int main(int argc, char *argv[])
 >   {
->   	int max_order, r;
+>   	unsigned long vm_types, vm_type;
+> @@ -314,4 +376,6 @@ int main(int argc, char *argv[])
 >   
-> @@ -4589,8 +4589,8 @@ static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
->   {
->   	unsigned int foll = fault->write ? FOLL_WRITE : 0;
->   
-> -	if (fault->is_private)
-> -		return kvm_mmu_faultin_pfn_private(vcpu, fault);
-> +	if (fault->is_private || kvm_memslot_is_gmem_only(fault->slot))
-> +		return kvm_mmu_faultin_pfn_gmem(vcpu, fault);
->   
->   	foll |= FOLL_NOWAIT;
->   	fault->pfn = __kvm_faultin_pfn(fault->slot, fault->gfn, foll,
+>   	for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+>   		test_guest_memfd(vm_type);
+> +
+> +	test_guest_memfd_guest();
+
+First glance at the name, it leads me to think about something of nested.
+
+>   }
 
