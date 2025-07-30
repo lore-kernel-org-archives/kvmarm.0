@@ -1,126 +1,114 @@
-Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF472343C7;
-	Wed, 30 Jul 2025 14:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23CE92D9ED8
+	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 14:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753886119; cv=none; b=bGN3J9aih8uWBdhTOYKs9XFQ2wOqaRo64ZlbQSFAiuMUWgUsVi0yqoZJlPAtBQpF6pGAH++QiYK+j7RNITwYetGOAprNfH40G+wc51fiRDjCSdeEv36JPJt1jCsQ/g5/JtR1bV7nCEczwjCliKWhy1EwsTTTep3qsCJsyZyfkU8=
+	t=1753886577; cv=none; b=P4QI0VUw4F0hfp+sTX0MYC9izcWMCW3Ceb812EldR22nORKn1yeSKqG1pl42IMoMX89shjBeX20zBViTh/Tk+3XdjLvao1Z+aJM574YTL+H90s3MHlk0E50WulTICJxWpQleYn99vVOn8I6SudRm9XnMgB4twe/mva/WQhDQdcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753886119; c=relaxed/simple;
-	bh=KX9gky5b66eICbQ0UiZw3jTma9kJ/uimQoSGy09Y554=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tSVPUqpvRDKCFdf10YyCP31W+ingi/GjTyDjNKUdpwb1aEYDQo7sDLM9JgblOBcz4xBItTHnL8u3NJCcM4B6dwXL3BgH6FulAsTbyBxWpAymJbplXQNkVd7M1DfObMh7JwlGYT5zTjdRCeiqgb3c0DYE/gwrZhiSvepihEIrQlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=HKBSTtuz; arc=none smtp.client-ip=119.8.177.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1753886577; c=relaxed/simple;
+	bh=gGRfP7BSpng2geWuLtovyzO2vvewCAFqLFPtlv86Vs0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W5HmEHK+cDcge8HnA9U5+LUJVEYdeJav93DGugALnZMnOSHK+2DiTQdazNZT7qxbTRlodpp+fApgJv2esIBOIg2zOAYZb4DzcTbuuffdTg0OGci9WJThHJCsjKQZETPlIvGA5dWb6YQUtlfBEUclgSf7+1h+V7gxMJ2h/TxPXwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jyrm56wT; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="HKBSTtuz"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=V4VzUm4zcB95VkurnMS1za6yWaYSay+dQ+3Hi8qJDuM=;
-	b=HKBSTtuzFdIanTfuhOsFeGOSLmYVsWUE41QHkn8zXLZs/UdFZieK/WTSKGhb/KngdNlsDOo/2
-	v90rSbM2uhWR9+cJygGBmHFgIZKlfNZ46XqWq/s5dk+4tsMpKe57zvxKi6+LAT2Coh2p8jDjq5G
-	fFMairtdXGK12fYQJwH4Ilg=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.37])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4bsZTT4vDSz1P7Hb;
-	Wed, 30 Jul 2025 22:33:49 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bsZQ82bphz6GD84;
-	Wed, 30 Jul 2025 22:30:56 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 77D00140393;
-	Wed, 30 Jul 2025 22:35:09 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 30 Jul
- 2025 16:35:08 +0200
-Date: Wed, 30 Jul 2025 15:35:06 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <aik@amd.com>,
-	<lukas@wunner.de>, Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun
-	<yilun.xu@linux.intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, "Suzuki K
- Poulose" <Suzuki.Poulose@arm.com>, Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 26/38] KVM: arm64: Add exit handler related to
- device assignment
-Message-ID: <20250730153506.00006280@huawei.com>
-In-Reply-To: <20250728135216.48084-27-aneesh.kumar@kernel.org>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
-	<20250728135216.48084-27-aneesh.kumar@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jyrm56wT"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-707453b0306so34482976d6.2
+        for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 07:42:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1753886574; x=1754491374; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yE9XS5x/IPLFg7Q0+oI241GEqid5njht4Vd0VCx+/2E=;
+        b=jyrm56wTckHmfEw+6BsYUu1EEZb+ZKds+e9v8dKtJBcImBCAfTP9xKp1Jmqpk8rszZ
+         f8yRnkhObmsfH+xG+SOYVmfHJGN9tZ8bfOoQeqrNLPwCX2Kr+hIyrSxC6luNbdtE2ltY
+         9r766+s0AOVlmrzprH5JsnsIjb556rgNfVseXhpzuUwxLVgIcM2KV351x5WePpoxNPqi
+         NvoW8TprTw1Q0YUYVUQOt5XVt7GlsJdMqYNQjwagANaCUFujNCJBwsUqbxrgBpbmzsKI
+         GGJOcanfA4qWT4m/DoNyJpZtNUvJzpRge+v0VwHLHTACI/AdeUfyPhY7adY3FYUsBl+j
+         KT7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753886574; x=1754491374;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yE9XS5x/IPLFg7Q0+oI241GEqid5njht4Vd0VCx+/2E=;
+        b=v7uPeMObdUQgksbX6GBEMgGYZ0yfM4NPLbV8Fel8keMaJYU9eLia3ryJBkDRtFYsMW
+         JX73lJ/y4o7ZW3r7C+RE/9fsEJTyLeYeooJKwGuGCX88+Up+3kvOjSvDnPygSYgdK8LE
+         X+CAEhYblSBIcraeNcDBLBN170mwpzYIlaZxiTGDY81YT/pAUk+W1dhfWAUMPJcOHGcG
+         5gL3OizeFjtHO2VfyyFHXlwgVfZJZihcK5MiKa7e2E4a6AzIiutaJYMoLiBDTN+seP6n
+         cI8yjHWuQT7PfY07WZ1hmavd800x+D2aPaFCxl6u0wIv8M9D6mHecSxvj0Wx2+i8Z3Al
+         qEvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMoQ1lA0Tjur0sAknYBUe++oeTN1+VCgpZWUEIMGXBvhtFVwRJ54+ypLPNxyC5Z3HBnF4st7A=@lists.linux.dev
+X-Gm-Message-State: AOJu0YziDC6uNxSyt45fwQwu++FaVVx0plsmAtuVVRH65qfYpmDRM59x
+	jHHCi/KGYwzCKy98maynIkZr2cC22SVoidjpJ1SeFEmP0VywNlR2W45nN94AM/nw4D0=
+X-Gm-Gg: ASbGncvFWMMy6qZML0oPIDuoZqO+yRimrjL9UQGqEZtYWGIOXpg/E0+rHpsMwRGhHwN
+	4iZkJQNvXLBPGfo32WVfSAR7woQZS6bwTrhgC6reb1WUloG5hR27i0Upy16defrdtTF9SD6FPRa
+	nRSjOZOTtxtlWZng7HZ2KdCotXVREd3LIDBYbOpCv6SPPixG+Us9B64RswoCMXilNzYIGJwXMae
+	0sWYPKOIVN0QQ3iullzSFZg3ZfLnCDK8Bjhqp4jGgHqUPkLJ6YCQyL1ZujG9rSXswbRrodXnClU
+	ctBo/AfDMKxfKVAJu1advq+B65qmecg1JiKo1D2J6BCfrRvF+vvp9rImJYA3inNDv146y3uTy1K
+	wjHzRnPsIHWHVOJGGg0IJO6GGvzEaVC5o5eO6P3h54dL+fAz86kVijC9nFRHbkjSmWySB6izi68
+	kzrQk=
+X-Google-Smtp-Source: AGHT+IFTshf+JMDcrv8+0/UalWTBjWGXz7BdMW99vihoM+QJWNKuspc/O9f/fXBj039JGJi+af7NVQ==
+X-Received: by 2002:a05:6214:ac7:b0:707:4daf:631 with SMTP id 6a1803df08f44-7076719b73dmr50415456d6.42.1753886574527;
+        Wed, 30 Jul 2025 07:42:54 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7074b52ddc7sm39845896d6.77.2025.07.30.07.42.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Jul 2025 07:42:53 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uh817-00000000RlW-0qIU;
+	Wed, 30 Jul 2025 11:42:53 -0300
+Date: Wed, 30 Jul 2025 11:42:53 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, robin.murphy@arm.com,
+	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
+	mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v3 29/29] iommu/arm-smmu-v3-kvm: Add IOMMU ops
+Message-ID: <20250730144253.GM26511@ziepe.ca>
+References: <20250728175316.3706196-1-smostafa@google.com>
+ <20250728175316.3706196-30-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250728175316.3706196-30-smostafa@google.com>
 
-On Mon, 28 Jul 2025 19:22:03 +0530
-"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-
-> Different RSI calls related to DA result in REC exits. Add a facility to
-> register handlers for handling these REC exits.
+On Mon, Jul 28, 2025 at 05:53:16PM +0000, Mostafa Saleh wrote:
+> Register the SMMUv3 through IOMMU ops, that only support identity
+> domains. This allows the driver to know which device are currently used
+> to properly enable/disable then.
 > 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 92 ++++++++++++++++++-
+>  1 file changed, 91 insertions(+), 1 deletion(-)
 
+Can you split the new iommu subysstem driver out please? I think I
+asked this before.
 
-> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-> index c6e16ab608e1..a5ef68b62bc0 100644
-> --- a/arch/arm64/include/asm/rmi_smc.h
-> +++ b/arch/arm64/include/asm/rmi_smc.h
+This series is big, reviewing a new iommu driver should be done separately.
 
-> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
-> index 1a8ca7526863..25948207fc5b 100644
-> --- a/arch/arm64/kvm/rme-exit.c
-> +++ b/arch/arm64/kvm/rme-exit.c
+Please review all the comments for the verisilicon driver, I think
+many of the remarks apply here too:
 
+ - Domain attachment looks questionable. Please do not have
+   attach/detach language at all in the hypervisor facing API.
+ - Get the ordering and APIs right so replace works. You need this to support RMRs
+ - Use a blocking domain not some unclear detatch idea
+ - Use a blocking domain for release
+ - Use the smmu-v3 approach for the fwspec, don't store things in the drvdata.
 
-> +static int rec_exit_dev_mem_map(struct kvm_vcpu *vcpu)
-> +{
-> +	int ret;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +
-> +	if (realm_exit_dev_mem_map_handler) {
-> +		ret = (*realm_exit_dev_mem_map_handler)(rec);
-> +	} else {
-> +		kvm_pr_unimpl("Unsupported exit reason: %u\n",
-> +			      rec->run->exit.exit_reason);
-> +		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> +		ret = 0;
-
-I guess maybe this gets more complex later, but right now
-		return 0;
-
-And maybe return in the if branch as well.
-Same for other similar code in this patch.
-
-> +	}
-> +	return ret;
-> +}
-> +
->  static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
->  {
->  	struct realm_rec *rec = &vcpu->arch.rec;
-> @@ -198,6 +252,12 @@ int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
->  		return rec_exit_ripas_change(vcpu);
->  	case RMI_EXIT_HOST_CALL:
->  		return rec_exit_host_call(vcpu);
-> +	case RMI_EXIT_VDEV_REQUEST:
-> +		return rec_exit_vdev_request(vcpu);
-> +	case RMI_EXIT_VDEV_COMM:
-> +		return rec_exit_vdev_communication(vcpu);
-> +	case RMI_EXIT_DEV_MEM_MAP:
-> +		return rec_exit_dev_mem_map(vcpu);
->  	}
->  
->  	kvm_pr_unimpl("Unsupported exit reason: %u\n",
-
+Jason
