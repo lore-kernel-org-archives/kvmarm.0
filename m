@@ -1,153 +1,200 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB0C2DAFB4
-	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 15:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5617B2D9EDF
+	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 15:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753888042; cv=none; b=HbTuEVyfvktvios1TlywJvcloOvR2T0qBboYqlsE8nTLWWW5UB4T3O8Ka0TGaS7d2FYapjym7efVZzuHnpiezG0zN5ABXNPLpa9X8kHVvggnp1a5S8urosWVVEzvhtsRs3WnPc7WVhxaECykT7npktpyrgDFY3sZRTEm0HP8vJc=
+	t=1753890748; cv=none; b=QAWV9ixpulGvSZhzJZdNXfcycgCRumIfdceLkueNR+IFFvgTh4V0EUi+vtblfIxhoTSw4GXmt59XDhTz+vjVA4Udja/oc3DEARO+PdnRPIrLMMNSJ29PkOI0dUw6YCPA/MVmQvWpeIo1YMuGhP8mfE3sgPBp3+x42uVeNhG7IiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753888042; c=relaxed/simple;
-	bh=dCek+LVoEASGAo11jE4aq2PC6g9GeAbOlhCDXCoh3U0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LXLIWCvTwChK+sD9HucX7L/jBOeV/dLPzF1ohszO2pY3PdFe57l4LmoazTGIV7ayYy4XeVkiUPV+PIY1jqkV1PTU7bRNofQmgXzTJo1LUaLdo3QIFkiGuvl8TgNcAUdInQnyHGyayKNrPc/KmFw98E+hnpO2NBVii0NiQMAKbc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ta0Zs8wF; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1753890748; c=relaxed/simple;
+	bh=KaUzYMzqAKDKj1Ugou6j/Gy3Is2HqkyvG79qzuUKqs0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oRzkE/1cCPin8rSADx1NhmjP7nWHFDPxCOsErwkA59PEvbcSBgYvb1VbNmDufzqJhWN5+cP/Bg8xTEn3IQxUZoU9Npus1tVjRe4kc4h4efSJMsP9dIRQqymthLyi3gHf3jNCYnx53kl2nRiWsjSxrp9FNGaBMnmAZQYlz7fIWb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FC6fiO3m; arc=none smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ta0Zs8wF"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-455b63bfa52so51395e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 08:07:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FC6fiO3m"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4aaf43cbbdcso237121cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 08:52:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753888038; x=1754492838; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FwnA2oNKgnZXUtMiDazVBO1hROK96MeArFT9225UuGA=;
-        b=Ta0Zs8wF5JGZWIF2MESj238/IK7jWJexH3CR5VIZ/ghSdut1c4kdBAoq787lI3fR/3
-         VsTiVBgJXWGt5pj1SpphFMcnnnq+TSbJAI2aLVXWZawutJ4e1JR/On/CckF0cAI03Z5H
-         pUiaIz4/PpBZthYgCnhkeej+rblz0/LDOkt1poG1RvNw58e+WK0TYzjncl519nAwhM0w
-         lWSYKXDtRMD7431ECgpJ3QBbkXH9qyNnx2NDmwCKRFkTqrZR+r8OlIzcITwOIrx9Pmy0
-         /r7yCqpPp7b7buAsrDmF6ZVGXI9SzZ4ppdXba3geZMlhbaOC9kBvXAGFUSjwU+x8HQXy
-         nwLQ==
+        d=google.com; s=20230601; t=1753890744; x=1754495544; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=J5S/gfwjHD+oJdrQWb3m/7MfRXYBPvNIQcNwOPtzGuc=;
+        b=FC6fiO3mE2rUS7HWvtI5YcO0Mp+Nldj5V0K4Fo5C8aPVpjfAfxqVxD7iL+ncnq1tls
+         aPoYUxlydLyqcd8Z0B7fiDEttQyLzNckRV+U3tpbyYFIin/aHf+k6myzyj5iHmkNvuyH
+         uILTgnCvIkBGV9/uY9H4vHGC71tQE/NznYqGosru20Q2FmZTuOl447vloNdYkOGvcelZ
+         4ryKWzl4wgYjbzqsI9oqMl/MPOSkenDqo31gcfVX9TQUtQ71g1psV25uPC0sSm1ks2bs
+         lDXDFD/taqXJ8DNZ75dw19+MhWatLvwk6SzYZQGWeS5cbAVptALjh5suSqmOjugPRj7W
+         imAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753888038; x=1754492838;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FwnA2oNKgnZXUtMiDazVBO1hROK96MeArFT9225UuGA=;
-        b=qJLxdvUW6Ac3tvji38cT4ji21Jmi/o2FJEecm3vToUhlsMGP9ZQa16KALSzCfwgztI
-         z/td296o2jlhXzpz4l6Gf7tRCqecBE2l5A0dQVJZNfyaFwg73DdeAFCsiUTmW+FewR+J
-         2DYwkhOcVp50A7Je1gnH4OR4z2GydH1qcDEkwYzL3rMBBuNa8IjQIgF9HtA6XdM3UE0h
-         3AAeL+o3UlOopWfC79oXHTG/q53DYbWlGzbNNzQwQnr/ja6FT8noTV4a5OoUTpcuVQcm
-         XojJ46MfkgQnJ0ILmQqGktSjrJT78kZim2s1LW0SbyGtOyDXYdv3nvsdw+nwiGnvkh//
-         L1CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUCJkVrxqNwXSvGeH1noimGdFUJB1//qzhOklyRwldYX2AVofb5bQWQiflNyRWEndZlonSL/IU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwE2elylQ51KtXQSXEhUu+miU7EWS6EZVFglqxev3JDgZVkrKEW
-	96fnkyTAcr7pc3pzYvU9aiUW4+E0iIoiohzRJwAdLA+R6Lbe461QF4YXUpKgCZhIBQ==
-X-Gm-Gg: ASbGncsZmoynxWUzQvn8KwPMmGiUDRD2XrvpaCfZmGetg1pTqOe4hvSEglR+nm9q25E
-	oqA5pHUYRERmJr9rNXQD6BV8j4C+ZZWTOXRtWaF96aEkTjSA26x1DcH0+JNlQvfcu0nSCYCa+0J
-	Hfz255lSGhTYt6qq+8r/X2O9J9whq3PF6l2BfKajAvluTNd/t1+eas9uBhyB5MbYhffAEOjh8Ca
-	CliJ9HwbZePzaZv3QVGolKkJHyFZBaG4xTz2Dlr0INYRKTnd/7AQ328vX+ozKx5ay+iPVOHKG/W
-	dcmt5mHSbJS8DMH3UT2gKPG/eaLOlTTGpOcq0RWzfkXhgJmY4inzia2GLEa7qXvTgJt0r4m5UtI
-	Q4wzj9gIl3elUVOGiYBL38rK7G4QkUCPvnedonRxwF2oR5cp3xGkath64btrIeBgICWph
-X-Google-Smtp-Source: AGHT+IFXd4tj1Gi+aSqsAPlyaWZo7LbAx7OS/cZ5blys8+9sDywLpzMvfiK5whFAaT6QiTiBqgdEJA==
-X-Received: by 2002:a05:600c:8b66:b0:455:fd3e:4e12 with SMTP id 5b1f17b1804b1-45893a978a1mr1755975e9.4.1753888038295;
-        Wed, 30 Jul 2025 08:07:18 -0700 (PDT)
-Received: from google.com (88.140.78.34.bc.googleusercontent.com. [34.78.140.88])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4588ee11c91sm35868305e9.4.2025.07.30.08.07.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jul 2025 08:07:17 -0700 (PDT)
-Date: Wed, 30 Jul 2025 15:07:14 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, robin.murphy@arm.com,
-	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v3 29/29] iommu/arm-smmu-v3-kvm: Add IOMMU ops
-Message-ID: <aIo1ImP7R7VhRpVE@google.com>
-References: <20250728175316.3706196-1-smostafa@google.com>
- <20250728175316.3706196-30-smostafa@google.com>
- <20250730144253.GM26511@ziepe.ca>
+        d=1e100.net; s=20230601; t=1753890744; x=1754495544;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J5S/gfwjHD+oJdrQWb3m/7MfRXYBPvNIQcNwOPtzGuc=;
+        b=aAex03YKhJFdZdY+k3iys7wXfrjz26j5QPCCnc5eKWoIdxTF8cOQwD1t4kIBVzol5l
+         bfIaCkudcPrXCUfzQl5jQc1GKnJtebHbGXP6Up78tj0PMvzmW3BgCtOieTJSLMp3fGrm
+         gI+DN4CMrHc6A2FJr4EYIb6khetqBytxyofqhGGe2LThxHlgjxZEl+VY+SQIqxktlonx
+         bXwMzWuKUKjZVZH8gQjGBI6qwKR/mVI6EelSa6IGwGREUTtWl/2siLRmjwwowzVyAilW
+         h9Z3Z3RzIL6yj4Ojn/cFHGfm1hIEQc/cQtCtzCdww+5WEWoANjL9vUK3b/ysT05l5CyF
+         xVqw==
+X-Forwarded-Encrypted: i=1; AJvYcCViYXrZNuBBRH9eyEiDa/SRr1rken6KIitpoTtFyzSBPu8kUbWavqp14wHMIdmG98X0erDRYtI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywz37yuEw5l90/Frtm2Re56kRNCmY2dPLs3J9Ilr/PtSdRwhNBc
+	PgejuOGcpURSlKGlXweq5U4FpLZC25sl2Zw3d9DZ19PolBdBz4fp+cXd2sWYJBcP1VKLnDvWEhW
+	vZ9Mm6z74wNUw+QfqBxixY2yg7I4gOtyeeT/dBsld
+X-Gm-Gg: ASbGncvex3jbtm/B+BewZbGcIJpufPoGl1Z76IV+v8R20stkBh7hqfzYNJDgXYuFkMQ
+	9fZbMErAAM5NX8vZXb6te39WUFEkBf3Hp/u42tdUwQOUevqD4J6kR2U9XIUidFL0gsLWzQ8Z3AE
+	GKL6N/wjtqVlxbA9d8XZ1dNxKKtiAFfkkJ+cOiHCPunnCG3Hu2oDVGikYPXoDGq9O/ZEk6i7yJj
+	IIMoRk=
+X-Google-Smtp-Source: AGHT+IHCoggrbKuqrS/V3GqDELMmyPu68zQZy/cgUabllEs7qJ283gO9wOXP3Z6D76RtekV7nYcliE9mbdlhJ89jyUs=
+X-Received: by 2002:a05:622a:b:b0:4a6:f525:e35a with SMTP id
+ d75a77b69052e-4aedf608f0emr3661281cf.9.1753890743755; Wed, 30 Jul 2025
+ 08:52:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250730144253.GM26511@ziepe.ca>
+References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-25-seanjc@google.com>
+In-Reply-To: <20250729225455.670324-25-seanjc@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 30 Jul 2025 16:51:47 +0100
+X-Gm-Features: Ac12FXzaE318ERqLrJiYydulNyZlDipqqavrDa-QlTdUT7g8r8Yi-Dt4-p51ElI
+Message-ID: <CA+EHjTx7V=bHZ3HTN+gK+MzNhwDehiqQXG2r4AYmMKDufYGOww@mail.gmail.com>
+Subject: Re: [PATCH v17 24/24] KVM: selftests: Add guest_memfd testcase to
+ fault-in on !mmap()'d memory
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
+	Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jul 30, 2025 at 11:42:53AM -0300, Jason Gunthorpe wrote:
-> On Mon, Jul 28, 2025 at 05:53:16PM +0000, Mostafa Saleh wrote:
-> > Register the SMMUv3 through IOMMU ops, that only support identity
-> > domains. This allows the driver to know which device are currently used
-> > to properly enable/disable then.
-> > 
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > ---
-> >  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 92 ++++++++++++++++++-
-> >  1 file changed, 91 insertions(+), 1 deletion(-)
-> 
-> Can you split the new iommu subysstem driver out please? I think I
-> asked this before.
+On Tue, 29 Jul 2025 at 23:56, Sean Christopherson <seanjc@google.com> wrote:
+>
+> Add a guest_memfd testcase to verify that a vCPU can fault-in guest_memfd
+> memory that supports mmap(), but that is not currently mapped into host
+> userspace and/or has a userspace address (in the memslot) that points at
+> something other than the target guest_memfd range.  Mapping guest_memfd
+> memory into the guest is supposed to operate completely independently from
+> any userspace mappings.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Sorry, maybe I misunderstood, do you mean split this patch into multiple
-patches or split all KVM SMMUv3 driver out of this series?
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
 
-> 
-> This series is big, reviewing a new iommu driver should be done separately.
-> 
-> Please review all the comments for the verisilicon driver, I think
-> many of the remarks apply here too:
-
-Thanks, I will go through them.
-
-> 
->  - Domain attachment looks questionable. Please do not have
->    attach/detach language at all in the hypervisor facing API.
-
-I am not sure I understand this one, the hypervisor API has no
-attach/detach APIs?
-We only notify the hypervisor via “enable/disable” hypercalls when
-devices are attached or released (as only IDENTITY DOMAIN is supported)
-so it can enable or disable translation.
-
->  - Get the ordering and APIs right so replace works. You need this to support RMRs
-
-I see, we can’t support bypass for security reasons, but we can enable
-the identity map for such devices.
-
->  - Use a blocking domain not some unclear detatch idea
-
-There is not a single detach in this driver, we only support attach and release
-operation, which just goes to the hypervisor as enable/disable identity.
-
->  - Use a blocking domain for release
-
-I see, I can add “blocked_domain” similar to “arm_smmu_blocked_domain”
-which just disables the device translation, I will look into, I am just
-concerned it's more code as this driver only supports a single domain
-type.
-
->  - Use the smmu-v3 approach for the fwspec, don't store things in the drvdata.
-
-This is using “dev_iommu_fwspec_get” similar to the SMMUv3 driver,
-am I missing something?
-
-The driver only save the "struct arm_smmu_device" in drvdata, which is
-exactly what the other driver does (which allows us to re-use a lot of
-the code)
-
-Thanks,
-Mostafa
+Cheers,
+/fuad
 
 
-> 
-> Jason
+
+> ---
+>  .../testing/selftests/kvm/guest_memfd_test.c  | 64 +++++++++++++++++++
+>  1 file changed, 64 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index 088053d5f0f5..b86bf89a71e0 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -13,6 +13,7 @@
+>
+>  #include <linux/bitmap.h>
+>  #include <linux/falloc.h>
+> +#include <linux/sizes.h>
+>  #include <setjmp.h>
+>  #include <signal.h>
+>  #include <sys/mman.h>
+> @@ -21,6 +22,7 @@
+>
+>  #include "kvm_util.h"
+>  #include "test_util.h"
+> +#include "ucall_common.h"
+>
+>  static void test_file_read_write(int fd)
+>  {
+> @@ -298,6 +300,66 @@ static void test_guest_memfd(unsigned long vm_type)
+>         kvm_vm_free(vm);
+>  }
+>
+> +static void guest_code(uint8_t *mem, uint64_t size)
+> +{
+> +       size_t i;
+> +
+> +       for (i = 0; i < size; i++)
+> +               __GUEST_ASSERT(mem[i] == 0xaa,
+> +                              "Guest expected 0xaa at offset %lu, got 0x%x", i, mem[i]);
+> +
+> +       memset(mem, 0xff, size);
+> +       GUEST_DONE();
+> +}
+> +
+> +static void test_guest_memfd_guest(void)
+> +{
+> +       /*
+> +        * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
+> +        * the guest's code, stack, and page tables, and low memory contains
+> +        * the PCI hole and other MMIO regions that need to be avoided.
+> +        */
+> +       const uint64_t gpa = SZ_4G;
+> +       const int slot = 1;
+> +
+> +       struct kvm_vcpu *vcpu;
+> +       struct kvm_vm *vm;
+> +       uint8_t *mem;
+> +       size_t size;
+> +       int fd, i;
+> +
+> +       if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP))
+> +               return;
+> +
+> +       vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
+> +
+> +       TEST_ASSERT(vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP),
+> +                   "Default VM type should always support guest_memfd mmap()");
+> +
+> +       size = vm->page_size;
+> +       fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
+> +       vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
+> +
+> +       mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +       TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
+> +       memset(mem, 0xaa, size);
+> +       munmap(mem, size);
+> +
+> +       virt_pg_map(vm, gpa, gpa);
+> +       vcpu_args_set(vcpu, 2, gpa, size);
+> +       vcpu_run(vcpu);
+> +
+> +       TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
+> +
+> +       mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+> +       TEST_ASSERT(mem != MAP_FAILED, "mmap() on guest_memfd failed");
+> +       for (i = 0; i < size; i++)
+> +               TEST_ASSERT_EQ(mem[i], 0xff);
+> +
+> +       close(fd);
+> +       kvm_vm_free(vm);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>         unsigned long vm_types, vm_type;
+> @@ -314,4 +376,6 @@ int main(int argc, char *argv[])
+>
+>         for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+>                 test_guest_memfd(vm_type);
+> +
+> +       test_guest_memfd_guest();
+>  }
+> --
+> 2.50.1.552.g942d659e1b-goog
+>
