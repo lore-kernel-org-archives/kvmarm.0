@@ -1,123 +1,110 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F3321128D
-	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 21:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9651DDA15;
+	Wed, 30 Jul 2025 21:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753909885; cv=none; b=Jsn0hgFAMzLUsvHswrEEfMh1w/PVaxENnuJNrLtAH6Bk7JZPlwWpQY3BD/io84vDhoy80F0+HOslHS5L1/XoEmf254hjg/+oAjnoMp/2n9q5Je85SupxU2YLbyEHbfIh+Zv3i25mv9iOOKJl7Xfcq1T7jEQXbPdec9QxFmjCmTs=
+	t=1753910117; cv=none; b=jUozOOBHKLe2n+GC68Z+1BcCWob27GCLjsvFCnngbJcBw6zbxGIXuv+VkCMGDNAMUE0s/yX/+EF1LUsTKKqZS/6ZApm8LAat2ahKg9Sd+Ttr64lUs8VJSocbtO29VKdQMhSayps51+rQQ2p3IVYhoIT7xqAOHQYY8iL9ATFc/O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753909885; c=relaxed/simple;
-	bh=cVmFzsj3OpZTUi6FUzCWejRWJRm0o5ncvOdXgEoC+OE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ReUV5EJVsiVDcTKFfNKqjL9w5OzcRaZnoegzyGmWzA4HAQyNkhTFFtqN/3HI79HbrsfBNd+Et9BJ9Nqxzd5rz3tGjb9gKwayMhwQlOFMU87NLb6RHeJH/cj79LS9PaudgoF9pCrm2h5svAcEygtKPMEUQNPZrPt8AEhME8+ABGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YXYXWmjm; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+	s=arc-20240116; t=1753910117; c=relaxed/simple;
+	bh=p7eZsxpS3vtI9tDNOoEZiy9hk5CJI4f8gTmOSqmh174=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=nLZ5hT39WBW+iF3ZhN4NIzKHGll0ZYfcFDP7F9kBQsDrxHv1JSj8tlXL3Bud36PQSh9DL9AlVIqJ3u9WakwEgu42qxOZFGEnETD7i1zW2I+DAujmLh+5JSeVc0yBc/2e6rezljk4V8M61ApJvNrrkn58pEHVSD7N3IpA+kBfJsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmTqUVtx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YXYXWmjm"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748f3613e6aso142762b3a.0
-        for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 14:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753909882; x=1754514682; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zcr0HAZVJL/wPM68//kB0QFOkcy4cqNgVvPP1uhkVrY=;
-        b=YXYXWmjmxRYkgwSs6q9F/UONr44dXv90ub39oTFHNWMOMbmT5ddd/HgF4FAq6+jxnt
-         7NdmMV9LkyNQmOs0/Q4z3sjnPcxgqR+LCSLtF8mOe31E4Um9EtEkX5Urr6Rp+OE+6kvv
-         FZ8MYX3xWYHKAQVlDBTbspnN+IpfrQ61vLtLWvjkTc3RkIeSY0F94AxxJFVi+Isvg/Pl
-         enhsGIQT2VcuG7eiiwK7CH+6PPp6FxC2UFEJwF4uRsp6kXsfoMPC/rqkYHLPBcBEf3M5
-         KI+Z70yKPhpMrU2aLSJuDeYi/vKSA2R747dC2Pd+VDR3MCgWyRyjloobnFwlunOyNY5v
-         p1Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753909882; x=1754514682;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Zcr0HAZVJL/wPM68//kB0QFOkcy4cqNgVvPP1uhkVrY=;
-        b=wuLQQnQe4euIXrfKwAPslsowKMzFrpA0MrStfHqCqEnkPspmIIHy9nW3yMd38tbt2N
-         5hgE/Wpl9yD/LdcyQI4JFV/XiOdGyLncZ6g009+GWHL2aro6UWqIdS+GteluZ2Abki5J
-         IRv8WWE/KnTegsXIIqgt8Aa7cDKmAts6rtafV4Du39A4u6RuKOZAjtxM/cty4Og14ZxS
-         M4mr8KyGJJs7Rwb6bQAvUvIFTZSvqVN2fPSVoTsR1Z9BVZgLgFb5WBC6dIhSi1yGhpgy
-         darLIlMJN07aZD97V450+x9azb7xv05tbVCfgHYlfal1eGNFzAUQZj4fwHXkFyMEQHNk
-         Z5Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCV4oamQuxtJN/rL1viVZe+Ju9mbRXhXL7tqrWNZLOpD3RVTNI5yDOG/IekCWJZW/zMTjDrheRg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwLxaxcER2OTN24l40h6CGf5zDCBWxFTFiqHtV+qWpKIFExQ7Pg
-	tGAK+oTUjME3OC6VGx1mdWrXsBExTPHAr/dWO3E6Ot26OqhCsdJm9zKEqy2G958v2YaZDo3Tef4
-	2HtULBHsb/EFh5EZ44u+o/A==
-X-Google-Smtp-Source: AGHT+IH81SELHZh+GPX7YKucdrOrQjsD2qC5Y2tfTvaMHB5OVH1Y4cxqU+ojrj5t1POmR4E8onsMP+EV8Hr7rDZV
-X-Received: from pgmb10.prod.google.com ([2002:a63:1b4a:0:b0:b3b:d2a0:df40])
- (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:12d3:b0:234:216b:cf98 with SMTP id adf61e73a8af0-23dc0e8609fmr7392654637.35.1753909881916;
- Wed, 30 Jul 2025 14:11:21 -0700 (PDT)
-Date: Wed, 30 Jul 2025 21:11:18 +0000
-In-Reply-To: <20250618042424.330664-6-jthoughton@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmTqUVtx"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D6E45C4CEEB;
+	Wed, 30 Jul 2025 21:15:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753910116;
+	bh=p7eZsxpS3vtI9tDNOoEZiy9hk5CJI4f8gTmOSqmh174=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=YmTqUVtxYpaNhdbkPogckhsBnYFGwmR0Vtdaf//I6za5TKQ0VnghxjOVegG/jG2Ny
+	 zsRQNR3aRGs4zFphKpbQlySpGdfweQZ+0EbP6RJuy0e/hITMX6Pir8Y3gpAdkbyB+g
+	 rxo6xRfN0h47InrLEAReQI2Kr9fTPUh25Zzbzv+w7o7V0CE22LxZhfxLdvD4DH6JcR
+	 0XschW/Zj3zQ/i3tpLe2bc4ZyHWHQgj5BhC07F/Qn2nF7+Tu7eaXE97yTsw+DUe6kT
+	 f7SaYYtkDnVoQ3B9sXXxTl42t3bO8TC6wqeZdVuP5IBwZ8OR9wJV4w+HWYmG15Kwoq
+	 fEun/NOLKGOdA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F76C87FCC;
+	Wed, 30 Jul 2025 21:15:16 +0000 (UTC)
+From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
+Date: Wed, 30 Jul 2025 21:15:04 +0000
+Subject: [PATCH v9 1/6] KVM: arm64: Correct return value on host version
+ downgrade attempt
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250618042424.330664-6-jthoughton@google.com>
-X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250730211120.4163536-1-jthoughton@google.com>
-Subject: Re: [PATCH v3 05/15] KVM: x86: Add support for KVM userfault exits
-From: James Houghton <jthoughton@google.com>
-To: jthoughton@google.com
-Cc: amoorthy@google.com, corbet@lwn.net, dmatlack@google.com, 
-	kalyazin@amazon.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	pbonzini@redhat.com, peterx@redhat.com, pgonda@google.com, seanjc@google.com, 
-	wei.w.wang@intel.com, yan.y.zhao@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250730-virtio-msg-ffa-v9-1-7f1b55c8d149@google.com>
+References: <20250730-virtio-msg-ffa-v9-0-7f1b55c8d149@google.com>
+In-Reply-To: <20250730-virtio-msg-ffa-v9-0-7f1b55c8d149@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Sudeep Holla <sudeep.holla@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, ahomescu@google.com, armellel@google.com, 
+ arve@android.com, ayrton@google.com, qperret@google.com, 
+ sebastianene@google.com, qwandor@google.com, 
+ Per Larsen <perlarsen@google.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1753910116; l=1399;
+ i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
+ bh=P+lmb3sotGE8m34PBEfN/prSolKXtIpxrlMSQIy5CgE=;
+ b=VKzFYOmcY0g8SQT9dFrjRsgwYo/TQGIlpS1AMrLT5Fz0mUdsn2nlcFi9n9U8XRR0V/4CPVnn1
+ 9X2bF0wPHL4BHihowB+PK5QTAl3dw8KfYS5jViTtx1u6yIQGIVfJnUP
+X-Developer-Key: i=perlarsen@google.com; a=ed25519;
+ pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
+X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
+ auth_id=402
+X-Original-From: Per Larsen <perlarsen@google.com>
+Reply-To: perlarsen@google.com
 
-On Tue, Jun 17, 2025 at 9:24=E2=80=AFPM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> Only a few changes are needed to support KVM userfault exits on x86:
->
-> 1. Adjust kvm_mmu_hugepage_adjust() to force pages to be mapped at 4K
-> =C2=A0 =C2=A0while KVM_MEM_USERFAULT is enabled.
-> 2. Return -EFAULT when kvm_do_userfault() when it reports that the page
-> =C2=A0 =C2=A0is userfault. (Upon failure to read from the bitmap,
-> =C2=A0 =C2=A0kvm_do_userfault() will return true without setting up a mem=
-ory fault
-> =C2=A0 =C2=A0exit, so we'll return a bare -EFAULT).
->
-> For hugepage recovery, the behavior when disabling KVM_MEM_USERFAULT
-> should match the behavior when disabling KVM_MEM_LOG_DIRTY_PAGES; make
-> changes to kvm_mmu_slot_apply_flags() to recover hugepages when
-> KVM_MEM_USERFAULT is disabled.
->
-> Signed-off-by: James Houghton <jthoughton@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+From: Per Larsen <perlarsen@google.com>
 
-This patch fails to remove the WARN in recover_huge_pages_range(). The
-diff below will be applied to the next version of this patch, whenever it
-comes.
+Once the hypervisor negotiates the FF-A version with the host, it should
+remain locked-in. However, it is possible to load FF-A as a module first
+supporting version 1.1 and then 1.0.
 
-This WARN can be hit by enabling KVM_MEM_LOG_DIRTY_PAGES and
-KVM_MEM_USERFAULT, then disabling KVM_MEM_USERFAULT.
+Without this patch, the FF-A 1.0 driver will use 1.0 data structures to
+make calls which the hypervisor will incorrectly interpret as 1.1 data
+structures. With this patch, negotiation will fail.
 
-I've been having offline discussions with Sean about this series; I'm
-waiting for him to rework the KVM_GENERIC_PAGE_FAULT bits. I'll dedicate
-some more time to the QEMU side of things too.
+This patch does not change existing functionality in the case where a
+FF-A 1.2 driver is loaded after a 1.1 driver; the 1.2 driver will need
+to use 1.1 in order to proceed.
 
-Thanks.
+Acked-by: Will Deacon <will@kernel.org>
+Signed-off-by: Per Larsen <perlarsen@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 7f3d7229b2c1f..2d83ddb233a9a 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1779,7 +1779,7 @@ static void recover_huge_pages_range(struct kvm *kvm,
- 	u64 huge_spte;
- 	int r;
-=20
--	if (WARN_ON_ONCE(kvm_slot_dirty_track_enabled(slot)))
-+	if (kvm_slot_dirty_track_enabled(slot))
- 		return;
-=20
- 	rcu_read_lock();
+diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+index 3369dd0c4009f84ad3cf9481c747bdc57a162370..2c199d40811efb5bfae199c4a67d8ae3d9307357 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ffa.c
++++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+@@ -712,7 +712,10 @@ static void do_ffa_version(struct arm_smccc_res *res,
+ 
+ 	hyp_spin_lock(&version_lock);
+ 	if (has_version_negotiated) {
+-		res->a0 = hyp_ffa_version;
++		if (FFA_MINOR_VERSION(ffa_req_version) < FFA_MINOR_VERSION(hyp_ffa_version))
++			res->a0 = FFA_RET_NOT_SUPPORTED;
++		else
++			res->a0 = hyp_ffa_version;
+ 		goto unlock;
+ 	}
+ 
+
+-- 
+2.50.1.552.g942d659e1b-goog
+
+
