@@ -1,72 +1,72 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A811B0439
-	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 08:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F87E55B
+	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 08:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753949309; cv=none; b=Kyz/IjlUleS6vygV4vRmpCDEX1pQeTI5kvaj4plK2UQ+wQ6w+6MYq1S36KSRfE6hEjev6OBAkWx8ZZ+its/bAtUZ0MJAs+uXU7f/tn7p1vgGiqze6fFZ+w8SNrwyjbUYRzqlK/PhVOdvqdKaTosYli04xrkCp+WuqoDjTePuN7A=
+	t=1753949337; cv=none; b=SYtQkndFvaIiUyPTazWInvwJUU74Lxxb/LlyAwSFBbNuNZXgIWB5FVTD+K7Xb7cJZTwXQixHE3gFdrLsGE86mVqZo5wtkLQ7qIODFTmdL4U2em2HgybGqHhfqwBBrLzPg8TxavvPZ5/K/mB8X5j/O8LCxM9yjMvHdsATLjj9hiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753949309; c=relaxed/simple;
-	bh=e5Hocw5GiE127jmgexsLYEDO3B9Flp3i16mxz7Kb7EU=;
+	s=arc-20240116; t=1753949337; c=relaxed/simple;
+	bh=sOdpA6ePDmomXzo1Y2B+Mmkj9rNOUEog8vH9h84ed5U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K/o9VrA1UT0WyNigJ+MLrNoJHlHOHb8uFvPgOHwbv3f2BMKUAs8IrtPzSrkg25kug+CimQgbicquNFGQtxF2Isysr3Xw3NIniwwbkcwZd20l/qh17OKNSaGcQIP3d4fmicNgYDhExv297fY7RTbMsWkplEEAbPfzuqXrEI1mzbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zMQGeevb; arc=none smtp.client-ip=209.85.160.172
+	 To:Cc:Content-Type; b=mQMReTu0hd+2QIHdYUQhRu3e+z1twpjpvfd2uRv8i7FG7TLm1P6CCsT/Gm2VfL2Jre2SSrytaPClV/ISFWpnj+lD4DEdRpHXcmcJUMyY2YimosVgGZgDYXawv7dBxeJ/o/fKNWUt4LfNpN4DPPTEyQgWa1IO5DqMa+v1I70pQRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jRKovPDR; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zMQGeevb"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4aef56cea5bso60921cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 01:08:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jRKovPDR"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4aaf43cbbdcso138221cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 01:08:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753949306; x=1754554106; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753949335; x=1754554135; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jeno8f5+usJMV/ac339wMG/DF96hWxCd1z1Rm4i7gbQ=;
-        b=zMQGeevbeDZt5ISay+l7MXSoyfYZmYkp0xt6CMZAv5sIw+WunWUzRm/3qqE6bHAQxb
-         JQ6wRMadha+BphM4IGQmko+diWPgf8ahzt9lPWP2GQMZN2p3XJedtuIgK8Dde0y6tDMZ
-         703iQqaEFAV8yI/hAI3g0NNw8h54YZEe8Lj3NQbE6kcwg24SQzEg7pB2bFX68HgG4Cm0
-         2FXI3RiPnsItXfG+sN+dnlOqbcwKkckZBn2WYMrLeQiFUa2hJ46xc2JAC4t/BB7+UMgG
-         VJn5c9kvJH0bD+jouV8hg+5Y+0KPtMK3LZDqCfCrEjyDOlUclR2VXAD+Ag//llx89k1z
-         DLsw==
+        bh=GnPE+sz1C/80U9yCW9/f/ei/+/2FFUemOvS6oEBnVic=;
+        b=jRKovPDRMdtVKvjCl4ekdmHF1I4WeQ6CMg+dE6j50uTlW30uaC3L+wLIDm0dsBGBx0
+         uMFROWLoi9amlFMcpSCcWWeIHuLV64aOMBT8wfCN1tRR2IzpMj0PW0LlClY8rxc0aJ+0
+         Z7GlCDh+WYOEneAdHfH8lp0RpGoE6TWaEOYgP+xgVC1q56z3IbZcuWl6HjqBkSccWMTE
+         OTy8W5IaDVIDPAKiLzwdxllTpWdCWcFL5lSK83Oz6xEyCWDozCDHecK0XNhvFTrCH/FK
+         NGx9tWoqGi1j+D80Lzj/nE1fM5W63gJJAYVJ7vb714eHoxd2jtq4Ibj2gwKpCFezZkr3
+         CXkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753949306; x=1754554106;
+        d=1e100.net; s=20230601; t=1753949335; x=1754554135;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Jeno8f5+usJMV/ac339wMG/DF96hWxCd1z1Rm4i7gbQ=;
-        b=Go6EFAHOy3QnuZYLqgk7myE6jUMRN+A9DbVsIPQ+imKepBuFyyMC/SijWc1tqBd+lH
-         C+HXy0uLfRqkQ50hF6ZxtOd8lv1NwDRkkSSVEXn28ix3iTC7pj2myFno+3EFxqHdU77t
-         27OeO5jGEGOyaO5rXf7LJNAICULbwlQ2rzGPfrJooPSF/jCtEjP5DUDbjmSrWTmHEBOk
-         6EJmO0Wy37zWj/+DBKM6f0E6RSWtyTyveTasHC42x3oX/IlMmk8Oh3R9KZjyhwagy5Uf
-         v6tn2kt53znv/0x0V0egr/YbGmC3biGBah7fAat+MCEsnKz0rF49keWXOjMC3jEi+nnp
-         F8SA==
-X-Forwarded-Encrypted: i=1; AJvYcCUyeu+VEB1uG0gFIEY+JhIi6INaSUrH7HM4zLxQF4tw4+ZFEFuhpsLoyuNk9C9K/lbgpHViV9o=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyMA60t8uqwPqGm/3PLbChC2gOHmdrL3eO1m0TsAD/HkqlIk3zx
-	g4spVH0RRHCShdXAVImdVIzglIs1K7hjVMMIAIbBvnbFeSmWsoTU3/eZFug5tz1iR77dvuJsQ7N
-	PSWtLzgPCWo7Qn/tOV7ZB2rnobzKeKi+rVqk09hsa
-X-Gm-Gg: ASbGnctA48HiitisQh4tt9IT11ChEM+LiVzaLPjkzQPDHHRT1NwwUb+bVIkq43rPfnc
-	Ud4/M6J+mrHKpe+iUeFbVF/i260jymVCA1mDZKN9hTKkrgpG6RdvZdPk4W6L5MJNHHylzNbzTFR
-	qPNZdfsEPYpnWoL99Uph2HnxZeEOeocZE3S7ie6jZwfY0Vb+QqkgsKuPBgwl2aePitdW8+BnFIc
-	cDiEO0=
-X-Google-Smtp-Source: AGHT+IFbmVQN1x5b+62iRQ3U8XZDUkGVQZbiaLNVWtLXncLKF5qCofgpdoCiMDPvbq7m8yKnT95C2PAE3uUVd0hLcc4=
-X-Received: by 2002:a05:622a:13cd:b0:4a6:fc57:b85a with SMTP id
- d75a77b69052e-4aeeff89123mr2556921cf.14.1753949305731; Thu, 31 Jul 2025
- 01:08:25 -0700 (PDT)
+        bh=GnPE+sz1C/80U9yCW9/f/ei/+/2FFUemOvS6oEBnVic=;
+        b=k0hClUYJeO3q+vq/ABE6rSkLF+vvqNbaJ9SBcNTKvgKEEgv3nAd4QAUd9l5mCB+Ovp
+         LI1uxYPaDjBWyQnws7lm+SHfGFJu6U1fPA0YxrsJyjWubgSRGDcAVBFRxZ3kxU/gnWpv
+         mw/KaDuAiNkKQSk2zUhPf9JCU8paPfEKlrmXs/b+zJmm1gLMp1ih+gqEzzln045so2uZ
+         06vLNVJmm5qG6oCbBRMv+jxirAwYlmpSkTBss66GnM7QDv0NatW6M0kCyprcsZbdqLeL
+         dAIa+2LLPyFVtIH5eLjQ94Au3BQXWv0CWJoBcXE2T4jruyx1EwaN/lYqDE31XD4PYznd
+         5dZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/fC9psJN0jGqvHHvF1P5FKgjS9hNoY8BNrwD/QyZLg0mO2B3fas+FpwByinLGW0Ehvh3wUtM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx0XHnfJ4V5Mp3qRCYvwxHLx+fanxTRiIqWHZMJotZIPE6kl+qw
+	+wiIJsRGDfMsQ01u1Rzctl6M4sB1/dHIGtZx09t2u/qAmigyBhCdcXltUdMGcVVrbJ9QobhQqBg
+	QPWCmtuWO6mvm/JhIif6ewCg9YEU4ADFLj3MK9zGM
+X-Gm-Gg: ASbGncvAiswQti8ZzP6i3p5drH1/YVjaXA9OijP54KghpCX0cL9Jv5jjwK6ICfJjETy
+	IEENSq7e6xlr2DR7EvHkqpDJtjHJv/83sMpwkHw0krO3UOFWjTNEdE91JLqawWXO/QcSsQ2T5a/
+	19qqLPhbSVma391k0/dCqNV8XiP6ZhfyAeIY3PWwZqAoLrQlpD7/rKwRI+qYB1TMWnCniE/1Up7
+	kBHgI4=
+X-Google-Smtp-Source: AGHT+IFK/wJp553R4XjzZSWJ+dcd/8ojrcK2vt8dKw6Dg/D6YDKGLkDZhQfaq4WdtYxdsAtQNGiLyd6uqBH+0njZkJk=
+X-Received: by 2002:a05:622a:178c:b0:4a6:f525:e35a with SMTP id
+ d75a77b69052e-4aef1c6158fmr1665301cf.9.1753949334737; Thu, 31 Jul 2025
+ 01:08:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-5-seanjc@google.com>
-In-Reply-To: <20250729225455.670324-5-seanjc@google.com>
+References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-4-seanjc@google.com>
+In-Reply-To: <20250729225455.670324-4-seanjc@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 31 Jul 2025 09:07:49 +0100
-X-Gm-Features: Ac12FXy0R_yNTeBd7qrXPHZNFcLfR6ujjjzcWA_Yc7EECI6d3AjDyGMKsJvuKKg
-Message-ID: <CA+EHjTxHk4hsPXDiUY2nOfGdT9GjPvu7YdNKApkUJK4RjBKB4Q@mail.gmail.com>
-Subject: Re: [PATCH v17 04/24] KVM: x86: Select TDX's KVM_GENERIC_xxx
- dependencies iff CONFIG_KVM_INTEL_TDX=y
+Date: Thu, 31 Jul 2025 09:08:18 +0100
+X-Gm-Features: Ac12FXwMtfUYkRsjJ3iXPfnzRPX0pAHczqzVmU7Q3OVeBtET53NBzRBcYs_fBLw
+Message-ID: <CA+EHjTyZx5pU6Qhe8HNw_ciGXDVfasaD6eBnofSfUJk3VnbzTw@mail.gmail.com>
+Subject: Re: [PATCH v17 03/24] KVM: x86: Select KVM_GENERIC_PRIVATE_MEM
+ directly from KVM_SW_PROTECTED_VM
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
@@ -80,10 +80,11 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Tue, 29 Jul 2025 at 23:55, Sean Christopherson <seanjc@google.com> wrote:
 >
-> Select KVM_GENERIC_PRIVATE_MEM and KVM_GENERIC_MEMORY_ATTRIBUTES directly
-> from KVM_INTEL_TDX, i.e. if and only if TDX support is fully enabled in
-> KVM.  There is no need to enable KVM's private memory support just because
-> the core kernel's INTEL_TDX_HOST is enabled.
+> Now that KVM_SW_PROTECTED_VM doesn't have a hidden dependency on KVM_X86,
+> select KVM_GENERIC_PRIVATE_MEM from within KVM_SW_PROTECTED_VM instead of
+> conditionally selecting it from KVM_X86.
+>
+> No functional change intended.
 >
 > Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Reviewed-by: David Hildenbrand <david@redhat.com>
@@ -96,31 +97,29 @@ Reviewed-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
->  arch/x86/kvm/Kconfig | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index 402ba00fdf45..13ab7265b505 100644
+> index 9895fc3cd901..402ba00fdf45 100644
 > --- a/arch/x86/kvm/Kconfig
 > +++ b/arch/x86/kvm/Kconfig
-> @@ -95,8 +95,6 @@ config KVM_SW_PROTECTED_VM
->  config KVM_INTEL
->         tristate "KVM for Intel (and compatible) processors support"
->         depends on KVM && IA32_FEAT_CTL
-> -       select KVM_GENERIC_PRIVATE_MEM if INTEL_TDX_HOST
-> -       select KVM_GENERIC_MEMORY_ATTRIBUTES if INTEL_TDX_HOST
->         help
->           Provides support for KVM on processors equipped with Intel's VT
->           extensions, a.k.a. Virtual Machine Extensions (VMX).
-> @@ -135,6 +133,8 @@ config KVM_INTEL_TDX
->         bool "Intel Trust Domain Extensions (TDX) support"
->         default y
->         depends on INTEL_TDX_HOST
+> @@ -46,7 +46,6 @@ config KVM_X86
+>         select HAVE_KVM_PM_NOTIFIER if PM
+>         select KVM_GENERIC_HARDWARE_ENABLING
+>         select KVM_GENERIC_PRE_FAULT_MEMORY
+> -       select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
+>         select KVM_WERROR if WERROR
+>
+>  config KVM
+> @@ -84,6 +83,7 @@ config KVM_SW_PROTECTED_VM
+>         bool "Enable support for KVM software-protected VMs"
+>         depends on EXPERT
+>         depends on KVM_X86 && X86_64
 > +       select KVM_GENERIC_PRIVATE_MEM
-> +       select KVM_GENERIC_MEMORY_ATTRIBUTES
 >         help
->           Provides support for launching Intel Trust Domain Extensions (TDX)
->           confidential VMs on Intel processors.
+>           Enable support for KVM software-protected VMs.  Currently, software-
+>           protected VMs are purely a development and testing vehicle for
 > --
 > 2.50.1.552.g942d659e1b-goog
 >
