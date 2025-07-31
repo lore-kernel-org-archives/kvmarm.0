@@ -1,166 +1,245 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14D42E40E
-	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 08:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641D71B0439
+	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 08:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753948923; cv=none; b=beS98zvPQMpWB1m40+ScfsRp6rp2ygcffarADy/kkqEBnJRU4q05XOhb86MguwbZYDSYgX56FnnGNSccp3MKN/SnkQNW3cIXL+UG0kzG8iavTFgVdszTRR3gjOHuBA+Mw7in/2LS99BYvUiCHk37SsJTNjm9PC9a42EnGjSKn+I=
+	t=1753949164; cv=none; b=bqsiG2Vp/iY2nNXe+yBz1mRPt2vvdVidQGCkWYHcVRkAM4Pt3fUbkMJa++CkCtdSEzzw9AccUhL6+hde2022w7rqGOrVBP4r3D49trObxrSYWPqudSNh/dm56guXEP9flG7h80m+RHe05rchYn2mIiGCldNxBF3j/wJ2V+jMsMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753948923; c=relaxed/simple;
-	bh=LcAqJ7x/hkHgTux6gZtuAebLsx1Ln3OpuPN9qKEn+CE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MwvmisIokO0JcSwf2WxsvGyC/m4tC/sAmziqzOwbYjlCH2OqrchgvTdcFfprrNVidkBnDFeOS8vIGRt0yvSKfD7wZObrqdwdSuXBAAszb72lGO/dneIvk1gT5BUOikniS9Z98uMaOXFIYk9zCTQjA9/0CH6Y7tWLz11Gnk1E+TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iHB9ePte; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1753949164; c=relaxed/simple;
+	bh=Dr25RX5UwdEyT/fw+Vjy8ZCDiwBHn/6iRJwKcG/4Kjw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SUoJD7XnEmFyk1fUNRP4OXgcIc0q6+GPs7gwt3Xjt6HXQ1bXRPUVonYQl7pJ9sEF0fVRFbacWP2LVKqHETsrI1yglPAxN5HagbsPnidsmEgnSHlgJUYkNpc2AV7JknT0CrhfGS3vGcwvdODWqr3CCIwbUgWa62OQoXpAcAIO9Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tpVdsQ+0; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iHB9ePte"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753948920;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=1JJijs4W2vHC2VDBttSaecYsyLQnG1kUwLx2TkZowLU=;
-	b=iHB9ePteHf8ZYchRMsHErqrf5v8LuyGn6/PbrwPkRy/htwY0fqynZzutSWw/bRLrjv1YR7
-	Ygll1mu0PAmtIdATXUF7PxnhQ1frnxqEm3pELP9Vr8NoS252GsWbLWim8Dmp/0vkySZC0A
-	pJKe+HgXIn2+z+C8oIoYMT1BegQfxWU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-533-EhlZayoqNui5HFVPdWhhqg-1; Thu, 31 Jul 2025 04:01:57 -0400
-X-MC-Unique: EhlZayoqNui5HFVPdWhhqg-1
-X-Mimecast-MFC-AGG-ID: EhlZayoqNui5HFVPdWhhqg_1753948917
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4586cc8f9f2so791105e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 01:01:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tpVdsQ+0"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4aef56cea5bso59921cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 01:06:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753949161; x=1754553961; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sX9GbqVIjmwrvhX5OSfDHPFCq4jInN5mZum+NpNw7Gs=;
+        b=tpVdsQ+0C8/aiF9zSCRPqoDJ1o+w5tiwiFRLs2+Ls4nVah960RHX8OklDwu/g/VN0f
+         6oEixMS9hIlo6zp4y82UTgE/+4jVrkykevtU/Ex3iw77xA5ly/AfcHbfKa6d8LQtooCc
+         Q481yXHTWy0AuS6a44kgQiUs3d+mIUDvZR3/S8+/2WkXfADQhhj5sAguqELR8soKJ+My
+         wUh+EzF5EUyoPVzzeSlH3gQq4L2TDlkbw9K0r2th2e8xuKDFybV+kG5XomXmxHodWAo3
+         3E6+CiJoFKvMUS0fWe6D9kIlogupouq4ypt7rj4RDTEeeUiwI1UBCbTSOwOYN6w5Zr2A
+         60bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753948917; x=1754553717;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1JJijs4W2vHC2VDBttSaecYsyLQnG1kUwLx2TkZowLU=;
-        b=Br1sVhuKtjj0KQoGC7hQnuljgLhulWOy21GOXsI21tGfHKeuvdirufR44J1AnnihC9
-         rq8AMWUMuQwsbv4q3kRmfITh77Bvj1xwMbtdQgNbpzXFnWZ0zE0yXuVHqtGMLsDb5EEV
-         L2dugj4ZIeL1MF/rePV+x5tJk0gxs51MHIZDvm9rKu16Wb0n0yxb4H9y5iQHdj/G2inX
-         zqVeVyUXqhwD+cr2a2CPPntDp3CpZ5sy9dZwvyXnMm8/l+Xp2Smhr+qJ82Cd70gWxN7L
-         GYaIA1v907A71C5y08sIfQrJWmo4tJVqpsKMgxvo4d9H/0XLHkJHCNyM5YRLwf24aW50
-         R88A==
-X-Forwarded-Encrypted: i=1; AJvYcCWpo/myDjHKM2WssaxPt5Oik3jV9ynB/wIB9PQhqgRuah4dtmmSpXjLeDgMufWqBSflmf0BiC4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzNa3okzVAm3E4qHVuCGI2iDq71hzfDXCRGBc/Ds1/WJNAOL71s
-	5V6Jip6gBGoqh0ArrWlmIr9PiRIafyJOgEEoRC/RNhOVlN5i1IEsNTS8Ae9mY+hulDxX9lgvF5i
-	oBa4T+WEYpXqmfQzmYbBsYU1TMCPmaeNN3b8zYIPvLHmhdcOTSm7jChtYfQ==
-X-Gm-Gg: ASbGncsWs2M/fbmD8CrQ7vW+XNelHOAo+PCU0nt6h28IXdMQOM1TvKkUnTzYaJImxD0
-	5C3oEsR+TmbezXt4kypu5/0GPivvIn3ivbhV2Amo/eziEIOuAM714dup6G7YJewn5nhCHDs6sJM
-	QxJ9qxHdsZxkKiAo5vBGjMbGT2hQIwpFUY1akDNjKC2hclNqPhPV/OOpUQVh3wNJVB22taB4Lh4
-	qaPMIU4zD8Hjpbwq7JMPp4bQNX1qYeJNN95W98xbpyn2g557hTpUU/PQPiNLMrPBdIPKyG4J3C3
-	JOhRJHJ+8JTcCuokIBJ3z9V7577aEgk3Yb+XRLcRxq98pR1DJgB8BTYhr1cVyxk6EbeaoQPhqfQ
-	KeiaW7qPXGieSGC0QgKfW1DXA/crQEp0V9lWEPnuHU6/UB4Wd4pA/s7wsqjyxtTFRxcU=
-X-Received: by 2002:a05:600c:8b77:b0:43d:fa58:700e with SMTP id 5b1f17b1804b1-45892ceaecbmr48174815e9.33.1753948916701;
-        Thu, 31 Jul 2025 01:01:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHyLz/naDKoYXO0ZrbHzB0TQqBQIY0shm63Y9kIehrjwG6I0rtLZZVVvO3oMjdHoQbbfXbHRw==
-X-Received: by 2002:a05:600c:8b77:b0:43d:fa58:700e with SMTP id 5b1f17b1804b1-45892ceaecbmr48174345e9.33.1753948916261;
-        Thu, 31 Jul 2025 01:01:56 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f44:3700:be07:9a67:67f7:24e6? (p200300d82f443700be079a6767f724e6.dip0.t-ipconnect.de. [2003:d8:2f44:3700:be07:9a67:67f7:24e6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458a3038121sm10902415e9.1.2025.07.31.01.01.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Jul 2025 01:01:55 -0700 (PDT)
-Message-ID: <33b6deba-a1bb-4515-a659-9822b5b13d95@redhat.com>
-Date: Thu, 31 Jul 2025 10:01:53 +0200
+        d=1e100.net; s=20230601; t=1753949161; x=1754553961;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sX9GbqVIjmwrvhX5OSfDHPFCq4jInN5mZum+NpNw7Gs=;
+        b=CAtBQegOmKMaTJzHratUEa4QZyNjKmh8kBpTcS3MfOoNwhSw0rEAlD1ywR4YmDnjwm
+         5kzFV5oeWDoncZwFswfR1A1H3unyK2VtEgVi1B8xgdJC45DE0IFNQjUK9tsPfTDvqHOb
+         OoPAAgCEUYbN1syqRUhW6mzy6LYzrJVRJfb/vCS+J1Jpk2RJ01fTnt+3fsDj9LJMgsKf
+         5BuK2iaxB1sR1BRyBeumtazT8wAWwUXRv/tR6ruTAW+vB8GLB6fVsQ0yoi2Vikn3Yy0h
+         KZYG1OVOmxj/YSgXaoYe+0A2cJb6u2zgS8T/xzUcZuvM7HD8+JotNdNAQUlgOA7vyM1w
+         GLyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVAiXRqGkIyMm90qpAMVFmtw2APyRaUt23Y/s6Hi1gMgLu1kJVoSV0Vrz9M4m1Xdq5J78R5HBk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxdvTWAgjdUiAO1XVLdi0TRRNvUKcOYqdydEh5aLDjnadtn9Wcv
+	JyuKF2U995PIz+VRYMpfwkIXqBRXZjgBaENs22wzKcteEfJdJTdCYr7Zk9Bjuoczjdj1grceIm0
+	nVFXtCG85joLqUoPi6E577w/Q7jacBMIN3+vBS5LY
+X-Gm-Gg: ASbGnctTsGy0iqWY8Q79OCnCq22ZIxXCb9QVdXunWAXzcFuZzccmWBsp8H1SkFcSk5e
+	ibrt+h3KpJ/e6x7oAngA29QTqS7MmdsVkDszvBFvdG4ouiVSGEGNfzSDOvEw520uBeayfNWPXvd
+	BloDi9wpAKne2ALJojxCHZd3Ijv3NkmwkSi0rW0iLmygWHjw8Qa5wTAugrcM7eSWPdzbgemxHin
+	zhTewow8z7GHsGfXw==
+X-Google-Smtp-Source: AGHT+IH4yq+cZN4dHwzK7g8E7DSjy0bGu3xiXGytk3StPe2WtxT21gv+bvGK0jCbJI3gRQMQxRtljt9Le12kOsEdiUI=
+X-Received: by 2002:a05:622a:1989:b0:479:1958:d81a with SMTP id
+ d75a77b69052e-4aeefd25399mr2167431cf.6.1753949160761; Thu, 31 Jul 2025
+ 01:06:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-16-seanjc@google.com>
+In-Reply-To: <20250729225455.670324-16-seanjc@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 31 Jul 2025 09:05:24 +0100
+X-Gm-Features: Ac12FXyz8RfnHssTX6SapaASSN1w3XZbMdMXGmxSRe7KK501NuRu89FkBwEbo-Y
+Message-ID: <CA+EHjTz0g+Fd-893WYA9+WBhvMvbsrXvFtL3OGa8ohC6DdVbdw@mail.gmail.com>
 Subject: Re: [PATCH v17 15/24] KVM: x86/mmu: Extend guest_memfd's max mapping
  level to shared mappings
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- Ira Weiny <ira.weiny@intel.com>, Gavin Shan <gshan@redhat.com>,
- Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>,
- Xiaoyao Li <xiaoyao.li@intel.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>,
- James Houghton <jthoughton@google.com>
-References: <20250729225455.670324-1-seanjc@google.com>
- <20250729225455.670324-16-seanjc@google.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- g3eXuA==
-Organization: Red Hat
-In-Reply-To: <20250729225455.670324-16-seanjc@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: TEJNaksZmExOt2rSnXMvf5c4mdmYQNhwSiemBig-PiY_1753948917
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
+	Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 30.07.25 00:54, Sean Christopherson wrote:
+On Tue, 29 Jul 2025 at 23:55, Sean Christopherson <seanjc@google.com> wrote:
+>
 > Rework kvm_mmu_max_mapping_level() to consult guest_memfd for all mappings,
 > not just private mappings, so that hugepage support plays nice with the
 > upcoming support for backing non-private memory with guest_memfd.
-> 
+>
 > In addition to getting the max order from guest_memfd for gmem-only
 > memslots, update TDX's hook to effectively ignore shared mappings, as TDX's
 > restrictions on page size only apply to Secure EPT mappings.  Do nothing
 > for SNP, as RMP restrictions apply to both private and shared memory.
-> 
+>
 > Suggested-by: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
--- 
 Cheers,
+/fuad
 
-David / dhildenb
-
+>  arch/x86/include/asm/kvm_host.h |  2 +-
+>  arch/x86/kvm/mmu/mmu.c          | 12 +++++++-----
+>  arch/x86/kvm/svm/sev.c          |  2 +-
+>  arch/x86/kvm/svm/svm.h          |  4 ++--
+>  arch/x86/kvm/vmx/main.c         |  5 +++--
+>  arch/x86/kvm/vmx/tdx.c          |  5 ++++-
+>  arch/x86/kvm/vmx/x86_ops.h      |  2 +-
+>  7 files changed, 19 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index c0a739bf3829..c56cc54d682a 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1922,7 +1922,7 @@ struct kvm_x86_ops {
+>         void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+>         int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+>         void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
+> -       int (*gmem_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn);
+> +       int (*gmem_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn, bool is_private);
+>  };
+>
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 61eb9f723675..e83d666f32ad 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3302,8 +3302,9 @@ static u8 kvm_max_level_for_order(int order)
+>         return PG_LEVEL_4K;
+>  }
+>
+> -static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+> -                                       const struct kvm_memory_slot *slot, gfn_t gfn)
+> +static u8 kvm_gmem_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+> +                                    const struct kvm_memory_slot *slot, gfn_t gfn,
+> +                                    bool is_private)
+>  {
+>         u8 max_level, coco_level;
+>         kvm_pfn_t pfn;
+> @@ -3327,7 +3328,7 @@ static u8 kvm_max_private_mapping_level(struct kvm *kvm, struct kvm_page_fault *
+>          * restrictions.  A return of '0' means "no additional restrictions", to
+>          * allow for using an optional "ret0" static call.
+>          */
+> -       coco_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn);
+> +       coco_level = kvm_x86_call(gmem_max_mapping_level)(kvm, pfn, is_private);
+>         if (coco_level)
+>                 max_level = min(max_level, coco_level);
+>
+> @@ -3361,8 +3362,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault,
+>         if (max_level == PG_LEVEL_4K)
+>                 return PG_LEVEL_4K;
+>
+> -       if (is_private)
+> -               host_level = kvm_max_private_mapping_level(kvm, fault, slot, gfn);
+> +       if (is_private || kvm_memslot_is_gmem_only(slot))
+> +               host_level = kvm_gmem_max_mapping_level(kvm, fault, slot, gfn,
+> +                                                       is_private);
+>         else
+>                 host_level = host_pfn_mapping_level(kvm, gfn, slot);
+>         return min(host_level, max_level);
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index be1c80d79331..807d4b70327a 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -4947,7 +4947,7 @@ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
+>         }
+>  }
+>
+> -int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+> +int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private)
+>  {
+>         int level, rc;
+>         bool assigned;
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index d84a83ae18a1..70df7c6413cf 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -866,7 +866,7 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+>  void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
+>  int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+>  void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
+> -int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
+> +int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private);
+>  struct vmcb_save_area *sev_decrypt_vmsa(struct kvm_vcpu *vcpu);
+>  void sev_free_decrypted_vmsa(struct kvm_vcpu *vcpu, struct vmcb_save_area *vmsa);
+>  #else
+> @@ -895,7 +895,7 @@ static inline int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, in
+>         return 0;
+>  }
+>  static inline void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end) {}
+> -static inline int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+> +static inline int sev_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private)
+>  {
+>         return 0;
+>  }
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index dd7687ef7e2d..bb5f182f6788 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -831,10 +831,11 @@ static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+>         return tdx_vcpu_ioctl(vcpu, argp);
+>  }
+>
+> -static int vt_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+> +static int vt_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+> +                                    bool is_private)
+>  {
+>         if (is_td(kvm))
+> -               return tdx_gmem_max_mapping_level(kvm, pfn);
+> +               return tdx_gmem_max_mapping_level(kvm, pfn, is_private);
+>
+>         return 0;
+>  }
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index b444714e8e8a..ca9c8ec7dd01 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -3318,8 +3318,11 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+>         return ret;
+>  }
+>
+> -int tdx_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+> +int tdx_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private)
+>  {
+> +       if (!is_private)
+> +               return 0;
+> +
+>         return PG_LEVEL_4K;
+>  }
+>
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 6037d1708485..4c70f56c57c8 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -153,7 +153,7 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+>  void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
+>  void tdx_flush_tlb_all(struct kvm_vcpu *vcpu);
+>  void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+> -int tdx_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
+> +int tdx_gmem_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn, bool is_private);
+>  #endif
+>
+>  #endif /* __KVM_X86_VMX_X86_OPS_H */
+> --
+> 2.50.1.552.g942d659e1b-goog
+>
