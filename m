@@ -1,72 +1,72 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F87E55B
-	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 08:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362F8E55B
+	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 08:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753949337; cv=none; b=SYtQkndFvaIiUyPTazWInvwJUU74Lxxb/LlyAwSFBbNuNZXgIWB5FVTD+K7Xb7cJZTwXQixHE3gFdrLsGE86mVqZo5wtkLQ7qIODFTmdL4U2em2HgybGqHhfqwBBrLzPg8TxavvPZ5/K/mB8X5j/O8LCxM9yjMvHdsATLjj9hiI=
+	t=1753949352; cv=none; b=l9OWkqogsIVfUo0U3bl3C7nSWXypq2bUI5XkZyNYDN/rZEsBD/R4vhx8cmQPEY7D3ZbeDEXvXfIbQqdqq6mss4PzQUhsYu/PIIetJCIvEvhZD+/bFQrcOB79A6mnAdg0S37c0pnxhTP+MBFTs78v5kLuFEjrRmxhtYucuQpym84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753949337; c=relaxed/simple;
-	bh=sOdpA6ePDmomXzo1Y2B+Mmkj9rNOUEog8vH9h84ed5U=;
+	s=arc-20240116; t=1753949352; c=relaxed/simple;
+	bh=3qhIHJybqYLHwwYanOWTSTzOJk3WZo3sjmIfTKSzZ/w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mQMReTu0hd+2QIHdYUQhRu3e+z1twpjpvfd2uRv8i7FG7TLm1P6CCsT/Gm2VfL2Jre2SSrytaPClV/ISFWpnj+lD4DEdRpHXcmcJUMyY2YimosVgGZgDYXawv7dBxeJ/o/fKNWUt4LfNpN4DPPTEyQgWa1IO5DqMa+v1I70pQRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jRKovPDR; arc=none smtp.client-ip=209.85.160.171
+	 To:Cc:Content-Type; b=apJ6Hxs51YBEBdv/XOUDnt42Tgks0voz6/dwdbV96it8moHDCZLG1PiLzLyCLnP87pm+V3Bq9ptKcSrNKK4ME3lRobc7OCWv/NeFJc4ueHdM02v5VJXeHwOyw/Xrqv7OHqPq1LB3kGff2tr7wMxzLL8+U7lRbzFuT6tJofXtOys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yHit1Dbr; arc=none smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jRKovPDR"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4aaf43cbbdcso138221cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 01:08:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yHit1Dbr"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ab3ad4c61fso274561cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 01:09:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753949335; x=1754554135; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1753949350; x=1754554150; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GnPE+sz1C/80U9yCW9/f/ei/+/2FFUemOvS6oEBnVic=;
-        b=jRKovPDRMdtVKvjCl4ekdmHF1I4WeQ6CMg+dE6j50uTlW30uaC3L+wLIDm0dsBGBx0
-         uMFROWLoi9amlFMcpSCcWWeIHuLV64aOMBT8wfCN1tRR2IzpMj0PW0LlClY8rxc0aJ+0
-         Z7GlCDh+WYOEneAdHfH8lp0RpGoE6TWaEOYgP+xgVC1q56z3IbZcuWl6HjqBkSccWMTE
-         OTy8W5IaDVIDPAKiLzwdxllTpWdCWcFL5lSK83Oz6xEyCWDozCDHecK0XNhvFTrCH/FK
-         NGx9tWoqGi1j+D80Lzj/nE1fM5W63gJJAYVJ7vb714eHoxd2jtq4Ibj2gwKpCFezZkr3
-         CXkw==
+        bh=sVpT/rCjQeAh5KIDPEhyQ+wKLpTK8xJK+YrwTKpUU6g=;
+        b=yHit1DbrVg4wlBRPbML9frPUXpB9TB6g084U63HbtTiWsMTaGybqwtDq8HSmat1Y1A
+         GYDYsVY+Gn6W0f7/bRvTvCmDWfHLJArxOpLVo5ijRcfmCK0j8rxV1oVRmwxAppFN6JHo
+         r/uNXEdDwqcdPRDNXwpeui3W4ZXJgAjnlvHYIIPVqjAN7k67maNFsfZ7/zNuyMX6+LqC
+         GyNpewUllBWoU20vYwND0un+XqIPFjzhl5pK5v20yR8MPi3OvkeqY1Qz6feQfqtEG9qH
+         nzR7Bat9DQARLgcQmbdHzFODM3Ohws7jhV5byC6jOLUaAMUmnZ9++4Etm3/ThTi2s7IZ
+         WvJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753949335; x=1754554135;
+        d=1e100.net; s=20230601; t=1753949350; x=1754554150;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GnPE+sz1C/80U9yCW9/f/ei/+/2FFUemOvS6oEBnVic=;
-        b=k0hClUYJeO3q+vq/ABE6rSkLF+vvqNbaJ9SBcNTKvgKEEgv3nAd4QAUd9l5mCB+Ovp
-         LI1uxYPaDjBWyQnws7lm+SHfGFJu6U1fPA0YxrsJyjWubgSRGDcAVBFRxZ3kxU/gnWpv
-         mw/KaDuAiNkKQSk2zUhPf9JCU8paPfEKlrmXs/b+zJmm1gLMp1ih+gqEzzln045so2uZ
-         06vLNVJmm5qG6oCbBRMv+jxirAwYlmpSkTBss66GnM7QDv0NatW6M0kCyprcsZbdqLeL
-         dAIa+2LLPyFVtIH5eLjQ94Au3BQXWv0CWJoBcXE2T4jruyx1EwaN/lYqDE31XD4PYznd
-         5dZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/fC9psJN0jGqvHHvF1P5FKgjS9hNoY8BNrwD/QyZLg0mO2B3fas+FpwByinLGW0Ehvh3wUtM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx0XHnfJ4V5Mp3qRCYvwxHLx+fanxTRiIqWHZMJotZIPE6kl+qw
-	+wiIJsRGDfMsQ01u1Rzctl6M4sB1/dHIGtZx09t2u/qAmigyBhCdcXltUdMGcVVrbJ9QobhQqBg
-	QPWCmtuWO6mvm/JhIif6ewCg9YEU4ADFLj3MK9zGM
-X-Gm-Gg: ASbGncvAiswQti8ZzP6i3p5drH1/YVjaXA9OijP54KghpCX0cL9Jv5jjwK6ICfJjETy
-	IEENSq7e6xlr2DR7EvHkqpDJtjHJv/83sMpwkHw0krO3UOFWjTNEdE91JLqawWXO/QcSsQ2T5a/
-	19qqLPhbSVma391k0/dCqNV8XiP6ZhfyAeIY3PWwZqAoLrQlpD7/rKwRI+qYB1TMWnCniE/1Up7
-	kBHgI4=
-X-Google-Smtp-Source: AGHT+IFK/wJp553R4XjzZSWJ+dcd/8ojrcK2vt8dKw6Dg/D6YDKGLkDZhQfaq4WdtYxdsAtQNGiLyd6uqBH+0njZkJk=
-X-Received: by 2002:a05:622a:178c:b0:4a6:f525:e35a with SMTP id
- d75a77b69052e-4aef1c6158fmr1665301cf.9.1753949334737; Thu, 31 Jul 2025
- 01:08:54 -0700 (PDT)
+        bh=sVpT/rCjQeAh5KIDPEhyQ+wKLpTK8xJK+YrwTKpUU6g=;
+        b=BA3WHSV6pjONjaMEPzsq0y4fKIuK5Bo9qDqm+PkQhvTZpeInoRDemLvcjLHw10s4Y7
+         Ex/tYUNjuxjsbbydDPBZEaFe46Pb2z4w0bGrLHFKkoSWxt2dJpWHlLbSlyPVg5JRzB4i
+         35Q6cQoTuNToMmb8U3eZUOiYJBZmYGQ9Sypa4/tkdNSqs//dSD9y3i+JGL3MjPeLTpLL
+         hvXNqI3eVo77dq4jBBc5K+m72QpHQq1QDlfzfXkiOyMcpTaDWbSu9Z0GRvxtyAzSQOR2
+         wSgvQflFWGrrX565ckop+DXCBkd2ho59yHDR2JGz9Z7i/FVFiagqAvELcgGMS7nnQWVw
+         mjKw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbP2zc5d4HdfiOlQghGriuphJeqSwUew6gOhICuJJpPUxqHKugvIdYcT1un/PUG0/E5osAVAM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzOrfWuJGYXf6iDjepLcgolP6hSvPYZruM5RCa3+0AWKbjZ3UnK
+	/fCa98kN0+s3ZwlB6JXz5+FZAea6H1s9stfk8TUzhS+yLx7xdMv2IYJw+JU3rCPHq6Ta+yCI4Re
+	8k1VIGU4ZaSDSvABeWScbSeRcwh6cluqWtIIoILqK
+X-Gm-Gg: ASbGncupDqiuUEi2M4/Og6s28KNcwXThzKmr3pNZzt95/BTfXgJm47lIIC+5R/gsnpQ
+	J2ZiPJm6Z1rbaIGz0WB8z4u5dm5pcLlTBiMSzR/Ajg/Udj6XIxL6kwXTPaucSa9WbAxQwhnhsrQ
+	jXu+QBf3d2aqnq9F5Y2zjsbJT7iKfzn0Wh//0QJq99Niz2+ncuGGTZDnvS3Wc/jwf4jO33rCqJW
+	PpQQ3s=
+X-Google-Smtp-Source: AGHT+IGrOVcMpMBT75FdKmxNn0PIJ5gM9b3irx1KceuhF9jVkzaF5hxH8j7i6+oG0xfsaxYdfsfyN79teagnN0ObxVs=
+X-Received: by 2002:ac8:5a0b:0:b0:4aa:c3f9:99a7 with SMTP id
+ d75a77b69052e-4aeeff4d635mr2252941cf.20.1753949349819; Thu, 31 Jul 2025
+ 01:09:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-4-seanjc@google.com>
-In-Reply-To: <20250729225455.670324-4-seanjc@google.com>
+References: <20250729225455.670324-1-seanjc@google.com> <20250729225455.670324-3-seanjc@google.com>
+In-Reply-To: <20250729225455.670324-3-seanjc@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 31 Jul 2025 09:08:18 +0100
-X-Gm-Features: Ac12FXwMtfUYkRsjJ3iXPfnzRPX0pAHczqzVmU7Q3OVeBtET53NBzRBcYs_fBLw
-Message-ID: <CA+EHjTyZx5pU6Qhe8HNw_ciGXDVfasaD6eBnofSfUJk3VnbzTw@mail.gmail.com>
-Subject: Re: [PATCH v17 03/24] KVM: x86: Select KVM_GENERIC_PRIVATE_MEM
- directly from KVM_SW_PROTECTED_VM
+Date: Thu, 31 Jul 2025 09:08:33 +0100
+X-Gm-Features: Ac12FXzXuU8fZ8KWH4QzSncdpqMTYPr50tdZb-JZxmCnm--xfHOVid80C_5YEog
+Message-ID: <CA+EHjTx7OF2i4MvviAXQq0v6+a7T4SMU0PGsObDBo98Y6zvrBQ@mail.gmail.com>
+Subject: Re: [PATCH v17 02/24] KVM: x86: Have all vendor neutral sub-configs
+ depend on KVM_X86, not just KVM
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
@@ -80,14 +80,25 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Tue, 29 Jul 2025 at 23:55, Sean Christopherson <seanjc@google.com> wrote:
 >
-> Now that KVM_SW_PROTECTED_VM doesn't have a hidden dependency on KVM_X86,
-> select KVM_GENERIC_PRIVATE_MEM from within KVM_SW_PROTECTED_VM instead of
-> conditionally selecting it from KVM_X86.
+> Make all vendor neutral KVM x86 configs depend on KVM_X86, not just KVM,
+> i.e. gate them on at least one vendor module being enabled and thus on
+> kvm.ko actually being built.  Depending on just KVM allows the user to
+> select the configs even though they won't actually take effect, and more
+> importantly, makes it all too easy to create unmet dependencies.  E.g.
+> KVM_GENERIC_PRIVATE_MEM can't be selected by KVM_SW_PROTECTED_VM, because
+> the KVM_GENERIC_MMU_NOTIFIER dependency is select by KVM_X86.
 >
-> No functional change intended.
+> Hiding all sub-configs when neither KVM_AMD nor KVM_INTEL is selected also
+> helps communicate to the user that nothing "interesting" is going on, e.g.
 >
-> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>   --- Virtualization
+>   <M>   Kernel-based Virtual Machine (KVM) support
+>   < >   KVM for Intel (and compatible) processors support
+>   < >   KVM for AMD processors support
+>
+> Fixes: ea4290d77bda ("KVM: x86: leave kvm.ko out of the build if no vendor module is requested")
 > Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
 
@@ -97,29 +108,85 @@ Reviewed-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
->  arch/x86/kvm/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/Kconfig | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 >
 > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index 9895fc3cd901..402ba00fdf45 100644
+> index 2c86673155c9..9895fc3cd901 100644
 > --- a/arch/x86/kvm/Kconfig
 > +++ b/arch/x86/kvm/Kconfig
-> @@ -46,7 +46,6 @@ config KVM_X86
->         select HAVE_KVM_PM_NOTIFIER if PM
->         select KVM_GENERIC_HARDWARE_ENABLING
->         select KVM_GENERIC_PRE_FAULT_MEMORY
-> -       select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
->         select KVM_WERROR if WERROR
+> @@ -74,7 +74,7 @@ config KVM_WERROR
+>         # FRAME_WARN, i.e. KVM_WERROR=y with KASAN=y requires special tuning.
+>         # Building KVM with -Werror and KASAN is still doable via enabling
+>         # the kernel-wide WERROR=y.
+> -       depends on KVM && ((EXPERT && !KASAN) || WERROR)
+> +       depends on KVM_X86 && ((EXPERT && !KASAN) || WERROR)
+>         help
+>           Add -Werror to the build flags for KVM.
 >
->  config KVM
-> @@ -84,6 +83,7 @@ config KVM_SW_PROTECTED_VM
+> @@ -83,7 +83,7 @@ config KVM_WERROR
+>  config KVM_SW_PROTECTED_VM
 >         bool "Enable support for KVM software-protected VMs"
 >         depends on EXPERT
->         depends on KVM_X86 && X86_64
-> +       select KVM_GENERIC_PRIVATE_MEM
+> -       depends on KVM && X86_64
+> +       depends on KVM_X86 && X86_64
 >         help
 >           Enable support for KVM software-protected VMs.  Currently, software-
 >           protected VMs are purely a development and testing vehicle for
+> @@ -169,7 +169,7 @@ config KVM_AMD_SEV
+>  config KVM_IOAPIC
+>         bool "I/O APIC, PIC, and PIT emulation"
+>         default y
+> -       depends on KVM
+> +       depends on KVM_X86
+>         help
+>           Provides support for KVM to emulate an I/O APIC, PIC, and PIT, i.e.
+>           for full in-kernel APIC emulation.
+> @@ -179,7 +179,7 @@ config KVM_IOAPIC
+>  config KVM_SMM
+>         bool "System Management Mode emulation"
+>         default y
+> -       depends on KVM
+> +       depends on KVM_X86
+>         help
+>           Provides support for KVM to emulate System Management Mode (SMM)
+>           in virtual machines.  This can be used by the virtual machine
+> @@ -189,7 +189,7 @@ config KVM_SMM
+>
+>  config KVM_HYPERV
+>         bool "Support for Microsoft Hyper-V emulation"
+> -       depends on KVM
+> +       depends on KVM_X86
+>         default y
+>         help
+>           Provides KVM support for emulating Microsoft Hyper-V.  This allows KVM
+> @@ -203,7 +203,7 @@ config KVM_HYPERV
+>
+>  config KVM_XEN
+>         bool "Support for Xen hypercall interface"
+> -       depends on KVM
+> +       depends on KVM_X86
+>         help
+>           Provides KVM support for the hosting Xen HVM guests and
+>           passing Xen hypercalls to userspace.
+> @@ -213,7 +213,7 @@ config KVM_XEN
+>  config KVM_PROVE_MMU
+>         bool "Prove KVM MMU correctness"
+>         depends on DEBUG_KERNEL
+> -       depends on KVM
+> +       depends on KVM_X86
+>         depends on EXPERT
+>         help
+>           Enables runtime assertions in KVM's MMU that are too costly to enable
+> @@ -228,7 +228,7 @@ config KVM_EXTERNAL_WRITE_TRACKING
+>
+>  config KVM_MAX_NR_VCPUS
+>         int "Maximum number of vCPUs per KVM guest"
+> -       depends on KVM
+> +       depends on KVM_X86
+>         range 1024 4096
+>         default 4096 if MAXSMP
+>         default 1024
 > --
 > 2.50.1.552.g942d659e1b-goog
 >
