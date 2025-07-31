@@ -1,191 +1,141 @@
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2082.outbound.protection.outlook.com [40.107.95.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7218D2BE7D9;
-	Thu, 31 Jul 2025 11:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753962478; cv=fail; b=t5Ah/1Hoo6lW/g1T8wTj/rngdRr4R4SmnRSUbas2T8jKQOokIBMBMChuo+b4jZa31HBEqzdps8DO/5nmROFR7SKvt4rrYAB0C8ZplR1FHnUrdHHrOXIkj3o82Spr/G6pqk1Y1jkz1psQ0TXLSKyObxAxFi6/CYz8ZjOYpsLYvio=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753962478; c=relaxed/simple;
-	bh=CfL/gKX25MNLdwc8+O5gih5Q1ARBEtdQkSdCxloSm7Y=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nkIQ6uaWq+0LzSDsf3Sc4/dMETMlCRe7iCbjrM208Y+gEdDDKZuTXpLE/RLzwG/eIpt5bZfG+0VhmrOdWTCpTq4whW/qpXEnUb2pOQGdsgZTbycxyl5Aks8qzUESdrYhIeZAI+OGsNaNVhQ1nOMJ2WT9RnjMg/KtA50WUKP3X0c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qgV8xKWs; arc=fail smtp.client-ip=40.107.95.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9DB2744D
+	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 12:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753963898; cv=none; b=CffEQKI4xXF6VTdqHWf3+N2WmvSO9QSb1AOQnNEYCEpAqpJ743OBxCMkPih+X1zxZ8BpWK6WJJHVPSE7RwEQAtOwDa1YhaJlVu6KEUU47vIeLKoPKuzysGsSz5BdTxa69OAsnLz093QQXFBa23b/mewC8DLE/7HewWJjdSVPTjc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753963898; c=relaxed/simple;
+	bh=S1wXea6GSEkJsxBK8lGgS5pwcy7cCkvMsy6PmRLU7EE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LHpHPBMvqfe+8vjFvzOGWi7ssl82wjp55mJQ791NmvrQbLu5zufi0GBh9KHIQqar0gpv55ysqjc8Sg87U0UjLF7QXLfUQnE2jgKd7xyA+DgU0y40kEKido82Z8mhjsgB72KQgja+VtbI7zn3z3K70BQEH9zSuzrNKlip/Q0De5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=iGi6SRN8; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qgV8xKWs"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=we6XJL+iYA1XB+/SasYXVX4x0A4prNv0SCxhktiIipEKKTNcGw3CepLGZeloRkjW3gHfum9HqpO9shZW/WJTy/sowMYvtKDzp9ILJnoOwzRhf3F1kkB8pq76n3RhHtELUhZrujXxnwJSBM3VOhXHDrQvejitRklqJgIuzyNhttAqet/Eb71Tzq8KLW6wijay7+DEeWcCD0tdZh6sQcyGNMKBbAks6O5SG4q4F8SJ9Ua1GQxiv7ej5n+NmqBRi1i+ly4D6718Tqy8NTBNy/srffA2+7uUtvjgy12m3xiqdUl1CwP4zotFE2qSuzQtrFBvpBp/s4zFhwZ7dpFsmR43kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0IxhGESs+BeKIW1y0uxA1RtvhXMGVyNTfPIMC3dcSnw=;
- b=zAeYfA37iw4SBnwvE/u++GgUeYzDP8bROW3YEHIrvkXDFivDuKpYGnp9tdy98vmVqxdPTdgYYgz5fjs2vVEbXKb+rbDg9qG0R+mgFUSN61yw0LE1kV8TpB5r5d5tlj0LFvrCrW5FVHcF3GVewgp4Y0dBGxnbeF7INyLJJtZ6ESTO5Ergghb9b+RF7AgvCYg0lvKxZ6orO7VShi3+XV2htC8eHMozEDVP50cBDlOQzx9GspVB7/nZ9JlH4Pclbwrr3io5MwulQ83oicgI5wFVHvlvJIxkJpxthn4kLTNo+6UKAQG1j9vmnnxxkISiCaGO+qGP8mJGysEnyIdsNvVF8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0IxhGESs+BeKIW1y0uxA1RtvhXMGVyNTfPIMC3dcSnw=;
- b=qgV8xKWsztpQ6vk0wPX70qFXInAeOiN9cvHl1RY5dtt7mBFBc0xIvogfbT7gVw2k12C7cTvS+y5inDaBzxxyYMvZwFEnp4IudeSkGcafWZYfAtqVv4DDpDp2bMyIF9EbDQEkmrFtyDvLysHam6OQQYpa0KeyQWCX4zfa0NUOVv776LATO4mGqz16f/t3AFQHZjBTWvyZw3IecA2pUrTuI6MLGEXqZ+JU8iPn5fcdTORCPkZhAyEgyyUyWx3crx8A529iyOkaVvA9xQMQoqdFgACkHju39LnY9+tZojEF7AhYoj4OFaDsG0RCIgQ2f0zC9WMidDTF8lYF5r0z3F/Pag==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5391.namprd12.prod.outlook.com (2603:10b6:5:39a::14)
- by SJ5PPF09E5F035B.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::988) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Thu, 31 Jul
- 2025 11:47:51 +0000
-Received: from DM4PR12MB5391.namprd12.prod.outlook.com
- ([fe80::6096:acf3:4a5c:f003]) by DM4PR12MB5391.namprd12.prod.outlook.com
- ([fe80::6096:acf3:4a5c:f003%5]) with mapi id 15.20.8989.010; Thu, 31 Jul 2025
- 11:47:50 +0000
-Message-ID: <69c1bd48-c55b-4af1-a48b-1669102af1be@nvidia.com>
-Date: Thu, 31 Jul 2025 14:47:44 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 13/38] coco: host: arm64: Create a PDEV with rmm
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
- linux-coco@lists.linux.dev, lukas@wunner.de, kvmarm@lists.linux.dev,
- Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
- Steven Price <steven.price@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="iGi6SRN8"
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-70739d1f07bso3334686d6.2
+        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 05:11:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1753963895; x=1754568695; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6GiA2tw+gwtAnjFcFPQpD5ne+ingC66pFHpYZpZzeYY=;
+        b=iGi6SRN8hR78AV97FCHuISIEwz2RBl79mHjsnhqXVv6FpGIJE06w0PuU1n7bgtkf/E
+         vxxTE8idLYGh0b7gXkilWg4YeEufhjbUaYPl/Bx8plDtZiTiMOntx/sae3mSl4ItaOPv
+         cWLScfHPtMISPjELluYaZ65yyGN1qGmV9mwYdGbQfOC4j5DQc9jX1kk16aXPYuw/cwCL
+         xkPJdFzkDgBVrZtQbJOFjp0bqleBAwQa1QQykhYVsPFABHmQKhKNZ7RzIW2MdzmZIW/I
+         o7qY5j4WFOUA0fbEFo//azyDOYSJLk98bEc0frc/OTLACKiGT8rJmcyOj2ri15Yt+wS5
+         5ZwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753963895; x=1754568695;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6GiA2tw+gwtAnjFcFPQpD5ne+ingC66pFHpYZpZzeYY=;
+        b=Yt/YJ1Vf+JV+2kevpjafh7rJR2jpTZ1ByG2+izjUIk+XUIAr7T9UQOp5rcJAzn4RON
+         +TGemh/bwP/Swfn9q9Afrfp5I/rqdQZf2Ccy8FgGaqsCyO94NRvawxHvFve+8BxKUYS3
+         sATNf6d5HHlzp1ntBPzYzXwXel6qYTaEY9crhVRZd3ioshxiSMS+pbiFuqs/ldxlTXxT
+         3keuPx56BnNlDWSV46R7lU6NFOs2crhmbQhOk51hVQa47SC8ZnUXZBRE1nk8qXvxSa4N
+         YUaDxGAvmhm+UWsXZ7c55bJZj9kPZoKqLriqT78zJ+Bd/1RYShUWoB1XOV9b/mTCFPNd
+         d8xA==
+X-Forwarded-Encrypted: i=1; AJvYcCUd9ZS4CA4xYHa6YO+IvQaDWFHnV0dDG/H3xEPyaYtrTpNnw0heAgfVBlU/LUhHemqy2q0fJV0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxtbNLUJpLTaiaT2AKL+05YKTP5OxMBFTiFMy8Y7ErnKpTDVu2b
+	gOfMZrYk39Rb0DluiHT818XUPMCDo5yb66Y6wo00KYvYtG5TI3zBnHMcJJTsHZb2LjU=
+X-Gm-Gg: ASbGnct0LYao2fjmllJXfI5ANu5O+q6T3474XJa8vLE4wQ7S4C1KXdWR7+C4+CfyTpo
+	ZnSD1PN1dk5lCZ4zS6ZLZirBGzTYPIHK/KOsmoXdIu+m63dj90pTCrTS7Iqb6K7wCZ+l3+H+CBX
+	cZSQZgZDW/mRphW8cpmeF48Ps1Ve3XrVqhlCgFdqJIeNdJbJjXOTIYnWYy5tf6O8jni23EfaBVv
+	f3q11yU+cXMg+lrsteamRAYX7O9T9mlpZGgKIWsnCrDiDA0lFyGt6oD4OX7GkMcIP1xfRbKfneM
+	P7H8edCmIVzDTgklpbvFrCYPJyE/tx9sWBt/oR+W8tJPKuN8D0onw0JwpO7qG7l20bHXPz7E5v0
+	ZbWxjYJwJ6ltuOVC64w6ld0Si1a+qKQbJnWR1VxWaJnyGTjya9LxnFPEVvGmLToew4amBqsADIM
+	C7/CM=
+X-Google-Smtp-Source: AGHT+IHjUvGatsM+Nj0UuwSVsL9Oyl4RA08oAzeUsK3Cyb+xVgspshhI3seh3MnRe0x10Mxp0AXXeA==
+X-Received: by 2002:a05:6214:4118:b0:706:fa53:9d4f with SMTP id 6a1803df08f44-70766dc979fmr80279936d6.3.1753963894472;
+        Thu, 31 Jul 2025 05:11:34 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7077cea1782sm6330876d6.93.2025.07.31.05.11.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Jul 2025 05:11:33 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uhS8D-00000000oUc-0rT4;
+	Thu, 31 Jul 2025 09:11:33 -0300
+Date: Thu, 31 Jul 2025 09:11:33 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>, linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, gregkh@linuxfounation.org
+Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
+ device
+Message-ID: <20250731121133.GP26511@ziepe.ca>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-14-aneesh.kumar@kernel.org>
-Content-Language: en-US
-From: Arto Merilainen <amerilainen@nvidia.com>
-In-Reply-To: <20250728135216.48084-14-aneesh.kumar@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0106.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:c::22) To DM4PR12MB5391.namprd12.prod.outlook.com
- (2603:10b6:5:39a::14)
+ <20250728135216.48084-12-aneesh.kumar@kernel.org>
+ <20250729181045.0000100b@huawei.com>
+ <20250729231948.GJ26511@ziepe.ca>
+ <yq5aqzxy9ij1.fsf@kernel.org>
+ <20250730113827.000032b8@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5391:EE_|SJ5PPF09E5F035B:EE_
-X-MS-Office365-Filtering-Correlation-Id: 91bfcd63-f252-4afd-d196-08ddd0281366
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bld6akhsT1pFdytNYjl4Y05IWFhtS1hhNmFKdFIyL3JjdnhOQndHVW50eUJ3?=
- =?utf-8?B?aWxFT2VWNW9lK1psdkNFYmFDY21KYml1VzdrdmFUOXFCVGk1OTRYQ2MrenJj?=
- =?utf-8?B?SWt3T0EvOUs0eFowOWEraVZ0MG9PSm5BdDg2REh2eUFjK2R1VXQ0S2ZlanE2?=
- =?utf-8?B?ZUhiQllXQUR6c2grZVlrVlMvS3l1ZFZrYS8rU0tKSkUzQ3J2emRmR1B1bDUy?=
- =?utf-8?B?SHVNaldFajR2UWd2WWloQjNKREtoYTRweE1UTE1qS0czeDVhemhBaUZ2Y2sy?=
- =?utf-8?B?YUk2MENXRGZVZzNiTDViNTJDaXNDeHo4TWdrOUJxQzY1cEhVSzN5NTE5ODd4?=
- =?utf-8?B?bWMvVU5kSFR2WGNkUEMySnZMb1NkMXdxTlByR2dOMHhzT1lnMEJld1FpRmxD?=
- =?utf-8?B?dzdta2N6ZzJwNFhNMG9YRU9BbWExVmc3Sm9EeGxHVmFFaXBJays0Z1FzblhZ?=
- =?utf-8?B?V1Y0WENiOWJPVkRVb2paRmFKWFpkV1M1d2k0UWlINWFwNHV1N2kzbHVrQ1Rk?=
- =?utf-8?B?cTBkZGFiK3d2ZTRPTS9nK3RvMzFuR2R6RGdVbGZIZDNtckJlTzI4Q0wrRWVs?=
- =?utf-8?B?VGhXd0x4ZUluYWMwcjBRQnNiMzY0R2RhVW4rQ0pXK21NYVNqRGdkemlhUlRW?=
- =?utf-8?B?dEg5OXhENzRxU01DcFQ3WFF2SC9vdCtJZk8yRHNFRmd1TzdYTEpmeFo5OHor?=
- =?utf-8?B?SXF1NmNIOW5UMTErb2daMktpK3pkVEsvc3ZnYWVXdnhCSW9QckdSdFBINklu?=
- =?utf-8?B?eGI5M3p4alp4SHIxbFJOekxtdjZmMFhCODFRWStXVWRmaDNIaXdTZ2lWYTNa?=
- =?utf-8?B?VWI3T1RLbEtQcTFpL2hNU1ZNRktreXV6dzRoWkRyZlE3R0Rhd0ZDUFp6K1Fu?=
- =?utf-8?B?STcvTzZXMEZKQ1VYMTRKOHkrMDltbHBYY25xWlRDVnVpaEJlN2JDVndwUWs4?=
- =?utf-8?B?Wlg0Q0Q5Wk1yRURJZXkvS0NKNjhZRlNMRjlBcHBPdnBBc09WSy9kV0d2TjRu?=
- =?utf-8?B?enlwYi9pUE8vV0MyWGFFL045NkdPb1IxL3ZLZWZHbHYyUHc5Wm1vOWpXZWVH?=
- =?utf-8?B?V3BNcFNBT0hyaUpFNUpkT1kza01hTmluSExNZ2ZHZ1N4M3hnT2JOM3RFeng0?=
- =?utf-8?B?c210UGcyK1VQNVFHeXZWa1Y2N3dRZ01mdU8xMnMzM1haYUlwMmpFYVhUVUhu?=
- =?utf-8?B?YjIwbXJtczd4QXVma2RMYzRhc0lmYk12SHNaTDdRcjNHMklrcHdjSHdxdVFW?=
- =?utf-8?B?UjArbHlPNHZYWTVaRlYvaVpScklyZTduSDdyZVo5RnljejdvaWNUeWFDNkhZ?=
- =?utf-8?B?UDFFYmNmR2tqcVdGSjNjTUtyM0JrdU1pbVVVNkRBb0dUZ25LMDhKZWxiR3B5?=
- =?utf-8?B?amkyMmt3UkRkT1hydHVVY0VPUjY1bG42YzZnL1pQNjREM21wWkRHZ05Id3Vl?=
- =?utf-8?B?ZHByc3FJMWlIVFluUkJwZTNxYWh1MkVvNCtNMG5ka3FqeDRKRjBxcEdaNE1T?=
- =?utf-8?B?Qm9yc05GSXovUlVFcG5vR1UxSnI5TGxXbjRZamhGOFFueDJ6RXorOFBGNVpl?=
- =?utf-8?B?OUdpNFhyUzRSWjNvY0JHdlAreHl1by9IVFkrZUhiTHdBZjc4b1BONGYrTVBS?=
- =?utf-8?B?K21LQU5hcWc3ZndpZHpBZ3hHb0RPK21YcHNVaEJmaXUwenp3VlVqRWxZOTNr?=
- =?utf-8?B?REI5RkRiU1ZVUmVuQTJjbkdXMWhBVkRTMEt0MFpPRm5veUpUVlVkZ1pyaURj?=
- =?utf-8?B?MktIODRsUzF1akxnTHp0MXZpVnU1SG5kQkluR1FMVTZuSTNwWDRDbW1Fa2Mr?=
- =?utf-8?B?NFRaUVIzdDVyTUp6eE5QY0FNNnlYL3loZmpnU0FkL3paWXhKWkFocVFieGxp?=
- =?utf-8?B?M0k1NU1DMVc0ZU0yYXdUYXkwT29uMTJYY1RLa1Iza1JlSFZBdnFGNWV4TVM2?=
- =?utf-8?Q?j3j0hGJ6Xp4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5391.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZitPKzQ0MjFSMS91RlRhRFUrWk1YSlpER1lJVG9leFBSUkVVcjY1SHYwRGF3?=
- =?utf-8?B?NHpuenBxMDE1K1VmU3FjMlErUW9IczJ3WUUrWFFCTWFPRHZrcGlGL0RrWGJT?=
- =?utf-8?B?UGFnNis2NWNySnpnSS84MTBIZlF2NnlFSXZDM0sxUkFSNXlaR3BpVnlQd2F5?=
- =?utf-8?B?Sk5UQmIxc1ZWcFA1Q1hTT3ZIMUN6b2ExTGwzcmpJZnVxZHArYkU4aFZ2UW92?=
- =?utf-8?B?SkYrUkRIN0VCR3FXSyt5aUlQQmJPaU9xamtmQ3ZCOXpFc0h0QjZPWVloVUpJ?=
- =?utf-8?B?MUx5T0VGaHhjK0JjNDZjVklvQkFMQVRlUFVyYW9BQzlXZktGVDBtNTRodVI5?=
- =?utf-8?B?bGdCYUYrZUd0aHBtUFBVZlRhakoraEwrK0pYaVdzOWZpMTBxcGY4RlFrS0lN?=
- =?utf-8?B?Qk16MnR3MWUyUFNlNEJqd1hZN3VBNVhwbHllQWVqZ3R6Q2xFOGlmUng3V1B4?=
- =?utf-8?B?dWd4bHg1SHhnR1J5NG5tOEEwWGsxQ2ZEOVMwaWp4encvTFZNRW9QeFh2bk9t?=
- =?utf-8?B?akViZkNVdTZkYnNvMk80RmE0NTdDSEgvSFNxNGY5YmM2MUFQMmpDaVBhbGd4?=
- =?utf-8?B?Y0ZEVzh1dzU3LzNaWWJkQk8yK2FBQUROQitNQ3IxU3BaRVRTTGJXcGYxSUhO?=
- =?utf-8?B?cHEzNWszT25jWW5jQnBqSE5ocXFsS2dpS21NKzdwUDhFa2ZYdWdOYUd2Tk81?=
- =?utf-8?B?UGJBRWQzSzhWN3Z6NncydmRWZ25IOG0yM09OYkxSc2JuU0dyL1lDNWUvckph?=
- =?utf-8?B?OGc0cS9ydXR4amtsQkJzMzRFVmxSekJKaWhBUmJZUyt4bjc3Y0ZqVGdFRE5q?=
- =?utf-8?B?VG43WVdmcXhpVlczUkYwN2lQYmVGMGZwdW01QTNDbUNQYVZWb0xZck1POXQv?=
- =?utf-8?B?VGR4VitKcE1iUDFlelZwd2dodHNlSTl2UWVGRkI0NnQyZEcyM2FYQmorVE9G?=
- =?utf-8?B?UlRxMEg1ci83cDNpcTJYOWNmNG9oeTFTOUxqeGI0Y05XekFmK2JpOHNnK1VK?=
- =?utf-8?B?dUtzRThSR2hPSVhxdUo4Q2xGU1ZuUzVvRHRsZDZFaVdpclRBSFQyMDJTT0Ra?=
- =?utf-8?B?OGZhQ1o5c1dSVUxQT0o4eXJJOTFYa2tiVFZWMGhzWFRnNVM1Z1Q2MDZTaEd5?=
- =?utf-8?B?S1hvN3R0VnBDVXJOVUJzU3dCeUdlSkhmajU4N0grQnhGU0JHdUpWZnFtcWlF?=
- =?utf-8?B?TGJtck1OZFNCbkx4bjI1QUpwaS9HVzJDUWpwU2dSUU53TUEwSmI2T1ZHa2F6?=
- =?utf-8?B?RFRTMllyUjlTTEZpcGZFaG5RR1loK0xpSGFZTEppZ0tCdzhMTCtTRU12UXlC?=
- =?utf-8?B?N01Kd2ErZmIxalNGbVZPUTRkTml3WHhPTGx4RTduZ3pLQktxVlM4UnN2bzFY?=
- =?utf-8?B?MXo2VERrUDB2WlNQaHVuZFJNS1NNa3BlbVR1bXNlN2Q5REo4Nkg1cnZhMW1F?=
- =?utf-8?B?d0Zlb21ZRUIrNXhjcU5Dc2pvS2s5N05JWjcwOVdmU0NmV3JZTHJYb2VEcmtv?=
- =?utf-8?B?VVZ6Z1ZsZFRFL3h2d2VjWGlORTZFako5enE0M2FlZGl3dEFGS0RiSnR5Zjlw?=
- =?utf-8?B?TDREdlUvMjZrYlAwWjNVODR4R0orb3B2TjlGY28wRkNRdmpUTkJCQVhkRTF5?=
- =?utf-8?B?VUFYZXpxTUREM0F0V1pDRUJ0Nlg1NEJuZzNUU055Y3FJSVdHMVZqS1RoNStv?=
- =?utf-8?B?NWVMQlNqSEM4UDZGTUhsOHN2Rm9ZTGM3VytWK29EOXhFazhXSm0xTXQxd05D?=
- =?utf-8?B?RC96Z08wVS91eG5PQmlsSG5kZVBSZXhvbXRWOTZ0OE1BY0lhQlVmdWl6czhF?=
- =?utf-8?B?NzM3TG4yNkdXOHA3UTFwMXFKTHdxOW02SzJ1MjN5L2tIZmZWRU03YXphampr?=
- =?utf-8?B?Wm5TL1R0d2UzbHkreGRRaFMyd1RKNmJZTzNwR0N4TDY0VVcyUER3TnFLVjl4?=
- =?utf-8?B?WGZQS2Mxb1NyUDdrbHZZdzBNb3l6L0tqcWw1Yk8vU2NURm4rbENrdklWMGF4?=
- =?utf-8?B?MXVQVWJ1Mk1aVnlOc1lLcDRZcnFyYW5weXlYMDF6V2M1Z1drbWZQYkZJU280?=
- =?utf-8?B?QzNEejNiRjQ5WDFqK2RMVTRpT01zQzg4Qnh6MEhNUzRhbDN4eTFkWVNPb3ZO?=
- =?utf-8?Q?V+NOD4fA3U9oHYm+YcUg6esNd?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91bfcd63-f252-4afd-d196-08ddd0281366
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5391.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2025 11:47:50.0876
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RVjRpS1aesIID2ys5KTlW/e+ec9CzLkecY8PW1d6dqxIE+i///2S4x6bhLy4WxbtnHQSoT8eEgLo4mo8ljADxQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF09E5F035B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250730113827.000032b8@huawei.com>
 
+On Wed, Jul 30, 2025 at 11:38:27AM +0100, Jonathan Cameron wrote:
+> On Wed, 30 Jul 2025 14:12:26 +0530
+> "Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
+> 
+> > Jason Gunthorpe <jgg@ziepe.ca> writes:
+> > 
+> > > On Tue, Jul 29, 2025 at 06:10:45PM +0100, Jonathan Cameron wrote:
+> > >  
+> > >> > +static struct platform_device cca_host_dev = {  
+> > >> Hmm. Greg is getting increasingly (and correctly in my view) grumpy with
+> > >> platform devices being registered with no underlying resources etc as glue
+> > >> layers.  Maybe some of that will come later.  
+> > >
+> > > Is faux_device a better choice? I admit to not knowing entirely what
+> > > it is for..
+> 
+> I'll go with a cautious yes to faux_device. This case of a glue device
+> with no resources and no reason to be on a particular bus was definitely
+> the intent but I'm not 100% sure without trying it that we don't run
+> into any problems.
+> 
+> Not that many examples yet, but cpuidle-psci.c looks like a vaguely similar
+> case to this one.  
+> 
+> All it really does is move the location of the device and
+> smash together the device registration with probe/remove.
+> That means the device disappears if probe() fails, which is cleaner
+> in many ways than leaving a pointless stub behind.
+> 
+> Maybe it isn't appropriate it if is actually useful to rmmod/modprobe the
+> driver. 
 
-On 28.7.2025 16.51, Aneesh Kumar K.V (Arm) wrote:
+Yeah, exactly. Can a TSM driver even be modular? If it has to be built
+in then there is no reason to do this:
 
-> +static int pci_res_to_pdev_addr(struct rmi_pdev_addr_range *pdev_addr,
-> +				unsigned int naddr, struct resource *res,
-> +				unsigned int nres)
-> +{
-> +	int i, j;
-> +
-> +	for (i = 0, j = 0; i < naddr && j < nres; j++) {
-> +		if (res[j].flags & IORESOURCE_MEM) {
-> +			pdev_addr[i].base = res[j].start;
-> +			pdev_addr[i].top  = res[j].end;
+> > The goal is to have tsm class device to be parented by the platform
+> > device.
 
-I think there is an off-by-one bug in res[j].end. As per the RMM 
-specification the base address is inclusive and the top address is 
-exclusive. Both res[j].start and res[j].end are inclusive, and hence
-res[j].end seems wrong.
+IMHO the only real point of that is to trigger module autoloading.
 
-> +	/* use the rid and MMIO resources of the epdev */
-> +	params->rid_top = params->rid_base = rid;
+Otherwise the tsm core should accept NULL as the parent pointer during
+registration, it probably already does..
 
-Similar issue here. As per the specification the rid_base is inclusive 
-and the rid_top exclusive.
-
-- R2
-
+Jason
