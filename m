@@ -1,218 +1,169 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736CE487A5
-	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 14:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746BA23B63A
+	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 16:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753971445; cv=none; b=MLVwNLLSuIagtv6DkQL0y9gI38pcfGvYBVk32jo3ItDBcoqTwifTbTbpdZVYuJqh9SsYUZKhgB7DdPTNGOHsJuZAxci2HNHIW77eknXdJLjMlXZRutJnA9cPAY1nvqgiFy6h3Sk54k3eGl3N70F9FnMlDDv/NhwXadecnZqw/K4=
+	t=1753980264; cv=none; b=nEHMZi+ZUJAKW5T4Msu/xlR2DLujl1+thixor+HqfmDYnuDJJyfg6Au48M5aX4wPm7AY6Mlhlxljm7OZ2b2Thxaf5p0Yt6f4ngmr+LGxxVxmq1/fpuaRcXkrE3psf1FUhS5VDNrL0K8HZGQQhy1IluzqilPn2tUap65/rtfQnnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753971445; c=relaxed/simple;
-	bh=E1Mr78SFe7OCoQAaZ7NNFqP+kLbmSKTZ7SjbzvGIat0=;
+	s=arc-20240116; t=1753980264; c=relaxed/simple;
+	bh=0ydWxwjD9XEC5CUiTws7bnBflFo19mkRu4g2JfonLVc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EHctSTa3q6IbttjJ2rQ+xDaw2rphJ5pAbWbNOkw1LRStdyECeC0EiLY2hL/MQx+IH7MiBTA4HNrjoZt5qn5JLPJPQnm4pkTKli9FEXi4iieF9Z/EoKG43LVxfhc5mSmpyMHe6Zln8/91vflp+ucTHxZL8Rz3BHp4mCmTaauoB6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CkPfiION; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=IQNUXAjQPCDdY9aMwlkaJwBWK/2+sMjaJ7XXNgrw1C4fRExLt69ntezTOGb35Mo6Dr2Jn+l49DMOB4hCexO9+npOyv1kzkrElqShqTp60bWeQfKV5ERUmdfrrusRMjJky7wqmnD3xP8eeE+U9Fcy3df+na2Peq8/5SwrfJBvAc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=dwLBwt9V; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CkPfiION"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-456007cfcd7so83305e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 07:17:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dwLBwt9V"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7e050bd078cso104849885a.3
+        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 09:44:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753971442; x=1754576242; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pcWB14Cn8mezh693QdjehHNThSsfRoWZAjW9od9JFCc=;
-        b=CkPfiIONuqu8eVo25uaN/sEpMOP9D6QC0DuGMA6HbQXvFgZTOk9I5tF1fH3lIGOAdB
-         R23kkCwulbT0uBJqnybj6bfgz46SYQD6gppA4bE/0HRKHFb1I5Jy5tHc3tS3CS+ENEVc
-         eHaDnp7WDWLsOmDjAY49Q2NrOfgh4M2PBz5o1GFaCVFO2kdnAc2ADdv7SaaJyYOZKRvk
-         yrVumXZuyY9ru46iCWYF9Eg0v1ySZ+frUUothh9/D/h6INBxbM2VybIvyWyJPEgs8Vs3
-         YvoI0rF+HjtJl33k1sUeJeI0MGJKbPovXc6YFoNEAilQoKSE3zWB3+Y/rRRVQN3sf2F8
-         RrGQ==
+        d=ziepe.ca; s=google; t=1753980261; x=1754585061; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tcmilfvF9ZQoGR+FnM2Pm4UtduREsySGygmbtoMGep0=;
+        b=dwLBwt9VxqRTW/IPOmB36wo+1S3+KdN4LtMK/IF5cVHgqvrdlxS/Jrzi9GsfBsCbJk
+         w8YxfMXXYvXdQYXqnS/XHaSATpsuAYeGp+hdjCJcr6oNaS3GSMKq24YIOwsbffoF5a5k
+         L3OlNgCZFy4ErIN+31mO4vLQ2Lex/D1ytjKAcgqwOj1RhsMEbkvG9AtAEYtnQsrUI6+M
+         Jv/IXa0kxF1rd/91UMKI8DMaYlQmKtzagFN1lNE76IiWoKIl/5Bz6svxdC1vzFnbPbDC
+         pwJbz80SvQFuvCCXRlDanhEZ6svvdrzc9Hco342XdDuhH/7PL9fX6f/THtu6VlBg0OtZ
+         mSmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753971442; x=1754576242;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcWB14Cn8mezh693QdjehHNThSsfRoWZAjW9od9JFCc=;
-        b=lgf8FpfY6ttS1kSTnYw2kuNv4JFLY48vmzAwskHEA4TV7iM+t0glhRbZbX5l1vhc1L
-         3kYJJcGXZbAemmQAq1BeNPbTl54hsBmkvrql62QX4/lZjzGjkj4lJVaQyp4URAa4XsEy
-         UevuSGmyVQ/p+ey1O6jL2Poi00+NEHcihEzKmp7Fs2HOIkJ71O7qHqWd9atCAXtFI19v
-         tASAFmhMYjA7vWfAHkh+A3ff5hCZFhNkJ0uwMxkfLNh+Z3/x110A3sjCmiF1rPrgO5MA
-         pY5J3Ehfsh9dMByQNS5Z61b8buvTeKkaGHUEKNjIj/s8HMopkaUYGWvWEMs3G9I4S3XO
-         JxVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsdHz1Q/5pDEb/2/r80TNvRO0kq1My1D7jOJgCoMQxdFCksKbcWu2kO9mrS9HL/jdXMsxIK0k=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyiCDRP1iTUbG8QG85Nyx7DA+L2bYbzGYwvO90706qbek84wPrF
-	hdPK+D+BCsvCRU8dczNKSXu6WG69QAG41K8QMJPlIcxKhra2WkkN4VYJYWeWa3pPeQ==
-X-Gm-Gg: ASbGncvNtWMJB7uuk8deVDkNiR9HgpoXrLoW1cNEor5D9F1DbOJuaT3gNrGch9krJaZ
-	z9M8uuiDkq9IqJA8w42wFvPStBiQJBfzZIqHL+YYzGPlxwQs7LM7hAhnP+4GSVmY8HLWOOKyFfo
-	nA2yz7gZxUleARbznYNU17pKGr4fEBfXHZx34GkQlzxkmmG6hTuG0d7Hw05o7KSrs8etFWh9DxX
-	8x9ZOSh+CuAWYJFQK1SXMncXPxLRnh75azrcT5wUhXeM45VooTRYhqrqI2LKPFvuitglDyOX1+L
-	eogr0WckSxdIc1rQ1ylvs8b82aVrwjcEicJI5CmmfN6Lbs8agGLX0wdhpQ45Sm1hpYskerHhjxW
-	WthaDygy69m6F0TOt34Rxx6kAgKKEF+S3GSbVl1ybVAOniH+2N2QWNiRG2ON9VQ/mMQ==
-X-Google-Smtp-Source: AGHT+IHQna8PBH+0rnLeEfLwPLu5VSthuOinGeMrMZmAiA37gK//dxUBEvZYVDk/z0ZzOGHZAGlqMw==
-X-Received: by 2002:a05:600d:108:10b0:455:fd3e:4e12 with SMTP id 5b1f17b1804b1-4589f38f199mr1003195e9.4.1753971441527;
-        Thu, 31 Jul 2025 07:17:21 -0700 (PDT)
-Received: from google.com (110.121.148.146.bc.googleusercontent.com. [146.148.121.110])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4589ee4f0d2sm28100345e9.18.2025.07.31.07.17.20
+        d=1e100.net; s=20230601; t=1753980261; x=1754585061;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tcmilfvF9ZQoGR+FnM2Pm4UtduREsySGygmbtoMGep0=;
+        b=h0WL8rNhIL35T956rTaj5ei1gjs1M9JOPUxQvZuHkX8AGk3TFUBVSGHXeRhec91rUo
+         Y0V68puu+4+C0Lzr7R9BfkgbJDver28sDtNvDC13NXBEdjDsUXptzFtuup/7/aSf3mSX
+         tJSJVkwnjGkbUccR202JyO8XtVXyti8nuQmF1eyHpbyqty+QqTSwErqBob2tW8c0lz8z
+         smle8kJKeCJWltc6eStSUd26yPnPyH3pA3YNB9gyu/3uJoMog3cCi/l9agcEdOHbSEmv
+         VDJyQ6ILK3ZHLkidD6/ysdDx7570VMmJJAUeYHfkb1ykauX7jteTHv/irmDNjwtRV6QX
+         khcw==
+X-Forwarded-Encrypted: i=1; AJvYcCV946P2J17i81wImBIwg/9m1FO8qSR7uRwAQsWX68cISbw6hFjq8dCtWWN7fx6pGNOKRqwtLFE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw3CvwyecfMKWnBdyiYdeJ6cOYM9ZMYInzwyubWRk/OaWt29X2l
+	uNpPx1KX7CNoX+9togYYqtAs8J2Sk26QbTwcBSKerGd6pOFLLcogkNiNRiNlw1pH8f0=
+X-Gm-Gg: ASbGncvEMZ1CBRkJeTmVnlBQ/r5lYz6hDTy8OQHdbBiEIzdiEONO6Zk2bOhhfYlFZyc
+	pmslMc1bXGJQcIPxkZWDfWQaN3RfsK17cBhCbj0aTgja61Nem9bekaIq+gk0CpqENfKTct+scer
+	0TgmvK4ZBFB/rpar0+cELXoYFr6NMHNx2lssgpLRB+gYe9HgzL6pn0Ok4hR0Ycv+uSPhpeiXa9+
+	4Kjhl8LdI0GzgytbnoRLP82mLkjP1OtXW500yG2wEHYqrUjqITdy8D9EIgrIDR/b/cDQ7+izgky
+	b5XXzp0RNJVhXSZHzu3Dsie+f5vtoSYpiwaljv1OAmIomep0BdpFEbRTE81CzNXDJ96zrWIUbW6
+	xHJKGb6RjZzPa3rh4ta3PST37B+xBIk8mXqFlwgIMS+FoP4Wg01hV/dpe+0ooE2JJSVVY
+X-Google-Smtp-Source: AGHT+IGezk+WkJhds2uXLxdfTtDWHWkQhul0EkxScNsiZbu9fh3mwabmeFpESJ116Y7P+FXm+MFLoA==
+X-Received: by 2002:a05:620a:4447:b0:7e6:7c5e:61a4 with SMTP id af79cd13be357-7e67c5e6a28mr597979385a.62.1753980261143;
+        Thu, 31 Jul 2025 09:44:21 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4aeeec005c2sm10224741cf.16.2025.07.31.09.44.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 07:17:20 -0700 (PDT)
-Date: Thu, 31 Jul 2025 14:17:17 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, robin.murphy@arm.com,
-	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v3 29/29] iommu/arm-smmu-v3-kvm: Add IOMMU ops
-Message-ID: <aIt67bOzp6XS_yO-@google.com>
-References: <20250728175316.3706196-1-smostafa@google.com>
- <20250728175316.3706196-30-smostafa@google.com>
- <20250730144253.GM26511@ziepe.ca>
- <aIo1ImP7R7VhRpVE@google.com>
- <20250730164752.GO26511@ziepe.ca>
+        Thu, 31 Jul 2025 09:44:20 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uhWOC-00000000qAm-0Z6k;
+	Thu, 31 Jul 2025 13:44:20 -0300
+Date: Thu, 31 Jul 2025 13:44:20 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 04/38] tsm: Support DMA Allocation from private
+ memory
+Message-ID: <20250731164420.GW26511@ziepe.ca>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-5-aneesh.kumar@kernel.org>
+ <20250728143318.GD26511@ziepe.ca>
+ <yq5a5xfbbe35.fsf@kernel.org>
+ <20250729143339.GH26511@ziepe.ca>
+ <bbe2a41a-8f72-4224-a0bc-225c1e35a180@arm.com>
+ <20250731121740.GQ26511@ziepe.ca>
+ <1388fb70-3d2d-4c41-9526-521cb75eb422@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250730164752.GO26511@ziepe.ca>
+In-Reply-To: <1388fb70-3d2d-4c41-9526-521cb75eb422@arm.com>
 
-On Wed, Jul 30, 2025 at 01:47:52PM -0300, Jason Gunthorpe wrote:
-> On Wed, Jul 30, 2025 at 03:07:14PM +0000, Mostafa Saleh wrote:
-> > On Wed, Jul 30, 2025 at 11:42:53AM -0300, Jason Gunthorpe wrote:
-> > > On Mon, Jul 28, 2025 at 05:53:16PM +0000, Mostafa Saleh wrote:
-> > > > Register the SMMUv3 through IOMMU ops, that only support identity
-> > > > domains. This allows the driver to know which device are currently used
-> > > > to properly enable/disable then.
+On Thu, Jul 31, 2025 at 02:48:23PM +0100, Suzuki K Poulose wrote:
+> On 31/07/2025 13:17, Jason Gunthorpe wrote:
+> > On Wed, Jul 30, 2025 at 11:09:35AM +0100, Suzuki K Poulose wrote:
+> > > > > It is unclear whether devices would need to perform DMA to shared
+> > > > > (unencrypted) memory while operating in this mode, as TLPs with T=1
+> > > > > are generally expected to target private memory.
 > > > > 
-> > > > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > > > ---
-> > > >  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 92 ++++++++++++++++++-
-> > > >  1 file changed, 91 insertions(+), 1 deletion(-)
+> > > > PCI SIG supports it, kernel should support it.
 > > > 
-> > > Can you split the new iommu subysstem driver out please? I think I
-> > > asked this before.
+> > > ACK. On Arm CCA, the device can access shared IPA, with T=1 transaction
+> > > as long as the mapping is active in the Stage2 managed by RMM.
 > > 
-> > Sorry, maybe I misunderstood, do you mean split this patch into multiple
-> > patches or split all KVM SMMUv3 driver out of this series?
+> > Right, I expect that the T=0 SMMU S2 translation is a perfect subset of
+> > the T=1 S2 rmm translation. At most pages that are not available to
+> > T=0 should be removed when making the subset.
 > 
-> Yes the latter, the iommu driver introduction is best as its own
-> series
+> Yes, this is what the VMM is supposed to do today, see [0] & [1].
 
-I thought about that but I was worried the maintainers wouldn't like
-introducing the infrastructure first in the hypervisor without a user.
-I am open to split this, but let’s see what they think.
+Okay great!
 
+> > I'm not sure what the plan is here on ARM though, do you expect to
+> > pre-load the entire T=0 SMMU S2 with the shared IPA aliases and rely
+> > on the GPT for protection or will the hypervisor dynamically change
+> > the T=0 SMMU S2 after each shared/private change? Same question for
 > 
-> > >  - Domain attachment looks questionable. Please do not have
-> > >    attach/detach language at all in the hypervisor facing API.
-> > 
-> > I am not sure I understand this one, the hypervisor API has no
-> > attach/detach APIs?
-> > We only notify the hypervisor via “enable/disable” hypercalls when
-> > devices are attached or released (as only IDENTITY DOMAIN is supported)
-> > so it can enable or disable translation.
-> 
-> Same difference, different words.. We've had trouble with this kind of
-> ambiguous language.
-> 
-> attach identity
-> attach blocking
-> 
-> Keep it clean and simple
+> Yes, share/private transitions do go all the way back to VMM and it
+> is supposed to make the necessary changes to the SMMU S2 (as in [1]).
 
-Makes sense, from the kernel point of view it will be attached to
-identity/blocking domains, but the hypervisor api is just enable/disable HVC
-as it doesn’t know what is a domain. If terminology is really a problem,
-I can make it one hypercall as “set_state” with on/off or identity/blocking
+Okay, it works, but also why?
 
-> 
-> > >  - Get the ordering and APIs right so replace works. You need this to support RMRs
-> > 
-> > I see, we can’t support bypass for security reasons, but we can enable
-> > the identity map for such devices.
-> 
-> You will have a small issue if the bootup has the pkvm side put the
-> device into a blocking translation then later switches to an
-> "identity".
-> 
-> As far as I understand it display scan out buffers have to be
-> continuously hitlessly mapped. So you want all the transitions from
-> bootup bypass, pkvm isolation, "identity", etc to continuously
-> hitlessly map the RMRs containing the buffers.
-> 
-> I think :)
+From a hypervisor perspective when using VFIO I'd like the guestmemfd
+to fix all the physical memory immediately, so the entire physical map
+is fixed and known. Backed by 1G huge pages most likely.
 
-I think that would be hard with pKVM, maybe it’s possible to achieve
-that seamingless, we would need to export such devices to pKVM at
-boot before de-privilege.
+Is there a reason not to just dump that into the T=0 SMMU using 1G
+huge pages and never touch it again? The GPT provides protection?
 
-TBH, I am not sure what hardware does that. So, another option is to fail
-gracefully if RMR exists (which falls back to the current driver) and then
-pKVM would run with DMA isolation, which is the status quo.
+Sure sounds appealing..
 
-And then RMR support for pKVM can be added later if there is interset.
+> As for the RMM S2, the current plan is to re-use the CPU S2 managed
+> by RMM.
 
-> 
-> > >  - Use a blocking domain not some unclear detatch idea
-> > 
-> > There is not a single detach in this driver, we only support attach and release
-> > operation, which just goes to the hypervisor as enable/disable
-> > identity.
-> 
-> 'disable' then.
-> 
-> > >  - Use a blocking domain for release
-> > 
-> > I see, I can add “blocked_domain” similar to “arm_smmu_blocked_domain”
-> > which just disables the device translation, I will look into, I am just
-> > concerned it's more code as this driver only supports a single domain
-> > type.
-> 
-> Yes, this is the right thing. There should not be operations in the
-> driver that change the underyling translation that are anything other
-> than attaching domains. It becomes too hard to maintain.
+Yes, but my question is if the CPU will be prepopulated
+ 
+> Actually it is. But might solve the problem for confidential VMs,
+> where the S2 mapping is kind of pinned.
 
-Will do as mentioned above.
+Not kind of pinned, it is pinned in the hypervisor..
+ 
+> Population of S2 is a bit tricky for CVMs, as there are restrictions
+> due to :
+>   1) Pre-boot measurements
+>   2) Restrictions on modifying the S2 (at least on CCA).
 
-> 
->  
-> > >  - Use the smmu-v3 approach for the fwspec, don't store things in the drvdata.
-> > 
-> > This is using “dev_iommu_fwspec_get” similar to the SMMUv3 driver,
-> > am I missing something?
-> 
-> Oh I got it confused, you are just calling 
-> 
-> +       .device_group           = arm_smmu_device_group,
-> +       .of_xlate               = arm_smmu_of_xlate,
-> +       .get_resv_regions       = arm_smmu_get_resv_regions,
-> 
-> Which is also weird, why does an entirely new driver call 4 random functions
-> in arm smmu?
-> 
-> Maybe don't, they are all trivial functions, or you don't need
-> them. For example you don't need MSI_IOVA_BASE if the driver doesn't
-> support paging.
-> 
+I haven't dug into any of this, but I'd challenge you to try to make
+it run fast if the guestmemfd has a full fixed address map in 1G pages
+and could just dump them into the RMM efficiently once during boot.
 
-They are not random, as part of this series the SMMUv3 driver is split
-where some of the code goes to “arm-smmu-v3-common.c” which is used by
-both drivers, this reduces a lot of duplication.
+Perhaps there are ways to optimize the measurements for huge amounts
+of zero'd memory.
 
-I am not sure if we need get_resv_regions, maybe it's useful for sysfs
-"/sys/kernel/iommu_groups/reserved_regions"? I will double check.
+> Filling in the S2, with already populated S2 is complicated for CCA
+> (costly, but not impossible). But the easier way is for the Realm to
+> fault in the pages before they are used for DMA (and S2 mappings can be
+> pinned by the hyp as default). Hence that suggestion.
 
-Thanks,
-Mostafa
+I guess, but it's weird, kinda slow, and the RMM can never unfault them..
 
-> Jason
+How will you reconstruct the 1G huge pages in the S2 if you are only
+populating on faults? Can you really fault the entire 1G page? If so
+why can't it be prepopulated?
+
+Jason
