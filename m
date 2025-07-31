@@ -1,190 +1,121 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F97221F24
-	for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 22:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C7CE55B
+	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 07:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753915487; cv=none; b=to/BzWaUoXjwTG3eoAtJaw8NUm9muKMAonYLq6S7/amOm41Od/CSA+qD9VFJERz7kIsbEmJWasRjz2gsCJGh+gyNo3O4aPOCHdu86KjeulfZuUCbyhOzth0FhUje70dJg3rIjdtXSRJxes0NyYwCVMXcMTtxxr889Upv5jcvMxQ=
+	t=1753948179; cv=none; b=VIWwHD2B1pWws4X0VtF1Ccg8UTXX29QykWhoXC60vRpUQCF2d/p5NKRrjRI0/e67HbbEydtFeffqwL+8hMvIPzAUv1sojzP3VAXCVObGrKw353TdSaa8PllTazwQN7fD5+pFiM411mWDvwlf1QCMJzQMEh9Dh3lMqVNTgvtoFMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753915487; c=relaxed/simple;
-	bh=plnA5GPYRADuDvOFCrwy5MjhmaBZB11lrvEEaNu+2hE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GMAE5nROHmEqeSKxoidyjSdXxDv5G8RVn6bninB3MeS7IylwwWVks90NIpYxU3DJeycGeivfNsLAyerKGLTa+Hud3ObDhnbxwiFyX3kUrr06UapontZi7EumlsugZomU8NK84+WfV7cBprMHpcLU3tHAmv7cc6fcZGlmtJiDZjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0KZOhxci; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1753948179; c=relaxed/simple;
+	bh=Gs1MIGdx+aL/FvTa33b5/hEqyQZgikPYWC/APuQ9dlg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CzS2fOLw+3rXNiQkecvYSJ/h3gkcT1V878PshiRBQQWDTs/CvWulQPGygfAbDyBchunRPH13PqJ72dolSSAxxpFKSTWnxRrZ2gI2omvBHZVPeL1NlNV4aa556NUr2pLQ76md0+NUrUy+C7cr0AzMH49XkjMSy72Jbvx7de8nc6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H4zfgFFI; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0KZOhxci"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-748e6457567so1071353b3a.1
-        for <kvmarm@lists.linux.dev>; Wed, 30 Jul 2025 15:44:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753915485; x=1754520285; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ECWzv5e2xsuSDiY8UbhBmnQ0CYKWUYp4TIAX7WJgUDc=;
-        b=0KZOhxci72IQpNSORwnMLFlj9QQseYdcjTfwhA0WG2w2J8xpQZH2HoJ5G2cAHlvyqH
-         NfZseulRFpDMJndHom6ZZLf2Xe5uX/X7AhgMFzZvIZatO7Ug7KBVrjtPOwLrh7kLJn+m
-         tcwepOL0WNcyO/RGjJ9V8QPUZUDTFNh49pFN/41HYPhZpcKaUXuefInK74FrKvUt+Nzp
-         +mvJBAZ+HwEX8Io/M+4PJf8ZOt09J/G9WVCs5uIlsli/2K+UAhIp6d8S8qQIl67bLYcV
-         7tsXBwH0nDiT17WsetB+TQCrDEIDBLgpSqxASftXm0EtiaKXWtcSyaEsAaXLsM3TaOyX
-         9q4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753915485; x=1754520285;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ECWzv5e2xsuSDiY8UbhBmnQ0CYKWUYp4TIAX7WJgUDc=;
-        b=KsDRXBDpotMN+Cq1Skzw8sMq3r7wJ3vY8L1WxkItCR9+VrOQy5N/G5RpSILokIKvOO
-         elRlbxRDPGeqrEyoLMDhZajd/B5XxWs88jGJIYijyF8m4FSWWeZ+nJbjDJ9KBdv0uaWl
-         FRDTs3RPxwfARd6KzOpmaZDnbRy/oiRKET+9YM8X4gvtb5DIY0eqSCKUVKkPN2eMmxd5
-         x84w8Vb0ShmyzX+zTtxFu7k8sszac/Fk1RtiCdfzhR9gpZly1bH+bqkkFt5AxyGvc4aI
-         yCZH5HzhyDUFYCx+2078LygE/EWnYqMVhcFWAJsX8l9pz1jL+Bc5CDeKR/w8YE8v+tOy
-         Wh5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUp0g55rLYN3DLEymlnIllyJ/D8vJ3iOR80ETaPy0pYHuwEWIrK+YRCxuS6fypqwLmsswmqDz0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw/OBut70HFLoncIQbKvLCObObteO9TH4Pn+EtVvsbYRbOzWVzF
-	0tRt4WNz4gRIW+hyZORr70HHgAjpqv49+Bu++jahCp9zzvo/9lZjFie+TFlc6TRDyybD+LIqr2B
-	5UQP2rLR26VNgpKMgRFX8rcDdzg==
-X-Google-Smtp-Source: AGHT+IG2jrN7LcvgIWrJ4pHg8D4X2boCwV7dmSEgcVYsZ4qFvdN8Q5fmxfreX5UVqZROCmx2pQYYvC5DyR2A5cxeKg==
-X-Received: from pfoo1.prod.google.com ([2002:a05:6a00:1a01:b0:746:21fd:3f7a])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:47c7:b0:23d:c7aa:a6f0 with SMTP id adf61e73a8af0-23dc7aaa79dmr5184186637.22.1753915485016;
- Wed, 30 Jul 2025 15:44:45 -0700 (PDT)
-Date: Wed, 30 Jul 2025 15:44:43 -0700
-In-Reply-To: <diqzwm7pjrbf.fsf@ackerleytng-ctop.c.googlers.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H4zfgFFI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753948177; x=1785484177;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Gs1MIGdx+aL/FvTa33b5/hEqyQZgikPYWC/APuQ9dlg=;
+  b=H4zfgFFIofogbNiFZpqULllfc6ZN0UYSC5SWI7lMaX+SietFUCenDzQk
+   uwCZCQ3B4eHMkgQeLC1eHMESigf0QBMv86BKI+tx0HNSYNU68tlTFaGAr
+   Pq7jxhECkDr3b/RTAhwxyK4nihVQdp/CZcMGZDNVIZ+o3EoJ8VBTIuRLO
+   I5awOaWEf7PQnTeq6xsWlOFgyodw5Fx4zmKpg/XiQ/7Dzk51eMSBn5/Gz
+   8uvUTQ3gqWn74sccDm6vLvZLFTEQzO2rGwvUTxTNF7VRA5vG9sNrewx/6
+   2h4DUSjv7UnyEV3HMt23J5LPT5kyCNJ1IZpH4H+2Ki8iS1+tJ+xvJRVo/
+   A==;
+X-CSE-ConnectionGUID: VLcRuVjtRiORWUqtAwN95A==
+X-CSE-MsgGUID: UptL3j3tSaWskRimkHZrww==
+X-IronPort-AV: E=McAfee;i="6800,10657,11507"; a="56340252"
+X-IronPort-AV: E=Sophos;i="6.16,353,1744095600"; 
+   d="scan'208";a="56340252"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 00:49:37 -0700
+X-CSE-ConnectionGUID: 73cEAW53RymL+KeNij9jPQ==
+X-CSE-MsgGUID: my5o4r9WSBaok3whtlcfJQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,353,1744095600"; 
+   d="scan'208";a="163541810"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 00:49:33 -0700
+Message-ID: <44f17b93-cf3c-43e9-b921-5f904c13db69@intel.com>
+Date: Thu, 31 Jul 2025 15:49:29 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250729225455.670324-1-seanjc@google.com> <diqzwm7pjrbf.fsf@ackerleytng-ctop.c.googlers.com>
-Message-ID: <diqztt2tjo2s.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v17 00/24] KVM: Enable mmap() for guest_memfd
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Ira Weiny <ira.weiny@intel.com>, Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Tao Chan <chentao@kylinos.cn>, 
-	James Houghton <jthoughton@google.com>, Jiaqi Yan <jiaqiyan@google.com>, vannapurve@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 23/24] KVM: selftests: guest_memfd mmap() test when
+ mmap is supported
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+ Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>,
+ Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand <david@redhat.com>,
+ Fuad Tabba <tabba@google.com>, Ackerley Tng <ackerleytng@google.com>,
+ Tao Chan <chentao@kylinos.cn>, James Houghton <jthoughton@google.com>
+References: <20250729225455.670324-1-seanjc@google.com>
+ <20250729225455.670324-24-seanjc@google.com>
+ <856487d0-8e1a-4e64-a8e6-13977fd31fed@intel.com>
+ <aIoWosN3UiPe2qQK@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <aIoWosN3UiPe2qQK@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Ackerley Tng <ackerleytng@google.com> writes:
+On 7/30/2025 8:57 PM, Sean Christopherson wrote:
+> On Wed, Jul 30, 2025, Xiaoyao Li wrote:
+>> On 7/30/2025 6:54 AM, Sean Christopherson wrote:
+>>
+>> ...
+>>
+>>> +int main(int argc, char *argv[])
+>>> +{
+>>> +	unsigned long vm_types, vm_type;
+>>> +
+>>> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
+>>> +
+>>> +	/*
+>>> +	 * Not all architectures support KVM_CAP_VM_TYPES. However, those that
+>>> +	 * support guest_memfd have that support for the default VM type.
+>>> +	 */
+>>> +	vm_types = kvm_check_cap(KVM_CAP_VM_TYPES);
+>>> +	if (!vm_types)
+>>> +		vm_types = VM_TYPE_DEFAULT;
+>>> +
+>>> +	for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+>>> +		test_guest_memfd(vm_type);
+>>
+>> For ARCHes that don't support KVM_CAP_VM_TYPES, e.g., ARM, vm_types is 0
+>> (VM_TYPE_DEFAULT). the for_each_set_bit() loop will not execute any
+>> iteration at all.
+> 
+> Doh, indeed.
+> 
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index b86bf89a71e0..b3ca6737f304 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -372,7 +372,7 @@ int main(int argc, char *argv[])
+>           */
+>          vm_types = kvm_check_cap(KVM_CAP_VM_TYPES);
+>          if (!vm_types)
+> -               vm_types = VM_TYPE_DEFAULT;
+> +               vm_types = BIT(VM_TYPE_DEFAULT);
+>   
+>          for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+>                  test_guest_memfd(vm_type);
 
-> Sean Christopherson <seanjc@google.com> writes:
->
->> Paolo,
->>
->> The arm64 patches have been Reviewed-by Marc, and AFAICT the x86 side of
->> things is a go.  Barring a screwup on my end, this just needs your approval.
->>
->> Assuming everything looks good, it'd be helpful to get this into kvm/next
->> shortly after rc1.  The x86 Kconfig changes in particular create semantic
->> conflicts with in-flight series.
->>
->>
->> Add support for host userspace mapping of guest_memfd-backed memory for VM
->> types that do NOT use support KVM_MEMORY_ATTRIBUTE_PRIVATE (which isn't
->> precisely the same thing as CoCo VMs, since x86's SEV-MEM and SEV-ES have
->> no way to detect private vs. shared).
->>
->> mmap() support paves the way for several evolving KVM use cases:
->>
->>  * Allows VMMs like Firecracker to run guests entirely backed by
->>    guest_memfd [1]. This provides a unified memory management model for
->>    both confidential and non-confidential guests, simplifying VMM design.
->>
->>  * Enhanced Security via direct map removal: When combined with Patrick's
->>    series for direct map removal [2], this provides additional hardening
->>    against Spectre-like transient execution attacks by eliminating the
->>    need for host kernel direct maps of guest memory.
->>
->>  * Lays the groundwork for *restricted* mmap() support for guest_memfd-backed
->>    memory on CoCo platforms [3] that permit in-place
->>    sharing of guest memory with the host.
->>
->> Based on kvm/queue.
->>
->> [1] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
->> [2] https://lore.kernel.org/all/20250221160728.1584559-1-roypat@amazon.co.uk
->> [3] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com
->>
->> [...snip...]
->
-> With this version, when guest_memfd memory is mmap-ed() and faulted to
-> userspace, when there's a memory failure, the process does not get a
-> SIGBUS. Specifically, this selftest fails with "MADV_HWPOISON should
-> have triggered SIGBUS."
->
-> diff --git i/tools/testing/selftests/kvm/guest_memfd_test.c w/tools/testing/selftests/kvm/guest_memfd_test.c
-> index b86bf89a71e04..70ef75a23bb60 100644
-> --- i/tools/testing/selftests/kvm/guest_memfd_test.c
-> +++ w/tools/testing/selftests/kvm/guest_memfd_test.c
-> @@ -70,6 +70,10 @@ static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
->  
->  	ret = munmap(mem, total_size);
->  	TEST_ASSERT(!ret, "munmap() should succeed.");
-> +
-> +	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-> +			total_size);
-> +	TEST_ASSERT(!ret, "Truncate the entire file (cleanup) should succeed.");
->  }
->  
->  static sigjmp_buf jmpbuf;
-> @@ -104,6 +108,47 @@ static void test_fault_overflow(int fd, size_t page_size, size_t total_size)
->  
->  	ret = munmap(mem, map_size);
->  	TEST_ASSERT(!ret, "munmap() should succeed.");
-> +
-> +	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-> +			total_size);
-> +	TEST_ASSERT(!ret, "Truncate the entire file (cleanup) should succeed.");
-> +}
-> +
-> +static void test_memory_failure(int fd, size_t page_size, size_t total_size)
-> +{
-> +	struct sigaction sa_old, sa_new = {
-> +		.sa_handler = fault_sigbus_handler,
-> +	};
-> +	void *memory_failure_addr;
-> +	char *mem;
-> +	int ret;
-> +
-> +	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-> +	TEST_ASSERT(mem != MAP_FAILED, "mmap() for guest_memfd should succeed.");
-> +
-> +	memset(mem, 0xaa, page_size);
-> +
+With the above fix,
 
-My bad. If the above was changed from page_size to total_size, the page
-would have been faulted in, and then we get a SIGBUS.
-
-> +	memory_failure_addr = mem + page_size;
-> +	sigaction(SIGBUS, &sa_new, &sa_old);
-> +	if (sigsetjmp(jmpbuf, 1) == 0) {
-> +		madvise(memory_failure_addr, page_size, MADV_HWPOISON);
-> +		TEST_ASSERT(false, "MADV_HWPOISON should have triggered SIGBUS.");
-> +	}
-> +	sigaction(SIGBUS, &sa_old, NULL);
-> +
-> +	ret = munmap(mem, total_size);
-> +	TEST_ASSERT(!ret, "munmap() should succeed.");
-> +
-> +	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-> +			total_size);
-> +	TEST_ASSERT(!ret, "Truncate the entire file (cleanup) should succeed.");
->  }
->  
->  static void test_mmap_not_supported(int fd, size_t page_size, size_t total_size)
-> @@ -286,6 +331,7 @@ static void test_guest_memfd(unsigned long vm_type)
->  	if (flags & GUEST_MEMFD_FLAG_MMAP) {
->  		test_mmap_supported(fd, page_size, total_size);
->  		test_fault_overflow(fd, page_size, total_size);
-> +		test_memory_failure(fd, page_size, total_size);
->  	} else {
->  		test_mmap_not_supported(fd, page_size, total_size);
->  	}
->
-> Is this by design or should some new memory_failure handling be added?
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
