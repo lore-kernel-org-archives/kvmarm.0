@@ -1,150 +1,158 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786B525FA2C
-	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 16:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECE31C07C3
+	for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 16:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753980785; cv=none; b=LjwBOQkCgmly6tlrnrSQ4lkpHvzqlmyTInL5f9Apa/MuEIFXxB633P/NnK9WWv4e6Mgl+OdSTHV0Te4Vha6Md7zopRIYzvuVaPeGvjYDqatN9kvp+MrpkIPvkDqzQxTg0WOD6rfZ9vxaDSncHxT5aabyd6dwFZHA9aqSfcdRZ9E=
+	t=1753981081; cv=none; b=MS6pld68bVAsBhxOa5aCOyJ8veST2JFWHrTsbnbqojYxcX9IMrMLqenjhV4GG2H0t0I47oqnpwezp4ZJCRoCBzMQ8wB2FYHN67Xtrh4VfxnzQzm5B5QuDRNDlT3/R4p/moH/SMmZgNo2A5yIFO7Zt9Eadz9MBtazigERoJJVBDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753980785; c=relaxed/simple;
-	bh=pZ8JW4BupERaCqn+7ehMHUhgMaXIyZtrBvv8TKORWvQ=;
+	s=arc-20240116; t=1753981081; c=relaxed/simple;
+	bh=sYmx/wQQxsT0OJ4i5ILgxPjIEHTJZkdf4b3yA/YfuDY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i+twxJi6RN7dH16Wi820uOy3FCyp0SKd8oTRL0dW3efXY03dbcnKFJT5WSiFBHwGUZraZ6J/0hmZZ4/2v77+z/ET+po8dRLUa6T0Xagcldh7SZ9Aq9YEqbGbnEzucAY9H54QkgrEIB+C33wqvfrbhitCJ1WIEkMc/DtnRT7RXSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=VOQ9OOJs; arc=none smtp.client-ip=209.85.222.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=C7iSEE2LvGRTBW30ca7/IVC+d9YNKNGTjwfY6jnCIhNrdTf3MaDL7xCQTwK1prRwv1J/yICjfuIk5u/iL4GzrmbSoQBN8Xwiyx9vRE+cT1cqsu5I8edQmAZ+aPlWG3TcVqozt6i2c6Lhnmbve3XgAlqHbuI4KiYQjTe4LkdsTMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=RV4U+Mvo; arc=none smtp.client-ip=209.85.222.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="VOQ9OOJs"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7dd8773f9d9so92696285a.2
-        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 09:53:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="RV4U+Mvo"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7e2c920058fso232919485a.0
+        for <kvmarm@lists.linux.dev>; Thu, 31 Jul 2025 09:57:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1753980782; x=1754585582; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ge8sFkdUD5dsmHZi6nhZDTs93Pw2wZ3dkBFapdPEw0U=;
-        b=VOQ9OOJsQzrZPdKLW63yAGmiSvYZDx/mDzevlsOYOifqWFVPlxh82KtpPI+KMjPTKT
-         0Mn7fmh50wfYZcWRTa2sgKayvRngGZWyP4X6m0Wg27nr58LfidhV5eGO12beglJNdQkB
-         f9ti50f+PMEVibkoShnAv6ZHU5CMWGzMRX0Rln0GxXFSsM90B76Gy/kAGqFw7wcaHpdu
-         1mS31wyCe0oDrAyPrDXeLR/gsUChyZx9DyQKhRW6tjzxQLwqCAajWRLLAACPwVfRmA73
-         KhF9YQnYm9fx2mr/TiDA7CUXsh8Pbmww9hvYs2kEtvsNFEn33B74WG8Svpc6v7P+O/7B
-         ZNMw==
+        d=ziepe.ca; s=google; t=1753981079; x=1754585879; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Jr6COAzZQd1YZD6Knd07jyj5Q1nEe5SAc40WyTUG0tI=;
+        b=RV4U+MvozBkDYNBlDzOoMbaJPDeoxurBMYDBwsBSR7MhocKevD7c+YkVQx0bwCHLYr
+         cJckTdJeGnD+r28W2/jP5i3PTMHD50BCGzYl9l+caQwCfygk6W1727zlq8K4Zfq0gec0
+         bpPWJ3CwXndkvHZ9I3oZsifXBxPbWPHBKnZprOdaFaMhN+Tyvq0kpCASckqMYK4XXD5H
+         l/808pUo2AsDPFxCqSWvoAMAJ/1m2CgxibYjfk9NP3WuZxkvr91pETHqD11IsriGOt3X
+         jLw/Ig050VMo/AfRhcw8Gh3LtB0EXBtoa8AmmobjzQbzj3EzKi/HqpPLGRoO8JNB7sXq
+         nQGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753980782; x=1754585582;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ge8sFkdUD5dsmHZi6nhZDTs93Pw2wZ3dkBFapdPEw0U=;
-        b=Wsr88fvE7KOHmbQ2pUpDtK1fg4XGwnhV80s6TPDec41wH3uah6e69KEJbXSKQDOCdB
-         jc70fxmFSht0jfoiT+B8wqOI+q9/PhltcBmXdOV5YqrnrxVUP6hreY6bUTiKx+9HNdR/
-         5cAqYQcUXeBVp+WElO5I7PZRrjgXA5DKCdSeOHtfYkFfpy5vKYgXLaAyIz5OyKG5zrGO
-         1KGS1k6Ly69ScK6NBzTHTsmqYBSFpFv64I+AFs7kwqnC8KCqJEKL+J+HpLklIVAF9vbo
-         Agn70Cv8Pheot0Jzo0RoVLAfncPlCqU5lT3wnMXFwwdGal++i0uBHpta+DVOuI7bAEZK
-         JEQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9pCYQsgOpBz+GZOaoRDGvBYYR3keIriiKItSEZ5R4MEvoaKH4FYw49wOEflpVrXUwiQgRe8M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwH4hhrTXwwJtc+MmsOUwppCsGn+wnUXIukRjFgnZPOwhNv3piZ
-	CYutn9475hI4ZScMMWYEU5pNI7scQzhiwdvAgbOuzUm+UwG6X/eLGXWqNkKSy1pZ0sk=
-X-Gm-Gg: ASbGncvPmZWD+YH2zKR00+DjFbAoZLXY8Pw2+PfhroyQZThvJNr5IcKgSkzH6+nbQM7
-	ncPgy1hqf6J3H2gs1KoU68XF0xX70E0aNSUOJG2mZbY3nbGMZaRcrhpIPYiQ6Ns+hi7dz8ttiII
-	kvyH1xo5h8sIou16i/asZk+wSt2iHlja92wEh2eNA/NZYx5fa9Y6fEQu+83UE4IFRekLt2zUBRn
-	OM1jMdX11i0tIj3tdHT/lAackJxDMVqv1R/CamPVD1BG0IWFjJKWU5f8sqboZGGKJT44vPLZcxM
-	kF4KhJG4I8TcXK+chzpyd/9Y9n42QUVW4LBe/g+2BYbKlczjhC6qXahtopci/wmkpOappWQP4+t
-	RzQBRjh6DCKqMPb47UnN9tc6/jbD7gdJdjQdpexSIhpUtM9n43MtCZVf16fbjzvIpAxrqCbTg48
-	Nn+kI=
-X-Google-Smtp-Source: AGHT+IFxkpl6QnLP1d2Hal87IlMNzkW4ERQZ01Eb9frEOc1Kw3im7nXPwCw8k1/LtI/6s3msgQWswQ==
-X-Received: by 2002:a05:620a:2808:b0:7e3:4b7c:40a0 with SMTP id af79cd13be357-7e66f3e29c2mr1060489785a.51.1753980782245;
-        Thu, 31 Jul 2025 09:53:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753981079; x=1754585879;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jr6COAzZQd1YZD6Knd07jyj5Q1nEe5SAc40WyTUG0tI=;
+        b=QCX6+ozUvQWkO/G7PePrZnD118m5UTBDSAWRzOSrcjCgjfY0aASIl3lu2NtKnzcsdn
+         dbzrdGhQ0q4fqNyvU/Mit/uDrw0XnPfrSugY4NZOHhsQnCFU3hMHylSnMxP+oX1EV4Dn
+         VOpN/meM7JUgI/jcAXVqpEX6HKWsF2W3fe7qnYVn5FOE0lNkUgVBG9PtFL623IBCWGpQ
+         KBZIOEBCd4OQZSfeQyaDAOTEMQsfrEO7udiopdDMB8SyOWTP7ZfFMaMPwcdQFkAVl+HX
+         Db7c0GC32OQ0ILkmMMN3jL+ntqaSZA/TpODdMc1GQT8STlPGkV6VfSvEb934Io/VTpTF
+         rWzg==
+X-Forwarded-Encrypted: i=1; AJvYcCXo3jtbObvbf4r+fxJJzbhtsMf6UPiilCAY/L4mrfQMSP5lyiuZf2x18kFfMPUcdSfYh/0Qk/8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwobQfjrgFAqZFBiFTqxVhQfnVecb0QQKbXVZkoAVq9SBSy8avU
+	51qzQV4666kw0U9LPfMAO82bGEzRtpKXfIPp8WCkT0qL1H6w9e+X+i5hu4asXtZvf1I=
+X-Gm-Gg: ASbGnctDhT2DxpjUTSE44iDB0XlgsVWDgg4UciD7RD0UjCW1yUpJh7Z5Kg5l/SIcGfm
+	/M+9dwpazYTz+mb09QDqR460BFEPIz7x+vFHBNjW6WYzAEP0RIcJlvonFeXceX3G+2a16kraryu
+	fdvejZOsDCrxfc3ceeO37L8jqoDLDS4x80QiQukmSvVII1W8LhZFLU85suCKBcDNr6xqFXoxuh1
+	hmqNA+Q6L1Hn/f7I1jBch8HFGl5uCr7S/IZ+9MAmWzwtW5iVFPGpOLWylJTTODCnHCY6VYRbAjK
+	gG6OS2qOpGHk+TB9BstCpBb4XkeTQFghtFkmwuDTZFcdBOkMatKS9pi9v3hI6eXiXbNDeecH6bK
+	Ya7F7pVDjNtIa/orWh+TzBYywqd2sfoqiEvxtzHTELdlSQucYkH5em/9ps4ckHbB/lAr2
+X-Google-Smtp-Source: AGHT+IF0HcZH8FVBmKJ4GmjA2mzyAVblpZ7PRNdTI+fWx8fAyi9WQRlG7UaDpDQUTKMH5yyVV73AIA==
+X-Received: by 2002:a05:620a:4515:b0:7e0:a51a:b393 with SMTP id af79cd13be357-7e68128ccb4mr331058485a.7.1753981078536;
+        Thu, 31 Jul 2025 09:57:58 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e67f5c5537sm108625985a.35.2025.07.31.09.53.01
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e67f706406sm105256385a.49.2025.07.31.09.57.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 09:53:01 -0700 (PDT)
+        Thu, 31 Jul 2025 09:57:57 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1uhWWb-00000000qDo-1Gf4;
-	Thu, 31 Jul 2025 13:53:01 -0300
-Date: Thu, 31 Jul 2025 13:53:01 -0300
+	id 1uhWbN-00000000qFA-1y2m;
+	Thu, 31 Jul 2025 13:57:57 -0300
+Date: Thu, 31 Jul 2025 13:57:57 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Arto Merilainen <amerilainen@nvidia.com>
-Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-	linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH v1 34/38] coco: guest: arm64: Validate mmio range
- found in the interface report
-Message-ID: <20250731165301.GY26511@ziepe.ca>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-35-aneesh.kumar@kernel.org>
- <d57d12ce-78c6-4381-80eb-03e9e94f9903@nvidia.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, robin.murphy@arm.com,
+	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
+	mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v3 29/29] iommu/arm-smmu-v3-kvm: Add IOMMU ops
+Message-ID: <20250731165757.GZ26511@ziepe.ca>
+References: <20250728175316.3706196-1-smostafa@google.com>
+ <20250728175316.3706196-30-smostafa@google.com>
+ <20250730144253.GM26511@ziepe.ca>
+ <aIo1ImP7R7VhRpVE@google.com>
+ <20250730164752.GO26511@ziepe.ca>
+ <aIt67bOzp6XS_yO-@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <d57d12ce-78c6-4381-80eb-03e9e94f9903@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aIt67bOzp6XS_yO-@google.com>
 
-On Thu, Jul 31, 2025 at 02:39:09PM +0300, Arto Merilainen wrote:
-> On 28.7.2025 16.52, Aneesh Kumar K.V (Arm) wrote:
+On Thu, Jul 31, 2025 at 02:17:17PM +0000, Mostafa Saleh wrote:
+> On Wed, Jul 30, 2025 at 01:47:52PM -0300, Jason Gunthorpe wrote:
+> > On Wed, Jul 30, 2025 at 03:07:14PM +0000, Mostafa Saleh wrote:
+> > > On Wed, Jul 30, 2025 at 11:42:53AM -0300, Jason Gunthorpe wrote:
+> > > > On Mon, Jul 28, 2025 at 05:53:16PM +0000, Mostafa Saleh wrote:
+> > > > > Register the SMMUv3 through IOMMU ops, that only support identity
+> > > > > domains. This allows the driver to know which device are currently used
+> > > > > to properly enable/disable then.
+> > > > > 
+> > > > > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > > > > ---
+> > > > >  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 92 ++++++++++++++++++-
+> > > > >  1 file changed, 91 insertions(+), 1 deletion(-)
+> > > > 
+> > > > Can you split the new iommu subysstem driver out please? I think I
+> > > > asked this before.
+> > > 
+> > > Sorry, maybe I misunderstood, do you mean split this patch into multiple
+> > > patches or split all KVM SMMUv3 driver out of this series?
+> > 
+> > Yes the latter, the iommu driver introduction is best as its own
+> > series
 > 
-> > +	for (int i = 0; i < interface_report->mmio_range_count; i++, mmio_range++) {
-> > +
-> > +		/*FIXME!! units in 4K size*/
-> > +		range_id = FIELD_GET(TSM_INTF_REPORT_MMIO_RANGE_ID, mmio_range->range_attributes);
-> > +
-> > +		/* no secure interrupts */
-> > +		if (msix_tbl_bar != -1 && range_id == msix_tbl_bar) {
-> > +			pr_info("Skipping misx table\n");
-> > +			continue;
-> > +		}
-> > +
-> > +		if (msix_pba_bar != -1 && range_id == msix_pba_bar) {
-> > +			pr_info("Skipping misx pba\n");
-> > +			continue;
-> > +		}
-> > +
-> 
-> 
-> MSI-X and PBA can be placed to a BAR that has other registers as well. While
-> the PCIe specification recommends BAR-level isolation for MSI-X structures,
-> it is not mandated.
+> I thought about that but I was worried the maintainers wouldn't like
+> introducing the infrastructure first in the hypervisor without a user.
+> I am open to split this, but let’s see what they think.
 
-Right, there are not enough BARs in most devices to give MSI its own
-BAR.
+You can merge both series at the same time
 
->  It is enough to have sufficient isolation within the
-> BAR. Therefore, skipping the MSI-X and PBA BARs altogether may leave
-> registers unintentionally mapped via unprotected IPA when they
-> should have been mapped via protected IPA.
+> Makes sense, from the kernel point of view it will be attached to
+> identity/blocking domains, but the hypervisor api is just enable/disable HVC
+> as it doesn’t know what is a domain. If terminology is really a problem,
+> I can make it one hypercall as “set_state” with on/off or identity/blocking
 
-Right, this sounds bad.
+I would call it set_state with states IDENTITY/BLOCKING. That is
+clear. enable/disable is ambiguous.
 
-> Instead of skipping the whole BAR, would it make sense to determine
-> where the MSI-X related regions reside, and skip validation only from these
-> regions?
+> TBH, I am not sure what hardware does that. So, another option is to fail
+> gracefully if RMR exists (which falls back to the current driver) and then
+> pKVM would run with DMA isolation, which is the status quo.
 
-IMHO this is a mess. The virtualization must end up putting a shared
-page(s) covering the MSI space in the middle of the MMIO region.
+iGPUs either access the DRAM through the iommu or they use some OS
+invisible side band channel.
 
-I think this should be done by fragmenting the layout in the IPA where
-the private MMIO is within the protected IPA space with an unmapped
-hole covering the MSIX registers. The acceptance process should
-validate this.
+The ones that use the iommu have this quirk.
 
-The MSIX registers would then be located in the shared IPA space.
+> They are not random, as part of this series the SMMUv3 driver is split
+> where some of the code goes to “arm-smmu-v3-common.c” which is used by
+> both drivers, this reduces a lot of duplication.
 
-A normal driver mmaping it's BAR will then crash if it tries to access
-the MSIX registers. This is good, we want to catch these non-secure
-configurations and block them.
+I find it very confusing.
 
-The MSI code will have to know to compute the shared IPA alias and use
-that.
+It made sense to factor some of the code out so that pKVM can have
+it's own smmv3 HW driver, sure.
+
+But I don't understand why a paravirtualized iommu driver for pKVM has
+any relation to smmuv3. Shouldn't it just be calling some hypercalls
+to set IDENTITY/BLOCKING?
+
+> I am not sure if we need get_resv_regions, maybe it's useful for sysfs
+> "/sys/kernel/iommu_groups/reserved_regions"? I will double check.
+
+It is important to get this info from the FW..
 
 Jason
