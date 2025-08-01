@@ -1,148 +1,209 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CF01EEA47;
-	Fri,  1 Aug 2025 09:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26ED72441B8;
+	Fri,  1 Aug 2025 12:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754040641; cv=none; b=nesXReyjGcXw5E4pBeEFYDzZfeItjTk3I6YKs3WtnUQcroaPohbEwhSOunWczUhmojkjKJHS3i5M9rotxk1fCUwGe3vKi3H03pI3Nq5BitE/fe/q3sOKRL4LnfUF7nesYoOPcFqOsX935ZaqViNDHIXpKeUSFp5cDEP2Dl44Y3U=
+	t=1754051159; cv=none; b=A30hVFOWl3oJ8Y1ViTI8YbSB035M226lbe07Wp7vzuudWxfPxydReOp2QAm6x1en4Gkcr89DlUUBNEty90eVM20vIiVXdDiurwBFV3FfEFQyRg7vQsOZ3EXY6EpvrRr7hJO42pA6I8za6eCqZ1rXf4Q/VTN5nugJ5lUL0bleWU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754040641; c=relaxed/simple;
-	bh=Q/Y0tbgbPrbBf99+QkFEhAXhItdfzeo+28ANDqH73Tc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ajerbiXT701DKS6U0vcmlOMm7jh1XVowCriDSaw16Op000VOsDCowEasWuhayRZEJdA5SgfdDSvX475B4U1hVZr5lItT6Hb0S949ASo+sgkgG1mhFtlYBjnF18o0T4u+CdQLszZGxjL/EihUQMDiY4sfCYr+uvV58EIqtsJhtXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A9CBD169C;
-	Fri,  1 Aug 2025 02:30:30 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC89A3F66E;
-	Fri,  1 Aug 2025 02:30:36 -0700 (PDT)
-Message-ID: <791e259b-3a57-487d-81ca-9d83f83ad685@arm.com>
-Date: Fri, 1 Aug 2025 10:30:35 +0100
+	s=arc-20240116; t=1754051159; c=relaxed/simple;
+	bh=+Ltd4Hy3tdsuA5Vc2mPQHqD/Wg7sA0TicSGOKBy5Rpk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OaT4GPgkM7BlVw7P9LdH/mhdHmphVua0tpVn63kRi0fmzxUJQafB0wEi/mSa/sAD8WEztHlKHfvPHv13b/kilWsap839H84KZb06zmD+D5NmEkKOU0u58DHuC6BsZbGgzZN+DbsUt9ubqY5ImPSqA7EOHmpvSs47HJq6lbHM9Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U4GACaKs; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U4GACaKs"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=+Ltd4Hy3tdsuA5Vc2mPQHqD/Wg7sA0TicSGOKBy5Rpk=; b=U4GACaKsgynZ6ANU/dUYe0WO9B
+	HqZjffV8Z+YKe7oAyOvYfE4OXc+Tp3guH5IQ3bOT/NTHN6EX3gzv88hkJEvWA1triNTC+jCVKsmuO
+	ceIbz4xWOhlCiNxRX7/HxEv4zTy6SC+JvMl8MCNHsL4MxvJOkdcwtOXwxDkucj5X4vjWhLpUDVRel
+	rUMuAxgeUQIxSuYIF6XTym15EPB10OefYNbY4r5DDq0nd1suq51reXMZr2j9Jqa5s7L2L3yA0pMHR
+	TF3yFX26DG54wZP9CI3+zV28zxdaw3orGuQ+tAvHeOD8mhFGMvbWTlPVP4Qjs7K5A7JttrigDkEa1
+	RvdLI+PQ==;
+Received: from 54-240-197-232.amazon.com ([54.240.197.232] helo=edge-m2-r3-179.e-iad50.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uhopV-0000000E6LM-42Z2;
+	Fri, 01 Aug 2025 12:25:47 +0000
+Message-ID: <2700e50c6ca07b58c4a4a0c219815cf3e1319f35.camel@infradead.org>
+Subject: Re: [RFC PATCH 06/34] KVM: gunyah: Add initial Gunyah backend
+ support
+From: David Woodhouse <dwmw2@infradead.org>
+To: Karim Manaouil <karim.manaouil@linaro.org>,
+ linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, Steven Price <steven.price@arm.com>, Gavin Shan
+ <gshan@redhat.com>, Suzuki Poulose's avatarSuzuki K Poulose
+ <suzuki.poulose@arm.com>, "Usug, Ugur" <ugurus@amazon.co.uk>
+Cc: Alexander Graf <graf@amazon.com>, Alex Elder <elder@kernel.org>, Catalin
+ Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>, Joey
+ Gouly <joey.gouly@arm.com>,  Jonathan Corbet <corbet@lwn.net>, Marc Zyngier
+ <maz@kernel.org>, Mark Brown <broonie@kernel.org>,  Mark Rutland
+ <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Paolo
+ Bonzini <pbonzini@redhat.com>, Prakruthi Deepak Heragu
+ <quic_pheragu@quicinc.com>,  Quentin Perret <qperret@google.com>, Rob
+ Herring <robh@kernel.org>, Srinivas Kandagatla <srini@kernel.org>, 
+ Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>, Will Deacon
+ <will@kernel.org>, Haripranesh S <haripran@qti.qualcomm.com>,  Carl van
+ Schaik <cvanscha@qti.qualcomm.com>, Murali Nalajala <mnalajal@quicinc.com>,
+ Sreenivasulu Chalamcharla <sreeniva@qti.qualcomm.com>, Trilok Soni
+ <tsoni@quicinc.com>, Stefan Schmidt <stefan.schmidt@linaro.org>
+Date: Fri, 01 Aug 2025 13:25:43 +0100
+In-Reply-To: <20250424141341.841734-7-karim.manaouil@linaro.org>
+References: <20250424141341.841734-1-karim.manaouil@linaro.org>
+	 <20250424141341.841734-7-karim.manaouil@linaro.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-kuiyOGxGFoDOQHVFJxGm"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 04/38] tsm: Support DMA Allocation from private
- memory
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, linux-coco@lists.linux.dev,
- kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
- Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>,
- Steven Price <steven.price@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-5-aneesh.kumar@kernel.org>
- <20250728143318.GD26511@ziepe.ca> <yq5a5xfbbe35.fsf@kernel.org>
- <20250729143339.GH26511@ziepe.ca>
- <bbe2a41a-8f72-4224-a0bc-225c1e35a180@arm.com>
- <20250731121740.GQ26511@ziepe.ca>
- <1388fb70-3d2d-4c41-9526-521cb75eb422@arm.com>
- <20250731164420.GW26511@ziepe.ca>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250731164420.GW26511@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 31/07/2025 17:44, Jason Gunthorpe wrote:
-> On Thu, Jul 31, 2025 at 02:48:23PM +0100, Suzuki K Poulose wrote:
->> On 31/07/2025 13:17, Jason Gunthorpe wrote:
->>> On Wed, Jul 30, 2025 at 11:09:35AM +0100, Suzuki K Poulose wrote:
->>>>>> It is unclear whether devices would need to perform DMA to shared
->>>>>> (unencrypted) memory while operating in this mode, as TLPs with T=1
->>>>>> are generally expected to target private memory.
->>>>>
->>>>> PCI SIG supports it, kernel should support it.
->>>>
->>>> ACK. On Arm CCA, the device can access shared IPA, with T=1 transaction
->>>> as long as the mapping is active in the Stage2 managed by RMM.
->>>
->>> Right, I expect that the T=0 SMMU S2 translation is a perfect subset of
->>> the T=1 S2 rmm translation. At most pages that are not available to
->>> T=0 should be removed when making the subset.
->>
->> Yes, this is what the VMM is supposed to do today, see [0] & [1].
-> 
-> Okay great!
-> 
->>> I'm not sure what the plan is here on ARM though, do you expect to
->>> pre-load the entire T=0 SMMU S2 with the shared IPA aliases and rely
->>> on the GPT for protection or will the hypervisor dynamically change
->>> the T=0 SMMU S2 after each shared/private change? Same question for
->>
->> Yes, share/private transitions do go all the way back to VMM and it
->> is supposed to make the necessary changes to the SMMU S2 (as in [1]).
-> 
-> Okay, it works, but also why?
-> 
->  From a hypervisor perspective when using VFIO I'd like the guestmemfd
-> to fix all the physical memory immediately, so the entire physical map
-> is fixed and known. Backed by 1G huge pages most likely.
-> 
-> Is there a reason not to just dump that into the T=0 SMMU using 1G
-> huge pages and never touch it again? The GPT provides protection?
-
-That is possible, once we get guest_memfd mmap support merged upstream.
-GPT does provide protection. The only caveat is, does the guest_memfd
-support this at all ? i.e., shared->private transitions with a shared
-mapping in place (Though this is in SMMU only, not the Host CPU
-pagetables)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
-> 
-> Sure sounds appealing..
-> 
->> As for the RMM S2, the current plan is to re-use the CPU S2 managed
->> by RMM.
-> 
-> Yes, but my question is if the CPU will be prepopulated
->   
->> Actually it is. But might solve the problem for confidential VMs,
->> where the S2 mapping is kind of pinned.
-> 
-> Not kind of pinned, it is pinned in the hypervisor..
->   
->> Population of S2 is a bit tricky for CVMs, as there are restrictions
->> due to :
->>    1) Pre-boot measurements
->>    2) Restrictions on modifying the S2 (at least on CCA).
-> 
-> I haven't dug into any of this, but I'd challenge you to try to make
-> it run fast if the guestmemfd has a full fixed address map in 1G pages
-> and could just dump them into the RMM efficiently once during boot.
-> 
-> Perhaps there are ways to optimize the measurements for huge amounts
-> of zero'd memory.
+--=-kuiyOGxGFoDOQHVFJxGm
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There is. We (VMM) can choose not to "measure" the zero'd pages.
+On Thu, 2025-04-24 at 15:13 +0100, Karim Manaouil wrote:
+>=20
+> - Introduces a new Kconfig split: `CONFIG_KVM_ARM` for native support,
+> =C2=A0 and a variant for Gunyah-backed virtualization.
+> - Adds `gunyah.c`, a new arch backend file that implements the minimal
+> =C2=A0 KVM architecture callbacks and stub interfaces required by the KVM
+> =C2=A0 core to build and boot.
+> - Refactors Makefile and build rules to support mutually exclusive
+> =C2=A0 builds of `CONFIG_KVM_ARM` and `CONFIG_GUNYAH`.
+> - Introduces a dummy implementation of required KVM stubs such as:
+> =C2=A0 `kvm_arch_init_vm()`, `kvm_arch_vcpu_create()`, `kvm_age_gfn()`, e=
+tc.
+
+I quite like this, conceptually. I do think it's important for the
+kernel to provide a generic virtualization API regardless of the
+underlying hardware/firmware =E2=80=94 that is, after all, what an OS kerne=
+l is
+*for*. So the answer "not in KVM" is just fundamentally not realistic.
+
+I'd like to see fewer #ifdefs though. The model we have on x86 with
+static_calls for the AMD vs. Intel back ends seems to work out OK.
+
+We ought to be able to come up with a model inspired by x86 where we
+allow certain methods to be provided by one of many sets of 'lowvisor'
+ops or whatever we want to call them:
+
+ =E2=80=A2 Native KVM (at EL2)
+ =E2=80=A2 pKVM
+ =E2=80=A2 Gunyah
+ =E2=80=A2 CCA
+ =E2=80=A2 ... and potentially one or two others.
+
+Currently we have completely separate work on some of those; can we
+combine at least the basic hooks/operations and come up with something
+which is minimally intrusive where each one just plugs in its own
+implementation but the KVM userspace API is as unified as possible?
+
+--=-kuiyOGxGFoDOQHVFJxGm
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDgwMTEyMjU0
+M1owLwYJKoZIhvcNAQkEMSIEIOCh638+fg6HH0s6fKaXunZT8sKstrN7UYcBZ1ogkLEEMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIASdHLiVQmlr6W
+jlNNL+KtVJ+ZydQztNDdK3u1lkYjE9evUTAnQtuA9hOtD+VfuBi/e1lZinYZqLUJKDoFf96ery5i
+ACKJPCmpW4tfgkDHPPGscM6J7kKP+OIhDv5rKd/i61jXZsQQ6f1sGAcGWUluNzdrAfuB1ycvAtjr
+IEqvfmRtAN3MxORUMabjkzHuYJG5FvTSGtyYhpcMbjpBhD4/petj3DdoQvyVkH0QFnH+Fy8D5VDo
+mgbDKWmlK//4sIceKkc0dBBoLm9i2B8UsQ76oREiWM/zRcQGGuJ1tiiBx2iTucIXh91QCR/RHB0M
+SqUuSCIhPjOkt4xpv6CRr4rgNRVN1RnZto+nBaHsp6NNVht9Mxep61y3nlh5hAJ9LcGQcZOUFhir
+fSUZ1qkN3RfbsJSjrDJUpMeFi+gHECitcp1jMiFr+g+WbIfsDzFzfoOVOL4zhEpd45A3IN5+6RI8
+9FABy/Otw1m92tDtJJgvnqw0OdkqrdEZRWTBsrJg6JLdzZnNRLWDoedzEkE/LL++7PuhaSy+6BXt
+mqid7HxGosGrFHZGxxf3k1WfMxQQdiICaTOkV+O72ZEdvJ62rsnuiFZOIsw/xxAxhqGrvaMNzhWx
+syhYmPopOYx0BLpEMj2kFDO9jqHDjRt8sReAu6sl1/o5LKAWlWXxU6jmpLvSx5MAAAAAAAA=
 
 
->> Filling in the S2, with already populated S2 is complicated for CCA
->> (costly, but not impossible). But the easier way is for the Realm to
->> fault in the pages before they are used for DMA (and S2 mappings can be
->> pinned by the hyp as default). Hence that suggestion.
-> 
-> I guess, but it's weird, kinda slow, and the RMM can never unfault them..
-> 
-> How will you reconstruct the 1G huge pages in the S2 if you are only
-> populating on faults? Can you really fault the entire 1G page? If so
-> why can't it be prepopulated?
-
-It is tricky to prepopulate the 1G page, as parts of the pages may be
-"populated" with contents. We can recreate the 1G block mapping by
-"FOLD" ing the leaf level tables, all the way upto 1G, after the
-mappings are created. We have to do that anyway for CCA.
-
-I think we can go ahead with VMM pre-populating the entire DRAM
-and keeping it pinned for DA. Rather than doing this from the
-vfio kernel, it could be done by the VMM as it has better knowledge
-of the populated contents and map the rest as "unmeasured" 0s.
-
-Suzuki
+--=-kuiyOGxGFoDOQHVFJxGm--
