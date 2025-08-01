@@ -1,216 +1,150 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38A323AD
-	for <kvmarm@lists.linux.dev>; Fri,  1 Aug 2025 16:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AE028CF79
+	for <kvmarm@lists.linux.dev>; Fri,  1 Aug 2025 18:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754066662; cv=none; b=uwc+5Ae1FMvqIiP3o1Q9qffWr3wAr9bH7fnDaRu0gWJubcX217icoc9RFG8nCUS0MTmRIiVg6dVqdpygBp9M08wDKXP9/0svVo+EYupbDLr6fsxVr3mDnBa1Ayy7HsyL45qMEHAKa3C/zVRr6bZxc0LyoIMcNNYGepy6Y4MmrwU=
+	t=1754074774; cv=none; b=JqRoBRB+FGNpdEIux64Y2MI6BVKTxHkVZg3XEqFAb0asXDHqw2QeY05s2l55fH2PSKdDeSPCgajDL9zLn2K30hCJvnxBLSS7EQaEN3LHxOQDKMyZy2ysfnuYKm7GipuoVHlsWv0wfgdj2orfD2cMpED0p9WG6dY2Rtak+F35nsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754066662; c=relaxed/simple;
-	bh=igrMx6iFIDdFmFIB8l2bfoLXUmpgB2zic38Ft4a8CSI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nz3lZHGHWqppcP/vYXb7S6ZD4tH8thefV0DT7YesJye9SlUdrZKBE2y1Z0/HO/HgYmv9gojIPbS+eAa6i1OAwxZdJouuFqwl8w+eY+VyDrfBaHty45bBGmvzo99sZdYfl+GACBx0hClk7pplIZbWKb5aAJ4xJKU74MZ4hg01mNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2P7SdGz3; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1754074774; c=relaxed/simple;
+	bh=ZCus/7TYCpdBpSHkNX8J3JFdhNbHBG34XLdpJYdbpIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RKkpGCp/ZTDHqmDABFOyXIvUcWPU5OoGpRIwTSpDXqZujqMFybltHyr11jpmb+IbSmPDItOg6m000LzEnD3v3MbXnjYq4L6xeO/Xjjf2YwqIPJ0gK+A2Z0V6LjGgcr6fFlfzUlva+E+09OtzVdYTr6b818tCB0DyOFeTtjh9osM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=WBn0PiQg; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2P7SdGz3"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31ed9a17f22so2955452a91.0
-        for <kvmarm@lists.linux.dev>; Fri, 01 Aug 2025 09:44:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="WBn0PiQg"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4aeea691687so13754241cf.1
+        for <kvmarm@lists.linux.dev>; Fri, 01 Aug 2025 11:59:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754066660; x=1754671460; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cmFw3mXH/exEQe+/QLbl03MUiMl4ucnB+5XoLqj1sUc=;
-        b=2P7SdGz3+tsIO6ygNmHKBAdEni9QeHMCPFvMHxbvChVxLW99ebm5qRsBTHwCdVT3d2
-         k1b5R9meVJUNOYiU7unHlr2hNm+CU8HqeKoUyRl1QrgDsXjQVu50EGHNTsfUQbl5tR4p
-         8k+4TgQc5L37FOjvXAAIvjd2ZspsAK9zQXKDNqJa1CKuv5Hpw8/TsgrhfCk1Tg+9uLIH
-         trwQ9KpgargQaq/nv8kHo1RCau0rGZsP2QjvhbzMjM4jEwp2w2gaZ120enDt4Kzuyn/y
-         ZQgnSkF69nVOS3r5o7FiUFVTspWbhNiBchzITNO0txXE9DzYoSXdUa5sqlsYWtsKJoZF
-         LvDg==
+        d=ziepe.ca; s=google; t=1754074772; x=1754679572; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AyIY9+7qRYH18QG3yHqvpWY8fQNePxyU0Y1cLmmOWtc=;
+        b=WBn0PiQgZniBXhNPZqC8wShHxgEgzYqWEbDyCsO0Z7dT1zIJF6UEeUzzvHByHqxMSd
+         Bh9gi2gbBO07hYEJn0WqPCkZBaiA6yhQL+5XXaYXqPISOhKQynondEM/S8+AnQNwf5GG
+         T6Ou8cjsvlfF4dSRLFFEzqBPxkVCcGWzrEtuhOqt5yDCua+02h0XIAxhcE0A7BqqXgeS
+         Xo5UTXKtJaX9SuyIIKnJ580QASlpQqdAGIj3bugUYb4DZIrCgOxUO66g01MOTP+uGMKh
+         EZ2byuVaEkv5iwofKIA4UFdCsz1C+6FB/54aK+qhDw7DLS75T6nugtAVq8pqBFgxDO2N
+         Knsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754066660; x=1754671460;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cmFw3mXH/exEQe+/QLbl03MUiMl4ucnB+5XoLqj1sUc=;
-        b=p3ShNU9yG1jz9PjDHMOiJMA+r8iFStJvmB54MUSlw2YskP/S4qjki7KGdGqUbCYLfE
-         vwXjjIJNL5fKFAY4CxwDzOqGdSR31pMwPHs3zPcJ3qy4sQ8RCms4ZzNaMT+i8AhcO8x0
-         jZHwtVzOWS2p+xFYc14mrj6bH/J721SRJrOxsRIjTbH75/ac7R8Gk29Odc3SJMjRbLAD
-         dETlVOYfzbSq1mcvZRNN0C62YVcsGe5LLR74UVflYbj44F9VLaUlR/b6MfcDYqnti/2C
-         DakGrEtxzbJo3PRB0njzRQFyMMsq1UHhvFMtV2vY8OaPmmknAGXNWP8lNKhFQOzB34HV
-         nDEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZQLmrUJUW2djsxwzYR9ULqefkLRHtT1U/EMxFjdmJaOy2TnoZfPQPyjiKQkoysQxfaYpm/Xk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzDT/n8vBTACGBz1UMMkEacmhFFcg793oD8Gf+ilDWD8JwtX8gt
-	tOJcxeaMFrYcKH0Wif1eLgEvjCC+k3/pbzNqoETL6gypLUSD6c079B+4lzgqVOI7lN4TKNVnVhi
-	FXl+cEQ==
-X-Google-Smtp-Source: AGHT+IHTCPWlBsVY++6yRHnsFzrU+E4U0uWTRC0q7DUxzgBPU0wzo6RMGy3C5kq+eZLK/o+LJzUMjGasNMs=
-X-Received: from pjf12.prod.google.com ([2002:a17:90b:3f0c:b0:311:462d:cb60])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1812:b0:311:da03:3437
- with SMTP id 98e67ed59e1d1-321162b44b8mr568364a91.27.1754066660052; Fri, 01
- Aug 2025 09:44:20 -0700 (PDT)
-Date: Fri, 1 Aug 2025 09:44:18 -0700
-In-Reply-To: <b27f807e-b04f-487d-be13-74a8b0a61b42@intel.com>
+        d=1e100.net; s=20230601; t=1754074772; x=1754679572;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AyIY9+7qRYH18QG3yHqvpWY8fQNePxyU0Y1cLmmOWtc=;
+        b=PKvtu5SQor1e3QPM4xUNXcwfYO/Nx2NRSbJ2vsBBNE+gtthru+Ld6UOtlJNTSaMypv
+         xb3ZMopljlpR6fFNb/O7PbCteAE4L0pfyUoGiCOuMHkP+yGzUyLIfxpt/q+YmFYTiDRT
+         hp5FiDdXjOQvfFbOskax71emQadogyrtXX3A8vHKf8Iey37tq2wa7MTYj+kaNzPhTTD0
+         M86S5TD/NNp+zstP3XhJaYhScxL0POLKjNvZYeG2EbE4G1G8zm/WDU7V/LEBTSSrcpEn
+         frhzfTYKPwILPjJ6FbnrJTYTaEnv9LQj1qLBq2pV3yC9K4Te26dPTrkgcgsF3dER3NaT
+         LPgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6nSZT/aHMIoY5fG1qEdCnBb7kBhaU7bePjUgsHr1bVKbAxoJ57e1bvV1Y2mDniMk5kAOmA7s=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyWJol1mG2TkCyIK+uzxCWZtZRt2wJ2woXL1fSk+WyforsFpQLL
+	Wegne0DHIygHe8/PXSsQVqJPMkAPqQTtMs5dI3cjLwWltAikSLUxh7OALzOtCPzmjfQ=
+X-Gm-Gg: ASbGncueN1M1NPVJQJ+spP0/u5+iRWODWoAzAsYgKuOTullAgrB8Y6Inj4xjhiFLttu
+	JzsBKur4XLT8FuZawAIBFqGoN1HyPiA7UCM8TUfxamN2QSxhhfMw8M6339uM1ZDc5mvuPi4RAaz
+	ZZtJKKoV8poHuJez/Hk9g7vYaXgcc4lq/roR6u5TD2x2K65rlG+AeRRJjWvB6/sdgszuLknw9Hg
+	K1MJjb+pJKqnPU3lpwSRjlhpc/T9Y+U0/c8FohMOWjLXbwEMClo4Jo7n+VUBLFRVRiEVfEp7Oj/
+	lrqifPx1sX/HlvwCRXscaFx8tMMD2ogFNlkH25A5QTHFBt4x88jyXXGooGngr+wLwKXQeKTTHeF
+	roBjWiN4RcmErdHSVbZyr4o/VR+rff+kT8em+JMLwYL/Ngoxj2k6PrN8c5WIq0gUwzYFM
+X-Google-Smtp-Source: AGHT+IHvW1P/vYfLuQdieKRLav2sj0iL8HcBFcWOObvqQ/GoW+Jjhx1hxhp1NE0qHlpxeA4ab2Hb6w==
+X-Received: by 2002:a05:622a:15c2:b0:4ab:887c:8b with SMTP id d75a77b69052e-4af10a88ee3mr13217181cf.42.1754074771752;
+        Fri, 01 Aug 2025 11:59:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4aeeed670c6sm24010891cf.37.2025.08.01.11.59.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Aug 2025 11:59:31 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uhuyY-000000014Fy-2vCk;
+	Fri, 01 Aug 2025 15:59:30 -0300
+Date: Fri, 1 Aug 2025 15:59:30 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, robin.murphy@arm.com,
+	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
+	mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v3 29/29] iommu/arm-smmu-v3-kvm: Add IOMMU ops
+Message-ID: <20250801185930.GH26511@ziepe.ca>
+References: <20250728175316.3706196-1-smostafa@google.com>
+ <20250728175316.3706196-30-smostafa@google.com>
+ <20250730144253.GM26511@ziepe.ca>
+ <aIo1ImP7R7VhRpVE@google.com>
+ <20250730164752.GO26511@ziepe.ca>
+ <aIt67bOzp6XS_yO-@google.com>
+ <20250731165757.GZ26511@ziepe.ca>
+ <aIurlx5QzEtjpFLd@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250729193341.621487-1-seanjc@google.com> <20250729193341.621487-6-seanjc@google.com>
- <b27f807e-b04f-487d-be13-74a8b0a61b42@intel.com>
-Message-ID: <aIzu4q_7yBmCIOWK@google.com>
-Subject: Re: [PATCH 5/5] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
-From: Sean Christopherson <seanjc@google.com>
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Vishal Annapurve <vannapurve@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Nikolay Borisov <nik.borisov@suse.com>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aIurlx5QzEtjpFLd@google.com>
 
-+Chao
+On Thu, Jul 31, 2025 at 05:44:55PM +0000, Mostafa Saleh wrote:
+> > > They are not random, as part of this series the SMMUv3 driver is split
+> > > where some of the code goes to “arm-smmu-v3-common.c” which is used by
+> > > both drivers, this reduces a lot of duplication.
+> > 
+> > I find it very confusing.
+> > 
+> > It made sense to factor some of the code out so that pKVM can have
+> > it's own smmv3 HW driver, sure.
+> > 
+> > But I don't understand why a paravirtualized iommu driver for pKVM has
+> > any relation to smmuv3. Shouldn't it just be calling some hypercalls
+> > to set IDENTITY/BLOCKING?
+> 
+> Well it’s not really “paravirtualized” as virtio-iommu, this is an SMMUv3
+> driver (it uses the same binding a the smmu-v3)
 
-On Fri, Aug 01, 2025, Adrian Hunter wrote:
-> On 29/07/2025 22:33, Sean Christopherson wrote:
-> > +static int tdx_terminate_vm(struct kvm *kvm)
-> > +{
-> > +	if (kvm_trylock_all_vcpus(kvm))
-> > +		return -EBUSY;
-> > +
-> > +	kvm_vm_dead(kvm);
-> > +	to_kvm_tdx(kvm)->vm_terminated = true;
-> > +
-> > +	kvm_unlock_all_vcpus(kvm);
-> > +
-> > +	tdx_mmu_release_hkid(kvm);
-> > +
-> > +	return 0;
-> > +}
-> 
-> As I think I mentioned when removing vm_dead first came up,
-> I think we need more checks.  I spent some time going through
-> the code and came up with what is below:
-> 
-> First, we need to avoid TDX VCPU sub-IOCTLs from racing with
-> tdx_mmu_release_hkid().  But having any TDX sub-IOCTL run after
-> KVM_TDX_TERMINATE_VM raises questions of what might happen, so
-> it is much simpler to understand, if that is not possible.
-> There are 3 options:
-> 
-> 1. Require that KVM_TDX_TERMINATE_VM is valid only if
-> kvm_tdx->state == TD_STATE_RUNNABLE.  Since currently all
-> the TDX sub-IOCTLs are for initialization, that would block
-> the opportunity for any to run after KVM_TDX_TERMINATE_VM.
-> 
-> 2. Check vm_terminated in tdx_vm_ioctl() and tdx_vcpu_ioctl()
-> 
-> 3. Test KVM_REQ_VM_DEAD in tdx_vm_ioctl() and tdx_vcpu_ioctl()
-> 
-> [ Note cannot check is_hkid_assigned() because that is racy ]
-> 
-> Secondly, I suggest we avoid SEAMCALLs that will fail and
-> result in KVM_BUG_ON() if HKID has been released.
-> 
-> There are 2 groups of those: MMU-related and TDVPS_ACCESSORS.
-> 
-> For the MMU-related, the following 2 functions should return
-> an error immediately if vm_terminated:
-> 
-> 	tdx_sept_link_private_spt()
-> 	tdx_sept_set_private_spte()
-> 
-> For that not be racy, extra synchronization is needed so that
-> vm_terminated can be reliably checked when holding mmu lock
-> i.e.
-> 
-> static int tdx_terminate_vm(struct kvm *kvm)
-> {
-> 	if (kvm_trylock_all_vcpus(kvm))
-> 		return -EBUSY;
-> 
-> 	kvm_vm_dead(kvm);
-> +
-> +       write_lock(&kvm->mmu_lock);
-> 	to_kvm_tdx(kvm)->vm_terminated = true;
-> +       write_unlock(&kvm->mmu_lock);
-> 
-> 	kvm_unlock_all_vcpus(kvm);
-> 
-> 	tdx_mmu_release_hkid(kvm);
-> 
-> 	return 0;
-> }
-> 
-> Finally, there are 2 TDVPS_ACCESSORS that need avoiding:
-> 
-> 	tdx_load_mmu_pgd()
-> 		skip td_vmcs_write64() if vm_terminated
-> 
-> 	tdx_protected_apic_has_interrupt()
-> 		skip td_state_non_arch_read64() if vm_terminated
+> It re-use the same probe code, fw/hw parsing and so on (inside the kernel),
+> also re-use the same structs to make that possible. 
 
-Oof.  And as Chao pointed out[*], removing the vm_dead check would allow creating
-and running vCPUs in a dead VM, which is most definitely not desirable.  Squashing
-the vCPU creation case is easy enough if we keep vm_dead but still generally allow
-ioctls, and it's probably worth doing that no matter what (to plug the hole where
-pending vCPU creations could succeed):
+I think this is not quite true, I think you have some part of the smmu driver
+bootstrap the pkvm protected driver.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d477a7fda0ae..941d2c32b7dc 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4207,6 +4207,11 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- 
-        mutex_lock(&kvm->lock);
- 
-+       if (kvm->vm_dead) {
-+               r = -EIO;
-+               goto unlock_vcpu_destroy;
-+       }
-+
-        if (kvm_get_vcpu_by_id(kvm, id)) {
-                r = -EEXIST;
-                goto unlock_vcpu_destroy;
+But then the pkvm takes over all the registers and the command queue.
 
-And then to ensure vCPUs can't do anything, check KVM_REQ_VM_DEAD after acquiring
-vcpu->mutex.
+Are you saying the event queue is left behind for the kernel? How does
+that work if it doesn't have access to the registers?
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6c07dd423458..883077eee4ce 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4433,6 +4433,12 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 
-        if (mutex_lock_killable(&vcpu->mutex))
-                return -EINTR;
-+
-+       if (kvm_test_request(KVM_REQ_VM_DEAD, vcpu)) {
-+               r = -EIO;
-+               goto out;
-+       }
-+
-        switch (ioctl) {
-        case KVM_RUN: {
-                struct pid *oldpid;
+So what is left of the actual *iommu subsystem* driver is just some
+pkvm hypercalls?
 
+It seems more sensible to me to have a pkvm HW driver for SMMUv3 that
+is split between pkvm and kernel, that operates the HW - but is NOT an
+iommu subsystem driver
 
-That should address all TDVPS paths (I hope), and I _think_ would address all
-MMU-related paths as well?  E.g. prefault requires a vCPU.
+Then an iommu subsystem driver that does the hypercalls, that is NOT
+connected to SMMUv3 at all.
 
-Disallowing (most) vCPU ioctls but not all VM ioctls on vm_dead isn't great ABI
-(understatement), but I think we need/want the above changes even if we keep the
-general vm_dead restriction.  And given the extremely ad hoc behavior of taking
-kvm->lock for VM ioctls, trying to enforce vm_dead for "all" VM ioctls seems like
-a fool's errand.
+In other words you have two cleanly seperate concerns here, an "pkvm
+iommu subsystem" that lets pkvm control iommu HW - and the current
+"iommu subsystem" that lets the kernel control iommu HW. The same
+driver should not register to both.
 
-So I'm leaning toward keeping "KVM: Reject ioctls only if the VM is bugged, not
-simply marked dead" (with a different shortlog+changelog), but keeping vm_dead
-(and not introducing kvm_tdx.vm_terminated).
+> As mentioned in the cover letter, we can also still build nesting on top of
+> this driver, and I plan to post an RFC for that, once this one is sorted.
 
-Thoughts?
+I would expect nesting to present an actual paravirtualized SMMUv3
+though, with a proper normal SMMUv3 IOMMU subystem driver. This is how
+ARM architecture is built to work, why mess it up?
 
-[*] https://lore.kernel.org/all/aIlzeT+yFG2Tvb3%2F@intel.com
+So my advice above seems cleaner, you have the pkvm iommu HW driver
+that turns around and presents a completely normal SMMUv3 HW API which
+is bound by the ordinately SMMUv3 iommu subsystem driver.
+
+Jason
