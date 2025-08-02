@@ -1,276 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825621E7C1B;
-	Sat,  2 Aug 2025 09:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624A4214204
+	for <kvmarm@lists.linux.dev>; Sat,  2 Aug 2025 10:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754125415; cv=none; b=Uku/4MQqRYa1pKKlXrL+QIsKcasYsDCZD98cDUZlVBzoPCashVDTG6qcR+khldE7ubVg0IibdoNVJjcw79e2Crmkz+4Luh3C68pn7BXrnssRkAeCaeLy4C6RFBHWMIo6BbujTLOlTdSXL2oyb+ay81XVtnNgkciwZedMmXHqrEM=
+	t=1754131093; cv=none; b=RsdO9xvYU+JZIE6cxENRdkp89qrtPKO6V7C9iUHGhzmDVdNrQM3uK2o3NwYb9a4Z8y/dUu5Ywv9ULvijmZAhuTXb4qRx/rPa2yc0rkZpcO4cfBbxSI14egB+Mn6fQ751UBhOn1d+hqmoJWo9PvMh9iSQthBhrCph4pp3tun5mhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754125415; c=relaxed/simple;
-	bh=B+sLSD/spXOHjS0PWTHttU03+WW1yULv9NwniNHJJPY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=sllCWRlD7Un1mpRc/IPpNjZIZaJhKWCmmoCxgffDUQER7rAw3T6n9Cv5hWj4HeFJ8wAbeK97eM6Fr140xCgYo4AJlcLVe4KIdUHlXzHMVASmApdsnA9+0JYF31Ydib684HaHg79DdEiJ/RfwE6uHurtHPgtP7YbQw3P+u4HGhMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bSa/9iUd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754131093; c=relaxed/simple;
+	bh=78NVjdNVPg30hTJnbWBWyc33Oq0igcvoln/WVrBhAt0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RWkAQuVEbpA/EbwWErhu9L5n9NsYbUUFcfh8YEwp9xdLVLBLJlnTjLuMaloBQlCw3MWXbKfDhzzY3zYm75DexdMW2PCLhj5eYRCNGpCwLOcOGPszNquFJqk+JAho8u1H4BdWyQXk+RWAXLxJLqjIImQh/a7mgbu9CXOwb+GbUh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=DnxyNdlP; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bSa/9iUd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC25AC4CEEF;
-	Sat,  2 Aug 2025 09:03:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754125415;
-	bh=B+sLSD/spXOHjS0PWTHttU03+WW1yULv9NwniNHJJPY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=bSa/9iUdUGz5mSHzXuDyWCxOGL5I5Q7pp06nQjGP17OPVQ3mqE1TCsIaEggsH3iuf
-	 t6Q8O5c7hAUI7lRolFF88ap529irddphG1teWc0XaDzPsIrq2/7LoqDRY/U0w7Nn/a
-	 qjyUzM4zP/7/fOgT87W9BRIFgUoihaj84nn5W0Nq34srLhFrqPSMv/BBBzrpvW6lew
-	 ouOgQDMOCweSaSmThNFguvWXmUnyvUbMQniSM0+/Z+WQH7g2bk5bActe3XDoi1oXV9
-	 d9uGQkqsKXI+c5ETG+DCcIYgUrWwzI6VqRxK7VXQ+AfucnNZiIlTyiEC9NNrXwi53S
-	 U79LQX792ty5w==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	linux-pci@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="DnxyNdlP"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24041a39005so12122175ad.2
+        for <kvmarm@lists.linux.dev>; Sat, 02 Aug 2025 03:38:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie.ntu.edu.tw; s=google; t=1754131089; x=1754735889; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G63QXIxj+Dtjk0K95q+UoQIrd3RUwOdJawqBP/rtSGw=;
+        b=DnxyNdlPOhYGDHUJiVPTajf3Rb5yRvxQrD1T6ChQtyHMJdDUobSOiE9IgYqXbXkDHl
+         DXR1CY0Oedk/O0HX3h3b2nXuE4VIGjEuaf6EvhS7CAqUE9qFC+EgGwhuBahjkjow6f2t
+         U1+3cINYjmmWfk5lCi2TPmHCxg4ZgGUIX4vPVnNKOnTJJLVnDyzFbRJpfMOLU3Ub1srj
+         LXo23uNq6Wc7Bful0Bd/7x4g1kcZovTpCJc/d7wjSmsdngrY72eGZjle77ogd8wZ74fH
+         lBNEPF/8s5s3HcGq55NBdgQKNiAP0X/CV4/Evg0kTs/E+FlqviHi65Lu4RvOubn/rz0+
+         hdxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754131089; x=1754735889;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G63QXIxj+Dtjk0K95q+UoQIrd3RUwOdJawqBP/rtSGw=;
+        b=xTxcubM65Mg+kiErI7KsjT+UBCdu3Upbp1cu6u6WfJQD9+BvMFunGsBbFRWKt+CYJ/
+         YasDlRY3LS0/JmrcMQ2xNTBMe7XESAmHtIy4RJqLgQrPr+N1NaxMmZxiaEWI6zRnLrwl
+         gj/qrGNDVDFE4EtiUscd1j2YpdbSOMFUfw2yQiL3FlH9UsoV0k/rbBnOzx2UviUniIRh
+         DG22rVtXKZXJ3CrkVA1JCf10sfqPf6ftjorV807SVc1SjgL7tutZsICjMjEMwiA9o3o8
+         Cl2TktZTCeuWlZMaI8yhC6Febtg29Iy236Y5yszrJhxYby6T6+qcnfIalyHUq5s7Vona
+         hsuw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4CO5ikJhCxmytdNQ/dhjKBfJ/6ApM2L0qwlXKkezE2qAsIVUbIPR1h66ANahrdiUYBPJXhAg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyM/l5ki9xwfBr5Pt9da24lm+eVuZe8UogJd2qqMouf5JZWUQNi
+	WJpDv4yWM3/Q+JQJYFPVtsFBxD54b/BKtrEczkl8MtgxkcXWMoAMJAcU1/8Nm/Lq68pf+GTN1N0
+	YA10cVwO11qeB2/5lnY+DlRAzs5H3/J1PkV02n7I9ASfSTLeUkds=
+X-Gm-Gg: ASbGncswjC8NeNN9FUosl3J70MU7c2sia6iMEaxyAzPF5cL9jY6Igru3b8g33aokn1+
+	YQInSvyLhzNnZPMH4eas3x4FfsG2WelR6NGVYy4a3zuB1QEW0QViCAwnm8hBEjAVA/t8H7RarbV
+	f+rLXJcyWpF/DXtiYf9NlwRKiFyteoIlyZy08+YfgMXso204rlyg5r5HJ5+48wmBEvH2FX1zZzg
+	gTXDaUSjMyHE1XYjoJOvB78bk7fyDdozNsp6KAnlhyCWy4u73FNrZxMJu3Au1LF80XfR6t4MRLr
+	XOMj17Omt9cPgOFWsC+VcFxC4WhJwcSWdOMe41DNtNuc5WFVCtDAjKRQJUucmACpG5JewRvFUXc
+	sRjx+Rgvg7PzsTHvHUS6bR2K8m/5f7Hx5pU2hzthkxjEaRpsZMIA/ewZLThTa
+X-Google-Smtp-Source: AGHT+IET2miJQcQuyN4A48qXGASFh6PFQlmTNZHqpeRrnOMmptg7WMuDBI8s0Bnz8/+S9PgeZ151wg==
+X-Received: by 2002:a17:902:ea10:b0:240:3c62:6194 with SMTP id d9443c01a7336-24246f6a8famr37337425ad.20.1754131088712;
+        Sat, 02 Aug 2025 03:38:08 -0700 (PDT)
+Received: from zenbook (1-162-100-196.dynamic-ip.hinet.net. [1.162.100.196])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aca205sm63963445ad.193.2025.08.02.03.38.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Aug 2025 03:38:08 -0700 (PDT)
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 08/38] iommufd/tsm: Add tsm_op iommufd ioctls
-In-Reply-To: <20250729173458.00003ca5@huawei.com>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-9-aneesh.kumar@kernel.org>
- <20250729173458.00003ca5@huawei.com>
-Date: Sat, 02 Aug 2025 14:33:26 +0530
-Message-ID: <yq5afrea9jtt.fsf@kernel.org>
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH] KVM: arm64: ptdump: Fix exec attribute printing
+Date: Sat,  2 Aug 2025 18:40:21 +0800
+Message-ID: <20250802104021.3076621-1-r09922117@csie.ntu.edu.tw>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-Jonathan Cameron <Jonathan.Cameron@huawei.com> writes:
+Currently the guest stage-2 page table dump has the executable attribute
+printed in reverse, showing "X" for a non-executable region and showing
+" " for an executable one. This is caused by misjudgement of which
+string gets printed for the executable and non-executable case. Fix it
+by swapping the two strings.
 
-> On Mon, 28 Jul 2025 19:21:45 +0530
-> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->
->> Add operations bind and unbind used to bind a TDI to the secure guest.
->>=20
->> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
->
-> Hi Aneesh,
->
-> I'm mostly reading this to get head around it rather than fully review
-> at this point.
->
-> A few things inline though that I noticed whilst doing so.
->
-> Jonathan
->
->> ---
->>  drivers/iommu/iommufd/iommufd_private.h |  1 +
->>  drivers/iommu/iommufd/main.c            |  3 ++
->>  drivers/iommu/iommufd/viommu.c          | 50 +++++++++++++++++++++++++
->>  drivers/vfio/pci/vfio_pci_core.c        | 10 +++++
->>  include/uapi/linux/iommufd.h            | 18 +++++++++
->>  5 files changed, 82 insertions(+)
->>=20
->> diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iom=
-mufd/iommufd_private.h
->> index fce68714c80f..e08186f1d102 100644
->> --- a/drivers/iommu/iommufd/iommufd_private.h
->> +++ b/drivers/iommu/iommufd/iommufd_private.h
->> @@ -697,6 +697,7 @@ void iommufd_vdevice_destroy(struct iommufd_object *=
-obj);
->>  void iommufd_vdevice_abort(struct iommufd_object *obj);
->>  int iommufd_hw_queue_alloc_ioctl(struct iommufd_ucmd *ucmd);
->>  void iommufd_hw_queue_destroy(struct iommufd_object *obj);
->> +int iommufd_vdevice_tsm_op_ioctl(struct iommufd_ucmd *ucmd);
->>=20=20
->>  static inline struct iommufd_vdevice *
->>  iommufd_get_vdevice(struct iommufd_ctx *ictx, u32 id)
->
->> diff --git a/drivers/iommu/iommufd/viommu.c b/drivers/iommu/iommufd/viom=
-mu.c
->> index 59f1e1176f7f..c934312e5397 100644
->> --- a/drivers/iommu/iommufd/viommu.c
->> +++ b/drivers/iommu/iommufd/viommu.c
->> @@ -162,6 +162,9 @@ void iommufd_vdevice_abort(struct iommufd_object *ob=
-j)
->>=20=20
->>  	lockdep_assert_held(&idev->igroup->lock);
->>=20=20
->> +#ifdef CONFIG_TSM
-> Can we use stubs for some of this stuff so we don't need ifdefs in as many
-> places.
->
->> +	tsm_unbind(idev->dev);
->> +#endif
->>  	if (vdev->destroy)
->>  		vdev->destroy(vdev);
->>  	/* xa_cmpxchg is okay to fail if alloc failed xa_cmpxchg previously */
->> @@ -471,3 +474,50 @@ int iommufd_hw_queue_alloc_ioctl(struct iommufd_ucm=
-d *ucmd)
->>  	iommufd_put_object(ucmd->ictx, &viommu->obj);
->>  	return rc;
->>  }
->> +
->> +#ifdef CONFIG_TSM
->> +int iommufd_vdevice_tsm_op_ioctl(struct iommufd_ucmd *ucmd)
->
-> Might want to split this out to a separate c file and use stubs in a head=
-er to
-> keep the code clean here.
->
->> +{
->> +	struct iommu_vdevice_tsm_op *cmd =3D ucmd->cmd;
->> +	struct iommufd_vdevice *vdev;
->> +	struct kvm *kvm;
->> +	int rc =3D -ENODEV;
->> +
->> +	if (cmd->flags)
->> +		return -EOPNOTSUPP;
->> +
->> +	vdev =3D container_of(iommufd_get_object(ucmd->ictx, cmd->vdevice_id,
->> +					       IOMMUFD_OBJ_VDEVICE),
->> +			    struct iommufd_vdevice, obj);
->> +	if (IS_ERR(vdev))
->> +		return PTR_ERR(vdev);
->> +
->> +	kvm =3D vdev->viommu->kvm_filp->private_data;
->> +	if (kvm) {
->> +		/*
->> +		 * tsm layer will make take care of parallel calls to tsm_bind/unbind
->
-> Wrap comment to say under 80 chars. Or if file goes higher, use a single =
-line
-> comment.
->
-> 		  tsm layer will take care ...
->
-> (stray 'make')
->
->> +		 */
->> +		if (cmd->op =3D=3D IOMMU_VDEICE_TSM_BIND)
->> +			rc =3D tsm_bind(vdev->idev->dev, kvm, vdev->virt_id);
->> +		else if (cmd->op =3D=3D IOMMU_VDEICE_TSM_UNBIND)
->> +			rc =3D tsm_unbind(vdev->idev->dev);
->> +
->> +		if (rc) {
->> +			rc =3D -ENODEV;
->
-> If we want to eat an error code coming from elsewhere, maybe a comment on=
- why?
->
->> +			goto out_put_vdev;
->> +		}
->> +	} else {
->> +		goto out_put_vdev;
->
-> If this always skips the next line, does that imply that line should
-> have been under if (kvm)?  Maybe this makes more sense in
-> later patches - if so ignore this comment.
->
->
->> +	}
->> +	rc =3D iommufd_ucmd_respond(ucmd, sizeof(*cmd));
->> +
->> +out_put_vdev:
->> +	iommufd_put_object(ucmd->ictx, &vdev->obj);
->> +	return rc;
->> +}
->> +#else /* !CONFIG_TSM */
->> +int iommufd_vdevice_tsm_op_ioctl(struct iommufd_ucmd *ucmd)
->> +{
->> +	return -ENODEV;
->> +}
->> +#endif
->> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pc=
-i_core.c
->> index bee3cf3226e9..afdb39c6aefd 100644
->> --- a/drivers/vfio/pci/vfio_pci_core.c
->> +++ b/drivers/vfio/pci/vfio_pci_core.c
->> @@ -694,6 +694,16 @@ void vfio_pci_core_close_device(struct vfio_device =
-*core_vdev)
->>  #if IS_ENABLED(CONFIG_EEH)
->>  	eeh_dev_release(vdev->pdev);
->>  #endif
->> +
->> +#if 0
->
-> If you really need to do this, add a comment on why if 0
->
->> +	/*
->> +	 * destroy vdevice which involves tsm unbind before we disable pci dis=
-able
->> +	 * A MSE/BME clear will transition the device to error state.
->> +	 */
->> +	if (core_vdev->iommufd_device)
->> +		iommufd_device_tombstone_vdevice(core_vdev->iommufd_device);
->> +#endif
->> +
->>  	vfio_pci_core_disable(vdev);
->>
+Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+---
+ arch/arm64/kvm/ptdump.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This is something I=E2=80=99d like to get feedback on. According to the TSM
-specification, we=E2=80=99re required to unlock before clearing MSE/BME via=
-=20
-calling `vfio_pci_core_disable(vdev)`.
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index 098416d7e5c25..99fc13f1c11fb 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -44,8 +44,8 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+ 	}, {
+ 		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+ 		.val	= PTE_VALID,
+-		.set	= " ",
+-		.clear	= "X",
++		.set	= "X",
++		.clear	= " ",
+ 	}, {
+ 		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+ 		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+-- 
+2.50.1
 
-However, in the current `iommufd` branch, we seem to call
-`vdevice_destroy` a bit too late in the sequence to meet this
-requirement.
-
-
->>  	mutex_lock(&vdev->igate);
->> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
->> index 9014c61a97d4..8b1fbf1ef25c 100644
->> --- a/include/uapi/linux/iommufd.h
->> +++ b/include/uapi/linux/iommufd.h
->> @@ -57,6 +57,7 @@ enum {
->
->>  /**
->> @@ -1127,6 +1128,23 @@ enum iommu_veventq_flag {
->>  	IOMMU_VEVENTQ_FLAG_LOST_EVENTS =3D (1U << 0),
->>  };
->>=20=20
->> +/**
->> + * struct iommu_vdevice_tsm_OP - ioctl(IOMMU_VDEVICE_TSM_OP)
->> + * @size: sizeof(struct iommu_vdevice_tsm_OP)
->
-> _op I guess?
->
->> + * @op: Either TSM_BIND or TSM_UNBIMD
->> + * @flags: Must be 0
->> + * @vdevice_id: Object handle for the vDevice. Returned from IOMMU_VDEV=
-ICE_ALLOC
->> + */
->> +struct iommu_vdevice_tsm_op {
->> +	__u32 size;
->> +	__u32 op;
->> +	__u32 flags;
->> +	__u32 vdevice_id;
->> +};
->> +#define IOMMU_VDEVICE_TSM_OP	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_VDEVICE_TSM_=
-OP)
->> +#define IOMMU_VDEICE_TSM_BIND		0x1
->> +#define IOMMU_VDEICE_TSM_UNBIND		0x2
->> +
->>  /**
->>   * struct iommufd_vevent_header - Virtual Event Header for a vEVENTQ St=
-atus
->>   * @flags: Combination of enum iommu_veventq_flag
-
-
-Thanks for the review comments. I'll update the patch with the suggested ch=
-anges.
-
-
--aneesh
