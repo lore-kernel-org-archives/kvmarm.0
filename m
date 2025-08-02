@@ -1,71 +1,71 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DB3239562
-	for <kvmarm@lists.linux.dev>; Sat,  2 Aug 2025 13:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904983207
+	for <kvmarm@lists.linux.dev>; Sat,  2 Aug 2025 14:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754142120; cv=none; b=b0fgEGxSsVNqcRuUKnw+eQhMc3bntcP/jEpErG3Ql+eUy1C7CgOE6MFaD62mk3ZiW7Pl3ASPiNmlClEY23F/VlZ9TH6z4TVX7jIKfwir0mBd2uKhPC7qwvcaSybIRvnGoVKv+6Ry6M/4dKYNLEqPrr58qGjLE316bqckAGe8DKo=
+	t=1754144274; cv=none; b=X0DvNvJwmGJ+dpA+jp/dqvHHWS+LEL0v/9tv4SA63VV0zM6xxYp+WIFg7B6ekcSdNQREEVAmphRt9IMxs/94/7G9lm2DniU+nlWWFobFdphwUY/e1oI/JfBiJMGIZDRV1IczJPGdvc9DjsBNoety5fmKp7fj+JUSyKsLcsq+ZDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754142120; c=relaxed/simple;
-	bh=A3twgw+3GWVYYFsSIocE5ftAItdu/FBceRJG47y6ZNM=;
+	s=arc-20240116; t=1754144274; c=relaxed/simple;
+	bh=FQ39B9jERPUAW3pWSgAAeA1QG0tXEiueP0zJxCjCnZk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uggF/jWL4w2hJQQrgnghcLlMsF4Xdp5P/aIQSNhBrV6tskfW+HnL6onLeipbKWh/pkCF4HCyuAnTgWBlhL6ygo6LrwCunrVQadP9zsNPYHn5nb0FdC6De1v2w80RgeZQhd3qt24mE/ErNOTuT2/wWpCCaAcFB4MeIpXCR46Wg2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=R+rP3Ys0; arc=none smtp.client-ip=209.85.160.170
+	 Content-Type:Content-Disposition:In-Reply-To; b=f1EVo9k4T/tWpKOp+oVIoOSAvChuZ+Fs2APOmiIMxzbhYL6PC4J/jU/VLYlqpwNYekpQrPb1dxyz/oei+rIud0U8QDTs+ecVKO+j02TwBS5RhQQKJdqUkAqnuG0sGGZ3orry4WPB+dBqQPBAMb3Ywbq1UBmT3xsHH9h5Q0k2OJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=F0YwNw5P; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="R+rP3Ys0"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4af14096b9eso9504281cf.3
-        for <kvmarm@lists.linux.dev>; Sat, 02 Aug 2025 06:41:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="F0YwNw5P"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7e32c9577ddso155433485a.0
+        for <kvmarm@lists.linux.dev>; Sat, 02 Aug 2025 07:17:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1754142116; x=1754746916; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1754144271; x=1754749071; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dQYB2j5N3eZBI44lsWtNzt2CVeD9f75v+QDgKG5n1yk=;
-        b=R+rP3Ys0tLaqlZfAEWqjWjNmFEpd+nqhizMeUWTyiiLXVR4JK9S5Qu8JBXRQjXQfkI
-         8y+zV7Eqh0cZe+HVjd+x0QUHoebXFBYgvDtKPjO3mUBLYh0rmoiAGP2n8pzVKgi7BOSb
-         jDwbB0swXJeRECgzSmW+fIt+YlF6+UvuL3TXwKfMXoNpXNbXVj9PuranIjUk40jt7i7a
-         uEkBBKM9GOvvRtqmIaY2xsT3e9mDHUIN6VO8vhAlKsg2ApWlzOM8AtZotPJvb+YiOldQ
-         JNXqUSBPa6VZM8SJPNGpOOq//jRC74/Y1C9gy2gtRdh3Gkrd40/WXppcE2SxnUNle0B/
-         ffvQ==
+        bh=XAht3BlYnywuDydAQFgQqb1h2JGOGBLyurA+IzlOJa4=;
+        b=F0YwNw5PQmdNPXnkbLaXVZMePCR0ppt8lnntTMVZjEWi61r1FzkPtGEXmmr9BEDTmO
+         adksgrISpxGDxY3NlK4pP9ULYquqPB3SLwCSeuS9rp6r7sTbldK+9V2z1iPZbYmf7WT2
+         UHTzR8oGDUNwnf3f7iBsx07oohxx5MQ1zT8LrW/EPIfNE547LdKEaLPJgKhO8Mg2pY+z
+         rIE+S42CpJYYeiEryFZrtk1PMSSQx3Q+kPnFGIhw9iZdFV3IgPXVYBWHPEQ2mhwd5b2J
+         yK2OeXLewtMZ0HIYlabLzVOFDosPMQ4emoonatyb3qeaeRFvK5eXy57oTi86SIi99VJv
+         NpUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754142116; x=1754746916;
+        d=1e100.net; s=20230601; t=1754144271; x=1754749071;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dQYB2j5N3eZBI44lsWtNzt2CVeD9f75v+QDgKG5n1yk=;
-        b=tkf4ZYHZ/yBM6rRx6qpCiDvmEMqc1V0SwDVtqMZvDuN2RrS6sFjAzBdDGRWBTu37zi
-         RpfKSwWk64w4OIwPY8QeS65wO+YcY4D9BGwhK/edeH+1bHVyEj2jcZvIwWYKE4E26aAy
-         U7B0A0ij7seaf92FRqt144uoFGOsbFWXLG4P6Nq4ML0B/qGo5WEFUCusOypRJTVJOXk2
-         8KVd2FYkRAXoHiNW+P6J2prQg+9k4a1TIldKwtjPQxLDVlcspGmA6QtEXR8y0Cp0/zi0
-         syckBlziV1amvnhuSaK47Yq7nRZ+f/Hw/0myJtD5eLI423I9ILput3xGGcGgWkJkhPl8
-         YIxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYfH7Q6vSJ8TQ0xSHyQ2PxUTOodGULPEKXafOzB4aFFCr6MnLLJgl9/fpZgMqHUJQJH0MWB34=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwoCXGek/nVSPNRNs+b82KNysf/5omh+UKsAamTSrncUaXk8mxN
-	p7ZNQZ7SRDT7uK9UXOeqdWj+vileUOegYWalpq8iQzvCAN6EDT6CmT1mYF6zp6ZTFIc=
-X-Gm-Gg: ASbGnctJMaofUjmTWDAtTAgj2LcOcbSt5OGmjflBWl7S3ai4ex4kvcUJpo8ju6NcltG
-	60AKHXmG1TaQMEofdk4FsmH86N7i4QtSNGlqPMhWibZqwSiZnCfEqZI+oxatf1JPFjiokhEEyDI
-	ulWJJ0QgQIBlRKydmUcE9+LOF4YGiIhxxdtnpgunwRrhQ+lwbrK39ypbmVIFxvwwNXWaNzMH7ce
-	vO4bv7VZvjPdv0Kd2TDmE/VfovMQyl9u0dVMz3F2LvyHs+xskBMUxcGLQDvgrOoTCxcKwjMTZTm
-	OLWE6EXal6xjI+zub2I8+0hktNyT19xAa2mwpNakcvXJQWDNkRQs84tLsQyYnb+ojghuSG9lljS
-	7AI7l3UTzM7VPPNLrb7aNTwTQDo7LsyMgafyyRdwoLZe2f70fWawuC3od0bfF7WnY4RqF2v9Tie
-	Y86ZY=
-X-Google-Smtp-Source: AGHT+IH9zuh0IwBkoewvGIgO8/CED1zpnPpU3SJpI3mT+2sTUv+6/McJoV9dw9ylKlFlqAeQzA5i+Q==
-X-Received: by 2002:ac8:5a86:0:b0:4ab:5c2d:fb25 with SMTP id d75a77b69052e-4af109b48d1mr49979041cf.19.1754142116061;
-        Sat, 02 Aug 2025 06:41:56 -0700 (PDT)
+        bh=XAht3BlYnywuDydAQFgQqb1h2JGOGBLyurA+IzlOJa4=;
+        b=eBhYHjGjjWsZzzh0x2e0rsU8vGcS7glKabv9gGiTpM3OLaMHjoL2Nrfx5eEVyGaTJv
+         agyrI/3UVdkhe+GnWKui3SAGm9+sQL1ler4bjrUWydtBC8EWWXISU6CnrXYMbQT+SucD
+         frpk2nhRwY0Gclswd54iUeXWUfdjDYMcNihj+aIp+XQWv5gLPiy/4H/R1mptWYf4/vph
+         ZwAY7pBysFXKJJp4HaZd/WZUCCTIfoh28zDoyZg6a8OZuF0cokvNKUcwdOtD5ljCWxfk
+         GVWtenkniOOiIvpwLudIW1TWJSDYfPsNpPeuUZ1YB8aACkLjbYMeLZk8gSeMYM7+DFYA
+         tmaw==
+X-Forwarded-Encrypted: i=1; AJvYcCWCd7npWPV0GjKUlvM7VjtHnP+D3Fzai8Xq5J4+v0h1skHhZaxA+an3w9lwbn7zqHjJUHM1rAY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzIIjEzJ1ipvodJzYdSzMu8ceuyI6cAy28Mw0v+LsqYAtPuTHPL
+	utS/Oz7ibdUDPkK2lp3qLC2JtuAXISQVvAGA658RX8uqpEGoT9LvNDH8QUCrjG35W40=
+X-Gm-Gg: ASbGncswMdVhrmQWVC8NEIpTwrQGDcdZ9f6ItClIc9F8qow++3JRpOxW7nmflGBFpy5
+	kPEet0ZNqgu51VprJAmXUdtLpjcRnTIdTSFqZ25FzdzpsEMqMW6jjveQ/x2I1wRfVbUbNMVympl
+	0ep5ruvPmVfSH/NBZqVAyr9cIqQ9DAVc/koaPd1sAJucoewexx3ZQOBW4aJ8mmCSoMqYC8XtVea
+	O2WXLoQkWuSaU1BM5QVkr/lytONT6SfLH1zo7/XOwU+xQLzZuTYDmz9OS14nm/1OIBTV/tHhpZc
+	D/INx9a23gIV0wZUiTQhdVUrxHf4uYHPxw6KkXfP8lSBgQAJZ0C2m7yHwtKGhzeI4dG1+AdL4o+
+	iC0u4IKyaGJislgnb4kf5k5UB+3ejmEhkaNjyc9Ul8nOOpVLsWEm43WuocwrJi5hTwhSv
+X-Google-Smtp-Source: AGHT+IGdPAmPi73Qx9Dpc4yn7AJ3AWkRwpu/Z2rB1pE3w5ZLbSl1DPKWIHYygsiQ4vWMpbzVE9HS0A==
+X-Received: by 2002:a05:620a:1645:b0:7e3:39c2:9856 with SMTP id af79cd13be357-7e696268352mr406724785a.1.1754144271303;
+        Sat, 02 Aug 2025 07:17:51 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4aeeedb0403sm30889761cf.47.2025.08.02.06.41.55
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e681c8c727sm313508585a.78.2025.08.02.07.17.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Aug 2025 06:41:55 -0700 (PDT)
+        Sat, 02 Aug 2025 07:17:50 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1uiCUk-00000001A2v-3YjF;
-	Sat, 02 Aug 2025 10:41:54 -0300
-Date: Sat, 2 Aug 2025 10:41:54 -0300
+	id 1uiD3W-00000001AEi-0hrF;
+	Sat, 02 Aug 2025 11:17:50 -0300
+Date: Sat, 2 Aug 2025 11:17:50 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+To: dan.j.williams@intel.com
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
 	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
 	Xu Yilun <yilun.xu@linux.intel.com>,
@@ -74,15 +74,12 @@ Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 04/38] tsm: Support DMA Allocation from private
- memory
-Message-ID: <20250802134154.GI26511@ziepe.ca>
+Subject: Re: [RFC PATCH v1 00/38] ARM CCA Device Assignment support
+Message-ID: <20250802141750.GL26511@ziepe.ca>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-5-aneesh.kumar@kernel.org>
- <20250728143318.GD26511@ziepe.ca>
- <yq5a5xfbbe35.fsf@kernel.org>
- <20250729143339.GH26511@ziepe.ca>
- <yq5aikj69kpn.fsf@kernel.org>
+ <688c2155849a2_cff99100dd@dwillia2-xfh.jf.intel.com.notmuch>
+ <20250801155104.GC26511@ziepe.ca>
+ <688d2f7ac39ce_cff9910024@dwillia2-xfh.jf.intel.com.notmuch>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -91,88 +88,129 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq5aikj69kpn.fsf@kernel.org>
+In-Reply-To: <688d2f7ac39ce_cff9910024@dwillia2-xfh.jf.intel.com.notmuch>
 
-On Sat, Aug 02, 2025 at 02:14:20PM +0530, Aneesh Kumar K.V wrote:
-> Jason Gunthorpe <jgg@ziepe.ca> writes:
+On Fri, Aug 01, 2025 at 02:19:54PM -0700, dan.j.williams@intel.com wrote:
+
+> On the host this establishes an SPDM session and sets up link encryption
+> (IDE) with the physical device. Leave VMs out of the picture, this
+> capability in isolation is a useful property. It addresses the similar
+> threat model that Intel Total Memory Encryption (TME) or AMD Secure
+> Memory Encryption (SME) go after, i.e. interposer on a physical link
+> capturing data in flight. 
+
+Okay, maybe connect is not an intuitive name for opening IDE
+sessions..
+
+> I started this project with "all existing T=0 drivers 'just work'" as a
+> goal and a virtue. I have been begrudgingly pulled away from it from the
+> slow drip of complexity it appears to push into the PCI core.
+
+Do you have some examples? I don't really see what complexity there is
+if the solution it simply not auto bind any drivers to TDISP capable
+devices and userspace is responsible to manually bind a driver once it
+has reached T=1.
+
+This seems like the minimum possible simplicitly for the kernel as
+simply everything is managed by userspace, and there is really no
+special kernel behavior beyond switching the DMA API of an unbound
+driver on the T=0/1 change.
+
+> The concern is neither userspace nor the PCI core have everything it
+> needs to get the device to T=1. 
+
+Disagree, I think userspace can have everything. It may need some
+per-device userspace support in difficult cases, but userspace can
+deal with it..
+
+> PCI core knows that the device is T=1 capable, but does not know how
+> to preconfigure the device-specific lock state,
+
+Userspace can do this. Can we define exactly what is needed to do this
+"pre-configure the device specific lock state"? At the very worst, for
+the most poorly designed device, userspace would have to bind a T=0
+driver and then unbind it.
+
+Again, I am trying to make something simple for the kernel that gets
+us to a working solution before we jump ahead to far more complex in
+the kernel models, like aware drivers that can toggle themselves
+between T=0/1.
+
+> Userspace might be able to bind a new driver that leaves the device in a
+> lockable state on unbind, but that is not "just works" that is,
+
+I wouldn't have the kernel leave the device in the locked state. That
+should always be userspace. The special driver may do whatever special
+setup is needed, then unbind and leave a normal unlocked device
+"prepped" for userspace locking without doing a FLR or
+something. Realistically I expect this to be a very rare requirement,
+I think this coming up just reflects the HW immaturity of some early
+TDISP devices.
+
+Sensible mature devices should have no need of a pre-locking step. I
+think we should design toward that goal as the stable future and only
+try to enable a hacky work around for the problematic early devices. I
+certainly am not keen on seeing significant permanent kernel
+complexity to support this device design defect.
+
+> driver that expects the device arrives already running. Also, that main
+> driver needs to be careful not to trigger typically benign actions like
+> touch the command register to trip the device into ERROR state, or any
+> device-specific actions that trip ERROR state but would otherwise be
+> benign outside of TDISP."
+
+As I said below, I disagree with this. You can't touch the *physical*
+command register but the cVM can certainly touch the *virtualized*
+command register. It up to the VMM To ensure this doesn't cause the
+device to fall out of RUN as part of virtualization.
+
+I'd also say that the VMM should be responsible to set pBME=1 even if
+vBME=0? Shouldn't it? That simplifies even more things for the guest.
+
+> > From that principal the kernel should NOT auto probe drivers to T=0
+> > devices that can be made T=1. Userspace should handle attaching HW to
+> > such devices, and userspace can sequence whatever is required,
+> > including the attestation and verifying.
 > 
-> > On Tue, Jul 29, 2025 at 01:53:10PM +0530, Aneesh Kumar K.V wrote:
-> >> Jason Gunthorpe <jgg@ziepe.ca> writes:
-> >> 
-> >> > On Mon, Jul 28, 2025 at 07:21:41PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> >> >> @@ -48,3 +49,12 @@ int set_memory_decrypted(unsigned long addr, int numpages)
-> >> >>  	return crypt_ops->decrypt(addr, numpages);
-> >> >>  }
-> >> >>  EXPORT_SYMBOL_GPL(set_memory_decrypted);
-> >> >> +
-> >> >> +bool force_dma_unencrypted(struct device *dev)
-> >> >> +{
-> >> >> +	if (dev->tdi_enabled)
-> >> >> +		return false;
-> >> >
-> >> > Is this OK? I see code like this:
-> >> >
-> >> > static inline dma_addr_t phys_to_dma_direct(struct device *dev,
-> >> > 		phys_addr_t phys)
-> >> > {
-> >> > 	if (force_dma_unencrypted(dev))
-> >> > 		return phys_to_dma_unencrypted(dev, phys);
-> >> > 	return phys_to_dma(dev, phys);
-> >> >
-> >> > What are the ARM rules for generating dma addreses?
-> >> >
-> >> > 1) Device is T=0, memory is unencrypted, call dma_addr_unencrypted()
-> >> >    and do "top bit IBA set"
-> >> >
-> >> > 2) Device is T=1, memory is encrypted, use the phys_to_dma() normally
-> >> >
-> >> > 3) Device it T=1, memory is uncrypted, use the phys_to_dma()
-> >> >    normally??? Seems odd, I would have guessed the DMA address sould
-> >> >    be the same as case #1?
-> >> >
-> >> > Can you document this in a comment?
-> >> >
-> >> 
-> >> If a device is operating in secure mode (T=1), it is currently assumed
-> >> that only access to private (encrypted) memory is supported.
-> >
-> > No, this is no how the PCI specs were written as far as I
-> > understand. The XT bit thing is supposed to add more fine grained
-> > device side control over what memory the DMA can target. T alone does
-> > not do that.
-> >
-> >> It is unclear whether devices would need to perform DMA to shared
-> >> (unencrypted) memory while operating in this mode, as TLPs with T=1
-> >> are generally expected to target private memory.
-> >
-> > PCI SIG supports it, kernel should support it.
-> >
+> Agree, for PCI it would be simple to set a no-auto-probe policy for T=1
+> capable devices.
+
+So then it is just a question of what does a userspace component need
+to do.
+
+> I do not want to burden the PCI core with TDISP compatibility hacks and
+> workarounds if it turns out only a small handful of devices ever deploy
+> a first generation TDISP Device Security Manager (DSM). L1 aiding L2, or
+> TDISP simplicity improvements to allow the PCI core to handle this in a
+> non-broken way, are what I expect if secure device assignment takes off.
+
+Same feeling about pre-configuration :)
+
+> > The starting point must have the core code do this sequence
+> > for every driver. Once that is working we can talk about if other
+> > flows are needed.
 > 
-> Would we also need a separate DMA allocation API for allocating
-> addresses intended to be shared with the non-secure hypervisor?
+> Do you agree that "device-specific-prep+lock" is the problem to solve?
+
+Not "the" problem, but an design issue we need to accommodate but not
+endorse.
+
+> > But I think we can start with the idea that such RAS failures have to
+> > reload the driver too and work on improvements. Realistically few
+> > drivers have the sort of RAS features to consume this anyhow and maybe
+> > we introduce some "enhanced" driver mode to opt-into down the road.
 > 
-> Are there any existing drivers in the kernel that already require such
-> shared allocations, which I could use as a reference?
+> Hmm, having trouble not reading that back supporting my argument above:
+> 
+> Realistically few devices support TDISP lets require enhanced drivers to
+> opt-into TDISP for the time being.
 
-The most likely case in the near term is PCI P2P to shared MMIO.
+I would be comfortable if hitless RAS recovery for TDISP devices
+requires some kernel opt-in. But also I'm not sure how this should
+work from a security perspective. Should userspace also have to
+re-attest before allowing back to RUN? Clearly this is complicated.
 
-I don't know any way to allocate shared memory in a driver??
-
-At the bare minimum this patch should be documenting the correct
-architecture and outlining any gaps in the current implementation.
-
-I also don't really understand what the above code is even
-doing.. Isn't the design on ARM that the IPA always encodes the
-shared/private in the top bit?
-
-How do we get a shared page that does not already have a phys_addr_t
-in the shared IPA? Shouldn't the kernel have switched to the shared
-IPA alias when it returned the swiotlb buffer? eg why do we need to do:
-
-#define dma_addr_unencrypted(x)		((x) | PROT_NS_SHARED)
-
-At all?
-
-Suzuki ?
+Also, I would be comfortable to support this only for devices that do
+not require pre-configuration.
 
 Jason
