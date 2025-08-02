@@ -1,115 +1,494 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624A4214204
-	for <kvmarm@lists.linux.dev>; Sat,  2 Aug 2025 10:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958861A5B9D;
+	Sat,  2 Aug 2025 10:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754131093; cv=none; b=RsdO9xvYU+JZIE6cxENRdkp89qrtPKO6V7C9iUHGhzmDVdNrQM3uK2o3NwYb9a4Z8y/dUu5Ywv9ULvijmZAhuTXb4qRx/rPa2yc0rkZpcO4cfBbxSI14egB+Mn6fQ751UBhOn1d+hqmoJWo9PvMh9iSQthBhrCph4pp3tun5mhE=
+	t=1754132081; cv=none; b=ORno8zz5F8/W/6u1xhptRX7LIce3V+yJgCdGliwiLZr6GwI9alqo/iVAu6myvXsxSbXdXHMIdz6yy9kWwQvmBqz+0TD+m+8tmIWpTCqLZFXMEGhHgilF7dZM5X24PGkdTAcwlkoXktlg2HOJVZPa25dEOAQB8SLNTCTw4xGt5Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754131093; c=relaxed/simple;
-	bh=78NVjdNVPg30hTJnbWBWyc33Oq0igcvoln/WVrBhAt0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RWkAQuVEbpA/EbwWErhu9L5n9NsYbUUFcfh8YEwp9xdLVLBLJlnTjLuMaloBQlCw3MWXbKfDhzzY3zYm75DexdMW2PCLhj5eYRCNGpCwLOcOGPszNquFJqk+JAho8u1H4BdWyQXk+RWAXLxJLqjIImQh/a7mgbu9CXOwb+GbUh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=DnxyNdlP; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+	s=arc-20240116; t=1754132081; c=relaxed/simple;
+	bh=O1FbT7nkwc9fzVfMdXpkf1PCeahMIKJ1NDoaIjn3lVc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=RjCZfLyLhBeTQDArggnnB4QW80w40LObVeTDDkWWFDpWG1cz2sXZYDrO0owBD/uHgu8nKq8WtsyOkUXAjQyRoxs/j89qhHsKuSEx3Xfhux6RSYX5tstHi9HjalaWSCb/r84I+rtwG6dEpDb8Bp8xgmfUNUJWRr6kDIun4mhpzF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/LTkmPc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="DnxyNdlP"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24041a39005so12122175ad.2
-        for <kvmarm@lists.linux.dev>; Sat, 02 Aug 2025 03:38:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie.ntu.edu.tw; s=google; t=1754131089; x=1754735889; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G63QXIxj+Dtjk0K95q+UoQIrd3RUwOdJawqBP/rtSGw=;
-        b=DnxyNdlPOhYGDHUJiVPTajf3Rb5yRvxQrD1T6ChQtyHMJdDUobSOiE9IgYqXbXkDHl
-         DXR1CY0Oedk/O0HX3h3b2nXuE4VIGjEuaf6EvhS7CAqUE9qFC+EgGwhuBahjkjow6f2t
-         U1+3cINYjmmWfk5lCi2TPmHCxg4ZgGUIX4vPVnNKOnTJJLVnDyzFbRJpfMOLU3Ub1srj
-         LXo23uNq6Wc7Bful0Bd/7x4g1kcZovTpCJc/d7wjSmsdngrY72eGZjle77ogd8wZ74fH
-         lBNEPF/8s5s3HcGq55NBdgQKNiAP0X/CV4/Evg0kTs/E+FlqviHi65Lu4RvOubn/rz0+
-         hdxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754131089; x=1754735889;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G63QXIxj+Dtjk0K95q+UoQIrd3RUwOdJawqBP/rtSGw=;
-        b=xTxcubM65Mg+kiErI7KsjT+UBCdu3Upbp1cu6u6WfJQD9+BvMFunGsBbFRWKt+CYJ/
-         YasDlRY3LS0/JmrcMQ2xNTBMe7XESAmHtIy4RJqLgQrPr+N1NaxMmZxiaEWI6zRnLrwl
-         gj/qrGNDVDFE4EtiUscd1j2YpdbSOMFUfw2yQiL3FlH9UsoV0k/rbBnOzx2UviUniIRh
-         DG22rVtXKZXJ3CrkVA1JCf10sfqPf6ftjorV807SVc1SjgL7tutZsICjMjEMwiA9o3o8
-         Cl2TktZTCeuWlZMaI8yhC6Febtg29Iy236Y5yszrJhxYby6T6+qcnfIalyHUq5s7Vona
-         hsuw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4CO5ikJhCxmytdNQ/dhjKBfJ/6ApM2L0qwlXKkezE2qAsIVUbIPR1h66ANahrdiUYBPJXhAg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyM/l5ki9xwfBr5Pt9da24lm+eVuZe8UogJd2qqMouf5JZWUQNi
-	WJpDv4yWM3/Q+JQJYFPVtsFBxD54b/BKtrEczkl8MtgxkcXWMoAMJAcU1/8Nm/Lq68pf+GTN1N0
-	YA10cVwO11qeB2/5lnY+DlRAzs5H3/J1PkV02n7I9ASfSTLeUkds=
-X-Gm-Gg: ASbGncswjC8NeNN9FUosl3J70MU7c2sia6iMEaxyAzPF5cL9jY6Igru3b8g33aokn1+
-	YQInSvyLhzNnZPMH4eas3x4FfsG2WelR6NGVYy4a3zuB1QEW0QViCAwnm8hBEjAVA/t8H7RarbV
-	f+rLXJcyWpF/DXtiYf9NlwRKiFyteoIlyZy08+YfgMXso204rlyg5r5HJ5+48wmBEvH2FX1zZzg
-	gTXDaUSjMyHE1XYjoJOvB78bk7fyDdozNsp6KAnlhyCWy4u73FNrZxMJu3Au1LF80XfR6t4MRLr
-	XOMj17Omt9cPgOFWsC+VcFxC4WhJwcSWdOMe41DNtNuc5WFVCtDAjKRQJUucmACpG5JewRvFUXc
-	sRjx+Rgvg7PzsTHvHUS6bR2K8m/5f7Hx5pU2hzthkxjEaRpsZMIA/ewZLThTa
-X-Google-Smtp-Source: AGHT+IET2miJQcQuyN4A48qXGASFh6PFQlmTNZHqpeRrnOMmptg7WMuDBI8s0Bnz8/+S9PgeZ151wg==
-X-Received: by 2002:a17:902:ea10:b0:240:3c62:6194 with SMTP id d9443c01a7336-24246f6a8famr37337425ad.20.1754131088712;
-        Sat, 02 Aug 2025 03:38:08 -0700 (PDT)
-Received: from zenbook (1-162-100-196.dynamic-ip.hinet.net. [1.162.100.196])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aca205sm63963445ad.193.2025.08.02.03.38.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Aug 2025 03:38:08 -0700 (PDT)
-From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/LTkmPc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88C5BC4CEEF;
+	Sat,  2 Aug 2025 10:54:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754132081;
+	bh=O1FbT7nkwc9fzVfMdXpkf1PCeahMIKJ1NDoaIjn3lVc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=K/LTkmPcxEdimJ4/ZtLElXXa+g2dxn8ADkRyZfHjwdjM65VRXAYVJ0r9W2u6bWM6o
+	 CnanAZjhmKBGldJdiESIpW9Nqezi+rwXNSKKWTaPUwJlRc98jBPyz6RemIBFzAc2yu
+	 dJh8LMKW75xPHPYblMs/FfEazaQN4ooJQz74/sNptNfgrVOq4yBlcVc/vmOAVhXfkH
+	 3yIYI7JhTpCAzv6tHCp4RnBm+QhEYkCLgTllaYRDSxgUoFhmSSDqXad3A+e5K4K9PM
+	 MaHpdsbjSm1MJN3EWSLrlbYQ2vT601FdoSIxeWUkKbGcGGOnhKtDZkGedPuLjLgLT8
+	 EJA/Y9yj0vS9Q==
+X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
+	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH] KVM: arm64: ptdump: Fix exec attribute printing
-Date: Sat,  2 Aug 2025 18:40:21 +0800
-Message-ID: <20250802104021.3076621-1-r09922117@csie.ntu.edu.tw>
-X-Mailer: git-send-email 2.50.1
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 13/38] coco: host: arm64: Create a PDEV with rmm
+In-Reply-To: <20250730133959.0000051b@huawei.com>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-14-aneesh.kumar@kernel.org>
+ <20250730133959.0000051b@huawei.com>
+Date: Sat, 02 Aug 2025 16:24:32 +0530
+Message-ID: <yq5acy9e9eon.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Gm-Spam: 0
-X-Gm-Phishy: 0
+Content-Type: text/plain
 
-Currently the guest stage-2 page table dump has the executable attribute
-printed in reverse, showing "X" for a non-executable region and showing
-" " for an executable one. This is caused by misjudgement of which
-string gets printed for the executable and non-executable case. Fix it
-by swapping the two strings.
+Jonathan Cameron <Jonathan.Cameron@huawei.com> writes:
 
-Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
----
- arch/arm64/kvm/ptdump.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> On Mon, 28 Jul 2025 19:21:50 +0530
+> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+>
+>> Create the realm physical device with RMM.
+>> 
+>> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> Hi Aneesh,
+>
+> Various small things inline.
+>
+> Jonathan
+>
+>> ---
+>>  arch/arm64/include/asm/rmi_cmds.h        |  31 +++++
+>>  arch/arm64/include/asm/rmi_smc.h         |  72 ++++++++++-
+>>  drivers/virt/coco/arm-cca-host/Makefile  |   2 +-
+>>  drivers/virt/coco/arm-cca-host/arm-cca.c |  10 +-
+>>  drivers/virt/coco/arm-cca-host/rmm-da.c  | 150 +++++++++++++++++++++++
+>>  drivers/virt/coco/arm-cca-host/rmm-da.h  |   5 +
+>>  6 files changed, 267 insertions(+), 3 deletions(-)
+>>  create mode 100644 drivers/virt/coco/arm-cca-host/rmm-da.c
+>> 
+>> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+>> index ef53147c1984..f0817bd3bab4 100644
+>> --- a/arch/arm64/include/asm/rmi_cmds.h
+>> +++ b/arch/arm64/include/asm/rmi_cmds.h
+>> @@ -505,4 +505,35 @@ static inline int rmi_rtt_unmap_unprotected(unsigned long rd,
+>>  	return res.a0;
+>>  }
+>>  
+>> +static inline unsigned long rmi_pdev_aux_count(unsigned long flags, u64 *aux_count)
+>> +{
+>> +	struct arm_smccc_res res;
+>> +
+>> +	arm_smccc_1_1_invoke(SMC_RMI_PDEV_AUX_COUNT, flags, &res);
+>> +
+>> +	*aux_count = res.a1;
+>> +	return res.a0;
+>> +}
+>> +
+>> +static inline unsigned long rmi_pdev_create(unsigned long pdev_phys,
+>> +					    unsigned long pdev_params_phys)
+>> +{
+>> +	struct arm_smccc_res res;
+>> +
+>> +	arm_smccc_1_1_invoke(SMC_RMI_PDEV_CREATE,
+>> +			     pdev_phys, pdev_params_phys, &res);
+>> +
+>> +	return res.a0;
+>> +}
+>> +
+>> +static inline unsigned long rmi_pdev_get_state(unsigned long pdev_phys, unsigned long *state)
+>
+> I'd use the enum for the state type and range check in here.
+>
+>
+>> +{
+>> +	struct arm_smccc_res res;
+>> +
+>> +	arm_smccc_1_1_invoke(SMC_RMI_PDEV_GET_STATE, pdev_phys, &res);
+>> +
+>> +	*state = res.a1;
+>> +	return res.a0;
+>> +}
+>> +
+>>  #endif /* __ASM_RMI_CMDS_H */
+>> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+>> index 42708d500048..a84ed61e5001 100644
+>> --- a/arch/arm64/include/asm/rmi_smc.h
+>> +++ b/arch/arm64/include/asm/rmi_smc.h
+>> @@ -26,7 +26,7 @@
+>>  #define SMC_RMI_DATA_CREATE		SMC_RMI_CALL(0x0153)
+>>  #define SMC_RMI_DATA_CREATE_UNKNOWN	SMC_RMI_CALL(0x0154)
+>>  #define SMC_RMI_DATA_DESTROY		SMC_RMI_CALL(0x0155)
+>> -
+>
+> Probably keep
+>
+>> +#define SMC_RMI_PDEV_AUX_COUNT		SMC_RMI_CALL(0x0156)
+>
+> and add one here as different groups.
+>
+>>  #define SMC_RMI_REALM_ACTIVATE		SMC_RMI_CALL(0x0157)
+>>  #define SMC_RMI_REALM_CREATE		SMC_RMI_CALL(0x0158)
+>>  #define SMC_RMI_REALM_DESTROY		SMC_RMI_CALL(0x0159)
+>> @@ -47,6 +47,9 @@
+>>  #define SMC_RMI_RTT_INIT_RIPAS		SMC_RMI_CALL(0x0168)
+>>  #define SMC_RMI_RTT_SET_RIPAS		SMC_RMI_CALL(0x0169)
+>>  
+>> +#define SMC_RMI_PDEV_CREATE             SMC_RMI_CALL(0x0176)
+>> +#define SMC_RMI_PDEV_GET_STATE		SMC_RMI_CALL(0x0178)
+>> +
+>>  #define RMI_ABI_MAJOR_VERSION	1
+>>  #define RMI_ABI_MINOR_VERSION	0
+>>  
+>> @@ -268,4 +271,71 @@ struct rec_run {
+>>  	struct rec_exit exit;
+>>  };
+>>  
+>> +enum rmi_pdev_state {
+> Type never used, but I think it should be. See above.
+>
+>> +	RMI_PDEV_NEW,
+>> +	RMI_PDEV_NEEDS_KEY,
+>> +	RMI_PDEV_HAS_KEY,
+>> +	RMI_PDEV_READY,
+> Seems someone put another state in here, but I guess you'll update
+> when the rest of the stack catches up.
+> 	RMI_PDEV_IDE_RESETTING,
+>
+> Maybe throw a comment here for now.
+>
+>> +	RMI_PDEV_COMMUNICATING,
+>> +	RMI_PDEV_STOPPING,
+>> +	RMI_PDEV_STOPPED,
+>> +	RMI_PDEV_ERROR,
+>> +};
+>> +
+>> +#define MAX_PDEV_AUX_GRANULES	32
+>> +#define MAX_IOCOH_ADDR_RANGE	16
+>> +#define MAX_FCOH_ADDR_RANGE	4
+>> +
+>> +#define RMI_PDEV_SPDM_TRUE	BIT(0)
+>> +#define RMI_PDEV_IDE_TRUE	BIT(1)
+>> +#define RMI_PDEV_FOCOH		BIT(2)
+>> +#define RMI_PDEV_P2P_STREAM	BIT(3)
+>
+> I'd stick flags in the name (assuming this is
+> RmiPDevFlags? I'm not sure as the spec I could
+> find has different usages other after BIT(!))
+>
+>
+>> +
+>> +#define RMI_HASH_SHA_256	0
+>> +#define RMI_HASH_SHA_512	1
+>> +
+>> +struct rmi_pdev_addr_range {
+>> +	unsigned long base;
+>> +	unsigned long top;
+>
+> Whilst we only care about platforms where this is u64, maybe
+> just make that explicit so we can trivially see this
+> matches the spec?
+>
+>> +};
+>> +
+>> +struct rmi_pdev_params {
+>
+> Reference? Looks like B4.4.25 RmiPdevParams type
+> in alp15.  Though as there are some fields missing
+> I guess this chagned.
+>
 
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index 098416d7e5c25..99fc13f1c11fb 100644
---- a/arch/arm64/kvm/ptdump.c
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -44,8 +44,8 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
- 	}, {
- 		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
- 		.val	= PTE_VALID,
--		.set	= " ",
--		.clear	= "X",
-+		.set	= "X",
-+		.clear	= " ",
- 	}, {
- 		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
- 		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
--- 
-2.50.1
+This patch series is currently based on the ALP12 specification, available here:
+https://developer.arm.com/-/cdn-downloads/permalink/Architectures/Armv9/DEN0137_1.1-alp12.zip
 
+The next revision of the series will be updated to align with the ALP15 specification.
+
+>
+>> +	union {
+>> +		struct {
+>> +			u64 flags;
+>> +			u64 pdev_id;
+>> +			u64 segment_id;
+>> +			u64 ecam_addr;
+>> +			u64 root_id;
+>> +			u64 cert_id;
+>> +			u64 rid_base;
+>> +			u64 rid_top;
+>> +			u64 hash_algo;
+>> +			u64 num_aux;
+>> +			u64 ide_sid;
+>
+> Called ncoh_ide_side in the alpha 15.  Maybe match that unless
+> it is changing name in future version.
+>
+>> +			u64 ncoh_num_addr_range;
+>> +			u64 coh_num_addr_range;
+>> +		};
+>> +		u8 padding1[0x100];
+>> +	};
+>> +
+>> +	union { /* 0x100 */
+>> +		u64 aux_granule[MAX_PDEV_AUX_GRANULES];
+>> +		u8 padding2[0x100];
+>> +	};
+>> +
+>> +	union { /* 0x200 */
+>> +		struct {
+>> +			struct rmi_pdev_addr_range ncoh_addr_range[MAX_IOCOH_ADDR_RANGE];
+>> +		};
+>> +		u8 padding3[0x100];
+>> +	};
+>> +	union { /* 0x300 */
+>> +		struct {
+>> +			struct rmi_pdev_addr_range coh_addr_range[MAX_FCOH_ADDR_RANGE];
+>> +		};
+>> +		u8 padding4[0x100];
+>> +	};
+>
+> Maybe pad out the rest?  Mostly so we can see here that it is 4k.
+>
+
+ok
+
+>
+>> +};
+>> +
+>>  #endif /* __ASM_RMI_SMC_H */
+>
+>> diff --git a/drivers/virt/coco/arm-cca-host/arm-cca.c b/drivers/virt/coco/arm-cca-host/arm-cca.c
+>> index c8b0e6db1f47..84d97dd41191 100644
+>> --- a/drivers/virt/coco/arm-cca-host/arm-cca.c
+>> +++ b/drivers/virt/coco/arm-cca-host/arm-cca.c
+>> @@ -124,7 +124,15 @@ static int cca_tsm_connect(struct pci_dev *pdev)
+>>  	rc = tsm_ide_stream_register(pdev, ide);
+>>  	if (rc)
+>>  		goto err_tsm;
+>> -
+>
+> Tidy up.  I'd leave it.
+>
+>> +	/*
+>> +	 * Take a module reference so that we won't call unregister
+>> +	 * without rme_unasign_device
+>> +	 */
+>> +	if (!try_module_get(THIS_MODULE)) {
+>> +		rc = -ENXIO;
+>> +		goto err_tsm;
+>> +	}
+>> +	rme_asign_device(pdev);
+>>  	/*
+>>  	 * Once ide is setup enable the stream at endpoint
+>>  	 * Root port will be done by RMM
+>> diff --git a/drivers/virt/coco/arm-cca-host/rmm-da.c b/drivers/virt/coco/arm-cca-host/rmm-da.c
+>> new file mode 100644
+>> index 000000000000..426e530ac182
+>> --- /dev/null
+>> +++ b/drivers/virt/coco/arm-cca-host/rmm-da.c
+>> @@ -0,0 +1,150 @@
+>
+>
+>> +
+>> +static int init_pdev_params(struct pci_dev *pdev, struct rmi_pdev_params *params)
+>> +{
+>> +	void *aux;
+>
+> Probably makes sense to reduce scope of aux to within the loop.
+>
+>> +	int rid, ret, i;
+>> +	phys_addr_t aux_phys;
+>> +	struct cca_host_dsc_pf0 *dsc_pf0;
+>> +	struct pci_dev *rp = pcie_find_root_port(pdev);
+> Only used in one place for now anyway.  Probably better
+> to move it down there.
+>
+>> +	struct pci_config_window *cfg = pdev->bus->sysdata;
+>> +
+>> +	dsc_pf0 = to_cca_dsc_pf0(pdev);
+>
+> I'd do that at declaration.  Seems little advantage in doing it
+> down here.
+>
+>> +	/* assign the ep device with RMM */
+>> +	rid = pci_dev_id(pdev);
+>> +	params->pdev_id = rid;
+>> +	/* slot number for certificate chain */
+>> +	params->cert_id = 0;
+>> +	/* io coherent spdm/ide and non p2p */
+>> +	params->flags = RMI_PDEV_SPDM_TRUE | RMI_PDEV_IDE_TRUE;
+>> +	params->ide_sid = dsc_pf0->sel_stream->stream_id;
+>> +	params->hash_algo = RMI_HASH_SHA_256;
+>> +	/* use the rid and MMIO resources of the epdev */
+>
+> Spell out epdev or associate it with the pdev here more clearly.
+>
+>> +	params->rid_top = params->rid_base = rid;
+>> +	params->ecam_addr = cfg->res.start;
+>> +	params->root_id = pci_dev_id(rp);
+>
+> 	params->root_id = pci_dev_id(pcie_find_root_port(pdev));
+> to me acts as better documentation fo what is going on than using
+> the local variable rp.
+>
+>> +
+>> +	params->ncoh_num_addr_range = pci_res_to_pdev_addr(params->ncoh_addr_range,
+>> +							    ARRAY_SIZE(params->ncoh_addr_range),
+>> +							    pdev->resource,
+>> +							    DEVICE_COUNT_RESOURCE);
+>> +
+>> +	rmi_pdev_aux_count(params->flags, &params->num_aux);
+>> +	pr_debug("%s using %ld pdev aux granules\n", __func__, (unsigned long)params->num_aux);
+>> +	dsc_pf0->num_aux = params->num_aux;
+>> +	for (i = 0; i < params->num_aux; i++) {
+>
+> 		void *aux = (void *)__get_free_page(GFP_KERNEL);
+>
+>> +		aux = (void *)__get_free_page(GFP_KERNEL);
+>> +		if (!aux) {
+>> +			ret = -ENOMEM;
+>> +			goto err_free_aux;
+>> +		}
+>> +
+>> +		aux_phys = virt_to_phys(aux);
+>> +		if (rmi_granule_delegate(aux_phys)) {
+>> +			ret = -ENXIO;
+>> +			free_page((unsigned long)aux);
+>> +			goto err_free_aux;
+>> +		}
+>> +		params->aux_granule[i] = aux_phys;
+>> +		dsc_pf0->aux[i] = aux;
+>> +	}
+>> +	return 0;
+>> +
+>> +err_free_aux:
+>> +	free_aux_pages(i, dsc_pf0->aux[i]);
+>
+> I think you want
+> 	free_aux_pages(i, dsc_pf0->aux);
+> Assuming this is supposed to unwind the loop above.
+>
+>> +	return -ENOMEM;
+>> +}
+>> +
+> Trivial: Single line probably fine here.
+>> +
+>> +int rme_asign_device(struct pci_dev *pci_dev)
+>> +{
+>> +	int ret;
+>> +	void *rmm_pdev;
+>> +	unsigned long state;
+>> +	phys_addr_t rmm_pdev_phys;
+>> +	struct rmi_pdev_params *params;
+>> +	struct cca_host_dsc_pf0 *dsc_pf0;
+>> +
+>> +	dsc_pf0 = to_cca_dsc_pf0(pci_dev);
+>
+> Might as well save a line with
+>
+> 	struct cca_host_dsc_pf0 *dsc_pf0 = to_cca_dsc_pf0(pci_dev);
+>
+>> +	rmm_pdev = (void *)get_zeroed_page(GFP_KERNEL);
+>> +	if (!rmm_pdev) {
+>> +		ret = -ENOMEM;
+>
+> return -ENOMEM;
+>
+>> +		goto err_out;
+>> +	}
+>> +
+>> +	rmm_pdev_phys = virt_to_phys(rmm_pdev);
+>> +	if (rmi_granule_delegate(rmm_pdev_phys)) {
+>> +		ret = -ENXIO;
+>> +		goto err_free_pdev;
+>> +	}
+>> +
+>> +	params = (struct rmi_pdev_params *)get_zeroed_page(GFP_KERNEL);
+>> +	if (!params) {
+>> +		ret = -ENOMEM;
+>> +		goto err_granule_undelegate;
+>> +	}
+>> +
+>> +	ret = init_pdev_params(pci_dev, params);
+>> +	if (ret)
+>> +		goto err_free_params;
+>> +
+>> +	ret = rmi_pdev_create(rmm_pdev_phys, virt_to_phys(params));
+>> +	pr_info("rmi_pdev_create(0x%llx, 0x%llx): %d\n", rmm_pdev_phys, virt_to_phys(params), ret);
+>
+> RFC, but even so I'd demote to debug and use dynamic debug stuff to enable
+> them for your testing.
+>
+>> +	if (ret)
+>> +		goto err_free_aux;
+>> +
+>> +	rmi_pdev_get_state(rmm_pdev_phys, &state);
+>> +	if (state != RMI_PDEV_NEW)
+>> +		goto err_free_aux;
+>
+> Nothing to unwind in rmi_pdev_create()?  We've told the
+> RMM about it then we blow away it's resources. Seems unwise!
+> Maybe this is cleaned up elsewhere but if so a comment is
+> probably good.
+>
+
+`pdev_create` is expected to set the device state to `RMI_PDEV_NEW`, so
+the subsequent check is redundant if `rmi_pdev_create` returns success.
+I will drop that.
+
+>
+>> +
+>> +	dsc_pf0->rmm_pdev = rmm_pdev;
+>> +	free_page((unsigned long)params);
+>> +	return 0;
+>> +
+>> +err_free_aux:
+>> +	free_aux_pages(dsc_pf0->num_aux, dsc_pf0->aux);
+>> +err_free_params:
+>> +	free_page((unsigned long)params);
+>> +err_granule_undelegate:
+>> +	rmi_granule_undelegate(rmm_pdev_phys);
+>> +err_free_pdev:
+>> +	free_page((unsigned long)rmm_pdev);
+>> +err_out:
+>
+> One of my favourite nitpicks. Why not just return if nothing to do?
+> That tends to save a reviewer a bit of scrolling when checking
+> error paths do correct unwinding.
+>
+>> +	return ret;
+>> +}
+>> diff --git a/drivers/virt/coco/arm-cca-host/rmm-da.h b/drivers/virt/coco/arm-cca-host/rmm-da.h
+>> index 840cb584acdd..179ba68f2430 100644
+>> --- a/drivers/virt/coco/arm-cca-host/rmm-da.h
+>> +++ b/drivers/virt/coco/arm-cca-host/rmm-da.h
+>> @@ -14,6 +14,10 @@
+>>  struct cca_host_dsc_pf0 {
+>>  	struct pci_tsm_pf0 pci;
+>>  	struct pci_ide *sel_stream;
+>> +
+>> +	void *rmm_pdev;
+>> +	int num_aux;
+>> +	void *aux[MAX_PDEV_AUX_GRANULES];
+>>  };
+>>  
+>>  static inline struct cca_host_dsc_pf0 *to_cca_dsc_pf0(struct pci_dev *pdev)
+>> @@ -26,4 +30,5 @@ static inline struct cca_host_dsc_pf0 *to_cca_dsc_pf0(struct pci_dev *pdev)
+>>  	return container_of(tsm, struct cca_host_dsc_pf0, pci.tsm);
+>>  }
+>>  
+>> +int rme_asign_device(struct pci_dev *pdev);
+>>  #endif
+
+Thanks for the review comments. I'll update the patch with the suggested changes.
+
+-aneesh
