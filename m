@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD6628FAB7;
-	Mon,  4 Aug 2025 22:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B4323AE62;
+	Mon,  4 Aug 2025 22:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754346494; cv=none; b=ZRFdMSfURvH5TiTe9FlrI7ayUBhGASlc+eYmb2plMagHzTomSjZ9uMIVeQPHf4xU27ADXGBMIh3tPo6gkr53fWlGODy1l4ZbnBGkyOdcsq253JTdQeisA6VXYrZoV8nEAMrm3YmBwqUApW/rdLJt/QOYK9tcHSsgLgXPbdCZAX0=
+	t=1754346504; cv=none; b=VfPB9zcg8JWFD7gtv9UCMeHg6KcNt3VsI3rare4q5EM2mEL2iEdIe7Al7ACE3i9lH0rRRDIFBZHlzRsQyLcPyq8KtOWyXuruAj9paEQvqSCTCrlxhBwmBl+XFxZCBL/ThjOAPtCk6nPmY7TzhMQjp1Stl+xrRFh5ERcnCmYC49w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754346494; c=relaxed/simple;
-	bh=VEDdtnrXmtStkhq9z4lMyQxccc8EH1cR7PNQK/h2aM0=;
+	s=arc-20240116; t=1754346504; c=relaxed/simple;
+	bh=q4237OQdbICcheydjchcyh2EA8wjg3mYtLiH9eZRtWc=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=hgNga9iinfRdpYrjj80qdypPvuWvGr5tY+7945sHcPn0haSECU9x1L9wxW/SOqJshIPMQtMhQWk8GKh2ALwcLmrYiIPQBz/YUgy7rbwRW576Sr1F7w8FasybtBfYISxzamYLq7KLBc4MGptRRd+z2LmlGhtQicNob/3Bz1dAg8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qCh9xGt7; arc=none smtp.client-ip=10.30.226.201
+	 Content-Disposition:In-Reply-To; b=iOSfvMo90QEjs5WrDnBESfNd9qPmCzmf7Cx87Z+sYp6tt27DIYle8Kcm1svQqK4ykHAhTnVedl3dxnVP7Ohki2aJKa6bFicsraU0Gz/PPhQWneLJPZ8xdiV/sLOk/bNgvQYk2zUS15MeQxAJOs9JBJoqnhzJLeezunDppudUOgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GU4/hIaU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qCh9xGt7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFCC4C4CEE7;
-	Mon,  4 Aug 2025 22:28:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GU4/hIaU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49DBBC4CEE7;
+	Mon,  4 Aug 2025 22:28:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754346493;
-	bh=VEDdtnrXmtStkhq9z4lMyQxccc8EH1cR7PNQK/h2aM0=;
+	s=k20201202; t=1754346503;
+	bh=q4237OQdbICcheydjchcyh2EA8wjg3mYtLiH9eZRtWc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=qCh9xGt7imyzFiPPprdhjYQzJD/Ew0iJCh1fXw7SgUUXmPgUimPFmb9WaeFR6izSj
-	 uFl1srLFYOKN1h5HOPknLWl4DSUY0amvSs+lN8xRQ5FJiayzm4i+L9q5zqBQ7pSIok
-	 0rEGrjAZP0j2oqpWn3H1hiNFKx/20KVFes/aCK0Y1J+U7FlPPDlkeo3z1aD7d2L3MU
-	 I6/uDTmzQ7TFQFjPKEsULq2RY7EovuxTBZphnBKAIvFUGc+4NdFKost3eF9zxaVVY6
-	 0U3Dj3hOhzCbcKKwVlukK+SA7PpD6gviacgD3jrgjJTfTSNU1v4gIkKgkfg0Bawzok
-	 FoP+RdkkgAYLQ==
-Date: Mon, 4 Aug 2025 17:28:12 -0500
+	b=GU4/hIaU0WfdPkSg9xAP+5KDOEq5OtZaqUclyAnHfYy3MAdDJ0D5vhtXgfe+aulK/
+	 NCMfaBUa+JyI7FlbVkSiL+RanggBwpTNO5BUwuB3akaBBxBodD6fEcRE7gFMMW0eWD
+	 OgIntqtC6FAUM3q5axot4APChRsmgRLB4tu27lREMrqOV4lhrffwQjXcBzOr9lmH11
+	 KghukrGkOYdgkq/28Dbp+7vJmIOWQKs9HeqiuoAUxeYYbulVQMYB623kYkBjJ/A0Lb
+	 r3CffjTdFWGArOjpBUV4a5dBYOW3be+yWILzC8w7bm1aMeJ6GX19wgLyixT+grypr/
+	 kkalhfYvyB4Ww==
+Date: Mon, 4 Aug 2025 17:28:22 -0500
 From: Bjorn Helgaas <helgaas@kernel.org>
 To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
@@ -38,8 +38,9 @@ Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 13/38] coco: host: arm64: Create a PDEV with rmm
-Message-ID: <20250804222812.GA3644946@bhelgaas>
+Subject: Re: [RFC PATCH v1 32/38] coco: guest: arm64: Add support for guest
+ initiated TDI bind/unbind
+Message-ID: <20250804222822.GA3645600@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,28 +49,12 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250728135216.48084-14-aneesh.kumar@kernel.org>
+In-Reply-To: <20250728135216.48084-33-aneesh.kumar@kernel.org>
 
-On Mon, Jul 28, 2025 at 07:21:50PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> Create the realm physical device with RMM.
+On Mon, Jul 28, 2025 at 07:22:09PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> Add RHI for VDEV_SET_TDI_STATE
+> 
+> Note: This is not part of RHI spec. This is a POC implementation
+> and will be later switced to correct interface defined by RHI.
 
-> +++ b/drivers/virt/coco/arm-cca-host/arm-cca.c
-> @@ -124,7 +124,15 @@ static int cca_tsm_connect(struct pci_dev *pdev)
->  	rc = tsm_ide_stream_register(pdev, ide);
->  	if (rc)
->  		goto err_tsm;
-> -
-> +	/*
-> +	 * Take a module reference so that we won't call unregister
-> +	 * without rme_unasign_device
-
-s/rme_unasign_device/rme_unassign/
-
-> +	 */
-> +	if (!try_module_get(THIS_MODULE)) {
-> +		rc = -ENXIO;
-> +		goto err_tsm;
-> +	}
-> +	rme_asign_device(pdev);
-
-s/rme_asign_device/rme_assign_device/
+s/switced/switched/ (or maybe "converted")
