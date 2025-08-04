@@ -1,206 +1,408 @@
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2082.outbound.protection.outlook.com [40.107.101.82])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511F019F11E;
-	Mon,  4 Aug 2025 02:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754274756; cv=fail; b=VHIZDAoAuStlS+BXRbDLAw4n4/rWVOR9a32bysaWQHuP21C+HT4w1ctr1Ibj7bDrnffGkaKP26mKwSiAT5lVXfEXYcyK0RuhhQ5tbvGnA6yL5koaW9agSJRrBBBMZsVcxMipoKHx4APWUeMED1x79IiEMaZOyJNM2GnjDG4y2EE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754274756; c=relaxed/simple;
-	bh=jvOvq0OxsgyE+mYobpg4J7knqLKoDXOuVKgEHdCxbb0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LTtVXhLVdlFxA7zJH6L2S1nT3ZPK5IgVnhUQw06NtYzKP2ALAm5nJxaHHAkFB9Nj92owIqg1tsBeGl2bmPA1D/Pmu7HAfnn/clMIX0iMw3O/st2fKp/Wd+9lAopNT8XxhZtLl6kyYWRl/I7EFXImSRC8LFVukdpFRmCYEGnzbyY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SVcmb0tK; arc=fail smtp.client-ip=40.107.101.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DC02248B5;
+	Mon,  4 Aug 2025 04:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754281043; cv=none; b=lHsDiy3nS5TCmwdMqE7JKT2GQmnpQy+5aTvPkdK0vzau5hecKnd/zJqAmXB5YGI7OcuYtio7vy7sjU6lpzTfpOYWLaoXhAB52sJ6Z7Kza32M23mJUy79GqCeDTFl311I7Gn6vzkcGWO+Mpna6IT9RFKUfVMcfhzYXaCFcWLv1vA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754281043; c=relaxed/simple;
+	bh=o4IjvNMM7tJSWXRpMT61RxOAfr06yTVYXSmWzPGeq5E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pvLG8H6mz+Om75BNQpRU49i617HMLoCLUFlx4w+m/mpfimY9lTdyDRXxMde8PqSe88XyTh38UYJKdS0IxofTjtRGGgyLt02oYWrK9YhB7Mw97B2FhINvbgevmotDoseuPZXKObEkA5DAoC4HmxiH1uLMxtOz4DzqU/4cYOE0PV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0uYI2MN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SVcmb0tK"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CF3o68NqUjYsl/cdxG7bXBqwR8mJqc3XS/iCCDJeAcUwI02qlTNvB6VMDaA1GJLSFHoLcY8QOrtYNTDk03d9GNegfXQjMDFCqVuExxAP2+zd5zDvTKMmof6C8/IShFeNsjdLIl26klDJ6Q5p290iv925rbBw6j2rGwAqtHyEuJrh3J6ZjBj9rv6iAtYjrJtmnCZ+xVUj0/i74mTfPEzVexuF6d7M+WgwOJLfgm1v34WQh654gYDs/pyQ2baHpAkIvlAok8ZqyRXdACjTgp122gUFvJet1VJW2XQ37fGl1SCYv48aD3DtPsRY7Iso9Teecd2kia0qtCRHmjufJkx3yA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9XknGT+PGWyeYz4zatbeTRugN2H7c+KyPS1eeJA8UWE=;
- b=r39GKmgRTcP/tTzcN60zt9hM0N1JmTUmIobX96FtPY+ZI6j3kbaFq0I7xxDWgsccdfTE3GwAkiRNrjXYpRBpZvm8Qt2sQcojyqVFx3OtghD0whVjpdU3UHawiSDvjYc1z8Pm/AnpWH5CTW3riNDb5sbSq6Au+cDLYqtWtKJC3Wgzf2uEazTBhGPqu74yl6g3jZsrY51W5S589QtsaRVIBi6AFeE7g7NCMVEsHTsX3vunw4v6mWna+U3u5iaYXwvgvaZU+WxXUFWlZuNZQcC8VEX0E9Det2MDamRYcduGOcnEJzGzAY+p7WHSbbi2tB5REStRzp9+Vw1Bu7upVDTEkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9XknGT+PGWyeYz4zatbeTRugN2H7c+KyPS1eeJA8UWE=;
- b=SVcmb0tKv2VGm3OPWpJTAUFj71brEqD9IB1HOR0uf4AshKXjCc1RND5V83HDr7TAYUxMD2qkyS2AczLU6gZzLGS0DVZ8Q7Ii+AjYslnGtL7MX59q4hCQ9SONNF9KoFop+7vwzYLolXrvN/QvqusP6Qp4oKHdGGnsclDgd1THwu0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by MW4PR12MB7382.namprd12.prod.outlook.com (2603:10b6:303:222::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.26; Mon, 4 Aug
- 2025 02:32:31 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8989.018; Mon, 4 Aug 2025
- 02:32:30 +0000
-Message-ID: <bfac9ab6-9115-44d5-90c8-e22c3dbdb607@amd.com>
-Date: Mon, 4 Aug 2025 08:02:23 +0530
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [RFC PATCH v1 10/38] iommufd/vdevice: Add TSM map ioctl
-To: Jason Gunthorpe <jgg@ziepe.ca>,
- "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0uYI2MN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E545FC4CEE7;
+	Mon,  4 Aug 2025 04:17:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754281043;
+	bh=o4IjvNMM7tJSWXRpMT61RxOAfr06yTVYXSmWzPGeq5E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Q0uYI2MNm064dZdIdBMbbnWunRdGqSmvx7Q9JYfxNPxLRPxmM3TpUYlUpsn8lCx62
+	 sqzTNicDXez5JXf+0uRyfZ5nConaxuWF0dLNJeYhT7XZaY8tthh1iOLcfT/Ku7kVg0
+	 HACQ5Glf5g825toQ5JR4TzvJEok5fWnFn254Owcw048/OyGAIimwlHiS5xOR6pGlwM
+	 Lw3Fqx0uD6A6yYDAFBWDWDx6rcLihug2K5IJla8lSQo8yNOWUgfS5FtxeQWfYnEfV2
+	 6hMY8NVkzGgv+Z78sBGwDAgDV5Aw7KcOFecAbxz9177DGhaZbFdWpEB3EWQWv1D5X9
+	 pfyn1YQk9iVUA==
+X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
- linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, lukas@wunner.de,
- Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>,
- Suzuki K Poulose <Suzuki.Poulose@arm.com>,
- Steven Price <steven.price@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
+	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 14/38] coco: host: arm64: Device communication
+ support
+In-Reply-To: <20250730145248.000043be@huawei.com>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-11-aneesh.kumar@kernel.org>
- <20250728141701.GC26511@ziepe.ca>
-From: Alexey Kardashevskiy <aik@amd.com>
-Content-Language: en-US
-In-Reply-To: <20250728141701.GC26511@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SY4P282CA0004.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:a0::14) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+ <20250728135216.48084-15-aneesh.kumar@kernel.org>
+ <20250730145248.000043be@huawei.com>
+Date: Mon, 04 Aug 2025 09:47:16 +0530
+Message-ID: <yq5a5xf3afg3.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|MW4PR12MB7382:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0302ce10-f0cb-4d66-3e7e-08ddd2ff28b8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QTQ0WG45c1k3RGkxTERQeitBMWxacC8rYXZTSjBrajdRQzc4VnlBZkt6Qzh5?=
- =?utf-8?B?YUJUNVVjK0RSbTRySXh1NWdtaTFIMTBSK2NIejlyeXpZaUlGc3BPQUYwL2tm?=
- =?utf-8?B?ckc4di9QQTlwUGp2QjZGb3NlU1U2TmxTaEpqZjVjcVpGOHhJYUQrOFppL1dK?=
- =?utf-8?B?MmhPOTVtMWtkeWozV0pQKy9EWUhPbFRCZ2Q5THJmQmplOGtGTGE4OWhmalBS?=
- =?utf-8?B?OHhrTFViNUZ1YkJFMVZYQXBPcXd0dkN2VzlPYndKUUc5RVA5MHdJbnp3M2hS?=
- =?utf-8?B?Ry84eVovTTJKSW04YXEzd0xEQms3ZXRpZktqN2NnVGJEM2NFdjVDTkozMEhk?=
- =?utf-8?B?bWQxZUw1Yk05SWVnaUtGd2FYUGpYNnBtNkgxQ0hXTE1peVg4YVRjY0ZwZnNK?=
- =?utf-8?B?YXl5aGoxOFFNKzU5ZXg0T3V3S3NSTWNLRG9uZG5JZFEyTUdrVWRUbXltZFRz?=
- =?utf-8?B?blFGaERIMWU4RWxNajUwQXNQUkVwRlR0cU1UUHJsSmpySDlpK015b1pkVlV1?=
- =?utf-8?B?UHozSUxLN1hhV2dxWXJBV1FiRnJkY2QwdjlFa05RSnZnbU0wb2RUcG5maFk5?=
- =?utf-8?B?cXl4UTRTNHlQR0V3L3dGWXFqZit4eTUyM25kNHM1TFZPeXkvYkhraU9LajdG?=
- =?utf-8?B?VmNFS0ovcDFhalV2T25jYU84bzY1VHpWYjZrdzFXQUMvWHV0blZ0WVJiejE0?=
- =?utf-8?B?L2oxVy9PSGs0TzVOSVE2RFBhRjNRMzg4Rmc0Q2pCWFE1a1RHbkhZT0FGYTNn?=
- =?utf-8?B?Vk9VVTJDeVlsdVpsenpjc0x2dEFSOTM1Ylc0OUFGMTNKcEp2WGR0VCtOWXA3?=
- =?utf-8?B?b3JuaGVNNDdJaGlmb0kvUXJHV0dTQkxQZ2YzWGxOemkzVFJkb3FXWTcyb1M5?=
- =?utf-8?B?OVBVd2haMm96bzRlK0IwNmRuKy9VRkVyYVpTSWVPd2JsYW9QcjJHaEc3Zm50?=
- =?utf-8?B?WG8zdTZ4bW4zNkt4YXZ0Yk4zK2pDWE5xMkVVVHlOMHY1UXhnRVFmN2s1MFBh?=
- =?utf-8?B?aFFSY2Jwazc5VW0zdEs1SmU0TkIwS3FRazZDSDJsWEtSbHBWQ3dFOE5Md3Bl?=
- =?utf-8?B?M3lockF5UktjY3FBaDRBYU0xOUgxSjhPNVhsWDY2M01WN3dkazg3Y1dKcGU2?=
- =?utf-8?B?bDB2MlkwcnJXN1ovN0R5MWQ4a1Z1M2QvZnJNWGw5Z0dLMWYzMWFlQ1pvY3NY?=
- =?utf-8?B?cmxlaldGdEpSejhKM0kzZXhuZk9FUEMySXBKa1N2L21NdWs0N0kxZkdobVc3?=
- =?utf-8?B?UVFvUnBwSmxkZU9PMGxMVWlyNUl0NTJWR3RBTS9nZVJmUWV1blNVeUphUDNG?=
- =?utf-8?B?djNNcFdMS0Izc2s2TStHcG1aMkVPdXhXKytic1VUc3BaV29aYlVVazE1a2xL?=
- =?utf-8?B?aVFQNUtoNWZycUlEc2doRTJmRjFCd1liQ1RaTUpmZ1Uxakd3djlSN2VhYXJK?=
- =?utf-8?B?TFRmR0o5OFpGSzROS3lqU290OE1xNEFxRzh3Z2hrQXVlSm16TUZCRkJmNHEx?=
- =?utf-8?B?WmZVTDZuZlM5cjU5cUplQWt6cWRMYWh0cEpicnF4YXN6dDl4dUlwRUxhTDNn?=
- =?utf-8?B?amZFMUhZd3J6RC93Tzgxa3NzVkU2RmRZUjhrMW5JM3NpZ042TWhtcXNGd1c3?=
- =?utf-8?B?WjlBdGVkUVloU1BYdlhRL1UwdFNBMW16Y2doOU0rQ2NFdG4vRk0va3E5RWc2?=
- =?utf-8?B?M25HSlhhK1F6R2ROTGVGQVR6a25DckRHKzFQWG83Rld0Mkx5NEhFWjI5Sklr?=
- =?utf-8?B?Y1cvMnBMVlZBRUVKd3IvTzAwUkhTZy9MVTI1aEo3cDlmbXd3YU1mL3lMaEJz?=
- =?utf-8?B?OUsyQWV6Z2R3Z2RFWnhzTStQU2JEaW5mUEphVUp3dTREYlpFZFVySnlFZ01z?=
- =?utf-8?B?NDNaOHorMDFlVjNGRWsvY1dpRFk5Nk9ybXFLWVRRQkpndVZZU28zeUtFK3M4?=
- =?utf-8?Q?Xr8f8c4NZwk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WFI4Y0xlbm9paTZIVUs0WkxMRFkybGJuM3Q3MWxjNkJiYUwrcFNuWlBac1B4?=
- =?utf-8?B?MTdyOGhCTnRZWFhwUjhmQzk1bTFHU0tTSlhtRUQ4dTIvOTczMmZXVkdaTGVv?=
- =?utf-8?B?ZGlWa3ZqTzZFSGNMbjlMR1ErSVFSeFV0akgyUDE3ZHZmNkpDMzl3elMyR2ZG?=
- =?utf-8?B?U01neStXNVJ0RGtVUnAzcktjelB5aWE5N2Q1czNRemUybzlFNkhHbG5xTkx5?=
- =?utf-8?B?b2tFV0tuV1puVWkrSHg4YjFBT0p6cmN2cHhMdkMrTGNuN053RkNENXBjSENQ?=
- =?utf-8?B?YUt4U05aeGduSUdiMHYzNFE5ZHI5RHowRWx3OVJyQk1wbW0vRko1enBOUU5S?=
- =?utf-8?B?MGJ0QXBlZmNva3A2Y2hkSmI2RVhtc1lUV0JMNE5nMDd3L0lQZWpaWDh2YWMz?=
- =?utf-8?B?eGRuejRVRHNPck1GWUtlNm9ienl5NmZMbENHS003RUdHRlRYUjlPUFBRMmxo?=
- =?utf-8?B?VUtsUWIyRVlNUmVuNlB0bSsyb0x4R0dlMUw3ZHZkQjRibDV1WXd1T0Y1czhO?=
- =?utf-8?B?Q2dBZXd2SjVBRlZaLzZIbkFkL1J2QklXQ25YTzBOU05PL2VSeXUycjdFdEFV?=
- =?utf-8?B?SExycVNhQUZUN2tVeEY0dmltays4UFVXb2lpTCtIQ2FxcHJlLzMvSE9kODJI?=
- =?utf-8?B?dXRUb2lYaWYySFJBTmgyUkI5elJQRzIra3RBQmVHWmhhcU1ZamxScEFCUkh2?=
- =?utf-8?B?YU90NmcvUjhwMUtnZTV3ZVQ1K2hvZVVhaWRvT0RoM3dxeDFOUURxckxKT29j?=
- =?utf-8?B?VXJJNDQyWFlPOUtKdU1OZnhGN2RVK2JOKzViMnBUbmplQVMyTXdFN0RGUnU2?=
- =?utf-8?B?TzZyUWw5eFJKVXlkTEhCa051MUdMMUN6VlJRMzhaMHZCWXU1Y0VaUHFmTXFP?=
- =?utf-8?B?YjlXNzhveTVkMXljY2dCaWU5dkEwN1NnVVJ3SlRrMDl3TjM2OUpoN214ME9Z?=
- =?utf-8?B?MGpjWnNFSGRsVkFuQUk1NUQ1V0VHVFZhOVhhR25ZcUxMSnNxZ0xiR0hVZGU2?=
- =?utf-8?B?UFRrMVJDVGxwTldRZVIwUkpncEt2NTI2bVlySHRIcHAyQ0R2ZGZCY3hSbUhS?=
- =?utf-8?B?UG5HQTBFeGJRcjI4dXhFWFRZSnRyKzVXdXZCM3pHWlZnc3JtaUVKYU9wUnBL?=
- =?utf-8?B?MDc5L2k0NWp5V2lYOTY5aTFVYzR3M2RuTXpsbHRYY0M3QWlNOXovdG53TUY0?=
- =?utf-8?B?dWdQT2FuRGE5eUo4bExzWlFFZXlXQXpldWRBcWZ6bDBaSnRseEdGQzNVV1d2?=
- =?utf-8?B?cFE5QUVlWVBsNk5EbU1ZVEI0bStLZ3lTOEZHWmd2TURWNmgvdDd0Q00vOVhp?=
- =?utf-8?B?SXZjbXZnQWNpZzlVdU03VEZmNnVLdHZjQThtRENocUFBY0V6WnI1cWs5c0cy?=
- =?utf-8?B?TWpsQUlmTU9rLzB4cVhKbXVqa3ZpQ3dpbi8xMDNWTkVMUCtSMGVpTUdNQ2Vu?=
- =?utf-8?B?aklNYmtUTnJWTSthUEVSOWFDNmF2NWZsVFlzTVRqVWxnRjVMRzV5d293V0Zt?=
- =?utf-8?B?OVk5Uld3dFlpazlkMHBCaitBVHk3Wmt1R1NTUDd5NE1GSllqWUpTSkVVNWVP?=
- =?utf-8?B?bExlYzBLeWZIT1NRVEdabUQ3WnFacFRCMzJWdzE2MmR4eDcrWXBDdmRJVDhi?=
- =?utf-8?B?QTQzRVp4VGRWMnlVYVJPTlhtalZMT053L1FpRE1jSEFCNksxR0g4VlUyS2dH?=
- =?utf-8?B?a3o4ZDB5OXM1MU5OWnhUcjZleURwKy91Z2tPS0NUSThQWHJYMGZBMjhpeG9u?=
- =?utf-8?B?a2F3U1VEUTIzamV6TnlTdHdvTjJFNHo3Qm5MMUE5T1NmcHVOSFRmRFJocU5o?=
- =?utf-8?B?TlErOE5iZE1PTmlWUG55QW1Xa1htN295T1VKQWdxL1RzSlFVS3p0aHl6QW9P?=
- =?utf-8?B?cEJxN0dlNDRWQ3hDWXhTNm55dGMyMzg5VHRDcU92TXNmejJIV0kveUpZODBZ?=
- =?utf-8?B?dUlsVU53RFFmcnhqVzBTZVJZVkxoczdJdVdRWExWOVY2UlovNFRoOW1CTHVK?=
- =?utf-8?B?ZkFSVDVxVk9TTVY1bEdoUURSbVpna1M4SWxJeWxSY3IrR1dRMHlNVFM5ay9i?=
- =?utf-8?B?MHV5UUZwYmRNNjh4M1B0T2xQUFNSc2c5dTE1Y1JuOVFQaVlQQ1JSOXJ3T1g3?=
- =?utf-8?Q?CukA7R1HNnVoQzmYJuc14kBNj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0302ce10-f0cb-4d66-3e7e-08ddd2ff28b8
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2025 02:32:30.2625
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bWkN++SJtollA4wE4Pj2C3LQw2NYn6tgI3iOXP1fmH0mTD2QpUTgEVgNbZ7i7g7Ev014W52v5CIYw3iDTLK//g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7382
+Content-Type: text/plain
+
+Jonathan Cameron <Jonathan.Cameron@huawei.com> writes:
+
+> On Mon, 28 Jul 2025 19:21:51 +0530
+> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+>
+>> Add helpers for device communication from RMM
+>> 
+>> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+>> ---
+>>  arch/arm64/include/asm/rmi_cmds.h        |  11 ++
+>>  arch/arm64/include/asm/rmi_smc.h         |  49 ++++++
+>>  drivers/virt/coco/arm-cca-host/arm-cca.c |  45 ++++++
+>>  drivers/virt/coco/arm-cca-host/rmm-da.c  | 198 +++++++++++++++++++++++
+>>  drivers/virt/coco/arm-cca-host/rmm-da.h  |  41 +++++
+>>  5 files changed, 344 insertions(+)
+>> 
+>
+>>  #endif /* __ASM_RMI_CMDS_H */
+>> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+>> index a84ed61e5001..8bece465b670 100644
+>> --- a/arch/arm64/include/asm/rmi_smc.h
+>> +++ b/arch/arm64/include/asm/rmi_smc.h
+>> @@ -47,6 +47,7 @@
+>
+>>  
+>> +#define RMI_DEV_COMM_EXIT_CACHE_REQ	BIT(0)
+>> +#define RMI_DEV_COMM_EXIT_CACHE_RSP	BIT(1)
+>> +#define RMI_DEV_COMM_EXIT_SEND		BIT(2)
+>> +#define RMI_DEV_COMM_EXIT_WAIT		BIT(3)
+>> +#define RMI_DEV_COMM_EXIT_MULTI		BIT(4)
+>> +
+>> +#define RMI_DEV_COMM_NONE	0
+>> +#define RMI_DEV_COMM_RESPONSE	1
+>> +#define RMI_DEV_COMM_ERROR	2
+>> +
+>> +#define RMI_PROTOCOL_SPDM		0
+>> +#define RMI_PROTOCOL_SECURE_SPDM	1
+>> +
+>> +#define RMI_DEV_VCA			0
+>> +#define RMI_DEV_CERTIFICATE		1
+>> +#define RMI_DEV_MEASUREMENTS		2
+>> +#define RMI_DEV_INTERFACE_REPORT	3
+>> +
+>> +struct rmi_dev_comm_enter {
+>> +	u64 status;
+>> +	u64 req_addr;
+>> +	u64 resp_addr;
+>> +	u64 resp_len;
+>> +};
+>> +
+>> +struct rmi_dev_comm_exit {
+>> +	u64 flags;
+>> +	u64 cache_req_offset;
+>> +	u64 cache_req_len;
+>> +	u64 cache_rsp_offset;
+>> +	u64 cache_rsp_len;
+>> +	u64 cache_obj_id;
+>> +	u64 protocol;
+>> +	u64 req_len;
+>> +	u64 timeout;
+> In latest spec called rsp_timeout.
+> Not sure we care that much but if no strong reason otherwise, should
+> aim to match the spec text. (Maybe this got renamed?)
+>> +};
+>
+>> diff --git a/drivers/virt/coco/arm-cca-host/arm-cca.c b/drivers/virt/coco/arm-cca-host/arm-cca.c
+>> index 84d97dd41191..294a6ef60d5f 100644
+>> --- a/drivers/virt/coco/arm-cca-host/arm-cca.c
+>> +++ b/drivers/virt/coco/arm-cca-host/arm-cca.c
+>> @@ -85,6 +85,45 @@ static void cca_tsm_pci_remove(struct pci_tsm *tsm)
+>>  	vfree(dsc_pf0);
+>>  }
+>>  
+>> +static int init_dev_communication_buffers(struct cca_host_comm_data *comm_data)
+>> +{
+>> +	int ret = -ENOMEM;
+>> +
+>> +	comm_data->io_params = (struct rmi_dev_comm_data *)get_zeroed_page(GFP_KERNEL);
+>
+> Hmm. There isn't a DEFINE_FREE() yet for free_page().  Maybe time to add one.
+> If we did then we'd use local variables until all allocations succeed then
+> assign with no_free_ptr()
+>
+>
+>> +	if (!comm_data->io_params)
+>> +		goto err_out;
+>> +
+>> +	comm_data->resp_buff = (void *)__get_free_page(GFP_KERNEL);
+>> +	if (!comm_data->resp_buff)
+>> +		goto err_res_buff;
+>> +
+>> +	comm_data->req_buff = (void *)__get_free_page(GFP_KERNEL);
+>> +	if (!comm_data->req_buff)
+>> +		goto err_req_buff;
+>> +
+>> +
+>> +	comm_data->io_params->enter.status = RMI_DEV_COMM_NONE;
+>> +	comm_data->io_params->enter.resp_addr = virt_to_phys(comm_data->resp_buff);
+>> +	comm_data->io_params->enter.req_addr  = virt_to_phys((void *)comm_data->req_buff);
+> I think it's already a a void * and even if it were some other pointer type
+> no cast would be necessary.
+>
+>> +	comm_data->io_params->enter.resp_len = 0;
+>> +
+>> +	return 0;
+>> +
+>> +err_req_buff:
+>> +	free_page((unsigned long)comm_data->resp_buff);
+>> +err_res_buff:
+>> +	free_page((unsigned long)comm_data->io_params);
+>> +err_out:
+>> +	return ret;
+>> +}
+>> +
+>
+>> +
+>>  /* per root port unique with multiple restrictions. For now global */
+>>  static DECLARE_BITMAP(cca_stream_ids, MAX_STREAM_ID);
+>>  
+>> @@ -124,6 +163,7 @@ static int cca_tsm_connect(struct pci_dev *pdev)
+>>  	rc = tsm_ide_stream_register(pdev, ide);
+>>  	if (rc)
+>>  		goto err_tsm;
+>> +	init_dev_communication_buffers(&dsc_pf0->comm_data);
+>>  	/*
+>>  	 * Take a module reference so that we won't call unregister
+>>  	 * without rme_unasign_device
+>> @@ -133,6 +173,11 @@ static int cca_tsm_connect(struct pci_dev *pdev)
+>>  		goto err_tsm;
+>>  	}
+>>  	rme_asign_device(pdev);
+> 	rme_assign_device() - I obviously missed this earlier!
+>
+>> +	/*
+>> +	 * Schedule a work to fetch device certificate and setup IDE
+> Single line comment probably fine here.  Though it perhaps doesn't add
+> much over the function name.
+>> +	 */
+>> +	schedule_rme_ide_setup(pdev);
+>> +
+>>  	/*
+>>  	 * Once ide is setup enable the stream at endpoint
+>>  	 * Root port will be done by RMM
+>> diff --git a/drivers/virt/coco/arm-cca-host/rmm-da.c b/drivers/virt/coco/arm-cca-host/rmm-da.c
+>> index 426e530ac182..d123940ce82e 100644
+>> --- a/drivers/virt/coco/arm-cca-host/rmm-da.c
+>> +++ b/drivers/virt/coco/arm-cca-host/rmm-da.c
+>> @@ -148,3 +148,201 @@ int rme_asign_device(struct pci_dev *pci_dev)
+>>  err_out:
+>>  	return ret;
+>>  }
+>> +
+>> +static int doe_send_req_resp(struct pci_tsm *tsm)
+>> +{
+>> +	u8 protocol;
+>> +	int ret, data_obj_type;
+>> +	struct cca_host_comm_data *comm_data;
+>> +	struct rmi_dev_comm_exit *io_exit;
+>> +
+>> +	comm_data = to_cca_comm_data(tsm->pdev);
+>> +
+>> +	io_exit = &comm_data->io_params->exit;
+>> +	protocol = io_exit->protocol;
+>
+> For all these I'd combine with the declarations.
+>
+>> +
+>> +	pr_debug("doe_req size:%lld doe_io_type=%d\n", io_exit->req_len, (int)protocol);
+>> +
+>> +	if (protocol == RMI_PROTOCOL_SPDM)
+>> +		data_obj_type = PCI_DOE_PROTO_CMA;
+>> +	else if (protocol == RMI_PROTOCOL_SECURE_SPDM)
+>> +		data_obj_type = PCI_DOE_PROTO_SSESSION;
+>> +	else
+>> +		return -EINVAL;
+>> +
+>> +	ret = pci_tsm_doe_transfer(tsm->dsm_dev, data_obj_type,
+>> +				   comm_data->req_buff, io_exit->req_len,
+>> +				   comm_data->resp_buff, PAGE_SIZE);
+>> +	pr_debug("doe returned:%d\n", ret);
+>> +	return ret;
+>> +}
+>> +
+>> +/* Parallel update for cca_dsc contents FIXME!! */
+>> +static int __do_dev_communicate(int type, struct pci_tsm *tsm)
+>> +{
+>> +	int ret;
+>> +	bool is_multi;
+>> +	u8 *cache_buf;
+>> +	int *cache_offset;
+>> +	int nbytes, cache_remaining;
+>> +	struct cca_host_dsc_pf0 *dsc_pf0;
+>> +	struct rmi_dev_comm_exit *io_exit;
+>> +	struct rmi_dev_comm_enter *io_enter;
+>> +	struct cca_host_comm_data *comm_data;
+>> +
+>> +
+>> +	comm_data = to_cca_comm_data(tsm->pdev);
+>> +	io_enter = &comm_data->io_params->enter;
+>> +	io_exit = &comm_data->io_params->exit;
+>
+> Might as well set these local variables as the declaration point
+> above.  None of them will be very long lines.
+>
+>> +
+>> +	dsc_pf0 = to_cca_dsc_pf0(tsm->dsm_dev);
+>> +redo_communicate:
+>> +	is_multi = false;
+>> +
+>> +	if (type == PDEV_COMMUNICATE)
+>> +		ret = rmi_pdev_communicate(virt_to_phys(dsc_pf0->rmm_pdev),
+>> +					   virt_to_phys(comm_data->io_params));
+>> +	else
+>> +		ret = RMI_ERROR_INPUT;
+>
+> I'd split this case out and return here farther than using the match below
+> as it feels like the error message auto to be more specific. Something
+> about type not matching.
+>
+
+This get updated in the follow up patch as below.
+
+	if (type == PDEV_COMMUNICATE)
+		ret = rmi_pdev_communicate(virt_to_phys(dsc_pf0->rmm_pdev),
+					   virt_to_phys(comm_data->io_params));
+	else {
+		struct cca_host_tdi *host_tdi = container_of(tsm->tdi, struct cca_host_tdi, tdi);
+
+		ret = rmi_vdev_communicate(virt_to_phys(dsc_pf0->rmm_pdev),
+					   virt_to_phys(host_tdi->rmm_vdev),
+					   virt_to_phys(comm_data->io_params));
+	}
 
 
+>
+>> +	if (ret != RMI_SUCCESS) {
+>> +		pr_err("pdev communicate error\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	/* caching request from RMM */
+>> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_RSP) {
+>> +		switch (io_exit->cache_obj_id) {
+>> +		case RMI_DEV_VCA:
+>> +			cache_buf = dsc_pf0->vca.buf;
+>> +			cache_offset = &dsc_pf0->vca.size;
+>> +			cache_remaining = sizeof(dsc_pf0->vca.buf) - *cache_offset;
+>> +			break;
+>> +		case RMI_DEV_CERTIFICATE:
+>> +			cache_buf = dsc_pf0->cert_chain.cache.buf;
+>> +			cache_offset = &dsc_pf0->cert_chain.cache.size;
+>> +			cache_remaining = sizeof(dsc_pf0->cert_chain.cache.buf) - *cache_offset;
+>> +			break;
+>> +		default:
+>> +			/* FIXME!! depending on the DevComms status,
+>> +			 * it might require to ABORT the communcation.
+>> +			 */
+>> +			return -EINVAL;
+>> +		}
+>> +
+>> +		if (io_exit->cache_rsp_len > cache_remaining)
+>> +			return -EINVAL;
+>> +
+>> +		memcpy(cache_buf + *cache_offset,
+>> +		       (comm_data->resp_buff + io_exit->cache_rsp_offset), io_exit->cache_rsp_len);
+>> +		*cache_offset += io_exit->cache_rsp_len;
+>> +	}
+>> +
+>> +	/*
+>> +	 * wait for last packet request from RMM.
+>> +	 * We should not find this because our device communication in synchronous
+>> +	 */
+>> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_WAIT)
+>> +		return -ENXIO;
+>> +
+>> +	is_multi = !!(io_exit->flags & RMI_DEV_COMM_EXIT_MULTI);
+>
+> !! doesn't add anything here that I can see over
+>
+> 	is_multi = io_exit->flags & RMI_DEV_COMM_EXIT_MULTI;
+>
+>
+>> +
+>> +	/* next packet to send */
+>> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_SEND) {
+>> +		nbytes = doe_send_req_resp(tsm);
+>> +		if (nbytes < 0) {
+>> +			/* report error back to RMM */
+>> +			io_enter->status = RMI_DEV_COMM_ERROR;
+>> +		} else {
+>> +			/* send response back to RMM */
+>> +			io_enter->resp_len = nbytes;
+>> +			io_enter->status = RMI_DEV_COMM_RESPONSE;
+>> +		}
+>> +	} else {
+>> +		/* no data transmitted => no data received */
+>> +		io_enter->resp_len = 0;
+>> +	}
+>> +
+>> +	/* The call need to do multiple request/respnse */
+>> +	if (is_multi)
+>> +		goto redo_communicate;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int do_dev_communicate(int type, struct pci_tsm *tsm, int target_state)
+>> +{
+>> +	int ret;
+>> +	unsigned long state;
+>> +	unsigned long error_state;
+>> +	struct cca_host_dsc_pf0 *dsc_pf0;
+>> +	struct rmi_dev_comm_enter *io_enter;
+>> +
+>> +	dsc_pf0 = to_cca_dsc_pf0(tsm->dsm_dev);
+>> +	io_enter = &dsc_pf0->comm_data.io_params->enter;
+>> +	io_enter->resp_len = 0;
+>> +	io_enter->status = RMI_DEV_COMM_NONE;
+>> +
+>> +	state = -1;
+>> +	do {
+>> +		ret = __do_dev_communicate(type, tsm);
+>> +		if (ret != 0) {
+> 		if (ret)
+>
+>> +			pr_err("dev communication error\n");
+>> +			break;
+>
+> I'd just return in error cases.
+>
+>> +		}
+>> +
+>> +		if (type == PDEV_COMMUNICATE) {
+>> +			ret = rmi_pdev_get_state(virt_to_phys(dsc_pf0->rmm_pdev),
+>> +						 &state);
+>> +			error_state = RMI_PDEV_ERROR;
+>> +		}
+>> +		if (ret != 0) {
+>> +			pr_err("Get dev state error\n");
+>> +			break;
+>> +		}
+>> +	} while (state != target_state && state != error_state);
+>> +
+>> +	pr_info("dev_io_complete: status: %d state:%ld\n", ret, state);
+>> +
+>> +	return state;
+>> +}
 
-On 28/7/25 19:47, Jason Gunthorpe wrote:
-> On Mon, Jul 28, 2025 at 07:21:47PM +0530, Aneesh Kumar K.V (Arm) wrote:
->> With passthrough devices, we need to make sure private memory is
->> allocated and assigned to the secure guest before we can issue the DMA.
->> For ARM RMM, we only need to map and the secure SMMU management is
->> internal to RMM. For shared IPA, vfio/iommufd DMA MAP/UNMAP interface
->> does the equivalent
-> 
-> I'm not really sure what this is about? It is about getting KVM to pin
-> all the memory and commit it to the RMM so it can be used for DMA?
-> 
-> But it looks really strange to have an iommufd ioctl that just calls a
-> KVM function. Feeling this should be a KVM function, or a guestmfd
-> behavior??
+Thanks for the review comments. I'll update the patch with the suggested changes.
 
-
-I ended up exporting the guestmemfd's kvm_gmem_get_folio() for gfn->pfn and its fd a bit differently in iommufd - "no extra referencing":
-https://github.com/AMDESE/linux-kvm/commit/f1ebd358327f026f413f8d3d64d46decfd6ab7f6
-
-It is a new iommufd->kvm dependency though.
-
-> I was kind of thinking it would be nice to have a guestmemfd mode that
-> was "pinned", meaning the memory is allocated and remains almost
-> always mapped into the TSM's page tables automatically. VFIO using
-> guests would set things this way.
-
-Yeah while doing the above, I was wondering if I want to pass the fd type when DMA-mapping from an fd or "detect" it as I do in the above commit or have some iommufd_fdmap_ops in this fd saying "(no) pinning needed" (or make this a flag of IOMMU_IOAS_MAP_FILE).
-
-The "detection" is (mapping_inaccessible(mapping) && mapping_unevictable(mapping)), works for now.
-
-btw in the AMD case, here it does not matter as much if it is private or shared, I map everything and let RMP and the VM deal with the permissions. Thanks,
-
-
-> 
-> Jason
-
--- 
-Alexey
-
+-aneesh
