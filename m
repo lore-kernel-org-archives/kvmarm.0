@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17540253F12
-	for <kvmarm@lists.linux.dev>; Mon,  4 Aug 2025 12:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D41723A58B
+	for <kvmarm@lists.linux.dev>; Mon,  4 Aug 2025 12:18:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754309879; cv=none; b=g759m93WTox7h/5dzo4WG4gtg9E2YuudxLvmN5cfzRKHzapSmuYbmKHhtdrlBB117X4tLD1D6jBACiZEtJmiOU3thr9XDg7EoQFJbxTtYetYL6DB+j/h3MEiJ9UNGfzp0A5Zkx/qrTGMHkTJqbeItltFyZwXeCI4iwmUbYRF+YY=
+	t=1754309883; cv=none; b=LohGgnaP0BCR48MJb7S4NFznO8W1i80gJCOFLdDPxUVE5awdrLlToP92etS6PD6mgGZ0OTnQFMMiX6BHfZDCDyrmvfXkRdriDAvKEVWZaF+yHp/57lornpAGzjrb3VlIKLmZGuOw70L/QWDuY2Va5uBsHE7XFl2yAPhwqbCkDK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754309879; c=relaxed/simple;
-	bh=6dzm+Zi+XjXp5mYLVu5J9JmYF9QrHLzEoJ97N/GyEkM=;
+	s=arc-20240116; t=1754309883; c=relaxed/simple;
+	bh=yyHiKn3TTe/WLOZndQLfBtKivmH21ktYqHo2TtBhYCA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SgrJT1VRAx73H3k5jtHvhFUCYm0AbC/3f7mStv4E8+vUWk8pnAooVF0I1DWWJ9NpThm/rV2+tPm0oIx9jzmZJQw6SCWhCcAq/wzgrIZ2YGTxE34hy66Jill71Mo/Fstn3iGzmG43jj0zjFUvqdZlZhGqKcV7/H1uxMSSHFfxl1M=
+	 MIME-Version; b=j+klTX+fJCPighgdmhASTiFb+iyC+6t1c5EkStneTZyuszgl7UGlG+NbGZ6xftaa/WsgMidFnF3Camnt4VPVaH304H7gX1yHINvQojCVd6zYX+t2Gcr+1fu2LTrOdJ806nWzUbRXts72L+lwttusSb8I54ESMchsNaH11rZ0ORo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B5CF150C;
-	Mon,  4 Aug 2025 05:17:49 -0700 (PDT)
-Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 057273F738;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 91355150C;
 	Mon,  4 Aug 2025 05:17:53 -0700 (PDT)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E987D3F738;
+	Mon,  4 Aug 2025 05:17:57 -0700 (PDT)
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -46,9 +46,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	linux-pm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH 07/11] arm64: make the per-task SCTLR2_EL1
-Date: Mon,  4 Aug 2025 13:17:20 +0100
-Message-Id: <20250804121724.3681531-8-yeoreum.yun@arm.com>
+Subject: [PATCH 08/11] KVM: arm64: initialise SCTLR2_EL1 at __kvm_host_psci_cpu_entry()
+Date: Mon,  4 Aug 2025 13:17:21 +0100
+Message-Id: <20250804121724.3681531-9-yeoreum.yun@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250804121724.3681531-1-yeoreum.yun@arm.com>
 References: <20250804121724.3681531-1-yeoreum.yun@arm.com>
@@ -60,74 +60,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some of field of SCTLR2 registers should be configurable per task
-not globally -- i.e) FEAT_CPA2 related field and etc.
-
-For future usage of these fields, make the per-task SCTLR2_EL1.
+initialise SCTLR2_EL1 at __kvm_host_psci_cpu_entry().
 
 Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
 ---
- arch/arm64/include/asm/processor.h | 5 +++++
- arch/arm64/kernel/process.c        | 9 +++++++++
- 2 files changed, 14 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index 1bf1a3b16e88..7980161172f7 100644
---- a/arch/arm64/include/asm/processor.h
-+++ b/arch/arm64/include/asm/processor.h
-@@ -182,6 +182,7 @@ struct thread_struct {
- 	u64			mte_ctrl;
- #endif
- 	u64			sctlr_user;
-+	u64			sctlr2_user;
- 	u64			svcr;
- 	u64			tpidr2_el0;
- 	u64			por_el0;
-@@ -256,6 +257,9 @@ static inline void task_set_sve_vl_onexec(struct task_struct *task,
- 	(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB |   \
- 	 SCTLR_EL1_TCF0_MASK)
-
-+#define SCTLR2_USER_MASK	\
-+	(SCTLR2_EL1_EnPACM0 | SCTLR2_EL1_CPTA0 | SCTLR2_EL1_CPTM0)
-+
- static inline void arch_thread_struct_whitelist(unsigned long *offset,
- 						unsigned long *size)
- {
-@@ -368,6 +372,7 @@ struct task_struct;
- unsigned long __get_wchan(struct task_struct *p);
-
- void update_sctlr_el1(u64 sctlr);
-+void update_sctlr2_el1(u64 sctlr2);
-
- /* Thread switching */
- extern struct task_struct *cpu_switch_to(struct task_struct *prev,
-diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index 08b7042a2e2d..e86325d07fa8 100644
---- a/arch/arm64/kernel/process.c
-+++ b/arch/arm64/kernel/process.c
-@@ -699,6 +699,11 @@ void update_sctlr_el1(u64 sctlr)
- 	isb();
- }
-
-+void update_sctlr2_el1(u64 sctlr2)
-+{
-+	sysreg_clear_set(sctlr2_el1, SCTLR2_USER_MASK, sctlr2);
-+}
-+
- /*
-  * Thread switching.
+diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+index c3e196fb8b18..4ed4b7fa57c2 100644
+--- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
++++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+@@ -4,6 +4,7 @@
+  * Author: David Brazdil <dbrazdil@google.com>
   */
-@@ -738,6 +743,10 @@ struct task_struct *__switch_to(struct task_struct *prev,
- 	if (prev->thread.sctlr_user != next->thread.sctlr_user)
- 		update_sctlr_el1(next->thread.sctlr_user);
 
-+	if (alternative_has_cap_unlikely(ARM64_HAS_SCTLR2) &&
-+	    prev->thread.sctlr2_user != next->thread.sctlr2_user)
-+		update_sctlr2_el1(next->thread.sctlr2_user);
-+
- 	/* the actual thread switch */
- 	last = cpu_switch_to(prev, next);
++#include <asm/alternative.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+@@ -219,6 +220,8 @@ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
+ 		release_boot_args(boot_args);
 
+ 	write_sysreg_el1(INIT_SCTLR_EL1_MMU_OFF, SYS_SCTLR);
++	if (alternative_has_cap_unlikely(ARM64_HAS_SCTLR2))
++		write_sysreg_el1(INIT_SCTLR2_EL1, SYS_SCTLR2);
+ 	write_sysreg(INIT_PSTATE_EL1, SPSR_EL2);
+
+ 	__host_enter(host_ctxt);
 --
 LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
