@@ -1,143 +1,131 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285F71FDD
-	for <kvmarm@lists.linux.dev>; Mon,  4 Aug 2025 15:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3E5226177;
+	Mon,  4 Aug 2025 17:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754320932; cv=none; b=VgoxIN9+9mCDGSoGcLXgsYuAOyRdCqJSZ79jozjDo9t4WuoIx25KRIyjLhax+ke4lMGBHSoAfAQKXjwVNZfh5yBLx5HGhKSlc0DR+sliPM2SmI8jBrgL7Gm1jBpO87RjeCgEXW3ZC4kcH4B5VkYWxefYgitda3Us7Gg5LeWPVl4=
+	t=1754329503; cv=none; b=PQTEDwQnyoLbc+Zr+9PnHp6QbH4GGV9fXCRYTU7FeN3T/AdjGKi2wgIbb0qLeOw4gR6b/xIaKoIFKVARg3P6jDEPaypW9t5G0rwMM/HDoxY7E2sKYmRdjvny3ppE+S8On8/RP/YS2x9ncIclwBf8+Y4sE/5mu7CEx41pdLv1Uwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754320932; c=relaxed/simple;
-	bh=TD83Fz3P8u//V8Y1cX6pFywl3ILTbs7KXqK7IVCw6Ew=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WqpRUb/STy9Y20r7ksIHfcYJ6W3qkKsHvYN6gcVCTK6f9KPvlOS9DfrB7oBWIJJ1AKPrFGo2RRel8JQj+QBVJg0jToi9x0kZesFHC3b+cvkCmSzbXGGnfAyJzIfn+mZUybVeRZQ0AHcTSVjNTJDjRZMGyb4UL8djbswFZd/5kVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3034D1E4D;
-	Mon,  4 Aug 2025 08:22:01 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F071F3F673;
-	Mon,  4 Aug 2025 08:22:06 -0700 (PDT)
-Date: Mon, 4 Aug 2025 16:22:04 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: ptdump: Fix exec attribute printing
-Message-ID: <aJDQHMbiNVToTbum@J2N7QTR9R3>
-References: <20250802104021.3076621-1-r09922117@csie.ntu.edu.tw>
- <d72b7928-8646-4616-a8f0-96b9d9bbaf09@arm.com>
- <z2hmwwmtgbrio2wv3sj2pc4zhxdjioorlhnm45o2arcsjahjni@xod435q26jqq>
+	s=arc-20240116; t=1754329503; c=relaxed/simple;
+	bh=+6983uikn0yjZmMwTznyxyuaz/i87Agap+CKdQcLC8U=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U/KoJNWhJmNqmVrE7/d3fdxg5B3PyfH6uXFe/CrqC9iJqxh/Tu1eYnAErfnY+TsldCXSOKHJziEwkJEEFaUV7At9lAWH8BNzMjA7S1XxKe5J3MUgMUYLEXt/EgH//cCKDk8eyOrr2FbaIe5iw7kVkX2V34Ri4Zf4KsoWGlBR/cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F5JV3ymW; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F5JV3ymW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03D2CC4CEF0;
+	Mon,  4 Aug 2025 17:45:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754329503;
+	bh=+6983uikn0yjZmMwTznyxyuaz/i87Agap+CKdQcLC8U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=F5JV3ymWjmg3Ea3MlkksddkwxF+nE7Z/km3GsIUCNhZM3MqqJWA9Q9h55Sj9Ot8Ce
+	 8+tQO2nmRdklfetbKCfJ1XKgKUx4Z99ag2mSu2oXnEBP0EYEaUQBSJV/nCe6+V15Nf
+	 zjZoSzlgRFFoQFJO8Rqtim/WumXcl0Q52iSQgR3SH/IJM0/MPF3Eu+vyfkjJeIHOil
+	 G1DoxiYeLdS5b8aJQAxGLC78cENi9ZIB1pztra4JsBndzBS7fx15BiMA/vcWRH28qF
+	 8y8drtqmjQAxC4ns4el4kdLDYXapxQKSLG8WTiqLoYbwHLKZfBz6CEdGuMZ5dAfRi8
+	 JbOKNpvQ9oWIw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uizF6-003stC-SL;
+	Mon, 04 Aug 2025 18:45:01 +0100
+Date: Mon, 04 Aug 2025 18:45:00 +0100
+Message-ID: <87ectrt203.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH kvmtool v3 2/6] arm64: Initial nested virt support
+In-Reply-To: <aJDGrFj003YkVVZs@raptor>
+References: <20250729095745.3148294-1-andre.przywara@arm.com>
+	<20250729095745.3148294-3-andre.przywara@arm.com>
+	<aJDGrFj003YkVVZs@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <z2hmwwmtgbrio2wv3sj2pc4zhxdjioorlhnm45o2arcsjahjni@xod435q26jqq>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Aug 04, 2025 at 08:41:35PM +0800, Wei-Lin Chang wrote:
-> Hi Anshuman,
+On Mon, 04 Aug 2025 15:41:48 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> On Sun, Aug 03, 2025 at 07:33:04PM +0530, Anshuman Khandual wrote:
+> Hi Andre,
+> 
+> On Tue, Jul 29, 2025 at 10:57:41AM +0100, Andre Przywara wrote:
+> > The ARMv8.3 architecture update includes support for nested
+> > virtualization. Allow the user to specify "--nested" to start a guest in
+> > (virtual) EL2 instead of EL1.
+> > This will also change the PSCI conduit from HVC to SMC in the device
+> > tree.
 > > 
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  arm64/fdt.c                         |  5 ++++-
+> >  arm64/include/kvm/kvm-config-arch.h |  5 ++++-
+> >  arm64/kvm-cpu.c                     | 12 +++++++++++-
+> >  3 files changed, 19 insertions(+), 3 deletions(-)
 > > 
-> > On 02/08/25 4:10 PM, Wei-Lin Chang wrote:
-> > > Currently the guest stage-2 page table dump has the executable attribute
-> > > printed in reverse, showing "X" for a non-executable region and showing
-> > > " " for an executable one. This is caused by misjudgement of which
-> > > string gets printed for the executable and non-executable case. Fix it
-> > > by swapping the two strings.
-> > > 
-> > > Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-> > > ---
-> > >  arch/arm64/kvm/ptdump.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > > index 098416d7e5c25..99fc13f1c11fb 100644
-> > > --- a/arch/arm64/kvm/ptdump.c
-> > > +++ b/arch/arm64/kvm/ptdump.c
-> > > @@ -44,8 +44,8 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
-> > >  	}, {
-> > >  		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> > >  		.val	= PTE_VALID,
-> > > -		.set	= " ",
-> > > -		.clear	= "X",
-> > > +		.set	= "X",
-> > > +		.clear	= " ",
-> > >  	}, {
-
-I think the big problem here is that we've included the 'PTE_VALID' bit
-in the mask. We don't bother with that for the Stage-1 ptdump code, e.g.
-
-        {
-                .mask   = PTE_PXN,
-                .val    = PTE_PXN,
-                .set    = "NX",
-                .clear  = "x ",
-        },
-
-.... so do we actually need to take the PTE_VALID bit into account here? Do
-invalid Stage-2 entries have anything we don't want to report?
-
-... or can we change the Stage-2 ptdump code to have:
-
-	{
-		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
-		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
-		.set	= "NX",
-		.clear	= "x ",
-	},
-
-... and match the Stage-1 code?
-
-Otherwise, maybe we can add a separate valid-only filter.
-
-> > >  		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> > >  		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> > 
-> > Is not KVM_PTE_LEAF_ATTR_HI_S2_XN already in the reverse semantics aka
-> > XN (Execute Never). Hence when KVM_PTE_LEAF_ATTR_HI_S2_XN macro is set
-> > that means the entry is not executable and vice versa.
+> > diff --git a/arm64/fdt.c b/arm64/fdt.c
+> > index df7775876..98f1dd9d4 100644
+> > --- a/arm64/fdt.c
+> > +++ b/arm64/fdt.c
+> > @@ -205,7 +205,10 @@ static int setup_fdt(struct kvm *kvm)
+> >  		_FDT(fdt_property_string(fdt, "compatible", "arm,psci"));
+> >  		fns = &psci_0_1_fns;
+> >  	}
+> > -	_FDT(fdt_property_string(fdt, "method", "hvc"));
+> > +	if (kvm->cfg.arch.nested_virt)
+> > +		_FDT(fdt_property_string(fdt, "method", "smc"));
+> > +	else
+> > +		_FDT(fdt_property_string(fdt, "method", "hvc"));
+> >  	_FDT(fdt_property_cell(fdt, "cpu_suspend", fns->cpu_suspend));
+> >  	_FDT(fdt_property_cell(fdt, "cpu_off", fns->cpu_off));
+> >  	_FDT(fdt_property_cell(fdt, "cpu_on", fns->cpu_on));
+> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+> > index ee031f010..a1dac28e6 100644
+> > --- a/arm64/include/kvm/kvm-config-arch.h
+> > +++ b/arm64/include/kvm/kvm-config-arch.h
+> > @@ -10,6 +10,7 @@ struct kvm_config_arch {
+> >  	bool		aarch32_guest;
+> >  	bool		has_pmuv3;
+> >  	bool		mte_disabled;
+> > +	bool		nested_virt;
+> >  	u64		kaslr_seed;
+> >  	enum irqchip_type irqchip;
+> >  	u64		fw_addr;
+> > @@ -57,6 +58,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+> >  		     "Type of interrupt controller to emulate in the guest",	\
+> >  		     irqchip_parser, NULL),					\
+> >  	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
+> > -		"Address where firmware should be loaded"),
+> > +		"Address where firmware should be loaded"),			\
+> > +	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
 > 
-> Yes you are correct. However in dump_prot() we have:
-> 
-> if ((st->current_prot & bits->mask) == bits->val)
-> 	s = bits->set;
-> else
-> 	s = bits->clear;
-> 
-> Analysis:
-> 
-> 1. region is executable:
->     - st->current_prot == PTE_VALID (ignore other bits)
->     - st->current_prot & bits->mask gets PTE_VALID
->     - if condition is true (.val is PTE_VALID)
->     - prints bits->set
-> 
-> 2. region is not executable:
->     - st->current_prot == KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID
->     - st->current_prot & bits->mask gets (KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID)
->     - if condition is false
->     - prints bits->clear
+> --nested sounds a bit vague (what if KVM decides to nest something else in the
+> future?) and the variable that keeps track of the parameter is called
+> 'nested_virt'. Is it too late to rename --nested to --nested-virt for
+> consistency and better clarity?
 
-As above, this is because the PTE_VALID bit has been placed into the
-mask, and that's not how the ptdump code was intended to be used.
+I disagree. 'nested' is pretty much unambiguous in the context of
+virtualisation. 'nested-virt' is only an overstatement of an idiom
+that anyone playing with kvmtool will understand.
 
-> Therefore we want .set = "X", and .clear = " ".
+	M.
 
-That'll work around the problem, but I'm not sure that's the right fix.
-If nothing else, it's *very* confusing.
-
-Mark.
+-- 
+Jazz isn't dead. It just smells funny.
