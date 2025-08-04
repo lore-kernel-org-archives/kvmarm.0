@@ -1,167 +1,180 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A653E154BF5;
-	Mon,  4 Aug 2025 06:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAB529A2
+	for <kvmarm@lists.linux.dev>; Mon,  4 Aug 2025 07:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754290720; cv=none; b=cKD+BxGF+ZKBruUS5m/KK8dTko+sdJ+Qm8MIc/VLmn7w1dn8xhOoroCwz2/dD4riMl1pnBfu6U7SUYj73kW4t8zuf5nUKk11n2CV1jb5Ceicte+DJaUd1QmHl20gLwQEaM/qBQix0Mb4nXOCt4qfPnOM7/tr7KvKLjnhRd2dPnM=
+	t=1754290886; cv=none; b=VyxczJ9rlQ80BmE0redBR942Ft2+MvHIQkjSPmQziQZTs6xP9JLZD4DvJHzlRVDcRgyqB6bZaVKbHlmZ/WQusyH/WYgnTAGomHlxLYK3JmbyDSJqNvGFQ5RSyu7LkYpl4b7XWk4M++FL72fWkgWG4AzWJHz/3zEykkbtGzgEH1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754290720; c=relaxed/simple;
-	bh=v9xHj22hdbHBZDlVa+VuQOMIt2QxRwUCOV+GzKrIJhA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oqmgLd/4FAZNZNx+BShuZ3fl8Q3JkNEHe/bnlUpnT37xEK1LYQMx5InnaO+Pq/xQ0ES+AJ16I7HEakhLNfsx/VRILAO8gcjku3JU3J9xfgJvjQyc74vhnBR9ZUEMeqzZ4rYIYVC8HDAFWWPYWpgFNk3oWnOSEgPqSppacZ12EAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/jdK+ut; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754290886; c=relaxed/simple;
+	bh=vpzFDWHx1vzLUpzzVT1XmrHvTcJ2axEi+eoubCbO0sc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hys6k/VoIrdU5UyDagb4oh20w3WkPzAvY24zXMedPaRB/AINAS/LRs/B0I/+6psVb9Jvi11T+WLzPF6Gs/SPifB3dICrCNWYaOY54rvnXUtizFaA3RtaMU2CHIRMY0zLgGgQukfqPuFBjm5Mr5wQS3oahcx/5P3PG6gf2+ApFOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kbu/8vUN; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/jdK+ut"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 505DEC4CEE7;
-	Mon,  4 Aug 2025 06:58:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754290720;
-	bh=v9xHj22hdbHBZDlVa+VuQOMIt2QxRwUCOV+GzKrIJhA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Y/jdK+ut68wZ5ohu3wdskfRvZyF3bu6qBSWXqMLqfml+LqgNX5ezRTNOo9kpWScYQ
-	 J2koYnAyY6AWUeMG0PORloDMlUkATt9dURYjg/SkGx8Hizx++TJq7FeANZlGAazH91
-	 y6GPS7zWa/qZQ0g98dJp51ZqXKK4waE5MHDPtMltTzNfIX601Tjnv/JPCQobZdo58g
-	 ZU6lDm13A2Qb9XBHampfiYuOMuUaNmJ7gO3yj2g4JEyXf3Kdm8t5tK/6TnKXcHshKQ
-	 yjBZ+hYsNSgLj/S/7yokaDCafy2QcqHHjzfCADFeSO1Izx2iuloBKg2uxJYGofi6Jf
-	 m2II9zTbLrTTQ==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
-	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 04/38] tsm: Support DMA Allocation from private
- memory
-In-Reply-To: <20250802134154.GI26511@ziepe.ca>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-5-aneesh.kumar@kernel.org>
- <20250728143318.GD26511@ziepe.ca> <yq5a5xfbbe35.fsf@kernel.org>
- <20250729143339.GH26511@ziepe.ca> <yq5aikj69kpn.fsf@kernel.org>
- <20250802134154.GI26511@ziepe.ca>
-Date: Mon, 04 Aug 2025 12:28:33 +0530
-Message-ID: <yq5aldnz8teu.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kbu/8vUN"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b0673b0a7cso278351cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 04 Aug 2025 00:01:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754290884; x=1754895684; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RSHEYJX788VYHRiy4xhCclV7U8sQXRjHeZkuG3AFE8g=;
+        b=kbu/8vUN7lM/+2HoArscT+RaEpixSVr91kE1b7zMn55YRXDan3rvolOTz8SxUYzRAs
+         Fx7Tp7Z+xlwbT8ucGhmkZtp9+qE2Ubsk52o4g9mKR+0HwbpbrWR7zwV4n62Y2ieS9dZe
+         tqBSP9OK5UTQREZX4/Ke3er79Gh3liuona+QKtg0CJqpi6w8xOMsf3UPgzecd6v3BAIU
+         JqX+9o/QaQbxy7h/1Nzs9dnmH9dpaNOhVVvVxyJfm6N5UH5zO/pmltV+/ZOJNd9a1NEH
+         T6ZFjlq5SwZiWN20TwFFbe/IMO8DM4CZlV1AId0hZ7JetWpUl6o8ZDpWEWon/ouvK6zs
+         zltA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754290884; x=1754895684;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RSHEYJX788VYHRiy4xhCclV7U8sQXRjHeZkuG3AFE8g=;
+        b=dZkVV6ch9SvecH7Ad69k3o79Eq2B1pd/f//xkQa3fOpX38XCkRcVHqpJCFo0NjHlKb
+         m5s+qZ4FmxqIjVOHw5b+W7+tocsoF1MtwTUJ1hXyIMgflGuQKVFEh73PtuK7YNpb8uJ9
+         G7SMLUYa3MoIL5OvD5zY6wGhTu0SeKd2snYRYAyeOCfCdQBYvHVrucUeOhoonUV2Wd/Z
+         vE9oUjVdlASORTt5skLRTVvg34RQWGtMMl2HewDkoko0e9eNedfGCBKw9iSClcMPIWkV
+         45Tv+mS+2L9cIRg3gRaRtuZuA2Q4/CisKre3F5Kly8egXDMxM81IWy8nJeTF90EWyz5M
+         /dcw==
+X-Gm-Message-State: AOJu0YxAKqmsYUiewAXWU97cZ8DTf4DRvB9h/2bEvxlT4+hxZ1fz3PBe
+	nXO2jGLVKnlwqd144AIspy5iUAwAM8tg/kIVuwhVd5ZDKoSqf/WSMLu6uNiHXFywSegyMEpwCfT
+	+XykGd86/557VKUlr75wcpmjxQXaMqqct+7Ehx064
+X-Gm-Gg: ASbGncv6wUs4b6wNXoV9VzwXscw6o+vuGWRRDQj1+EgA3WBJdR4YKDa55ldXf+uBSA+
+	I4yqTCUofWc0l8XmDAsISnuvpjFyn74fdFjFYGzTl+15Wlx0DfukePGpzagdb01WkXHHCevDuGC
+	U2//wYQvBTIos9dCoq12uGlHgRAXT5sqKNz3DSghraBwkP5GgWSSz7vwej2ipeFMXWNESIGUb8o
+	x7837Lq
+X-Google-Smtp-Source: AGHT+IGniHAA7FH+Eqd7YBUZA05anC+yqxu5yiEtg/S9Kxo9mx70xDcmXaV24SioouRxAn4eOORFllugMTauEdotgoE=
+X-Received: by 2002:a05:622a:15cb:b0:4af:103d:f71 with SMTP id
+ d75a77b69052e-4af12e2b2b0mr9053651cf.2.1754290883220; Mon, 04 Aug 2025
+ 00:01:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20250729120014.2799359-1-tabba@google.com> <20250729120014.2799359-2-tabba@google.com>
+ <szsqsx77mjo4kdawzcboud4eawuvz3sye4grmx5n74qzze26ap@xbfwc44ruetx>
+In-Reply-To: <szsqsx77mjo4kdawzcboud4eawuvz3sye4grmx5n74qzze26ap@xbfwc44ruetx>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 4 Aug 2025 08:00:46 +0100
+X-Gm-Features: Ac12FXzPxlkyqKTxS6wmipvAxMngDbBJoOhGXmwgi5KEq_pfkUCqwpGRVI4eeuY
+Message-ID: <CA+EHjTxMoVD=ViS8rC+4oiLojQpobfnxHMBSx7qOLSwU_v_J=g@mail.gmail.com>
+Subject: Re: [PATCH v1 1/8] KVM: arm64: Rename pkvm.enabled to pkvm.is_protected
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, mark.rutland@arm.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, broonie@kernel.org, vdonnefort@google.com, 
+	qperret@google.com, sebastianene@google.com, keirf@google.com, 
+	smostafa@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Jason Gunthorpe <jgg@ziepe.ca> writes:
+Hi Wei-Lin,
 
-> On Sat, Aug 02, 2025 at 02:14:20PM +0530, Aneesh Kumar K.V wrote:
->> Jason Gunthorpe <jgg@ziepe.ca> writes:
->>=20
->> > On Tue, Jul 29, 2025 at 01:53:10PM +0530, Aneesh Kumar K.V wrote:
->> >> Jason Gunthorpe <jgg@ziepe.ca> writes:
->> >>=20
->> >> > On Mon, Jul 28, 2025 at 07:21:41PM +0530, Aneesh Kumar K.V (Arm) wr=
-ote:
->> >> >> @@ -48,3 +49,12 @@ int set_memory_decrypted(unsigned long addr, in=
-t numpages)
->> >> >>  	return crypt_ops->decrypt(addr, numpages);
->> >> >>  }
->> >> >>  EXPORT_SYMBOL_GPL(set_memory_decrypted);
->> >> >> +
->> >> >> +bool force_dma_unencrypted(struct device *dev)
->> >> >> +{
->> >> >> +	if (dev->tdi_enabled)
->> >> >> +		return false;
->> >> >
->> >> > Is this OK? I see code like this:
->> >> >
->> >> > static inline dma_addr_t phys_to_dma_direct(struct device *dev,
->> >> > 		phys_addr_t phys)
->> >> > {
->> >> > 	if (force_dma_unencrypted(dev))
->> >> > 		return phys_to_dma_unencrypted(dev, phys);
->> >> > 	return phys_to_dma(dev, phys);
->> >> >
->> >> > What are the ARM rules for generating dma addreses?
->> >> >
->> >> > 1) Device is T=3D0, memory is unencrypted, call dma_addr_unencrypte=
-d()
->> >> >    and do "top bit IBA set"
->> >> >
->> >> > 2) Device is T=3D1, memory is encrypted, use the phys_to_dma() norm=
-ally
->> >> >
->> >> > 3) Device it T=3D1, memory is uncrypted, use the phys_to_dma()
->> >> >    normally??? Seems odd, I would have guessed the DMA address sould
->> >> >    be the same as case #1?
->> >> >
->> >> > Can you document this in a comment?
->> >> >
->> >>=20
->> >> If a device is operating in secure mode (T=3D1), it is currently assu=
-med
->> >> that only access to private (encrypted) memory is supported.
->> >
->> > No, this is no how the PCI specs were written as far as I
->> > understand. The XT bit thing is supposed to add more fine grained
->> > device side control over what memory the DMA can target. T alone does
->> > not do that.
->> >
->> >> It is unclear whether devices would need to perform DMA to shared
->> >> (unencrypted) memory while operating in this mode, as TLPs with T=3D1
->> >> are generally expected to target private memory.
->> >
->> > PCI SIG supports it, kernel should support it.
->> >
->>=20
->> Would we also need a separate DMA allocation API for allocating
->> addresses intended to be shared with the non-secure hypervisor?
->>=20
->> Are there any existing drivers in the kernel that already require such
->> shared allocations, which I could use as a reference?
+On Sun, 3 Aug 2025 at 07:09, Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
 >
-> The most likely case in the near term is PCI P2P to shared MMIO.
+> Hi Fuad,
 >
-> I don't know any way to allocate shared memory in a driver??
+> I am reading some pKVM code and would like to ask for help on some
+> questions to make sure my understanding is correct:
 >
-> At the bare minimum this patch should be documenting the correct
-> architecture and outlining any gaps in the current implementation.
+> While looking at the code I don't see pkvm.enabled, or now
+> pkvm.is_protected really assigned, is pkvm development going to add the
+> ability to let the user pick whether they want to start a protected VM
+> (host EL1 can't access VM memory and registers, mostly) or not (like
+> nVHE mode VMs) in the future?
 >
-> I also don't really understand what the above code is even
-> doing.. Isn't the design on ARM that the IPA always encodes the
-> shared/private in the top bit?
+> Also, since when running pKVM (kvm-arm.mode=protected) the user can't
+> yet choose the VM to be protected or not, the current state is that all
+> VMs started by pKVM is protected, is that understanding correct?
 >
-> How do we get a shared page that does not already have a phys_addr_t
-> in the shared IPA? Shouldn't the kernel have switched to the shared
-> IPA alias when it returned the swiotlb buffer? eg why do we need to do:
+> Sorry if I missed anything.
+
+You're absolutely right. We are in the process of upstreaming pKVM,
+especially support for protected VMs. As you've noticed, upstream code
+doesn't yet support that. This series is meant to help facilitate
+that.
+
+To get an idea of what we hope to upstream, you could have a look at
+what we have in Android:
+
+https://android.googlesource.com/kernel/common/+/refs/heads/android16-6.12
+
+What we have in Android is a new VM type, KVM_VM_TYPE_ARM_PROTECTED,
+that you would set on VM creation (when running in protected mode) to
+designate a VM as protected. That would set is_protected (or enabled)
+to true.
+
+I hope this helps.
+
+Cheers,
+/fuad
+
 >
-> #define dma_addr_unencrypted(x)		((x) | PROT_NS_SHARED)
+> Thanks,
+> Wei-Lin Chang
 >
-
-swiotlb virt addr is updated in the direct map page table such that we
-have the correct attribute set. For ex: swiotlb_update_mem_attributes
-uses set_memory_decrypted() to mark the memory as shared.
-
-	set_memory_decrypted((unsigned long)mem->vaddr, bytes >> PAGE_SHIFT);
-
-However, when mapping swiotlb regions to obtain a `dma_addr_t`, we still
-need to explicitly convert the physical address:
-
-swiotlb_map()
-	swiotlb_addr =3D swiotlb_tbl_map_single(dev, paddr, size, 0, dir, attrs);
-        ...
-
-	/* Ensure that the address returned is DMA'ble */
-	dma_addr =3D phys_to_dma_unencrypted(dev, swiotlb_addr);
-
-Note that we don=E2=80=99t update the phys_addr_t to set the top
-bit. For reference:
-
-	tlb_addr =3D slot_addr(pool->start, index) + offset;
-
--aneesh
+> On Tue, Jul 29, 2025 at 01:00:06PM +0100, Fuad Tabba wrote:
+> > The 'pkvm.enabled' field in struct kvm_protected_vm is confusingly named.
+> > Its purpose is to indicate whether a VM is a pKVM protected VM, not
+> > whether the VM itself is enabled or running.
+> >
+> > For a non-protected VM, the VM can be fully active, yet this field would
+> > be false. This ambiguity can lead to incorrect assumptions about the VM's
+> > operational state and makes the code harder to reason about.
+> >
+> > Rename the field to 'is_protected' to make it unambiguous that the flag
+> > tracks the protected status of the VM.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 4 ++--
+> >  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 2 +-
+> >  2 files changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 3e41a880b062..55dc7cd83e40 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -252,7 +252,7 @@ struct kvm_protected_vm {
+> >       pkvm_handle_t handle;
+> >       struct kvm_hyp_memcache teardown_mc;
+> >       struct kvm_hyp_memcache stage2_teardown_mc;
+> > -     bool enabled;
+> > +     bool is_protected;
+> >  };
+> >
+> >  struct kvm_mpidr_data {
+> > @@ -1522,7 +1522,7 @@ struct kvm *kvm_arch_alloc_vm(void);
+> >
+> >  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> >
+> > -#define kvm_vm_is_protected(kvm)     (is_protected_kvm_enabled() && (kvm)->arch.pkvm.enabled)
+> > +#define kvm_vm_is_protected(kvm)     (is_protected_kvm_enabled() && (kvm)->arch.pkvm.is_protected)
+> >
+> >  #define vcpu_is_protected(vcpu)              kvm_vm_is_protected((vcpu)->kvm)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > index 338505cb0171..6198c1d27b5b 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > @@ -406,7 +406,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+> >       hyp_vm->host_kvm = host_kvm;
+> >       hyp_vm->kvm.created_vcpus = nr_vcpus;
+> >       hyp_vm->kvm.arch.mmu.vtcr = host_mmu.arch.mmu.vtcr;
+> > -     hyp_vm->kvm.arch.pkvm.enabled = READ_ONCE(host_kvm->arch.pkvm.enabled);
+> > +     hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
+> >       hyp_vm->kvm.arch.flags = 0;
+> >       pkvm_init_features_from_host(hyp_vm, host_kvm);
+> >  }
+> > --
+> > 2.50.1.487.gc89ff58d15-goog
+> >
