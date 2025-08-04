@@ -1,166 +1,241 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECB51EB5DD
-	for <kvmarm@lists.linux.dev>; Mon,  4 Aug 2025 14:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754318881; cv=none; b=B9qadGZzdJwDZH8KcuDYWkcNoNK2u4gJZUy/Jtu6fLt3cWP72E/9TwlA62Y7IvilM+YGCQhLvGbBz7qaddR73EZk/jYDYppkKz1QkoV0S8xk4E7Mm7gNBAOHLrIEfLaiJ5emPZ2LZFk1+P+dyFatZw7YCbvN3v5YuwcpsQNBR8o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754318881; c=relaxed/simple;
-	bh=tRnh4pGZAMs0ZMK796mJ6/fWGo5O49/gAs0OJw7S6D8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uh2AWjulKxk2iUVgqkZsc9+4CzyTVuORja296Y+YOBQi84JNOuElw25QGTZxhB6FP2Q+Se0+XvuR6T82Eki3GfkQp00ccINa6NbPE+FltuZekFeSKZsiUu3OEi/VCpVF3edIspqkXqdx8vwxAQIyA2wnHsl44gD9vkmSY9xfNq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010052.outbound.protection.outlook.com [52.101.69.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6171D2C190
+	for <kvmarm@lists.linux.dev>; Mon,  4 Aug 2025 15:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.52
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754319828; cv=fail; b=FGgmGGKFm/m8FJYXXy9WWR/i9VOB70W4r7IsgEG1VWKZBlBeeBJOle7DaENFDkaT8gntUKmj0RO4Ao1U28dDa6GGlT265PaRlWyroP2pvKsoafqvZObZ/9ezvFio4pcOmoT9BX2tcMbDajt4owrNVDfNZNW2r4CKtDAHFpnqjlQ=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754319828; c=relaxed/simple;
+	bh=40/9PnpERQHHUjBiKguh2AbDR3zs+yum+urw0lzc+I8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=er2tFpVH5ket8/o97MDU9Ef4mSIzSl5hrcfSyZoym6lkRTGPUQKF+Ts0F+KgG9XclPj3cGynMuYUW5EZ+l/XJnlIh5ry+e4VTB0U4YWmvlKpgTqMvhfxk5LfMVSLDr4cvbZFj6zwQvS2XV07ZopBosyU4EDQhWAhDvXruybqZ0o=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SHicY9eG; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SHicY9eG; arc=fail smtp.client-ip=52.101.69.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08541150C;
-	Mon,  4 Aug 2025 07:47:51 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE7763F738;
-	Mon,  4 Aug 2025 07:47:57 -0700 (PDT)
-Date: Mon, 4 Aug 2025 15:47:55 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>,
-	Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH kvmtool v3 6/6] arm64: Generate HYP timer interrupt
- specifiers
-Message-ID: <aJDIG8cJQjzbwj3w@raptor>
-References: <20250729095745.3148294-1-andre.przywara@arm.com>
- <20250729095745.3148294-7-andre.przywara@arm.com>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SHicY9eG";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SHicY9eG"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=F+WilQL9R9mTBm8wIiCSfWHPnCYKPmEP03jjFkJ5sAsuZfJQnNvhU9aJ3FxZSvmuWxa6SWs96GSm+xdktVJvo0k8D1QwfmUnCjab6iSn7H8swBiXdjw9e3EYfREDPNerRp5liWGz0qkmauZ2jXPA5F7rDghLSlp0AWuVqZtXFGeX8AKkkOtWD2Ur4aIqqtklsskimaR2uKTSH6EDmRAUSnpz48mf2+6XpbGs8L642sjhygGNAdqqZ/PuqOhmpWoow7vi4lOUa2SuvgliuVPzIksUgSaWWI4H28BnqCwvEUceeJh9kOuU9wdN7TNIuE7snIzlUKS2qWeeqWwc7co4rA==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=w0tTGKAS/E8ofpb5WcCjGZ8pOSobw+Dvjf1Mj9Z7A58=;
+ b=A2sPI7NA243V3ArnUngTDA5+vmKAKtAK/84Q4JuDi2I0Jpp82cRUZK3V9Cb9sk2brSgxjGfHCPJQNQGj8DJJftsX/9xIQTYTKtOp0TddgEk3ciUCMyrR5OyDW6uFsapDG3PCf2hgBX+gj0PcrhP2E4ivNSGBY7PMLrew/u+Luz0AC4JcqS3PMCgPwOMBH8slHZPeDYqKh6l8RmeHEhIf6jMt9Z4Yfy5wquSG9H9ButNkMrze09OrIYUcRh+1W6cQC5REEbuFcW7zZoDLo9FgUdfU3I7+tpsf2gh3gewF7zJWYc5OPIEEyeKPHx7CMOdxjwww5TSq1EagRJBTqO5WhA==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
+ (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w0tTGKAS/E8ofpb5WcCjGZ8pOSobw+Dvjf1Mj9Z7A58=;
+ b=SHicY9eG4cHJomJlFN4Xx2DFneJ9wyqUcBgPZkGmeXdB+wGgdXziraAoJ78N4ngyjdOibhTMH2ctRNwxtQ41mZ72zNpoA1PEfA11IhdEzmqKeLrOunuY+byFbnj69BHvBy31p3q7Lt/Yg1iPAPkK9U+GrRqalTEbeuvFOeuXNG0=
+Received: from DU2PR04CA0213.eurprd04.prod.outlook.com (2603:10a6:10:2b1::8)
+ by AS8PR08MB9314.eurprd08.prod.outlook.com (2603:10a6:20b:5a5::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.20; Mon, 4 Aug
+ 2025 15:03:41 +0000
+Received: from DB1PEPF00039233.eurprd03.prod.outlook.com
+ (2603:10a6:10:2b1:cafe::9f) by DU2PR04CA0213.outlook.office365.com
+ (2603:10a6:10:2b1::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.20 via Frontend Transport; Mon,
+ 4 Aug 2025 15:03:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ DB1PEPF00039233.mail.protection.outlook.com (10.167.8.106) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9009.8
+ via Frontend Transport; Mon, 4 Aug 2025 15:03:40 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uM+z93E2JKzbO989JJz417QK9oB/BPhuhn+4DWOuU/7VqdCbZ/tU6OfJAgkDLkvcKZ+58w+cXHyVMCxaVCupv3qs5tZVMnGlOuIgBnUM3fOaGOdMskV5dkrrUpEuuZCRAk87Oov/lr1Pl73DdoB/18Ng0w1GR1pOhFUBQnPY80f0SLFyj/i38lJqU2j4nSdIZ1sYkrALZbL/i8bELP8JQNMmJ6W7Zmr9yMPoxn+Au+bCAt1XKsV6JOiah24pWRh+5F+xmjEwkxVaYGDDMSzJI1Hlv3nO33adhToO1Cd50DxhuqeDJZZ0PA/+Ss00duMtaAGB2G6BeMPOLKhFdZY6mw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=w0tTGKAS/E8ofpb5WcCjGZ8pOSobw+Dvjf1Mj9Z7A58=;
+ b=woo7PdGZx2yskqo8XUhlnSeO9RGXHxB96FxHdFGDUiOZlKzbTsIYrSqRLRCcDJD/x8Vbq5ssxzQnS8HygdEAqjULsUMBQtf/0MW/XC4+Snq6k/ZOC4OhvCOPvsP7cw3kYIROh7KizBfUwX6hJoOMuXW98fzoaFI+c/kRFQ+nJoVhfAdHWH1efllHLxwSpnk7mOEqvOIz/YHEgn2AfjCJLiH//WPoOnbQl+ZHlPf5Tdstf2QatnjbcXspQY/9m07khAGVBwIv4Eu4Hlo5c6OBp7Zma/cg3BTrVX4tvaNXT9umisRhNjIqQzUMvGI+3D9X2BHQyg0ZoslsbN0V4bzfkg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w0tTGKAS/E8ofpb5WcCjGZ8pOSobw+Dvjf1Mj9Z7A58=;
+ b=SHicY9eG4cHJomJlFN4Xx2DFneJ9wyqUcBgPZkGmeXdB+wGgdXziraAoJ78N4ngyjdOibhTMH2ctRNwxtQ41mZ72zNpoA1PEfA11IhdEzmqKeLrOunuY+byFbnj69BHvBy31p3q7Lt/Yg1iPAPkK9U+GrRqalTEbeuvFOeuXNG0=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
+ (2603:10a6:150:163::20) by DBBPR08MB6220.eurprd08.prod.outlook.com
+ (2603:10a6:10:205::5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.20; Mon, 4 Aug
+ 2025 15:03:07 +0000
+Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
+ ([fe80::d430:4ef9:b30b:c739]) by GV1PR08MB10521.eurprd08.prod.outlook.com
+ ([fe80::d430:4ef9:b30b:c739%7]) with mapi id 15.20.8989.018; Mon, 4 Aug 2025
+ 15:03:07 +0000
+Date: Mon, 4 Aug 2025 16:03:03 +0100
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
+	oliver.upton@linux.dev, anshuman.khandual@arm.com, robh@kernel.org,
+	james.morse@arm.com, mark.rutland@arm.com, joey.gouly@arm.com,
+	ry111@xry111.site, Dave.Martin@arm.com, ahmed.genidi@arm.com,
+	kevin.brodsky@arm.com, scott@os.amperecomputing.com, mbenes@suse.cz,
+	james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org,
+	pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 10/11] KVM: arm64: nv: support SCTLR2_ELx on nv
+Message-ID: <aJDLp+2Tuv7SMxK7@e129823.arm.com>
+References: <20250804121724.3681531-1-yeoreum.yun@arm.com>
+ <20250804121724.3681531-11-yeoreum.yun@arm.com>
+ <86pldb6xkl.wl-maz@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86pldb6xkl.wl-maz@kernel.org>
+X-ClientProxiedBy: LO4P123CA0557.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:33b::13) To GV1PR08MB10521.eurprd08.prod.outlook.com
+ (2603:10a6:150:163::20)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250729095745.3148294-7-andre.przywara@arm.com>
+X-MS-TrafficTypeDiagnostic:
+	GV1PR08MB10521:EE_|DBBPR08MB6220:EE_|DB1PEPF00039233:EE_|AS8PR08MB9314:EE_
+X-MS-Office365-Filtering-Correlation-Id: ebdc12ba-669e-4a47-c591-08ddd36818e3
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info-Original:
+ =?us-ascii?Q?pHVTFO2kUubWU5YYEfdgJiN71OXOiQ+V4Dq/sKv9d2G0uexboBebdjteBIgQ?=
+ =?us-ascii?Q?G0PGiwGtkvqRfRZkvK6+lqdxQ/ih6Om6BTWDD1+YtD1HSfLGVeaFpRHjkGh1?=
+ =?us-ascii?Q?gQm25ojDax368nyYWCY8dp/DfHWbGKVGuR2xxMg0iIiOZJJmVyOYaVZVAgzG?=
+ =?us-ascii?Q?gkBmNe+EXAtQEZaXa6Tt0wxX5DgaWMUZuPNTfnNA6M2bdJtPwUtFEaW+FueH?=
+ =?us-ascii?Q?YHWuBXNxMPRB21B9zu1ZBZu4/SeYMdp0DZyobdSE8gMjcZ/WCRBnyJi9L3pe?=
+ =?us-ascii?Q?SQNXCm1y7KhiNuuyrc6KZfgt+q4OLAMh6NYs0cwCq2YauUjPyAoEita+jveN?=
+ =?us-ascii?Q?o412PrFvcMF0PnbYm030T6C43dKNbmi1DUtQeQfdaIyMzAl1+xLglMYxaiV5?=
+ =?us-ascii?Q?QizzmGdZG4NM7/9/BQwMFGl5qdJqZSQF4+MctdjeH9Jc8L+P3wEHi3tPAyuy?=
+ =?us-ascii?Q?iif526/WN8UmJPDBXpdMVtjzCMXPHn5NwuxsMbBqLoHN3A2FcLe+36/r7xP2?=
+ =?us-ascii?Q?woLHt48/vGBjHOQ/qZyTKHQFlbs0TSsO5ggvIf2GIrj7+XtZN0eRu0LvemxT?=
+ =?us-ascii?Q?Pw+4A3wdgJDARChGXfI9Y3mYe87J1PCYmHvCjmF7SSshJDPi15Kn0yGXsz6t?=
+ =?us-ascii?Q?H9EtKZmdVL9wUD7KD3cI6RTA8ffMP5BblOGrKf1O4bZtO0YItgAz8/Y1zj1/?=
+ =?us-ascii?Q?fyj8XJVgzZkOtCJWHTUvBfUD+LZ3BzPyIEwzHyATfR2idXCpGbSOZYwgYNO1?=
+ =?us-ascii?Q?5KnqaMzKwHgFPhUdt/9J6tTswnJ9GC71EyhnuWn9a9OOTzeO3+rM0s4uHuGJ?=
+ =?us-ascii?Q?AdC4OSDq2RFjH2GRrU0uwMSnMNJc9lliBMmmHovR92CvuoLCUqD1f9mEwYpY?=
+ =?us-ascii?Q?GqQ7AlYfcBhT2Rkq85oITVNv0uIvr1pg3aqzOoK2XbUnqsqgXv7P3OmG4xPg?=
+ =?us-ascii?Q?1J0sJC8nkOD5CQnkd+CoB4hU9s8eprZNxI0jswT87QpzV3bnVmNHUe5i2Ptw?=
+ =?us-ascii?Q?Ttf8aW/RIcpVbHu+DDmBlsELTAD/wJYFBtd7jJla8tZG+uwLSyAnsQBPZdfn?=
+ =?us-ascii?Q?4pbMBl/Y7u9087QgyFU3mBo045ItlaXzLy7deJTYeIkbrKjH1/2ZgtA5H0hT?=
+ =?us-ascii?Q?U8/IOCQZ9EfLT4MZc2+DryG122KIGH0+gknM7aiPoUtMkA1V/SRXMw2qDe+C?=
+ =?us-ascii?Q?UBFSB07YSdTRWrna+eHm38w9yRT5jnunvHSpHy6eLOfL0Me+FdBFMVvgZBVg?=
+ =?us-ascii?Q?gXqe6xUmo0TRY3SYUlv4VTy9nkhKxOaMEKvbBCULy/ddvusgijtfeXWbffxn?=
+ =?us-ascii?Q?f30CdAZuS1Cj+mNA6IWh2q074CN+ejl2udFkKLs+m88IQFp0aQ4dnp3oxroT?=
+ =?us-ascii?Q?/RNztxXgyQAbFaZYA4fklDd3Ek+zEaxX/jlB0c2dHHfec7tprQQfOL4PdI3l?=
+ =?us-ascii?Q?dHE0JKgNn+s=3D?=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB6220
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ DB1PEPF00039233.eurprd03.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	091177b6-e9f2-47c0-3096-08ddd36804ef
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|35042699022|82310400026|14060799003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?bQolujlGxB8O7t6nx4Ntv9NOUdiMa3PJBKqe/J5f23sHw1RPUuSKtj2vwMrK?=
+ =?us-ascii?Q?OC181l2HtoTnC9EJScTM6gV19Q79bhh2XJkUcAWxalpYOFQ1i1sA4T+KmnPN?=
+ =?us-ascii?Q?mm1qwvsQFC9VI3q8brDuG7eW5ssJ3nNz6+GBunaOJX0ePpYu6LnRo1Aj3htu?=
+ =?us-ascii?Q?Nr3kkLQMYUNTFFPVc4EpeufBmow9YmY7hK/CcW3R0SkTmqdMiL2YYz1rzTqI?=
+ =?us-ascii?Q?kU109GIl5gCi7ZHhJjHV0ybXAgO74Orcgm7+3iUCyzthyNy4nPZldEcQw+FA?=
+ =?us-ascii?Q?8riCwKBRce6tjwgCe2OvKUykwtXhhD1rEhJ9Z1rhqezqWZe7U1N6pLX36V7f?=
+ =?us-ascii?Q?jvGpeKmggVEt2i5RnN0PxV6w4gb0tyY6JPBEPtCsWEEUI6udyH3/6jIXaJy6?=
+ =?us-ascii?Q?Oz+OeDRP3cS+cDUNA9CaFrRM5lMCxJjhbaoDHP9dq+s+Im0ZcX8KtyLslaA3?=
+ =?us-ascii?Q?8584M5PgiUkTKfgM92SH8mYGUJFP3EUHnBcXeWVP4S4O5pZt/F8oLkqYkdHY?=
+ =?us-ascii?Q?2Or1p9rSXW0znjtBiDxkXSF6Wp50ntdIZbnOpoFpI8+g4pfanXKCiQhnP4He?=
+ =?us-ascii?Q?Yjv6TXcOqz0jo2Z3za79l/WufAM8FQoUkiVWm6skldb/U6aGJzjhucPZa6C9?=
+ =?us-ascii?Q?f/kAOy2pZS2s1FABM8v1FTuN+b4tlF1+9tElEaxIBl85NNvqH1V7CLY5r8qS?=
+ =?us-ascii?Q?xsx9MGxbcnylw2av7MgF8Iwmn8jVePyKrbtDZp4V7dPAuVPHHBptgWI0UetP?=
+ =?us-ascii?Q?FLzFzRkQa3m8b1i/TXa20HsgnlZyxRIFUrzZC/ex17pFpQp+HDh9aiw4yfBU?=
+ =?us-ascii?Q?NkR/c/VL86AuLno8HLikcDbmEObhR4vhCNoo2ig1F74aONP0UGzS+HzefyfD?=
+ =?us-ascii?Q?RbjGU+pvh7U8zL0vdUyK68gfmrRa+04uK2v9uSrFRga433M3WJKswGclS7Ns?=
+ =?us-ascii?Q?guLAe/biyCoU7Yc4ZQOyWLhhojfvf1MJHRzPr4ilev6YVBuJVU0sar8PhjId?=
+ =?us-ascii?Q?dqs44j+2B2ty0DzoFKiC8mY8bVK+3QHNzevv6J96fCa3m6GVYCOyhkcmuvfQ?=
+ =?us-ascii?Q?MCNK5mLThTMD79q+Z7Oed47Gmdh1ct9D9tb9oj+ZykrXWWh4cRS/FtkrflOr?=
+ =?us-ascii?Q?yKueHa7uFkB/LS9fyxcUTbI2ftEXkMB0lXGW8njt/o4RQoTPyS9ALJhcG4MV?=
+ =?us-ascii?Q?uvMvEPz6qxLcDfkljqrx39AT0C/l1dBrGddbNUepUHr+VemjbWOumTMi9NQl?=
+ =?us-ascii?Q?WILubona1MJCOfSHUAPro9o0xMsecRKeBwU+iX5uqibt5P/KiVXnaMhI+WjH?=
+ =?us-ascii?Q?qBujLl5dEY6REeFiWAdpGKz+IxCu9CRm7jzVmUeEgVGwBtnmaiZEXxIHaXER?=
+ =?us-ascii?Q?aEB2MDHXLvWx/D9GP5f/K/hYSi2pEF82or3hwvvmX6f9lEgdv2n4n91JikG+?=
+ =?us-ascii?Q?ZKaacQ+K/68IUNxgSAezfBoqfLUoKpcUNY0pbvBEgTTSMeUkLo5xuuOwOYnE?=
+ =?us-ascii?Q?2uf4xv2K46Maj8Mnv2esZl518G4SC5Qk7PTf?=
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(35042699022)(82310400026)(14060799003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2025 15:03:40.3105
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ebdc12ba-669e-4a47-c591-08ddd36818e3
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF00039233.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB9314
 
-Hi Andre,
+Hi Marc,
 
-On Tue, Jul 29, 2025 at 10:57:45AM +0100, Andre Przywara wrote:
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> FEAT_VHE introduced a non-secure EL2 virtual timer, along with its
-> interrupt line. Consequently the arch timer DT binding introduced a fifth
-> interrupt to communicate this interrupt number.
-> 
-> Refactor the interrupts property generation code to deal with a variable
-> number of interrupts, and forward five interrupts instead of four in case
-> nested virt is enabled.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arm64/arm-cpu.c           |  4 +---
->  arm64/include/kvm/timer.h |  2 +-
->  arm64/timer.c             | 29 ++++++++++++-----------------
->  3 files changed, 14 insertions(+), 21 deletions(-)
-> 
-> diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-> index 1e456f2c6..abdd6324f 100644
-> --- a/arm64/arm-cpu.c
-> +++ b/arm64/arm-cpu.c
-> @@ -12,11 +12,9 @@
->  
->  static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  {
-> -	int timer_interrupts[4] = {13, 14, 11, 10};
-> -
->  	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip,
->  				kvm->cfg.arch.nested_virt);
-> -	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
-> +	timer__generate_fdt_nodes(fdt, kvm);
->  	pmu__generate_fdt_nodes(fdt, kvm);
->  }
->  
-> diff --git a/arm64/include/kvm/timer.h b/arm64/include/kvm/timer.h
-> index 928e9ea7a..81e093e46 100644
-> --- a/arm64/include/kvm/timer.h
-> +++ b/arm64/include/kvm/timer.h
-> @@ -1,6 +1,6 @@
->  #ifndef ARM_COMMON__TIMER_H
->  #define ARM_COMMON__TIMER_H
->  
-> -void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs);
-> +void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm);
->  
->  #endif /* ARM_COMMON__TIMER_H */
-> diff --git a/arm64/timer.c b/arm64/timer.c
-> index 861f2d994..2ac6144f9 100644
-> --- a/arm64/timer.c
-> +++ b/arm64/timer.c
-> @@ -5,31 +5,26 @@
->  #include "kvm/timer.h"
->  #include "kvm/util.h"
->  
-> -void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
-> +void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  {
->  	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
->  	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
-> -	u32 irq_prop[] = {
-> -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-> -		cpu_to_fdt32(irqs[0]),
-> -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-> +	int irqs[5] = {13, 14, 11, 10, 12};
-> +	int nr = ARRAY_SIZE(irqs);
-> +	u32 irq_prop[nr * 3];
->  
-> -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-> -		cpu_to_fdt32(irqs[1]),
-> -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-> +	if (!kvm->cfg.arch.nested_virt)
-> +		nr--;
+> [...]
+>
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index dc1d26559bfa..a4d3b2d2fd80 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -1704,6 +1704,19 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+> >  			 TCR2_EL2_AMEC1 | TCR2_EL2_DisCH0 | TCR2_EL2_DisCH1);
+> >  	set_sysreg_masks(kvm, TCR2_EL2, res0, res1);
+> >
+> > +	/*
+> > +	 * SCTLR2_EL2 - until explicit support for each feature, set all as RES0.
+> > +	 */
+> > +	res0 = SCTLR2_EL2_RES0 | SCTLR2_EL2_EMEC;
+> > +	res0 |= SCTLR2_EL2_EASE;
+> > +	res0 |= SCTLR2_EL2_NMEA;
+> > +	res0 |= (SCTLR2_EL2_EnADERR | SCTLR2_EL2_EnANERR);
+> > +	res0 |= SCTLR2_EL2_EnIDCP128;
+> > +	res0 |= (SCTLR2_EL2_CPTA | SCTLR2_EL2_CPTA0 |
+> > +		 SCTLR2_EL2_CPTM | SCTLR2_EL2_CPTM0);
+> > +	res1 = SCTLR2_EL2_RES1;
+> > +	set_sysreg_masks(kvm, SCTLR2_EL2, res0, res1);
+>
+> This patch is obsolete, but I'd like to point out that this is not the
+> way we describe these things. Each bit of the register needs to be
+> tracked against the feature it is part of, and not blindly added to
+> the RES0 set. See
+>
+> https://lore.kernel.org/all/20250708172532.1699409-15-oliver.upton@linux.dev/
+>
+> for the equivalent change.
+>
+> You should *NEVER* describe a functional bit as RESx without
+> considering whether the feature is exposed to the guest, irrespective
+> of what the kernel supports.
 
-I'm confused.
+Thanks to let me know.
+I'll keep in mind :)
 
-FEAT_VHE introduced the EL2 virtual timer, and my interpretation of the Arm ARM
-is that the EL2 virtual timer is present if an only if FEAT_VHE:
-
-"In an implementation of the Generic Timer that includes EL3, if EL3 can use
-AArch64, the following timers are implemented:
-[..]
-* When FEAT_VHE is implemented, a Non-secure EL2 virtual timer."
-
-Is my interpretation correct?
-
-KVM doesn't allow FEAT_VHE and FEAT_E2H0 to coexist (in
-nested.c::limit_nv_id_reg()), to force E2H to be RES0. Assuming my interpretion
-is correct, shouldn't the check be:
-
-	if (!kvm->cfg.arch.nested_virt || kvm->cfg.arch.e2h0)
-		nr--;
-
-Thanks,
-Alex
-
->  
-> -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-> -		cpu_to_fdt32(irqs[2]),
-> -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-> -
-> -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-> -		cpu_to_fdt32(irqs[3]),
-> -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-> -	};
-> +	for (int i = 0; i < nr; i++) {
-> +		irq_prop[i * 3 + 0] = cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI);
-> +		irq_prop[i * 3 + 1] = cpu_to_fdt32(irqs[i]);
-> +		irq_prop[i * 3 + 2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW);
-> +	}
->  
->  	_FDT(fdt_begin_node(fdt, "timer"));
->  	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
-> -	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-> +	_FDT(fdt_property(fdt, "interrupts", irq_prop, nr * 3 * sizeof(irq_prop[0])));
->  	_FDT(fdt_property(fdt, "always-on", NULL, 0));
->  	if (kvm->cfg.arch.force_cntfrq > 0)
->  		_FDT(fdt_property_cell(fdt, "clock-frequency", kvm->cfg.arch.force_cntfrq));
-> -- 
-> 2.25.1
-> 
+--
+Sincerely,
+Yeoreum Yun
