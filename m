@@ -1,86 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB33623817D;
-	Mon,  4 Aug 2025 12:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A7324DCE5;
+	Mon,  4 Aug 2025 12:37:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754310267; cv=none; b=IgZ73GF4898gPcKgd/SyzYLDsvK+tGfRyO/ZsbRo80UFInyGHW8qjTi6eY5DeSIbE1/n1upHVr9HGR26Iexh3e8t56dIBr9I2w7vTuVKq5p6ALIRiOYIohb/zfsjmSrwfVdIjJ4GdRTdqSJxEVWlCj6VJWllT9WakSn6sVCTMTw=
+	t=1754311048; cv=none; b=oCJVJWi+dcmoqWaGI7RWu7FV9dep7yesuREmwL7feU9clzOwTj5+oJOqnRGp9Y97/ZnxLF4Xy7KNrqzmqCfvRnNFb2wfRLlOrCP3jUkEmzeU/ffjoxGfJkKhkGZ0JktdedH1fEDhJPVTYsld9W+JfPKIcy+ARRF5s+PfWh6j1oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754310267; c=relaxed/simple;
-	bh=bkwZgyJhQDmHzonI+LQ1V7J2vFMO9gc7MkhZX5tyXMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p2KWE/G7fv6YnFXGibcslB4MYCgCF9/nsFfNtD/N9QpUeZakRTCP8NXlAOP5h3gj5kp86wQ+GvN3XNNCp5vUP019W2TjL1aXZIQMWnGoE4ViNKFXYXg3PylVwMC9iywRDE9OiNC8sGZfleI/0zSEDvSCKZY33i2yo62eOAEqrd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tfybmt22; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754311048; c=relaxed/simple;
+	bh=8364lKVjSLoE/C4yuz2dcYUZ0SL1p8n0c26MfIf5a78=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OBqK+MgYJZWP7RYoQzjaRMG//aipyrj/OP9rJ4SnunRRr+eSoHeY7VaCbqgPx4jGWp1kMigu6eymVr9ogPHSrXoOQG8XWaxK9VTJikJkafoAUPguikZNFx2LXQA+hWPa5rCRUeiFRvgeJXfZ0z3L2VyhD552/9kda6Wdboo8E3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCftZlo7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tfybmt22"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79BCFC4CEE7;
-	Mon,  4 Aug 2025 12:24:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCftZlo7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94521C4CEE7;
+	Mon,  4 Aug 2025 12:37:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754310266;
-	bh=bkwZgyJhQDmHzonI+LQ1V7J2vFMO9gc7MkhZX5tyXMQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Tfybmt22jKHdfyRIKUevHxxBDRWk6mGh7Z2yGNPtcNyRcX65OLSLQMBYVRM1e6Kqq
-	 BtuviDfu/KqvYKp6VQEQgCIqw5GBeWsAQ4FqI3XNbTFQrQH3CKw71tl495dF3qBWz8
-	 OuBHUfhCdMSZWmmmifuYzlHBjhY0ty/5mEqBTE3r2oOzd2kh57SaubiGtsGygsAFbQ
-	 W3tSv0ta5vjhK2nugqpk3QWAxapBx9JJhfFUuM0JsAOiSGJoxtNAcvReajQOOPOFxv
-	 /oHGbMoZInw43o2I6GX5ByrYr10Wj3I0CmkGbvZEOj+eEpO4QlF1N8N3nIUoORzO4a
-	 3Wat6twnEyyow==
-Date: Mon, 4 Aug 2025 13:24:18 +0100
-From: Mark Brown <broonie@kernel.org>
+	s=k20201202; t=1754311047;
+	bh=8364lKVjSLoE/C4yuz2dcYUZ0SL1p8n0c26MfIf5a78=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PCftZlo7iQ3hCmDco0y44Mw8TLIDghTi1MRqE3nS9mdUNuzwmQQ5Zg2hh96m/VUA1
+	 u9WkrQGn8SVWhZwMuBnV6T1qgpU7W2LXbMgiqY+/406oLEwdSB5iOlJMfY+ZtKZnd+
+	 KbZ9jMqZiLZMW/78ARACB/lYGX4T5wN+kpjW/W/J1lZMJtm9pgh0vzTmw+n01R7QD1
+	 xT8THOp7AxnRcBJASHIRePnWFTFqT7N6jns4vOnMZS4FZrsQB7kapbFncF6wBetHXe
+	 h2lxPkJ5N2O16hgbWL+Kh8cdpwwVIPoy+NDyuIKddrkZbkjCPui6317a1xaKVJajbs
+	 gGkUGDB7BYvVQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uiuRQ-003nlf-Th;
+	Mon, 04 Aug 2025 13:37:24 +0100
+Date: Mon, 04 Aug 2025 13:37:23 +0100
+Message-ID: <86qzxr6z5o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, anshuman.khandual@arm.com, robh@kernel.org,
-	james.morse@arm.com, mark.rutland@arm.com, joey.gouly@arm.com,
-	ry111@xry111.site, Dave.Martin@arm.com, ahmed.genidi@arm.com,
-	kevin.brodsky@arm.com, scott@os.amperecomputing.com, mbenes@suse.cz,
-	james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org,
-	pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-pm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH 01/11] arm64/sysreg: add system registers SCTLR2_EL2
-Message-ID: <8451ed4b-7881-44b5-84a8-51cdfefff464@sirena.org.uk>
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	broonie@kernel.org,
+	oliver.upton@linux.dev,
+	anshuman.khandual@arm.com,
+	robh@kernel.org,
+	james.morse@arm.com,
+	mark.rutland@arm.com,
+	joey.gouly@arm.com,
+	ry111@xry111.site,
+	Dave.Martin@arm.com,
+	ahmed.genidi@arm.com,
+	kevin.brodsky@arm.com,
+	scott@os.amperecomputing.com,
+	mbenes@suse.cz,
+	james.clark@linaro.org,
+	frederic@kernel.org,
+	rafael@kernel.org,
+	pavel@kernel.org,
+	ryan.roberts@arm.com,
+	suzuki.poulose@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 00/11] support SCTLR2_ELx
+In-Reply-To: <20250804121724.3681531-1-yeoreum.yun@arm.com>
 References: <20250804121724.3681531-1-yeoreum.yun@arm.com>
- <20250804121724.3681531-2-yeoreum.yun@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="QXyWowRG1xuUZNLB"
-Content-Disposition: inline
-In-Reply-To: <20250804121724.3681531-2-yeoreum.yun@arm.com>
-X-Cookie: Shading within a garment may occur.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yeoreum.yun@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, oliver.upton@linux.dev, anshuman.khandual@arm.com, robh@kernel.org, james.morse@arm.com, mark.rutland@arm.com, joey.gouly@arm.com, ry111@xry111.site, Dave.Martin@arm.com, ahmed.genidi@arm.com, kevin.brodsky@arm.com, scott@os.amperecomputing.com, mbenes@suse.cz, james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org, pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Mon, 04 Aug 2025 13:17:13 +0100,
+Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+>=20
+> This series introduces initial support for the SCTLR2_ELx registers in Li=
+nux.
+> The feature is optional starting from ARMv8.8/ARMv9.3,
+> and becomes mandatory from ARMv8.9/ARMv9.4.
+>=20
+> Currently, Linux has no strict need to modify SCTLR2_ELx=E2=80=94
+> at least assuming that firmware initializes
+> these registers to reasonable defaults.
+>=20
+> However, several upcoming architectural features will require configuring
+> control bits in these registers.
+> Notable examples include FEAT_PAuth_LR and FEAT_CPA2.
+>=20
+> This series is based on v6.16 and probably KVM-safe but
+> Not tested yet:
+>   - nVHE boot.
 
---QXyWowRG1xuUZNLB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+"Probably" and "Not tested yet" are not exactly what we are looking
+for when looking at a series that adds support for a new architectural
+feature.
 
-On Mon, Aug 04, 2025 at 01:17:14PM +0100, Yeoreum Yun wrote:
-> Add definitions of SCTLR2_EL2.
+Also, a lot of the KVM patches are redundant now that we do have
+FEAT_SCTLR2 support in KVM (see what has been merged for 6.17). You
+probably want to rebase on -rc1 once it is released, which should cut
+the series by half.
 
-When adding registers it's useful to quote the revision of the spec
-you're referencing, this helps people doing updates in future (eg,
-DDI0601 2025-06).  The update looks good:
+Thanks,
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+	M.
 
---QXyWowRG1xuUZNLB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmiQpnEACgkQJNaLcl1U
-h9CcBwf9GiP4bpNbz/SUgAbK7e4d1KY3dHM9fA/NoEjouAyr3z4GGftmo0j+u+3l
-f+F3EdQYM8DAzRw1pn++ykB92zaa4SYpdk/cWpzHI8KY2R76m9odebfutA84O/qA
-ixu7DHD03Bjd0ZRjpb9SXMu36HT2rpnuP4qpZ1msZjunX5jmWPHblZ8cI91go/VJ
-GSHSrFn8dCzf2rTYuJWWVhicxorOZDU2/d075LBvOTwMGV1dvPVbl6wiCm88qx3b
-JfbIPlNgjvnGe0fIkzX5QbciX3m7zJg1/DlI4VT/DXzW5Bss10Pe8YIjfPDfzoyI
-8XlJablGPqi24NGkLmS8euCOqArX/Q==
-=m8fU
------END PGP SIGNATURE-----
-
---QXyWowRG1xuUZNLB--
+--=20
+Without deviation from the norm, progress is not possible.
