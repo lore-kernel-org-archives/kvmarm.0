@@ -1,124 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAF71C5D59;
-	Mon,  4 Aug 2025 08:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4537E22D7B6;
+	Mon,  4 Aug 2025 10:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754296141; cv=none; b=oaDOo2rG2wAHLXLwHTSKnGiuH1uF8HLpiXPe+w2nDT8dQj45J9dTUSRQHeMUuKrhC4toHij7toH7BN6X1fah4a81nzgHO4/6zjCByl7W7KWRRRh6pFiEljrQ3WjXL1NZcG8Koqd4uWJagaV0jv030rVs7C8tLnroCAHtWkWXTz4=
+	t=1754303024; cv=none; b=MEzLFyQA7e0VMFL4HJeo7EjFRBcISQW+5rKK04BofS2FPvYqXIzRjDBT8cBlqa1GVpimrZCvJlMI2L4jcj31dFW/9HutHFkAs8FWA9FsIYrYtQqcxWQCVaE6pa73/O1N3Xg1B7V2Hj2dJS/VxxC8H7FlDA91ZMbwxVttnFtZHOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754296141; c=relaxed/simple;
-	bh=DwOZcfM/c4GuDZJmEoD7EL7622q+//Noz+SL9yl0crc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BEV5RGi9NyzoHnV5dck62rj+AETLU6mHsgBHcUDloEPyQBMp4tvL7+dpkzVMX9Hp6z3vqUre/DKfGfYXD22XDrY5BqqIODHkIiBWgIqZ3d9pxXXhfkkx5zUK64Owe316zurGT0TJA3xFKLM1i+kJXtqjBwXQu1yCCVnIUPEZGC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HpagILEA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754303024; c=relaxed/simple;
+	bh=X1VUhgt8QW/ZfVr4EXLGfxcOIQqMZmFuJ0KQugFBrP0=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G3Jt0bFwdAxMDRH3PTO4nKdyK4GCcZlPFscV4aIRHxVfwxU3wvtaEUPNEVTedaxwEt8OpjDXo6ggi1xE0OC9tKmPTjZRUjCUbE6+UgEacZ86xrzSqxoMcQLUKOSXhibdwggNCrXamW8yoeTRwqJ+h+k2CIooff/PhxX0Knc5vYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=krZ916p6; arc=none smtp.client-ip=119.8.177.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HpagILEA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8998C4CEE7;
-	Mon,  4 Aug 2025 08:28:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754296141;
-	bh=DwOZcfM/c4GuDZJmEoD7EL7622q+//Noz+SL9yl0crc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=HpagILEA7gkYNsLZm0Bv8HzL64baPebYPjFllMETO/c0GOZi9K+zwAWKiiFjPq67U
-	 4FbMqDBpQABKMYxSRP8/mQndLaSdew0ux4N+mSl61oxDw+FJozL/Ecbfo50pqTUD/6
-	 ibPeSBPpnpVy6Uxh+jsjCDMO6qlR/ikmSuFIrwaYFkJYYHOCEtISRIk1Mh5X2p/2Qr
-	 Xrae55a2D+ovzA3t9t6V8IuedpbrpX/ZhYmKodBSMhSuJErLAVwyjufFaYXw6wqT2Z
-	 miC3msw+hG+O2AbbYMVinPft9CGYv1/n6oy/+y0Er7YXjGqivdyd6ZqIhSNZqIj2YY
-	 poIa7+jC2ZAJA==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Alexey Kardashevskiy <aik@amd.com>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 10/38] iommufd/vdevice: Add TSM map ioctl
-In-Reply-To: <bfac9ab6-9115-44d5-90c8-e22c3dbdb607@amd.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="krZ916p6"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=yXPzIEEoaPN1VOdITWv34hp9rv4PXkmKFCr/GnHNnyQ=;
+	b=krZ916p6MflWi+t54Nh5ZPuOIQXBLK17j9mJYliCU3H8LoGXgjO1vjrCmf+7jTthc71o+Scz/
+	8gRm/qrszeSN0RjpvFGrpSumMnaTnLPyhy0sYRhp+Mugi7yKgilUQHdwE9HkleCa1H4GnJSDTuD
+	7dTPC95O7J3AD57GduXJkAQ=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.37])
+	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4bwXfV5p2mzN0dZ;
+	Mon,  4 Aug 2025 18:21:54 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bwXb96HLrz6L5Ks;
+	Mon,  4 Aug 2025 18:19:01 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0EAAA140133;
+	Mon,  4 Aug 2025 18:23:29 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 4 Aug
+ 2025 12:23:28 +0200
+Date: Mon, 4 Aug 2025 11:23:26 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
+	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <aik@amd.com>,
+	<lukas@wunner.de>, Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun
+	<yilun.xu@linux.intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, "Suzuki K
+ Poulose" <Suzuki.Poulose@arm.com>, Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 38/38] coco: guest: arm64: Add support for
+ fetching device info
+Message-ID: <20250804112326.00000f40@huawei.com>
+In-Reply-To: <yq5ao6sv8tw9.fsf@kernel.org>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-11-aneesh.kumar@kernel.org>
- <20250728141701.GC26511@ziepe.ca>
- <bfac9ab6-9115-44d5-90c8-e22c3dbdb607@amd.com>
-Date: Mon, 04 Aug 2025 13:58:53 +0530
-Message-ID: <yq5aikj38p8a.fsf@kernel.org>
+	<20250728135216.48084-39-aneesh.kumar@kernel.org>
+	<20250731113653.000000cd@huawei.com>
+	<yq5ao6sv8tw9.fsf@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Alexey Kardashevskiy <aik@amd.com> writes:
-
-> On 28/7/25 19:47, Jason Gunthorpe wrote:
->> On Mon, Jul 28, 2025 at 07:21:47PM +0530, Aneesh Kumar K.V (Arm) wrote:
->>> With passthrough devices, we need to make sure private memory is
->>> allocated and assigned to the secure guest before we can issue the DMA.
->>> For ARM RMM, we only need to map and the secure SMMU management is
->>> internal to RMM. For shared IPA, vfio/iommufd DMA MAP/UNMAP interface
->>> does the equivalent
->>=20
->> I'm not really sure what this is about? It is about getting KVM to pin
->> all the memory and commit it to the RMM so it can be used for DMA?
->>=20
->> But it looks really strange to have an iommufd ioctl that just calls a
->> KVM function. Feeling this should be a KVM function, or a guestmfd
->> behavior??
->
->
-> I ended up exporting the guestmemfd's kvm_gmem_get_folio() for gfn->pfn a=
-nd its fd a bit differently in iommufd - "no extra referencing":
-> https://github.com/AMDESE/linux-kvm/commit/f1ebd358327f026f413f8d3d64d46d=
-ecfd6ab7f6
->
-> It is a new iommufd->kvm dependency though.
->
-
-Was the motivation for that design choice the fact that in case of AMD
-VFIO/IOMMUFD manages both private memory allocation and updates to the
-IOMMU page tables?
-
-On the ARM side, the requirement is to ensure that pages are present in
-the stage-2 page table, which is managed by the firmware (RMM). Because
-of this, we need an interface that VFIO/IOMMUFD can use to trigger
-stage-2 mappings within KVM.
-
-Alternatively, we could introduce a dedicated KVM ioctl for this
-purpose, avoiding the need to rely on IOMMUFD.
-
-For reference, TDX uses a similar ioctl=E2=80=94`KVM_TDX_INIT_MEM_REGION`=
-=E2=80=94to
-initialize guest memory. However, that interface isn=E2=80=99t well-suited =
-for
-dynamic updates to stage-2 mappings during shared-to-private or
-private-to-shared transitions.
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
 
->
->> I was kind of thinking it would be nice to have a guestmemfd mode that
->> was "pinned", meaning the memory is allocated and remains almost
->> always mapped into the TSM's page tables automatically. VFIO using
->> guests would set things this way.
->
-> Yeah while doing the above, I was wondering if I want to pass the fd type=
- when DMA-mapping from an fd or "detect" it as I do in the above commit or =
-have some iommufd_fdmap_ops in this fd saying "(no) pinning needed" (or mak=
-e this a flag of IOMMU_IOAS_MAP_FILE).
->
-> The "detection" is (mapping_inaccessible(mapping) && mapping_unevictable(=
-mapping)), works for now.
->
-> btw in the AMD case, here it does not matter as much if it is private or =
-shared, I map everything and let RMP and the VM deal with the permissions. =
-Thanks,
->
->
+> >  
+> >> +	if (!dev_info) {
+> >> +		ret = -ENOMEM;
+> >> +		goto err_out;
+> >> +	}
+> >> +
+> >> +	ret = rsi_rdev_get_info(vdev_id, dsm->instance_id, virt_to_phys(dev_info));
+> >> +	if (ret != RSI_SUCCESS) {
+> >> +		pci_err(pdev, "failed to get device digests (%lu)\n", ret);
+> >> +		ret = -EIO;
+> >> +		kfree(dev_info);
+> >> +		goto err_out;
+> >> +	}
+> >> +
+> >> +	dsm->dev_info.attest_type   = dev_info->attest_type;
+> >> +	dsm->dev_info.cert_id       = dev_info->cert_id;
+> >> +	dsm->dev_info.hash_algo     = dev_info->hash_algo;
+> >> +	memcpy(dsm->dev_info.cert_digest, dev_info->cert_digest, SHA512_DIGEST_SIZE);
+> >> +	memcpy(dsm->dev_info.meas_digest, dev_info->meas_digest, SHA512_DIGEST_SIZE);
+> >> +	memcpy(dsm->dev_info.report_digest, dev_info->report_digest, SHA512_DIGEST_SIZE);
+> >> +  
+> >
+> > Can't you memcpy the whole thing in one go?
+> >  
+> 
+> yes. But won't that be confusing? Is there a difference?
+> Also struct dsm_device_info is not same as struct rsi_device_info. We
+> don't need to keep all that padding in dsm_device_info.
+Ah. I misread and thought they were the same structure.  No problem copying
+only relevant fields then!
 
--aneesh
+Jonathan
