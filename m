@@ -1,71 +1,72 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4715F274B50
-	for <kvmarm@lists.linux.dev>; Tue,  5 Aug 2025 15:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E382777F9
+	for <kvmarm@lists.linux.dev>; Tue,  5 Aug 2025 15:26:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754407280; cv=none; b=eT3krQf18TKB4HwszxfugeZMrc6O+fDYyMpsNbZGtiSCOuP+a0QQAFY6yklBkgAoES52tW6PIxdEZB9/SX+PlsD8MuFy057u8fLykW9bic9gkYNagSBlu3WLazc0fzckuxsUQ2QozsU+VbjlOv3BAdtu4bDHOGlfe8H4J9P/Css=
+	t=1754407583; cv=none; b=GWIOBePbhsNFeayWjTF2dc3Oo8lUvy/fCJkD4meW1IRoFD2EGVQjbLFgyljpNQ5pLqAA7/3DF7Z7hSy0y7tmPa05/K8gYi40mzpd507CMPAIKc7D/88h9Itm4T/feG1ILQugmXksbBcuXuv6nOFxoohDVan+ir9LQYGbiL5iK94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754407280; c=relaxed/simple;
-	bh=r1Meg3SAhDcH+nnYjimoBkrTZ4UUpLXDaIJfimD1+eA=;
+	s=arc-20240116; t=1754407583; c=relaxed/simple;
+	bh=85LFVfz3EHtKAnH+R08aZcwRaoR3Ar74rwBiG0VRHcI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R5n5Gb6ylUFJOrbGhS+zzWZYsZ3v/IMuwwY/9ymCiC/6fSVBJ6tDf/RvIOLEgp8okGWlQN9L9FMltfv+/KTDIupSfYKdo9vXxeZW3OUSemAPIJthqqRQuKvHS6y4diKsixZvKXf2vLmF3Ue4q1YORabYSyuoDICnbOOK2nnNk+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LZylkyjm; arc=none smtp.client-ip=209.85.160.174
+	 To:Cc:Content-Type; b=brf83kS2DTQCdZoDuJddC8uzBHAlqbXH34GwFYRalzl5QRP26fYBZpIpK7Lzb1rxkrAPsZaa3W1RnQjtvKNi59+6iZAA/I1n4bt+Q5zGWyCMuROaVsB9mse2uQSMIOn3pDGyVtSsKI8W0IlVC5eCtevy2f4a1f7bHL2ipcyEoHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NBeoKIUy; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LZylkyjm"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4b0673b0a7cso628111cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 05 Aug 2025 08:21:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NBeoKIUy"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b07a5e9f9fso454511cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 05 Aug 2025 08:26:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754407278; x=1755012078; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1754407581; x=1755012381; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=r1Meg3SAhDcH+nnYjimoBkrTZ4UUpLXDaIJfimD1+eA=;
-        b=LZylkyjmzGw9dmh4Wf60VQZAWpIEFofMmowySbobjdBrhNF1JPKeZ1tWL11z/fFOfP
-         NjsLv99sc4A5zohZHDCUHDsNpyqzyV8WNJHjhtjfTEI7VQiJsMpcSePUd4DVHsrtc85b
-         MYXE0io/2jV+A3pSSUO6oL5tghC+goCORwYAU8qlDZVni9/YX1xlQ9Nv4AHOZDFscUmh
-         6qnoWHCspusKcUl5lAUxIOAtj87Fviz/USwrJmmVl65d++mhGuw7n/xVwOunrVCb6jCe
-         1T66doGHq65uoiKW3oUevFj61QBf5zRhddqPw66ci4dgkyv5QsHf0/x0DZBderdYI2rm
-         TAAA==
+        bh=2i1Q1DU3TAUIFLraB4yYdaRtcD0rhW97RSVmaj5w/Uw=;
+        b=NBeoKIUyk40l3xJRlJpJLg0YSmAwuSUePJLU9lHjc0xky/xolGyjd1AKMfnp2ALZJJ
+         62Ys0lPveqlqnwbUiMUJH/mbaNUE2B6ICiD5unl9VJwSp3toCkdDdW2VSx+wnMe3qxIK
+         JElGEcrgh+XWQ+fkLZH/I7y+FfR3oJhaY1HqD39clknam6v2LTrP2mFCAaS7hxzA5npq
+         OJ5E9aIqB9ieVArswMTP2/V3+TRrCoy7vy4WSEMFkh8w8cOs5uR6GDfUa9cNuMqd3NH/
+         KOEZccdLjmOwC40Xr/k+NzesQxYrROghDKkjSR7ilnKDRUXBcI56X7NQmBRVEyt6PYk4
+         DktA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754407278; x=1755012078;
+        d=1e100.net; s=20230601; t=1754407581; x=1755012381;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=r1Meg3SAhDcH+nnYjimoBkrTZ4UUpLXDaIJfimD1+eA=;
-        b=U9UO7FZxRF8JjZsqVDw10SRc7KvtOAdfFlqUWnxEeWRw40/0F1rOQSk2wgWdvs2kPP
-         tZCZeerXo9XQ6sMKoYpPQ40C6ngDP469DXFfiXlorXJUU43I8wWJordJZp9/iBGRLlrx
-         AY5j6BpOIGWW/6snHoCH4+qOhTtoxgw+q7V4pM1gFADkv/gBrjFLS5A3PRKtcBXrMZUY
-         waB9v1KfQcZjaEb8IU7J/jIKY0WQGJLJugVDEXBuS9kRdi9umytBbfsdNzFuy8cCKSR5
-         n5maR4o3KNBk01Qy3b7ZfuxDDftpym2/wSmEIL/ixTvCgPK9oyu+WpZrMxclo/5oTq+T
-         rWHg==
-X-Gm-Message-State: AOJu0YxZ8Skk9cyYBzwYCJJZJ+RDIWr2WCi/Zv2flVTw3d5+gvN01RL8
-	sjnoC6XL/vPoaKwJuBiK+TjAFqm4nbV0e1gT4Ao+f44byFy63WNs4fAN3Of6RxTYljJDDvyA+/P
-	iG9msKH3+cIxKGiCnVyFfxIz+nGPTxIWQ42b+dZyL
-X-Gm-Gg: ASbGncu3cecHF6qNFitF8aA6CzK0xnZsSdCBtgtXdQFHqgXz1I6+zgvleZshRIZhBDg
-	qICtT0owpfiPwF3yVxSGUh9yVhbmHT7VZ3W7U6MIl5AklpRGaCCL9aHO8oIf0XNW9LOHqdEdojs
-	ANRCq+m63u1LPoYM4vQpzj1+bjj7EeJTu/MEwhPXlDuvjwaz6mewRibFTx+xNQCnR/rNZQHzYlc
-	Y1WbasJ
-X-Google-Smtp-Source: AGHT+IHgagTKXL9FPCp0iCD+9/acHZKe2CgULwhUdyzE2hK/zZEFw7jdeh3IdiV4ujAdRnhlDN2PVWoMVQsJW7Lprbc=
-X-Received: by 2002:a05:622a:4e:b0:4b0:83a3:9bac with SMTP id
- d75a77b69052e-4b084ffef47mr4060521cf.17.1754407277855; Tue, 05 Aug 2025
- 08:21:17 -0700 (PDT)
+        bh=2i1Q1DU3TAUIFLraB4yYdaRtcD0rhW97RSVmaj5w/Uw=;
+        b=D9fVgltli6zdwRzZcrwuxwl5M5ZflwK5ir1nK6Z+gnjqQlGa66Ij35EQ/fcaKCOAgN
+         feUts11784m0Aa3NW75Tv2RWxkIpzUWz14OTGVpNsm3xusVzkYw42/dvW0C6YmM3tA27
+         0XDPNU6HBljCS1THhVfAX2JdNlzg80aade1sNHFob8w187kv2EZmH+H5ZgC7rO7BjpN+
+         y/UgqwAaTtJNnDJN/LtqsiPM5ut+Stinij0CIiQ2ocmGY2Op4BKNDR2nVGZ0WhQBQjMW
+         0d6QuHotGloAaHgbMiKASSzcSQLwq4sWOtJpRZUW03VWse9uXn9hJCl+QNZE8/MZFNN+
+         6jqA==
+X-Gm-Message-State: AOJu0YyJ9WLPnyTAamWnEugKpGpImEmKEoO1KQqalVL+lc7VYFtU2zZe
+	hDr4J/fvqT4vGAqDJEJciMVLdtoyeqBqfa9MN1CZO8F2PDxL7/DfJPbo+JOvmCObSQBVv9cI9JX
+	+349SwLZh+XRUmoZiy2aoK3Mr9F+3z3He9gHv27Rl
+X-Gm-Gg: ASbGnctCbu2Qq4xlaaoeRz6U1FRalMsXrSgm4y4WhPMVIzs+6HG0Mji8JDZpWdNo5Fv
+	bpc17UCC+kEzKqBIdCEna/MxnFpKvezB5qkQXxGcD6fbEE9DsF0z4u5TerzLSYDxRWwd+8CEQrj
+	IjvejZNP53ZWLyKI456/yV3ZuZDEUdo6rZgYJsnNQS8l1d8u+pHJUwcWdNgyPr104mFCn7gxkW2
+	hO0HIiIaI/x7LlR4jJmL+lD4gjdNw==
+X-Google-Smtp-Source: AGHT+IEPn9BAGcyC9RdcMH/TSHPcwTUayFCZLped6m7ux8g9VELmwHfnCo7ockxlrmEucnHiOvlt+/on7eAnUN3nm54=
+X-Received: by 2002:a05:622a:188a:b0:4a9:e34a:58a1 with SMTP id
+ d75a77b69052e-4b0850188c9mr3535311cf.21.1754407580322; Tue, 05 Aug 2025
+ 08:26:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250805135617.831971-1-tabba@google.com> <aJIXqmv1_0djt82y@willie-the-truck>
-In-Reply-To: <aJIXqmv1_0djt82y@willie-the-truck>
+References: <20250805135617.831971-1-tabba@google.com> <20250805135617.831971-4-tabba@google.com>
+ <aJIWyNwWAAaCf_cw@willie-the-truck>
+In-Reply-To: <aJIWyNwWAAaCf_cw@willie-the-truck>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 5 Aug 2025 16:20:41 +0100
-X-Gm-Features: Ac12FXyEbwP4ln3SJ6qXyIbaadtTPQ9r3wm2Hpipb7fqLA4duSGS1qyDxnJRhTc
-Message-ID: <CA+EHjTzTikJjhHAse0vKBwn2Gi=nOR9MKjQDOFL2H8BxBL3JGg@mail.gmail.com>
-Subject: Re: [PATCH v1 0/4] KVM: arm64: Fixes to handling of restricted
- registers for protected VMs
+Date: Tue, 5 Aug 2025 16:25:44 +0100
+X-Gm-Features: Ac12FXwES16-Z6v36CMKkJpW1AjsyxfYdUX8eXVbea0sO4LsoBDdHYz-X1Ffbsk
+Message-ID: <CA+EHjTx_3oYJk=Hu=33VjVT34RBRvSp=uPwo+NNnzs-t38K91A@mail.gmail.com>
+Subject: Re: [PATCH v1 3/4] KVM: arm64: Sync protected guest VBAR_EL1 on
+ injecting an undef exception
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
@@ -76,38 +77,46 @@ Content-Type: text/plain; charset="UTF-8"
 
 Hi Will,
 
-On Tue, 5 Aug 2025 at 15:39, Will Deacon <will@kernel.org> wrote:
+On Tue, 5 Aug 2025 at 15:35, Will Deacon <will@kernel.org> wrote:
 >
-> Hi Fuad,
->
-> On Tue, Aug 05, 2025 at 02:56:13PM +0100, Fuad Tabba wrote:
-> > This patch series is mainly about fixing issues we've encountered in
-> > pKVM (in downstream Android code), related to the handling of protected
-> > VM access to restricted registers and injecting undefined exceptions
-> > into a protected guest.
+> On Tue, Aug 05, 2025 at 02:56:16PM +0100, Fuad Tabba wrote:
+> > In pKVM, a race condition can occur if a guest updates its VBAR_EL1
+> > register and, before a vCPU exit synchronizes this change, the
+> > hypervisor needs to inject an undefined exception into a protected
+> > guest.
 > >
-> > The last patch isn't pKVM specific, but a fix to the vgic-v2 code
-> > encountered while fixing the issues in this series. The issue it fixes
-> > was indirectly introduced into the code with hVHE.
+> > In this scenario, the vCPU still holds the stale VBAR_EL1 value from
+> > before the guest's update. When pKVM injects the exception, it ends up
+> > using the stale value.
 > >
-> > Based on Linux 6.16.
+> > Explicitly read the live value of VBAR_EL1 from the guest and update the
+> > vCPU value immediately before pending the exception. This ensures the
+> > vCPU's value is the same as the guest's and that the exception will be
+> > handled at the correct address upon resuming the guest.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > index bbd60013cf9e..b34b10be1ad7 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > @@ -253,6 +253,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+> >
+> >       *vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
+> >       *vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+> > +     vcpu_write_sys_reg(vcpu, read_sysreg_el1(SYS_VBAR), VBAR_EL1);
 >
-> Thanks for putting this together so quickly.
->
-> I left some small comments on patches 2 and 3 but, for the sake of
-> transparency (I already mentioned the GIC thing to Marc), please can
-> you add:
->
-> Reported-by: Will Deacon <will@kernel.org>
->
-> on patches 1 and 4?
+> You say "in pKVM" in the commit message, but why isn't this applicable
+> to !VHE in general?
 
-Will do.
+Because this function is only used in pKVM. I guess there's nothing
+stopping anyone from using it in other non-VHE code in the future
+though
 
 Cheers,
 /fuad
 
->
-> Cheers,
->
 > Will
