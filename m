@@ -1,182 +1,162 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121862AD0B;
-	Tue,  5 Aug 2025 05:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F721C8CE
+	for <kvmarm@lists.linux.dev>; Tue,  5 Aug 2025 08:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754370432; cv=none; b=mItvsmO8NqkQL15IgS7DdSwoCDqKY3tMCtuVQbssrpum1jJ/BzlvM8IgyGYvBPaS0n2GYNqxko6UlKwf0Vpi8wFxzo7fTEFo9zv/a2uaIPK6gCCHFo908b01Xvs+OR2hzQ2UVAbMQEYUjKay1VoFyNwNmxBcXvf3bqUrxUBExtY=
+	t=1754382728; cv=none; b=gjKCTuz0nxGFzneEZ9eXTFp58FrN/kEFJwbFJOaZyGtj+ZKkoCjUGug3bNThzciuQGAY1etLFqJ3OmR4ys3ECLNfuMcbkP5lVguLI/VGI0X/wtK+/I8QJNPd2XZ3gBvFkYOMMuydpCnOvN5xSEA5iCGoKOPMqt5QRhjH3JIsucc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754370432; c=relaxed/simple;
-	bh=9JDTR9BxKqic2TGY9UgdkLZTSDBnR2ZFG+hzdLOr00Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PE0bykPMTdEBTu4zrz8hCau6D5P3qkxZOqq40zbT10jqEkAfxjVyASyf+Nx0YSKopuNVMBEPAtxOCRkGwtvmd7h55bb7BlkL8mqE9RGF6S5/UDDZ02LmPvGgaTNlP9Yy/7V1Qwk/w0FQklCBjj+6gagiAD7Zim5DOu49yfpRquI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JJEXGLeL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754382728; c=relaxed/simple;
+	bh=fHmpaIOPjkyexmjJ3+L8AA+pWZ8k+h7xPPc0/QhT1+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IT4dpUhrHhg4a5nk3nb6Ix7gpuUs3UlXoQ0/I2IeggFPIoIxzJpOz7NsRZ5Zsz53INj1Vo2j2t5cVaBT3dBDH35MfVUkI4utn6WL6i7a+eeFvhPTDpjZtrWdGkAw9yre/k2K8O1kI62jMZGAFjkZ7P+/Zxb59Ik/2oO51GaUlmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pMrF8ezL; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJEXGLeL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EFD2C4CEF4;
-	Tue,  5 Aug 2025 05:07:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754370429;
-	bh=9JDTR9BxKqic2TGY9UgdkLZTSDBnR2ZFG+hzdLOr00Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=JJEXGLeLW4Ji6YpUI7Jk/7agACw+LI+u0FLJJIcUDRT/i5p7fJekRNHQ+A2kEZ6UZ
-	 1BI+WOGTUierOiSsVUwXvlaM+YXoOT2+3G+z9SgT54IEjeYh+PnCINwiY/IvaPndqi
-	 cX50dRGTKuHXprBPKb5jchNRFNIgmkg7rszvJS+QAo9ZQ4pzHxiZH7sJQTmdGe1DoB
-	 dn+xeuwdAcgwPKACAsskGRNUT2JlPL5SwxBd8T/AflA/K6XABhM+cRkZc/j0EyELe9
-	 ONm7FKmR2lisWfUzlcjAgxKeIwtCTHRuFMWx5fUaUH/HRTK1FtxDWRPrmpVciquHf3
-	 YJdip/0O9CTmA==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: dan.j.williams@intel.com, Jason Gunthorpe <jgg@ziepe.ca>,
-	dan.j.williams@intel.com
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
-	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pMrF8ezL"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-458bf57a4e7so63975e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 05 Aug 2025 01:32:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754382725; x=1754987525; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7BWA0STOcqIUzpFQVaS5UHy7SE6OJhVfIhAfBgcIup8=;
+        b=pMrF8ezLCsb8pGVBs1H31L/p+ni8oTNXzuLwS1jXr9qIKAxJHNzgM5Uuq3VqQpbq4F
+         vKRiW1xPF8Ybwb988KoxIWSnqLftDznj1N7u874E8L2FZGzidW0s95ACdXQatulEmiJZ
+         LpxRm6Q7aALEjdae/ql3PokN+3HTk1LbwtE/Xc3PuWkuKcns267bIcIMmeaOISbM9u2G
+         MrzBT4NhjCMfGTyWqHa2kX3qUfwrqGUL6KVVvTIuaVdidk5gRX+Y3D734M/BzPx9qhOP
+         pxVwjjVgiMp0VYxyXBCom9McDCHWVOvY8VoxfAOu7zgNic+n7U6xeEYfM0j9xxQ+MoDc
+         WxgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754382725; x=1754987525;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7BWA0STOcqIUzpFQVaS5UHy7SE6OJhVfIhAfBgcIup8=;
+        b=N/y5t06JthyqfnM8acO3IdzSs353m7e0aRCX+ZhVEoe9un6AAZz1Vyv2aejyWDWpxR
+         SrKAPXX/u/smLkqj4BqG+4MEwe3jDDMa/NaY1MMaUCH4MS0WEVxTp3WlwjnDs5BJJ4UL
+         phGA0q0YDEFHwdXuIn7QtumSotZ3xnGy75SvDvrW+qwpvQif1ijtzpPR+SXVvNspQd2l
+         b1C4Gzsm9/Ztp6fASwFVanN33SDaZF0DBYDHAIoXeqbSvFIPAZ3I7wBjc6Gwq2rexZ8C
+         8B0Rp5BAx0jW1qWcrNYzGN+cRXUWxkYKpWbe47FLCMJs30vpGPFkof0viGeN3Uq8eDbo
+         jLiw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0GtueID2uOZOKVgk9UwIigKoOuyz6eH+QPT7xnGkZ9e6Id/WMPh1aR/xYrqJoZhXwUCgNgYU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzadzwGzrJZQyZl10NXBFU3mB5U8G6L0sw298KIdRetSLzdly1T
+	LDZfdJdKHuRB7Ze4/haetkGrzBJ2pgFisBZz5zrBwj4+k+xRVBP3xMGD+2XbxD5XmA==
+X-Gm-Gg: ASbGncto3lgcikFEWFk0HSgrWi0UDj1KlX+afhMkWZpl8/AcryKclPr1gIOYX4/Shm+
+	994ixA4P2VybflsjSXjO3SOtNM9Hi59SSVyLB9rKjUl1iXBPgLCz12XTFjW+R3OY3h0jw4Czm/+
+	FwUIX6/o0QWLtVvwHHLHfB5i6I3bfDGj/kDljduxwvjzjNB+yjp1VxL2EF2jOEJxkmVfiv1OJHB
+	j8NVmLMOAAkKGE/P2dHWDjMFde5Lo9Q4p1CmxuqAyKaUkwtuB73LIhP35uD/qQyy7PZ/gnrxjTn
+	icOJvP8PyIewyISolCWffvSKEOaX0s2+XEs8iVEGCH0cw6SVCm0N+gKpSwx1zux+cn99fnkEgNE
+	EBqDKrbjwDxk5vtEhcQ5ECPrNCbajlL5FjfKIQ1GoqVd9Sj7Ebojwz9cSH3mTjxY=
+X-Google-Smtp-Source: AGHT+IFKztsRYhYKwdwIDsCDgAVK6+r35a5h3+OYoOMO7aVdiPkoVmjrLzpy/fS3Hiy5FOXrT7eLpw==
+X-Received: by 2002:a05:600c:888a:b0:439:8f59:2c56 with SMTP id 5b1f17b1804b1-459e269dbbamr469945e9.2.1754382724391;
+        Tue, 05 Aug 2025 01:32:04 -0700 (PDT)
+Received: from google.com (72.47.233.35.bc.googleusercontent.com. [35.233.47.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e075047fsm18416515e9.1.2025.08.05.01.32.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Aug 2025 01:32:03 -0700 (PDT)
+Date: Tue, 5 Aug 2025 08:31:59 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 00/38] ARM CCA Device Assignment support
-In-Reply-To: <688d2f7ac39ce_cff9910024@dwillia2-xfh.jf.intel.com.notmuch>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <688c2155849a2_cff99100dd@dwillia2-xfh.jf.intel.com.notmuch>
- <20250801155104.GC26511@ziepe.ca>
- <688d2f7ac39ce_cff9910024@dwillia2-xfh.jf.intel.com.notmuch>
-Date: Tue, 05 Aug 2025 10:37:01 +0530
-Message-ID: <yq5acy9a8ih6.fsf@kernel.org>
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: ptdump: Fix exec attribute printing
+Message-ID: <aJHBf4KCUPpWbyU5@google.com>
+References: <20250802104021.3076621-1-r09922117@csie.ntu.edu.tw>
+ <d72b7928-8646-4616-a8f0-96b9d9bbaf09@arm.com>
+ <z2hmwwmtgbrio2wv3sj2pc4zhxdjioorlhnm45o2arcsjahjni@xod435q26jqq>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <z2hmwwmtgbrio2wv3sj2pc4zhxdjioorlhnm45o2arcsjahjni@xod435q26jqq>
 
-<dan.j.williams@intel.com> writes:
+On Mon, Aug 04, 2025 at 08:41:35PM +0800, Wei-Lin Chang wrote:
 
-> Jason Gunthorpe wrote:
->> On Thu, Jul 31, 2025 at 07:07:17PM -0700, dan.j.williams@intel.com wrote:
->> > Aneesh Kumar K.V (Arm) wrote:
->> > > Host:
->> > > step 1.
->> > > echo ${DEVICE} > /sys/bus/pci/devices/${DEVICE}/driver/unbind
->> > > echo vfio-pci > /sys/bus/pci/devices/${DEVICE}/driver_override
->> > > echo ${DEVICE} > /sys/bus/pci/drivers_probe
->> > >=20
->> > > step 2.
->> > > echo 1 > /sys/bus/pci/devices/$DEVICE/tsm/connect
->> >=20
->> > Just for my own understanding... presumably there is no ordering
->> > constraint for ARM CCA between step1 and step2, right? I.e. The connect
->> > state is independent of the bind state.
->> >=20
->> > In the v4 PCI/TSM scheme the connect command is now:
->> >=20
->> > echo $tsm_dev > /sys/bus/pci/devices/$DEVICE/tsm/connect
->>=20
->> What does this do on the host? It seems to somehow prep it for VM
->> assignment? Seems pretty strange this is here in sysfs and not part of
->> creating the vPCI function in the VM through VFIO and iommufd?
->
-> vPCI is out of the picture at this phase.
->
-> On the host this establishes an SPDM session and sets up link encryption
-> (IDE) with the physical device. Leave VMs out of the picture, this
-> capability in isolation is a useful property. It addresses the similar
-> threat model that Intel Total Memory Encryption (TME) or AMD Secure
-> Memory Encryption (SME) go after, i.e. interposer on a physical link
-> capturing data in flight.=20
->
-> With that established then one can go futher to do the full TDISP dance.
->
->> Frankly, I'm nervous about making any uAPI whatsoever for the
->> hypervisor side at this point. I don't think we have enough of the
->> solution even in draft format. I'd really like your first merged TSM
->> series to only have uAPI for the guest side where things are hopefully
->> closer to complete.
->
-> Aligned. I am not comfortable merging any of this until we have that end
-> to end reliably stable for a kernel cycle or 2. The proposal is soak all
-> the vendor solutions together in tsm.git#staging.
->
-> Now, if the guest side graduates out of that staging before the host
-> side, I am ok with that.
->
->> > > step 1:
->> > > echo ${DEVICE} > /sys/bus/pci/devices/${DEVICE}/driver/unbind
->> > >=20
->> > > step 2: Move the device to TDISP LOCK state
->> > > echo 1 > /sys/bus/pci/devices/${DEVICE}/tsm/lock
->> >=20
->> > Ok, so my stance has recently picked up some nuance here. As Jason
->> > mentions here:
->> >=20
->> > http://lore.kernel.org/20250410235008.GC63245@ziepe.ca
->> >=20
->> > "However it works, it should be done before the driver is probed and
->> > remain stable for the duration of the driver attachment. From the
->> > iommu side the correct iommu domain, on the correct IOMMU instance to
->> > handle the expected traffic should be setup as the DMA API's iommu
->> > domain."
->>=20
->> I think it is not just the dma api, but also the MMIO registers may
->> move location (form shared to protected IPA space for
->> example). Meaning any attached driver is completely wrecked.
->
-> True.
->
->> > I agree with that up until the point where the implication is userspace
->> > control of the UNLOCKED->LOCKED transition. That transition requires
->> > enabling bus-mastering (BME),=20
->>=20
->> Why? That's sad. BME should be controlled by the VM driver not the
->> TSM, and it should be set only when a VM driver is probed to the RUN
->> state device?
->
-> To me it is an unfortunate PCI specification wrinkle that writing to the
-> command register drops the device from RUN to ERROR. So you can LOCK
-> without setting BME, but then no DMA.
->
+Hi Wei-Lin,
 
-This is only w.r.t clearing BME isn't ?
-
-According to section 11.2.6 DSM Tracking and Handling of Locked TDI Configu=
-rations
-
-Clearing any of the following bits causes the TDI hosted
-by the Function to transition to ERROR:
-
-=E2=80=A2 Memory Space Enable
-=E2=80=A2 Bus Master Enable
+> Hi Anshuman,
+> 
+> On Sun, Aug 03, 2025 at 07:33:04PM +0530, Anshuman Khandual wrote:
+> > 
+> > 
+> > On 02/08/25 4:10 PM, Wei-Lin Chang wrote:
+> > > Currently the guest stage-2 page table dump has the executable attribute
+> > > printed in reverse, showing "X" for a non-executable region and showing
+> > > " " for an executable one. This is caused by misjudgement of which
+> > > string gets printed for the executable and non-executable case. Fix it
+> > > by swapping the two strings.
+> > > 
+> > > Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+> > > ---
+> > >  arch/arm64/kvm/ptdump.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > > index 098416d7e5c25..99fc13f1c11fb 100644
+> > > --- a/arch/arm64/kvm/ptdump.c
+> > > +++ b/arch/arm64/kvm/ptdump.c
+> > > @@ -44,8 +44,8 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+> > >  	}, {
+> > >  		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+> > >  		.val	= PTE_VALID,
+> > > -		.set	= " ",
+> > > -		.clear	= "X",
+> > > +		.set	= "X",
+> > > +		.clear	= " ",
+> > >  	}, {
+> > >  		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> > >  		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> > 
+> > Is not KVM_PTE_LEAF_ATTR_HI_S2_XN already in the reverse semantics aka
+> > XN (Execute Never). Hence when KVM_PTE_LEAF_ATTR_HI_S2_XN macro is set
+> > that means the entry is not executable and vice versa.
+> 
+> Yes you are correct. However in dump_prot() we have:
+> 
+> if ((st->current_prot & bits->mask) == bits->val)
+> 	s = bits->set;
+> else
+> 	s = bits->clear;
+> 
+> Analysis:
+> 
+> 1. region is executable:
+>     - st->current_prot == PTE_VALID (ignore other bits)
+>     - st->current_prot & bits->mask gets PTE_VALID
+>     - if condition is true (.val is PTE_VALID)
+>     - prints bits->set
+> 
+> 2. region is not executable:
+>     - st->current_prot == KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID
+>     - st->current_prot & bits->mask gets (KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID)
+>     - if condition is false
+>     - prints bits->clear
+> 
+> Therefore we want .set = "X", and .clear = " ".
 
 
-Which implies the flow described in the cover-letter where driver enable th=
-e BME works?
-However clearing BME may be problematic? I did have a FIXME!!/comment in [1]
+This seems correct but it will produce a different output than the
+stage-1 ptdump. What if we drop the PTE_VALID from the mask & value as
+Mark and Anshuman are suggesting and print NX when the bit is set and x
+otherwise as the stage-1 ptdump does ?
 
-vfio_pci_core_close_device():
+> 
+> Thanks,
+> Wei-Lin Chang
 
-#if 0
-	/*
-	 * destroy vdevice which involves tsm unbind before we disable pci disable
-	 * A MSE/BME clear will transition the device to error state.
-	 */
-	if (core_vdev->iommufd_device)
-		iommufd_device_tombstone_vdevice(core_vdev->iommufd_device);
-#endif
-
-	vfio_pci_core_disable(vdev);
-
-
-Currently, we destroy (TSM unbind) the vdevice after calling
-vfio_pci_core_disable(), which means BME is cleared before unbinding,
-and the TDI transitions to the ERROR state.
-
-[1] https://lore.kernel.org/all/20250728135216.48084-9-aneesh.kumar@kernel.=
-org/
-
--aneesh
+Thanks,
+Sebastian
