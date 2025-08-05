@@ -1,131 +1,210 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7122427A121
-	for <kvmarm@lists.linux.dev>; Tue,  5 Aug 2025 15:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46281C84B8
+	for <kvmarm@lists.linux.dev>; Tue,  5 Aug 2025 15:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754408936; cv=none; b=K4GtR4yj9oudRdQDlcJq7uw6vmwSEwOFOgu1w3EIZXlQblimdFf3HvoD0xbY6lG5SHQBUlvO9BlAkDDiQYTg/Ur5trJCWtmYYfct2WztXC3nS7pk9sISEAit5fOFb1Rjt1nrxXU+Xft9m2uahwKMHy/0QMdObo2fWbl5WiX+DYQ=
+	t=1754409143; cv=none; b=gA/esad0O/CR74IR9gVNLn3IVwwp5S2JBhkMomLQ9suZkgWuSxGyeSUPAu+P2rrX40jxYjrQ8m9qr0fs8bG6fWEcdkomJrmcNCuktsxCV0YYz0EPfVvjR5t2XQirsAlE7Z/pLrIHgDBixlcmAoOHzvm7D+cFV5CjTd0mqNNpNaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754408936; c=relaxed/simple;
-	bh=vK/izEOcqRroDKEjuurkSpJYsxNQb8UJ35ZS/H8ApXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rdASyLWePa/vCJlBWVU2XvFlZ0N8TrNEQF5haeRq1aGgHOloVzF+21WfNHvDNkLBQge+zT6ZgBEIWpDYdo2+hfYtgHbgXRATG+Y86C1C0qgMj+t7mjFACClQKDGZyBQR/AgA+I18DgmI7AwnssHlu2ElI2Pzz++einII8FWLT7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=kLxISsO5; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1754409143; c=relaxed/simple;
+	bh=fyO4reQXeGKhGsr7Y56nGjeCrWj+hWNl/mSVcQpg+Kc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nmK2qJTRTTh4mSrMOttmLDUSO0N9jUxoUohRHeoT28zcvH1KVXUnYC6vqelwdrNaiRFNJnYGiiATp0iLeSjMuNqDA219mMda0r1BEv59E5zoJR+fXQNjtE/oU9s707UWvAs0H5VF9YIWYEotm9ev5NnmSk+f1s5KtwK0rjbRaoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=15PHGB0t; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="kLxISsO5"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7e69960c557so435501385a.1
-        for <kvmarm@lists.linux.dev>; Tue, 05 Aug 2025 08:48:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="15PHGB0t"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4aaf43cbbdcso320041cf.1
+        for <kvmarm@lists.linux.dev>; Tue, 05 Aug 2025 08:52:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1754408933; x=1755013733; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PvWDI0NE7eWO/Fmxnrgsva4q0z87yVrAZ5bf0Zwi6vs=;
-        b=kLxISsO5ZfOIXIn5/TPwoB3DGILRcIgKnIPIjRtNQ8C+DZDKNTlh86MdtUJzQ/n+D4
-         5NJuL/+4w3OkPAlAEfZpBgaxiVLIwoA6YWe8Wb0kJaPsK67I0JYkrCA7ulM/UUjJBiDI
-         H0aRe9vuv+XT/VRAuf/o8eITt0RHQ4iQcKWw7QiUk7K1+suvQSRNtVgxqYpnglHAmMQR
-         j71SDsvPE3JDXIttWaOQhDijqOS2Xqedgfk7GAnzqJvlECRKCTBVuRVQMsMKEy97ZMFy
-         a4HKWbilm00qC19+AnTP00aBxQXJeuI6zvaK1SWoDgJDh8Ir+Y+dCMlaEi2ejpWhjsUr
-         YuWg==
+        d=google.com; s=20230601; t=1754409141; x=1755013941; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjX1yDKhoAMYocT3xj/0AsKA7BcblHg4H+9czODs6Ds=;
+        b=15PHGB0tAXw9z7kZ3t4RJSenAlBh9GlvCIva0kV+1uK6+4cvTj+B3qmeyA6LKc1UBJ
+         9V6yPpmFLM/SywF0l+fSFiAxh+R1w3z4A/4bgVwBCO3aXoY+kgz5ss1iRBHLOZGklGf3
+         A15My18GRv+3XgaEn1hS5nsa53L5C0sCPiu3YEGgdB2YHjuXwEh+OmVm994x7tnhBDYh
+         06/ldJRBLAHyPkWme8AXBehEyhJE8S31/KWkyr5d/U9msAJu0PQLj++SbWSON42TsHFV
+         dOlnATCGPdyu59ZxkyPtsN+r2h43WYhPEhFGOn2hGjxcMrseBqVZpWvEV4N5w/ec1B88
+         V8bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754408933; x=1755013733;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PvWDI0NE7eWO/Fmxnrgsva4q0z87yVrAZ5bf0Zwi6vs=;
-        b=iemdQIj8eXAcprDQf2fjElvMjsz9ABEppaZK46qXdC5A3wypgVzGg1Fx4E0eKpR7u4
-         EPsW+hV7OjbgZ5JW19N7exU4A+vYsqz4Wc8U9C8Cb6ndw2pweeF0PpyLEGeoK54zHHvn
-         u03n8lvqs2wEsFfdQTHvOoKBKn7/87Kx6dT/G3s0Uot0+e6bQMqluQj72O7uINdj6ViN
-         AwBn9Qwbv6U8oj5TvnssOwrVOrl7ARlML560cZquLLT8WyTVBHxfTGWlfV7Sa4B/WBJh
-         Q+SplxnD71u4XQd58ZXuuPhm3s1aXta8/rDxJK9stALjiQgdygl6oN17Zfpz8Mzm9Ek5
-         QKTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWY17e0dBgtW+5D4DZ280wAeqHUTkVNXuqABrKsiHOZEp0xk/SQYCEfehXK2CPdlIb2p3Ffqrg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx7LPQsgIclg8BedX3mDkjgSExV6jnX4lA9HOMmoPTifebsdq4T
-	mQfshAL/bdF1+0uhujm79dO2AxRsEyWftBszsVWJYAb5QBB/clfa5W9Ox+EooX1lp60=
-X-Gm-Gg: ASbGncuewpWLdGHzPVtV4FVw1xtRg1JbIrshSe7cveoq70M50gAXn/GRa8GctyZE8ea
-	R5JE28s9MBOAQRRp0iZkUJbBMPY4KYn4sOBLUoMwCJBjB52XJoz9kA/9+7TdHJFiZLkXHwznI2D
-	DZ2XSb5Q9CafoSVl88uOkp0nG3aAuilSexF5XykkD+82ms8od8nIH7j0IH65dObTT9G1uvigW3u
-	jtRV7me/4QDPvqCEKQ+Ioqu6HP3gwGwDUuwx9L/9WDNdRq73Oa1DlQhaGPptCogMUs6/se2JLuq
-	WBcSs5s4EnbxK7ZMtheZhNZZQsZ54dh53m4VV3kJizxZ8eeZxUqr8fi/XmwrmwQb5s2rOshwbke
-	nHCMb7BJYVCYb5iV69b65Cs89DD8BilYe/NWGL219+CakULct6SXTp5QADM7no1Vx4k3Z
-X-Google-Smtp-Source: AGHT+IHt6aPFR2Bw0HlJGSa/mOk3c8+BRcWZQsYV0g4OgyGhD3tGZLbn6be+rsoLdw/XIZZFhDjoag==
-X-Received: by 2002:a05:620a:2541:b0:7e6:3030:e480 with SMTP id af79cd13be357-7e6963a6eedmr1890516185a.57.1754408933141;
-        Tue, 05 Aug 2025 08:48:53 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e8040a9154sm214850385a.70.2025.08.05.08.48.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Aug 2025 08:48:52 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1ujJuF-00000001Ydr-4AIQ;
-	Tue, 05 Aug 2025 12:48:52 -0300
-Date: Tue, 5 Aug 2025 12:48:51 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 10/38] iommufd/vdevice: Add TSM map ioctl
-Message-ID: <20250805154851.GT26511@ziepe.ca>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-11-aneesh.kumar@kernel.org>
- <20250728141701.GC26511@ziepe.ca>
- <bfac9ab6-9115-44d5-90c8-e22c3dbdb607@amd.com>
+        d=1e100.net; s=20230601; t=1754409141; x=1755013941;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tjX1yDKhoAMYocT3xj/0AsKA7BcblHg4H+9czODs6Ds=;
+        b=S5HN0yjkpvaYxD5hReQKVbaWLXUg8qeRRfCfAXKU7I2JSPcMFIM+WixxDJD3/+zu3y
+         YMWFnpSzxsYbwmm81sqB4h3Pd5tZ0Ich6HodDKYQFgo8ZPHbWyG29tq37X7P5CVjVra7
+         MXerhZaiJNKKlgslaH8yvDEWDatv60iPIQxpt2x6aorZHlWDCW4M3hkqPO87OndPRjRl
+         MLjdxX6R8YfUSa2uA5QY+rjIeqsF03ZkAjs6GafXGfNEgTPT/9iHu4CHpGSw6xAVGRDT
+         ZKoSmjqZwaWbCSfcVO4JINmdzeEHNRtrv6WxmQyHUOPYq02DvSKTXDwUJuHECSfvUZbd
+         xKyQ==
+X-Gm-Message-State: AOJu0YzookU+WOjz/edg9Aw/OymQoLmJ57BhX25wkEk1yhwqe98/9MMC
+	rbpsWY9CyhQ5LqtaNdAd3kXgg7urXtTWUv79Va0FtZmArtJrH5zU+uHSUgWMFNXix87dfCtLTB8
+	epwn42e9G5zuXZpkdM9Pm7R0jDGU7eLYwZQBTq2IudY9CKrZOYYP2/Ji+
+X-Gm-Gg: ASbGncvDaXPiy3fA+FhCBWjS6QGPkSZyX6kFgWs7kUkvrWCL5MX7GEUZ0yFK8f90EVq
+	kFgb8hN9cceGm8F7x6kCvCiH1EwCoYm5luqCSaULj8hxPXOu2g2Ca8k0ShpDia1BzR0biy/QQ2i
+	tE/XIa5fKOqLsggdswnEPcwnL/LIoftTKB0X5Mrib7xqUT1m0IhoF2l22lIN5InTg1tMMohAVNU
+	lTF+PXU
+X-Google-Smtp-Source: AGHT+IGbRK8JECKTHipEp5ScNvysVry8hhcYGrLgedBJ1sNn4eetXEItpZTcRmxnSLaIkN5bfay/z2pwDKVSvv1QGc4=
+X-Received: by 2002:ac8:5fd6:0:b0:4b0:8318:a95 with SMTP id
+ d75a77b69052e-4b084f118f8mr4295551cf.8.1754409140243; Tue, 05 Aug 2025
+ 08:52:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bfac9ab6-9115-44d5-90c8-e22c3dbdb607@amd.com>
+References: <20250805135617.831971-1-tabba@google.com> <20250805135617.831971-3-tabba@google.com>
+ <aJIXerl04PDah1db@willie-the-truck>
+In-Reply-To: <aJIXerl04PDah1db@willie-the-truck>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 5 Aug 2025 16:51:43 +0100
+X-Gm-Features: Ac12FXyK_iYmZ8yIpjR9FKi_Zz057gBdcMrKioHmqRePthAo7QCB0owev24d6vs
+Message-ID: <CA+EHjTwaz=TnTJRxZmmCNY7bJyNrmXtPdEUW65en4=khcL_aag@mail.gmail.com>
+Subject: Re: [PATCH v1 2/4] KVM: arm64: Make vcpu_{read,write}_sys_reg
+ available to HYP code
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	vdonnefort@google.com, qperret@google.com, sebastianene@google.com, 
+	keirf@google.com, smostafa@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Aug 04, 2025 at 08:02:23AM +0530, Alexey Kardashevskiy wrote:
-> I ended up exporting the guestmemfd's kvm_gmem_get_folio() for gfn->pfn and its fd a bit differently in iommufd - "no extra referencing":
-> https://github.com/AMDESE/linux-kvm/commit/f1ebd358327f026f413f8d3d64d46decfd6ab7f6
+Hi Will,
 
-This patch needs to explain how the lifecylce works and why the IOMMU
-can't UAF the memory. I think it cannot really work as shown without
-more things like an invalidation callback.
+On Tue, 5 Aug 2025 at 15:39, Will Deacon <will@kernel.org> wrote:
+>
+> On Tue, Aug 05, 2025 at 02:56:15PM +0100, Fuad Tabba wrote:
+> > Allow vcpu_{read,write}_sys_reg() to be called from EL2. This makes it
+> > possible for hyp to use existing helper functions to access the vCPU
+> > context.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h | 184 +++++++++++++++++++++++++++
+> >  arch/arm64/include/asm/kvm_host.h    |   3 -
+> >  arch/arm64/kvm/sys_regs.c            | 184 ---------------------------
+> >  3 files changed, 184 insertions(+), 187 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 0720898f563e..1f449ef4564c 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -224,6 +224,190 @@ static inline bool vcpu_is_host_el0(const struct kvm_vcpu *vcpu)
+> >       return is_hyp_ctxt(vcpu) && !vcpu_is_el2(vcpu);
+> >  }
+> >
+> > +#define PURE_EL2_SYSREG(el2)                                         \
+> > +     case el2: {                                                     \
+> > +             *el1r = el2;                                            \
+> > +             return true;                                            \
+> > +     }
+> > +
+> > +#define MAPPED_EL2_SYSREG(el2, el1, fn)                                      \
+> > +     case el2: {                                                     \
+> > +             *xlate = fn;                                            \
+> > +             *el1r = el1;                                            \
+> > +             return true;                                            \
+> > +     }
+> > +
+> > +static bool get_el2_to_el1_mapping(unsigned int reg,
+> > +                                unsigned int *el1r, u64 (**xlate)(u64))
+> > +{
+>
+> I guess this needs to be 'inline' too, but...
+>
+> > +static inline u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+> > +{
+> > +     u64 val = 0x8badf00d8badf00d;
+> > +     u64 (*xlate)(u64) = NULL;
+> > +     unsigned int el1r;
+> > +
+> > +     if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
+> > +             goto memory_read;
+> > +
+> > +     if (unlikely(get_el2_to_el1_mapping(reg, &el1r, &xlate))) {
+> > +             if (!is_hyp_ctxt(vcpu))
+> > +                     goto memory_read;
+> > +
+> > +             /*
+> > +              * CNTHCTL_EL2 requires some special treatment to
+> > +              * account for the bits that can be set via CNTKCTL_EL1.
+> > +              */
+> > +             switch (reg) {
+> > +             case CNTHCTL_EL2:
+> > +                     if (vcpu_el2_e2h_is_set(vcpu)) {
+> > +                             val = read_sysreg_el1(SYS_CNTKCTL);
+> > +                             val &= CNTKCTL_VALID_BITS;
+> > +                             val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
+> > +                             return val;
+> > +                     }
+> > +                     break;
+> > +             }
+> > +
+> > +             /*
+> > +              * If this register does not have an EL1 counterpart,
+> > +              * then read the stored EL2 version.
+> > +              */
+> > +             if (reg == el1r)
+> > +                     goto memory_read;
+> > +
+> > +             /*
+> > +              * If we have a non-VHE guest and that the sysreg
+> > +              * requires translation to be used at EL1, use the
+> > +              * in-memory copy instead.
+> > +              */
+> > +             if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
+> > +                     goto memory_read;
+> > +
+> > +             /* Get the current version of the EL1 counterpart. */
+> > +             WARN_ON(!__vcpu_read_sys_reg_from_cpu(el1r, &val));
+> > +             if (reg >= __SANITISED_REG_START__)
+> > +                     val = kvm_vcpu_apply_reg_masks(vcpu, reg, val);
+> > +
+> > +             return val;
+> > +     }
+> > +
+> > +     /* EL1 register can't be on the CPU if the guest is in vEL2. */
+> > +     if (unlikely(is_hyp_ctxt(vcpu)))
+> > +             goto memory_read;
+> > +
+> > +     if (__vcpu_read_sys_reg_from_cpu(reg, &val))
+> > +             return val;
+> > +
+> > +memory_read:
+> > +     return __vcpu_sys_reg(vcpu, reg);
+> > +}
+>
+> ... isn't this now pretty huge to be inlining? Similarly for the write
+> accessor. What does the bloat-o-meter script say?
 
-IOW you need to define for how long the return result of
-guest_memfd_get_pfn() is valid for.
+In terms of the bloat-o-meter script:
 
-> > I was kind of thinking it would be nice to have a guestmemfd mode that
-> > was "pinned", meaning the memory is allocated and remains almost
-> > always mapped into the TSM's page tables automatically. VFIO using
-> > guests would set things this way.
-> 
-> Yeah while doing the above, I was wondering if I want to pass the fd
-> type when DMA-mapping from an fd or "detect" it as I do in the above
-> commit or have some iommufd_fdmap_ops in this fd saying "(no)
-> pinning needed" (or make this a flag of IOMMU_IOAS_MAP_FILE).
+add/remove: 4/4 grow/shrink: 27/5 up/down: 16720/-108 (16612)
+Function                                     old     new   delta
+vcpu_read_sys_reg                            648    4132   +3484
+__vcpu_read_sys_reg_from_cpu                 428    2112   +1684
+vcpu_write_sys_reg                           672    2016   +1344
+get_el2_to_el1_mapping                       404    1616   +1212
+is_hyp_ctxt                                  216    1256   +1040
+__vcpu_write_sys_reg_to_cpu                  420    1232    +812
+vcpu_el2_e2h_is_set                          296    1032    +736
+...
+Total: Before=33050106, After=33066718, chg +0.05%
 
-It should be autodetected.
+Looking more carefully at the code, I should be using __vcpu_sys_reg()
+and __vcpu_assign_sys_reg() directly, since we're !VHE. I'll fix it
+when I respin.
 
-Since this is unique behavior for guestmemfd it is fine to start
-there..
+Thanks!
+/fuad
 
-> btw in the AMD case, here it does not matter as much if it is
-> private or shared, I map everything and let RMP and the VM deal with
-> the permissions. Thanks,
-
-I think ARM would like to do this as well.
-
-Hence my suggestion that guestmemfd could just have unchanging 1G PFNs
-and all shared/private changes have no impact on iommufd.
-
-If so likely all this needs is an invalidation callback from
-guestmemfd to iommufd to revoke on ftruncate.
-
-Jason
+> Will
+>
