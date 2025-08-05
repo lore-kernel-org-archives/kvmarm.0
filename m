@@ -1,134 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A24298CDE
-	for <kvmarm@lists.linux.dev>; Tue,  5 Aug 2025 18:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA1925394C
+	for <kvmarm@lists.linux.dev>; Tue,  5 Aug 2025 18:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754419289; cv=none; b=q9E1r3Yul7q+XAkIGV48QXGSp1Hu5AtsHoBEHPiqGDGrShGGtTDFqqOY5+aHqSEUzEbDX1uR89n56aYoW9nhScdJn1/iwKLTYRV45FeLo2a3YRwBVk8Kb5sAUuh8+zmi4xBe7PIiNM98p826ibKHBhfsVMgEZ5JH7IYJkS/KZNk=
+	t=1754419343; cv=none; b=F+hhUKeRN/vmQ3fb7QG5TjlRNaTfEuTKhLMhiHvWH1p2QVVZf9KaGa7ignzIfRrQUTOOpZDYczu2MrY4lmnUn0QQqZaanjmktHRIzG5Rf+XNKeJuojk1ELpe0ejYHhWgwI07tFm0Nhhmh4g0J90wcCn5nxTMEZsvr2dRi1g+fQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754419289; c=relaxed/simple;
-	bh=uD11fUjResybtgXeRjv89oPYdFDMt5vMpFniG+hDzd8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H1Q+D7yNMTONxHb+yn8S5DmyEIysh2iey6y2ACmpyBxd2vDTBBa2nl12+KdEuCC5tIcLopxBdxnCffWnVSefGZKxEJ+f/WHxgrvHJ+oc8Sm9z7TuL0FKEAeJZAZIQvVHSKECPTJFOq0SAOxA1nxHklGrtLjxW0RRNa6WxpX0sIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZlDorHx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754419343; c=relaxed/simple;
+	bh=P46mtJ0gCpHpBEjbtuFgOf8BIfh7RrO1hxnNGIV0+78=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gH55adoUziTNIaIppZd9qgoQABDIKoESAVpOD4uElNTi+/0mF1cLYwr5CC1Y78Pfj1yJlwPpRGFJ1YhhWPYjUTHmCYmEDcEbL20C5EqIyc9s05+r7Vvkh/Y0dpeepw1n33FlAoH/1z2+hr1O9EHXr1RFLTzhxlFtl8UxUYC0cy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=cWGF2MsT; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZlDorHx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8238C4CEF0;
-	Tue,  5 Aug 2025 18:41:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754419289;
-	bh=uD11fUjResybtgXeRjv89oPYdFDMt5vMpFniG+hDzd8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BZlDorHxq6qUpw+ESL8LNjn4/KQtwOQtiyp2gso4NevuBnyOmX7dF/d8BR4FBTCJ9
-	 +bRV6K4Hi6t1ldnVjfwQrURP50Dppd2O4f8VRFq6rGSXgNOUQJoE1LO1FQf3HMpYvw
-	 oC6ozpTr+8oVDTEZDJhOR+QxZGPicxKcJ4cyBRa9ydzgkDgWjqlNzlrbbMcGyP8Lli
-	 yNjEd9zS9a+viAFkNuAXjIMs6Bbw9FtyQrDfkl45+GIyIbB9Rk1YT8R152XLaC/dAz
-	 Bp5OmEQaoTbbpLZ0viPsv2VS7UPY12r3YQjOqHsQGSdUYr1OY3UOeE+SEwSnIQmkjo
-	 I69VD6kwInbfQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ujMbG-004FWi-QC;
-	Tue, 05 Aug 2025 19:41:26 +0100
-Date: Tue, 05 Aug 2025 19:41:26 +0100
-Message-ID: <86cy99a9wp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	vdonnefort@google.com,
-	qperret@google.com,
-	sebastianene@google.com,
-	keirf@google.com,
-	smostafa@google.com
-Subject: Re: [PATCH v1 3/4] KVM: arm64: Sync protected guest VBAR_EL1 on injecting an undef exception
-In-Reply-To: <20250805135617.831971-4-tabba@google.com>
-References: <20250805135617.831971-1-tabba@google.com>
-	<20250805135617.831971-4-tabba@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="cWGF2MsT"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7d45f5fde50so518195385a.2
+        for <kvmarm@lists.linux.dev>; Tue, 05 Aug 2025 11:42:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1754419340; x=1755024140; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=U7XB7GrHToBPhXF/Sktcv3tgOaDMdGgdpINsfi2+cJw=;
+        b=cWGF2MsTamYF7W6z1B5LLR3B8Dn0qIPIQoxNLgvfOkNdTTRV/a1btupCCaYroCQVmZ
+         LCtBYfJtGf6h6w42Q2Rd1RGaIh6E0+E4GHJAQmyhP3cMmt9VtliAKuY9ZNhMy2TeI0L9
+         NHLiXlFBbbwDkYBuzw9d58LHY/cwpXjYdth1oPY32hUS2xhOzla04+sZrNTl6bIzTKaa
+         IICnxq+Ws98fWq10wOsd+QZuI/HDry5OD4+reLbXDAHCeAPCyF2b1Zw6FiYYmKkGG+fN
+         utbPSfENKthiH7r5Gcimc35zrHq56rNgbcXRCFidVGbuX3X9lmdVnkxM5wW+L2O/BrOt
+         8nPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754419341; x=1755024141;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U7XB7GrHToBPhXF/Sktcv3tgOaDMdGgdpINsfi2+cJw=;
+        b=KrsnSuSqAH2r/BKmwXI4hYV09OXMvEemiqc7E3+T8wYgmxFh2nGCH+4zTpymqLQqdh
+         ZKe+M258OtH0jpx+cypDB+E7pXL1BacBmrOA54okrchiXqEzulbqEjPbIsOgItgw5hqR
+         v4PSuB7kwpmUiUnVylx5WRL2Chrfrqnia7xsC8/1d6riXd/7V5E0AEP03rKbbej5u6Pe
+         H3a+O1NfUz6QMOnfJ9bRdZhqSwDzaDGaQkmi9tv0w9+BazmoM0i1Eka4fmSO18k/T2Vi
+         9MsgQjknnSi/fhvxDjgcedHB/FreXYJXvy2UaA2Tg9r8ligKgGtMfuIArel/nhQT28w6
+         ZDUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBufQoJrww72gjzbbxZZnFmopQ4ZP+yoYQz7M1M8WgBibXur5K7oheGlUZdpU1xk1ggT8yENQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyMVxtD5X4frYcjYf6kZA9pVCIWuTq4pkMDszD69DCcOnllvnFK
+	iQyYaFltQYsp7niCvUnKueML0rRJyCbcimLLDEAkvyJLb0laRb2ASDtIHS4bzidDzXQ=
+X-Gm-Gg: ASbGncuWDGBwr+Oq3A7vgIMgLCC+e9snmsJju+0PaaZFFNFwH6khr9h+H9kHS767MXe
+	KFDfCRYol5XOxkpkPwefhDb7QVbuMwwY7GJ/y/P8fWfty8KDPtNSW9A10bVyPrWgXpBp2ad2geP
+	Sdg2fB60xWV60sf56uhgCC0FQabomsbtqguMyoaQEpYPCQafS767VJnPsOZIqvHsb04vbCjuJ4x
+	KwnBedjwbRxNQdV9cTw03vuuSEmIFcLFvH4ohF9yIIs08ODpPlIaIzAaTD0Pr32QIrCtnvLAxkM
+	haLf6Og1zmQ8n89lDp0rKLXMMS3GN39wQKp3RrMcswbu+qi/BQ4fhyC+cAQfLWubPR2ENPkac73
+	APN1cVHWM9i6xQ01zoqsS/59ZEiS6ubwfzDEa54mjGUDXsBzXoABdgYvuO2K5+NWyVlqo
+X-Google-Smtp-Source: AGHT+IFJzYdfGQoh/nIgvuIB92GlB+9KcosE0NpiAsp7dbUcQ9i0SxxUhRh1JZQ7lvAEKF3yp7Ujtg==
+X-Received: by 2002:a05:620a:a91a:b0:7e6:30f0:82bd with SMTP id af79cd13be357-7e814dae548mr48217385a.33.1754419340508;
+        Tue, 05 Aug 2025 11:42:20 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e67f594228sm692985285a.11.2025.08.05.11.42.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Aug 2025 11:42:19 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1ujMc7-00000001aDl-0KMK;
+	Tue, 05 Aug 2025 15:42:19 -0300
+Date: Tue, 5 Aug 2025 15:42:19 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: dan.j.williams@intel.com
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 00/38] ARM CCA Device Assignment support
+Message-ID: <20250805184219.GZ26511@ziepe.ca>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <688c2155849a2_cff99100dd@dwillia2-xfh.jf.intel.com.notmuch>
+ <20250801155104.GC26511@ziepe.ca>
+ <688d2f7ac39ce_cff9910024@dwillia2-xfh.jf.intel.com.notmuch>
+ <yq5acy9a8ih6.fsf@kernel.org>
+ <20250805172741.GX26511@ziepe.ca>
+ <68924d18a68d4_55f091004d@dwillia2-xfh.jf.intel.com.notmuch>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vdonnefort@google.com, qperret@google.com, sebastianene@google.com, keirf@google.com, smostafa@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <68924d18a68d4_55f091004d@dwillia2-xfh.jf.intel.com.notmuch>
 
-On Tue, 05 Aug 2025 14:56:16 +0100,
-Fuad Tabba <tabba@google.com> wrote:
+On Tue, Aug 05, 2025 at 11:27:36AM -0700, dan.j.williams@intel.com wrote:
+> > > Clearing any of the following bits causes the TDI hosted
+> > > by the Function to transition to ERROR:
+> > > 
+> > > • Memory Space Enable
+> > > • Bus Master Enable
+> > 
+> > Oh that's nice, yeah!
 > 
-> In pKVM, a race condition can occur if a guest updates its VBAR_EL1
-> register and, before a vCPU exit synchronizes this change, the
-> hypervisor needs to inject an undefined exception into a protected
-> guest.
+> That is useful, but an unmodified PCI driver is going to make separate
+> calls to pci_set_master() and pci_enable_device() so it should still be
+> the case that those need to be trapped out of the concern that
+> writing back zero for a read-modify-write also trips the error state on
+> some device that fails the Robustness Principle.
+
+I hope we don't RMW BME and MSE in some weird way like that :(
+ 
+> > Here is where I feel the VMM should be trapping this and NOPing it, or
+> > failing that the guest PCI Core should NOP it.
 > 
-> In this scenario, the vCPU still holds the stale VBAR_EL1 value from
-> before the guest's update. When pKVM injects the exception, it ends up
-> using the stale value.
+> At this point (vfio shutdown path) the VMM is committed stopping guest
+> operations with the device. So ok not to not NOP in this specific path,
+> right?
+
+What I said in my other mail was the the T=1 state should have nothing
+to do with driver binding. So unbinding vfio should leave the device
+in the RUN state just fine.
+
+> > With the ideal version being the TSM and VMM would be able to block
+> > the iommu as a functional stand in for BME.
 > 
-> Explicitly read the live value of VBAR_EL1 from the guest and update the
-> vCPU value immediately before pending the exception. This ensures the
-> vCPU's value is the same as the guest's and that the exception will be
-> handled at the correct address upon resuming the guest.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index bbd60013cf9e..b34b10be1ad7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -253,6 +253,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
->  
->  	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
->  	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
-> +	vcpu_write_sys_reg(vcpu, read_sysreg_el1(SYS_VBAR), VBAR_EL1);
->  
->  	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
->  
+> The TSM block for BME is the LOCKED or ERROR state. That would be in
+> conflict with the proposal that the device stays in the RUN state on
+> guest driver unbind.
 
-There is something I don't understand. vcpu_write_sys_reg() is only
-useful if you make use of the SYSREGS_ON_CPU flag. Which is only
-driven by the VHE code (in arch/arm64/kvm/hyp/vhe/sysreg-sr.c).
+This is a different thing. Leaving RUN says the OS (especially
+userspace) does not trust the device.
 
-As a consequence, this only writes to memory, since the flag is always
-false, and we take the following path:
+Disabling DMA, on explict trusted request from the cVM, is entirely
+fine to do inside the T=1 state. PCI made it so the only way to do
+this is with the IOMMU, oh well, so be it.
 
-static inline void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
-{
-	u64 (*xlate)(u64) = NULL;
-	unsigned int el1r;
+> I feel like either the device stays in RUN state and BME leaks, or the
+> device is returned to LOCKED on driver unbind. 
 
-	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
-		goto memory_write;
+Stay in RUN is my vote. I can't really defend the other choice from a
+linux driver model perspective.
 
-[...]
-memory_write:
-	__vcpu_assign_sys_reg(vcpu, reg, val);
-}
+> Otherwise a functional stand-in for BME that also keeps the device
+> in RUN state feels like a TSM feature request for a "RUN but
+> BLOCKED" state.
 
-My conclusion so far is that you only ever need to write to the shadow
-view of the register, and that the previous patch serves no purpose.
+Yes, and probably not necessary, more of a defence against bugs in
+depth kind of request. For Linux we would like it if the device can be
+in RUN and have DMA blocked off during all times when no driver is
+attached.
 
-Am I missing anything?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Jason
