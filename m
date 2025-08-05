@@ -1,144 +1,102 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9087D098;
-	Tue,  5 Aug 2025 02:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463A721639B;
+	Tue,  5 Aug 2025 04:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754361347; cv=none; b=HtcdpRnmJgWTPQjIho/ArSeE8oEGAYsz9FyAoRTSn+lul8fJ3KCmnAEYjVzvmrP86vWlxVBCQNnnA7BLLt6Zy0QHol/r8ldyPQE2jXgHyoOpnsvhNkMpD0qtCSXfCosJj621ogFFLxv9vis61VNn28EhvEzhIniIs3gMatGrkKk=
+	t=1754369438; cv=none; b=puEXYCZsR4zgM7Cm3M0q52jbXSkpZOn+FjQK1k2hoE7R/cqfHNzS4dxL7vceWM1t+0l0xSnq0JJ+fWnOwI/qKloxIa4/oSc2lT9d7dVqzbyML8q5C8rNGaCyh2uEUKReIC/WQXo0K/nps1uOx3lSfPggkZuF4EL5N3nUsTsMJiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754361347; c=relaxed/simple;
-	bh=WNJEOW8KWqBdbtvoj3VmjtsdImT7zj15PWKPLcsJXAk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nTXg0yXzU+lxtOKg/KjT62p6rlQ5Z3H31LPyEyS4q6DLAeseQ9kgC5J5gPh9imWmVNRKqofH50Mxbqq0Z3GI22UASHxDgQBlqR/arI+I9vf0EfGOO3rY++gtXKKtBTGgVFRmTup7CHBqGwmhJOFwtQ7KEnlQyjlGwuVWgKKTKKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Faez5goL; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1754369438; c=relaxed/simple;
+	bh=fVWNpB6uzPWSzmZr0uT2aPWOOivAck8Ett7wh/W2aVU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=AbWomXF+kHdzNAgdXOT4JlwqYIdgwq9m8ItiYCVtIeeqn7JM98QVt0CZoVAUgAbnNzzcXwJkOBwO5HaWklQk7s2mi8G6yqjqNGP+4ulX/vIpKWnUERBK3/2aj9NhoIUwyUzyA8mQy11FbnQ63Y7Yl+j6vl+EGA+zJwL45a2A00M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F4El6S8+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Faez5goL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754361346; x=1785897346;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WNJEOW8KWqBdbtvoj3VmjtsdImT7zj15PWKPLcsJXAk=;
-  b=Faez5goLHe5vYZal0pqC6idZYpJDHE3Nlz51S5j0wvi69IVDkog1LKZ4
-   QVzk5k0bg4rZCjbbNpAziC+wHPgx19PVa5foLfhfVxLwAgg36nXw3tC3V
-   m1myaAHlmYWhdsl5b0Gt0EiEZhzrEAyVHLhwRMtdJubavSs7S0whQfskj
-   B0wNuc0mNi7t0979AWVoKPLVdbJnXNjIRCsNZvUHwhQHfENcdjIMIQfex
-   NhAQj4uNQWxiNOtqHJLWzjakKkyFYRhsodkJ1Nf/xUtlYm3I4rPIRRmup
-   xds5mwgnFnKaapZQxK44IPLRcmMb4xocGSwO74QzUghLlp0OBbziFCLDI
-   Q==;
-X-CSE-ConnectionGUID: zXgrOdTZQfO4ykDT1PT+CA==
-X-CSE-MsgGUID: 6nqhUY6MSzWFdQFUjFw7uQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11512"; a="67217350"
-X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
-   d="scan'208";a="67217350"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 19:35:45 -0700
-X-CSE-ConnectionGUID: /YnWTCSyTmu5PHjREof3iQ==
-X-CSE-MsgGUID: JeLk3g5WR5mXt7k4FP7kmA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
-   d="scan'208";a="163577182"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa006.jf.intel.com with ESMTP; 04 Aug 2025 19:35:42 -0700
-Date: Tue, 5 Aug 2025 10:26:06 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F4El6S8+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BC47C4CEF4;
+	Tue,  5 Aug 2025 04:50:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754369437;
+	bh=fVWNpB6uzPWSzmZr0uT2aPWOOivAck8Ett7wh/W2aVU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=F4El6S8+IawdSAD8fksaTfbbKtGS+nE3I8MKiRTseeG1AB8uMLPCSOwknxK1ojb6L
+	 tuz+9TP0LScVsHNyhI/gmm5Z8PAcLdCbMxLsE62MGeaUaJ/XCqA+xXKBqIrtUMlGAT
+	 JUhT96eHUgSgdImjhUz+QGwj2gq+bEeMXpvn1gDFoaEO53OdfiwbvX5cyYHRwOzXj5
+	 RtALf24V53/Ylb26LE/blICqBGvmpptJBNrEH6lWckTpjGlQqIUfQTQN3RWhUlinAE
+	 BDRNtEE3xYA4DAy4qeJiNy7kEXmfqPEaYuc3lMyb8K+ES7dvnNZA+02dIOlUXhYwGM
+	 4nBnPfrzC21+w==
+X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: dan.j.williams@intel.com, linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
+	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
 	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 06/38] iommufd: Add and option to request for bar
- mapping with IORESOURCE_EXCLUSIVE
-Message-ID: <aJFrvsURkhpTJgh8@yilunxu-OptiPlex-7050>
+Subject: Re: [RFC PATCH v1 00/38] ARM CCA Device Assignment support
+In-Reply-To: <688c2155849a2_cff99100dd@dwillia2-xfh.jf.intel.com.notmuch>
 References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-7-aneesh.kumar@kernel.org>
- <20250728140841.GA26511@ziepe.ca>
- <yq5a34afbdtl.fsf@kernel.org>
- <20250729142917.GF26511@ziepe.ca>
- <aInBxnVIu+lnkzlV@yilunxu-OptiPlex-7050>
- <20250731122217.GR26511@ziepe.ca>
+ <688c2155849a2_cff99100dd@dwillia2-xfh.jf.intel.com.notmuch>
+Date: Tue, 05 Aug 2025 10:20:30 +0530
+Message-ID: <yq5afre68j8p.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250731122217.GR26511@ziepe.ca>
+Content-Type: text/plain
 
-On Thu, Jul 31, 2025 at 09:22:17AM -0300, Jason Gunthorpe wrote:
-> On Wed, Jul 30, 2025 at 02:55:02PM +0800, Xu Yilun wrote:
-> > On Tue, Jul 29, 2025 at 11:29:17AM -0300, Jason Gunthorpe wrote:
-> > > On Tue, Jul 29, 2025 at 01:58:54PM +0530, Aneesh Kumar K.V wrote:
-> > > > Jason Gunthorpe <jgg@ziepe.ca> writes:
-> > > > 
-> > > > > On Mon, Jul 28, 2025 at 07:21:43PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> > > > >> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-> > > > >
-> > > > > Why would we need this?
-> > > > >
-> > > > > I can sort of understand why Intel would need it due to their issues
-> > > > > with MCE, but ARM shouldn't care either way, should it?
-> > > > >
-> > > > > But also why is it an iommufd option? That doesn't seem right..
-> > > > >
-> > > > > Jason
-> > > > 
-> > > > This is based on our previous discussion https://lore.kernel.org/all/20250606120919.GH19710@nvidia.com
-> > > 
-> > > I suggested a global option, this is a per-device option, and that
-> > > especially seems wrong for iommufd. If it is per-device that is vfio,
-> > 
-> > I think this should be per-device.
-> 
-> IMHO there is no use case for that, it should arguably be global to
-> the whole kernel.
+<dan.j.williams@intel.com> writes:
 
-I think there are 2 topics here:
+> Aneesh Kumar K.V (Arm) wrote:
+>> This patch series implements support for Device Assignment in the ARM CCA
+>> architecture. The code changes are based on Alp12 specification published here
+>> [1].
+>> 
+>> The code builds on the TSM framework patches posted at [2]. We add extension to
+>> that framework so that TSM is now used in both the host and the guest.
+>> 
+>> A DA workflow can be summarized as below:
+>> 
+>> Host:
+>> step 1.
+>> echo ${DEVICE} > /sys/bus/pci/devices/${DEVICE}/driver/unbind
+>> echo vfio-pci > /sys/bus/pci/devices/${DEVICE}/driver_override
+>> echo ${DEVICE} > /sys/bus/pci/drivers_probe
+>> 
+>> step 2.
+>> echo 1 > /sys/bus/pci/devices/$DEVICE/tsm/connect
+>
+> Just for my own understanding... presumably there is no ordering
+> constraint for ARM CCA between step1 and step2, right? I.e. The connect
+> state is independent of the bind state.
+>
+> In the v4 PCI/TSM scheme the connect command is now:
+>
+> echo $tsm_dev > /sys/bus/pci/devices/$DEVICE/tsm/connect
+>
+>> Now in the guest we follow the below steps
+>
+> I assume a signifcant amount of kvmtool magic happens here to get the
+> TDI into a "bind capable" state, can you share that command?
+>
 
-1. Prevent VFIO mmap
-2. Prevent /sys/../resource, /dev/mem users
+lkvm run --realm -c 2 -m 256 -k /kselftest/Image  -p  "$KERNEL_PARAMS" -d ./rootfs-guest.ext2 --iommufd-vdevice --vfio-pci $DEVICE1 --vfio-pci $DEVICE2
 
-I assume you are refering to the 2nd, then I agree.
+> I had been assuming that everyone was prototyping with QEMU. Not a
+> problem per se, but the memory management for shared device assignment /
+> bounce buffering has had a quite of bit of work on the QEMU side, so
+> just curious about the difference in approach here. Like, does kvmtool
+> support operating the device in shared mode with bounce buffering and
+> page conversion (shared <=> private) support? In any event, happy to see
+> mutiple simultaneous consumers of this new kernel infrastructure.
+>
 
-> 
-> > The original purpose of this pci_region_request_*() is to prevent
-> > further mmap/read/write against a vfio_cdev FD which would be used
-> 
-> No way, the VFIO internal mmap should be controled by VFIO not by
-
-I assume your point is never to use more than one request region in the
-same driver to achieve some mutual exclusion. I'm good to it. We could
-switch to some bound flag.
-
-> request region. If you want to block that it should be blocked by
-> iommufd telling VFIO that the device is bound which revokes the
-> mmaps/dmabufs/etc and prevents opening new ones.
-
-Agree.
-
-> 
-> The only thing request region should do is prevent /sys/../resource,
-> /dev/mem users and so on, which is why it can and should be
-> global. Arguably VFIO should always block those things but
-> historically hasn't..
-
-Agree. So seems no need a global option?
-
-Thanks,
-Yilun
-
-> 
-> There should only be one request region call in VFIO, it should
-> ideally happen when the VFIO driver probes the device.
-> 
-> Jason
+-aneesh
