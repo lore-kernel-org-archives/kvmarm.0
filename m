@@ -1,104 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D651BCA07;
-	Tue,  5 Aug 2025 14:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4715F274B50
+	for <kvmarm@lists.linux.dev>; Tue,  5 Aug 2025 15:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754405353; cv=none; b=nH0/aRX9tdYBjal7g8AGrD6witM6N2+W5SwEsK7gxGqXoZTphiOs6QMOIIH6PRuQ3kOm9kVNJGFbY43QhJqbg5XEPGuZ0FhQDA5ujcYNuPI4/ypY6m8EADr227Ytya6sgsl+68bhxpQLoPHOhCX8Db6ikW/3buXgiHnbuy8B0vc=
+	t=1754407280; cv=none; b=eT3krQf18TKB4HwszxfugeZMrc6O+fDYyMpsNbZGtiSCOuP+a0QQAFY6yklBkgAoES52tW6PIxdEZB9/SX+PlsD8MuFy057u8fLykW9bic9gkYNagSBlu3WLazc0fzckuxsUQ2QozsU+VbjlOv3BAdtu4bDHOGlfe8H4J9P/Css=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754405353; c=relaxed/simple;
-	bh=g7knE9ug0EmLDYjRKXiNJuFaF+Il11QTq54rtre3QTs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tg5tot1UorUYzVIbkDNqeqwB1zCfvcREY3hkO/odcmICnXsQrkQX+AyJTJxmIfUz2rkYFlMBDMf3P32wNUgFg5thUGA/9sNdknIVXb9tQVEhasuOmGh5dTt5PD8pE//dMHc54LDlvzlgEe1uTXoKDeqOaUcBbReHtUWSo5RCvok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=upqPGit0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754407280; c=relaxed/simple;
+	bh=r1Meg3SAhDcH+nnYjimoBkrTZ4UUpLXDaIJfimD1+eA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R5n5Gb6ylUFJOrbGhS+zzWZYsZ3v/IMuwwY/9ymCiC/6fSVBJ6tDf/RvIOLEgp8okGWlQN9L9FMltfv+/KTDIupSfYKdo9vXxeZW3OUSemAPIJthqqRQuKvHS6y4diKsixZvKXf2vLmF3Ue4q1YORabYSyuoDICnbOOK2nnNk+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LZylkyjm; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="upqPGit0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8177C4CEF0;
-	Tue,  5 Aug 2025 14:49:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754405353;
-	bh=g7knE9ug0EmLDYjRKXiNJuFaF+Il11QTq54rtre3QTs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=upqPGit0HxC6HEwZVDb3Jwfamg/tWADYMK0T14l0IR9HlXFGJpNC2chDD/mhZDOkR
-	 HlFXfopKreQpfgX8X6nWJchIqjBu34biQCrNW8JdVBPOWLhoMPkK5ruHkVlDOWDxAT
-	 soY3A4nMlhLEzZhEPAHgH9dnFasI4ICkNLEocDubp9zeCZP1tWE3e7mvivP6d2Da8M
-	 +C98jjOQ6ijGd1CgTXx/9Ku8iw+w9yKXeg9f3zMpm4UmtA4IkGUEvTQ/ll9ZLEQhtf
-	 EQUYapC684MPbPXqeNlNy++nANFWsk+a/XaYoRZjYottBvy129CEIQq1wPphQRh6cR
-	 CzLEqHlqqskLg==
-Date: Tue, 5 Aug 2025 15:49:06 +0100
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: perlarsen@google.com, Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, ahomescu@google.com,
-	armellel@google.com, arve@android.com, ayrton@google.com,
-	qperret@google.com, sebastianene@google.com, qwandor@google.com
-Subject: Re: [PATCH v7 4/5] KVM: arm64: Bump the supported version of FF-A to
- 1.2
-Message-ID: <aJIZ4v0X74zox1xZ@willie-the-truck>
-References: <20250701-virtio-msg-ffa-v7-0-995afc3d385e@google.com>
- <20250701-virtio-msg-ffa-v7-4-995afc3d385e@google.com>
- <aHpP7fntDQ7SMPAC@willie-the-truck>
- <86zfck7pys.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LZylkyjm"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4b0673b0a7cso628111cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 05 Aug 2025 08:21:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754407278; x=1755012078; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=r1Meg3SAhDcH+nnYjimoBkrTZ4UUpLXDaIJfimD1+eA=;
+        b=LZylkyjmzGw9dmh4Wf60VQZAWpIEFofMmowySbobjdBrhNF1JPKeZ1tWL11z/fFOfP
+         NjsLv99sc4A5zohZHDCUHDsNpyqzyV8WNJHjhtjfTEI7VQiJsMpcSePUd4DVHsrtc85b
+         MYXE0io/2jV+A3pSSUO6oL5tghC+goCORwYAU8qlDZVni9/YX1xlQ9Nv4AHOZDFscUmh
+         6qnoWHCspusKcUl5lAUxIOAtj87Fviz/USwrJmmVl65d++mhGuw7n/xVwOunrVCb6jCe
+         1T66doGHq65uoiKW3oUevFj61QBf5zRhddqPw66ci4dgkyv5QsHf0/x0DZBderdYI2rm
+         TAAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754407278; x=1755012078;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r1Meg3SAhDcH+nnYjimoBkrTZ4UUpLXDaIJfimD1+eA=;
+        b=U9UO7FZxRF8JjZsqVDw10SRc7KvtOAdfFlqUWnxEeWRw40/0F1rOQSk2wgWdvs2kPP
+         tZCZeerXo9XQ6sMKoYpPQ40C6ngDP469DXFfiXlorXJUU43I8wWJordJZp9/iBGRLlrx
+         AY5j6BpOIGWW/6snHoCH4+qOhTtoxgw+q7V4pM1gFADkv/gBrjFLS5A3PRKtcBXrMZUY
+         waB9v1KfQcZjaEb8IU7J/jIKY0WQGJLJugVDEXBuS9kRdi9umytBbfsdNzFuy8cCKSR5
+         n5maR4o3KNBk01Qy3b7ZfuxDDftpym2/wSmEIL/ixTvCgPK9oyu+WpZrMxclo/5oTq+T
+         rWHg==
+X-Gm-Message-State: AOJu0YxZ8Skk9cyYBzwYCJJZJ+RDIWr2WCi/Zv2flVTw3d5+gvN01RL8
+	sjnoC6XL/vPoaKwJuBiK+TjAFqm4nbV0e1gT4Ao+f44byFy63WNs4fAN3Of6RxTYljJDDvyA+/P
+	iG9msKH3+cIxKGiCnVyFfxIz+nGPTxIWQ42b+dZyL
+X-Gm-Gg: ASbGncu3cecHF6qNFitF8aA6CzK0xnZsSdCBtgtXdQFHqgXz1I6+zgvleZshRIZhBDg
+	qICtT0owpfiPwF3yVxSGUh9yVhbmHT7VZ3W7U6MIl5AklpRGaCCL9aHO8oIf0XNW9LOHqdEdojs
+	ANRCq+m63u1LPoYM4vQpzj1+bjj7EeJTu/MEwhPXlDuvjwaz6mewRibFTx+xNQCnR/rNZQHzYlc
+	Y1WbasJ
+X-Google-Smtp-Source: AGHT+IHgagTKXL9FPCp0iCD+9/acHZKe2CgULwhUdyzE2hK/zZEFw7jdeh3IdiV4ujAdRnhlDN2PVWoMVQsJW7Lprbc=
+X-Received: by 2002:a05:622a:4e:b0:4b0:83a3:9bac with SMTP id
+ d75a77b69052e-4b084ffef47mr4060521cf.17.1754407277855; Tue, 05 Aug 2025
+ 08:21:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86zfck7pys.wl-maz@kernel.org>
+References: <20250805135617.831971-1-tabba@google.com> <aJIXqmv1_0djt82y@willie-the-truck>
+In-Reply-To: <aJIXqmv1_0djt82y@willie-the-truck>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 5 Aug 2025 16:20:41 +0100
+X-Gm-Features: Ac12FXyEbwP4ln3SJ6qXyIbaadtTPQ9r3wm2Hpipb7fqLA4duSGS1qyDxnJRhTc
+Message-ID: <CA+EHjTzTikJjhHAse0vKBwn2Gi=nOR9MKjQDOFL2H8BxBL3JGg@mail.gmail.com>
+Subject: Re: [PATCH v1 0/4] KVM: arm64: Fixes to handling of restricted
+ registers for protected VMs
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	vdonnefort@google.com, qperret@google.com, sebastianene@google.com, 
+	keirf@google.com, smostafa@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hey Marc,
+Hi Will,
 
-(we discussed this very briefly offline but I wanted to reply for the
-benefit of everybody else and also because I don't recall quite where we
-ended up)
+On Tue, 5 Aug 2025 at 15:39, Will Deacon <will@kernel.org> wrote:
+>
+> Hi Fuad,
+>
+> On Tue, Aug 05, 2025 at 02:56:13PM +0100, Fuad Tabba wrote:
+> > This patch series is mainly about fixing issues we've encountered in
+> > pKVM (in downstream Android code), related to the handling of protected
+> > VM access to restricted registers and injecting undefined exceptions
+> > into a protected guest.
+> >
+> > The last patch isn't pKVM specific, but a fix to the vgic-v2 code
+> > encountered while fixing the issues in this series. The issue it fixes
+> > was indirectly introduced into the code with hVHE.
+> >
+> > Based on Linux 6.16.
+>
+> Thanks for putting this together so quickly.
+>
+> I left some small comments on patches 2 and 3 but, for the sake of
+> transparency (I already mentioned the GIC thing to Marc), please can
+> you add:
+>
+> Reported-by: Will Deacon <will@kernel.org>
+>
+> on patches 1 and 4?
 
-On Thu, Jul 31, 2025 at 08:56:59AM +0100, Marc Zyngier wrote:
-> On Fri, 18 Jul 2025 14:45:17 +0100,
-> Will Deacon <will@kernel.org> wrote:
-> > On Tue, Jul 01, 2025 at 10:06:37PM +0000, Per Larsen via B4 Relay wrote:
-> > > From: Per Larsen <perlarsen@google.com>
-> > > @@ -734,7 +741,10 @@ static int hyp_ffa_post_init(void)
-> > >  	if (res.a0 != FFA_SUCCESS)
-> > >  		return -EOPNOTSUPP;
-> > >  
-> > > -	switch (res.a2) {
-> > > +	if ((res.a2 & GENMASK(15, 2)) != 0 || res.a3 != 0)
-> > > +		return -EINVAL;
-> > 
-> > Why are you checking bits a2[15:2] and a3? The spec says they MBZ,
-> > so we shouldn't care about enforcing that. In fact, adding the check
-> > probably means we'll fail if those bits get allocated in future.
-> 
-> I have the exact opposite approach. If we don't check that they are 0
-> for v1.2 and previous versions, we won't be able to tell what they
-> mean when they are finally allocated to mean something in version
-> 1.337.
-> 
-> Until we support such version, MBZ should be enforced, because we
-> otherwise don't understand what the "client" is trying to say. And we
-> don't understand, we're guaranteed to do the wrong thing.
-
-We've lost a bunch of context in the diff here, but there are two
-important things to keep in mind at this point:
-
-  1. We've negotiated a known version of FF-A, so it won't be v1.337 and
-     we _should_ be able rely on the spec authors not breaking stuff
-     retrospectively (famous last words...)
-
-  2. The response we're parsing here is something that has come back
-     from TZ after we (the hypervisor) have called FFA_FEATURES. If
-     those MBZ bits are non-zero, I think should just ignore them.
+Will do.
 
 Cheers,
+/fuad
 
-Will
+>
+> Cheers,
+>
+> Will
