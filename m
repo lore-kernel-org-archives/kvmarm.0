@@ -1,57 +1,57 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C5A2D8760
-	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 19:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37812DECC6
+	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 19:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754510317; cv=none; b=lHOb7DZANzr24QOyfCJ9RkugUbd/ZZVtEDW/+Ustq4qd5J1czLSuhEeFhsaMu5+hCksu8YuuCMbzWQOjd9sikofrdNUCFrD76DeBCKIm/YGH3IhoGzKt4o63qe/ZCgw2+ELppymLssP9YDOmZkgSVmZRUmEZ6I8s8hAfVam7e2M=
+	t=1754510319; cv=none; b=ZXJShKxF/DtN4KAFVEmg6ud3GGVBzngAnG3TlEppMBTcfXAQheML+3dwhl1ezZHds2QLn2qjkvCEwm5Nsj68dd5YcmqAKfoOYjgKtoBVtl+CHGRxkiKIUTUCUt/KRMWvNdQ154a+yDtRhL4OCkuOzDzF//eGxnrBmn5a0HvapH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754510317; c=relaxed/simple;
-	bh=QVIn0+kukbkiW0o85fHutqEBFnL/lbFRNdNnmVngsXM=;
+	s=arc-20240116; t=1754510319; c=relaxed/simple;
+	bh=BkM6KVwWoNh4dFmNtuvLOgPAK4SVj00cIniNA7xy18I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nfKOcEyMNOAxpWmdaz41ntW6onv5KoFRaDnXR1mFJyY+u26wIPlTHNBUkhuq8NkGBlqRWQlhtdzTlRAoYgiGk3OmWXPJYHAhtSGVkltuSRk4bx6iQD5Pb5WWb4ywmz3EwWHjWLDZnrgvnhQaq25ctqPI45SRmJmJSIfF67Kp70o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SQjj3zaE; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=GH+3a0pcT/rLlFDCzkN5zUfqAtRXGojTnEPUaPKYJ6EnvcMb8Icp+sJjfGtrw28lbveOwuoi3rsWyA5PTI/klR21bX6zY93Sdd7kpBqyrRLyykGBm/lhPBBH1rkNZcm53VapMCq0slQwACIPVBnAzrEC8EQ3ayYfg+zvamqLyIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J9bJI1Uv; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQjj3zaE"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b321087b1cdso237576a12.2
-        for <kvmarm@lists.linux.dev>; Wed, 06 Aug 2025 12:58:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J9bJI1Uv"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3211b736a11so571722a91.0
+        for <kvmarm@lists.linux.dev>; Wed, 06 Aug 2025 12:58:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754510314; x=1755115114; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1754510316; x=1755115116; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pi5hsDnuks7nSFD8RayInQ9oz1eBhk4hTX7Cx/64BFI=;
-        b=SQjj3zaEtE32K5xKvSZY6ZPeOfM//PgH0iBODSF6Ovq4uWOuBJg+oeWkEhZSetSmDB
-         uREt9Ayu5GwMb+z9y+EWVcTwoqJ7BFMuymVv8kC9bUY83xSieesFP+wJ0kK1+DMgNA3x
-         kn8KTga9dQ59V9P0Q0D4yCQYk+BmssbHLKyLeMQdbU+UBsYE/qRCB9T2VUXFwgPt8NmY
-         nBj9KcaqvLI0Ot9JOh6zPRmILb8eL0WC0nmpi8KgGgMJTResRqWC0WWEbPrLUUoGHajZ
-         6tkmg6q5pcjZVxQSfjHevjTNsCMmo05Ux0+iew8IBcIFBlBHRQAC7ttmGV9VVEvGUxUV
-         2Q9A==
+        bh=zkAAwl8vElfQMpdapHv3m96nWKKm7bgpMF9fVPIUZ/g=;
+        b=J9bJI1UvhrIy57wi3FUfrhMh90AgUGe6R8xwxzOM/hWMwNAqcHYXn+cIXg/Q6rsUmA
+         eL4IQPMisADoSF7Cs9XpUlyBIw995RWjIbeBMv1D8BTcf+mkj/eGikYVDIv4Fi4n/Hgm
+         9yOrGcgKvsrGUquPvsuEAzZujNAPFz/Cw52VVkF1zu77dYwrLHEylxNi2eOqFiwT07ea
+         L4Q/daJJOHkLIR0lChixocZRgubub6bGW0lrUVvzrSk+rPvgqUGWFO5OKTw6SDhwTAwU
+         rZ5ART1Ujandn1qr9fIbLyDQA8pTD8rQ4g37saZA7QnocpsP7tAEROW0WsXT5REozOG/
+         4shg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754510314; x=1755115114;
+        d=1e100.net; s=20230601; t=1754510316; x=1755115116;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Pi5hsDnuks7nSFD8RayInQ9oz1eBhk4hTX7Cx/64BFI=;
-        b=IZaHLhDN/tnqFdCfkA+339pQB0xqMFAzbP2F0AsJFyjtJdyrW4LqQLcSyNOCTdFPIT
-         RxWfJxlsBKKrSpjzWEq8vlk9mbaCbP9+q7W9gq8H7BKdYbET2sgZ6+B2LGUxDLoG3Pnv
-         RV/D3IOpozfxTVro29QroEWp+907851d9MwEa8It/8aivurDbXGYRXlWeosm6oC6wnpK
-         M6bdCDt1vR9o+DiCh7Tfgx5Tqq6SqH4iwzu0TLXWPIGeJoFoH4TLxr5KOlTRLMefovZ7
-         +zH+fU7xGLxChr7JD0jjZS45mhT3Gp5OsgRnyNAIRgReEMZYSYnKFn39KO5fxm0tU9X6
-         88yw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx7nslIsDzm2CWLCdhzv2X+mpIOnFmytHvZCk+P/mL85JIlaJPG9dPevLYUL1jTbpdplYB/F0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzN7phT6BrsN9BOTt2zUIDp7uAiOhU3v+PIJY+Zm4zzM2qD8Xuk
-	mrc+ifoEdNyOLXJ4JWh1Lp2DX7U6//cBAzXbLlvbrtikcXqaqwy3Eer4PIeHq8ssXXv7SdaLCnI
-	0lKJWLg==
-X-Google-Smtp-Source: AGHT+IEJD5GH7UI5TAAlffejmtsOUdJu9B+mpPPWAxLwTCJvZJKLbNbFAds3hHNJ28h7v90ap7LjckKJrbQ=
-X-Received: from plhl7.prod.google.com ([2002:a17:903:1207:b0:235:f4e3:ba29])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d581:b0:234:d7b2:2ac3
- with SMTP id d9443c01a7336-2429f2eea48mr59065095ad.20.1754510314065; Wed, 06
- Aug 2025 12:58:34 -0700 (PDT)
+        bh=zkAAwl8vElfQMpdapHv3m96nWKKm7bgpMF9fVPIUZ/g=;
+        b=nK6HOD4MvG38geUvgoJ0vfK1lvomFVbEqrmkl1IZbRoZjn3taMuKl3cIuKHY+XdNf3
+         IE5cuGlF+HjFqUJMbcrAfDk3QVumXxcl7+9d6/bv48dqxynUMYNQmsUXrZu4fxxqjuQ+
+         EGABYAop5iKZ4hn0SLnlRije+UJyvsItCQMz0PtLQPNGWDSQ0wSTswiXycGzo4GLSb3K
+         aegTeN1/rSKv5T4/ASnHlnW2sgZvvKN8rKzM6sBBRkMrBtKvog35VSUAowDeyodvVAI0
+         ApxybNEemMJhqguu6O/nyp8IQwDfUqGlyG8cHKPzJqONndBYXrgEbcQP5zOcnYadvgWd
+         /apQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXul66MzyU5c4V2hN6zHn0WgHK4xoXaOQgy05LsuYFUfr69OZ1hWImITAAn0g+Bc5FV1saxIYk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyKTEY245tR17kcPCz6v57rYPb8NDJqlFpF5dQ5yig4MXauri8X
+	L9hABR+RngvCTh7rupBUM0h/vIoLGdeh/s0zPzRpQ55stgovXaj9W3NA9RaKJjjyVBDOsrQtj7k
+	G3zI7wg==
+X-Google-Smtp-Source: AGHT+IFaZiYR5zJC7+pYfASpXTxuG1epwB6mNpav4wNliQpQcOBcA3rZjhVGTTG4ScmGlrhUBGt34kaYMPo=
+X-Received: from pjbqb13.prod.google.com ([2002:a17:90b:280d:b0:31f:61fc:b283])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d87:b0:31e:c630:ec93
+ with SMTP id 98e67ed59e1d1-32166ca773bmr5198285a91.16.1754510316148; Wed, 06
+ Aug 2025 12:58:36 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 12:56:58 -0700
+Date: Wed,  6 Aug 2025 12:56:59 -0700
 In-Reply-To: <20250806195706.1650976-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250806195706.1650976-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806195706.1650976-37-seanjc@google.com>
-Subject: [PATCH v5 36/44] KVM: x86/pmu: Always stuff GuestOnly=1,HostOnly=0
- for mediated PMCs on AMD
+Message-ID: <20250806195706.1650976-38-seanjc@google.com>
+Subject: [PATCH v5 37/44] KVM: x86/pmu: Load/put mediated PMU context when
+ entering/exiting guest
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -82,42 +82,392 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Sandipan Das <sandipan.das@amd.com>
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-On AMD platforms, there is no way to restore PerfCntrGlobalCtl at
-VM-Entry or clear it at VM-Exit. Since the register states will be
-restored before entering and saved after exiting guest context, the
-counters can keep ticking and even overflow leading to chaos while
-still in host context.
+Implement the PMU "world switch" between host perf and guest mediated PMU.
+When loading guest state, call into perf to switch from host to guest, and
+then load guest state into hardware, and then reverse those actions when
+putting guest state.
 
-To avoid this, intecept event selectors, which is already done by mediated
-PMU. In addition, always set the GuestOnly bit and clear the HostOnly bit
-for PMU selectors on AMD. Doing so allows the counters run only in guest
-context even if their enable bits are still set after VM exit and before
-host/guest PMU context switch.
+On the KVM side, when loading guest state, zero PERF_GLOBAL_CTRL to ensure
+all counters are disabled, then load selectors and counters, and finally
+call into vendor code to load control/status information.  While VMX and
+SVM use different mechanisms to avoid counting host activity while guest
+controls are loaded, both implementations require PERF_GLOBAL_CTRL to be
+zeroed when the event selectors are in flux.
 
-Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+When putting guest state, reverse the order, and save and zero controls
+and status prior to saving+zeroing selectors and counters.  Defer clearing
+PERF_GLOBAL_CTRL to vendor code, as only SVM needs to manually clear the
+MSR; VMX configures PERF_GLOBAL_CTRL to be atomically cleared by the CPU
+on VM-Exit.
+
+Handle the difference in MSR layouts between Intel and AMD by communicating
+the bases and stride via kvm_pmu_ops.  Because KVM requires Intel v4 (and
+full-width writes) and AMD v2, the MSRs to load/save are constant for a
+given vendor, i.e. do not vary based on the guest PMU, and do not vary
+based on host PMU (because KVM will simply disable mediated PMU support if
+the necessary MSRs are unsupported).
+
+Except for retrieving the guest's PERF_GLOBAL_CTRL, which needs to be read
+before invoking any fastpath handler (spoiler alert), perform the context
+switch around KVM's inner run loop.  State only needs to be synchronized
+from hardware before KVM can access the software "caches".
+
+Note, VMX already grabs the guest's PERF_GLOBAL_CTRL immediately after
+VM-Exit, as hardware saves value into the VMCS.
+
+Co-developed-by: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
-[sean: massage shortlog]
+Co-developed-by: Sandipan Das <sandipan.das@amd.com>
+Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/pmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm-x86-pmu-ops.h |   2 +
+ arch/x86/include/asm/msr-index.h       |   1 +
+ arch/x86/kvm/pmu.c                     | 111 +++++++++++++++++++++++++
+ arch/x86/kvm/pmu.h                     |  10 +++
+ arch/x86/kvm/svm/pmu.c                 |  34 ++++++++
+ arch/x86/kvm/svm/svm.c                 |   3 +
+ arch/x86/kvm/vmx/pmu_intel.c           |  45 ++++++++++
+ arch/x86/kvm/x86.c                     |   4 +
+ 8 files changed, 210 insertions(+)
 
+diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+index ad2cc82abf79..f0aa6996811f 100644
+--- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
++++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+@@ -24,6 +24,8 @@ KVM_X86_PMU_OP_OPTIONAL(deliver_pmi)
+ KVM_X86_PMU_OP_OPTIONAL(cleanup)
+ 
+ KVM_X86_PMU_OP_OPTIONAL(write_global_ctrl)
++KVM_X86_PMU_OP(mediated_load)
++KVM_X86_PMU_OP(mediated_put)
+ 
+ #undef KVM_X86_PMU_OP
+ #undef KVM_X86_PMU_OP_OPTIONAL
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 06bd7aaae931..0f50a74797a4 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -1171,6 +1171,7 @@
+ #define MSR_CORE_PERF_GLOBAL_STATUS	0x0000038e
+ #define MSR_CORE_PERF_GLOBAL_CTRL	0x0000038f
+ #define MSR_CORE_PERF_GLOBAL_OVF_CTRL	0x00000390
++#define MSR_CORE_PERF_GLOBAL_STATUS_SET	0x00000391
+ 
+ #define MSR_PERF_METRICS		0x00000329
+ 
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index b4c6a7704a01..77042cad3155 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -1234,3 +1234,114 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+ 	kfree(filter);
+ 	return r;
+ }
++
++static __always_inline u32 fixed_counter_msr(u32 idx)
++{
++	return kvm_pmu_ops.FIXED_COUNTER_BASE + idx * kvm_pmu_ops.MSR_STRIDE;
++}
++
++static __always_inline u32 gp_counter_msr(u32 idx)
++{
++	return kvm_pmu_ops.GP_COUNTER_BASE + idx * kvm_pmu_ops.MSR_STRIDE;
++}
++
++static __always_inline u32 gp_eventsel_msr(u32 idx)
++{
++	return kvm_pmu_ops.GP_EVENTSEL_BASE + idx * kvm_pmu_ops.MSR_STRIDE;
++}
++
++static void kvm_pmu_load_guest_pmcs(struct kvm_vcpu *vcpu)
++{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++	struct kvm_pmc *pmc;
++	u32 i;
++
++	/*
++	 * No need to zero out unexposed GP/fixed counters/selectors since RDPMC
++	 * is intercepted if hardware has counters that aren't visible to the
++	 * guest (KVM will inject #GP as appropriate).
++	 */
++	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
++		pmc = &pmu->gp_counters[i];
++
++		wrmsrl(gp_counter_msr(i), pmc->counter);
++		wrmsrl(gp_eventsel_msr(i), pmc->eventsel_hw);
++	}
++	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
++		pmc = &pmu->fixed_counters[i];
++
++		wrmsrl(fixed_counter_msr(i), pmc->counter);
++	}
++}
++
++void kvm_mediated_pmu_load(struct kvm_vcpu *vcpu)
++{
++	if (!kvm_vcpu_has_mediated_pmu(vcpu) ||
++	    KVM_BUG_ON(!lapic_in_kernel(vcpu), vcpu->kvm))
++		return;
++
++	lockdep_assert_irqs_disabled();
++
++	perf_load_guest_context(kvm_lapic_get_reg(vcpu->arch.apic, APIC_LVTPC));
++
++	/*
++	 * Disable all counters before loading event selectors and PMCs so that
++	 * KVM doesn't enable or load guest counters while host events are
++	 * active.  VMX will enable/disabled counters at VM-Enter/VM-Exit by
++	 * atomically loading PERF_GLOBAL_CONTROL.  SVM effectively performs
++	 * the switch by configuring all events to be GUEST_ONLY.
++	 */
++	wrmsrl(kvm_pmu_ops.PERF_GLOBAL_CTRL, 0);
++
++	kvm_pmu_load_guest_pmcs(vcpu);
++
++	kvm_pmu_call(mediated_load)(vcpu);
++}
++
++static void kvm_pmu_put_guest_pmcs(struct kvm_vcpu *vcpu)
++{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++	struct kvm_pmc *pmc;
++	u32 i;
++
++	/*
++	 * Clear selectors and counters to ensure hardware doesn't count using
++	 * guest controls when the host (perf) restores its state.
++	 */
++	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
++		pmc = &pmu->gp_counters[i];
++
++		pmc->counter = rdpmc(i);
++		if (pmc->counter)
++			wrmsrl(gp_counter_msr(i), 0);
++		if (pmc->eventsel_hw)
++			wrmsrl(gp_eventsel_msr(i), 0);
++	}
++
++	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
++		pmc = &pmu->fixed_counters[i];
++
++		pmc->counter = rdpmc(INTEL_PMC_FIXED_RDPMC_BASE | i);
++		if (pmc->counter)
++			wrmsrl(fixed_counter_msr(i), 0);
++	}
++}
++
++void kvm_mediated_pmu_put(struct kvm_vcpu *vcpu)
++{
++	if (!kvm_vcpu_has_mediated_pmu(vcpu) ||
++	    KVM_BUG_ON(!lapic_in_kernel(vcpu), vcpu->kvm))
++		return;
++
++	lockdep_assert_irqs_disabled();
++
++	/*
++	 * Defer handling of PERF_GLOBAL_CTRL to vendor code.  On Intel, it's
++	 * atomically cleared on VM-Exit, i.e. doesn't need to be clear here.
++	 */
++	kvm_pmu_call(mediated_put)(vcpu);
++
++	kvm_pmu_put_guest_pmcs(vcpu);
++
++	perf_put_guest_context();
++}
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 1c9d26d60a60..e2e2d8476a3f 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -38,11 +38,19 @@ struct kvm_pmu_ops {
+ 	void (*cleanup)(struct kvm_vcpu *vcpu);
+ 
+ 	bool (*is_mediated_pmu_supported)(struct x86_pmu_capability *host_pmu);
++	void (*mediated_load)(struct kvm_vcpu *vcpu);
++	void (*mediated_put)(struct kvm_vcpu *vcpu);
+ 	void (*write_global_ctrl)(u64 global_ctrl);
+ 
+ 	const u64 EVENTSEL_EVENT;
+ 	const int MAX_NR_GP_COUNTERS;
+ 	const int MIN_NR_GP_COUNTERS;
++
++	const u32 PERF_GLOBAL_CTRL;
++	const u32 GP_EVENTSEL_BASE;
++	const u32 GP_COUNTER_BASE;
++	const u32 FIXED_COUNTER_BASE;
++	const u32 MSR_STRIDE;
+ };
+ 
+ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops);
+@@ -240,6 +248,8 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
+ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
+ void kvm_pmu_instruction_retired(struct kvm_vcpu *vcpu);
+ void kvm_pmu_branch_retired(struct kvm_vcpu *vcpu);
++void kvm_mediated_pmu_load(struct kvm_vcpu *vcpu);
++void kvm_mediated_pmu_put(struct kvm_vcpu *vcpu);
+ 
+ bool is_vmware_backdoor_pmc(u32 pmc_idx);
+ bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu);
 diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 9641ef5d0dd7..a5e70a4e7647 100644
+index a5e70a4e7647..c03720b30785 100644
 --- a/arch/x86/kvm/svm/pmu.c
 +++ b/arch/x86/kvm/svm/pmu.c
-@@ -165,7 +165,8 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		data &= ~pmu->reserved_bits;
- 		if (data != pmc->eventsel) {
- 			pmc->eventsel = data;
--			pmc->eventsel_hw = data;
-+			pmc->eventsel_hw = (data & ~AMD64_EVENTSEL_HOSTONLY) |
-+					   AMD64_EVENTSEL_GUESTONLY;
- 			kvm_pmu_request_counter_reprogram(pmc);
- 		}
- 		return 0;
+@@ -233,6 +233,32 @@ static bool amd_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_pm
+ 	return host_pmu->version >= 2;
+ }
+ 
++static void amd_mediated_pmu_load(struct kvm_vcpu *vcpu)
++{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++	u64 global_status;
++
++	rdmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS, global_status);
++	/* Clear host global_status MSR if non-zero. */
++	if (global_status)
++		wrmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, global_status);
++
++	wrmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_SET, pmu->global_status);
++	wrmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, pmu->global_ctrl);
++}
++
++static void amd_mediated_pmu_put(struct kvm_vcpu *vcpu)
++{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++
++	wrmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
++	rdmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS, pmu->global_status);
++
++	/* Clear global status bits if non-zero */
++	if (pmu->global_status)
++		wrmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, pmu->global_status);
++}
++
+ struct kvm_pmu_ops amd_pmu_ops __initdata = {
+ 	.rdpmc_ecx_to_pmc = amd_rdpmc_ecx_to_pmc,
+ 	.msr_idx_to_pmc = amd_msr_idx_to_pmc,
+@@ -244,8 +270,16 @@ struct kvm_pmu_ops amd_pmu_ops __initdata = {
+ 	.init = amd_pmu_init,
+ 
+ 	.is_mediated_pmu_supported = amd_pmu_is_mediated_pmu_supported,
++	.mediated_load = amd_mediated_pmu_load,
++	.mediated_put = amd_mediated_pmu_put,
+ 
+ 	.EVENTSEL_EVENT = AMD64_EVENTSEL_EVENT,
+ 	.MAX_NR_GP_COUNTERS = KVM_MAX_NR_AMD_GP_COUNTERS,
+ 	.MIN_NR_GP_COUNTERS = AMD64_NUM_COUNTERS,
++
++	.PERF_GLOBAL_CTRL = MSR_AMD64_PERF_CNTR_GLOBAL_CTL,
++	.GP_EVENTSEL_BASE = MSR_F15H_PERF_CTL0,
++	.GP_COUNTER_BASE = MSR_F15H_PERF_CTR0,
++	.FIXED_COUNTER_BASE = 0,
++	.MSR_STRIDE = 2,
+ };
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index add50b64256c..ca6f453cc160 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4416,6 +4416,9 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
+ 
+ 	vcpu->arch.regs_avail &= ~SVM_REGS_LAZY_LOAD_SET;
+ 
++	if (!msr_write_intercepted(vcpu, MSR_AMD64_PERF_CNTR_GLOBAL_CTL))
++		rdmsrq(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, vcpu_to_pmu(vcpu)->global_ctrl);
++
+ 	/*
+ 	 * We need to handle MC intercepts here before the vcpu has a chance to
+ 	 * change the physical cpu
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 6874c522577e..41a845de789e 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -786,6 +786,43 @@ static void intel_pmu_write_global_ctrl(u64 global_ctrl)
+ 	vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL, global_ctrl);
+ }
+ 
++
++static void intel_mediated_pmu_load(struct kvm_vcpu *vcpu)
++{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++	u64 global_status, toggle;
++
++	rdmsrq(MSR_CORE_PERF_GLOBAL_STATUS, global_status);
++	toggle = pmu->global_status ^ global_status;
++	if (global_status & toggle)
++		wrmsrq(MSR_CORE_PERF_GLOBAL_OVF_CTRL, global_status & toggle);
++	if (pmu->global_status & toggle)
++		wrmsrq(MSR_CORE_PERF_GLOBAL_STATUS_SET, pmu->global_status & toggle);
++
++	wrmsrq(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl_hw);
++}
++
++static void intel_mediated_pmu_put(struct kvm_vcpu *vcpu)
++{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++
++	/* MSR_CORE_PERF_GLOBAL_CTRL is already saved at VM-exit. */
++	rdmsrq(MSR_CORE_PERF_GLOBAL_STATUS, pmu->global_status);
++
++	/* Clear hardware MSR_CORE_PERF_GLOBAL_STATUS MSR, if non-zero. */
++	if (pmu->global_status)
++		wrmsrq(MSR_CORE_PERF_GLOBAL_OVF_CTRL, pmu->global_status);
++
++	/*
++	 * Clear hardware FIXED_CTR_CTRL MSR to avoid information leakage and
++	 * also to avoid accidentally enabling fixed counters (based on guest
++	 * state) while running in the host, e.g. when setting global ctrl.
++	 */
++	if (pmu->fixed_ctr_ctrl_hw)
++		wrmsrq(MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
++}
++
++
+ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+ 	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
+ 	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
+@@ -799,9 +836,17 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+ 	.cleanup = intel_pmu_cleanup,
+ 
+ 	.is_mediated_pmu_supported = intel_pmu_is_mediated_pmu_supported,
++	.mediated_load = intel_mediated_pmu_load,
++	.mediated_put = intel_mediated_pmu_put,
+ 	.write_global_ctrl = intel_pmu_write_global_ctrl,
+ 
+ 	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
+ 	.MAX_NR_GP_COUNTERS = KVM_MAX_NR_INTEL_GP_COUNTERS,
+ 	.MIN_NR_GP_COUNTERS = 1,
++
++	.PERF_GLOBAL_CTRL = MSR_CORE_PERF_GLOBAL_CTRL,
++	.GP_EVENTSEL_BASE = MSR_P6_EVNTSEL0,
++	.GP_COUNTER_BASE = MSR_IA32_PMC0,
++	.FIXED_COUNTER_BASE = MSR_CORE_PERF_FIXED_CTR0,
++	.MSR_STRIDE = 1,
+ };
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b8014435c988..7fb94ef64e18 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10906,6 +10906,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		run_flags |= KVM_RUN_LOAD_DEBUGCTL;
+ 	vcpu->arch.host_debugctl = debug_ctl;
+ 
++	kvm_mediated_pmu_load(vcpu);
++
+ 	guest_timing_enter_irqoff();
+ 
+ 	for (;;) {
+@@ -10936,6 +10938,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		++vcpu->stat.exits;
+ 	}
+ 
++	kvm_mediated_pmu_put(vcpu);
++
+ 	/*
+ 	 * Do this here before restoring debug registers on the host.  And
+ 	 * since we do this before handling the vmexit, a DR access vmexit
 -- 
 2.50.1.565.gc32cd1483b-goog
 
