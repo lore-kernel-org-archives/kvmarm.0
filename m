@@ -1,57 +1,57 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A10B2D46AF
-	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 19:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172132D5C8A
+	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 19:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754510287; cv=none; b=XvywCfxPj6HCnRZYZFMDdYZGNpDWPXdh+cliy+iNaCGcXlI3aN4djHbTzXZsSMWiwkmTA9c86czlotCjH0Olwg27gy1/nfTdlq8vi57YByJQOtQ24Y97UUSshOPIbQ4233V4IbTrr/rjEyzvX082Tu1jc/hbgLOZgRaYI+ZVcSM=
+	t=1754510289; cv=none; b=BGGsoM8KZmqQGaTL97dDrVZRmjAGdmZOgO1x4oe8KdEpNbj2wEsoUaXg/4WlO9PW9fHbPCpdwQ6zngsWgAk7t3PbRfH/vU7apAEIU/C8u0mXa2bUXVmY2xcsbPjaxSYjBAuNonpvuZksStKsx7Ix2jbUd6TLWUEuhxwu7uDBFm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754510287; c=relaxed/simple;
-	bh=SrY28soq4e2umnXSFWFek5BM85G7hV4RrtHjWFxzyM0=;
+	s=arc-20240116; t=1754510289; c=relaxed/simple;
+	bh=JJbKDILTxe6TmmJfqZTBwaNtNaEK5gYeJU99RMfSqbk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dxVpvqNKOCmG2oMPlFn7SbBStsxZUHZhViuCjrjEhTBeKR9slVl112LKVP9oBFEHRgwadkhx/9g1nyMNxzFqekFdtHDgegKJ3Ui4Djzf0bafXH89QqWJswpUCSClk+ag6h5odDDZ0t3a8FIAL+nqtGziDlXcbrf9PCjlKwm97WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SOpq+fp2; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=VHITAwI55voaD6QXbSsd5EigVBkoj8oZ5d7UGLRNKcZVMzexXbgE1vdiN1MWKv7BTlXlQBLDuvXrbbmdV9zr0wSiqXMAd5IMMbmMjj009/HvHzY6Xlz39R4OdGxB36kOhgLGpx+ZR+mRIyljRksgVlsQYOnzOTdeVfyYf+qOFT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fzdxg5Xd; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SOpq+fp2"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76bfb082331so275543b3a.0
-        for <kvmarm@lists.linux.dev>; Wed, 06 Aug 2025 12:58:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fzdxg5Xd"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2425e41424cso2205205ad.1
+        for <kvmarm@lists.linux.dev>; Wed, 06 Aug 2025 12:58:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754510284; x=1755115084; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1754510286; x=1755115086; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=GWdUZrt+U2ZtCbYKTsMlrHRvg1+poTmQboTMZxCN7ww=;
-        b=SOpq+fp2W7t6GxrZpLzZCVR3jAs0DenOrCgwox6smKV5F1kDQ64AhDvwvca5vAz46a
-         yE2GmAkENA0aIquv55u8czNazt9PAmgoet+g3/kDE94HwuJacupl26OG1Q3hzwzRaX9T
-         Zwc8hAnlPtpV9TRCF0IwvWqFvBt0xZqJdJT0RgDVDbJgdn6vAqv8lycIgsW24R5nVW4w
-         lcGEuQ6ye1yDYdmYqnE97dW++Li8ckz7GjNsfX9STraCFCqJMu8/C3wzK9wnwjDw5N1z
-         5OFyG6yHZ4WZ1vADJzn9m2WFHuQ3yi50YPrf0QRPilHeN5aOWD5OULsKXZZbI9HWFz5V
-         Vn4w==
+        bh=UYs6XLsbq3wmUfEBezJ9021CIzqcfmK4yWnl0Vk41Lo=;
+        b=Fzdxg5Xdu3hXguhcAF5g3bGmudWRr6Zy0mX+vc9kWZ0bkACFaBm6xutsXCWzqlhHnQ
+         j5qOO6QY0E37u+PCT3/NILzxQ4KedyMawoBx+V02lSTDOec4zuybYTXXw7Lw9le+vKHL
+         L3xjeQ1gbOwtApqjY6pxyHG2ocxNOM7LC5ezAkZefBOl9cHDYQWXCJJW/mazhWc0YxNg
+         wcbWLI3Pb2EC6GGVSR3S/XnAtjCotdxfLsZxQW6TKoGW6eWofwb/QgbqOXGnc8G8wRC3
+         2Tf3G4xKclUZJcvrf4oau1dMTK75NDuvBXaFkdeTjMeJ8tCK5ghesoeltxd8dMbqj94q
+         jeEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754510284; x=1755115084;
+        d=1e100.net; s=20230601; t=1754510286; x=1755115086;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GWdUZrt+U2ZtCbYKTsMlrHRvg1+poTmQboTMZxCN7ww=;
-        b=dyIR2Jaf5b95edCVemWe3paAqr324F8FOwUTSQWaJdAa+gWnpSgF0u7cZkCrYRJ0pG
-         3qPdBh2YUNVam+5o5Vw9neoqx6wEr/uxabKHMB+rD5PgSgtEpyBxqOeh6Z0lKNjNzWvh
-         8gydiGEUc5gC0iqOB4dRecB2QJUtdFQw2sNk1jcOdVFRaugMQp63X7wLvTFvz64DrfX5
-         BQYNhAlAytMmYlRSfLZb1y5p0U5hCy+ey7z+RXvTpmm1wlMHG+JpOAdGLPxYb11aNDUv
-         UiFQCZQ1zWo7guZVsUQ607+H8ka+r3ncB9AtGjtjl8hyPo5axNqtx5vUs1Ssqbtf5jNx
-         HzHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXRdFVYQTlgD1SsCAe70ekazrAnBL3YHguN0g/rVqJGPHoKmy/WxRKuPelbuT2pGJCbFrSU8UU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyVogCMKbd3PI/N7iMvfdzGPfZNZh9Htcp5/R+WKz6QkuyJPM8c
-	b984PCSm3vle7KbvAl06/W+7JdtJhnlg55oqQa9zTSoCHrZfCVDZkg9MdwRjulY8HcILwbF5Luq
-	sgCjxgQ==
-X-Google-Smtp-Source: AGHT+IGuU+RWQRwCAfzWML148fgqdvdKW6alxUtwh3XwkGhhvD7y/3BjKg8jOpNbCUSNYHrZUCLfYMHRL8Y=
-X-Received: from pghd12.prod.google.com ([2002:a63:fd0c:0:b0:b42:2d66:cdc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6300:8045:b0:240:43e9:6cb7
- with SMTP id adf61e73a8af0-24043e97001mr56266637.45.1754510284410; Wed, 06
- Aug 2025 12:58:04 -0700 (PDT)
+        bh=UYs6XLsbq3wmUfEBezJ9021CIzqcfmK4yWnl0Vk41Lo=;
+        b=d+ALwXO5f99fItpiRE6cdvwJk518X0qJzbFAjWYrDXAkSr0e1Y+0hox1uxPnqh22TB
+         zB6uDlL/sYdgHfJoaBJFKSEgezv4vU/TgnG7UPP0e1zrMKtNXDN0xkNz2EpHcliWb3bM
+         aQC45uGb3ULe4jsHVsCaUuM4FdKdQVCHaXEoSbVlxNUxu0TNeqEwZNNm3Gm/v1lYXfY0
+         bno0YCgyqF32NR9wkCpBUA5ZPVGG+XOvO/GPLVxB7RfuHdiZuaqCEPwRmp4vVWgdg2ot
+         dD5S8MIiF7/Zb0MtnxYeNoJC3iRHeX+9us64JAzYMqtzPA854/bmJmHgOgrwnHtIcW1U
+         qRKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkoVx6cnx2qEIVi0lyHW0m78vBnR8i8/BhlX4dY4OwcvbdACRQKrsfKy0Vk991kdiVWvsLzDM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyhToyBJiqDGac8sdxB+N/y5xqnj5rK4NLW+uXCFwmRCWj3Zw8L
+	/xq50DscO8gB2V6AMI1jA5b4vVU+j3HlS/PQSWw8S++3lwYLwiGukQ9JH618SihoAHGLb5/rIiR
+	1naBw7A==
+X-Google-Smtp-Source: AGHT+IEjtNNsSzvoH0/VB3MvaueTobKjhNGxenKGyVkg+/CWGpyESmYfNsRK9kQsugEnvTMUeRjISaSTO8s=
+X-Received: from pjov3.prod.google.com ([2002:a17:90a:9603:b0:31c:2fe4:33b6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1b44:b0:240:b28:22a3
+ with SMTP id d9443c01a7336-242b1a687dfmr5147985ad.29.1754510285965; Wed, 06
+ Aug 2025 12:58:05 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 12:56:41 -0700
+Date: Wed,  6 Aug 2025 12:56:42 -0700
 In-Reply-To: <20250806195706.1650976-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250806195706.1650976-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806195706.1650976-20-seanjc@google.com>
-Subject: [PATCH v5 19/44] KVM: x86/pmu: Implement Intel mediated PMU
- requirements and constraints
+Message-ID: <20250806195706.1650976-21-seanjc@google.com>
+Subject: [PATCH v5 20/44] KVM: x86/pmu: Implement AMD mediated PMU requirements
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -82,90 +81,44 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
-
-Implement Intel PMU requirements and constraints for mediated PMU support.
-Require host PMU version 4+ so that PERF_GLOBAL_STATUS_SET can be used to
-precisely load the guest's status value into hardware, and require full-
-width writes so that KVM can precisely load guest counter values.
-
-Disable PEBS and LBRs if mediated PMU support is enabled, as they won't be
-supported in the initial implementation.
+Require host PMU version 2+ for AMD mediated PMU support, as
+PERF_GLOBAL_CTRL and friends are hard requirements for the mediated PMU.
 
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Co-developed-by: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
-[sean: split to separate patch, add full-width writes dependency]
+[sean: extract to separate patch, write changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/capabilities.h |  3 ++-
- arch/x86/kvm/vmx/pmu_intel.c    | 17 +++++++++++++++++
- arch/x86/kvm/vmx/vmx.c          |  3 ++-
- 3 files changed, 21 insertions(+), 2 deletions(-)
+ arch/x86/kvm/svm/pmu.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 5316c27f6099..854e54c352f8 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -389,7 +389,8 @@ static inline bool vmx_pt_mode_is_host_guest(void)
- 
- static inline bool vmx_pebs_supported(void)
- {
--	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
-+	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept &&
-+	       !enable_mediated_pmu;
- }
- 
- static inline bool cpu_has_notify_vmexit(void)
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 07baff96300f..8df8d7b4f212 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -776,6 +776,20 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index 7b8577f3c57a..96be2c3e0d65 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -227,6 +227,11 @@ static void amd_pmu_init(struct kvm_vcpu *vcpu)
  	}
  }
  
-+static bool intel_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_pmu)
++static bool amd_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_pmu)
 +{
-+	u64 host_perf_cap = 0;
-+
-+	if (boot_cpu_has(X86_FEATURE_PDCM))
-+		rdmsrq(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
-+
-+	/*
-+	 * Require v4+ for MSR_CORE_PERF_GLOBAL_STATUS_SET, and full-width
-+	 * writes so that KVM can precisely load guest counter values.
-+	 */
-+	return host_pmu->version >= 4 && host_perf_cap & PMU_CAP_FW_WRITES;
++	return host_pmu->version >= 2;
 +}
 +
- struct kvm_pmu_ops intel_pmu_ops __initdata = {
- 	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
- 	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
-@@ -787,6 +801,9 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
- 	.reset = intel_pmu_reset,
- 	.deliver_pmi = intel_pmu_deliver_pmi,
- 	.cleanup = intel_pmu_cleanup,
+ struct kvm_pmu_ops amd_pmu_ops __initdata = {
+ 	.rdpmc_ecx_to_pmc = amd_rdpmc_ecx_to_pmc,
+ 	.msr_idx_to_pmc = amd_msr_idx_to_pmc,
+@@ -236,6 +241,9 @@ struct kvm_pmu_ops amd_pmu_ops __initdata = {
+ 	.set_msr = amd_pmu_set_msr,
+ 	.refresh = amd_pmu_refresh,
+ 	.init = amd_pmu_init,
 +
-+	.is_mediated_pmu_supported = intel_pmu_is_mediated_pmu_supported,
++	.is_mediated_pmu_supported = amd_pmu_is_mediated_pmu_supported,
 +
- 	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
- 	.MAX_NR_GP_COUNTERS = KVM_MAX_NR_INTEL_GP_COUNTERS,
- 	.MIN_NR_GP_COUNTERS = 1,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ed10013dac95..8c6343494e62 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7795,7 +7795,8 @@ static __init u64 vmx_get_perf_capabilities(void)
- 	if (boot_cpu_has(X86_FEATURE_PDCM))
- 		rdmsrq(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
- 
--	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
-+	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR) &&
-+	    !enable_mediated_pmu) {
- 		x86_perf_get_lbr(&vmx_lbr_caps);
- 
- 		/*
+ 	.EVENTSEL_EVENT = AMD64_EVENTSEL_EVENT,
+ 	.MAX_NR_GP_COUNTERS = KVM_MAX_NR_AMD_GP_COUNTERS,
+ 	.MIN_NR_GP_COUNTERS = AMD64_NUM_COUNTERS,
 -- 
 2.50.1.565.gc32cd1483b-goog
 
