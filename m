@@ -1,60 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B6529E0F7;
-	Wed,  6 Aug 2025 17:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A902E36ED;
+	Wed,  6 Aug 2025 18:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754502327; cv=none; b=kOKhYSmJ12ga3TQp/XGt5wSnVkeklvmDn0YJP4K9oR0mk7CN9YYaIkEzF3vJnsxVkAzJdnCja4zwssEoNA4rsQseiXBnBZ5IWahz2i9rn/zhLrHXkuTuyQ+FXakCr0OQGxq+ZSwI7tJouij7frw4xBlnb8UHYX3JfENJlvJUKe8=
+	t=1754504270; cv=none; b=f40VD/TJT8yNqZVQ/QmaCU4Z94rurVne0Nsp78P1np0Dhw6YZ5IhI+Gz7TSup1f7+NI/2fGxL5WeTGw/2q+yRJd+wuIt1z/mzcBkBHKIiq3nrE9r76DQbgkfjK++sHElNTrEaqf0LuZErzKnGUbdjQoEpvcF+OrMhlQ8YtZfPgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754502327; c=relaxed/simple;
-	bh=YArr/JaGktAlQo2hhqkApDSBj81iHH0IBqI1ORILAs8=;
+	s=arc-20240116; t=1754504270; c=relaxed/simple;
+	bh=tVIrd2LQ/c5yfLuLbK0Jf7K+0CkcqrpV21ilXh3nK5k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RvlBDPiFL3fsSWwTRq3XjzfqysNJkV1qdgl8vg+wCU3q7VI2Xq67zJxYTTKATT5LB3O/tbjkmdrW63FUQtxWhKwazQqggPHzbXspkZyQpfjaml+VFUZoZSrTO3V7fmrnDezRMabKBPXtmo1UK1e5S4IK448k6oUC/McJ0A0gFys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYpRT03m; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Qbh0yL8I0G/Xw3OOtjhQbsXcK6qrx4IhwL85/5XyU1RgQb32p8STomSt6IKRk6pfkSN/jRHFGS9IAMJKQO6ZQIs8jbmE+uKf9x2F8Zy2PgcucxZAHcPOrqilpUYn2bgTt81/xPuTg3GXedOEqGOxtixQWjyycjZHPypQdaZihQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZfFaFrw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYpRT03m"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0B65C4CEE7;
-	Wed,  6 Aug 2025 17:45:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZfFaFrw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCE12C4CEE7;
+	Wed,  6 Aug 2025 18:17:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754502327;
-	bh=YArr/JaGktAlQo2hhqkApDSBj81iHH0IBqI1ORILAs8=;
+	s=k20201202; t=1754504269;
+	bh=tVIrd2LQ/c5yfLuLbK0Jf7K+0CkcqrpV21ilXh3nK5k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tYpRT03mnnqOtMQ6R+vTn0wc835RggQSPt2fZIIQU/Zadp9aQR37hlIWpF7NgLmmk
-	 EfOjr7sjJ8DWAdunY/eEKRyDrc/BTIMvMWb2NeNdzzsMJ7pGlW2IM043kefpikqybc
-	 SiMNkhCJHosIcnMW9hdeefRWzJnknD7UIBSSwta4YmqOf8fgjqwMx6LoxjEr5Pg7Oq
-	 973bucMF1cSsK6xrWSdlFLH/EnG0KG71bYmcLEnUBVSg0plctwjEu/fsPftkMzOh/B
-	 YIAq4mJVWA7LSaASTYeZVP6zqldY9uft2xbA7ulUze5vgOlxhEbftg8pl0hvWinyMg
-	 sZbwIDQFLNM8w==
+	b=rZfFaFrwU6qL+9ZE0ASZ5cNSr6koitnX281KevotnTPKlJE233FzggbjHqabqwmzg
+	 5NLhs5hKzeArAkmK/7swlRbw3dK4PZkemlJSZiqn3LQy870E/EJNjWrZ6gVE+Hp6c/
+	 lBK8n57cR0dC2bu0geA4+XXbK9N6iiNGGiatGJz+N9uU9QLUYQxurXNo1z7YlL/Oxa
+	 Ee2qlKpw280FaqWBnqKOX0T4G4KrVEdVnc6keWFE9EsEzhcPFIm1WHm9R28DlcSQ3d
+	 L3CoTg+q0OAavRIy9f+KT2LgnEpDScREfHMGjerwd2DMJEdrJRzvNx6W1dqaX8gFYq
+	 y+oOJn3Fbwvhg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ujiCb-004acx-0S;
-	Wed, 06 Aug 2025 18:45:25 +0100
-Date: Wed, 06 Aug 2025 18:45:24 +0100
-Message-ID: <868qjw9wej.wl-maz@kernel.org>
+	id 1ujihv-004bCc-Ka;
+	Wed, 06 Aug 2025 19:17:47 +0100
+Date: Wed, 06 Aug 2025 19:17:47 +0100
+Message-ID: <867bzg9uwk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly
-	<joey.gouly@arm.com>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will
- Deacon <will@kernel.org>
+	Will Deacon <will@kernel.org>
 Subject: Re: [PATCH v1 1/2] KVM: arm64: nv: fix S2 translation for nVHE guests
-In-Reply-To: <20250806141707.3479194-2-volodymyr_babchuk@epam.com>
+In-Reply-To: <aJOS3oOwUWeRLS4j@linux.dev>
 References: <20250806141707.3479194-1-volodymyr_babchuk@epam.com>
 	<20250806141707.3479194-2-volodymyr_babchuk@epam.com>
+	<aJOS3oOwUWeRLS4j@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,97 +61,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Volodymyr_Babchuk@epam.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, Volodymyr_Babchuk@epam.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Volodymyr,
-
-Thanks for looking into this.
-
-On Wed, 06 Aug 2025 15:17:55 +0100,
-Volodymyr Babchuk <Volodymyr_Babchuk@epam.com> wrote:
+On Wed, 06 Aug 2025 18:37:34 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> According to ARM architecture specification (ARM DDI 0487 L.a, section
-> C5.4.3), Stage 2 translation should be skipped when VHE is active, or,
-> in other words, E2H bit is set. Fix the code by inverting both check
-> and comment.
+> Hi Volodymyr,
 > 
-> Signed-off-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
-> ---
->  arch/arm64/kvm/at.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Thanks for catching this.
 > 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index a25be111cd8f8..5e7c3fb01273c 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -1412,10 +1412,10 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  		return;
->  
->  	/*
-> -	 * If we only have a single stage of translation (E2H=0 or
-> +	 * If we only have a single stage of translation (E2H=1 or
->  	 * TGE=1), exit early. Same thing if {VM,DC}=={0,0}.
->  	 */
-> -	if (!vcpu_el2_e2h_is_set(vcpu) || vcpu_el2_tge_is_set(vcpu) ||
-> +	if (vcpu_el2_e2h_is_set(vcpu) || vcpu_el2_tge_is_set(vcpu) ||
->  	    !(vcpu_read_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)))
->  		return;
+> On Wed, Aug 06, 2025 at 02:17:55PM +0000, Volodymyr Babchuk wrote:
+> > According to ARM architecture specification (ARM DDI 0487 L.a, section
+> > C5.4.3), Stage 2 translation should be skipped when VHE is active, or,
+> > in other words, E2H bit is set. Fix the code by inverting both check
+> > and comment.
+> > 
+> > Signed-off-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+> > ---
+> >  arch/arm64/kvm/at.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index a25be111cd8f8..5e7c3fb01273c 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -1412,10 +1412,10 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> >  		return;
+> >  
+> >  	/*
+> > -	 * If we only have a single stage of translation (E2H=0 or
+> > +	 * If we only have a single stage of translation (E2H=1 or
+> >  	 * TGE=1), exit early. Same thing if {VM,DC}=={0,0}.
+> >  	 */
+> > -	if (!vcpu_el2_e2h_is_set(vcpu) || vcpu_el2_tge_is_set(vcpu) ||
+> > +	if (vcpu_el2_e2h_is_set(vcpu) || vcpu_el2_tge_is_set(vcpu) ||
+> 
+> The check should be HCR_EL2.<E2H,TGE> == '11'. Maybe instead:
+> 
+> 	/*
+> 	 * Exit early if we only have a single stage of translation
+> 	 * either because we're in the EL2&0 translation regime or
+> 	 * stage-2 translation is disabled (i.e. HCR_EL2.{VM,DC}=={0,0}).
+> 	 */
+> 	 if (compute_translation_regime(vcpu, op) == TR_EL20 ||
+> 	     !(vcpu_read_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)))
+> 	     return;
 
-The code we have here is clearly bogus, but what you are suggesting
-doesn't look correct to me either. Here's what the spec says:
-
-<quote>
-
-Performs stage 1 and 2 address translation, with permissions as if
-reading from the given virtual address from EL1, or from EL2 if the
-Effective value of HCR_EL2.{E2H, TGE} is {1, 1}, using the following
-translation regime:
-
-  * When EL2 is implemented and enabled in the Security state
-    described by the current Effective value of SCR_EL3.{NSE, NS}:
-
-    - If the Effective value of HCR_EL2.{E2H, TGE} is not {1, 1}, the
-      EL1&0 translation regime, accessed from EL1.
-
-    - If the Effective value of HCR_EL2.{E2H, TGE} is {1, 1}, the
-      EL2&0 translation regime, accessed from EL2.
-
-  * Otherwise, the EL1&0 translation regime, accessed from EL1.
-
-</quote>
-
-We're obviously in the first bullet, so we need to work out whether
-this is applying to the EL1&0 or the EL2&0 translation regime. By the
-letter of the spec, we need to check for E2H+TGE being both set to
-elide the S2 final walk.
-
-I suspect what you really want is the hack below, though I think the
-DC handling has always been broken (who cares anyway?).
+Ah, same solution, just way better written!
 
 Thanks,
 
 	M.
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 0e56105339493..3e591979f947e 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -1420,10 +1420,10 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		return;
- 
- 	/*
--	 * If we only have a single stage of translation (E2H=0 or
--	 * TGE=1), exit early. Same thing if {VM,DC}=={0,0}.
-+	 * If we only have a single stage of translation ({E2H,TGE}={1,1}),
-+	 * exit early. Same thing if {VM,DC}=={0,0}.
- 	 */
--	if (!vcpu_el2_e2h_is_set(vcpu) || vcpu_el2_tge_is_set(vcpu) ||
-+	if ((vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) ||
- 	    !(vcpu_read_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)))
- 		return;
- 
 
 -- 
 Without deviation from the norm, progress is not possible.
