@@ -1,51 +1,46 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CAD24BCE8
-	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 17:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C406ADD
+	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 17:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754500872; cv=none; b=KRR7xZB/2l8r0FQPOXFnyPAzgkSfYfZzKdXnuGHUopy4fdMBTsQ3vMx/oGRa2qXkG5Mngyb1CpJdqhVGSgQ/OAoibVT1kHP4bj2bDs2FuioBQKKlMhcaDDtbOFKpIzFiq941vPhZnaMLehGv8oqLBkQijliMVA0VRZmFRPXk8ac=
+	t=1754501867; cv=none; b=ZUnMFXtH1Krded/RdSuNpVe5hlSbdVQiMJMZ4+IdQtdE4DqaatbfpIAH60N9+CJMHqGlandSWFbikPwKxw6FN9tBY+2FllKIMIErydGTTpf2MssBOQCnY9ZDLCviFsslU3ZDgkem3/SrCu58Igql7X3+L+n+gcmPaR2aL65MHSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754500872; c=relaxed/simple;
-	bh=kjhnQ5Za+XBsranDfYgw0zRqfwEAy/mULiOdftIXj5Y=;
+	s=arc-20240116; t=1754501867; c=relaxed/simple;
+	bh=ItwQQinzoy1k9xRaJDcDyAfhcb+Qxxt685cUb9oSdMM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=skDipacvCcGPzm1ZNnEzmWqPg1ElUfO6zer7sXMrgIGDig3UsW6KeYfZtXTtYtybvr6lIWzJ41rFN9CJHo0wjSW6s44GRAKZj8L8Hi9qypx6cw3EfU7rUsBodahX6LXejAGFreT2N4WxGcSZdvc7SqplC30les1AqonkQUY63n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VtkQ++7b; arc=none smtp.client-ip=95.215.58.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=eXxWzY91DopJ82p8qH707Amqg8LXz1BQeuDLmn3B8A80nGZp49pogEKXOoZystaTA/R6nbqD7LpC1p/mp9vbXMuwFPb6+enxpDuTFPZnp5PPo7VjlbxOdy6fzld8HG+LuyE102jlZs2uIGBIVhdv075yJUm/fiYAb47l9yyjHp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OsFNdeLe; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VtkQ++7b"
-Date: Wed, 6 Aug 2025 10:20:55 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OsFNdeLe"
+Date: Wed, 6 Aug 2025 10:37:34 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754500867;
+	t=1754501862;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LXEzdvjKc1frf74KZZ2Dk9UeoT9Qj8s/haDO00iYsCY=;
-	b=VtkQ++7b2u/bXmsWSk18w3r7GM1P5JVR7OF9qYXkJUdtUAb1xF+174eBKK9E0p7iYnpU9o
-	qMZ/Jn24nSr9r2S/3tLcPCdxS8TX5DhSvQ3mumqS7+RSehNtdiprcMvvWdydZeJAT64sl/
-	DZOMHF4WOTVO1Lqo5qTY5dzVsOhTh5M=
+	bh=6Ds8ZTCnuuJX8YoiEXe67S5tyk4cccTW3kTX4rJWKqc=;
+	b=OsFNdeLeDvZyIFiiB1P4x4mWtoQy5vL5ZWA2tYr/zzJpw2Mrs7Cza1OvWrHba5WqdpThxY
+	ZJkFFBys3aoF1VbW3jltvWSIZw8COfKcGBhuwLT5bC5+pnuoitfF0MIV6t4ADdf2E8EfgB
+	9XgTfpziVOpPqpPoi8bypZ12rtBJyYA=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
- KVM_ARM_VCPU_PMU_V3_COMPOSITION
-Message-ID: <aJOO99xUrhsrvLwl@linux.dev>
-References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: nv: fix S2 translation for nVHE guests
+Message-ID: <aJOS3oOwUWeRLS4j@linux.dev>
+References: <20250806141707.3479194-1-volodymyr_babchuk@epam.com>
+ <20250806141707.3479194-2-volodymyr_babchuk@epam.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,135 +49,49 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <20250806141707.3479194-2-volodymyr_babchuk@epam.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Akihiko,
+Hi Volodymyr,
 
-This is an unreasonably large patch that needs to be broken down into
-smaller patches, ideally one functional change per patch. We need this
-even for an RFC for the sake of reviews.
+Thanks for catching this.
 
-On Wed, Aug 06, 2025 at 06:09:54PM +0900, Akihiko Odaki wrote:
-> +static u64 kvm_pmu_get_pmc_value(struct kvm_vcpu *vcpu, u8 idx)
->  {
-> -	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> +	struct kvm_pmc *pmc = *kvm_vcpu_idx_to_pmc(vcpu, idx);
->  	u64 counter, reg, enabled, running;
-> +	unsigned int i;
->  
-> -	reg = counter_index_to_reg(pmc->idx);
-> +	reg = counter_index_to_reg(idx);
->  	counter = __vcpu_sys_reg(vcpu, reg);
+On Wed, Aug 06, 2025 at 02:17:55PM +0000, Volodymyr Babchuk wrote:
+> According to ARM architecture specification (ARM DDI 0487 L.a, section
+> C5.4.3), Stage 2 translation should be skipped when VHE is active, or,
+> in other words, E2H bit is set. Fix the code by inverting both check
+> and comment.
+> 
+> Signed-off-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+> ---
+>  arch/arm64/kvm/at.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index a25be111cd8f8..5e7c3fb01273c 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -1412,10 +1412,10 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  		return;
 >  
 >  	/*
->  	 * The real counter value is equal to the value of counter register plus
->  	 * the value perf event counts.
+> -	 * If we only have a single stage of translation (E2H=0 or
+> +	 * If we only have a single stage of translation (E2H=1 or
+>  	 * TGE=1), exit early. Same thing if {VM,DC}=={0,0}.
 >  	 */
-> -	if (pmc->perf_event)
-> -		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> -						 &running);
-> +	if (pmc)
-> +		for (i = 0; i < pmc->nr_perf_events; i++)
-> +			counter += perf_event_read_value(pmc->perf_events[i],
-> +							 &enabled, &running);
+> -	if (!vcpu_el2_e2h_is_set(vcpu) || vcpu_el2_tge_is_set(vcpu) ||
+> +	if (vcpu_el2_e2h_is_set(vcpu) || vcpu_el2_tge_is_set(vcpu) ||
 
-I'm concerned that this array of events concept you're introducing is
-going to be error-prone. An approach that reallocates a new PMU event in
-the case of a vCPU migrating to a new PMU implementation would be
-desirable.
+The check should be HCR_EL2.<E2H,TGE> == '11'. Maybe instead:
 
-> +static void reset_sample_period(struct perf_event *perf_event)
-> +{
-> +	struct kvm_pmc **pmc = perf_event->overflow_handler_context;
-> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> +	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
-> +	u64 period;
-> +
-> +	cpu_pmu->pmu.stop(perf_event, PERF_EF_UPDATE);
-> +
-> +	/*
-> +	 * Reset the sample period to the architectural limit,
-> +	 * i.e. the point where the counter overflows.
-> +	 */
-> +	period = compute_period(pmc, kvm_pmu_get_pmc_value(vcpu, (*pmc)->idx));
-> +
-> +	local64_set(&perf_event->hw.period_left, 0);
-> +	perf_event->attr.sample_period = period;
-> +	perf_event->hw.sample_period = period;
-> +
-> +	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
-> +}
-
-No, we can't start calling into the internal driver interfaces. The fact
-that we have a pointer to the PMU is an ugly hack and shouldn't be used
-like this.
-
-> @@ -725,8 +729,8 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->  	attr.type = arm_pmu->pmu.type;
->  	attr.size = sizeof(attr);
->  	attr.pinned = 1;
-> -	attr.disabled = !kvm_pmu_counter_is_enabled(pmc);
-> -	attr.exclude_user = !kvm_pmc_counts_at_el0(pmc);
-> +	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, (*pmc)->idx);
-> +	attr.exclude_user = !kvm_pmc_counts_at_el0(vcpu, (*pmc)->idx);
->  	attr.exclude_hv = 1; /* Don't count EL2 events */
->  	attr.exclude_host = 1; /* Don't count host events */
->  	attr.config = eventsel;
-
-Can we just special-case the fixed CPU cycle counter to use
-PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES? That _should_ have the
-intended effect of opening an event on the PMU for this CPU.
-
-> +	/*
-> +	 * If we have a filter in place and that the event isn't allowed, do
-> +	 * not install a perf event either.
-> +	 */
-> +	if (vcpu->kvm->arch.pmu_filter &&
-> +	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
-> +		return;
-> +
-> +	if (arm_pmu) {
-> +		*pmc = kvm_pmu_alloc_pmc(idx, 1);
-> +		if (!*pmc)
-> +			goto err;
-> +
-> +		kvm_pmu_create_perf_event(pmc, arm_pmu, eventsel);
-> +	} else {
-> +		guard(mutex)(&arm_pmus_lock);
-
-This is a system-wide lock, the need for which is eliminated if you go
-for the reallocation approach I mention.
-
-> +static int kvm_arm_pmu_v3_set_pmu_composition(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct arm_pmu_entry *entry;
-> +	struct arm_pmu *arm_pmu;
-> +
-> +	lockdep_assert_held(&kvm->arch.config_lock);
-> +
-> +	if (kvm_vm_has_ran_once(kvm) ||
-> +	    (kvm->arch.pmu_filter && !kvm->arch.nr_composed_host_pmus))
-> +		return -EBUSY;
-
-I'm not sure there's much value in preventing the user from configuring
-the PMU event filter. Even in the case of the fixed CPU cycle counter we
-allow userspace to filter the event.
-
-It is much more important to have mutual exclusion between this UAPI and
-userspace explicitly selecting a PMU implementation.
-
-> @@ -1223,6 +1328,8 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  
->  		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
->  	}
-> +	case KVM_ARM_VCPU_PMU_V3_COMPOSITION:
-> +		return kvm_arm_pmu_v3_set_pmu_composition(vcpu);
-
-I'd prefer naming this something like 'KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY'.
-We will have the fixed instruction counter eventually which is another
-event we could potentially provide system-wide.
+	/*
+	 * Exit early if we only have a single stage of translation
+	 * either because we're in the EL2&0 translation regime or
+	 * stage-2 translation is disabled (i.e. HCR_EL2.{VM,DC}=={0,0}).
+	 */
+	 if (compute_translation_regime(vcpu, op) == TR_EL20 ||
+	     !(vcpu_read_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)))
+	     return;
 
 Thanks,
 Oliver
