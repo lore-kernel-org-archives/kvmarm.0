@@ -1,57 +1,57 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DF82BE652
-	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 19:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8E22BE7BA
+	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 19:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754510256; cv=none; b=TegzznYA5AoU3Ue9DgcEPeHVOOLHaxGU+tMBO9u+k3HKeZn+KCJRVSOkr1kGn6zsmMOja9W1rhD6Q+IMd2eNTYzH79mr4zwnJ25x1WW439hxcJv5Pktklyb3a8BvbNRyQjR6GB9DttrGCgg9ceZE2CMtdAizhEYpCUiedbmUOdE=
+	t=1754510257; cv=none; b=OJ2RcJJH+WqVWH4bKpDJqFvu6Td9eJu78LYfUw8QujQ8pHqyciETCo/tYHPLpjXidxu5k3UabWtj3deXvb2HsxfAPxkgK3YVgPkPqTqzLZa9KacbVaDK1LrTNreduywuvRCv1xEbaXGDrQ43UubEk14h4RgDVIEI0H2WqoNvo2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754510256; c=relaxed/simple;
-	bh=jUBl1OA0dbcCe9Exxx/O066eDYx/qkeyxg/XjKFA/3U=;
+	s=arc-20240116; t=1754510257; c=relaxed/simple;
+	bh=tS0WmC5r+kmTtxkhhYKlXDU+egOc68kS1ctzXr8LOA8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=izBSCc09/Y632WssNJgcGEYYnEMBfCCYGWg/bODK2tQfx3p3vDH0I2sHSV5Sf1tuTQCWXaXRj8ScH5BwZHB3GVfwYmqh16hWWHtPqx7T1NHXVPKb7cTe6hJNM33Try1Ve775pTo1R25uqUtIgUdptyCrQ7F1TudFKmvEdUCcAMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t+9I7UdA; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=nFu5u8AAIzEg0tYQnaKQ1fDzS6bRImGsNldt+zIdFDI2S/PBE0FgdIY27LZGCcRsjc8ZiA4WpYo1FzDZ7sbcM1YcisCa+LDmv1i+x394aZVNPcz4dREuUsfQX4tI7lDwKFcunazZVLgzXaoYkB3YcnjNubF5JfxKNF9GHOYTpRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KAQhCwwr; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t+9I7UdA"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76bef13c254so290734b3a.0
-        for <kvmarm@lists.linux.dev>; Wed, 06 Aug 2025 12:57:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KAQhCwwr"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76c115731eeso519802b3a.0
+        for <kvmarm@lists.linux.dev>; Wed, 06 Aug 2025 12:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754510252; x=1755115052; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1754510254; x=1755115054; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=3IAofGMjgJOHx6SdMcFjG4jFgSxJevKv5cJ/ErNkHsk=;
-        b=t+9I7UdAI3t+yRyT9+jE4voYQ8CDGe0P+o2sNg90h1+rZIf1d7A00GYphpXOKiLymr
-         bQDk9cstMagLupxh3vPgTubVe5/1OTRTTORE8Qq+i7xClziaHs2VntpjMkTY0Kx4+cOD
-         IIX6RljujdKeKG/LSteXCk8S6pANxq1VMCk3aAhTof0KOVgDvRGQPfeWChN8zF6RlfGw
-         N5sDZ+cvd7KKI4vA4CrPLGDVHuZZyQJKuEDeD+PpQkIh/dG+pEMcgAxvtmZyrr3zUEK1
-         TrQGxhB7w8lv9qLlgahd9aeRemtHLb7eU59jW5JR4jByAVau+kgwxAtKev2dO/mNpQW9
-         rj7Q==
+        bh=tP9GWyHDKyhyNham1AJeXmzoVBEhNFAEzN5Uklpk9I0=;
+        b=KAQhCwwr8WbYdbZsUWvUgGXCOMNUTatYd2lavS5ZSh5uBKe/VhqN6HiwH0zGxf5T0x
+         EPib3T1p/i3535AVIzwn22PyeU5DK6h8hcs/P5lvkkG3R0o6ZijLMv7wrin0nglKWXbT
+         B6rd/mnhn1XIAX1yTa/3TrcBewZpxRerBWUsd+l+KoTef8LXG6/qKUoxwrHDzVO4i/wJ
+         C72PfSSXGkxAIprSAPez751RnA6bWOJgop0egDWTGOJZNMDUPkSe1wx5FkyFB+1m70nf
+         2tZBPSGJl0lQKFZa5tzRFu5hzp6dS4Kvlcq4CVQVzCSC12gx0CZ2XVvV//8U0b0o6k7R
+         vPSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754510252; x=1755115052;
+        d=1e100.net; s=20230601; t=1754510254; x=1755115054;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3IAofGMjgJOHx6SdMcFjG4jFgSxJevKv5cJ/ErNkHsk=;
-        b=dcnHoURxt4qKtw46b7F//KzIrXePMimNJMUYnDBx9Hj4W+1Zh8Bx2afQLvxaSy8DTG
-         6EcsiwMIhVHnYShuT6fFDeiHdXm04VXtY4SXbsFa4rqCO5KCh8S9ueChFwKuC6F8OtBg
-         ELuUmGTd9acEbAmHt4CicswenwW31uzOEc18l0rsdt2Y5KAtZ2J53givZKgn3pay1cIH
-         xOGzOp21RlzZcdeiaVsJLL/GzU4+dk0qcCNMM3vup+ttAeDw+LlbkJpF9pOr4H4+qyL+
-         oL5igc8kGmn6KU6V4YSNYK2fzIdp/0njitPxdHYFLtZC49omSzQJ+EJ0PS4DP1613KzJ
-         kBWg==
-X-Forwarded-Encrypted: i=1; AJvYcCWb90GeefcVOe0kglcPX3URvcywnKf5y9ui4BkuLKDSo0q/Gp5055IGg6ZqzxJqwTv6XD82b2s=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx3Xy1BoKKLVds3ivQacIvKismw5lzMNt2N1eaNaHpXPG3nAAHX
-	1H2RuSe5PyZyKyViF+PUZKlmbgHrYcEACjPr0lCbYyn8nOMBhjNm/8WwSPZ5aoc6NCqCUC2aSQ3
-	YT0KLRA==
-X-Google-Smtp-Source: AGHT+IGg8m1AYQ1T/bkneerdDiI2IWHPXHDhUcioTumR7faJkpYOSLNXQVSuuMxt1I5dkPrSi8WAHfNQ8i8=
-X-Received: from pgc3.prod.google.com ([2002:a05:6a02:2f83:b0:b42:2da2:8848])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a103:b0:23f:f712:4103
- with SMTP id adf61e73a8af0-24041364f38mr1167741637.18.1754510252085; Wed, 06
- Aug 2025 12:57:32 -0700 (PDT)
+        bh=tP9GWyHDKyhyNham1AJeXmzoVBEhNFAEzN5Uklpk9I0=;
+        b=XGDuD/0CpnXQXEv0xgTQBIxadpk+J8mXGhrnH2XFOQabJ2YDfHpC7RUAeqQTkjCVoj
+         57qBpuN+IO7Z+RwHJBAJW5ftCJOM2pgKM6vmhWvqdwJfnTSoOG7g4z6IAzUCyCXfrPLO
+         GOeZ4+qoBB22FBkwnp6ELrSixVs9dejvW6Oy4SPhzZoEaFFiSWld5ts8F4byLOTN5lgm
+         S+MryBNAGyvsuUwJuADE5fZnBeuIwbW5RRB4l+BI2k4QvWBzingr2cpQNmyVGUjmffjJ
+         Dc3GhhVjLP2oK4zBqi/rnqDghJXnESg6bFUnapq43Bf/0IlJa/tLR1Mdal/TSsiK8N/l
+         b0wQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUk9ceu2JPP4DxAwe0dGj2xWJ21zldWGaFuuYvx6viqFX3bRj5tUllK1ZthHrn9inM9Auzyvz8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzsoNnAUOdABQrhkT/GZ2pejh1C8viSx/1U61oHk1DQQXKp5x3X
+	gJ+Yr2W0wNISHxRBVa01jZ96g9clRILcvVRuKkEjfUQZOFLKKejDI7WAjfFiPQQg9Vde1OVBEQr
+	Myb4T2w==
+X-Google-Smtp-Source: AGHT+IE0CEB3xtAs9hI54+H7B1IyMBLcepknW0FCY+2mxv/eXxKsKgLhnBmg0Z6EMAhWWlTkD97yQMZQQo8=
+X-Received: from pgg21.prod.google.com ([2002:a05:6a02:4d95:b0:b42:3ec5:d919])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:5493:b0:220:aea6:2154
+ with SMTP id adf61e73a8af0-2403125bcacmr7040722637.17.1754510253905; Wed, 06
+ Aug 2025 12:57:33 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  6 Aug 2025 12:56:24 -0700
+Date: Wed,  6 Aug 2025 12:56:25 -0700
 In-Reply-To: <20250806195706.1650976-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250806195706.1650976-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250806195706.1650976-3-seanjc@google.com>
-Subject: [PATCH v5 02/44] perf: Add generic exclude_guest support
+Message-ID: <20250806195706.1650976-4-seanjc@google.com>
+Subject: [PATCH v5 03/44] perf: Move security_perf_event_free() call to __free_event()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -81,64 +81,43 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Kan Liang <kan.liang@linux.intel.com>
+Move the freeing of any security state associated with a perf event from
+_free_event() to __free_event(), i.e. invoke security_perf_event_free() in
+the error paths for perf_event_alloc().  This will allow adding potential
+error paths in perf_event_alloc() that can occur after allocating security
+state.
 
-Only KVM knows the exact time when a guest is entering/exiting. Expose
-two interfaces to KVM to switch the ownership of the PMU resources.
+Note, kfree() and thus security_perf_event_free() is a nop if
+event->security is NULL, i.e. calling security_perf_event_free() even if
+security_perf_event_alloc() fails or is never reached is functionality ok.
 
-All the pinned events must be scheduled in first. Extend the
-perf_event_sched_in() helper to support extra flag, e.g., EVENT_GUEST.
-
-Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- kernel/events/core.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ kernel/events/core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/events/core.c b/kernel/events/core.c
-index d4528554528d..3a98e11d8efc 100644
+index 3a98e11d8efc..1753a97638a3 100644
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
-@@ -2866,14 +2866,15 @@ static void task_ctx_sched_out(struct perf_event_context *ctx,
- 
- static void perf_event_sched_in(struct perf_cpu_context *cpuctx,
- 				struct perf_event_context *ctx,
--				struct pmu *pmu)
-+				struct pmu *pmu,
-+				enum event_type_t event_type)
+@@ -5596,6 +5596,8 @@ static void __free_event(struct perf_event *event)
  {
--	ctx_sched_in(&cpuctx->ctx, pmu, EVENT_PINNED);
-+	ctx_sched_in(&cpuctx->ctx, pmu, EVENT_PINNED | event_type);
- 	if (ctx)
--		 ctx_sched_in(ctx, pmu, EVENT_PINNED);
--	ctx_sched_in(&cpuctx->ctx, pmu, EVENT_FLEXIBLE);
-+		ctx_sched_in(ctx, pmu, EVENT_PINNED | event_type);
-+	ctx_sched_in(&cpuctx->ctx, pmu, EVENT_FLEXIBLE | event_type);
- 	if (ctx)
--		 ctx_sched_in(ctx, pmu, EVENT_FLEXIBLE);
-+		ctx_sched_in(ctx, pmu, EVENT_FLEXIBLE | event_type);
- }
+ 	struct pmu *pmu = event->pmu;
  
- /*
-@@ -2929,7 +2930,7 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
- 	else if (event_type & EVENT_PINNED)
- 		ctx_sched_out(&cpuctx->ctx, pmu, EVENT_FLEXIBLE);
++	security_perf_event_free(event);
++
+ 	if (event->attach_state & PERF_ATTACH_CALLCHAIN)
+ 		put_callchain_buffers();
  
--	perf_event_sched_in(cpuctx, task_ctx, pmu);
-+	perf_event_sched_in(cpuctx, task_ctx, pmu, 0);
+@@ -5659,8 +5661,6 @@ static void _free_event(struct perf_event *event)
  
- 	for_each_epc(epc, &cpuctx->ctx, pmu, 0)
- 		perf_pmu_enable(epc->pmu);
-@@ -4147,7 +4148,7 @@ static void perf_event_context_sched_in(struct task_struct *task)
- 		ctx_sched_out(&cpuctx->ctx, NULL, EVENT_FLEXIBLE);
- 	}
+ 	unaccount_event(event);
  
--	perf_event_sched_in(cpuctx, ctx, NULL);
-+	perf_event_sched_in(cpuctx, ctx, NULL, 0);
- 
- 	perf_ctx_sched_task_cb(cpuctx->task_ctx, task, true);
- 
+-	security_perf_event_free(event);
+-
+ 	if (event->rb) {
+ 		/*
+ 		 * Can happen when we close an event with re-directed output.
 -- 
 2.50.1.565.gc32cd1483b-goog
 
