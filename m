@@ -1,40 +1,41 @@
 Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB3C2853E9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109A11F948
 	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 09:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754471465; cv=none; b=NC+PW4+J9KcpCvzsOwZ0Fu9yrsyvndnXgtvwVHD/GncTDgJ+5kbmTE/jdQGfeGf7b9QYitYz7kXnpsfAtfA/KwxfILauQ/y2AFjQkaetqpgJsyh+GRAw2TQQaLrJCPQ97asjYtywI3OL0yuaUoJVoXVcXBxlA+32MtATq7RzNUA=
+	t=1754471465; cv=none; b=fMtB5mUd6GjumCRwfoUswLwbh3tEHmwDSDQ+okL7fzX5V1HXssZwje0vODDPrVnhMJE2OzD/hkGb+1AwyXMkm4E4vmiiYXsje1lbPV43C75uFrMbGPgYr0TsNyMtf7lrEiNEaBD8ESsX1K7YpO+3vh/GZ9+JJswVMPLZ455IN3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1754471465; c=relaxed/simple;
-	bh=31I6WjXhRwY1ZO5yYnIVtAEAXW02SAJ1j4oJyCrK7cU=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=q8BWzOdmbqIyT9rdl50txvbHbT7ONDvLSWbdiqpuFne27GCl4YyyBDwW9f5bSUQDBlGcEwcxgtYouP2vob0aAb9RZl7IJXU1AYVbNptc4WA5dPNIbDo5tLEuesoHfAJ0q81Kw6t6oaacHMGHTbHqDBG9UkiqEgG5muhxqUBgEsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=XEsBx9IL reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+	bh=GHrQqSC1UtWlG4pv4bxpFM9GNMvL/w8HFNVLh9OzojE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=cF2Ubf/ebKA+g7WgxJ0+RjUzEnMNoG7c2xgfGMuKJzSvkn1Q73tpc3oBMzpM9dkQPTgL0Zr2SbTZCB+73wSc4hf8j+kvXGIk8PpLvCAlSRbcRXkBls2JQA31LCGdICOFtw/ymTg0NYSbXrwX27KoTgf5ehmqYp4uIdBKPUxJ5lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=ILovQubZ reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="XEsBx9IL"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="ILovQubZ"
 Received: from h205.csg.ci.i.u-tokyo.ac.jp (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
 	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 5769A4Q3005818
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 5769A4Q5005818
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
 	Wed, 6 Aug 2025 18:10:13 +0900 (JST)
 	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=04SbAc//VYkDj1IMLyHG/BmwbhPG6uTcl3uHd/dz/BI=;
+DKIM-Signature: a=rsa-sha256; bh=cNChbfwbJxu1p5jME8+k/YzZo2FzwjCcltFsF+wNolE=;
         c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=From:Subject:Date:Message-Id:To;
+        h=From:Date:Subject:Message-Id:To;
         s=rs20250326; t=1754471413; v=1;
-        b=XEsBx9IL1udj/IyQHko/lhxsGUKJnAMTGyD6LZOzTQNNIBBMmB+owrZBhNRAY3Zt
-         DCl7SGKRwTdo0a/DCr88QNE4yZrv4Y4qiMvLI8Ba48/tWugukGW0HkDvgp1brHEY
-         WMAGmkFQHI3jbtf3vHTgRpLTMVbCrMhB/NQVPTDKJ0JdM6hwuRB50Memt2+KbBTE
-         UbiasCzNdvjQSKAKqJi7qqwybDdmOLx6wgUtcpV/fMk/2TKAaSTBx9s6LfhA+qEi
-         L/Ly7LCfvGHHUshrmn+2UFUI4eqTLbNHiWdAiTdysMPTWcuWwPe5gb63gFtw9E9y
-         4fxayjyrq+lW7QIi7WGvPA==
+        b=ILovQubZMvdmX4JupMk0+o5hS9d1oHFD/LOTYDhCE9Rx1fIWftCeY+n5oeAPTDYg
+         Eqe74MSJsTncKg9JzaZL0QyvCPj7JSZZa2UiLlIl7jlL+uOSgFkVy7uXaPfZ6M3c
+         J8x/BLWE36onnKZWuL9r/H/RR9Dlkpvari6SP8pmN2kV8Fi69UNiMRWWonyQl6sX
+         /nwbnxU4dYSURcWsDjE6AYKC+eQuZ3eCWXfVca8QcDRuDzZOVw2FT0+AIeVweHoI
+         CiWev08DGiq7qgq+19v+7R3R0zABjK5m6+pOau/HIL1Odsj8SwCTXfxoddYAILOO
+         zs6v7mRu1+ZJs3BowaDHYA==
 From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Subject: [PATCH RFC v2 0/2] KVM: arm64: PMU: Use multiple host PMUs
-Date: Wed, 06 Aug 2025 18:09:53 +0900
-Message-Id: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+Date: Wed, 06 Aug 2025 18:09:55 +0900
+Subject: [PATCH RFC v2 2/2] KVM: arm64: selftests: Test guest PMUv3
+ composition
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,11 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAOEbk2gC/zWOyw6CMBBFf4XM2pK28oisTEz8ALeGRWEGmQWgL
- TYQwr/bVF3eOyfnzgaOLJODKtnAkmfH0xiCPiTQ9mZ8kGAMGbTUudQ6E/3aWEYhFeZdl5WEqCH
- AT0sdL1F0h9v1AvW3tPR6B+n8uzTGkWinYeC5SnyRqiKCPbt5smv8wqtIxsGjOv0HvRJKZKgMG
- iWplPkZzTrykgYb1Pu+fwAs6cmzywAAAA==
-X-Change-ID: 20250224-hybrid-01d5ff47edd2
+Message-Id: <20250806-hybrid-v2-2-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
         Joey Gouly <joey.gouly@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -64,61 +63,252 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 X-Mailer: b4 0.14.2
 
-On heterogeneous arm64 systems, KVM's PMU emulation is based on the
-features of a single host PMU instance. When a vCPU is migrated to a
-pCPU with an incompatible PMU, counters such as PMCCNTR_EL0 stop
-incrementing.
-
-Although this behavior is permitted by the architecture, Windows does
-not handle it gracefully and may crash with a division-by-zero error.
-
-The current workaround requires VMMs to pin vCPUs to a set of pCPUs
-that share a compatible PMU. This is difficult to implement correctly in
-QEMU/libvirt, where pinning occurs after vCPU initialization, and it
-also restricts the guest to a subset of available pCPUs.
-
-This patch introduces the KVM_ARM_VCPU_PMU_V3_COMPOSITION attribute to
-create a "composite" PMU. When set, KVM exposes a PMU that is compatible
-with all pCPUs by advertising only a single cycle counter, a feature
-common to all PMUs.
-
-This allows Windows guests to run reliably on heterogeneous systems
-without crashing, even without vCPU pinning, and enables VMMs to
-schedule vCPUs across all available pCPUs, making full use of the host
-hardware.
-
-A QEMU patch that demonstrates the usage of the new attribute is
-available at:
-https://lore.kernel.org/qemu-devel/20250806-kvm-v1-1-d1d50b7058cd@rsg.ci.i.u-tokyo.ac.jp/
-("[PATCH RFC] target/arm/kvm: Choose PMU backend")
+Test the following:
+- KVM_ARM_VCPU_PMU_V3_COMPOSITION is unset at initialization.
+- KVM_ARM_VCPU_PMU_V3_COMPOSITION can be set.
+- Setting KVM_ARM_VCPU_PMU_V3_COMPOSITION for the first after setting
+  an event filter results in EBUSY.
+- KVM_ARM_VCPU_PMU_V3_COMPOSITION can be set again even if an event
+  filter has already been set.
+- Setting KVM_ARM_VCPU_PMU_V3_COMPOSITION after running a VCPU results
+  in EBUSY.
+- The composite guest PMUv3 behaves as a PMUv3 whose PMCR.N is 0.
 
 Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 ---
-Changes in v2:
-- Added the KVM_ARM_VCPU_PMU_V3_COMPOSITION attribute to opt in the
-  feature.
-- Added code to handle overflow.
-- Link to v1: https://lore.kernel.org/r/20250319-hybrid-v1-1-4d1ada10e705@daynix.com
+ .../selftests/kvm/arm64/vpmu_counter_access.c      | 148 ++++++++++++++++-----
+ 1 file changed, 118 insertions(+), 30 deletions(-)
 
----
-Akihiko Odaki (2):
-      KVM: arm64: PMU: Introduce KVM_ARM_VCPU_PMU_V3_COMPOSITION
-      KVM: arm64: selftests: Test guest PMUv3 composition
+diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+index f16b3b27e32ed7ca57481f27d689d47783aa0345..8d91d8017aea6a190be4a11e5abedb3324d93989 100644
+--- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
++++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+@@ -409,16 +409,7 @@ static void create_vpmu_vm(void *guest_code)
+ {
+ 	struct kvm_vcpu_init init;
+ 	uint8_t pmuver, ec;
+-	uint64_t dfr0, irq = 23;
+-	struct kvm_device_attr irq_attr = {
+-		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+-		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
+-		.addr = (uint64_t)&irq,
+-	};
+-	struct kvm_device_attr init_attr = {
+-		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+-		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
+-	};
++	uint64_t dfr0;
+ 
+ 	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
+ 	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
+@@ -445,10 +436,6 @@ static void create_vpmu_vm(void *guest_code)
+ 	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
+ 		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
+ 		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+-
+-	/* Initialize vPMU */
+-	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+-	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
+ }
+ 
+ static void destroy_vpmu_vm(void)
+@@ -475,14 +462,26 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
+ 	}
+ }
+ 
+-static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
++static void test_init_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool composition,
++					  bool expect_fail)
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	uint64_t pmcr, pmcr_orig;
++	uint64_t irq = 23;
+ 
+ 	create_vpmu_vm(guest_code);
+ 	vcpu = vpmu_vm.vcpu;
+ 
++	if (composition)
++		vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++				     KVM_ARM_VCPU_PMU_V3_COMPOSITION, NULL);
++
++	vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++			     KVM_ARM_VCPU_PMU_V3_IRQ, &irq);
++
++	vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++			     KVM_ARM_VCPU_PMU_V3_INIT, NULL);
++
+ 	pmcr_orig = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
+ 	pmcr = pmcr_orig;
+ 
+@@ -508,15 +507,15 @@ static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
+  * Create a guest with one vCPU, set the PMCR_EL0.N for the vCPU to @pmcr_n,
+  * and run the test.
+  */
+-static void run_access_test(uint64_t pmcr_n)
++static void run_access_test(uint64_t pmcr_n, bool composition)
+ {
+ 	uint64_t sp;
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vcpu_init init;
+ 
+-	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
++	pr_debug("Test with pmcr_n %lu, composition %d\n", pmcr_n, composition);
+ 
+-	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
++	test_init_vpmu_vm_with_pmcr_n(pmcr_n, composition, false);
+ 	vcpu = vpmu_vm.vcpu;
+ 
+ 	/* Save the initial sp to restore them later to run the guest again */
+@@ -550,14 +549,14 @@ static struct pmreg_sets validity_check_reg_sets[] = {
+  * Create a VM, and check if KVM handles the userspace accesses of
+  * the PMU register sets in @validity_check_reg_sets[] correctly.
+  */
+-static void run_pmregs_validity_test(uint64_t pmcr_n)
++static void run_pmregs_validity_test(uint64_t pmcr_n, bool composition)
+ {
+ 	int i;
+ 	struct kvm_vcpu *vcpu;
+ 	uint64_t set_reg_id, clr_reg_id, reg_val;
+ 	uint64_t valid_counters_mask, max_counters_mask;
+ 
+-	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
++	test_init_vpmu_vm_with_pmcr_n(pmcr_n, composition, false);
+ 	vcpu = vpmu_vm.vcpu;
+ 
+ 	valid_counters_mask = get_counters_mask(pmcr_n);
+@@ -607,11 +606,11 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
+  * the vCPU to @pmcr_n, which is larger than the host value.
+  * The attempt should fail as @pmcr_n is too big to set for the vCPU.
+  */
+-static void run_error_test(uint64_t pmcr_n)
++static void run_error_test(uint64_t pmcr_n, bool composition)
+ {
+ 	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
+ 
+-	test_create_vpmu_vm_with_pmcr_n(pmcr_n, true);
++	test_init_vpmu_vm_with_pmcr_n(pmcr_n, composition, true);
+ 	destroy_vpmu_vm();
+ }
+ 
+@@ -629,20 +628,109 @@ static uint64_t get_pmcr_n_limit(void)
+ 	return get_pmcr_n(pmcr);
+ }
+ 
+-int main(void)
++static void test_config(uint64_t pmcr_n, bool composition)
+ {
+-	uint64_t i, pmcr_n;
+-
+-	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
++	uint64_t i;
+ 
+-	pmcr_n = get_pmcr_n_limit();
+ 	for (i = 0; i <= pmcr_n; i++) {
+-		run_access_test(i);
+-		run_pmregs_validity_test(i);
++		run_access_test(i, composition);
++		run_pmregs_validity_test(i, composition);
+ 	}
+ 
+ 	for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
+-		run_error_test(i);
++		run_error_test(i, composition);
++}
++
++static void test_composition(void)
++{
++	struct kvm_pmu_event_filter filter = { .nevents = 0 };
++	struct kvm_vm *vm;
++	struct kvm_vcpu *running_vcpu;
++	struct kvm_vcpu *stopped_vcpu;
++	struct kvm_vcpu_init init;
++	int ret;
++
++	create_vpmu_vm(guest_code);
++	ret = __vcpu_has_device_attr(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++				     KVM_ARM_VCPU_PMU_V3_COMPOSITION);
++	if (ret) {
++		TEST_ASSERT(ret == -1 && errno == ENXIO,
++			    KVM_IOCTL_ERROR(KVM_GET_DEVICE_ATTR, ret));
++		destroy_vpmu_vm();
++		return;
++	}
++
++	/* Assert that composition is unset at initialization. */
++	ret = __vcpu_device_attr_get(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++				     KVM_ARM_VCPU_PMU_V3_COMPOSITION, NULL);
++	TEST_ASSERT(ret == -1 && errno == ENXIO,
++		    KVM_IOCTL_ERROR(KVM_GET_DEVICE_ATTR, ret));
++
++	/* Assert that setting composition succeeds. */
++	vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++			     KVM_ARM_VCPU_PMU_V3_COMPOSITION, NULL);
++
++	/* Assert that getting composition succeeds. */
++	vcpu_device_attr_get(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++			     KVM_ARM_VCPU_PMU_V3_COMPOSITION, NULL);
++
++	/*
++	 * Assert that setting composition again succeeds even if an event
++	 * filter has already been set.
++	 */
++	vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++			     KVM_ARM_VCPU_PMU_V3_FILTER, &filter);
++
++	vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++			     KVM_ARM_VCPU_PMU_V3_COMPOSITION, NULL);
++
++	destroy_vpmu_vm();
++
++	create_vpmu_vm(guest_code);
++
++	/*
++	 * Assert that setting composition results in EBUSY if an event filter
++	 * has already been set while composition has not.
++	 */
++	vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++			     KVM_ARM_VCPU_PMU_V3_FILTER, &filter);
++
++	ret = __vcpu_device_attr_set(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++				     KVM_ARM_VCPU_PMU_V3_COMPOSITION, NULL);
++	TEST_ASSERT(ret == -1 && errno == EBUSY,
++		    KVM_IOCTL_ERROR(KVM_GET_DEVICE_ATTR, ret));
++
++	destroy_vpmu_vm();
++
++	/*
++	 * Assert that setting composition after running a VCPU results in
++	 * EBUSY.
++	 */
++	vm = vm_create(2);
++	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
++	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
++	running_vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
++	stopped_vcpu = aarch64_vcpu_add(vm, 1, &init, guest_code);
++	vcpu_device_attr_set(running_vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++			     KVM_ARM_VCPU_PMU_V3_INIT, NULL);
++	vcpu_run(running_vcpu);
++
++	ret = __vcpu_device_attr_set(stopped_vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++				     KVM_ARM_VCPU_PMU_V3_COMPOSITION, NULL);
++	TEST_ASSERT(ret == -1 && errno == EBUSY,
++		    KVM_IOCTL_ERROR(KVM_GET_DEVICE_ATTR, ret));
++
++	kvm_vm_free(vm);
++
++	test_config(0, true);
++}
++
++int main(void)
++{
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
++
++	test_config(get_pmcr_n_limit(), false);
++	test_composition();
+ 
+ 	return 0;
+ }
 
- Documentation/virt/kvm/devices/vcpu.rst            |  30 ++
- arch/arm64/include/asm/kvm_host.h                  |   2 +
- arch/arm64/include/uapi/asm/kvm.h                  |   1 +
- arch/arm64/kvm/arm.c                               |   5 +-
- arch/arm64/kvm/pmu-emul.c                          | 495 +++++++++++++--------
- arch/arm64/kvm/sys_regs.c                          |   2 +-
- include/kvm/arm_pmu.h                              |  12 +-
- .../selftests/kvm/arm64/vpmu_counter_access.c      | 148 ++++--
- 8 files changed, 461 insertions(+), 234 deletions(-)
----
-base-commit: 8ec6d99a41e3d1dbdff2bdb3aa42951681e1e76c
-change-id: 20250224-hybrid-01d5ff47edd2
-
-Best regards,
 -- 
-Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+2.50.1
 
