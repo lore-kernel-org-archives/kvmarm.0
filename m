@@ -1,166 +1,296 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A43C8EB;
-	Wed,  6 Aug 2025 18:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82E62BD5B7
+	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 19:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754506614; cv=none; b=JUsTmprko80qNerCb1nWykI/dn8w9+m0ml9QW4mdfpBx57paWEpR2D8/PQ03FfIxJuEhohesxVh4+pu6oNoWagkDxBs2D3w9HJaNf32hb7dTb4Z9y34o1alaUcebcNA7RJilZeUnnbTEjC2+f5584/keNd0aC9CrZSD2A149lec=
+	t=1754510251; cv=none; b=lqO421Bj89rMm+WSRfEIiEFomgPrVDjnCbRav8ztdhhwRnJ93cMiKvwX6A0rylywTCmqVdQSrAGvlj8LUwWH/k+ncY8tiHnRNhGgTim06NWM81No2vdF7PUS3kU8cNc80IYPRG3xBGNh5DkED5NCdgDnjvlpBCUztE8Cbo67A1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754506614; c=relaxed/simple;
-	bh=om1aWa/B7Oy/fsSLhs55XzyydC9EjqsVE/7K+ztsDSs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iUa+xt0hLCtumgR6oNb5Qx4DM+5jdhsox7Ex0JJ4FzvlfY2oSOZ10qOTltqAQ31A/8ad8X4QaHU5dm+jJQ7TRGHLIW1OORcT0WncgwcJMBuRC1gSch44KgKaFcyRuq3WzVajvr6n3pcS+/oCixZ0ELnPixpaWlsoOeykmWtgw6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sb5UxwWM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754510251; c=relaxed/simple;
+	bh=7ItWeP68jXOqxjRGL8UcVyhL0v+vsphGfvNRONop5fg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cN9g2TNT8uGpjDPhIUugxn7JB/hSqeYOh9NVecvOtJF/XwrM9fgu7ePkG7AkNI9NknKjYSF06lxQNUdX6EKfvv+OSCF4Aefvl4MXSMBWvxvFq3XsO8vjeN6GK8xGlsI/hKeTXSBDClfR9X5MClw9/Qt/cRXbTn38i5DAoQWeWh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K1Ru927o; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sb5UxwWM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ECA3C4CEE7;
-	Wed,  6 Aug 2025 18:56:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754506612;
-	bh=om1aWa/B7Oy/fsSLhs55XzyydC9EjqsVE/7K+ztsDSs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sb5UxwWMSQUxbLB7MzB5pEw56XpOE1zygr73grW+FdGaVGx2g3qeoP/jp+H8oqTK+
-	 pQXnW7KR5mKYtvtBZLmlSOUpLMa0jTStxgV6peAMyAOFeIrjpOT/BWtVOJxLQfqYlg
-	 85vb4+xbkeOoM9PREQGug3Gi3lpLzv5n7QKk0HrVlTbZEGD1JosaDjpJHJH4yX+YgB
-	 wsgFbZCMfGmb04wRyMGkbWEGM+G59T+zB+tg6Ew/EA9EnlPk4S6G9SVCFSVGB1SgN5
-	 VlU4JiQ5zoCrudWrWmjkwQS7He0ehkVGdoN63KR+XD5R9qtx79BuHhTjPigr5Af45c
-	 AWZYis9BefrDQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ujjJi-004by9-1y;
-	Wed, 06 Aug 2025 19:56:50 +0100
-Date: Wed, 06 Aug 2025 19:56:49 +0100
-Message-ID: <865xf09t3i.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly
-	<joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will
- Deacon <will@kernel.org>
-Subject: Re: [PATCH v1 2/2] KVM: arm64: nv: update CPU register PAR_EL1 after 'at s*'
-In-Reply-To: <20250806141707.3479194-3-volodymyr_babchuk@epam.com>
-References: <20250806141707.3479194-1-volodymyr_babchuk@epam.com>
-	<20250806141707.3479194-3-volodymyr_babchuk@epam.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K1Ru927o"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b38ec062983so115854a12.3
+        for <kvmarm@lists.linux.dev>; Wed, 06 Aug 2025 12:57:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754510249; x=1755115049; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YiSAi80MlZj2ytBXJIndfL/QD0SGw7awSa7/LhzXfd4=;
+        b=K1Ru927oEPHeatf+KTN6QGJQJqSuvgK7gHF8+taq7miPjpV5rRmlwY/dx536inReD7
+         TTTUGMCe6xhbObOSqCiJAgfWRQgymdXLVL2H4m2LrH6h/Ga/9ZEU7RxFRUbkAxP6U7t9
+         M5QEGN5AVTrG6+oEm6whREvbHBX1t54P6g33CjYh3optZOvK46htk8qrdr66d35kkz8u
+         pAiap5FdeKup7B8ZkVrTU9mEaHCXd5LSf8/27/zjU+YHrSDmjUzsHTzs2FsPuT8MMGZH
+         HL98KJcUgaCrYP0ZqC1/EK/SNHLVKqNk7z7b8knBo3pULEYroHsFWiIDYb1pbeo+JzJ3
+         aBjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754510249; x=1755115049;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YiSAi80MlZj2ytBXJIndfL/QD0SGw7awSa7/LhzXfd4=;
+        b=HTVgk/bTrGi1m2VNzuwRDi68F1qMiAZ1C6ejHFfa+l0DKIGMfKWc3z67glVo6yxaMX
+         PzDxTZVdNTUKbWf+4vbPMIXR5fJhIrWEQjDmiUsFKapsjbJjNz1nn8yYNFzBsSIR2c0d
+         MNj5H9oMwcibdCvdCcsCHhrLJT1tgup/AKTciuL+ZtDZs+ObFy/EuUdfkEXygWgQYuf9
+         O0MQwyv8YETHZLgFEAcoZC6zprxmPZIsffJK/668u3oNFq8LmJmJzzGw4no7hJ9+l0s/
+         /Ux9Z3SoSdsNWtg5BnCYXZ9PD6d6PqmSCNNzPk394KRBImVKI4v72SVouXIyRNEZ8b4O
+         1WxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXLyhLKKcczKi6LpFJxlIwrnyS6J9Be90kA10TQRxh7QX14L7WMV5E/oS0AAf9KOd1Fxs1n68s=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzmt54UZHdXJLsikyTCSBFzQiVz/1mYDZk4dK9qSxn5GiM3Zj0I
+	cnhLcgGH4KfUiTbgUBQYpe9iOZ8GOWmrYDTVul9SZYEJQNm2b4Gz+0q/3yxUh1n5QW7tAmde9+l
+	6pOCj+Q==
+X-Google-Smtp-Source: AGHT+IEiZF4ZVXP/srLo4kntXv21eK34Ewron2VGf18IaFFGcm86hQQPlcpG9BeCZl+mVxBNNadcXtcYKE4=
+X-Received: from pjoa3.prod.google.com ([2002:a17:90a:8c03:b0:312:14e5:174b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7c2:b0:31c:15d9:8aa
+ with SMTP id 98e67ed59e1d1-32166cd17a9mr5063314a91.34.1754510248842; Wed, 06
+ Aug 2025 12:57:28 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed,  6 Aug 2025 12:56:22 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Volodymyr_Babchuk@epam.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
+Message-ID: <20250806195706.1650976-1-seanjc@google.com>
+Subject: [PATCH v5 00/44] KVM: x86: Add support for mediated vPMUs
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>, 
+	Yongwei Ma <yongwei.ma@intel.com>, Mingwei Zhang <mizhang@google.com>, 
+	Xiong Zhang <xiong.y.zhang@linux.intel.com>, Sandipan Das <sandipan.das@amd.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 06 Aug 2025 15:17:55 +0100,
-Volodymyr Babchuk <Volodymyr_Babchuk@epam.com> wrote:
-> 
-> Previously this code update only vCPU's in-memory value, which is good,
-> but not enough, as there will be no context switch after exiting
-> exception handler, so in-memory value will not get into actual
-> register.
-> 
-> It worked good enough for VHE guests because KVM code tried fast path,
-> which of course updated real PAR_EL1.
+This series is based on the fastpath+PMU cleanups series[*] (which is based on
+kvm/queue), but the non-KVM changes apply cleanly on v6.16 or Linus' tree.
+I.e. if you only care about the perf changes, I would just apply on whatever
+branch is convenient and stop when you hit the KVM changes.
 
-Nothing to do with VHE, I'm afraid. We can take the slow path for any
-odd reason, even on VHE. This is more of a structural problem, see
-below.
+My hope/plan is that the perf changes will go through the tip tree with a
+stable tag/branch, and the KVM changes will go the kvm-x86 tree.
 
-> 
-> Signed-off-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7b8a0a6f26468..ab2b5e261d312 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3463,6 +3463,9 @@ static bool handle_at_s1e2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  
->  	__kvm_at_s1e2(vcpu, op, p->regval);
->  
-> +	/* No context switch happened, so we need to update PAR_EL1 manually */
-> +	write_sysreg(vcpu_read_sys_reg(vcpu, PAR_EL1), par_el1);
-> +
+Non-x86 KVM folks, y'all are getting Cc'd due to minor changes in "KVM: Add a
+simplified wrapper for registering perf callbacks".
 
-This looks like the wrong fix, as it papers over another issue.
+The full set is also available at:
 
-The core problem is vcpu_write_sys_reg() (resp. read) does the wrong
-thing with registers such as PAR_EL1, which are not translated between
-EL1 and EL2, and therefore are always live, no matter what.
+  https://github.com/sean-jc/linux.git tags/mediated-vpmu-v5
 
-Can you please try the hack below? I don't like it, but at least it
-shows where the actual problem lies.
+Add support for mediated vPMUs in KVM x86, where "mediated" aligns with the
+standard definition of intercepting control operations (e.g. event selectors),
+while allowing the guest to perform data operations (e.g. read PMCs, toggle
+counters on/off) without KVM getting involed.
 
-Thanks,
+For an in-depth description of the what and why, please see the cover letter
+from the original RFC:
 
-	M.
+  https://lore.kernel.org/all/20240126085444.324918-1-xiong.y.zhang@linux.intel.com
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ad25484772574..167f0d411a708 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -95,7 +95,13 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
- 		return true;						\
- 	}
- 
--static bool get_el2_to_el1_mapping(unsigned int reg,
-+#define COMMON_SYSREG(r)						\
-+	case r: {							\
-+		 *el1r = __INVALID_SYSREG__;				\
-+		 return is_hyp_ctxt(vcpu);					\
-+	}
-+
-+static bool get_el2_to_el1_mapping(const struct kvm_vcpu *vcpu, unsigned int reg,
- 				   unsigned int *el1r, u64 (**xlate)(u64))
- {
- 	switch (reg) {
-@@ -119,6 +125,7 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
- 		PURE_EL2_SYSREG(  HAFGRTR_EL2	);
- 		PURE_EL2_SYSREG(  CNTVOFF_EL2	);
- 		PURE_EL2_SYSREG(  CNTHCTL_EL2	);
-+		COMMON_SYSREG(	  PAR_EL1	);
- 		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
- 				  translate_sctlr_el2_to_sctlr_el1	     );
- 		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,
-@@ -158,7 +165,7 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- 	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
- 		goto memory_read;
- 
--	if (unlikely(get_el2_to_el1_mapping(reg, &el1r, &xlate))) {
-+	if (unlikely(get_el2_to_el1_mapping(vcpu, reg, &el1r, &xlate))) {
- 		if (!is_hyp_ctxt(vcpu))
- 			goto memory_read;
- 
-@@ -219,7 +226,7 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
- 		goto memory_write;
- 
--	if (unlikely(get_el2_to_el1_mapping(reg, &el1r, &xlate))) {
-+	if (unlikely(get_el2_to_el1_mapping(vcpu, reg, &el1r, &xlate))) {
- 		if (!is_hyp_ctxt(vcpu))
- 			goto memory_write;
- 
+All KVM tests pass (or fail the same before and after), and I've manually
+verified MSR/PMC are passed through as expected, but I haven't done much at all
+to actually utilize the PMU in a guest.  I'll be amazed if I didn't make at
+least one major goof.
 
+Similarly, I tried to address all feedback, but there are many, many changes
+relative to v4.  If I missed something, I apologize in advance.
+
+In other words, please thoroughly review and test.
+
+[*] https://lore.kernel.org/all/20250805190526.1453366-1-seanjc@google.com
+
+v5:
+ - Add a patch to call security_perf_event_free() from __free_event()
+   instead of _free_event() (necessitated by the __cleanup() changes).
+ - Add CONFIG_PERF_GUEST_MEDIATED_PMU to guard the new perf functionality.
+ - Ensure the PMU is fully disabled in perf_{load,put}_guest_context() when
+   when switching between guest and host context. [Kan, Namhyung]
+ - Route the new system IRQ, PERF_GUEST_MEDIATED_PMI_VECTOR, through perf,
+   not KVM, and play nice with FRED.
+ - Rename and combine perf_{guest,host}_{enter,exit}() to a single set of
+   APIs, perf_{load,put}_guest_context().
+ - Rename perf_{get,put}_mediated_pmu() to perf_{create,release}_mediated_pmu()
+   to (hopefully) better differentiate them from perf_{load,put}_guest_context().
+ - Change the param to the load/put APIs from "u32 guest_lvtpc" to
+   "unsigned long data" to decouple arch code as much as possible.  E.g. if
+   a non-x86 arch were to ever support a mediated vPMU, @data could be used
+   to pass a pointer to a struct.
+ - Use pmu->version to detect if a vCPU has a mediated PMU.
+ - Use a kvm_x86_ops hook to check for mediated PMU support.
+ - Cull "passthrough" from as many places as I could find.
+ - Improve the changelog/documentation related to RDPMC interception.
+ - Check harware capabilities, not KVM capabilities, when calculating
+   MSR and RDPMC intercepts.
+ - Rework intercept (re)calculation to use a request and the existing (well,
+   will be existing as of 6.17-rc1) vendor hooks for recalculating intercepts.
+ - Always read PERF_GLOBAL_CTRL on VM-Exit if writes weren't intercepted while
+   running the vCPU.
+ - Call setup_vmcs_config() before kvm_x86_vendor_init() so that the golden
+   VMCS configuration is known before kvm_init_pmu_capability() is called.
+ - Keep as much refresh/init code in common x86 as possible.
+ - Context switch PMCs and event selectors in common x86, not vendor code.
+ - Bail from the VM-Exit fastpath if the guest is counting instructions
+   retired and the mediated PMU is enabled (because guest state hasn't yet
+   been synchronized with hardware).
+ - Don't require an userspace to opt-in via KVM_CAP_PMU_CAPABILITY, and instead
+   automatically "create" a mediated PMU on the first KVM_CREATE_VCPU call if
+   the VM has an in-kernel local APIC.
+ - Add entries in kernel-parameters.txt for the PMU params.
+ - Add a patch to elide PMC writes when possible.
+ - Many more fixups and tweaks...
+
+v4:
+ - https://lore.kernel.org/all/20250324173121.1275209-1-mizhang@google.com
+ - Rebase whole patchset on 6.14-rc3 base.
+ - Address Peter's comments on Perf part.
+ - Address Sean's comments on KVM part.
+   * Change key word "passthrough" to "mediated" in all patches
+   * Change static enabling to user space dynamic enabling via KVM_CAP_PMU_CAPABILITY.
+   * Only support GLOBAL_CTRL save/restore with VMCS exec_ctrl, drop the MSR
+     save/retore list support for GLOBAL_CTRL, thus the support of mediated
+     vPMU is constrained to SapphireRapids and later CPUs on Intel side.
+   * Merge some small changes into a single patch.
+ - Address Sandipan's comment on invalid pmu pointer.
+ - Add back "eventsel_hw" and "fixed_ctr_ctrl_hw" to avoid to directly
+   manipulate pmc->eventsel and pmu->fixed_ctr_ctrl.
+
+v3: https://lore.kernel.org/all/20240801045907.4010984-1-mizhang@google.com
+v2: https://lore.kernel.org/all/20240506053020.3911940-1-mizhang@google.com
+v1: https://lore.kernel.org/all/20240126085444.324918-1-xiong.y.zhang@linux.intel.com
+
+Dapeng Mi (15):
+  KVM: x86/pmu: Start stubbing in mediated PMU support
+  KVM: x86/pmu: Implement Intel mediated PMU requirements and
+    constraints
+  KVM: x86: Rename vmx_vmentry/vmexit_ctrl() helpers
+  KVM: x86/pmu: Move PMU_CAP_{FW_WRITES,LBR_FMT} into msr-index.h header
+  KVM: VMX: Add helpers to toggle/change a bit in VMCS execution
+    controls
+  KVM: x86/pmu: Disable RDPMC interception for compatible mediated vPMU
+  KVM: x86/pmu: Load/save GLOBAL_CTRL via entry/exit fields for mediated
+    PMU
+  KVM: x86/pmu: Use BIT_ULL() instead of open coded equivalents
+  KVM: x86/pmu: Disable interception of select PMU MSRs for mediated
+    vPMUs
+  KVM: x86/pmu: Bypass perf checks when emulating mediated PMU counter
+    accesses
+  KVM: x86/pmu: Reprogram mediated PMU event selectors on event filter
+    updates
+  KVM: x86/pmu: Load/put mediated PMU context when entering/exiting
+    guest
+  KVM: x86/pmu: Handle emulated instruction for mediated vPMU
+  KVM: nVMX: Add macros to simplify nested MSR interception setting
+  KVM: x86/pmu: Expose enable_mediated_pmu parameter to user space
+
+Kan Liang (7):
+  perf: Skip pmu_ctx based on event_type
+  perf: Add generic exclude_guest support
+  perf: Add APIs to create/release mediated guest vPMUs
+  perf: Clean up perf ctx time
+  perf: Add a EVENT_GUEST flag
+  perf: Add APIs to load/put guest mediated PMU context
+  perf/x86/intel: Support PERF_PMU_CAP_MEDIATED_VPMU
+
+Mingwei Zhang (3):
+  perf/x86/core: Plumb mediated PMU capability from x86_pmu to
+    x86_pmu_cap
+  KVM: x86/pmu: Introduce eventsel_hw to prepare for pmu event filtering
+  KVM: nVMX: Disable PMU MSR interception as appropriate while running
+    L2
+
+Sandipan Das (3):
+  perf/x86/core: Do not set bit width for unavailable counters
+  perf/x86/amd: Support PERF_PMU_CAP_MEDIATED_VPMU for AMD host
+  KVM: x86/pmu: Always stuff GuestOnly=1,HostOnly=0 for mediated PMCs on
+    AMD
+
+Sean Christopherson (15):
+  perf: Move security_perf_event_free() call to __free_event()
+  perf: core/x86: Register a new vector for handling mediated guest PMIs
+  perf/x86: Switch LVTPC to/from mediated PMI vector on guest load/put
+    context
+  KVM: VMX: Setup canonical VMCS config prior to kvm_x86_vendor_init()
+  KVM: SVM: Check pmu->version, not enable_pmu, when getting PMC MSRs
+  KVM: Add a simplified wrapper for registering perf callbacks
+  KVM: x86/pmu: Snapshot host (i.e. perf's) reported PMU capabilities
+  KVM: x86/pmu: Implement AMD mediated PMU requirements
+  KVM: x86: Rework KVM_REQ_MSR_FILTER_CHANGED into a generic
+    RECALC_INTERCEPTS
+  KVM: x86: Use KVM_REQ_RECALC_INTERCEPTS to react to CPUID updates
+  KVM: x86/pmu: Move initialization of valid PMCs bitmask to common x86
+  KVM: x86/pmu: Restrict GLOBAL_{CTRL,STATUS}, fixed PMCs, and PEBS to
+    PMU v2+
+  KVM: x86/pmu: Disallow emulation in the fastpath if mediated PMCs are
+    active
+  KVM: nSVM: Disable PMU MSR interception as appropriate while running
+    L2
+  KVM: x86/pmu: Elide WRMSRs when loading guest PMCs if values already
+    match
+
+Xiong Zhang (1):
+  KVM: x86/pmu: Register PMI handler for mediated vPMU
+
+ .../admin-guide/kernel-parameters.txt         |  49 ++
+ arch/arm64/kvm/arm.c                          |   2 +-
+ arch/loongarch/kvm/main.c                     |   2 +-
+ arch/riscv/kvm/main.c                         |   2 +-
+ arch/x86/entry/entry_fred.c                   |   1 +
+ arch/x86/events/amd/core.c                    |   2 +
+ arch/x86/events/core.c                        |  32 +-
+ arch/x86/events/intel/core.c                  |   5 +
+ arch/x86/include/asm/hardirq.h                |   3 +
+ arch/x86/include/asm/idtentry.h               |   6 +
+ arch/x86/include/asm/irq_vectors.h            |   4 +-
+ arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+ arch/x86/include/asm/kvm-x86-pmu-ops.h        |   4 +
+ arch/x86/include/asm/kvm_host.h               |   7 +-
+ arch/x86/include/asm/msr-index.h              |  17 +-
+ arch/x86/include/asm/perf_event.h             |   1 +
+ arch/x86/include/asm/vmx.h                    |   1 +
+ arch/x86/kernel/idt.c                         |   3 +
+ arch/x86/kernel/irq.c                         |  19 +
+ arch/x86/kvm/Kconfig                          |   1 +
+ arch/x86/kvm/cpuid.c                          |   2 +
+ arch/x86/kvm/pmu.c                            | 272 ++++++++-
+ arch/x86/kvm/pmu.h                            |  37 +-
+ arch/x86/kvm/svm/nested.c                     |  18 +-
+ arch/x86/kvm/svm/pmu.c                        |  51 +-
+ arch/x86/kvm/svm/svm.c                        |  54 +-
+ arch/x86/kvm/vmx/capabilities.h               |  11 +-
+ arch/x86/kvm/vmx/main.c                       |  14 +-
+ arch/x86/kvm/vmx/nested.c                     |  65 ++-
+ arch/x86/kvm/vmx/pmu_intel.c                  | 169 ++++--
+ arch/x86/kvm/vmx/pmu_intel.h                  |  15 +
+ arch/x86/kvm/vmx/vmx.c                        | 143 +++--
+ arch/x86/kvm/vmx/vmx.h                        |  11 +-
+ arch/x86/kvm/vmx/x86_ops.h                    |   2 +-
+ arch/x86/kvm/x86.c                            |  69 ++-
+ arch/x86/kvm/x86.h                            |   1 +
+ include/linux/kvm_host.h                      |  11 +-
+ include/linux/perf_event.h                    |  38 +-
+ init/Kconfig                                  |   4 +
+ kernel/events/core.c                          | 521 ++++++++++++++----
+ .../beauty/arch/x86/include/asm/irq_vectors.h |   3 +-
+ virt/kvm/kvm_main.c                           |   6 +-
+ 42 files changed, 1385 insertions(+), 295 deletions(-)
+
+
+base-commit: 53d61a43a7973f812caa08fa922b607574befef4
 -- 
-Without deviation from the norm, progress is not possible.
+2.50.1.565.gc32cd1483b-goog
+
