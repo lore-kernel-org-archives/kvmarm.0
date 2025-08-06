@@ -1,115 +1,147 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4172229B799;
-	Wed,  6 Aug 2025 16:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E167F29ACE6;
+	Wed,  6 Aug 2025 17:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754499393; cv=none; b=NmWyZv3EOVDcbmc7TtgloDKi67S23/d3Pj6QgV3USBKKG/DDdfkE7BqhGMES13r+KaicgxyOnjrrWc2op3R/2PxNSDc35zujLwg6kzBBrRtjU5lluPigLhE/nSmDCKFk97whHnjAmQbeZeXAckqOtTIK/0RPiUEobhTkVjJ47O4=
+	t=1754500214; cv=none; b=TR/7uqDj7YNAguJEqO/O3SDqM9SovaybhqKV58fI9lgJraiSAkLwSOeQNKn70TsATmo5l5zRODWqO1Hk6iLYOHW3FSe0htsvJ4pkJczdmI0SHPcGl0Q3KUxMguUdSY9ICfJCjsWLWoVA7rUVCsv3XrFTDlOKfyOQd+32ceewf14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754499393; c=relaxed/simple;
-	bh=zAGAbsELpollOdT/eTW6SPvyl/e20p98489YUkFL0Rg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jhrx2xhH8ripqKKCoBcEdr8hltPJ71PthhM5McywRuN6RjGUzsVcbxg3Q+s53OFvOTsEU5Qnp0lG43A4Pwp9jALwusT69NXsLWdzA22pXannqG2DsYdnDkHuWLqysR8UOWrmit0VpQXUuvJWXUWWlr8b87Wjh06R6GfPVZyFWak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F9V9Einp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754500214; c=relaxed/simple;
+	bh=KC18PkgeIXM5gTZVIz69jI5Goanj7HtMUTRlzjO5+w4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SjDwCvAoCUhkcggLxRolflLefW+GIMBc4nsutRmL+rx4lZh+40GHUIezSWTE7joMnKcn9gnE0c2MgF8J1DO4fCiNGESGdwS/gg8U66wNfxgVQT1nHOvfPtWvkXCW6jiLR3CfOtShJjyxhIF9cqjETIlsGropU8eyErwDPQtcQec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IE2yFYh/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F9V9Einp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0770C4CEE7;
-	Wed,  6 Aug 2025 16:56:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IE2yFYh/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79002C4CEE7;
+	Wed,  6 Aug 2025 17:10:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754499392;
-	bh=zAGAbsELpollOdT/eTW6SPvyl/e20p98489YUkFL0Rg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F9V9EinprHiKzCbTb5mFCy5cqHsyiK9BXScCXegKPXYR0tkMsC3eiwHGo4pKCR9JZ
-	 2KkYsh8avrTzkE8+1GlbQefmuif6J+j3GIiibP1Av9BE45DJJ+fhPxWq+D+djSqnK2
-	 eicOadzeXamTMgkbyKAjxpXE1Hf46jBV2u1gQ8X5Uc4AG49NlDMzQ5oMh4Obj/J8OB
-	 EJSuSbeeBwkdfG6PbdXR+TEIYSMi7ecxIhPOYVZ99PcVd0oUt5trigPa/5oD19TRkG
-	 Fp2CNgQ6AvjZ3RrA3VhIkZZncCIXyGoArsHc3bs++s1Upgcmkrq9FmZhxL1/RSkVUI
-	 Q0ErQ0CvINNSg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1754500213;
+	bh=KC18PkgeIXM5gTZVIz69jI5Goanj7HtMUTRlzjO5+w4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IE2yFYh/cEZc/FXrCrt2zf5Xd6VHBZ/yQDjkULkyXasQ8qrnqiegr0lh2Iddzv6o7
+	 nzeG2B0HydxZ/o0FFBAn0QjGUatWZ/kg/oUfA0JU6mPLD4XMslQWe3Q/st4aKyvl4D
+	 6L6Aq9JgXtX11k/GpLzcD8oPIT8uWACo+vLjMAp6YyTg2xRltGtpgZ29zCQtVWOuMC
+	 IOWqAqFbfBc2ZX6SrNuDjmmW8AAvzFZzeA4S/wgS/ebEP42wUh4ni+L9ZYLyd7AIWp
+	 SXojmJyPHwtm7natqKHlruFT+iaGBnak4Awb/Xr5vvFS4VMFiABsJoJCk/n2R/D6CB
+	 tqYouBl/9ommg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ujhRE-004ZQV-3S;
-	Wed, 06 Aug 2025 17:56:28 +0100
+	id 1ujheU-004ZmT-PP;
+	Wed, 06 Aug 2025 18:10:11 +0100
+Date: Wed, 06 Aug 2025 18:10:10 +0100
+Message-ID: <86a54c9y19.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v2 2/5] KVM: arm64: Handle RASv1p1 registers
-Date: Wed,  6 Aug 2025 17:56:12 +0100
-Message-Id: <20250806165615.1513164-3-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250806165615.1513164-1-maz@kernel.org>
-References: <20250806165615.1513164-1-maz@kernel.org>
+	Mark Rutland <mark.rutland@arm.com>,
+	jackabt@amazon.com
+Subject: Re: [PATCH] KVM: arm64: selftest: Add standalone test checking for KVM's own UUID
+In-Reply-To: <20250722-87ac9d7e0b27cf7c67a4fbd3@orel>
+References: <20250721155136.892255-1-maz@kernel.org>
+	<20250722-87ac9d7e0b27cf7c67a4fbd3@orel>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com, cohuck@redhat.com
+X-SA-Exim-Rcpt-To: ajones@ventanamicro.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, mark.rutland@arm.com, jackabt@amazon.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_RASv1p1 system registeres are not handled at all so far.
-KVM will give an embarassed warning on the console and inject
-an UNDEF, despite RASv1p1 being exposed to the guest on suitable HW.
+On Tue, 22 Jul 2025 10:18:10 +0100,
+Andrew Jones <ajones@ventanamicro.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, Jul 21, 2025 at 04:51:36PM +0100, Marc Zyngier wrote:
+> > Tinkering with UUIDs is a perilious task, and the KVM UUID gets
+> > broken at times. In order to spot this early enough, add a selftest
+> > that will shout if the expected value isn't found.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/20250721130558.50823-1-jackabt.amazon@gmail.com
+> > ---
+> >  tools/testing/selftests/kvm/Makefile.kvm     |  1 +
+> >  tools/testing/selftests/kvm/arm64/kvm-uuid.c | 67 ++++++++++++++++++++
+> >  2 files changed, 68 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> > 
+> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> > index ce817a975e50a..e1eb1ba238a2a 100644
+> > --- a/tools/testing/selftests/kvm/Makefile.kvm
+> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> > @@ -167,6 +167,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+> >  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+> >  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+> >  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
+> > +TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
+> >  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+> >  TEST_GEN_PROGS_arm64 += arch_timer
+> >  TEST_GEN_PROGS_arm64 += coalesced_io_test
+> > diff --git a/tools/testing/selftests/kvm/arm64/kvm-uuid.c b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> > new file mode 100644
+> > index 0000000000000..89d9c8b182ae5
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
+> > @@ -0,0 +1,67 @@
+> > +#include <errno.h>
+> > +#include <linux/arm-smccc.h>
+> > +#include <asm/kvm.h>
+> > +#include <kvm_util.h>
+> > +
+> > +#include "processor.h"
+> > +
+> > +/*
+> > + * Do NOT redefine these constants, or try to replace them with some
+> > + * "common" version. They are hardcoded here to detect any potential
+> > + * breakage happening in the rest of the kernel.
+> > + *
+> > + * KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74
+> > + */
+> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
+> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
+> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
+> > +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
+> > +
+> > +static void guest_code(void)
+> > +{
+> > +	struct arm_smccc_res res = {};
+> > +
+> > +	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
+> > +
+> > +	__GUEST_ASSERT(res.a0 != SMCCC_RET_NOT_SUPPORTED, "a0 = %lx\n", res.a0);
+> 
+> Should this check res.a0 == SMCCC_RET_SUCCESS instead?
 
-Handle these registers similarly to FEAT_RAS, with the added fun
-that there are *two* way to indicate the presence of FEAT_RASv1p1.
+Sorry for the delay, but now that I'm awake, it is obvious this
+doesn't work at all. A0-A3 contain the full UID.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+While checking for A0 != NOT_SUPPORTED is valid, checking for
+A0 == SUCCESS cannot work on KVM (we'd get 0xb66fb428 instead of 0).
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ad25484772574..1b4114790024e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2695,6 +2695,18 @@ static bool access_ras(struct kvm_vcpu *vcpu,
- 	struct kvm *kvm = vcpu->kvm;
- 
- 	switch(reg_to_encoding(r)) {
-+	case SYS_ERXPFGCDN_EL1:
-+	case SYS_ERXPFGCTL_EL1:
-+	case SYS_ERXPFGF_EL1:
-+	case SYS_ERXMISC2_EL1:
-+	case SYS_ERXMISC3_EL1:
-+		if (!(kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1) ||
-+		      (kvm_has_feat_enum(kvm, ID_AA64PFR0_EL1, RAS, IMP) &&
-+		       kvm_has_feat(kvm, ID_AA64PFR1_EL1, RAS_frac, RASv1p1)))) {
-+			kvm_inject_undefined(vcpu);
-+			return false;
-+		}
-+		break;
- 	default:
- 		if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
- 			kvm_inject_undefined(vcpu);
-@@ -3058,8 +3070,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_ERXCTLR_EL1), access_ras },
- 	{ SYS_DESC(SYS_ERXSTATUS_EL1), access_ras },
- 	{ SYS_DESC(SYS_ERXADDR_EL1), access_ras },
-+	{ SYS_DESC(SYS_ERXPFGF_EL1), access_ras },
-+	{ SYS_DESC(SYS_ERXPFGCTL_EL1), access_ras },
-+	{ SYS_DESC(SYS_ERXPFGCDN_EL1), access_ras },
- 	{ SYS_DESC(SYS_ERXMISC0_EL1), access_ras },
- 	{ SYS_DESC(SYS_ERXMISC1_EL1), access_ras },
-+	{ SYS_DESC(SYS_ERXMISC2_EL1), access_ras },
-+	{ SYS_DESC(SYS_ERXMISC3_EL1), access_ras },
- 
- 	MTE_REG(TFSR_EL1),
- 	MTE_REG(TFSRE0_EL1),
+So actually, this assertion is meaningless, and I'm dropping it.
+
+Thanks,
+
+	M.
+
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
