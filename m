@@ -1,163 +1,188 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B1427FB1B;
-	Wed,  6 Aug 2025 17:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CAD24BCE8
+	for <kvmarm@lists.linux.dev>; Wed,  6 Aug 2025 17:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754500428; cv=none; b=GxhD1ES2+EI0gY4NQLrUJLURdrfRilMomWh3WsxYlsw1XcLlez2EVMqSrWElvu6/56aadQ4DeehyeAjXXBHSr9mbl7olzHf48q1Bt7pYiefOHPAiqMziESGcXfU7XcM6llVNNRAx20HbO0kaDEaKrXstc8pYZwyBoUjf308jF8A=
+	t=1754500872; cv=none; b=KRR7xZB/2l8r0FQPOXFnyPAzgkSfYfZzKdXnuGHUopy4fdMBTsQ3vMx/oGRa2qXkG5Mngyb1CpJdqhVGSgQ/OAoibVT1kHP4bj2bDs2FuioBQKKlMhcaDDtbOFKpIzFiq941vPhZnaMLehGv8oqLBkQijliMVA0VRZmFRPXk8ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754500428; c=relaxed/simple;
-	bh=8Vggf2SHfGzqRxDTnJWCQ5dqoRdquclLk4o1w8m9LAY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nJ57ngARwpiPlGbBeo3yB1+/oT+IB0XqHQVGe9+fG4dj/nU9Trb1ttwa80IbFIH3WlYcbTiS7mlcmqsFEaHMecg9XSUWLWaika5721x4k+71mBMR3+zVjYiq/3K1H2zZjsBImtUMRLWRAsSmWDSCBGp9RQlPb8tOOg2wivxA76E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WrScxnv5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754500872; c=relaxed/simple;
+	bh=kjhnQ5Za+XBsranDfYgw0zRqfwEAy/mULiOdftIXj5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=skDipacvCcGPzm1ZNnEzmWqPg1ElUfO6zer7sXMrgIGDig3UsW6KeYfZtXTtYtybvr6lIWzJ41rFN9CJHo0wjSW6s44GRAKZj8L8Hi9qypx6cw3EfU7rUsBodahX6LXejAGFreT2N4WxGcSZdvc7SqplC30les1AqonkQUY63n4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VtkQ++7b; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WrScxnv5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C76EC4CEE7;
-	Wed,  6 Aug 2025 17:13:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754500428;
-	bh=8Vggf2SHfGzqRxDTnJWCQ5dqoRdquclLk4o1w8m9LAY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=WrScxnv5OUixV5aL9DREM83KxjMw3FTOVgzNslxJDOEal41plYlUNIzbs8c6hmrHg
-	 yznHJAT9kF9YgzFC0ZfEj+YThXOuIUcjKoSGw8qWo2qAfZncP7xYgnMBA2qZ+2a09U
-	 92YVK0IFtTWsCzJWyVyZFgleVkm/+vd74u7fEa8h1/CgB7++Pk/i3AN1TSE2nKhVjG
-	 XzIqI26Mu5uqfzrpACpDxNT3IaLo/ayyRnfhBjFxo2t7SRoAmNGJIzsey3ad9t46/8
-	 /0QcorrKNt9r//Zjg9tPwRLOf8lZjo9YyU1wdGKPgs5WjcUJEPXkTOz5ljwZSi1tWf
-	 Lrq3PF8LE5NEQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ujhhy-004Ztc-33;
-	Wed, 06 Aug 2025 18:13:46 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VtkQ++7b"
+Date: Wed, 6 Aug 2025 10:20:55 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1754500867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LXEzdvjKc1frf74KZZ2Dk9UeoT9Qj8s/haDO00iYsCY=;
+	b=VtkQ++7b2u/bXmsWSk18w3r7GM1P5JVR7OF9qYXkJUdtUAb1xF+174eBKK9E0p7iYnpU9o
+	qMZ/Jn24nSr9r2S/3tLcPCdxS8TX5DhSvQ3mumqS7+RSehNtdiprcMvvWdydZeJAT64sl/
+	DZOMHF4WOTVO1Lqo5qTY5dzVsOhTh5M=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	ajones@ventanamicro.com,
-	Sebastian Ott <sebott@redhat.com>
-Subject: [PATCH v2] KVM: arm64: selftest: Add standalone test checking for KVM's own UUID
-Date: Wed,  6 Aug 2025 18:13:41 +0100
-Message-Id: <20250806171341.1521210-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
+ KVM_ARM_VCPU_PMU_V3_COMPOSITION
+Message-ID: <aJOO99xUrhsrvLwl@linux.dev>
+References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+ <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, ajones@ventanamicro.com, sebott@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
+X-Migadu-Flow: FLOW_OUT
 
-Tinkering with UUIDs is a perilious task, and the KVM UUID gets
-broken at times. In order to spot this early enough, add a selftest
-that will shout if the expected value isn't found.
+Hi Akihiko,
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Sebastian Ott <sebott@redhat.com>
-Link: https://lore.kernel.org/r/20250721130558.50823-1-jackabt.amazon@gmail.com
----
- tools/testing/selftests/kvm/Makefile.kvm     |  1 +
- tools/testing/selftests/kvm/arm64/kvm-uuid.c | 70 ++++++++++++++++++++
- 2 files changed, 71 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/kvm-uuid.c
+This is an unreasonably large patch that needs to be broken down into
+smaller patches, ideally one functional change per patch. We need this
+even for an RFC for the sake of reviews.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index ce817a975e50a..e1eb1ba238a2a 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -167,6 +167,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
- TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
- TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
- TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
-+TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
- TEST_GEN_PROGS_arm64 += access_tracking_perf_test
- TEST_GEN_PROGS_arm64 += arch_timer
- TEST_GEN_PROGS_arm64 += coalesced_io_test
-diff --git a/tools/testing/selftests/kvm/arm64/kvm-uuid.c b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
-new file mode 100644
-index 0000000000000..af9581b860f14
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
-@@ -0,0 +1,70 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+// Check that nobody has tampered with KVM's UID
-+
-+#include <errno.h>
-+#include <linux/arm-smccc.h>
-+#include <asm/kvm.h>
-+#include <kvm_util.h>
-+
-+#include "processor.h"
-+
-+/*
-+ * Do NOT redefine these constants, or try to replace them with some
-+ * "common" version. They are hardcoded here to detect any potential
-+ * breakage happening in the rest of the kernel.
-+ *
-+ * KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74
-+ */
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
-+
-+static void guest_code(void)
-+{
-+	struct arm_smccc_res res = {};
-+
-+	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
-+
-+	__GUEST_ASSERT(res.a0 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 &&
-+		       res.a1 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 &&
-+		       res.a2 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 &&
-+		       res.a3 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3,
-+		       "Unexpected KVM-specific UID %lx %lx %lx %lx\n", res.a0, res.a1, res.a2, res.a3);
-+	GUEST_DONE();
-+}
-+
-+int main (int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	bool guest_done = false;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	while (!guest_done) {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			guest_done = true;
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_PRINTF:
-+			printf("%s", uc.buffer);
-+			break;
-+		default:
-+			TEST_FAIL("Unexpected guest exit");
-+		}
-+	}
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
--- 
-2.39.2
+On Wed, Aug 06, 2025 at 06:09:54PM +0900, Akihiko Odaki wrote:
+> +static u64 kvm_pmu_get_pmc_value(struct kvm_vcpu *vcpu, u8 idx)
+>  {
+> -	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> +	struct kvm_pmc *pmc = *kvm_vcpu_idx_to_pmc(vcpu, idx);
+>  	u64 counter, reg, enabled, running;
+> +	unsigned int i;
+>  
+> -	reg = counter_index_to_reg(pmc->idx);
+> +	reg = counter_index_to_reg(idx);
+>  	counter = __vcpu_sys_reg(vcpu, reg);
+>  
+>  	/*
+>  	 * The real counter value is equal to the value of counter register plus
+>  	 * the value perf event counts.
+>  	 */
+> -	if (pmc->perf_event)
+> -		counter += perf_event_read_value(pmc->perf_event, &enabled,
+> -						 &running);
+> +	if (pmc)
+> +		for (i = 0; i < pmc->nr_perf_events; i++)
+> +			counter += perf_event_read_value(pmc->perf_events[i],
+> +							 &enabled, &running);
 
+I'm concerned that this array of events concept you're introducing is
+going to be error-prone. An approach that reallocates a new PMU event in
+the case of a vCPU migrating to a new PMU implementation would be
+desirable.
+
+> +static void reset_sample_period(struct perf_event *perf_event)
+> +{
+> +	struct kvm_pmc **pmc = perf_event->overflow_handler_context;
+> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> +	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
+> +	u64 period;
+> +
+> +	cpu_pmu->pmu.stop(perf_event, PERF_EF_UPDATE);
+> +
+> +	/*
+> +	 * Reset the sample period to the architectural limit,
+> +	 * i.e. the point where the counter overflows.
+> +	 */
+> +	period = compute_period(pmc, kvm_pmu_get_pmc_value(vcpu, (*pmc)->idx));
+> +
+> +	local64_set(&perf_event->hw.period_left, 0);
+> +	perf_event->attr.sample_period = period;
+> +	perf_event->hw.sample_period = period;
+> +
+> +	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
+> +}
+
+No, we can't start calling into the internal driver interfaces. The fact
+that we have a pointer to the PMU is an ugly hack and shouldn't be used
+like this.
+
+> @@ -725,8 +729,8 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
+>  	attr.type = arm_pmu->pmu.type;
+>  	attr.size = sizeof(attr);
+>  	attr.pinned = 1;
+> -	attr.disabled = !kvm_pmu_counter_is_enabled(pmc);
+> -	attr.exclude_user = !kvm_pmc_counts_at_el0(pmc);
+> +	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, (*pmc)->idx);
+> +	attr.exclude_user = !kvm_pmc_counts_at_el0(vcpu, (*pmc)->idx);
+>  	attr.exclude_hv = 1; /* Don't count EL2 events */
+>  	attr.exclude_host = 1; /* Don't count host events */
+>  	attr.config = eventsel;
+
+Can we just special-case the fixed CPU cycle counter to use
+PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES? That _should_ have the
+intended effect of opening an event on the PMU for this CPU.
+
+> +	/*
+> +	 * If we have a filter in place and that the event isn't allowed, do
+> +	 * not install a perf event either.
+> +	 */
+> +	if (vcpu->kvm->arch.pmu_filter &&
+> +	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
+> +		return;
+> +
+> +	if (arm_pmu) {
+> +		*pmc = kvm_pmu_alloc_pmc(idx, 1);
+> +		if (!*pmc)
+> +			goto err;
+> +
+> +		kvm_pmu_create_perf_event(pmc, arm_pmu, eventsel);
+> +	} else {
+> +		guard(mutex)(&arm_pmus_lock);
+
+This is a system-wide lock, the need for which is eliminated if you go
+for the reallocation approach I mention.
+
+> +static int kvm_arm_pmu_v3_set_pmu_composition(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct arm_pmu_entry *entry;
+> +	struct arm_pmu *arm_pmu;
+> +
+> +	lockdep_assert_held(&kvm->arch.config_lock);
+> +
+> +	if (kvm_vm_has_ran_once(kvm) ||
+> +	    (kvm->arch.pmu_filter && !kvm->arch.nr_composed_host_pmus))
+> +		return -EBUSY;
+
+I'm not sure there's much value in preventing the user from configuring
+the PMU event filter. Even in the case of the fixed CPU cycle counter we
+allow userspace to filter the event.
+
+It is much more important to have mutual exclusion between this UAPI and
+userspace explicitly selecting a PMU implementation.
+
+> @@ -1223,6 +1328,8 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  
+>  		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
+>  	}
+> +	case KVM_ARM_VCPU_PMU_V3_COMPOSITION:
+> +		return kvm_arm_pmu_v3_set_pmu_composition(vcpu);
+
+I'd prefer naming this something like 'KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY'.
+We will have the fixed instruction counter eventually which is another
+event we could potentially provide system-wide.
+
+Thanks,
+Oliver
