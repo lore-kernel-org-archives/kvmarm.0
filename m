@@ -1,64 +1,67 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD0823507F
-	for <kvmarm@lists.linux.dev>; Thu,  7 Aug 2025 12:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D9A23AB9D
+	for <kvmarm@lists.linux.dev>; Thu,  7 Aug 2025 12:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754568099; cv=none; b=c/A/yZTruUKiPiIiOB6f6NVnYMiH5/8zYJQLGxjvXwm2tiTuTigGOPkDe6hmjoUpjC7bDSBUctcrQmZunahpS3ObgtYRuxZi0AG508LZ99J0PD5PK1e2YZIg1k5wal9J1Y5bu4QTMI2JhHh6QKQOfj5QbYb6UKPpPEmhSICX+g8=
+	t=1754568100; cv=none; b=tSiIpwSDqKJxVMqLB76YltPakbMF9Ji88a3ZMSU1MDaUeEwaC8HRojxXM0PZsSNji18/JwgyAL9TE+fCQTyQJEZ9pig+SIgQSZgt1nanV9E+Nevdstq3zIN4xn7X4WQigoYSFLqs57G+P1g7WFzee2DJz2cbgf4sUdIC7t0BohM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754568099; c=relaxed/simple;
-	bh=G7i6KCTQBxmT8/epoPM7BKLqjb/sdX9EkaS80XrWDb8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kyPt4/38qpS8fynxAoOsrYGVNs2EDqmESeOIK4CBq3OMcKQtV9/LMrfqC7hpts2JY0TVUX2ZqrtnII5LV/gTvSbJDEwhGk2+gqEGxbPQPDUFBiIlE9aZw9JbeQ4+BFllFyPb4LXdrdh5dh/en511ZS54q5huyfxjQ4kiYYbRMIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ngl5UXlE; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1754568100; c=relaxed/simple;
+	bh=uAUZoi5rbCwh2TbdVBhZsAaPPA5C/kKTY4u+NhCw+UQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=SSOSEREcw1Qp36R5Re1NuO18zcNRypMOCaZ0TUQ84cgpHoaw9UxbgFLTpY3zYa3oa/xqy6pD8ON3+3xqx4r4RUutHtNrwRqoMfbUmxPDgQ9e3fDN8Fg5l2ZBVDxq+6kHWRCEVRgGOewGu1eBaOrv7smkHN184gvhfsbu01w4miM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iBOQhIQt; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ngl5UXlE"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-459d3abb2b5so3391515e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 07 Aug 2025 05:01:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iBOQhIQt"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-459e0f54c88so4720715e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 07 Aug 2025 05:01:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754568094; x=1755172894; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NJvDev6JiarMJWMxcbrKmT0EeRzHRecrSUf9b1TXS7Y=;
-        b=Ngl5UXlE3bbnvCWelJsIXnbqarZIgnyU7fjN66lfKDk0pPWfMqEgNQdCLkR5bRmFDL
-         Nz/ZP61451J6ZZugZQiw691eZbvOhd5H00yNcWclphf8H4wNvWbMiUDwgVNfelU8ODM3
-         +9UxqhOTmX4p59cAZggpQ9TlHC0tQjKZWw+wrn/R0s2J/a0dFSdzaICVSeWhSTmuyl+V
-         omIkoFs86YRIbnrQ4jnk6mjGVrrpx9eOXUH+vVB/+LrN3Uo7g9lFnYjM+BTAskyz70nh
-         I6YFYLmWqZYfVbZYeIWHMR5yfwPyulF1uMg20+I3Ic+JpySa+EC9WY+5qpFAvc5XtELu
-         J0xw==
+        d=google.com; s=20230601; t=1754568096; x=1755172896; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MmEFD0EBHHCbQjRU4Ho1kLwGkicc5ODUkU4+n5Gkins=;
+        b=iBOQhIQtRhobUp3bYdzHBtrPYPSNXYwhxT2ZF90yEJVITVxFsvPsEUchfr904v6S+O
+         TgLkF5/GQNlWgk2fYV/PBd5yCuBIJLKu6D9K5CjIPSoPS1h6t8jbV/hH3DrRKSw3lc6T
+         lm/vua+kOJaO43PC2q5/uBFLj5N7HHMMtS349fm5YugNBeW7AfeVX3hUwXc78vXjBuFY
+         vJMfWTSP17Kmza2TXCPX4Vvaf3Qh2qwSxP1Jo+8VAXKGuNhb4sl1s7Abi/KuUh0MLZfW
+         YdJC0+ABkbF+UETugby22IKTXFo3MwfCC2NfPxKfFCW4hEC/ghCpXUahsiUS9XzOtSOk
+         17kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754568094; x=1755172894;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NJvDev6JiarMJWMxcbrKmT0EeRzHRecrSUf9b1TXS7Y=;
-        b=rhg1/u0VACBTaMcOVIcdkvi7iDlmsQMclIvSh3LpeFLYRdJmp0loi0GFlOl+F99Fic
-         /6WZ0LMYhooknWCYTykv3A2tt6pioyN8s41VsMJ+TSK1PJ6loWya4rf3s3whb2/Ro6ug
-         NqRnsrK3Xtc+2wwwLC8TrN4wcXCJp/apx1Kfk4ofHGCoG+h4ImrUa+JA+FiC/VcbSf3h
-         ip3neXUn9qiwHrGZNv0Of9MBwCo6wAzMxx7bUsoWSdus2+ZlRS5GIF6I9X2NV1/lE8ZR
-         mtdyfumX2usJfzhohbnaI7CZsfBdAqFfrQMXu/dZrEfesASa9BYjwB0JQUS0D30ND4sw
-         YREw==
-X-Gm-Message-State: AOJu0Yy53U4j3PwRzsPe3jDzQZnrimW/UEpIDyZG1QDXeDw0m7rhdIW8
-	wK/WfwfCjuA14YQIZOHod/IDysTd5CRZTopNYSlGH0nH1z4u6Zy58CXanHEEkHLXSL5cMoUpIrM
-	DWHddd7Q4zt2Ckei8uzfHCKjn28RDB7L2lPLcaIb8izWnYZNLicYkwUGX5OTFR1PGe/E8avQFBx
-	6aD5PUnF53d43j20Ob1k5iFiNTlfTQr6M=
-X-Google-Smtp-Source: AGHT+IF1zofXBCVZFK4r7lqTfARStajWiSiUpki2EYDcpjB2YB3WeHi7UsQXh6wQgWjdJzGmiZaDkDz8vw==
-X-Received: from wmbdr26.prod.google.com ([2002:a05:600c:609a:b0:459:df20:248e])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:c0c3:20b0:456:2698:d4d9
- with SMTP id 5b1f17b1804b1-459e73a9797mr46541875e9.3.1754568094066; Thu, 07
- Aug 2025 05:01:34 -0700 (PDT)
-Date: Thu,  7 Aug 2025 13:01:30 +0100
+        d=1e100.net; s=20230601; t=1754568096; x=1755172896;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MmEFD0EBHHCbQjRU4Ho1kLwGkicc5ODUkU4+n5Gkins=;
+        b=mj7kmX2RbFmaSI1wlOjWbkhBlHTkTo7Twb5MArvbbxV7jYU+RAcjiQZlKoxAD9Mv1g
+         NFWbGd+JzrgTEo8BDORWCiljwOFthw28hhu/4xnWM30AfDLvC1Y8G/SJToiHivoOSDe3
+         wWUWbkriReRZyIHYgAdfC6vWScZMgtNs3bpcxy3gGiERWq1oRoyoJEnZixYRrtyLdB2c
+         YnXBvT4XuiTlXDJV4S7Hfecsngk0sTXe+6h6arAGGQlRPuMMJ0s0ZHcIO6B7XwCXv32Z
+         /2mVOmqexaHZ5KlsWSHgk6OMAqHYSU9/rWYxLJ5HblLDSacyFfdG97r54K/kDh1GLykq
+         amEA==
+X-Gm-Message-State: AOJu0Ywd6x+ZxQXfIoaIo8D662sGfn5TeruTKhqoRKOHXekhZVopXsu5
+	LhwMDqwFS63IgolNsYN143KzGlGXxK1MpdHwuG8EzBeB4jnkMwwp3ldzaV+Kx+yd/1RTq2fePRp
+	sadipzVdMaNZyQ3CZaJjzVYl4O0WjmbFCo1CMOhD50xGcWbmxDx1loeXGw0Hw4Rv2Hk9n0RWyB/
+	WuwGD769BLYU8yyeb6FJwCW23fyBFTsOw=
+X-Google-Smtp-Source: AGHT+IEmpiZ2nf55Jh9uJTfBQmAxp4UNraapK34c6dr71U4u9eBljMgOdK7u/bo0AUdVstmW33UDMvX8rQ==
+X-Received: from wmsd10.prod.google.com ([2002:a05:600c:3aca:b0:459:da33:b20c])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4f46:b0:458:d289:3e26
+ with SMTP id 5b1f17b1804b1-459ede86e31mr32019695e9.2.1754568096496; Thu, 07
+ Aug 2025 05:01:36 -0700 (PDT)
+Date: Thu,  7 Aug 2025 13:01:32 +0100
+In-Reply-To: <20250807120133.871892-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250807120133.871892-1-tabba@google.com>
 X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250807120133.871892-1-tabba@google.com>
-Subject: [PATCH v2 0/3] KVM: arm64: Fixes to handling of restricted registers
- for protected VMs
+Message-ID: <20250807120133.871892-3-tabba@google.com>
+Subject: [PATCH v2 2/3] KVM: arm64: Sync protected guest VBAR_EL1 on injecting
+ an undef exception
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -68,38 +71,38 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-This patch series mainly fixes issues we've encountered in pKVM (in
-downstream Android code), related to the handling of protected VM access
-to restricted registers and injecting undefined exceptions into a
-protected guest.
+In pKVM, a race condition can occur if a guest updates its VBAR_EL1
+register and, before a vCPU exit synchronizes this change, the
+hypervisor needs to inject an undefined exception into a protected
+guest.
 
-The last patch in this series isn't pKVM specific, but a fix to the
-vgic-v2 code encountered while fixing the issues in this series. The
-issue it fixes was indirectly introduced into the code with hVHE.
+In this scenario, the vCPU still holds the stale VBAR_EL1 value from
+before the guest's update. When pKVM injects the exception, it ends up
+using the stale value.
 
-Changes from v1 [1]:
-- Dropped the refactoring patch.
-- Added Reported-by tags.
+Explicitly read the live value of VBAR_EL1 from the guest and update the
+vCPU value immediately before pending the exception. This ensures the
+vCPU's value is the same as the guest's and that the exception will be
+handled at the correct address upon resuming the guest.
 
-Based on Linux 6.16.
+Reported-by: Keir Fraser <keirf@google.com>
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20250805135617.831971-1-tabba@google.com/
-
-Fuad Tabba (3):
-  KVM: arm64: Handle AIDR_EL1 and REVIDR_EL1 in host for protected VMs
-  KVM: arm64: Sync protected guest VBAR_EL1 on injecting an undef
-    exception
-  arm64: vgic-v2: Fix guest endianness check in hVHE mode
-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c       | 5 +++++
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 2 +-
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-
-base-commit: 038d61fd642278bab63ee8ef722c50d10ab01e8f
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index bbd60013cf9e..71d2fc97f004 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -253,6 +253,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ 
+ 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
+ 	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
++	__vcpu_assign_sys_reg(vcpu, read_sysreg_el1(SYS_VBAR), VBAR_EL1);
+ 
+ 	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
+ 
 -- 
 2.50.1.565.gc32cd1483b-goog
 
