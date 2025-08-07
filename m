@@ -1,53 +1,78 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D513F9FB
-	for <kvmarm@lists.linux.dev>; Thu,  7 Aug 2025 02:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD29C133
+	for <kvmarm@lists.linux.dev>; Thu,  7 Aug 2025 03:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754532228; cv=none; b=o9f3D/lgYT+fyImtf8Fe0vyInsZX7/QeHXAFZdAPnG0WeIG1eIHekkArATpS8ZVdyv6wpBcR2eABp3uOEMV/2yRpNTjZbCaOFd+2x2mtn29cADlSe2rxwGhEZOV8mwKIx3S4ZL8U647Rg9AXRedu2bYfqJb7mc/PpNn+ML6dfnE=
+	t=1754536228; cv=none; b=VOpd/1qHBcSTuuN1QsxksoQldoyB7uhSXa0vLMBVNKmUf8vu3WQyXXQ0zwIlVUsPew9CxYMUfBMvE7VrNdNMzPIRsXTpscEn+BSbQwPZ2uKifVGCMr+l2+tBM5bluYc/x0ziy4A6lV7SbasSwAbTQsR7thH4yDhNLkMw1IQjVr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754532228; c=relaxed/simple;
-	bh=hqmcfReuijwtnpNcJRsSkCHLXblH9O/rigatjdEuRlU=;
+	s=arc-20240116; t=1754536228; c=relaxed/simple;
+	bh=nrN/WKRHHInr2RbhcbZ9vP8u1SI12TAyiL10R/cI0GI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZOm7XaUCjbLOp/zvZRlu0V2trvFkx705JGKxRjE0koJAYFEQK5yq8Dt53BTXmnAIAWMZv0He3MC76mDDqnopEwvXfXhchLH/S7IDfot7Y0BGZvsgjeFsnI5P5fdl8tCt3m/3HmZc97fsqlWBndpryvOr5FNDLLXO54cWMIo7wY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qg86bz33; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=nCBsSczyRjIrEprxmQTT16L+6sEdlaLL3ItkxgbxYYPlzJaHN7WBMPFLEkXymWpJvpBbBk+4b/DDlmqUswQqof9dqDbR3PZaw1V8pzmbaqewPEFTfBk6bAd8D/Y0qGNNjqDrCP4AtnnjjQfGoMvWLllOoQHEHf8aKtgbIA/p33o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=b+IHOxAY; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qg86bz33"
-Date: Wed, 6 Aug 2025 19:03:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754532222;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m4lFUwBUTBASs8+w6RWnaE1vMNcqXEPtsns4iFPW3QQ=;
-	b=Qg86bz33wt/39A/xZzIW0ZTd1srRiZPD+rB+zqoTKG4gFhl3WRsh3Owk58E9KtF176Vpfj
-	05pY2mo1wxaAb79x+wFf8f2yL2E96FW2bZ4GODk0yLPFhGuQvFjdfgoSq/csplV1rYXk22
-	sFeqpRT2AYHBtFw9a98PEruMPqQMaDc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
- KVM_ARM_VCPU_PMU_V3_COMPOSITION
-Message-ID: <aJQJdElbZJ6KzQxD@linux.dev>
-References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <aJOO99xUrhsrvLwl@linux.dev>
- <276fdfb8-f1ca-44ad-b310-a811684b265a@rsg.ci.i.u-tokyo.ac.jp>
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="b+IHOxAY"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b34a6d0c9a3so535964a12.3
+        for <kvmarm@lists.linux.dev>; Wed, 06 Aug 2025 20:10:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie.ntu.edu.tw; s=google; t=1754536225; x=1755141025; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gDbbzO/MBfCwa9anx+czvBO5imGoZ/RyUt5Cn2glgCY=;
+        b=b+IHOxAYrbI/LIQ+9O8zBxkaMNtxCCCAR53n+QoLqV/C/bGVpWgWyhhMAzVIlZHZJ4
+         5YRfyOYWA7VwhJKFwse8MdPpYORzgJZ75v/y6QvxuSpdKdf5aO4hFTLAQXBR5b/dzOfY
+         4of4A4aPMWgDyqRF6FqZhmNd1964rdjSKtPFfr2i0ZptRHIkLnOxvmMnCSm0xl4C9y2a
+         eh02RQ9e02Pqg0fcbK055X9dKpYCZkG2nIgn4vgmjKnroeX83dB2MKI61kHmaVLvCjZR
+         tcWVtEqy/GmkEqE4CdEZvXAUnr8LmrNZnwgCq3qpIzflRGRB46PbsyF7wjdSimfUokfK
+         fUXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754536225; x=1755141025;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gDbbzO/MBfCwa9anx+czvBO5imGoZ/RyUt5Cn2glgCY=;
+        b=W+wqJKOxBfWMRxhjnQH8GFrE3aG1gPPO3Xvbwtz50suaulASTHgi+E9VuzBC1gPm7d
+         o44gRGO80QzzHbhcKzOok5aoyBA5qR2sJNHwgfNP2Szx2n7JlbBqLAwGYpSQNQAWezuE
+         e4YiJFoES99URJk+pRm5qYfXvOuGRF2zLN2p6LAYi5c6nMhYv6P4Ee6Ldc9Owea+vyjp
+         sB3CyBvFC/saY1j7vr+e3z2NtAu2Os7KQ0zyzX81/O8YozEt0obR6UC0lp34j0A41WK9
+         +6t1D+UK34qqfTsgxRTBnU3a8PCCQLuVFkt5ka5tZ38fG8WdBR6+r1n5DylOh1F/IbNW
+         Lfig==
+X-Forwarded-Encrypted: i=1; AJvYcCWVBZZxyN4490zT+pDd+qj5kEM9yUhr7qGwO5Qzay5Eq+1hohcrqQ5Dq09768JYA5pbkDFLCpE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyvOuDIfiOB1aMjXUV3g0bgc4bmdrRdPT7NrH3ZLIyrNdlQ1Nta
+	bdBqtx5y45TK20wPzBIcGDwhfJGlzg6iai3h1OJaZNlYTvjsVy8S+/RBf2PMDAX2A8zO4pj7FUI
+	2fyZgm2oo/AvJ710RsG26eSxvi1kTnstOI+fdvMEnwOyx5cJRZv0=
+X-Gm-Gg: ASbGncuT6mka+phVQEDHnq12fdKP3uSwgveIWDeXthqEDZTLOo/A/korIj8HZla9/0f
+	5gxThIBPgtV7lllTRX5Svp/hBFwGQUUdnBQuQpEWRQPr05zfMbvgkLEXBfc4+FjTFRxmOkrM3XO
+	E2nw0/WuVI9L3itZ6eB9/TeHz0JBKjZR16+KeUjw4UjFKis9eu9Btn/xVOFW8BhS5DqvqcFOAC6
+	DNANzPzlW+e3/1Kuu+87/92LHW0nXQFxQtU/dCr2Wg+2ng2M5O4PPDxPdMuwoHRsqpnSb5LxaRe
+	FjzZ6bnfe+EfCCcOkfvVwX1GlOGcioEa4IfJ4tJ7e3vzoXx3biy7soM93KH40J8uRgR7oDIWrzG
+	CnI6ztoCGfxRv5EpFyJujvmm89GJGVB3b1qgmEUfJ6AmpJUFVCvOLbHmQvnjeKQoFT51IrM4=
+X-Google-Smtp-Source: AGHT+IFMVcRp6VR4IdWnWexUALKIuSPhb07wbduD4zm+PjHvxwvZ6x3aGSq9zjx5g1N+kmv/0FkZ2Q==
+X-Received: by 2002:a17:902:e748:b0:242:9bca:863d with SMTP id d9443c01a7336-2429f59ce44mr64630105ad.55.1754536224661;
+        Wed, 06 Aug 2025 20:10:24 -0700 (PDT)
+Received: from zenbook (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3216126c96esm4081982a91.22.2025.08.06.20.10.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Aug 2025 20:10:23 -0700 (PDT)
+Date: Thu, 7 Aug 2025 11:12:55 +0800
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH] KVM: arm64: ptdump: Fix exec attribute printing
+Message-ID: <yzl5a3r3vq42kbcsetdlmmtfaafzsyhcqzpfmlbhy3fqh4eylm@hocbkksrt2nj>
+References: <20250802104021.3076621-1-r09922117@csie.ntu.edu.tw>
+ <d72b7928-8646-4616-a8f0-96b9d9bbaf09@arm.com>
+ <z2hmwwmtgbrio2wv3sj2pc4zhxdjioorlhnm45o2arcsjahjni@xod435q26jqq>
+ <aJHBf4KCUPpWbyU5@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,167 +81,93 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <276fdfb8-f1ca-44ad-b310-a811684b265a@rsg.ci.i.u-tokyo.ac.jp>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <aJHBf4KCUPpWbyU5@google.com>
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On Thu, Aug 07, 2025 at 03:24:43AM +0900, Akihiko Odaki wrote:
-> On 2025/08/07 2:20, Oliver Upton wrote:
-> > Hi Akihiko,
+Hi all,
+
+On Tue, Aug 05, 2025 at 08:31:59AM +0000, Sebastian Ene wrote:
+> On Mon, Aug 04, 2025 at 08:41:35PM +0800, Wei-Lin Chang wrote:
+> 
+> Hi Wei-Lin,
+> 
+> > Hi Anshuman,
 > > 
-> > This is an unreasonably large patch that needs to be broken down into
-> > smaller patches, ideally one functional change per patch. We need this
-> > even for an RFC for the sake of reviews.
+> > On Sun, Aug 03, 2025 at 07:33:04PM +0530, Anshuman Khandual wrote:
+> > > 
+> > > 
+> > > On 02/08/25 4:10 PM, Wei-Lin Chang wrote:
+> > > > Currently the guest stage-2 page table dump has the executable attribute
+> > > > printed in reverse, showing "X" for a non-executable region and showing
+> > > > " " for an executable one. This is caused by misjudgement of which
+> > > > string gets printed for the executable and non-executable case. Fix it
+> > > > by swapping the two strings.
+> > > > 
+> > > > Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+> > > > ---
+> > > >  arch/arm64/kvm/ptdump.c | 4 ++--
+> > > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > > > index 098416d7e5c25..99fc13f1c11fb 100644
+> > > > --- a/arch/arm64/kvm/ptdump.c
+> > > > +++ b/arch/arm64/kvm/ptdump.c
+> > > > @@ -44,8 +44,8 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+> > > >  	}, {
+> > > >  		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+> > > >  		.val	= PTE_VALID,
+> > > > -		.set	= " ",
+> > > > -		.clear	= "X",
+> > > > +		.set	= "X",
+> > > > +		.clear	= " ",
+> > > >  	}, {
+> > > >  		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> > > >  		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> > > 
+> > > Is not KVM_PTE_LEAF_ATTR_HI_S2_XN already in the reverse semantics aka
+> > > XN (Execute Never). Hence when KVM_PTE_LEAF_ATTR_HI_S2_XN macro is set
+> > > that means the entry is not executable and vice versa.
 > > 
-> > On Wed, Aug 06, 2025 at 06:09:54PM +0900, Akihiko Odaki wrote:
-> > > +static u64 kvm_pmu_get_pmc_value(struct kvm_vcpu *vcpu, u8 idx)
-> > >   {
-> > > -	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> > > +	struct kvm_pmc *pmc = *kvm_vcpu_idx_to_pmc(vcpu, idx);
-> > >   	u64 counter, reg, enabled, running;
-> > > +	unsigned int i;
-> > > -	reg = counter_index_to_reg(pmc->idx);
-> > > +	reg = counter_index_to_reg(idx);
-> > >   	counter = __vcpu_sys_reg(vcpu, reg);
-> > >   	/*
-> > >   	 * The real counter value is equal to the value of counter register plus
-> > >   	 * the value perf event counts.
-> > >   	 */
-> > > -	if (pmc->perf_event)
-> > > -		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> > > -						 &running);
-> > > +	if (pmc)
-> > > +		for (i = 0; i < pmc->nr_perf_events; i++)
-> > > +			counter += perf_event_read_value(pmc->perf_events[i],
-> > > +							 &enabled, &running);
+> > Yes you are correct. However in dump_prot() we have:
 > > 
-> > I'm concerned that this array of events concept you're introducing is
-> > going to be error-prone. An approach that reallocates a new PMU event in
-> > the case of a vCPU migrating to a new PMU implementation would be
-> > desirable.
-> 
-> I avoided allocation at migration because I was worried with disabled
-> preemption. perf_event_create_kernel_counter() internally takes a mutex so
-> it cannot be used if preemption is disabled.
-> 
-> I wonder if it is guaranteed that kvm_arch_vcpu_load() executes with
-> preemption. If so, I can add a hook there to call
-> perf_event_create_kernel_counter().
-
-You don't need to allocate the event at vcpu_load(). The only guarantee
-we need is that an event has been attached to the PMC prior to entering
-the guest, for which the KVM_REQ_* infrastructure is quite useful.
-
+> > if ((st->current_prot & bits->mask) == bits->val)
+> > 	s = bits->set;
+> > else
+> > 	s = bits->clear;
 > > 
-> > > +static void reset_sample_period(struct perf_event *perf_event)
-> > > +{
-> > > +	struct kvm_pmc **pmc = perf_event->overflow_handler_context;
-> > > +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> > > +	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
-> > > +	u64 period;
-> > > +
-> > > +	cpu_pmu->pmu.stop(perf_event, PERF_EF_UPDATE);
-> > > +
-> > > +	/*
-> > > +	 * Reset the sample period to the architectural limit,
-> > > +	 * i.e. the point where the counter overflows.
-> > > +	 */
-> > > +	period = compute_period(pmc, kvm_pmu_get_pmc_value(vcpu, (*pmc)->idx));
-> > > +
-> > > +	local64_set(&perf_event->hw.period_left, 0);
-> > > +	perf_event->attr.sample_period = period;
-> > > +	perf_event->hw.sample_period = period;
-> > > +
-> > > +	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
-> > > +}
+> > Analysis:
 > > 
-> > No, we can't start calling into the internal driver interfaces. The fact
-> > that we have a pointer to the PMU is an ugly hack and shouldn't be used
-> > like this.
-> 
-> This function was extracted from kvm_pmu_perf_overflow() and is not a new
-> addition (which should have been clear if I would have split the patch as
-> you noted).
-
-Yuck, then forgive my whining.
-
-> I thought of replacing it with perf_event_period(), but there is a catch: it
-> returns -EINVAL if the 63th bit of the sample period number is set. Perhaps
-> we can just specify ((1ULL << 63) - 1) if the sample period is going to be
-> so long, but I conservatively avoided that. I can change it if you prefer
-> that way or have an alternative idea.
-
-Let's keep it as-is then. Sorry about the noise.
-
-> > Can we just special-case the fixed CPU cycle counter to use
-> > PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES? That _should_ have the
-> > intended effect of opening an event on the PMU for this CPU.
-> 
-> I have an impression that perhaps this emulation can be more generic by
-> converting eventsel to PERF_COUNT_HW_* numbers with armv8_pmuv3_perf_map in
-> drivers/perf/arm_pmuv3.c, but it is not in scope of this change. The current
-> code is sufficient for now.
-
-The only cross-PMU events we will support are the fixed counters, my
-strong preference is that we do not reverse-map architectural events to
-generic perf events for all counters.
-
-> > I'm not sure there's much value in preventing the user from configuring
-> > the PMU event filter. Even in the case of the fixed CPU cycle counter we
-> > allow userspace to filter the event.
-> 
-> It is possible to configure the PMU event filter, but it needs to be done
-> after setting the attribute. This behavior is aligned with
-> KVM_ARM_VCPU_PMU_V3_SET_PMU.
-
-That's fine then, I missed that detail.
-
-> They are mutually exclusive and the latest configuration takes effect.
-> 
-> If you set SET_PMU after COMPOSITION, SET_PMU will take effect.
-> If you set COMPOSITION after SET_PMU, COMPOSITION will take effect.
-> 
-> I'll note that in the documentation.
-
-This isn't what I meant. What I mean is that userspace either can use
-the SET_PMU ioctl or the COMPOSITION ioctl. Once one of them has been
-used the other ioctl returns an error.
-
-We're really bad at getting ioctl ordering / interleaving right and
-syzkaller has a habit of finding these mistakes. There's zero practical
-value in using both of these ioctls on the same VM, let's prevent it.
-
-> > > +	case KVM_ARM_VCPU_PMU_V3_COMPOSITION:
-> > > +		return kvm_arm_pmu_v3_set_pmu_composition(vcpu);
+> > 1. region is executable:
+> >     - st->current_prot == PTE_VALID (ignore other bits)
+> >     - st->current_prot & bits->mask gets PTE_VALID
+> >     - if condition is true (.val is PTE_VALID)
+> >     - prints bits->set
 > > 
-> > I'd prefer naming this something like 'KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY'.
-> > We will have the fixed instruction counter eventually which is another
-> > event we could potentially provide system-wide.
+> > 2. region is not executable:
+> >     - st->current_prot == KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID
+> >     - st->current_prot & bits->mask gets (KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID)
+> >     - if condition is false
+> >     - prints bits->clear
+> > 
+> > Therefore we want .set = "X", and .clear = " ".
 > 
-> The design decision to expose the cycle counter is driven by the motivation
-> to satisfy FEAT_PMU for the guest rather than the host capability.
 > 
-> When we implement FEAT_PMUv3_ICNTR in the future, I think we will need to
-> add KVM_ARM_VCPU_PMU_V3_COMPOSITION_ICNTR or something. The resultig
-> emulated PMU will work only on host CPUs that have instruction counters; a
-> host CPU may lack one because it doesn't implement FEAT_PMUv3_ICNTR or has a
-> third-party PMU like apple-m1-cpu-pmu (this particular PMU has an
-> instruction counter fortunately).
+> This seems correct but it will produce a different output than the
+> stage-1 ptdump. What if we drop the PTE_VALID from the mask & value as
+> Mark and Anshuman are suggesting and print NX when the bit is set and x
+> otherwise as the stage-1 ptdump does ?
+> 
 
-No, this is at odds with the way we handle CPU features in KVM/arm64.
-
-Ignoring this ioctl, the goal is that after KVM_ARM_VCPU_INIT the vCPU
-is initialized to the maximum possible feature set. If userspace wants
-to de-feature the VM it can do so by modifying the ID registers.
-
-OTOH, your ioctl is dealing with something structural in how we
-support PMUs on the system. It should be defined as exposing all fixed
-counters that we support on a given piece of hardware. On systems
-without FEAT_PMUv3_ICNTR, the result should be a vPMU that only has the
-CPU cycle counter.
-
-On a system that has FEAT_PMUv3_ICNTR, userspace can still use this
-ioctl and explicitly de-feature ICNTR by writing to the ID register
-after initialization.
+Thank you all for the valuable feedback!
+Yes, let me follow this and send a v2.
 
 Thanks,
-Oliver
+Wei-Lin Chang
+
+> > 
+> > Thanks,
+> > Wei-Lin Chang
+> 
+> Thanks,
+> Sebastian
