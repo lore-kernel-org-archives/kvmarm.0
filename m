@@ -1,116 +1,103 @@
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E30221275
-	for <kvmarm@lists.linux.dev>; Thu,  7 Aug 2025 12:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDFE2550D5
+	for <kvmarm@lists.linux.dev>; Thu,  7 Aug 2025 12:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754568101; cv=none; b=JoEIDCwLnyjMzjELPR7p13LJ3IOAkx7YRcSIOLAvQuxtpHyF+H2V0MqfjstXnVs4IPTwG8sA3SbpMR2/z2jq5Psed093WOYfZGK5rPvuRxLGyzHbloJySVu99KSEjzwVRW2gxWbjvBNUe9FLX0FoeYGu0jreWJUaj3TyAc3o4KY=
+	t=1754571344; cv=none; b=fE9zIatP9BNuVxFwRJjZMJI4ZcJY8c7vb7nPEzpL6H2LT3E7RdfBngFZNbuCCBh1kXXXXgJhxZzPhE+sqyjprOrII5ibts5qB7DnBDqzXtfCNi9coDOr3MSfgKNFkil/+mqYLyQ5miPuVQlPPs2ke0Qj1bJDssA+at/FBUuZF10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754568101; c=relaxed/simple;
-	bh=iLtySnvG1gttOwujmHulupEmNFzFD1J2TWZHp/Qnc3s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lakGKjX6jRlHVJz2Kae83q46tGKZtuaILFzyaA9/PL1grEORkGrvzD49MdAwLJEmdLRK3np5KcYJRlyJcgJyQLqtninR6sMT2Viq5aDfaKidggEd3ityplfya7x1WEa3VvjA2lYigXOvEsgJOoAZrhpVfxd2HHZ4wx1KUcmW968=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EJ1ZaDuE; arc=none smtp.client-ip=209.85.208.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EJ1ZaDuE"
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a169cso1036272a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 07 Aug 2025 05:01:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754568097; x=1755172897; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ym8ckk+VrCoktE6lkLMoRO29CSpEB7biJzQ35QJvlbM=;
-        b=EJ1ZaDuENZaYQgTS26iLxgzpwL53L3QVXcxhjxnZ/GTg94jOt3msps0v0QvK+vlTgq
-         mALxjPBcR/3Wv9OoboFhgQbWLl0ACyN6B23OMfVmnMTiC3V7e2IXx+Wq6ddtppz97xk+
-         RSNc1VEoDOzsPd6HyqLH1BcT/HYfs/E1oYOteRO8ZqgLtyCRSuA4dJKOcwkrH44Y9jZj
-         S+8bEDkq3ihOW1RD6QCRndgyadXbl9LJFHbg5MaE3ej4WhZC3MO5EUv9UwQ4PwzzUx7e
-         o6U9cwecFiq3PCW3VGAtMQERH83TZKAOuWfwbhERoqG0vhj0IVWonJsDdvrb+wIKWA5s
-         8yMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754568097; x=1755172897;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ym8ckk+VrCoktE6lkLMoRO29CSpEB7biJzQ35QJvlbM=;
-        b=QHgC+OmBwkp+O/fogJP36Ryq5DIO3lTu9MyQZ700lKwHhBYZjUVXGMpN8URvD3URKE
-         lDOxhSl9zRzjZCyyXC/suxxKt4yIzD3ctIIqfXXeEU5npuzP+9pTYamAeIhZkXc7Tf7N
-         Hzp/UImFdTuyi/O8Opz6yxo9RgQGQZ/AtHMiFNakcD7ESTs5R5GZ7YzCHcm7r8IzbhoP
-         cTTIjwJajSHMFXPPfLOQggOOM+ir7tt0OWgq0yrvwzcGhzJ89kT708IP4XROTuu5EdAC
-         pq1bIj0qoOC5sKnv9EytIdmUOTW3FhdoAm+pA0Z7q63PsEL5uaspfjEyseAX/sHEpMYf
-         CKzA==
-X-Gm-Message-State: AOJu0Yxc9g+Lm/NiXrakLmQFnhgm79M3fpWvaQ9eGzDSduBWQZ93ITbw
-	jHQ0comt/Hlx32RvDXmwVlAjOtRMeHCycOWMo68nGQmY3Wbf/GRxBD/yKO9QzZS7au6x613MS1c
-	XqL/+ZekiBZPbxCrs0I1ITj72VmkvUi5sGxOcyKZEbdYiUlPcRIr1bQ4WPkAdid1YXQAUgdQZPk
-	2UEZ0jLxnLrRtz4wBTi6PoiM0382Js4pA=
-X-Google-Smtp-Source: AGHT+IHCXiYdGkqSZezcMr/5HJ8nW+vXd0I20GHxpc650nk5XAEIKQRYW0qXtNDvRlsqHYqyF+bbLH2eYA==
-X-Received: from edss28.prod.google.com ([2002:a50:8d1c:0:b0:608:fc64:b570])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:254d:b0:615:a5f0:26f9
- with SMTP id 4fb4d7f45d1cf-6179614219dmr4720604a12.21.1754568095234; Thu, 07
- Aug 2025 05:01:35 -0700 (PDT)
-Date: Thu,  7 Aug 2025 13:01:31 +0100
-In-Reply-To: <20250807120133.871892-1-tabba@google.com>
+	s=arc-20240116; t=1754571344; c=relaxed/simple;
+	bh=h2H0F3yEEGIlcD1VJmopqC8FoJgWxNjjGL9lY6FErqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PP+1wqf498b+coLRq3E1o/GlciVvWtflQazRsBw8RrpAsvycCxCWhXWCKcsXOeO7k2pcqfdWpW29f4fLRvM5WQtXp8/DRjiKh2Lon5xAes4zg2oOUZ8S4GiP2XKh15OCFcEisPwycyOp7Dvo+Lf/JNDMVlM4lw6T/Y6jQb9X0aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C7841713;
+	Thu,  7 Aug 2025 05:55:27 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCA5A3F5A1;
+	Thu,  7 Aug 2025 05:55:33 -0700 (PDT)
+Date: Thu, 7 Aug 2025 13:55:31 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v2 4/5] KVM: arm64: Expose FEAT_RASv1p1 in a canonical
+ manner
+Message-ID: <20250807125531.GB2351327@e124191.cambridge.arm.com>
+References: <20250806165615.1513164-1-maz@kernel.org>
+ <20250806165615.1513164-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250807120133.871892-1-tabba@google.com>
-X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-Message-ID: <20250807120133.871892-2-tabba@google.com>
-Subject: [PATCH v2 1/3] KVM: arm64: Handle AIDR_EL1 and REVIDR_EL1 in host for
- protected VMs
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, vdonnefort@google.com, qperret@google.com, 
-	sebastianene@google.com, keirf@google.com, smostafa@google.com, 
-	tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250806165615.1513164-5-maz@kernel.org>
 
-Since commit 17efc1acee62 ("arm64: Expose AIDR_EL1 via sysfs"), AIDR_EL1
-is read early during boot. Therefore, a guest running as a protected VM
-will fail to boot because when it attempts to access AIDR_EL1, access to
-that register is restricted in pKVM for protected guests.
+On Wed, Aug 06, 2025 at 05:56:14PM +0100, Marc Zyngier wrote:
+> If we have RASv1p1 on the host, advertise it to the guest in the
+> "canonical way", by setting ID_AA64PFR0_EL1 to V1P1, rather than
+> the convoluted RAS+RAS_frac method.
+> 
+> Note that this also advertises FEAT_DoubleFault, which doesn't
+> affect the guest at all, as only EL3 is concerned by this.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 1b4114790024e..66e5a733e9628 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1800,6 +1800,18 @@ static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  	if (!vcpu_has_sve(vcpu))
+>  		val &= ~ID_AA64PFR0_EL1_SVE_MASK;
+>  
+> +	/*
+> +	 * Describe RASv1p1 in a canonical way -- ID_AA64PFR1_EL1.RAS_frac
+> +	 * is cleared separately. Note that by advertising RASv1p1 here, we
 
-Similar to how MIDR_EL1 is handled by the host for protected VMs, let
-the host handle accesses to AIDR_EL1 as well as REVIDR_EL1. However note
-that, unlike MIDR_EL1, AIDR_EL1 and REVIDR_EL1 are trapped by
-HCR_EL2.TID1. Therefore, explicitly mark them as handled by the host for
-protected VMs. TID1 is always set in pKVM, because it needs to restrict
-access to SMIDR_EL1, which is also trapped by that bit.
+Where is it cleared? __kvm_read_sanitised_id_reg() is where I would have
+expected to see it:
 
-Reported-by: Will Deacon <will@kernel.org>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 4 ++++
- 1 file changed, 4 insertions(+)
+    case SYS_ID_AA64PFR1_EL1:                                                                                                                                                                  
+        if (!kvm_has_mte(vcpu->kvm)) {                                                                                                                                                         
+            val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);                                                                                                                                   
+            val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac);                                                                                                                              
+        }                                                                                                                                                                                      
+                                                                                                                                                                                               
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);                                                                                                                                       
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RNDR_trap);                                                                                                                                 
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_NMI);                                                                                                                                       
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_GCS);                                                                                                                                       
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_THE);                                                                                                                                       
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTEX);                                                                                                                                      
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_PFAR);                                                                                                                                      
+        val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MPAM_frac);                                                                                                                                 
+        break;                                                                  
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 1ddd9ed3cbb3..bbd60013cf9e 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -372,6 +372,9 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 
- 	/* Debug and Trace Registers are restricted. */
- 
-+	/* Group 1 ID registers */
-+	HOST_HANDLED(SYS_REVIDR_EL1),
-+
- 	/* AArch64 mappings of the AArch32 ID registers */
- 	/* CRm=1 */
- 	AARCH32(SYS_ID_PFR0_EL1),
-@@ -460,6 +463,7 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 
- 	HOST_HANDLED(SYS_CCSIDR_EL1),
- 	HOST_HANDLED(SYS_CLIDR_EL1),
-+	HOST_HANDLED(SYS_AIDR_EL1),
- 	HOST_HANDLED(SYS_CSSELR_EL1),
- 	HOST_HANDLED(SYS_CTR_EL0),
- 
--- 
-2.50.1.565.gc32cd1483b-goog
-
+> +	 * implicitly advertise FEAT_DoubleFault. However, since that last
+> +	 * feature is a pure EL3 feature, this is not relevant for the
+> +	 * guest, and we save on the complexity.
+> +	 */
+> +	if (cpus_have_final_cap(ARM64_HAS_RASV1P1_EXTN)) {
+> +		val &= ~ID_AA64PFR0_EL1_RAS;
+> +		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, RAS, V1P1);
+> +	}
+> +
+>  	/*
+>  	 * The default is to expose CSV2 == 1 if the HW isn't affected.
+>  	 * Although this is a per-CPU feature, we make it global because
+> -- 
+> 2.39.2
+> 
