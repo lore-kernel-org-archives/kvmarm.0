@@ -1,114 +1,63 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C998D26AE4
-	for <kvmarm@lists.linux.dev>; Fri,  8 Aug 2025 11:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE79B1FBEB6
+	for <kvmarm@lists.linux.dev>; Fri,  8 Aug 2025 12:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754652794; cv=none; b=YWFIQAPt8JXiOJ2z7kcm0lWrA5gla8hx4e61/wrUIv2zKch/iK4Vk03UvlFvgEhSf40ZWRqAYZF897SR5BEAWRJqvPiFFE3AkdTGLUc0CTk5RhBIVg3I3Jt9HqcSJO5cUlbWObSSsXSn9OqEa9y7p+Wb7NLOOY0PcFjDsMzdWlo=
+	t=1754656629; cv=none; b=Y3pNDKFnQPUCXzWLzEjwwwh98FXEf8/hOnhtGn3aZwsMIYU5TpbFBLRAJmEIA2ef6RzkHuGqN9bKFh5HDcPVDWrvObR5dQ5sCfy+yrUXp2WyXIduBSMPnTt9J4OlszC+JyBT3GevH7tS+ByjxOpt88ENAUPSp7nyjqokTaE5Snk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754652794; c=relaxed/simple;
-	bh=g9uNRp8fmKZF9ZWb5BlkCw/50T+dr1q/Ys9LCxuDbpM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=SOkKCsW2NUwQqbrB8TSaShmXUdfS+Ba3bNyMwOzxxanIAiLCB04ydS7lzxGp6QFd4wGciGbxBL5cv/iwFkuhtjS4NMN2LrqYuX0h5XysZ1to7DX0G3B8vSRaHGTr/QkFbpzDFUMKTQMwIOK7ebHrEf9kLGAjjpt01gclTqrwQa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AXMjcCvx; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AXMjcCvx"
-Message-ID: <3c52f485-cde4-44ef-8ffd-a61a671359db@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754652788;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=abYPtt9gp7dt5yQH3k623AWoEHl0Hr24WYJOo0TOVqs=;
-	b=AXMjcCvxLwSFAD/YRaO8PD0GKrgmIk2ml8mkVGam9Wpw+pdwiNWB7g9mSzWcYDD78BAnhb
-	xJAEMRuY7gcOBFzy0sZZGnIQtr7Gi6Ui/Muf7vFoYS0KWhwvCXh3nwU/0p1q113F5funUo
-	Fk3qVMMCxaWr5FIkILLswNSejIidwlo=
-Date: Fri, 8 Aug 2025 19:32:54 +0800
+	s=arc-20240116; t=1754656629; c=relaxed/simple;
+	bh=hSZfRs7QxjiBbqw4t9VGZPhMQaXckK6qsNAKECTWHxQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YFP1YmOSAeSskojqU7bVwZfVj4cP6mCD84Ztq/gYtxDvtXp8J+4zjX5g/GKtFpsDsMxXATez8jurc5pxXWxJqWeISh9BT6gBH1l8N9itomEUA9W1xfdl9nTt9qzdngcFGBuWBZliPqRPh7VfD04ZzmubR+0xOR3G6J+tdYnumy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 040D816F8;
+	Fri,  8 Aug 2025 05:36:59 -0700 (PDT)
+Received: from localhost (e132581.arm.com [10.1.196.87])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC0AD3F738;
+	Fri,  8 Aug 2025 05:37:06 -0700 (PDT)
+Date: Fri, 8 Aug 2025 13:37:04 +0100
+From: Leo Yan <leo.yan@arm.com>
+To: James Clark <james.clark@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v6 12/12] perf docs: arm-spe: Document new SPE filtering
+ features
+Message-ID: <20250808123704.GC3420125@e132581.arm.com>
+References: <20250808-james-perf-feat_spe_eft-v6-0-6daf498578c8@linaro.org>
+ <20250808-james-perf-feat_spe_eft-v6-12-6daf498578c8@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 1/8] KVM: arm64: Rename pkvm.enabled to
- pkvm.is_protected
-Content-Language: en-US
-To: Fuad Tabba <tabba@google.com>, kvmarm <kvmarm@lists.linux.dev>,
- arm-kernel <linux-arm-kernel@lists.infradead.org>
-References: <20250729120014.2799359-1-tabba@google.com>
- <20250729120014.2799359-2-tabba@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kunwu Chan <kunwu.chan@linux.dev>
-In-Reply-To: <20250729120014.2799359-2-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250808-james-perf-feat_spe_eft-v6-12-6daf498578c8@linaro.org>
 
-On 2025/7/29 20:00, Fuad Tabba wrote:
-> The 'pkvm.enabled' field in struct kvm_protected_vm is confusingly named.
-> Its purpose is to indicate whether a VM is a pKVM protected VM, not
-> whether the VM itself is enabled or running.
-> 
-> For a non-protected VM, the VM can be fully active, yet this field would
-> be false. This ambiguity can lead to incorrect assumptions about the VM's
-> operational state and makes the code harder to reason about.
-> 
-> Rename the field to 'is_protected' to make it unambiguous that the flag
-> tracks the protected status of the VM.
-> 
-> No functional change intended.
-> 
-lgtm
+On Fri, Aug 08, 2025 at 12:23:09PM +0100, James Clark wrote:
 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->   arch/arm64/include/asm/kvm_host.h | 4 ++--
->   arch/arm64/kvm/hyp/nvhe/pkvm.c    | 2 +-
->   2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 3e41a880b062..55dc7cd83e40 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -252,7 +252,7 @@ struct kvm_protected_vm {
->   	pkvm_handle_t handle;
->   	struct kvm_hyp_memcache teardown_mc;
->   	struct kvm_hyp_memcache stage2_teardown_mc;
-> -	bool enabled;
-> +	bool is_protected;
->   };
->   
->   struct kvm_mpidr_data {
-> @@ -1522,7 +1522,7 @@ struct kvm *kvm_arch_alloc_vm(void);
->   
->   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
->   
-> -#define kvm_vm_is_protected(kvm)	(is_protected_kvm_enabled() && (kvm)->arch.pkvm.enabled)
-> +#define kvm_vm_is_protected(kvm)	(is_protected_kvm_enabled() && (kvm)->arch.pkvm.is_protected)
->   
->   #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
->   
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 338505cb0171..6198c1d27b5b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -406,7 +406,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
->   	hyp_vm->host_kvm = host_kvm;
->   	hyp_vm->kvm.created_vcpus = nr_vcpus;
->   	hyp_vm->kvm.arch.mmu.vtcr = host_mmu.arch.mmu.vtcr;
-> -	hyp_vm->kvm.arch.pkvm.enabled = READ_ONCE(host_kvm->arch.pkvm.enabled);
-> +	hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
->   	hyp_vm->kvm.arch.flags = 0;
->   	pkvm_init_features_from_host(hyp_vm, host_kvm);
->   }
+[...]
 
-Reviewed-by: Kunwu Chan <chentao@kylinos.cn>
+> +  data_src_filter=<mask> - mask to filter from 0-63 possible data sources (PMSDSFR, FEAT_SPE_FDS) - See 'Data source filtering'
 
--- 
-Thanks,
-        Kunwu Chan.
-
+A typo: s/data_src_filter/inv_data_src_filter
