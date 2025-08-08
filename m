@@ -1,151 +1,208 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB35221737
-	for <kvmarm@lists.linux.dev>; Thu,  7 Aug 2025 18:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294C8224AED;
+	Fri,  8 Aug 2025 07:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754593096; cv=none; b=bXBG9L/CIUwtmPRCjCj2SAcExsmvTtVFp/Ym+fIfkwtBu8KjdpW4cDQROLCeEV+iG0nVr+YeO/56wZJ/0IeqhwX6RiqMMEdzvjfZ2fj1zuEf2Zqnn+Kdy2JFIEfewBLcy9KURVtAAEbdezb9Km5LS53AldwKtFu7IYvVmyFWCtw=
+	t=1754638251; cv=none; b=XwO1jHQMAPmzk7T8Ft4iQtznGFk4L7BUh3fZGGJ+CASnGhwkMmYG3M5Jy8G5NnNCm29XizmwsEB4+6iLwY87ZEg/+0DkZpvMRG5HJ1xGh1oEf9JxvD53OT+Vg7W+1akcsBmwHk6H9bsEqXSdQLcHsf/pH06lMg3k1QO+RWX5z64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754593096; c=relaxed/simple;
-	bh=MuhIPyi2F5+ipcNc957b0wI7HllbWh/lbIIst2ORD2E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TneHuQ0CBq42Ffs+sBaCWasb2aE+m7LXWroWIPxi7ybP2XK6wLU69VCKGsUmJNmCsHYh6vzmVK/i2EJCcHEOR1N3+W5HXo/uP//oLFDM8lfCEjdIarX/OssBEeLhg67Bx7QY71mgXZUCcsLasGWPKDN1RfSUL/kHu6YodcOcvjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UdaIOGIZ; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1754638251; c=relaxed/simple;
+	bh=N93jbXCfcX8tT1d6Si749lOVTvmyst9EjSTFBREX9yk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nruZ3qvapTGs62IZhreh8gMrvQGZErsFNmDD0BMVgUDTPnyc48WRSF4zKLz6ToSLnvijNNXzpo8yd2L53YX5q1IcMK7TIrdgMagoQgFHdeAKWxBZaLt8jDwAFL9INhr+B9NAAXBQOk5WRHP+ej0yvY9UyGkHIM7joKHXMq5jBVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QCzzD3i1; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UdaIOGIZ"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b099118fedso59751cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 07 Aug 2025 11:58:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754593094; x=1755197894; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=96362UVupe8COf1P6wW/mjtmbdG3wWxnQMi7BMOUIUE=;
-        b=UdaIOGIZIBN7RDKi7sKyD1+720Qlreq98q3WMyvSnDxP7xUY/ZmFhLucwu450r+rXJ
-         nkgq7rLj/g6VX/lh0MJWx6OJ4fbOmm9tq0NOkhkRYETwIzA7OYKsWq93YVEIJfguiO2R
-         RhYVi6J5d31ylqu5gdASNWh0nVnhilkikCxIPCedMAn25hTKSeXPc0+s6yFlBZnLfFod
-         EntLPF/WhrPbnh7o1GoR137PaVslgV1YWkDM1QFKleG5joYLzlD6VGU5MEL6jbmSLk+C
-         Rn77CrdY5uo4WbNmRJ/wxtgP7mytGkLkQ4OB81Vg7wX4vBjjMsCEVn8YVEecUOLVyNjr
-         oaaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754593094; x=1755197894;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=96362UVupe8COf1P6wW/mjtmbdG3wWxnQMi7BMOUIUE=;
-        b=S1ZS9gdk5H3tI3CLjvQn2/9vg6aJMT0JOPzmtZvilRce0uS9JR71rQgcRJzIamTF5W
-         GDyjtwFx+8vD0QoDzSHGXufNxz9CoicI/r7DqUz2a+NhCAzUMyxjhmCaKV+qHtTkKQDM
-         sZe3p8BeGfP71o0rVRipwm9QwxN72wOipVgk4xi2EutCWGtMmbIsHcjmJdGRpfjXGrOv
-         ECpylYvzVpZYg20vzRlWyOE6cD9JXU+MVqTIxI3+8JJD7yE+OzYqC+CNWFIxbSLRTHLN
-         7I+7LIUOPNxknf20lyQoqyv+3eJBgatLtaOr/26d21ogFuJ/BozItc9X6TJ5dGyL8JZx
-         BuXg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9tGude5TiutJw/XMXpGrUXCg+2H5oHxCa+Kmwjw9K3vGOkx+CtgttQKTEoXB3FQemOLkg+Hg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwIYq9hwdIVdi8B+twJVPQGgay9JYBYXYCWoKQPSbmLDQ6LxGWU
-	IVSgO2glA9VWvUFozCRzp8OUaMNDfKbF/EXmmZyjU9Aer1JpB1ptTh0pYFI0Loy6YlraU4CnHsY
-	c0/Bw2m7Hk6tACuox6FweNJb/ouTNSfcnN/MwtGpk
-X-Gm-Gg: ASbGncv9tZdgz9bqHSMdtuQPV15zJXpz/zaHgcGK6dVprFkNSoVwtaDOt1CBaCzRPuq
-	4u8fY2w3HFQbjJ0VRNLhxx1OW6j4s0xykHiURQKf+XZKrFx1fZrK+rFLY6mIwIzJogameFygk30
-	5EgLvbmjlcGwVKqaSjhbC6A0eAcjaZhnPnb+YrP0H7M2t6b9lDny++B8nzCa0UDOjIxyrMhrh4s
-	JxqyA9tWm0wkjZodAkvs0YPCX93p5gE866J
-X-Google-Smtp-Source: AGHT+IGQv3PJBbuZ1uXQcTT0alJEv27zQP6RUhp/GXkD21PwsG9r1YtfOqnK9qoS+hDRmSRDSNYUz0kE+B4S+clok58=
-X-Received: by 2002:a05:622a:a648:b0:4a5:a83d:f50d with SMTP id
- d75a77b69052e-4b0af27a4c2mr270701cf.11.1754593093620; Thu, 07 Aug 2025
- 11:58:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QCzzD3i1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754638250; x=1786174250;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=N93jbXCfcX8tT1d6Si749lOVTvmyst9EjSTFBREX9yk=;
+  b=QCzzD3i1ZbnrUsaoWeChKbnC1N8x9UaGsrMi70uG1KNUlfB1lk3cxNuS
+   whO1L3uNXl5+RGB1Y7v6FMmYJRN+T82P5XvdT5XHcetVgRyLsuqQxVBnK
+   kiddcc0bzrOtY2oOp/MgLTljAL20f+LLMsKM9f3gyfb5aQASmGFJ2D4Mg
+   Oz3VN6rvs2BhUuHbcMNF0Oljy/N6UmKZGozlCenQgIY04M+Kwg2zC3dvn
+   3ywXd3gIjQe7jnYCFua+3wXRiedRLtBELpnF6dHzzngpPmjVdb3Z/r4Qj
+   3mXRUjDAj9WgTQvUaJxXIo8LkbRIHPWwIZpzTYtMRcdRJtm8Kevhh+xV6
+   g==;
+X-CSE-ConnectionGUID: CO3iTBptTIi9nN8RjEMDdQ==
+X-CSE-MsgGUID: QD+n4BhbS1CPnbSbXzZtBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="56860992"
+X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
+   d="scan'208";a="56860992"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2025 00:30:50 -0700
+X-CSE-ConnectionGUID: nPT+neYWR5ic6FwTvd4gdw==
+X-CSE-MsgGUID: 3HIOr3NzSxqUGeU1ve8zNQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
+   d="scan'208";a="165677254"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.106]) ([10.124.240.106])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2025 00:30:43 -0700
+Message-ID: <f3e09bef-8bc9-48ac-983e-7a18c2ff4ad2@linux.intel.com>
+Date: Fri, 8 Aug 2025 15:30:40 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250724235144.2428795-1-rananta@google.com> <20250724235144.2428795-3-rananta@google.com>
- <aIjwalITY6CAj7TO@linux.dev>
-In-Reply-To: <aIjwalITY6CAj7TO@linux.dev>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Thu, 7 Aug 2025 11:58:01 -0700
-X-Gm-Features: Ac12FXylmxDAHRXg2gQCPPXuwIGOmW7c0vzzAhp62yyDvoK-TIuMbTJEHyOdR6k
-Message-ID: <CAJHc60wBNTP9SSt_skEXXv9N+tF_1RoV6vcQQx4hWphJF6EmkQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Destroy the stage-2 page-table periodically
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 07/44] perf: Add APIs to load/put guest mediated PMU
+ context
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
+ Mingwei Zhang <mizhang@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Sandipan Das <sandipan.das@amd.com>
+References: <20250806195706.1650976-1-seanjc@google.com>
+ <20250806195706.1650976-8-seanjc@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250806195706.1650976-8-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Oliver,
 
+On 8/7/2025 3:56 AM, Sean Christopherson wrote:
+> From: Kan Liang <kan.liang@linux.intel.com>
 >
-> Protected mode is affected by the same problem, potentially even worse
-> due to the overheads of calling into EL2. Both protected and
-> non-protected flows should use stage2_destroy_range().
+> Add exported APIs to load/put a guest mediated PMU context.  KVM will
+> load the guest PMU shortly before VM-Enter, and put the guest PMU shortly
+> after VM-Exit.
 >
-I experimented with this (see diff below), and it looks like it takes
-significantly longer to finish the destruction even for a very small
-VM. For instance, it takes ~140 seconds on an Ampere Altra machine.
-This is probably because we run cond_resched() for every breakup in
-the entire sweep of the possible address range, 0 to  ~(0ULL), even
-though there are no actual mappings there, and we context switch out
-more often.
+> On the perf side of things, schedule out all exclude_guest events when the
+> guest context is loaded, and schedule them back in when the guest context
+> is put.  I.e. yield the hardware PMU resources to the guest, by way of KVM.
+>
+> Note, perf is only responsible for managing host context.  KVM is
+> responsible for loading/storing guest state to/from hardware.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> [sean: shuffle patches around, write changelog]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  include/linux/perf_event.h |  2 ++
+>  kernel/events/core.c       | 61 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 63 insertions(+)
+>
+> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+> index 0958b6d0a61c..42d019d70b42 100644
+> --- a/include/linux/perf_event.h
+> +++ b/include/linux/perf_event.h
+> @@ -1925,6 +1925,8 @@ extern u64 perf_event_pause(struct perf_event *event, bool reset);
+>  #ifdef CONFIG_PERF_GUEST_MEDIATED_PMU
+>  int perf_create_mediated_pmu(void);
+>  void perf_release_mediated_pmu(void);
+> +void perf_load_guest_context(unsigned long data);
+> +void perf_put_guest_context(void);
+>  #endif
+>  
+>  #else /* !CONFIG_PERF_EVENTS: */
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index 6875b56ddd6b..77398b1ad4c5 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -469,10 +469,19 @@ static cpumask_var_t perf_online_pkg_mask;
+>  static cpumask_var_t perf_online_sys_mask;
+>  static struct kmem_cache *perf_event_cache;
+>  
+> +#ifdef CONFIG_PERF_GUEST_MEDIATED_PMU
+> +static DEFINE_PER_CPU(bool, guest_ctx_loaded);
+> +
+> +static __always_inline bool is_guest_mediated_pmu_loaded(void)
+> +{
+> +	return __this_cpu_read(guest_ctx_loaded);
+> +}
+> +#else
+>  static __always_inline bool is_guest_mediated_pmu_loaded(void)
+>  {
+>  	return false;
+>  }
+> +#endif
+>  
+>  /*
+>   * perf event paranoia level:
+> @@ -6379,6 +6388,58 @@ void perf_release_mediated_pmu(void)
+>  	atomic_dec(&nr_mediated_pmu_vms);
+>  }
+>  EXPORT_SYMBOL_GPL(perf_release_mediated_pmu);
+> +
+> +/* When loading a guest's mediated PMU, schedule out all exclude_guest events. */
+> +void perf_load_guest_context(unsigned long data)
 
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
+nit: the "data" argument is not used in this patch, we may defer to
+introduce it in patch 09/44.
 
-+ static void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-+ {
-+       u64 end = is_protected_kvm_enabled() ? ~(0ULL) : BIT(pgt->ia_bits);
-+       u64 next, addr = 0;
-+
-+       do {
-+               next = stage2_range_addr_end(addr, end);
-+               KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, addr,
-+                                                            next - addr);
-+
-+               if (next != end)
-+                       cond_resched();
-+       } while (addr = next, addr != end);
-+
-+
-+       KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
-+ }
 
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -316,9 +316,13 @@ static int __pkvm_pgtable_stage2_unmap(struct
-kvm_pgtable *pgt, u64 start, u64 e
-        return 0;
- }
-
--void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-+void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt, u64
-addr, u64 size)
-+{
-+       __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
-+}
-+
-+void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
-+{
-+}
-
-Without cond_resched() in place, it takes about half the time.
-
-I also tried moving cond_resched() to __pkvm_pgtable_stage2_unmap(),
-as per the below diff, and calling pkvm_pgtable_stage2_destroy_range()
-for the entire 0 to ~(1ULL) range (instead of breaking it up). Even
-for a fully 4K mapped 128G VM, I see it taking ~65 seconds, which is
-close to the baseline (no cond_resched()).
-
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -311,8 +311,11 @@ static int __pkvm_pgtable_stage2_unmap(struct
-kvm_pgtable *pgt, u64 start, u64 e
-                        return ret;
-                pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
-                kfree(mapping);
-+               cond_resched();
-        }
-
-Does it make sense to call cond_resched() only when we actually unmap pages?
-
-Thank you.
-Raghavendra
+> +{
+> +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+> +
+> +	lockdep_assert_irqs_disabled();
+> +
+> +	guard(perf_ctx_lock)(cpuctx, cpuctx->task_ctx);
+> +
+> +	if (WARN_ON_ONCE(__this_cpu_read(guest_ctx_loaded)))
+> +		return;
+> +
+> +	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
+> +	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_GUEST);
+> +	if (cpuctx->task_ctx) {
+> +		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
+> +		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
+> +	}
+> +
+> +	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
+> +	if (cpuctx->task_ctx)
+> +		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
+> +
+> +	__this_cpu_write(guest_ctx_loaded, true);
+> +}
+> +EXPORT_SYMBOL_GPL(perf_load_guest_context);
+> +
+> +void perf_put_guest_context(void)
+> +{
+> +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+> +
+> +	lockdep_assert_irqs_disabled();
+> +
+> +	guard(perf_ctx_lock)(cpuctx, cpuctx->task_ctx);
+> +
+> +	if (WARN_ON_ONCE(!__this_cpu_read(guest_ctx_loaded)))
+> +		return;
+> +
+> +	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
+> +	if (cpuctx->task_ctx)
+> +		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
+> +
+> +	perf_event_sched_in(cpuctx, cpuctx->task_ctx, NULL, EVENT_GUEST);
+> +
+> +	if (cpuctx->task_ctx)
+> +		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
+> +	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
+> +
+> +	__this_cpu_write(guest_ctx_loaded, false);
+> +}
+> +EXPORT_SYMBOL_GPL(perf_put_guest_context);
+>  #else
+>  static int mediated_pmu_account_event(struct perf_event *event) { return 0; }
+>  static void mediated_pmu_unaccount_event(struct perf_event *event) {}
