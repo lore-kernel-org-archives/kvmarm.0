@@ -1,55 +1,48 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC10D21D5BB
-	for <kvmarm@lists.linux.dev>; Fri,  8 Aug 2025 23:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C365128DB7E;
+	Fri,  8 Aug 2025 23:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754694511; cv=none; b=N4m1mqZmAvR8lvOV3cUHDFkvDnqI7GISDz6Ezu1Q2GBqudm5WfmuXpuGfyIfH0R+WIO2TOmHXU4kRvNRzlF43qYMLm6o1+/GcZLR2oP25yKglvzuDiqzVbMhb22O03K9UuXqMVHJKn68zO5BzW9zrlMlEAYN57hExSSlBMdQ61s=
+	t=1754696255; cv=none; b=efH806xoxZPVr6kBBhPECS2GkCZkbhhDYO3U0q06MKDUURl/QhxnY4jlQIOHmMBoTSXBbnNbqdWwsgAhdlPV8oWQHu+0kK+sKhKZMO8ADChV3+g0niKD/Iyzbpr4bfrb6FhOjjLXbq7RR8nB1WWIn8UnGSk3DxNz9snT8+Pv3b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754694511; c=relaxed/simple;
-	bh=kbsQ31aSNCemwZhBnbzsJeSuRfAVPY2j5geuXdv6z8o=;
+	s=arc-20240116; t=1754696255; c=relaxed/simple;
+	bh=T+sq90fZbAHQa4cXxatq1af0mUJVgnCR3V/n7FvtWb8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jrQ1//DptrMmmiEKHbAenT7SuApM3prF5UmReLvdwUUg5N1MmBOCjIB8Q4ivE+3QyTQU6Oebjbwq+Cn7OtNqzZEeKLloaXxxeIyfaSNog4z8pTKy8+CV91RFuNFcb6gjAWn+AtU4hFDFEO7Ni8Mhl2d9Ijsdai8tsek4Sn+LXyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uh8iDmv7; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=bWjyGewtUOeksSoeu+mpedm89lJxjiZA8b6kGdS2IQQutxIsdLacKe8LFivUkRr8lwtEtoT4SyKQoKdpf3+ooypkLwoQ854553DQEYWRdJ9F9r+h6paYNkEyFejjxM8OPFHw3E3dOpVlXpFYhmDWUl0YGlAa0E/fPrU/vRGtsUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYwhqwmL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uh8iDmv7"
-Date: Fri, 8 Aug 2025 16:08:18 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754694507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dKxQUSmpTCdRhHeB+mUzyq09Je0k79BxYRE2H27YH/E=;
-	b=uh8iDmv79ewEgnftriRVVLaUf8NnoGiKpNpDcqs/ZBuvIoGlELbgtdqdFDYNIIl66czDB2
-	ounj7qjpP4ivL4I5uV6iItD2v9UdS/JHTEAoVVhAFztQ0ArM3UnQkhb34cFPXj+J6QH7y7
-	918JoUjZXL5FuLYycMvc4LkU3Y1Gz2Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYwhqwmL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D35C4CEED;
+	Fri,  8 Aug 2025 23:37:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754696255;
+	bh=T+sq90fZbAHQa4cXxatq1af0mUJVgnCR3V/n7FvtWb8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TYwhqwmLswXF1VCFh0EFkpAQ+ydMyosA7S3qRVKzDFgO9U9fh0YTf1Yloq+n8RgVA
+	 xDH+2NoDkNAzdnx0J44/GwdmjXzSVpMVsKUYnI5g76kc7fDASjNAeAJaDKdAseI80E
+	 Aq3X+o/QdlWja4NNojIsQt/CRlr+fRVKSeo322RF8red0q66zqYL8H3Z++GJZsT6sb
+	 odPAclk9UcXqzjOkHB2JFYk3Tbcm0QexujEWlti6LHTgTywbNIgoJ9F6crNxT2GtEM
+	 aQXFBi1KYyRxWqQyiohfIFbT/KJ/0qXVYysFOOHYIqj0+rGm4AuFh0BSrMiI6DQy6X
+	 4ONklFiNV68Lg==
+Date: Fri, 8 Aug 2025 23:37:33 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
- KVM_ARM_VCPU_PMU_V3_COMPOSITION
-Message-ID: <aJaDYhme_St2b2sM@linux.dev>
-References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <aJOO99xUrhsrvLwl@linux.dev>
- <276fdfb8-f1ca-44ad-b310-a811684b265a@rsg.ci.i.u-tokyo.ac.jp>
- <aJQJdElbZJ6KzQxD@linux.dev>
- <62494f54-13c6-4b9f-86a1-9a19ce58e91f@rsg.ci.i.u-tokyo.ac.jp>
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 38/38] coco: guest: arm64: Add support for
+ fetching device info
+Message-ID: <20250808233733.GA3119612@google.com>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-39-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,70 +51,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <62494f54-13c6-4b9f-86a1-9a19ce58e91f@rsg.ci.i.u-tokyo.ac.jp>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250728135216.48084-39-aneesh.kumar@kernel.org>
 
-On Thu, Aug 07, 2025 at 11:06:21PM +0900, Akihiko Odaki wrote:
-> > The only cross-PMU events we will support are the fixed counters, my
-> > strong preference is that we do not reverse-map architectural events to
-> > generic perf events for all counters.
-> 
-> I wonder if there is a benefit to special case PERF_COUNT_HW_CPU_CYCLES
-> then; the current logic of kvm_map_pmu_event() looks sufficient for me.
+On Mon, Jul 28, 2025 at 07:22:15PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> @@ -5,6 +5,8 @@ config ARM_CCA_GUEST
+>  	tristate "Arm CCA Guest driver"
+>  	depends on ARM64
+>  	depends on PCI_TSM
+> +	select CRYPTO_SHA256
+> +	select CRYPTO_SHA512
+>  	select TSM_REPORTS
+>  	select TSM
 
-I'd rather we just use the generic perf events and let the driver remap
-things on our behalf. These are fixed counters, using constant events
-feels like the right way to go about that.
+CRYPTO_LIB_SHA256 and CRYPTO_LIB_SHA512
 
-kvm_map_pmu_event() is trying to solve a slightly different problem
-where we need to map programmable PMUv3 events into a non-PMUv3 event
-space, like on the M1 PMU.
+> +	if (dsm->dev_info.hash_algo == RSI_HASH_SHA_256) {
+> +		hash_alg_name = "sha256";
+> +		digest_size = SHA256_DIGEST_SIZE;
+> +	} else if (dsm->dev_info.hash_algo == RSI_HASH_SHA_512) {
+> +		hash_alg_name = "sha512";
+> +		digest_size = SHA512_DIGEST_SIZE;
+> +	} else {
+> +		pci_err(pdev, "unknown realm hash algorithm!\n");
+> +		ret = -EINVAL;
+> +		goto err_out;
+> +	}
+> +
+> +	alg = crypto_alloc_shash(hash_alg_name, 0, 0);
+> +	if (IS_ERR(alg)) {
+> +		pci_err(pdev, "cannot allocate %s\n", hash_alg_name);
+> +		return PTR_ERR(alg);
+> +	}
+> +
+> +	sdesc_size = sizeof(struct shash_desc) + crypto_shash_descsize(alg);
+> +	shash = kzalloc(sdesc_size, GFP_KERNEL);
+> +	if (!shash) {
+> +		pci_err(pdev, "cannot allocate sdesc\n");
+> +		ret = -ENOMEM;
+> +		goto err_free_shash;
+> +	}
+> +	shash->tfm = alg;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(reports); i++) {
+> +		ret = crypto_shash_digest(shash, reports[i].report,
+> +					  reports[i].size, digest);
+> +		if (ret) {
+> +			pci_err(pdev, "failed to compute digest, %d\n", ret);
+> +			goto err_free_sdesc;
+> +		}
 
-> > This isn't what I meant. What I mean is that userspace either can use
-> > the SET_PMU ioctl or the COMPOSITION ioctl. Once one of them has been
-> > used the other ioctl returns an error.
-> > 
-> > We're really bad at getting ioctl ordering / interleaving right and
-> > syzkaller has a habit of finding these mistakes. There's zero practical
-> > value in using both of these ioctls on the same VM, let's prevent it.
-> 
-> The corresponding RFC series for QEMU uses KVM_ARM_VCPU_PMU_V3_SET_PMU to
-> probe host PMUs, and falls back to KVM_ARM_VCPU_PMU_V3_COMPOSITION if none
-> covers all CPUs. Switching between SET_PMU and COMPOSITION is useful during
-> such probing.
-> 
-> COMPOSITION is designed to behave like just another host PMU that is set
-> with SET_PMU. SET_PMU allows setting a different host PMU even if SET_PMU
-> has already been invoked so it is also allowed to set a host PMU even if
-> COMPOSITION has already been invoked, maintaining consistency with
-> non-composed PMUs.
-> 
-> You can find the QEMU patch at:
-> https://lore.kernel.org/qemu-devel/20250806-kvmq-v1-1-d1d50b7058cd@rsg.ci.i.u-tokyo.ac.jp/
-> 
-> (look up KVM_ARM_VCPU_PMU_V3_SET_PMU for the probing code)
+Use sha256() and sha512().
 
-Having both of these attributes return success when probed with
-KVM_HAS_DEVICE_ATTR is fine; what I mean is that once KVM_SET_DEVICE_ATTR
-has been called on an attribute the other fails.
-
-> > On a system that has FEAT_PMUv3_ICNTR, userspace can still use this
-> > ioctl and explicitly de-feature ICNTR by writing to the ID register
-> > after initialization.
-> 
-> Now I understand better.
-> 
-> Currently, KVM_ARM_VCPU_PMU_V3_COMPOSITION sets supported_cpus to ones that
-> have cycle counters compatible with PMU emulation.
-> 
-> If FEAT_PMUv3_ICNTR is set to the ID register, I guess
-> KVM_ARM_VCPU_PMU_V3_COMPOSITION will set supported_cpus to ones that have
-> compatible cycle and instruction counters. If so, the naming
-> KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY indeed makes sense.
-
-Perfect. Ideally SOC vendors do the sensible thing and ensure that
-FEAT_PMUv3_ICNTR is consistent on all implementations in a machine. We
-will hide the feature in KVM if it is not.
-
-Thanks,
-Oliver
+- Eric
