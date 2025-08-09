@@ -1,191 +1,156 @@
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1545C1DF97F
-	for <kvmarm@lists.linux.dev>; Sat,  9 Aug 2025 06:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A568A1D61BC
+	for <kvmarm@lists.linux.dev>; Sat,  9 Aug 2025 13:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754720502; cv=none; b=Sn+fjpG0xL4yy9Qw+FRaDr3B18qngMalEtyPD8NgZqq2P6DjgAAbW/0Llv3nBF9Naksw1E0GasZ22m88h3IzVDLBvbTnbxPqwEFew9VTJ6xH797zHwCRYAmjn6EvEVjGNLbSYxNT7VmsouYwv7zsRM+WA5CCJs/vlqEz/H8XZmg=
+	t=1754747521; cv=none; b=Q8zBlxzzLH0Gv8SN0JeeadoN0Ql4Tfjut/16MTJFtX/qIbJ0MgYbkF/+gEwef4CsQOCaG23AkSCjy5AOtf6pl9wk9OUDrX9iOVJe9EX7tesnSMsF2Pkuh9ZX7q4/wcF524OX3GnLr2S+5X7s+w0ZXiV0Dk5Z7RoHHyeTP6PmMak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754720502; c=relaxed/simple;
-	bh=1mADe4k0H7TVjVISrym93OlCtbnTCPUUg6EcDGGcrS8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YnlR0YzISoANEQvFlob6vwbikJ9U6UvEy3y+5s/T0lSxeBVvQqQvxWKY7wj6i4rkBjSG3fIsDQU8f5UaRZ2AfXRcaihT5e3NBdw4y8gdPr4W2U/T0fXFagp7b7+//3ne89cKBQCvGUJ7UcjsEFW6nBtFKryO/qTe1nugdJvQHnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=WakBQInh reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
+	s=arc-20240116; t=1754747521; c=relaxed/simple;
+	bh=tjyqMDsgDi7/+p9JXVyraldUe4Vb3gfBUInuu8Tjjwg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nP4+nW+PKhdJxtBAsBbk2wmi8OOmthMXQDDJly81rWRdBV/I/CsatYC6WfPAK5BKLoeR00acyoyBdhIIJEI9eAIig8fyV0Pga3Yg5uNijoAS3Zv4mJiYrDTQyio9BMPaYhW0WyQPT7E0jZ5UemdHlYF4FMuxv/oyB0+g3QODRQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=CWc6sKu4; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="WakBQInh"
-Received: from [133.11.54.205] (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 5796FeEc068583
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 9 Aug 2025 15:15:41 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=tjn7589sn0todta5MMbg+BG3V2sZPDUGxLyydNTxbQc=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=Message-ID:Date:Subject:To:From;
-        s=rs20250326; t=1754720141; v=1;
-        b=WakBQInh0cpfd1IgkkB74HPobXmSXxTLBu+vowlNpmhZVyQcXV5KEfxgIlhumpDg
-         0mCLcq34OsW9yBbXPxv/4xNnLOWAXY5rrxZyt1yXGIENC7Inaadqn8rkDGmjYrSh
-         EioPFP/iMmiWtTi9Wc7OCd8QAm0mj1UQ7Kkwkju3Vl2xl0+/pSDvbSXPPogRYVOR
-         PBRddWDA3RUOKATSyOwHf9bEMlwr3wT9Gg2FN18XMXYSGwvVzVhqeLozF9q0YA4D
-         +sKngJ+4IpJfvUzq0MrYGh0jrM2tZ2P42r3jPvrVbl9E3pToCF5iL+lERP20A4n0
-         liPykRyaCidMaytalVSdQg==
-Message-ID: <e33c21eb-d4d3-4c38-aab8-60399c7ae210@rsg.ci.i.u-tokyo.ac.jp>
-Date: Sat, 9 Aug 2025 15:15:40 +0900
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="CWc6sKu4"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-76c3607d960so3297159b3a.1
+        for <kvmarm@lists.linux.dev>; Sat, 09 Aug 2025 06:51:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie.ntu.edu.tw; s=google; t=1754747517; x=1755352317; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jFMFOpY04n7pfsjOLDYFeb6qmDpqp5aExAGmAsyPClc=;
+        b=CWc6sKu43/IAmdH/mYfJHRft2zP1BjCXSttkQKNx6yavmxQ8PukjCBclDYB1oIcXLm
+         7oflE0mn1C0i7HNax7b/M0uiy3t+gqiIdBDB/jegCET0Vs+BXpAwdBn0MV2EAF7HxQD5
+         KOjwToo6Ncop/ZWx99DXWdOblqUdBdHRx7brEfWkDNngsI2ja//Bu/HMwDc4SQQ1CLIg
+         MQPbUYkyemyTmwgLhYeS/AP5fm36JaeqfJXAnxEa8ZpoCtQJPJpe54jAvAaKW3j00UUQ
+         hkNNbvmOh6UhTJAb2NKTmNdeNgqeMCAh3x44wnwb92AyjYLWCVgUY2RH5sFp4kBBxDMN
+         ymrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754747517; x=1755352317;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jFMFOpY04n7pfsjOLDYFeb6qmDpqp5aExAGmAsyPClc=;
+        b=HcZtRnMHoGcqcSi0DUzYRD+HHLYqlssAZYrHAQQESqn/aRVC48x73ZTpSyxAipAeB0
+         nbIfOgCXcm38w9jbVFkrkNmGX+xCaHubPSHlNdw1+I6tDTjRIxxSsWeyq5he02d7AUqp
+         jFLtaAcgZhPK5GjhKDMn/kDAW4ogfFNaaAS4ag2YAii/9495f5xr8ypd3KR66Lu+MxN4
+         keAHvdWbHbwyjajaR+AYkzw3e2je3eUCoWzyshrARyaAwI1686QTX5YvwT6P85D/Lb03
+         K95rCuhvyXa30NBvC9gCThWLVV3q51mFprTQA3mosLb9CsI9PRGdKLPJ4tfFLnD8s3sg
+         uwVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWV9Qvm2TLsucmYbWjOqzqlWyLfVgvspTxYt8xbr7qD0PJzl1MSrV56gmCshRbcD3gQmoZHwbQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxtTSDCNXyJah+5kWqGAOuauer41Psk+8QFCahz1mA3l4RUvIfx
+	POUgpyOt0iWWWQjdaBkdoIf6aWYbzgj+3PkK1WzjhjNdgK9q0dO8BbtrvxyHyaFC/OVSlDpPc1Z
+	uG5A7HZ6w+6Fp9x+MqNpS6DCEtX3MOHu8jOO562HjVkGgwdrceME=
+X-Gm-Gg: ASbGncu76s9YQktCp95gYfG2q8QtiY12fWmM7Y98Wy/jMF/rKR7JA8gFFN+4BUuIT6G
+	wUlbz8HUBQwzfDyEry8JggJ4vx/pjd0HT2OU8gCGT6QaDNrJq+1s/hGwB1pObVCL1CxAL2rnSJG
+	pTYN3ipkVvtyoskIEXJoH/jZ99StyG2QbFBrnQlo+MKDhNY+snvZoQYdA8RL2zV5cic07gSsvvH
+	nIg75PQUXnEVOTVm0y/0LEDXTjE9I+HJgEvsExd+2OO+at9ls0qjVARQoAwLshvm6h6jebMP51S
+	/UyYR7AQvelNUItChjYT62fsKj2roSvfnK5cp9mMmNgyxk4ndkTC9CFRBrXisJAQelVjPxH5A8e
+	WQZQFj0KX/NYPYNSK7RFWvX527tZdUEPT40PtDsbVd/YyipbDTCJ+6qvCcaZrRD97QA==
+X-Google-Smtp-Source: AGHT+IEeNgCRS6Ls8b+R2Cf86RDBC5tmWlbLAIMn2W5koGX7pj8yLDZ046+xiBALeYUwG2HzAegNfg==
+X-Received: by 2002:a05:6a21:6d94:b0:240:1bdb:bed2 with SMTP id adf61e73a8af0-240551be2a1mr10707896637.32.1754747516856;
+        Sat, 09 Aug 2025 06:51:56 -0700 (PDT)
+Received: from zenbook (1-162-100-9.dynamic-ip.hinet.net. [1.162.100.9])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bcce8fa10sm22538342b3a.52.2025.08.09.06.51.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Aug 2025 06:51:56 -0700 (PDT)
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
+	Will Deacon <will@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v2] KVM: arm64: ptdump: Don't test PTE_VALID alongside other attributes
+Date: Sat,  9 Aug 2025 21:53:56 +0800
+Message-ID: <20250809135356.1003520-1-r09922117@csie.ntu.edu.tw>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 1/2] KVM: arm64: PMU: Introduce
- KVM_ARM_VCPU_PMU_V3_COMPOSITION
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu
- <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, devel@daynix.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20250806-hybrid-v2-0-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <20250806-hybrid-v2-1-0661aec3af8c@rsg.ci.i.u-tokyo.ac.jp>
- <aJOO99xUrhsrvLwl@linux.dev>
- <276fdfb8-f1ca-44ad-b310-a811684b265a@rsg.ci.i.u-tokyo.ac.jp>
- <aJQJdElbZJ6KzQxD@linux.dev>
- <62494f54-13c6-4b9f-86a1-9a19ce58e91f@rsg.ci.i.u-tokyo.ac.jp>
- <aJaDYhme_St2b2sM@linux.dev>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <aJaDYhme_St2b2sM@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On 2025/08/09 8:08, Oliver Upton wrote:
-> On Thu, Aug 07, 2025 at 11:06:21PM +0900, Akihiko Odaki wrote:
->>> The only cross-PMU events we will support are the fixed counters, my
->>> strong preference is that we do not reverse-map architectural events to
->>> generic perf events for all counters.
->>
->> I wonder if there is a benefit to special case PERF_COUNT_HW_CPU_CYCLES
->> then; the current logic of kvm_map_pmu_event() looks sufficient for me.
-> 
-> I'd rather we just use the generic perf events and let the driver remap
-> things on our behalf. These are fixed counters, using constant events
-> feels like the right way to go about that.
-> 
-> kvm_map_pmu_event() is trying to solve a slightly different problem
-> where we need to map programmable PMUv3 events into a non-PMUv3 event
-> space, like on the M1 PMU.
+The attribute masks and test values in the ptdump code are meant for
+individual attributes, however for stage-2 ptdump we included PTE_VALID
+while testing for R, W, X, and AF. This led to some confusion and the
+flipped output for the executable attribute.
 
-It is currently also used to map non-programmable PMUv3 events.
+Remove PTE_VALID from all attribute masks and values so that each test
+matches only the relevant bits.
 
-I want to understand the motivation better. The current procedure to 
-determine the config value is as follows:
-1) If the register is PMCCFILTR_EL0:
-    a) eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES.
-2) If the register is not PMCCFILTR_EL0:
-    a) Derive eventsel by masking the register value.
-3) If map_pmuv3_event() exists:
-    a) The config value is map_pmuv3_event(eventsel).
-4) If map_pmuv3_event() does not exist:
-    a) The config value is eventsel.
+Additionally, the executable attribute printing is updated to align with
+stage-1 ptdump, printing "NX" for non-executable regions and "x " for
+executable ones.
 
-If we use PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES, the procedure 
-will look like the following:
-1) If the register is PMCCFILTR_EL0:
-    a) The config value is PERF_TYPE_HARDWARE / PERF_COUNT_HW_CPU_CYCLES.
-2) If the reigster is not PMCCFILTR_EL0:
-    a) Derive eventsel by masking the register value.
-    b) If map_pmuv3_event() exists:
-       i) The config value is map_pmuv3_event(eventsel).
-    c) if map_pmuv3_event() does not exist,
-       i) The config value is eventsel.
+Suggested-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Suggested-by: Mark Rutland <mark.rutland@arm.com>
+Suggested-by: Sebastian Ene <sebastianene@google.com>
+Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+---
+Tested on QEMU.
 
-It does not seem that using PERF_TYPE_HARDWARE / 
-PERF_COUNT_HW_CPU_CYCLES simplifies the procedure.
+Changes in v2, thanks to those listed in the Suggested-by tags:
+  - remove PTE_VALID from .mask and .val
+  - make executable attribute output format identical to stage-1 ptdump
+  - Link to v1: https://lore.kernel.org/kvmarm/20250802104021.3076621-1-r09922117@csie.ntu.edu.tw/
+---
+ arch/arm64/kvm/ptdump.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-> 
->>> This isn't what I meant. What I mean is that userspace either can use
->>> the SET_PMU ioctl or the COMPOSITION ioctl. Once one of them has been
->>> used the other ioctl returns an error.
->>>
->>> We're really bad at getting ioctl ordering / interleaving right and
->>> syzkaller has a habit of finding these mistakes. There's zero practical
->>> value in using both of these ioctls on the same VM, let's prevent it.
->>
->> The corresponding RFC series for QEMU uses KVM_ARM_VCPU_PMU_V3_SET_PMU to
->> probe host PMUs, and falls back to KVM_ARM_VCPU_PMU_V3_COMPOSITION if none
->> covers all CPUs. Switching between SET_PMU and COMPOSITION is useful during
->> such probing.
->>
->> COMPOSITION is designed to behave like just another host PMU that is set
->> with SET_PMU. SET_PMU allows setting a different host PMU even if SET_PMU
->> has already been invoked so it is also allowed to set a host PMU even if
->> COMPOSITION has already been invoked, maintaining consistency with
->> non-composed PMUs.
->>
->> You can find the QEMU patch at:
->> https://lore.kernel.org/qemu-devel/20250806-kvmq-v1-1-d1d50b7058cd@rsg.ci.i.u-tokyo.ac.jp/
->>
->> (look up KVM_ARM_VCPU_PMU_V3_SET_PMU for the probing code)
-> 
-> Having both of these attributes return success when probed with
-> KVM_HAS_DEVICE_ATTR is fine; what I mean is that once KVM_SET_DEVICE_ATTR
-> has been called on an attribute the other fails.
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index 098416d7e5c25..dc5acfb00af91 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -32,23 +32,23 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+ 		.set	= " ",
+ 		.clear	= "F",
+ 	}, {
+-		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+-		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
++		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
++		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+ 		.set	= "R",
+ 		.clear	= " ",
+ 	}, {
+-		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
+-		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
++		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
++		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+ 		.set	= "W",
+ 		.clear	= " ",
+ 	}, {
+-		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+-		.val	= PTE_VALID,
+-		.set	= " ",
+-		.clear	= "X",
++		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
++		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
++		.set	= "NX",
++		.clear	= "x ",
+ 	}, {
+-		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+-		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
++		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
++		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+ 		.set	= "AF",
+ 		.clear	= "  ",
+ 	}, {
+-- 
+2.50.1
 
-By probing, I meant checking if a host PMU is compatible with KVM.
-
-More concretely, QEMU implements the following procedure to detect a PMU 
-backend compatible with all host CPUs:
-
-1) Traverse /sys/bus/event_source/devices
-    a) Check if the device has the cpus and type attributes.
-       If it doesn't, skip it.
-    b) Try to set the device's type with KVM_ARM_VCPU_PMU_V3_SET_PMU.
-       If successful, the device is compatible with KVM.
-    c) Check if the device's cpus cover all host CPUs.
-       If it does, use it with KVM_ARM_VCPU_PMU_V3_SET_PMU.
-
-2) Check if the union of the cpus attributes of compatible devices
-    cover all CPUs. If it does, use KVM_ARM_VCPU_PMU_V3_COMPOSITION.
-
-3) If it failed to find a usable backend until this step,
-    there is no PMU backend compatible with all host CPUs.
-
-Here, 1b) calls KVM_SET_DEVICE_ATTR with KVM_ARM_VCPU_PMU_V3_SET_PMU 
-during probing.
-
-> 
->>> On a system that has FEAT_PMUv3_ICNTR, userspace can still use this
->>> ioctl and explicitly de-feature ICNTR by writing to the ID register
->>> after initialization.
->>
->> Now I understand better.
->>
->> Currently, KVM_ARM_VCPU_PMU_V3_COMPOSITION sets supported_cpus to ones that
->> have cycle counters compatible with PMU emulation.
->>
->> If FEAT_PMUv3_ICNTR is set to the ID register, I guess
->> KVM_ARM_VCPU_PMU_V3_COMPOSITION will set supported_cpus to ones that have
->> compatible cycle and instruction counters. If so, the naming
->> KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY indeed makes sense.
-> 
-> Perfect. Ideally SOC vendors do the sensible thing and ensure that
-> FEAT_PMUv3_ICNTR is consistent on all implementations in a machine. We
-> will hide the feature in KVM if it is not.
-
-M1 PMU also implements a fixed instruction counter, fortunately on all 
-CPUs. I hope they continue to do so (and ideally they implement 
-FEAT_PMUv3 and FEAT_PMUv3_ICNTR).
-
-Regards,
-Akihiko Odaki
