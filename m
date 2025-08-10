@@ -1,121 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD2D2E36F1;
-	Sat,  9 Aug 2025 20:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E0F22A4DA;
+	Sun, 10 Aug 2025 21:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754770902; cv=none; b=J12mGiVCQ873t4x/K//4UoYKxYyeLZafvXsSJz+5ok+1Ti+jPFqYcwX7arOgtiV4dD+NAvM+Zx0eIkMg4MmQU/PfKCCZn6i0oL1kUMn6BeETG5M8uTGhU3b2FcmAAkdY3KEOU4X9AUbXA0sneKlx2YneBmT8WY+mRQVyOO7WoJQ=
+	t=1754860330; cv=none; b=uW36EKXhKW9z07HIja324++MX0a7yHazWhVColsBFwdTIbTJR/2yheTxB2yYUlV2HjT877jxU8aNTLUZM1O3cvkNKsQVdL5+RFqaiRn+yhsfgDSa2ZAlVQo+Q9+NzRrAkL31+Xyp6s3zO/nXoQwF/yWUeZOJ9ukhdh05iVyxoFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754770902; c=relaxed/simple;
-	bh=sEv9PYmMWBEnq4cHeF3/88QlEU0nUxNppYfuZI0MI4w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B/PT6kYlmIjseW45qGmAwwFNuK6j5hTa63eZRK6fPZDLbS3St3dEZqex7D78snDC67+rIgXAZZ32+JwM4mLZa+gXelKg9ipXnD1Sr6qogk8I08ZdpKNmmVB7h4UOLnrM/NDgeq7AlB/ukko7cDfaojwpgJ+RZuW7Un2LSNHp1zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t0vtXvBi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754860330; c=relaxed/simple;
+	bh=PTB+y1bea+X0pwle+Qsb0krCZI4wJwkr28qnyuTl7j4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hczlwUowThmGaIIQa6Vt6qpx34/PL/cHbhQOygSaAvDu48nmIPqFqH/fQ9n9EX+P9Lg6RTtBynxT4wDoLLugNrRYJiUm9pUQG0CpDHNA4z1vIkmv6ZXtNfhE22Ao9C/6kDeQV4y7/fk5j8LkrYpBexGx8B5TCG+0YwYWAl4HaLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HCOBV3tU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0vtXvBi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13CC7C4CEE7;
-	Sat,  9 Aug 2025 20:21:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HCOBV3tU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF676C4CEEB;
+	Sun, 10 Aug 2025 21:12:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754770902;
-	bh=sEv9PYmMWBEnq4cHeF3/88QlEU0nUxNppYfuZI0MI4w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t0vtXvBiTdiyGeBfS+qz+5/zNJjDQbJrp68NxASz/zeYJNbHNTDX+AUP4R9dUUACP
-	 +AHjUjtdez1AsSOWDZ0HotGytUVcSoVSqCQZof9DT7oBrwwarGrhH+RRz0J9Bq1pkU
-	 ZgEhjGm8pI+qXxbbtNeJEddC0QpWO7Ic8ud9ykNewNe1OgnD7YHECEW1uGKF4wxHp4
-	 T1K1msqGvHJ1qubOHaSFcFEtljt3dMd7xOE3Yk5f2BtxYykzVtZcn4WIvMQfQIZez2
-	 DgdNXoXtJf4IvZ8/lJsxTYiF2M9LCZN4+fChU5v/1J3e4mEcDvFuKXtL4MZdw6MyUT
-	 qYH4qeVWFn89Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ukq4R-005hzT-Tt;
-	Sat, 09 Aug 2025 21:21:40 +0100
-Date: Sat, 09 Aug 2025 21:21:39 +0100
-Message-ID: <8734a0tfe4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v2 4/5] KVM: arm64: Expose FEAT_RASv1p1 in a canonical manner
-In-Reply-To: <aJZ-wCLYh_STGiTI@linux.dev>
-References: <20250806165615.1513164-1-maz@kernel.org>
-	<20250806165615.1513164-5-maz@kernel.org>
-	<20250807125531.GB2351327@e124191.cambridge.arm.com>
-	<aJZ-wCLYh_STGiTI@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1754860329;
+	bh=PTB+y1bea+X0pwle+Qsb0krCZI4wJwkr28qnyuTl7j4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HCOBV3tU+ctjdX3pY3Zg/0pvMsfqNnXGmHLBwd4NcMVjVEH7cvRnVceivTVzUTBgz
+	 iBywCPbd901UmslM78Hnuk/eTpHS6/f3sLyf9xPRghxH/2C+4EPHmKaK3TU1y8G/SD
+	 2LZGbg4pzBNtyw7wRgsvYlW0+yX8/zcykqfhKvNIWp878PjsojxBNWCh5PKt5A4KoZ
+	 LQ8F53gT97pNeIvGJtMveQduZsLP39bJ9M6pBSMzg1LErA9A75yivHXsm8MZHlMgbc
+	 tG9XSvaRQ5XBE9KczEQP5WOF5MlpsjN04vNY4GNEFA7Y6xVuMV9vlzvKe/2lUu0GBk
+	 cXiQT6eCpZTTg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD1539D0C2B;
+	Sun, 10 Aug 2025 21:12:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com, cohuck@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 00/13] stackleak: Support Clang stack depth tracking
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <175486034248.1221929.3658503475425874388.git-patchwork-notify@kernel.org>
+Date: Sun, 10 Aug 2025 21:12:22 +0000
+References: <20250717231756.make.423-kees@kernel.org>
+In-Reply-To: <20250717231756.make.423-kees@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: linux-riscv@lists.infradead.org, arnd@arndb.de, mingo@kernel.org,
+ gustavoars@kernel.org, hch@lst.de, andreyknvl@gmail.com,
+ ryabinin.a.a@gmail.com, ardb@kernel.org, masahiroy@kernel.org,
+ nathan@kernel.org, nicolas.schier@linux.dev, nick.desaulniers+lkml@gmail.com,
+ morbo@google.com, justinstitt@google.com, linux-kernel@vger.kernel.org,
+ x86@kernel.org, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-s390@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ sparclinux@vger.kernel.org, llvm@lists.linux.dev
 
-On Fri, 08 Aug 2025 23:48:32 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+Hello:
+
+This series was applied to riscv/linux.git (fixes)
+by Kees Cook <kees@kernel.org>:
+
+On Thu, 17 Jul 2025 16:25:05 -0700 you wrote:
+> v3:
+>   - split up and drop __init vs inline patches that went via arch trees
+>   - apply feedback about preferring __init to __always_inline
+>   - incorporate Ritesh Harjani's patch for __init cleanups in powerpc
+>   - wider build testing on older compilers
+>  v2: https://lore.kernel.org/lkml/20250523043251.it.550-kees@kernel.org/
+>  v1: https://lore.kernel.org/lkml/20250507180852.work.231-kees@kernel.org/
 > 
-> On Thu, Aug 07, 2025 at 01:55:31PM +0100, Joey Gouly wrote:
-> > On Wed, Aug 06, 2025 at 05:56:14PM +0100, Marc Zyngier wrote:
-> > > If we have RASv1p1 on the host, advertise it to the guest in the
-> > > "canonical way", by setting ID_AA64PFR0_EL1 to V1P1, rather than
-> > > the convoluted RAS+RAS_frac method.
-> > > 
-> > > Note that this also advertises FEAT_DoubleFault, which doesn't
-> > > affect the guest at all, as only EL3 is concerned by this.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/sys_regs.c | 12 ++++++++++++
-> > >  1 file changed, 12 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 1b4114790024e..66e5a733e9628 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -1800,6 +1800,18 @@ static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
-> > >  	if (!vcpu_has_sve(vcpu))
-> > >  		val &= ~ID_AA64PFR0_EL1_SVE_MASK;
-> > >  
-> > > +	/*
-> > > +	 * Describe RASv1p1 in a canonical way -- ID_AA64PFR1_EL1.RAS_frac
-> > > +	 * is cleared separately. Note that by advertising RASv1p1 here, we
-> > 
-> > Where is it cleared? __kvm_read_sanitised_id_reg() is where I would have
-> > expected to see it:
-> 
-> Actually, I'm a bit worried this change doesn't give us very much value
-> since Marc already does the exhaustive RASv1p1 check in the sysreg
-> emulation.
-> 
-> There's potential for breakage when migrating VMs between new/old kernels
-> on systems w/ FEAT_RASv1p1 && !FEAT_DoubleFault.
-> 
-> Marc, WDYT about dropping this patch and instead opening up RAS_frac to
-> writes?
+> [...]
 
-That's indeed probably best. But the question I can't manage to answer
-right now is how we migrate RASv1p1 between the two versions? It means
-cross-idreg dependencies, ordering and all that, and I'm a bit
-reluctant to do so.
+Here is the summary with links:
+  - [v3,01/13] stackleak: Rename STACKLEAK to KSTACK_ERASE
+    (no matching commit)
+  - [v3,02/13] stackleak: Rename stackleak_track_stack to __sanitizer_cov_stack_depth
+    (no matching commit)
+  - [v3,03/13] stackleak: Split KSTACK_ERASE_CFLAGS from GCC_PLUGINS_CFLAGS
+    (no matching commit)
+  - [v3,04/13] x86: Handle KCOV __init vs inline mismatches
+    (no matching commit)
+  - [v3,05/13] arm: Handle KCOV __init vs inline mismatches
+    (no matching commit)
+  - [v3,06/13] arm64: Handle KCOV __init vs inline mismatches
+    https://git.kernel.org/riscv/c/65c430906eff
+  - [v3,07/13] s390: Handle KCOV __init vs inline mismatches
+    https://git.kernel.org/riscv/c/c64d6be1a6f8
+  - [v3,08/13] powerpc/mm/book3s64: Move kfence and debug_pagealloc related calls to __init section
+    https://git.kernel.org/riscv/c/645d1b666498
+  - [v3,09/13] mips: Handle KCOV __init vs inline mismatch
+    https://git.kernel.org/riscv/c/d01daf9d95c9
+  - [v3,10/13] init.h: Disable sanitizer coverage for __init and __head
+    https://git.kernel.org/riscv/c/381a38ea53d2
+  - [v3,11/13] kstack_erase: Support Clang stack depth tracking
+    (no matching commit)
+  - [v3,12/13] configs/hardening: Enable CONFIG_KSTACK_ERASE
+    https://git.kernel.org/riscv/c/4c56d9f7e75e
+  - [v3,13/13] configs/hardening: Enable CONFIG_INIT_ON_FREE_DEFAULT_ON
+    https://git.kernel.org/riscv/c/437641a72d0a
 
-Thoughts?
-
-	M.
-
+You are awesome, thank you!
 -- 
-Jazz isn't dead. It just smells funny.
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
