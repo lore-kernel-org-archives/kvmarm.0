@@ -1,109 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E0F22A4DA;
-	Sun, 10 Aug 2025 21:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05571214812
+	for <kvmarm@lists.linux.dev>; Mon, 11 Aug 2025 10:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754860330; cv=none; b=uW36EKXhKW9z07HIja324++MX0a7yHazWhVColsBFwdTIbTJR/2yheTxB2yYUlV2HjT877jxU8aNTLUZM1O3cvkNKsQVdL5+RFqaiRn+yhsfgDSa2ZAlVQo+Q9+NzRrAkL31+Xyp6s3zO/nXoQwF/yWUeZOJ9ukhdh05iVyxoFA=
+	t=1754907591; cv=none; b=e0hdZ28dw8hqgD64HRign39mOQ/qg+1bOTpzK+72bplYsN95FGt9pDf9TTUyH0SrKLCwwFo62vgA61SH/eQZwz5eM8TAy6XAgKCTn91hEG/grewsy+ejEDEZlNt0j1tqHXTC0eNd9JfwrRmDmVGqNjbTWXIIW4ppYY8hw6QXtzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754860330; c=relaxed/simple;
-	bh=PTB+y1bea+X0pwle+Qsb0krCZI4wJwkr28qnyuTl7j4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hczlwUowThmGaIIQa6Vt6qpx34/PL/cHbhQOygSaAvDu48nmIPqFqH/fQ9n9EX+P9Lg6RTtBynxT4wDoLLugNrRYJiUm9pUQG0CpDHNA4z1vIkmv6ZXtNfhE22Ao9C/6kDeQV4y7/fk5j8LkrYpBexGx8B5TCG+0YwYWAl4HaLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HCOBV3tU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754907591; c=relaxed/simple;
+	bh=c89JrwDAHCN1zXHSsnRD+OtZ3Xb5quCSSl2lWosvGWc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WC8KPJC8PlHciyR09SMhHIloe12omkxCQtzkfySHfByQEdcWqbg5gjQLRj/ONQlD6ovgCz371p9BlOcB9FdOC726OOcbhrDZ8mOrR5uimIAVfM7G7/bdad8KvSj5HI1wNoBs8iPfOpmffQ1C32QBRpWPNdgAHlIGQEsTKAJy3xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ps9nEmUK; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HCOBV3tU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF676C4CEEB;
-	Sun, 10 Aug 2025 21:12:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754860329;
-	bh=PTB+y1bea+X0pwle+Qsb0krCZI4wJwkr28qnyuTl7j4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HCOBV3tU+ctjdX3pY3Zg/0pvMsfqNnXGmHLBwd4NcMVjVEH7cvRnVceivTVzUTBgz
-	 iBywCPbd901UmslM78Hnuk/eTpHS6/f3sLyf9xPRghxH/2C+4EPHmKaK3TU1y8G/SD
-	 2LZGbg4pzBNtyw7wRgsvYlW0+yX8/zcykqfhKvNIWp878PjsojxBNWCh5PKt5A4KoZ
-	 LQ8F53gT97pNeIvGJtMveQduZsLP39bJ9M6pBSMzg1LErA9A75yivHXsm8MZHlMgbc
-	 tG9XSvaRQ5XBE9KczEQP5WOF5MlpsjN04vNY4GNEFA7Y6xVuMV9vlzvKe/2lUu0GBk
-	 cXiQT6eCpZTTg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD1539D0C2B;
-	Sun, 10 Aug 2025 21:12:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ps9nEmUK"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b785aee904so2027464f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 11 Aug 2025 03:19:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754907588; x=1755512388; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YFqWTTk05Ml/MIvsxQnEF+TYVUSm4fUy0wHLdAWzEyE=;
+        b=Ps9nEmUKJAsQtcIkFbbLR3LYK/XceSK6t4pOOhNLzQMGJqCUsnN6sZ8tSnVQ6CpVo8
+         Roi2M/zbqKGFJqghmS/8uqtxD2je30aVOByQd8WIQqAdfVj3b4XgudCa6ahNrPtefjbN
+         KsLu9P9fzFNb8LnW9Vk2bAYr12/AZdaU2X8BK/mMqzbzrkA4hdRHrgi79Az7BhKniVPt
+         PFa6S5Q2rundMCeYXjci0P3tMEUtvIsaATq9SSJ4WJYraDQp4Qsu1bKxj3z09O4b+wL7
+         x01HQV3uyFK2jAgaPo1fvE5zqGgAeeTEIyRFGM0IZ8O1EcRpKU2ZTzGL1aOYiCANJcJ/
+         aoPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754907588; x=1755512388;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YFqWTTk05Ml/MIvsxQnEF+TYVUSm4fUy0wHLdAWzEyE=;
+        b=Wwod69+a4991zlsHga7CCmNOgry+0PeUCHLuY2E3hTnVIxhjGcAllu9jkB9dhkdYKP
+         uhj8MKPwNZjcR53uTmkx3oHiaVL9ENAgbH2+Mss0FmXqhpp8K6t2lvjuRwmdaliVD6iw
+         D/k+CI1qzJ6Msf+xYx4StG1B9HVkTkObzxKOYTyo0M7eGBt5pT/ZSn2of1TIwCTO4kB5
+         1Up0xbADJ5HgfV9FPk6ct+Ikj26KDV+KhMxlOh7z6F3zaESAyE5U2SoupIfiADmPuxRN
+         YswJGhNpwOK/PRvu1Sq8JhcUMoneY4heEMKFKgJgngRo4mPrRJ5ff9ALRIpMBYhA4nv2
+         86Fg==
+X-Gm-Message-State: AOJu0Yy7Im0ppsbXKYpHiBckckwQJsaGlQKbf0b1gXVMrrZj2gbbA1wU
+	jWa4xdXSFZNen30sBDUdGLPR6Jnn8RCix9bIuN67eWi/6rYJ/fckvPGQZOm7NsSXc3E5MPJDNjJ
+	RBU7z/p1bWzqsLJTWnO/zNfQI4mAgveEOF7cV3kKCeQJoqANwh9srrfCAli5vK7dZzVRvw0Jeys
+	F1/HQtmT3d3A8yDzE75klVfz8xs91K0L8=
+X-Google-Smtp-Source: AGHT+IFwgUj6ZZlPnitf5n78PJ6BTTwk8mKt9u1l8JS3PzuP9YtYupCNYGag/GowQHUizsrvpKq/MUeIcw==
+X-Received: from wmqe20.prod.google.com ([2002:a05:600c:4e54:b0:459:e13a:ffe8])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5d88:0:b0:3a6:d95e:f38c
+ with SMTP id ffacd0b85a97d-3b900b4d414mr10490118f8f.33.1754907588356; Mon, 11
+ Aug 2025 03:19:48 -0700 (PDT)
+Date: Mon, 11 Aug 2025 11:19:39 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 00/13] stackleak: Support Clang stack depth tracking
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <175486034248.1221929.3658503475425874388.git-patchwork-notify@kernel.org>
-Date: Sun, 10 Aug 2025 21:12:22 +0000
-References: <20250717231756.make.423-kees@kernel.org>
-In-Reply-To: <20250717231756.make.423-kees@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: linux-riscv@lists.infradead.org, arnd@arndb.de, mingo@kernel.org,
- gustavoars@kernel.org, hch@lst.de, andreyknvl@gmail.com,
- ryabinin.a.a@gmail.com, ardb@kernel.org, masahiroy@kernel.org,
- nathan@kernel.org, nicolas.schier@linux.dev, nick.desaulniers+lkml@gmail.com,
- morbo@google.com, justinstitt@google.com, linux-kernel@vger.kernel.org,
- x86@kernel.org, kasan-dev@googlegroups.com, linux-doc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-s390@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org,
- sparclinux@vger.kernel.org, llvm@lists.linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.1.703.g449372360f-goog
+Message-ID: <20250811101947.3637632-1-tabba@google.com>
+Subject: [PATCH v2 0/8] KVM: arm64: Reserve pKVM VM handle during initial VM setup
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
+	mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, 
+	vdonnefort@google.com, qperret@google.com, sebastianene@google.com, 
+	keirf@google.com, smostafa@google.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Changes since v1 [1]:
+- Collect reviews.
+- Add more details to cover letter.
+- Rebase on Linux 6.17-rc1.
 
-This series was applied to riscv/linux.git (fixes)
-by Kees Cook <kees@kernel.org>:
+All VMs in pKVM identified by their handle, a unique per-VM ID. This
+handle is shared between the host kernel and the hypvervisor, and used
+to track the VM across both.
 
-On Thu, 17 Jul 2025 16:25:05 -0700 you wrote:
-> v3:
->   - split up and drop __init vs inline patches that went via arch trees
->   - apply feedback about preferring __init to __always_inline
->   - incorporate Ritesh Harjani's patch for __init cleanups in powerpc
->   - wider build testing on older compilers
->  v2: https://lore.kernel.org/lkml/20250523043251.it.550-kees@kernel.org/
->  v1: https://lore.kernel.org/lkml/20250507180852.work.231-kees@kernel.org/
-> 
-> [...]
+In pKVM, this handle is allocated when the VM is initialized at the
+hypervisor, which is on the first vCPU run. However, the host starts
+initializing the VM and setting up its data structures earlier. MMU
+notifiers for the VMs are also registered before VM initialization at
+the hypervisor, and rely on the handle to identify the VM [2].
+Therefore, there is a potential gap between when the VM is (partially)
+setup at the host, but still without a valid pKVM handle to identify it
+when communicating with the hypervisor.
 
-Here is the summary with links:
-  - [v3,01/13] stackleak: Rename STACKLEAK to KSTACK_ERASE
-    (no matching commit)
-  - [v3,02/13] stackleak: Rename stackleak_track_stack to __sanitizer_cov_stack_depth
-    (no matching commit)
-  - [v3,03/13] stackleak: Split KSTACK_ERASE_CFLAGS from GCC_PLUGINS_CFLAGS
-    (no matching commit)
-  - [v3,04/13] x86: Handle KCOV __init vs inline mismatches
-    (no matching commit)
-  - [v3,05/13] arm: Handle KCOV __init vs inline mismatches
-    (no matching commit)
-  - [v3,06/13] arm64: Handle KCOV __init vs inline mismatches
-    https://git.kernel.org/riscv/c/65c430906eff
-  - [v3,07/13] s390: Handle KCOV __init vs inline mismatches
-    https://git.kernel.org/riscv/c/c64d6be1a6f8
-  - [v3,08/13] powerpc/mm/book3s64: Move kfence and debug_pagealloc related calls to __init section
-    https://git.kernel.org/riscv/c/645d1b666498
-  - [v3,09/13] mips: Handle KCOV __init vs inline mismatch
-    https://git.kernel.org/riscv/c/d01daf9d95c9
-  - [v3,10/13] init.h: Disable sanitizer coverage for __init and __head
-    https://git.kernel.org/riscv/c/381a38ea53d2
-  - [v3,11/13] kstack_erase: Support Clang stack depth tracking
-    (no matching commit)
-  - [v3,12/13] configs/hardening: Enable CONFIG_KSTACK_ERASE
-    https://git.kernel.org/riscv/c/4c56d9f7e75e
-  - [v3,13/13] configs/hardening: Enable CONFIG_INIT_ON_FREE_DEFAULT_ON
-    https://git.kernel.org/riscv/c/437641a72d0a
+Additionally, in the future, the host needs to communicate with
+TrustZone about the before the VM first run. Therefore, move handle
+creation to when the VM is first initialized at the host.
 
-You are awesome, thank you!
+This patch series also takes the oportunity to do some refactoring
+(mostly renaming and fixing documentation) of the code. We are in the
+process of upstreaming pKVM. Refactoring this code now would generate
+less churn than postponing it, as the upstreamed codebase grows.
+Moreover, the exsiting names and documentation are at best misleading
+(and in cases actually wrong), which could lead to more confusion and
+problems reviewing code in the future.
+
+This patch series is divided into two parts:
+
+- Patches 1-4: Renaming, refactoring, and tidying up to lay the
+  groundwork for moving handle initialization and to fix existing
+  issues.
+- Patches 5-8: Decouple handle creation from VM initialization at the
+  hypervisor and move the handle creation to VM initialization at the
+  host.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20250729120014.2799359-1-tabba@google.com/
+[2] https://lore.kernel.org/all/20250303214947.GA30619@willie-the-truck/
+
+Fuad Tabba (8):
+  KVM: arm64: Rename pkvm.enabled to pkvm.is_protected
+  KVM: arm64: Rename 'host_kvm' to 'kvm' in pKVM host code
+  KVM: arm64: Clarify comments to distinguish pKVM mode from protected
+    VMs
+  KVM: arm64: Decouple hyp VM creation state from its handle
+  KVM: arm64: Separate allocation and insertion of pKVM VM table entries
+  KVM: arm64: Consolidate pKVM hypervisor VM initialization logic
+  KVM: arm64: Introduce separate hypercalls for pKVM VM reservation and
+    initialization
+  KVM: arm64: Reserve pKVM handle during pkvm_init_host_vm()
+
+ arch/arm64/include/asm/kvm_asm.h       |   2 +
+ arch/arm64/include/asm/kvm_host.h      |   5 +-
+ arch/arm64/include/asm/kvm_pkvm.h      |   1 +
+ arch/arm64/kvm/arm.c                   |  12 +-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   4 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  14 ++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 177 +++++++++++++++++++------
+ arch/arm64/kvm/pkvm.c                  |  76 +++++++----
+ 8 files changed, 217 insertions(+), 74 deletions(-)
+
+
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.50.1.703.g449372360f-goog
 
