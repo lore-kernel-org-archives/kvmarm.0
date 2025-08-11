@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A6029BD96
-	for <kvmarm@lists.linux.dev>; Mon, 11 Aug 2025 16:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0508B29BDAF
+	for <kvmarm@lists.linux.dev>; Mon, 11 Aug 2025 16:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754930207; cv=none; b=sWNyls6n61qClnufZYShT7zXBlGCsCsC60CgGHxBqOA5/BD+XxSU8CNJ2HY2NzGxXOHJ+3bJixwRTaQio0DoGxW98G7B0IrCgP5gL7i8efzxIkaMrGdSUuGuQLQR+fhqSApciwr00B7UhJxLn821YP2dWWd6VpkCYLc3St+Lb/g=
+	t=1754930210; cv=none; b=LfLT2OE69PcfQpywyHPUIiNBwY6t8WbyalmHMjnXrTgQFOI42sr+eczaMrhunWkojfgFRB4OtLCAp1YLOJE2JlmKrcp1bMhsQkT16/Ae8lZXsCMAMAyUBTX2en+5ABrx2cmCLJdH6IE6VJfEHZuGmA+Jji2ZVkF1iBUweGC+itM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754930207; c=relaxed/simple;
-	bh=c/AlTkiLUhEVwzILpmNJrARDzCbA4lU0/yhG+Mjco4o=;
+	s=arc-20240116; t=1754930210; c=relaxed/simple;
+	bh=m5hJ5wCLuUXn1rIayTKhn+IlkMV3RyCtKcHb43Xii2o=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eZpo8PLNxt44MvEgEdcNlRGELoKpztO39vHf/iOzChojucCmFcIYWdkzQbOjiMkSYmR2crKOSzBujWnmNDg3ZbAtFiRgpgf4uEDQpAglxG07caSzWlZ4tRsmsARQJMzznqiJjaHv2CEqZxYCVKWcxhqGAAZjaqhRGpm7e9dfJR0=
+	 MIME-Version; b=ISNZ+UyeCQRs/5QvDMkor3MKRWa5oYlAppdvFh2vpDS88Jz/eee5lnWKrYAvvlajP7erOzCoS/SaBExspxzQYykHUuL5Z/uY7qW0eKLVvHn3gCo6UiH2fR5piedVbq+bv+p9M+l9dcd6yRHkHkqFN4euMsN1FQs4b8zGlEzEj1M=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA6FE2696;
-	Mon, 11 Aug 2025 09:36:37 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 751FC26A4;
+	Mon, 11 Aug 2025 09:36:40 -0700 (PDT)
 Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 72DEB3F738;
-	Mon, 11 Aug 2025 09:36:43 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2CFC13F738;
+	Mon, 11 Aug 2025 09:36:46 -0700 (PDT)
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -36,9 +36,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v6 2/5] KVM: arm64: expose FEAT_LSUI to guest
-Date: Mon, 11 Aug 2025 17:36:32 +0100
-Message-Id: <20250811163635.1562145-3-yeoreum.yun@arm.com>
+Subject: [PATCH v6 3/5] arm64: Kconfig: add LSUI Kconfig
+Date: Mon, 11 Aug 2025 17:36:33 +0100
+Message-Id: <20250811163635.1562145-4-yeoreum.yun@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250811163635.1562145-1-yeoreum.yun@arm.com>
 References: <20250811163635.1562145-1-yeoreum.yun@arm.com>
@@ -50,37 +50,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-expose FEAT_LSUI to guest.
+Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+previleged level to access to access user memory without clearing
+PSTATE.PAN bit.
+It's enough to add CONFIG_AS_HAS_LSUI only because the code for LSUI uses
+individual `.arch_extension` entries.
 
 Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-Acked-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/arm64/Kconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 82ffb3b3b3cf..fb6c154aa37d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1642,7 +1642,8 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
- 		break;
- 	case SYS_ID_AA64ISAR3_EL1:
--		val &= ID_AA64ISAR3_EL1_FPRCVT | ID_AA64ISAR3_EL1_FAMINMAX;
-+		val &= ID_AA64ISAR3_EL1_FPRCVT | ID_AA64ISAR3_EL1_FAMINMAX |
-+		       ID_AA64ISAR3_EL1_LSUI;
- 		break;
- 	case SYS_ID_AA64MMFR2_EL1:
- 		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
-@@ -2991,7 +2992,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 					ID_AA64ISAR2_EL1_APA3 |
- 					ID_AA64ISAR2_EL1_GPA3)),
- 	ID_WRITABLE(ID_AA64ISAR3_EL1, (ID_AA64ISAR3_EL1_FPRCVT |
--				       ID_AA64ISAR3_EL1_FAMINMAX)),
-+				       ID_AA64ISAR3_EL1_FAMINMAX | ID_AA64ISAR3_EL1_LSUI)),
- 	ID_UNALLOCATED(6,4),
- 	ID_UNALLOCATED(6,5),
- 	ID_UNALLOCATED(6,6),
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index e9bbfacc35a6..c474de3dce02 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -2239,6 +2239,11 @@ config ARM64_GCS
+ 
+ endmenu # "v9.4 architectural features"
+ 
++config AS_HAS_LSUI
++	def_bool $(as-instr,.arch_extension lsui)
++	help
++	 Supported by LLVM 20 and later, not yet supported by GNU AS.
++
+ config ARM64_SVE
+ 	bool "ARM Scalable Vector Extension support"
+ 	default y
 -- 
 LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
