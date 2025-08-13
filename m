@@ -1,64 +1,66 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6879B288C1F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F002877E3
 	for <kvmarm@lists.linux.dev>; Wed, 13 Aug 2025 16:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755103512; cv=none; b=mAJ0nlGMIg5XOxrmwQzu5DkqVKtkXXGdpNM+HL7TCmO47zGXtZP5/6JfvSN2CiTIGox8FHSsJHg4E1NK1iloGuAth3VrV7qnQ3lFqz2vJjWkXe3Yvk9bpp8lKr0bUeGZ1J9lXvVAmNi5tqs91KltF6Z5s2mwmkw+NYw/C/ZNVKw=
+	t=1755103513; cv=none; b=gIxR1dnj3A3MEyiSm8mHmFHDQ8CRGxr4yUWZas2YxgnujWfF5F4S1VnOqlcmTAByDZgm3GPhjOEvyvUUK1ZlcVU43kHt6LgdgG1OyekdJgcPTaVjzXxRDTWJObhEBrXiwtpfgibVttSYzEQINIglET3kFWzc1LFtMfD9UoKdq1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755103512; c=relaxed/simple;
-	bh=EjiuLxZT56+7VxVscZG/+Ytzfkhf1KNKoogTvoqEnnA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=U9Xdv9VTyqEftPLpbug3iIVYWTOfSGX6sG7rWZahm/0HUs/jdaD/MWRba0b5V66191DsFmgddCdL3sKRbfRhjk5RsH2aAlM/wfeXrN0EpUzB02Qd+3I2b4EnSoE54uH+Pnef4onxkDYkTtczRb9/TrL2WaBtPSs/GTDHtrgtuec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lsg0LcqR; arc=none smtp.client-ip=209.85.208.74
+	s=arc-20240116; t=1755103513; c=relaxed/simple;
+	bh=BJjEEIEz6V5k1KBNKtZFM+YUZ2EkLFZKDvXlXMmgGb0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MurI+ywdQMa4ZtOpAmOqM2Qv92JOXE2cPTDWtK8SlRCqDjyEcIac6z9uR3TWEpeNYFc7I/H0pcdVmJ+rPI+7o4w0WNjdSG4vOfw2lChLJOkvfQ3GZfnx7XjppVnm8BSdXHnvHLNDlr26HZWypLwBezdrXkjRT27GjXgAPUNafmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ce7SeIAP; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lsg0LcqR"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-6181f6936d6so3107846a12.3
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ce7SeIAP"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b9d41c245fso23972f8f.0
         for <kvmarm@lists.linux.dev>; Wed, 13 Aug 2025 09:45:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20230601; t=1755103509; x=1755708309; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=i58vDD8ciCG4tqEiOdS2g0gU9MJ6vUoA6yHuonpgaXs=;
-        b=lsg0LcqR72x9hs3STe76JW/x+QU1PwokhZKB2vztGWWF4LUaGxKGAjM5nzRz5xTxE5
-         pOXGJWFAJYZhTmJhFBRMP8s6Ic7HMVMm6IbDtkx2ae6uMZj3GMbS4et0v985wlj9pzyi
-         lEy0dBJU6ESjmh350hWGuHEI6XtWCvpwAStoyW5Ozw92ldayaz/VV2Au6Cbxj+HszeB0
-         8g/eyB8CUchtniPIHDaXt1rL97s0QcRs7NHmlVhPYb7VBInnqhZDqDRV9NqoTO6sCUC+
-         yTPvFOCnhwwIk9w3Rpf/zt8Bh1rBpAu85hY2LnqQaZyFrGoaLAU9sLJvifLCI9rKX1gg
-         lfGQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GBQsfHg/ZyhTgkDWvIhH6lJQIV/CSzF6SBf+6h9QT90=;
+        b=Ce7SeIAPRt0APauCGY7nAWxHrbW4Yt1+Xiin+k4jd3rB1m51X4eY2hYTELD+jCeq7q
+         T7qGJsGl20p0l1q3ppNnfvtR1gAlc0dm4wBxd8tcPPtR71gAzOs59Xc8yyto64Q0LfEY
+         ozIRqpuweaD0R6cIt51+TQe6G1gYp0wJ1CjFQcVU8wxerp3M/Ytj5woWa+Lo05OeAa9z
+         RtGNbpphlX9csmdfOf0yPafNKRlkS3IiFswANJtjXMyu+0PEWpsU4gzxKlF3hXFIaiBW
+         0duT2Wp3OZvYg9OTN7v8q4eCUpOX7GRDIx6eggImQNDT9Wc3LQA3f3ElcZqbIL2jBSf0
+         SR8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1755103509; x=1755708309;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=i58vDD8ciCG4tqEiOdS2g0gU9MJ6vUoA6yHuonpgaXs=;
-        b=j5VMMuuygFI8gOptf/x/VayNj9xReAnQbRRtYD1ptBCOrm+rbtN1qKl/q/l3RBk7Ia
-         6xFnjxilUDcnfwuxFuAyiHJj8fbL7zB4RBdhuDkwKel1nVCQUYi82yK/bi7OBVYru4oK
-         2l7x+i2LInIyMMtF3CXBkBwaA1xDJXSOg2Wl5e5iMvXRVI7ubhywlI3kyqxCyDUA+Jr8
-         VdKUh1HX5kt59mE7lKTWbNPy5u4cIZ+4cqMSqK7ko7QrEOSlg57kAT/OvJ0RLVF4lP9W
-         F8wpRBuNnjDGOsZRl8Mzi0/RSnCLv1RqiMiLd9V2iHkD344CAu0VlY8gMNIJhpVeBUGd
-         ksQw==
-X-Gm-Message-State: AOJu0YwqeuoUH9vN4vqBjDJF+cPMk4YRy33gbTIvy4nSWW/SYUxGd2og
-	3e3cdmEqnIpURi9KXOQGYbP9iYhUYOTqpVKr4ni7BeIokuyk6bQOGDmztI6fn3SsM+daNktrpqN
-	jhyqdmvirfomH5rcYU0kOvUTwiw0WA3C5t567nqS6uT3QjXGQ/sbEni6vwbaFdB3PAwt6Nq+SzW
-	XRlSCd+eDZ+SZpxYGKaq8xb+UKpiLqzW8=
-X-Google-Smtp-Source: AGHT+IF0drcCjeBdG/uPQgP82HDkur1vntaYSIKvrMuZrEM2KABBBPD2dmHvJX65Xz6iE3/3L6JbiBwVPQ==
-X-Received: from edj1.prod.google.com ([2002:a05:6402:3241:b0:617:b625:f131])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a50:a6d3:0:b0:615:a847:c179
- with SMTP id 4fb4d7f45d1cf-6186bfc2c65mr2002154a12.18.1755103507594; Wed, 13
- Aug 2025 09:45:07 -0700 (PDT)
-Date: Wed, 13 Aug 2025 17:45:04 +0100
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GBQsfHg/ZyhTgkDWvIhH6lJQIV/CSzF6SBf+6h9QT90=;
+        b=R+g49qvuxjqF5EonhkN4c3WCyd9Mqxtt+is2L88JGjDX8g8QIgbs3CPXYsfHmu0mkv
+         LBaCQZH7Dhfe/Z3qMLnGmMYvhZUKL/4OvH6FA7OVve9D6GzaRIQ6Qgzxcyvf/lEmNmXL
+         5/UL65b10t4SoZF8NFqhlxEAB9LGjiPdY+qbOIZWQltehdHT/3/mSaP+6+UcVx+JuvXz
+         DzEyD/Ce4OuTQmLgXRl9j0v/Yq87x4darOP50lYKuFAvywzwtmwDa4MYH5wPe4QV+qQf
+         NM0fhbDS53c4vXT991j4tMGqrbh5cGdnoTKwokvUTXYNc+oSYP7C7DtuduTddAiUvsKd
+         8Jmg==
+X-Gm-Message-State: AOJu0Yy3/pbOo6xkfBviyxo1+5LAfrLGrDBNsbTau0Yf2fuyT3aX3RiH
+	QHFdLrCKG+1WWz9SuDwkom8jMDkeAwVv3YpC8dNjyDa9FhDlC8qlcKgS80OVJxiY5DzDyvm4PZO
+	Ubs2cscYz1mr480HjiZOWiR/k3C112GoBhVkp3RQtmoXjXSidOdPan4LvCz92JmSjNuaMbwVzQ/
+	SMN+8FmaBsFn221xB/HkAXi2fgzRcGjZs=
+X-Google-Smtp-Source: AGHT+IE2tdJBgqq+pKrYLNZS8C9leJxwEsJViWMuTQXg/qqAAeOo3ObjGJvwtxU1QDM6fT8EA1U6GYZxrw==
+X-Received: from wre18.prod.google.com ([2002:a05:6000:4b12:b0:3b9:95c:a591])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1789:b0:3b7:994b:8438
+ with SMTP id ffacd0b85a97d-3b9edf4433amr12720f8f.46.1755103508884; Wed, 13
+ Aug 2025 09:45:08 -0700 (PDT)
+Date: Wed, 13 Aug 2025 17:45:05 +0100
+In-Reply-To: <20250813164506.1203851-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250813164506.1203851-1-tabba@google.com>
 X-Mailer: git-send-email 2.51.0.rc0.215.g125493bb4a-goog
-Message-ID: <20250813164506.1203851-1-tabba@google.com>
-Subject: [PATCH v2 0/2] arm64: sysreg: Fix sysreg field definitions and
- generation script
+Message-ID: <20250813164506.1203851-2-tabba@google.com>
+Subject: [PATCH v2 1/2] arm64: sysreg: Fix and tidyup sysreg field definitions
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -68,43 +70,86 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The sysreg file has an erroronous value in the Security Enum, where
-NSACR_RFR is set to 0b0001 instead of the spec value of 0b0010.
-Moreover, the file has some redundant definitions, e.g., RCWSMASK_EL1.
-While these redundant definitions are not wrong per se, they add
-unnecessary code into the header file and could be a source of future
-bugs.
+Fix the value of ID_PFR1_EL1.Security NSACR_RFR to be 0b0010, as per
+DDI0601/2025-06, which wasn't correctly set when introduced in commit
+1224308075f1 ("arm64/sysreg: Convert ID_PFR1_EL1 to automatic generation").
 
-Fix the Enum value, remove the redundant Sysreg definitions, and while
-at it, tidy up the sysreg file a bit.
+While at it, remove redundant definitions of CPACR_EL12 and
+RCWSMASK_EL1, fix typos, and convert the only instance of spacing with
+spaces to tabs (in SPMZR_EL0).
 
-To reduce the chance of this happening in the future, add validation to
-the sysreg header generation script. I didn't want to go overboard with
-validation, so I only added validation that would catch the errors that
-I've seen, which also are errors that wouldn't generate a build error
-later on.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+Note that NSACR_RFR isn't used in the kernel as far as I could tell, so
+I didn't add a 'Fixes' tag.
+---
+ arch/arm64/tools/sysreg | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
-Changes since v1 [1]:
-- Remove redundant definition of CPACR_EL12
-- New patch that adds validation to the sysreg header generation script
-- Rebase on 6.17-rc1
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20250808123744.2087648-1-tabba@google.com/
-
-Fuad Tabba (2):
-  arm64: sysreg: Fix and tidyup sysreg field definitions
-  arm64: sysreg: Add validation checks to sysreg header generation
-    script
-
- arch/arm64/tools/gen-sysreg.awk | 20 ++++++++++++++++++++
- arch/arm64/tools/sysreg         | 18 +++++-------------
- 2 files changed, 25 insertions(+), 13 deletions(-)
-
-
-base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 696ab1f32a67..975dcfacbfe6 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -31,7 +31,7 @@
+ # Mapping	<name_EL1>
+ # EndSysreg
+ 
+-# Where multiple system regsiters are not VHE aliases but share a
++# Where multiple system registers are not VHE aliases but share a
+ # common layout, a SysregFields block can be used to describe the
+ # shared layout:
+ 
+@@ -54,7 +54,7 @@
+ #
+ # In general it is recommended that new enumeration items be named for the
+ # feature that introduces them (eg, FEAT_LS64_ACCDATA introduces enumeration
+-# item ACCDATA) though it may be more taseful to do something else.
++# item ACCDATA) though it may be more tasteful to do something else.
+ 
+ Sysreg	OSDTRRX_EL1	2	0	0	0	2
+ Res0	63:32
+@@ -377,8 +377,8 @@ Sysreg	SPMOVSCLR_EL0	2	3	9	12	3
+ Field	63:0	P
+ EndSysreg
+ 
+-Sysreg	SPMZR_EL0       2	3	9	12	4
+-Field   63:0      P
++Sysreg	SPMZR_EL0	2	3	9	12	4
++Field   63:0	P
+ EndSysreg
+ 
+ Sysreg	SPMSELR_EL0	2	3	9	12	5
+@@ -474,7 +474,7 @@ EndEnum
+ Enum	7:4	Security
+ 	0b0000	NI
+ 	0b0001	EL3
+-	0b0001	NSACR_RFR
++	0b0010	NSACR_RFR
+ EndEnum
+ UnsignedEnum	3:0	ProgMod
+ 	0b0000	NI
+@@ -2528,10 +2528,6 @@ Field	17:16	ZEN
+ Res0	15:0
+ EndSysreg
+ 
+-Sysreg	CPACR_EL12      3	5	1	0	2
+-Mapping	CPACR_EL1
+-EndSysreg
+-
+ Sysreg	CPACRALIAS_EL1  3	0	1	4	4
+ Mapping	CPACR_EL1
+ EndSysreg
+@@ -2576,10 +2572,6 @@ Sysreg	PFAR_EL12	3	5	6	0	5
+ Mapping	PFAR_EL1
+ EndSysreg
+ 
+-Sysreg	RCWSMASK_EL1	3	0	13	0	3
+-Field	63:0	RCWSMASK
+-EndSysreg
+-
+ Sysreg	SCTLR2_EL1      3	0	1	0	3
+ Res0    63:13
+ Field   12      CPTM0
 -- 
 2.51.0.rc0.215.g125493bb4a-goog
 
