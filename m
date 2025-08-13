@@ -1,55 +1,55 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F002877E3
-	for <kvmarm@lists.linux.dev>; Wed, 13 Aug 2025 16:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8C7288CB7
+	for <kvmarm@lists.linux.dev>; Wed, 13 Aug 2025 16:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755103513; cv=none; b=gIxR1dnj3A3MEyiSm8mHmFHDQ8CRGxr4yUWZas2YxgnujWfF5F4S1VnOqlcmTAByDZgm3GPhjOEvyvUUK1ZlcVU43kHt6LgdgG1OyekdJgcPTaVjzXxRDTWJObhEBrXiwtpfgibVttSYzEQINIglET3kFWzc1LFtMfD9UoKdq1I=
+	t=1755103513; cv=none; b=kxecVIr2hcSn46SIHjwwrsbNUS7lXQEZWMZrFKhOqomiuCF5CK51guTker2/RwDr+X30G8XG4/c9fKzEFa9KqKMqUeYoVQj5Sbta8P8mWvYIw7tyNpf8rCpt2FneBJsZt8ySSYwqcULOqwtHXL/mtUvYb1SdWAeD/A3CjDX9bAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755103513; c=relaxed/simple;
-	bh=BJjEEIEz6V5k1KBNKtZFM+YUZ2EkLFZKDvXlXMmgGb0=;
+	bh=INFQkvd7Z9WsIBct3De5UH7q4C3opQyrd0zFYOSH2Xc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MurI+ywdQMa4ZtOpAmOqM2Qv92JOXE2cPTDWtK8SlRCqDjyEcIac6z9uR3TWEpeNYFc7I/H0pcdVmJ+rPI+7o4w0WNjdSG4vOfw2lChLJOkvfQ3GZfnx7XjppVnm8BSdXHnvHLNDlr26HZWypLwBezdrXkjRT27GjXgAPUNafmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ce7SeIAP; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=RM+5myenCwmJewOckFXCTOSBPktizXCMIHG5CETXqj1wJ7pW4Rfe3bmvuVThAoOeKtxs7lPK19DE/4Y0EOrsmsVXgbHWdrFFlSwYAHqqKlvbuz5sfcxtz2NQxdmsu0hwGYbPdds/H0RLwMeD/HvIlcBSCzc54gruMSyCxIl1ZXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qm7iluWe; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ce7SeIAP"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b9d41c245fso23972f8f.0
-        for <kvmarm@lists.linux.dev>; Wed, 13 Aug 2025 09:45:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qm7iluWe"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-459dfbece11so35313795e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 13 Aug 2025 09:45:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755103509; x=1755708309; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1755103510; x=1755708310; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GBQsfHg/ZyhTgkDWvIhH6lJQIV/CSzF6SBf+6h9QT90=;
-        b=Ce7SeIAPRt0APauCGY7nAWxHrbW4Yt1+Xiin+k4jd3rB1m51X4eY2hYTELD+jCeq7q
-         T7qGJsGl20p0l1q3ppNnfvtR1gAlc0dm4wBxd8tcPPtR71gAzOs59Xc8yyto64Q0LfEY
-         ozIRqpuweaD0R6cIt51+TQe6G1gYp0wJ1CjFQcVU8wxerp3M/Ytj5woWa+Lo05OeAa9z
-         RtGNbpphlX9csmdfOf0yPafNKRlkS3IiFswANJtjXMyu+0PEWpsU4gzxKlF3hXFIaiBW
-         0duT2Wp3OZvYg9OTN7v8q4eCUpOX7GRDIx6eggImQNDT9Wc3LQA3f3ElcZqbIL2jBSf0
-         SR8w==
+        bh=2sp3aPSAtyo6I6rR6nNXHOeKvBEwtpMGHhEmiY/HzQI=;
+        b=Qm7iluWeC9zDDaYpBC0dY0i5bRWwcRcfTk3IivQ4f5h78xBZnTcQ8VcxGvZZgasaei
+         pRggivWGD9svN5RiIMfcsgcCY0BuPjqmtahq2nZvHr4i9ncxoqPkcUIDkbWmzrOKgQ5Q
+         rhuCza7vW4lAEiL2C/9lFH/f+Uu9o+ntf2Y/IxXBv028lI1Q68CmtS9ypczTCSQJmbKx
+         lqPiXaNauKKS3+KEcb4JyOZfiewRSIdvRCqeb0HwrFG8dakEyLpsguvY3hD6Xp6Sb6FG
+         g0DhuBnsHGOngnW3lxHtkZozuLXW+LU6oSErXoiPMYtFLnk5t/Ypx+Fw9COidXdx9Cbv
+         YBSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755103509; x=1755708309;
+        d=1e100.net; s=20230601; t=1755103510; x=1755708310;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GBQsfHg/ZyhTgkDWvIhH6lJQIV/CSzF6SBf+6h9QT90=;
-        b=R+g49qvuxjqF5EonhkN4c3WCyd9Mqxtt+is2L88JGjDX8g8QIgbs3CPXYsfHmu0mkv
-         LBaCQZH7Dhfe/Z3qMLnGmMYvhZUKL/4OvH6FA7OVve9D6GzaRIQ6Qgzxcyvf/lEmNmXL
-         5/UL65b10t4SoZF8NFqhlxEAB9LGjiPdY+qbOIZWQltehdHT/3/mSaP+6+UcVx+JuvXz
-         DzEyD/Ce4OuTQmLgXRl9j0v/Yq87x4darOP50lYKuFAvywzwtmwDa4MYH5wPe4QV+qQf
-         NM0fhbDS53c4vXT991j4tMGqrbh5cGdnoTKwokvUTXYNc+oSYP7C7DtuduTddAiUvsKd
-         8Jmg==
-X-Gm-Message-State: AOJu0Yy3/pbOo6xkfBviyxo1+5LAfrLGrDBNsbTau0Yf2fuyT3aX3RiH
-	QHFdLrCKG+1WWz9SuDwkom8jMDkeAwVv3YpC8dNjyDa9FhDlC8qlcKgS80OVJxiY5DzDyvm4PZO
-	Ubs2cscYz1mr480HjiZOWiR/k3C112GoBhVkp3RQtmoXjXSidOdPan4LvCz92JmSjNuaMbwVzQ/
-	SMN+8FmaBsFn221xB/HkAXi2fgzRcGjZs=
-X-Google-Smtp-Source: AGHT+IE2tdJBgqq+pKrYLNZS8C9leJxwEsJViWMuTQXg/qqAAeOo3ObjGJvwtxU1QDM6fT8EA1U6GYZxrw==
-X-Received: from wre18.prod.google.com ([2002:a05:6000:4b12:b0:3b9:95c:a591])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1789:b0:3b7:994b:8438
- with SMTP id ffacd0b85a97d-3b9edf4433amr12720f8f.46.1755103508884; Wed, 13
- Aug 2025 09:45:08 -0700 (PDT)
-Date: Wed, 13 Aug 2025 17:45:05 +0100
+        bh=2sp3aPSAtyo6I6rR6nNXHOeKvBEwtpMGHhEmiY/HzQI=;
+        b=EkxGHLZa9LXz0ZDPtvzxBmmdGw5dUlr23rCt7hWhOkNmtenSV9jROb8VM97WKvhLKQ
+         kiXs9VsacZeegQKwAtmCgwYipzcHFOgtUDGlScrEI/2X8SZO5CbJFqQgsmhC1OjZ2Mrm
+         5fZwlnuacWh806v4DsyQB1Tidpx2/Doh6EqA1D6a7GBkKcp5clvtKU0/Jjtp9BlDh7yG
+         5XOqxwtroB9epZo5ZuGZFVBhbWoWrjryRgniyClHduP402x0HoIcpq1chqeVLuvRY3aH
+         5VWmSVD6vh0yvw+4wC3o8Yl56QMOcNEPy/HujXyJ0D3nuTheeKCnm3XvT7TA3hRxl+98
+         79qw==
+X-Gm-Message-State: AOJu0Yzsn6x2vJavfd6ZT3qXbCf5QKbO4zdDi2sF2+lBxPpszt/JejVj
+	QJp2wINE3B0Pc1SwTOaKUNYWS3GMxtTiOiZ+iOSEISduCATZMynNkuq1ZyOaWrMUBG/qkNEz8Bt
+	4JGe21sblrxut13ketMA30yB1BMUAYX/bJSnt3ebI7ZiAeZNTWGM1x6hXZuN+RHVDzdEj068/da
+	3bpuTJmCV7pePM0UuBxdGPIEXRffGve3I=
+X-Google-Smtp-Source: AGHT+IHSkTxAvev72EiizIpa601N7yiEbIYtlzv/L++w8V6rBQLkl95wQlGjod9UkIaNfBEXvNzWjE/1PQ==
+X-Received: from wmby11-n2.prod.google.com ([2002:a05:600c:c04b:20b0:458:6799:d779])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3b23:b0:456:eab:6344
+ with SMTP id 5b1f17b1804b1-45a165c4f74mr36679425e9.15.1755103509761; Wed, 13
+ Aug 2025 09:45:09 -0700 (PDT)
+Date: Wed, 13 Aug 2025 17:45:06 +0100
 In-Reply-To: <20250813164506.1203851-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250813164506.1203851-1-tabba@google.com>
 X-Mailer: git-send-email 2.51.0.rc0.215.g125493bb4a-goog
-Message-ID: <20250813164506.1203851-2-tabba@google.com>
-Subject: [PATCH v2 1/2] arm64: sysreg: Fix and tidyup sysreg field definitions
+Message-ID: <20250813164506.1203851-3-tabba@google.com>
+Subject: [PATCH v2 2/2] arm64: sysreg: Add validation checks to sysreg header
+ generation script
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -70,86 +71,98 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Fix the value of ID_PFR1_EL1.Security NSACR_RFR to be 0b0010, as per
-DDI0601/2025-06, which wasn't correctly set when introduced in commit
-1224308075f1 ("arm64/sysreg: Convert ID_PFR1_EL1 to automatic generation").
+The gen_sysreg.awk script processes the system register specification in
+the sysreg text file to generate C macro definitions. The current script
+will silently accept certain errors in the specification file, leading
+to incorrect header generation.
 
-While at it, remove redundant definitions of CPACR_EL12 and
-RCWSMASK_EL1, fix typos, and convert the only instance of spacing with
-spaces to tabs (in SPMZR_EL0).
+For example, a Sysreg or SysregFields can be accidentally duplicated,
+causing its macros to be emitted twice. Or an Enum can contain duplicate
+values for different items, which is architecturally incorrect.
+
+Add checks to catch these errors at build time. The script now tracks
+all seen Sysreg and SysregFields definitions and checks for duplicates.
+It also tracks values within each Enum block to ensure entries are
+unique.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
-Note that NSACR_RFR isn't used in the kernel as far as I could tell, so
-I didn't add a 'Fixes' tag.
----
- arch/arm64/tools/sysreg | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+ arch/arm64/tools/gen-sysreg.awk | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 696ab1f32a67..975dcfacbfe6 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -31,7 +31,7 @@
- # Mapping	<name_EL1>
- # EndSysreg
+diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
+index f2a1732cb1f6..bbbb812603e8 100755
+--- a/arch/arm64/tools/gen-sysreg.awk
++++ b/arch/arm64/tools/gen-sysreg.awk
+@@ -122,6 +122,10 @@ $1 == "SysregFields" && block_current() == "Root" {
+ 	res1 = "UL(0)"
+ 	unkn = "UL(0)"
  
--# Where multiple system regsiters are not VHE aliases but share a
-+# Where multiple system registers are not VHE aliases but share a
- # common layout, a SysregFields block can be used to describe the
- # shared layout:
++	if (reg in defined_fields)
++		fatal("Duplicate SysregFields definition for " reg)
++	defined_fields[reg] = 1
++
+ 	next_bit = 63
  
-@@ -54,7 +54,7 @@
- #
- # In general it is recommended that new enumeration items be named for the
- # feature that introduces them (eg, FEAT_LS64_ACCDATA introduces enumeration
--# item ACCDATA) though it may be more taseful to do something else.
-+# item ACCDATA) though it may be more tasteful to do something else.
+ 	next
+@@ -162,6 +166,10 @@ $1 == "Sysreg" && block_current() == "Root" {
+ 	res1 = "UL(0)"
+ 	unkn = "UL(0)"
  
- Sysreg	OSDTRRX_EL1	2	0	0	0	2
- Res0	63:32
-@@ -377,8 +377,8 @@ Sysreg	SPMOVSCLR_EL0	2	3	9	12	3
- Field	63:0	P
- EndSysreg
++	if (reg in defined_regs)
++		fatal("Duplicate Sysreg definition for " reg)
++	defined_regs[reg] = 1
++
+ 	define("REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
+ 	define("SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", " op2 ")")
  
--Sysreg	SPMZR_EL0       2	3	9	12	4
--Field   63:0      P
-+Sysreg	SPMZR_EL0	2	3	9	12	4
-+Field   63:0	P
- EndSysreg
+@@ -284,6 +292,8 @@ $1 == "SignedEnum" && (block_current() == "Sysreg" || block_current() == "Sysreg
+ 	define_field(reg, field, msb, lsb)
+ 	define_field_sign(reg, field, "true")
  
- Sysreg	SPMSELR_EL0	2	3	9	12	5
-@@ -474,7 +474,7 @@ EndEnum
- Enum	7:4	Security
- 	0b0000	NI
- 	0b0001	EL3
--	0b0001	NSACR_RFR
-+	0b0010	NSACR_RFR
- EndEnum
- UnsignedEnum	3:0	ProgMod
- 	0b0000	NI
-@@ -2528,10 +2528,6 @@ Field	17:16	ZEN
- Res0	15:0
- EndSysreg
++	delete seen_enum_vals
++
+ 	next
+ }
  
--Sysreg	CPACR_EL12      3	5	1	0	2
--Mapping	CPACR_EL1
--EndSysreg
--
- Sysreg	CPACRALIAS_EL1  3	0	1	4	4
- Mapping	CPACR_EL1
- EndSysreg
-@@ -2576,10 +2572,6 @@ Sysreg	PFAR_EL12	3	5	6	0	5
- Mapping	PFAR_EL1
- EndSysreg
+@@ -297,6 +307,8 @@ $1 == "UnsignedEnum" && (block_current() == "Sysreg" || block_current() == "Sysr
+ 	define_field(reg, field, msb, lsb)
+ 	define_field_sign(reg, field, "false")
  
--Sysreg	RCWSMASK_EL1	3	0	13	0	3
--Field	63:0	RCWSMASK
--EndSysreg
--
- Sysreg	SCTLR2_EL1      3	0	1	0	3
- Res0    63:13
- Field   12      CPTM0
++	delete seen_enum_vals
++
+ 	next
+ }
+ 
+@@ -309,6 +321,8 @@ $1 == "Enum" && (block_current() == "Sysreg" || block_current() == "SysregFields
+ 
+ 	define_field(reg, field, msb, lsb)
+ 
++	delete seen_enum_vals
++
+ 	next
+ }
+ 
+@@ -320,6 +334,8 @@ $1 == "EndEnum" && block_current() == "Enum" {
+ 	lsb = null
+ 	print ""
+ 
++	delete seen_enum_vals
++
+ 	block_pop()
+ 	next
+ }
+@@ -329,6 +345,10 @@ $1 == "EndEnum" && block_current() == "Enum" {
+ 	val = $1
+ 	name = $2
+ 
++	if (val in seen_enum_vals)
++		fatal("Duplicate Enum value " val " for " name)
++	seen_enum_vals[val] = 1
++
+ 	define(reg "_" field "_" name, "UL(" val ")")
+ 	next
+ }
 -- 
 2.51.0.rc0.215.g125493bb4a-goog
 
