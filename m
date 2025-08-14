@@ -1,118 +1,94 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411F61A288
-	for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 04:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0951E22A4FC
+	for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 07:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755147539; cv=none; b=h/C7RnFKTQrIhBiWdanvefVyy64VySYGLExJc9jmNnr3OGVSHMbHnCcnloQvgHmmOOc35oUSvqScJJgE2XsbFpRven3lk0GDF/bdsFe9+PYbcR/R0Vni6PRn10y6nsvehloGKFHQwdkMa7RG2NuKiT1vjSwddGrEXwcVOzOg/+Y=
+	t=1755155642; cv=none; b=STx4xLMLdrmcLQDcU6wAfhb2kIXLquk9JsC9kFP8vWxWJ23HBP+16XcOLPX4KHnmH9B95Xxnhr9A6WIl5Zr91g8oYcr73ZYoJP/mC3VTSeeXPFc9qdR/C9UZ9of2YmtjrDLDh6LbNTVUkm+U0wvI677hxPo0k/ccnNJ0oAn6cTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755147539; c=relaxed/simple;
-	bh=MTQU2eXAIATJzrYJqz53j3kQwUq/5ZcFFz5BoC//o50=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RrtD4FgV1g07wUp4N7wUApKaUC/xHipsNMbIr+iY97GQF38h6ZGsXnNELv84/ZmkFSvAAH7DxuWcJR/SkuAUnj/NogV94kExS1suJbHtx7fg8XIJegqljOssi4T3qte1ER8W45U5exV2SlxgKGRdasdlyReezlbwfM9snNDZFA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 206DA1691;
-	Wed, 13 Aug 2025 21:58:47 -0700 (PDT)
-Received: from [10.163.65.190] (unknown [10.163.65.190])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A7F0D3F63F;
-	Wed, 13 Aug 2025 21:58:50 -0700 (PDT)
-Message-ID: <8683495e-da79-4746-b6da-52164cdc031d@arm.com>
-Date: Thu, 14 Aug 2025 10:28:47 +0530
+	s=arc-20240116; t=1755155642; c=relaxed/simple;
+	bh=OWvsjc3EKVtUKbboA4LkDtJBrhoSQDAUQm9WjinbFOM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L+z1C1rJ89iaIOHzvQ6v+dgmENcfuNtP30nWhFzUGyF3j22tyBx/7EnNOVoKX4vi939MJQ/XzNvlRMWcUyMTNwDn2Nffi0akzMy+0IWgrywnVSg3cOr/MCmv4fPlwZEIrocqHRTmYXnP30u1redTb56rBmB7ypKI9xfLaWPa2RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OGAeP24o; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OGAeP24o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E57C4CEEF;
+	Thu, 14 Aug 2025 07:14:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755155641;
+	bh=OWvsjc3EKVtUKbboA4LkDtJBrhoSQDAUQm9WjinbFOM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OGAeP24oJEPc4ZFfo6EHfPt3F9jskA926S5XBPy2E0YkucyJReJ9Szd8QKT4o8oss
+	 iRxpo/zc/dA2x/aPMua7KCQdAgRKd9V9IwMDbE3uBeoXFEKQDzIlSdvb8HuXLC1NaY
+	 0ae+zIuJaqS79dPU3ot2TlFpd32InWeWIutluUiYv987mb1d10Pi9XAh1QRu7R5s8e
+	 LAlCn/wXabNsoPXuHdQI1xyBhqMnDG91l9eS6icNMeaov3/e1B26Tz6YXHMdLEFkYS
+	 nZAF2n0Qr9wX8wQ2QBgEHhtodR0jaPvw+nue3R3Sr1gMCE4ZxzxUdn31ZxL0Hgt6S5
+	 U4USJfVRB8lEg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1umS9u-007KiS-RZ;
+	Thu, 14 Aug 2025 08:13:59 +0100
+Date: Thu, 14 Aug 2025 08:13:58 +0100
+Message-ID: <86frdu8jex.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	sebastianene@google.com,
+	keirf@google.com,
+	smostafa@google.com
+Subject: Re: [PATCH v2 1/2] arm64: sysreg: Fix and tidyup sysreg field definitions
+In-Reply-To: <20250813164506.1203851-2-tabba@google.com>
+References: <20250813164506.1203851-1-tabba@google.com>
+	<20250813164506.1203851-2-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: arm64: ptdump: Don't test PTE_VALID alongside
- other attributes
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Sebastian Ene <sebastianene@google.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>
-References: <20250809135356.1003520-1-r09922117@csie.ntu.edu.tw>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20250809135356.1003520-1-r09922117@csie.ntu.edu.tw>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vdonnefort@google.com, qperret@google.com, sebastianene@google.com, keirf@google.com, smostafa@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 09/08/25 7:23 PM, Wei-Lin Chang wrote:
-> The attribute masks and test values in the ptdump code are meant for
-> individual attributes, however for stage-2 ptdump we included PTE_VALID
-> while testing for R, W, X, and AF. This led to some confusion and the
-> flipped output for the executable attribute.
+On Wed, 13 Aug 2025 17:45:05 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Remove PTE_VALID from all attribute masks and values so that each test
-> matches only the relevant bits.
+> Fix the value of ID_PFR1_EL1.Security NSACR_RFR to be 0b0010, as per
+> DDI0601/2025-06, which wasn't correctly set when introduced in commit
+> 1224308075f1 ("arm64/sysreg: Convert ID_PFR1_EL1 to automatic generation").
 > 
-> Additionally, the executable attribute printing is updated to align with
-> stage-1 ptdump, printing "NX" for non-executable regions and "x " for
-> executable ones.
+> While at it, remove redundant definitions of CPACR_EL12 and
+> RCWSMASK_EL1, fix typos, and convert the only instance of spacing with
+> spaces to tabs (in SPMZR_EL0).
 > 
-> Suggested-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> Suggested-by: Mark Rutland <mark.rutland@arm.com>
-> Suggested-by: Sebastian Ene <sebastianene@google.com>
-> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
-> Tested on QEMU.
-> 
-> Changes in v2, thanks to those listed in the Suggested-by tags:
->   - remove PTE_VALID from .mask and .val
->   - make executable attribute output format identical to stage-1 ptdump
->   - Link to v1: https://lore.kernel.org/kvmarm/20250802104021.3076621-1-r09922117@csie.ntu.edu.tw/
-> ---
->  arch/arm64/kvm/ptdump.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> index 098416d7e5c25..dc5acfb00af91 100644
-> --- a/arch/arm64/kvm/ptdump.c
-> +++ b/arch/arm64/kvm/ptdump.c
-> @@ -32,23 +32,23 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
->  		.set	= " ",
->  		.clear	= "F",
->  	}, {
-> -		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> -		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
->  		.set	= "R",
->  		.clear	= " ",
->  	}, {
-> -		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
-> -		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
->  		.set	= "W",
->  		.clear	= " ",
->  	}, {
-> -		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
-> -		.val	= PTE_VALID,
-> -		.set	= " ",
-> -		.clear	= "X",
-> +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
-> +		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
-> +		.set	= "NX",
-> +		.clear	= "x ",
->  	}, {
-> -		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> -		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
-> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
-> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
->  		.set	= "AF",
->  		.clear	= "  ",
->  	}, {
+> Note that NSACR_RFR isn't used in the kernel as far as I could tell, so
+> I didn't add a 'Fixes' tag.
 
-LGTM and consistent with Stage-1.
+Seems reasonable.
 
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Acked-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
