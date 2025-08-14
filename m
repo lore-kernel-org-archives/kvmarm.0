@@ -1,64 +1,25 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91ACF30146B
-	for <kvmarm@lists.linux.dev>; Wed, 13 Aug 2025 23:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411F61A288
+	for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 04:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755127655; cv=none; b=Ayk1U5+K1OrOzBZ/5izYsPL9jNkig5ITCRBSOb0YQceJcCMNlQiONe2vAGnpacIH3XA+V2sDVrLFeJ9tayFnsoOD1F4fhakh16I9/wyyFT0Rwq2OSfGNJ3yNafu8cgHa8VZ37mhRGtJeG4mC9kncpFPVV2P2wfYNYD4bzxcKunQ=
+	t=1755147539; cv=none; b=h/C7RnFKTQrIhBiWdanvefVyy64VySYGLExJc9jmNnr3OGVSHMbHnCcnloQvgHmmOOc35oUSvqScJJgE2XsbFpRven3lk0GDF/bdsFe9+PYbcR/R0Vni6PRn10y6nsvehloGKFHQwdkMa7RG2NuKiT1vjSwddGrEXwcVOzOg/+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755127655; c=relaxed/simple;
-	bh=n3zi5eBnDJxAq5Y1VMbs/IRUjVefPwWnMWHx3rHj+nk=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=m7wY4KeUL3JHYZhZJPtqcl2QR/GOBR2G57GfGXitY8Lg0c30C/9RJ8djMl0CU0gQGA4gaBWTxzyy/6y7UAht85AuCi2oDGqKJl7f3Yf+LosG9OOD2YwqxyGTAydFk3cHIwMx5ASqTzgtRuTJucsWzpFAGzamTMl7RcHeoHKEK5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BtLG92gt; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BtLG92gt"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e2e5c0d4fso375463b3a.0
-        for <kvmarm@lists.linux.dev>; Wed, 13 Aug 2025 16:27:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1755127653; x=1755732453; darn=lists.linux.dev;
-        h=content-transfer-encoding:subject:cc:to:content-language:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=671X5sFGwqHEAR/PM0HKyNG8ZucV9LLOvqO6yHtGxIY=;
-        b=BtLG92gt9Zs5lztj+mWdDyvGjJzJE2fD9CeX0l367tcJB91/PaYz0jWpG+P5EDplxF
-         cga6MdMoon3rmSG3VEbuEdGnJu+RszOrieSTMwBxWVHzxcDwxjQU+DxFbRkI63WCLbRO
-         e1PsJMiz+T9CydCLUuRbT68DlPsczkXuhZw9+BrRSWQeNY8ZjJGwk/sw5Z2rqTlNFdhD
-         XceaThIRL0TubtyXHZaGy/+hh5lZfhIb9Z9rGiYC3aX7G5J1Q70a0W/C5nEtqJZaCFil
-         wG0wPZdHCgfCtbhwnpjzn9VSJLAPWQ+c/hi92BL0RQZib4WSqpST0xBjv/cgoIQli8C4
-         kP3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755127653; x=1755732453;
-        h=content-transfer-encoding:subject:cc:to:content-language:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=671X5sFGwqHEAR/PM0HKyNG8ZucV9LLOvqO6yHtGxIY=;
-        b=lPswKbqcr+iVuDPqgdl5HIfQf8VV7nq3PTj2FZs8isrR29vxp7vJTmn9QDVOWVhyO9
-         gehIGGFi/jeVYjnSexDSH8/GUGiVA9vSjYQXPENxB0NjO0e16cHF80dSSHpu2tisAjas
-         +z8Bd+bmwYezIWtXJRIZRO1kdibWigiS9Q1ZQ8bMRe28NG4Uz3B8XkI9tHXACo53sMTO
-         rh3e8u2NVTz/rbS0ZuVRJLAKSg88gBXFV3wCTb8Uv4FClJoSWJ6js/FknUmBEA15eOC+
-         Ex9OyCmB5S1jhWF75biS8q8z3yeqYHnD0dwzq5bt+Lp/qmcIxownQWgu/PynLILaAVaM
-         2dpg==
-X-Gm-Message-State: AOJu0YxWMCFjPXT4vp1JFUt7CxugwTMjmJ2ti/2ZwnnoxVrn2pZYaVpq
-	g/0X4sTvw1ar3/SRAXw5uLETTUL3XUYMKziNA7OgVo0bnjllCVGXczeFqdGvzzotckAJZIfCLPS
-	SSjqg
-X-Gm-Gg: ASbGncvSWz+5wUFTN5vrPIb+I6WfnBYr8JLzIFBtwc3iW3zv1Jhh3xnEC1UmFRNjKXb
-	ODATudWKCCSDbJ+iX/2GhXqQbQ+XniiFcpz7/5re5KLjw/Uv3LFXejsqwpx7t9bUgSK1cumrCDa
-	pP1LGABrwJWwG5nIFWl1p1cfmLgihL79EqpeDSkweVe8hWoYiTDyUnuR4XkXv9Q0RtXpIJ28G63
-	PChzX5zohcgy27++zDjGSdO8vynK47ks7JbbKgzvo86YOcvOTKo0czAFvmOOOAsFCwfTbX+Zgaf
-	u7hiJdeeiL9nScRsFSLblrkVamRmCfYI94KyUX4ttVEOKsf24BKHKeLpmk7pW2rjs/l9fP5MC0T
-	r32IQRMfAQxKBXmSYZoFC0dV2KWZPYIXImfXdwqA=
-X-Google-Smtp-Source: AGHT+IHLNkaJfIvv5CCD9tks/OXBzVDSKXibWWP3Z4/VR2Un3vGNBroCQpwE1UPfeLcXxPi8EvMN9A==
-X-Received: by 2002:a05:6a20:7f9a:b0:23d:b341:c2a4 with SMTP id adf61e73a8af0-240bd28603fmr1161297637.38.1755127652631;
-        Wed, 13 Aug 2025 16:27:32 -0700 (PDT)
-Received: from [192.168.4.112] ([206.83.105.236])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bccfd88dbsm32941165b3a.103.2025.08.13.16.27.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 16:27:32 -0700 (PDT)
-Message-ID: <1c6b4f19-6cb2-4da0-9acc-d63307880de1@linaro.org>
-Date: Thu, 14 Aug 2025 09:27:25 +1000
+	s=arc-20240116; t=1755147539; c=relaxed/simple;
+	bh=MTQU2eXAIATJzrYJqz53j3kQwUq/5ZcFFz5BoC//o50=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RrtD4FgV1g07wUp4N7wUApKaUC/xHipsNMbIr+iY97GQF38h6ZGsXnNELv84/ZmkFSvAAH7DxuWcJR/SkuAUnj/NogV94kExS1suJbHtx7fg8XIJegqljOssi4T3qte1ER8W45U5exV2SlxgKGRdasdlyReezlbwfM9snNDZFA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 206DA1691;
+	Wed, 13 Aug 2025 21:58:47 -0700 (PDT)
+Received: from [10.163.65.190] (unknown [10.163.65.190])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A7F0D3F63F;
+	Wed, 13 Aug 2025 21:58:50 -0700 (PDT)
+Message-ID: <8683495e-da79-4746-b6da-52164cdc031d@arm.com>
+Date: Thu, 14 Aug 2025 10:28:47 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,33 +27,92 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2] KVM: arm64: ptdump: Don't test PTE_VALID alongside
+ other attributes
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Sebastian Ene <sebastianene@google.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+References: <20250809135356.1003520-1-r09922117@csie.ntu.edu.tw>
 Content-Language: en-US
-To: kvmarm@lists.linux.dev, qemu-devel <qemu-devel@nongnu.org>
-Cc: Marc Zyngier <maz@kernel.org>, Peter Maydell <peter.maydell@linaro.org>,
- Oliver Upton <oliver.upton@linux.dev>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>
-Subject: KVM sysreg ids for FEAT_SYSREG128
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20250809135356.1003520-1-r09922117@csie.ntu.edu.tw>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hiya,
-
-QEMU (ab)uses the kvm encoding of system register ids in the migration stream.  As we 
-implement support for FEAT_D128, it would be good to agree on an encoding for the 128-bit 
-registers so that we can avoid complications with migration later.
-
-I don't think this is terribly complicated.  Simply adjust the value in the 
-KVM_REG_SIZE_MASK field from U64 to U128.  E.g.
-
-PAR_EL1 (64-bit)	(__ARM64_SYS_REG(3, 0, 7, 4, 0) | KVM_REG_SIZE_U64)
-PAR_EL1 (128-bit)	(__ARM64_SYS_REG(3, 0, 7, 4, 0) | KVM_REG_SIZE_U128)
-
-This will currently be cleanly rejected by index_to_params, resulting in ENOENT for the 
-ioctl.  When KVM grows support for D128 guests, kvm_sys_reg_{get,set}_user can select the 
-read/write code path based on reg->id & KVM_REG_SIZE_MASK.
-
-Comments?
 
 
-r~
+On 09/08/25 7:23 PM, Wei-Lin Chang wrote:
+> The attribute masks and test values in the ptdump code are meant for
+> individual attributes, however for stage-2 ptdump we included PTE_VALID
+> while testing for R, W, X, and AF. This led to some confusion and the
+> flipped output for the executable attribute.
+> 
+> Remove PTE_VALID from all attribute masks and values so that each test
+> matches only the relevant bits.
+> 
+> Additionally, the executable attribute printing is updated to align with
+> stage-1 ptdump, printing "NX" for non-executable regions and "x " for
+> executable ones.
+> 
+> Suggested-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> Suggested-by: Mark Rutland <mark.rutland@arm.com>
+> Suggested-by: Sebastian Ene <sebastianene@google.com>
+> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+> ---
+> Tested on QEMU.
+> 
+> Changes in v2, thanks to those listed in the Suggested-by tags:
+>   - remove PTE_VALID from .mask and .val
+>   - make executable attribute output format identical to stage-1 ptdump
+>   - Link to v1: https://lore.kernel.org/kvmarm/20250802104021.3076621-1-r09922117@csie.ntu.edu.tw/
+> ---
+>  arch/arm64/kvm/ptdump.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> index 098416d7e5c25..dc5acfb00af91 100644
+> --- a/arch/arm64/kvm/ptdump.c
+> +++ b/arch/arm64/kvm/ptdump.c
+> @@ -32,23 +32,23 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+>  		.set	= " ",
+>  		.clear	= "F",
+>  	}, {
+> -		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+> -		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+>  		.set	= "R",
+>  		.clear	= " ",
+>  	}, {
+> -		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
+> -		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
+> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+>  		.set	= "W",
+>  		.clear	= " ",
+>  	}, {
+> -		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+> -		.val	= PTE_VALID,
+> -		.set	= " ",
+> -		.clear	= "X",
+> +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+> +		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+> +		.set	= "NX",
+> +		.clear	= "x ",
+>  	}, {
+> -		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> -		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+> +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+>  		.set	= "AF",
+>  		.clear	= "  ",
+>  	}, {
+
+LGTM and consistent with Stage-1.
+
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
