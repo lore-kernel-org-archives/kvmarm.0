@@ -1,142 +1,141 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32B12F0C53
-	for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 09:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0283E199FD0;
+	Thu, 14 Aug 2025 16:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755164938; cv=none; b=cAY5hhHa5okp5q4TCUU2HTq+2cc0lYNilVZ7msfYmoqNRW1D0kfo2UCBVThbzv3fN9bBKzYGhUTuOBV6Fusax1VhJoMg4/Ek6FYcV9wRwA1Z8gtHPyObIRsyfIuFICQk25fN3q4NkNPhE4CSqLrYZnuXVTVvaYebnm/uLhTWwhc=
+	t=1755188221; cv=none; b=tJD2xWDXn6TvhZg7Fx59VA5OTnEGgt+wstLnc56hBMzxvOwKUsl4MfkKIaoz8H4KBJQILViXm3F19nHzBu5hZ+JgJsnd3tXOmFvAlqXZb+Wru6VGGmMWaG1cKUNlQ0aINKxRW3hpBGJQkwfFG8wm/pYj9nBnFM+xcyz3F8vv1Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755164938; c=relaxed/simple;
-	bh=6ViulPyNxpGyEla0Ly7QVqs2yGv2gIdTjYax+36+3Ko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZpyWCSKz+M9Rj4af600YNwvQu6I7e2gmfbw6swnlD30sE3fj41ItRQBPg43FeHuG1DNJuGvrOmBsCJGRmS+54RF/Wif8DKKYRDnxsD0UkekkYwqUOzF6YBK/Mg4w9qAU6YwHY1gcuOZo0NGY/50cqUAbd3J1BKMF8iJI7/aDq1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=uHMsiRqb; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1755188221; c=relaxed/simple;
+	bh=M/7zR0HTuRXInmuZjL5TwHMxUA2vqz7c6KFg9vcni0s=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mfEgY/ttSuglcm7lvAnqQ1/X8MRzxXmsVIVdnlr7/Ud7SOocrZF9xM111zjPd0iSxVePD6dtmXzC/cqtqTj0+D7swGJAnij3aWXIARozl48/d8mBhgLeEPVBAmjq/TR2vmNfPSlAnLm6SjxcQAvuKFKHsptzmTnbTa0wVMbvciQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayapHOIH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uHMsiRqb"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-76e2e88c6a6so721168b3a.1
-        for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 02:48:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1755164936; x=1755769736; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UhXQ8ClAZyC6ZwPBAtm9gjqUVvPh4kKwbXv0Fn9fBm8=;
-        b=uHMsiRqbKYCpc6nD90AwEJdK4z1dwf65wEJVhC2+RWeVr5oZbswLZcpLiV3HAHO5yN
-         DEv7dPxAtubPsuhZFwVJXTc5Uj1nc2w1RuoEF5b3M3jSo8PDf2AetKSZYExoUPb3uJ6A
-         KqMzLcG8yKrPYTaS2VtKRL0lXG7miMy+weSZzwrnv+/2ZgNxB4eP7nVKh17f4LqMLqF1
-         qdpieDClSuKSlAot4uiMtFZN4BU+HsUVKqIpVkj0BcKosoEppgIyHtitwtGYuw9KQPax
-         977MpVWUFGvJMM98Ak1raq4x1ABJlqAJgLh6VG+s/acVmj/ZLXv1/CZpBvLpbq4pKaNS
-         EtLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755164936; x=1755769736;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UhXQ8ClAZyC6ZwPBAtm9gjqUVvPh4kKwbXv0Fn9fBm8=;
-        b=OtdURPBeAUKuGh5batU8AJbc+zJLFE0GBRm5C9Ea1jDOdKEexJDnC0yLJG2iOSDyAy
-         9HH0F3fMZmQGa4osqExfcyHECPvILIqS650gl104NXEVC3UJPcM5KEyDX3+5vog9Fagg
-         II9YkIxt4J1JfvKoaT/H1vx97uDBKSmvSLXCcx/UyMhq6tQLQqZyuDB8Je9CCzeMuRF+
-         2bsi9RlHSYndUGo/oA580Eqf5g0qhsYDRaqI9qTYkAe8qveZpKG+RJtG8T4j45VPR9Yo
-         tvHo1ElJfavb+CZNU4pg6rVCZvRNXPHRRrAj1Upyjwz6JRt8DFVWl9KPgXBa/+FQELJn
-         imAw==
-X-Gm-Message-State: AOJu0YxhbCjMMt1QVSRuWqvqpqwsvHgZN8+0A1+ziOQZVaWecyN1uhlL
-	xa7qs7MyKEHPDLFh1mxmLeAp+SCQEOGglBeXkrSRDLmkntfsWpuGD/zwbadTMd2PChM=
-X-Gm-Gg: ASbGncv66OHeu4vgVz5LnfRRRHak/eMTulYmE3glMwYGk79Nc4U71fM7iENFXMSzOOs
-	2qpMY0FPrcVUcS6HTUCdm0q13LtUsYlfZAs+H73I+gSHM/5XvAelj9eOWR7ZduXDEKm4TKjZJcA
-	nivjqprkNXB9iVeZA+X32+fXnN3VLWj+h4fePmlK/8GHNh6+G54gWUXTBGMK5pGRrtW5UHn4qHZ
-	WjwXnl0r7mzunNCKgSWduKl8KxCbnCSpw4niEHFS/JDbhXGB39TVNRu7qavuPE1hpsoyvmDHZuQ
-	m8B74f+Wq7o4mFnqsSP+h8vF4YXoQ+PAcyE9NxxUV2Wstyex9GOTDdp2Lc0TmR8yjlt2++8BMsa
-	y5tb7KNXEB9IKLiTCM4FLb9B4MRwepl94aMny1LkK9DQaUXDm+FEDxgYjHNfNELPwFwKfItyWaS
-	+dY7j3wYZWbb8pq+MFqJOEkO32lWE9oKIeTIu6YCAWXTrOSAyfxhffvoOGizhRhDPn
-X-Google-Smtp-Source: AGHT+IHj3MwSb3JWcBhyoOovn8dGlEB/uRNYUIfQ0xd1gbq/JeWWUz0xFadXXnz/eyXHwR6A1K6geg==
-X-Received: by 2002:a05:6a21:6da6:b0:240:20d:47ca with SMTP id adf61e73a8af0-240bd019e6cmr3470292637.10.1755164936214;
-        Thu, 14 Aug 2025 02:48:56 -0700 (PDT)
-Received: from ?IPV6:2401:d006:5c08:e100:bc49:5c3a:83c2:8ce7? (19r3hzjy9klp0jf5b7z5.ipv6.originbroadband.com.au. [2401:d006:5c08:e100:bc49:5c3a:83c2:8ce7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b470fd547d0sm2562644a12.4.2025.08.14.02.48.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Aug 2025 02:48:55 -0700 (PDT)
-Message-ID: <80d7478a-bed3-4e6f-9241-2c4b54c62929@linaro.org>
-Date: Thu, 14 Aug 2025 19:48:49 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayapHOIH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 893C1C4CEED;
+	Thu, 14 Aug 2025 16:17:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755188220;
+	bh=M/7zR0HTuRXInmuZjL5TwHMxUA2vqz7c6KFg9vcni0s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ayapHOIHutnDYHAU+8nS01cXH6K0nYKsnMFwKwBX+uVr3uBaLlFruW0Gd26aduI4c
+	 mTnJ2dBEhDENeA4AkGD0+ce2jXbuAEuEUJhF5c1OZ0NqyXPQf6dY71njNz08OVoW2D
+	 2+NcuTCEcIsY6L1l3MscfBZTeuqohVuw9yV2iaeQoAzWKIzHXK5iaCRlwbMx2epK8n
+	 /0q1BFJt/WlXHFJpAXxEAs9h/n2sBuB3UCEojqnD5UKC3XtD6Opol7HIpiL4Uy/Jg2
+	 dZJNRXsqOu5k+E88zdYvJgWod9JFA4aZYUEtxvdO0hUU30vlLSbbmAzzXo9BiP06Bs
+	 LDMj1sA9yYWcg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1umadO-007WRz-6x;
+	Thu, 14 Aug 2025 17:16:58 +0100
+Date: Thu, 14 Aug 2025 17:16:57 +0100
+Message-ID: <86ikipev46.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Fix vcpu_{read,write}_sys_reg() accessors
+In-Reply-To: <aJuixWlc87f2UlK0@linux.dev>
+References: <20250809144811.2314038-1-maz@kernel.org>
+	<20250809144811.2314038-3-maz@kernel.org>
+	<aJuixWlc87f2UlK0@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: KVM sysreg ids for FEAT_SYSREG128
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, qemu-devel <qemu-devel@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- Oliver Upton <oliver.upton@linux.dev>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>
-References: <1c6b4f19-6cb2-4da0-9acc-d63307880de1@linaro.org>
- <86cy8y8grv.wl-maz@kernel.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Content-Language: en-US
-In-Reply-To: <86cy8y8grv.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, volodymyr_babchuk@epam.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 8/14/25 18:11, Marc Zyngier wrote:
-> Hi Richard,
+On Tue, 12 Aug 2025 21:23:33 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Thanks for bringing this up. FEAT_D128 is not on anyone's radar on the
-> KVM side (I really don't fancy having to write another set of page
-> table walkers), but it doesn't hurt to be prepared.
+> On Sat, Aug 09, 2025 at 03:48:11PM +0100, Marc Zyngier wrote:
+> > @@ -144,125 +156,120 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
+> >  		MAPPED_EL2_SYSREG(ZCR_EL2,     ZCR_EL1,     NULL	     );
+> >  		MAPPED_EL2_SYSREG(CONTEXTIDR_EL2, CONTEXTIDR_EL1, NULL	     );
+> >  		MAPPED_EL2_SYSREG(SCTLR2_EL2,  SCTLR2_EL1,  NULL	     );
+> > +	case CNTHCTL_EL2:
+> > +		/* CNTHCTL_EL2 is super special, until we support NV2.1 */
+> > +		loc->loc = ((is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu)) ?
+> > +			    SR_LOC_SPECIAL : SR_LOC_MEMORY);
+> > +		break;
+> > +	case TPIDR_EL0:
+> > +	case TPIDRRO_EL0:
+> > +	case TPIDR_EL1:
+> > +	case PAR_EL1:
+> > +		/* These registers are always loaded, no matter what */
+> > +		loc->loc = SR_LOC_LOADED;
+> > +		break;
+> >  	default:
+> > -		return false;
+> > +		/*
+> > +		 * Non-mapped EL2 registers are by definition in memory, but
+> > +		 * we don't need to distinguish them here, as the CPU
+> > +		 * register accessors will bail out and we'll end-up using
+> > +		 * the backing store.
+> > +		 *
+> > +		 * EL1 registers are, however, only loaded if we're
+> > +		 * not in hypervisor context.
+> > +		 */
+> > +		loc->loc = is_hyp_ctxt(vcpu) ? SR_LOC_MEMORY : SR_LOC_LOADED;
 > 
-> On Thu, 14 Aug 2025 00:27:25 +0100,
-> Richard Henderson <richard.henderson@linaro.org> wrote:
->>
->> Hiya,
->>
->> QEMU (ab)uses the kvm encoding of system register ids in the migration
->> stream.  As we implement support for FEAT_D128, it would be good to
->> agree on an encoding for the 128-bit registers so that we can avoid
->> complications with migration later.
->>
->> I don't think this is terribly complicated.  Simply adjust the value
->> in the KVM_REG_SIZE_MASK field from U64 to U128.  E.g.
->>
->> PAR_EL1 (64-bit)	(__ARM64_SYS_REG(3, 0, 7, 4, 0) | KVM_REG_SIZE_U64)
->> PAR_EL1 (128-bit)	(__ARM64_SYS_REG(3, 0, 7, 4, 0) | KVM_REG_SIZE_U128)
->>
->> This will currently be cleanly rejected by index_to_params, resulting
->> in ENOENT for the ioctl.  When KVM grows support for D128 guests,
->> kvm_sys_reg_{get,set}_user can select the read/write code path based
->> on reg->id & KVM_REG_SIZE_MASK.
->>
->> Comments?
+> Hmm... I get the feeling that this flow is becoming even more subtle.
+> There's some implicit coupling between this switch statement and the
+> __vcpu_{read,write}_sys_reg_from_cpu() which feels like it could be
+> error prone. Especially since we're gonna lose the WARN() that would
+> inform us if an on-CPU register was actually redirected to memory.
 > 
-> The encoding of the register, as described above, is absolutely fine.
+> I'm wondering if we need some macro hell containing the block of
+> registers we handle on-CPU and expand that can be expanded into this
+> triage switch case as well as the sysreg accessor.
 > 
-> But since you brought the subject, I'd like to align on a bit more
-> than the encoding.
-> 
-> The way I see imagine it after two cups of coffee (which clearly isn't
-> enough) is to have a feature bit provided at VM creation time,
-> enabling D128 support, HW support allowing.
-> 
-> At that point, querying the list of supported sysregs would report the
-> 128bit versions of TTBR{0,1}_EL{1,2}, VTTBR_EL2, and PAR_EL1 (ignoring
-> things we are unlikely to ever support, such as FEAT_THE). The 64bit
-> versions of these registers would not be reported.
-> 
-> Does that align with what QEMU would do internally?
+> What you have definitely seems correct, though. I'll twiddle a bit and
+> see if I come up with something, although I imagine what you have is
+> what we'll use in the end anyway.
 
-Yes.
+My current conclusion is that a macro hack is not really practical, if
+only because we end-up here from out-of-line C code, and that at this
+stage we've lost all symbolic information.
 
-After selecting the feature set for the cpu, we register the system registers that 
-correspond to each feature.  During registration, we select the size of each register 
-(more specifically, the canonical definition is maximal, and 128-bit registers are 
-squashed back down to a 64-bit registers when FEAT_SYSREG128 is not enabled).
+We *could* take the nuclear option of re-modelling the sysreg enum as
+a bunch of #define, similar to the way we deal with vcpu flags, and
+have accessors for the various bits of information, but that comes
+with two different problems:
 
-We always require the same cpu model during migration, and the choice of register size is 
-tied to the cpu model, so there shouldn't be any migration issues.  With -cpu max, we 
-explicitly don't support migration between qemu versions.
+- we don't have a good way to iterate over symbolic registers
 
+- we need to repaint a large portion of the code base
 
-r~
+Given that, I've taken another approach, which is to move all these
+things close together (no more inlining), and add enough WARN_ON()s
+that you really have to try and game the code to miss something and
+not get caught. In the process, I found a couple of extra stragglers
+that are always loaded when running a 32bit guest (the *32_EL2
+registers...).
+
+I've pushed the current state on my kvm-arm64/at-fixes-6.17 branch,
+and I'll try to repost patches over the weekend.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
