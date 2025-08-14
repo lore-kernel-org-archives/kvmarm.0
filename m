@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0951E22A4FC
-	for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 07:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C1F1A9F8F
+	for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 07:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755155642; cv=none; b=STx4xLMLdrmcLQDcU6wAfhb2kIXLquk9JsC9kFP8vWxWJ23HBP+16XcOLPX4KHnmH9B95Xxnhr9A6WIl5Zr91g8oYcr73ZYoJP/mC3VTSeeXPFc9qdR/C9UZ9of2YmtjrDLDh6LbNTVUkm+U0wvI677hxPo0k/ccnNJ0oAn6cTc=
+	t=1755155769; cv=none; b=lrmbNzwmxnD9FmrU2QofEePamuw2uNikPi5mCqGmnIpzINzgdJzVmqvqA2oinYNsmEhm52uy8EYyXUAl3ENA1P98tCzYrHEy4/d7bloZ/xu2DUV265lxk5fTU3KZKgx9lxWJ0zZh1R5HD/NKUUGL4nXeZXDImA/iLyrhxQ7LXvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755155642; c=relaxed/simple;
-	bh=OWvsjc3EKVtUKbboA4LkDtJBrhoSQDAUQm9WjinbFOM=;
+	s=arc-20240116; t=1755155769; c=relaxed/simple;
+	bh=ECvrWWwHAWd6mW83/kXEp1zhLwqr2pHT8QKOF/ZxN/0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L+z1C1rJ89iaIOHzvQ6v+dgmENcfuNtP30nWhFzUGyF3j22tyBx/7EnNOVoKX4vi939MJQ/XzNvlRMWcUyMTNwDn2Nffi0akzMy+0IWgrywnVSg3cOr/MCmv4fPlwZEIrocqHRTmYXnP30u1redTb56rBmB7ypKI9xfLaWPa2RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OGAeP24o; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=f6Sp/OFpeHDtAZXxydmucKqMSqld1FeRjr1gP/9tsaT8IpJ3fgQVeGhlRv02tZ2kEqoUSLa3wSBj9oOf8CYnzxqVDrrqahpilkBu+HIirhlll8lJpCskTlpBrsraOzbFrRs4GXfxQUoqcsptOCVYXkbtdPEmvwq4AjuEiOlCDcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RIqlVBCl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OGAeP24o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E57C4CEEF;
-	Thu, 14 Aug 2025 07:14:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RIqlVBCl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F86C4CEEF;
+	Thu, 14 Aug 2025 07:16:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755155641;
-	bh=OWvsjc3EKVtUKbboA4LkDtJBrhoSQDAUQm9WjinbFOM=;
+	s=k20201202; t=1755155769;
+	bh=ECvrWWwHAWd6mW83/kXEp1zhLwqr2pHT8QKOF/ZxN/0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OGAeP24oJEPc4ZFfo6EHfPt3F9jskA926S5XBPy2E0YkucyJReJ9Szd8QKT4o8oss
-	 iRxpo/zc/dA2x/aPMua7KCQdAgRKd9V9IwMDbE3uBeoXFEKQDzIlSdvb8HuXLC1NaY
-	 0ae+zIuJaqS79dPU3ot2TlFpd32InWeWIutluUiYv987mb1d10Pi9XAh1QRu7R5s8e
-	 LAlCn/wXabNsoPXuHdQI1xyBhqMnDG91l9eS6icNMeaov3/e1B26Tz6YXHMdLEFkYS
-	 nZAF2n0Qr9wX8wQ2QBgEHhtodR0jaPvw+nue3R3Sr1gMCE4ZxzxUdn31ZxL0Hgt6S5
-	 U4USJfVRB8lEg==
+	b=RIqlVBCl9FRxKUrECo6Bzbhv/UCKPhU4yHX1/q/XQgYJJEwLMhlBgfp0rDxfCq+Ne
+	 +vtLthSUz7NOZRfDSg9g7RRddOrNhCXuB8NkueymMNpz+rxfBv8xiri6uGcexADgeh
+	 7io1d6siEdjZxONCFjjOe8B52SKEE4BvU21JVsp1ZqVhH36Ee/bLzhwMGrJHheCylK
+	 AECN6pIYrel9es//WjhayG7C/CRm+EH2PVDK0T6bR8XKZCc646H9rOS68/oNFnPwTO
+	 lDuanfnx9jT1T9vAaJYYsh8wQFqi5jLsABxov8jz3hkfpxb3G/KKarw3xQ7L/h20et
+	 Uen+FAW/ZP8Lg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1umS9u-007KiS-RZ;
-	Thu, 14 Aug 2025 08:13:59 +0100
-Date: Thu, 14 Aug 2025 08:13:58 +0100
-Message-ID: <86frdu8jex.wl-maz@kernel.org>
+	id 1umSBw-007Kl2-2u;
+	Thu, 14 Aug 2025 08:16:04 +0100
+Date: Thu, 14 Aug 2025 08:16:03 +0100
+Message-ID: <86ecte8jbg.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -49,10 +49,10 @@ Cc: kvmarm@lists.linux.dev,
 	sebastianene@google.com,
 	keirf@google.com,
 	smostafa@google.com
-Subject: Re: [PATCH v2 1/2] arm64: sysreg: Fix and tidyup sysreg field definitions
-In-Reply-To: <20250813164506.1203851-2-tabba@google.com>
+Subject: Re: [PATCH v2 2/2] arm64: sysreg: Add validation checks to sysreg header generation script
+In-Reply-To: <20250813164506.1203851-3-tabba@google.com>
 References: <20250813164506.1203851-1-tabba@google.com>
-	<20250813164506.1203851-2-tabba@google.com>
+	<20250813164506.1203851-3-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,23 +68,26 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@li
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 13 Aug 2025 17:45:05 +0100,
+On Wed, 13 Aug 2025 17:45:06 +0100,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> Fix the value of ID_PFR1_EL1.Security NSACR_RFR to be 0b0010, as per
-> DDI0601/2025-06, which wasn't correctly set when introduced in commit
-> 1224308075f1 ("arm64/sysreg: Convert ID_PFR1_EL1 to automatic generation").
+> The gen_sysreg.awk script processes the system register specification in
+> the sysreg text file to generate C macro definitions. The current script
+> will silently accept certain errors in the specification file, leading
+> to incorrect header generation.
 > 
-> While at it, remove redundant definitions of CPACR_EL12 and
-> RCWSMASK_EL1, fix typos, and convert the only instance of spacing with
-> spaces to tabs (in SPMZR_EL0).
+> For example, a Sysreg or SysregFields can be accidentally duplicated,
+> causing its macros to be emitted twice. Or an Enum can contain duplicate
+> values for different items, which is architecturally incorrect.
+> 
+> Add checks to catch these errors at build time. The script now tracks
+> all seen Sysreg and SysregFields definitions and checks for duplicates.
+> It also tracks values within each Enum block to ensure entries are
+> unique.
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
-> Note that NSACR_RFR isn't used in the kernel as far as I could tell, so
-> I didn't add a 'Fixes' tag.
 
-Seems reasonable.
+Thanks for adding these checks, most useful.
 
 Acked-by: Marc Zyngier <maz@kernel.org>
 
