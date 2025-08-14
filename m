@@ -1,58 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C1F1A9F8F
-	for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 07:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3E12749D9
+	for <kvmarm@lists.linux.dev>; Thu, 14 Aug 2025 08:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755155769; cv=none; b=lrmbNzwmxnD9FmrU2QofEePamuw2uNikPi5mCqGmnIpzINzgdJzVmqvqA2oinYNsmEhm52uy8EYyXUAl3ENA1P98tCzYrHEy4/d7bloZ/xu2DUV265lxk5fTU3KZKgx9lxWJ0zZh1R5HD/NKUUGL4nXeZXDImA/iLyrhxQ7LXvg=
+	t=1755159068; cv=none; b=NXnrST5wDdao0+nd0OfBHlZX6+3L1RdbfFU4VC4oWXC/vZ2CLprHEI1VzwVbkSBgOvGnn68wXSgOuU80ImRVcYBFg44PBcNbhN9cVY555ZZQrSP98mVeb9T0V6PjskA0VJ1SOoVvYvsaqap0V4xMUVF99veMgCs0+4SL/t7zZBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755155769; c=relaxed/simple;
-	bh=ECvrWWwHAWd6mW83/kXEp1zhLwqr2pHT8QKOF/ZxN/0=;
+	s=arc-20240116; t=1755159068; c=relaxed/simple;
+	bh=zPcej9q0M1ji9SBAbwmwb0bKVjgCbJuyYpRyZwuMqKk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f6Sp/OFpeHDtAZXxydmucKqMSqld1FeRjr1gP/9tsaT8IpJ3fgQVeGhlRv02tZ2kEqoUSLa3wSBj9oOf8CYnzxqVDrrqahpilkBu+HIirhlll8lJpCskTlpBrsraOzbFrRs4GXfxQUoqcsptOCVYXkbtdPEmvwq4AjuEiOlCDcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RIqlVBCl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=hwIxoWvVVSHrtKwa+ShDkQd4y6Ii6n0IGxDmabJKRSxt7fIFwuoTRSH/S9mXRLj0nmbd3SZis9hkmZriy5iRti5gsBMTaMKCZPr/If7jgS4xnxe41r77TSNa1QqSzmVKul35Lc+FzangQL0XPUJ6GyQCezdtHehLNRVNtUa0dBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mSQi4tXI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RIqlVBCl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F86C4CEEF;
-	Thu, 14 Aug 2025 07:16:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mSQi4tXI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180E0C4CEEF;
+	Thu, 14 Aug 2025 08:11:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755155769;
-	bh=ECvrWWwHAWd6mW83/kXEp1zhLwqr2pHT8QKOF/ZxN/0=;
+	s=k20201202; t=1755159068;
+	bh=zPcej9q0M1ji9SBAbwmwb0bKVjgCbJuyYpRyZwuMqKk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RIqlVBCl9FRxKUrECo6Bzbhv/UCKPhU4yHX1/q/XQgYJJEwLMhlBgfp0rDxfCq+Ne
-	 +vtLthSUz7NOZRfDSg9g7RRddOrNhCXuB8NkueymMNpz+rxfBv8xiri6uGcexADgeh
-	 7io1d6siEdjZxONCFjjOe8B52SKEE4BvU21JVsp1ZqVhH36Ee/bLzhwMGrJHheCylK
-	 AECN6pIYrel9es//WjhayG7C/CRm+EH2PVDK0T6bR8XKZCc646H9rOS68/oNFnPwTO
-	 lDuanfnx9jT1T9vAaJYYsh8wQFqi5jLsABxov8jz3hkfpxb3G/KKarw3xQ7L/h20et
-	 Uen+FAW/ZP8Lg==
+	b=mSQi4tXImKf0v+f/jvSQa66DgrrTk6bi/b2xMIlRLi/rXN7XvxoF5PjsEVc1bMHz+
+	 nI+4w5u8uVzp7+3nUYTfw/0RvmAq4FucIho2AUWg2hAzzvn/q+uk0PsGKga/Sx4h5c
+	 d7ZNZT/84l+m8RGepB44q2Op2blrlOGoxlDWuoZGvLPNJT/C5ZFGc3NlZXWylhdLvr
+	 TPmI63/Dy9UntyaoL5a3Ph3G90VNC3AVvdYR/AALwNM8X9YfjPc0HXpQmJ+MpJQd+n
+	 vjSnESr5HxhSBNK1xeLCxM/EXvkBCYjVHsmHMXAFFJ/7sGOZc9YAEFjdmS3cFXeKA6
+	 IEL1LnqbBuoZw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1umSBw-007Kl2-2u;
-	Thu, 14 Aug 2025 08:16:04 +0100
-Date: Thu, 14 Aug 2025 08:16:03 +0100
-Message-ID: <86ecte8jbg.wl-maz@kernel.org>
+	id 1umT37-007Lun-0f;
+	Thu, 14 Aug 2025 09:11:01 +0100
+Date: Thu, 14 Aug 2025 09:11:00 +0100
+Message-ID: <86cy8y8grv.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	vdonnefort@google.com,
-	qperret@google.com,
-	sebastianene@google.com,
-	keirf@google.com,
-	smostafa@google.com
-Subject: Re: [PATCH v2 2/2] arm64: sysreg: Add validation checks to sysreg header generation script
-In-Reply-To: <20250813164506.1203851-3-tabba@google.com>
-References: <20250813164506.1203851-1-tabba@google.com>
-	<20250813164506.1203851-3-tabba@google.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: kvmarm@lists.linux.dev,	qemu-devel <qemu-devel@nongnu.org>,	Peter
+ Maydell <peter.maydell@linaro.org>,	Oliver Upton <oliver.upton@linux.dev>,
+	Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
+Subject: Re: KVM sysreg ids for FEAT_SYSREG128
+In-Reply-To: <1c6b4f19-6cb2-4da0-9acc-d63307880de1@linaro.org>
+References: <1c6b4f19-6cb2-4da0-9acc-d63307880de1@linaro.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,32 +53,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vdonnefort@google.com, qperret@google.com, sebastianene@google.com, keirf@google.com, smostafa@google.com
+X-SA-Exim-Rcpt-To: richard.henderson@linaro.org, kvmarm@lists.linux.dev, qemu-devel@nongnu.org, peter.maydell@linaro.org, oliver.upton@linux.dev, alex.bennee@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 13 Aug 2025 17:45:06 +0100,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> The gen_sysreg.awk script processes the system register specification in
-> the sysreg text file to generate C macro definitions. The current script
-> will silently accept certain errors in the specification file, leading
-> to incorrect header generation.
-> 
-> For example, a Sysreg or SysregFields can be accidentally duplicated,
-> causing its macros to be emitted twice. Or an Enum can contain duplicate
-> values for different items, which is architecturally incorrect.
-> 
-> Add checks to catch these errors at build time. The script now tracks
-> all seen Sysreg and SysregFields definitions and checks for duplicates.
-> It also tracks values within each Enum block to ensure entries are
-> unique.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+Hi Richard,
 
-Thanks for adding these checks, most useful.
+Thanks for bringing this up. FEAT_D128 is not on anyone's radar on the
+KVM side (I really don't fancy having to write another set of page
+table walkers), but it doesn't hurt to be prepared.
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+On Thu, 14 Aug 2025 00:27:25 +0100,
+Richard Henderson <richard.henderson@linaro.org> wrote:
+> 
+> Hiya,
+> 
+> QEMU (ab)uses the kvm encoding of system register ids in the migration
+> stream.  As we implement support for FEAT_D128, it would be good to
+> agree on an encoding for the 128-bit registers so that we can avoid
+> complications with migration later.
+> 
+> I don't think this is terribly complicated.  Simply adjust the value
+> in the KVM_REG_SIZE_MASK field from U64 to U128.  E.g.
+> 
+> PAR_EL1 (64-bit)	(__ARM64_SYS_REG(3, 0, 7, 4, 0) | KVM_REG_SIZE_U64)
+> PAR_EL1 (128-bit)	(__ARM64_SYS_REG(3, 0, 7, 4, 0) | KVM_REG_SIZE_U128)
+> 
+> This will currently be cleanly rejected by index_to_params, resulting
+> in ENOENT for the ioctl.  When KVM grows support for D128 guests,
+> kvm_sys_reg_{get,set}_user can select the read/write code path based
+> on reg->id & KVM_REG_SIZE_MASK.
+> 
+> Comments?
+
+The encoding of the register, as described above, is absolutely fine.
+
+But since you brought the subject, I'd like to align on a bit more
+than the encoding.
+
+The way I see imagine it after two cups of coffee (which clearly isn't
+enough) is to have a feature bit provided at VM creation time,
+enabling D128 support, HW support allowing.
+
+At that point, querying the list of supported sysregs would report the
+128bit versions of TTBR{0,1}_EL{1,2}, VTTBR_EL2, and PAR_EL1 (ignoring
+things we are unlikely to ever support, such as FEAT_THE). The 64bit
+versions of these registers would not be reported.
+
+Does that align with what QEMU would do internally?
+
+Thanks,
 
 	M.
 
