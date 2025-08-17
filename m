@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961F51E0E1F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F70023F41F;
 	Sun, 17 Aug 2025 20:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755462125; cv=none; b=jRRY/9CABg2oGHzFxTjUaNutzUmL8pKQgb37Tj8vPu7JFzeljvvybZIv4s1koleAWSIFraf6vgZqBAUfzZXXIchMmRNNo7ZUwmNrmw1YvIP9vIuuiSq/hexLwYUYdPCe0N+3sLCbN7262a2IdUTXXQ+NcXkuGMzO4VvD7fuN5Dc=
+	t=1755462126; cv=none; b=tQMk0Y7VMnOyaaCbLwz4WNNdNqIFXA7EZS3Kq1NGIfuH238r5++rQXCebwJMZXj8QhAxSl3z1qV7NDQmKyGP0tAAQW1T5QGdMqg+i0/5Neilhu8zwb6Jvmmjt/GM61fxWQncSB3K/EytNV/mNQW3c022Ik9PpPbohiW5E8j+N2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755462125; c=relaxed/simple;
-	bh=6IKXewD5unUmBax2L4vHEKjl6ny3rrpHG4F8C3MhAI4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jiKEbqHG0gCcrRkkDYXWlLq3vSDkxWostp8hVrAmLuv9Jk0HAmbRPbTxX21P+kJGt+CUnAGGF57+LkFTnV5BQMhcg56mX/m4ofJSS3FIgGXcHsVD1eTw76VTKqUrBU/xu/6R729clHLhzBcIWnusv5GtH/isyAfGrHBjTlgsG6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JQ/fuZOR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755462126; c=relaxed/simple;
+	bh=/kr1h3ivDaybILMj58T9joQcQNXYw3TXcpEPHXi8CWI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=crU/Lwawnug9XLjdCUuErX4ak9zNyjeSLS/3LI4W3UVhdTCSXUIrgL0SW6t4zsYHwAUOKfkwEpGEFk1KFdG0yAYHiTZOOXGoSs+JEX6YSCvJpMJee00/TOmSszX9Yr2ScanydQSNKkaftDlOq9ZAIea8E4s2tB8+sUQjGdYGjHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/p1LFvy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JQ/fuZOR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33B61C4CEEB;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/p1LFvy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4A7BC116D0;
 	Sun, 17 Aug 2025 20:22:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1755462125;
-	bh=6IKXewD5unUmBax2L4vHEKjl6ny3rrpHG4F8C3MhAI4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JQ/fuZORsW19lxI3yCEgGoKsk/eCkdixoVAwGBsuTCHwVrwe125DUvz/ImYQN0m9e
-	 SVzyFTelspj4+e3kqbco62jwL8K+Z3KN7wMLOd2C+qGY5vGgcVqZqRCKjX1gjUCO2p
-	 i+X64uCFoJGt4yLdEcT5oBHpK9euSaEREzSk2u5ciSUl+K+9WH9mlRH63r2S0t5q+9
-	 N7R5fKKqGSAhuqiRGtBJb+yf/LgppqM13bc7GnBfKDYrzv+0+ndzQVV1SzxQlrp38e
-	 JlO6O0IbUkM2kC0obukFDaJ5B/iQD+PZRBheP8fNE977hoxWarTEq5polxRzwnPuv1
-	 48mhCcwGn+dOA==
+	bh=/kr1h3ivDaybILMj58T9joQcQNXYw3TXcpEPHXi8CWI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=M/p1LFvyG1jWQGFGy5M3aZHnSBRa/vq1bKsLxZDZItAsACkJ+cWaK066JObotivc7
+	 so7haCYLxbnPyuFWhZ8IA3DhNbcXFXxkorzj62eXIF0G9F4Bo5FZUJPYpSSWTGTe0l
+	 DA1qm5DCUkm2F89pDehuWKtv/Sstnq2vGNYEDqX+hSSVnL1mRs48Zt3SiopSlTvJb/
+	 ifmaQ6zdh1E8Ml3ddO5aZjoLX4HaOAostCLm2ORaA/qJ5gEzMnmi2bliQoFvsKSsSn
+	 VsevUxHY/t8UYuS9x3AK3B7ZNzIElwPCJZjWKXKWJGvAJ7216DVLOHE9ybem/Ve433
+	 EngDuW9UR1o2Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1unjtC-008PX0-PO;
-	Sun, 17 Aug 2025 21:22:02 +0100
+	id 1unjtD-008PX0-OS;
+	Sun, 17 Aug 2025 21:22:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,10 +43,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v3 0/6] KVM: arm64: FEAT_RASv1p1 support and RAS selection
-Date: Sun, 17 Aug 2025 21:21:52 +0100
-Message-Id: <20250817202158.395078-1-maz@kernel.org>
+Subject: [PATCH v3 4/6] KVM: arm64: Make ID_AA64PFR0_EL1.RAS writable
+Date: Sun, 17 Aug 2025 21:21:56 +0100
+Message-Id: <20250817202158.395078-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250817202158.395078-1-maz@kernel.org>
+References: <20250817202158.395078-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,67 +61,27 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This is the next iteration of this series trying to plug some of our
-RAS holes (no pun intended...). See [1] for the original series.
+Make ID_AA64PFR0_EL1.RAS writable so that we can restore a VM from
+a system without RAS to a RAS-equipped machine (or disable RAS
+in the guest).
 
-The difference with the previous drop is that we don't try to expose a
-canonical encoding RASv1p1. Which means you must migrate between
-similar implementations for now.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-I've also added a cleanup patch at the end, which can be dropped.
-
-Patches on top of v6.17-rc1.
-
-* From v2 [2]:
-
-  - Drop the canonical RASv1p1 advertisement
-
-  - Expose ID_AA64PFR1_EL1.RAS_frac as a writable field
-
-  - Added an extra patch dropping ARM64_FEATURE_MASK(), as it is both
-    useless and annoying
-
-  - Pick RB from Joey (thanks!)
-
-* From v1 [1]:
-
-  - Bunch of patches picked by Oliver (thanks!)
-
-  - Added missing SYS_ERXMISC{2,3}_EL1 from the list of handled RAS
-    registers
-
-  - Added some rationale about the advertising of RASv1p1 (Cornelia)
-
-  - Picked AB from Catalin (thanks!)
-
-[1] https://lore.kernel.org/kvmarm/20250721101955.535159-1-maz@kernel.org
-[2] https://lore.kernel.org/kvmarm/20250806165615.1513164-1-maz@kernel.org
-
-Marc Zyngier (6):
-  arm64: Add capability denoting FEAT_RASv1p1
-  KVM: arm64: Handle RASv1p1 registers
-  KVM: arm64: Ignore HCR_EL2.FIEN set by L1 guest's EL2
-  KVM: arm64: Make ID_AA64PFR0_EL1.RAS writable
-  KVM: arm64: Make ID_AA64PFR1_EL1.RAS_frac writable
-  KVM: arm64: Get rid of ARM64_FEATURE_MASK()
-
- arch/arm64/include/asm/sysreg.h               |  3 -
- arch/arm64/kernel/cpufeature.c                | 24 ++++++
- arch/arm64/kvm/arm.c                          |  8 +-
- arch/arm64/kvm/hyp/vhe/switch.c               |  5 +-
- arch/arm64/kvm/nested.c                       |  3 +-
- arch/arm64/kvm/sys_regs.c                     | 75 +++++++++++++------
- arch/arm64/tools/cpucaps                      |  1 +
- tools/arch/arm64/include/asm/sysreg.h         |  3 -
- .../selftests/kvm/arm64/aarch32_id_regs.c     |  2 +-
- .../selftests/kvm/arm64/debug-exceptions.c    | 12 +--
- .../testing/selftests/kvm/arm64/no-vgic-v3.c  |  4 +-
- .../selftests/kvm/arm64/page_fault_test.c     |  6 +-
- .../testing/selftests/kvm/arm64/set_id_regs.c |  8 +-
- .../selftests/kvm/arm64/vpmu_counter_access.c |  2 +-
- .../selftests/kvm/lib/arm64/processor.c       |  6 +-
- 15 files changed, 107 insertions(+), 55 deletions(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index feb1a7a708e25..3306fef432cbb 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2941,7 +2941,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 		    ~(ID_AA64PFR0_EL1_AMU |
+ 		      ID_AA64PFR0_EL1_MPAM |
+ 		      ID_AA64PFR0_EL1_SVE |
+-		      ID_AA64PFR0_EL1_RAS |
+ 		      ID_AA64PFR0_EL1_AdvSIMD |
+ 		      ID_AA64PFR0_EL1_FP)),
+ 	ID_FILTERED(ID_AA64PFR1_EL1, id_aa64pfr1_el1,
 -- 
 2.39.2
 
