@@ -1,36 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC4E23958C;
-	Sun, 17 Aug 2025 12:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCFC24468D;
+	Sun, 17 Aug 2025 12:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755433176; cv=none; b=VPfrY7ElMrvLRUgCoXa2Rm3XZYK1t9rPMM6ejRrrjY35QXbHyZQbyzr2Dw0MrXScAvKgKsn16IzNeiF3BJYwAeDQKl8Aue8znl8+gfO/mUsgRe/VxJIYw8mvMzPnSD3oHWf0qC9f9x+BJoqj2061OwOWIpacYYwjcvnFrOQ+jXc=
+	t=1755433176; cv=none; b=Yz8OORvx3jkyjw2HbGFipDagCHLBwMP49amR8pb10RhL5k2nyynQ54efrsNEjwGiN1IEfL5usOsD7miRbfiy/SsjMSiA+6/oJW0oI10F6RnzFk+AR/e4ZNljOT68UcLT4fFi4vxqsSlnAD8NeSuC9I2PyW1jWNIMone8J+du51Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755433176; c=relaxed/simple;
-	bh=RBob3+AvRkvfEfvFXTw/GdVJZ/1+9Wc1qjUp0oWbL8s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UUIrKKvPN5NZHzoCZXE5g83ONPyiL+ykgYQa8o2mpqnV4LgBbDTQcQzX3NazJlKEKWrbQZl6ci0716uicf7/+bXjNrQirtBTJia1bzZp+N5cY1xKkca2zeDWmbigT6feXpwjiQ/nM9yp81WG61DIRUcdPQnQa7hpaqgrwkY3zXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MicD08+X; arc=none smtp.client-ip=10.30.226.201
+	bh=dASPEeUs8fF0JPg3CriKPlz4cPW/fuQlXdkrCNipZ94=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aqJi0szhfndIWHVNwlCsZ3igak0L14nib0T2p1QCSAH+M97b1y56mrqHHQCnRvsZoMdwRlrQauP7jZ5A+iPodcbdviIytrPQRQoOgTwCD0u/rS/73laVrBXD8DYjKRLM4eD+cBsIsxy9EZoAQ30f1EPuw8en4mfPnHqcXtY9dqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H9+H61Tm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MicD08+X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11866C4CEED;
-	Sun, 17 Aug 2025 12:19:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H9+H61Tm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78009C4CEEB;
+	Sun, 17 Aug 2025 12:19:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755433176;
-	bh=RBob3+AvRkvfEfvFXTw/GdVJZ/1+9Wc1qjUp0oWbL8s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MicD08+XXo1pVla9xI65WfAi2HmvTpxnN1p3V1haJEKgtZ3Bu/8EECll9IreGSaQA
-	 pJxYyA38557tr15fwtpmoLqVHp0rfPH1VCrv0bchLP/4FRKTb+3mhk4+jc+7HnnbGI
-	 6aojR+VBxTyYGYYu7lwgi19wX3AyMC5AJ8yy515EFPLq4NPg0QBegCccDTB8EH1sAN
-	 gBocqRuiHfmMkNK5f1Yqxj6NpuwzHWRyrpqAq2lrle5R7Ez6Ee4PTuQnt3vdtkCxmD
-	 urcKFAgNqPajJMlSgn8RZWeOi/yIcA6eXr5vOYEuouWc69Mgz2475ZdlY9kVgzdkbG
-	 IrP8XorUnEK7g==
+	s=k20201202; t=1755433175;
+	bh=dASPEeUs8fF0JPg3CriKPlz4cPW/fuQlXdkrCNipZ94=;
+	h=From:To:Cc:Subject:Date:From;
+	b=H9+H61TmbPT1dYHWQNGeArlMFwF2rWVIbw/Aj6xGhtxf4UIb6GHqCPt3HYiSoFz/I
+	 OZnBgzdHRATym/EZ9I5zW/sy7gxU/wSrwFujauVxbDhRfadOJOYH18eP5qkQop2T4E
+	 1BS2UG4fWrx+G3m7rcH3u6713WUYywLikKFFTNryx+qXX4iRzNtkHkSJkA0XAaL8OV
+	 zyFtIR/DrldGnWUJzwWHyNKzTLNlZvPuthB3QW6nGALBa2mm+XIFh3QrOt/jXiTAuz
+	 k9K9hHkstqKOGK+IGutqJYCrYzy4AgXYC8NcwPQ8O/sRgcZ+eXPps3K3ifY+5/8oY2
+	 uTo/D7bT3/X0Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uncME-008L0z-RG;
+	id 1uncME-008L0z-9v;
 	Sun, 17 Aug 2025 13:19:30 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -41,12 +40,10 @@ Cc: Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 2/4] KVM: arm64: Simplify sysreg access on exception delivery
-Date: Sun, 17 Aug 2025 13:19:24 +0100
-Message-Id: <20250817121926.217900-3-maz@kernel.org>
+Subject: [PATCH v2 0/4] KVM: arm64: Live system register access fixes
+Date: Sun, 17 Aug 2025 13:19:22 +0100
+Message-Id: <20250817121926.217900-1-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250817121926.217900-1-maz@kernel.org>
-References: <20250817121926.217900-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,63 +56,28 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Distinguishing between NV and VHE is slightly pointless, and only
-serves as an extra complication, or a way to introduce bugs, such
-as the way SPSR_EL1 gets written without checking for the state
-being resident.
+This series stems from [1], which outlined some rather bad bugs in the
+way we handle live system registers with VHE. As the discussion
+progressed, I decided to tighten things a bit, and found a couple more
+bugs in the process.
 
-Get rid if this silly distinction, and fix the bug in one go.
+I appreciate this is a bit big for a -rc, but at the same time some of
+the issues are rather annoying, and I'd like to make sure we address
+these for good.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/exception.c | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+[1] https://lore.kernel.org/all/20250809144811.2314038-3-maz@kernel.org/
 
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 3e67333197ab2..bef40ddb16dbc 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -22,36 +22,28 @@
- 
- static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- {
--	u64 val;
--
--	if (unlikely(vcpu_has_nv(vcpu)))
-+	if (has_vhe())
- 		return vcpu_read_sys_reg(vcpu, reg);
--	else if (vcpu_get_flag(vcpu, SYSREGS_ON_CPU) &&
--		 __vcpu_read_sys_reg_from_cpu(reg, &val))
--		return val;
- 
- 	return __vcpu_sys_reg(vcpu, reg);
- }
- 
- static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- {
--	if (unlikely(vcpu_has_nv(vcpu)))
-+	if (has_vhe())
- 		vcpu_write_sys_reg(vcpu, val, reg);
--	else if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU) ||
--		 !__vcpu_write_sys_reg_to_cpu(val, reg))
-+	else
- 		__vcpu_assign_sys_reg(vcpu, reg, val);
- }
- 
- static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long target_mode,
- 			      u64 val)
- {
--	if (unlikely(vcpu_has_nv(vcpu))) {
-+	if (has_vhe()) {
- 		if (target_mode == PSR_MODE_EL1h)
- 			vcpu_write_sys_reg(vcpu, val, SPSR_EL1);
- 		else
- 			vcpu_write_sys_reg(vcpu, val, SPSR_EL2);
--	} else if (has_vhe()) {
--		write_sysreg_el1(val, SYS_SPSR);
- 	} else {
- 		__vcpu_assign_sys_reg(vcpu, SPSR_EL1, val);
- 	}
+Marc Zyngier (4):
+  KVM: arm64: Check for SYSREGS_ON_CPU before accessing the 32bit state
+  KVM: arm64: Simplify sysreg access on exception delivery
+  KVM: arm64: Fix vcpu_{read,write}_sys_reg() accessors
+  KVM: arm64: Remove __vcpu_{read,write}_sys_reg_{from,to}_cpu()
+
+ arch/arm64/include/asm/kvm_host.h | 111 +---------
+ arch/arm64/kvm/hyp/exception.c    |  20 +-
+ arch/arm64/kvm/sys_regs.c         | 344 ++++++++++++++++++++----------
+ 3 files changed, 243 insertions(+), 232 deletions(-)
+
 -- 
 2.39.2
 
