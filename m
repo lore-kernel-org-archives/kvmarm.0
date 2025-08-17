@@ -1,46 +1,52 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9192FCC00
-	for <kvmarm@lists.linux.dev>; Sat, 16 Aug 2025 15:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDDB199FAB;
+	Sun, 17 Aug 2025 12:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755357591; cv=none; b=Cz3KZGNJKXyaqR2m4xkFxfMvnIegUR3Yui8sP+OoZMDap2SNwApgjuvcwP0OaesuU5aohkJ0o+IbZGZpKwpeYG0ZNm/T0rb7mkRKWs3xjrInu87RJujWhaygAAKHI9lgfri6k7vgH/jZ7Lfvb5rTKPZgwTDOOtUlmTN1PN8bxJs=
+	t=1755433173; cv=none; b=aXMjkqVX+YS0OhCT27/WNXgkGk1oVVNwpdz3Wa/w1cPlgYeEHGw6P4vwl5X/GCkrwYKp/Taa71jNo4EKH6wSwhrtNvol13ks3uM9zFYLnRFyXdWhHmWvMreg0Co5pJIxpwx44UqL0j5SErNN+ZtoM7Pb7Sm5mOcrOCtusKY2fHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755357591; c=relaxed/simple;
-	bh=8eu35A25ZoHlVGl5aQr08jMr2zEpcJk0h8Qm+KEEqLA=;
+	s=arc-20240116; t=1755433173; c=relaxed/simple;
+	bh=6O3ZVvHdrs8pMLhU0xKvwyNZZW4I8MNdbGA++gTccPY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BzQjjermaocNErd2g/MUVuLC6ZX000p+hrNyDrfrsO+hnFTtWeQMS3RtMxw+SQqqQqGu3nWUlxgJCKdhsJN9/HcMs3NLmGJXbLOPXudV59WcOYT59WNqqpvLb+B5T2AHhjnKro/h8WDAOjh58e4UTUHEgJ/qlTK5pRQcJZVm45w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 858E21D13;
-	Sat, 16 Aug 2025 08:19:41 -0700 (PDT)
-Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7D6993F5A1;
-	Sat, 16 Aug 2025 08:19:47 -0700 (PDT)
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: catalin.marinas@arm.com,
-	will@kernel.org,
-	broonie@kernel.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	james.morse@arm.com,
-	ardb@kernel.org,
-	scott@os.amperecomputing.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	mark.rutland@arm.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH RESEND v7 6/6] arm64: futex: support futex with FEAT_LSUI
-Date: Sat, 16 Aug 2025 16:19:29 +0100
-Message-Id: <20250816151929.197589-7-yeoreum.yun@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250816151929.197589-1-yeoreum.yun@arm.com>
-References: <20250816151929.197589-1-yeoreum.yun@arm.com>
+	 MIME-Version; b=sxXAxl1z4dK+sE7gvRvLISl4ZSEPSGHJWDxxs/4Efym12O7t8FGNDSeOwj9XWTuEcfJssA112WHvmkFzMi8eBd4dwXhOsNtX8S0mdsdEP7+KXX+5WuGPtWtenKBrUqYBGsWGIXCIJyDyEZBuG5JiJeKo6dFpT3lgNwSpzJMHG+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=haZkg418; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="haZkg418"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFDB3C4CEEB;
+	Sun, 17 Aug 2025 12:19:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755433172;
+	bh=6O3ZVvHdrs8pMLhU0xKvwyNZZW4I8MNdbGA++gTccPY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=haZkg418UdG9q9K+quCbAsm664rxL+8kNtzH18ZgS0fCfu+nlW2yriUpd5A+IneKH
+	 L2DV8LO4FU29iZlcMrPqqgPfyaynqRnj1grCZ5MEzwNFEyVPdAX3rBcN+VDuCM62Bi
+	 VhR6RDzCWMxs+2KzBvXB6yGY92n1MSyUwsYFbLQJvElZek2LXwXDWbH6ZevoRJsY5X
+	 skx+sVw7EHFn8Y5CHcBIC1CJ0LLWk5nlNCPga/jsO/L43Pk44Bu5TIryBg4C4Lk+oM
+	 VjhslD36wcNmubmOOK+seE2GG0lqqdC/1kMDQkNt2gRkboV8KlALGBkjyFyQbpBPZc
+	 dzUQeqSebYRPw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uncME-008L0z-Hj;
+	Sun, 17 Aug 2025 13:19:30 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Volodymyr Babchuk <volodymyr_babchuk@epam.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v2 1/4] KVM: arm64: Check for SYSREGS_ON_CPU before accessing the 32bit state
+Date: Sun, 17 Aug 2025 13:19:23 +0100
+Message-Id: <20250817121926.217900-2-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250817121926.217900-1-maz@kernel.org>
+References: <20250817121926.217900-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,182 +54,42 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, volodymyr_babchuk@epam.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Current futex atomic operations are implemented with ll/sc instructions
-and clearing PSTATE.PAN.
+Just like c6e35dff58d3 ("KVM: arm64: Check for SYSREGS_ON_CPU before
+accessing the CPU state") fixed the 64bit state access, add a check
+for the 32bit state actually being on the CPU before writing it.
 
-Since Armv9.6, FEAT_LSUI supplies not only load/store instructions but
-also atomic operation for user memory access in kernel it doesn't need
-to clear PSTATE.PAN bit anymore.
-
-With theses instructions some of futex atomic operations don't need to
-be implmented with ldxr/stlxr pair instead can be implmented with
-one atomic operation supplied by FEAT_LSUI.
-
-However, some of futex atomic operations still need to use ll/sc way
-via ldtxr/stltxr supplied by FEAT_LSUI since there is no correspondant
-atomic instruction or doesn't support word size operation.
-(i.e) eor, cas{mb}t
-
-But It's good to work without clearing PSTATE.PAN bit.
-
-Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/futex.h | 130 ++++++++++++++++++++++++++++++++-
- 1 file changed, 129 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/exception.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-index 22a6301a9f3d..ece35ca9b5d9 100644
---- a/arch/arm64/include/asm/futex.h
-+++ b/arch/arm64/include/asm/futex.h
-@@ -9,6 +9,8 @@
- #include <linux/uaccess.h>
- #include <linux/stringify.h>
-
-+#include <asm/alternative.h>
-+#include <asm/alternative-macros.h>
- #include <asm/errno.h>
-
- #define LLSC_MAX_LOOPS	128 /* What's the largest number you can think of? */
-@@ -115,11 +117,137 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
- 	return ret;
- }
-
-+#ifdef CONFIG_AS_HAS_LSUI
-+
-+#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-+
-+#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
-+static __always_inline int						\
-+__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-+{									\
-+	int ret = 0;							\
-+	int oldval;							\
-+									\
-+	uaccess_ttbr0_enable();						\
-+	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
-+	__LSUI_PREAMBLE							\
-+"1:	" #asm_op #mb "	%w3, %w2, %1\n"					\
-+"2:\n"									\
-+	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)				\
-+	: "+r" (ret), "+Q" (*uaddr), "=r" (oldval)			\
-+	: "r" (oparg)							\
-+	: "memory");							\
-+	uaccess_ttbr0_disable();					\
-+									\
-+	if (!ret)							\
-+		*oval = oldval;						\
-+									\
-+	return ret;							\
-+}
-+
-+LSUI_FUTEX_ATOMIC_OP(add, ldtadd, al)
-+LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
-+LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
-+LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
-+
-+static __always_inline int
-+__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
-+{
-+	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
-+}
-+
-+static __always_inline int
-+__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
-+{
-+	unsigned int loops = LLSC_MAX_LOOPS;
-+	int ret, oldval, tmp;
-+
-+	uaccess_ttbr0_enable();
-+	/*
-+	 * there are no ldteor/stteor instructions...
-+	 */
-+	asm volatile("// __lsui_futex_atomic_eor\n"
-+	__LSUI_PREAMBLE
-+"	prfm	pstl1strm, %2\n"
-+"1:	ldtxr	%w1, %2\n"
-+"	eor	%w3, %w1, %w5\n"
-+"2:	stltxr	%w0, %w3, %2\n"
-+"	cbz	%w0, 3f\n"
-+"	sub	%w4, %w4, %w0\n"
-+"	cbnz	%w4, 1b\n"
-+"	mov	%w0, %w6\n"
-+"3:\n"
-+"	dmb	ish\n"
-+	_ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w0)
-+	_ASM_EXTABLE_UACCESS_ERR(2b, 3b, %w0)
-+	: "=&r" (ret), "=&r" (oldval), "+Q" (*uaddr), "=&r" (tmp),
-+	  "+r" (loops)
-+	: "r" (oparg), "Ir" (-EAGAIN)
-+	: "memory");
-+	uaccess_ttbr0_disable();
-+
-+	if (!ret)
-+		*oval = oldval;
-+
-+	return ret;
-+}
-+
-+static __always_inline int
-+__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-+{
-+	int ret = 0;
-+	unsigned int loops = LLSC_MAX_LOOPS;
-+	u32 val, tmp;
-+
-+	uaccess_ttbr0_enable();
-+	/*
-+	 * cas{al}t doesn't support word size...
-+	 */
-+	asm volatile("//__lsui_futex_cmpxchg\n"
-+	__LSUI_PREAMBLE
-+"	prfm	pstl1strm, %2\n"
-+"1:	ldtxr	%w1, %2\n"
-+"	eor	%w3, %w1, %w5\n"
-+"	cbnz	%w3, 4f\n"
-+"2:	stltxr	%w3, %w6, %2\n"
-+"	cbz	%w3, 3f\n"
-+"	sub	%w4, %w4, %w3\n"
-+"	cbnz	%w4, 1b\n"
-+"	mov	%w0, %w7\n"
-+"3:\n"
-+"	dmb	ish\n"
-+"4:\n"
-+	_ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)
-+	_ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)
-+	: "+r" (ret), "=&r" (val), "+Q" (*uaddr), "=&r" (tmp), "+r" (loops)
-+	: "r" (oldval), "r" (newval), "Ir" (-EAGAIN)
-+	: "memory");
-+	uaccess_ttbr0_disable();
-+
-+	if (!ret)
-+		*oval = oldval;
-+
-+	return ret;
-+}
-+
-+#define __lsui_llsc_body(op, ...)					\
-+({									\
-+	alternative_has_cap_likely(ARM64_HAS_LSUI) ?			\
-+		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
-+})
-+
-+#else	/* CONFIG_AS_HAS_LSUI */
-+
-+#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
-+
-+#endif	/* CONFIG_AS_HAS_LSUI */
-+
-+
- #define FUTEX_ATOMIC_OP(op)						\
- static __always_inline int						\
- __futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)		\
- {									\
--	return __llsc_futex_atomic_##op(oparg, uaddr, oval);		\
-+	return __lsui_llsc_body(futex_atomic_##op, oparg, uaddr, oval);	\
- }
-
- FUTEX_ATOMIC_OP(add)
---
-LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+index 95d186e0bf54f..3e67333197ab2 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -59,7 +59,7 @@ static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long target_mode,
+ 
+ static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
+ {
+-	if (has_vhe())
++	if (has_vhe() && vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
+ 		write_sysreg(val, spsr_abt);
+ 	else
+ 		vcpu->arch.ctxt.spsr_abt = val;
+@@ -67,7 +67,7 @@ static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
+ 
+ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
+ {
+-	if (has_vhe())
++	if (has_vhe() && vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
+ 		write_sysreg(val, spsr_und);
+ 	else
+ 		vcpu->arch.ctxt.spsr_und = val;
+-- 
+2.39.2
 
