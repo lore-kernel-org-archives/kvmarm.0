@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4511B423C
-	for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 09:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52CA21765B
+	for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 09:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755508306; cv=none; b=NotdrM4+Gfuv1pFdKLvgqfSnqSDn2U/fdldJoewkeE0lVelqc7WSxyYtElaBLGHaiajLV5hzWl9jxoq6/Vavh2sXR+3OE2feRCB5vARe5ecjNTKDhPQP4fFEx9omwx6ZS/W3FgaLP1eZw60QteRKYpUGYJRBikfPwU2H5Tfrhp4=
+	t=1755508647; cv=none; b=TIA26BwdW+lPapk7JAujAgiUBo5dHf3iwqkYR3OM2g2ClgiDFNrrr//3kBzPY35OmTgkaBmeT/pG1RYSRrU45w/V3v3OvLcR/7KXHB7kPgXBbljy7xtMJZAhkHj3NiSXY70vGFwDcV+m18i3MCpedHkShzLxlkRBbmPG8Cw6Hvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755508306; c=relaxed/simple;
-	bh=gle12oxOtDoWNNjDbG8+S0dFyMPys4A83WkK/06gxHw=;
+	s=arc-20240116; t=1755508647; c=relaxed/simple;
+	bh=PmpVfxf9inMP37NkMBjiCc3EF2wQn7mnDy/mD1xkvGM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WcL1ML6aAhIufGaMTEL9iQKGTw2OV0SVbDNMV7Ba6gbl36apJVtcEm/qS83/0X719yOz7d6fsauMtcMd7+jfIjL5EtEGA4lU7elira1QMuyt6BFMrG65yAFkZUL9DVVKTt+4L2ouytpPNT8rFyVKgziDQK5EE6ipKzpMmKmN1hQ=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iw8UGvG1xTPl3HQ2PiOZAJXvSt6zYiFmhphuG/lKgsHtLSKkcJDTrfjEU19Qqoo/35rKvYHB5NhCOGbx7FFs4t6HTPsPLSIxidAZ7evI9H4GMES3PbJzdNINyuphIZRUobPs5RYvR0O7gahqoTtCfzlNLVMNALJ9LqaVE1eqnbw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86D291424;
-	Mon, 18 Aug 2025 02:11:35 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0BA63150C;
+	Mon, 18 Aug 2025 02:17:17 -0700 (PDT)
 Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19F0A3F58B;
-	Mon, 18 Aug 2025 02:11:39 -0700 (PDT)
-Date: Mon, 18 Aug 2025 10:11:30 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 42C723F58B;
+	Mon, 18 Aug 2025 02:17:20 -0700 (PDT)
+Date: Mon, 18 Aug 2025 10:17:15 +0100
 From: Mark Rutland <mark.rutland@arm.com>
 To: Anshuman Khandual <anshuman.khandual@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -28,10 +28,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Mark Brown <broonie@kernel.org>,
 	Ryan Roberts <ryan.roberts@arm.com>, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] arm64/sysreg: Update TCR_EL1 register
-Message-ID: <aKLuQmfSi1Qg2och@J2N7QTR9R3>
+Subject: Re: [PATCH 3/4] arm64/sysreg: Add TCR_EL2 register
+Message-ID: <aKLvm2_bNtxcs8Dz@J2N7QTR9R3>
 References: <20250818045759.672408-1-anshuman.khandual@arm.com>
- <20250818045759.672408-2-anshuman.khandual@arm.com>
+ <20250818045759.672408-4-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,113 +40,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250818045759.672408-2-anshuman.khandual@arm.com>
+In-Reply-To: <20250818045759.672408-4-anshuman.khandual@arm.com>
 
-On Mon, Aug 18, 2025 at 10:27:56AM +0530, Anshuman Khandual wrote:
-> Update TCR_EL1 register fields as per latest ARM ARM DDI 0487 7.B and while
-> here drop an explicit sysreg definition SYS_TCR_EL1 from sysreg.h, which is
-> now redundant.
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
->  arch/arm64/include/asm/sysreg.h |  2 --
->  arch/arm64/tools/sysreg         | 52 ++++++++++++++++++++++++++++-----
->  2 files changed, 44 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index d5b5f2ae1afa..ad5c901af229 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -281,8 +281,6 @@
->  #define SYS_RGSR_EL1			sys_reg(3, 0, 1, 0, 5)
->  #define SYS_GCR_EL1			sys_reg(3, 0, 1, 0, 6)
->  
-> -#define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
-> -
->  #define SYS_APIAKEYLO_EL1		sys_reg(3, 0, 2, 1, 0)
->  #define SYS_APIAKEYHI_EL1		sys_reg(3, 0, 2, 1, 1)
->  #define SYS_APIBKEYLO_EL1		sys_reg(3, 0, 2, 1, 2)
+On Mon, Aug 18, 2025 at 10:27:58AM +0530, Anshuman Khandual wrote:
 > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 696ab1f32a67..4bdae8bb11dc 100644
+> index 4bdae8bb11dc..d2b40105eb41 100644
 > --- a/arch/arm64/tools/sysreg
 > +++ b/arch/arm64/tools/sysreg
-> @@ -4756,17 +4756,53 @@ Field   37      TBI0
->  Field   36      AS
->  Res0    35
->  Field   34:32   IPS
-> -Field   31:30   TG1
-> -Field   29:28   SH1
-> -Field   27:26   ORGN1
-> -Field   25:24   IRGN1
-> +UnsignedEnum   31:30   TG1
-> +	0b01	16K
-> +	0b10	4K
-> +	0b11	64K
-> +EndEnum
-
-This is clearly not an ordered set.
-
-This should just use Enum, not UnsignedEnum.
-
-Likewise for all the other cases below.
-
-Mark.
-
-> +UnsignedEnum   29:28   SH1
-> +	0b00	NONE
-> +	0b10	OUTER
-> +	0b11	INNER
-> +EndEnum
-> +UnsignedEnum   27:26  ORGN1
-> +	0b00	NC
-> +	0b01	WBWA
-> +	0b10	WT
-> +	0b11	WBnWA
-> +EndEnum
-> +UnsignedEnum   25:24   IRGN1
-> +	0b00	NC
-> +	0b01	WBWA
-> +	0b10	WT
-> +	0b11	WBnWA
-> +EndEnum
->  Field   23      EPD1
->  Field   22      A1
->  Field   21:16   T1SZ
-> -Field   15:14   TG0
-> -Field   13:12   SH0
-> -Field   11:10   ORGN0
-> -Field   9:8     IRGN0
-> +UnsignedEnum   15:14   TG0
+> @@ -4812,6 +4812,50 @@ Sysreg	TCR_EL12        3	5	2	0	2
+>  Mapping	TCR_EL1
+>  EndSysreg
+>  
+> +Sysreg	TCR_EL2        3	4	2	0	2
+> +Res0	63:34
+> +Field	33	MTX
+> +Field	32	DS
+> +Res1	31
+> +Field	30	TCMA
+> +Field	29	TBID
+> +Field	28	HWU62
+> +Field	27	HWU61
+> +Field	26	HWU60
+> +Field	25	HWU59
+> +Field	24	HPD
+> +Res1	23
+> +Field	22	HD
+> +Field	21	HA
+> +Field	20	TBI
+> +Res0	19
+> +Field   18:16	PS
+> +UnsignedEnum	15:14	TG0
 > +	0b00	4K
 > +	0b01	64K
 > +	0b10	16K
 > +EndEnum
-> +UnsignedEnum   13:12   SH0
+
+Same comment as for patch 1: this is not ordered, use Enum rather than
+UnsignedEnum. Likewise for the other cases below.
+
+Mark.
+
+> +UnsignedEnum	13:12	SH0
 > +	0b00	NONE
 > +	0b10	OUTER
 > +	0b11	INNER
 > +EndEnum
-> +UnsignedEnum   11:10  ORGN0
+> +UnsignedEnum	11:10	ORGN0
 > +	0b00	NC
 > +	0b01	WBWA
 > +	0b10	WT
 > +	0b11	WBnWA
 > +EndEnum
-> +UnsignedEnum   9:8   IRGN0
+> +UnsignedEnum	9:8	IRGN0
 > +	0b00	NC
 > +	0b01	WBWA
 > +	0b10	WT
 > +	0b11	WBnWA
 > +EndEnum
->  Field   7       EPD0
->  Res0    6
->  Field   5:0     T0SZ
+> +Res0    7:6
+> +Field   5:0	T0SZ
+> +EndSysreg
+> +
+>  Sysreg	TCRALIAS_EL1    3	0	2	7	6
+>  Mapping	TCR_EL1
+>  EndSysreg
 > -- 
 > 2.25.1
 > 
