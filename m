@@ -1,154 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122EF258CFA;
-	Mon, 18 Aug 2025 15:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D7E255F28
+	for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 15:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755532023; cv=none; b=QMn99PFnsQXbHzrSsVTihZIeBPwjgAntzrDPsIXIj4caJj20bHz4Zae1612KgCtGbxTFMjzu4r5tN65gTImhC9GTZgj8RZQnXIPXD5j8IxMCAdDBiSpDKeOOpvg1ZaxQe4YpDbktAd3MzBOex3PwvHu3ZVkU1dceQepG6ytlA8Q=
+	t=1755532323; cv=none; b=tVyCJ4XHPL+Rz6rvzmopLbobWPJTedQSbR1eFOBqfH8rxXmpJI/NYm2dWZbCYhDoyBiQSPFI9iBKmo8V9ylfdytaa+fzGGxn4504FLzF0RBwrpeJJ2umaSF2J3t9inUIw0GK0wI7atNOyRu8Gi+lmzsM10UdbgnMBIKLESaZw2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755532023; c=relaxed/simple;
-	bh=W6AmuSmN9qaWu3EIFd4eq8W4sSZ6dygxL+NWbHPYrzc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nqt3YfkId69I3Zip62VMGLEApcyRBpOd6fQeQk+sEQBAMah1hnBkmLwZeBfCuRWCweZX3zQv4gkFQ+BECvwRWcpZmyXuxmHnJ53tmqj2KpkO//GXXveDHOs8gbsP0Jq5xk6jZ8UGf43c9hB+IzADH/DovUlCHhDrYbEIkRlm3ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2aSOb3D; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755532323; c=relaxed/simple;
+	bh=78CPDCFp5nzoxHHBT0nHL9r7Uu+5xAhmDWdsc9UL2k0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OeAXHuHWwYYjMw66kpcDZaRFVIwTXSPNKj94TqA/x02WBNet7reLa9wpFEa7C5A7VYydVQUbhNIrZLAR8tFycKh9QjWr/nsDY9PoJoas4LPSP09tHALyZOB537dZNQFwhN0quSn7rQZ5I5o3qaZknadoK752myW4u1PqKcktj0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OtT9NCSl; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2aSOb3D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85585C4CEEB;
-	Mon, 18 Aug 2025 15:47:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755532022;
-	bh=W6AmuSmN9qaWu3EIFd4eq8W4sSZ6dygxL+NWbHPYrzc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e2aSOb3DJlmkn7hgl5ndvqTbohd07H4hP00GZjm+2z+su04i8FSpfejqd3OOkaYkW
-	 ne8R2t8XogWY46TX2nJd1iUl8+tV5eUeLk3QD76R4f0pMnzaED62uuxeNmF5bGr30d
-	 ryl4y+GI4y0uFapRJmBjm2AUD1DrfMtLDtlwbaIGH1wsMt8APOULhfOQiXRVqzDWgm
-	 Y5mI6UcP5ynpoVoDdzpSD0ajG0QIXhqAYHlhQZXGrmKHjxFV2hK3fBIE7w9Gexuc6I
-	 3Q8beDL32asIGC1xDvUZ3bUzh+YQ1hTPc7zEtK1Yf2OXwuRFV+dhkRwUKjN+C1ojqX
-	 rqKIs184FnKFg==
-Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uo24a-008fb5-Co;
-	Mon, 18 Aug 2025 16:47:00 +0100
-Date: Mon, 18 Aug 2025 16:46:59 +0100
-Message-ID: <87jz30my30.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mark Brown <broonie@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] arm64/sysreg: Replace TCR_EL1 field macros
-In-Reply-To: <20250818045759.672408-3-anshuman.khandual@arm.com>
-References: <20250818045759.672408-1-anshuman.khandual@arm.com>
-	<20250818045759.672408-3-anshuman.khandual@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OtT9NCSl"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-242d1e947feso383635ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 08:52:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755532321; x=1756137121; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jhFVRc1NfpOXTxJauWn9T+QK0y3Sx+B3L8yuuFsdMS8=;
+        b=OtT9NCSlERaVNBqoTDzlsC0C6TUQnE0YdgbUMMZwuHzPYO5LLEGyJWNqh5dJ+dlsDL
+         Yt2ZTCx7T6AsGj/PmtjtXcnzyvDH5eA6EyMDjrDrHIb2CyvlzlJyPIoYUQBbO9U326Y0
+         oWFmCwgFADcft+c6i5pmV2HQkvcBvy3rtimSEI3CkZjYpUTEf+1tu/dHeoGP0wsne2UK
+         oEH9nzi/QjNCp4mAU/u0SAuJ7FgJwozFhqcps+Yrhcv9/THYGvTTPpadxB1OLMQ+NIax
+         5yR8DS+LzxwPsBtDUrOhwzpVEaILJXorbfzwkmV50UpPn1+Tldsk9t+xaWRW1UGMsClW
+         3oPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755532321; x=1756137121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jhFVRc1NfpOXTxJauWn9T+QK0y3Sx+B3L8yuuFsdMS8=;
+        b=Gqssiw1NoRaoWOKoBMFFhTLJTcvA2IVtYqK07kXAatlm88f7nmbZUQkWxKpzjVnRMJ
+         vMPK9fKhsRvZVrrRZkIP+pfqMCVrPhsNwRWU2tuVJoBHFqy9040HtZ2kon6kQQRpheme
+         cuDdoBXE8vQS9tKwsT0FyIyyqBTZo/LdQyu/uvzSdEywUGJU3wUMA+W5uMIb+oG2/P5R
+         Dz9syTNjpWaFGv+cmiRQ60aMi9H0B8DyCpvb4VHhMAEOonwVkHyco+wpdYnRe84XwLiD
+         ZnOcI6OG2VmvB0HojA0UdKYm6gwn1NKqZeCRzWnjSVegFNm9KtcDB0I7/HcmGe0paNiK
+         8UyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOnh3Uc66ZOWjp/TePyqGeNQ6q0ha1wjL0pyzWkK3ZAmbF+q6M5dZKzJE5zBntgBaqZU5NDlU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzikd1J9tTBSSfDCq3bU346VluUfsGKpztEVRUrJw6KFxwPO9Iq
+	uCIhkSegZ2UzEbEz4GthFYB+a0Y1KAyIJjvVX2atcHWoYjXPq3L8PS0YCrJktSAyQAZEu7eyyJR
+	pZKaVMRwLRAD9Eo3Nh3W79yAgNhXVQm6mKVXp09MY
+X-Gm-Gg: ASbGncsM1dMh2fo9S5uog1YFyJngr1HWV3xCwCGGWO5J0WwZnan4HtECBfcHkDmYlJc
+	rNf7r4/ul8jA103KES0qqrHRCWDwpyZrtNcPgwLlh89Og++HWZcAu91MWns8UtHsRClfnOGPrZ3
+	qkqvgoxiTBTEnsd8mVHgoDoUXMc/NTxy9fk972xNII2Igs+qUOYDRHAKShmL+dsFktX/bxHfhwJ
+	WXj7ELBPOo7giyf6rFTj9k84FeOVQBwI+QH96OZNHpeDlY=
+X-Google-Smtp-Source: AGHT+IFBH6QXJvRW18+gfLm+VEHNtKAKh4EWppvXhfmrKKXkPioVQ+b0Kd0ODwqL4Zd3to4i9UzRN7iKxM94h8uE8ug=
+X-Received: by 2002:a17:902:e54e:b0:231:ddc9:7b82 with SMTP id
+ d9443c01a7336-2447a77afebmr6549035ad.13.1755532321031; Mon, 18 Aug 2025
+ 08:52:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 86.149.246.145
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, ryan.roberts@arm.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20250814-james-perf-feat_spe_eft-v7-0-6a743f7fa259@linaro.org> <20250814-james-perf-feat_spe_eft-v7-8-6a743f7fa259@linaro.org>
+In-Reply-To: <20250814-james-perf-feat_spe_eft-v7-8-6a743f7fa259@linaro.org>
+From: Ian Rogers <irogers@google.com>
+Date: Mon, 18 Aug 2025 08:51:50 -0700
+X-Gm-Features: Ac12FXyV1x2afpy-E2EhDR_cSfBMqeVdgvNI2wMfxjm0rwNa4JtVzwidrn9_Mpg
+Message-ID: <CAP-5=fXBot2K0MR9t7o6J7-FihNXzKcotdF6p3bfL7DwqR9jfg@mail.gmail.com>
+Subject: Re: [PATCH v7 08/12] perf: Add perf_event_attr::config4
+To: James Clark <james.clark@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Leo Yan <leo.yan@arm.com>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 18 Aug 2025 05:57:57 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
-> This just replaces all used TCR_EL1 field macros with tools sysreg variant
-> based fields and subsequently drops them from the header (pgtable-hwdef.h).
-> While here, also drop all the unused TCR_XXX macros from the header.
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+On Thu, Aug 14, 2025 at 2:26=E2=80=AFAM James Clark <james.clark@linaro.org=
+> wrote:
+>
+> Arm FEAT_SPE_FDS adds the ability to filter on the data source of a
+> packet using another 64-bits of event filtering control. As the existing
+> perf_event_attr::configN fields are all used up for SPE PMU, an
+> additional field is needed. Add a new 'config4' field.
+
+Somewhat off-topic, imo it would be nice if we could land:
+https://lore.kernel.org/lkml/20250603181634.1362626-1-ctshao@google.com/
+and show all the config values via fdinfo to better allow tools to
+diagnose when PMUs are busy, etc. The patch there tries to be minimal
+and just reveal config (even with being minimal the patch is stalled).
+
+Thanks,
+Ian
+
+> Reviewed-by: Leo Yan <leo.yan@arm.com>
+> Tested-by: Leo Yan <leo.yan@arm.com>
+> Reviewed-by: Ian Rogers <irogers@google.com>
+> Signed-off-by: James Clark <james.clark@linaro.org>
 > ---
->  arch/arm64/include/asm/assembler.h         |   6 +-
->  arch/arm64/include/asm/cputype.h           |   2 +-
->  arch/arm64/include/asm/kvm_arm.h           |  28 +++---
->  arch/arm64/include/asm/kvm_nested.h        |   6 +-
->  arch/arm64/include/asm/mmu_context.h       |   4 +-
->  arch/arm64/include/asm/pgtable-hwdef.h     | 107 +++------------------
->  arch/arm64/include/asm/pgtable-prot.h      |   2 +-
->  arch/arm64/kernel/cpufeature.c             |   4 +-
->  arch/arm64/kernel/pi/map_kernel.c          |   8 +-
->  arch/arm64/kernel/vmcore_info.c            |   2 +-
->  arch/arm64/kvm/arm.c                       |   6 +-
->  arch/arm64/kvm/at.c                        |  48 ++++-----
->  arch/arm64/kvm/hyp/include/hyp/switch.h    |   2 +-
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   2 +-
->  arch/arm64/kvm/hyp/nvhe/switch.c           |   2 +-
->  arch/arm64/kvm/hyp/nvhe/tlb.c              |   2 +-
->  arch/arm64/kvm/hyp/vhe/tlb.c               |   2 +-
->  arch/arm64/kvm/nested.c                    |   8 +-
->  arch/arm64/kvm/pauth.c                     |  12 +--
->  arch/arm64/mm/proc.S                       |  29 +++---
->  tools/arch/arm64/include/asm/cputype.h     |   2 +-
->  21 files changed, 101 insertions(+), 183 deletions(-)
-
-[...]
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 888f7c7abf54..b47d6d530e57 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2000,10 +2000,10 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
->  
->  	tcr = read_sysreg(tcr_el1);
->  	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-> -		tcr &= ~(TCR_HD | TCR_HA | TCR_A1 | TCR_T0SZ_MASK);
-> -		tcr |= TCR_EPD1_MASK;
-> +		tcr &= ~(TCR_EL1_HD | TCR_EL1_HA | TCR_EL1_A1 | TCR_EL1_T0SZ_MASK);
-> +		tcr |= TCR_EL1_EPD1_MASK;
-
-Except that none of that code is about EL1. At all.
-
->  	} else {
-> -		unsigned long ips = FIELD_GET(TCR_IPS_MASK, tcr);
-> +		unsigned long ips = FIELD_GET(TCR_EL1_IPS_MASK, tcr);
->  
->  		tcr &= TCR_EL2_MASK;
->  		tcr |= TCR_EL2_RES1 | FIELD_PREP(TCR_EL2_PS_MASK, ips);
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 0e5610533949..5f0f10ef38f0 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -134,8 +134,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  	tbi = (wi->regime == TR_EL2 ?
->  	       FIELD_GET(TCR_EL2_TBI, tcr) :
->  	       (va55 ?
-> -		FIELD_GET(TCR_TBI1, tcr) :
-> -		FIELD_GET(TCR_TBI0, tcr)));
-> +		FIELD_GET(TCR_EL1_TBI1, tcr) :
-> +		FIELD_GET(TCR_EL1_TBI0, tcr)));
-
-This is the reason number one why I dislike this patch.
-
-Here, we deal with both the EL1&0 *and* the EL2&0 translation
-regimes. And I left the original definition *on purpose* so that
-nobody would read this code as being EL1-only. Now, you will glance
-over it with warm fuzzy feeling that you know what this is about --
-purely EL1. And that's what bugs are made of.
-
-Of course, nothing changed functionally. But is it better? No.
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+>  include/uapi/linux/perf_event.h | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/include/uapi/linux/perf_event.h b/include/uapi/linux/perf_ev=
+ent.h
+> index 78a362b80027..0d0ed85ad8cb 100644
+> --- a/include/uapi/linux/perf_event.h
+> +++ b/include/uapi/linux/perf_event.h
+> @@ -382,6 +382,7 @@ enum perf_event_read_format {
+>  #define PERF_ATTR_SIZE_VER6                    120     /* Add: aux_sampl=
+e_size */
+>  #define PERF_ATTR_SIZE_VER7                    128     /* Add: sig_data =
+*/
+>  #define PERF_ATTR_SIZE_VER8                    136     /* Add: config3 *=
+/
+> +#define PERF_ATTR_SIZE_VER9                    144     /* add: config4 *=
+/
+>
+>  /*
+>   * 'struct perf_event_attr' contains various attributes that define
+> @@ -543,6 +544,7 @@ struct perf_event_attr {
+>         __u64   sig_data;
+>
+>         __u64   config3; /* extension of config2 */
+> +       __u64   config4; /* extension of config3 */
+>  };
+>
+>  /*
+>
+> --
+> 2.34.1
+>
