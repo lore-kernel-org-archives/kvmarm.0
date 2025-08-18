@@ -1,93 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7039032C304;
-	Mon, 18 Aug 2025 17:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E44E2522A1;
+	Mon, 18 Aug 2025 18:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755536852; cv=none; b=hGSMMhe/gqxlAyimgvf+08QcE1QOLz3LJSHfMm0LLk3mS/sjyEa0PW9ElbGqs8edAfrI5akTaISmu+Vu41baiplZMroT2KhoSI3sPZCHwO7kOr95QBgTv415hx22ROr23zXgpDU+gEFDCG6zzWHXET3sOSDDKcOw7KxYHHcYsnE=
+	t=1755542165; cv=none; b=Z/fm9uqBoioPL+4VVyKGZAfTKWAfINs6iPnUEUx5Ru1bxIHboQsp2LLTw8fItkYkzbXYnKHOnY4CBPzRXz090f6Dw4IEboUQfOzwByrOXbKZTPppEZadr+YmpdHmDbvW22FpDzbs9o3vIr5TbgbMmihWvDPcdXIPqt7CnFVQmXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755536852; c=relaxed/simple;
-	bh=KhHns3MO0aHvf+3Asuji1SH4gKY6cGswxL3bjgtAUSI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=O++Ynm7RK2bWNIbpbJMmiNpErPUwxZM3iL18IurF6YTb28484vjqOwiwCZ1V/c6DmTwHQCozQfVsWcVnxkX+CiX6nQabYenNThAP3BBCw+my3YAo/HvbU4xv8dp85hr6WY1R/kKr0nqrFOHTGxSynzk85Rrj8NmDDBjGuHvSBpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J4Zht8J9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J4Zht8J9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB006C4CEEB;
-	Mon, 18 Aug 2025 17:07:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755536852;
-	bh=KhHns3MO0aHvf+3Asuji1SH4gKY6cGswxL3bjgtAUSI=;
-	h=From:Date:Subject:To:Cc:From;
-	b=J4Zht8J9cq28qvrFdNfKEhj6+9ZF3/cDfE7ThTl02xFlct9SSpXoQdeE+ZpCY+KM0
-	 EYTnSOOkZ/JwKjy5XlRnbhw+Y/6XpZcrlzAm1+IIOp1fzbb1LAdT7qBr1h+ViURf1d
-	 KdZgz3aD2/S5BBlkUT//+2y307Hk5JjZFIJbzRaxWAV4eBFHuZsllpGzIzuQLXZQRT
-	 FAYbTz6kW81T5dWMQZyfCYCVrS10hZDko46lU1fHnWNouAKx4Im9wJNTtRxbfGeJmZ
-	 lJJlSM8Sa30BxbDZuKP+A7L7D6AaGCqCyiIs9lPGIAoed8mGkZhY0mmF3J+p+A4uc0
-	 q0vt3kfqcYVBg==
-From: Mark Brown <broonie@kernel.org>
-Date: Mon, 18 Aug 2025 17:41:00 +0100
-Subject: [PATCH] KVM: arm64: selftests: Sync ID_AA64MMFR3_EL1 in
- set_id_regs
+	s=arc-20240116; t=1755542165; c=relaxed/simple;
+	bh=/TNdDJM7aNaPZKDRxUq92db+dTiso/s/YJpk5Xhi43c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VZJC0VUMJqtIdaEuPF2dpUmEXrN7B0r0/G/kby+SGo8pEwvkNiMppK2SY+mXSZvKjWDod7N0mTDkos6IZfsPkk6og76ee1Wp1vAwcuPOv8MD8hatXk8OVaqILV/RvWuo9keqdCh/pthbbBYYSCicHnMVuIrakUBPw1jOhWleDvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A7D1C4CEEB;
+	Mon, 18 Aug 2025 18:36:02 +0000 (UTC)
+Date: Mon, 18 Aug 2025 19:35:59 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: will@kernel.org, broonie@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com,
+	joey.gouly@arm.com, james.morse@arm.com, ardb@kernel.org,
+	scott@os.amperecomputing.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 5/5] arm64: futex: support futex with FEAT_LSUI
+Message-ID: <aKNyj_6dZVp9O4BA@arm.com>
+References: <20250811163635.1562145-1-yeoreum.yun@arm.com>
+ <20250811163635.1562145-6-yeoreum.yun@arm.com>
+ <aJ9oIes7LLF3Nsp1@arm.com>
+ <aKB55rPj1Qe8G+zF@e129823.arm.com>
+ <aKCcbQWioNfG1MMQ@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250818-kvm-arm64-selftests-mmfr3-idreg-v1-1-2f85114d0163@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAJtXo2gC/x2NywqDMBAAf0X27IKJ8UF/RTykZmOXNrbsihQk/
- 27wODDMnKAkTAqP6gShg5W/WwFTV7C8/LYScigMtrFdM5oO30dCL6l3qPSJO+mumFKUtohCKw5
- PH8cwWOdaA6XyE4r8vw/TnPMFI+NEvXEAAAA=
-X-Change-ID: 20250815-kvm-arm64-selftests-mmfr3-idreg-7baf8d724431
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-cff91
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1114; i=broonie@kernel.org;
- h=from:subject:message-id; bh=KhHns3MO0aHvf+3Asuji1SH4gKY6cGswxL3bjgtAUSI=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoo13QE86Q+y16bpfWE+6x/9uKmyweiprMs5xFd
- i2iompCKpmJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaKNd0AAKCRAk1otyXVSH
- 0BLnB/47gyQvwyahO0s7MsRSP2NgxKt/teBkTEhY6fNSSnTUGClsLhO1v7AwheWNVNuF7pMb9N3
- sSFAFAcJwQaJmtRlJQca/uTn5FLMGV5Fp3EznJ1nOatvjL17YpmJixZyGZOppo5cNL6+TBLCiUp
- CTVDIgAWbUAkzhA8NVdmyRQgcoQA/cW7vq2y5/2tLPCkcr9vZqkjeiDA45szgLRWm0KtfEXRcRe
- FU63m2c+k07H7iPqyDtf0m9qDWgrgvNHD1yaqpyze2ryyrVywr7tMsxSJSryueQ3TMxHXU0ymMk
- MVb302LVklf1wglLZJWS4Q8yT52k9g+yv/ZiLqqVnk2lf6+H
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKCcbQWioNfG1MMQ@e129823.arm.com>
 
-When we added coverage for ID_AA64MMFR3_EL1 we didn't add it to the list
-of registers we read in the guest, do so.
+On Sat, Aug 16, 2025 at 03:57:49PM +0100, Yeoreum Yun wrote:
+> > > > +#ifdef CONFIG_AS_HAS_LSUI
+> > > > +
+> > > > +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> > > > +
+> > > > +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
+> > > > +static __always_inline int						\
+> > > > +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> > > > +{									\
+> > > > +	int ret = 0;							\
+> > > > +	int val;							\
+> > > > +									\
+> > > > +	mte_enable_tco();						\
+> > >
+> >
+> > > The reason uaccess_disable_privileged() sets the MTE TCO (tag check
+> > > override) is because the user and the kernel may have different settings
+> > > for tag checking. If we use the user instructions provided by FEAT_LSUI,
+> > > we leave the MTE checking as is.
+> > >
+> > > The same comment for all the other functions here.
+> >
+> > You're right. Thanks for catching this :)
+> 
+> But one bikeshedding question.
+> why we need to care about the different settings for tag checking when
+> we use uaccess_disable_privileged()?
 
-Fixes: 0b593ef12afc ("KVM: arm64: selftests: Catch up set_id_regs with the kernel")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 1 +
- 1 file changed, 1 insertion(+)
+Because, for example, the user may not be interested in any tag check
+faults (has checking disabled) but the kernel uses KASAN with
+synchronous tag check faults. If it uses the privileged instructions as
+in the futex API, it either won't make progress or report errors to the
+user which it does not expect.
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index d3bf9204409c..97d5ab9ef0fe 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -243,6 +243,7 @@ static void guest_code(void)
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64MMFR3_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
- 	GUEST_REG_SYNC(SYS_CTR_EL0);
- 	GUEST_REG_SYNC(SYS_MIDR_EL1);
+> IIUC, the reason we uses to uaccess_disaable_privileged() to access
+> user memory with copy_from/to_user() and etc.
 
----
-base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
-change-id: 20250815-kvm-arm64-selftests-mmfr3-idreg-7baf8d724431
+We don't use uaccess_disable_privileged() with copy_from_user() since
+those use the unprivileged instructions already.
 
-Best regards,
---  
-Mark Brown <broonie@kernel.org>
+> But, although tag check fault happens in kernel side,
+> It seems to be handled by fixup code if user address is wrong.
 
+The user may know it is wrong and not care (e.g. one wants to keep using
+a buggy application).
+
+-- 
+Catalin
