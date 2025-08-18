@@ -1,138 +1,102 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D7E255F28
-	for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 15:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93562278146;
+	Mon, 18 Aug 2025 16:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755532323; cv=none; b=tVyCJ4XHPL+Rz6rvzmopLbobWPJTedQSbR1eFOBqfH8rxXmpJI/NYm2dWZbCYhDoyBiQSPFI9iBKmo8V9ylfdytaa+fzGGxn4504FLzF0RBwrpeJJ2umaSF2J3t9inUIw0GK0wI7atNOyRu8Gi+lmzsM10UdbgnMBIKLESaZw2Y=
+	t=1755533544; cv=none; b=N7MdopQ93NHrWR9USgWpOwpGCYONSAs00DaH/m2vrgtTjgqnmHQ5N26pzuVubXsVOxkjJQ8XFvo4wWX1gFiNqZ2Cw3HJMR6fqGSAgvJmLsUAkELaS7N7dP+gJMQZwRqw1krFWYxuKKXqKhq+u7u1WF2dXOFFmSVDMd/h1QvpX+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755532323; c=relaxed/simple;
-	bh=78CPDCFp5nzoxHHBT0nHL9r7Uu+5xAhmDWdsc9UL2k0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OeAXHuHWwYYjMw66kpcDZaRFVIwTXSPNKj94TqA/x02WBNet7reLa9wpFEa7C5A7VYydVQUbhNIrZLAR8tFycKh9QjWr/nsDY9PoJoas4LPSP09tHALyZOB537dZNQFwhN0quSn7rQZ5I5o3qaZknadoK752myW4u1PqKcktj0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OtT9NCSl; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1755533544; c=relaxed/simple;
+	bh=0KlOKuDfOUdk5ngaWQoAWmJ0VU24ir66fy6JVhYV5wA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k8bENesrk8fvnY5ZrXgxxu8jcUj5jQH6VwPcjZNvgxrtSiV8EQKJBPeu6nWPGpDzQk6LuGsnn6KMak/+BH1chGv/HbKeKjclcHb62uawrbJ+4QJZj1Dgyool5htm6s/YZ+cz1uoIfLdhBTSaxM69VMuGa+L50fP98SoviNz6TuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bwEc88ku; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OtT9NCSl"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-242d1e947feso383635ad.0
-        for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 08:52:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755532321; x=1756137121; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jhFVRc1NfpOXTxJauWn9T+QK0y3Sx+B3L8yuuFsdMS8=;
-        b=OtT9NCSlERaVNBqoTDzlsC0C6TUQnE0YdgbUMMZwuHzPYO5LLEGyJWNqh5dJ+dlsDL
-         Yt2ZTCx7T6AsGj/PmtjtXcnzyvDH5eA6EyMDjrDrHIb2CyvlzlJyPIoYUQBbO9U326Y0
-         oWFmCwgFADcft+c6i5pmV2HQkvcBvy3rtimSEI3CkZjYpUTEf+1tu/dHeoGP0wsne2UK
-         oEH9nzi/QjNCp4mAU/u0SAuJ7FgJwozFhqcps+Yrhcv9/THYGvTTPpadxB1OLMQ+NIax
-         5yR8DS+LzxwPsBtDUrOhwzpVEaILJXorbfzwkmV50UpPn1+Tldsk9t+xaWRW1UGMsClW
-         3oPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755532321; x=1756137121;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jhFVRc1NfpOXTxJauWn9T+QK0y3Sx+B3L8yuuFsdMS8=;
-        b=Gqssiw1NoRaoWOKoBMFFhTLJTcvA2IVtYqK07kXAatlm88f7nmbZUQkWxKpzjVnRMJ
-         vMPK9fKhsRvZVrrRZkIP+pfqMCVrPhsNwRWU2tuVJoBHFqy9040HtZ2kon6kQQRpheme
-         cuDdoBXE8vQS9tKwsT0FyIyyqBTZo/LdQyu/uvzSdEywUGJU3wUMA+W5uMIb+oG2/P5R
-         Dz9syTNjpWaFGv+cmiRQ60aMi9H0B8DyCpvb4VHhMAEOonwVkHyco+wpdYnRe84XwLiD
-         ZnOcI6OG2VmvB0HojA0UdKYm6gwn1NKqZeCRzWnjSVegFNm9KtcDB0I7/HcmGe0paNiK
-         8UyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOnh3Uc66ZOWjp/TePyqGeNQ6q0ha1wjL0pyzWkK3ZAmbF+q6M5dZKzJE5zBntgBaqZU5NDlU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzikd1J9tTBSSfDCq3bU346VluUfsGKpztEVRUrJw6KFxwPO9Iq
-	uCIhkSegZ2UzEbEz4GthFYB+a0Y1KAyIJjvVX2atcHWoYjXPq3L8PS0YCrJktSAyQAZEu7eyyJR
-	pZKaVMRwLRAD9Eo3Nh3W79yAgNhXVQm6mKVXp09MY
-X-Gm-Gg: ASbGncsM1dMh2fo9S5uog1YFyJngr1HWV3xCwCGGWO5J0WwZnan4HtECBfcHkDmYlJc
-	rNf7r4/ul8jA103KES0qqrHRCWDwpyZrtNcPgwLlh89Og++HWZcAu91MWns8UtHsRClfnOGPrZ3
-	qkqvgoxiTBTEnsd8mVHgoDoUXMc/NTxy9fk972xNII2Igs+qUOYDRHAKShmL+dsFktX/bxHfhwJ
-	WXj7ELBPOo7giyf6rFTj9k84FeOVQBwI+QH96OZNHpeDlY=
-X-Google-Smtp-Source: AGHT+IFBH6QXJvRW18+gfLm+VEHNtKAKh4EWppvXhfmrKKXkPioVQ+b0Kd0ODwqL4Zd3to4i9UzRN7iKxM94h8uE8ug=
-X-Received: by 2002:a17:902:e54e:b0:231:ddc9:7b82 with SMTP id
- d9443c01a7336-2447a77afebmr6549035ad.13.1755532321031; Mon, 18 Aug 2025
- 08:52:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bwEc88ku"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=KmfCSi8O/XddsGKdRcKOqeDj7Pe6vE7Gax1joOuFhh4=; b=bwEc88kumrWiUkBPFis3R2xC8x
+	1VSU964ojxy4pizILXyaiupvjmCF+9S/j3hMn/7+0O6Nq5XCPfRh9SWhm98h0t2UFUjmA1dzWRZgt
+	tbkFmQuB/mZqY6ky3oZFaXzKbsxU61JtKuUNYn7rd7psdx+2eesyLw8rFRzpJQ1Win9JV+gpfxIJX
+	B0ERXsVVo7c2wl1HSeiIdqRZ4++3ImaZyhHbocKrxLR1Y5j1GlmqWCDYwxZ0RlMOOcuzzqa8ePrTH
+	qkSXaxaLa6fA1jK8eqoW/9WZ9mA8to8qlNfcQ4735MGvUb9ThF8/IOfNGNvoRXzwQSiekxnBpg4fR
+	SmVuRZ6Q==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uo2Sx-0000000HRhy-0oaa;
+	Mon, 18 Aug 2025 16:12:11 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 7731030029B; Mon, 18 Aug 2025 18:12:10 +0200 (CEST)
+Date: Mon, 18 Aug 2025 18:12:10 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, loongarch@lists.linux.dev,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	Kan Liang <kan.liang@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Subject: Re: [PATCH v5 09/44] perf/x86: Switch LVTPC to/from mediated PMI
+ vector on guest load/put context
+Message-ID: <20250818161210.GJ3289052@noisy.programming.kicks-ass.net>
+References: <20250806195706.1650976-1-seanjc@google.com>
+ <20250806195706.1650976-10-seanjc@google.com>
+ <20250815113951.GC4067720@noisy.programming.kicks-ass.net>
+ <aJ9VQH87ytkWf1dH@google.com>
+ <aJ9YbZTJAg66IiVh@google.com>
+ <20250818143204.GH3289052@noisy.programming.kicks-ass.net>
+ <aKNF7jc4qr9ab-Es@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250814-james-perf-feat_spe_eft-v7-0-6a743f7fa259@linaro.org> <20250814-james-perf-feat_spe_eft-v7-8-6a743f7fa259@linaro.org>
-In-Reply-To: <20250814-james-perf-feat_spe_eft-v7-8-6a743f7fa259@linaro.org>
-From: Ian Rogers <irogers@google.com>
-Date: Mon, 18 Aug 2025 08:51:50 -0700
-X-Gm-Features: Ac12FXyV1x2afpy-E2EhDR_cSfBMqeVdgvNI2wMfxjm0rwNa4JtVzwidrn9_Mpg
-Message-ID: <CAP-5=fXBot2K0MR9t7o6J7-FihNXzKcotdF6p3bfL7DwqR9jfg@mail.gmail.com>
-Subject: Re: [PATCH v7 08/12] perf: Add perf_event_attr::config4
-To: James Clark <james.clark@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Leo Yan <leo.yan@arm.com>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKNF7jc4qr9ab-Es@google.com>
 
-On Thu, Aug 14, 2025 at 2:26=E2=80=AFAM James Clark <james.clark@linaro.org=
-> wrote:
->
-> Arm FEAT_SPE_FDS adds the ability to filter on the data source of a
-> packet using another 64-bits of event filtering control. As the existing
-> perf_event_attr::configN fields are all used up for SPE PMU, an
-> additional field is needed. Add a new 'config4' field.
+On Mon, Aug 18, 2025 at 08:25:34AM -0700, Sean Christopherson wrote:
 
-Somewhat off-topic, imo it would be nice if we could land:
-https://lore.kernel.org/lkml/20250603181634.1362626-1-ctshao@google.com/
-and show all the config values via fdinfo to better allow tools to
-diagnose when PMUs are busy, etc. The patch there tries to be minimal
-and just reveal config (even with being minimal the patch is stalled).
+> > OK, so *IF* doing the VM-exit during PMI is sound, this is something
+> > that needs a comment somewhere. 
+> 
+> I'm a bit lost here.  Are you essentially asking if it's ok to take a VM-Exit
+> while the guest is handling a PMI?  If so, that _has_ to work, because there are
+> myriad things that can/will trigger a VM-Exit at any point while the guest is
+> active.
 
-Thanks,
-Ian
+Yes, that's what I'm asking. Why is this VM-exit during PMI nonsense not
+subject to the same failures that mandates the mid/late PMI ACK.
 
-> Reviewed-by: Leo Yan <leo.yan@arm.com>
-> Tested-by: Leo Yan <leo.yan@arm.com>
-> Reviewed-by: Ian Rogers <irogers@google.com>
-> Signed-off-by: James Clark <james.clark@linaro.org>
-> ---
->  include/uapi/linux/perf_event.h | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/include/uapi/linux/perf_event.h b/include/uapi/linux/perf_ev=
-ent.h
-> index 78a362b80027..0d0ed85ad8cb 100644
-> --- a/include/uapi/linux/perf_event.h
-> +++ b/include/uapi/linux/perf_event.h
-> @@ -382,6 +382,7 @@ enum perf_event_read_format {
->  #define PERF_ATTR_SIZE_VER6                    120     /* Add: aux_sampl=
-e_size */
->  #define PERF_ATTR_SIZE_VER7                    128     /* Add: sig_data =
-*/
->  #define PERF_ATTR_SIZE_VER8                    136     /* Add: config3 *=
-/
-> +#define PERF_ATTR_SIZE_VER9                    144     /* add: config4 *=
-/
->
->  /*
->   * 'struct perf_event_attr' contains various attributes that define
-> @@ -543,6 +544,7 @@ struct perf_event_attr {
->         __u64   sig_data;
->
->         __u64   config3; /* extension of config2 */
-> +       __u64   config4; /* extension of config3 */
->  };
->
->  /*
->
-> --
-> 2.34.1
->
+And yes, I realize this needs to work. But so far I'm not sure I
+understand why that is a safe thing to do.
+
+Like I wrote, I suspect writing all the PMU MSRs serializes things
+sufficiently, but if that is the case, that needs to be explicitly
+mentioned. Because that also doesn't explain why we needs mid-ack
+instead of late-ack on ADL e-cores for instance.
+
+Could it perhaps be that we don't let the guests do PEBS because DS
+doesn't virtualize? And thus we don't have the malformed PEBS record?
