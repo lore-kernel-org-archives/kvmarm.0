@@ -1,129 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96854304BC7
-	for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 09:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B33F3218A9
+	for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 12:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755508961; cv=none; b=YMhGBWlkFIl4gha+vx6y9ZLBtoPZquOREHs0yXKvKksx7JttnYPyUf3V9SG9U4ZrGmjwXJ9DJMTxj1jPaGZQ/Er8Vgw5prpCvUccbETh6lSAK3RKW6z5je0sRyqmA99o/K06uY+WyV4F6Aepozi7YWTo9AEafcBRxA8W5XtRGBk=
+	t=1755520338; cv=none; b=Dpyq0X5KKVUmxtbkcYxY89BOVnGkN3I0vRE56vr40UNNg5zwieFoi2x/FZhu8lfeQvT+u9A+IhPa8/gcxwalV2Q4cGnV/4y9DJG3/1uIfY2WFoiztmJA2lb8J6fuI3e3gL1tWQJ84Od/vLdK6Tdh9nnLFM5sVzY3sYP+FPe6P24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755508961; c=relaxed/simple;
-	bh=L84sV9sJv4P91toXAI+YVqEu5X7KKgWHJj/8Fmw+qV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DNxIa/qmjBjUBPWb3KDJsgJpKNIVpY3Zl8sgm+UFBXQpyRCUftjUu2lFW0gTomzZFfgaH/uhKecU7pM/6lOAnAbuORee7gI9g2IDuBG7CARHmQuGEe/Sh6zAokgTiMosB3fsEkLFcnQFahPWHQl2AdLo8J77BJXLtMbRnBorK+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6829150C;
-	Mon, 18 Aug 2025 02:22:31 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 438963F58B;
-	Mon, 18 Aug 2025 02:22:35 -0700 (PDT)
-Date: Mon, 18 Aug 2025 10:22:30 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mark Brown <broonie@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/4] arm64/sysreg: Add VTCR_EL2 register
-Message-ID: <aKLw1jvwOo4wG64n@J2N7QTR9R3>
-References: <20250818045759.672408-1-anshuman.khandual@arm.com>
- <20250818045759.672408-5-anshuman.khandual@arm.com>
+	s=arc-20240116; t=1755520338; c=relaxed/simple;
+	bh=wnzyKxf8inTgU8+M+6idd9OtmixsX9MUjnCXKR2eJKs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ktEVt8OPdr7ILmhueBrZnc+2ZiW7tyuKdj/ifVbbO5HaqWpvWId6K1spcH9BKsxwvmSuUXxXo8H8oA/r+hXscRxwKq3ymJxQw9hQwh2cwfI9FW/XPer9i+oNAhDKnHpHgqLsNctYd6v/KRJd5S8z646AC+CnKNGz7+05J8YQMtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TqdH3Nfm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqdH3Nfm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755520335;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/xhetDspssApBKISBn5ZaW5PlAHoD+TybPOqB+IwKDk=;
+	b=TqdH3Nfm/z19nW2plS+vc1GpKcZ4IFZyJ0ERMtDTgjErf4gOdF9H/ypSwCOTvOO9/RuHu9
+	6MkRjEg4nmwAf93Uo4275MFEl+Aw5DpYlbeNaAmVwAjyf9Ch3tpRQS3fG8CNdpzDKlDj4b
+	qdjGtXoNmvX36u0E1MI+/nBb56dfe98=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-QzENNlAGPtaUSEVz6EQjMw-1; Mon,
+ 18 Aug 2025 08:32:12 -0400
+X-MC-Unique: QzENNlAGPtaUSEVz6EQjMw-1
+X-Mimecast-MFC-AGG-ID: QzENNlAGPtaUSEVz6EQjMw_1755520330
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F34E195608A;
+	Mon, 18 Aug 2025 12:32:09 +0000 (UTC)
+Received: from localhost (dhcp-192-216.str.redhat.com [10.33.192.216])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EC335180028C;
+	Mon, 18 Aug 2025 12:32:07 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui
+ Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 1/6] arm64: Add capability denoting FEAT_RASv1p1
+In-Reply-To: <20250817202158.395078-2-maz@kernel.org>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Avril Crosse O'Flaherty"
+References: <20250817202158.395078-1-maz@kernel.org>
+ <20250817202158.395078-2-maz@kernel.org>
+User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
+Date: Mon, 18 Aug 2025 14:32:05 +0200
+Message-ID: <87zfbwerp6.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250818045759.672408-5-anshuman.khandual@arm.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Mon, Aug 18, 2025 at 10:27:59AM +0530, Anshuman Khandual wrote:
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index d2b40105eb41..f5a0a304f844 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -4910,6 +4910,63 @@ Field	1	PIE
->  Field	0	PnCH
->  EndSysreg
->  
-> +Sysreg	VTCR_EL2	3	4	2	1	2
-> +Res0	63:46
-> +Field	45	HDBSS
-> +Field	44	HAFT
-> +Res0	43:42
-> +Field	41	TL0
-> +Field	40	GCSH
-> +Res0	39
-> +Field	38	D128
-> +Field	37	S2POE
-> +Field	36	S2PIE
-> +Field	35	TL1
-> +Field	34	AssuredOnly
-> +Field	33	SL2
-> +Field	32	DS
-> +Res1	31
-> +Field	30	NSA
-> +Field	29	NSW
-> +Field	28	HWU62
-> +Field	27	HWU61
-> +Field	26	HWU60
-> +Field	25	HWU59
-> +Res0	24:23
-> +Field	22	HD
-> +Field	21	HA
-> +Res0	20
-> +UnsignedEnum	19	VS
-> +	0b0	8BIT
-> +	0b1	16BIT
-> +EndEnum
+On Sun, Aug 17 2025, Marc Zyngier <maz@kernel.org> wrote:
 
-You left TCR_EL1.AS as a single-bit 'Field', so please do the same here
-for consistency. I don't think there's much gained by making this any
-sort of enum.
+> Detecting FEAT_RASv1p1 is rather complicated, as there are two
+> ways for the architecture to advertise the same thing (always a
+> delight...).
+>
+> Add a capability that will advertise this in a synthetic way to
+> the rest of the kernel.
+>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kernel/cpufeature.c | 24 ++++++++++++++++++++++++
+>  arch/arm64/tools/cpucaps       |  1 +
+>  2 files changed, 25 insertions(+)
 
-> +Field	18:16	PS
-> +UnsignedEnum	15:14	TG0
-> +		0b00	4K
-> +		0b01	64K
-> +		0b10	16K
-> +EndEnum
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-As with other patches, this is not ordered. Please use Enum.
-
-Likewise for the other cases below.
-
-Mark.
-
-> +UnsignedEnum	13:12	SH0
-> +		0b00	NONE
-> +		0b10	OUTER
-> +		0b11	INNER
-> +EndEnum
-> +UnsignedEnum	11:10	ORGN0
-> +	0b00	NC
-> +	0b01	WBWA
-> +	0b10	WT
-> +	0b11	WBnWA
-> +EndEnum
-> +UnsignedEnum	9:8	IRGN0
-> +	0b00	NC
-> +	0b01	WBWA
-> +	0b10	WT
-> +	0b11	WBnWA
-> +EndEnum
-> +Field	7:6	SL0
-> +Field	5:0	T0SZ
-> +EndSysreg
-> +
->  SysregFields MAIR2_ELx
->  Field	63:56	Attr7
->  Field	55:48	Attr6
-> -- 
-> 2.25.1
-> 
-> 
