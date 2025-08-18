@@ -1,91 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E44E2522A1;
-	Mon, 18 Aug 2025 18:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC73BE555;
+	Mon, 18 Aug 2025 19:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755542165; cv=none; b=Z/fm9uqBoioPL+4VVyKGZAfTKWAfINs6iPnUEUx5Ru1bxIHboQsp2LLTw8fItkYkzbXYnKHOnY4CBPzRXz090f6Dw4IEboUQfOzwByrOXbKZTPppEZadr+YmpdHmDbvW22FpDzbs9o3vIr5TbgbMmihWvDPcdXIPqt7CnFVQmXE=
+	t=1755545183; cv=none; b=SjGPiulzhakX/PkdezRF/FIsnn58PSqFRa2SoVrXHvsr0evBxXhOEaM/Gu2TnBAkT0V4SSD0Obz5iZxUrVGXHe8FU1P1180vXbY/GJXm0SdVByD6qLNVmqw3SjTmuiU+aHiYOQUM9iMSxHhO/PbQXQ4qIwY8pohHqhUUymuqUz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755542165; c=relaxed/simple;
-	bh=/TNdDJM7aNaPZKDRxUq92db+dTiso/s/YJpk5Xhi43c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VZJC0VUMJqtIdaEuPF2dpUmEXrN7B0r0/G/kby+SGo8pEwvkNiMppK2SY+mXSZvKjWDod7N0mTDkos6IZfsPkk6og76ee1Wp1vAwcuPOv8MD8hatXk8OVaqILV/RvWuo9keqdCh/pthbbBYYSCicHnMVuIrakUBPw1jOhWleDvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A7D1C4CEEB;
-	Mon, 18 Aug 2025 18:36:02 +0000 (UTC)
-Date: Mon, 18 Aug 2025 19:35:59 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: will@kernel.org, broonie@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com,
-	joey.gouly@arm.com, james.morse@arm.com, ardb@kernel.org,
-	scott@os.amperecomputing.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 5/5] arm64: futex: support futex with FEAT_LSUI
-Message-ID: <aKNyj_6dZVp9O4BA@arm.com>
-References: <20250811163635.1562145-1-yeoreum.yun@arm.com>
- <20250811163635.1562145-6-yeoreum.yun@arm.com>
- <aJ9oIes7LLF3Nsp1@arm.com>
- <aKB55rPj1Qe8G+zF@e129823.arm.com>
- <aKCcbQWioNfG1MMQ@e129823.arm.com>
+	s=arc-20240116; t=1755545183; c=relaxed/simple;
+	bh=+y/vOOo8jAZA17Jtz8gRMU0zs0a5jt47Bouz8MVv3Wg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=tu9Guv4YxTkS7O2py7ILd9YV1bsg0wTGKFUQaSly+9c25prviC8B0zL9yMl81MyMc6jxUIMaDWFEToTyXhO48A8NytWm47Nluo8xHtosPcxs7vZ7tS6CpgOtrnbWLrQV6r7mu5c+fYWu1yUPwh54rVZRXs+Fx778qhbrEdHvapA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qfDDwrE+; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfDDwrE+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A2F9C4CEEB;
+	Mon, 18 Aug 2025 19:26:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755545183;
+	bh=+y/vOOo8jAZA17Jtz8gRMU0zs0a5jt47Bouz8MVv3Wg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=qfDDwrE+BVp5zL1+EDWcdMm7DmF/RDfc139D2y/CQIlaGUYVodu81jkwikSMnQAp9
+	 I6RIQpL6z+vUbr3V7f/oao7P8ecH/sO6LvAa8gv51EltIpuqfeFBLOPDwjrF1O/XCq
+	 ARoyCzVY3yd1NvKMFVR6KGeaRKuc5mP30SqfNLuf/Psh7+Mxtli77t09TWya4cAkaf
+	 7eaPmhtMhH5/niq6dqMUg+SdujDRCt50ZzIhPsb4uyR4K+LfRgdZC+A6QpQroNGfKu
+	 3v/o6HbGyBOre8ZFJYdaycQMX+ZajkeTaG4trVyK3qk3A6yClCydTDmX7dlovz2KPi
+	 P8EBQe0D/+0Ww==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v3 0/3] arm64: Support FEAT_LSFE (Large System Float
+ Extension)
+Date: Mon, 18 Aug 2025 20:21:17 +0100
+Message-Id: <20250818-arm64-lsfe-v3-0-af6f4d66eb39@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aKCcbQWioNfG1MMQ@e129823.arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAC59o2gC/1XMQQ6CMBCF4auQrq2ZlgKtK+9hXECZQiOCmZpGQ
+ 7i7hcQoy/eS/5tZQPIY2CmbGWH0wU9jGvkhY7avxw65b9NmEmQBpSx4TfdS8SE45KAFWGd03Vr
+ JUvAgdP61YZdr2r0Pz4nemx3F+n6Z6p+JggMvdV4IqxpXKXG+IY04HCfq2OpE+WsryHetTC1ab
+ DUYY2yjdu2yLB+mc/9x4QAAAA==
+X-Change-ID: 20250625-arm64-lsfe-0810cf98adc2
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+ linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-cff91
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1372; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=+y/vOOo8jAZA17Jtz8gRMU0zs0a5jt47Bouz8MVv3Wg=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoo35Z9ywOmVIYyAGuED3un6+Vp7m7E8UOzL3eO
+ oaGa9ejrgyJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaKN+WQAKCRAk1otyXVSH
+ 0Pn0B/9Lgel83JGwfCO6weWZrwLTSxZ2NGgB1wsezpQ0o8+jWonTcI42s6sUDwa5kbmTm29twd3
+ au1tIWNztBPPSfYtmfR013a77/8OggTudCW3WkyBYW60gOe+W7oO9VZ7ncmJjl0KdLpga9/CJo2
+ QrcJs0AQeSYSfDSX2aUFarsYAeJf0BOpcZQQqFmRcBJeEYfOXJuoPISSlTl2QToQGQbEIsSsuHZ
+ czwK5wGZhCDuyu3Rz5InsNXmq1P2Yw0DbkfMp0rYdaX6NClG3rFT6zQD59hMfeqRpSHeCawPxMD
+ Tpj8xMNFP4Z9IbXUBYDpqVYc5Y1Csw1L4AH82yeJPogRglaZ
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Sat, Aug 16, 2025 at 03:57:49PM +0100, Yeoreum Yun wrote:
-> > > > +#ifdef CONFIG_AS_HAS_LSUI
-> > > > +
-> > > > +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-> > > > +
-> > > > +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
-> > > > +static __always_inline int						\
-> > > > +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-> > > > +{									\
-> > > > +	int ret = 0;							\
-> > > > +	int val;							\
-> > > > +									\
-> > > > +	mte_enable_tco();						\
-> > >
-> >
-> > > The reason uaccess_disable_privileged() sets the MTE TCO (tag check
-> > > override) is because the user and the kernel may have different settings
-> > > for tag checking. If we use the user instructions provided by FEAT_LSUI,
-> > > we leave the MTE checking as is.
-> > >
-> > > The same comment for all the other functions here.
-> >
-> > You're right. Thanks for catching this :)
-> 
-> But one bikeshedding question.
-> why we need to care about the different settings for tag checking when
-> we use uaccess_disable_privileged()?
+FEAT_LSFE is optional from v9.5, it adds new instructions for atomic
+memory operations with floating point values.  We have no immediate use
+for it in kernel, provide a hwcap so userspace can discover it and allow
+the ID register field to be exposed to KVM guests.
 
-Because, for example, the user may not be interested in any tag check
-faults (has checking disabled) but the kernel uses KASAN with
-synchronous tag check faults. If it uses the privileged instructions as
-in the futex API, it either won't make progress or report errors to the
-user which it does not expect.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v3:
+- Rebase onto v6.17-rc1.
+- Link to v2: https://lore.kernel.org/r/20250703-arm64-lsfe-v2-0-eced80999cb4@kernel.org
 
-> IIUC, the reason we uses to uaccess_disaable_privileged() to access
-> user memory with copy_from/to_user() and etc.
+Changes in v2:
+- Fix result of vi dropping in hwcap test.
+- Link to v1: https://lore.kernel.org/r/20250627-arm64-lsfe-v1-0-68351c4bf741@kernel.org
 
-We don't use uaccess_disable_privileged() with copy_from_user() since
-those use the unprivileged instructions already.
+---
+Mark Brown (3):
+      arm64/hwcap: Add hwcap for FEAT_LSFE
+      KVM: arm64: Expose FEAT_LSFE to guests
+      kselftest/arm64: Add lsfe to the hwcaps test
 
-> But, although tag check fault happens in kernel side,
-> It seems to be handled by fixup code if user address is wrong.
+ Documentation/arch/arm64/elf_hwcaps.rst   |  4 ++++
+ arch/arm64/include/asm/hwcap.h            |  1 +
+ arch/arm64/include/uapi/asm/hwcap.h       |  1 +
+ arch/arm64/kernel/cpufeature.c            |  2 ++
+ arch/arm64/kernel/cpuinfo.c               |  1 +
+ arch/arm64/kvm/sys_regs.c                 |  4 +++-
+ tools/testing/selftests/arm64/abi/hwcap.c | 21 +++++++++++++++++++++
+ 7 files changed, 33 insertions(+), 1 deletion(-)
+---
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+change-id: 20250625-arm64-lsfe-0810cf98adc2
 
-The user may know it is wrong and not care (e.g. one wants to keep using
-a buggy application).
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
--- 
-Catalin
