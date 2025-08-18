@@ -1,195 +1,193 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8D1256C89
-	for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 15:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF167308F13;
+	Mon, 18 Aug 2025 15:43:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755530739; cv=none; b=gF5nln7KBvLfRBakorozVUbXaky3tWkJOqX+I+MBv21v+NxVqIJKhherpTgRC1UsxkrHnKs8nXxu+M6pdvjK1vSCNyOIPfJwB/ZnceSb7gVHyl4SqG1364vUL9fyxu7NvhSGWlyCFHc7QnEn4hPEsnqqnY35aqy7C+8bxJrouf4=
+	t=1755531812; cv=none; b=QVN9KmTdNPvukCjFqm/KwSZlkA4UD5vV3WXFaob6z/eIhQZtbTfM89JwWDpbblN584FOM7znNO1a5der6ofm0z3al4dSITIF2qB29rLhUT32OnoPNcrmIJhQKJ2fwo8XpblG/2DLf6MwrB6/STDjzaf+DYAv4vdcdzIpCPbTLN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755530739; c=relaxed/simple;
-	bh=cQQ74RqI0oi17iisfFPsBnqCiIujEhsD/7CJ215Qn5s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tdk5ZBZiKoNkshCLHPo8wn6+XZjmhrbBNsmO1L1lf+41UnWg0ecI8QANN+bq6APqggW8TBd/seyYDyoiWJjZfgmIH2zcQsu/Zk05+wofK5j+KvHTm6q/NV6q5TC140ydO2AWFaVvcNsMws5x8kWvsggaU6rIdaatRz65swJ8KHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a+NpuiLE; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1755531812; c=relaxed/simple;
+	bh=2gw9bufPdvuGnWtKJzkTzSHcYSXunQ7KQaWLcstisag=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EJ2n+4gZFyw8MnVR7J+ayysyynWBB/czrNwD3PPOFwjukhPSCBI9yn8pejDy709hG+jv+7+WCdtrpcfGBu/Zo2p/BeZ5qlzacbGVFWEaw0vQH35rjvJ6ZUoxkDfFcDxN5rzOy1EI5BzYjHOjpnBgki0qlSSHvNsKVUSJLhpsx58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OdNd+gU2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a+NpuiLE"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32326e6b1deso3883044a91.3
-        for <kvmarm@lists.linux.dev>; Mon, 18 Aug 2025 08:25:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755530736; x=1756135536; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CsoYx/ZJm+dL7FRV6jyG7YgqbQ7bK3pBhdAAvFLAFxA=;
-        b=a+NpuiLEk6Btbskx4rNZBgLp131SSEjNdXxqbYBO/3Ocwn6UcBVhCcogwd+CqLu35t
-         DdP2ZuEEa+kAgmiPo3D50eWdobE/t/vqVQrZp9x4WDyODyd82cqg57jy0p31JbaXHAhY
-         qsIBL/VIjDknwXjjYwhxOjpWK6SJfq2sN9iwjzg+e9t5he+5HhZd8DyagLHHefVzhNnk
-         iUxoHoVjE+Ztf34I15I/WriUotEISMDV4/3PfleUrIZN+MfiIBjxdd44qStoITOMuyPe
-         FXPvyMFBYkwsZn3Xe0mRVT5Ka8YPAQ25aVHby9qdqAy+AaZmu/yM6IuIFErX7V7yBeD9
-         JF7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755530736; x=1756135536;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CsoYx/ZJm+dL7FRV6jyG7YgqbQ7bK3pBhdAAvFLAFxA=;
-        b=Y44pUVKi+s9KAkZghiARFm9F0xd/Wtm7OLa7PvDZQeWSOdrj1JFTC0iI9ktQYOqY04
-         gN1mULAfAzodC5aYx1xTrwq6lh0ZRRKue6YI6Sx74mBxYJa2egXasDUs7Ihduq72Y1fr
-         KzL6AzhczNLZZ7Uep9hPJTcv3Wh/yOGVjkoHmQO/CH2caE7bTNyYkDLbBVxSz2IWGLE0
-         s3xM155/s3k531Eg6RtgJ8bUQAtPfOxliz4FOoHbRX9vJnZjEDp2mf5PbUrxnStOK3Vi
-         CrFe3nHjKntbho09/8Bk+UByAFRiVz82g/43W0yIC1oZqRmwNPN7NEv3btz1xaofnYgR
-         5cWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8fByyVO5hlW6/qgPlk7GEr5H0307cpA5ioVudetgFPHKb7jqu9QKSCKf0ZukiI5FMP4hEX2E=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwqIq45TZ9Uh2ts05bDNPKscp7m5CTvBgz9xHVm8a5yuEQq8kLs
-	YSQL+3CCx5D4A7/Fm1Fdak/oIsM5KzELd4t/5OzeZN6cr+aXKVkyEZWFKzp12TFFPZqX1+d23vs
-	rUNrAKg==
-X-Google-Smtp-Source: AGHT+IFCmpj8FbJmK1+JWLBztlT6f28DkrWlTFsNjoSajBRjHfMiKFT/6+vAkpnb7u9ULN6Oz/FIAv/3KBU=
-X-Received: from pjee5.prod.google.com ([2002:a17:90b:5785:b0:311:ef56:7694])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52c6:b0:31e:f3b7:49c6
- with SMTP id 98e67ed59e1d1-323421b64b7mr17300718a91.15.1755530736134; Mon, 18
- Aug 2025 08:25:36 -0700 (PDT)
-Date: Mon, 18 Aug 2025 08:25:34 -0700
-In-Reply-To: <20250818143204.GH3289052@noisy.programming.kicks-ass.net>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OdNd+gU2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39E6FC4CEEB;
+	Mon, 18 Aug 2025 15:43:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755531812;
+	bh=2gw9bufPdvuGnWtKJzkTzSHcYSXunQ7KQaWLcstisag=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OdNd+gU2RzCHnheu7QHypV85qYdEmzkXGbMRwN4Ud74Gu7537V/ABBSmlTU32xpAW
+	 R+Y49WjaELw1uuf9aIRhtJ1LpMFcuNqTVDVIGWs/eU4iaX8tP7vlcSv8mTJIFjnVs5
+	 M/+zJhzPrK05V/89tT/liw3X3Rr/PMVRpmU0lKchrSlqoQ01p+Ij0eF7WNMq0CNVrk
+	 iQ0t+WqUw42wFZ0JTwzDDPBPGWbcqH5vYCB/Dx7vKVFUjY9QkFRWtI60nzOpHf/f21
+	 KIpf2zswgKLuI8VJqxBOqByd9GCOi33UgxPXKWj8tXZUlLvxxl3kbsar25O0XVgGFk
+	 343glz0N3v44A==
+Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uo218-008fTF-Hr;
+	Mon, 18 Aug 2025 16:43:26 +0100
+Date: Mon, 18 Aug 2025 16:43:06 +0100
+Message-ID: <87ldngmy9h.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Mark Brown <broonie@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] arm64/sysreg: Add TCR_EL2 register
+In-Reply-To: <20250818045759.672408-4-anshuman.khandual@arm.com>
+References: <20250818045759.672408-1-anshuman.khandual@arm.com>
+	<20250818045759.672408-4-anshuman.khandual@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-10-seanjc@google.com>
- <20250815113951.GC4067720@noisy.programming.kicks-ass.net>
- <aJ9VQH87ytkWf1dH@google.com> <aJ9YbZTJAg66IiVh@google.com> <20250818143204.GH3289052@noisy.programming.kicks-ass.net>
-Message-ID: <aKNF7jc4qr9ab-Es@google.com>
-Subject: Re: [PATCH v5 09/44] perf/x86: Switch LVTPC to/from mediated PMI
- vector on guest load/put context
-From: Sean Christopherson <seanjc@google.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
-	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 86.149.246.145
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, ryan.roberts@arm.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Aug 18, 2025, Peter Zijlstra wrote:
-> On Fri, Aug 15, 2025 at 08:55:25AM -0700, Sean Christopherson wrote:
-> > On Fri, Aug 15, 2025, Sean Christopherson wrote:
-> > > On Fri, Aug 15, 2025, Peter Zijlstra wrote:
-> > > > > diff --git a/kernel/events/core.c b/kernel/events/core.c
-> > > > > index e1df3c3bfc0d..ad22b182762e 100644
-> > > > > --- a/kernel/events/core.c
-> > > > > +++ b/kernel/events/core.c
-> > > > > @@ -6408,6 +6408,8 @@ void perf_load_guest_context(unsigned long data)
-> > > > >  		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
-> > > > >  	}
-> > > > >  
-> > > > > +	arch_perf_load_guest_context(data);
-> > > > 
-> > > > So I still don't understand why this ever needs to reach the generic
-> > > > code. x86 pmu driver and x86 kvm can surely sort this out inside of x86,
-> > > > no?
-> > > 
-> > > It's definitely possible to handle this entirely within x86, I just don't love
-> > > switching the LVTPC without the protection of perf_ctx_lock and perf_ctx_disable().
-> > > It's not a sticking point for me if you strongly prefer something like this: 
-> > > 
-> > > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> > > index 0e5048ae86fa..86b81c217b97 100644
-> > > --- a/arch/x86/kvm/pmu.c
-> > > +++ b/arch/x86/kvm/pmu.c
-> > > @@ -1319,7 +1319,9 @@ void kvm_mediated_pmu_load(struct kvm_vcpu *vcpu)
-> > >  
-> > >         lockdep_assert_irqs_disabled();
-> > >  
-> > > -       perf_load_guest_context(kvm_lapic_get_reg(vcpu->arch.apic, APIC_LVTPC));
-> > > +       perf_load_guest_context();
-> > > +
-> > > +       perf_load_guest_lvtpc(kvm_lapic_get_reg(vcpu->arch.apic, APIC_LVTPC));
-> > 
-> > Hmm, an argument for providing a dedicated perf_load_guest_lvtpc() APIs is that
-> > it would allow KVM to handle LVTPC writes in KVM's VM-Exit fastpath, i.e. without
-> > having to do a full put+reload of the guest context.
-> > 
-> > So if we're confident that switching the host LVTPC outside of
-> > perf_{load,put}_guest_context() is functionally safe, I'm a-ok with it.
+On Mon, 18 Aug 2025 05:57:58 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> Let me see. So the hardware sets Masked when it raises the interrupt.
+> Add TCR_EL2 register fields as per the latest ARM ARM DDI 0487 7.B in tools
+
+7.B??? My copy of the published ARM ARM has L.B as the version suffix.
+
+Also, if you got the registers from the ARM ARM, please stop doing
+so. This is terribly error prone, and likely to be incomplete, given
+that the ARM ARM lags about a year behind the published architecture.
+
+You have the BSD-licensed MRS at your disposal, please make use of it.
+
+> sysreg format and drop all the existing redundant macros from the header
+> (arch/arm64/include/asm/kvm_arm.h). While here also drop an explicit sysreg
+> definction SYS_TCR_EL2 from sysreg.h header.
 > 
-> The interrupt handler clears it from software -- depending on uarch in 3
-> different places:
->  1) right at the start of the PMI
->  2) in the middle, right before enabling the PMU (writing global control)
->  3) at the end of the PMI
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h | 13 ----------
+>  arch/arm64/include/asm/sysreg.h  |  1 -
+>  arch/arm64/tools/sysreg          | 44 ++++++++++++++++++++++++++++++++
+>  3 files changed, 44 insertions(+), 14 deletions(-)
 > 
-> the various changelogs adding that code mention spurious PMIs and
-> malformed PEBS records.
-> 
-> So the fun all happens when the guest is doing PMI and gets a VM-exit
-> while still Masked.
-> 
-> At that point, we can come in and completely rewrite the PMU state,
-> reroute the PMI and enable things again. Then later, we 'restore' the
-> PMU state, re-set LVTPC masked to the guest interrupt and 'resume'.
-> 
-> What could possibly go wrong :/ Kan, I'm assuming, but not knowing, that
-> writing all the PMU MSRs is somehow serializing state sufficient to not
-> cause the above mentioned fails? Specifically, clearing PEBS_ENABLE
-> should inhibit those malformed PEBS records or something? What if the
-> host also has PEBS and we don't actually clear the bit?
-> 
-> The current order ensures we rewrite LVTPC when global control is unset;
-> I think we want to keep that.
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 560d9cb63413..8994cddef182 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -107,19 +107,6 @@
+>  
+>  #define MPAMHCR_HOST_FLAGS	0
+>  
+> -/* TCR_EL2 Registers bits */
+> -#define TCR_EL2_DS		(1UL << 32)
+> -#define TCR_EL2_RES1		((1U << 31) | (1 << 23))
+> -#define TCR_EL2_HPD		(1 << 24)
+> -#define TCR_EL2_TBI		(1 << 20)
+> -#define TCR_EL2_PS_SHIFT	16
+> -#define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
+> -#define TCR_EL2_PS_40B		(2 << TCR_EL2_PS_SHIFT)
+> -#define TCR_EL2_TG0_MASK	TCR_EL1_TG0_MASK
+> -#define TCR_EL2_SH0_MASK	TCR_EL1_SH0_MASK
+> -#define TCR_EL2_ORGN0_MASK	TCR_EL1_ORGN0_MASK
+> -#define TCR_EL2_IRGN0_MASK	TCR_EL1_IRGN0_MASK
+> -#define TCR_EL2_T0SZ_MASK	0x3f
+>  #define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
+>  			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+>  
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index ad5c901af229..112d5d0acb50 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -523,7 +523,6 @@
+>  
+>  #define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
+>  #define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
+> -#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+>  #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+>  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+>  
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 4bdae8bb11dc..d2b40105eb41 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -4812,6 +4812,50 @@ Sysreg	TCR_EL12        3	5	2	0	2
+>  Mapping	TCR_EL1
+>  EndSysreg
+>  
+> +Sysreg	TCR_EL2        3	4	2	0	2
+> +Res0	63:34
+> +Field	33	MTX
+> +Field	32	DS
+> +Res1	31
+> +Field	30	TCMA
+> +Field	29	TBID
+> +Field	28	HWU62
+> +Field	27	HWU61
+> +Field	26	HWU60
+> +Field	25	HWU59
+> +Field	24	HPD
+> +Res1	23
+> +Field	22	HD
+> +Field	21	HA
+> +Field	20	TBI
+> +Res0	19
+> +Field   18:16	PS
+> +UnsignedEnum	15:14	TG0
+> +	0b00	4K
+> +	0b01	64K
+> +	0b10	16K
+> +EndEnum
+> +UnsignedEnum	13:12	SH0
+> +	0b00	NONE
+> +	0b10	OUTER
+> +	0b11	INNER
+> +EndEnum
+> +UnsignedEnum	11:10	ORGN0
+> +	0b00	NC
+> +	0b01	WBWA
+> +	0b10	WT
+> +	0b11	WBnWA
+> +EndEnum
+> +UnsignedEnum	9:8	IRGN0
+> +	0b00	NC
+> +	0b01	WBWA
+> +	0b10	WT
+> +	0b11	WBnWA
+> +EndEnum
+> +Res0    7:6
+> +Field   5:0	T0SZ
+> +EndSysreg
 
-Yes, for sure.
+This is only the E2H==0 version of TCR_EL2. IF you are going to
+describe this register in a useful manner, then add both formats so
+that we know what we are dealing with.
 
-> While staring at this, I note that perf_load_guest_context() will clear
-> global ctrl, clear all the counter programming, and re-enable an empty
-> pmu. Now, an empty PMU should result in global control being zero --
-> there is nothing run after all.
-> 
-> But then kvm_mediated_pmu_load() writes an explicit 0 again. Perhaps
-> replace this with asserting it is 0 instead?
+	M.
 
-Yeah, I like that idea, a lot.  This?
-
-	perf_load_guest_context();
-
-	/*
-	 * Sanity check that "loading" guest context disabled all counters, as
-	 * modifying the LVTPC while host perf is active will cause explosions,
-	 * as will loading event selectors and PMCs with guest values.
-	 *
-	 * VMX will enable/disable counters at VM-Enter/VM-Exit by atomically
-	 * loading PERF_GLOBAL_CONTROL.  SVM effectively performs the switch by
-	 * configuring all events to be GUEST_ONLY.
-	 */
-	WARN_ON_ONCE(rdmsrq(kvm_pmu_ops.PERF_GLOBAL_CTRL));
-
-	perf_load_guest_lvtpc(kvm_lapic_get_reg(vcpu->arch.apic, APIC_LVTPC));
-
-> Anyway, this means that moving the LVTPC writing into
-> kvm_mediated_pmu_load() as you suggest is identical.
-> perf_load_guest_context() results in global control being 0, we then
-> assert it is 0, and write LVTPC while it is still 0.
-> kvm_pmu_load_guest_pmcs() will then frob the MSRs.
-> 
-> OK, so *IF* doing the VM-exit during PMI is sound, this is something
-> that needs a comment somewhere. 
-
-I'm a bit lost here.  Are you essentially asking if it's ok to take a VM-Exit
-while the guest is handling a PMI?  If so, that _has_ to work, because there are
-myriad things that can/will trigger a VM-Exit at any point while the guest is
-active.
-
-> Then going back again, is the easy part, since on the host side, we can never
-> transition into KVM during a PMI.
+-- 
+Jazz isn't dead. It just smells funny.
