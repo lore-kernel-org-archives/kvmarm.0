@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B834B31159D;
-	Tue, 19 Aug 2025 08:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C4626D4CF;
+	Tue, 19 Aug 2025 08:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755592156; cv=none; b=e2J9oeVLNxploKR8Aoh8yDGSCs+tt5E7k6l2U7T7C6mevP7ZohIjYYkx2B0GSCHjJco/+ocMBENS8IykPHiWJbMjKYgxTjC3I3W0J8JUTolpZOVpZE8EKVYHwInMWOPBdpadtfjDwCS7unqkU1vOU7O+CqWFCNXrwFIKMmijISs=
+	t=1755592514; cv=none; b=ZKg9CH5JufqBqnBOsuG9sI/2vMUFsPJifQBFbRG23phnhe+5YEzyYFhrcWzVfx6KP2tUua3Gt6+rGuyXJDXOGXZhyv2414FX1UGJk2Cjj6LQVM6O5CMPX/b8pjJLWdgT7AoPSLWIaPN4OvtICo30j+vSIB+LinNC7SPHzI66Hio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755592156; c=relaxed/simple;
-	bh=sb7IXWFytjY59+7DZrrxzCX6gg12LTHilkBQwAbPXW0=;
+	s=arc-20240116; t=1755592514; c=relaxed/simple;
+	bh=EGFYn9S9X5jab97X6MPlmhaU5A2DD/JytViFQMo3Yuc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i8X30xPP05m8O2G6upzscb1/3edeKa+XKLTX8vIi60e4PEtHvx9z4mLRC74VvJhuG+evLiZ8SZq/UR0WI4XEgu5seWAgN9KB2MhhXwXwo31Ayn0gD4SslAk/O59Id/WSpAFiT/LT8hJu2JSliPuFODtTkodvehIbbmprvrFiemw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nAPw0vPE; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=DQ9KkkWYOcHL0RZMdnlQT8vYV/6qUNmm9RP8YdeBB1uxe/iceL+vH8B30xJ4hyiVy5Kn1iIQDWkzWW80Q4Y36Cy7+iIOVqeoltECneHSSyBVC2cllLIi1M1jyOFkEg0asQAmn7Sm93uV16fybjJKAOMOMrp9NF33+7XTcdqmUUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FiTz9mr9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nAPw0vPE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D158C4CEF1;
-	Tue, 19 Aug 2025 08:29:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiTz9mr9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 460EDC4CEF1;
+	Tue, 19 Aug 2025 08:35:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755592156;
-	bh=sb7IXWFytjY59+7DZrrxzCX6gg12LTHilkBQwAbPXW0=;
+	s=k20201202; t=1755592514;
+	bh=EGFYn9S9X5jab97X6MPlmhaU5A2DD/JytViFQMo3Yuc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nAPw0vPEHV9zTl9wVPuYtFCyNNRDw38H6YnjcnVFk1I3N0mI2cxOSOIBd9OJPvRDc
-	 K4W+uoZv0PS/vqqdTEfnsS9Zy1fi52VpnoAhhHQsd6+UAvO7tFTLTLljZSsJ9PowLv
-	 x3kyxPA6nKdh9yYqio4UfY5LQsDsDmiMFmDjScleYVnlbxSNYIbK5Gj6rrcp9xXnDw
-	 p9goqfBdCjw/5FSsBtX2qhtO5NrfRyY0NkRnN2m7pXFpozJ84jkgoYzOgv1cegnwbc
-	 eqBmrMeAhtCNSsqIeCanlgRRHdPAFOKPW+UP/3oSk3XH12K8pTrwIvXNlE9maRIHVL
-	 /ldJ9ETfsbT7w==
+	b=FiTz9mr9lu+tPaJqN1PK8f3hv1IHwQ0TXG3HfeoAszxK49VtEVJU+Wp7p8emNpYz2
+	 T3IgG3WTo0tobbNFt5Qxqk0zYzDACtP3W03oQj1wIzVMWt/uRxSRwV6Xy2cy8Ovow/
+	 kQTT3z8rhJS1GuuHwywz1HFIJCgTAq8NBs/IV4ywVf5064Z97qY+772oOeKMg3soYK
+	 XX8VxH4mtBU5jz6+XN45tMIezcmBumcPY2z9yoo/X2QKEfd+hQbs1iRSmayMSEVNJI
+	 XirSg2SCrsBGiuUt8fWbELHouDortubfS/ngfCnjO838uWg50nATPu/XGHasvtblVv
+	 V93VIOObmV9PQ==
 Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uoHiN-008tGS-TU;
-	Tue, 19 Aug 2025 09:29:09 +0100
-Date: Tue, 19 Aug 2025 09:29:07 +0100
-Message-ID: <87tt23k94c.wl-maz@kernel.org>
+	id 1uoHoB-008tOd-1V;
+	Tue, 19 Aug 2025 09:35:07 +0100
+Date: Tue, 19 Aug 2025 09:35:06 +0100
+Message-ID: <87sehnk8ud.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
@@ -44,12 +45,12 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Ryan Roberts <ryan.roberts@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/4] arm64/sysreg: Add TCR_EL2 register
-In-Reply-To: <bea0e6b4-4b9e-45c7-b42a-fde93d627cba@arm.com>
+Subject: Re: [PATCH 4/4] arm64/sysreg: Add VTCR_EL2 register
+In-Reply-To: <bf78530c-e3e7-42b1-be7c-409d6427afda@arm.com>
 References: <20250818045759.672408-1-anshuman.khandual@arm.com>
-	<20250818045759.672408-4-anshuman.khandual@arm.com>
-	<87ldngmy9h.wl-maz@kernel.org>
-	<bea0e6b4-4b9e-45c7-b42a-fde93d627cba@arm.com>
+	<20250818045759.672408-5-anshuman.khandual@arm.com>
+	<aKLw1jvwOo4wG64n@J2N7QTR9R3>
+	<bf78530c-e3e7-42b1-be7c-409d6427afda@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,75 +62,86 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 86.149.246.145
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, ryan.roberts@arm.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, ryan.roberts@arm.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 19 Aug 2025 06:58:51 +0100,
+On Tue, 19 Aug 2025 05:24:29 +0100,
 Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> On 18/08/25 9:13 PM, Marc Zyngier wrote:
-> > On Mon, 18 Aug 2025 05:57:58 +0100,
-> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> >>
-> >> Add TCR_EL2 register fields as per the latest ARM ARM DDI 0487 7.B in tools
+> 
+> 
+> On 18/08/25 2:52 PM, Mark Rutland wrote:
+> > On Mon, Aug 18, 2025 at 10:27:59AM +0530, Anshuman Khandual wrote:
+> >> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> >> index d2b40105eb41..f5a0a304f844 100644
+> >> --- a/arch/arm64/tools/sysreg
+> >> +++ b/arch/arm64/tools/sysreg
+> >> @@ -4910,6 +4910,63 @@ Field	1	PIE
+> >>  Field	0	PnCH
+> >>  EndSysreg
+> >>  
+> >> +Sysreg	VTCR_EL2	3	4	2	1	2
+> >> +Res0	63:46
+> >> +Field	45	HDBSS
+> >> +Field	44	HAFT
+> >> +Res0	43:42
+> >> +Field	41	TL0
+> >> +Field	40	GCSH
+> >> +Res0	39
+> >> +Field	38	D128
+> >> +Field	37	S2POE
+> >> +Field	36	S2PIE
+> >> +Field	35	TL1
+> >> +Field	34	AssuredOnly
+> >> +Field	33	SL2
+> >> +Field	32	DS
+> >> +Res1	31
+> >> +Field	30	NSA
+> >> +Field	29	NSW
+> >> +Field	28	HWU62
+> >> +Field	27	HWU61
+> >> +Field	26	HWU60
+> >> +Field	25	HWU59
+> >> +Res0	24:23
+> >> +Field	22	HD
+> >> +Field	21	HA
+> >> +Res0	20
+> >> +UnsignedEnum	19	VS
+> >> +	0b0	8BIT
+> >> +	0b1	16BIT
+> >> +EndEnum
 > > 
-> > 7.B??? My copy of the published ARM ARM has L.B as the version suffix.
+> > You left TCR_EL1.AS as a single-bit 'Field', so please do the same here
+> > for consistency. I don't think there's much gained by making this any
+> > sort of enum.
 > 
-> Right, the version is L.B instead.
-> > 
-> > Also, if you got the registers from the ARM ARM, please stop doing
-> > so. This is terribly error prone, and likely to be incomplete, given
-> > that the ARM ARM lags about a year behind the published architecture.
-> > 
-> > You have the BSD-licensed MRS at your disposal, please make use of it.
+> But actually there is an use case in kvm_get_vtcr().
 > 
-> I guess you are suggesting the latest layout from the XML. Sure will refer
-> the layout from the following description.
-> 
-> https://developer.arm.com/documentation/ddi0601/2025-06/AArch64-Registers/TCR-EL2--Translation-Control-Register--EL2-
-
-This not what I have said. Read this for a start:
-
-https://developer.arm.com/documentation/ddi0601/2025-06/Proprietary-Notice?lang=en
-
-The XML is *NOT* usable to generate Linux descriptions, full stop. If
-you don't believe me, ask your favourite legal department.
-
-What I'm asking you to do is to:
-
-- Download https://developer.arm.com/-/cdn-downloads/permalink/Exploration-Tools-OS-Machine-Readable-Data/AARCHMRS_BSD/AARCHMRS_OPENSOURCE_A_profile-2025-06.tar.gz
-  (which is BSD-licensed)
-
-- Parse the JSON files to *extract* the information -- not copy/paste
-  it or write it by hand. See
-  https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/getting-started-aarchmrs-features-json-python
-  as an example
-
-- If you can't be bothered to write your own script, have a look at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/maz/AARCHMRS (the
-  'tooling' branch).
-
-[...]
-
-> > This is only the E2H==0 version of TCR_EL2. IF you are going to
-> > describe this register in a useful manner, then add both formats so
-> > that we know what we are dealing with.
-> 
-> IIUC two different runtime layouts for TCR_EL2 is not possible to be
-> defined in current tools sysreg format.
-
-Then the tool is broken. Fix the tool. You have the same problem with
-CNTHCTL_EL2, for example, and turning a blind eye is not going to
-help.
-
-> Also one layout is not just a larger extension of the other - in
-> which cases we could have just defined the larger layout.
+>         /* Set the vmid bits */
+>         vtcr |= (get_vmid_bits(mmfr1) == 16) ?
+>                 SYS_FIELD_PREP_ENUM(VTCR_EL2, VS, 16BIT) :
+>                 SYS_FIELD_PREP_ENUM(VTCR_EL2, VS, 8BIT);
 >
-> But curious do we have use cases for bits from the other layout now ?
 
-I don't. But given what you suggested in your reply to patch #2, this
-would become an absolute requirement.
+Here you go (untested):
+
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index c351b4abd5db..49266efc8bab 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -623,10 +623,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+ 	if (kvm_lpa2_is_enabled())
+ 		vtcr |= VTCR_EL2_DS;
+ 
+-	/* Set the vmid bits */
+-	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
+-		VTCR_EL2_VS_16BIT :
+-		VTCR_EL2_VS_8BIT;
++	vtcr |= FIELD_PREP(BIT(VTCR_EL2_VS_SHIFT), (get_vmid_bits(mmfr1) == 16));
+ 
+ 	return vtcr;
+ }
 
 	M.
 
