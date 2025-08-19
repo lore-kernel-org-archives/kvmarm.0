@@ -1,149 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C4626D4CF;
-	Tue, 19 Aug 2025 08:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCEE26E6E4;
+	Tue, 19 Aug 2025 08:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755592514; cv=none; b=ZKg9CH5JufqBqnBOsuG9sI/2vMUFsPJifQBFbRG23phnhe+5YEzyYFhrcWzVfx6KP2tUua3Gt6+rGuyXJDXOGXZhyv2414FX1UGJk2Cjj6LQVM6O5CMPX/b8pjJLWdgT7AoPSLWIaPN4OvtICo30j+vSIB+LinNC7SPHzI66Hio=
+	t=1755592740; cv=none; b=DwTlKzpqnu2bJDI/dw4tI27JTU4xYpbpYQ88fpKDTZ09vJ6fn++WDdcnSyx9v9fASTkjsD0SZYcVj+WU+m9I1YKocIwxSzDlvyQ+UwJ/+dun/EHWD/IRBjaTURHxuG9pCNOtbnHp6gF0UOVFQDGHWl5HklESppqgOE7r00+RHo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755592514; c=relaxed/simple;
-	bh=EGFYn9S9X5jab97X6MPlmhaU5A2DD/JytViFQMo3Yuc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DQ9KkkWYOcHL0RZMdnlQT8vYV/6qUNmm9RP8YdeBB1uxe/iceL+vH8B30xJ4hyiVy5Kn1iIQDWkzWW80Q4Y36Cy7+iIOVqeoltECneHSSyBVC2cllLIi1M1jyOFkEg0asQAmn7Sm93uV16fybjJKAOMOMrp9NF33+7XTcdqmUUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FiTz9mr9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiTz9mr9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 460EDC4CEF1;
-	Tue, 19 Aug 2025 08:35:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755592514;
-	bh=EGFYn9S9X5jab97X6MPlmhaU5A2DD/JytViFQMo3Yuc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FiTz9mr9lu+tPaJqN1PK8f3hv1IHwQ0TXG3HfeoAszxK49VtEVJU+Wp7p8emNpYz2
-	 T3IgG3WTo0tobbNFt5Qxqk0zYzDACtP3W03oQj1wIzVMWt/uRxSRwV6Xy2cy8Ovow/
-	 kQTT3z8rhJS1GuuHwywz1HFIJCgTAq8NBs/IV4ywVf5064Z97qY+772oOeKMg3soYK
-	 XX8VxH4mtBU5jz6+XN45tMIezcmBumcPY2z9yoo/X2QKEfd+hQbs1iRSmayMSEVNJI
-	 XirSg2SCrsBGiuUt8fWbELHouDortubfS/ngfCnjO838uWg50nATPu/XGHasvtblVv
-	 V93VIOObmV9PQ==
-Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uoHoB-008tOd-1V;
-	Tue, 19 Aug 2025 09:35:07 +0100
-Date: Tue, 19 Aug 2025 09:35:06 +0100
-Message-ID: <87sehnk8ud.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mark Brown <broonie@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	kvmarm@lists.linux.dev,
+	s=arc-20240116; t=1755592740; c=relaxed/simple;
+	bh=PU3YNexJTCgesX6f7cpBCRWSlGprO2iB+9oIGzKXA3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PJqchoH7YXLoFto7h4LW97+8MY/8lZkJP1YmrvlL4+zw6vv01k7vSbu5kZKUpO0jdE61KfE8s4VTIM6Wa5TstslktJUcqvonsIwXonRn33WcL2jHoQTsW0Jtnf+/m4S9dZKcgBGejQU/eWLNbirm3UhUjkPK9g79qj+mSTJ/WBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1E14C4CEF1;
+	Tue, 19 Aug 2025 08:38:56 +0000 (UTC)
+Date: Tue, 19 Aug 2025 09:38:54 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: will@kernel.org, broonie@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com,
+	joey.gouly@arm.com, james.morse@arm.com, ardb@kernel.org,
+	scott@os.amperecomputing.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/4] arm64/sysreg: Add VTCR_EL2 register
-In-Reply-To: <bf78530c-e3e7-42b1-be7c-409d6427afda@arm.com>
-References: <20250818045759.672408-1-anshuman.khandual@arm.com>
-	<20250818045759.672408-5-anshuman.khandual@arm.com>
-	<aKLw1jvwOo4wG64n@J2N7QTR9R3>
-	<bf78530c-e3e7-42b1-be7c-409d6427afda@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: Re: [PATCH v6 5/5] arm64: futex: support futex with FEAT_LSUI
+Message-ID: <aKQ4HvqZa_7Q7oDu@arm.com>
+References: <20250811163635.1562145-1-yeoreum.yun@arm.com>
+ <20250811163635.1562145-6-yeoreum.yun@arm.com>
+ <aJ9oIes7LLF3Nsp1@arm.com>
+ <aKB55rPj1Qe8G+zF@e129823.arm.com>
+ <aKCcbQWioNfG1MMQ@e129823.arm.com>
+ <aKNyj_6dZVp9O4BA@arm.com>
+ <aKOE1aqe6EljRkuB@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 86.149.246.145
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, ryan.roberts@arm.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKOE1aqe6EljRkuB@e129823.arm.com>
 
-On Tue, 19 Aug 2025 05:24:29 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+On Mon, Aug 18, 2025 at 08:53:57PM +0100, Yeoreum Yun wrote:
+> > On Sat, Aug 16, 2025 at 03:57:49PM +0100, Yeoreum Yun wrote:
+> > > why we need to care about the different settings for tag checking when
+> > > we use uaccess_disable_privileged()?
+[...]
+> > > But, although tag check fault happens in kernel side,
+> > > It seems to be handled by fixup code if user address is wrong.
+> >
+> > The user may know it is wrong and not care (e.g. one wants to keep using
+> > a buggy application).
 > 
+> Then Does this example -- ignoring wrong and keep using a buggy
+> application shows us that we need to enable TCO when
+> we runs the LSUI instruction?
 > 
-> 
-> On 18/08/25 2:52 PM, Mark Rutland wrote:
-> > On Mon, Aug 18, 2025 at 10:27:59AM +0530, Anshuman Khandual wrote:
-> >> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> >> index d2b40105eb41..f5a0a304f844 100644
-> >> --- a/arch/arm64/tools/sysreg
-> >> +++ b/arch/arm64/tools/sysreg
-> >> @@ -4910,6 +4910,63 @@ Field	1	PIE
-> >>  Field	0	PnCH
-> >>  EndSysreg
-> >>  
-> >> +Sysreg	VTCR_EL2	3	4	2	1	2
-> >> +Res0	63:46
-> >> +Field	45	HDBSS
-> >> +Field	44	HAFT
-> >> +Res0	43:42
-> >> +Field	41	TL0
-> >> +Field	40	GCSH
-> >> +Res0	39
-> >> +Field	38	D128
-> >> +Field	37	S2POE
-> >> +Field	36	S2PIE
-> >> +Field	35	TL1
-> >> +Field	34	AssuredOnly
-> >> +Field	33	SL2
-> >> +Field	32	DS
-> >> +Res1	31
-> >> +Field	30	NSA
-> >> +Field	29	NSW
-> >> +Field	28	HWU62
-> >> +Field	27	HWU61
-> >> +Field	26	HWU60
-> >> +Field	25	HWU59
-> >> +Res0	24:23
-> >> +Field	22	HD
-> >> +Field	21	HA
-> >> +Res0	20
-> >> +UnsignedEnum	19	VS
-> >> +	0b0	8BIT
-> >> +	0b1	16BIT
-> >> +EndEnum
-> > 
-> > You left TCR_EL1.AS as a single-bit 'Field', so please do the same here
-> > for consistency. I don't think there's much gained by making this any
-> > sort of enum.
-> 
-> But actually there is an use case in kvm_get_vtcr().
-> 
->         /* Set the vmid bits */
->         vtcr |= (get_vmid_bits(mmfr1) == 16) ?
->                 SYS_FIELD_PREP_ENUM(VTCR_EL2, VS, 16BIT) :
->                 SYS_FIELD_PREP_ENUM(VTCR_EL2, VS, 8BIT);
->
+> AFAIK, LSUI instruction also check memory tag -- i.e) ldtadd.
+> if passed user address which has unmatched tag and if user isn't
+> interested in tah check, It can meet the unexpected report from KASAN.
 
-Here you go (untested):
-
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index c351b4abd5db..49266efc8bab 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -623,10 +623,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- 	if (kvm_lpa2_is_enabled())
- 		vtcr |= VTCR_EL2_DS;
- 
--	/* Set the vmid bits */
--	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
--		VTCR_EL2_VS_16BIT :
--		VTCR_EL2_VS_8BIT;
-+	vtcr |= FIELD_PREP(BIT(VTCR_EL2_VS_SHIFT), (get_vmid_bits(mmfr1) == 16));
- 
- 	return vtcr;
- }
-
-	M.
+That's a valid point w.r.t. PSTATE.TCO that applies to copy_to/from_user
+as well. I don't think we documented it but we don't expect the user
+PSTATE.TCO state to be taken into account while doing uaccess from the
+kernel. We do, however, expect SCTLR_EL1.TCF0 to be honoured and that's
+what the user normally tweaks via a prctl(). The TCO is meant to
+disable tag checking briefly when TCF enabled the tag check faults.
 
 -- 
-Jazz isn't dead. It just smells funny.
+Catalin
