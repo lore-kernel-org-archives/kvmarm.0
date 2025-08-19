@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F3F2264CA
-	for <kvmarm@lists.linux.dev>; Tue, 19 Aug 2025 05:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4471F265CC0
+	for <kvmarm@lists.linux.dev>; Tue, 19 Aug 2025 06:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755583147; cv=none; b=LkaXmupchxwDB3sr4ldvQwiqNRlwjIcpzwz/Tbs/RN+GXQ+3gy0f4H0e5CEZhEYn31x8gvMuFZM4e05pSvo+577kOBF3xf29P/EpN5aw+4nUHF3Ku6khBYfrzzoksahHiTUjOGsbslvYAx6PpawDmv3vTs7alh9yaeyWI8jyzOQ=
+	t=1755586019; cv=none; b=qqq/DdlSNf78eyOMt/r3c7I4eWHP27OZ73UbIs9F9HMm8qWaBWBJ3fDWXk6HZx+iib5x4zhnO+LhFGAn3yC1KT65Pfa2xVg7na1XXmNtb8BcOBqiib+M8MuhMY6mwxhfC7YU0UK3c3181Ep9AT1LRD7RUTQaZMlucNNXMqvzuzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755583147; c=relaxed/simple;
-	bh=X89cjFgOmZ0Ln4Ar3QQwsWEIKQLCUrDZWW0dEUXjBac=;
+	s=arc-20240116; t=1755586019; c=relaxed/simple;
+	bh=3VjvM0UA0K8iBmYSTQrznqGE0MptvWh5Z31cwVqDuEs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OXXtcdSlVaKCJD4jedz3SupQhOsahujOpHJxxBLMl4GCMzKaZ/DvZyfZXIVum6dvWT7xqF1+/A36g5Z5XIcvQhnV95xbab/YmuNtjEPJFkO1goo6KM6y74yCnBprEX6iKPsfW08uGrf+Pp7+TTqtKyh0lJF8MOQzklbvmH0JP+4=
+	 In-Reply-To:Content-Type; b=EDNWs/H7jJgpLghz7OEIcTVzZRNivxGjDM8gLebyuPAfHatyUVl47XyL22Ne7hfKue0/gkfexAAXs2EDCalOKHzUXurl/3pLfXTWXcsf63RnR3saio/pPgZmwGlHlF7ao+bRlg52i5niCY7Egi/om9jZymspf+OsqyjnUvNn9BI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A786F152B;
-	Mon, 18 Aug 2025 22:58:49 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61E4B152B;
+	Mon, 18 Aug 2025 23:46:48 -0700 (PDT)
 Received: from [10.164.146.16] (J09HK2D2RT.blr.arm.com [10.164.146.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 913663F63F;
-	Mon, 18 Aug 2025 22:58:54 -0700 (PDT)
-Message-ID: <bea0e6b4-4b9e-45c7-b42a-fde93d627cba@arm.com>
-Date: Tue, 19 Aug 2025 11:28:51 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B8693F63F;
+	Mon, 18 Aug 2025 23:46:53 -0700 (PDT)
+Message-ID: <b63b6344-ab7c-43d8-b418-e030344dfd7c@arm.com>
+Date: Tue, 19 Aug 2025 12:16:50 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] arm64/sysreg: Add TCR_EL2 register
+Subject: Re: [PATCH 2/4] arm64/sysreg: Replace TCR_EL1 field macros
 To: Marc Zyngier <maz@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
@@ -35,149 +35,105 @@ Cc: linux-arm-kernel@lists.infradead.org,
  Ryan Roberts <ryan.roberts@arm.com>, kvmarm@lists.linux.dev,
  linux-kernel@vger.kernel.org
 References: <20250818045759.672408-1-anshuman.khandual@arm.com>
- <20250818045759.672408-4-anshuman.khandual@arm.com>
- <87ldngmy9h.wl-maz@kernel.org>
+ <20250818045759.672408-3-anshuman.khandual@arm.com>
+ <87jz30my30.wl-maz@kernel.org>
 Content-Language: en-US
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <87ldngmy9h.wl-maz@kernel.org>
+In-Reply-To: <87jz30my30.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 18/08/25 9:13 PM, Marc Zyngier wrote:
-> On Mon, 18 Aug 2025 05:57:58 +0100,
+
+
+On 18/08/25 9:16 PM, Marc Zyngier wrote:
+> On Mon, 18 Aug 2025 05:57:57 +0100,
 > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 >>
->> Add TCR_EL2 register fields as per the latest ARM ARM DDI 0487 7.B in tools
-> 
-> 7.B??? My copy of the published ARM ARM has L.B as the version suffix.
-
-Right, the version is L.B instead.
-> 
-> Also, if you got the registers from the ARM ARM, please stop doing
-> so. This is terribly error prone, and likely to be incomplete, given
-> that the ARM ARM lags about a year behind the published architecture.
-> 
-> You have the BSD-licensed MRS at your disposal, please make use of it.
-
-I guess you are suggesting the latest layout from the XML. Sure will refer
-the layout from the following description.
-
-https://developer.arm.com/documentation/ddi0601/2025-06/AArch64-Registers/TCR-EL2--Translation-Control-Register--EL2-
-> 
->> sysreg format and drop all the existing redundant macros from the header
->> (arch/arm64/include/asm/kvm_arm.h). While here also drop an explicit sysreg
->> definction SYS_TCR_EL2 from sysreg.h header.
+>> This just replaces all used TCR_EL1 field macros with tools sysreg variant
+>> based fields and subsequently drops them from the header (pgtable-hwdef.h).
+>> While here, also drop all the unused TCR_XXX macros from the header.
 >>
 >> Cc: Catalin Marinas <catalin.marinas@arm.com>
 >> Cc: Will Deacon <will@kernel.org>
 >> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
 >> Cc: Mark Brown <broonie@kernel.org>
->> Cc: linux-arm-kernel@lists.infradead.org
 >> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-arm-kernel@lists.infradead.org
 >> Cc: linux-kernel@vger.kernel.org
 >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 >> ---
->>  arch/arm64/include/asm/kvm_arm.h | 13 ----------
->>  arch/arm64/include/asm/sysreg.h  |  1 -
->>  arch/arm64/tools/sysreg          | 44 ++++++++++++++++++++++++++++++++
->>  3 files changed, 44 insertions(+), 14 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
->> index 560d9cb63413..8994cddef182 100644
->> --- a/arch/arm64/include/asm/kvm_arm.h
->> +++ b/arch/arm64/include/asm/kvm_arm.h
->> @@ -107,19 +107,6 @@
->>  
->>  #define MPAMHCR_HOST_FLAGS	0
->>  
->> -/* TCR_EL2 Registers bits */
->> -#define TCR_EL2_DS		(1UL << 32)
->> -#define TCR_EL2_RES1		((1U << 31) | (1 << 23))
->> -#define TCR_EL2_HPD		(1 << 24)
->> -#define TCR_EL2_TBI		(1 << 20)
->> -#define TCR_EL2_PS_SHIFT	16
->> -#define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
->> -#define TCR_EL2_PS_40B		(2 << TCR_EL2_PS_SHIFT)
->> -#define TCR_EL2_TG0_MASK	TCR_EL1_TG0_MASK
->> -#define TCR_EL2_SH0_MASK	TCR_EL1_SH0_MASK
->> -#define TCR_EL2_ORGN0_MASK	TCR_EL1_ORGN0_MASK
->> -#define TCR_EL2_IRGN0_MASK	TCR_EL1_IRGN0_MASK
->> -#define TCR_EL2_T0SZ_MASK	0x3f
->>  #define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
->>  			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
->>  
->> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->> index ad5c901af229..112d5d0acb50 100644
->> --- a/arch/arm64/include/asm/sysreg.h
->> +++ b/arch/arm64/include/asm/sysreg.h
->> @@ -523,7 +523,6 @@
->>  
->>  #define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
->>  #define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
->> -#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
->>  #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
->>  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
->>  
->> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
->> index 4bdae8bb11dc..d2b40105eb41 100644
->> --- a/arch/arm64/tools/sysreg
->> +++ b/arch/arm64/tools/sysreg
->> @@ -4812,6 +4812,50 @@ Sysreg	TCR_EL12        3	5	2	0	2
->>  Mapping	TCR_EL1
->>  EndSysreg
->>  
->> +Sysreg	TCR_EL2        3	4	2	0	2
->> +Res0	63:34
->> +Field	33	MTX
->> +Field	32	DS
->> +Res1	31
->> +Field	30	TCMA
->> +Field	29	TBID
->> +Field	28	HWU62
->> +Field	27	HWU61
->> +Field	26	HWU60
->> +Field	25	HWU59
->> +Field	24	HPD
->> +Res1	23
->> +Field	22	HD
->> +Field	21	HA
->> +Field	20	TBI
->> +Res0	19
->> +Field   18:16	PS
->> +UnsignedEnum	15:14	TG0
->> +	0b00	4K
->> +	0b01	64K
->> +	0b10	16K
->> +EndEnum
->> +UnsignedEnum	13:12	SH0
->> +	0b00	NONE
->> +	0b10	OUTER
->> +	0b11	INNER
->> +EndEnum
->> +UnsignedEnum	11:10	ORGN0
->> +	0b00	NC
->> +	0b01	WBWA
->> +	0b10	WT
->> +	0b11	WBnWA
->> +EndEnum
->> +UnsignedEnum	9:8	IRGN0
->> +	0b00	NC
->> +	0b01	WBWA
->> +	0b10	WT
->> +	0b11	WBnWA
->> +EndEnum
->> +Res0    7:6
->> +Field   5:0	T0SZ
->> +EndSysreg
+>>  arch/arm64/include/asm/assembler.h         |   6 +-
+>>  arch/arm64/include/asm/cputype.h           |   2 +-
+>>  arch/arm64/include/asm/kvm_arm.h           |  28 +++---
+>>  arch/arm64/include/asm/kvm_nested.h        |   6 +-
+>>  arch/arm64/include/asm/mmu_context.h       |   4 +-
+>>  arch/arm64/include/asm/pgtable-hwdef.h     | 107 +++------------------
+>>  arch/arm64/include/asm/pgtable-prot.h      |   2 +-
+>>  arch/arm64/kernel/cpufeature.c             |   4 +-
+>>  arch/arm64/kernel/pi/map_kernel.c          |   8 +-
+>>  arch/arm64/kernel/vmcore_info.c            |   2 +-
+>>  arch/arm64/kvm/arm.c                       |   6 +-
+>>  arch/arm64/kvm/at.c                        |  48 ++++-----
+>>  arch/arm64/kvm/hyp/include/hyp/switch.h    |   2 +-
+>>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   2 +-
+>>  arch/arm64/kvm/hyp/nvhe/switch.c           |   2 +-
+>>  arch/arm64/kvm/hyp/nvhe/tlb.c              |   2 +-
+>>  arch/arm64/kvm/hyp/vhe/tlb.c               |   2 +-
+>>  arch/arm64/kvm/nested.c                    |   8 +-
+>>  arch/arm64/kvm/pauth.c                     |  12 +--
+>>  arch/arm64/mm/proc.S                       |  29 +++---
+>>  tools/arch/arm64/include/asm/cputype.h     |   2 +-
+>>  21 files changed, 101 insertions(+), 183 deletions(-)
 > 
-> This is only the E2H==0 version of TCR_EL2. IF you are going to
-> describe this register in a useful manner, then add both formats so
-> that we know what we are dealing with.
+> [...]
+> 
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 888f7c7abf54..b47d6d530e57 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -2000,10 +2000,10 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+>>  
+>>  	tcr = read_sysreg(tcr_el1);
+>>  	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
+>> -		tcr &= ~(TCR_HD | TCR_HA | TCR_A1 | TCR_T0SZ_MASK);
+>> -		tcr |= TCR_EPD1_MASK;
+>> +		tcr &= ~(TCR_EL1_HD | TCR_EL1_HA | TCR_EL1_A1 | TCR_EL1_T0SZ_MASK);
+>> +		tcr |= TCR_EL1_EPD1_MASK;
+> 
+> Except that none of that code is about EL1. At all.
+> 
+>>  	} else {
+>> -		unsigned long ips = FIELD_GET(TCR_IPS_MASK, tcr);
+>> +		unsigned long ips = FIELD_GET(TCR_EL1_IPS_MASK, tcr);
+>>  
+>>  		tcr &= TCR_EL2_MASK;
+>>  		tcr |= TCR_EL2_RES1 | FIELD_PREP(TCR_EL2_PS_MASK, ips);
+>> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+>> index 0e5610533949..5f0f10ef38f0 100644
+>> --- a/arch/arm64/kvm/at.c
+>> +++ b/arch/arm64/kvm/at.c
+>> @@ -134,8 +134,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>>  	tbi = (wi->regime == TR_EL2 ?
+>>  	       FIELD_GET(TCR_EL2_TBI, tcr) :
+>>  	       (va55 ?
+>> -		FIELD_GET(TCR_TBI1, tcr) :
+>> -		FIELD_GET(TCR_TBI0, tcr)));
+>> +		FIELD_GET(TCR_EL1_TBI1, tcr) :
+>> +		FIELD_GET(TCR_EL1_TBI0, tcr)));
+> 
+> This is the reason number one why I dislike this patch.
+> 
+> Here, we deal with both the EL1&0 *and* the EL2&0 translation
+> regimes. And I left the original definition *on purpose* so that
+> nobody would read this code as being EL1-only. Now, you will glance
+> over it with warm fuzzy feeling that you know what this is about --
+> purely EL1. And that's what bugs are made of.
+> 
+> Of course, nothing changed functionally. But is it better? No.
 
-IIUC two different runtime layouts for TCR_EL2 is not possible to be
-defined in current tools sysreg format. Also one layout is not just
-a larger extension of the other - in which cases we could have just
-defined the larger layout.
-
-But curious do we have use cases for bits from the other layout now ?
+Just wondering - will it be better to use TCR_EL1/TCR_EL2 definitions
+conditionally for EL1&0 and EL2&0 translation regimes as applicable ?
+Could there any other better method here ? Because the current situation
+where there are some custom TCR macros, some tools sysreg generated macros,
+and then those macros getting used in an adhoc manner in different places,
+is not very consistent either.
