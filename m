@@ -1,56 +1,25 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEFF0F510;
-	Mon, 18 Aug 2025 20:07:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75162512D8
+	for <kvmarm@lists.linux.dev>; Tue, 19 Aug 2025 03:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755547664; cv=none; b=gtUnn62WZH7T1s+xYjyNBtr/onxmcqinDWqq9NqekHL3Z+mOpgN8NDeU6rY6VBAqN5hGZCQg5tiIAbd58ZAQAXfp5dGNhxAyhIzTCrahTWQPKn6tWppkF82l6ucb/l00SMtAvcDDoSLXaNn2By0qD/7lZag7ZWKyMv9PT/UOJEM=
+	t=1755575028; cv=none; b=uHRowlmk8QuaxchoRRAIuvzNDt4TF+LFTa+f4XR/W6nitfBTzaYH2H6R7ZPosJL8ZHEm5QXq4QQ3ohEMZIWUapAfKhdRkYPBw4RuCdPjlfsXp4zaDa12nFIrtGwDopDinJIY0CN3oNmr6XYr4gwIIMxTOCOuWbCCZGu+bmGOxFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755547664; c=relaxed/simple;
-	bh=HUP2AEiZfFgmlejZ9gs27ibEAHSKm6RtjRLDUuqDXBM=;
+	s=arc-20240116; t=1755575028; c=relaxed/simple;
+	bh=mtJ6Q650DJeOOlKZdRV7hJKSiYg3ndl/fYc2aOVg02w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T9FbF6NmiBdc9AP9BHdcm16LWJHTUfR5oLe0Z4JlA9afit2kfuo9YD9z47kbtb5yVYPZzaqS6wdLaeICy/oNHtsJypgd1j7aVgNsKhXIe5xAObw8T69lNyi9coe6lZS3KjLB8FJL8Nb2Cr1tZN8vf7pcH9/eeu1zyYSp0Uy3ues=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F9oTVbBu; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F9oTVbBu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755547663; x=1787083663;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=HUP2AEiZfFgmlejZ9gs27ibEAHSKm6RtjRLDUuqDXBM=;
-  b=F9oTVbBuK8fZEOqmOJwLuhaU1Z+cHHP05a6oZ4yISpCDUrmXS5RaT96v
-   hM/6UP12uUeXoTRdbxuCYTftEHgh3f3LhIPb4Y5BpuLq28WF7nWoozjYD
-   q9HbTureoXfwT9iKnIMWAjh2VXAIuKK+lsNKOky8aUmpqFl1J/vuOr0Gh
-   iZr4w2xarbb/kpkqdWuUTYKXfM/y0uCBfhhDjbw/BQZM1caZBDFIbWTiH
-   8RLu7NuBVq7OgQ4skQTYRST7y9CTN60lsclY4c8I7VXNrJGDrlbqJ5N8K
-   EtEU/JyrhTTCCN6FC2DWQX0kVyu0gCrwFcy7R3D5ns78/ofrjYhb3aFef
-   g==;
-X-CSE-ConnectionGUID: fg4CMOqpTGuXd3INrYHpMg==
-X-CSE-MsgGUID: t/atL0QTT1i9kFJZh+IYIw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11526"; a="69233315"
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="scan'208";a="69233315"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 13:07:43 -0700
-X-CSE-ConnectionGUID: VPdWLgrPQ4q9Io7sk+4Srw==
-X-CSE-MsgGUID: IPqmhJ93SHqaacsNGeVfjQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="scan'208";a="168055360"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 13:07:41 -0700
-Received: from [10.124.163.195] (kliang2-mobl1.ccr.corp.intel.com [10.124.163.195])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id D183720B571C;
-	Mon, 18 Aug 2025 13:07:39 -0700 (PDT)
-Message-ID: <4e58688f-22e0-4e20-9043-dee76d01d24f@linux.intel.com>
-Date: Mon, 18 Aug 2025 13:07:39 -0700
+	 In-Reply-To:Content-Type; b=DcGSBcwztIKFoKe6pwZmJLf7z6Wo2Kh+hCjX6Tn8EMZg8tDObFWAxZfpXPJOXkTMnWSBFYK7LNLmTZCTR2mWCo9CCMocOEzZrgLy4ZaMsvJYlVOSnobgVdQA6q+gBrMc/nS5gUq9Nzsursl7eVCiWyVg/gKXNmrckpXR8LNNpQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D9790152B;
+	Mon, 18 Aug 2025 20:43:35 -0700 (PDT)
+Received: from [10.164.146.16] (J09HK2D2RT.blr.arm.com [10.164.146.16])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C05703F58B;
+	Mon, 18 Aug 2025 20:43:40 -0700 (PDT)
+Message-ID: <cdc7bf7f-3237-43b7-ab9c-473fc65f0cad@arm.com>
+Date: Tue, 19 Aug 2025 09:13:37 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,87 +27,134 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/44] perf/x86: Switch LVTPC to/from mediated PMI
- vector on guest load/put context
-To: Peter Zijlstra <peterz@infradead.org>,
- Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Yongwei Ma <yongwei.ma@intel.com>, Mingwei Zhang <mizhang@google.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Sandipan Das <sandipan.das@amd.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-References: <20250806195706.1650976-1-seanjc@google.com>
- <20250806195706.1650976-10-seanjc@google.com>
- <20250815113951.GC4067720@noisy.programming.kicks-ass.net>
- <aJ9VQH87ytkWf1dH@google.com> <aJ9YbZTJAg66IiVh@google.com>
- <20250818143204.GH3289052@noisy.programming.kicks-ass.net>
- <aKNF7jc4qr9ab-Es@google.com>
- <20250818161210.GJ3289052@noisy.programming.kicks-ass.net>
+Subject: Re: [PATCH 1/4] arm64/sysreg: Update TCR_EL1 register
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Mark Brown <broonie@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250818045759.672408-1-anshuman.khandual@arm.com>
+ <20250818045759.672408-2-anshuman.khandual@arm.com>
+ <aKLuQmfSi1Qg2och@J2N7QTR9R3>
 Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20250818161210.GJ3289052@noisy.programming.kicks-ass.net>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <aKLuQmfSi1Qg2och@J2N7QTR9R3>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 2025-08-18 9:12 a.m., Peter Zijlstra wrote:
-> On Mon, Aug 18, 2025 at 08:25:34AM -0700, Sean Christopherson wrote:
-> 
->>> OK, so *IF* doing the VM-exit during PMI is sound, this is something
->>> that needs a comment somewhere. 
+On 18/08/25 2:41 PM, Mark Rutland wrote:
+> On Mon, Aug 18, 2025 at 10:27:56AM +0530, Anshuman Khandual wrote:
+>> Update TCR_EL1 register fields as per latest ARM ARM DDI 0487 7.B and while
+>> here drop an explicit sysreg definition SYS_TCR_EL1 from sysreg.h, which is
+>> now redundant.
 >>
->> I'm a bit lost here.  Are you essentially asking if it's ok to take a VM-Exit
->> while the guest is handling a PMI?  If so, that _has_ to work, because there are
->> myriad things that can/will trigger a VM-Exit at any point while the guest is
->> active.
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Mark Brown <broonie@kernel.org>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>>  arch/arm64/include/asm/sysreg.h |  2 --
+>>  arch/arm64/tools/sysreg         | 52 ++++++++++++++++++++++++++++-----
+>>  2 files changed, 44 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+>> index d5b5f2ae1afa..ad5c901af229 100644
+>> --- a/arch/arm64/include/asm/sysreg.h
+>> +++ b/arch/arm64/include/asm/sysreg.h
+>> @@ -281,8 +281,6 @@
+>>  #define SYS_RGSR_EL1			sys_reg(3, 0, 1, 0, 5)
+>>  #define SYS_GCR_EL1			sys_reg(3, 0, 1, 0, 6)
+>>  
+>> -#define SYS_TCR_EL1			sys_reg(3, 0, 2, 0, 2)
+>> -
+>>  #define SYS_APIAKEYLO_EL1		sys_reg(3, 0, 2, 1, 0)
+>>  #define SYS_APIAKEYHI_EL1		sys_reg(3, 0, 2, 1, 1)
+>>  #define SYS_APIBKEYLO_EL1		sys_reg(3, 0, 2, 1, 2)
+>> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+>> index 696ab1f32a67..4bdae8bb11dc 100644
+>> --- a/arch/arm64/tools/sysreg
+>> +++ b/arch/arm64/tools/sysreg
+>> @@ -4756,17 +4756,53 @@ Field   37      TBI0
+>>  Field   36      AS
+>>  Res0    35
+>>  Field   34:32   IPS
+>> -Field   31:30   TG1
+>> -Field   29:28   SH1
+>> -Field   27:26   ORGN1
+>> -Field   25:24   IRGN1
+>> +UnsignedEnum   31:30   TG1
+>> +	0b01	16K
+>> +	0b10	4K
+>> +	0b11	64K
+>> +EndEnum
 > 
-> Yes, that's what I'm asking. Why is this VM-exit during PMI nonsense not
-> subject to the same failures that mandates the mid/late PMI ACK.
+> This is clearly not an ordered set.
 > 
-> And yes, I realize this needs to work. But so far I'm not sure I
-> understand why that is a safe thing to do.
+> This should just use Enum, not UnsignedEnum.
 > 
-> Like I wrote, I suspect writing all the PMU MSRs serializes things
-> sufficiently, but if that is the case, that needs to be explicitly
-> mentioned. Because that also doesn't explain why we needs mid-ack
-> instead of late-ack on ADL e-cores for instance.
+> Likewise for all the other cases below.
 
-The mid-ack and late-ack only require under some corner cases, e.g., two
-PMIs are triggered simultaneously with PEBS.
-Because the ucode of p-core and e-core handle the pending PEBS records
-and PMIs differently.
-For p-core, the ACK should be as close to EOM. Otherwise, the pending
-PMI will trigger a spurious PMI warning.
-For e-core, the uncode handles the pending PMI well. There is no
-spurious PMI. However, it impacts the update of the PEBS_DATA_CFG. The
-PEBS_DATA_CFG is global. If the ACK cannot be done before re-enabling
-counters, the stale PEBS_DATA_CFG will somehow be written into the next
-PEBS record of the pending PMI. It triggers the malformed PEBS record.
-
-For the upcoming arch PEBS, the data cfg is per-counter.
-The mid-ack workaround should not be required.
+Sure, will change.
 > 
-> Could it perhaps be that we don't let the guests do PEBS because DS
-> doesn't virtualize? And thus we don't have the malformed PEBS record?
->
+> Mark.
+> 
+>> +UnsignedEnum   29:28   SH1
+>> +	0b00	NONE
+>> +	0b10	OUTER
+>> +	0b11	INNER
+>> +EndEnum
+>> +UnsignedEnum   27:26  ORGN1
+>> +	0b00	NC
+>> +	0b01	WBWA
+>> +	0b10	WT
+>> +	0b11	WBnWA
+>> +EndEnum
+>> +UnsignedEnum   25:24   IRGN1
+>> +	0b00	NC
+>> +	0b01	WBWA
+>> +	0b10	WT
+>> +	0b11	WBnWA
+>> +EndEnum
+>>  Field   23      EPD1
+>>  Field   22      A1
+>>  Field   21:16   T1SZ
+>> -Field   15:14   TG0
+>> -Field   13:12   SH0
+>> -Field   11:10   ORGN0
+>> -Field   9:8     IRGN0
+>> +UnsignedEnum   15:14   TG0
+>> +	0b00	4K
+>> +	0b01	64K
+>> +	0b10	16K
+>> +EndEnum
+>> +UnsignedEnum   13:12   SH0
+>> +	0b00	NONE
+>> +	0b10	OUTER
+>> +	0b11	INNER
+>> +EndEnum
+>> +UnsignedEnum   11:10  ORGN0
+>> +	0b00	NC
+>> +	0b01	WBWA
+>> +	0b10	WT
+>> +	0b11	WBnWA
+>> +EndEnum
+>> +UnsignedEnum   9:8   IRGN0
+>> +	0b00	NC
+>> +	0b01	WBWA
+>> +	0b10	WT
+>> +	0b11	WBnWA
+>> +EndEnum
+>>  Field   7       EPD0
+>>  Res0    6
+>>  Field   5:0     T0SZ
+>> -- 
+>> 2.25.1
+>>
+>>
 
-Yes, I don't think it can impact the mediated PMU. The legacy PEBS for
-vPMU is not supported.
-Since the configuration is per-counter with the arch PEBS, the malformed
-PEBS record should not be triggered either.
-
-
-Thanks,
-Kan
