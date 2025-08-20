@@ -1,178 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD58C179A3;
-	Wed, 20 Aug 2025 22:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27B86FBF;
+	Wed, 20 Aug 2025 22:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755727337; cv=none; b=bQBGQsDwbJMjmYtPB3SwXj7PtyKNGEoLz6VWImOIrExp7OU9Ugud1ZvyLtVO0NmgO6eheYVmFqPjebT2vtHmh042qJRLPctubnN3DXKEmxfGoLVKwHiWsBPm+DdR7Dd/rvKoRwbG6jfPC0NdZO6HN7szq8Tik9LFfiVm64Lu5Ec=
+	t=1755728038; cv=none; b=UIJQPIPJsY0FqYMvzpAw7rS9f4xyA2Ktmvd/1NaVk7VMVososmlWVB1SSmFb3sbbTHhhnQNbjP5Ec0zVIH755rWNGD6DXrIk2jKLMjjTHFJMss4ZqKAxWoeH9gDsgqPDuk7SX2BKaQ2UP9wRJo64wlJsVJKxUYSkLvYhq7xX7+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755727337; c=relaxed/simple;
-	bh=qpzq8xFh8O6Sfd7kFjk7FbKEkmABy8wjXxb1oqoY7tI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QsqzkgbRK8VBos50GRAqz+ezhtbEB0qTcd5RDLu6zDXh3d7qK9FwLF5KCTbpRZ4BZ7pexbAxqv3aQfHnf9oBBbKji4pgkzxnTwmoEPoq43xf13WVudw1CDTuBluOV9FPWEYBrm/b9bYFFkc9REkjDYJtZctE/a1pJh06F3R13N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X44mG8TC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755728038; c=relaxed/simple;
+	bh=723mCQUWr4vd81W677iTRLHJxWJWtzlIUtHlOa32V2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F7ovZxgKynayNwOM6ZxKxU3ZJEsJlc3FQ14WNGvJHlAnGqH0Fd758h1LFNx3FBkFGYkheVLWOy53X8lfF8DFe1Ih0uHU00cHTaAwdaVqLhKcL5ggjyyBtdlSfQ/5ZjL0L1I8AZjSswK8WLL/V3Zln7TJcieN6uBqQ0Ijy32NqNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSwEfGU/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X44mG8TC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61231C4CEE7;
-	Wed, 20 Aug 2025 22:02:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSwEfGU/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 093ECC4CEE7;
+	Wed, 20 Aug 2025 22:13:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755727337;
-	bh=qpzq8xFh8O6Sfd7kFjk7FbKEkmABy8wjXxb1oqoY7tI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X44mG8TCXKK5v+P1T8NFCEeTLrc+6wn3VP87ZC8S3yaCZgtyj/JJW1cdiFVMevpOR
-	 xoPp+AYCEthoV9/9T/EE6O3/DlVrM2DJiCwxpZjhaT/PKkwNOYRPn+hsSv6gKqqk8R
-	 THzOB/8edGNO+Krn+REkTz5qNsIu/LEzMXTbKu1hsZhU3dwB20Bg6JqGdoEPYZqhmz
-	 Ke5ocy23JyUtOwGSMD7vd+v36QNEKW26ZXbck6uHzEPqaNaTJSUFHCH6geUQJTh4KS
-	 ErXQmnB2FrGYukkGW2oXFHsT34lLGC7ws1wBNwGz6s+clfw3lFVBUK7uVJcng6FOQb
-	 OoQ6KWnyrqGww==
-Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uoqsm-009Vp5-4r;
-	Wed, 20 Aug 2025 23:02:12 +0100
-Date: Wed, 20 Aug 2025 23:02:11 +0100
-Message-ID: <87ms7tk5y4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+	s=k20201202; t=1755728037;
+	bh=723mCQUWr4vd81W677iTRLHJxWJWtzlIUtHlOa32V2c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NSwEfGU/YJrPF3PALBhfdolw0CHUjRu08AInSQfl2oOFBo69/fuTXpzGZwvjoaJdB
+	 rQYI4nMpqDfU9sxX15xmXjazClgIP2wxPYwwNa6I0VCbVYMGpWY/PEqRV0l5UXVrs9
+	 U+Nci3ttrnIrMHvMkF/mWu3GjYDDzWJ94MN16eC6x3t+P6XGjoBLVQMsA9yU3e5Sm7
+	 kPZHWAGTE1vGTiscwRLtNeTW/7xBYsZValPSquuhueO9073mlb5tWJW20d9g/AmkO5
+	 bWu3H1/p9uEmQiEOvmob4rT6gGAGpSJ6Is7CdXGrvAwEHi/pp/xZCSHYBKLXZP8piE
+	 NO7XFUVIJnmTg==
+Date: Wed, 20 Aug 2025 23:13:52 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v15 4/6] KVM: arm64: Set PSTATE.EXLOCK when entering an exception
-In-Reply-To: <20250820-arm64-gcs-v15-4-5e334da18b84@kernel.org>
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v15 2/6] KVM: arm64: Manage GCS access and registers for
+ guests
+Message-ID: <6ea4127b-813d-49b0-9922-b5f298ca5f0e@sirena.org.uk>
 References: <20250820-arm64-gcs-v15-0-5e334da18b84@kernel.org>
-	<20250820-arm64-gcs-v15-4-5e334da18b84@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20250820-arm64-gcs-v15-2-5e334da18b84@kernel.org>
+ <87o6s9k8ie.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 86.149.246.145
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="JKL6PMQq5ZwIKYYm"
+Content-Disposition: inline
+In-Reply-To: <87o6s9k8ie.wl-maz@kernel.org>
+X-Cookie: Whoever dies with the most toys wins.
 
-On Wed, 20 Aug 2025 15:14:44 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> As per DDI 0487 RWTXBY we need to manage PSTATE.EXLOCK when entering an
 
-Nit: please use an underscore between the type of a statement and its
-"name", as it makes it a bit more readable (R_WTXBY).
+--JKL6PMQq5ZwIKYYm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> exception, when the exception is entered from a lower EL the bit is cleared
-> while if entering from the same EL it is set to GCSCR_ELx.EXLOCKEN.
-> Implement this behaviour in enter_exception64().
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/uapi/asm/ptrace.h |  1 +
->  arch/arm64/kvm/hyp/exception.c       | 37 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 38 insertions(+)
-> 
-> diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-> index 0f39ba4f3efd..f2fb029fb61a 100644
-> --- a/arch/arm64/include/uapi/asm/ptrace.h
-> +++ b/arch/arm64/include/uapi/asm/ptrace.h
-> @@ -56,6 +56,7 @@
->  #define PSR_C_BIT	0x20000000
->  #define PSR_Z_BIT	0x40000000
->  #define PSR_N_BIT	0x80000000
-> +#define PSR_EXLOCK_BIT 0x400000000
->  
->  #define PSR_BTYPE_SHIFT		10
->  
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-> index 95d186e0bf54..46e1d0c3038c 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -73,6 +73,38 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
->  		vcpu->arch.ctxt.spsr_und = val;
->  }
->  
-> +static unsigned long enter_exception64_gcs(struct kvm_vcpu *vcpu,
-> +					   unsigned long mode,
-> +					   unsigned long target_mode)
+On Wed, Aug 20, 2025 at 10:06:49PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-A more appropriate name would be compute_exlock().
+> > In order to allow userspace to control availability of the feature to
+> > guests we enable writability for only ID_AA64PFR1_EL1.GCS, this is a
+> > deliberately conservative choice to avoid errors due to oversights.
+> > Further fields should be made writable in future.
 
-> +{
-> +	u64 gcscr;
-> +
-> +	if (!kvm_has_gcs(kern_hyp_va(vcpu->kvm)))
-> +		return 0;
-> +
-> +	/* GCS can't be enabled for 32 bit */
-> +	if (mode & PSR_MODE32_BIT)
-> +		return 0;
-> +
-> +	/* When taking an exception to a higher EL EXLOCK is cleared. */
-> +	if ((mode | PSR_MODE_THREAD_BIT) != target_mode)
-> +		return 0;
-> +
-> +	/*
-> +	 * When taking an exception to the same EL EXLOCK is set to
-> +	 * the effective value of GCSR_ELx.EXLOCKEN.
-> +	 */
-> +	if (vcpu_is_el2(vcpu))
-> +		gcscr = __vcpu_read_sys_reg(vcpu, GCSCR_EL2);
-> +	else
-> +		gcscr = __vcpu_read_sys_reg(vcpu, GCSCR_EL1);
-> +
-> +	if (gcscr & GCSCR_ELx_EXLOCKEN)
-> +		return PSR_EXLOCK_BIT;
-> +
-> +	return 0;
-> +}
-> +
->  /*
->   * This performs the exception entry at a given EL (@target_mode), stashing PC
->   * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-> @@ -162,6 +194,11 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
->  	// PSTATE.BTYPE is set to zero upon any exception to AArch64
->  	// See ARM DDI 0487E.a, pages D1-2293 to D1-2294.
->  
-> +	// PSTATE.EXLOCK is set to 0 upon any exception to a higher
-> +	// EL, or to GCSCR_ELx.EXLOCKEN for an exception to the same
-> +	// exception level.  See ARM DDI 0487 RWTXBY, D.1.3.2 in K.a.
-> +	new |= enter_exception64_gcs(vcpu, mode, target_mode);
-> +
->  	new |= PSR_D_BIT;
->  	new |= PSR_A_BIT;
->  	new |= PSR_I_BIT;
-> 
+> I'm not sure what you mean by that. Making the feature field writable
+> is only allowable if we have some level of support (and otherwise we
+> should prevent both the feature being exposed, and the field being
+> writable).
 
-But that's not the only case where we have to deal with EXLOCK, is it?
-What of ERET and its PAuth variants? R_TYTWB says:
+> So future fields being writable will only happen when the features are
+> fully supported, and only then.
 
-<quote>
-If in AArch64 state, any of the following situations can cause an
-illegal exception return:
+> Please clarify, or drop this altogether.
 
-[...]
+That's bitrot from earlier versions where we needed to enable
+ID_AA64PFR1_EL1, the other versions were similar.  I'll remove these
+stale references.
 
-- If the Effective value of GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK
-  is 0, the execution of an exception return instruction to return to
-  the current Exception level ELx.
-</quote>
+--JKL6PMQq5ZwIKYYm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-My reading of the spec is that this needs handling.
+-----BEGIN PGP SIGNATURE-----
 
-	M.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmimSJ8ACgkQJNaLcl1U
+h9ArWQf/eQm5fVrMcWS54gUdtfiVe/qKLMrda9FKLpovpB8GsKqKDBef8b7Mo0GZ
+wv/jvtET+UErD1lSyfeYcMoKrjKryCkuA9/vbNs+pB3j/wo9/DS11IgYXyj+fy/h
+EpFn4aJieXOnKMBAngpXM3ZcSpio/ZPVASw28Ux17L8gfmYcLmAgNC1XaxD6bj7x
++IsTvk7ekqeUGzFYeZVZetm76oozpkKRKV3N8X4d5YfPukP83y8HrDKJZp0yIklF
++tLpcqGjMgmEb8XMWdGNY5PwHzPeQou/Dx4Tn0+lilEJV8vOZDyJKSHeQDvjeZnV
+EVWu21kCgBmxXm8RxEmGCalLJpYV3A==
+=2ze9
+-----END PGP SIGNATURE-----
 
--- 
-Jazz isn't dead. It just smells funny.
+--JKL6PMQq5ZwIKYYm--
