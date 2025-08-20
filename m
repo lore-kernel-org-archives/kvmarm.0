@@ -1,114 +1,105 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C0D36CDE2;
-	Wed, 20 Aug 2025 15:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDAA62E8B60
+	for <kvmarm@lists.linux.dev>; Wed, 20 Aug 2025 15:10:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755702037; cv=none; b=CtFZ7qWWlvM4+FgqcLkErwGzl0cNpimSsMGGTEfXIGGo5RX5ul1JzOPdQ4VTJI+vVg8X1THsm8eJDVHklJTNU4giJb1dZYnqxqfymaLuX9b2HJFExG8p7yHxqt0Y7YwZskPHRsjWjEpG/qRXjkT51y4eHi74a5AOGnn4nAFki94=
+	t=1755702652; cv=none; b=L8EvPnB5UdVPVgFyiDCvoxZ/FTvJqyfXlsYaX1R7KoM54TyYZpj42glbipyp427AP6ZogHPqK5lyx4iJYTyRfZGbCC+6JM+OwU8SH4VYU3jGKNZq9/qLlLBRsYACYbCnJKnC1B9XfUEV7jM136R2QShk1RFTlUcdB9IJ+tQTy/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755702037; c=relaxed/simple;
-	bh=BZRXIQEzTfhUOH3gRrJChcfL6Ji+pvsTbZ8FZjpI1kg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hybMfdU+XUb3mKmG5me73zZuwP/tUUV18h7uzE75ZQKb11NP9FKgN8bwNob6cYGwq3CJ0zCi6BwyuxVm+sXwC+WV1BQNBAmfZ0sxSYsqywJde7GEPOKSDeyVBzntBoj9mQqx4LaUxnxsh4iJVKeDtC9E+g/eU+POAGtXM75N9E4=
+	s=arc-20240116; t=1755702652; c=relaxed/simple;
+	bh=0o1ZKr+OVgTNv/axtlIyra7bcdBWa1I6DQfsq+DZb4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NZOE7yNa5BjU3LeR/ooeC1ZEveI0Trl68HqHWIbH6oX8ojO6N7Lng/6shGIdR+8ZKRGVJsedYT82ymA9onSLx+c/j1dYcLKA1lXMRTemwqM/2ImIN1yAuJ9EkGpJKoShu9CixsvbI+/cDSr1zvTcPCe5FRVGM2KxKI5/EKVzMqw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2FF7B2F27;
-	Wed, 20 Aug 2025 08:00:27 -0700 (PDT)
-Received: from e122027.arm.com (unknown [10.57.2.58])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EFD343F738;
-	Wed, 20 Aug 2025 08:00:30 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH v10 43/43] KVM: arm64: Allow activating realms
-Date: Wed, 20 Aug 2025 15:56:03 +0100
-Message-ID: <20250820145606.180644-44-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250820145606.180644-1-steven.price@arm.com>
-References: <20250820145606.180644-1-steven.price@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 270261D31;
+	Wed, 20 Aug 2025 08:10:42 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.68])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 695743F738;
+	Wed, 20 Aug 2025 08:10:46 -0700 (PDT)
+Date: Wed, 20 Aug 2025 16:10:26 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
+	oliver.upton@linux.dev, anshuman.khandual@arm.com, robh@kernel.org,
+	james.morse@arm.com, mark.rutland@arm.com, joey.gouly@arm.com,
+	ahmed.genidi@arm.com, kevin.brodsky@arm.com,
+	scott@os.amperecomputing.com, mbenes@suse.cz,
+	james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org,
+	pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 1/5] arm64: make SCTLR2_EL1 accessible
+Message-ID: <aKXlYhhrNp/8StK2@e133380.arm.com>
+References: <20250813120118.3953541-1-yeoreum.yun@arm.com>
+ <20250813120118.3953541-2-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250813120118.3953541-2-yeoreum.yun@arm.com>
 
-Add the ioctl to activate a realm and set the static branch to enable
-access to the realm functionality if the RMM is detected.
+Hi,
 
-Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/kvm/rme.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+On Wed, Aug 13, 2025 at 01:01:14PM +0100, Yeoreum Yun wrote:
+> When the kernel runs at EL1, and yet is booted at EL2,
+> HCRX_EL2.SCTLR2En must be set to avoid trapping SCTLR2_EL1 accesses
+> from EL1 to EL2.
+> 
+> Ensure this bit is set at the point of initialising EL2.
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/el2_setup.h | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index 46033027510c..d755b4d46d77 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -57,9 +57,15 @@
+>          /* Enable GCS if supported */
+>  	mrs_s	x1, SYS_ID_AA64PFR1_EL1
+>  	ubfx	x1, x1, #ID_AA64PFR1_EL1_GCS_SHIFT, #4
+> -	cbz	x1, .Lset_hcrx_\@
+> +	cbz	x1, .Lskip_hcrx_GCSEn_\@
+>  	orr	x0, x0, #HCRX_EL2_GCSEn
+>  
+> +.Lskip_hcrx_GCSEn_\@:
+> +	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+> +	ubfx	x1, x1, #ID_AA64MMFR3_EL1_SCTLRX_SHIFT, #4
+> +	cbz	x1, .Lset_hcrx_\@
+> +	orr	x0, x0, HCRX_EL2_SCTLR2En
 
-diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 55ef3143a7b2..299473298720 100644
---- a/arch/arm64/kvm/rme.c
-+++ b/arch/arm64/kvm/rme.c
-@@ -1253,6 +1253,20 @@ static int kvm_init_ipa_range_realm(struct kvm *kvm,
- 	return realm_init_ipa_state(kvm, addr, end);
- }
- 
-+static int kvm_activate_realm(struct kvm *kvm)
-+{
-+	struct realm *realm = &kvm->arch.realm;
-+
-+	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
-+		return -EINVAL;
-+
-+	if (rmi_realm_activate(virt_to_phys(realm->rd)))
-+		return -ENXIO;
-+
-+	WRITE_ONCE(realm->state, REALM_STATE_ACTIVE);
-+	return 0;
-+}
-+
- /* Protects access to rme_vmid_bitmap */
- static DEFINE_SPINLOCK(rme_vmid_lock);
- static unsigned long *rme_vmid_bitmap;
-@@ -1400,6 +1414,9 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		r = kvm_populate_realm(kvm, &args);
- 		break;
- 	}
-+	case KVM_CAP_ARM_RME_ACTIVATE_REALM:
-+		r = kvm_activate_realm(kvm);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -1725,5 +1742,5 @@ void kvm_init_rme(void)
- 	if (rme_vmid_init())
- 		return;
- 
--	/* Future patch will enable static branch kvm_rme_is_available */
-+	static_branch_enable(&kvm_rme_is_available);
- }
--- 
-2.43.0
+Nit: prefix immediate operands with # please -- see usage elsewhere in
+this file.
 
+(This comes from the legacy AArch32 syntax and has never been required
+by AArch64 assemblers, but it has become a tradition in the Linux arch
+code...)
+
+The only execptions to this rule are macros (mov_q, mrs_s etc. --
+frequently they have an underscore in the name; "real" instructions
+never do.)
+
+> +
+>  .Lset_hcrx_\@:
+
+Maybe rename this label to .Lskip_hcrx_SCTLR2En_\@, so that people
+don't have to keep renaming an existing label whenever they add
+another block here.
+
+>  	msr_s	SYS_HCRX_EL2, x0
+>  .Lskip_hcrx_\@:
+
+[...]
+
+Cheers
+---Dave
