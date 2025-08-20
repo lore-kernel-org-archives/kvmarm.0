@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912FB2D6E61;
-	Wed, 20 Aug 2025 15:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D8E2E8B8C;
+	Wed, 20 Aug 2025 15:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755702003; cv=none; b=ZP7Lwd7HtpLA2R2kPehdarqxK3HzpC0enQ9ZSfJVgmKEDPjW8z/Rl+U5q6noEucfZu8OLVSOxhOZmTkHT8xhgzDWA1jTd+7bvJDWHsNlSG7ODpO9D3ymL/iQnCjrr/O2wrr6Bz7dYhzdNW3FjyVP7+VBhNqjyI2xUpiPlpshAjQ=
+	t=1755702006; cv=none; b=fhP4S05GbSlJiDa7xWp87t+VxUHGAmwozPM+1ZTutcRjyM43SHTNI3baTeEY5pv4lEGpz6JwVk7YscMfO4yVBUOBTEgslqnK0McclGjVmycXHPz5dHhWWjTYrnRAEnudtJQ+Jj2xTS1YjrmTJJ/zUiuB9iBxkr8I1reQ8znXtC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755702003; c=relaxed/simple;
-	bh=KxxRbbujNVlQSeHvmMNEn2cnxUoLZN7rKcWaoldvXN4=;
+	s=arc-20240116; t=1755702006; c=relaxed/simple;
+	bh=CBXraJBEfnDhgRr6K5X3gy5V8ePyHdWoOpzCm9TYeAs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q0mvfWOZbyiIsO4chbq+WZWPiq62Io29jyuFe3wNRRltbEeBmo8Jj4NFG3RHsQxJnacqWPb9EjsdDyO1LT0TvJm3W28aQB4Peuha6snbwpk3+cMZzRAPYWeeVScenBdjuDqSMw5Auqb/fXjq38TPFtsQ347RDkEcY67IdapqAeg=
+	 MIME-Version; b=TNhTFfEf/cCC/k5gtvJYgyR4D5McVHObLzpgReHbN0eJn9JuOgE9+DMAKVAKoV5cNX1zg4i+06orEQVGkcFCZU/I0JzhhFZ3pGiWIgKcLGBu1dTXUYdYsjRXRB4mUSkbVOtfk5AZZVrq12GNiPvqT5aYuzyfGAKKoXtojp3NR94=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE7862C3E;
-	Wed, 20 Aug 2025 07:59:51 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 15B642C3E;
+	Wed, 20 Aug 2025 07:59:56 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.2.58])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB78B3F738;
-	Wed, 20 Aug 2025 07:59:55 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 85C763F738;
+	Wed, 20 Aug 2025 08:00:00 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -44,9 +44,9 @@ Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v10 35/43] arm64: RME: Set breakpoint parameters through SET_ONE_REG
-Date: Wed, 20 Aug 2025 15:55:55 +0100
-Message-ID: <20250820145606.180644-36-steven.price@arm.com>
+Subject: [PATCH v10 36/43] arm64: RME: Initialize PMCR.N with number counter supported by RMM
+Date: Wed, 20 Aug 2025 15:55:56 +0100
+Message-ID: <20250820145606.180644-37-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250820145606.180644-1-steven.price@arm.com>
 References: <20250820145606.180644-1-steven.price@arm.com>
@@ -60,111 +60,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-Allow userspace to configure the number of breakpoints and watchpoints
-of a Realm VM through KVM_SET_ONE_REG ID_AA64DFR0_EL1.
-
-The KVM sys_reg handler checks the user value against the maximum value
-given by RMM (arm64_check_features() gets it from the
-read_sanitised_id_aa64dfr0_el1() reset handler).
-
-Userspace discovers that it can write these fields by issuing a
-KVM_ARM_GET_REG_WRITABLE_MASKS ioctl.
+Provide an accurate number of available PMU counters to userspace when
+setting up a Realm.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arch/arm64/kvm/guest.c    |  2 ++
- arch/arm64/kvm/rme.c      |  3 +++
- arch/arm64/kvm/sys_regs.c | 17 +++++++++++------
- 3 files changed, 16 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_rme.h | 1 +
+ arch/arm64/kvm/pmu-emul.c        | 3 +++
+ arch/arm64/kvm/rme.c             | 5 +++++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index a6daf6c78383..5306f7ec2379 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -803,6 +803,7 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- }
+diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+index f77e1f9eb6b9..0ada489ff104 100644
+--- a/arch/arm64/include/asm/kvm_rme.h
++++ b/arch/arm64/include/asm/kvm_rme.h
+@@ -89,6 +89,7 @@ struct realm_rec {
+ void kvm_init_rme(void);
+ u32 kvm_realm_ipa_limit(void);
+ u32 kvm_realm_vgic_nr_lr(void);
++u8 kvm_realm_max_pmu_counters(void);
  
- #define KVM_REG_ARM_PMCR_EL0		ARM64_SYS_REG(3, 3, 9, 12, 0)
-+#define KVM_REG_ARM_ID_AA64DFR0_EL1	ARM64_SYS_REG(3, 0, 0, 5, 0)
+ u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
  
- /*
-  * The RMI ABI only enables setting some GPRs and PC. The selection of GPRs
-@@ -821,6 +822,7 @@ static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
- 	} else {
- 		switch (reg->id) {
- 		case KVM_REG_ARM_PMCR_EL0:
-+		case KVM_REG_ARM_ID_AA64DFR0_EL1:
- 			return true;
- 		}
- 	}
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 41331f883780..6604aa982d02 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -1014,6 +1014,9 @@ u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm)
+ {
+ 	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
+ 
++	if (kvm_is_realm(kvm))
++		return kvm_realm_max_pmu_counters();
++
+ 	/*
+ 	 * PMUv3 requires that all event counters are capable of counting any
+ 	 * event, though the same may not be true of non-PMUv3 hardware.
 diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 4869921086fb..3b25c6caf286 100644
+index 3b25c6caf286..07e30ddf4d15 100644
 --- a/arch/arm64/kvm/rme.c
 +++ b/arch/arm64/kvm/rme.c
-@@ -588,6 +588,7 @@ static int realm_create_rd(struct kvm *kvm)
- 	void *rd = NULL;
- 	phys_addr_t rd_phys, params_phys;
- 	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
-+	u64 dfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64DFR0_EL1);
- 	int i, r;
- 	int rtt_num_start;
+@@ -87,6 +87,11 @@ u32 kvm_realm_vgic_nr_lr(void)
+ 	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS);
+ }
  
-@@ -624,6 +625,8 @@ static int realm_create_rd(struct kvm *kvm)
- 	params->rtt_num_start = rtt_num_start;
- 	params->rtt_base = kvm->arch.mmu.pgd_phys;
- 	params->vmid = realm->vmid;
-+	params->num_bps = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
-+	params->num_wps = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
- 
- 	if (kvm->arch.arm_pmu) {
- 		params->pmu_num_ctrs = kvm->arch.nr_pmu_counters;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1b199b3eb9c7..2b8de301f057 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1864,6 +1864,9 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
++u8 kvm_realm_max_pmu_counters(void)
++{
++	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS);
++}
++
+ u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
  {
- 	u8 debugver = SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, val);
- 	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);
-+	u8 bps = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, val);
-+	u8 wps = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, val);
-+	u8 ctx_cmps = SYS_FIELD_GET(ID_AA64DFR0_EL1, CTX_CMPs, val);
- 
- 	/*
- 	 * Prior to commit 3d0dba5764b9 ("KVM: arm64: PMU: Move the
-@@ -1883,10 +1886,11 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 		val &= ~ID_AA64DFR0_EL1_PMUVer_MASK;
- 
- 	/*
--	 * ID_AA64DFR0_EL1.DebugVer is one of those awkward fields with a
--	 * nonzero minimum safe value.
-+	 * ID_AA64DFR0_EL1.DebugVer, BRPs and WRPs all have to be greater than
-+	 * zero. CTX_CMPs is never greater than BRPs.
- 	 */
--	if (debugver < ID_AA64DFR0_EL1_DebugVer_IMP)
-+	if (debugver < ID_AA64DFR0_EL1_DebugVer_IMP || !bps || !wps ||
-+	    ctx_cmps > bps)
- 		return -EINVAL;
- 
- 	return set_id_reg(vcpu, rd, val);
-@@ -2103,10 +2107,11 @@ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	mutex_lock(&vcpu->kvm->arch.config_lock);
- 
- 	/*
--	 * Once the VM has started the ID registers are immutable. Reject any
--	 * write that does not match the final register value.
-+	 * Once the VM has started or the Realm descriptor is created, the ID
-+	 * registers are immutable. Reject any write that does not match the
-+	 * final register value.
- 	 */
--	if (kvm_vm_has_ran_once(vcpu->kvm)) {
-+	if (kvm_vm_has_ran_once(vcpu->kvm) || kvm_realm_is_created(vcpu->kvm)) {
- 		if (val != read_id_reg(vcpu, rd))
- 			ret = -EBUSY;
- 		else
+ 	u32 bps = u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_NUM_BPS);
 -- 
 2.43.0
 
