@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3282D6E73;
-	Wed, 20 Aug 2025 21:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD58C179A3;
+	Wed, 20 Aug 2025 22:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755724022; cv=none; b=tzm9/zdJHaMb9bWzwFJmnmFQ0H9UKo5NgDKso7vrFeEtv3aHVAXtW/FjJgRM8cjc4ve9YQm4dzKX4/ANpGBW06QAbCpUtkuIOgmQKy9H82uWfcjOmgoZ0kjr9V7tnjWmmyvNxVjXg0ySvvA5fMN8HXjD19waDX9dF6xyXndXjec=
+	t=1755727337; cv=none; b=bQBGQsDwbJMjmYtPB3SwXj7PtyKNGEoLz6VWImOIrExp7OU9Ugud1ZvyLtVO0NmgO6eheYVmFqPjebT2vtHmh042qJRLPctubnN3DXKEmxfGoLVKwHiWsBPm+DdR7Dd/rvKoRwbG6jfPC0NdZO6HN7szq8Tik9LFfiVm64Lu5Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755724022; c=relaxed/simple;
-	bh=jEpv9dsCIXbIBynicqQ0dP6JZ4BCvS3IdZffu8Qg+1c=;
+	s=arc-20240116; t=1755727337; c=relaxed/simple;
+	bh=qpzq8xFh8O6Sfd7kFjk7FbKEkmABy8wjXxb1oqoY7tI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CsChmeb0xLG3NTvq+wsp93KbIQjNyeDub+btos4t6S0cr0nVRIUGVuuKbpIUjvJEV4X81NTtzGWcTdQSZC5/uLW3Ia5FuEPTsQ3NIFcHim4vXeoJUqtsHWlq18f/OMHNUByx8wsMS6gaLthTdSG9CxHzQ0+Aa77oufy0rKn8qqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3oP929V; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=QsqzkgbRK8VBos50GRAqz+ezhtbEB0qTcd5RDLu6zDXh3d7qK9FwLF5KCTbpRZ4BZ7pexbAxqv3aQfHnf9oBBbKji4pgkzxnTwmoEPoq43xf13WVudw1CDTuBluOV9FPWEYBrm/b9bYFFkc9REkjDYJtZctE/a1pJh06F3R13N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X44mG8TC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3oP929V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D48BC4CEE7;
-	Wed, 20 Aug 2025 21:07:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X44mG8TC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61231C4CEE7;
+	Wed, 20 Aug 2025 22:02:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755724021;
-	bh=jEpv9dsCIXbIBynicqQ0dP6JZ4BCvS3IdZffu8Qg+1c=;
+	s=k20201202; t=1755727337;
+	bh=qpzq8xFh8O6Sfd7kFjk7FbKEkmABy8wjXxb1oqoY7tI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G3oP929VN3mOReD4gapeeAz0APdZitM87mRHUoIrjvMqRBGT36c6TO0Q3kssDHFAI
-	 OJQ6I2iZQ16iz7g5jbqvGFUnvGCB6RNF+N4zksRA/la3qiQGoqikYBAuXnmZxkQlnS
-	 056xF1PYZfrDayO79EvbOieHqwirJwJNMvvLRdjhkwRtThNRthQM1qf3pcYoFpmH9K
-	 X1rmyjauvh1/DXMkzV8qGancHdH8Di01ZfckFRu9YhrBYsgEYc0JaDURG+2yTTjL/G
-	 G9LWDRv76Q+x6xkbK5f7FmrxjEplH2dIE0GkpS0DBjKMFauFuVCdmctRXf6do+E3Ee
-	 f4K1/rxpexnqA==
+	b=X44mG8TCXKK5v+P1T8NFCEeTLrc+6wn3VP87ZC8S3yaCZgtyj/JJW1cdiFVMevpOR
+	 xoPp+AYCEthoV9/9T/EE6O3/DlVrM2DJiCwxpZjhaT/PKkwNOYRPn+hsSv6gKqqk8R
+	 THzOB/8edGNO+Krn+REkTz5qNsIu/LEzMXTbKu1hsZhU3dwB20Bg6JqGdoEPYZqhmz
+	 Ke5ocy23JyUtOwGSMD7vd+v36QNEKW26ZXbck6uHzEPqaNaTJSUFHCH6geUQJTh4KS
+	 ErXQmnB2FrGYukkGW2oXFHsT34lLGC7ws1wBNwGz6s+clfw3lFVBUK7uVJcng6FOQb
+	 OoQ6KWnyrqGww==
 Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uoq1C-009V23-Nf;
-	Wed, 20 Aug 2025 22:06:51 +0100
-Date: Wed, 20 Aug 2025 22:06:49 +0100
-Message-ID: <87o6s9k8ie.wl-maz@kernel.org>
+	id 1uoqsm-009Vp5-4r;
+	Wed, 20 Aug 2025 23:02:12 +0100
+Date: Wed, 20 Aug 2025 23:02:11 +0100
+Message-ID: <87ms7tk5y4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -47,10 +47,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v15 2/6] KVM: arm64: Manage GCS access and registers for guests
-In-Reply-To: <20250820-arm64-gcs-v15-2-5e334da18b84@kernel.org>
+Subject: Re: [PATCH v15 4/6] KVM: arm64: Set PSTATE.EXLOCK when entering an exception
+In-Reply-To: <20250820-arm64-gcs-v15-4-5e334da18b84@kernel.org>
 References: <20250820-arm64-gcs-v15-0-5e334da18b84@kernel.org>
-	<20250820-arm64-gcs-v15-2-5e334da18b84@kernel.org>
+	<20250820-arm64-gcs-v15-4-5e334da18b84@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,69 +66,111 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 20 Aug 2025 15:14:42 +0100,
+On Wed, 20 Aug 2025 15:14:44 +0100,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> GCS introduces a number of system registers for EL1 and EL0, on systems
+> As per DDI 0487 RWTXBY we need to manage PSTATE.EXLOCK when entering an
 
-and EL2.
+Nit: please use an underscore between the type of a statement and its
+"name", as it makes it a bit more readable (R_WTXBY).
 
-> with GCS we need to context switch them and expose them to VMMs to allow
-> guests to use GCS.
+> exception, when the exception is entered from a lower EL the bit is cleared
+> while if entering from the same EL it is set to GCSCR_ELx.EXLOCKEN.
+> Implement this behaviour in enter_exception64().
 > 
-> In order to allow guests to use GCS we also need to configure
-> HCRX_EL2.GCSEn, if this is not set GCS instructions will be noops and
-> CHKFEAT will report GCS as disabled.  Also enable fine grained traps for
-> access to the GCS registers by guests which do not have the feature
-> enabled.
-
-I don't see any FGT configuration in this patch. As far as I can tell,
-the FGU generation already takes care of that particular case.
-
-> 
-> In order to allow userspace to control availability of the feature to
-> guests we enable writability for only ID_AA64PFR1_EL1.GCS, this is a
-> deliberately conservative choice to avoid errors due to oversights.
-> Further fields should be made writable in future.
-
-I'm not sure what you mean by that. Making the feature field writable
-is only allowable if we have some level of support (and otherwise we
-should prevent both the feature being exposed, and the field being
-writable).
-
-So future fields being writable will only happen when the features are
-fully supported, and only then.
-
-Please clarify, or drop this altogether.
-
->
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h       |  3 +++
->  arch/arm64/include/asm/kvm_host.h          | 14 ++++++++++++++
->  arch/arm64/include/asm/vncr_mapping.h      |  2 ++
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 31 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 10 ++++++++++
->  arch/arm64/kvm/sys_regs.c                  | 31 +++++++++++++++++++++++++++++-
->  6 files changed, 90 insertions(+), 1 deletion(-)
->
+>  arch/arm64/include/uapi/asm/ptrace.h |  1 +
+>  arch/arm64/kvm/hyp/exception.c       | 37 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 38 insertions(+)
+> 
+> diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
+> index 0f39ba4f3efd..f2fb029fb61a 100644
+> --- a/arch/arm64/include/uapi/asm/ptrace.h
+> +++ b/arch/arm64/include/uapi/asm/ptrace.h
+> @@ -56,6 +56,7 @@
+>  #define PSR_C_BIT	0x20000000
+>  #define PSR_Z_BIT	0x40000000
+>  #define PSR_N_BIT	0x80000000
+> +#define PSR_EXLOCK_BIT 0x400000000
+>  
+>  #define PSR_BTYPE_SHIFT		10
+>  
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index 95d186e0bf54..46e1d0c3038c 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -73,6 +73,38 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
+>  		vcpu->arch.ctxt.spsr_und = val;
+>  }
+>  
+> +static unsigned long enter_exception64_gcs(struct kvm_vcpu *vcpu,
+> +					   unsigned long mode,
+> +					   unsigned long target_mode)
+
+A more appropriate name would be compute_exlock().
+
+> +{
+> +	u64 gcscr;
+> +
+> +	if (!kvm_has_gcs(kern_hyp_va(vcpu->kvm)))
+> +		return 0;
+> +
+> +	/* GCS can't be enabled for 32 bit */
+> +	if (mode & PSR_MODE32_BIT)
+> +		return 0;
+> +
+> +	/* When taking an exception to a higher EL EXLOCK is cleared. */
+> +	if ((mode | PSR_MODE_THREAD_BIT) != target_mode)
+> +		return 0;
+> +
+> +	/*
+> +	 * When taking an exception to the same EL EXLOCK is set to
+> +	 * the effective value of GCSR_ELx.EXLOCKEN.
+> +	 */
+> +	if (vcpu_is_el2(vcpu))
+> +		gcscr = __vcpu_read_sys_reg(vcpu, GCSCR_EL2);
+> +	else
+> +		gcscr = __vcpu_read_sys_reg(vcpu, GCSCR_EL1);
+> +
+> +	if (gcscr & GCSCR_ELx_EXLOCKEN)
+> +		return PSR_EXLOCK_BIT;
+> +
+> +	return 0;
+> +}
+> +
+>  /*
+>   * This performs the exception entry at a given EL (@target_mode), stashing PC
+>   * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
+> @@ -162,6 +194,11 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+>  	// PSTATE.BTYPE is set to zero upon any exception to AArch64
+>  	// See ARM DDI 0487E.a, pages D1-2293 to D1-2294.
+>  
+> +	// PSTATE.EXLOCK is set to 0 upon any exception to a higher
+> +	// EL, or to GCSCR_ELx.EXLOCKEN for an exception to the same
+> +	// exception level.  See ARM DDI 0487 RWTXBY, D.1.3.2 in K.a.
+> +	new |= enter_exception64_gcs(vcpu, mode, target_mode);
+> +
+>  	new |= PSR_D_BIT;
+>  	new |= PSR_A_BIT;
+>  	new |= PSR_I_BIT;
+> 
+
+But that's not the only case where we have to deal with EXLOCK, is it?
+What of ERET and its PAuth variants? R_TYTWB says:
+
+<quote>
+If in AArch64 state, any of the following situations can cause an
+illegal exception return:
 
 [...]
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 82ffb3b3b3cf..592cb5d6497a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -138,6 +138,8 @@ static bool get_el2_to_el1_mapping(unsigned int reg,
->  		MAPPED_EL2_SYSREG(PIR_EL2,     PIR_EL1,     NULL	     );
->  		MAPPED_EL2_SYSREG(PIRE0_EL2,   PIRE0_EL1,   NULL	     );
->  		MAPPED_EL2_SYSREG(POR_EL2,     POR_EL1,     NULL	     );
-> +		MAPPED_EL2_SYSREG(GCSCR_EL2,   GCSCR_EL1,   NULL             );
-> +		MAPPED_EL2_SYSREG(GCSPR_EL2,   GCSPR_EL1,   NULL             );
+- If the Effective value of GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK
+  is 0, the execution of an exception return instruction to return to
+  the current Exception level ELx.
+</quote>
 
-How is the state accessed when loaded on the CPU? You seem to be
-missing accessors for these two registers, affecting both EL1 and EL2
-in the guest.
+My reading of the spec is that this needs handling.
 
 	M.
 
