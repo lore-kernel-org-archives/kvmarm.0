@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97FCE19CD1B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A405D1A9F88;
 	Wed, 20 Aug 2025 01:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755652212; cv=none; b=DOboDl7C1eWBTS7Aw8h1Xwwuy8Ubd9z9RKdvOSf4F7iRow+M8YY4o9xmuaQX3uc6R3izq3tdks5ZquImamyGqnRav+kY6W12BnKml2UhcuzCuLG5l8Sb9oYtmu94f/FDwOEd4OLZP/Km1T+FnW4stOXb8v/OjUUVSE7l9GBri7w=
+	t=1755652212; cv=none; b=Rdjb0wqWUFsLl3pX99qTjcxUDjI4lk5S7lzdZ1HZgBamg2VS6HEYnf2cpCbc8g25cUpcA9C5SGMOjpcbxCAuwTvL5Okxq04CxlnKjXjg3AYjJzByC4tV1nNHwhMP1ZGLSO4wYGyao+txknEDSnk7oIgzWc74uSIRVQJf8dcilZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755652212; c=relaxed/simple;
-	bh=tOLJC4XmErVOk1Sghyu21V/WaFzS/sTkdBmrgl3W6yo=;
+	bh=Lqqq7AHyYOhfOqe+nhs+g+PzDgeG3Hp9HuWcnnqQIrM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=K6vpwC3oPU/eMyqdgfFzMABLiz6Uw93VZtskeZw2weWLcrNWKyu1Bw39h4qq7Eig46QN2iqi0Hit4Ib3lRfEYqZlYm8NJGDMMCL3KHay2EiDBo6u61jtEQoSGSwnlyJtl0h7GYC/8457jJBwQ5xUk8Itx6cWcLNtD89BNYV7N9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W10m9Gei; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=UAUTrzaSPv1QSJFRMxbyzF5ZWyA2QmO9+ZId4U3oAAJXwuFhnDJBoyYG75vLghRknEt2OuxhTDZE2OklQssEJ2ulRkjrUPeUto81AztUo5sivfMolrCVrXC9En5AWG33Dnt6HGa5+6LPBZO0BfdY+koJewDoOZFPEvkQliQIoGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CItM7Ul7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W10m9Gei"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 74CCCC19421;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CItM7Ul7"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5769BC113D0;
 	Wed, 20 Aug 2025 01:10:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1755652212;
-	bh=tOLJC4XmErVOk1Sghyu21V/WaFzS/sTkdBmrgl3W6yo=;
+	bh=Lqqq7AHyYOhfOqe+nhs+g+PzDgeG3Hp9HuWcnnqQIrM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=W10m9GeiBephdiYEc/sT08pqz2c8zw1eaF/xmzWAhyzdmrgeQRkAcc+jcYIRbdnEq
-	 /qN2oMr2e31JSJ4YPPHS71fj0k7d7hGZcWvBYpNy1z55PFabtbO8LkBYuxRtBCTcWO
-	 RW9HKgaud+FWXrWCPsuX+bsa8jMvivtVSva/qkan5UXjHPKhQ8kSi+Ir8pdL/0O60O
-	 kzCe1NhMIjvTfdz9wk9QS84NlFFsBTUzitCNhByWizXZuEd8pnlUxmhREUXmDQfUGQ
-	 PdjcPDqxYMVRVTTZ/aCnKMP7fM7HY8bU8OB7xfLdvkDBM/WCSLT3RkQRKa4NNoHPQb
-	 X6hO7wC/Wx/BA==
+	b=CItM7Ul765E1Xp/k9mRT7Ksn/+E4FHx+QYzinYL4ACrVWs5Rl7a3dbh70tVuGhG4s
+	 Z6eaJ7xcxwXqzKjHvoUMv7dJ0aK1DyRvZ18Gkp42jQa0SuvsYx8dNR/AO7ZDwvt6fo
+	 4h3IsOxwMndLGxjgUZYEdxlHS6l09F6I/4+92tcGeNJez9RFI08Btaw/hgL/6RX6DF
+	 swOs3UvNQR1sHEaSOe0DXdHe/aAyW8pQifcZMOkO/B8XBOuEDtv8BL1up6q3cgdKaU
+	 CsBq3wwIEpevbvsokE5XLsVKyazP1XAvWllWb0kUOBVBWsj+taF42hQqbf2g9rER+M
+	 sR6c+uNSw/ITA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67600CA0EE6;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42CD8CA0EEB;
 	Wed, 20 Aug 2025 01:10:12 +0000 (UTC)
 From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
-Date: Wed, 20 Aug 2025 01:10:07 +0000
-Subject: [PATCH v11 3/6] KVM: arm64: Mark FFA_NOTIFICATION_* calls as
- unsupported
+Date: Wed, 20 Aug 2025 01:10:05 +0000
+Subject: [PATCH v11 1/6] KVM: arm64: Correct return value on host version
+ downgrade attempt
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250820-virtio-msg-ffa-v11-3-497ef43550a3@google.com>
+Message-Id: <20250820-virtio-msg-ffa-v11-1-497ef43550a3@google.com>
 References: <20250820-virtio-msg-ffa-v11-0-497ef43550a3@google.com>
 In-Reply-To: <20250820-virtio-msg-ffa-v11-0-497ef43550a3@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -55,11 +55,11 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  sebastianene@google.com, qwandor@google.com, 
  Per Larsen <perlarsen@google.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755652211; l=1012;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755652211; l=1403;
  i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
- bh=+NnU5kbTyzDsIIrdmhBCiy1drOF1PzOEKH5ncvoLdR0=;
- b=lN3fWnDz8MMhIOGVf5N0OsE4YlgyP2zM3y+yQNZk0pus91GZeGMXsH8yoy3Iklu6aIPMj4rm1
- bgaMrfDrNVLCktM0Ff1IcsgQPl+HUwMvwA4zQOD9qE1xCItiCnAxJLH
+ bh=icYN+w/jF5WdVJR00f3pzlkimt49rPtFfXuyjLMlXDQ=;
+ b=1EPqnBTa/1TceSMEuVU5TKitB9kFXozlMZcxvaAA1uSkv3dL54Jzz5mGAaogyCkzDugtN0Sck
+ r77haJhtvrNBaqhQxOOLoc0sLTmzfNDXryw8+/Bm99QL/04KYZhA0go
 X-Developer-Key: i=perlarsen@google.com; a=ed25519;
  pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
 X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
@@ -69,31 +69,38 @@ Reply-To: perlarsen@google.com
 
 From: Per Larsen <perlarsen@google.com>
 
-Prevent FFA_NOTIFICATION_* interfaces from being passed through to TZ.
+Once the hypervisor negotiates the FF-A version with the host, it should
+remain locked-in. However, it is possible to load FF-A as a module first
+supporting version 1.1 and then 1.0.
+
+Without this patch, the FF-A 1.0 driver will use 1.0 data structures to
+make calls which the hypervisor will incorrectly interpret as 1.1 data
+structures. With this patch, negotiation will fail.
+
+This patch does not change existing functionality in the case where a
+FF-A 1.2 driver is loaded after a 1.1 driver; the 1.2 driver will need
+to use 1.1 in order to proceed.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Per Larsen <perlarsen@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/ffa.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 8290396384a2a3294fd64bc0378459829941a64c..40a785b6ed063f9de31f51f1e82ebd9c70b13de9 100644
+index 3369dd0c4009f84ad3cf9481c747bdc57a162370..2c199d40811efb5bfae199c4a67d8ae3d9307357 100644
 --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
 +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -670,6 +670,14 @@ static bool ffa_call_supported(u64 func_id)
- 	case FFA_RXTX_MAP:
- 	case FFA_MEM_DONATE:
- 	case FFA_MEM_RETRIEVE_REQ:
-+       /* Optional notification interfaces added in FF-A 1.1 */
-+	case FFA_NOTIFICATION_BITMAP_CREATE:
-+	case FFA_NOTIFICATION_BITMAP_DESTROY:
-+	case FFA_NOTIFICATION_BIND:
-+	case FFA_NOTIFICATION_UNBIND:
-+	case FFA_NOTIFICATION_SET:
-+	case FFA_NOTIFICATION_GET:
-+	case FFA_NOTIFICATION_INFO_GET:
- 		return false;
+@@ -712,7 +712,10 @@ static void do_ffa_version(struct arm_smccc_res *res,
+ 
+ 	hyp_spin_lock(&version_lock);
+ 	if (has_version_negotiated) {
+-		res->a0 = hyp_ffa_version;
++		if (FFA_MINOR_VERSION(ffa_req_version) < FFA_MINOR_VERSION(hyp_ffa_version))
++			res->a0 = FFA_RET_NOT_SUPPORTED;
++		else
++			res->a0 = hyp_ffa_version;
+ 		goto unlock;
  	}
  
 
