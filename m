@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D266618991E;
-	Wed, 20 Aug 2025 22:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C0A27A12D;
+	Wed, 20 Aug 2025 22:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755728130; cv=none; b=LezQdxf41Y/pwVre/Jxn+G3nGqxFhWj+wqrh9JDMnV/eIvLxeHvD1H3UP2aHLQMsdYAc+ZCL/+fl6XPd5OQj6poqcBviSc26ClenvdYey/idUxZWf1kAwTy8J3RWtQ/pWJ1Pby1c7omX7P0eYc5Pdc6MNwy9rZoLTq+RpK4TkRM=
+	t=1755728291; cv=none; b=LOqh+LBloNUtii+91/tEGIjXQ1wbkjz1xCwdLM49FTHrFHMSuMeYAM9Uxi3C7wONDlC33vgbbWUfHSJL6St6Y8EVINUiYEr9yJjFFff0fWEloYsYCAdkIO4cJpaRemIbAR9gkpNm2UbHR+/tLI7o2SoQI7GI2HeJJezO+dmDxiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755728130; c=relaxed/simple;
-	bh=pV6kDL6PIDFC0mwCK5gV9e0W2aPceEaVuWKaFn/7g6M=;
+	s=arc-20240116; t=1755728291; c=relaxed/simple;
+	bh=TGQmzkspugVB5qBEUpdujC25KIeihWnVs9IUgXT1UOE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UrRs8bnMCjcXcj9prCdxABpVTd0oIX10qx+kQhSdchSqSr0A5cv5zRp6iYf50Z6BOH4+z/dhftg3d4xR4gTuNCHnoC2h5FLq5K3lPLQGirYU41nOG6ifTVEd3EWtVwH+f38f/6O9YrcG09nd5vKGRjz4kzN8lRMRBCeOLcI94q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y2KyhvhA; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=oeEu1IOzqYrj7cK4LDJv/TEjLYmjwPWXe1+MsX7IEbHAyMj5j5KcGW79yeZii1N24G/NP/Q9PPx1SNIphjbNUoT/1DmKv0Qff8U27JZhgBH8lPbkBjw4VNmUCF6Xuaaz36EfrOPpT1skmwQULW9WxX9qRs2u+Ag6UCxJCmAQsMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jgpFo5rW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y2KyhvhA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3690CC4CEE7;
-	Wed, 20 Aug 2025 22:15:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jgpFo5rW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 484D4C4CEE7;
+	Wed, 20 Aug 2025 22:18:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755728130;
-	bh=pV6kDL6PIDFC0mwCK5gV9e0W2aPceEaVuWKaFn/7g6M=;
+	s=k20201202; t=1755728291;
+	bh=TGQmzkspugVB5qBEUpdujC25KIeihWnVs9IUgXT1UOE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y2KyhvhAVR3/gKC7W/S1QdsFqJ5l4WaOyzdLBEUDZr+vdUm4Lr790sESxZA6BBclN
-	 fugWGpTAV8t9htbX9EdrBo+hZfDjLGkZGcWeN6z7ISrP14fcfyMoCfRxsEH96nQ8qv
-	 XcWsitR1H7qLNcM6BAxEaY1886/48KQlU25v+SAdx/y1r9ApGvpzOeW77R2+T/Bic7
-	 A4DFUFvsPSf94l+fA5Hr8khXeNpPIqZRJsKxYorDa0kY92r6vTZZc8ObaZ6i6rJLPj
-	 +e+M75CMCrtpkSJKP1Bc4X9yGqBQrBu3uLYmWqzwNaB6iIGa506aI+IRk3gQLhlWmr
-	 JQRBM5AoNvohw==
+	b=jgpFo5rWJ4pzUbV4s3NIXt30fTeWof+pZ3u+I1ZB+VY7dCND39o9inCzVHWygFDKD
+	 QH3yYsrpWSHRpoU7wsOZQxBmHRTxQp/jrHVd2L2nAfjGWbA9oB3OXASBfl/txY2y5n
+	 zq4bkpKpHOn08Cs+cnU+OvZDVvtoTynjfeyMxXIPnMy5NrUqCJA1xykXMyTn32vTIx
+	 MDlmAgWKDqXKB5X69EN9GXkOSFLzw1YBLMWZ0JX343mwyHJzHy/9Dni5p6hUNhGwdH
+	 TX0s75NmqbuFugE3MPi2lmiBRKmERtfe+KpgFnSTrCt+k7sZBmHqVtcu/h2fSyVtQo
+	 hQfYLIT3q14/g==
 Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uor5b-009VxZ-Sz;
-	Wed, 20 Aug 2025 23:15:28 +0100
-Date: Wed, 20 Aug 2025 23:15:25 +0100
-Message-ID: <87ldndk5c2.wl-maz@kernel.org>
+	id 1uor8A-009W00-5o;
+	Wed, 20 Aug 2025 23:18:06 +0100
+Date: Wed, 20 Aug 2025 23:18:05 +0100
+Message-ID: <87jz2xk57m.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -47,10 +47,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v15 3/6] KVM: arm64: Forward GCS exceptions to nested guests
-In-Reply-To: <20250820-arm64-gcs-v15-3-5e334da18b84@kernel.org>
+Subject: Re: [PATCH v15 5/6] KVM: arm64: Allow GCS to be enabled for guests
+In-Reply-To: <20250820-arm64-gcs-v15-5-5e334da18b84@kernel.org>
 References: <20250820-arm64-gcs-v15-0-5e334da18b84@kernel.org>
-	<20250820-arm64-gcs-v15-3-5e334da18b84@kernel.org>
+	<20250820-arm64-gcs-v15-5-5e334da18b84@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,59 +66,32 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 20 Aug 2025 15:14:43 +0100,
+On Wed, 20 Aug 2025 15:14:45 +0100,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> GCS can generate exceptions with an EC of 0x2D (GCS Data Check
-> Exception) when data validation checks fail.  When running a nested
-> guest which has access to GCS such exceptions can be directed from EL0
-> to EL2 and therefore need to be forwarded to the guest hypervisor, add
-> handling for this.
-
-Why is it so? A GCS exception from EL0 should be routed to EL1, no
-matter what (either this is an L1 guest with EL1 pretending to be EL2,
-or this is an L2 guest that has its own EL1).
-
-Can you describe the case where we need to reinject the exception?
-
->
+> Now that required functionality for GCS is in place expose
+> ID_AA64PFR1_EL1.GCS, allowing guests to be given the feature.
+> 
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/kvm/handle_exit.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index a598072f36d2..2f5aef84b294 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -301,10 +301,18 @@ static int handle_svc(struct kvm_vcpu *vcpu)
->  
->  static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
->  {
-> -	/* We don't expect GCS, so treat it with contempt */
-> -	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> -		WARN_ON_ONCE(1);
-> +	if (!kvm_has_gcs(vcpu->kvm)) {
-> +		kvm_inject_undefined(vcpu);
-> +		return 1;
-> +	}
->  
-> +	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-
-We now have is_nested_ctxt(), which is more obvious.
-
-> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +		return 1;
-> +	}
-> +
-> +	/* We shouldn't have generated a trap in this case */
-> +	WARN_ON_ONCE(1);
->  	kvm_inject_undefined(vcpu);
->  	return 1;
->  }
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 592cb5d6497a..60e234422064 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1616,7 +1616,6 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RNDR_trap);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_NMI);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_GCS);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_THE);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTEX);
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_PFAR);
 > 
 
-Thanks,
+Still disabled for NV in limit_nv_id_reg().
 
 	M.
 
