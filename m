@@ -1,54 +1,54 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282472EBDDC
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 08:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58ADE2EBBB4
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 08:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755764080; cv=none; b=NN5R8W0w9qDhyhqT9cKoSMWPDrgBgPLOzp3Sil7Bi6lRoF8mt4GBq3mTldfRvU921EUZa9rsU+fwkdoWKQVbqBkcqOEG/8E/DlR1W78rffzuNfPyGPuUdW2dhMXI202u2ZhBptQSL9dC1Td3o78rbJsHTg3J12t5Zgms0mXeLeY=
+	t=1755764080; cv=none; b=dqPakPAVVn2KPzPT9OK2lBvm3QIp4pEDJ0Cl5PA7L8Ngl6cIPQk4abwetMqSYcNtePsOM8vzI8pXKTAhLZYt0XhNr2uxwnRPWBEOlfWAlsewOvUGg1Bsi0FsbDmV2u2Q0E7aWi00y+X7w8fJQP8MPml1rxIp9IzinUJHwY7n+dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755764080; c=relaxed/simple;
-	bh=//1C5R4DthAxGm8JMNjmAFCgr8hZt+T9yu21+eu5nDU=;
+	bh=tDwkzXWnH6tgflSExWhKKHXZebxR4zI92cCyIMifjFc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CnJtbstohIHcRncDSBTBXUhJtimB0kK/njRpROibIaU2h7/cu70J3JOPxHjV/C0DmWEpSaozlOFiEbZIci/BxavuXA7+PMiL3b4kDNwlNEw8wNHr+zrpGrMogKzLQLiNMDBG/Id+B8toHMHOG1SL1sP+6iCrFM1ziE87Qbp5kbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=peMEnHGW; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=JAR/8NKz07/7zMoQSCXPiTHaEwibjJA2P2Csh0rAvhlu0HhtayhIuqFgs39GuldEXfqdul01yz0gOYqhghl00vLNbR2JD7pwW3riThdvhiD7kOtzVZ3ISH3mbXOwFpeB/X0VetHkX5+xx5K9KrIpWqLHxM4TCE26F16Wv/s6oqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OleZ+mtE; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="peMEnHGW"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b9edf41d07so365827f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 01:14:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OleZ+mtE"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45a1b0cfbafso4016585e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 01:14:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755764077; x=1756368877; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1755764076; x=1756368876; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XIkumAY+Qa+CLy3aOczQdeniGlNqiyL93/I+4NSc/RU=;
-        b=peMEnHGWfqrOR4QabICJhcxv5f1joyHeTu4vaY8+bYCuJn3Te3A2toOtpo9V5aiOAO
-         A6e3CP4Nt7CrHk2gLro1lOA2T2pwHWzc9JcGd60vKFqvSTVUtNBLOF89rlbmLcrK2Xi9
-         X1gohKSX7ezhb88+7oKExggeuCSBkbfiW3bhyb6CnZP309VFDfYQ1MMo4c4qjmTY71/C
-         8QRFT9LxMwu5I+7IER6y8ciZoTp04aw0Z1P35i0FGZMO+tFZMHoxZJ6ARwiODtznUPtm
-         9th6Fst2uHYDjNI4jh48G2Xcwy8vd6VzqVxNSGkT/pSAQp0YqlQxFG6oOph5s3+XNhHx
-         hsdw==
+        bh=24vtXolJgWFlmCc1c2PtYNQB1/b0KRqdJsndd7gSEog=;
+        b=OleZ+mtEduPdXhJEIOfXFd8Z1lUiypPLF7m3aIFo1g1Nx8e4LaDquQncLqGmXf0HIm
+         j1tMz7Fo7bms4RCKvWV3e2clgMGdeu6bu+7jKIcP0Nd5jqWRuk0JSAIIdk+jj0npkvwa
+         TinKGpoDOXcRPfEKocX41mFcUIyVJ9s5H3dP2glJvumVBCubFPFBrKdfK3sIAhjbFovx
+         P0zVii0jVBATMs6IwjWD/PFE15Rt27YnBiR90pNOuLkodi/j5O0pu3pDABTtApmpgNuL
+         pEspudR1CXz0U1P5icUSUiCRsE5wo9sHwnUdED5AIOcJwtnghdkW1VSBA6aJcUGA2tEa
+         3uHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755764077; x=1756368877;
+        d=1e100.net; s=20230601; t=1755764076; x=1756368876;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XIkumAY+Qa+CLy3aOczQdeniGlNqiyL93/I+4NSc/RU=;
-        b=BmwT6mrCFVJl1UNlkfzYfjkooVaqqNd5rZkZ5FRxD+7H9Z4Mv9DZJKMpwArldfM61y
-         8JdFg/dLX8oJMfca1Pd5Nv2pTJGInXF1aLjq2qfC4h4GSXUfwVwzeC1xDsvYSa2xfdsK
-         CdCQezKepM8++6MtwMYUA5AeIq5mUQkR7uZ6VW7qDR99M60Xfzq7mJaLpg4mWCrB75Wh
-         /K77vzic77EP9jxxdJssIspxGAu0St32bubFr8ctAydHnV5DCs+oIt+e8l4HQLt4DHrj
-         DOQMRDDV2BcXXhYW6ldZGMZY99JTY0qz3vnN2W1goOYcWYPHNjfKDxMIEATpaMBoDMGq
-         1h7w==
-X-Gm-Message-State: AOJu0YwMPYNKV+7sIrpGrDkLi9DG6jUhcDGNMlPLI9uP6WRXaAuXtFTw
-	YNJNNOoGeIuoZbSbS4YI8HsDzx3xJ3H6XLWDo0zA69XJ0IblHnBaO6ow7TBkV9af0d9R8SATehy
-	COpFJnHkVrboX9xcVCDZLtQ==
-X-Google-Smtp-Source: AGHT+IE2B3XpASX09u97oWLtmj7+DKYyjygPNdcC74JBMjS5y3LNop0tkSYmf/aQQm/kgIZulSB2bKIgmPvhviGD
-X-Received: from wmbex21.prod.google.com ([2002:a05:600c:8315:b0:459:d8e5:aead])
+        bh=24vtXolJgWFlmCc1c2PtYNQB1/b0KRqdJsndd7gSEog=;
+        b=qVaf6Ubm1/CzN/Tebtg1zL/5KOc2Zk4Xxriges2YSUR11RuFpr7K3wcvsBOXHTUjrv
+         vydrGUt25QoIG9jt3A+tnOTeSIK24+hbHjH+wHH5ZFUqAhYBJtnGFM1VAmoqAxxWOQf5
+         sWEP1+zrKrWbJCjLcU43ba9LFPBQY91CX4vTWVc0J+4Et4I4rDHwOyGp0Io1jr673oAJ
+         9e+SHwZDwYNdZ3a2YV9v0j0ivZwxIJCmNm7t3ahaXz6FA//iJiVCHYIjAmtkw7/J4bUN
+         HPFSlYD+wLwkwg4kCiH6SzhPblJqdfScuATgX2UcMfuQHHVviFMpopmZjyXhxjfDBNS1
+         xHkQ==
+X-Gm-Message-State: AOJu0YwzrN+3Mb+hdvGA0Zu1k3hbSHfqR/deS4S/yT8jGJp9qoG4lfGD
+	f87gPHPHVDH5W1tcCbMSr432VfpiBMorKX8+T/jSN91SRWgV1R9/fkMXVeTd4/YzD6BAG5euyOd
+	lsidcJSzd6z1GbhwjfVAJXw==
+X-Google-Smtp-Source: AGHT+IHAfe25Nzx29A/y2LL6JJzOD7A+0ndWQGxZWD3Px5TYNBB/VZ64SUhiRwSLkKQTuJ5qsZUG1SQClaOlNRTi
+X-Received: from wmnn26-n2.prod.google.com ([2002:a05:600d:15a:20b0:459:d639:5949])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:2c04:b0:3b7:8338:d219 with SMTP id ffacd0b85a97d-3c49405d778mr1324920f8f.3.1755764076780;
- Thu, 21 Aug 2025 01:14:36 -0700 (PDT)
-Date: Thu, 21 Aug 2025 09:13:59 +0100
+ 2002:a05:600c:8b4b:b0:45b:47e1:f5ff with SMTP id 5b1f17b1804b1-45b4d85e112mr9547115e9.35.1755764075850;
+ Thu, 21 Aug 2025 01:14:35 -0700 (PDT)
+Date: Thu, 21 Aug 2025 09:13:58 +0100
 In-Reply-To: <20250821081412.1008261-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250821081412.1008261-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.51.0.rc2.233.g662b1ed5c5-goog
-Message-ID: <20250821081412.1008261-12-vdonnefort@google.com>
-Subject: [PATCH v6 11/24] tracing: Add a trace remote module for testing
+Message-ID: <20250821081412.1008261-11-vdonnefort@google.com>
+Subject: [PATCH v6 10/24] tracing: Introduce simple_ring_buffer
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -70,331 +70,456 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a module to help testing the tracefs support for trace remotes. This
-module:
-
-  * Use simple_ring_buffer to write into a ring-buffer.
-  * Declare a single "selftest" event that can be triggered from
-    user-space.
-  * Register a "test" trace remote.
-
-This is intended to be used by trace remote selftests.
+Add a simple implementation of the kernel ring-buffer. This intends to
+be used later by ring-buffer remotes such as the pKVM hypervisor, hence
+the need for a cut down version (write only) without any dependency.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
+diff --git a/include/linux/simple_ring_buffer.h b/include/linux/simple_ring_buffer.h
+new file mode 100644
+index 000000000000..d6761dc2f404
+--- /dev/null
++++ b/include/linux/simple_ring_buffer.h
+@@ -0,0 +1,50 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _LINUX_SIMPLE_RING_BUFFER_H
++#define _LINUX_SIMPLE_RING_BUFFER_H
++
++#include <linux/list.h>
++#include <linux/ring_buffer.h>
++#include <linux/ring_buffer_types.h>
++#include <linux/types.h>
++
++/*
++ * Ideally those struct would stay private but the caller needs to know how big they are to allocate
++ * the memory for simple_ring_buffer_init().
++ */
++struct simple_buffer_page {
++	struct list_head	list;
++	struct buffer_data_page	*page;
++	u64			entries;
++	u32			write;
++	u32			id;
++};
++
++struct simple_rb_per_cpu {
++	struct simple_buffer_page	*tail_page;
++	struct simple_buffer_page	*reader_page;
++	struct simple_buffer_page	*head_page;
++	struct simple_buffer_page	*bpages;
++	struct trace_buffer_meta	*meta;
++	u32				nr_pages;
++
++#define SIMPLE_RB_UNAVAILABLE	0
++#define SIMPLE_RB_READY		1
++#define SIMPLE_RB_WRITING	2
++	u32				status;
++
++	u64				last_overrun;
++	u64				write_stamp;
++
++	struct simple_rb_cbs		*cbs;
++};
++
++void *simple_ring_buffer_reserve(struct simple_rb_per_cpu *cpu_buffer, unsigned long length,
++				 u64 timestamp);
++void simple_ring_buffer_commit(struct simple_rb_per_cpu *cpu_buffer);
++void simple_ring_buffer_unload(struct simple_rb_per_cpu *cpu_buffer);
++int simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer, struct simple_buffer_page *bpages,
++			    const struct ring_buffer_desc *desc);
++int simple_ring_buffer_enable_tracing(struct simple_rb_per_cpu *cpu_buffer, bool enable);
++int simple_ring_buffer_swap_reader_page(struct simple_rb_per_cpu *cpu_buffer);
++int simple_ring_buffer_reset(struct simple_rb_per_cpu *cpu_buffer);
++#endif
 diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
-index 918afcc1fcaf..52131d89993c 100644
+index 99af56d39eaf..918afcc1fcaf 100644
 --- a/kernel/trace/Kconfig
 +++ b/kernel/trace/Kconfig
-@@ -1244,4 +1244,12 @@ config TRACE_REMOTE
- config SIMPLE_RING_BUFFER
+@@ -1241,4 +1241,7 @@ source "kernel/trace/rv/Kconfig"
+ config TRACE_REMOTE
  	bool
  
-+config TRACE_REMOTE_TEST
-+	tristate "Test module for remote tracing"
-+	select TRACE_REMOTE
-+	select SIMPLE_RING_BUFFER
-+	help
-+	  This trace remote includes a ring-buffer writer implementation using
-+	  "simple_ring_buffer". This is solely intending for testing.
++config SIMPLE_RING_BUFFER
++	bool
 +
  endif # FTRACE
 diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-index 03d7d80a9436..53534447e70b 100644
+index 6dab341acc46..03d7d80a9436 100644
 --- a/kernel/trace/Makefile
 +++ b/kernel/trace/Makefile
-@@ -112,4 +112,6 @@ obj-$(CONFIG_RV) += rv/
+@@ -111,4 +111,5 @@ obj-$(CONFIG_TRACEPOINT_BENCHMARK) += trace_benchmark.o
+ obj-$(CONFIG_RV) += rv/
  
  obj-$(CONFIG_TRACE_REMOTE) += trace_remote.o
- obj-$(CONFIG_SIMPLE_RING_BUFFER) += simple_ring_buffer.o
-+obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
-+
++obj-$(CONFIG_SIMPLE_RING_BUFFER) += simple_ring_buffer.o
  libftrace-y := ftrace.o
-diff --git a/kernel/trace/remote_test.c b/kernel/trace/remote_test.c
+diff --git a/kernel/trace/simple_ring_buffer.c b/kernel/trace/simple_ring_buffer.c
 new file mode 100644
-index 000000000000..f8506d95ef3a
+index 000000000000..3efdb895d77a
 --- /dev/null
-+++ b/kernel/trace/remote_test.c
-@@ -0,0 +1,263 @@
++++ b/kernel/trace/simple_ring_buffer.c
+@@ -0,0 +1,360 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2025 - Google LLC
 + * Author: Vincent Donnefort <vdonnefort@google.com>
 + */
 +
-+#include <linux/module.h>
++#include <linux/atomic.h>
 +#include <linux/simple_ring_buffer.h>
-+#include <linux/trace_remote.h>
-+#include <linux/tracefs.h>
-+#include <linux/types.h>
 +
-+#define REMOTE_EVENT_INCLUDE_FILE kernel/trace/remote_test_events.h
-+#include <trace/define_remote_events.h>
++#include <asm/barrier.h>
++#include <asm/local.h>
 +
-+static DEFINE_PER_CPU(struct simple_rb_per_cpu *, simple_rbs);
-+static struct trace_buffer_desc *remote_test_buffer_desc;
++#define SIMPLE_RB_LINK_HEAD	1UL
++#define SIMPLE_RB_LINK_MASK	~SIMPLE_RB_LINK_HEAD
 +
-+/*
-+ * The trace_remote lock already serializes accesses from the trace_remote_callbacks.
-+ * However write_event can still race with load/unload.
-+ */
-+static DEFINE_MUTEX(simple_rbs_lock);
-+
-+static int remote_test_load_simple_rb(int cpu, struct ring_buffer_desc *rb_desc)
++static void simple_bpage_set_head_link(struct simple_buffer_page *bpage)
 +{
-+	struct simple_rb_per_cpu *cpu_buffer;
-+	struct simple_buffer_page *bpages;
-+	int ret = -ENOMEM;
++	unsigned long link = (unsigned long)bpage->list.next;
 +
-+	cpu_buffer = kzalloc(sizeof(*cpu_buffer), GFP_KERNEL);
-+	if (!cpu_buffer)
-+		return ret;
-+
-+	bpages = kmalloc_array(rb_desc->nr_page_va, sizeof(*bpages), GFP_KERNEL);
-+	if (!bpages)
-+		goto err_free_cpu_buffer;
-+
-+	ret = simple_ring_buffer_init(cpu_buffer, bpages, rb_desc);
-+	if (ret)
-+		goto err_free_bpages;
-+
-+	guard(mutex)(&simple_rbs_lock);
-+
-+	*per_cpu_ptr(&simple_rbs, cpu) = cpu_buffer;
-+
-+	return 0;
-+
-+err_free_bpages:
-+	kfree(bpages);
-+
-+err_free_cpu_buffer:
-+	kfree(cpu_buffer);
-+
-+	return ret;
-+}
-+
-+static void remote_test_unload_simple_rb(int cpu)
-+{
-+	struct simple_rb_per_cpu *cpu_buffer = *per_cpu_ptr(&simple_rbs, cpu);
-+	struct simple_buffer_page *bpages;
-+
-+	if (!cpu_buffer)
-+		return;
-+
-+	guard(mutex)(&simple_rbs_lock);
-+
-+	bpages = cpu_buffer->bpages;
-+	simple_ring_buffer_unload(cpu_buffer);
-+	kfree(bpages);
-+	kfree(cpu_buffer);
-+	*per_cpu_ptr(&simple_rbs, cpu) = NULL;
-+}
-+
-+static struct trace_buffer_desc *remote_test_load(unsigned long size, void *unused)
-+{
-+	struct ring_buffer_desc *rb_desc;
-+	struct trace_buffer_desc *desc;
-+	size_t desc_size;
-+	int cpu, ret;
-+
-+	if (WARN_ON(remote_test_buffer_desc))
-+		return ERR_PTR(-EINVAL);
-+
-+	cpus_read_lock();
-+
-+	desc_size = trace_buffer_desc_size(size, num_online_cpus());
-+	if (desc_size == SIZE_MAX) {
-+		ret = -E2BIG;
-+		goto err_unlock_cpus;
-+	}
-+
-+	desc = kmalloc(desc_size, GFP_KERNEL);
-+	if (!desc) {
-+		ret = -ENOMEM;
-+		goto err_unlock_cpus;
-+	}
-+
-+	ret = trace_remote_alloc_buffer(desc, size, cpu_online_mask);
-+	if (ret)
-+		goto err_free_desc;
-+
-+	for_each_ring_buffer_desc(rb_desc, cpu, desc) {
-+		ret = remote_test_load_simple_rb(rb_desc->cpu, rb_desc);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	remote_test_buffer_desc = desc;
-+
-+	cpus_read_unlock();
-+
-+	return remote_test_buffer_desc;
-+
-+err:
-+	for_each_ring_buffer_desc(rb_desc, cpu, remote_test_buffer_desc)
-+		remote_test_unload_simple_rb(rb_desc->cpu);
-+	trace_remote_free_buffer(remote_test_buffer_desc);
-+
-+err_free_desc:
-+	kfree(desc);
-+
-+err_unlock_cpus:
-+	cpus_read_unlock();
-+
-+	return ERR_PTR(ret);
-+}
-+
-+static void remote_test_unload(struct trace_buffer_desc *desc, void *unused)
-+{
-+	struct ring_buffer_desc *rb_desc;
-+	int cpu;
-+
-+	if (WARN_ON(desc != remote_test_buffer_desc))
-+		return;
-+
-+	for_each_ring_buffer_desc(rb_desc, cpu, desc)
-+		remote_test_unload_simple_rb(rb_desc->cpu);
-+
-+	remote_test_buffer_desc = NULL;
-+	trace_remote_free_buffer(desc);
-+}
-+
-+static int remote_test_enable_tracing(bool enable, void *unused)
-+{
-+	struct ring_buffer_desc *rb_desc;
-+	int cpu;
-+
-+	if (!remote_test_buffer_desc)
-+		return -ENODEV;
-+
-+	for_each_ring_buffer_desc(rb_desc, cpu, remote_test_buffer_desc)
-+		WARN_ON(simple_ring_buffer_enable_tracing(*per_cpu_ptr(&simple_rbs, rb_desc->cpu),
-+							  enable));
-+	return 0;
-+}
-+
-+static int remote_test_swap_reader_page(unsigned int cpu, void *unused)
-+{
-+	struct simple_rb_per_cpu *cpu_buffer;
-+
-+	if (cpu >= NR_CPUS)
-+		return -EINVAL;
-+
-+	cpu_buffer = *per_cpu_ptr(&simple_rbs, cpu);
-+	if (!cpu_buffer)
-+		return -EINVAL;
-+
-+	return simple_ring_buffer_swap_reader_page(cpu_buffer);
-+}
-+
-+static int remote_test_reset(unsigned int cpu, void *unused)
-+{
-+	struct simple_rb_per_cpu *cpu_buffer;
-+
-+	if (cpu >= NR_CPUS)
-+		return -EINVAL;
-+
-+	cpu_buffer = *per_cpu_ptr(&simple_rbs, cpu);
-+	if (!cpu_buffer)
-+		return -EINVAL;
-+
-+	return simple_ring_buffer_reset(cpu_buffer);
-+}
-+
-+static int remote_test_enable_event(unsigned short id, bool enable, void *unused)
-+{
-+	if (id != REMOTE_TEST_EVENT_ID)
-+		return -EINVAL;
++	link &= SIMPLE_RB_LINK_MASK;
++	link |= SIMPLE_RB_LINK_HEAD;
 +
 +	/*
-+	 * Let's just use the struct remote_event enabled field that is turned on and off by
-+	 * trace_remote. This is a bit racy but good enough for a simple test module.
++	 * Paired with simple_bpage_is_head() to order access between the head link and overrun. It
++	 * ensures we always report an up-to-date value after swapping the reader page.
 +	 */
++	smp_store_release(&bpage->list.next, (struct list_head *)link);
++}
++
++static bool simple_bpage_is_head(struct simple_buffer_page *bpage)
++{
++	unsigned long link = (unsigned long)smp_load_acquire(&bpage->list.prev->next);
++
++	return link & SIMPLE_RB_LINK_HEAD;
++}
++
++static bool simple_bpage_unset_head_link(struct simple_buffer_page *bpage,
++					 struct simple_buffer_page *dst)
++{
++	unsigned long *link = (unsigned long *)(&bpage->list.next);
++	unsigned long old = (*link & SIMPLE_RB_LINK_MASK) | SIMPLE_RB_LINK_HEAD;
++	unsigned long new = (unsigned long)(&dst->list);
++
++	return try_cmpxchg(link, &old, new);
++}
++
++static struct simple_buffer_page *simple_bpage_from_link(struct list_head *list)
++{
++	unsigned long ptr = (unsigned long)list & SIMPLE_RB_LINK_MASK;
++
++	return container_of((struct list_head *)ptr, struct simple_buffer_page, list);
++}
++
++static struct simple_buffer_page *simple_bpage_next_page(struct simple_buffer_page *bpage)
++{
++	return simple_bpage_from_link(bpage->list.next);
++}
++
++static void simple_bpage_reset(struct simple_buffer_page *bpage)
++{
++	bpage->write = 0;
++	bpage->entries = 0;
++
++	local_set(&bpage->page->commit, 0);
++}
++
++static void simple_bpage_init(struct simple_buffer_page *bpage, unsigned long page)
++{
++	INIT_LIST_HEAD(&bpage->list);
++	bpage->page = (struct buffer_data_page *)page;
++
++	simple_bpage_reset(bpage);
++}
++
++#define simple_rb_meta_inc(__meta, __inc)		\
++	WRITE_ONCE((__meta), (__meta + __inc))
++
++static bool simple_rb_loaded(struct simple_rb_per_cpu *cpu_buffer)
++{
++	return !!cpu_buffer->bpages;
++}
++
++int simple_ring_buffer_swap_reader_page(struct simple_rb_per_cpu *cpu_buffer)
++{
++	struct simple_buffer_page *last, *head, *reader;
++	unsigned long overrun;
++
++	if (!simple_rb_loaded(cpu_buffer))
++		return -ENODEV;
++
++	head = cpu_buffer->head_page;
++	reader = cpu_buffer->reader_page;
++
++	do {
++		/* Run after the writer to find the head */
++		if (!simple_bpage_is_head(head))
++			head = simple_bpage_next_page(head);
++
++		/* Connect the reader page around the header page */
++		reader->list.next = head->list.next;
++		reader->list.prev = head->list.prev;
++
++		/* The last page before the head */
++		last = simple_bpage_from_link(head->list.prev);
++
++		/* The reader page points to the new header page */
++		simple_bpage_set_head_link(reader);
++
++		overrun = cpu_buffer->meta->overrun;
++	} while (!simple_bpage_unset_head_link(last, reader));
++
++	cpu_buffer->head_page = simple_bpage_from_link(reader->list.next);
++	cpu_buffer->head_page->list.prev = &reader->list;
++	cpu_buffer->reader_page = head;
++	cpu_buffer->meta->reader.lost_events = overrun - cpu_buffer->last_overrun;
++	cpu_buffer->meta->reader.id = cpu_buffer->reader_page->id;
++	cpu_buffer->last_overrun = overrun;
++
 +	return 0;
 +}
 +
-+static ssize_t
-+write_event_write(struct file *filp, const char __user *ubuf, size_t cnt, loff_t *pos)
++static struct simple_buffer_page *simple_rb_move_tail(struct simple_rb_per_cpu *cpu_buffer)
 +{
-+	struct remote_event_format_selftest *evt_test;
-+	struct simple_rb_per_cpu *cpu_buffer;
-+	unsigned long val;
-+	int ret;
++	struct simple_buffer_page *tail, *new_tail;
 +
-+	ret = kstrtoul_from_user(ubuf, cnt, 10, &val);
-+	if (ret)
-+		return ret;
++	tail = cpu_buffer->tail_page;
++	new_tail = simple_bpage_next_page(tail);
 +
-+	guard(mutex)(&simple_rbs_lock);
++	if (simple_bpage_unset_head_link(tail, new_tail)) {
++		/*
++		 * Oh no! we've caught the head. There is none anymore and swap_reader will spin
++		 * until we set the new one. Overrun must be written first, to make sure we report
++		 * the correct number of lost events.
++		 */
++		simple_rb_meta_inc(cpu_buffer->meta->overrun, new_tail->entries);
++		simple_rb_meta_inc(cpu_buffer->meta->pages_lost, 1);
 +
-+	if (!remote_event_selftest.enabled)
-+		return cnt;
++		simple_bpage_set_head_link(new_tail);
++	}
 +
-+	cpu_buffer = *this_cpu_ptr(&simple_rbs);
-+	if (!cpu_buffer)
++	simple_bpage_reset(new_tail);
++	cpu_buffer->tail_page = new_tail;
++
++	simple_rb_meta_inc(cpu_buffer->meta->pages_touched, 1);
++
++	return new_tail;
++}
++
++static unsigned long rb_event_size(unsigned long length)
++{
++	struct ring_buffer_event *event;
++
++	return length + RB_EVNT_HDR_SIZE + sizeof(event->array[0]);
++}
++
++static struct ring_buffer_event *
++rb_event_add_ts_extend(struct ring_buffer_event *event, u64 delta)
++{
++	event->type_len = RINGBUF_TYPE_TIME_EXTEND;
++	event->time_delta = delta & TS_MASK;
++	event->array[0] = delta >> TS_SHIFT;
++
++	return (struct ring_buffer_event *)((unsigned long)event + 8);
++}
++
++static struct ring_buffer_event *
++simple_rb_reserve_next(struct simple_rb_per_cpu *cpu_buffer, unsigned long length, u64 timestamp)
++{
++	unsigned long ts_ext_size = 0, event_size = rb_event_size(length);
++	struct simple_buffer_page *tail = cpu_buffer->tail_page;
++	struct ring_buffer_event *event;
++	u32 write, prev_write;
++	u64 time_delta;
++
++	time_delta = timestamp - cpu_buffer->write_stamp;
++
++	if (test_time_stamp(time_delta))
++		ts_ext_size = 8;
++
++	prev_write = tail->write;
++	write = prev_write + event_size + ts_ext_size;
++
++	if (unlikely(write > (PAGE_SIZE - BUF_PAGE_HDR_SIZE)))
++		tail = simple_rb_move_tail(cpu_buffer);
++
++	if (!tail->entries) {
++		tail->page->time_stamp = timestamp;
++		time_delta = 0;
++		ts_ext_size = 0;
++		write = event_size;
++		prev_write = 0;
++	}
++
++	tail->write = write;
++	tail->entries++;
++
++	cpu_buffer->write_stamp = timestamp;
++
++	event = (struct ring_buffer_event *)(tail->page->data + prev_write);
++	if (ts_ext_size) {
++		event = rb_event_add_ts_extend(event, time_delta);
++		time_delta = 0;
++	}
++
++	event->type_len = 0;
++	event->time_delta = time_delta;
++	event->array[0] = event_size - RB_EVNT_HDR_SIZE;
++
++	return event;
++}
++
++void *simple_ring_buffer_reserve(struct simple_rb_per_cpu *cpu_buffer, unsigned long length,
++				 u64 timestamp)
++{
++	struct ring_buffer_event *rb_event;
++
++	if (cmpxchg(&cpu_buffer->status, SIMPLE_RB_READY, SIMPLE_RB_WRITING) != SIMPLE_RB_READY)
++		return NULL;
++
++	rb_event = simple_rb_reserve_next(cpu_buffer, length, timestamp);
++
++	return &rb_event->array[1];
++}
++
++void simple_ring_buffer_commit(struct simple_rb_per_cpu *cpu_buffer)
++{
++	local_set(&cpu_buffer->tail_page->page->commit,
++		  cpu_buffer->tail_page->write);
++	simple_rb_meta_inc(cpu_buffer->meta->entries, 1);
++
++	/*
++	 * Paired with simple_rb_enable_tracing() to ensure data is
++	 * written to the ring-buffer before teardown.
++	 */
++	smp_store_release(&cpu_buffer->status, SIMPLE_RB_READY);
++}
++
++static u32 simple_rb_enable_tracing(struct simple_rb_per_cpu *cpu_buffer, bool enable)
++{
++	u32 prev_status;
++
++	if (enable)
++		return cmpxchg(&cpu_buffer->status, SIMPLE_RB_UNAVAILABLE, SIMPLE_RB_READY);
++
++	/* Wait for the buffer to be released */
++	do {
++		prev_status = cmpxchg_acquire(&cpu_buffer->status,
++					      SIMPLE_RB_READY,
++					      SIMPLE_RB_UNAVAILABLE);
++	} while (prev_status == SIMPLE_RB_WRITING);
++
++	return prev_status;
++}
++
++int simple_ring_buffer_reset(struct simple_rb_per_cpu *cpu_buffer)
++{
++	struct simple_buffer_page *bpage;
++	u32 prev_status;
++
++	if (!simple_rb_loaded(cpu_buffer))
 +		return -ENODEV;
 +
-+	evt_test = simple_ring_buffer_reserve(cpu_buffer,
-+					      sizeof(struct remote_event_format_selftest),
-+					      trace_clock_global());
-+	if (!evt_test)
++	prev_status = simple_rb_enable_tracing(cpu_buffer, false);
++
++	while (!simple_bpage_is_head(cpu_buffer->head_page))
++		cpu_buffer->head_page = simple_bpage_next_page(cpu_buffer->head_page);
++
++	bpage = cpu_buffer->tail_page = cpu_buffer->head_page;
++	do {
++		simple_bpage_reset(bpage);
++		bpage = simple_bpage_next_page(bpage);
++	} while (bpage != cpu_buffer->head_page);
++
++	simple_bpage_reset(cpu_buffer->reader_page);
++
++	cpu_buffer->last_overrun = 0;
++	cpu_buffer->write_stamp = 0;
++
++	cpu_buffer->meta->reader.read = 0;
++	cpu_buffer->meta->reader.lost_events = 0;
++	cpu_buffer->meta->entries = 0;
++	cpu_buffer->meta->overrun = 0;
++	cpu_buffer->meta->read = 0;
++	cpu_buffer->meta->pages_lost = 0;
++	cpu_buffer->meta->pages_touched = 0;
++
++	if (prev_status == SIMPLE_RB_READY)
++		simple_rb_enable_tracing(cpu_buffer, true);
++
++	return 0;
++}
++
++int simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer, struct simple_buffer_page *bpages,
++			    const struct ring_buffer_desc *desc)
++{
++	struct simple_buffer_page *bpage = bpages;
++	int i;
++
++	/* At least 1 reader page and one head */
++	if (desc->nr_page_va < 2)
++		return -EINVAL;
++
++	memset(cpu_buffer, 0, sizeof(*cpu_buffer));
++
++	cpu_buffer->bpages = bpages;
++
++	cpu_buffer->meta = (void *)desc->meta_va;
++	memset(cpu_buffer->meta, 0, sizeof(*cpu_buffer->meta));
++	cpu_buffer->meta->meta_page_size = PAGE_SIZE;
++	cpu_buffer->meta->nr_subbufs = cpu_buffer->nr_pages;
++
++	/* The reader page is not part of the ring initially */
++	simple_bpage_init(bpage, desc->page_va[0]);
++	bpage->id = 0;
++
++	cpu_buffer->nr_pages = 1;
++
++	cpu_buffer->reader_page = bpage;
++	cpu_buffer->tail_page = bpage + 1;
++	cpu_buffer->head_page = bpage + 1;
++
++	for (i = 1; i < desc->nr_page_va; i++) {
++		simple_bpage_init(++bpage, desc->page_va[i]);
++
++		bpage->list.next = &(bpage + 1)->list;
++		bpage->list.prev = &(bpage - 1)->list;
++		bpage->id = i;
++
++		cpu_buffer->nr_pages = i + 1;
++	}
++
++	/* Close the ring */
++	bpage->list.next = &cpu_buffer->tail_page->list;
++	cpu_buffer->tail_page->list.prev = &bpage->list;
++
++	/* The last init'ed page points to the head page */
++	simple_bpage_set_head_link(bpage);
++
++	return 0;
++}
++
++void simple_ring_buffer_unload(struct simple_rb_per_cpu *cpu_buffer)
++{
++	if (!simple_rb_loaded(cpu_buffer))
++		return;
++
++	simple_rb_enable_tracing(cpu_buffer, false);
++
++	cpu_buffer->bpages = 0;
++}
++
++int simple_ring_buffer_enable_tracing(struct simple_rb_per_cpu *cpu_buffer, bool enable)
++{
++	if (!simple_rb_loaded(cpu_buffer))
 +		return -ENODEV;
 +
-+	evt_test->hdr.id = REMOTE_TEST_EVENT_ID;
-+	evt_test->id = val;
++	simple_rb_enable_tracing(cpu_buffer, enable);
 +
-+	simple_ring_buffer_commit(cpu_buffer);
-+
-+	return cnt;
++	return 0;
 +}
-+
-+static const struct file_operations write_event_fops = {
-+	.write	= write_event_write,
-+};
-+
-+static int remote_test_init_tracefs(struct dentry *d, void *unused)
-+{
-+	return tracefs_create_file("write_event", 0200, d, NULL, &write_event_fops) ?
-+		0 : -ENOMEM;
-+}
-+
-+static struct trace_remote_callbacks trace_remote_callbacks = {
-+	.init			= remote_test_init_tracefs,
-+	.load_trace_buffer	= remote_test_load,
-+	.unload_trace_buffer	= remote_test_unload,
-+	.enable_tracing		= remote_test_enable_tracing,
-+	.swap_reader_page	= remote_test_swap_reader_page,
-+	.reset			= remote_test_reset,
-+	.enable_event		= remote_test_enable_event,
-+};
-+
-+static int __init remote_test_init(void)
-+{
-+	return trace_remote_register("test", &trace_remote_callbacks, NULL,
-+				     &remote_event_selftest, 1);
-+}
-+
-+module_init(remote_test_init);
-+
-+MODULE_DESCRIPTION("Test module for the trace remote interface");
-+MODULE_AUTHOR("Vincent Donnefort");
-+MODULE_LICENSE("GPL");
-diff --git a/kernel/trace/remote_test_events.h b/kernel/trace/remote_test_events.h
-new file mode 100644
-index 000000000000..bb68aac4a25c
---- /dev/null
-+++ b/kernel/trace/remote_test_events.h
-@@ -0,0 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#define REMOTE_TEST_EVENT_ID 1
-+
-+REMOTE_EVENT(selftest, REMOTE_TEST_EVENT_ID,
-+	RE_STRUCT(
-+		re_field(u64, id)
-+	),
-+	RE_PRINTK("id=%lld", __entry->id)
-+);
 -- 
 2.51.0.rc2.233.g662b1ed5c5-goog
 
