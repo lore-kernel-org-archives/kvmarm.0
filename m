@@ -1,118 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E8635FC09;
-	Thu, 21 Aug 2025 20:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEE328B7EF
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755809067; cv=none; b=cFfCVuAZN/K5b+SyWhZ9WKnwjVIzCBta2o9c2t5G9rjBelYx8aLekBwu18hK/eZZwtc2i+Uiwg72EI48v1h8lbUQ2bsFAl8khVVtwu1ADi/TQMb6u2VYCeU1ADbP0opHk0TPMoaJawJVFP0bzB3IeFi+nWh1gdSp4z4WOhl1OQw=
+	t=1755810048; cv=none; b=HpVpolZLAr1OUw4UUbeA+5mJAoxjpmvImUnZQVxZJRJ3nBW8bGlNITom6SjDW/lpU3uveNCGp5AyOiY9vORxRwx/QY6oQmGT0AR5BiI8bpKjjD2RPfAI27Un+Ucuq6gZSymTWzRFQJWSNEtPmgRGyXlT6cWRkpBrwm5yPpl6/9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755809067; c=relaxed/simple;
-	bh=QGyQHv1jYZF3uVA7onjUxkDQan9RTUY4fxnZL00rGXY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ms3rGdFIo3JwL5S9HGCpGNdH2/h0h+1kspOxCHK7l/VBPVpakE8k5BIbHIh3BfyqjwaaphLbMHShwhgMoG8UyV7iAYkn1x9Ud9bSLPX/a9VttBg/OKVICn0p8qOUaWMIjmpP+mobY6zFvB7pkhyB8xZh7XKPAANPbo584hxdRZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pN65S0Hm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755810048; c=relaxed/simple;
+	bh=pnhR4u7zzImF/Q9sjPpvcLTIm1nBKcxgPPtEJd8L7Pw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=t8iBK9F2C1GIcLTIspJspOvfaSCPKpgzVnOF7b+z6mEzXyWcguPGiTv/dN6UVrMoAG6keua4gOxYTrATVRsxvQV1phSFs/1sgSeRW1g4XAhqIBTT+OzlCverIPAqgRAbLAyIiVKvEguERyRIqF4rWxOWRYvuiFZNVPV1cPhlQJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XborZPIR; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pN65S0Hm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CFDC113D0;
-	Thu, 21 Aug 2025 20:44:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755809066;
-	bh=QGyQHv1jYZF3uVA7onjUxkDQan9RTUY4fxnZL00rGXY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pN65S0Hm98/7eBQk2cyfAEh3nYjRLHVZAjZmP8LJZJoELf3EbpS+l1LIqzljo8U4m
-	 HjWxJpslql+PBGVkeqxPE9n11kL4MRvMiggg7zCiHMdp78jo6VRLAjkVxe/dw6BkFU
-	 G+UnH0makA9mu+VZU+SOu+Opf44USbiuhiXodj9hdWvl+RPvxynWgI64NuSf8qkiNJ
-	 wbQtxTMswBVP200c+ukNe+EQA5zTOKHo4/SA+O9d9HAchukQt/pZTrSwZr3n5dndDB
-	 OjPSC8CM+JBMOsfGNpVi7azWP8BWK4YbsVtytLl5AAk+ErosVxPo1mv62bmKx7VAi0
-	 BjXbN96zvqrXw==
-Date: Thu, 21 Aug 2025 21:44:21 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v15 4/6] KVM: arm64: Set PSTATE.EXLOCK when entering an
- exception
-Message-ID: <ac3b2d52-5b24-441b-bcdc-463ae9c78b3d@sirena.org.uk>
-References: <20250820-arm64-gcs-v15-0-5e334da18b84@kernel.org>
- <20250820-arm64-gcs-v15-4-5e334da18b84@kernel.org>
- <87ms7tk5y4.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XborZPIR"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24457f42254so31753915ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:00:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755810046; x=1756414846; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QRu9EPlqPIRbrAwuhln90egPhix9C1W7TbuFz42eH5A=;
+        b=XborZPIRcu3SIKCdCuup5CgcluwfbbgDRqlS9d3yLFveO6Eiu9+ni95qk7TmlO//us
+         Lw21+HpJqwXra+UdjUOijN6Zo9X5z9EZGLdd5uLbN4DvYtgnFQqYmVnl+iXz/V+gmMK2
+         lVDAmbid86iB3JxNF6M7aM9mVzb6URTYZedzYb6Y2ZkylLL0f0zEQsOntoKGcOgvKVzG
+         fjzDChLtID2Sq7gnYRL4oEv9sfwvhqrY9FByP9I0antveu69Lav7kFRwSc3rn+cLnpRL
+         EPves6hOIJArVpvuN4S6jjlA1e4J4TQZgoGEzj6YeXJ2a3qeSCgCkgymaaFL7E6sd6QJ
+         pc1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755810046; x=1756414846;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QRu9EPlqPIRbrAwuhln90egPhix9C1W7TbuFz42eH5A=;
+        b=k+ZjPMMNzFtK01Ilj4fLMnVqhnM/Af1e7BYOlooHMzURU4ht+mEYKfZKMyxhYOCCrU
+         V5vb4glq8WVYwYWZw3gIRgjAaCMQ6nZzViId+tOM5ZWoQgRy0tse3OFtMqMwpKqWMFPs
+         cjEspxA3ueTNOAaJmITuULRStmTam4DzfJVcO06s925QmiPuvRo46wt42itCkxbF4oRc
+         /hRNfyVKk92qJApbqXHqDognqL3Rr8+a/PmwBLt6cjzi/YWrztf23+4u1/7e5n1JNo84
+         QjFoaPP31Y1WP/H5dFuCG4hws0bOMM98v+T10P7tZVMlXNYV2g3qvYCiMEV7e+S2dNSA
+         vT4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV0R5A1bEaf237YF83FOdWVkk8b2bS6fJatS4Y90p0l6VQPpPdXQnCrYL3MKBTVGaPCX1nJWzk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwN5p5zvLn6dMo8oZCPSs5v3zSfo62j3S9D0jMOTRgEgkJRUFYS
+	0Mo4LWM4tW8RjQsVQMficvGTY6rAWSI8Uea9bOoY+z00sovbCzLopF2bY7XnSQfSTS4g7j19ejq
+	GZlwveA==
+X-Google-Smtp-Source: AGHT+IHZUS2rRBwXbx5vsu0uArLnBj6wHgoX5fZrabl/HszonPOiLFCujnncNL374CLOxHiZbqaT370jPEA=
+X-Received: from pjm15.prod.google.com ([2002:a17:90b:2fcf:b0:31f:61fc:b283])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f552:b0:240:b075:577f
+ with SMTP id d9443c01a7336-2462ef1d579mr9364185ad.37.1755810045874; Thu, 21
+ Aug 2025 14:00:45 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Aug 2025 14:00:26 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="+NFBeoT7qeYVduLe"
-Content-Disposition: inline
-In-Reply-To: <87ms7tk5y4.wl-maz@kernel.org>
-X-Cookie: Warp 7 -- It's a law we can live with.
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
+Message-ID: <20250821210042.3451147-1-seanjc@google.com>
+Subject: [RFC PATCH 00/16] KVM: arm64: Add "struct kvm_page_fault"
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+
+Add an arm64 version of "struct kvm_page_fault" to (hopefully) tidy up
+the abort path, and to pave the way for things like KVM Userfault[*] that
+want to consume kvm_page_fault in arch-neutral code.
+
+This is essentially one giant nop of code shuffling.
+
+RFC as this is only compile-tested.  I didn't want to spend time testing
+until I got feedback on whether or not y'all are amenable to the general idea.
+
+[*] https://lore.kernel.org/all/20250618042424.330664-1-jthoughton@google.com
+
+Sean Christopherson (16):
+  KVM: arm64: Drop nested "esr" to eliminate variable shadowing
+  KVM: arm64: Get iabt status on-demand
+  KVM: arm64: Move SRCU-protected region of kvm_handle_guest_abort() to
+    helper
+  KVM: arm64: Use guard(srcu) in kvm_handle_guest_abort()
+  KVM: arm64: Introduce "struct kvm_page_fault" for tracking abort state
+  KVM: arm64: Pass kvm_page_fault pointer to
+    transparent_hugepage_adjust()
+  KVM: arm64: Pass @fault to fault_supports_stage2_huge_mapping()
+  KVM: arm64: Add helper to get permission fault granule from ESR
+  KVM: arm64: Track perm fault granule in "struct kvm_page_fault"
+  KVM: arm64: Drop local vfio_allow_any_uc, use vm_flags snapshot
+  KVM: arm64: Drop local mte_allowed, use vm_flags snapshot
+  KVM: arm64: Move VMA-related information into "struct kvm_page_fault"
+  KVM: arm64: Stash "mmu_seq" in "struct kvm_page_fault"
+  KVM: arm64: Track "forced" information in "struct kvm_page_fault"
+  KVM: arm64: Extract mmap_lock-protected code to helper for user mem
+    aborts
+  KVM: arm64: Don't bother nullifying "vma" in mem abort path
+
+ arch/arm64/include/asm/esr.h         |   6 +
+ arch/arm64/include/asm/kvm_emulate.h |   9 -
+ arch/arm64/include/asm/kvm_host.h    |  32 ++
+ arch/arm64/kvm/mmu.c                 | 514 +++++++++++++--------------
+ 4 files changed, 282 insertions(+), 279 deletions(-)
 
 
---+NFBeoT7qeYVduLe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+-- 
+2.51.0.261.g7ce5a0a67e-goog
 
-On Wed, Aug 20, 2025 at 11:02:11PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-
-> > As per DDI 0487 RWTXBY we need to manage PSTATE.EXLOCK when entering an
-
-> Nit: please use an underscore between the type of a statement and its
-> "name", as it makes it a bit more readable (R_WTXBY).
-
-Updated as you request.  I have seen both usages - the non _ version
-plays nicer with searching the PDF to find the rules since you can just
-copy it directly into a PDF viewer.
-
-> > +	// EL, or to GCSCR_ELx.EXLOCKEN for an exception to the same
-> > +	// exception level.  See ARM DDI 0487 RWTXBY, D.1.3.2 in K.a.
-> > +	new |=3D enter_exception64_gcs(vcpu, mode, target_mode);
-> > +
-> >  	new |=3D PSR_D_BIT;
-> >  	new |=3D PSR_A_BIT;
-> >  	new |=3D PSR_I_BIT;
-
-> But that's not the only case where we have to deal with EXLOCK, is it?
-> What of ERET and its PAuth variants? R_TYTWB says:
-
-> <quote>
-> If in AArch64 state, any of the following situations can cause an
-> illegal exception return:
->=20
-> [...]
->=20
-> - If the Effective value of GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK
->   is 0, the execution of an exception return instruction to return to
->   the current Exception level ELx.
-> </quote>
-
-> My reading of the spec is that this needs handling.
-
-Am I right in thinking that this handling is needed for the NV case
-only?
-
---+NFBeoT7qeYVduLe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAminhSQACgkQJNaLcl1U
-h9Ao0gf+I31dMh9CHMVH6wKHnBom98nMGxIPuirlnN5zM3f5tofXHJRgTQvJd6oS
-LqRiqCSrp8MjmOFPti9rUMk6WRRzGGG4gHbTO1ANmaGrlY1frYhW91SH6i+03XH8
-i79wMm5+COz/jk9DXmVFJzuk2PQTTs7xUy9+UW3ZXKpvauyeaU0QH0IBUdSHG+ks
-QY8kAt7lp4hklpFTlrYnCjNMui2AU2+Pu+Wu+IF6Y12i6dJ7dk2RtvH/PkFLw4oG
-8NCyFQuC4WX5tOIaGNpbzdmgPT5gRHs48CgNzRrI/BPWiWQ/Pbakceh5DN+pYPNl
-donq5HcvHZXywx/jXKdRbBgUHgPFIw==
-=xfXz
------END PGP SIGNATURE-----
-
---+NFBeoT7qeYVduLe--
