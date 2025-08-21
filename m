@@ -1,57 +1,57 @@
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84382EBDE2
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584232EBDF9
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755810066; cv=none; b=utdBvqtFlw8arwqeNLp5pmhBIRRoOzj7Kurb45IKu+HDfdeoj3aT7n9edkk+8sZdsWL7+Wx984lWwvn+NJTagwT+PmcLQQUyYhWSdypliED7VW80tsYGdDMuEenhiCQ6CZEipwPi5Drqx0OeQ4citAZ/Den73pc0PwaQefv4EMI=
+	t=1755810067; cv=none; b=iIavIIUguHzMwxnM4yZiyMBkS9VPEdfKNXRoGiccAngDJlbY/vyTG/15zDuqFO97jaSHvqaHRsXvdTSbbbHUUgJDcg91gW3IBgbSw4uPW/JRNXPeTeS+CURCah/+VIfcVS8hSkYIaPXMabcaXJcjxnYX+Y+gV7BuzTR9PvZNXk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755810066; c=relaxed/simple;
-	bh=+61MIfhB12OoqxvOVjd5E5G1e4moY0EeyCZxMuVXI2c=;
+	s=arc-20240116; t=1755810067; c=relaxed/simple;
+	bh=6TQp1XTfTlSOYUWOIWGmda/8IL4quEzAyAn5KTiu3gY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lWyvp27+yevm0ndn/TPSyyld9z/3dpT3I63pkyIpT8y42mMG6d4qUgVWKuZ6N39GEJaRQ5JreGjZNP3KkwSxTSAgX/3oTllzM3KKH2Rnw03poBw97A6iR2ICPqZr8Xy4wA121veIyWJUFsvH61/FqhtDjH1XjVJPPGKJxqA7fDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FcNY2DFD; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=W6AMA/qOHx5BIYA6orFEegzky/04sWze35Xbs/lgxitiDK+6P9z4YtN3LiKCChkLrj84STzdrdNNBPYKkdzdl0r03ZciTDmzbvTDbOPe0o/P4sFd3YU+SsLmaXxEeUzGc2NtLyVic7x/FSQ9dNuh7Vf552lU6IYpcqDrem4PVMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mGkI38Ai; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FcNY2DFD"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-323266b700cso2886043a91.0
-        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:01:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mGkI38Ai"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-324f81677d7so943525a91.0
+        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:01:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755810063; x=1756414863; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1755810065; x=1756414865; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=AynODOx7TIbccej4ZjLdZ9RTKEuSncfsehCPn6XLS1g=;
-        b=FcNY2DFDtEbv5uiHlEviqGNOtwOVPkqMlrqEjAZ0sC3HASsWafO/JlN9kqWVsRVnqv
-         7TmoZDfJnzM+3O7+RBih17ZEnitEv7VZo7Y450S0F+xCK/q9zD9C++tFHcbxkfmKAfZc
-         RVciaCm3Zmtxtcno0tHVa9ht5GwxvoMthqXkCyoiP9ZV5+8OIJPawhKUv+P0w4F0wciW
-         N1OrBmAJycjE66xIry2Cz/z4TsbQUywHixSVsKTB4a76gdquYkRwC3IuioR9byw4eZ8E
-         C4RSrTpERmuvZQBWNz8WvOKeEQ3EgkmhaOKy2vlFWbu2QRWN1HckgJ4Hq2lUgWPyjw2P
-         zUUQ==
+        bh=l3aBAqBLvvziXAff3l7qHBrH3ii9s2uHCbYHv1XlpUE=;
+        b=mGkI38Ai2KP3I/zMX3BCoL2luqSF4NOCcxNkmRFfL0NWoTERINRdfNUYW7n7mQ854G
+         TCCceBCUFueKC8E4LUNerzjSXGiDWyyl7UiUsiR3hIjdpCE7xodz1tgWOm8Dz+GkYJJR
+         vBieSIsE6n41PaIyO6VJ2e9Yb/aG+QFQlxbKH4N4SpOLF7zUw6h3ShwBLtkV5ptXq6wM
+         8SbbuVgFt1VbZ+D6HfvqYZSILEIIlK06/JMvNZKfQ2uimGeh8bJNhJ5uxfmmnIKxccrD
+         hVJqOr3bbPPz7ufL/4+dBHXr0kDTHRFy8tSNIyPhM2GfKh/Ds04AAar3bEr8qJt/tdrE
+         pFcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755810063; x=1756414863;
+        d=1e100.net; s=20230601; t=1755810065; x=1756414865;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AynODOx7TIbccej4ZjLdZ9RTKEuSncfsehCPn6XLS1g=;
-        b=Y1MF3rMsya2AE/5td3pMC94ba9cd4oYIf2q5Eap1ZlJUb2xLWVT8XOzy+Yv6Kt+g8s
-         u4krL0T3Im8nSHilE/1KzS20GrqE4cXLugJPOIkRwHTl4LQG/ysp1QxaQitsqKBdOnDU
-         mKAL+ZgyvTEvmVm//2gTTqcsTzCzJ5kZ09DhxSxjSFGGek6f3ZmM/3sDd7nEDCuxfego
-         E7XyCBg0EjLbeMqxiiekSUMmenE4gc7tV9QBzHQcdZX2sRh8uTuh0GgNEnU1Ojn7rzpL
-         F2gbIsC/qAvdsYqN+G8siaDCd+P5m8ujYoN2PrM6N9qUJ0rO6LGio9R8r3zQYdMoBj02
-         87tA==
-X-Forwarded-Encrypted: i=1; AJvYcCXtf3sxp2k2qZccjPIjyAUNeH1RYIXJY/TxN+o5iljH4lt1tDd6T7Q1Q3OAwDx59p6laGjNVws=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxCLwpftEQx4mNzmMk7yFUzKbVfGZedE4Pbur7vywpWnXkpPqGc
-	brh2oaty2yADxPMep6vX0yr/n46xsiUIMZDCb29cswBihI86Je3B62A+zPnCccP4C3jfpDYE7Ew
-	i7oyPPg==
-X-Google-Smtp-Source: AGHT+IEVYwl5YEkw1vqENiDixKFNtOSSF5og6sdGONTLhDTmarsazTWsy/GXacXJvdeMD+BKnVg4vh8e0tk=
-X-Received: from pjbsd14.prod.google.com ([2002:a17:90b:514e:b0:321:78e7:57fb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b4c:b0:31e:d929:5ca5
- with SMTP id 98e67ed59e1d1-32515e2230emr1041388a91.1.1755810063041; Thu, 21
- Aug 2025 14:01:03 -0700 (PDT)
+        bh=l3aBAqBLvvziXAff3l7qHBrH3ii9s2uHCbYHv1XlpUE=;
+        b=Omh45rIazrryDvnM+9007HBkWv8DItCyPjuZ3NpnAroY8BGYYmavaJ+cbWuTJOYYn0
+         lyoKUAYmFpmmrSdVatCctsEfeUAdbs7OreMGnrx0vSeq4BYAERDYKg1EVHmDMekeZ4xM
+         U41+c2dbFFSwyrDejx6PxJLVtRsParvYMM0gdJILTvoPh7tO5KNKYsFzk/3pdfcaZ9wO
+         bsw/Y+NpJmJWfgqawRUQDAA/EQO55EBiGim7fKGWPXW57916NvdnM8/ykh2alTgcFyHa
+         TozQukL20BF8jzMwGs2pVqISLUCOoY7EwyXN04pqTtrzbOJxdeiXLhuXgYt9l9eCyL4f
+         9vWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWer+HoByv6rYTj3fI7RqSYauPSm1HnS3I9c2VDK0ilrevq+NWpxlMaftVLFq6RLJZ5FvEx5qw=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy+I+Okn+Aquw13G30NN2vatjeKugbZp2tMlDUs5OjcYZyzOidw
+	eGVdZCuqeVJB5RiBqa0AiVbTme7NNu3uyr5gwxgzl7Yc4M1pWfV6JeZSNHSdXfHALjY11ku/w7w
+	Elv9/Bw==
+X-Google-Smtp-Source: AGHT+IHyv2vSy5H3gPx/CMXMIii4nN/TDg0JEF0C1pJibiyBy90Nx8cGqdPBlytbuWHgL7DJUzJnyJ3Kweo=
+X-Received: from pjbee11.prod.google.com ([2002:a17:90a:fc4b:b0:312:187d:382d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c87:b0:324:ec53:1385
+ with SMTP id 98e67ed59e1d1-32515e36b2emr1212430a91.10.1755810064638; Thu, 21
+ Aug 2025 14:01:04 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 21 Aug 2025 14:00:36 -0700
+Date: Thu, 21 Aug 2025 14:00:37 -0700
 In-Reply-To: <20250821210042.3451147-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250821210042.3451147-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250821210042.3451147-11-seanjc@google.com>
-Subject: [RFC PATCH 10/16] KVM: arm64: Drop local vfio_allow_any_uc, use
- vm_flags snapshot
+Message-ID: <20250821210042.3451147-12-seanjc@google.com>
+Subject: [RFC PATCH 11/16] KVM: arm64: Drop local mte_allowed, use vm_flags snapshot
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -71,47 +70,75 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop user_mem_abort()'s local vfio_allow_any_uc variable and instead use
-the vm_flags snapshot.
+Drop user_mem_abort()'s local mte_allowed and instead use the vm_flags
+snapshot.  The redundant variables aren't problematic per se, but will be
+quite awkward when a future change moves the vm_flags snapshot into
+"struct kvm_page_fault".
+
+Opportunistically drop kvm_vma_mte_allowed() and open code the vm_flags
+check in the memslot preparation code, as there's little value in hiding
+VM_MTE_ALLOWED (arguably negative "value), and the fault path can't use
+the VMA-based helper (because looking at the VMA outside of mmap_lock is
+unsafe).
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/mmu.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/mmu.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 10c73494d505..e1375296940b 100644
+index e1375296940b..b85968019dd4 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1476,7 +1476,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+@@ -1454,11 +1454,6 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+ 	}
+ }
+ 
+-static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+-{
+-	return vma->vm_flags & VM_MTE_ALLOWED;
+-}
+-
+ static bool kvm_vma_is_cacheable(struct vm_area_struct *vma)
+ {
+ 	switch (FIELD_GET(PTE_ATTRINDX_MASK, pgprot_val(vma->vm_page_prot))) {
+@@ -1475,7 +1470,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
  	int ret = 0;
  	bool writable, force_pte = false;
- 	bool mte_allowed, is_vma_cacheable;
--	bool s2_force_noncacheable = false, vfio_allow_any_uc = false;
-+	bool s2_force_noncacheable = false;
+-	bool mte_allowed, is_vma_cacheable;
++	bool is_vma_cacheable;
+ 	bool s2_force_noncacheable = false;
  	unsigned long mmu_seq;
  	struct kvm *kvm = vcpu->kvm;
- 	struct vm_area_struct *vma;
-@@ -1608,8 +1608,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	fault->gfn = fault->ipa >> PAGE_SHIFT;
- 	mte_allowed = kvm_vma_mte_allowed(vma);
+@@ -1606,7 +1601,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	}
  
--	vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
--
+ 	fault->gfn = fault->ipa >> PAGE_SHIFT;
+-	mte_allowed = kvm_vma_mte_allowed(vma);
+ 
  	vm_flags = vma->vm_flags;
  
- 	is_vma_cacheable = kvm_vma_is_cacheable(vma);
-@@ -1741,7 +1739,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		prot |= KVM_PGTABLE_PROT_X;
+@@ -1724,7 +1718,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  
- 	if (s2_force_noncacheable) {
--		if (vfio_allow_any_uc)
-+		if (vm_flags & VM_ALLOW_ANY_UNCACHED)
- 			prot |= KVM_PGTABLE_PROT_NORMAL_NC;
- 		else
- 			prot |= KVM_PGTABLE_PROT_DEVICE;
+ 	if (!fault->is_perm && !s2_force_noncacheable && kvm_has_mte(kvm)) {
+ 		/* Check the VMM hasn't introduced a new disallowed VMA */
+-		if (mte_allowed) {
++		if (vm_flags & VM_MTE_ALLOWED) {
+ 			sanitise_mte_tags(kvm, fault->pfn, vma_pagesize);
+ 		} else {
+ 			ret = -EFAULT;
+@@ -2215,7 +2209,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 		if (!vma)
+ 			break;
+ 
+-		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
++		if (kvm_has_mte(kvm) && !(vma->vm_flags & VM_MTE_ALLOWED)) {
+ 			ret = -EINVAL;
+ 			break;
+ 		}
 -- 
 2.51.0.261.g7ce5a0a67e-goog
 
