@@ -1,57 +1,57 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A1C2EB5C2
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0EB2EB850
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755810060; cv=none; b=MnJX9IFgPBPvpK6hzNAeyZ8HkHkIPfQ1gNpnubm0KCMvH8wY+TkNLRAiVHAhaARlS1oawH+W5OchvB5aWh9ab+jIHDv5hrbVNysoAcO2sYmmdCeGOqsp/DMK5g4tLISsvQ4zuJuEBxEX65fMZNB3z8RjwgW5vtWq3+vX9Jwqx94=
+	t=1755810061; cv=none; b=ISan7ba09l30f/YaB45T+11PfHQ49/IyYyyuiS0+Wcv1/zgUBmbIsw9MprwrOHev9DGIMTKKQkPt5p8XaBnC+hFvGUffltJzb5Uup5bSoasyeDtqP+hLtCFIOr4EPatfFCZI9K302evlNYU7FojNAd/JpHgkKjnMLmsXbfScEqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755810060; c=relaxed/simple;
-	bh=n2xHKJwW4GBGQxPu8+45mca9yh0HIcvMkQScT1xXiwY=;
+	s=arc-20240116; t=1755810061; c=relaxed/simple;
+	bh=ABhvefXpoIuEQ5mRvyqgcnHqEvoUbf3IKbz3Y8+eKrc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iPlbsdkaHJ1RqBsYQTH1zL8MD4Y61uloFmzH4waSnueVZL6R1IocUUxWHmFb+2yvIa0qOuzGMEVUOtmmLBLygL1LMkVGXhav1RN5K99Kfc/PONAs2+jZfaG0EJOuLumctgJDonOhz3fOI7Yn7Nb1tj2JpDQCuvwg1Uc5ZACJCcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=otuR9nPj; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=OHtzK/xMUrR5gYxjK+X+63osuY0sWVXX9IosQfecZoaZDIrG2k/A/4MAV0d8cpr6hM/CPCdaeOo6OL18E4P+dhdnwBVBcYRv9BZRA8PS4iTPzRj0xah/hVkfOoX7C180IhkugOARVD92KceK670IGeffvX9l/QdKetMy9uXJ6FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p4zG0/lb; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="otuR9nPj"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32326e46a20so2466690a91.3
-        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:00:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p4zG0/lb"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-244581ce13aso29201385ad.2
+        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755810058; x=1756414858; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1755810060; x=1756414860; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=rIYjUyPKKDdCEejXmfDWcQPbYLUJJKvCpdBRdQ8wgkk=;
-        b=otuR9nPjy61wgvd9Jpd3ktun+BYSKlOzqGwGRW9w4kv3R/Kg0awS96f6MZXjTxZwuU
-         2Xs3GHi6EzLfvPRE3KWYp52H+Uj7tftXSBqsQ+Qh56y0fewskRLSnV3sn1RIdFfzz26h
-         nKt7jOzfLXxHL5vkEDtk+DfzGpayuq7iYcLXTpzSbeS4ozgORaMFD5yXvzqAq0/Vbqun
-         FsWJjOG4UAn0i2zumg9mmXdGtJhaSik09ZEU+mnFlq/PnmQLoDa82CS1MrDQGxzkDt8j
-         /DjJNh+rO1Dz34eZN40Q86xNFF2foRxJLgrskV08SXvyw1MM2uBMwaMxE0eRIXnfrYjZ
-         KHJg==
+        bh=qF0NqksTmsFEMXYPOijW2W+Po4z2kEGBRHxGZcBCgsM=;
+        b=p4zG0/lbhckrXx1TRhslWFfhqqv+t46VPOgV5K9QA4v6QrBgK1PmjRS03ddbZkCKJW
+         OO/yyCsJX1WS4O5lxcaSOZbmjVyJv4dPaoqoKVl1Vg+Bd4aMoAHysnmFb4fL+qPAz+80
+         oK0agxXGRkyEWg3zMSdhDCZpgXSJBsy1h1bSJrspV8aCrlFXYLcuyk908/GoyBNZPd7J
+         hhhMgI2Ei9QImRVpO7ft33iv5cpK0ymMw4PYnKHCNhdKA3ELZKt9u+HHIT9OVFRXGnAw
+         Nw6TjHMDd+LiphjKTPII+N1S+KxjxWS2PhX8b2pzv4oEDYVzUFz3/i/LCV1/Jjgx4oow
+         BZdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755810058; x=1756414858;
+        d=1e100.net; s=20230601; t=1755810060; x=1756414860;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rIYjUyPKKDdCEejXmfDWcQPbYLUJJKvCpdBRdQ8wgkk=;
-        b=A5BNjU+jFxqj2H3NQgeIlnFtvMWLPW9pxuxe5U4E6hqWMu1lscim3WVLfb6l8gvPB+
-         5Q6lLiUugwEMP8oTASZhomJpfvg9F5LB2NbTzbSYGadky/3bXxEIePJfgAToljo3O8CP
-         58UPfAYvh6yp+7dB8Wz04NRXRCGzbJeJWvW/anUwT7qE8d9oPabtZz/T/EFOMlWNCWwM
-         0KJFW7k401elzg1gWXzB5tpmTXBn08YRx8kVyXWwZ8nlaXG+/cT8VrQj7sKnQeDtFbTF
-         r+qDRijGoGI2k4wU3FaIQs0W+PNMerYb+dpd2vnYmMAgUoZXwkh5rnDjaAX68Slvym6u
-         BdmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUs6CHwcKyXNM+IUsoVUyWKMwR2Ehanzx29DLAuenQ9sbWOoEkZlcyy5SHF4efAvTloLGR/42Y=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxt3vF6iFcXy+3VNj9p0W5ntfAg3t78lyMVIU++NSgSxcTM+Ta/
-	MNVJyehEUsSjggL5SCLcAm5Ozdx67hepxqbpEcDFMeyoVHp1LsJANYol4xJ+g9bC2Z+xR4O40Tc
-	oegCMXA==
-X-Google-Smtp-Source: AGHT+IGevG4sJg+U1oYZiyIkXuxzC5L9OjooNDxBFWaxTZvDjCA0pb211437o2pCDdf6DI+kKvb4PRBSGWk=
-X-Received: from pjbrr6.prod.google.com ([2002:a17:90b:2b46:b0:323:247f:7f59])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d610:b0:31f:762c:bc40
- with SMTP id 98e67ed59e1d1-32515e54409mr1117649a91.16.1755810058080; Thu, 21
- Aug 2025 14:00:58 -0700 (PDT)
+        bh=qF0NqksTmsFEMXYPOijW2W+Po4z2kEGBRHxGZcBCgsM=;
+        b=rIG5gC/r+1hfccaAL9pfyavnv0GJ3aksMQ6B4eJF0N3bQ3KzxzxxiYsz0TblA1Q4im
+         d1YKF9XjRkkqAD5KBQWhO5RTrjT2kIJ/0Ep81OdvypzQaVTyuq+bp+z6vE4Zp/Wv95V8
+         G67eLl9UeQoyMqtzcAXEQR+YhAkB2C0WzsKzZql6aKy/x2rwXjTagSxlzGsvwP3fYaPL
+         +tkUgPCWxO8yEYYRMuatFq39VLoUnQxFCAN+jFQMQUBW8n1Zju6a+IefJJJ7+iF35Q0v
+         AmZfz6pNkT41c0sFd+p554OuaNfszcRcvaw8paZXKc9cI/5bSZ+XQ3Q+SENdmM9+ziKM
+         O5nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWqirWqbfSVk/lLlx1PeekiPakuv9wfGlBmDpSmVBptM5kcHCP7IEYnyqXLop2G20EGTs86RY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxmcxOYrSv+cJpekot3Osk0Hf1QzCAKcR8FLIhqbI4FNmdxTleY
+	oK3QIkjkOyJ7qvkAFlIKwYfEOreiJMWR4FshJa4YPYr2D8OKd15Ky+IyHe19t1QJ+Wb0+Ydve+p
+	QNN/iDw==
+X-Google-Smtp-Source: AGHT+IG5Izpq2Sl1N9Hzv50wRfJpmndOfATaks3Z+gYK79D4NeWWn/zwR5Uaz/7EA8M4H+pgD0lOKvSxa0c=
+X-Received: from plgv17.prod.google.com ([2002:a17:902:e8d1:b0:23c:7695:dcc5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce01:b0:240:52c8:2556
+ with SMTP id d9443c01a7336-2462ef44433mr9049685ad.39.1755810059747; Thu, 21
+ Aug 2025 14:00:59 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 21 Aug 2025 14:00:33 -0700
+Date: Thu, 21 Aug 2025 14:00:34 -0700
 In-Reply-To: <20250821210042.3451147-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250821210042.3451147-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250821210042.3451147-8-seanjc@google.com>
-Subject: [RFC PATCH 07/16] KVM: arm64: Pass @fault to fault_supports_stage2_huge_mapping()
+Message-ID: <20250821210042.3451147-9-seanjc@google.com>
+Subject: [RFC PATCH 08/16] KVM: arm64: Add helper to get permission fault
+ granule from ESR
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -70,71 +71,56 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Pass the full kvm_page_fault object when querying if a fault supports a
-hugepage mapping instead of passing the separate slot+address pair.
+Extract KVM's code for getting the granule for a permission fault into a
+standalone API that takes in a raw ESR, so that KVM can get the granule
+from a local copy of the ESR instead of re-retrieving the value from the
+vCPU.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/mmu.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ arch/arm64/include/asm/esr.h         | 6 ++++++
+ arch/arm64/include/asm/kvm_emulate.h | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 047aba00388c..c6aadd8baa18 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1287,10 +1287,10 @@ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
- 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index e1deed824464..5bb99cfd184a 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -8,6 +8,7 @@
+ #define __ASM_ESR_H
+ 
+ #include <asm/memory.h>
++#include <asm/pgtable-hwdef.h>
+ #include <asm/sysreg.h>
+ 
+ #define ESR_ELx_EC_UNKNOWN	UL(0x00)
+@@ -478,6 +479,11 @@ static inline bool esr_fsc_is_permission_fault(unsigned long esr)
+ 	       (esr == ESR_ELx_FSC_PERM_L(0));
  }
  
--static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
--					       unsigned long hva,
-+static bool fault_supports_stage2_huge_mapping(struct kvm_page_fault *fault,
- 					       unsigned long map_size)
++static inline u64 esr_fsc_perm_fault_granule(unsigned long esr)
++{
++	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(esr & ESR_ELx_FSC_LEVEL));
++}
++
+ static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
  {
-+	struct kvm_memory_slot *memslot = fault->slot;
- 	gpa_t gpa_start;
- 	hva_t uaddr_start, uaddr_end;
- 	size_t size;
-@@ -1348,8 +1348,8 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
- 	 * userspace_addr or the base_gfn, as both are equally aligned (per
- 	 * the check above) and equally sized.
- 	 */
--	return (hva & ~(map_size - 1)) >= uaddr_start &&
--	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
-+	return (fault->hva & ~(map_size - 1)) >= uaddr_start &&
-+	       (fault->hva & ~(map_size - 1)) + map_size <= uaddr_end;
+ 	esr = esr & ESR_ELx_FSC;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index fa8a08a1ccd5..8065f54927cb 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -455,7 +455,7 @@ u64 kvm_vcpu_trap_get_perm_fault_granule(const struct kvm_vcpu *vcpu)
+ 	unsigned long esr = kvm_vcpu_get_esr(vcpu);
+ 
+ 	BUG_ON(!esr_fsc_is_permission_fault(esr));
+-	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(esr & ESR_ELx_FSC_LEVEL));
++	return esr_fsc_perm_fault_granule(esr);
  }
  
- /*
-@@ -1368,7 +1368,7 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_page_fault *fault)
- 	 * sure that the HVA and IPA are sufficiently aligned and that the
- 	 * block map is contained within the memslot.
- 	 */
--	if (fault_supports_stage2_huge_mapping(fault->slot, fault->hva, PMD_SIZE)) {
-+	if (fault_supports_stage2_huge_mapping(fault, PMD_SIZE)) {
- 		int sz = get_user_mapping_size(kvm, fault->hva);
- 
- 		if (sz < 0)
-@@ -1547,7 +1547,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	switch (vma_shift) {
- #ifndef __PAGETABLE_PMD_FOLDED
- 	case PUD_SHIFT:
--		if (fault_supports_stage2_huge_mapping(fault->slot, fault->hva, PUD_SIZE))
-+		if (fault_supports_stage2_huge_mapping(fault, PUD_SIZE))
- 			break;
- 		fallthrough;
- #endif
-@@ -1555,7 +1555,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		vma_shift = PMD_SHIFT;
- 		fallthrough;
- 	case PMD_SHIFT:
--		if (fault_supports_stage2_huge_mapping(fault->slot, fault->hva, PMD_SIZE))
-+		if (fault_supports_stage2_huge_mapping(fault, PMD_SIZE))
- 			break;
- 		fallthrough;
- 	case CONT_PTE_SHIFT:
+ static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
 -- 
 2.51.0.261.g7ce5a0a67e-goog
 
