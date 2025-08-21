@@ -1,57 +1,57 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F082FC038
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9055B2F3604
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755810074; cv=none; b=IsE4H0VOZeX+Yr93XnCLHzgyvTISMmbnJ8cL9l1sJIHwmfYG+bBgtm+nHppM58JEdQmJK07B6RM9rm7xylzBklUcUn52bTTdD87fuU+zCYkqvC1gODD1sS59mpARVsW33CY5SuiIYpijx5NZsd1yBZ/oz7uCAP1FpNv+bV91xlg=
+	t=1755810075; cv=none; b=evtwZ5Ais5AFmZ70R1JqNo2yiXrPSTX8BAQJRpX8eCLi00gybTfpxCfLPciazc5lRKRYqOoa2/AlIHT7WJTUJ2cCfmmn7xdcD1urm/4HVeztogEFvht+ji9zTwRzki6yRb2F0feQ+EqTmhllGREDnrIdNcN4IzBMPTRriSCsrvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755810074; c=relaxed/simple;
-	bh=AoW4m6UY7aQpJgkdXNQBDrHg3vmPuYVWlkUo96wIdqA=;
+	s=arc-20240116; t=1755810075; c=relaxed/simple;
+	bh=wzbsuKcJ4wvLXzApjrI6i7l0No25qC4BNkAFtcIBLxk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tHLXRC2qFgld0JbPS5A/DmWKRt+0oT/U2epg3hN3nCfMFkOzfR2gfay5gyqwOgJ29L4FDRPUuii7eOQ1hOPdO20l2nxgDIpJt4S18jhng2PYRYM/3QyNTP5PuBA3vDH9xvAob5fZO0xJPWzglkqwgo1W8CBR+3ngC87uPHbrmYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XuS6TByw; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=e7gjEyKsXPhn7C32X/yU6zqsqBVSbbQcLZHYCuv4YnIQjQpX73c90S7AWr4pFeKk1YjekVZRshnhICZe27vLuuxIlUn/llvFPJzBGg3s32T9RKgEE/AaRN5H9FQkD/KKbae5Yn+e6alotFr5L8xLxLw7IgRe5zmlmTMmmtdDWTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lm+y7hnW; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XuS6TByw"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76e2eab5baaso1311773b3a.2
-        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:01:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lm+y7hnW"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4716fa1e59so1158143a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:01:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755810070; x=1756414870; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1755810071; x=1756414871; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxt6rTMqHrWA9f8ahxcPmdPJmqaCbIUP8K6s+gPHJdY=;
-        b=XuS6TBywGS443Z9FU5TEJd5ozms0wvpsBQpqE5m9rwTxGaS6DHETd4/l/aZRSM1IBz
-         EIFCPJQwKMQJsYJJneubUrifzJsOGP5NRQp4kvskkdq2EjSZxtuOujsqBF4yoM0m/BJm
-         /RMk7744qMBIBU3MbwzLHftQjf0ZeucWjNh/62vobdE25aRgR7ZGyhScgDqEpJ0cugMz
-         9Y/cOeDoMzeevPGBZmqa9iZ5LuZ5VQlpFIBx/LRMJnRhynTFRRUZW6MaA8VVhZ8SIAoZ
-         pQ5ielNQXy/J3GAZqeR5PIUbtKTdcFif7uJGQYIUQJCW92tVeXLgRJzPxyPIQEdDyaAo
-         Xl0A==
+        bh=WFOpvpsT1MnunRLl4T+BHRi0vN/i3KJyyI1xXmPrPlw=;
+        b=Lm+y7hnWC5vgOCxMmcNJPLK3zIejTYJjOevsfqa+4M7exZHaBbSjxMOpfp0x5Wy5xC
+         buhIPPcUhQxKBh/P5PMrIq16hnbZ2ghbhCuEyL/FWNtGWUDUu4RaS3FvJrs9F5LdvGB5
+         0HVYMZQIobTSceHIPaQrk0p5sR2aLJh5kDu1TT6mLcpW3llByFbcFqrgVJKoPo9c8wYN
+         4MNuSvbPuikhVloxYOTBc/vk1sn8yDwPLRSdofRMi6FX8+NdHxF19V1RBnY0JWlTza1j
+         6P6tx0fND8op7FoGxDxtyW/Mw4aBoSP4pK0HXjfFvgeP5y3/pYF8CexMTH8PBJ8GKssS
+         ruig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755810070; x=1756414870;
+        d=1e100.net; s=20230601; t=1755810071; x=1756414871;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fxt6rTMqHrWA9f8ahxcPmdPJmqaCbIUP8K6s+gPHJdY=;
-        b=vbOhbG9xr7jMkju/nyxytIaNssPeMJVB+Fpf1bpsAzCmk8/HcfxrzU/XRVlojielQL
-         Vj1s1TdStf5Y3a1dolrTJuL8MGxjw5QOA3ztgv0KcjuD+sYz6HWHfnSOElQNHp4GuaJj
-         y+19JxR6p2vSWOyUW2KttHmpg/+/dUrpAa1Zjf96vcsqiAkYxgJcTjNYjUPvJLorWrcO
-         Mme3eS/GmHDCpMKNd+dt4KD67KIvIpmGdBwVsBhUBhhqjsyCokIcZTtPJNaOqEf7G+KY
-         y+8zDqlpofEojBZoP7kVsoP3aw1TMFU4md+oyCyU2ASJQqtSA4FqsymGAThVsumQ+FGw
-         faLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUL9OqE5QEsEHWjuOsmqXUxD+QTZcOs836wOCDDcPQ4LSK6ig3fTKphWosfIRwWcmaZgfp8pj4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwzH7abHf4j0al/VnlL3xZV6XlfUAcVZ1y0vHcDkgmcViUB+Hwa
-	pEcsdGbDsEeApQxPQT56cJRm6tvSkTy1ocIchs9a/ANN1TMUvuUd6ErtXQcqMmHn0hYUELTR08V
-	oIIzC5g==
-X-Google-Smtp-Source: AGHT+IFn+EYj/FE0ePzblUKFMdEC+BFGAdYI0PBx7I9mvhQoZZjMBZ5mHJyHtUrO2Tk/q3sQHu7NuwUXWEg=
-X-Received: from pfbbd13.prod.google.com ([2002:a05:6a00:278d:b0:76e:8abf:185a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7489:b0:240:130e:d781
- with SMTP id adf61e73a8af0-24340c10ac7mr756815637.17.1755810069751; Thu, 21
- Aug 2025 14:01:09 -0700 (PDT)
+        bh=WFOpvpsT1MnunRLl4T+BHRi0vN/i3KJyyI1xXmPrPlw=;
+        b=TYXSkM1kDGoHMxveZg5StlRDOsMnv9H9sfA1BkkfGgZhSN5mbJA2E4GIJDVtymSsh/
+         wuSfVuxQZewkDB3PQyVcHX7S3izse5hzqyieXjwBMZRBaMGMZAwn3w08GqtjlLLFTSMq
+         ayeQp7QkRt68nY+NqFBxFRfjW3IYBsOfmXk9WYup30Wzy/O58U4wVu026qLZN5SWPK0t
+         7Cj4D468sfrggQ5owEui2/ewTglPcCM41b3TvtkYdlCwcRhN4Cy2kyWBlufKohcmmXC5
+         2+MgJ6V+BBnMYBRBgIxpI5QgncVcSZ9T9HnSOUBmwEjT4TbEigNE1fCdVcQ+thr7MPjx
+         SLjg==
+X-Forwarded-Encrypted: i=1; AJvYcCV4VQKcAOj6if1sa2EtkYY7LCPBI0QkdqGd4BJsM/mi8xVcvFxgsZ/a7OKyfaN2UMXQ0+DosWg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzJCEFp0/McTTreB1zz+puKOHFdM4aCveVZ3oQXC2f25DC7K2fJ
+	/MYesuSO9c75jWwLdbNdMWGCbV9Y93/oJcb+NqpOw1ERZyJbBEmac9OHNdrnnThZKlYOFHE8N5g
+	XcDHjqQ==
+X-Google-Smtp-Source: AGHT+IH2D5yvxXbQMYKp9CQ1/YsbKvTYEoUYMROb+eewLnOLV2mjTAu7kJckUk9DqMy3wtdy3hZnzxFFxu8=
+X-Received: from pghz18.prod.google.com ([2002:a63:e112:0:b0:b42:8a4c:7b14])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2446:b0:240:1fb6:d335
+ with SMTP id adf61e73a8af0-24340db0419mr735886637.37.1755810071501; Thu, 21
+ Aug 2025 14:01:11 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 21 Aug 2025 14:00:40 -0700
+Date: Thu, 21 Aug 2025 14:00:41 -0700
 In-Reply-To: <20250821210042.3451147-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250821210042.3451147-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250821210042.3451147-15-seanjc@google.com>
-Subject: [RFC PATCH 14/16] KVM: arm64: Track "forced" information in "struct kvm_page_fault"
+Message-ID: <20250821210042.3451147-16-seanjc@google.com>
+Subject: [RFC PATCH 15/16] KVM: arm64: Extract mmap_lock-protected code to
+ helper for user mem aborts
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -70,128 +71,140 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move the abort handler's local "force_pte" and "s2_force_noncacheable"
-variables into "struct kvm_page_fault" in anticipation of moving the
-mmap_lock-protected code to a separate helper.
+Factor out the mmap_lock-protected portion of user_mem_abort() to a new
+helper, partly to make user_mem_abort() easier to follow, but mostly so
+that the scope of the mmap_lock-protected code is more explicitly bounded.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/mmu.c              | 22 +++++++++++-----------
- 2 files changed, 14 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/mmu.c | 96 ++++++++++++++++++++++++--------------------
+ 1 file changed, 52 insertions(+), 44 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6a99f7fa065d..fa52546bf870 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -440,6 +440,9 @@ struct kvm_page_fault {
- 	} vma;
- 
- 	long pagesize;
-+
-+	bool force_pte;
-+	bool s2_force_noncacheable;
- };
- 
- /*
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 575a4f9f2583..fec3a6aeabd0 100644
+index fec3a6aeabd0..ea326d66f027 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1469,8 +1469,7 @@ static bool kvm_vma_is_cacheable(struct vm_area_struct *vma)
- static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+@@ -1466,47 +1466,10 @@ static bool kvm_vma_is_cacheable(struct vm_area_struct *vma)
+ 	}
+ }
+ 
+-static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
++static int kvm_gather_fault_vma_info(struct kvm_vcpu *vcpu,
++				     struct kvm_page_fault *fault)
  {
- 	int ret = 0;
--	bool writable, force_pte = false;
--	bool s2_force_noncacheable = false;
-+	bool writable;
- 	struct kvm *kvm = vcpu->kvm;
+-	int ret = 0;
+-	bool writable;
+-	struct kvm *kvm = vcpu->kvm;
  	struct vm_area_struct *vma;
- 	void *memcache;
-@@ -1526,7 +1525,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	 * memslots.
- 	 */
- 	if (logging_active) {
--		force_pte = true;
-+		fault->force_pte = true;
- 		fault->vma.pageshift = PAGE_SHIFT;
- 	} else {
- 		fault->vma.pageshift = get_vma_page_shift(vma, fault->hva);
-@@ -1548,7 +1547,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		fallthrough;
- 	case CONT_PTE_SHIFT:
- 		fault->vma.pageshift = PAGE_SHIFT;
--		force_pte = true;
-+		fault->force_pte = true;
- 		fallthrough;
- 	case PAGE_SHIFT:
- 		break;
-@@ -1561,7 +1560,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	if (fault->nested) {
- 		unsigned long max_map_size;
- 
--		max_map_size = force_pte ? PAGE_SIZE : PUD_SIZE;
-+		max_map_size = fault->force_pte ? PAGE_SIZE : PUD_SIZE;
- 
- 		WARN_ON_ONCE(fault->ipa != kvm_s2_trans_output(fault->nested));
- 
-@@ -1581,7 +1580,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
- 			max_map_size = PAGE_SIZE;
- 
--		force_pte = (max_map_size == PAGE_SIZE);
-+		fault->force_pte = (max_map_size == PAGE_SIZE);
- 		fault->pagesize = min(fault->pagesize, (long)max_map_size);
- 	}
- 
-@@ -1656,7 +1655,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 			 * In both cases, we don't let transparent_hugepage_adjust()
- 			 * change things at the last minute.
- 			 */
--			s2_force_noncacheable = true;
-+			fault->s2_force_noncacheable = true;
- 		}
- 	} else if (logging_active && !fault->write) {
- 		/*
-@@ -1666,7 +1665,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		writable = false;
- 	}
- 
--	if (fault->exec && s2_force_noncacheable)
-+	if (fault->exec && fault->s2_force_noncacheable)
- 		return -ENOEXEC;
+-	void *memcache;
+-	bool logging_active = memslot_is_logging(fault->slot);
+-	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+-	struct kvm_pgtable *pgt;
+-	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
+-
+-	VM_BUG_ON(fault->write && fault->exec);
+-
+-	if (fault->is_perm && !fault->write && !fault->exec) {
+-		kvm_err("Unexpected L2 read permission error\n");
+-		return -EFAULT;
+-	}
+-
+-	if (!is_protected_kvm_enabled())
+-		memcache = &vcpu->arch.mmu_page_cache;
+-	else
+-		memcache = &vcpu->arch.pkvm_memcache;
+-
+-	/*
+-	 * Permission faults just need to update the existing leaf entry,
+-	 * and so normally don't require allocations from the memcache. The
+-	 * only exception to this is when dirty logging is enabled at runtime
+-	 * and a write fault needs to collapse a block entry into a table.
+-	 */
+-	if (!fault->is_perm || (logging_active && fault->write)) {
+-		int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+-
+-		if (!is_protected_kvm_enabled())
+-			ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
+-		else
+-			ret = topup_hyp_memcache(memcache, min_pages);
+-
+-		if (ret)
+-			return ret;
+-	}
  
  	/*
-@@ -1699,7 +1698,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	 * If we are not forced to use page mapping, check if we are
- 	 * backed by a THP and thus use block mapping if possible.
- 	 */
--	if (fault->pagesize == PAGE_SIZE && !(force_pte || s2_force_noncacheable)) {
-+	if (fault->pagesize == PAGE_SIZE &&
-+	    !(fault->force_pte || fault->s2_force_noncacheable)) {
- 		if (fault->is_perm && fault->granule > PAGE_SIZE)
- 			fault->pagesize = fault->granule;
- 		else
-@@ -1711,7 +1711,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		}
+ 	 * Let's check if we will get back a huge page backed by hugetlbfs, or
+@@ -1520,11 +1483,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 		return -EFAULT;
  	}
  
--	if (!fault->is_perm && !s2_force_noncacheable && kvm_has_mte(kvm)) {
-+	if (!fault->is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm)) {
- 		/* Check the VMM hasn't introduced a new disallowed VMA */
- 		if (fault->vma.vm_flags & VM_MTE_ALLOWED) {
- 			sanitise_mte_tags(kvm, fault->pfn, fault->pagesize);
-@@ -1727,7 +1727,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	if (fault->exec)
- 		prot |= KVM_PGTABLE_PROT_X;
+-	/*
+-	 * logging_active is guaranteed to never be true for VM_PFNMAP
+-	 * memslots.
+-	 */
+-	if (logging_active) {
++	/* Logging is guaranteed to never be active for VM_PFNMAP memslots. */
++	if (memslot_is_logging(fault->slot)) {
+ 		fault->force_pte = true;
+ 		fault->vma.pageshift = PAGE_SHIFT;
+ 	} else {
+@@ -1613,6 +1573,54 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+ 	mmap_read_unlock(current->mm);
  
--	if (s2_force_noncacheable) {
-+	if (fault->s2_force_noncacheable) {
- 		if (fault->vma.vm_flags & VM_ALLOW_ANY_UNCACHED)
- 			prot |= KVM_PGTABLE_PROT_NORMAL_NC;
- 		else
++	return 0;
++}
++
++static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
++{
++	int ret = 0;
++	bool writable;
++	struct kvm *kvm = vcpu->kvm;
++	void *memcache;
++	bool logging_active = memslot_is_logging(fault->slot);
++	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
++	struct kvm_pgtable *pgt;
++	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
++
++	VM_BUG_ON(fault->write && fault->exec);
++
++	if (fault->is_perm && !fault->write && !fault->exec) {
++		kvm_err("Unexpected L2 read permission error\n");
++		return -EFAULT;
++	}
++
++	if (!is_protected_kvm_enabled())
++		memcache = &vcpu->arch.mmu_page_cache;
++	else
++		memcache = &vcpu->arch.pkvm_memcache;
++
++	/*
++	 * Permission faults just need to update the existing leaf entry,
++	 * and so normally don't require allocations from the memcache. The
++	 * only exception to this is when dirty logging is enabled at runtime
++	 * and a write fault needs to collapse a block entry into a table.
++	 */
++	if (!fault->is_perm || (logging_active && fault->write)) {
++		int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
++
++		if (!is_protected_kvm_enabled())
++			ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
++		else
++			ret = topup_hyp_memcache(memcache, min_pages);
++
++		if (ret)
++			return ret;
++	}
++
++	ret = kvm_gather_fault_vma_info(vcpu, fault);
++	if (ret)
++		return ret;
++
+ 	fault->pfn = __kvm_faultin_pfn(fault->slot, fault->gfn,
+ 				       fault->write ? FOLL_WRITE : 0,
+ 				       &writable, &fault->page);
 -- 
 2.51.0.261.g7ce5a0a67e-goog
 
