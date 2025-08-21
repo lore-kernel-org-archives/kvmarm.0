@@ -1,107 +1,380 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2EB2ED17C
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 10:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C772367AE
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 11:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755773749; cv=none; b=ICcZbWA/zrRhE9x7S6P9KC1Xh3hyXAN1wHMdF6TPDivju/yP/bB6NWFeSMZ1djK+S4TI1FAnJYec8lpjXffLffhZldwQvyl/2lokeNHV+KbsDRV+8UYC9I+ZAvWacrWZpUFfF8NSZio9OBIUrOFqWq5ofgwdDr9l//EgMvnZa/A=
+	t=1755775790; cv=none; b=PWrctwDjrdxLkDR39ZmtFRpHZ8S6t0qLL6coDjyVvnZSPpimuZkptIRKtupL19cIEgOf8OruGF1NF1A4biMYFuhpC6XgNUdf18abSusWEAR9KI+gGsyF786AShEQKqwdrkmc8U4YBTS59fmGaSsSFjgdT+vfWKgF9q3abcdz/js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755773749; c=relaxed/simple;
-	bh=vSowepKw8Ryt0NuXgAWRakxcuhgjM/DtykqDnbHXwWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=f/kNA8JmH8Vgtdcgk5AvdCBU7B4XvpxWdshEufGiMibO74DWJTMKv1CJH58aWdab8VI2ortoTVs1ANThq6Yzrj2zLGvZZhxvxRoM7SVkI3O1Zjr5BB51WIo4Of+s7B224b8ILEx44VvFSIVZrXMIywrsqKcS1jtYFBGJBfjF6DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4c70XD5X71z2VRJ7;
-	Thu, 21 Aug 2025 18:52:44 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3E2811A0188;
-	Thu, 21 Aug 2025 18:55:35 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 21 Aug 2025 18:55:34 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 21 Aug 2025 18:55:34 +0800
-Message-ID: <de355a64-01f6-cbc5-7a88-5f57687d5fb8@hisilicon.com>
-Date: Thu, 21 Aug 2025 18:55:13 +0800
+	s=arc-20240116; t=1755775790; c=relaxed/simple;
+	bh=JI/MpSX4dyHaJFGIoS5eAQWZBphXVcvUkH4kTW3XBio=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pmAHtsBVP6cd3lBnRrcl+P6Ur84I/nEuypG+NY0WKKvHwsmtifr4XOYW6WevMBlsWB/daGrGmXYVUI1ErGv6W46MMxxrTcaQqUgDm6bMWPewfFgakH5QViHBDqls4WlNxHQ/oitWLt6uEchiFobxbPcaDKsUSsTPtw6TeOyecbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 780B7152B;
+	Thu, 21 Aug 2025 04:29:38 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0E7603F58B;
+	Thu, 21 Aug 2025 04:29:44 -0700 (PDT)
+Message-ID: <fb782326-06d6-4e3d-9614-6f5798dafee4@arm.com>
+Date: Thu, 21 Aug 2025 12:29:43 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v4 3/6] KVM: arm64: vgic-v3: Allow access to GICD_IIDR
- prior to initialization
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 6/6] KVM: arm64: Get rid of ARM64_FEATURE_MASK()
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Cornelia Huck <cohuck@redhat.com>
+References: <20250817202158.395078-1-maz@kernel.org>
+ <20250817202158.395078-7-maz@kernel.org>
 Content-Language: en-US
-To: Oliver Upton <oliver.upton@linux.dev>, <kvmarm@lists.linux.dev>
-CC: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, "Suzuki K
- Poulose" <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>, jiangkunkun
-	<jiangkunkun@huawei.com>
-References: <20250709211417.2074487-1-oliver.upton@linux.dev>
- <20250709211417.2074487-4-oliver.upton@linux.dev>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <20250709211417.2074487-4-oliver.upton@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+From: Ben Horgan <ben.horgan@arm.com>
+In-Reply-To: <20250817202158.395078-7-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemq200004.china.huawei.com (7.202.195.237)
 
-On 2025/7/10 5:14, Oliver Upton wrote:
-> KVM allows userspace to write GICD_IIDR for backwards-compatibility with
-> older kernels, where new implementation revisions have new features.
-> Unfortunately this is allowed to happen at runtime, and ripping features
-> out from underneath a running guest is a terrible idea.
+Hi Marc,
+
+On 8/17/25 21:21, Marc Zyngier wrote:
+> The ARM64_FEATURE_MASK() macro was a hack introduce whilst the
+> automatic generation of sysreg encoding was introduced, and was
+> too unreliable to be entirely trusted.
 > 
-> While we can't do anything about the ABI, prepare for more ID-like
-> registers by allowing access to GICD_IIDR prior to VGIC initialization.
-> Subsequent changes will allow the VMM to further provision the GIC
-> feature set, e.g. the presence of nASSGIcap.
+> We are in a better place now, and we could really do without this
+> macro. Get rid of it altogether.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/vgic/vgic-init.c       |  9 +--------
->  arch/arm64/kvm/vgic/vgic-kvm-device.c | 20 +++++++++++++++++++-
->  2 files changed, 20 insertions(+), 9 deletions(-)
+>   arch/arm64/include/asm/sysreg.h               |  3 --
+>   arch/arm64/kvm/arm.c                          |  8 ++--
+>   arch/arm64/kvm/sys_regs.c                     | 40 +++++++++----------
+>   tools/arch/arm64/include/asm/sysreg.h         |  3 --
+>   .../selftests/kvm/arm64/aarch32_id_regs.c     |  2 +-
+>   .../selftests/kvm/arm64/debug-exceptions.c    | 12 +++---
+>   .../testing/selftests/kvm/arm64/no-vgic-v3.c  |  4 +-
+>   .../selftests/kvm/arm64/page_fault_test.c     |  6 +--
+>   .../testing/selftests/kvm/arm64/set_id_regs.c |  8 ++--
+>   .../selftests/kvm/arm64/vpmu_counter_access.c |  2 +-
+>   .../selftests/kvm/lib/arm64/processor.c       |  6 +--
+>   11 files changed, 44 insertions(+), 50 deletions(-)
 > 
-[...]
->  /*
->   * vgic_v3_attr_regs_access - allows user space to access VGIC v3 state
->   *
-> @@ -552,7 +570,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
->  
->  	mutex_lock(&dev->kvm->arch.config_lock);
->  
-> -	if (!vgic_initialized(dev->kvm)) {
-> +	if (!(vgic_initialized(dev->kvm) || reg_allowed_pre_init(attr))) {
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index d5b5f2ae1afaa..6604fd6f33f45 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -1142,9 +1142,6 @@
+>   
+>   #define ARM64_FEATURE_FIELD_BITS	4
+While you're at it, consider getting rid of ARM64_FEATURE_FIELD_BITS 
+too. This is only used in the set_id_regs.c selftest.
+>   
+> -/* Defined for compatibility only, do not add new users. */
+> -#define ARM64_FEATURE_MASK(x)	(x##_MASK)
+> -
+>   #ifdef __ASSEMBLY__
+>   
+>   	.macro	mrs_s, rt, sreg
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 888f7c7abf547..5bf101c869c9a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2408,12 +2408,12 @@ static u64 get_hyp_id_aa64pfr0_el1(void)
+>   	 */
+>   	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+>   
+> -	val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+> -		 ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+> +	val &= ~(ID_AA64PFR0_EL1_CSV2 |
+> +		 ID_AA64PFR0_EL1_CSV3);
+>   
+> -	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
+> +	val |= FIELD_PREP(ID_AA64PFR0_EL1_CSV2,
+>   			  arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED);
+> -	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
+> +	val |= FIELD_PREP(ID_AA64PFR0_EL1_CSV3,
+>   			  arm64_get_meltdown_state() == SPECTRE_UNAFFECTED);
+>   
+>   	return val;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e149786f8bde0..00a485180c4eb 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1617,18 +1617,18 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>   		break;
+>   	case SYS_ID_AA64ISAR1_EL1:
+>   		if (!vcpu_has_ptrauth(vcpu))
+> -			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) |
+> -				 ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API) |
+> -				 ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPA) |
+> -				 ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPI));
+> +			val &= ~(ID_AA64ISAR1_EL1_APA |
+> +				 ID_AA64ISAR1_EL1_API |
+> +				 ID_AA64ISAR1_EL1_GPA |
+> +				 ID_AA64ISAR1_EL1_GPI);
+>   		break;
+>   	case SYS_ID_AA64ISAR2_EL1:
+>   		if (!vcpu_has_ptrauth(vcpu))
+> -			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3) |
+> -				 ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3));
+> +			val &= ~(ID_AA64ISAR2_EL1_APA3 |
+> +				 ID_AA64ISAR2_EL1_GPA3);
+>   		if (!cpus_have_final_cap(ARM64_HAS_WFXT) ||
+>   		    has_broken_cntvoff())
+> -			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
+> +			val &= ~ID_AA64ISAR2_EL1_WFxT;
+>   		break;
+>   	case SYS_ID_AA64ISAR3_EL1:
+>   		val &= ID_AA64ISAR3_EL1_FPRCVT | ID_AA64ISAR3_EL1_FAMINMAX;
+> @@ -1644,7 +1644,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>   		       ID_AA64MMFR3_EL1_S1PIE;
+>   		break;
+>   	case SYS_ID_MMFR4_EL1:
+> -		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
+> +		val &= ~ID_MMFR4_EL1_CCIDX;
+>   		break;
+>   	}
+>   
+> @@ -1830,22 +1830,22 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val)
+>   	u64 pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+>   
+>   	if (!kvm_has_mte(vcpu->kvm)) {
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac);
+> +		val &= ~ID_AA64PFR1_EL1_MTE;
+> +		val &= ~ID_AA64PFR1_EL1_MTE_frac;
+>   	}
+>   
+>   	if (!(cpus_have_final_cap(ARM64_HAS_RASV1P1_EXTN) &&
+>   	      SYS_FIELD_GET(ID_AA64PFR0_EL1, RAS, pfr0) == ID_AA64PFR0_EL1_RAS_IMP))
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RAS_frac);
+> -
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RNDR_trap);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_NMI);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_GCS);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_THE);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTEX);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_PFAR);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MPAM_frac);
+> +		val &= ~ID_AA64PFR1_EL1_RAS_frac;
+> +
+> +	val &= ~ID_AA64PFR1_EL1_SME;
+> +	val &= ~ID_AA64PFR1_EL1_RNDR_trap;
+> +	val &= ~ID_AA64PFR1_EL1_NMI;
+> +	val &= ~ID_AA64PFR1_EL1_GCS;
+> +	val &= ~ID_AA64PFR1_EL1_THE;
+> +	val &= ~ID_AA64PFR1_EL1_MTEX;
+> +	val &= ~ID_AA64PFR1_EL1_PFAR;
+> +	val &= ~ID_AA64PFR1_EL1_MPAM_frac;
+>   
+>   	return val;
+>   }
+> diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+> index 690b6ebd118f4..65f2759ea27a3 100644
+> --- a/tools/arch/arm64/include/asm/sysreg.h
+> +++ b/tools/arch/arm64/include/asm/sysreg.h
+> @@ -1080,9 +1080,6 @@
+>   
+>   #define ARM64_FEATURE_FIELD_BITS	4
+>   
+> -/* Defined for compatibility only, do not add new users. */
+> -#define ARM64_FEATURE_MASK(x)	(x##_MASK)
+> -
+>   #ifdef __ASSEMBLY__
+>   
+>   	.macro	mrs_s, rt, sreg
+> diff --git a/tools/testing/selftests/kvm/arm64/aarch32_id_regs.c b/tools/testing/selftests/kvm/arm64/aarch32_id_regs.c
+> index cef8f7323ceb8..713005b6f508e 100644
+> --- a/tools/testing/selftests/kvm/arm64/aarch32_id_regs.c
+> +++ b/tools/testing/selftests/kvm/arm64/aarch32_id_regs.c
+> @@ -146,7 +146,7 @@ static bool vcpu_aarch64_only(struct kvm_vcpu *vcpu)
+>   
+>   	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
+>   
+> -	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
+> +	el0 = FIELD_GET(ID_AA64PFR0_EL1_EL0, val);
+>   	return el0 == ID_AA64PFR0_EL1_EL0_IMP;
+>   }
+>   
+> diff --git a/tools/testing/selftests/kvm/arm64/debug-exceptions.c b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> index e34963956fbc9..1d431de8729c5 100644
+> --- a/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> +++ b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> @@ -116,12 +116,12 @@ static void reset_debug_state(void)
+>   
+>   	/* Reset all bcr/bvr/wcr/wvr registers */
+>   	dfr0 = read_sysreg(id_aa64dfr0_el1);
+> -	brps = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_BRPs), dfr0);
+> +	brps = FIELD_GET(ID_AA64DFR0_EL1_BRPs, dfr0);
+>   	for (i = 0; i <= brps; i++) {
+>   		write_dbgbcr(i, 0);
+>   		write_dbgbvr(i, 0);
+>   	}
+> -	wrps = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_WRPs), dfr0);
+> +	wrps = FIELD_GET(ID_AA64DFR0_EL1_WRPs, dfr0);
+>   	for (i = 0; i <= wrps; i++) {
+>   		write_dbgwcr(i, 0);
+>   		write_dbgwvr(i, 0);
+> @@ -418,7 +418,7 @@ static void guest_code_ss(int test_cnt)
+>   
+>   static int debug_version(uint64_t id_aa64dfr0)
+>   {
+> -	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), id_aa64dfr0);
+> +	return FIELD_GET(ID_AA64DFR0_EL1_DebugVer, id_aa64dfr0);
+>   }
+>   
+>   static void test_guest_debug_exceptions(uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
+> @@ -539,14 +539,14 @@ void test_guest_debug_exceptions_all(uint64_t aa64dfr0)
+>   	int b, w, c;
+>   
+>   	/* Number of breakpoints */
+> -	brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_BRPs), aa64dfr0) + 1;
+> +	brp_num = FIELD_GET(ID_AA64DFR0_EL1_BRPs, aa64dfr0) + 1;
+>   	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required");
+>   
+>   	/* Number of watchpoints */
+> -	wrp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_WRPs), aa64dfr0) + 1;
+> +	wrp_num = FIELD_GET(ID_AA64DFR0_EL1_WRPs, aa64dfr0) + 1;
+>   
+>   	/* Number of context aware breakpoints */
+> -	ctx_brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_CTX_CMPs), aa64dfr0) + 1;
+> +	ctx_brp_num = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs, aa64dfr0) + 1;
+>   
+>   	pr_debug("%s brp_num:%d, wrp_num:%d, ctx_brp_num:%d\n", __func__,
+>   		 brp_num, wrp_num, ctx_brp_num);
+> diff --git a/tools/testing/selftests/kvm/arm64/no-vgic-v3.c b/tools/testing/selftests/kvm/arm64/no-vgic-v3.c
+> index ebd70430c89de..f222538e60841 100644
+> --- a/tools/testing/selftests/kvm/arm64/no-vgic-v3.c
+> +++ b/tools/testing/selftests/kvm/arm64/no-vgic-v3.c
+> @@ -54,7 +54,7 @@ static void guest_code(void)
+>   	 * Check that we advertise that ID_AA64PFR0_EL1.GIC == 0, having
+>   	 * hidden the feature at runtime without any other userspace action.
+>   	 */
+> -	__GUEST_ASSERT(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC),
+> +	__GUEST_ASSERT(FIELD_GET(ID_AA64PFR0_EL1_GIC,
+>   				 read_sysreg(id_aa64pfr0_el1)) == 0,
+>   		       "GICv3 wrongly advertised");
+>   
+> @@ -165,7 +165,7 @@ int main(int argc, char *argv[])
+>   
+>   	vm = vm_create_with_one_vcpu(&vcpu, NULL);
+>   	pfr0 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
+> -	__TEST_REQUIRE(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), pfr0),
+> +	__TEST_REQUIRE(FIELD_GET(ID_AA64PFR0_EL1_GIC, pfr0),
+>   		       "GICv3 not supported.");
+>   	kvm_vm_free(vm);
+>   
+> diff --git a/tools/testing/selftests/kvm/arm64/page_fault_test.c b/tools/testing/selftests/kvm/arm64/page_fault_test.c
+> index dc6559dad9d86..4ccbd389d1336 100644
+> --- a/tools/testing/selftests/kvm/arm64/page_fault_test.c
+> +++ b/tools/testing/selftests/kvm/arm64/page_fault_test.c
+> @@ -95,14 +95,14 @@ static bool guest_check_lse(void)
+>   	uint64_t isar0 = read_sysreg(id_aa64isar0_el1);
+>   	uint64_t atomic;
+>   
+> -	atomic = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR0_EL1_ATOMIC), isar0);
+> +	atomic = FIELD_GET(ID_AA64ISAR0_EL1_ATOMIC, isar0);
+>   	return atomic >= 2;
+>   }
+>   
+>   static bool guest_check_dc_zva(void)
+>   {
+>   	uint64_t dczid = read_sysreg(dczid_el0);
+> -	uint64_t dzp = FIELD_GET(ARM64_FEATURE_MASK(DCZID_EL0_DZP), dczid);
+> +	uint64_t dzp = FIELD_GET(DCZID_EL0_DZP, dczid);
+>   
+>   	return dzp == 0;
+>   }
+> @@ -195,7 +195,7 @@ static bool guest_set_ha(void)
+>   	uint64_t hadbs, tcr;
+>   
+>   	/* Skip if HA is not supported. */
+> -	hadbs = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_HAFDBS), mmfr1);
+> +	hadbs = FIELD_GET(ID_AA64MMFR1_EL1_HAFDBS, mmfr1);
+>   	if (hadbs == 0)
+>   		return false;
+>   
+> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> index d3bf9204409c3..36d40c267b994 100644
+> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> @@ -594,8 +594,8 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
+>   	 */
+>   	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
+>   
+> -	mte = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE), val);
+> -	mte_frac = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac), val);
+> +	mte = FIELD_GET(ID_AA64PFR1_EL1_MTE, val);
+> +	mte_frac = FIELD_GET(ID_AA64PFR1_EL1_MTE_frac, val);
+>   	if (mte != ID_AA64PFR1_EL1_MTE_MTE2 ||
+>   	    mte_frac != ID_AA64PFR1_EL1_MTE_frac_NI) {
+>   		ksft_test_result_skip("MTE_ASYNC or MTE_ASYMM are supported, nothing to test\n");
+> @@ -612,7 +612,7 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
+> -	mte_frac = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac), val);
+> +	mte_frac = FIELD_GET(ID_AA64PFR1_EL1_MTE_frac, val);
+>   	if (mte_frac == ID_AA64PFR1_EL1_MTE_frac_NI)
+>   		ksft_test_result_pass("ID_AA64PFR1_EL1.MTE_frac=0 accepted and still 0xF\n");
+>   	else
+> @@ -774,7 +774,7 @@ int main(void)
+>   
+>   	/* Check for AARCH64 only system */
+>   	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
+> -	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
+> +	el0 = FIELD_GET(ID_AA64PFR0_EL1_EL0, val);
+>   	aarch64_only = (el0 == ID_AA64PFR0_EL1_EL0_IMP);
+>   
+>   	ksft_print_header();
+> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> index f16b3b27e32ed..a0c4ab8391559 100644
+> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> @@ -441,7 +441,7 @@ static void create_vpmu_vm(void *guest_code)
+>   
+>   	/* Make sure that PMUv3 support is indicated in the ID register */
+>   	dfr0 = vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1));
+> -	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), dfr0);
+> +	pmuver = FIELD_GET(ID_AA64DFR0_EL1_PMUVer, dfr0);
+>   	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
+>   		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
+>   		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> index 9d69904cb6084..eb115123d7411 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> @@ -573,15 +573,15 @@ void aarch64_get_supported_page_sizes(uint32_t ipa, uint32_t *ipa4k,
+>   	err = ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
+>   	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_GET_ONE_REG, vcpu_fd));
+>   
+> -	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN4), val);
+> +	gran = FIELD_GET(ID_AA64MMFR0_EL1_TGRAN4, val);
+>   	*ipa4k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN4_NI,
+>   					ID_AA64MMFR0_EL1_TGRAN4_52_BIT);
+>   
+> -	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN64), val);
+> +	gran = FIELD_GET(ID_AA64MMFR0_EL1_TGRAN64, val);
+>   	*ipa64k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN64_NI,
+>   					ID_AA64MMFR0_EL1_TGRAN64_IMP);
+>   
+> -	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN16), val);
+> +	gran = FIELD_GET(ID_AA64MMFR0_EL1_TGRAN16, val);
+>   	*ipa16k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN16_NI,
+>   					ID_AA64MMFR0_EL1_TGRAN16_52_BIT);
+>   
 
-I am confused here, the logic is that:
+-- 
+Thanks,
 
-1. For the ID registers, they can not be modified after vGIC init.
-2. For other registers, the original logic is that they should be modified after
-   vGIC init.
+Ben
 
-So code here should be:
-
-if ((reg_allowed_pre_init(attr) && vgic_initialized(dev->kvm)) ||
-    !vgic_initialized(dev->kvm)) {
-         ret = -EBUSY;
-         goto out;
-}
-
-Not sure my understanding is right.
-
-Best,
-Zhou
-
->  		ret = -EBUSY;
->  		goto out;
->  	}
