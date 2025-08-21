@@ -1,54 +1,54 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F5C2F3C26
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 08:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA40D2F5318
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 08:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755764098; cv=none; b=Kd6HBNuycOXts1sfHZ05S5vR40cV+3nfmoRC9aLYVjWl1yMxftAIlRJ9rrRerH1suFC591tMqdL3RJ+fbvLnroGnNCu66C/x7vyU3sGdTq1QRY/V/CzbmE6nStvwvuvmb5ojTKx4MvVRq8LhGokHytOy8wRjEG7ullnFWXBwjoE=
+	t=1755764099; cv=none; b=ufJq6eMbUput+dH6JORmsJ80czqOJkLom5KHKKUAf+mmsB0+f12H6B1lVSVp/2YaXWtQlNDhN89st6oZUWdoubUKKw7n6/m3WBa9LtYGsWgFbj4uIm4J5oDRBDgcXnOwsPPhg6bv3BnQWAL8VrvmPN+G6J4qESdrJmKAwEBvagQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755764098; c=relaxed/simple;
-	bh=GYhMRL/4BrKlzUJdbWBycxCFy/OOj1KxnU0mfovQ03k=;
+	s=arc-20240116; t=1755764099; c=relaxed/simple;
+	bh=3KMoWYrKCS9iXFyZU23vQdmkGsH1bjakmfocPm6yigk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Lz9ZkuPXiYGKsaC254U/z2YRtHECiAchF4UNKa088MBNFoLIhh+0jjKveByvRlcKJLocve56PCdh72d+JXvhHLfaRxI9XiKMMMHLFp+mK16m5zUGvHK7RKGc/s8vgMa6zUJoZ4QcwMw9ofOfh6qrmKOyT9hn4SpGOcTub2jscR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GCt8tfoF; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=nkX5NiE8ETv2f9xh/o2wcPB0ymeB+oLfXk7XZbm7oRE0ZE7L1dzhUbxA5moWiXBI/VNnY5zFxwGXHbWDENpu/RltBi7hs3hw+PN2HPWf6xI64SoqLaFgXMYHFOvo95ktlwvZeTHZ9MRxl4V+xC//KqH3a5jpjyp2Huf+ZG8qDl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cKGa7EWf; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GCt8tfoF"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3c3b22f45eeso595727f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 01:14:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cKGa7EWf"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45a1b0015aaso3289885e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 01:14:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755764094; x=1756368894; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1755764096; x=1756368896; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VJuYw9YtOUTxOKcJe9GYPUdg6A5eauGTuxfSWUfKtck=;
-        b=GCt8tfoFwt/G8lbqFx4omO09ll+Knlpun8rCgGzaxcxvQAddvnfSd6Hi3k3Owwp5O5
-         gp1PSlDky9hdyv6YETZsM7L9bPnvprL/so8wITHfn1Ax76TYRTNamAoepA9MC00vmuE5
-         afTsCTjbQ0yy9NBPpDvagUuw/+Rt/ENh1dxDCqLPm4f7KZh5YTss2wmxJvLif7C4tAYx
-         u/5i9EFw7I8dwaoPlxmjove0P/u2gr+dwHuY9YOfRxtUj7uwa1Qi6CLg3K9GIH0CizrC
-         SMii5aZMlu7tYhoulpHTgP/mkF/G9Y4//5HVfa9hWsnRpdDi8ifexWE6WL3nTZMyyWmQ
-         kB5A==
+        bh=lXmeaJhI9e99CmL9wkkDfiednrjI4qTS7gtaFJx7Vrs=;
+        b=cKGa7EWfk7a1pXh0PVwvr2shdn+7KFE4rqow9NTZA8Vu5VNKgZ463bnso3ybr6X8lk
+         29Bs3QZDHL50hUEAWNSmKBQndUKte0hU9Ys6+uAwvqudj3MPzIxKrwhPYtJ8xhJgttdd
+         GFZKPfpOBufdCGBHIKkYOSA2x8xA+g1XD3kTX3u4sm3+eRJUEESYst87Hj0tuwrNDmwQ
+         cYyqN6MugFVkVNu0cTGsP2//yvi3QRGpchBBK5wd8x/tigve6S93V8K30P2/JQKg/2fM
+         gmv+RgJ/lEnz6mLg25S8nlqDmpOYQyEe2kbOgwxAmC/RmTEjHnZn2vQZhbuEFeWibSAI
+         yX2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755764094; x=1756368894;
+        d=1e100.net; s=20230601; t=1755764096; x=1756368896;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VJuYw9YtOUTxOKcJe9GYPUdg6A5eauGTuxfSWUfKtck=;
-        b=vppjosX7Mv8voRvOFJKH+qaGjOmilFQsgyoTUaqjYLnZ3Yjk+XiVdwOLdDXGQG1kxk
-         LHsDrY6kuL9WIqkRru++QmZPsTJCyqACGDKoc30fdn2eKlBcwlwIf5Q7/dRt+4lRQhnq
-         WuniAesZcFMY47J1SAqyuLh8SKTHFREbX6AUmDfvYweqaDCeOekRgKovM8Df5nLimpvk
-         DbnRntQgi7xEo1KVy/8J/ulLhEV6iEMVJ1L/id8lnJmWxMmuodDJfJexnbi7Y4RgB44r
-         /SzrDnCQJkTAs9x+Tb4WrVkzPicmOm+/OVNvwphWV4Ddh6HezRldK1LGOL2fFIsqf1GS
-         4Glw==
-X-Gm-Message-State: AOJu0YzIQERufDRnbtuPpwvBYU+7JmuhBFJUHSpymaERtVUVqb9T1kz1
-	QlX32hIz2S+ezSnhzhsE08KrO+o4hZrgLEOUFfl3LWhiLW0UbX2MuT2M4BDjl0OyaBPVTw4mWRM
-	uIkoGz0oQize20/AXd1SB3A==
-X-Google-Smtp-Source: AGHT+IEinA++oc/gQDS+j3wuYMFfToMe5DnZzzdAdhRTYs5/w3tHItN2vCEdHVa+TZ6bcaADQEZqE25FZvUvHW2b
-X-Received: from wrbcm4.prod.google.com ([2002:a5d:5f44:0:b0:3a5:648f:da85])
+        bh=lXmeaJhI9e99CmL9wkkDfiednrjI4qTS7gtaFJx7Vrs=;
+        b=EofX41j+BQkOX+KvmL96qZSRXKNda9MwLH3leLSxjCzKVGQrxwCDG8xEcPpACUrqVr
+         VSUWQeFDJD29cpMuyvtj9wP7ERb8yfgRhAt2UnvVCwGqdMrAmuZbqZUZwxdtgejZjOS+
+         1ED+zPMxlqjNkiZxjng4Rh3TmSSyIg8IWGUxMEPXvCsYlAx2328zbTeIhJ+KkqL3u+rr
+         ZkmphZqL19IEBEIxtDlv361v5j7/UmmJzrRs3mPjD1gPXRhel8wJYIDjZWH/kJDDNe/1
+         WY2gyPX7sTP+bzTVvpkNkhCPXusEiwCxNs6A0AdIxomiWfs8WxDQt15NE0z7Vak5QcGc
+         yviw==
+X-Gm-Message-State: AOJu0YzoGF2oKerwVYJ8jWG3jykX1Rhr6tqe0f1oboElTS0qM6Ma7nYA
+	R4iipn/QpTyBF4c/qA7rJykR2zBnf9yejYu7kTsY30VTnQUis+/gO6MHa8I4+U9uf8H258/EDSL
+	1Slbr7J354s1yPs0LXPeY9w==
+X-Google-Smtp-Source: AGHT+IHVkLSbuPXaBGbeYxLB8Apzj2J/LjIQ1ACzqcVV+IhVmKpANZi8n0fKVREaY1XDOmHvrY0P+LX9S3g8rjan
+X-Received: from wmcn3-n2.prod.google.com ([2002:a05:600c:c0c3:20b0:45b:4777:8063])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:2404:b0:3c3:973a:fe3d with SMTP id ffacd0b85a97d-3c497838009mr1125897f8f.59.1755764093978;
- Thu, 21 Aug 2025 01:14:53 -0700 (PDT)
-Date: Thu, 21 Aug 2025 09:14:10 +0100
+ 2002:a05:600c:a46:b0:45b:47e1:ef79 with SMTP id 5b1f17b1804b1-45b4d869ceemr12017085e9.36.1755764096134;
+ Thu, 21 Aug 2025 01:14:56 -0700 (PDT)
+Date: Thu, 21 Aug 2025 09:14:12 +0100
 In-Reply-To: <20250821081412.1008261-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250821081412.1008261-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.51.0.rc2.233.g662b1ed5c5-goog
-Message-ID: <20250821081412.1008261-23-vdonnefort@google.com>
-Subject: [PATCH v6 22/24] KVM: arm64: Add hyp_enter/hyp_exit events to pKVM hyp
+Message-ID: <20250821081412.1008261-25-vdonnefort@google.com>
+Subject: [PATCH v6 24/24] tracing: selftests: Add pKVM trace remote tests
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -67,181 +67,80 @@ To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	jstultz@google.com, qperret@google.com, will@kernel.org, 
 	aneesh.kumar@kernel.org, kernel-team@android.com, 
-	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>
+	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The hyp_enter and hyp_exit events are logged by the hypervisor any time
-it is entered and exited.
+Run the trace remote selftests with the pKVM trace remote "hypervisor".
 
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Cc: linux-kselftest@vger.kernel.org
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
-index d6e033c96c52..ce3953bc884a 100644
---- a/arch/arm64/include/asm/kvm_hypevents.h
-+++ b/arch/arm64/include/asm/kvm_hypevents.h
-@@ -7,4 +7,21 @@
- #include <nvhe/trace.h>
- #endif
- 
-+HYP_EVENT(hyp_enter,
-+	HE_PROTO(void),
-+	HE_STRUCT(
-+	),
-+	HE_ASSIGN(
-+	),
-+	HE_PRINTK()
-+);
-+
-+HYP_EVENT(hyp_exit,
-+	HE_PROTO(void),
-+	HE_STRUCT(
-+	),
-+	HE_ASSIGN(
-+	),
-+	HE_PRINTK()
-+);
- #endif
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h b/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h
+diff --git a/tools/testing/selftests/ftrace/test.d/remotes/pkvm/buffer_size.tc b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/buffer_size.tc
 new file mode 100644
-index 000000000000..4b69d33e4f2d
+index 000000000000..383ef7a84274
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
++++ b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/buffer_size.tc
+@@ -0,0 +1,10 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++# description: Test pkvm hypervisor tracing buffer size
 +
-+#include <asm/kvm_hypevents.h>
++SOURCE_REMOTE_TEST=1
++. $TEST_DIR/remotes/buffer_size.tc
 +
-+#include <linux/arm-smccc.h>
++set -e
++setup_remote "hypervisor"
++test_buffer_size
+diff --git a/tools/testing/selftests/ftrace/test.d/remotes/pkvm/reset.tc b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/reset.tc
+new file mode 100644
+index 000000000000..679e31257d0b
+--- /dev/null
++++ b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/reset.tc
+@@ -0,0 +1,10 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++# description: Test pkvm hypervisor tracing reset
 +
-+#undef arm_smccc_1_1_smc
-+#define arm_smccc_1_1_smc(...)					\
-+	do {							\
-+		trace_hyp_exit();				\
-+		__arm_smccc_1_1(SMCCC_SMC_INST, __VA_ARGS__);	\
-+		trace_hyp_enter();				\
-+	} while (0)
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 3369dd0c4009..e00931fd194f 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -26,10 +26,10 @@
-  * the duration and are therefore serialised.
-  */
- 
--#include <linux/arm-smccc.h>
- #include <linux/arm_ffa.h>
- #include <asm/kvm_pkvm.h>
- 
-+#include <nvhe/arm-smccc.h>
- #include <nvhe/ffa.h>
- #include <nvhe/mem_protect.h>
- #include <nvhe/memory.h>
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index aebed41f7de7..f8361520967b 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -12,6 +12,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_host.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_hypevents.h>
- #include <asm/kvm_mmu.h>
- 
- #include <nvhe/ffa.h>
-@@ -716,7 +717,9 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
- 
- static void default_host_smc_handler(struct kvm_cpu_context *host_ctxt)
- {
-+	trace_hyp_exit();
- 	__kvm_hyp_host_forward_smc(host_ctxt);
-+	trace_hyp_enter();
- }
- 
- static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
-@@ -740,6 +743,8 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- {
- 	u64 esr = read_sysreg_el2(SYS_ESR);
- 
-+	trace_hyp_enter();
++SOURCE_REMOTE_TEST=1
++. $TEST_DIR/remotes/reset.tc
 +
- 	switch (ESR_ELx_EC(esr)) {
- 	case ESR_ELx_EC_HVC64:
- 		handle_host_hcall(host_ctxt);
-@@ -754,4 +759,6 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 	default:
- 		BUG();
- 	}
++set -e
++setup_remote "hypervisor"
++test_reset
+diff --git a/tools/testing/selftests/ftrace/test.d/remotes/pkvm/trace_pipe.tc b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/trace_pipe.tc
+new file mode 100644
+index 000000000000..4c77431e884f
+--- /dev/null
++++ b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/trace_pipe.tc
+@@ -0,0 +1,10 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++# description: Test pkvm hypervisor tracing pipe
 +
-+	trace_hyp_exit();
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index c3e196fb8b18..64d1d418df1d 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -6,11 +6,12 @@
- 
- #include <asm/kvm_asm.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_hypevents.h>
- #include <asm/kvm_mmu.h>
--#include <linux/arm-smccc.h>
- #include <linux/kvm_host.h>
- #include <uapi/linux/psci.h>
- 
-+#include <nvhe/arm-smccc.h>
- #include <nvhe/memory.h>
- #include <nvhe/trap_handler.h>
- 
-@@ -205,6 +206,7 @@ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
- 	struct psci_boot_args *boot_args;
- 	struct kvm_cpu_context *host_ctxt;
- 
-+	trace_hyp_enter();
- 	host_ctxt = host_data_ptr(host_ctxt);
- 
- 	if (is_cpu_on)
-@@ -221,6 +223,7 @@ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
- 	write_sysreg_el1(INIT_SCTLR_EL1_MMU_OFF, SYS_SCTLR);
- 	write_sysreg(INIT_PSTATE_EL1, SPSR_EL2);
- 
-+	trace_hyp_exit();
- 	__host_enter(host_ctxt);
- }
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index ccd575d5f6de..e51f431e8b23 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -7,7 +7,6 @@
- #include <hyp/switch.h>
- #include <hyp/sysreg-sr.h>
- 
--#include <linux/arm-smccc.h>
- #include <linux/kvm_host.h>
- #include <linux/types.h>
- #include <linux/jump_label.h>
-@@ -21,6 +20,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_hypevents.h>
- #include <asm/kvm_mmu.h>
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
-@@ -302,10 +302,13 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	__debug_switch_to_guest(vcpu);
- 
- 	do {
-+		trace_hyp_exit();
++SOURCE_REMOTE_TEST=1
++. $TEST_DIR/remotes/trace_pipe.tc
 +
- 		/* Jump in the fire! */
- 		exit_code = __guest_enter(vcpu);
- 
- 		/* And we're baaack! */
-+		trace_hyp_enter();
- 	} while (fixup_guest_exit(vcpu, &exit_code));
- 
- 	__sysreg_save_state_nvhe(guest_ctxt);
++set -e
++setup_remote "hypervisor"
++test_trace_pipe
+diff --git a/tools/testing/selftests/ftrace/test.d/remotes/pkvm/unloading.tc b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/unloading.tc
+new file mode 100644
+index 000000000000..059c7ad1c008
+--- /dev/null
++++ b/tools/testing/selftests/ftrace/test.d/remotes/pkvm/unloading.tc
+@@ -0,0 +1,10 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++# description: Test pkvm hypervisor tracing buffer unloading
++
++SOURCE_REMOTE_TEST=1
++. $TEST_DIR/remotes/unloading.tc
++
++set -e
++setup_remote "hypervisor"
++test_unloading
 -- 
 2.51.0.rc2.233.g662b1ed5c5-goog
 
