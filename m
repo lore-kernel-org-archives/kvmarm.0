@@ -1,57 +1,57 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3BC2EAB82
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A1C2EB5C2
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755810058; cv=none; b=AGdjOLXIlTL8+PgGlRp0Ce+ZffFF/MOUNYU1A/Pr6PhKTSlWc7+KGEX5aql0BQUZEQOgrVJ42Yh5DnX++GjlV6fB2GQGNw7dBGPeGC45iri8iiTgCjv9JWsbVWf5kM154iZz0LBHNk2OhrjptiJ9GhNqSCUVMWwSA3EN9BTCyCE=
+	t=1755810060; cv=none; b=MnJX9IFgPBPvpK6hzNAeyZ8HkHkIPfQ1gNpnubm0KCMvH8wY+TkNLRAiVHAhaARlS1oawH+W5OchvB5aWh9ab+jIHDv5hrbVNysoAcO2sYmmdCeGOqsp/DMK5g4tLISsvQ4zuJuEBxEX65fMZNB3z8RjwgW5vtWq3+vX9Jwqx94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755810058; c=relaxed/simple;
-	bh=O97tgp5t9/0u9T/cM2oyRaSjhATuyjcKvcGSgt6Pzfo=;
+	s=arc-20240116; t=1755810060; c=relaxed/simple;
+	bh=n2xHKJwW4GBGQxPu8+45mca9yh0HIcvMkQScT1xXiwY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HUz7fzWZK1UNQs0biMHc2rBK0incGCHGsR33DOAfSybouZQxu48JkanrCgRb1mH6NXpOjxOBM7g0pIOaEpVZgPJDwJm2rNR/bxcrV+qA7HRiy5AkUWLpGTPKc7GCI14xuenEdB5djka2/Vk7eCTsi5/EbDqDtiarhye3qgugdOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s369OeHw; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=iPlbsdkaHJ1RqBsYQTH1zL8MD4Y61uloFmzH4waSnueVZL6R1IocUUxWHmFb+2yvIa0qOuzGMEVUOtmmLBLygL1LMkVGXhav1RN5K99Kfc/PONAs2+jZfaG0EJOuLumctgJDonOhz3fOI7Yn7Nb1tj2JpDQCuvwg1Uc5ZACJCcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=otuR9nPj; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s369OeHw"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b474b68cff7so1173730a12.1
-        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:00:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="otuR9nPj"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32326e46a20so2466690a91.3
+        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:00:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755810056; x=1756414856; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1755810058; x=1756414858; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=vioVXt2ZZgg7NeYPZVOuYjJyML9DfewAFD4Lo8ICLyI=;
-        b=s369OeHw5nyE2NehuuYU2ofh+vvfeDG5yzAF3gf7lGfq4eFPQifYYUMRP+/OBLjqFM
-         is4ti/zQkTWZzIwo0qyg/icxlCg2ieo9vQufe0tlTffpS95Gv/57ArOLQDAvpvLCbMJr
-         hjyhMf5zjTY3wvRr8AEH51V1Bt/PrL9wZy8lQgzGp1uGmIK5x9KkQQQhuMjU3m7QIDjA
-         PYt/D/6y2CCSLBLdxTGcte/E9MQ/2tf4QQStJnyUyv/OX6aTQtGISFPunwjNnUN0qxmw
-         XgjKGhehPWWxL+57mqq6dnh5XbvvjvMfG7mxyZ1fYrfuxhvdwAtdU6O9dMI3B93jfPiE
-         obiw==
+        bh=rIYjUyPKKDdCEejXmfDWcQPbYLUJJKvCpdBRdQ8wgkk=;
+        b=otuR9nPjy61wgvd9Jpd3ktun+BYSKlOzqGwGRW9w4kv3R/Kg0awS96f6MZXjTxZwuU
+         2Xs3GHi6EzLfvPRE3KWYp52H+Uj7tftXSBqsQ+Qh56y0fewskRLSnV3sn1RIdFfzz26h
+         nKt7jOzfLXxHL5vkEDtk+DfzGpayuq7iYcLXTpzSbeS4ozgORaMFD5yXvzqAq0/Vbqun
+         FsWJjOG4UAn0i2zumg9mmXdGtJhaSik09ZEU+mnFlq/PnmQLoDa82CS1MrDQGxzkDt8j
+         /DjJNh+rO1Dz34eZN40Q86xNFF2foRxJLgrskV08SXvyw1MM2uBMwaMxE0eRIXnfrYjZ
+         KHJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755810056; x=1756414856;
+        d=1e100.net; s=20230601; t=1755810058; x=1756414858;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vioVXt2ZZgg7NeYPZVOuYjJyML9DfewAFD4Lo8ICLyI=;
-        b=blqmejldIuA8e0x0rmc/EfF0GndFDS+HdRyct4aMGkzY/jxyKwL05PHx8rEvAwo1U9
-         xSvCB46C+FhUSitCoecjrltGkaHmJlSeRpnZ8/2mLmlaSAlM2cJVqs9427oO1JilLAI0
-         W0yYcGXmkcZS3hNl/SrJ8h7meAKCqeozr4eIx6Tfu7VTZYhzqRC8Hwqj0fZBI3qPRBVA
-         AiEo8r5hPQPtb0V7up4BCd0Juf3HsE4BHCDg72R3kI78ym/d+Nldu2gA+X7x/8wgC0Vg
-         WmOcGf+hR7E7GRapBqG8LmfDjR2kz45OCOtNBQRU2vr8mGik16sTZniog3r5wj7QzMya
-         jUug==
-X-Forwarded-Encrypted: i=1; AJvYcCXaU7O39PhvR/E71OhmF7Q9ozhvGZu2T3PkAjBPDEMWqlJ0UuFgD5kAg/8bQtHQ5S1ACskxlic=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywu+0J2uyycvMb7dA039oCRfFiT0KLsRoQnwyZYrmRKaHYCFXoM
-	raoe3N/UK6ZTrcpli13PPPDyMbFkIiL19swLwOhYWSalHVTz+PL+fyAb7xEzYXqaSVeNBlHS+gu
-	p8TMIZA==
-X-Google-Smtp-Source: AGHT+IFMAoySLGWaBGxxLE7EGe5/JK70vfGurcQkwXtR0YxVIkKbRYcB3XHf65NsmmZ5Hb+78WjJ0WrD9XU=
-X-Received: from pjbee15.prod.google.com ([2002:a17:90a:fc4f:b0:321:c3cc:2574])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c45:b0:324:e96a:2ada
- with SMTP id 98e67ed59e1d1-3251774ac2emr940105a91.21.1755810055944; Thu, 21
- Aug 2025 14:00:55 -0700 (PDT)
+        bh=rIYjUyPKKDdCEejXmfDWcQPbYLUJJKvCpdBRdQ8wgkk=;
+        b=A5BNjU+jFxqj2H3NQgeIlnFtvMWLPW9pxuxe5U4E6hqWMu1lscim3WVLfb6l8gvPB+
+         5Q6lLiUugwEMP8oTASZhomJpfvg9F5LB2NbTzbSYGadky/3bXxEIePJfgAToljo3O8CP
+         58UPfAYvh6yp+7dB8Wz04NRXRCGzbJeJWvW/anUwT7qE8d9oPabtZz/T/EFOMlWNCWwM
+         0KJFW7k401elzg1gWXzB5tpmTXBn08YRx8kVyXWwZ8nlaXG+/cT8VrQj7sKnQeDtFbTF
+         r+qDRijGoGI2k4wU3FaIQs0W+PNMerYb+dpd2vnYmMAgUoZXwkh5rnDjaAX68Slvym6u
+         BdmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUs6CHwcKyXNM+IUsoVUyWKMwR2Ehanzx29DLAuenQ9sbWOoEkZlcyy5SHF4efAvTloLGR/42Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxt3vF6iFcXy+3VNj9p0W5ntfAg3t78lyMVIU++NSgSxcTM+Ta/
+	MNVJyehEUsSjggL5SCLcAm5Ozdx67hepxqbpEcDFMeyoVHp1LsJANYol4xJ+g9bC2Z+xR4O40Tc
+	oegCMXA==
+X-Google-Smtp-Source: AGHT+IGevG4sJg+U1oYZiyIkXuxzC5L9OjooNDxBFWaxTZvDjCA0pb211437o2pCDdf6DI+kKvb4PRBSGWk=
+X-Received: from pjbrr6.prod.google.com ([2002:a17:90b:2b46:b0:323:247f:7f59])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d610:b0:31f:762c:bc40
+ with SMTP id 98e67ed59e1d1-32515e54409mr1117649a91.16.1755810058080; Thu, 21
+ Aug 2025 14:00:58 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 21 Aug 2025 14:00:32 -0700
+Date: Thu, 21 Aug 2025 14:00:33 -0700
 In-Reply-To: <20250821210042.3451147-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250821210042.3451147-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250821210042.3451147-7-seanjc@google.com>
-Subject: [RFC PATCH 06/16] KVM: arm64: Pass kvm_page_fault pointer to transparent_hugepage_adjust()
+Message-ID: <20250821210042.3451147-8-seanjc@google.com>
+Subject: [RFC PATCH 07/16] KVM: arm64: Pass @fault to fault_supports_stage2_huge_mapping()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -70,68 +70,71 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use the local kvm_page_fault structure to adjust for transparent hugepages
-when resolving guest aborts, to reduce the number of parameters from 5=>2,
-and to eliminate the less-than-pleasant pointer dereferences.
+Pass the full kvm_page_fault object when querying if a fault supports a
+hugepage mapping instead of passing the separate slot+address pair.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/mmu.c | 20 ++++++--------------
- 1 file changed, 6 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/mmu.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index ca98778989b2..047aba00388c 100644
+index 047aba00388c..c6aadd8baa18 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1361,19 +1361,15 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
-  * Returns the size of the mapping.
-  */
- static long
--transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
--			    unsigned long hva, kvm_pfn_t *pfnp,
--			    phys_addr_t *ipap)
-+transparent_hugepage_adjust(struct kvm *kvm, struct kvm_page_fault *fault)
+@@ -1287,10 +1287,10 @@ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+ 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+ }
+ 
+-static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+-					       unsigned long hva,
++static bool fault_supports_stage2_huge_mapping(struct kvm_page_fault *fault,
+ 					       unsigned long map_size)
  {
--	kvm_pfn_t pfn = *pfnp;
--
- 	/*
- 	 * Make sure the adjustment is done only for THP pages. Also make
++	struct kvm_memory_slot *memslot = fault->slot;
+ 	gpa_t gpa_start;
+ 	hva_t uaddr_start, uaddr_end;
+ 	size_t size;
+@@ -1348,8 +1348,8 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+ 	 * userspace_addr or the base_gfn, as both are equally aligned (per
+ 	 * the check above) and equally sized.
+ 	 */
+-	return (hva & ~(map_size - 1)) >= uaddr_start &&
+-	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
++	return (fault->hva & ~(map_size - 1)) >= uaddr_start &&
++	       (fault->hva & ~(map_size - 1)) + map_size <= uaddr_end;
+ }
+ 
+ /*
+@@ -1368,7 +1368,7 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_page_fault *fault)
  	 * sure that the HVA and IPA are sufficiently aligned and that the
  	 * block map is contained within the memslot.
  	 */
--	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
--		int sz = get_user_mapping_size(kvm, hva);
-+	if (fault_supports_stage2_huge_mapping(fault->slot, fault->hva, PMD_SIZE)) {
-+		int sz = get_user_mapping_size(kvm, fault->hva);
+-	if (fault_supports_stage2_huge_mapping(fault->slot, fault->hva, PMD_SIZE)) {
++	if (fault_supports_stage2_huge_mapping(fault, PMD_SIZE)) {
+ 		int sz = get_user_mapping_size(kvm, fault->hva);
  
  		if (sz < 0)
- 			return sz;
-@@ -1381,10 +1377,8 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 		if (sz < PMD_SIZE)
- 			return PAGE_SIZE;
- 
--		*ipap &= PMD_MASK;
--		pfn &= ~(PTRS_PER_PMD - 1);
--		*pfnp = pfn;
--
-+		fault->ipa &= PMD_MASK;
-+		fault->pfn &= ~(PTRS_PER_PMD - 1);
- 		return PMD_SIZE;
- 	}
- 
-@@ -1724,9 +1718,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		if (fault->is_perm && fault_granule > PAGE_SIZE)
- 			vma_pagesize = fault_granule;
- 		else
--			vma_pagesize = transparent_hugepage_adjust(kvm, fault->slot,
--								   fault->hva, &fault->pfn,
--								   &fault->fault_ipa);
-+			vma_pagesize = transparent_hugepage_adjust(kvm, fault);
- 
- 		if (vma_pagesize < 0) {
- 			ret = vma_pagesize;
+@@ -1547,7 +1547,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	switch (vma_shift) {
+ #ifndef __PAGETABLE_PMD_FOLDED
+ 	case PUD_SHIFT:
+-		if (fault_supports_stage2_huge_mapping(fault->slot, fault->hva, PUD_SIZE))
++		if (fault_supports_stage2_huge_mapping(fault, PUD_SIZE))
+ 			break;
+ 		fallthrough;
+ #endif
+@@ -1555,7 +1555,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 		vma_shift = PMD_SHIFT;
+ 		fallthrough;
+ 	case PMD_SHIFT:
+-		if (fault_supports_stage2_huge_mapping(fault->slot, fault->hva, PMD_SIZE))
++		if (fault_supports_stage2_huge_mapping(fault, PMD_SIZE))
+ 			break;
+ 		fallthrough;
+ 	case CONT_PTE_SHIFT:
 -- 
 2.51.0.261.g7ce5a0a67e-goog
 
