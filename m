@@ -1,108 +1,118 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875941EB5B
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 18:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E8635FC09;
+	Thu, 21 Aug 2025 20:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755801837; cv=none; b=Kg14OQpjSwQjM75cFowyGdlUecrKscgISNc1YbjWu2BgM/KgGmRK5emg2PsUCGo1VJ1XzaCXHfzb/gjB+b4btQDA0FY4qX0h9RGjnuh6rAwuub+uStPXKUew4HVXr2CKxSYIz5CZDyvoLfc4fPaLCcrfmUuq3fergEi8Z5mEYpE=
+	t=1755809067; cv=none; b=cFfCVuAZN/K5b+SyWhZ9WKnwjVIzCBta2o9c2t5G9rjBelYx8aLekBwu18hK/eZZwtc2i+Uiwg72EI48v1h8lbUQ2bsFAl8khVVtwu1ADi/TQMb6u2VYCeU1ADbP0opHk0TPMoaJawJVFP0bzB3IeFi+nWh1gdSp4z4WOhl1OQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755801837; c=relaxed/simple;
-	bh=Y0+B5xsKPXsCq8dRDNoWcxakWZXi4WhWHBZ1dKMqVQw=;
+	s=arc-20240116; t=1755809067; c=relaxed/simple;
+	bh=QGyQHv1jYZF3uVA7onjUxkDQan9RTUY4fxnZL00rGXY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=he3Zql17bqTlMkcDQX/A95wJcTYXpW/uPhaj5MJshRrgBBoTiDTkp+pcWDw0jUEwTtjgfykvb+TeaZO7nKeBPLIdK/Ox4nvILC8M4sTNK9sKtP9DZblLo1YTzwYQUVMrxu+bFNa1UFo0x0bbtN3Z2d7ZUsb0k8MZLh5vDIciEc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NbD34Ch0; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ms3rGdFIo3JwL5S9HGCpGNdH2/h0h+1kspOxCHK7l/VBPVpakE8k5BIbHIh3BfyqjwaaphLbMHShwhgMoG8UyV7iAYkn1x9Ud9bSLPX/a9VttBg/OKVICn0p8qOUaWMIjmpP+mobY6zFvB7pkhyB8xZh7XKPAANPbo584hxdRZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pN65S0Hm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NbD34Ch0"
-Date: Thu, 21 Aug 2025 11:43:41 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755801832;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WqoDM3gCktoZvUcB8/+GpGw1BWyayewk0lnSwJsBs6M=;
-	b=NbD34Ch0pST9S7i5dZLDu4SArFzQKOnMq0WvjRWfyr9tp0RZF/v6/+x1NXqNZvYLND3u6v
-	kNq1FzUYZyqHeZJpFA4JlOQsWRRo054trzs+jx17LmYACriksk137z46iOHi4SXN2x3X1h
-	NpR6LCSA46to4pC7Oc24DuClXzbyTJU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pN65S0Hm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CFDC113D0;
+	Thu, 21 Aug 2025 20:44:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755809066;
+	bh=QGyQHv1jYZF3uVA7onjUxkDQan9RTUY4fxnZL00rGXY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pN65S0Hm98/7eBQk2cyfAEh3nYjRLHVZAjZmP8LJZJoELf3EbpS+l1LIqzljo8U4m
+	 HjWxJpslql+PBGVkeqxPE9n11kL4MRvMiggg7zCiHMdp78jo6VRLAjkVxe/dw6BkFU
+	 G+UnH0makA9mu+VZU+SOu+Opf44USbiuhiXodj9hdWvl+RPvxynWgI64NuSf8qkiNJ
+	 wbQtxTMswBVP200c+ukNe+EQA5zTOKHo4/SA+O9d9HAchukQt/pZTrSwZr3n5dndDB
+	 OjPSC8CM+JBMOsfGNpVi7azWP8BWK4YbsVtytLl5AAk+ErosVxPo1mv62bmKx7VAi0
+	 BjXbN96zvqrXw==
+Date: Thu, 21 Aug 2025 21:44:21 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	jiangkunkun <jiangkunkun@huawei.com>
-Subject: Re: [PATCH v4 3/6] KVM: arm64: vgic-v3: Allow access to GICD_IIDR
- prior to initialization
-Message-ID: <aKdo3aIxN6-RKVtA@linux.dev>
-References: <20250709211417.2074487-1-oliver.upton@linux.dev>
- <20250709211417.2074487-4-oliver.upton@linux.dev>
- <de355a64-01f6-cbc5-7a88-5f57687d5fb8@hisilicon.com>
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v15 4/6] KVM: arm64: Set PSTATE.EXLOCK when entering an
+ exception
+Message-ID: <ac3b2d52-5b24-441b-bcdc-463ae9c78b3d@sirena.org.uk>
+References: <20250820-arm64-gcs-v15-0-5e334da18b84@kernel.org>
+ <20250820-arm64-gcs-v15-4-5e334da18b84@kernel.org>
+ <87ms7tk5y4.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+NFBeoT7qeYVduLe"
+Content-Disposition: inline
+In-Reply-To: <87ms7tk5y4.wl-maz@kernel.org>
+X-Cookie: Warp 7 -- It's a law we can live with.
+
+
+--+NFBeoT7qeYVduLe
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <de355a64-01f6-cbc5-7a88-5f57687d5fb8@hisilicon.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 21, 2025 at 06:55:13PM +0800, Zhou Wang wrote:
-> On 2025/7/10 5:14, Oliver Upton wrote:
-> > KVM allows userspace to write GICD_IIDR for backwards-compatibility with
-> > older kernels, where new implementation revisions have new features.
-> > Unfortunately this is allowed to happen at runtime, and ripping features
-> > out from underneath a running guest is a terrible idea.
-> > 
-> > While we can't do anything about the ABI, prepare for more ID-like
-> > registers by allowing access to GICD_IIDR prior to VGIC initialization.
-> > Subsequent changes will allow the VMM to further provision the GIC
-> > feature set, e.g. the presence of nASSGIcap.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-init.c       |  9 +--------
-> >  arch/arm64/kvm/vgic/vgic-kvm-device.c | 20 +++++++++++++++++++-
-> >  2 files changed, 20 insertions(+), 9 deletions(-)
-> > 
+On Wed, Aug 20, 2025 at 11:02:11PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+
+> > As per DDI 0487 RWTXBY we need to manage PSTATE.EXLOCK when entering an
+
+> Nit: please use an underscore between the type of a statement and its
+> "name", as it makes it a bit more readable (R_WTXBY).
+
+Updated as you request.  I have seen both usages - the non _ version
+plays nicer with searching the PDF to find the rules since you can just
+copy it directly into a PDF viewer.
+
+> > +	// EL, or to GCSCR_ELx.EXLOCKEN for an exception to the same
+> > +	// exception level.  See ARM DDI 0487 RWTXBY, D.1.3.2 in K.a.
+> > +	new |=3D enter_exception64_gcs(vcpu, mode, target_mode);
+> > +
+> >  	new |=3D PSR_D_BIT;
+> >  	new |=3D PSR_A_BIT;
+> >  	new |=3D PSR_I_BIT;
+
+> But that's not the only case where we have to deal with EXLOCK, is it?
+> What of ERET and its PAuth variants? R_TYTWB says:
+
+> <quote>
+> If in AArch64 state, any of the following situations can cause an
+> illegal exception return:
+>=20
 > [...]
-> >  /*
-> >   * vgic_v3_attr_regs_access - allows user space to access VGIC v3 state
-> >   *
-> > @@ -552,7 +570,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
-> >  
-> >  	mutex_lock(&dev->kvm->arch.config_lock);
-> >  
-> > -	if (!vgic_initialized(dev->kvm)) {
-> > +	if (!(vgic_initialized(dev->kvm) || reg_allowed_pre_init(attr))) {
-> 
-> I am confused here, the logic is that:
-> 
-> 1. For the ID registers, they can not be modified after vGIC init.
-> 2. For other registers, the original logic is that they should be modified after
->    vGIC init.
-> 
-> So code here should be:
-> 
-> if ((reg_allowed_pre_init(attr) && vgic_initialized(dev->kvm)) ||
->     !vgic_initialized(dev->kvm)) {
->          ret = -EBUSY;
->          goto out;
-> }
-> 
-> Not sure my understanding is right.
+>=20
+> - If the Effective value of GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK
+>   is 0, the execution of an exception return instruction to return to
+>   the current Exception level ELx.
+> </quote>
 
-This would break ABI which I tried to allude to in the changelog.
-GICD_IIDR is _already_ writable post-init, meaning that the only option
-we have is to relax that register and allow access pre- and post-init.
+> My reading of the spec is that this needs handling.
 
-The preferred semantics around ID registers is that they're RW prior to
-init and RO post-init. GICD_TYPER2 enforces this.
+Am I right in thinking that this handling is needed for the NV case
+only?
 
-Thanks,
-Oliver
+--+NFBeoT7qeYVduLe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAminhSQACgkQJNaLcl1U
+h9Ao0gf+I31dMh9CHMVH6wKHnBom98nMGxIPuirlnN5zM3f5tofXHJRgTQvJd6oS
+LqRiqCSrp8MjmOFPti9rUMk6WRRzGGG4gHbTO1ANmaGrlY1frYhW91SH6i+03XH8
+i79wMm5+COz/jk9DXmVFJzuk2PQTTs7xUy9+UW3ZXKpvauyeaU0QH0IBUdSHG+ks
+QY8kAt7lp4hklpFTlrYnCjNMui2AU2+Pu+Wu+IF6Y12i6dJ7dk2RtvH/PkFLw4oG
+8NCyFQuC4WX5tOIaGNpbzdmgPT5gRHs48CgNzRrI/BPWiWQ/Pbakceh5DN+pYPNl
+donq5HcvHZXywx/jXKdRbBgUHgPFIw==
+=xfXz
+-----END PGP SIGNATURE-----
+
+--+NFBeoT7qeYVduLe--
