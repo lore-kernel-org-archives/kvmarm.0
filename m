@@ -1,99 +1,98 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D287E2FC027
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 21:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5B3393DFA;
+	Thu, 21 Aug 2025 21:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755810075; cv=none; b=a6ND9VRjrsXlvVzn0iuyKs6qbjM6W0QSAVLNxO36X672tXIc3ckYS/RHMgLNYsIDWTVHn5TYhYY7kOxb9yd7gISHaV1nj8W/gV73PmLh3BREs8GaoMqF1GK/s9pxvTW69cFK6nJ1WnCEDbDg80ON8evinnWhbPdh/CVRBKkYZeo=
+	t=1755811556; cv=none; b=SmqGKCdGADQGxE32L6Z6AEjMkMI/mIWhfs+iU8kpFbtEK2n6gdkU+Z0DtJQC1P3nU/av+9Ang7HBlgj8l5xIvFo6nsf5JH9SH+GxY2NohiQkPwX3uDtStifiDl93Vvreosky7LeJm/feMReheR6T9xdHjoasUUXhfFnr9m1mcJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755810075; c=relaxed/simple;
-	bh=ztqVo6NA34foMRWPPxfCFK7i38/nXKR/2OW2xBZ5Cz4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SHzrjVJORoiQw1UYYLsGP5QwHUICmJwQEsyewtPSN5VrlZ9BYAa/+0AN9AE0Q3XdA1AHZ8IUMxtvzvIpeH4+6t9v8tg0leT4WMcFaLQENgeySpOPJfUA1EzSkBouZbyxxRQsvwjZP3D/QHI/3RCUFFMZ5EiFiX3jrQKXa2ZJKog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D7EPqQ3z; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1755811556; c=relaxed/simple;
+	bh=+Q8r/IpJLSBFIgkrEyE128JdbLX+nx0vcUqeZBoKrNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/cP0c/JPOqQteImQPUTwiJAPnu8hDOUdgnGW56mL9kIkelSFDF6Js+qYNYVFy/FKPzPwVf4yWgVD8Oon97YJKw9fvaYpZB8mYN2s4BYPLlgHpEpXcqgwg4GaVRxmsOnWAe3W70uxgRcdqQUvTTptOpuQ0MHJ7lbHKSMgOhRg4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pD1PJctA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D7EPqQ3z"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-325228e9c12so52523a91.1
-        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 14:01:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755810073; x=1756414873; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=raIzGhW7lpJoGFirZ1c9kEw1ZuKCVqeLv2nD/b2/YKU=;
-        b=D7EPqQ3zm2n2wS3xLbjJR0ML7AlFUsggqqh6/Kre1VBfSdJIeNuIh+FrfWVgKF8trX
-         Q74+bAyK4IMl2pITzXBCwzS0agqoHH7xoJR0vHNzxKVFao70pcWBUYxwC06p3qyDG9aF
-         j8EOMBBz3gatzgIUCJ8M++UzlEwPEtmZvIh2UVVegmcocYPw2i0591NUK1vay0fGxP7f
-         zM6G/65pYFK9u4Y2c3acCb63y0pKAxGWPMVwZWjIpMoBbC8LBjrsHub/GOvNVuVoDXRp
-         N54nrUoGb51AmRBRCjbDT+jHwBBu/PudhqBDZjYrkYikt/s7pb9eA5tS5ox1PgZ12/FN
-         MTVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755810073; x=1756414873;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=raIzGhW7lpJoGFirZ1c9kEw1ZuKCVqeLv2nD/b2/YKU=;
-        b=BDDO9T8e4nSO41ctVFnAgi+xqouX5EkxxHjSI2dsTNql35q/nK0wzx+Y9aaB6G46Hh
-         2GutzxNOBehIEiAJEtbEWKFisd7pCYj1BRNf/OmsK6fTRp3b+neEcOx/6k+WZkQ0tn+Z
-         cLXvKMBfvMPSkcugGPquN/sfZFTpOphrPjnPPE91GRzgn2CLlKb0Me87pPOZZ20RrK+s
-         Yxc/fl0uLjI0n6wEcRpzKJf60ovQtPt22Rpvp4V8rOofq4cK1+GuCyoRkWc8v++H049S
-         1A3WKhIScmiwmhimDd8Gc3ybOxHjxoe2gQFFW7BHo9yMNdbtBDUlt4Oyzyt97qBpwD2U
-         lETA==
-X-Forwarded-Encrypted: i=1; AJvYcCX6//v9+1XpV6nGDRFdQ1jcESdHOFibI70SCQIBhJ5bc5jSwLo0x9m5deAkMAQmGBXrzuQ0h/M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxxsR4gPfSyN/2wbmlhb0BnQxueXqUd2MAaVdXm7DryJkMX+C9N
-	mhSEIqzr8NBb7D8gDFClBghfY7rsREyMJlSvn4UVQj6EPcFRE0elG2JWuXCOtDqjv0XHYcJOXex
-	cXv8u1g==
-X-Google-Smtp-Source: AGHT+IFblgzDSGtA8EPOlO44N2jRty+RipPpxQzb/XSsK78s9IItTWN33FoV1VAgZIXu+UmzYrewPt9GIfA=
-X-Received: from pjgg5.prod.google.com ([2002:a17:90b:57c5:b0:321:76a2:947c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d4e:b0:321:1348:4438
- with SMTP id 98e67ed59e1d1-324eed210damr5152464a91.7.1755810073194; Thu, 21
- Aug 2025 14:01:13 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 21 Aug 2025 14:00:42 -0700
-In-Reply-To: <20250821210042.3451147-1-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pD1PJctA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AD5AC4CEEB;
+	Thu, 21 Aug 2025 21:25:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755811555;
+	bh=+Q8r/IpJLSBFIgkrEyE128JdbLX+nx0vcUqeZBoKrNo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pD1PJctAFEJ69To4v41TtyclO/w7OOhbzdeShybQoY78IUYgi9InihindHlQPz1mS
+	 RDWYt+k9zmChtVD2neeSodbbnaxjWfLFMJJRGOt0J1JJcPjyYAtY5eG1ZUoIj+wuJ4
+	 6ldPPkw1V+FD1dSlPxZiGt+TI3XA/wB99EW0kfmMrtqh69XokRelVhjNpuTXxju5e6
+	 ZtTgjgUYLYQe7TiGes/+yuss9HqB3fQsC6J7xRzfh+EKBAC1GzDXxo/1xAgQ8De1QF
+	 KrSuFURxk0QIlT4gCka0fv/vjpfjp8nvDmKIrcPRizyBJ4BJhptt2MdCn9AikQaCqz
+	 OySzkfFMZy/hA==
+Date: Thu, 21 Aug 2025 22:25:50 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v15 3/6] KVM: arm64: Forward GCS exceptions to nested
+ guests
+Message-ID: <e1c3bee5-6521-4dbd-a207-4ec3e4ff19fe@sirena.org.uk>
+References: <20250820-arm64-gcs-v15-0-5e334da18b84@kernel.org>
+ <20250820-arm64-gcs-v15-3-5e334da18b84@kernel.org>
+ <87ldndk5c2.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250821210042.3451147-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250821210042.3451147-17-seanjc@google.com>
-Subject: [RFC PATCH 16/16] KVM: arm64: Don't bother nullifying "vma" in mem
- abort path
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
-	James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="llrqpkiErFSNNE6q"
+Content-Disposition: inline
+In-Reply-To: <87ldndk5c2.wl-maz@kernel.org>
+X-Cookie: Warp 7 -- It's a law we can live with.
 
-Now that the local "vma" in kvm_gather_fault_vma_info() will naturally go
-out of scope when mmap_lock is dropped, don't bother nullifying the
-variable.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/arm64/kvm/mmu.c | 3 ---
- 1 file changed, 3 deletions(-)
+--llrqpkiErFSNNE6q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index ea326d66f027..435582e997ce 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1559,9 +1559,6 @@ static int kvm_gather_fault_vma_info(struct kvm_vcpu *vcpu,
- 	fault->vma.vm_flags = vma->vm_flags;
- 	fault->vma.is_cacheable = kvm_vma_is_cacheable(vma);
- 
--	/* Don't use the VMA after the unlock -- it may have vanished */
--	vma = NULL;
--
- 	/*
- 	 * Read mmu_invalidate_seq so that KVM can detect if the results of
- 	 * vma_lookup() or __kvm_faultin_pfn() become stale prior to
--- 
-2.51.0.261.g7ce5a0a67e-goog
+On Wed, Aug 20, 2025 at 11:15:25PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
+> > GCS can generate exceptions with an EC of 0x2D (GCS Data Check
+> > Exception) when data validation checks fail.  When running a nested
+> > guest which has access to GCS such exceptions can be directed from EL0
+> > to EL2 and therefore need to be forwarded to the guest hypervisor, add
+> > handling for this.
+
+> Why is it so? A GCS exception from EL0 should be routed to EL1, no
+> matter what (either this is an L1 guest with EL1 pretending to be EL2,
+> or this is an L2 guest that has its own EL1).
+
+> Can you describe the case where we need to reinject the exception?
+
+I think I'd got myself confused while looking at the HCR_EL2.TGE case
+thinking we enabled that in some case.  I can't now see what I was
+looking at there, pretty sure I'm just mistaken - thanks for spotting
+that, unless I work out what I was thinking I'll drop this.
+
+--llrqpkiErFSNNE6q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAminjt0ACgkQJNaLcl1U
+h9DhBgf/W05P5KDqWX/JqdJjThleyVH7QJ1ZUGO+5QIqs7ZnsqlHdGl/KPWFFIc7
+jqQBGtJ4BPARkr60Wcq/G1DI3kuGD/61a0PktBxAAMZvtfabDeRgKftQVMrBfa/U
+zf88E/l6oAFCZQClYX4xprBoUSrG71rk4QemvoJrEbwkHXFIBptOEkRXPdWBcaHP
+rjKiN7sSW6HxLsTuLXlLVN66V7D3RI03Fyw2Sj17wofhOUEd+5P5bET5RLeXSxRN
+hEYPQqaF9t745NIwsmvD8b60HGUqOdEfAG9ZO+cW3enju+765GAqlajE8vMLxbeb
+kNvV7xm23iBrTHRFUXxDOwhXIb75+g==
+=3kBM
+-----END PGP SIGNATURE-----
+
+--llrqpkiErFSNNE6q--
