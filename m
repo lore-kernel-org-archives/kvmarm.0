@@ -1,105 +1,115 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33852F6160
-	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 13:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EC92D0C73
+	for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 17:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755783870; cv=none; b=hGYhnxRkQhsG4x9hNMF1/WGNDRYthwBD9v9IPXuwaBWgIYE6wrmqgtYTwonipVQc4bjY9C9nCYCkdbBfxxVU6dc/bQO8RXSEnIuW4LrdZVhTFQfwvf2S1id0zIT9szx2S5qXe/Tlw104xDgECXPJrcKA4KBzySxYwNi3W5QIbmw=
+	t=1755797057; cv=none; b=oeIpN9hZC80n4tghftP0EgRAgZhOHPwY0mBEqX8HuLg544tHz1JJdgXC2fN5EBnoR6WbIBNW1mR+MK4w5uHa+3F+OPsIdCXUaf6tHxSYrZX/YpQ6T0EaoEM6RQnUsO9Q8quObQrpEM8Ut0udzDKwUd7uUbZh2xbn1Z8V8AUrBUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755783870; c=relaxed/simple;
-	bh=dJoM8OOMt6arEJ9uw1r81fXCakiPDHhaniul2hBPWEA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NuD8f0tMG0C34uGuTcC0u8IqmslG+G4l63YC7l7HUxj9paF4b4ZopxXcB8OXTvXcJ6Jsd/c/5cXH5K244n7iSMdN7MB2nLw0Hbyo+ttW68NuDhpq6Niblj6S+mr7/SdJsO/koyC5MPG7kDaw9kG1NgmCHhtN1FEvj7V9Kbjvw+o=
+	s=arc-20240116; t=1755797057; c=relaxed/simple;
+	bh=IUbH3WbmxlzHq2+s+kwAQw59k6Gn4nCP57hjhBfZunY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D2twdtvefukCp7ovnH96J90NTn3gH2lRcV3ZJ7IY2WtHOyiGyHU4tksEdgm3likjwLri5FKCV4dqWevoJgymWVegwSzgA+X4i5KKHoubuHH4bReMiL00B+OOriyWknaiQiEdzFUdZc3eYA28OD3gu/6u/lmkU7ovWH92DJvvKWE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E77CD152B;
-	Thu, 21 Aug 2025 06:44:19 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FB583F59E;
-	Thu, 21 Aug 2025 06:44:26 -0700 (PDT)
-Message-ID: <56e049d4-dc15-40e0-a3ba-62d45678780d@arm.com>
-Date: Thu, 21 Aug 2025 14:44:25 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E0A2152B;
+	Thu, 21 Aug 2025 10:24:06 -0700 (PDT)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B67483F59E;
+	Thu, 21 Aug 2025 10:24:10 -0700 (PDT)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: catalin.marinas@arm.com,
+	will@kernel.org,
+	broonie@kernel.org,
+	oliver.upton@linux.dev,
+	anshuman.khandual@arm.com,
+	robh@kernel.org,
+	james.morse@arm.com,
+	mark.rutland@arm.com,
+	joey.gouly@arm.com,
+	Dave.Martin@arm.com,
+	ahmed.genidi@arm.com,
+	kevin.brodsky@arm.com,
+	scott@os.amperecomputing.com,
+	mbenes@suse.cz,
+	james.clark@linaro.org,
+	frederic@kernel.org,
+	rafael@kernel.org,
+	pavel@kernel.org,
+	ryan.roberts@arm.com,
+	suzuki.poulose@arm.com,
+	maz@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH v4 0/5] initialize SCTRL2_ELx
+Date: Thu, 21 Aug 2025 18:24:03 +0100
+Message-Id: <20250821172408.2101870-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/6] KVM: arm64: Handle RASv1p1 registers
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Cornelia Huck <cohuck@redhat.com>
-References: <20250817202158.395078-1-maz@kernel.org>
- <20250817202158.395078-3-maz@kernel.org>
- <95819606-ef3b-46e1-8201-1abf0219659f@arm.com> <87ect4kd7a.wl-maz@kernel.org>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <87ect4kd7a.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+This series introduces initial support for the SCTLR2_ELx registers in Linux.
+The feature is optional starting from ARMv8.8/ARMv9.3,
+and becomes mandatory from ARMv8.9/ARMv9.4.
 
-On 8/21/25 14:37, Marc Zyngier wrote:
-> On Thu, 21 Aug 2025 14:13:52 +0100,
-> Ben Horgan <ben.horgan@arm.com> wrote:
->>
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 82ffb3b3b3cf7..feb1a7a708e25 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -2697,6 +2697,18 @@ static bool access_ras(struct kvm_vcpu *vcpu,
->>>   	struct kvm *kvm = vcpu->kvm;
->>>     	switch(reg_to_encoding(r)) {
->>> +	case SYS_ERXPFGCDN_EL1:
->>> +	case SYS_ERXPFGCTL_EL1:
->>> +	case SYS_ERXPFGF_EL1:
->>> +	case SYS_ERXMISC2_EL1:
->>> +	case SYS_ERXMISC3_EL1:
->>> +		if (!(kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1) ||
->>> +		      (kvm_has_feat_enum(kvm, ID_AA64PFR0_EL1, RAS, IMP) &&
->>> +		       kvm_has_feat(kvm, ID_AA64PFR1_EL1, RAS_frac, RASv1p1)))) {
->>> +			kvm_inject_undefined(vcpu);
->>> +			return false;
->>> +		}
->>> +		break;
->>>   	default:
->>>   		if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
->>>   			kvm_inject_undefined(vcpu);
->> The default condition needs updating for the case when
->> ID_AA64PFR0_EL1.RAS = b10 otherwise access to the non-v1 specific RAS
->> registers will result in an UNDEF being injected.
-> 
-> I don't think so. The RAS field is described as such:
-> 
-> 	UnsignedEnum    31:28   RAS
-> 	        0b0000  NI
->         	0b0001  IMP
-> 	        0b0010  V1P1
-> 	        0b0011  V2
-> 	EndEnum
-> 
-> Since this is an unsigned enum, this checks for a value < IMP. Only
-> RAS not being implemented is this condition satisfied, and an UNDEF
-> injected.
-> 
-> Or am I missing something obvious here (I wouldn't be surprised...)?
+Currently, Linux has no strict need to modify SCTLR2_ELx--
+at least assuming that firmware initializes
+these registers to reasonable defaults.
 
-No, you are indeed correct. I missed the difference between
-kvm_has_feat_enum() and kvm_has_feat(). Sorry for the noise.
+However, several upcoming architectural features will require configuring
+control bits in these registers.
+Notable examples include FEAT_PAuth_LR and FEAT_CPA2.
 
-> 
-> 	M.
-> 
+Patch History
+==============
+from v3 to v4:
+  - integrate set_sctlr2_elx() and __set_sctlr2_elx() to set_sctlr2_elx()
+    without isb()
+  - fix the wrong register setting in set_sctlr2_elx().
+  - add initialise SCTLR2_EL2 at HVC_SOFT_RESTART.
+  - https://lore.kernel.org/all/20250813120118.3953541-1-yeoreum.yun@arm.com/
 
--- 
-Thanks,
+from v2 to v3:
+  - rewrite commit messages.
+  - fix missing SCTLR2_EL2 synchonization at boot.
+  - merging the __kvm_host_psci_cpu_entry() changes into patch #1
+  - https://lore.kernel.org/all/20250811163340.1561893-1-yeoreum.yun@arm.com/
 
-Ben
+from v1 to v2:
+  - rebase to v6.17-rc1
+  - https://lore.kernel.org/all/20250804121724.3681531-1-yeoreum.yun@arm.com/
+
+Yeoreum Yun (5):
+  arm64: make SCTLR2_EL1 accessible
+  arm64: initialise SCTLR2_ELx register at boot time
+  arm64: save/restore SCTLR2_EL1 when cpu_suspend()/resume()
+  arm64: initialise SCTLR2_EL1 at cpu_soft_restart()
+  arm64: make the per-task SCTLR2_EL1
+
+ arch/arm64/include/asm/assembler.h   | 15 +++++++++++++++
+ arch/arm64/include/asm/el2_setup.h   | 17 +++++++++++++++--
+ arch/arm64/include/asm/processor.h   |  3 +++
+ arch/arm64/include/asm/suspend.h     |  2 +-
+ arch/arm64/include/asm/sysreg.h      |  5 +++++
+ arch/arm64/kernel/cpu-reset.S        |  4 ++++
+ arch/arm64/kernel/head.S             |  5 +++++
+ arch/arm64/kernel/hyp-stub.S         | 10 ++++++++++
+ arch/arm64/kernel/process.c          |  9 +++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  3 +++
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c |  3 +++
+ arch/arm64/mm/proc.S                 | 24 ++++++++++++++++--------
+ 12 files changed, 89 insertions(+), 11 deletions(-)
+
+
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
