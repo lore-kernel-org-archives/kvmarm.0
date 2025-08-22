@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7073831280A;
-	Fri, 22 Aug 2025 14:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F6833CE96;
+	Fri, 22 Aug 2025 14:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755872732; cv=none; b=PKyc1E2kqCaPiEgu0KsfGWHesC9VavRRR15nzpK0fa0xZgkhxTTLTTSs/s1E+MmtvSh14BuvbleG4Q3K7JY4jDTBhkljLGhaa2S2+8b3/AEkF8jmyY0xrMfCNUQlhOToIXlWynT7XOyc+GNJ2tAJubf3fru1ySeg1JJcXecLX0o=
+	t=1755872746; cv=none; b=TeRSt/UF1B3w83J3fDmgGvg5WQAygbMWkS/IAjn2PObmYfoXxIpGvtN/WwzoI7srdKzeH+YWmDr8ce+R4X69MUtucYs7on6aHjeK848U0kIpQlvk0CosEtU8VfydARWtEcVfdkhtpIUW3yWH6Mw0FFJL9aUAvsp6XrpsWFjG1eI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755872732; c=relaxed/simple;
-	bh=Ce8xVjTX+LdoK8WYSQNLB8XNPREgItbTHqmQpvQAYkc=;
+	s=arc-20240116; t=1755872746; c=relaxed/simple;
+	bh=KyNdvmJcWNQlFOkEzyU9lFODE6zP45OQYbPcpz/CoyA=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=hrkANnJtqZhkZaVVUseTiPVRoPQqxT9tyXtSpOrYLhmaMlMLO74ogYsz9BX+1g5vMjlvZPkSVMrPscypYexkloyFTuD7q4RIQSuInjquhX4F/KV6sD1EV7c2Xh18S3Nxj2qEWy7HDrE2/C9n+mNnr2tTMwqMABlK4Yk9a68rV0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BSe20ul5; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type; b=tTbbNxLAgqluWiX9kauXDYbqbx6xYQXCMZkFoZOZfPLBQxPvHmCy8dz2ql0lyutJwEKKth3n7HLJl9Tav9TP4tnA1RHEJlJdZQvWUDf8MzwvfYhMkLVop+WiVM+paMLxvVPtS1qpBud+BK17k/nGgyKN5qtEY7cav97CRKM9OB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FYRxhooS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BSe20ul5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E9AC4CEED;
-	Fri, 22 Aug 2025 14:25:31 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FYRxhooS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2040CC4CEED;
+	Fri, 22 Aug 2025 14:25:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755872732;
-	bh=Ce8xVjTX+LdoK8WYSQNLB8XNPREgItbTHqmQpvQAYkc=;
+	s=korg; t=1755872745;
+	bh=KyNdvmJcWNQlFOkEzyU9lFODE6zP45OQYbPcpz/CoyA=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:From;
-	b=BSe20ul57KuSwSNT0pYtd50nT03RRVTm0wI9xPlrL0e2DvOsIRcnTYhSeAKbzxeHw
-	 3eU4mf4zV9JDqJeaVQCPbB/q5ILYygixpzH5CPfym+30F5B3z+iiGSN1z6rGhbfvtp
-	 OKpNWQfhyskt/XnQDvKU7R3eoSHMcdM+efXn1+HI=
-Subject: Patch "KVM: arm64: Fix kernel BUG() due to bad backport of FPSIMD/SVE/SME fix" has been added to the 5.15-stable tree
+	b=FYRxhooSG69tjO4f9aGFYBZDUe/C6bdOWqXBCB+geyAReH4AYlwT3kA7KnHq+AYu6
+	 eJKJIRrWAZbKSd3BDB5cvzqBthiF7NtCqeKbf1kQ3uCsC3aTkU0+Eljn8j8SEq2wTU
+	 5PV6EeBLSrIR2lPmRAq3qbRLJ6qVCPEsW+MG4JPg=
+Subject: Patch "KVM: arm64: Fix kernel BUG() due to bad backport of FPSIMD/SVE/SME fix" has been added to the 6.1-stable tree
 To: ardb@kernel.org,gregkh@linuxfoundation.org,kvmarm@lists.linux.dev,lee@kernel.org,linux-arm-kernel@lists.infradead.org,mark.rutland@arm.com,maz@kernel.org,sashal@kernel.org,tabba@google.com,will@kernel.org
 Cc: <stable-commits@vger.kernel.org>
 From: <gregkh@linuxfoundation.org>
-Date: Fri, 22 Aug 2025 16:25:28 +0200
+Date: Fri, 22 Aug 2025 16:25:42 +0200
 In-Reply-To: <20250822140402.2688-1-will@kernel.org>
-Message-ID: <2025082228-camper-turtle-e085@gregkh>
+Message-ID: <2025082242-cardigan-unmixed-b5bd@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,12 +46,12 @@ This is a note to let you know that I've just added the patch titled
 
     KVM: arm64: Fix kernel BUG() due to bad backport of FPSIMD/SVE/SME fix
 
-to the 5.15-stable tree which can be found at:
+to the 6.1-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
      kvm-arm64-fix-kernel-bug-due-to-bad-backport-of-fpsimd-sve-sme-fix.patch
-and it can be found in the queue-5.15 subdirectory.
+and it can be found in the queue-6.1 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
@@ -130,7 +130,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -1303,10 +1303,10 @@ void fpsimd_save_and_flush_cpu_state(voi
+@@ -1851,10 +1851,10 @@ void fpsimd_save_and_flush_cpu_state(voi
  	if (!system_supports_fpsimd())
  		return;
  	WARN_ON(preemptible());
@@ -147,7 +147,10 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 Patches currently in stable-queue which might be from will@kernel.org are
 
-queue-5.15/kvm-arm64-fix-kernel-bug-due-to-bad-backport-of-fpsimd-sve-sme-fix.patch
-queue-5.15/arm64-mark-kernel-as-tainted-on-sae-and-serror-panic.patch
-queue-5.15/arm64-entry-mask-daif-in-cpu_switch_to-call_on_irq_stack.patch
-queue-5.15/mm-ptdump-take-the-memory-hotplug-lock-inside-ptdump_walk_pgd.patch
+queue-6.1/vsock-virtio-resize-receive-buffers-so-that-each-skb.patch
+queue-6.1/kvm-arm64-fix-kernel-bug-due-to-bad-backport-of-fpsimd-sve-sme-fix.patch
+queue-6.1/arm64-mark-kernel-as-tainted-on-sae-and-serror-panic.patch
+queue-6.1/arm64-entry-mask-daif-in-cpu_switch_to-call_on_irq_stack.patch
+queue-6.1/vsock-virtio-validate-length-in-packet-header-before-skb_put.patch
+queue-6.1/mm-ptdump-take-the-memory-hotplug-lock-inside-ptdump_walk_pgd.patch
+queue-6.1/vhost-vsock-avoid-allocating-arbitrarily-sized-skbs.patch
