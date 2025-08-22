@@ -1,84 +1,122 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B732AD25
-	for <kvmarm@lists.linux.dev>; Fri, 22 Aug 2025 00:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635F21A294
+	for <kvmarm@lists.linux.dev>; Fri, 22 Aug 2025 01:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755820944; cv=none; b=q/GVIwu+XjgFECq7n7yLz5I5RDcWQ1mkJ7VqnfCJXcun9gcI4xWyFDMyd8MTMxOGAFqbnfYuyuetzafBh6Ox/MrFireUP04Hfbca/+8UadIhgfx55UyQ/GzAKfsPLduqtUtoKvt0rF6fFAzyshha3eRqlK/YublLpvYl0oGn93o=
+	t=1755827657; cv=none; b=mUdTohJ0QG5Js0GcX5WrQoJkgVTWZ8D4akDQyn9acM/6Fy2ZRRq0+440U1+0Y9nufDMd3e6Wj34NevdtkSg/DkRjs6G2O/QcXD5LYrp/43V/1SIGfmFOg7jsr6ooT1IR/sQdZ7ddBpsBT9rohEVvL5E4hQXgDTRmCgcOsIDl6T8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755820944; c=relaxed/simple;
-	bh=R6gkMxCHMB3bEPIOgtU0MGTgtQA11whemnMGltciFGk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dmkim4IZwczCoDVYl9ubiXGMNd2KfbdN02Xh2Zxu6Fj/sHz+Qrkr9rjGgPRKC25Na8fmHhDLqjpqDST29SA7aySZZPzHZ5DGEAATeb+ddA82tHLuHDaF54kFM+54WAl4kpFsdsd0qZTWGXqdGS3f6HFI71HcpjkJhYKcJl9yIEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JT73iF4r; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JT73iF4r"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755820931;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ucW5TqvXSFl4ARAEgmgO1++0Jhipt96vounQfr6Zybo=;
-	b=JT73iF4rjnd4Iy29P/fnGsFVmZ0yBnBwk5yn05z2bblCN/Z9ixfOS9rERLTbPQvUMP/DCq
-	W6QZBWJwRk6XAT0CHe4j+jLmYlyion1XoXC8E1WyOpJaG/nlXm1DBvApM7Y4iJblp3V/bm
-	v/xo5pRaZktkHiPEVv4RxstIblUeIjY=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v3 0/6] KVM: arm64: FEAT_RASv1p1 support and RAS selection
-Date: Thu, 21 Aug 2025 17:01:59 -0700
-Message-Id: <175582091318.1266576.11766063075536898345.b4-ty@linux.dev>
-In-Reply-To: <20250817202158.395078-1-maz@kernel.org>
-References: <20250817202158.395078-1-maz@kernel.org>
+	s=arc-20240116; t=1755827657; c=relaxed/simple;
+	bh=/1/QWLsLvRtdrhrDAVpUpcNbke1YQ3duino1v3jonrI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tS2qMPDn5ec2/cp1Dkfd6aWNnDr5zSPpsxd4PTn2B6cV/Ug0VN8WXZwPxYRp8CCuQyS9ZcatPY9j+hDHX/KB71HhFsXM9fFZHCBq+L3H2/x/y//NfTdrq3M0F3tBhacz9TLVODpw47KH3Agu9N+kW7njHkZMAPGcoePUKgaj/vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4c7NYV2nMrz27jGQ;
+	Fri, 22 Aug 2025 09:55:10 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id B807E1A0171;
+	Fri, 22 Aug 2025 09:54:04 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 22 Aug 2025 09:54:04 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 22 Aug 2025 09:54:03 +0800
+Message-ID: <996453bb-fc9a-9606-afec-3f322fa50b27@hisilicon.com>
+Date: Fri, 22 Aug 2025 09:54:03 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v4 3/6] KVM: arm64: vgic-v3: Allow access to GICD_IIDR
+ prior to initialization
+Content-Language: en-US
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: <kvmarm@lists.linux.dev>, Marc Zyngier <maz@kernel.org>, Joey Gouly
+	<joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Raghavendra Rao Ananta <rananta@google.com>,
+	jiangkunkun <jiangkunkun@huawei.com>
+References: <20250709211417.2074487-1-oliver.upton@linux.dev>
+ <20250709211417.2074487-4-oliver.upton@linux.dev>
+ <de355a64-01f6-cbc5-7a88-5f57687d5fb8@hisilicon.com>
+ <aKdo3aIxN6-RKVtA@linux.dev>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <aKdo3aIxN6-RKVtA@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
-On Sun, 17 Aug 2025 21:21:52 +0100, Marc Zyngier wrote:
-> This is the next iteration of this series trying to plug some of our
-> RAS holes (no pun intended...). See [1] for the original series.
+On 2025/8/22 2:43, Oliver Upton wrote:
+> On Thu, Aug 21, 2025 at 06:55:13PM +0800, Zhou Wang wrote:
+>> On 2025/7/10 5:14, Oliver Upton wrote:
+>>> KVM allows userspace to write GICD_IIDR for backwards-compatibility with
+>>> older kernels, where new implementation revisions have new features.
+>>> Unfortunately this is allowed to happen at runtime, and ripping features
+>>> out from underneath a running guest is a terrible idea.
+>>>
+>>> While we can't do anything about the ABI, prepare for more ID-like
+>>> registers by allowing access to GICD_IIDR prior to VGIC initialization.
+>>> Subsequent changes will allow the VMM to further provision the GIC
+>>> feature set, e.g. the presence of nASSGIcap.
+>>>
+>>> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+>>> ---
+>>>  arch/arm64/kvm/vgic/vgic-init.c       |  9 +--------
+>>>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 20 +++++++++++++++++++-
+>>>  2 files changed, 20 insertions(+), 9 deletions(-)
+>>>
+>> [...]
+>>>  /*
+>>>   * vgic_v3_attr_regs_access - allows user space to access VGIC v3 state
+>>>   *
+>>> @@ -552,7 +570,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+>>>  
+>>>  	mutex_lock(&dev->kvm->arch.config_lock);
+>>>  
+>>> -	if (!vgic_initialized(dev->kvm)) {
+>>> +	if (!(vgic_initialized(dev->kvm) || reg_allowed_pre_init(attr))) {
+>>
+>> I am confused here, the logic is that:
+>>
+>> 1. For the ID registers, they can not be modified after vGIC init.
+>> 2. For other registers, the original logic is that they should be modified after
+>>    vGIC init.
+>>
+>> So code here should be:
+>>
+>> if ((reg_allowed_pre_init(attr) && vgic_initialized(dev->kvm)) ||
+>>     !vgic_initialized(dev->kvm)) {
+>>          ret = -EBUSY;
+>>          goto out;
+>> }
+>>
+>> Not sure my understanding is right.
 > 
-> The difference with the previous drop is that we don't try to expose a
-> canonical encoding RASv1p1. Which means you must migrate between
-> similar implementations for now.
-> 
-> [...]
+> This would break ABI which I tried to allude to in the changelog.
+> GICD_IIDR is _already_ writable post-init, meaning that the only option
+> we have is to relax that register and allow access pre- and post-init.>
+> The preferred semantics around ID registers is that they're RW prior to
+> init and RO post-init. GICD_TYPER2 enforces this.
 
-Applied to fixes, thanks!
+Hi Oliver,
 
-[1/6] arm64: Add capability denoting FEAT_RASv1p1
-      https://git.kernel.org/kvmarm/kvmarm/c/8049164653c6
-[2/6] KVM: arm64: Handle RASv1p1 registers
-      https://git.kernel.org/kvmarm/kvmarm/c/d7b3e23f945b
-[3/6] KVM: arm64: Ignore HCR_EL2.FIEN set by L1 guest's EL2
-      https://git.kernel.org/kvmarm/kvmarm/c/9049fb1227a2
-[4/6] KVM: arm64: Make ID_AA64PFR0_EL1.RAS writable
-      https://git.kernel.org/kvmarm/kvmarm/c/1fab657cb2a0
-[5/6] KVM: arm64: Make ID_AA64PFR1_EL1.RAS_frac writable
-      https://git.kernel.org/kvmarm/kvmarm/c/7a765aa88e34
-[6/6] KVM: arm64: Get rid of ARM64_FEATURE_MASK()
-      https://git.kernel.org/kvmarm/kvmarm/c/0843e0ced338
+I got your idea, many thanks for your help.
 
---
 Best,
-Oliver
+Zhou
+
+> 
+> Thanks,
+> Oliver
+> .
