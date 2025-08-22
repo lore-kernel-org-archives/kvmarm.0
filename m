@@ -1,78 +1,197 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8F729ACF0
-	for <kvmarm@lists.linux.dev>; Fri, 22 Aug 2025 09:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1622F0C50;
+	Fri, 22 Aug 2025 09:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755854762; cv=none; b=h4wj21WAgS1CQ2fpZX9HCQTgCFz7EHgFzhM5b69xVGXdPhEULT/SakKT4CWrdtUYACgYvVs6HoQw6FOTMZUQBUNtw1wq2pTI+9Ctlw4baFuuwRzfXrYXRfpwv3DGT/jtcSQY35LhaQ5EJxh8/VkCAdGn/Sh/1Z5MsGelYWHMv9k=
+	t=1755855617; cv=none; b=SGJnuB9OYHWP1zJRmPXhPXP2s/ZWUfIwhs59M6E8QE9xqm0AG+aVrkg5vjBCqPwJK+wefxbLXz2QhrUhmfzaolX8vG0xVW4a9NpfOMA5y5O2uhRMdp5cWhtvJ2otlVE6N9vN65Nbg3wnI0/hZvws2icmPVFNO1IW2hqc3lyyHeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755854762; c=relaxed/simple;
-	bh=zU0G/aUo6bfSJLPq+JRQFqKaqZJgVyzOmP1MHFt8paA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hGAXwRQ1lno90hZmHhjUb1GVvKyk8VxLugYDoRuwVb8kpFhlW7XnmMjraOVnHzmO8BCPNVZAOK+/XNucnAu6Dej9fxd+YNHoJWXCW7fNAGCSOSJch90inGVhVTG3wr41htjk44LcCKMACLumU9khRa/qQABLw1kHklPWuVPJUAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I6gMCdUf; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1755855617; c=relaxed/simple;
+	bh=WliF9Pv+T2msM6jeX79r2lfVXxYoeSLxljPsWjKXP6w=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uQQRu3hqwkSv0jNI/OGV7xT4mncut/Og7O1JYTqP5Dyflb6j+HO14Ik7MOomnwWynNffkhV4mnyzggFYeYXTUHRVzHVI5y/hp0l0NGHPWTTe7a9ubu3bodVKnAz1l+Xdh7jfIyiDTHir4aZTmfdrgoTEkaydSHgmosxhhaDv3dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BsZ3eFy4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I6gMCdUf"
-Date: Fri, 22 Aug 2025 02:25:43 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755854757;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SLjg8Y5myb/BfSTld+S05SbtufySosFInjHD1VZtzHU=;
-	b=I6gMCdUf8SOoxP9R+ovqkZBQ277HOocaX8dY7qeW8bj3T7YfmvoW4cJK2LJh5qGGjKu4hp
-	iTY2B2a0tfbAr84wJ5ZkiPqszexiJyLfb6wqC6+NOG9sDP5plAeS8V86HMQVRHjI0IsNpG
-	Cfc4/7w+XjmPGKZ2nS3NOPz8WDjM8VA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BsZ3eFy4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25F3BC4CEED;
+	Fri, 22 Aug 2025 09:40:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755855617;
+	bh=WliF9Pv+T2msM6jeX79r2lfVXxYoeSLxljPsWjKXP6w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BsZ3eFy4A4W8aWlFqpso3FdTHT/UAesmL+roY8O+AJBpMbBrd+k1nfKt0nxp2o0H6
+	 0bSLOTrQpK+xxYJKZMaw+8d74FwMbKpTFQPKt/lpcaDskjMih1+z9I/ApJpwy++nOZ
+	 RbDvgrk88tiWlPJo9iUitZwx7qF19Ch7OskgrEfW7fpjxjBYcsGvc9P5kQONnlc/bz
+	 KbmdDoGBJoVRKZJswgJa9S846sxfVxD1qJmN4qAkDYdsNCtDkbpf5NrvmiNo8wCHqu
+	 pdZyxrEHG80j3RtCyxBBgV1T1ouMVedlIljCtHkyuL8djrJ72XzTgVaj3OSOPsGbMx
+	 VMJVwGGDs0gKg==
+Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1upOFl-00A3zP-Ht;
+	Fri, 22 Aug 2025 10:40:09 +0100
+Date: Fri, 22 Aug 2025 10:40:07 +0100
+Message-ID: <87a53rk83s.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
 Subject: Re: [PATCH] KVM: arm64: nv: Allow shadow stage 2 read fault
-Message-ID: <aKg3l23hheuQ1dJH@linux.dev>
+In-Reply-To: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
 References: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 86.149.246.145
+X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Wei-Lin,
+Hey Wei-Lin,
 
-You've been finding some good stuff with nested, thank you :)
+On Fri, 22 Aug 2025 04:18:53 +0100,
+Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
+> 
+> We don't expect to ever encounter a stage-2 read permission fault,
+> because read permission is always granted when mapping stage-2. However,
+> this isn't certainly the case when NV is involved. The key is the shadow
+> mapping built for L2 must have the same or stricter permissions than
+> those that L1 built for L2, hence opening the possibility of mappings
+> without read permission.
+> 
+> Let's continue handling the read fault if we're handling a shadow
+> stage-2 fault, instead of erroring out.
+> 
+> The following illustrates an example, vertical lines stand for either
+> L0, L1, or L2 running, with left: L0, middle: L1, and right: L2.
+> Horizontal arrows stand for traps and erets between them.
+> 
+> '''
+> L0                               L1                               L2
+>                                                L2                 |
+>                                                writes to an L2 PA |
+> |<----------------------------------------------------------------|
+> |
+> | L0
+> | finds no mapping in
+> | L1's s2pt for L2
+> |
+> | L0
+> | injects data abort
+> |------------------------------->|
+>                                  | L1
+>                                  | for whatever reason
+>                                  | treats this abort specially,
+>                                  | only gives it W permission
+>                                  |
+>        eret traps to L0          |
+> |<-------------------------------|
+> |
+> |      eret back to L2
+> |---------------------------------------------------------------->|
+>                                                                   |
+>                                                    L2             |
+>                                                    writes to same |
+>                                                    L2 PA (replay) |
+> |<----------------------------------------------------------------|
+> |
+> | L0
+> | finds mapping in s2pt that
+> | L1 built for L2, create
+> | shadow mapping for L2,
+> | but only gives it W to match
+> | what L1 had given
+> |
+> |
+> |      eret back to L2
+> |---------------------------------------------------------------->|
+>                                                                   |
+>                                                    L2             |
+>                                                    writes to same |
+>                                                    L2 PA (replay) |
+>                                                    success        |
+> |<----------------------------------------------------------------|
+> |
+> |
+> |------------------------------->| L1
+>                                  | for some reason, relaxes
+>                                  | L2's permission from W
+>                                  | to RW, AND, doesn't flush
+>                                  | TLB
+>                                  |
+>        eret traps to L0          |
+> |<-------------------------------|
+> |
+> |      eret back to L2
+> |---------------------------------------------------------------->|
+>                                                                   |
+>                                                     L2            |
+>                                                     read to L2 PA |
+> |<----------------------------------------------------------------|
+> | stage-2 read fault
+> |
+> '''
+> 
+> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
 
-On Fri, Aug 22, 2025 at 11:18:53AM +0800, Wei-Lin Chang wrote:
+Excellent detective work! Bonus points for the ASCII art -- I'm not
+sure how practical it will be to keep it in the final commit, but this
+definitely helps understanding the issue.
+
+> ---
+> 
 > I am able to trigger this error with a modified L1 KVM, but I do realize
 > this requires L1 to be very strange (or even just wrong) so I understand
 > if we don't want to handle this kind of edge case. On the other hand,
 > could there also be other ways to trigger this that I have not thought
 > of?
-
-The architecture is pretty unambiguous here that the stage-2 can
-represent a translation w/o read permission.
-
+> 
 > Another thing is that this change lets L1 get away with not flushing the
 > TLB, but TLBs are ephemeral so it's fine in this aspect, however I'm not
 > sure if there are other considerations.
 
-FEAT_ETS3 is an interesting one since it provides software with ordering
-expectations around MMU faults (including permission faults) and updates
-to the translation tables. For KVM's shadow stage-2 to comply we need to
-re-walk the guest's stage-2 before injecting the fault at L1.
+Well, it depends whose TLBs we're talking about. The CPU TLBs are
+definitely ephemeral. But the KVM-managed TLBs (aka the shadow S2) is
+pretty static, and I am a bit worried to relax this.
 
+What would happen on actual HW? L1 would take a S2 fault, because the
+TLBs are out of sync with the S2 PTs. And yes, maybe the TLB pressure
+woulds make it so that it works *sometimes*, but there wouldn't be any
+guarantee of forward progress as long as EL2 doesn't issue a TLBI.
+
+I reckon we should implement that particular behaviour whenever
+possible, and handle permission faults early, possibly ahead of the
+guest S2 walk (the way we handle VNCR_EL2 faults is IMO a good model).
+
+This would imply taking the guest's S2 permission at face value, and
+only drop W permission when the memslot is RO -- you'd then need to
+keep track of the original W bit somewhere. And that's where things
+become much harder, because KVM can decide to remap arbitrary ranges
+of IPA space as RO, which implies we should track the W bit at all
+times, most likely as one of the SW bits in the PTE.
+
+We'll need exactly that if we ever want to implement the
+Hardware-managed Dirty Bit, but I have the feeling we need an actual
+design for this, and not a quick hack. Your approach is therefore the
+correct one for the time being.
+
+> 
 > ---
 >  arch/arm64/kvm/mmu.c | 4 ++--
 >  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -91,10 +210,16 @@ re-walk the guest's stage-2 before injecting the fault at L1.
 > +		kvm_err("Unexpected S2 read permission error\n");
 >  		return -EFAULT;
 >  	}
+>  
 
-Hmm... I'm also willing to just delete this check altogether. The
-likelihood of KVM creating a stage-2 PTE w/o read permission is rather
-low.
+Honestly, I'd rather kill this check altogether rather than adding
+another condition to it -- I suggested it to Fuad a while ago. This is
+the first time we ever see it firing, and I don't think it is bringing
+much.
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
