@@ -1,225 +1,217 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1622F0C50;
-	Fri, 22 Aug 2025 09:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34902F49F0
+	for <kvmarm@lists.linux.dev>; Fri, 22 Aug 2025 10:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755855617; cv=none; b=SGJnuB9OYHWP1zJRmPXhPXP2s/ZWUfIwhs59M6E8QE9xqm0AG+aVrkg5vjBCqPwJK+wefxbLXz2QhrUhmfzaolX8vG0xVW4a9NpfOMA5y5O2uhRMdp5cWhtvJ2otlVE6N9vN65Nbg3wnI0/hZvws2icmPVFNO1IW2hqc3lyyHeg=
+	t=1755858784; cv=none; b=qiwp/wH1neC5Ex1tPKlb4wUkj3JLrT7NaqYCn+UvfJ53mHrOTN4GsiiqUQQym4s/nh2xnokvhJVs8qmZ3oQY1Npzz5nOwTO+cGxLy+svI0bsE9QIvqxySmu6PAMsdoPQHuBhd8Kaj9TcL1QJsXukbYKGzhQsKX6/waU2wFNnnY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755855617; c=relaxed/simple;
-	bh=WliF9Pv+T2msM6jeX79r2lfVXxYoeSLxljPsWjKXP6w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uQQRu3hqwkSv0jNI/OGV7xT4mncut/Og7O1JYTqP5Dyflb6j+HO14Ik7MOomnwWynNffkhV4mnyzggFYeYXTUHRVzHVI5y/hp0l0NGHPWTTe7a9ubu3bodVKnAz1l+Xdh7jfIyiDTHir4aZTmfdrgoTEkaydSHgmosxhhaDv3dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BsZ3eFy4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755858784; c=relaxed/simple;
+	bh=CU41YE7iOuiEUBXAR1fHUTzQP9FmIAESCXuQePsKguE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FGXouEjEqowAsG6QWyYJBPCY48Si4Djtqtu/96yDMukV0xN8GvNsFxmSghFtsu5rvKDVBITSyqqnhb2d3TNyjmG1up33wAmJ2heJS3l2iZKH4EJBZnieRZEEchyT/PaN/Iz6kH6nDoa4mx4nkXOp8lAgvP7+KEglHBGIEeB9AgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=jkCs8m8z; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BsZ3eFy4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25F3BC4CEED;
-	Fri, 22 Aug 2025 09:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755855617;
-	bh=WliF9Pv+T2msM6jeX79r2lfVXxYoeSLxljPsWjKXP6w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BsZ3eFy4A4W8aWlFqpso3FdTHT/UAesmL+roY8O+AJBpMbBrd+k1nfKt0nxp2o0H6
-	 0bSLOTrQpK+xxYJKZMaw+8d74FwMbKpTFQPKt/lpcaDskjMih1+z9I/ApJpwy++nOZ
-	 RbDvgrk88tiWlPJo9iUitZwx7qF19Ch7OskgrEfW7fpjxjBYcsGvc9P5kQONnlc/bz
-	 KbmdDoGBJoVRKZJswgJa9S846sxfVxD1qJmN4qAkDYdsNCtDkbpf5NrvmiNo8wCHqu
-	 pdZyxrEHG80j3RtCyxBBgV1T1ouMVedlIljCtHkyuL8djrJ72XzTgVaj3OSOPsGbMx
-	 VMJVwGGDs0gKg==
-Received: from host86-149-246-145.range86-149.btcentralplus.com ([86.149.246.145] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1upOFl-00A3zP-Ht;
-	Fri, 22 Aug 2025 10:40:09 +0100
-Date: Fri, 22 Aug 2025 10:40:07 +0100
-Message-ID: <87a53rk83s.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: nv: Allow shadow stage 2 read fault
-In-Reply-To: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
-References: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="jkCs8m8z"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3e6666a4f55so17186825ab.3
+        for <kvmarm@lists.linux.dev>; Fri, 22 Aug 2025 03:33:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1755858781; x=1756463581; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LpW5veLMLPdr6OKMte0tGA4PuK4ym/yIcC2Y9SUMkpQ=;
+        b=jkCs8m8zRQUu2uwJtcA75Hd5FL2wM1V7Uv8yyo7XD9ty27HW4pJ1zK2nvFasNUx86e
+         vQLGdNQ+yiS5vZP7E2TUWGqlRRdPosY33a8SBF5yUoUTAWdRCU8YRkdRl/dte//3zep4
+         bGBjIy2AbgC/lWsZzGG3oEdybY/j4GNwDH0eqN5IQudpoqU1Ki7bhqvJwosUAYb18BPK
+         Y12LvGPUCisBQDxx55q0yfxdwa9BzBOe8MtzzReSx5jkNvtFaajJJHC+dpRUmpQ6Tht7
+         TA+FSjgXfzfnip3a/FGIYLZ6Huu2lPNlZH6MXMTCWkEyGVMR8tSGgEKOEQCoIsmYZiT/
+         I9jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755858781; x=1756463581;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LpW5veLMLPdr6OKMte0tGA4PuK4ym/yIcC2Y9SUMkpQ=;
+        b=a3NwfpjoomuarX5D733skGhVImt1a6ipSX0XJ66POtmmkzVRKANXPIv6Q6uyds4C8C
+         QstC4h/DpUY7McDfVvJBoMd1vd4FGfkkP/nqB1r08Rdu38cYyW/YWPEOsL1iolaNn2OS
+         ffwfy5sUP+7oIXoTQpcXhu61yjD/Z4pq0AAm44ltpA0O+8k9AnSWipBeP0oBFKs2iSro
+         7O5Cg5M26J7x2Ax1KDSYK9FNM8M00F3EPBmXLR/dRQCHgZbOedk5hGdrWyIpsBRnjkF7
+         1PxdRtrlDH4k2TbJt6zVSntsvH6c4BS9zxU0kjckV6xgCaQ7ymD1J/pvSAglCgumvteN
+         gSQA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4b+c9sdBcBAiGJjJzmCxSTQYCub8ZtATNfVxrHOCdgrTTly7spEnvlR326dgikPwc72XXdYg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxKV3cpIFyJprV6cQcVx7snl3wkWpK0BX6jBlavst222xJ27I4F
+	ghPm++vfjylgkhWM+MLvRvV0TsRy+UH1y/12pSeYhfX4Pxl9IF/vqhyM4/Vmu7KFyaxylVOfi4O
+	Dgwiyb2lFFUIAsEyhCyKUL6MVDW4H8bVH/VIYvkY1tw==
+X-Gm-Gg: ASbGncvfJl256fN6n2EM0/nByrrrIz2S5QMUGAnGgPgaM85KOyOoH83W/8JvnFJGen+
+	CbbQyh+hDU62l5owZZ4hImWgCifB+eq/ls8P9dtM+EnhsSVka4LmqDRr/QIZUMzeCphOttnXPnT
+	TpTvg/CjsQlfSWxeMbQtnrQFt2HHFaQCIvrwO0gR7XMohII+RG50cFFtojjATnFJtlvL9cwvwqD
+	mml4L/N
+X-Google-Smtp-Source: AGHT+IFxa3sIYy8GmbrliB9vOURhQsISjHNbjP8q123c5R9HRTAMf+tU9qbPOd1N7VsCfi+G9RwFcCmvT1G6Qpsac28=
+X-Received: by 2002:a05:6e02:1607:b0:3e3:fd25:f6a with SMTP id
+ e9e14a558f8ab-3e921a5c447mr39155945ab.11.1755858780756; Fri, 22 Aug 2025
+ 03:33:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 86.149.246.145
-X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-17-seanjc@google.com>
+In-Reply-To: <20250806195706.1650976-17-seanjc@google.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 22 Aug 2025 16:02:49 +0530
+X-Gm-Features: Ac12FXz94_OmeQku-x70DMZyHIHAiBydPtfIxKmb7IUME7_u-QmNy8EiX87dBF4
+Message-ID: <CAAhSdy3Ee1K7kfwFUhdcjoe+c4oi06Tm+Jo7CE2ycqHjuBou-A@mail.gmail.com>
+Subject: Re: [PATCH v5 16/44] KVM: Add a simplified wrapper for registering
+ perf callbacks
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
+	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hey Wei-Lin,
+On Thu, Aug 7, 2025 at 1:27=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> Add a parameter-less API for registering perf callbacks in anticipation o=
+f
+> introducing another x86-only parameter for handling mediated PMU PMIs.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-On Fri, 22 Aug 2025 04:18:53 +0100,
-Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
-> 
-> We don't expect to ever encounter a stage-2 read permission fault,
-> because read permission is always granted when mapping stage-2. However,
-> this isn't certainly the case when NV is involved. The key is the shadow
-> mapping built for L2 must have the same or stricter permissions than
-> those that L1 built for L2, hence opening the possibility of mappings
-> without read permission.
-> 
-> Let's continue handling the read fault if we're handling a shadow
-> stage-2 fault, instead of erroring out.
-> 
-> The following illustrates an example, vertical lines stand for either
-> L0, L1, or L2 running, with left: L0, middle: L1, and right: L2.
-> Horizontal arrows stand for traps and erets between them.
-> 
-> '''
-> L0                               L1                               L2
->                                                L2                 |
->                                                writes to an L2 PA |
-> |<----------------------------------------------------------------|
-> |
-> | L0
-> | finds no mapping in
-> | L1's s2pt for L2
-> |
-> | L0
-> | injects data abort
-> |------------------------------->|
->                                  | L1
->                                  | for whatever reason
->                                  | treats this abort specially,
->                                  | only gives it W permission
->                                  |
->        eret traps to L0          |
-> |<-------------------------------|
-> |
-> |      eret back to L2
-> |---------------------------------------------------------------->|
->                                                                   |
->                                                    L2             |
->                                                    writes to same |
->                                                    L2 PA (replay) |
-> |<----------------------------------------------------------------|
-> |
-> | L0
-> | finds mapping in s2pt that
-> | L1 built for L2, create
-> | shadow mapping for L2,
-> | but only gives it W to match
-> | what L1 had given
-> |
-> |
-> |      eret back to L2
-> |---------------------------------------------------------------->|
->                                                                   |
->                                                    L2             |
->                                                    writes to same |
->                                                    L2 PA (replay) |
->                                                    success        |
-> |<----------------------------------------------------------------|
-> |
-> |
-> |------------------------------->| L1
->                                  | for some reason, relaxes
->                                  | L2's permission from W
->                                  | to RW, AND, doesn't flush
->                                  | TLB
->                                  |
->        eret traps to L0          |
-> |<-------------------------------|
-> |
-> |      eret back to L2
-> |---------------------------------------------------------------->|
->                                                                   |
->                                                     L2            |
->                                                     read to L2 PA |
-> |<----------------------------------------------------------------|
-> | stage-2 read fault
-> |
-> '''
-> 
-> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+For KVM RISC-V:
+Acked-by: Anup Patel <anup@brainfault.org>
 
-Excellent detective work! Bonus points for the ASCII art -- I'm not
-sure how practical it will be to keep it in the final commit, but this
-definitely helps understanding the issue.
+Regards,
+Anup
 
 > ---
-> 
-> I am able to trigger this error with a modified L1 KVM, but I do realize
-> this requires L1 to be very strange (or even just wrong) so I understand
-> if we don't want to handle this kind of edge case. On the other hand,
-> could there also be other ways to trigger this that I have not thought
-> of?
-> 
-> Another thing is that this change lets L1 get away with not flushing the
-> TLB, but TLBs are ephemeral so it's fine in this aspect, however I'm not
-> sure if there are other considerations.
-
-Well, it depends whose TLBs we're talking about. The CPU TLBs are
-definitely ephemeral. But the KVM-managed TLBs (aka the shadow S2) is
-pretty static, and I am a bit worried to relax this.
-
-What would happen on actual HW? L1 would take a S2 fault, because the
-TLBs are out of sync with the S2 PTs. And yes, maybe the TLB pressure
-woulds make it so that it works *sometimes*, but there wouldn't be any
-guarantee of forward progress as long as EL2 doesn't issue a TLBI.
-
-I reckon we should implement that particular behaviour whenever
-possible, and handle permission faults early, possibly ahead of the
-guest S2 walk (the way we handle VNCR_EL2 faults is IMO a good model).
-
-This would imply taking the guest's S2 permission at face value, and
-only drop W permission when the memslot is RO -- you'd then need to
-keep track of the original W bit somewhere. And that's where things
-become much harder, because KVM can decide to remap arbitrary ranges
-of IPA space as RO, which implies we should track the W bit at all
-times, most likely as one of the SW bits in the PTE.
-
-We'll need exactly that if we ever want to implement the
-Hardware-managed Dirty Bit, but I have the feeling we need an actual
-design for this, and not a quick hack. Your approach is therefore the
-correct one for the time being.
-
-> 
-> ---
->  arch/arm64/kvm/mmu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1c78864767c5c..41017ca579b19 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1508,8 +1508,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
->  	VM_BUG_ON(write_fault && exec_fault);
->  
-> -	if (fault_is_perm && !write_fault && !exec_fault) {
-> -		kvm_err("Unexpected L2 read permission error\n");
-> +	if (fault_is_perm && !write_fault && !exec_fault && !nested) {
-> +		kvm_err("Unexpected S2 read permission error\n");
->  		return -EFAULT;
->  	}
->  
-
-Honestly, I'd rather kill this check altogether rather than adding
-another condition to it -- I suggested it to Fuad a while ago. This is
-the first time we ever see it firing, and I don't think it is bringing
-much.
-
-Thanks,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+>  arch/arm64/kvm/arm.c      |  2 +-
+>  arch/loongarch/kvm/main.c |  2 +-
+>  arch/riscv/kvm/main.c     |  2 +-
+>  arch/x86/kvm/x86.c        |  2 +-
+>  include/linux/kvm_host.h  | 11 +++++++++--
+>  virt/kvm/kvm_main.c       |  5 +++--
+>  6 files changed, 16 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 888f7c7abf54..6c604b5214f2 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2328,7 +2328,7 @@ static int __init init_subsystems(void)
+>         if (err)
+>                 goto out;
+>
+> -       kvm_register_perf_callbacks(NULL);
+> +       kvm_register_perf_callbacks();
+>
+>  out:
+>         if (err)
+> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+> index 80ea63d465b8..f62326fe29fa 100644
+> --- a/arch/loongarch/kvm/main.c
+> +++ b/arch/loongarch/kvm/main.c
+> @@ -394,7 +394,7 @@ static int kvm_loongarch_env_init(void)
+>         }
+>
+>         kvm_init_gcsr_flag();
+> -       kvm_register_perf_callbacks(NULL);
+> +       kvm_register_perf_callbacks();
+>
+>         /* Register LoongArch IPI interrupt controller interface. */
+>         ret =3D kvm_loongarch_register_ipi_device();
+> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+> index 67c876de74ef..cbe842c2f615 100644
+> --- a/arch/riscv/kvm/main.c
+> +++ b/arch/riscv/kvm/main.c
+> @@ -159,7 +159,7 @@ static int __init riscv_kvm_init(void)
+>                 kvm_info("AIA available with %d guest external interrupts=
+\n",
+>                          kvm_riscv_aia_nr_hgei);
+>
+> -       kvm_register_perf_callbacks(NULL);
+> +       kvm_register_perf_callbacks();
+>
+>         rc =3D kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+>         if (rc) {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 5af2c5aed0f2..d80bbd5e0859 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9689,7 +9689,7 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *op=
+s)
+>                 set_hv_tscchange_cb(kvm_hyperv_tsc_notifier);
+>  #endif
+>
+> -       kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
+> +       __kvm_register_perf_callbacks(ops->handle_intel_pt_intr, NULL);
+>
+>         if (IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) && tdp_mmu_enabled)
+>                 kvm_caps.supported_vm_types |=3D BIT(KVM_X86_SW_PROTECTED=
+_VM);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 15656b7fba6c..20c50eaa0089 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1731,10 +1731,17 @@ static inline bool kvm_arch_intc_initialized(stru=
+ct kvm *kvm)
+>  #ifdef CONFIG_GUEST_PERF_EVENTS
+>  unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu);
+>
+> -void kvm_register_perf_callbacks(unsigned int (*pt_intr_handler)(void));
+> +void __kvm_register_perf_callbacks(unsigned int (*pt_intr_handler)(void)=
+,
+> +                                  void (*mediated_pmi_handler)(void));
+> +
+> +static inline void kvm_register_perf_callbacks(void)
+> +{
+> +       __kvm_register_perf_callbacks(NULL, NULL);
+> +}
+> +
+>  void kvm_unregister_perf_callbacks(void);
+>  #else
+> -static inline void kvm_register_perf_callbacks(void *ign) {}
+> +static inline void kvm_register_perf_callbacks(void) {}
+>  static inline void kvm_unregister_perf_callbacks(void) {}
+>  #endif /* CONFIG_GUEST_PERF_EVENTS */
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index ecafab2e17d9..d477a7fda0ae 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -6429,10 +6429,11 @@ static struct perf_guest_info_callbacks kvm_guest=
+_cbs =3D {
+>         .handle_mediated_pmi    =3D NULL,
+>  };
+>
+> -void kvm_register_perf_callbacks(unsigned int (*pt_intr_handler)(void))
+> +void __kvm_register_perf_callbacks(unsigned int (*pt_intr_handler)(void)=
+,
+> +                                  void (*mediated_pmi_handler)(void))
+>  {
+>         kvm_guest_cbs.handle_intel_pt_intr =3D pt_intr_handler;
+> -       kvm_guest_cbs.handle_mediated_pmi =3D NULL;
+> +       kvm_guest_cbs.handle_mediated_pmi =3D mediated_pmi_handler;
+>
+>         perf_register_guest_info_callbacks(&kvm_guest_cbs);
+>  }
+> --
+> 2.50.1.565.gc32cd1483b-goog
+>
