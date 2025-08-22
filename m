@@ -1,200 +1,183 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A2B270ECD
-	for <kvmarm@lists.linux.dev>; Fri, 22 Aug 2025 03:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CADC15E90;
+	Fri, 22 Aug 2025 06:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755832605; cv=none; b=lxxXflikMVezogXmFb3lhcRRQZdkcYPQEvLBaZWlYIwUAMh4RKdwo/kO0DBB/DWhVR1SAOEUeADx6wNbtTEXG9Nqmexsx9BAvT4h727nsIaNMy+ZPfiKdZJRpIGA/c0W+SsaYQSG9oAKrC+3lXvyZdYZw6scFgKerXlXCmh3sxQ=
+	t=1755845473; cv=none; b=LsoRSjLzEZLXrJRQZIaqCM0BIPwF1HyHIX98x2Tmk/hGeG0iJ/vpwBPkmi4ujAKiE5qyCi74sai0KgGgLz2uo6CVKKazaav3ZeoB/BSZxcH6NuAA3L31otDorGP0QQadlJQUDlp2cvhxFNLjjoS2+IeGaGWITAqWGun2vci2vGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755832605; c=relaxed/simple;
-	bh=UxmMU8bzkBQzj8gGXBuFRC2TfwP2x2RdYhhhCuDkImg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JjQqF8Rnf4bWrnEMlNqu2kU0GfvGjw7ushx3rIbOVbJ/izXERaLZFC/so1x9x1xT8G5Fk03D0hngv79UJXdISAAtC3NKy4ASdfsZKYKoxbRSR2xRZhv1zbmADmdPlGtqN8CTbW/5d7/Dwlq2e2TbchBHrllpWFKn9WDW5+BYVlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=WLDmKesq; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+	s=arc-20240116; t=1755845473; c=relaxed/simple;
+	bh=JCJe22NBnh/Ohku/c/jURhYMPWhOcCrL/i6Ia6jiF3I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GpN0xA4zEg4CpMkbGI/HOvMaiHfHeE8ImFiAcNUPv+nYboozqpABuID7686LcvtkVc8ZQkhSPuTlrFiGcFryVZiyDBAEeU5alXKN9xLrzneAJ9HwhJvc6xFdYSLrPyz9FLUcaiWf0MVaDtkuzErUUGuvbwNoKSqK3Nr/Zx6grNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=j17RBcsD; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="WLDmKesq"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-24626e06f04so6340985ad.2
-        for <kvmarm@lists.linux.dev>; Thu, 21 Aug 2025 20:16:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie.ntu.edu.tw; s=google; t=1755832600; x=1756437400; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L/zK7mkD8fhIY1XCicJNUFjtjYCKj9ei/cY2eINbo8s=;
-        b=WLDmKesqAC0k7kPxS7x7Zo3/SxH1SH1ht1rsWMM3YYW4RzYr7fQ+ApcMQIl7calQ6q
-         lFMaotjBcIbTquZZ8bXNItxhlez5A8A/uppcx2Vayh0Wt7UI1cj+9TmRGw9d5tp0I4VK
-         CJ6z5TE/hdCcvN6LWfZvz3hJf3Jb8v3GRx29KS43gQXheF0XOleM+AlxQtIhR1rpn7P7
-         sQ0PQWcbrQiNhyjx3qUQ5KkSiaLShc5AQblWO2Y1mz8IQ7wSkEoQKlW9Ci8t3jLCw5t2
-         w4Xn5yrG7hzimSq87CfIXim7tvScrDQyhIbfssYj5EGJYHJVof6Q5/EIBOpxR1i6OkCr
-         QjXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755832600; x=1756437400;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L/zK7mkD8fhIY1XCicJNUFjtjYCKj9ei/cY2eINbo8s=;
-        b=dZORF9n62tnhFRhKB59MFUdmzA5wyF3IRq2RL4Ag1jbxZKQx2b42zCGpwNmBTPg6CC
-         a7sfsa/ivKRU19YW0bDayARrtwOo6VHKMh2OwYArlFoDtFD8IX5z9jPqyKBrE0KMGOdq
-         6SUOr5rVXx5lKTocXctXTH/gSojl6ToAiFrmHd0ooUfF6EQ/X4tc31GkQe5rKx05AgSa
-         8RPfWamE5qEHEqfB1gvqfjdSK9X5c0Y5/R6zL4QqbZp2a+QvdnHJEvIUxHtQVals8FfF
-         eP/C/ha6aP7xugHF752Nxw1qiJWVfNzyp4iIOWUR4HG19sQKXfw1+4MOVwHFC+i7MScs
-         F3fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuSKDCTD58HnDwyxQXSk08VAAnpnpCR3z7J1Av9wdzWjCxgIiRlR+JMBH9FAqbroQvg+v8hAU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy0WZq4oauX3f9/FlUJ6vJqRLdw62NNPpILdH075S3uy2HpM7hR
-	a6GxPh8trn+GN1vKMWcdQqeFtsY3yke3m/nrPQ0iGfm694gXPgMPwlJfDm9pahdxiSkNlwfwUlh
-	bumbylM2qf1c7TIKNrNyGo6AVSgBBLWUDspsrffkm442fUZFyAbo=
-X-Gm-Gg: ASbGncvpOrTBIrJ+a+3XY+tM3EDwhNg4xiC3/MeAzZVdBM3IDE9rauVPBVDnvuMZPu9
-	L4fE6wlQwBWrEj4v4xf6nXYMhezF/jHL7Mwu4jD90wXSKyooKXrFgF66fOq5Ry4hseeQr95cxe/
-	0Snhy4HYFPF6tS0n1caAwOThekbJRxOtTUDCb55wytz0z+ZivV/yTb1/0cnNb6V7U7AMHQvz1FN
-	a+1sSbGJRiZiQfi+g1BSuI23nZbsyJChiWrd/W3BAJB6NxWcUdCDTr1DdU/PdR72wlCJYwun8Fs
-	kLbSn/c+Wq0vWSlFPwz8DyrcRCcpUxj1RvVFmfieCeBDOhh0cQZBLoGOqM9A+wwDW3DqISLsFYi
-	x40C9ZupLLphS6FVIeIKVoGio/RM8fqqNNnLDj+O1DbrelUBpZTtXvZyJf+Hu
-X-Google-Smtp-Source: AGHT+IGRHO829XEsXzh+WOPZNk1WyYwE7h4SZNk2NBxWmhF3KYYwHSWfii8nwJe2Ho0aEwY27Tlw2A==
-X-Received: by 2002:a17:902:db01:b0:246:1a33:d9da with SMTP id d9443c01a7336-2462ef85803mr23044175ad.42.1755832600100;
-        Thu, 21 Aug 2025 20:16:40 -0700 (PDT)
-Received: from zenbook (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32514c4b722sm1089459a91.31.2025.08.21.20.16.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 20:16:39 -0700 (PDT)
-From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH] KVM: arm64: nv: Allow shadow stage 2 read fault
-Date: Fri, 22 Aug 2025 11:18:53 +0800
-Message-ID: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="j17RBcsD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=IrjTn5lxjgH6PT63JNA+B4QI+udrzjtftEznNof8LA0=; b=j17RBcsD4qSuOv6w/CU/WxHpFF
+	IUY594dwVhdfBDbQGOv/tKSfMsm0NAXG1Md63nkJNodbRDDk8nW85G6B2OB7xQTA4CYrfAHA3MtQJ
+	6fR1Ko1vfc8+DXbMEJWnMc+JPvB3m9SyDhWLFY94FS9FNO+CVHBVhJfjMdLlt2k5wPS3ZmXInAlMo
+	Yd/DMzJdv4+lN7VYpp0Kveb9yEnELMp1djT3fv3kLMnXUFlH6Ba9vdZOXO0xIvUuhyD3CJDAY0+1R
+	bC6jGsswDCYcR+XRRagP4v+i5j6hl4KC1BjvFwfFUO80GQLv5SLQ6ntdvHQ7Lrjwoa8/ZmJMX1pTo
+	lADwTdoA==;
+Received: from [50.53.25.54] (helo=[192.168.254.17])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1upLc4-00000001kK4-2FVr;
+	Fri, 22 Aug 2025 06:51:00 +0000
+Message-ID: <f87145e5-5a86-4ccf-96ac-61e16e894b81@infradead.org>
+Date: Thu, 21 Aug 2025 23:50:58 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Gm-Spam: 0
-X-Gm-Phishy: 0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 11/29] KVM: arm64: Document the KVM ABI for SME
+To: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <shuah@kernel.org>
+Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
+ Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20250822-kvm-arm64-sme-v7-0-7a65d82b8b10@kernel.org>
+ <20250822-kvm-arm64-sme-v7-11-7a65d82b8b10@kernel.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20250822-kvm-arm64-sme-v7-11-7a65d82b8b10@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-We don't expect to ever encounter a stage-2 read permission fault,
-because read permission is always granted when mapping stage-2. However,
-this isn't certainly the case when NV is involved. The key is the shadow
-mapping built for L2 must have the same or stricter permissions than
-those that L1 built for L2, hence opening the possibility of mappings
-without read permission.
 
-Let's continue handling the read fault if we're handling a shadow
-stage-2 fault, instead of erroring out.
 
-The following illustrates an example, vertical lines stand for either
-L0, L1, or L2 running, with left: L0, middle: L1, and right: L2.
-Horizontal arrows stand for traps and erets between them.
+On 8/21/25 6:53 PM, Mark Brown wrote:
+> SME, the Scalable Matrix Extension, is an arm64 extension which adds
+> support for matrix operations, with core concepts patterned after SVE.
+> 
+> SVE introduced some complication in the ABI since it adds new vector
+> floating point registers with runtime configurable size, the size being
+> controlled by a prameter called the vector length (VL). To provide control
 
-'''
-L0                               L1                               L2
-                                               L2                 |
-                                               writes to an L2 PA |
-|<----------------------------------------------------------------|
-|
-| L0
-| finds no mapping in
-| L1's s2pt for L2
-|
-| L0
-| injects data abort
-|------------------------------->|
-                                 | L1
-                                 | for whatever reason
-                                 | treats this abort specially,
-                                 | only gives it W permission
-                                 |
-       eret traps to L0          |
-|<-------------------------------|
-|
-|      eret back to L2
-|---------------------------------------------------------------->|
-                                                                  |
-                                                   L2             |
-                                                   writes to same |
-                                                   L2 PA (replay) |
-|<----------------------------------------------------------------|
-|
-| L0
-| finds mapping in s2pt that
-| L1 built for L2, create
-| shadow mapping for L2,
-| but only gives it W to match
-| what L1 had given
-|
-|
-|      eret back to L2
-|---------------------------------------------------------------->|
-                                                                  |
-                                                   L2             |
-                                                   writes to same |
-                                                   L2 PA (replay) |
-                                                   success        |
-|<----------------------------------------------------------------|
-|
-|
-|------------------------------->| L1
-                                 | for some reason, relaxes
-                                 | L2's permission from W
-                                 | to RW, AND, doesn't flush
-                                 | TLB
-                                 |
-       eret traps to L0          |
-|<-------------------------------|
-|
-|      eret back to L2
-|---------------------------------------------------------------->|
-                                                                  |
-                                                    L2            |
-                                                    read to L2 PA |
-|<----------------------------------------------------------------|
-| stage-2 read fault
-|
-'''
+                  parameter
 
-Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
----
+> of this to VMMs we offer two phase configuration of SVE, SVE must first be
+> enabled for the vCPU with KVM_ARM_VCPU_INIT(KVM_ARM_VCPU_SVE), after which
+> vector length may then be configured but the configurably sized floating
+> point registers are inaccessible until finalized with a call to
+> KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_SVE) after which the configurably sized
+> registers can be accessed.
+> 
+...
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  Documentation/virt/kvm/api.rst | 117 +++++++++++++++++++++++++++++------------
+>  1 file changed, 82 insertions(+), 35 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 6aa40ee05a4a..71f46b342641 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
 
-I am able to trigger this error with a modified L1 KVM, but I do realize
-this requires L1 to be very strange (or even just wrong) so I understand
-if we don't want to handle this kind of edge case. On the other hand,
-could there also be other ways to trigger this that I have not thought
-of?
+> @@ -2600,12 +2600,12 @@ Specifically:
+>    0x6020 0000 0010 00d5 FPCR        32  fp_regs.fpcr
+>  ======================= ========= ===== =======================================
+>  
+> -.. [1] These encodings are not accepted for SVE-enabled vcpus.  See
+> -       :ref:`KVM_ARM_VCPU_INIT`.
+> +.. [1] These encodings are not accepted for SVE enabled vcpus.  See
 
-Another thing is that this change lets L1 get away with not flushing the
-TLB, but TLBs are ephemeral so it's fine in this aspect, however I'm not
-sure if there are other considerations.
+                                               SVE-enabled
+was good.
 
----
- arch/arm64/kvm/mmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> +       :ref:`KVM_ARM_VCPU_INIT`.  They are also not accepted when SME is
+> +       enabled without SVE and the vcpu is in streaming mode.
+>  
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1c78864767c5c..41017ca579b19 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1508,8 +1508,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
- 	VM_BUG_ON(write_fault && exec_fault);
- 
--	if (fault_is_perm && !write_fault && !exec_fault) {
--		kvm_err("Unexpected L2 read permission error\n");
-+	if (fault_is_perm && !write_fault && !exec_fault && !nested) {
-+		kvm_err("Unexpected S2 read permission error\n");
- 		return -EFAULT;
- 	}
- 
+> @@ -2665,19 +2675,25 @@ follows::
+>  	/* Vector length vq * 16 bytes not supported */
+>  
+>  .. [2] The maximum value vq for which the above condition is true is
+> -       max_vq.  This is the maximum vector length available to the guest on
+> -       this vcpu, and determines which register slices are visible through
+> -       this ioctl interface.
+> +       max_vq.  This is the maximum vector length currently available to
+> +       the guest on this vcpu, and determines which register slices are
+> +       visible through this ioctl interface.
+> +
+> +       If SME is supported then the max_vq used for the Z and P registers
+> +       then while SVCR.SM is 1 this vector length will be the maximum SME
+
+I'm having trouble parsing the 2 lines above.
+
+> +       vector length available for the guest, otherwise it will be the
+> +       maximum SVE vector length available.
+>  
+>  (See Documentation/arch/arm64/sve.rst for an explanation of the "vq"
+>  nomenclature.)
+>  
+
+> @@ -3520,7 +3537,7 @@ Possible features:
+>  	        initial value of this pseudo-register indicates the best set of
+>  	        vector lengths possible for a vcpu on this host.
+>  
+> -	   * Before KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_SVE):
+> +	   * Before KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_VEC}):
+
+		Why the inserted '}', please?
+
+>  
+>  	      - KVM_RUN and KVM_GET_REG_LIST are not available;
+>  
+> @@ -3533,11 +3550,40 @@ Possible features:
+>  	        KVM_SET_ONE_REG, to modify the set of vector lengths available
+>  	        for the vcpu.
+>  
+> -	   * After KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_SVE):
+> +	   * After KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_VEC):
+>  
+>  	      - the KVM_REG_ARM64_SVE_VLS pseudo-register is immutable, and can
+>  	        no longer be written using KVM_SET_ONE_REG.
+>  
+> +	- KVM_ARM_VCPU_SME: Enables SME for the CPU (arm64 only).
+> +	  Depends on KVM_CAP_ARM_SME.
+> +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_VEC):
+> +
+> +	   * After KVM_ARM_VCPU_INIT:
+> +
+> +	      - KVM_REG_ARM64_SME_VLS may be read using KVM_GET_ONE_REG: the
+> +	        initial value of this pseudo-register indicates the best set of
+> +	        vector lengths possible for a vcpu on this host.
+> +
+> +	   * Before KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_VEC}):
+
+	ditto: inserted '}'
+
+> +
+> +	      - KVM_RUN and KVM_GET_REG_LIST are not available;
+> +
+> +	      - KVM_GET_ONE_REG and KVM_SET_ONE_REG cannot be used to access
+> +	        the scalable architectural SVE registers
+> +	        KVM_REG_ARM64_SVE_ZREG(), KVM_REG_ARM64_SVE_PREG() or
+> +	        KVM_REG_ARM64_SVE_FFR, the matrix register
+> +		KVM_REG_ARM64_SME_ZA() or the LUT register KVM_REG_ARM64_ZT();
+> +
+> +	      - KVM_REG_ARM64_SME_VLS may optionally be written using
+> +	        KVM_SET_ONE_REG, to modify the set of vector lengths available
+> +	        for the vcpu.
+> +
+> +	   * After KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_VEC):
+
 -- 
-2.50.1
+~Randy
 
