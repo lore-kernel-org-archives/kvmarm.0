@@ -1,98 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B189393DD1;
-	Mon, 25 Aug 2025 22:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E2E1A23A4;
+	Mon, 25 Aug 2025 23:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756160801; cv=none; b=gz9f7KqydZHWUcB86tkU+PIDKrNgI99SdR77d6b8R555VQc8qDjKudLevrwcrucey/5AfPPT/lCD8X/nX8vT1E63bDxZSRjxktQsHW4Jh7jjJTztNCGtmb5QC9fD9Ry+3oKUz7RXYW7BcAP/74H/7gObqfQOfqI4UbozLMEsPQI=
+	t=1756163342; cv=none; b=kn5irwqVbgONcPwayA2oknlYpS0427wJMCJg1pF/wg5VZ1oATBGz3YNCg9ybFJGsncGGQkwViKO6Zd+oxbbUtzj8OikyCYvQ/m+ursH2PWSMYlhnO7dRB32e8vftUEO6oVg/RnHFmITyB1Mb/AdXCPterrC0xCEInUAiKmbc+AY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756160801; c=relaxed/simple;
-	bh=GoT/IDAj0/zl52GctB7u4AkgxxaowB1GBSt3qSkJ1E4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BUj+aOxb6taEO7eOvnxmRMsk58NN2WRKrdfUOJF32tZARV+xxUnCCJMC8WcSwzFJiII6BhulK9HLHK9gRVODQuVP2N+YqulJ4Mu8MsnE2tP3JTbWrzThXOrf3OgyvyU9nd1cMEyvw+eQS3CX+O396F2xwXQw31z95rW86eFT20Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NWhRXs6C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756163342; c=relaxed/simple;
+	bh=Fz172bfnT2fDc0B5BW9KQC8VQwSCH+A00nsF+R3Nznk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hz+aKgpJdS3JUod7kXUBD2/nkVJSpiysPW4oa4ySdYm3lpsEga2G1EqOQKu94HiY+ebSQtbFESFb6CiU8vrPHVEbe8eJSQWcuk4JbRcb1SlJ3du8gHgWHCDemEaKkRsqSQJDHZH2uLBS++ih/zQWEhX1jmSwA7teJ9QtS01DZSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=GTT5fOzU; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NWhRXs6C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01FEDC4CEED;
-	Mon, 25 Aug 2025 22:26:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756160800;
-	bh=GoT/IDAj0/zl52GctB7u4AkgxxaowB1GBSt3qSkJ1E4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NWhRXs6Cbt9IBasNjzbrSoMfcGqD7tsG+V408f534nn6Bx+XQJj85bVx7NsFSy+yU
-	 TmOztuBY/wqLhaH+5EZk96/TwXUXIkZZXJhymLz/XqCycTtAp21dM7xDlt7u77Efi9
-	 i650eYZ5SRgcoXWnDHonuVKfPSVk7N9gIJBPt4VR0KeDj/UrZnQxBpWGz/KEXpMEC5
-	 KC+SFUbdvyPM/aYHhQlv8UHOZRNBZQnoYRbhwKGap+ReS6crF/1t/uenNLY9qNSDYf
-	 irJDfpr3g/Zb1UeuMJWMPgi888bpBrHyT/dBPpbUsGxoLlDL0YFx55ub3z9UObaIVS
-	 hCBvdVm4TTUeA==
-Date: Mon, 25 Aug 2025 22:26:38 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Uladzislau Rezki <urezki@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-hyperv@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [PATCH 0/5] Drivers: hv: Fix NEED_RESCHED_LAZY and use common
- APIs
-Message-ID: <aKzjHjtI2fbFjBpe@liuwe-devbox-ubuntu-v2.tail21d00.ts.net>
-References: <20250825200622.3759571-1-seanjc@google.com>
- <20250825222319.GO3419281@noisy.programming.kicks-ass.net>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="GTT5fOzU"
+Received: from [100.64.0.200] (unknown [20.29.225.195])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 1E032211829D;
+	Mon, 25 Aug 2025 16:08:59 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1E032211829D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1756163339;
+	bh=yjj+T4F6X5Rb2NiUbWNootXcw5MYUgeaYi89zI0rqQM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GTT5fOzUX6bjgmJRyTtl5Nlh5JACcr0YCsgajA504/VguHTsD2kG9KDvDG5alk+gF
+	 AlqgkFhhFVQMT3abN68Y5Bm44usX4MzHqG7q2W8uP1gfSybPvK8eBGyTYKXvPevQWI
+	 Yg63eHOsilGGsMx/M0Y6URyOnRsPjGUV5RxxijdQ=
+Message-ID: <3188ca61-2591-4576-9777-1671689b7235@linux.microsoft.com>
+Date: Mon, 25 Aug 2025 16:08:45 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250825222319.GO3419281@noisy.programming.kicks-ass.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/5] Drivers: hv: Fix NEED_RESCHED_LAZY and use common
+ APIs
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Peter Zijlstra <peterz@infradead.org>,
+ Andy Lutomirski <luto@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett
+ <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Uladzislau Rezki <urezki@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, rcu@vger.kernel.org
+References: <20250825200622.3759571-1-seanjc@google.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <20250825200622.3759571-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 26, 2025 at 12:23:19AM +0200, Peter Zijlstra wrote:
-> On Mon, Aug 25, 2025 at 01:06:17PM -0700, Sean Christopherson wrote:
-> > Fix a bug where MSHV root partitions don't honor NEED_RESCHED_LAZY, and then
-> > deduplicate the TIF related MSHV code by turning the "kvm" entry APIs into
-> > more generic "virt" APIs (which ideally would have been done when MSHV root
-> > support was added).
-> > 
-> > Assuming all is well, maybe this could go through the tip tree?
-> > 
-> > The Hyper-V stuff and non-x86 architectures are compile-tested only.
+On 8/25/2025 1:06 PM, Sean Christopherson wrote:
+> Fix a bug where MSHV root partitions don't honor NEED_RESCHED_LAZY, and then
+> deduplicate the TIF related MSHV code by turning the "kvm" entry APIs into
+> more generic "virt" APIs (which ideally would have been done when MSHV root
+> support was added).
 > 
-> I suspect there's more of this wreckage in the new VTL driver that
-> they just put in:
+> Assuming all is well, maybe this could go through the tip tree?
 > 
->   https://lore.kernel.org/all/20250729051436.190703-3-namjain@linux.microsoft.com/
+> The Hyper-V stuff and non-x86 architectures are compile-tested only.
 > 
-> although ideally they rip that thing out. I don't know how that code can
-> ever be correct.
 
-Please give us some time, Peter. I have asked the corresponding team to
-respond to your comments.
+Thanks Sean, I can test the root partition changes.
 
-Wei
+A similar change will be needed in mshv_vtl_main.c since it also calls
+mshv_do_pre_guest_mode_work() (hence the "common" in mshv_common.c).
+
+Also, is it possible to make all the mshv driver changes in a single patch?
+It seems like it would be cleaner than refactoring it in patches 1 & 2 and
+then deleting all the refactored code in patch 5.
+
+Thanks
+Nuno
+
+> Sean Christopherson (5):
+>   Drivers: hv: Move TIF pre-guest work handling fully into mshv_common.c
+>   Drivers: hv: Handle NEED_RESCHED_LAZY before transferring to guest
+>   entry/kvm: KVM: Move KVM details related to signal/-EINTR into KVM
+>     proper
+>   entry: Rename "kvm" entry code assets to "virt" to genericize APIs
+>   Drivers: hv: Use common "entry virt" APIs to do work before running
+>     guest
+> 
+>  MAINTAINERS                                 |  2 +-
+>  arch/arm64/kvm/Kconfig                      |  2 +-
+>  arch/arm64/kvm/arm.c                        |  3 +-
+>  arch/loongarch/kvm/Kconfig                  |  2 +-
+>  arch/loongarch/kvm/vcpu.c                   |  3 +-
+>  arch/riscv/kvm/Kconfig                      |  2 +-
+>  arch/riscv/kvm/vcpu.c                       |  3 +-
+>  arch/x86/kvm/Kconfig                        |  2 +-
+>  arch/x86/kvm/vmx/vmx.c                      |  1 -
+>  arch/x86/kvm/x86.c                          |  3 +-
+>  drivers/hv/Kconfig                          |  1 +
+>  drivers/hv/mshv.h                           |  2 --
+>  drivers/hv/mshv_common.c                    | 22 ---------------
+>  drivers/hv/mshv_root_main.c                 | 31 ++++-----------------
+>  include/linux/{entry-kvm.h => entry-virt.h} | 19 +++++--------
+>  include/linux/kvm_host.h                    | 17 +++++++++--
+>  include/linux/rcupdate.h                    |  2 +-
+>  kernel/entry/Makefile                       |  2 +-
+>  kernel/entry/{kvm.c => virt.c}              | 15 ++++------
+>  kernel/rcu/tree.c                           |  6 ++--
+>  virt/kvm/Kconfig                            |  2 +-
+>  21 files changed, 49 insertions(+), 93 deletions(-)
+>  rename include/linux/{entry-kvm.h => entry-virt.h} (83%)
+>  rename kernel/entry/{kvm.c => virt.c} (66%)
+> 
+> 
+> base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
+
