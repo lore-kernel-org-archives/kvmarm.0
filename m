@@ -1,225 +1,162 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993DE18FC91
-	for <kvmarm@lists.linux.dev>; Mon, 25 Aug 2025 02:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2511C76026
+	for <kvmarm@lists.linux.dev>; Mon, 25 Aug 2025 15:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756090057; cv=none; b=NqaMe30en3CUVHtVLlYbXQbjcCC7fjdq1T5jNEGLoMyqp7ZUVWjvrrqNuOuA3S5ojI88KNfTQiFWSMZWitit9hkUa9DsA8XsRSUiBZkGcSXBcQU/WzSneBoZTmZ5qwsfnBdRzhHDdL1LbeOXZXpFwveWIU1696VYh3XE1PP266s=
+	t=1756137134; cv=none; b=jIRIyyCyE4D0lkRDM5MxQE/udYyxW6y7z/VLg0USlSZYW7RC1uAUUtNEkSnRCt1asDpZwKPq/gYTRq4yY8wpXak65fURkAIzmQw564e0kPq610COmNS781rEj2cDV6ofq+i4d3mZprDOlY39NJ5uq0bkalxVcdUeByTb/RjzViY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756090057; c=relaxed/simple;
-	bh=Q6uBlWMbOmk29fT5efcu0SjqikpiXfzjlXhCVghLBF0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sy5FNN80PlfYBvjFnNC5PP7mtri0aroAAAbRbkmVfOB5fWloBtZk7QlsaWpmdcyCedEXBM3kov+cQNSNGwkV2Q72pzJzV7UZe81oPN2OPn20/38l3NVsAfBV6LVfJlUMTfOyVw+hxsQwZEiUxplC5/083N6m4YY93SGIwmVQO/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4c9FW970yXz1R91T;
-	Mon, 25 Aug 2025 10:44:37 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2A12D1A0188;
-	Mon, 25 Aug 2025 10:47:33 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 25 Aug 2025 10:47:32 +0800
-Received: from huawei.com (10.90.31.46) by kwepemq200004.china.huawei.com
- (7.202.195.237) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 25 Aug
- 2025 10:47:32 +0800
-From: Zhou Wang <wangzhou1@hisilicon.com>
-To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
-CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <tangnianyao@huawei.com>,
-	<wangwudi@hisilicon.com>, <liuyonglong@huawei.com>,
-	<prime.zeng@hisilicon.com>, Zhou Wang <wangzhou1@hisilicon.com>
-Subject: [PATCH v2 4/4] ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200802
-Date: Mon, 25 Aug 2025 10:39:54 +0800
-Message-ID: <20250825023954.3516381-5-wangzhou1@hisilicon.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250825023954.3516381-1-wangzhou1@hisilicon.com>
-References: <20250825023954.3516381-1-wangzhou1@hisilicon.com>
+	s=arc-20240116; t=1756137134; c=relaxed/simple;
+	bh=KZkhA/kQOmp5Oy93QMxfpEXKqa6Fo2q74cwH7XYOoXk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:content-type; b=JHP+CjG/4SWOlpKB7n6HrV16gQEoqs66fu/MYOU1CdB6QPCYejtOSqA+8Kpt9iJCpIo04xARZvAomtaEzQivhkCr4RyQck5eNDhnYiJOZ9JpoJ4U2F8FmoF851RgaNwL9Ydlf7OhS8wGfYIMNSegmc+p+l4gWuV4s/gnxJhJC7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OPCBtIBg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OPCBtIBg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756137132;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Ed6qfTFHMUqyUn8kqjL4nj7yM5M0u0oh4hNGYHbww5c=;
+	b=OPCBtIBgbbPpWnlUqiNTfGcjkKnbrBL1ShPg0cmIpqaRl+SXNM4WwayfxdvnqytsiaUa6f
+	34kJ4oVplFatvfD8oic8ucvOywuuMxe4HJpWDL03N8OqLmn0CaoUiaf7NqOY4bLcRw+73w
+	McRuiRpkAjx/Go4+DeR8Zea5VSfsw/Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-PCYMmeMyPWW7dRxEesKhoA-1; Mon, 25 Aug 2025 11:52:10 -0400
+X-MC-Unique: PCYMmeMyPWW7dRxEesKhoA-1
+X-Mimecast-MFC-AGG-ID: PCYMmeMyPWW7dRxEesKhoA_1756137129
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45a1b05a59cso32699115e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 25 Aug 2025 08:52:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756137129; x=1756741929;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ed6qfTFHMUqyUn8kqjL4nj7yM5M0u0oh4hNGYHbww5c=;
+        b=MNlmsd5cS3RGMUrVBAmwZh5ibOYz/lsFtJEicVL35/gPsAwC14EOWot0mV433arRfG
+         A/vDkjL+ICWh7n4w3DzuLDV2Q1BFpv7AeDnFXcoNPjWSj75F4HAtQy1F7802IDiCYLA3
+         66RV2iTpQ+KdiQB04MDkr67gdq7zw1eLDR69Y1rglwr25ZoXKxVSMVDJqBkVGu8NDHbz
+         ezm27V1JwxFLzEwnMs5lBTjC45PWO7VWT57WhAmXNgPC1zhcCtUVYnhAIBgKEQsHgJbG
+         M5plKzTj7sAZiPUXto51jhdlPXdO0YktLTa7rqqMbmxWItLNRHFuEX/1JHsQGY909r6X
+         i5uA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEkFwaukNEhNN87S01qdudqsR1+Xo/R/sSPJf4aQorZ3idXHNQRVoAOUWXxS78iBSbydxrh6c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxCjHigf6cVtcF6WeEiT3j9rU4LRAZxwNIvcJbXCVyY/xXYDKL+
+	nTe2fL5rmFgZBw52xxBvrZNvAoxURq2CxdVPiTdp+9cl4CdS26pXCW20e2sd6+/iuQI3LCr9qHK
+	R5hzJUahq/kPRequTgAfWpoSJtwsk15VoaBJZgneYlzKCciLqVwzKBk9v069OhPkII0OE
+X-Gm-Gg: ASbGncv2V86D+pqeRnplJCNiklzBCjUHVr50pvAJBMrllDSii8spZzYyvx/f5rgt+5v
+	1WM6IqS2+xcOqKpd+apZlnADfIZoLy3e8WMlzy54ZVHyDIMm22NbgILnvu8Z26dV42B9ovhQLHP
+	S0n2/K6c6WpiYfgisHWOwS2k5yPpOeslzvDAYthiM708f/iJpP7gwZOkucyJ0N6Gt7SekdwcuWu
+	GKooHTVb22qzlcEwgLiOSHHbND5hlXJ/c0b6tk565RqlA9VqATIrCSyJgRPEd8F+wZs6ydWey4k
+	KRbdO6KUY/bVGhruI87+H4/vwV1bDHy+vE/pQrHc1TP4qGdPQAVAJL1eH/sfr8rQAkpNNIDrREm
+	tM1pjDP6EQQynUUkLnCyx/PtTU4k=
+X-Received: by 2002:a05:6000:2404:b0:3b8:d30c:885f with SMTP id ffacd0b85a97d-3c5dcefe32fmr10599038f8f.53.1756137128980;
+        Mon, 25 Aug 2025 08:52:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFXEz5g23IvWuo/ydVi6QeOhq8AK8ymIKqhjfE0JE8EYTvGus+zqYsHwn1w6Z++sXaw7/PNcA==
+X-Received: by 2002:a05:6000:2404:b0:3b8:d30c:885f with SMTP id ffacd0b85a97d-3c5dcefe32fmr10599010f8f.53.1756137128539;
+        Mon, 25 Aug 2025 08:52:08 -0700 (PDT)
+Received: from rh.redhat.com (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c70f237fefsm12155436f8f.30.2025.08.25.08.52.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Aug 2025 08:52:08 -0700 (PDT)
+From: Sebastian Ott <sebott@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sebastian Ott <sebott@redhat.com>
+Subject: [PATCH] KVM: selftests: fix irqfd_test on arm64
+Date: Mon, 25 Aug 2025 17:52:03 +0200
+Message-ID: <20250825155203.71989-1-sebott@redhat.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: kAycSKlFWYRkUiSPWaV-AjdGbVxkWSEhlS4GnQLfnDE_1756137129
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+content-type: text/plain; charset="US-ASCII"; x-default=true
 
-For GICv4.0 of Hip10 and Hip10C, it has a SoC bug with vPE schedule:
-when multiple vPEs are sending vpe schedule/deschedule commands
-concurrently and repeatedly, some vPE schedule command may not be
-scheduled, and it will cause the command timeout.
+irqfd_test on arm triggers the following assertion:
+==== Test Assertion Failure ====
+  include/kvm_util.h:527: !ret
+  pid=3643 tid=3643 errno=11 - Resource temporarily unavailable
+     1  0x00000000004026d7: kvm_irqfd at kvm_util.h:527
+     2  0x0000000000402083: main at irqfd_test.c:100
+     3  0x0000ffffa5aab587: ?? ??:0
+     4  0x0000ffffa5aab65f: ?? ??:0
+     5  0x000000000040236f: _start at ??:?
+  KVM_IRQFD failed, rc: -1 errno: 11 (Resource temporarily unavailable)
 
-The hardware implementation is that there is one GIC hardware in one CPU die,
-which handles all vPE schedule operations one by one in all CPUs of this die.
-The bug is that if the number of queued vPE schedule operations is more
-than a certain value, the last vPE schedule operation will be lost.
+Fix this by setting up a vgic for the vm.
 
-One possible way to solve this problem is to limit the number of vLPIs, so
-the hardware could spend less time to scan virtual pending table when it
-handles the vPE schedule operations, so the queued vPE schedule operations
-will never be more than above certain value.
-
-Given the number of CPUs of die, and imagine there is 100 vPE schedule
-operations per second one CPU, it can be calculated that we can limit
-the number of vLPI to 4096 for virtual machine to avoid the issue.
-
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Signed-off-by: Sebastian Ott <sebott@redhat.com>
 ---
- Documentation/arch/arm64/silicon-errata.rst |  2 ++
- arch/arm64/Kconfig                          | 12 ++++++++++++
- arch/arm64/include/asm/cputype.h            |  4 ++++
- arch/arm64/kernel/cpu_errata.c              | 15 +++++++++++++++
- arch/arm64/kvm/vgic/vgic-init.c             |  9 ++++++++-
- arch/arm64/kvm/vgic/vgic-mmio-v3.c          |  6 ++++++
- arch/arm64/tools/cpucaps                    |  1 +
- 7 files changed, 48 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/irqfd_test.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-index b18ef4064bc0..0de545c1fce5 100644
---- a/Documentation/arch/arm64/silicon-errata.rst
-+++ b/Documentation/arch/arm64/silicon-errata.rst
-@@ -264,6 +264,8 @@ stable kernels.
- +----------------+-----------------+-----------------+-----------------------------+
- | Hisilicon      | Hip09           | #162100801      | HISILICON_ERRATUM_162100801 |
- +----------------+-----------------+-----------------+-----------------------------+
-+| Hisilicon      | Hip{10,10C}     | #162200802      | HISILICON_ERRATUM_162200802 |
-++----------------+-----------------+-----------------+-----------------------------+
- +----------------+-----------------+-----------------+-----------------------------+
- | Qualcomm Tech. | Kryo/Falkor v1  | E1003           | QCOM_FALKOR_ERRATUM_1003    |
- +----------------+-----------------+-----------------+-----------------------------+
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index e9bbfacc35a6..a43a341047a2 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1270,6 +1270,18 @@ config HISILICON_ERRATUM_162100801
+diff --git a/tools/testing/selftests/kvm/irqfd_test.c b/tools/testing/selftests/kvm/irqfd_test.c
+index 7c301b4c7005..f7b8766e9d42 100644
+--- a/tools/testing/selftests/kvm/irqfd_test.c
++++ b/tools/testing/selftests/kvm/irqfd_test.c
+@@ -8,7 +8,11 @@
+ #include <stdint.h>
+ #include <sys/sysinfo.h>
  
- 	  If unsure, say Y.
- 
-+config HISILICON_ERRATUM_162200802
-+	bool "Hip{10, 10C} 162200802 erratum support"
-+	default y
-+	help
-+	  For GICv4.0 of Hip10 and Hip10C, it has a soc bug with vPE schedule:
-+	  when multiple vPEs are sending vpe schedule/deschedule commands
-+	  concurrently and repeatly, some vPE schedule command may not be
-+	  scheduled, and it will cause the command timeout. To avoid the
-+	  issue, limit the number of vLPI to 4096 for virtual machine.
-+
-+	  If unsure, say Y.
-+
- config QCOM_FALKOR_ERRATUM_1003
- 	bool "Falkor E1003: Incorrect translation due to ASID change"
- 	default y
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index 661735616787..c40328907433 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -134,6 +134,8 @@
- 
- #define HISI_CPU_PART_TSV110		0xD01
- #define HISI_CPU_PART_HIP09			0xD02
-+#define HISI_CPU_PART_HIP10		0xD03
-+#define HISI_CPU_PART_HIP10C		0xD45
- #define HISI_CPU_PART_HIP12		0xD06
- 
- #define APPLE_CPU_PART_M1_ICESTORM	0x022
-@@ -223,6 +225,8 @@
- #define MIDR_FUJITSU_A64FX MIDR_CPU_MODEL(ARM_CPU_IMP_FUJITSU, FUJITSU_CPU_PART_A64FX)
- #define MIDR_HISI_TSV110 MIDR_CPU_MODEL(ARM_CPU_IMP_HISI, HISI_CPU_PART_TSV110)
- #define MIDR_HISI_HIP09 MIDR_CPU_MODEL(ARM_CPU_IMP_HISI, HISI_CPU_PART_HIP09)
-+#define MIDR_HISI_HIP10 MIDR_CPU_MODEL(ARM_CPU_IMP_HISI, HISI_CPU_PART_HIP10)
-+#define MIDR_HISI_HIP10C MIDR_CPU_MODEL(ARM_CPU_IMP_HISI, HISI_CPU_PART_HIP10C)
- #define MIDR_HISI_HIP12 MIDR_CPU_MODEL(ARM_CPU_IMP_HISI, HISI_CPU_PART_HIP12)
- #define MIDR_APPLE_M1_ICESTORM MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM)
- #define MIDR_APPLE_M1_FIRESTORM MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM)
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 59d723c9ab8f..c97a65d799db 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -564,6 +564,14 @@ static const struct midr_range erratum_ac04_cpu_23_list[] = {
- };
- #endif
- 
-+#ifdef CONFIG_HISILICON_ERRATUM_162200802
-+static const struct midr_range erratum_hisi_162200802[] = {
-+	MIDR_ALL_VERSIONS(MIDR_HISI_HIP10),
-+	MIDR_ALL_VERSIONS(MIDR_HISI_HIP10C),
-+	{},
-+};
++#include "processor.h"
+ #include "kvm_util.h"
++#ifdef __aarch64__
++#include "vgic.h"
 +#endif
+ 
+ static struct kvm_vm *vm1;
+ static struct kvm_vm *vm2;
+@@ -86,14 +90,30 @@ static void juggle_eventfd_primary(struct kvm_vm *vm, int eventfd)
+ 	kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
+ }
+ 
++static struct kvm_vm *test_vm_create(void)
++{
++#ifdef __aarch64__
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	int gic_fd;
 +
- const struct arm64_cpu_capabilities arm64_errata[] = {
- #ifdef CONFIG_ARM64_WORKAROUND_CLEAN_CACHE
- 	{
-@@ -905,6 +913,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		.matches = has_impdef_pmuv3,
- 		.cpu_enable = cpu_enable_impdef_pmuv3_traps,
- 	},
-+#ifdef CONFIG_HISILICON_ERRATUM_162200802
-+	{
-+		.desc = "HiSilicon erratum 162200802",
-+		.capability = ARM64_WORKAROUND_HISI_162200802,
-+		ERRATA_MIDR_RANGE_LIST(erratum_hisi_162200802),
-+	},
++	vm = vm_create_with_one_vcpu(&vcpu, NULL);
++	gic_fd = vgic_v3_setup(vm, 1, 64);
++	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
++
++	return vm;
 +#endif
- 	{
- 	}
- };
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 46468cb97536..306ae6f55983 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -389,7 +389,14 @@ int vgic_init(struct kvm *kvm)
- 	/* freeze the number of spis */
- 	if (!dist->nr_spis)
- 		dist->nr_spis = VGIC_NR_IRQS_LEGACY - VGIC_NR_PRIVATE_IRQS;
--	dist->nr_lpis = 0;
++	return vm_create(1);
++}
 +
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_HISI_162200802) &&
-+	    kvm_vgic_global_state.has_gicv4 &&
-+	    !kvm_vgic_global_state.has_gicv4_1)
-+		dist->nr_lpis = 4096;
-+	else
-+		dist->nr_lpis = 0;
-+
+ int main(int argc, char *argv[])
+ {
+ 	pthread_t racing_thread;
+ 	int r, i;
  
- 	ret = kvm_vgic_dist_init(kvm, dist->nr_spis);
- 	if (ret)
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 3a53b63f7b20..477d6af4a709 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -180,6 +180,12 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
- 			return -EINVAL;
- 		if (GICD_TYPER_NUM_LPIS(val) > INTERRUPT_ID_BITS_ITS)
- 			return -EINVAL;
-+		/* Limit the number of vlpis to 4096 */
-+		if (cpus_have_final_cap(ARM64_WORKAROUND_HISI_162200802) &&
-+		    kvm_vgic_global_state.has_gicv4 &&
-+		    !kvm_vgic_global_state.has_gicv4_1 &&
-+		    GICD_TYPER_NUM_LPIS(val) != 12)
-+			return -EINVAL;
+ 	/* Create "full" VMs, as KVM_IRQFD requires an in-kernel IRQ chip. */
+-	vm1 = vm_create(1);
+-	vm2 = vm_create(1);
++	vm1 = test_vm_create();
++	vm2 = test_vm_create();
  
- 		dist->nr_lpis = 2 ^ GICD_TYPER_NUM_LPIS(val);
- 		return 0;
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index ef0b7946f5a4..e39bd95dea74 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -111,6 +111,7 @@ WORKAROUND_CAVIUM_TX2_219_PRFM
- WORKAROUND_CAVIUM_TX2_219_TVM
- WORKAROUND_CLEAN_CACHE
- WORKAROUND_DEVICE_LOAD_ACQUIRE
-+WORKAROUND_HISI_162200802
- WORKAROUND_NVIDIA_CARMEL_CNP
- WORKAROUND_PMUV3_IMPDEF_TRAPS
- WORKAROUND_QCOM_FALKOR_E1003
+ 	WRITE_ONCE(__eventfd, kvm_new_eventfd());
+ 
 -- 
-2.33.0
+2.51.0
 
