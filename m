@@ -1,44 +1,68 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201ED13C695
-	for <kvmarm@lists.linux.dev>; Mon, 25 Aug 2025 21:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD12326290;
+	Mon, 25 Aug 2025 21:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756157928; cv=none; b=oTVfsmCCxb0i3p3KsZ1ZhOFO0Y2XrAGFH65nLKYIhIMOIULRvU0+D8KEtHwYOB0dR9EVeoumlhhmsRHOvadDv/hj0bQpO1uNynsNysqXaBn5tFbCkzkDIJ+xt8RKZPbIxIvWqcQzCpg0VtLNp87PVXvgeSRRZuJagwTxSHaK/9g=
+	t=1756158355; cv=none; b=hdFfzTrW7nakp6Fdk4vehspuTA9nTLArvCpIfQAZHaH1HNAFNO43QNIf1bfeWBNHzLCHg8o6xdk8s/4SUeVnBm7r3ibEbNvIV4fp+GzJREjQMAUQlb3RyXPfHyGWoAbBeEgiQTkZbZEAC+zXYinIvagUMG9ftqFjPceLq8qHC+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756157928; c=relaxed/simple;
-	bh=nDzVpC+t1U+7sHNaEIwZiniHiB4Gcj9beJV5ErzYl1w=;
+	s=arc-20240116; t=1756158355; c=relaxed/simple;
+	bh=z2K4pTnpiDqLqYIH8QVc9PQKE3DH+YA71ZyqVbqxW6o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VslLdK42bQK7kvnpsmAcNWSKA0KOzOHq4T/MEECEvuLlDE/gZ1+Xiie7DzhycqmzX2nOwJkTnjtlpQ8yGX1sO5/9bLzF1AVpoz5YyC8HloBVans/ThMFZ0HLUPwARRPc8tj/FjqGsTBpToxTpfNoEgxhDmNcN+R1GOZVenIZzcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dKKl258e; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=LONqsWp/LDezsMAEnFrenRga02z/ihQeYlpSR5zsALSc+kzGABF8fgIVGE1IAcbc3NyOo0SsaiJcbXqQ9CQpBF3NAqTwCm9pK5JedNDWwi2eyUa+NZ5zQQC7HiQp7QcTxwt58NLNinBsKxchETtpUewfKo+yVbG/mfM70KV6nIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WehF5ftN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dKKl258e"
-Date: Mon, 25 Aug 2025 14:38:31 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756157923;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Svt/1wXouXBpITE7xnGEFoLKgtvLf25+nxzKUnLuc7E=;
-	b=dKKl258ebLK0JjJ6bmMPG+Q9KnsfJP84OX4Vb2wogABy/Psyhw6QcqPnO3eDUhaDPxbQbm
-	n+2GkQ1imRGLIht5eNvDOSaEso+pt4GQihzHD00PJUSCxKfbQLM/3rGk6MNZQ4rw9yzjpy
-	jnjs6mBksPP1oNFazsyPiV16vKR/L2c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WehF5ftN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95AD6C4CEED;
+	Mon, 25 Aug 2025 21:45:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756158354;
+	bh=z2K4pTnpiDqLqYIH8QVc9PQKE3DH+YA71ZyqVbqxW6o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WehF5ftNNXRo0ktcAvTwwGNFGV/EAJ74RPmJHCc1/Z17l1QEglTKoK3ibLL8gnc4t
+	 NlKz6k7fz2lmrzWRP6K+pj3xu5efQX0yAcStIUphpdlkE0hXvX1O/hxV14uaFfM9Il
+	 teNGWS4vL/IPlA1GKik4UxLjNusOjbU5D/OewsXrWcI/Ynet9r+J6j0h0Qw9udbcdx
+	 Jt5qZw5UoaBh5E3LiK4rJTYYyfwi5l7H9dDZXLKpcynQANDbCwVWm46jM36cUflkSE
+	 TgteF7/ksdzao8dEBvyhS4bxR3OBEL/v0WKy2lffmwCnCK3v1xmgFX8nRRpGli6jrU
+	 9ptYFqpFDYbDA==
+Date: Mon, 25 Aug 2025 21:45:52 +0000
+From: Wei Liu <wei.liu@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Sebastian Ott <sebott@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: fix irqfd_test on arm64
-Message-ID: <aKzX152737nAo479@linux.dev>
-References: <20250825155203.71989-1-sebott@redhat.com>
- <aKy-9eby1OS38uqM@google.com>
- <87zfbnyvk9.wl-maz@kernel.org>
- <aKzRgp58vU6h02n6@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, loongarch@lists.linux.dev,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-hyperv@vger.kernel.org, rcu@vger.kernel.org,
+	mrathor@linux.microsoft.com, nunodasneves@linux.microsoft.com
+Subject: Re: [PATCH 0/5] Drivers: hv: Fix NEED_RESCHED_LAZY and use common
+ APIs
+Message-ID: <aKzZkItq-8_OmxJ0@liuwe-devbox-ubuntu-v2.tail21d00.ts.net>
+References: <20250825200622.3759571-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,33 +71,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aKzRgp58vU6h02n6@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250825200622.3759571-1-seanjc@google.com>
 
-On Mon, Aug 25, 2025 at 02:11:30PM -0700, Sean Christopherson wrote:
-> On Mon, Aug 25, 2025, Marc Zyngier wrote:
-> > On Mon, 25 Aug 2025 20:52:21 +0100,
-> > Sean Christopherson <seanjc@google.com> wrote:
-> > > Is there a sane way to handle vGIC creation in kvm_arch_vm_post_create()?  E.g.
-> > > could we create a v3 GIC when possible, and fall back to v2?  And then provide a
-> > > way for tests to express a hard v3 GIC dependency?
-> > 
-> > You can ask KVM what's available. Like an actual VMM does. There is no
-> > shortage of examples in the current code base.
+On Mon, Aug 25, 2025 at 01:06:17PM -0700, Sean Christopherson wrote:
+> Fix a bug where MSHV root partitions don't honor NEED_RESCHED_LAZY, and then
+> deduplicate the TIF related MSHV code by turning the "kvm" entry APIs into
+> more generic "virt" APIs (which ideally would have been done when MSHV root
+> support was added).
 > 
-> Right, by "sane" I meant: is there a way to instantiate a supported GIC without
-> making it hard/painful to write tests, and without having to plumb in arm64
-> specific requirements to common APIs?
-> 
-> E.g. are there tests that use the common vm_create() APIs and rely on NOT having
-> a GIC?
 
-Instead of stuffing a GIC in behind vm_create(), I'd rather we have a
-specific helper for creating a VM with an irqchip. There's tests in
-arm64 that rely on all this generic infrastructure and also need to
-select / dimension a GIC appropriately for the test.
+It is nice to have a common infrastructure.
 
-The majority of selftests don't even need an irqchip anyway.
+Cc Mukesh and Nuno for review and test.
 
 Thanks,
-Oliver
+Wei
+
+> Assuming all is well, maybe this could go through the tip tree?
+> 
+> The Hyper-V stuff and non-x86 architectures are compile-tested only.
+> 
+> Sean Christopherson (5):
+>   Drivers: hv: Move TIF pre-guest work handling fully into mshv_common.c
+>   Drivers: hv: Handle NEED_RESCHED_LAZY before transferring to guest
+>   entry/kvm: KVM: Move KVM details related to signal/-EINTR into KVM
+>     proper
+>   entry: Rename "kvm" entry code assets to "virt" to genericize APIs
+>   Drivers: hv: Use common "entry virt" APIs to do work before running
+>     guest
+> 
+>  MAINTAINERS                                 |  2 +-
+>  arch/arm64/kvm/Kconfig                      |  2 +-
+>  arch/arm64/kvm/arm.c                        |  3 +-
+>  arch/loongarch/kvm/Kconfig                  |  2 +-
+>  arch/loongarch/kvm/vcpu.c                   |  3 +-
+>  arch/riscv/kvm/Kconfig                      |  2 +-
+>  arch/riscv/kvm/vcpu.c                       |  3 +-
+>  arch/x86/kvm/Kconfig                        |  2 +-
+>  arch/x86/kvm/vmx/vmx.c                      |  1 -
+>  arch/x86/kvm/x86.c                          |  3 +-
+>  drivers/hv/Kconfig                          |  1 +
+>  drivers/hv/mshv.h                           |  2 --
+>  drivers/hv/mshv_common.c                    | 22 ---------------
+>  drivers/hv/mshv_root_main.c                 | 31 ++++-----------------
+>  include/linux/{entry-kvm.h => entry-virt.h} | 19 +++++--------
+>  include/linux/kvm_host.h                    | 17 +++++++++--
+>  include/linux/rcupdate.h                    |  2 +-
+>  kernel/entry/Makefile                       |  2 +-
+>  kernel/entry/{kvm.c => virt.c}              | 15 ++++------
+>  kernel/rcu/tree.c                           |  6 ++--
+>  virt/kvm/Kconfig                            |  2 +-
+>  21 files changed, 49 insertions(+), 93 deletions(-)
+>  rename include/linux/{entry-kvm.h => entry-virt.h} (83%)
+>  rename kernel/entry/{kvm.c => virt.c} (66%)
+> 
+> 
+> base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
+> -- 
+> 2.51.0.261.g7ce5a0a67e-goog
+> 
