@@ -1,120 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F35F1632C8;
-	Mon, 25 Aug 2025 20:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA10287257
+	for <kvmarm@lists.linux.dev>; Mon, 25 Aug 2025 21:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756155065; cv=none; b=BWenwtR8Wa6PHwU8OgjNz5P3VsK1jNkO1oHVYHdFxnZcCbANSi6srv37X4Vef+JIdH/AhiV7H+/BKN7PREpYJwclpVMMTeO+YX906m/J9QC/olr+kRo41tg7BM5jW4FVwgioH+BQLqvlqxEplVnj1CMkhZAqKqOi8OIum17A4pU=
+	t=1756156123; cv=none; b=lhFLynpyyNKBBdj1vfSjMTceNjCC2j6C3L32BuTmjfB+K4ofvHABhEm3iVwbOvUokFc+WqcpWaJoX0c6sCEIsf7t3xSRq5CXvNy0pjxI6yYnGxDAmi0epXY4podOybgY0thlobnKOKptW0cz4qhKgN0JQPC8ZP/xKUh0Q7tu6IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756155065; c=relaxed/simple;
-	bh=3v8ZwzMQp6vVVbwvD/f/q5xRWGh2QXldSzFtAYwk/QA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gnJYvHd44W4voiHBTNVW3ctJpEmihmvgAgUdmW3wVe4pPn9I/p+4q/M5aElvxQecE2gG0YMQnPM7PJ5yqx9eecdrCHKSinjYB/8Q8AK4nlP3ZxlvanC3KLmwrHTNh6iAT9D1FB0Zr7hefwGI2zg8E4bN8iCbhBZpy3QuW5xx7ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTvl8hQx; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTvl8hQx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C168C4CEED;
-	Mon, 25 Aug 2025 20:51:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756155065;
-	bh=3v8ZwzMQp6vVVbwvD/f/q5xRWGh2QXldSzFtAYwk/QA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DTvl8hQx/dzgJ0SeP4gMEgDeFDVLJSwWfDa3Wc/B1+vFtw4ARQZXlJB4DWUnnoc2s
-	 n2b9hl+FxHEoaZHjkTQF7y0az/5PoQy7wuD9d5RoBzWuujbjMtTo7pCKI0Gy4hCDoV
-	 WvB4f+Laip7+5YYbALMqrG3W1A9rMeJOSW2d7y8CsLv+ErU+ft7ijSBJaMIxJMAURj
-	 2uQIvhOS2V8qgrUh5huIgKkzxLaPl5pnTA7IAsR6IXO9MTycR0KHaNyLk3kuKKpkbM
-	 8zjXPBdCP79lSILbrO9r6aZNGaNuxcUiqVtdLz196fhnTmOj4UbyjR+jc0CuyHhQ5H
-	 1v+TpYyCEb4Aw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uqe9e-00000000Od9-43HS;
-	Mon, 25 Aug 2025 20:51:03 +0000
-Date: Mon, 25 Aug 2025 21:51:02 +0100
-Message-ID: <87zfbnyvk9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Sebastian Ott <sebott@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: fix irqfd_test on arm64
-In-Reply-To: <aKy-9eby1OS38uqM@google.com>
-References: <20250825155203.71989-1-sebott@redhat.com>
-	<aKy-9eby1OS38uqM@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1756156123; c=relaxed/simple;
+	bh=YbedgNfWinZDDzvHEt14s6YkMLvqG6IdVtI4JF3YddI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XPeRD/thA+K3q3jirKYSN6nKaLvE/vhxag4TiJHHEyW2H1IRZw/73xp4FnqCb9qeR6YnwA2NJrR2oMbLbC9FHw77lSYkKQVD1wkQpQgLritmruAhaLh/blUSHQQUB2yHJ9bxaPKHH3QIWoir4PW2VJYWBYv/Vd5+pM6KVqXUktk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3eea931c037so668945ab.0
+        for <kvmarm@lists.linux.dev>; Mon, 25 Aug 2025 14:08:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756156121; x=1756760921;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BqZ4/31f0Gtlx5+7VYAHWFz+uBSEbjWh2SiS3l8pvq8=;
+        b=LeuJk/2AO9/tH1ywdVnRH8+9ceZMaYRzXRRWiUE9G55V292enBWdHA3febKTJxdJLK
+         enmwuSUEAbIm5HTuPaO+QPfUMbORfj4jJiFsxGdLWskdxd8M2hFRndgXKYxYmyiLWBBe
+         Kv6DMc7Rj3k7O2s9w6KUtqgdbo0nejM1vkLVB1aYx2LcRJxcpACcQ2XQlMuMmPKvh8sX
+         NZAlbLV4O3g8bYlISq4WFQiJABpD4Nu+m8Ujf+Gl3TBe3JwadqnYy/Ob/MN8C5JuDwvN
+         CNIQS+pt2t4+d3z4NLmMx2ZBNdfXNxSIeDU29NAoiq4F+64T6ixn8iPAv8VIGLCZQ2xI
+         FijA==
+X-Forwarded-Encrypted: i=1; AJvYcCWswxn8CpztP44wh2qdrYAOUaQuPMZualhzyDRepX5hvvTiktrK5OxU9OGLo8Jxik53y0X46tw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YywoXmBXi6al/CwgQOp/+w0spHbMlNDQI0Y9Re9KzM4Z+c+lQ4V
+	JWhYRAUFhjvUhp8BvFEhIg2XZgLWksJk38w6/tsZT+sFJZP9YBzRPkn731c6t3+JNkXYrOq//aU
+	BoeV2JL7XwcKZIl9pWJA4QuJuGae80oinDPMRM7iGV8RSspjGiJJVx8dRz6U=
+X-Google-Smtp-Source: AGHT+IGpS1LzWvp0I6RmvMl/qq93Vsp8qCYZ44qc949rEp5qDgNdDz744+IAFZov/EbEy+xcBL5nFoRh5qOVdUWsvpJwmA8GhIZ1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, sebott@redhat.com, pbonzini@redhat.com, shuah@kernel.org, oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1fe1:b0:3e5:7e26:2f90 with SMTP id
+ e9e14a558f8ab-3e922504b72mr209775655ab.24.1756156121309; Mon, 25 Aug 2025
+ 14:08:41 -0700 (PDT)
+Date: Mon, 25 Aug 2025 14:08:41 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68acd0d9.a00a0220.33401d.048b.GAE@google.com>
+Subject: [syzbot] [kvmarm?] [kvm?] WARNING: locking bug in vgic_put_irq
+From: syzbot <syzbot+cef594105ac7e60c6d93@syzkaller.appspotmail.com>
+To: catalin.marinas@arm.com, joey.gouly@arm.com, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	suzuki.poulose@arm.com, syzkaller-bugs@googlegroups.com, will@kernel.org, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 25 Aug 2025 20:52:21 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Mon, Aug 25, 2025, Sebastian Ott wrote:
-> > irqfd_test on arm triggers the following assertion:
-> > ==== Test Assertion Failure ====
-> >   include/kvm_util.h:527: !ret
-> >   pid=3643 tid=3643 errno=11 - Resource temporarily unavailable
-> >      1  0x00000000004026d7: kvm_irqfd at kvm_util.h:527
-> >      2  0x0000000000402083: main at irqfd_test.c:100
-> >      3  0x0000ffffa5aab587: ?? ??:0
-> >      4  0x0000ffffa5aab65f: ?? ??:0
-> >      5  0x000000000040236f: _start at ??:?
-> >   KVM_IRQFD failed, rc: -1 errno: 11 (Resource temporarily unavailable)
-> > 
-> > Fix this by setting up a vgic for the vm.
-> > 
-> > Signed-off-by: Sebastian Ott <sebott@redhat.com>
-> > ---
-> > @@ -86,14 +90,30 @@ static void juggle_eventfd_primary(struct kvm_vm *vm, int eventfd)
-> >  	kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
-> >  }
-> >  
-> > +static struct kvm_vm *test_vm_create(void)
-> > +{
-> > +#ifdef __aarch64__
-> > +	struct kvm_vm *vm;
-> > +	struct kvm_vcpu *vcpu;
-> > +	int gic_fd;
-> > +
-> > +	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-> > +	gic_fd = vgic_v3_setup(vm, 1, 64);
-> > +	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
-> 
-> I don't think this test requires v3+, any GIC will do.
+Hello,
 
-There is no such thing as "any GIC". You need to know what is
-available, and ask for something that actually exists. So while the
-above is wrong on the ground that this doesn't work on v2 or v5, the
-selection has to be explicit.
+syzbot found the following issue on:
 
-> Is there a sane way to handle vGIC creation in kvm_arch_vm_post_create()?  E.g.
-> could we create a v3 GIC when possible, and fall back to v2?  And then provide a
-> way for tests to express a hard v3 GIC dependency?
+HEAD commit:    7b8346bd9fce KVM: arm64: Don't attempt vLPI mappings when ..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+console output: https://syzkaller.appspot.com/x/log.txt?x=17b4e862580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7c53d3478750eda0
+dashboard link: https://syzkaller.appspot.com/bug?extid=cef594105ac7e60c6d93
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15860634580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1074e862580000
 
-You can ask KVM what's available. Like an actual VMM does. There is no
-shortage of examples in the current code base.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-7b8346bd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/74f545807499/vmlinux-7b8346bd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d83062566dc7/Image-7b8346bd.gz.xz
 
-And ideally, this should be made an integral part of creating a viable
-VM, which the current VM creation hack makes a point in not providing.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cef594105ac7e60c6d93@syzkaller.appspotmail.com
 
-	M.
+=============================
+[ BUG: Invalid wait context ]
+6.16.0-rc3-syzkaller-g7b8346bd9fce #0 Not tainted
+-----------------------------
+syz.0.29/3743 is trying to lock:
+a3ff80008e2e9e18 (&xa->xa_lock#20){....}-{3:3}, at: vgic_put_irq+0xb4/0x190 arch/arm64/kvm/vgic/vgic.c:137
+other info that might help us debug this:
+context-{5:5}
+3 locks held by syz.0.29/3743:
+ #0: a3ff80008e2e90a8 (&kvm->slots_lock){+.+.}-{4:4}, at: kvm_vgic_destroy+0x50/0x624 arch/arm64/kvm/vgic/vgic-init.c:499
+ #1: a3ff80008e2e9fa0 (&kvm->arch.config_lock){+.+.}-{4:4}, at: kvm_vgic_destroy+0x5c/0x624 arch/arm64/kvm/vgic/vgic-init.c:500
+ #2: 58f0000021be1428 (&vgic_cpu->ap_list_lock){....}-{2:2}, at: vgic_flush_pending_lpis+0x3c/0x31c arch/arm64/kvm/vgic/vgic.c:150
+stack backtrace:
+CPU: 0 UID: 0 PID: 3743 Comm: syz.0.29 Not tainted 6.16.0-rc3-syzkaller-g7b8346bd9fce #0 PREEMPT 
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:466 (C)
+ __dump_stack+0x30/0x40 lib/dump_stack.c:94
+ dump_stack_lvl+0xd8/0x12c lib/dump_stack.c:120
+ dump_stack+0x1c/0x28 lib/dump_stack.c:129
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4833 [inline]
+ check_wait_context kernel/locking/lockdep.c:4905 [inline]
+ __lock_acquire+0x978/0x299c kernel/locking/lockdep.c:5190
+ lock_acquire+0x14c/0x2e0 kernel/locking/lockdep.c:5871
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0x5c/0x7c kernel/locking/spinlock.c:162
+ vgic_put_irq+0xb4/0x190 arch/arm64/kvm/vgic/vgic.c:137
+ vgic_flush_pending_lpis+0x24c/0x31c arch/arm64/kvm/vgic/vgic.c:158
+ __kvm_vgic_vcpu_destroy+0x44/0x500 arch/arm64/kvm/vgic/vgic-init.c:455
+ kvm_vgic_destroy+0x100/0x624 arch/arm64/kvm/vgic/vgic-init.c:505
+ kvm_arch_destroy_vm+0x80/0x138 arch/arm64/kvm/arm.c:244
+ kvm_destroy_vm virt/kvm/kvm_main.c:1308 [inline]
+ kvm_put_kvm+0x800/0xff8 virt/kvm/kvm_main.c:1344
+ kvm_vm_release+0x58/0x78 virt/kvm/kvm_main.c:1367
+ __fput+0x4ac/0x980 fs/file_table.c:465
+ ____fput+0x20/0x58 fs/file_table.c:493
+ task_work_run+0x1bc/0x254 kernel/task_work.c:227
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ do_notify_resume+0x1b4/0x270 arch/arm64/kernel/entry-common.c:151
+ exit_to_user_mode_prepare arch/arm64/kernel/entry-common.c:169 [inline]
+ exit_to_user_mode arch/arm64/kernel/entry-common.c:178 [inline]
+ el0_svc+0xb4/0x160 arch/arm64/kernel/entry-common.c:768
+ el0t_64_sync_handler+0x78/0x108 arch/arm64/kernel/entry-common.c:786
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
 
--- 
-Jazz isn't dead. It just smells funny.
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
