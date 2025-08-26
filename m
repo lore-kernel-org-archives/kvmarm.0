@@ -1,46 +1,44 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6AE262FD8
-	for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 19:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6204D23AB95
+	for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 19:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756236316; cv=none; b=en4/0JLhKGI8x2QWZZ8m0onXgaX1vPNy8zTQUoysbB9AgN5waoaovld9/hZnq1bMhTY2ELOMXx0doMDnj1PwFW6EdswhkY80z9c1B7cl0v6nufOwcUgX1EF8PqqMLriclmCIv5yBwAuqLgFrjdJDTkIzzQZFoHO/b4QueSAJ0uE=
+	t=1756236595; cv=none; b=Y7FDpV2drm1wr0hvC+V4OVQ/IdD/DAzTI+W+MSyk9porZAd1T/HijalzQQ0blDHJ+C1+tvOU/0ogfEi3dRgF2fdttArTdfzPQb1YMbVIgEyh1BRK+q3pXH5S0dsHR22cAwx1rbt0o8MlvtSMaNYQfRPvCaaVPnPd9SsrJNEELjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756236316; c=relaxed/simple;
-	bh=TIwen88LojEtqJsmUY7vK8YG0QX4vhduLnEXSKWkIhk=;
+	s=arc-20240116; t=1756236595; c=relaxed/simple;
+	bh=rEKbhoNka+rtltPfgB057P3vkV2ooVBisYd42WcxP/M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R86S1P7tqIAMzYVZbwV3nRrk/SiTCPghUO94UbobcrqlKIm/pDOoJsbiZj21XODq91TV0QLClH8IzDPmPcIwe1JYSDO2Fy5VHTqr0iQERf6y4qrH0wWaEz/+MvHD1BtHVt/cwYfocQpZ+7HQqHwF+sBcTdFr+N9FJktDiunu7wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LGvR0U5Y; arc=none smtp.client-ip=91.218.175.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=qKGUEqLzJGsOCuTRO4ZjfSFhG9fDUZvJ/CxyDXzYYO3hz2yv12b/zujNKXKLo5mrfNAv64Xd5b4Uwr6ybdQxqPS0G8QBuCFAFyevuVgyjFr0+Yr7a7/793FVdJ59649eNtRXyfaamrcu7xYYHA+Z+Vq6oLNEbpQ1WbkuaOh2jRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aDqDpINy; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LGvR0U5Y"
-Date: Tue, 26 Aug 2025 12:24:20 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aDqDpINy"
+Date: Tue, 26 Aug 2025 12:29:38 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756236310;
+	t=1756236591;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y4qvZnHIq/rLDQqSB4x4EUgaIF9JpQ4JSYMZzNwApLY=;
-	b=LGvR0U5Y3NhPWpyPQSEB//AwQyYyNUfzVXjRtH8g9Du9ppuBHDt72wfrXdvhpiOM4tPIed
-	rdp52ERydTIoS9iACwUc2dSfUGEKEH0jdoateYW1J4DMALl0laMjGEsidf869z12pc1C/B
-	6zoP06K1Q0OqfGd9coZDnqu7bdaLDfQ=
+	bh=A3TH3r3Rwj1NIsB8dPGas/6OVkWEe0yZPECgLM5Cpvg=;
+	b=aDqDpINynr6ybo6xMCGuGg/Zm3t4jpzlChTdjV1hAwFyilOB/hSW8hHvUKENj0Q9zZh6rs
+	zkPcG5uk/BTm7PXnIPzAupTb3u1putzTorFk6ye4so4VTdKUMGqM01ra6qxVE+HZnhWg02
+	3MRonxtLj+pvtIRm0QYoetQYBwm/mMA=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Sebastian Ott <sebott@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: fix irqfd_test on arm64
-Message-ID: <aK4J5EA10ufKJZsU@linux.dev>
-References: <20250825155203.71989-1-sebott@redhat.com>
- <aKy-9eby1OS38uqM@google.com>
- <87zfbnyvk9.wl-maz@kernel.org>
- <aKzRgp58vU6h02n6@google.com>
- <aKzX152737nAo479@linux.dev>
- <aK4CJnNxB6omPufp@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	James Houghton <jthoughton@google.com>
+Subject: Re: [RFC PATCH 05/16] KVM: arm64: Introduce "struct kvm_page_fault"
+ for tracking abort state
+Message-ID: <aK4LIj-OZsP_35wc@linux.dev>
+References: <20250821210042.3451147-1-seanjc@google.com>
+ <20250821210042.3451147-6-seanjc@google.com>
+ <aKeeRynpwFTSONfm@linux.dev>
+ <aK4DwtuQtzYvRei-@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,40 +47,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aK4CJnNxB6omPufp@google.com>
+In-Reply-To: <aK4DwtuQtzYvRei-@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Aug 26, 2025 at 11:51:18AM -0700, Sean Christopherson wrote:
-> On Mon, Aug 25, 2025, Oliver Upton wrote:
-> > The majority of selftests don't even need an irqchip anyway.
+On Tue, Aug 26, 2025 at 11:58:10AM -0700, Sean Christopherson wrote:
+> On Thu, Aug 21, 2025, Oliver Upton wrote:
+> > Hey Sean,
+> > 
+> > On Thu, Aug 21, 2025 at 02:00:31PM -0700, Sean Christopherson wrote:
+> > > Add and use a kvm_page_fault structure to track state when handling a
+> > > guest abort.  Collecting everything in a single structure will enable a
+> > > variety of cleanups (reduce the number of params passed to helpers), and
+> > > will pave the way toward using "struct kvm_page_fault" in arch-neutral KVM
+> > > code, e.g. to consolidate logic for KVM_EXIT_MEMORY_FAULT.
+> > > 
+> > > No functional change intended.
+> > > 
+> > > Cc: James Houghton <jthoughton@google.com>
+> > > Link: https://lore.kernel.org/all/20250618042424.330664-1-jthoughton@google.com
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h |  18 ++++
+> > >  arch/arm64/kvm/mmu.c              | 143 ++++++++++++++----------------
+> > >  2 files changed, 87 insertions(+), 74 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 2f2394cce24e..4623cbc1edf4 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -413,6 +413,24 @@ struct kvm_vcpu_fault_info {
+> > >  	u64 disr_el1;		/* Deferred [SError] Status Register */
+> > >  };
+> > >  
+> > > +struct kvm_page_fault {
+> > > +	const u64 esr;
+> > > +	const bool exec;
+> > > +	const bool write;
+> > > +	const bool is_perm;
+> > 
+> > Hmm... these might be better represented as predicates that take a
+> > pointer to this struct and we just compute it based on ESR. That'd have
+> > the benefit in the arch-neutral code where 'struct kvm_page_fault' is an
+> > opaque type and we don't need to align field names/types.
 > 
-> But it's really, really nice for developers if they can assume a certain level of
-> configuration is done by the infrastructure, i.e. don't have worry about doing
-> what is effectively "basic" VM setup.
+> We'd need to align function names/types though, so to some extent it's six of one,
+> half dozen of the other.  My slight preference would be to require kvm_page_fault
+> to have certain fields, but I'm ok with making kvm_page_fault opaque to generic
+> code and instead adding arch APIs.  Having a handful of wrappers in x86 isn't the
+> end of the world, and it would be more familiar for pretty much everyone.
 
-The more we pile behind what a "basic" VM configuration is the less
-expressive the tests become. Being able to immediately grok the *intent*
-of a test from reading it first pass is a very good thing. Otherwise I
-need to go figure out what the definition of "basic" means when I need
-to write a test and decide if that is compatible with what I'm trying to
-do.
-
-vm_create_with_irqchip() is delightfully unambiguous.
-
-> E.g. x86 selftests creates an IRQCHIP, sets up descriptor tables and exception
-> handlers, and a handful of other "basic" things, and that has eliminated soooo
-> much boilerplate code and the associated friction with having to know/discover
-> that e.g. sending IRQs in a test requires additional setup beyond the obvious
-> steps like wiring up a handler.
-
-That simply isn't going to happen on arm64. On top of the fact that the
-irqchip configuration depends on the intent of the test (e.g. wired IRQs
-v. MSIs), there's a bunch of guest-side initialization that needs to
-happen too.
-
-We can add an extremely barebones GIC when asked for (although guest
-init isn't addressed) but batteries are not included on this architecture
-and I'd rather not attempt to abstract that.
+To clarify my earlier point, my actual interest is in using ESR as the
+source of truth from the arch POV, interface to the arch-neutral code
+isn't that big of a deal either way.
 
 Thanks,
 Oliver
