@@ -1,131 +1,268 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5A9221DAC
-	for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 00:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD70350848
+	for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 13:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756168040; cv=none; b=GZULS0DA2YbbU68OMEesCt5ybahevfBRVnZK1Ryq+OyrXDX75iaOwVi1+TIpiuFZYn+yd6fgSq8W3cyM2hxR9gEzJSrBaPFkoNBZ4U7VHicaRpwlHMvlY1FiU9GIYHzfQ6lh65AzsunqoCO9vpX6L3EixLXZf99Q5gkRrEACFlQ=
+	t=1756216014; cv=none; b=sGzqb9s8T1664MF36Ugf91ZaNYuQ+oc3TfvFhaKLbngAR19mWRwPw3Sov7ch4Fs6iHUGCm3lH0zeLvFHS8MkdfXxgRLaUHdM68HDZuqKspco6POvCtvajCP1+cARjbaeMy2jpq1r8grqJBq/U64BlvwFKXZfZ9LThPpX9v1snbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756168040; c=relaxed/simple;
-	bh=5L/BYqW9WfoHeTEgYYwzNBfWpjlpn5EeY5J3QpRZyJ0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Wn46mWlhFTeNpYe5tizylfUMJPS1UMklLl7YfqTh/UcW9aqEzMJbmUrHHOZaO8SJuX8HjaTIQQxBvscm3RcKKtYp+qMgBrq0WOEio1k1FVD40R75/JPctLUXPzgyjujjpX51w97GFBhUKBv8YVSCc9HLHqCF/mW/RkeWHPkdwac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=suNU1BZ7; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1756216014; c=relaxed/simple;
+	bh=D2WCPWAROvWpGOBAO/irESE4qw7Dj1nlyMvIle7uz6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eL1e3CQkm18WCegu8lTNCnZbq+efhRHd2RetcVBGcSpr7pyjnXl913ngdVqNq7i/Y9td7bid0/Jkq97SkhgU51mPGTzqr7T+DFKRa8EKgEXhcFtZOR5KJSYOR9+aFz8+O3A4MO6Wrlm+Qtdv8L8MJM1Wl0Tbt+xtjPkcr2VtrC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=iagiYMJq; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="suNU1BZ7"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-771e1451631so2878534b3a.1
-        for <kvmarm@lists.linux.dev>; Mon, 25 Aug 2025 17:27:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="iagiYMJq"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b4c1ed55930so2051921a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 06:46:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756168038; x=1756772838; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U4ctZNwYJMz9+Hk7ge9l8ZiYDw45Y30bqY3Iaj5/gqE=;
-        b=suNU1BZ7W4CzNBuVKm/nc7VqXAfmq9IHBLaciWKHRiD+AeAYdd3AvNWDDlmPjmDwU7
-         embG1WIXkEOJlKrUyscEJBK04EOEbEwimoMogPtDIrdzaz6zB4DyhGpz7b6DamcFjPwN
-         vABjtwBOBZTQ2WTYfEjnp5xv82dyLu3gHwmTUMTcL50+zzRTEo/bom1ci6lbv8N6Kbc5
-         2aiR9sF4GI6+XHkbOCeLqAKyce2lBYZfITvEYmBmq1c6gSU7ZupWmMjWAhITqt+Bz3b3
-         YEcAQiz7haSo6Jbh6DlpaDsBwqCnN016rMfGsfUe/Iy+fK3QsSdDzH7HsF12p4hxlhIH
-         4+sA==
+        d=csie.ntu.edu.tw; s=google; t=1756216010; x=1756820810; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=osdPfu3X+WvVcN3qUZlA7PO/Is6NQe7OboBpnwUj8qo=;
+        b=iagiYMJqydl8ASxzusdzDkxbAJgf6D27ard0wjxfm2CCiwRgNkdMrLCSPVzS3Kp09z
+         SluFpT4oXq4zDIlWPH3bM6NMkw5clK/zQcfgnFUCRljK+BiF70wX8MzIgCWQQMe3mvR2
+         F4Q3eGYfYTeqLI/mIMh8oqIQzx/HgXBVCFWx289qxseIEKp93gsuHOPjAOCW7VDDwMvO
+         /Sc/RiHRtBbLYxx/kIZuAlsAVPjGLGYwvT1d0+tiKF3CrfwiA9C0owddF9P8sSMpHYr3
+         JDxfi8Nvkwelbjo053HBpEazYwZiOsGzIViDI+FWdqY7QhP/EiZzilsUKff/XbO6XRD9
+         jAXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756168038; x=1756772838;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U4ctZNwYJMz9+Hk7ge9l8ZiYDw45Y30bqY3Iaj5/gqE=;
-        b=pBT6MHVSQX3/mktLKZRMLi+iIWpiLQ9FKCk1cAgO05t908PS8VCHbXBA1r77aZUD5D
-         kkTr9qgZntmmWEic7pxdlfOlxJmAfIMnnGYcZW69iiET4fD9EKc9yw/hKaPcnNpL1VvH
-         O/uyHReO87M1LXr/MQF3sn//trvbzaMvb5eaJo8N+7/6orgXPHuq1PGmPEsc/xzTvSjG
-         o9iMPwAwGB/pFQ9YErZERrEoucFPZqFyURZBYhtQc93X2pHJXvER/QM5UdWzV0I9a9ws
-         yU1uPg1YQXWe6z5ZOFPWX3uP3nobph6KFi0uDQc7onQdJc2htZYLQ6GwurwFwTn6ylZB
-         lHwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUrwveKCWzklu1JTUOgf3YFlhVRATYqPz53e8gJhu9s0tOLonxCt6/K+ug3foU8UsvVFHHEOdU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz/c0VUeRYOXJ3nIE1adN6pbvQLRcxt+NBwKSAHhfbaMb/mkQ2Y
-	f/Qcf7494rZbbLPW2DGNA+yZqWQMFO0fZMIGOib5abWuXKRRbj2M9LOBepZJkLMT4zpGpDrtW1w
-	cn5j/Wg==
-X-Google-Smtp-Source: AGHT+IFw5Mjf6HTcAUWU+u7CL/B6QAA0945o29LTS2VrhL4i1mL+9cXlmfjB4AEyc0iYoyyJlQoJr1vqexM=
-X-Received: from pjbsp15.prod.google.com ([2002:a17:90b:52cf:b0:30a:7da4:f075])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a105:b0:230:8b26:9d47
- with SMTP id adf61e73a8af0-24340ab318emr21164734637.10.1756168038330; Mon, 25
- Aug 2025 17:27:18 -0700 (PDT)
-Date: Mon, 25 Aug 2025 17:27:16 -0700
-In-Reply-To: <3188ca61-2591-4576-9777-1671689b7235@linux.microsoft.com>
+        d=1e100.net; s=20230601; t=1756216010; x=1756820810;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=osdPfu3X+WvVcN3qUZlA7PO/Is6NQe7OboBpnwUj8qo=;
+        b=ulBacqekqCgww3JWdkrfvaESmBpA+IspzbDgk5b3WwQUbBiBc50n2ZhINWZc1Z5JUI
+         aRUi/ITn6oUjEMAhz5o0GAqdh176gGnrNkzSC66WdHmuMq8E01hJkc+m8JWvscHXyymx
+         kHqDftkoLDEotUupQsBlwkzOdWdfWrYfET2yD3HwKXUAz1N4lm7zN9jp0sYjMzmKmB3T
+         bqFgnOHNtjCZqwbWKyZ7Nw6exaJupddjQsCtlpDDiORnMzFMJcQCXSHyo7fCFELHz4vx
+         3vww+p+39hQEZ/iRIwIkesKg/xoTWPAmtzHWHeFusZjYtkf8X/q8KCsCfjPjqsfMqSzK
+         lwcA==
+X-Forwarded-Encrypted: i=1; AJvYcCXMBbETmP/SFxRf9fak434IKm1Ol282Sq8imUC7I7sCIMp6Dm3AKoVGBLEPHRax8Q/oS04jsnI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyzqrMQUqj/6TV2D3VywLwkuWYUTtZubpGYOSjcKN1oAO7717B6
+	nvBfgMAtVFIukrkVBR2VrZMZB/C0i1Mc6aV2+5cKqifWOyPZTDdLvWPS94HuzKlIYrzg50EwyGR
+	s/TpfS/erikIwrsUbsjIwYK9BzKH263EMo6FXeCVlLmJYVLcqS00=
+X-Gm-Gg: ASbGncsmCAggZmG03KAnm/rmlrvAf0NAJfKayBZOyWoXL00K6ndbkHsmJAUQBcdFgSx
+	aXQ1xTgBEE6rVST/zUyQfb92stO9AomK6B3+FgAySDjXmHAw/7YzEy5ua4p4ujF07OmmBgtj4hk
+	SMf2BuHHORaB/YnjGzqcR0uAMon9HZssBmk78XKcjx9EMGnsFfTX6RKzQlb19SFJ603AcMEdkn/
+	MLLgxMcgAgRGiQ/oGEoU7tKVgkHK1ax0+U3uAgCjK/ay1MMEVMWiRhxMoa61EIPBDUZoIegyZ6S
+	fuAVRadzjfyU58WiDYuUjTgyBTEczGt6RHliOXSqOqjceGufYsT25QPqml8Uc7BEX+WB5bNOvfH
+	JZEMXa9kAvoV/1R3y5jk68U0v/63sZS2PfY+OtaKxCe0sM+c2IX6A49OR8A==
+X-Google-Smtp-Source: AGHT+IEapx+qUYn+gnSfpFGolofqtYLrq6ffT2yt159qZt5g4CsSb6AqyhXzJhjpuNXlfxvFnyc/wA==
+X-Received: by 2002:a17:902:c94d:b0:245:f002:d67c with SMTP id d9443c01a7336-2462eeb6325mr197352005ad.30.1756216009581;
+        Tue, 26 Aug 2025 06:46:49 -0700 (PDT)
+Received: from zenbook (1-162-83-231.dynamic-ip.hinet.net. [1.162.83.231])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2466887198dsm96470935ad.110.2025.08.26.06.46.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Aug 2025 06:46:49 -0700 (PDT)
+Date: Tue, 26 Aug 2025 21:49:27 +0800
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: nv: Allow shadow stage 2 read fault
+Message-ID: <djypsyratk63ovzv3flzb2tmunqtcoryzserwhsaaq5nuogsrx@u3uuwynnafbj>
+References: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
+ <87a53rk83s.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250825200622.3759571-1-seanjc@google.com> <3188ca61-2591-4576-9777-1671689b7235@linux.microsoft.com>
-Message-ID: <aKz_ZMvvF0e9nwSn@google.com>
-Subject: Re: [PATCH 0/5] Drivers: hv: Fix NEED_RESCHED_LAZY and use common APIs
-From: Sean Christopherson <seanjc@google.com>
-To: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Andy Lutomirski <luto@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett <josh@joshtriplett.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-hyperv@vger.kernel.org, 
-	rcu@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a53rk83s.wl-maz@kernel.org>
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On Mon, Aug 25, 2025, Nuno Das Neves wrote:
-> On 8/25/2025 1:06 PM, Sean Christopherson wrote:
-> > Fix a bug where MSHV root partitions don't honor NEED_RESCHED_LAZY, and then
-> > deduplicate the TIF related MSHV code by turning the "kvm" entry APIs into
-> > more generic "virt" APIs (which ideally would have been done when MSHV root
-> > support was added).
-> > 
-> > Assuming all is well, maybe this could go through the tip tree?
-> > 
-> > The Hyper-V stuff and non-x86 architectures are compile-tested only.
-> > 
+Hi Marc,
+
+On Fri, Aug 22, 2025 at 10:40:07AM +0100, Marc Zyngier wrote:
+> Hey Wei-Lin,
 > 
-> Thanks Sean, I can test the root partition changes.
+> On Fri, 22 Aug 2025 04:18:53 +0100,
+> Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
+> > 
+> > We don't expect to ever encounter a stage-2 read permission fault,
+> > because read permission is always granted when mapping stage-2. However,
+> > this isn't certainly the case when NV is involved. The key is the shadow
+> > mapping built for L2 must have the same or stricter permissions than
+> > those that L1 built for L2, hence opening the possibility of mappings
+> > without read permission.
+> > 
+> > Let's continue handling the read fault if we're handling a shadow
+> > stage-2 fault, instead of erroring out.
+> > 
+> > The following illustrates an example, vertical lines stand for either
+> > L0, L1, or L2 running, with left: L0, middle: L1, and right: L2.
+> > Horizontal arrows stand for traps and erets between them.
+> > 
+> > '''
+> > L0                               L1                               L2
+> >                                                L2                 |
+> >                                                writes to an L2 PA |
+> > |<----------------------------------------------------------------|
+> > |
+> > | L0
+> > | finds no mapping in
+> > | L1's s2pt for L2
+> > |
+> > | L0
+> > | injects data abort
+> > |------------------------------->|
+> >                                  | L1
+> >                                  | for whatever reason
+> >                                  | treats this abort specially,
+> >                                  | only gives it W permission
+> >                                  |
+> >        eret traps to L0          |
+> > |<-------------------------------|
+> > |
+> > |      eret back to L2
+> > |---------------------------------------------------------------->|
+> >                                                                   |
+> >                                                    L2             |
+> >                                                    writes to same |
+> >                                                    L2 PA (replay) |
+> > |<----------------------------------------------------------------|
+> > |
+> > | L0
+> > | finds mapping in s2pt that
+> > | L1 built for L2, create
+> > | shadow mapping for L2,
+> > | but only gives it W to match
+> > | what L1 had given
+> > |
+> > |
+> > |      eret back to L2
+> > |---------------------------------------------------------------->|
+> >                                                                   |
+> >                                                    L2             |
+> >                                                    writes to same |
+> >                                                    L2 PA (replay) |
+> >                                                    success        |
+> > |<----------------------------------------------------------------|
+> > |
+> > |
+> > |------------------------------->| L1
+> >                                  | for some reason, relaxes
+> >                                  | L2's permission from W
+> >                                  | to RW, AND, doesn't flush
+> >                                  | TLB
+> >                                  |
+> >        eret traps to L0          |
+> > |<-------------------------------|
+> > |
+> > |      eret back to L2
+> > |---------------------------------------------------------------->|
+> >                                                                   |
+> >                                                     L2            |
+> >                                                     read to L2 PA |
+> > |<----------------------------------------------------------------|
+> > | stage-2 read fault
+> > |
+> > '''
+> > 
+> > Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
 > 
-> A similar change will be needed in mshv_vtl_main.c since it also calls
-> mshv_do_pre_guest_mode_work() (hence the "common" in mshv_common.c).
+> Excellent detective work! Bonus points for the ASCII art -- I'm not
+> sure how practical it will be to keep it in the final commit, but this
+> definitely helps understanding the issue.
 
-Oof, more dependencies.  I suppose the easiest thing would be to send a series
-against
+Thanks, I tried to make it clear for those that aren't familiar with NV,
+including myself :P
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/hyperv/linux.git queue
+> 
+> > ---
+> > 
+> > I am able to trigger this error with a modified L1 KVM, but I do realize
+> > this requires L1 to be very strange (or even just wrong) so I understand
+> > if we don't want to handle this kind of edge case. On the other hand,
+> > could there also be other ways to trigger this that I have not thought
+> > of?
+> > 
+> > Another thing is that this change lets L1 get away with not flushing the
+> > TLB, but TLBs are ephemeral so it's fine in this aspect, however I'm not
+> > sure if there are other considerations.
+> 
+> Well, it depends whose TLBs we're talking about. The CPU TLBs are
+> definitely ephemeral. But the KVM-managed TLBs (aka the shadow S2) is
+> pretty static, and I am a bit worried to relax this.
+> 
+> What would happen on actual HW? L1 would take a S2 fault, because the
+> TLBs are out of sync with the S2 PTs. And yes, maybe the TLB pressure
+> woulds make it so that it works *sometimes*, but there wouldn't be any
+> guarantee of forward progress as long as EL2 doesn't issue a TLBI.
+> 
+> I reckon we should implement that particular behaviour whenever
+> possible, and handle permission faults early, possibly ahead of the
+> guest S2 walk (the way we handle VNCR_EL2 faults is IMO a good model).
 
-and then route everything through there?
+The parts above make complete sense.
 
-Alternatively, frontload the MSHV fixes (which I'll do regardless) and take those
-through hyperv and the rest through the tip tree?  That seems like an absurd
-amount of juggling though, especially if we want to get the cleanups into 6.18.
-And if none of these lands, it's MSHV that'll suffer the most, so betting it all
-on the hyperv tree doesn't seem terrible.
+> 
+> This would imply taking the guest's S2 permission at face value, and
+> only drop W permission when the memslot is RO -- you'd then need to
+> keep track of the original W bit somewhere. And that's where things
+> become much harder, because KVM can decide to remap arbitrary ranges
+> of IPA space as RO, which implies we should track the W bit at all
+> times, most likely as one of the SW bits in the PTE.
 
-> Also, is it possible to make all the mshv driver changes in a single patch?
+But sorry, I struggle to understand this paragraph after reading it many
+times, probably my experience with the code isn't enough for me to make
+the connection. Why are we talking about the W bit suddenly?
+If you don't mind, can you reword what's discussed here?
+I only very vaguely get that there will be 2 W bits, one from what L1 set,
+and one from the L0 memslot, if I didn't completely miss the point..
 
-It's certainly possible, but I'd prefer not do to that.
+> 
+> We'll need exactly that if we ever want to implement the
+> Hardware-managed Dirty Bit, but I have the feeling we need an actual
+> design for this, and not a quick hack. Your approach is therefore the
+> correct one for the time being.
+> 
+> > 
+> > ---
+> >  arch/arm64/kvm/mmu.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 1c78864767c5c..41017ca579b19 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1508,8 +1508,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+> >  	VM_BUG_ON(write_fault && exec_fault);
+> >  
+> > -	if (fault_is_perm && !write_fault && !exec_fault) {
+> > -		kvm_err("Unexpected L2 read permission error\n");
+> > +	if (fault_is_perm && !write_fault && !exec_fault && !nested) {
+> > +		kvm_err("Unexpected S2 read permission error\n");
+> >  		return -EFAULT;
+> >  	}
+> >  
+> 
+> Honestly, I'd rather kill this check altogether rather than adding
+> another condition to it -- I suggested it to Fuad a while ago. This is
+> the first time we ever see it firing, and I don't think it is bringing
+> much.
 
-> It seems like it would be cleaner than refactoring it in patches 1 & 2 and
-> then deleting all the refactored code in patch 5.
+No problem and agreed. Let me prepare another version.
 
-Only if you don't care about backporting fixes, bisection, or maintaining code.
+Thanks,
+Wei-Lin Chang
 
-E.g. if checking NEED_RESCHED_LAZY somehow causes issues, it would be really nice
-for that to bisect to exactly that patch, not a patch that also switches to a
-completely different set of APIs.
-
-And if someone is wants the fixes in a pre-6.18 kernel, they don't need to
-backport all of the KVM and entry code changes just to get the fix.
-
-As for the maintenance headache, see above.
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Jazz isn't dead. It just smells funny.
