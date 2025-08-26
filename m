@@ -1,139 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB8A2D837C;
-	Tue, 26 Aug 2025 16:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1692F2E7F21
+	for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 18:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756227483; cv=none; b=XXhQxg+Z2zJ7Ls0Vfm5yhmEdAzyN7lyg7Rupp/xJ+CY/Qx7MtmI/+Iu7LJ6mJm5ZjpwOMx96WOEevVEQbTbbD63uChgix+YzdBTA201exvr4Z+D2QxGvwQ3oOxUnDtNL7jt8uNGyXA164c1FZ3zKYKVupuYV0ttdg3pYxdFmQJ0=
+	t=1756234281; cv=none; b=ik1KaJR4HdgSz4jpb3uU+yL1dWadBlYLUhhOZiqrj+vpIv+WccFB00T4LM9YaNknnxB5oMPfUFGgzyvdbZy0o4Ch00fB+aCgExYWN3kZpNzGAWG1VPcCvsMTdMhS4pEokQAqLg2RlkDHl35/C04d5xTPnr3xgQwQLK84ptNbAYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756227483; c=relaxed/simple;
-	bh=fnUtXDAxJfdbxKoWIvjZ0YEMsdquajfs3Wt0vqohrgU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ubMmnoo2oZu9s6x/EePqUAL6yDQNyPSEn9QLVcp1fDTzFKhnPHdwNItf1KrVl76vYqHNUSo0T4xLsZrxMtzfPtxsYoeWBgZVL2BFKsLWS+Gn86AlRsHZVg5MsrA92wClIOcSii+yml4tMhTKqDDFw9xeLeS1jATQ2bfM51G8L/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuvpJ+uR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756234281; c=relaxed/simple;
+	bh=ePoQZSqtiQfljKx6DF9Tewo2GeYmeDzoRcxt1mAmdBA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EybJD0E71DZLKV63lSfCbUKoxejt26bdFkknwyJ8uRzCOCC/8RgT3vTAwW7NFazEelpDi+GVK/TLbbvrr0Zpl/x6OyFUdtcctg5RQSWsPkpU77y6JV1qZsUOj8HyVmSIMIpzE00bKqlAmF6xemo5MhrQaKR3pLsr9w6cuhUwk9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sg3cesE9; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuvpJ+uR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C82A7C4CEF1;
-	Tue, 26 Aug 2025 16:58:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756227482;
-	bh=fnUtXDAxJfdbxKoWIvjZ0YEMsdquajfs3Wt0vqohrgU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fuvpJ+uRtRM9fzHvRv14jD9ZQo0Z+Ik1UILyoPgPF2jz8dNyPROaEFVvlvQAaXz4X
-	 ttXYaAtJGkub4HtTxq/BEINhmPDYT0kc4MO9Pt7hSTntGG0uTTAcFEzDYKdGxtFeT2
-	 qkjkQ9Njb/UFnPIIvb1+17UQA9vp2juzNUYGm3uywq3v8NTkaS1OlNFYQ09AI39lpx
-	 YQaZvSP4SUfRf4YlPPa54Y1tNy/wsF7ZVJVKqynCB7t8JfsAtW1Xvl7gh2NjEvVbqY
-	 byeS9jwZXrmVRhx6StAaC2vlVi6HX3Ox4JExT2RQEj9zwDNL3tioAysr1mHqOoXhAg
-	 8DUjtPx04KNjg==
-Date: Tue, 26 Aug 2025 16:58:00 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Andy Lutomirski <luto@kernel.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Uladzislau Rezki <urezki@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-hyperv@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [PATCH 0/5] Drivers: hv: Fix NEED_RESCHED_LAZY and use common
- APIs
-Message-ID: <aK3nmOgVl4INJpjG@liuwe-devbox-ubuntu-v2.tail21d00.ts.net>
-References: <20250825200622.3759571-1-seanjc@google.com>
- <3188ca61-2591-4576-9777-1671689b7235@linux.microsoft.com>
- <aKz_ZMvvF0e9nwSn@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sg3cesE9"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-771e43782aaso2378163b3a.1
+        for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 11:51:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756234279; x=1756839079; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wx/eP8ISZUfaNU5gsf9zfBk4G2Ojy7BXWA5HSbjb9W8=;
+        b=sg3cesE9kEr5c/sBQmIFgxk4dOgzCAcglO9nTBY752/8FmXn1cBEI2DyoB2hSeGfP0
+         ox+GD/kCCcXJs5WOFQeLhRY9Zu/mghGUK7lx0IJ5zBrx0ZNogg8PWzwYxCDynl+sECQb
+         RzH16poTkiWZoxdXXyh5m+eO0QF6UYnTPY9Vb2+kNSIje3QYCi1TnfuFZHg+BbZMOQHb
+         uNjJZ7892oMz+JsRzkCvw14PvJURcBfJVMcMbKfVrBOBBjcfw3/zeLL2WiPX5g+uwo5i
+         P1kFyrYQ4z76Ms/KWdOuFgThXNCj8yQOj54FcYbD4V4UlYYTE81W9H91S9ATFKbeknpy
+         vGSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756234279; x=1756839079;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wx/eP8ISZUfaNU5gsf9zfBk4G2Ojy7BXWA5HSbjb9W8=;
+        b=Rd14n6LmDXPUBkBNIPwfOfK4VBe28RVlzgMMWhal52Djfa9B16rD9ZkHyYRvUSWT+t
+         sUPallsI+LJIrl+I4E1MdLXqgQhs3f1b8Ndz/eMbbX97pksdPPQPO4NVehV2rO/prX2H
+         Pt01xV5QxvPEbO3U4FNvUhUHyXgGbiOd8T1lAN6iY61tOSTCn9iiwwjpZk0BOwCuhTvG
+         L2PcN9nwrM9Ne10tqm/S8nPpGOjpM5LGDc+prXvabWkb3QbVNTvfnMuIq9ttWrhvXZkV
+         3kfeTvoCRyCQghYkf13TX6XSZKtLDKCU9c7CuK4KIoXflCVV4oBk0XveJ7fAQ3vujnJh
+         SmAg==
+X-Forwarded-Encrypted: i=1; AJvYcCWHvDq4ofUc0KH0May8JrBwhvqWeG4otrSXBNqs83V+pIPTTLvtktE25q8pKQfnsFm934el024=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz93y2RzrTizhXg2tmkDgL23oRq554KKlFXF+D/xPLa3ef5IEHY
+	wUKPncvnHCfG15J3XVarp1qHvgsmNwDwmjioLq4xWgYyhYo7E1WN8K7UjznR0XBBXY01fIt0ZOZ
+	6d5DRCg==
+X-Google-Smtp-Source: AGHT+IGKYZgVuKPCFTi5OK6fXT9HPNRtj+Ry3+8K8iNH2BVKAfyRecdTfCXVWb0y2y273V0KC9Ad4c4jfQ0=
+X-Received: from pfhh22.prod.google.com ([2002:a05:6a00:2316:b0:76e:839a:7a08])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3e01:b0:748:e9e4:d970
+ with SMTP id d2e1a72fcca58-7702fa091a4mr19565624b3a.1.1756234279349; Tue, 26
+ Aug 2025 11:51:19 -0700 (PDT)
+Date: Tue, 26 Aug 2025 11:51:18 -0700
+In-Reply-To: <aKzX152737nAo479@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aKz_ZMvvF0e9nwSn@google.com>
+Mime-Version: 1.0
+References: <20250825155203.71989-1-sebott@redhat.com> <aKy-9eby1OS38uqM@google.com>
+ <87zfbnyvk9.wl-maz@kernel.org> <aKzRgp58vU6h02n6@google.com> <aKzX152737nAo479@linux.dev>
+Message-ID: <aK4CJnNxB6omPufp@google.com>
+Subject: Re: [PATCH] KVM: selftests: fix irqfd_test on arm64
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Sebastian Ott <sebott@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Aug 25, 2025 at 05:27:16PM -0700, Sean Christopherson wrote:
-> On Mon, Aug 25, 2025, Nuno Das Neves wrote:
-> > On 8/25/2025 1:06 PM, Sean Christopherson wrote:
-> > > Fix a bug where MSHV root partitions don't honor NEED_RESCHED_LAZY, and then
-> > > deduplicate the TIF related MSHV code by turning the "kvm" entry APIs into
-> > > more generic "virt" APIs (which ideally would have been done when MSHV root
-> > > support was added).
+On Mon, Aug 25, 2025, Oliver Upton wrote:
+> On Mon, Aug 25, 2025 at 02:11:30PM -0700, Sean Christopherson wrote:
+> > On Mon, Aug 25, 2025, Marc Zyngier wrote:
+> > > On Mon, 25 Aug 2025 20:52:21 +0100,
+> > > Sean Christopherson <seanjc@google.com> wrote:
+> > > > Is there a sane way to handle vGIC creation in kvm_arch_vm_post_create()?  E.g.
+> > > > could we create a v3 GIC when possible, and fall back to v2?  And then provide a
+> > > > way for tests to express a hard v3 GIC dependency?
 > > > 
-> > > Assuming all is well, maybe this could go through the tip tree?
-> > > 
-> > > The Hyper-V stuff and non-x86 architectures are compile-tested only.
-> > > 
+> > > You can ask KVM what's available. Like an actual VMM does. There is no
+> > > shortage of examples in the current code base.
 > > 
-> > Thanks Sean, I can test the root partition changes.
+> > Right, by "sane" I meant: is there a way to instantiate a supported GIC without
+> > making it hard/painful to write tests, and without having to plumb in arm64
+> > specific requirements to common APIs?
 > > 
-> > A similar change will be needed in mshv_vtl_main.c since it also calls
-> > mshv_do_pre_guest_mode_work() (hence the "common" in mshv_common.c).
+> > E.g. are there tests that use the common vm_create() APIs and rely on NOT having
+> > a GIC?
 > 
-> Oof, more dependencies.  I suppose the easiest thing would be to send a series
-> against
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/hyperv/linux.git queue
-> 
-> and then route everything through there?
+> Instead of stuffing a GIC in behind vm_create(), I'd rather we have a
+> specific helper for creating a VM with an irqchip. There's tests in
+> arm64 that rely on all this generic infrastructure and also need to
+> select / dimension a GIC appropriately for the test.
 
-Our fixes branch is on 6.17-rc1. You can use it as a base if you want
-to.
+I've no objection to arm64 providing an API for tests that need a specific GIC
+configuration (I think it's a great idea), but I don't think that needs to be
+mutually exclusive with having the common APIs instantiate _a_ GIC by default.
 
-> 
-> Alternatively, frontload the MSHV fixes (which I'll do regardless) and take those
-> through hyperv and the rest through the tip tree?  That seems like an absurd
-> amount of juggling though, especially if we want to get the cleanups into 6.18.
-> And if none of these lands, it's MSHV that'll suffer the most, so betting it all
-> on the hyperv tree doesn't seem terrible.
-> 
+What if we use a global flag with thread local storage (because paranoia is
+basically free, I think) to communicate that the test wants to create a v3 vGIC?
 
-I'm happy to do it however the community sees fit.
+E.g.
 
-> > Also, is it possible to make all the mshv driver changes in a single patch?
-> 
-> It's certainly possible, but I'd prefer not do to that.
-> 
-> > It seems like it would be cleaner than refactoring it in patches 1 & 2 and
-> > then deleting all the refactored code in patch 5.
-> 
-> Only if you don't care about backporting fixes, bisection, or maintaining code.
-> 
-> E.g. if checking NEED_RESCHED_LAZY somehow causes issues, it would be really nice
-> for that to bisect to exactly that patch, not a patch that also switches to a
-> completely different set of APIs.
-> 
-> And if someone is wants the fixes in a pre-6.18 kernel, they don't need to
-> backport all of the KVM and entry code changes just to get the fix.
+---
+static __thread bool vm_wants_custom_vgic;
 
-+1 on this.
+void kvm_arch_vm_post_create(struct kvm_vm *vm)
+{
+	if (!vm_wants_custom_vgic) {
+		<setup default vgic>
+	}
+}
 
-Thanks,
-Wei
+struct kvm_vm *vm_create_with_vgic_v3(uint32_t nr_vcpus, void *guest_code,
+				      uint32_t nr_irqs, struct kvm_vcpu **vcpus)
+{
+	TEST_ASSERT(!vm_wants_custom_vgic, "blah blah blah");
+	vm_wants_custom_vgic = true;
+	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus)
+	vm_wants_custom_vgic = false;
 
-> 
-> As for the maintenance headache, see above.
+	vgic_v3_setup(vm, nr_vcpus, nr_irqs);
+}
+
+struct kvm_vm *vm_create_with_one_vcpu_and_vgic_v3(struct kvm_vcpu **vcpu,
+						   void *guest_code,
+						   uint32_t nr_irqs)
+{
+	struct kvm_vcpu *vcpus[1];
+	struct kvm_vm *vm;
+
+	vm = vm_create_with_vgic_v3(1, guest_code, nr_irqs, vcpus);
+
+	*vcpu = vcpus[0];
+	return vm;
+}
+---
+
+> The majority of selftests don't even need an irqchip anyway.
+
+But it's really, really nice for developers if they can assume a certain level of
+configuration is done by the infrastructure, i.e. don't have worry about doing
+what is effectively "basic" VM setup.
+
+E.g. x86 selftests creates an IRQCHIP, sets up descriptor tables and exception
+handlers, and a handful of other "basic" things, and that has eliminated soooo
+much boilerplate code and the associated friction with having to know/discover
+that e.g. sending IRQs in a test requires additional setup beyond the obvious
+steps like wiring up a handler.
