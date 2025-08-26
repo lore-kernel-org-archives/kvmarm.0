@@ -1,75 +1,74 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD70350848
-	for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 13:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E702352090
+	for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 13:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756216014; cv=none; b=sGzqb9s8T1664MF36Ugf91ZaNYuQ+oc3TfvFhaKLbngAR19mWRwPw3Sov7ch4Fs6iHUGCm3lH0zeLvFHS8MkdfXxgRLaUHdM68HDZuqKspco6POvCtvajCP1+cARjbaeMy2jpq1r8grqJBq/U64BlvwFKXZfZ9LThPpX9v1snbs=
+	t=1756216348; cv=none; b=cMLlaj2E2WUbaPAdN3aY8hy4+qW3aOeMict4GLcsY0ZgdNPoURpUKC96D188aC2eMRSRiNoEZIAHgI2dUk5SmqnorN3sN4LfVjlk6GzhmQjjdNJXx4FvSJtemU98NOTqn6FzusAJh+cfFdm2Ty5x6o/+EudUGv8FZeiqtSgNEGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756216014; c=relaxed/simple;
-	bh=D2WCPWAROvWpGOBAO/irESE4qw7Dj1nlyMvIle7uz6A=;
+	s=arc-20240116; t=1756216348; c=relaxed/simple;
+	bh=ekOHapBN3MK0HyC/SCeCFRc8rNUhhpwxn7KoJlL/4hY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eL1e3CQkm18WCegu8lTNCnZbq+efhRHd2RetcVBGcSpr7pyjnXl913ngdVqNq7i/Y9td7bid0/Jkq97SkhgU51mPGTzqr7T+DFKRa8EKgEXhcFtZOR5KJSYOR9+aFz8+O3A4MO6Wrlm+Qtdv8L8MJM1Wl0Tbt+xtjPkcr2VtrC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=iagiYMJq; arc=none smtp.client-ip=209.85.215.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=m80QSZfLFDE6/fpavFtUh3RBy0NbmCub3EOAJ6m1xwpAn1YM1FOb1aNetS+bLDc8i9HKkJanrB8AerspXpf01AyMVLIXbcY5x4cal8XXa7lDVkkERsLalFiNZyLVOFZUq5YMIY0aLBiVicbl08KVvm4KYFlPAtbVUiIsQcM+AlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=BR6jzr+T; arc=none smtp.client-ip=209.85.215.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="iagiYMJq"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b4c1ed55930so2051921a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 06:46:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="BR6jzr+T"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b47052620a6so4777365a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 06:52:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie.ntu.edu.tw; s=google; t=1756216010; x=1756820810; darn=lists.linux.dev;
+        d=csie.ntu.edu.tw; s=google; t=1756216346; x=1756821146; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=osdPfu3X+WvVcN3qUZlA7PO/Is6NQe7OboBpnwUj8qo=;
-        b=iagiYMJqydl8ASxzusdzDkxbAJgf6D27ard0wjxfm2CCiwRgNkdMrLCSPVzS3Kp09z
-         SluFpT4oXq4zDIlWPH3bM6NMkw5clK/zQcfgnFUCRljK+BiF70wX8MzIgCWQQMe3mvR2
-         F4Q3eGYfYTeqLI/mIMh8oqIQzx/HgXBVCFWx289qxseIEKp93gsuHOPjAOCW7VDDwMvO
-         /Sc/RiHRtBbLYxx/kIZuAlsAVPjGLGYwvT1d0+tiKF3CrfwiA9C0owddF9P8sSMpHYr3
-         JDxfi8Nvkwelbjo053HBpEazYwZiOsGzIViDI+FWdqY7QhP/EiZzilsUKff/XbO6XRD9
-         jAXg==
+        bh=lHGyXOKrjm5oz81TLpvSpWDaUb0vSgaahBghiDLKLpk=;
+        b=BR6jzr+TzNfw6LhY2Yd04wTX2l7KxFOWAZ6pvxsgh9H81b4QUy7hRptZFTcFikKXtz
+         U4iafdtqDKv3hL28717Va8XJ8CNAWGPc4RVrblBJ3nhxKHmI77jwXNAdWAa4Mk/+O1cz
+         kNVYc4ya8Pi7LNjnWZVRDn48nFz2vHPMFQYCPS/+aOlOWdiWTgXl8iGaFt7VHoYxJ5QJ
+         Qt7h6Gu5IVAOln0AU5O3t1oITUGDT91moYdHPROxY/Fylk2mv8wAEfWDcCS0V988KJ/V
+         oVM66u/P+4CvaZowM/Jtr90AZJX92CkMs5lC/N5mNIaAYN2oro17WuuEshY2LljauBpl
+         KvNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756216010; x=1756820810;
+        d=1e100.net; s=20230601; t=1756216346; x=1756821146;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=osdPfu3X+WvVcN3qUZlA7PO/Is6NQe7OboBpnwUj8qo=;
-        b=ulBacqekqCgww3JWdkrfvaESmBpA+IspzbDgk5b3WwQUbBiBc50n2ZhINWZc1Z5JUI
-         aRUi/ITn6oUjEMAhz5o0GAqdh176gGnrNkzSC66WdHmuMq8E01hJkc+m8JWvscHXyymx
-         kHqDftkoLDEotUupQsBlwkzOdWdfWrYfET2yD3HwKXUAz1N4lm7zN9jp0sYjMzmKmB3T
-         bqFgnOHNtjCZqwbWKyZ7Nw6exaJupddjQsCtlpDDiORnMzFMJcQCXSHyo7fCFELHz4vx
-         3vww+p+39hQEZ/iRIwIkesKg/xoTWPAmtzHWHeFusZjYtkf8X/q8KCsCfjPjqsfMqSzK
-         lwcA==
-X-Forwarded-Encrypted: i=1; AJvYcCXMBbETmP/SFxRf9fak434IKm1Ol282Sq8imUC7I7sCIMp6Dm3AKoVGBLEPHRax8Q/oS04jsnI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyzqrMQUqj/6TV2D3VywLwkuWYUTtZubpGYOSjcKN1oAO7717B6
-	nvBfgMAtVFIukrkVBR2VrZMZB/C0i1Mc6aV2+5cKqifWOyPZTDdLvWPS94HuzKlIYrzg50EwyGR
-	s/TpfS/erikIwrsUbsjIwYK9BzKH263EMo6FXeCVlLmJYVLcqS00=
-X-Gm-Gg: ASbGncsmCAggZmG03KAnm/rmlrvAf0NAJfKayBZOyWoXL00K6ndbkHsmJAUQBcdFgSx
-	aXQ1xTgBEE6rVST/zUyQfb92stO9AomK6B3+FgAySDjXmHAw/7YzEy5ua4p4ujF07OmmBgtj4hk
-	SMf2BuHHORaB/YnjGzqcR0uAMon9HZssBmk78XKcjx9EMGnsFfTX6RKzQlb19SFJ603AcMEdkn/
-	MLLgxMcgAgRGiQ/oGEoU7tKVgkHK1ax0+U3uAgCjK/ay1MMEVMWiRhxMoa61EIPBDUZoIegyZ6S
-	fuAVRadzjfyU58WiDYuUjTgyBTEczGt6RHliOXSqOqjceGufYsT25QPqml8Uc7BEX+WB5bNOvfH
-	JZEMXa9kAvoV/1R3y5jk68U0v/63sZS2PfY+OtaKxCe0sM+c2IX6A49OR8A==
-X-Google-Smtp-Source: AGHT+IEapx+qUYn+gnSfpFGolofqtYLrq6ffT2yt159qZt5g4CsSb6AqyhXzJhjpuNXlfxvFnyc/wA==
-X-Received: by 2002:a17:902:c94d:b0:245:f002:d67c with SMTP id d9443c01a7336-2462eeb6325mr197352005ad.30.1756216009581;
-        Tue, 26 Aug 2025 06:46:49 -0700 (PDT)
+        bh=lHGyXOKrjm5oz81TLpvSpWDaUb0vSgaahBghiDLKLpk=;
+        b=vpL0GFvgyZkZCRPq7OH9/kIMR0sEUj7v+7DArOr76PPFN0j1PwQ9SZXg7FNmOkOFkw
+         ZWEZ4xkwJjxlVb3jccsnqE3oTR4BkGwwIS0Lf72wMqH82M0OvS37ViTtaG4i8WR26Aw6
+         CxP+UOJf9TZ86VbBD6okrjY+yAQ9Y8wBVhXNbWeSLhxi7CxJLvi5LP+QloQLWnhFX6O/
+         mYJqzUthz3Pjq0x5jKM+/5WMbiS/wKN11giCW7ipGv//1jsZj9e0Un9/9wQ/dWUoPNbr
+         HnNP7g2Y8qaNmpITDp0UqIbMv3bbv33FxlwALol7ZtduW8pQX5xHyxYRoktRFs2zpM0G
+         YQKw==
+X-Forwarded-Encrypted: i=1; AJvYcCWyAdh7sIFNQKjG/UvZrHV52CoSefoDpqstAENVmiVBOHXZ/gPNQEyMP3Vs/MhC0CkDaK2HjcE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzRwluSmp+MeBiE8xyLrJtBMVSYkC5HhmcULo+oX7Ez4EKR31KQ
+	VvyRb/yodCPW3SRC1xB4zrB47fle0gItttY/8xNcgTswdXuTCYGgvoMC4rnA1ufh7Z9xpLhfQUn
+	hnuW3++CB/AtaD7maegbjWIchdPjORpRM8uM4RuvuU+TbdKg0XQs=
+X-Gm-Gg: ASbGncuChaY6d666NBUWdo7jjT+pJtQWy0R7eVFzVIqOR6YEXefThnynmg+hsCyxKp6
+	BEDtUjkE8K0Mgmet0JMAQopxTeKwjh2Mkrs673FU3fs1bvNGqGB6EyksTOH4t2Jf4X2kRhbfZD1
+	/igdslXh078HBlvgZCMUrGtgi3/LQ4qnNtTjP4xVxtHuHJOYxJFvQ4e3v9gml5JPoyZB+ndxoXv
+	T3n7I5DNl0ZG2qjKOzdn8SnIsfUs99k7xuPT/wWgUUxsUzVzWC0z055cfWDIgFj4vQum6XgXNyQ
+	lpcwC9GdeM/hEGWt7UdcIA9/wwANuUQR6PdXEfpsnVArU/U3D26xm+ek/PAhhU6lxAsYjwIZGk2
+	kcUOk9upU8CZxTMHMCOoDYPf2MKtRDAcrwhFCkSvO+mg6CWSR21nNlmgxJivk/Mb2WOVD
+X-Google-Smtp-Source: AGHT+IGxhWDFYVYxqq2b3637yU3GvKWhKRYnWWKXaAejHtAF5wXzw4/2DHVTT2A4Zo0gjU/UoaN6ZA==
+X-Received: by 2002:a17:903:238a:b0:245:f860:80b1 with SMTP id d9443c01a7336-248753a264dmr23720075ad.11.1756216345708;
+        Tue, 26 Aug 2025 06:52:25 -0700 (PDT)
 Received: from zenbook (1-162-83-231.dynamic-ip.hinet.net. [1.162.83.231])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2466887198dsm96470935ad.110.2025.08.26.06.46.46
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24668889dbbsm96756765ad.132.2025.08.26.06.52.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 06:46:49 -0700 (PDT)
-Date: Tue, 26 Aug 2025 21:49:27 +0800
+        Tue, 26 Aug 2025 06:52:25 -0700 (PDT)
+Date: Tue, 26 Aug 2025 21:55:11 +0800
 From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 Subject: Re: [PATCH] KVM: arm64: nv: Allow shadow stage 2 read fault
-Message-ID: <djypsyratk63ovzv3flzb2tmunqtcoryzserwhsaaq5nuogsrx@u3uuwynnafbj>
+Message-ID: <l4ge3jp2leuzxkpn7nowptl7hjzeiq6amqowibycdhuahgafnw@o3dcvj7njix5>
 References: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
- <87a53rk83s.wl-maz@kernel.org>
+ <aKg3l23hheuQ1dJH@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,157 +77,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87a53rk83s.wl-maz@kernel.org>
+In-Reply-To: <aKg3l23hheuQ1dJH@linux.dev>
 X-Gm-Spam: 0
 X-Gm-Phishy: 0
 
-Hi Marc,
+Hi Oliver,
 
-On Fri, Aug 22, 2025 at 10:40:07AM +0100, Marc Zyngier wrote:
-> Hey Wei-Lin,
+On Fri, Aug 22, 2025 at 02:25:43AM -0700, Oliver Upton wrote:
+> Hi Wei-Lin,
 > 
-> On Fri, 22 Aug 2025 04:18:53 +0100,
-> Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
-> > 
-> > We don't expect to ever encounter a stage-2 read permission fault,
-> > because read permission is always granted when mapping stage-2. However,
-> > this isn't certainly the case when NV is involved. The key is the shadow
-> > mapping built for L2 must have the same or stricter permissions than
-> > those that L1 built for L2, hence opening the possibility of mappings
-> > without read permission.
-> > 
-> > Let's continue handling the read fault if we're handling a shadow
-> > stage-2 fault, instead of erroring out.
-> > 
-> > The following illustrates an example, vertical lines stand for either
-> > L0, L1, or L2 running, with left: L0, middle: L1, and right: L2.
-> > Horizontal arrows stand for traps and erets between them.
-> > 
-> > '''
-> > L0                               L1                               L2
-> >                                                L2                 |
-> >                                                writes to an L2 PA |
-> > |<----------------------------------------------------------------|
-> > |
-> > | L0
-> > | finds no mapping in
-> > | L1's s2pt for L2
-> > |
-> > | L0
-> > | injects data abort
-> > |------------------------------->|
-> >                                  | L1
-> >                                  | for whatever reason
-> >                                  | treats this abort specially,
-> >                                  | only gives it W permission
-> >                                  |
-> >        eret traps to L0          |
-> > |<-------------------------------|
-> > |
-> > |      eret back to L2
-> > |---------------------------------------------------------------->|
-> >                                                                   |
-> >                                                    L2             |
-> >                                                    writes to same |
-> >                                                    L2 PA (replay) |
-> > |<----------------------------------------------------------------|
-> > |
-> > | L0
-> > | finds mapping in s2pt that
-> > | L1 built for L2, create
-> > | shadow mapping for L2,
-> > | but only gives it W to match
-> > | what L1 had given
-> > |
-> > |
-> > |      eret back to L2
-> > |---------------------------------------------------------------->|
-> >                                                                   |
-> >                                                    L2             |
-> >                                                    writes to same |
-> >                                                    L2 PA (replay) |
-> >                                                    success        |
-> > |<----------------------------------------------------------------|
-> > |
-> > |
-> > |------------------------------->| L1
-> >                                  | for some reason, relaxes
-> >                                  | L2's permission from W
-> >                                  | to RW, AND, doesn't flush
-> >                                  | TLB
-> >                                  |
-> >        eret traps to L0          |
-> > |<-------------------------------|
-> > |
-> > |      eret back to L2
-> > |---------------------------------------------------------------->|
-> >                                                                   |
-> >                                                     L2            |
-> >                                                     read to L2 PA |
-> > |<----------------------------------------------------------------|
-> > | stage-2 read fault
-> > |
-> > '''
-> > 
-> > Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+> You've been finding some good stuff with nested, thank you :)
 > 
-> Excellent detective work! Bonus points for the ASCII art -- I'm not
-> sure how practical it will be to keep it in the final commit, but this
-> definitely helps understanding the issue.
-
-Thanks, I tried to make it clear for those that aren't familiar with NV,
-including myself :P
-
-> 
-> > ---
-> > 
+> On Fri, Aug 22, 2025 at 11:18:53AM +0800, Wei-Lin Chang wrote:
 > > I am able to trigger this error with a modified L1 KVM, but I do realize
 > > this requires L1 to be very strange (or even just wrong) so I understand
 > > if we don't want to handle this kind of edge case. On the other hand,
 > > could there also be other ways to trigger this that I have not thought
 > > of?
-> > 
+> 
+> The architecture is pretty unambiguous here that the stage-2 can
+> represent a translation w/o read permission.
+> 
 > > Another thing is that this change lets L1 get away with not flushing the
 > > TLB, but TLBs are ephemeral so it's fine in this aspect, however I'm not
 > > sure if there are other considerations.
 > 
-> Well, it depends whose TLBs we're talking about. The CPU TLBs are
-> definitely ephemeral. But the KVM-managed TLBs (aka the shadow S2) is
-> pretty static, and I am a bit worried to relax this.
-> 
-> What would happen on actual HW? L1 would take a S2 fault, because the
-> TLBs are out of sync with the S2 PTs. And yes, maybe the TLB pressure
-> woulds make it so that it works *sometimes*, but there wouldn't be any
-> guarantee of forward progress as long as EL2 doesn't issue a TLBI.
-> 
-> I reckon we should implement that particular behaviour whenever
-> possible, and handle permission faults early, possibly ahead of the
-> guest S2 walk (the way we handle VNCR_EL2 faults is IMO a good model).
+> FEAT_ETS3 is an interesting one since it provides software with ordering
+> expectations around MMU faults (including permission faults) and updates
+> to the translation tables. For KVM's shadow stage-2 to comply we need to
+> re-walk the guest's stage-2 before injecting the fault at L1.
 
-The parts above make complete sense.
+Thanks for telling me this, I haven't noticed ETS before, let me learn
+about it.
 
 > 
-> This would imply taking the guest's S2 permission at face value, and
-> only drop W permission when the memslot is RO -- you'd then need to
-> keep track of the original W bit somewhere. And that's where things
-> become much harder, because KVM can decide to remap arbitrary ranges
-> of IPA space as RO, which implies we should track the W bit at all
-> times, most likely as one of the SW bits in the PTE.
-
-But sorry, I struggle to understand this paragraph after reading it many
-times, probably my experience with the code isn't enough for me to make
-the connection. Why are we talking about the W bit suddenly?
-If you don't mind, can you reword what's discussed here?
-I only very vaguely get that there will be 2 W bits, one from what L1 set,
-and one from the L0 memslot, if I didn't completely miss the point..
-
-> 
-> We'll need exactly that if we ever want to implement the
-> Hardware-managed Dirty Bit, but I have the feeling we need an actual
-> design for this, and not a quick hack. Your approach is therefore the
-> correct one for the time being.
-> 
-> > 
 > > ---
 > >  arch/arm64/kvm/mmu.c | 4 ++--
 > >  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -247,22 +129,17 @@ and one from the L0 memslot, if I didn't completely miss the point..
 > > +		kvm_err("Unexpected S2 read permission error\n");
 > >  		return -EFAULT;
 > >  	}
-> >  
 > 
-> Honestly, I'd rather kill this check altogether rather than adding
-> another condition to it -- I suggested it to Fuad a while ago. This is
-> the first time we ever see it firing, and I don't think it is bringing
-> much.
+> Hmm... I'm also willing to just delete this check altogether. The
+> likelihood of KVM creating a stage-2 PTE w/o read permission is rather
+> low.
 
-No problem and agreed. Let me prepare another version.
+Agreed, and this is in agreement with Marc, let me drop this in the next
+version.
 
 Thanks,
 Wei-Lin Chang
 
 > 
 > Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Jazz isn't dead. It just smells funny.
+> Oliver
