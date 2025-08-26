@@ -1,74 +1,71 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E702352090
-	for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 13:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB8A2D837C;
+	Tue, 26 Aug 2025 16:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756216348; cv=none; b=cMLlaj2E2WUbaPAdN3aY8hy4+qW3aOeMict4GLcsY0ZgdNPoURpUKC96D188aC2eMRSRiNoEZIAHgI2dUk5SmqnorN3sN4LfVjlk6GzhmQjjdNJXx4FvSJtemU98NOTqn6FzusAJh+cfFdm2Ty5x6o/+EudUGv8FZeiqtSgNEGs=
+	t=1756227483; cv=none; b=XXhQxg+Z2zJ7Ls0Vfm5yhmEdAzyN7lyg7Rupp/xJ+CY/Qx7MtmI/+Iu7LJ6mJm5ZjpwOMx96WOEevVEQbTbbD63uChgix+YzdBTA201exvr4Z+D2QxGvwQ3oOxUnDtNL7jt8uNGyXA164c1FZ3zKYKVupuYV0ttdg3pYxdFmQJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756216348; c=relaxed/simple;
-	bh=ekOHapBN3MK0HyC/SCeCFRc8rNUhhpwxn7KoJlL/4hY=;
+	s=arc-20240116; t=1756227483; c=relaxed/simple;
+	bh=fnUtXDAxJfdbxKoWIvjZ0YEMsdquajfs3Wt0vqohrgU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m80QSZfLFDE6/fpavFtUh3RBy0NbmCub3EOAJ6m1xwpAn1YM1FOb1aNetS+bLDc8i9HKkJanrB8AerspXpf01AyMVLIXbcY5x4cal8XXa7lDVkkERsLalFiNZyLVOFZUq5YMIY0aLBiVicbl08KVvm4KYFlPAtbVUiIsQcM+AlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=BR6jzr+T; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+	 Content-Type:Content-Disposition:In-Reply-To; b=ubMmnoo2oZu9s6x/EePqUAL6yDQNyPSEn9QLVcp1fDTzFKhnPHdwNItf1KrVl76vYqHNUSo0T4xLsZrxMtzfPtxsYoeWBgZVL2BFKsLWS+Gn86AlRsHZVg5MsrA92wClIOcSii+yml4tMhTKqDDFw9xeLeS1jATQ2bfM51G8L/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuvpJ+uR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="BR6jzr+T"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b47052620a6so4777365a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 26 Aug 2025 06:52:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie.ntu.edu.tw; s=google; t=1756216346; x=1756821146; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lHGyXOKrjm5oz81TLpvSpWDaUb0vSgaahBghiDLKLpk=;
-        b=BR6jzr+TzNfw6LhY2Yd04wTX2l7KxFOWAZ6pvxsgh9H81b4QUy7hRptZFTcFikKXtz
-         U4iafdtqDKv3hL28717Va8XJ8CNAWGPc4RVrblBJ3nhxKHmI77jwXNAdWAa4Mk/+O1cz
-         kNVYc4ya8Pi7LNjnWZVRDn48nFz2vHPMFQYCPS/+aOlOWdiWTgXl8iGaFt7VHoYxJ5QJ
-         Qt7h6Gu5IVAOln0AU5O3t1oITUGDT91moYdHPROxY/Fylk2mv8wAEfWDcCS0V988KJ/V
-         oVM66u/P+4CvaZowM/Jtr90AZJX92CkMs5lC/N5mNIaAYN2oro17WuuEshY2LljauBpl
-         KvNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756216346; x=1756821146;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lHGyXOKrjm5oz81TLpvSpWDaUb0vSgaahBghiDLKLpk=;
-        b=vpL0GFvgyZkZCRPq7OH9/kIMR0sEUj7v+7DArOr76PPFN0j1PwQ9SZXg7FNmOkOFkw
-         ZWEZ4xkwJjxlVb3jccsnqE3oTR4BkGwwIS0Lf72wMqH82M0OvS37ViTtaG4i8WR26Aw6
-         CxP+UOJf9TZ86VbBD6okrjY+yAQ9Y8wBVhXNbWeSLhxi7CxJLvi5LP+QloQLWnhFX6O/
-         mYJqzUthz3Pjq0x5jKM+/5WMbiS/wKN11giCW7ipGv//1jsZj9e0Un9/9wQ/dWUoPNbr
-         HnNP7g2Y8qaNmpITDp0UqIbMv3bbv33FxlwALol7ZtduW8pQX5xHyxYRoktRFs2zpM0G
-         YQKw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyAdh7sIFNQKjG/UvZrHV52CoSefoDpqstAENVmiVBOHXZ/gPNQEyMP3Vs/MhC0CkDaK2HjcE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzRwluSmp+MeBiE8xyLrJtBMVSYkC5HhmcULo+oX7Ez4EKR31KQ
-	VvyRb/yodCPW3SRC1xB4zrB47fle0gItttY/8xNcgTswdXuTCYGgvoMC4rnA1ufh7Z9xpLhfQUn
-	hnuW3++CB/AtaD7maegbjWIchdPjORpRM8uM4RuvuU+TbdKg0XQs=
-X-Gm-Gg: ASbGncuChaY6d666NBUWdo7jjT+pJtQWy0R7eVFzVIqOR6YEXefThnynmg+hsCyxKp6
-	BEDtUjkE8K0Mgmet0JMAQopxTeKwjh2Mkrs673FU3fs1bvNGqGB6EyksTOH4t2Jf4X2kRhbfZD1
-	/igdslXh078HBlvgZCMUrGtgi3/LQ4qnNtTjP4xVxtHuHJOYxJFvQ4e3v9gml5JPoyZB+ndxoXv
-	T3n7I5DNl0ZG2qjKOzdn8SnIsfUs99k7xuPT/wWgUUxsUzVzWC0z055cfWDIgFj4vQum6XgXNyQ
-	lpcwC9GdeM/hEGWt7UdcIA9/wwANuUQR6PdXEfpsnVArU/U3D26xm+ek/PAhhU6lxAsYjwIZGk2
-	kcUOk9upU8CZxTMHMCOoDYPf2MKtRDAcrwhFCkSvO+mg6CWSR21nNlmgxJivk/Mb2WOVD
-X-Google-Smtp-Source: AGHT+IGxhWDFYVYxqq2b3637yU3GvKWhKRYnWWKXaAejHtAF5wXzw4/2DHVTT2A4Zo0gjU/UoaN6ZA==
-X-Received: by 2002:a17:903:238a:b0:245:f860:80b1 with SMTP id d9443c01a7336-248753a264dmr23720075ad.11.1756216345708;
-        Tue, 26 Aug 2025 06:52:25 -0700 (PDT)
-Received: from zenbook (1-162-83-231.dynamic-ip.hinet.net. [1.162.83.231])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24668889dbbsm96756765ad.132.2025.08.26.06.52.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 06:52:25 -0700 (PDT)
-Date: Tue, 26 Aug 2025 21:55:11 +0800
-From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: nv: Allow shadow stage 2 read fault
-Message-ID: <l4ge3jp2leuzxkpn7nowptl7hjzeiq6amqowibycdhuahgafnw@o3dcvj7njix5>
-References: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
- <aKg3l23hheuQ1dJH@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuvpJ+uR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C82A7C4CEF1;
+	Tue, 26 Aug 2025 16:58:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756227482;
+	bh=fnUtXDAxJfdbxKoWIvjZ0YEMsdquajfs3Wt0vqohrgU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fuvpJ+uRtRM9fzHvRv14jD9ZQo0Z+Ik1UILyoPgPF2jz8dNyPROaEFVvlvQAaXz4X
+	 ttXYaAtJGkub4HtTxq/BEINhmPDYT0kc4MO9Pt7hSTntGG0uTTAcFEzDYKdGxtFeT2
+	 qkjkQ9Njb/UFnPIIvb1+17UQA9vp2juzNUYGm3uywq3v8NTkaS1OlNFYQ09AI39lpx
+	 YQaZvSP4SUfRf4YlPPa54Y1tNy/wsF7ZVJVKqynCB7t8JfsAtW1Xvl7gh2NjEvVbqY
+	 byeS9jwZXrmVRhx6StAaC2vlVi6HX3Ox4JExT2RQEj9zwDNL3tioAysr1mHqOoXhAg
+	 8DUjtPx04KNjg==
+Date: Tue, 26 Aug 2025 16:58:00 +0000
+From: Wei Liu <wei.liu@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, loongarch@lists.linux.dev,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-hyperv@vger.kernel.org, rcu@vger.kernel.org
+Subject: Re: [PATCH 0/5] Drivers: hv: Fix NEED_RESCHED_LAZY and use common
+ APIs
+Message-ID: <aK3nmOgVl4INJpjG@liuwe-devbox-ubuntu-v2.tail21d00.ts.net>
+References: <20250825200622.3759571-1-seanjc@google.com>
+ <3188ca61-2591-4576-9777-1671689b7235@linux.microsoft.com>
+ <aKz_ZMvvF0e9nwSn@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -77,69 +74,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aKg3l23hheuQ1dJH@linux.dev>
-X-Gm-Spam: 0
-X-Gm-Phishy: 0
+In-Reply-To: <aKz_ZMvvF0e9nwSn@google.com>
 
-Hi Oliver,
-
-On Fri, Aug 22, 2025 at 02:25:43AM -0700, Oliver Upton wrote:
-> Hi Wei-Lin,
-> 
-> You've been finding some good stuff with nested, thank you :)
-> 
-> On Fri, Aug 22, 2025 at 11:18:53AM +0800, Wei-Lin Chang wrote:
-> > I am able to trigger this error with a modified L1 KVM, but I do realize
-> > this requires L1 to be very strange (or even just wrong) so I understand
-> > if we don't want to handle this kind of edge case. On the other hand,
-> > could there also be other ways to trigger this that I have not thought
-> > of?
-> 
-> The architecture is pretty unambiguous here that the stage-2 can
-> represent a translation w/o read permission.
-> 
-> > Another thing is that this change lets L1 get away with not flushing the
-> > TLB, but TLBs are ephemeral so it's fine in this aspect, however I'm not
-> > sure if there are other considerations.
-> 
-> FEAT_ETS3 is an interesting one since it provides software with ordering
-> expectations around MMU faults (including permission faults) and updates
-> to the translation tables. For KVM's shadow stage-2 to comply we need to
-> re-walk the guest's stage-2 before injecting the fault at L1.
-
-Thanks for telling me this, I haven't noticed ETS before, let me learn
-about it.
-
-> 
-> > ---
-> >  arch/arm64/kvm/mmu.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
+On Mon, Aug 25, 2025 at 05:27:16PM -0700, Sean Christopherson wrote:
+> On Mon, Aug 25, 2025, Nuno Das Neves wrote:
+> > On 8/25/2025 1:06 PM, Sean Christopherson wrote:
+> > > Fix a bug where MSHV root partitions don't honor NEED_RESCHED_LAZY, and then
+> > > deduplicate the TIF related MSHV code by turning the "kvm" entry APIs into
+> > > more generic "virt" APIs (which ideally would have been done when MSHV root
+> > > support was added).
+> > > 
+> > > Assuming all is well, maybe this could go through the tip tree?
+> > > 
+> > > The Hyper-V stuff and non-x86 architectures are compile-tested only.
+> > > 
 > > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 1c78864767c5c..41017ca579b19 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1508,8 +1508,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> >  	VM_BUG_ON(write_fault && exec_fault);
-> >  
-> > -	if (fault_is_perm && !write_fault && !exec_fault) {
-> > -		kvm_err("Unexpected L2 read permission error\n");
-> > +	if (fault_is_perm && !write_fault && !exec_fault && !nested) {
-> > +		kvm_err("Unexpected S2 read permission error\n");
-> >  		return -EFAULT;
-> >  	}
+> > Thanks Sean, I can test the root partition changes.
+> > 
+> > A similar change will be needed in mshv_vtl_main.c since it also calls
+> > mshv_do_pre_guest_mode_work() (hence the "common" in mshv_common.c).
 > 
-> Hmm... I'm also willing to just delete this check altogether. The
-> likelihood of KVM creating a stage-2 PTE w/o read permission is rather
-> low.
+> Oof, more dependencies.  I suppose the easiest thing would be to send a series
+> against
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/hyperv/linux.git queue
+> 
+> and then route everything through there?
 
-Agreed, and this is in agreement with Marc, let me drop this in the next
-version.
+Our fixes branch is on 6.17-rc1. You can use it as a base if you want
+to.
+
+> 
+> Alternatively, frontload the MSHV fixes (which I'll do regardless) and take those
+> through hyperv and the rest through the tip tree?  That seems like an absurd
+> amount of juggling though, especially if we want to get the cleanups into 6.18.
+> And if none of these lands, it's MSHV that'll suffer the most, so betting it all
+> on the hyperv tree doesn't seem terrible.
+> 
+
+I'm happy to do it however the community sees fit.
+
+> > Also, is it possible to make all the mshv driver changes in a single patch?
+> 
+> It's certainly possible, but I'd prefer not do to that.
+> 
+> > It seems like it would be cleaner than refactoring it in patches 1 & 2 and
+> > then deleting all the refactored code in patch 5.
+> 
+> Only if you don't care about backporting fixes, bisection, or maintaining code.
+> 
+> E.g. if checking NEED_RESCHED_LAZY somehow causes issues, it would be really nice
+> for that to bisect to exactly that patch, not a patch that also switches to a
+> completely different set of APIs.
+> 
+> And if someone is wants the fixes in a pre-6.18 kernel, they don't need to
+> backport all of the KVM and entry code changes just to get the fix.
+
++1 on this.
 
 Thanks,
-Wei-Lin Chang
+Wei
 
 > 
-> Thanks,
-> Oliver
+> As for the maintenance headache, see above.
