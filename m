@@ -1,101 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977941A23AF;
-	Wed, 27 Aug 2025 13:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED80B2741A6;
+	Wed, 27 Aug 2025 16:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756300475; cv=none; b=PNoqctxhxp4okXwDj3GYtBDV1OQfuqMGJqby2I1F0tlrZIsBzuyxFktEXJH/fydpgABd1iA1vgWVuhLHyLLOSQB/ZGdckk9JV5R0ABg+D+QnbAp/eRai4VEUWqvfFs1NbIFuebHPhgbxKGJ0Ylsl9J1ptQVrjHL9iLc2tu8kvEs=
+	t=1756311049; cv=none; b=HTZvn+E5SWet/d+YFXnAE69j2OpyXwYaWKS91YhUKdc9o1cCorY/WcG3WZ8QdTQV0CTYXx1jn3qHYZpjBoIF0kXZ1BoRWle489+t2O0DP9ZliCCXhgX8NasXRU0+/hWHghcAf9BqZheus3Sl7UJOhw0per8XAHEzvuLp3u+yrQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756300475; c=relaxed/simple;
-	bh=BHEGK0fjVDQ6cDX+4RlPfEiA5ObgqNeGUDDWhUIpej0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TEHDMa9ec3Jdq39r2gRrZDIe82FedoRLlzSeVSC0rrPhJzGkXeM6hZ8SrZ+jlA3riLT4Mb8VW5xiW+Fzc/wBuoEKb/IedVv3UktadnoZ4f1pdEe2tLAzV8phLzaw0Zp1kJW2OCbFeZ5dEk/ETzWe+y37MJbMZ+4Zvo3uVidnruM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2IyALzM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756311049; c=relaxed/simple;
+	bh=hHsu9WQdYQHrwXxayIAM189ualpE0/qjEduc1G4m+4U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MW/bbZF550+JbIcEz9dGwb8cpv7c0Qodt9hvsYdidMs/HCoxkZdU1qZfyVN1GyZaFVIufxkhxWcWu9pKYod5fOGfuOmJ5u06k2LqH4ptbifrUh9rP4gAJvWXrKQNy3zBuO4lm8PcAg+xLR3i3jnrwQ4jdTsm3YwWX5UBnhcgN5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXyPwnSS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2IyALzM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B56FC4CEF4;
-	Wed, 27 Aug 2025 13:14:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXyPwnSS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 997DDC4CEF0;
+	Wed, 27 Aug 2025 16:10:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756300475;
-	bh=BHEGK0fjVDQ6cDX+4RlPfEiA5ObgqNeGUDDWhUIpej0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o2IyALzMaZe28pUewT2u98hAlAgAi8OG1UFonYL2PVwNhwLFRPjz4ZgJWEmd+2rPZ
-	 4qwg3KdcpZmXOHV2K4VYd9LiC8VZatPXt0Z4g8aXLv20PP/jnTN1y6jrKIY0t4oF8K
-	 REJ7Uwba+MfFbQQuG7rCO1aC3C4GPuB5Ig5LxaMcY1d0qDFb4+D2BcmjW4tekwzITX
-	 njvcJiDibURZ9YuuffsO94mK1EhpIusfUJWmU5MT3tEA3vwFAHnDv8zFP6BW+H70S/
-	 ZvR9lIgZSHrKyQuGFyj1kcO8f6AuqhatMd9LoZKrYxjaMqTDK0mAowmiKHlXL/Xo45
-	 E1yKzpQrSVEWA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1756311048;
+	bh=hHsu9WQdYQHrwXxayIAM189ualpE0/qjEduc1G4m+4U=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WXyPwnSSQQpLkBnT/nHeRzsbEeft4QEWRzGqnJioHYVLz5VBgSLPHlhmM8B7ukBNR
+	 euietACguNGUwzaKWzYFImpSkuACz3nx1bJASGJLgNCv7dl/rrVjofb9KNIS7fgIMD
+	 DIum4u0/0SbmA+IwODqj3MRJ+89ohmISCIJwfeaNGixHtR1YC1/16ch68mzJtT6IbI
+	 1OuagGUMsPmOEnQU2vwlaSgibhuIKrRYn7nc73wLPOAFtenb6PhpoVywKGdHs43NX0
+	 ZfTWPmm/nr65DPYBrdVhaLqiioCSfp+AC+Rpy7INoLJHaI84aKOuXq4iwHtp9cy4tI
+	 pEOuLFMw8VcxQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1urFyy-00000000vKi-3IYO;
-	Wed, 27 Aug 2025 13:14:32 +0000
-Date: Wed, 27 Aug 2025 14:14:31 +0100
-Message-ID: <86ecswewjs.wl-maz@kernel.org>
+	id 1urIjW-00000000yGc-24Sv;
+	Wed, 27 Aug 2025 16:10:46 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	kvm@vger.kernel.org,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Ira Weiny <ira.weiny@intel.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shivank Garg <shivankg@amd.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Fuad Tabba <tabba@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Tao Chan <chentao@kylinos.cn>,
-	James Houghton <jthoughton@google.com>
-Subject: Re: [PATCH v17 00/24] KVM: Enable mmap() for guest_memfd
-In-Reply-To: <CABgObfb21UEZf4aQVv_-v3uFCp08G3SWhoTbpmSFz7qL0Xm63w@mail.gmail.com>
-References: <20250729225455.670324-1-seanjc@google.com>
-	<87b10d94-dca2-4ecb-a86f-b38c5c90e0cf@redhat.com>
-	<86frdcewue.wl-maz@kernel.org>
-	<CABgObfb21UEZf4aQVv_-v3uFCp08G3SWhoTbpmSFz7qL0Xm63w@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 00/16] KVM: arm64: TTW reporting on SEA and 52bit PA in S1 PTW
+Date: Wed, 27 Aug 2025 17:10:22 +0100
+Message-Id: <20250827161039.938958-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, ira.weiny@intel.com, gshan@redhat.com, shivankg@amd.com, vbabka@suse.cz, xiaoyao.li@intel.com, david@redhat.com, tabba@google.com, ackerleytng@google.com, chentao@kylinos.cn, jthoughton@google.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 27 Aug 2025 14:11:22 +0100,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> Yo can
->=20
-> On Wed, Aug 27, 2025 at 3:08=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
-te:
-> >
-> > On Wed, 27 Aug 2025 09:43:54 +0100,
-> > Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > > Applied to kvm/next, thanks!
-> >
-> > Can you please create a stable branch for these patches? It is quite
-> > likely that whatever I queue for 6.18 will conflict with that, and I'd
-> > like to be able to resolve the conflicts myself.
->=20
-> You can just base kvm-arm/next on kvm/next, but if you prefer I pushed
-> guest-memfd-mmap at https://git.kernel.org/pub/scm/virt/kvm/kvm.git/.
+Yes, $SUBJECT rolls of the tongue.
 
-Pulled, thanks.
+This series was triggered by the realisation that when injecting an
+SEA while on a S1PTW fault, we don't report the level of the walk and
+instead give a bare SEA, which definitely violates the architecture.
 
-	M.
+This state of things dates back to the pre-NV days, when we didn't
+have a S1 page table walker, and really didn't want to implement one.
+I've since moved on and reluctantly implemented one, which means we
+now *could* provide the level if we really wanted to.
 
---=20
-Without deviation from the norm, progress is not possible.
+However, nothing is that simple. The current code in at.c is firmly
+48bit, as our NV implementation doesn't yet support 52bit PA, while an
+EL1 VM can happily enjoy LPA and LPA2. As a result, it is necessary to
+expand the S1 PTW to support both LPA and LPA2. Joy.
+
+Then, once the above is achieved, we need to hook into the PTW
+machinery to match the first level of the walk that results in
+accessing the faulty address. For this, we introduce a simple filter
+mechanism that could be expanded if we needed to (no, please no).
+
+Finally, we can plug this into the fault injection path, and enjoy
+seeing the translation level being populated in the ESR_ELx register.
+
+Patches on top of 6.16-rc3.
+
+Marc Zyngier (16):
+  KVM: arm64: Add helper computing the state of 52bit PA support
+  KVM: arm64: Account for 52bit when computing maximum OA
+  KVM: arm64: Compute 52bit TTBR address and alignment
+  KVM: arm64: Decouple output address from the PT descriptor
+  KVM: arm64: Pass the walk_info structure to compute_par_s1()
+  KVM: arm64: Compute shareability for LPA2
+  KVM: arm64: Populate PAR_EL1 with 52bit addresses
+  KVM: arm64: Expand valid block mappings to FEAT_LPA/LPA2 support
+  KVM: arm64: Report faults from S1 walk setup at the expected start
+    level
+  KVM: arm64: Allow use of S1 PTW for non-NV vcpus
+  KVM: arm64: Allow EL1 control registers to be accessed from the CPU
+    state
+  KVM: arm64: Don't switch MMU on translation from non-NV context
+  KVM: arm64: Add filtering hook to S1 page table walk
+  KVM: arm64: Add S1 IPA to page table level walker
+  KVM: arm64: Populate level on S1PTW SEA injection
+  KVM: arm64: selftest: Expand external_aborts test to look for TTW
+    levels
+
+ arch/arm64/include/asm/kvm_nested.h           |  25 +-
+ arch/arm64/kvm/at.c                           | 341 +++++++++++++-----
+ arch/arm64/kvm/inject_fault.c                 |  27 +-
+ arch/arm64/kvm/nested.c                       |   2 +-
+ .../selftests/kvm/arm64/external_aborts.c     |  43 +++
+ .../selftests/kvm/include/arm64/processor.h   |   1 +
+ .../selftests/kvm/lib/arm64/processor.c       |  13 +-
+ 7 files changed, 362 insertions(+), 90 deletions(-)
+
+-- 
+2.39.2
+
