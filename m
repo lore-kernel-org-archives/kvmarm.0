@@ -1,77 +1,79 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBFE35334D
-	for <kvmarm@lists.linux.dev>; Wed, 27 Aug 2025 12:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800753128A2;
+	Wed, 27 Aug 2025 13:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756299467; cv=none; b=JGJcstObYJl5nCBDss2SlR0WCQujauui2KyQD45OQtGR824z0hOnqPrpOKFFrwIPmeSHjApbEbu/BfjWc1ZmoipZv3tD3AtKKecjjWNI2WOnRYc6/oOMm5RToxbEExelsq6D6+fMFqdYCcPGxCyfnCSiQdo6V2gJARY1PQKrcDg=
+	t=1756300093; cv=none; b=otIbaPzLvTm5l08o87RUzDxI+PAwaMdVlrg8jKjkLEpkYuuQyW50K/zSrN7y4Rc6O/TmmDHuJ8joYfYm3olayIsg6xP/1ZzYAve1ooMVwSoqyKN5cgPnWvjO+L2fRg2Sl9Msb5MVTUsMFhM4jYWkPu4JJRGd3BjNl8z5NmX0tFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756299467; c=relaxed/simple;
-	bh=w3nOGUy17xC76CjSfrnPpR5S63ym37zVcNGqJFaVJTc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qNyf3lL913BwQGQEttA0SRFx7SOMDJYnuMWMbGS2rbzBTcU8BQXyRs8BRgA7O2JNhCr5KEVDRSxxuiEAxxk+AK+k0d00AeE45yrYqI3sfRvmFiVaNMUCV8WhekLFvuui8EiVBue/PWabcl8W5oGpvwKUnzVBGlyoFt1yLfq6Tx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i/GEBd/J; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1756300093; c=relaxed/simple;
+	bh=IpEGFEEfU545ej3QeF5+hs5SmtlfBlWhDI8ZhRwmlgs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KUqNBi0tmBsF6Cr6phR9xYpDPct0CBwXs5R8bwqIUEbTDa4opY1kFL0y6fAx4Zf9BZ28LtRFjDQIORkT6ZUC8xK1tNIB0NOshmTBOG0zE6jaG1Ou/43xn6uJhEPhwbs6fJiiVuU5rvgdiNb9uNvZc7/pmQMx7+A9d3R5DaqsIw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=snBJ2WlH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i/GEBd/J"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2461c537540so72638075ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 27 Aug 2025 05:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756299465; x=1756904265; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBqCOEucd2EHQAImfHa6bYvYMgk6Ar5j1i6s5MVGeY8=;
-        b=i/GEBd/Jp8bXBoLRB63qwgKw/MSj2MjuPBMbJ7a+74Wpmp0nNPYwuIrsd3lwqXk++v
-         r39c9Rxy2CK38eYcJ8O/B28ArKkcywx5uJv014pDBGa7Xd1NGZw9QGn8Caa3mPZTt4Yt
-         7N1V3uJ3/H8bv+t+qzioS1qhIqJwPWMnQCyjR60fol/jqaLQ62u4rbB/LteQZC0ex4os
-         NQ6ECoSGkYopu1gsWaKuIRvrqQMeP3bMaa3KnpNV7naTgpBQLwTE7NzFnS7L1M2fQaTO
-         TXhOCa6gRAjWb+v53s/9fh0Z/CsJxaNDiS/A7HRyfOB+kqmhQ+augT7+knhHq0O+Mj3h
-         YtPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756299465; x=1756904265;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBqCOEucd2EHQAImfHa6bYvYMgk6Ar5j1i6s5MVGeY8=;
-        b=nydHUkqC0MQClbT8yWrXta/kMO2ZxIMBdeNeZsw2mULUp14x9Cq/5tax6wrOXWYGw9
-         CfNTrQW1O8ZmZ+HRy9/4tPPflDTZXaRrWo3EiZu6gZkvcTavANyP+0q+tbqLuHAsQXAm
-         sfmfaYmwHaJxOuHbdQeuxZhoi9lJNGgx/D8XR5O5E3+iX1k5kLOZpm+Q8O0fcV1/WJP/
-         gtLEMWqrwxDCiABZgDobhbJBG7wo/qb+wvzJ5A4b8uJBD/lvoMJ1FHLXMSoDgUnksgHm
-         eNM8yZGKeRzw3SeUzjipJfF5dAGGNRPiT12uonOCf794iP77uL+0/HCHu0xWg+gdsdeo
-         OVFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXBLolMoiwd/rR4M/QK26pAzwLIrVZvzZrd7exNvtvSNiptS+HM98PWEh97SF/SPXpPf/SaTFM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxwC/dWqNSbP2eo0ACmXTuAhoNhb63xlYOt4hX0x6mucbqjjz+/
-	UCLW8XYYj5nUVAk8iS93AVeWyYL317ecLrwmtQ/K2CnAuI0lFrXCCq8We3fdgNWpsdX7y2t9GZM
-	Lm4z4Qg==
-X-Google-Smtp-Source: AGHT+IGjYzo/cbnGJG6xrvxcdKkBIhOc9WrrVofRF0UoN4jq9615eiNnHnaTmYmPl4ZeSe1Rkx8Oa2x6F14=
-X-Received: from plbmq12.prod.google.com ([2002:a17:902:fd4c:b0:248:8f78:7ff4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db0e:b0:246:edc9:3a80
- with SMTP id d9443c01a7336-246edc93d95mr136614825ad.5.1756299465291; Wed, 27
- Aug 2025 05:57:45 -0700 (PDT)
-Date: Wed, 27 Aug 2025 05:57:43 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="snBJ2WlH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 187D9C4CEEB;
+	Wed, 27 Aug 2025 13:08:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756300092;
+	bh=IpEGFEEfU545ej3QeF5+hs5SmtlfBlWhDI8ZhRwmlgs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=snBJ2WlHLIctRupH0IhLfUosaWzE7Cju4kyy0lsniZeIChbOLef9dHdVmypF8wmtx
+	 GTxBQaL2ur3CWyPzoUipmCJMQb5gql+q8rE140bjVEJaa1tHLJt0AhkE6g7BE+i+Fp
+	 IFBTiLevWOnfXr4ryw1r6Fq0G9Tmg2MIXHrq4TzdAxIRx+bUNbOvPbVMDgoGTxRfQC
+	 Ujl7kQdI4Tq1m801f4hO7W3HBcGpBaSf8vs7/3xfY9aTEeZGHpkztdLOIPIjuvkyZT
+	 08+FQmvxN7zOdv2ybOlfSzRuL19cKPM9ZicK2Mw71lZyPcfpZqaSqcHTbe5XGoY422
+	 FSmkjaloeEqqw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1urFsn-00000000vBX-20Bc;
+	Wed, 27 Aug 2025 13:08:09 +0000
+Date: Wed, 27 Aug 2025 14:08:09 +0100
+Message-ID: <86frdcewue.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Ira Weiny <ira.weiny@intel.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shivank Garg <shivankg@amd.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	David Hildenbrand <david@redhat.com>,
+	Fuad Tabba <tabba@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Tao Chan <chentao@kylinos.cn>,
+	James Houghton <jthoughton@google.com>
+Subject: Re: [PATCH v17 00/24] KVM: Enable mmap() for guest_memfd
 In-Reply-To: <87b10d94-dca2-4ecb-a86f-b38c5c90e0cf@redhat.com>
+References: <20250729225455.670324-1-seanjc@google.com>
+	<87b10d94-dca2-4ecb-a86f-b38c5c90e0cf@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250729225455.670324-1-seanjc@google.com> <87b10d94-dca2-4ecb-a86f-b38c5c90e0cf@redhat.com>
-Message-ID: <aK8Ax2EchXMuX642@google.com>
-Subject: Re: [PATCH v17 00/24] KVM: Enable mmap() for guest_memfd
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
-	Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>, 
-	James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, ira.weiny@intel.com, gshan@redhat.com, shivankg@amd.com, vbabka@suse.cz, xiaoyao.li@intel.com, david@redhat.com, tabba@google.com, ackerleytng@google.com, chentao@kylinos.cn, jthoughton@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Aug 27, 2025, Paolo Bonzini wrote:
+On Wed, 27 Aug 2025 09:43:54 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
 > On 7/30/25 00:54, Sean Christopherson wrote:
 > > Paolo,
 > > 
@@ -107,7 +109,13 @@ On Wed, Aug 27, 2025, Paolo Bonzini wrote:
 > 
 > Applied to kvm/next, thanks!
 
-Thank you!
+Can you please create a stable branch for these patches? It is quite
+likely that whatever I queue for 6.18 will conflict with that, and I'd
+like to be able to resolve the conflicts myself.
 
-FWIW, I did separate run of the patches and came up with the same resolutions
-for the arm64 changes, so I'm sure they're perfect ;-)
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
