@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7819733EAF9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B8A340DB0;
 	Wed, 27 Aug 2025 16:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756311049; cv=none; b=mxXhZNI1c9HDyU6OTLhSz8605ipT2YVprWIIZnDgWqZRDU6QcgEh+rxL1IBj15F/IVeYL91vC6niTQdRMEISJKANY3r/0bOfgvuWJQ6eUe7v33pYlxu+DrflRHRvZn2oCK0Qsd/SoA2vFVSDD80MTZ8xc9dQbT3RmdhzZZqFTsU=
+	t=1756311049; cv=none; b=qpGk1BQeYB1RA+3evGY5Q9RfR4DbKTn/6yMHZWYnwWMQfntF7Xj87fAz7ojhpLLXF+96MdtlsYr6GkBq7rPzvRhmbPKwUP6OazB6MRQr7/yz3Xw0LbKr20yjq7E6NxutxjflIS45Tr9GhzmEHlnkJeIYkZKNcsRxnUqYEb0E/so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756311049; c=relaxed/simple;
-	bh=/xmMjNJO1y5cdr7S0+GamClR1BgNvrEtoT4V7IyrfNY=;
+	bh=xV/l/kQzWax0F16OB/PKIyWWct24uzmjuIqhelTe0Q4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JhakGhErR5PZCXsCYNiwRGM05PsdMpc8VfCdbhQ5aiKj4dW22QR9UoSxPXTCAcIqy2PrmabHjFuM8onxpSunjjqDb7UEeo9qv0Wwpv7By8oXib3GSLkBUjFw0nEM19qsEFsP5/cKy+kzVBYQ0q/eNQL4PUSo4Fth+RQOtZb1w/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g6KWq1iV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=HB+79V2Eu+pRpoW6ApGXjMH4nVIIE2O0BF8cskLWkgjiGJnM5zPOQlYgIxaOObJrYU8pH+zazHI9PG1sA9PqKfPXEp1NuWZokEeJexCF5f1zYJZkJTfyFaHhtNxQigQXsxdryAWUXYaQqZQVMTmbHmCazSXKC5/U5k16v8XbdGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dpDO21ew; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g6KWq1iV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E41C2C4CEF5;
-	Wed, 27 Aug 2025 16:10:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dpDO21ew"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 702BEC4CEF6;
+	Wed, 27 Aug 2025 16:10:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756311048;
-	bh=/xmMjNJO1y5cdr7S0+GamClR1BgNvrEtoT4V7IyrfNY=;
+	s=k20201202; t=1756311049;
+	bh=xV/l/kQzWax0F16OB/PKIyWWct24uzmjuIqhelTe0Q4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g6KWq1iVHeTpg1VBGcBlXr1UWKSuBHTgntnekPpnim+ff/iYs3ddQ45gsN8M8ImY3
-	 v59u8ZAaMBWtlnGe8OAXiKbk3KDeKRH0UGQRnWSBcuITLM7I8s0hJNojA9JVzGrtjr
-	 Cq1c5FT+8uUMbQ1NYMEhMuI7hKIEkS4T1NBeOKOv4C7DYPliHgeASzDVifWi/KL8lV
-	 ex6LVmpOJmDc4r82szDbPhyewILhsbjVYMio0FHTK3grxG8+fbzv1LcCI0wQCtOHQC
-	 wrGpBS8DzXFifBZyZj548ieRbwtryYGcUPMYOXs3GVmM17puHC7JfgWm7rMAHOyni/
-	 cUoLYPBjmgCEA==
+	b=dpDO21ewKU6WpvDlxN0onPfie99L0qYlfi0WMsXcoNUkHvpTs8RqJzJmGgJ8e4WjC
+	 N8VxozyLxnvpOKH0Fpt8eVNhI/7Xb/t81IyL/WXjS8u7iUAGvR+C7IRTA5I42YlsbA
+	 GYlmtrXDzMGpayKVUXD8wP/vrsy4oGBLoDvg29FyyqRanosKeE6E7dq1ppQDjDn2mh
+	 Lx3EKxeXY7+h9r2pdfxfgpH92nU+WM+FPwsEDc9p6c18Z/iK2xNMYmGIQdqSJ8Vq6Y
+	 GNVAgDPS0b4Sg6P/obbk3bKKV4xSQy65RdHWcPUCnqLBBMN34qYCzbEgx4hW4qnjB/
+	 R2hXl0HHlWuTQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1urIjW-00000000yGc-3qoE;
-	Wed, 27 Aug 2025 16:10:46 +0000
+	id 1urIjX-00000000yGc-2CpQ;
+	Wed, 27 Aug 2025 16:10:47 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 02/16] KVM: arm64: Account for 52bit when computing maximum OA
-Date: Wed, 27 Aug 2025 17:10:24 +0100
-Message-Id: <20250827161039.938958-3-maz@kernel.org>
+Subject: [PATCH 05/16] KVM: arm64: Pass the walk_info structure to compute_par_s1()
+Date: Wed, 27 Aug 2025 17:10:27 +0100
+Message-Id: <20250827161039.938958-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250827161039.938958-1-maz@kernel.org>
 References: <20250827161039.938958-1-maz@kernel.org>
@@ -58,66 +58,65 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Adjust the computation of the max OA to account for 52bit PAs.
+Instead of just passing the translation regime, pass the full
+walk_info structure to compute_par_s1(). This will help further
+chamges that will require it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 7 +++++--
- arch/arm64/kvm/at.c                 | 2 +-
- arch/arm64/kvm/nested.c             | 2 +-
- 3 files changed, 7 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/at.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 038e35430bb2c..1a03095b03c5b 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -265,7 +265,7 @@ static inline u64 decode_range_tlbi(u64 val, u64 *range, u16 *asid)
- 	return base;
- }
- 
--static inline unsigned int ps_to_output_size(unsigned int ps)
-+static inline unsigned int ps_to_output_size(unsigned int ps, bool pa52bit)
- {
- 	switch (ps) {
- 	case 0: return 32;
-@@ -273,7 +273,10 @@ static inline unsigned int ps_to_output_size(unsigned int ps)
- 	case 2: return 40;
- 	case 3: return 42;
- 	case 4: return 44;
--	case 5:
-+	case 5: return 48;
-+	case 6: if (pa52bit)
-+			return 52;
-+		fallthrough;
- 	default:
- 		return 48;
- 	}
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 10484249f9d54..04b7ff4426303 100644
+index 4013d52e308bf..ea94710335652 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -295,7 +295,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 	ps = (wi->regime == TR_EL2 ?
- 	      FIELD_GET(TCR_EL2_PS_MASK, tcr) : FIELD_GET(TCR_IPS_MASK, tcr));
- 
--	wi->max_oa_bits = min(get_kvm_ipa_limit(), ps_to_output_size(ps));
-+	wi->max_oa_bits = min(get_kvm_ipa_limit(), ps_to_output_size(ps, wi->pa52bit));
- 
- 	/* Compute minimal alignment */
- 	x = 3 + ia_bits - ((3 - wi->sl) * stride + wi->pgshift);
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 7c7cbe970797b..046dcfc8bf76b 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -349,7 +349,7 @@ static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
- 	wi->sl = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
- 	/* Global limit for now, should eventually be per-VM */
- 	wi->max_oa_bits = min(get_kvm_ipa_limit(),
--			      ps_to_output_size(FIELD_GET(VTCR_EL2_PS_MASK, vtcr)));
-+			      ps_to_output_size(FIELD_GET(VTCR_EL2_PS_MASK, vtcr), false));
+@@ -807,8 +807,8 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+ 	return par;
  }
  
- int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+-static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr,
+-			  enum trans_regime regime)
++static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
++			  struct s1_walk_result *wr)
+ {
+ 	u64 par;
+ 
+@@ -823,7 +823,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr,
+ 		par  = SYS_PAR_EL1_NSE;
+ 		par |= wr->pa & GENMASK_ULL(47, 12);
+ 
+-		if (regime == TR_EL10 &&
++		if (wi->regime == TR_EL10 &&
+ 		    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+ 			par |= FIELD_PREP(SYS_PAR_EL1_ATTR,
+ 					  MEMATTR(WbRaWa, WbRaWa));
+@@ -838,14 +838,14 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr,
+ 
+ 		par  = SYS_PAR_EL1_NSE;
+ 
+-		mair = (regime == TR_EL10 ?
++		mair = (wi->regime == TR_EL10 ?
+ 			vcpu_read_sys_reg(vcpu, MAIR_EL1) :
+ 			vcpu_read_sys_reg(vcpu, MAIR_EL2));
+ 
+ 		mair >>= FIELD_GET(PTE_ATTRINDX_MASK, wr->desc) * 8;
+ 		mair &= 0xff;
+ 
+-		sctlr = (regime == TR_EL10 ?
++		sctlr = (wi->regime == TR_EL10 ?
+ 			 vcpu_read_sys_reg(vcpu, SCTLR_EL1) :
+ 			 vcpu_read_sys_reg(vcpu, SCTLR_EL2));
+ 
+@@ -1243,7 +1243,7 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 		fail_s1_walk(&wr, ESR_ELx_FSC_PERM_L(wr.level), false);
+ 
+ compute_par:
+-	return compute_par_s1(vcpu, &wr, wi.regime);
++	return compute_par_s1(vcpu, &wi, &wr);
+ }
+ 
+ /*
 -- 
 2.39.2
 
