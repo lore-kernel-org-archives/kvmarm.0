@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A8030BBAF
-	for <kvmarm@lists.linux.dev>; Thu, 28 Aug 2025 10:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AF830BBA5
+	for <kvmarm@lists.linux.dev>; Thu, 28 Aug 2025 10:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756376795; cv=none; b=C9VyC1KYm9mybDeOKQ/VfZmAhqw71o9yOh4YdMrUjOAIwtQvXYKS6Fad7azsEWS0YsqMZOTLvU3LkiTRfmqa34Fd6izJ9lB8yyqb+bQV6ybos66Y9MgC5o7ZSSNwHCLbWQ8J+1IoXUQfjN9Wi6c9ZUT4FaSik+e4r8dxoaDHjwE=
+	t=1756376831; cv=none; b=GdoSmbwMrbEvFMg6JNVo98bCmbPKOnlmpYxtXLz1f8knjJ6DHZ18dnITBL3IAOEORvEq85Iruy6NP2iT81NhqwMkrpXfY2fpbfbte0TZKGGAX93+vXh25fp9JZi0PHUWbYP/c5xOrTW/6tMPaWRbKq+FKE4/4H11QphgesSUEkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756376795; c=relaxed/simple;
-	bh=sh2LcQ6Lxm7TMsk0fKFwAED7+3qWa4eQO4kONfe0irc=;
+	s=arc-20240116; t=1756376831; c=relaxed/simple;
+	bh=V2DQ1K7o0rWRHZ5T0jHAqrTGbpQITG7eIK38E8u8zGI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f88Z7juRjorneRuV364FQfEAU2giQzddkfKY4PHIVVl94x9BMBxQC6PsXhPuTqESNSkFJeCtyhA2VoY9vGI1fkqd7lVHev95uOK9RTarIlhgxT3Qk/ZCf9MzVdMRm7+83bj/dgMsgYbGheXb9qnkeAEonMUsA/B6vRk9geOkJaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I9+wJUjC; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=c6Ph1egSxBAke0cMTAi8G3tmbW1ZBiGE6PauN4rJOtEHPBksQXR0CS3yMbaFMnJBnDn5gXJy152kSRw0tjEBuozx7uFoU2XVDy/pZsCQyj+AStx70HIwnH8WUSYGlJO8U+XPMHOlV5nrpHYq0tJGN1cKENymsUS8e8NJQTfYYG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A0/zsL+5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I9+wJUjC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0/zsL+5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756376793;
+	s=mimecast20190719; t=1756376828;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=KriyZgiAZRJDnfHsymUHd3lqzo8k4QI+bEtwKwBmcAI=;
-	b=I9+wJUjCWMWKsXEC8F0EIYeIfWv3MLvtWOehQANpiV3rfgilBWYciEDh/NcXFnRoor32Gw
-	nGDUcHZhjMs1Jcg5yi+kEPeKhhI7duPWQRGTINrf6CLrWzwUWPeBB4mDAHrN+mMcPa2Xty
-	XkJMZff2Kf5DgofQ0HUTmYwZwqiantI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+boQAII1rVe8mjF/ARYqXtwP6OIEQU1CeV61LbixoDI=;
+	b=A0/zsL+5JelqkVYavDvE8bxuzr/KhXrufBwY34zigrRwDrjWeiUJtLb3pELUth/w0c/59s
+	XwTJ8X5fJAzL48+LfUsZegZf9//E0R9F96Aw3Iq01L5Wby8XaiYCoETnfCoZLhx3fHkSsh
+	Z8Ji0tovwMHdXd9GiM9f9OfvK+eXZbo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-490-2c7kp1smOGWD0MX2PtH4NQ-1; Thu, 28 Aug 2025 06:26:31 -0400
-X-MC-Unique: 2c7kp1smOGWD0MX2PtH4NQ-1
-X-Mimecast-MFC-AGG-ID: 2c7kp1smOGWD0MX2PtH4NQ_1756376791
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45a1b0511b3so4931895e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 28 Aug 2025 03:26:31 -0700 (PDT)
+ us-mta-474-SZpiB4XlMOKzYrqfReDHSw-1; Thu, 28 Aug 2025 06:27:07 -0400
+X-MC-Unique: SZpiB4XlMOKzYrqfReDHSw-1
+X-Mimecast-MFC-AGG-ID: SZpiB4XlMOKzYrqfReDHSw_1756376826
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45b612dbc28so5380535e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 28 Aug 2025 03:27:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756376791; x=1756981591;
+        d=1e100.net; s=20230601; t=1756376826; x=1756981626;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KriyZgiAZRJDnfHsymUHd3lqzo8k4QI+bEtwKwBmcAI=;
-        b=LLqRPcIPXXed7ssdFWigySOJRCgvTclbhlAvcaCb8xLm9KUgBdZpz62DNnWawao/br
-         kmJ+f7KKzliVNFhxe55FGAY1Fo3lyVHw/DD7MRyGxc/V2rqJkt2CTnXGaWhcDYgTtGNu
-         S7UhMRhyJuu5CP0Zv84QOdVDFg7d32W0tfWYzH61mPb20NEQhtUxKQW5hOsS5JqmlPiY
-         cFUoWAjXk17fN2NpCU1ORMtRxw6mJ3F9TFSQiXFgh4dqMxkMWpuXrv0WNBAiz2RPCfYo
-         bKS6rsPcGnT4O1FbvszBU0kaJdsdabWO6nBUtYgyyVm2eg3bkwBhtB6tl5UBKDp6B+H4
-         Z4kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGPmIf9a5YqCqzc2uOBSj8UEKYtkOxiboqCv4Jgo/RE97EamuhlDOju5j74YYw9+M74cfgML8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy3XFiEX9AurvFXKXc30didUDnqhysgpA1r636YI04ILp3xFaAo
-	sK9O9/uC4gvwjuHg+Br47BmgA5b9UlpPUJ1k/ipDHHoYVgCYywUa56PndiiuoVtsaFza/CUpivU
-	Gcl3XKyszPZUe62pLA1Na/jh+rmhVIM0Sb5CIZBUbm02kFHfMSrvBXEYlIQ==
-X-Gm-Gg: ASbGncsx7KKijA1zdH92jV6v2FGlYpShOH/vbhKeBU9NOG+p0GLOKkvsJzWt11stbsb
-	vQ/Peyfuzo+Tjy0bOEYVOTD6r/nfSVQQ5rgbG0QAgBYH0Kdk7Mj+iVafKTjNjNsQUA/AR1dmrZ6
-	VZuoTJJTPa6cc0/Jx/6QCBu6oPAlCrsmSQ6MaHyZ8KfQFubSsqAS/6rd7Y38C4w8di8CE/FW5Su
-	oYU+PjypSHj8vs9UxUoMl8MBmW8YSnUFYA+L52ahS7h7AXgSHFdaQjCSVyYWnXiHWOTeE48bMd+
-	4ECtyelqs37YU3tpBx5WYSyc5zeVJMqbrMx3g6SdAmxus/n9dSt+ZNUni7fzuTUSsxX+Hb4xy0K
-	ilpcnqxYjS+aC/zmqhk8Yqt13dV0Lujuuw5h05he49vlKPsq3kuz6aqlaeXR3JJdAiBo=
-X-Received: by 2002:a05:600c:4f4d:b0:456:1b6f:c888 with SMTP id 5b1f17b1804b1-45b62586a5dmr114585625e9.23.1756376790544;
-        Thu, 28 Aug 2025 03:26:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFtFlmG2bk+e9nYytQDuLDUJ8uuAXsdALOuDZVwchnxhUM2yFRl9mv4ZYrhg+X+WjfZRuMlZg==
-X-Received: by 2002:a05:600c:4f4d:b0:456:1b6f:c888 with SMTP id 5b1f17b1804b1-45b62586a5dmr114585345e9.23.1756376790087;
-        Thu, 28 Aug 2025 03:26:30 -0700 (PDT)
+        bh=+boQAII1rVe8mjF/ARYqXtwP6OIEQU1CeV61LbixoDI=;
+        b=ODOoTWo5gILrxLO4x9UUUMamklfHdlkpsvNyg981LaDqX/1ggEqlHLyxeOOIuI0aWR
+         cdxijPF/zbJ+YX8ygv4bwy8matmKKKuS17//bCBmuazanqslZsMdVOuYsJgu6Ivbn5rK
+         cl2AGZBH7A0T1o7MiKtEml1pk4I2h9N4oqa4fEqMomeZnEqVL57mBcHPcRIImfVK60gn
+         bqqttH4LBFcXtSa42zt7m+19hHuTKVcSs5K6Al46sQZQPv6q9zpOpRgxD28E6u1thnaA
+         c1NcUVKuJo1qUEPOF61KupJSn2xQ+KzvIUVK8npT5ohINN4nsVWjpLpxCi0xkP0Mc/PF
+         a0GA==
+X-Forwarded-Encrypted: i=1; AJvYcCXQLX5OOlOat43X28sXNpdUx+uPaQRy4w8VdrViZX0UbRn7ew2g9zVZzTRTxaxktOyujfMdYY4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwZj1Xsi7aS4TD/wRMUrRylU19q8gcuR5padm0KrySp+pysZTIj
+	bUbavCwsILH1OQSoMfnwkdJOS4JstgNOHQuRMEFKJ/OmAWqn+50I2Od3t7tzJQCdWioJsuonfs+
+	UyJ4FNcRne9d9eAJX0aPS7Ca9pusEB9+TeSMbXWQeNNqUZ6bT8Hf99XzDzA==
+X-Gm-Gg: ASbGncu5AMgf0roJt22ee9tLrdA0lB81pgYwaoo7lVjpDQGToZhXGIQJAnFS0i5NF6n
+	z5SEq4t4uP3uKNHuWVSBd0QD2zEblUtB8aw/9hOq/GNZshbZ13JSkvkaOPgcnrEgQzcOD3VnHOE
+	ChOS+R39OGi3P0VT0k5rSPjwVNeNbh3p9S6Ypi+N1jUUBpzvE1S6y9WzE7U3iyG3+AB3c6YY4PY
+	kKiFyvof+DUrAADwm+9fpBxw9v+WotRqM4uBUpqc918roVJAsJBAaXZb1h45bXZ7CA8of2T3agn
+	0W8qDxy8/ymCcrTUy/w5zeKBII8v/xH4UB0UvizytaRxGajQYNF1T5J8kVsdyW7+24roZwmM8wH
+	DHuFjc1xc/zHok3T/0rKWuWWFACzmFLPWlnzbaGH89KS1Wkly+gKok5rN2UmFGcK3P9E=
+X-Received: by 2002:a05:600c:154f:b0:458:6733:fb43 with SMTP id 5b1f17b1804b1-45b517c552dmr175226095e9.19.1756376826316;
+        Thu, 28 Aug 2025 03:27:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGPPKlRhmhqihhHf2b6I8uk2qPvwY6WU+Zs5Jt8nlR70umt1Km4fvCsG1mTvTrW6wkpR7QnGQ==
+X-Received: by 2002:a05:600c:154f:b0:458:6733:fb43 with SMTP id 5b1f17b1804b1-45b517c552dmr175225815e9.19.1756376825801;
+        Thu, 28 Aug 2025 03:27:05 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f28:c100:2225:10aa:f247:7b85? (p200300d82f28c100222510aaf2477b85.dip0.t-ipconnect.de. [2003:d8:2f28:c100:2225:10aa:f247:7b85])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b6f31d083sm67062965e9.24.2025.08.28.03.26.28
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b79799c4fsm25881455e9.3.2025.08.28.03.27.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Aug 2025 03:26:29 -0700 (PDT)
-Message-ID: <093db25e-12d7-4372-873b-72f189117936@redhat.com>
-Date: Thu, 28 Aug 2025 12:26:27 +0200
+        Thu, 28 Aug 2025 03:27:05 -0700 (PDT)
+Message-ID: <786503d6-e58d-412a-a17b-f5e4e481c3fe@redhat.com>
+Date: Thu, 28 Aug 2025 12:27:04 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 11/12] KVM: selftests: cover
- GUEST_MEMFD_FLAG_NO_DIRECT_MAP in guest_memfd_test.c
+Subject: Re: [PATCH v5 05/12] KVM: Documentation: describe
+ GUEST_MEMFD_FLAG_NO_DIRECT_MAP
 To: "Roy, Patrick" <roypat@amazon.co.uk>,
  "seanjc@google.com" <seanjc@google.com>
 Cc: "tabba@google.com" <tabba@google.com>,
@@ -94,7 +94,7 @@ Cc: "tabba@google.com" <tabba@google.com>,
  "Thomson, Jack" <jackabt@amazon.co.uk>, "Manwaring, Derek"
  <derekmn@amazon.com>
 References: <20250828093902.2719-1-roypat@amazon.co.uk>
- <20250828093902.2719-12-roypat@amazon.co.uk>
+ <20250828093902.2719-6-roypat@amazon.co.uk>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -140,9 +140,9 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <20250828093902.2719-12-roypat@amazon.co.uk>
+In-Reply-To: <20250828093902.2719-6-roypat@amazon.co.uk>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 86uNfVFQG-CWrnSkie5lMUeIGYnaGNGF0-i5hbUx_O8_1756376791
+X-Mimecast-MFC-PROC-ID: _Q10cYiG0bhUtLVYDFCBj41hN2IP58uZbIWvG3aizVY_1756376826
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -151,6 +151,25 @@ Content-Transfer-Encoding: 7bit
 On 28.08.25 11:39, Roy, Patrick wrote:
 > Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
 > ---
+>   Documentation/virt/kvm/api.rst | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index c17a87a0a5ac..b52c14d58798 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6418,6 +6418,11 @@ When the capability KVM_CAP_GUEST_MEMFD_MMAP is supported, the 'flags' field
+>   supports GUEST_MEMFD_FLAG_MMAP.  Setting this flag on guest_memfd creation
+>   enables mmap() and faulting of guest_memfd memory to host userspace.
+>   
+> +When the capability KVM_CAP_GMEM_NO_DIRECT_MAP is supported, the 'flags' field
+> +supports GUEST_MEMFG_FLAG_NO_DIRECT_MAP. Setting this flag makes the guest_memfd
+> +instance behave similarly to memfd_secret, and unmaps the memory backing it from
+> +the kernel's address space after allocation.
+> +
+>   When the KVM MMU performs a PFN lookup to service a guest fault and the backing
+>   guest_memfd has the GUEST_MEMFD_FLAG_MMAP set, then the fault will always be
+>   consumed from guest_memfd, regardless of whether it is a shared or a private
 
 WARNING: Missing commit description - Add an appropriate one
 WARNING: From:/Signed-off-by: email name mismatch: 'From: "Roy, Patrick" 
