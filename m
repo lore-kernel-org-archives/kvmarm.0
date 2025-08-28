@@ -1,193 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE9935AABD;
-	Wed, 27 Aug 2025 16:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636ABD515
+	for <kvmarm@lists.linux.dev>; Thu, 28 Aug 2025 00:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756311051; cv=none; b=FIaH1aGM+b4nb77jc53g7fF1mxHi5PrXxYPINTHVKTyFc+x6E2vgMDcuGTDcM+oRsrPsdBxh/clwfkF7wRUuQaFNFh0B4SjKaa3aJ9qojdbF/cmgI3lAUIEr1Y68xy3KaPSDPjQECKPzEP+XX5172duVAXFwduzrwmm3/P0TMhk=
+	t=1756339324; cv=none; b=pmt6dzXSFx4zv2cqArA0h+lQeigJKKgFQxeyVkr/TO29TX1TutADLeugENQ4a0/TaKVDe9ZAlPl0BVDAtyHcEeq/KYfNRE6Uptu8uFq/kWtMbhzLj1/IfmEPbfguJGqhFHY1x+YeHpsKLgL5tmcPRhU+Y+Zr40AJ+x9+6xwmHfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756311051; c=relaxed/simple;
-	bh=6B5+c9uUTaPo5ss1f0hbG+yJAYTqzC9v9VAjf7G/RI4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JEmfqQZcCht2wNm9O4NYizKJ4DuLu7CRshlZUbZst6nAYTOgGEVC0BJHnvuK+2SOMHmPNSix2x0vQgVpZQayW8N6biTkwyE+UFtGEwA1QQbFcoXDKtbQyC1bayjK+d1BeOvg9wlKP93tXNrGN6bdi0v+X+Sng0WAAQ3qbepP7pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NCqSp+Gq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756339324; c=relaxed/simple;
+	bh=zswYe5h9Zux3BU3V6n/2Y7ArjSVkrrMm1xmCzQlsrI0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mzE2+Tt0g4rzwOP4k9tAA1mA1ot30MC5egfYtLcEFAIcIwasIELf9b952BWFrrHX6kuNkrIN9cxy32Vtxa+N8WOxNTBzqgNlVH6wQT1M2aRbO7ZjfvhngAFzsL+9Ue1g1P29PKEjU6qyEeSGgTZBpjYSt2/jSexbqRu+djEQh1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dev1gIO3; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NCqSp+Gq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67341C4CEF0;
-	Wed, 27 Aug 2025 16:10:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756311051;
-	bh=6B5+c9uUTaPo5ss1f0hbG+yJAYTqzC9v9VAjf7G/RI4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NCqSp+GqTJaKBpAXOLPp1bp3aMnxsgIOjbmPBZy+aojxDqBDuiPIRxpV8FJx3h0Lt
-	 hb+i6Owfa4cWKCWhN8FoeNXuCePrj5SmympTKeSI/UN6LAfOCdITp+MWlPy2vDxoIO
-	 2YUTZ8EbR5VpkmlZvibsI6w6yjaRgJWlIORqkdpmqalnDEwp9A3+D8PJOQ8W4Qp7CT
-	 drqWLoPdAplHZCAICJ1wIcVqv778Fx4bH2FhekL1kaondH5kFZmd3X6/NIvg1Y+XXK
-	 98yAX0oKNyjNXGNIo1rV2pGSn3HJyX+npUL6LOIl02SlybgbhcLzR193Gn6koPYCcI
-	 Cw1013wF/rU5A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1urIjZ-00000000yGc-2paM;
-	Wed, 27 Aug 2025 16:10:49 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 16/16] KVM: arm64: selftest: Expand external_aborts test to look for TTW levels
-Date: Wed, 27 Aug 2025 17:10:38 +0100
-Message-Id: <20250827161039.938958-17-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250827161039.938958-1-maz@kernel.org>
-References: <20250827161039.938958-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dev1gIO3"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-325ce1082bcso563553a91.0
+        for <kvmarm@lists.linux.dev>; Wed, 27 Aug 2025 17:02:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756339322; x=1756944122; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a1KBCmOkm9jj1CVFgQDrkKT5Cri9uMCD3k1Mkup3E5M=;
+        b=dev1gIO3nusjpYk9dyrU+hveUe/LMc9LD8YwpH19NhchfBHCGRs8FhoBaRFBBrSRzN
+         ssXy2H/KpDawDYLDuMqhHCVBNEXOmjN3CYr1RWkV+KRJOI2eGFwnv4dKM2y4XE0vRAGN
+         EEUAs3JjpFjIqjWnDHakx8CTjSWuHOCOvaHSpdJvL13/k2Y38d+7+vVzZugsC4IUYfuy
+         9pFgXCG1pilh0m0PwYw4xbymPetWUiWeZpyoimxi2qQ7Hka/Xd5to7WicrK8y1skM82C
+         woLZ2ARNC0j6b+FHXk4nrj4BO6tPo+XEmKqsGGkWsq7//rmbfLPGER4i5j7xxy0JA+C3
+         HRqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756339322; x=1756944122;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a1KBCmOkm9jj1CVFgQDrkKT5Cri9uMCD3k1Mkup3E5M=;
+        b=HSLFvjghwj8AGgRaMoGYfzzUaUngamoSu/3r8X2NV+rj1/n5induzjsYTQoBlfIqRu
+         vGhk2uhtyzyJzobKjjfNTRVrIxmEmW1JuG92JeXG+pfzr6WSEOVi5TXHkFcDOe0r75H5
+         G+PiX4dgNFmBl5vHhvlgQdbxGyXCEf0RPRvTg6tWgqad54g3znay5fbwTNumkwwOTjj2
+         u+nas9wGQoMsGE1tb3A5ROXbKXaaAWW1NVpOuTke3L07dgJ8C8fB7h/AkgDzBv+h+fde
+         v3JJtmr4d7jMVLgUUZ8j+hfIPjf7ZdeEidN/d7V1xWONOkEgJsjo+fY72hDcJU0xG5hO
+         J+ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUGCVRcDQw/ptNNWfmQcN+7lbkJ3EDrpg2HdCgrp7yKu8gm1oeKzAj5oc2mRcrguTxhd4Uov+k=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyb0GCoVPxit78M88syJ7bwmaGbsD0qtGxMsnfYhqkfoEf6L6Iy
+	lgC9ipttX28FDs5hxJWwR3HOBMGe48PUN7zE0c3PabpWxR1ujOjB5FgbqqrT0EKvdhmmw2ZA0ud
+	zX8zF0w==
+X-Google-Smtp-Source: AGHT+IF6kzCkrmSsnzkeC4ntTYmLEyMfD8fyiYTiSQm4IQpQL6BrLCB4IIHTXj0uI8vGzJiOm/SE6wuxA5g=
+X-Received: from pjbsv16.prod.google.com ([2002:a17:90b:5390:b0:325:4747:a99b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5627:b0:31e:ec58:62e2
+ with SMTP id 98e67ed59e1d1-32515eaafdcmr30552688a91.19.1756339321553; Wed, 27
+ Aug 2025 17:02:01 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 27 Aug 2025 17:01:49 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
+Message-ID: <20250828000156.23389-1-seanjc@google.com>
+Subject: [PATCH v2 0/7] Drivers: hv: Fix NEED_RESCHED_LAZY and use common APIs
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Andy Lutomirski <luto@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
+	Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett <josh@joshtriplett.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-hyperv@vger.kernel.org, rcu@vger.kernel.org, 
+	Nuno Das Neves <nunodasneves@linux.microsoft.com>, Mukesh R <mrathor@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Add a basic test corrupting a level-2 table entry to check that
-the resulting abort is a SEA on a PTW at level-3.
+Fix a bug where MSHV root partitions (and upper-level VTL code) don't honor
+NEED_RESCHED_LAZY, and then deduplicate the TIF related MSHV code by turning
+the "kvm" entry APIs into more generic "virt" APIs.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- .../selftests/kvm/arm64/external_aborts.c     | 43 +++++++++++++++++++
- .../selftests/kvm/include/arm64/processor.h   |  1 +
- .../selftests/kvm/lib/arm64/processor.c       | 13 +++++-
- 3 files changed, 56 insertions(+), 1 deletion(-)
+This version is based on
 
-diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
-index 062bf84cced13..acb32d0f27bbe 100644
---- a/tools/testing/selftests/kvm/arm64/external_aborts.c
-+++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
-@@ -250,6 +250,48 @@ static void test_serror(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void expect_sea_s1ptw_handler(struct ex_regs *regs)
-+{
-+	u64 esr = read_sysreg(esr_el1);
-+
-+
-+	GUEST_ASSERT_EQ(regs->pc, expected_abort_pc);
-+	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
-+	GUEST_ASSERT_EQ((esr & ESR_ELx_FSC), ESR_ELx_FSC_SEA_TTW(3));
-+
-+	GUEST_DONE();
-+}
-+
-+static noinline void test_s1ptw_abort_guest(void)
-+{
-+	extern char test_s1ptw_abort_insn;
-+
-+	WRITE_ONCE(expected_abort_pc, (u64)&test_s1ptw_abort_insn);
-+
-+	asm volatile("test_s1ptw_abort_insn:\n\t"
-+		     "ldr x0, [%0]\n\t"
-+		     : : "r" (MMIO_ADDR) : "x0", "memory");
-+
-+	GUEST_FAIL("Load on S1PTW abort should not retire");
-+}
-+
-+static void test_s1ptw_abort(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	u64 *ptep, bad_pa;
-+	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_s1ptw_abort_guest,
-+							expect_sea_s1ptw_handler);
-+
-+	ptep = virt_get_pte_hva_at_level(vm, MMIO_ADDR, 2);
-+	bad_pa = BIT(vm->pa_bits) - vm->page_size;
-+
-+	*ptep &= ~GENMASK(47, 12);
-+	*ptep |= bad_pa;
-+
-+	vcpu_run_expect_done(vcpu);
-+	kvm_vm_free(vm);
-+}
-+
- static void test_serror_emulated_guest(void)
- {
- 	GUEST_ASSERT(!(read_sysreg(isr_el1) & ISR_EL1_A));
-@@ -327,4 +369,5 @@ int main(void)
- 	test_serror_masked();
- 	test_serror_emulated();
- 	test_mmio_ease();
-+	test_s1ptw_abort();
- }
-diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
-index 255fed769a8a5..e3e916b1d9c4e 100644
---- a/tools/testing/selftests/kvm/include/arm64/processor.h
-+++ b/tools/testing/selftests/kvm/include/arm64/processor.h
-@@ -175,6 +175,7 @@ void vm_install_exception_handler(struct kvm_vm *vm,
- void vm_install_sync_handler(struct kvm_vm *vm,
- 		int vector, int ec, handler_fn handler);
- 
-+uint64_t *virt_get_pte_hva_at_level(struct kvm_vm *vm, vm_vaddr_t gva, int level);
- uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva);
- 
- static inline void cpu_relax(void)
-diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-index 9d69904cb6084..5c459862f6325 100644
---- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-@@ -185,7 +185,7 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
- }
- 
--uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
-+uint64_t *virt_get_pte_hva_at_level(struct kvm_vm *vm, vm_vaddr_t gva, int level)
- {
- 	uint64_t *ptep;
- 
-@@ -195,17 +195,23 @@ uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
- 	ptep = addr_gpa2hva(vm, vm->pgd) + pgd_index(vm, gva) * 8;
- 	if (!ptep)
- 		goto unmapped_gva;
-+	if (level == 0)
-+		return ptep;
- 
- 	switch (vm->pgtable_levels) {
- 	case 4:
- 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pud_index(vm, gva) * 8;
- 		if (!ptep)
- 			goto unmapped_gva;
-+		if (level == 1)
-+			break;
- 		/* fall through */
- 	case 3:
- 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pmd_index(vm, gva) * 8;
- 		if (!ptep)
- 			goto unmapped_gva;
-+		if (level == 2)
-+			break;
- 		/* fall through */
- 	case 2:
- 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pte_index(vm, gva) * 8;
-@@ -223,6 +229,11 @@ uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
- 	exit(EXIT_FAILURE);
- }
- 
-+uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
-+{
-+	return virt_get_pte_hva_at_level(vm, gva, 3);
-+}
-+
- vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- {
- 	uint64_t *ptep = virt_get_pte_hva(vm, gva);
+  git://git.kernel.org/pub/scm/linux/kernel/git/hyperv/linux.git hyperv-next
+
+in order to pickup the VTL changes that are queued for 6.18.  I also
+squashed the NEED_RESCHED_LAZY fixes for root and VTL modes into a single
+patch, as it should be easy/straightforward to drop the VTL change as needed
+if we want this in 6.17 or earlier.
+
+That effectively means the full series is dependent on the VTL changes being
+fully merged for 6.18.  But I think that's ok as it's really only the MSHV
+changes that have any urgency whatsoever, and I assume that Microsoft is
+the only user that truly cares about the MSHV root fix.  I.e. if the whole
+thing gets delayed, I think it's only the Hyper-V folks that are impacted.
+
+I have no preference what tree this goes through, or when, and can respin
+and/or split as needed.
+
+As with v1, the Hyper-V stuff and non-x86 architectures are compile-tested
+only.
+
+v2:
+ - Rebase on hyperv-next.
+ - Fix and converge the VTL code as well. [Peter, Nuno]
+
+v1: https://lore.kernel.org/all/20250825200622.3759571-1-seanjc@google.com
+
+
+Sean Christopherson (7):
+  Drivers: hv: Handle NEED_RESCHED_LAZY before transferring to guest
+  Drivers: hv: Disentangle VTL return cancellation from SIGPENDING
+  Drivers: hv: Disable IRQs only after handling pending work before VTL
+    return
+  entry/kvm: KVM: Move KVM details related to signal/-EINTR into KVM
+    proper
+  entry: Rename "kvm" entry code assets to "virt" to genericize APIs
+  Drivers: hv: Use common "entry virt" APIs to do work in root before
+    running guest
+  Drivers: hv: Use "entry virt" APIs to do work before returning to
+    lower VTL
+
+ MAINTAINERS                                 |  2 +-
+ arch/arm64/kvm/Kconfig                      |  2 +-
+ arch/arm64/kvm/arm.c                        |  3 +-
+ arch/loongarch/kvm/Kconfig                  |  2 +-
+ arch/loongarch/kvm/vcpu.c                   |  3 +-
+ arch/riscv/kvm/Kconfig                      |  2 +-
+ arch/riscv/kvm/vcpu.c                       |  3 +-
+ arch/x86/kvm/Kconfig                        |  2 +-
+ arch/x86/kvm/vmx/vmx.c                      |  1 -
+ arch/x86/kvm/x86.c                          |  3 +-
+ drivers/hv/Kconfig                          |  2 ++
+ drivers/hv/mshv.h                           |  2 --
+ drivers/hv/mshv_common.c                    | 22 ---------------
+ drivers/hv/mshv_root_main.c                 | 31 ++++-----------------
+ drivers/hv/mshv_vtl_main.c                  | 23 +++++++--------
+ include/linux/{entry-kvm.h => entry-virt.h} | 19 +++++--------
+ include/linux/kvm_host.h                    | 17 +++++++++--
+ include/linux/rcupdate.h                    |  2 +-
+ kernel/entry/Makefile                       |  2 +-
+ kernel/entry/{kvm.c => virt.c}              | 15 ++++------
+ kernel/rcu/tree.c                           |  6 ++--
+ virt/kvm/Kconfig                            |  2 +-
+ 22 files changed, 60 insertions(+), 106 deletions(-)
+ rename include/linux/{entry-kvm.h => entry-virt.h} (83%)
+ rename kernel/entry/{kvm.c => virt.c} (66%)
+
+
+base-commit: 03ac62a578566730ab3c320f289f7320798ee2e1
 -- 
-2.39.2
+2.51.0.268.g9569e192d0-goog
 
