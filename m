@@ -1,64 +1,69 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636ABD515
-	for <kvmarm@lists.linux.dev>; Thu, 28 Aug 2025 00:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD6E1CA81
+	for <kvmarm@lists.linux.dev>; Thu, 28 Aug 2025 00:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756339324; cv=none; b=pmt6dzXSFx4zv2cqArA0h+lQeigJKKgFQxeyVkr/TO29TX1TutADLeugENQ4a0/TaKVDe9ZAlPl0BVDAtyHcEeq/KYfNRE6Uptu8uFq/kWtMbhzLj1/IfmEPbfguJGqhFHY1x+YeHpsKLgL5tmcPRhU+Y+Zr40AJ+x9+6xwmHfI=
+	t=1756339325; cv=none; b=pJHmzqcb5UqOfRAE48OqvunlNRk292LsrQXfQzPF6jZrJTbO34HwYWOo+Op9vkjOpJxvZLb6hZKXPOYjgotWkRf55OwaCcxb2anl7K8KGa1YfGXizp5ddJ6j1r9FNOSKC9xLm8cjwnakBeG5xZTHlSSXDItLRYXpTZVlnn/b0Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756339324; c=relaxed/simple;
-	bh=zswYe5h9Zux3BU3V6n/2Y7ArjSVkrrMm1xmCzQlsrI0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mzE2+Tt0g4rzwOP4k9tAA1mA1ot30MC5egfYtLcEFAIcIwasIELf9b952BWFrrHX6kuNkrIN9cxy32Vtxa+N8WOxNTBzqgNlVH6wQT1M2aRbO7ZjfvhngAFzsL+9Ue1g1P29PKEjU6qyEeSGgTZBpjYSt2/jSexbqRu+djEQh1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dev1gIO3; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1756339325; c=relaxed/simple;
+	bh=yezIQljWRff+Ph2Kkfldm8tP8XBUOynmTR8J0FoBino=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Qeo8rCmWZJrNbiSxbJtrGawtjH7g1WQf65EXSiXBp4875RlsI+bbVDrPDMoOzR46rtLuHKBgJdZX24FuQj4Xu7/OKEotLqKbPHcgLstUIgEqStlKiQJPz6xWqpyoTy/UpwdwvGEBw21K7mNnEEWZTGru9PciDQku/sw1CsHKAaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AX9OpaFi; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dev1gIO3"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-325ce1082bcso563553a91.0
-        for <kvmarm@lists.linux.dev>; Wed, 27 Aug 2025 17:02:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AX9OpaFi"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-771e2f5b5dcso522132b3a.0
+        for <kvmarm@lists.linux.dev>; Wed, 27 Aug 2025 17:02:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756339322; x=1756944122; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a1KBCmOkm9jj1CVFgQDrkKT5Cri9uMCD3k1Mkup3E5M=;
-        b=dev1gIO3nusjpYk9dyrU+hveUe/LMc9LD8YwpH19NhchfBHCGRs8FhoBaRFBBrSRzN
-         ssXy2H/KpDawDYLDuMqhHCVBNEXOmjN3CYr1RWkV+KRJOI2eGFwnv4dKM2y4XE0vRAGN
-         EEUAs3JjpFjIqjWnDHakx8CTjSWuHOCOvaHSpdJvL13/k2Y38d+7+vVzZugsC4IUYfuy
-         9pFgXCG1pilh0m0PwYw4xbymPetWUiWeZpyoimxi2qQ7Hka/Xd5to7WicrK8y1skM82C
-         woLZ2ARNC0j6b+FHXk4nrj4BO6tPo+XEmKqsGGkWsq7//rmbfLPGER4i5j7xxy0JA+C3
-         HRqA==
+        d=google.com; s=20230601; t=1756339324; x=1756944124; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=kCYLCx+qR2vxxpcmuDTRXW8z6xS3j6g2rCWoMpSsv0A=;
+        b=AX9OpaFiQA5dPOAepdiqHO1hiY8gzdBDsDyZJaCQWOFKqj3SPEzxxKDVVlg3pDawVB
+         T0PNIbzPoht70Ta7i0JmaWv55l1Pc9YbJnNjDQdFeOABjY/JJFtvo03oPYRLuAhhcYk9
+         3n6Q16SQq2MMI0J1tQFt259g1O8qtL6Yw54Nr4+O0dJXaB6sH5FccWGzPv9Skyom9qoU
+         Df0IwC6180zp7C/S382RDQI2xrHD1NqhZoTZ0kUbPsV65ZxNXGIY4GU30p3o+3yobr/d
+         RJlIBEfjDdmxXqKYRtB4zdd4ydpyUrEBTVJQQ/roVE4bPXaVu2ZrYvODMcY0TF9fKwkI
+         b7Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756339322; x=1756944122;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a1KBCmOkm9jj1CVFgQDrkKT5Cri9uMCD3k1Mkup3E5M=;
-        b=HSLFvjghwj8AGgRaMoGYfzzUaUngamoSu/3r8X2NV+rj1/n5induzjsYTQoBlfIqRu
-         vGhk2uhtyzyJzobKjjfNTRVrIxmEmW1JuG92JeXG+pfzr6WSEOVi5TXHkFcDOe0r75H5
-         G+PiX4dgNFmBl5vHhvlgQdbxGyXCEf0RPRvTg6tWgqad54g3znay5fbwTNumkwwOTjj2
-         u+nas9wGQoMsGE1tb3A5ROXbKXaaAWW1NVpOuTke3L07dgJ8C8fB7h/AkgDzBv+h+fde
-         v3JJtmr4d7jMVLgUUZ8j+hfIPjf7ZdeEidN/d7V1xWONOkEgJsjo+fY72hDcJU0xG5hO
-         J+ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGCVRcDQw/ptNNWfmQcN+7lbkJ3EDrpg2HdCgrp7yKu8gm1oeKzAj5oc2mRcrguTxhd4Uov+k=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyb0GCoVPxit78M88syJ7bwmaGbsD0qtGxMsnfYhqkfoEf6L6Iy
-	lgC9ipttX28FDs5hxJWwR3HOBMGe48PUN7zE0c3PabpWxR1ujOjB5FgbqqrT0EKvdhmmw2ZA0ud
-	zX8zF0w==
-X-Google-Smtp-Source: AGHT+IF6kzCkrmSsnzkeC4ntTYmLEyMfD8fyiYTiSQm4IQpQL6BrLCB4IIHTXj0uI8vGzJiOm/SE6wuxA5g=
-X-Received: from pjbsv16.prod.google.com ([2002:a17:90b:5390:b0:325:4747:a99b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5627:b0:31e:ec58:62e2
- with SMTP id 98e67ed59e1d1-32515eaafdcmr30552688a91.19.1756339321553; Wed, 27
- Aug 2025 17:02:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756339324; x=1756944124;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kCYLCx+qR2vxxpcmuDTRXW8z6xS3j6g2rCWoMpSsv0A=;
+        b=j9KEIpTV+xWlXatBbZy8I/Z3n8JmnUgad+Xv9jr9XS9IOm4tP6/7EJ2+2uV/JaaPw/
+         2zauIUVB/uQW9T9QPBgOlVZ2irgHZh/Qnvn8Nb+QkUwRlxX/kCDUh0TzKljpu72qrntp
+         EkDPmng6t8vzyVMXkVh5wF1uNveM4D0ybmJcNF9oOD56oT1hhYEzZMaaIdNP7TqoEwBR
+         ZuTGHtEgHcwhCHiuzR3jf+kYOfgHYkBq6M/bzbrR3ykv4UP6dgit8um6cvIQLC7KKhgz
+         AmnMhUzwBGfhfF6P5s/osGYFd6OV7TguUQ6JbIPfHy9NBzvGL2UJTDSch6Du+Twzs7I0
+         QI9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUcPsDK6oCocnP6bZQmr2qM6NdvuDTPyNKbjc5JUrykRFLs54xO0At8MWO5lX+3lPItZvOXLVk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxZC886dpnKnF8yd2vRxBwW2cA4w/albMEgNUW3jhGbY9hhm9aF
+	PgKRSdj74KwMCnGMZ7FBtCW/UGn6m4+J7+tYRUrOf5pgUntKUA7kN8bb6eP9qgOY5zsg/UU6hz/
+	wMoHrlg==
+X-Google-Smtp-Source: AGHT+IHDUlpPfgfETOO31fD//wXWMymV5Mnw/Y+lifpogBKPY1IBHbcv76HZ+xFt3eQXYgFR8TyJX2ZK1/M=
+X-Received: from pfgs8.prod.google.com ([2002:a05:6a00:1788:b0:771:f315:17c4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:a85:b0:76b:d8f7:d30b
+ with SMTP id d2e1a72fcca58-7702f9f4896mr22345026b3a.10.1756339323354; Wed, 27
+ Aug 2025 17:02:03 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Aug 2025 17:01:49 -0700
+Date: Wed, 27 Aug 2025 17:01:50 -0700
+In-Reply-To: <20250828000156.23389-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20250828000156.23389-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
-Message-ID: <20250828000156.23389-1-seanjc@google.com>
-Subject: [PATCH v2 0/7] Drivers: hv: Fix NEED_RESCHED_LAZY and use common APIs
+Message-ID: <20250828000156.23389-2-seanjc@google.com>
+Subject: [PATCH v2 1/7] Drivers: hv: Handle NEED_RESCHED_LAZY before
+ transferring to guest
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
@@ -81,79 +86,67 @@ Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Nuno Das Neves <nunodasneves@linux.microsoft.com>, Mukesh R <mrathor@linux.microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Fix a bug where MSHV root partitions (and upper-level VTL code) don't honor
-NEED_RESCHED_LAZY, and then deduplicate the TIF related MSHV code by turning
-the "kvm" entry APIs into more generic "virt" APIs.
+Check for NEED_RESCHED_LAZY, not just NEED_RESCHED, prior to transferring
+control to a guest.  Failure to check for lazy resched can unnecessarily
+delay rescheduling until the next tick when using a lazy preemption model.
 
-This version is based on
+Note, ideally both the checking and processing of TIF bits would be handled
+in common code, to avoid having to keep three separate paths synchronized,
+but defer such cleanups to the future to keep the fix as standalone as
+possible.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/hyperv/linux.git hyperv-next
+Cc: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+Cc: Mukesh R <mrathor@linux.microsoft.com>
+Fixes: 621191d709b1 ("Drivers: hv: Introduce mshv_root module to expose /dev/mshv to VMMs")
+Fixes: 64503b4f4468 ("Drivers: hv: Introduce mshv_vtl driver")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ drivers/hv/mshv_common.c    | 2 +-
+ drivers/hv/mshv_root_main.c | 3 ++-
+ drivers/hv/mshv_vtl_main.c  | 3 ++-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
 
-in order to pickup the VTL changes that are queued for 6.18.  I also
-squashed the NEED_RESCHED_LAZY fixes for root and VTL modes into a single
-patch, as it should be easy/straightforward to drop the VTL change as needed
-if we want this in 6.17 or earlier.
-
-That effectively means the full series is dependent on the VTL changes being
-fully merged for 6.18.  But I think that's ok as it's really only the MSHV
-changes that have any urgency whatsoever, and I assume that Microsoft is
-the only user that truly cares about the MSHV root fix.  I.e. if the whole
-thing gets delayed, I think it's only the Hyper-V folks that are impacted.
-
-I have no preference what tree this goes through, or when, and can respin
-and/or split as needed.
-
-As with v1, the Hyper-V stuff and non-x86 architectures are compile-tested
-only.
-
-v2:
- - Rebase on hyperv-next.
- - Fix and converge the VTL code as well. [Peter, Nuno]
-
-v1: https://lore.kernel.org/all/20250825200622.3759571-1-seanjc@google.com
-
-
-Sean Christopherson (7):
-  Drivers: hv: Handle NEED_RESCHED_LAZY before transferring to guest
-  Drivers: hv: Disentangle VTL return cancellation from SIGPENDING
-  Drivers: hv: Disable IRQs only after handling pending work before VTL
-    return
-  entry/kvm: KVM: Move KVM details related to signal/-EINTR into KVM
-    proper
-  entry: Rename "kvm" entry code assets to "virt" to genericize APIs
-  Drivers: hv: Use common "entry virt" APIs to do work in root before
-    running guest
-  Drivers: hv: Use "entry virt" APIs to do work before returning to
-    lower VTL
-
- MAINTAINERS                                 |  2 +-
- arch/arm64/kvm/Kconfig                      |  2 +-
- arch/arm64/kvm/arm.c                        |  3 +-
- arch/loongarch/kvm/Kconfig                  |  2 +-
- arch/loongarch/kvm/vcpu.c                   |  3 +-
- arch/riscv/kvm/Kconfig                      |  2 +-
- arch/riscv/kvm/vcpu.c                       |  3 +-
- arch/x86/kvm/Kconfig                        |  2 +-
- arch/x86/kvm/vmx/vmx.c                      |  1 -
- arch/x86/kvm/x86.c                          |  3 +-
- drivers/hv/Kconfig                          |  2 ++
- drivers/hv/mshv.h                           |  2 --
- drivers/hv/mshv_common.c                    | 22 ---------------
- drivers/hv/mshv_root_main.c                 | 31 ++++-----------------
- drivers/hv/mshv_vtl_main.c                  | 23 +++++++--------
- include/linux/{entry-kvm.h => entry-virt.h} | 19 +++++--------
- include/linux/kvm_host.h                    | 17 +++++++++--
- include/linux/rcupdate.h                    |  2 +-
- kernel/entry/Makefile                       |  2 +-
- kernel/entry/{kvm.c => virt.c}              | 15 ++++------
- kernel/rcu/tree.c                           |  6 ++--
- virt/kvm/Kconfig                            |  2 +-
- 22 files changed, 60 insertions(+), 106 deletions(-)
- rename include/linux/{entry-kvm.h => entry-virt.h} (83%)
- rename kernel/entry/{kvm.c => virt.c} (66%)
-
-
-base-commit: 03ac62a578566730ab3c320f289f7320798ee2e1
+diff --git a/drivers/hv/mshv_common.c b/drivers/hv/mshv_common.c
+index 6f227a8a5af7..eb3df3e296bb 100644
+--- a/drivers/hv/mshv_common.c
++++ b/drivers/hv/mshv_common.c
+@@ -151,7 +151,7 @@ int mshv_do_pre_guest_mode_work(ulong th_flags)
+ 	if (th_flags & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL))
+ 		return -EINTR;
+ 
+-	if (th_flags & _TIF_NEED_RESCHED)
++	if (th_flags & (_TIF_NEED_RESCHED | _TIF_NEED_RESCHED_LAZY))
+ 		schedule();
+ 
+ 	if (th_flags & _TIF_NOTIFY_RESUME)
+diff --git a/drivers/hv/mshv_root_main.c b/drivers/hv/mshv_root_main.c
+index 932932cb91ea..0d849f09160a 100644
+--- a/drivers/hv/mshv_root_main.c
++++ b/drivers/hv/mshv_root_main.c
+@@ -484,7 +484,8 @@ mshv_vp_wait_for_hv_kick(struct mshv_vp *vp)
+ static int mshv_pre_guest_mode_work(struct mshv_vp *vp)
+ {
+ 	const ulong work_flags = _TIF_NOTIFY_SIGNAL | _TIF_SIGPENDING |
+-				 _TIF_NEED_RESCHED  | _TIF_NOTIFY_RESUME;
++				 _TIF_NEED_RESCHED  | _TIF_NEED_RESCHED_LAZY |
++				 _TIF_NOTIFY_RESUME;
+ 	ulong th_flags;
+ 
+ 	th_flags = read_thread_flags();
+diff --git a/drivers/hv/mshv_vtl_main.c b/drivers/hv/mshv_vtl_main.c
+index dc6594ae03ad..12f5e77b7095 100644
+--- a/drivers/hv/mshv_vtl_main.c
++++ b/drivers/hv/mshv_vtl_main.c
+@@ -728,7 +728,8 @@ static int mshv_vtl_ioctl_return_to_lower_vtl(void)
+ 	preempt_disable();
+ 	for (;;) {
+ 		const unsigned long VTL0_WORK = _TIF_SIGPENDING | _TIF_NEED_RESCHED |
+-						_TIF_NOTIFY_RESUME | _TIF_NOTIFY_SIGNAL;
++						_TIF_NOTIFY_RESUME | _TIF_NOTIFY_SIGNAL |
++						_TIF_NEED_RESCHED_LAZY;
+ 		unsigned long ti_work;
+ 		u32 cancel;
+ 		unsigned long irq_flags;
 -- 
 2.51.0.268.g9569e192d0-goog
 
