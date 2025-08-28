@@ -1,157 +1,159 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060551EB1AA;
-	Thu, 28 Aug 2025 14:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3370121D3E2;
+	Thu, 28 Aug 2025 14:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756389923; cv=none; b=SzQhq6gOK22MHHrrNsVsUuZw9XIyNb3yGlPbQe3oGw9hVQUeTjdEnvh1fGd/Vl5C3tgw4+21Vgcobq/Hz6Kcye9u/7qvdquPFT++T97bcQxZenjeFMKbDb6NDlX4+2l3ZHIRACqGuuOb8hdxIK5tQIQ+qpBqJ0LW3/6qiFtCXmw=
+	t=1756391209; cv=none; b=TeTtQadAkVeUtipVjpSZlpA5HeH+p6XfQsfS9PD7Isrs6ltCIkS7/tlYHNjXsx2zuQ/4V/tZKHCctqnMDjiLy6gJUZ91DSmh0V4cGz8z77YB2SP9nwamwkA4bNIDmOsb2TWRvRfD0+6FxQdHcrMy32ZPlEYs7KW8AGkni7WUJNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756389923; c=relaxed/simple;
-	bh=DyNh/B5mAGR7TnY7MatHO1yPHUOMMK2nagZ3lUWn2fA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WKTyJZBxfbd6HcULd0/bK2CvtCrzek8J567EXKK1VsXNUkLr9t8KZQY9E703E9mTdeCRj2NKWeMrWIUcBhcoSF3LRYsX+cs0/oV+p48sb3r5utR8CpKhABzrneBN/fQUEKOBA6urG/PJ+jae1OGCmumC44s3Jvr/6e4eApN1atY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H+zo2fE6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756391209; c=relaxed/simple;
+	bh=p5P8kAChBoN4WOlr76oijnY83blpFKG+JTaA6cgwwtY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=itE8P5b8LnxL18z2dJ8yuF954Nb2gy1bdHMCi5Hrsf9SFPAIRWkmb/AudUBCDtVBO1SrYFGI70Y9zCLW6l/xwgQcNvQrMscD06x+vcNQcdgrxKkauvzJyAguyHQkZeOBMLsq5zKGlm/EntJQdXX0CIY3jX9fnZKcfl5PPIknruA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7kEKCt2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H+zo2fE6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85578C4CEEB;
-	Thu, 28 Aug 2025 14:05:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7kEKCt2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60BB8C4CEF5;
+	Thu, 28 Aug 2025 14:26:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756389922;
-	bh=DyNh/B5mAGR7TnY7MatHO1yPHUOMMK2nagZ3lUWn2fA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H+zo2fE6t4kb7opwDirCTmZXQYUMxdvDUzaEKmgm8oXo5Y/8fdTsykOW8ssM5iF+D
-	 SmedYJyt043ervcAhMuYbe8ar+hbn7oFmJsq22z8U6+H2RIfzztrWWqTszG4rGAhwd
-	 yzBFfas+iTFaYelbOfN0IK7GUHRM8SskLDVX6yP8Job6MSKqD5TiFWdb6F2XxO3efU
-	 cBZ73/1djxNknr85AEIcZHyRIBxY1ujZEKIWxq8qWu4rl4nsKhy0ixUBGdKbbAefws
-	 T1nGT5HPB82ySUXmGtOvqLzYWC/DG4BL/X1u7pWZyB9bqMLmWOoBvJA9LmUNcviwzi
-	 2fII+8TyG8u0A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1urdFf-00000001H7W-31tP;
-	Thu, 28 Aug 2025 14:05:19 +0000
-Date: Thu, 28 Aug 2025 15:05:19 +0100
-Message-ID: <86a53jee3k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
+	s=k20201202; t=1756391208;
+	bh=p5P8kAChBoN4WOlr76oijnY83blpFKG+JTaA6cgwwtY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c7kEKCt2emu8+T6n7qTfSORifJVoKQh2kg28pFXSWr0eYZyb/w6+Pb4ykjBXYLmm9
+	 97jHgUVhwZWTzkgi/woAxVcFRSqNt76KPpYDjEo/EUHeq+X7Or7nKTgZZb078U0ARQ
+	 no/xsYpiTG0WZghM96EE7TUKcqUIvqG8ZqxE6LONBXzI1oEaB9ZSsCRi7YWonu52OK
+	 mYiGeIi4SmfWeptkTfY28Z5aL5e89Ptp3Wk4NECmiBSY/evwNnIG9qPCfRMJj6YBEZ
+	 6xmANqqFEBrWPu+TgH7qlb/qozJe2OIv7rCaHx2IOvLG89vU7gWDeCHQGwDqPHiGPU
+	 Ijmj0CkpirSdg==
+Date: Thu, 28 Aug 2025 17:26:39 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "david@redhat.com" <david@redhat.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"tabba@google.com" <tabba@google.com>,
+	"ackerleytng@google.com" <ackerleytng@google.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
 	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org"
-	<will@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 1/5] KVM: arm64: Allow ICC_SRE_EL2 accesses on a GICv5 host
-In-Reply-To: <20250828105925.3865158-2-sascha.bischoff@arm.com>
-References: <20250828105925.3865158-1-sascha.bischoff@arm.com>
-	<20250828105925.3865158-2-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"will@kernel.org" <will@kernel.org>,
+	"vbabka@suse.cz" <vbabka@suse.cz>,
+	"Cali, Marco" <xmarcalx@amazon.co.uk>,
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"Thomson, Jack" <jackabt@amazon.co.uk>,
+	"Manwaring, Derek" <derekmn@amazon.com>
+Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
+Message-ID: <aLBnHwUN74ErKVjX@kernel.org>
+References: <20250828093902.2719-1-roypat@amazon.co.uk>
+ <20250828093902.2719-4-roypat@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250828093902.2719-4-roypat@amazon.co.uk>
 
-On Thu, 28 Aug 2025 11:59:42 +0100,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Thu, Aug 28, 2025 at 09:39:19AM +0000, Roy, Patrick wrote:
+> Add AS_NO_DIRECT_MAP for mappings where direct map entries of folios are
+> set to not present . Currently, mappings that match this description are
+> secretmem mappings (memfd_secret()). Later, some guest_memfd
+> configurations will also fall into this category.
 > 
-> The bet0 release of the GICv5 specification didn't include the
-> ICC_SRE_EL2 register as part of FEAT_GCIE_LEGACY. This was an
-> oversight, and support for this register has been added as of the bet1
-> release of the specification.
+> Reject this new type of mappings in all locations that currently reject
+> secretmem mappings, on the assumption that if secretmem mappings are
+> rejected somewhere, it is precisely because of an inability to deal with
+> folios without direct map entries, and then make memfd_secret() use
+> AS_NO_DIRECT_MAP on its address_space to drop its special
+> vma_is_secretmem()/secretmem_mapping() checks.
 > 
-> Remove the guarding in the vGICv3 code that skipped the ICC_SRE_EL2
-> accesses for a GICv5 host. As a result of this change, it now becomes
-> possible to use nested virtualisation on a GICv5 host when running
-> legacy GICv3-based VMs.
+> This drops a optimization in gup_fast_folio_allowed() where
+> secretmem_mapping() was only called if CONFIG_SECRETMEM=y. secretmem is
+> enabled by default since commit b758fe6df50d ("mm/secretmem: make it on
+> by default"), so the secretmem check did not actually end up elided in
+> most cases anymore anyway.
 > 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Use a new flag instead of overloading AS_INACCESSIBLE (which is already
+> set by guest_memfd) because not all guest_memfd mappings will end up
+> being direct map removed (e.g. in pKVM setups, parts of guest_memfd that
+> can be mapped to userspace should also be GUP-able, and generally not
+> have restrictions on who can access it).
+> 
+> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
 > ---
->  arch/arm64/kvm/hyp/vgic-v3-sr.c | 27 +++++++--------------------
->  1 file changed, 7 insertions(+), 20 deletions(-)
+>  include/linux/pagemap.h   | 16 ++++++++++++++++
+>  include/linux/secretmem.h | 18 ------------------
+>  lib/buildid.c             |  4 ++--
+>  mm/gup.c                  | 14 +++-----------
+>  mm/mlock.c                |  2 +-
+>  mm/secretmem.c            |  6 +-----
+>  6 files changed, 23 insertions(+), 37 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index d81275790e69..7dbfd35a63a8 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -296,19 +296,12 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
->  	}
+> diff --git a/include/linux/secretmem.h b/include/linux/secretmem.h
+> index e918f96881f5..0ae1fb057b3d 100644
+> --- a/include/linux/secretmem.h
+> +++ b/include/linux/secretmem.h
+> @@ -4,28 +4,10 @@
+>  
+>  #ifdef CONFIG_SECRETMEM
+>  
+> -extern const struct address_space_operations secretmem_aops;
+
+Please also make secretmem_aops static in mm/secretmem.c
+
+> -static inline bool secretmem_mapping(struct address_space *mapping)
+> -{
+> -	return mapping->a_ops == &secretmem_aops;
+> -}
+> -
+
+...
+
+> diff --git a/mm/gup.c b/mm/gup.c
+> index adffe663594d..8c988e076e5d 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -1234,7 +1234,7 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
+>  	if ((gup_flags & FOLL_SPLIT_PMD) && is_vm_hugetlb_page(vma))
+>  		return -EOPNOTSUPP;
+>  
+> -	if (vma_is_secretmem(vma))
+> +	if (vma_is_no_direct_map(vma))
+>  		return -EFAULT;
+>  
+>  	if (write) {
+> @@ -2751,7 +2751,6 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
+>  {
+>  	bool reject_file_backed = false;
+>  	struct address_space *mapping;
+> -	bool check_secretmem = false;
+>  	unsigned long mapping_flags;
 >  
 >  	/*
-> -	 * GICv5 BET0 FEAT_GCIE_LEGACY doesn't include ICC_SRE_EL2. This is due
-> -	 * to be relaxed in a future spec release, at which point this in
-> -	 * condition can be dropped.
-> +	 * Prevent the guest from touching the ICC_SRE_EL1 system
-> +	 * register. Note that this may not have any effect, as
-> +	 * ICC_SRE_EL2.Enable being RAO/WI is a valid implementation.
->  	 */
-> -	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
-> -		/*
-> -		 * Prevent the guest from touching the ICC_SRE_EL1 system
-> -		 * register. Note that this may not have any effect, as
-> -		 * ICC_SRE_EL2.Enable being RAO/WI is a valid implementation.
-> -		 */
-> -		write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
-> -			     ICC_SRE_EL2);
-> -	}
-> +	write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
-> +		     ICC_SRE_EL2);
-
-At some point, it would be great to elide this on systems where
-GICv2-on-v3 doesn't exist, as there is no way for the guest to disable
-the system register view. This would avoid a couple of pointless traps
-on each entry-exit for a nested guest.
-
+> @@ -2763,14 +2762,6 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
+>  		reject_file_backed = true;
 >  
->  	/*
->  	 * If we need to trap system registers, we must write
-> @@ -329,14 +322,8 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
->  		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
->  	}
->  
-> -	/*
-> -	 * Can be dropped in the future when GICv5 spec is relaxed. See comment
-> -	 * above.
-> -	 */
-> -	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
-> -		val = read_gicreg(ICC_SRE_EL2);
-> -		write_gicreg(val | ICC_SRE_EL2_ENABLE, ICC_SRE_EL2);
-> -	}
-> +	val = read_gicreg(ICC_SRE_EL2);
-> +	write_gicreg(val | ICC_SRE_EL2_ENABLE, ICC_SRE_EL2);
+>  	/* We hold a folio reference, so we can safely access folio fields. */
+> -
+> -	/* secretmem folios are always order-0 folios. */
+> -	if (IS_ENABLED(CONFIG_SECRETMEM) && !folio_test_large(folio))
+> -		check_secretmem = true;
+> -
+> -	if (!reject_file_backed && !check_secretmem)
+> -		return true;
+> -
+>  	if (WARN_ON_ONCE(folio_test_slab(folio)))
+>  		return false;
 
-Same here. That's two back-to-back traps for values that cannot
-realistically change on non-v2-compat systems (i.e. relatively modern
-machines).
-
-No need to respin for that, but I may end-up posting a follow-up to
-clean this up.
-
-Thanks,
-
-	M.
+There's a check for hugetlb after this and a comment there mentions
+secretmem, please update that to "mapping with no direct map" or something
+like that.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Sincerely yours,
+Mike.
