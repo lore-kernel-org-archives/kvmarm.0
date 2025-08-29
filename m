@@ -1,132 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DB42D321F;
-	Fri, 29 Aug 2025 08:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74780270EBC
+	for <kvmarm@lists.linux.dev>; Fri, 29 Aug 2025 09:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756455204; cv=none; b=SxloxrWb6jWvQUvO3EI6YO6FIkad/guziUXp83pEOb967FQW/la97weQBrqo6+OjgfhnSmdpCM+aVdLOM8hGcKRfbY/vg+c2KKKUPFQV5OD340KCoGEGi6JcqXB4Dm9So9HsjRQd9fNX77ds5aJIwbOxhvGBrbthMxuvu0JxEYg=
+	t=1756461107; cv=none; b=izkZrXvNBQ3Xy39/bGkgimxDkFaB76wb1uZaszDgs4xZ83FjzvRuSm4e1c6BPddCNusdGL6vpA9vei1fezGWWPwTht3FkFaHBPqHbc06RBx6TFM8sPq3wbaDdZ1/LcHaGMgUpzMrO6Ru53INpO0F52B1Ok8aUDDbMvQeyl5epd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756455204; c=relaxed/simple;
-	bh=/QgTUEjLJvtCEweoaKMR9FxAwI+j6T0k2tHXf4ZR0Eg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c7kLDXOC2+dQ54meaOuXIlBX5oRUowAXDIacnIz8SJq92XAfbna8X/+6yhsLQe0f+8Vpr0qJBlA4ABSJOWOFWjmMhkCri2cCxXNC5l4b8Ujh/UgIuGcZEGnh8MpOs75eRLiOqW6GXaOUkAXVkK/Ng8KZYEEkv4gvd5/r0cdR0c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UzeNfyN3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756461107; c=relaxed/simple;
+	bh=9GIA2BFF5eLSy6mrBzqSFzk5Ex1qE7rhRRN0WvjbZTE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sAxAnXyai74/Hhcs8ZJR0xL1pJ/Jujo7DtjFL1ffi8hGSQ0E5yjc3j6E+ixRzrmlP5u7K6rMDgORKfI0IgGVdgHizzhLf7GVYkkhCCH3QHdjhzv0f2LdWJnI/Jfn43RKJS/+X5O21ErqQyBVpyhkWoc6waqJruqEAW49J9wI75s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WCeyJI7/; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UzeNfyN3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F3FAC4AF0C;
-	Fri, 29 Aug 2025 08:13:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756455204;
-	bh=/QgTUEjLJvtCEweoaKMR9FxAwI+j6T0k2tHXf4ZR0Eg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UzeNfyN3XArG9qZPSsv2vifCNAeRvS4LtVpDC5aJPlAXVwBQ+A9LcqvimiMW6QJW6
-	 oSL8p9/R1OTR8cb1l4qRMVjlaC5Vsho3FAMP237y45wzs/ysoIGJaLy0xe77nd4B55
-	 x+60NqUy1U2iq6/Zbkmxz2X+FmaAkIGlZgHKwnyBs9LGEcXwx9f6Gu9WfOUKsDTd6s
-	 YHsiuDSIl3N+A3xl9EWiD8b/CmuNd0ql6okQfcxY1HGbRr1I6h1MhKdZmGZ8EMceH8
-	 4XpuPptslKwglXnr5x8MoarWXaueUdi/aWHfZF4LVwvQOtrCBRLaqH03eMcQtIz7Y4
-	 KG5wBTg2JHrvw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uruEb-00000001W2M-3xiw;
-	Fri, 29 Aug 2025 08:13:22 +0000
-Date: Fri, 29 Aug 2025 09:13:20 +0100
-Message-ID: <867bymeean.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mark Brown <broonie@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 2/2] arm64/sysreg: Replace TCR_EL1 field macros
-In-Reply-To: <20250829060215.1086792-3-anshuman.khandual@arm.com>
-References: <20250829060215.1086792-1-anshuman.khandual@arm.com>
-	<20250829060215.1086792-3-anshuman.khandual@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WCeyJI7/"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45a1b0b14daso11493415e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 29 Aug 2025 02:51:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756461104; x=1757065904; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=txk6Ntr1OB9E+08Z6A0ZYjiGrZLcfjKX3b0L/eGpWQ4=;
+        b=WCeyJI7/eox/N3f8aXqqvIETg3XKiShCWdhxdotWBVWMOYApDKpXQc8j0ULjNAaxFm
+         qSOrtuTiCH/mWgfd7OCsNxpGnN0PU858Iza8KVgxHdlY21TX6ECdtyjlXHtFQERcvP/H
+         XgDXyN1ezRCc9tcNzX8hUS9Dgk7FarLuRfWEgidCEM5IP1pNvrwYI3FNu4u5pymLHgES
+         UD8vR74Y3qJKc5+iPM4ob1HGykpfVv7INe4W+bYX4bR8lO+NNnLLGOCxYoW8Afj8asL9
+         Ym0m3VKfw9BF1hbVNBeD/6G+zjuzQXxhNJDK8b0Wdie7kw3LCeZLga+m9zwRBTIu1n8U
+         vwAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756461104; x=1757065904;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=txk6Ntr1OB9E+08Z6A0ZYjiGrZLcfjKX3b0L/eGpWQ4=;
+        b=ecVL4+g5FbAep+cljkpg+zcCOrGml84vvgHqT5ibRXWmYv2G4Rwu0a/1GIHWRnw2Dr
+         INi5qJX3vYhWVG5kBasP/lx2hnWCGFlboc0ElWzWj0TkS3k+tXH+I3wkmhH97TTikYHA
+         WksEvAVS0VI9TmSZEMkwAvtKFj0QiQJumf7YZ26h/gcmmFC6nROjS3+rrmP6vWh7NKry
+         ua9z2X6LFuKqUFHQUw8z3aFjQp1thPFYRB4X737lYPlXWv2fg0YM4x5paEVUsQbMSmEw
+         PqAzS+To2ELonTArI6h9ezSTed/KbA28d8hZU3czENoKThNknJtJ2ATrKmDhjrEoxPy1
+         MlTA==
+X-Gm-Message-State: AOJu0Yx7ZYHYcBbeMqZzwYk5btoW70rcUPkWxrSQVm+2JWc/TgS6KNGY
+	BsKsgbIjuNy6kjoKiGrQEv1tx5uK0tVCXusrYlH0EtNG5hepEozyU1/yBXOeUIOeilX5G0/X/yP
+	GMwsr+JNqU+Uc7af76YgI6mHqL5XtiBq/QmyaqpIUFabdHrUaxtYw89rbSHqb/Q8Xm1WzDC842w
+	aeYA7DQdKUMNTnNJzt/PYZUKkXxvgu3Kc=
+X-Google-Smtp-Source: AGHT+IEf1nkRoty1oRvWii9Is2r7lcOEZRt6GRqg0M5bkn7wWr7F2w87YgWyLO2mtNb12anWTrGICsLuyg==
+X-Received: from wmqa7.prod.google.com ([2002:a05:600c:3487:b0:459:df20:248e])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4248:b0:45b:7e86:7378
+ with SMTP id 5b1f17b1804b1-45b7e8676f1mr12711315e9.34.1756461103846; Fri, 29
+ Aug 2025 02:51:43 -0700 (PDT)
+Date: Fri, 29 Aug 2025 10:51:40 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, ryan.roberts@arm.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
+Message-ID: <20250829095143.123476-1-tabba@google.com>
+Subject: [PATCH v3 0/3] arm64: sysreg: Fix sysreg field definitions and
+ generation script
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, vdonnefort@google.com, qperret@google.com, 
+	sebastianene@google.com, keirf@google.com, smostafa@google.com, 
+	tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 29 Aug 2025 07:02:15 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
-> This just replaces all used TCR_EL1 field macros with tools sysreg variant
-> based fields and subsequently drops them from the header (pgtable-hwdef.h)
-> and moves them into KVM header (asm/kvm_arm.h) for continued usage in KVM.
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V2:
-> 
-> - Dropped all TCR_EL1 replacements from KVM code
-> - Moved existing TCR_XXX macros from (asm/pgtable-hwdef.h) into KVM header
->   (asm/kvm_arm.h) for their continued usage
-> 
->  arch/arm64/include/asm/assembler.h     |   6 +-
->  arch/arm64/include/asm/cputype.h       |   2 +-
->  arch/arm64/include/asm/kvm_arm.h       |  92 +++++++++++++++++++++++
->  arch/arm64/include/asm/mmu_context.h   |   4 +-
->  arch/arm64/include/asm/pgtable-hwdef.h | 100 +------------------------
->  arch/arm64/include/asm/pgtable-prot.h  |   2 +-
->  arch/arm64/kernel/cpufeature.c         |   4 +-
->  arch/arm64/kernel/pi/map_kernel.c      |   8 +-
->  arch/arm64/kernel/vmcore_info.c        |   2 +-
->  arch/arm64/mm/proc.S                   |  36 +++++----
->  tools/arch/arm64/include/asm/cputype.h |   2 +-
->  11 files changed, 134 insertions(+), 124 deletions(-)
->
+The sysreg definitions file has a few errors. In Enum Security,
+NSACR_RFR is set to 0b0001 instead of the spec value of 0b0010.
+Additionaly, the sign of the Enums DoubleLock and EIESB are wrong
+(should be Signed and Unsigned, respectively).
 
-[...]
+Moreover, the file has some redundant definitions, e.g.,
+RCWSMASK_EL1. While these redundant definitions are not wrong per se,
+they add unnecessary code into the generated header file and could be a
+source of future bugs.
 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 1da290aeedce..ad3c305c6374 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -107,6 +107,98 @@
->  
->  #define MPAMHCR_HOST_FLAGS	0
->  
-> +#define TCR_T0SZ_OFFSET		0
-> +#define TCR_T1SZ_OFFSET		16
+Fix the Enums and remove the redundant Sysreg definitions.
 
-These are unused by KVM.
+To reduce the chance of this happening in the future, add validation to
+the sysreg header generation script. I didn't want to go overboard with
+validation, so I only added validation that would catch most of the
+errors that I've seen, which also are errors that wouldn't generate a
+build error later on.
 
-> +#define TCR_TxSZ(x)		(TCR_T0SZ(x) | TCR_T1SZ(x))
-> +#define TCR_TxSZ_WIDTH		6
-> +#define TCR_T0SZ_MASK		(((UL(1) << TCR_TxSZ_WIDTH) - 1) << TCR_T0SZ_OFFSET)
-> +#define TCR_T1SZ_MASK		(((UL(1) << TCR_TxSZ_WIDTH) - 1) << TCR_T1SZ_OFFSET)
+Changes since v2 [1]:
+- Added patch that fixes field sign definitions for DoubleLock and EIESB
+- Removed whitespace fixes from first patch, since there are more
+  inconsistent whitespace use in the file, and fixing it all would lead
+  to too much churn.
+- Collected Reviews/Acks
+- Rebased on 6.17-rc3
 
-[eyeroll]
+Cheers,
+/fuad
 
-Why do you need to repeat all of this, while you just introduced
-new definitions? Surely you can write a script that express one in
-term of the other, and add that to KVM, instead of just blindly moving
-stuff around?
+[1] https://lore.kernel.org/all/20250813164506.1203851-1-tabba@google.com/
 
-	M.
+Fuad Tabba (3):
+  arm64: sysreg: Fix and tidy up sysreg field definitions
+  arm64: sysreg: Correct sign definitions for EIESB and DoubleLock
+  arm64: sysreg: Add validation checks to sysreg header generation
+    script
 
+ arch/arm64/tools/gen-sysreg.awk | 20 ++++++++++++++++++++
+ arch/arm64/tools/sysreg         | 18 +++++-------------
+ 2 files changed, 25 insertions(+), 13 deletions(-)
+
+
+base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
 -- 
-Without deviation from the norm, progress is not possible.
+2.51.0.338.gd7d06c2dae-goog
+
