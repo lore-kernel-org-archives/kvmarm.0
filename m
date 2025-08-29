@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB33F3081BB
-	for <kvmarm@lists.linux.dev>; Fri, 29 Aug 2025 10:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75591CD215
+	for <kvmarm@lists.linux.dev>; Fri, 29 Aug 2025 10:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756462079; cv=none; b=Ki4+41uwXuxHgZiepQZs7uG2G7gpVYXvvK05f7JrKs+qEl976Bv0aiFtMoxLIQcqDMJb+U/0zRPSXIMJKldEone6/pHw0mQVRXtuj3wS7K4VtObg1diBIut8PjrXp4SiCBXKAP+bW67x/1GIwhumTvDknQ0g2KAADTr/u32/mhc=
+	t=1756462264; cv=none; b=iRR5lKxkeTAq6dYODCxtzCwuijjQun9UoFxCq6q8gXlJRPeLvywFMQoxpQ/LfGHqSUvConJmF7IrHg1+DYud+ZoJpnCzYP2E0owE6R9eIlyve2Lq5deJtWlxFchJUtHLnV2KsD4RUvAjd5hRRo7TrL19yMFTHievvnTh8BufQOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756462079; c=relaxed/simple;
-	bh=GfXLFsP23ocpkdbfOrhclqjT58FXPr0qTTHtyEKMueE=;
+	s=arc-20240116; t=1756462264; c=relaxed/simple;
+	bh=eH6BKRKwOTjkJywNwq4bGs8NT2i7bK1YZgAubN8xarA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QiQKLdSWzWnagMOU+nYu8fB6rZWV49cADOxljc5372oF8JBj27f2mKmaCCtydUWWDOHbFbiw8Yk4cLgS72/dGsnylV4I2fA0vE9oplnuvz1AbV/81iyui6B+FYfIYXABPS6TMB8vARuqohTjid9T+Otqbxm7EQmEFsRX5zGAE+k=
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOWGCmrll8F9ZyaOhWb7UVfW2SAUReILJMIJ/riCcmsPKjavTKt7OufbbI/cd0ARudqvnc1r5Xky/Awsi94GjJPCjapn9/g1X1q5qnkgrdFbg6olPkvYwfOjs3DbW1SfXo3MzPPZqFz5K1yJ7RIVEwQS6/it6z/Bal0D1kIAGbE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF2A31758;
-	Fri, 29 Aug 2025 03:07:48 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB06F1758;
+	Fri, 29 Aug 2025 03:10:53 -0700 (PDT)
 Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C09F23F694;
-	Fri, 29 Aug 2025 03:07:53 -0700 (PDT)
-Date: Fri, 29 Aug 2025 11:07:46 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 725AE3F694;
+	Fri, 29 Aug 2025 03:10:49 -0700 (PDT)
+Date: Fri, 29 Aug 2025 11:10:45 +0100
 From: Mark Rutland <mark.rutland@arm.com>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -26,11 +26,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
 	catalin.marinas@arm.com, vdonnefort@google.com, qperret@google.com,
 	sebastianene@google.com, keirf@google.com, smostafa@google.com
-Subject: Re: [PATCH v3 1/3] arm64: sysreg: Fix and tidy up sysreg field
- definitions
-Message-ID: <aLF78ux6oTQYKnHr@J2N7QTR9R3>
+Subject: Re: [PATCH v3 2/3] arm64: sysreg: Correct sign definitions for EIESB
+ and DoubleLock
+Message-ID: <aLF8pU4k5chetsDy@J2N7QTR9R3>
 References: <20250829095143.123476-1-tabba@google.com>
- <20250829095143.123476-2-tabba@google.com>
+ <20250829095143.123476-3-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,90 +39,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250829095143.123476-2-tabba@google.com>
+In-Reply-To: <20250829095143.123476-3-tabba@google.com>
 
-On Fri, Aug 29, 2025 at 10:51:41AM +0100, Fuad Tabba wrote:
-> Fix the value of ID_PFR1_EL1.Security NSACR_RFR to be 0b0010, as per
-> DDI0601/2025-06, which wasn't correctly set when introduced in commit
-> 1224308075f1 ("arm64/sysreg: Convert ID_PFR1_EL1 to automatic generation").
+On Fri, Aug 29, 2025 at 10:51:42AM +0100, Fuad Tabba wrote:
+> The `ID_AA64MMFR4_EL1.EIESB` field, is an unsigned enumeration, but was
+> incorrectly defined as a `SignedEnum` when introduced in commit
+> cfc680bb04c5 ("arm64: sysreg: Add layout for ID_AA64MMFR4_EL1"). This is
+> corrected to `UnsignedEnum`.
 > 
-> While at it, remove redundant definitions of CPACR_EL12 and
-> RCWSMASK_EL1 and fix some typos.
+> Conversely, the `ID_AA64DFR0_EL1.DoubleLock` field, is a signed
+> enumeration, but was incorrectly defined as an `UnsignedEnum`. This is
+> corrected to `SignedEnum`, which wasn't correctly set when annotated as
+> such in commit ad16d4cf0b4f ("arm64/sysreg: Initial unsigned annotations
+> for ID registers").
 > 
-> Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> Acked-by: Marc Zyngier <maz@kernel.org>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
-> Note that NSACR_RFR isn't used in the kernel as far as I could tell, so
-> I didn't add a 'Fixes' tag.
+> Note: No active users in the kernel for these two fields yet. pKVM
+> checks DoubleLock, but only for protected VMs, which aren't enabled
+> upstream yet. Hence no Fixes tag.
 
-Since this is all cleanup, I think that's fine, but were that necessary,
-it would be nicer to have the NSACR_RFR fix separate from the other
-cleanups.
-
-FWIW, as this stands:
+I have no strong feelings either way on that, so FWIW:
 
 Acked-by: Mark Rutland <mark.rutland@arm.com>
 
 Mark.
 
 > ---
->  arch/arm64/tools/sysreg | 14 +++-----------
->  1 file changed, 3 insertions(+), 11 deletions(-)
+>  arch/arm64/tools/sysreg | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
 > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 696ab1f32a67..f1a012ee0db6 100644
+> index f1a012ee0db6..d396fa587ec1 100644
 > --- a/arch/arm64/tools/sysreg
 > +++ b/arch/arm64/tools/sysreg
-> @@ -31,7 +31,7 @@
->  # Mapping	<name_EL1>
->  # EndSysreg
->  
-> -# Where multiple system regsiters are not VHE aliases but share a
-> +# Where multiple system registers are not VHE aliases but share a
->  # common layout, a SysregFields block can be used to describe the
->  # shared layout:
->  
-> @@ -54,7 +54,7 @@
->  #
->  # In general it is recommended that new enumeration items be named for the
->  # feature that introduces them (eg, FEAT_LS64_ACCDATA introduces enumeration
-> -# item ACCDATA) though it may be more taseful to do something else.
-> +# item ACCDATA) though it may be more tasteful to do something else.
->  
->  Sysreg	OSDTRRX_EL1	2	0	0	0	2
->  Res0	63:32
-> @@ -474,7 +474,7 @@ EndEnum
->  Enum	7:4	Security
+> @@ -1693,7 +1693,7 @@ UnsignedEnum	43:40	TraceFilt
 >  	0b0000	NI
->  	0b0001	EL3
-> -	0b0001	NSACR_RFR
-> +	0b0010	NSACR_RFR
+>  	0b0001	IMP
 >  EndEnum
->  UnsignedEnum	3:0	ProgMod
+> -UnsignedEnum	39:36	DoubleLock
+> +SignedEnum	39:36	DoubleLock
+>  	0b0000	IMP
+>  	0b1111	NI
+>  EndEnum
+> @@ -2409,7 +2409,7 @@ UnsignedEnum	11:8	ASID2
 >  	0b0000	NI
-> @@ -2528,10 +2528,6 @@ Field	17:16	ZEN
->  Res0	15:0
->  EndSysreg
->  
-> -Sysreg	CPACR_EL12      3	5	1	0	2
-> -Mapping	CPACR_EL1
-> -EndSysreg
-> -
->  Sysreg	CPACRALIAS_EL1  3	0	1	4	4
->  Mapping	CPACR_EL1
->  EndSysreg
-> @@ -2576,10 +2572,6 @@ Sysreg	PFAR_EL12	3	5	6	0	5
->  Mapping	PFAR_EL1
->  EndSysreg
->  
-> -Sysreg	RCWSMASK_EL1	3	0	13	0	3
-> -Field	63:0	RCWSMASK
-> -EndSysreg
-> -
->  Sysreg	SCTLR2_EL1      3	0	1	0	3
->  Res0    63:13
->  Field   12      CPTM0
+>  	0b0001	IMP
+>  EndEnum
+> -SignedEnum	7:4	EIESB
+> +UnsignedEnum	7:4	EIESB
+>  	0b0000	NI
+>  	0b0001	ToEL3
+>  	0b0010	ToELx
 > -- 
 > 2.51.0.338.gd7d06c2dae-goog
 > 
