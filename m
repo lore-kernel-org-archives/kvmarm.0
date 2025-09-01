@@ -1,94 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.65.3.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B2D323E;
-	Mon,  1 Sep 2025 14:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804CE1C1F0D
+	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 14:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.65.3.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756736883; cv=none; b=JJ1oKNw60z5OB6C0ANjhf6NMq0gqsilPFNzW9n7405D/7Y2HtKvVfIccGyoZw4RLAZEPkaYH8ieSgsyhwOwuSf60PBR/3atwKRtC1nycPaTzBhmCzK0FW4s4u6HzXBPHog8nLgm89vr4p8paUNCq9hpGk7jX5NoSF2VjnOgMVz8=
+	t=1756737015; cv=none; b=lh5+ydE7KO/Sd/Y1uH3QQstqhcELFRUqX4HH0AwDa4eWeuYmRMXyqdX67juA6tJZlmPGfmygsBAs2LRYjupdy2RJyEhkFkGvV30rRtP05o2ITP1FuUzPpF37VZZKaZlkIW96+4bLGDIBhQZL7cWEemX6jJrfjO4xMF/WbuWwcrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756736883; c=relaxed/simple;
-	bh=79YhD1biW7ZRAbWexbw6r9UIo8+R0Ehi9QzCMPNdDb0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l+67CZVVBuKTgMwKbyP3uD4iN/y7nzoPXqsrujBFjoqts9th7XzqL94l+5we92MjmVY8x7b9Fhs05pGiOKOfkw6bcTIs3UPRMfrSt7LwQhXaY8TiTfbrwFfNVHh84/hWI9qz0cMyzVio8iKYa7J5WzwKzTBULCib+h/N2WI13O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YzAQYKzY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756737015; c=relaxed/simple;
+	bh=ThRwItIAwvtz61VcsD5Fw+ketQmDIUxXtokPShuvEEY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=phL1HHcu8/PWtvnY7ShpWpRjprRTsqNqgm/MwJ0pPmKLs4aRE978U7Xki4gw5XMOuQiWIHMddrtecjzvwUx4QBMd9SHSbj3FkAvL0wTb+2+NvZP9Gu2YUjhIFLySrcremwaux2vju0SZieLsuLnaEUdR51Tt1B4OiPdLVUZ6tJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=VuHQf2G3; arc=none smtp.client-ip=3.65.3.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YzAQYKzY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF62C4CEF0;
-	Mon,  1 Sep 2025 14:27:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756736882;
-	bh=79YhD1biW7ZRAbWexbw6r9UIo8+R0Ehi9QzCMPNdDb0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YzAQYKzYOdJ3Q71t1i2a14NKnIRG3n/WMD3ZFyAehHTZcJusoFFuNtDI2+HYZCtj4
-	 wk4jXKHQxLBdQ/Wwob+BiDoE7bcA3zFC9B0eRyi7Kfl4+gmWXl8HuIHV2Af5e9fgwA
-	 k9kw3BDo2FcbU50hWaofq1m8IK+QrX0RmYGl2DNtGvaotpXICnparE35Y4MV2Fgiq5
-	 5DMOJp4CNBhGnYB20E8CWFZprn65hFKxKfRI0r2dTONJbvqIUGV2TGTOHgvLj0O5JQ
-	 t5EmUEtJBtKDLedgo9+7Jmh8ty/H6KSolSb9QH8nHkMnNj4dqhY7W8+tFatLVLqv3G
-	 4q+9NkXdezl/A==
-Date: Mon, 1 Sep 2025 17:27:53 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "ackerleytng@google.com" <ackerleytng@google.com>,
-	"david@redhat.com" <david@redhat.com>,
-	"Manwaring, Derek" <derekmn@amazon.com>,
-	"Thomson, Jack" <jackabt@amazon.co.uk>,
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="VuHQf2G3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1756737013; x=1788273013;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=dLl1oyt4RUhXcYIWGbyNXvmAubTcFciHIOgmTgsswPk=;
+  b=VuHQf2G3X+O31P03imHyX7UqH0pxCxOzJQru0BCLtCvVGv1MziPREAuV
+   ZFjjTawKZZRMRxC9ZkgvMfwv8LoMafLl+0rcHcHsJByCO/m+uoXUV0anS
+   PJCLWibnHgdAvYjDf7+DD6deFZHcxMWArmJi0WgmlwX9RA1flIhpRL7vz
+   pjhFZJe7c715lCVSCOV0XawTr8o22DeWOG9XmLTvKNJW58dgaITH/oDKc
+   Lg+MznA0VjhOFsSiwhka9tWET4+5aPBT7mN6UlAPKDHfEoubaBq2OK4oU
+   +E+MUABMraRztQKs07Z7XFfM7OB96Tpx8GwaYY3X0Ut9fLYP5zddwprKn
+   A==;
+X-CSE-ConnectionGUID: 7B/ba3PkSy26ZXnwYQdRbw==
+X-CSE-MsgGUID: s/0fbb7eT56B6Mg2WRcDHg==
+X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
+   d="scan'208";a="1466996"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 14:30:03 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:23216]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.18.194:2525] with esmtp (Farcaster)
+ id 24b98d19-0a60-4c24-a3c6-c81ad810034e; Mon, 1 Sep 2025 14:30:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 24b98d19-0a60-4c24-a3c6-c81ad810034e
+Received: from EX19D015EUB001.ant.amazon.com (10.252.51.114) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Mon, 1 Sep 2025 14:30:02 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB001.ant.amazon.com (10.252.51.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Mon, 1 Sep 2025 14:30:01 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.2562.020; Mon, 1 Sep 2025 14:30:01 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+To: "david@redhat.com" <david@redhat.com>
+CC: "ackerleytng@google.com" <ackerleytng@google.com>, "Manwaring, Derek"
+	<derekmn@amazon.com>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Kalyazin,
+ Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
 	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"tabba@google.com" <tabba@google.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>,
-	"will@kernel.org" <will@kernel.org>,
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-Subject: Re: [PATCH v5 04/12] KVM: guest_memfd: Add flag to remove from
- direct map
-Message-ID: <aLWtaZYi65aLtTAP@kernel.org>
-References: <aLBtwIhQpX6AR2Z6@kernel.org>
- <20250901142220.30610-1-roypat@amazon.co.uk>
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Roy, Patrick"
+	<roypat@amazon.co.uk>, "rppt@kernel.org" <rppt@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "tabba@google.com"
+	<tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "will@kernel.org"
+	<will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH v5 05/12] KVM: Documentation: describe
+ GUEST_MEMFD_FLAG_NO_DIRECT_MAP
+Thread-Topic: [PATCH v5 05/12] KVM: Documentation: describe
+ GUEST_MEMFD_FLAG_NO_DIRECT_MAP
+Thread-Index: AQHcG0zmqnuL2jS1NUKSUglbGWh4mA==
+Date: Mon, 1 Sep 2025 14:30:01 +0000
+Message-ID: <20250901143000.5017-1-roypat@amazon.co.uk>
+References: <786503d6-e58d-412a-a17b-f5e4e481c3fe@redhat.com>
+In-Reply-To: <786503d6-e58d-412a-a17b-f5e4e481c3fe@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250901142220.30610-1-roypat@amazon.co.uk>
 
-On Mon, Sep 01, 2025 at 02:22:22PM +0000, Roy, Patrick wrote:
-> On Thu, 2025-08-28 at 15:54 +0100, Mike Rapoport wrote:
-> > On Thu, Aug 28, 2025 at 09:39:21AM +0000, Roy, Patrick wrote:
-> >
-> >>  static inline void kvm_gmem_mark_prepared(struct folio *folio)
-> >>  {
-> >> +     struct inode *inode = folio_inode(folio);
-> >> +
-> >> +     if (kvm_gmem_test_no_direct_map(inode))
-> >> +             set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio), false);
-> > 
-> > This may fail to split large mapping in the direct map. Why not move this
-> > to kvm_gmem_prepare_folio() where you can handle returned error?
-> 
-> Argh, yeah, got that the wrong way around. Will update the error handling.
-> 
-> > I think that using set_direct_map_invalid_noflush() here and
-> > set_direct_map_default_noflush() in kvm_gmem_free_folio() better is
-> > clearer and makes it more obvious that here the folio is removed from the
-> > direct map and when freed it's direct mapping is restored.
-> > 
-> > This requires to export two symbols in patch 2, but I think it's worth it.
-> 
-> Mh, but set_direct_map_[default|invalid]_noflush() only take a single struct
-> page * argument, so they'd either need to gain a npages argument, or we add yet
-> more functions to set_memory.h.  Do you still think that's worth it? 
-
-Ah, right, misremembered that. Let's keep set_direct_map_valid_noflush().
- 
--- 
-Sincerely yours,
-Mike.
+On Thu, 2025-08-28 at 11:27 +0100, David Hildenbrand wrote:=0A=
+> On 28.08.25 11:39, Roy, Patrick wrote:=0A=
+>> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>=0A=
+>> ---=0A=
+>>   Documentation/virt/kvm/api.rst | 5 +++++=0A=
+>>   1 file changed, 5 insertions(+)=0A=
+>>=0A=
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api=
+.rst=0A=
+>> index c17a87a0a5ac..b52c14d58798 100644=0A=
+>> --- a/Documentation/virt/kvm/api.rst=0A=
+>> +++ b/Documentation/virt/kvm/api.rst=0A=
+>> @@ -6418,6 +6418,11 @@ When the capability KVM_CAP_GUEST_MEMFD_MMAP is s=
+upported, the 'flags' field=0A=
+>>   supports GUEST_MEMFD_FLAG_MMAP.  Setting this flag on guest_memfd crea=
+tion=0A=
+>>   enables mmap() and faulting of guest_memfd memory to host userspace.=
+=0A=
+>>=0A=
+>> +When the capability KVM_CAP_GMEM_NO_DIRECT_MAP is supported, the 'flags=
+' field=0A=
+>> +supports GUEST_MEMFG_FLAG_NO_DIRECT_MAP. Setting this flag makes the gu=
+est_memfd=0A=
+>> +instance behave similarly to memfd_secret, and unmaps the memory backin=
+g it from=0A=
+>> +the kernel's address space after allocation.=0A=
+>> +=0A=
+>>   When the KVM MMU performs a PFN lookup to service a guest fault and th=
+e backing=0A=
+>>   guest_memfd has the GUEST_MEMFD_FLAG_MMAP set, then the fault will alw=
+ays be=0A=
+>>   consumed from guest_memfd, regardless of whether it is a shared or a p=
+rivate=0A=
+> =0A=
+> WARNING: Missing commit description - Add an appropriate one=0A=
+=0A=
+Admittedly wasn't sure what to say that wouldn't just repeat the commit tit=
+le=0A=
+or the contents. Maybe that just means this shouldn't be its own patch. Wil=
+l=0A=
+squash in the previous one (same for PATCH 11/12).=0A=
+=0A=
+> WARNING: From:/Signed-off-by: email name mismatch: 'From: "Roy, Patrick"=
+=0A=
+> <roypat@amazon.co.uk>' !=3D 'Signed-off-by: Patrick Roy <roypat@amazon.co=
+.uk>'=0A=
+=0A=
+Heh, my git config only ever uses "Patrick Roy <roypat@amazon.co.uk>". Not =
+sure=0A=
+where "Roy, Patrick" comes from, could it be the mail server mangling thing=
+s?=0A=
+=0A=
+> -- =0A=
+> Cheers=0A=
+> =0A=
+> David / dhildenb=0A=
+> =0A=
+Best,=0A=
+Patrick=0A=
