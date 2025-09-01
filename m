@@ -1,64 +1,65 @@
-Received: from fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.158.153.154])
+Received: from fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.199.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E35F1A9FB9
-	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 14:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.158.153.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551392F361A;
+	Mon,  1 Sep 2025 14:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.199.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756735399; cv=none; b=PNXslI2fJ70v7TSKWdDYwTCpv0e8iYzdvWHpFzQnviUADDUxfgukNh8J99krgiUgLCVAmlouDg8co+F/px/bQn28BUjI+JBdcZifCJK35ccXxH2r/6JhEONeDJpQA6NEqNnhOxk7R+rnzH2R82eYFJXIB2+p0YIvrrNWBNJnnRw=
+	t=1756735532; cv=none; b=q40LsVQmeokf1sCnt1jI2c5bPlDs4OMN6vjDRPeO5h4TPU5G1akwSODHmE6RWhmY8wTJBBRRQE83cbUF7hg6tyJPzM+QOt9oqwq8nsN5xnE8Xtt7NATcDXJRnPQuAJYnIuN5B6g5ONpf+Ugmggd2LBz+Nf+2Z1naUsDQuUWMYaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756735399; c=relaxed/simple;
-	bh=8CSjKnM5Evxz3AwWp6BBnliN2csYH+hCb0uO2A+z0Uk=;
+	s=arc-20240116; t=1756735532; c=relaxed/simple;
+	bh=ItZqN5Op7g9rIJ5RShixnsRk5gMblgw67xQPu8prjug=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JM46EX7bkiiAa70q/uYLlIo84GtMIeswpOkw4b+d+51Ftwdx47uK35AtNYIqvVU5Q52uG+Pq5/In7rC6rWOH/uQSvRmV6F2rspwnV/D2VA1cyMWadFCYFQtBj/PSStuYItst/UfBS2w/0GqaKHWzyi2QDBISoH9IpATVQYixd98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=ap59WIrK; arc=none smtp.client-ip=18.158.153.154
+	 Content-Type:MIME-Version; b=rcomB+KurN9dEhxgPcMGWVHVI4TcO0y5Iov0/HfzO3a2dkZsu3+z8KkMO8LUsvVcv6CmadWDV/aYXgjICaivPaJDP0D4aS/tYgiW/DetXrXqaTAD4dMUyLxJMpKw6hFcgJ0uVIhr5m3LWRNEQEEEh3/reb07rfKsx34iX+LfKZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=IeHKIisd; arc=none smtp.client-ip=18.199.210.3
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="ap59WIrK"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="IeHKIisd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1756735397; x=1788271397;
+  s=amazoncorp2; t=1756735527; x=1788271527;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=ZpDM1obzK12bUteESwrJgWTMch0DIESyPnVssVZOnU8=;
-  b=ap59WIrKdbtQm4b6DVLCAaBLQJ3DofUzCM+zAZbmcwFHXxfVbGw7y7t8
-   mJdq0Vem/649qNNUvDOyNpot3D6l2gNBwjWJB1XzFAOF1bA0cwtbIqiZH
-   O+UagsGhHCgOSx23nuVl2f6hXKQCaV/YOy90S7vZDN8Qaw9mKn04aSa3k
-   nxL2mT0ISXVZ0QCMNmtsnf94638fJIE9Eb9GHRZUeN0GqQfRP4odCvONj
-   ggRTr5G9518dfGBMKK2SPGIpZqTkz/uH4s0dYdkghCSSskmbSzBVz8W/z
-   pfsz58A5w5r26KatVVOuRb4WpH12Znkt5LHbPWenlITH4cPr/ISGGcBj3
+  bh=Kse27neqs7TZ5sTIdJhbs0CXmugDWDcv4gD+1oQQ4ac=;
+  b=IeHKIisdRCXoZ5+V441l9oXqa7nrbEkpfLyaC0umnYkFL/LbuVXeiFnj
+   BhgsLae20Tlq1w4DSiqC48YHBv+GVqku1yOGfD0fdk6/0lZGbRbuiGVWP
+   63r5/nUvd6FMLgpueoH8UgaLfdkjnUSJeOhhv3YaOBZo4m7adb83Tpa7G
+   lfEYZRYD4j3yDKoylKH9GKksATNVzCcNeDSd78BLXHlvXyVtH2rIYdW5r
+   V7xIJkNaGSvlKMF9+nKvGVtRSIK2LFwVGLqshvlOG5z/KI1SM1ErRbR2q
+   tT5PMXQRYJ+SO91KGf1UA/nn9gscfAZJhw0SoT80PRAyGPEepUT8AgZWr
    Q==;
-X-CSE-ConnectionGUID: cy41DMtgQzWT9ehlwIF+7w==
-X-CSE-MsgGUID: AJVPOO4OT6GsjUOkK8ggbg==
+X-CSE-ConnectionGUID: 6cHdMLo7TCuPNE/i2oSWAA==
+X-CSE-MsgGUID: 9a3n9BLESJaLUrTeRH3vhg==
 X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
-   d="scan'208";a="1356650"
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 14:03:07 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [54.240.197.228:17259]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.42.3:2525] with esmtp (Farcaster)
- id 1e95fe30-2115-4c92-bf6e-bd2030ad81f1; Mon, 1 Sep 2025 14:03:07 +0000 (UTC)
-X-Farcaster-Flow-ID: 1e95fe30-2115-4c92-bf6e-bd2030ad81f1
-Received: from EX19D015EUB003.ant.amazon.com (10.252.51.113) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Mon, 1 Sep 2025 14:03:07 +0000
+   d="scan'208";a="1361090"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 14:05:17 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:5495]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.18.194:2525] with esmtp (Farcaster)
+ id b74a8fdc-df20-4ffe-a94c-ca7bfc8d3d2d; Mon, 1 Sep 2025 14:05:17 +0000 (UTC)
+X-Farcaster-Flow-ID: b74a8fdc-df20-4ffe-a94c-ca7bfc8d3d2d
 Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19D015EUB003.ant.amazon.com (10.252.51.113) with Microsoft SMTP Server
+ EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Mon, 1 Sep 2025 14:05:17 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB004.ant.amazon.com (10.252.51.13) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 1 Sep 2025 14:03:06 +0000
+ Mon, 1 Sep 2025 14:05:16 +0000
 Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
  EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
- 15.02.2562.020; Mon, 1 Sep 2025 14:03:06 +0000
+ 15.02.2562.020; Mon, 1 Sep 2025 14:05:16 +0000
 From: "Roy, Patrick" <roypat@amazon.co.uk>
-To: "david@redhat.com" <david@redhat.com>
-CC: "ackerleytng@google.com" <ackerleytng@google.com>, "Manwaring, Derek"
-	<derekmn@amazon.com>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Kalyazin,
- Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
+To: "lkp@intel.com" <lkp@intel.com>
+CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
+	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
 	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>,
 	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Roy, Patrick"
 	<roypat@amazon.co.uk>, "rppt@kernel.org" <rppt@kernel.org>,
 	"seanjc@google.com" <seanjc@google.com>, "tabba@google.com"
@@ -66,11 +67,11 @@ CC: "ackerleytng@google.com" <ackerleytng@google.com>, "Manwaring, Derek"
 	<will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
 Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
 Thread-Topic: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-Thread-Index: AQHcG0kkyhDN15WuC0qLRSRUvcsDSg==
-Date: Mon, 1 Sep 2025 14:03:06 +0000
-Message-ID: <20250901140305.14081-1-roypat@amazon.co.uk>
-References: <7ef927d8-190d-4b22-8ec7-dcb9f5f75dba@redhat.com>
-In-Reply-To: <7ef927d8-190d-4b22-8ec7-dcb9f5f75dba@redhat.com>
+Thread-Index: AQHcG0lxZt1T5YHk+UqqKLGu1cJJ3g==
+Date: Mon, 1 Sep 2025 14:05:16 +0000
+Message-ID: <20250901140515.15769-1-roypat@amazon.co.uk>
+References: <202508311805.yfcdeaFC-lkp@intel.com>
+In-Reply-To: <202508311805.yfcdeaFC-lkp@intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -85,72 +86,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 
 =0A=
-On Thu, 2025-08-28 at 22:00 +0100, David Hildenbrand wrote:=0A=
-> On 28.08.25 11:39, Roy, Patrick wrote:=0A=
->> Add AS_NO_DIRECT_MAP for mappings where direct map entries of folios are=
-=0A=
->> set to not present . Currently, mappings that match this description are=
-=0A=
->> secretmem mappings (memfd_secret()). Later, some guest_memfd=0A=
->> configurations will also fall into this category.=0A=
->>=0A=
->> Reject this new type of mappings in all locations that currently reject=
-=0A=
->> secretmem mappings, on the assumption that if secretmem mappings are=0A=
->> rejected somewhere, it is precisely because of an inability to deal with=
-=0A=
->> folios without direct map entries, and then make memfd_secret() use=0A=
->> AS_NO_DIRECT_MAP on its address_space to drop its special=0A=
->> vma_is_secretmem()/secretmem_mapping() checks.=0A=
->>=0A=
->> This drops a optimization in gup_fast_folio_allowed() where=0A=
->> secretmem_mapping() was only called if CONFIG_SECRETMEM=3Dy. secretmem i=
-s=0A=
->> enabled by default since commit b758fe6df50d ("mm/secretmem: make it on=
-=0A=
->> by default"), so the secretmem check did not actually end up elided in=
-=0A=
->> most cases anymore anyway.=0A=
->>=0A=
->> Use a new flag instead of overloading AS_INACCESSIBLE (which is already=
-=0A=
->> set by guest_memfd) because not all guest_memfd mappings will end up=0A=
->> being direct map removed (e.g. in pKVM setups, parts of guest_memfd that=
-=0A=
->> can be mapped to userspace should also be GUP-able, and generally not=0A=
->> have restrictions on who can access it).=0A=
->>=0A=
->> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>=0A=
->> ---=0A=
-> [...]=0A=
+On Sun, 2025-08-31 at 11:26 +0100, kernel test robot wrote:=0A=
+> Hi Patrick,=0A=
 > =0A=
->> +static inline bool vma_is_no_direct_map(const struct vm_area_struct *vm=
-a)=0A=
->> +{=0A=
->> +     return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_mappi=
-ng);=0A=
->> +}=0A=
->> +=0A=
+> kernel test robot noticed the following build warnings:=0A=
 > =0A=
-> "vma_is_no_direct_map" reads a bit weird.=0A=
+> [auto build test WARNING on a6ad54137af92535cfe32e19e5f3bc1bb7dbd383]=0A=
 > =0A=
-> "vma_has_no_direct_map" or "vma_no_direct_mapping" might be better.=0A=
-=0A=
-I went with "vma_has_no_direct_map" for now, because vma_no_direct_mapping=
-=0A=
-would imply (to me at least) changing "mapping_no_direct_map" to=0A=
-"mapping_no_direct_mapping", which also reads a bit weird imo.=0A=
-=0A=
-> With the comment Mike and Fuad raised, this LGTM.=0A=
+> url:    https://github.com/intel-lab-lkp/linux/commits/Roy-Patrick/filema=
+p-Pass-address_space-mapping-to-free_folio/20250828-174202=0A=
+> base:   a6ad54137af92535cfe32e19e5f3bc1bb7dbd383=0A=
+> patch link:    https://lore.kernel.org/r/20250828093902.2719-4-roypat%40a=
+mazon.co.uk=0A=
+> patch subject: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP=0A=
+> config: loongarch-randconfig-r133-20250831 (https://download.01.org/0day-=
+ci/archive/20250831/202508311805.yfcdeaFC-lkp@intel.com/config)=0A=
+> compiler: loongarch64-linux-gcc (GCC) 14.3.0=0A=
+> reproduce: (https://download.01.org/0day-ci/archive/20250831/202508311805=
+.yfcdeaFC-lkp@intel.com/reproduce)=0A=
 > =0A=
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of=0A=
+> the same patch/commit), kindly add following tags=0A=
+> | Reported-by: kernel test robot <lkp@intel.com>=0A=
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202508311805.yfcdeaFC-lkp=
+@intel.com/=0A=
 > =0A=
-> -- =0A=
-> Cheers=0A=
+> sparse warnings: (new ones prefixed by >>)=0A=
+>>> mm/secretmem.c:155:39: sparse: sparse: symbol 'secretmem_aops' was not =
+declared. Should it be static?=0A=
 > =0A=
-> David / dhildenb=0A=
+> vim +/secretmem_aops +155 mm/secretmem.c=0A=
+> =0A=
+> 1507f51255c9ff Mike Rapoport           2021-07-07  154=0A=
+> 1507f51255c9ff Mike Rapoport           2021-07-07 @155  const struct addr=
+ess_space_operations secretmem_aops =3D {=0A=
+> 46de8b979492e1 Matthew Wilcox (Oracle  2022-02-09  156)         .dirty_fo=
+lio    =3D noop_dirty_folio,=0A=
+> 6612ed24a24273 Matthew Wilcox (Oracle  2022-05-02  157)         .free_fol=
+io     =3D secretmem_free_folio,=0A=
+> 5409548df3876a Matthew Wilcox (Oracle  2022-06-06  158)         .migrate_=
+folio  =3D secretmem_migrate_folio,=0A=
+> 1507f51255c9ff Mike Rapoport           2021-07-07  159  };=0A=
+> 1507f51255c9ff Mike Rapoport           2021-07-07  160=0A=
+> =0A=
+> --=0A=
+> 0-DAY CI Kernel Test Service=0A=
+> https://github.com/intel/lkp-tests/wiki=0A=
 =0A=
-Best,=0A=
-Patrick=0A=
-=0A=
-=0A=
-=0A=
+This is the same thing Mike already pointed out (making `secretmem_aops` st=
+atic)=0A=
