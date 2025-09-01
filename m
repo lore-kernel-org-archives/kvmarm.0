@@ -1,138 +1,137 @@
-Received: from fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.199.210.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551392F361A;
-	Mon,  1 Sep 2025 14:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.199.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49ECB1096F
+	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 14:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756735532; cv=none; b=q40LsVQmeokf1sCnt1jI2c5bPlDs4OMN6vjDRPeO5h4TPU5G1akwSODHmE6RWhmY8wTJBBRRQE83cbUF7hg6tyJPzM+QOt9oqwq8nsN5xnE8Xtt7NATcDXJRnPQuAJYnIuN5B6g5ONpf+Ugmggd2LBz+Nf+2Z1naUsDQuUWMYaA=
+	t=1756736178; cv=none; b=RH0NYymHIbaycTn0MFUrKg5WlUeY6P1PBTEHT0wxOSQElWoJyDg17nh7nE3VZEOhDUy90wBf0GRqC5eMn1osFLXLv3rkqxO72p+Nixcyfhv9MTXsqYAgnhsiLfXbUw99hd7zIcBjTQVv7ySVIahW91CYKMEvE4RKcy2G3T3zpXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756735532; c=relaxed/simple;
-	bh=ItZqN5Op7g9rIJ5RShixnsRk5gMblgw67xQPu8prjug=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rcomB+KurN9dEhxgPcMGWVHVI4TcO0y5Iov0/HfzO3a2dkZsu3+z8KkMO8LUsvVcv6CmadWDV/aYXgjICaivPaJDP0D4aS/tYgiW/DetXrXqaTAD4dMUyLxJMpKw6hFcgJ0uVIhr5m3LWRNEQEEEh3/reb07rfKsx34iX+LfKZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=IeHKIisd; arc=none smtp.client-ip=18.199.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1756736178; c=relaxed/simple;
+	bh=J6adxaMTbKmeAjhW+nOvDYWFj4xMGaf6efDHsjIWpX8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oiqeh5hPuvALmgzpvOf2a50UbP65CZ9IOX3tPU0Ve+jATvty6z8/a4D1zWG4Td11vBhpvfhigyyLRKgA/I4+Z3ix1m58SDjAERxFFR5qUeKY9/432OJjorj+8W6VUgORcn7nb0W5R394BmAIu0wBb/V7vhU8HVznQQ/oLjrHi8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TXFi6YxC; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="IeHKIisd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TXFi6YxC"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-248f2da72edso9184795ad.2
+        for <kvmarm@lists.linux.dev>; Mon, 01 Sep 2025 07:16:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1756735527; x=1788271527;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Kse27neqs7TZ5sTIdJhbs0CXmugDWDcv4gD+1oQQ4ac=;
-  b=IeHKIisdRCXoZ5+V441l9oXqa7nrbEkpfLyaC0umnYkFL/LbuVXeiFnj
-   BhgsLae20Tlq1w4DSiqC48YHBv+GVqku1yOGfD0fdk6/0lZGbRbuiGVWP
-   63r5/nUvd6FMLgpueoH8UgaLfdkjnUSJeOhhv3YaOBZo4m7adb83Tpa7G
-   lfEYZRYD4j3yDKoylKH9GKksATNVzCcNeDSd78BLXHlvXyVtH2rIYdW5r
-   V7xIJkNaGSvlKMF9+nKvGVtRSIK2LFwVGLqshvlOG5z/KI1SM1ErRbR2q
-   tT5PMXQRYJ+SO91KGf1UA/nn9gscfAZJhw0SoT80PRAyGPEepUT8AgZWr
-   Q==;
-X-CSE-ConnectionGUID: 6cHdMLo7TCuPNE/i2oSWAA==
-X-CSE-MsgGUID: 9a3n9BLESJaLUrTeRH3vhg==
-X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
-   d="scan'208";a="1361090"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 14:05:17 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:5495]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.18.194:2525] with esmtp (Farcaster)
- id b74a8fdc-df20-4ffe-a94c-ca7bfc8d3d2d; Mon, 1 Sep 2025 14:05:17 +0000 (UTC)
-X-Farcaster-Flow-ID: b74a8fdc-df20-4ffe-a94c-ca7bfc8d3d2d
-Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Mon, 1 Sep 2025 14:05:17 +0000
-Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19D015EUB004.ant.amazon.com (10.252.51.13) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 1 Sep 2025 14:05:16 +0000
-Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
- EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
- 15.02.2562.020; Mon, 1 Sep 2025 14:05:16 +0000
-From: "Roy, Patrick" <roypat@amazon.co.uk>
-To: "lkp@intel.com" <lkp@intel.com>
-CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
-	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
-	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Roy, Patrick"
-	<roypat@amazon.co.uk>, "rppt@kernel.org" <rppt@kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>, "tabba@google.com"
-	<tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "will@kernel.org"
-	<will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
-Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-Thread-Topic: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-Thread-Index: AQHcG0lxZt1T5YHk+UqqKLGu1cJJ3g==
-Date: Mon, 1 Sep 2025 14:05:16 +0000
-Message-ID: <20250901140515.15769-1-roypat@amazon.co.uk>
-References: <202508311805.yfcdeaFC-lkp@intel.com>
-In-Reply-To: <202508311805.yfcdeaFC-lkp@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20230601; t=1756736176; x=1757340976; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=olATEhuJ7Rj0q51m0msTdMRcBctLQkkJ/hDbLCgUHPE=;
+        b=TXFi6YxCF89axylGi/LpH675mxSe8HoXm4V7V3YWr/Lc+BR5UqUDIyzAhVOUYZyoq6
+         jyFyl/Xedve5Z+E1Md/MLqy33+7SCoT0NHczFjpHmsAyoK9wLGc9VUvNm6bFLhS2qDP3
+         o3tP+si1b6IooVNTfaL1G5oDKpLL+PVZ915O6qtwrCisqS40X3CT5I++mCp034skaiMR
+         YPwZjmEIWtgTd5zTQ95JT98AO5+eWtJ1emmg9HOxdFRRogK/6bu6hoV75KvUlq0JG3NK
+         W4cLqpryEwHRhj7LTLTeR5Z+XIZW65UN2RVn4uqP+D68bg46zZ48F6Qy3OlPFjUspt0Z
+         0JvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756736176; x=1757340976;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=olATEhuJ7Rj0q51m0msTdMRcBctLQkkJ/hDbLCgUHPE=;
+        b=LjgJCFRqLkDX9jgHMlBatl4vUVlO8x8wgQQrJAuAOaAA3rRbHecoxGCQ2nCe4OKk/S
+         kvy7WvoN79fNQoXO+hjYqIot+YBDXRwyo+3bG7OoYmiXYm5r5glIrSirWPaKNc7XYsUr
+         hzrHigJmtJV/aJH1CyFUMMAbVZvHsWMIqQhxVXmOcIbWA3giK4xK/e+JlogaJKi1YOt0
+         jyW3k3/3z9CHcj2pNjszY2gepLWK4yR1pK5mzgy624J3XoJcrntsdiDtaWc/u5BCjkY3
+         0flCPVJo0NqV3rMkPpu5ReCKIGWkI/qr+wtDoib/rzcIZYuUzwi3+gBgG0vaDZeU9spV
+         mU/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVgGQ4kl5AckCPzppqr8x68S5l/G0qONtoJGx6AkFsyCZr+FELxN/S7JVRSUNyRkaVasF+UlyA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YysWtJl7q/1c+ZCyH72HFAShm1W/leUxg0DDudfsiAr51AuvHWy
+	/RScVNNuYC4pMuCZ5eymuNJIpGbr1xQbbxyVy1GqPGprrsa9S/D6aKI0
+X-Gm-Gg: ASbGncswuvohKgk9833Sb6OB78FM9yVXlvYARbjf63Yng2EWa+eMBNkpdP+q+KbZ4yM
+	a29QuRiUaxP+ZrJjErcqEFsf1BPFvBzQZ3UDra/eOmuVy+cScIV7LtC44ltSxWtFLSa6UY7OL71
+	vRFfBEZ6P+xsDuRFiYEn0PinkBMBVRg8RfOezo+SGH4EmOcB4ArN9qMz2vUbY6yixm22W6o7mFV
+	7qHARPyyv1vr9OOPO8TtsK+9peuZcBpJan/LZhKq60yTTIKeEZMmeMwlPtPaA1e4uMYdGCvr1oM
+	VSBfO5r2/IrrBrSoEDKaUHz5r9gheKXJYjgts93DgWF/fYC7m8hkiiC3PDSvoztcmWN4cWAptdi
+	+8kiQxLitn8rjrHcFxPbRwt4=
+X-Google-Smtp-Source: AGHT+IHf7G+mUAagKO2yJzD5uM1O7o4u98GK3mA53rtvl6kubMMUObA8Y6uYeXML8+HaH3iMeRvPFQ==
+X-Received: by 2002:a17:902:e74f:b0:246:ed8f:c63e with SMTP id d9443c01a7336-2491be7d2a2mr85172585ad.0.1756736176486;
+        Mon, 01 Sep 2025 07:16:16 -0700 (PDT)
+Received: from localhost ([106.101.139.14])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24905da1b35sm106729755ad.84.2025.09.01.07.16.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Sep 2025 07:16:16 -0700 (PDT)
+From: Gyujeong Jin <wlsrbwjd7232@gmail.com>
+To: maz@kernel.org,
+	oliver.upton@linux.dev
+Cc: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wlsrbwjd7232@gmail.com,
+	gyutrange <wlsrbwjd643@naver.com>,
+	stable@vger.kernel.org,
+	DongHa Lee <gap-dev@example.com>,
+	Daehyeon Ko <4ncient@example.com>,
+	Geonha Lee <leegn4a@example.com>,
+	Hyungyu Oh <dqpc_lover@example.com>,
+	Jaewon Yang <r4mbb1@example.com>
+Subject: [PATCH] KVM: arm64: nested: Fix VA sign extension in VNCR/TLBI paths
+Date: Mon,  1 Sep 2025 23:15:51 +0900
+Message-ID: <20250901141551.57981-1-wlsrbwjd7232@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-=0A=
-On Sun, 2025-08-31 at 11:26 +0100, kernel test robot wrote:=0A=
-> Hi Patrick,=0A=
-> =0A=
-> kernel test robot noticed the following build warnings:=0A=
-> =0A=
-> [auto build test WARNING on a6ad54137af92535cfe32e19e5f3bc1bb7dbd383]=0A=
-> =0A=
-> url:    https://github.com/intel-lab-lkp/linux/commits/Roy-Patrick/filema=
-p-Pass-address_space-mapping-to-free_folio/20250828-174202=0A=
-> base:   a6ad54137af92535cfe32e19e5f3bc1bb7dbd383=0A=
-> patch link:    https://lore.kernel.org/r/20250828093902.2719-4-roypat%40a=
-mazon.co.uk=0A=
-> patch subject: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP=0A=
-> config: loongarch-randconfig-r133-20250831 (https://download.01.org/0day-=
-ci/archive/20250831/202508311805.yfcdeaFC-lkp@intel.com/config)=0A=
-> compiler: loongarch64-linux-gcc (GCC) 14.3.0=0A=
-> reproduce: (https://download.01.org/0day-ci/archive/20250831/202508311805=
-.yfcdeaFC-lkp@intel.com/reproduce)=0A=
-> =0A=
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of=0A=
-> the same patch/commit), kindly add following tags=0A=
-> | Reported-by: kernel test robot <lkp@intel.com>=0A=
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202508311805.yfcdeaFC-lkp=
-@intel.com/=0A=
-> =0A=
-> sparse warnings: (new ones prefixed by >>)=0A=
->>> mm/secretmem.c:155:39: sparse: sparse: symbol 'secretmem_aops' was not =
-declared. Should it be static?=0A=
-> =0A=
-> vim +/secretmem_aops +155 mm/secretmem.c=0A=
-> =0A=
-> 1507f51255c9ff Mike Rapoport           2021-07-07  154=0A=
-> 1507f51255c9ff Mike Rapoport           2021-07-07 @155  const struct addr=
-ess_space_operations secretmem_aops =3D {=0A=
-> 46de8b979492e1 Matthew Wilcox (Oracle  2022-02-09  156)         .dirty_fo=
-lio    =3D noop_dirty_folio,=0A=
-> 6612ed24a24273 Matthew Wilcox (Oracle  2022-05-02  157)         .free_fol=
-io     =3D secretmem_free_folio,=0A=
-> 5409548df3876a Matthew Wilcox (Oracle  2022-06-06  158)         .migrate_=
-folio  =3D secretmem_migrate_folio,=0A=
-> 1507f51255c9ff Mike Rapoport           2021-07-07  159  };=0A=
-> 1507f51255c9ff Mike Rapoport           2021-07-07  160=0A=
-> =0A=
-> --=0A=
-> 0-DAY CI Kernel Test Service=0A=
-> https://github.com/intel/lkp-tests/wiki=0A=
-=0A=
-This is the same thing Mike already pointed out (making `secretmem_aops` st=
-atic)=0A=
+From: gyutrange <wlsrbwjd643@naver.com>
+
+VNCR/TLBI VA reconstruction currently uses bit 48 as the sign bit,
+but for 48-bit virtual addresses the correct sign bit is bit 47.
+Using 48 can mis-canonicalize addresses in the negative half and may
+cause missed invalidations.
+
+Although VNCR_EL2 encodes other architectural fields (RESS, BADDR;
+see Arm ARM D24.2.206), sign_extend64() interprets its second argument
+as the index of the sign bit. Passing 48 prevents propagation of the
+canonical sign bit for 48-bit VAs.
+
+Impact:
+- Incorrect canonicalization of VAs with bit47=1
+- Potential stale VNCR pseudo-TLB entries after TLBI or MMU notifier
+- Possible incorrect translation/permissions or DoS when combined
+  with other issues
+
+Fixes: 667304740537 ("KVM: arm64: Mask out non-VA bits from TLBI VA* on VNCR invalidation")
+Cc: stable@vger.kernel.org
+Reported-by: DongHa Lee <gap-dev@example.com>
+Reported-by: Gyujeong Jin <wlsrbwjd7232@gmail.com>
+Reported-by: Daehyeon Ko <4ncient@example.com>
+Reported-by: Geonha Lee <leegn4a@example.com>
+Reported-by: Hyungyu Oh <dqpc_lover@example.com>
+Reported-by: Jaewon Yang <r4mbb1@example.com>
+Signed-off-by: Gyujeong Jin <wlsrbwjd7232@gmail.com>
+---
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 77db81bae86f..eaa6dd9da086 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1169,7 +1169,7 @@ int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu)
+ 
+ static u64 read_vncr_el2(struct kvm_vcpu *vcpu)
+ {
+-	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 48);
++	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 47);
+ }
+ 
+ static int kvm_translate_vncr(struct kvm_vcpu *vcpu)
+-- 
+2.43.0
+
