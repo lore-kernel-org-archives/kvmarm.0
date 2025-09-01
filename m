@@ -1,122 +1,244 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810DA311963;
-	Mon,  1 Sep 2025 11:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505111E04AD
+	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 11:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756724785; cv=none; b=Aa2B+/tQBZcnqM4vC8UCx4FWTe0J5WHMVxkRs5zMsXKgGo7ke2wZoo6Iq+B4iCLy1QYt1YdEckE+7GNfY8AaAKfnrzEtMxfm3bHIRBs9MF3aSGAqWL1NopZyQkO7JRLxPKl2uAtb061OEl2q+sK5yWsqJZYRTwDkMOxfDqF1AKM=
+	t=1756725451; cv=none; b=k71ZbO//YTkPicc68hTzDSPBjJRxWZnn22UXILys7kD7nXcv/j6bdeQdsbRAtbC6rz1oslfr1J+geflUm54QeLksDqlwMYOlruzt+2g7h/T1pJjaabD0f9/7b1Lq2nPwPicQ3YF+nUg1rGd7l2j04b4yi6H18Tqgp6s6BgoZerQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756724785; c=relaxed/simple;
-	bh=BLKwIniZaRvZZv+sqfSQfIekcdvuVVsnll7sWAynepU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eJNKqR7PPypWeRsVk7TFH8NfDeaAaqmWoqOiPL+SiHdJKXTJaiwJl2bkPQGcwPzqBfSXeuRgTFILomTzTnfxLKnxPESlW02fK2eFS1i+lv7tFS5j/dzF6GrfNUVC+m0l/2sCqxC8JWPgITYMcJjX4gzTHz4KvD2mfBlcJwlT7Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yl9J+wxk; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yl9J+wxk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30E0CC4CEF0;
-	Mon,  1 Sep 2025 11:06:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756724785;
-	bh=BLKwIniZaRvZZv+sqfSQfIekcdvuVVsnll7sWAynepU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Yl9J+wxkNvzhr4pStX6mk8mohCv/DsVXKf2ZTclhPx46O7qw00o1XY4dUZO/BVnD5
-	 WiiqQvNPcBOv0CJ8Ec1qcnqArCRXALjRnoA4yFoYMZk5Fa87RWM8ANkcPZVsdIzAe1
-	 df9YzIgl5mD97fm4MzUTpDp5ae70dIXsF2sx7QjisTb59KMpWAN2B5vtLqodQ8ELFl
-	 3BAVMIG2rYzLvIL1avpZNOnkdJKnWhfP8v70AAGk0xl77PffAYT4E19+QBkWIJdZhZ
-	 xE9CLN9/rZRybAhWJuivVVyAIN9UE/iAQLvoGJMOlixQ29uE8clvZtTD2nGASS5HDs
-	 V08z73e7KofyQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1ut2Mg-00000002Dh6-35F5;
-	Mon, 01 Sep 2025 11:06:22 +0000
-Date: Mon, 01 Sep 2025 12:06:22 +0100
-Message-ID: <864itme8k1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: nv: Allow shadow stage 2 read fault
-In-Reply-To: <djypsyratk63ovzv3flzb2tmunqtcoryzserwhsaaq5nuogsrx@u3uuwynnafbj>
-References: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
-	<87a53rk83s.wl-maz@kernel.org>
-	<djypsyratk63ovzv3flzb2tmunqtcoryzserwhsaaq5nuogsrx@u3uuwynnafbj>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1756725451; c=relaxed/simple;
+	bh=F7iWN5i0Z4ac96KM5nThFDAx/K/uVkvFV0bZ2bDEw08=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZYYrM+uvk5k6/jqg1udMAZwBnWkHQnITaFbbewlRpImQSTW9EGTap4oGwZN7roT5CL2dujEw4UtPnlIjg5UoQE7zEyjraHeJY7k0N8OYmEPgH7oKcjEbJfSFbjnVF92xAWQCTnNmIaNHsmq1pREorG6QgXK/CVkCPXLgQ5YJUu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 523881A00;
+	Mon,  1 Sep 2025 04:17:20 -0700 (PDT)
+Received: from [10.163.70.120] (unknown [10.163.70.120])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ECE1A3F6A8;
+	Mon,  1 Sep 2025 04:17:24 -0700 (PDT)
+Message-ID: <8faf8d1d-0987-4ce0-b626-01de8f214baf@arm.com>
+Date: Mon, 1 Sep 2025 16:47:21 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3 2/2] arm64/sysreg: Replace TCR_EL1 field macros
+To: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Mark Brown <broonie@kernel.org>, Ryan Roberts <ryan.roberts@arm.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250901072037.743380-1-anshuman.khandual@arm.com>
+ <20250901072037.743380-3-anshuman.khandual@arm.com>
+ <07171e19-71a4-4672-adfd-03feb17433e9@arm.com>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <07171e19-71a4-4672-adfd-03feb17433e9@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Aug 2025 14:49:27 +0100,
-Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
+
+
+On 01/09/25 4:07 PM, Ben Horgan wrote:
+> Hi Anshuman,
 > 
-> Hi Marc,
+> On 9/1/25 08:20, Anshuman Khandual wrote:
+>> This just replaces all used TCR_EL1 field macros with tools sysreg variant
+>> based fields and subsequently drops them from the header (pgtable-hwdef.h)
+>> and moves them into KVM header (asm/kvm_arm.h) for continued usage in KVM.
+>>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Mark Brown <broonie@kernel.org>
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>> Changes in V3:
+>>
+>> - KVM TCR_XXX flags are expressed via TCR_EL1_XXX flags per Marc
+>>
+>>  arch/arm64/include/asm/assembler.h     |  6 +-
+>>  arch/arm64/include/asm/cputype.h       |  2 +-
+>>  arch/arm64/include/asm/kvm_arm.h       | 78 ++++++++++++++++++++
+>>  arch/arm64/include/asm/mmu_context.h   |  4 +-
+>>  arch/arm64/include/asm/pgtable-hwdef.h | 98 +-------------------------
+>>  arch/arm64/include/asm/pgtable-prot.h  |  2 +-
+>>  arch/arm64/kernel/cpufeature.c         |  4 +-
+>>  arch/arm64/kernel/pi/map_kernel.c      |  8 +--
+>>  arch/arm64/kernel/vmcore_info.c        |  2 +-
+>>  arch/arm64/mm/proc.S                   | 36 ++++++----
+>>  tools/arch/arm64/include/asm/cputype.h |  2 +-
+>>  11 files changed, 118 insertions(+), 124 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+>> index 23be85d93348..1392860a3c97 100644
+>> --- a/arch/arm64/include/asm/assembler.h
+>> +++ b/arch/arm64/include/asm/assembler.h
+>> @@ -325,14 +325,14 @@ alternative_cb_end
+>>   * tcr_set_t0sz - update TCR.T0SZ so that we can load the ID map
+>>   */
+>>  	.macro	tcr_set_t0sz, valreg, t0sz
+>> -	bfi	\valreg, \t0sz, #TCR_T0SZ_OFFSET, #TCR_TxSZ_WIDTH
+>> +	bfi	\valreg, \t0sz, #TCR_EL1_T0SZ_SHIFT, #TCR_EL1_T0SZ_WIDTH
+>>  	.endm
+>>  
+>>  /*
+>>   * tcr_set_t1sz - update TCR.T1SZ
+>>   */
+>>  	.macro	tcr_set_t1sz, valreg, t1sz
+>> -	bfi	\valreg, \t1sz, #TCR_T1SZ_OFFSET, #TCR_TxSZ_WIDTH
+>> +	bfi	\valreg, \t1sz, #TCR_EL1_T1SZ_SHIFT, #TCR_EL1_T1SZ_WIDTH
+>>  	.endm
+>>  
+>>  /*
+>> @@ -589,7 +589,7 @@ alternative_endif
+>>  	.macro	offset_ttbr1, ttbr, tmp
+>>  #if defined(CONFIG_ARM64_VA_BITS_52) && !defined(CONFIG_ARM64_LPA2)
+>>  	mrs	\tmp, tcr_el1
+>> -	and	\tmp, \tmp, #TCR_T1SZ_MASK
+>> +	and	\tmp, \tmp, #TCR_EL1_T1SZ_MASK
+>>  	cmp	\tmp, #TCR_T1SZ(VA_BITS_MIN)
+>>  	orr	\tmp, \ttbr, #TTBR1_BADDR_4852_OFFSET
+>>  	csel	\ttbr, \tmp, \ttbr, eq
+>> diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+>> index 661735616787..5d80710ca85f 100644
+>> --- a/arch/arm64/include/asm/cputype.h
+>> +++ b/arch/arm64/include/asm/cputype.h
+>> @@ -243,7 +243,7 @@
+>>  /* Fujitsu Erratum 010001 affects A64FX 1.0 and 1.1, (v0r0 and v1r0) */
+>>  #define MIDR_FUJITSU_ERRATUM_010001		MIDR_FUJITSU_A64FX
+>>  #define MIDR_FUJITSU_ERRATUM_010001_MASK	(~MIDR_CPU_VAR_REV(1, 0))
+>> -#define TCR_CLEAR_FUJITSU_ERRATUM_010001	(TCR_NFD1 | TCR_NFD0)
+>> +#define TCR_CLEAR_FUJITSU_ERRATUM_010001	(TCR_EL1_NFD1 | TCR_EL1_NFD0)
+>>  
+>>  #ifndef __ASSEMBLY__
+>>  
+>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>> index 1da290aeedce..4e0ca6140857 100644
+>> --- a/arch/arm64/include/asm/kvm_arm.h
+>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>> @@ -107,6 +107,84 @@
+>>  
+>>  #define MPAMHCR_HOST_FLAGS	0
+>>  
+>> +#define TCR_T0SZ_MASK		TCR_EL1_T0SZ_MASK
+>> +#define TCR_T1SZ_MASK		TCR_EL1_T1SZ_MASK
+>> +
+>> +#define TCR_EPD0_MASK		TCR_EL1_EPD0_MASK
+>> +#define TCR_EPD1_MASK		TCR_EL1_EPD1_MASK
+>> +
+>> +#define TCR_IRGN0_MASK		TCR_EL1_IRGN0_MASK
+>> +#define TCR_IRGN0_NC		(TCR_EL1_IRGN0_NC << TCR_EL1_IRGN0_SHIFT)
+>> +#define TCR_IRGN0_WBWA		(TCR_EL1_IRGN0_WBWA << TCR_EL1_IRGN0_SHIFT)
+>> +#define TCR_IRGN0_WT		(TCR_EL1_IRGN0_WT << TCR_EL1_IRGN0_SHIFT)
+>> +#define TCR_IRGN0_WBnWA		(TCR_EL1_IRGN0_WBnWA << TCR_EL1_IRGN0_SHIFT)
+>> +
+>> +#define TCR_IRGN1_MASK		TCR_EL1_IRGN1_MASK
+>> +#define TCR_IRGN1_NC		(TCR_EL1_IRGN1_NC << TCR_EL1_IRGN1_SHIFT)
+>> +#define TCR_IRGN1_WBWA		(TCR_EL1_IRGN1_WBWA << TCR_EL1_IRGN1_SHIFT)
+>> +#define TCR_IRGN1_WT		(TCR_EL1_IRGN1_WT << TCR_EL1_IRGN1_SHIFT)
+>> +#define TCR_IRGN1_WBnWA		(TCR_EL1_IRGN1_WBnWA << TCR_EL1_IRGN1_SHIFT)
+>> +
+>> +#define TCR_IRGN_NC		(TCR_EL1_IRGN0_NC | TCR_EL1_IRGN1_NC)
+>> +#define TCR_IRGN_WT		(TCR_EL1_IRGN0_WT | TCR_EL1_IRGN1_WT)
+>> +#define TCR_IRGN_WBnWA		(TCR_EL1_IRGN0_WBnWA | TCR_EL1_IRGN1_WBnWA)
+>> +#define TCR_IRGN_MASK		(TCR_EL1_IRGN0_MASK | TCR_EL1_IRGN1_MASK)
+>> +
+>> +#define TCR_ORGN0_MASK		TCR_EL1_ORGN0_MASK
+>> +#define TCR_ORGN0_NC		(TCR_EL1_ORGN0_NC << TCR_EL1_ORGN0_SHIFT)
+>> +#define TCR_ORGN0_WBWA		(TCR_EL1_ORGN0_WBWA << TCR_EL1_ORGN0_SHIFT)
+>> +#define TCR_ORGN0_WT		(TCR_EL1_ORGN0_WT << TCR_EL1_ORGN0_SHIFT)
+>> +#define TCR_ORGN0_WBnWA		(TCR_EL1_ORGN0_WBnWA << TCR_EL1_ORGN0_SHIFT)
+>> +
+>> +#define TCR_ORGN1_MASK		TCR_EL1_ORGN1_MASK
+>> +#define TCR_ORGN1_NC		(TCR_EL1_ORGN1_NC << TCR_EL1_ORGN1_SHIFT)
+>> +#define TCR_ORGN1_WBWA		(TCR_EL1_ORGN1_WBWA << TCR_EL1_ORGN1_SHIFT)
+>> +#define TCR_ORGN1_WT		(TCR_EL1_ORGN1_WT << TCR_EL1_ORGN1_SHIFT)
+>> +#define TCR_ORGN1_WBnWA		(TCR_EL1_ORGN1_WBnWA << TCR_EL1_ORGN1_SHIFT)
+>> +
+>> +#define TCR_ORGN_NC		(TCR_EL1_ORGN0_NC | TCR_EL1_ORGN1_NC)
+>> +#define TCR_ORGN_WT		(TCR_EL1_ORGN0_WT | TCR_EL1_ORGN1_WT)
+>> +#define TCR_ORGN_WBnWA		(TCR_EL1_ORGN0_WBnWA | TCR_EL1_ORGN1_WBnWA)
+> Shouldn't these 3 be defined as per the code you remove below?
 > 
-> On Fri, Aug 22, 2025 at 10:40:07AM +0100, Marc Zyngier wrote:
-> >
-> > This would imply taking the guest's S2 permission at face value, and
-> > only drop W permission when the memslot is RO -- you'd then need to
-> > keep track of the original W bit somewhere. And that's where things
-> > become much harder, because KVM can decide to remap arbitrary ranges
-> > of IPA space as RO, which implies we should track the W bit at all
-> > times, most likely as one of the SW bits in the PTE.
+> #define TCR_ORGN_NC		(TCR_ORGN0_NC | TCR_ORGN1_NC)
+> #define TCR_ORGN_WT		(TCR_ORGN0_WT | TCR_ORGN1_WT)
+> #define TCR_ORGN_WBnWA		(TCR_ORGN0_WBnWA | TCR_ORGN1_WBnWA)
 > 
-> But sorry, I struggle to understand this paragraph after reading it many
-> times, probably my experience with the code isn't enough for me to make
-> the connection. Why are we talking about the W bit suddenly?
-> If you don't mind, can you reword what's discussed here?
-> I only very vaguely get that there will be 2 W bits, one from what L1 set,
-> and one from the L0 memslot, if I didn't completely miss the point..
+> However, it does seem surprising that whether or not EL1 is in the name
+> changes whether there is a shift or not.
 
-Sorry, I quickly drifted into something related.
+I am afraid you are right.
 
-My take on this category of problems is that we're better off always
-using the permissions that the guest gives us. This is the scheme that
-we have adopted with VNCR. It means we wouldn't have to rewalk the
-guest S2 on permission fault, since we'd be guaranteed to have the
-latest update.
+Originally TCR_ORGN_NC actually ORed in place shifted values
+for both ORGN0 and ORGN1 register fields.
 
-However, S2 management implies that a S2 mapping can be made read-only
-at any point (dirty log, for example). Which means that on a
-permission fault, you'd need to find out whether the page is R/O
-because the guest said so, or because the host decided to make it so.
+TCR_ORGN0_NC (UL(0) << TCR_ORGN0_SHIFT)
+TCR_ORGN1_NC (UL(0) << TCR_ORGN1_SHIFT)
+TCR_ORGN_NC (TCR_ORGN0_NC | TCR_ORGN1_NC)
 
-Which means that somehow you need to work out why you have taken a
-permission fault. You can either
+Hence after this change it should still do the same.
 
-- rewalk the guest S2 as if you missed in the TLB
-- or keep a copy of the W bit in the shadow SW
+TCR_ORGN0_NC            (TCR_EL1_ORGN0_NC << TCR_EL1_ORGN0_SHIFT)
+TCR_ORGN1_WBWA          (TCR_EL1_ORGN1_WBWA << TCR_EL1_ORGN1_SHIFT)
 
-> > We'll need exactly that if we ever want to implement the
-> > Hardware-managed Dirty Bit, but I have the feeling we need an actual
-> > design for this, and not a quick hack. Your approach is therefore the
-> > correct one for the time being.
+As TCR_ORGN0_NC and TCR_ORGN1_WBWA again contain the shifted
+in place register field values, hence these macro definitions
+should not change at all.
 
-And that's why I brought this up: to support HD in the guest S2, we
-need to mark the full shadow S2 as R/O, and update the guest S2 on the
-back of that fault.
+It should still be
 
-Thanks,
+TCR_ORGN_NC		(TCR_ORGN0_NC | TCR_ORGN1_NC)
 
-	M.
+Not as proposed in this patch
 
--- 
-Without deviation from the norm, progress is not possible.
+TCR_ORGN_NC		(TCR_EL1_ORGN0_NC | TCR_EL1_ORGN1_NC)
+
+This problem exists for the above TCR_IRGN_XXX flags as well.
+Will do the following changes.
+
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -125,10 +125,10 @@
+ #define TCR_IRGN1_WT           (TCR_EL1_IRGN1_WT << TCR_EL1_IRGN1_SHIFT)
+ #define TCR_IRGN1_WBnWA                (TCR_EL1_IRGN1_WBnWA << TCR_EL1_IRGN1_SHIFT)
+
+-#define TCR_IRGN_NC            (TCR_EL1_IRGN0_NC | TCR_EL1_IRGN1_NC)
+-#define TCR_IRGN_WT            (TCR_EL1_IRGN0_WT | TCR_EL1_IRGN1_WT)
+-#define TCR_IRGN_WBnWA         (TCR_EL1_IRGN0_WBnWA | TCR_EL1_IRGN1_WBnWA)
+-#define TCR_IRGN_MASK          (TCR_EL1_IRGN0_MASK | TCR_EL1_IRGN1_MASK)
++#define TCR_IRGN_NC            (TCR_IRGN0_NC | TCR_IRGN1_NC)
++#define TCR_IRGN_WT            (TCR_IRGN0_WT | TCR_IRGN1_WT)
++#define TCR_IRGN_WBnWA         (TCR_IRGN0_WBnWA | TCR_IRGN1_WBnWA)
++#define TCR_IRGN_MASK          (TCR_IRGN0_MASK | TCR_IRGN1_MASK)
+
+ #define TCR_ORGN0_MASK         TCR_EL1_ORGN0_MASK
+ #define TCR_ORGN0_NC           (TCR_EL1_ORGN0_NC << TCR_EL1_ORGN0_SHIFT)
+@@ -142,10 +142,10 @@
+ #define TCR_ORGN1_WT           (TCR_EL1_ORGN1_WT << TCR_EL1_ORGN1_SHIFT)
+ #define TCR_ORGN1_WBnWA                (TCR_EL1_ORGN1_WBnWA << TCR_EL1_ORGN1_SHIFT)
+
+-#define TCR_ORGN_NC            (TCR_EL1_ORGN0_NC | TCR_EL1_ORGN1_NC)
+-#define TCR_ORGN_WT            (TCR_EL1_ORGN0_WT | TCR_EL1_ORGN1_WT)
+-#define TCR_ORGN_WBnWA         (TCR_EL1_ORGN0_WBnWA | TCR_EL1_ORGN1_WBnWA)
+-#define TCR_ORGN_MASK          (TCR_EL1_ORGN0_MASK | TCR_EL1_ORGN1_MASK)
++#define TCR_ORGN_NC            (TCR_ORGN0_NC | TCR_ORGN1_NC)
++#define TCR_ORGN_WT            (TCR_ORGN0_WT | TCR_ORGN1_WT)
++#define TCR_ORGN_WBnWA         (TCR_ORGN0_WBnWA | TCR_ORGN1_WBnWA)
++#define TCR_ORGN_MASK          (TCR_ORGN0_MASK | TCR_ORGN1_MASK)
+
+ #define TCR_SH0_MASK           TCR_EL1_SH0_MASK
+ #define TCR_SH0_INNER          (TCR_EL1_SH0_INNER << TCR_EL1_SH0_SHIFT) 
+
+
+
+
+
