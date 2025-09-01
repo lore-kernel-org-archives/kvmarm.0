@@ -1,54 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3471CDFCA;
-	Mon,  1 Sep 2025 13:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEFE12CD8B;
+	Mon,  1 Sep 2025 13:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756733300; cv=none; b=ubolxBCfzVBKsbHL/aZyJf/eYD5chkPib+lrlkIp6uDC7aaxsC/Zu5L/QQP42IAdMkmV3zH9/9BXxGWE4TYy857+U/ntRm9+W4pvbrIeCNFLLv+fVMwLPHgx/1pDVgemxlowZKFPbx9rSETgkNVkOcEIqWcY97xgzrVLiaD9aeY=
+	t=1756733438; cv=none; b=spCwZmk/dMAbuzJ/KvwKKba9tsjEfEfchSEo2bbcZVXhjN8Ud301IkfyZFqUuRYYzQN8//K39AxX/bGrUj484RyRL5cvFtGXDqxBO0cNoiMjjAquRWv8DQYhNt3nhGZFsU5va+qt4cHlcvS2IXfwR/Euea5v4y4I5HHwtwJLHQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756733300; c=relaxed/simple;
-	bh=Zij+aiPmhHbsz6ba8gUa8QWGp81pVIPzIJsYgiGdtnI=;
+	s=arc-20240116; t=1756733438; c=relaxed/simple;
+	bh=e2lNX30J79IdJmjUmjr3EtEfeJFIPem/dnVmubqrERk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o+NleZfzVn/usWRfaOzIKB5DZiJnv7KC5QvLtT5YRhl1vix/ymU76kWThG9KQJcNR9rDESpZCpfG0nIINkp/f0jYrWAaQq6op2JP9z0m11zlhFU4YAMKxvj2VF+JMsjC4f0IkNvR3Qei+0OhAVaVPQD9t/IyPkfOAGBBo1u/tCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ca6rdAH3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=TCjuDeRcZNW4T7tXOPt3WoQUtmPsOBS0vPWlF4sVCxtbdDJtpe+ARhWoO06sAZJOloh48DptF2Q6GBxw6LhkH70JvWToawnOupCMtCPXaPnjR6MUrOq1xFdfOS6oG80vZ7qMsYDBRM4YDn1R4rqEVM9cvIrHdieoOPLE83LlXn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GBdH+kpT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ca6rdAH3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD465C4CEF0;
-	Mon,  1 Sep 2025 13:28:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GBdH+kpT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFF45C4CEF0;
+	Mon,  1 Sep 2025 13:30:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756733298;
-	bh=Zij+aiPmhHbsz6ba8gUa8QWGp81pVIPzIJsYgiGdtnI=;
+	s=k20201202; t=1756733438;
+	bh=e2lNX30J79IdJmjUmjr3EtEfeJFIPem/dnVmubqrERk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ca6rdAH3pva2fovuGbIWfgXcx484jiVI7RZ6LdQTXP3H/8arYoZnXfvhfyD3AwCX2
-	 byss9qUQQXj2N0KlPj724lbgQdUFYASUmt7ZtyTLmrp7GdvFB30FTxIFF5HbU5BOTZ
-	 lf6Rmk0QyBDFb6nLiOmYxoBbpjE8YX092ZJOFU5V49SHy8zZH/CJf7WrhB/DdV2Zts
-	 qHb7Gz7B9S+zJeflg+ZjaGPe9ihXFcsiH1xDCk1gz5EBpJhiXyyfvLtFZ4x/ZAqerW
-	 lD+Anfs4T61RDNgDj646O1IQUHKx63m85easozpSlGHJiKh27LrVGZwnmzRAKYJWNw
-	 Xn/lVC3odT8dQ==
+	b=GBdH+kpT9TwqPh+0+7OX99d6ts0qcgKMkaK8UOYfHrRloHgbWGfXD0a8QyN18bsus
+	 JmScz2CRXclNO+XFUjHNIXv3Uk6DaegLkgKG+WR7kE+Li1B9ZVqx7gEepXHrHKhU+7
+	 TekPfuGmhTJbVlL0sr91uCzleu/c0SuquxI1ls3tmrzTRK43v20CQPP3TYlfoOsbdj
+	 5X4FSbBa5+Ct06LlE2HArLb8gjyt3OIYz1ateIAQ/VAgK10qMyx6nIg6HpqS4IcBFu
+	 EvIryrwyMrSnYzla+63jks8blz8XGUv/GOjNUquibXX3gjt+jJlQMhpNcykCmA4UMD
+	 7k0FbgepvtrSQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1ut4a0-00000002Gdt-2tvq;
-	Mon, 01 Sep 2025 13:28:16 +0000
-Date: Mon, 01 Sep 2025 14:28:16 +0100
-Message-ID: <86zfbecnf3.wl-maz@kernel.org>
+	id 1ut4cF-00000002Ggu-3kyv;
+	Mon, 01 Sep 2025 13:30:36 +0000
+Date: Mon, 01 Sep 2025 14:30:35 +0100
+Message-ID: <86y0qycnb8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Gyujeong Jin <wlsrbwjd7232@gmail.com>
-Cc: oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kvmarm@lists.linux.dev,
+To: James Clark <james.clark@linaro.org>
+Cc: Yingchao Deng <yingchao.deng@oss.qualcomm.com>,
 	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	gyutrange <wlsrbwjd643@naver.com>
-Subject: Re: [PATCH] KVM: arm64: nested: Fix VA sign extension in VNCR/TLBI paths
-In-Reply-To: <20250901124520.54259-1-wlsrbwjd7232@gmail.com>
-References: <20250901124520.54259-1-wlsrbwjd7232@gmail.com>
+	quic_yingdeng@quicinc.com,
+	jinlong.mao@oss.qualcomm.com,
+	tingwei.zhang@oss.qualcomm.com,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Fix NULL pointer access issue
+In-Reply-To: <80178c90-b9f3-4e1f-baa5-f54aa89ec927@linaro.org>
+References: <20250901-etm_crash-v1-1-ce65e44c137c@oss.qualcomm.com>
+	<450f11c2-6c11-4ffa-ae20-db4ea419a3ca@linaro.org>
+	<863496e4yg.wl-maz@kernel.org>
+	<80178c90-b9f3-4e1f-baa5-f54aa89ec927@linaro.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,48 +67,86 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wlsrbwjd7232@gmail.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, wlsrbwjd643@naver.com
+X-SA-Exim-Rcpt-To: james.clark@linaro.org, yingchao.deng@oss.qualcomm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, quic_yingdeng@quicinc.com, jinlong.mao@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 01 Sep 2025 13:45:20 +0100,
-Gyujeong Jin <wlsrbwjd7232@gmail.com> wrote:
+On Mon, 01 Sep 2025 13:31:23 +0100,
+James Clark <james.clark@linaro.org> wrote:
 > 
-> From: gyutrange <wlsrbwjd643@naver.com>
 > 
-> Signed-off-by: gyutrange <wlsrbwjd643@naver.com>
-
-Where is the commit message?
-
-> ---
->  arch/arm64/kvm/nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 77db81bae86f..eaa6dd9da086 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1169,7 +1169,7 @@ int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu)
->  
->  static u64 read_vncr_el2(struct kvm_vcpu *vcpu)
->  {
-> -	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 48);
-> +	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 47);
->  }
->  
+> On 01/09/2025 1:24 pm, Marc Zyngier wrote:
+> > On Mon, 01 Sep 2025 11:36:11 +0100,
+> > James Clark <james.clark@linaro.org> wrote:
+> >> 
+> >> 
+> >> 
+> >> On 01/09/2025 11:01 am, Yingchao Deng wrote:
+> >>> When linux is booted in EL1, macro "host_data_ptr()" is a wrapper that
+> >>> resolves to "&per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)",
+> >>> is_hyp_mode_available() return false during kvm_arm_init, the per-CPU base
+> >>> pointer __kvm_nvhe_kvm_arm_hyp_percpu_base[cpu] remains uninitialized.
+> >>> Consequently, any access via per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)
+> >>> will result in a NULL pointer.
+> >>> 
+> >>> Add is_kvm_arm_initialised() condition check to ensure that kvm_arm_init
+> >>> completes all necessary initialization steps, including init_hyp_mode.
+> >>> 
+> >>> Fixes: 054b88391bbe2 ("KVM: arm64: Support trace filtering for guests")
+> >>> Signed-off-by: Yingchao Deng <yingchao.deng@oss.qualcomm.com>
+> >>> ---
+> >>> Add a check to prevent accessing uninitialized per-CPU data.
+> >>> ---
+> >>>    arch/arm64/kvm/debug.c | 7 ++++---
+> >>>    1 file changed, 4 insertions(+), 3 deletions(-)
+> >>> 
+> >>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> >>> index 381382c19fe4741980c79b08bbdab6a1bcd825ad..add58056297293b4eb337028773b1b018ecc9d35 100644
+> >>> --- a/arch/arm64/kvm/debug.c
+> >>> +++ b/arch/arm64/kvm/debug.c
+> >>> @@ -233,7 +233,7 @@ void kvm_debug_handle_oslar(struct kvm_vcpu *vcpu, u64 val)
+> >>>    void kvm_enable_trbe(void)
+> >>>    {
+> >>>    	if (has_vhe() || is_protected_kvm_enabled() ||
+> >>> -	    WARN_ON_ONCE(preemptible()))
+> >>> +	    WARN_ON_ONCE(preemptible()) || !is_kvm_arm_initialised())
+> >> 
+> >> Hi Yingchao,
+> >> 
+> >> There shouldn't be a warning for this, at least for the case where
+> >> it's not initialized and never will be. If you're never going to run a
+> >> guest these functions can all skip, the same way for !has_vhe() etc.
+> > 
+> > It's not a warning. It's a bona-fide crash:
+> > 
+> > void kvm_enable_trbe(void)
+> > {
+> > 	if (has_vhe() || is_protected_kvm_enabled() ||
+> > 	    WARN_ON_ONCE(preemptible()))
+> > 		return;
+> > 
+> > 	host_data_set_flag(TRBE_ENABLED); <--- Explodes here
+> > }
+> > 
+> > So the write of the flag has to be skipped if KVM is available, even
+> > if KVM is compiled in.
+> > 
+> > 	M.
+> > 
+> 
+> Yeah. And just in case there is any confusion, I didn't mean that we
+> should not have the check entirely, just that it shouldn't be in the
+> WARN_ON_ONCE(). We should put it in the part that makes the functions
+> silently skip:
+> 
+>   if (has_vhe() || is_protected_kvm_enabled() ||
+>       !is_kvm_arm_initialised() ||
+>       WARN_ON_ONCE(preemptible()))
+>           return;
 
-This code is not there for sign extension of the VA. It is there for
-the propagation of bit 48 (yes, bit 48, not a typo) in RESS and the
-top bits of BADDR. D24.2.206 has all the details for this.
-
-Furthermore, we already check that the VA is canonical at the point of
-establishing the translation (see the references to R_YYVYV and
-I_THCZK in the S1 PTW code), and don't install a TLB in that case.
-
-But maybe you have spotted something I didn't, so some explanations
-would be very welcome.
-
-Thanks,
+Which is exactly what the OP wrote, except for swapping the last two
+terms.
 
 	M.
 
