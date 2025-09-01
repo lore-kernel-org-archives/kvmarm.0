@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A6132A825
-	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 15:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC6932F769
+	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 15:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756739614; cv=none; b=DVXmC+nkbqQTwVru9a1KaVLXYVvBHQP4jf0QmjopoxQBfdpSJx4fp117GYPQ1Fozg37DtgbqbcWjBHIL5NkdlNtzGQ7R95TNUtK0wyL3raEEvjJQxGV9HUPSvUYIAOlT1kLHmoHINTtD8GQ3YFusd5weiQA1cM+mt6zoYmtvqpw=
+	t=1756739905; cv=none; b=b5rEM0KE7GqJe5pL3zgE49g/7kECphJGrpzC0wl72KdnyBKc6EH9teZr7jKp1Udns0NO9PPzgIBCwZ7yC8N0C1JHPK9zXbnKLw2VH4avLCJ4XwAzS+Q0PlyDTdjIsKRJ4+C2sgVw6sNHwFcvJW9/oFHLrylWtQ/vpqM7t6b2P1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756739614; c=relaxed/simple;
-	bh=T/RAEzoBRkli0OidqH8/F4ZUiWPJufg9WZ3CV/HQrVs=;
+	s=arc-20240116; t=1756739905; c=relaxed/simple;
+	bh=mi1jhE0hSalMzhQcxvX/AVfoKXLeTEfI2y5Rv+u9/3U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FmF1F2Fu9XDZldIkKdrBlZh+ydYzdI3y5ABkm6uw6uvoius3Hdl9W7cVsByFyoGOKBDbI76XUjIRBjs/nW8jZl6SKZe1jP7JsvBuFDJhmydAyxI9rATylPuFLUa+dhrk93WKOuekMCN+eNNNuCPUMFgCI15VB8BV2QcWHo/X/1w=
+	 Content-Type:Content-Disposition:In-Reply-To; b=kI+Ydu7xg22MoFRqouoWAGcjmObvMKo4cIX1uVToolYgRqfoKjAjwBunNH6PP6Tj4cLX82plOT4ZzKGCUJW1DkUhu4BYGgUf615k1WEpT0xXMnVJdoUQcCcFyGXPqirtngdGSaIhjeNvKIwQ/O6k/kelj23pYsNmqEEw2GG3+eo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 26719175A;
-	Mon,  1 Sep 2025 08:13:24 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E701B16A3;
+	Mon,  1 Sep 2025 08:18:14 -0700 (PDT)
 Received: from e133380.arm.com (e133380.arm.com [10.1.197.68])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 847B83F6A8;
-	Mon,  1 Sep 2025 08:13:28 -0700 (PDT)
-Date: Mon, 1 Sep 2025 16:13:25 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4DF833F6A8;
+	Mon,  1 Sep 2025 08:18:19 -0700 (PDT)
+Date: Mon, 1 Sep 2025 16:18:16 +0100
 From: Dave Martin <Dave.Martin@arm.com>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
 Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
@@ -31,10 +31,9 @@ Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
 	maz@kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 4/5] arm64: initialise SCTLR2_EL1 at cpu_soft_restart()
-Message-ID: <aLW4FTcqommWSIej@e133380.arm.com>
+Subject: Re: [PATCH v4 0/5] initialize SCTRL2_ELx
+Message-ID: <aLW5OIgv8/bvvY9E@e133380.arm.com>
 References: <20250821172408.2101870-1-yeoreum.yun@arm.com>
- <20250821172408.2101870-5-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,60 +42,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250821172408.2101870-5-yeoreum.yun@arm.com>
+In-Reply-To: <20250821172408.2101870-1-yeoreum.yun@arm.com>
 
 Hi,
 
-On Thu, Aug 21, 2025 at 06:24:07PM +0100, Yeoreum Yun wrote:
-> Explicitly initialize the SCTLR2_ELx register before launching
-> a new kernel via kexec() to avoid leaving SCTLR2_ELx with an
-> arbitrary value when the new kernel runs.
+On Thu, Aug 21, 2025 at 06:24:03PM +0100, Yeoreum Yun wrote:
+> This series introduces initial support for the SCTLR2_ELx registers in Linux.
+> The feature is optional starting from ARMv8.8/ARMv9.3,
+> and becomes mandatory from ARMv8.9/ARMv9.4.
 > 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> ---
->  arch/arm64/kernel/cpu-reset.S      | 4 ++++
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 3 +++
->  2 files changed, 7 insertions(+)
+> Currently, Linux has no strict need to modify SCTLR2_ELx--
+> at least assuming that firmware initializes
+> these registers to reasonable defaults.
 > 
-> diff --git a/arch/arm64/kernel/cpu-reset.S b/arch/arm64/kernel/cpu-reset.S
-> index c87445dde674..c8888891dc8d 100644
-> --- a/arch/arm64/kernel/cpu-reset.S
-> +++ b/arch/arm64/kernel/cpu-reset.S
-> @@ -37,6 +37,10 @@ SYM_TYPED_FUNC_START(cpu_soft_restart)
->  	 * regime if HCR_EL2.E2H == 1
->  	 */
->  	msr	sctlr_el1, x12
-> +
-> +	mov_q	x12, INIT_SCTLR2_EL1
-> +	set_sctlr2_elx	1, x12, x8
-> +
+> However, several upcoming architectural features will require configuring
+> control bits in these registers.
+> Notable examples include FEAT_PAuth_LR and FEAT_CPA2.
 
-Nit: does it matter whether we reset SCTLR2 before SCTLR?
+This looks OK to me now, except for one or two minor issues (see
+replies to the patches).
 
-I can't find a convincing architectural reason why they need to be
-reset in a particular order, but it looks a bit strange that the
-cpu_soft_restart and __kvm_handle_stub_hvc versions of this reset the
-registers in the opposite order...
+I think we will need a way of testing all the code paths before this
+should be merged, though.
 
->  	isb
->  
->  	cbz	x0, 1f				// el2_switch?
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> index aada42522e7b..cc569656fe35 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> @@ -255,6 +255,9 @@ SYM_CODE_START(__kvm_handle_stub_hvc)
->  	mov	x0, xzr
->  reset:
->  	/* Reset kvm back to the hyp stub. */
-> +	mov_q 	x5, INIT_SCTLR2_EL2
-> +	set_sctlr2_elx	2, x5, x4
-> +
->  	mov_q	x5, INIT_SCTLR_EL2_MMU_OFF
->  	pre_disable_mmu_workaround
->  	msr	sctlr_el2, x5
+Have you tested all the code paths, or are there some things that have
+not been tested?
 
-Otherwise, I guess this is fine.
+
+Since this code is not useful by itself, it may make sense to delay
+merging it until we have patches for a feature that depends on SCTLR2.
 
 Cheers
 ---Dave
