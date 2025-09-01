@@ -1,97 +1,122 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71FA35977
-	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 10:56:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810DA311963;
+	Mon,  1 Sep 2025 11:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756724165; cv=none; b=JAiwOas9OlufHgwzxhq21sehCmUsLrrouiguK0auZI31dG3tADnlxt3j3XwC3kORnJ5MJsTJyvBLVglxsiYEFiOicGGmIbJibCzsRHtvNYysgYiodW9719Ru3hS3SR/Dd+4cSBpnqSwcCl4N9Rk/i7DBXpKr8yY7Fgyw+JTiO6U=
+	t=1756724785; cv=none; b=Aa2B+/tQBZcnqM4vC8UCx4FWTe0J5WHMVxkRs5zMsXKgGo7ke2wZoo6Iq+B4iCLy1QYt1YdEckE+7GNfY8AaAKfnrzEtMxfm3bHIRBs9MF3aSGAqWL1NopZyQkO7JRLxPKl2uAtb061OEl2q+sK5yWsqJZYRTwDkMOxfDqF1AKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756724165; c=relaxed/simple;
-	bh=P9BPZdFHZ5XKGE6FgGHc5F57wdaBOrCqpoJYDaNxEhM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hbp6MZz/lH3cXuP+mYWFq0+HxU2akF+LQG6pSVoJyxQX9Fg7mUfCQ3jFjMefjo4CJ+KuUvel4WUOwoyx3FAYA49hnsApw4f08NZ+yKs4dLZ3GlfghodKe9R09/YRld/o4ken/crc3fs/BEKRAZ/lcYkF4g7Qn4To/MaPHPKkb/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4cFm0T5B8hz13NJQ;
-	Mon,  1 Sep 2025 18:52:09 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8E225180486;
-	Mon,  1 Sep 2025 18:55:58 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 1 Sep 2025 18:55:58 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 1 Sep 2025 18:55:57 +0800
-Message-ID: <fc7763d5-bed6-ace6-ace8-a50c031cab36@hisilicon.com>
-Date: Mon, 1 Sep 2025 18:55:49 +0800
+	s=arc-20240116; t=1756724785; c=relaxed/simple;
+	bh=BLKwIniZaRvZZv+sqfSQfIekcdvuVVsnll7sWAynepU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eJNKqR7PPypWeRsVk7TFH8NfDeaAaqmWoqOiPL+SiHdJKXTJaiwJl2bkPQGcwPzqBfSXeuRgTFILomTzTnfxLKnxPESlW02fK2eFS1i+lv7tFS5j/dzF6GrfNUVC+m0l/2sCqxC8JWPgITYMcJjX4gzTHz4KvD2mfBlcJwlT7Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yl9J+wxk; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yl9J+wxk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30E0CC4CEF0;
+	Mon,  1 Sep 2025 11:06:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756724785;
+	bh=BLKwIniZaRvZZv+sqfSQfIekcdvuVVsnll7sWAynepU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Yl9J+wxkNvzhr4pStX6mk8mohCv/DsVXKf2ZTclhPx46O7qw00o1XY4dUZO/BVnD5
+	 WiiqQvNPcBOv0CJ8Ec1qcnqArCRXALjRnoA4yFoYMZk5Fa87RWM8ANkcPZVsdIzAe1
+	 df9YzIgl5mD97fm4MzUTpDp5ae70dIXsF2sx7QjisTb59KMpWAN2B5vtLqodQ8ELFl
+	 3BAVMIG2rYzLvIL1avpZNOnkdJKnWhfP8v70AAGk0xl77PffAYT4E19+QBkWIJdZhZ
+	 xE9CLN9/rZRybAhWJuivVVyAIN9UE/iAQLvoGJMOlixQ29uE8clvZtTD2nGASS5HDs
+	 V08z73e7KofyQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1ut2Mg-00000002Dh6-35F5;
+	Mon, 01 Sep 2025 11:06:22 +0000
+Date: Mon, 01 Sep 2025 12:06:22 +0100
+Message-ID: <864itme8k1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: nv: Allow shadow stage 2 read fault
+In-Reply-To: <djypsyratk63ovzv3flzb2tmunqtcoryzserwhsaaq5nuogsrx@u3uuwynnafbj>
+References: <20250822031853.2007437-1-r09922117@csie.ntu.edu.tw>
+	<87a53rk83s.wl-maz@kernel.org>
+	<djypsyratk63ovzv3flzb2tmunqtcoryzserwhsaaq5nuogsrx@u3uuwynnafbj>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v2 0/4] Add workaround for HIP10/HIP10C erratum 162200802
-Content-Language: en-US
-To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
-CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <tangnianyao@huawei.com>,
-	<wangwudi@hisilicon.com>, <liuyonglong@huawei.com>,
-	<prime.zeng@hisilicon.com>
-References: <20250825023954.3516381-1-wangzhou1@hisilicon.com>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <20250825023954.3516381-1-wangzhou1@hisilicon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025/8/25 10:39, Zhou Wang wrote:
-> As the discussion from V1 series, V2 series firstly adds GICD.num_LPIs
-> writable support, then add HiSilicon erratum 162200802.
+On Tue, 26 Aug 2025 14:49:27 +0100,
+Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
 > 
-> Erratum number should be 162200802, make a mistake in V1, so fix it as
-> well.
+> Hi Marc,
 > 
-> Zhou Wang (4):
->   KVM: arm64: Allow userspace to write GICD_TYPER.num_LPIs
->   KVM: arm64: selftests: Add test for GICD.num_LPIs
->   Documentation: KVM: arm64: Add GICD_TYPER.num_LPIs writable
->     description
->   ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200802
-
-Hi Marc and Oliver,
-
-As the discussion in V1 series, this series firstly adds GICD.num_LPIs
-writable support, then add erratum patch.
-
-If this series is OK, I will prepare QEMU related patch.
-
-BTW v1 is https://lore.kernel.org/all/20250626124142.2035110-1-wangzhou1@hisilicon.com/
-
-Best,
-Zhou
-
+> On Fri, Aug 22, 2025 at 10:40:07AM +0100, Marc Zyngier wrote:
+> >
+> > This would imply taking the guest's S2 permission at face value, and
+> > only drop W permission when the memslot is RO -- you'd then need to
+> > keep track of the original W bit somewhere. And that's where things
+> > become much harder, because KVM can decide to remap arbitrary ranges
+> > of IPA space as RO, which implies we should track the W bit at all
+> > times, most likely as one of the SW bits in the PTE.
 > 
->  Documentation/arch/arm64/silicon-errata.rst   |  2 ++
->  .../virt/kvm/devices/arm-vgic-v3.rst          |  6 ++++
->  arch/arm64/Kconfig                            | 12 +++++++
->  arch/arm64/include/asm/cputype.h              |  4 +++
->  arch/arm64/kernel/cpu_errata.c                | 15 +++++++++
->  arch/arm64/kvm/vgic/vgic-init.c               |  9 +++++
->  arch/arm64/kvm/vgic/vgic-its.c                |  9 +++--
->  arch/arm64/kvm/vgic/vgic-kvm-device.c         |  1 +
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c            | 22 +++++++++++++
->  arch/arm64/tools/cpucaps                      |  1 +
->  include/kvm/arm_vgic.h                        |  1 +
->  include/linux/irqchip/arm-gic-v3.h            |  1 +
->  tools/testing/selftests/kvm/arm64/vgic_init.c | 33 +++++++++++++++++++
->  .../selftests/kvm/include/arm64/gic_v3.h      |  2 ++
->  14 files changed, 116 insertions(+), 2 deletions(-)
-> 
+> But sorry, I struggle to understand this paragraph after reading it many
+> times, probably my experience with the code isn't enough for me to make
+> the connection. Why are we talking about the W bit suddenly?
+> If you don't mind, can you reword what's discussed here?
+> I only very vaguely get that there will be 2 W bits, one from what L1 set,
+> and one from the L0 memslot, if I didn't completely miss the point..
+
+Sorry, I quickly drifted into something related.
+
+My take on this category of problems is that we're better off always
+using the permissions that the guest gives us. This is the scheme that
+we have adopted with VNCR. It means we wouldn't have to rewalk the
+guest S2 on permission fault, since we'd be guaranteed to have the
+latest update.
+
+However, S2 management implies that a S2 mapping can be made read-only
+at any point (dirty log, for example). Which means that on a
+permission fault, you'd need to find out whether the page is R/O
+because the guest said so, or because the host decided to make it so.
+
+Which means that somehow you need to work out why you have taken a
+permission fault. You can either
+
+- rewalk the guest S2 as if you missed in the TLB
+- or keep a copy of the W bit in the shadow SW
+
+> > We'll need exactly that if we ever want to implement the
+> > Hardware-managed Dirty Bit, but I have the feeling we need an actual
+> > design for this, and not a quick hack. Your approach is therefore the
+> > correct one for the time being.
+
+And that's why I brought this up: to support HD in the guest S2, we
+need to mark the full shadow S2 as R/O, and update the guest S2 on the
+back of that fault.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
