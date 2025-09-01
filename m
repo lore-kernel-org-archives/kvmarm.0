@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5240263C90
-	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 15:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4098D320A1D
+	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 15:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756738903; cv=none; b=NOGHeANgF8VoQC7Nybt00H5yJKOSfiPnOg8EHYFxT79Q9sdBvjjpicRKSKEy90zvwWTFFe/VO+DRoMyIHyn44fo0lnGq8Bf1WPFCviALi8L8yfQSwgJL9fX2pppXPtNlKHSeL5mTE+geE0gi4ixPSsvx3qnzSeJPrMNuE9VQ+6Y=
+	t=1756739598; cv=none; b=eNAdDq79zAHMXo1Ry46RvHw92cUaMTGCiwNYCusWLBnzk1t/ckbR5jJ3zNo0C6fvZ13stsnmqncc17Jwm4UvfAgGzopr4RG7fSDsylYXAS+FwNwqRmlWetFhRz8rb2EbdWJRBF9/x17lm8yjE3FwWSz669O3b+f9/1nFMN4kCC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756738903; c=relaxed/simple;
-	bh=sKIHQaF4uEzrA4VpXBz7JVyj9mqvjOrJ0LV/LJ7YQ9Q=;
+	s=arc-20240116; t=1756739598; c=relaxed/simple;
+	bh=qREE9DY6AeaqxRM1Wkl3pRC/CG0ewqa3Bq3lWt63IXU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TOV4Kq1VsxGzZ5OXz5Sm7PX+6BoHWnSgEps5GSsK7oDGRZiRkZ+QoXaYflm/URmkJqdcCk5auYRBpeeeP6q6gAHwGltO6IWU6ChbuBfgpPf4CQ2PdsYmb9ALcbqryQSSqMEbGMWgJ6+Ib02sFZSn42ugHS/MVDdgfY157lrr61Y=
+	 Content-Type:Content-Disposition:In-Reply-To; b=aTVDfBleGd4fRoLu/SlDnTGv6CNpDrxOZ3xCqBTWfoK8jdiKWimbahd5JHqPwduxmA5lpVNSZXaZ8vcUJdhNDkNj+AnMlrrctMYmeyogGEu4nyjdJILF6LJQjx0BFkICrp/JWPkJRXjgvsbeBEbOdPEz4Cj2HiBmBA84QuTzAQ8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCCCC16A3;
-	Mon,  1 Sep 2025 08:01:32 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C9EC916A3;
+	Mon,  1 Sep 2025 08:13:05 -0700 (PDT)
 Received: from e133380.arm.com (e133380.arm.com [10.1.197.68])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5D4CF3F6A8;
-	Mon,  1 Sep 2025 08:01:37 -0700 (PDT)
-Date: Mon, 1 Sep 2025 16:01:34 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 33B8D3F6A8;
+	Mon,  1 Sep 2025 08:13:10 -0700 (PDT)
+Date: Mon, 1 Sep 2025 16:13:07 +0100
 From: Dave Martin <Dave.Martin@arm.com>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
 Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
@@ -28,14 +28,13 @@ Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
 	scott@os.amperecomputing.com, mbenes@suse.cz,
 	james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org,
 	pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-pm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 4/5] arm64: initialise SCTLR2_EL1 at cpu_soft_restart()
-Message-ID: <aLW1Thh3Xscw1O3U@e133380.arm.com>
-References: <20250813120118.3953541-1-yeoreum.yun@arm.com>
- <20250813120118.3953541-5-yeoreum.yun@arm.com>
- <aKXlnZ8HXHBZMj4T@e133380.arm.com>
- <aKYGsqCTRXwnb6Gw@e129823.arm.com>
+	maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 2/5] arm64: initialise SCTLR2_ELx register at boot time
+Message-ID: <aLW4A3rTcJvA0c+j@e133380.arm.com>
+References: <20250821172408.2101870-1-yeoreum.yun@arm.com>
+ <20250821172408.2101870-3-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,84 +43,130 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aKYGsqCTRXwnb6Gw@e129823.arm.com>
+In-Reply-To: <20250821172408.2101870-3-yeoreum.yun@arm.com>
 
 Hi,
 
-On Wed, Aug 20, 2025 at 06:32:34PM +0100, Yeoreum Yun wrote:
-> Hi Dave,
+On Thu, Aug 21, 2025 at 06:24:05PM +0100, Yeoreum Yun wrote:
+> The value of the SCTLR2_ELx register is UNKNOWN after reset.
+> If the firmware initializes these registers properly, no additional
+> initialization is required.
+> However, in cases where they are not initialized correctly,
+> initialize the SCTLR2_ELx registers during CPU/vCPU boot
+> to prevent unexpected system behavior caused by invalid values.
 > 
-> > On Wed, Aug 13, 2025 at 01:01:17PM +0100, Yeoreum Yun wrote:
-> > > SCTLR2_EL1 register is optional starting from ARMv8.8/ARMv9.3,
-> > > and becomes mandatory from ARMv8.9/ARMv9.4
-> > > and serveral architectural feature are controled by bits in
-> > > these registers.
-> > >
-> > > Before, launching new kernel via kexec, initialise SCTLR2_EL1 explicitly.
-> > >
-> > > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> > > ---
-> > >  arch/arm64/kernel/cpu-reset.S | 6 ++++++
-> > >  1 file changed, 6 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/kernel/cpu-reset.S b/arch/arm64/kernel/cpu-reset.S
-> > > index c87445dde674..123564af345b 100644
-> > > --- a/arch/arm64/kernel/cpu-reset.S
-> > > +++ b/arch/arm64/kernel/cpu-reset.S
-> > > @@ -37,6 +37,12 @@ SYM_TYPED_FUNC_START(cpu_soft_restart)
-> > >  	 * regime if HCR_EL2.E2H == 1
-> > >  	 */
-> > >  	msr	sctlr_el1, x12
-> > > +
-> > > +alternative_if ARM64_HAS_SCTLR2
-> > > +	mov_q	x12, INIT_SCTLR2_EL1
-> > > +	msr_s	SYS_SCTLR2_EL1, x12
-> > > +alternative_else_nop_endif
-> > > +
-> >
-> > It would be better to do this based on the ID regs.
-> >
-> > Although the previous kernel _shouldn't_ have used SCTLR2 if the
-> > capability ARM64_HAS_SCTLR2 did not get enabled, it would be better to
-> > enforce a clean state here for the new kernel.
-> >
-> > If so, maybe one of the macros that you already defined can be used
-> > here?  (But it's also fine to open-code it.)
-> 
-> But cpu_soft_restart() can be called before capability is enabled?
-> I think this function is called after "capability" setup,
-> Was it good to use alternative than check the ID register?
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
 
-What I meant is that we should reset SCTLR2_EL1 here even if the
-ARM64_HAS_SCTLR2 capability is not set.
+[...]
 
-The cpu_soft_restart() code has responsibilities similar to those of a
-bootloader.  We want to put the CPU into a known state, irrespective of
-how the current kernel has been using the CPU.
+> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+> index 23be85d93348..c25c2aed5125 100644
+> --- a/arch/arm64/include/asm/assembler.h
+> +++ b/arch/arm64/include/asm/assembler.h
+> @@ -738,6 +738,21 @@ alternative_endif
+>  	set_sctlr sctlr_el2, \reg
+>  .endm
+>  
+> +/* Set SCTLR2_ELx to the @reg value. */
+> +.macro set_sctlr2_elx, el, reg, tmp
+> +	mrs_s	\tmp, SYS_ID_AA64MMFR3_EL1
+> +	ubfx	\tmp, \tmp, #ID_AA64MMFR3_EL1_SCTLRX_SHIFT, #4
+> +	cbz	\tmp, .Lskip_sctlr2_\@
+> +	.if	\el == 2
+> +	msr_s	SYS_SCTLR2_EL2, \reg
+> +	.elseif	\el == 12
+> +	msr_s	SYS_SCTLR2_EL12, \reg
+> +	.else
+> +	msr_s	SYS_SCTLR2_EL1, \reg
+> +	.endif
+> +.Lskip_sctlr2_\@:
+> +.endm
+> +
 
-For one thing, we come through this path when booting a crash kernel if
-the current kernel panicked.  So we should avoid making too many
-assumptions about anything being in a sensible state here.
+You were right that just doing
 
-(Your rewrite of this in v4 looks fine.)
+	msr_s	SYS_SCTLR_\el, \reg
 
-> > >  	isb
-> > >
-> > >  	cbz	x0, 1f				// el2_switch?
-> >
-> > [...]
-> >
-> > In the case where the el2_switch argument in non-zero, don't we also
-> > need to do something to reinitialise SCTLR2_EL2 after switching back
-> > to EL2, in the HVC_SOFT_RESTART handler?
-> >
-> > Maybe I missed something.
-> 
-> No. I'm missing to init in NVHE's HVC_SOFT_RESTART handler to clear SCTLR2_EL2.
-> 
-> Thanks!
+here doesn't work.  It looks like we rely on the C preprocessor to
+expand the SYS_FOO_REG names to numeric sysreg encodings.  By the time
+the assembler macros are expanded, it is too late to construct sysreg
+names -- the C preprocessor only runs once, before the assembler.
 
-I'll take a look at this in v4.
+So, your code here looks reasonable.
+
+But, it will still silently do the wrong thing if \el is empty or
+garbage, so it is probably worth adding an error check:
+
+	.else
+	.error "Bad EL \"\el\" in set_sctlr2_elx"
+	.endif
+
+
+Also, looking at all this again, the "1", "2" and "12" suffixes are not
+really numbers: SYS_REG_EL02 would definitely not be the same thing as
+SYS_REG_EL2 (although there is no _EL02 version of this particular
+register).
+
+So, can you use .ifc to do a string comparison instead?
+
+If might be a good idea to migrate other macros that use an "el"
+argument to do something similar -- although that probably doesn't
+belong in this series.
+
+The assembler seems to have no ".elseifc" directive, so you'll need
+separate nested .ifc blocks:
+
+	.ifc	\el,2
+	msr_s	SYS_SCTLR2_EL2, \reg
+	.else
+	.ifc	\el,12
+	msr_s	SYS_SCTLR2_EL12, \reg
+	.else
+	.ifc	\el,1
+	msr_s	SYS_SCTLR2_EL1, \reg
+	.else
+	.error	"Bad EL \"\el\" in set_sctlr2_elx"
+	.endif
+	.endif
+	.endif
+
+(Note, I've not tested this approach.  If you can think of a better
+way, please feel free to suggest.)
+
+[...]
+
+> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> index 36e2d26b54f5..ac12f1b4f8e2 100644
+> --- a/arch/arm64/kernel/hyp-stub.S
+> +++ b/arch/arm64/kernel/hyp-stub.S
+> @@ -144,7 +144,17 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+>  
+>  .Lskip_indirection:
+>  .Lskip_tcr2:
+> +	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+> +	ubfx	x1, x1, #ID_AA64MMFR3_EL1_SCTLRX_SHIFT, #4
+> +	cbz	x1, .Lskip_sctlr2
+> +	mrs_s	x1, SYS_SCTLR2_EL12
+> +	msr_s	SYS_SCTLR2_EL1, x1
+>  
+> +	// clean SCTLR2_EL1
+> +	mov_q	x1, INIT_SCTLR2_EL1
+> +	msr_s	SYS_SCTLR2_EL12, x1
+
+I'm still not sure why we need to do this.  The code doesn't seem to
+clean up by the EL1 value of any other register -- or have I missed
+something?
+
+We have already switched to EL2, via the HVC call that jumped to
+__finalise_el2.  We won't run at EL1 again unless KVM starts a guest --
+but in that case, it's KVM's responsibility to set up the EL1 registers
+before handing control to the guest.
+
+In any case, is SCTLR2_EL1 ever set to anything except INIT_SCTLR2_EL1
+before we get here?
+
+[...]
 
 Cheers
 ---Dave
