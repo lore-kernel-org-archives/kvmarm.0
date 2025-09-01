@@ -1,137 +1,186 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49ECB1096F
-	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 14:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4FC17B402
+	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 14:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756736178; cv=none; b=RH0NYymHIbaycTn0MFUrKg5WlUeY6P1PBTEHT0wxOSQElWoJyDg17nh7nE3VZEOhDUy90wBf0GRqC5eMn1osFLXLv3rkqxO72p+Nixcyfhv9MTXsqYAgnhsiLfXbUw99hd7zIcBjTQVv7ySVIahW91CYKMEvE4RKcy2G3T3zpXA=
+	t=1756736212; cv=none; b=X9DNTKjbaCzvqzjZFI5v9qfJeoDkIWLwekTbXStXHVh+BxnCUaW1bvlG+BUKF8onptvyS4UuCk5IMzcxdvKc+CmZUamoeJGnUVAnFyGmRKQ7jickV/tRcx8wK+S61OUI7NfELMvWePgMaaM7isSax9nCqR/UMff/RC3D8H/AhB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756736178; c=relaxed/simple;
-	bh=J6adxaMTbKmeAjhW+nOvDYWFj4xMGaf6efDHsjIWpX8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oiqeh5hPuvALmgzpvOf2a50UbP65CZ9IOX3tPU0Ve+jATvty6z8/a4D1zWG4Td11vBhpvfhigyyLRKgA/I4+Z3ix1m58SDjAERxFFR5qUeKY9/432OJjorj+8W6VUgORcn7nb0W5R394BmAIu0wBb/V7vhU8HVznQQ/oLjrHi8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TXFi6YxC; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756736212; c=relaxed/simple;
+	bh=jt+tul4E9f3ksTeOn/sSTakfsjMH5U1DeVEhi6a5AEc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pU7nmkxw6iwoIRQ0oS2DSY6gr7Q60xCj88Fq0+ySzd/CtIXXWe49px2nxxONnD1HMbKfMmuDzLJtEvdE0d7oR11CGplJVaWWvoXka82avASSjiAx8v/Flsoi5fsHxrZd5dVSOHFeg3WWLr0g/KJXBedAbf+tr6uMiRVNLA4a/Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BymF0noq; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TXFi6YxC"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-248f2da72edso9184795ad.2
-        for <kvmarm@lists.linux.dev>; Mon, 01 Sep 2025 07:16:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BymF0noq"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3d1bf79d758so1835061f8f.1
+        for <kvmarm@lists.linux.dev>; Mon, 01 Sep 2025 07:16:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756736176; x=1757340976; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=olATEhuJ7Rj0q51m0msTdMRcBctLQkkJ/hDbLCgUHPE=;
-        b=TXFi6YxCF89axylGi/LpH675mxSe8HoXm4V7V3YWr/Lc+BR5UqUDIyzAhVOUYZyoq6
-         jyFyl/Xedve5Z+E1Md/MLqy33+7SCoT0NHczFjpHmsAyoK9wLGc9VUvNm6bFLhS2qDP3
-         o3tP+si1b6IooVNTfaL1G5oDKpLL+PVZ915O6qtwrCisqS40X3CT5I++mCp034skaiMR
-         YPwZjmEIWtgTd5zTQ95JT98AO5+eWtJ1emmg9HOxdFRRogK/6bu6hoV75KvUlq0JG3NK
-         W4cLqpryEwHRhj7LTLTeR5Z+XIZW65UN2RVn4uqP+D68bg46zZ48F6Qy3OlPFjUspt0Z
-         0JvA==
+        d=linaro.org; s=google; t=1756736209; x=1757341009; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iESc6dfW9RcmL1rZ9bcUT9E2jgBG3o06ZEwcLauMwJI=;
+        b=BymF0noqtrq5QVBdOoBVGGXre86NRvKsUhAz6l6cQWFl0gseHurnsIflqs9YSkMYWu
+         NHNgr6ACcjMJ4z47WibRgtVAZVMRmXwwnLz6NWwPvFY+xXPUSS3Z6nzE64JWNofn7zlY
+         GyFt+SEB52axgCoA3PJOAixaxWBU49AV6fKpPxPagIKfqylN5poAfiw/1v8mZWhWRqMU
+         fZcKSZMGxwPBf+uNEq/ZvBctDcvnlOo4IwxG1koLkS1IMva2kyaiJoqC0fx/dlpDmhFi
+         cXtmHx4o0DA81shNgWKEWxwq+nPWRJ92DvLqr0iTOdO9OSPPNyxxPXBM6bRZSllSyWtd
+         SXCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756736176; x=1757340976;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=olATEhuJ7Rj0q51m0msTdMRcBctLQkkJ/hDbLCgUHPE=;
-        b=LjgJCFRqLkDX9jgHMlBatl4vUVlO8x8wgQQrJAuAOaAA3rRbHecoxGCQ2nCe4OKk/S
-         kvy7WvoN79fNQoXO+hjYqIot+YBDXRwyo+3bG7OoYmiXYm5r5glIrSirWPaKNc7XYsUr
-         hzrHigJmtJV/aJH1CyFUMMAbVZvHsWMIqQhxVXmOcIbWA3giK4xK/e+JlogaJKi1YOt0
-         jyW3k3/3z9CHcj2pNjszY2gepLWK4yR1pK5mzgy624J3XoJcrntsdiDtaWc/u5BCjkY3
-         0flCPVJo0NqV3rMkPpu5ReCKIGWkI/qr+wtDoib/rzcIZYuUzwi3+gBgG0vaDZeU9spV
-         mU/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVgGQ4kl5AckCPzppqr8x68S5l/G0qONtoJGx6AkFsyCZr+FELxN/S7JVRSUNyRkaVasF+UlyA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YysWtJl7q/1c+ZCyH72HFAShm1W/leUxg0DDudfsiAr51AuvHWy
-	/RScVNNuYC4pMuCZ5eymuNJIpGbr1xQbbxyVy1GqPGprrsa9S/D6aKI0
-X-Gm-Gg: ASbGncswuvohKgk9833Sb6OB78FM9yVXlvYARbjf63Yng2EWa+eMBNkpdP+q+KbZ4yM
-	a29QuRiUaxP+ZrJjErcqEFsf1BPFvBzQZ3UDra/eOmuVy+cScIV7LtC44ltSxWtFLSa6UY7OL71
-	vRFfBEZ6P+xsDuRFiYEn0PinkBMBVRg8RfOezo+SGH4EmOcB4ArN9qMz2vUbY6yixm22W6o7mFV
-	7qHARPyyv1vr9OOPO8TtsK+9peuZcBpJan/LZhKq60yTTIKeEZMmeMwlPtPaA1e4uMYdGCvr1oM
-	VSBfO5r2/IrrBrSoEDKaUHz5r9gheKXJYjgts93DgWF/fYC7m8hkiiC3PDSvoztcmWN4cWAptdi
-	+8kiQxLitn8rjrHcFxPbRwt4=
-X-Google-Smtp-Source: AGHT+IHf7G+mUAagKO2yJzD5uM1O7o4u98GK3mA53rtvl6kubMMUObA8Y6uYeXML8+HaH3iMeRvPFQ==
-X-Received: by 2002:a17:902:e74f:b0:246:ed8f:c63e with SMTP id d9443c01a7336-2491be7d2a2mr85172585ad.0.1756736176486;
-        Mon, 01 Sep 2025 07:16:16 -0700 (PDT)
-Received: from localhost ([106.101.139.14])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24905da1b35sm106729755ad.84.2025.09.01.07.16.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 07:16:16 -0700 (PDT)
-From: Gyujeong Jin <wlsrbwjd7232@gmail.com>
-To: maz@kernel.org,
-	oliver.upton@linux.dev
-Cc: joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wlsrbwjd7232@gmail.com,
-	gyutrange <wlsrbwjd643@naver.com>,
-	stable@vger.kernel.org,
-	DongHa Lee <gap-dev@example.com>,
-	Daehyeon Ko <4ncient@example.com>,
-	Geonha Lee <leegn4a@example.com>,
-	Hyungyu Oh <dqpc_lover@example.com>,
-	Jaewon Yang <r4mbb1@example.com>
-Subject: [PATCH] KVM: arm64: nested: Fix VA sign extension in VNCR/TLBI paths
-Date: Mon,  1 Sep 2025 23:15:51 +0900
-Message-ID: <20250901141551.57981-1-wlsrbwjd7232@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1756736209; x=1757341009;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iESc6dfW9RcmL1rZ9bcUT9E2jgBG3o06ZEwcLauMwJI=;
+        b=uK4XERYAYH/AKVEKmo4lurhqxwbh2fIwVetGhVetcMUc0I4g78vhwKg3g6sXrAZJQl
+         1UjcV2D9CE9DE0L1GYwTupD71Fy0eG92+H9j4Yfm0ShrXkfrA8aamKKpKeOMxEuddqP1
+         4RyXSI5ngc/Gd3lubJB5TDg8lElg19FMA8gIiaM6bkJTcgGk3ZbTy8buIJw7OfoAob+5
+         sSBOBo/xlmtpGnsvverpOvwXbXBEWZ0h6aCIZ4A0ayX7SHlC2xy2riOmKpi7H7moVGTY
+         jRYscdvE0V096HW3gD8pPPosnfptA2raeUlQGVGsqgWlek3Di+KTMcHn/Jfm0c2KQTQS
+         SwNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV33xfBYlLvG+YtXlMrtQ9c1mLV5bCy+xJ3y1qHCK1tSHZ6wLDlFTyf3mFLG4ml9IlqvDVuttk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwAr/6RR4SDvhepcbcGGd2MsbVpHsGiWdUs+kngf5BKd6XXMG+h
+	AUpsI+25qn9W/ZPl4ptYLM31Hgtt15UwxbYeC3dclYyPOcWOB1qqOBKWQ8MSErncCtA=
+X-Gm-Gg: ASbGncvW4TFsuCN31NZgIYrgjUnVglEpBsCWZkohJm7oWh7h1N/VJNv2wKbirbuo48j
+	GWzjfxRLWWQNc4RHKFIQ5VidtYG38B+JkaViu3ttXovMdVMwC3lP8eNoWmlJA4EaaRSXQHcXjF5
+	6UmJjIY/HzxgHYs7SIimRwa2EZ1CUYoMJFejDSFG1Jo7yfV+kZD54UrAfF7PANwLYxG6vTIWpwz
+	v/qNuLSbBOjCikqorpFRnJJxs9F9lJ09bhtK3N+rtxHnJx9JeeX22L5bAAqlZ2hEiiZTDCymq8E
+	KVCCN5Dap07gkMYwmno57jtf9NZ3mt/bjDjyOP4EuKVhncII90XlQUNjkVWeNIQCHi1UfRuMrBb
+	T/X2QmOvzvybIZM1JH7JIi+ZxLhU=
+X-Google-Smtp-Source: AGHT+IHlQJYM2HX5g9ub7kOJOAXNXL4BWDzftuXNNBg0pmc4Ys0RWFLMX49ejuXDiUIn/rslt0RP/A==
+X-Received: by 2002:a05:6000:4021:b0:3ce:e9d6:ad24 with SMTP id ffacd0b85a97d-3d1e05bab3dmr5752072f8f.50.1756736209038;
+        Mon, 01 Sep 2025 07:16:49 -0700 (PDT)
+Received: from [192.168.1.3] ([185.48.76.109])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d21a32dbc5sm11053282f8f.11.2025.09.01.07.16.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Sep 2025 07:16:48 -0700 (PDT)
+Message-ID: <239f2e3d-1fb5-4d53-869f-aba2d7a6530d@linaro.org>
+Date: Mon, 1 Sep 2025 15:16:47 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Fix NULL pointer access issue
+To: Marc Zyngier <maz@kernel.org>,
+ Yingchao Deng <yingchao.deng@oss.qualcomm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, quic_yingdeng@quicinc.com,
+ jinlong.mao@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com,
+ Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>
+References: <20250901-etm_crash-v1-1-ce65e44c137c@oss.qualcomm.com>
+ <450f11c2-6c11-4ffa-ae20-db4ea419a3ca@linaro.org>
+ <863496e4yg.wl-maz@kernel.org>
+ <80178c90-b9f3-4e1f-baa5-f54aa89ec927@linaro.org>
+ <86y0qycnb8.wl-maz@kernel.org>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <86y0qycnb8.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: gyutrange <wlsrbwjd643@naver.com>
 
-VNCR/TLBI VA reconstruction currently uses bit 48 as the sign bit,
-but for 48-bit virtual addresses the correct sign bit is bit 47.
-Using 48 can mis-canonicalize addresses in the negative half and may
-cause missed invalidations.
 
-Although VNCR_EL2 encodes other architectural fields (RESS, BADDR;
-see Arm ARM D24.2.206), sign_extend64() interprets its second argument
-as the index of the sign bit. Passing 48 prevents propagation of the
-canonical sign bit for 48-bit VAs.
+On 01/09/2025 2:30 pm, Marc Zyngier wrote:
+> On Mon, 01 Sep 2025 13:31:23 +0100,
+> James Clark <james.clark@linaro.org> wrote:
+>>
+>>
+>>
+>> On 01/09/2025 1:24 pm, Marc Zyngier wrote:
+>>> On Mon, 01 Sep 2025 11:36:11 +0100,
+>>> James Clark <james.clark@linaro.org> wrote:
+>>>>
+>>>>
+>>>>
+>>>> On 01/09/2025 11:01 am, Yingchao Deng wrote:
+>>>>> When linux is booted in EL1, macro "host_data_ptr()" is a wrapper that
+>>>>> resolves to "&per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)",
+>>>>> is_hyp_mode_available() return false during kvm_arm_init, the per-CPU base
+>>>>> pointer __kvm_nvhe_kvm_arm_hyp_percpu_base[cpu] remains uninitialized.
+>>>>> Consequently, any access via per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)
+>>>>> will result in a NULL pointer.
+>>>>>
+>>>>> Add is_kvm_arm_initialised() condition check to ensure that kvm_arm_init
+>>>>> completes all necessary initialization steps, including init_hyp_mode.
+>>>>>
+>>>>> Fixes: 054b88391bbe2 ("KVM: arm64: Support trace filtering for guests")
+>>>>> Signed-off-by: Yingchao Deng <yingchao.deng@oss.qualcomm.com>
+>>>>> ---
+>>>>> Add a check to prevent accessing uninitialized per-CPU data.
+>>>>> ---
+>>>>>     arch/arm64/kvm/debug.c | 7 ++++---
+>>>>>     1 file changed, 4 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>>>>> index 381382c19fe4741980c79b08bbdab6a1bcd825ad..add58056297293b4eb337028773b1b018ecc9d35 100644
+>>>>> --- a/arch/arm64/kvm/debug.c
+>>>>> +++ b/arch/arm64/kvm/debug.c
+>>>>> @@ -233,7 +233,7 @@ void kvm_debug_handle_oslar(struct kvm_vcpu *vcpu, u64 val)
+>>>>>     void kvm_enable_trbe(void)
+>>>>>     {
+>>>>>     	if (has_vhe() || is_protected_kvm_enabled() ||
+>>>>> -	    WARN_ON_ONCE(preemptible()))
+>>>>> +	    WARN_ON_ONCE(preemptible()) || !is_kvm_arm_initialised())
+>>>>
+>>>> Hi Yingchao,
+>>>>
+>>>> There shouldn't be a warning for this, at least for the case where
+>>>> it's not initialized and never will be. If you're never going to run a
+>>>> guest these functions can all skip, the same way for !has_vhe() etc.
+>>>
+>>> It's not a warning. It's a bona-fide crash:
+>>>
+>>> void kvm_enable_trbe(void)
+>>> {
+>>> 	if (has_vhe() || is_protected_kvm_enabled() ||
+>>> 	    WARN_ON_ONCE(preemptible()))
+>>> 		return;
+>>>
+>>> 	host_data_set_flag(TRBE_ENABLED); <--- Explodes here
+>>> }
+>>>
+>>> So the write of the flag has to be skipped if KVM is available, even
+>>> if KVM is compiled in.
+>>>
+>>> 	M.
+>>>
+>>
+>> Yeah. And just in case there is any confusion, I didn't mean that we
+>> should not have the check entirely, just that it shouldn't be in the
+>> WARN_ON_ONCE(). We should put it in the part that makes the functions
+>> silently skip:
+>>
+>>    if (has_vhe() || is_protected_kvm_enabled() ||
+>>        !is_kvm_arm_initialised() ||
+>>        WARN_ON_ONCE(preemptible()))
+>>            return;
+> 
+> Which is exactly what the OP wrote, except for swapping the last two
+> terms.
+> 
+> 	M.
+> 
 
-Impact:
-- Incorrect canonicalization of VAs with bit47=1
-- Potential stale VNCR pseudo-TLB entries after TLBI or MMU notifier
-- Possible incorrect translation/permissions or DoS when combined
-  with other issues
+Hah! So it is. Being on the same line as the warning really threw me 
+despite looking at it 10 times.
 
-Fixes: 667304740537 ("KVM: arm64: Mask out non-VA bits from TLBI VA* on VNCR invalidation")
-Cc: stable@vger.kernel.org
-Reported-by: DongHa Lee <gap-dev@example.com>
-Reported-by: Gyujeong Jin <wlsrbwjd7232@gmail.com>
-Reported-by: Daehyeon Ko <4ncient@example.com>
-Reported-by: Geonha Lee <leegn4a@example.com>
-Reported-by: Hyungyu Oh <dqpc_lover@example.com>
-Reported-by: Jaewon Yang <r4mbb1@example.com>
-Signed-off-by: Gyujeong Jin <wlsrbwjd7232@gmail.com>
----
- arch/arm64/kvm/nested.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Not sure if it's just me but I think having the warning at the end or on 
+its own line is more readable.
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 77db81bae86f..eaa6dd9da086 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1169,7 +1169,7 @@ int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu)
- 
- static u64 read_vncr_el2(struct kvm_vcpu *vcpu)
- {
--	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 48);
-+	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 47);
- }
- 
- static int kvm_translate_vncr(struct kvm_vcpu *vcpu)
--- 
-2.43.0
+Either way:
+
+Reviewed-by: James Clark <james.clark@linaro.org>
+
+
+
 
