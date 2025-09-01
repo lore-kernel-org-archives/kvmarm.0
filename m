@@ -1,154 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEFE12CD8B;
-	Mon,  1 Sep 2025 13:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9749F3D994
+	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 13:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756733438; cv=none; b=spCwZmk/dMAbuzJ/KvwKKba9tsjEfEfchSEo2bbcZVXhjN8Ud301IkfyZFqUuRYYzQN8//K39AxX/bGrUj484RyRL5cvFtGXDqxBO0cNoiMjjAquRWv8DQYhNt3nhGZFsU5va+qt4cHlcvS2IXfwR/Euea5v4y4I5HHwtwJLHQ8=
+	t=1756734434; cv=none; b=AILiwdEAaJAT5QIO5MamT9AHinn4Jmp01MjJ/2dN+RL33vc0KA56KZLdqKCh/4pTfXt+akVxIzRGKGti70/f1o6O2hvH1XohP5+7Sb6iL8SVD0T5bqt9f9ZgNJNOZPifv8GCMJFU4e8q79s2KOGnDSf0xci6ZaLhGmQaAIYGDIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756733438; c=relaxed/simple;
-	bh=e2lNX30J79IdJmjUmjr3EtEfeJFIPem/dnVmubqrERk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TCjuDeRcZNW4T7tXOPt3WoQUtmPsOBS0vPWlF4sVCxtbdDJtpe+ARhWoO06sAZJOloh48DptF2Q6GBxw6LhkH70JvWToawnOupCMtCPXaPnjR6MUrOq1xFdfOS6oG80vZ7qMsYDBRM4YDn1R4rqEVM9cvIrHdieoOPLE83LlXn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GBdH+kpT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756734434; c=relaxed/simple;
+	bh=AfWNq8qOG43flzRWME3FN/9/nkz8zIUH0oyoL8ZMcCk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NPd7rmYNbUTQHMcf5OdudxVew2bwKSOSzHJlqpBihlOVZNQEJ6d3I9h3CTtOXk5YqrgQFFlt+cyPDWOta1KL/xrvxiAL2CulTDvUgWBh+Gl+L6Fb18SDjd+z54sWLwJkrlDVP6i1iTPgRbwpfH0GBW/eiUzCzqUriN35LbZ2RiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Q9JC1tDG; arc=none smtp.client-ip=52.28.197.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GBdH+kpT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFF45C4CEF0;
-	Mon,  1 Sep 2025 13:30:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756733438;
-	bh=e2lNX30J79IdJmjUmjr3EtEfeJFIPem/dnVmubqrERk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GBdH+kpT9TwqPh+0+7OX99d6ts0qcgKMkaK8UOYfHrRloHgbWGfXD0a8QyN18bsus
-	 JmScz2CRXclNO+XFUjHNIXv3Uk6DaegLkgKG+WR7kE+Li1B9ZVqx7gEepXHrHKhU+7
-	 TekPfuGmhTJbVlL0sr91uCzleu/c0SuquxI1ls3tmrzTRK43v20CQPP3TYlfoOsbdj
-	 5X4FSbBa5+Ct06LlE2HArLb8gjyt3OIYz1ateIAQ/VAgK10qMyx6nIg6HpqS4IcBFu
-	 EvIryrwyMrSnYzla+63jks8blz8XGUv/GOjNUquibXX3gjt+jJlQMhpNcykCmA4UMD
-	 7k0FbgepvtrSQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1ut4cF-00000002Ggu-3kyv;
-	Mon, 01 Sep 2025 13:30:36 +0000
-Date: Mon, 01 Sep 2025 14:30:35 +0100
-Message-ID: <86y0qycnb8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: Yingchao Deng <yingchao.deng@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	quic_yingdeng@quicinc.com,
-	jinlong.mao@oss.qualcomm.com,
-	tingwei.zhang@oss.qualcomm.com,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Fix NULL pointer access issue
-In-Reply-To: <80178c90-b9f3-4e1f-baa5-f54aa89ec927@linaro.org>
-References: <20250901-etm_crash-v1-1-ce65e44c137c@oss.qualcomm.com>
-	<450f11c2-6c11-4ffa-ae20-db4ea419a3ca@linaro.org>
-	<863496e4yg.wl-maz@kernel.org>
-	<80178c90-b9f3-4e1f-baa5-f54aa89ec927@linaro.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Q9JC1tDG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1756734432; x=1788270432;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+FO6rXzJ1OSaPqvoH5IT1CQYrfHskP0PMe12nrwxRLg=;
+  b=Q9JC1tDGGmQa8cbTlrJeUFILAHZVn9hv8HoPCtoYm5T2eHgQ9R8CBpvf
+   q/+ojK3nXCvA0HBRFselha6Bm9s3mslwgU4T+5bzYjZoHQMhggFc/JPuJ
+   PyudG0+YE9ShgQJ5WRgZCGiCq0/2AAKSRlPowtWabB0+iT19U5yHSTvJb
+   EC4ps/QZ0UdwkfHkkQ5YZTgQBEiOUXzgWoeY4eTP+iI7ARJAtPBh9aSm1
+   eVUdtP+lDPzuQMgY7EQ/2p+ku0wj5Y82sEoU3FEstufT0kiO9cMCvWR5f
+   ekeWAZ9AqFLki2cCdePAqoXSr81uZsfLm/7a25v0z3jHpJYvU0EFiN+jS
+   Q==;
+X-CSE-ConnectionGUID: m8ytizq0Q1qu8e8vIjnAEg==
+X-CSE-MsgGUID: iRZ+qBh2R/uOhlJ6+f0jsg==
+X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
+   d="scan'208";a="1359904"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 13:47:02 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:16772]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.42.3:2525] with esmtp (Farcaster)
+ id ca3958c9-cdc5-4794-b45a-6e9b3384e54b; Mon, 1 Sep 2025 13:47:02 +0000 (UTC)
+X-Farcaster-Flow-ID: ca3958c9-cdc5-4794-b45a-6e9b3384e54b
+Received: from EX19D015EUB003.ant.amazon.com (10.252.51.113) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Mon, 1 Sep 2025 13:47:01 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB003.ant.amazon.com (10.252.51.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Mon, 1 Sep 2025 13:47:01 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.2562.020; Mon, 1 Sep 2025 13:47:01 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+To: "tabba@google.com" <tabba@google.com>
+CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
+	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Roy, Patrick"
+	<roypat@amazon.co.uk>, "rppt@kernel.org" <rppt@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"will@kernel.org" <will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH v5 02/12] arch: export set_direct_map_valid_noflush to KVM
+ module
+Thread-Topic: [PATCH v5 02/12] arch: export set_direct_map_valid_noflush to
+ KVM module
+Thread-Index: AQHcG0bk577bUdlDRkuvvFVSrUyVog==
+Date: Mon, 1 Sep 2025 13:47:00 +0000
+Message-ID: <20250901134659.32171-1-roypat@amazon.co.uk>
+References: <CA+EHjTwDZ-FRV2KfC5ZG9SJYeeMRVUHQ8rVtb9dx2AQwCriPQw@mail.gmail.com>
+In-Reply-To: <CA+EHjTwDZ-FRV2KfC5ZG9SJYeeMRVUHQ8rVtb9dx2AQwCriPQw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.clark@linaro.org, yingchao.deng@oss.qualcomm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, quic_yingdeng@quicinc.com, jinlong.mao@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
 
-On Mon, 01 Sep 2025 13:31:23 +0100,
-James Clark <james.clark@linaro.org> wrote:
-> 
-> 
-> 
-> On 01/09/2025 1:24 pm, Marc Zyngier wrote:
-> > On Mon, 01 Sep 2025 11:36:11 +0100,
-> > James Clark <james.clark@linaro.org> wrote:
-> >> 
-> >> 
-> >> 
-> >> On 01/09/2025 11:01 am, Yingchao Deng wrote:
-> >>> When linux is booted in EL1, macro "host_data_ptr()" is a wrapper that
-> >>> resolves to "&per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)",
-> >>> is_hyp_mode_available() return false during kvm_arm_init, the per-CPU base
-> >>> pointer __kvm_nvhe_kvm_arm_hyp_percpu_base[cpu] remains uninitialized.
-> >>> Consequently, any access via per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)
-> >>> will result in a NULL pointer.
-> >>> 
-> >>> Add is_kvm_arm_initialised() condition check to ensure that kvm_arm_init
-> >>> completes all necessary initialization steps, including init_hyp_mode.
-> >>> 
-> >>> Fixes: 054b88391bbe2 ("KVM: arm64: Support trace filtering for guests")
-> >>> Signed-off-by: Yingchao Deng <yingchao.deng@oss.qualcomm.com>
-> >>> ---
-> >>> Add a check to prevent accessing uninitialized per-CPU data.
-> >>> ---
-> >>>    arch/arm64/kvm/debug.c | 7 ++++---
-> >>>    1 file changed, 4 insertions(+), 3 deletions(-)
-> >>> 
-> >>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> >>> index 381382c19fe4741980c79b08bbdab6a1bcd825ad..add58056297293b4eb337028773b1b018ecc9d35 100644
-> >>> --- a/arch/arm64/kvm/debug.c
-> >>> +++ b/arch/arm64/kvm/debug.c
-> >>> @@ -233,7 +233,7 @@ void kvm_debug_handle_oslar(struct kvm_vcpu *vcpu, u64 val)
-> >>>    void kvm_enable_trbe(void)
-> >>>    {
-> >>>    	if (has_vhe() || is_protected_kvm_enabled() ||
-> >>> -	    WARN_ON_ONCE(preemptible()))
-> >>> +	    WARN_ON_ONCE(preemptible()) || !is_kvm_arm_initialised())
-> >> 
-> >> Hi Yingchao,
-> >> 
-> >> There shouldn't be a warning for this, at least for the case where
-> >> it's not initialized and never will be. If you're never going to run a
-> >> guest these functions can all skip, the same way for !has_vhe() etc.
-> > 
-> > It's not a warning. It's a bona-fide crash:
-> > 
-> > void kvm_enable_trbe(void)
-> > {
-> > 	if (has_vhe() || is_protected_kvm_enabled() ||
-> > 	    WARN_ON_ONCE(preemptible()))
-> > 		return;
-> > 
-> > 	host_data_set_flag(TRBE_ENABLED); <--- Explodes here
-> > }
-> > 
-> > So the write of the flag has to be skipped if KVM is available, even
-> > if KVM is compiled in.
-> > 
-> > 	M.
-> > 
-> 
-> Yeah. And just in case there is any confusion, I didn't mean that we
-> should not have the check entirely, just that it shouldn't be in the
-> WARN_ON_ONCE(). We should put it in the part that makes the functions
-> silently skip:
-> 
->   if (has_vhe() || is_protected_kvm_enabled() ||
->       !is_kvm_arm_initialised() ||
->       WARN_ON_ONCE(preemptible()))
->           return;
-
-Which is exactly what the OP wrote, except for swapping the last two
-terms.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Hi Fuad!=0A=
+=0A=
+On Thu, 2025-08-28 at 11:07 +0100, Fuad Tabba wrote:=0A=
+>> diff --git a/arch/loongarch/mm/pageattr.c b/arch/loongarch/mm/pageattr.c=
+=0A=
+>> index f5e910b68229..d076bfd3fcbf 100644=0A=
+>> --- a/arch/loongarch/mm/pageattr.c=0A=
+>> +++ b/arch/loongarch/mm/pageattr.c=0A=
+>> @@ -217,6 +217,7 @@ int set_direct_map_invalid_noflush(struct page *page=
+)=0A=
+>>=0A=
+>>         return __set_memory(addr, 1, __pgprot(0), __pgprot(_PAGE_PRESENT=
+ | _PAGE_VALID));=0A=
+>>  }=0A=
+>> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");=0A=
+> =0A=
+> This should be after 'set_direct_map_valid_noflush', not 'invalid'.=0A=
+> =0A=
+> With that fixed:=0A=
+> =0A=
+> Reviewed-by: Fuad Tabba <tabba@google.com>=0A=
+=0A=
+Ah, yes, good catch, thanks!=0A=
+=0A=
+Best,=0A=
+Patrick=0A=
