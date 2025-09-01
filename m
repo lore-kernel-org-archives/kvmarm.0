@@ -1,212 +1,157 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF64340D97
-	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 14:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0BB33A03A
+	for <kvmarm@lists.linux.dev>; Mon,  1 Sep 2025 14:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756737810; cv=none; b=ena8nAGBjutcpzvAa1IWIyYX0FXlAJlJiqpAXfrFc0CxanHkUvTgDAxdWNZZl8taKKbXO0Z5gjz361iYovEA0keTYhbLiTnK+/DUdlkZ13GKUCb1MOBULw5XPzhQWj4hwtiIs26LqsB5NRaWoxBRvpm6rYjp/8b5LltfnsHKxS0=
+	t=1756738606; cv=none; b=hQqHvREpQ2+YN+J/vHTrqh6KjM/r8WrMnqQv0QqSnODcghBaVrn800KTolz6vzkBdIbvumd+zbe1cB7wZoe0HoGtZaAUusPSMvJb4PCxTYdTrtvQOqFmo93OA7WPX6ZPYyrMmAQSoYpXyLePV3r2CVY482ks9c2QbngvPchifO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756737810; c=relaxed/simple;
-	bh=fzV2ArRfUZY3Zqk8nsUA/BCr9akfeCnj+cgX8D3T2U0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o022oZRVhvfUuTytq/dcoAZSRsAKOK+n2WvC+6ueYdH8wBoQwaVF/pxvSlGdY13rCPrecwrt3vKzdJP7h2D3byfHxeLrVpOEE63isfkIzbvB1tpZKVRoHCYrpd13XxrJLLEhHshC5FGpCSp805ZmF1cwd3BI+NuN41sTJj4YV+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=he83A8Hr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1756738606; c=relaxed/simple;
+	bh=0r92TVxw7xStPkhxnOmkl8O336c+4U2sqZq5v2M5rfQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ScokYEA2vvCQm31dBoAo9HBujDStd09RhZ6TfGC95shwawYybN/H1mQw0jlgX2fwmLr5jBAwNlZefws46ddGUb/M49vwK5ygHAK+gvNqXslESD+DKDvq5fNZ5/uQNLKFXW3PKnXCXtZnXrFjwH9CC0uHxqIGwyr6wwZ/lGebgC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Zz/3rOz0; arc=none smtp.client-ip=52.28.197.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="he83A8Hr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756737807;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ZQf4Reiy5apT64tfdgfETW33d38jjuSty8SoNlXS3hY=;
-	b=he83A8Hr4oZxw6L7xZYUs5O56bNktzRy1zVWXInnzvHq6lU9BSaZhxS71R1yPfCC7poltk
-	ul6uyxGnyjxq32PJhu5YntHb/ow7v59L9W+f9sCh3+ZnLuZG3Xws98WHMAAlh5yYtopkff
-	zsQh8SlOPC6LGLSZi1jId1Np6uy00LA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-lRhmNWRRO_-4JaY6mT9nUA-1; Mon, 01 Sep 2025 10:43:26 -0400
-X-MC-Unique: lRhmNWRRO_-4JaY6mT9nUA-1
-X-Mimecast-MFC-AGG-ID: lRhmNWRRO_-4JaY6mT9nUA_1756737805
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45b8af0b8deso7342285e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 01 Sep 2025 07:43:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756737805; x=1757342605;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZQf4Reiy5apT64tfdgfETW33d38jjuSty8SoNlXS3hY=;
-        b=oT08WUiF36+YvPPprQUOoycSzA5AC3Ae6jKGm0JPovHZaRJuZVAuRQPOa823vgxIAD
-         DQ0gXI1ymj+exPaqeSWHGbfy2vzl4uDUzbq1WU0gE8/hmJJAZ+XIYy+VUCkDFDaKakD6
-         O60pov1R79zl9dgaagSYB7h90paVMSsgVOWp3yoRGtWi8mC6iFYeqXYvm56XWvAfFeWq
-         G9EuXLXKC/bCFWSGzV8NcjL3aIkk2nfcFfFOv1PgwUNRe9nEdOcUygXI/0lBJFS0aDIm
-         R66MB/j155Tw/fc0GPimD6+eECbu+W//xvoH9Nm1/oNbl+mdEGZcQ2DZlS0wsp85muoj
-         /OrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWe0ckxCRT4qKJgCjM5bes/r0K6yphX5RP3uqMHXPBjLo3iTPNgKNpVlLIpyPT4rRx/7yU30qk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyPJ40QU6Jz7EnmUBIOCAyZrW4zQQLgtAvLEqFuRaJ13L2BKGCF
-	xVv9HtWGNWZkxDVzRbaKPIv5Yzfc/aDlx5TFi0cXtay9Ct8pv5WtbMC+LgoDgsWAT9BsAo2ySMe
-	yXyRrDzT40X3ry9P7b3kIgyy4rWK8Zn0GhSMAL/3BrvbOX0rkIEo+jwAU+Q==
-X-Gm-Gg: ASbGncuXmW1Z1QE2VPPOXP/AaTg2oG7fQRnvQscTF64mL7RBiCiTvwtyaLJ32CnlFHd
-	vDJaHKGQpDrWdsmTNdqPkyAM/mwvSV1pMI1sKxDecJLjawUjVpSDexytYSTQoYmAJ5nEV9vXeat
-	u12rFkxCM39CbQhFjv7mUAxNQLEJO+zM2DXF2G/LS88WmMlv9/U6NMdkK9x0F2SmwqlHGhEJep+
-	rxLxSXCQEOZJizoc9/3s4fn9aglFt/wuOQ2QGUCiBgftrRLiJZ4PQ53tDDlzDzsm1FVs+VkaOXU
-	ttDURk6aUyd2XmaijqhuSNspZ6QwM9vh1wmoqnnk1AFjLlWYDhGhuT711NnvyxvYqdKqwMSAg8g
-	luf6BsJpwu1AlHKtmtln1KDygUOp4bKThz52xuGckwXziqafvTSM3VQ8O/rnT/TcBXU0=
-X-Received: by 2002:a05:600c:3b9d:b0:45b:8a84:503b with SMTP id 5b1f17b1804b1-45b8a845256mr54590905e9.31.1756737805321;
-        Mon, 01 Sep 2025 07:43:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQRfn5sR/77vqQEmdzkbnhL4QNlRAOrqr4TrvFYBM6bDd/eneSMeY2Ldu8ZaHvy16wvsmCiw==
-X-Received: by 2002:a05:600c:3b9d:b0:45b:8a84:503b with SMTP id 5b1f17b1804b1-45b8a845256mr54590595e9.31.1756737804892;
-        Mon, 01 Sep 2025 07:43:24 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f37:2b00:948c:dd9f:29c8:73f4? (p200300d82f372b00948cdd9f29c873f4.dip0.t-ipconnect.de. [2003:d8:2f37:2b00:948c:dd9f:29c8:73f4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b87b38fcfsm53262385e9.0.2025.09.01.07.43.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Sep 2025 07:43:24 -0700 (PDT)
-Message-ID: <e2620083-656b-4af1-91d5-6452eda2e4a7@redhat.com>
-Date: Mon, 1 Sep 2025 16:43:22 +0200
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Zz/3rOz0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1756738604; x=1788274604;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=DzdixQuy30cIOdtGPtZhymwxAjNsuo6l8KhPTQzil28=;
+  b=Zz/3rOz02k0CZijphqp9ZkI2uI+MNzRHVUtqSaZj0zco6n+GKXQecmxT
+   v0winJS3clIBs3DoevV7i21tnrZHvkBYMIzZc488ErWNdDvdPuLXFlic3
+   NuB7uWF4peU+w6IYuB5aimAFu4wNfAFqvXa/fFYQIGJnFRMcutOZpWs9f
+   oqYoFpzHYBbU3aJ4Z+RCn5ucKCSQzhGWMN10ISnPXJMlsJ+uYjPy45Lsu
+   ghCjiS03i/pxxXd1WGydNCWFW2Jf3/yYQg5NHwJNGCbTfwbYRonT8wMzR
+   T34wslWVo3fHlrDg31uws6b6a2gxBCVEp6Bz6wBNIukxyJOYNZmEjo2B4
+   A==;
+X-CSE-ConnectionGUID: TP9bWQ1xROib+ix+/ngIXQ==
+X-CSE-MsgGUID: YwAZ6XeoRvujHV/6Dg0jJQ==
+X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
+   d="scan'208";a="1364214"
+Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
+  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 14:56:34 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:28303]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.36.37:2525] with esmtp (Farcaster)
+ id 90fd1a2a-3fc2-46c8-b14d-04ef65bb514a; Mon, 1 Sep 2025 14:56:34 +0000 (UTC)
+X-Farcaster-Flow-ID: 90fd1a2a-3fc2-46c8-b14d-04ef65bb514a
+Received: from EX19D015EUB002.ant.amazon.com (10.252.51.123) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Mon, 1 Sep 2025 14:56:33 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB002.ant.amazon.com (10.252.51.123) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Mon, 1 Sep 2025 14:56:33 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.2562.020; Mon, 1 Sep 2025 14:56:33 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+To: "Roy, Patrick" <roypat@amazon.co.uk>
+CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
+	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "rppt@kernel.org"
+	<rppt@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
+	"tabba@google.com" <tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"will@kernel.org" <will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
+Thread-Topic: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
+Thread-Index: AQHcG0fkqK4jccjXtUKv/NLtaS3P1rR+aqUA
+Date: Mon, 1 Sep 2025 14:56:33 +0000
+Message-ID: <20250901145632.28172-1-roypat@amazon.co.uk>
+References: <20250901135408.5965-1-roypat@amazon.co.uk>
+In-Reply-To: <20250901135408.5965-1-roypat@amazon.co.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 05/12] KVM: Documentation: describe
- GUEST_MEMFD_FLAG_NO_DIRECT_MAP
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "ackerleytng@google.com" <ackerleytng@google.com>,
- "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
- <jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rppt@kernel.org" <rppt@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "tabba@google.com" <tabba@google.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "will@kernel.org" <will@kernel.org>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>
-References: <786503d6-e58d-412a-a17b-f5e4e481c3fe@redhat.com>
- <20250901143000.5017-1-roypat@amazon.co.uk>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20250901143000.5017-1-roypat@amazon.co.uk>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 4tSd1d0auZYVokrReJ4Uq6SvD3_bSjmsh-f0pnSMivM_1756737805
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 01.09.25 16:30, Roy, Patrick wrote:
-> On Thu, 2025-08-28 at 11:27 +0100, David Hildenbrand wrote:
->> On 28.08.25 11:39, Roy, Patrick wrote:
->>> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
->>> ---
->>>    Documentation/virt/kvm/api.rst | 5 +++++
->>>    1 file changed, 5 insertions(+)
->>>
->>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>> index c17a87a0a5ac..b52c14d58798 100644
->>> --- a/Documentation/virt/kvm/api.rst
->>> +++ b/Documentation/virt/kvm/api.rst
->>> @@ -6418,6 +6418,11 @@ When the capability KVM_CAP_GUEST_MEMFD_MMAP is supported, the 'flags' field
->>>    supports GUEST_MEMFD_FLAG_MMAP.  Setting this flag on guest_memfd creation
->>>    enables mmap() and faulting of guest_memfd memory to host userspace.
->>>
->>> +When the capability KVM_CAP_GMEM_NO_DIRECT_MAP is supported, the 'flags' field
->>> +supports GUEST_MEMFG_FLAG_NO_DIRECT_MAP. Setting this flag makes the guest_memfd
->>> +instance behave similarly to memfd_secret, and unmaps the memory backing it from
->>> +the kernel's address space after allocation.
->>> +
->>>    When the KVM MMU performs a PFN lookup to service a guest fault and the backing
->>>    guest_memfd has the GUEST_MEMFD_FLAG_MMAP set, then the fault will always be
->>>    consumed from guest_memfd, regardless of whether it is a shared or a private
->>
->> WARNING: Missing commit description - Add an appropriate one
-> 
-> Admittedly wasn't sure what to say that wouldn't just repeat the commit title
-> or the contents. Maybe that just means this shouldn't be its own patch. Will
-> squash in the previous one (same for PATCH 11/12).
-
-Very right :)
-
-If there is nothing to say then probably everything was already said 
-(other patch), lol
-
-> 
->> WARNING: From:/Signed-off-by: email name mismatch: 'From: "Roy, Patrick"
->> <roypat@amazon.co.uk>' != 'Signed-off-by: Patrick Roy <roypat@amazon.co.uk>'
-> 
-> Heh, my git config only ever uses "Patrick Roy <roypat@amazon.co.uk>". Not sure
-> where "Roy, Patrick" comes from, could it be the mail server mangling things?
-
-Good question. Does it only happen through git?
-
-When Nikita sends through amazon.com[1] it seems to be fine.
-
-But when he also sent through amazon.co.uk [2], it's also messed up.
-
-I suggest contacting the amazon.co.uk admin or ... sending through 
-amazon.com :)
-
-
-[1] 
-https://lore.kernel.org/all/cda7c46b-c474-48f4-b703-e2f988470f3b@amazon.com/T/#u
-[1] 
-https://lore.kernel.org/all/20250828153049.3922-1-kalyazin@amazon.com/T/#u
-
--- 
-Cheers
-
-David / dhildenb
-
+On Mon, 2025-09-01 at 14:54 +0100, "Roy, Patrick" wrote:=0A=
+> =0A=
+> Hi Fuad!=0A=
+> =0A=
+> On Thu, 2025-08-28 at 11:21 +0100, Fuad Tabba wrote:=0A=
+>> Hi Patrick,=0A=
+>>=0A=
+>> On Thu, 28 Aug 2025 at 10:39, Roy, Patrick <roypat@amazon.co.uk> wrote:=
+=0A=
+>>> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h=0A=
+>>> index 12a12dae727d..b52b28ae4636 100644=0A=
+>>> --- a/include/linux/pagemap.h=0A=
+>>> +++ b/include/linux/pagemap.h=0A=
+>>> @@ -211,6 +211,7 @@ enum mapping_flags {=0A=
+>>>                                    folio contents */=0A=
+>>>         AS_INACCESSIBLE =3D 8,    /* Do not attempt direct R/W access t=
+o the mapping */=0A=
+>>>         AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM =3D 9,=0A=
+>>> +       AS_NO_DIRECT_MAP =3D 10,  /* Folios in the mapping are not in t=
+he direct map */=0A=
+>>>         /* Bits 16-25 are used for FOLIO_ORDER */=0A=
+>>>         AS_FOLIO_ORDER_BITS =3D 5,=0A=
+>>>         AS_FOLIO_ORDER_MIN =3D 16,=0A=
+>>> @@ -346,6 +347,21 @@ static inline bool mapping_writeback_may_deadlock_=
+on_reclaim(struct address_spac=0A=
+>>>         return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &mapping-=
+>flags);=0A=
+>>>  }=0A=
+>>>=0A=
+>>> +static inline void mapping_set_no_direct_map(struct address_space *map=
+ping)=0A=
+>>> +{=0A=
+>>> +       set_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
+>>> +}=0A=
+>>> +=0A=
+>>> +static inline bool mapping_no_direct_map(struct address_space *mapping=
+)=0A=
+>>> +{=0A=
+>>> +       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
+>>> +}=0A=
+>>> +=0A=
+>>> +static inline bool vma_is_no_direct_map(const struct vm_area_struct *v=
+ma)=0A=
+>>> +{=0A=
+>>> +       return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_ma=
+pping);=0A=
+>>> +}=0A=
+>>> +=0A=
+>> Any reason vma is const whereas mapping in the function that it calls=0A=
+>> (defined above it) isn't?=0A=
+> =0A=
+> Ah, I cannot say that that was a conscious decision, but rather an artifa=
+ct of=0A=
+> the code that I looked at for reference when writing these two simply did=
+ it=0A=
+> this way.  Are you saying both should be const, or neither (in my mind, b=
+oth=0A=
+> could be const, but the mapping_*() family of functions further up in thi=
+s file=0A=
+> dont take const arguments, so I'm a bit unsure now)?=0A=
+=0A=
+Hah, just saw=0A=
+https://lore.kernel.org/linux-mm/20250901123028.3383461-3-max.kellermann@io=
+nos.com/.=0A=
+Guess that means "both should be const" then :D=0A=
+=0A=
+>> Cheers,=0A=
+>> /fuad=0A=
+> =0A=
+> Best,=0A=
+> Patrick=0A=
+=0A=
