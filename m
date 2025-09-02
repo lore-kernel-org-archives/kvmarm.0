@@ -1,172 +1,97 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3D62DC341
-	for <kvmarm@lists.linux.dev>; Tue,  2 Sep 2025 13:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6327F31B131;
+	Tue,  2 Sep 2025 15:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756818842; cv=none; b=naMJ/v7bkIWStpYnY3AGEyVlwYBEN1v36L0JotN8UBomt+Ylzwj4UDJuS/CwjmaJPTsprsn8GpMentqfQh0r0AXagzqu8Wl/gwRauQpXxj0XGn1YmlLd0/HBdCKkxE1IHIozJPyJ6spSP8wsZw245n0n5T9Wlph11LsYucbGk/A=
+	t=1756827702; cv=none; b=ngdEmKhoBoXNC/EYzkszhEPsQyytkoeQ03r7t8b7swheMGTVFu3RqooVIChgPiLTQg9Y1O/Mb9WTQYbuFiabSb203vBOGBZHF/TtrLUk/DJEheBRkgL0QD8W7+hA0A2b8ic8eMnsRsg6CQ5muPy1DPR9SVZ9aMSpZvtaNcuJvZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756818842; c=relaxed/simple;
-	bh=3pXIixBqdz5fiNKmBzEl+d3b2QVhPhpOSwSgDed4oJQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BVXcIbwRqm3U8QPy4egZ4TcaSiUoIG/nl4ALTvp/WYMJih/v4Ch7nsvk92d9S/2WjARv315f/smjcmumucdzpsWMSxSYloJ3Ij3coSUXlAr+dBtgiB1TOv2JqfS0z1O/HZ+JioouSF22KMvUkOfSOlTvbjej5fJZs89gMNb428k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D6D1F27B5;
-	Tue,  2 Sep 2025 06:13:51 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA5713F694;
-	Tue,  2 Sep 2025 06:13:58 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org
-Subject: [PATCH v2 2/2] KVM: arm64: VHE: Save and restore host MDCR_EL2 value correctly
-Date: Tue,  2 Sep 2025 14:08:33 +0100
-Message-ID: <20250902130833.338216-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250902130833.338216-1-alexandru.elisei@arm.com>
-References: <20250902130833.338216-1-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1756827702; c=relaxed/simple;
+	bh=x33XkRQZmTF0t4JK6plAC/PahprcBBIFiMnsKSn2e9A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=eKaRptLwEsTGACD/QsqgUSiNJuIIogVHDe/iZRnO6E/cNU9uiUtlaTJG42O5doYUhuWTZ2hoQZVcyPIskbN4pWdUnHgc/Qopgd25OWco2eoIYzpPKz7LsXdq6AoJ0ZfcX5at+OKoP6ZhW4djqDYc9qe5lATpWrBhFEmXS1Y5AqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2zZ8Oasy; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CbELGlnz; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2zZ8Oasy";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CbELGlnz"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1756827699;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pGwYTKhGfWnlBOKIJz2ymmNYWDHnVcRdnTi9w0My2J4=;
+	b=2zZ8Oasydxmvlshi+0hPu1sllPKmuKAIhq/xyqKhr/ICLKxEbNE0Y8arXmULIhFseyznbC
+	NlsSLx1j+NShWRw4gbfZYL8ad5Y7lWn8tb1mtzBcqKCgFv1WeUGKNq+n7XQhESEv6T34k/
+	n78/Em8081lAQ+c0FZDT1a52G86GycH2kX6jzJhFFVWxLjuPwg8RTepS8e7qQA3UHoxMNI
+	+IpQnlz/nMshQLJtN/61G6QO6p2VGZrRfWPs6kIiw2HVPD/gE0RaT4ds+sXRt+9jlzH+BL
+	fwA1t27rhnwV3uIP1p5Z+Vmh74rHjoSwepM5Lm9+8N4mVvRUU07myiLH1ff+xg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1756827699;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pGwYTKhGfWnlBOKIJz2ymmNYWDHnVcRdnTi9w0My2J4=;
+	b=CbELGlnz4Ygw+ApxTHhD0Wzrjj/QAZbjUecQqluEnw1bvfySdSmzQUCOWm89MgF184XaOn
+	VBamn8Ys02TYr6Bw==
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen
+ <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, Borislav
+ Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang
+ <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Peter Zijlstra <peterz@infradead.org>, Andy
+ Lutomirski <luto@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay
+ <neeraj.upadhyay@kernel.org>, Joel Fernandes <joelagnelf@nvidia.com>, Josh
+ Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Uladzislau Rezki <urezki@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, rcu@vger.kernel.org, Nuno Das Neves
+ <nunodasneves@linux.microsoft.com>, Mukesh R <mrathor@linux.microsoft.com>
+Subject: Re: [PATCH v2 4/7] entry/kvm: KVM: Move KVM details related to
+ signal/-EINTR into KVM proper
+In-Reply-To: <20250828000156.23389-5-seanjc@google.com>
+References: <20250828000156.23389-1-seanjc@google.com>
+ <20250828000156.23389-5-seanjc@google.com>
+Date: Tue, 02 Sep 2025 17:41:37 +0200
+Message-ID: <87wm6gzwsu.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Prior to commit 75a5fbaf6623 ("KVM: arm64: Compute MDCR_EL2 at
-vcpu_load()"), host MDCR_EL2 was saved correctly:
+On Wed, Aug 27 2025 at 17:01, Sean Christopherson wrote:
+> Move KVM's morphing of pending signals into userspace exits into KVM
+> proper, and drop the @vcpu param from xfer_to_guest_mode_handle_work().
+> How KVM responds to -EINTR is a detail that really belongs in KVM itself,
+> and invoking kvm_handle_signal_exit() from kernel code creates an inverted
+> module dependency.  E.g. attempting to move kvm_handle_signal_exit() into
+> kvm_main.c would generate an linker error when building kvm.ko as a module.
+>
+> Dropping KVM details will also converting the KVM "entry" code into a more
+> generic virtualization framework so that it can be used when running as a
+> Hyper-V root partition.
+>
+> Lastly, eliminating usage of "struct kvm_vcpu" outside of KVM is also nice
+> to have for KVM x86 developers, as keeping the details of kvm_vcpu purely
+> within KVM allows changing the layout of the structure without having to
+> boot into a new kernel, e.g. allows rebuilding and reloading kvm.ko with a
+> modified kvm_vcpu structure as part of debug/development.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-kvm_arch_vcpu_load()
-  kvm_vcpu_load_debug() /* Doesn't touch hardware MDCR_EL2. */
-  kvm_vcpu_load_vhe()
-    __activate_traps_common()
-       /* Saves host MDCR_EL2. */
-       *host_data_ptr(host_debug_state.mdcr_el2) = read_sysreg(mdcr_el2)
-       /* Writes VCPU MDCR_EL2. */
-       write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2)
-
-The MDCR_EL2 value saved previously was restored in
-kvm_arch_vcpu_put() -> kvm_vcpu_put_vhe().
-
-After the aforementioned commit, host MDCR_EL2 is never saved:
-
-kvm_arch_vcpu_load()
-  kvm_vcpu_load_debug() /* Writes VCPU MDCR_EL2 */
-  kvm_vcpu_load_vhe()
-    __activate_traps_common()
-       /* Saves **VCPU** MDCR_EL2. */
-       *host_data_ptr(host_debug_state.mdcr_el2) = read_sysreg(mdcr_el2)
-       /* Writes VCPU MDCR_EL2 a second time. */
-       write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2)
-
-kvm_arch_vcpu_put() -> kvm_vcpu_put_vhe() then restores the VCPU MDCR_EL2
-value. Also VCPU's MDCR_EL2 value gets written to hardware twice now.
-
-Fix this by saving the host MDCR_EL2 in kvm_arch_vcpu_load() before it gets
-overwritten by the VCPU's MDCR_EL2 value, and restore it on VCPU put.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-
-Tested on a cubie a5e by adding a few print statements. Without the patch:
-
-[ 1009.416572] kvm_arch_init_vm: MDCR_EL2=0x6
-[ 1028.397204] kvm_arch_destroy_vm: MDCR_EL2=0xe66
-[ 1049.271878] kvm_arch_init_vm: MDCR_EL2=0xe66
-[ 1066.030000] kvm_arch_destroy_vm: MDCR_EL2=0xe66
-
-With the patch:
-
-[  977.814892] kvm_arch_init_vm: MDCR_EL2=0x6
-[ 1040.084919] kvm_arch_destroy_vm: MDCR_EL2=0x6
-[ 1045.987826] kvm_arch_init_vm: MDCR_EL2=0x6
-[ 1128.720366] kvm_arch_destroy_vm: MDCR_EL2=0x6
-
- arch/arm64/kvm/debug.c                  | 6 ++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 5 -----
- arch/arm64/kvm/hyp/nvhe/switch.c        | 6 ++++++
- 3 files changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index e7ce0d5a622d..c81b11c42e4d 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -144,6 +144,9 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
- 	/* Must be called before kvm_vcpu_load_vhe() */
- 	KVM_BUG_ON(vcpu_get_flag(vcpu, SYSREGS_ON_CPU), vcpu->kvm);
- 
-+	if (has_vhe())
-+		*host_data_ptr(host_debug_state.mdcr_el2) = read_sysreg(mdcr_el2);
-+
- 	/*
- 	 * Determine which of the possible debug states we're in:
- 	 *
-@@ -190,6 +193,9 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
- 
- void kvm_vcpu_put_debug(struct kvm_vcpu *vcpu)
- {
-+	if (has_vhe())
-+		write_sysreg(*host_data_ptr(host_debug_state.mdcr_el2), mdcr_el2);
-+
- 	if (likely(!(vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
- 		return;
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 84ec4e100fbb..b6682202edf3 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -431,9 +431,6 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
- 	}
- 
--	*host_data_ptr(host_debug_state.mdcr_el2) = read_sysreg(mdcr_el2);
--	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
--
- 	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
- 		u64 hcrx = vcpu->arch.hcrx_el2;
- 		if (is_nested_ctxt(vcpu)) {
-@@ -454,8 +451,6 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
- 
--	write_sysreg(*host_data_ptr(host_debug_state.mdcr_el2), mdcr_el2);
--
- 	write_sysreg(0, hstr_el2);
- 	if (system_supports_pmuv3()) {
- 		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index ccd575d5f6de..d3b9ec8a7c28 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -50,6 +50,10 @@ extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
- static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	___activate_traps(vcpu, vcpu->arch.hcr_el2);
-+
-+	*host_data_ptr(host_debug_state.mdcr_el2) = read_sysreg(mdcr_el2);
-+	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-+
- 	__activate_traps_common(vcpu);
- 	__activate_cptr_traps(vcpu);
- 
-@@ -93,6 +97,8 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 		isb();
- 	}
- 
-+	write_sysreg(*host_data_ptr(host_debug_state.mdcr_el2), mdcr_el2);
-+
- 	__deactivate_traps_common(vcpu);
- 
- 	write_sysreg_hcr(this_cpu_ptr(&kvm_init_params)->hcr_el2);
--- 
-2.51.0
-
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
