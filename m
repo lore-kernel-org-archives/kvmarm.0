@@ -1,155 +1,103 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360262E7F1A
-	for <kvmarm@lists.linux.dev>; Tue,  2 Sep 2025 07:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA52F3D76
+	for <kvmarm@lists.linux.dev>; Tue,  2 Sep 2025 08:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756799993; cv=none; b=IJO5ug7SDRJIMEMz2Z5FdgZsYdkdoZQKjDszD4tqZjUvMpQj+UOotiiIGXtm0tIQEpuJCK8cg32VK5JhKsifaf824o1NmGCOpnMI/M/d+C5REYFkY4t286Wrk9psdxl07j0fxaWw/xzFGzkrPYwCvQT1uw3SUTgmJib+JVh1fmo=
+	t=1756801425; cv=none; b=mSXb7Iu+NZnHoH2cC30u+wlfcURypsoxcxQGvXRkok+slHt1hHFfZyAA+cuxbZh5gE+O9kyp1333dBfKONg0clmJecVF+WMd8ElQgHajG51oG4Bxyw/nFJyg6djnTOptUqlKHl+ZbmcwFmGMTvMZEcjIJToPJjM06yQ/nH9iKdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756799993; c=relaxed/simple;
-	bh=tebRK0QcMgpMQT7H4oKZqhEct4KUpLNswRIw/gQ5Jd8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GdVl22+vAYWv6XLfrL7PvbS7RS5t4QCbKEWd/cBXkXaNJB5hblZAJe+CodXpbmf5sRqitdgMR1dBZJeiXuqfALYV55ky5QgbkdeOPWsxM4+jNFR9GQHIG5p6/FxoQa1gNSh4uFIBc2TlZUTibdNo/eRd1JFEelLIDnUrf9D/+vI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lJMRNiZI; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lJMRNiZI"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4b327480fd0so824561cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 02 Sep 2025 00:59:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756799991; x=1757404791; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=oNeLWs2qHyUDts+2iHePFK0hNcgX1eWBxmSFpW760QQ=;
-        b=lJMRNiZIBCGHpfe/N51fBnvH4OH8SeFN0WsUph6QnNlI19GOkeixJRR3a38wc4Q8Zi
-         17/n+SUQpz09itiQafq7HlGvLF0wv4c9Nxo/VBT0ryYEgbrx6MJWczTV8hXqhS55ewXn
-         e0QzQrWbI7Cz28IKEbw4JOloBGjgVoigZqSxH246HTOc5zdrUMzXDU4nB0nmpQphiYB9
-         js0jfiTmg6Sn65XG44uFxIyF5pxLz80IJt+96MYe9kWEJtLXelsFHTL1MFinTgvMBiSS
-         p5odzGYE0n2M2jtDQt//W8J6YLlHWn+JsOs2bhgAUjbrifVmZXMsVnd3xDvQKS8nlukx
-         ir+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756799991; x=1757404791;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oNeLWs2qHyUDts+2iHePFK0hNcgX1eWBxmSFpW760QQ=;
-        b=L0TCaK0d3vrlzjH1NNPubDmuceI6iZRuGPWO6zhJcmaMYXtlJYIw5gFb6XkpoGXdXb
-         IJxnRseQo0OhIsR+Qw1pzEiuThf9+muKlDqRsyuKR/TcDHYNgU3tzlvxUWjeoOUtHftb
-         t4cwShTFmc+aR1P1MILSQCLKoO6GdkA9sW+37NL+WcfgQiAufC+jUql2SeCYDJiMhUrY
-         uPXOWNtKFGFAwqpTqYQpIqSOvIsHfQv3ju6tJSblqB6BELmajlhzqhqFKZ+ZXMRr/6oz
-         O934DeV9UqLtiwbOnZeCKVI76z0enH54N70z/9qgpEqBS3RcYklXZsnQ0/C+vzHulxKY
-         9u2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUKnp9eae7Ea3bKqpi6gGRpLVSbyQ4qzRIe9ZdcI+FoevsWxnCi3JM6uT3J4KHtTxM+04gDB+E=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzivVNVoEvo/mZ/F7E5Hx8w8agCanETP8TcreztIwyWTLUTlMwf
-	5d/V32Ydy/5bT9XaSyX/2kWUyN5GMBI6VNScYowe1hKEE+nYh6F7TQx9DnfhM3X+0gCa2X11E3b
-	KaWSm3lmkj/s8IiBTf98SSfLlBg1rJJCRi6PG88n4
-X-Gm-Gg: ASbGnctz7GNXVwUZ1hZA8gDFvhPKy3rrH4mhPwok2laKNQWQh66McGJqPKPV148gf0b
-	fWOEYmHx/89e0w7LGKUMLchFevaHHFWp5cApAoQlpxXVST61tAbhNdHdFQfb8Dh7ogXy7glW5BA
-	LqzlOOBsftwz6asjWehQGSUejyDznJbvK1ZSKaHVsFi4BzNhfsX+7PkAlKZY/1BIy/hba2QCYRp
-	U17jXFxcDee4nZeCJStgczqfjMkTWJFIWm/
-X-Google-Smtp-Source: AGHT+IFkdbqiMarowY+mmKOzuU9RyYySZu0bnzDQg3QNeDfxzMXfy+3OtZ2GRaaDn0H+MAu5W+vNpqCjVKeX20zwo4o=
-X-Received: by 2002:a05:622a:107:b0:48d:8f6e:ece7 with SMTP id
- d75a77b69052e-4b31b245bdfmr13130661cf.3.1756799990207; Tue, 02 Sep 2025
- 00:59:50 -0700 (PDT)
+	s=arc-20240116; t=1756801425; c=relaxed/simple;
+	bh=/Fc93HJyTsls3mqFSuyCskutbKEm0Sfk24vuIXo3Fw8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WlOKQZUTtB8XlWcDheLq/3LYxe/R0fglV7d+0zzzNyTF0usPfZtqM56aMllo+6oJKc5fsIYzRWVHEvy2gcLL/0LXi03eWL+Wwc54IYFi+DbDD4Z+Zeec/KHdt0vhoftqNMxy0K5EgtXoqua5q69YMPlLmF+K6oVZ5F85p84mlYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B6D82720;
+	Tue,  2 Sep 2025 01:23:29 -0700 (PDT)
+Received: from [10.57.4.221] (unknown [10.57.4.221])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5EA903F6A8;
+	Tue,  2 Sep 2025 01:23:35 -0700 (PDT)
+Message-ID: <e823610a-e145-4627-9968-6d2dcc873184@arm.com>
+Date: Tue, 2 Sep 2025 09:23:34 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250901135408.5965-1-roypat@amazon.co.uk> <20250901145632.28172-1-roypat@amazon.co.uk>
-In-Reply-To: <20250901145632.28172-1-roypat@amazon.co.uk>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 2 Sep 2025 08:59:13 +0100
-X-Gm-Features: Ac12FXwFaub6kV3Kd2ykY4foMIV_-u80DlGRtIr2iGvqoKH4iO-6ScE4yMry24U
-Message-ID: <CA+EHjTxPfzDk=XmwS0uAtjwsYB829s1uZSMC6x3R6KGQ-SqjtQ@mail.gmail.com>
-Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com" <david@redhat.com>, 
-	"Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "rppt@kernel.org" <rppt@kernel.org>, 
-	"seanjc@google.com" <seanjc@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "will@kernel.org" <will@kernel.org>, 
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/5] arm64: cpucaps: Add GICv5 Legacy vCPU interface
+ (GCIE_LEGACY) capability
+Content-Language: en-GB
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ Joey Gouly <Joey.Gouly@arm.com>, "yuzenghui@huawei.com"
+ <yuzenghui@huawei.com>, "will@kernel.org" <will@kernel.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ Timothy Hayes <Timothy.Hayes@arm.com>
+References: <20250828105925.3865158-1-sascha.bischoff@arm.com>
+ <20250828105925.3865158-4-sascha.bischoff@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250828105925.3865158-4-sascha.bischoff@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Patrick,
-
-On Mon, 1 Sept 2025 at 15:56, Roy, Patrick <roypat@amazon.co.uk> wrote:
->
-> On Mon, 2025-09-01 at 14:54 +0100, "Roy, Patrick" wrote:
-> >
-> > Hi Fuad!
-> >
-> > On Thu, 2025-08-28 at 11:21 +0100, Fuad Tabba wrote:
-> >> Hi Patrick,
-> >>
-> >> On Thu, 28 Aug 2025 at 10:39, Roy, Patrick <roypat@amazon.co.uk> wrote:
-> >>> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-> >>> index 12a12dae727d..b52b28ae4636 100644
-> >>> --- a/include/linux/pagemap.h
-> >>> +++ b/include/linux/pagemap.h
-> >>> @@ -211,6 +211,7 @@ enum mapping_flags {
-> >>>                                    folio contents */
-> >>>         AS_INACCESSIBLE = 8,    /* Do not attempt direct R/W access to the mapping */
-> >>>         AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM = 9,
-> >>> +       AS_NO_DIRECT_MAP = 10,  /* Folios in the mapping are not in the direct map */
-> >>>         /* Bits 16-25 are used for FOLIO_ORDER */
-> >>>         AS_FOLIO_ORDER_BITS = 5,
-> >>>         AS_FOLIO_ORDER_MIN = 16,
-> >>> @@ -346,6 +347,21 @@ static inline bool mapping_writeback_may_deadlock_on_reclaim(struct address_spac
-> >>>         return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &mapping->flags);
-> >>>  }
-> >>>
-> >>> +static inline void mapping_set_no_direct_map(struct address_space *mapping)
-> >>> +{
-> >>> +       set_bit(AS_NO_DIRECT_MAP, &mapping->flags);
-> >>> +}
-> >>> +
-> >>> +static inline bool mapping_no_direct_map(struct address_space *mapping)
-> >>> +{
-> >>> +       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);
-> >>> +}
-> >>> +
-> >>> +static inline bool vma_is_no_direct_map(const struct vm_area_struct *vma)
-> >>> +{
-> >>> +       return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_mapping);
-> >>> +}
-> >>> +
-> >> Any reason vma is const whereas mapping in the function that it calls
-> >> (defined above it) isn't?
-> >
-> > Ah, I cannot say that that was a conscious decision, but rather an artifact of
-> > the code that I looked at for reference when writing these two simply did it
-> > this way.  Are you saying both should be const, or neither (in my mind, both
-> > could be const, but the mapping_*() family of functions further up in this file
-> > dont take const arguments, so I'm a bit unsure now)?
->
-> Hah, just saw
-> https://lore.kernel.org/linux-mm/20250901123028.3383461-3-max.kellermann@ionos.com/.
-> Guess that means "both should be const" then :D
-
-I don't have any strong preference regarding which way, as long as
-it's consistent. The thing that should be avoided is having one
-function with a parameter marked as const, pass that parameter (or
-something derived from it), to a non-const function. Instead of
-helping, this could cause a lot of headaches when trying to debug
-things in the future, and figuring out what something that's supposed
-to be "const" is being "corrupted".
-
-Cheers,
-/fuad
+On 28/08/2025 11:59, Sascha Bischoff wrote:
+> Implement the GCIE_LEGACY capability as a system feature to be able to
+> check for support from KVM. The type is explicitly
+> ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE, which means that the capability
+> is enabled early if all boot CPUs support it. Additionally, if this
+> capability is enabled during boot, it prevents late onlining of CPUs
+> that lack it, thereby avoiding potential mismatched configurations
+> which would break KVM.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
 
->
-> >> Cheers,
-> >> /fuad
-> >
-> > Best,
-> > Patrick
->
+> ---
+>   arch/arm64/kernel/cpufeature.c | 15 +++++++++++++++
+>   arch/arm64/tools/cpucaps       |  1 +
+>   2 files changed, 16 insertions(+)
+> 
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 9ad065f15f1d..afb3b10afd75 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2520,6 +2520,15 @@ test_has_mpam_hcr(const struct arm64_cpu_capabilities *entry, int scope)
+>   	return idr & MPAMIDR_EL1_HAS_HCR;
+>   }
+>   
+> +static bool
+> +test_has_gicv5_legacy(const struct arm64_cpu_capabilities *entry, int scope)
+> +{
+> +	if (!this_cpu_has_cap(ARM64_HAS_GICV5_CPUIF))
+> +		return false;
+> +
+> +	return !!(read_sysreg_s(SYS_ICC_IDR0_EL1) & ICC_IDR0_EL1_GCIE_LEGACY);
+> +}
+> +
+>   static const struct arm64_cpu_capabilities arm64_features[] = {
+>   	{
+>   		.capability = ARM64_ALWAYS_BOOT,
+> @@ -3131,6 +3140,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>   		.matches = has_cpuid_feature,
+>   		ARM64_CPUID_FIELDS(ID_AA64PFR2_EL1, GCIE, IMP)
+>   	},
+> +	{
+> +		.desc = "GICv5 Legacy vCPU interface",
+> +		.type = ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE,
+
+This is the right type for the capability intended, running the test on 
+each boot time CPUs and setting the cap accordingly.
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+
