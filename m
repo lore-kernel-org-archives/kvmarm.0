@@ -1,189 +1,155 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1542A1C1F0D
-	for <kvmarm@lists.linux.dev>; Tue,  2 Sep 2025 03:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360262E7F1A
+	for <kvmarm@lists.linux.dev>; Tue,  2 Sep 2025 07:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756784915; cv=none; b=p1hk1+LLY9TeuxYRpKmXTfe0qC+oDriT76XF2Gk/H/Z0eUCy3/SDv3q1EXx4j3LhSXXOvyF84K6/5Ka1gC1LCikdWNEFRYGee7x2VpqVl3YSo8CJmiCLLsml1SPSutf84lWFRzTXocsOu4iUcoauxAdvBuPeDfgxvZYNwti9bLc=
+	t=1756799993; cv=none; b=IJO5ug7SDRJIMEMz2Z5FdgZsYdkdoZQKjDszD4tqZjUvMpQj+UOotiiIGXtm0tIQEpuJCK8cg32VK5JhKsifaf824o1NmGCOpnMI/M/d+C5REYFkY4t286Wrk9psdxl07j0fxaWw/xzFGzkrPYwCvQT1uw3SUTgmJib+JVh1fmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756784915; c=relaxed/simple;
-	bh=pomve51ySnfeym3a5NacsGQMLiUMbbW2nqwOtU9Q3SM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=MhU5JvvRr/fpwiw61+7bpYv+kjmcZvn8tjRkTZXhI/k331L9zSJNNpBUQJJvk6NnCgt0uGqZM3G5gV3l30L8/YTRByGo7Z0mPOMoq6JFMkTfG3hkEYqJ5VSTcXjeBIYEvVbY45TKXtV0qT7DH66JeXxJpqKfhf/IZ5/+nhL4zz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=V9WQ0yxk; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1756799993; c=relaxed/simple;
+	bh=tebRK0QcMgpMQT7H4oKZqhEct4KUpLNswRIw/gQ5Jd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GdVl22+vAYWv6XLfrL7PvbS7RS5t4QCbKEWd/cBXkXaNJB5hblZAJe+CodXpbmf5sRqitdgMR1dBZJeiXuqfALYV55ky5QgbkdeOPWsxM4+jNFR9GQHIG5p6/FxoQa1gNSh4uFIBc2TlZUTibdNo/eRd1JFEelLIDnUrf9D/+vI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lJMRNiZI; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="V9WQ0yxk"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5822S9Xv030159
-	for <kvmarm@lists.linux.dev>; Tue, 2 Sep 2025 03:48:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=yKa72tAMaYiEp5QU2uzmYr
-	LEiYq8WJdxdN4mi1XQFe4=; b=V9WQ0yxkytlWbP/SkTsiQKHrLJW0XQxHQeGOc3
-	AHm1VbemjWBjeBCgQWX2+CiwMilJ1VHzH2tSAViGZ+WbxC6oCDb5A9euLdw1JXoZ
-	oaB+yImSicqjw2TtuW5hMe1YJSt/chIT8nUTF0O9tN2mp1+kp7XsASDU4AwZqvVE
-	MNxpLsebgy68Hi3rGTz46dZ176jhFMDl8nMSrsn2xCMP5WvZtYRg5aew6Ap9B4Hc
-	yUwIY5ho9Z+7SGGGKo9X9s38NYcrOBpUgELZ4372vYpmAlEbdrD6FoW01fcRgIpv
-	U8z60PVIzZIbz6sGKi33NuykUnPtEkVYK9UaYQRHWPT9shcw==
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48w8wy26qu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvmarm@lists.linux.dev>; Tue, 02 Sep 2025 03:48:32 +0000 (GMT)
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2445803f0cfso63089195ad.1
-        for <kvmarm@lists.linux.dev>; Mon, 01 Sep 2025 20:48:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lJMRNiZI"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4b327480fd0so824561cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 02 Sep 2025 00:59:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756799991; x=1757404791; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=oNeLWs2qHyUDts+2iHePFK0hNcgX1eWBxmSFpW760QQ=;
+        b=lJMRNiZIBCGHpfe/N51fBnvH4OH8SeFN0WsUph6QnNlI19GOkeixJRR3a38wc4Q8Zi
+         17/n+SUQpz09itiQafq7HlGvLF0wv4c9Nxo/VBT0ryYEgbrx6MJWczTV8hXqhS55ewXn
+         e0QzQrWbI7Cz28IKEbw4JOloBGjgVoigZqSxH246HTOc5zdrUMzXDU4nB0nmpQphiYB9
+         js0jfiTmg6Sn65XG44uFxIyF5pxLz80IJt+96MYe9kWEJtLXelsFHTL1MFinTgvMBiSS
+         p5odzGYE0n2M2jtDQt//W8J6YLlHWn+JsOs2bhgAUjbrifVmZXMsVnd3xDvQKS8nlukx
+         ir+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756784912; x=1757389712;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1756799991; x=1757404791;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yKa72tAMaYiEp5QU2uzmYrLEiYq8WJdxdN4mi1XQFe4=;
-        b=NArYcncMC/jvUWU/2hoP6/gY5MOPMaLo6U/2el6p8K9ywcTbO30iN3FwDshjhIjAOj
-         N8/HE48ptC7UCoC9updyvqhwIplN/KJQPjgSW4RlGyWFQHZPTRPy4DR3QVCKzC+YcwWB
-         CbLgHhd1GQc68Z/UXa7yxZjLiySgNPGK4Nfh3fbryb+if2LIbXwbUcZykdOgTaOsq23V
-         eMayoYg6jqEBPO8wj1GyRa1EFRhE9/8ynyjVX7Fc2Tv77LHs8sVIOh35M+ORWViR6Ew7
-         L9s44YAFKl58brVCyeAc8eSmSPcDe36Z7KgApIn1oq4JuJqex1GNQ9d31eqbLf3FPc9u
-         M8vw==
-X-Forwarded-Encrypted: i=1; AJvYcCVTcgotRFJh9c8bO3Z2UQipDanYJz9tZMhIJIaD+WPCb0Z+7zH2ZSc9sLdm6T7J1HGtZ8e1HzY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzF1Bl2K5N1IMLrQ6au1XhrEzaXKCT3UwEMAD7CaCt36mHOQj3c
-	BYYwzj0YmFCBQsKiui+6xpkeCqjyozpCbZhFY0An7Pky4IEGWXYvh0GuPgLUYGWvyZH82VQMr3/
-	VVYTBc3GPMw9om+/wH39v8CNGgfGMJXijw7iEcsStOHqpmzDy7JqEwKGcTQw=
-X-Gm-Gg: ASbGnctsRtEc+W96n3RiCvU4c2ZKhEJmuxqCK9QfXy+DPLmxJ3c/z+lLWxUuRW7Tp1o
-	y5UyAKmDfkAt+Fr5u785VWpG8sJMT2n/p3w7tVeDrxmDuw32Ywz+00izciySKFEP58CYvjmcLus
-	LsO4rJta2oXrSud8yu//E5tty+InjEwScqsFlxzgwl7d8x5SQYWFEo7kvtrz6HP/m0x0MY36+sO
-	khxKLUn55AvonbeCXi/jiHN+FbcvqDAe6i0oeTx6C3A9+6nO6xEyBxIA2RC0aYcsM0xImY4dh8y
-	5Q4CRQBWQkE1yjG3X6JVzmniC19ptaI+Yijzg/5UNiroJUtn6QNPQDdcCau7GX9B7I28K+cfmZM
-	kwzuJOegTFzuDuaDhukP17lbPmUNSH2zIe/UJ
-X-Received: by 2002:a17:902:e80f:b0:240:968f:4d64 with SMTP id d9443c01a7336-249448f9c33mr135634115ad.11.1756784911727;
-        Mon, 01 Sep 2025 20:48:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IExAbd7KtHY902tMepR979+mkTIDMW7M9jw2QHkr4Ls1PNDX5hM4GxNt4OPOJy08c/0mSNzYg==
-X-Received: by 2002:a17:902:e80f:b0:240:968f:4d64 with SMTP id d9443c01a7336-249448f9c33mr135633765ad.11.1756784911264;
-        Mon, 01 Sep 2025 20:48:31 -0700 (PDT)
-Received: from jinlmao-gv.ap.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24b168157b6sm3467515ad.13.2025.09.01.20.48.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 20:48:30 -0700 (PDT)
-From: Yingchao Deng <yingchao.deng@oss.qualcomm.com>
-Date: Tue, 02 Sep 2025 11:48:25 +0800
-Subject: [PATCH v2] KVM: arm64: Fix NULL pointer access issue
+        bh=oNeLWs2qHyUDts+2iHePFK0hNcgX1eWBxmSFpW760QQ=;
+        b=L0TCaK0d3vrlzjH1NNPubDmuceI6iZRuGPWO6zhJcmaMYXtlJYIw5gFb6XkpoGXdXb
+         IJxnRseQo0OhIsR+Qw1pzEiuThf9+muKlDqRsyuKR/TcDHYNgU3tzlvxUWjeoOUtHftb
+         t4cwShTFmc+aR1P1MILSQCLKoO6GdkA9sW+37NL+WcfgQiAufC+jUql2SeCYDJiMhUrY
+         uPXOWNtKFGFAwqpTqYQpIqSOvIsHfQv3ju6tJSblqB6BELmajlhzqhqFKZ+ZXMRr/6oz
+         O934DeV9UqLtiwbOnZeCKVI76z0enH54N70z/9qgpEqBS3RcYklXZsnQ0/C+vzHulxKY
+         9u2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUKnp9eae7Ea3bKqpi6gGRpLVSbyQ4qzRIe9ZdcI+FoevsWxnCi3JM6uT3J4KHtTxM+04gDB+E=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzivVNVoEvo/mZ/F7E5Hx8w8agCanETP8TcreztIwyWTLUTlMwf
+	5d/V32Ydy/5bT9XaSyX/2kWUyN5GMBI6VNScYowe1hKEE+nYh6F7TQx9DnfhM3X+0gCa2X11E3b
+	KaWSm3lmkj/s8IiBTf98SSfLlBg1rJJCRi6PG88n4
+X-Gm-Gg: ASbGnctz7GNXVwUZ1hZA8gDFvhPKy3rrH4mhPwok2laKNQWQh66McGJqPKPV148gf0b
+	fWOEYmHx/89e0w7LGKUMLchFevaHHFWp5cApAoQlpxXVST61tAbhNdHdFQfb8Dh7ogXy7glW5BA
+	LqzlOOBsftwz6asjWehQGSUejyDznJbvK1ZSKaHVsFi4BzNhfsX+7PkAlKZY/1BIy/hba2QCYRp
+	U17jXFxcDee4nZeCJStgczqfjMkTWJFIWm/
+X-Google-Smtp-Source: AGHT+IFkdbqiMarowY+mmKOzuU9RyYySZu0bnzDQg3QNeDfxzMXfy+3OtZ2GRaaDn0H+MAu5W+vNpqCjVKeX20zwo4o=
+X-Received: by 2002:a05:622a:107:b0:48d:8f6e:ece7 with SMTP id
+ d75a77b69052e-4b31b245bdfmr13130661cf.3.1756799990207; Tue, 02 Sep 2025
+ 00:59:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250902-etm_crash-v2-1-aa9713a7306b@oss.qualcomm.com>
-X-B4-Tracking: v=1; b=H4sIAAhptmgC/5WMQQrCMBBFr1KyNiVJkzZ15T2kSBinNmAbzdSil
- N7dtFt1IQMf/mfemxlh9Ehsn80s4uTJhyEVtcsYdG64IPfn1JkSyohaSI5jf4LoqOMCsVYFprT
- A0v8tYuufm+vYpN55GkN8bepJrus3yyR5OigLWRkhjbGHQJTfH+4Koe/zFKv7F6grqK1srXai/
- QsELA1qDbKo4BNslmV5A95872wbAQAA
-X-Change-ID: 20250901-etm_crash-0ee923eee98c
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-        Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, James Clark <james.clark@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, quic_yingdeng@quicinc.com,
-        jinlong.mao@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com,
-        Yingchao Deng <yingchao.deng@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1756784908; l=2434;
- i=yingchao.deng@oss.qualcomm.com; s=20250901; h=from:subject:message-id;
- bh=pomve51ySnfeym3a5NacsGQMLiUMbbW2nqwOtU9Q3SM=;
- b=bb5AIneQZyVNy1w/19DaiOY0pRfZROqaFONWQ94N/D2KTzx4Qwhkqa6plCGU5jzJpmtAP/dLg
- 2aAiLb7LhkMDRSfnmZt1hgR8nWzcT8mVlW5YJt4j6mL+o+/77IbjXhq
-X-Developer-Key: i=yingchao.deng@oss.qualcomm.com; a=ed25519;
- pk=xilq+l2r3MI2IvgF26j2OwmdNb/TQNeJMQ3VdJi8C4U=
-X-Authority-Analysis: v=2.4 cv=Ycq95xRf c=1 sm=1 tr=0 ts=68b66911 cx=c_pps
- a=JL+w9abYAAE89/QcEU+0QA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
- a=KKAkSRfTAAAA:8 a=ZDfnslOjjdbEBvoarX8A:9 a=QEXdDO2ut3YA:10
- a=324X-CrmTo6CU4MGRt3R:22 a=cvBusfyB2V15izCimMoJ:22
-X-Proofpoint-GUID: uywhvUyxuPua0a9fZB7cjl2eZySx9QIg
-X-Proofpoint-ORIG-GUID: uywhvUyxuPua0a9fZB7cjl2eZySx9QIg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTAxMDEwMSBTYWx0ZWRfXybaL+YInOp7O
- 8Y543eTpuwHUV05wSmIFGcJ3s5eOt+bQEvoZnuXjNgWVp2JtlRqQrVrp85wcnBt3Z/qdA0wn3s2
- 4uMG1NTCJScKEMnJinUbsbflB1Sl+2PI0/8CeD8P8hkyWyQsllOJs+1JKMxBZruBAy6UIA7cRYp
- JJH/Y8f7TTTDF8nNbwcGnY5TsHQPF85pLboN5citMTSjcH0ao2ccUFrmB+r5A6tXbIGGn02Ps2N
- P+9uhs8MnFvvv1LbvjKf/jFsiu0SfnYxBZwA1hMZfcilAezeVt8Z+CGcJnOn8sNm9b7ax8KMA5E
- GL0HgUqPcFmVOpH/NOd95VLdntwHBMOaoZFiOgEhoT3fqsayZ4hAZLBkHjzXc5yPFmQoxlxe1HC
- rOU2XtfY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-02_01,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 adultscore=0 phishscore=0 malwarescore=0
- bulkscore=0 suspectscore=0 impostorscore=0 spamscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509010101
+References: <20250901135408.5965-1-roypat@amazon.co.uk> <20250901145632.28172-1-roypat@amazon.co.uk>
+In-Reply-To: <20250901145632.28172-1-roypat@amazon.co.uk>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 2 Sep 2025 08:59:13 +0100
+X-Gm-Features: Ac12FXwFaub6kV3Kd2ykY4foMIV_-u80DlGRtIr2iGvqoKH4iO-6ScE4yMry24U
+Message-ID: <CA+EHjTxPfzDk=XmwS0uAtjwsYB829s1uZSMC6x3R6KGQ-SqjtQ@mail.gmail.com>
+Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
+To: "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com" <david@redhat.com>, 
+	"Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "rppt@kernel.org" <rppt@kernel.org>, 
+	"seanjc@google.com" <seanjc@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "will@kernel.org" <will@kernel.org>, 
+	"Cali, Marco" <xmarcalx@amazon.co.uk>
+Content-Type: text/plain; charset="UTF-8"
 
-When linux is booted in EL1, macro "host_data_ptr()" is a wrapper that
-resolves to "&per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)",
-is_hyp_mode_available() return false during kvm_arm_init, the per-CPU base
-pointer __kvm_nvhe_kvm_arm_hyp_percpu_base[cpu] remains uninitialized.
-Consequently, any access via per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)
-will result in a NULL pointer.
+Hi Patrick,
 
-Add is_kvm_arm_initialised() condition check to ensure that kvm_arm_init
-completes all necessary initialization steps, including init_hyp_mode.
+On Mon, 1 Sept 2025 at 15:56, Roy, Patrick <roypat@amazon.co.uk> wrote:
+>
+> On Mon, 2025-09-01 at 14:54 +0100, "Roy, Patrick" wrote:
+> >
+> > Hi Fuad!
+> >
+> > On Thu, 2025-08-28 at 11:21 +0100, Fuad Tabba wrote:
+> >> Hi Patrick,
+> >>
+> >> On Thu, 28 Aug 2025 at 10:39, Roy, Patrick <roypat@amazon.co.uk> wrote:
+> >>> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+> >>> index 12a12dae727d..b52b28ae4636 100644
+> >>> --- a/include/linux/pagemap.h
+> >>> +++ b/include/linux/pagemap.h
+> >>> @@ -211,6 +211,7 @@ enum mapping_flags {
+> >>>                                    folio contents */
+> >>>         AS_INACCESSIBLE = 8,    /* Do not attempt direct R/W access to the mapping */
+> >>>         AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM = 9,
+> >>> +       AS_NO_DIRECT_MAP = 10,  /* Folios in the mapping are not in the direct map */
+> >>>         /* Bits 16-25 are used for FOLIO_ORDER */
+> >>>         AS_FOLIO_ORDER_BITS = 5,
+> >>>         AS_FOLIO_ORDER_MIN = 16,
+> >>> @@ -346,6 +347,21 @@ static inline bool mapping_writeback_may_deadlock_on_reclaim(struct address_spac
+> >>>         return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &mapping->flags);
+> >>>  }
+> >>>
+> >>> +static inline void mapping_set_no_direct_map(struct address_space *mapping)
+> >>> +{
+> >>> +       set_bit(AS_NO_DIRECT_MAP, &mapping->flags);
+> >>> +}
+> >>> +
+> >>> +static inline bool mapping_no_direct_map(struct address_space *mapping)
+> >>> +{
+> >>> +       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);
+> >>> +}
+> >>> +
+> >>> +static inline bool vma_is_no_direct_map(const struct vm_area_struct *vma)
+> >>> +{
+> >>> +       return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_mapping);
+> >>> +}
+> >>> +
+> >> Any reason vma is const whereas mapping in the function that it calls
+> >> (defined above it) isn't?
+> >
+> > Ah, I cannot say that that was a conscious decision, but rather an artifact of
+> > the code that I looked at for reference when writing these two simply did it
+> > this way.  Are you saying both should be const, or neither (in my mind, both
+> > could be const, but the mapping_*() family of functions further up in this file
+> > dont take const arguments, so I'm a bit unsure now)?
+>
+> Hah, just saw
+> https://lore.kernel.org/linux-mm/20250901123028.3383461-3-max.kellermann@ionos.com/.
+> Guess that means "both should be const" then :D
 
-Fixes: 054b88391bbe2 ("KVM: arm64: Support trace filtering for guests")
-Signed-off-by: Yingchao Deng <yingchao.deng@oss.qualcomm.com>
-Reviewed-by: James Clark <james.clark@linaro.org>
----
-Add a check to prevent accessing uninitialized per-CPU data.
----
-Changes in v2:
-1. Move the warning to the end in order to improve readability. No
-functional change intended
-- Link to v1: https://lore.kernel.org/r/20250901-etm_crash-v1-1-ce65e44c137c@oss.qualcomm.com
----
- arch/arm64/kvm/debug.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+I don't have any strong preference regarding which way, as long as
+it's consistent. The thing that should be avoided is having one
+function with a parameter marked as const, pass that parameter (or
+something derived from it), to a non-const function. Instead of
+helping, this could cause a lot of headaches when trying to debug
+things in the future, and figuring out what something that's supposed
+to be "const" is being "corrupted".
 
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 381382c19fe4741980c79b08bbdab6a1bcd825ad..593fcbbc7c014335c5999b774f9bfa367e709cb5 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -233,7 +233,7 @@ void kvm_debug_handle_oslar(struct kvm_vcpu *vcpu, u64 val)
- void kvm_enable_trbe(void)
- {
- 	if (has_vhe() || is_protected_kvm_enabled() ||
--	    WARN_ON_ONCE(preemptible()))
-+	    !is_kvm_arm_initialised() || WARN_ON_ONCE(preemptible()))
- 		return;
- 
- 	host_data_set_flag(TRBE_ENABLED);
-@@ -243,7 +243,7 @@ EXPORT_SYMBOL_GPL(kvm_enable_trbe);
- void kvm_disable_trbe(void)
- {
- 	if (has_vhe() || is_protected_kvm_enabled() ||
--	    WARN_ON_ONCE(preemptible()))
-+	    !is_kvm_arm_initialised() || WARN_ON_ONCE(preemptible()))
- 		return;
- 
- 	host_data_clear_flag(TRBE_ENABLED);
-@@ -252,7 +252,8 @@ EXPORT_SYMBOL_GPL(kvm_disable_trbe);
- 
- void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest)
- {
--	if (is_protected_kvm_enabled() || WARN_ON_ONCE(preemptible()))
-+	if (is_protected_kvm_enabled() || !is_kvm_arm_initialised() ||
-+	    WARN_ON_ONCE(preemptible()))
- 		return;
- 
- 	if (has_vhe()) {
+Cheers,
+/fuad
 
----
-base-commit: 8cd53fb40a304576fa86ba985f3045d5c55b0ae3
-change-id: 20250901-etm_crash-0ee923eee98c
 
-Best regards,
--- 
-Yingchao Deng <yingchao.deng@oss.qualcomm.com>
-
+>
+> >> Cheers,
+> >> /fuad
+> >
+> > Best,
+> > Patrick
+>
