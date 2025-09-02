@@ -1,177 +1,212 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.156.205.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43052E36F4
-	for <kvmarm@lists.linux.dev>; Tue,  2 Sep 2025 08:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB98229B18
+	for <kvmarm@lists.linux.dev>; Tue,  2 Sep 2025 09:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.156.205.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756803083; cv=none; b=PphD4imzETriMc7w9BlHq6Iym2p9O/WFxFnivUHWOKHTxnT4EOPdsYtjtJBoPAQ5XD1jZQ50hSmXNJlD/76j2jIMFDuwIo+B/0YZMmelRm3X8v1ZFTkD2aGjdxDAfKGONj2jHGVCvX4IrLr4DS9eylmDyX8SZADzjlk9zAiotrA=
+	t=1756804705; cv=none; b=FouX/A3v7glJhpWkwHdLp7F+iZiuhk/9sosVChNp8ZMFhftcs3VHfL7Fj0cvfWhEAeXjomk13gE8BJZzDQ12QUUZ1aIYhDzd3DwE1+4xfWMDEP/+Qvvzx0RxDckZFulnBQdJZteOLdVZnhrgyndv2SN2w8wYA4X7vIcHtl/ncLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756803083; c=relaxed/simple;
-	bh=LpctAe6OrOBL+wU0ij68SMzomzlRkC/NvKCrGAq8e4M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BCqBEcaJNJl3zG2b9qlFyqIl+CoDyTEubdiGGEVSdjceuFjxnZwZsxVM+3lrRRUHYFt7h2IboXzaLLqVYVDnGEZSwFhfnlbbq6suiJUtXQDWUnsMfeLuIS0cfGIMwpibIHLw98R7X6CHWW2MuIhhNI0drKtfPk6t7RmDno0oEkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i6eCPzRa; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1756804705; c=relaxed/simple;
+	bh=TCPKWsfZFQGu30LRVjrNcQr0GmwDdYlTXVIAbCm7qMc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FyHnfkIUAKH9zh8PAki1Gg94v9bMMnOVy2O6WoZirFRndOQO2G0VyLlALvuVvoDz8N5R/8xBvoe2ikeHBhteJdoJIaELRWq2DIvXeOSd4gMYslbmQaxvY+uR2A5/it3d+St1nra4mgNOoGmE8dgDe2dmeN7X4/brOr3gx5OG7lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=m5L6p9GQ; arc=none smtp.client-ip=18.156.205.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i6eCPzRa"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4b30bb04ed8so458021cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 02 Sep 2025 01:51:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="m5L6p9GQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756803081; x=1757407881; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iP4mX/+2DHYze7f0itBbCFIKzjrmdvMk6mmWMpcGwHA=;
-        b=i6eCPzRaQl/dvaIDufdogA3Q/i2wdFlmE/ZBbJdaqqlwD8qwY2anXlm+1x2dsH63Ga
-         S5kaREBoTojhDuy+zpmNm9fA+W4WSD3RZ4kjfEAz/u/FDVkvhdxISPv8cqzhYY5r2I4l
-         csirQxsJCZBxQnDeGTUX3ZIkFtuCUq88S1elP/bbdggbDDkUjrhewGh8i6aGbcPq8LFL
-         2GlihVMt00i3Sop0UpsoA5xrGNon08OiNqZfHnGIpP41/yk7J8glhf8P2+CA1gQofOH0
-         WdHziPf70Qw46QgJXKEXVVUaMNHFIohmRe5BnX84iHMfEIp+nVXL8dxlOfTA84xWZ5wz
-         PNcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756803081; x=1757407881;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iP4mX/+2DHYze7f0itBbCFIKzjrmdvMk6mmWMpcGwHA=;
-        b=vx6HDDy3oLtvW39UlhzzFXkG9LRILhd+4IAGAVxRAvw1nvYC4XZPkuceK796GgWRXk
-         ZfNmtZC0l2gfgYB0NoG03KOcvQeZ3HpeBTggj4Zy7l13oDXDrMDqxT1LQ13FY5w6zfTS
-         xWl7CXBP4Fw1WLzAH9CUT8L+itE1aarUcaTpQ4nTbkkViAvaz7M3YLZ8gD7GnnOCmYen
-         sP0zPdN34NP/kfuHAGMLzONLQaZq5yfuHE/0zwUfNLnfa8KV08EF5l9zlQKQcjxD9cxI
-         1BmvehKnSDhsABRDxlvMnsv+ibdX+rf8AMvheLFT/0Mi/4OMLr02RMsJOtdUSG6DSht5
-         Vmxw==
-X-Forwarded-Encrypted: i=1; AJvYcCUSmv8TnDHpb9bNG/c5OJ1Z7JIWZaLY0OUMRjfGyCKoMl/2yrBTIIWKmbQWg89xr4B2T48NOI4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyP6el3PhAwV7ZH2+b7izQcudqW6HBVh6RgY8CLwuoJwNBfV2ed
-	7Ks82F7JAxFxqFLE4NtSE+kleQ9jVL8M2Y5cQl8XysMKbTMAHZXlWKEvTV0rVYTk1x3RAhxysax
-	eJGl6gjt4HrFnkN24pVF3VWrhWiZgwRn1fYLkibYf
-X-Gm-Gg: ASbGnct2QwVkWACWR8KK1tssNaEyACF3qQoWYePrSE2oVyII9Ot0FENGetvmkpPsrF3
-	4/M7rVq7hrM5gnyP3XIAADQKZoWgxCrVU+z/hE6lTJ072js9oy8X6z3JRKV9MKRWWkFZF23iC2x
-	VR9ox+y8E/lxj3PjtEumJ6th3m8aTnDOrD5pWGYRzSk0rEWe2m6GMr1MacylyPSwVZ7pBC53Cyp
-	Jw84gjD5n6u8V7e1aCGPzDRUQ==
-X-Google-Smtp-Source: AGHT+IEl9wSTHdiJwZPLw2efIYDBOrEGcJPxDblGkQXiafOiZIaocXkLc6odVx1VLSTjodsqJVOs6KtZuN8sumvistY=
-X-Received: by 2002:a05:622a:a28a:b0:4b0:9c14:2fec with SMTP id
- d75a77b69052e-4b325008444mr9184701cf.8.1756803080383; Tue, 02 Sep 2025
- 01:51:20 -0700 (PDT)
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1756804703; x=1788340703;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=b3121Ksby9vgseoaEWxEHU4vRAFZeQ1OVILTcsYl54A=;
+  b=m5L6p9GQSS5F/wN3KFMXkClnOcy5TjJffdIO+/q/+m4/9dVBcK1DUOLZ
+   bhtzd5VJ4u9bvePUjIRG+JZVzyNKEnGPglORp/wjuv3M6err5tqOB0/9M
+   VPQjq9dMep91jHI7SyoZt5r8pLF/92Zid7/lRFSS+nrQPXc7nHy37SCWk
+   VamcoxF7jfOXweleQgcBLlbItPdn9oHJS9IX/UPjOWRY5w/yfgtkMKZdf
+   SJIdTvIoQmSFOV/zTHkKEc2EV/E38vyksPyI1m5kiFnvpcyFXN/tqUGax
+   nc4FSPq9R5rTmGpuLj0mL7JWRsQQbTeVllk4PQktHUZLfsT3nn99fAy93
+   g==;
+X-CSE-ConnectionGUID: 857AEqg7QrqTm9k0lMss/A==
+X-CSE-MsgGUID: VIb4ccPwT16IyAIE1hvYkg==
+X-IronPort-AV: E=Sophos;i="6.18,214,1751241600"; 
+   d="scan'208";a="1502449"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 09:18:13 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:10410]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.3.140:2525] with esmtp (Farcaster)
+ id 250cd30a-1333-458c-a5c1-5df8fd2d5adc; Tue, 2 Sep 2025 09:18:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 250cd30a-1333-458c-a5c1-5df8fd2d5adc
+Received: from EX19D015EUB002.ant.amazon.com (10.252.51.123) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Tue, 2 Sep 2025 09:18:12 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB002.ant.amazon.com (10.252.51.123) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Tue, 2 Sep 2025 09:18:12 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.2562.020; Tue, 2 Sep 2025 09:18:12 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+To: "tabba@google.com" <tabba@google.com>
+CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
+	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Roy, Patrick"
+	<roypat@amazon.co.uk>, "rppt@kernel.org" <rppt@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"will@kernel.org" <will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
+Thread-Topic: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
+Thread-Index: AQHcG+qBqyZs7keLDUCAS7X1QtiGSg==
+Date: Tue, 2 Sep 2025 09:18:12 +0000
+Message-ID: <20250902091810.4854-1-roypat@amazon.co.uk>
+References: <CA+EHjTxymfya75KdOrUsSUhtfmxe180DedhJpLQAGeCjsum_nw@mail.gmail.com>
+In-Reply-To: <CA+EHjTxymfya75KdOrUsSUhtfmxe180DedhJpLQAGeCjsum_nw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250901135408.5965-1-roypat@amazon.co.uk> <20250901145632.28172-1-roypat@amazon.co.uk>
- <CA+EHjTxPfzDk=XmwS0uAtjwsYB829s1uZSMC6x3R6KGQ-SqjtQ@mail.gmail.com> <862475d8-5a4f-44c3-9b3f-56319f70192d@redhat.com>
-In-Reply-To: <862475d8-5a4f-44c3-9b3f-56319f70192d@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 2 Sep 2025 09:50:43 +0100
-X-Gm-Features: Ac12FXwr7whnN-VXo5s-ZgZo6eW3l7wyHW3APjTTLjncve_-hqyXmzJXVm4lqgs
-Message-ID: <CA+EHjTxymfya75KdOrUsSUhtfmxe180DedhJpLQAGeCjsum_nw@mail.gmail.com>
-Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-To: David Hildenbrand <david@redhat.com>
-Cc: "Roy, Patrick" <roypat@amazon.co.uk>, "ackerleytng@google.com" <ackerleytng@google.com>, 
-	"Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "rppt@kernel.org" <rppt@kernel.org>, 
-	"seanjc@google.com" <seanjc@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "will@kernel.org" <will@kernel.org>, 
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 2 Sept 2025 at 09:46, David Hildenbrand <david@redhat.com> wrote:
->
-> On 02.09.25 09:59, Fuad Tabba wrote:
-> > Hi Patrick,
-> >
-> > On Mon, 1 Sept 2025 at 15:56, Roy, Patrick <roypat@amazon.co.uk> wrote:
-> >>
-> >> On Mon, 2025-09-01 at 14:54 +0100, "Roy, Patrick" wrote:
-> >>>
-> >>> Hi Fuad!
-> >>>
-> >>> On Thu, 2025-08-28 at 11:21 +0100, Fuad Tabba wrote:
-> >>>> Hi Patrick,
-> >>>>
-> >>>> On Thu, 28 Aug 2025 at 10:39, Roy, Patrick <roypat@amazon.co.uk> wrote:
-> >>>>> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-> >>>>> index 12a12dae727d..b52b28ae4636 100644
-> >>>>> --- a/include/linux/pagemap.h
-> >>>>> +++ b/include/linux/pagemap.h
-> >>>>> @@ -211,6 +211,7 @@ enum mapping_flags {
-> >>>>>                                     folio contents */
-> >>>>>          AS_INACCESSIBLE = 8,    /* Do not attempt direct R/W access to the mapping */
-> >>>>>          AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM = 9,
-> >>>>> +       AS_NO_DIRECT_MAP = 10,  /* Folios in the mapping are not in the direct map */
-> >>>>>          /* Bits 16-25 are used for FOLIO_ORDER */
-> >>>>>          AS_FOLIO_ORDER_BITS = 5,
-> >>>>>          AS_FOLIO_ORDER_MIN = 16,
-> >>>>> @@ -346,6 +347,21 @@ static inline bool mapping_writeback_may_deadlock_on_reclaim(struct address_spac
-> >>>>>          return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &mapping->flags);
-> >>>>>   }
-> >>>>>
-> >>>>> +static inline void mapping_set_no_direct_map(struct address_space *mapping)
-> >>>>> +{
-> >>>>> +       set_bit(AS_NO_DIRECT_MAP, &mapping->flags);
-> >>>>> +}
-> >>>>> +
-> >>>>> +static inline bool mapping_no_direct_map(struct address_space *mapping)
-> >>>>> +{
-> >>>>> +       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);
-> >>>>> +}
-> >>>>> +
-> >>>>> +static inline bool vma_is_no_direct_map(const struct vm_area_struct *vma)
-> >>>>> +{
-> >>>>> +       return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_mapping);
-> >>>>> +}
-> >>>>> +
-> >>>> Any reason vma is const whereas mapping in the function that it calls
-> >>>> (defined above it) isn't?
-> >>>
-> >>> Ah, I cannot say that that was a conscious decision, but rather an artifact of
-> >>> the code that I looked at for reference when writing these two simply did it
-> >>> this way.  Are you saying both should be const, or neither (in my mind, both
-> >>> could be const, but the mapping_*() family of functions further up in this file
-> >>> dont take const arguments, so I'm a bit unsure now)?
-> >>
-> >> Hah, just saw
-> >> https://lore.kernel.org/linux-mm/20250901123028.3383461-3-max.kellermann@ionos.com/.
-> >> Guess that means "both should be const" then :D
-> >
-> > I don't have any strong preference regarding which way, as long as
-> > it's consistent. The thing that should be avoided is having one
-> > function with a parameter marked as const, pass that parameter (or
-> > something derived from it), to a non-const function.
->
-> I think the compiler will tell you that that is not ok (and you'd have
-> to force-cast the const it away).
-
-Not for the scenario I'm worried about. The compiler didn't complain
-about this (from this patch):
-
-+static inline bool mapping_no_direct_map(struct address_space *mapping)
-+{
-+       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);
-+}
-+
-+static inline bool vma_is_no_direct_map(const struct vm_area_struct *vma)
-+{
-+       return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_mapping);
-+}
-
-vma_is_no_direct_map() takes a const, but mapping_no_direct_map()
-doesn't. For now, mapping_no_direct_map() doesn't modify anything. But
-it could, and the compiler wouldn't complain.
-
-Cheers,
-/fuad
-
-
-> Agreed that we should be using const * for these simple getter/test
-> functions.
->
-> --
-> Cheers
->
-> David / dhildenb
->
+On Tue, 2025-09-02 at 09:50 +0100, Fuad Tabba wrote:=0A=
+> On Tue, 2 Sept 2025 at 09:46, David Hildenbrand <david@redhat.com> wrote:=
+=0A=
+>>=0A=
+>> On 02.09.25 09:59, Fuad Tabba wrote:=0A=
+>>> Hi Patrick,=0A=
+>>>=0A=
+>>> On Mon, 1 Sept 2025 at 15:56, Roy, Patrick <roypat@amazon.co.uk> wrote:=
+=0A=
+>>>>=0A=
+>>>> On Mon, 2025-09-01 at 14:54 +0100, "Roy, Patrick" wrote:=0A=
+>>>>>=0A=
+>>>>> Hi Fuad!=0A=
+>>>>>=0A=
+>>>>> On Thu, 2025-08-28 at 11:21 +0100, Fuad Tabba wrote:=0A=
+>>>>>> Hi Patrick,=0A=
+>>>>>>=0A=
+>>>>>> On Thu, 28 Aug 2025 at 10:39, Roy, Patrick <roypat@amazon.co.uk> wro=
+te:=0A=
+>>>>>>> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h=0A=
+>>>>>>> index 12a12dae727d..b52b28ae4636 100644=0A=
+>>>>>>> --- a/include/linux/pagemap.h=0A=
+>>>>>>> +++ b/include/linux/pagemap.h=0A=
+>>>>>>> @@ -211,6 +211,7 @@ enum mapping_flags {=0A=
+>>>>>>>                                     folio contents */=0A=
+>>>>>>>          AS_INACCESSIBLE =3D 8,    /* Do not attempt direct R/W acc=
+ess to the mapping */=0A=
+>>>>>>>          AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM =3D 9,=0A=
+>>>>>>> +       AS_NO_DIRECT_MAP =3D 10,  /* Folios in the mapping are not =
+in the direct map */=0A=
+>>>>>>>          /* Bits 16-25 are used for FOLIO_ORDER */=0A=
+>>>>>>>          AS_FOLIO_ORDER_BITS =3D 5,=0A=
+>>>>>>>          AS_FOLIO_ORDER_MIN =3D 16,=0A=
+>>>>>>> @@ -346,6 +347,21 @@ static inline bool mapping_writeback_may_deadl=
+ock_on_reclaim(struct address_spac=0A=
+>>>>>>>          return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &map=
+ping->flags);=0A=
+>>>>>>>   }=0A=
+>>>>>>>=0A=
+>>>>>>> +static inline void mapping_set_no_direct_map(struct address_space =
+*mapping)=0A=
+>>>>>>> +{=0A=
+>>>>>>> +       set_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
+>>>>>>> +}=0A=
+>>>>>>> +=0A=
+>>>>>>> +static inline bool mapping_no_direct_map(struct address_space *map=
+ping)=0A=
+>>>>>>> +{=0A=
+>>>>>>> +       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
+>>>>>>> +}=0A=
+>>>>>>> +=0A=
+>>>>>>> +static inline bool vma_is_no_direct_map(const struct vm_area_struc=
+t *vma)=0A=
+>>>>>>> +{=0A=
+>>>>>>> +       return vma->vm_file && mapping_no_direct_map(vma->vm_file->=
+f_mapping);=0A=
+>>>>>>> +}=0A=
+>>>>>>> +=0A=
+>>>>>> Any reason vma is const whereas mapping in the function that it call=
+s=0A=
+>>>>>> (defined above it) isn't?=0A=
+>>>>>=0A=
+>>>>> Ah, I cannot say that that was a conscious decision, but rather an ar=
+tifact of=0A=
+>>>>> the code that I looked at for reference when writing these two simply=
+ did it=0A=
+>>>>> this way.  Are you saying both should be const, or neither (in my min=
+d, both=0A=
+>>>>> could be const, but the mapping_*() family of functions further up in=
+ this file=0A=
+>>>>> dont take const arguments, so I'm a bit unsure now)?=0A=
+>>>>=0A=
+>>>> Hah, just saw=0A=
+>>>> https://lore.kernel.org/linux-mm/20250901123028.3383461-3-max.kellerma=
+nn@ionos.com/.=0A=
+>>>> Guess that means "both should be const" then :D=0A=
+>>>=0A=
+>>> I don't have any strong preference regarding which way, as long as=0A=
+>>> it's consistent. The thing that should be avoided is having one=0A=
+>>> function with a parameter marked as const, pass that parameter (or=0A=
+>>> something derived from it), to a non-const function.=0A=
+>>=0A=
+>> I think the compiler will tell you that that is not ok (and you'd have=
+=0A=
+>> to force-cast the const it away).=0A=
+> =0A=
+> Not for the scenario I'm worried about. The compiler didn't complain=0A=
+> about this (from this patch):=0A=
+> =0A=
+> +static inline bool mapping_no_direct_map(struct address_space *mapping)=
+=0A=
+> +{=0A=
+> +       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
+> +}=0A=
+> +=0A=
+> +static inline bool vma_is_no_direct_map(const struct vm_area_struct *vma=
+)=0A=
+> +{=0A=
+> +       return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_mapp=
+ing);=0A=
+> +}=0A=
+> =0A=
+> vma_is_no_direct_map() takes a const, but mapping_no_direct_map()=0A=
+> doesn't. For now, mapping_no_direct_map() doesn't modify anything. But=0A=
+> it could, and the compiler wouldn't complain.=0A=
+=0A=
+Wouldn't this only be a problem if vma->vm_file->f_mapping was a 'const str=
+uct=0A=
+address_space *const'? I thought const-ness doesn't leak into pointers (e.g=
+.=0A=
+even above, vma_is_no_direct_map isn't allowed to make vma point at somethi=
+ng=0A=
+else, but it could modify the pointed-to vm_area_struct).=0A=
+=0A=
+> Cheers,=0A=
+> /fuad=0A=
+> =0A=
+> =0A=
+>> Agreed that we should be using const * for these simple getter/test=0A=
+>> functions.=0A=
+>>=0A=
+>> --=0A=
+>> Cheers=0A=
+>>=0A=
+>> David / dhildenb=0A=
+>>=0A=
+=0A=
