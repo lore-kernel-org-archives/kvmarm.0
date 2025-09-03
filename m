@@ -1,264 +1,115 @@
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011045.outbound.protection.outlook.com [52.101.70.45])
+Received: from outbound.pv.icloud.com (p-west1-cluster4-host7-snip4-10.eps.apple.com [57.103.65.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB861286418
-	for <kvmarm@lists.linux.dev>; Wed,  3 Sep 2025 12:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.45
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756901368; cv=fail; b=bDE+WBsnPEV9J8MbKyVo00P5ERNkN4zbCSkR+54R/zludI5JKXkAL5x+5vFXprLaUUOzuxHNLqsbWlrB0I5MHBjEnY8mDcMCwoktGyRDyRK0GJ6FmwH9l5Awwv+8lsBwSySFZRoOSKZ46Przj70hZzY3WgJ9aaCXyARmc/akNiQ=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756901368; c=relaxed/simple;
-	bh=Q3NdlTvbLJAqDew3DeIkA43nVbPVHdWHo4LGmqYROpA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=tbWGpMKPHvMjdOi/ENOumZP195SNpfooQCXuiMtI1WNYIfVIKANFIJK+7qhBRxzMSv6NfmNGuDBUsagF2CjQY4kMY9G0LdxxvJYLx+u/X3cUNIM4bDsuHcSCsanGMJ6fKXSkyVuTVyVD6VdXFj68L5rLaTvvFu1uCynREoodUKE=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=DEua+FtX; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=DEua+FtX; arc=fail smtp.client-ip=52.101.70.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D5F2E8B70
+	for <kvmarm@lists.linux.dev>; Wed,  3 Sep 2025 12:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.65.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756903233; cv=none; b=b/4/5cvNBmPOfEqbgKRiMwum/fFuU5DBOPWNqv0V/sUEX0Jcs3Y267uPz2HneI9ck/5uS4aVJgPwMz0HbmexqW4bx2lgVWDbK5NYqKPPDNuGxM5j/TkKlym7CmvV+R2BTvtGOqgN+RF27m0yN9cdLF7zdXPo74hruDXVgaIZW+w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756903233; c=relaxed/simple;
+	bh=WpZZpgymLZ7IZGm4uDUA2RgytgvwPKaiaPfsuMZFsHs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uf4XNZRMItmpVf+4klHuWg83kC382J97ZJBs/5XpiyfOtL7F47tIlz6d07IfSfBfdDsLN2A1fA3HtkVUaYHn5ymNsbVItdG7h25khhXehdPioUJNuqZG3iyVNGRiT2qnlmIgnxrSAJ+mzmzpHyn0k1CUJbMXhocvfUU3laiM+No=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sswd.pw; spf=pass smtp.mailfrom=sswd.pw; dkim=pass (2048-bit key) header.d=sswd.pw header.i=@sswd.pw header.b=hcZ7S69p; arc=none smtp.client-ip=57.103.65.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sswd.pw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sswd.pw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="DEua+FtX";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="DEua+FtX"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=tWmxeWtSPMkXSKAS89VuBZBfsZf+MF4J4D4N3JzystNvAUjFG2pVKfcaJcAB93Tip2XwphmRGeu80YfNgP0uomLW0WkJk6Z86xXr8PtSlsifljN2FAhGvg5OwPCrUIhCVIcPGGP2nm1KIyEIGAKrQ7cu6g1OZ7/1d2Bk0kCJhhQTKcJesceCe6PKP2O/dMgxambmM/bxJ5zRGO2FEyKV/PRHcE/aMFx7YZgEZeLavkpjMaB+M9AvNh84iMUpVdeEvfWDERsTWvDm32ZSkw4v3+byHJ5wR8GUJJs/FU3phaUg1LDtIio/60mi0LbQM2GrvPzqJBD37Wk3SNehb5ayfQ==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q3NdlTvbLJAqDew3DeIkA43nVbPVHdWHo4LGmqYROpA=;
- b=kPQg299aGM4QbquLRLFdpReH5oqnYtfsIo2pRw+B5BgA4EybmnPswgLGoBQgE2Y3MmXVoUcpj/TWtiIFq8MuT91EpRgMjGkOHZiww5pExVaVvbd+Y6p75JbL2p6fvJo9oGlntPDb6fSv8fP0VTtK2AI1Jd2RUh2MzsLnC9OfKESFOeQy+Yq4vA88bLsh9ctO8jBXeB6N++nBrz8/PnlD+fayHIe7bUb2/x3leSxifnI0BgGkSUxts2VizgcLKMeBurfOXhSiTw9OX05+0gFcsFDHGCbFQh3cdA6Mc7vwBzOVgsHy7E96zwSWRMsnerKfL83rihe4bLCM+D/thQgZyg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q3NdlTvbLJAqDew3DeIkA43nVbPVHdWHo4LGmqYROpA=;
- b=DEua+FtXQQwDUa8iMhZ2A9W0CY1SRJGVxMXoSXETcyM4wYuyiGCX9gNWYRgBort758Fklm0r3clpndmZ8WwreZP1FeUsW4WS4dZiRdgCqqoGRLWQ0+eZScgb1+okNw95QRjgl0csPWiN7g1op6+M3fQYvEqrdVWBZIQNAO1/4dk=
-Received: from DU2PR04CA0348.eurprd04.prod.outlook.com (2603:10a6:10:2b4::9)
- by DU0PR08MB9750.eurprd08.prod.outlook.com (2603:10a6:10:446::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.17; Wed, 3 Sep
- 2025 12:09:20 +0000
-Received: from DU6PEPF00009529.eurprd02.prod.outlook.com
- (2603:10a6:10:2b4:cafe::69) by DU2PR04CA0348.outlook.office365.com
- (2603:10a6:10:2b4::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.17 via Frontend Transport; Wed,
- 3 Sep 2025 12:09:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DU6PEPF00009529.mail.protection.outlook.com (10.167.8.10) with Microsoft SMTP
- Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.11 via
- Frontend Transport; Wed, 3 Sep 2025 12:09:20 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NiNGZ+r9v1l+4eyW3SXnMy/UP5Cb1b4NDBSqNXU3MmLfNxvr90nxJGk7Gei8NBPJarQjUoAF5WGJ6O44sQk3TUPwt6XpaxI2RAEKJ8/JTYguchhSBKZpvLIV1Yh7pfEtWLgrd0EBgjKd//kScDSO+1R/RbwnmRxD2DojoTJ18a4GIoiU1a47xijzIwL6xcxoK06hizgAUUEeDKz/pTqjliiQOfQHWnzs3qWhB0rQI1jUgszP+Y4Np587OmFqhOJWcKmi4zyPz3kHNN157Zh/zZuYd8I5Xv6bQ/tn33FpDo4GaE5w2Ty3caHchjN+irGe++1kOtVQC0GC+Sy69gZNBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q3NdlTvbLJAqDew3DeIkA43nVbPVHdWHo4LGmqYROpA=;
- b=lslWwBReRZplJWlHVuph/BIHFwcDZaafr5PEUNz4VLbzWlSH/NO3E9JzLrMD3aXmFK85O8fHIZvDvHU9R9WgWd4CkzXr9hc7tmO/ibj6W+I3KAatuF0hRXfCtE9xhBe0fKKiau2nwpfRubLRHv4SDZv0nlQ7DxXPf6smdX88a1GbkJ+vb3VLdZ24iC+ia9eOgzMzNzxxOlx2927HpXfvDCjXoCalYq/5LsB0S2tGNZ1Wv64YzPUtLjPNF3gEbjKCLH9VTOmrS9NfkgHOwpUroUfkhFY9RqFlmhueOMgGwWzK22vDAZfTMejU1g+nLbTrfXcmUYKMz+Mwast0SQrGiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q3NdlTvbLJAqDew3DeIkA43nVbPVHdWHo4LGmqYROpA=;
- b=DEua+FtXQQwDUa8iMhZ2A9W0CY1SRJGVxMXoSXETcyM4wYuyiGCX9gNWYRgBort758Fklm0r3clpndmZ8WwreZP1FeUsW4WS4dZiRdgCqqoGRLWQ0+eZScgb1+okNw95QRjgl0csPWiN7g1op6+M3fQYvEqrdVWBZIQNAO1/4dk=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20) by DBBPR08MB6137.eurprd08.prod.outlook.com
- (2603:10a6:10:20f::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Wed, 3 Sep
- 2025 12:08:48 +0000
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::d430:4ef9:b30b:c739]) by GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::d430:4ef9:b30b:c739%7]) with mapi id 15.20.9073.026; Wed, 3 Sep 2025
- 12:08:48 +0000
-Date: Wed, 3 Sep 2025 13:08:44 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
-	oliver.upton@linux.dev, anshuman.khandual@arm.com, robh@kernel.org,
-	james.morse@arm.com, mark.rutland@arm.com, joey.gouly@arm.com,
-	ahmed.genidi@arm.com, kevin.brodsky@arm.com,
-	scott@os.amperecomputing.com, mbenes@suse.cz,
-	james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org,
-	pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com,
-	maz@kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 0/5] initialize SCTRL2_ELx
-Message-ID: <aLgvzKeEPn325aRO@e129823.arm.com>
-References: <20250821172408.2101870-1-yeoreum.yun@arm.com>
- <aLW5OIgv8/bvvY9E@e133380.arm.com>
- <aLXjVNCbT6YeWlSS@e129823.arm.com>
- <aLgd0/7peYBA4z87@e133380.arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aLgd0/7peYBA4z87@e133380.arm.com>
-X-ClientProxiedBy: LO2P265CA0504.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:13b::11) To GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20)
+	dkim=pass (2048-bit key) header.d=sswd.pw header.i=@sswd.pw header.b="hcZ7S69p"
+Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-11 (Postfix) with ESMTPS id 7A5251800858;
+	Wed,  3 Sep 2025 12:40:22 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sswd.pw; s=sig1; bh=zkbWduFk8ozX1oSl6OLe8t0wpi3qXVuq+LzyBUgCb+M=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=hcZ7S69pM88GpDkrUueb4EjUWG2tS5fu9VVySXomdVU9A3aTlATcEqPOmESn8ka+pbfk3cmVL0qSOOMjy+58IOAtylQ280ZLfQegkoRKsDHcLTreCMPiM4t+EvfL60TFNd/4KDeSoi4OYEidW3I07BIVrvMyyLVMCq60ePslX1hvPPJE8WU4Mb+ZUYP4ZGKxZd7pvqUkZ2RZ512y943c27Mlg6i338FCRr25/cBJnjclVkeebS/c90tA96SKdKTYx8UWigIAht10HXT8xQCG12jhCx5ZDeSId4aQfCK7xVu8wPj77L0kaDt+dF0FPPEUwoY6VnJrblnUhlekHm27HQ==
+mail-alias-created-date: 1750314795890
+Received: from localhost.localdomain (pv-asmtp-me-k8s.p00.prod.me.com [17.56.9.36])
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-11 (Postfix) with ESMTPSA id 2854E180016F;
+	Wed,  3 Sep 2025 12:40:20 +0000 (UTC)
+From: p@sswd.pw
+To: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	leedongha <gapdev2004@gmail.com>
+Subject: [PATCH] arm64: kvm: Fix incorrect VNCR invalidation range calculation
+Date: Wed,  3 Sep 2025 21:39:49 +0900
+Message-ID: <20250903123949.24858-1-p@sswd.pw>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	GV1PR08MB10521:EE_|DBBPR08MB6137:EE_|DU6PEPF00009529:EE_|DU0PR08MB9750:EE_
-X-MS-Office365-Filtering-Correlation-Id: 454f6507-fba5-4b5a-099b-08ddeae2b6b8
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info-Original:
- =?us-ascii?Q?iZkmKaqAd0LtT4oN26GVgKGlF1AVPfKIRZXYySYNf6OkV7OiGIa4d7J5JbRy?=
- =?us-ascii?Q?wmimjvlXIXFDZ6u09WNm41t9NXXrzrtCHfajAQpekJxixJ02iuIdhL51OWrA?=
- =?us-ascii?Q?aNAv1OYDFpWO1O9YI/RK1YZJz9SMm5ablSZP0hzOnqdRmg9t2ypkWDvBt80f?=
- =?us-ascii?Q?TY5PSQkMG2weO2WQ7v/Tm26yLcM/+M5BaCADjNU8lezu28FRKeNyjfg2X/H4?=
- =?us-ascii?Q?dtSHr5AnGFesQESrs+jEetPBypLndMQIbi7kqY7OXQVcLPlf4DXvSg5JgVN5?=
- =?us-ascii?Q?YsFLp8K/Oymi5rXjxbw6smkv2lVVbRVsynVnUF7r2P+uzW/duwOieCrFpJSR?=
- =?us-ascii?Q?MYT1hvqkyHbEc50LnS4cLTz/MWxboztvnyhrvMFfVkunRNUqtwUx5FjREzrd?=
- =?us-ascii?Q?k3u/k7GOhTioHG1iOD7b2ITcPlOGw0fMSWkYqW1KT9cNLZeDk3rw3SRMxo7F?=
- =?us-ascii?Q?xvPXEBEX+uSKZKxBbpAR+df6LUxxONBqRgzwCGGRV2WmlqAKLpcRhSFKH9I/?=
- =?us-ascii?Q?DtNSIeNPolC7OP8OqKdVjCmWBBUQLKlyXB/CWpnItuZzvYfYbdHa7e8KeU+R?=
- =?us-ascii?Q?b+jSd6ZE6t9bQlGdAs3TfHryccDLBTsFdxMDgk5r8gRGEmQUwO0cZgz1M73N?=
- =?us-ascii?Q?0MoBWj1CAwAuSpY9wj/gF+EE/xDHA8HREDdIoeN5pgFaM+qYdoAagAmHlB8A?=
- =?us-ascii?Q?zYn5JEXM65MLb4EnGGOF9lEZlHvKE74zeroZugiuxq2+ERknpwr7RE8XvRzZ?=
- =?us-ascii?Q?PPPtqTinY570/GyZ4XqXU+locBiMtUFEh+t9I3A1zE9oUTgYLrgH4yrvu5A7?=
- =?us-ascii?Q?cgZS/zzfpvXb7aBRCH1F7XV05YQZgEKHshoVyNrxIh48K8OZLIK6VO0oSzdw?=
- =?us-ascii?Q?KpKID8DO0bGLXGfrbo/P9R4rgeBMXEV5MLNmixXp52KSH23hk9OXIG74fQVP?=
- =?us-ascii?Q?mOofRJsJfQz8Ry2pD6XGQoUrZa1B4qS693bjfxFbtExmRW6rhQDUMfF8Te3H?=
- =?us-ascii?Q?MWvaepYAODG2oVWmwDYDKRZxuFmQQy+lKpoOlUZAFZyNIIfpnvWkIiuPgSIX?=
- =?us-ascii?Q?FYtWhrBwM/UoxsQSQ5/83RV/LGZxWxfU/som2eS6TKg8tPKVz+GfOmYbiju4?=
- =?us-ascii?Q?YHk9vLO5n0LWBwuz0SSChYPDvRpu2pSG4uwOpW3VBxt1IJ69CjeQK5C4Lz+u?=
- =?us-ascii?Q?8m+PZ4eKZT60PKV+6b4N4zdNsRwvHSLrhGlBc8FsHXDZl460Pr7Wn7wL2kPF?=
- =?us-ascii?Q?Ku8K4lnr+ZlQXTQsoLSD6eK9xl53BYSKE54wJeEP/n16aJAvQrWn4CYGt+0Q?=
- =?us-ascii?Q?zt0nfhzqhiaqZCto1nSwXobfGi2BbXgtTES5ph4KM5kydAts/xet4zSef12z?=
- =?us-ascii?Q?AMthXAevdJKDXi9JxvP1q7HONUg40r9TqMV3kBgfzaWtf9KiZJelk+qHXlPH?=
- =?us-ascii?Q?/89rdOguImQ=3D?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB6137
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DU6PEPF00009529.eurprd02.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	a2789604-ca4d-43a7-f432-08ddeae2a333
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|14060799003|82310400026|35042699022|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8ebNwoiuY2GAHCmWGvFA7k2zLHObELCttoYUsr08/W/HNeCi/KYj++V20PKa?=
- =?us-ascii?Q?IiO0o8NgMODCFVh1Iz8v9Qvn8hXYA5NzFpLJxxIzRUYiSBJY+afhWdUnrq96?=
- =?us-ascii?Q?UQQpz+gO6rzAESnvwW0yTmkiso8B68r+X6KUdWQnEHQo0h6i+ljSZHLIk0SB?=
- =?us-ascii?Q?/adGs2njq4AoBSx6xqvBghYO60p7UkCPTAqGZNQvmSSMh/f7NkbNzbqiI96J?=
- =?us-ascii?Q?bV6sPbBLuieNIRhB7uzHM5pIgz6vkt5lNYJzicW4YP4GrMG/TBvpwpv+YiTC?=
- =?us-ascii?Q?BoPI5rZvSBr0W+0IuGUPng9J/8V6mlGqMf2kkD8Sq9R4LKBFMFLzaGWEdvRr?=
- =?us-ascii?Q?i3LK+4AjaT7+2Row3OEmUzgG5OsJ2iFDaMC+vmeAdQV1DRrZV0kZciAnEFG2?=
- =?us-ascii?Q?tzz7q110JvvVlxl2OxtFfxTl7bTT9Yhfo4KBWhUv3qeEl8VcBFwgBaVWDMDJ?=
- =?us-ascii?Q?6k1nfe9bQ0ED+USORUdmlLQmVPkRslW1WCVTR1If3Auo2Cd41LoJ83L5NFYD?=
- =?us-ascii?Q?zGl1zr4A8/wpb5EOTUPoO4vAD1ZFDPmLAuh/fwC//TAr7rjyUuCwY5FqA8t+?=
- =?us-ascii?Q?MCrpJ/d8omY/mcu1wtgofcowH8zIy3z8uQCiw087bCZfxO+St95xaVNcwzdV?=
- =?us-ascii?Q?4VwwEUGGbCXM67FEmUOtO8aI92nyqHLrevWgZVIoRfiuhvGzRExRO+eubQPv?=
- =?us-ascii?Q?aXr2lBDS97c0Rs+Bq2b5QUHhDCQ3pMid1aqaHWemiQpXmolqBeo2hJJz4vQM?=
- =?us-ascii?Q?xH7JoS8Z7ARIB3LQMds1NB0Vmzt5XWSzT6H+4PkjC8x2WFpRUghl6WL4k+96?=
- =?us-ascii?Q?8/T0NSciN2+Eqa8kF5hmZ/w1yDJyBwJNz5bJTo4jXMeObIdvRx3IjQNttq7i?=
- =?us-ascii?Q?XOD2vV10oxVyz1d3EC3s4aWaR4qXOdJ8/JDQtfqZJQm/hK4/jwCnMJiijjcY?=
- =?us-ascii?Q?mUFlxRKp6QNkbwkLF/dGGDq7DUxHUrAX5kab5dvn9Y7xIp4quu3d8J8RR2SX?=
- =?us-ascii?Q?0poLU2ZBhJvpPBJsQv7l05EmDpn8VNiGcvjTZMkPkiOPASb1zjt7rtRuTi6L?=
- =?us-ascii?Q?md/OyZp1yXJaEeZVg520UZowccjhnivweMzrGs0TV1FS6jsS2pn/BP5P5cNn?=
- =?us-ascii?Q?hdXjeWsXpn29vuie6YbSxMuwSg6dCjyjuchBmVBti4R88BZkeBQINq5rNMWJ?=
- =?us-ascii?Q?K9K+YU4KRxqbA2KEmwSe6xJ85u/TDc8kEgu5jbmOTLMUiqOi5kuJvWuOcDz1?=
- =?us-ascii?Q?qEDsCBmQrwFf/v8wDxmGyrTQGNMHw2VHbc+bAfuNiTVmbNZggImsIoytqdBD?=
- =?us-ascii?Q?Dm+df2E8WjLkCS0+Ftto1wlIPzSSxncJQG2UnP+xkIrHIhsBKOJ19Q1sml4J?=
- =?us-ascii?Q?cWlcI3FXVk2ALynRWEI/UsRIfHT5e6dyqH/FSzv1jVdUFZBf+1eDnNOrLeft?=
- =?us-ascii?Q?IhYbY2CNDPR++/hLVKR+7Siv1By8DK+qnPvN0OkN+B1XG4cNBF9KrHafbWK3?=
- =?us-ascii?Q?VkpUK886zyXb/yns0lMmuhh3UWvyNHAolHLI?=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(14060799003)(82310400026)(35042699022)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2025 12:09:20.4510
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 454f6507-fba5-4b5a-099b-08ddeae2b6b8
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF00009529.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB9750
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: CsZx7LOoZ-aqYzrD7XXVTM3fT-9sCVi2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTAzMDEyNyBTYWx0ZWRfXzCI9zaT0AJ/I
+ sWLbJg8s9vK+GTv/4HxVPukUvphLoRmoFeI+kfZn2/6T7ee1ch2ie618ghhiZv0RQZL3HJk+JoT
+ SbLtxnRI/euUyL8UlwXX/uN21I3gotcU99k9TqDjACERoA4/njX4whFL4yEbtVkVaf9SQ0lgTpA
+ DiG9FGyE8NrZPwvsLbfxz/Toj8yxjm8wk61YKVzXK1084xzQr6gH2xQ/YmDK1dZaABn3VzezigA
+ 0TJ/xJoEApddQbNHRWulAzZEtixtUNnsIY/xSijKaq2ScMKtDSelu2bkjVyAMhkg/GCRT/OeE=
+X-Proofpoint-GUID: CsZx7LOoZ-aqYzrD7XXVTM3fT-9sCVi2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-03_06,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ clxscore=1030 mlxlogscore=955 malwarescore=0 spamscore=0 suspectscore=0
+ mlxscore=0 adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.22.0-2506270000 definitions=main-2509030127
+X-JNJ: AAAAAAABRuhrF1q2p1yBnvoa7/bmADHgJtUTVO9igOrLr4Pd5YRLRDm0Prs5q5ESz7qqchzNl1o+pcsImxY+l47ydiKWMCeotRdwZI3C8IRdQAGIMOMTVPV3lvjLPW3miwKpp/me9o5+BOzf+uGfX1mlQclc0t5/VvtxR4tYnWiaH5o6XTvflxSmt86v3tdDw74fG8zsJKoFOhmwvOuB2ZWW/0cPEPULE+54qyyQ1I28dydHJjxexnUlIjxROVPzQARlobCwX8zyzS0j06fy5eZ2afR0e9+CZoRLGGM3gyfCKHui77UuVKvKYOI/uAWqnib2TF/b0SkQnG2f5Y9Qg1O8hJC6OBsKVbQburFJSNDKuK9Riz8IkG8C696PVRS2e2yhXkJ+gI/ANNQ+EX4ONzfB2dUEa7zdrVb+01YZByesw/sGcSUViHiUvnko/O/qGn1BwnnHhaf9txXdMz6Q9UbXk4dbNXhsU/10MvhwRVWS9BvPQ98mx09KMzNQZM8oKBnN/Z+aFL923XloD5TmoZFgUdUDHYrJIHK0zfHVhvRRWVmjG9jWLSLlX1bIOrD0vq+EOU2+hi8zHiYY9HxFf2xiDNRM0t+KpULR41j5huyaQHiitd5KwW+uG+iSzGxG96PRr0tkqXI6CIJYzDis4m1zWkpc/Hijt7se4ERCcmTx5sawAEUmI39O8fkNbbAXrOC+FdCXfj2V4VbX/bIYSxft1gLHFm6a2Zn/
 
-Hi Dave,
+From: leedongha <gapdev2004@gmail.com>
 
-[...]
-> > > > This series introduces initial support for the SCTLR2_ELx registers in Linux.
-> > > > The feature is optional starting from ARMv8.8/ARMv9.3,
-> > > > and becomes mandatory from ARMv8.9/ARMv9.4.
-> > > >
-> > > > Currently, Linux has no strict need to modify SCTLR2_ELx--
-> > > > at least assuming that firmware initializes
-> > > > these registers to reasonable defaults.
-> > > >
-> > > > However, several upcoming architectural features will require configuring
-> > > > control bits in these registers.
-> > > > Notable examples include FEAT_PAuth_LR and FEAT_CPA2.
-> > >
-> > > This looks OK to me now, except for one or two minor issues (see
-> > > replies to the patches).
-> > >
-> > > I think we will need a way of testing all the code paths before this
-> > > should be merged, though.
-> > >
-> > > Have you tested all the code paths, or are there some things that have
-> > > not been tested?
-> >
-> > I've tested for pKVM, nested and nhve and crash path
-> > (I do my best what can I do for modified path).
->
-> Was that just confirming that the kernel boots / does not crash?
+The code for invalidating VNCR entries in both kvm_invalidate_vncr_ipa()
+and invalidate_vncr_va() incorrectly uses a bitwise AND with `(size - 1)`
+instead of `~(size - 1)` to align the start address. This results
+in masking the address bits instead of aligning them down to the start
+of the block.
 
-Not only that, since the my last mistake, I've check it with debugger
-too -- set the SCTLR2_ELx as I expected.
+This bug may cause stale VNCR TLB entries to remain valid even after a
+TLBI or MMU notifier, leading to incorrect memory translation and
+unexpected guest behavior.
 
->
-> What about CPU suspend/resume and hotplug?
+Credit
+Team 0xB6 in bob14:
+DongHa Lee (@GAP-dev)
+Gyujeong Jin (@G1uN4sh)
+Daehyeon Ko (@4ncienth)
+Geonha Lee (@leegn4a)
+Hyungyu Oh (@DQPC_lover)
+Jaewon Yang (@R4mbb1)
 
-Of course It's done both enter/exit idle and hotplug with related kselftest test.
+Signed-off-by: leedongha <gapdev2004@gmail.com>
+---
+ arch/arm64/kvm/nested.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
->
-> My concern is that most of the defined SCTLR2_ELx bits won't affect
-> kernel execution unless the corresponding hardware features are
-> actively being used -- so while we know that the patches don't break
-> the kernel, this may not prove that SCTLR2_ELx is really being
-> initialised / saved / restored / reset correctly.
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 77db81bae86f..d0ddce877b5d 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -847,7 +847,7 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+ 
+ 		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+ 							    vt->wr.level));
+-		ipa_start = vt->wr.pa & (ipa_size - 1);
++		ipa_start = vt->wr.pa & ~(ipa_size - 1);
+ 		ipa_end = ipa_start + ipa_size;
+ 
+ 		if (ipa_end <= start || ipa_start >= end)
+@@ -887,7 +887,7 @@ static void invalidate_vncr_va(struct kvm *kvm,
+ 
+ 		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+ 							   vt->wr.level));
+-		va_start = vt->gva & (va_size - 1);
++		va_start = vt->gva & ~(va_size - 1);
+ 		va_end = va_start + va_size;
+ 
+ 		switch (scope->type) {
+-- 
+2.43.0
 
-That's why I've confirmed with debugger whether the SCTLR2_ELx value
-sets as I expected... personally I've done as much as I can for
-test related for SCTLR2_ELx.
->
-> > > Since this code is not useful by itself, it may make sense to delay
-> > > merging it until we have patches for a feature that depends on SCTLR2.
-> >
-> > Whatever I pass this detiermination for maintainer.
->
-> Sure, that's just my opinion.
->
-> Either way, this doesn't stop anyone from building support for specific
-> features on top of this series before it gets merged.
-
-Okay.
-
-Thanks!
-
---
-Sincerely,
-Yeoreum Yun
