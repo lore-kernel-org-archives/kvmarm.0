@@ -1,352 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D9C2D4B4E;
-	Wed,  3 Sep 2025 04:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8246D2F1FD1
+	for <kvmarm@lists.linux.dev>; Wed,  3 Sep 2025 10:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756875499; cv=none; b=thOBBgjuXZc5/bDmzWd+brSk7o5VJr9UTfrNfN+MeSvdHDXwoFjd7+BQYunAol2AbVo5Rk/RFNfzM9Y0NJMHwLxbqPszdzZQ516tkDbZPRFcmmUkCXGg3PUmm/kTc97222BX+FGgeRCDIF8MOiU4xdGCkBtUeOfGpyPdsn05VtI=
+	t=1756896214; cv=none; b=j6usoTCBtSFC4B3N5gZ0PkcX/VHMxFD3gEeZqgFrojYE1hBBZ1JXoj2xGjqDcmoN0FOHDOEPvOcnRM0DOzSYL6vkk6LGKT1e2i9+vJZRMlru4hl+jjUOJT20qnMvIzC+WYmX6S+/eCSzh50I0drp+giZ85PVZgGdk3VVokwikkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756875499; c=relaxed/simple;
-	bh=6YJvO7PqsDrEvLx2JteHA5sSPVycN44jl8SxtQBZTHw=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=gFnKLTwecZBlwShlvoqwYUz7sHY6xarARy4kHYQL2uh7am7gnoPQ4CLOO740HjbvprGwcxWWRlwU4wKZs/1ulruPhXp0E6PY0rKdnq67Nw1J7LREC8KYxeUadiKto2oHChJwFaZVDKVDWT//UalO0/WuZiwXny9k1MKJyBptPHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RHRNFLhQ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RHRNFLhQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04C8CC4CEF0;
-	Wed,  3 Sep 2025 04:58:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756875498;
-	bh=6YJvO7PqsDrEvLx2JteHA5sSPVycN44jl8SxtQBZTHw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RHRNFLhQh+CxZitPcxGq0MmzpR0gHMbqTumPkFZKSLS1jgT5b0kVXbXhWc/Pvdxsq
-	 RsNZjGr70W6P93yRbsaOro7UK+llD/EXQ0e3fIWkdW/OUAV0zkpkUGIuXPtAC1XQSr
-	 aZn3ox+K9cek1H/kDmIg6KLBhcslnlqdT/TxpqOcok4yzPr65Ji4pHjSkJB6CioEIZ
-	 mTiHxFltJ3QvXv5hIi3YkbFtWGl9DH/Gm0EcblCyeNRf6pEEq7Ayj69TfR8wcV/+9Q
-	 RrJKVnC8aON60DMRGR3DyEKleqf27d0g9yduDWZ0WbzKRr0N6dJH8gJqc3MJc3bco5
-	 cj1PJVVYYGJlg==
-Date: Wed, 3 Sep 2025 13:58:14 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: rostedt@goodmis.org, mathieu.desnoyers@efficios.com,
- linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
- joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- jstultz@google.com, qperret@google.com, will@kernel.org,
- aneesh.kumar@kernel.org, kernel-team@android.com,
- linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 12/24] tracing: selftests: Add trace remote tests
-Message-Id: <20250903135814.57c4ec19de536032c640b755@kernel.org>
-In-Reply-To: <20250821081412.1008261-13-vdonnefort@google.com>
-References: <20250821081412.1008261-1-vdonnefort@google.com>
-	<20250821081412.1008261-13-vdonnefort@google.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1756896214; c=relaxed/simple;
+	bh=0xgXK32LwH4jKgL1saEp2OIZ8OaGhKzMMdKC166g8RE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S+Fzk+y2NxkEcjVDNb0SukIwzfryVbOn3pla0coRgVduklBpAyrmhEqVR/XNauC0ntXhxMDPJNgw5yX0DPcOkR4n/O5D7/fKuqOhmNrildKJLp1IIH8tJqfX60moc/+8Q5jaNLoS64UfGudCidtjuYBgpIrJryEbxc6jvRoid0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0E321688;
+	Wed,  3 Sep 2025 03:43:24 -0700 (PDT)
+Received: from e133380.arm.com (e133380.arm.com [10.1.197.68])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0DDAD3F6A8;
+	Wed,  3 Sep 2025 03:43:28 -0700 (PDT)
+Date: Wed, 3 Sep 2025 11:43:09 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
+	oliver.upton@linux.dev, anshuman.khandual@arm.com, robh@kernel.org,
+	james.morse@arm.com, mark.rutland@arm.com, joey.gouly@arm.com,
+	ahmed.genidi@arm.com, kevin.brodsky@arm.com,
+	scott@os.amperecomputing.com, mbenes@suse.cz,
+	james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org,
+	pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com,
+	maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 2/5] arm64: initialise SCTLR2_ELx register at boot time
+Message-ID: <aLgbvWYeCr5l1MF6@e133380.arm.com>
+References: <20250821172408.2101870-1-yeoreum.yun@arm.com>
+ <20250821172408.2101870-3-yeoreum.yun@arm.com>
+ <aLW4A3rTcJvA0c+j@e133380.arm.com>
+ <aLXmCJOuxCHVXEYx@e129823.arm.com>
+ <aLbJeQf9LKXFTxzS@e133380.arm.com>
+ <aLbPjmy/ZYSd+wzA@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aLbPjmy/ZYSd+wzA@e129823.arm.com>
 
-On Thu, 21 Aug 2025 09:14:00 +0100
-Vincent Donnefort <vdonnefort@google.com> wrote:
+Hi,
 
-> Exercise the tracefs interface for trace remote with a set of tests to
-> check:
+On Tue, Sep 02, 2025 at 12:05:50PM +0100, Yeoreum Yun wrote:
+> Hi Dave,
 > 
->   * loading/unloading (unloading.tc)
->   * reset (reset.tc)
->   * size changes (buffer_size.tc)
->   * event integrity (trace_pipe)
+> [...]
 > 
-> Cc: Shuah Khan <skhan@linuxfoundation.org>
-> Cc: linux-kselftest@vger.kernel.org
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > > > > diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> > > > > index 36e2d26b54f5..ac12f1b4f8e2 100644
+> > > > > --- a/arch/arm64/kernel/hyp-stub.S
+> > > > > +++ b/arch/arm64/kernel/hyp-stub.S
+> > > > > @@ -144,7 +144,17 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+> > > > >
+> > > > >  .Lskip_indirection:
+> > > > >  .Lskip_tcr2:
+> > > > > +	mrs_s	x1, SYS_ID_AA64MMFR3_EL1
+> > > > > +	ubfx	x1, x1, #ID_AA64MMFR3_EL1_SCTLRX_SHIFT, #4
+> > > > > +	cbz	x1, .Lskip_sctlr2
+> > > > > +	mrs_s	x1, SYS_SCTLR2_EL12
+> > > > > +	msr_s	SYS_SCTLR2_EL1, x1
+> > > > >
+> > > > > +	// clean SCTLR2_EL1
+> > > > > +	mov_q	x1, INIT_SCTLR2_EL1
+> > > > > +	msr_s	SYS_SCTLR2_EL12, x1
+> > > >
+> > > > I'm still not sure why we need to do this.  The code doesn't seem to
+> > > > clean up by the EL1 value of any other register -- or have I missed
+> > > > something?
+> > > >
+> > > > We have already switched to EL2, via the HVC call that jumped to
+> > > > __finalise_el2.  We won't run at EL1 again unless KVM starts a guest --
+> > > > but in that case, it's KVM's responsibility to set up the EL1 registers
+> > > > before handing control to the guest.
+> > > >
+> > > > In any case, is SCTLR2_EL1 ever set to anything except INIT_SCTLR2_EL1
+> > > > before we get here?
+
+[...]
+
+> When I look at init_el2(), it returns to EL1 via:
 > 
-> diff --git a/tools/testing/selftests/ftrace/test.d/remotes/buffer_size.tc b/tools/testing/selftests/ftrace/test.d/remotes/buffer_size.tc
-> new file mode 100644
-> index 000000000000..60bf431ccc91
-> --- /dev/null
-> +++ b/tools/testing/selftests/ftrace/test.d/remotes/buffer_size.tc
-> @@ -0,0 +1,24 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +# description: Test trace remote buffer size
+>   mov x0, #INIT_PSTATE_EL1
+>   msr spsr_el2, x0
+>   ...
+>   eret
+> 
+> In other words, from init_kernel_el() through finalise_el2(),
+> all system-register accesses are made at EL1 (i.e., SYS_REG_EL1).
+> During this period, it appears that only SCTLR_EL1 is modified,
+> so the code only needs to care about the accessed register — SCTLR_EL1.
+> 
+> That’s why SCTLR_EL1 is reinitialised at the end of finalise_el2().
+> Otherwise, the MMU bit might remain enabled, which could cause errors later
+> when launching a VM under VHE.
+> 
+> However, the idea behind this patch is to initialise SCTLR2_ELx
+> the same way as SCTLR_ELx.
+> I’m not sure whether SCTLR2_ELx is modified during this period.
+> If it is (now or in the future),
+> it should be cleared/reinitialised just like SCTLR_EL1.
+> 
+> This patch is based on the assumption that there may be modifications to
+> SCTLR2_ELx during this period. So it isn’t about other system registers;
+> it’s about the register actually used during this period.
+> 
+> Am I missing anything?
+> 
+> Thanks!
+> 
+> --
+> Sincerely,
+> Yeoreum Yun
 
-I think this test requires `remotes/`. If so, please add
+I think I missed the SCTLR_EL1 reset in the idmap code after the
+enter_vhe label.
 
-# requires: remotes
+Actually, I'm not sure whether there is any architectural reason for
+setting SCTLR_EL1 to INIT_SCTLR_EL1_MMU_OFF here.  "for good measure"
+suggests that it felt like a good idea but there was no known reason
+for it.  The commit message for the original patch doesn't offer an
+explanation -- maybe Marc can remember.
 
-Then this test will be skipped if it is not enabled.
+This might be a defence against speculative translation table walks
+using the EL1&0 regime (but the architecture says [RNRJPP]: "If an
+implementation is executing at EL3 or EL2, the PE is not permitted to
+use the registers associated with the EL1&0 translation regime to
+speculatively access memory or translation tables.")  So it shouldn't
+really matter, but in case buggy CPUs don't implement this rule
+properly it may be a good idea to turn the stage1 MMU off just in case.
 
-> +
-> +. $TEST_DIR/remotes/functions
-> +
-> +test_buffer_size()
-> +{
-> +    echo 0 > tracing_on
-> +    assert_unloaded
-> +
-> +    echo 4096 > buffer_size_kb
-> +    echo 1 > tracing_on
-> +    assert_loaded
-> +
-> +    echo 0 > tracing_on
-> +    echo 7 > buffer_size_kb
-> +}
-> +
-> +if [ -z "$SOURCE_REMOTE_TEST" ]; then
-> +    set -e
-> +    setup_remote_test
-> +    test_buffer_size
-> +fi
-> diff --git a/tools/testing/selftests/ftrace/test.d/remotes/functions b/tools/testing/selftests/ftrace/test.d/remotes/functions
-> new file mode 100644
-> index 000000000000..504a495b3b1b
-> --- /dev/null
-> +++ b/tools/testing/selftests/ftrace/test.d/remotes/functions
-> @@ -0,0 +1,33 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +setup_remote()
-> +{
-> +	local name=$1
-> +
-> +	[ -e $TRACING_DIR/remotes/$name/write_event ] || exit_unresolved
-> +
-> +	cd remotes/$name/
-> +	echo 0 > tracing_on
-> +	clear_trace
-> +	echo 7 > buffer_size_kb
-> +	echo 0 > events/enable
-> +	echo 1 > events/$name/selftest/enable
-> +	echo 1 > tracing_on
-> +}
-> +
-> +setup_remote_test()
-> +{
-> +	[ -d $TRACING_DIR/remotes/test/ ] || modprobe remote_test || exit_unresolved
-> +
-> +	setup_remote "test"
-> +}
-> +
-> +assert_loaded()
-> +{
-> +	grep -q "(loaded)" buffer_size_kb
-> +}
-> +
-> +assert_unloaded()
-> +{
-> +	grep -q "(unloaded)" buffer_size_kb
-> +}
-> diff --git a/tools/testing/selftests/ftrace/test.d/remotes/reset.tc b/tools/testing/selftests/ftrace/test.d/remotes/reset.tc
-> new file mode 100644
-> index 000000000000..93d6eb2a807f
-> --- /dev/null
-> +++ b/tools/testing/selftests/ftrace/test.d/remotes/reset.tc
-> @@ -0,0 +1,105 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +# description: Test trace remote reset
-
-Ditto.
-
-> +
-> +. $TEST_DIR/remotes/functions
-> +
-> +get_cpu_ids()
-> +{
-> +    sed -n 's/^processor\s*:\s*\([0-9]\+\).*/\1/p' /proc/cpuinfo
-> +}
-> +
-> +dump_trace()
-> +{
-> +    output=$(mktemp /tmp/remote_test.XXXXXX)
-
-For the test-local temporary working directory, can you use $TMPDIR
-instead of /tmp ? That directory is removed after running each test.
-
-> +    cat trace_pipe > $output &
-> +    pid=$!
-> +    sleep 1
-> +    kill -1 $pid
-> +
-> +    echo $output
-> +}
-> +
-> +check_reset()
-> +{
-> +    write_event_path="write_event"
-> +    taskset=""
-> +
-> +    clear_trace
-> +
-> +    # Is the buffer empty?
-> +    output=$(dump_trace)
-> +    test $(wc -l $output | cut -d ' ' -f1) -eq 0
-> +
-> +    if $(echo $(pwd) | grep -q "per_cpu/cpu"); then
-> +        write_event_path="../../write_event"
-> +        cpu_id=$(echo $(pwd) | sed -e 's/.*per_cpu\/cpu//')
-> +        taskset="taskset -c $cpu_id"
-> +    fi
-> +    rm $output
-> +
-> +    # Can we properly write a new event?
-> +    $taskset echo 7890 > $write_event_path
-> +    output=$(dump_trace)
-> +    test $(wc -l $output | cut -d ' ' -f1) -eq 1
-> +    grep -q "id=7890" $output
-> +    rm $output
-> +}
-> +
-> +test_global_interface()
-> +{
-> +    output=$(mktemp /tmp/remote_test.XXXXXX)
-> +
-> +    # Confidence check
-> +    echo 123456 > write_event
-> +    output=$(dump_trace)
-> +    grep -q "id=123456" $output
-> +    rm $output
-> +
-> +    # Reset single event
-> +    echo 1 > write_event
-> +    check_reset
-> +
-> +    # Reset lost events
-> +    for i in $(seq 1 10000); do
-> +        echo 1 > write_event
-> +    done
-> +    check_reset
-> +}
-> +
-> +test_percpu_interface()
-> +{
-> +    [ "$(get_cpu_ids | wc -l)" -ge 2 ] || return 0
-> +
-> +    for cpu in $(get_cpu_ids); do
-> +        taskset -c $cpu echo 1 > write_event
-> +    done
-> +
-> +    check_non_empty=0
-> +    for cpu in $(get_cpu_ids); do
-> +        cd per_cpu/cpu$cpu/
-> +
-> +        if [ $check_non_empty -eq 0 ]; then
-> +            check_reset
-> +            check_non_empty=1
-> +        else
-> +            # Check we have only reset 1 CPU
-> +            output=$(dump_trace)
-> +            test $(wc -l $output | cut -d ' ' -f1) -eq 1
-> +            rm $output
-> +        fi
-> +        cd -
-> +    done
-> +}
-> +
-> +test_reset()
-> +{
-> +    test_global_interface
-> +    test_percpu_interface
-> +}
-> +
-> +if [ -z "$SOURCE_REMOTE_TEST" ]; then
-> +    set -e
-> +    setup_remote_test
-> +    test_reset
-> +fi
-> diff --git a/tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc b/tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc
-> new file mode 100644
-> index 000000000000..f4bd2b3655e0
-> --- /dev/null
-> +++ b/tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc
-> @@ -0,0 +1,57 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +# description: Test trace remote trace_pipe
-
-Ditto.
-
-> +
-> +. $TEST_DIR/remotes/functions
-> +
-> +test_trace_pipe()
-> +{
-> +    echo 0 > tracing_on
-> +    assert_unloaded
-> +
-> +    echo 1024 > buffer_size_kb
-> +    echo 1 > tracing_on
-> +    assert_loaded
-> +
-> +    output=$(mktemp /tmp/remote_test.XXXXXX)
-> +
-> +    cat trace_pipe > $output &
-> +    pid=$!
-> +
-> +    for i in $(seq 1 1000); do
-> +        echo $i > write_event
-> +    done
-> +
-> +    echo 0 > tracing_on
-> +    sleep 1
-> +    kill $pid
-> +
-> +    prev_ts=0 # TODO: Init with proper clock value
-> +    prev_id=0
-> +
-> +    # Only keep <timestamp> <id>
-> +    sed -i -e 's/\[[0-9]*\]\s*\([0-9]*.[0-9]*\): [a-z]* id=\([0-9]*\)/\1 \2/' $output
-> +
-> +    IFS=$'\n'
-
-This fails checkbashisms test. Can you use printf for this?
-
-IFS=$(printf "\n")
+Since it's there, though, it probably does make sense to reinitialise
+SCTLR2_EL1 at the same time -- but can you move this so that it is next
+to the SCTLR_EL1 reinitialisation?  Otherwise, the purpose of
+reinitialising SCTLR2_EL1 is unclear.  It really should come under the
+same "for good measure" justification as the SCTLR_EL1 reset.
 
 
-> +    for line in $(cat $output); do
-> +        ts=$(echo $line | cut -d ' ' -f 1)
-> +        id=$(echo $line | cut -d ' ' -f 2)
-> +
-> +        test $(echo "$ts>$prev_ts" | bc) -eq 1
-> +        test $id -eq $((prev_id + 1))
-> +
-> +        prev_ts=$ts
-> +        prev_id=$id
-> +    done
-> +
-> +    test $prev_id -eq 1000
-> +
-> +    rm $output
-> +}
-> +
-> +if [ -z "$SOURCE_REMOTE_TEST" ]; then
-> +    set -e
-> +
-> +    setup_remote_test
-> +    test_trace_pipe
-> +fi
-> diff --git a/tools/testing/selftests/ftrace/test.d/remotes/unloading.tc b/tools/testing/selftests/ftrace/test.d/remotes/unloading.tc
-> new file mode 100644
-> index 000000000000..99f97e100fde
-> --- /dev/null
-> +++ b/tools/testing/selftests/ftrace/test.d/remotes/unloading.tc
-> @@ -0,0 +1,40 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +# description: Test trace remote unloading
+However, I don't think this has anything to do with putting things into
+a clean state for VMs.  KVM defines the reset state for all the _EL1
+regs explicitly -- failing to do that would be a bug in KVM.
 
-Here, please add "requires: remotes" line.
+(See arch/arm64/kvm/sys_regs.c : sys_reg_descs[], kvm_reset_sys_regs().)
 
-Thank you,
-
-
--- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
+Cheers
+---Dave
