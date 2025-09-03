@@ -1,29 +1,53 @@
-Received: from outbound.pv.icloud.com (p-west1-cluster4-host7-snip4-10.eps.apple.com [57.103.65.181])
+Received: from cvsmtppost106.wmail.worksmobile.com (cvsmtppost106.wmail.worksmobile.com [125.209.209.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D5F2E8B70
-	for <kvmarm@lists.linux.dev>; Wed,  3 Sep 2025 12:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.65.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2AA31A071
+	for <kvmarm@lists.linux.dev>; Wed,  3 Sep 2025 15:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=125.209.209.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756903233; cv=none; b=b/4/5cvNBmPOfEqbgKRiMwum/fFuU5DBOPWNqv0V/sUEX0Jcs3Y267uPz2HneI9ck/5uS4aVJgPwMz0HbmexqW4bx2lgVWDbK5NYqKPPDNuGxM5j/TkKlym7CmvV+R2BTvtGOqgN+RF27m0yN9cdLF7zdXPo74hruDXVgaIZW+w=
+	t=1756912505; cv=none; b=IDWs5d+9JwhbymUWcMGVdJmFmnZ4IGT0VWxbpO3AOCy9PTaNX8mEaxSJh+R/RakDZato03Q/D7cDH4lorKLIfE14Pz+RiN2ia6aR0GOBDBT1w25ebyPV7f3rlwqn0ODXBwi4Lz3toqY/+1uQAWjGGTntlvIp0j2uu3nsC7/lX98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756903233; c=relaxed/simple;
-	bh=WpZZpgymLZ7IZGm4uDUA2RgytgvwPKaiaPfsuMZFsHs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uf4XNZRMItmpVf+4klHuWg83kC382J97ZJBs/5XpiyfOtL7F47tIlz6d07IfSfBfdDsLN2A1fA3HtkVUaYHn5ymNsbVItdG7h25khhXehdPioUJNuqZG3iyVNGRiT2qnlmIgnxrSAJ+mzmzpHyn0k1CUJbMXhocvfUU3laiM+No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sswd.pw; spf=pass smtp.mailfrom=sswd.pw; dkim=pass (2048-bit key) header.d=sswd.pw header.i=@sswd.pw header.b=hcZ7S69p; arc=none smtp.client-ip=57.103.65.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sswd.pw
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sswd.pw
+	s=arc-20240116; t=1756912505; c=relaxed/simple;
+	bh=3FhiaCfmZwkYLyKJbI+B3fuYEbKg6EUl6NdwQ1AxukY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qe/oBdmLa9lukXA0GgXs1GzMNDoy/v7250nMg5YD3GBbSKJhHPHEwzX6CW78SPwftHDqedMNRa54gf1RU9OE7ztJAgzGtsV+/kjy/S9HjMBpZ/f7Joz+yQUTbJnCUHhAHU3lWlkjfcOLnpXFNyc/qqdt8jL+ZycJ2Upx/CWichw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=korea.ac.kr; spf=pass smtp.mailfrom=korea.ac.kr; dkim=pass (2048-bit key) header.d=worksmobile.com header.i=@worksmobile.com header.b=yoeS5+qL; dkim=pass (1024-bit key) header.d=korea.ac.kr header.i=@korea.ac.kr header.b=dsAQssHO; arc=none smtp.client-ip=125.209.209.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=korea.ac.kr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=korea.ac.kr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sswd.pw header.i=@sswd.pw header.b="hcZ7S69p"
-Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-11 (Postfix) with ESMTPS id 7A5251800858;
-	Wed,  3 Sep 2025 12:40:22 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sswd.pw; s=sig1; bh=zkbWduFk8ozX1oSl6OLe8t0wpi3qXVuq+LzyBUgCb+M=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=hcZ7S69pM88GpDkrUueb4EjUWG2tS5fu9VVySXomdVU9A3aTlATcEqPOmESn8ka+pbfk3cmVL0qSOOMjy+58IOAtylQ280ZLfQegkoRKsDHcLTreCMPiM4t+EvfL60TFNd/4KDeSoi4OYEidW3I07BIVrvMyyLVMCq60ePslX1hvPPJE8WU4Mb+ZUYP4ZGKxZd7pvqUkZ2RZ512y943c27Mlg6i338FCRr25/cBJnjclVkeebS/c90tA96SKdKTYx8UWigIAht10HXT8xQCG12jhCx5ZDeSId4aQfCK7xVu8wPj77L0kaDt+dF0FPPEUwoY6VnJrblnUhlekHm27HQ==
-mail-alias-created-date: 1750314795890
-Received: from localhost.localdomain (pv-asmtp-me-k8s.p00.prod.me.com [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-11 (Postfix) with ESMTPSA id 2854E180016F;
-	Wed,  3 Sep 2025 12:40:20 +0000 (UTC)
-From: p@sswd.pw
+	dkim=pass (2048-bit key) header.d=worksmobile.com header.i=@worksmobile.com header.b="yoeS5+qL";
+	dkim=pass (1024-bit key) header.d=korea.ac.kr header.i=@korea.ac.kr header.b="dsAQssHO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=worksmobile.com;
+	s=s20171120; t=1756911890;
+	bh=3FhiaCfmZwkYLyKJbI+B3fuYEbKg6EUl6NdwQ1AxukY=;
+	h=From:To:Subject:Date:Message-ID:From:Subject:Feedback-ID:
+	 X-Works-Security;
+	b=yoeS5+qLqwx51cCugDjTqy/HAuqvWmjhXmTMaOBS2ZR7ht81xBTCXx8WyrysE3QJJ
+	 gSgUmt9qJF/+tQe0Be5xHgunSYVvJqPVdiNesCr0bjNFoDQ9buoHcHZo8EhUp1TaNN
+	 Bi1g2x4atDw8iIZxYz+Q2QPUv/GR6OkS2GiMmMxTrblO2qwMoHvyZD/Bc4ytNOdLMT
+	 /gABI8y93gSX733fVKDQEx/7ij5xhAHoxlU3dN8WV5zK0+rUcqLFPyZRfH+1JWOc3w
+	 eiZynDBdqJTxRvegMLncIkSI2U/qOotbvbClgay43HllGGvI3Ii730J6WafNYQgux5
+	 zSXJ6ZSqz7U2g==
+Received: from cvsendbo004.wmail ([10.113.20.173])
+  by cvsmtppost106.wmail.worksmobile.com with ESMTP id Qniq3hUMSBmsB4KxPkCQcg
+  for <kvmarm@lists.linux.dev>;
+  Wed, 03 Sep 2025 15:04:50 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=korea.ac.kr;
+	s=naverworks; t=1756911890;
+	bh=3FhiaCfmZwkYLyKJbI+B3fuYEbKg6EUl6NdwQ1AxukY=;
+	h=From:To:Subject:Date:Message-ID:From:Subject:Feedback-ID:
+	 X-Works-Security;
+	b=dsAQssHOInAbkx77EBdrK50Cc/qJksE186U24D/5Hg2iqMTOllmi6xSx1+WQ0F07J
+	 FxMh2k/I/PrMUpjvEbjaVec/KRkpTAkK1Uyw9yWZcQy8RDJWHvg+yC+B41ClQHQeIB
+	 8vNSBIBg917LJnvOgvvu7dbv17YwtF5NDwsfwMLA=
+X-Session-ID: paH7lmGFTMuO7byS2M2b2w
+X-Works-Send-Opt: L/bwjAJYjHm/FqMrKBmmKxg/FACYjHmm
+X-Works-Smtp-Source: VdnXaAM9FqJZ+Hmmaxtl+6E=
+Received: from camellia.vcn11051708.oraclevcn.com ([130.162.137.185])
+  by cvnsmtp104.wmail.worksmobile.com with ESMTP id paH7lmGFTMuO7byS2M2b2w
+  for <multiple recipients>
+  (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+  Wed, 03 Sep 2025 15:04:50 -0000
+From: Geonha Lee <w1nsom3gna@korea.ac.kr>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -34,10 +58,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	leedongha <gapdev2004@gmail.com>
-Subject: [PATCH] arm64: kvm: Fix incorrect VNCR invalidation range calculation
-Date: Wed,  3 Sep 2025 21:39:49 +0900
-Message-ID: <20250903123949.24858-1-p@sswd.pw>
+	Geonha Lee <w1nsom3gna@korea.ac.kr>
+Subject: [PATCH] KVM: arm64: nested: fix VNCR TLB ASID match logic for non-Global entries
+Date: Thu,  4 Sep 2025 00:04:21 +0900
+Message-ID: <20250903150421.90752-1-w1nsom3gna@korea.ac.kr>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -45,71 +69,51 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: CsZx7LOoZ-aqYzrD7XXVTM3fT-9sCVi2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTAzMDEyNyBTYWx0ZWRfXzCI9zaT0AJ/I
- sWLbJg8s9vK+GTv/4HxVPukUvphLoRmoFeI+kfZn2/6T7ee1ch2ie618ghhiZv0RQZL3HJk+JoT
- SbLtxnRI/euUyL8UlwXX/uN21I3gotcU99k9TqDjACERoA4/njX4whFL4yEbtVkVaf9SQ0lgTpA
- DiG9FGyE8NrZPwvsLbfxz/Toj8yxjm8wk61YKVzXK1084xzQr6gH2xQ/YmDK1dZaABn3VzezigA
- 0TJ/xJoEApddQbNHRWulAzZEtixtUNnsIY/xSijKaq2ScMKtDSelu2bkjVyAMhkg/GCRT/OeE=
-X-Proofpoint-GUID: CsZx7LOoZ-aqYzrD7XXVTM3fT-9sCVi2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-03_06,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- clxscore=1030 mlxlogscore=955 malwarescore=0 spamscore=0 suspectscore=0
- mlxscore=0 adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2506270000 definitions=main-2509030127
-X-JNJ: AAAAAAABRuhrF1q2p1yBnvoa7/bmADHgJtUTVO9igOrLr4Pd5YRLRDm0Prs5q5ESz7qqchzNl1o+pcsImxY+l47ydiKWMCeotRdwZI3C8IRdQAGIMOMTVPV3lvjLPW3miwKpp/me9o5+BOzf+uGfX1mlQclc0t5/VvtxR4tYnWiaH5o6XTvflxSmt86v3tdDw74fG8zsJKoFOhmwvOuB2ZWW/0cPEPULE+54qyyQ1I28dydHJjxexnUlIjxROVPzQARlobCwX8zyzS0j06fy5eZ2afR0e9+CZoRLGGM3gyfCKHui77UuVKvKYOI/uAWqnib2TF/b0SkQnG2f5Y9Qg1O8hJC6OBsKVbQburFJSNDKuK9Riz8IkG8C696PVRS2e2yhXkJ+gI/ANNQ+EX4ONzfB2dUEa7zdrVb+01YZByesw/sGcSUViHiUvnko/O/qGn1BwnnHhaf9txXdMz6Q9UbXk4dbNXhsU/10MvhwRVWS9BvPQ98mx09KMzNQZM8oKBnN/Z+aFL923XloD5TmoZFgUdUDHYrJIHK0zfHVhvRRWVmjG9jWLSLlX1bIOrD0vq+EOU2+hi8zHiYY9HxFf2xiDNRM0t+KpULR41j5huyaQHiitd5KwW+uG+iSzGxG96PRr0tkqXI6CIJYzDis4m1zWkpc/Hijt7se4ERCcmTx5sawAEUmI39O8fkNbbAXrOC+FdCXfj2V4VbX/bIYSxft1gLHFm6a2Zn/
 
-From: leedongha <gapdev2004@gmail.com>
+kvm_vncr_tlb_lookup() is supposed to return true when the cached VNCR
+TLB entry is valid for the current context. For non-Global entries, that
+means the entry’s ASID must match the current ASID.
 
-The code for invalidating VNCR entries in both kvm_invalidate_vncr_ipa()
-and invalidate_vncr_va() incorrectly uses a bitwise AND with `(size - 1)`
-instead of `~(size - 1)` to align the start address. This results
-in masking the address bits instead of aligning them down to the start
-of the block.
+The current code returns true when the ASIDs do *not* match, which
+inverts the logic. This is a potential vulnerability:
 
-This bug may cause stale VNCR TLB entries to remain valid even after a
-TLBI or MMU notifier, leading to incorrect memory translation and
-unexpected guest behavior.
+- Valid entries are ignored and we fall back to kvm_translate_vncr(),
+  hurting performance.
+- Mismatched entries are treated as permission faults (-EPERM) instead
+  of triggering a fresh translation.
+- This can also cause stale translations to be (wrongly) considered
+  valid across address spaces.
 
-Credit
-Team 0xB6 in bob14:
-DongHa Lee (@GAP-dev)
-Gyujeong Jin (@G1uN4sh)
-Daehyeon Ko (@4ncienth)
-Geonha Lee (@leegn4a)
-Hyungyu Oh (@DQPC_lover)
-Jaewon Yang (@R4mbb1)
+Flip the predicate so non-Global entries only hit when ASIDs match.
 
-Signed-off-by: leedongha <gapdev2004@gmail.com>
+Reported-by: Team 0xB6 in bob14
+  DongHa Lee (@GAP-dev)
+  Gyujeong Jin (@gyutrange)
+  Daehyeon Ko (@4ncienth)
+  Geonha Lee (@leegn4a)
+  Hyungyu Oh (@DQPC_lover)
+  Jaewon Yang (@R4mbb)
+
+Signed-off-by: Geonha Lee <w1nsom3gna@korea.ac.kr>
 ---
- arch/arm64/kvm/nested.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 77db81bae86f..d0ddce877b5d 100644
+index 77db81bae86f..24eab94d7d7f 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -847,7 +847,7 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+@@ -1276,7 +1276,7 @@ static bool kvm_vncr_tlb_lookup(struct kvm_vcpu *vcpu)
+ 		    !(tcr & TCR_ASID16))
+ 			asid &= GENMASK(7, 0);
  
- 		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
- 							    vt->wr.level));
--		ipa_start = vt->wr.pa & (ipa_size - 1);
-+		ipa_start = vt->wr.pa & ~(ipa_size - 1);
- 		ipa_end = ipa_start + ipa_size;
+-		return asid != vt->wr.asid;
++		return asid == vt->wr.asid;
+ 	}
  
- 		if (ipa_end <= start || ipa_start >= end)
-@@ -887,7 +887,7 @@ static void invalidate_vncr_va(struct kvm *kvm,
- 
- 		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
- 							   vt->wr.level));
--		va_start = vt->gva & (va_size - 1);
-+		va_start = vt->gva & ~(va_size - 1);
- 		va_end = va_start + va_size;
- 
- 		switch (scope->type) {
+ 	return true;
 -- 
 2.43.0
 
