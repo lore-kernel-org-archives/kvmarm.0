@@ -1,123 +1,77 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9CB2F744D
-	for <kvmarm@lists.linux.dev>; Thu,  4 Sep 2025 09:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB0F23BCFD
+	for <kvmarm@lists.linux.dev>; Thu,  4 Sep 2025 10:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756978477; cv=none; b=ecrAoJDVtEvJY+WolwrTFDItD5qT/rAyo6G8IUkYeHA+z30785Wsi3dk3OWwDCiFEg/PevlW4A7cF6iu41mt+CdzOU+0VqQzx1tOgEBZ7knhK8A79fYXRzab73gUNMHV75fwyjK1o6H1x+QfCMpup62oGx1TCnPPibFP6rxv+8o=
+	t=1756981514; cv=none; b=ZCi3tO6jwmQ5R5DIHqIPpRQMIRWgxfpbKz0RdXb5NHQ3rwBTWvYRPBmGuUuQ5GwVweCMk9TGxCNRLhE+7NVO3OB+TKLr+EVQE5/P5g3xUNqgdvUMx3kE0BHinStSRE4uPsP4rbR7fr4TYOu2nIUmSSBgTLVZlZmIRfLCt+rcepc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756978477; c=relaxed/simple;
-	bh=KJrvxiKA8da0PAhQCMt7czC6UZkPyTF1XEzM5QZa9LE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZjseCgpeip6Lbm85uXjUyMCt6bqTIsrXE/ZSAThRWWuNk6et9o6XAf8+ce3DuUJSofaOScrVB4eFPH7BuoetzlwykSN6mBRCPOcBenkuTK73PLkUNTeUHWXwZWM07+naEwjNpBCMUiI/3K0xqbB/J2goW0NihSyk03QGke34drM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K8bnUM9o; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K8bnUM9o"
-Date: Thu, 4 Sep 2025 00:57:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756978472;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RvXraad7M9/KAbsxZuVznw4PuxcMicz+ycPue4L1oEw=;
-	b=K8bnUM9oGvlHPCu5IwDqYoXJM87iFMrFkvivzsP9o3Vy9gVgb/OT6fLf2fWkv8V/AbMGxl
-	BIY4MxwR8GbjJKHyV+16OnLGE1pKkw/lwbt0IGO1EefBFMy2ll5Ux4XEVfzNAYirgsx0CO
-	VLT7Fiow1AaujU5PusHgs/OL8hEj+aE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>, Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 0/5] KVM: arm64: GICv5 legacy (GCIE_LEGACY) NV enablement
- and cleanup
-Message-ID: <aLlGeLOE_PVsYDAU@linux.dev>
-References: <20250828105925.3865158-1-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1756981514; c=relaxed/simple;
+	bh=7B6tRAQ/x6uPj4Np1+EaCweR3Eh37F1jHsIKSD7AWJo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KHn8HnNoHYvwelo1m+dCOnM7BmwdAiWENMbAFT6i2PlZULwyJQoBLVlgMA9TnYxeVFUJONZPfx9lBOl7+TVlrTBNgCNCN3jPIKhqx+k2S0JS/T7vN87pa5k56kmbi1OI3tXqd7Nxwfl/YlbfHeZ+mcirrkIBYjevyCkml7H7Los=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 921321756;
+	Thu,  4 Sep 2025 03:25:02 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E362B3F63F;
+	Thu,  4 Sep 2025 03:25:09 -0700 (PDT)
+Message-ID: <308ef1ea-f81c-4081-b664-a55e77de81d6@arm.com>
+Date: Thu, 4 Sep 2025 11:25:08 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250828105925.3865158-1-sascha.bischoff@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] KVM: arm64: vgic-v3: Indicate vgic_put_irq() may take
+ LPI xarray lock
+To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20250904062348.223976-1-oliver.upton@linux.dev>
+ <20250904062348.223976-6-oliver.upton@linux.dev>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <20250904062348.223976-6-oliver.upton@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 28, 2025 at 10:59:41AM +0000, Sascha Bischoff wrote:
-> Hi all,
-> 
-> This series enables nested virtualization for GICv3-based VMs on GICv5
-> hosts (w/ FEAT_GCIE_LEGACY) in KVM/arm64. In addition, it adds a CPU
-> capability to track support for FEAT_GCIE_LEGACY across all CPUs.
-> 
-> The series fixes ICC_SRE_EL2 access handling for GICv5 hosts (to match
-> the updated bet1+ specification [1]), and extends nested
-> virtualization support to vGICv3 guests running on compatible GICv5
-> systems. With these changes, it becomes possible to run with
-> kvm-arm.mode=nested, and these changes have been tested with three
-> levels of nesting on simulated hardware (Arm FVP).
-> 
-> Previously, the presence of FEAT_GCIE_LEGACY was tracked in the GICv5
-> driver via gic_kvm_info, and the probing logic could incorrectly
-> enable legacy support if the boot CPU exposed the feature while others
-> did not. This created the risk of mismatched configurations,
-> particularly when late-onlining CPUs without FEAT_GCIE_LEGACY.
-> 
-> To address this, the series introduces a proper ARM64_HAS_GICV5_LEGACY
-> CPU capability, and moves KVM to use cpus_have_final_cap() to ensure
-> consistent system-wide enablement. With this, late-onlined but
-> mismatched CPUs are cleanly rejected at bring-up.
-> 
-> Patch summary
-> 
-> KVM: arm64: allow ICC_SRE_EL2 accesses on a GICv5 host
->     Update handling to reflect the corrected GICv5 specification.
-> 
-> KVM: arm64: Enable nested for GICv5 host with FEAT_GCIE_LEGACY
->     Allow nested virtualization for vGICv3 guests on GICv5 hosts with
->     legacy support.
-> 
-> arm64: cpucaps: Add GICv5 Legacy vCPU interface (GCIE_LEGACY) capability
->     Introduce a new CPU capability that prevents mismatched
->     configurations.
-> 
-> KVM: arm64: Use ARM64_HAS_GICV5_LEGACY for GICv5 probing
->     Ensure probing is consistent across all CPUs by using cpucaps.
-> 
-> irqchip/gic-v5: Drop has_gcie_v3_compat from gic_kvm_info
->     Remove obsolete compatibility flag, as FEAT_GCIE_LEGACY is now a
->     CPU feature.
-> 
-> Comments and reviews are very welcome.
-> 
-> Thanks,
-> Sascha
-> 
-> [1] https://developer.arm.com/documentation/aes0070/latest/
-> 
-> Sascha Bischoff (5):
->   KVM: arm64: Allow ICC_SRE_EL2 accesses on a GICv5 host
->   KVM: arm64: Enable nested for GICv5 host with FEAT_GCIE_LEGACY
->   arm64: cpucaps: Add GICv5 Legacy vCPU interface (GCIE_LEGACY)
->     capability
->   KVM: arm64: Use ARM64_HAS_GICV5_LEGACY for GICv5 probing
->   irqchip/gic-v5: Drop has_gcie_v3_compat from gic_kvm_info
+Hi Oliver,
 
-For the series:
+On 9/4/25 07:23, Oliver Upton wrote:
+> The release path on LPIs is quite rare, meaning it can be difficult to
+> find lock ordering bugs on the LPI xarray's spinlock. Tell lockdep that
+> vgic_put_irq() might acquire the xa_lock to make unsafe patterns more
+> obvious.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index a21b482844ce..e61b95167ed1 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -142,6 +142,9 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  
+> +	if (irq->intid > VGIC_MIN_LPI)
+> +		might_lock(&dist->lpi_xa.xa_lock);
+> +
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+nit: Use >= rather than > to include all LPI.
+
+>  	if (!__vgic_put_irq(kvm, irq))
+>  		return;
+>  
 
 Thanks,
-Oliver
+
+Ben
+
