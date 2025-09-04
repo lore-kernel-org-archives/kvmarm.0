@@ -1,30 +1,32 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88912868AD
-	for <kvmarm@lists.linux.dev>; Thu,  4 Sep 2025 07:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B790629B78E
+	for <kvmarm@lists.linux.dev>; Thu,  4 Sep 2025 07:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756970913; cv=none; b=tH/vfbPiKB548cIXWRs8dao3UQXojqlfTlJ9LU9yiffIB25jnxSdLH8/tqphPdkO/h7NwdGQAqQBGKFmJJsHLejAK7F9dzuZ94p1964NZTcESAPvcN4SM48O9VZ1X0SPWvUqKabeyP/Q7vCbFCE274+Dxtp9ve34kJ+w5vIpofk=
+	t=1756970913; cv=none; b=nTdHc6W/qpi1Yw9nwgfYC++B6+MlGgDyl1FCI1VU8kZtj4sOLD3jzQHqtOQ+ZAtw0+ELHFIOQP5UjdehHzgP4bbNLtS4GEll5fNYTBRXnDVG66Smbwky60kHXUFr8ahLgErznXfeTPpdW8m4lBE3TGMYoTqtu8pTB8GACGq/sNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756970913; c=relaxed/simple;
-	bh=cBXk1zuME5mPoWxJrbhKeqU6sOeaDcZt/44yFbgHYuU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Fy2TzgguChnjVaQf/X+D4QIzqP76uH8wDoqDATAMZmFnymk5g/tlZy/rWgBUO3ijtKm6whuxQSJCH7wg6yz6v6zseSZ7kvSDxxLHvabiTWwDUVfQv2EpCy5SX1dLm9YMY0GhuUTnxU6ixIBbfbpBQOB/DiKVYhU9K8ZjeK6VrsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Bc4U5BtB; arc=none smtp.client-ip=91.218.175.186
+	bh=ef5Vyrdbds07Qb9NPQNpRS7OpMoiF+B/EpzM1aF2IPA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=mi2xC90PTAkAzwtdsLh88QL4F4NESCW2xvMwNmefRPF1TqlnkHNP59S2HoodngeQzEgj00R/CABwtuDK4XZ+SoNuTLS5ZCpU7z3o8klUc8mIdH4X1rUqLiFsR+VpK/O6ENu2eDKSqwri5d9T3EotVdhoAwgA3FPGVoswWt5TFnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rK8SDymH; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Bc4U5BtB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rK8SDymH"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756970907;
+	t=1756970908;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dq1K2l8GLmezhxBKuzfJKwuUGmebYvdCC3KQBnaYDNA=;
-	b=Bc4U5BtBsG+ChAeYiHkaq6bfuBWj1Wh6EqrW9gJ7E9EQjMiKJGnM1jzb8nxf/vJrPTqHyJ
-	IO0NdlOBggdv3qKMNqXJwLrEFlbsTm1PkelVfsMftrhNVJmaI4ampnOGIUNDc1/CEeoyAW
-	OYqkY6P0dzQGLsooHnSPVCHdKetKGDE=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cBxpOsI68m+bd4r/5vOcR+wn8MHx4WyhcPxj/aZJuMg=;
+	b=rK8SDymHi78i02o/Uvl1fh6IaTIL/ZwnQOWho3IjEidFsFOEwn4VKECyf9tvB/wkQ85T1/
+	8ASFpDrzNG0nVIza2wn+pjr2xV4PgS6EkX9+4EWIJeN6jv8vpOn3ONDfNEibPP0oEC2u6f
+	/bbCOdYCVp3DweMivieBpxoIOMUNWT8=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -32,9 +34,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 0/5] KVM: arm64: vgic-v3: Fix yet another lock ordering turd
-Date: Wed,  3 Sep 2025 23:23:43 -0700
-Message-Id: <20250904062348.223976-1-oliver.upton@linux.dev>
+Subject: [PATCH 2/5] KVM: arm64: Spin off release helper from vgic_put_irq()
+Date: Wed,  3 Sep 2025 23:23:45 -0700
+Message-Id: <20250904062348.223976-3-oliver.upton@linux.dev>
+In-Reply-To: <20250904062348.223976-1-oliver.upton@linux.dev>
+References: <20250904062348.223976-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,37 +48,60 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-syzkaller found yet another locking bug in the VGIC [*], this time due
-to nesting a 'plain' spinlock (xa_lock) inside of a raw spinlock
-(ap_list_lock). Given the way we do refcounts on LPIs it is possible
-for this exact sort of issue to crop up where the last reference may
-be dropped in unexpected places.
+Spin off the release implementation from vgic_put_irq() to prepare for a
+more involved fix for lock ordering such that it may be unnested from
+raw spinlocks. This has the minor functional change of doing call_rcu()
+behind the xa_lock although it shouldn't be consequential.
 
-Small series to fix the issue by deferring xarray modifications outside
-of the ap_list_lock critical section along with some slight lockdep
-hinting to make these rare bugs a bit more obvious.
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/vgic/vgic.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-Applies to 6.17-rc4.
-
-Oliver Upton (5):
-  KVM: arm64: vgic-v3: Use bare refcount for VGIC LPIs
-  KVM: arm64: Spin off release helper from vgic_put_irq()
-  KVM: arm64: vgic-v3: Erase LPIs from xarray outside of raw spinlocks
-  KVM: arm64: vgic-v3: Don't require IRQs be disabled for LPI xarray
-    lock
-  KVM: arm64: vgic-v3: Indicate vgic_put_irq() may take LPI xarray lock
-
- arch/arm64/kvm/vgic/vgic-debug.c |  2 +-
- arch/arm64/kvm/vgic/vgic-init.c  |  6 +--
- arch/arm64/kvm/vgic/vgic-its.c   | 15 +++---
- arch/arm64/kvm/vgic/vgic-v4.c    |  2 +-
- arch/arm64/kvm/vgic/vgic.c       | 78 +++++++++++++++++++++++---------
- arch/arm64/kvm/vgic/vgic.h       |  8 ++--
- include/kvm/arm_vgic.h           | 10 ++--
- 7 files changed, 80 insertions(+), 41 deletions(-)
-
-
-base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index a1d6fab895c4..ec4d70936a5b 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -114,22 +114,32 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
+ 	return vgic_get_irq(vcpu->kvm, intid);
+ }
+ 
++static void vgic_release_lpi_locked(struct vgic_dist *dist, struct vgic_irq *irq)
++{
++	lockdep_assert_held(&dist->lpi_xa.xa_lock);
++	__xa_erase(&dist->lpi_xa, irq->intid);
++	kfree_rcu(irq, rcu);
++}
++
++static __must_check bool __vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
++{
++	if (irq->intid < VGIC_MIN_LPI)
++		return false;
++
++	return refcount_dec_and_test(&irq->refcount);
++}
++
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	unsigned long flags;
+ 
+-	if (irq->intid < VGIC_MIN_LPI)
+-		return;
+-
+-	if (!refcount_dec_and_test(&irq->refcount))
++	if (!__vgic_put_irq(kvm, irq))
+ 		return;
+ 
+ 	xa_lock_irqsave(&dist->lpi_xa, flags);
+-	__xa_erase(&dist->lpi_xa, irq->intid);
++	vgic_release_lpi_locked(dist, irq);
+ 	xa_unlock_irqrestore(&dist->lpi_xa, flags);
+-
+-	kfree_rcu(irq, rcu);
+ }
+ 
+ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
 -- 
 2.39.5
 
