@@ -1,82 +1,129 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9222C08C4
-	for <kvmarm@lists.linux.dev>; Thu,  4 Sep 2025 09:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FE4292938;
+	Thu,  4 Sep 2025 09:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756978251; cv=none; b=bj81CZQCmY9vzclgwAWaRCTIPI7OJjdyf/Q81lDZsuL3zpzqxMVKvrlGNEuuvUdfOMdBWv8J3OKmwx8LDhTI9H287n1WQ+JAJ0kKcYVRnEz+ZHuRppJjkXWU2eruqP+0AlIVERNOtciM+UTtDC4R1ZTI0f0dZafEZQ2elxj2sQE=
+	t=1756978367; cv=none; b=DngeOprXYNJH2xxXhcdIrurobRmlwBNi9O2zB1GEoiOG5qhAY6yCyO0rsYlHnnInAWTFBKxnkCfWkwYG7JHS6b2TdPY4hJ7GgwIeF9wSCFjE+cJdK1av3kPFOHapNLY2Odc0w9dYczDNDoYJwFYIko1c3wtb0bNNpCD133EVw0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756978251; c=relaxed/simple;
-	bh=sIt763qDGoFtK8mb3vF00aS8HMGDWN9MfG1m65J9SiY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L+8H6POYzE/YcXFjq307u41WJagLOkfyHBUA7OVDcPHGx363jF8kxZu3pgPP6AwjHk9eI34vK/t7EwKEsMPdRPbpXQUfsbHA9VhknmdZ9uqGP0QDH+JoCf1ObvW6ks3+JOe4RK42RuOM/+oanPNHC6UtY3Xi1EV7RW+BC8JXIqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6FFEA1756;
-	Thu,  4 Sep 2025 02:30:34 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6294D3F6A8;
-	Thu,  4 Sep 2025 02:30:41 -0700 (PDT)
-Date: Thu, 4 Sep 2025 10:30:38 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: VHE: Initialize PMSCR_EL1
-Message-ID: <aLlcPoBLA09mtGg3@raptor>
-References: <20250902130833.338216-1-alexandru.elisei@arm.com>
- <20250902130833.338216-2-alexandru.elisei@arm.com>
- <aLk3xLd8ylxP63hH@linux.dev>
+	s=arc-20240116; t=1756978367; c=relaxed/simple;
+	bh=yf/N5FG6j+HGi+MnPiinMu7YMSmQafp7t//r67FQCIQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tILsC9Q+xC2iAq4v9wL2tmoP2nlTagkwSfD8bEuOjDBcCZd9cWaaCpfquxWkMIgeaT9Sq2NyIjZvwWwPeh+Is/E4FwvZs3lTcA+N3cfqETaKJNfbE5NLz/QTZKRxFoSZwl4LpZCXXgqUZDJ+FJhk/0LfQxgMBvGpRlF7kydDrew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pa6HEGs3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pa6HEGs3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A0AC4CEF0;
+	Thu,  4 Sep 2025 09:32:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756978367;
+	bh=yf/N5FG6j+HGi+MnPiinMu7YMSmQafp7t//r67FQCIQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Pa6HEGs3yoQTLqBVfGTHPhLM5ADn5HxjG0dVuwFap4t+ryAS2vz8XCR8i05wZfvi7
+	 VlHfKQ29KpTIRrhmVDf7gCmbTVOnre5xQTkGvuKw3U/uzkOo9eG92zu2LiGk/t/ohW
+	 2UukjGuPwl9xmdPVnPIAFBU1UqRgrf67haCK4VNpfVkXt2KV+igaCeZOq6oGR2Zhot
+	 4VgOKdfXDnuizMIF/dBP1UVUVmRu57LX2ZsaxLfDZ3XtLHxMI66YD1J7KJIMCOQiF7
+	 mVhCmi1mWWtNnb/spq5Dzn2HCtyaJ979htqSL9GahXhKNBEjwPzbnTsyYDG9le+vQt
+	 k75b0IAwqpEEw==
+Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uu6Kj-00000003Foo-00sL;
+	Thu, 04 Sep 2025 09:32:45 +0000
+Date: Thu, 04 Sep 2025 10:32:44 +0100
+Message-ID: <87v7lyzhoj.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Geonha Lee <w1nsom3gna@korea.ac.kr>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: nested: fix VNCR TLB ASID match logic for non-Global entries
+In-Reply-To: <20250903150421.90752-1-w1nsom3gna@korea.ac.kr>
+References: <20250903150421.90752-1-w1nsom3gna@korea.ac.kr>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aLk3xLd8ylxP63hH@linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 131.175.126.3
+X-SA-Exim-Rcpt-To: w1nsom3gna@korea.ac.kr, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Oliver,
+On Wed, 03 Sep 2025 16:04:21 +0100,
+Geonha Lee <w1nsom3gna@korea.ac.kr> wrote:
+>=20
+> kvm_vncr_tlb_lookup() is supposed to return true when the cached VNCR
+> TLB entry is valid for the current context. For non-Global entries, that
+> means the entry=E2=80=99s ASID must match the current ASID.
+>=20
+> The current code returns true when the ASIDs do *not* match, which
+> inverts the logic. This is a potential vulnerability:
+>=20
+> - Valid entries are ignored and we fall back to kvm_translate_vncr(),
+>   hurting performance.
+> - Mismatched entries are treated as permission faults (-EPERM) instead
+>   of triggering a fresh translation.
+> - This can also cause stale translations to be (wrongly) considered
+>   valid across address spaces.
 
-On Wed, Sep 03, 2025 at 11:55:00PM -0700, Oliver Upton wrote:
-> On Tue, Sep 02, 2025 at 02:08:32PM +0100, Alexandru Elisei wrote:
-> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> > index 381382c19fe4..e7ce0d5a622d 100644
-> > --- a/arch/arm64/kvm/debug.c
-> > +++ b/arch/arm64/kvm/debug.c
-> > @@ -74,13 +74,19 @@ void kvm_init_host_debug_data(void)
-> >  	*host_data_ptr(debug_brps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
-> >  	*host_data_ptr(debug_wrps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
-> >  
-> > +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
-> > +	    !(read_sysreg_s(SYS_PMBIDR_EL1) & PMBIDR_EL1_P)) {
-> > +		if (has_vhe()) {
-> > +			/* Clear E{0,1}SPE, which reset to UNKNOWN values. */
-> > +			write_sysreg_el1(0, SYS_PMSCR);
-> > +		} else {
-> > +			host_data_set_flag(HAS_SPE);
-> > +		}
-> > +	}
-> > +
-> 
-> nit: While this is correct, from a code organization perspective it
-> doesn't belong here. The rest of this function is concerned with probing
-> hardware state and initializing the corresponding host data.
+I don't immediately see the vulnerability on the host. In the guest,
+yes, absolutely.
 
-Yes, you're totally right.
+>=20
+> Flip the predicate so non-Global entries only hit when ASIDs match.
+>=20
+> Reported-by: Team 0xB6 in bob14
+>   DongHa Lee (@GAP-dev)
+>   Gyujeong Jin (@gyutrange)
+>   Daehyeon Ko (@4ncienth)
+>   Geonha Lee (@leegn4a)
+>   Hyungyu Oh (@DQPC_lover)
+>   Jaewon Yang (@R4mbb)
 
-> 
-> I prefer Marc's suggestion which could be wrapped up in a function called
-> 'kvm_debug_init_vhe()' or similar.
+Reported-by: has a specific meaning, and needs addresses. Oliver, can
+you change this to some sort of attribution?
 
-I forgot about Marc's suggestion, my bad. Will do that for the next iteration.
+>=20
+> Signed-off-by: Geonha Lee <w1nsom3gna@korea.ac.kr>
+> ---
+>  arch/arm64/kvm/nested.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 77db81bae86f..24eab94d7d7f 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1276,7 +1276,7 @@ static bool kvm_vncr_tlb_lookup(struct kvm_vcpu *vc=
+pu)
+>  		    !(tcr & TCR_ASID16))
+>  			asid &=3D GENMASK(7, 0);
+> =20
+> -		return asid !=3D vt->wr.asid;
+> +		return asid =3D=3D vt->wr.asid;
+>  	}
+> =20
+>  	return true;
 
-Thanks,
-Alex
+Yup, looks correct to me. Thanks again for fixing it.
 
-> 
-> Thanks,
-> Oliver
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+--=20
+Jazz isn't dead. It just smells funny.
