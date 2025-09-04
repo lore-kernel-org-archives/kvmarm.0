@@ -1,98 +1,130 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7902C1593
-	for <kvmarm@lists.linux.dev>; Thu,  4 Sep 2025 08:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA2218DB35;
+	Thu,  4 Sep 2025 09:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756974671; cv=none; b=qLzz1AIpwwe2X/e+6iiHRQxPlRDx4oLG+B5q5qozhmxCA9MBsuAR/sZ0fNmsP5pDfNWcxFWKico8icP/5mdWimhkYMSHt61eEvd/Oya6soxpZtfnaSEEWs0pPDEoVoMxY9E+pJKB2Y9a/ZIUiFhAJ5Edt65xfT0PuJohekVtnLE=
+	t=1756978153; cv=none; b=qmT8raI21wLrWML+MGkvGuJ1mO/dxAwAn09DFMyHJTS2/sjjfzfUoJmMTiq83OAzp1GGA/ytF3b2jgf19djZcK+FEXQZD6+ncYIRVETcQRf8bzbpnaJzpWTPJtF8LmbSUaSG8/bN6il3F1knfR3Ca1gnjh1y4l9OjX0Ureola6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756974671; c=relaxed/simple;
-	bh=dNK+Uh0eSrcb1kz54j/HC6iHQyjm3cyL0Ws0tPsoLEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NpN5SjJzg2dso9YCNB8WPdAlPYKWB4UIpSL9771ejxHCnr/Wr1w+cLD8BKHuRRC7ysz6x6IhMH+S5Q6UzYGzRECeFJLEz7SZNllStake2g4keh3rt64qhCTmowSsnCpwDxReBvPs/al6qCSpp/4GiywCpGkXMiG4q4C68LSfO7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xZZHEQPI; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1756978153; c=relaxed/simple;
+	bh=nau7kMpEG/k0ioNwzEP756kl3OKRZzgIs8ivDWYdEUM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bIA6BJ/fs9cp70JOxQ9hliEoqyzU65x/gEXr0V+p3AzPJG4fqeerAXfB4GjxkF+vnZK77cX3hvZkHsyLqBgR0a4HLiwlclUT0rc5fuqzyd56foMiKEBWlkLEy19t6pZRn/knYJDQ5u/Pj+o0LtWJEWrDISHVLHgg62jGFoUll5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j51DwJyk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xZZHEQPI"
-Date: Thu, 4 Sep 2025 00:26:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756974655;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oNdZCLI9Qh4c9oJ4l0QFxSHO1I3wLPIs2ZcoTVbvVSI=;
-	b=xZZHEQPICy+oxcy5y2oGaGUIUdwzJ0QpB0CjVdocLgXh97ZBpxbOzHhYQ366AXqVNLIVYS
-	Uc48K+mfCygSr09+VVL+rHrFbxEYnSq1LyKoavn7mwraT6POlwjhCXOeeKT46YDUl7fHJL
-	YgdMjHHiu85UjKVXDkQIH/KuLMsce24=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Yingchao Deng <yingchao.deng@oss.qualcomm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j51DwJyk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21C55C4CEF0;
+	Thu,  4 Sep 2025 09:29:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756978153;
+	bh=nau7kMpEG/k0ioNwzEP756kl3OKRZzgIs8ivDWYdEUM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j51DwJykRcurtpU2Sp+0A7NQ1QLelFcrZOLttQSfUYPH03PqgVuRVF9/vr4XKogTb
+	 ArFiIlFJb/HW5VOV426tMt0hba7HO0fW5ZZOPyQJjkTinEWMIq6Goj254G0oKfLSj4
+	 DPFmBrQbVzmVE7uQWq4OWXHGRiPeh+LxdsxzoIGocRMsfOPuQ2XQtt9OWWGkucB5a1
+	 IfmZ2f92A9n5F1i4LkuP5A9Ipf4Q4DfWcyf7Ug/iNATlXIWQVAU7XeqJYXfod8vqxS
+	 k9rrjHVz24d7tTqtCy2va7Y2mpFeh6pN0w3jrn9W1bAoRRbgxwOnwJIiQ4Uv46czul
+	 EzRGro0fnPZVw==
+Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uu6HG-00000003Fjy-1W1K;
+	Thu, 04 Sep 2025 09:29:10 +0000
+Date: Thu, 04 Sep 2025 10:29:09 +0100
+Message-ID: <87wm6ezhui.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: p@sswd.pw
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, James Clark <james.clark@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, quic_yingdeng@quicinc.com,
-	jinlong.mao@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com
-Subject: Re: [PATCH v2] KVM: arm64: Fix NULL pointer access issue
-Message-ID: <aLk_F8LgpFW6Qo3O@linux.dev>
-References: <20250902-etm_crash-v2-1-aa9713a7306b@oss.qualcomm.com>
+	Will Deacon <will@kernel.org>,
+	leedongha <gapdev2004@gmail.com>
+Subject: Re: [PATCH] arm64: kvm: Fix incorrect VNCR invalidation range calculation
+In-Reply-To: <20250903123949.24858-1-p@sswd.pw>
+References: <20250903123949.24858-1-p@sswd.pw>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250902-etm_crash-v2-1-aa9713a7306b@oss.qualcomm.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 131.175.126.3
+X-SA-Exim-Rcpt-To: p@sswd.pw, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, gapdev2004@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Yingchao,
-
-The shortlog is extremely vague, you should aim to succinctly describe
-the functional change of your patch. e.g.
-
-  KVM: arm64: Return early from trace helpers when KVM isn't available
-
-On Tue, Sep 02, 2025 at 11:48:25AM +0800, Yingchao Deng wrote:
-> When linux is booted in EL1, macro "host_data_ptr()" is a wrapper that
-> resolves to "&per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)",
-> is_hyp_mode_available() return false during kvm_arm_init, the per-CPU base
-> pointer __kvm_nvhe_kvm_arm_hyp_percpu_base[cpu] remains uninitialized.
-> Consequently, any access via per_cpu_ptr_nvhe_sym(kvm_host_data, cpu)
-> will result in a NULL pointer.
+On Wed, 03 Sep 2025 13:39:49 +0100,
+p@sswd.pw wrote:
 > 
-> Add is_kvm_arm_initialised() condition check to ensure that kvm_arm_init
-> completes all necessary initialization steps, including init_hyp_mode.
+> From: leedongha <gapdev2004@gmail.com>
+> 
+> The code for invalidating VNCR entries in both kvm_invalidate_vncr_ipa()
+> and invalidate_vncr_va() incorrectly uses a bitwise AND with `(size - 1)`
+> instead of `~(size - 1)` to align the start address. This results
+> in masking the address bits instead of aligning them down to the start
+> of the block.
+> 
+> This bug may cause stale VNCR TLB entries to remain valid even after a
+> TLBI or MMU notifier, leading to incorrect memory translation and
+> unexpected guest behavior.
+> 
+> Credit
+> Team 0xB6 in bob14:
+> DongHa Lee (@GAP-dev)
+> Gyujeong Jin (@G1uN4sh)
+> Daehyeon Ko (@4ncienth)
+> Geonha Lee (@leegn4a)
+> Hyungyu Oh (@DQPC_lover)
+> Jaewon Yang (@R4mbb1)
+> 
+> Signed-off-by: leedongha <gapdev2004@gmail.com>
 
-OTOH, the changelog is very mechanical and hard to grok.
+The SoB of the person sending the patch is required.
 
-  When linux is booted at EL1, host_data_ptr() resolves to the nVHE
-  hypervisor's copy of host data. When hyp mode isn't available for
-  KVM the nVHE percpu bases remain uninitialized. Consequently, any usage
-  of host_data_ptr() will result in a NULL dereference which has been
-  observed in KVM's trace filtering helpers.
-
-  Add an early return to the trace filtering helpers if KVM isn't
-  initialized, avoiding the NULL dereference.
-
-> Fixes: 054b88391bbe2 ("KVM: arm64: Support trace filtering for guests")
-> Signed-off-by: Yingchao Deng <yingchao.deng@oss.qualcomm.com>
-> Reviewed-by: James Clark <james.clark@linaro.org>
 > ---
-> Add a check to prevent accessing uninitialized per-CPU data.
-> ---
-> Changes in v2:
-> 1. Move the warning to the end in order to improve readability. No
-> functional change intended
+>  arch/arm64/kvm/nested.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 77db81bae86f..d0ddce877b5d 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -847,7 +847,7 @@ static void kvm_invalidate_vncr_ipa(struct kvm *kvm, u64 start, u64 end)
+>  
+>  		ipa_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+>  							    vt->wr.level));
+> -		ipa_start = vt->wr.pa & (ipa_size - 1);
+> +		ipa_start = vt->wr.pa & ~(ipa_size - 1);
+>  		ipa_end = ipa_start + ipa_size;
+>  
+>  		if (ipa_end <= start || ipa_start >= end)
+> @@ -887,7 +887,7 @@ static void invalidate_vncr_va(struct kvm *kvm,
+>  
+>  		va_size = ttl_to_size(pgshift_level_to_ttl(vt->wi.pgshift,
+>  							   vt->wr.level));
+> -		va_start = vt->gva & (va_size - 1);
+> +		va_start = vt->gva & ~(va_size - 1);
+>  		va_end = va_start + va_size;
+>  
+>  		switch (scope->type) {
 
-IMO, the warning should be the very first condition we evaluate. Even if
-the system configuration leads to an early return anyway (e.g. protected
-mode) the caller is not invoking these helpers from the right context.
+Yup, absolutely correct. Thanks a lot for spotting this.
+With the above nit addressed:
 
-Thanks,
-Oliver
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
