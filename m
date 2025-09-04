@@ -1,129 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FE4292938;
-	Thu,  4 Sep 2025 09:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9CB2F744D
+	for <kvmarm@lists.linux.dev>; Thu,  4 Sep 2025 09:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756978367; cv=none; b=DngeOprXYNJH2xxXhcdIrurobRmlwBNi9O2zB1GEoiOG5qhAY6yCyO0rsYlHnnInAWTFBKxnkCfWkwYG7JHS6b2TdPY4hJ7GgwIeF9wSCFjE+cJdK1av3kPFOHapNLY2Odc0w9dYczDNDoYJwFYIko1c3wtb0bNNpCD133EVw0E=
+	t=1756978477; cv=none; b=ecrAoJDVtEvJY+WolwrTFDItD5qT/rAyo6G8IUkYeHA+z30785Wsi3dk3OWwDCiFEg/PevlW4A7cF6iu41mt+CdzOU+0VqQzx1tOgEBZ7knhK8A79fYXRzab73gUNMHV75fwyjK1o6H1x+QfCMpup62oGx1TCnPPibFP6rxv+8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756978367; c=relaxed/simple;
-	bh=yf/N5FG6j+HGi+MnPiinMu7YMSmQafp7t//r67FQCIQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tILsC9Q+xC2iAq4v9wL2tmoP2nlTagkwSfD8bEuOjDBcCZd9cWaaCpfquxWkMIgeaT9Sq2NyIjZvwWwPeh+Is/E4FwvZs3lTcA+N3cfqETaKJNfbE5NLz/QTZKRxFoSZwl4LpZCXXgqUZDJ+FJhk/0LfQxgMBvGpRlF7kydDrew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pa6HEGs3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756978477; c=relaxed/simple;
+	bh=KJrvxiKA8da0PAhQCMt7czC6UZkPyTF1XEzM5QZa9LE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZjseCgpeip6Lbm85uXjUyMCt6bqTIsrXE/ZSAThRWWuNk6et9o6XAf8+ce3DuUJSofaOScrVB4eFPH7BuoetzlwykSN6mBRCPOcBenkuTK73PLkUNTeUHWXwZWM07+naEwjNpBCMUiI/3K0xqbB/J2goW0NihSyk03QGke34drM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K8bnUM9o; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pa6HEGs3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A0AC4CEF0;
-	Thu,  4 Sep 2025 09:32:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756978367;
-	bh=yf/N5FG6j+HGi+MnPiinMu7YMSmQafp7t//r67FQCIQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Pa6HEGs3yoQTLqBVfGTHPhLM5ADn5HxjG0dVuwFap4t+ryAS2vz8XCR8i05wZfvi7
-	 VlHfKQ29KpTIRrhmVDf7gCmbTVOnre5xQTkGvuKw3U/uzkOo9eG92zu2LiGk/t/ohW
-	 2UukjGuPwl9xmdPVnPIAFBU1UqRgrf67haCK4VNpfVkXt2KV+igaCeZOq6oGR2Zhot
-	 4VgOKdfXDnuizMIF/dBP1UVUVmRu57LX2ZsaxLfDZ3XtLHxMI66YD1J7KJIMCOQiF7
-	 mVhCmi1mWWtNnb/spq5Dzn2HCtyaJ979htqSL9GahXhKNBEjwPzbnTsyYDG9le+vQt
-	 k75b0IAwqpEEw==
-Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uu6Kj-00000003Foo-00sL;
-	Thu, 04 Sep 2025 09:32:45 +0000
-Date: Thu, 04 Sep 2025 10:32:44 +0100
-Message-ID: <87v7lyzhoj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Geonha Lee <w1nsom3gna@korea.ac.kr>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: nested: fix VNCR TLB ASID match logic for non-Global entries
-In-Reply-To: <20250903150421.90752-1-w1nsom3gna@korea.ac.kr>
-References: <20250903150421.90752-1-w1nsom3gna@korea.ac.kr>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K8bnUM9o"
+Date: Thu, 4 Sep 2025 00:57:44 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756978472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RvXraad7M9/KAbsxZuVznw4PuxcMicz+ycPue4L1oEw=;
+	b=K8bnUM9oGvlHPCu5IwDqYoXJM87iFMrFkvivzsP9o3Vy9gVgb/OT6fLf2fWkv8V/AbMGxl
+	BIY4MxwR8GbjJKHyV+16OnLGE1pKkw/lwbt0IGO1EefBFMy2ll5Ux4XEVfzNAYirgsx0CO
+	VLT7Fiow1AaujU5PusHgs/OL8hEj+aE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>, Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 0/5] KVM: arm64: GICv5 legacy (GCIE_LEGACY) NV enablement
+ and cleanup
+Message-ID: <aLlGeLOE_PVsYDAU@linux.dev>
+References: <20250828105925.3865158-1-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 131.175.126.3
-X-SA-Exim-Rcpt-To: w1nsom3gna@korea.ac.kr, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250828105925.3865158-1-sascha.bischoff@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 03 Sep 2025 16:04:21 +0100,
-Geonha Lee <w1nsom3gna@korea.ac.kr> wrote:
->=20
-> kvm_vncr_tlb_lookup() is supposed to return true when the cached VNCR
-> TLB entry is valid for the current context. For non-Global entries, that
-> means the entry=E2=80=99s ASID must match the current ASID.
->=20
-> The current code returns true when the ASIDs do *not* match, which
-> inverts the logic. This is a potential vulnerability:
->=20
-> - Valid entries are ignored and we fall back to kvm_translate_vncr(),
->   hurting performance.
-> - Mismatched entries are treated as permission faults (-EPERM) instead
->   of triggering a fresh translation.
-> - This can also cause stale translations to be (wrongly) considered
->   valid across address spaces.
+On Thu, Aug 28, 2025 at 10:59:41AM +0000, Sascha Bischoff wrote:
+> Hi all,
+> 
+> This series enables nested virtualization for GICv3-based VMs on GICv5
+> hosts (w/ FEAT_GCIE_LEGACY) in KVM/arm64. In addition, it adds a CPU
+> capability to track support for FEAT_GCIE_LEGACY across all CPUs.
+> 
+> The series fixes ICC_SRE_EL2 access handling for GICv5 hosts (to match
+> the updated bet1+ specification [1]), and extends nested
+> virtualization support to vGICv3 guests running on compatible GICv5
+> systems. With these changes, it becomes possible to run with
+> kvm-arm.mode=nested, and these changes have been tested with three
+> levels of nesting on simulated hardware (Arm FVP).
+> 
+> Previously, the presence of FEAT_GCIE_LEGACY was tracked in the GICv5
+> driver via gic_kvm_info, and the probing logic could incorrectly
+> enable legacy support if the boot CPU exposed the feature while others
+> did not. This created the risk of mismatched configurations,
+> particularly when late-onlining CPUs without FEAT_GCIE_LEGACY.
+> 
+> To address this, the series introduces a proper ARM64_HAS_GICV5_LEGACY
+> CPU capability, and moves KVM to use cpus_have_final_cap() to ensure
+> consistent system-wide enablement. With this, late-onlined but
+> mismatched CPUs are cleanly rejected at bring-up.
+> 
+> Patch summary
+> 
+> KVM: arm64: allow ICC_SRE_EL2 accesses on a GICv5 host
+>     Update handling to reflect the corrected GICv5 specification.
+> 
+> KVM: arm64: Enable nested for GICv5 host with FEAT_GCIE_LEGACY
+>     Allow nested virtualization for vGICv3 guests on GICv5 hosts with
+>     legacy support.
+> 
+> arm64: cpucaps: Add GICv5 Legacy vCPU interface (GCIE_LEGACY) capability
+>     Introduce a new CPU capability that prevents mismatched
+>     configurations.
+> 
+> KVM: arm64: Use ARM64_HAS_GICV5_LEGACY for GICv5 probing
+>     Ensure probing is consistent across all CPUs by using cpucaps.
+> 
+> irqchip/gic-v5: Drop has_gcie_v3_compat from gic_kvm_info
+>     Remove obsolete compatibility flag, as FEAT_GCIE_LEGACY is now a
+>     CPU feature.
+> 
+> Comments and reviews are very welcome.
+> 
+> Thanks,
+> Sascha
+> 
+> [1] https://developer.arm.com/documentation/aes0070/latest/
+> 
+> Sascha Bischoff (5):
+>   KVM: arm64: Allow ICC_SRE_EL2 accesses on a GICv5 host
+>   KVM: arm64: Enable nested for GICv5 host with FEAT_GCIE_LEGACY
+>   arm64: cpucaps: Add GICv5 Legacy vCPU interface (GCIE_LEGACY)
+>     capability
+>   KVM: arm64: Use ARM64_HAS_GICV5_LEGACY for GICv5 probing
+>   irqchip/gic-v5: Drop has_gcie_v3_compat from gic_kvm_info
 
-I don't immediately see the vulnerability on the host. In the guest,
-yes, absolutely.
+For the series:
 
->=20
-> Flip the predicate so non-Global entries only hit when ASIDs match.
->=20
-> Reported-by: Team 0xB6 in bob14
->   DongHa Lee (@GAP-dev)
->   Gyujeong Jin (@gyutrange)
->   Daehyeon Ko (@4ncienth)
->   Geonha Lee (@leegn4a)
->   Hyungyu Oh (@DQPC_lover)
->   Jaewon Yang (@R4mbb)
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-Reported-by: has a specific meaning, and needs addresses. Oliver, can
-you change this to some sort of attribution?
-
->=20
-> Signed-off-by: Geonha Lee <w1nsom3gna@korea.ac.kr>
-> ---
->  arch/arm64/kvm/nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 77db81bae86f..24eab94d7d7f 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1276,7 +1276,7 @@ static bool kvm_vncr_tlb_lookup(struct kvm_vcpu *vc=
-pu)
->  		    !(tcr & TCR_ASID16))
->  			asid &=3D GENMASK(7, 0);
-> =20
-> -		return asid !=3D vt->wr.asid;
-> +		return asid =3D=3D vt->wr.asid;
->  	}
-> =20
->  	return true;
-
-Yup, looks correct to me. Thanks again for fixing it.
-
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-
-	M.
-
---=20
-Jazz isn't dead. It just smells funny.
+Thanks,
+Oliver
