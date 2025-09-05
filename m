@@ -1,58 +1,126 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612692F5495
-	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 12:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947D82747B;
+	Fri,  5 Sep 2025 12:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757076107; cv=none; b=FvP/jhIAYrFfru6kffNrfTby/JxV3LKnnaIz8mWg98gbZs9zHkib9NexaCCRb6KPG9rX8GCSBaTMKF0hh0YC3iuQJrzoM3DeFwh+V6IIb4bkipWZbczec9JKxxrYrVmbswnS3WrXRmZYO36sqCBbDzkMlVpGjJFz9zxEMsDNfFw=
+	t=1757076131; cv=none; b=TWuea5HR1R071BZU8otLojgIMzxjEr7F2ugDfxo+RASc9+17uT/b0Uxn8wwRbIkKFU4vDen7yE/S6+5yFLmNxFdlCb57kZhGTdnf8AH2BEFGh2TSNHqhy07lbTTvdvFTzIMKnYRusJgYOna2349kj7Q/o3NCCQXNbJOVhm8TD+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757076107; c=relaxed/simple;
-	bh=O3IgAWzoBKQI7rWCvlTFj2il/YVcxrgTZCHEq5CrjWc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OsAenUw/XGyWoYH064HeOCSCx7Cc8UQWEBbarhk+gTOVPMYKx2xfOy2TxgnYasyUKMkhsxkm+gapBZ27QRtCkPd1i9GRNSDO7YdwwLEuq7enKJ/nMwCLlz2N5RmRAos0DW1uQq/Y1pLc9VXU52cH1zmpNf1PLfFbqvhV+jsdF1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61588153B;
-	Fri,  5 Sep 2025 05:41:37 -0700 (PDT)
-Received: from login2.euhpc.arm.com (login2.euhpc.arm.com [10.6.38.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 304983F63F;
-	Fri,  5 Sep 2025 05:41:45 -0700 (PDT)
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-To: kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com,
-	andrew.jones@linux.dev
-Subject: [kvm-unit-tests PATCH] arm64: mte: Fix MTE granule mask
-Date: Fri,  5 Sep 2025 13:41:29 +0100
-Message-Id: <20250905124129.32435-1-vladimir.murzin@arm.com>
-X-Mailer: git-send-email 2.24.0
+	s=arc-20240116; t=1757076131; c=relaxed/simple;
+	bh=/3OeXZlr4xjhyb0qagsOeB6JIKiHR9LeiB/2F0p8kqw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aMK5EcPtW02mIvVc/M7gxyJxmAz7JUXV8O/RHroShGutVtWEQTgGzKi7KAEgtn0J8dHOU/iv0i0LQ9tCrVJ9Y0C0qw9j4N7cNN2PoJLIb4Mv4doZE5xywKQl7w+wT3YMCtqiXaRUEg4r5TlLsiqeTm9pzqhV00rIvuj99VCJxjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ie2JrDBs; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ie2JrDBs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C9E5C4CEF1;
+	Fri,  5 Sep 2025 12:42:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757076131;
+	bh=/3OeXZlr4xjhyb0qagsOeB6JIKiHR9LeiB/2F0p8kqw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ie2JrDBsJNYABvpbzAUardYKHdtGGtGTygDlq+6KVM2Y7jajaL16rL4hWCWy+gTmi
+	 KS5OOOjFwdK430dpbxDS91B+7Q/k6qH1S9rHeL49wxT7svyjlNvXfi/+vlA9FkFmR2
+	 A8uUSS+aiWkIJVPEIXsm6i7SHnDO+Sh3I9D86/NO8lG2QHhr5PdgfvP/jSIZvjE3LR
+	 3SyME7NMXoKVn2iz3/Vu/L40GGIuPgIc3H6Nl25pHqidcDg5t+K9ximl51E+pvep48
+	 pY/IHZ9QXYoquBYXd2Hjr+hS4PhD7fJnatrt2+I3lFY9GMJA9AqGtc2WEit/Aa262X
+	 RYp0UkKzbk21g==
+Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uuVlY-00000003dl7-3MD5;
+	Fri, 05 Sep 2025 12:42:08 +0000
+Date: Fri, 05 Sep 2025 13:42:07 +0100
+Message-ID: <87ms79ystc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: kvmarm@lists.linux.dev,
+	Linux ARM <linux-arm-kernel@lists.infradead.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	lkft-triage@lists.linaro.org,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Fuad Tabba <tabba@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Ben Copeland <benjamin.copeland@linaro.org>,
+	Mark Brown <broonie@kernel.org>,
+	Aishwarya TCV <Aishwarya.TCV@arm.com>
+Subject: Re: kvm-unit-tests hang on Arm FVP with protected mode
+In-Reply-To: <CA+G9fYsT3b3Qd-m6tSDOgAXpgLPWz0QD_Z6a+_ff4oTecA85PQ@mail.gmail.com>
+References: <CA+G9fYsT3b3Qd-m6tSDOgAXpgLPWz0QD_Z6a+_ff4oTecA85PQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 131.175.126.3
+X-SA-Exim-Rcpt-To: naresh.kamboju@linaro.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, lkft-triage@lists.linaro.org, regressions@lists.linux.dev, tabba@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, catalin.marinas@arm.com, will@kernel.org, suzuki.poulose@arm.com, anders.roxell@linaro.org, arnd@arndb.de, dan.carpenter@linaro.org, benjamin.copeland@linaro.org, broonie@kernel.org, Aishwarya.TCV@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-So it generates correct mask when used together with MTE_TAG_SHIFT
+On Fri, 05 Sep 2025 13:28:45 +0100,
+Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+> 
+> kvm-unit-tests consistently hang on Arm FVP when booted with
+> kvm-arm.mode=protected across both 4K and 64K page-size kernel builds.
+> 
+> Running the same tests with kvm-arm.mode=vhe completes successfully.
 
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
----
- arm/mte.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Do you realise that "kvm-arm.mode=vhe" is not a valid option?
 
-diff --git a/arm/mte.c b/arm/mte.c
-index 95d58aaa..a1bed8a7 100644
---- a/arm/mte.c
-+++ b/arm/mte.c
-@@ -26,7 +26,7 @@
- #define MTE_TCF_ASYMM	0b11
- 
- #define MTE_GRANULE_SIZE        UL(16)
--#define MTE_GRANULE_MASK        (~(MTE_GRANULE_SIZE - 1))
-+#define MTE_GRANULE_MASK        (MTE_GRANULE_SIZE - 1)
- #define MTE_TAG_SHIFT           56
- 
- #define untagged(p)									\
+> 
+> Anders, bisected and identified the first bad commit as:
+> 
+>   066daa8d3bc2694c392e14091978043aed7b1f23
+>   KVM: arm64: Initialize HCRX_EL2 traps in pKVM
+> 
+> Regression Analysis:
+> - Reproducibility? yes
+> 
+> Test regression: kvm-unit-tests hang on Arm FVP with kvm-arm.mode=protected
+> 
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> 
+> Environment:
+> Platform: Arm FVP base-revc
+> Kernel: arm64 (tested with 4K and 64K page sizes)
+> Mode: kvm-arm.mode=protected (hangs) vs kvm-arm.mode=vhe (passes)
+> Test suite: kvm-unit-tests (./run_tests.sh -a -t -v)
+> Cmdline args : kvm-arm.mode=protected
+> Kernel: Mainline master and Linux next master
+> 
+> Test run log:
+> INFO: running kvm unit tests ...
+> + [ True = false ]
+> + ./run_tests.sh -a -t -v
+> + tee -a /lava-1/0/tests/0_kvm-unit-tests/automated/linux/kvm-unit-tests/output/result_log.txt
+> TAP version 13
+
+What do you expect us to do with such a non-report? Can you please, at
+the very least, identify which test in that test suite triggers the
+failure?
+
+> Links:
+> https://regressions.linaro.org/lkft/linux-mainline-master/v6.17-rc4/lava/kvm-unit-tests/history/?page=1
+
+What is there? This link requires a login, and goes to 11 on the
+scale of being useless.
+
+	M.
+
 -- 
-2.34.1
-
+Jazz isn't dead. It just smells funny.
