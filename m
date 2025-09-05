@@ -1,49 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3E4270557
-	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 08:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717C43093A5
+	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 08:29:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757060029; cv=none; b=FqgEHfRMESQ9BQv44xGS51Rn6J3e7E1hNQ7f1mpRZcpDyfZvKnsTN9p5cwKF31seNlch3tgRvHCob7YDMteMSJRNxN7n2NwN+VhzrT/G73Uv0pGOZQFrazWBoRlnHvlZK+EZDpxJLcxnI+JVi/gbK53WaAme6NDfX8oUOcaYgyg=
+	t=1757060986; cv=none; b=ZT2k44b0pTvgYHGG9K/b9+rMK3uF15o5yyUqfF67Pn+rtV39znrGKR0mSgpJoa0DVz3HdUfPlAQtTIWoBilQz72mKwwzpXCKHMwvDendmm/A9lq6/ad1vkYLYHqoJaQhL8Y0hvyKUs4CdlWUqv2QqYZ8OJR+3xJR2frlzySbpDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757060029; c=relaxed/simple;
-	bh=Ix99zc+zpZ0Jd8HthV8HuOrfhFlkI7IIkOCl1neROVw=;
+	s=arc-20240116; t=1757060986; c=relaxed/simple;
+	bh=6nX2Fhe2M62J80QY266vPOZ6TMOcnLaxIZD7e8xT0oE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NQ8Iqd8ngPCnYIsfIBxJ6cYvNoNLqiqfYhEtxScLUIwpUuEi1XVF2eBlDCMvDdgtXkfKHOhH18LMm/OO40JbFAVr/mqjr0W6ej8BdLLD9WitOyk0lRGONq+Lg6bvODD9Hn6aiP6Jjt3ksk7YRXFPkIn16U62OvaJ5RgR68RZjp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rXSeuh9k; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=steH1y+xQLN9/E+5xJzi0uJkF6nTwb+LsQGwqQ/Pz7MRXfSD4u7r0Ob/RMk2ZB7wWP8Z4vHqPOYsPwELGh5/QCepVFUQ6NkY1lgG7j6elW5fCak+PPJd2oCY2DnILwZwD7IUfbFW3QI0UQFOUFZv7dPsvbEvAJh8/1TYeu6PReo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rNdDNBTI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXSeuh9k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57595C4CEF1;
-	Fri,  5 Sep 2025 08:13:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNdDNBTI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16B27C4CEF1;
+	Fri,  5 Sep 2025 08:29:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757060029;
-	bh=Ix99zc+zpZ0Jd8HthV8HuOrfhFlkI7IIkOCl1neROVw=;
+	s=k20201202; t=1757060986;
+	bh=6nX2Fhe2M62J80QY266vPOZ6TMOcnLaxIZD7e8xT0oE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rXSeuh9ki9Dhe/N8dQkx0H5amEwnV12dWyHnI8wOC+s/5YTDvrxss0jlz4FhIhDpl
-	 yg8aHzsU1pUkyMrSWnx2hJohMeeszOOWqBtRYLBAlhY4G6FjTp67LJ0cC/adITa1xq
-	 WgLXMjmZEStLS4omFwD+CAfr58uqHqIOmOHLuK9vls2U+68V4hkRYn4EC4nio1Uigq
-	 FDi+fd4rxL3th1pA56PlpRdZk0fG3Hd9Sy1Ct+pCYgrPrPANyuo9g4Bw2BERR6Yeln
-	 DbYoVHnYyct+JlnOHiV9lOk3iC5HcLqn+0CDi9onrrPr/FNc8lHzetKlQRsxf1otgy
-	 CbsTh9ocTJ7lQ==
+	b=rNdDNBTI4jrSt/pP6BXw4yhJDRRTFGPosy2fYsLBfXQeP00ORMA6BSe/oU5iMcHXB
+	 FgIzCPpSAL+tmFk6WCh0vXBYyHq/0Ur/R515D9SzZkHje8lbkxpuOL2wkEij2gAGg7
+	 QqoL+M8xL+cUIpXtJwGZyo5xv9pZm9ohwAFXd0rGEQh0rCyp7ygDg202f6yWh19aWo
+	 0VNqciYwIaovY2Pt1aT2aYJPLLFU0GKf/eNKRpEHkWftHfvygCSj5qJgr+yZ6I6YjF
+	 nPSXrE6z0SeQkm1mWDg6B74YT2fXP1fFe2PrpK5yt5kZqry8/4aWaXphEM7I8aj/FI
+	 lrs1hy7aCmXYg==
 Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uuRZr-00000003Ysw-0yET;
-	Fri, 05 Sep 2025 08:13:47 +0000
-Date: Fri, 05 Sep 2025 09:13:45 +0100
-Message-ID: <87plc5z58m.wl-maz@kernel.org>
+	id 1uuRpI-00000003ZDj-0Z2s;
+	Fri, 05 Sep 2025 08:29:44 +0000
+Date: Fri, 05 Sep 2025 09:29:43 +0100
+Message-ID: <87o6rpz4i0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 4/5] KVM: arm64: vgic-v3: Don't require IRQs be disabled for LPI xarray lock
-In-Reply-To: <20250904062348.223976-5-oliver.upton@linux.dev>
+Subject: Re: [PATCH 0/5] KVM: arm64: vgic-v3: Fix yet another lock ordering turd
+In-Reply-To: <20250904062348.223976-1-oliver.upton@linux.dev>
 References: <20250904062348.223976-1-oliver.upton@linux.dev>
-	<20250904062348.223976-5-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,86 +58,25 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@ar
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 04 Sep 2025 07:23:47 +0100,
+On Thu, 04 Sep 2025 07:23:43 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Now that the LPI xarray is only read with IRQs disabled, relax the
-> locking on the xarray to a non-IRQ disabling spinlock.
+> syzkaller found yet another locking bug in the VGIC [*], this time due
+> to nesting a 'plain' spinlock (xa_lock) inside of a raw spinlock
+> (ap_list_lock). Given the way we do refcounts on LPIs it is possible
+> for this exact sort of issue to crop up where the last reference may
+> be dropped in unexpected places.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/vgic/vgic-init.c |  2 +-
->  arch/arm64/kvm/vgic/vgic-its.c  |  7 +++----
->  arch/arm64/kvm/vgic/vgic.c      | 13 ++++++-------
->  3 files changed, 10 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 4c777136ea5f..4c3c0d82e476 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -53,7 +53,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
->  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
->  
-> -	xa_init_flags(&dist->lpi_xa, XA_FLAGS_LOCK_IRQ);
-> +	xa_init(&dist->lpi_xa);
->  }
->  
->  /* CREATION */
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index f162206adb48..ce3e3ed3f29f 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -78,7 +78,6 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
->  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
->  	struct vgic_irq *irq = vgic_get_irq(kvm, intid), *oldirq;
-> -	unsigned long flags;
->  	int ret;
->  
->  	/* In this case there is no put, since we keep the reference. */
-> @@ -89,7 +88,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
->  	if (!irq)
->  		return ERR_PTR(-ENOMEM);
->  
-> -	ret = xa_reserve_irq(&dist->lpi_xa, intid, GFP_KERNEL_ACCOUNT);
-> +	ret = xa_reserve(&dist->lpi_xa, intid, GFP_KERNEL_ACCOUNT);
->  	if (ret) {
->  		kfree(irq);
->  		return ERR_PTR(ret);
-> @@ -104,7 +103,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
->  	irq->target_vcpu = vcpu;
->  	irq->group = 1;
->  
-> -	xa_lock_irqsave(&dist->lpi_xa, flags);
-> +	xa_lock(&dist->lpi_xa);
->  
->  	/*
->  	 * There could be a race with another vgic_add_lpi(), so we need to
-> @@ -126,7 +125,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
->  	}
->  
->  out_unlock:
-> -	xa_unlock_irqrestore(&dist->lpi_xa, flags);
-> +	xa_unlock(&dist->lpi_xa);
->  
->  	if (ret)
->  		return ERR_PTR(ret);
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 480391a0dcad..a21b482844ce 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -28,7 +28,7 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
->   *     kvm->arch.config_lock (mutex)
->   *       its->cmd_lock (mutex)
->   *         its->its_lock (mutex)
-> - *           vgic_dist->lpi_xa.xa_lock		must be taken with IRQs disabled
-> + *           vgic_dist->lpi_xa.xa_lock
+> Small series to fix the issue by deferring xarray modifications outside
+> of the ap_list_lock critical section along with some slight lockdep
+> hinting to make these rare bugs a bit more obvious.
 
-Doesn't this contradict the commit message statement that we always
-take this lock with interrupts disabled?
+I quite like that we get a release operation, rather than the slightly
+counter-intuitive construct we have today.
 
-Thanks,
+With the couple of issues that Ben and I raised fixed:
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
