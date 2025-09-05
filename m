@@ -1,48 +1,46 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9181927AC2F
-	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 09:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F061279DD3
+	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 09:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757065289; cv=none; b=E7eEMwglCZqVwndhB2XJaSPnRSysdIUkhovD0qmXHtl3zj36bGYh4wMlDkxOT/6GN6Kr5yWrJI6DADNmN/7GmMQHFkwXIvOugpQ3lbgYilm4PwUUeJl8uyskihYPSumqJ0E/F1LjjcNRY2shoUe/wvcRF5Ir407mhL7WXJa+G28=
+	t=1757065291; cv=none; b=k6mobwDAcjE0MgdPOoX9wj/dOrslGmAF+bHiR3OisgshwLZ/Ts76Tm2Tzhm+FnF2lyhHqbnyIss6s06mTUxUJS+dVcLicnVM61jrrXPB22T0E4uLJKI5NDP6Xc/JLWWEIeQF2VZOS2JPzNfusz9v6Y6HrQE417hC/abGtc0pTzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757065289; c=relaxed/simple;
-	bh=uk+qLQLDtRvS4MkPbhsWGc9Ftz18/PORzXeYF3PUwMw=;
+	s=arc-20240116; t=1757065291; c=relaxed/simple;
+	bh=fUa5NaK+E4wiGm/bgRkC9fh6/Pm+sXfruU2We5KdNCg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TS4yiqs3SuXSM7l/BYrtJYAO48n7/X/mJNQcRpZfmBSA7+7nXvZReOiopojQXQtxR8mXCNpAmxQbNveiMkhfDGI5+EexSYFL69M6CWADmfCnnIUS8ZmahD23hSs+jLmaDXFBkxNxP+lx2DAK5yEEgxoh8XK9ka5yK3W2BetpcPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A0w1z7Dv; arc=none smtp.client-ip=95.215.58.171
+	 MIME-Version:Content-Type; b=G5GIeHqOC1bzM/P4fJBeDzT2ySJSDPlCn4jTbiMYRh6NGRTX4JqMW/VCic/CtheCXJ1gTt/JlSqFUyKSRtxnhdO7dc7qgAeN/6uL7pfOQqQsOv5509BTEXCvboP0oIZj7ufsahy84g6EakLxIyZbcubhAOPzRwldr9cIbITTryQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wpMNqaR8; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="A0w1z7Dv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wpMNqaR8"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757065285;
+	t=1757065287;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G8XOvxlNGGHJoLa5Vx3ErGAvajcQpTrIPeSJD9PSV10=;
-	b=A0w1z7DvZDe/KnnN8T47etkJWRrtB7CkxzLUmCf1ShOOB8lFX8wDeJXi1ugCG1FJhJefr9
-	U2wt/iIG9rpMMNbnFIhKpGQuEkh0GTYwSl40cwe4pQCXwCveOhw61iPR4gI6kfMy4QYOso
-	n+6fS1vUo9rUYzAQBRzvzdopdVM2IuI=
+	bh=e3f89ee38JzlP4+WgyrG1VSv+60qHAOmRS35v0Ui0Uw=;
+	b=wpMNqaR88xSefy6Ul0H0g6t9aY5WxK1iW7rRhQRQnK5gjU++CLwnujruhbgPH4QwmWvnyj
+	ZGfTlu/z0rp+4sSm1aemt139jjbh/O3vXo67Bf5oNgjcJg06oRSLxiT/3o3w20WM2dxP74
+	uxvIzZPiF9lQDeV4yyP834GcRlgfZCw=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: maz@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: VHE: Debug fixes
-Date: Fri,  5 Sep 2025 02:41:07 -0700
-Message-Id: <175706523474.1669883.3863665313729519721.b4-ty@linux.dev>
-In-Reply-To: <20250902130833.338216-1-alexandru.elisei@arm.com>
-References: <20250902130833.338216-1-alexandru.elisei@arm.com>
+	Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Mark freed S2 MMUs as invalid
+Date: Fri,  5 Sep 2025 02:41:08 -0700
+Message-Id: <175706523465.1669883.14530688411686369270.b4-ty@linux.dev>
+In-Reply-To: <20250905072859.211369-1-maz@kernel.org>
+References: <20250905072859.211369-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,25 +51,21 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, 02 Sep 2025 14:08:31 +0100, Alexandru Elisei wrote:
-> This is v2 of the patch that zeroes PMSCR_EL1 [1] at boot, hopefully now it's
-> not as bad.
+On Fri, 05 Sep 2025 08:28:59 +0100, Marc Zyngier wrote:
+> When freeing an S2 MMU, we free the associated pgd, but omit to
+> mark the structure as invalid. Subsequently, a call to
+> kvm_nested_s2_unmap() would pick these invalid S2 MMUs and
+> pass them down the teardown path.
 > 
-> Picked up another fix - patch #2 ("KVM: arm64: VHE: Save and restore host
-> MDCR_EL2 value correctly") is new.
-> 
-> [1] https://lore.kernel.org/kvmarm/20241106122654.38234-1-alexandru.elisei@arm.com/
+> This ends up with a nasty warning as we try to unmap an unallocated
+> set of page tables.
 > 
 > [...]
 
-I squashed the suggestion into the second patch.
-
 Applied to fixes, thanks!
 
-[1/2] KVM: arm64: VHE: Initialize PMSCR_EL1
-      https://git.kernel.org/kvmarm/kvmarm/c/e643542c7160
-[2/2] KVM: arm64: VHE: Save and restore host MDCR_EL2 value correctly
-      https://git.kernel.org/kvmarm/kvmarm/c/2f67b9a64842
+[1/1] KVM: arm64: Mark freed S2 MMUs as invalid
+      https://git.kernel.org/kvmarm/kvmarm/c/34b8f4adedd5
 
 --
 Best,
