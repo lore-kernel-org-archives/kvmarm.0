@@ -1,80 +1,146 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C43B242D86
-	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 07:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3E4270557
+	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 08:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757058492; cv=none; b=g9Z53Pn/I2kjiD7f15Kqxi1CZOoKg2e+c2nqtK9ytsK4IMiSeIeIz6SYYMQuwn5jo0u5A+icY3ZUQdnkMNn0qrWFNfIER4fmUSkLaEWNP8xuYeEkvbaH05XRzzWoGFHeNLOwHhIGw5cfNFIuk9uIGtftKKs0I89zVO6evW9bmDI=
+	t=1757060029; cv=none; b=FqgEHfRMESQ9BQv44xGS51Rn6J3e7E1hNQ7f1mpRZcpDyfZvKnsTN9p5cwKF31seNlch3tgRvHCob7YDMteMSJRNxN7n2NwN+VhzrT/G73Uv0pGOZQFrazWBoRlnHvlZK+EZDpxJLcxnI+JVi/gbK53WaAme6NDfX8oUOcaYgyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757058492; c=relaxed/simple;
-	bh=W0BZZH2P+iFH6WYZoq2yGe7BYdujIfHQopESIKmJt7I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KpJkbK7OP4ejoJN16ud1buzcgDqz00729RvimaCLVLRqmNrAivM8W5hEfdpqzylddQdbKt/XO4oSLwK2wATwMJP6CwXPF5bILJ5imvDv0TrUriTSgSOA+RPveqeIya5WvHkkT53BzW0FW8wlt2+rnDAQJSjxe+5Ua8Qa42HPSvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gX10oQlv; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1757060029; c=relaxed/simple;
+	bh=Ix99zc+zpZ0Jd8HthV8HuOrfhFlkI7IIkOCl1neROVw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NQ8Iqd8ngPCnYIsfIBxJ6cYvNoNLqiqfYhEtxScLUIwpUuEi1XVF2eBlDCMvDdgtXkfKHOhH18LMm/OO40JbFAVr/mqjr0W6ej8BdLLD9WitOyk0lRGONq+Lg6bvODD9Hn6aiP6Jjt3ksk7YRXFPkIn16U62OvaJ5RgR68RZjp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rXSeuh9k; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gX10oQlv"
-Date: Fri, 5 Sep 2025 00:19:38 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757058488;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Cn6arcdUbclsr/vvq5z2G1HjcpABmQT+ily1ikXZzo=;
-	b=gX10oQlvtgYLvRCtbLmDsj/lnqodhUuFyUskskaKSm86+ujHSNCJxgFYEb1D0bcUDjYtzB
-	Prjlec2O9MTnlh9J0zh0QtVfbeH2JvpTWNzBA27kJamlCYie4tzP8liVMCXPoMr2Sfn1b1
-	TTsj3Wf+IDYEnpStDupm8j45eMsq+S4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXSeuh9k"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57595C4CEF1;
+	Fri,  5 Sep 2025 08:13:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757060029;
+	bh=Ix99zc+zpZ0Jd8HthV8HuOrfhFlkI7IIkOCl1neROVw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rXSeuh9ki9Dhe/N8dQkx0H5amEwnV12dWyHnI8wOC+s/5YTDvrxss0jlz4FhIhDpl
+	 yg8aHzsU1pUkyMrSWnx2hJohMeeszOOWqBtRYLBAlhY4G6FjTp67LJ0cC/adITa1xq
+	 WgLXMjmZEStLS4omFwD+CAfr58uqHqIOmOHLuK9vls2U+68V4hkRYn4EC4nio1Uigq
+	 FDi+fd4rxL3th1pA56PlpRdZk0fG3Hd9Sy1Ct+pCYgrPrPANyuo9g4Bw2BERR6Yeln
+	 DbYoVHnYyct+JlnOHiV9lOk3iC5HcLqn+0CDi9onrrPr/FNc8lHzetKlQRsxf1otgy
+	 CbsTh9ocTJ7lQ==
+Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uuRZr-00000003Ysw-0yET;
+	Fri, 05 Sep 2025 08:13:47 +0000
+Date: Fri, 05 Sep 2025 09:13:45 +0100
+Message-ID: <87plc5z58m.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	syzbot+cef594105ac7e60c6d93@syzkaller.appspotmail.com
-Subject: Re: [PATCH 3/5] KVM: arm64: vgic-v3: Erase LPIs from xarray outside
- of raw spinlocks
-Message-ID: <aLqPCkBktGoZZcqb@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 4/5] KVM: arm64: vgic-v3: Don't require IRQs be disabled for LPI xarray lock
+In-Reply-To: <20250904062348.223976-5-oliver.upton@linux.dev>
 References: <20250904062348.223976-1-oliver.upton@linux.dev>
- <20250904062348.223976-4-oliver.upton@linux.dev>
- <87qzwlz6l5.wl-maz@kernel.org>
+	<20250904062348.223976-5-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87qzwlz6l5.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 131.175.126.3
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 05, 2025 at 08:44:38AM +0100, Marc Zyngier wrote:
-> On Thu, 04 Sep 2025 07:23:46 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> > index ed0e96031a65..af224db3cf72 100644
-> > --- a/include/kvm/arm_vgic.h
-> > +++ b/include/kvm/arm_vgic.h
-> > @@ -139,7 +139,11 @@ struct vgic_irq {
-> >  	bool pending_latch;		/* The pending latch state used to calculate
-> >  					 * the pending state for both level
-> >  					 * and edge triggered IRQs. */
-> > -	bool active;			/* not used for LPIs */
-> > +	union {
-> > +		bool active;		/* not used for LPIs */
-> > +		bool pending_release;	/* LPI pending a release */
-> > +	};
-> > +
+On Thu, 04 Sep 2025 07:23:47 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Err... no. Please don't do that. An activated LPI that hasn't been
-> EOI'd yet does have the active state in the LR (yes, the original
-> comment is totally broken, please remove it).
+> Now that the LPI xarray is only read with IRQs disabled, relax the
+> locking on the xarray to a non-IRQ disabling spinlock.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c |  2 +-
+>  arch/arm64/kvm/vgic/vgic-its.c  |  7 +++----
+>  arch/arm64/kvm/vgic/vgic.c      | 13 ++++++-------
+>  3 files changed, 10 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 4c777136ea5f..4c3c0d82e476 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -53,7 +53,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  
+> -	xa_init_flags(&dist->lpi_xa, XA_FLAGS_LOCK_IRQ);
+> +	xa_init(&dist->lpi_xa);
+>  }
+>  
+>  /* CREATION */
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index f162206adb48..ce3e3ed3f29f 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -78,7 +78,6 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  	struct vgic_irq *irq = vgic_get_irq(kvm, intid), *oldirq;
+> -	unsigned long flags;
+>  	int ret;
+>  
+>  	/* In this case there is no put, since we keep the reference. */
+> @@ -89,7 +88,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+>  	if (!irq)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> -	ret = xa_reserve_irq(&dist->lpi_xa, intid, GFP_KERNEL_ACCOUNT);
+> +	ret = xa_reserve(&dist->lpi_xa, intid, GFP_KERNEL_ACCOUNT);
+>  	if (ret) {
+>  		kfree(irq);
+>  		return ERR_PTR(ret);
+> @@ -104,7 +103,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+>  	irq->target_vcpu = vcpu;
+>  	irq->group = 1;
+>  
+> -	xa_lock_irqsave(&dist->lpi_xa, flags);
+> +	xa_lock(&dist->lpi_xa);
+>  
+>  	/*
+>  	 * There could be a race with another vgic_add_lpi(), so we need to
+> @@ -126,7 +125,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+>  	}
+>  
+>  out_unlock:
+> -	xa_unlock_irqrestore(&dist->lpi_xa, flags);
+> +	xa_unlock(&dist->lpi_xa);
+>  
+>  	if (ret)
+>  		return ERR_PTR(ret);
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 480391a0dcad..a21b482844ce 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -28,7 +28,7 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+>   *     kvm->arch.config_lock (mutex)
+>   *       its->cmd_lock (mutex)
+>   *         its->its_lock (mutex)
+> - *           vgic_dist->lpi_xa.xa_lock		must be taken with IRQs disabled
+> + *           vgic_dist->lpi_xa.xa_lock
 
-Yeah, this obviously wasn't thought about too carefully. I'll squash in
-a fix unless there's something more ugly that needs addressing.
+Doesn't this contradict the commit message statement that we always
+take this lock with interrupts disabled?
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
