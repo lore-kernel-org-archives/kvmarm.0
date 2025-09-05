@@ -1,96 +1,95 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CB1DF71
-	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 07:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21531DF71
+	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 07:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757057885; cv=none; b=ppCFRoDwdRtNoKBwLn1NcHrKGCe8iumqDW+RI72hBFz2t89Wm9hmqCzPhB69oL/qyQVjeHhOHwaoS4sc1Rxwlvxy8s1mICbvZefetmgYgEquxV0trcxOa50qZdrPowuRazTKarHIBDEEpN786iay4hkPNj2KGXoTG+s8zmxXJsQ=
+	t=1757058281; cv=none; b=YcM1tJ2HWqarIjSDN4G8uHWSz+LtrsDEMZHXLw3YxCc5WL07cpnodyxgYcrvvi5CkVM1NEKItL0XdO8QZhEq3EDqWwcaB9xQMTNh4zfkGcFbGWWBTV0KfdHuFdYZatBioXvqvg212jwyOXPIegQZ6lp0+knMprHopArXRvxeoeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757057885; c=relaxed/simple;
-	bh=2/my/Ql9o8nPnoXRWfJgugmukVXNPoReFH8GbllR+XE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fLLR/nPQAkv5WNTU85C9OP44dyrt3AkN/vWqV+QNqzoaeo8Z7E+cgGIMghlpYwjVXhwRgGIfPV1TUtA2BKhwrCCvClWWj7oMAAWGCnlpxw5cUjg/KPznnHVPNsAhkZjg8mCb1oGXMM3qmO5PmgAR89PCqyqbKDbN6Mb3GR0QWgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xFxorx+y; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1757058281; c=relaxed/simple;
+	bh=geKnlCquhTMPQikR97mj4qNGNp++pRtPhfSp9KYcr8o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GdSbdir9Yni0AABV9RpEZXi+Z3t4e2nlp82GJqUmmuyYA0m+VIl/5tV9LCJ+juCEILjNZRMVJUqI4tqa2izLa8GOQiyzzKpPSVaHv65yfOE6bjDpSu65R1sQHQa98eZ8t+/QkkFLMR8k9MSK+ky9c3JgXRsEd14ewzcvVI2Vw3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YlhDQC0Z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xFxorx+y"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-720f0dd2809so9908226d6.3
-        for <kvmarm@lists.linux.dev>; Fri, 05 Sep 2025 00:38:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757057882; x=1757662682; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2/my/Ql9o8nPnoXRWfJgugmukVXNPoReFH8GbllR+XE=;
-        b=xFxorx+yp2r3OF60ZKa+O5cihQLeE62s4fkMCbtGFwnvMRaDlWlDIwKrewwCEYkaMX
-         euQ9qRXKK+VUVvgdj61LDWsgQKImGz9sxj3fNDkbGDxkJEjRkwnVZSxewBVvzCUS+dr4
-         vI53nDprNMv/n9Z4qqAPl0FR1OxmFDeUqLAc2yZOJhxsJGgsCNNKDHnzf9spcNOT0mD/
-         8zG1j45XzklwWlw8yRWiSS9EvkSJ7sEZkryafTcxzNhrhTubpWdlczXIb3mqXWBmiCX+
-         q0rgEfFq3XwWWMLvW5MVkax1UiigRKrto6jWFZgcKpcaeEM6iF3YMFnTChA5aHdLQ3XF
-         koYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757057882; x=1757662682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2/my/Ql9o8nPnoXRWfJgugmukVXNPoReFH8GbllR+XE=;
-        b=WkWk+A2O28B7uPfxHVLcuFsejjEeR594w2b9oALyoUhNRleF4EgyYZTpXEKszxGx4E
-         V6gCx/PCthsdTUZKLEEYWiiHgH64NxYWHqyEtxm/2pfs9c4ZGO16jttrDbKkfLp3W04H
-         jHQrzVRKl6EAL/w8mPyOdTlt/yz6JwsX7Gb09V4Hmpssb8CO5Hf/Tzhol4+2LqoTNHG1
-         VBGKe1KYcAcxB+30dE+hiSB6XNeug+s7tWApjJ60tr4LQ9O+15xTpZQOczgvIY0fkebf
-         cFl3aANpke9MKqIzOUTyoRt3u6UuJGBdqm5ktR6FBt2qjefGlOIhu836HXoorQD8LCXu
-         jJMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbVYR546PVPTpknPBpH8wEY6rorTuLHKkkzgjEYvCWg/HgYd/NsQgucWW6V6+qdlfKo2n4VN0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwIsloj9wPmPWlmGGVMHKtSnkYwNkJERvSjzIzDYYqFG7r/S8ID
-	0+X0p9IPl/aHrZfDkOPtb4wLPxuoEI2AnSC9U8S5neTAPczQjcpE4zEyP33U6a9bA9fQulXnTke
-	9U+9jYX0JeYIzOEviFfC2kpcntbE3FRtn3kf4/ox2
-X-Gm-Gg: ASbGnctf1ulk1mZtqQlp0WIwPkxNXzwb6+8BU0b+DbuJuA+3IKGqkzuG+54vG9Ini/S
-	XKV9ANYK8o0NbkE0kZqG20Cz8DTxoemvhuwFbt9QfWxYfvOmOaB3N92qC3C6n851nQzja4Tqz/y
-	y66KSW7V6vnJTLHNMFUsIut1KLWM4d2/gN1brRcJ5SkILsJfpDqf4/CQjenEuOChn6Y3xjSkkG0
-	+Pjgr0/y67VDElbJbc4Wp4AdDtpWbsaGga5gLDfZ/y5epFMDjkepiYDH8u1VXHGeA==
-X-Google-Smtp-Source: AGHT+IFE09o3zvwFit1z+V+NTJ1W2r8nA7pHITHbk+kAV4bsQCI3NxyvXXEch3sDbY+dR8RXfjhjay6jPuMf6SYHGSM=
-X-Received: by 2002:a05:6214:130e:b0:720:4a66:d3e3 with SMTP id
- 6a1803df08f44-7204a66dec4mr108057196d6.22.1757057882205; Fri, 05 Sep 2025
- 00:38:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YlhDQC0Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEADCC4CEF1;
+	Fri,  5 Sep 2025 07:44:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757058281;
+	bh=geKnlCquhTMPQikR97mj4qNGNp++pRtPhfSp9KYcr8o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YlhDQC0ZfA/02aKqNIY1taOHS4c1kwPFnx5e/S3jQFtzVYC0mBWHK++BAr6U9TeU5
+	 xoWgC8rnyw5Ik1b8b3wYGxR466j96hc6Ybsmo7nCaiJ7Mli9m+6r/QCA4aNd8Mo0X1
+	 xE296h4gccC11DHAUkpZMPYQIkwlSVpGVMV9wlUs2EHSSSiSAz+3Mv1R3XNy1B+xY6
+	 oHo6uhpTu8p5VEsopvZ1TncW7jypvae8IqWfS0zrl/V6Z8C8j6LeeuoHKamLAnfd8L
+	 CX7CnSlYc5PvZ59tYrPlApO5y16qy13DreJ9vaSvfh7/D4XFw37swju/Tor2Pf8XNT
+	 2HN4Jo5xdNt5g==
+Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uuR7f-00000003YKV-02R5;
+	Fri, 05 Sep 2025 07:44:39 +0000
+Date: Fri, 05 Sep 2025 08:44:38 +0100
+Message-ID: <87qzwlz6l5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	syzbot+cef594105ac7e60c6d93@syzkaller.appspotmail.com
+Subject: Re: [PATCH 3/5] KVM: arm64: vgic-v3: Erase LPIs from xarray outside of raw spinlocks
+In-Reply-To: <20250904062348.223976-4-oliver.upton@linux.dev>
+References: <20250904062348.223976-1-oliver.upton@linux.dev>
+	<20250904062348.223976-4-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250904101746.275795-1-oliver.upton@linux.dev> <87seh1z77s.wl-maz@kernel.org>
-In-Reply-To: <87seh1z77s.wl-maz@kernel.org>
-From: Alexander Potapenko <glider@google.com>
-Date: Fri, 5 Sep 2025 09:37:25 +0200
-X-Gm-Features: Ac12FXxQPoUcREfxLO7az-YhOj238tT0MVyHkpwaSqXdWgPbs2_1ZZeB3kv-hAY
-Message-ID: <CAG_fn=XOcO83S6663vnPgYgs1i1mUg7463dfW1KS4AdFOnyrvQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Only free fully unmapped tables in stage2_free_walker()
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 131.175.126.3
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, syzbot+cef594105ac7e60c6d93@syzkaller.appspotmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 5, 2025 at 9:32=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 04 Sep 2025 11:17:46 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > syzkaller caught a terminal use-after-free in the free walker resulting
-> > from a premature put_page() on a partially unmapped page table.
-> > Previously KVM performed a single walk covering the entire IPA space,
-> > but now that the range of the walk is up to KVM_PGTABLE_MIN_BLOCK_LEVEL
-> > worth of memory it is possibly to only partially free a table.
-> >
-> > Fix it by only dropping the table reference if the page count of the
-> > table is 1 (i.e. no longer contains valid PTEs).
-> >
-> > Fixes: e9abe311f356 ("KVM: arm64: Reschedule as needed when destroying =
-the stage-2 page-tables")
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
->
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
-Tested-by: Alexander Potapenko <glider@google.com>
+On Thu, 04 Sep 2025 07:23:46 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index ed0e96031a65..af224db3cf72 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -139,7 +139,11 @@ struct vgic_irq {
+>  	bool pending_latch;		/* The pending latch state used to calculate
+>  					 * the pending state for both level
+>  					 * and edge triggered IRQs. */
+> -	bool active;			/* not used for LPIs */
+> +	union {
+> +		bool active;		/* not used for LPIs */
+> +		bool pending_release;	/* LPI pending a release */
+> +	};
+> +
+
+Err... no. Please don't do that. An activated LPI that hasn't been
+EOI'd yet does have the active state in the LR (yes, the original
+comment is totally broken, please remove it).
+
+Imagine a case where you'd preempt the guest between the read of IAR
+and the write to EOI: pending_release is now set, and that could
+result in some funky stuff...
+
+Just add it as a separate field, I don't think anyone will cry over
+that.
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
