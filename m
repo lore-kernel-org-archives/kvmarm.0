@@ -1,95 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21531DF71
-	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 07:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C43B242D86
+	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 07:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757058281; cv=none; b=YcM1tJ2HWqarIjSDN4G8uHWSz+LtrsDEMZHXLw3YxCc5WL07cpnodyxgYcrvvi5CkVM1NEKItL0XdO8QZhEq3EDqWwcaB9xQMTNh4zfkGcFbGWWBTV0KfdHuFdYZatBioXvqvg212jwyOXPIegQZ6lp0+knMprHopArXRvxeoeY=
+	t=1757058492; cv=none; b=g9Z53Pn/I2kjiD7f15Kqxi1CZOoKg2e+c2nqtK9ytsK4IMiSeIeIz6SYYMQuwn5jo0u5A+icY3ZUQdnkMNn0qrWFNfIER4fmUSkLaEWNP8xuYeEkvbaH05XRzzWoGFHeNLOwHhIGw5cfNFIuk9uIGtftKKs0I89zVO6evW9bmDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757058281; c=relaxed/simple;
-	bh=geKnlCquhTMPQikR97mj4qNGNp++pRtPhfSp9KYcr8o=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GdSbdir9Yni0AABV9RpEZXi+Z3t4e2nlp82GJqUmmuyYA0m+VIl/5tV9LCJ+juCEILjNZRMVJUqI4tqa2izLa8GOQiyzzKpPSVaHv65yfOE6bjDpSu65R1sQHQa98eZ8t+/QkkFLMR8k9MSK+ky9c3JgXRsEd14ewzcvVI2Vw3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YlhDQC0Z; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757058492; c=relaxed/simple;
+	bh=W0BZZH2P+iFH6WYZoq2yGe7BYdujIfHQopESIKmJt7I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KpJkbK7OP4ejoJN16ud1buzcgDqz00729RvimaCLVLRqmNrAivM8W5hEfdpqzylddQdbKt/XO4oSLwK2wATwMJP6CwXPF5bILJ5imvDv0TrUriTSgSOA+RPveqeIya5WvHkkT53BzW0FW8wlt2+rnDAQJSjxe+5Ua8Qa42HPSvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gX10oQlv; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YlhDQC0Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEADCC4CEF1;
-	Fri,  5 Sep 2025 07:44:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757058281;
-	bh=geKnlCquhTMPQikR97mj4qNGNp++pRtPhfSp9KYcr8o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YlhDQC0ZfA/02aKqNIY1taOHS4c1kwPFnx5e/S3jQFtzVYC0mBWHK++BAr6U9TeU5
-	 xoWgC8rnyw5Ik1b8b3wYGxR466j96hc6Ybsmo7nCaiJ7Mli9m+6r/QCA4aNd8Mo0X1
-	 xE296h4gccC11DHAUkpZMPYQIkwlSVpGVMV9wlUs2EHSSSiSAz+3Mv1R3XNy1B+xY6
-	 oHo6uhpTu8p5VEsopvZ1TncW7jypvae8IqWfS0zrl/V6Z8C8j6LeeuoHKamLAnfd8L
-	 CX7CnSlYc5PvZ59tYrPlApO5y16qy13DreJ9vaSvfh7/D4XFw37swju/Tor2Pf8XNT
-	 2HN4Jo5xdNt5g==
-Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uuR7f-00000003YKV-02R5;
-	Fri, 05 Sep 2025 07:44:39 +0000
-Date: Fri, 05 Sep 2025 08:44:38 +0100
-Message-ID: <87qzwlz6l5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gX10oQlv"
+Date: Fri, 5 Sep 2025 00:19:38 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757058488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Cn6arcdUbclsr/vvq5z2G1HjcpABmQT+ily1ikXZzo=;
+	b=gX10oQlvtgYLvRCtbLmDsj/lnqodhUuFyUskskaKSm86+ujHSNCJxgFYEb1D0bcUDjYtzB
+	Prjlec2O9MTnlh9J0zh0QtVfbeH2JvpTWNzBA27kJamlCYie4tzP8liVMCXPoMr2Sfn1b1
+	TTsj3Wf+IDYEnpStDupm8j45eMsq+S4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	syzbot+cef594105ac7e60c6d93@syzkaller.appspotmail.com
-Subject: Re: [PATCH 3/5] KVM: arm64: vgic-v3: Erase LPIs from xarray outside of raw spinlocks
-In-Reply-To: <20250904062348.223976-4-oliver.upton@linux.dev>
+Subject: Re: [PATCH 3/5] KVM: arm64: vgic-v3: Erase LPIs from xarray outside
+ of raw spinlocks
+Message-ID: <aLqPCkBktGoZZcqb@linux.dev>
 References: <20250904062348.223976-1-oliver.upton@linux.dev>
-	<20250904062348.223976-4-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20250904062348.223976-4-oliver.upton@linux.dev>
+ <87qzwlz6l5.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 131.175.126.3
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, syzbot+cef594105ac7e60c6d93@syzkaller.appspotmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87qzwlz6l5.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 04 Sep 2025 07:23:46 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, Sep 05, 2025 at 08:44:38AM +0100, Marc Zyngier wrote:
+> On Thu, 04 Sep 2025 07:23:46 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> > index ed0e96031a65..af224db3cf72 100644
+> > --- a/include/kvm/arm_vgic.h
+> > +++ b/include/kvm/arm_vgic.h
+> > @@ -139,7 +139,11 @@ struct vgic_irq {
+> >  	bool pending_latch;		/* The pending latch state used to calculate
+> >  					 * the pending state for both level
+> >  					 * and edge triggered IRQs. */
+> > -	bool active;			/* not used for LPIs */
+> > +	union {
+> > +		bool active;		/* not used for LPIs */
+> > +		bool pending_release;	/* LPI pending a release */
+> > +	};
+> > +
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index ed0e96031a65..af224db3cf72 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -139,7 +139,11 @@ struct vgic_irq {
->  	bool pending_latch;		/* The pending latch state used to calculate
->  					 * the pending state for both level
->  					 * and edge triggered IRQs. */
-> -	bool active;			/* not used for LPIs */
-> +	union {
-> +		bool active;		/* not used for LPIs */
-> +		bool pending_release;	/* LPI pending a release */
-> +	};
-> +
+> Err... no. Please don't do that. An activated LPI that hasn't been
+> EOI'd yet does have the active state in the LR (yes, the original
+> comment is totally broken, please remove it).
 
-Err... no. Please don't do that. An activated LPI that hasn't been
-EOI'd yet does have the active state in the LR (yes, the original
-comment is totally broken, please remove it).
+Yeah, this obviously wasn't thought about too carefully. I'll squash in
+a fix unless there's something more ugly that needs addressing.
 
-Imagine a case where you'd preempt the guest between the read of IAR
-and the write to EOI: pending_release is now set, and that could
-result in some funky stuff...
-
-Just add it as a separate field, I don't think anyone will cry over
-that.
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+Thanks,
+Oliver
