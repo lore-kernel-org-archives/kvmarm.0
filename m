@@ -1,119 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859C535208A;
-	Fri,  5 Sep 2025 13:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C61836CC9E
+	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 14:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757079528; cv=none; b=k1M2xfCRhbU9smknKlme+pecHD19SI+Yx8nBP0HrElNespKZWm5eby0Gp4izy8jkre8MuzvXvKxVYY0y2AP2sCj4ewyrGt49BDKdDF3tMttAG4qj6r99LhQ6/Nxxc1BPxVU6HbkzCK3vQ9ZfPFky9eAOZXPh6VV7zAfjT0nllXw=
+	t=1757082106; cv=none; b=AbtODGjTraHpOFR+3rxQvF30cXWS/7Q1ToDMNoCjHy/Fv18X65iApU8eFD28RghfAxZK4mNPnFWr/8Yt0JV15gRIePH3x1qqoMf9kz/e02bhAY751ZJQzBH/qhepBRqLQqlnuR+3VBZtXuSP510vg52wb0wQXlu16iyuW4SNNRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757079528; c=relaxed/simple;
-	bh=+RfIeCiYHGfOQAYZpOBH5xFxrQIjFV5rbqolCOJUiVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LVgq8ij0+NGbBuhU3JB2Cvk6bPAyiR8TLT/XdJOSG2NoRl/5CCb/jOszc7zif+KM9Qlla36kbzhJxyzPp1x5rIwQ00LNmRJ/hmgLqaFYeXPHZTZV6gbyXXqu+r56gtQPE4SyjRI4zC7GYt67YD7iC0HWHNH43E8sEAT8CkXwyFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=goqvWAlu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757082106; c=relaxed/simple;
+	bh=l2X2gD8rpVn93k+Ce9cWSPWhKVrm+9ailUyBS3fkx/0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VrQPKws9cxsxBEkEuzVIdoq3eeaqK7Ia/Jhkp3u9QFUvI8DJ7sD4bM97pS7+UzMKyd+Ik4CIryQ0/+9hclqqSoAwvTEKOIGv1kHjOOJgHjpyN40ibAqABQUomCjITnCDdsG0ybst3U26bYnobxW2g0WW3R13r6R5fokCbTkPlwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uuAQuaO7; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="goqvWAlu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45B7FC4CEF1;
-	Fri,  5 Sep 2025 13:38:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757079528;
-	bh=+RfIeCiYHGfOQAYZpOBH5xFxrQIjFV5rbqolCOJUiVQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=goqvWAluxfzf8BkxFwUH6Ln7miVt6sUnhYEjzlJ0bfEm6Z+hkN7Vbm+5YeSyn4CZq
-	 nfc/ZWNn4ruTbxMbNZUqC/HtAnC6ie9u7NgP+pl4PTtHfQIkHasEbxJQCEIuZG7c6G
-	 3YJH26/oE9qL2Xkghwa6/0lf4A3/FEFYpnEgDsQvJkjT2T2ftwdCzOHTphbw1NRKn8
-	 HV1egnOIdjeyvJpeDSdBn/jomeNlNAN6ZnNGOsiwu7EutupADa1bHHpkcN4zKF34qr
-	 Xi/Xfb07GAaelXX5R9irbB92nla6CsdO+hpRpj2iAnhtRUIGi52egIr9m97RUdDx7h
-	 3YfsrU1YqhEGA==
-Date: Fri, 5 Sep 2025 14:38:41 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Naresh Kamboju <naresh.kamboju@linaro.org>, kvmarm@lists.linux.dev,
-	Linux ARM <linux-arm-kernel@lists.infradead.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	lkft-triage@lists.linaro.org,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Fuad Tabba <tabba@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uuAQuaO7"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757082103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7XOlyl1+L/F/x+ZmZ8UGrxdRSg53IZ3sEh1L9YH8CEU=;
+	b=uuAQuaO7vaTwnWMD5OOXam/pXtzQ81Af8+GJXlnscu3ewesdZ07QB7u+IQq6KfsNfnuyLT
+	60YYyhY5ZmRaXBAH/xaaBl+dMkRihajv2sK+RreiT9LyX83j58YmXCYZEpWD9er6JPlNDp
+	DQbsaejXwKiuGNspZO8QUWDI2fbXZyw=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Ben Copeland <benjamin.copeland@linaro.org>,
-	Aishwarya TCV <Aishwarya.TCV@arm.com>
-Subject: Re: kvm-unit-tests hang on Arm FVP with protected mode
-Message-ID: <345e42db-eabd-4e34-abf5-d9974dfe55d1@sirena.org.uk>
-References: <CA+G9fYsT3b3Qd-m6tSDOgAXpgLPWz0QD_Z6a+_ff4oTecA85PQ@mail.gmail.com>
- <87ms79ystc.wl-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v2 0/6] KVM: arm64: vgic-v3: Fix yet another lock ordering turd
+Date: Fri,  5 Sep 2025 03:05:25 -0700
+Message-Id: <20250905100531.282980-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ftKo7STfvoWEjFz0"
-Content-Disposition: inline
-In-Reply-To: <87ms79ystc.wl-maz@kernel.org>
-X-Cookie: He who laughs, lasts.
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+
+v1: https://lore.kernel.org/kvmarm/20250904062348.223976-1-oliver.upton@linux.dev/
+
+v1 -> v2:
+ - Drop union misbehavior + misleading comment (Marc)
+ - Fix LPI check to include the first one (Ben)
+ - Clarify changelog to make lock relaxation slightly more obvious
+
+Oliver Upton (6):
+  KVM: arm64: vgic: Drop stale comment on IRQ active state
+  KVM: arm64: vgic-v3: Use bare refcount for VGIC LPIs
+  KVM: arm64: Spin off release helper from vgic_put_irq()
+  KVM: arm64: vgic-v3: Erase LPIs from xarray outside of raw spinlocks
+  KVM: arm64: vgic-v3: Don't require IRQs be disabled for LPI xarray
+    lock
+  KVM: arm64: vgic-v3: Indicate vgic_put_irq() may take LPI xarray lock
+
+ arch/arm64/kvm/vgic/vgic-debug.c |  2 +-
+ arch/arm64/kvm/vgic/vgic-init.c  |  6 +--
+ arch/arm64/kvm/vgic/vgic-its.c   | 15 +++---
+ arch/arm64/kvm/vgic/vgic-v4.c    |  2 +-
+ arch/arm64/kvm/vgic/vgic.c       | 78 +++++++++++++++++++++++---------
+ arch/arm64/kvm/vgic/vgic.h       |  8 ++--
+ include/kvm/arm_vgic.h           |  9 ++--
+ 7 files changed, 79 insertions(+), 41 deletions(-)
 
 
---ftKo7STfvoWEjFz0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
+-- 
+2.39.5
 
-On Fri, Sep 05, 2025 at 01:42:07PM +0100, Marc Zyngier wrote:
-> Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-
-> > INFO: running kvm unit tests ...
-> > + [ True = false ]
-> > + ./run_tests.sh -a -t -v
-> > + tee -a /lava-1/0/tests/0_kvm-unit-tests/automated/linux/kvm-unit-tests/output/result_log.txt
-> > TAP version 13
-
-> What do you expect us to do with such a non-report? Can you please, at
-> the very least, identify which test in that test suite triggers the
-> failure?
-
-Looking at the log file that isn't password protected that's the last
-line of output so it'll have hung trying to do the first test, based on
-the log from another machine:
-
-   https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250905/testrun/29777055/suite/kvm-unit-tests/test/debug-bp-migration-timeout-duration90s/log
-
-it seems that should be
-
-   ok 1 - selftest-setup: selftest: setup: smp: number of CPUs matches expectation
-
-that's died for the version they're using.
-
-> > Links:
-> > https://regressions.linaro.org/lkft/linux-mainline-master/v6.17-rc4/lava/kvm-unit-tests/history/?page=1
-
-> What is there? This link requires a login, and goes to 11 on the
-> scale of being useless.
-
-My Linaro account appears to have been disabled at some point so I
-can't access it either.  If this is affecting mainline presumably it's
-been an issue in at least -next for a while.
-
---ftKo7STfvoWEjFz0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmi65+AACgkQJNaLcl1U
-h9DLewf+Ls/00LL8UkAstP2PfYnm8MYv7sEGvfU6pcxX76rmhhoo+wHh/P4hYxIc
-GnEmWTawHaooNeTHseqYhjmZExdIu4kjBFLylfnR0kl70I7Z9fj2lNke/I5l6esd
-y6+T8DWSATVhQTebL9S/tmeQ223uLeJxoWU3o2Cex5787ehN5TMly7bqCBleQNrE
-C6WrgNNVDCffoSsFFv+CCCRtptBgSIUmJTox4dxFIAvmJ3NLhe9yB2SCvQGGWIRr
-mp9DPS9eygW3mJsa3IWwmUhpA1nVrUbcmI+KFXgTdDwP36xjlLGj0E0o41TL8NiJ
-O1/Rrzn/W690wZtEzwjotbV4+hBASg==
-=/HVR
------END PGP SIGNATURE-----
-
---ftKo7STfvoWEjFz0--
