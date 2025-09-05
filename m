@@ -1,48 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947D82747B;
-	Fri,  5 Sep 2025 12:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859C535208A;
+	Fri,  5 Sep 2025 13:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757076131; cv=none; b=TWuea5HR1R071BZU8otLojgIMzxjEr7F2ugDfxo+RASc9+17uT/b0Uxn8wwRbIkKFU4vDen7yE/S6+5yFLmNxFdlCb57kZhGTdnf8AH2BEFGh2TSNHqhy07lbTTvdvFTzIMKnYRusJgYOna2349kj7Q/o3NCCQXNbJOVhm8TD+o=
+	t=1757079528; cv=none; b=k1M2xfCRhbU9smknKlme+pecHD19SI+Yx8nBP0HrElNespKZWm5eby0Gp4izy8jkre8MuzvXvKxVYY0y2AP2sCj4ewyrGt49BDKdDF3tMttAG4qj6r99LhQ6/Nxxc1BPxVU6HbkzCK3vQ9ZfPFky9eAOZXPh6VV7zAfjT0nllXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757076131; c=relaxed/simple;
-	bh=/3OeXZlr4xjhyb0qagsOeB6JIKiHR9LeiB/2F0p8kqw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aMK5EcPtW02mIvVc/M7gxyJxmAz7JUXV8O/RHroShGutVtWEQTgGzKi7KAEgtn0J8dHOU/iv0i0LQ9tCrVJ9Y0C0qw9j4N7cNN2PoJLIb4Mv4doZE5xywKQl7w+wT3YMCtqiXaRUEg4r5TlLsiqeTm9pzqhV00rIvuj99VCJxjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ie2JrDBs; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757079528; c=relaxed/simple;
+	bh=+RfIeCiYHGfOQAYZpOBH5xFxrQIjFV5rbqolCOJUiVQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LVgq8ij0+NGbBuhU3JB2Cvk6bPAyiR8TLT/XdJOSG2NoRl/5CCb/jOszc7zif+KM9Qlla36kbzhJxyzPp1x5rIwQ00LNmRJ/hmgLqaFYeXPHZTZV6gbyXXqu+r56gtQPE4SyjRI4zC7GYt67YD7iC0HWHNH43E8sEAT8CkXwyFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=goqvWAlu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ie2JrDBs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C9E5C4CEF1;
-	Fri,  5 Sep 2025 12:42:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="goqvWAlu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45B7FC4CEF1;
+	Fri,  5 Sep 2025 13:38:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757076131;
-	bh=/3OeXZlr4xjhyb0qagsOeB6JIKiHR9LeiB/2F0p8kqw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ie2JrDBsJNYABvpbzAUardYKHdtGGtGTygDlq+6KVM2Y7jajaL16rL4hWCWy+gTmi
-	 KS5OOOjFwdK430dpbxDS91B+7Q/k6qH1S9rHeL49wxT7svyjlNvXfi/+vlA9FkFmR2
-	 A8uUSS+aiWkIJVPEIXsm6i7SHnDO+Sh3I9D86/NO8lG2QHhr5PdgfvP/jSIZvjE3LR
-	 3SyME7NMXoKVn2iz3/Vu/L40GGIuPgIc3H6Nl25pHqidcDg5t+K9ximl51E+pvep48
-	 pY/IHZ9QXYoquBYXd2Hjr+hS4PhD7fJnatrt2+I3lFY9GMJA9AqGtc2WEit/Aa262X
-	 RYp0UkKzbk21g==
-Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uuVlY-00000003dl7-3MD5;
-	Fri, 05 Sep 2025 12:42:08 +0000
-Date: Fri, 05 Sep 2025 13:42:07 +0100
-Message-ID: <87ms79ystc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: kvmarm@lists.linux.dev,
+	s=k20201202; t=1757079528;
+	bh=+RfIeCiYHGfOQAYZpOBH5xFxrQIjFV5rbqolCOJUiVQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=goqvWAluxfzf8BkxFwUH6Ln7miVt6sUnhYEjzlJ0bfEm6Z+hkN7Vbm+5YeSyn4CZq
+	 nfc/ZWNn4ruTbxMbNZUqC/HtAnC6ie9u7NgP+pl4PTtHfQIkHasEbxJQCEIuZG7c6G
+	 3YJH26/oE9qL2Xkghwa6/0lf4A3/FEFYpnEgDsQvJkjT2T2ftwdCzOHTphbw1NRKn8
+	 HV1egnOIdjeyvJpeDSdBn/jomeNlNAN6ZnNGOsiwu7EutupADa1bHHpkcN4zKF34qr
+	 Xi/Xfb07GAaelXX5R9irbB92nla6CsdO+hpRpj2iAnhtRUIGi52egIr9m97RUdDx7h
+	 3YfsrU1YqhEGA==
+Date: Fri, 5 Sep 2025 14:38:41 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>, kvmarm@lists.linux.dev,
 	Linux ARM <linux-arm-kernel@lists.infradead.org>,
 	open list <linux-kernel@vger.kernel.org>,
 	lkft-triage@lists.linaro.org,
 	Linux Regressions <regressions@lists.linux.dev>,
-	Fuad Tabba <tabba@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+	Fuad Tabba <tabba@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
@@ -52,75 +44,76 @@ Cc: kvmarm@lists.linux.dev,
 	Arnd Bergmann <arnd@arndb.de>,
 	Dan Carpenter <dan.carpenter@linaro.org>,
 	Ben Copeland <benjamin.copeland@linaro.org>,
-	Mark Brown <broonie@kernel.org>,
 	Aishwarya TCV <Aishwarya.TCV@arm.com>
 Subject: Re: kvm-unit-tests hang on Arm FVP with protected mode
-In-Reply-To: <CA+G9fYsT3b3Qd-m6tSDOgAXpgLPWz0QD_Z6a+_ff4oTecA85PQ@mail.gmail.com>
+Message-ID: <345e42db-eabd-4e34-abf5-d9974dfe55d1@sirena.org.uk>
 References: <CA+G9fYsT3b3Qd-m6tSDOgAXpgLPWz0QD_Z6a+_ff4oTecA85PQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <87ms79ystc.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 131.175.126.3
-X-SA-Exim-Rcpt-To: naresh.kamboju@linaro.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, lkft-triage@lists.linaro.org, regressions@lists.linux.dev, tabba@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, catalin.marinas@arm.com, will@kernel.org, suzuki.poulose@arm.com, anders.roxell@linaro.org, arnd@arndb.de, dan.carpenter@linaro.org, benjamin.copeland@linaro.org, broonie@kernel.org, Aishwarya.TCV@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ftKo7STfvoWEjFz0"
+Content-Disposition: inline
+In-Reply-To: <87ms79ystc.wl-maz@kernel.org>
+X-Cookie: He who laughs, lasts.
 
-On Fri, 05 Sep 2025 13:28:45 +0100,
-Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-> 
-> kvm-unit-tests consistently hang on Arm FVP when booted with
-> kvm-arm.mode=protected across both 4K and 64K page-size kernel builds.
-> 
-> Running the same tests with kvm-arm.mode=vhe completes successfully.
 
-Do you realise that "kvm-arm.mode=vhe" is not a valid option?
+--ftKo7STfvoWEjFz0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> 
-> Anders, bisected and identified the first bad commit as:
-> 
->   066daa8d3bc2694c392e14091978043aed7b1f23
->   KVM: arm64: Initialize HCRX_EL2 traps in pKVM
-> 
-> Regression Analysis:
-> - Reproducibility? yes
-> 
-> Test regression: kvm-unit-tests hang on Arm FVP with kvm-arm.mode=protected
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> 
-> Environment:
-> Platform: Arm FVP base-revc
-> Kernel: arm64 (tested with 4K and 64K page sizes)
-> Mode: kvm-arm.mode=protected (hangs) vs kvm-arm.mode=vhe (passes)
-> Test suite: kvm-unit-tests (./run_tests.sh -a -t -v)
-> Cmdline args : kvm-arm.mode=protected
-> Kernel: Mainline master and Linux next master
-> 
-> Test run log:
-> INFO: running kvm unit tests ...
-> + [ True = false ]
-> + ./run_tests.sh -a -t -v
-> + tee -a /lava-1/0/tests/0_kvm-unit-tests/automated/linux/kvm-unit-tests/output/result_log.txt
-> TAP version 13
+On Fri, Sep 05, 2025 at 01:42:07PM +0100, Marc Zyngier wrote:
+> Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
 
-What do you expect us to do with such a non-report? Can you please, at
-the very least, identify which test in that test suite triggers the
-failure?
+> > INFO: running kvm unit tests ...
+> > + [ True = false ]
+> > + ./run_tests.sh -a -t -v
+> > + tee -a /lava-1/0/tests/0_kvm-unit-tests/automated/linux/kvm-unit-tests/output/result_log.txt
+> > TAP version 13
 
-> Links:
-> https://regressions.linaro.org/lkft/linux-mainline-master/v6.17-rc4/lava/kvm-unit-tests/history/?page=1
+> What do you expect us to do with such a non-report? Can you please, at
+> the very least, identify which test in that test suite triggers the
+> failure?
 
-What is there? This link requires a login, and goes to 11 on the
-scale of being useless.
+Looking at the log file that isn't password protected that's the last
+line of output so it'll have hung trying to do the first test, based on
+the log from another machine:
 
-	M.
+   https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250905/testrun/29777055/suite/kvm-unit-tests/test/debug-bp-migration-timeout-duration90s/log
 
--- 
-Jazz isn't dead. It just smells funny.
+it seems that should be
+
+   ok 1 - selftest-setup: selftest: setup: smp: number of CPUs matches expectation
+
+that's died for the version they're using.
+
+> > Links:
+> > https://regressions.linaro.org/lkft/linux-mainline-master/v6.17-rc4/lava/kvm-unit-tests/history/?page=1
+
+> What is there? This link requires a login, and goes to 11 on the
+> scale of being useless.
+
+My Linaro account appears to have been disabled at some point so I
+can't access it either.  If this is affecting mainline presumably it's
+been an issue in at least -next for a while.
+
+--ftKo7STfvoWEjFz0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmi65+AACgkQJNaLcl1U
+h9DLewf+Ls/00LL8UkAstP2PfYnm8MYv7sEGvfU6pcxX76rmhhoo+wHh/P4hYxIc
+GnEmWTawHaooNeTHseqYhjmZExdIu4kjBFLylfnR0kl70I7Z9fj2lNke/I5l6esd
+y6+T8DWSATVhQTebL9S/tmeQ223uLeJxoWU3o2Cex5787ehN5TMly7bqCBleQNrE
+C6WrgNNVDCffoSsFFv+CCCRtptBgSIUmJTox4dxFIAvmJ3NLhe9yB2SCvQGGWIRr
+mp9DPS9eygW3mJsa3IWwmUhpA1nVrUbcmI+KFXgTdDwP36xjlLGj0E0o41TL8NiJ
+O1/Rrzn/W690wZtEzwjotbV4+hBASg==
+=/HVR
+-----END PGP SIGNATURE-----
+
+--ftKo7STfvoWEjFz0--
