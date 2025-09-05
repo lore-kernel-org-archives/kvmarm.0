@@ -1,92 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055A82E92D2;
-	Fri,  5 Sep 2025 07:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F42B21A420
+	for <kvmarm@lists.linux.dev>; Fri,  5 Sep 2025 07:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757057345; cv=none; b=SSToHu8brjNXwS9BAXLFohJpVARN6cxfzC9kWJ97APXDmkl2jPqO8GVHOdM5IMAY7szsdd6z0bGQTSmnLT4XHO+RDTwraSYR4Y1DxsXYev0pspkpuqIZZL5PrR+7JW4nis5cA/DhR7gYJwIQBsyoODJfb/yCqWx+I1bL4PLfIBQ=
+	t=1757057467; cv=none; b=dIcBz5wJh14eXNDC6gEMAgRuMniBCq4mZv1HEkuu8BU04pIY50Mb9rwNiwnsRIImVd6kzrUyffDcubX/SvuwYTTwVd3D3wUmCz3vUuYIXdR0QmOlVXM0QrHfbnqwromC0zgJU1lcqZ2W57nyO+KRx7h5PqGMTlwA51VSTvLxX1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757057345; c=relaxed/simple;
-	bh=yVy1f3yKmPmzFcw9VKqDyY9YboyVtGIYlwJrQrV2qog=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mT6B9P3/VW3lGSqaVbiVU1hBFdiituZ9OTYx6gMXShIHKjVXVIHIkQxsmzpJoIu8iXWdKuw455W9XDtSHFFshoNu7d3Cu3BJC3B6in4o56xnzLlEH79e1pWDyeh7Vi0wXd0WIdJbRlyXwYY8p7ksQ7mKaA29B2iK0Mm7mma4Jcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oGuR7LOd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757057467; c=relaxed/simple;
+	bh=0r18/xnNcEkcXy9KCaMdS+oa2KNJQRIxMP6SmBBEk/o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CPtPtptRVdusQeQj43h50elb/HC2L1B5UYkngCnWdvjdl0kvvrdWRybHGVxagOQNTGJ9ZqI5cMressMsNkHF0V4jxCSfk7oJLgAmc/KfHoFAfIZeoxQuO3om8pMWhnmFivXv5BjdX2S+kz8qhDxav0LONDSsPz9AdYfa8ftWwJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AdSS5ZFC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oGuR7LOd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D324C4CEF1;
-	Fri,  5 Sep 2025 07:29:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AdSS5ZFC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B03CC4CEF1;
+	Fri,  5 Sep 2025 07:31:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757057344;
-	bh=yVy1f3yKmPmzFcw9VKqDyY9YboyVtGIYlwJrQrV2qog=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oGuR7LOdCqpTVIeg+Y1AtdcT434yJI73d6FnTZh8Ibgz6vjBV+WB2H1zg7zyA8Q3X
-	 4uZ61Bvtmm9/OU65Kg4MeJAzI9AoeM4UJnAW9Yl2zfvURlKc54UDDFl3BmXsepJIFf
-	 P8Q9juSPgRsENh5jbPAzr2C0LdpcHd63f++ybzmoTlZjMhuCwmuyMiPaw1t3Lzg2RK
-	 iDf1mBgpf2+rM79po6E0bMX8KRCPq5Kc0VPAYDf/tPTA361hbOao+jIyGeaymAT9JQ
-	 3dPB/R3UgXUd4Lr6YRaW8KVDpqEmuFoHJvEvy8+2+GOv96t7TPxgPTAMyJx4v2P4OO
-	 9T3NUhB0jcahA==
-Received: from [131.175.126.3] (helo=lobster-girl.dot1x.polimi.it)
+	s=k20201202; t=1757057466;
+	bh=0r18/xnNcEkcXy9KCaMdS+oa2KNJQRIxMP6SmBBEk/o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AdSS5ZFCqTTDP/VJSuqIiWWKeRXHjTKmJbebhKhxO+Qo6VFMWBAfaLegaXvqZxCLt
+	 /bSOYmnXBWKy6UxWtK2WjBYRlsezk1+yEwRTClJehm7KnxYO57RFhq9tzVuOmJ2JOf
+	 qKN+oNekF31qjSMol6qo7tRbF/ttVBp2bdlAWo8cP3g3WPUnqSTO8KV1YFenEotI1M
+	 wFQIszUA2uJZFbji2bOp1szVckVrrU4CIA6ciRdPdfcTG7MuJNMbshr1hnVIFJ0sao
+	 R4Dtu0wsjjycE1OFjUyOigTRXdqMD7mWRIL2gNdamRp5Mzk5qbJBTuwi9ApmVZzOJi
+	 VxGbl/hb0RNVA==
+Received: from [131.175.126.3] (helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uuQsY-00000003Y39-0yts;
-	Fri, 05 Sep 2025 07:29:02 +0000
+	id 1uuQuW-00000003Y61-09GO;
+	Fri, 05 Sep 2025 07:31:04 +0000
+Date: Fri, 05 Sep 2025 08:31:03 +0100
+Message-ID: <87seh1z77s.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: Mark freed S2 MMUs as invalid
-Date: Fri,  5 Sep 2025 08:28:59 +0100
-Message-ID: <20250905072859.211369-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.2
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH] KVM: arm64: Only free fully unmapped tables in stage2_free_walker()
+In-Reply-To: <20250904101746.275795-1-oliver.upton@linux.dev>
+References: <20250904101746.275795-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 131.175.126.3
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rananta@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When freeing an S2 MMU, we free the associated pgd, but omit to
-mark the structure as invalid. Subsequently, a call to
-kvm_nested_s2_unmap() would pick these invalid S2 MMUs and
-pass them down the teardown path.
+On Thu, 04 Sep 2025 11:17:46 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> syzkaller caught a terminal use-after-free in the free walker resulting
+> from a premature put_page() on a partially unmapped page table.
+> Previously KVM performed a single walk covering the entire IPA space,
+> but now that the range of the walk is up to KVM_PGTABLE_MIN_BLOCK_LEVEL
+> worth of memory it is possibly to only partially free a table.
+> 
+> Fix it by only dropping the table reference if the page count of the
+> table is 1 (i.e. no longer contains valid PTEs).
+> 
+> Fixes: e9abe311f356 ("KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables")
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
-This ends up with a nasty warning as we try to unmap an unallocated
-set of page tables.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Fix this by making the S2 MMU invalid on freeing the pgd by calling
-kvm_init_nested_s2_mmu().
+	M.
 
-Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/mmu.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9a45daf817bf..315aaadfda30 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1074,6 +1074,10 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 		mmu->pgt = NULL;
- 		free_percpu(mmu->last_vcpu_ran);
- 	}
-+
-+	if (kvm_is_nested_s2_mmu(kvm, mmu))
-+		kvm_init_nested_s2_mmu(mmu);
-+		
- 	write_unlock(&kvm->mmu_lock);
- 
- 	if (pgt) {
 -- 
-2.47.2
-
+Jazz isn't dead. It just smells funny.
