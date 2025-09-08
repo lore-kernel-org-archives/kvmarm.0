@@ -1,101 +1,117 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D5530EF9F
-	for <kvmarm@lists.linux.dev>; Mon,  8 Sep 2025 16:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21797145B16;
+	Mon,  8 Sep 2025 18:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757349362; cv=none; b=gm/NbxJNJbvzDP6r2/YieRQcg3XVecYeFaRXP7Q9d+5nwENV84X5vwdYOHu6DPu0N2zaamwBBFqG5WfbCRpuubUEEGq+gAtiETQURcmMBGccSj/1T0+fsbHGOFEgikxeM8mkU7Ys7cnyhFexgDSHGwOm027EflJI13yWAbKOaD8=
+	t=1757354680; cv=none; b=HifaYPggA6sauSirnKqiB9XcBNokfgYZP3wDNhuDhTNTN618wxJO050g9MZhNWIstYmwVx3HscNuG5q/rBSpoRAk8EFzT/tUbAWgXPp8R9I/VpprW3fUV5gaSCRi31+S7Oua/rqm5xZA5PSlY0+3zsyt/pZd5aPf5nlXeboxOnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757349362; c=relaxed/simple;
-	bh=6LostVtP/daJPYmbFFLvihLxnyTt/y/P/gXony6Gh7c=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DFJC4OkMuaMUG6el9pYlu+7TyctBzEWqvl73N+0bZqQhedqC7SZa6orxCY1t6BMDUiYR2KP0fGAqbLwRst4neGjOh76OQbbr0Vbu9u4HKAE6oxbAno3HJFk51fmcQ9wseBpgYuEXFLdsNs19VDxcqx7o3zRmi3K+HbZVEOll3Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JsKzVkM9; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1757354680; c=relaxed/simple;
+	bh=CXyhYW8x/bV3wwNvRcSBJG3Rf+qaaGEaieFwPcKjB/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LSRWZrrkrN+0bE2dl+vp5MifeQcP3RnB4d01vvvJQXgQRrmp6KPtBuUAEP4QK6L8wDz76iP7XvXe07js4gI6QgdkDxq2xkKOMxTTvec+6MYV3T4OO2kbCSeXbqx41jrUlbhIP9CAmwqkA1fvAvm4ED2FCa4cFrWZi6wa5E11uN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=HmlB72x3; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JsKzVkM9"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45de13167aaso16379965e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 08 Sep 2025 09:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757349359; x=1757954159; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WmM4LftI21357OgeVjH332v8ir12kSjHUiMiWxV6Jy4=;
-        b=JsKzVkM9zVyJrlf5RKSRrGf36u0Dr0ZQzFiTFxG6/JxYEbulSo83xMSEvTkwlw4bni
-         tPtqnVhajb0gHlq+rThE4Oson+6Sr+p5QqXGg+Ei03QpQ95ydnQx9FarML8IVM+WTbvY
-         MYkENkFMZbsx3WjA6bUbhT8jvbSDNXlKFfIcbGX48fbx75ZhkDTOtbpGOAVlTNPAHLTu
-         1x+rIcsWkJehGZdPiIvOUxmdEzREWP2h/hAcRO+4o3yz+IYy4HXGSBqU+zG39LN1D5HK
-         NmrUYaMw9QnsatvdWd4qsn0gtir6OHwQ2T9WhxofyupdPphw2bWT2qlx+6rAX+JR5RL0
-         p4jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757349359; x=1757954159;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WmM4LftI21357OgeVjH332v8ir12kSjHUiMiWxV6Jy4=;
-        b=r5LnGfvo+7F94uzPmi3gvjcEYysH2YCbwkc5TnQM2Wd3+jthGED+HSV2lCeXSEGQ2q
-         U947fdC2ty3MjsuFhgjurctsfxu3eX5p6BMPxjlXId2n24Xr8gZ+Oi8MZ2utQPV+r4zB
-         TO15nzqL9+hAEmlHnNQ1XE8pUN/yG/cVNwR8g5EpfybkCn1xxEf88ttxLWMslngSvV0u
-         51w6KTIqFcIkVE1zgXktjJnpukul6Y6y/CS65fG+SylYaxOWXewjuX9BhIdNkIUf9582
-         1Ch5g1TFgYsi8+D9Y9WY6VLpgCUhuLEYFGFTXH0xb9wEtBXgxq0aPL7kJ2Fkm0LKo3Dy
-         2zdg==
-X-Gm-Message-State: AOJu0YxzuMAXIRQH9+J9jt3mFiHkUKFpjWk09pgW4MgSkoVEhPqWOyAY
-	YXP8QThlk/bkP4LmkL+HtvihbC5IZ1SvxMPdPThJnW9DcsLlIZLhY703IIwizA8diDY90O2HC3E
-	kzrVTFc+OXUACo3e6NJSY+XZZ5sCOcpISgpoXTAJxBNLviumZvm5mtLREtlqHfQNwMzlWalCEwP
-	zfG5vjXQUOr8ZVCku3K72arzi8MQ5wni4=
-X-Google-Smtp-Source: AGHT+IEPtQhZHhaSSiFrRywARpqA9kmZE1Y6TE2e26K2tyWQbsjjS1YtpIf0he6IaQ2gQJGqetaDUms3uQ==
-X-Received: from wrbet15.prod.google.com ([2002:a05:6000:230f:b0:3c3:cdfb:e634])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:184d:b0:3e7:4265:66de
- with SMTP id ffacd0b85a97d-3e742656b0emr4522585f8f.8.1757349358812; Mon, 08
- Sep 2025 09:35:58 -0700 (PDT)
-Date: Mon,  8 Sep 2025 17:35:57 +0100
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HmlB72x3"
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 588Hg5FR018214;
+	Mon, 8 Sep 2025 18:04:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=Gvfc1Iz0nE71iFyrDfLCzdho+9INv
+	h3b39JFa+yZSCg=; b=HmlB72x3mAG2OTF+mpFYTPWxWJAedUblKs0adiSA/9+FV
+	Eq032MZm7ZQHamSMLi2+11tSrTARtNIZ73cZBGGreh9CjWQajTVommebx+Ts4zyB
+	4Z2x2KtFPAkYBp6jMGux8zfFFncWMBSAvWXS90r+vovBjYPDSHg9sl5B9YSlAkIK
+	8NgY5Hmi1Eai9C/0tdHj0IXLkevpLlyoqjK8/+oR8W1w/nwqturpMeyD93ti5R3X
+	jhx3iHpmZ55ZRX3LoKuYBAckanzmNQUS//DTRLIScxcEiD2uBRpmL9gsI6jb2UUj
+	kKzM9mf5gFSrZ1u3xoAh5mfxT4vUgo++MN5Ps4J6Q==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4921pe8bd4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Sep 2025 18:04:17 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 588GfmaV030651;
+	Mon, 8 Sep 2025 18:04:17 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 490bd8hetg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Sep 2025 18:04:17 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 588I4GZh026431;
+	Mon, 8 Sep 2025 18:04:16 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 490bd8hesq-1;
+	Mon, 08 Sep 2025 18:04:16 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: julien.thierry@arm.com, marc.zyngier@arm.com, jintack@cs.columbia.edu,
+        christoffer.dall@arm.com, maz@kernel.org, oliver.upton@linux.dev,
+        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: arm64: vgic: fix incorrect spinlock API usage
+Date: Mon,  8 Sep 2025 11:04:11 -0700
+Message-ID: <20250908180413.3655546-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.355.g5224444f11-goog
-Message-ID: <20250908163557.2419780-1-tabba@google.com>
-Subject: [PATCH] KVM: arm64: Fix parameter ordering for VBAR_EL1 assignment
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-08_06,2025-09-08_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ suspectscore=0 spamscore=0 phishscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2508110000 definitions=main-2509080179
+X-Proofpoint-GUID: FW9NxWmtgJYneDA1syrnrDHum9ilFNl9
+X-Proofpoint-ORIG-GUID: FW9NxWmtgJYneDA1syrnrDHum9ilFNl9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA4MDE1MiBTYWx0ZWRfX1vkUAsbAZHAR
+ 8uD8FsEVyUc+aywSroPjXmMDYlWgwX+nmT1PWjNI9flpbQwmsYceTrUOKMbFjHBXPPe7eymXY/M
+ 0ucDTo42rK3jwhpXEXy7fPq/mg/13FWT0/GM1oZiFGGuIqGG0GvL7N84moIL7MwqgrCkYnUPy6Y
+ /HY2TrMFnsFhSf6kZXD5RvkS0qEO/iB1HVo2w4O4XxqBMdqz/OTmn0TSjtYykT4ZoIRyfZY8NXc
+ AQSlTIlTOaM+WPRLdph7xPQbEy772cXsWat9O+yHea1mkC4DVJDKxvBZz3Bw/Gq5YmO/6M7Cf+W
+ rrY0s5eAtxbzjX9Msn4+JvW6NLRPSN5SH+CxVuIucGa9E7imICW3pwUvvoIDZH6kM1U0oCtti9m
+ 0OtVFDre
+X-Authority-Analysis: v=2.4 cv=b9Oy4sGx c=1 sm=1 tr=0 ts=68bf1aa1 cx=c_pps
+ a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
+ a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=VwQbUJbxAAAA:8 a=gWKObWcHZHFoBn1Bvp0A:9
 
-The __vcpu_assign_sys_reg() helper expects the register ID as the second
-argument and the value to be assigned as the third. However, the
-existing code was passing these parameters in the incorrect order.
+The function vgic_flush_lr_state() is calling _raw_spin_unlock()
+instead of the proper raw_spin_unlock().
 
-Fix the function call to properly read the live value of VBAR_EL1 from
-the guest and update the vCPU value immediately before pending the
-exception. This ensures the vCPU's value is the same as the guest's and
-that the exception will be handled at the correct address upon resuming
-the guest.
+_raw_spin_unlock() is an internal low-level API and should not
+be used directly; using raw_spin_unlock() ensures proper locking
+semantics in the vgic code.
 
-Fixes: 798eb5978700 ("KVM: arm64: Sync protected guest VBAR_EL1 on injecting an undef exception")
-Signed-off-by: Fuad Tabba <tabba@google.com>
+Fixes: 8fa3adb8c6be ("KVM: arm/arm64: vgic: Make vgic_irq->irq_lock a raw_spinlock")
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Acked-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 2 +-
+v1 -> v2
+Dropped extra paragraph and added Acked-by Marc
+---
+ arch/arm64/kvm/vgic/vgic.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 71d2fc97f004..82da9b03692d 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -253,7 +253,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index f5148b38120a..c74d6120a12c 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -818,7 +818,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 		 * the AP list has been sorted already.
+ 		 */
+ 		if (multi_sgi && irq->priority > prio) {
+-			_raw_spin_unlock(&irq->irq_lock);
++			raw_spin_unlock(&irq->irq_lock);
+ 			break;
+ 		}
  
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
- 	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
--	__vcpu_assign_sys_reg(vcpu, read_sysreg_el1(SYS_VBAR), VBAR_EL1);
-+	__vcpu_assign_sys_reg(vcpu, VBAR_EL1, read_sysreg_el1(SYS_VBAR));
- 
- 	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
- 
-
-base-commit: 76eeb9b8de9880ca38696b2fb56ac45ac0a25c6c
 -- 
-2.51.0.355.g5224444f11-goog
+2.50.1
 
