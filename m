@@ -1,56 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CE430ACF6;
-	Mon,  8 Sep 2025 13:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE5B219A89;
+	Mon,  8 Sep 2025 13:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757337923; cv=none; b=EYeACXoebL7ssuYfsCKYmSOO3HcL1gx4CuA9B2CY4XIrYwQ2e58fHX9Gkk+ip5Y3EE5IzU4IvSU3UuJkadnLQhJY+DTjdrIaKqvRDEJlZSMjKMUsfjchy9qN83pZlA/jOuj0HKW20pnONrDBQYlbaAvseIzbFUDCaaCxoLytawQ=
+	t=1757339887; cv=none; b=hcaOA3ei5Ab98ZdjxpLA8VpcTnUWQiWbYY4BKFrGi/Fd7esjcOUJBiTL9kER7btiwSr14j8M78Op5oBK9herbuXJ50yOr6olQWgj4AqBL4vWFA6m6H5utYgaK++qfh7rLSMOvi33k1iSmzQPEDD71CjE/i0HvobxuH38W2Cyp3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757337923; c=relaxed/simple;
-	bh=y0jr9P2vLFUAvWYOjc4mNs3/bRNqNluga8F3APLirjo=;
+	s=arc-20240116; t=1757339887; c=relaxed/simple;
+	bh=ChmIAcj/dnFANRrz5jNvnNUzLHzNhXpK8n1dncSrldM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dv+ugBCxm2Hhok5ktp0ygbRoWpkGTN6FqXMqZUlk/7be2zVaS1cpjtHLF3XATYjeTdpn2uqUBE9TK9OWPwFUhN8KgrAlI9Lv978mxt5HUCvy1wN58ByAfiwoF58jh8pi6NAQW8gJppzKZr47fQXY8F5cpCeQuCKZri6dYB1zq+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vr6NNYXt; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=S6HIbgY7LLJt+l5n/vRNwoKIKxcRhgo2odL0onostOCNwr1fwaA5gjEPQsAGHkZXDSj6cr8w/0ZFnfrT54LgkPkukk6BCHj8xM65iIdkitLpGe8wWZQarjbSZvWHPr5UTlGZiXiUjl1AR+k+fDX9UceYkrOGtjd74x4uUeTVqZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9P+QMlc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vr6NNYXt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA3AFC4CEF1;
-	Mon,  8 Sep 2025 13:25:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9P+QMlc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B949EC4CEF1;
+	Mon,  8 Sep 2025 13:58:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757337923;
-	bh=y0jr9P2vLFUAvWYOjc4mNs3/bRNqNluga8F3APLirjo=;
+	s=k20201202; t=1757339887;
+	bh=ChmIAcj/dnFANRrz5jNvnNUzLHzNhXpK8n1dncSrldM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Vr6NNYXtSMvOm43mYkK4BbzmIYBoKPdkU9UCjQZ+0w/ZLzC2wE8Y7EyhLYOY1NSD/
-	 bsnAGDTWjq9FeBBjTDzrTUoHpOHXxdci5P+isp6jC7EXbn+AS16PqruQS2sbyXZ/7Y
-	 ZErWBNFHKABgCi4qCYJokjrKdWfOKwf68TRpdC9gVeNeRT62lK/8EpY3wlwB93Xf7V
-	 8CcG77wwixILtegnkWbsshU7y2zG2PLcfWdllk11gHXPVI26Jmrc4Qe7DgsqMl/b7b
-	 +FxdqAmlQWEUKmBRuVMBX2aybmxLORtY3gUqTTQJEG5iWk1Z2+26mFrOE6wdIXRLWL
-	 mxKKH6ARecZ7g==
-Date: Mon, 8 Sep 2025 14:25:18 +0100
-From: Will Deacon <will@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>,
-	Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH kvmtool v3 0/6] arm64: Nested virtualization support
-Message-ID: <aL7ZPlm3kANwiWb3@willie-the-truck>
-References: <20250729095745.3148294-1-andre.przywara@arm.com>
+	b=s9P+QMlcB6/kv65EJ/r8wgbS1+rtOGpcJZUD3K2SSnlyfyzMP8DgDTBOVsziC87ae
+	 /egbfDyxkD5rX9oSgZVjb7NVefInUL4WblogJNfV3+OQHHKQQpEnrXG0Xi566B+TR1
+	 gX4+mCXL0bfdZ0/jA0ufVCBMIIibVRZ2HmdLLAc8yQrsBu4xP7jUhn6NQD8qp2F+as
+	 a5D+4mzU25h7R40AJN/y6zcCH/hI0aDQ/k8zlMzoYRfjG0YUdJy3lQPvHPZxoMP7Gk
+	 6BvWpUPTcBPLsZHe40AL7pooO7YRLZVkRZ+9LxRGC15ZP4n6lYQ5iru41RQoaXhH7b
+	 W+Fb8Cjzu2tTw==
+Date: Mon, 8 Sep 2025 14:58:02 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Ryan Roberts <ryan.roberts@arm.com>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V4 1/2] arm64/sysreg: Update TCR_EL1 register
+Message-ID: <a195095c-8ebd-4d74-959b-7b407d416a1f@sirena.org.uk>
+References: <20250907123000.414181-1-anshuman.khandual@arm.com>
+ <20250907123000.414181-2-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Fenb2D74LwSI5seO"
+Content-Disposition: inline
+In-Reply-To: <20250907123000.414181-2-anshuman.khandual@arm.com>
+X-Cookie: Air is water with holes in it.
+
+
+--Fenb2D74LwSI5seO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250729095745.3148294-1-andre.przywara@arm.com>
 
-Hi Andre,
+On Sun, Sep 07, 2025 at 05:59:59PM +0530, Anshuman Khandual wrote:
 
-On Tue, Jul 29, 2025 at 10:57:39AM +0100, Andre Przywara wrote:
-> This is v3 of the nested virt support series, adjusting commit messages
-> and adding a check that FEAT_E2H0 is really available.
+> Update TCR_EL1 register fields as per latest ARM ARM DDI 0487 L.B and while
+> here drop an explicit sysreg definition SYS_TCR_EL1 from sysreg.h, which is
+> now redundant.
 
-Do you plan to respin this addressing Alexandru's outstanding comments?
+I actually checked against DDI0601 2025-06 to spare my poor machine the
+strain of loading the ARM.
 
-Will
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+I guess the cleanup of the redundant definition could've been a separate
+patch but it's not super important.
+
+--Fenb2D74LwSI5seO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmi+4OoACgkQJNaLcl1U
+h9DpUgf/eYIiyohWTImwl29rN26NIgS5XpcDfsusIXjvrtJB++D0WIWMytjRlJQW
+fmO8gsCX7JHPCsUWsVW8XGlK4etS1VKCNzhrrdhddLXpba6ehzkIIAL39P/55a1H
+C5tRtgSOakcYFO9RgLunVn4NaXZ0onGAzKwgEzfQROETU1jxAFFPxPMzdX4NC6cE
+1BjFexNWOPIXyde1/U7oQC4lqutO7mJ3JXfnwqJ7I2POTngOYtNzSfjaOxUUTfh6
+78jdDrGCsyC8f0X9P8RNr+DBI1nsje/20MI6akPiwMDbD61NYkNuQJ2shiOdG+Fz
+bAE6/MUBIxbUJaEUZXpZVZuDh8sxDg==
+=Md/t
+-----END PGP SIGNATURE-----
+
+--Fenb2D74LwSI5seO--
