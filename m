@@ -1,125 +1,118 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4374C2D5C95
-	for <kvmarm@lists.linux.dev>; Mon,  8 Sep 2025 06:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819542E7186;
+	Mon,  8 Sep 2025 08:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757313976; cv=none; b=s2hBUTK4B+fEGPk/YrqxpexoxTqGPnsKrDHQzhKy/C8IhQmGVWXome2VPOqmzwy/Yw7dyb4a6qB4fXFVqjVip0486Yt6khnD6KeeQdDgdXVNLcljyRnbZtE33Y70q7JPW9qn0FVEP5aSgqw8SSoYoXqUKiG7S6C9EoC8em3MSO0=
+	t=1757319373; cv=none; b=OiUzh3Zrt1hvFAjV0h4CZy66ovD7nQylucNiLWwddD5B1xU43OM357g/FTJkE0m9pKfac1u9hrwZt6fJH0FHDf+XVJPKPIjYa7VNqQY+DXJtc5BzeviOu2L/OIPAtr8lKCysSxLgT+cGf4dgBumBhfiAbNVivPsme0fFvi5Yg1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757313976; c=relaxed/simple;
-	bh=J+uwgCSb716MwM+IdWxrDTwyLDESBtarqBq1Dado3nw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t2ybOWANHB0/PG0Z0ZTzlkHBubKZ6zkTpr5i+cGKWnDgOGJ99v8OaL25vLDPxc9SF4OVhxDTvmow4CZK7SbfKmha1OcJsjHpK+uNdJFL5kbVRv0mE0I1H38PZW/HoTYwffVOCupnrpcBmr/vQk9e/36+hRvYI1vhfp8lpc9uNIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=fTfV/CqF; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
+	s=arc-20240116; t=1757319373; c=relaxed/simple;
+	bh=DLZHF/rUNU9ns+9DDMmo9PmSHU3/mYamUscTiLTEGLQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cHc+Pp4VwK768TE4LtMcZq6+4Pp74b3CBhm9K3ElEKkd4KzLrZ10SxS2W2BtNGYHZv8iuaP0re3zjw+MN2nj5y/ij0FITE6MCbQVXmsNwXIDngYHZAWkPbdYqpWdZ0UfhJWiQsm3Bu0KgVi1DmmyKSNw0f/NVxqDEuXKiYYELmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i32vRR3A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="fTfV/CqF"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24cd340377dso23200635ad.1
-        for <kvmarm@lists.linux.dev>; Sun, 07 Sep 2025 23:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie.ntu.edu.tw; s=google; t=1757313972; x=1757918772; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X/6C0dAUyoLQyauQofbYRj/vzpgwi+DjfoZxlhTk298=;
-        b=fTfV/CqFlxTQyyR9PEKMUO6x1APlhAJpnTDzlRe1Ct+7W83LA2beH+eIRAI/8Qj++d
-         vTtSbFrkg0MVM72upxpqvFsmQZ1kxNjaghkAaeJ+G7lUE85N/WmBBvStFtCrp0ZNAbiA
-         ZWpugokEHU/QBM+P/F5JJoR5XlCVghWOF0eE/cPmsL0D8U1fFyNFoneROgCu0MBBSUeP
-         +3XveiTiR7GcbMXs6DmRuId+mJs9XgdNp2BYcvZ70fQFXWZELgJMooLU1hvhzppxZrnM
-         8nDQGYP21a8QYeZzdWOZ8Nyw3rRpgfakEE7xQ17pjDa49O5cHl9fVx83os6sGBl7t7l4
-         k0dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757313972; x=1757918772;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X/6C0dAUyoLQyauQofbYRj/vzpgwi+DjfoZxlhTk298=;
-        b=l2KxhJkpG3/Zd1q2YVUnrmO+nQWwtNPXdt5rwjrt/ld3Ym4MK/W57E7XOLAccc253z
-         LAlrs9u0arlQdEHSVqBDnM4CjrwAOA1l7vSzJZiAlF2Qkb9PHLqS/WudbXgua9TUARl6
-         ZxG7i1ezQLrvLwE8/uzUVnU78Lf+wEe0ccKF8FyA59xATv9yoDxYZgg0XzdEUChmR7G6
-         M8cDu3riBWNI4SYQnlPJLePaepiYsGSiCO6E4z04bRK9sGq+TS1SZS72dOtdqdZfvfmT
-         +bexVjPSyMw5Pex0+LWYH06gRt4oq4R4+9Dm9zvmO9q+gbK1dE1GuVSliIAKCmvaKtWd
-         xN8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUiuSFWD8d2nmYW/9bo0k1LIP5miL4OTZOIy8dgrCdDexx1DlE/KOl1Mh4MqSkTC3gTOpE1T50=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwgCG1PG8vhtISbLs+H3VmjjHmrWltjltLnr4+B0CR9mtjQwRKA
-	G8Aw/kAr/a3UUCSmvQD3GlcVLs0iocAwHB4UnrGw5a2XbUxPnFLdvHTfznNYalgh+a9BA+Bk8GH
-	sDEOcW94NPDQcrtf6MH7Q6QX/tZirol4GqQmDqtEUwZqBpqYomoI=
-X-Gm-Gg: ASbGncudHS4dRIQg823vSgVsniFn9ChXUSpdskbIRLlSGd5jeLVuQygEEKlceckmhzh
-	Fs1lRJcwiGg99VrLejuK1Piny7LQPRhWF833zVsEri/9Lk4ZzJY3GNRO/vWwPJyYI0dBNpVDaUp
-	Ngzf8j2m18zVA1WOOOIz+CeHy/PnD5e7HYwCtZCXR4h0ckInBjjpK8vO62KM8VCfG+wzUAnB6Z9
-	GWiHhqm0am6NArzzELBUuAsR7JqdaI8ELS179P8EHNYsG2+us3wUmUGx0iFjSdbAyI65sepqltZ
-	eewXgQNUbL+J6Ap31OFVGZ3Q7MB/EDASw5QUUX8yCQ/BbQTMkTQHdSvngE4eSMeHlqppQqS/cWN
-	G+Xz3sGnkPpgNhTVoN2S4B1TYM3WwH53+PCRGwvEtIg+bi7iDAGUP6HJAfZkZXwqMBF7iLeA=
-X-Google-Smtp-Source: AGHT+IEQZar8WBAOm85u+suoluGDr+DTtstTbqs6dfovDku4FTi9XGSytpEOzcrDiccqig50y3evvA==
-X-Received: by 2002:a17:902:f64e:b0:24c:be1f:c1f7 with SMTP id d9443c01a7336-25170e4187fmr86761255ad.39.1757313972470;
-        Sun, 07 Sep 2025 23:46:12 -0700 (PDT)
-Received: from zenbook (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b5236338fcasm1574671a12.35.2025.09.07.23.46.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Sep 2025 23:46:12 -0700 (PDT)
-From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: linux-arm-kernel@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i32vRR3A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 032B8C4CEF5;
+	Mon,  8 Sep 2025 08:16:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757319373;
+	bh=DLZHF/rUNU9ns+9DDMmo9PmSHU3/mYamUscTiLTEGLQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=i32vRR3ABJq188+BNWhx97TYzeALeiwRSr6DLIZvIPSi/ATlECtYWCMhYeRpQ4XGD
+	 AukMSYoeu6qw/uMsoxdQGC8ceHp8RpkV7oQKKZ79Y3z1IcM06H5+D+OebHibC8w08n
+	 oBqj469Wwkjje1jHnqzTozQJXF9OGGg+BJWFt91LzjN9vAHaDgaTuEMsEtF1bBZw9r
+	 n03ij3PuGY6HyEYabUE2bZVDu3MD7USL5Wk3VbTUmUZQl3UN/t2Hv8XF6mcALO/4ZJ
+	 YMtaTjrUxiHrxcQWNBVC7spalkcY5dQlMokq1XUhFwOVTVe6lmNe9swL6w/p9IJoQg
+	 H36f0YLgApwIw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uvX2o-00000004E7Q-2Uk6;
+	Mon, 08 Sep 2025 08:16:10 +0000
+Date: Mon, 08 Sep 2025 09:16:10 +0100
+Message-ID: <86v7ltcqb9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: 	jintack@cs.columbia.edu,
+	christoffer.dall@arm.com,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH v2] KVM: arm64: Remove stage 2 read fault check
-Date: Mon,  8 Sep 2025 14:48:06 +0800
-Message-ID: <20250908064806.4093081-1-r09922117@csie.ntu.edu.tw>
-X-Mailer: git-send-email 2.50.1
+Subject: Re: [PATCH] KVM: arm64: vgic: fix incorrect spinlock API usage
+In-Reply-To: <20250907201421.3612784-1-alok.a.tiwari@oracle.com>
+References: <20250907201421.3612784-1-alok.a.tiwari@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Gm-Spam: 0
-X-Gm-Phishy: 0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alok.a.tiwari@oracle.com, jintack@cs.columbia.edu, christoffer.dall@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In the non-NV case, read permission is always granted when mapping
-stage-2, so checking for it doesn't bring much. On the other hand,
-shadow stage-2 for NV guests could potentially have non-readable
-mappings when we align the permissions with those that L1 set for L2, we
-shouldn't be checking for read faults in this case either.
+[removing @arm.com addresses that haven't been in use for a very long
+time]
 
-So just remove this check.
+On Sun, 07 Sep 2025 21:14:13 +0100,
+Alok Tiwari <alok.a.tiwari@oracle.com> wrote:
+> 
+> The function vgic_flush_lr_state() was calling _raw_spin_unlock()
 
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
----
+s/was/is/
 
-Changes in v2, thanks to those listed in the Suggested-by tags:
-  - remove the read fault check instead of skipping it for NV
-  - Link to v1: https://lore.kernel.org/kvmarm/20250822031853.2007437-1-r09922117@csie.ntu.edu.tw/
+> instead of the proper raw_spin_unlock().
+>
+> _raw_spin_unlock() is an internal low-level API and should not
+> be used directly; using raw_spin_unlock() ensures proper locking
+> semantics in the vgic code.
+> 
+> This change replaces low-level API usage with the general kernel
+> spinlock API, avoiding misuse of internal functions and aligning
+> with kernel locking conventions.
 
----
- arch/arm64/kvm/mmu.c | 5 -----
- 1 file changed, 5 deletions(-)
+This paragraph doesn't add much, please drop it.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1c78864767c5c..fb239cd9f7a67 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1508,11 +1508,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
- 	VM_BUG_ON(write_fault && exec_fault);
- 
--	if (fault_is_perm && !write_fault && !exec_fault) {
--		kvm_err("Unexpected L2 read permission error\n");
--		return -EFAULT;
--	}
--
- 	if (!is_protected_kvm_enabled())
- 		memcache = &vcpu->arch.mmu_page_cache;
- 	else
+> 
+> Fixes: 8fa3adb8c6be ("KVM: arm/arm64: vgic: Make vgic_irq->irq_lock a raw_spinlock")
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index f5148b38120a..c74d6120a12c 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -818,7 +818,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+>  		 * the AP list has been sorted already.
+>  		 */
+>  		if (multi_sgi && irq->priority > prio) {
+> -			_raw_spin_unlock(&irq->irq_lock);
+> +			raw_spin_unlock(&irq->irq_lock);
+>  			break;
+>  		}
+>  
+
+With the above fixed:
+
+Acked-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
 -- 
-2.50.1
-
+Without deviation from the norm, progress is not possible.
