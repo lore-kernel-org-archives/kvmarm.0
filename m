@@ -1,59 +1,77 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADE01CDFAC;
-	Sun,  7 Sep 2025 20:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4374C2D5C95
+	for <kvmarm@lists.linux.dev>; Mon,  8 Sep 2025 06:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757276098; cv=none; b=onsjP+/Heof/i3BOc8nOcvi9nfXvjxhKvPBRfmBWq8Ddd/30bu+8PuSBjCVCnZ8ebwdmdqL9GeyuXylps0mp70U9+5HS+U47gh74jlsOd3UJCXke4XMgFWxb25rFhAmswC6dJBQnB9UtYpn+hG3pf+1OlaLVEumWwc46TN+rcfM=
+	t=1757313976; cv=none; b=s2hBUTK4B+fEGPk/YrqxpexoxTqGPnsKrDHQzhKy/C8IhQmGVWXome2VPOqmzwy/Yw7dyb4a6qB4fXFVqjVip0486Yt6khnD6KeeQdDgdXVNLcljyRnbZtE33Y70q7JPW9qn0FVEP5aSgqw8SSoYoXqUKiG7S6C9EoC8em3MSO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757276098; c=relaxed/simple;
-	bh=DHVsgq3EZ4dBzOun/+E5oVCv9xOjuvlbvo+5NkfxOgI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pfAmc3p7BuO2G2WbuDbdTYROnS6f7TtytxdzoGg5SxgDcmbq2i3DV8BUEYpEHheA8PFWOf6JwtSXf/1NdWLhSgQYoqMZDWp/hdFuwz4Qna5/WFNas9kVftESUL5lLXQWkXM/JeXcP1ocaUWT/idpoQJU0gzfHqg+kHxcAZBt9gI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=CRZOsZs4; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1757313976; c=relaxed/simple;
+	bh=J+uwgCSb716MwM+IdWxrDTwyLDESBtarqBq1Dado3nw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t2ybOWANHB0/PG0Z0ZTzlkHBubKZ6zkTpr5i+cGKWnDgOGJ99v8OaL25vLDPxc9SF4OVhxDTvmow4CZK7SbfKmha1OcJsjHpK+uNdJFL5kbVRv0mE0I1H38PZW/HoTYwffVOCupnrpcBmr/vQk9e/36+hRvYI1vhfp8lpc9uNIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw; spf=pass smtp.mailfrom=csie.ntu.edu.tw; dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b=fTfV/CqF; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.ntu.edu.tw
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csie.ntu.edu.tw
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CRZOsZs4"
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 587K9g7B011397;
-	Sun, 7 Sep 2025 20:14:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=yM0Vnuw61hBJNTZ8/foS1QpgJsoSP
-	iaVg+C7UGUfKdo=; b=CRZOsZs4Umaab65N2HvsFSoHdkfOaQ6YwDhOXPIdXOe5j
-	qptWipHdo//n6l3CVevCRK59/ulPtqqhOfDXBR9aqbDfMPN/I6ymJeUax5rm2hcn
-	Whxy1tjZ8gwWWfRsCge67y0XysHaa33jcwHFgKd3TiLMq7OYssiiQugTpIteiABN
-	/71sgU6klI3Fa3EqL3lTzz+58MsF7vbyALFPJYfIFXkUFgnCU8qV7Qvc5WptiElG
-	P7IJrTnFrAwwSf3Wc3kafONU4kPBCV13+lwbkVHAFTfEzDfiieIpJhOoCWdP9ZPV
-	Tk2jhxGwjgruskcI03GbsQOKQXar4u+1kb5jq/TxA==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 491gua801u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 07 Sep 2025 20:14:26 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 587EFFwd030698;
-	Sun, 7 Sep 2025 20:14:25 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 490bd7cyuy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 07 Sep 2025 20:14:25 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 587KEOmf039410;
-	Sun, 7 Sep 2025 20:14:24 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 490bd7cyus-1;
-	Sun, 07 Sep 2025 20:14:24 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: julien.thierry@arm.com, marc.zyngier@arm.com, jintack@cs.columbia.edu,
-        christoffer.dall@arm.com, maz@kernel.org, oliver.upton@linux.dev,
-        joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: vgic: fix incorrect spinlock API usage
-Date: Sun,  7 Sep 2025 13:14:13 -0700
-Message-ID: <20250907201421.3612784-1-alok.a.tiwari@oracle.com>
+	dkim=pass (2048-bit key) header.d=csie.ntu.edu.tw header.i=@csie.ntu.edu.tw header.b="fTfV/CqF"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24cd340377dso23200635ad.1
+        for <kvmarm@lists.linux.dev>; Sun, 07 Sep 2025 23:46:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie.ntu.edu.tw; s=google; t=1757313972; x=1757918772; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X/6C0dAUyoLQyauQofbYRj/vzpgwi+DjfoZxlhTk298=;
+        b=fTfV/CqFlxTQyyR9PEKMUO6x1APlhAJpnTDzlRe1Ct+7W83LA2beH+eIRAI/8Qj++d
+         vTtSbFrkg0MVM72upxpqvFsmQZ1kxNjaghkAaeJ+G7lUE85N/WmBBvStFtCrp0ZNAbiA
+         ZWpugokEHU/QBM+P/F5JJoR5XlCVghWOF0eE/cPmsL0D8U1fFyNFoneROgCu0MBBSUeP
+         +3XveiTiR7GcbMXs6DmRuId+mJs9XgdNp2BYcvZ70fQFXWZELgJMooLU1hvhzppxZrnM
+         8nDQGYP21a8QYeZzdWOZ8Nyw3rRpgfakEE7xQ17pjDa49O5cHl9fVx83os6sGBl7t7l4
+         k0dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757313972; x=1757918772;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X/6C0dAUyoLQyauQofbYRj/vzpgwi+DjfoZxlhTk298=;
+        b=l2KxhJkpG3/Zd1q2YVUnrmO+nQWwtNPXdt5rwjrt/ld3Ym4MK/W57E7XOLAccc253z
+         LAlrs9u0arlQdEHSVqBDnM4CjrwAOA1l7vSzJZiAlF2Qkb9PHLqS/WudbXgua9TUARl6
+         ZxG7i1ezQLrvLwE8/uzUVnU78Lf+wEe0ccKF8FyA59xATv9yoDxYZgg0XzdEUChmR7G6
+         M8cDu3riBWNI4SYQnlPJLePaepiYsGSiCO6E4z04bRK9sGq+TS1SZS72dOtdqdZfvfmT
+         +bexVjPSyMw5Pex0+LWYH06gRt4oq4R4+9Dm9zvmO9q+gbK1dE1GuVSliIAKCmvaKtWd
+         xN8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUiuSFWD8d2nmYW/9bo0k1LIP5miL4OTZOIy8dgrCdDexx1DlE/KOl1Mh4MqSkTC3gTOpE1T50=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwgCG1PG8vhtISbLs+H3VmjjHmrWltjltLnr4+B0CR9mtjQwRKA
+	G8Aw/kAr/a3UUCSmvQD3GlcVLs0iocAwHB4UnrGw5a2XbUxPnFLdvHTfznNYalgh+a9BA+Bk8GH
+	sDEOcW94NPDQcrtf6MH7Q6QX/tZirol4GqQmDqtEUwZqBpqYomoI=
+X-Gm-Gg: ASbGncudHS4dRIQg823vSgVsniFn9ChXUSpdskbIRLlSGd5jeLVuQygEEKlceckmhzh
+	Fs1lRJcwiGg99VrLejuK1Piny7LQPRhWF833zVsEri/9Lk4ZzJY3GNRO/vWwPJyYI0dBNpVDaUp
+	Ngzf8j2m18zVA1WOOOIz+CeHy/PnD5e7HYwCtZCXR4h0ckInBjjpK8vO62KM8VCfG+wzUAnB6Z9
+	GWiHhqm0am6NArzzELBUuAsR7JqdaI8ELS179P8EHNYsG2+us3wUmUGx0iFjSdbAyI65sepqltZ
+	eewXgQNUbL+J6Ap31OFVGZ3Q7MB/EDASw5QUUX8yCQ/BbQTMkTQHdSvngE4eSMeHlqppQqS/cWN
+	G+Xz3sGnkPpgNhTVoN2S4B1TYM3WwH53+PCRGwvEtIg+bi7iDAGUP6HJAfZkZXwqMBF7iLeA=
+X-Google-Smtp-Source: AGHT+IEQZar8WBAOm85u+suoluGDr+DTtstTbqs6dfovDku4FTi9XGSytpEOzcrDiccqig50y3evvA==
+X-Received: by 2002:a17:902:f64e:b0:24c:be1f:c1f7 with SMTP id d9443c01a7336-25170e4187fmr86761255ad.39.1757313972470;
+        Sun, 07 Sep 2025 23:46:12 -0700 (PDT)
+Received: from zenbook (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b5236338fcasm1574671a12.35.2025.09.07.23.46.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Sep 2025 23:46:12 -0700 (PDT)
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v2] KVM: arm64: Remove stage 2 read fault check
+Date: Mon,  8 Sep 2025 14:48:06 +0800
+Message-ID: <20250908064806.4093081-1-r09922117@csie.ntu.edu.tw>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -62,56 +80,46 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-07_08,2025-09-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- suspectscore=0 spamscore=0 phishscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2509070211
-X-Authority-Analysis: v=2.4 cv=UatRSLSN c=1 sm=1 tr=0 ts=68bde7a2 cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=yJojWOMRYYMA:10 a=yPCof4ZbAAAA:8 a=WX6EjEeCYAaawmOpSx8A:9
-X-Proofpoint-GUID: vn0JFs1aucJtM4zfA_naB14cPmViid_P
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA3MDIxMCBTYWx0ZWRfXyi7y69tKHa/g
- OdCGom5mn8xjL4lwkli87rAIotIGbro6CPGkq69LNDmEjn5Z6d+qpjiIdE8wb83bNPFX5aX4f2K
- 22UNd2JS2hu51WMCLPaROobhkZb/LE6E/48T6hK6UFjKmE8YWG/4fuv3q8cFsY4dYplrqwaR3Ok
- 3fLbMUMu+JE10plW+ShEL/83BpWO2oATFbNPYAiRCtOvr3+lXmF5qTLSjRduPwPuVVM2sfyQ7fS
- CwccXkZXhBkA11jETac59OMenO/1CnWV4prAo9XrgLx7938XzjNNgphDcgif5SeYO+0uaoU60UJ
- FDVypMuGuBQkQVOHaPo/CjwEbatVxJwWT6HG4wh1hCmUeOFF9K1NpmE4uDInpj5ZQ11Qa8joMDZ
- bXL8fhbz
-X-Proofpoint-ORIG-GUID: vn0JFs1aucJtM4zfA_naB14cPmViid_P
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-The function vgic_flush_lr_state() was calling _raw_spin_unlock()
-instead of the proper raw_spin_unlock().
+In the non-NV case, read permission is always granted when mapping
+stage-2, so checking for it doesn't bring much. On the other hand,
+shadow stage-2 for NV guests could potentially have non-readable
+mappings when we align the permissions with those that L1 set for L2, we
+shouldn't be checking for read faults in this case either.
 
-_raw_spin_unlock() is an internal low-level API and should not
-be used directly; using raw_spin_unlock() ensures proper locking
-semantics in the vgic code.
+So just remove this check.
 
-This change replaces low-level API usage with the general kernel
-spinlock API, avoiding misuse of internal functions and aligning
-with kernel locking conventions.
-
-Fixes: 8fa3adb8c6be ("KVM: arm/arm64: vgic: Make vgic_irq->irq_lock a raw_spinlock")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
 ---
- arch/arm64/kvm/vgic/vgic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index f5148b38120a..c74d6120a12c 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -818,7 +818,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- 		 * the AP list has been sorted already.
- 		 */
- 		if (multi_sgi && irq->priority > prio) {
--			_raw_spin_unlock(&irq->irq_lock);
-+			raw_spin_unlock(&irq->irq_lock);
- 			break;
- 		}
+Changes in v2, thanks to those listed in the Suggested-by tags:
+  - remove the read fault check instead of skipping it for NV
+  - Link to v1: https://lore.kernel.org/kvmarm/20250822031853.2007437-1-r09922117@csie.ntu.edu.tw/
+
+---
+ arch/arm64/kvm/mmu.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1c78864767c5c..fb239cd9f7a67 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1508,11 +1508,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+ 	VM_BUG_ON(write_fault && exec_fault);
  
+-	if (fault_is_perm && !write_fault && !exec_fault) {
+-		kvm_err("Unexpected L2 read permission error\n");
+-		return -EFAULT;
+-	}
+-
+ 	if (!is_protected_kvm_enabled())
+ 		memcache = &vcpu->arch.mmu_page_cache;
+ 	else
 -- 
 2.50.1
 
