@@ -1,169 +1,84 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F7D1A9FA3
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 01:48:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A3427381E
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 03:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757382491; cv=none; b=mjTfu4/IcL6CJaCSENWjN39PvaKR8kWfMoykpJdQNFdzUa6TiJpr76fTYpfo6RXlEG6pPn7WqV38ZaWzYtb2xZQt4REJhsIOKD+B/7DkAC0HirDuNH7s0SVKrPhsCfZsTTwiqeJ4qK6rS4XAS7jgf2LSHhkogT0kUKOszd5+Q7o=
+	t=1757389462; cv=none; b=lB1Ev25BGja3ArJn+rq8wbfaeSZfU0TE6c8b5moktfDQtQBo6IOSnzDA6GnICYEncY9J6HNb1TAOWWiGX2e35nQiEKWwh5/wEj1Cy41Jk7E6vBPeBvXgkxdVWVdTYP9vA/O3sirQUF5PDwH/FWGyDaOi2sYURzCB5y1yygauicA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757382491; c=relaxed/simple;
-	bh=is2pUEHEiZMQU1R2ZtXgqvP+1teelQQSyxe1k0SHyzk=;
-	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ZYQ8N5owpbdAmai6wcj96gOj0ET+xjJfUhvuhnPW2eFSCE45w5AT6qMjFoZvnoPs5BTKhl0Ld5QDSl+CXny1uh70N3pFMWrwdDFRqI5trDvZ45vlThe/fxAOpSV/p5YL4y6/64furjNuZsbzcJvzxs0sqy8DJeVzlKw1YYuTDG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	s=arc-20240116; t=1757389462; c=relaxed/simple;
+	bh=nX0kTriVjYy1tTLnCyk08yLcoXQfD7SxHRJJ+JkVFgo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HLL3582Ekb3IHkQrvLWLX47X8AFP1wVtS098nGcGFt4kW+YTiPaUhY7UhyWw0w9aFoAfRsX9z0V6ZvaGFksvcraiUKrHfTrrnsZgENcznTYHA7LpGIQ+GqAfCIhBEGizFtzEYSo0NcgdqtV45q7dg5QRPNZExHOmL9KarZWvOuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cLRRj1mY3zRk4L;
-	Tue,  9 Sep 2025 09:43:29 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2AAE7180087;
-	Tue,  9 Sep 2025 09:48:06 +0800 (CST)
-Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 9 Sep 2025 09:48:05 +0800
-Received: from [10.67.121.177] (10.67.121.177) by
- kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 9 Sep 2025 09:48:04 +0800
-CC: <yangyicong@hisilicon.com>, <catalin.marinas@arm.com>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <corbet@lwn.net>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
-	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <tangchengchang@huawei.com>,
-	<wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v4 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
-To: Will Deacon <will@kernel.org>
-References: <20250715081356.12442-1-yangyicong@huawei.com>
- <20250715081356.12442-6-yangyicong@huawei.com>
- <aL7Fgx__LeLfbDyU@willie-the-truck>
-From: Yicong Yang <yangyicong@huawei.com>
-Message-ID: <5d2ba565-715b-9b17-951b-f805dde5988b@huawei.com>
-Date: Tue, 9 Sep 2025 09:48:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cLV1t64B5z2CgBs;
+	Tue,  9 Sep 2025 11:39:46 +0800 (CST)
+Received: from dggpemf500013.china.huawei.com (unknown [7.185.36.188])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7CDF91A016C;
+	Tue,  9 Sep 2025 11:44:18 +0800 (CST)
+Received: from huawei.com (10.50.165.33) by dggpemf500013.china.huawei.com
+ (7.185.36.188) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 9 Sep
+ 2025 11:44:17 +0800
+From: Jinqian Yang <yangjinqian1@huawei.com>
+To: <oliver.upton@linux.dev>, <yuzenghui@huawei.com>, <maz@kernel.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <liuyonglong@huawei.com>,
+	<wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>
+Subject: [PATCH v2 1/3] KVM: arm64: Make ID_AA64MMFR1_EL1.HCX writable from userspace
+Date: Tue, 9 Sep 2025 11:44:13 +0800
+Message-ID: <20250909034415.3822478-2-yangjinqian1@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20250909034415.3822478-1-yangjinqian1@huawei.com>
+References: <20250909034415.3822478-1-yangjinqian1@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <aL7Fgx__LeLfbDyU@willie-the-truck>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemq200018.china.huawei.com (7.202.195.108)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ dggpemf500013.china.huawei.com (7.185.36.188)
 
-On 2025/9/8 20:01, Will Deacon wrote:
-> On Tue, Jul 15, 2025 at 04:13:54PM +0800, Yicong Yang wrote:
->> From: Yicong Yang <yangyicong@hisilicon.com>
->>
->> Armv8.7 introduces single-copy atomic 64-byte loads and stores
->> instructions and its variants named under FEAT_{LS64, LS64_V}.
->> These features are identified by ID_AA64ISAR1_EL1.LS64 and the
->> use of such instructions in userspace (EL0) can be trapped. In
->> order to support the use of corresponding instructions in userspace:
->> - Make ID_AA64ISAR1_EL1.LS64 visbile to userspace
->> - Add identifying and enabling in the cpufeature list
->> - Expose these support of these features to userspace through HWCAP3
->>   and cpuinfo
->>
->> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
->> ---
->>  Documentation/arch/arm64/booting.rst    | 12 ++++++
->>  Documentation/arch/arm64/elf_hwcaps.rst |  6 +++
->>  arch/arm64/include/asm/hwcap.h          |  2 +
->>  arch/arm64/include/uapi/asm/hwcap.h     |  2 +
->>  arch/arm64/kernel/cpufeature.c          | 51 +++++++++++++++++++++++++
->>  arch/arm64/kernel/cpuinfo.c             |  2 +
->>  arch/arm64/tools/cpucaps                |  2 +
->>  7 files changed, 77 insertions(+)
->>
->> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
->> index ee9b790c0d72..837823d49212 100644
->> --- a/Documentation/arch/arm64/booting.rst
->> +++ b/Documentation/arch/arm64/booting.rst
->> @@ -483,6 +483,18 @@ Before jumping into the kernel, the following conditions must be met:
->>  
->>     - MDCR_EL3.TPM (bit 6) must be initialized to 0b0
->>  
->> +  For CPUs support for 64-byte loads and stores without status (FEAT_LS64):
-> 
-> nit: I think you're missing a word ("For CPUs with support ...").
-> 
->> +
->> +  - If the kernel is entered at EL1 and EL2 is present:
->> +
->> +    - HCRX_EL2.EnALS (bit 1) must be initialised to 0b1.
->> +
->> +  For CPUs support for 64-byte loads and stores with status (FEAT_LS64_V):
-> 
-> Same here, but also FEAT_LS64_V only applies to stores so no need to
-> mention loads.
-> 
->> +
->> +  - If the kernel is entered at EL1 and EL2 is present:
->> +
->> +    - HCRX_EL2.EnASR (bit 2) must be initialised to 0b1.
->> +
->>  The requirements described above for CPU mode, caches, MMUs, architected
->>  timers, coherency and system registers apply to all CPUs.  All CPUs must
->>  enter the kernel in the same exception level.  Where the values documented
->> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
->> index 69d7afe56853..9e6db258ff48 100644
->> --- a/Documentation/arch/arm64/elf_hwcaps.rst
->> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
->> @@ -435,6 +435,12 @@ HWCAP2_SME_SF8DP4
->>  HWCAP2_POE
->>      Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
->>  
->> +HWCAP3_LS64
->> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001.
->> +
->> +HWCAP3_LS64_V
->> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010.
-> 
-> Given that these instructions only work on IMPLEMENTATION DEFINED memory
-> locations and aren't guaranteed to generate an abort if used elsewhere,
-> how is userspace supposed to know what to do with them?
-> 
+Allow userspace to downgrade HCX in ID_AA64MMFR1_EL1. Userspace can
+only change this value from high to low.
 
-per ARM DDI0487 L.b section C3.2.6,
+Signed-off-by: Jinqian Yang <yangjinqian1@huawei.com>
+---
+ arch/arm64/kvm/sys_regs.c                       | 1 -
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-  When the instructions access a memory type that is not one of the following,
-  a data abort for unsupported Exclusive or atomic access is generated...
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 82ffb3b3b3cf..f2267db1c44c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3002,7 +3002,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 				      ~(ID_AA64MMFR0_EL1_RES0 |
+ 					ID_AA64MMFR0_EL1_ASIDBITS)),
+ 	ID_WRITABLE(ID_AA64MMFR1_EL1, ~(ID_AA64MMFR1_EL1_RES0 |
+-					ID_AA64MMFR1_EL1_HCX |
+ 					ID_AA64MMFR1_EL1_TWED |
+ 					ID_AA64MMFR1_EL1_XNX |
+ 					ID_AA64MMFR1_EL1_VH |
+diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+index d3bf9204409c..a744dee30cd2 100644
+--- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+@@ -165,6 +165,7 @@ static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
+ static const struct reg_ftr_bits ftr_id_aa64mmfr1_el1[] = {
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, TIDCP1, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, AFP, 0),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, HCX, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, ETS, 0),
+ 	REG_FTR_BITS(FTR_HIGHER_SAFE, ID_AA64MMFR1_EL1, SpecSEI, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, PAN, 0),
+-- 
+2.33.0
 
-so...
-
-> As it stands, exposing the feature blindly feels like a bad idea to me.
-> Surely there needs to be a way for userspace to either probe or request
-> memory that supports the instructions? We should also make sure we
-> handle the abort properly if it occurs and presumably deliver a SIGBUS.
-> 
-
-...on host accessing an unsupported memory region a SIGBUS will be delivered,
-selftests for the instruction added in PATCH 7/7 make use of this, comments
-added in ls64_sigill() explained there will be a SIGBUS recieved if accessing
-the normal memory.
-
-if in a VM the DABT will be taken by the guestOS (then handled in the same
-way like host, deliver a SIGBUS by the guestOS) or by the hypervisor depend
-on the hardware implementation. for the latter case PATCH 3/7 add the handling
-to inject the DABT back to the VM.
-
-as for the usage, since LS64 is intended to interact with the device, currently
-we only use it in userspace drviers, as mentioned in the coverletter:
-
-  A real scenario for this feature is that the userspace driver can make use of
-  this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
-  directly into the hardware.
-
-the userspace driver will know exactly whether their devices support LS64 or not
-and request the target memory.
-
-thanks.
