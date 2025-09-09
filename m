@@ -1,25 +1,24 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A3427381E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638DD2737FD
 	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 03:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757389462; cv=none; b=lB1Ev25BGja3ArJn+rq8wbfaeSZfU0TE6c8b5moktfDQtQBo6IOSnzDA6GnICYEncY9J6HNb1TAOWWiGX2e35nQiEKWwh5/wEj1Cy41Jk7E6vBPeBvXgkxdVWVdTYP9vA/O3sirQUF5PDwH/FWGyDaOi2sYURzCB5y1yygauicA=
+	t=1757389463; cv=none; b=f2wapaBDPuPYgmJHSoBt5Tx/gCH2QDkzuboP2UQt84YQa8xu9yFFjISRC5GWPsFi/ytKeONxMAfBAq+k6mrXS/hxQHE2tXGd2rpeqslLkun24KqC/6Sh0fFISv6AieUmZhTxLNkvQuT2J+RKb9sy6mJB6IE8dqi8iYr/zeNQkGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757389462; c=relaxed/simple;
-	bh=nX0kTriVjYy1tTLnCyk08yLcoXQfD7SxHRJJ+JkVFgo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HLL3582Ekb3IHkQrvLWLX47X8AFP1wVtS098nGcGFt4kW+YTiPaUhY7UhyWw0w9aFoAfRsX9z0V6ZvaGFksvcraiUKrHfTrrnsZgENcznTYHA7LpGIQ+GqAfCIhBEGizFtzEYSo0NcgdqtV45q7dg5QRPNZExHOmL9KarZWvOuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	s=arc-20240116; t=1757389463; c=relaxed/simple;
+	bh=gDCpq+D8chBeC/sjkf+IgkkpMT8NIfZNa1/+6ArkfhE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q7h6kiBtg3ql9XcknNmTl9o/GZWWoZMp/5DS3rk7b+tdWOXodqRMywHrkxQS1m6I0ITP/QxtG0qJjaxKE4/8xbR38TeC+yDn+JL16yLe//4l5jc1VcuvlLT2ppgDbFc3lAo+Rtd4IECx7acgOBq/j6JiCnld/h0aw9ugI2ACTM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cLV1t64B5z2CgBs;
-	Tue,  9 Sep 2025 11:39:46 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cLV1m65CqzRkDx;
+	Tue,  9 Sep 2025 11:39:40 +0800 (CST)
 Received: from dggpemf500013.china.huawei.com (unknown [7.185.36.188])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7CDF91A016C;
-	Tue,  9 Sep 2025 11:44:18 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id C2D111800B1;
+	Tue,  9 Sep 2025 11:44:17 +0800 (CST)
 Received: from huawei.com (10.50.165.33) by dggpemf500013.china.huawei.com
  (7.185.36.188) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 9 Sep
@@ -29,12 +28,10 @@ To: <oliver.upton@linux.dev>, <yuzenghui@huawei.com>, <maz@kernel.org>
 CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
 	<linux-kernel@vger.kernel.org>, <liuyonglong@huawei.com>,
 	<wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>
-Subject: [PATCH v2 1/3] KVM: arm64: Make ID_AA64MMFR1_EL1.HCX writable from userspace
-Date: Tue, 9 Sep 2025 11:44:13 +0800
-Message-ID: <20250909034415.3822478-2-yangjinqian1@huawei.com>
+Subject: [PATCH v2 0/3] KVM: arm64: make EL2 feature fields writable in ID_AA64MMFR1_EL1
+Date: Tue, 9 Sep 2025 11:44:12 +0800
+Message-ID: <20250909034415.3822478-1-yangjinqian1@huawei.com>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250909034415.3822478-1-yangjinqian1@huawei.com>
-References: <20250909034415.3822478-1-yangjinqian1@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,39 +43,25 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  dggpemf500013.china.huawei.com (7.185.36.188)
 
-Allow userspace to downgrade HCX in ID_AA64MMFR1_EL1. Userspace can
-only change this value from high to low.
+Allow userspace to downgrade EL2 features (VH, TWED, HCX) to ensure VM live
+migration compatibility between hosts with varying feature support.
 
-Signed-off-by: Jinqian Yang <yangjinqian1@huawei.com>
----
- arch/arm64/kvm/sys_regs.c                       | 1 -
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+v1: https://lore.kernel.org/linux-arm-kernel/20250325121126.1380681-1-yangjinqian1@huawei.com/
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 82ffb3b3b3cf..f2267db1c44c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3002,7 +3002,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 				      ~(ID_AA64MMFR0_EL1_RES0 |
- 					ID_AA64MMFR0_EL1_ASIDBITS)),
- 	ID_WRITABLE(ID_AA64MMFR1_EL1, ~(ID_AA64MMFR1_EL1_RES0 |
--					ID_AA64MMFR1_EL1_HCX |
- 					ID_AA64MMFR1_EL1_TWED |
- 					ID_AA64MMFR1_EL1_XNX |
- 					ID_AA64MMFR1_EL1_VH |
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index d3bf9204409c..a744dee30cd2 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -165,6 +165,7 @@ static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
- static const struct reg_ftr_bits ftr_id_aa64mmfr1_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, TIDCP1, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, AFP, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, HCX, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, ETS, 0),
- 	REG_FTR_BITS(FTR_HIGHER_SAFE, ID_AA64MMFR1_EL1, SpecSEI, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, PAN, 0),
+Change Log:
+v1->v2:
+  -Added support for downgrading TWED and VH fields.
+  -Added corresponding test cases to the set_id_regs selftest.
+
+Jinqian Yang (3):
+  KVM: arm64: Make ID_AA64MMFR1_EL1.HCX writable from userspace
+  KVM: arm64: Make ID_AA64MMFR1_EL1.TWED writable from userspace
+  KVM: arm64: Make ID_AA64MMFR1_EL1.VH writable from userspace
+
+ arch/arm64/kvm/sys_regs.c                       | 3 ---
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 3 +++
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
 -- 
 2.33.0
 
