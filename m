@@ -1,128 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE7C747F;
-	Tue,  9 Sep 2025 15:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00C52EAB88
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 16:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757433379; cv=none; b=s5CYMUY5H2amyT2TquCNj1FQm0ew5nRox4RmRA1T6hBn2o7PEdP/5rTTpB3R3szSp/dCDI17kiSK/XSuyyRCpF/yZyxtQnDl/s0Ff2LsnZtOP9MvOz/WUzFctPlTQAqG3s0wJaXK+p/qo8iqif4h5A4JBer2W8e60cyOo+SThbY=
+	t=1757434224; cv=none; b=ko7V+ssm6SlXY5+hcX1Kv9hspgTYe6pVQCq17+AatVl3dwhDyu6uUg+prEFfp1/LREN+ZukMERTJ+wS1Nnk49SqXKlGuvgycKIL6anQ17L6JEgUWkB+yX9dBDZzKFKNSq/H0PG9ijwAJ2Y4tJ9EeANqvoCRZvgGdZG0P8Eh2Y7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757433379; c=relaxed/simple;
-	bh=RtUitodWOkKeQEEaclflXS12jq+q0qRZEHBeguTytIc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pIEfdrsETGhHsehp8+HzIjuy+MpeEDrxqSTla2iFc6SgKo2gd9PbGRwwNGAnXMLHD/tnKo90Txg1+4Pk24BKI0O1Gbjmk3KXAoANsS0mny0jxzlftwgxyQB249XMezuDiXSFaLN6zqITouIilAjZBfQByyQnXjB+Bh3FQxkd7Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8mexh43; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757434224; c=relaxed/simple;
+	bh=bvmtY118txyjfxnCSpGNzanxwErszIEgZjkDshuNbJ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QMH6FNETw1CBQZtJnDRUZNBJzmOBjVGE5gbk8EVQWMxJ2IryUO146+rbVgr2BjzHWyk4gFEyb4AhSC1DDWSlAl3orWVHDYw4D7rUk64sG/wSuywUgt8YzJGPY/hcBqLYidZ9+CWw1FiqoHcc0ylXtNhdv9StP4UoonfkZBAEhkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xd2+qh9c; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8mexh43"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BECBC4CEF4;
-	Tue,  9 Sep 2025 15:56:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757433379;
-	bh=RtUitodWOkKeQEEaclflXS12jq+q0qRZEHBeguTytIc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X8mexh43sOY/SEveLtu9JYR24EqArE2lyojo7jK49c2ClNxxjSMm2pQQ7EV3ADYTB
-	 JhxSONgh4k/2k3o5UV/SzG1EebwiW6VK4ro6+AooG/1BpT7PD1W2ZY4rht9bbbhgAB
-	 vkYp8Rqz6H8Sboxip4bhijsZCdG9t8wBPL8GIJ36WIzdEBVjDmQIb2/t0+JNJ1r9cw
-	 t8X3rDnmLW79xEwWkcQ2XsZ/cICUpn3DtGVLxnQ7Tw2cl5AXVbdLDjFc6M7qtufEYL
-	 sF9zrY36pYK5fFqoZ6aPKR+y0e1j8xKuhJ+BtRfo+glELJfoTjooEIvtUkYY65NMCN
-	 /kOgBZIVWcjAQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uw0hc-00000004kKc-37ay;
-	Tue, 09 Sep 2025 15:56:16 +0000
-Date: Tue, 09 Sep 2025 16:56:16 +0100
-Message-ID: <86frcvd3hb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Mostafa Saleh <smostafa@google.com>,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	iommu@lists.linux.dev,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	robin.murphy@arm.com,
-	jean-philippe@linaro.org,
-	qperret@google.com,
-	tabba@google.com,
-	jgg@ziepe.ca,
-	mark.rutland@arm.com,
-	praan@google.com
-Subject: Re: [PATCH v4 03/28] KVM: arm64: pkvm: Add pkvm_time_get()
-In-Reply-To: <aMA2ugNakqrA1Pg0@willie-the-truck>
-References: <20250819215156.2494305-1-smostafa@google.com>
-	<20250819215156.2494305-4-smostafa@google.com>
-	<aMA2ugNakqrA1Pg0@willie-the-truck>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xd2+qh9c"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3dad6252eacso2666844f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 09:10:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757434221; x=1758039021; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J+NppKLzVrIsIoSaivdIxFGudWC05VGLRO9K0C3DxKA=;
+        b=Xd2+qh9cPjfwfUxr6gKOgQrPFLbI4dSevJVm6QDQzDBT75p/TrO9fDEJGAVWTd3+j5
+         UZ1wztpXuKpwCXael2GOT0bbC3g2fjiMe/ABpHp0/B3nxotimLT4YZAs6NnUfufrEaxI
+         QspqDM6LRbXsnsdAca8VQB50PIKA6Mun4KYwsrEIsiMe06INjLZiHLPWeQqLuaCgZ9mM
+         k7gmjMW3ABWo1J/abQwLGeS5Q2TzKSRW9p9k8iLr4DVJRFtNCQfuXUufQqj92JGBqPHq
+         gDI4xWx4mz5FprDbQdit+23YhlBu+zaqz4Ah1DoeDJdsreql1k8HqZ3AUJkEV9WF3ePZ
+         xXEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757434221; x=1758039021;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J+NppKLzVrIsIoSaivdIxFGudWC05VGLRO9K0C3DxKA=;
+        b=GNDOw6xNpjJl/qTyVjauvj2U8PX1/2rXRe5HrMxuj1KohP6YS9SCAyBmnRjp67ikzn
+         6bpJtORRPA4eft9c1DKEyUw61ORymrNb855zXMWUnXlM3uRwZ+5kuvJwC4KuekDkDh5m
+         r3mrwBgE77NZzCtX9OMDRNRrI0gyaonGzdYskkypmUe4pLb6zV0iEGv6csbXucvh4tWe
+         TgxcTtM2aoxE1iVjCJtX+Mh73eBzQ4+iLNlzJuXoOYHf6DxskMrxVo+n7hdG6yatZXHb
+         rj0H+t3dHYha4gxPKDAmjxexPKNjUQ5WLCsohAs1KM0U9TFyfOVCAmXJJohLD/wda3ss
+         RQ1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUQYxs0381WemUxjvw69ZWa036DbiBPdJRRl4RqQ61kHWscMv/NkVA/tbq5aB3mVaEnQZT4aaA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwppNrICDMRoc7Cq7krmFJpXFn9QCJyuxfzJIjDazUf9qz6XSlp
+	0fYeDzBQ+6p0JKCKmtW9Wwtx9YYAoYb8orqsaeRwFni8PyomvFgFOiOfQ5dc88cknA==
+X-Gm-Gg: ASbGncsSENdkoDnax4BKiolgXSh2oP6A0yG/4Q5bVD/1ZUQoNmq5shP7jg7yUaoxs9G
+	5a/1BTUHrboOY9jBhykiNRcY27VMj2SJgeswAsOnBwc0tarP1248jAki/jrW9kB7eKtBFfKeOHP
+	PjCypRiSE/idMoI3xfechFawJAruSnoBhnmthLzuF0m7mfcKSbFCsmm7uFQB4G0ScTXdNdhZyEu
+	2UJHWrSLdBiV/1QEl/DGFbUQOVLKvd5ukcsoeTID+XrO5lCincSDDbSDHNDi/TfQ2L/lD/S1muT
+	eG9RSQefZuNB+G6WRn7aYhgNJ16jtYgF3Ix/91DaPdYrNUlvbno/aZdMuf9IaSQa03yZzD9f9Bs
+	u7ZQWHHgcXMz+0g1cn7aqE/iw7yQ7+eUHQHjNTLAsyecLaMMoe5xD2KcrCsCkE9tubxNXcUHOFP
+	igm7zk
+X-Google-Smtp-Source: AGHT+IEcQIe0OC8lSfD+aiR6eeprIeDl6s8EC4O8tczqPnzu992yeZRmguAnbDmw2y0KnALeXMKgPg==
+X-Received: by 2002:a05:6000:1449:b0:3e4:ea11:f7df with SMTP id ffacd0b85a97d-3e64392b8c4mr12530932f8f.40.1757434220628;
+        Tue, 09 Sep 2025 09:10:20 -0700 (PDT)
+Received: from google.com (211.29.195.35.bc.googleusercontent.com. [35.195.29.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e752238910sm3069080f8f.41.2025.09.09.09.10.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Sep 2025 09:10:19 -0700 (PDT)
+Date: Tue, 9 Sep 2025 17:10:16 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, jstultz@google.com,
+	qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
+	kernel-team@android.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 03/24] tracing: Introduce trace remotes
+Message-ID: <aMBRaPzjR4OJVIWn@google.com>
+References: <20250821081412.1008261-1-vdonnefort@google.com>
+ <20250821081412.1008261-4-vdonnefort@google.com>
+ <20250908193606.47143d09@gandalf.local.home>
+ <aMAYvA9LSvfxvt_C@google.com>
+ <20250909093848.402674b7@gandalf.local.home>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, smostafa@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, robin.murphy@arm.com, jean-philippe@linaro.org, qperret@google.com, tabba@google.com, jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250909093848.402674b7@gandalf.local.home>
 
-On Tue, 09 Sep 2025 15:16:26 +0100,
-Will Deacon <will@kernel.org> wrote:
->=20
-> On Tue, Aug 19, 2025 at 09:51:31PM +0000, Mostafa Saleh wrote:
-> > Add a function to return time in us.
-> >=20
-> > This can be used from IOMMU drivers while waiting for conditions as
-> > for SMMUv3 TLB invalidation waiting for sync.
-> >=20
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > ---
-> >  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 ++
-> >  arch/arm64/kvm/hyp/nvhe/setup.c        |  4 ++++
-> >  arch/arm64/kvm/hyp/nvhe/timer-sr.c     | 33 ++++++++++++++++++++++++++
-> >  3 files changed, 39 insertions(+)
+On Tue, Sep 09, 2025 at 09:38:48AM -0400, Steven Rostedt wrote:
+> On Tue, 9 Sep 2025 13:08:28 +0100
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> 
+> > > > +		rb_desc = __next_ring_buffer_desc(rb_desc);  
+> > > 
+> > > Is there no check to make sure that the cpu mask matches what the rb_desc
+> > > will have?  
+> > 
+> > The function is filling rb_desc[], based on the cpumask input, so both will
+> > match when returning from this function.
+> > It is then easy to handle the case where some CPUs are not part of the cpumask.
+> > See remote_test_load() where for_each_ring_buffer_desc() iterates over all the
+> > CPUs from the trace_desc but uses rb_desc->cpu.
+> > 
+> > Is it what you meant?
+> 
+> I'm more worried about the allocation not being big enough for the rb_desc
+> being filled. I just noticed that the trace_remote_register() function is
+> missing a kerneldoc header. Please add one and specify what the parameters
+> are for as well as their requirements.
+> 
+> It's fine to state that the allocation of desc must match what the cpumask
+> is. But the lack of comments about what the function does and what is
+> expected of the parameters makes it hard to know if it is performing
+> properly.
 
-[...]
+Ok, will do!
 
-> > +#define SEC_TO_US 1000000
-> > +
-> > +int pkvm_timer_init(void)
-> > +{
-> > +	timer_freq =3D read_sysreg(cntfrq_el0);
-> > +	/*
-> > +	 * TODO: The highest privileged level is supposed to initialize this
-> > +	 * register. But on some systems (which?), this information is only
-> > +	 * contained in the device-tree, so we'll need to find it out some ot=
-her
-> > +	 * way.
-> > +	 */
-> > +	if (!timer_freq || timer_freq < SEC_TO_US)
-> > +		return -ENODEV;
-> > +	return 0;
-> > +}
->=20
-> Right, I think the frequency should be provided by the host once the arch
-> timer driver has probed successfully. Relying on CNTFRQ isn't viable imo.
+I could also add a desc_size parameter to make sure we won't overflow the given
+desc?
 
-We can always patch the value in, =C3=A0 la kimage_voffset. But it really
-begs the question: who is their right mind doesn't set CNTFRQ_EL0 to
-something sensible? Why should we care about supporting such
-contraption?
-
-I'd be happy to simply disable KVM when CNTFRQ_EL0 is misprogrammed,
-or that the device tree provides a clock frequency. Because there is
-no good way to support a guest in that case.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+> 
+> -- Steve
