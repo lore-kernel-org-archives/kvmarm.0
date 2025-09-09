@@ -1,129 +1,112 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B662727E6
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 08:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21A3279780
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 09:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757407832; cv=none; b=ERP89+RlInpktLA3LsWz11h3rRSyB/7FU3OfQz1oQ2qPpRkVT/XJ8lUIksjCOH7X/A2QZNS1Yxk5XTCodsbZ8LpuwxAsoYbVt0KR7y3AcaLAuSf2jeDG/3eefXncwAPiPdTbXfNK3OsilZ1CY0H0svT6tPTBqVZpiR2uKTZHT9E=
+	t=1757408844; cv=none; b=E9jeUTZda1bacHhcBri/ASlWgzBQ6zBz2xFlEzWrzFyZkr7t880Ogl4HRNsmspHpVzU0DL6q2BJSgTF3AKTjOebTekMhBlXTjFz78uKtmFy0Tn+FqBLl63ryWKygKqzLXyc97u8B2iobqzLZSrhL9AOnK4rDJ0DcGFfZUCGQvPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757407832; c=relaxed/simple;
-	bh=adMZy7eOmAHzt2uZjdZmTIJ42EyrJmwOC91Y5k+mhoo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=alEd2fe+a6OX6Hr9wW/ux3bJsj1qK9n4FlIcAw5HB9QpITUdtqpoUknHd6LVvc50l76quZOuFgj/CToL2wqYXKARu/3cDp5o718En8/O2+Rj7PnMlpzsAaBNtXKj2nGJXIwuVbw6m+glfaoWhtNI7NF33szuITxbDKDd+Sa9GIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1L5FxpDo; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1757408844; c=relaxed/simple;
+	bh=4wKVdqiDvc8x64AZdz8dHzcdaT7HMFiEUg5nxr1xgD4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EEUoWI/sai4q2VG0yne4IZ8w/Xfxlc/z5Ydgi0TeLe7u0Z3n3iQmUzFFn08MhxJ/PaLOBWADVSzn8y6ocewiO72UoAaBEaMhD5EauB2RLx7MXuiFrr7M8j/1RhgCNVm56jWvXj7w+3SEi0doyskw+QbBFG8MWekoj1ciEuqc1dU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kogUUAJp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1L5FxpDo"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b48fc1d998so783491cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 01:50:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757407830; x=1758012630; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iyQrVgT/DRDk1flErmNG0zRfCzOEya0nPwf7kHpzdv8=;
-        b=1L5FxpDo+RfhEqktjodE5LT0Es8v4W39hNsU1bU7+eSfb1dlyg+eLo+ULQ53Dn4ie1
-         dYG0KheYiQkw+riuR8pxTqqqZVoJg+pvRT6MF3iyGJUTL+1qbYi0xW3iEw1NsU/hhTL8
-         9e/M1IrhYMIc5UYn3U/3EbVbW/RqRuPtMs/l1qlXaXuhrxh0pn4IzLfL4Rp+MxPwTOjk
-         x5obuSLOwtbCYsbZQ8fgc10llI/ct8x0Mv+ynnvebDxN0HW7ENgUn9F9FE2btTWEjLug
-         4v9x1MYYz6h2cH1cJ1LLYqRG2GQ6s0vSPlCzUF1J0UCcXKl50hfFGoDYNnN71ujxFmi2
-         SydQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757407830; x=1758012630;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iyQrVgT/DRDk1flErmNG0zRfCzOEya0nPwf7kHpzdv8=;
-        b=rhVK5ksS3J6wbMwi9zxArPKjmF9JQuO0XwIfsiRnoudPzs9+Q9O8ghw89uruspI9ze
-         CZb8GtKI5WyNg1ibyXAd2CMTq0qIRxTJN7D8iB86l4qdfxc9C2lRnk9HqLZmurKB+L12
-         1vWVdco/YI7JlTOsoNLj6BYpLcWzAl+ovmdxywefxekyF0UCa9vjP5RTrNpvMi9BEv5A
-         +nAfW3R13f88Z3n1U2VeDZNCBs22OpkOY6pfRWgLIxyAP6MXPzLW1ddwfC2r97NHETPj
-         TyFmPgrOFSZpVw8WJm2ihkn1/0mKHZ0egxkJrGxH99Zbpb/QHCbshrw8NeJKngMoUseu
-         FhfQ==
-X-Gm-Message-State: AOJu0YzuF/1MTmuMByYR0lBaM0nIGa/0VM503tqfIe/Uv3WxsJiOp4r+
-	OBebEo+omG6vIUQfkGx96celoMJs3NiJstHMEKwMtRZnj4U7zmAVPBKFgucRSfBJ6NCo2O8bVZ1
-	/yIj6Eouk4swBVJZaVrqiCS8YZEg4txzxTaOEGYSH1CTKxGF5YNS/ojw6
-X-Gm-Gg: ASbGncuQzReGPl+U8aCNTSRnJblNykaJ0xgBsz79xyX0j8T2TZ9KhRJqDmxaNtr1o0K
-	bb4Gj78OBQ2li8h01HTtEAlfDX+Pf+eSmIpmVQvVHJntpiQeh6ui+of9NA8MwmbhOqe/2hQkV3X
-	84RfSUvH0kNa4CyjHBiP7Yy/H36sfa17O/8ZZYrHA0a0oBqG45NTAVBM51MrsX+PjSWqQx5GaEI
-	xqRddgF6SMu2q4=
-X-Google-Smtp-Source: AGHT+IHiI3JXPX6IbsbQYAgKJcPHbcd79MrxwtJkz+hhWiamNDxhM8IdKcNuI6OeSEaIUOp1gEuys6yJXscaruEjuio=
-X-Received: by 2002:ac8:578e:0:b0:4b3:1617:e617 with SMTP id
- d75a77b69052e-4b5f83a4782mr15526561cf.11.1757407829304; Tue, 09 Sep 2025
- 01:50:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kogUUAJp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 716D6C4CEF4;
+	Tue,  9 Sep 2025 09:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757408844;
+	bh=4wKVdqiDvc8x64AZdz8dHzcdaT7HMFiEUg5nxr1xgD4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kogUUAJpj2PUM7i8R22D8a4yT3dvfPZReGMGRGguBS6ICb1QiQwelgiklQS0D7kWe
+	 QT2cJci+Z+sWtIJ5lS6e05Zij+6qT95ld+F1537Ry8FG4BFbuMeHioYRu3/N75ByK4
+	 fW1HhPgU8RDso2htB3zvDI5UoFe8MAux5g8AokPzX3LKkW7UnAxn5NnoJDfRkEaN8B
+	 PRGD0nev3FEGl7UEDBFt5pKjHR462E3ZyUohshEZRw9Z/8E2AOp6TVEo2VrvLNuvpF
+	 RcM5PXhEIu7eiT34/v+H5NWl0qtZDo5wgEB9BxSPZOWAFtTxCaAk7MNK+5gOybPBrq
+	 lY1y01uO38k5A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uvuJu-00000004bjw-0dsw;
+	Tue, 09 Sep 2025 09:07:22 +0000
+Date: Tue, 09 Sep 2025 10:07:21 +0100
+Message-ID: <86ms74c7ue.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jinqian Yang <yangjinqian1@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Exclude guest's TWED configuration when TWE isn't set
+In-Reply-To: <20250909071602.294783-1-oliver.upton@linux.dev>
+References: <20250909071602.294783-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250909072323.4106202-1-tabba@google.com>
-In-Reply-To: <20250909072323.4106202-1-tabba@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 9 Sep 2025 09:49:53 +0100
-X-Gm-Features: AS18NWB0DvPmFi-qUEdQUC9WLPdPZweoYYOUsOpJ_ZmY0_5YIMF-ZkM-TNKvlxk
-Message-ID: <CA+EHjTy4fZe-Naj3wX8gZ3wTWvkAmSkEWqDfnmHcnp8T7Kz7OA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] arm64: sysreg: Fix sysreg field definitions and
- generation script
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, broonie@kernel.org, vdonnefort@google.com, 
-	qperret@google.com, sebastianene@google.com, keirf@google.com, 
-	smostafa@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, yangjinqian1@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-I sent this cover letter out by mistake. Sorry for the noise.
+On Tue, 09 Sep 2025 08:16:02 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> KVM blindly OR's the guest values for TWEDEL and TWEDEn into the
+> programmed value even if the guest has WFE traps disabled. Exclude these
+> fields from the final value when TWE isn't set to avoid potentially
+> delaying a trap desired by the host.
+> 
+> Note that KVM doesn't use FEAT_TWED currently so there's no need to
+> empty out these fields the other way around (i.e. host TWE=0, guest
+> TWE=1).
+> 
+> Fixes: 04ab519bb86d ("KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2")
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/vhe/switch.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 0998ad4a2552..e4955b49c0d2 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -95,6 +95,13 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+>  			/* Force NV2 in case the guest is forgetful... */
+>  			guest_hcr |= HCR_NV2;
+>  		}
+> +
+> +		/*
+> +		 * Exclude the guest's TWED configuration if it hasn't set TWE
+> +		 * to avoid potentially delaying traps for the host.
+> +		 */
+> +		if (!(guest_hcr & HCR_TWE))
+> +			guest_hcr &= (HCR_EL2_TWEDEn | HCR_EL2_TWEDEL);
+>  	}
+>  
+>  	BUG_ON(host_data_test_flag(VCPU_IN_HYP_CONTEXT) &&
+> 
+> base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
 
-Cheers,
-/fuad
+I'm a bit lost here.
 
-On Tue, 9 Sept 2025 at 08:23, Fuad Tabba <tabba@google.com> wrote:
->
-> The sysreg definitions file has a few errors. In Enum Security,
-> NSACR_RFR is set to 0b0001 instead of the spec value of 0b0010.
-> Additionaly, the sign of the Enums DoubleLock and EIESB are wrong
-> (should be Signed and Unsigned, respectively).
->
-> Moreover, the file has some redundant definitions, e.g.,
-> RCWSMASK_EL1. While these redundant definitions are not wrong per se,
-> they add unnecessary code into the generated header file and could be a
-> source of future bugs.
->
-> Fix the Enums and remove the redundant Sysreg definitions.
->
-> To reduce the chance of this happening in the future, add validation to
-> the sysreg header generation script. I didn't want to go overboard with
-> validation, so I only added validation that would catch most of the
-> errors that I've seen, which also are errors that wouldn't generate a
-> build error later on.
->
-> Changes since v2 [1]:
-> - Added patch that fixes field sign definitions for DoubleLock and EIESB
-> - Removed whitespace fixes from first patch, since there are more
->   inconsistent whitespace use in the file, and fixing it all would lead
->   to too much churn.
-> - Collected Reviews/Acks
-> - Rebased on 6.17-rc3
->
-> Cheers,
-> /fuad
->
-> [1] https://lore.kernel.org/all/20250813164506.1203851-1-tabba@google.com/
->
-> Fuad Tabba (3):
->   arm64: sysreg: Fix and tidy up sysreg field definitions
->   arm64: sysreg: Correct sign definitions for EIESB and DoubleLock
->   arm64: sysreg: Add validation checks to sysreg header generation
->     script
->
->  arch/arm64/tools/gen-sysreg.awk | 20 ++++++++++++++++++++
->  arch/arm64/tools/sysreg         | 18 +++++-------------
->  2 files changed, 25 insertions(+), 13 deletions(-)
->
->
-> base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
-> --
-> 2.51.0.338.gd7d06c2dae-goog
->
+We seem to sanitise ID_AA64MMFR1_EL1 in a way that totally removes
+TWED from the feature set (see limit_nv_id_reg()). Therefore,
+HCR_EL2.(TWEDEn,TWEDEL} should be RES0, no matter what.
+
+Is there another way the guest can set these bits?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
