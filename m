@@ -1,54 +1,54 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7021F30A4
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 07:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D8B1F30A4
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 07:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757402608; cv=none; b=KGOCsYX7+7EDXUah0gVGi+LCYf7yGlRQk2KQf+TDbDqtaXMoa2sosW8tt12Jhg4BfoBYmqOkh/d5t+PSinkSa6bId7dLBXN7s1iAtc67YKyq2nSsR1R9uTJRHMLr8T16DqTCm0IK+dhIgPTf9o6Bieu3IxaB1zyPwB6n2DVcoqs=
+	t=1757402681; cv=none; b=EX0jAKyacNpzJ4Dzyx5mTCzWZ1/8OB4MfQcRNVNsFDvvFJEyjSmy/GZaX+gqoEhuAkWYmkUUO5v96mGHPzNoFIKI+ysjbgaoUWiJTmeyWI73JnK16MM1CGIM5o9dKkJdgRd1+i1ZXLmQO5YcQIIGiW2ChG+xLl8FPkjMfZ43t/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757402608; c=relaxed/simple;
-	bh=9GIA2BFF5eLSy6mrBzqSFzk5Ex1qE7rhRRN0WvjbZTE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lcwT/9/9J0kEVW2tR0F1zqlQ5ykEtGEdAb43EmUxAVFuuPQ4/lS4TDk11bxDwAOtWn3t8+LUvwxRAoZ3S1ZrDvBL/3rtZH7UtbqrIJnRTfkocMSvL0/pp9oRD/MGxhXrJeLWC7lHsR2XOVrFkpGqNhg0PviWTxmO5z83K7xjHVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ieUbXtZP; arc=none smtp.client-ip=209.85.208.74
+	s=arc-20240116; t=1757402681; c=relaxed/simple;
+	bh=zf5g9JVbffHwDWLfAsqx3YYCXepP/f3rF8cm6T8Oh1I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bpfqRCFGw2RO7JzTBAFqsLvPbjC3qFU3vxmOkIdSw+zsnm+oHBYDsTdeJM1qZK+fcanIU+1KyzGBtSqQycOGVw2oUzPY40V/Ln057vpwQ8GkLBqPZa4jRLT421B89Veg84CCjLkQ6utJB67xAEg2oHW613qDqkdnSE5OlwWYLVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ooks1ANK; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ieUbXtZP"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-627eaf68bbfso2888619a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 00:23:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ooks1ANK"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45cb6d8f42bso50224425e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 00:24:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757402605; x=1758007405; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1757402678; x=1758007478; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=txk6Ntr1OB9E+08Z6A0ZYjiGrZLcfjKX3b0L/eGpWQ4=;
-        b=ieUbXtZP0Zj1Q7QUcIrQCl8AvIghPrD/Z2j2bFx9cqd3LuwF8fesCZp7rNQzzDi4K/
-         dStXp/+xCaTzdiXc4geG8jnIYq2fVnCco7CamO4MbclbzPfbhBKW9ZyCTZOhC6aAWzth
-         xiCJXR8n08hxhphB3zwLV82BspWej4N8APy42YWqojEywawzvBDfro89fNXPZLt802hO
-         phSn+Ty+/w57nQ3pY490Z0kYDIrBxZzMcgw4J6zeGr2s5h4fiwcYPtQiSeh8jcKiPcF4
-         khYWrj+e6aepv90H7sLQ8fR1k63s4pRceb8WossqX6LfXQSdnKbnhIeKcMQE/n+eEi4k
-         yzYg==
+        bh=4jsEz9fgJmk0ksX4kLPAefA4ve+DQm6tpFhq1fTW05k=;
+        b=Ooks1ANKV60F/SZ64iBo0gqkphZ29AJquYz6ISiJkew7njvVVISKjFmyj32D5cK1PD
+         7QsFdBXIi4ApgN5HyO1qqiCX16gG4nCEJ1MHuh30SiohPZ87hp4RtpZMoiaWhh4ogLxB
+         Im7V0t4oY89Oh4ACjckXEwyUtyq4AmmD0xbLw6/KE4tl/h7xPUxDaiXMzAfnR1ZMydt1
+         MnpXA27IGeE3I7FzASDl5OLc84zrRID0f9+4CENvGmoIvRSo1Dtd94YVh4jYh9G/T6HW
+         0nxWyV7Ts9fvEQB4Qp7Y4HSK9N3HpI7IHjb7nYL5DE15s/MbwSBUEa7RV3gWMZ6bfN3R
+         FOqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757402605; x=1758007405;
+        d=1e100.net; s=20230601; t=1757402678; x=1758007478;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=txk6Ntr1OB9E+08Z6A0ZYjiGrZLcfjKX3b0L/eGpWQ4=;
-        b=DDKEiv+SR8xjajadMQD+tjBO2vC59pZ1p4QPlmVYTgucXPKP5pyMEGWnXBcl7C7xz6
-         gQQWVJ8ctnsnOjQ3Z7+qEwKlm7i8T88/pZBmX2mQqafRIGu7idPYcZpnIG87BLrvc+ru
-         CdiRKE6EtrVPUi3A+Vzi73p1zh7xfTA0LEcSVSJUxKzNCUuUJQgjWh9vhtlHBtpUXoQI
-         o+Y1g+i2ccAQhm6Ghmy1hWJ3U5eTqUPOXhvuyGGnDtVZ+f7OZTBiSblaqM6fMKI9n3N2
-         vLRQRrmsnvww1Q4MlfbziIrIjJL90RlwflYJppFqkGwTcPWlujPkcE9hpekEun9KygyZ
-         8jrA==
-X-Gm-Message-State: AOJu0YyWPVNl5RmeV8fbEJwWXI6nrOr3phScYx5gFN0jWHldYHud0n9P
-	5AFToQI0jgXSe/fORVQyyWL8Crf20XRWNQaJjkL8slZTVByhP58ANs7MpeFC1M2mbvIAoFZCmt0
-	D9zNyBxX7IzHTQrnb/siyoE93FGsoACXmEyMs7mMFGQ8wn14XD3W5ThzpHQCpe5FNj1wTyzCwP+
-	E9+I2wIVU+Z0c4Z0fuZUMx7Ssu/xGs6IU=
-X-Google-Smtp-Source: AGHT+IE31mnI8tt35OKxh/bw5AtNubsZRR5apcr5fYboVoXcoTobk7h9dG7B1/QBDvJejQNdbu0DvRO4TA==
-X-Received: from edbin10.prod.google.com ([2002:a05:6402:208a:b0:618:3425:80bd])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:4416:b0:626:d96d:c0bb
- with SMTP id 4fb4d7f45d1cf-626d96dc3e8mr8167866a12.9.1757402604824; Tue, 09
- Sep 2025 00:23:24 -0700 (PDT)
-Date: Tue,  9 Sep 2025 08:23:20 +0100
+        bh=4jsEz9fgJmk0ksX4kLPAefA4ve+DQm6tpFhq1fTW05k=;
+        b=t6KheVl9IpAthLmewHaYtY9Sap388mIdp0MhXMNwH1WPtcRz8vuS5F6c/ARHllqUOT
+         Ce110GaBRVPVfglwsxuaE+mxj0Fej65Qs3b6z9LIbN+1xzLJ0T9wyu5T94LAcEbBVAos
+         wpA+33406b7q5ALO9bhSG8tiMmoKoIQUQN3VuB9Q3Q8iqpij805UP/ztRGPIelHUCZjG
+         JTCGFx2MXSXBACbCgFIiDR+2OMCVTVfUBQaIEVAZMQ8iz/7yg4tYzjFPkVahOgeXOOb8
+         WdwiP1ZfglDMcFLMEtw0yyPl6fFilNTtT5KnQlcFAT/jO7bl4GEhElSAv/vwKE4Gwvkz
+         Irdw==
+X-Gm-Message-State: AOJu0Ywq9plCgd2u41G9nyjYWIBN35w9WZEMHKk3TWYzk6lVyKONijZ0
+	wFkljg/2+Vwy+BCEiRVY7xZcmGLBoBR1lHphLTwlk+Tt4mhy4+Nch8GmGDM0twUhTEE+7kKMK88
+	tOB/ZVXWwoS+pw9MyoatKfKfIISHwfOp2kg81FZk2vDGLq+mCeDVWxgsHC8lD1fj7+ndKc5u8VW
+	4HImtM78/S+Xt+oZFNBlhYfZ/n6vCRcdg=
+X-Google-Smtp-Source: AGHT+IEJrT7+VCqOsjnlAYQHGj+Hsu9QmUjEOE0MGoJ33in3RdQuQRwfShGEQa2Lrq6j1uzXWgMfX9wydA==
+X-Received: from wmbei18.prod.google.com ([2002:a05:600c:3f12:b0:458:bdde:5c9b])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:5493:b0:45d:98be:ee9e
+ with SMTP id 5b1f17b1804b1-45ddde6a3f0mr85599835e9.1.1757402677896; Tue, 09
+ Sep 2025 00:24:37 -0700 (PDT)
+Date: Tue,  9 Sep 2025 08:24:27 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,9 +56,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250909072323.4106202-1-tabba@google.com>
-Subject: [PATCH v3 0/3] arm64: sysreg: Fix sysreg field definitions and
- generation script
+Message-ID: <20250909072437.4110547-1-tabba@google.com>
+Subject: [PATCH v4 0/9] KVM: arm64: Reserve pKVM VM handle during initial VM setup
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -68,49 +67,82 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	smostafa@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The sysreg definitions file has a few errors. In Enum Security,
-NSACR_RFR is set to 0b0001 instead of the spec value of 0b0010.
-Additionaly, the sign of the Enums DoubleLock and EIESB are wrong
-(should be Signed and Unsigned, respectively).
+Changes since v3 [1]:
+- NOTE: only the last patch (9/9) has changed.
+- Fix bug reported by Mark [2]. The existing call to pkvm_init_host_vm()
+  wasn't gated by protected mode being enabled, unlike the call to
+  pkvm_destroy_hyp_vm(). This imbalance caused failures in non-protected
+  mode, especially when creating and destroying multiple VMs. Tested
+  with kvm demand_paging_test using nvhe, vhe, and protected.
+- Rebase on Linux 6.17-rc5
 
-Moreover, the file has some redundant definitions, e.g.,
-RCWSMASK_EL1. While these redundant definitions are not wrong per se,
-they add unnecessary code into the generated header file and could be a
-source of future bugs.
+All VMs in pKVM identified by their handle, a unique per-VM ID. This
+handle is shared between the host kernel and the hypvervisor, and used
+to track the VM across both.
 
-Fix the Enums and remove the redundant Sysreg definitions.
+In pKVM, this handle is allocated when the VM is initialized at the
+hypervisor, which is on the first vCPU run. However, the host starts
+initializing the VM and setting up its data structures earlier. MMU
+notifiers for the VMs are also registered before VM initialization at
+the hypervisor, and rely on the handle to identify the VM [3].
+Therefore, there is a potential gap between when the VM is (partially)
+setup at the host, but still without a valid pKVM handle to identify it
+when communicating with the hypervisor.
 
-To reduce the chance of this happening in the future, add validation to
-the sysreg header generation script. I didn't want to go overboard with
-validation, so I only added validation that would catch most of the
-errors that I've seen, which also are errors that wouldn't generate a
-build error later on.
+Additionally, in the future, the host needs to communicate with
+TrustZone about the before the VM first run. Therefore, move handle
+creation to when the VM is first initialized at the host.
 
-Changes since v2 [1]:
-- Added patch that fixes field sign definitions for DoubleLock and EIESB
-- Removed whitespace fixes from first patch, since there are more
-  inconsistent whitespace use in the file, and fixing it all would lead
-  to too much churn.
-- Collected Reviews/Acks
-- Rebased on 6.17-rc3
+This patch series also takes the oportunity to do some refactoring
+(mostly renaming and fixing documentation) of the code. We are in the
+process of upstreaming pKVM. Refactoring this code now would generate
+less churn than postponing it, as the upstreamed codebase grows.
+Moreover, the exsiting names and documentation are at best misleading
+(and in cases actually wrong), which could lead to more confusion and
+problems reviewing code in the future.
+
+This patch series is divided into two parts:
+
+- Patches 1-5: Renaming, refactoring, and tidying up to lay the
+  groundwork for moving handle initialization and to fix existing
+  issues.
+- Patches 6-9: Decouple handle creation from VM initialization at the
+  hypervisor and move the handle creation to VM initialization at the
+  host.
 
 Cheers,
 /fuad
 
-[1] https://lore.kernel.org/all/20250813164506.1203851-1-tabba@google.com/
+[1] https://lore.kernel.org/all/20250827101949.4089456-1-tabba@google.com/
+[2] https://lore.kernel.org/all/1a248f14-60f2-4f8f-8b4d-3c63e602fd54@sirena.org.uk/
+[3] https://lore.kernel.org/all/20250303214947.GA30619@willie-the-truck/
 
-Fuad Tabba (3):
-  arm64: sysreg: Fix and tidy up sysreg field definitions
-  arm64: sysreg: Correct sign definitions for EIESB and DoubleLock
-  arm64: sysreg: Add validation checks to sysreg header generation
-    script
+Fuad Tabba (9):
+  KVM: arm64: Add build-time check for duplicate DECLARE_REG use
+  KVM: arm64: Rename pkvm.enabled to pkvm.is_protected
+  KVM: arm64: Rename 'host_kvm' to 'kvm' in pKVM host code
+  KVM: arm64: Clarify comments to distinguish pKVM mode from protected
+    VMs
+  KVM: arm64: Decouple hyp VM creation state from its handle
+  KVM: arm64: Separate allocation and insertion of pKVM VM table entries
+  KVM: arm64: Consolidate pKVM hypervisor VM initialization logic
+  KVM: arm64: Introduce separate hypercalls for pKVM VM reservation and
+    initialization
+  KVM: arm64: Reserve pKVM handle during pkvm_init_host_vm()
 
- arch/arm64/tools/gen-sysreg.awk | 20 ++++++++++++++++++++
- arch/arm64/tools/sysreg         | 18 +++++-------------
- 2 files changed, 25 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h              |   2 +
+ arch/arm64/include/asm/kvm_host.h             |   5 +-
+ arch/arm64/include/asm/kvm_pkvm.h             |   1 +
+ arch/arm64/kvm/arm.c                          |  14 +-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   4 +-
+ .../arm64/kvm/hyp/include/nvhe/trap_handler.h |   3 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  14 ++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 177 +++++++++++++-----
+ arch/arm64/kvm/pkvm.c                         |  76 +++++---
+ 9 files changed, 221 insertions(+), 75 deletions(-)
 
 
-base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
+base-commit: 76eeb9b8de9880ca38696b2fb56ac45ac0a25c6c
 -- 
-2.51.0.338.gd7d06c2dae-goog
+2.51.0.384.g4c02a37b29-goog
 
