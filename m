@@ -1,136 +1,71 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.hostedemail.com (smtprelay0014.hostedemail.com [216.40.44.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5548346A1E
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 13:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3502D22D4F6
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 13:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757425006; cv=none; b=c3ApC1ZYFWsRgqShIWmFsNNH2zFsiNZY8Zj9KvnwRc++rJVTVgJoHPh24cNMeBo+NuhPUQRU5dywdqZBaUEsMcUOm+s+RUm3v/zogNfteuxwp2SA+QjGZ957B/66aLBg3kPa+jDZ3w4bLJPwIDTMY+K3l5vousTJyadC3QpQYrA=
+	t=1757425604; cv=none; b=SUIjLnWBP+1tWePmeVdydrSeoJukCQrqRDw+hbB++m/6PXdx6Qte8E4mhZXuL2Wq/EC6X8j9b1MpMYGq1O2tkk7sF/C1VpIJM/cxp/r06lknQkXBlmn1uMCRSWnFX8/RBbZshDNFdOM3T12qxUT90o6OqblID9Lud7RPpyhkA/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757425006; c=relaxed/simple;
-	bh=s+LTaxCdkbtafjfpxFbMtUJbb49yFD25c+tR5bvUCJA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jZgRBywX9eDzvnE36N1x2sbfsXN9Inz+VvuXGvyIgCJLqD2xdJqPKTNFg+FHMhxcDzT7YONZtTUnewO8uIBCRuCvipL2VekcP8eFOrwTNsDK9Magkm8zPmXthX06ceXJJO7MVucNlRAJBSZzhqn3v5871KtmYEOOooSUtqgGZBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zxwiWfrA; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zxwiWfrA"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3df9f185b82so2412725f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 06:36:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757425003; x=1758029803; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=owMpJomD9HktZXrYn67PIBgyXHZh+dj149j6UZF5idE=;
-        b=zxwiWfrA8htNwnf3EutgCMVqBfSDVz3owV7Q+XEa5fNjlw3svM62f4ddkwlvlX6rxK
-         O35SnnCgp+cw+JWFd/cJMrXdlEAP2TpaM8yx4g6fMgPDSzvx6T3KO6KbO+3EBKPE3Nok
-         1byo4M9mxCQCU6svYAvJYhf75Ws1PbA0kxzHivGvHEYYPmtTExzkBzmPDvMJxen+Wc4F
-         2wzwQC95NjzxbWV8OZjS1xDMNn62Q/9CAZ+0yvApDoQ22fXE930AwtA3YewOT3MH5p/9
-         r6D3Ci7KfQ/pC5jBbPLX651Z/yP0wdvesYQcHxRzh/pf2Z2oRWFFPC8e3w+bRvAAbQ90
-         np8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757425003; x=1758029803;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=owMpJomD9HktZXrYn67PIBgyXHZh+dj149j6UZF5idE=;
-        b=pbtWyZ+USX+Oy4td4laP3gNzliMNYbPxyquEkY5ix87BG2bfjdfYOrZ9/meQqfRtnH
-         lksV0z+KlM4QVJhnL7RqSzwPDgqezRBMPZppvCbmYfSxEl23lllNc8ikJklQPyI55wMX
-         8k20h4ZriZOjZCeAHtVnpytM3ZAClGiqwjI4dKQbUaE+IwMLlOqDz3LzZqAep7rwDfC/
-         05FzLN6LvW58pKlW7lOMo7ZWz23JFQREkLWanen7PheiV65ffN36ZgBF3CSs3j9CjMUU
-         P6UBj2apioT/Fl3UTSnMNuPOo9XDD7byChlFsWEI2oT5PioxE3Q/QHtLvXmCu7Cfc+/B
-         9JTA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2qPZm8Pi6QNp4j789UrR3SSels3mbqAaPuyaQoDDJ/FhH6pYXdk8AbPct3LIdGjmPdfkdh84=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyjE9HyqOjFWq0f2AsAnxdFkCAjjLROCdr2V7GMhMlHZcn6PNC+
-	bFuEEo4ZgCTX1VrRKroVPPwlUzlm4N9nw+AcR71osZjtUMXBjZolAS3z2tjOWGRMG9UlacdOunO
-	jlsTwl1gaaQ9gCw==
-X-Google-Smtp-Source: AGHT+IFb5uZ+yXEAm2ul5d4u0zb6FcIArGntIYWXEsNgKuqjWpTpJjl0OgQdZTnmi211wUNW182dBv2tNknMLA==
-X-Received: from wrbfq12.prod.google.com ([2002:a05:6000:2a0c:b0:3db:2c3c:8268])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a5d:64c9:0:b0:3c9:b8b7:ea4e with SMTP id ffacd0b85a97d-3e637370e00mr9580515f8f.19.1757425003090;
- Tue, 09 Sep 2025 06:36:43 -0700 (PDT)
-Date: Tue,  9 Sep 2025 13:36:31 +0000
-In-Reply-To: <20250909133631.3844423-1-smostafa@google.com>
+	s=arc-20240116; t=1757425604; c=relaxed/simple;
+	bh=zXP0vgpsslX+xoM+R5u5Z8Qq+cPpKOIF09oVF2DyXdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gsCMP/BQ8Q2bC8XCmaejNgcmyxB3iElh0+Q6xaRA4OjRn72wj2C/H2uy4IY3u0SgRm9ivOrvyS4uRUaU7ilUf7klD3c8x9R6kaciHEnTahYIAgYXdn8pttht0tzrNfz6H5tRfR2HVcPbKqnrZUtkxBFGvtYOYaMmzWFP7dVH7aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf20.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay05.hostedemail.com (Postfix) with ESMTP id 324285951B;
+	Tue,  9 Sep 2025 13:39:44 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf20.hostedemail.com (Postfix) with ESMTPA id 900C62002A;
+	Tue,  9 Sep 2025 13:39:40 +0000 (UTC)
+Date: Tue, 9 Sep 2025 09:40:28 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ aneesh.kumar@kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 04/24] tracing: Add reset to trace remotes
+Message-ID: <20250909094028.3265b751@gandalf.local.home>
+In-Reply-To: <aMAZMaZJ1_Eny5Ku@google.com>
+References: <20250821081412.1008261-1-vdonnefort@google.com>
+	<20250821081412.1008261-5-vdonnefort@google.com>
+	<20250908193757.079aae76@gandalf.local.home>
+	<aMAZMaZJ1_Eny5Ku@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250909133631.3844423-1-smostafa@google.com>
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250909133631.3844423-3-smostafa@google.com>
-Subject: [PATCH v2 2/2] KVM: arm64: Map hyp text as RO and dump instr on panic
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, perret@google.com, keirf@google.com, 
-	Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 900C62002A
+X-Stat-Signature: wfa3mdrmcbzi14spidjppaqea6aw3qp1
+X-Rspamd-Server: rspamout02
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1+E8T0HTQskMKNFMQEhwq4iyvDU75kvHts=
+X-HE-Tag: 1757425180-933823
+X-HE-Meta: U2FsdGVkX1+Wwks7b6yVoepNeV7TOzWudjuaDH2HvpSyApAYLfX3FbQwoINlsSIJNvKZcFkkzCa70xLZ8yV4M3RgoVBTMxN5wkAN4Tvsgw8YtAsvBOUnzzaGQoIagJtU8jlbuWu7YwTn4neLH9QVlsUmEnxOFj+Ce+XWBl2YeuaS2Co2nBtPDT2dppC4tUtOJR/BNg+CfKupetaSNKi+SIEiMtMc+wVlYX5nkohak+WdMCO/O577kVmfRGQBv0yYCqWaEXG1hBinQi1qPSUlt1pVhygCIsWRDJWGDRHVLOLUYn/A+q+kGxNNxzOWFpeRPlmy68ip0z5ZjM1JDFzumCv8TLnOFVx7
 
-Map the hyp text section as RO, there are no secrets there
-and that allows the kernel extract info for debugging.
+On Tue, 9 Sep 2025 13:10:25 +0100
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-As in case of panic we can now dump the faulting instructions
-similar to the kernel.
+> > I wonder if we should name the file "reset" to not be confusing to users
+> > when they cat the file and it doesn't produce any output.  
+> 
+> My idea was to keep the exact same interface as the rest of the tracing. I could
+> keep that /trace file for compatibility and add /reset?
+> 
+> "cat trace" could also just returns a text like *** not supported *** ?
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
-Acked-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/handle_exit.c    |  4 +---
- arch/arm64/kvm/hyp/nvhe/setup.c | 12 ++++++++++--
- 2 files changed, 11 insertions(+), 5 deletions(-)
+If it's never going to be supported, I rather not add it. It not being
+there is a sure way of knowing it's not supported. Just adding it because
+the normal system has it is actually worse if it doesn't behave the same.
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 99a8205fc104..d449e15680e4 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -560,9 +560,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 	kvm_nvhe_dump_backtrace(hyp_offset);
- 
- 	/* Dump the faulting instruction */
--	if (!is_protected_kvm_enabled() ||
--	    IS_ENABLED(CONFIG_NVHE_EL2_DEBUG))
--		dump_kernel_instr(panic_addr + kaslr_offset());
-+	dump_kernel_instr(panic_addr + kaslr_offset());
- 
- 	/*
- 	 * Hyp has panicked and we're going to handle that by panicking the
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index a48d3f5a5afb..90bd014e952f 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -192,6 +192,7 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	enum pkvm_page_state state;
- 	struct hyp_page *page;
- 	phys_addr_t phys;
-+	enum kvm_pgtable_prot prot;
- 
- 	if (!kvm_pte_valid(ctx->old))
- 		return 0;
-@@ -210,11 +211,18 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	 * configured in the hypervisor stage-1, and make sure to propagate them
- 	 * to the hyp_vmemmap state.
- 	 */
--	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(ctx->old));
-+	prot = kvm_pgtable_hyp_pte_prot(ctx->old);
-+	state = pkvm_getstate(prot);
- 	switch (state) {
- 	case PKVM_PAGE_OWNED:
- 		set_hyp_state(page, PKVM_PAGE_OWNED);
--		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
-+		/* hyp text is RO in the host stage-2 to be inspected on panic. */
-+		if (prot == PAGE_HYP_EXEC) {
-+			set_host_state(page, PKVM_NOPAGE);
-+			return host_stage2_idmap_locked(phys, PAGE_SIZE, KVM_PGTABLE_PROT_R);
-+		} else {
-+			return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
-+		}
- 	case PKVM_PAGE_SHARED_OWNED:
- 		set_hyp_state(page, PKVM_PAGE_SHARED_OWNED);
- 		set_host_state(page, PKVM_PAGE_SHARED_BORROWED);
--- 
-2.51.0.384.g4c02a37b29-goog
-
+-- Steve
