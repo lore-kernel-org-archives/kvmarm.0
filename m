@@ -1,85 +1,116 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5D023816C
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 07:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7021F30A4
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 07:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757402183; cv=none; b=DelUtgaPEPzE6IkFOJmacuNa/fg6RreQv6A6fQ8B5uR5ley9CREBu4fQPhMHd8xbiOTAJX7kPUrxXjc5tAyDrbvlMUejfgR9l7hfWSmZ/gaBMcYCVHT1PCVOwrR82AFWUd+YU49qjfZ62zIs7vF08VVY0B1A7yZXTAuKQigjWu8=
+	t=1757402608; cv=none; b=KGOCsYX7+7EDXUah0gVGi+LCYf7yGlRQk2KQf+TDbDqtaXMoa2sosW8tt12Jhg4BfoBYmqOkh/d5t+PSinkSa6bId7dLBXN7s1iAtc67YKyq2nSsR1R9uTJRHMLr8T16DqTCm0IK+dhIgPTf9o6Bieu3IxaB1zyPwB6n2DVcoqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757402183; c=relaxed/simple;
-	bh=sDjq4b6RUDNx5PxefChkphpWI4opbuKhZaYVauVO2Aw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rhNOhQ9PSt/TWsDwuQoz5h7ynY7pHAiaIpVlhw3qKtAE89/r3VOtKAIxUG2g+rqEuZxjMFJBCOy0+KAzxpHQjEWvnzYDp3te+7FfHNFmfLxwO+cnLUToWSI1IFF2WzBhhFopQhkSjpgGR8/7Z47M4t8xgZ04cLXL3liiKz8NrRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mHXUoeS5; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1757402608; c=relaxed/simple;
+	bh=9GIA2BFF5eLSy6mrBzqSFzk5Ex1qE7rhRRN0WvjbZTE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lcwT/9/9J0kEVW2tR0F1zqlQ5ykEtGEdAb43EmUxAVFuuPQ4/lS4TDk11bxDwAOtWn3t8+LUvwxRAoZ3S1ZrDvBL/3rtZH7UtbqrIJnRTfkocMSvL0/pp9oRD/MGxhXrJeLWC7lHsR2XOVrFkpGqNhg0PviWTxmO5z83K7xjHVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ieUbXtZP; arc=none smtp.client-ip=209.85.208.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mHXUoeS5"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757402174;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=58/WQwUKjO1Bhr+jt1G0I0MHn6q79XTAHx7VecDSibk=;
-	b=mHXUoeS5c8kh0MRoVsCo73XuBh/ukOynhMKdnlboO6eirIRjE//yDbxh7bkSPvVOVyRM0s
-	EvaxCygrQDadcRNycvYwNjVcXJCZ43uRZ8U11CwQa1cWCx8ESU/5UiOGs4hs+Rt/bl5CrE
-	7BFszsLpApAvQPmuH1/uyhKOBH8Ywyk=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jinqian Yang <yangjinqian1@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: nv: Exclude guest's TWED configuration when TWE isn't set
-Date: Tue,  9 Sep 2025 00:16:02 -0700
-Message-Id: <20250909071602.294783-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ieUbXtZP"
+Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-627eaf68bbfso2888619a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 00:23:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757402605; x=1758007405; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=txk6Ntr1OB9E+08Z6A0ZYjiGrZLcfjKX3b0L/eGpWQ4=;
+        b=ieUbXtZP0Zj1Q7QUcIrQCl8AvIghPrD/Z2j2bFx9cqd3LuwF8fesCZp7rNQzzDi4K/
+         dStXp/+xCaTzdiXc4geG8jnIYq2fVnCco7CamO4MbclbzPfbhBKW9ZyCTZOhC6aAWzth
+         xiCJXR8n08hxhphB3zwLV82BspWej4N8APy42YWqojEywawzvBDfro89fNXPZLt802hO
+         phSn+Ty+/w57nQ3pY490Z0kYDIrBxZzMcgw4J6zeGr2s5h4fiwcYPtQiSeh8jcKiPcF4
+         khYWrj+e6aepv90H7sLQ8fR1k63s4pRceb8WossqX6LfXQSdnKbnhIeKcMQE/n+eEi4k
+         yzYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757402605; x=1758007405;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=txk6Ntr1OB9E+08Z6A0ZYjiGrZLcfjKX3b0L/eGpWQ4=;
+        b=DDKEiv+SR8xjajadMQD+tjBO2vC59pZ1p4QPlmVYTgucXPKP5pyMEGWnXBcl7C7xz6
+         gQQWVJ8ctnsnOjQ3Z7+qEwKlm7i8T88/pZBmX2mQqafRIGu7idPYcZpnIG87BLrvc+ru
+         CdiRKE6EtrVPUi3A+Vzi73p1zh7xfTA0LEcSVSJUxKzNCUuUJQgjWh9vhtlHBtpUXoQI
+         o+Y1g+i2ccAQhm6Ghmy1hWJ3U5eTqUPOXhvuyGGnDtVZ+f7OZTBiSblaqM6fMKI9n3N2
+         vLRQRrmsnvww1Q4MlfbziIrIjJL90RlwflYJppFqkGwTcPWlujPkcE9hpekEun9KygyZ
+         8jrA==
+X-Gm-Message-State: AOJu0YyWPVNl5RmeV8fbEJwWXI6nrOr3phScYx5gFN0jWHldYHud0n9P
+	5AFToQI0jgXSe/fORVQyyWL8Crf20XRWNQaJjkL8slZTVByhP58ANs7MpeFC1M2mbvIAoFZCmt0
+	D9zNyBxX7IzHTQrnb/siyoE93FGsoACXmEyMs7mMFGQ8wn14XD3W5ThzpHQCpe5FNj1wTyzCwP+
+	E9+I2wIVU+Z0c4Z0fuZUMx7Ssu/xGs6IU=
+X-Google-Smtp-Source: AGHT+IE31mnI8tt35OKxh/bw5AtNubsZRR5apcr5fYboVoXcoTobk7h9dG7B1/QBDvJejQNdbu0DvRO4TA==
+X-Received: from edbin10.prod.google.com ([2002:a05:6402:208a:b0:618:3425:80bd])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:4416:b0:626:d96d:c0bb
+ with SMTP id 4fb4d7f45d1cf-626d96dc3e8mr8167866a12.9.1757402604824; Tue, 09
+ Sep 2025 00:23:24 -0700 (PDT)
+Date: Tue,  9 Sep 2025 08:23:20 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250909072323.4106202-1-tabba@google.com>
+Subject: [PATCH v3 0/3] arm64: sysreg: Fix sysreg field definitions and
+ generation script
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, broonie@kernel.org, vdonnefort@google.com, 
+	qperret@google.com, sebastianene@google.com, keirf@google.com, 
+	smostafa@google.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-KVM blindly OR's the guest values for TWEDEL and TWEDEn into the
-programmed value even if the guest has WFE traps disabled. Exclude these
-fields from the final value when TWE isn't set to avoid potentially
-delaying a trap desired by the host.
+The sysreg definitions file has a few errors. In Enum Security,
+NSACR_RFR is set to 0b0001 instead of the spec value of 0b0010.
+Additionaly, the sign of the Enums DoubleLock and EIESB are wrong
+(should be Signed and Unsigned, respectively).
 
-Note that KVM doesn't use FEAT_TWED currently so there's no need to
-empty out these fields the other way around (i.e. host TWE=0, guest
-TWE=1).
+Moreover, the file has some redundant definitions, e.g.,
+RCWSMASK_EL1. While these redundant definitions are not wrong per se,
+they add unnecessary code into the generated header file and could be a
+source of future bugs.
 
-Fixes: 04ab519bb86d ("KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2")
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/hyp/vhe/switch.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Fix the Enums and remove the redundant Sysreg definitions.
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 0998ad4a2552..e4955b49c0d2 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -95,6 +95,13 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
- 			/* Force NV2 in case the guest is forgetful... */
- 			guest_hcr |= HCR_NV2;
- 		}
-+
-+		/*
-+		 * Exclude the guest's TWED configuration if it hasn't set TWE
-+		 * to avoid potentially delaying traps for the host.
-+		 */
-+		if (!(guest_hcr & HCR_TWE))
-+			guest_hcr &= (HCR_EL2_TWEDEn | HCR_EL2_TWEDEL);
- 	}
- 
- 	BUG_ON(host_data_test_flag(VCPU_IN_HYP_CONTEXT) &&
+To reduce the chance of this happening in the future, add validation to
+the sysreg header generation script. I didn't want to go overboard with
+validation, so I only added validation that would catch most of the
+errors that I've seen, which also are errors that wouldn't generate a
+build error later on.
 
-base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
+Changes since v2 [1]:
+- Added patch that fixes field sign definitions for DoubleLock and EIESB
+- Removed whitespace fixes from first patch, since there are more
+  inconsistent whitespace use in the file, and fixing it all would lead
+  to too much churn.
+- Collected Reviews/Acks
+- Rebased on 6.17-rc3
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20250813164506.1203851-1-tabba@google.com/
+
+Fuad Tabba (3):
+  arm64: sysreg: Fix and tidy up sysreg field definitions
+  arm64: sysreg: Correct sign definitions for EIESB and DoubleLock
+  arm64: sysreg: Add validation checks to sysreg header generation
+    script
+
+ arch/arm64/tools/gen-sysreg.awk | 20 ++++++++++++++++++++
+ arch/arm64/tools/sysreg         | 18 +++++-------------
+ 2 files changed, 25 insertions(+), 13 deletions(-)
+
+
+base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
 -- 
-2.39.5
+2.51.0.338.gd7d06c2dae-goog
 
