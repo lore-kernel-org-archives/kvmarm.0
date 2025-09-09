@@ -1,55 +1,55 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186742FB093
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 07:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50101F30A4
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 07:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757402684; cv=none; b=IO2Kto0MpIVw/EY4ZyP3rpn6gUeZ4/IwhcegrmbYpXaX1m+L6DeKjZX3MnrtMP40Knzd5TV2QGibmF0HTwebx/dl2RscVNpepLa+vbslRNT+7btEFguYY1tIUcRNuSPE7oG9D8A9K/RvIzk7GxorF5fEJrBLZCsVz+P1AaAA45Y=
+	t=1757402685; cv=none; b=kZMi96R+fFktHcxdiX9V/te18CXKd6aC7Pq8CMXW42zVOCzYNWm3PZ5RzwO51BxrzUr4oIK1orE3kPlnkkPh1wB7bXOdVmpiPMU0RE6CM4j77jv2IYTzq7SCy689gCiXKUBUqNaU3FzA8M4zSxBOS45DLRKXyraN4DPjdbNzLOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757402684; c=relaxed/simple;
-	bh=tUXW+ofNiz02CW8EFmgp/f4HbVtSlArr7sqc/GZq5NM=;
+	s=arc-20240116; t=1757402685; c=relaxed/simple;
+	bh=NNTpI0u22oVkD7h+kLi+/tr1S1zVt1I28+NqnEvbbSw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JbA9qGAOhkEQN6a1egfeCYhtjLptRbfVSMBDnXZMLyBnr03puMro3XXH9BgxAAQjTWRqGkcRVMr91ofY16RcpjaDEo99U8sg/Xqox8yePDjgfNOIL0y3aQKv45y4/zPlPTFgaRHGRqlWRWI8R4tf5H+b2neYAtIR0Luv8imPSYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qproW7Ac; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=SemcKJgxt9X6zMYa0Xu3QNP7UOlysJoB0t6R9DlhaC0+ZH9jl5dNZXOaJJXDmgl5SuC6gYSP/aYBUQ0kzyK9vdVlc0QcwiUIC5vt4vAZADbRgaTGlRTYTUFy/KLMII31ch0uNy7F92nC4gstdgdVui9XatBvuEpkkCH/9Vb37Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bpQ0r3wO; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qproW7Ac"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3e61deaf253so1997840f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 00:24:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bpQ0r3wO"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45b98de0e34so40844555e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 00:24:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757402681; x=1758007481; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1757402682; x=1758007482; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fpuaZWpwHD1IZjAGpdSGgFXSAYCuUUsJNgHSlQWyn4Y=;
-        b=qproW7Ac+kTRMog+luWB9/8QxDZYLQhx7Hhimvifsnwv9vTcoQY3ThiB6VZW7WvUO/
-         sYI863Qiraezv1N22XRdI6byfWKKIlOVK4WOc/3slZLKPLKS2iQrqRPy24WdSuqQ34c2
-         8z09gdTIV9N4LdHLIjBFHOsC1qWK3Sq3KJdrmDRgsEEHOEQBoy1FdGol/ShX3osQwC36
-         PTm952kilxeYPbNqaWrtPQeBZ/nGOA6texyNAmC7mdblD5Uo8HJ95lt3cYCufzhNe3nM
-         bpq93BqpSwhw47h0/GUbCldU3L8+3w6sgoOZvDyE+1ih9hKSNdngSIr2ldm5nR4wEy2m
-         ycAA==
+        bh=XvS7suGai3RogclrAtRQ2NtllrH/ITXs0daVVO19SRk=;
+        b=bpQ0r3wOf5JCafvo31trWOg3EJaStDLFSywY6LO4vN+9NsE8/DFCuTKfLJWNJ7/eYg
+         8PEZ+idSRSYhK59oyBYQZ3W0abb5udSs2FNqlI4JBmUGmHv5mmszg9rNBI9ZDHJGTW2a
+         f70pLfZxZWx3Z7Ft00ZDXlq88mck2+f1XlM5X9rqSN6tUNmpJCfNFxllW5/WdDDz+9Pm
+         dnjhhkEYs41TazpPqFOoEO9MvIG9QVUD9VwE7e5aWYZ0pcJSNimorcNMK4OuVb8jAO4E
+         2FTf79NRzyQsgfgmriQHPKpMlevf7XY1cOrr4eTMBlDO8cnkhN+sSZip6zQJD4/0Q2DA
+         k+Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757402681; x=1758007481;
+        d=1e100.net; s=20230601; t=1757402682; x=1758007482;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fpuaZWpwHD1IZjAGpdSGgFXSAYCuUUsJNgHSlQWyn4Y=;
-        b=tZwpq514RbWxNIHybMQDaWvlAlpMdDK8laKMkA6d1Ku/S/i/mPoQanguUSdWE2NQmA
-         gwRhA8QGtyv6F06Dq6/whE6MtAZ0VpDnWoTBAkmKPe/S9Cq5POJ19YuQfeyOm0ENinx/
-         89OqfB0OOQTyLXMW9eJVhRK6WCtrCJjfMkKp4POZccoVchBk7N6ZALhLz6uvQ9PL31+L
-         95qW42LwbvTnllYGlDnheT1nUcIgk9sXKoVGEqh+v+MmfGYvyN3ObY1dJDyAszeuziUc
-         u06NAD1MxdR9U/2e7z/5/nj8ORLwT4GUKvjJexnuVfqEftTNL7LVn4efmrl4Dn++BvED
-         DRxA==
-X-Gm-Message-State: AOJu0Yz7+bpPLJGRwESxmebGEoYq5bz/tSzm+NdDTklLLwixws3kUnMK
-	1gKk4hcRO7Iiq4YJs6xGgQIJIOIxSFXWtEK0pXUnylP6qIs0SIUln9oWK887aA7PBiLN9/guX7l
-	2ZeVY+R+tGR7PTdAD9/MWgnqK/5p+xpmv1s+6X4FDhoaw52vv+ZlDDMEUk0eiS5O3jFougn0CVE
-	9fklI7h71ocQSrCILb3dpWnpCCi8G+QBk=
-X-Google-Smtp-Source: AGHT+IFpr4GL3PRIkEBqOVne0CX2qomut3PLzgU4knSILRFgs6WxJvoBwuEb6uQ71mFuNqingc6ATaNeaQ==
-X-Received: from wrtr3.prod.google.com ([2002:a5d:4e43:0:b0:3d4:dcf3:824d])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2203:b0:3dc:3b91:6231
- with SMTP id ffacd0b85a97d-3e636d8f8demr8014805f8f.12.1757402681337; Tue, 09
- Sep 2025 00:24:41 -0700 (PDT)
-Date: Tue,  9 Sep 2025 08:24:31 +0100
+        bh=XvS7suGai3RogclrAtRQ2NtllrH/ITXs0daVVO19SRk=;
+        b=kyUz+MfAiLeprQV30wuPqmAjWlrM46lEbjl/zlWTE9TRsD/Ia7GKlbewBL1IIp0ks5
+         tlm17W255jX+nyHq9fezUu75XQIPYG2o7y1AX2m9R4KoScAeTrEBs+TMutuLzMQG0P6H
+         /8f7B3jb+71MxGBV9NpUZmTnVJPQFdI7PzEs4ednmeHTAY2EOm0NY11Vh5kNGiiMrTrS
+         JLq11CXdtsj3VW4ax9Pcn6Ygc9xHPDmkzk/OzwuXOBAtHypkNhlVUx+Z+YUOMrt3DA7B
+         pHiu1lEf+uq03zZrgwZorGdkkqx6hB8KKeJXCzJwYrp/fvNycxN/L8v4Da37nd2F5Hn2
+         rEIw==
+X-Gm-Message-State: AOJu0YywhnUW0aBe4ivSzlUPwYAOANg/4f4Nx9IHOXt5cfLEfejItwsO
+	eTq2aAxcDqMiR6cdB2HHQijLsj7EfVqcc/mAfukk08R8u776nsHN0/3UEwRTxslowhOIYkytayu
+	f8qH6Vl8RlFeGpTz78C6FdMOXXbk1K1dOfCxOyM10jHWkCLZvJ/buuEwVfimUkHmutH2KDzW0c3
+	W7KcX+PvLG64wtWtc41Qf8Hj+RZAXZhV4=
+X-Google-Smtp-Source: AGHT+IGCQIIQO3QV9jVW7Oz8ZQmopDoADhxOWLjQ3E53XncqD6Lg+ss+CmkgZdMZsNfhbiDRQEOa0wFZjQ==
+X-Received: from wmbes11.prod.google.com ([2002:a05:600c:810b:b0:458:bf93:f0e1])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1987:b0:458:b01c:8f
+ with SMTP id 5b1f17b1804b1-45ddde8a55cmr115788295e9.8.1757402682154; Tue, 09
+ Sep 2025 00:24:42 -0700 (PDT)
+Date: Tue,  9 Sep 2025 08:24:32 +0100
 In-Reply-To: <20250909072437.4110547-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20250909072437.4110547-1-tabba@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250909072437.4110547-5-tabba@google.com>
-Subject: [PATCH v4 4/9] KVM: arm64: Clarify comments to distinguish pKVM mode
- from protected VMs
+Message-ID: <20250909072437.4110547-6-tabba@google.com>
+Subject: [PATCH v4 5/9] KVM: arm64: Decouple hyp VM creation state from its handle
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -71,121 +70,115 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	smostafa@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The hypervisor code for protected KVM contains comments that are
-imprecise and at times flat-out wrong. They often refer to a "protected
-VM" in contexts where the code or data structure applies to _any_ VM
-managed by the hypervisor when pKVM is enabled.
+Currently, the presence of a pKVM handle (pkvm.handle != 0) is used to
+determine if the corresponding hypervisor (EL2) VM has been created and
+initialized. This couples the handle's lifecycle with the VM's creation
+state.
 
-For instance, the 'vm_table' holds handles for all VMs known to the
-hypervisor, not exclusively for those that are configured as protected.
-This inaccurate terminology can make the code scope harder to understand
-for future (and current) developers.
+This coupling will become problematic with upcoming changes that will
+allocate the pKVM handle earlier in the VM's life, before the VM is
+instantiated at the hypervisor.
 
-Clarify the comments throughout the pKVM hypervisor code to make a clear
-distinction between the pKVM feature itself (i.e., "protected mode") and
-the VMs that are specifically configured to be protected. This involves
-replacing ambiguous uses of "protected VM" with more accurate phrasing.
+To prepare for this and make the state tracking explicit, decouple the
+two concepts. Introduce a new boolean flag, 'pkvm.is_created', to track
+whether the hypervisor-side VM has been created and initialized.
 
-No functional change intended.
+A new helper, pkvm_hyp_vm_is_created(), is added to check this flag. All
+call sites that previously checked for the handle's existence are
+converted to use the new, explicit check. The 'is_created' flag is set
+to true upon successful creation in the hypervisor (EL2) and cleared
+upon destruction.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 25 +++++++++++--------------
- 2 files changed, 12 insertions(+), 15 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/include/asm/kvm_pkvm.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/pkvm.c    |  1 +
+ arch/arm64/kvm/pkvm.c             | 11 +++++++++--
+ 4 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index ce31d3b73603..4540324b5657 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -29,7 +29,7 @@ struct pkvm_hyp_vcpu {
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7ad997dabddb..8ede884f091d 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -253,6 +253,7 @@ struct kvm_protected_vm {
+ 	struct kvm_hyp_memcache teardown_mc;
+ 	struct kvm_hyp_memcache stage2_teardown_mc;
+ 	bool is_protected;
++	bool is_created;
  };
  
- /*
-- * Holds the relevant data for running a protected vm.
-+ * Holds the relevant data for running a vm in protected mode.
-  */
- struct pkvm_hyp_vm {
- 	struct kvm kvm;
+ struct kvm_mpidr_data {
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 35f9d9478004..0aecd4ac5f45 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -18,6 +18,7 @@
+ 
+ int pkvm_init_host_vm(struct kvm *kvm);
+ int pkvm_create_hyp_vm(struct kvm *kvm);
++bool pkvm_hyp_vm_is_created(struct kvm *kvm);
+ void pkvm_destroy_hyp_vm(struct kvm *kvm);
+ int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu);
+ 
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 6198c1d27b5b..abe173406c88 100644
+index abe173406c88..969f6b293234 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -23,8 +23,8 @@ unsigned int kvm_arm_vmid_bits;
- unsigned int kvm_host_sve_max_vl;
+@@ -407,6 +407,7 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+ 	hyp_vm->kvm.created_vcpus = nr_vcpus;
+ 	hyp_vm->kvm.arch.mmu.vtcr = host_mmu.arch.mmu.vtcr;
+ 	hyp_vm->kvm.arch.pkvm.is_protected = READ_ONCE(host_kvm->arch.pkvm.is_protected);
++	hyp_vm->kvm.arch.pkvm.is_created = true;
+ 	hyp_vm->kvm.arch.flags = 0;
+ 	pkvm_init_features_from_host(hyp_vm, host_kvm);
+ }
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 358168572482..2138dbfcb04b 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -87,12 +87,13 @@ void __init kvm_hyp_reserve(void)
  
- /*
-- * The currently loaded hyp vCPU for each physical CPU. Used only when
-- * protected KVM is enabled, but for both protected and non-protected VMs.
-+ * The currently loaded hyp vCPU for each physical CPU. Used in protected mode
-+ * for both protected and non-protected VMs.
-  */
- static DEFINE_PER_CPU(struct pkvm_hyp_vcpu *, loaded_hyp_vcpu);
- 
-@@ -135,7 +135,7 @@ static int pkvm_check_pvm_cpu_features(struct kvm_vcpu *vcpu)
+ static void __pkvm_destroy_hyp_vm(struct kvm *kvm)
  {
- 	struct kvm *kvm = vcpu->kvm;
+-	if (kvm->arch.pkvm.handle) {
++	if (pkvm_hyp_vm_is_created(kvm)) {
+ 		WARN_ON(kvm_call_hyp_nvhe(__pkvm_teardown_vm,
+ 					  kvm->arch.pkvm.handle));
+ 	}
  
--	/* Protected KVM does not support AArch32 guests. */
-+	/* No AArch32 support for protected guests. */
- 	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL0, AARCH32) ||
- 	    kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL1, AARCH32))
- 		return -EINVAL;
-@@ -210,8 +210,8 @@ static pkvm_handle_t idx_to_vm_handle(unsigned int idx)
- DEFINE_HYP_SPINLOCK(vm_table_lock);
+ 	kvm->arch.pkvm.handle = 0;
++	kvm->arch.pkvm.is_created = false;
+ 	free_hyp_memcache(&kvm->arch.pkvm.teardown_mc);
+ 	free_hyp_memcache(&kvm->arch.pkvm.stage2_teardown_mc);
+ }
+@@ -165,6 +166,7 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
+ 		goto free_vm;
  
- /*
-- * The table of VM entries for protected VMs in hyp.
-- * Allocated at hyp initialization and setup.
-+ * A table that tracks all VMs in protected mode.
-+ * Allocated during hyp initialization and setup.
-  */
- static struct pkvm_hyp_vm **vm_table;
+ 	kvm->arch.pkvm.handle = ret;
++	kvm->arch.pkvm.is_created = true;
+ 	kvm->arch.pkvm.stage2_teardown_mc.flags |= HYP_MEMCACHE_ACCOUNT_STAGE2;
+ 	kvm_account_pgtable_pages(pgd, pgd_sz / PAGE_SIZE);
  
-@@ -495,7 +495,7 @@ static int find_free_vm_table_entry(struct kvm *host_kvm)
- /*
-  * Allocate a VM table entry and insert a pointer to the new vm.
-  *
-- * Return a unique handle to the protected VM on success,
-+ * Return a unique handle to the VM on success,
-  * negative error code on failure.
-  */
- static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
-@@ -594,10 +594,8 @@ static void unmap_donated_memory_noclear(void *va, size_t size)
+@@ -176,12 +178,17 @@ static int __pkvm_create_hyp_vm(struct kvm *kvm)
+ 	return ret;
  }
  
- /*
-- * Initialize the hypervisor copy of the protected VM state using the
-- * memory donated by the host.
-- *
-- * Unmaps the donated memory from the host at stage 2.
-+ * Initialize the hypervisor copy of the VM state using host-donated memory.
-+ * Unmap the donated memory from the host at stage 2.
-  *
-  * host_kvm: A pointer to the host's struct kvm.
-  * vm_hva: The host va of the area being donated for the VM state.
-@@ -606,7 +604,7 @@ static void unmap_donated_memory_noclear(void *va, size_t size)
-  *	    the VM. Must be page aligned. Its size is implied by the VM's
-  *	    VTCR.
-  *
-- * Return a unique handle to the protected VM on success,
-+ * Return a unique handle to the VM on success,
-  * negative error code on failure.
-  */
- int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
-@@ -668,10 +666,9 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
- }
++bool pkvm_hyp_vm_is_created(struct kvm *kvm)
++{
++	return READ_ONCE(kvm->arch.pkvm.is_created);
++}
++
+ int pkvm_create_hyp_vm(struct kvm *kvm)
+ {
+ 	int ret = 0;
  
- /*
-- * Initialize the hypervisor copy of the protected vCPU state using the
-- * memory donated by the host.
-+ * Initialize the hypervisor copy of the vCPU state using host-donated memory.
-  *
-- * handle: The handle for the protected vm.
-+ * handle: The hypervisor handle for the vm.
-  * host_vcpu: A pointer to the corresponding host vcpu.
-  * vcpu_hva: The host va of the area being donated for the vcpu state.
-  *	     Must be page aligned. The size of the area must be equal to
+ 	mutex_lock(&kvm->arch.config_lock);
+-	if (!kvm->arch.pkvm.handle)
++	if (!pkvm_hyp_vm_is_created(kvm))
+ 		ret = __pkvm_create_hyp_vm(kvm);
+ 	mutex_unlock(&kvm->arch.config_lock);
+ 
 -- 
 2.51.0.384.g4c02a37b29-goog
 
