@@ -1,49 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21A3279780
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 09:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756A0318138;
+	Tue,  9 Sep 2025 10:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757408844; cv=none; b=E9jeUTZda1bacHhcBri/ASlWgzBQ6zBz2xFlEzWrzFyZkr7t880Ogl4HRNsmspHpVzU0DL6q2BJSgTF3AKTjOebTekMhBlXTjFz78uKtmFy0Tn+FqBLl63ryWKygKqzLXyc97u8B2iobqzLZSrhL9AOnK4rDJ0DcGFfZUCGQvPk=
+	t=1757412631; cv=none; b=G4SwgXHDymhMMmLIMh5/OUlPMd7CL94QvHJkbZHJY7H1/p2qbWtevQTA0W5mx0wmZJr3xK1TTWvtPrW6k+xCW5L8vZsP5v9Qdcd0/mCmJLAQUlv5At5CXscrL4Po5tFFLDquAZ+Co9XT6QkyEv/n7PWKcZ0JPcCVbhl8Tqa5Qmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757408844; c=relaxed/simple;
-	bh=4wKVdqiDvc8x64AZdz8dHzcdaT7HMFiEUg5nxr1xgD4=;
+	s=arc-20240116; t=1757412631; c=relaxed/simple;
+	bh=8dFaAu/k8M7eyPENQa+Q5aInG87lPBk4mrOmpVQhByk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EEUoWI/sai4q2VG0yne4IZ8w/Xfxlc/z5Ydgi0TeLe7u0Z3n3iQmUzFFn08MhxJ/PaLOBWADVSzn8y6ocewiO72UoAaBEaMhD5EauB2RLx7MXuiFrr7M8j/1RhgCNVm56jWvXj7w+3SEi0doyskw+QbBFG8MWekoj1ciEuqc1dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kogUUAJp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=rSkp4M8kfCgXnVssiUizgCeUf+BzE1fRFnjkjfSCzZw/DWswbVmd/BPN5GwYPvyo87IPiYO1iOrR4G9sP/whLSojiaC7LAV1EbwhgNJzOUxaRrhiJaL/srcYi60f7ZCAuEfXz0ifljVLq9dv4PTieEXkbTR2Y6qYyuzTXF3PaKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4zARQ9K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kogUUAJp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 716D6C4CEF4;
-	Tue,  9 Sep 2025 09:07:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4zARQ9K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FF08C4AF09;
+	Tue,  9 Sep 2025 10:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757408844;
-	bh=4wKVdqiDvc8x64AZdz8dHzcdaT7HMFiEUg5nxr1xgD4=;
+	s=k20201202; t=1757412631;
+	bh=8dFaAu/k8M7eyPENQa+Q5aInG87lPBk4mrOmpVQhByk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kogUUAJpj2PUM7i8R22D8a4yT3dvfPZReGMGRGguBS6ICb1QiQwelgiklQS0D7kWe
-	 QT2cJci+Z+sWtIJ5lS6e05Zij+6qT95ld+F1537Ry8FG4BFbuMeHioYRu3/N75ByK4
-	 fW1HhPgU8RDso2htB3zvDI5UoFe8MAux5g8AokPzX3LKkW7UnAxn5NnoJDfRkEaN8B
-	 PRGD0nev3FEGl7UEDBFt5pKjHR462E3ZyUohshEZRw9Z/8E2AOp6TVEo2VrvLNuvpF
-	 RcM5PXhEIu7eiT34/v+H5NWl0qtZDo5wgEB9BxSPZOWAFtTxCaAk7MNK+5gOybPBrq
-	 lY1y01uO38k5A==
+	b=b4zARQ9Kn/I/jDOwzfat35RVovH1ZuTfkR+vc8thJ5Ctz6h8iJE267FUKQYvWP5Pa
+	 JPkJcn+hv1/LOfRdUSRdfZUWFvVMdTf+f3aTA3SKFCCtSggySYO8iPocxnQbkGKCl4
+	 AXWnT7W/QHpcqCv2ZucUonUfEbWTj+AAnpWVTnpWiYKcNHu61DT7xkrxydlE9G6KPY
+	 tLdzeZriXMl8b4Zny6ZPAmZ+AICVcw042SDKdtbq+qKwia+vvl9yBaDhAhXSUJ+3dE
+	 Og/n4qQVCdTpzU2Mk+XW6eJUMXq3z2l5Jut6MgfjJ3Aik7fjl/Ln4tV0CK9Gnqm0HR
+	 u+fmT3b9mI1ww==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uvuJu-00000004bjw-0dsw;
-	Tue, 09 Sep 2025 09:07:22 +0000
-Date: Tue, 09 Sep 2025 10:07:21 +0100
-Message-ID: <86ms74c7ue.wl-maz@kernel.org>
+	id 1uvvIy-00000004de3-3Ufv;
+	Tue, 09 Sep 2025 10:10:28 +0000
+Date: Tue, 09 Sep 2025 11:10:28 +0100
+Message-ID: <86ldmoc4x7.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jinqian Yang <yangjinqian1@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Exclude guest's TWED configuration when TWE isn't set
-In-Reply-To: <20250909071602.294783-1-oliver.upton@linux.dev>
-References: <20250909071602.294783-1-oliver.upton@linux.dev>
+Cc: Jinqian Yang <yangjinqian1@huawei.com>,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	liuyonglong@huawei.com,
+	wangzhou1@hisilicon.com
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Make ID_AA64MMFR1_EL1.HCX writable from userspace
+In-Reply-To: <aL_SIwQiz3QO1fKe@linux.dev>
+References: <20250909034415.3822478-1-yangjinqian1@huawei.com>
+	<20250909034415.3822478-2-yangjinqian1@huawei.com>
+	<aL_SIwQiz3QO1fKe@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,56 +59,39 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, yangjinqian1@huawei.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, yangjinqian1@huawei.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, liuyonglong@huawei.com, wangzhou1@hisilicon.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 09 Sep 2025 08:16:02 +0100,
+On Tue, 09 Sep 2025 08:07:15 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> KVM blindly OR's the guest values for TWEDEL and TWEDEn into the
-> programmed value even if the guest has WFE traps disabled. Exclude these
-> fields from the final value when TWE isn't set to avoid potentially
-> delaying a trap desired by the host.
+> On Tue, Sep 09, 2025 at 11:44:13AM +0800, Jinqian Yang wrote:
+> > Allow userspace to downgrade HCX in ID_AA64MMFR1_EL1. Userspace can
+> > only change this value from high to low.
+> > 
+> > Signed-off-by: Jinqian Yang <yangjinqian1@huawei.com>
 > 
-> Note that KVM doesn't use FEAT_TWED currently so there's no need to
-> empty out these fields the other way around (i.e. host TWE=0, guest
-> TWE=1).
-> 
-> Fixes: 04ab519bb86d ("KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2")
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/vhe/switch.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 0998ad4a2552..e4955b49c0d2 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -95,6 +95,13 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
->  			/* Force NV2 in case the guest is forgetful... */
->  			guest_hcr |= HCR_NV2;
->  		}
-> +
-> +		/*
-> +		 * Exclude the guest's TWED configuration if it hasn't set TWE
-> +		 * to avoid potentially delaying traps for the host.
-> +		 */
-> +		if (!(guest_hcr & HCR_TWE))
-> +			guest_hcr &= (HCR_EL2_TWEDEn | HCR_EL2_TWEDEL);
->  	}
->  
->  	BUG_ON(host_data_test_flag(VCPU_IN_HYP_CONTEXT) &&
-> 
-> base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
+> I'm not sure our quality of emulation is that great in this case. We
+> have no way of trapping the register and it is always stateful. Better
+> yet, our RESx infrastructure doesn't account for the presence of
+> FEAT_HCX and we happily merge the contents with the host's HCRX.
 
-I'm a bit lost here.
+Yeah, that's not good, and definitely deserves a fix.
 
-We seem to sanitise ID_AA64MMFR1_EL1 in a way that totally removes
-TWED from the feature set (see limit_nv_id_reg()). Therefore,
-HCR_EL2.(TWEDEn,TWEDEL} should be RES0, no matter what.
+> We should make a reasonable attempt at upholding the architecture before
+> allowing userspace to de-feature FEAT_HCX.
 
-Is there another way the guest can set these bits?
+My concern here is the transitive implications of FEAT_HCX being
+disabled: a quick look shows about 20 features that depend on
+FEAT_HCX, and we don't really track this. I can probably generate the
+dependency graph, but that's not going to be small. Or very useful.
+
+However, we should be able to let FEAT_HCX being disabled without
+problem if the downgrading is limited to non-EL2 VMs. Same thing for
+FEAT_VHE.
+
+What do you think?
 
 	M.
 
