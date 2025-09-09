@@ -1,64 +1,63 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EFD31B119
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 12:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEA632A828
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 12:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757419717; cv=none; b=lu4q3cogn9mQ3sO60iCU3YArskou1gYry+XdgzuIRVmPuYGyA1rmNXAXOafKFbHv4cg6kCVtbbuH8iwLlmQ3zMOAFHvHQZh9NcE+n9SSwywDfRKX6iQW/fh6aK/VVR+lRUpL+W3Go2zz/s5BuTNKST5jGCIdy054Ig0JMF6oxY8=
+	t=1757419832; cv=none; b=L4qmweCQCQw9XXV1UwiQ1GIL1LO3ekV5WGUvsvB46hdmfZmML9JRQozHbUsTYqXeaompSm8Q5ToQtzlq/tpTF4rzc7+5XijEs5Bc6Z81cmM3f8dj0yEnNYDmvHj6EpJ+jKNl1cuAfNAdqWrP9z4orfUse3+P6jVqk8GX/FIE3rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757419717; c=relaxed/simple;
-	bh=e2bY/7qkyaiM/i1NmIYcr9PECxFTLhoEx9C77uMaccw=;
+	s=arc-20240116; t=1757419832; c=relaxed/simple;
+	bh=POQ+KrDMZzWUCA/637U0YCLhbicOSpe5n5QI1q7mb84=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UkOe09xfdOREL9pUDP6qItZs3Nj3UMKPfpUCam8Us/qxerLEOxeBjtWt7Uzv9kixsaWuSCk9dNbqN2LQAGPL9+INd1kJ+KnhaY32KADJQ42D3I7SxmvCSw4o0ytwAHhbECD5+RRHhZoO+4AecttZOQsrotPCZRjET6meVH/rJj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SrVE4zjE; arc=none smtp.client-ip=209.85.221.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=eLTUPAak61rqiOE2pJGtqEl8Xj3heuBn9AIBiwTRuG83LWkfht7TrNyZI3rISp/Nd7Wt42aDCoT3F2Nrz9yeAuhnmVxpZMM1Y4IPBx6UrXFCK00r1KHqmHH+jYHOG6MqK9OgiKjR9zbAv82UEOFiRo391XJ7oeMl3vFAlBKovPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dZ8ekFOo; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SrVE4zjE"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3c6abcfd142so2745248f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 05:08:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dZ8ekFOo"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-45cb6180b60so35288805e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 05:10:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757419713; x=1758024513; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1757419829; x=1758024629; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M7vDbC+h+/IIbH/cXwkOmZAco4ey3LkcdIeQn9K9PmM=;
-        b=SrVE4zjEXXhtEd4nVYjDPcJyZxl+/XY//BGCR6RsD6uqLV1IQtHe+ob/NzYjRD7DV0
-         mFshFbxR3xszARpgdx4UgpStDOSZemMRhd9CHsru96IjJckxtVeAjuMejkvd2isvp9H4
-         d1nMoIJr19l86PPVb+MxccW/HlEe2CGla8r4F7idjpGixMMQW5NO+7fx1YP0yRBPj+k1
-         ldNqIszjpuur5FIylW1EfXRQVGIG9L8hoPJoqe97GfPDgLKJyWXv2P718F+5Dg1ZiAJ4
-         i8PKlbSNJQ7/iHC9nuFLmyDSsn0v/WBnrs00xE1arMt6pKarLH11HKHG85QNfTAFwZ9a
-         dRGw==
+        bh=6WMhFn1C+Yx6W2wpeHv5vlp4fLrLgkTAzBM0vbXLgCo=;
+        b=dZ8ekFOoE44xI6zqA0PBCtR1Sa7fwX6Q5eCRzEbsT+0HjwE6KeMCfRdJSMlQ5Lxl6L
+         rzQH/b394Y2K48uZDzQA3h5bhhFTvuOPvglJX3yKXTTJQFDvEYi5RCImG45eWSMScA6P
+         6By0nQR+3pVaHLL5ZjPXH2jI/mo3+sVzaiCbgDH+M+9pU3uaoZgAHXkiAPZ90Zbg0mz9
+         8VLfeS2fz2oLKahc0yoFCoVfIlFqEbM0lttXOKV5ye0B5CPqZWT1cQRq0PRUAvzrlu6N
+         EJnyPyT4XvT0Tm6/gydVgeEIzy6zOsG4LCHtQebqQzYMpxBrT5prAEWCFbpDCyKYoiTA
+         OavQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757419713; x=1758024513;
+        d=1e100.net; s=20230601; t=1757419829; x=1758024629;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M7vDbC+h+/IIbH/cXwkOmZAco4ey3LkcdIeQn9K9PmM=;
-        b=saJE86mD3GPcmWow8a5hZ4RsgIBHn/VO7fNbarTprtgzHi63in0djmbK5iGsEXkUDL
-         kAQZnWhZ6JA9MWu2E6hw5rPa6FtbMNkRa3onAOLC/g0groY28sNr702DOZ5d2WiYJdkE
-         rRaWNEGKSncMZwPf4LMIZPqlR+UmWDP1rjGMdkEAmbD7yWlqMYa9yLrQctXXdO81Lk9A
-         WD+9my8pfrZtG7goPfruoVgZHZB5/JbKoldQjBKGeeb1dmZZ1U2DJ/+Rblzdcgilz55h
-         noBuBGZv9oRBh17kQauW1QIHIm91oJI9ZfwrO1BGvvOHxHzkwtN2cVYKbcPMxYhlHtej
-         xsUw==
-X-Forwarded-Encrypted: i=1; AJvYcCVS05EpaJrkfZGLvqS70Zc1P0YiDhZjvy5QmCCWoVvOxuH7huUKZaptklN4nYsvYZObo/HQBa0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyCO7EuoGr8Q9fFf8tJsfVrncVtMwiGbinhjFAd+XZcA+0aPEGL
-	smCYAKZB3B5ky8AUMX+ekRs7W/5QJMRksEIo3n2uaBr9EK1rCH3E9Pu4DB045pGyvA==
-X-Gm-Gg: ASbGnctS1E63USM/EKga0j+6BPvD8mOfKVkNc91mK6SJKGWnTOmaK6PYsMauOFngswP
-	3OyjBiSxD8eRmAQ/dKfcLVFZyFQximuQCL2NFxezhM4efTYYEqwkkGIMEJTrBvwYoyGqTUhWqnl
-	QCeIUcqP0fXYLBkTiy4XvL8D9p8eoLPclEiUUfSSD9fwhBpMXED8v6WfDEAfSZbyVyE/IrMfwax
-	Y3yrTizshVRgvodZcXcpz1GqSClcTZsBI+FXh8ftelAOCUkOnUneiiFMdvgEsqEZHV6LHtHwnZi
-	Ee4OZ54BM2nXUbQpXmSEDEdTy7oQHhGC66YbnM+yfNBxQ47tPLrf0IM9FFvwgXdAMbIizWcmm5d
-	gr6yLwD8sGTyZNxd0bcpkWg2pBzsIeiO2IxDqxBwdyzS4DG2UE0yTLqEO0bG3mBsp4ij/ODHpV+
-	8RyuCE
-X-Google-Smtp-Source: AGHT+IEmpSA1PmUMsgcmd2ZNoedzp7F9aWzukj/yEFhZuO5KFbaj8r4hHCaj2MqwR9Y8LELRFzynbQ==
-X-Received: by 2002:a05:6000:2486:b0:3e7:490c:1a2 with SMTP id ffacd0b85a97d-3e7490c049dmr6915730f8f.10.1757419712364;
-        Tue, 09 Sep 2025 05:08:32 -0700 (PDT)
+        bh=6WMhFn1C+Yx6W2wpeHv5vlp4fLrLgkTAzBM0vbXLgCo=;
+        b=Q96aLUO5spSIH2Mb6IBjs9HaVG2VxOsdcyZ0kh5bVWFCl3ozNoCT1egumdIR7epUph
+         hZrt0rfmHM8SVJC+9UPgMoB3678cwwwQJesh8AwCibnrvxeH8mOtuXmbX/fNLSSwOJcp
+         +fcySJLyQzo6kOhrJ416zQZLdoikvtFTzb5GY2XX+Tu8sT+CWYu0RjfQa45Eh2Tc6kt6
+         PZQsgt4eBHJoK3tbYUVYyJhi6BkVtwmjFxMiZvhKwXtGLwvOodB2LQojsfWGLXi4UNgY
+         5xxnMfwmAj3AH1V1XtWNg8c3K7Y5eylJ3j6hzu0s2JQqDUMruvhGoZzgYgekOcYLd+vZ
+         jBjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUCsvcXJ9PA8KJITWolXZaAWL3+2Y2IV2EIdXsNfyOTaqW6R/Og7e+egkLgAv4MN35hQPlC1Xs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyYCWDtETRgyYuL+cWSNxHkwx6aJmzTkQHxULV6pmkNnz6SCqAd
+	mDiF8W0Sv9LSR7mhqztg2fyqez8zvEIE375OuXstcNOJU0IFTHJGGRO8PX2O9N3hYg==
+X-Gm-Gg: ASbGncsThre3aBQtm9QxulwtyvCTXBlxmqDLvXL77l3i+5NhzQXqNYEjwGIJT+N+kCl
+	Ne3q+lF7MJL6avALMidRhMwkq7QOnhlVyrXShw6CS03MFFymQXnMJi0njmJmHpWxbzdfJQ5YTPE
+	3TfSTW8Ud3jFQlm/J2es++W2VsEZOhBeRRV2xXolEg2VkUUqPc9ZoFAzZ0C7fLsoEumYIjuHCJi
+	qF8xa4+K7N/sbkMaZgaAtmHNbJGKeoUcHEqCOJDFeGmjlJAQXEe6elPSP9Yq3y6Uw2naSUrbpCD
+	1lgZ2ce2YSexLH4X6A6+gizOCBj9U03YAk8AAydMjIvoNdsZElTM64xDOMTLLD8Z9ZKoVE9N3a/
+	s8F20HmheB4at5uqHD1MtvHip23zC1TLqLzfrnYh28LP29FctSk1G68QvvZjtG3HiNvfSTw==
+X-Google-Smtp-Source: AGHT+IEC0Y6r4tWAAX1HWCsbBwXYE/aB19u5wg0kytabUISZq9YPIfqob+aeZg0wKmLtsUPhiNDWVA==
+X-Received: by 2002:a5d:61c5:0:b0:3e7:17d4:38ad with SMTP id ffacd0b85a97d-3e717d43c09mr7390502f8f.55.1757419828720;
+        Tue, 09 Sep 2025 05:10:28 -0700 (PDT)
 Received: from google.com (211.29.195.35.bc.googleusercontent.com. [35.195.29.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e7521c9cb9sm2559883f8f.20.2025.09.09.05.08.31
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45dd2304e16sm234800165e9.7.2025.09.09.05.10.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 05:08:31 -0700 (PDT)
-Date: Tue, 9 Sep 2025 13:08:28 +0100
+        Tue, 09 Sep 2025 05:10:28 -0700 (PDT)
+Date: Tue, 9 Sep 2025 13:10:25 +0100
 From: Vincent Donnefort <vdonnefort@google.com>
 To: Steven Rostedt <rostedt@goodmis.org>
 Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
@@ -68,11 +67,11 @@ Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
 	linux-arm-kernel@lists.infradead.org, jstultz@google.com,
 	qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
 	kernel-team@android.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 03/24] tracing: Introduce trace remotes
-Message-ID: <aMAYvA9LSvfxvt_C@google.com>
+Subject: Re: [PATCH v6 04/24] tracing: Add reset to trace remotes
+Message-ID: <aMAZMaZJ1_Eny5Ku@google.com>
 References: <20250821081412.1008261-1-vdonnefort@google.com>
- <20250821081412.1008261-4-vdonnefort@google.com>
- <20250908193606.47143d09@gandalf.local.home>
+ <20250821081412.1008261-5-vdonnefort@google.com>
+ <20250908193757.079aae76@gandalf.local.home>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,194 +80,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250908193606.47143d09@gandalf.local.home>
+In-Reply-To: <20250908193757.079aae76@gandalf.local.home>
 
-On Mon, Sep 08, 2025 at 07:36:05PM -0400, Steven Rostedt wrote:
-> On Thu, 21 Aug 2025 09:13:51 +0100
+On Mon, Sep 08, 2025 at 07:37:57PM -0400, Steven Rostedt wrote:
+> On Thu, 21 Aug 2025 09:13:52 +0100
 > Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> > A trace remote relies on ring-buffer remotes to read and control
-> > compatible tracing buffers, written by entity such as firmware or
-> > hypervisor.
-> > 
-> > Add a Tracefs directory remotes/ that contains all instances of trace
-> > remotes. Each instance follows the same hierarchy as any other to ease
-> > the support by existing user-space tools.
-> > 
-> > This currently does not provide any event support, which will come
-> > later.
-> > 
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > 
-> > diff --git a/include/linux/trace_remote.h b/include/linux/trace_remote.h
-> > new file mode 100644
-> > index 000000000000..de043a6f2fe0
-> > --- /dev/null
-> > +++ b/include/linux/trace_remote.h
-> > @@ -0,0 +1,21 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +
-> > +#ifndef _LINUX_TRACE_REMOTE_H
-> > +#define _LINUX_TRACE_REMOTE_H
-> > +
-> > +#include <linux/ring_buffer.h>
-> > +
-> > +struct trace_remote_callbacks {
-> > +	struct trace_buffer_desc *
-> > +		(*load_trace_buffer)(unsigned long size, void *priv);
-> 
-> I believe this is one of those cases where the 80 char limit is more of a
-> guildline than a rule. It looks better to keep the above as one line.
-> 
-> > +	void	(*unload_trace_buffer)(struct trace_buffer_desc *desc, void *priv);
-> 
-> Heck, this is already passed 80 characters ;-)
-> 
-> > +	int	(*enable_tracing)(bool enable, void *priv);
-> > +	int	(*swap_reader_page)(unsigned int cpu, void *priv);
-> > +};
-> > +
-> > +int trace_remote_register(const char *name, struct trace_remote_callbacks *cbs, void *priv);
-> > +int trace_remote_alloc_buffer(struct trace_buffer_desc *desc, size_t size,
-> > +			      const struct cpumask *cpumask);
-> > +void trace_remote_free_buffer(struct trace_buffer_desc *desc);
-> > +
-> > +#endif
-> > diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
-> > index d2c79da81e4f..99af56d39eaf 100644
-> > --- a/kernel/trace/Kconfig
-> > +++ b/kernel/trace/Kconfig
-> > @@ -1238,4 +1238,7 @@ config HIST_TRIGGERS_DEBUG
+> > @@ -400,7 +436,9 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
+> >  	    !trace_create_file("buffer_size_kb", TRACEFS_MODE_WRITE, remote_d, remote,
+> >  			       &buffer_size_kb_fops) ||
+> >  	    !trace_create_file("trace_pipe", TRACEFS_MODE_READ, remote_d, remote,
+> > -			       &trace_pipe_fops))
+> > +			       &trace_pipe_fops) ||
+> > +	    !trace_create_file("trace", 0200, remote_d, remote,
+> > +			       &trace_fops))
+> >  		goto err;
 > >  
+> >  	percpu_d = tracefs_create_dir("per_cpu", remote_d);
+> > @@ -422,7 +460,9 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
+> >  		}
+> >  
+> >  		if (!trace_create_cpu_file("trace_pipe", TRACEFS_MODE_READ, cpu_d, remote, cpu,
+> > -					   &trace_pipe_fops))
+> > +					   &trace_pipe_fops) ||
+> > +		    !trace_create_cpu_file("trace", 0200, cpu_d, remote, cpu,
+> > +					   &trace_fops))
+> >  			goto err;
+> >  	}
 > 
-> 
-> > +
-> > +int trace_remote_register(const char *name, struct trace_remote_callbacks *cbs, void *priv)
-> > +{
-> > +	struct trace_remote *remote;
-> > +
-> > +	remote = kzalloc(sizeof(*remote), GFP_KERNEL);
-> > +	if (!remote)
-> > +		return -ENOMEM;
-> > +
-> > +	remote->cbs = cbs;
-> > +	remote->priv = priv;
-> > +	remote->trace_buffer_size = 7 << 10;
-> > +	remote->poll_ms = 100;
-> 
-> What's with the magic numbers?
+> I wonder if we should name the file "reset" to not be confusing to users
+> when they cat the file and it doesn't produce any output.
 
-The 7KiB value can be modified with the tracefs file buffer_size_kb.
+My idea was to keep the exact same interface as the rest of the tracing. I could
+keep that /trace file for compatibility and add /reset?
 
-the 100ms can't be modified. I could either make a tracefs file or just a
-trace_remote_set_poll_ms() function so it can be modified after registration.
-
-In all cases, I'll add a TRACE_REMOTE_DEFAULT_XXXX definition at the start of
-the file.
-
-> 
-> > +	mutex_init(&remote->lock);
-> > +
-> > +	if (trace_remote_init_tracefs(name, remote)) {
-> > +		kfree(remote);
-> > +		return -ENOMEM;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +void trace_remote_free_buffer(struct trace_buffer_desc *desc)
-> > +{
-> > +	struct ring_buffer_desc *rb_desc;
-> > +	int cpu;
-> > +
-> > +	for_each_ring_buffer_desc(rb_desc, cpu, desc) {
-> > +		unsigned int id;
-> > +
-> > +		free_page(rb_desc->meta_va);
-> > +
-> > +		for (id = 0; id < rb_desc->nr_page_va; id++)
-> > +			free_page(rb_desc->page_va[id]);
-> > +	}
-> > +}
-> > +
-> > +int trace_remote_alloc_buffer(struct trace_buffer_desc *desc, size_t size,
-> > +			      const struct cpumask *cpumask)
-> > +{
-> > +	int nr_pages = (PAGE_ALIGN(size) / PAGE_SIZE) + 1;
-> > +	struct ring_buffer_desc *rb_desc;
-> > +	int cpu;
-> > +
-> > +	desc->nr_cpus = 0;
-> > +	desc->struct_len = offsetof(struct trace_buffer_desc, __data);
-> 
-> The above is better as:
-> 
-> 	desc->struct_len = struct_size(desc, __data, 0);
-> 
-> As it also does some other checks, like make sure __data is a flexible
-> array.
-> 
-> > +
-> > +	rb_desc = (struct ring_buffer_desc *)&desc->__data[0];
-> > +
-> > +	for_each_cpu(cpu, cpumask) {
-> > +		unsigned int id;
-> > +
-> > +		rb_desc->cpu = cpu;
-> > +		rb_desc->nr_page_va = 0;
-> > +		rb_desc->meta_va = (unsigned long)__get_free_page(GFP_KERNEL);
-> > +		if (!rb_desc->meta_va)
-> > +			goto err;
-> > +
-> > +		for (id = 0; id < nr_pages; id++) {
-> > +			rb_desc->page_va[id] = (unsigned long)__get_free_page(GFP_KERNEL);
-> > +			if (!rb_desc->page_va[id])
-> 
-> What exactly are these pages allocated for? Is this what the remote will
-> use to write to? There should be more comments about how this is used.
-
-Those are the actual ring-buffer data pages. I'll add a comment here.
-> 
-> > +				goto err;
-> > +
-> > +			rb_desc->nr_page_va++;
-> > +		}
-> > +		desc->nr_cpus++;
-> > +		desc->struct_len += offsetof(struct ring_buffer_desc, page_va);
-> > +		desc->struct_len += sizeof(rb_desc->page_va[0]) * rb_desc->nr_page_va;
-> 
-> Shouldn't the above be:
-> 
-> 		desc->struct_len += struct_size(rb_desc, page_va, rb_desc->nr_page_va);
-> 
-> ?
-
-Yes, that'd look way better.
-
-> 
-> > +		rb_desc = __next_ring_buffer_desc(rb_desc);
-> 
-> Is there no check to make sure that the cpu mask matches what the rb_desc
-> will have?
-
-The function is filling rb_desc[], based on the cpumask input, so both will
-match when returning from this function.
-It is then easy to handle the case where some CPUs are not part of the cpumask.
-See remote_test_load() where for_each_ring_buffer_desc() iterates over all the
-CPUs from the trace_desc but uses rb_desc->cpu.
-
-Is it what you meant?
+"cat trace" could also just returns a text like *** not supported *** ?
 
 > 
 > -- Steve
-> 
-> > +	}
-> > +
-> > +	return 0;
-> > +
-> > +err:
-> > +	trace_remote_free_buffer(desc);
-> > +	return -ENOMEM;
-> > +}
-> 
