@@ -1,25 +1,25 @@
-Received: from relay.hostedemail.com (smtprelay0016.hostedemail.com [216.40.44.16])
+Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B973E22258C
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 18:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD992FE058
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 18:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757443148; cv=none; b=jxdYfRCksT/zyaqmI/cmCSYwslGYf9rFpxdmjzfZoS5vG9yFd9pXpdMJ8gBeAumibT41ar1M8kuYHY+0FDTp6y7ct8Y9JBDRFQ+K6AyzCre4JNn4sGPBQV/NWvSEf/duoE34xW5iUZq7D8XletbJCTdaylbLHNKo0yW3FvCporI=
+	t=1757443917; cv=none; b=rVXHub0qK3adtMVddLkaYjwIEfjSg8xdZpYew2CggpiI/bKQswiGhsNPOFoQCODuU90nxtjUOy2/pNUocHt+fGmH47rPwVK4JEeqYV1B7XufruPB3hpA8PXZLe16o/eXCERRwelo0BgMhgFf1BlYKRBSeeSmwp57P8755XbWkXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757443148; c=relaxed/simple;
-	bh=eqcE62nxhCYT/g1eduv2zGQJ99h5K0JxSzmZu9RmBP4=;
+	s=arc-20240116; t=1757443917; c=relaxed/simple;
+	bh=BspH+H9bDmo8zPVTnwL3CGtMUZHBn1KnVEmbw2azLPs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b4nsspJv1rAJPBxz1L+eKyloJ130+ZRAZcNCfEkXt1agNHw5G77EAmiPtXtx+NDbxo6sBDmMi7dYLtCl5cHX4qm5d4n47UiOa0Jfuuj+rSU3KUriXP29izaUUxt6R+v64uqIUA1cU7K+Fd723r7ysIbNpNU42jnKtXmhCwDgoAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.16
+	 MIME-Version:Content-Type; b=LCLGs3+I35xPy+/FVYc5hEAYDu+oVDNtHDHFFlhk0H03t/izQvpByOfIO1ny055RKfh1w/im2eyOxxLn4MJkztENaAGdSWUzdon+HP7h7h8iZex+7afZ76bH7t/TmKxar+Akr9+XCOnsM3Y93i2qSx/urHvVPbqgwpiQ/Gf3MB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf20.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay08.hostedemail.com (Postfix) with ESMTP id 69E5A14069C;
-	Tue,  9 Sep 2025 18:39:04 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf20.hostedemail.com (Postfix) with ESMTPA id B2FDE20025;
-	Tue,  9 Sep 2025 18:39:00 +0000 (UTC)
-Date: Tue, 9 Sep 2025 14:39:48 -0400
+Received: from omf13.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay07.hostedemail.com (Postfix) with ESMTP id F2317160720;
+	Tue,  9 Sep 2025 18:51:51 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf13.hostedemail.com (Postfix) with ESMTPA id 7B67F20012;
+	Tue,  9 Sep 2025 18:51:48 +0000 (UTC)
+Date: Tue, 9 Sep 2025 14:52:36 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
@@ -30,14 +30,15 @@ Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
  aneesh.kumar@kernel.org, kernel-team@android.com,
  linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v6 04/24] tracing: Add reset to trace remotes
-Message-ID: <20250909143948.420bfb1c@gandalf.local.home>
-In-Reply-To: <aMBSa29ev0BNgr5R@google.com>
+Message-ID: <20250909145236.69192cd0@gandalf.local.home>
+In-Reply-To: <20250909143948.420bfb1c@gandalf.local.home>
 References: <20250821081412.1008261-1-vdonnefort@google.com>
 	<20250821081412.1008261-5-vdonnefort@google.com>
 	<20250908193757.079aae76@gandalf.local.home>
 	<aMAZMaZJ1_Eny5Ku@google.com>
 	<20250909094028.3265b751@gandalf.local.home>
 	<aMBSa29ev0BNgr5R@google.com>
+	<20250909143948.420bfb1c@gandalf.local.home>
 X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -47,51 +48,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B2FDE20025
-X-Stat-Signature: 88rpahm4umjmmcjmrz9w7j3z6z8cjawb
+X-Rspamd-Queue-Id: 7B67F20012
+X-Stat-Signature: 6jcmoe7kyeoer8m9umxo4ko1reffbtxx
 X-Rspamd-Server: rspamout02
 X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX1/Dfb0F/ok0yMi6rVU9qwiXjkJqxDcdMLk=
-X-HE-Tag: 1757443140-354827
-X-HE-Meta: U2FsdGVkX1/dFMJGRD+C6O+Za+iRGR7QlQeUizfNtukq1m6fiS7yJXJxYQxG9yxfVWgqP1DYfzB0aOk3vcc97HywbUnaMvNe17yZQK7V0szWK1Xn6Fl1E/CQyXQAKRnkuCgAc7SuJp0V/GjwyvI52PlbVs4xIb6J5bfiz08Jgs1BYuK2BxX9Q4cDppfKLQ5O3V9K0Fdd3muKjQcb4613ryQc1TiRocoDXYvOIhxEJ3hsZTAKZllg5vzY8IgoDRAIEVes+/4idN+hXi8UaE6BF780N6C1bIYBKIOoWDOENiR/Vg6w8f57zdLTvf6x0jOhYSOnHsTZAQiFGZjiGXvDuz1xkAnD1qwI
+X-Session-ID: U2FsdGVkX1/Tp3xCEgkAFI9W9nCgXIN17UPOUbr/RZU=
+X-HE-Tag: 1757443908-581386
+X-HE-Meta: U2FsdGVkX19lVud6y51xD4pMo2ZnzH0+UrCZC4hG0ICafd9IutkjFFOMtBXudM1zmBAVN/ESckwodi3a29EU01Len6FKTmVk2tjNG99glyZ+QI696mxRxOxD2bUPYF12N/hHUtbTx6vVRZCXpWAb/7xweUx089qM/JRxCOCfk1eA4id+quq9lOrlkLW9+L2+dle6GSfGoW9IwFgYvjLbC4ZtzLIlYJA3uH0qIqcJwJqThsDREqcMQCssMntZzpGq5l0GJHyAy7fi4dCWAcWK8H91UnGqFFzUOmr9Yo/BbOFYTy3NVlTEEx5rX1M42WuDEufQlOM1JvbO1zjYLsvHPI6FqzaraTfe2/fIxIwCHJC+xQ9246RoD9BVWgA5Vh6t
 
-On Tue, 9 Sep 2025 17:14:35 +0100
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On Tue, 9 Sep 2025 14:39:48 -0400
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
-> On Tue, Sep 09, 2025 at 09:40:28AM -0400, Steven Rostedt wrote:
-> > On Tue, 9 Sep 2025 13:10:25 +0100
-> > Vincent Donnefort <vdonnefort@google.com> wrote:
-> >   
-> > > > I wonder if we should name the file "reset" to not be confusing to users
-> > > > when they cat the file and it doesn't produce any output.    
-> > > 
-> > > My idea was to keep the exact same interface as the rest of the tracing. I could
-> > > keep that /trace file for compatibility and add /reset?
-> > > 
-> > > "cat trace" could also just returns a text like *** not supported *** ?  
-> > 
-> > If it's never going to be supported, I rather not add it. It not being
-> > there is a sure way of knowing it's not supported. Just adding it because
-> > the normal system has it is actually worse if it doesn't behave the same.  
-> 
-> If later we extend the meta-page to support non-consuming read, /trace would
-> then become useful.
-> 
-> Another argument for non-consuming read would be to enable dump on panic.
-> 
-> But I understand your point, it might be wishful thinking at this point.
->
+> But anyway, I think it should work for the remote buffers too. Let me go
+> and fix the current iterator.
 
-It may be possible to still do a trace file. Basically, it would work the
-same way the normal iterator works. Today it reads the trace while the
-writer could be modifying it.
+I thought it was broken but it isn't ;-) I did it properly, I just didn't
+look deep enough.
 
-Actually, I think there's a bug in the iterator code today :-p
+So yeah, look at the rb_iter_head_event() code. The ring buffer iterator
+has a copy of the event. It has:
 
-It needs to be modified to copy the event, as it currently passes the event
-as is and that event could be written over by the writer.
+	if ((iter->head + length) > commit || length > iter->event_size)
+		/* Writer corrupted the read? */
+		goto reset;
 
-But anyway, I think it should work for the remote buffers too. Let me go
-and fix the current iterator.
+	memcpy(iter->event, event, length);
+	/*
+	 * If the page stamp is still the same after this rmb() then the
+	 * event was safely copied without the writer entering the page.
+	 */
+	smp_rmb();
+
+	/* Make sure the page didn't change since we read this */
+	if (iter->page_stamp != iter_head_page->page->time_stamp ||
+	    commit > rb_page_commit(iter_head_page))
+		goto reset;
+
+It first checks before copying that the data it's about to copy hasn't been
+touched by the writer.
+
+It then copies the event into the iter->event temp buffer.
+
+Then it checks again that the data hasn't been touched. If it has, then
+consider the data corrupt and end the iteration. This is how the "trace"
+file works. I believe you could do the same for the remote code.
+
+If we are gonna keep the "trace" file, let's make sure it's fully
+implemented.
 
 -- Steve
