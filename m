@@ -1,71 +1,107 @@
-Received: from relay.hostedemail.com (smtprelay0014.hostedemail.com [216.40.44.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3502D22D4F6
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 13:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F6E21FF24;
+	Tue,  9 Sep 2025 13:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757425604; cv=none; b=SUIjLnWBP+1tWePmeVdydrSeoJukCQrqRDw+hbB++m/6PXdx6Qte8E4mhZXuL2Wq/EC6X8j9b1MpMYGq1O2tkk7sF/C1VpIJM/cxp/r06lknQkXBlmn1uMCRSWnFX8/RBbZshDNFdOM3T12qxUT90o6OqblID9Lud7RPpyhkA/E=
+	t=1757425610; cv=none; b=gjVx4/HCvmR0LKa/Rm+/fmUP+TnwUI2Nw5d+YTcYeseQWraENxnFHogAdAfPsbn69JsFEVm0paX0X2xvnGoi74urlv6lGceAc2LFahREuMR5mU8kSfIVcevHJsdAAvHTch20xp5Quo+tYMLcB4t7ZFEcQ1V6Zd9INmeNh5dAv/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757425604; c=relaxed/simple;
-	bh=zXP0vgpsslX+xoM+R5u5Z8Qq+cPpKOIF09oVF2DyXdk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gsCMP/BQ8Q2bC8XCmaejNgcmyxB3iElh0+Q6xaRA4OjRn72wj2C/H2uy4IY3u0SgRm9ivOrvyS4uRUaU7ilUf7klD3c8x9R6kaciHEnTahYIAgYXdn8pttht0tzrNfz6H5tRfR2HVcPbKqnrZUtkxBFGvtYOYaMmzWFP7dVH7aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf20.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay05.hostedemail.com (Postfix) with ESMTP id 324285951B;
-	Tue,  9 Sep 2025 13:39:44 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf20.hostedemail.com (Postfix) with ESMTPA id 900C62002A;
-	Tue,  9 Sep 2025 13:39:40 +0000 (UTC)
-Date: Tue, 9 Sep 2025 09:40:28 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
- joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- jstultz@google.com, qperret@google.com, will@kernel.org,
- aneesh.kumar@kernel.org, kernel-team@android.com,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 04/24] tracing: Add reset to trace remotes
-Message-ID: <20250909094028.3265b751@gandalf.local.home>
-In-Reply-To: <aMAZMaZJ1_Eny5Ku@google.com>
-References: <20250821081412.1008261-1-vdonnefort@google.com>
-	<20250821081412.1008261-5-vdonnefort@google.com>
-	<20250908193757.079aae76@gandalf.local.home>
-	<aMAZMaZJ1_Eny5Ku@google.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1757425610; c=relaxed/simple;
+	bh=fzqqDDXTXgc1xKVVIHwn9vLmbH7HU5zTtM5qBx+V1ZU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BvCkzOvHw12hjEo90jHirLB+iVACfOPxYMviqHcPCzau4BlTOZlG2CRGtOwMJW43nj8iOMmVnRoTzbfGJLxSI3TTdd8sPpS7jQpt3OQIQce/+m1ZefSBfNv1Ae9/dZoDuzHN83+xUgDcBoQL3WbsQndJHH6eRwKWBDEa4bY7ZjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s6O+tDe2; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s6O+tDe2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5C10C4CEF4;
+	Tue,  9 Sep 2025 13:46:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757425609;
+	bh=fzqqDDXTXgc1xKVVIHwn9vLmbH7HU5zTtM5qBx+V1ZU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s6O+tDe2nrg87Y7/S+Zk9CUrbY2AdJMilB+urbthEyUsD50w1xb2noRQ1hCfq76IO
+	 OC9sU4Hg0uJfdwkJkJOdPfYuPYJ3kLD6dm4xpaPKqMxOpRvB6YOhyKHGaoqDDtJNMk
+	 dwqSNFvk3G51DEKHhMh5plT2MAealjDxEpioHpsZDuSJmRqbkzRxgN5bRqAXaPdL4Z
+	 qecqt2l8gxUclecmElV1DM1/ODvksxyOjKEL6UsI40CQDjtXObCrGsN+vpMdcM4jU+
+	 xFO2svDAchpW7sWBsiJrHobI4p46x7Kj0bJp+Tgv4oE94k83/EhbqFzHRLuvO3gP6j
+	 fXLkQS3/pTCCg==
+Date: Tue, 9 Sep 2025 14:46:42 +0100
+From: Will Deacon <will@kernel.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, robin.murphy@arm.com,
+	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
+	jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v4 01/28] KVM: arm64: Add a new function to donate memory
+ with prot
+Message-ID: <aMAvwlMQ-Jf2MWzd@willie-the-truck>
+References: <20250819215156.2494305-1-smostafa@google.com>
+ <20250819215156.2494305-2-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 900C62002A
-X-Stat-Signature: wfa3mdrmcbzi14spidjppaqea6aw3qp1
-X-Rspamd-Server: rspamout02
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX1+E8T0HTQskMKNFMQEhwq4iyvDU75kvHts=
-X-HE-Tag: 1757425180-933823
-X-HE-Meta: U2FsdGVkX1+Wwks7b6yVoepNeV7TOzWudjuaDH2HvpSyApAYLfX3FbQwoINlsSIJNvKZcFkkzCa70xLZ8yV4M3RgoVBTMxN5wkAN4Tvsgw8YtAsvBOUnzzaGQoIagJtU8jlbuWu7YwTn4neLH9QVlsUmEnxOFj+Ce+XWBl2YeuaS2Co2nBtPDT2dppC4tUtOJR/BNg+CfKupetaSNKi+SIEiMtMc+wVlYX5nkohak+WdMCO/O577kVmfRGQBv0yYCqWaEXG1hBinQi1qPSUlt1pVhygCIsWRDJWGDRHVLOLUYn/A+q+kGxNNxzOWFpeRPlmy68ip0z5ZjM1JDFzumCv8TLnOFVx7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250819215156.2494305-2-smostafa@google.com>
 
-On Tue, 9 Sep 2025 13:10:25 +0100
-Vincent Donnefort <vdonnefort@google.com> wrote:
-
-> > I wonder if we should name the file "reset" to not be confusing to users
-> > when they cat the file and it doesn't produce any output.  
+On Tue, Aug 19, 2025 at 09:51:29PM +0000, Mostafa Saleh wrote:
+> Soon, IOMMU drivers running in the hypervisor might interact with
+> non-coherent devices, so it needs a mechanism to map memory as
+> non cacheable.
+> Add ___pkvm_host_donate_hyp() which accepts a new argument for prot,
+> so the driver can add KVM_PGTABLE_PROT_NORMAL_NC.
 > 
-> My idea was to keep the exact same interface as the rest of the tracing. I could
-> keep that /trace file for compatibility and add /reset?
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 11 +++++++++--
+>  2 files changed, 10 insertions(+), 2 deletions(-)
 > 
-> "cat trace" could also just returns a text like *** not supported *** ?
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 5f9d56754e39..52d7ee91e18c 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -36,6 +36,7 @@ int __pkvm_prot_finalize(void);
+>  int __pkvm_host_share_hyp(u64 pfn);
+>  int __pkvm_host_unshare_hyp(u64 pfn);
+>  int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+> +int ___pkvm_host_donate_hyp(u64 pfn, u64 nr_pages, enum kvm_pgtable_prot prot);
+>  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 8957734d6183..861e448183fd 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -769,13 +769,15 @@ int __pkvm_host_unshare_hyp(u64 pfn)
+>  	return ret;
+>  }
+>  
+> -int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
+> +int ___pkvm_host_donate_hyp(u64 pfn, u64 nr_pages, enum kvm_pgtable_prot prot)
+>  {
+>  	u64 phys = hyp_pfn_to_phys(pfn);
+>  	u64 size = PAGE_SIZE * nr_pages;
+>  	void *virt = __hyp_va(phys);
+>  	int ret;
+>  
+> +	WARN_ON(prot & KVM_PGTABLE_PROT_X);
 
-If it's never going to be supported, I rather not add it. It not being
-there is a sure way of knowing it's not supported. Just adding it because
-the normal system has it is actually worse if it doesn't behave the same.
+Should this actually just enforce that the permissions are
+KVM_PGTABLE_PROT_RW:
 
--- Steve
+	WARN_ON((prot & KVM_PGTABLE_PROT_RWX) != KVM_PGTABLE_PROT_RW);
+
+?
+
+Since the motivation is about the memory type rather than the
+permissions, it would be best to preserve the current behaviour.
+
+Will
