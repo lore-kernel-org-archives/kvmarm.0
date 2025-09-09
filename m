@@ -1,92 +1,97 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.hostedemail.com (smtprelay0016.hostedemail.com [216.40.44.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF056301007
-	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 18:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B973E22258C
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 18:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757442667; cv=none; b=joQe6W6eGFJnZS0L4LIzdFW7u1El5OGY5VnAyQyzOqsjw3xc1TvkCA5Y911I7dF2UQO498kKnZqD9DfHyxA1VzBcwOk2dOoRvBlq+sFwvCko6tHkKo+LEV2X2VUj/muM2fHA5OzR9S90GUl3y+mSpeOpz70k+G4GtZgeBNjRfps=
+	t=1757443148; cv=none; b=jxdYfRCksT/zyaqmI/cmCSYwslGYf9rFpxdmjzfZoS5vG9yFd9pXpdMJ8gBeAumibT41ar1M8kuYHY+0FDTp6y7ct8Y9JBDRFQ+K6AyzCre4JNn4sGPBQV/NWvSEf/duoE34xW5iUZq7D8XletbJCTdaylbLHNKo0yW3FvCporI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757442667; c=relaxed/simple;
-	bh=yM0Xnr5mgLbhYQekgENeXiwmJdvFW1b1xD3j7t4hWgo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oZu08BkCAHiln3C7HBdhVjrGPZfJzIZi9FI6MsrS38rprBbHRQd7GP7m4JswFfq7MvrSmqTt7d/9o2aRzHU1n3+xKQg3cxBOwtew0WKRYMlqw0SygqpYdrC+M+ExlPIpIDWdM+rv18GUP8LBd5Fbl7KmhaXd1ga2qfIpofU/uYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2LHQ6PkH; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2LHQ6PkH"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b350971a2eso20991cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 09 Sep 2025 11:31:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757442659; x=1758047459; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TfxcLFfDrPkIJiNUWhVN3N4fK2AjPT82pZU1A16szcs=;
-        b=2LHQ6PkHHmNAZWQtRjbtwTyiNxL+fK5tUPzjW2uZPxsVY4HEnjBE11mfIulXoZQ+lT
-         H57MJc2mX6eWEK2BDZ8k69Xfpt8Vz+u1eAjPhDys6Uc7amDfFBgyj2OQqKBIp4Lt5Ms2
-         KHhC2LO+pmsqx7v+TMy3N23WuPz0L+nj+Q0bJDrI+8CilygncLEJxD+D1vrM82GZnekc
-         DNuJOwdx3J2LU+RaxEqu8lUqhTI3L0ct3DPepCagWYgWihQ5lcyieQeOO6yY/cjCwcD9
-         UGShd9x9UxHb5/koXqwc11m3PhJu792n8iVcrwrkwUquotfb4xeKA4MFmRP4/3hJwXe4
-         0A5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757442659; x=1758047459;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TfxcLFfDrPkIJiNUWhVN3N4fK2AjPT82pZU1A16szcs=;
-        b=Q9diZSAo+3mxJrLcsajxKk/fuuuG8JuLSyy51n8oaqgwdbUTheSmr7f0SI+SxB0899
-         atUK7Cg0arHX6/GAkpSIV1cEBE/aytNw08bhkmDHBcjkfetSU22vguMvPAS9SAPK142Q
-         5u0ScVLRCrYZOdIoDsvEXVI7tc+TMVDoFlGKO/FN8SRvVV799J8fMlSSvyykPQjbG6Kr
-         OxiwGQOFjqARUCKSYMkQWW2+CU4e9rI2GiZB0+wWmo9KrZIlkRW3pWcI8qK0jjvbiqDR
-         1bgDcVy9CP/rTEd4Gcm313t1SFUYKrH5qcCN1fMz22ICeVryOHoAk2fTbJJodgvPNF5f
-         7RfA==
-X-Forwarded-Encrypted: i=1; AJvYcCWRgc9J+xloeyAqFv0HGPuL5f/8dbWeoD2GE4ZOVM+QkoZIkspNzsJMx3AHjhDzQYKCi9eMh3M=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzqHnZIjq8Vrbw0ECUSliI+nmG64Z/B4epuoUEXqBqO2gqLtT1f
-	iBOHa2eOUDkoC2rR+xTKKvVESbEFOtgVU8VQYjjA30UxujgoOJwspzcy5Hjbb73btrV1LZcPLYG
-	AwrYOV2XxMEnNhrVj+CwEesdmlub3hN6SAhWGQQUphtZnZIOyHJxboDhyYhM=
-X-Gm-Gg: ASbGncvHI2PIcUmJC4eT6GhjQMuO6CW+5fS/Qt/m1koCNJegVVd8ZBpdJFIic0NmOLM
-	8qNm3B4SlDIB1X/lxEQC59jnvSrjEjR16j9tlTaO/+iKFd0vtuUKWuUNupidQBXtqzOG8M+yzXk
-	lRId8a4uzXAG4tB6zm2Ub5ChUpdXl6gmHQVK8s58eqkP5GlIzlumt46mWzGnLrt7/jaudzF7CFn
-	xEZhnA2KPIOw7sRmupR6A==
-X-Google-Smtp-Source: AGHT+IGf+Q8hPzzej9xbfaEr60LoJgETjDgKDHy0ML31wiaO21T7Ktg8vRU8pvPgmGyM85KMJM70NWIugrUwyx3yAfE=
-X-Received: by 2002:a05:622a:14e:b0:4b4:979d:8764 with SMTP id
- d75a77b69052e-4b62569f89bmr232071cf.19.1757442659042; Tue, 09 Sep 2025
- 11:30:59 -0700 (PDT)
+	s=arc-20240116; t=1757443148; c=relaxed/simple;
+	bh=eqcE62nxhCYT/g1eduv2zGQJ99h5K0JxSzmZu9RmBP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b4nsspJv1rAJPBxz1L+eKyloJ130+ZRAZcNCfEkXt1agNHw5G77EAmiPtXtx+NDbxo6sBDmMi7dYLtCl5cHX4qm5d4n47UiOa0Jfuuj+rSU3KUriXP29izaUUxt6R+v64uqIUA1cU7K+Fd723r7ysIbNpNU42jnKtXmhCwDgoAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf20.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay08.hostedemail.com (Postfix) with ESMTP id 69E5A14069C;
+	Tue,  9 Sep 2025 18:39:04 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf20.hostedemail.com (Postfix) with ESMTPA id B2FDE20025;
+	Tue,  9 Sep 2025 18:39:00 +0000 (UTC)
+Date: Tue, 9 Sep 2025 14:39:48 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ aneesh.kumar@kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 04/24] tracing: Add reset to trace remotes
+Message-ID: <20250909143948.420bfb1c@gandalf.local.home>
+In-Reply-To: <aMBSa29ev0BNgr5R@google.com>
+References: <20250821081412.1008261-1-vdonnefort@google.com>
+	<20250821081412.1008261-5-vdonnefort@google.com>
+	<20250908193757.079aae76@gandalf.local.home>
+	<aMAZMaZJ1_Eny5Ku@google.com>
+	<20250909094028.3265b751@gandalf.local.home>
+	<aMBSa29ev0BNgr5R@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250819215156.2494305-1-smostafa@google.com> <20250819215156.2494305-17-smostafa@google.com>
-In-Reply-To: <20250819215156.2494305-17-smostafa@google.com>
-From: Daniel Mentz <danielmentz@google.com>
-Date: Tue, 9 Sep 2025 11:30:48 -0700
-X-Gm-Features: Ac12FXyo44kEPGnZiMSM0NG36OMtjkd65ZSJDU9pCejgoL2I9Mvg7O8L88TNYvU
-Message-ID: <CAE2F3rDc-4SirDDrQeZJQDqjdv67-QFfQhHfwyd+O6f5OsBSpw@mail.gmail.com>
-Subject: Re: [PATCH v4 16/28] iommu/arm-smmu-v3-kvm: Create array for hyp SMMUv3
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, maz@kernel.org, 
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	robin.murphy@arm.com, jean-philippe@linaro.org, qperret@google.com, 
-	tabba@google.com, jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: B2FDE20025
+X-Stat-Signature: 88rpahm4umjmmcjmrz9w7j3z6z8cjawb
+X-Rspamd-Server: rspamout02
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1/Dfb0F/ok0yMi6rVU9qwiXjkJqxDcdMLk=
+X-HE-Tag: 1757443140-354827
+X-HE-Meta: U2FsdGVkX1/dFMJGRD+C6O+Za+iRGR7QlQeUizfNtukq1m6fiS7yJXJxYQxG9yxfVWgqP1DYfzB0aOk3vcc97HywbUnaMvNe17yZQK7V0szWK1Xn6Fl1E/CQyXQAKRnkuCgAc7SuJp0V/GjwyvI52PlbVs4xIb6J5bfiz08Jgs1BYuK2BxX9Q4cDppfKLQ5O3V9K0Fdd3muKjQcb4613ryQc1TiRocoDXYvOIhxEJ3hsZTAKZllg5vzY8IgoDRAIEVes+/4idN+hXi8UaE6BF780N6C1bIYBKIOoWDOENiR/Vg6w8f57zdLTvf6x0jOhYSOnHsTZAQiFGZjiGXvDuz1xkAnD1qwI
 
-On Tue, Aug 19, 2025 at 2:55=E2=80=AFPM Mostafa Saleh <smostafa@google.com>=
- wrote:
+On Tue, 9 Sep 2025 17:14:35 +0100
+Vincent Donnefort <vdonnefort@google.com> wrote:
+
+> On Tue, Sep 09, 2025 at 09:40:28AM -0400, Steven Rostedt wrote:
+> > On Tue, 9 Sep 2025 13:10:25 +0100
+> > Vincent Donnefort <vdonnefort@google.com> wrote:
+> >   
+> > > > I wonder if we should name the file "reset" to not be confusing to users
+> > > > when they cat the file and it doesn't produce any output.    
+> > > 
+> > > My idea was to keep the exact same interface as the rest of the tracing. I could
+> > > keep that /trace file for compatibility and add /reset?
+> > > 
+> > > "cat trace" could also just returns a text like *** not supported *** ?  
+> > 
+> > If it's never going to be supported, I rather not add it. It not being
+> > there is a sure way of knowing it's not supported. Just adding it because
+> > the normal system has it is actually worse if it doesn't behave the same.  
+> 
+> If later we extend the meta-page to support non-consuming read, /trace would
+> then become useful.
+> 
+> Another argument for non-consuming read would be to enable dump on panic.
+> 
+> But I understand your point, it might be wishful thinking at this point.
 >
-> +               if (kvm_arm_smmu_array[i].mmio_size < SZ_128K) {
-> +                       pr_err("SMMUv3(%s) has unsupported size(0x%lx)\n"=
-, np->name,
-> +                              kvm_arm_smmu_array[i].mmio_size);
 
-Use format specifier %pOF to print device tree node.
-If mmio_size is a size_t type, use format specifier %zx.
-Align language of error message with kernel driver which prints "MMIO
-region too small (%pr)\n".
-I'm wondering if we should use kvm_err instead of pr_err.
+It may be possible to still do a trace file. Basically, it would work the
+same way the normal iterator works. Today it reads the trace while the
+writer could be modifying it.
+
+Actually, I think there's a bug in the iterator code today :-p
+
+It needs to be modified to copy the event, as it currently passes the event
+as is and that event could be written over by the writer.
+
+But anyway, I think it should work for the remote buffers too. Let me go
+and fix the current iterator.
+
+-- Steve
