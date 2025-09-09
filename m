@@ -1,82 +1,169 @@
-Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6183054F0
-	for <kvmarm@lists.linux.dev>; Mon,  8 Sep 2025 23:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F7D1A9FA3
+	for <kvmarm@lists.linux.dev>; Tue,  9 Sep 2025 01:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757374644; cv=none; b=Jw/ci9kCaZrVwNzsLOAKcgp8YkU4BluZPqjCC7sNnUeTyPd0krlSaQTvZ4p2xjSdNiv0KPGxHJprL888jI0LTIkO8HnjZkN4PafY3xcVMMYTK9ooSLYF2soaJOIRCCsXHTBo9ajlMrt1o3Q5oK+P1r4YPEPp8LMBzb7+i0Tp0Ts=
+	t=1757382491; cv=none; b=mjTfu4/IcL6CJaCSENWjN39PvaKR8kWfMoykpJdQNFdzUa6TiJpr76fTYpfo6RXlEG6pPn7WqV38ZaWzYtb2xZQt4REJhsIOKD+B/7DkAC0HirDuNH7s0SVKrPhsCfZsTTwiqeJ4qK6rS4XAS7jgf2LSHhkogT0kUKOszd5+Q7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757374644; c=relaxed/simple;
-	bh=b/7INvGlACZqgSm8XhR6n/N4TB0Cl26/+RGOEBMuczE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d8KxeukWnunTs0W4CjXsBwS2/duM8ZbTrE2RLUrrrltu4neYOf0AxDWpYlQ8m0o/iIQYclmQMxU/7GEsBaoHkXVcX7j0/FJvdvrHJksXXj52Gp63fzlBBIbtieJGBzdJdhv5aTLzfMo3vSCrJrUhljUfx21hcVFrzweLOMsSqTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf07.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay01.hostedemail.com (Postfix) with ESMTP id 7F90A1DDB91;
-	Mon,  8 Sep 2025 23:37:14 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf07.hostedemail.com (Postfix) with ESMTPA id F243A20024;
-	Mon,  8 Sep 2025 23:37:10 +0000 (UTC)
-Date: Mon, 8 Sep 2025 19:37:57 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
- joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- jstultz@google.com, qperret@google.com, will@kernel.org,
- aneesh.kumar@kernel.org, kernel-team@android.com,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 04/24] tracing: Add reset to trace remotes
-Message-ID: <20250908193757.079aae76@gandalf.local.home>
-In-Reply-To: <20250821081412.1008261-5-vdonnefort@google.com>
-References: <20250821081412.1008261-1-vdonnefort@google.com>
-	<20250821081412.1008261-5-vdonnefort@google.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1757382491; c=relaxed/simple;
+	bh=is2pUEHEiZMQU1R2ZtXgqvP+1teelQQSyxe1k0SHyzk=;
+	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ZYQ8N5owpbdAmai6wcj96gOj0ET+xjJfUhvuhnPW2eFSCE45w5AT6qMjFoZvnoPs5BTKhl0Ld5QDSl+CXny1uh70N3pFMWrwdDFRqI5trDvZ45vlThe/fxAOpSV/p5YL4y6/64furjNuZsbzcJvzxs0sqy8DJeVzlKw1YYuTDG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cLRRj1mY3zRk4L;
+	Tue,  9 Sep 2025 09:43:29 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2AAE7180087;
+	Tue,  9 Sep 2025 09:48:06 +0800 (CST)
+Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 9 Sep 2025 09:48:05 +0800
+Received: from [10.67.121.177] (10.67.121.177) by
+ kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 9 Sep 2025 09:48:04 +0800
+CC: <yangyicong@hisilicon.com>, <catalin.marinas@arm.com>, <maz@kernel.org>,
+	<oliver.upton@linux.dev>, <corbet@lwn.net>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<shuah@kernel.org>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
+	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <tangchengchang@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v4 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
+To: Will Deacon <will@kernel.org>
+References: <20250715081356.12442-1-yangyicong@huawei.com>
+ <20250715081356.12442-6-yangyicong@huawei.com>
+ <aL7Fgx__LeLfbDyU@willie-the-truck>
+From: Yicong Yang <yangyicong@huawei.com>
+Message-ID: <5d2ba565-715b-9b17-951b-f805dde5988b@huawei.com>
+Date: Tue, 9 Sep 2025 09:48:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <aL7Fgx__LeLfbDyU@willie-the-truck>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Stat-Signature: wdbcg9cmz9hgzbiksnz8z5e99z9oj6b5
-X-Rspamd-Server: rspamout07
-X-Rspamd-Queue-Id: F243A20024
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX18XbN7DKfTHTi5CaU0ETRtueyTq0Kn+udA=
-X-HE-Tag: 1757374630-126015
-X-HE-Meta: U2FsdGVkX1+EtvhnbdP2Gtp4noi9cwQOFuTgiBxTimh80Zt9R2I9RRFZOl6Ad9iETIg8Vo1wn0H3utT0IieAsllW9nATADRweoco0USuPbF/DP4mzyWeE7aIzDtTjPTMCyknsX9vb+/wfUw4RcDhTt6//E9Z3hqrulPr2olWCfWURJbu73yPFEi3lUwCRSODrbQJTtcFs9kbOy6wjiU0k5sLzN78GCaIrqX6j0uq3wxNHph6lidTpEKShX9mn39tAzBAhFD2JHB0HJDOgo8fyH/TPKH5N4qstseJVEKZysaLeFeVQlz4byE2opEgIDC69C7Sll18FkwB6E6vUWqaMXNqzjYegYIr
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq200018.china.huawei.com (7.202.195.108)
 
-On Thu, 21 Aug 2025 09:13:52 +0100
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On 2025/9/8 20:01, Will Deacon wrote:
+> On Tue, Jul 15, 2025 at 04:13:54PM +0800, Yicong Yang wrote:
+>> From: Yicong Yang <yangyicong@hisilicon.com>
+>>
+>> Armv8.7 introduces single-copy atomic 64-byte loads and stores
+>> instructions and its variants named under FEAT_{LS64, LS64_V}.
+>> These features are identified by ID_AA64ISAR1_EL1.LS64 and the
+>> use of such instructions in userspace (EL0) can be trapped. In
+>> order to support the use of corresponding instructions in userspace:
+>> - Make ID_AA64ISAR1_EL1.LS64 visbile to userspace
+>> - Add identifying and enabling in the cpufeature list
+>> - Expose these support of these features to userspace through HWCAP3
+>>   and cpuinfo
+>>
+>> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+>> ---
+>>  Documentation/arch/arm64/booting.rst    | 12 ++++++
+>>  Documentation/arch/arm64/elf_hwcaps.rst |  6 +++
+>>  arch/arm64/include/asm/hwcap.h          |  2 +
+>>  arch/arm64/include/uapi/asm/hwcap.h     |  2 +
+>>  arch/arm64/kernel/cpufeature.c          | 51 +++++++++++++++++++++++++
+>>  arch/arm64/kernel/cpuinfo.c             |  2 +
+>>  arch/arm64/tools/cpucaps                |  2 +
+>>  7 files changed, 77 insertions(+)
+>>
+>> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+>> index ee9b790c0d72..837823d49212 100644
+>> --- a/Documentation/arch/arm64/booting.rst
+>> +++ b/Documentation/arch/arm64/booting.rst
+>> @@ -483,6 +483,18 @@ Before jumping into the kernel, the following conditions must be met:
+>>  
+>>     - MDCR_EL3.TPM (bit 6) must be initialized to 0b0
+>>  
+>> +  For CPUs support for 64-byte loads and stores without status (FEAT_LS64):
+> 
+> nit: I think you're missing a word ("For CPUs with support ...").
+> 
+>> +
+>> +  - If the kernel is entered at EL1 and EL2 is present:
+>> +
+>> +    - HCRX_EL2.EnALS (bit 1) must be initialised to 0b1.
+>> +
+>> +  For CPUs support for 64-byte loads and stores with status (FEAT_LS64_V):
+> 
+> Same here, but also FEAT_LS64_V only applies to stores so no need to
+> mention loads.
+> 
+>> +
+>> +  - If the kernel is entered at EL1 and EL2 is present:
+>> +
+>> +    - HCRX_EL2.EnASR (bit 2) must be initialised to 0b1.
+>> +
+>>  The requirements described above for CPU mode, caches, MMUs, architected
+>>  timers, coherency and system registers apply to all CPUs.  All CPUs must
+>>  enter the kernel in the same exception level.  Where the values documented
+>> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
+>> index 69d7afe56853..9e6db258ff48 100644
+>> --- a/Documentation/arch/arm64/elf_hwcaps.rst
+>> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
+>> @@ -435,6 +435,12 @@ HWCAP2_SME_SF8DP4
+>>  HWCAP2_POE
+>>      Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
+>>  
+>> +HWCAP3_LS64
+>> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001.
+>> +
+>> +HWCAP3_LS64_V
+>> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010.
+> 
+> Given that these instructions only work on IMPLEMENTATION DEFINED memory
+> locations and aren't guaranteed to generate an abort if used elsewhere,
+> how is userspace supposed to know what to do with them?
+> 
 
-> @@ -400,7 +436,9 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
->  	    !trace_create_file("buffer_size_kb", TRACEFS_MODE_WRITE, remote_d, remote,
->  			       &buffer_size_kb_fops) ||
->  	    !trace_create_file("trace_pipe", TRACEFS_MODE_READ, remote_d, remote,
-> -			       &trace_pipe_fops))
-> +			       &trace_pipe_fops) ||
-> +	    !trace_create_file("trace", 0200, remote_d, remote,
-> +			       &trace_fops))
->  		goto err;
->  
->  	percpu_d = tracefs_create_dir("per_cpu", remote_d);
-> @@ -422,7 +460,9 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
->  		}
->  
->  		if (!trace_create_cpu_file("trace_pipe", TRACEFS_MODE_READ, cpu_d, remote, cpu,
-> -					   &trace_pipe_fops))
-> +					   &trace_pipe_fops) ||
-> +		    !trace_create_cpu_file("trace", 0200, cpu_d, remote, cpu,
-> +					   &trace_fops))
->  			goto err;
->  	}
+per ARM DDI0487 L.b section C3.2.6,
 
-I wonder if we should name the file "reset" to not be confusing to users
-when they cat the file and it doesn't produce any output.
+  When the instructions access a memory type that is not one of the following,
+  a data abort for unsupported Exclusive or atomic access is generated...
 
--- Steve
+so...
+
+> As it stands, exposing the feature blindly feels like a bad idea to me.
+> Surely there needs to be a way for userspace to either probe or request
+> memory that supports the instructions? We should also make sure we
+> handle the abort properly if it occurs and presumably deliver a SIGBUS.
+> 
+
+...on host accessing an unsupported memory region a SIGBUS will be delivered,
+selftests for the instruction added in PATCH 7/7 make use of this, comments
+added in ls64_sigill() explained there will be a SIGBUS recieved if accessing
+the normal memory.
+
+if in a VM the DABT will be taken by the guestOS (then handled in the same
+way like host, deliver a SIGBUS by the guestOS) or by the hypervisor depend
+on the hardware implementation. for the latter case PATCH 3/7 add the handling
+to inject the DABT back to the VM.
+
+as for the usage, since LS64 is intended to interact with the device, currently
+we only use it in userspace drviers, as mentioned in the coverletter:
+
+  A real scenario for this feature is that the userspace driver can make use of
+  this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
+  directly into the hardware.
+
+the userspace driver will know exactly whether their devices support LS64 or not
+and request the target memory.
+
+thanks.
