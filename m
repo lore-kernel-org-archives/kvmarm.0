@@ -1,246 +1,221 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA423376A7
-	for <kvmarm@lists.linux.dev>; Wed, 10 Sep 2025 18:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757527787; cv=none; b=GL40pDHY4jaFjDq9CS241R4z5Ac6z08TwQ6W2rh4rv4d1QfuW4vERuWb/McOD1YVyv0FEcsdDVx2QT5PWJjKog9dp3NmTJkweoUxJRFmcQlVtlvn9AuGymbrB4QCGi5qiyjduAHLk7yHkQxpQn30rUaL3ervKlVsvcZcLL3K0sU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757527787; c=relaxed/simple;
-	bh=rXWJqJft9qRnT37sROgBw2BQpz8y+zR3s63eK3zyYk8=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D29126D4D8
+	for <kvmarm@lists.linux.dev>; Wed, 10 Sep 2025 18:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=91.218.175.188
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757527789; cv=fail; b=asK3PoSxTB+7gnYzmLdfW0HkZk9HuMQXwtOZMnqdxTbPz0u3etyiXktqkB68+/nu2rRkgtcEHDRnOJRRIvDs1gRxAn/gCFT6bZrgYd9Kv/Bwc6ZScwQyXFGns6SRnW2yvwUrhMcMypQu3Nluh9QR9QXTvN7+LKrmyOu67MBi1QI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757527789; c=relaxed/simple;
+	bh=I5BQmU9p8aGGRjvkvVTVxwT5IaeoeE59ZDNKDEIgu1g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jOyhiIWNzA7VBxoqrHdQ6xoKCmLmqr+Tb9KvgRkbAgkI6KzzcJ7SANkSLnvwoujdimX9IwKRaX/wfmGZyy4wW+0paT10q2XI/D6TUNb35qAUMrNWb7reseut8HRaZyCJi17EGH8I/4yE1bTdONId9YJB5s5ACn/JOLKboO575ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=D6mC7ZQE; arc=none smtp.client-ip=91.218.175.185
+	 MIME-Version; b=jJx3+ZD0KOJb2DV07gt6xwWwTxoGbEe6Ypxk4bBZL30t9LI+5Smy1f3pC+y1C8hpBLlsQIKgRA2MM6eB65VJEnKLU0RCSMM4JVmtpvDPzUBWn2BhkItXaHNI8guNfMtKnfDHSVPIW4d37Y4whMuL74cVEl4F/ADPDG2GZh3h+1Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ocA44LYO; dkim=fail (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O3bpTdQA reason="signature verification failed"; arc=fail smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D6mC7ZQE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ocA44LYO";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O3bpTdQA"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757527783;
+	t=1757527785;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3/3NYCrYU10OqzVNnB/rKIXIMaH0ha49X1JhZ9LVGNU=;
-	b=D6mC7ZQENO+iejZB3g8lmOIejqgl9/hN0mKc8WRNHrTYWtOfEhItqKLxyENBafIRnaHZoi
-	w9sQw1unrQneB83S4VuGMOWZPD0qIKymK7C+vNfpKYEAKte4rWMhcEiHmizZNWCmoO5mU4
-	JKwH1ifJCy0kME2/azcZ6LWcciqeEZs=
+	bh=Qzn5g8Hw7KzqnqodLNnlFqbmVmAnwg8HpayM5vJro2A=;
+	b=ocA44LYOvyLNlB3Bjyuo9BlIL6idrKVGZ5CgvskFZ8zqmiKUH0tTQH1TR9TfD60CSHW5Ia
+	KzmcBAf1xMZQZxngCVDg7IuymLYpgFs3fdjyLrYVlcvl0zMjj4+UZYnfb4Z8i92N9vHk3M
+	23rIaFKFhe7fqRKjj6bfK/8DB6JZfYc=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 2/2] Revert "KVM: arm64: Split kvm_pgtable_stage2_destroy()"
-Date: Wed, 10 Sep 2025 11:09:29 -0700
-Message-Id: <20250910180930.3679473-3-oliver.upton@linux.dev>
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: [PATCH] bad bad bad
+Date: Wed, 10 Sep 2025 11:09:30 -0700
+Message-Id: <20250826163335.880047-1-maz@kernel.org>
 In-Reply-To: <20250910180930.3679473-1-oliver.upton@linux.dev>
 References: <20250910180930.3679473-1-oliver.upton@linux.dev>
+X-Envelope-To: oliver.upton@linux.dev
+Authentication-Results: aspmx1.migadu.com; dkim=pass header.d=kernel.org header.s=k20201202 header.b=O3bpTdQA; spf=pass (aspmx1.migadu.com: domain of maz@kernel.org designates 172.234.252.31 as permitted sender) smtp.mailfrom=maz@kernel.org; dmarc=pass (policy=quarantine) header.from=kernel.org
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1; t=1756226028; h=from:from:reply-to:subject:subject:date:date:message-id:message-id: to:to:cc:mime-version:mime-version: content-transfer-encoding:content-transfer-encoding:dkim-signature; bh=MaTRZRfvU6ndoc4WGJ/STJiAhpK2Xk0JxSoWS22BpAY=; b=UrdsRtGcQ4J/IeIeAQC1FutLPtdjt2UIyRlbrnurItZToA/joVhSdO1x5CkTsuO9E7K7sp IXcHNExcLMoSNa3SAJWdC/ao8AGyUI5JdGthu28cfz3DcLy8UpcyfY6f5ogpYc95VngVOZ 57JhBOav0R/6w2RUOJUZwH9NSrL72xM=
+ARC-Seal: i=1; s=key1; d=linux.dev; t=1756226028; a=rsa-sha256; cv=none; b=DIpQikrXnLzaNJf5kjBC+CQzhWOzf67TPnu0tFaNsN9g+kuiRMIH/7Sc2ObPmZaA5XQ0GF ipuMiC8WFyKBtKePYLyRTaY8/5J8E1DvKGD2SZu+VJs8FgVpnMVAZ/p26QFHdw1jSfHst1 PbNWgnRQofQaxO9bmY5dd58Ol4NucY0=
+ARC-Authentication-Results: i=1; aspmx1.migadu.com; dkim=pass header.d=kernel.org header.s=k20201202 header.b=O3bpTdQA; spf=pass (aspmx1.migadu.com: domain of maz@kernel.org designates 172.234.252.31 as permitted sender) smtp.mailfrom=maz@kernel.org; dmarc=pass (policy=quarantine) header.from=kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org; s=k20201202; t=1756226025; bh=dHR65QXGf8w1dBCf5RYqqKU6LKOZgghODBwOoH4O5jY=; h=From:To:Subject:Date:From; b=O3bpTdQALPGadCba5yLFFA2j3HiIkOTvFOiG68kA8oAtBVDgsV/tI0XsFTFS2gFoX 20nJPIFTc69Q11n2gwHbiJG/5C2ZjAOXQLCuf33oajkVxDtRu5OcopWi+mRLT7LZPi lCCb3cbHmKj3b/9OGgoxmZ+r0L4QMBJ3WR2W9xiQ6JxOngRB/olkG5IxvhU8LiL8K9 pmzU41Mm3X33JYxImRg78MOk1iPyaMkPTw6RS4Km8+otHC2IOFvClWUhm56WvEKwmG 6Zal5REOUEuTid/EffFL/0KBUcMk82dci/Xmj5svp5v9OukkSUtdv8x8OHHEVgvYq6 dcMNSudNyr/3g==
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Score: -6.24
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-This reverts commit 0e89ca13ee5ff41b437bb2a003c0eaf34ea43555.
+From: Marc Zyngier <maz@kernel.org>
 
-The functional change that depended on this refactoring has been found
-to be quite problematic. Reverting the whole pile to start fresh when
-new fixes are available.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 30 ----------------------------
- arch/arm64/include/asm/kvm_pkvm.h    |  4 +---
- arch/arm64/kvm/hyp/pgtable.c         | 25 ++++-------------------
- arch/arm64/kvm/mmu.c                 | 12 ++---------
- arch/arm64/kvm/pkvm.c                | 11 ++--------
- 5 files changed, 9 insertions(+), 73 deletions(-)
+ .../selftests/kvm/arm64/external_aborts.c     | 54 +++++++++++++++++++
+ .../selftests/kvm/include/arm64/processor.h   |  1 +
+ .../selftests/kvm/lib/arm64/processor.c       | 13 ++++-
+ 3 files changed, 67 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 1246216616b5..2888b5d03757 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -355,11 +355,6 @@ static inline kvm_pte_t *kvm_dereference_pteref(struct kvm_pgtable_walker *walke
- 	return pteref;
- }
+diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
+index 062bf84cced13..780e2af1f3b7b 100644
+--- a/tools/testing/selftests/kvm/arm64/external_aborts.c
++++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
+@@ -11,6 +11,7 @@
+ #define EXPECTED_SERROR_ISS	(ESR_ELx_ISV | 0x1d1ed)
  
--static inline kvm_pte_t *kvm_dereference_pteref_raw(kvm_pteref_t pteref)
--{
--	return pteref;
--}
--
- static inline int kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
+ static u64 expected_abort_pc;
++static vm_vaddr_t bad_ptw_va;
+ 
+ static void expect_sea_handler(struct ex_regs *regs)
  {
- 	/*
-@@ -389,11 +384,6 @@ static inline kvm_pte_t *kvm_dereference_pteref(struct kvm_pgtable_walker *walke
- 	return rcu_dereference_check(pteref, !(walker->flags & KVM_PGTABLE_WALK_SHARED));
+@@ -84,6 +85,9 @@ static void __vcpu_run_expect(struct kvm_vcpu *vcpu, unsigned int cmd)
+ 	case UCALL_ABORT:
+ 		REPORT_GUEST_ASSERT(uc);
+ 		break;
++	case UCALL_PRINTF:
++		printf("%s", uc.buffer);
++		break;
+ 	default:
+ 		if (uc.cmd == cmd)
+ 			return;
+@@ -250,6 +254,55 @@ static void test_serror(void)
+ 	kvm_vm_free(vm);
  }
  
--static inline kvm_pte_t *kvm_dereference_pteref_raw(kvm_pteref_t pteref)
--{
--	return rcu_dereference_raw(pteref);
--}
--
- static inline int kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
++static void expect_sea_s1ptw_handler(struct ex_regs *regs)
++{
++	u64 esr = read_sysreg(esr_el1);
++
++
++	GUEST_ASSERT_EQ(regs->pc, expected_abort_pc);
++	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
++	__GUEST_ASSERT((esr & ESR_ELx_FSC_TYPE) >= ESR_ELx_FSC_SEA_TTW(-1) &&
++		       (esr & ESR_ELx_FSC_TYPE) <= ESR_ELx_FSC_SEA_TTW(3),
++		       "ESR == %lx\n", esr);
++
++	GUEST_DONE();
++}
++
++static noinline void test_s1ptw_abort_guest(void)
++{
++	void (*fn)(void) = (void*)bad_ptw_va;
++	extern char test_s1ptw_abort_insn;
++
++	WRITE_ONCE(expected_abort_pc, (u64)&test_s1ptw_abort_insn);
++
++	fn();
++	asm volatile("test_s1ptw_abort_insn:\n\t"
++		     "ldr x0, [%0]\n\t"
++		     : : "r" (bad_ptw_va) : "x0", "memory");
++
++	GUEST_FAIL("Load on S1PTW abort should not retire");
++}
++
++static void test_s1ptw_abort(void)
++{
++	struct kvm_vcpu *vcpu;
++	u64 *ptep, bad_pa;
++	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_s1ptw_abort_guest,
++							expect_sea_s1ptw_handler);
++
++	bad_ptw_va = __vm_vaddr_alloc(vm, vm->page_size,
++				      vm->page_size, MEM_REGION_DATA);
++
++	ptep = virt_get_pte_hva_at_level(vm, bad_ptw_va, 2);
++	bad_pa = BIT(vm->pa_bits) - vm->page_size;
++
++	*ptep &= ~GENMASK(47, 12);
++	*ptep |= bad_pa;
++
++	vcpu_run_expect_done(vcpu);
++	kvm_vm_free(vm);
++}
++
+ static void test_serror_emulated_guest(void)
  {
- 	if (walker->flags & KVM_PGTABLE_WALK_SHARED)
-@@ -561,26 +551,6 @@ static inline int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2
-  */
- void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+ 	GUEST_ASSERT(!(read_sysreg(isr_el1) & ISR_EL1_A));
+@@ -327,4 +380,5 @@ int main(void)
+ 	test_serror_masked();
+ 	test_serror_emulated();
+ 	test_mmio_ease();
++	test_s1ptw_abort();
+ }
+diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
+index 255fed769a8a5..e3e916b1d9c4e 100644
+--- a/tools/testing/selftests/kvm/include/arm64/processor.h
++++ b/tools/testing/selftests/kvm/include/arm64/processor.h
+@@ -175,6 +175,7 @@ void vm_install_exception_handler(struct kvm_vm *vm,
+ void vm_install_sync_handler(struct kvm_vm *vm,
+ 		int vector, int ec, handler_fn handler);
  
--/**
-- * kvm_pgtable_stage2_destroy_range() - Destroy the unlinked range of addresses.
-- * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-- * @addr:      Intermediate physical address at which to place the mapping.
-- * @size:      Size of the mapping.
-- *
-- * The page-table is assumed to be unreachable by any hardware walkers prior
-- * to freeing and therefore no TLB invalidation is performed.
-- */
--void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
--					u64 addr, u64 size);
--
--/**
-- * kvm_pgtable_stage2_destroy_pgd() - Destroy the PGD of guest stage-2 page-table.
-- * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
-- *
-- * It is assumed that the rest of the page-table is freed before this operation.
-- */
--void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
--
- /**
-  * kvm_pgtable_stage2_free_unlinked() - Free an unlinked stage-2 paging structure.
-  * @mm_ops:	Memory management callbacks.
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 35f9d9478004..ea58282f59bb 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -179,9 +179,7 @@ struct pkvm_mapping {
++uint64_t *virt_get_pte_hva_at_level(struct kvm_vm *vm, vm_vaddr_t gva, int level);
+ uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva);
  
- int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 			     struct kvm_pgtable_mm_ops *mm_ops);
--void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
--					u64 addr, u64 size);
--void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
-+void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
- int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
- 			    enum kvm_pgtable_prot prot, void *mc,
- 			    enum kvm_pgtable_walk_flags flags);
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index c36f282a175d..c351b4abd5db 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1551,38 +1551,21 @@ static int stage2_free_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	return 0;
+ static inline void cpu_relax(void)
+diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+index 9d69904cb6084..628c5bc8c4381 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/processor.c
++++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+@@ -185,7 +185,7 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
  }
  
--void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
--				       u64 addr, u64 size)
-+void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+-uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
++uint64_t *virt_get_pte_hva_at_level(struct kvm_vm *vm, vm_vaddr_t gva, int level)
  {
-+	size_t pgd_sz;
- 	struct kvm_pgtable_walker walker = {
- 		.cb	= stage2_free_walker,
- 		.flags	= KVM_PGTABLE_WALK_LEAF |
- 			  KVM_PGTABLE_WALK_TABLE_POST,
- 	};
+ 	uint64_t *ptep;
  
--	WARN_ON(kvm_pgtable_walk(pgt, addr, size, &walker));
--}
--
--void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
--{
--	size_t pgd_sz;
--
-+	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
- 	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
--
--	/*
--	 * Since the pgtable is unlinked at this point, and not shared with
--	 * other walkers, safely deference pgd with kvm_dereference_pteref_raw()
--	 */
--	pgt->mm_ops->free_pages_exact(kvm_dereference_pteref_raw(pgt->pgd), pgd_sz);
-+	pgt->mm_ops->free_pages_exact(kvm_dereference_pteref(&walker, pgt->pgd), pgd_sz);
- 	pgt->pgd = NULL;
+@@ -195,17 +195,23 @@ uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
+ 	ptep = addr_gpa2hva(vm, vm->pgd) + pgd_index(vm, gva) * 8;
+ 	if (!ptep)
+ 		goto unmapped_gva;
++	if (level == 0)
++		return ptep;
+ 
+ 	switch (vm->pgtable_levels) {
+ 	case 4:
+ 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pud_index(vm, gva) * 8;
+ 		if (!ptep)
+ 			goto unmapped_gva;
++		if (level == 1)
++			return ptep;
+ 		/* fall through */
+ 	case 3:
+ 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pmd_index(vm, gva) * 8;
+ 		if (!ptep)
+ 			goto unmapped_gva;
++		if (level == 2)
++			return ptep;
+ 		/* fall through */
+ 	case 2:
+ 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pte_index(vm, gva) * 8;
+@@ -223,6 +229,11 @@ uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
+ 	exit(EXIT_FAILURE);
  }
  
--void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
--{
--	kvm_pgtable_stage2_destroy_range(pgt, 0, BIT(pgt->ia_bits));
--	kvm_pgtable_stage2_destroy_pgd(pgt);
--}
--
- void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, s8 level)
++uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
++{
++	return virt_get_pte_hva_at_level(vm, gva, 3);
++}
++
+ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
  {
- 	kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6330a02c8418..9a45daf817bf 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -904,14 +904,6 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
- 	return 0;
- }
- 
--static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
--{
--	unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
--
--	KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, 0, BIT(ia_bits));
--	KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
--}
--
- /**
-  * kvm_init_stage2_mmu - Initialise a S2 MMU structure
-  * @kvm:	The pointer to the KVM structure
-@@ -988,7 +980,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	return 0;
- 
- out_destroy_pgtable:
--	kvm_stage2_destroy(pgt);
-+	KVM_PGT_FN(kvm_pgtable_stage2_destroy)(pgt);
- out_free_pgtable:
- 	kfree(pgt);
- 	return err;
-@@ -1085,7 +1077,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 	write_unlock(&kvm->mmu_lock);
- 
- 	if (pgt) {
--		kvm_stage2_destroy(pgt);
-+		KVM_PGT_FN(kvm_pgtable_stage2_destroy)(pgt);
- 		kfree(pgt);
- 	}
- }
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 61827cf6fea4..fcd70bfe44fb 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -316,16 +316,9 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
- 	return 0;
- }
- 
--void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
--					u64 addr, u64 size)
-+void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
- {
--	__pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
--}
--
--void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
--{
--	/* Expected to be called after all pKVM mappings have been released. */
--	WARN_ON_ONCE(!RB_EMPTY_ROOT(&pgt->pkvm_mappings.rb_root));
-+	__pkvm_pgtable_stage2_unmap(pgt, 0, ~(0ULL));
- }
- 
- int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	uint64_t *ptep = virt_get_pte_hva(vm, gva);
 -- 
-2.39.5
+2.39.2
+
 
