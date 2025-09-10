@@ -1,78 +1,86 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9482566D2
-	for <kvmarm@lists.linux.dev>; Wed, 10 Sep 2025 09:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689B131A069
+	for <kvmarm@lists.linux.dev>; Wed, 10 Sep 2025 14:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757497681; cv=none; b=TzdvbywNrL0XYkha/aWpXDmlCfnWOWYXW/eeaAe3ADxPPp6un/cUlXUKjH09i3dQX0uL6zqXRcuGdEYCJ99rgkA18HGvF9utnRBqi7BPlHUwaaCWALi7VkTVr0rhuY4FiEvWfZ0R87M8/YUvbEfdsUiTkpyRXTeJiLNCWo4cIqc=
+	t=1757514075; cv=none; b=pOC8l3pfAwxvCK484DZtc4peCDdD2Xx0dKXXoa+ruGdR3CFpClIlSXmmqOPiKV/aEpdhTMhS0PJ9/TAMpxW4OgcM/LNXebMkgq/xpsqIsAtPI88WFQGgchsrV4ESPHWYqD+IFSXfsV34XACTckJUs8um4VhH8dmD1Fb1lAtUG5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757497681; c=relaxed/simple;
-	bh=0V31LUAQineHaHR+Zk1fa1rB++gkt0nxE0bE4w2NcJ8=;
+	s=arc-20240116; t=1757514075; c=relaxed/simple;
+	bh=LNKhKhA6C3nXEhiScX2h3yeOP0cYoVecRbWOHC2eAUU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H/WEqh6r4lOMrgi36Z8/G7OpRc0G8W0LiFcFVtkTWWxeWVnwy/Jo2h3JjUPPbKvdZbAqDYtbYqu9Xs08WN72z/l4zaLLHj+wEAR+5YazYWCGGFzXoHQmJ1tJXOOFMsDVqppFr/NA/uvCY0VAZ5MqcbGfu2P24yux3jBBPH8j2o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m2mkdFAx; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=VyYZxlPrpJSFKC2rqDNS0dqxd0dJFO8xUughoHn5iIwZ0fjD+iDCrtCdqSK+41OUrdACywIVrYH2qTIICaLDEJOFuF2buys2+A28c+h0poBo11P37QEP4ECsL/xKOrbg01lUDCxQGg2sONsXdbfoq0raE/1n+DbgaugiebDJiyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Rf2KQtZI; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m2mkdFAx"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45dd513f4ecso40979355e9.3
-        for <kvmarm@lists.linux.dev>; Wed, 10 Sep 2025 02:47:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Rf2KQtZI"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8126c6c3564so69897885a.0
+        for <kvmarm@lists.linux.dev>; Wed, 10 Sep 2025 07:21:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757497678; x=1758102478; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1757514072; x=1758118872; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uvtu3uafbueZeizVaV/6mc7Nfku5GeAYQMpYTXLT+4o=;
-        b=m2mkdFAxVwHMCtKTF++oQ7bAnV1k4VbYzx57uCuvKa6I5BV+odx2zSxmwL0Q809gss
-         Zu1UrSK+rrF0uKnlX9P00dPQcA+R+TTeRRXbNn/dJWV+x28lT9W7WhPZyuSk8HPdfNJk
-         rVOrmblXAiiiLKca8JNUbq5iFCQYpExiHMgzcwXQGZOGYY/iJdWBLhR7S88+KdjnN+tk
-         3nXyBfTS3hLbma1NjK3O4Ds1uRQtd0X98458kDM2ocPYGR1KG4dyNMRzF7LJQeKMYivo
-         /t4DnPEn7bVWRvikcsfdNZuWgxvyUzE3/5DSFkfUkFqxk+BHBLufsFrZvOTfAbp4swhj
-         XCOQ==
+        bh=LNKhKhA6C3nXEhiScX2h3yeOP0cYoVecRbWOHC2eAUU=;
+        b=Rf2KQtZIcASJxmT9QJWSuBlQuA1sW1v39fIMOungMiMOjx0jKJJKMkU2KTI5sWATly
+         VqBZcY68kTedJQQv4EO0/qR8RM4GWFeWmRA39T/mdoe7jGigUmd0verYlm9Db95tDDpM
+         O+pRhY2b/NTDw3b+9vT6PN01s/WlXP1j8Efqp2ksTWy40d2aqPJvPdXVT2svoEmx0QGu
+         xMuJTZN9+sPOae0Jnr/04bT7Xk0QHsR2Qf8WP0Czctz/erOIgxXvQCv4Q8jE/C3RatHu
+         u9wT8Lpm/BLn1K1TWRjZhWOvn2yhvzKVJEffeH7K8c85lvDGDxw4D6OkB7OnQBWdoUua
+         Ktkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757497678; x=1758102478;
+        d=1e100.net; s=20230601; t=1757514072; x=1758118872;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uvtu3uafbueZeizVaV/6mc7Nfku5GeAYQMpYTXLT+4o=;
-        b=mRvHa8/WV14PSiVMyMa4cVG3AE4oGKQgoFNiCqVD19K2QU5VXyyozchl/Y5Utg8Mz9
-         T8aNtQTSDqEFqtZibtkpH3kN+w0GxBwri13nwbyFmWAN1Bmp79zMsivOi41RPZkXXQfZ
-         aTN6ypgup4s+iNtdieZJ7leMv3ZCjiROSV4yKVgonwC1TPvBc9b/eF3NG+svkmPw9fCb
-         1cqfbI8I39VHwdT/OumCh+AZpktkATHFQETjSfwMUE5/Ca3MBkcrVdcU5phx7gOXxZut
-         4PrPuAgLGS31xoxszMlonV90heVRd13raNXDzCvsT32eD2D5fINX5Pmsp1+qwVu/74IB
-         MlWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWa847zihQZslo9yZJ0DPRJQkKjG8YKiZCZCm2IHopO7zrIX8cOTL1/OxzAza/3k7yGKIcz8tU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw2DNjIgNKKCpdEYvYEe0+Yy3MzOoyUCwKvEX2FMso/JrVgRhTJ
-	lP+eGQxnX8fD0ixR6UktjacBX3Grkav5Y+VmCIzoJsgRgRqjvcLKpMaZSvflyZlQGw==
-X-Gm-Gg: ASbGnctk2Pk1Y62yMWwQq6cehxerDMfu7fU1ZBVexdNLj4xwi+FfqdZWIKqpbe0cN5G
-	Xb+U6Byp4/1DH43iRA9cvSEbOzMAQ4ipu6TlZYYyP508QPuZbYVMNUJMUfdTKBBq7wPuHQ+RMaO
-	JOwcfVFKyHLFjVTnssEx/lFAXuOn5J0sM+HZ6YHyxwDcVZpaj+4AcHK64sPpKx9PBHqp1quKQco
-	haPqsUpFRWZQbl/yRMxj6uJxFkazb+fg+bkv192mu81OZkDq2cgd4TF8wVW1oaLhtEYiJNx0J3p
-	WE9LY3y+MpOPEgqDFSsRjPOy5rHcqVCrJ7xqcfrEpLPXL3eVnAe0P5lGWxtvkhea2BAfnktnzyJ
-	+XVrg8t0q1Qs8e9fTyOvJXNJfN7X/nkcQNK1hyTIsoTbwITOkjbLrEJC3WKmQKMjj394PvJoS2R
-	r2Nopg
-X-Google-Smtp-Source: AGHT+IFWWYfR8ORYSi5S/6yVLRSE1Vl7ci8b3o8skMEhA51akRxc13pv3ScUUN6gVKKYUtaBgf3yww==
-X-Received: by 2002:a05:600c:8b43:b0:45d:d718:3b9e with SMTP id 5b1f17b1804b1-45ddde92627mr142163035e9.10.1757497677772;
-        Wed, 10 Sep 2025 02:47:57 -0700 (PDT)
-Received: from google.com (211.29.195.35.bc.googleusercontent.com. [35.195.29.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e752238832sm6017788f8f.31.2025.09.10.02.47.57
+        bh=LNKhKhA6C3nXEhiScX2h3yeOP0cYoVecRbWOHC2eAUU=;
+        b=r4qWjByQ2GCCRIqTnE5IjeKlmFOWmkZucztdNk4pTAMrXt7fXXjt+oYTtIsVd6ak2v
+         6YBBirtrYAQvjsmKZWMREm9CHyqDfdU5LiBQAuL7+Y9fBx0dALF2+Z/irPDXEPGNSbbl
+         YGsCnp0tVsu1jfGdu1NHs/G2zyjyB5bodkNyX/EQ1iu96U5kIyxO4h5zkZQPj59p0hDm
+         V0YnVLEWLfUvGJcYu6QlH1yOsG9GhstCwZV9Qz+X27dF8rlSAwLdUMLVrdyKTVdQJfLi
+         n8AM4p2FYC7BpBmmjpLU8rQRVG4J82MoDRG7pqVoKQbRPgc3jiypLLy2U4iFnYmkE5rF
+         R28Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWG5+zl6um+dcUAMP0c7oKN8CR2DKfPNXF7h0iFAf2alWQwhPSmr/j9KmPjPspgftmEFahWr/8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyl1Naz1ddrFoGOe132b64ttIWSQt2bY1QFzPCY/9vPBsFGRAmj
+	+Rv3H/Nxd96P6Fvp4dMkaV8aEGcVbUvDcC+Lx5SWT2DBEjYWMVUE504XxRDjZC5mfng=
+X-Gm-Gg: ASbGncv9RIyeEhUWrC56132JGNK9jjiYBMsH+/psSuzGlEzVmFsFWWjflZE/p+9iomV
+	zfr5pdmscoiPioUcK/dicxBljj+3zTzXar/mPGdi4FVJA088wWJOSy9VEYzo+4F5JcW1Rjb0GWd
+	/5JaL7leCmcPFE0C+bRnSmwqvP8yWXRDhfQ4ScsM4MGW085Q+jpGGAEFCwHN9lBHA5rWHralq7s
+	G+Q8gO37RBFgm9lPUqYF90LjlVKSOAhG5LIWAnxFp9fbi1azT8I27qAn1COWWmVcz2U8QaTuqeF
+	e39q2+flOyEtr/sCGGCVnzmAUM6N/o3S51jF2Cl7h9gcYaXiEh3SSAbSGL5NX1Dk4CfjyzfLLk9
+	Jw8Q4xzSRCdSkIEZJdWFJ8HxJTdEJBNUCuPxSkYpUj3f1BxcYq7KZg5Zic/RBvB2YoGf8
+X-Google-Smtp-Source: AGHT+IFQUqXdlLFuZHw73Bg4VN3PcnM2gIuoqeeTT9gq8x5We6/aliAOx3fJNb9QKgrD/fgUoao2tw==
+X-Received: by 2002:a05:620a:4054:b0:7f2:8bef:93c8 with SMTP id af79cd13be357-813c443dcbdmr1375146585a.40.1757514072083;
+        Wed, 10 Sep 2025 07:21:12 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-81b5ed732f1sm299020385a.49.2025.09.10.07.21.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 02:47:57 -0700 (PDT)
-Date: Wed, 10 Sep 2025 10:47:54 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
-	linux-trace-kernel@vger.kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, jstultz@google.com,
-	qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
-	kernel-team@android.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 10/24] tracing: Introduce simple_ring_buffer
-Message-ID: <aMFJSlbHRsvzYKaF@google.com>
-References: <20250821081412.1008261-1-vdonnefort@google.com>
- <20250821081412.1008261-11-vdonnefort@google.com>
- <20250909182644.092b3e85@gandalf.local.home>
+        Wed, 10 Sep 2025 07:21:11 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uwLh8-00000003roy-2q61;
+	Wed, 10 Sep 2025 11:21:10 -0300
+Date: Wed, 10 Sep 2025 11:21:10 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Arto Merilainen <amerilainen@nvidia.com>
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+	linux-coco@lists.linux.dev
+Subject: Re: [RFC PATCH v1 34/38] coco: guest: arm64: Validate mmio range
+ found in the interface report
+Message-ID: <20250910142110.GE882933@ziepe.ca>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-35-aneesh.kumar@kernel.org>
+ <d57d12ce-78c6-4381-80eb-03e9e94f9903@nvidia.com>
+ <c3291a06-1154-4c89-a77b-73e2a3ef61ee@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,64 +89,23 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250909182644.092b3e85@gandalf.local.home>
+In-Reply-To: <c3291a06-1154-4c89-a77b-73e2a3ef61ee@nvidia.com>
 
-[...]
+On Wed, Sep 10, 2025 at 08:47:43AM +0300, Arto Merilainen wrote:
+> This creates a tricky problem given that RSI_VDEV_VALIDATE_MAPPING requires
+> both the ipa_base and pa_base which should correspond to the same location.
+> In above scenario, the PA of the first range would correspond to the BAR
+> base whereas the second range would correspond to a location residing after
+> the MSI-X table.
 
-> > +static struct ring_buffer_event *
-> > +simple_rb_reserve_next(struct simple_rb_per_cpu *cpu_buffer, unsigned long length, u64 timestamp)
-> > +{
-> > +	unsigned long ts_ext_size = 0, event_size = rb_event_size(length);
-> > +	struct simple_buffer_page *tail = cpu_buffer->tail_page;
-> > +	struct ring_buffer_event *event;
-> > +	u32 write, prev_write;
-> > +	u64 time_delta;
-> > +
-> > +	time_delta = timestamp - cpu_buffer->write_stamp;
-> 
-> The remote buffers never get preempted do they?
-> 
-> That is, it doesn't need to handle different contexts like the normal
-> kernel does? (normal, softirq, irq, NMI, etc).
+This seems like a defect in the RSI_VDEV_VALIDATE_MAPPING - it should
+be able to consume the same format of data that the tdisp report emits
+to validate it.
 
-No, luckily, we don't need to support any of that.
+From a kernel side we also should be careful that the driver isn't
+tricked into mapping MMIO that is not secure when it should
+be. Presumably all the default io access functions should demand
+secure memory in T=1 mode, and special ones like the MSI-X code would
+have some special version to accept either?
 
-> 
-> -- Steve
-> 
-> > +
-> > +	if (test_time_stamp(time_delta))
-> > +		ts_ext_size = 8;
-> > +
-> > +	prev_write = tail->write;
-> > +	write = prev_write + event_size + ts_ext_size;
-> > +
-> > +	if (unlikely(write > (PAGE_SIZE - BUF_PAGE_HDR_SIZE)))
-> > +		tail = simple_rb_move_tail(cpu_buffer);
-> > +
-> > +	if (!tail->entries) {
-> > +		tail->page->time_stamp = timestamp;
-> > +		time_delta = 0;
-> > +		ts_ext_size = 0;
-> > +		write = event_size;
-> > +		prev_write = 0;
-> > +	}
-> > +
-> > +	tail->write = write;
-> > +	tail->entries++;
-> > +
-> > +	cpu_buffer->write_stamp = timestamp;
-> > +
-> > +	event = (struct ring_buffer_event *)(tail->page->data + prev_write);
-> > +	if (ts_ext_size) {
-> > +		event = rb_event_add_ts_extend(event, time_delta);
-> > +		time_delta = 0;
-> > +	}
-> > +
-> > +	event->type_len = 0;
-> > +	event->time_delta = time_delta;
-> > +	event->array[0] = event_size - RB_EVNT_HDR_SIZE;
-> > +
-> > +	return event;
-> > +}
-> > +
+Jason
