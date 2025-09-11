@@ -1,62 +1,63 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D969C31B833
-	for <kvmarm@lists.linux.dev>; Thu, 11 Sep 2025 13:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CC332ED4D
+	for <kvmarm@lists.linux.dev>; Thu, 11 Sep 2025 13:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757598580; cv=none; b=XTWrgvQxKpKW488C/IxTcIpSFZwcQErDSC2CUMbt7v6z2Qd+JRi9fIO+C9WkGOc4ZDJT9+F8Dqle5J06/PANiFkzxj+rtRIPe0f7/xkDxdySA2617PVbVKe7bSwtMpYRM3eZluHeSRffmphIjuS4ROi/YtcWwx5Y+W83z18AlEA=
+	t=1757598584; cv=none; b=mNa6sw6DyCWZnR+rk8IqmVWjP898Ij5bxgPRJl2oB134UXmnmaCV7OwqI4+tNcYSchruK9bMp5vPHLjdH7ndsx7Jvf8zxQSvw/CLC1NnF4GE13eLX3gpjkOnNTNLDggLUuoMG6OgmB+POidu9lsAKzAvwixeplReeIJUCUYK8OI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757598580; c=relaxed/simple;
-	bh=T8VtWbZoh0VIipzuyBrHjr9wwGoQSoHS3Ynzhj6XMgs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DEs431QpzrAZMBF93OvU33iE/e4+lMHY4pUA8TxL+XipXzsjPhJ9XLoGUVJZEMSePPr9lVWiHbbrrxreU0n2UNcZNRewU0J9HqiziG+qEZsI/gHrQd0mjeYHrZYnZETCcCFKXx+9sHkus6AjADojLSk8kh0XPTlWCS1erBQpOaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QVJr09np; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1757598584; c=relaxed/simple;
+	bh=MgG36VJmw214zv4sHqDEvyy0doXE0b66hEX+1oPfR84=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=GauzH2Z+fytNU5t4W9n1jju7cZ92Cq7/Zesswcth7Tsp0F7YYYXv0PzWDxmg6Db55KuOTBG7r3YSEUskAq5I7D4Fps64Umgl2qDEpd2qKuuOQbIyYysktGb5+nHwetyqO4+aZcCeKemB/gTjawPUgyLYMYkUK+bACxGYZDIWWac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrqccS+w; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QVJr09np"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45de60d39b7so5840175e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 11 Sep 2025 06:49:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrqccS+w"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45dd7b15a64so6742035e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 11 Sep 2025 06:49:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757598577; x=1758203377; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vEbc34OfcWsmZ87K3FZrtli36glSfRnoXSobn53PJa0=;
-        b=QVJr09npl0V/ciiM+32I41wqtT8wJhkFDkib9B3NbJFopQkiOb5qy/tAnwgZfdjiJJ
-         4LNcbFKatkLqtyJ+ImiE2KRnhEQmB8DONO0CRNTnTfLSXQtlInlE8e+zk1UMEjIoJwq9
-         BfI4Xuf17BU6eRabu1cIqL5QPSiFu6UPQaJ/HCH9zcK27mzk92G8GmAhvLIeRpriKGS/
-         L9RlxWGLSX1gjKFro1V15QHvCucVyCNglIirrYlJJ5N7/+a4XbOFamJqsqpYUg2ybD8t
-         XD2nD5Vdzmty/mHdGDg348SceooVIC3589rjeOi6N9vuiJH+QBXlC/DUyRiXHDUwQiSZ
-         Ujnw==
+        d=gmail.com; s=20230601; t=1757598581; x=1758203381; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AJBOYBviiAkHEGuAebJYs1rSMwBP/rg8f5sw3Y1zhrU=;
+        b=lrqccS+wYE7AG05McX2NtSttYIQ7rn2yRvx+kD+1BEl7NzziX0TnsAbzr/1b4flDMk
+         ySeUT0CTCwMfCUqZjM/Jvn/GJnltmTgN4Q1gKVNMFcwCSYMNyOj0DN0qPuARh3QTvLIS
+         WCYtLfwSnSxJV9AYGOsvH9pi4iM14Zx28DQlAjQvBGDep7K01dU8umgLQw2EJi7dJlh3
+         WS37sXqN/SnoH7lKYeo4w9NmL51k9cPt8lova9xlhHPFnY75YuBMzq0AUwTkPTKkDjv9
+         oRUiPLWaj6dTql11KeU1MA4JV5GSM+yXrIKVpz+fwFiauJaomPLf6bZXAcC5x7HOJr7J
+         bggA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757598577; x=1758203377;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vEbc34OfcWsmZ87K3FZrtli36glSfRnoXSobn53PJa0=;
-        b=qx+hHKqYTxJ4YMTdphPABkKCGv1yN2gp8SLL1496g9vj2vHg6v4vHoWZCRWqFIL/eS
-         DwsRj2VbuLfDThB4g8Zishp1vcDgII5WIJ4Y3rmr5+fZnLWc6U0LtN0DKya24y7znDIA
-         R4zvc8uCKISSZ4Raz9GmO2S+WCGE81yUvacB+aZ5a4di2eAcjMgO13UI63T7wLvZbRbv
-         MWxJGuyFRMC3facEYoey9CNcxobO7B3sdTwsbMg4TdcpZlIkSLpqQZPcUFaP0oU7YFLF
-         zKbVor+Hb5Z3AkZeRozsah8YRnWLn98z93O8d6TeG5jVm0tu4E/HnzXIRVBDh70ZUPT7
-         i/Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFINxUGOyi/3J7JFfuYrgoBMQA0Zr7sXf1abgMC17kTXrIgJO1LTXh0LWXFrQD6U4JkMN7PII=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwL7EXYiguP0C6KqtSYuis11i+jik3WYDg4jSTpus0Otnezl1qs
-	PWtEcE+U8bkOd3xEv2bnDDYZYhgHLZwe0VaOqsXQ3RfSyh58laJ2fU5O
-X-Gm-Gg: ASbGnctVYfDGKEUzsUCJxa7MwkoZHKbhkyOQBa2kZMan+Dx7upvzlDBo7rC5c6CyJPt
-	uZ7ZUU6bGaAOBS0bFw8poj2BLEdE244X6meCKUfCI2Ls9U1U4OcgcApxpgJGt2g06Zgi2hxx4EI
-	mv5Xb01oGbAcHVIeSaKFFIAlnwBaY9xUnc4TXPBxFUoVYzq9FlU7jbQFVhVIjtxjn6TdtgzO2cY
-	IlmisMcW9R66ndCvpCTE0xTZnAahqOevlfe4jYPRXbQBTs7oR9vKOvcDI8vIR9n+ZbtEbbbHKHO
-	NmOsa9Bn1dxbVHXxaPfuIKEXwA3JmeL5IO/BfaEIVbK2SPWz8BFgKQ3cmaD/pQzMbYULKbLRLwz
-	3gBYQr6kyLYuTnhGq9uZPghOkp6PZdmOYEf1us0daX4Y3ZFOFZkIXzlcnPvN2Ofey+GKzngSQo0
-	bqinO8p/0=
-X-Google-Smtp-Source: AGHT+IFuIFRdqHBZCko8vFOdNi4YwrG+SNtH2f5JJFAo5fww3TZYrgIbpWxJK/MEue66sSX1sYEkLQ==
-X-Received: by 2002:a05:6000:1ac6:b0:3df:f065:ca13 with SMTP id ffacd0b85a97d-3e64392b761mr17129810f8f.33.1757598577050;
-        Thu, 11 Sep 2025 06:49:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757598581; x=1758203381;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AJBOYBviiAkHEGuAebJYs1rSMwBP/rg8f5sw3Y1zhrU=;
+        b=UvMS4NCUHOfu5TqN8GxyYQPLAPXxmIB1i/q19HgzkdiCqsZXTsnV6NBJVG4EB1NIB5
+         sU4DrAIC0r0nzKZ9OgQGcn4QGpzT+DZ6Pod8NWYrHJ5tasQKelwXorVu7CICeHqhIJem
+         /+hSdT5sIrdRMsXXZuY1LrqRowpSPVm8upNazmdgyGSD4zQvxQZCeTx/PbtQApgaKsYH
+         dqb0KIZxm+SysKDJ2lx6LnTkLh+X5PfPp33zoHmzXgS7igkeBFuYD2HKdKvYO1Tgo+Rz
+         7MqEAnYfmWYxrH53R0qVELSYq2lwjJMjPcIiJD8W33e9plidt6EK7bMYpHPrygtu6q/L
+         Lm4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWAX1fEnzvVE2HjLMEUfwTGuWW9ePwCjX23q58lS8Df4dOGS1w0BgvCu9WNpz62EwjqJw1mceo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwbSh/pZUM/MVvVrJDqou3sFEPMXwvEkATJ30tlYJKlYdLx6kk6
+	52kp5JdR35botlDqpmupGJiq0xW0NlJfc2Hne45C8PoockHwLXct4OGn
+X-Gm-Gg: ASbGncsCRvheq+hbj1+karAdpVATAyEmJAQ40meTPq4GRu0LO3aSEk6GiuFr/CIFqso
+	MVBAeGRCpv/pZSdW+8X2DGhHtM04vEDpsn/QF4LnrvDBWtwch/oF19wTPNXCVyzB7/mv//xFtE/
+	d4IzieD+AipNf2CwXTIvuOo3UztOLquD86d9M/Xs6aWy0YAWvS5a0rasT2TpVM8ynVBpivDwm8y
+	ZNOUV0lmw4PCrQ2TR7N+PDTobox2qG3msUhmi4m66sQ2oquPqf1p2p9W8Zl1f8llcxyp1AxcyHa
+	qqkWNFP7UesuPUBC/0Ka3bn8uuAEPxbjzkx9gQIje3nCxUhhBSnL23NWWa7XmViny5s4YlY1AJY
+	saOfvAOlbk8s6jPTPTe/xrYpn/maRAhJPn2n3XWwfdla69BzxxvwVriviXDAXBQ==
+X-Google-Smtp-Source: AGHT+IF9gYWYpXj1cgrspFLvRu0yrW6lKAr/MmACXhsm2WBvm6knLxYnlrbbjGF1EG0D4ZDyCrnxvA==
+X-Received: by 2002:a05:600c:a103:b0:45b:910c:adf with SMTP id 5b1f17b1804b1-45dfd5e3d68mr29948455e9.12.1757598580729;
+        Thu, 11 Sep 2025 06:49:40 -0700 (PDT)
 Received: from f4d4888f22f2.ant.amazon.com.com ([15.248.2.27])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e760778915sm2608361f8f.12.2025.09.11.06.49.35
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e760778915sm2608361f8f.12.2025.09.11.06.49.39
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 11 Sep 2025 06:49:36 -0700 (PDT)
+        Thu, 11 Sep 2025 06:49:40 -0700 (PDT)
 From: Jack Thomson <jackabt.amazon@gmail.com>
 To: maz@kernel.org,
 	oliver.upton@linux.dev,
@@ -75,10 +76,12 @@ Cc: joey.gouly@arm.com,
 	roypat@amazon.co.uk,
 	kalyazin@amazon.co.uk,
 	jackabt@amazon.com
-Subject: [PATCH 0/6] KVM ARM64 pre_fault_memory
-Date: Thu, 11 Sep 2025 14:46:42 +0100
-Message-Id: <20250911134648.58945-1-jackabt.amazon@gmail.com>
+Subject: [PATCH 1/6] KVM: arm64: Add __gmem_abort and __user_mem_abort
+Date: Thu, 11 Sep 2025 14:46:43 +0100
+Message-Id: <20250911134648.58945-2-jackabt.amazon@gmail.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250911134648.58945-1-jackabt.amazon@gmail.com>
+References: <20250911134648.58945-1-jackabt.amazon@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -89,55 +92,88 @@ Content-Transfer-Encoding: 8bit
 
 From: Jack Thomson <jackabt@amazon.com>
 
-Overview:
+Adding __gmem_abort and __user_mem_abort that preserve -EAGAIN results.
+These will be used by the pre-fault implementation which needs to retry
+on -EAGAIN.
 
-This patch series adds ARM64 support for the KVM_PRE_FAULT_MEMORY
-feature, which was previously only available on x86 [1]. This allows
-a reduction in the number of stage-2 faults during execution. This is
-beneficial in post-copy migration scenarios, particularly in memory
-intensive applications, where high latencies are experienced due to
-the stage-2 faults when pre-populating memory via UFFD / memcpy.
+Also add an optional page_size output parameter to __user_mem_abort to
+return the VMA page size, which will be needed for pre-faulting.
 
-Patch Overview:
+No functional changes are intended
 
- - The first patch is a preparatory refactor.
+Signed-off-by: Jack Thomson <jackabt@amazon.com>
+---
+ arch/arm64/kvm/mmu.c | 36 +++++++++++++++++++++++++++++-------
+ 1 file changed, 29 insertions(+), 7 deletions(-)
 
- - The second patch is adding a page walk flag for pre-faulting.
-
- - The third patch adds support for the KVM_PRE_FAULT_MEMORY ioctl
-   on arm64.
-
- - The fourth patch fixes an issue with unaligned mmap allocations
-   in the selftests.
-
- - The fifth patch updates the pre_fault_memory_test to support
-   arm64.
-
- - The last patch extends the pre_fault_memory_test to cover
-   different vm memory backings.
-
-[1]: https://lore.kernel.org/kvm/20240710174031.312055-1-pbonzini@redhat.com
-
-Jack Thomson (6):
-  KVM: arm64: Add __gmem_abort and __user_mem_abort
-  KVM: arm64: Add KVM_PGTABLE_WALK_PRE_FAULT walk flag
-  KVM: arm64: Add pre_fault_memory implementation
-  KVM: selftests: Fix unaligned mmap allocations
-  KVM: selftests: Enable pre_fault_memory_test for arm64
-  KVM: selftests: Add option for different backing in pre-fault tests
-
- arch/arm64/include/asm/kvm_pgtable.h          |   3 +
- arch/arm64/kvm/Kconfig                        |   1 +
- arch/arm64/kvm/arm.c                          |   1 +
- arch/arm64/kvm/hyp/pgtable.c                  |   6 +-
- arch/arm64/kvm/mmu.c                          |  97 +++++++++++++--
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +-
- .../selftests/kvm/pre_fault_memory_test.c     | 110 +++++++++++++-----
- 8 files changed, 186 insertions(+), 45 deletions(-)
-
-
-base-commit: 42188667be387867d2bf763d028654cbad046f7b
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a36426ccd9b5..082e7d8ae655 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1521,9 +1521,9 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
+ 
+ #define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
+ 
+-static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+-		      struct kvm_s2_trans *nested,
+-		      struct kvm_memory_slot *memslot, bool is_perm)
++static int __gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
++			struct kvm_s2_trans *nested,
++			struct kvm_memory_slot *memslot, bool is_perm)
+ {
+ 	bool write_fault, exec_fault, writable;
+ 	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
+@@ -1592,13 +1592,22 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (writable && !ret)
+ 		mark_page_dirty_in_slot(kvm, memslot, gfn);
+ 
++	return ret;
++}
++
++static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
++		      struct kvm_s2_trans *nested,
++		      struct kvm_memory_slot *memslot, bool is_perm)
++{
++	int ret = __gmem_abort(vcpu, fault_ipa, nested, memslot, is_perm);
+ 	return ret != -EAGAIN ? ret : 0;
+ }
+ 
+-static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+-			  struct kvm_s2_trans *nested,
+-			  struct kvm_memory_slot *memslot, unsigned long hva,
+-			  bool fault_is_perm)
++static int __user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
++			    struct kvm_s2_trans *nested,
++			    struct kvm_memory_slot *memslot,
++			    long *page_size, unsigned long hva,
++			    bool fault_is_perm)
+ {
+ 	int ret = 0;
+ 	bool topup_memcache;
+@@ -1871,10 +1880,23 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	kvm_release_faultin_page(kvm, page, !!ret, writable);
+ 	kvm_fault_unlock(kvm);
+ 
++	if (page_size)
++		*page_size = vma_pagesize;
++
+ 	/* Mark the page dirty only if the fault is handled successfully */
+ 	if (writable && !ret)
+ 		mark_page_dirty_in_slot(kvm, memslot, gfn);
+ 
++	return ret;
++}
++
++static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
++			  struct kvm_s2_trans *nested,
++			  struct kvm_memory_slot *memslot, unsigned long hva,
++			  bool fault_is_perm)
++{
++	int ret = __user_mem_abort(vcpu, fault_ipa, nested, memslot, NULL,
++			    hva, fault_is_perm);
+ 	return ret != -EAGAIN ? ret : 0;
+ }
+ 
 -- 
 2.43.0
 
