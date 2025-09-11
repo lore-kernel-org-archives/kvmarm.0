@@ -1,151 +1,154 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DC82EFD84
-	for <kvmarm@lists.linux.dev>; Wed, 10 Sep 2025 20:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3FB329F29;
+	Thu, 11 Sep 2025 05:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757535922; cv=none; b=FR/XRzNlQCqvtT0d02hxIy/qFMiq56zEL8nbYi5d7kbpKOI4ISSrlD/aMQHEIFRDuwwMSWVkXOC8TFaHEQ1KQfCxFKzwlAbrXWjLs6pSrFjZgCx6gMnFBBirl6Q48yjlVOhCPnOhxm4U/UDC5JFeoRn95WXhdsyxKDJ8ueJhn/o=
+	t=1757568840; cv=none; b=TDUrFH6HTFo9UIFRNV6a5S4znpTNv7K6b7B6yL5yirWf34r5i4/AFbMn9lMD7xB4vMHLadJRmyc5cEF1Ti2OYjFcQjsUDHQUwPTejFHef0XTOAqcH2JZ9hAHl5NjJM+9su0gxlJSfSFe3ryCq69RhwdJDGpEcxhAIfQgUhsxP80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757535922; c=relaxed/simple;
-	bh=p3VkcWlO3QI4zWzgjfxWR08XJP8TTbdCL2Wl8WEyMKM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=cO9K7M4O4M25h+Ze5SiWHVWl2MjB/+xu+9hNrkIife4redqese2BNItwMD07qScDtS+2NtPENhn5Hl2iEXxMlV1dpbENZV7a3F9bHY9wmT5LwWNWZRj4zB8lmNo1FgEcmjS4XkeYyaH1I99+SBIWE/p9wUDoy6z5Z/svBMOVQDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AjH0iceW; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1757568840; c=relaxed/simple;
+	bh=5vWUqhvI4pD7PEFK16VOGInaekHB8D/PZdNkUx+vkzo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=m0IVGX4z25AZcOI7+so2E6uaFFAbEkQHwlJI4p8fhiG4rsM1umOH7EhFHmM3+HhXp7YF1Izxro0rqB5jeAGO0koAOwBQ3JvYnb06IxwYYP1T7JzB1P8EzvM2G8FIxSoVi09VIkqPUwx21hUiZZEm/oB+sp/Zz25vTuPp3ut3XAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BFT6pShU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AjH0iceW"
-Date: Wed, 10 Sep 2025 13:25:08 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757535918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=7NUSh4J/FGzjUVpP0QMaih3K/9q6SmF3s0V6r2pV6bQ=;
-	b=AjH0iceW0rwJ8+46ZfNEZGaoTmLdjfFIUCnqTmGtEGkW/o705QXz1zwdppcvwbtLPbvTp1
-	g4MxLCYrKbwkCZ4t1FU5QTt9De/zP5T12gay7Ga4K3beof9JmcOrk/cNuo+7jgFqWaF5QK
-	fBJXYtP/FBItObslHvtt4H3eNTPsiPg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 changes for 6.17, round #3
-Message-ID: <aMHepH8Md9gSu2ix@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BFT6pShU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA597C4CEF1;
+	Thu, 11 Sep 2025 05:33:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757568839;
+	bh=5vWUqhvI4pD7PEFK16VOGInaekHB8D/PZdNkUx+vkzo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=BFT6pShUwC2LHdJj1bD7Cyqj0kBjdg10vsYiOhwd6YIqPHY3x0Rc2grk5Z0mCaj+f
+	 YlhZPsqmbVhb0043ePmfWFOwoN0s0k87pK/mSg5cTOHHNNT28CP80SL2mvi6JY0a8D
+	 PfVl0GorQ+dqp1v/FWOX1UYd4I0ZEMl5StDZov0SMkhhbdD+0P0/Q+DrOUA8QWi62a
+	 4fLqaBHMgfAZ1FF6eRyFmLr9DIEOpe7mnO5crtxbdZfabRTuLmEvJyWngMtuPmnRpU
+	 wONyDWq5cbRtqpCSVp9cYV4ZtkAgTLDZIPevlQxwTqVHdbYJhZxdLFEQA/3YMExDfO
+	 +T+cHRoziMnPA==
+X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Arto Merilainen <amerilainen@nvidia.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
+	lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+	linux-coco@lists.linux.dev
+Subject: Re: [RFC PATCH v1 34/38] coco: guest: arm64: Validate mmio range
+ found in the interface report
+In-Reply-To: <c3291a06-1154-4c89-a77b-73e2a3ef61ee@nvidia.com>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-35-aneesh.kumar@kernel.org>
+ <d57d12ce-78c6-4381-80eb-03e9e94f9903@nvidia.com>
+ <c3291a06-1154-4c89-a77b-73e2a3ef61ee@nvidia.com>
+Date: Thu, 11 Sep 2025 11:03:50 +0530
+Message-ID: <yq5ay0ql364h.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
+Arto Merilainen <amerilainen@nvidia.com> writes:
 
-This is most likely the final set of KVM/arm64 fixes for 6.17.
+> On 31.7.2025 14.39, Arto Merilainen wrote:
+>> On 28.7.2025 16.52, Aneesh Kumar K.V (Arm) wrote:
+>>=20
+>>> +=C2=A0=C2=A0=C2=A0 for (int i =3D 0; i < interface_report->mmio_range_=
+count; i++,=20
+>>> mmio_range++) {
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*FIXME!! units in 4K size*/
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 range_id =3D FIELD_GET(TSM_=
+INTF_REPORT_MMIO_RANGE_ID,=20
+>>> mmio_range->range_attributes);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* no secure interrupts */
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (msix_tbl_bar !=3D -1 &&=
+ range_id =3D=3D msix_tbl_bar) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pr_=
+info("Skipping misx table\n");
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 con=
+tinue;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (msix_pba_bar !=3D -1 &&=
+ range_id =3D=3D msix_pba_bar) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pr_=
+info("Skipping misx pba\n");
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 con=
+tinue;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>=20
+>>=20
+>> MSI-X and PBA can be placed to a BAR that has other registers as well.=20
+>> While the PCIe specification recommends BAR-level isolation for MSI-X=20
+>> structures, it is not mandated. It is enough to have sufficient=20
+>> isolation within the BAR. Therefore, skipping the MSI-X and PBA BARs=20
+>> altogether may leave registers unintentionally mapped via unprotected=20
+>> IPA when they should have been mapped via protected IPA.
+>>=20
+>> Instead of skipping the whole BAR, would it make sense to determine
+>> where the MSI-X related regions reside, and skip validation only from=20
+>> these regions?
+>
+> I re-reviewed my suggestion, and what I proposed here seems wrong.=20
+> However, I think there is a different more generic problem related to=20
+> the MSI-X table, PBA and non-TEE ranges.
+>
+> If a BAR is sparse (e.g., it has TEE pages and the MSI-X table, PBA or=20
+> non-TEE areas), the TDISP interface report may contain multiple ranges=20
+> with the same range_id (/BAR id). In case a BAR contains some registers=20
+> in low addresses, the MSI-X table and other registers after the MSI-X=20
+> table, the interface report is expected to have two ranges for the same=20
+> BAR with different "first 4k page" and "size" fields.
+>
+> This creates a tricky problem given that RSI_VDEV_VALIDATE_MAPPING=20
+> requires both the ipa_base and pa_base which should correspond to the=20
+> same location. In above scenario, the PA of the first range would=20
+> correspond to the BAR base whereas the second range would correspond to=20
+> a location residing after the MSI-X table.
+>
+> Assuming that the report contains obfuscated (but linear) physical=20
+> addresses, it would be possible to create heuristics for this case.=20
+> However, the fundamental problem is that none of the "first 4k page"=20
+> fields in the ranges is guaranteed to correspond to the base of any BAR:=
+=20
+> Consider a case where the MSI-X table is in the beginning of a BAR and=20
+> it is followed by a single TEE range. If the MSI-X is not locked, the=20
+> "first 4k page" field will not correspond to the beginning of the BAR.=20
+> If the realm naiviely reads the ipa_base using pci_resouce_n() and=20
+> corresponding pa_base from the interface report, the addresses won't=20
+> match and the validation will fail.
+>
+> It seems that interpreting the interface report cannot be done without=20
+> knowledge of the device's register layout. Therefore, I don't think the=20
+> ranges can be validated/remapped automatically without involving the=20
+> device driver, but there should be APIs for reading the interface=20
+> report, and for requesting making specific ranges protected.
+>
 
-Of note, I reverted a couple of fixes we took in 6.17 for RCU stalls when
-destroying a stage-2 page table. There appears to be some nasty refcounting /
-UAF issues lurking in those patches and the band-aid we tried to apply didn't
-hold.
+But we need to validate the interface report before accepting the device,
+and the device driver is only loaded after the device has been accepted.
 
-Besides that, random pile of fixes, many involving the usual suspects: nested
-and the vgic.
+Can we assume that only the MSI-X table and PBA ranges may be missing
+from the interface report, while all other non-secure regions are
+reported as NON-TEE ranges?
 
-Please pull.
+If so, we could retrieve the MSI-X guest real address details from
+config space and map the beginning of the BAR correctly.
 
-Thanks,
-Oliver
+Dan / Yilun =E2=80=94 how is this handled in Intel TDX?
 
-The following changes since commit b320789d6883cc00ac78ce83bccbfe7ed58afcf0:
+From what I can see, the AMD patches appear to encounter the same issue.
 
-  Linux 6.17-rc4 (2025-08-31 15:33:07 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.17-2
-
-for you to fetch changes up to e6157256ee1a6a500da42556e059d4dec2ade871:
-
-  Revert "KVM: arm64: Split kvm_pgtable_stage2_destroy()" (2025-09-10 11:11:22 -0700)
-
-----------------------------------------------------------------
-KVM/arm64 changes for 6.17, round #3
-
- - Invalidate nested MMUs upon freeing the PGD to avoid WARNs when
-   visiting from an MMU notifier
-
- - Fixes to the TLB match process and TLB invalidation range for
-   managing the VCNR pseudo-TLB
-
- - Prevent SPE from erroneously profiling guests due to UNKNOWN reset
-   values in PMSCR_EL1
-
- - Fix save/restore of host MDCR_EL2 to account for eagerly programming
-   at vcpu_load() on VHE systems
-
- - Correct lock ordering when dealing with VGIC LPIs, avoiding scenarios
-   where an xarray's spinlock was nested with a *raw* spinlock
-
- - Permit stage-2 read permission aborts which are possible in the case
-   of NV depending on the guest hypervisor's stage-2 translation
-
- - Call raw_spin_unlock() instead of the internal spinlock API
-
- - Fix parameter ordering when assigning VBAR_EL1
-
-----------------------------------------------------------------
-Alexandru Elisei (2):
-      KVM: arm64: Initialize PMSCR_EL1 when in VHE
-      KVM: arm64: VHE: Save and restore host MDCR_EL2 value correctly
-
-Alok Tiwari (1):
-      KVM: arm64: vgic: fix incorrect spinlock API usage
-
-Dongha Lee (1):
-      KVM: arm64: nv: Fix incorrect VNCR invalidation range calculation
-
-Fuad Tabba (1):
-      KVM: arm64: Fix parameter ordering for VBAR_EL1 assignment
-
-Geonha Lee (1):
-      KVM: arm64: nv: fix VNCR TLB ASID match logic for non-Global entries
-
-Marc Zyngier (1):
-      KVM: arm64: Mark freed S2 MMUs as invalid
-
-Oliver Upton (8):
-      KVM: arm64: vgic: Drop stale comment on IRQ active state
-      KVM: arm64: vgic-v3: Use bare refcount for VGIC LPIs
-      KVM: arm64: Spin off release helper from vgic_put_irq()
-      KVM: arm64: vgic-v3: Erase LPIs from xarray outside of raw spinlocks
-      KVM: arm64: vgic-v3: Don't require IRQs be disabled for LPI xarray lock
-      KVM: arm64: vgic-v3: Indicate vgic_put_irq() may take LPI xarray lock
-      Revert "KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables"
-      Revert "KVM: arm64: Split kvm_pgtable_stage2_destroy()"
-
-Wei-Lin Chang (1):
-      KVM: arm64: Remove stage 2 read fault check
-
- arch/arm64/include/asm/kvm_host.h       |  1 +
- arch/arm64/include/asm/kvm_pgtable.h    | 30 -------------
- arch/arm64/include/asm/kvm_pkvm.h       |  4 +-
- arch/arm64/kvm/arm.c                    |  4 +-
- arch/arm64/kvm/debug.c                  | 13 ++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h |  5 ---
- arch/arm64/kvm/hyp/nvhe/switch.c        |  6 +++
- arch/arm64/kvm/hyp/nvhe/sys_regs.c      |  2 +-
- arch/arm64/kvm/hyp/pgtable.c            | 25 ++---------
- arch/arm64/kvm/mmu.c                    | 45 +++----------------
- arch/arm64/kvm/nested.c                 |  6 +--
- arch/arm64/kvm/pkvm.c                   | 11 +----
- arch/arm64/kvm/vgic/vgic-debug.c        |  2 +-
- arch/arm64/kvm/vgic/vgic-init.c         |  6 +--
- arch/arm64/kvm/vgic/vgic-its.c          | 15 +++----
- arch/arm64/kvm/vgic/vgic-v4.c           |  2 +-
- arch/arm64/kvm/vgic/vgic.c              | 80 ++++++++++++++++++++++++---------
- arch/arm64/kvm/vgic/vgic.h              |  8 ++--
- include/kvm/arm_vgic.h                  |  9 ++--
- 19 files changed, 120 insertions(+), 154 deletions(-)
+-aneesh
