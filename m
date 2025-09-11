@@ -1,68 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2375A34575B;
-	Thu, 11 Sep 2025 15:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CA234A31E
+	for <kvmarm@lists.linux.dev>; Thu, 11 Sep 2025 15:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757603389; cv=none; b=Rt7ISzBWGQvDj5VDpTfnS5wM0O4nyhGlg5XCmO9na/gRqcg0kkWuG1MA6VQVBmKNSZN39I3tR2+fXQ1k7SFLmUfjOxwGi7aciMy4ZPg2tuSk1mRyo0yQVsUZUKI8xUIQX7/H6VTGhs93SkZlvB6c1jalGnguBshiUTluZqM/oJI=
+	t=1757603898; cv=none; b=mcIh5OMalv2+E17d0kmGB3tEvV7p3fHwXQsqCacBNsVkpx9Ip9k0LJmv2sxMee5WuiZKpNrO1wqQCYo4XFyaFqpHPYAESv8513TzAK9QbKLIhla0d5dK7qRLpJEMdp2g1PRM3uT4GjmLCal8cHNz4eAU0lPA8ztewYgT7S13Nmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757603389; c=relaxed/simple;
-	bh=gBDmezCMu/2OkI3KT860YnQjdQW9Blm0iG3vh7MOde0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l36CZBZjK0CzON75VG3Sj87KyVmFWVLC6DCAnF2ayTm/t/gAgfkkMURXyQ0IN7PoRkqpTnOcJivpF83o8oGn012NsVhukvVb7sYs17q/861eKBhU0IuKjRWNQ7FAIyY5vkYjWfCoMD1yEY2yoMgsN9qw5JN8A2igvlzjTIhty7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fwul0kJi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757603898; c=relaxed/simple;
+	bh=4kGiMNWl70c+t1jpo2wDVgJIIXlrUNj+YdEfV+tcftE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tTEUp0kdRNwjlZUqVlsN3TZUU0s6sCA+D7WFFojeppszrVlPMNuk1b5Lm2keqoHNpUOFG4UIRennvjPFWcdpfz5IzUii0PZ7VBxwVAWKACNisBZJ7AA/8Ic6o3BN+FplJ4ucMST4h9OIFjeMkNMmitCvIqkKq4ijAHwv6kOpf/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MeGAtm+q; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fwul0kJi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35F2FC4CEF5;
-	Thu, 11 Sep 2025 15:09:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757603388;
-	bh=gBDmezCMu/2OkI3KT860YnQjdQW9Blm0iG3vh7MOde0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fwul0kJi6q74mGU5Dqukf5JEmtODC2NkyMLIdTjXljA7qbeJj6mIM5DM6y2vBfH4d
-	 suNiil4MVNnU/HJN42xo2+eNpsSS0tKlwA8yGJgwTex6OH2OHz4lZxT4ZDNFVu7hjW
-	 YgRRChvuX573cN4nRIHtJsu67KZqy/UdGDAHkpWkyFJ/WwQngxIsnO2QyujxjSvd1l
-	 EkXWCIL8O5IclKEzb8fUUAd2nJd9V40X/OiEqeKElYtHqbZa+hYCvB2ajZj5tgZv7j
-	 j+/bMVLheV9VFI6ItJ96j1idNA4g8c3DEbf+UGyC52SycLwaMJXMfCbZGRwFo+OpUa
-	 BuquWy/GxJYzg==
-Date: Thu, 11 Sep 2025 16:09:42 +0100
-From: Will Deacon <will@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: catalin.marinas@arm.com, broonie@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, james.morse@arm.com,
-	ardb@kernel.org, scott@os.amperecomputing.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND v7 0/6] support FEAT_LSUI and apply it on futex
- atomic ops
-Message-ID: <aMLmNnehYX6gqEIf@willie-the-truck>
-References: <20250816151929.197589-1-yeoreum.yun@arm.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MeGAtm+q"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-72e565bf2feso6242707b3.3
+        for <kvmarm@lists.linux.dev>; Thu, 11 Sep 2025 08:18:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1757603894; x=1758208694; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=knG17Yq8OEl51CMsovL2EtZQpAt43iivBldwrOwPUGA=;
+        b=MeGAtm+qduvYA4PlDiG807UjXpJLegbcTKxHqceR4SpieSfgBSkAAPYjevhKovQ5uF
+         jsGK6H+nY3Ur0pd7DUaM/oBGVixIkTWJd/a+80aTzqVjwO2NYJaxStxEk3JQuhCQ6Ckc
+         qTJDfrfs2rXMVeKd8gLjewf5iaLnRYTi+7tQQo38ki6rydIHmQkbyUfN7FSaqqWbjQt0
+         8Px+/9zU6D5QAXu+J1LdQ8i78kDw7GaAGrt2IXATHJ/BODNCR69j82MPBwMgHh+Fg1qD
+         l3kYG8Zbz0OlbK7ve/Q0VY3K+mVcl3Q6iNBoi1pxAuEkiarY02XVVlxXj/2UQwfi3uKI
+         5VFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757603894; x=1758208694;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=knG17Yq8OEl51CMsovL2EtZQpAt43iivBldwrOwPUGA=;
+        b=S0cb8juXAyyGxXUnAa2VQ/mY+74+tubC6hNfSAJ2mrDWW6Xq23rOWp3VsX+d/hVTb4
+         vhriFT8FziZ+79vafBqWNVflt5nydEHswSYR+KjtXHMyFwXSjktW9XVPT9DoFXOs8A8U
+         MTneXCDPb4Zs6NbJDeKs4BLCiPtH5SQcrhGcxTjnckCaSAa6g2tJYX3zxBUfSRgY4o6K
+         +He5lK0U642UhhyJtc6QxFvhWECE/1/UH5eSJqWYSsxi00m+x6ryFKvWHVuwuiyJWvDD
+         Qv9C77J0pvxzN2xiyJGjlEc/kuUc+FY7DpZfYlnpSIpOInNz4fVij/eiZvkFmznXM8N3
+         1TuA==
+X-Forwarded-Encrypted: i=1; AJvYcCW1+TDisxf9g/kl41eAvVSwC8MEsdozJ4x2rGmBXUddJBWPZm3YXjLFdvDsJrxjkQPgdP7ncpo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwHG5F7qGs4UEHUwiDrLNzpcIuAJqywKuKqV+X+cW0iSdxjO9Im
+	BMhebk8V0TTRm9j5xkgSh0bRXY/VGXc0cZ+/2tpFtl+8tSgn80NqsaoRLrQw6OFMDmEiskorMLS
+	pytfEGiwTQKKbhEyx5uDVQvWgQIL1Rpp2nZ+eVXegJA==
+X-Gm-Gg: ASbGnctFYrqmfnYVjAiMmSRGV+8aqkwUwknMNRTMootqZWW5wReSixQ6AutsFKAnkr+
+	Mnz8laCotAxiySnTqgcvCMA7U5EWaRcomi2b2bFQSVSCnr1J3jzfLBQXV/d9zJxof0s68wPuBRH
+	5VvqUkjhmsJO+SyQfbotmubDDXZMoI4SF4mDhDwBp2Ti8MekD9HYjrG7WSv7K+q0zHi0QC1hKbu
+	M++jKtY1/WtEVS0A2o=
+X-Google-Smtp-Source: AGHT+IF3H557iKfUovfqwt2gL5bCvaJImvBqsOCUlSfE7rbWLqZkyw3UKcIFfROpG6jQIj6ebdJJMvpqUVlLx0flUXw=
+X-Received: by 2002:a05:690c:b9c:b0:722:8611:7979 with SMTP id
+ 00721157ae682-727f534c628mr212302917b3.26.1757603893463; Thu, 11 Sep 2025
+ 08:18:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250816151929.197589-1-yeoreum.yun@arm.com>
+References: <20250911144923.24259-1-sebott@redhat.com>
+In-Reply-To: <20250911144923.24259-1-sebott@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Sep 2025 16:18:02 +0100
+X-Gm-Features: Ac12FXz6fXkfCmLnxnecWlBKlTxswjmrip5hHL8mvpSj6aSPT4PhMhm5w4RtkfM
+Message-ID: <CAFEAcA8EDJT1+ayyWNsfdOvNoGzczzWV-JSyiP1c1jbxmcBshQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] arm: add kvm-psci-version vcpu property
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Aug 16, 2025 at 04:19:23PM +0100, Yeoreum Yun wrote:
-> Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
-> previleged level to access to access user memory without clearing
-> PSTATE.PAN bit.
-> 
-> This patchset support FEAT_LSUI and applies in futex atomic operation
-> where can replace from ldxr/stlxr pair implmentation with clearing
-> PSTATE.PAN bit to correspondant load/store unprevileged atomic operation
-> without clearing PSTATE.PAN bit.
-> 
-> (Sorry, I've sent wrongly for patch version 7 and resend it.
->  Again, sorry for mail-boom).
+On Thu, 11 Sept 2025 at 15:49, Sebastian Ott <sebott@redhat.com> wrote:
+>
+> This series adds a vcpu knob to request a specific PSCI version
+> from KVM via the KVM_REG_ARM_PSCI_VERSION FW register.
+>
+> Note: in order to support PSCI v0.1 we need to drop vcpu
+> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+> Alternatively we could limit support to versions >=0.2 .
+>
+> Sebastian Ott (2):
+>   target/arm/kvm: add constants for new PSCI versions
+>   target/arm/kvm: add kvm-psci-version vcpu property
 
-I tried to review this but I can't find any details about FEAT_LSUI in
-the latest Arm ARM. Where should I be looking for the architecture spec?
+Could we have some rationale, please? What's the use case
+where you might need to specify a particular PSCI version?
 
-Will
+thanks
+-- PMM
