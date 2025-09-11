@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A183D76;
-	Thu, 11 Sep 2025 15:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471B7343D7C;
+	Thu, 11 Sep 2025 15:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757604150; cv=none; b=miJmSmRmdSTbHNIgP9vs2dBnRmTZ2Y5oBgk1dvlh9iOS17zx4XsUCBqYJCwhHhi0LXR198TfCLHmhQKFdjVCWVjNSXMMXQvL/vc6o6nL/OcOptZxtzkRWAwc6SWVLVNnJlRF4YKPRXW20teQZSSZM1+xF66IhG/Ti9HACdc5Re8=
+	t=1757604536; cv=none; b=jxjX8zazG5fovtNz1iVa1pHLK1UXjdhL6hB7Bp82JSX+/QfoLRfSlFQVdpwUE7rALd0uNpKYvdGacR2MfVP3m71LjDmfEStmPHICv6kXbWM+TXXUl7VYl+e0gf3EZgTusvg6OffdibIdCt7wiYrcRCjpq0l2NSamgD9TJMXLoOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757604150; c=relaxed/simple;
-	bh=9ANPCayp/6AVvTnSZ16aUQ6wUqmjzSzIMaezeBu+G/g=;
+	s=arc-20240116; t=1757604536; c=relaxed/simple;
+	bh=7zogeD5U+3a3b8x9LW5ah9FYZnDdsBjL9Qsg7Ua4oy0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RmG+mwzu1+JV4nJiCISHTZtk6LuQy36fXB2HWeb5Tx1PnTSi2UmQcV9P/14Uj8zbwWC6T6E91u/aWFhBIk4eBVh+hw3gy3bxuJJdO5zKXa1jlD2BfoArZk9EeVFvsz2h9cFuZbIVWWt52+sQ3E8avcx1mvc0f0NJDu51g1GrEzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MSYgkinh; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=k8ecLkBBMk9G/bSV0PfLMsI+c/mtS9JY78drgf3uyyR7lPIM0Y0yotLCWy80sBEPc4c21psdDIvCWlo9zOlvKKwqF/lKZhWrOJGRwt7hpgsA3pILvRnvUI69Q+UsO9IddMeU66+SsTRDwA2TXddgzcloraU+xOzkvbYMpNJahQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pHRwvcbf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MSYgkinh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54B68C4CEF0;
-	Thu, 11 Sep 2025 15:22:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pHRwvcbf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B0BBC4CEF0;
+	Thu, 11 Sep 2025 15:28:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757604150;
-	bh=9ANPCayp/6AVvTnSZ16aUQ6wUqmjzSzIMaezeBu+G/g=;
+	s=k20201202; t=1757604535;
+	bh=7zogeD5U+3a3b8x9LW5ah9FYZnDdsBjL9Qsg7Ua4oy0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MSYgkinh0gRSGkEGz5xc0r1m2bUsSNbqN6icKHW2IEYCC43zT+40wghBE71VtZV27
-	 r8audT2mP+p/6TFd472uOjrrok+vn1YczMO87oW0tqrvrL9gEaysJImirDa68ZtbIw
-	 eCgeWDK+5rnhpvuOffBHFgPUBeizw2/boIbc9EA8laHupMWXE+EeeLzVn36Cj4bgmL
-	 kj95ip718dmRvlBJKgFv1SODHSB4IGvZnqc++2h9wzkDSrhPoyqp0SpQeuNZRGRJVW
-	 QkNYscyfPvUylJf7+UwH4juY7aA9mKAAwJWWOqpuY101f/pFworZ8IdbIuAybdSabm
-	 2mAEXgoJll7OQ==
-Date: Thu, 11 Sep 2025 16:22:24 +0100
+	b=pHRwvcbfBxyQUYkjkexYTVYl9ySPcLwALUBC4vaBD1UyWRvgoRdRvwd70UoKnqD5Q
+	 FUDwHqjMtZSoO7VTmFDwt1oZ/6G/kdyQJ473Rzg6wfd6q4NpwXtotx3v4WBYp6IWGk
+	 PrhGM4z6ZXc0yVSj2AQd3OQwgwXimWGgBX82ZgtE0yy3ZYyUWVKeHX+mb9HRDeZmdE
+	 xlcJuztvM3qEDnS9zTrh0CcDCldYE0/o6NpiE/oJnBqd1N3b9xRPiOZpWRQCLMWJ9Y
+	 Vh5dbqboW1BkhyaT6KmsJxTMUZqHro3kF+fpJ5ArvSlVwQGF4/zNlRaYd3G3OiRSkJ
+	 2ylPwTbCDibeg==
+Date: Thu, 11 Sep 2025 16:28:49 +0100
 From: Will Deacon <will@kernel.org>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
 Cc: catalin.marinas@arm.com, broonie@kernel.org, maz@kernel.org,
@@ -35,10 +35,11 @@ Cc: catalin.marinas@arm.com, broonie@kernel.org, maz@kernel.org,
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND v7 6/6] arm64: futex: support futex with FEAT_LSUI
-Message-ID: <aMLpMBWtHDI9sPHK@willie-the-truck>
+Subject: Re: [PATCH v7 RESEND 5/6] arm64: futex: small optimisation for
+ __llsc_futex_atomic_set()
+Message-ID: <aMLqsez5y9R6FIdJ@willie-the-truck>
 References: <20250816151929.197589-1-yeoreum.yun@arm.com>
- <20250816151929.197589-7-yeoreum.yun@arm.com>
+ <20250816151929.197589-6-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,117 +48,87 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250816151929.197589-7-yeoreum.yun@arm.com>
+In-Reply-To: <20250816151929.197589-6-yeoreum.yun@arm.com>
 
-On Sat, Aug 16, 2025 at 04:19:29PM +0100, Yeoreum Yun wrote:
-> Current futex atomic operations are implemented with ll/sc instructions
-> and clearing PSTATE.PAN.
+On Sat, Aug 16, 2025 at 04:19:28PM +0100, Yeoreum Yun wrote:
+> __llsc_futex_atomic_set() is implmented using
+> LLSC_FUTEX_ATOMIC_OP() macro with "mov  %w3, %w5".
+> But this instruction isn't required to implement fux_atomic_set()
+> so make a small optimisation by implementing __llsc_futex_atomic_set()
+> as separate function.
 > 
-> Since Armv9.6, FEAT_LSUI supplies not only load/store instructions but
-> also atomic operation for user memory access in kernel it doesn't need
-> to clear PSTATE.PAN bit anymore.
-> 
-> With theses instructions some of futex atomic operations don't need to
-> be implmented with ldxr/stlxr pair instead can be implmented with
-> one atomic operation supplied by FEAT_LSUI.
-> 
-> However, some of futex atomic operations still need to use ll/sc way
-> via ldtxr/stltxr supplied by FEAT_LSUI since there is no correspondant
-> atomic instruction or doesn't support word size operation.
-> (i.e) eor, cas{mb}t
-> 
-> But It's good to work without clearing PSTATE.PAN bit.
+> This will make usage of LLSC_FUTEX_ATOMIC_OP() macro more simple.
 > 
 > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
 > ---
->  arch/arm64/include/asm/futex.h | 130 ++++++++++++++++++++++++++++++++-
->  1 file changed, 129 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/futex.h | 43 ++++++++++++++++++++++++++++------
+>  1 file changed, 36 insertions(+), 7 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-> index 22a6301a9f3d..ece35ca9b5d9 100644
+> index ab7003cb4724..22a6301a9f3d 100644
 > --- a/arch/arm64/include/asm/futex.h
 > +++ b/arch/arm64/include/asm/futex.h
-> @@ -9,6 +9,8 @@
->  #include <linux/uaccess.h>
->  #include <linux/stringify.h>
-> 
-> +#include <asm/alternative.h>
-> +#include <asm/alternative-macros.h>
->  #include <asm/errno.h>
+> @@ -13,7 +13,7 @@
 > 
 >  #define LLSC_MAX_LOOPS	128 /* What's the largest number you can think of? */
-> @@ -115,11 +117,137 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
->  	return ret;
+> 
+> -#define LLSC_FUTEX_ATOMIC_OP(op, insn)					\
+> +#define LLSC_FUTEX_ATOMIC_OP(op, asm_op)				\
+>  static __always_inline int						\
+>  __llsc_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+>  {									\
+> @@ -24,7 +24,7 @@ __llsc_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+>  	asm volatile("// __llsc_futex_atomic_" #op "\n"			\
+>  "	prfm	pstl1strm, %2\n"					\
+>  "1:	ldxr	%w1, %2\n"						\
+> -	insn "\n"							\
+> +"	" #asm_op "	%w3, %w1, %w5\n"				\
+>  "2:	stlxr	%w0, %w3, %2\n"						\
+>  "	cbz	%w0, 3f\n"						\
+>  "	sub	%w4, %w4, %w0\n"					\
+> @@ -46,11 +46,40 @@ __llsc_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+>  	return ret;							\
 >  }
 > 
-> +#ifdef CONFIG_AS_HAS_LSUI
-> +
-> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-> +
-> +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
-> +static __always_inline int						\
-> +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-> +{									\
-> +	int ret = 0;							\
-> +	int oldval;							\
-> +									\
-> +	uaccess_ttbr0_enable();						\
-> +	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
-> +	__LSUI_PREAMBLE							\
-> +"1:	" #asm_op #mb "	%w3, %w2, %1\n"					\
-> +"2:\n"									\
-> +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)				\
-> +	: "+r" (ret), "+Q" (*uaddr), "=r" (oldval)			\
-> +	: "r" (oparg)							\
-> +	: "memory");							\
-> +	uaccess_ttbr0_disable();					\
-> +									\
-> +	if (!ret)							\
-> +		*oval = oldval;						\
-> +									\
-> +	return ret;							\
-> +}
-> +
-> +LSUI_FUTEX_ATOMIC_OP(add, ldtadd, al)
-> +LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
-> +LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
-> +LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
+> -LLSC_FUTEX_ATOMIC_OP(add, "add	%w3, %w1, %w5")
+> -LLSC_FUTEX_ATOMIC_OP(or, "orr	%w3, %w1, %w5")
+> -LLSC_FUTEX_ATOMIC_OP(and, "and	%w3, %w1, %w5")
+> -LLSC_FUTEX_ATOMIC_OP(eor, "eor	%w3, %w1, %w5")
+> -LLSC_FUTEX_ATOMIC_OP(set, "mov	%w3, %w5")
+> +LLSC_FUTEX_ATOMIC_OP(add, add)
+> +LLSC_FUTEX_ATOMIC_OP(or, orr)
+> +LLSC_FUTEX_ATOMIC_OP(and, and)
+> +LLSC_FUTEX_ATOMIC_OP(eor, eor)
 > +
 > +static __always_inline int
-> +__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
-> +{
-> +	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
+> +__llsc_futex_atomic_set(int oparg, u32 __user *uaddr, int *oval)
 > +{
 > +	unsigned int loops = LLSC_MAX_LOOPS;
-> +	int ret, oldval, tmp;
+> +	int ret, oldval;
 > +
-> +	uaccess_ttbr0_enable();
-> +	/*
-> +	 * there are no ldteor/stteor instructions...
-> +	 */
-
-*sigh*
-
-Were these new instructions not added with futex in mind?
-
-I wonder whether CAS would be better than exclusives for xor...
-
-> +static __always_inline int
-> +__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +	int ret = 0;
-> +	unsigned int loops = LLSC_MAX_LOOPS;
-> +	u32 val, tmp;
+> +	uaccess_enable_privileged();
+> +	asm volatile("//__llsc_futex_xchg\n"
+> +"	prfm	pstl1strm, %2\n"
+> +"1:	ldxr	%w1, %2\n"
+> +"2:	stlxr	%w0, %w4, %2\n"
+> +"	cbz	%w3, 3f\n"
+> +"	sub	%w3, %w3, %w0\n"
+> +"	cbnz	%w3, 1b\n"
+> +"	mov	%w0, %w5\n"
+> +"3:\n"
+> +"	dmb	ish\n"
+> +	_ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w0)
+> +	_ASM_EXTABLE_UACCESS_ERR(2b, 3b, %w0)
+> +	: "=&r" (ret), "=&r" (oldval), "+Q" (*uaddr), "+r" (loops)
+> +	: "r" (oparg), "Ir" (-EAGAIN)
+> +	: "memory");
+> +	uaccess_disable_privileged();
 > +
-> +	uaccess_ttbr0_enable();
-> +	/*
-> +	 * cas{al}t doesn't support word size...
-> +	 */
+> +	if (!ret)
+> +		*oval = oldval;
 
-What about just aligning down and doing a 64-bit cas in that case?
+Hmm, I'm really not sure this is worthwhile. I doubt the "optimisation"
+actually does anything and adding a whole new block of asm just for the
+SET case isn't much of an improvement on the maintainability side, either.
 
 Will
