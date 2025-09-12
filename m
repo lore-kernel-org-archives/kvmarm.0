@@ -1,111 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E758D3002DE;
-	Fri, 12 Sep 2025 13:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8286021348
+	for <kvmarm@lists.linux.dev>; Fri, 12 Sep 2025 14:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757685258; cv=none; b=fjTghRFAVTnSBCZkugb5fVmUhJQT5lMxGEdnW2KUQ18Yhpj9FdP4eKyoZnVaQZG0r39V6Tgz9htp6re1k+AS8Esks+fCAlxD94TqFGGYQVCet0HLScO8GCmMlJ5hxUruYbW+V+L6PjDFpz/+5+PCLvlZggKg51u9Aq6GYdBlznI=
+	t=1757685948; cv=none; b=KoXAO+9PbPMuPGz8PJUONY/mOOd+VTsKnzdGSEGaTur5sriX9OjKbFDcUeRCrPmc8iNJynrxHJVAG5N183PJyY0PDlgJR7CK47nJIw5o1D14JR14cVKGdpyNdqdz/dE2ZtfI3p/SYUn8SmrwknIZJsB5RJpbZRvHth6T0TtVErY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757685258; c=relaxed/simple;
-	bh=HIAwmhCNeSypW5N4gjF2EVFOTx2Y1RaxzUCFu5jMQBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DVhNxjaWd4ddlQ/1W5YDFlDVgsMqJtMf1535F9tAevbYkN25vv8m4mbO11x1eKR5tLC4d32Oei3WkC+MFR0VlopmO+WqkS/hR6nF798+lHgThjOhu2xUkxA/LwRnKVtWhQpEZ2KRC0dKTPx+9PSxjuxNcGLicpq79PfbNLXXjac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d5HLOVTR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757685948; c=relaxed/simple;
+	bh=wPa31C/u/zYnKmpAPD3QOJm/Vnf/aC31z5afXxruVno=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W76VDS4fk7RXnT58hu/yi5O6ixfUaktQwi8f3u8oQ6XDU7wKok5DIduV+52Kl3LBftyWcq8qJb1QtDHv6m386CbFgmpfguo5XKErbkFaFzpsrdtjcqm/zPQ7mhxcxRpurCIPjP8VDNM8U3PfUiXXXxJ9E5vPN8xS0Q8pTj/yG0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Q8pLkyYP; arc=none smtp.client-ip=119.8.177.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d5HLOVTR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B506C4CEF1;
-	Fri, 12 Sep 2025 13:54:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757685257;
-	bh=HIAwmhCNeSypW5N4gjF2EVFOTx2Y1RaxzUCFu5jMQBU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d5HLOVTRn8pvc+pKJoK4+1B+mArFCpTnmR6tbLA7cUSDW726oWDdKaGQbYsR/cLNU
-	 cI/PSFWIBpPpf+eU5vognCEBeEdsyiAp13aPfzJpyE3nFKYAdZVlvSUTwxgNwMWiS8
-	 l7aehyrP7Sezh4COKYXi2MGFUE1NIRRWf3JNrEmtPH7jDogV8Uk47L/YhAxVcM3c+u
-	 CtSEGBLgfVPKJJdbA5LEN/kIoAoVd7Is5NqKARbYhrBM6qxZfggSXrCcElxTjbSpMR
-	 C0vQ7X0/32IWXF7+qgyQcIsX6uLDWzdmETRmiZl8DtpwuX+5mpD1FTe6F5JFkZxcOS
-	 5sXX9B9Id3YOg==
-Date: Fri, 12 Sep 2025 14:54:11 +0100
-From: Will Deacon <will@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, robin.murphy@arm.com,
-	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v4 15/28] iommu/arm-smmu-v3: Load the driver later in KVM
- mode
-Message-ID: <aMQmA9cLaeYWG5_C@willie-the-truck>
-References: <20250819215156.2494305-1-smostafa@google.com>
- <20250819215156.2494305-16-smostafa@google.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Q8pLkyYP"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=/DcnQTeZI4YKYnANsuOLP3ExlPyT4WtsTA72OsrRERg=;
+	b=Q8pLkyYP6XMLOWfm0UEEdNgeHC6ZXfaCemitYMnvTcFKWHImQdcBRA4C4p7bQ3TevArIMHvOy
+	jE1m7zqlkBek2L3dbxELIo4lledWmAravBzacMis+yV1DrtVPsFvdSqEIAPlsKjXYy1xmdnf3MF
+	rGA09i4tPOxEglnLUUJj1zE=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.35])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4cNbK13n41z1P7Gn;
+	Fri, 12 Sep 2025 21:45:09 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cNbJn3zS2z6M53n;
+	Fri, 12 Sep 2025 21:44:57 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 015531402ED;
+	Fri, 12 Sep 2025 21:47:39 +0800 (CST)
+Received: from localhost (10.203.177.15) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 12 Sep
+ 2025 15:47:38 +0200
+Date: Fri, 12 Sep 2025 14:47:36 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Will Deacon <will@kernel.org>
+CC: Yicong Yang <yangyicong@huawei.com>, <yangyicong@hisilicon.com>,
+	<catalin.marinas@arm.com>, <maz@kernel.org>, <oliver.upton@linux.dev>,
+	<corbet@lwn.net>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <shuah@kernel.org>,
+	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
+	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <tangchengchang@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v4 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
+Message-ID: <20250912144736.00007673@huawei.com>
+In-Reply-To: <aMLvtpaCgRqPAU2Z@willie-the-truck>
+References: <20250715081356.12442-1-yangyicong@huawei.com>
+	<20250715081356.12442-6-yangyicong@huawei.com>
+	<aL7Fgx__LeLfbDyU@willie-the-truck>
+	<5d2ba565-715b-9b17-951b-f805dde5988b@huawei.com>
+	<aMLvtpaCgRqPAU2Z@willie-the-truck>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250819215156.2494305-16-smostafa@google.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Tue, Aug 19, 2025 at 09:51:43PM +0000, Mostafa Saleh wrote:
-> While in KVM mode, the driver must be loaded after the hypervisor
-> initializes.
+On Thu, 11 Sep 2025 16:50:14 +0100
+Will Deacon <will@kernel.org> wrote:
+
+> On Tue, Sep 09, 2025 at 09:48:04AM +0800, Yicong Yang wrote:
+> > On 2025/9/8 20:01, Will Deacon wrote:  
+> > > On Tue, Jul 15, 2025 at 04:13:54PM +0800, Yicong Yang wrote:  
+> > >> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
+> > >> index 69d7afe56853..9e6db258ff48 100644
+> > >> --- a/Documentation/arch/arm64/elf_hwcaps.rst
+> > >> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
+> > >> @@ -435,6 +435,12 @@ HWCAP2_SME_SF8DP4
+> > >>  HWCAP2_POE
+> > >>      Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
+> > >>  
+> > >> +HWCAP3_LS64
+> > >> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001.
+> > >> +
+> > >> +HWCAP3_LS64_V
+> > >> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010.  
+> > > 
+> > > Given that these instructions only work on IMPLEMENTATION DEFINED memory
+> > > locations and aren't guaranteed to generate an abort if used elsewhere,
+> > > how is userspace supposed to know what to do with them?
+> > >   
+> > 
+> > per ARM DDI0487 L.b section C3.2.6,
+> > 
+> >   When the instructions access a memory type that is not one of the following,
+> >   a data abort for unsupported Exclusive or atomic access is generated...  
 > 
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 25 ++++++++++++++++-----
->  1 file changed, 19 insertions(+), 6 deletions(-)
+> That's about the memory _type_. I'm talking about a supported memory type
+> (e.g. writeback cacheable) but when the physical location doesn't support
+> the instruction. That's captured a little later in the same section:
 > 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 10ca07c6dbe9..a04730b5fe41 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -4576,12 +4576,6 @@ static const struct of_device_id arm_smmu_of_match[] = {
->  };
->  MODULE_DEVICE_TABLE(of, arm_smmu_of_match);
->  
-> -static void arm_smmu_driver_unregister(struct platform_driver *drv)
-> -{
-> -	arm_smmu_sva_notifier_synchronize();
-> -	platform_driver_unregister(drv);
-> -}
-> -
->  static struct platform_driver arm_smmu_driver = {
->  	.driver	= {
->  		.name			= "arm-smmu-v3",
-> @@ -4592,8 +4586,27 @@ static struct platform_driver arm_smmu_driver = {
->  	.remove = arm_smmu_device_remove,
->  	.shutdown = arm_smmu_device_shutdown,
->  };
-> +
-> +#ifndef CONFIG_ARM_SMMU_V3_PKVM
-> +static void arm_smmu_driver_unregister(struct platform_driver *drv)
-> +{
-> +	arm_smmu_sva_notifier_synchronize();
-> +	platform_driver_unregister(drv);
-> +}
-> +
->  module_driver(arm_smmu_driver, platform_driver_register,
->  	      arm_smmu_driver_unregister);
-> +#else
-> +/*
-> + * Must be done after the hypervisor initializes at module_init()
-> + * No need for unregister as this is a built in driver.
-> + */
-> +static int arm_smmu_driver_register(void)
-> +{
-> +	return platform_driver_register(&arm_smmu_driver);
-> +}
-> +device_initcall_sync(arm_smmu_driver_register);
-> +#endif /* !CONFIG_ARM_SMMU_V3_PKVM */
+>   | If the target memory location does not support the LD64B or ST64B
+>   | instructions, then one of the following behaviors occurs:
+>   |  * A stage 1 Data Abort, reported using the DFSC code of 0b110101,
+>   |    is generated.
+>   |  * The instruction performs the memory accesses, but the accesses
+>   |    are not single-copy atomic above the byte level
+> 
+> and I think that's a bad interface to expose blindly to userspace solely
+> as a boolean hwcap.
+Hi Will,
 
-I think this is a bit grotty as we now have to reason about different
-initialisation ordering based on CONFIG_ARM_SMMU_V3_PKVM. Could we
-instead return -EPROBE_DEFER if the driver tries to probe before the
-hypervisor is up?
+Nasty, so now I'm curious. Any thoughts on how to expose what regions it is appropriate
+for?  I can think of various heavy weight options but wondering if there is a simple
+solution.
 
-Will
+Jonathan
+> 
+> Will
+> 
+
