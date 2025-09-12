@@ -1,121 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CEE302CB2;
-	Fri, 12 Sep 2025 11:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978BC274FDB
+	for <kvmarm@lists.linux.dev>; Fri, 12 Sep 2025 11:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757676140; cv=none; b=lry69C63xSsVlKj2PtEI5um6IygdVqoa9bda8rZgRuRWQcv3UGdNEXfZPBdYS9xwljhQBqQzdS7bQr/3/seDAmBlDMsnBrX5cLMbdtI3GWIkeRnNfmS7n15HVKk1HwPmK5s9HrMYBi9x1Sj6pJF9PvKmKCtr0NQqm65/BnBpTFY=
+	t=1757676834; cv=none; b=jhaWszcswoeFhuYWHgTX7J4Qj5A7HmICaAdYkxrUqmyMRcp342r806DDK0MdOJmRta7rHvkavL3bg7+GaV4v37ODX+AhQrG0j+eD+F3suyRanZryADU8cz2/6RFzSLM/b9MutFgACr3eQsYGtbCK/K8LVgU4w24mYSTKMWJ+zRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757676140; c=relaxed/simple;
-	bh=2Z09lyzr3mlySMGqqjLAI9Q8pohqjxnIJ8nt0XVxnnw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gJQ7IvSzHoVd26Cmb6rO6EPEfbPtUR+rhATZmvVRa97yvN4wouy8tCatj7mxTPDRtT5h0G71oDAxbZ+sCjPSc4VUhGieOv/LJVJU2b9v24Lfk+okk0LH5W8jxSEjnu5tluGRLg7Y4qDK/qglIg9bK3NvJ0N+nI3aoACdQKj/ClQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L34ZYKvk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757676834; c=relaxed/simple;
+	bh=XBHAModFzS9RT7TpF2/ykWjDQcNt9+bCE4YK2ZwUuV0=;
+	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
+	 Cc:In-Reply-To:To; b=rtwsR6nkdRNX2mu62IdTqak2j+LpHxMHsQHcY4ShtayQoKz19uxapSte1jVzX75CdT4wPLqZh/JHo61ITxLVLYNycCt0fHXC/CvYI7AQUblD9PP7bEPOAKzV4c0aF/AQZXVbKF1B5mJt38pMnxuO87Stw7eW5yvrFxjlBlvzrSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOPJOgRR; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L34ZYKvk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDC14C4CEF7;
-	Fri, 12 Sep 2025 11:22:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757676140;
-	bh=2Z09lyzr3mlySMGqqjLAI9Q8pohqjxnIJ8nt0XVxnnw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=L34ZYKvkzUB5+9nv8Ow5OWUHNFysI8goeM6YczMJs91QTuZ9ENhdQBw/sQZxbcqIA
-	 GGj0FoaBJlU+Apn+Ir0QqMi0GIx3V2TWDtYMsJruNdyPq6fOqEbAjx7rcQKsBL4eB1
-	 ZfAJbaAPcf3GMZbfEsEvUk5Jj0DDZ6JTNOecVh3+BDkQLJjcF773MbmzCwCxMjxqhC
-	 TG5dd72VwSu7XRSYD0qKQzSZ+du6M4Hsfpq/uXQ/VcdSndSUevVNIBaR6ryzK3pNld
-	 NUkps7GD7ZPpazktK1Lm6xQVSu4UeJVJtUF2+0u/5o0BsfelP33i5UfMQcHxmHzpJO
-	 uEEFna+EHHPWQ==
-From: Mark Brown <broonie@kernel.org>
-Date: Fri, 12 Sep 2025 10:25:32 +0100
-Subject: [PATCH v16 6/6] KVM: selftests: arm64: Add GCS registers to
- get-reg-list
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOPJOgRR"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-32dea064b51so565661a91.2
+        for <kvmarm@lists.linux.dev>; Fri, 12 Sep 2025 04:33:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757676832; x=1758281632; darn=lists.linux.dev;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Me3gQ2+XLChgmuRgGxhLuD7lEdljJYpRCmXxWniexUs=;
+        b=OOPJOgRRN7yTIG1QY7YkmG+D8bqyoLyd6oleoQECGl8wsiE+aEzMI6beO6f3mijwc4
+         pNfQuJ1PGKpNpJgOyBPm7XTXiZCib8iZ+TjzY9Fh5jKW68PfdYQpvYNHOLX1PBU/sKc8
+         NE60/L0m6+HTfwCfO5EPi5xsL8nBar4wWhtstJGZkih61TIu85BFsEhjUVSj0l+NukFQ
+         4LrJhd26nG63hpdDuBjgyyJ4Yev4+224wswVjYumtW9Eq6wCSlWaAF/5TQElCwZ8AiXI
+         hX1XS+NcXebuBkKxxV+MfWOtmaU5/wQ2HiuDAdvDvUKpUDXuEAJfGzSSRzQkmRrqixoK
+         tMCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757676832; x=1758281632;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Me3gQ2+XLChgmuRgGxhLuD7lEdljJYpRCmXxWniexUs=;
+        b=qvYjDUwh+w573PxePIK9nHARVWv0ttZvGYgWfcYk1/5DFF0tPz4uMmE801Wag3X1mB
+         LJAkvXiGNbZ/wzDMZ4a/T6Gj6jDoAxWKtJb0bPZNPvdGWpXVOXAeV009w1cZaHlCQe5W
+         rh/FTlhk9R3JrLRWetqOKUtGUzsInHt88ag56d2sH7cRLvt001dWaBETey0/Q08Lw8vh
+         kkRyH499NTApBjVIxcSkmiZuDb6RWPyLQ+0Frhn5tdPHhpCbwoLRyDmLas9WuvgQ9SLN
+         qCA8KIBrdKoJn10x4YivFbDwfXpNegf94qlc5JPAbV6HlrKnRYeVwYueaD+inhWftHeX
+         2xKg==
+X-Forwarded-Encrypted: i=1; AJvYcCW0MRfqSqnZM+vK0lyWPyL1Z2OUVcY5Te2C1KZbVI0WnE164B82Ir9fXhqPfn0w0hpzXX51joQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyUU9aDmWpEhZ/NoidtomFFhkJEVO/8qgvWmyxlM5rLgQxSM4vT
+	8XFbug/Z7sQn7kpNpmlsZDY2WRWCeyJI1NAgaR9FuNLZh9XsbIhqbYYy
+X-Gm-Gg: ASbGncsI+F4UyNvvGL1hBkQP1HTmf9dsYCPnzadRGgMg2ExlZeA0jIxHxnp+YJS+M56
+	8ZlbyBcszAu3fQPkxMda6SWUwtFZgAFngIvlnu3ogVFiTvKAoQK0aWSuged9s4Yo+btANIallMR
+	1gBjNOE8dhNaTob4owyZiInxOP/XNl8MB4Auja3ZGRvIgIlUKxNwMoGAlO2QPv1MdlUnJdm3LPw
+	XTiq0jElQPsfOvqATkTX87gLq0+ZuJX8nrkTML2ola5FY9F0RkoUBZoLazUnbA0BpqBh/nVhQpn
+	W+pWfuIK00BjIuVIUpPScGXZEZ4ou71L09O55Uqpu8vk1kW9yuwqp89D5ivYcUKMUlKDRHC7+mK
+	0VhT0VzPnOZgGI7w2Gkwp+yn1/vi7hyjaYwhTC12Mg6Vou6cxCMZ8K2/JpOiwQMGlXxqEIT+xLM
+	FsoZFmMDY=
+X-Google-Smtp-Source: AGHT+IG4CQOrsidgDKZqODfMcOoJgWe/C+OuZOd1ih4oVDYDwhAJqojGn09l0Bnkzu0cbpihXieC8w==
+X-Received: by 2002:a17:90b:3889:b0:32d:5721:df96 with SMTP id 98e67ed59e1d1-32de4f808f5mr2582134a91.32.1757676831756;
+        Fri, 12 Sep 2025 04:33:51 -0700 (PDT)
+Received: from smtpclient.apple (p73a27f58.hyognt01.ap.so-net.ne.jp. [115.162.127.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32dd7ceecfasm2203933a91.7.2025.09.12.04.33.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Sep 2025 04:33:51 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Itaru Kitayama <itaru.kitayama@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250912-arm64-gcs-v16-6-6435e5ec37db@kernel.org>
-References: <20250912-arm64-gcs-v16-0-6435e5ec37db@kernel.org>
-In-Reply-To: <20250912-arm64-gcs-v16-0-6435e5ec37db@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
- Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-X-Mailer: b4 0.15-dev-56183
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2417; i=broonie@kernel.org;
- h=from:subject:message-id; bh=2Z09lyzr3mlySMGqqjLAI9Q8pohqjxnIJ8nt0XVxnnw=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBoxAJY4+SLnStXXvVFpBNYWlP1+VGHPxHvlmN6M
- z611HojkTCJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaMQCWAAKCRAk1otyXVSH
- 0CORB/97WmwBUUlxAL6LjWlqWHp9V44CpCGTC8Lhk6gOOTvNi+TUCs5aGaKAmuFUa6SKHkaOBSF
- EKWdDn7SfL8jcvcmmZu0fRFASR0rW40r76P/++ZuDCMg1UJhJAtQ8PENu/BIsrwqpjsyVoCsmyJ
- kTsrJZQkxq5KFPxlIVNtb85ZEaLZEV5IN+y5tLS0jVoN7drGvdySNw56qL+pfuwJTmpzfYRahF+
- nkLZR9oDmz6oCZoMui8A5bj0hErIFgI/AHAgYXUULilLRnwZ32rMPmmfSuKzXnt3Gp3A/dWTmHa
- BJHd3LjzUSlDY50YlZs6fq3uO0Jy5Vi7H7qbcCd9ny+3TQuK
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH] PMCR_EL0.N is RAZ/WI. At least a build failes in Ubuntu 22.04 LTS. Remove the set function.
+Date: Fri, 12 Sep 2025 20:33:39 +0900
+Message-Id: <3FEB4D87-EEAF-4A21-BCBC-291A4A7C2230@gmail.com>
+References: <867by4c4v1.wl-maz@kernel.org>
+Cc: Itaru Kitayama <itaru.kitayama@linux.dev>,
+ Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ K Poulose Suzuki <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Itaru Kitayama <itaru.kitayama@fujitsu.com>
+In-Reply-To: <867by4c4v1.wl-maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+X-Mailer: iPhone Mail (22G100)
 
-GCS adds new registers GCSCR_EL1, GCSCRE0_EL1, GCSPR_EL1 and GCSPR_EL0. Add
-these to those validated by get-reg-list.
 
-Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/arm64/get-reg-list.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
-index 011fad95dd02..9bf33064377b 100644
---- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
-@@ -42,6 +42,12 @@ struct feature_id_reg {
- static struct feature_id_reg feat_id_regs[] = {
- 	REG_FEAT(TCR2_EL1,	ID_AA64MMFR3_EL1, TCRX, IMP),
- 	REG_FEAT(TCR2_EL2,	ID_AA64MMFR3_EL1, TCRX, IMP),
-+	REG_FEAT(GCSPR_EL0,	ID_AA64PFR1_EL1, GCS, IMP),
-+	REG_FEAT(GCSPR_EL1,	ID_AA64PFR1_EL1, GCS, IMP),
-+	REG_FEAT(GCSPR_EL2,	ID_AA64PFR1_EL1, GCS, IMP),
-+	REG_FEAT(GCSCRE0_EL1,	ID_AA64PFR1_EL1, GCS, IMP),
-+	REG_FEAT(GCSCR_EL1,	ID_AA64PFR1_EL1, GCS, IMP),
-+	REG_FEAT(GCSCR_EL2,	ID_AA64PFR1_EL1, GCS, IMP),
- 	REG_FEAT(PIRE0_EL1,	ID_AA64MMFR3_EL1, S1PIE, IMP),
- 	REG_FEAT(PIRE0_EL2,	ID_AA64MMFR3_EL1, S1PIE, IMP),
- 	REG_FEAT(PIR_EL1,	ID_AA64MMFR3_EL1, S1PIE, IMP),
-@@ -486,6 +492,9 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 2, 0, 1),	/* TTBR1_EL1 */
- 	ARM64_SYS_REG(3, 0, 2, 0, 2),	/* TCR_EL1 */
- 	ARM64_SYS_REG(3, 0, 2, 0, 3),	/* TCR2_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 0),	/* GCSCR_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 1),	/* GCSPR_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 5, 2),	/* GCSCRE0_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 1, 0),	/* AFSR0_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 1, 1),	/* AFSR1_EL1 */
- 	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
-@@ -502,6 +511,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
- 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-+	ARM64_SYS_REG(3, 3, 2, 5, 1),	/* GCSPR_EL0 */
- 	ARM64_SYS_REG(3, 3, 10, 2, 4),	/* POR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
- 	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
-@@ -740,6 +750,8 @@ static __u64 el2_regs[] = {
- 	SYS_REG(PIRE0_EL2),
- 	SYS_REG(PIR_EL2),
- 	SYS_REG(POR_EL2),
-+	SYS_REG(GCSPR_EL2),
-+	SYS_REG(GCSCR_EL2),
- 	SYS_REG(AMAIR_EL2),
- 	SYS_REG(VBAR_EL2),
- 	SYS_REG(CONTEXTIDR_EL2),
+> On Sep 12, 2025, at 20:01, Marc Zyngier <maz@kernel.org> wrote:
+>=20
+> =EF=BB=BFOn Fri, 12 Sep 2025 09:27:40 +0100,
+> Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
+>>=20
+>> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+>=20
+> This isn't an acceptable commit message.
+>=20
+>> ---
+>> Seen a build failure with old Ubuntu 22.04 LTS, while the latest release
+>> has no build issue, a write to the bit fields is RAZ/WI, remove the
+>> function.
+>> ---
+>> tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 6 ------
+>> 1 file changed, 6 deletions(-)
+>>=20
+>> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/to=
+ols/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>> index f16b3b27e32ed7ca57481f27d689d47783aa0345..56214a4430be90b3e1d840f27=
+19b22dd44f0b49b 100644
+>> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>> @@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
+>>    return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+>> }
+>>=20
+>> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+>> -{
+>> -    u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
+>> -}
+>> -
+>> static uint64_t get_counters_mask(uint64_t n)
+>> {
+>>    uint64_t mask =3D BIT(ARMV8_PMU_CYCLE_IDX);
+>> @@ -490,7 +485,6 @@ static void test_create_vpmu_vm_with_pmcr_n(uint64_t p=
+mcr_n, bool expect_fail)
+>>     * Setting a larger value of PMCR.N should not modify the field, and
+>>     * return a success.
+>>     */
+>> -    set_pmcr_n(&pmcr, pmcr_n);
+>>    vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+>>    pmcr =3D vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
+>>=20
+>>=20
+>=20
+> So what are you fixing here? A build failure? A semantic defect?
+> Something else? What makes this a valid change?
+>=20
+> Frankly, I have no idea.
+>=20
+> But KVM definitely allows PMCR_EL0.N to be written from userspace, and
+> that's not going to change.
+>=20
 
--- 
-2.47.2
+Then I=E2=80=99ll drop this patch.
 
+Thanks,
+Itaru.
+
+>    M.
+>=20
+> --
+> Without deviation from the norm, progress is not possible.
