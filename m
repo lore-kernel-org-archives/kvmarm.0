@@ -1,81 +1,108 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A7126E701
-	for <kvmarm@lists.linux.dev>; Fri, 12 Sep 2025 21:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D06273D6D;
+	Fri, 12 Sep 2025 21:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757712209; cv=none; b=VAZ9iT2cUYP37uEGfRnLk0AeZu+h4C5EPGN+uEm3rQ0I8MNL36RVeZhDr9bkeAK0KLQDIoAoChj6ZHMyAjSdEqXzUxAhBMkEu5eAIROKqUNEYYW8zQTYmu/8ZQ3Qqi5lgc35UvjBFSVViNyIi+AZlmuNdBOG9SqR/DVMaRzC0C8=
+	t=1757712659; cv=none; b=gqUBnKd/tNHK3oBdn++w0Qu4nKvJzb+u4qPViuH9OeHjXENRVMdAk7JFkrL1W48A4/Y5VtcKKZ7Wn4+80J1pStQaG1NlxvYU6B5VTRsg9NZv+uaWDfNurl3+eQcHi1oYQo3BvnybnnWlq5C1oBj86dUWqeVPayZQ07Vua0V3qAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757712209; c=relaxed/simple;
-	bh=QhHDRtamGHNqbRWIo6Ojx+fmf77sLPnVLcHCcbVB6vA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=B/Sgd8o5WIvOT35999IrRNqqKB1xeGUdMIlb1IxAvRwDVQPessnpgxLvP++FrZjXXwOyxKqEgLmS5fvLbhenS/Q8Qqj0mNyRGdSGhBBTpYUhrH5MGsHAYXYtRChais/ew7nYALCpDXI2oSEq87lgGkvRJGHsk9xqAGgMm71e0Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cg3fz+3n; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1757712659; c=relaxed/simple;
+	bh=ROOxPMoHZeX2C55B+T1892lm27mdEE7tXf8RWUdYD4s=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pyD7Iu168c/8ASzoJKnBmq/YU6iN2RE7xBoap38S8gqeFUx4ZG5o+Pe359CG6+UIZ7alporvPS2z1RrhiulGk/S4m3Ei/TnoKPJh5zPoV0MGwc+yBBD0SrUYcitm8Otck9dj/ZCstzDG5Z2GY1yRaF3ZoZGyRKnlDRUUpEMHMgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NCQ4vNf6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Cg3fz+3n"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757712206;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5kbJyACD2zKs3BtD/b2gnM8mDDFj6e3FGgo+X4Ei0qQ=;
-	b=Cg3fz+3n21Iz1XlBTq+y+ztjy7hrx5FiIj6DZQzMo4ElybDDOcsknhdDSFUPFvSTAehGXf
-	1fYCmBme3pk59hFrwJhcnb5DpNz3fmE44riffWn9Py/NamW981DxNjKG6kGlID2nGojbYH
-	Y2lvi+jbnIFfHuOEKoKlR5LbxHnpW1U=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NCQ4vNf6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F599C4CEF5;
+	Fri, 12 Sep 2025 21:30:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757712658;
+	bh=ROOxPMoHZeX2C55B+T1892lm27mdEE7tXf8RWUdYD4s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NCQ4vNf6J1KUx693QddwsDnduxLLflhhPbPEkncW3RejjdZYdMemWaPGwzK895scA
+	 FyWtRO+KFAZVF+KUZ/nSMCGg7Gw+WoUrbjeCeG1pzZWodGGYDUNzD9LhKF1ZCV4cMk
+	 efPG20V13+oix10lAReteVa0qUaaSiIsgwEKXZfPsox3Kwiq8CVqELdFirC4M/Mu+A
+	 ETN271tzU5OyQJDNIQdOvha65YOINhAb+ur3AktrnqoANgU9dOE1a2T1kqfyXj/5dV
+	 jjTMDDJitjHRibc7Q7/INfgoyrckQe1yZef4IX2iefNuIHZEA/Fb+8QalMbFtTzFao
+	 EzEzQd+iPJvtQ==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uxBM7-00000005pJX-3RCo;
+	Fri, 12 Sep 2025 21:30:55 +0000
+Date: Fri, 12 Sep 2025 22:30:53 +0100
+Message-ID: <87frcrz7ci.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jinqian Yang <yangjinqian1@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 11/11] KVM: arm64: nv: Expose up to FEAT_Debugv8p8 to NV-enabled VMs
-Date: Fri, 12 Sep 2025 14:22:58 -0700
-Message-Id: <20250912212258.407350-12-oliver.upton@linux.dev>
-In-Reply-To: <20250912212258.407350-1-oliver.upton@linux.dev>
-References: <20250912212258.407350-1-oliver.upton@linux.dev>
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v16 2/6] KVM: arm64: Manage GCS access and registers for guests
+In-Reply-To: <aMRLYBWfDFiIB7wx@finisterre.sirena.org.uk>
+References: <20250912-arm64-gcs-v16-0-6435e5ec37db@kernel.org>
+	<20250912-arm64-gcs-v16-2-6435e5ec37db@kernel.org>
+	<865xdndgpw.wl-maz@kernel.org>
+	<aMRLYBWfDFiIB7wx@finisterre.sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The changes to the debug architecture up to v8.8 are concerned with
-external debug, which of course has no direct impact on VMs. Raise the
-feature limit and document what's preventing us from raising it further.
+On Fri, 12 Sep 2025 17:33:36 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Fri, Sep 12, 2025 at 12:59:23PM +0100, Marc Zyngier wrote:
+> > On Fri, 12 Sep 2025 10:25:28 +0100,
+> > Mark Brown <broonie@kernel.org> wrote:
+> 
+> > >  		MAPPED_EL2_SYSREG(PIR_EL2,     PIR_EL1,     NULL	     );
+> > >  		MAPPED_EL2_SYSREG(PIRE0_EL2,   PIRE0_EL1,   NULL	     );
+> > >  		MAPPED_EL2_SYSREG(POR_EL2,     POR_EL1,     NULL	     );
+> > > +		MAPPED_EL2_SYSREG(GCSCR_EL2,   GCSCR_EL1,   NULL             );
+> > > +		MAPPED_EL2_SYSREG(GCSPR_EL2,   GCSPR_EL1,   NULL             );
+> > >  		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
+> > >  		MAPPED_EL2_SYSREG(ELR_EL2,     ELR_EL1,	    NULL	     );
+> > >  		MAPPED_EL2_SYSREG(SPSR_EL2,    SPSR_EL1,    NULL	     );
+> 
+> > Just like the previous version, you're missing the accessors that
+> > would be this table useful. Meaning that the vcpu_read_sys_reg() and
+> > vcpu_write_sys_reg() accessors will fail for all 4 GSC registers.
+> 
+> Just to confirm, this is __vcpu_{read,write}_sysreg()?
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/nested.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+No.
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 65b5fbb88510..74bd5140c9a4 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1581,8 +1581,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 			 ID_AA64DFR0_EL1_PMSS		|
- 			 ID_AA64DFR0_EL1_TraceVer);
- 
--		/* Cap Debug to ARMv8.1 */
--		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, VHE);
-+		/*
-+		 * FEAT_Debugv8p9 requires support for extended breakpoints /
-+		 * watchpoints.
-+		 */
-+		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
- 		break;
- 	}
- 
+vcpu_{read,write}_sys_reg() and co are the broken high-level
+accessors. __vcpu_{read,write}_sysreg() call into those depending on
+the context, and __vcpu_{read,write}_sys_reg_{to,from}_cpu() have now
+been removed and replaced by similar (but private) accessors.
+
+See -rc4 for the details.
+
+In any case, a bunch of register accesses in this series are broken,
+as they don't respect the register life cycle of the guest.
+
+	M.
+
 -- 
-2.39.5
-
+Jazz isn't dead. It just smells funny.
