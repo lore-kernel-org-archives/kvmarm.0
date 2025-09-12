@@ -1,142 +1,95 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBC8307AE3;
-	Fri, 12 Sep 2025 12:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268FE14EC62;
+	Fri, 12 Sep 2025 13:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757679094; cv=none; b=tRb5Jd0IcsGYPMBrD/4YR4f3iif3hbFOcAgH0ynP39KOw0YMukngVNgTGWt9S9MBK6zLbhnEHVo6R/qHuZiXNV9al2s0l+pPyc0r3j8irEUZYwGUQC1gTK1RD7X2qLN709DQ3PpvmffC/6Ssbu2YEUx6+hmTjuqoSptV1/rVNaU=
+	t=1757684930; cv=none; b=o8jVNa8B6vTbPidpFa/E1TFHYNYKqQLTfmhKPFTlCmq2EF7w0wHMDH5rq/qiDrgG0oC48IU43iWCmh2CaTBTIqUNimJzXZHTsG6cLdGrJSRumDmAkOHcm/lzln6B9uvu3br7vU7AAz4vLKDV4cmDhK6GgVIFMziozo9bPPZlnlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757679094; c=relaxed/simple;
-	bh=XRHXIkOFKo+7035cNRrBYS4AXTjDo5unw4Qr62yGDW0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JylvsrP5ThXNEw+rh1zyPBhnRKJeCkCVpDeOSzMpirTmJfMccu4G8J1RAQ7Mv5sNSRPojXmlbm7nvDKTEzgL+/LZRux3hYzLzDq81EOBEI3J280SauMuQtxrT/PVrq+AXZyT9ezzQE8cf2K/zkIZU0AZUf6AlzAbsosL9Qdepao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a0J2vXtV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757684930; c=relaxed/simple;
+	bh=chwM5K+xTzqEOy4QaouFWqu8+ltEBz2JlWDvhXp3SZU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hx03ESs1BGDaABAkoZouQIogQZdnMKvy9413w5/IcuDHM8OO/gi4Xlr8Gs7/x2ARaBlY5yy4yeCL+kN3dKIOsMelCIx56P2gK8zIiJDEQSHPqofuOdUonpb9XLBugdubtNBDPOI1ngkuACZQXUp29501OINkZ62r4J9aqzav8vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7UHCh5B; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a0J2vXtV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AFC2C4CEF1;
-	Fri, 12 Sep 2025 12:11:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7UHCh5B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2132C4CEF4;
+	Fri, 12 Sep 2025 13:48:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757679094;
-	bh=XRHXIkOFKo+7035cNRrBYS4AXTjDo5unw4Qr62yGDW0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a0J2vXtVQcgXKtlhg36EclpHdO5TWV0+E5eP6mUnhhft6bZE+UYwoVO5gQIXKiyY6
-	 M05n8cc0XTZLYqAl+S+Vy+3GK6+vjO8uMG0GnV3nuGerWKeyzujv9CKKiUTkF5WDSd
-	 pt94V79JVWG6GvonNI/l2/H2of8kjUYdX0H42/DdCT7YC5vg0SBKXVwVtq+WI+amZJ
-	 a6gxlIiLDqiyLMEifG0ZCcIv/eic7NTsgajrBEg/y3KYSEo4kQWxS+evyWFisGOyMC
-	 BXfK4eeyBdS5SnARYLycSD6C+pFbFh9mVekY1vgd3dmVwZWTc3vDYzj6AfpLROQuig
-	 zq+r2yIBt4f9A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1ux2cm-00000005gFU-0GlJ;
-	Fri, 12 Sep 2025 12:11:32 +0000
-Date: Fri, 12 Sep 2025 13:11:31 +0100
-Message-ID: <86348rdg5o.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Itaru Kitayama <itaru.kitayama@gmail.com>
-Cc: Itaru Kitayama <itaru.kitayama@linux.dev>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	K Poulose Suzuki <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Subject: Re: [PATCH] PMCR_EL0.N is RAZ/WI. At least a build failes in Ubuntu 22.04 LTS. Remove the set function.
-In-Reply-To: <3FEB4D87-EEAF-4A21-BCBC-291A4A7C2230@gmail.com>
-References: <867by4c4v1.wl-maz@kernel.org>
-	<3FEB4D87-EEAF-4A21-BCBC-291A4A7C2230@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1757684929;
+	bh=chwM5K+xTzqEOy4QaouFWqu8+ltEBz2JlWDvhXp3SZU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n7UHCh5B5vrhQNfG9nY1XhpwhsjSK11kr/oOJbHpuZo9EF78yza6cnHHzItS9Z3jw
+	 wC5bc/tE+2UbPEZFl1OkREx8UKSZ2F+0kmRaV95SAZpPQUbUHuNoHJqQTXeR3q1VTs
+	 u5yUyJm1KYXqJkk9EHnDaQMbBfof3aWCLVoISVLBgDgDl6suwCLi2Z9n5uMXFufpJg
+	 GEEcPaTjjpVoQhBM1gaCRoU38n2RFPCQGO1ce64hIyDnKJA1TYp87le9OLn5sJjcrD
+	 ZlB6kGXSiQg6OAfjoXqFTNQhfDUUY5yT/jIt4JUWYpNdmStOE086YToHUnFX1sx1sb
+	 pcS1FjtLnc8pw==
+Date: Fri, 12 Sep 2025 14:48:43 +0100
+From: Will Deacon <will@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org, mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com, qperret@google.com, aneesh.kumar@kernel.org,
+	kernel-team@android.com, linux-kernel@vger.kernel.org,
+	smostafa@google.com
+Subject: Re: [PATCH v6 16/24] KVM: arm64: Add clock support for the pKVM hyp
+Message-ID: <aMQku2zzNRppTRhS@willie-the-truck>
+References: <20250821081412.1008261-1-vdonnefort@google.com>
+ <20250821081412.1008261-17-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: itaru.kitayama@gmail.com, itaru.kitayama@linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, itaru.kitayama@fujitsu.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250821081412.1008261-17-vdonnefort@google.com>
 
-On Fri, 12 Sep 2025 12:33:39 +0100,
-Itaru Kitayama <itaru.kitayama@gmail.com> wrote:
->=20
->=20
->=20
-> > On Sep 12, 2025, at 20:01, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > =EF=BB=BFOn Fri, 12 Sep 2025 09:27:40 +0100,
-> > Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
-> >>=20
-> >> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> >=20
-> > This isn't an acceptable commit message.
-> >=20
-> >> ---
-> >> Seen a build failure with old Ubuntu 22.04 LTS, while the latest relea=
-se
-> >> has no build issue, a write to the bit fields is RAZ/WI, remove the
-> >> function.
-> >> ---
-> >> tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 6 ------
-> >> 1 file changed, 6 deletions(-)
-> >>=20
-> >> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b=
-/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> >> index f16b3b27e32ed7ca57481f27d689d47783aa0345..56214a4430be90b3e1d840=
-f2719b22dd44f0b49b 100644
-> >> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> >> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> >> @@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
-> >>    return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
-> >> }
-> >>=20
-> >> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
-> >> -{
-> >> -    u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
-> >> -}
-> >> -
-> >> static uint64_t get_counters_mask(uint64_t n)
-> >> {
-> >>    uint64_t mask =3D BIT(ARMV8_PMU_CYCLE_IDX);
-> >> @@ -490,7 +485,6 @@ static void test_create_vpmu_vm_with_pmcr_n(uint64=
-_t pmcr_n, bool expect_fail)
-> >>     * Setting a larger value of PMCR.N should not modify the field, and
-> >>     * return a success.
-> >>     */
-> >> -    set_pmcr_n(&pmcr, pmcr_n);
-> >>    vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
-> >>    pmcr =3D vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
-> >>=20
-> >>=20
-> >=20
-> > So what are you fixing here? A build failure? A semantic defect?
-> > Something else? What makes this a valid change?
-> >=20
-> > Frankly, I have no idea.
-> >=20
-> > But KVM definitely allows PMCR_EL0.N to be written from userspace, and
-> > that's not going to change.
-> >=20
->=20
-> Then I=E2=80=99ll drop this patch.
+[+Mostafa]
 
-I'm not asking you to drop it, I'm asking you to explain. If you found
-a problem, let's discuss it and fix it. But as it stands, you're not
-giving me much to go on.
+On Thu, Aug 21, 2025 at 09:14:04AM +0100, Vincent Donnefort wrote:
+> By default, the arm64 host kernel is using the arch timer as a source
+> for sched_clock. Conveniently, EL2 has access to that same counter,
+> allowing to generate clock values that are synchronized.
+> 
+> The clock needs nonetheless to be setup with the same slope values as
+> the kernel. Introducing at the same time trace_clock() which is expected
+> to be later configured by the hypervisor tracing.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-	M.
+[...]
 
---=20
-Without deviation from the norm, progress is not possible.
+> +/* Using host provided data. Do not use for anything else than debugging. */
+> +u64 trace_clock(void)
+> +{
+> +	struct clock_data *clock = &trace_clock_data;
+> +	u64 bank = smp_load_acquire(&clock->cur);
+> +	u64 cyc, ns;
+> +
+> +	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
+> +
+> +	if (likely(cyc < clock->data[bank].cyc_overflow64)) {
+> +		ns = cyc * clock->data[bank].mult;
+> +		ns >>= clock->data[bank].shift;
+> +	} else {
+> +		ns = __clock_mult_uint128(cyc, clock->data[bank].mult,
+> +					  clock->data[bank].shift);
+> +	}
+> +
+> +	return (u64)ns + clock->data[bank].epoch_ns;
+
+So the comment here say this is for debugging only but, afaict, this
+would also be useful for the cmdq timeouts in your nested SMMU series [1]
+and would remove the need to mess around with the clock frequency in
+the driver code...
+
+Will
+
+[1] https://lore.kernel.org/lkml/20250819215156.2494305-4-smostafa@google.com/
