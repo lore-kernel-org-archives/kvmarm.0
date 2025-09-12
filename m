@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084A1280CF1;
-	Fri, 12 Sep 2025 21:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52FA81798F;
+	Fri, 12 Sep 2025 21:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757713472; cv=none; b=gc/5MCdQxT2mqLbE5P5miyBgIa8I9gqSHnKSsrgRr7jibHvB9+bhR7LPXkpDFU4t2Qw6xIPIzivwOEEoOwczbOQ9CfIBqRV/uL7UIXDsXl63wimRPuS9g+g++sNxWC7Cnua/JB92m9FQ2f2af1H5mIs59lFWG0SIpbykugcaRKw=
+	t=1757713587; cv=none; b=GfkebnmEeDQ9Tve99TkgAHZSzBqKOHnUm91x2k9I7hxEj58oyUOzgKLCJtXKrTANJoN0pbUz0IoP/mMWpkXcimt050BhCMovlkw5Y/5myajDJfFTgyYKFvIQlZgoeA+klW7sE3JFSDJGoEM3cylQTRyuyfzy6DocgDksaQobFFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757713472; c=relaxed/simple;
-	bh=oSKfU+P7ccMg188II6EO2cJq+sduRk0IxK/pqog4cSU=;
+	s=arc-20240116; t=1757713587; c=relaxed/simple;
+	bh=LE/pKOZjl39+pd41X1ZUViQqZVkvkaULc0/s+XUleLM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EPl7CZ3DKMCud5rEwr9KKxDswcn5/TGaYDSy2J6C27sv1DKaL0QtPAxKqToAtvqbvpd4RXJvPPz0H8RzvXn3RnGOg2eA9Sw4KZ8ZR2TKEma7i6IC0pJ5kGnsjqu/PPGAuw2cU/vkkQWxrhwmsqQcvHeAUe3XRFTrK7KHqY3OYJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bJ6I3O6S; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=qba525/gFjVbvYCIPQ8e/I9zHsHoMyg5WG5yfoil9MsK6P70SiE0CVQmcoB6aEF7f6cs8S+tM6F/deFzdrWOWxAm/GYsOXZQ+plYsdeKuO/AZ9RKNFnslnms8rAR/V8IPMKP/N8U5INmgqpBRgS+KDsqFxyk032OIdTyeukI748=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vg8ENwcS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bJ6I3O6S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83509C4CEF1;
-	Fri, 12 Sep 2025 21:44:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vg8ENwcS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D47F8C4CEF1;
+	Fri, 12 Sep 2025 21:46:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757713471;
-	bh=oSKfU+P7ccMg188II6EO2cJq+sduRk0IxK/pqog4cSU=;
+	s=k20201202; t=1757713586;
+	bh=LE/pKOZjl39+pd41X1ZUViQqZVkvkaULc0/s+XUleLM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bJ6I3O6StZuiXEUknMkPl1d+XBcHoYo8KEz0hmh0oJMDf7MhqDpzuxbw6otYgNdvz
-	 JUoafKn1e31LqhlISkZ1IQQvo20W6u8VnkDJhbEjZq7OJMpt2FSRjw/Yl3oEM4+MGl
-	 zJi+ZbrctAmToGrR+0+kYVvhWj9VNr4m1TTnmLaFSQFjQJcU7nQC8VBJld+w2K7JQ2
-	 hdA8NkZHEjRX3CRgndAuVA12VfXC6o5sknSnGqtHy8dpKWt8tPgRSI15ldZl+Y3dPR
-	 Qn/IlGW3uuiqPMX3IKQFlaHmaALAhaAVaovvJOzJFbPAoPJGokI84V/j4pO+QH6w0h
-	 J8cxwUlIailTg==
+	b=Vg8ENwcSM/0SbWBZCbjFFP2ze6ITCVRYLRkQzz1Vxr4GlnSTxb9plxsUwaJD1Z4ER
+	 DaJKDUOGVo3ytea8MNLu0g66lEck4hPQv8IPnhO5P49qKQybUVUaZ0rzurlgPWkKje
+	 TXepy2qTBZ4Sf4/KBC2FxpY/1Oo5f+B8YEV+dferDgflFqKw8RPsScXkMj2Esk1AAe
+	 GOiH2nsIN8KV7d6dIPbk5g6S9Z8uu0RZOPat05zfRK3xvolfSDDiu6uUwMHp7WCDHY
+	 x1s3m4I9FOn78LOeQ1quboX3Jn+99BdpLXOWN/GBR9zOJKbv08tUryVe3I3dJLD6Fi
+	 CZgzBAxhwVCdQ==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uxBZF-00000005pTe-1Lxi;
-	Fri, 12 Sep 2025 21:44:29 +0000
-Date: Fri, 12 Sep 2025 22:44:27 +0100
-Message-ID: <87cy7vz6pw.wl-maz@kernel.org>
+	id 1uxBb6-00000005pVz-3V5f;
+	Fri, 12 Sep 2025 21:46:24 +0000
+Date: Fri, 12 Sep 2025 22:46:23 +0100
+Message-ID: <87bjnfz6mo.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -46,11 +46,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v16 5/6] KVM: arm64: Allow GCS to be enabled for guests
-In-Reply-To: <20250912-arm64-gcs-v16-5-6435e5ec37db@kernel.org>
+	linux-kernel@vger.kernel.org,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Subject: Re: [PATCH v16 6/6] KVM: selftests: arm64: Add GCS registers to get-reg-list
+In-Reply-To: <20250912-arm64-gcs-v16-6-6435e5ec37db@kernel.org>
 References: <20250912-arm64-gcs-v16-0-6435e5ec37db@kernel.org>
-	<20250912-arm64-gcs-v16-5-6435e5ec37db@kernel.org>
+	<20250912-arm64-gcs-v16-6-6435e5ec37db@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,39 +63,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, thiago.bauermann@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Sep 2025 10:25:31 +0100,
+On Fri, 12 Sep 2025 10:25:32 +0100,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> Now that required functionality for GCS is in place expose
-> ID_AA64PFR1_EL1.GCS, allowing guests to be given the feature.
+> GCS adds new registers GCSCR_EL1, GCSCRE0_EL1, GCSPR_EL1 and GCSPR_EL0. Add
+> these to those validated by get-reg-list.
 > 
+> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/kvm/nested.c   | 7 ++++---
->  arch/arm64/kvm/sys_regs.c | 2 --
->  2 files changed, 4 insertions(+), 5 deletions(-)
+>  tools/testing/selftests/kvm/arm64/get-reg-list.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 153b3e11b115..d2d55e18c610 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1459,9 +1459,10 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
->  
->  	case SYS_ID_AA64PFR1_EL1:
->  		/* Only support BTI, SSBS, CSV2_frac */
-> -		val &= (ID_AA64PFR1_EL1_BT	|
-> -			ID_AA64PFR1_EL1_SSBS	|
-> -			ID_AA64PFR1_EL1_CSV2_frac);
-> +		val &= (ID_AA64PFR1_EL1_BT		|
-> +			ID_AA64PFR1_EL1_SSBS		|
-> +			ID_AA64PFR1_EL1_CSV2_frac	|
-> +			ID_AA64PFR1_EL1_GCS);
+> diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+> index 011fad95dd02..9bf33064377b 100644
+> --- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+> @@ -42,6 +42,12 @@ struct feature_id_reg {
+>  static struct feature_id_reg feat_id_regs[] = {
+>  	REG_FEAT(TCR2_EL1,	ID_AA64MMFR3_EL1, TCRX, IMP),
+>  	REG_FEAT(TCR2_EL2,	ID_AA64MMFR3_EL1, TCRX, IMP),
+> +	REG_FEAT(GCSPR_EL0,	ID_AA64PFR1_EL1, GCS, IMP),
+> +	REG_FEAT(GCSPR_EL1,	ID_AA64PFR1_EL1, GCS, IMP),
+> +	REG_FEAT(GCSPR_EL2,	ID_AA64PFR1_EL1, GCS, IMP),
+> +	REG_FEAT(GCSCRE0_EL1,	ID_AA64PFR1_EL1, GCS, IMP),
+> +	REG_FEAT(GCSCR_EL1,	ID_AA64PFR1_EL1, GCS, IMP),
+> +	REG_FEAT(GCSCR_EL2,	ID_AA64PFR1_EL1, GCS, IMP),
+>  	REG_FEAT(PIRE0_EL1,	ID_AA64MMFR3_EL1, S1PIE, IMP),
+>  	REG_FEAT(PIRE0_EL2,	ID_AA64MMFR3_EL1, S1PIE, IMP),
+>  	REG_FEAT(PIR_EL1,	ID_AA64MMFR3_EL1, S1PIE, IMP),
+> @@ -486,6 +492,9 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 0, 2, 0, 1),	/* TTBR1_EL1 */
+>  	ARM64_SYS_REG(3, 0, 2, 0, 2),	/* TCR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 2, 0, 3),	/* TCR2_EL1 */
+> +	ARM64_SYS_REG(3, 0, 2, 5, 0),	/* GCSCR_EL1 */
+> +	ARM64_SYS_REG(3, 0, 2, 5, 1),	/* GCSPR_EL1 */
+> +	ARM64_SYS_REG(3, 0, 2, 5, 2),	/* GCSCRE0_EL1 */
+>  	ARM64_SYS_REG(3, 0, 5, 1, 0),	/* AFSR0_EL1 */
+>  	ARM64_SYS_REG(3, 0, 5, 1, 1),	/* AFSR1_EL1 */
+>  	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
+> @@ -502,6 +511,7 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
+>  	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
+> +	ARM64_SYS_REG(3, 3, 2, 5, 1),	/* GCSPR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 10, 2, 4),	/* POR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
+> @@ -740,6 +750,8 @@ static __u64 el2_regs[] = {
+>  	SYS_REG(PIRE0_EL2),
+>  	SYS_REG(PIR_EL2),
+>  	SYS_REG(POR_EL2),
+> +	SYS_REG(GCSPR_EL2),
+> +	SYS_REG(GCSCR_EL2),
+>  	SYS_REG(AMAIR_EL2),
+>  	SYS_REG(VBAR_EL2),
+>  	SYS_REG(CONTEXTIDR_EL2),
+> 
 
-How about updating the comment?
+More importantly, I'd expect a test that exercises the exception
+paths, as the current code is pretty broken.
 
 	M.
 
