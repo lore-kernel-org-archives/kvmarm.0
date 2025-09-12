@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2646030ACF9;
-	Fri, 12 Sep 2025 16:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4774B30E83D;
+	Fri, 12 Sep 2025 16:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757695461; cv=none; b=cxvbNw2c2kDI31QZKBbhUTfc43+pCfrT/3YUKzyCMa73pz53gPrC8kVKhz5xtJG5mcqn8mubtxv+Te5okfL7tgqkibMw3nO7FS9orZShquOV/DDr9P8wHcO+33cvuBxxDxBFv0P0zTN/rk9JZjoe0QIMQf+1LuUHMa1WCC0u/Xg=
+	t=1757696038; cv=none; b=Wz41EqoWXtDaA+QEZX1bRdNnpqFjCQYWcpyummHeqje+gRD+MVOImHGiHkIPs1ZkW0G01pFHXbQhsU6R4SoLZquqwT+IgxfjPmSNciBDCQxAEbk2tMhgjoK7EWYIYgHPgl/oUUB1A8DL8fW3qcyR/25KsHfcV5j5Gw/D5djK/78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757695461; c=relaxed/simple;
-	bh=HPmldDCz7zhpWDN7uGs/4kAMsot1fkoRvtKnK1a+TcM=;
+	s=arc-20240116; t=1757696038; c=relaxed/simple;
+	bh=uUFnrieoLxzSat6u+ShEFsAWL4sxsVEqWU61B/F1RO0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZxsOpTsYaDNZ98ic+tewSF3FiM+omflHvdy68OaCPRT+zMhYWchCK4uRURCLM9fVfEwe/Mp8JLsiZuAo2TGSRC6PFzG9Hgt0DsgC1KmY882Cfo+/Ws6ZQMIgf++r88/DpqMjmYAFeLideCi0MY/BUhgFg2CLZN8/DvCgFBN7KNs=
+	 Content-Type:Content-Disposition:In-Reply-To; b=QF+rXADt2+73SG/D42HcWdzAvNjEkqOrnU0la60DlZXwgO7J+f9RgPj2adpvItlBWRorFke6VQi5/TfGuvFYFzMVsFE2Wz1lo2W6sd0GBwGxMIF1fwgh0IZQDGvxm1mA/z4UtT/x9GuQbFiY+79AOsxeHYcV/a0Qh9X2Zjtb5AE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 147A9C4CEF1;
-	Fri, 12 Sep 2025 16:44:17 +0000 (UTC)
-Date: Fri, 12 Sep 2025 17:44:15 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D870C4CEF1;
+	Fri, 12 Sep 2025 16:53:55 +0000 (UTC)
+Date: Fri, 12 Sep 2025 17:53:53 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
 Cc: will@kernel.org, broonie@kernel.org, maz@kernel.org,
@@ -25,7 +25,7 @@ Cc: will@kernel.org, broonie@kernel.org, maz@kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH RESEND v7 4/6] arm64: futex: refactor futex atomic
  operation
-Message-ID: <aMRN3z3WNRGuwBgQ@arm.com>
+Message-ID: <aMRQIeIdyiWVR8a0@arm.com>
 References: <20250816151929.197589-1-yeoreum.yun@arm.com>
  <20250816151929.197589-5-yeoreum.yun@arm.com>
 Precedence: bulk
@@ -39,27 +39,25 @@ Content-Disposition: inline
 In-Reply-To: <20250816151929.197589-5-yeoreum.yun@arm.com>
 
 On Sat, Aug 16, 2025 at 04:19:27PM +0100, Yeoreum Yun wrote:
-> +#define FUTEX_ATOMIC_OP(op)						\
-> +static __always_inline int						\
-> +__futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)		\
-> +{									\
-> +	return __llsc_futex_atomic_##op(oparg, uaddr, oval);		\
-> +}
-> +
-> +FUTEX_ATOMIC_OP(add)
-> +FUTEX_ATOMIC_OP(or)
-> +FUTEX_ATOMIC_OP(and)
-> +FUTEX_ATOMIC_OP(eor)
-> +FUTEX_ATOMIC_OP(set)
-> +
-> +static __always_inline int
-> +__futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +	return __llsc_futex_cmpxchg(uaddr, oldval, newval, oval);
-> +}
+> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> index bc06691d2062..ab7003cb4724 100644
+> --- a/arch/arm64/include/asm/futex.h
+> +++ b/arch/arm64/include/asm/futex.h
+> @@ -7,17 +7,21 @@
+> 
+>  #include <linux/futex.h>
+>  #include <linux/uaccess.h>
+> +#include <linux/stringify.h>
+> 
+>  #include <asm/errno.h>
+> 
+> -#define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+> +#define LLSC_MAX_LOOPS	128 /* What's the largest number you can think of? */
 
-The patch looks fine and my impression that the __futex_* functions will
-be used in patch 6 to dispatch between lsui and llsc. But you got them
-the other way around. I'll comment there. For this patch:
+I just noticed - you might as well leave the name as is here, especially
+if in patch 6 you align down address and use CAS on a 64-bit value as
+per Will's comment (and it's no longer LLSC). I think renaming this is
+unnecessary.
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+-- 
+Catalin
