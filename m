@@ -1,49 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075A2280CF1
-	for <kvmarm@lists.linux.dev>; Fri, 12 Sep 2025 21:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084A1280CF1;
+	Fri, 12 Sep 2025 21:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757713391; cv=none; b=rArwi51BFfUKuDOXSjwDKtThG0IKKhTElnx2PAuYUVK2A45CQmMGRnXZHY5230QPBTvrAi4TpjoJChHk2kzWIpsMBuzpMU2B8RN/fafPqMEyJl2BYzY6e7X0wCdvx1szj/7PBIk5VmHQtUbJTdd4caKpm5GYw7NdF9rymADOoF8=
+	t=1757713472; cv=none; b=gc/5MCdQxT2mqLbE5P5miyBgIa8I9gqSHnKSsrgRr7jibHvB9+bhR7LPXkpDFU4t2Qw6xIPIzivwOEEoOwczbOQ9CfIBqRV/uL7UIXDsXl63wimRPuS9g+g++sNxWC7Cnua/JB92m9FQ2f2af1H5mIs59lFWG0SIpbykugcaRKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757713391; c=relaxed/simple;
-	bh=DR/X3Kd+nnt0YodkSFwvimBtxlnL4RgFrvrpc78ux64=;
+	s=arc-20240116; t=1757713472; c=relaxed/simple;
+	bh=oSKfU+P7ccMg188II6EO2cJq+sduRk0IxK/pqog4cSU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B5zxQo+a9GFuzw+VA67mT9pJhBQ+oC/iNQ49ibHzY3aVL4vPLUJQf2XYueJQTCf4IMBX8JAaZtk83i5Xa/JSQbZnRf5QTacctbPCYVixUEWEFpI45nxwcZmPRh9Eb4gWanCtWlqSOdP/rL6lfPosKXGSRd+FHte0wme9F7KAea0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DNlzDCeu; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=EPl7CZ3DKMCud5rEwr9KKxDswcn5/TGaYDSy2J6C27sv1DKaL0QtPAxKqToAtvqbvpd4RXJvPPz0H8RzvXn3RnGOg2eA9Sw4KZ8ZR2TKEma7i6IC0pJ5kGnsjqu/PPGAuw2cU/vkkQWxrhwmsqQcvHeAUe3XRFTrK7KHqY3OYJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bJ6I3O6S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DNlzDCeu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9ABC4CEF1;
-	Fri, 12 Sep 2025 21:43:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bJ6I3O6S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83509C4CEF1;
+	Fri, 12 Sep 2025 21:44:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757713390;
-	bh=DR/X3Kd+nnt0YodkSFwvimBtxlnL4RgFrvrpc78ux64=;
+	s=k20201202; t=1757713471;
+	bh=oSKfU+P7ccMg188II6EO2cJq+sduRk0IxK/pqog4cSU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DNlzDCeu9h7Je5JLqkiH8VbqKZjD8Gnzont+paAE6dpUyeGeGxDnKFFY5b9odbNnP
-	 xx0aeNUH4xnc3nlkU6UUvwTvhD/3LvRI5ELNC0JHK+6sP1fBtJ+pdhPM4RZ6JiThyq
-	 VRN/r+aMxPawihTDuXq+1YUiZmYeposdPl99E14pJR2V0nvY/MhZ9v1tYy9ZxKCjE/
-	 2krtYf+/6Rodxv8mfq+k8fc7VWLz5BN3PuUZEkqmXztcfqjjYpgFAYWb0dqM0Ap8hq
-	 7ifn280UYXSTO+g6hdWeJVXeXjkO4WQt858i9qvZhm/h4MBlIW7cQDSuO67/OFtU40
-	 7tRqj29MysAvw==
+	b=bJ6I3O6StZuiXEUknMkPl1d+XBcHoYo8KEz0hmh0oJMDf7MhqDpzuxbw6otYgNdvz
+	 JUoafKn1e31LqhlISkZ1IQQvo20W6u8VnkDJhbEjZq7OJMpt2FSRjw/Yl3oEM4+MGl
+	 zJi+ZbrctAmToGrR+0+kYVvhWj9VNr4m1TTnmLaFSQFjQJcU7nQC8VBJld+w2K7JQ2
+	 hdA8NkZHEjRX3CRgndAuVA12VfXC6o5sknSnGqtHy8dpKWt8tPgRSI15ldZl+Y3dPR
+	 Qn/IlGW3uuiqPMX3IKQFlaHmaALAhaAVaovvJOzJFbPAoPJGokI84V/j4pO+QH6w0h
+	 J8cxwUlIailTg==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uxBXw-00000005pSO-0F40;
-	Fri, 12 Sep 2025 21:43:08 +0000
-Date: Fri, 12 Sep 2025 22:43:05 +0100
-Message-ID: <87ecsbz6s6.wl-maz@kernel.org>
+	id 1uxBZF-00000005pTe-1Lxi;
+	Fri, 12 Sep 2025 21:44:29 +0000
+Date: Fri, 12 Sep 2025 22:44:27 +0100
+Message-ID: <87cy7vz6pw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jinqian Yang <yangjinqian1@huawei.com>
-Subject: Re: [PATCH 00/11] KVM: arm64: nv: Align feature limitations with current state of support
-In-Reply-To: <20250912212258.407350-1-oliver.upton@linux.dev>
-References: <20250912212258.407350-1-oliver.upton@linux.dev>
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v16 5/6] KVM: arm64: Allow GCS to be enabled for guests
+In-Reply-To: <20250912-arm64-gcs-v16-5-6435e5ec37db@kernel.org>
+References: <20250912-arm64-gcs-v16-0-6435e5ec37db@kernel.org>
+	<20250912-arm64-gcs-v16-5-6435e5ec37db@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,50 +62,39 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, yangjinqian1@huawei.com
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Sep 2025 22:22:47 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, 12 Sep 2025 10:25:31 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> There's a mix of features we currently hide for NV VMs that we actually
-> can already support, either because they have no impact on our NV
-> implementation or the feature was already implemented and someone forgot
-> to update the mask...
+> Now that required functionality for GCS is in place expose
+> ID_AA64PFR1_EL1.GCS, allowing guests to be given the feature.
 > 
-> On top of that, I decided to invert our masking for several registers to
-> have denylist behavior. This is a better way to express things, IMO, as
-> the features we do not support are explicitly listed.
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/kvm/nested.c   | 7 ++++---
+>  arch/arm64/kvm/sys_regs.c | 2 --
+>  2 files changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 153b3e11b115..d2d55e18c610 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1459,9 +1459,10 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+>  
+>  	case SYS_ID_AA64PFR1_EL1:
+>  		/* Only support BTI, SSBS, CSV2_frac */
+> -		val &= (ID_AA64PFR1_EL1_BT	|
+> -			ID_AA64PFR1_EL1_SSBS	|
+> -			ID_AA64PFR1_EL1_CSV2_frac);
+> +		val &= (ID_AA64PFR1_EL1_BT		|
+> +			ID_AA64PFR1_EL1_SSBS		|
+> +			ID_AA64PFR1_EL1_CSV2_frac	|
+> +			ID_AA64PFR1_EL1_GCS);
 
-This was done for a reason: as long as NV was out of tree, it was far
-easier to pick what we wanted to support, rather than playing
-wack-a-mole as new features were popping up in the non-NV code.
-
-Now that NV is in, and that NV support is part of the basic
-requirements for anything that we add to KVM, it is probably the right
-time to invert the logic.
-
-> In so doing, I found a bug relating to FEAT_DoubleLock where we
-> accidentally claim support where we shouldn't as the 0 value implies
-> the feature is implemented.
-
-Meh. Don't you love negative features?
-
-> I've made each relaxation into its own patch to capture the rationale in
-> the changelog but I'm also fine squashing these based on the affected
-> register. Features that limit our MMU implementation are deliberately
-> left masked, e.g. FEAT_ETS* and FEAT_nTLBPA place constraints on the
-> behavior of our nested MMU. Although the latter is highly unlikely to
-> matter.
-
-Well, unlikely to matter for S2. For S1, this is a different story.
-
-> Applies to 6.17-rc4. **NOTE** this depends on Jinqian's series to make
-> ID_AA64MMFR1_EL1.TWED writable [*], that should be applied before this
-> series.
-
-Thanks for that. I'll have a look shortly.
+How about updating the comment?
 
 	M.
 
