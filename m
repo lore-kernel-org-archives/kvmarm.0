@@ -1,55 +1,55 @@
-Received: from fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.156.205.64])
+Received: from fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.75.33.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98FB2C21F4;
-	Fri, 12 Sep 2025 09:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.156.205.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231F62D5924;
+	Fri, 12 Sep 2025 09:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.75.33.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757668678; cv=none; b=IHphn/9KQ5x4vphaDQJ3Ru9lSrZtJfA16NWmQzZiyv12sSU2adWgC5mv9jcFB5+Az+vj/6oOaAAQM6iFoBY27EJtRW1Ujqiqhkv7PZ+iebMPsIPuGTm/Sk1IzpsQ+saYFP0L5GrPJABPxEntsgOkGtlULLQRYZt3EUUDFbSRERc=
+	t=1757668682; cv=none; b=nFEqlK5RNh8+g5xeOgmx05QqOke+fbHBjHo/y8RWxhi5sY2YeqiSnirTXaWfOzvP9mgn+R95EqokgWeG5seUYC7BTHzoIEs5l1quAGv7Qn5BRgQBm7xfPQmPv+TTke0H6qiwcTyQvS5sog5AQKU889O0Mg5vTO528RJzq+D5AGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757668678; c=relaxed/simple;
-	bh=kCA7I8O/bIQ5VR41rCrn7q7wuheONqlGizzpnXwizAo=;
+	s=arc-20240116; t=1757668682; c=relaxed/simple;
+	bh=wid5ZpMlIzw0h5J5aZk2zxWaJiSvOU9JNas+rLWeyIQ=;
 	h=From:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=W0mrWgFsXzhpfTIX2Wy7UJOqndAfPPKG4cvflIAvaEeuYLhdjbmwgiX1VP3DB8lm9MT+fymtEohKk7gICGcMJlWGgVeK9xqdSrxEeHTosDoZnn08SYKQ26uBz3FhWDJqaMHmuRbNDsT9GO7y/8VVV3OJ8+sT3Y0iH6EWDzCxd88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=KgIXe2Xu; arc=none smtp.client-ip=18.156.205.64
+	 Content-Type:MIME-Version; b=eI2Cn8sZ3jmHVMx5wPEYU1HSCUdLd4WppqIjjX8ZNCLPfDoBAhGok1AKDOp8gXQ15e+3cecydByh9SLBjbadbIWgwnnqIUQOdhUiE2O4gKzjGto54tpotb7qVhg9hHFT5r3z010D3T8qfw44cMw5uJvhgRGMJFZQHS4oO94Q180=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=sZre0aTe; arc=none smtp.client-ip=3.75.33.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="KgIXe2Xu"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="sZre0aTe"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1757668676; x=1789204676;
+  s=amazoncorp2; t=1757668680; x=1789204680;
   h=from:cc:subject:date:message-id:references:in-reply-to:
    content-transfer-encoding:mime-version;
-  bh=41cdObRV2/ULxTOTq6Jo3VA2F7BSJFHzuhvS9zYggVk=;
-  b=KgIXe2XuzXCAaHA0zcOeaIlP0GcxDlZ1AHJjTqUiArq3W9aMiqcDG5cC
-   c/r9cSMFWxyF46yqdKp3S/JQYXPr4lLsNZN6Z8xoxF3fM48h61Af3k9Or
-   7/Le/5Vsr+5l1q+/bkPwYqAeBklA71/0T/ZD7QW6UdY5mnUE21/zdIizw
-   0tVjjXLcn7Af0cbqSqJ1MMlnw4KVGB9uc8lBwtbG2DOK7w4mLRJYmQ9JW
-   sIxBJNUMbP/Kh7UjhVehXvMXAw71oyV7enR8Vkt4Qay0Ww0V32jcfJbXm
-   3tKJKUILFw72JN/kE7BAuM6FJoXo+j42ogi5k4X7PzyQDBXHfWZoql/nt
+  bh=5NNoBeZQBb9T957EsbM7la6hJHqpaE8HET/lqUjlaxE=;
+  b=sZre0aTeXnb/yNGcTYv+Os4qG4H2yV+dqDKPwcp4MiaOu00JZAzPweOM
+   ZQaC+GQTUaHcobG65NvLvhYCA0+98jnKTpMBw+hyuf+MqSUyyr/CsZpkV
+   UBwJFCJ7dhWMR68YJDOBPcDULN6O93LqCxxCemL3krrU8af7WoJOLq09w
+   RAyx0GUJ+xcmHdUCw6/nUu43g77r4RFwVvDYrHzLUM4XAuN3mUZeCP7d6
+   PCYj+QY2JDmLP0L7t8ghBGsZaMTCxcqC3pZYetkuFWIR/hz1SWmfwFSV/
+   uTKmAJflFaM9asr4ZHr03Z6mp9qeHBtQJWTzESYrgyCBRCAm6+/c86rtT
    g==;
-X-CSE-ConnectionGUID: ebdcgtMrTx6xMDSWHdTt2g==
-X-CSE-MsgGUID: PGUELi/XT06/ELEYBnfMnQ==
+X-CSE-ConnectionGUID: wYtI5NgKRIqisl+Vievf/A==
+X-CSE-MsgGUID: EReQ7El5R9GU0+jpTmihUA==
 X-IronPort-AV: E=Sophos;i="6.18,259,1751241600"; 
-   d="scan'208";a="2004659"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2025 09:17:55 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:16512]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.1.26:2525] with esmtp (Farcaster)
- id 0785c246-36c5-4fce-8800-3c624d06aeb2; Fri, 12 Sep 2025 09:17:55 +0000 (UTC)
-X-Farcaster-Flow-ID: 0785c246-36c5-4fce-8800-3c624d06aeb2
-Received: from EX19D015EUB001.ant.amazon.com (10.252.51.114) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+   d="scan'208";a="2009022"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2025 09:17:48 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:6176]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.45.248:2525] with esmtp (Farcaster)
+ id 54936bdc-7bbc-4a51-83bc-460f78b35c73; Fri, 12 Sep 2025 09:17:48 +0000 (UTC)
+X-Farcaster-Flow-ID: 54936bdc-7bbc-4a51-83bc-460f78b35c73
+Received: from EX19D015EUB003.ant.amazon.com (10.252.51.113) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Fri, 12 Sep 2025 09:17:44 +0000
+ Fri, 12 Sep 2025 09:17:47 +0000
 Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19D015EUB001.ant.amazon.com (10.252.51.114) with Microsoft SMTP Server
+ EX19D015EUB003.ant.amazon.com (10.252.51.113) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Fri, 12 Sep 2025 09:17:43 +0000
+ Fri, 12 Sep 2025 09:17:46 +0000
 Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
  EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
- 15.02.2562.020; Fri, 12 Sep 2025 09:17:43 +0000
+ 15.02.2562.020; Fri, 12 Sep 2025 09:17:46 +0000
 From: "Roy, Patrick" <roypat@amazon.co.uk>
 CC: "Thomson, Jack" <jackabt@amazon.co.uk>, "Kalyazin, Nikita"
 	<kalyazin@amazon.co.uk>, "Cali, Marco" <xmarcalx@amazon.co.uk>,
@@ -114,13 +114,13 @@ CC: "Thomson, Jack" <jackabt@amazon.co.uk>, "Kalyazin, Nikita"
 	<devel@lists.orangefs.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
 	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
 	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: [PATCH v6 08/11] KVM: selftests: Add guest_memfd based
- vm_mem_backing_src_types
-Thread-Topic: [PATCH v6 08/11] KVM: selftests: Add guest_memfd based
- vm_mem_backing_src_types
-Thread-Index: AQHcI8YY6/+VU2XIuE+c9Ntv3BXwAw==
-Date: Fri, 12 Sep 2025 09:17:43 +0000
-Message-ID: <20250912091708.17502-9-roypat@amazon.co.uk>
+Subject: [PATCH v6 10/11] KVM: selftests: cover GUEST_MEMFD_FLAG_NO_DIRECT_MAP
+ in existing selftests
+Thread-Topic: [PATCH v6 10/11] KVM: selftests: cover
+ GUEST_MEMFD_FLAG_NO_DIRECT_MAP in existing selftests
+Thread-Index: AQHcI8YaDbzInvv1DEGA7z1fcDmE6Q==
+Date: Fri, 12 Sep 2025 09:17:46 +0000
+Message-ID: <20250912091708.17502-11-roypat@amazon.co.uk>
 References: <20250912091708.17502-1-roypat@amazon.co.uk>
 In-Reply-To: <20250912091708.17502-1-roypat@amazon.co.uk>
 Accept-Language: en-US
@@ -136,209 +136,67 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 
-Allow selftests to configure their memslots such that userspace_addr is=0A=
-set to a MAP_SHARED mapping of the guest_memfd that's associated with=0A=
-the memslot. This setup is the configuration for non-CoCo VMs, where all=0A=
-guest memory is backed by a guest_memfd whose folios are all marked=0A=
-shared, but KVM is still able to access guest memory to provide=0A=
-functionality such as MMIO emulation on x86.=0A=
-=0A=
-Add backing types for normal guest_memfd, as well as direct map removed=0A=
-guest_memfd.=0A=
+Extend mem conversion selftests to cover the scenario that the guest can=0A=
+fault in and write gmem-backed guest memory even if its direct map=0A=
+removed. Also cover the new flag in guest_memfd_test.c tests.=0A=
 =0A=
 Signed-off-by: Patrick Roy <roypat@amazon.co.uk>=0A=
 ---=0A=
- .../testing/selftests/kvm/include/kvm_util.h  | 18 ++++++=0A=
- .../testing/selftests/kvm/include/test_util.h |  7 +++=0A=
- tools/testing/selftests/kvm/lib/kvm_util.c    | 63 ++++++++++---------=0A=
- tools/testing/selftests/kvm/lib/test_util.c   |  8 +++=0A=
- 4 files changed, 66 insertions(+), 30 deletions(-)=0A=
+ tools/testing/selftests/kvm/guest_memfd_test.c             | 2 ++=0A=
+ .../selftests/kvm/x86/private_mem_conversions_test.c       | 7 ++++---=0A=
+ 2 files changed, 6 insertions(+), 3 deletions(-)=0A=
 =0A=
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing=
-/selftests/kvm/include/kvm_util.h=0A=
-index 23a506d7eca3..5204a0a18a7f 100644=0A=
---- a/tools/testing/selftests/kvm/include/kvm_util.h=0A=
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h=0A=
-@@ -635,6 +635,24 @@ static inline bool is_smt_on(void)=0A=
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing=
+/selftests/kvm/guest_memfd_test.c=0A=
+index b3ca6737f304..1187438b6831 100644=0A=
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c=0A=
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c=0A=
+@@ -275,6 +275,8 @@ static void test_guest_memfd(unsigned long vm_type)=0A=
  =0A=
- void vm_create_irqchip(struct kvm_vm *vm);=0A=
- =0A=
-+static inline uint32_t backing_src_guest_memfd_flags(enum vm_mem_backing_s=
-rc_type t)=0A=
-+{=0A=
-+	uint32_t flags =3D 0;=0A=
-+=0A=
-+	switch (t) {=0A=
-+	case VM_MEM_SRC_GUEST_MEMFD:=0A=
-+		flags |=3D GUEST_MEMFD_FLAG_MMAP;=0A=
-+		fallthrough;=0A=
-+	case VM_MEM_SRC_GUEST_MEMFD_NO_DIRECT_MAP:=0A=
+ 	if (vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP))=0A=
+ 		flags |=3D GUEST_MEMFD_FLAG_MMAP;=0A=
++	if (vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_NO_DIRECT_MAP))=0A=
 +		flags |=3D GUEST_MEMFD_FLAG_NO_DIRECT_MAP;=0A=
-+		break;=0A=
-+	default:=0A=
-+		break;=0A=
-+	}=0A=
-+=0A=
-+	return flags;=0A=
-+}=0A=
-+=0A=
- static inline int __vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size=
-,=0A=
- 					uint64_t flags)=0A=
- {=0A=
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testin=
-g/selftests/kvm/include/test_util.h=0A=
-index 0409b7b96c94..a56e53fc7b39 100644=0A=
---- a/tools/testing/selftests/kvm/include/test_util.h=0A=
-+++ b/tools/testing/selftests/kvm/include/test_util.h=0A=
-@@ -133,6 +133,8 @@ enum vm_mem_backing_src_type {=0A=
- 	VM_MEM_SRC_ANONYMOUS_HUGETLB_16GB,=0A=
- 	VM_MEM_SRC_SHMEM,=0A=
- 	VM_MEM_SRC_SHARED_HUGETLB,=0A=
-+	VM_MEM_SRC_GUEST_MEMFD,=0A=
-+	VM_MEM_SRC_GUEST_MEMFD_NO_DIRECT_MAP,=0A=
- 	NUM_SRC_TYPES,=0A=
- };=0A=
  =0A=
-@@ -165,6 +167,11 @@ static inline bool backing_src_is_shared(enum vm_mem_b=
-acking_src_type t)=0A=
- 	return vm_mem_backing_src_alias(t)->flag & MAP_SHARED;=0A=
+ 	test_create_guest_memfd_multiple(vm);=0A=
+ 	test_create_guest_memfd_invalid_sizes(vm, flags, page_size);=0A=
+diff --git a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c=
+ b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c=0A=
+index 82a8d88b5338..8427d9fbdb23 100644=0A=
+--- a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c=0A=
++++ b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c=0A=
+@@ -367,7 +367,7 @@ static void *__test_mem_conversions(void *__vcpu)=0A=
  }=0A=
  =0A=
-+static inline bool backing_src_is_guest_memfd(enum vm_mem_backing_src_type=
- t)=0A=
-+{=0A=
-+	return t =3D=3D VM_MEM_SRC_GUEST_MEMFD || t =3D=3D VM_MEM_SRC_GUEST_MEMFD=
-_NO_DIRECT_MAP;=0A=
-+}=0A=
-+=0A=
- static inline bool backing_src_can_be_huge(enum vm_mem_backing_src_type t)=
-=0A=
+ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, ui=
+nt32_t nr_vcpus,=0A=
+-				 uint32_t nr_memslots)=0A=
++				 uint32_t nr_memslots, uint64_t gmem_flags)=0A=
  {=0A=
- 	return t !=3D VM_MEM_SRC_ANONYMOUS && t !=3D VM_MEM_SRC_SHMEM;=0A=
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/sel=
-ftests/kvm/lib/kvm_util.c=0A=
-index cc67dfecbf65..a81089f7c83f 100644=0A=
---- a/tools/testing/selftests/kvm/lib/kvm_util.c=0A=
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c=0A=
-@@ -1060,6 +1060,34 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backi=
-ng_src_type src_type,=0A=
- 	alignment =3D 1;=0A=
- #endif=0A=
- =0A=
-+	if (guest_memfd < 0) {=0A=
-+		if ((flags & KVM_MEM_GUEST_MEMFD) || backing_src_is_guest_memfd(src_type=
-)) {=0A=
-+			uint32_t guest_memfd_flags =3D backing_src_guest_memfd_flags(src_type);=
-=0A=
-+=0A=
-+			TEST_ASSERT(!guest_memfd_offset,=0A=
-+				    "Offset must be zero when creating new guest_memfd");=0A=
-+			guest_memfd =3D vm_create_guest_memfd(vm, mem_size, guest_memfd_flags);=
-=0A=
-+		}=0A=
-+	} else {=0A=
-+		/*=0A=
-+		 * Install a unique fd for each memslot so that the fd=0A=
-+		 * can be closed when the region is deleted without=0A=
-+		 * needing to track if the fd is owned by the framework=0A=
-+		 * or by the caller.=0A=
-+		 */=0A=
-+		guest_memfd =3D dup(guest_memfd);=0A=
-+		TEST_ASSERT(guest_memfd >=3D 0, __KVM_SYSCALL_ERROR("dup()", guest_memfd=
-));=0A=
-+	}=0A=
-+=0A=
-+	if (guest_memfd > 0) {=0A=
-+		flags |=3D KVM_MEM_GUEST_MEMFD;=0A=
-+=0A=
-+		region->region.guest_memfd =3D guest_memfd;=0A=
-+		region->region.guest_memfd_offset =3D guest_memfd_offset;=0A=
-+	} else {=0A=
-+		region->region.guest_memfd =3D -1;=0A=
-+	}=0A=
-+=0A=
  	/*=0A=
- 	 * When using THP mmap is not guaranteed to returned a hugepage aligned=
-=0A=
- 	 * address so we have to pad the mmap. Padding is not needed for HugeTLB=
-=0A=
-@@ -1075,10 +1103,13 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_back=
-ing_src_type src_type,=0A=
- 	if (alignment > 1)=0A=
- 		region->mmap_size +=3D alignment;=0A=
+ 	 * Allocate enough memory so that each vCPU's chunk of memory can be=0A=
+@@ -394,7 +394,7 @@ static void test_mem_conversions(enum vm_mem_backing_sr=
+c_type src_type, uint32_t=0A=
  =0A=
--	region->fd =3D -1;=0A=
--	if (backing_src_is_shared(src_type))=0A=
-+	if (backing_src_is_guest_memfd(src_type))=0A=
-+		region->fd =3D guest_memfd;=0A=
-+	else if (backing_src_is_shared(src_type))=0A=
- 		region->fd =3D kvm_memfd_alloc(region->mmap_size,=0A=
- 					     src_type =3D=3D VM_MEM_SRC_SHARED_HUGETLB);=0A=
-+	else=0A=
-+		region->fd =3D -1;=0A=
+ 	vm_enable_cap(vm, KVM_CAP_EXIT_HYPERCALL, (1 << KVM_HC_MAP_GPA_RANGE));=
+=0A=
  =0A=
- 	region->mmap_start =3D mmap(NULL, region->mmap_size,=0A=
- 				  PROT_READ | PROT_WRITE,=0A=
-@@ -1106,34 +1137,6 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backi=
-ng_src_type src_type,=0A=
+-	memfd =3D vm_create_guest_memfd(vm, memfd_size, 0);=0A=
++	memfd =3D vm_create_guest_memfd(vm, memfd_size, gmem_flags);=0A=
+ =0A=
+ 	for (i =3D 0; i < nr_memslots; i++)=0A=
+ 		vm_mem_add(vm, src_type, BASE_DATA_GPA + slot_size * i,=0A=
+@@ -477,7 +477,8 @@ int main(int argc, char *argv[])=0A=
+ 		}=0A=
  	}=0A=
  =0A=
- 	region->backing_src_type =3D src_type;=0A=
--=0A=
--	if (guest_memfd < 0) {=0A=
--		if (flags & KVM_MEM_GUEST_MEMFD) {=0A=
--			uint32_t guest_memfd_flags =3D 0;=0A=
--			TEST_ASSERT(!guest_memfd_offset,=0A=
--				    "Offset must be zero when creating new guest_memfd");=0A=
--			guest_memfd =3D vm_create_guest_memfd(vm, mem_size, guest_memfd_flags);=
-=0A=
--		}=0A=
--	} else {=0A=
--		/*=0A=
--		 * Install a unique fd for each memslot so that the fd=0A=
--		 * can be closed when the region is deleted without=0A=
--		 * needing to track if the fd is owned by the framework=0A=
--		 * or by the caller.=0A=
--		 */=0A=
--		guest_memfd =3D dup(guest_memfd);=0A=
--		TEST_ASSERT(guest_memfd >=3D 0, __KVM_SYSCALL_ERROR("dup()", guest_memfd=
-));=0A=
--	}=0A=
--=0A=
--	if (guest_memfd > 0) {=0A=
--		flags |=3D KVM_MEM_GUEST_MEMFD;=0A=
--=0A=
--		region->region.guest_memfd =3D guest_memfd;=0A=
--		region->region.guest_memfd_offset =3D guest_memfd_offset;=0A=
--	} else {=0A=
--		region->region.guest_memfd =3D -1;=0A=
--	}=0A=
--=0A=
- 	region->unused_phy_pages =3D sparsebit_alloc();=0A=
- 	if (vm_arch_has_protected_memory(vm))=0A=
- 		region->protected_phy_pages =3D sparsebit_alloc();=0A=
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/se=
-lftests/kvm/lib/test_util.c=0A=
-index 03eb99af9b8d..b2baee680083 100644=0A=
---- a/tools/testing/selftests/kvm/lib/test_util.c=0A=
-+++ b/tools/testing/selftests/kvm/lib/test_util.c=0A=
-@@ -299,6 +299,14 @@ const struct vm_mem_backing_src_alias *vm_mem_backing_=
-src_alias(uint32_t i)=0A=
- 			 */=0A=
- 			.flag =3D MAP_SHARED,=0A=
- 		},=0A=
-+		[VM_MEM_SRC_GUEST_MEMFD] =3D {=0A=
-+			.name =3D "guest_memfd",=0A=
-+			.flag =3D MAP_SHARED,=0A=
-+		},=0A=
-+		[VM_MEM_SRC_GUEST_MEMFD_NO_DIRECT_MAP] =3D {=0A=
-+			.name =3D "guest_memfd_no_direct_map",=0A=
-+			.flag =3D MAP_SHARED,=0A=
-+		}=0A=
- 	};=0A=
- 	_Static_assert(ARRAY_SIZE(aliases) =3D=3D NUM_SRC_TYPES,=0A=
- 		       "Missing new backing src types?");=0A=
+-	test_mem_conversions(src_type, nr_vcpus, nr_memslots);=0A=
++	test_mem_conversions(src_type, nr_vcpus, nr_memslots, 0);=0A=
++	test_mem_conversions(src_type, nr_vcpus, nr_memslots, GUEST_MEMFD_FLAG_NO=
+_DIRECT_MAP);=0A=
+ =0A=
+ 	return 0;=0A=
+ }=0A=
 -- =0A=
 2.50.1=0A=
 =0A=
