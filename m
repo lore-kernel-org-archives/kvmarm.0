@@ -1,85 +1,220 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739D21D9346;
-	Mon, 15 Sep 2025 20:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C58EEBD
+	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 21:31:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757968644; cv=none; b=uiBVzPWfkLcCAnYL82FfDsMK7vfLdRXif4WP3lSS0+D7bEGLIyEXuWWhPTsrlLg++kiaOBKDBorM/eVVZKHxcUpEpoDDOeFLTrmEuIuwgmx/wtwTJyx9oNJBwhj20D900LjoPZzKNldDu9pPGv3va37aDSxdjoC4PJOKupa23uY=
+	t=1757971916; cv=none; b=JAfv7TlvOUzUSyYH+GBvKLSZhysyat3vr1jrc6FGvSkOaInaRIM1cxM9Z5Cn+vLaPclFp0gGZRhOSd5mmBTU9ZqLQ3cfFIyYupyPKpEtUqi/vEIJselVOEPD0OwNoRaf886xD63XxvQlhXpI43B89CHUcHXZQ0z/hcUyDkzg6L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757968644; c=relaxed/simple;
-	bh=EZeBJvxuLKJ6o0huTr1hGLlMz25RgDl+itYYX5CuQyk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VcdmiXJd2R4tTJ98ak1OPpPt40tT/2DpPwOM9hcyAMCzQ3r6t8K29SPvUYp51Lb5+McneebyTmirZM+a6Gi8FR7es1G4pOODdMnPlGAE+ja5syu1bzChBO9wBBan3eRtJzDcJcdY04D1QBMdo+I3ELQGeam4EY+JoFAdwosGLA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4vNRxSB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757971916; c=relaxed/simple;
+	bh=W7C84yvEfJE6W6gHRa9X5Y9kR/gi2La0o9oC7V8Bg7A=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=tJgrhCne5k3MBlY6qta9+yCHJl0iv/XACO8+yMpGXzA25pA+FmvhFQWhpMo5aLCv5oyiuvJFOkujcfw+UerdA1JnRN92Biuf/MDcqpVFloskMkR5p7iv3fZUJhtrlYldq/MzPgVwY4KCMUpesdN6rA6RECZoOY+tE8SvhkWkwog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=geKn2S6P; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4vNRxSB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55DECC4CEF1;
-	Mon, 15 Sep 2025 20:37:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757968644;
-	bh=EZeBJvxuLKJ6o0huTr1hGLlMz25RgDl+itYYX5CuQyk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q4vNRxSBfLX0vyLgaLf/3j9mJiqey8PykJkILYvLEoqn0LZbbxXwGFLLKAlhfGKfH
-	 viNEaSwB8afu1N/ESddNalwYBT2715MBF7An4urp8GWogV5Ymx9JiEs7tC9yfReVpr
-	 GJS/4SNShNH4IsNDet+7S9hEkPBbJ/BB87UWhGhNiMxxQnl+Bf0I1C5eJXEsx7IDB2
-	 wKFFB+u/eUa9nSkm34wKRDgOZIAHT45Z+SzZyFfQ7qO94myjMtLG0Qzgc/dzeE4ikc
-	 tolEkkaVBrMMhGeJBiHx6eN9TeGal7RL7SPvwL5ToJwLFAUgaX/1s53c9HwTLGg1so
-	 XmaexXo/kkwqQ==
-Date: Mon, 15 Sep 2025 21:37:17 +0100
-From: Will Deacon <will@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Yeoreum Yun <yeoreum.yun@arm.com>, broonie@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, james.morse@arm.com,
-	ardb@kernel.org, scott@os.amperecomputing.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND v7 0/6] support FEAT_LSUI and apply it on futex
- atomic ops
-Message-ID: <aMh4_XzQqG2gZU_y@willie-the-truck>
-References: <20250816151929.197589-1-yeoreum.yun@arm.com>
- <aMLmNnehYX6gqEIf@willie-the-truck>
- <aML3Ps1xeTCVCdTn@arm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="geKn2S6P"
+Content-Type: text/plain;
+	charset=utf-8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1757971911;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TjCQVoRcvkNWmv8o166ThVNsGRK8YUNi+qrJMGfB+yU=;
+	b=geKn2S6PjU8cjPzCGXTD7pgYIXVvFexC6PL/ne74oYaDfT7ErWwmgUZlTnKEWFLlqwjK4g
+	dAdDWU1mliydp+hlSe9nK4kAyAnaF5hOmeW/LTAyCI3zETi+kyivMSOs6f9ZLYJGOnZGQk
+	hQyHt8PkQo143xev04YYejRqnoaumWs=
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aML3Ps1xeTCVCdTn@arm.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH] PMCR_EL0.N is RAZ/WI. At least a build failes in Ubuntu
+ 22.04 LTS. Remove the set function.
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+In-Reply-To: <86348rdg5o.wl-maz@kernel.org>
+Date: Tue, 16 Sep 2025 06:31:31 +0900
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>,
+ K Poulose Suzuki <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>,
+ linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <0524084A-9E82-408A-9F22-369ED25E42E9@linux.dev>
+References: <867by4c4v1.wl-maz@kernel.org>
+ <3FEB4D87-EEAF-4A21-BCBC-291A4A7C2230@gmail.com>
+ <86348rdg5o.wl-maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Sep 11, 2025 at 05:22:22PM +0100, Catalin Marinas wrote:
-> On Thu, Sep 11, 2025 at 04:09:42PM +0100, Will Deacon wrote:
-> > On Sat, Aug 16, 2025 at 04:19:23PM +0100, Yeoreum Yun wrote:
-> > > Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
-> > > previleged level to access to access user memory without clearing
-> > > PSTATE.PAN bit.
-> > > 
-> > > This patchset support FEAT_LSUI and applies in futex atomic operation
-> > > where can replace from ldxr/stlxr pair implmentation with clearing
-> > > PSTATE.PAN bit to correspondant load/store unprevileged atomic operation
-> > > without clearing PSTATE.PAN bit.
-> > > 
-> > > (Sorry, I've sent wrongly for patch version 7 and resend it.
-> > >  Again, sorry for mail-boom).
-> > 
-> > I tried to review this but I can't find any details about FEAT_LSUI in
-> > the latest Arm ARM. Where should I be looking for the architecture spec?
-> 
-> Unfortunately, it's just in the public xml at the moment. Hopefully
-> we'll get a release of the Arm ARM by the end of the year. Otherwise, in
-> the private 2024 arch spec. Not ideal though.
 
-Ah, thanks, the xml is a *lot* better than nothing.
 
-> If you'd rather wait until in turns up in the public spec, fine by me.
+> On Sep 12, 2025, at 21:11, Marc Zyngier <maz@kernel.org> wrote:
+>=20
+> On Fri, 12 Sep 2025 12:33:39 +0100,
+> Itaru Kitayama <itaru.kitayama@gmail.com> wrote:
+>>=20
+>>=20
+>>=20
+>>> On Sep 12, 2025, at 20:01, Marc Zyngier <maz@kernel.org> wrote:
+>>>=20
+>>> =EF=BB=BFOn Fri, 12 Sep 2025 09:27:40 +0100,
+>>> Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
+>>>>=20
+>>>> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+>>>=20
+>>> This isn't an acceptable commit message.
+>>>=20
+>>>> ---
+>>>> Seen a build failure with old Ubuntu 22.04 LTS, while the latest =
+release
+>>>> has no build issue, a write to the bit fields is RAZ/WI, remove the
+>>>> function.
+>>>> ---
+>>>> tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 6 ------
+>>>> 1 file changed, 6 deletions(-)
+>>>>=20
+>>>> diff --git =
+a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c =
+b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>>>> index =
+f16b3b27e32ed7ca57481f27d689d47783aa0345..56214a4430be90b3e1d840f2719b22dd=
+44f0b49b 100644
+>>>> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>>>> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>>>> @@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
+>>>>   return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+>>>> }
+>>>>=20
+>>>> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+>>>> -{
+>>>> -    u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
+>>>> -}
+>>>> -
+>>>> static uint64_t get_counters_mask(uint64_t n)
+>>>> {
+>>>>   uint64_t mask =3D BIT(ARMV8_PMU_CYCLE_IDX);
+>>>> @@ -490,7 +485,6 @@ static void =
+test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
+>>>>    * Setting a larger value of PMCR.N should not modify the field, =
+and
+>>>>    * return a success.
+>>>>    */
+>>>> -    set_pmcr_n(&pmcr, pmcr_n);
+>>>>   vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+>>>>   pmcr =3D vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
+>>>>=20
+>>>>=20
+>>>=20
+>>> So what are you fixing here? A build failure? A semantic defect?
+>>> Something else? What makes this a valid change?
+>>>=20
+>>> Frankly, I have no idea.
+>>>=20
+>>> But KVM definitely allows PMCR_EL0.N to be written from userspace, =
+and
+>>> that's not going to change.
+>>>=20
+>>=20
+>> Then I=E2=80=99ll drop this patch.
+>=20
+> I'm not asking you to drop it, I'm asking you to explain. If you found
+> a problem, let's discuss it and fix it. But as it stands, you're not
+> giving me much to go on.
+>=20
 
-As long as you're happy to continue helping with the review, I think
-it's fine.
+You are right, while the bit fields are write ignored, to be consistent =
+with the handling of other bit fields of the register, I=E2=80=99m fully =
+convinced that checking the write operation in the vpmu_counter_access.c =
+file should be kept.
 
-Cheers,
+The build error I=E2=80=99ve seen with Ubuntu 22.04 LTS is below:=20
 
-Will
+gcc -D_GNU_SOURCE=3D  =
+-I/home/itaru/projects/linux/tools/testing/selftests/cgroup/lib/include =
+-DDEBUG -Wall -Wstrict-prototypes -Wuninitialized -O0 -g -std=3Dgnu99 =
+-Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFIG_64BIT =
+-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset =
+-fno-builtin-strnlen -fno-stack-protector -fno-PIE -fno-strict-aliasing =
+-I/home/itaru/projects/linux/tools/testing/selftests/../../../tools/includ=
+e =
+-I/home/itaru/projects/linux/tools/testing/selftests/../../../tools/arch/a=
+rm64/include =
+-I/home/itaru/projects/linux/tools/testing/selftests/../../../usr/include/=
+ -Iinclude -Iarm64 -Iinclude/arm64 -I ../rseq -I..  -isystem =
+/home/itaru/projects/linux/tools/testing/selftests/../../../usr/include =
+-I/home/itaru/projects/linux/tools/testing/selftests/../../../tools/arch/a=
+rm64/include/generated/   -c arm64/vpmu_counter_access.c -o =
+/home/itaru/projects/linux/tools/testing/selftests/kvm/arm64/vpmu_counter_=
+access.o
+In file included from =
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/arch/arm=
+64/include/asm/sysreg.h:1098,
+                 from =
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/arch/arm=
+64/include/asm/esr.h:10,
+                 from include/arm64/processor.h:16,
+                 from arm64/vpmu_counter_access.c:16:
+In function =E2=80=98field_multiplier=E2=80=99,
+    inlined from =E2=80=98field_mask=E2=80=99 at =
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/include/=
+linux/bitfield.h:141:17,
+    inlined from =E2=80=98u64_encode_bits=E2=80=99 at =
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/include/=
+linux/bitfield.h:172:1,
+    inlined from =E2=80=98u64p_replace_bits=E2=80=99 at =
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/include/=
+linux/bitfield.h:172:1,
+    inlined from =E2=80=98set_pmcr_n=E2=80=99 at =
+arm64/vpmu_counter_access.c:50:2:
+=
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/include/=
+linux/bitfield.h:136:17: error: call to =E2=80=98__bad_mask=E2=80=99 =
+declared with attribute error: bad bitfield mask
+  136 |                 __bad_mask();
+      |                 ^~~~~~~~~~~~
+In function =E2=80=98field_multiplier=E2=80=99,
+    inlined from =E2=80=98u64_encode_bits=E2=80=99 at =
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/include/=
+linux/bitfield.h:172:1,
+    inlined from =E2=80=98u64p_replace_bits=E2=80=99 at =
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/include/=
+linux/bitfield.h:172:1,
+    inlined from =E2=80=98set_pmcr_n=E2=80=99 at =
+arm64/vpmu_counter_access.c:50:2:
+=
+/home/itaru/projects/linux/tools/testing/selftests/../../../tools/include/=
+linux/bitfield.h:136:17: error: call to =E2=80=98__bad_mask=E2=80=99 =
+declared with attribute error: bad bitfield mask
+  136 |                 __bad_mask();
+      |                 ^~~~~~~~~~~~
+arm64/vpmu_counter_access.c: At top level:
+cc1: note: unrecognized command-line option =
+=E2=80=98-Wno-gnu-variable-sized-type-not-at-end=E2=80=99 may have been =
+intended to silence earlier diagnostics
+make: *** [Makefile.kvm:303: =
+/home/itaru/projects/linux/tools/testing/selftests/kvm/arm64/vpmu_counter_=
+access.o] Error 1
+
+Thanks,
+Itaru.
+
+> M.
+>=20
+> --=20
+> Without deviation from the norm, progress is not possible.
+
+
