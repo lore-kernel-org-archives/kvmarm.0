@@ -1,75 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C522F998B;
-	Mon, 15 Sep 2025 10:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59F92F5313;
+	Mon, 15 Sep 2025 10:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757933690; cv=none; b=mrVvgipOJFHDDZF/A6kOQx377fCdaYSBwgwrzBvHo2zhrMjn37yeoll98uK2jYhhmKMk6R3oTEly5v/1WIADnfHT8AYfkOCR31mql+JruUEq16g3vm5mtJq4On7XqYsoikyMFv2x73t4shU41Z/0LGFQCkDVZxwnWxIQX7HGyME=
+	t=1757933732; cv=none; b=RzpXfDa5KGmbE+MdI254qF6p1xe6c5xn46skCHQ5ESPLm5VV+FeE2fqPAs+4WlBOMiFkPLZRX2uOYCe6RWNrqaloJDAqV91G6jvWTaoY2NoXtk40r4cC0+mJTzyJQnD34oKd7Ih0TVFs35j6h80E28fWyFnWsQlCn3MjiMbp7hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757933690; c=relaxed/simple;
-	bh=M8SkjZeU6dCQfX1o6+UMsowRF/3INQ8dsl4CaGbWqqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h8X7BdX4GAn0mSfX1sD7iNFH8hjoL/PB8cyVy/+1kENXKxbYRdRbLDk9Tx1jWALQsyncMstyZsPuQm61E5GGYJYH5xcBbVN8VYS+9Kk9LpAa05lz2CCi4wOihOyLRiNtYsXiSugvjZVyQHKPPo3Pt2+PYBYdVTSMbI165IYbgCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o1U5sYUY; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1U5sYUY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0975C4CEF1;
-	Mon, 15 Sep 2025 10:54:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757933690;
-	bh=M8SkjZeU6dCQfX1o6+UMsowRF/3INQ8dsl4CaGbWqqw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o1U5sYUY5kz82KPEBxqntZ4xF+CeO4mdugufCCwjY2xPgnOpKd6lomFQG/BcIMJ30
-	 px3qnfcuRYLH5IK6fPCMM1++uXk/u0qYlHpZ5jimcN2Ww+7H5GCSrAYZPlmqwW/0jm
-	 ZZmvRjJs31fK8XefSmzks29tryaDMSzzCQsydp+v3O8DGKVUDr2tKSQpPfa07E6Qgw
-	 bDNiw9u8ZgvL7dVnEYFOHciOo24iC4Or285ehQlAGewxgTbuTwOWvuYXKw2N2QqJ/W
-	 rUzDVenaolwbBNgU3d68tswnHBnvjuVok/mtQanoOgo+rowaoAWFGgO9AuXB7xbTPy
-	 xI19zRGDJCSYQ==
-Date: Mon, 15 Sep 2025 11:54:44 +0100
-From: Will Deacon <will@kernel.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, catalin.marinas@arm.com, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, perret@google.com, keirf@google.com,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Dump instruction on hyp panic
-Message-ID: <aMfwdInqPCiqc8rn@willie-the-truck>
-References: <20250909133631.3844423-1-smostafa@google.com>
- <20250909133631.3844423-2-smostafa@google.com>
+	s=arc-20240116; t=1757933732; c=relaxed/simple;
+	bh=b2mf4Z3CF2NmHVs2TZP+YQo6OPUtx5t0zbzVahIcsKk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bMSrZkYj2jwWP8a2d/vwsmVtQqlbr4dImrlQVhOWH1o2hdTkKwmWaWm+3HEdK8zCtvikYKQc5N9DsyL+D94P5ljQQ0ms5DvIEjq8wwLTaOmEgYfa9ifV0Rfjaw2pfNoAPpF3PvPHNoFnfvh6Il1zjhCEfdh9/MUDLaWEk3adKVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 020F21BF7;
+	Mon, 15 Sep 2025 03:55:22 -0700 (PDT)
+Received: from [10.57.5.5] (unknown [10.57.5.5])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E6C5D3F694;
+	Mon, 15 Sep 2025 03:55:24 -0700 (PDT)
+Message-ID: <bc17ddc9-ed9d-4d51-93f4-784a73036e7c@arm.com>
+Date: Mon, 15 Sep 2025 11:55:22 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250909133631.3844423-2-smostafa@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 02/43] arm64: RME: Handle Granule Protection Faults
+ (GPFs)
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+ <20250820145606.180644-3-steven.price@arm.com> <aLGRNc5u1EPlCpyb@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <aLGRNc5u1EPlCpyb@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 09, 2025 at 01:36:30PM +0000, Mostafa Saleh wrote:
-> Similar to the kernel panic, where the instruction code is printed,
-> we can do the same for hypervisor panics.
+On 29/08/2025 12:38, Catalin Marinas wrote:
+> On Wed, Aug 20, 2025 at 03:55:22PM +0100, Steven Price wrote:
+>> If the host attempts to access granules that have been delegated for use
+>> in a realm these accesses will be caught and will trigger a Granule
+>> Protection Fault (GPF).
+>>
+>> A fault during a page walk signals a bug in the kernel and is handled by
+>> oopsing the kernel. A non-page walk fault could be caused by user space
+>> having access to a page which has been delegated to the kernel and will
+>> trigger a SIGBUS to allow debugging why user space is trying to access a
+>> delegated page.
+>>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v2:
+>>  * Include missing "Granule Protection Fault at level -1"
+>> ---
+>>  arch/arm64/mm/fault.c | 31 +++++++++++++++++++++++++------
+>>  1 file changed, 25 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+>> index d816ff44faff..e4237637cd8f 100644
+>> --- a/arch/arm64/mm/fault.c
+>> +++ b/arch/arm64/mm/fault.c
+>> @@ -854,6 +854,25 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
+>>  	return 0;
+>>  }
+>>  
+>> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
+>> +{
+>> +	const struct fault_info *inf = esr_to_fault_info(esr);
+>> +
+>> +	die_kernel_fault(inf->name, far, esr, regs);
+>> +	return 0;
+>> +}
 > 
-> This patch does that only in case of “CONFIG_NVHE_EL2_DEBUG” or nvhe.
+> This is fine, it's irrelevant whether the fault happened at EL0 or EL1.
 > 
-> The next patch adds support for pKVM.
+>> +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
+>> +{
+>> +	const struct fault_info *inf = esr_to_fault_info(esr);
+>> +
+>> +	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
+>> +		return 0;
+>> +
+>> +	arm64_notify_die(inf->name, regs, inf->sig, inf->code, far, esr);
+>> +	return 0;
+>> +}
 > 
-> Also, remove the hardcoded argument dump_kernel_instr().
+> The end result is somewhat similar but why not just return 1 and avoid
+> the arm64_notify_die() call? Let do_mem_abort() handle the oops vs user
+> signal. With die_kernel_fault() we print the "Unable to handle
+> kernel..." message and some more information.
 > 
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> Tested-by: Kunwu Chan <chentao@kylinos.cn>
-> Reviewed-by: Kunwu Chan <chentao@kylinos.cn>
-> ---
->  arch/arm64/include/asm/traps.h |  1 +
->  arch/arm64/kernel/traps.c      | 15 +++++++++------
->  arch/arm64/kvm/handle_exit.c   |  5 +++++
->  3 files changed, 15 insertions(+), 6 deletions(-)
 
-Thanks for the respin:
+Yes, that makes sense - something has gone very wrong if the kernel hits
+a GPF but that's no reason not to output a (more) useful message.
 
-Acked-by: Will Deacon <will@kernel.org>
-
-Will
+Thanks,
+Steve
