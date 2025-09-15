@@ -1,228 +1,126 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98ECB2EFDBE
-	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 08:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E841F30BB
+	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 09:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757925394; cv=none; b=h0BvzEA5MTSPDgwqF7lpGTEFguY42qst6TfmhFSgJQSMRua8PsnPKfp5wZmSPYCOzqPpxK7g3t4QQJog+tz2yScV6JOIzyndI39pjxBPyMg5gF5OSmNTw/QvVb2I9qDkmP9n35NqudXeSHUnbrIRop/Z1El1GI7WqfXJB/mIRs8=
+	t=1757927616; cv=none; b=V/w0PYO5CPq6dFquFvEzBaooR6IUSNA7syyeszivr7FABZE2j43W6/bl2j4qttAxpFyYGdnom6W6HD3LSL22YDKs1gun79RCH9Drc3LeGmk35tQyLXnMa5YKMk6L3wV1cg4hf+s2J6awOCJXSBBRLLDYrSWJRAI9VTjbf59gOZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757925394; c=relaxed/simple;
-	bh=oTUc05uAoj8tDOxyEV34nE5zIEyVRYInAxKt2au/nUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c6E8TAtA65bqfaViGryqbc3nCw1/6V411wP7qpQEVznpX/KpGaX97GtUG0Lie0w/B1WG+NuO5qIbC1ipgPFvt9wH1VSqbNfpMSOAcn7rHcY6qNFqrfmzWpkz0QhAlV7SAFtz/MTy56sgGlCVo97rEQU1zyGjxJ+KS93FTaw3chc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s17LM0al; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s17LM0al"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45f2f894632so17735e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 01:36:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757925391; x=1758530191; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uuG6t3iAuSKi0EnadmhBvC3rHWT3Byv2xYmpCXcLPYA=;
-        b=s17LM0alBJ7e9+Eodjpi8VJfsgc2oH+3DwdHDf34CNMSKKlmalpNYsUfQX3oDFZ7g2
-         wVlODOSTt8aj3v+xPKNXBQj3k+uMv0mGXbeogUZ+fw1iWvACZAnksdQOCUtrShi8Smhm
-         uRffPCq9LyrZA6sCc5QVf3OM5u+KCRw4kggTUeP1yZ0zQhYkrc0oriCs115e9UYRGvDq
-         MTTXrZ14f2K42OuReqYfPiAh52Y2nEdpqSGHxs8r8f0+qM7lV8EDFkTFWH+0ljS6V3LH
-         l0QXjK6Ny4u/pYSiNzci8TE4b+7btCnjl73XXBB4HBLMT+4K7t7H3C6n/HsGjk9SWx70
-         ZP6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757925391; x=1758530191;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uuG6t3iAuSKi0EnadmhBvC3rHWT3Byv2xYmpCXcLPYA=;
-        b=XSYtEmq2Efd53AJXg7e0+z7rP5LXLuZDLdrO++n8HGHVpAVyVZzKRxxqAAzvA2/U8U
-         S6KaC6BSQDqPnUYnr4tNmVvCWsZbfLZrc/GDtpnRYOYYL/cVo8YslZYr/4hn2L/RmJWG
-         POi4Ojerxc4gpsdd6lZEaHLZ6jEGzYQrx3CGQx+Aw9lu5BpDQOrUCjvr8UUaFgk9pujp
-         UBbBe1oi1upAP9Dmz55xT1hJbhCWNFZlHRxNSrRwEGIh+roWYyBoN2zoX0TIK/FOWDt6
-         TXDLuaMfAe2NDpOuA82EfkDzgpQb+UGlDDrmAZNumzWDkFnTZcoVGQLA+JeZRfp2hySg
-         oA1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUymF1Pu8P63TknNshB8tFi2pUBs3he5DPlDNFbspoQGfReZ091HNLZVW/Y/L1meg+fHEGgllw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwaKxOw+cM/rcPZUjvX/0id1ASDn6rxJyVn9/jmrlljN6rapBHS
-	hGi+wVmOi7C+TITSUpiajTKEsSE0W3xEDR6iCPAT27O6yxIatwjf9nQLIDUKMzOfpg==
-X-Gm-Gg: ASbGncs5+CkAEz3NodEHlFMB9RYhZ5Fo+cHo5CWLcyB0/QD+W83bvc3njlCN88+YLAz
-	6JhnWtZe1KcZgKUMApVE7iY8BLPpkg1iRm634wtNZ/2AqNCAFXvam5c5I6T7K8d/kbKz11uITjC
-	/9RmE62fCyzuZDlnvGUjbTMs/j17oWb13KprlsDPasx+Eos5FiwClMsyOklximNm9Tu1DlubwpI
-	Ph4+LRQygykaAKyarzIri4quSzY36f306AUM8cZc0gz6UvpQGSHGP/2N0UCECMOAlvW6LbQvIq6
-	oxo//qMTBSoS0gUA1vZ67/JS6hi+Xnxg5ncEG9vMJTo5VIvjPjSYuVWBecwTS4rR4kxxu/ghIuO
-	jgh6jou89jXdQoCKitkn0fCdwIm7qwPQunW1OCeMJA6qY3bZOUjKScqz2ngaeynf+VxzBGg==
-X-Google-Smtp-Source: AGHT+IGhw7FjFgBAENHxwqNBn+q5TwhC7OvA4GcuoSnWIVBJGcdJW/TW82vig7dbFCs8/b6w3sEoaQ==
-X-Received: by 2002:a05:600c:a10c:b0:45f:2db6:5202 with SMTP id 5b1f17b1804b1-45f2db65722mr740645e9.3.1757925390598;
-        Mon, 15 Sep 2025 01:36:30 -0700 (PDT)
-Received: from google.com (157.24.148.146.bc.googleusercontent.com. [146.148.24.157])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ebc49f7ebbsm397501f8f.51.2025.09.15.01.36.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 01:36:30 -0700 (PDT)
-Date: Mon, 15 Sep 2025 08:36:26 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 04/38] tsm: Support DMA Allocation from private
- memory
-Message-ID: <aMfQCoLuVeR0nf02@google.com>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-5-aneesh.kumar@kernel.org>
+	s=arc-20240116; t=1757927616; c=relaxed/simple;
+	bh=NtcqAVPtebwVePikKYuDoVB0ug1k1jHfCkmM7NepnwM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ghQe957PAdTjxDkh6CgGqbqykSEHCrJk5Tz1FwawRGjXA3sLX2FdBOVLHtyHBNbFsJCvmj7NNqCSxcndaO4JH+859eiDUlARFxb9WCUGZQo/Xs5BTuuw6HrfpFxjvEx6UFdhjUry3kcOyQkK6BdWCdDS0HnhTyKRXHotmnN47hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E468B1424;
+	Mon, 15 Sep 2025 02:13:24 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 177063F694;
+	Mon, 15 Sep 2025 02:13:30 -0700 (PDT)
+Message-ID: <5d30d737-945f-4524-81ac-12ff03edca6c@arm.com>
+Date: Mon, 15 Sep 2025 10:13:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250728135216.48084-5-aneesh.kumar@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Fix debug checking for np-guests using huge
+ mappings
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+ oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, james.morse@arm.com, tabba@google.com,
+ Quentin Perret <qperret@google.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ stable@vger.kernel.org
+References: <20250815162655.121108-1-ben.horgan@arm.com>
+ <aKMkvQEyeK1QH12X@google.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <aKMkvQEyeK1QH12X@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Aneesh,
-
-On Mon, Jul 28, 2025 at 07:21:41PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> Currently, we enforce the use of bounce buffers to ensure that memory
-> accessed by non-secure devices is explicitly shared with the host [1].
-> However, for secure devices, this approach must be avoided.
 
 
-Sorry this might be a basic question, I just started looking into this.
-I see that “force_dma_unencrypted” and “is_swiotlb_force_bounce” are only
-used from DMA-direct, but it seems in your case it involves an IOMMU.
-How does it influence bouncing in that case?
+On 8/18/25 14:03, Vincent Donnefort wrote:
+> Thanks for the fix!
+> 
+> On Fri, Aug 15, 2025 at 05:26:55PM +0100, Ben Horgan wrote:
+>> When running with transparent huge pages and CONFIG_NVHE_EL2_DEBUG then
+>> the debug checking in assert_host_shared_guest() fails on the launch of an
+>> np-guest. This WARN_ON() causes a panic and generates the stack below.
+>>
+>> In __pkvm_host_relax_perms_guest() the debug checking assumes the mapping
+>> is a single page but it may be a block map. Update the checking so that
+>> the size is not checked and just assumes the correct size.
+>>
+>> While we're here make the same fix in __pkvm_host_mkyoung_guest().
+>>
+>>   Info: # lkvm run -k /share/arch/arm64/boot/Image -m 704 -c 8 --name guest-128
+>>   Info: Removed ghost socket file "/.lkvm//guest-128.sock".
+>> [ 1406.521757] kvm [141]: nVHE hyp BUG at: arch/arm64/kvm/hyp/nvhe/mem_protect.c:1088!
+>> [ 1406.521804] kvm [141]: nVHE call trace:
+>> [ 1406.521828] kvm [141]:  [<ffff8000811676b4>] __kvm_nvhe_hyp_panic+0xb4/0xe8
+>> [ 1406.521946] kvm [141]:  [<ffff80008116d12c>] __kvm_nvhe_assert_host_shared_guest+0xb0/0x10c
+>> [ 1406.522049] kvm [141]:  [<ffff80008116f068>] __kvm_nvhe___pkvm_host_relax_perms_guest+0x48/0x104
+>> [ 1406.522157] kvm [141]:  [<ffff800081169df8>] __kvm_nvhe_handle___pkvm_host_relax_perms_guest+0x64/0x7c
+>> [ 1406.522250] kvm [141]:  [<ffff800081169f0c>] __kvm_nvhe_handle_trap+0x8c/0x1a8
+>> [ 1406.522333] kvm [141]:  [<ffff8000811680fc>] __kvm_nvhe___skip_pauth_save+0x4/0x4
+>> [ 1406.522454] kvm [141]: ---[ end nVHE call trace ]---
+>> [ 1406.522477] kvm [141]: Hyp Offset: 0xfffece8013600000
+>> [ 1406.522554] Kernel panic - not syncing: HYP panic:
+>> [ 1406.522554] PS:834003c9 PC:0000b1806db6d170 ESR:00000000f2000800
+>> [ 1406.522554] FAR:ffff8000804be420 HPFAR:0000000000804be0 PAR:0000000000000000
+>> [ 1406.522554] VCPU:0000000000000000
+>> [ 1406.523337] CPU: 3 UID: 0 PID: 141 Comm: kvm-vcpu-0 Not tainted 6.16.0-rc7 #97 PREEMPT
+>> [ 1406.523485] Hardware name: FVP Base RevC (DT)
+>> [ 1406.523566] Call trace:
+>> [ 1406.523629]  show_stack+0x18/0x24 (C)
+>> [ 1406.523753]  dump_stack_lvl+0xd4/0x108
+>> [ 1406.523899]  dump_stack+0x18/0x24
+>> [ 1406.524040]  panic+0x3d8/0x448
+>> [ 1406.524184]  nvhe_hyp_panic_handler+0x10c/0x23c
+>> [ 1406.524325]  kvm_handle_guest_abort+0x68c/0x109c
+>> [ 1406.524500]  handle_exit+0x60/0x17c
+>> [ 1406.524630]  kvm_arch_vcpu_ioctl_run+0x2e0/0x8c0
+>> [ 1406.524794]  kvm_vcpu_ioctl+0x1a8/0x9cc
+>> [ 1406.524919]  __arm64_sys_ioctl+0xac/0x104
+>> [ 1406.525067]  invoke_syscall+0x48/0x10c
+>> [ 1406.525189]  el0_svc_common.constprop.0+0x40/0xe0
+>> [ 1406.525322]  do_el0_svc+0x1c/0x28
+>> [ 1406.525441]  el0_svc+0x38/0x120
+>> [ 1406.525588]  el0t_64_sync_handler+0x10c/0x138
+>> [ 1406.525750]  el0t_64_sync+0x1ac/0x1b0
+>> [ 1406.525876] SMP: stopping secondary CPUs
+>> [ 1406.525965] Kernel Offset: disabled
+>> [ 1406.526032] CPU features: 0x0000,00000080,8e134ca1,9446773f
+>> [ 1406.526130] Memory Limit: none
+>> [ 1406.959099] ---[ end Kernel panic - not syncing: HYP panic:
+>> [ 1406.959099] PS:834003c9 PC:0000b1806db6d170 ESR:00000000f2000800
+>> [ 1406.959099] FAR:ffff8000804be420 HPFAR:0000000000804be0 PAR:0000000000000000
+>> [ 1406.959099] VCPU:0000000000000000 ]
+>>
+>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+>> Fixes: db14091d8f75 ("KVM: arm64: Stage-2 huge mappings for np-guests")
+> 
+> Not sure if it really matters but it's more about fixing f28f1d02f4ea (KVM: arm64: Add a range
+> to __pkvm_host_unshare_guest()) which introduced the check size !=
+> kvm_granule_size(). Even though this is noop until db14091d8f75
 
-Thanks,
-Mostafa
+Happy to update the Fixes tag with whatever is required. I was in two
+minds but opted for db14091d8f75 as that's where this starts to make a
+functional difference.
 
 > 
-> To achieve this, we introduce a device flag that controls whether a
-> bounce buffer allocation is required for the device. Additionally, this flag is
-> used to manage the top IPA bit assignment for setting up
-> protected/unprotected IPA aliases.
+>> Cc: Vincent Donnefort <vdonnefort@google.com>
+>> Cc: Quentin Perret <qperret@google.com>
+>> Cc: Ryan Roberts <ryan.roberts@arm.com>
+>> Cc: stable@vger.kernel.org
 > 
-> [1] commit fbf979a01375 ("arm64: Enforce bounce buffers for realm DMA")
-> 
-> based on changes from Alexey Kardashevskiy <aik@amd.com>
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-> ---
->  arch/arm64/include/asm/mem_encrypt.h |  6 +-----
->  arch/arm64/mm/mem_encrypt.c          | 10 ++++++++++
->  drivers/pci/tsm.c                    |  6 ++++++
->  include/linux/device.h               |  1 +
->  include/linux/swiotlb.h              |  4 ++++
->  5 files changed, 22 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/mem_encrypt.h b/arch/arm64/include/asm/mem_encrypt.h
-> index 314b2b52025f..d77c10cd5b79 100644
-> --- a/arch/arm64/include/asm/mem_encrypt.h
-> +++ b/arch/arm64/include/asm/mem_encrypt.h
-> @@ -15,14 +15,10 @@ int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops);
->  
->  int set_memory_encrypted(unsigned long addr, int numpages);
->  int set_memory_decrypted(unsigned long addr, int numpages);
-> +bool force_dma_unencrypted(struct device *dev);
->  
->  int realm_register_memory_enc_ops(void);
->  
-> -static inline bool force_dma_unencrypted(struct device *dev)
-> -{
-> -	return is_realm_world();
-> -}
-> -
->  /*
->   * For Arm CCA guests, canonical addresses are "encrypted", so no changes
->   * required for dma_addr_encrypted().
-> diff --git a/arch/arm64/mm/mem_encrypt.c b/arch/arm64/mm/mem_encrypt.c
-> index ee3c0ab04384..279696a8af3f 100644
-> --- a/arch/arm64/mm/mem_encrypt.c
-> +++ b/arch/arm64/mm/mem_encrypt.c
-> @@ -17,6 +17,7 @@
->  #include <linux/compiler.h>
->  #include <linux/err.h>
->  #include <linux/mm.h>
-> +#include <linux/device.h>
->  
->  #include <asm/mem_encrypt.h>
->  
-> @@ -48,3 +49,12 @@ int set_memory_decrypted(unsigned long addr, int numpages)
->  	return crypt_ops->decrypt(addr, numpages);
->  }
->  EXPORT_SYMBOL_GPL(set_memory_decrypted);
-> +
-> +bool force_dma_unencrypted(struct device *dev)
-> +{
-> +	if (dev->tdi_enabled)
-> +		return false;
-> +
-> +	return is_realm_world();
-> +}
-> +EXPORT_SYMBOL_GPL(force_dma_unencrypted);
-> diff --git a/drivers/pci/tsm.c b/drivers/pci/tsm.c
-> index e4a3b5b37939..60f50d57a725 100644
-> --- a/drivers/pci/tsm.c
-> +++ b/drivers/pci/tsm.c
-> @@ -120,6 +120,7 @@ static int pci_tsm_disconnect(struct pci_dev *pdev)
->  
->  	tsm_ops->disconnect(pdev);
->  	tsm->state = PCI_TSM_INIT;
-> +	pdev->dev.tdi_enabled = false;
->  
->  	return 0;
->  }
-> @@ -199,6 +200,8 @@ static int pci_tsm_accept(struct pci_dev *pdev)
->  	if (rc)
->  		return rc;
->  	tsm->state = PCI_TSM_ACCEPT;
-> +	pdev->dev.tdi_enabled = true;
-> +
->  	return 0;
->  }
->  
-> @@ -557,6 +560,9 @@ static void __pci_tsm_init(struct pci_dev *pdev)
->  	default:
->  		break;
->  	}
-> +
-> +	/* FIXME!! should this be default true and switch to false for TEE capable device */
-> +	pdev->dev.tdi_enabled = false;
->  }
->  
->  void pci_tsm_init(struct pci_dev *pdev)
-> diff --git a/include/linux/device.h b/include/linux/device.h
-> index 4940db137fff..d62e0dd9d8ee 100644
-> --- a/include/linux/device.h
-> +++ b/include/linux/device.h
-> @@ -688,6 +688,7 @@ struct device {
->  #ifdef CONFIG_IOMMU_DMA
->  	bool			dma_iommu:1;
->  #endif
-> +	bool			tdi_enabled:1;
->  };
->  
->  /**
-> diff --git a/include/linux/swiotlb.h b/include/linux/swiotlb.h
-> index 3dae0f592063..61e7cff7768b 100644
-> --- a/include/linux/swiotlb.h
-> +++ b/include/linux/swiotlb.h
-> @@ -173,6 +173,10 @@ static inline bool is_swiotlb_force_bounce(struct device *dev)
->  {
->  	struct io_tlb_mem *mem = dev->dma_io_tlb_mem;
->  
-> +	if (dev->tdi_enabled) {
-> +		dev_warn_once(dev, "(TIO) Disable SWIOTLB");
-> +		return false;
-> +	}
->  	return mem && mem->force_bounce;
->  }
->  
-> -- 
-> 2.43.0
-> 
+> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>Thanks!
+Ben
+
