@@ -1,90 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B99D224891
-	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 16:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D7D212574;
+	Mon, 15 Sep 2025 19:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757955214; cv=none; b=nS3eVO6SBBSclxTJNDcrMG3BEZklqF1+Yz0SbSeU4LaXRy3lIYS27YHQtsJwbnPOhmgLjecaAsuC1d0NOOtkaGoGWT0YWkKB1UrPgHfUIcv7enpT6Kw6e7HcSUl6wtyLjm72trLBRQcnAd1qjfoFVZGCV67JbmLCRSi01rxhfQA=
+	t=1757965239; cv=none; b=aSsyBj56WeVo/VgGbV0Wd6DYWrBRBhNypBRCcBbDi+iO5IqopcXnompjRoC/B8IwqR3NcyZHWrqU692UaTmEUXA7wTG85aiZuHVTd+laemZSc4SSmxzYCT1dwuvauNNhhl2UVxHQNgDGh4owWCIe9lVMSjCCm+pkCQTuzvk7GCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757955214; c=relaxed/simple;
-	bh=mr8xIGCKnB4G5+8TaKxfsscKPKoQFGfQ1GJ3Zixoh1c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SmL77UE3NA+3bC4yXRi2sfqh+MEywOyRxiprqHq1IRRG2cceYv9zeJoaem0AjUX57eOVt34Qd/hahiLkkb6CNOFqnQ9TjvnrNvJDRVDf/kA59x54Cl3+8vY1Cxy/EJG7oesMAzboPdX+FWELclzLnDlskDETD9VqBuXlaxdZT8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0t4FdCP; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0t4FdCP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0AA7C4CEF1;
-	Mon, 15 Sep 2025 16:53:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757955213;
-	bh=mr8xIGCKnB4G5+8TaKxfsscKPKoQFGfQ1GJ3Zixoh1c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=C0t4FdCPYoAMS0qiePdSzxlUy4bYXgvPVm9AkkdzHGgMNB2ehUk20gtEjPgZPpsQ0
-	 XfToX+19n7fkRGseSXXsxkLj0bA5cIdR01fH40KBWHlnCCCHH+mFdgaxyHw0DtDEOq
-	 dZ52gcJayhVjEDVjxl64jdBE7aMgsO3ysiA7FB4pyAXQHEzFRWCXEJro+IIhxa2YOW
-	 jZ+joc7AMg2WHweYuJ0Y7ZxrL60gJO6p/NjrRZk4wtwRgsBAuYigbO4Almu5OCQ+2H
-	 62x/K4utH1BxPUNP/HfVt73xoIwGFPRd6qbOnrG7zN2gCj2HFepJ2cFM1jFPZ0zMKe
-	 CygUEu0mz6H1Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uyCSJ-00000006SZG-1Jin;
-	Mon, 15 Sep 2025 16:53:31 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Peter Collingbourne <pcc@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Update stale comment for sanitise_mte_tags()
-Date: Mon, 15 Sep 2025 17:53:28 +0100
-Message-Id: <175795518947.664776.2321133557894998741.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250915155234.196288-1-alexandru.elisei@arm.com>
-References: <20250915155234.196288-1-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1757965239; c=relaxed/simple;
+	bh=g5xAknOdfENgPm/cKcyiCHJ9HVP9ZcMgVpHNO/PV2QE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=djFsF1A9XnURolynkW4DxdQaqyjn4an+lnJxfICCZEv65NxsUvdjFlAJzUrLPj0BxUoMfp8AbvsJtgekYgPtZpc2bEap7YFm7RERyPgiy1wAe5P28//2EJda1XaWti08vpYSTk7mAMXoooRnonbAO0rpTzH2gbvVsEo/SptwWPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F133C4CEF1;
+	Mon, 15 Sep 2025 19:40:36 +0000 (UTC)
+Date: Mon, 15 Sep 2025 20:40:33 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: will@kernel.org, broonie@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, james.morse@arm.com,
+	ardb@kernel.org, scott@os.amperecomputing.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND v7 4/6] arm64: futex: refactor futex atomic
+ operation
+Message-ID: <aMhrscd1gz_syMtL@arm.com>
+References: <20250816151929.197589-1-yeoreum.yun@arm.com>
+ <20250816151929.197589-5-yeoreum.yun@arm.com>
+ <aMRQIeIdyiWVR8a0@arm.com>
+ <aMfrR0vserl/hfZ3@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, pcc@google.com, catalin.marinas@arm.com, steven.price@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMfrR0vserl/hfZ3@e129823.arm.com>
 
-On Mon, 15 Sep 2025 16:52:34 +0100, Alexandru Elisei wrote:
-> Commit c911f0d46879 ("KVM: arm64: permit all VM_MTE_ALLOWED mappings
-> with MTE enabled") allowed VM_SHARED VMAs in a VM with MTE enabled, so
-> remove the comment to the contrary.
+On Mon, Sep 15, 2025 at 11:32:39AM +0100, Yeoreum Yun wrote:
+> > On Sat, Aug 16, 2025 at 04:19:27PM +0100, Yeoreum Yun wrote:
+> > > diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> > > index bc06691d2062..ab7003cb4724 100644
+> > > --- a/arch/arm64/include/asm/futex.h
+> > > +++ b/arch/arm64/include/asm/futex.h
+> > > @@ -7,17 +7,21 @@
+> > >
+> > >  #include <linux/futex.h>
+> > >  #include <linux/uaccess.h>
+> > > +#include <linux/stringify.h>
+> > >
+> > >  #include <asm/errno.h>
+> > >
+> > > -#define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+> > > +#define LLSC_MAX_LOOPS	128 /* What's the largest number you can think of? */
+> >
+> > I just noticed - you might as well leave the name as is here, especially
+> > if in patch 6 you align down address and use CAS on a 64-bit value as
+> > per Will's comment (and it's no longer LLSC). I think renaming this is
+> > unnecessary.
 > 
-> Commit d77e59a8fccd ("arm64: mte: Lock a page for MTE tag initialisation")
-> removed the race that can lead to tags being zeroed more than once when
-> multiple threads attempt initialisation at the same time, so remove the
-> comment about mmap_lock too. Note that sanitise_mte_tags() was never called
-> with the mmap_lock held from user_mem_abort() and the race was prevented by
-> kvm->mmu_lock.
+> Okay. I'll restore to use origin name.
+> But I think LSUI wouldn't be used with CAS according to patch 6's
+> comments from you and additionally i think
+> chaning the CAS would make a failure because of
+> change of unrelated field. i.e)
 > 
-> [...]
+> struct user_structure{
+>   uint32 futex;
+>   uint32 some_value;
+> };
+> 
+> In this case, the change of some_value from user side could make a
+> failure of futex atomic operation.
 
-Applied to next, thanks!
+Yes but the loop would read 'some_value' again, fold in 'futex' and
+retry. It would eventually succeed or fail after 128 iterations if the
+user keeps changing that location. Note that's also the case with LL/SC,
+the exclusive monitor would be cleared by some store in the same cache
+line (well, depending on the hardware implementation) and the STXR fail.
+From this perspective, CAS has better chance of succeeding.
 
-[1/1] KVM: arm64: Update stale comment for sanitise_mte_tags()
-      commit: 597f41e1743882db32f99dde062adbec29104586
+> So I think it would be better to keep the current LLSC implementation
+> in LSUI.
 
-Cheers,
+I think the code would look simpler with LL/SC but you can give it a try
+and post the code sample here (not in a new series).
 
-	M.
+BTW, is there a test suite for all the futex operations? The cover
+letter did not mention any.
+
 -- 
-Without deviation from the norm, progress is not possible.
-
-
+Catalin
