@@ -1,65 +1,64 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519742C11FB
-	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 21:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE3B2C1581
+	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 21:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757973297; cv=none; b=Y4AsHnqVCg1nRo2Lydpnsytat27SiZjH4f6n/bgCfuVTtl0L7VhFaMoY2VLtunzSXgdVC9+Zph9EVCVEKosJOnRQD04b8lLXpGOsCkOtrmR6f36VDgvYsE5pPCHS3xJ1nFn6zMoG7V4V2aJmASLamKVYSoxN41O1LNyAqEKs9EQ=
+	t=1757973300; cv=none; b=cyE288qsKtr92t9cxiK+DD2qFg6o9cxqLDQzgnJ2bMbuwff1vGElIg4Y0ppg9c+8qu8G5qIvArlc2JEdqBhZM+udHN/Rr0HjAVv2foQ5NDjotnwIIK1kowtcgZuzOmMxyBFoI3dbHbPTXez31JlOlgAjLsGrhESDJsBNaEseRk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757973297; c=relaxed/simple;
-	bh=PdHvRfevfRqxtXXEl7OhG5gE+ulxsfMQaWQYO3eysx4=;
+	s=arc-20240116; t=1757973300; c=relaxed/simple;
+	bh=4pFJ7PlEmesvXr3cQL2H05B7Cqj5Q/UV1hXOSPL7QWY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZeUWqanVFJUHBsU9fRZoi+RYD9dy7daZ9xkpWvh9fzooGjHUD0vLE4fllNdIoaPBjgdFD42LH0A+HT8txqoCO872DcQmi5ugjUIlueLG6HgvWVE/XySxFCva48f6MBF5IA6mK4IJu9nUXcEj9fBQdzrFcNBJk0exFjDgNqBNQNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=WmWXcB+I; arc=none smtp.client-ip=209.85.219.46
+	 MIME-Version; b=FwkZDKToLd3TZGpVSjd/LztBi4HcGTJs1xIKv+ou0/IzeOFNPTBxvSAXsCEE7J4bhs7wOnpS526QxyxYei+TYh25J4/G4J9PdHdVQfKFWsk8ZZh46sNsxlFcttuH5WRToxTKHriS1iyeptfWIIGGA3kcR7aE0veLpjF/3fZE0ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=gCAkT2to; arc=none smtp.client-ip=209.85.219.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="WmWXcB+I"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-77766aae1abso18032266d6.3
-        for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 14:54:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="gCAkT2to"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-78393b4490cso13987126d6.0
+        for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 14:54:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1757973295; x=1758578095; darn=lists.linux.dev;
+        d=grsecurity.net; s=grsec; t=1757973298; x=1758578098; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=osV/NIjrIH3bFRop0adAnSBkm9yQEHuI7nZrGLeMdNc=;
-        b=WmWXcB+InIMWpNXU9CbgpHdALA9sZczF0xB4Fjb+dx94n+vYCv+rHp4SbKvANO9TiO
-         NOFlG2wucKFT5uMcd+A/YEm5RfE7EKPkynRUnpVF6S3JLzmezh43Av4FsP9W7JvRAETu
-         XEm3yFKp3Zoq6JLDFuRkecL3hfhGiYjUUvdrYXuNBzZU1YiTJhS962crwe3OBeNjfPiX
-         Xx7KCDcJOApctYes3nNTt2kWSmFvWAhcajTcaLIVL7RFEyZIgjK4xeQnDyVyPzQ0uK4q
-         pwdbNWBj8YqOwd4kDau+3QCV/ubK/g2dp3GPOA/115/wJcoH715mVcnaxJvEZTYbKRwa
-         zDzQ==
+        bh=89dl8JzAtkZ/mNSRMgjqLcxEDRNkD5DRSw13EhLsQUs=;
+        b=gCAkT2toBUuglqdmhyD4P7f4VXPx7XoW2v8U7z05R8OqVkgVyt0g8N2h84l4Zte/2q
+         9ukI0pTnU0VbzFWZoWxWKa5vD4hek8bb+DXnsUd19WyzL38bVPzFVAgPyvGrkt+fAMXo
+         D+BtaDu1nxizNd0GkbBOmHXoFuJCg+vudVdMJqt1vHlVJNspx8+lauPUTt4I+oopW/+j
+         ZvobIy/zjla0QGFUbkt/AJbXF2iYSFmdwVKYwS9e39M7FqGzPbKvTEa8wBxq8Oa3mXcS
+         dwXYnJIFjUnltaLygMgt8T7T6quJUTw+mTibmkEv1oBkRBqChrJ/XP6tX+LMmW1fQR9N
+         z2rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757973295; x=1758578095;
+        d=1e100.net; s=20230601; t=1757973298; x=1758578098;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=osV/NIjrIH3bFRop0adAnSBkm9yQEHuI7nZrGLeMdNc=;
-        b=kY9VD6JOPt7biURJwXZI5/IK8o8GF+HEQb75yo+S2d9v+fvK7viYQnQQVtEwvHiFib
-         xsWrHROPuhSMgc8VPQY/4eChCIFx5UTFuHZvHv+BJwCm3+lmind/fDJiL1fl72paSFFQ
-         8iZ5YB5C+ArTZwM6CiBAtb0a5aPyDq7DG1QR0uTaFol7ovpWu1VB1JjPVx4bw5+4hxZJ
-         hXbOCWLJD76DQKbaIvPGvoj8z4IUIJGjXdtPccCp34jICwngIkyvUerEGPSprrfYBI3c
-         1BWOKmkuoSIYYwC2+jMaJVYKoOKGGUQkTjOfIMDfYMGs/i6fiyiXpPxUYi4rzsBNX7o1
-         dFuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWX3PQgZUby52StjZ9eqc3esvi7yTM4e13lG7u1KV8p/LLwNNM55QSdxW3AzKyQPDkSllq6jsg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxZ5IUO/Yp7NvhawO9zHJ/N74TW0G4wAaCYAh/tWd1RB4TDVAaH
-	/i25V5Hvk5g1Dj1CfPOnfxCR8bHfm3iNP7LSnEhbcC0Eilgqz7bsCgBCU6vJ97bcTn49YhREa0h
-	MPOXV
-X-Gm-Gg: ASbGncv4I76Sznjyr5giu4TlQXQ+Z13By+FQi2BFJOrDuLebQQs18UlKUiZfxiPJBcd
-	Jl5dirt5niJuS4aRGmc9bBOXlDwMF/jdIGkSldrS3FuxH6vvp4EnihY6JbBvIEjWv/dOexrPJLN
-	yDsxgZNJpJVE0vX1NV0pCP/ikcRwkJ4V5+sNr3ZAqD7XssCRq/1L/6WW3B4NBDSbGCtuGEs8aD3
-	0M/F/AYQQTo+RZHh1qv+oNFFwLNRX3yLhcnut3/gyLXEQqhQaD2cHB+hFA6Jf7dVmbwzLA6gcVn
-	T9F3PM5WtUdtTr1Kz7zL+ya4PD6Bcz6/O5o0Ceyn24wLI2b1qFdmQ//yX4pLoexPayfMMq9Txrc
-	rM7pzZ/jn+So1hzrOqVhKZ4xBuOjAtxpJAixbjvz4UoL/ymGeqBLrM3qBzjN67+xN2aVZeDWxY3
-	JD+hzg9eIJHHknH43DG7lXQ6tjoY7Z
-X-Google-Smtp-Source: AGHT+IHFw5J+yWr+E/blgWAggycz6gvE13byABTAUgHBbzCSHqYp1RjFAsQBSWhl5BL4Ce51buVRAQ==
-X-Received: by 2002:a05:6214:1d23:b0:743:15ff:94dc with SMTP id 6a1803df08f44-767bb4acc69mr166749496d6.7.1757973295050;
-        Mon, 15 Sep 2025 14:54:55 -0700 (PDT)
+        bh=89dl8JzAtkZ/mNSRMgjqLcxEDRNkD5DRSw13EhLsQUs=;
+        b=E9UL1VT1FvIHGOKokH4wIC8GGwq8Ke1sKZmgmDQxjQkVGSNVLK4/jRTWwK6qrZ8QTA
+         Vku41w5pvMkCnaElaQNJbknErTla01Qnp+H+SfH52NNQS/AOtrvzxwWn+BdiO1X87rMf
+         0LJMTpaH8M+CT9RIBRKTwUS1b1lBwblYzxs127s65ZtZZSqpDWLjVJtIG4iGZLW+Ah7o
+         gvem0N37cF8UhukHoSaohpZFpwnpjfdEM8AMKpbvKfnkrR5PZlT30kbeN2J3gE9ArD2M
+         mrNcl/o8gXmBdzeZIu/8Vk/3oseaPSQGkuDMSScpiVn768v4sHOC9zRRbr/FtG5/PYxq
+         L5PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4qm62HjEFD0rG6O06n3/KL3QQtcSuWtenSCm2w8Kl73m1FwmnTRt1W2mK6bmOv2D4h1OLpl4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwE0Ias+7uirjB+9okbtIPVZT7jSDVfnNnrtPKPZdYQC/FTFRFC
+	2tqtBsxZiGnKnPfM96ST9HMqfBoRiC0hzG2ocAqyzD5rIBgt+1WPfyk4x6BwMHW7vvI=
+X-Gm-Gg: ASbGncsPLOO8dTZYpgmmefmO23nFl4dZbhivPKs2DofFnD2YLtOVfeSMlnfx2Lt2Eqy
+	eN+FnBe1Gp6wTA782LdSldV6BMLxvb24z3AAFtgYb09tVrFEiYeXyJbt4PpGY3uD1Za5id91gwL
+	Orj+fSDMpPfzVJz94FJhPFiRW43TX9ucNIo3/wiJNHXqco/A2jKwsXs1aZX5WD/DxuOGyeWa2CV
+	tnNkMv+2660xYtCkEtEjNwhpWto/a3/APMsofyIH9rnsaaT66FB7KuoxANOce3+CdP182bRChFN
+	zy5Vm9AhSIhx/PeaT0+ZhYF/FYaooSRJZxOxLza+Ss/otAl3YjTXS0S+iG792oEXdEBIsCaESVk
+	YqEtyavfA5UzrVoqLwkAMgMHStjgxz3zJevoK9jxtR6RyNxtA61prc8k3rMoWve3W+NO2aePtGb
+	sGgmc/O9pkJ8iI8inp69ScmfTDNm0a
+X-Google-Smtp-Source: AGHT+IHUQeSFbd5uMK2kqS+/fPHkKVOSrTvADLumpaByKCM49cbxczNpu9T8V9R7sDVfxCx22JSMZQ==
+X-Received: by 2002:a05:6214:5009:b0:780:600d:b93a with SMTP id 6a1803df08f44-780600dbc1bmr63952606d6.41.1757973297685;
+        Mon, 15 Sep 2025 14:54:57 -0700 (PDT)
 Received: from bell.fritz.box (p200300faaf00da008e63e663d61a1504.dip0.t-ipconnect.de. [2003:fa:af00:da00:8e63:e663:d61a:1504])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-783edc88db3sm25104796d6.66.2025.09.15.14.54.52
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-783edc88db3sm25104796d6.66.2025.09.15.14.54.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 14:54:54 -0700 (PDT)
+        Mon, 15 Sep 2025 14:54:57 -0700 (PDT)
 From: Mathias Krause <minipli@grsecurity.net>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -69,9 +68,9 @@ To: Andrew Jones <andrew.jones@linux.dev>,
 Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 3/4] arm64: Better backtraces for leaf functions
-Date: Mon, 15 Sep 2025 23:54:31 +0200
-Message-ID: <20250915215432.362444-4-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 4/4] arm: Fix backtraces involving leaf functions
+Date: Mon, 15 Sep 2025 23:54:32 +0200
+Message-ID: <20250915215432.362444-5-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250915215432.362444-1-minipli@grsecurity.net>
 References: <20250915215432.362444-1-minipli@grsecurity.net>
@@ -83,33 +82,87 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Similar to x86 before, ARM64 skips the stack frame setup for leaf
-functions, making backtraces miss frames.
+When backtracing starts in a leaf function, it'll cause the code to go
+off the rials as the stack frame for leaf functions is incomplete -- it
+lacks the return address, likely just causing recursive exception
+handling by trying to follow an invalid pointer chain.
 
-Fortunately, gcc supports forcing generating stack frames for these via
--mno-omit-leaf-frame-pointer.
+Unfortunately, -mno-omit-leaf-frame-pointer isn't supported for the ARM
+target as an easy fix. Make use of -mapcs-frame instead to force the
+generation of an APCS stack frame layout[1] that can be traversed
+reliably.
 
+As Clang doesn't support -mapcs-frame, make the stack walking code
+handle this by using the (old) more compact standard format as a
+fall-back.
+
+Link: https://developer.arm.com/documentation/dui0041/c/ARM-Procedure-Call-Standard/APCS-definition/The-stack-backtrace-data-structure [1]
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
- arm/Makefile.arm64 | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index bf7ea2a36d3a..a40c830df20f 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -67,5 +67,11 @@ tests += $(TEST_DIR)/mte.$(exe)
+---
+I failed to build KUT with Clang for ARM for various reasons, the code
+is clearly lacking Clang support for ARM, so I doubt this fall-back will
+be needed / used anytime soon.
+
+ arm/Makefile.arm |  8 ++++++++
+ lib/arm/stack.c  | 18 ++++++++++++++++--
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+index d6250b7fb686..7734e17fe583 100644
+--- a/arm/Makefile.arm
++++ b/arm/Makefile.arm
+@@ -39,4 +39,12 @@ tests =
  
  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
  
 +ifneq ($(KEEP_FRAME_POINTER),)
-+# Force the generation of a regular stack frame even for leaf functions to make
-+# stack walking reliable.
-+LATE_CFLAGS += $(call cc-option, -mno-omit-leaf-frame-pointer, "")
++# Force the generation of an APCS stack frame layout to be able to reliably
++# walk the stack. Otherwise the compiler may omit saving LR on the stack for
++# leaf functions and, unfortunately, -mno-omit-leaf-frame-pointer isn't
++# supported on ARM :(
++LATE_CFLAGS += $(call cc-option, -mapcs-frame -DAPCS_FRAMES, "")
 +endif
 +
  arch_clean: arm_clean
- 	$(RM) lib/arm64/.*.d
+diff --git a/lib/arm/stack.c b/lib/arm/stack.c
+index 66d18b47ea53..b2384d8eb4c1 100644
+--- a/lib/arm/stack.c
++++ b/lib/arm/stack.c
+@@ -8,6 +8,20 @@
+ #include <libcflat.h>
+ #include <stack.h>
+ 
++/*
++ * APCS stack frames are generated by code like this:
++ * | mov  ip, sp
++ * | push {..., fp, ip, lr, pc}
++ * | sub  fp, ip, #4
++ */
++#ifdef APCS_FRAMES
++# define FP_IDX -3
++# define LR_IDX -1
++#else
++# define FP_IDX -1
++# define LR_IDX 0
++#endif
++
+ int arch_backtrace_frame(const void *frame, const void **return_addrs,
+ 			 int max_depth, bool current_frame)
+ {
+@@ -27,10 +41,10 @@ int arch_backtrace_frame(const void *frame, const void **return_addrs,
+ 	for (depth = 0; depth < max_depth; depth++) {
+ 		if (!fp)
+ 			break;
+-		return_addrs[depth] = (void *)fp[0];
++		return_addrs[depth] = (void *)fp[LR_IDX];
+ 		if (return_addrs[depth] == 0)
+ 			break;
+-		fp = (unsigned long *)fp[-1];
++		fp = (unsigned long *)fp[FP_IDX];
+ 	}
+ 
+ 	walking = 0;
 -- 
 2.47.3
 
