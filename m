@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C80301021;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D0F301015;
 	Mon, 15 Sep 2025 11:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757936699; cv=none; b=d/PgIcdSJxnG+mqzqDvmLTlLMF70Jm3Ugi4Hgnn/2DqqgAJZA11ffGtjLfoiPJbV3s8fvXQ383eMYIB0L137tvGEyLz3xMQyPhH1A1ISmQXW3BENn2ANZRr4hS1jve0vRhFltKYixGfiYniaEDiFe/MxGhZmDJ9zzYowBxVNq9g=
+	t=1757936699; cv=none; b=WF80hdxY+tY15EnArJV295ji+4C73q/ZMTSgeh5fygLzci4sKC2oZQVVMlqoNEtMRYOlfcM7/r4J7UTipoTXKnauQPnFyUeeYDBkE8aiUwUwkxH4iDBgl6pd00eD75DchebKE6cLD2Evbn1BVh0OdFYUbW7vk7klpAvcMJPbBhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757936699; c=relaxed/simple;
-	bh=cuS9SHuGG3F79ODO0qmZswZFWO7i6E8RahYMo63RrsA=;
+	bh=2TF/zey+KtgVTwTjGrxKxIt7FD4E/OPw0nUb/TkWf2o=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RwDMn4hRkud4JwZadpBZnc+vROxZBIEAughau8U5KZdlmbqOSFVNSioMbwDM2n3ckeLyMaIg2KoUg/AOOv+lDeTm/GvwMuTikS1IZC/XlRJ1eQM6sWhEu27Evs8ZFp6kUzN+PJt+XY0fnlnedZOYlCGJZt3xM7yrNkEmJo2bW4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IU+xPNqk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=pMWizGKjO1iEGkhsAZWeZeonjPsqm0rUqrRYQ6RdI/O+5AqrQ6EOH1Fxpp93iFH8JO5JyrBzgC8dtxDI9xIOnPu+/KykVLPdgv8QqpsqAVAW+Ij04+51rGfZ8FGB09srN+A0ylH7KN4xBpAfHFvxMyUqO6POcl9pi5GJXe1Y7is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KucY3wyZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IU+xPNqk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B914C4CEFB;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KucY3wyZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22A54C4CEF1;
 	Mon, 15 Sep 2025 11:44:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1757936699;
-	bh=cuS9SHuGG3F79ODO0qmZswZFWO7i6E8RahYMo63RrsA=;
+	bh=2TF/zey+KtgVTwTjGrxKxIt7FD4E/OPw0nUb/TkWf2o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IU+xPNqkSPTmBziaDo6mj2aQO/ljEmiikR7hLb3dKcb0N19BV2Lkuzg9t+OgX3BZk
-	 afTzQzfXmFeqAhjNeUmSW1NS7Uv2kaTkkXTQVutCw73pSm0UqUtemQ6WhSAnWPfTJn
-	 4BDGpcSb5xYE4WI+iY6OuOHMw7jVNQVten4M1dj9KyewHChIxNr81bsVJ618QY+OI3
-	 4nlFzP+jH7uANi8S3KyhSAUK8VSrTilVmhYCckU16/wbTj735LYT15OeGNCoDgVo00
-	 eHIh7Iglw7UPoB25PTPIOjKpSXLWb6vEb5msges14zSYneMesOP3N7OwLIz+X/dAkI
-	 zQiPCDV7g/rPg==
+	b=KucY3wyZ7ey4BOfRCjfbLr0+D5mWLUvhVrg9PvRWDaErQRg3o5JOBBdBrKU1uErKj
+	 QT7YognH7WcR/TBciahDpN4IRUqqfV1z+FwiBuZtCPQsK1KuYVgqrPkpiI6K972hiP
+	 Cfhb1x/wDgfbMaXXA/5p6LZ131sk9qwzEpdiDs4TkGW9sz5uZyL0TTgU0+3FlwBNT0
+	 Hwrk0y+nvc09kNkoinngMJG93fy6c+yZ33wg+yHxPMtx55igs4URKm6a2V/QfQsMtm
+	 BhJszbm9RhrPB0eMDGHGKB8A7eeyaTbZrcCwiQn+xA9AV5AQGHGUgEg5GrwsoV5cTZ
+	 SGb+HUv7GHLBQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uy7dh-00000006MDw-32D7;
+	id 1uy7dh-00000006MDw-1NvK;
 	Mon, 15 Sep 2025 11:44:57 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 14/16] KVM: arm64: Add S1 IPA to page table level walker
-Date: Mon, 15 Sep 2025 12:44:49 +0100
-Message-Id: <20250915114451.660351-15-maz@kernel.org>
+Subject: [PATCH v2 12/16] KVM: arm64: Don't switch MMU on translation from non-NV context
+Date: Mon, 15 Sep 2025 12:44:47 +0100
+Message-Id: <20250915114451.660351-13-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250915114451.660351-1-maz@kernel.org>
 References: <20250915114451.660351-1-maz@kernel.org>
@@ -58,104 +58,52 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Use the filtering hook infrastructure to implement a new walker
-that, for a given VA and an IPA, returns the level of the first
-occurence of this IPA in the walk from that VA.
-
-This will be used to improve our SEA syndrome reporting.
+If calling into the AT code from guest EL1, there is no need
+to consider any context switch, as we are guaranteed to be
+in the correct context.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  2 +
- arch/arm64/kvm/at.c                 | 65 +++++++++++++++++++++++++++++
- 2 files changed, 67 insertions(+)
+ arch/arm64/kvm/at.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index cce0e4cb54484..2be6c3de74e3d 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -353,6 +353,8 @@ struct s1_walk_result {
- 
- int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 		       struct s1_walk_result *wr, u64 va);
-+int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa,
-+			     int *level);
- 
- /* VNCR management */
- int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu);
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index c099bab30cb0d..117ce1ff5e767 100644
+index c84a021067daf..2f6f83cc8d19d 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -1578,3 +1578,68 @@ int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+@@ -1294,7 +1294,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ {
+ 	struct mmu_config config;
+ 	struct kvm_s2_mmu *mmu;
+-	bool fail;
++	bool fail, mmu_cs;
+ 	u64 par;
  
- 	return 0;
- }
-+
-+struct desc_match {
-+	u64	ipa;
-+	int	level;
-+};
-+
-+static int match_s1_desc(struct s1_walk_context *ctxt, void *priv)
-+{
-+	struct desc_match *dm = priv;
-+	u64 ipa = dm->ipa;
-+
-+	/* Use S1 granule alignment */
-+	ipa &= GENMASK(52, ctxt->wi->pgshift);
-+
-+	/* Not the IPA we're looking for? Continue. */
-+	if (ipa != ctxt->table_ipa)
-+		return 0;
-+
-+	/* Note the level and interrupt the walk */
-+	dm->level = ctxt->level;
-+	return -EINTR;
-+}
-+
-+int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
-+{
-+	struct desc_match dm = {
-+		.ipa	= ipa,
-+	};
-+	struct s1_walk_info wi = {
-+		.filter	= &(struct s1_walk_filter){
-+			.fn	= match_s1_desc,
-+			.priv	= &dm,
-+		},
-+		.regime	= TR_EL10,
-+		.as_el0	= false,
-+		.pan	= false,
-+	};
-+	struct s1_walk_result wr = {};
-+	int ret;
-+
-+	ret = setup_s1_walk(vcpu, &wi, &wr, va);
-+	if (ret)
-+		return ret;
-+
-+	/* We really expect the S1 MMU to be on here... */
-+	if (WARN_ON_ONCE(wr.level == S1_MMU_DISABLED)) {
-+		*level = 0;
-+		return 0;
-+	}
-+
-+	/* Walk the guest's PT, looking for a match along the way */
-+	ret = walk_s1(vcpu, &wi, &wr, va);
-+	switch (ret) {
-+	case -EINTR:
-+		/* We interrupted the walk on a match, return the level */
-+		*level = dm.level;
-+		return 0;
-+	case 0:
-+		/* The walk completed, we failed to find the entry */
-+		return -ENOENT;
-+	default:
-+		/* Any other error... */
-+		return ret;
-+	}
-+}
+ 	par = SYS_PAR_EL1_F;
+@@ -1310,8 +1310,13 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	 * If HCR_EL2.{E2H,TGE} == {1,1}, the MMU context is already
+ 	 * the right one (as we trapped from vEL2). If not, save the
+ 	 * full MMU context.
++	 *
++	 * We are also guaranteed to be in the correct context if
++	 * we're not in a nested VM.
+ 	 */
+-	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
++	mmu_cs = (vcpu_has_nv(vcpu) &&
++		  !(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)));
++	if (!mmu_cs)
+ 		goto skip_mmu_switch;
+ 
+ 	/*
+@@ -1379,7 +1384,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 
+ 	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
+ 
+-	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
++	if (mmu_cs)
+ 		__mmu_config_restore(&config);
+ 
+ 	return par;
 -- 
 2.39.2
 
