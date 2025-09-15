@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D0F301015;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ED530147D;
 	Mon, 15 Sep 2025 11:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757936699; cv=none; b=WF80hdxY+tY15EnArJV295ji+4C73q/ZMTSgeh5fygLzci4sKC2oZQVVMlqoNEtMRYOlfcM7/r4J7UTipoTXKnauQPnFyUeeYDBkE8aiUwUwkxH4iDBgl6pd00eD75DchebKE6cLD2Evbn1BVh0OdFYUbW7vk7klpAvcMJPbBhs=
+	t=1757936700; cv=none; b=Bw7ZDbYNrVZ9pPwsYbne6R+rJPxfjlZiL3j9A4SxVlvKSQKo7k/eNU73dZNfhy+veC+QYWo44avbnzqGt27QF7q0K8EbjWrfhwr+VPUjJtKWs0x/c8LS2K8vqf00Q12SArWnUy8Icr/j3UVJ36jFPmVke3gNhK9YzwMFJ+7WS+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757936699; c=relaxed/simple;
-	bh=2TF/zey+KtgVTwTjGrxKxIt7FD4E/OPw0nUb/TkWf2o=;
+	s=arc-20240116; t=1757936700; c=relaxed/simple;
+	bh=z2QNt9RWN4zT8Ci51cyrFFeAAtDEFGBEVB1qDDNY7qw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pMWizGKjO1iEGkhsAZWeZeonjPsqm0rUqrRYQ6RdI/O+5AqrQ6EOH1Fxpp93iFH8JO5JyrBzgC8dtxDI9xIOnPu+/KykVLPdgv8QqpsqAVAW+Ij04+51rGfZ8FGB09srN+A0ylH7KN4xBpAfHFvxMyUqO6POcl9pi5GJXe1Y7is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KucY3wyZ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=DdSVp9/bKUBYbx43C8nO6ru6UZeO+t/5RduioXpcE/ZxwBvHf+cyRt/myKhN6DhKlOLERnvm8fD12LLG2z9Hi/oyOAfKnDr4jLLkghrpg2eafrdHgBd2gtMn/f1dWWAfi5ttrR4S983cjyJbIH0ySCF4To8aEBliRUo3AX+1SiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0Xq/kLB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KucY3wyZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22A54C4CEF1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0Xq/kLB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8320C4CEF5;
 	Mon, 15 Sep 2025 11:44:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1757936699;
-	bh=2TF/zey+KtgVTwTjGrxKxIt7FD4E/OPw0nUb/TkWf2o=;
+	bh=z2QNt9RWN4zT8Ci51cyrFFeAAtDEFGBEVB1qDDNY7qw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KucY3wyZ7ey4BOfRCjfbLr0+D5mWLUvhVrg9PvRWDaErQRg3o5JOBBdBrKU1uErKj
-	 QT7YognH7WcR/TBciahDpN4IRUqqfV1z+FwiBuZtCPQsK1KuYVgqrPkpiI6K972hiP
-	 Cfhb1x/wDgfbMaXXA/5p6LZ131sk9qwzEpdiDs4TkGW9sz5uZyL0TTgU0+3FlwBNT0
-	 Hwrk0y+nvc09kNkoinngMJG93fy6c+yZ33wg+yHxPMtx55igs4URKm6a2V/QfQsMtm
-	 BhJszbm9RhrPB0eMDGHGKB8A7eeyaTbZrcCwiQn+xA9AV5AQGHGUgEg5GrwsoV5cTZ
-	 SGb+HUv7GHLBQ==
+	b=J0Xq/kLBiiv/ouO4uVwk2aqCB5U6PtbxQWGSwhfhR+MITR5M5Wq0R7ZKw0SqaUFzn
+	 9njR3osRvpNSKnQcUYEvd3Bfw/S3vD9okXHcflEVSGNZj9Tx+JhOpifwu2fg3pawZ5
+	 6OmH1mwxJdzECiGQGuWoRrp1bcXEnIY3iTdf0eBVODRssLICOCBYJTjw5ybTZBXlkx
+	 1kkT+x/CXfbunvRr/DQDYL/zIxVSmtDzdN+2CBAPRT80vqhjoU9IR553zbQ9emcDuz
+	 jUmIaUiEyFM65NyVBy1Hn+e+LAqW1aqLRyZyUKi1xCpVKMzK1yeUFpQXYNEkFf+J1q
+	 YZZ98a5e5JgEA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uy7dh-00000006MDw-1NvK;
+	id 1uy7dh-00000006MDw-3r8g;
 	Mon, 15 Sep 2025 11:44:57 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 12/16] KVM: arm64: Don't switch MMU on translation from non-NV context
-Date: Mon, 15 Sep 2025 12:44:47 +0100
-Message-Id: <20250915114451.660351-13-maz@kernel.org>
+Subject: [PATCH v2 15/16] KVM: arm64: Populate level on S1PTW SEA injection
+Date: Mon, 15 Sep 2025 12:44:50 +0100
+Message-Id: <20250915114451.660351-16-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250915114451.660351-1-maz@kernel.org>
 References: <20250915114451.660351-1-maz@kernel.org>
@@ -58,52 +58,69 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If calling into the AT code from guest EL1, there is no need
-to consider any context switch, as we are guaranteed to be
-in the correct context.
+Our fault injection mechanism is mildly primitive, and doesn't
+really implement the architecture when it comes to reporting
+the level of a failing S1 PTW (we blindly report a SEA outside
+of a PTW).
+
+Now that we can walk the S1 page tables and look for a particular
+IPA in the descriptors, it is pretty easy to improve the SEA
+injection code.
+
+Note that we only do it for AArch64 guests, and that 32bit guests
+are left to their own device (oddly enough, I don't fancy writing
+a 32bit PTW...).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/inject_fault.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index c84a021067daf..2f6f83cc8d19d 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -1294,7 +1294,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 6745f38b64f9c..dfcd66c655179 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -106,7 +106,30 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
  {
- 	struct mmu_config config;
- 	struct kvm_s2_mmu *mmu;
--	bool fail;
-+	bool fail, mmu_cs;
- 	u64 par;
+ 	unsigned long cpsr = *vcpu_cpsr(vcpu);
+ 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
+-	u64 esr = 0;
++	u64 esr = 0, fsc;
++	int level;
++
++	/*
++	 * If injecting an abort from a failed S1PTW, rewalk the S1 PTs to
++	 * find the failing level. If we can't find it, assume the error was
++	 * transient and restart without changing the state.
++	 */
++	if (kvm_vcpu_abt_iss1tw(vcpu)) {
++		u64 hpfar = kvm_vcpu_get_fault_ipa(vcpu);
++		int ret;
++
++		if (hpfar == INVALID_GPA)
++			return;
++
++		ret = __kvm_find_s1_desc_level(vcpu, addr, hpfar, &level);
++		if (ret)
++			return;
++
++		WARN_ON_ONCE(level < -1 || level > 3);
++		fsc = ESR_ELx_FSC_SEA_TTW(level);
++	} else {
++		fsc = ESR_ELx_FSC_EXTABT;
++	}
  
- 	par = SYS_PAR_EL1_F;
-@@ -1310,8 +1310,13 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	 * If HCR_EL2.{E2H,TGE} == {1,1}, the MMU context is already
- 	 * the right one (as we trapped from vEL2). If not, save the
- 	 * full MMU context.
-+	 *
-+	 * We are also guaranteed to be in the correct context if
-+	 * we're not in a nested VM.
- 	 */
--	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-+	mmu_cs = (vcpu_has_nv(vcpu) &&
-+		  !(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)));
-+	if (!mmu_cs)
- 		goto skip_mmu_switch;
+ 	/* This delight is brought to you by FEAT_DoubleFault2. */
+ 	if (effective_sctlr2_ease(vcpu))
+@@ -133,7 +156,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 	if (!is_iabt)
+ 		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
  
- 	/*
-@@ -1379,7 +1384,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+-	esr |= ESR_ELx_FSC_EXTABT;
++	esr |= fsc;
  
- 	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
- 
--	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+	if (mmu_cs)
- 		__mmu_config_restore(&config);
- 
- 	return par;
+ 	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
+ 	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
 -- 
 2.39.2
 
