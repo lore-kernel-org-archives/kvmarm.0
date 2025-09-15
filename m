@@ -1,141 +1,228 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998762ECD32
-	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 08:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98ECB2EFDBE
+	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 08:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757924972; cv=none; b=Zuag1ODBkq7tD7u+XTIZMZSp0ry6SZ1r/LUCiZgZVAOVtKM7Ei/DOPnRJSgLiHggYeHUJ6VlqsM1xuzkFu6jehUfBaM2gKB/ntHalBHzVit6VpGjVX3RWh//j4ei+D4pIsKFk7RKrg/mG2S0McnqCTAPjRoGRTcSrQoWPdbYTww=
+	t=1757925394; cv=none; b=h0BvzEA5MTSPDgwqF7lpGTEFguY42qst6TfmhFSgJQSMRua8PsnPKfp5wZmSPYCOzqPpxK7g3t4QQJog+tz2yScV6JOIzyndI39pjxBPyMg5gF5OSmNTw/QvVb2I9qDkmP9n35NqudXeSHUnbrIRop/Z1El1GI7WqfXJB/mIRs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757924972; c=relaxed/simple;
-	bh=AM0IbrbasXdUbw78EhhSKGCuGd0Z3zFtSdCsCjeG3Kc=;
-	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=VLS6hPvZ8kFSisHJmv2FgZbMc2w66MsMB9WgzgRV6qRjCkUtqeSM4tTz4tayqpkiId68NL+GlZQ00JvPBAC9h+xQ4rfXpx5kQtd5pW60REQVFlq65vE9XYZcvdcgP4ear+c6cHo1FkiWN9a2QqoDeRDrZbOPve0zkb9k+NHaoRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cQJ5S3xCKz2VRmg;
-	Mon, 15 Sep 2025 16:26:04 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id CA5B81402A5;
-	Mon, 15 Sep 2025 16:29:26 +0800 (CST)
-Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 15 Sep 2025 16:29:26 +0800
-Received: from [10.67.121.177] (10.67.121.177) by
- kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 15 Sep 2025 16:29:25 +0800
-CC: <yangyicong@hisilicon.com>, <catalin.marinas@arm.com>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <corbet@lwn.net>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<shuah@kernel.org>, <shameerali.kolothum.thodi@huawei.com>,
-	<linuxarm@huawei.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>,
-	<tangchengchang@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v4 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
-To: Will Deacon <will@kernel.org>, Jonathan Cameron
-	<jonathan.cameron@huawei.com>
-References: <20250715081356.12442-1-yangyicong@huawei.com>
- <20250715081356.12442-6-yangyicong@huawei.com>
- <aL7Fgx__LeLfbDyU@willie-the-truck>
- <5d2ba565-715b-9b17-951b-f805dde5988b@huawei.com>
- <aMLvtpaCgRqPAU2Z@willie-the-truck> <20250912144736.00007673@huawei.com>
-From: Yicong Yang <yangyicong@huawei.com>
-Message-ID: <666e3588-2e42-2275-f9ec-94ba0954bdc6@huawei.com>
-Date: Mon, 15 Sep 2025 16:29:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+	s=arc-20240116; t=1757925394; c=relaxed/simple;
+	bh=oTUc05uAoj8tDOxyEV34nE5zIEyVRYInAxKt2au/nUs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c6E8TAtA65bqfaViGryqbc3nCw1/6V411wP7qpQEVznpX/KpGaX97GtUG0Lie0w/B1WG+NuO5qIbC1ipgPFvt9wH1VSqbNfpMSOAcn7rHcY6qNFqrfmzWpkz0QhAlV7SAFtz/MTy56sgGlCVo97rEQU1zyGjxJ+KS93FTaw3chc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s17LM0al; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s17LM0al"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45f2f894632so17735e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 01:36:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757925391; x=1758530191; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uuG6t3iAuSKi0EnadmhBvC3rHWT3Byv2xYmpCXcLPYA=;
+        b=s17LM0alBJ7e9+Eodjpi8VJfsgc2oH+3DwdHDf34CNMSKKlmalpNYsUfQX3oDFZ7g2
+         wVlODOSTt8aj3v+xPKNXBQj3k+uMv0mGXbeogUZ+fw1iWvACZAnksdQOCUtrShi8Smhm
+         uRffPCq9LyrZA6sCc5QVf3OM5u+KCRw4kggTUeP1yZ0zQhYkrc0oriCs115e9UYRGvDq
+         MTTXrZ14f2K42OuReqYfPiAh52Y2nEdpqSGHxs8r8f0+qM7lV8EDFkTFWH+0ljS6V3LH
+         l0QXjK6Ny4u/pYSiNzci8TE4b+7btCnjl73XXBB4HBLMT+4K7t7H3C6n/HsGjk9SWx70
+         ZP6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757925391; x=1758530191;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uuG6t3iAuSKi0EnadmhBvC3rHWT3Byv2xYmpCXcLPYA=;
+        b=XSYtEmq2Efd53AJXg7e0+z7rP5LXLuZDLdrO++n8HGHVpAVyVZzKRxxqAAzvA2/U8U
+         S6KaC6BSQDqPnUYnr4tNmVvCWsZbfLZrc/GDtpnRYOYYL/cVo8YslZYr/4hn2L/RmJWG
+         POi4Ojerxc4gpsdd6lZEaHLZ6jEGzYQrx3CGQx+Aw9lu5BpDQOrUCjvr8UUaFgk9pujp
+         UBbBe1oi1upAP9Dmz55xT1hJbhCWNFZlHRxNSrRwEGIh+roWYyBoN2zoX0TIK/FOWDt6
+         TXDLuaMfAe2NDpOuA82EfkDzgpQb+UGlDDrmAZNumzWDkFnTZcoVGQLA+JeZRfp2hySg
+         oA1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUymF1Pu8P63TknNshB8tFi2pUBs3he5DPlDNFbspoQGfReZ091HNLZVW/Y/L1meg+fHEGgllw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwaKxOw+cM/rcPZUjvX/0id1ASDn6rxJyVn9/jmrlljN6rapBHS
+	hGi+wVmOi7C+TITSUpiajTKEsSE0W3xEDR6iCPAT27O6yxIatwjf9nQLIDUKMzOfpg==
+X-Gm-Gg: ASbGncs5+CkAEz3NodEHlFMB9RYhZ5Fo+cHo5CWLcyB0/QD+W83bvc3njlCN88+YLAz
+	6JhnWtZe1KcZgKUMApVE7iY8BLPpkg1iRm634wtNZ/2AqNCAFXvam5c5I6T7K8d/kbKz11uITjC
+	/9RmE62fCyzuZDlnvGUjbTMs/j17oWb13KprlsDPasx+Eos5FiwClMsyOklximNm9Tu1DlubwpI
+	Ph4+LRQygykaAKyarzIri4quSzY36f306AUM8cZc0gz6UvpQGSHGP/2N0UCECMOAlvW6LbQvIq6
+	oxo//qMTBSoS0gUA1vZ67/JS6hi+Xnxg5ncEG9vMJTo5VIvjPjSYuVWBecwTS4rR4kxxu/ghIuO
+	jgh6jou89jXdQoCKitkn0fCdwIm7qwPQunW1OCeMJA6qY3bZOUjKScqz2ngaeynf+VxzBGg==
+X-Google-Smtp-Source: AGHT+IGhw7FjFgBAENHxwqNBn+q5TwhC7OvA4GcuoSnWIVBJGcdJW/TW82vig7dbFCs8/b6w3sEoaQ==
+X-Received: by 2002:a05:600c:a10c:b0:45f:2db6:5202 with SMTP id 5b1f17b1804b1-45f2db65722mr740645e9.3.1757925390598;
+        Mon, 15 Sep 2025 01:36:30 -0700 (PDT)
+Received: from google.com (157.24.148.146.bc.googleusercontent.com. [146.148.24.157])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ebc49f7ebbsm397501f8f.51.2025.09.15.01.36.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Sep 2025 01:36:30 -0700 (PDT)
+Date: Mon, 15 Sep 2025 08:36:26 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	aik@amd.com, lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 04/38] tsm: Support DMA Allocation from private
+ memory
+Message-ID: <aMfQCoLuVeR0nf02@google.com>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-5-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20250912144736.00007673@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq200018.china.huawei.com (7.202.195.108)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250728135216.48084-5-aneesh.kumar@kernel.org>
 
-On 2025/9/12 21:47, Jonathan Cameron wrote:
-> On Thu, 11 Sep 2025 16:50:14 +0100
-> Will Deacon <will@kernel.org> wrote:
+Hi Aneesh,
+
+On Mon, Jul 28, 2025 at 07:21:41PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> Currently, we enforce the use of bounce buffers to ensure that memory
+> accessed by non-secure devices is explicitly shared with the host [1].
+> However, for secure devices, this approach must be avoided.
+
+
+Sorry this might be a basic question, I just started looking into this.
+I see that “force_dma_unencrypted” and “is_swiotlb_force_bounce” are only
+used from DMA-direct, but it seems in your case it involves an IOMMU.
+How does it influence bouncing in that case?
+
+Thanks,
+Mostafa
+
 > 
->> On Tue, Sep 09, 2025 at 09:48:04AM +0800, Yicong Yang wrote:
->>> On 2025/9/8 20:01, Will Deacon wrote:  
->>>> On Tue, Jul 15, 2025 at 04:13:54PM +0800, Yicong Yang wrote:  
->>>>> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
->>>>> index 69d7afe56853..9e6db258ff48 100644
->>>>> --- a/Documentation/arch/arm64/elf_hwcaps.rst
->>>>> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
->>>>> @@ -435,6 +435,12 @@ HWCAP2_SME_SF8DP4
->>>>>  HWCAP2_POE
->>>>>      Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
->>>>>  
->>>>> +HWCAP3_LS64
->>>>> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001.
->>>>> +
->>>>> +HWCAP3_LS64_V
->>>>> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010.  
->>>>
->>>> Given that these instructions only work on IMPLEMENTATION DEFINED memory
->>>> locations and aren't guaranteed to generate an abort if used elsewhere,
->>>> how is userspace supposed to know what to do with them?
->>>>   
->>>
->>> per ARM DDI0487 L.b section C3.2.6,
->>>
->>>   When the instructions access a memory type that is not one of the following,
->>>   a data abort for unsupported Exclusive or atomic access is generated...  
->>
->> That's about the memory _type_. I'm talking about a supported memory type
->> (e.g. writeback cacheable) but when the physical location doesn't support
->> the instruction. That's captured a little later in the same section:
->>
->>   | If the target memory location does not support the LD64B or ST64B
->>   | instructions, then one of the following behaviors occurs:
->>   |  * A stage 1 Data Abort, reported using the DFSC code of 0b110101,
->>   |    is generated.
->>   |  * The instruction performs the memory accesses, but the accesses
->>   |    are not single-copy atomic above the byte level
->>
->> and I think that's a bad interface to expose blindly to userspace solely
->> as a boolean hwcap.
-> Hi Will,
+> To achieve this, we introduce a device flag that controls whether a
+> bounce buffer allocation is required for the device. Additionally, this flag is
+> used to manage the top IPA bit assignment for setting up
+> protected/unprotected IPA aliases.
 > 
-> Nasty, so now I'm curious. Any thoughts on how to expose what regions it is appropriate
-> for?  I can think of various heavy weight options but wondering if there is a simple
-> solution.
+> [1] commit fbf979a01375 ("arm64: Enforce bounce buffers for realm DMA")
 > 
-
-in my understanding the hwcap only describes the capabilities of the CPU but not
-the whole system. the users should make sure the function works as expected if the
-CPU supports it and they're going to use it. specifically the LS64 is intended for
-device memory only, so the user should take responsibility of using it on supported
-memory.
-
-may raise the similar question if use other atomic instructions (e.g. LSE) on the
-memory does not support atomicity. find this restriction in ARM DDI0487 L.b section B2.2.6
-
-  Some system implementations might not support atomic instructions for all regions of the
-  memory
-
-and if perform atomic instruction on unsupported memory it's allowed to implement as
-
-  * The instruction generates a synchronous External abort.
-  * The instruction generates a System Error interrupt.
-  * The instruction generates an IMPLEMENTATION DEFINED MMU fault reported using the Data
-    Abort Fault status code of ESR_ELx.DFSC = 110101.
-  * The instruction is treated as a NOP.
-  * The instructions are performed, but there is no guarantee that the memory accesses were
-    performed atomically in regard to other agents that access memory. In this case, the
-    instruction might also generate a System Error interrupt.
-
-if instruction performed without generate a SEI in the last implementation, it's quite similar
-to the condition of LS64.
-
-thanks.
+> based on changes from Alexey Kardashevskiy <aik@amd.com>
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  arch/arm64/include/asm/mem_encrypt.h |  6 +-----
+>  arch/arm64/mm/mem_encrypt.c          | 10 ++++++++++
+>  drivers/pci/tsm.c                    |  6 ++++++
+>  include/linux/device.h               |  1 +
+>  include/linux/swiotlb.h              |  4 ++++
+>  5 files changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/mem_encrypt.h b/arch/arm64/include/asm/mem_encrypt.h
+> index 314b2b52025f..d77c10cd5b79 100644
+> --- a/arch/arm64/include/asm/mem_encrypt.h
+> +++ b/arch/arm64/include/asm/mem_encrypt.h
+> @@ -15,14 +15,10 @@ int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops);
+>  
+>  int set_memory_encrypted(unsigned long addr, int numpages);
+>  int set_memory_decrypted(unsigned long addr, int numpages);
+> +bool force_dma_unencrypted(struct device *dev);
+>  
+>  int realm_register_memory_enc_ops(void);
+>  
+> -static inline bool force_dma_unencrypted(struct device *dev)
+> -{
+> -	return is_realm_world();
+> -}
+> -
+>  /*
+>   * For Arm CCA guests, canonical addresses are "encrypted", so no changes
+>   * required for dma_addr_encrypted().
+> diff --git a/arch/arm64/mm/mem_encrypt.c b/arch/arm64/mm/mem_encrypt.c
+> index ee3c0ab04384..279696a8af3f 100644
+> --- a/arch/arm64/mm/mem_encrypt.c
+> +++ b/arch/arm64/mm/mem_encrypt.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/compiler.h>
+>  #include <linux/err.h>
+>  #include <linux/mm.h>
+> +#include <linux/device.h>
+>  
+>  #include <asm/mem_encrypt.h>
+>  
+> @@ -48,3 +49,12 @@ int set_memory_decrypted(unsigned long addr, int numpages)
+>  	return crypt_ops->decrypt(addr, numpages);
+>  }
+>  EXPORT_SYMBOL_GPL(set_memory_decrypted);
+> +
+> +bool force_dma_unencrypted(struct device *dev)
+> +{
+> +	if (dev->tdi_enabled)
+> +		return false;
+> +
+> +	return is_realm_world();
+> +}
+> +EXPORT_SYMBOL_GPL(force_dma_unencrypted);
+> diff --git a/drivers/pci/tsm.c b/drivers/pci/tsm.c
+> index e4a3b5b37939..60f50d57a725 100644
+> --- a/drivers/pci/tsm.c
+> +++ b/drivers/pci/tsm.c
+> @@ -120,6 +120,7 @@ static int pci_tsm_disconnect(struct pci_dev *pdev)
+>  
+>  	tsm_ops->disconnect(pdev);
+>  	tsm->state = PCI_TSM_INIT;
+> +	pdev->dev.tdi_enabled = false;
+>  
+>  	return 0;
+>  }
+> @@ -199,6 +200,8 @@ static int pci_tsm_accept(struct pci_dev *pdev)
+>  	if (rc)
+>  		return rc;
+>  	tsm->state = PCI_TSM_ACCEPT;
+> +	pdev->dev.tdi_enabled = true;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -557,6 +560,9 @@ static void __pci_tsm_init(struct pci_dev *pdev)
+>  	default:
+>  		break;
+>  	}
+> +
+> +	/* FIXME!! should this be default true and switch to false for TEE capable device */
+> +	pdev->dev.tdi_enabled = false;
+>  }
+>  
+>  void pci_tsm_init(struct pci_dev *pdev)
+> diff --git a/include/linux/device.h b/include/linux/device.h
+> index 4940db137fff..d62e0dd9d8ee 100644
+> --- a/include/linux/device.h
+> +++ b/include/linux/device.h
+> @@ -688,6 +688,7 @@ struct device {
+>  #ifdef CONFIG_IOMMU_DMA
+>  	bool			dma_iommu:1;
+>  #endif
+> +	bool			tdi_enabled:1;
+>  };
+>  
+>  /**
+> diff --git a/include/linux/swiotlb.h b/include/linux/swiotlb.h
+> index 3dae0f592063..61e7cff7768b 100644
+> --- a/include/linux/swiotlb.h
+> +++ b/include/linux/swiotlb.h
+> @@ -173,6 +173,10 @@ static inline bool is_swiotlb_force_bounce(struct device *dev)
+>  {
+>  	struct io_tlb_mem *mem = dev->dma_io_tlb_mem;
+>  
+> +	if (dev->tdi_enabled) {
+> +		dev_warn_once(dev, "(TIO) Disable SWIOTLB");
+> +		return false;
+> +	}
+>  	return mem && mem->force_bounce;
+>  }
+>  
+> -- 
+> 2.43.0
+> 
