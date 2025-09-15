@@ -1,154 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FC72DF130;
-	Mon, 15 Sep 2025 09:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201BB1E47B3
+	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 09:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757929138; cv=none; b=E2bGL1Ya/SIMwYdQyrDtqp6RZxvQI4FHtDZirRaztXnxfF/ITFZadE6jFKRWvj1V5W2zAG/WKBdoAeBg1EM1A+NRViB0SMZMpA3oDegDwAl6FzezXXSVG7iqLnvZZtOXGpp5nubKWWO+uGe4Adfp4uv2Y6UxUiTCxEnAaDa6xjg=
+	t=1757929852; cv=none; b=JWbwQZlFXy1M51HRIxEEfxRz0+TFKy38Uwux67mWVkp6SjlMMl5AMbjfTWmZ4gWlGvjpos+YnsB3lZel2c84QFsybcyfi9GUZKIs4kw2yc8nlkAmjvBmRebJCB/Xd+5/m8DnhHFbcnvtxukW0Nggur2akKYIddwGyztqw0eaeds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757929138; c=relaxed/simple;
-	bh=pPcw5Aglj30q8w9L1jbmAPFHByeSGZ84ttWKjhwzqnY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qvRBArGdyZC8nSZFfcJ86BJ1Y8ImX3PSb4yJvvU59Z1N6un8pdz7VU4oVIJR0FvSoV5oEIBxX57DlSMWjsJYEtzKa5xblzpBcbafZtT90wL+hGhm23YBYr1AwpCzwm3pNhSxiYQ4mEfIZolDF2woEhEdGjAICP5iDPWpZLbex5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iXkvwGCS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757929852; c=relaxed/simple;
+	bh=Oi62lywdDLKkKygUTfWGFHwFeq/dkJsnfIBR3CLOMG8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YduUMdlEKS7honrhHdqVqvVm3uVhjPX9w7kw3vziYMmZTS9jChf43Qv9+Lf2Dqa3LW+j4oIpg3JVkhDOUZTVceEAq2pTatb7979k03iUQbRqyeZAx9NRdbILr70/YvWRg35YJ7MUjVlcvBn2jskINYpnEXPA3dtSivr1xLiclus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tbyR1yVc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iXkvwGCS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 213E8C4CEF1;
-	Mon, 15 Sep 2025 09:38:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tbyR1yVc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC335C4CEF5;
+	Mon, 15 Sep 2025 09:50:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757929138;
-	bh=pPcw5Aglj30q8w9L1jbmAPFHByeSGZ84ttWKjhwzqnY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iXkvwGCSqZkDn4G0fMbAyiH2KCJYx3UK0SD6fSjnM6gBYvRaWpmPWZA/hFGr77koC
-	 g8g4RFGr8ynQomGmuhNzeoHzgcmOI0u960M+XzxoAH7fev8q3zGtno3LQGqs/eYsBl
-	 pnc9R8PYRo/JfcK1dJU7Ne6vS3bDkOfUL1y8t0W135nycBlRWuKnoxAqGj7OvY8t/m
-	 XsZnHZJsnklN3mBfQIW4iA8N0bQ9+e2SrDo8z6V70bMNwk1VXcvUuLKEpis48zh607
-	 /m8EaGXsbDj6F2vQ5o4M0XojlOp60r4Y7W42izT/IwmTYv++abN98rVpn1WgEgU5xK
-	 zr5gbvFLaRVpw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1757929852;
+	bh=Oi62lywdDLKkKygUTfWGFHwFeq/dkJsnfIBR3CLOMG8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tbyR1yVcylRKlSrNl0nReGo3ggSA0LVb6GVj5wea81t9vI1pQU0JN+HFGrbtLCVEi
+	 X3dwfItwNIsY0hoKMHcG1KrYrPoIvxUBgrNX0BZVVOzp6y5SkVsxXf8MFonq9bBY0V
+	 u35v9N1g3MJeGIKS2lHkAoC2fqc3fkMdCABYC82TVidTXgFXMY0xfEFG+OPOAtIJH6
+	 DHiG+HgGb3ALsmc7BXu8QbjWe2TPoaDLt/1VCbW/IVuZUneQjte8t9IAEaUFxE7zMi
+	 LMqiFujiupsci11e6qGAv62sntNc26l2GIHN7B0ICETp7rVVqtmHDmKc/FV5tYavet
+	 P0oSUPVQjHbBQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uy5fk-00000006JJB-06WB;
-	Mon, 15 Sep 2025 09:38:56 +0000
-Date: Mon, 15 Sep 2025 10:38:55 +0100
-Message-ID: <86zfawawcw.wl-maz@kernel.org>
+	id 1uy5rG-00000006JVk-04gs;
+	Mon, 15 Sep 2025 09:50:50 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>,
-	catalin.marinas@arm.com,
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Fuad Tabba <tabba@google.com>
+Cc: oliver.upton@linux.dev,
 	will@kernel.org,
-	oliver.upton@linux.dev,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	james.morse@arm.com,
-	tabba@google.com,
-	Quentin Perret <qperret@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix debug checking for np-guests using huge mappings
-In-Reply-To: <5d30d737-945f-4524-81ac-12ff03edca6c@arm.com>
-References: <20250815162655.121108-1-ben.horgan@arm.com>
-	<aKMkvQEyeK1QH12X@google.com>
-	<5d30d737-945f-4524-81ac-12ff03edca6c@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	catalin.marinas@arm.com,
+	broonie@kernel.org,
+	vdonnefort@google.com,
+	qperret@google.com,
+	sebastianene@google.com,
+	keirf@google.com,
+	smostafa@google.com
+Subject: Re: [PATCH v4 0/9] KVM: arm64: Reserve pKVM VM handle during initial VM setup
+Date: Mon, 15 Sep 2025 10:50:46 +0100
+Message-Id: <175792983912.521298.3255691890570537685.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250909072437.4110547-1-tabba@google.com>
+References: <20250909072437.4110547-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ben.horgan@arm.com, vdonnefort@google.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, james.morse@arm.com, tabba@google.com, qperret@google.com, ryan.roberts@arm.com, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, broonie@kernel.org, vdonnefort@google.com, qperret@google.com, sebastianene@google.com, keirf@google.com, smostafa@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 15 Sep 2025 10:13:29 +0100,
-Ben Horgan <ben.horgan@arm.com> wrote:
+On Tue, 09 Sep 2025 08:24:27 +0100, Fuad Tabba wrote:
+> Changes since v3 [1]:
+> - NOTE: only the last patch (9/9) has changed.
+> - Fix bug reported by Mark [2]. The existing call to pkvm_init_host_vm()
+>   wasn't gated by protected mode being enabled, unlike the call to
+>   pkvm_destroy_hyp_vm(). This imbalance caused failures in non-protected
+>   mode, especially when creating and destroying multiple VMs. Tested
+>   with kvm demand_paging_test using nvhe, vhe, and protected.
+> - Rebase on Linux 6.17-rc5
 > 
-> 
-> 
-> On 8/18/25 14:03, Vincent Donnefort wrote:
-> > Thanks for the fix!
-> > 
-> > On Fri, Aug 15, 2025 at 05:26:55PM +0100, Ben Horgan wrote:
-> >> When running with transparent huge pages and CONFIG_NVHE_EL2_DEBUG then
-> >> the debug checking in assert_host_shared_guest() fails on the launch of an
-> >> np-guest. This WARN_ON() causes a panic and generates the stack below.
-> >>
-> >> In __pkvm_host_relax_perms_guest() the debug checking assumes the mapping
-> >> is a single page but it may be a block map. Update the checking so that
-> >> the size is not checked and just assumes the correct size.
-> >>
-> >> While we're here make the same fix in __pkvm_host_mkyoung_guest().
-> >>
-> >>   Info: # lkvm run -k /share/arch/arm64/boot/Image -m 704 -c 8 --name guest-128
-> >>   Info: Removed ghost socket file "/.lkvm//guest-128.sock".
-> >> [ 1406.521757] kvm [141]: nVHE hyp BUG at: arch/arm64/kvm/hyp/nvhe/mem_protect.c:1088!
-> >> [ 1406.521804] kvm [141]: nVHE call trace:
-> >> [ 1406.521828] kvm [141]:  [<ffff8000811676b4>] __kvm_nvhe_hyp_panic+0xb4/0xe8
-> >> [ 1406.521946] kvm [141]:  [<ffff80008116d12c>] __kvm_nvhe_assert_host_shared_guest+0xb0/0x10c
-> >> [ 1406.522049] kvm [141]:  [<ffff80008116f068>] __kvm_nvhe___pkvm_host_relax_perms_guest+0x48/0x104
-> >> [ 1406.522157] kvm [141]:  [<ffff800081169df8>] __kvm_nvhe_handle___pkvm_host_relax_perms_guest+0x64/0x7c
-> >> [ 1406.522250] kvm [141]:  [<ffff800081169f0c>] __kvm_nvhe_handle_trap+0x8c/0x1a8
-> >> [ 1406.522333] kvm [141]:  [<ffff8000811680fc>] __kvm_nvhe___skip_pauth_save+0x4/0x4
-> >> [ 1406.522454] kvm [141]: ---[ end nVHE call trace ]---
-> >> [ 1406.522477] kvm [141]: Hyp Offset: 0xfffece8013600000
-> >> [ 1406.522554] Kernel panic - not syncing: HYP panic:
-> >> [ 1406.522554] PS:834003c9 PC:0000b1806db6d170 ESR:00000000f2000800
-> >> [ 1406.522554] FAR:ffff8000804be420 HPFAR:0000000000804be0 PAR:0000000000000000
-> >> [ 1406.522554] VCPU:0000000000000000
-> >> [ 1406.523337] CPU: 3 UID: 0 PID: 141 Comm: kvm-vcpu-0 Not tainted 6.16.0-rc7 #97 PREEMPT
-> >> [ 1406.523485] Hardware name: FVP Base RevC (DT)
-> >> [ 1406.523566] Call trace:
-> >> [ 1406.523629]  show_stack+0x18/0x24 (C)
-> >> [ 1406.523753]  dump_stack_lvl+0xd4/0x108
-> >> [ 1406.523899]  dump_stack+0x18/0x24
-> >> [ 1406.524040]  panic+0x3d8/0x448
-> >> [ 1406.524184]  nvhe_hyp_panic_handler+0x10c/0x23c
-> >> [ 1406.524325]  kvm_handle_guest_abort+0x68c/0x109c
-> >> [ 1406.524500]  handle_exit+0x60/0x17c
-> >> [ 1406.524630]  kvm_arch_vcpu_ioctl_run+0x2e0/0x8c0
-> >> [ 1406.524794]  kvm_vcpu_ioctl+0x1a8/0x9cc
-> >> [ 1406.524919]  __arm64_sys_ioctl+0xac/0x104
-> >> [ 1406.525067]  invoke_syscall+0x48/0x10c
-> >> [ 1406.525189]  el0_svc_common.constprop.0+0x40/0xe0
-> >> [ 1406.525322]  do_el0_svc+0x1c/0x28
-> >> [ 1406.525441]  el0_svc+0x38/0x120
-> >> [ 1406.525588]  el0t_64_sync_handler+0x10c/0x138
-> >> [ 1406.525750]  el0t_64_sync+0x1ac/0x1b0
-> >> [ 1406.525876] SMP: stopping secondary CPUs
-> >> [ 1406.525965] Kernel Offset: disabled
-> >> [ 1406.526032] CPU features: 0x0000,00000080,8e134ca1,9446773f
-> >> [ 1406.526130] Memory Limit: none
-> >> [ 1406.959099] ---[ end Kernel panic - not syncing: HYP panic:
-> >> [ 1406.959099] PS:834003c9 PC:0000b1806db6d170 ESR:00000000f2000800
-> >> [ 1406.959099] FAR:ffff8000804be420 HPFAR:0000000000804be0 PAR:0000000000000000
-> >> [ 1406.959099] VCPU:0000000000000000 ]
-> >>
-> >> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> >> Fixes: db14091d8f75 ("KVM: arm64: Stage-2 huge mappings for np-guests")
-> > 
-> > Not sure if it really matters but it's more about fixing f28f1d02f4ea (KVM: arm64: Add a range
-> > to __pkvm_host_unshare_guest()) which introduced the check size !=
-> > kvm_granule_size(). Even though this is noop until db14091d8f75
-> 
-> Happy to update the Fixes tag with whatever is required. I was in two
-> minds but opted for db14091d8f75 as that's where this starts to make a
-> functional difference.
+> [...]
 
-No need to resend, I've adjusted this locally.
+Applied to next, thanks!
 
-Thanks,
+[1/9] KVM: arm64: Add build-time check for duplicate DECLARE_REG use
+      commit: f9ac33e45d57bc4aa365363ffb650c830e5bb325
+[2/9] KVM: arm64: Rename pkvm.enabled to pkvm.is_protected
+      commit: 58dfb66b1e4cfb998db9e71437a2c0d9b83a93c0
+[3/9] KVM: arm64: Rename 'host_kvm' to 'kvm' in pKVM host code
+      commit: 604a5032b454bde03200d755f6ecc3f724511c6a
+[4/9] KVM: arm64: Clarify comments to distinguish pKVM mode from protected VMs
+      commit: 070362648f5f546018747a9a1857c1597594934e
+[5/9] KVM: arm64: Decouple hyp VM creation state from its handle
+      commit: 3c45b67625357ac680ee2508493b697cdcd78128
+[6/9] KVM: arm64: Separate allocation and insertion of pKVM VM table entries
+      commit: 1abc1ad52989fcc45a0de68bc49656d9fd0c2d74
+[7/9] KVM: arm64: Consolidate pKVM hypervisor VM initialization logic
+      commit: 814fd6beacf3c105ab8c8796be07d740952899fe
+[8/9] KVM: arm64: Introduce separate hypercalls for pKVM VM reservation and initialization
+      commit: 256b4668cd890b741c54f83dbbef76ba847c23be
+[9/9] KVM: arm64: Reserve pKVM handle during pkvm_init_host_vm()
+      commit: 07aeb70707b1d52968f4959a5dba321ea4219c8a
+
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
