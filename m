@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E9D2FFDCB;
-	Mon, 15 Sep 2025 11:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A432FD7CC;
+	Mon, 15 Sep 2025 11:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757936698; cv=none; b=fKAELzMhmUAFaNQwxseHiptgAouERlGk70vyi+SE0tj6azgtUdsY5bTTY4a3kCZDndSECLUlKFykwoW71AKBl9NJ4908DixMMA2hanc80a6CMtChIHZ2AqUs2d9mYTPVW6wwlGe+mLBmk7SUarE3bl6fvW/59yj3dcr6NhFDMIY=
+	t=1757936698; cv=none; b=HR0KwnzlQouEkzSzY9XQdNRed1auj1AMMo2zYgq0LTIJNEwNrbrrW3HRgk+Tp620TKD+Q1o6c5s1jUz6i06kg61NUc0Ms4Py+AS00eR/g4KYdhHiFGp+EedkcbhCl5bol5pjC54Wui7Xe3QYxR5WI23yd9ntMACNmAJuW3CS/GU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757936698; c=relaxed/simple;
-	bh=YGO8iofCD9Klx/7xoZBjB3a2UwUyHWW5VkjpdU6mkSo=;
+	bh=4f/7HgkGl2yRcs7jxujS6YOzH5ZV7Vwa6Ec9AEQf0UY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Kzx9WzUeAl6/dFBRacCqvpMXVURFVs7q0/clsEhqTXaciV59YdJrY3c+8vMDx4JhLVJXPqsuFonyHJ6YaVAtxGF6cgCxdTgIZ7x24qIR6M1ll2Qjv6HyVHgBcEEef3RnDoYB/mVqa8DkX38HGub4G1na18Zh4Pkcu+qW0DWIYdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGLKFNmr; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=nw1E0+Vc9ERvpmogsIhnIt9NdcO49yTpQXWj9bqgQuD0GNTR0pp3e1M2Ui3HI+1MJHf2G9sknqw5ToYbZmeggUYpjzNQgCJxz+qxr9TYLlSzhBR7mNj8zf97uJ7MQt6PjVw0ZRDn0A4P+d7Do3e1Lkxzo8DI3BnPi7rGjY2v2BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OkiYy8nA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGLKFNmr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4EB7C4CEF1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OkiYy8nA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6E75C4CEF7;
 	Mon, 15 Sep 2025 11:44:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1757936697;
-	bh=YGO8iofCD9Klx/7xoZBjB3a2UwUyHWW5VkjpdU6mkSo=;
+	bh=4f/7HgkGl2yRcs7jxujS6YOzH5ZV7Vwa6Ec9AEQf0UY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iGLKFNmrU69yTiktOfzRLU3kbWpFoVwhEwehBIh7gmmzau6EdVdpz9YxurBHkFDXh
-	 KwYCgSexf7eMPgGmHDZoomfXhFntmNnFbugCGZGJtQxwCOOeEiPzJ2xdBGgHBdCEY/
-	 z6Z9dSvtF92sLWsUZZsCb4CCCgrheQT4ha09MzMYuVHf3Ptp9C9cl5Q1COXsuybc8L
-	 0IvdKqIfVEqL4UshJb97iAhiCr2bDQ+r57eBOIF9hI/ZJvawp+NDsh7Ozfwf4gbfEQ
-	 Ue9I1b+f+OXVOw9XGbO+OUGEH/k0q21QY1ILGbL6B8z2943U4Xsu5LGDrKrtnMeUI/
-	 E4nfOAVXl2UUw==
+	b=OkiYy8nACq+xrwP199WRd9BlmSkZDJ+TyFZI75YSUqvwWD07073ZGIoJNSXtAgEUj
+	 5quJ+lBDneQdU7bU6NpGQ5OprxWE/O8JuagIGkzeTEoDgtc/SdHGDd0qeiYNTGOnz2
+	 Rx8FLWd9P1WBXD9AE67DEfPd03w/L0p7xQ7afmzXf0EHWqLv/5wAradSfo4Mm3F0j/
+	 zeKL2lYBkgGHHc1lfbQsQKeJhOhSmVJjbrYoKTaV6HKKfSHI7G4ZZP9DDe0+bV2p5x
+	 v8hWlrkg64Y9cGcg+uSM8EBW9jwSjQYw35CiQ8z5wgD2zqOUsESrkjRgNLMn1v/DSz
+	 6BjiRWKBBK+9Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uy7df-00000006MDw-2ygY;
-	Mon, 15 Sep 2025 11:44:55 +0000
+	id 1uy7dg-00000006MDw-0QrQ;
+	Mon, 15 Sep 2025 11:44:56 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 04/16] KVM: arm64: Decouple output address from the PT descriptor
-Date: Mon, 15 Sep 2025 12:44:39 +0100
-Message-Id: <20250915114451.660351-5-maz@kernel.org>
+Subject: [PATCH v2 06/16] KVM: arm64: Compute shareability for LPA2
+Date: Mon, 15 Sep 2025 12:44:41 +0100
+Message-Id: <20250915114451.660351-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250915114451.660351-1-maz@kernel.org>
 References: <20250915114451.660351-1-maz@kernel.org>
@@ -58,77 +58,119 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add a helper converting the descriptor into a nicely formed OA,
-irrespective of the in-descriptor representation (< 52bit, LPA
-or LPA2).
+LPA2 gets the memory access shareability from TCR_ELx instead of
+getting it form the descriptors. Store it in the walk info struct
+so that it is passed around and evaluated as required.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  1 +
+ arch/arm64/kvm/at.c                 | 37 +++++++++++++++++++++++------
+ 2 files changed, 31 insertions(+), 7 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 1a03095b03c5b..f3135ded47b7d 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -295,6 +295,7 @@ struct s1_walk_info {
+ 	unsigned int		pgshift;
+ 	unsigned int		txsz;
+ 	int 	     		sl;
++	u8			sh;
+ 	bool			as_el0;
+ 	bool	     		hpd;
+ 	bool			e0poe;
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index e02e467fc2ccd..bdb2c3e22f248 100644
+index acf6a5d497773..952c02c57d7dd 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -56,6 +56,29 @@ static bool has_52bit_pa(struct kvm_vcpu *vcpu, struct s1_walk_info *wi, u64 tcr
- 	return (tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS));
- }
- 
-+static u64 desc_to_oa(struct s1_walk_info *wi, u64 desc)
-+{
-+	u64 addr;
-+
-+	if (!wi->pa52bit)
-+		return desc & GENMASK_ULL(47, wi->pgshift);
-+
-+	switch (BIT(wi->pgshift)) {
-+	case SZ_4K:
-+	case SZ_16K:
-+		addr = desc & GENMASK_ULL(49, wi->pgshift);
-+		addr |= FIELD_GET(KVM_PTE_ADDR_51_50_LPA2, desc) << 50;
-+		break;
-+	case SZ_64K:
-+	default:	    /* IMPDEF: treat any other value as 64k */
-+		addr = desc & GENMASK_ULL(47, wi->pgshift);
-+		addr |= FIELD_GET(KVM_PTE_ADDR_51_48, desc) << 48;
-+		break;
-+	}
-+
-+	return addr;
-+}
-+
- /* Return the translation regime that applies to an AT instruction */
- static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 op)
- {
-@@ -402,7 +425,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 			wr->PXNTable |= FIELD_GET(PMD_TABLE_PXN, desc);
- 		}
- 
--		baddr = desc & GENMASK_ULL(47, wi->pgshift);
-+		baddr = desc_to_oa(wi, desc);
- 
- 		/* Check for out-of-range OA */
- 		if (check_output_size(baddr, wi))
-@@ -431,7 +454,8 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 			goto transfault;
- 	}
- 
--	if (check_output_size(desc & GENMASK(47, va_bottom), wi))
-+	baddr = desc_to_oa(wi, desc);
-+	if (check_output_size(baddr & GENMASK(52, va_bottom), wi))
+@@ -188,6 +188,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	if (!tbi && (u64)sign_extend64(va, 55) != va)
  		goto addrsz;
  
- 	if (!(desc & PTE_AF)) {
-@@ -444,7 +468,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 	wr->failed = false;
- 	wr->level = level;
- 	wr->desc = desc;
--	wr->pa = desc & GENMASK(47, va_bottom);
-+	wr->pa = baddr & GENMASK(52, va_bottom);
- 	wr->pa |= va & GENMASK_ULL(va_bottom - 1, 0);
++	wi->sh = (wi->regime == TR_EL2 ?
++		  FIELD_GET(TCR_EL2_SH0_MASK, tcr) :
++		  (va55 ?
++		   FIELD_GET(TCR_SH1_MASK, tcr) :
++		   FIELD_GET(TCR_SH0_MASK, tcr)));
++
+ 	va = (u64)sign_extend64(va, 55);
  
- 	wr->nG = (wi->regime != TR_EL2) && (desc & PTE_NG);
+ 	/* Let's put the MMU disabled case aside immediately */
+@@ -697,21 +703,36 @@ static u8 combine_s1_s2_attr(u8 s1, u8 s2)
+ #define ATTR_OSH	0b10
+ #define ATTR_ISH	0b11
+ 
+-static u8 compute_sh(u8 attr, u64 desc)
++static u8 compute_final_sh(u8 attr, u8 sh)
+ {
+-	u8 sh;
+-
+ 	/* Any form of device, as well as NC has SH[1:0]=0b10 */
+ 	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
+ 		return ATTR_OSH;
+ 
+-	sh = FIELD_GET(PTE_SHARED, desc);
+ 	if (sh == ATTR_RSV)		/* Reserved, mapped to NSH */
+ 		sh = ATTR_NSH;
+ 
+ 	return sh;
+ }
+ 
++static u8 compute_s1_sh(struct s1_walk_info *wi, struct s1_walk_result *wr,
++			u8 attr)
++{
++	u8 sh;
++
++	/*
++	 * non-52bit and LPA have their basic shareability described in the
++	 * descriptor. LPA2 gets it from the corresponding field in TCR,
++	 * conveniently recorded in the walk info.
++	 */
++	if (!wi->pa52bit || BIT(wi->pgshift) == SZ_64K)
++		sh = FIELD_GET(PTE_SHARED, wr->desc);
++	else
++		sh = wi->sh;
++
++	return compute_final_sh(attr, sh);
++}
++
+ static u8 combine_sh(u8 s1_sh, u8 s2_sh)
+ {
+ 	if (s1_sh == ATTR_OSH || s2_sh == ATTR_OSH)
+@@ -725,7 +746,7 @@ static u8 combine_sh(u8 s1_sh, u8 s2_sh)
+ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+ 			   struct kvm_s2_trans *tr)
+ {
+-	u8 s1_parattr, s2_memattr, final_attr;
++	u8 s1_parattr, s2_memattr, final_attr, s2_sh;
+ 	u64 par;
+ 
+ 	/* If S2 has failed to translate, report the damage */
+@@ -798,11 +819,13 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+ 	    !MEMATTR_IS_DEVICE(final_attr))
+ 		final_attr = MEMATTR(NC, NC);
+ 
++	s2_sh = FIELD_GET(PTE_SHARED, tr->desc);
++
+ 	par  = FIELD_PREP(SYS_PAR_EL1_ATTR, final_attr);
+ 	par |= tr->output & GENMASK(47, 12);
+ 	par |= FIELD_PREP(SYS_PAR_EL1_SH,
+ 			  combine_sh(FIELD_GET(SYS_PAR_EL1_SH, s1_par),
+-				     compute_sh(final_attr, tr->desc)));
++				     compute_final_sh(final_attr, s2_sh)));
+ 
+ 	return par;
+ }
+@@ -856,7 +879,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		par |= FIELD_PREP(SYS_PAR_EL1_ATTR, mair);
+ 		par |= wr->pa & GENMASK_ULL(47, 12);
+ 
+-		sh = compute_sh(mair, wr->desc);
++		sh = compute_s1_sh(wi, wr, mair);
+ 		par |= FIELD_PREP(SYS_PAR_EL1_SH, sh);
+ 	}
+ 
 -- 
 2.39.2
 
