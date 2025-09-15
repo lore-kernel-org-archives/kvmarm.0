@@ -1,64 +1,65 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEF42C0F8C
-	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 21:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952462C11D1
+	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 21:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757973292; cv=none; b=OSTzBYa4c7vbMVKpjEHIsHWs6px9H5/ohRavtZd3DRPdm8gf1L9Vrb2JFV8zPLUzqKkPxNuC231wYYz4lL4PhLGSKsy7HZ5C6utHPdPZHRkDEJ8WwccbTTuowt3aOZ/KpDyXf2/xX5msB6FwNZIbaIlXWWAvXekpczvfs0rEeZQ=
+	t=1757973295; cv=none; b=GydTHTfxP6yM2gJfSa3lsxOQ8JWmgG/WDJ57ivO6/dnReEAmlXu49m/+VzolOiD+kIawtf35UIsf25nMe2rArcFo5XKEuj38cevkBt1gOWyqnkiQFiun0mZAbIr8BVOKFs36jHpzcOc0Afxvv7pATtTqwYYo8oG2/kjoV9EUw7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757973292; c=relaxed/simple;
-	bh=Bk5KjA4JdS/NCumF4B+M4o8ki0+1/OPy8Zsgtq0+E5E=;
+	s=arc-20240116; t=1757973295; c=relaxed/simple;
+	bh=V74ryi50fllprQ+sbnAnYVxeP6t7/qch9aRTHY0lIig=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=px5LvL+H7PpZ7F1MiFJDyw0tgmeMOyBRQFRxrBVM6qQWtTLKauAAHduEGMzQSE3tRfqSi6tfIey5onZCFaFjRgkqnnKXsSMKL2HBwra7Cwl8eTGWU66G0LZTRPXBOG14lKOnbD8kW9eRGiNov0fnRV7M4RtCOsxMFxA2rSURpgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Nhtf8r8c; arc=none smtp.client-ip=209.85.219.45
+	 MIME-Version; b=dwI4kb8POxXgmExj8VarFoUOt3ourjxveaN3vqhou02e8a7TAgdRfAaCNTJIR7QgzSpzUyBo25etk60Y17opz68/GYsW5ISQ2PwEpxZQs6lVxolbrOxRAwWFyiQ8aw9Jcg9B/pRpRRs7SYSdq4rw5VIwGKYCZqjck9e7JelvF5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=oUF2PJab; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Nhtf8r8c"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-7814871b581so13028416d6.2
-        for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 14:54:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="oUF2PJab"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-76b8fd4ba2cso28190336d6.3
+        for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 14:54:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1757973290; x=1758578090; darn=lists.linux.dev;
+        d=grsecurity.net; s=grsec; t=1757973292; x=1758578092; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V1Wf1YB0SsfvRNrXE8RjpeDW1RLS6E9uJSM4diZKivw=;
-        b=Nhtf8r8cGGi3Oxg95GYyPADvV2D8RYKFA7IGRUh4wOUceh+d2jW+N4Ep1miq6f0cPz
-         8Kt77O/e9P8qvkqcZrRdNBr8DHVBm9eHjSpCZz2qGkKNiGMU6jLWMc/HX2n34oxc71u3
-         SZg2JE6aMEFMnG7kkJBS//tP63FZYczI2/QaZK++5Yfj0O7Ops59f8sE7fsPHW0oEAN1
-         bhZqXrzuA2MePtz40rx0uDOBV5SfXm+syeAIeKVlR2v1ell9Z4+MEe/cRmKmP6FBuuJm
-         kw/+pdMeKj1GMBt9WBh/DDZ34kUGZ5wio2q53SRyeAk5s8vHtRRFrSLIxxu37JzAlKeF
-         zrww==
+        bh=uS1hCbLa4Et7x6l9f592uuKlwLa7KX/sJXToAiHGN0g=;
+        b=oUF2PJab9JFFVA07D9XMKELAQKj+8i0ulR1XVb/vG8xYDYQSvpJEoQ4oUMFSSXW5Q6
+         2ZKWIQaqhOrj+61J5OFfyy+fyeojC7S59SiSaPMeWKfmNd9OHCpW8+VFqDMfwzCiu/Db
+         QRZrawcoYWcx4U5V0mQc00Vpt4eEBYcoSOxxI6JSy4Ug44aiHrjGUpYgs3+m0hHKFbSB
+         JZQS55tBUaMEP/sHcM3rxFafROyFyKbntJzJWAQL1PFI9BfzGEAJvEYv+l34bb2KCgs7
+         3LNMhKb1jfbx1J8nXt1WnWNs8uE8cYnbq9/0nM4qSAGZExFsOs7eSdg3cSUobNrSPlFH
+         +sjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757973290; x=1758578090;
+        d=1e100.net; s=20230601; t=1757973292; x=1758578092;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V1Wf1YB0SsfvRNrXE8RjpeDW1RLS6E9uJSM4diZKivw=;
-        b=Q9Un9fs4EMWBigcYMvtM5reIkLWG6rKPtqJKAFHT4k1KBvmWP0gx7knlW++Hjzn13H
-         ziopoeaeeA8k14Dso3Ew+7UQgtmBuNFhSZ8sDw9PNyVd//lwmxgnxvs5JSo3E3Vu8WHG
-         Q/6x2hBTlLlguTQKsF6C/tEfCXU0YN0x9EYOskqGxQtuwbbKBNzgt/De2/LWP36RSLU2
-         /JChtSLFdHQ72ngY/h1FjgbRtjsquRKaub6gCu9CnCDyURHFP9gneMBcViTXe2UFVw36
-         MFgBXducFfa3YbXOzP6RUaJy2EmFOF7l+ESw9pnquur2ZKIT6Wm4sP3eXtYJ53sIYDh8
-         4BVw==
-X-Forwarded-Encrypted: i=1; AJvYcCXA8PZIJ0RVg3CDjay1T8ZZ8yiZj+x/5E3r4WXcc4C4YABpvsN3iz4VbUyjiH/zBNYJLMOMdtc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyrsO/QBiol1L359Jcz4E7FqkTyV6wptV0QjbiicS9003Rm/Hbd
-	UlVUJh+mzXcLSCLEeT2iVTZ7R9udpo1bZMQVlgXiXLrOnggSDwamZJ4DN99dYpaD6VI=
-X-Gm-Gg: ASbGncsqXS6UflmX9jy5bNrB0JZDzc5Y+p5Ht2xuCmas3qAlvYE+a1+6QVmZaxiTzmY
-	dqPatMOjsNHZiiOwIHOX0gzZEiXk6Ihh1R7KXVufPTH+OOa3jYW2RyHemXrDVA+zPzLWhAhGjtq
-	uD1R2AfI1ZeXRluMWCTUIiCa3x/IqbNOjxcHjfrqXGDshnNufwnNtEWEnw21hnpm892ILnEjw4+
-	cNg2Q/zaoMm7nvd5iF2hyUOxZJ6AVn7abkzN32sGQXgHL0v5dtTO/c/j0xMgM27k6caD2Zz59aK
-	At4yQfx8dnz3V/+WujG5tEZ4CcdP6rbOXZBUbSGiaAjyEGWeVARNDlcU7jva50N4K4kdl0yh4fl
-	IVEJFKDMppTFPAEOuKU4ohd0QIJ9ICKvAFdW/odV3Cnc/7+1Rv/pBJJ/Fea32CQsK1ucDg6HLf6
-	RmGwBHzZZbZFynPxP9RJXJ3LrAFSsO
-X-Google-Smtp-Source: AGHT+IEJAtu0zt8kOgDGhE3gvqekHDqO6GH/t48ORW60nfsydMY5t/sT9Xnm7A1gzaPfgepEiGjW1g==
-X-Received: by 2002:a05:6214:21e2:b0:740:fffe:c0e5 with SMTP id 6a1803df08f44-767c3a5483amr201042416d6.50.1757973289714;
-        Mon, 15 Sep 2025 14:54:49 -0700 (PDT)
+        bh=uS1hCbLa4Et7x6l9f592uuKlwLa7KX/sJXToAiHGN0g=;
+        b=KhaM7LUSKZZFuAadoDWG5hvSW4KwX3nhXN7DfmUZ/162OTNH3GX/sGghF6F0OrhppE
+         DVE/cO97Pb95pPUX9WFVlWvmx+7yMgYc3FE3J88TMyKYWCcSv2MXVtQ5KKYg8KCTZUi0
+         fzoZawE7wSrVm4pRRmk1LpyGlPXLdVEXvyOZdpbUEU3dj8bDY8+AYY8bxRew6zNwFocJ
+         4I3OFAXqd3oVcIHSrokNZ1mShKQQcgUm6e6bfXxX0v4SdyS7CkPP8q4WZx/mNaJd65ki
+         bMJs73Y1t/xKXt7GiZoIViLU7EXECfak5fcE7xUMcuRyOMk3vWnv7xOKcSwmRUEEOonJ
+         S2Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCUH+zfSMzKuZRxi1SmophAd/PsgDkY3U2lyza8g6SaAP7ex8NdANR2og40TfVUUJo+1MPd9FBk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyKKbdqTEXwW9fTsulfSPm+yqZZdT42gJP+PDHTWc6rk+JX+4Cf
+	V0FBdBj4aWQRgUWBqvJj4WA7DqelITLrYR9eOia8zykOwDJDa0JH6TQS4B3FIuSk5NYai0HcOBA
+	6+zlK
+X-Gm-Gg: ASbGncuqSTyWW7l0z2O9ztstYb2kqN0asMhhZETG1phDF9ngHIck03ZytjMZIDrRX6P
+	lirCxBW8TGjs/piNwb/Ups6naAqKN0ee8M83pB3Pzvn/6HfDmtOboQLx2N9dpECLbs8R1uA0g1z
+	rSvLQ5XuBlBgsTXaIEbDcd247ABX4fI8w+kC0WVRmvdPtxRn6rupFjt3hEGd03TsAaJYwcZzzjr
+	cWkCRSPs7YxF36lU1s4+FQg1CSwYiN6AsDnnm7ClzQ2bCQx1i321119yvRhQvEmhemLOgYhJUOw
+	mPKBozDyu0KOhI0eV0aogKHBBLZZYCs0bEe12I58M8jE8drW3o2AhjQeZuz96lD/h8Q+o/YsjfI
+	Hl+Qsa7SLbxOh7Lz97xdGAzL2odsNh1srs9Aj2jrmRbeO7v4xV4hh71dWQJeLe2CW3LOWBCqGll
+	KjBiOgbMZr30x+PdKktA==
+X-Google-Smtp-Source: AGHT+IGV5e0judTPviZfC121RGuql1NEb4uEFiPSK4CkEMEQ03cwtJ5PHz8OZy22/jFB8T1ux5L+WA==
+X-Received: by 2002:a05:6214:20a5:b0:72a:d613:317e with SMTP id 6a1803df08f44-767c46cdaf2mr171830896d6.53.1757973292430;
+        Mon, 15 Sep 2025 14:54:52 -0700 (PDT)
 Received: from bell.fritz.box (p200300faaf00da008e63e663d61a1504.dip0.t-ipconnect.de. [2003:fa:af00:da00:8e63:e663:d61a:1504])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-783edc88db3sm25104796d6.66.2025.09.15.14.54.47
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-783edc88db3sm25104796d6.66.2025.09.15.14.54.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 14:54:49 -0700 (PDT)
+        Mon, 15 Sep 2025 14:54:52 -0700 (PDT)
 From: Mathias Krause <minipli@grsecurity.net>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -68,9 +69,9 @@ To: Andrew Jones <andrew.jones@linux.dev>,
 Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 1/4] Makefile: Provide a concept of late CFLAGS
-Date: Mon, 15 Sep 2025 23:54:29 +0200
-Message-ID: <20250915215432.362444-2-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 2/4] x86: Better backtraces for leaf functions
+Date: Mon, 15 Sep 2025 23:54:30 +0200
+Message-ID: <20250915215432.362444-3-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250915215432.362444-1-minipli@grsecurity.net>
 References: <20250915215432.362444-1-minipli@grsecurity.net>
@@ -82,36 +83,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow architectures to provide CFLAGS that should be added only after
-all other optional CFLAGS have been evaluated.
+Leaf functions are problematic for backtraces as they lack the frame
+pointer setup epilogue. If such a function causes a fault, the original
+caller won't be part of the backtrace. That's problematic if, for
+example, memcpy() is failing because it got passed a bad pointer. The
+generated backtrace will look like this, providing no clue what the
+issue may be:
 
-This will be useful for flags that depend on other, generic ones.
+	STACK: @401b31 4001ad
+  0x0000000000401b31: memcpy at lib/string.c:136 (discriminator 3)
+        	for (i = 0; i < n; ++i)
+      > 		a[i] = b[i];
 
-To allow 'LATE_CFLAGS' to make use of the $(cc-option ...) helper,
-assume it'll be a lazily evaluated variable. To further ensure the
-$(cc-option ...) compiler invocation overhead won't be per-use of
-$(CFLAGS), enforce its evaluation prior to extending CFLAGS.
+  0x00000000004001ac: gdt32_end at x86/cstart64.S:127
+        	lea __environ(%rip), %rdx
+      > 	call main
+        	mov %eax, %edi
+
+By abusing profiling, we can force the compiler to emit a frame pointer
+setup epilogue even for leaf functions, making the above backtrace
+change like this:
+
+	STACK: @401c21 400512 4001ad
+  0x0000000000401c21: memcpy at lib/string.c:136 (discriminator 3)
+        	for (i = 0; i < n; ++i)
+      > 		a[i] = b[i];
+
+  0x0000000000400511: main at x86/hypercall.c:91 (discriminator 24)
+
+      > 	memcpy((void *)~0xbadc0de, (void *)0xdeadbeef, 42);
+
+  0x00000000004001ac: gdt32_end at x86/cstart64.S:127
+        	lea __environ(%rip), %rdx
+      > 	call main
+        	mov %eax, %edi
+
+Above backtrace includes the failing memcpy() call, making it much
+easier to spot the bug.
+
+Enable "fake profiling" if supported by the compiler to get better
+backtraces. The runtime overhead should be negligible for the gained
+debugability as the profiling call is actually a NOP.
 
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
- Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
+One may argure that the "ifneq ($(KEEP_FRAME_POINTER),) ... endif"
+wrapping isn't needed, and that's true. However, it simplifies toggling
+that variable, if there'll ever be a need for it.
 
-diff --git a/Makefile b/Makefile
-index 9dc5d2234e2a..0ce0813bf124 100644
---- a/Makefile
-+++ b/Makefile
-@@ -95,6 +95,10 @@ CFLAGS += $(wmissing_parameter_type)
- CFLAGS += $(wold_style_declaration)
- CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+ x86/Makefile.common | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index 5663a65d3df4..be18a77a779e 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -43,6 +43,17 @@ COMMON_CFLAGS += -O1
+ # stack.o relies on frame pointers.
+ KEEP_FRAME_POINTER := y
  
-+# Evaluate and add late cflags last -- they may depend on previous flags
-+LATE_CFLAGS := $(LATE_CFLAGS)
-+CFLAGS += $(LATE_CFLAGS)
++ifneq ($(KEEP_FRAME_POINTER),)
++# Fake profiling to force the compiler to emit a frame pointer setup also in
++# leaf function (-mno-omit-leaf-frame-pointer doesn't work, unfortunately).
++#
++# Note:
++# We need to defer the cc-option test until -fno-pic or -no-pie have been
++# added to CFLAGS as -mnop-mcount needs it. The lazy evaluation of CFLAGS
++# during compilation makes this do "The Right Thing."
++LATE_CFLAGS += $(call cc-option, -pg -mnop-mcount, "")
++endif
 +
- autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
+ FLATLIBS = lib/libcflat.a
  
- LDFLAGS += -nostdlib $(no_pie) -z noexecstack
+ ifeq ($(CONFIG_EFI),y)
 -- 
 2.47.3
 
