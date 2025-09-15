@@ -1,62 +1,64 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCF92C0280
-	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 21:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEF42C0F8C
+	for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 21:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757973290; cv=none; b=gnooOqYZjKpCk1xhpw5ufAwJxwMui/5YnpXEQf7hMHUhdkIr1tqRaEoXMDNkjpQtl97i1N/NPVoYp05pLyUTvnZixxjj6ls2EBAzjMLLFqHJ3P1qUNGMWhCHcUp+NXkryVPrxMJvyaKkmcaRQ2U+BwLSYsOGpXeKHQcRI0mfhbM=
+	t=1757973292; cv=none; b=OSTzBYa4c7vbMVKpjEHIsHWs6px9H5/ohRavtZd3DRPdm8gf1L9Vrb2JFV8zPLUzqKkPxNuC231wYYz4lL4PhLGSKsy7HZ5C6utHPdPZHRkDEJ8WwccbTTuowt3aOZ/KpDyXf2/xX5msB6FwNZIbaIlXWWAvXekpczvfs0rEeZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757973290; c=relaxed/simple;
-	bh=BqECl176v/Gtm4B/mzO5FafL5ayJtu8vuAS8DstIHt0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gmzhHyKhWyi7e19FyWxZ4r4ZXkc5Lzhjgjq99gbohUhz6kQArs54VqLFfae/yOUfgEsHyOIPP+wc514tKlN8rdpD+TT3shQNK0WvK+4rLtg/YgEtMp+SMVHQxOh3Cnf93QJ2wm0xBfqr6HrBzW9xvBgEkTMrpqh4oJcxdNi6XLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=RxGN44cv; arc=none smtp.client-ip=209.85.222.178
+	s=arc-20240116; t=1757973292; c=relaxed/simple;
+	bh=Bk5KjA4JdS/NCumF4B+M4o8ki0+1/OPy8Zsgtq0+E5E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=px5LvL+H7PpZ7F1MiFJDyw0tgmeMOyBRQFRxrBVM6qQWtTLKauAAHduEGMzQSE3tRfqSi6tfIey5onZCFaFjRgkqnnKXsSMKL2HBwra7Cwl8eTGWU66G0LZTRPXBOG14lKOnbD8kW9eRGiNov0fnRV7M4RtCOsxMFxA2rSURpgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Nhtf8r8c; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="RxGN44cv"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-827ec18434aso238392685a.0
-        for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 14:54:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Nhtf8r8c"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-7814871b581so13028416d6.2
+        for <kvmarm@lists.linux.dev>; Mon, 15 Sep 2025 14:54:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1757973287; x=1758578087; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ombFoMObEj+Bm9MTRqLdHT2Je2br1eQyhTzkCsJmqpw=;
-        b=RxGN44cvdwx/B/Yx1+tR3lfXtVfDrweloBv95caGn8AZm/Z46s8lQiPDgqAat9F7aC
-         PRdeCSD7Dd087dCHuGPUomrAV5orX54t9JT19e3DfRL7U8ZFcUiiQPFpMb10REwX3pAF
-         tTSaUuM7BhkbGQBJPnSgper5s+t0bJFZ52QZytHb5wqO2EAlHgU+PFR93/rxMVTdajey
-         5fh/D0pmJjPCOhes3qtmp1/N5yWGiO/zQyL5HvcV8sY0MDw0Eeb5V52e02uEICds0SVm
-         E/5EGTYXkEOqmccOmd+ciaO0vp+E/EqN8K59lYjQRK+SdTOm8iz7oQdrqq0CAmDdPYoI
-         P6Tw==
+        d=grsecurity.net; s=grsec; t=1757973290; x=1758578090; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V1Wf1YB0SsfvRNrXE8RjpeDW1RLS6E9uJSM4diZKivw=;
+        b=Nhtf8r8cGGi3Oxg95GYyPADvV2D8RYKFA7IGRUh4wOUceh+d2jW+N4Ep1miq6f0cPz
+         8Kt77O/e9P8qvkqcZrRdNBr8DHVBm9eHjSpCZz2qGkKNiGMU6jLWMc/HX2n34oxc71u3
+         SZg2JE6aMEFMnG7kkJBS//tP63FZYczI2/QaZK++5Yfj0O7Ops59f8sE7fsPHW0oEAN1
+         bhZqXrzuA2MePtz40rx0uDOBV5SfXm+syeAIeKVlR2v1ell9Z4+MEe/cRmKmP6FBuuJm
+         kw/+pdMeKj1GMBt9WBh/DDZ34kUGZ5wio2q53SRyeAk5s8vHtRRFrSLIxxu37JzAlKeF
+         zrww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757973287; x=1758578087;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ombFoMObEj+Bm9MTRqLdHT2Je2br1eQyhTzkCsJmqpw=;
-        b=qDpjH1hYJuOWToGDwQa3zpbQgIwBbiZHwADPHDAOyBwOE2ua1I4GseFDcyca3TZC+H
-         w3zXz0HIR3D1fNliTe9KAWWrjlNg4nYfOl+K630VCF5uxGP73263MkprG9vNrjBUPTE3
-         8COugrwT5HH+z6MeFedJBDtZPvOaPxKRBMaa23TLwbEA7jWXWkWvPv8Ta8LbFv+bL4wL
-         v2pnqoI12r5xBhuU+zM3KVrf+F6PF0hlKRru7SjEsNcdSwNGHKNbFXYGyLiL9du4hCBN
-         +16XCLeU7TU3urPjWGRQWv9eGot2oX/I1da5QNCHQGVg2QbGfffWUqfxfZsvNCP+MsfU
-         fX0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVccCsZvPKWa41VfzF8F8QCmFtFHZnGy5L+UaLO6bYgCHrlzmSmtFXeO7RZh8YiIPiuaCh22Sc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzLIS45hdUUGLzBGJmWuSPUROUtgaUT2YkhapDUUFe83qTt9oUZ
-	nkczt8kDa3PWP/njbO6HMNaEYW8hXcF+HHqPl66lDs1NPYdWo50R2lJVsKEzFjgjIOM=
-X-Gm-Gg: ASbGnculuR1Ph7h5sRxG4ZyoZiwtZWlycSF8DpK6zmWmiy5jFg1z0eZqVQrCd5WlsBY
-	r0nJCqZq4Pai9BwS+IiLPZmxfIJDie95CbQCMbB6O9ch5iPsLywp+fJz2ogMFUKkJ6KlbDYWA36
-	RBn6SEzXRzh2EdlgHz14XZKmhYr79LxNNxw4WSohE79uNGMkDQwRaLJHob4a7J3YyGwncQzSBLa
-	2n6EEgObl/UvT7BS3VtsK1kgVe/o6XV2CvioyhMrucW4ELAfe7C3oMNzEclkpzpeOYhSWfEN8Gl
-	5GuoktsHST94uQc2wIOSYj9VcqeidZdVI/GSgm2wva3tsZciptPDwVuP8saQhHLbMNlim1feyix
-	BwYmkOnP96hUMdBkWUUTWtta4UanQTciL+1AzaVCdhJtdJNgPjNer5cu8MwgyM2Fqrw+i/YXpLI
-	9nx4hFPXYSnmzPv9KLyw==
-X-Google-Smtp-Source: AGHT+IEuqGdoGYF5m+yzcc+prlAqTqhfn1vJxl4k2UEJlpzW4xTYt2Bva1hztcSng6jqi/2eVt6xsQ==
-X-Received: by 2002:a05:620a:319a:b0:7e7:fc32:f07f with SMTP id af79cd13be357-823fd4191fbmr1919575285a.22.1757973287213;
-        Mon, 15 Sep 2025 14:54:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757973290; x=1758578090;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V1Wf1YB0SsfvRNrXE8RjpeDW1RLS6E9uJSM4diZKivw=;
+        b=Q9Un9fs4EMWBigcYMvtM5reIkLWG6rKPtqJKAFHT4k1KBvmWP0gx7knlW++Hjzn13H
+         ziopoeaeeA8k14Dso3Ew+7UQgtmBuNFhSZ8sDw9PNyVd//lwmxgnxvs5JSo3E3Vu8WHG
+         Q/6x2hBTlLlguTQKsF6C/tEfCXU0YN0x9EYOskqGxQtuwbbKBNzgt/De2/LWP36RSLU2
+         /JChtSLFdHQ72ngY/h1FjgbRtjsquRKaub6gCu9CnCDyURHFP9gneMBcViTXe2UFVw36
+         MFgBXducFfa3YbXOzP6RUaJy2EmFOF7l+ESw9pnquur2ZKIT6Wm4sP3eXtYJ53sIYDh8
+         4BVw==
+X-Forwarded-Encrypted: i=1; AJvYcCXA8PZIJ0RVg3CDjay1T8ZZ8yiZj+x/5E3r4WXcc4C4YABpvsN3iz4VbUyjiH/zBNYJLMOMdtc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyrsO/QBiol1L359Jcz4E7FqkTyV6wptV0QjbiicS9003Rm/Hbd
+	UlVUJh+mzXcLSCLEeT2iVTZ7R9udpo1bZMQVlgXiXLrOnggSDwamZJ4DN99dYpaD6VI=
+X-Gm-Gg: ASbGncsqXS6UflmX9jy5bNrB0JZDzc5Y+p5Ht2xuCmas3qAlvYE+a1+6QVmZaxiTzmY
+	dqPatMOjsNHZiiOwIHOX0gzZEiXk6Ihh1R7KXVufPTH+OOa3jYW2RyHemXrDVA+zPzLWhAhGjtq
+	uD1R2AfI1ZeXRluMWCTUIiCa3x/IqbNOjxcHjfrqXGDshnNufwnNtEWEnw21hnpm892ILnEjw4+
+	cNg2Q/zaoMm7nvd5iF2hyUOxZJ6AVn7abkzN32sGQXgHL0v5dtTO/c/j0xMgM27k6caD2Zz59aK
+	At4yQfx8dnz3V/+WujG5tEZ4CcdP6rbOXZBUbSGiaAjyEGWeVARNDlcU7jva50N4K4kdl0yh4fl
+	IVEJFKDMppTFPAEOuKU4ohd0QIJ9ICKvAFdW/odV3Cnc/7+1Rv/pBJJ/Fea32CQsK1ucDg6HLf6
+	RmGwBHzZZbZFynPxP9RJXJ3LrAFSsO
+X-Google-Smtp-Source: AGHT+IEJAtu0zt8kOgDGhE3gvqekHDqO6GH/t48ORW60nfsydMY5t/sT9Xnm7A1gzaPfgepEiGjW1g==
+X-Received: by 2002:a05:6214:21e2:b0:740:fffe:c0e5 with SMTP id 6a1803df08f44-767c3a5483amr201042416d6.50.1757973289714;
+        Mon, 15 Sep 2025 14:54:49 -0700 (PDT)
 Received: from bell.fritz.box (p200300faaf00da008e63e663d61a1504.dip0.t-ipconnect.de. [2003:fa:af00:da00:8e63:e663:d61a:1504])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-783edc88db3sm25104796d6.66.2025.09.15.14.54.44
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-783edc88db3sm25104796d6.66.2025.09.15.14.54.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 14:54:46 -0700 (PDT)
+        Mon, 15 Sep 2025 14:54:49 -0700 (PDT)
 From: Mathias Krause <minipli@grsecurity.net>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -66,10 +68,12 @@ To: Andrew Jones <andrew.jones@linux.dev>,
 Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf functions
-Date: Mon, 15 Sep 2025 23:54:28 +0200
-Message-ID: <20250915215432.362444-1-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 1/4] Makefile: Provide a concept of late CFLAGS
+Date: Mon, 15 Sep 2025 23:54:29 +0200
+Message-ID: <20250915215432.362444-2-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250915215432.362444-1-minipli@grsecurity.net>
+References: <20250915215432.362444-1-minipli@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,38 +82,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is v2 of [1], trying to enhance backtraces involving leaf
-functions.
+Allow architectures to provide CFLAGS that should be added only after
+all other optional CFLAGS have been evaluated.
 
-This version fixes backtraces on ARM and ARM64 as well, as ARM currently
-fails hard for leaf functions lacking a proper stack frame setup, making
-it dereference invalid pointers. ARM64 just skips frames, much like x86
-does.
+This will be useful for flags that depend on other, generic ones.
 
-v2 fixes this by introducing the concept of "late CFLAGS" that get
-evaluated in the top-level Makefile once all other optional flags have
-been added to $(CFLAGS), which is needed for x86's version at least.
+To allow 'LATE_CFLAGS' to make use of the $(cc-option ...) helper,
+assume it'll be a lazily evaluated variable. To further ensure the
+$(cc-option ...) compiler invocation overhead won't be per-use of
+$(CFLAGS), enforce its evaluation prior to extending CFLAGS.
 
-Please apply!
+Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+---
+ Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Thanks,
-Mathias
-
-[1] https://lore.kernel.org/kvm/20250724181759.1974692-1-minipli@grsecurity.net/
-
-Mathias Krause (4):
-  Makefile: Provide a concept of late CFLAGS
-  x86: Better backtraces for leaf functions
-  arm64: Better backtraces for leaf functions
-  arm: Fix backtraces involving leaf functions
-
- Makefile            |  4 ++++
- arm/Makefile.arm    |  8 ++++++++
- arm/Makefile.arm64  |  6 ++++++
- x86/Makefile.common | 11 +++++++++++
- lib/arm/stack.c     | 18 ++++++++++++++++--
- 5 files changed, 45 insertions(+), 2 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index 9dc5d2234e2a..0ce0813bf124 100644
+--- a/Makefile
++++ b/Makefile
+@@ -95,6 +95,10 @@ CFLAGS += $(wmissing_parameter_type)
+ CFLAGS += $(wold_style_declaration)
+ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+ 
++# Evaluate and add late cflags last -- they may depend on previous flags
++LATE_CFLAGS := $(LATE_CFLAGS)
++CFLAGS += $(LATE_CFLAGS)
++
+ autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
+ 
+ LDFLAGS += -nostdlib $(no_pie) -z noexecstack
 -- 
 2.47.3
 
