@@ -1,51 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771923019D2;
-	Tue, 16 Sep 2025 10:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E37306B15
+	for <kvmarm@lists.linux.dev>; Tue, 16 Sep 2025 11:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758017788; cv=none; b=AVMSiINgkOKdUsxYwxugoFqZPoitoIgs3Yuyey0Muq3njDzDmys78saAIMz8S86KKNcH9M8NK6a6K2VCMUIng4vj3Ylkq16jOFFYJl8ZM/gYz4qSwT40lB+iUVZD4Gijy5lcG20Lxsc98XliFIinswZ1UzZm0E3iUrENkAHJOOo=
+	t=1758023826; cv=none; b=YShSYctIwPzNKm9YCna55LzKfRa2DkQq4eWBRuDhCDfjDz9b4E0Ys3YUWAPzL9BOxboFkf7plZln/mxDjLB7RyvVGGUfz7AkptgaqCAFueJFGz/PQJNHhT700rYDgOyBN2svLCsNUIdBVQ7BLJ+T6KmRpJ4KbGNN8cmDYaEgCuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758017788; c=relaxed/simple;
-	bh=WnhgxGMR7wJ9/CFjtwaKsCL8RypUwh3juwnR8dXWu2s=;
+	s=arc-20240116; t=1758023826; c=relaxed/simple;
+	bh=DhwkCUF4dudkXP7+wY51z+786KhHrdUbmAB0Gd0fdow=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WxcFsRhbEtj3IYKcD5dWMhUe0pHnkS+LB5ki5iJdhGblwtsME+C/DCO/cEygnPlLB/Dy5wuiQh/oFNoKld3BQTpQmql0/nLbmqs0gclsBpg30ZMGft9tX3DWNRK0rwLSvuVFG6Zs+M28y8mawmMVXLTiAV6/pUum0z5ou7veVz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dH5md1Y+; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gf0+FFfyNVV3MAJWEylHL5vX9/7W+oQ0/UlypkU/+rLWhxFXh9IJYbJWXSyn1LqqbVnFfnvRYINWab2Adq8xlo7NxCBbg4TT2UNRu6NJzc1ELYxO/4kphfSI6f+mwOh2x0TN0fmIqy57xca5Mz/bfo4gMrlPWXb/iMGZvmKEOlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KPiZdEaE; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dH5md1Y+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40D2BC4CEEB;
-	Tue, 16 Sep 2025 10:16:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758017787;
-	bh=WnhgxGMR7wJ9/CFjtwaKsCL8RypUwh3juwnR8dXWu2s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dH5md1Y+HyrlWy7S+14VcOF8a9xKs+sWic8b1RoHGMfHcn3lMhEzwW/LGoK/j/wo4
-	 QYrDYop0aEPUCZpiD47VNWY7FxIxoR8b0SYND55zDBX+AsbJnKjBj2VpTeJdNzz1vQ
-	 l9QSN77tfPLONkwS7P65hh9H9VdPZVwtJje+28k5+0UkCcFpwY0tBohuLaRAz49XiC
-	 nA0we+gO5Poj9Jq7Z1D66qZ+0TLQze/lY1D7d7CznrXJvP8nROKd+I7O+EB6Yjqz4T
-	 YNv6JOGcFqV7GqsplRS2Kqi8/6y01j1TSVaGe84BbxWkCuyZ27V0PSCaMdZ6vdh0KP
-	 Ulb5X8XvPIioA==
-Date: Tue, 16 Sep 2025 11:16:21 +0100
-From: Will Deacon <will@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, broonie@kernel.org,
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KPiZdEaE"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-45f30011eceso46245e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 16 Sep 2025 04:57:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758023822; x=1758628622; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ySSczih2oIxRE/mCuJE87rsnZpN4MGD71PRCDCNKi2s=;
+        b=KPiZdEaEeJdPYZa22vWeG+EE6ZaBx1YSo1SWuc3NacYwuaXznV/VnzOucCyqQAaNAU
+         yb3SBfqzBGP2kP8lGCwKras/YBgPucSr11frXakLdDzJMWASebQf0oX44goG5n76h4Xv
+         bnEdp18Rjloupl+4NjQ11IOqF4SGXiSZew3Cu2Ixab409Bk5lDX3n21CWTX5Q6QFLmWG
+         7Yg91UhwnskfQfYNEaf9Erh3EMC6qrgTPpn+H16srsqoDLsPcsI/+HUIE+De6Xre5oaf
+         jWSbScNvmOmUf3/vuAJnny1L9jewUY/8N1lz47dzP6+pl4ZuKA5+LPwsj5fUWO6y13Sn
+         nr6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758023822; x=1758628622;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ySSczih2oIxRE/mCuJE87rsnZpN4MGD71PRCDCNKi2s=;
+        b=RHLgNrOgok8hViJzLtSMxmIpZ6f3awJpDqmSgk0facZDP7pTmXtECJ2d9K2uAODjXn
+         sQI6W1gYKqQZZPIzxzizPsts+zD7kMPGlarRUoiKXMvy0SunPAcJgK8b8EstyPvrPtMf
+         XVG1L2AoMzqFN5NPjFm3V+p3UzNNgOum9qYy8WulpU6RTSP3dCqdS32Gme2Ow7rvEiuy
+         P6hvZuuQIr9ySs/mOBfrKLvzf/D/kMEm5Y3LgF7dE7kBku+DJutydT0LAwM7+BZPDPpe
+         zR90T5AhgYVvYBxzr9Z/sMD2KnQt5pGRu5sAINOT1ShEDlgCg4rwwgBDBHlSwVZhaRdR
+         W6Cw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrSMFs2l25Ez2y/nHGPBpxaF9vdzb/h7KwI9Owp80xO5NP0kD21PMqY9IPdwr6ZMYB7tW6V4c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxwOgsZvRFylLgGJjX09w5SOUGavZO8Htskn667K6YZLNEPD0vP
+	WpSkodiJO5ng9t/HDbPj9IZoufvCDUlNmcX5vhdJ2JyI8/KYcZ5VFLWmxOs7Eu0wRA==
+X-Gm-Gg: ASbGncshz/AloEh35jGL3S7D1no8wTXGBRYGMSZDXN8le92ouyNVLoAC74nVDUg2h2T
+	axI46mFjT8+hibCHqKYKGjKxHYmcCEAuShM6Gc3gUw79auZmHm0YLnWw847BRlnMj0AVysy70ZY
+	iaJ+QuRn0P12aLOAio5BMDBbAosRg1v1xE/WqgPd9CHHPYbUWK5UP2sZ2pQ+8B7NtG1JcupfrxO
+	8VhFhER//4pqEy8LA8v8v4NpKxmvjLgIIfcmP0uzZggWuL89yKNI2nleNAzjBptpPfxwu8oNd3Q
+	FLf/Cdw82xwYHs19jwCtEE+S210cM4PXOY0l8vbLJwFg+uLBqo6W7bmgMXzSC/qbcvb6LoxyWl3
+	DKbcwTX5KjNuz6HBdxa+PQXeLV2RLjui+cs3CX39TjOvu7TT+7XuI6P5FmKoMw0VQg1To4Q==
+X-Google-Smtp-Source: AGHT+IHVAA1mnayi87cRkdBzWdXwnComM1Vq5NxdtVwd631wdxx6byWBLXjdkxRQfsfT6Te7gJR0sQ==
+X-Received: by 2002:a05:600c:4689:b0:43d:409c:6142 with SMTP id 5b1f17b1804b1-45f320079e2mr1709505e9.0.1758023822383;
+        Tue, 16 Sep 2025 04:57:02 -0700 (PDT)
+Received: from google.com (157.24.148.146.bc.googleusercontent.com. [146.148.24.157])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f3260a1ddsm15806845e9.5.2025.09.16.04.57.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Sep 2025 04:57:01 -0700 (PDT)
+Date: Tue, 16 Sep 2025 11:56:58 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
 	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	james.morse@arm.com, ardb@kernel.org, scott@os.amperecomputing.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND v7 4/6] arm64: futex: refactor futex atomic
- operation
-Message-ID: <aMk49UZ1EiUu3-Y2@willie-the-truck>
-References: <20250816151929.197589-1-yeoreum.yun@arm.com>
- <20250816151929.197589-5-yeoreum.yun@arm.com>
- <aMRQIeIdyiWVR8a0@arm.com>
- <aMfrR0vserl/hfZ3@e129823.arm.com>
- <aMhrscd1gz_syMtL@arm.com>
- <aMh4q4-xAPHnaOul@willie-the-truck>
- <aMkLb6jPiSbzeRWL@arm.com>
- <aMk1qxS3htyaTgEQ@e129823.arm.com>
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, robin.murphy@arm.com,
+	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
+	jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v4 01/28] KVM: arm64: Add a new function to donate memory
+ with prot
+Message-ID: <aMlQivFvqf1FGK_T@google.com>
+References: <20250819215156.2494305-1-smostafa@google.com>
+ <20250819215156.2494305-2-smostafa@google.com>
+ <aMAvwlMQ-Jf2MWzd@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,72 +81,68 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aMk1qxS3htyaTgEQ@e129823.arm.com>
+In-Reply-To: <aMAvwlMQ-Jf2MWzd@willie-the-truck>
 
-On Tue, Sep 16, 2025 at 11:02:19AM +0100, Yeoreum Yun wrote:
-> Hi,
-> > On Mon, Sep 15, 2025 at 09:35:55PM +0100, Will Deacon wrote:
-> > > On Mon, Sep 15, 2025 at 08:40:33PM +0100, Catalin Marinas wrote:
-> > > > On Mon, Sep 15, 2025 at 11:32:39AM +0100, Yeoreum Yun wrote:
-> > > > > So I think it would be better to keep the current LLSC implementation
-> > > > > in LSUI.
-> > > >
-> > > > I think the code would look simpler with LL/SC but you can give it a try
-> > > > and post the code sample here (not in a new series).
-> > >
-> > > If you stick the cas*t instruction in its own helper say, cmpxchg_user(),
-> > > then you can do all the shifting/masking in C and I don't reckon it's
-> > > that bad. It means we (a) get rid of exclusives, which is the whole
-> > > point of this and (b) don't have to mess around with PAN.
-> >
-> > We get rid of PAN toggling already since FEAT_LSUI introduces
-> > LDTXR/STTXR. But, I'm all for CAS if it doesn't look too bad. Easier
-> > I think if we do a get_user() of a u64 and combine it with the futex u32
-> > while taking care of CPU endianness. All in a loop. Hopefully the
-> > compiler is smart enough to reduce masking/or'ing to fewer instructions.
-> >
+On Tue, Sep 09, 2025 at 02:46:42PM +0100, Will Deacon wrote:
+> On Tue, Aug 19, 2025 at 09:51:29PM +0000, Mostafa Saleh wrote:
+> > Soon, IOMMU drivers running in the hypervisor might interact with
+> > non-coherent devices, so it needs a mechanism to map memory as
+> > non cacheable.
+> > Add ___pkvm_host_donate_hyp() which accepts a new argument for prot,
+> > so the driver can add KVM_PGTABLE_PROT_NORMAL_NC.
+> > 
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 11 +++++++++--
+> >  2 files changed, 10 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > index 5f9d56754e39..52d7ee91e18c 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > @@ -36,6 +36,7 @@ int __pkvm_prot_finalize(void);
+> >  int __pkvm_host_share_hyp(u64 pfn);
+> >  int __pkvm_host_unshare_hyp(u64 pfn);
+> >  int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+> > +int ___pkvm_host_donate_hyp(u64 pfn, u64 nr_pages, enum kvm_pgtable_prot prot);
+> >  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+> >  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+> >  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 8957734d6183..861e448183fd 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -769,13 +769,15 @@ int __pkvm_host_unshare_hyp(u64 pfn)
+> >  	return ret;
+> >  }
+> >  
+> > -int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
+> > +int ___pkvm_host_donate_hyp(u64 pfn, u64 nr_pages, enum kvm_pgtable_prot prot)
+> >  {
+> >  	u64 phys = hyp_pfn_to_phys(pfn);
+> >  	u64 size = PAGE_SIZE * nr_pages;
+> >  	void *virt = __hyp_va(phys);
+> >  	int ret;
+> >  
+> > +	WARN_ON(prot & KVM_PGTABLE_PROT_X);
 > 
-> Sorry for my wrong previous email.
+> Should this actually just enforce that the permissions are
+> KVM_PGTABLE_PROT_RW:
 > 
-> Here is what i intened with CAS operation:
+> 	WARN_ON((prot & KVM_PGTABLE_PROT_RWX) != KVM_PGTABLE_PROT_RW);
 > 
-> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-> index 1d6d9f856ac5..0aeda7ced2c0 100644
-> --- a/arch/arm64/include/asm/futex.h
-> +++ b/arch/arm64/include/asm/futex.h
-> @@ -126,6 +126,60 @@ LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
->  LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
->  LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
+> ?
 > 
-> +
-> +#define LSUI_CMPXCHG_HELPER(suffix, start_bit)                                 \
-> +static __always_inline int                                                     \
-> +__lsui_cmpxchg_helper_##suffix(u64 __user *uaddr, u32 oldval, u32 newval)      \
-> +{                                                                              \
-> +       int ret = 0;                                                            \
-> +       u64 oval, nval, tmp;                                                    \
-> +                                                                               \
-> +       asm volatile("//__lsui_cmpxchg_helper_" #suffix "\n"                    \
-> +       __LSUI_PREAMBLE                                                         \
-> +"      prfm    pstl1strm, %2\n"                                                \
-> +"1:    ldtr    %x1, %2\n"                                                      \
-> +"      mov     %x3, %x1\n"                                                     \
-> +"      bfi     %x1, %x5, #" #start_bit ", #32\n"                               \
-> +"      bfi     %x3, %x6, #" #start_bit ", #32\n"                               \
-> +"      mov     %x4, %x1\n"                                                     \
-> +"2:    caslt   %x1, %x3, %2\n"                                                 \
-> +"      sub     %x1, %x1, %x4\n"                                                \
-> +"      cbz     %x1, 3f\n"                                                      \
-> +"      mov     %w0, %w7\n"                                                     \
-> +"3:\n"                                                                         \
-> +"      dmb     ish\n"                                                          \
-> +"4:\n"                                                                         \
-> +       _ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)                                   \
-> +       _ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)                                   \
-> +       : "+r" (ret), "=&r" (oval), "+Q" (*uaddr), "=&r" (nval), "=&r" (tmp)    \
-> +       : "r" (oldval), "r" (newval), "Ir" (-EAGAIN)                            \
-> +       : "memory");                                                            \
+> Since the motivation is about the memory type rather than the
+> permissions, it would be best to preserve the current behaviour.
 
-The vast majority of this can be written in C.
+Yes, this series doesn't do any permisson changes, I was not sure if
+that would be needed in the future or not (some RO mappings), but I will
+update the check as suggested to be more strict.
 
-Will
+Thanks,
+Mostafa
+
+> 
+> Will
