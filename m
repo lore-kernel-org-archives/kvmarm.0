@@ -1,170 +1,205 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E5E30BF58
-	for <kvmarm@lists.linux.dev>; Tue, 16 Sep 2025 12:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFD12B2DA
+	for <kvmarm@lists.linux.dev>; Tue, 16 Sep 2025 12:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758025058; cv=none; b=hL/keIniLN/mmReydvfUHIvIYKWVMjTo2BplNhNzDUelhOavKAn4eIioVkeGZmtSX73/zKIqZbp8Ve0xzc9CjX1aF1MAzG/+HHR4sarCy4JPvd7vNm11vKfrCYsH5KsE8d1dEOKHIOgyApGMkPojvRw2e/TgA2oDbrM+67zlPLs=
+	t=1758026888; cv=none; b=Pok23DOqEAGSR7iDHpUQ/UFZGJVb3ikzpuFC2F088sTYOa1mHS7Y1JfgI0uGbDopUmdIheG4ewYqNtaoXlzk7aisAETjn78YVWALHsxmPcugYAD8MsRlUboujVmqFtsJB2VqqgD/VVPeSN7qhgDa1YO7kiRLagVcA1gGq9Vn+R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758025058; c=relaxed/simple;
-	bh=+Rt1OQ5f0XIuXvWrYdebVWJbfK3U2I/naiin5OO7UHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gfIP4S6t2is7h3yHm2/iR2gKBj6+fzz/UfNYDe2qQEjSS2Zw+f/MCv2eSnsattps1OFuE2efnkcek1rMoqLpU4FpbyoV+/y0b07FsPrPwUGc3j0xZ7oVSXhtp28XHobzUu+IE4Z0VZ6Bd+qt4cE10RnBluf+6rmhwBwjqwwYcZE=
+	s=arc-20240116; t=1758026888; c=relaxed/simple;
+	bh=7trFf5hhjGM8vRlPjzsKSeNmc4/I1VBnBBsERnwfJG8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FCEbLHbOAH9yc5oeV922hmKcQrvhktHN7Bqz2IqsJyIMfVGQF5vkyJokYZCU1EIPG/9gGyEMvZ30HxyPsLbcUaJ76lH+O2KDLypDU9QHVMHhkJ1b+pJO4lsAwtnJeT9iU/ylbACXKwGlVqdRleEIUKHH2xaRioxD5Fanae/3oac=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA73512FC;
-	Tue, 16 Sep 2025 05:17:27 -0700 (PDT)
-Received: from donnerap (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEA753F673;
-	Tue, 16 Sep 2025 05:17:34 -0700 (PDT)
-Date: Tue, 16 Sep 2025 13:17:32 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Will Deacon <will@kernel.org>, Julien Thierry
- <julien.thierry.kdev@gmail.com>, Marc Zyngier <maz@kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>
-Subject: Re: [PATCH kvmtool v3 4/6] arm64: add counter offset control
-Message-ID: <20250916131732.499ffe22@donnerap>
-In-Reply-To: <aJDHbClG5MagCCy5@raptor>
-References: <20250729095745.3148294-1-andre.przywara@arm.com>
-	<20250729095745.3148294-5-andre.przywara@arm.com>
-	<aJDHbClG5MagCCy5@raptor>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 472F62B;
+	Tue, 16 Sep 2025 05:47:58 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DCCC3F673;
+	Tue, 16 Sep 2025 05:48:03 -0700 (PDT)
+Date: Tue, 16 Sep 2025 13:47:59 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, broonie@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, james.morse@arm.com,
+	ardb@kernel.org, scott@os.amperecomputing.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND v7 4/6] arm64: futex: refactor futex atomic
+ operation
+Message-ID: <aMlcf5oUNZU65u_I@J2N7QTR9R3.cambridge.arm.com>
+References: <20250816151929.197589-1-yeoreum.yun@arm.com>
+ <20250816151929.197589-5-yeoreum.yun@arm.com>
+ <aMRQIeIdyiWVR8a0@arm.com>
+ <aMfrR0vserl/hfZ3@e129823.arm.com>
+ <aMhrscd1gz_syMtL@arm.com>
+ <aMh4q4-xAPHnaOul@willie-the-truck>
+ <aMkLb6jPiSbzeRWL@arm.com>
+ <aMk1qxS3htyaTgEQ@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMk1qxS3htyaTgEQ@e129823.arm.com>
 
-On Mon, 4 Aug 2025 15:45:00 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-Hi Alex,
-
-> You might want to capitalize the first letter of the subject line (add->Add).
+On Tue, Sep 16, 2025 at 11:02:19AM +0100, Yeoreum Yun wrote:
+> Hi,
+> > On Mon, Sep 15, 2025 at 09:35:55PM +0100, Will Deacon wrote:
+> > > On Mon, Sep 15, 2025 at 08:40:33PM +0100, Catalin Marinas wrote:
+> > > > On Mon, Sep 15, 2025 at 11:32:39AM +0100, Yeoreum Yun wrote:
+> > > > > So I think it would be better to keep the current LLSC implementation
+> > > > > in LSUI.
+> > > >
+> > > > I think the code would look simpler with LL/SC but you can give it a try
+> > > > and post the code sample here (not in a new series).
+> > >
+> > > If you stick the cas*t instruction in its own helper say, cmpxchg_user(),
+> > > then you can do all the shifting/masking in C and I don't reckon it's
+> > > that bad. It means we (a) get rid of exclusives, which is the whole
+> > > point of this and (b) don't have to mess around with PAN.
+> >
+> > We get rid of PAN toggling already since FEAT_LSUI introduces
+> > LDTXR/STTXR. But, I'm all for CAS if it doesn't look too bad. Easier
+> > I think if we do a get_user() of a u64 and combine it with the futex u32
+> > while taking care of CPU endianness. All in a loop. Hopefully the
+> > compiler is smart enough to reduce masking/or'ing to fewer instructions.
+> >
 > 
-> On Tue, Jul 29, 2025 at 10:57:43AM +0100, Andre Przywara wrote:
-> > From: Marc Zyngier <maz@kernel.org>
-> > 
-> > KVM allows the offsetting of the global counter in order to help with
-> > migration of a VM. This offset applies cumulatively with the offsets
-> > provided by the architecture.
-> > 
-> > Although kvmtool doesn't provide a way to migrate a VM, controlling
-> > this offset is useful to test the timer subsystem.
-> > 
-> > Add the command line option --counter-offset to allow setting this value
-> > when creating a VM.  
+> Sorry for my wrong previous email.
 > 
-> Out of curiosity, how is this related to nested virtualization?
+> Here is what i intened with CAS operation:
 > 
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  arm64/include/kvm/kvm-config-arch.h |  3 +++
-> >  arm64/kvm.c                         | 17 +++++++++++++++++
-> >  2 files changed, 20 insertions(+)
-> > 
-> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> > index a1dac28e6..44c43367b 100644
-> > --- a/arm64/include/kvm/kvm-config-arch.h
-> > +++ b/arm64/include/kvm/kvm-config-arch.h
-> > @@ -14,6 +14,7 @@ struct kvm_config_arch {
-> >  	u64		kaslr_seed;
-> >  	enum irqchip_type irqchip;
-> >  	u64		fw_addr;
-> > +	u64		counter_offset;
-> >  	unsigned int	sve_max_vq;
-> >  	bool		no_pvtime;
-> >  };
-> > @@ -59,6 +60,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
-> >  		     irqchip_parser, NULL),					\
-> >  	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
-> >  		"Address where firmware should be loaded"),			\
-> > +	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
-> > +		"Specify the counter offset, defaulting to 0"),			\  
+> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> index 1d6d9f856ac5..0aeda7ced2c0 100644
+> --- a/arch/arm64/include/asm/futex.h
+> +++ b/arch/arm64/include/asm/futex.h
+> @@ -126,6 +126,60 @@ LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
+>  LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
+>  LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
 > 
-> I'm having a hard time parsing this - if it's zero, then kvmtool leaves it
-> unset, how is the default value 0? Maybe you want to say that if left unset,
-> the counters behaves as if the global offset is zero.
+> +
+> +#define LSUI_CMPXCHG_HELPER(suffix, start_bit)                                 \
+> +static __always_inline int                                                     \
+> +__lsui_cmpxchg_helper_##suffix(u64 __user *uaddr, u32 oldval, u32 newval)      \
+> +{                                                                              \
+> +       int ret = 0;                                                            \
+> +       u64 oval, nval, tmp;                                                    \
+> +                                                                               \
+> +       asm volatile("//__lsui_cmpxchg_helper_" #suffix "\n"                    \
+> +       __LSUI_PREAMBLE                                                         \
+> +"      prfm    pstl1strm, %2\n"                                                \
+> +"1:    ldtr    %x1, %2\n"                                                      \
+> +"      mov     %x3, %x1\n"                                                     \
+> +"      bfi     %x1, %x5, #" #start_bit ", #32\n"                               \
+> +"      bfi     %x3, %x6, #" #start_bit ", #32\n"                               \
+> +"      mov     %x4, %x1\n"                                                     \
+> +"2:    caslt   %x1, %x3, %2\n"                                                 \
+> +"      sub     %x1, %x1, %x4\n"                                                \
+> +"      cbz     %x1, 3f\n"                                                      \
+> +"      mov     %w0, %w7\n"                                                     \
+> +"3:\n"                                                                         \
+> +"      dmb     ish\n"                                                          \
+> +"4:\n"                                                                         \
+> +       _ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)                                   \
+> +       _ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)                                   \
+> +       : "+r" (ret), "=&r" (oval), "+Q" (*uaddr), "=&r" (nval), "=&r" (tmp)    \
+> +       : "r" (oldval), "r" (newval), "Ir" (-EAGAIN)                            \
+> +       : "memory");                                                            \
+> +                                                                               \
+> +       return ret;                                                             \
+> +}
+> +
+> +LSUI_CMPXCHG_HELPER(lo, 0)
+> +LSUI_CMPXCHG_HELPER(hi, 32)
+> +
+> +static __always_inline int
+> +__lsui_cmpxchg_helper(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> +{
+> +       int ret;
+> +       unsigned long uaddr_al;
+> +
+> +       uaddr_al = ALIGN_DOWN((unsigned long)uaddr, sizeof(u64));
+> +
+> +       if (uaddr_al != (unsigned long)uaddr)
+> +               ret = __lsui_cmpxchg_helper_hi((u64 __user *)uaddr_al, oldval, newval);
+> +       else
+> +               ret = __lsui_cmpxchg_helper_lo((u64 __user *)uaddr_al, oldval, newval);
+> +
+> +       if (!ret)
+> +               *oval = oldval;
+> +
+> +       return ret;
+> +}
 
-That's a much longer wording for something meant to be a very concise
-description of the option, with the same meaning. So while "defaulting to
-0" might not be 100% correct when it comes to how it's *implemented*, from
-the user's point of view the effect is the same. And this is a user facing
-message.
+I think Will expects that you do more of this in C, e.g. have a basic
+user cmpxchg on a 64-bit type, e.g.
 
-> >  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
-> >  		    "Start VCPUs in EL2 (for nested virt)"),
-> >  
-> > diff --git a/arm64/kvm.c b/arm64/kvm.c
-> > index 23b4dab1f..6e971dd78 100644
-> > --- a/arm64/kvm.c
-> > +++ b/arm64/kvm.c
-> > @@ -119,6 +119,22 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
-> >  	pr_debug("MTE capability enabled");
-> >  }
-> >  
-> > +static void kvm__arch_set_counter_offset(struct kvm *kvm)
-> > +{
-> > +	struct kvm_arm_counter_offset offset = {
-> > +		.counter_offset = kvm->cfg.arch.counter_offset,
-> > +	};
-> > +
-> > +	if (!kvm->cfg.arch.counter_offset)
-> > +		return;
-> > +
-> > +	if (!kvm__supports_extension(kvm, KVM_CAP_COUNTER_OFFSET))
-> > +		die("No support for global counter offset");  
-> 
-> What happens when the user sets --counter-offset 0 and KVM doesn't support
-> the capability? Looks to me like instead of getting an error, kvmtool is happy
-> to proceed without actually setting the counter offset to 0. User might then be
-> fooled into thinking that KVM supports KVM_CAP_COUNTER_OFFSET, and when the same
-> user does --counter-offset x, they will get an error saying that there's no
-> support for it in KVM. I would be extremely confused by that.
+/*
+ * NOTE: *oldp is NOT updated if a fault is taken.
+ */
+static __always_inline int
+user_cmpxchg64_release(u64 __usr *addr, u64 *oldp, u64 new)
+{
+	int err = 0;
 
-On the other hand rejecting "--counter-offset 0" even when it's the
-default behaviour and would work is even more cumbersome, I'd say. And I'd
-argue that in general "offset 0" being a special case is well understood,
-so I wouldn't be too confused about that.
+	asm volatile(
+	__LSUI_PREAMBLE
+	"1:	caslt	%x[old], %x[new], %[addr]\n"
+	"2:\n"
+	_ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0) 
+	: [addr] "+Q" (addr),
+	  [old] "+r" (*oldp)
+	: [new] "r" (new)
+	: "memory"
+	);
 
-If you really feel that needs detailed explanation, maybe we should add
-that to the documentation?
+	return err;
+}
 
-Cheers,
-Andre
+That should be the *only* assembly you need to implement.
 
-> If this is something that you want to address, you can do it similar to
-> ram_addr: initialize the offset to something unreasonable before parsing the
-> command line parameters, and then bail early in kvm__arch_set_counter_offset().
-> 
-> Thanks,
-> Alex
-> 
-> > +
-> > +	if (ioctl(kvm->vm_fd, KVM_ARM_SET_COUNTER_OFFSET, &offset))
-> > +		die_perror("KVM_ARM_SET_COUNTER_OFFSET");
-> > +}
-> > +
-> >  void kvm__arch_init(struct kvm *kvm)
-> >  {
-> >  	/* Create the virtual GIC. */
-> > @@ -126,6 +142,7 @@ void kvm__arch_init(struct kvm *kvm)
-> >  		die("Failed to create virtual GIC");
-> >  
-> >  	kvm__arch_enable_mte(kvm);
-> > +	kvm__arch_set_counter_offset(kvm);
-> >  }
-> >  
-> >  static u64 kvm__arch_get_payload_region_size(struct kvm *kvm)
-> > -- 
-> > 2.25.1
-> >   
+Atop that, have a wrapper that uses get_user() and that helper above to
+implement the 32-bit user cmpxchg, with all the bit manipulation in C:
 
+/*
+ * NOTE: *oldp is NOT updated if a fault is taken.
+ */
+static int user_cmpxchg32_release(u32 __user *addr, u32 *oldp, u32 new)
+{
+	u64 __user *addr64 = PTR_ALIGN_DOWN(addr, sizeof(u64));
+	u64 old64, new64;
+	int ret;
+
+	if (get_user(old64, uaddr64))
+		return -EFAULT;
+
+	/*
+	 * TODO: merge '*oldp' into 'old64', and 'new' into 'new64',
+	 * taking into account endianness and alignment
+	 */
+
+	ret = user_cmpxchg64_release(uaddr64, &old64, new64);
+	if (ret)
+		return ret;
+
+	/*
+	 * TODO: extract '*oldp' from 'old64', taking into account
+	 * endianness and alignment.
+	 */
+
+	return 0;
+}
+
+Then use that 32-bit user cmpxchg for any cases which need it.
+
+As the compiler will have visiblity of all of the bit manipulation, it
+will hopefully be able to fold that together appropriately.
+
+Mark.
