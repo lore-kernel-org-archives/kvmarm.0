@@ -1,29 +1,29 @@
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011059.outbound.protection.outlook.com [52.101.70.59])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013014.outbound.protection.outlook.com [52.101.72.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D778B18DF9D
-	for <kvmarm@lists.linux.dev>; Tue, 16 Sep 2025 09:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6208F224B01
+	for <kvmarm@lists.linux.dev>; Tue, 16 Sep 2025 10:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.14
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758014733; cv=fail; b=ECKHw9crO85I4HR1VFdCS3wZ2ypKUpbPqNh4UArI4EXUp90OfN7Ny2TQoTn9cHlXmbLZ8eijj8Gzu9DXaJFqc0sI/ug5olyZKyXMiEmCPUon1VKJHRXDOXCfG/XF7HFw02RPdFAeSwfCKx1ZD5uaZyUcvJyBw+T2pOrQjXPqI2A=
+	t=1758016984; cv=fail; b=an6H1LUquMrfWAmkE1l41fd7Cl0NOKmEhGnxyoTzv2BAmP9qrRQhge4V8T/WIYvkdqAMOV4dnS7OTa1KeRW3fjMTLrIyw5EcXo7N6tNIIcQB5SLSX4ndLDeLRVCFLlm5jdmBM9zehrA1mk0gPTROKWeldO8HmLKnjgBKN4RhY0k=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758014733; c=relaxed/simple;
-	bh=V4f2nn4kbA90/WnTJa1ziUq6BVGr2pHu7p72RndhtQ0=;
+	s=arc-20240116; t=1758016984; c=relaxed/simple;
+	bh=E+N04wJ0NGSUBcdvKtTq9bCrddKpZzJ7SVZm1PHf0Lg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=tRRLesXQ5aIs35ndiZS/hZoar/sKRa/ilp9Z/KCSj6eH/RNQwWCMyo+tqqsPlDCIR1o0hCXnxHtgHKZHdFPvh0BVxtyvcVv3tpFHunioZwoAZGsm2k4WL5352IkyS3gCjuyLIbftL2I1SXZDu66o8SKGQZ1GuyPwqSP3IZHEnX0=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=AK4onXjH; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=AK4onXjH; arc=fail smtp.client-ip=52.101.70.59
+	 Content-Disposition:In-Reply-To:MIME-Version; b=uAa9MVoHe2rDyhnxU2B0/F6gQzt64g61ciEBNcxLQKJQUB5h9H0dPcMaUUJI0WhhGmLQi4Wzxlz19QLCsoUCQR5s4+3LB37+I1eOXnTPjIODX6Y8fdMvCzwSUG1JEP+9MmQDXMpK3df0LawI23XDfHVBaWS8pMQp/Ox+vOACUsU=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=anfqdQ7b; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=anfqdQ7b; arc=fail smtp.client-ip=52.101.72.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="AK4onXjH";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="AK4onXjH"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="anfqdQ7b";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="anfqdQ7b"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=E45mpPB3DOzx6s1Kq0ZmQfCSZRndRFWFXo+3fEai2yKqhkpsehKNj3N5GlEkIFJjea491/PCEOifhpTlyqlXlVMraUIaCBND9L6EC3CjkkSpUFknOsVRf2CrflUH0b43Xlk/C02SoIC1faRrzWDsiwQNTbvNO0MNewcIGMfqDBRZGtitsa84fgJs7nnBv974xWwTr0e3y2521oXp+jRtjCYqP/XDMqo6w5Vs57ALVaBAWrjIBhn3T7/zOzNsCl+R7HTZfPwTjW+kfGfphVNWFmbqSdcnjNqb6hLo74DaPMpnL69n1qvU9Dri/Cu2xLQPZvEe5j5ztKcuLKlK7AVy3w==
+ b=QOJfpl0PFRme8MAXTJ01sywbaQgtgSQYcA+BOUpVbsco+BjJm/esQS2bjMuX77yvoo2qiiqEZR5a8HaEOdjKoraAvuqSvOtdB9x7caRs4ZLNysqviStqaMG4dGB0kzouaJYSvBcK1mEPGWJ3YrASzhEY/Wy+hGNW1CS1ueCVgDcWD2gRmXTlBQwW7LC4sqsf6gumVHiBUx7qQGSj90I118XnFDMOCFQMyrnmM3lVvRITGIvMe1cSBMbVZ62XvoCR13n9INmThWG77930+A8aUGH9Lj7smBGXzRpzf9bbmEfWR7I3kFgeM9lNvvWUY20DrH+wPSBOsLF+RWX+QSCD2w==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=B6oK6gNfXzAck584z8eSvHZigp3WwAUwfaQZ8XGUPTc=;
- b=YInS4n9JKSaSWUtQ9/R9EOYrQnb6KkM3WvfBix342gUlQxoOTESeUNvJ6NO+PLjSyt/0ZZ+fMUDBjmAU9+Ua4Rau/Z+y1StuU778VjIG+s2Bog4stCeAP1IY3bfV0B/NMNydwr97GfK4b89QVYtUW48CKtTZJE2dTkyiV89wkxVnuBR8dWnh3tHImUPmP9ncflPzmHTFY2+RlA68Z9eizoE5qZnHi2wZLpGGWiOpHkrS4pKPZBOEVd80pDWXqflgUGt+t5Ff7gLovE6XZCMJ6RTp/nJttpKVYYzUdOSvDzqx/B546qyn04YyE/tk3T5KDyjaVV8t3pw4QsEd1fzqrg==
+ bh=7zLND5qDFYgtFTw0Ofi0oGgClk4mha1DAfA1buRMy+A=;
+ b=LKHFUQDKPaWk44bvkrSXwXW1KUuooqdgXcwMZDWeFkb2SxOp25TkcKCOzUxKJr+0rPtioZeki4BVlRi5FiWXOOWGRpUJMaq5pPax6uZTaWmTjeJBaONX2E5Y/N99mcVrlNn7T/8Wtl+dwylhO9f/p/bNWCCr8EU8/7Cf23gx7KD4nWMffPg8zive5BPHTGV030TnjdsOsvcvmY/pzoHcs/E10rdSLT1u7A1bbjSplpU8xchikBpqb1yeLdAcEupYKBJmHUmD4Jv8NcDQhjUyWNVBTz1M5lV+JKJQlKLVyJ66IOfvQ1/zZVhEj6fHAtfC9JdhZrshfWgHCYmIrGLlpQ==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
  (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B6oK6gNfXzAck584z8eSvHZigp3WwAUwfaQZ8XGUPTc=;
- b=AK4onXjHkFy83efCOIvYhS1EJyub8RUa34iv18Klhn1YFSAp8kEHaLGT/Sn8goA/rAUU34nH3IMX6ZqTI2SMJmMOV32+Qp3hHwIIk+KVCpWRjm9EXIq1+zJIQUmTobalgNJhqgucv0nCvCjrURtWl5bl/cpKIcLt+Y2rXxWs0Ww=
-Received: from PR1P264CA0174.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:344::18)
- by DU0PR08MB9299.eurprd08.prod.outlook.com (2603:10a6:10:41e::10) with
+ bh=7zLND5qDFYgtFTw0Ofi0oGgClk4mha1DAfA1buRMy+A=;
+ b=anfqdQ7bp7wVz5M8G0QBFcgsmmDcJj3A3jrkcGvBjn4dKv7lstEd0d1roz+hjcuEmJW11cAMn5GPNVXu3bVq5GIp/5OeRnn2j+tXNelARKuABA9uawMs5741zcoNMFSuBvEi9x0Yx2RZnlP7jlj0A0tkrlvJ5l4Doi1l7pkCrgk=
+Received: from DU2PR04CA0277.eurprd04.prod.outlook.com (2603:10a6:10:28c::12)
+ by AMDPR08MB11526.eurprd08.prod.outlook.com (2603:10a6:20b:719::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.19; Tue, 16 Sep
- 2025 09:25:25 +0000
-Received: from AM4PEPF00025F9A.EURPRD83.prod.outlook.com
- (2603:10a6:102:344:cafe::15) by PR1P264CA0174.outlook.office365.com
- (2603:10a6:102:344::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.13 via Frontend Transport; Tue,
- 16 Sep 2025 09:25:25 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Tue, 16 Sep
+ 2025 10:02:58 +0000
+Received: from DB3PEPF0000885E.eurprd02.prod.outlook.com
+ (2603:10a6:10:28c:cafe::81) by DU2PR04CA0277.outlook.office365.com
+ (2603:10a6:10:28c::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.21 via Frontend Transport; Tue,
+ 16 Sep 2025 10:02:58 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -51,35 +51,35 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AM4PEPF00025F9A.mail.protection.outlook.com (10.167.16.9) with Microsoft SMTP
- Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9160.0 via
- Frontend Transport; Tue, 16 Sep 2025 09:25:24 +0000
+ DB3PEPF0000885E.mail.protection.outlook.com (10.167.242.9) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.12
+ via Frontend Transport; Tue, 16 Sep 2025 10:02:57 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SNbFXTqaXx9BDA9sNJrXIFE1BMwW81SpNA54VzCUCifUO+87OBbyE36CAB8YveEMtJUySG3F++PPkN6lue4GfWB94y3SfdyITs8FSmrZMFOuIUc5S/uFPoftzZE8pc6LujflE7Mbp3HttAB6feMlJQ7n9z6lnmshUH5j16AXVYPPpFKPmta5dgIX4+uLtpVeEg9IbCG16ltJp4YaVdWpnQfofJuyzN8oHpUHTBB+yzYcjRCmZhPA236ncn0b6Mwz4Oalf0KQLcK2/UncqejERVAFC2IW1LeRezTScoVBPsCNyPIdCiqpFeABnnR7e94+2gCUfw77gsjgvtM4XL8q0Q==
+ b=mufq3M+9AZQAf+vfDBJ7r1JxYfXTJu6f+xj29BohyRuVxLlF0vjPEMbK0fBZlARCSHURw46ae4t/oX87CpqLERHyuDJVdQXKTtcb7I7dZoIyNhYkiuaE1HmALhgKXItspAQ+qC28ddjI/UcR9Xh5L5S3NXvViMoSuzAY5vPSQaHIqS+5bWvJEYKf6/gEG4ASlbUpk3s2xUwLmAqE93t+5mprKfDLIS9TG1ApjRe//qeTV0c59eGTGvJUb0TfXJt25HDqckfVDT8RC89Iv4a71pgPuhQf1AP8Kj9Eo1To1IlGhxM3Xm/AQsjcPmHkM7iC+hJhoi+v8OVeWO8Yqe/1Ig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=B6oK6gNfXzAck584z8eSvHZigp3WwAUwfaQZ8XGUPTc=;
- b=wWil6WPElDTAUKt+Gnwxft7GHdMBbb10LjYcsejrNMX34yCCgDRnFYP1GSwU5EMiZqFn/kRwYbC4ayd8lXlPzZF4bJJdsr5/JTTwh9lv4b6kYllNvPkilxFbuz/QF3dAunbbkkmgfNlddjlkrtvNOQ4NEXjsxWlUjfzV/knm/mWUCDRDermIXR8t+sHxLE+tf+9JlHiCBvG5xpeTD9N/OSM0S0viHwjwQje05MbVr16aU6wCFY7ibdAKTDYTrGX88r5arOpl4sja6IGhlYqZXj6HPZkGapY/6wsMOt2/p1RbW6Z3viziJJza7USQ1xSFDuhmbRiE4GMo2uVKFiD0pQ==
+ bh=7zLND5qDFYgtFTw0Ofi0oGgClk4mha1DAfA1buRMy+A=;
+ b=hw+kbczfIjZ8jjzlAFLLKYA0O+NdZ//B1L6duauIZPBFpPaomQL8QaXEKOpLnmfm9FoF3WoDbfqoDMGNPI+pYFaMYYGa5lGw04QpNFCx/udHKePkGncWo8WpX5Zw4+wKCrSR4KXveEaftIFc5AX58gdGBIPIKkm1o1nQSgiAYQAPaWjbPAR9CJAQdHYc1ZFQulLQY7+VbC4XfvymTJ6dtp7ro+OXnOtRObRwX0xa4xVUdU5+D2CTx8O88G9ybdiHI95E+Tb26RYmp/m8zl5mYA0wGlDWaykXK2ZTCsMfTs077O0SvSJvri5B/LF6g5hojF43J17X4L0eIYRywNKBpg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B6oK6gNfXzAck584z8eSvHZigp3WwAUwfaQZ8XGUPTc=;
- b=AK4onXjHkFy83efCOIvYhS1EJyub8RUa34iv18Klhn1YFSAp8kEHaLGT/Sn8goA/rAUU34nH3IMX6ZqTI2SMJmMOV32+Qp3hHwIIk+KVCpWRjm9EXIq1+zJIQUmTobalgNJhqgucv0nCvCjrURtWl5bl/cpKIcLt+Y2rXxWs0Ww=
+ bh=7zLND5qDFYgtFTw0Ofi0oGgClk4mha1DAfA1buRMy+A=;
+ b=anfqdQ7bp7wVz5M8G0QBFcgsmmDcJj3A3jrkcGvBjn4dKv7lstEd0d1roz+hjcuEmJW11cAMn5GPNVXu3bVq5GIp/5OeRnn2j+tXNelARKuABA9uawMs5741zcoNMFSuBvEi9x0Yx2RZnlP7jlj0A0tkrlvJ5l4Doi1l7pkCrgk=
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20) by AS8PR08MB7743.eurprd08.prod.outlook.com
- (2603:10a6:20b:524::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Tue, 16 Sep
- 2025 09:24:45 +0000
+ (2603:10a6:150:163::20) by AM8PR08MB5666.eurprd08.prod.outlook.com
+ (2603:10a6:20b:1de::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Tue, 16 Sep
+ 2025 10:02:24 +0000
 Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
  ([fe80::d430:4ef9:b30b:c739]) by GV1PR08MB10521.eurprd08.prod.outlook.com
  ([fe80::d430:4ef9:b30b:c739%3]) with mapi id 15.20.9115.020; Tue, 16 Sep 2025
- 09:24:45 +0000
-Date: Tue, 16 Sep 2025 10:24:42 +0100
+ 10:02:22 +0000
+Date: Tue, 16 Sep 2025 11:02:19 +0100
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>, broonie@kernel.org, maz@kernel.org,
@@ -90,7 +90,7 @@ Cc: Will Deacon <will@kernel.org>, broonie@kernel.org, maz@kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH RESEND v7 4/6] arm64: futex: refactor futex atomic
  operation
-Message-ID: <aMks2haYCZia8LR/@e129823.arm.com>
+Message-ID: <aMk1qxS3htyaTgEQ@e129823.arm.com>
 References: <20250816151929.197589-1-yeoreum.yun@arm.com>
  <20250816151929.197589-5-yeoreum.yun@arm.com>
  <aMRQIeIdyiWVR8a0@arm.com>
@@ -98,12 +98,11 @@ References: <20250816151929.197589-1-yeoreum.yun@arm.com>
  <aMhrscd1gz_syMtL@arm.com>
  <aMh4q4-xAPHnaOul@willie-the-truck>
  <aMkLb6jPiSbzeRWL@arm.com>
- <aMkqt1LMUd5QPc3S@e129823.arm.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aMkqt1LMUd5QPc3S@e129823.arm.com>
-X-ClientProxiedBy: LO4P123CA0443.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:1a9::16) To GV1PR08MB10521.eurprd08.prod.outlook.com
+In-Reply-To: <aMkLb6jPiSbzeRWL@arm.com>
+X-ClientProxiedBy: LO4P123CA0333.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:18c::14) To GV1PR08MB10521.eurprd08.prod.outlook.com
  (2603:10a6:150:163::20)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -112,8 +111,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-TrafficTypeDiagnostic:
-	GV1PR08MB10521:EE_|AS8PR08MB7743:EE_|AM4PEPF00025F9A:EE_|DU0PR08MB9299:EE_
-X-MS-Office365-Filtering-Correlation-Id: 359f9fe9-0cfc-4d8b-d7da-08ddf502f79d
+	GV1PR08MB10521:EE_|AM8PR08MB5666:EE_|DB3PEPF0000885E:EE_|AMDPR08MB11526:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1d278995-5888-4b56-9136-08ddf5083692
 x-checkrecipientrouted: true
 NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
@@ -121,265 +120,258 @@ X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
  BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info-Original:
- =?us-ascii?Q?XhiWGXT/LUoMg2wKqQ1wPqSl3fQqC8+H/a8oPB0/PWF4JOpgf6UbfmQQR9pH?=
- =?us-ascii?Q?MBq+9ozl5J7TwapKtDV+vWLQK8jEEEYOaDPUvKo2WSzcAIDU2rOgGMEpqnLt?=
- =?us-ascii?Q?IXRDkWAD52Ih8+GX6h2PEwvrIEkf/DFHjWzGQM/FIGMztEcw2xGNf1zoY9MG?=
- =?us-ascii?Q?9sVe8fWWuTiwSOUR2OS7zbIG9ScDpxftS/aF/wYzplbBWvl7hVVbekkSQXtE?=
- =?us-ascii?Q?bZ9Z8VLm+cBTr5lOjc6+4YuU14nemqN9n4ehB4/wOj+qT7ydav989BWZ5wQg?=
- =?us-ascii?Q?dNZX/3Ywh4suKH+DDgMsRziqUKFzQG9CWaqcnkAluaV5jGXD84ifuxA35BRn?=
- =?us-ascii?Q?WFijj0gF6DNAm4Ai6qJBXEhqAauAHEN1FA2Pk5GCR9Rjs4IrFIppV98A15gs?=
- =?us-ascii?Q?k1pyLKHXGmCLU4lNA45JJfuGtyTxx2KG6+PU24wiwHl24EOGVJcJTSeF7A6y?=
- =?us-ascii?Q?0ZwVbBo+Poit64jt2X14R+/0//qK9uj5tY5FakFH+x0Y9zmpL41BdwIIL9wC?=
- =?us-ascii?Q?ZW+qd9KsACXEuC0Mo6qmH4VTj0hUVnffPot5qGyA1/IjQVaOsf4sRzsb7+PV?=
- =?us-ascii?Q?sCTxp8XmCEiynyKKSkBK2geiko6lpr4x+Rpiy9p/vy514vomodcnixeS3goz?=
- =?us-ascii?Q?Z9If5Kc4pC+HmwgioEPFRWMlpcdVb+1HwUiOr2hdA6NrzGfpJigJFQ8uYfl9?=
- =?us-ascii?Q?LDAJNqVmRuwAFMZor1UFiwLTLwsUuE6KOHrl3x26LYaT5q7e1qUfIuGle2fJ?=
- =?us-ascii?Q?GdiWiqxPKCi/H5C6rUzb6rSfugJIqUGL/0bXORFnz0z0HQY1WqOAEMJxJY9O?=
- =?us-ascii?Q?rAh3gZcowgz8r6IMf+Nr64HPAylT6/7GbxOXbHx31N+xOtmeAIZctxGZgKnc?=
- =?us-ascii?Q?ZyjcOcVGgCCTqzueVqOGiHNDGiiCE+48Nai/xiFAyNB4lVxLyq62kI1BIIys?=
- =?us-ascii?Q?5eoZnCWlRX8/Fu3fUB+yKcye/4Lfjwjc9bVt/3JEfB7ZQr60SMi7mlXewXuE?=
- =?us-ascii?Q?lstvEstuDWBtnD8Ixj/xupJ2r1VciYyet3bu3+TOm8Fc5QE9qYrAhQ+RQGeu?=
- =?us-ascii?Q?C6lHI67iuigpDHqVWf+gasY1S9aEsIhtoCzj8mIhKpVGt7zdYVFCpBlDSICY?=
- =?us-ascii?Q?8KRGHRUTD2ke/JpbIbQ1AA11CdptxJUhQbYtXLH70w2Rew/zwotpymd0x+3a?=
- =?us-ascii?Q?3Q6xdJ/sO7SxgrHmgZAixBA2HTbopuLFIu0ibjVoU9FYjVyl+5KkHE3GzzTc?=
- =?us-ascii?Q?aksz0t6KDjhoK2Zi/7mwmbM5k+NN0WniMSI+j48mtC0yHcCEwgP7N2f9Utq4?=
- =?us-ascii?Q?NbxtWAol4gsO2xUeW1uxmV+s9KOI0Su82e/wgtNy6rxapoCVQ8fd95yUElcZ?=
- =?us-ascii?Q?P85/41fJgNV0Jj99VdMjieaSh+XA+DRkF2hNG3Ia30L82uaSB8HNaZmvYhVF?=
- =?us-ascii?Q?8ArCuVfWkoE=3D?=
+ =?us-ascii?Q?Bv7ugJwkdkaBX6YvR3UCNTfmkTMoH6FpddcS35kSmYWNvtzBj4+QupC7mn6V?=
+ =?us-ascii?Q?1B7t8ivAMwr/F+3pso1SvZh4z0lljRJip++1uy56J8Crm2FX2/fP2uuSAleM?=
+ =?us-ascii?Q?jEBI2womVBWFO0Rjk4NAaydRSPf98zkQbevtk1PVlMeHv5v/8/mzOP987uW7?=
+ =?us-ascii?Q?v9HmUpCyxvr7rMsbeGTEtGMzbmETueCDFlNMw1x7jHcULMKyXyuU2upPzapy?=
+ =?us-ascii?Q?nMQh1J16hXx9F5WT/+k8vIg2FTSDIz3kzzRthUZQnx2MxQTLL9B4bq9WGlLV?=
+ =?us-ascii?Q?quEnaX3ySenq1eiFpvsP5WaAb8jvnpkIXMsIShDMrTcBDrrDP3MMYVEr8GXk?=
+ =?us-ascii?Q?GXnfl70OcTFA9OBIWeemBjbh2vjfaAmxlMg5DPQ1hFx+XKpTCrQVNZ+rUJWp?=
+ =?us-ascii?Q?4m3vMILRZnYt77OeVyXa95taF6aHtEIPJAj7Q8UJVIpHDNkSHWenk8lnoZ+z?=
+ =?us-ascii?Q?pu9cZPhFrSt43qFXL12MGghKCTWkcLM6nHO4axNFdPaDSZ3NGvCv+hHglDmJ?=
+ =?us-ascii?Q?oA+fBLM89MD2OifCSmgP/CTouYAKyMCx8Sc/NIyR35WsdFMlbMdMBrHsQCW9?=
+ =?us-ascii?Q?t7MjP0i0izV5NjDvOQA3YKcC78B44ZmaQzBHiNeNTTLqMC1QO1pg95f6StnR?=
+ =?us-ascii?Q?ajdFnshHzdoT9Ni0SBEJF1z2wn1h+901palizHj1LcFuQC7FBrwvmNx9LSTJ?=
+ =?us-ascii?Q?FKvlRAmecIJX507mexRG+YUTSX/gyaD8qPYmn/CHXFZ7gV1BDIRMk87V16vo?=
+ =?us-ascii?Q?zgeC/p3O2CdRp6BpMXGlehIE6SyMWrQhgA0wmaLsGHzfGjfptNVvTH4I2+lx?=
+ =?us-ascii?Q?8IRWR8V7ekRvD3kXCFklnZ48HK+J5OBdVWP1c+dwR0qniXNq+p4afdgS+iAp?=
+ =?us-ascii?Q?VZHgUE0tuLIh3lC2ZzzS4iJ2ZcNuRp7VApUs5eeCexJSJ7Aurpp7GsxvyIsz?=
+ =?us-ascii?Q?6G9pElJclt1hWuvcr7BQWthteToHo96pl8IgQOi/WYR6GBrTM2cPA7UGUfYo?=
+ =?us-ascii?Q?AHDzRV9Xk7g27JN0pHE1SLA/OIU9ixxZlR3fpTiYiYhNdbeQfBIHYnSB7bNO?=
+ =?us-ascii?Q?IgiDQ4ODtOQnjdxVRPksSWuIUhLhyrmxXodNyZDl7oT+tuYp3e94e3Kpv4b6?=
+ =?us-ascii?Q?EeOXBGOAORMMaOsNIuT92mReLoQ8zwSLW+AlouNO4zsLx9sLXhNQVzVuBsKs?=
+ =?us-ascii?Q?spyP2c6QagGQl3kdVH3EEKkOoV6cg7myI808R0UXF52ZMYdt2aLX+HJWZmv1?=
+ =?us-ascii?Q?YZKiu2Fv5AI+YNCi7saZk9yajOQnWgqU8NMK54V6viKKjp0MfMMXk1K4ZxzI?=
+ =?us-ascii?Q?DWjhvgu9lI6QYrY1w5VAv5PsGSsb9kTpeac2u2BHykbF2R/BneNqsCjLb54v?=
+ =?us-ascii?Q?zNWXUC6fA71OGmnOHOvdSlUMyt34hHi07LJlbNwWGbWFwOd+nRjOEbWlMu5n?=
+ =?us-ascii?Q?er2yhTOakO8=3D?=
 X-Forefront-Antispam-Report-Untrusted:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB7743
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB5666
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM4PEPF00025F9A.EURPRD83.prod.outlook.com
+ DB3PEPF0000885E.eurprd02.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	02bce671-90b3-4da5-08d6-08ddf502dfc8
+	f604b0c1-2849-49ee-c712-08ddf5082167
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|14060799003|82310400026|35042699022|36860700013;
+	BCL:0;ARA:13230040|82310400026|14060799003|35042699022|1800799024|7416014|376014|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?b97DbTSvQ3gXeqgljKmigfiGKb6meSyAeMxKl1VlD/TIqYcKP6evZPZ1dNW2?=
- =?us-ascii?Q?V8YFECx16Oc4X2987CxbKFpufdZkyi22wjte4pL0EUDREsAtR5kT8kra5Mk4?=
- =?us-ascii?Q?q1+qIh4Ipy6dRlBiShFZR7L/J9pIP68eA8nyLo0zrT5YltE+tlpmvo8mnk8m?=
- =?us-ascii?Q?iIvGMUI1w++xc1zp3+xcnno0cY2iPb60K+W5FGal+DxFQBnYIYHKSZz2Dnfy?=
- =?us-ascii?Q?uZrYILqt7gkR7HkcKf8HNs31PSWrMXcMEHD34AhuqRID37eOhNj6VFeknkAU?=
- =?us-ascii?Q?Au1WYRaubpvgRnKGnoCkVgd0tZEVr1xlVIl9vOd1MEmiGqko3FDlgxrKl4PQ?=
- =?us-ascii?Q?AUeJ0khhXrbkAGDFy3MXetSEcQnSJNuQDDZ08uyDhgqLGbGCcyaclKtiw82t?=
- =?us-ascii?Q?7oGXmd8jnjkn9KIdIFU2Q6Qiml48chxlvx0WkOxXom8MdO5BGinIy4xQZEuN?=
- =?us-ascii?Q?scZQNv0SdfIoGt4xx3wWO4GFxntXzqMzYeHFAezWRWv0B1eor0hBlIq93QDd?=
- =?us-ascii?Q?5uymzHyzqXZAg8ocrAI7Ag671x/NNW/gwHKtL0gA8ZtIwp6vNEoiqke8KZ/H?=
- =?us-ascii?Q?Slb3aAq9r81zftWYQVcg0M6famFBETwf+4zC4NQ9k+7bvm+5ogjYnTcwkiZe?=
- =?us-ascii?Q?wsUcWcQRWfqCDW3AqiHnatEUSUtKdC3bdXXQGSnhOW1OTNeXaQ3K/JNrd1Yv?=
- =?us-ascii?Q?oPQsLccP3fRu+OWiQvSl92Aiwdy++O4M8uUjU2noKyDRF3uIT1xr79+Kl4F0?=
- =?us-ascii?Q?2AvmkOjgxdqGVqOpbPNCtGy2oj4003dkXUOY/djFTriWqQwqNJTm77fwcJOP?=
- =?us-ascii?Q?t1Ms/1kP4iqQdcekF9jr5wkkfer8CvJRfL3cjKDqeKssLXyQUiYLZjFXppIA?=
- =?us-ascii?Q?WdHWX1nv0TCvF0ic4nU1wtL/jepLDHtgnMhY1/YfJ8ewDJol+xNSIt+zAvWk?=
- =?us-ascii?Q?ZXL+0NCyboOS1pHywGTuz4QnnmcSvgUf0LRV0wAY7pm2EySn8Hk9AOYfG6tB?=
- =?us-ascii?Q?AlLNSyo6J8q3PFDBaZyWj0LlqAj8qjbwoMdAgLi+gHlKPP4SzOacNA2myRJd?=
- =?us-ascii?Q?3TMJXpvWKuNRQUT2B9jIOp+Acie+8MeLtgpYdfxAQmw9ozHD8Lu6GBIJ2y/Z?=
- =?us-ascii?Q?DeIBTeSiqzveQ/nIuTnaCC4LoZIZ98/iLAJIkBRxzlRKmxh0Hb6c1AxSeBC9?=
- =?us-ascii?Q?hOUtYVbumwEUR7JsOwzVcL2p+TiuzkEj1lAS/vpUIo3FIV2xi/vsudTbak9O?=
- =?us-ascii?Q?/jaO1yARCMueHGuUv72pL7zJR8qEmZAeSAR3pdAV/DLZqm6A0Ruu3N+qSrgh?=
- =?us-ascii?Q?VAAokG8wTwkVYu3vnE5ZACI5gDAsZ68zYOgn0/K/KAaRiOh/4SU22K+//7v0?=
- =?us-ascii?Q?isvYTXPe6ht0ca5oXvlVnk069YxjVBLAifUcAl7gSgnD53dWE2mKqh5kD3CC?=
- =?us-ascii?Q?zNITUFQFIpBo6yVX+HD/oZIA2XfG7SliXnjMZgoD2Jrpp4vsO71FlxjVer79?=
- =?us-ascii?Q?hkvsqD++WNm6C2XIcnP0GJoQmgz87fMfr+PG?=
+	=?us-ascii?Q?DGxsWrefF4uKifMjW3VO6bjJjlr7UQyRt12YLLBfru85GixeM0FeJ7YENqjF?=
+ =?us-ascii?Q?r8wUC65w9kUGeoTSJbP8FLrcz1/iktPQrjhwaFHo1ywsoFmhB0DiO5FqRtAT?=
+ =?us-ascii?Q?QLCy8kTjHajDjtjLI+sdoetrf9rpFFgl3FWPmVQ2gU+oCskv5xtDaVDzRCw7?=
+ =?us-ascii?Q?ewOB10YfRfstK6ShL4Gb9lRlMZN9RLWAxwAoCLNl0q7PlNBg4M5CkvSi7COD?=
+ =?us-ascii?Q?lUNdChExPcBqWQJX7WWk+n8UEmRSWgI6vqNh3THqcSYRVyPM5MVoc6EzJS8Z?=
+ =?us-ascii?Q?GmzS7rTMiIJSkB5+eobFV7/Uqv6bykfZja2DwqNSHIkU6YTVOfdUQm3fiGWF?=
+ =?us-ascii?Q?fxWJlfwEdPvu08Se3pMwhza6zJboQj+TRzhwN5EMqOIcKnP76bw/gDKyMfPR?=
+ =?us-ascii?Q?3QrP1B2mB195p7kL52wQJQJPHAuyD8ClHEn9cXy6gKjFI9vJPia6NAHRwp0j?=
+ =?us-ascii?Q?RRYE0w/auCwl6pXykCWV9k/yAY5eAyUx9ZWwen/ve2wTrIIU8Q2Qv1vJBYlT?=
+ =?us-ascii?Q?xlaxXEl37JT454rb2EFo4dRNk4vpQDMp0aE/jWVMb2aEeW8qNJn+RCsxRMnJ?=
+ =?us-ascii?Q?XlSQ0dDsNxDTsyP9/+oVvR2elTXRh7RXjq/OJ2xRkbe45AqMvSGtFbkOO3Ob?=
+ =?us-ascii?Q?Xy7sHPmf3Ywmu8oWutWnDmeIrIjvUvG0ivCtcmEpLY9oTpIZ3I1HoONbbicf?=
+ =?us-ascii?Q?GKLgrDs44VUT99lycfQ+AeTQUY4+xzNK8Q0GpHLf+a91Ws46WwdG7TKXsQj2?=
+ =?us-ascii?Q?jw1dYkv4ICkMPVgsvgICMwsXJg5ofPM/tu7X5AH15B3PpLGVJnFourTty5Kj?=
+ =?us-ascii?Q?o5DedO2cgAHNzH1nxS5sAcCFPbrvklv9EuRHYJ3z1dEaC7WSVcUk01DQdoZ+?=
+ =?us-ascii?Q?T+pag+la16nK/466irYoNVzefC+KE+tNwO39PJuwB3xinnXxgRRK1jYY6/ia?=
+ =?us-ascii?Q?bMwV/+4ch+noF42u4V5VOSzcgV/IyqCjvyPEZNb00CckXPNfPGIfpMdtpjnZ?=
+ =?us-ascii?Q?6Raq12YrC86Nq0ije+yI6bdF6AZ//o4vEzbg2dNgcO2TkqH66okMEuKarLsZ?=
+ =?us-ascii?Q?wjCEeUgKVTLr92fjylAcqHtH63MCfu4xfmGpHYmBRqbfRT6MlOZx1Gmvsc01?=
+ =?us-ascii?Q?wm10YKknTytH0F0kC6IrRQZIq2WfeFpwfE6ex9XZO23xsierBmkJqsWZ02Ej?=
+ =?us-ascii?Q?Zq8pu8QshynsDxX2ScLHXL94hP8bysmkm+Pf9U8lldSj6xDWoALbRkRkCsUf?=
+ =?us-ascii?Q?NRZoQyeuzJKqoxda5buT4D44eg9X6Mx08/IS/phfELSAGEg9dyt1Vy5ulcEw?=
+ =?us-ascii?Q?WeDLN9cpjNpV+SXVBvr40ZYMQBhSyu58rnVxX+fTWvR5ft02okOYLZxD9oGD?=
+ =?us-ascii?Q?spj5Fxey7r7C6WUJKXnEYyHofUTwYbLSkymYqSAbAOhXlJHQSXJ6Nm7c9WFE?=
+ =?us-ascii?Q?nzgtlWDM9cIkK9CgkQvLg3DyMjBjkgMMptXVSdlMg/e0CaOLc0TVZ7l8bpE0?=
+ =?us-ascii?Q?UOPEew+0449UuWFojPl+9xjWLP1VPLOZgeSg?=
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(14060799003)(82310400026)(35042699022)(36860700013);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(14060799003)(35042699022)(1800799024)(7416014)(376014)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2025 09:25:24.8554
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2025 10:02:57.9511
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 359f9fe9-0cfc-4d8b-d7da-08ddf502f79d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d278995-5888-4b56-9136-08ddf5083692
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00025F9A.EURPRD83.prod.outlook.com
+	DB3PEPF0000885E.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB9299
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMDPR08MB11526
 
-Sorry, Ignore this. I've sent wrong this :(
-I'll send it again.
-
-> Hi,
->
-> > On Mon, Sep 15, 2025 at 09:35:55PM +0100, Will Deacon wrote:
-> > > On Mon, Sep 15, 2025 at 08:40:33PM +0100, Catalin Marinas wrote:
-> > > > On Mon, Sep 15, 2025 at 11:32:39AM +0100, Yeoreum Yun wrote:
-> > > > > So I think it would be better to keep the current LLSC implementation
-> > > > > in LSUI.
-> > > >
-> > > > I think the code would look simpler with LL/SC but you can give it a try
-> > > > and post the code sample here (not in a new series).
+Hi,
+> On Mon, Sep 15, 2025 at 09:35:55PM +0100, Will Deacon wrote:
+> > On Mon, Sep 15, 2025 at 08:40:33PM +0100, Catalin Marinas wrote:
+> > > On Mon, Sep 15, 2025 at 11:32:39AM +0100, Yeoreum Yun wrote:
+> > > > So I think it would be better to keep the current LLSC implementation
+> > > > in LSUI.
 > > >
-> > > If you stick the cas*t instruction in its own helper say, cmpxchg_user(),
-> > > then you can do all the shifting/masking in C and I don't reckon it's
-> > > that bad. It means we (a) get rid of exclusives, which is the whole
-> > > point of this and (b) don't have to mess around with PAN.
+> > > I think the code would look simpler with LL/SC but you can give it a try
+> > > and post the code sample here (not in a new series).
 > >
-> > We get rid of PAN toggling already since FEAT_LSUI introduces
-> > LDTXR/STTXR. But, I'm all for CAS if it doesn't look too bad. Easier
-> > I think if we do a get_user() of a u64 and combine it with the futex u32
-> > while taking care of CPU endianness. All in a loop. Hopefully the
-> > compiler is smart enough to reduce masking/or'ing to fewer instructions.
-> >
+> > If you stick the cas*t instruction in its own helper say, cmpxchg_user(),
+> > then you can do all the shifting/masking in C and I don't reckon it's
+> > that bad. It means we (a) get rid of exclusives, which is the whole
+> > point of this and (b) don't have to mess around with PAN.
 >
-> Hmm, I think sure shifting/masking can be replace by single bfi
-> instruction like:
+> We get rid of PAN toggling already since FEAT_LSUI introduces
+> LDTXR/STTXR. But, I'm all for CAS if it doesn't look too bad. Easier
+> I think if we do a get_user() of a u64 and combine it with the futex u32
+> while taking care of CPU endianness. All in a loop. Hopefully the
+> compiler is smart enough to reduce masking/or'ing to fewer instructions.
 >
-> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-> index 1d6d9f856ac5..30da0006c0c8 100644
-> --- a/arch/arm64/include/asm/futex.h
-> +++ b/arch/arm64/include/asm/futex.h
-> @@ -126,6 +126,59 @@ LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
->  LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
->  LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
->
-> +
-> +#define LSUI_CMPXCHG_HELPER(suffix, start_bit)                                 \
-> +static __always_inline int                                                     \
-> +__lsui_cmpxchg_helper_##suffix(u64 __user *uaddr, u32 oldval, u32 newval)      \
-> +{                                                                              \
-> +       int ret = 0;                                                            \
-> +       u64 oval, nval, tmp;                                                    \
-> +                                                                               \
-> +       asm volatile("//__lsui_cmpxchg_helper_" #suffix "\n"                    \
-> +       __LSUI_PREAMBLE                                                         \
-> +"      prfm    pstl1strm, %2\n"                                                \
-> +"1:    ldtr    %x1, %2\n"                                                      \
-> +"      bfi     %x1, %x5, #" #start_bit ", #32\n"                               \
-> +"      bfi     %x1, %x6, #" #start_bit ", #32\n"                               \
-> +"      mov     %x4, %x5\n"                                                     \
-> +"2:    caslt   %x5, %x6, %2\n"                                                 \
-> +"      sub     %x4, %x4, %x5\n"                                                \
-> +"      cbz     %x4, 3f\n"                                                      \
-> +"      mov     %w0, %w7\n"                                                     \
-> +"3:\n"                                                                         \
-> +"      dmb     ish\n"                                                          \
-> +"4:\n"                                                                         \
-> +       _ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)                                   \
-> +       _ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)                                   \
-> +       : "+r" (ret), "=&r" (oval), "+Q" (*uaddr), "=&r" (nval), "=&r" (tmp)    \
-> +       : "r" (oldval), "r" (newval), "Ir" (-EAGAIN)                            \
-> +       : "memory");                                                            \
-> +                                                                               \
-> +       return ret;                                                             \
-> +}
-> +
-> +LSUI_CMPXCHG_HELPER(lo, 0)
-> +LSUI_CMPXCHG_HELPER(hi, 32)
-> +
-> +static __always_inline int
-> +__lsui_cmpxchg_helper(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +       int ret;
-> +       unsigned long uaddr_al;
-> +
-> +       uaddr_al = ALIGN_DOWN((unsigned long)uaddr, sizeof(u64));
-> +
-> +       if (uaddr_al != (unsigned long)uaddr)
-> +               ret = __lsui_cmpxchg_helper_hi((u64 __user *)uaddr_al, oldval, newval);
-> +       else
-> +               ret = __lsui_cmpxchg_helper_lo((u64 __user *)uaddr_al, oldval, newval);
-> +
-> +       if (!ret)
-> +               *oval = oldval;
-> +
-> +       return ret;
-> +}
-> +
->  static __always_inline int
->  __lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
->  {
-> @@ -135,71 +188,25 @@ __lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
->  static __always_inline int
->  __lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
->  {
-> -       unsigned int loops = FUTEX_MAX_LOOPS;
-> -       int ret, oldval, tmp;
-> +       int ret = -EAGAIN;
-> +       u32 oldval, newval;
->
->         /*
->          * there are no ldteor/stteor instructions...
->          */
-> -       asm volatile("// __lsui_futex_atomic_eor\n"
-> -       __LSUI_PREAMBLE
-> -"      prfm    pstl1strm, %2\n"
-> -"1:    ldtxr   %w1, %2\n"
-> -"      eor     %w3, %w1, %w5\n"
-> -"2:    stltxr  %w0, %w3, %2\n"
-> -"      cbz     %w0, 3f\n"
-> -"      sub     %w4, %w4, %w0\n"
-> -"      cbnz    %w4, 1b\n"
-> -"      mov     %w0, %w6\n"
-> -"3:\n"
-> -"      dmb     ish\n"
-> -       _ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w0)
-> -       _ASM_EXTABLE_UACCESS_ERR(2b, 3b, %w0)
-> -       : "=&r" (ret), "=&r" (oldval), "+Q" (*uaddr), "=&r" (tmp),
-> -         "+r" (loops)
-> -       : "r" (oparg), "Ir" (-EAGAIN)
-> -       : "memory");
-> +       unsafe_get_user(oldval, uaddr, err_fault);
-> +       newval = oldval ^ oparg;
->
-> -       if (!ret)
-> -               *oval = oldval;
-> +       ret = __lsui_cmpxchg_helper(uaddr, oldval, newval, oval);
->
-> +err_fault:
->         return ret;
->  }
->
->  static __always_inline int
->  __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
->  {
-> -       int ret = 0;
-> -       unsigned int loops = FUTEX_MAX_LOOPS;
-> -       u32 val, tmp;
-> -
-> -       /*
-> -        * cas{al}t doesn't support word size...
-> -        */
-> -       asm volatile("//__lsui_futex_cmpxchg\n"
-> -       __LSUI_PREAMBLE
-> -"      prfm    pstl1strm, %2\n"
-> -"1:    ldtxr   %w1, %2\n"
-> -"      eor     %w3, %w1, %w5\n"
-> -"      cbnz    %w3, 4f\n"
-> -"2:    stltxr  %w3, %w6, %2\n"
-> -"      cbz     %w3, 3f\n"
-> -"      sub     %w4, %w4, %w3\n"
-> -"      cbnz    %w4, 1b\n"
-> -"      mov     %w0, %w7\n"
-> -"3:\n"
-> -"      dmb     ish\n"
-> -"4:\n"
-> -       _ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)
-> -       _ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)
-> -       : "+r" (ret), "=&r" (val), "+Q" (*uaddr), "=&r" (tmp), "+r" (loops)
-> -       : "r" (oldval), "r" (newval), "Ir" (-EAGAIN)
-> -       : "memory");
-> -
-> -       if (!ret)
-> -               *oval = oldval;
-> -
-> -       return ret;
-> +       return __lsui_cmpxchg_helper(uaddr, oldval, newval, oval);
->  }
->
->  #define __lsui_llsc_body(op, ...)                                      \
->
->
-> This is based on the patch #6.
->
-> Am I missing something?
->
-> --
-> Sincerely,
-> Yeoreum Yun
->
+
+Sorry for my wrong previous email.
+
+Here is what i intened with CAS operation:
+
+diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+index 1d6d9f856ac5..0aeda7ced2c0 100644
+--- a/arch/arm64/include/asm/futex.h
++++ b/arch/arm64/include/asm/futex.h
+@@ -126,6 +126,60 @@ LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
+ LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
+ LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
+
++
++#define LSUI_CMPXCHG_HELPER(suffix, start_bit)                                 \
++static __always_inline int                                                     \
++__lsui_cmpxchg_helper_##suffix(u64 __user *uaddr, u32 oldval, u32 newval)      \
++{                                                                              \
++       int ret = 0;                                                            \
++       u64 oval, nval, tmp;                                                    \
++                                                                               \
++       asm volatile("//__lsui_cmpxchg_helper_" #suffix "\n"                    \
++       __LSUI_PREAMBLE                                                         \
++"      prfm    pstl1strm, %2\n"                                                \
++"1:    ldtr    %x1, %2\n"                                                      \
++"      mov     %x3, %x1\n"                                                     \
++"      bfi     %x1, %x5, #" #start_bit ", #32\n"                               \
++"      bfi     %x3, %x6, #" #start_bit ", #32\n"                               \
++"      mov     %x4, %x1\n"                                                     \
++"2:    caslt   %x1, %x3, %2\n"                                                 \
++"      sub     %x1, %x1, %x4\n"                                                \
++"      cbz     %x1, 3f\n"                                                      \
++"      mov     %w0, %w7\n"                                                     \
++"3:\n"                                                                         \
++"      dmb     ish\n"                                                          \
++"4:\n"                                                                         \
++       _ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)                                   \
++       _ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)                                   \
++       : "+r" (ret), "=&r" (oval), "+Q" (*uaddr), "=&r" (nval), "=&r" (tmp)    \
++       : "r" (oldval), "r" (newval), "Ir" (-EAGAIN)                            \
++       : "memory");                                                            \
++                                                                               \
++       return ret;                                                             \
++}
++
++LSUI_CMPXCHG_HELPER(lo, 0)
++LSUI_CMPXCHG_HELPER(hi, 32)
++
++static __always_inline int
++__lsui_cmpxchg_helper(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
++{
++       int ret;
++       unsigned long uaddr_al;
++
++       uaddr_al = ALIGN_DOWN((unsigned long)uaddr, sizeof(u64));
++
++       if (uaddr_al != (unsigned long)uaddr)
++               ret = __lsui_cmpxchg_helper_hi((u64 __user *)uaddr_al, oldval, newval);
++       else
++               ret = __lsui_cmpxchg_helper_lo((u64 __user *)uaddr_al, oldval, newval);
++
++       if (!ret)
++               *oval = oldval;
++
++       return ret;
++}
++
+ static __always_inline int
+ __lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
+ {
+@@ -135,71 +189,25 @@ __lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
+ static __always_inline int
+ __lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
+ {
+-       unsigned int loops = FUTEX_MAX_LOOPS;
+-       int ret, oldval, tmp;
++       int ret = -EAGAIN;
++       u32 oldval, newval;
+
+        /*
+         * there are no ldteor/stteor instructions...
+         */
+-       asm volatile("// __lsui_futex_atomic_eor\n"
+-       __LSUI_PREAMBLE
+-"      prfm    pstl1strm, %2\n"
+-"1:    ldtxr   %w1, %2\n"
+-"      eor     %w3, %w1, %w5\n"
+-"2:    stltxr  %w0, %w3, %2\n"
+-"      cbz     %w0, 3f\n"
+-"      sub     %w4, %w4, %w0\n"
+-"      cbnz    %w4, 1b\n"
+-"      mov     %w0, %w6\n"
+-"3:\n"
+-"      dmb     ish\n"
+-       _ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w0)
+-       _ASM_EXTABLE_UACCESS_ERR(2b, 3b, %w0)
+-       : "=&r" (ret), "=&r" (oldval), "+Q" (*uaddr), "=&r" (tmp),
+-         "+r" (loops)
+-       : "r" (oparg), "Ir" (-EAGAIN)
+-       : "memory");
++       unsafe_get_user(oldval, uaddr, err_fault);
++       newval = oldval ^ oparg;
+
+-       if (!ret)
+-               *oval = oldval;
++       ret = __lsui_cmpxchg_helper(uaddr, oldval, newval, oval);
+
++err_fault:
+        return ret;
+ }
+
+ static __always_inline int
+ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+ {
+-       int ret = 0;
+-       unsigned int loops = FUTEX_MAX_LOOPS;
+-       u32 val, tmp;
+-
+-       /*
+-        * cas{al}t doesn't support word size...
+-        */
+-       asm volatile("//__lsui_futex_cmpxchg\n"
+-       __LSUI_PREAMBLE
+-"      prfm    pstl1strm, %2\n"
+-"1:    ldtxr   %w1, %2\n"
+-"      eor     %w3, %w1, %w5\n"
+-"      cbnz    %w3, 4f\n"
+-"2:    stltxr  %w3, %w6, %2\n"
+-"      cbz     %w3, 3f\n"
+-"      sub     %w4, %w4, %w3\n"
+-"      cbnz    %w4, 1b\n"
+-"      mov     %w0, %w7\n"
+-"3:\n"
+-"      dmb     ish\n"
+-"4:\n"
+-       _ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)
+-       _ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)
+-       : "+r" (ret), "=&r" (val), "+Q" (*uaddr), "=&r" (tmp), "+r" (loops)
+-       : "r" (oldval), "r" (newval), "Ir" (-EAGAIN)
+-       : "memory");
+-
+-       if (!ret)
+-               *oval = oldval;
+-
+-       return ret;
++       return __lsui_cmpxchg_helper(uaddr, oldval, newval, oval);
+ }
+
+ #define __lsui_llsc_body(op, ...)                                      \
+(END)
+
+Am I missing something?
+
+Thanks!
 
 --
 Sincerely,
