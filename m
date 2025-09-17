@@ -1,105 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99EF34BA21;
-	Wed, 17 Sep 2025 16:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A4234BA3E
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 16:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758126192; cv=none; b=NpYwiB8dct36TYMDxfxwZtOLBNi3PNERRJKkTcRlumWc4kcTZHAuBDxSX6MtLAGDV8pVVFKhyIXhZqvDwI0y9IRqzw3+eKeu/+bA3bYMW1QnO0etkkopJk1zwv6tUBcMXg+S0i3k5aI+f8GCfUYR4fuvfBETGqAcUvZaveJ6Nlc=
+	t=1758126222; cv=none; b=S5aOzlDc22ELivr1+oozENPHx2yKcjGMpKsjwHD/lD3x1OUYmjuKdkMk+f/3oC8Y8haHbeYR3Iz/7Az9/mauqe+gE+mvdtv1/S+qggHhrM9e33Pk+Bq80yuh849VveT/sZO750Wgn2iLhx0cUKDS1JP82ZGvRfiMxJkhov0Rco4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758126192; c=relaxed/simple;
-	bh=9WSFumWUM+iDYPWeZ4g7rzOwgg3/uhk4ULpV1IZjzl0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pq7bWJ5urgYPa9xswjhKBud9X5GWKWia3I0z1p/k/W2B9lOEUI3IKi31cuAslkAALlezchjtSKFPcdtRn+XaUH+3sSZlrVBUXCtXMwLqZwsXCGJl+8nB7kF9Y7HClLsnRX9dhnyZDvlQ7CojsPrjiMbYeHWnryv7F8akovLNOTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kfzj1gnh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758126222; c=relaxed/simple;
+	bh=TzMcduB+dYNSr41rwhXSZY0U6gi844eOHxpTSsSIPn8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qj/v5EANZJXzChQp87HyvCzKkl6qnPk3vCjyr+XVRrMuaGoSMyJ4PkW18opP/6pUBGKhbcVBIBOb5vfIe+RPYbXb6KmB2JLpX2oP1LgFBlIXhyg1FYJ3nsZ3c68wzYCMn0flH3YGpmhovELLGp2xeOmCOkY5+KhWrsIIr/UFnv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=coS8lQSd; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kfzj1gnh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65058C4CEE7;
-	Wed, 17 Sep 2025 16:23:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758126191;
-	bh=9WSFumWUM+iDYPWeZ4g7rzOwgg3/uhk4ULpV1IZjzl0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Kfzj1gnhpIZIlSPLY/n2BOgor5Q8F4ztJr6k1ThhlxR+9gsvxo33Its/rk0lxWDEa
-	 kQMdfrnrLDl4nFOaB8Rp1etdML05U2P1DIxf8tbpfbCHL7R5d7R9ZFVsR8H0uV7JhE
-	 BH+95ZqPe7PISfmGarbuBioxBTAXfUP7jg5saw4yLgYpNB6RwTgNaOYux39yx7hB3e
-	 FET/o+5vB5i3A9XWDEqsUualCOk6gxTzumiLMP1GbDQ9+6LOekeCvcQCOIXWug3AlP
-	 D6nvLVHTS0IJadn4FFX/GbvGR63mT/jj+VNRCG6b0DA1DZHMZh8lFc3v/K9PX4QOYa
-	 ALNAw4EYVBjPA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uyuw1-000000079gN-05oW;
-	Wed, 17 Sep 2025 16:23:09 +0000
-Date: Wed, 17 Sep 2025 17:23:08 +0100
-Message-ID: <86o6r9121f.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org"
-	<will@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 1/5] KVM: arm64: Allow ICC_SRE_EL2 accesses on a GICv5 host
-In-Reply-To: <20250828105925.3865158-2-sascha.bischoff@arm.com>
-References: <20250828105925.3865158-1-sascha.bischoff@arm.com>
-	<20250828105925.3865158-2-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="coS8lQSd"
+Date: Wed, 17 Sep 2025 09:23:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758126217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VEWfwup8HkaFVKYNuzYL4Zw5tlWfBk4oey4f4O/y5yw=;
+	b=coS8lQSdLxDOzsi5y+YOpKTBPky/cJt2tuWoMiaNAWZnBCictOlfwr6AfiL/2Fj6Pjys0h
+	uWD4+wRSlAxbv5zGYGbqt00sceWNzJN35T67JXUeSfyn9kIA3UvmaIB5PPPvSM9u+F4hOF
+	tM5aAlI01f1Pxb2gIhgAdTySJxg3Ypo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, ankita@nvidia.com, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org
+Subject: Re: [PATCH v1] KVM: arm64: Fix page leak in user_mem_abort()
+Message-ID: <aMrgeuZur2Zd6ybX@linux.dev>
+References: <20250917130737.2139403-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917130737.2139403-1-tabba@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 28 Aug 2025 11:59:42 +0100,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Wed, Sep 17, 2025 at 02:07:37PM +0100, Fuad Tabba wrote:
+> The user_mem_abort() function acquires a page reference via
+> __kvm_faultin_pfn() early in its execution. However, the subsequent
+> checks for mismatched attributes between stage 1 and stage 2 mappings
+> would return an error code directly, bypassing the corresponding page
+> release.
 > 
-> The bet0 release of the GICv5 specification didn't include the
-> ICC_SRE_EL2 register as part of FEAT_GCIE_LEGACY. This was an
-> oversight, and support for this register has been added as of the bet1
-> release of the specification.
+> Fix this by storing the error and releasing the unused page before
+> returning the error.
 > 
-> Remove the guarding in the vGICv3 code that skipped the ICC_SRE_EL2
-> accesses for a GICv5 host. As a result of this change, it now becomes
-> possible to use nested virtualisation on a GICv5 host when running
-> legacy GICv3-based VMs.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Fixes: 6d674e28f642 ("KVM: arm/arm64: Properly handle faulting of device mappings")
+> Fixes: 2a8dfab26677 ("KVM: arm64: Block cacheable PFNMAP mapping")
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 
-I just remembered my promise from almost 3 weeks ago, and just posted
-this:
+Yikes, nice catch.
 
-https://lore.kernel.org/r/20250917161935.1630908-1-maz@kernel.org
-
-which kills two birds with one stone. I'll take it as a prefix to this
-series.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Oliver
