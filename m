@@ -1,199 +1,66 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1815C15CD74
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 04:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05491C5F23
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 05:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758081661; cv=none; b=P3ncYneQEfepuoKq/nCGMpTEMgHhDT1GnT/5weUi4cwp+3apAtC+wgEjZ8bhxz9R4u5msC6AuXpqh5zd4TYeLk5XFAnDslLSF0vlYPFTUWT6koG6ZCzdWHZD8m2DYrONyqeakE7k1LU34Y+zYqvGEEumTBwYm6ny2Ly7FgLHoAY=
+	t=1758086482; cv=none; b=pxn3t15PlCwaYPDQ/PCX48luNpl46cSmZ20jMxJD+efPF8nNG7rxnyu2F14PD9+60VvgDSJ7czCNpc63mK/cils3ODwLuGj6DtsJi/HnwNUmqG4I4m7Na77pVcA0WyZ1STds2VtR+hLaT1a8hVi3/NWKNuquMxQpBCuh0uNFTw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758081661; c=relaxed/simple;
-	bh=E+vg+p+zLhuxWHfCrPbQKHJN8kzS3UQqdYSutjkxwcM=;
-	h=CC:Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=i/5YCdhos1L7TgIh8H+mLVPa7g1i5OyiZHqd16ZfrTCKMzCy3j9p6Lv22ZYzDkmnFJQDcmIwZ8RetHfkQAmkCprKHs44YID31M9Gfv/iLweKVMIu4VpAlU68tz752I0tCAhPyx7TWrT0IwXKFEaFJgGkoQug/sD75OEhJSe3XW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cRQ1F5VTGzRkQj;
-	Wed, 17 Sep 2025 11:56:17 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 537AA1402E9;
-	Wed, 17 Sep 2025 12:00:55 +0800 (CST)
-Received: from kwepemq200018.china.huawei.com (7.202.195.108) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 17 Sep 2025 12:00:55 +0800
-Received: from [10.67.121.177] (10.67.121.177) by
- kwepemq200018.china.huawei.com (7.202.195.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 17 Sep 2025 12:00:53 +0800
-CC: <yangyicong@hisilicon.com>, Jonathan Cameron
-	<jonathan.cameron@huawei.com>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<corbet@lwn.net>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <shuah@kernel.org>,
-	<shameerali.kolothum.thodi@huawei.com>, <linuxarm@huawei.com>,
-	<prime.zeng@hisilicon.com>, <xuwei5@huawei.com>, <tangchengchang@huawei.com>,
-	<wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v4 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-References: <20250715081356.12442-1-yangyicong@huawei.com>
- <20250715081356.12442-6-yangyicong@huawei.com>
- <aL7Fgx__LeLfbDyU@willie-the-truck>
- <5d2ba565-715b-9b17-951b-f805dde5988b@huawei.com>
- <aMLvtpaCgRqPAU2Z@willie-the-truck> <20250912144736.00007673@huawei.com>
- <666e3588-2e42-2275-f9ec-94ba0954bdc6@huawei.com> <aMl6u7xTDLhrZmqK@arm.com>
- <0dfe5781-7ca7-7d9f-b099-b20da5e10a1b@huawei.com>
-From: Yicong Yang <yangyicong@huawei.com>
-Message-ID: <b63740fb-1f24-649c-4f18-46e4ffe5a41f@huawei.com>
-Date: Wed, 17 Sep 2025 12:00:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+	s=arc-20240116; t=1758086482; c=relaxed/simple;
+	bh=QftlpN5pu6WIwTG0pl52OHhs8s/lZYOjw5tZ8sUEXnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m99jW7ulbgTVTkC0PE3UfxaT+uh1mJfxcxZcQZZ/SJicEpk1FxNq5M2yh0D12FGL7dv+WQUHon2gfFV/iCko9CydupbFP8J9O72ftxSgga4GF7HAv7221XSKYIwZ/LXzG8QZ/1kFNMxaJRLX6T1iLILjoXHC9Y1T2jmESzjR0E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ONlm1N7/; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ONlm1N7/"
+Date: Tue, 16 Sep 2025 22:21:09 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758086477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SE80BDLp7RGmNryQ1WRS/aK8000n2rtH3W8fQeIL/c4=;
+	b=ONlm1N7/v3ZoW6UPF24U6gmqobIOXl4WGiyNax4nAwwivsgr2dSV79bQR6u9ESl43ku3nZ
+	53b8dPxD+kQFT7ZZV4ccOemciEY1RJbAohR3/ZnqDL5Ea3GGFYybmHP2DKihpSBQW81qTe
+	ss43SrLNC0BFkB6kA8lhxDzWIyWJ0tA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Fix kvm_vcpu_{set,is}_be() to deal with EL2
+ state
+Message-ID: <aMpFRYarTozl7Q38@linux.dev>
+References: <20250916161103.1040727-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <0dfe5781-7ca7-7d9f-b099-b20da5e10a1b@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq200018.china.huawei.com (7.202.195.108)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250916161103.1040727-1-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On 2025/9/17 11:51, Yicong Yang wrote:
-> On 2025/9/16 22:56, Catalin Marinas wrote:
->> On Mon, Sep 15, 2025 at 04:29:25PM +0800, Yicong Yang wrote:
->>> On 2025/9/12 21:47, Jonathan Cameron wrote:
->>>> On Thu, 11 Sep 2025 16:50:14 +0100
->>>> Will Deacon <will@kernel.org> wrote:
->>>>> On Tue, Sep 09, 2025 at 09:48:04AM +0800, Yicong Yang wrote:
->>>>>> per ARM DDI0487 L.b section C3.2.6,
->>>>>>
->>>>>>   When the instructions access a memory type that is not one of the following,
->>>>>>   a data abort for unsupported Exclusive or atomic access is generated...  
->>>>>
->>>>> That's about the memory _type_. I'm talking about a supported memory type
->>>>> (e.g. writeback cacheable) but when the physical location doesn't support
->>>>> the instruction. That's captured a little later in the same section:
->>>>>
->>>>>   | If the target memory location does not support the LD64B or ST64B
->>>>>   | instructions, then one of the following behaviors occurs:
->>>>>   |  * A stage 1 Data Abort, reported using the DFSC code of 0b110101,
->>>>>   |    is generated.
->>>>>   |  * The instruction performs the memory accesses, but the accesses
->>>>>   |    are not single-copy atomic above the byte level
->>
->> Is this a new addition to the L.b release of the ARM ARM? Maybe it was
->> there before in some other form (or a different place). At least it
->> doesn't say "unpredictable".
->>
+On Tue, Sep 16, 2025 at 05:11:03PM +0100, Marc Zyngier wrote:
+> Nobody really cares about BE, but KVM currently only deals with
+> SCTLR_EL1 when evaluating or setting the endianness in PSCI,
+> meaning that we evaluate whatever the L2 state has been at some point.
 > 
-> i think it's new in L.b. didn't find this is mentioned in K.a either.
+> Teach these primitives about SCTLR_EL2, and forget about BE...
 > 
->>>>> and I think that's a bad interface to expose blindly to userspace solely
->>>>> as a boolean hwcap.
->>>>
->>>> Nasty, so now I'm curious. Any thoughts on how to expose what regions it is appropriate
->>>> for?  I can think of various heavy weight options but wondering if there is a simple
->>>> solution.
->>>
->>> in my understanding the hwcap only describes the capabilities of the CPU but not
->>> the whole system. the users should make sure the function works as expected if the
->>> CPU supports it and they're going to use it. specifically the LS64 is intended for
->>> device memory only, so the user should take responsibility of using it on supported
->>> memory.
->>
->> We have other cases like MTE where we avoid exposing the HWCAP to user
->> if we know the memory system does not support MTE, though we intercepted
->> this early and asked the (micro)architects to tie the CPU ID field to
->> what the system supports.
->>
-> 
-> but we lack the same identification mechanism as CPU for the memory system, so it's just a
-> restriction for the hardware vendor that if certain feature is not supported for the whole
-> system (SoC) then do not advertise it in the CPU's ID field. otherwise i think we're currently
-> doing in the manner that if capability mismatch or cannot work as expected together then a
-> errata/workaround is used to disable the feature or add some workaround on this certain
-> platform.
-> 
-> this is also the case for LS64 but a bit more complex, since it involves the completer outside
-> the SoC (the device) and could be a hotplug one (PCIe). from the SoC part we can restrict to
-> advertise the feature only if it's fully supported (what we've already done on our hardware).
-> 
->>> may raise the similar question if use other atomic instructions (e.g. LSE) on the
->>> memory does not support atomicity. find this restriction in ARM DDI0487 L.b section B2.2.6
->>>
->>>   Some system implementations might not support atomic instructions for all regions of the
->>>   memory
->>
->> With exclusives or atomics, we require that the general purpose (system)
->> RAM supports the feature, otherwise Linux won't work properly (I don't
->> think we specifically documented this but it would be fairly obvious
->> when the kernel doesn't boot or user-space randomly crashes).
->>
-> 
-> yes the spec requires general purpose memory to support atomicity.
-> 
->   The architecture only requires that Conventional memory that is mapped in this way supports
->   this functionality
-> 
-> otherwise users should have knowledge whether the target memory agent support atomicity.
-> 
->>> and if perform atomic instruction on unsupported memory it's allowed to implement as
->>>
->>>   * The instruction generates a synchronous External abort.
->>>   * The instruction generates a System Error interrupt.
->>>   * The instruction generates an IMPLEMENTATION DEFINED MMU fault reported using the Data
->>>     Abort Fault status code of ESR_ELx.DFSC = 110101.
->>>   * The instruction is treated as a NOP.
->>>   * The instructions are performed, but there is no guarantee that the memory accesses were
->>>     performed atomically in regard to other agents that access memory. In this case, the
->>>     instruction might also generate a System Error interrupt.
->>>
->>> if instruction performed without generate a SEI in the last implementation, it's quite similar
->>> to the condition of LS64.
->>
->> The difference is that we don't support Linux on such systems.
->>
->> Arguably, the use of LD/ST64B* is fairly specialised and won't be used
->> on the general purpose RAM and by random applications. It needs a device
->> driver to create the NC/Device mapping and specific programs/libraries
->> to access it. I'm not sure the LS64 properties are guaranteed by the
->> device alone or the device together with the interconnect. I suspect the
->> latter and neither the kernel driver nor user space can tell. In the
->> best case, you get a fault and realise the system doesn't work as
->> expected. Worse is the non-atomicity with potentially silent corruption.
->>
-> 
-> will be the latter one, both interconnect and the target device need to
-> support it. but I think the driver developer (kernel driver or userspace
-> driver) must have knowledge about the support status, otherwise they
-> should not use it.
-> 
-> for general purpose ram currently we have fault mechenism to avoid ld/st64b
-> usage (there's maybe an exception if FEAT_LS64WB is supported, which is
-> introduced in the latest feature list but no spec describe it and allows
-> perform ld/st64b on memory with write-back attribute. but currently I have
-> no details about this feature from any public documents)
-> 
->> So, to Will's point, the HWCAP is not sufficient for user space to make
->> an informed decision on whether it can safely use the LS64 instructions.
->> Can a (generic) device driver tell or do we need additional information
->> in firmware tables to advertise the correct behaviour?
->>
-> 
-> my thoughts is that the driver developer should have known whether their
-> device support it or not if going to use this. the information in the
-> firmware table should be fine for platform devices, but cannot describe
-> information for hotpluggable ones like PCIe endpoint devices which may
-> not be listed in a firmware table.
-> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-another option is that we drop the advertisement from the hwcap and cpuinfo
-and let user retrieve the CPU suppport from the ID reg directly or from the
-dmesg. does it make sense?
+You know, I was about to say "don't we need to sanitise this?" although
+that seems to already be in place. Nice.
 
-thanks.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+
+Thanks,
+Oliver
