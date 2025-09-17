@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B18368087
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 14:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880F3333ABB
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 14:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758121005; cv=none; b=SGNaDkVBzM9fpYBo9iPGmuaYP4/8IVddHVu151hzOb03Tu7G24q2IgW/z6QRDVJbw878hXmCXzKbe/NmNqG6XbGAIe6Xixlzk1m+efPmDffBOLZ/WLLdkOnMg0yub+7y+VzdfjUzBl/52nCtghEnKWQ3tzcqxA6WTd0LTCmtAVM=
+	t=1758121008; cv=none; b=ItbB4d52fKMDoKRUEG9uQCILMjRZijS5Yf6LdSVisYG7S+szLgr2ZWO15jtrPqWzq81s6wBPuyBoXa6P2eervgbgqWf4p6SUWwxTf3OlGgvKmKQCKgzd5NTP/WO8y6T04ew+MjO2+dzshHI68BnvTYe4P2pfTEAOsqCPv71+F0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758121005; c=relaxed/simple;
-	bh=jpG4OioajyvO9e69rzujynWFs3I89Xv/VGW/yDdnHLY=;
+	s=arc-20240116; t=1758121008; c=relaxed/simple;
+	bh=N8YLYPkl4tKVv6OcchZf05oQ0VXHePRCzLklXY2vJXk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JSE3VGRDHrmi9dK2bL/CY+d38VjER+UBF11H3kjBEcuNeYcmeGXTfpY2EU7/ZPzo0PKnk3jCvFarABb8htlbcwIsqfcLnYzzNwIlh/Fi0kgpBzG/lRkaVzSqxa0A8sK7boCah/IZAuXXy62Sqbmq39Vx2T48qaXHrq6DjfDlJ/0=
+	 MIME-Version; b=EgRsKReRJGp3wZFf0dsrnvgIheXGjJY0Ha7JESxxF3FPVUEXXsVMlOqu0il+OnkmnPUBTkTXwPMHG84yDKdOsJS5FWFDazZfIIR/2GVDf9CC5QB1qImEqMu4UVVX61mgSCoKnDvTyNVgItF7AmonPxi34J0aZaQtni9vXGc8q0k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1A134267F;
-	Wed, 17 Sep 2025 07:56:35 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E05F3267F;
+	Wed, 17 Sep 2025 07:56:38 -0700 (PDT)
 Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C6D8D3F66E;
-	Wed, 17 Sep 2025 07:56:39 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 98C6C3F66E;
+	Wed, 17 Sep 2025 07:56:43 -0700 (PDT)
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -45,9 +45,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	linux-pm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v5 5/6] arm64: make the per-task SCTLR2_EL1
-Date: Wed, 17 Sep 2025 15:56:17 +0100
-Message-Id: <20250917145618.1232329-6-yeoreum.yun@arm.com>
+Subject: [PATCH v5 6/6] docs: arm64: Document booting requirements for FEAT_SCTLR2
+Date: Wed, 17 Sep 2025 15:56:18 +0100
+Message-Id: <20250917145618.1232329-7-yeoreum.yun@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250917145618.1232329-1-yeoreum.yun@arm.com>
 References: <20250917145618.1232329-1-yeoreum.yun@arm.com>
@@ -59,68 +59,46 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some bits in SCTLR2_EL1 that control system behavior can be
-configured on a per-task basis (e.g., fields related to FEAT_CPA2).
-To support future use of these fields, SCTLR2_EL1 is maintained
-per task.
+From: Dave Martin <Dave.Martin@arm.com>
 
-On platforms without FEAT_SCTLR2 support, there is no functional
-change and only minimal performance overhead.
+Support for FEAT_SCTLR2 imposes some requirments on the configuration
+of traps at exception levels above the level at which the kernel is
+booted.
 
+Document them.
+
+For now, don't document requirements on the initial state of SCTLR2_ELx
+at the kernel boot exception level.  The general wording under "System
+registers" appiles.  (SCTLR_ELx is similarly undocumented.)
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
 Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
 ---
- arch/arm64/include/asm/processor.h | 3 +++
- arch/arm64/kernel/process.c        | 9 +++++++++
- 2 files changed, 12 insertions(+)
+ Documentation/arch/arm64/booting.rst | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index 61d62bfd5a7b..e066116735c6 100644
---- a/arch/arm64/include/asm/processor.h
-+++ b/arch/arm64/include/asm/processor.h
-@@ -184,6 +184,7 @@ struct thread_struct {
- 	u64			mte_ctrl;
- #endif
- 	u64			sctlr_user;
-+	u64			sctlr2_user;
- 	u64			svcr;
- 	u64			tpidr2_el0;
- 	u64			por_el0;
-@@ -258,6 +259,8 @@ static inline void task_set_sve_vl_onexec(struct task_struct *task,
- 	(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB |   \
- 	 SCTLR_EL1_TCF0_MASK)
+diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+index 2f666a7c303c..e8fe1b2023a9 100644
+--- a/Documentation/arch/arm64/booting.rst
++++ b/Documentation/arch/arm64/booting.rst
+@@ -545,6 +545,16 @@ Before jumping into the kernel, the following conditions must be met:
  
-+#define SCTLR2_USER_MASK	(0)
+    - MDCR_EL3.TPM (bit 6) must be initialized to 0b0
+ 
++  For CPUs with the SCTLR2_ELx registers (FEAT_SCTLR2):
 +
- static inline void arch_thread_struct_whitelist(unsigned long *offset,
- 						unsigned long *size)
- {
-diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index 96482a1412c6..e54f192c0629 100644
---- a/arch/arm64/kernel/process.c
-+++ b/arch/arm64/kernel/process.c
-@@ -698,6 +698,11 @@ void update_sctlr_el1(u64 sctlr)
- 	isb();
- }
- 
-+static void update_sctlr2_el1(u64 sctlr2)
-+{
-+	sysreg_clear_set_s(SYS_SCTLR2_EL1, SCTLR2_USER_MASK, sctlr2);
-+}
++  - If EL3 is present:
 +
- /*
-  * Thread switching.
-  */
-@@ -737,6 +742,10 @@ struct task_struct *__switch_to(struct task_struct *prev,
- 	if (prev->thread.sctlr_user != next->thread.sctlr_user)
- 		update_sctlr_el1(next->thread.sctlr_user);
- 
-+	if (alternative_has_cap_unlikely(ARM64_HAS_SCTLR2) &&
-+	    prev->thread.sctlr2_user != next->thread.sctlr2_user)
-+		update_sctlr2_el1(next->thread.sctlr2_user);
++    - SCR_EL3.SCTLR2En (bit 44) must be initialised to 0b1.
 +
- 	/* the actual thread switch */
- 	last = cpu_switch_to(prev, next);
- 
++  - If the kernel is entered at EL1 and EL2 is present:
++
++    - HCRX_EL2.SCTLR2En (bit 15) must be initialised to 0b1.
++
+ The requirements described above for CPU mode, caches, MMUs, architected
+ timers, coherency and system registers apply to all CPUs.  All CPUs must
+ enter the kernel in the same exception level.  Where the values documented
 -- 
 LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
