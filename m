@@ -1,51 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C717630C102;
-	Wed, 17 Sep 2025 15:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C49930C0E0;
+	Wed, 17 Sep 2025 15:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758122742; cv=none; b=Po76lpSNsEwMT5fI1+lkHuXwvg9LjBmUQs3vgKsosNda7OyMmL9nItPVsQ25q0WW8ugIVvy3t2NM0G/VNJe5dRbI10Poe4VD/uqPm3aUusyp5ANT6Seg3sAbuobhmwhY3V8QhkZE/s9FqA8hiE+4M1f3OiKAUofvqE80s2nQlzI=
+	t=1758122904; cv=none; b=Xvoy5DG7hL0JrTsOH5/Lnr0xdGnCrUv18aJTg7D+caxiMAE9Tz1DcvaookLfd7S+EwVAwqosgmSM79YfRGABxExq67gYwaKBPJBc9hVmQrQdiRzbctaV0dovJEopnGwmso/UXP5N2JL2KaGbDl3CLYJekaotN1fcEUl6FRXtRzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758122742; c=relaxed/simple;
-	bh=tI6Ac6w2oSwCuXBkCkMUNA45xDANBSg0NsMKs0L/pWk=;
+	s=arc-20240116; t=1758122904; c=relaxed/simple;
+	bh=tCpYKYOs1RRFEZTeEQBT6Jf93AtipOf9WVQbNEp0FSA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ee+8ZIYgrgS+o9C29u+8pgSsYFDzqC9is/89gs5KNxlWeq3dr+sQZ6ZG2XeEhUHpCIUTuT/qcEWTT9uiAHUDHI3JPrkRokoJoRqHTRcgPBVIuQns3wPJF0nZfe/xE1QQmAeax8M2ApQoV5U2zwUu1VpzJZY4CSeVwylQCOfYHWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2QNT5yM; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=RRzVP8ogROkmhiUeE6UGsRepz769vj6zci9O6Y62NCysnhfyxe0j274H5cGQM5Nye7nqAQj6Qycx+xtuHw017VsU10EncJrTa55vWpTcvfK9vOdH0iRChPsQmvYmwLf3ACoRW5GeIDva8JsFeIdSsbEPQ7re4C7mb9h6VVnj8mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KlsKh/KO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2QNT5yM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37AF3C4CEF7;
-	Wed, 17 Sep 2025 15:25:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlsKh/KO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB7CC4CEE7;
+	Wed, 17 Sep 2025 15:28:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758122742;
-	bh=tI6Ac6w2oSwCuXBkCkMUNA45xDANBSg0NsMKs0L/pWk=;
+	s=k20201202; t=1758122903;
+	bh=tCpYKYOs1RRFEZTeEQBT6Jf93AtipOf9WVQbNEp0FSA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K2QNT5yMEHai5Vv/X9Wu5SKbEUub0HuW9bSL7UR9OtNZ2wgtTRGVMqy+EeWLu6zCB
-	 9HS05wzgxjSx4t8yvRyP1tYn37tOihaIeKFoa2duJhXOkZe33a7JQR2QKGK+m73OI1
-	 8NwIn1eQRXwi9/1JIkEExLaRWwFqnddrYWy4Fs8FdQ4nkVA4HktT8+KExwWgLeLtEi
-	 BnlbVPi/+zScjZk1SdmMRPOB2RNHTetUxhMCvBEbSWaEkKu2dDOvdlGuORECI+Ady9
-	 7fEcN6N9jEZj5n/s4KHdLyWw5f9796kOJslzMbSki0HHfRWGrgWyYakx0/qhfOCq5+
-	 BY2I3uw4moQjA==
-Date: Wed, 17 Sep 2025 16:25:35 +0100
+	b=KlsKh/KOWTz9EJsOhxbcsQD1AonOuNxGcDYCaLEvof0go8Kii2EdkTTE3cwzPY4+x
+	 pezqfTuKvi9Fyq8mgaea4SqDfa9UD6PRx+EjdXTuYIXRZBRf44v2XLveKJsGGoCqRP
+	 602qHH66J3aZQttpSl5FEe7O1QIUSnuUChjwlwFkG9xvRbSnJopQl9bpq+fWTNqDWl
+	 PXwste2mqnB34TEm4tS16177xoqY7yOlcrmkPIyBm5rty+gYZd+0D1YEz9+J4mt7UX
+	 2uF+bsk4wVK8zl+k1Sax14G72QagFZhjpimL4OyCtSA/RpByUaOKLlD3Lr0gs92s6v
+	 hUbwmgbk6ZzcA==
+Date: Wed, 17 Sep 2025 16:28:16 +0100
 From: Will Deacon <will@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Mostafa Saleh <smostafa@google.com>, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	iommu@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, robin.murphy@arm.com,
-	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v4 22/28] iommu/arm-smmu-v3-kvm: Emulate CMDQ for host
-Message-ID: <aMrS71vQ_MaVonzi@willie-the-truck>
-References: <20250819215156.2494305-1-smostafa@google.com>
- <20250819215156.2494305-23-smostafa@google.com>
- <aMQroI4NDu74PDGT@willie-the-truck>
- <20250915163858.GK882933@ziepe.ca>
- <aMl_5j8G3IGulAC6@google.com>
- <20250917123601.GA1326709@ziepe.ca>
- <aMrNTny9jgZJd_Ef@willie-the-truck>
- <20250917151612.GH1326709@ziepe.ca>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: catalin.marinas@arm.com, broonie@kernel.org, oliver.upton@linux.dev,
+	anshuman.khandual@arm.com, robh@kernel.org, james.morse@arm.com,
+	mark.rutland@arm.com, joey.gouly@arm.com, Dave.Martin@arm.com,
+	ahmed.genidi@arm.com, kevin.brodsky@arm.com,
+	scott@os.amperecomputing.com, mbenes@suse.cz,
+	james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org,
+	pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com,
+	maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 0/6] initialize SCTRL2_ELx
+Message-ID: <aMrTkLhLOhas8Viy@willie-the-truck>
+References: <20250917145618.1232329-1-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,37 +50,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250917151612.GH1326709@ziepe.ca>
+In-Reply-To: <20250917145618.1232329-1-yeoreum.yun@arm.com>
 
-On Wed, Sep 17, 2025 at 12:16:12PM -0300, Jason Gunthorpe wrote:
-> On Wed, Sep 17, 2025 at 04:01:34PM +0100, Will Deacon wrote:
-> > On Wed, Sep 17, 2025 at 09:36:01AM -0300, Jason Gunthorpe wrote:
-> > > On Tue, Sep 16, 2025 at 03:19:02PM +0000, Mostafa Saleh wrote:
-> > > 
-> > > > I think the fix for the problem Will mentioned is to just use CMOs
-> > > > before accessing the host structures, so that should be simple.
-> > > > If it turns to be more complicated, I am happy to drop the support
-> > > > for non-coherent devices from this series and we can add it later.
-> > > 
-> > > I feel like it is easier/better to fix the driver to use cachable
-> > > memory than to add CMOs to the pkvm side..
-> > 
-> > Hmm, but for non-coherent SMMU hardware (which sadly exists in
-> > production), I don't think there's a way for firmware to tell the driver
-> > that it needs to issue CMOs for the page-tables and the CDs but not the
-> > other in-memory data structures (e.g. STEs). I suppose we could do it in
-> > some pKVM-specific way, but then that's not really helping anybody else.
+On Wed, Sep 17, 2025 at 03:56:12PM +0100, Yeoreum Yun wrote:
+> This series introduces initial support for the SCTLR2_ELx registers in Linux.
+> The feature is optional starting from ARMv8.8/ARMv9.3,
+> and becomes mandatory from ARMv8.9/ARMv9.4.
 > 
-> Not sure I understand?
+> Currently, Linux has no strict need to modify SCTLR2_ELx--
+> at least assuming that firmware initializes
+> these registers to reasonable defaults.
 > 
-> I mean to issue CMOs in the smmu driver consistently for everthing,
-> page table, CD entry, STE, etc. Today it only does it for page table.
+> However, several upcoming architectural features will require configuring
+> control bits in these registers.
+> Notable examples include FEAT_PAuth_LR and FEAT_CPA2.
 > 
-> Make the driver consistently use cachable memory for everything
-> instead of having two different ways to deal with incoherent HW.
+> Patch History
+> ==============
+> from v4 to v5:
+>   - using .ifc in set_sctlr2_elx
+>   - change (re)initialise position after SCTLR_ELx
+>   - add docs for SCTRL2_ELx
+>   - rebase to v6.17-rc6
+>   - https://lore.kernel.org/all/20250821172408.2101870-1-yeoreum.yun@arm.com/
 
-Ah right, so the driver would unnecessarily issue CMOs for the structures
-that are just shared with the hypervisor. At least it's _functional_ that
-way, but I'm sure people will complain!
+Sorry, this is a really pedantic nit, but please can you fix the typo in
+the subject if/when you next post this?
+
+More importantly, as Dave says, I don't see the point in merging this
+until we have a use for the register. At that point, your patches can
+hopefully be a prefix of the series that uses it.
 
 Will
