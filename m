@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4529F2EA740
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 11:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF82A2F5499
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 11:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758107335; cv=none; b=t2MSqf1yA2Q3dK1CE2tC9AEnuDx1loL4xgxjOx8jO0+Qev7nEE2YPhYwmoey2MO98T4qeX8KnSUIfaSG6QBwSb1NB2oYuu+jUB45p+cuyUDGVcaJkM9W5faxmxfgiAjOqkmsLybIR+qm+iC65FR4W4RwywT2pOcBSaAyiX0HPPA=
+	t=1758107338; cv=none; b=fK8fVxkM9Dk8HQf8a+8ZPMyb8M6dLvmne2dtFm5WLMX+P2GDPamAxLvLnlItjB5dJ8BfZUtIC7FR2f1XsLfiD+bvnluMcpy7sPjWXDGkcZSLZdYV5BFRDIoHnCeOV0wJ1XdO3jrmmo9rQ92atwC3ngK5ZruRMC0k9wTkdrELHNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758107335; c=relaxed/simple;
-	bh=20QbCLjpe2fArK+DjDxhhuFdUUrwJ/AGa/wDAbICzTg=;
+	s=arc-20240116; t=1758107338; c=relaxed/simple;
+	bh=EaXCQ2EJ2zVcQaIC9xmiLklVLUzPqC7aenGAqOdUpnc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KX8var/DbA4/Kk3C3yH848WcppXacuDE7ryAkCZijIwrGc6dxd+0Ej3HdGz0/0YpSvKF4N8RBBBKFcBy51JNLSsacwAsm9RtkpofDD3dg8aRw1GA3E6++38/8EJu38YvYygvxkEjcH8qMngfrRbpwGbXL0KCbPCFtN3ke5fVKZA=
+	 MIME-Version; b=IwiWZXWmrwBgfbLM05Rg0zcHU2r7nlyFK+FANqzcH72fo6uFTbAJBDJzM2/8BIl58TmddEsw3lDpj5jfKjB0x6/rQ9nLBGOQKzJ+UzGkrZ3G86cF9OdpV6ZT85eSiSfIOlnFyW2QQRHRUaEE1B+7CFfeXpktRwJ1gESrzr6NIPE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 99E1D2696;
-	Wed, 17 Sep 2025 04:08:45 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3331426A4;
+	Wed, 17 Sep 2025 04:08:48 -0700 (PDT)
 Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 905773F66E;
-	Wed, 17 Sep 2025 04:08:51 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 20EF23F66E;
+	Wed, 17 Sep 2025 04:08:54 -0700 (PDT)
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -35,9 +35,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v8 1/5] arm64: cpufeature: add FEAT_LSUI
-Date: Wed, 17 Sep 2025 12:08:34 +0100
-Message-Id: <20250917110838.917281-2-yeoreum.yun@arm.com>
+Subject: [PATCH v8 2/5] KVM: arm64: expose FEAT_LSUI to guest
+Date: Wed, 17 Sep 2025 12:08:35 +0100
+Message-Id: <20250917110838.917281-3-yeoreum.yun@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250917110838.917281-1-yeoreum.yun@arm.com>
 References: <20250917110838.917281-1-yeoreum.yun@arm.com>
@@ -49,59 +49,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since Armv9.6, FEAT_LSUI provides load/store instructions
-that allow privileged code to access user memory without
-clearing the PSTATE.PAN bit.
-
-Add CPU feature detection for FEAT_LSUI.
+expose FEAT_LSUI to guest.
 
 Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+Acked-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- arch/arm64/kernel/cpufeature.c | 10 ++++++++++
- arch/arm64/tools/cpucaps       |  1 +
- 2 files changed, 11 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index ef269a5a37e1..9f83d3fe941b 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -279,6 +279,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar2[] = {
- 
- static const struct arm64_ftr_bits ftr_id_aa64isar3[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_FPRCVT_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_LSUI_SHIFT, 4, ID_AA64ISAR3_EL1_LSUI_NI),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_FAMINMAX_SHIFT, 4, 0),
- 	ARM64_FTR_END,
- };
-@@ -3156,6 +3157,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		ARM64_CPUID_FIELDS(ID_AA64PFR2_EL1, GCIE, IMP)
- 	},
-+#ifdef CONFIG_AS_HAS_LSUI
-+	{
-+		.desc = "Unprivileged Load Store Instructions (LSUI)",
-+		.capability = ARM64_HAS_LSUI,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64ISAR3_EL1, LSUI, IMP)
-+	},
-+#endif
- 	{},
- };
- 
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 9ff5cdbd2759..b728e5a2e05e 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -44,6 +44,7 @@ HAS_HCX
- HAS_LDAPR
- HAS_LPA2
- HAS_LSE_ATOMICS
-+HAS_LSUI
- HAS_MOPS
- HAS_NESTED_VIRT
- HAS_BBML2_NOABORT
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index b29f72478a50..abdf19ae250e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1757,7 +1757,8 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+ 			val &= ~ID_AA64ISAR2_EL1_WFxT;
+ 		break;
+ 	case SYS_ID_AA64ISAR3_EL1:
+-		val &= ID_AA64ISAR3_EL1_FPRCVT | ID_AA64ISAR3_EL1_FAMINMAX;
++		val &= ID_AA64ISAR3_EL1_FPRCVT | ID_AA64ISAR3_EL1_FAMINMAX |
++		       ID_AA64ISAR3_EL1_LSUI;
+ 		break;
+ 	case SYS_ID_AA64MMFR2_EL1:
+ 		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+@@ -3141,7 +3142,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 					ID_AA64ISAR2_EL1_APA3 |
+ 					ID_AA64ISAR2_EL1_GPA3)),
+ 	ID_WRITABLE(ID_AA64ISAR3_EL1, (ID_AA64ISAR3_EL1_FPRCVT |
+-				       ID_AA64ISAR3_EL1_FAMINMAX)),
++				       ID_AA64ISAR3_EL1_FAMINMAX | ID_AA64ISAR3_EL1_LSUI)),
+ 	ID_UNALLOCATED(6,4),
+ 	ID_UNALLOCATED(6,5),
+ 	ID_UNALLOCATED(6,6),
 -- 
 LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
