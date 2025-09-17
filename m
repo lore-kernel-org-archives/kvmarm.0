@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86552FB98D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85D92EC54D
 	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 16:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758128327; cv=none; b=DYi5HC0Ix1rZWpWsulrYxfa9wQt+UDJuGAITdzOuvuJ//CCEN4FrfPmlBygyDRJKciyRxmRnDJDR7AOZQi77iHeFgVFoCRJuXEiVMbcjiDVbeQ26VyKWMA6Ycc5ajGOfdOlJeIiI9DM73D18fZKCRqJ/RVpeKGwQSh6wWo6oPhc=
+	t=1758128327; cv=none; b=O/+wW/1LkvfvSq1hF3OzbjNC2XjKAnSarlUGdwfMe5IPsAy1E2KjaB5oSSo50rQxNkRRRb08/ZrhYjwzr0yuel94T5jPpxSZ/o3gYklFEvWIyZJXmkuLGmWrFu9Vv+CYaKo0a9T24WS1NbJOLgR+XZQ2BVbUZq1am7Ga5w23zd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758128327; c=relaxed/simple;
-	bh=d+w3TjPvq3SS133fV6Sh+nZK6LHsjMEfCPRqIKDB9F0=;
+	bh=scTyprIG46wzzk/gBRmZrGtepaqC0rmNAeCBnCv2f18=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=b9HOKcFzINK4zL3V8pV6IDP5+kwhnhiCl1IKrbKD/1jk/XNRtdEl4myoZJgu5DfwYoz+hAdkO6QABP3vsICLMq9u9B4YuRk5sbZv41DkETuv20h9oiPuReIR6xPlydoouL3pvOGFiTaJ2w3vRsZ4SN1tE9wMxuo1QhF7ThvA2Wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LObE7gn/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=msBbAaxGPWuLp+bdOHGnHV566/leITPy8t9TCVYnqvUMslRxys+Cw09ki2Hih2INYekqlYHtyedO8dgmkZJ5hrzxKNXDUW1MrSrdkuhgpZfj5riIIIA/UoqXVT3X2vjMdllfbiK1HK4UEuJqVZ8O4KCce/Yb860P3QKutCKlwi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=juuFVrex; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LObE7gn/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DBE0C4CEFB;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="juuFVrex"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2702BC4CEF9;
 	Wed, 17 Sep 2025 16:58:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1758128327;
-	bh=d+w3TjPvq3SS133fV6Sh+nZK6LHsjMEfCPRqIKDB9F0=;
+	bh=scTyprIG46wzzk/gBRmZrGtepaqC0rmNAeCBnCv2f18=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LObE7gn/2oQ9thof55DcvUVU8XCcofs1b3KKKB1+b/lxmpoHZwjk5s8+zlhBW2X9y
-	 N6mV59OP0xZccwtVcDpeSIriWIXm/DcO+o/21CEZ2n04+R9xXb34fMcfA3JrOpNn6v
-	 BuHRjPD0f7dwp4a0W9zDhnyTMmW6dtc8cCRmr3KS20bG+/nbGnOUKcq6flKUDvF8az
-	 iDoisbJ9NQpPL9g6+8J7T/irzS+hi4w9mlpqWhYNQP8Ei/E7K2Jq6LWXIPxORfbl/k
-	 vzvDRzENjQMHKZaqhhFfDc79Fok6gRSuVNXwuomU4STzkRHiLaJJ6a8kqZzDWWaURx
-	 JzV9etaLiMHBA==
+	b=juuFVrexea4AiIX8dfoeS3iEFSVaN68SbbwSJjux3kL1m3EAfUu1/iEatD/5BRbzr
+	 mqi+F+7FFJBL51EEQbT0wNKnAsWByyYs8FKLutCsRBJKjn7S8gBYsBTHzNA0qI2fXn
+	 gtmuv77UbFtPhiQs4uAgo77hqZcBS01Hc2lh6eKnhf2xctkvuZxkE6HrhN7LPXugYZ
+	 yjMycru63KJ+gMklf6GTl6CHbZCdhtZsWSHUJi/ScsbjZNrfOrSDbQpsfu9uebSfqd
+	 sVYColMzN+X53Qyz6RPDICLbTovHt+T7WkcSXagGBe8RrvZrnCK1yPQmj6OHyERNt0
+	 5jC+U6fekI9zQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uyvUT-00000007AQw-2EJn;
+	id 1uyvUT-00000007AQw-1Lgh;
 	Wed, 17 Sep 2025 16:58:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -40,9 +40,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Jinqian Yang <yangjinqian1@huawei.com>
-Subject: [PATCH 7/8] KVM: arm64: Convert SCTLR_EL1 RES0 handling to compute_reg_res0_bits()
-Date: Wed, 17 Sep 2025 17:58:39 +0100
-Message-Id: <20250917165840.1633412-8-maz@kernel.org>
+Subject: [PATCH 6/8] KVM: arm64: Enforce absence of FEAT_TCR2 on TCR2_EL2
+Date: Wed, 17 Sep 2025 17:58:38 +0100
+Message-Id: <20250917165840.1633412-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250917165840.1633412-1-maz@kernel.org>
 References: <20250917165840.1633412-1-maz@kernel.org>
@@ -64,50 +64,50 @@ Signed-off-by: Marc Zyngier <maz@kernel.org>
  1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 0e6723bd75775..09af46e16ac30 100644
+index b008551fcf7e9..0e6723bd75775 100644
 --- a/arch/arm64/kvm/config.c
 +++ b/arch/arm64/kvm/config.c
-@@ -1050,7 +1050,7 @@ static const
- struct reg_to_feat_map tcr2_el2_feat_map = FEAT_MAP(TCR2_EL2, FEAT_TCR2,
- 						    tcr2_el2_bit_feat_map);
+@@ -1024,7 +1024,7 @@ static const
+ struct reg_to_feat_map sctlr2_feat_map = FEAT_MAP(SCTLR2_EL1, FEAT_SCTLR2,
+ 						  sctlr2_bit_feat_map);
  
--static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
-+static const struct reg_bits_to_feat_map sctlr_el1_bit_feat_map[] = {
- 	NEEDS_FEAT(SCTLR_EL1_CP15BEN	|
- 		   SCTLR_EL1_ITD	|
- 		   SCTLR_EL1_SED,
-@@ -1124,6 +1124,10 @@ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
- 		   FEAT_AA64EL1),
+-static const struct reg_bits_to_feat_map tcr2_el2_feat_map[] = {
++static const struct reg_bits_to_feat_map tcr2_el2_bit_feat_map[] = {
+ 	NEEDS_FEAT(TCR2_EL2_FNG1	|
+ 		   TCR2_EL2_FNG0	|
+ 		   TCR2_EL2_A2,
+@@ -1046,6 +1046,10 @@ static const struct reg_bits_to_feat_map tcr2_el2_feat_map[] = {
+ 	NEEDS_FEAT(TCR2_EL2_PIE, FEAT_S1PIE),
  };
  
 +static const
-+struct reg_to_feat_map sctlr_el1_feat_map = FEAT_MAP(SCTLR_EL1, FEAT_AA64EL1,
-+						    sctlr_el1_bit_feat_map);
++struct reg_to_feat_map tcr2_el2_feat_map = FEAT_MAP(TCR2_EL2, FEAT_TCR2,
++						    tcr2_el2_bit_feat_map);
 +
- static const struct reg_bits_to_feat_map mdcr_el2_feat_map[] = {
- 	NEEDS_FEAT(MDCR_EL2_EBWE, FEAT_Debugv8p9),
- 	NEEDS_FEAT(MDCR_EL2_TDOSA, FEAT_DoubleLock),
-@@ -1196,8 +1200,7 @@ void __init check_feature_map(void)
+ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
+ 	NEEDS_FEAT(SCTLR_EL1_CP15BEN	|
+ 		   SCTLR_EL1_ITD	|
+@@ -1191,8 +1195,7 @@ void __init check_feature_map(void)
+ 	check_reg_feat_map(&hcrx_feat_map);
  	check_reg_feat_map(&hcr_feat_map);
  	check_reg_feat_map(&sctlr2_feat_map);
- 	check_reg_feat_map(&tcr2_el2_feat_map);
--	check_feat_map(sctlr_el1_feat_map, ARRAY_SIZE(sctlr_el1_feat_map),
--		       SCTLR_EL1_RES0, "SCTLR_EL1");
-+	check_reg_feat_map(&sctlr_el1_feat_map);
+-	check_feat_map(tcr2_el2_feat_map, ARRAY_SIZE(tcr2_el2_feat_map),
+-		       TCR2_EL2_RES0, "TCR2_EL2");
++	check_reg_feat_map(&tcr2_el2_feat_map);
+ 	check_feat_map(sctlr_el1_feat_map, ARRAY_SIZE(sctlr_el1_feat_map),
+ 		       SCTLR_EL1_RES0, "SCTLR_EL1");
  	check_feat_map(mdcr_el2_feat_map, ARRAY_SIZE(mdcr_el2_feat_map),
- 		       MDCR_EL2_RES0, "MDCR_EL2");
- }
-@@ -1407,9 +1410,7 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+@@ -1400,9 +1403,7 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+ 		*res1 = SCTLR2_EL1_RES1;
+ 		break;
+ 	case TCR2_EL2:
+-		*res0 = compute_res0_bits(kvm, tcr2_el2_feat_map,
+-					  ARRAY_SIZE(tcr2_el2_feat_map), 0, 0);
+-		*res0 |= TCR2_EL2_RES0;
++		*res0 = compute_reg_res0_bits(kvm, &tcr2_el2_feat_map, 0, 0);
  		*res1 = TCR2_EL2_RES1;
  		break;
  	case SCTLR_EL1:
--		*res0 = compute_res0_bits(kvm, sctlr_el1_feat_map,
--					  ARRAY_SIZE(sctlr_el1_feat_map), 0, 0);
--		*res0 |= SCTLR_EL1_RES0;
-+		*res0 = compute_reg_res0_bits(kvm, &sctlr_el1_feat_map, 0, 0);
- 		*res1 = SCTLR_EL1_RES1;
- 		break;
- 	case MDCR_EL2:
 -- 
 2.39.2
 
