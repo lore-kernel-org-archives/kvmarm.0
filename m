@@ -1,30 +1,32 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3DC2FF64C
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 21:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41BE302159
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 21:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758144071; cv=none; b=O9+ASa0rFbQzIgQpPncmjTlUVkjDigYx2E9cDABebSeCp0M5yjFrcj4R0FRlbiDZBwPhiQj+FHF2kEkY9vtxyFBJh2ektQt2oWoLFWkoQhf4d7ZxKvXXqaHzDWxyKwml/G/ceQbjAr3/hqMFJk75x2vVAOjIhkSDqcajauuVH4Y=
+	t=1758144072; cv=none; b=K6ohS4Z0emxkhea3HSiKbxzNPCVM2AvKlOHStfBkXjHsolsopghY7akZS/N0La2cx02LIP3CXAqQhkgCdDSYXK1PsTNewIB1wJAvZnmfhSdI6uipALE5/thFT/vRyJ85GelIFKiwfdVngxDy+sXNzpmQ7VE8JzDyJ/GsNIEdVoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758144071; c=relaxed/simple;
-	bh=C6JBU8UQ0J+TDyHKdV4+fcg6PQSDJYVvr3xClRwx3Vw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bXaRV5V4na2WZS5zTGJXszUBMERVH8RmQ+KT+geYr6CmYGE5FbWrx7fHxTL+tiTqj96Z91GYigRMecSDz6zT9nbSCVuaKpUgK3gqvXci5QycRcqdfqUEf/a/9Qr866gFyC8RnhVRsvEYM4hZikvA0Da77SaO6f20VCT/gcE7/jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S/a30xtA; arc=none smtp.client-ip=95.215.58.180
+	s=arc-20240116; t=1758144072; c=relaxed/simple;
+	bh=0mXiSySomtrpDg/5r48heAKR/PGyVvY8o7fZWx5akeQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bBsGcjekjn0r2WFI1qWxX3sWaykzrgIzjXEJ0YU1d43NwCnsUBJ13ajAMYuyKejZ6vdzkoKdBy6QIrxMzFbAnwmOXX9RwMVATyfC8fTOOpqWVPGW9TrzMzE/SCGQlbixJGQg8PSm5zOKydn8Ylb+EVgERHB9QVAw5zPrk7EKFw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QfGI0FR0; arc=none smtp.client-ip=95.215.58.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S/a30xtA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QfGI0FR0"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758144057;
+	t=1758144068;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pd1fhLL+GVsRg46oAn3Js7dlB2NaSHd/8Rv1J0NuXKs=;
-	b=S/a30xtARsCmkTyo3bGBxURya23Qgz70j2RC/jO311BRlsh3Bz3MCqREH3mRVBuICGhHS1
-	c/aYXmH0aHL4Fs0QG7RJ+rOGpPg/Kpr+rXSkiKWBQQpVwLgJ57FkLzL3H3X11oYTipH6rp
-	KrWZ7DYDVD8SGu+HYwfSbSWqBOIq/nQ=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4bAVQ7xzTmIVtjM3UYB4HE6Zzx4t7mj/lid4gyv+JD0=;
+	b=QfGI0FR0Cl7Pke36kXSYjJP4XZb3avjny91cjvn+WPnNX2Bo0R/2fCpmtMYNI/P3MJPA+q
+	0jTqJHsUTTGeDq69IqN+TFu8VBGKLJZwDwZOBmhHuSj4sfLZsITnI/ObEdNIo1U72xGupa
+	hdY8rgwTG2NEZ8v/JIJ8CsDeFDJB1qs=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -40,9 +42,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 00/13] KVM: arm64: selftests: Run selftests in VHE EL2
-Date: Wed, 17 Sep 2025 14:20:30 -0700
-Message-ID: <20250917212044.294760-1-oliver.upton@linux.dev>
+Subject: [PATCH 04/13] KVM: arm64: selftests: Add unsanitised helpers for VGICv3 creation
+Date: Wed, 17 Sep 2025 14:20:34 -0700
+Message-ID: <20250917212044.294760-5-oliver.upton@linux.dev>
+In-Reply-To: <20250917212044.294760-1-oliver.upton@linux.dev>
+References: <20250917212044.294760-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,76 +56,104 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-I've been working on some MMU-related features that are unused by KVM
-meaning they're somewhat annoying to test. Because of that, I found the
-time / patience to port our existing selftests infrastructure over to
-running in VHE EL2, opportunistically promoting tests when the stars
-align.
+vgic_v3_setup() has a good bit of sanity checking internally to ensure
+that vCPUs have actually been created and match the dimensioning of the
+vgic itself. Spin off an unsanitised setup and initialization helper so
+vgic initialization can be wired in around a 'default' VM's vCPU
+creation.
 
-Creating a VGIC is a hard requirement of enabling EL2 for a VM. As a
-consequence of this, I need to eat my words from my earlier conversation
-with Sean on this topic and hammer in a default VGICv3. This requires
-some participation from the arch-neutral code given the ordering
-constraints on vCPU and VGIC creation.
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ .../selftests/kvm/include/arm64/vgic.h        |  2 +
+ tools/testing/selftests/kvm/lib/arm64/vgic.c  | 50 ++++++++++++-------
+ 2 files changed, 35 insertions(+), 17 deletions(-)
 
-At the tail end of this series is a sanity test for EL2 but nothing is
-actually running nested (yet). Despite that, running in EL2 has proven
-valuable already as it has uncovered a bug [*].
-
-This is all _very_ lightly tested on an M2 :) Applies to 6.17-rc4
-
-[*]: https://lore.kernel.org/kvmarm/20250917203125.283116-1-oliver.upton@linux.dev/
-
-Oliver Upton (13):
-  KVM: arm64: selftests: Provide kvm_arch_vm_post_create() in library
-    code
-  KVM: arm64: selftests: Initialize VGICv3 only once
-  KVM: arm64: selftests: Add helper to check for VGICv3 support
-  KVM: arm64: selftests: Add unsanitised helpers for VGICv3 creation
-  KVM: arm64: selftests: Create a VGICv3 for 'default' VMs
-  KVM: arm64: selftests: Alias EL1 registers to EL2 counterparts
-  KVM: arm64: selftests: Provide helper for getting default vCPU target
-  KVM: arm64: selftests: Select SMCCC conduit based on current EL
-  KVM: arm64: selftests: Use hyp timer IRQs when test runs at EL2
-  KVM: arm64: selftests: Use the vCPU attr for setting nr of PMU
-    counters
-  KVM: arm64: selftests: Initialize HCR_EL2
-  KVM: arm64: selftests: Enable EL2 by default
-  KVM: arm64: selftests: Add basic test for running in VHE EL2
-
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../testing/selftests/kvm/arm64/arch_timer.c  | 13 +--
- .../kvm/arm64/arch_timer_edge_cases.c         | 13 +--
- tools/testing/selftests/kvm/arm64/hello_el2.c | 58 ++++++++++++
- .../testing/selftests/kvm/arm64/hypercalls.c  |  2 +-
- tools/testing/selftests/kvm/arm64/kvm-uuid.c  |  2 +-
- .../testing/selftests/kvm/arm64/no-vgic-v3.c  |  2 +
- tools/testing/selftests/kvm/arm64/psci_test.c | 13 +--
- .../testing/selftests/kvm/arm64/set_id_regs.c | 20 ++--
- .../selftests/kvm/arm64/smccc_filter.c        | 17 +++-
- tools/testing/selftests/kvm/arm64/vgic_init.c |  2 +
- tools/testing/selftests/kvm/arm64/vgic_irq.c  |  4 +-
- .../selftests/kvm/arm64/vgic_lpi_stress.c     |  8 +-
- .../selftests/kvm/arm64/vpmu_counter_access.c | 75 +++++++--------
- .../selftests/kvm/dirty_log_perf_test.c       | 35 -------
- tools/testing/selftests/kvm/dirty_log_test.c  |  1 +
- tools/testing/selftests/kvm/get-reg-list.c    |  9 +-
- .../selftests/kvm/include/arm64/arch_timer.h  | 24 +++++
- .../kvm/include/arm64/kvm_util_arch.h         |  5 +-
- .../selftests/kvm/include/arm64/processor.h   | 73 +++++++++++++++
- .../selftests/kvm/include/arm64/vgic.h        |  3 +
- .../testing/selftests/kvm/include/kvm_util.h  |  7 +-
- .../selftests/kvm/lib/arm64/processor.c       | 91 ++++++++++++++++---
- tools/testing/selftests/kvm/lib/arm64/vgic.c  | 64 +++++++++----
- tools/testing/selftests/kvm/lib/kvm_util.c    | 15 ++-
- .../testing/selftests/kvm/lib/x86/processor.c |  2 +-
- tools/testing/selftests/kvm/s390/cmma_test.c  |  2 +-
- tools/testing/selftests/kvm/steal_time.c      |  2 +-
- 28 files changed, 395 insertions(+), 168 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/arm64/hello_el2.c
-
-
-base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
+diff --git a/tools/testing/selftests/kvm/include/arm64/vgic.h b/tools/testing/selftests/kvm/include/arm64/vgic.h
+index b858fa8195b4..688beccc9436 100644
+--- a/tools/testing/selftests/kvm/include/arm64/vgic.h
++++ b/tools/testing/selftests/kvm/include/arm64/vgic.h
+@@ -17,6 +17,8 @@
+ 	index)
+ 
+ bool kvm_supports_vgic_v3(void);
++int __vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs);
++void __vgic_v3_init(int fd);
+ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs);
+ 
+ #define VGIC_MAX_RESERVED	1023
+diff --git a/tools/testing/selftests/kvm/lib/arm64/vgic.c b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+index 661744c6532e..d0f7bd0984b8 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/vgic.c
++++ b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+@@ -41,24 +41,11 @@ bool kvm_supports_vgic_v3(void)
+  * redistributor regions of the guest. Since it depends on the number of
+  * vCPUs for the VM, it must be called after all the vCPUs have been created.
+  */
+-int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
++int __vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
+ {
+ 	int gic_fd;
+ 	uint64_t attr;
+-	struct list_head *iter;
+-	unsigned int nr_gic_pages, nr_vcpus_created = 0;
+-
+-	TEST_ASSERT(nr_vcpus, "Number of vCPUs cannot be empty");
+-
+-	/*
+-	 * Make sure that the caller is infact calling this
+-	 * function after all the vCPUs are added.
+-	 */
+-	list_for_each(iter, &vm->vcpus)
+-		nr_vcpus_created++;
+-	TEST_ASSERT(nr_vcpus == nr_vcpus_created,
+-			"Number of vCPUs requested (%u) doesn't match with the ones created for the VM (%u)",
+-			nr_vcpus, nr_vcpus_created);
++	unsigned int nr_gic_pages;
+ 
+ 	/* Distributor setup */
+ 	gic_fd = __kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3);
+@@ -81,10 +68,39 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
+ 						KVM_VGIC_V3_REDIST_SIZE * nr_vcpus);
+ 	virt_map(vm, GICR_BASE_GPA, GICR_BASE_GPA, nr_gic_pages);
+ 
+-	kvm_device_attr_set(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
++	return gic_fd;
++}
++
++void __vgic_v3_init(int fd)
++{
++	kvm_device_attr_set(fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+ 			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
++}
+ 
+-	return gic_fd;
++int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
++{
++	unsigned int nr_vcpus_created = 0;
++	struct list_head *iter;
++	int fd;
++
++	TEST_ASSERT(nr_vcpus, "Number of vCPUs cannot be empty");
++
++	/*
++	 * Make sure that the caller is infact calling this
++	 * function after all the vCPUs are added.
++	 */
++	list_for_each(iter, &vm->vcpus)
++		nr_vcpus_created++;
++	TEST_ASSERT(nr_vcpus == nr_vcpus_created,
++		    "Number of vCPUs requested (%u) doesn't match with the ones created for the VM (%u)",
++		    nr_vcpus, nr_vcpus_created);
++
++	fd = __vgic_v3_setup(vm, nr_vcpus, nr_irqs);
++	if (fd < 0)
++		return fd;
++
++	__vgic_v3_init(fd);
++	return fd;
+ }
+ 
+ /* should only work for level sensitive interrupts */
 -- 
 2.47.3
 
