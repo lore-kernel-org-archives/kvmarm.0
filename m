@@ -1,292 +1,323 @@
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011009.outbound.protection.outlook.com [40.107.130.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13C02D3A6D
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 14:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.9
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758119380; cv=fail; b=JvxTwvL36TnFg65m0+wEwDQ5C//0cb+1tnPbs57CHiOfle5IIZCoILdtUcZ8u78j+6YMo7ehO8j0SF04jL72vXhPVNYMcujKgJ66K1eaVXdqcP4HTQ9L6bsw2I64AEsYvAaWG4iMIXT397QSkvCyQ/MtjU7ZO/5/9nGuSztgI3c=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758119380; c=relaxed/simple;
-	bh=syj5F+uQO0tW+MjiXvwEhmpjRYmm6UYq8QvIUGL/1ic=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Img/+45nHkAJa9j1Ks72caFi2YRcO8uuKahxRxAOZ2fNO/BqBuqAa+TYDz0ksXXbK+4mNL+W+J0KMsFNwjPgvVYy5g/5UYCQB7SSU6GoRBlP+bypIjk1ffguXzJ1A7dA/dolJbw3wDQQU7HvsoZxJhf1heQN1aibG8uxAfvBcYo=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ogH7c/4/; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ogH7c/4/; arc=fail smtp.client-ip=40.107.130.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC2F3161A4
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 14:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758120773; cv=none; b=carruA5ErbJrO2fCdOYd1MN92gnQuLUYz1blJhQ/hxomJJRo8jSSRWWmW5hxnzlgL5X6xoIR33hY51AHBGwNxZXlWSIM7O8M1rp+8lyZnfYTxujIBdoOtfwxoosaT3EgolCe/h+MCMVoe0+6SiAM4LpyytuFBPKqmGHClyflzwI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758120773; c=relaxed/simple;
+	bh=5epPT/yF5ySKt5yJiiDB0pyPwiJwOtudKK0nsTblkcQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A8HlJuhhhlqTqTYBBatvzaWeN5ZdiW4vCr+wJb+mOUgn34A/ZOlNcRyXNDmYfgaZTws7GSSuRbkfA7YquF4i7zEioCjdSPA2o/C1hJBBOpnqY/axEYAe2w0gotro/4wzLhnKrSrCHAUe2Uyyu2rR9/ZSsMVXKVVdd1r5hQvFm7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y5HKCiYJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ogH7c/4/";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ogH7c/4/"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=zUaMBGUrqCMGKuuqOmLq6G5g+acPRCQ0bZF6PJKpaJhGMbU8f4vchJmU0W3h+SDrUPHoCY8Kh2BBxkyp9I/kHo1RuWaMls5HpsrxYZqqCtYsP3tgsyDNAj9sJpWRTFN6SkFpJ1aSQh7NVJvXjoBMZcxt7OYSwaX57YnVKNOwA9jhXe+7VUd9lrWqhowtySmeTzXMH42/0RKgfW+rlZPgNFS0qCbdSaBYk9+g9mAbKYrDRNzmBhJXuUkGg79lk9degKvSucKLMrxIwLNGFm6B6TZNiOlMi1mR0BA9bruOHMK+QJC8x6qzQDas1asHtrs0BjNYFdnUdqDBVHJz/uxnHQ==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k1sH/NQLa+O1qhCKsXfDV0tUyIR6/Ydvry/+xnvEZoM=;
- b=GEJ9RZPWBPI5ycDqd+VIFOlm5qfjluE2Vc1spIGY7rIho+Tu+SRjuzYsET7HToJiP3STgvQU+FoQijNreYProZwqrXpYGPOpSTSmah0ms31+zu7f4+nC3Y+NIGm0sMKzux4ga4tx0neRNXfDBeH5kjv3F0IYJOGWNUoTlcshuJFxLXRsovSVlMxCkfvqi01GCz8yPYh9gyGKAjzcB+GVVdtO1nZzOF2TF17JFxMuExkyysdvupYrKRZxUy2mXi6xupkFtdc8wYaBhNkSNayCeSa+JytcqhhQRoIkQPdRHj8Mly3juw6UmKF1MRSdc5FGZuLOy/v0mIO8Arg8btHH2A==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k1sH/NQLa+O1qhCKsXfDV0tUyIR6/Ydvry/+xnvEZoM=;
- b=ogH7c/4/UIU2PZ2kwnu/y0+OsvJAngNKYB5FGEBGrsVepgWnbn0AlLdB1oDrjmYgWRu4NWmBLOz1cLj4+FeSHFwpt9LPTmvMzOTHkTFggFQCsAXGPdT/EKd8ZddFNfuSmYe3x80xHcUX8x8W+j0mmGAVIKZJFk6TSHCauYwg3MU=
-Received: from AM0PR04CA0108.eurprd04.prod.outlook.com (2603:10a6:208:be::49)
- by DU0PR08MB9874.eurprd08.prod.outlook.com (2603:10a6:10:422::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Wed, 17 Sep
- 2025 14:29:31 +0000
-Received: from AMS1EPF0000004C.eurprd04.prod.outlook.com
- (2603:10a6:208:be:cafe::d4) by AM0PR04CA0108.outlook.office365.com
- (2603:10a6:208:be::49) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.13 via Frontend Transport; Wed,
- 17 Sep 2025 14:29:31 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AMS1EPF0000004C.mail.protection.outlook.com (10.167.16.137) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.12
- via Frontend Transport; Wed, 17 Sep 2025 14:29:30 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o2JH/8RjCthN2OvU2HhMWhePGLv29LNX29Hfl8qXB8WVAG+nWLk8nkzhiMynC5J0ha0rp0h0jf6F2kLMir94DzwKibuwCg69C5yU/D8b7mNMvYS53gnzurBZZEKNCXTyeubQ8LnU9MpUw+VsV8XmnDcqS86BiHSaUZnsgW2/OHd72OidaDeezF/veczVwp3xOHfKKyH0sWM0U7zFjtF4rl+Zxz67ULDA+/S0/1QeWvGcp9Ih78HeSqu3vU+/RC0muu8KpAunf+bNsRJQqyG6gp9bC7E85BFPy4lfaT6qNWJ9xSRfYW3xJUgqWYtJ8BNBTRjAOfpK68N3pSuaHY2I3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k1sH/NQLa+O1qhCKsXfDV0tUyIR6/Ydvry/+xnvEZoM=;
- b=n+nGGAhpTPg40btPtkUixRtf1VmkwQXXnUKHAO6mpfEgotmz2ndHi2qH5KOq6sYxxaF5CtwMkjaC8kyNW41kk5xe+w6mn1S4U2zZdoyWgVavgPE2Hy3LBcxmcZriumVQUm/GAN66Ohb2hqge8hHgBw2RSOqRf6Itp2r7xmN+kIl8H7ipXaOlND+zCi+KU5TscIU+b/iV66Mq1hofGSvXE1ObVdbWmzJJ92f64zHWErmwNDW7kovDXVxTAInToX6SeFqiepU34wwoQw+dVKQ4ilyllib4RhI8tW0p6/fk8DRe315QHAM9EOimhoSykcAe8PwzxnhKhlE7pHbHijzh2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k1sH/NQLa+O1qhCKsXfDV0tUyIR6/Ydvry/+xnvEZoM=;
- b=ogH7c/4/UIU2PZ2kwnu/y0+OsvJAngNKYB5FGEBGrsVepgWnbn0AlLdB1oDrjmYgWRu4NWmBLOz1cLj4+FeSHFwpt9LPTmvMzOTHkTFggFQCsAXGPdT/EKd8ZddFNfuSmYe3x80xHcUX8x8W+j0mmGAVIKZJFk6TSHCauYwg3MU=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20) by PAXPR08MB6735.eurprd08.prod.outlook.com
- (2603:10a6:102:138::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Wed, 17 Sep
- 2025 14:28:59 +0000
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::d430:4ef9:b30b:c739]) by GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::d430:4ef9:b30b:c739%3]) with mapi id 15.20.9137.012; Wed, 17 Sep 2025
- 14:28:58 +0000
-Date: Wed, 17 Sep 2025 15:28:55 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
-	oliver.upton@linux.dev, anshuman.khandual@arm.com, robh@kernel.org,
-	james.morse@arm.com, mark.rutland@arm.com, joey.gouly@arm.com,
-	ahmed.genidi@arm.com, kevin.brodsky@arm.com,
-	scott@os.amperecomputing.com, mbenes@suse.cz,
-	james.clark@linaro.org, frederic@kernel.org, rafael@kernel.org,
-	pavel@kernel.org, ryan.roberts@arm.com, suzuki.poulose@arm.com,
-	maz@kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 2/5] arm64: initialise SCTLR2_ELx register at boot time
-Message-ID: <aMrFp/2TY2BYQ76W@e129823.arm.com>
-References: <20250821172408.2101870-1-yeoreum.yun@arm.com>
- <20250821172408.2101870-3-yeoreum.yun@arm.com>
- <aLW4A3rTcJvA0c+j@e133380.arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aLW4A3rTcJvA0c+j@e133380.arm.com>
-X-ClientProxiedBy: LO4P265CA0159.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2c7::9) To GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5HKCiYJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758120769;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=gDs3CUgjimStalCZ6Y06kSWDcmRW5MkZeDVBa3itpks=;
+	b=Y5HKCiYJkMelEBHm798LQBOLQFsyQ4blYDc14lDVhJ/bHYjdvQbuCv7/jO/47JDBWlsqO/
+	tEGGpzgemCnl/U0UimZ7TU43h178Eiq8aSCF2Er8+oFp51VBlUkq3KaUuSXvDq0L3o+kTU
+	Mj18HYK7ipfmA0ng1MjSJLfEzVKerwM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-425-ZFhgM8YYOsqCHtd0pctJog-1; Wed, 17 Sep 2025 10:52:48 -0400
+X-MC-Unique: ZFhgM8YYOsqCHtd0pctJog-1
+X-Mimecast-MFC-AGG-ID: ZFhgM8YYOsqCHtd0pctJog_1758120767
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45deddf34b9so5896855e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 07:52:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758120767; x=1758725567;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gDs3CUgjimStalCZ6Y06kSWDcmRW5MkZeDVBa3itpks=;
+        b=UI4z4PP2I7lP94MdTjp/D/ywunFGCJQZpF6OIk13m03vwDHP7S5xuxe8qyBVS7qF55
+         wnFyHUR8T+5rQMTN3vs5GBkk579ieEHZH5r6QnjzjyDlMfIwWrqeW6Hr87XrBqwQULmL
+         DSXyEGsR5O4RTnPEPpJahsymDqAqx6TjdoyY2toK7kEWpojIVKt0gidSwlhJxJJ1eLP6
+         ljJSKEdneqdPB6CkATZAXWfEzcQ3UmxSPu3bDfWGcKN5izcH18FjrJhAAiElfAYldgwJ
+         8u2BRnS/RAKeQtDJgVRTzago8IhiKdfnS3qWPMhIDFOq9QCYww53bvzZRZmj6oHbz1Jf
+         /KkA==
+X-Forwarded-Encrypted: i=1; AJvYcCU39EuN2B+8MErAYyg08DBVyN4xoUQ8VOlm9Z8wIbfiBZArPz0NxaPovpD0HuhSI3pOJ6yDJhI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwJFt7rUIhqNRVgsFOt7t4Drch3M6YNtuhubOeFGBgDjOtx0A/m
+	UIJCCINKvey0/PJJ2CaA5YK/WpVBELd/3G56+x7XD86EgMVkeLGwg+6mmUKMVh+DyYzds/52ens
+	YIttbxEg8bxUAqqpXZddsGeDX1xgdf0/Krd9gXsvDTzh+99km8GUdcePjYQ==
+X-Gm-Gg: ASbGncspe8IBzn+qT8P4qkJynebDwm1zLDAYzR3FwdXvHmSu5/3JQ1Nb6HI2y4dl2mT
+	yYSqVZynFx5d45htJvIz4+VlCwSWZ26tyMFIf6Vi5diIVa+dH6FMeMgaGSDqEzz1dfCflI+D22H
+	z8a7bhHmUPyhbrma+ev+eXd8hGuUTxKW8ZUz8BgsgMFoQAcVKttV4Y6gHhpEb4RqgOLN16I3Ay2
+	mjzatOVkSRhUyKY2nunH3BZlJN/I/v8ncLXoZaVA3otqURIrIQ4GC33Z0XM7ndgubw/lOlChGNQ
+	58xRHD0NCFofR4d7R5AfMGLUuMtCEG0U97xowoCfqPd6DJVLpiUnmHpNJ4QK5giGHx2LHOAIpyA
+	eraEV6BJhD5E5GxzKQ2YSvU1z7xbjoM/nL/2v4PGIEIjebL3ezlBqqGtBUh0RxUWQ
+X-Received: by 2002:a5d:584d:0:b0:3ea:d634:1493 with SMTP id ffacd0b85a97d-3ec9d70e1aemr6331311f8f.3.1758120767093;
+        Wed, 17 Sep 2025 07:52:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHCVwA2whdJvJ6k0SNSXVgRVBCXXeS7K5H+4SZxMmaPtCI7Uv2obWcxbuvE8IbcU5jjC+Gugg==
+X-Received: by 2002:a5d:584d:0:b0:3ea:d634:1493 with SMTP id ffacd0b85a97d-3ec9d70e1aemr6331269f8f.3.1758120766367;
+        Wed, 17 Sep 2025 07:52:46 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f27:6d00:7b96:afc9:83d0:5bd? (p200300d82f276d007b96afc983d005bd.dip0.t-ipconnect.de. [2003:d8:2f27:6d00:7b96:afc9:83d0:5bd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4613f3c69d5sm39701795e9.24.2025.09.17.07.52.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Sep 2025 07:52:45 -0700 (PDT)
+Message-ID: <e30627e5-f30f-4494-934c-58e4a427a476@redhat.com>
+Date: Wed, 17 Sep 2025 16:52:40 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	GV1PR08MB10521:EE_|PAXPR08MB6735:EE_|AMS1EPF0000004C:EE_|DU0PR08MB9874:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8aecd232-aa8e-470d-c39d-08ddf5f69d8f
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info-Original:
- =?us-ascii?Q?jwjnEyMckAhyhJxSoZ8+Rv+riOV8AJgu3Psu1FU7D629be/bExOpoBxBVRnB?=
- =?us-ascii?Q?hFlcOVRuwb2KyvQ7wSobXVu555FbLHWl7I42iQmUz0OLXZragfXxxTGvMWfe?=
- =?us-ascii?Q?CCppBWjZ0XdFSlhuLKaipFotApR9MrQcQ/+z/AfxBXLU26zx0rrYnv8ZskrF?=
- =?us-ascii?Q?oFcq5CkpGc4XQ3VF7rmkQjZ24Oz45PbX/ycGSygDcrLQlr7a7ugzl1CGjGgG?=
- =?us-ascii?Q?S8BzUGIQmU+vadMB7AE+n5aGqWoyaU42ccy2tWl1+pH4CbpTamkhMLnPMKzj?=
- =?us-ascii?Q?HO6RBVbyuXzksXp6VblmZnhGbeoltVSg2p6/VS3EoFgM8O4HuC6C5wFp3bjr?=
- =?us-ascii?Q?P12acpSK/2uVn8G1n4yu5bsaY++PPfKMO0A/unNQV9cIJyotudYF2DtXA/Yo?=
- =?us-ascii?Q?w2eENiyeKNy0E2DPFeuf0nc/qs1CKBo7Ca/Ti390h/btRRPh+DfwTAYCXdX7?=
- =?us-ascii?Q?oz6UyoVej2IpZEWS//KNZVMp+Hv9rFzb/MaUvMjjjep4tx4/enqhvuo/pFgx?=
- =?us-ascii?Q?0/w5UFB5FJxyGp2qQyzea8Bj2whLzR4lwBfc0ToHxpIKumuFNtYIvaK9MHfE?=
- =?us-ascii?Q?ytltUuk/JWshTUAG/hWRMgdpNcynLwEvsZRU9P+07V2U8kstdW19443kwgKE?=
- =?us-ascii?Q?QEJC027HEptPwun8E3Pjzeb04eNw7L7u9BQBJpCK5G/z74C6ymvZUA2JFYbS?=
- =?us-ascii?Q?cyKcVfeNsbIJQUIUUpuLOFf25GS7DSafYKzHBoNcy7UHIlGKkjEEDjDs6i+f?=
- =?us-ascii?Q?MVbCePoavFavgVlcgqQmZ5LI5uQ1U3bKZ8cHjQZKhEF45SXRqIbeS81ob9Kc?=
- =?us-ascii?Q?jL+2tnIPOqgdmF+2ZZY/4nkJmzCs7+5tOcLGXaIExPOBF3X01YpdN9IpwYPF?=
- =?us-ascii?Q?23mxjLgLAFyWJ7rKhr+trX6u7zIQPrws7GTr7WFCWikceVqME4u982Fml3+L?=
- =?us-ascii?Q?/UvyYIMvGBdyNtZ3R2FsDzdLQPxSX8EV+pqIh+WTBJjA7X2Rr3tUXd7JlW0Q?=
- =?us-ascii?Q?/i0a9q3ChRmWDhTuuubS8SqIAfFS4OKnddrvRzhZiJfXaDbbgCeRvPpC9WvU?=
- =?us-ascii?Q?AuHJa2dojbplmFe8zlrl8L2UtQber77faNi2YrbGC01642WIPajcl87smFCK?=
- =?us-ascii?Q?EVaK9VaMAumIs1UhZIVhfsOzJG/AnmOzZH1YilQ1j0ursiQH3hZv3FCuiTMR?=
- =?us-ascii?Q?VA0fzz2Qo9lJGFznsaHPzqwWqpXMZaCUkHHH1kJdMdSiHnRQwQFDvUGYYLVR?=
- =?us-ascii?Q?QUvGYcC3T1Dh74svvVU3ta7EPC18JlZNLp0uedYjdxrSLEFyVHrVYnYaNzeW?=
- =?us-ascii?Q?hmkWOGniyozroFBWGL1hasVJjlp8gRS/7CP/2ssqHQmf6bnLTTBJBxYY0St4?=
- =?us-ascii?Q?UyWm7ByWcQkkfjtSfcK5eBRbRZWZyL8j4/EEfQJAJfuukrOUI3KoGL4GsLxH?=
- =?us-ascii?Q?CdfgC9wBTyk=3D?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB6735
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AMS1EPF0000004C.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	31abadf5-aa59-4231-db77-08ddf5f689f7
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|14060799003|82310400026|35042699022|376014|7416014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ymBFU9XnXESjV5j1F8BoIveZ207z0n7matTY7JueN39TU2Mu+4cKZ2n3AnUV?=
- =?us-ascii?Q?gdFuFVO+M+PSmU+SPRyaxSr49Plskjnl6s2XMGk5mFQVh42M8SINIv7j4fsY?=
- =?us-ascii?Q?fzKF95w+C11YqowFT96pOBQiBK1L9CV9xwTFK/eyGswjpL2dLtmxH2li7jpT?=
- =?us-ascii?Q?pjOXf210wOsNuGeRHwgi/i308Z8+6fCRY+IbDjJO4C+W+QfbE0sNBW0ThDmO?=
- =?us-ascii?Q?8wp6pFkOm1qEBdL1G0yZNgMLEyPfNYpYhERr0GDgkMTCoHgi00b1vB5aM9VT?=
- =?us-ascii?Q?v60rS+dskzbVZld4qVdiYXtNiQh2Gcpl5TzjnhsdYi8MmKRJofknCB0XrNfo?=
- =?us-ascii?Q?Px1UB6RcF7EkgT2Bx4y53lOkjvnau8blmsLACzgZ/t0hTXHyjPtHqOZ200PE?=
- =?us-ascii?Q?dnfrzG5c9qamPSYM27BqWU37irWJYtYb4gDVAXS4sKrImSkK7tzHyqTnKKsI?=
- =?us-ascii?Q?3jaeLigWq/d153Zip/6MBkXLb6rSJh3LRycstPsN3EAYeOq8EdQJq2sMSWCd?=
- =?us-ascii?Q?8Pjo3I6TDwNLFPV+vdidru+sAnic7XJhuVnlKXYIwS+rMEuImnE5DWdl5f5b?=
- =?us-ascii?Q?D/GTc5ElLcACeHQ8969Hq4wQOr6GNPSPslT9+7w1r67CeNXiWzhoD+bDhTy7?=
- =?us-ascii?Q?gzpX52+JJfgbEa3ShgUeXNRmqVd1nhIAR2AeRxImeQfq+TQqKd72LSdSK0Px?=
- =?us-ascii?Q?eATXKdvwi20L6lnby3MiQfXDsjdihRrjJkVYVhbDe7tJ9qwlyXSUXezJ4Gxe?=
- =?us-ascii?Q?wJkha3n/prHXuAHgyXFZgLjSt6XnGvSIVRboYVTgfMpVpMMfdvCwhSefCzZ6?=
- =?us-ascii?Q?J6BOnPYqpk4ViEZh7P2MID1HXnIh8v/2zHwQv5gMrvKriSh8JPgsHyRgQJew?=
- =?us-ascii?Q?tPiGADhI6tN28JBhD1MXK/dXVOW8wz1qjP6KA2BF7vtcA9OaKOmmmVUDi73F?=
- =?us-ascii?Q?LAbD3ThmHJGTL9AjFy1Ag5nZB4woQ+Z+8X/fBQKpC1HFpA/cwAkEldGW8eQi?=
- =?us-ascii?Q?cA0Dfm7Z0Owubt8rjziOV7D/OSXkzqULt94jfeyO99G9bV1wRJFxgLDjLUKF?=
- =?us-ascii?Q?pMmNRZjEkqe6NKzkR3fjGghocdd6jcw8Zdc1UBz7cJB1Ddxe2YwvDovnFl9b?=
- =?us-ascii?Q?CfErIfQ6fQLnCaLNFf9p6VM4kS9lcXV5cCWQD40mmcrmHH3o04rzAq0mUhK9?=
- =?us-ascii?Q?83a+1d88eMw8Pf3JFSiMHRbV6BYzlq0nEqwI7XZSceBPtoUmUtRROK9PWrnp?=
- =?us-ascii?Q?HwtZc/X8hHjTtGaxxi3uLnkSRyQyx/LEQx6xxnpn5cq7t9m75JWS4eXcEv42?=
- =?us-ascii?Q?p6GO/j8koSoXL0NWzEMmCv84vm1ctrE68TeFiyhBXkpF0d/6w66E+YTjby4k?=
- =?us-ascii?Q?Cno3vw/92Mf4JaJdYB2gxR7h4b/7wzxR6S/z3nDptAAh+1z0TM0iLhDlwfP0?=
- =?us-ascii?Q?QMWStHCVhrXjJpIth7p9m8eIyjiUF2AYgyroATMwxQIBRHYb/8Y1KJQoKysU?=
- =?us-ascii?Q?KLI9v03rNEhLJ/DHhFk8kMPTPjPIKYM2d49r?=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(82310400026)(35042699022)(376014)(7416014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2025 14:29:30.9715
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8aecd232-aa8e-470d-c39d-08ddf5f69d8f
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS1EPF0000004C.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB9874
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 01/11] filemap: Pass address_space mapping to
+ ->free_folio()
+To: Hugh Dickins <hughd@google.com>, "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "Thomson, Jack" <jackabt@amazon.co.uk>,
+ "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+ "Cali, Marco" <xmarcalx@amazon.co.uk>,
+ "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
+ Elliot Berman <quic_eberman@quicinc.com>,
+ "willy@infradead.org" <willy@infradead.org>, "corbet@lwn.net"
+ <corbet@lwn.net>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "will@kernel.org" <will@kernel.org>,
+ "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+ "kernel@xen0n.name" <kernel@xen0n.name>,
+ "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+ "palmer@dabbelt.com" <palmer@dabbelt.com>,
+ "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+ "alex@ghiti.fr" <alex@ghiti.fr>,
+ "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+ "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
+ "hca@linux.ibm.com" <hca@linux.ibm.com>,
+ "gor@linux.ibm.com" <gor@linux.ibm.com>,
+ "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+ "svens@linux.ibm.com" <svens@linux.ibm.com>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "luto@kernel.org" <luto@kernel.org>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "trondmy@kernel.org" <trondmy@kernel.org>, "anna@kernel.org"
+ <anna@kernel.org>, "hubcap@omnibond.com" <hubcap@omnibond.com>,
+ "martin@omnibond.com" <martin@omnibond.com>,
+ "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+ "brauner@kernel.org" <brauner@kernel.org>, "jack@suse.cz" <jack@suse.cz>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+ "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+ "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
+ "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
+ <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "andrii@kernel.org" <andrii@kernel.org>,
+ "martin.lau@linux.dev" <martin.lau@linux.dev>,
+ "eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org"
+ <song@kernel.org>, "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
+ <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+ "jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+ "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+ "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
+ <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+ "axelrasmussen@google.com" <axelrasmussen@google.com>,
+ "yuanchu@google.com" <yuanchu@google.com>,
+ "weixugc@google.com" <weixugc@google.com>,
+ "hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+ "zhengqi.arch@bytedance.com" <zhengqi.arch@bytedance.com>,
+ "shakeel.butt@linux.dev" <shakeel.butt@linux.dev>,
+ "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
+ <seanjc@google.com>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+ "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+ "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+ "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+ "devel@lists.orangefs.org" <devel@lists.orangefs.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+References: <20250912091708.17502-1-roypat@amazon.co.uk>
+ <20250912091708.17502-2-roypat@amazon.co.uk>
+ <7c2677e1-daf7-3b49-0a04-1efdf451379a@google.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <7c2677e1-daf7-3b49-0a04-1efdf451379a@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 4zCz4-zGSLw7zlv1I7efyeb03dunbpOjKZj6k_pF17Y_1758120767
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Dave,
+On 16.09.25 08:23, Hugh Dickins wrote:
+> On Fri, 12 Sep 2025, Roy, Patrick wrote:
+> 
+>> From: Elliot Berman <quic_eberman@quicinc.com>
+>>
+>> When guest_memfd removes memory from the host kernel's direct map,
+>> direct map entries must be restored before the memory is freed again. To
+>> do so, ->free_folio() needs to know whether a gmem folio was direct map
+>> removed in the first place though. While possible to keep track of this
+>> information on each individual folio (e.g. via page flags), direct map
+>> removal is an all-or-nothing property of the entire guest_memfd, so it
+>> is less error prone to just check the flag stored in the gmem inode's
+>> private data.  However, by the time ->free_folio() is called,
+>> folio->mapping might be cleared. To still allow access to the address
+>> space from which the folio was just removed, pass it in as an additional
+>> argument to ->free_folio, as the mapping is well-known to all callers.
+>>
+>> Link: https://lore.kernel.org/all/15f665b4-2d33-41ca-ac50-fafe24ade32f@redhat.com/
+>> Suggested-by: David Hildenbrand <david@redhat.com>
+>> Acked-by: David Hildenbrand <david@redhat.com>
+>> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+>> [patrick: rewrite shortlog for new usecase]
+>> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
+>> ---
+>>   Documentation/filesystems/locking.rst |  2 +-
+>>   fs/nfs/dir.c                          | 11 ++++++-----
+>>   fs/orangefs/inode.c                   |  3 ++-
+>>   include/linux/fs.h                    |  2 +-
+>>   mm/filemap.c                          |  9 +++++----
+>>   mm/secretmem.c                        |  3 ++-
+>>   mm/vmscan.c                           |  4 ++--
+>>   virt/kvm/guest_memfd.c                |  3 ++-
+>>   8 files changed, 21 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
+>> index aa287ccdac2f..74c97287ec40 100644
+>> --- a/Documentation/filesystems/locking.rst
+>> +++ b/Documentation/filesystems/locking.rst
+>> @@ -262,7 +262,7 @@ prototypes::
+>>   	sector_t (*bmap)(struct address_space *, sector_t);
+>>   	void (*invalidate_folio) (struct folio *, size_t start, size_t len);
+>>   	bool (*release_folio)(struct folio *, gfp_t);
+>> -	void (*free_folio)(struct folio *);
+>> +	void (*free_folio)(struct address_space *, struct folio *);
+>>   	int (*direct_IO)(struct kiocb *, struct iov_iter *iter);
+>>   	int (*migrate_folio)(struct address_space *, struct folio *dst,
+>>   			struct folio *src, enum migrate_mode);
+> 
+> Beware, that is against the intent of free_folio().
+> 
+> Since its 2.6.37 origin in 6072d13c4293 ("Call the filesystem back
+> whenever a page is removed from the page cache"), freepage() or
+> free_folio() has intentionally NOT taken a struct address_space *mapping,
+> because that structure may already be freed by the time free_folio() is
+> called, if the last folio holding it has now been freed.
 
-[...]
+Thanks for noticing that Hugh, very good point!
 
-> > diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-> > index 23be85d93348..c25c2aed5125 100644
-> > --- a/arch/arm64/include/asm/assembler.h
-> > +++ b/arch/arm64/include/asm/assembler.h
-> > @@ -738,6 +738,21 @@ alternative_endif
-> >  	set_sctlr sctlr_el2, \reg
-> >  .endm
-> >
-> > +/* Set SCTLR2_ELx to the @reg value. */
-> > +.macro set_sctlr2_elx, el, reg, tmp
-> > +	mrs_s	\tmp, SYS_ID_AA64MMFR3_EL1
-> > +	ubfx	\tmp, \tmp, #ID_AA64MMFR3_EL1_SCTLRX_SHIFT, #4
-> > +	cbz	\tmp, .Lskip_sctlr2_\@
-> > +	.if	\el == 2
-> > +	msr_s	SYS_SCTLR2_EL2, \reg
-> > +	.elseif	\el == 12
-> > +	msr_s	SYS_SCTLR2_EL12, \reg
-> > +	.else
-> > +	msr_s	SYS_SCTLR2_EL1, \reg
-> > +	.endif
-> > +.Lskip_sctlr2_\@:
-> > +.endm
-> > +
->
-> You were right that just doing
->
-> 	msr_s	SYS_SCTLR_\el, \reg
->
-> here doesn't work.  It looks like we rely on the C preprocessor to
-> expand the SYS_FOO_REG names to numeric sysreg encodings.  By the time
-> the assembler macros are expanded, it is too late to construct sysreg
-> names -- the C preprocessor only runs once, before the assembler.
->
-> So, your code here looks reasonable.
->
-> But, it will still silently do the wrong thing if \el is empty or
-> garbage, so it is probably worth adding an error check:
->
-> 	.else
-> 	.error "Bad EL \"\el\" in set_sctlr2_elx"
-> 	.endif
->
->
-> Also, looking at all this again, the "1", "2" and "12" suffixes are not
-> really numbers: SYS_REG_EL02 would definitely not be the same thing as
-> SYS_REG_EL2 (although there is no _EL02 version of this particular
-> register).
->
-> So, can you use .ifc to do a string comparison instead?
->
-> If might be a good idea to migrate other macros that use an "el"
-> argument to do something similar -- although that probably doesn't
-> belong in this series.
->
-> The assembler seems to have no ".elseifc" directive, so you'll need
-> separate nested .ifc blocks:
->
-> 	.ifc	\el,2
-> 	msr_s	SYS_SCTLR2_EL2, \reg
-> 	.else
-> 	.ifc	\el,12
-> 	msr_s	SYS_SCTLR2_EL12, \reg
-> 	.else
-> 	.ifc	\el,1
-> 	msr_s	SYS_SCTLR2_EL1, \reg
-> 	.else
-> 	.error	"Bad EL \"\el\" in set_sctlr2_elx"
-> 	.endif
-> 	.endif
-> 	.endif
->
-> (Note, I've not tested this approach.  If you can think of a better
-> way, please feel free to suggest.)
->
+> 
+> Maybe something has changed since then, or maybe it happens to be safe
+> just in the context in which you want to use it; but it is against the
+> principle of free_folio().  (Maybe an rcu_read_lock() could be added
+> in __remove_mapping() to make it safe nowadays? maybe not welcome.)
 
-Sorry for late reply. but when I find some usage like above.
-I couldn't find any usage for this except this macro.
-In case of entry, since it just only chekc for "el0" case
-I think it doesn't need to apply this for them.
-
-So, let me apply this for set_sctlr2_elx only right now.
-when some new register requires this kind of pattern,
-let's apply at that time more generally.
+Let me dig into the callers:
 
 
-Thanks.
+1) filemap_free_folio()
 
---
-Sincerely,
-Yeoreum Yun
+filemap_free_folio() looks up the callback through 
+mapping->a_ops->free_folio. Nothing happens in-between that lookup and 
+the callback so we should be good.
+
+
+2) replace_page_cache_folio()
+
+replace_page_cache_folio() similarly looks up the callback through
+mapping->a_ops->free_folio. We do some operations afterwards, but 
+essentially store the new folio in the page cache and remove the old one.
+
+The only caller is fuse_try_move_folio(), and IIUC both folios are 
+locked, preventing concurrent truncation and the mapping going away.
+
+
+3) __remove_mapping()
+
+__remove_mapping() also looks up the callback through 
+mapping->a_ops->free_folio.
+
+Before we call free_folio() we remove the folio from the pagecache 
+(__filemap_remove_folio) to then drop locks and call free_folio().
+
+We're only holding the folio lock at that point.
+
+So yes I agree, truncate_inode_pages_final() could be racing with
+__remove_mapping().c That's probably exactly what the docs describe 
+regarding reclaim.
+
+
+rcu_read_lock() should indeed work, or some other mechanism that keeps 
+truncate_inode_pages_final() from succeeding in this racy situation.
+
+Alternatively I guess we would have to use another callback.
+
+-- 
+Cheers
+
+David / dhildenb
+
