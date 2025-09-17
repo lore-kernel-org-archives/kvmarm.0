@@ -1,66 +1,77 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397D82F2914
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 19:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3C17E0E8
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 20:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758139100; cv=none; b=bWvUiydPqqXWb+atemXQFXJhfXxLIjGYhHPlmanOcME/FhQ+RKNMB2lN+LpJaOCniCxA0TY3r01y5R7CwsITBhCSnBaN7pUnId3aNwukrDLsyqM2NMH0ghR5z3j7HHSFrh4RBB+Z+m02aXFTMvmNHNTDqc+tOkR2zxwiUovtGB8=
+	t=1758141098; cv=none; b=KZWdeF4gVCHWjj1klIx8WO7nQPk6cL8Ja+NzfjFNF/NCRPeyvThpd53wTJun9eXPw/sd8xN4nbZ7Pg5w4+83Fa5LL7vxQoTLnsVQZ3W6bgHUHgh4OzsK2wIgjeRa05om8VyM6J4SwQSKRNwVjyUalfPT2OGhH5EkXuVC39rJMxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758139100; c=relaxed/simple;
-	bh=++K/PDu6ONEBVfix9bUP26opRV7k3zTICh/JJM19N6c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hNYvOZNdJo4G3w+5fc2Ul9usjci8becnWRmj0LCI6KgXyR91NL7qwDcTTuYeu5LXSXFBlLbH7WtGJmXe/iRYP3b7JxvumVe72mvKQDU+VWFly+3LIn5VieYBjqD6NIJsDtQzjA5w5md61wMDpL5KIIh6kUpzxXsnmD79kQhgL+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dgSwnH+4; arc=none smtp.client-ip=91.218.175.172
+	s=arc-20240116; t=1758141098; c=relaxed/simple;
+	bh=6N/MIBsxXgYX3akD4VzxOpKq8vwRPVZlQyeNtLW01sY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RnX/j1JCp65JCE6bHdgRL33k3L8Aa2W63Uc5eDDb4QaYGRfm7AGwcygwsO/k38DyhqlcmAbVEZsAiNvHS4PdOIhJVXT1GgEvrXCwy7EJ+AxTx6YJJlQhnwDfat2A6AVsFGCDM46DoBqcQzkkrsJE6vrFElWmi0o4ajBnL2J01ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iUuoEMPJ; arc=none smtp.client-ip=95.215.58.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dgSwnH+4"
-Date: Wed, 17 Sep 2025 12:58:07 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758139094;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=axLM7SM1M1gPLHiJS2eIg7jyFvifPlO5uWh3xMQYZJo=;
-	b=dgSwnH+4+f66Ikzk19q0rR8cQttfhSzJBLlDvZVLXoIeeIYeyUrkcu6d0szkPvlao4PIIH
-	T4ziSwS062uU2fW0RG+BF4CPQC05hTjfFywCMS5aCLAabZ7z+U26nouF+8Zk9ay2nIJit3
-	DdUFC2UC4FyQ0BbtOpjEcfOILkuhTeg=
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iUuoEMPJ"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758141093;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NOirs6iTmsiiTW2caB6fYpkZEPTBeRYw/OmERRiILS4=;
+	b=iUuoEMPJH59kqVcYS2uX6xXogfF+u2JUZ1PYd6Qn/QICXHUXA3iv323DdVAkumOv3jCInl
+	m+Ucz+DKY0QXNFBBZ9MFu7ipCy31DtjUb3mAhRS0F7eUH42U1aK6FwJRcEsHqKl1ZpVkht
+	6iXAvvHBC5CkBkQBkJJ4daCXGgMSdS4=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 changes for 6.17, round #3
-Message-ID: <aMsSz9YUcd4Qf0ND@linux.dev>
-References: <aMHepH8Md9gSu2ix@linux.dev>
- <6e598aec-f55c-467a-abef-6d183bb9cfca@redhat.com>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/2] KVM: arm64: nv: Fixes for handling debug, MDCR_EL2
+Date: Wed, 17 Sep 2025 13:31:23 -0700
+Message-ID: <20250917203125.283116-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e598aec-f55c-467a-abef-6d183bb9cfca@redhat.com>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 17, 2025 at 07:56:15PM +0200, Paolo Bonzini wrote:
-> On 9/10/25 22:25, Oliver Upton wrote:
-> > Hi Paolo,
-> > 
-> > This is most likely the final set of KVM/arm64 fixes for 6.17.
-> > 
-> > Of note, I reverted a couple of fixes we took in 6.17 for RCU stalls when
-> > destroying a stage-2 page table. There appears to be some nasty refcounting /
-> > UAF issues lurking in those patches and the band-aid we tried to apply didn't
-> > hold.
-> 
-> Thanks for pointing this out, I will put a note about reverts in my own tag.
+As I was working on EL2 support for KVM selftests I realized that use of
+self-hosted debug inside of the VM is completely broken. Further
+inspection reveals yet another case where FEAT_NV2 does something
+insane -- MDSCR_EL1 is redirected to the VNCR page in spite of affecting
+the EL2 context.
 
-Appreciated, seems to have been an unintentional omission from my own
-tag.
+The situation can be remedied with traps. And after implementing that it
+became clear we make no effort of honoring the guest's MDCR traps.
+Whoops.
 
-Best,
-Oliver
+Small series to tidy both of these issues up. While FEAT_FGT provides a
+precise trap for MDSCR_EL1, I don't have access to such a system and
+would rather send something out that works for now. We can worry about
+making this fast later.
+
+Applies to 6.17-rc4.
+
+Oliver Upton (2):
+  KVM: arm64: nv: Trap debug registers when in hyp context
+  KVM: arm64: nv: Apply guest's MDCR traps in nested context
+
+ arch/arm64/include/asm/kvm_nested.h |  2 ++
+ arch/arm64/kvm/debug.c              |  3 +++
+ arch/arm64/kvm/nested.c             | 30 +++++++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
+
+
+base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
+-- 
+2.47.3
+
