@@ -1,200 +1,117 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85EC31960D
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 13:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839AE33B473
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 13:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758114322; cv=none; b=Y865PyjPZjaaCaBvcjGShoxk9jqWdbIJsBI/uKnyO4YnQdBsEBYxkotY6KOIf3xGEYFX9h5JK0L4mIseyWOtwcYEZ389vneO1O3KNbimQrOLNv4sFnZuK+wpeXMTkoQvxHHhFZXzQl4EmaV/KbLEYy8dwbyAhGpa7aqG1xFjwLk=
+	t=1758114462; cv=none; b=NUwm/INQ3LV/D2fsjZAfG0zqb2KYRkZdf5D6zwVWVyNDyeR9+3pN35XejS1c91VTuT9U0ltD/EWemgtf1bg00zMoljgxmR2t1NA9L3xo8W6QBRf+i91xuQdONqsdMBQ2q45LIL/VlXNkvvCL5TH1iTG4JUIfI/Y+hHpmGNiOdvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758114322; c=relaxed/simple;
-	bh=Zn7DP+iBhiHFFUKJovPoWHiMC8OI4Yo9zSaY/tnecGg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UoigDRiKxbL8rWnScEfBSUn6fgQstVNtzSxYJQ8zDKY0FsrFVvLEmup4ra/xMY8nVgn+Ug2sg2HcuBra5L6bhSpbzqb6FZErzZNsTrvYPuJD7khQITsjRQmK7bE5O73+z+vlI5RikSy7CzuBRzJRJa45QafwjdiwK6+/TzM6QdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83712267F;
-	Wed, 17 Sep 2025 06:05:09 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5E86B3F66E;
-	Wed, 17 Sep 2025 06:05:15 -0700 (PDT)
-Date: Wed, 17 Sep 2025 14:04:43 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	james.morse@arm.com, ardb@kernel.org, scott@os.amperecomputing.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 5/5] arm64: futex: support futex with FEAT_LSUI
-Message-ID: <aMqx67lZZEgYW-x5@J2N7QTR9R3>
-References: <20250917110838.917281-1-yeoreum.yun@arm.com>
- <20250917110838.917281-6-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1758114462; c=relaxed/simple;
+	bh=cFGMhYvRfY9VbCIJKIkuugXdHrAdn/krgr3zOGwE2B8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=unPahykaNhaVaihgKykLSwrTSI4DKifky7vtwm8mPDtdorEiae+J0X/rQAUnI3LQ+R/tO192EwqAlrs4eXZDn3ORjwvZCi2f1iujiANIGXvDJz9tjiKiEob2X1CKX8YQ+u1ESCuPuf3Qi8VYTNOOXFybcZtGFlUAnuJdIH+a8hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sgk1VmjS; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sgk1VmjS"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45e037fd142so55432345e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 06:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758114459; x=1758719259; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8nMbtF83ZYtz2l9mfpcIZhhnstM4fj0En2ikZPXdwXw=;
+        b=sgk1VmjSiy0wXHH7nyjISdJzmitevk4MkKMCXx6ouetGFXfV7ZQBp6IHFlyvLUIohj
+         Yt3KHQhKLVeZts9ZjtSNDsrLUZoHoII2jXkeOfMBawlTDEO0ZPg8Y4YdJ545MzGzSaeN
+         3aVR560/+IAQUbY70ODJppp6beBDU5c8iB8yOu4PMRy+jUuE/KJkMJnnFo2Ez9eU12po
+         YHyoz/fFjnAMwvBY0dQyIf83Rl2afdtSYRu3aLROj8GnkemAqS+E2TgosyVmyKfKXDcu
+         XiYAJzDiwSPQYsuvkMWk9fiiFalzWT9pveoKerf+HVBVHHMk7gtmbGgyOgEBXoQEZKbc
+         ZXow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758114459; x=1758719259;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8nMbtF83ZYtz2l9mfpcIZhhnstM4fj0En2ikZPXdwXw=;
+        b=aBzRN9Rwr/saVpjdPKf2m5HEQrueJZdu+q/KXDyuL5I1YRe8KgxmqLRySFbFbOh884
+         f0RZeE2iNDLXN325p7SSQn8d64JNB7cchKc1cNPtVSFSgNGr6MPBEx+mLV8KEza0Akil
+         YMLYXKc0iO2T3haHGc6/QhnYn+26N/6PsfhFyvvILo0OmoQXuUzCFa2P3r1DDeaYkQCf
+         hKk6iY8CMQaE2szKT2zgAdHE5lSV36yF/RITK/EhWNP5aiIte/LZ8vbh7lpiMeM46Qg8
+         Aj3Sbqm0C4kj11mHjBKq93lC+EnKFPsXwLTSTxLs1G9iCPOTnxa2BBfDq7btntOI9bme
+         Gbgw==
+X-Gm-Message-State: AOJu0Ywtu9asOsXBF/oxliUv5f55/dqL2oYwumWfJ3U3qx26QdHXUUDJ
+	qXSaOerDlRv3rJeJ5+gcGhLpL2+8bySOiGm4OflUJnBonisVRbLlSy3yy9mAe8RgXoDfzXYqohg
+	Vu1UsoeHz9C9PZmM9Pd0/sBBtShqvgPTTZVT8u2BaKp3kucuqKQZHw5j9XNW8KEhI2x93Kg+So3
+	pp45sVKf8uLbiggG49z/Kd7DdB8w6z7P8=
+X-Google-Smtp-Source: AGHT+IHWGmjnQP9pG3qanj1Q5J98tdnrDnaB3XFkq7Nm5Anu//i+9DZtynKA62hFBPQHVSIzroNa5bSyaA==
+X-Received: from wmpl42.prod.google.com ([2002:a05:600c:8aa:b0:45d:e45e:96aa])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:b8a:b0:45d:d50d:c0db
+ with SMTP id 5b1f17b1804b1-46202de09d9mr21103345e9.15.1758114458792; Wed, 17
+ Sep 2025 06:07:38 -0700 (PDT)
+Date: Wed, 17 Sep 2025 14:07:37 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250917110838.917281-6-yeoreum.yun@arm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250917130737.2139403-1-tabba@google.com>
+Subject: [PATCH v1] KVM: arm64: Fix page leak in user_mem_abort()
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, ankita@nvidia.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Sep 17, 2025 at 12:08:38PM +0100, Yeoreum Yun wrote:
-> +static __always_inline int
-> +__lsui_cmpxchg64(u64 __user *uaddr, u64 *oldval, u64 newval)
-> +{
-> +	int ret = 0;
-> +
-> +	asm volatile("// __lsui_cmpxchg64\n"
-> +	__LSUI_PREAMBLE
-> +"1:	casalt	%x2, %x3, %1\n"
-> +"2:\n"
-> +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
-> +	: "+r" (ret), "+Q" (*uaddr), "+r" (*oldval)
-> +	: "r" (newval)
-> +	: "memory");
-> +
-> +	return ret;
-> +}
-> +
-> +static __always_inline int
-> +__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +	u64 __user *uaddr_al;
+The user_mem_abort() function acquires a page reference via
+__kvm_faultin_pfn() early in its execution. However, the subsequent
+checks for mismatched attributes between stage 1 and stage 2 mappings
+would return an error code directly, bypassing the corresponding page
+release.
 
-Please use 'uaddr64' to match the other 64-bit variables.
+Fix this by storing the error and releasing the unused page before
+returning the error.
 
-I assume that the '_al' suffix is meant to be short for 'aligned', but I
-think using '64' is more consistent and clearer.
+Fixes: 6d674e28f642 ("KVM: arm/arm64: Properly handle faulting of device mappings")
+Fixes: 2a8dfab26677 ("KVM: arm64: Block cacheable PFNMAP mapping")
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+Based on Linux 6.17-rc6
+---
+ arch/arm64/kvm/mmu.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-> +	u64 oval64, nval64, tmp;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 86f3d80daf37..d57afca8afb4 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1706,7 +1706,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			 * cache maintenance.
+ 			 */
+ 			if (!kvm_supports_cacheable_pfnmap())
+-				return -EFAULT;
++				ret = -EFAULT;
+ 		} else {
+ 			/*
+ 			 * If the page was identified as device early by looking at
+@@ -1729,7 +1729,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	}
+ 
+ 	if (exec_fault && s2_force_noncacheable)
+-		return -ENOEXEC;
++		ret = -ENOEXEC;
++
++	if (ret) {
++		kvm_release_page_unused(page);
++		return ret;
++	}
+ 
+ 	/*
+ 	 * Potentially reduce shadow S2 permissions to match the guest's own
 
-Likewise, 'orig64' would be clearer than 'tmp' here.
+base-commit: f83ec76bf285bea5727f478a68b894f5543ca76e
+-- 
+2.51.0.384.g4c02a37b29-goog
 
-> +	static const u64 hi_mask = IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN) ?
-> +		GENMASK_U64(63, 32): GENMASK_U64(31, 0);
-> +	static const u8 hi_shift = IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN) ? 32 : 0;
-> +	static const u8 lo_shift = IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN) ? 0 : 32;
-> +
-> +	uaddr_al = (u64 __user *) PTR_ALIGN_DOWN(uaddr, sizeof(u64));
-> +	if (get_user(oval64, uaddr_al))
-> +		return -EFAULT;
-> +
-> +	if ((u32 __user *)uaddr_al != uaddr) {
-> +		nval64 = ((oval64 & ~hi_mask) | ((u64)newval << hi_shift));
-> +		oval64 = ((oval64 & ~hi_mask) | ((u64)oldval << hi_shift));
-> +	} else {
-> +		nval64 = ((oval64 & hi_mask) | ((u64)newval << lo_shift));
-> +		oval64 = ((oval64 & hi_mask) | ((u64)oldval << lo_shift));
-> +	}
-> +
-> +	tmp = oval64;
-> +
-> +	if (__lsui_cmpxchg64(uaddr_al, &oval64, nval64))
-> +		return -EFAULT;
-> +
-> +	if (tmp != oval64)
-> +		return -EAGAIN;
-
-This means that we'll immediately return -EAGAIN upon a spurious failure
-(where the adjacent 4 bytes have changed), whereas the LL/SC ops would
-retry FUTEX_MAX_LOOPS before returning -EGAIN.
-
-I suspect we want to retry here (or in the immediate caller).
-
-> +
-> +	*oval = oldval;
-> +
-> +	return 0;
-> +}
-
-Aside from the retry issue, I *think* you can simplify this to something
-like:
-
-static __always_inline int
-__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-{
-	uaddr64 = (u64 __user *)PTR_ALIGN_DOWN(uaddr, sizeof(u64));
-	u64 oval64, nval64, orig64;
-
-	if (get_user(oval64, uaddr64)
-		return -EFAULT;
-	
-	if (IS_ALIGNED(addr, sizeof(u64)) == IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN))  {
-		FIELD_MODIFY(GENMASK_U64(31, 0), &oval64, oldval);
-		FIELD_MODIFY(GENMASK_U64(31, 0), &nval64, newval);
-	} else {
-		FIELD_MODIFY(GENMASK_U64(63, 32), &oval64, oldval);
-		FIELD_MODIFY(GENMASK_U64(63, 32), &nval64, newval);
-	}
-	orig64 = oval64;
-
-	if (__lsui_cmpxchg64(uaddr_al, &oval64, nval64))
-		return -EFAULT;
-	
-	if (oval64 != orig64)
-		return -EAGAIN;
-
-	*oval = oldval;
-	return 0;
-}
-
-Mark.
-
-> +
-> +static __always_inline int
-> +__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
-> +{
-> +	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
-> +{
-> +	u32 oldval, newval;
-> +
-> +	/*
-> +	 * there are no ldteor/stteor instructions...
-> +	 */
-> +	if (get_user(oldval, uaddr))
-> +		return -EFAULT;
-> +
-> +	newval = oldval ^ oparg;
-> +
-> +	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
-> +
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
-> +}
-> +
-> +#define __lsui_llsc_body(op, ...)					\
-> +({									\
-> +	alternative_has_cap_likely(ARM64_HAS_LSUI) ?			\
-> +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
-> +})
-> +
-> +#else	/* CONFIG_AS_HAS_LSUI */
-> +
-> +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
-> +
-> +#endif	/* CONFIG_AS_HAS_LSUI */
-> +
-> +
->  #define FUTEX_ATOMIC_OP(op)						\
->  static __always_inline int						\
->  __futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)		\
->  {									\
-> -	return __llsc_futex_atomic_##op(oparg, uaddr, oval);		\
-> +	return __lsui_llsc_body(futex_atomic_##op, oparg, uaddr, oval);	\
->  }
->  
->  FUTEX_ATOMIC_OP(add)
-> -- 
-> LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
-> 
