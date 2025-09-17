@@ -1,103 +1,180 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DFC2F49ED
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 15:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F512F3C3A
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 16:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758124775; cv=none; b=trMu1XxPSacEvKBhy4hRt4VXlpGdOrNwlgyOaWm0md5qv47JMcODr6iCd2R3IQf17jOpcyqEllHOwr3jioRSFUq31ll1W38LlUlNXJa6m5UiUiu02jhBS5GXyPcTWzZ1LwZuIyxmb1AUNMBGIKl7worHTLyRcPxJsyyBhmpS1xk=
+	t=1758125983; cv=none; b=i60Ysn396qPzG/1tfZkLS5HDL0+fckFRYW3jz6tx/5yCypGLkU17OKEJu7OyMhjR60/bhNUwn5/WsCKmzeK9sGQD4lLtC5k3p9uuXK2hzIgw3u6smqQzcKBOefEi1P/8/U6ocfICiZvs83Z48RKOmGQnlWjDPvtpwSRAqbRuDb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758124775; c=relaxed/simple;
-	bh=bwd2hym8tNSAdXkGE4hZ3iw7DYGozn+untN0aXZ6tZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=poqIvpWWa4oQgkc38Z8mskz4Gw3KTs9/qE5C/XGlXV6BUEAJfD8KURNK9sRqq5NqZ9yiSYIMsAe3RrWroiXcTeUnuwNiK4o/tuRYRydqn3avPdaAGlib2SfRyAe0ti+r18tpvUVA7ze7Q0tdvA0OsZ0tx4FmW/KNJxsYTnmgv5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=PJ+yP9iG; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1758125983; c=relaxed/simple;
+	bh=yrT13gddazNWzpKILY32FF9cW6yTtx5tbKiQROUpzww=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NMRnUSt5M5v+yLxwbANBZL0OpbWhZLgNuFPynFWFDAWeXq2LOGacj/jDz9Qp0Od0GDkooXOAFHVLCvbOJ9sETletWYdoiyTBlgwllo/Llyh0yr1waWk/624Fk9fYSG8iMIAlbP3Fy6xXXGcUMHKYiNAnXWV5uVUY97fKWXrU2g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1OkGDGY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="PJ+yP9iG"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-62190d14a96so966eaf.3
-        for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 08:59:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1758124773; x=1758729573; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bwd2hym8tNSAdXkGE4hZ3iw7DYGozn+untN0aXZ6tZA=;
-        b=PJ+yP9iGdRUQ/bf2mGJDNDpfNO7s9BHMvtF3wzwPudl8K3MFwpXrSF1xHZuru1kjvG
-         Fb4NMDGCLveQFCHp5EQxJkO+n72KNh/Af4LwZlR4V+1qgrAxsB+j6OFTbD7DIFEejUmo
-         MPb3Lr+/TyNI4TRi58mzrYjbzssF7ANWtJugL6B4lnBPeZKwTEFmAfdUMqoOYsoaTI0l
-         gIQvej553sOi82pBfKFG8Cwp004mMUhIUDQ0chSlIxMKdsgXCZovkDNIxoTcYG/z1reD
-         scRthJ+LCcX14CCVtsXTlpoM5suDZHRybSSRKTj1Pj0wfZEu1doui0PCAYykBiZM+lze
-         NanQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758124773; x=1758729573;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bwd2hym8tNSAdXkGE4hZ3iw7DYGozn+untN0aXZ6tZA=;
-        b=AjDu8s+OCRVbF4sXtlUgftyh/BBi79k+Cj6v4MRcDGXBaAzU4qDJY9bkODWm6epZVa
-         lTaph6j/EzklRsoy66qj1nkkAXQXldZ1p0Cp34tnmIP3n641NvcjQtcOjKYtwNHOC80E
-         cAj21g1i9ASxuU9LLET+v72z1ytEObhfQ08bUugM+eV3Og/v72OCZOZK4BlvPDipv0U2
-         Y8cwqzAM61Z6cpyyxakoCP9Xzw0x1EzNsuvpXyERUKSMZxX0S1riKMpMO6tANsvHCYuf
-         rvTBltrsfa0H5NHAPWq4U0WshsfBLwFtPGLKxQ4kA/NXoMbwvSQTZGhJnZgm25X1bjzR
-         rWLw==
-X-Forwarded-Encrypted: i=1; AJvYcCVu2xRcE3352y5VkhuijsulXSoJx44Z2mCqnLMYKcMRdcez3eXUgYvV9tWUe0sVf/zz/XOE30g=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxRLRywhBJBKibJcyFOdG9VXbIyHSZQPqIfPXytTqH5AbkXEJyM
-	NCN6W1H71GJ/9nyTd7+FSf6vL+bjAQmbh1yJJ+hpE+fZlEa0vI1KvdN9D8MCYdjuTWw=
-X-Gm-Gg: ASbGncsOH/Px16cS77LhEnppM1Vo+AQ1Gd9fAygHVRhs07iq12WtsZRR4udmu9dA3HQ
-	+x2tjGMtcFjKSApOyuJc34qaNYDbQX4qzdmwy5c66Qx3ZC/09AC1WD6+4ZJ7lItyGTdXj8czqoF
-	wBuIHj49jiK1FGbHkxfTnL1SFmPC0sm6sBL+5b2H4xMEtmDBe0Wvek7lw8jF+BpxHlKugUeZqQC
-	ewPvDE+tTXzJ7YRJaZA5PkWfa6OphwgQo+pW7YfUfz3PqUnicaHnJAahw6Zjv/7za1xGJyfMJJn
-	40Cg50rIAAPhZMBexPNm7LNcmeZqAnMZk9S/PgjtEpsFOCxpm6GpvccS9wB1uZngcdd3XE3n
-X-Google-Smtp-Source: AGHT+IFPi2deeD5xpECHK4kizIqpzvjT3NpSt1j+SxaGfjDrfDGe9/bYIqtD0y9cjE6AL0d46S51pw==
-X-Received: by 2002:a05:6808:4f4b:b0:43b:2829:e642 with SMTP id 5614622812f47-43d50c63332mr1037591b6e.24.1758124772981;
-        Wed, 17 Sep 2025 08:59:32 -0700 (PDT)
-Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-43b828d6909sm4320090b6e.7.2025.09.17.08.59.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 08:59:32 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uyuZ9-00000008UmV-28J5;
-	Wed, 17 Sep 2025 12:59:31 -0300
-Date: Wed, 17 Sep 2025 12:59:31 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Will Deacon <will@kernel.org>
-Cc: Mostafa Saleh <smostafa@google.com>, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	iommu@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, robin.murphy@arm.com,
-	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v4 22/28] iommu/arm-smmu-v3-kvm: Emulate CMDQ for host
-Message-ID: <20250917155931.GI1326709@ziepe.ca>
-References: <20250819215156.2494305-1-smostafa@google.com>
- <20250819215156.2494305-23-smostafa@google.com>
- <aMQroI4NDu74PDGT@willie-the-truck>
- <20250915163858.GK882933@ziepe.ca>
- <aMl_5j8G3IGulAC6@google.com>
- <20250917123601.GA1326709@ziepe.ca>
- <aMrNTny9jgZJd_Ef@willie-the-truck>
- <20250917151612.GH1326709@ziepe.ca>
- <aMrS71vQ_MaVonzi@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1OkGDGY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF6B1C4CEE7;
+	Wed, 17 Sep 2025 16:19:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758125982;
+	bh=yrT13gddazNWzpKILY32FF9cW6yTtx5tbKiQROUpzww=;
+	h=From:To:Cc:Subject:Date:From;
+	b=P1OkGDGYUrawyGfQ261kRY5ps7C0+2NkR62LcT52UTLl4mAwBBENJbAyilBIt6H6F
+	 2mhb3TN0HNN4j+9sWQI/klhEM01aC2grwBmohg+s1TXVtzNIMsBP4cQeoLaVk9i5m2
+	 aYRnmWToTCyHuDKFwF4ifIyQuCJ7bCMn7UF5j7KNwwwnxHIYD6XQxHvkaX/w0KhOhO
+	 Z1F7JRR2QOX/KgrhZP85YlBAq3ZnlxyD4mU2OeD+UqOc4lKxeWRS6xNOn561v6krJk
+	 vOtEpCRcU2v8Pn5M2LYOgNt6WQSRJSgC7wyYWSqqRQnRT4gAW+/ZF7NDYKSFLjLEFi
+	 EskLAL/yDbIGQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uyusd-000000079Zn-46Em;
+	Wed, 17 Sep 2025 16:19:40 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Sascha Bischoff <sascha.bischoff@arm.com>
+Subject: [PATCH] KVM: arm64: Don't access ICC_SRE_EL2 if GICv3 doesn't support v2 compatibility
+Date: Wed, 17 Sep 2025 17:19:35 +0100
+Message-Id: <20250917161935.1630908-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aMrS71vQ_MaVonzi@willie-the-truck>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, sascha.bischoff@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Sep 17, 2025 at 04:25:35PM +0100, Will Deacon wrote:
+We currently access ICC_SRE_EL2 at each load/put on VHE, and on each
+entry/exit on nVHE. Both are quite onerous on NV, as this register
+always traps.
 
-> Ah right, so the driver would unnecessarily issue CMOs for the structures
-> that are just shared with the hypervisor. At least it's _functional_ that
-> way, but I'm sure people will complain!
+We do this to make sure the EL1 guest doesn't flip between v2 and v3
+behind our back. But all modern implementations have dropped v2,
+and this is just overhead.
 
-Yes, functional, why would anyone complain? STE and CD manipulation is
-not fast path for anything?
+At the same time, the GICv5 spec has been fixed to allow access to
+ICC_SRE_EL2 in legacy mode. Use this opportunity to replace the
+GICv5 checks for v2 compat checks, with an ad-hoc static key.
 
-Jason
+Co-developed-by: Sascha Bischoff <sascha.bischoff@arm.com>
+Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kernel/image-vars.h  |  3 +++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 25 +++++++++----------------
+ arch/arm64/kvm/vgic/vgic-v3.c   |  8 ++++++++
+ include/kvm/arm_vgic.h          |  1 +
+ 4 files changed, 21 insertions(+), 16 deletions(-)
+
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index 714b0b5ec5ac4..5369763606e71 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -105,6 +105,9 @@ KVM_NVHE_ALIAS(__hyp_stub_vectors);
+ KVM_NVHE_ALIAS(vgic_v2_cpuif_trap);
+ KVM_NVHE_ALIAS(vgic_v3_cpuif_trap);
+ 
++/* Static key indicating whether GICv3 has GICv2 compatibility */
++KVM_NVHE_ALIAS(vgic_v3_has_v2_compat);
++
+ /* Static key which is set if CNTVOFF_EL2 is unusable */
+ KVM_NVHE_ALIAS(broken_cntvoff_key);
+ 
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index d81275790e69b..acd909b7f2257 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -295,12 +295,8 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
+ 		}
+ 	}
+ 
+-	/*
+-	 * GICv5 BET0 FEAT_GCIE_LEGACY doesn't include ICC_SRE_EL2. This is due
+-	 * to be relaxed in a future spec release, at which point this in
+-	 * condition can be dropped.
+-	 */
+-	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
++	/* Only disable SRE if the host implements the GICv2 interface */
++	if (static_branch_unlikely(&vgic_v3_has_v2_compat)) {
+ 		/*
+ 		 * Prevent the guest from touching the ICC_SRE_EL1 system
+ 		 * register. Note that this may not have any effect, as
+@@ -329,19 +325,16 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
+ 		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
+ 	}
+ 
+-	/*
+-	 * Can be dropped in the future when GICv5 spec is relaxed. See comment
+-	 * above.
+-	 */
+-	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
++	/* Only restore SRE if the host implements the GICv2 interface */
++	if (static_branch_unlikely(&vgic_v3_has_v2_compat)) {
+ 		val = read_gicreg(ICC_SRE_EL2);
+ 		write_gicreg(val | ICC_SRE_EL2_ENABLE, ICC_SRE_EL2);
+-	}
+ 
+-	if (!cpu_if->vgic_sre) {
+-		/* Make sure ENABLE is set at EL2 before setting SRE at EL1 */
+-		isb();
+-		write_gicreg(1, ICC_SRE_EL1);
++		if (!cpu_if->vgic_sre) {
++			/* Make sure ENABLE is set at EL2 before setting SRE at EL1 */
++			isb();
++			write_gicreg(1, ICC_SRE_EL1);
++		}
+ 	}
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index b9ad7c42c5b01..f1c153106c563 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -588,6 +588,7 @@ int vgic_v3_map_resources(struct kvm *kvm)
+ }
+ 
+ DEFINE_STATIC_KEY_FALSE(vgic_v3_cpuif_trap);
++DEFINE_STATIC_KEY_FALSE(vgic_v3_has_v2_compat);
+ 
+ static int __init early_group0_trap_cfg(char *buf)
+ {
+@@ -697,6 +698,13 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+ 	if (kvm_vgic_global_state.vcpu_base == 0)
+ 		kvm_info("disabling GICv2 emulation\n");
+ 
++	/*
++	 * Flip the static branch if the HW supports v2, even if we're
++	 * not using it (such as in protected mode).
++	 */
++	if (has_v2)
++		static_branch_enable(&vgic_v3_has_v2_compat);
++
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_30115)) {
+ 		group0_trap = true;
+ 		group1_trap = true;
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 404883c7af6e8..9a6340d9c91e5 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -375,6 +375,7 @@ struct vgic_cpu {
+ 
+ extern struct static_key_false vgic_v2_cpuif_trap;
+ extern struct static_key_false vgic_v3_cpuif_trap;
++extern struct static_key_false vgic_v3_has_v2_compat;
+ 
+ int kvm_set_legacy_vgic_v2_addr(struct kvm *kvm, struct kvm_arm_device_addr *dev_addr);
+ void kvm_vgic_early_init(struct kvm *kvm);
+-- 
+2.39.2
+
