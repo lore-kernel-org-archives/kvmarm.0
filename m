@@ -1,32 +1,32 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F98530B52A
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 21:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB302749CE
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 21:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758144134; cv=none; b=J1YEM1pHlDcG6jAU16LtW5xwcumkOI1hXlx2VYCVjAFQTxkBXDKUQzR6CxtjNOIw+hZY9G8LNXflGvTZNXDe+bdcQycTttSM0RNCpwQ5VpuP7hMycC88PoXYXkMLAx/GrECkxTTo8svYOj2BeKFapt/6uF1H231VAv30NtYLU/M=
+	t=1758144136; cv=none; b=bkvzsBM08rZ0G+hPd2cItJo9gDQhSptGec90rX1B924cayZ2lzTBLABifmeccEz/6kh69ji9nKN8cvy4xMx8mufzNGmQZGGPY1JxdNxr5Zr9nEBJLEKGaykB9A/bFtzZ1rM8Dx+88k2F4Q4Kl0fRkOhPkPzW2zKdE/1yoAuOHtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758144134; c=relaxed/simple;
-	bh=689/OBfW/C2MrJbZxOFxShzMMLmvXMmlkqVKYAV0c2U=;
+	s=arc-20240116; t=1758144136; c=relaxed/simple;
+	bh=SzHRTvydUAOnrNTctQ/cxubaMWZQ2gSpHeYkGiI6J20=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B5zs70+uo7mVoak+oNnlPyTPuPWiejdT+N/R739pE25ZIbZoyhluxB6SGMY61vTzV/nRYYa5aSrnq2szePyJeebmlcHSS04S2wtTZqeWyIhy7XkbjEuecicd0pYZU4rU46bHiE33QQmLujoyobgrkKngPpoSBIStbGdDu/YYWlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N+00bxE7; arc=none smtp.client-ip=91.218.175.188
+	 MIME-Version; b=nOznRY4/RMIXs+aPOOAo6GtGVQfjKGTRhKosbEIxWYM437to1QHBYQhMARvufcnLFOTbFecSvYUDQt4w82/+q/TNadjF0SYdWIOPMnYO2qQK63jeTB8DeQcCLQR0311BeSqffLkv7SwRXXrpkYFhQKzFS4mUb/usz6iQXRjXzmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sWocmLbh; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N+00bxE7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sWocmLbh"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758144130;
+	t=1758144122;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=K5HYADmHCX472sFeljJ9Tm65HKk4u8deCrxi12j+YTQ=;
-	b=N+00bxE7auTffIakMyFatSTKSK4vg3b/Zepi/ODAad0m7xiTZhSmGNl3DoGVDbp++eocmM
-	d25IDz1OTCyOE01XVnQIUXcvhV2WWnHCtNFNsw7Y18SUt2lPgDhutS2nCpdbDBOmAFcxd6
-	USqnrq+1kw6gj2YTjoAKjfLJOP4g3l4=
+	bh=mo4OqzfGjmLC2N8F8wqwEshYuK+X6JdNA0FmDWCtBF8=;
+	b=sWocmLbhjmzHXxx9/n9OktxXOouX5Z9bF0An0NYSKi5RsOhXwodpmX8rtwH0+GchLsqJgr
+	1iRTAEwfKvXgHw38Oyx1Ku/2byxp/NYEwQbIqpp9kzZ0/mBXC/BMmk3qmxSKnm4Cq6K/yZ
+	uiDQRKSV3p6avOqpTq/jv3ZWNReRaTA=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -42,9 +42,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 13/13] KVM: arm64: selftests: Add basic test for running in VHE EL2
-Date: Wed, 17 Sep 2025 14:20:43 -0700
-Message-ID: <20250917212044.294760-14-oliver.upton@linux.dev>
+Subject: [PATCH 10/13] KVM: arm64: selftests: Use the vCPU attr for setting nr of PMU counters
+Date: Wed, 17 Sep 2025 14:20:40 -0700
+Message-ID: <20250917212044.294760-11-oliver.upton@linux.dev>
 In-Reply-To: <20250917212044.294760-1-oliver.upton@linux.dev>
 References: <20250917212044.294760-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -56,93 +56,152 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add an embarrassingly simple selftest for sanity checking KVM's VHE EL2
-and test that the ID register bits are consistent with HCR_EL2.E2H being
-RES1.
+Configuring the number of implemented counters via PMCR_EL0.N was a bad
+idea in retrospect as it interacts poorly with nested. Migrate the
+selftest to use the vCPU attribute instead of the KVM_SET_ONE_REG
+mechanism.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- tools/testing/selftests/kvm/arm64/hello_el2.c | 58 +++++++++++++++++++
- 2 files changed, 59 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/hello_el2.c
+ .../selftests/kvm/arm64/vpmu_counter_access.c | 59 +++++++++----------
+ 1 file changed, 28 insertions(+), 31 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 41b40c676d7f..5d59267d4089 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -156,6 +156,7 @@ TEST_GEN_PROGS_arm64 = $(TEST_GEN_PROGS_COMMON)
- TEST_GEN_PROGS_arm64 += arm64/aarch32_id_regs
- TEST_GEN_PROGS_arm64 += arm64/arch_timer_edge_cases
- TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
-+TEST_GEN_PROGS_arm64 += arm64/hello_el2
- TEST_GEN_PROGS_arm64 += arm64/host_sve
- TEST_GEN_PROGS_arm64 += arm64/hypercalls
- TEST_GEN_PROGS_arm64 += arm64/external_aborts
-diff --git a/tools/testing/selftests/kvm/arm64/hello_el2.c b/tools/testing/selftests/kvm/arm64/hello_el2.c
-new file mode 100644
-index 000000000000..3c1f44e43f65
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/hello_el2.c
-@@ -0,0 +1,58 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * hello_el2 - Basic KVM selftest for VM running at EL2 with E2H=RES1
-+ *
-+ * Copyright 2025 Google LLC
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include "ucall.h"
+diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+index 2a8f31c8e59f..ae36325c022f 100644
+--- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
++++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+@@ -44,11 +44,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
+ 	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+ }
+ 
+-static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+-{
+-	u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
+-}
+-
+ static uint64_t get_counters_mask(uint64_t n)
+ {
+ 	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
+@@ -414,10 +409,6 @@ static void create_vpmu_vm(void *guest_code)
+ 		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
+ 		.addr = (uint64_t)&irq,
+ 	};
+-	struct kvm_device_attr init_attr = {
+-		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+-		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
+-	};
+ 
+ 	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
+ 	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
+@@ -444,9 +435,7 @@ static void create_vpmu_vm(void *guest_code)
+ 		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
+ 		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+ 
+-	/* Initialize vPMU */
+ 	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+-	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
+ }
+ 
+ static void destroy_vpmu_vm(void)
+@@ -472,33 +461,28 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
+ 	}
+ }
+ 
+-static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
++static void test_create_vpmu_vm_with_nr_counters(unsigned int nr_counters, bool expect_fail)
+ {
+ 	struct kvm_vcpu *vcpu;
+-	uint64_t pmcr, pmcr_orig;
++	unsigned int prev;
++	int ret;
+ 
+ 	create_vpmu_vm(guest_code);
+ 	vcpu = vpmu_vm.vcpu;
+ 
+-	pmcr_orig = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
+-	pmcr = pmcr_orig;
++	prev = get_pmcr_n(vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0)));
+ 
+-	/*
+-	 * Setting a larger value of PMCR.N should not modify the field, and
+-	 * return a success.
+-	 */
+-	set_pmcr_n(&pmcr, pmcr_n);
+-	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+-	pmcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
++	ret = __vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++				     KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS, &nr_counters);
+ 
+ 	if (expect_fail)
+-		TEST_ASSERT(pmcr_orig == pmcr,
+-			    "PMCR.N modified by KVM to a larger value (PMCR: 0x%lx) for pmcr_n: 0x%lx",
+-			    pmcr, pmcr_n);
++		TEST_ASSERT(ret && errno == EINVAL,
++			    "Setting more PMU counters (%u) than available (%u) unexpectedly succeeded",
++			    nr_counters, prev);
+ 	else
+-		TEST_ASSERT(pmcr_n == get_pmcr_n(pmcr),
+-			    "Failed to update PMCR.N to %lu (received: %lu)",
+-			    pmcr_n, get_pmcr_n(pmcr));
++		TEST_ASSERT(!ret, KVM_IOCTL_ERROR(KVM_SET_DEVICE_ATTR, ret));
 +
-+#include <asm/sysreg.h>
-+
-+static void guest_code(void)
++	vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL, KVM_ARM_VCPU_PMU_V3_INIT, NULL);
+ }
+ 
+ /*
+@@ -513,7 +497,7 @@ static void run_access_test(uint64_t pmcr_n)
+ 
+ 	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
+ 
+-	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
++	test_create_vpmu_vm_with_nr_counters(pmcr_n, false);
+ 	vcpu = vpmu_vm.vcpu;
+ 
+ 	/* Save the initial sp to restore them later to run the guest again */
+@@ -554,7 +538,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
+ 	uint64_t set_reg_id, clr_reg_id, reg_val;
+ 	uint64_t valid_counters_mask, max_counters_mask;
+ 
+-	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
++	test_create_vpmu_vm_with_nr_counters(pmcr_n, false);
+ 	vcpu = vpmu_vm.vcpu;
+ 
+ 	valid_counters_mask = get_counters_mask(pmcr_n);
+@@ -608,7 +592,7 @@ static void run_error_test(uint64_t pmcr_n)
+ {
+ 	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
+ 
+-	test_create_vpmu_vm_with_pmcr_n(pmcr_n, true);
++	test_create_vpmu_vm_with_nr_counters(pmcr_n, true);
+ 	destroy_vpmu_vm();
+ }
+ 
+@@ -626,12 +610,25 @@ static uint64_t get_pmcr_n_limit(void)
+ 	return get_pmcr_n(pmcr);
+ }
+ 
++static bool kvm_supports_nr_counters_attr(void)
 +{
-+	u64 mmfr1 = read_sysreg_s(SYS_ID_AA64MMFR1_EL1);
-+	u64 mmfr4 = read_sysreg_s(SYS_ID_AA64MMFR4_EL1);
++	bool supported;
 +
-+	GUEST_ASSERT_EQ(get_current_el(), 2);
-+	GUEST_ASSERT(read_sysreg(hcr_el2) & HCR_EL2_E2H);
-+	GUEST_ASSERT_EQ(SYS_FIELD_GET(ID_AA64MMFR1_EL1, VH, mmfr1),
-+			ID_AA64MMFR1_EL1_VH_IMP);
-+	GUEST_ASSERT_EQ(SYS_FIELD_GET(ID_AA64MMFR4_EL1, E2H0, mmfr4),
-+			ID_AA64MMFR4_EL1_E2H0_NI_NV1);
++	create_vpmu_vm(NULL);
++	supported = !__vcpu_has_device_attr(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
++					    KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS);
++	destroy_vpmu_vm();
 +
-+	GUEST_DONE();
++	return supported;
 +}
 +
-+int main(void)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
-+
-+	vm = vm_create(1);
-+
-+	kvm_get_default_vcpu_target(vm, &init);
-+	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	kvm_arch_vm_finalize_vcpus(vm);
-+
-+	vcpu_run(vcpu);
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %ld\n", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
+ int main(void)
+ {
+ 	uint64_t i, pmcr_n;
+ 
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+ 	TEST_REQUIRE(kvm_supports_vgic_v3());
++	TEST_REQUIRE(kvm_supports_nr_counters_attr());
+ 
+ 	pmcr_n = get_pmcr_n_limit();
+ 	for (i = 0; i <= pmcr_n; i++) {
 -- 
 2.47.3
 
