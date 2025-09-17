@@ -1,139 +1,168 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1C42F99BC
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 17:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDA127C178;
+	Wed, 17 Sep 2025 18:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758131783; cv=none; b=pvMctY4LclgXQX4GuL6LWkxPvulDbl2NZnOMBI3AcIJ/aN3nZkobZdCvurcX9P/uM1SguPbvGDUR0y4NtfpLBspvX78Gp0mNRZrd2Xu+vo23DXKyefNARlsldq4ljbiagdefaZpW1ipNgGSjML6NR11sObhTcssiSMS4JPHcig4=
+	t=1758134669; cv=none; b=DG7O2IIvUMw2zhWA3N8enBBRWS7mtd2nOhoV3XfLBIZoRa7krVYHnO4GP5Jd6i7WtsmN5gBvCau/6LuEPA1FrXrm5Ha+uPdwwytLRbePhXWtzHZRsmYgGGELa+WwwLQEfBmNu1+9Hdlp9HWTglVu356nJ5unnvfdMYVAZwf1DR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758131783; c=relaxed/simple;
-	bh=oPkyEQThPJkZXDMJMqwLN+MXKminswUTWH1q3gWVLhE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AwHbsu9cnn+TcOFUO3egpGSLsGvsN5bH8O6Q5cVTzqoyRkefuvj1rJfSYZoT9i9S4qTYtT0g9HNXjM6PDzjkgFsx5IOxuaEdwRbpUse01Jp1QPtR9Jd/WTvTxfbNsJZwMuEfMNdBK8adkpCV/JKlBfZSjIIzL77g7f9QCW+lIwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ivVjtMmK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758134669; c=relaxed/simple;
+	bh=OLoxa48QuwEBcofnDByK3uh1SCi2Z/yYPHdY5JEg1PI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mse3c3iHbPPRDQ6dWpZDLr42c9ZT1alileM1bTUxshysMdhAEWRs74ZVW57+Sjro4DQ0t5DyWOFNQ7Hf4VqMyos0mBY9sjBOGbi+aS1JtPgAx17B0Z4MBOY4PwP5KohntzW0z69g7nSQ7A4/3rUnfV/SE6YCbT3GVUGR4YiccM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f8PqONEN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ivVjtMmK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758131780;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=o97Jkb44CguUDtzud8LMwc46TxzGlvMRMvZas4PSbL0=;
-	b=ivVjtMmKBaJu+7UWlAbLmdv7Tg5hLHFCXIOL/cVXoIWlcujwANUpaGeliLR8YBkTDO05Px
-	f4KEUZmGYNGch5kKZvLxwkkYyzz47vhmSQX8giqFRQtQNzK1n6OTD8r4WcDGBFkTvZVcB0
-	VBxvi7Kdq0pFalB1XCTCG+/ELuj0nBc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-4vmk6hVWMUaYqSEYGbC-Eg-1; Wed, 17 Sep 2025 13:56:19 -0400
-X-MC-Unique: 4vmk6hVWMUaYqSEYGbC-Eg-1
-X-Mimecast-MFC-AGG-ID: 4vmk6hVWMUaYqSEYGbC-Eg_1758131777
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3eb2c65e0d6so3263f8f.3
-        for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 10:56:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758131777; x=1758736577;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o97Jkb44CguUDtzud8LMwc46TxzGlvMRMvZas4PSbL0=;
-        b=kdaAPV3cfWZo0jMvXjSvCLDFz4GPRNcLRhnIQNm0xe8Qi99jnUJltAZlQnpK2aIEnf
-         94Tq42M92gDBVkbjC6/K2fOQvI4+SRNJsZDmUM5zhKWtw0Xv/aQtGylis/j24UHA1mFi
-         OAJ0LbOcRl5GWdkvoKY4SpTrN8O2tF777Z3zJ7FbfQ00qaWgGYhPYWSwGbaxhdEaYLCA
-         FGgATd32O2kYrEwu7kOutHdZ2Q62AjqHRHysactLTkYeC3/oD2Qs8TbuJXYQgz3z3alV
-         LIf5MkuBhB+Oqm7E4LkQWDAea3WQh3Ut1CNNbVQFn7dbp+yo/gT8LktpZ1eotCR77ctx
-         bOUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbHIwsyibU8usOhjPOaQvl0E3CxK6ChsRBEBHQkGwsRoMPGYPQe8WTIu6fPhanTosgTtcZKUY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw1BdwcdmB+glYFMd00Mil84qV2lBRCtbXe9IThsG8Nculuykk9
-	GowYyYRs1QqM4iHz9+6FUKAM/MFUjZuawyAgahdNh1gXkJw+QFEpg4TLY/rg0JZMVOmq1i3Vz0b
-	Z4wRaBC8R4ogcCYDLrKojkv0ZsFBIv6gZoQAurdlmAxNAk7DSjcUsGnRydg==
-X-Gm-Gg: ASbGncvXCBzL2bU5WBZlN2XNlITeO067CvgB1VnWyxBQco/Aph1BRZNT8xJD10ZQFZo
-	8m0K5Kxlhn4OU4xyxfrMUIw48TWZ3kDk/SXtVQ2Wc7DNFHn+5INPQA01DsNUpjzsd7IM0T7Ak7a
-	uyn1bZk2IHV9LfX7biBLZJ+eT9ldm6Q8a0INY7RA82147osQZmCvAXP3WOx95/bNOOEFQ7jXtt8
-	l/B7HAiUVg+0AM4SmJwYxCjwh7A0UlAP/vmZ6sYaFVdKvtQtOqi/WE9n8hKRI4wQ6PRhp5W0Vnl
-	PSk66zSkPRWolHMYVD8C9sGqCJBCkLUQ6HbZDIsZwgrvYJDR/CGA4h/ujAil7dCKmr9XTeUZGNK
-	Tf+VQr/eVtJC4C4fHF9kPbs+FMdDx/EI0DFIFoLnllJY=
-X-Received: by 2002:a05:6000:2512:b0:3ea:d9a7:43e4 with SMTP id ffacd0b85a97d-3ecdfa3f455mr2881661f8f.53.1758131777414;
-        Wed, 17 Sep 2025 10:56:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHtBAYP2GIwzz3bV6tNJV/6G8FSBl5qdvliPlMhUc/LxJ9XtvD0KciFkSa9CHP0G+pZLVonIQ==
-X-Received: by 2002:a05:6000:2512:b0:3ea:d9a7:43e4 with SMTP id ffacd0b85a97d-3ecdfa3f455mr2881644f8f.53.1758131777016;
-        Wed, 17 Sep 2025 10:56:17 -0700 (PDT)
-Received: from [192.168.10.48] ([151.95.56.250])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3ee0fbf1d35sm253196f8f.55.2025.09.17.10.56.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Sep 2025 10:56:16 -0700 (PDT)
-Message-ID: <6e598aec-f55c-467a-abef-6d183bb9cfca@redhat.com>
-Date: Wed, 17 Sep 2025 19:56:15 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f8PqONEN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33005C4CEE7;
+	Wed, 17 Sep 2025 18:44:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758134668;
+	bh=OLoxa48QuwEBcofnDByK3uh1SCi2Z/yYPHdY5JEg1PI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f8PqONENfOsX3iVnNu8gzDMdRStH7GoSN2gCmJumNxzU3dDXCWnKNl4/l6kfWb4LF
+	 tMPEko7Uxgu1oKN9QLzKTPw3vzijJvwTniwwi1XZdP9ocASlZFr6Xv5fP2btY8LA1m
+	 08UDfu7ijq2Vcndt64HGPL6kxN573aML1YCymlHCdtJmkqdb16Kvz1DoDVXDJv0f0n
+	 xqqKHWVaim5WsMbsY/6tS6/0VpPFmbkMNYj8aYyZAqvlUooCSpwv6gyUzjsjlLHXSp
+	 1W8KCDyXYPB33CHdXqrE9EgkeAw6/Dkh2S3gpiOdgXY8Q/Un712FbTj7PGc7comhQi
+	 kqT+zU22sKBBg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uyx8j-00000007Bv9-3g4d;
+	Wed, 17 Sep 2025 18:44:25 +0000
+Date: Wed, 17 Sep 2025 19:44:25 +0100
+Message-ID: <86ms6s2a2e.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Itaru Kitayama <itaru.kitayama@linux.dev>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	K Poulose Suzuki <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Subject: Re: [PATCH] PMCR_EL0.N is RAZ/WI. At least a build failes in Ubuntu 22.04 LTS. Remove the set function.
+In-Reply-To: <0524084A-9E82-408A-9F22-369ED25E42E9@linux.dev>
+References: <867by4c4v1.wl-maz@kernel.org>
+	<3FEB4D87-EEAF-4A21-BCBC-291A4A7C2230@gmail.com>
+	<86348rdg5o.wl-maz@kernel.org>
+	<0524084A-9E82-408A-9F22-369ED25E42E9@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] KVM/arm64 changes for 6.17, round #3
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-References: <aMHepH8Md9gSu2ix@linux.dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <aMHepH8Md9gSu2ix@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: NbMVKUrp1nIrixOBAl14CIzInAgnNgbPFLHL6KOlGaA_1758131777
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: itaru.kitayama@linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, itaru.kitayama@fujitsu.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 9/10/25 22:25, Oliver Upton wrote:
-> Hi Paolo,
-> 
-> This is most likely the final set of KVM/arm64 fixes for 6.17.
-> 
-> Of note, I reverted a couple of fixes we took in 6.17 for RCU stalls when
-> destroying a stage-2 page table. There appears to be some nasty refcounting /
-> UAF issues lurking in those patches and the band-aid we tried to apply didn't
-> hold.
+On Mon, 15 Sep 2025 22:31:31 +0100,
+Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
+>=20
+>=20
+>=20
+> > On Sep 12, 2025, at 21:11, Marc Zyngier <maz@kernel.org> wrote:
+> >=20
+> > On Fri, 12 Sep 2025 12:33:39 +0100,
+> > Itaru Kitayama <itaru.kitayama@gmail.com> wrote:
+> >>=20
+> >>=20
+> >>=20
+> >>> On Sep 12, 2025, at 20:01, Marc Zyngier <maz@kernel.org> wrote:
+> >>>=20
+> >>> =EF=BB=BFOn Fri, 12 Sep 2025 09:27:40 +0100,
+> >>> Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
+> >>>>=20
+> >>>> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> >>>=20
+> >>> This isn't an acceptable commit message.
+> >>>=20
+> >>>> ---
+> >>>> Seen a build failure with old Ubuntu 22.04 LTS, while the latest rel=
+ease
+> >>>> has no build issue, a write to the bit fields is RAZ/WI, remove the
+> >>>> function.
+> >>>> ---
+> >>>> tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 6 ------
+> >>>> 1 file changed, 6 deletions(-)
+> >>>>=20
+> >>>> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c=
+ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> >>>> index f16b3b27e32ed7ca57481f27d689d47783aa0345..56214a4430be90b3e1d8=
+40f2719b22dd44f0b49b 100644
+> >>>> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> >>>> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> >>>> @@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
+> >>>>   return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+> >>>> }
+> >>>>=20
+> >>>> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+> >>>> -{
+> >>>> -    u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
+> >>>> -}
+> >>>> -
+> >>>> static uint64_t get_counters_mask(uint64_t n)
+> >>>> {
+> >>>>   uint64_t mask =3D BIT(ARMV8_PMU_CYCLE_IDX);
+> >>>> @@ -490,7 +485,6 @@ static void test_create_vpmu_vm_with_pmcr_n(uint=
+64_t pmcr_n, bool expect_fail)
+> >>>>    * Setting a larger value of PMCR.N should not modify the field, a=
+nd
+> >>>>    * return a success.
+> >>>>    */
+> >>>> -    set_pmcr_n(&pmcr, pmcr_n);
+> >>>>   vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+> >>>>   pmcr =3D vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
+> >>>>=20
+> >>>>=20
+> >>>=20
+> >>> So what are you fixing here? A build failure? A semantic defect?
+> >>> Something else? What makes this a valid change?
+> >>>=20
+> >>> Frankly, I have no idea.
+> >>>=20
+> >>> But KVM definitely allows PMCR_EL0.N to be written from userspace, and
+> >>> that's not going to change.
+> >>>=20
+> >>=20
+> >> Then I=E2=80=99ll drop this patch.
+> >=20
+> > I'm not asking you to drop it, I'm asking you to explain. If you found
+> > a problem, let's discuss it and fix it. But as it stands, you're not
+> > giving me much to go on.
+> >=20
+>=20
+> You are right, while the bit fields are write ignored, to be
+> consistent with the handling of other bit fields of the register,
+> I=E2=80=99m fully convinced that checking the write operation in the
+> vpmu_counter_access.c file should be kept.
 
-Thanks for pointing this out, I will put a note about reverts in my own tag.
+The bit field is *not* ignored when written from userspace. That's how
+we configure the PMU if the guest runs at EL1.
 
-Paolo
+> The build error I=E2=80=99ve seen with Ubuntu 22.04 LTS is below:
 
+[snip]
+
+Can you please detail what compiler version this is? I'm unlikely to
+install an ancient version of Ubuntu, but I can pick the corresponding
+compiler version.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
