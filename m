@@ -1,66 +1,91 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05491C5F23
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 05:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED813081D6
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 08:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758086482; cv=none; b=pxn3t15PlCwaYPDQ/PCX48luNpl46cSmZ20jMxJD+efPF8nNG7rxnyu2F14PD9+60VvgDSJ7czCNpc63mK/cils3ODwLuGj6DtsJi/HnwNUmqG4I4m7Na77pVcA0WyZ1STds2VtR+hLaT1a8hVi3/NWKNuquMxQpBCuh0uNFTw8=
+	t=1758097297; cv=none; b=T3iIPoTYQJZPIPO6ryPcP9MkvMMCkDjRhogcizzzgAQi79zkUgjCxGP09/jazlLK2orY+rJ/aEiDcNcYD+3BfJWY+gsm9oesFHAqtHw1SddzlQr4gL/CZ+6JEooJInPYi9klWIv46xYNzXoIW6I9a/e8lxmT4MEk42vg9OSymCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758086482; c=relaxed/simple;
-	bh=QftlpN5pu6WIwTG0pl52OHhs8s/lZYOjw5tZ8sUEXnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m99jW7ulbgTVTkC0PE3UfxaT+uh1mJfxcxZcQZZ/SJicEpk1FxNq5M2yh0D12FGL7dv+WQUHon2gfFV/iCko9CydupbFP8J9O72ftxSgga4GF7HAv7221XSKYIwZ/LXzG8QZ/1kFNMxaJRLX6T1iLILjoXHC9Y1T2jmESzjR0E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ONlm1N7/; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1758097297; c=relaxed/simple;
+	bh=QG9kIwOrTVti9EkrTlseIQagno/pqmtWR2+SW9AJx3E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mQZynvxP5I+KXQaqeYb6kLyPuLu4ZffK3ek8yy/06OxO3GmKrqUey1jERUV5hFnlXSpzUo58swux13rZfFh2GreenY1HbseJl6AmKvTCXmR/yvbcy+HEDsLHRMSwVOm1ByUKG3O/zegLRS3Hxm7XaVLhQad8UmeKBn+lD8oLb78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMpdQ96B; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ONlm1N7/"
-Date: Tue, 16 Sep 2025 22:21:09 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758086477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SE80BDLp7RGmNryQ1WRS/aK8000n2rtH3W8fQeIL/c4=;
-	b=ONlm1N7/v3ZoW6UPF24U6gmqobIOXl4WGiyNax4nAwwivsgr2dSV79bQR6u9ESl43ku3nZ
-	53b8dPxD+kQFT7ZZV4ccOemciEY1RJbAohR3/ZnqDL5Ea3GGFYybmHP2DKihpSBQW81qTe
-	ss43SrLNC0BFkB6kA8lhxDzWIyWJ0tA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMpdQ96B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B470C4CEF0;
+	Wed, 17 Sep 2025 08:21:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758097297;
+	bh=QG9kIwOrTVti9EkrTlseIQagno/pqmtWR2+SW9AJx3E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cMpdQ96BU+A6ndiDqHZSkshRb53SaceqVsBr1BGZKhPQ/QPkdhsW7F72TsoIb2O+7
+	 /O+6Dyi+Sx81P+TpBEtc5DotFOgO8sc6Asioe2p3ASRPDkfa7andrQScaUvoDPc7Rb
+	 kFw+sL8cOyzmtAqp3NieCs02tH4frnghKDnHz7O+I92iIj+9FmJ6ZM5Klfr8V4zs+/
+	 EKy/VGvNJS6JZJq5dVQEFff36UoSiSfyY+a5rstjhXE56+xtWfeHDdFID2Cd+k5eDd
+	 +rWfiTzhRUaLRccAiWCkm7udhM5kMN3Rke9HjGJ4TUkmOZupJgidX/WUm1UMQHw1wO
+	 ePdETqh6uhUPw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uynPz-00000006ynu-0Vc7;
+	Wed, 17 Sep 2025 08:21:35 +0000
+Date: Wed, 17 Sep 2025 09:21:34 +0100
+Message-ID: <86plbp1oc1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Fix kvm_vcpu_{set,is}_be() to deal with EL2
- state
-Message-ID: <aMpFRYarTozl7Q38@linux.dev>
+Subject: Re: [PATCH] KVM: arm64: Fix kvm_vcpu_{set,is}_be() to deal with EL2 state
+In-Reply-To: <aMpFRYarTozl7Q38@linux.dev>
 References: <20250916161103.1040727-1-maz@kernel.org>
+	<aMpFRYarTozl7Q38@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250916161103.1040727-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Sep 16, 2025 at 05:11:03PM +0100, Marc Zyngier wrote:
-> Nobody really cares about BE, but KVM currently only deals with
-> SCTLR_EL1 when evaluating or setting the endianness in PSCI,
-> meaning that we evaluate whatever the L2 state has been at some point.
+On Wed, 17 Sep 2025 06:21:09 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Teach these primitives about SCTLR_EL2, and forget about BE...
+> On Tue, Sep 16, 2025 at 05:11:03PM +0100, Marc Zyngier wrote:
+> > Nobody really cares about BE, but KVM currently only deals with
+> > SCTLR_EL1 when evaluating or setting the endianness in PSCI,
+> > meaning that we evaluate whatever the L2 state has been at some point.
+> > 
+> > Teach these primitives about SCTLR_EL2, and forget about BE...
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> You know, I was about to say "don't we need to sanitise this?" although
+> that seems to already be in place. Nice.
 
-You know, I was about to say "don't we need to sanitise this?" although
-that seems to already be in place. Nice.
+Only for SCTLR_EL1.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+SCTLR_EL2, annoyingly enough, isn't, owing to plenty of bits depending
+on E2H. It's on my long list of things to address, but I'd like a
+common mechanism that'd deal with horrors such as CNTHCTL_EL2...
+
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
