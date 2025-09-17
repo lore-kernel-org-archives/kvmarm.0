@@ -1,35 +1,35 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB302749CE
-	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 21:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614B02FF64C
+	for <kvmarm@lists.linux.dev>; Wed, 17 Sep 2025 21:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758144136; cv=none; b=bkvzsBM08rZ0G+hPd2cItJo9gDQhSptGec90rX1B924cayZ2lzTBLABifmeccEz/6kh69ji9nKN8cvy4xMx8mufzNGmQZGGPY1JxdNxr5Zr9nEBJLEKGaykB9A/bFtzZ1rM8Dx+88k2F4Q4Kl0fRkOhPkPzW2zKdE/1yoAuOHtA=
+	t=1758146204; cv=none; b=s5gUT+Vx+0PwXMf+vprg3ODmnbeYmu0WzLHg70YI4IqCmP2vxepNnXl4EJoFofsT6Xq3rlN4mkkKI1IJ1pnfO/L7hDsjCqFOcwWMm5+rw4amAwXTEXBeLyGsViiyy+aP5DQOfyqCWexiVORkb2EQGV1wBfzZwpV7VVMhI6Go0hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758144136; c=relaxed/simple;
-	bh=SzHRTvydUAOnrNTctQ/cxubaMWZQ2gSpHeYkGiI6J20=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nOznRY4/RMIXs+aPOOAo6GtGVQfjKGTRhKosbEIxWYM437to1QHBYQhMARvufcnLFOTbFecSvYUDQt4w82/+q/TNadjF0SYdWIOPMnYO2qQK63jeTB8DeQcCLQR0311BeSqffLkv7SwRXXrpkYFhQKzFS4mUb/usz6iQXRjXzmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sWocmLbh; arc=none smtp.client-ip=91.218.175.174
+	s=arc-20240116; t=1758146204; c=relaxed/simple;
+	bh=0m9scD+P5IMalvlfBz3nkm1fdsFxVQ08SOb8GcTU4Xc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cWi7ZlUs/rTqTkxxx7+J+39OMilhefyUN8BHW1mSLETfVVgdp5ELby9Vi0l8tP26g2ETrJnZNKgc63d2rF8Dx8KPlCdAJ4G5/lmdDatIIydA/E8gCu8I6RMTyb41RyYjeIbFuSm742O/gk7mYuvzkedivDq9ks5GJLPHrLxB+P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qNRhO/em; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sWocmLbh"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qNRhO/em"
+Date: Thu, 18 Sep 2025 06:56:27 +0900
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758144122;
+	t=1758146199;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mo4OqzfGjmLC2N8F8wqwEshYuK+X6JdNA0FmDWCtBF8=;
-	b=sWocmLbhjmzHXxx9/n9OktxXOouX5Z9bF0An0NYSKi5RsOhXwodpmX8rtwH0+GchLsqJgr
-	1iRTAEwfKvXgHw38Oyx1Ku/2byxp/NYEwQbIqpp9kzZ0/mBXC/BMmk3qmxSKnm4Cq6K/yZ
-	uiDQRKSV3p6avOqpTq/jv3ZWNReRaTA=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	bh=MXZ7+Ibvsh1cXMBq66vw8RmPmdICgys8MaS/4a4cgSE=;
+	b=qNRhO/emD7xbps2428sDp6IrSxnPCufvt9GFU3kcjyRVvZv/+Rh7BH6jm+WQFppq1XLJ99
+	jeu17o6yf4WksZPpOza8BduvHVt8qrsQIHmEtKaodDV5fJ1ygRt5yKfxO7wGJJPuZ9AvlU
+	N+Npk3U3NqcMV2/RnayFLNRolyP7IMg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
@@ -39,169 +39,173 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Janosch Frank <frankja@linux.ibm.com>,
 	Claudio Imbrenda <imbrenda@linux.ibm.com>,
 	David Hildenbrand <david@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 10/13] KVM: arm64: selftests: Use the vCPU attr for setting nr of PMU counters
-Date: Wed, 17 Sep 2025 14:20:40 -0700
-Message-ID: <20250917212044.294760-11-oliver.upton@linux.dev>
-In-Reply-To: <20250917212044.294760-1-oliver.upton@linux.dev>
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 07/13] KVM: arm64: selftests: Provide helper for getting
+ default vCPU target
+Message-ID: <aMsui6JZ0q1z4pSc@vm4>
 References: <20250917212044.294760-1-oliver.upton@linux.dev>
+ <20250917212044.294760-8-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917212044.294760-8-oliver.upton@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-Configuring the number of implemented counters via PMCR_EL0.N was a bad
-idea in retrospect as it interacts poorly with nested. Migrate the
-selftest to use the vCPU attribute instead of the KVM_SET_ONE_REG
-mechanism.
+On Wed, Sep 17, 2025 at 02:20:37PM -0700, Oliver Upton wrote:
+> The default vCPU target in KVM selftests is pretty boring in that it
+> doesn't enable any vCPU features. Expose a helper for getting the
+> default target to prepare for cramming in more features. Call
+> KVM_ARM_PREFERRED_TARGET directly from get-reg-list as it needs
+> fine-grained control over feature flags.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  tools/testing/selftests/kvm/arm64/psci_test.c   |  2 +-
+>  .../testing/selftests/kvm/arm64/smccc_filter.c  |  2 +-
+>  .../selftests/kvm/arm64/vpmu_counter_access.c   |  4 ++--
+>  tools/testing/selftests/kvm/get-reg-list.c      |  9 ++++++---
+>  .../selftests/kvm/include/arm64/processor.h     |  2 ++
+>  .../testing/selftests/kvm/lib/arm64/processor.c | 17 +++++++++++------
+>  6 files changed, 23 insertions(+), 13 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/psci_test.c b/tools/testing/selftests/kvm/arm64/psci_test.c
+> index cf208390fd0e..0d4680da66d1 100644
+> --- a/tools/testing/selftests/kvm/arm64/psci_test.c
+> +++ b/tools/testing/selftests/kvm/arm64/psci_test.c
+> @@ -89,7 +89,7 @@ static struct kvm_vm *setup_vm(void *guest_code, struct kvm_vcpu **source,
+>  
+>  	vm = vm_create(2);
+>  
+> -	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	kvm_get_default_vcpu_target(vm, &init);
+>  	init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
+>  
+>  	*source = aarch64_vcpu_add(vm, 0, &init, guest_code);
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- .../selftests/kvm/arm64/vpmu_counter_access.c | 59 +++++++++----------
- 1 file changed, 28 insertions(+), 31 deletions(-)
+I wonder if the ioctl() can be called unconditionally in the 
+aarch64_vcpu_add() function. If the intention is that the kvm selftest
+code needs to write this way I am fine with that.
 
-diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-index 2a8f31c8e59f..ae36325c022f 100644
---- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-@@ -44,11 +44,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
- 	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
- }
- 
--static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
--{
--	u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
--}
--
- static uint64_t get_counters_mask(uint64_t n)
- {
- 	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
-@@ -414,10 +409,6 @@ static void create_vpmu_vm(void *guest_code)
- 		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
- 		.addr = (uint64_t)&irq,
- 	};
--	struct kvm_device_attr init_attr = {
--		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
--		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
--	};
- 
- 	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
- 	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-@@ -444,9 +435,7 @@ static void create_vpmu_vm(void *guest_code)
- 		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
- 		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
- 
--	/* Initialize vPMU */
- 	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
--	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
- }
- 
- static void destroy_vpmu_vm(void)
-@@ -472,33 +461,28 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
- 	}
- }
- 
--static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
-+static void test_create_vpmu_vm_with_nr_counters(unsigned int nr_counters, bool expect_fail)
- {
- 	struct kvm_vcpu *vcpu;
--	uint64_t pmcr, pmcr_orig;
-+	unsigned int prev;
-+	int ret;
- 
- 	create_vpmu_vm(guest_code);
- 	vcpu = vpmu_vm.vcpu;
- 
--	pmcr_orig = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
--	pmcr = pmcr_orig;
-+	prev = get_pmcr_n(vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0)));
- 
--	/*
--	 * Setting a larger value of PMCR.N should not modify the field, and
--	 * return a success.
--	 */
--	set_pmcr_n(&pmcr, pmcr_n);
--	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
--	pmcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
-+	ret = __vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				     KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS, &nr_counters);
- 
- 	if (expect_fail)
--		TEST_ASSERT(pmcr_orig == pmcr,
--			    "PMCR.N modified by KVM to a larger value (PMCR: 0x%lx) for pmcr_n: 0x%lx",
--			    pmcr, pmcr_n);
-+		TEST_ASSERT(ret && errno == EINVAL,
-+			    "Setting more PMU counters (%u) than available (%u) unexpectedly succeeded",
-+			    nr_counters, prev);
- 	else
--		TEST_ASSERT(pmcr_n == get_pmcr_n(pmcr),
--			    "Failed to update PMCR.N to %lu (received: %lu)",
--			    pmcr_n, get_pmcr_n(pmcr));
-+		TEST_ASSERT(!ret, KVM_IOCTL_ERROR(KVM_SET_DEVICE_ATTR, ret));
-+
-+	vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL, KVM_ARM_VCPU_PMU_V3_INIT, NULL);
- }
- 
- /*
-@@ -513,7 +497,7 @@ static void run_access_test(uint64_t pmcr_n)
- 
- 	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
- 
--	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
-+	test_create_vpmu_vm_with_nr_counters(pmcr_n, false);
- 	vcpu = vpmu_vm.vcpu;
- 
- 	/* Save the initial sp to restore them later to run the guest again */
-@@ -554,7 +538,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
- 	uint64_t set_reg_id, clr_reg_id, reg_val;
- 	uint64_t valid_counters_mask, max_counters_mask;
- 
--	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
-+	test_create_vpmu_vm_with_nr_counters(pmcr_n, false);
- 	vcpu = vpmu_vm.vcpu;
- 
- 	valid_counters_mask = get_counters_mask(pmcr_n);
-@@ -608,7 +592,7 @@ static void run_error_test(uint64_t pmcr_n)
- {
- 	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
- 
--	test_create_vpmu_vm_with_pmcr_n(pmcr_n, true);
-+	test_create_vpmu_vm_with_nr_counters(pmcr_n, true);
- 	destroy_vpmu_vm();
- }
- 
-@@ -626,12 +610,25 @@ static uint64_t get_pmcr_n_limit(void)
- 	return get_pmcr_n(pmcr);
- }
- 
-+static bool kvm_supports_nr_counters_attr(void)
-+{
-+	bool supported;
-+
-+	create_vpmu_vm(NULL);
-+	supported = !__vcpu_has_device_attr(vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL,
-+					    KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS);
-+	destroy_vpmu_vm();
-+
-+	return supported;
-+}
-+
- int main(void)
- {
- 	uint64_t i, pmcr_n;
- 
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
- 	TEST_REQUIRE(kvm_supports_vgic_v3());
-+	TEST_REQUIRE(kvm_supports_nr_counters_attr());
- 
- 	pmcr_n = get_pmcr_n_limit();
- 	for (i = 0; i <= pmcr_n; i++) {
--- 
-2.47.3
+Reviewed-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 
+> diff --git a/tools/testing/selftests/kvm/arm64/smccc_filter.c b/tools/testing/selftests/kvm/arm64/smccc_filter.c
+> index eb5551d21dbe..a8e22d866ea7 100644
+> --- a/tools/testing/selftests/kvm/arm64/smccc_filter.c
+> +++ b/tools/testing/selftests/kvm/arm64/smccc_filter.c
+> @@ -64,7 +64,7 @@ static struct kvm_vm *setup_vm(struct kvm_vcpu **vcpu)
+>  	struct kvm_vm *vm;
+>  
+>  	vm = vm_create(1);
+> -	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	kvm_get_default_vcpu_target(vm, &init);
+>  
+>  	/*
+>  	 * Enable in-kernel emulation of PSCI to ensure that calls are denied
+> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> index 36a3a8b4e0b5..2a8f31c8e59f 100644
+> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> @@ -430,7 +430,7 @@ static void create_vpmu_vm(void *guest_code)
+>  	}
+>  
+>  	/* Create vCPU with PMUv3 */
+> -	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	kvm_get_default_vcpu_target(vpmu_vm.vm, &init);
+>  	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+>  	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
+>  	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
+> @@ -525,7 +525,7 @@ static void run_access_test(uint64_t pmcr_n)
+>  	 * Reset and re-initialize the vCPU, and run the guest code again to
+>  	 * check if PMCR_EL0.N is preserved.
+>  	 */
+> -	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	kvm_get_default_vcpu_target(vpmu_vm.vm, &init);
+>  	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+>  	aarch64_vcpu_setup(vcpu, &init);
+>  	vcpu_init_descriptor_tables(vcpu);
+> diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
+> index 91f05f78e824..f4644c9d2d3b 100644
+> --- a/tools/testing/selftests/kvm/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/get-reg-list.c
+> @@ -116,10 +116,13 @@ void __weak finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+>  }
+>  
+>  #ifdef __aarch64__
+> -static void prepare_vcpu_init(struct vcpu_reg_list *c, struct kvm_vcpu_init *init)
+> +static void prepare_vcpu_init(struct kvm_vm *vm, struct vcpu_reg_list *c,
+> +			      struct kvm_vcpu_init *init)
+>  {
+>  	struct vcpu_reg_sublist *s;
+>  
+> +	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, init);
+> +
+>  	for_each_sublist(c, s)
+>  		if (s->capability)
+>  			init->features[s->feature / 32] |= 1 << (s->feature % 32);
+> @@ -127,10 +130,10 @@ static void prepare_vcpu_init(struct vcpu_reg_list *c, struct kvm_vcpu_init *ini
+>  
+>  static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, struct kvm_vm *vm)
+>  {
+> -	struct kvm_vcpu_init init = { .target = -1, };
+> +	struct kvm_vcpu_init init;
+>  	struct kvm_vcpu *vcpu;
+>  
+> -	prepare_vcpu_init(c, &init);
+> +	prepare_vcpu_init(vm, c, &init);
+>  	vcpu = __vm_vcpu_add(vm, 0);
+>  	aarch64_vcpu_setup(vcpu, &init);
+>  
+> diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
+> index 5a4b29c1b965..87f50efed720 100644
+> --- a/tools/testing/selftests/kvm/include/arm64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/arm64/processor.h
+> @@ -357,4 +357,6 @@ static __always_inline u64 ctxt_reg_alias(struct kvm_vcpu *vcpu, u32 encoding)
+>  	return KVM_ARM64_SYS_REG(alias);
+>  }
+>  
+> +void kvm_get_default_vcpu_target(struct kvm_vm *vm, struct kvm_vcpu_init *init);
+> +
+>  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> index 311660a9f655..5ae65fefd48c 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> @@ -267,19 +267,24 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+>  	}
+>  }
+>  
+> +void kvm_get_default_vcpu_target(struct kvm_vm *vm, struct kvm_vcpu_init *init)
+> +{
+> +	struct kvm_vcpu_init preferred = {};
+> +
+> +	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &preferred);
+> +
+> +	*init = preferred;
+> +}
+> +
+>  void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+>  {
+>  	struct kvm_vcpu_init default_init = { .target = -1, };
+>  	struct kvm_vm *vm = vcpu->vm;
+>  	uint64_t sctlr_el1, tcr_el1, ttbr0_el1;
+>  
+> -	if (!init)
+> +	if (!init) {
+> +		kvm_get_default_vcpu_target(vm, &default_init);
+>  		init = &default_init;
+> -
+> -	if (init->target == -1) {
+> -		struct kvm_vcpu_init preferred;
+> -		vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &preferred);
+> -		init->target = preferred.target;
+>  	}
+>  
+>  	vcpu_ioctl(vcpu, KVM_ARM_VCPU_INIT, init);
+> -- 
+> 2.47.3
+> 
