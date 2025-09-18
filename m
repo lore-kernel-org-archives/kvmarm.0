@@ -1,31 +1,31 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F40521C9E5
-	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 01:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD0654764
+	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 01:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758158774; cv=none; b=HQHVMwPRSITGY9dprh4STA+fNAVh/qjgtCLRbtwIWN4vuTKdwax9Td575QrX554jO0jR+iXcd8sB1akLWPrz3qm/82OSHBpkN22EVffOexBU4Fy4ri5vGpRRrxgMFHyEVEPiDhup4ET0d3azhM91do7Dvr0Bo778s0cLCfTUgQw=
+	t=1758159966; cv=none; b=TwZg1PbfS0qV8+o/sZmFyWp0bPSjmCFN0SoDRLT1X4PLVleMo9eCy7pGyRbAvpv6YfThP3qMwWQVHLU285k9cppcqk6WLMPOQZXauUI8qi5C56TidwKtL4rXUXfuZISG952nyNMwe8LPUACaUerf6fus62r/JDG4Vl+GxNEi/eQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758158774; c=relaxed/simple;
-	bh=XQ/Q1dGjyHi18nLYd6ZQWciw1WjkgGa3wE8hOveg3jI=;
+	s=arc-20240116; t=1758159966; c=relaxed/simple;
+	bh=JVKhKkxSZop6mixyG1NVJRyT4yaVnmI+fcWd4yK7LYE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B5WsQbdE/WhRl70igM6BMIy0Law/gcUN9QaRyBtYUKq8co11rBXYUJCVOR8nNo2Hbo2lxVuRyPQYh/hJckPZ/59lXaNbRWzuqceiTW5cNjHf1iDjEmBEvMv2kA2781Rd1+zcs7EeUa2z+GGtPECaVuIPyPQ6IWZ+QdbLgpe+1As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rRIIyGux; arc=none smtp.client-ip=95.215.58.189
+	 Content-Type:Content-Disposition:In-Reply-To; b=rveXKPx7zST9HKt2hbNJj1uXFZOX/HoO/z+wx+L6C81TblKmYSUXyMmCbMbivSa9hynonsJugxQsBpDuaIcaSIygTW+oIJRSEPy/+RZAqWulnzTx/y44MFnyeNQcBd7V7ktBMspSxG1891vNVnoL0brAkD6V2z10KC6G4cVrcvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SdFDJG43; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rRIIyGux"
-Date: Thu, 18 Sep 2025 10:25:58 +0900
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SdFDJG43"
+Date: Thu, 18 Sep 2025 10:45:51 +0900
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758158769;
+	t=1758159961;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=k9Jjt7WIG30EfMyysMomZPghPo22dRWUV095XopjZOE=;
-	b=rRIIyGux9mwYO5LpVSAUqWij4Ha3iOEdouYkK3XvQqZqV8cEnVNY1iFTrIRvXDdd9ULYpK
-	m+xGg+O8Y2hLyQpPvrqkSg6Nd1k3z3Aw0lpRY80eWFpYCx4GbuzY8fjdO3CAVnL/NPZHwE
-	Eh/u5laOzMOZIlMyZxWutvygrwpbGdw=
+	bh=Doq25p+1DFVIRWlQc0G6ormH2onTHdI1vNqxrn+KXcE=;
+	b=SdFDJG43Gg2xOHKStNM2G3t1zfMEJn8q/nCLMxuuojmrQU+IeUjSD+5NZqg5gBfGAs9eWV
+	moCt+yQvsQkKHWqOlRTWaTGEqc40rT28Q2++P52OSgOLJCzlQ8sRzzs9Ib9fTaez9NxouV
+	zSK6sR23IO6F6TriRgy5CY10IyJsKlQ=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Itaru Kitayama <itaru.kitayama@linux.dev>
 To: Oliver Upton <oliver.upton@linux.dev>
@@ -40,11 +40,11 @@ Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
 	Claudio Imbrenda <imbrenda@linux.ibm.com>,
 	David Hildenbrand <david@redhat.com>,
 	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 01/13] KVM: arm64: selftests: Provide
- kvm_arch_vm_post_create() in library code
-Message-ID: <aMtfpocXPg7mONac@vm4>
+Subject: Re: [PATCH 03/13] KVM: arm64: selftests: Add helper to check for
+ VGICv3 support
+Message-ID: <aMtkT9CC+lRH/vSD@vm4>
 References: <20250917212044.294760-1-oliver.upton@linux.dev>
- <20250917212044.294760-2-oliver.upton@linux.dev>
+ <20250917212044.294760-4-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,177 +53,171 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250917212044.294760-2-oliver.upton@linux.dev>
+In-Reply-To: <20250917212044.294760-4-oliver.upton@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 17, 2025 at 02:20:31PM -0700, Oliver Upton wrote:
-> In order to compel the default usage of EL2 in selftests, move
-> kvm_arch_vm_post_create() to library code and expose an opt-in for using
-> MTE by default.
+On Wed, Sep 17, 2025 at 02:20:33PM -0700, Oliver Upton wrote:
+> Introduce a proper predicate for probing VGICv3 by performing a 'test'
+> creation of the device on a dummy VM.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  .../testing/selftests/kvm/arm64/set_id_regs.c | 19 +++++--------------
->  .../selftests/kvm/include/arm64/processor.h   |  2 ++
->  .../selftests/kvm/lib/arm64/processor.c       | 13 +++++++++++++
->  3 files changed, 20 insertions(+), 14 deletions(-)
+>  tools/testing/selftests/kvm/arm64/arch_timer.c        |  3 ++-
+>  .../selftests/kvm/arm64/arch_timer_edge_cases.c       |  3 ++-
+>  tools/testing/selftests/kvm/arm64/vgic_irq.c          |  3 ++-
+>  tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c   |  4 ++--
+>  .../testing/selftests/kvm/arm64/vpmu_counter_access.c |  3 +--
+>  tools/testing/selftests/kvm/include/arm64/vgic.h      |  1 +
+>  tools/testing/selftests/kvm/lib/arm64/vgic.c          | 11 +++++++++++
+>  7 files changed, 21 insertions(+), 7 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> index 189321e96925..a2d367a2c93c 100644
-> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> @@ -15,8 +15,6 @@
->  #include "test_util.h"
->  #include <linux/bitfield.h>
+> diff --git a/tools/testing/selftests/kvm/arm64/arch_timer.c b/tools/testing/selftests/kvm/arm64/arch_timer.c
+> index eeba1cc87ff8..aaf4285f832a 100644
+> --- a/tools/testing/selftests/kvm/arm64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/arm64/arch_timer.c
+> @@ -184,6 +184,8 @@ struct kvm_vm *test_vm_create(void)
+>  	unsigned int i;
+>  	int nr_vcpus = test_args.nr_vcpus;
 >  
-> -bool have_cap_arm_mte;
-> -
->  enum ftr_type {
->  	FTR_EXACT,			/* Use a predefined safe value */
->  	FTR_LOWER_SAFE,			/* Smaller value is safe */
-> @@ -568,7 +566,9 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
->  	uint64_t mte_frac;
->  	int idx, err;
+> +	TEST_REQUIRE(kvm_supports_vgic_v3());
+> +
+>  	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
 >  
-> -	if (!have_cap_arm_mte) {
-> +	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
-> +	mte = FIELD_GET(ID_AA64PFR1_EL1_MTE, val);
-> +	if (!mte) {
->  		ksft_test_result_skip("MTE capability not supported, nothing to test\n");
->  		return;
->  	}
-> @@ -593,9 +593,6 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
->  	 * from unsupported (0xF) to supported (0).
->  	 *
->  	 */
-> -	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
+>  	vm_init_descriptor_tables(vm);
+> @@ -205,7 +207,6 @@ struct kvm_vm *test_vm_create(void)
+>  
+>  	test_init_timer_irq(vm);
+>  	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64);
+> -	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
+>  
+>  	/* Make all the test's cmdline args visible to the guest */
+>  	sync_global_to_guest(vm, test_args);
+> diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> index ce74d069cb7b..d349d80d8418 100644
+> --- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> +++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> @@ -952,7 +952,6 @@ static void test_vm_create(struct kvm_vm **vm, struct kvm_vcpu **vcpu,
+>  
+>  	test_init_timer_irq(*vm, *vcpu);
+>  	gic_fd = vgic_v3_setup(*vm, 1, 64);
+> -	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
+>  
+>  	sync_global_to_guest(*vm, test_args);
+>  	sync_global_to_guest(*vm, CVAL_MAX);
+> @@ -1042,6 +1041,8 @@ int main(int argc, char *argv[])
+>  	/* Tell stdout not to buffer its content */
+>  	setbuf(stdout, NULL);
+>  
+> +	TEST_REQUIRE(kvm_supports_vgic_v3());
+> +
+>  	if (!parse_args(argc, argv))
+>  		exit(KSFT_SKIP);
+>  
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
+> index a09dd423c2d7..9fc9e8e44ecd 100644
+> --- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
+> @@ -752,7 +752,6 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
+>  	vcpu_args_set(vcpu, 1, args_gva);
+>  
+>  	gic_fd = vgic_v3_setup(vm, 1, nr_irqs);
+> -	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping");
+>  
+>  	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
+>  		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
+> @@ -802,6 +801,8 @@ int main(int argc, char **argv)
+>  	int opt;
+>  	bool eoi_split = false;
+>  
+> +	TEST_REQUIRE(kvm_supports_vgic_v3());
+> +
+>  	while ((opt = getopt(argc, argv, "hn:e:l:")) != -1) {
+>  		switch (opt) {
+>  		case 'n':
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+> index fc4fe52fb6f8..cc2b21d374af 100644
+> --- a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+> @@ -215,8 +215,6 @@ static void setup_test_data(void)
+>  static void setup_gic(void)
+>  {
+>  	gic_fd = vgic_v3_setup(vm, test_data.nr_cpus, 64);
+> -	__TEST_REQUIRE(gic_fd >= 0, "Failed to create GICv3");
 > -
-> -	mte = FIELD_GET(ID_AA64PFR1_EL1_MTE, val);
->  	mte_frac = FIELD_GET(ID_AA64PFR1_EL1_MTE_frac, val);
->  	if (mte != ID_AA64PFR1_EL1_MTE_MTE2 ||
->  	    mte_frac != ID_AA64PFR1_EL1_MTE_frac_NI) {
-> @@ -750,14 +747,6 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
->  	ksft_test_result_pass("%s\n", __func__);
+>  	its_fd = vgic_its_setup(vm);
 >  }
 >  
-> -void kvm_arch_vm_post_create(struct kvm_vm *vm)
-> -{
-> -	if (vm_check_cap(vm, KVM_CAP_ARM_MTE)) {
-> -		vm_enable_cap(vm, KVM_CAP_ARM_MTE, 0);
-> -		have_cap_arm_mte = true;
-> -	}
-> -}
-> -
->  int main(void)
->  {
->  	struct kvm_vcpu *vcpu;
-> @@ -769,6 +758,8 @@ int main(void)
->  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES));
->  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_WRITABLE_IMP_ID_REGS));
+> @@ -374,6 +372,8 @@ int main(int argc, char **argv)
+>  	u32 nr_threads;
+>  	int c;
 >  
-> +	test_wants_mte();
+> +	TEST_REQUIRE(kvm_supports_vgic_v3());
 > +
->  	vm = vm_create(1);
->  	vm_enable_cap(vm, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS, 0);
->  	vcpu = vm_vcpu_add(vm, 0, guest_code);
-> diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
-> index 255fed769a8a..8370fc94041d 100644
-> --- a/tools/testing/selftests/kvm/include/arm64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/arm64/processor.h
-> @@ -300,4 +300,6 @@ void smccc_smc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
->  /* Execute a Wait For Interrupt instruction. */
->  void wfi(void);
+>  	while ((c = getopt(argc, argv, "hv:d:e:i:")) != -1) {
+>  		switch (c) {
+>  		case 'v':
+> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> index a0c4ab839155..01f61657de45 100644
+> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> @@ -436,8 +436,6 @@ static void create_vpmu_vm(void *guest_code)
+>  	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
+>  	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
+>  	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64);
+> -	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
+> -		       "Failed to create vgic-v3, skipping");
 >  
-> +void test_wants_mte(void);
-> +
->  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-> index eb115123d741..caed1998c7b3 100644
-> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-> @@ -653,3 +653,16 @@ void wfi(void)
->  {
->  	asm volatile("wfi");
->  }
-> +
-> +static bool request_mte;
-> +
-> +void test_wants_mte(void)
+>  	/* Make sure that PMUv3 support is indicated in the ID register */
+>  	dfr0 = vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1));
+> @@ -634,6 +632,7 @@ int main(void)
+>  	uint64_t i, pmcr_n;
+>  
+>  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+> +	TEST_REQUIRE(kvm_supports_vgic_v3());
+>  
+>  	pmcr_n = get_pmcr_n_limit();
+>  	for (i = 0; i <= pmcr_n; i++) {
+> diff --git a/tools/testing/selftests/kvm/include/arm64/vgic.h b/tools/testing/selftests/kvm/include/arm64/vgic.h
+> index c481d0c00a5d..b858fa8195b4 100644
+> --- a/tools/testing/selftests/kvm/include/arm64/vgic.h
+> +++ b/tools/testing/selftests/kvm/include/arm64/vgic.h
+> @@ -16,6 +16,7 @@
+>  	((uint64_t)(flags) << 12) | \
+>  	index)
+>  
+> +bool kvm_supports_vgic_v3(void);
+>  int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs);
+>  
+>  #define VGIC_MAX_RESERVED	1023
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/vgic.c b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+> index 64e793795563..661744c6532e 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/vgic.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/vgic.c
+> @@ -15,6 +15,17 @@
+>  #include "gic.h"
+>  #include "gic_v3.h"
+>  
+> +bool kvm_supports_vgic_v3(void)
 > +{
-> +	request_mte = true;
+> +	struct kvm_vm *vm = vm_create_barebones();
+> +	int r;
+> +
+> +	r = __kvm_test_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3);
+> +	kvm_vm_free(vm);
+> +
+> +	return !r;
 > +}
 > +
-> +void kvm_arch_vm_post_create(struct kvm_vm *vm)
-> +{
-> +	if (request_mte && vm_check_cap(vm, KVM_CAP_ARM_MTE))
-> +		vm_enable_cap(vm, KVM_CAP_ARM_MTE, 0);
-> +}
+>  /*
+>   * vGIC-v3 default host setup
+>   *
 > -- 
 > 2.47.3
->
+> 
 
-Hi,
-On FVP RevC with the kernel your series applied, I see set_id_regs fails
-to execute.
+Oliver
+The arch_timer_edge_cases selftest does not return nor fails on FVP RevC.
+I boot the system with kvm-arm.mode=nested.
 
-# ./arm64/set_id_regs
-Random seed: 0x6b8b4567
-TAP version 13
-1..102
-ok 1 ID_AA64DFR0_EL1_DoubleLock
-ok 2 ID_AA64DFR0_EL1_WRPs
-ok 3 ID_AA64DFR0_EL1_PMUVer
-ok 4 ID_AA64DFR0_EL1_DebugVer
-ok 5 # SKIP ID_DFR0_EL1_PerfMon on AARCH64 only system
-ok 6 # SKIP ID_DFR0_EL1_CopDbg on AARCH64 only system
-ok 7 ID_AA64ISAR0_EL1_RNDR
-ok 8 ID_AA64ISAR0_EL1_TLB
-ok 9 ID_AA64ISAR0_EL1_TS
-ok 10 ID_AA64ISAR0_EL1_FHM
-ok 11 ID_AA64ISAR0_EL1_DP
-ok 12 ID_AA64ISAR0_EL1_SM4
-ok 13 ID_AA64ISAR0_EL1_SM3
-ok 14 ID_AA64ISAR0_EL1_SHA3
-ok 15 ID_AA64ISAR0_EL1_RDM
-ok 16 ID_AA64ISAR0_EL1_TME
-ok 17 ID_AA64ISAR0_EL1_ATOMIC
-ok 18 ID_AA64ISAR0_EL1_CRC32
-ok 19 ID_AA64ISAR0_EL1_SHA2
-ok 20 ID_AA64ISAR0_EL1_SHA1
-ok 21 ID_AA64ISAR0_EL1_AES
-ok 22 ID_AA64ISAR1_EL1_LS64
-ok 23 ID_AA64ISAR1_EL1_XS
-ok 24 ID_AA64ISAR1_EL1_I8MM
-ok 25 ID_AA64ISAR1_EL1_DGH
-ok 26 ID_AA64ISAR1_EL1_BF16
-ok 27 ID_AA64ISAR1_EL1_SPECRES
-ok 28 ID_AA64ISAR1_EL1_SB
-ok 29 ID_AA64ISAR1_EL1_FRINTTS
-ok 30 ID_AA64ISAR1_EL1_LRCPC
-ok 31 ID_AA64ISAR1_EL1_FCMA
-ok 32 ID_AA64ISAR1_EL1_JSCVT
-ok 33 ID_AA64ISAR1_EL1_DPB
-ok 34 ID_AA64ISAR2_EL1_BC
-ok 35 ID_AA64ISAR2_EL1_RPRES
-ok 36 ID_AA64ISAR2_EL1_WFxT
-ok 37 ID_AA64PFR0_EL1_CSV3
-ok 38 ID_AA64PFR0_EL1_CSV2
-ok 39 ID_AA64PFR0_EL1_DIT
-ok 40 ID_AA64PFR0_EL1_SEL2
-ok 41 ID_AA64PFR0_EL1_GIC
-ok 42 ID_AA64PFR0_EL1_EL3
-ok 43 ID_AA64PFR0_EL1_EL2
-ok 44 ID_AA64PFR0_EL1_EL1
-ok 45 ID_AA64PFR0_EL1_EL0
-ok 46 ID_AA64PFR1_EL1_DF2
-ok 47 ID_AA64PFR1_EL1_CSV2_frac
-ok 48 ID_AA64PFR1_EL1_SSBS
-ok 49 ID_AA64PFR1_EL1_BT
-ok 50 ID_AA64MMFR0_EL1_ECV
-ok 51 ID_AA64MMFR0_EL1_EXS
-==== Test Assertion Failure ====
-  include/kvm_util.h:815: !ret
-    pid=897 tid=897 errno=22 - Invalid argument
-    sh: line 1: addr2line: command not found
-      KVM_SET_ONE_REG failed, rc: -1 errno: 22 (Invalid argument)
-
+Thanks,
+Itaru.
