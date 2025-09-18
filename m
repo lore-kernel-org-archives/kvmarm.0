@@ -1,124 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8E62C3250
-	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 15:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D3730FC3A
+	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 15:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758209219; cv=none; b=o2WgqUjbRkbqkmQHdn6x6X/cRAZW1Bq2Y7bYHtht1Gx/zZ04GVo8LusAhQ+GqxkFobn91lyxRcGoohNYrbpsBGQx66d7/feGv6tB5B8pp6amw9IS+uFS1rh7lsCO7gcf36k4TCAZq3GFjLgoADUekXgtc6eesWBjGi5/NqHjQRA=
+	t=1758210572; cv=none; b=GYhCt2Cw8rT2j0gI2NcF6bcQBB7i5SO+Qps5XT/QGHCq2t99YKSXoDcR2PD/prwFCEnnGcJLlqk6F0zG/zcq6S6gXkudMHe5HHldj7HonWcEzR9T4Qva3Jit16qPKZVMRqOtSLr7w25EqV4oxntn1D24qb64UjEYWSo9PIClvGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758209219; c=relaxed/simple;
-	bh=zqy4XWME9Al6Lq6iTcVkkgpbsqKbeHYZryhYiKlnWcI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YWLisb3CoRjrIM3GkA/onjQeh19tyO6hOle9Dbv1mTG0I8ocKmYKaqvdyBL2DeA1VLC6CLwBGJvSBF/05lDMc7jZl31CcT0R7CmvyuB6JWRRYWJeJeX0brrDI3tMN1vnOP4JnRiFVtnO7/vjaBHOLXvzqVfkMBzfV2y9UgAcDlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cjTRIokJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758210572; c=relaxed/simple;
+	bh=8N6jci7Nqm0E0bHYwE12wLEidPqbwmOdkiYeA0kQmNU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AgNHVxUR8FJzzbv38tK5ah7fVKsk21mRt0+SszBBYKnFGnKTu8unht2rgi32iD1unaMK/vbmfOc3wPMKw/IsTY7JeYrbk1HX9cyjdEUir3T/a0y/vDbIk9l/ecK5ckZGJCuyMkdE1c0fC2TfY21Quy2Pf7H+ggkv3uaM37yThpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d9oGu1kE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjTRIokJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758209216;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KL5XphfGve3/sGWIcFqGeYJJAdQnhKsRbINuS8YWb0o=;
-	b=cjTRIokJ1cvNz/BynNoI/S98IQAuxZfCnvG0OkzLT8gEFFiPiZ1vWVHCXP1bV1+DXGLW7h
-	0SEjevT8s+DeRAKeZAOlSb3hQfHwPgsE6/fdrw8v1ZW7q2aUUUv7uL1cXBf2eJ7E7oNE0R
-	yH1ZjtbfR9SP1ZX/DC/BP5wikv1yOgo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-472-2bzs1KukPKymztPfUAQwZw-1; Thu, 18 Sep 2025 11:26:55 -0400
-X-MC-Unique: 2bzs1KukPKymztPfUAQwZw-1
-X-Mimecast-MFC-AGG-ID: 2bzs1KukPKymztPfUAQwZw_1758209214
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45dd66e1971so10511265e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 08:26:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758209214; x=1758814014;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KL5XphfGve3/sGWIcFqGeYJJAdQnhKsRbINuS8YWb0o=;
-        b=kCQSp6so5DEslvFLzdXoNNPe65rfB5Vu2AtJKXOUjLjenVRwryHEcs8Eej3TSie+4o
-         c7x8UJbgGPj07UKO/yEJorAZVKNxH9XHTI/yH/w11O7xhgEvkaxfy6wq5Enq/oIqhYhL
-         7lD2o8Dd64bvRdQZjRfxTIvD+dkc8pOO0jiZ/FraFk9+NnnEoOSHIm3OFytvRu5UH04N
-         saT8Uu2SVit/vQvvEr3vUDT0dFJhATFqZLY5mop4GDCKqh0vhXwKicvf83HUrWPhECxf
-         +ZfbQujozGpYzFqHIYr5TpWeoGj1mPbWk+OwZEihwCpwS80904UdnOZWCB2/2Ft/qztt
-         GlZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWNSyLNr5CzW7GVVBSO/7VXUJgo+phteK/Mw4jcQzRsF8zaCjDVPcteNh958OGlkJ9AjNwui+U=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyH118H7YKONjjXzuzW3Ut5i8XL5xDKvZSv6yIHiREo6kD+OFu5
-	fmUkEb/2OGhNmSRHGOkAIjgIrNVM5W9mtksiex8z25N94SNeX/dHwDIyEiAqCbHdpO3miMisi3T
-	wlpgW7XC2rMoQVeFnFK6HcNJ32d22k4+Neu4gS0NegCMtexGKUBS/9JEcyg==
-X-Gm-Gg: ASbGnctuSImtHvxMfxjwr6dz9Iy9f7EIQ0GZwAGq3W3sWn5U5wrAUdfaAEUthU6A431
-	6XTlEw4rTfwsSVQcx5imFoaWeauqdCdKSN5f7/NxF1HZo9r58ZAtjL1GzoytLmBqLUpvxKMan0G
-	LVG4oqb9M9lc6csEkQs2N7Mmfkn6TNS2NjrWK5+T2L4J2H2tBGg2BgMiVVYKBW2uxEzkhOm5+TG
-	rtaAAKR5TLTkx+BrQDPujZkLFn2r3SjhwRocsaWiLD4mMMfqZjvHSI7O+dZxsnzZjdvBgFMIfS1
-	BcMK0/ewz4PA+YennUpr9NEVPO18Bp227+zAhWBYToBqH/hHZqBfwiNdd/WRhYrnjSzsUzVStOg
-	J2nN4N7YDiLk=
-X-Received: by 2002:a05:600c:19d4:b0:45b:8f5e:529a with SMTP id 5b1f17b1804b1-462031b1dfdmr63298615e9.14.1758209213819;
-        Thu, 18 Sep 2025 08:26:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEAFdhxqAFtJ5xKzXqH5L+rh3q+f9wj0clvTRsPw0BM11XcNBfnHbnLBJBzjrN/jbBhLHWSaw==
-X-Received: by 2002:a05:600c:19d4:b0:45b:8f5e:529a with SMTP id 5b1f17b1804b1-462031b1dfdmr63298295e9.14.1758209213397;
-        Thu, 18 Sep 2025 08:26:53 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee073f3d68sm4154041f8f.10.2025.09.18.08.26.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Sep 2025 08:26:52 -0700 (PDT)
-Message-ID: <6a4651a8-d6ea-4bcd-9f73-3e852f9904dc@redhat.com>
-Date: Thu, 18 Sep 2025 17:26:52 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d9oGu1kE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56708C4CEE7;
+	Thu, 18 Sep 2025 15:49:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758210572;
+	bh=8N6jci7Nqm0E0bHYwE12wLEidPqbwmOdkiYeA0kQmNU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=d9oGu1kEJ5xItBCnMjK8GaG3K/tEHFC/Gv9APbhjjRRcorc85eZ7oKMweYyIerhW8
+	 HUScDmyruj3gg5NYAxaDXrXb7y7pxxRWzxGF+whuEsNeMwH125bWhQffjyjbs59iyO
+	 MPyxejuTYrmOZJEwzdBFMpivG5/EpQZrKEQL+5eiCXCHRLF+nQeLWHwkGFyvcX7/BN
+	 wwQ7wVuIMGw00V4YpCyobAD4uIM8AcozYF63Up1WZan4PB7WX0J14UN/2y1xchPGWo
+	 4H2SLJLJ1wc8MKap5oaKXth2/3bnROZetw9V/FzWHcDCOJ8AJvS1uK6+23IbwxK7pQ
+	 tYCNyc6YFMSCQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uzGt0-00000007UvO-1ogX;
+	Thu, 18 Sep 2025 15:49:30 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: nv: Fixes for handling debug, MDCR_EL2
+Date: Thu, 18 Sep 2025 16:49:27 +0100
+Message-Id: <175821056033.1666408.6464337816121098317.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250917203125.283116-1-oliver.upton@linux.dev>
+References: <20250917203125.283116-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 1/2] target/arm/kvm: add constants for new PSCI versions
-To: Sebastian Ott <sebott@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20250911144923.24259-1-sebott@redhat.com>
- <20250911144923.24259-2-sebott@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250911144923.24259-2-sebott@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: eA-z9GpOxxd0-gP9ETzx7NOfZBB-GigStUAdM4t9n6s_1758209214
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 17 Sep 2025 13:31:23 -0700, Oliver Upton wrote:
+> As I was working on EL2 support for KVM selftests I realized that use of
+> self-hosted debug inside of the VM is completely broken. Further
+> inspection reveals yet another case where FEAT_NV2 does something
+> insane -- MDSCR_EL1 is redirected to the VNCR page in spite of affecting
+> the EL2 context.
+> 
+> The situation can be remedied with traps. And after implementing that it
+> became clear we make no effort of honoring the guest's MDCR traps.
+> Whoops.
+> 
+> [...]
 
+Applied to next, thanks!
 
-On 9/11/25 4:49 PM, Sebastian Ott wrote:
-> Add constants for PSCI version 1_2 and 1_3.
->
-> Signed-off-by: Sebastian Ott <sebott@redhat.com>
-> ---
->  target/arm/kvm-consts.h | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
-> index c44d23dbe7..239a8801df 100644
-> --- a/target/arm/kvm-consts.h
-> +++ b/target/arm/kvm-consts.h
-> @@ -97,6 +97,8 @@ MISMATCH_CHECK(QEMU_PSCI_1_0_FN_PSCI_FEATURES, PSCI_1_0_FN_PSCI_FEATURES);
->  #define QEMU_PSCI_VERSION_0_2                     0x00002
->  #define QEMU_PSCI_VERSION_1_0                     0x10000
->  #define QEMU_PSCI_VERSION_1_1                     0x10001
-> +#define QEMU_PSCI_VERSION_1_2                     0x10002
-> +#define QEMU_PSCI_VERSION_1_3                     0x10003
->  
->  MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP);
->  /* We don't bother to check every possible version value */
-I would simply squash this in next patch
+[1/2] KVM: arm64: nv: Trap debug registers when in hyp context
+      commit: 4a684088421d5a1ffb3b13243c58a9078c99e4b9
+[2/2] KVM: arm64: nv: Apply guest's MDCR traps in nested context
+      commit: 3af1105c4fa362d17d577b55d2b8a7c4609f16fc
 
-Thanks
+Cheers,
 
-Eric
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
