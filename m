@@ -1,44 +1,41 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1FE22756A
-	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 16:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF928253F14
+	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 16:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758214008; cv=none; b=nHyhcc/P8+3PD0OD+o6hnizjWcWVnfox5hV7/jml+E0kz75fVLm55ouWVXfvOT3WpkAsmzrAufwEhNZCOxOhU48cfjOMH/dvPiUYKJOcIknLz/61vuIW2TXPM7ZxhSvgzkRCBSNw3lEa9Pul0KErSqAFh35ewy0uar4ud4Xq+G4=
+	t=1758214518; cv=none; b=EzJPrWVpJmHlMde5MKEz6Rl9dYkP1GiJ9MAX7HONwkFhDBEtPrjbTdADJwF8ypMN30M5+/isKr9dOd7L0EyPcMl1OCwHWqPKQ868n60iqB62XkJLTesrrIABONLfVrvn2z01pGWgJrVQgAO3wZkA4I8x9/4mCS2H34sG0uWhyZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758214008; c=relaxed/simple;
-	bh=98mA3TQ3s9ico+em5UEjjF2rsrm0CZrrUEJ2tcGCZY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jO6p2cUuM3FAhg/WLRh3xA5/+u0tuScuMIGb8PAQrQNKCUNH135QKkysE6UgpAoYv1P9CF2EexsstqU14q2Ms58PaxcoFZgAW7QJhIbErte1ZBgYDn4TS3HGTMO5MZHzpZsVI8drRtjokcmIeIHWRH85VAMjQTet6KsZX1pcoag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YmOoiS/T; arc=none smtp.client-ip=91.218.175.189
+	s=arc-20240116; t=1758214518; c=relaxed/simple;
+	bh=d5YiUrjMeLDpw3K4Av+Lipvj0nMw98acCH2x7N2+Maw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h5ph5hhWOpHcx+78a7Or8kAagmeuD+i2I2YCBRQ5BTbcvguh+uJGJxzqeAwjQTdStydH83QKvdr8mC1shd1eNx5UlDPJ+f65cCs9Sxii2gS50zoDCAXwXsq8l+XLaztPMV+B+YAomXplSVv4Mz8dv+cx7fMU3T4SRBMtPCB80ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HNfQJ2+l; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YmOoiS/T"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HNfQJ2+l"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758214004;
+	t=1758214514;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B6hPZth8tJskdq9St+W3KYP9EVGJ3oxdVI1j+B8pBCA=;
-	b=YmOoiS/TJJ/gH5U3EyezGwWltArI1csHbNrfBmaopca8c7PreMH73o4L0646GoOi6cz3SB
-	aUzCHuJExVmT9OZrU1q58nvMMuARqWWZohAeqRG2orptRbNvMaoYSY1abKRyesTpV94ybi
-	HHRO4riahDyxX702foNMrY+SQ7mPFis=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eIiqvknu5fhykmVE6F5nroE2JXZ0WiK9Cm5Q0Aga/z8=;
+	b=HNfQJ2+l6OkLuLrXX+ZL6H6fLehJmgdluUImWxXphbO/i31BHcIO2VBt8cOSmoaBvw3Xm9
+	7d//QKRzyXrEXoZQz8znRLk1Vtrfz+j3v2UtlL+ICMzvelLDKbk4HUfaHS9u7Gf8kmP7xB
+	s5b0IFNP3gtyAtYY4zABwFhczQ5wjrM=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 2/2] [DO NOT SUBMIT] KVM: arm64: selftests: Test effective value of HCR_EL2.AMO
-Date: Thu, 18 Sep 2025 09:46:32 -0700
-Message-ID: <20250918164632.410404-3-oliver.upton@linux.dev>
-In-Reply-To: <20250918164632.410404-1-oliver.upton@linux.dev>
-References: <20250918164632.410404-1-oliver.upton@linux.dev>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Itaru Kitayama <itaru.kitayama@linux.dev>
+Subject: [PATCH] KVM: arm64: nv: Allow userspace to de-feature stage-2 TGRANs
+Date: Thu, 18 Sep 2025 09:55:05 -0700
+Message-ID: <20250918165505.415017-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,72 +45,58 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-A defect against the architecture now allows an implementation to treat
-AMO as 1 when HCR_EL2.{E2H, TGE} = {1, 0}. KVM now takes advantage of
-this interpretation to address a quality of emulation issue w.r.t.
-SError injection.
+KVM advertises the stage-2 TGRAN fields as writable to userspace but
+prevents any modification for NV-enabled VMs. Update the special-cased
+sanitization to permit de-featuring a particular TGRAN without allowing
+the legacy value which refers to the stage-1 field for support.
 
-Add a corresponding test case and expect a pending SError to be taken.
-
+Cc: Itaru Kitayama <itaru.kitayama@linux.dev>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- .../selftests/kvm/arm64/external_aborts.c     | 38 +++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
-index 062bf84cced1..78c29975f0a6 100644
---- a/tools/testing/selftests/kvm/arm64/external_aborts.c
-+++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
-@@ -318,6 +318,39 @@ static void test_mmio_ease(void)
- 	kvm_vm_free(vm);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index b29f72478a50..83ecfdb46704 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2148,16 +2148,29 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
+ 	return set_id_reg(vcpu, rd, user_val);
  }
  
-+static void test_serror_amo_guest(void)
-+{
-+	sysreg_clear_set(hcr_el2, HCR_EL2_AMO | HCR_EL2_TGE, 0);
++/*
++ * Allow userspace to de-feature a stage-2 translation granule but prevent it
++ * from claiming the impossible.
++ */
++#define tgran2_val_allowed(tg, safe, user)			\
++({								\
++	u8 __s = SYS_FIELD_GET(ID_AA64MMFR0_EL1, tg, safe);	\
++	u8 __u = SYS_FIELD_GET(ID_AA64MMFR0_EL1, tg, user);	\
++								\
++	__s == __u || __u == ID_AA64MMFR0_EL1_##tg##_NI;	\
++})
 +
-+	GUEST_SYNC(0);
-+	GUEST_ASSERT(read_sysreg(isr_el1) & ISR_EL1_A);
-+
-+	/*
-+	 * KVM treats the effective value of AMO as 1 when
-+	 * HCR_EL2.{E2H,TGE} = {1, 0}, meaning the SError will be taken when
-+	 * unmasked.
-+	 */
-+	local_serror_enable();
-+	isb();
-+	local_serror_disable();
-+
-+	GUEST_FAIL("Should've taken pending SError exception");
-+}
-+
-+static void test_serror_amo(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_serror_amo_guest,
-+							unexpected_dabt_handler);
-+
-+	vm_install_exception_handler(vm, VECTOR_ERROR_CURRENT, expect_serror_handler);
-+
-+	vcpu_run_expect_sync(vcpu);
-+	vcpu_inject_serror(vcpu);
-+	vcpu_run_expect_done(vcpu);
-+	kvm_vm_free(vm);
-+}
-+
- int main(void)
+ static int set_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
+ 				const struct sys_reg_desc *rd, u64 user_val)
  {
- 	test_mmio_abort();
-@@ -327,4 +360,9 @@ int main(void)
- 	test_serror_masked();
- 	test_serror_emulated();
- 	test_mmio_ease();
+ 	u64 sanitized_val = kvm_read_sanitised_id_reg(vcpu, rd);
+-	u64 tgran2_mask = ID_AA64MMFR0_EL1_TGRAN4_2_MASK |
+-			  ID_AA64MMFR0_EL1_TGRAN16_2_MASK |
+-			  ID_AA64MMFR0_EL1_TGRAN64_2_MASK;
+ 
+-	if (vcpu_has_nv(vcpu) &&
+-	    ((sanitized_val & tgran2_mask) != (user_val & tgran2_mask)))
++	if (!vcpu_has_nv(vcpu))
++		return set_id_reg(vcpu, rd, user_val);
 +
-+	if (!kvm_check_cap(KVM_CAP_ARM_EL2))
-+		return 0;
-+
-+	test_serror_amo();
- }
++	if (!tgran2_val_allowed(TGRAN4_2, sanitized_val, user_val) ||
++	    !tgran2_val_allowed(TGRAN16_2, sanitized_val, user_val) ||
++	    !tgran2_val_allowed(TGRAN64_2, sanitized_val, user_val))
+ 		return -EINVAL;
+ 
+ 	return set_id_reg(vcpu, rd, user_val);
+
+base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
 -- 
 2.47.3
 
