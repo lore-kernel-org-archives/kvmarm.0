@@ -1,223 +1,215 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD0654764
-	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 01:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA9127E041
+	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 05:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758159966; cv=none; b=TwZg1PbfS0qV8+o/sZmFyWp0bPSjmCFN0SoDRLT1X4PLVleMo9eCy7pGyRbAvpv6YfThP3qMwWQVHLU285k9cppcqk6WLMPOQZXauUI8qi5C56TidwKtL4rXUXfuZISG952nyNMwe8LPUACaUerf6fus62r/JDG4Vl+GxNEi/eQ=
+	t=1758171615; cv=none; b=rIseaQP503lI8afp666JfBJAaWQWHEVCfZYDGzz1HekAEAb2HnR4BP0WAIdu40lcqWKNf5PWwsevgh1V8WEdiRnxEQo5wNARqpVbvs9PzzneI5mPcOAbN3pzDVDw7Kot33wQkyRytA2xDsDcyyxzgD+QQhsBrYYMnPEsTY5sWxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758159966; c=relaxed/simple;
-	bh=JVKhKkxSZop6mixyG1NVJRyT4yaVnmI+fcWd4yK7LYE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rveXKPx7zST9HKt2hbNJj1uXFZOX/HoO/z+wx+L6C81TblKmYSUXyMmCbMbivSa9hynonsJugxQsBpDuaIcaSIygTW+oIJRSEPy/+RZAqWulnzTx/y44MFnyeNQcBd7V7ktBMspSxG1891vNVnoL0brAkD6V2z10KC6G4cVrcvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SdFDJG43; arc=none smtp.client-ip=95.215.58.180
+	s=arc-20240116; t=1758171615; c=relaxed/simple;
+	bh=NTRmcvXYWhctOV0qfIKNsbT/aCX4Xyo8YmGWgJa+rwI=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=fH2CXb88D5GcUZAqMCqK7pg1pTewAd7GQxJGLZwTJ6X9jLFaMwldM6ykoEP1W3+SYCcmQlnJblkHoSZ8rArWArkBF/HW7ABz+tCg3Idn9gekzr9FcPBf92JvWGKnWDboY7anLTmC2JXtwYjuYXAIhLcJExmBa9cQxA/zaoTmvFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ln/LCSps; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SdFDJG43"
-Date: Thu, 18 Sep 2025 10:45:51 +0900
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ln/LCSps"
+Content-Type: text/plain;
+	charset=utf-8
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758159961;
+	t=1758171599;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Doq25p+1DFVIRWlQc0G6ormH2onTHdI1vNqxrn+KXcE=;
-	b=SdFDJG43Gg2xOHKStNM2G3t1zfMEJn8q/nCLMxuuojmrQU+IeUjSD+5NZqg5gBfGAs9eWV
-	moCt+yQvsQkKHWqOlRTWaTGEqc40rT28Q2++P52OSgOLJCzlQ8sRzzs9Ib9fTaez9NxouV
-	zSK6sR23IO6F6TriRgy5CY10IyJsKlQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 03/13] KVM: arm64: selftests: Add helper to check for
- VGICv3 support
-Message-ID: <aMtkT9CC+lRH/vSD@vm4>
-References: <20250917212044.294760-1-oliver.upton@linux.dev>
- <20250917212044.294760-4-oliver.upton@linux.dev>
+	bh=m/FjkSkLDSAX/k9/Gbj65Yvrj1MFYxv5iP6Le03/bMs=;
+	b=ln/LCSps8zLes3RmwkHzk3oLNtxgjosb7VfkXI2BR81smuUi/YNKFfLgMSO+cU1tjls5cT
+	G3RxjUzqC6vWEtfh25Syvy4Er+aiyCBV5LUydHP+2wf14DRzb+s7Av/LecWkaJP8PcrZug
+	BGCFC5hDBozOPrQETibLsCKxaT/oUKE=
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250917212044.294760-4-oliver.upton@linux.dev>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH] PMCR_EL0.N is RAZ/WI. At least a build failes in Ubuntu
+ 22.04 LTS. Remove the set function.
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+In-Reply-To: <86ms6s2a2e.wl-maz@kernel.org>
+Date: Thu, 18 Sep 2025 13:59:36 +0900
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>,
+ K Poulose Suzuki <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>,
+ linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5C133488-95DD-4B1E-98C9-A9B13B6AF8F2@linux.dev>
+References: <867by4c4v1.wl-maz@kernel.org>
+ <3FEB4D87-EEAF-4A21-BCBC-291A4A7C2230@gmail.com>
+ <86348rdg5o.wl-maz@kernel.org>
+ <0524084A-9E82-408A-9F22-369ED25E42E9@linux.dev>
+ <86ms6s2a2e.wl-maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 17, 2025 at 02:20:33PM -0700, Oliver Upton wrote:
-> Introduce a proper predicate for probing VGICv3 by performing a 'test'
-> creation of the device on a dummy VM.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  tools/testing/selftests/kvm/arm64/arch_timer.c        |  3 ++-
->  .../selftests/kvm/arm64/arch_timer_edge_cases.c       |  3 ++-
->  tools/testing/selftests/kvm/arm64/vgic_irq.c          |  3 ++-
->  tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c   |  4 ++--
->  .../testing/selftests/kvm/arm64/vpmu_counter_access.c |  3 +--
->  tools/testing/selftests/kvm/include/arm64/vgic.h      |  1 +
->  tools/testing/selftests/kvm/lib/arm64/vgic.c          | 11 +++++++++++
->  7 files changed, 21 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/arm64/arch_timer.c b/tools/testing/selftests/kvm/arm64/arch_timer.c
-> index eeba1cc87ff8..aaf4285f832a 100644
-> --- a/tools/testing/selftests/kvm/arm64/arch_timer.c
-> +++ b/tools/testing/selftests/kvm/arm64/arch_timer.c
-> @@ -184,6 +184,8 @@ struct kvm_vm *test_vm_create(void)
->  	unsigned int i;
->  	int nr_vcpus = test_args.nr_vcpus;
->  
-> +	TEST_REQUIRE(kvm_supports_vgic_v3());
-> +
->  	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
->  
->  	vm_init_descriptor_tables(vm);
-> @@ -205,7 +207,6 @@ struct kvm_vm *test_vm_create(void)
->  
->  	test_init_timer_irq(vm);
->  	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64);
-> -	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
->  
->  	/* Make all the test's cmdline args visible to the guest */
->  	sync_global_to_guest(vm, test_args);
-> diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-> index ce74d069cb7b..d349d80d8418 100644
-> --- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-> +++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-> @@ -952,7 +952,6 @@ static void test_vm_create(struct kvm_vm **vm, struct kvm_vcpu **vcpu,
->  
->  	test_init_timer_irq(*vm, *vcpu);
->  	gic_fd = vgic_v3_setup(*vm, 1, 64);
-> -	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
->  
->  	sync_global_to_guest(*vm, test_args);
->  	sync_global_to_guest(*vm, CVAL_MAX);
-> @@ -1042,6 +1041,8 @@ int main(int argc, char *argv[])
->  	/* Tell stdout not to buffer its content */
->  	setbuf(stdout, NULL);
->  
-> +	TEST_REQUIRE(kvm_supports_vgic_v3());
-> +
->  	if (!parse_args(argc, argv))
->  		exit(KSFT_SKIP);
->  
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> index a09dd423c2d7..9fc9e8e44ecd 100644
-> --- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-> @@ -752,7 +752,6 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
->  	vcpu_args_set(vcpu, 1, args_gva);
->  
->  	gic_fd = vgic_v3_setup(vm, 1, nr_irqs);
-> -	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping");
->  
->  	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
->  		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
-> @@ -802,6 +801,8 @@ int main(int argc, char **argv)
->  	int opt;
->  	bool eoi_split = false;
->  
-> +	TEST_REQUIRE(kvm_supports_vgic_v3());
-> +
->  	while ((opt = getopt(argc, argv, "hn:e:l:")) != -1) {
->  		switch (opt) {
->  		case 'n':
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
-> index fc4fe52fb6f8..cc2b21d374af 100644
-> --- a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
-> @@ -215,8 +215,6 @@ static void setup_test_data(void)
->  static void setup_gic(void)
->  {
->  	gic_fd = vgic_v3_setup(vm, test_data.nr_cpus, 64);
-> -	__TEST_REQUIRE(gic_fd >= 0, "Failed to create GICv3");
-> -
->  	its_fd = vgic_its_setup(vm);
->  }
->  
-> @@ -374,6 +372,8 @@ int main(int argc, char **argv)
->  	u32 nr_threads;
->  	int c;
->  
-> +	TEST_REQUIRE(kvm_supports_vgic_v3());
-> +
->  	while ((c = getopt(argc, argv, "hv:d:e:i:")) != -1) {
->  		switch (c) {
->  		case 'v':
-> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> index a0c4ab839155..01f61657de45 100644
-> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> @@ -436,8 +436,6 @@ static void create_vpmu_vm(void *guest_code)
->  	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
->  	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
->  	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64);
-> -	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
-> -		       "Failed to create vgic-v3, skipping");
->  
->  	/* Make sure that PMUv3 support is indicated in the ID register */
->  	dfr0 = vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1));
-> @@ -634,6 +632,7 @@ int main(void)
->  	uint64_t i, pmcr_n;
->  
->  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
-> +	TEST_REQUIRE(kvm_supports_vgic_v3());
->  
->  	pmcr_n = get_pmcr_n_limit();
->  	for (i = 0; i <= pmcr_n; i++) {
-> diff --git a/tools/testing/selftests/kvm/include/arm64/vgic.h b/tools/testing/selftests/kvm/include/arm64/vgic.h
-> index c481d0c00a5d..b858fa8195b4 100644
-> --- a/tools/testing/selftests/kvm/include/arm64/vgic.h
-> +++ b/tools/testing/selftests/kvm/include/arm64/vgic.h
-> @@ -16,6 +16,7 @@
->  	((uint64_t)(flags) << 12) | \
->  	index)
->  
-> +bool kvm_supports_vgic_v3(void);
->  int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs);
->  
->  #define VGIC_MAX_RESERVED	1023
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/vgic.c b/tools/testing/selftests/kvm/lib/arm64/vgic.c
-> index 64e793795563..661744c6532e 100644
-> --- a/tools/testing/selftests/kvm/lib/arm64/vgic.c
-> +++ b/tools/testing/selftests/kvm/lib/arm64/vgic.c
-> @@ -15,6 +15,17 @@
->  #include "gic.h"
->  #include "gic_v3.h"
->  
-> +bool kvm_supports_vgic_v3(void)
-> +{
-> +	struct kvm_vm *vm = vm_create_barebones();
-> +	int r;
-> +
-> +	r = __kvm_test_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3);
-> +	kvm_vm_free(vm);
-> +
-> +	return !r;
-> +}
-> +
->  /*
->   * vGIC-v3 default host setup
->   *
-> -- 
-> 2.47.3
-> 
 
-Oliver
-The arch_timer_edge_cases selftest does not return nor fails on FVP RevC.
-I boot the system with kvm-arm.mode=nested.
+
+> On Sep 18, 2025, at 3:44, Marc Zyngier <maz@kernel.org> wrote:
+>=20
+> On Mon, 15 Sep 2025 22:31:31 +0100,
+> Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
+>>=20
+>>=20
+>>=20
+>>> On Sep 12, 2025, at 21:11, Marc Zyngier <maz@kernel.org> wrote:
+>>>=20
+>>> On Fri, 12 Sep 2025 12:33:39 +0100,
+>>> Itaru Kitayama <itaru.kitayama@gmail.com> wrote:
+>>>>=20
+>>>>=20
+>>>>=20
+>>>>> On Sep 12, 2025, at 20:01, Marc Zyngier <maz@kernel.org> wrote:
+>>>>>=20
+>>>>> =EF=BB=BFOn Fri, 12 Sep 2025 09:27:40 +0100,
+>>>>> Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
+>>>>>>=20
+>>>>>> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+>>>>>=20
+>>>>> This isn't an acceptable commit message.
+>>>>>=20
+>>>>>> ---
+>>>>>> Seen a build failure with old Ubuntu 22.04 LTS, while the latest =
+release
+>>>>>> has no build issue, a write to the bit fields is RAZ/WI, remove =
+the
+>>>>>> function.
+>>>>>> ---
+>>>>>> tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 6 =
+------
+>>>>>> 1 file changed, 6 deletions(-)
+>>>>>>=20
+>>>>>> diff --git =
+a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c =
+b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>>>>>> index =
+f16b3b27e32ed7ca57481f27d689d47783aa0345..56214a4430be90b3e1d840f2719b22dd=
+44f0b49b 100644
+>>>>>> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>>>>>> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+>>>>>> @@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
+>>>>>>  return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+>>>>>> }
+>>>>>>=20
+>>>>>> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+>>>>>> -{
+>>>>>> -    u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
+>>>>>> -}
+>>>>>> -
+>>>>>> static uint64_t get_counters_mask(uint64_t n)
+>>>>>> {
+>>>>>>  uint64_t mask =3D BIT(ARMV8_PMU_CYCLE_IDX);
+>>>>>> @@ -490,7 +485,6 @@ static void =
+test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
+>>>>>>   * Setting a larger value of PMCR.N should not modify the field, =
+and
+>>>>>>   * return a success.
+>>>>>>   */
+>>>>>> -    set_pmcr_n(&pmcr, pmcr_n);
+>>>>>>  vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+>>>>>>  pmcr =3D vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
+>>>>>>=20
+>>>>>>=20
+>>>>>=20
+>>>>> So what are you fixing here? A build failure? A semantic defect?
+>>>>> Something else? What makes this a valid change?
+>>>>>=20
+>>>>> Frankly, I have no idea.
+>>>>>=20
+>>>>> But KVM definitely allows PMCR_EL0.N to be written from userspace, =
+and
+>>>>> that's not going to change.
+>>>>>=20
+>>>>=20
+>>>> Then I=E2=80=99ll drop this patch.
+>>>=20
+>>> I'm not asking you to drop it, I'm asking you to explain. If you =
+found
+>>> a problem, let's discuss it and fix it. But as it stands, you're not
+>>> giving me much to go on.
+>>>=20
+>>=20
+>> You are right, while the bit fields are write ignored, to be
+>> consistent with the handling of other bit fields of the register,
+>> I=E2=80=99m fully convinced that checking the write operation in the
+>> vpmu_counter_access.c file should be kept.
+>=20
+> The bit field is *not* ignored when written from userspace. That's how
+> we configure the PMU if the guest runs at EL1.
+>=20
+>> The build error I=E2=80=99ve seen with Ubuntu 22.04 LTS is below:
+>=20
+> [snip]
+>=20
+> Can you please detail what compiler version this is? I'm unlikely to
+> install an ancient version of Ubuntu, but I can pick the corresponding
+> compiler version.
+>=20
+
+Sure, here it is:
+
+[itaru@vm4 ~]$ apt-cache show gcc
+Package: gcc
+Architecture: arm64
+Version: 4:11.2.0-1ubuntu1
+Priority: optional
+Section: devel
+Source: gcc-defaults (1.193ubuntu1)
+Origin: Ubuntu
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Original-Maintainer: Debian GCC Maintainers =
+<debian-gcc@lists.debian.org>
+Bugs: https://bugs.launchpad.net/ubuntu/+filebug
+Installed-Size: 50
+Provides: c-compiler, gcc-aarch64-linux-gnu (=3D 4:11.2.0-1ubuntu1)
+Depends: cpp (=3D 4:11.2.0-1ubuntu1), gcc-11 (>=3D 11.2.0-1~)
+Recommends: libc6-dev | libc-dev
+Suggests: gcc-multilib, make, manpages-dev, autoconf, automake, libtool, =
+flex, bison, gdb, gcc-doc
+Conflicts: gcc-doc (<< 1:2.95.3)
+Filename: pool/main/g/gcc-defaults/gcc_11.2.0-1ubuntu1_arm64.deb
+Size: 5128
+MD5sum: 2ec2c9fcec3deb45052f307f85f37f7f
+SHA1: 19491fe4fb89a6cbd389f573bf3abf46e841f3d6
+SHA256: 426deed543cc32f388ad8336354e312fb76a47450194d2d775d855ad5878f82e
+SHA512: =
+c7e16c35037b0987458bf51a341045cdc1ac8da5bada4eb1c43922a83c5e18203beca8df99=
+37b95de6c4185605f6e9054c92858d2842de0f6859cd21c0b33f01
+Description-en: GNU C compiler
+ This is the GNU C compiler, a fairly portable optimizing compiler for =
+C.
+ .
+ This is a dependency package providing the default GNU C compiler.
+Description-md5: c7efd71c7c651a9ac8b2adf36b137790
+Task: ubuntustudio-video, ubuntustudio-publishing, ubuntu-mate-core, =
+ubuntu-mate-desktop
+Build-Essential: yes
 
 Thanks,
 Itaru.
+
+> M.
+>=20
+> --=20
+> Without deviation from the norm, progress is not possible.
+
+
