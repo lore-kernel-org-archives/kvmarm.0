@@ -1,30 +1,32 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539DA220F3F
-	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 16:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180F923D2B1
+	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 16:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758214005; cv=none; b=ZU6JQWHYZMN8/1qihYWxSU/lWA3oaRgROtWr+ob1cSht9nNguu4sJx5eXvKo9IdUpGNjRsrCoNvUS2ZzUbaA8eJ6xaJeLXl+9ISR2s5ITLsfciXleF/lude/YLpeep8DgZJz53EoBu103/EFC4ky3BWXeu9k4PyVLuJKVcJmeCk=
+	t=1758214006; cv=none; b=nn5n4ojaXWSoxEen+o8i1Nedc74MHTX6mzSKfJU+j+alj7QZkUqYZgxHUlTRm5QAEvLkMw2Hvntgtc8yuSAktUVhlTKnKYPF/ke7a0LTCf0CMX3XVYhMGi8uJMO4mDhzNC2W3scqY9GFlG3zc8I9sZARyrJhRkTikHurogAC84U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758214005; c=relaxed/simple;
-	bh=beUteRQjvMB3m7FhkWzxhZMY0r1Fsk90pOMqKn3So5g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QwpaTeMZGTMb0XUotJDDazv7xmoC/8ziLjoQr2eOcQfhOTVY6YKdtrrFSW9+L7BnqbZWdPD+x+gc5nFJqgDj5tISn894YvDX+wqzKkCaa/0jfoRVacf6ITyPsTgoHZYp1qUJScriS34HpMhC5pY3qqTYpNwsnh09teISN4fVdsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HtRUqXsE; arc=none smtp.client-ip=91.218.175.188
+	s=arc-20240116; t=1758214006; c=relaxed/simple;
+	bh=3m5M5zktCjBtLkJfG0wy9s1rfY5VamPZHa500XDywbw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sk83ipTrOx33NP9RJunnf2ipOLsty9EstGTEw8J8ISZatjtckKpATQAyUAsYZG35ZsHEwrpz+K+mzhss44590wF7C25CPTe32g+CEYoK8ESqBgHtf1ISslHtxJlaVVDXTcfiN2hY91hZAIes3iRhZIbOBBzc7Tu6Rdm434NnAkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sJBgImYu; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HtRUqXsE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sJBgImYu"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758214001;
+	t=1758214003;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XEgMtaUtnYgTp0CTc/UmfbPTf5CJVtEQn37G9wjzMWI=;
-	b=HtRUqXsEa8HNsrdidLAp3fJ1vlBLQ638i8NbqEF/zgad8/USE/BpdanpOYIQGaIv2hoGk1
-	am4cpKxaUlgW2H0/GRojUJ/YVixhavnmWfQzRk5ojsbpSb+SHcyH8YR3aGUQ1LGACLaSBF
-	qcxlZYlWGBKT3ltjWJj7k6pV/aHBiW8=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7aMu11Qvc+NzehRpue7UZztcDlq9y5VVKgPcgsyE8Ho=;
+	b=sJBgImYuStARH9qjTMKoWzKlCGkkhBeyVYN7MCHYuWYSmzFAxpMtCnZN39TWHeKspRZYdI
+	XfFiqJ6oMXuiOgzk9H41eTFUlS7dlvwj/KGNJB+zFbjiYPdjNjNwpYANxJ0wXo6QSnhjs/
+	4JNiVT2wQ19IdD8qKI308YsDmL3odvA=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -32,9 +34,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 0/2] KVM: arm64: nv: Fix SError injection at EL2
-Date: Thu, 18 Sep 2025 09:46:30 -0700
-Message-ID: <20250918164632.410404-1-oliver.upton@linux.dev>
+Subject: [PATCH 1/2] KVM: arm64: nv: Treat AMO as 1 when at EL2 and {E2H,TGE} = {1, 0}
+Date: Thu, 18 Sep 2025 09:46:31 -0700
+Message-ID: <20250918164632.410404-2-oliver.upton@linux.dev>
+In-Reply-To: <20250918164632.410404-1-oliver.upton@linux.dev>
+References: <20250918164632.410404-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,35 +48,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-FEAT_NV2 keeps us out of the loop on changes to HCR_EL2. That really
-sucks when the guest hypervisor toggles bits that affect the hyp
-context, such as TGE and xMO.
+SErrors are not deliverable at EL2 when the effective value of
+HCR_EL2.{TGE,AMO} = {0, 0}. This is bothersome to deal with in nested
+as we need to use auxiliary pending state to track the pending vSError
+since HCR_EL2.VSE has no mechanism for honoring the guest HCR. On top of
+that, we have no way of making that auxiliary pending state visible in
+ISR_EL1.
 
-The architecture now allows an implementation to treat HCR_EL2.AMO as 1
-any time that HCR_EL2.{E2H,TGE} = {1, 0}, effectively allowing us to
-hide what would otherwise be a quality of emulation bug in SError
-injection.
+A defect against the architecture now allows an implementation to treat
+HCR_EL2.AMO as 1 when HCR_EL2.{E2H,TGE} = {1, 0}. Let's do exactly that,
+meaning SErrors are always deliverable at EL2 for the typical E2H=RES1
+VM.
 
-Unfortunately there's nothing to be done for E2H0 VMs, although given
-the direction of the architecture the offending hypervisor should just
-get with the times...
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/include/asm/kvm_emulate.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-I've included the selftests change for demonstration purposes only, I
-plan to incorporate it in my EL2 selftests which it currently depends
-on.
-
-Applies to 6.17-rc4.
-
-Oliver Upton (2):
-  KVM: arm64: nv: Treat AMO as 1 when at EL2 and {E2H,TGE} = {1, 0}
-  KVM: arm64: selftests: Test effective value of HCR_EL2.AMO
-
- arch/arm64/include/asm/kvm_emulate.h          | 14 +++++++
- .../selftests/kvm/arm64/external_aborts.c     | 38 +++++++++++++++++++
- 2 files changed, 52 insertions(+)
-
-
-base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index fa8a08a1ccd5..64ce3fec73ee 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -220,6 +220,20 @@ static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
+ 
+ static inline bool vcpu_el2_amo_is_set(const struct kvm_vcpu *vcpu)
+ {
++	/*
++	 * DDI0487L.b Known Issue D22105
++	 *
++	 * When executing at EL2 and HCR_EL2.{E2H,TGE} = {1, 0} it is
++	 * IMPLEMENTATION DEFINED whether the effective value of HCR_EL2.AMO
++	 * is the value programmed or 1.
++	 *
++	 * Make the implementation choice of treating the effective value as 1 as
++	 * we cannot subsequently catch changes to TGE or AMO that would
++	 * otherwise lead to the SError becoming deliverable.
++	 */
++	if (vcpu_is_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu) && !vcpu_el2_tge_is_set(vcpu))
++		return true;
++
+ 	return ctxt_sys_reg(&vcpu->arch.ctxt, HCR_EL2) & HCR_AMO;
+ }
+ 
 -- 
 2.47.3
 
