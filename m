@@ -1,140 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B44320F
-	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 09:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62ECB2DA757;
+	Thu, 18 Sep 2025 10:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758189189; cv=none; b=PO4loxvfYM8Qm0GSCRQrpm7RvS9fe5MthMwgPv3vpR7pLQiBzmqptE3JQkfiiicuUbf1Cx6mln3rlUyMV6qj+J5tGw9WE4VEmrYrROkjAKaGoE1l4B+qSFzF27JupaGvSPHiAKYKwyc80zey+a9p1aqchnasFJ20zo/k9FGuaJA=
+	t=1758191217; cv=none; b=eej1eX8L5T5JHJELR+A4wLRWCILWRLKoz9di1+3Za5dB2gbkV7YufEWJBi0luuwhwYtTfdCNoQX/NLhdRKn4vQg2fFvXPo+XAnK/hWQb5G1bDGuORmcaMurlh2SsiEet6/26sOc5/y/i5jPjvOTPvJZNtW0jc1/YtW17wFHGL9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758189189; c=relaxed/simple;
-	bh=OqwqsLUwctAhMmXyW7hg6PYE3hnpufnrkvvwksaLQC0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Scnohtk14LTAdYzY3BhwtTiwbZdqFYcPVP3gXLNLwz5/rp3FvRXfrN41g5X5RRnYJqpCF/3BN8pYAcITE51xkVZudtYt4XJd84MeuIAvCuoKKCNMDstqsUCN1SMB1CWaptwABi5T8c9C3WBhYwficf6RyOjxoeZWxxcwaSHU1Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=baCGlaQj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758191217; c=relaxed/simple;
+	bh=sF1A73VvtGB9XaGt3W5JSsV7eemrEK6rpb1l1Er5U4c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sAGZsLU0Gz+kysFMQ6+Mk3U2n9Y4uHjjek9xj6njaR8fnIiUqyz1/S0Ts9s7LYMExrRilSy406/uY7YPJG8cZGXVBRS9Q17TITkTFtaa6lg+ILGjz/+mYPONXpNJSef8jUXC3Zu/DcwXwlL8/tgRb4t4OWzsCm8yn1YGWgMtguo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1zzuGQ1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="baCGlaQj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C1D3C4CEE7;
-	Thu, 18 Sep 2025 09:53:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1zzuGQ1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0E21C4CEEB;
+	Thu, 18 Sep 2025 10:26:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758189189;
-	bh=OqwqsLUwctAhMmXyW7hg6PYE3hnpufnrkvvwksaLQC0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=baCGlaQjwKgJVyWuAvbkoAIjoKk0acSkkVj2p6Tnf2g1yE33H9ItAQj3E3/BJg+HM
-	 orAuNkl4Rx80VrVNmhF324O+LETCRPc35ovWUtRq1YiM0jbGXH0c+KGUHb1gH4Wn/V
-	 W+Ey76H3bHqP7Ld69nXigKhRf7syRliG8Y0RdrtZ6R2fIby8lcqq8jBStiyL8XRs5n
-	 bQMoq7VnrC3xAV7fx7167Sb5fVOOIcSxckXOVyC/3ei5XMuj5bhSubRpjyqmrURvG7
-	 XKKSL4B5HSCv/LcSZwM35PyKveY0YEhnf9aRSBimdYNingVKedTeV1Gh+QM40EAKG5
-	 XKD0WQTkyND/g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uzBK7-00000007NcI-0SQw;
-	Thu, 18 Sep 2025 09:53:07 +0000
-Date: Thu, 18 Sep 2025 10:53:06 +0100
-Message-ID: <86jz1w13zx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jinqian Yang <yangjinqian1@huawei.com>
-Subject: Re: [PATCH 1/8] KVM: arm64: Enforce absence of FEAT_FGT on FGT registers
-In-Reply-To: <aMuhni_SDxQaAtiU@linux.dev>
-References: <20250917165840.1633412-1-maz@kernel.org>
-	<20250917165840.1633412-2-maz@kernel.org>
-	<aMuhni_SDxQaAtiU@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1758191217;
+	bh=sF1A73VvtGB9XaGt3W5JSsV7eemrEK6rpb1l1Er5U4c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K1zzuGQ1IyAP7rN8bAjxPCKuWxBOVPFyVgQbmSYdk2+6ldtbIGKD37s5zjPh0ka59
+	 aFbSJKmPtZdoKfRTA0mKqVi1GpzqDCRJOtfiydL6CrKEQIXbFVD70NoxxUXh5QPl+b
+	 4mcyZJtPnH7kqeP2PHfd2cs6QK+BNXP/BPIZnpE/7cUoCcbt9oSF7/xL9MBfdXbs39
+	 7kmLXBYxcUJ3IopLad4+yYTRKQSf+rofLzeNxr0I7KjCbyk9u9uAmB99gdwheRKMGZ
+	 yK5RkO33GDEah89sfUAcURR/s2QkRm48D/+zOMCB5D3J6c4BF0xNkuAafrnSuWY7lc
+	 zZAN3WiY8ghZg==
+Date: Thu, 18 Sep 2025 11:26:50 +0100
+From: Will Deacon <will@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Mostafa Saleh <smostafa@google.com>, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, robin.murphy@arm.com,
+	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
+	mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v4 22/28] iommu/arm-smmu-v3-kvm: Emulate CMDQ for host
+Message-ID: <aMveas3QWXUk6xpm@willie-the-truck>
+References: <20250819215156.2494305-1-smostafa@google.com>
+ <20250819215156.2494305-23-smostafa@google.com>
+ <aMQroI4NDu74PDGT@willie-the-truck>
+ <20250915163858.GK882933@ziepe.ca>
+ <aMl_5j8G3IGulAC6@google.com>
+ <20250917123601.GA1326709@ziepe.ca>
+ <aMrNTny9jgZJd_Ef@willie-the-truck>
+ <20250917151612.GH1326709@ziepe.ca>
+ <aMrS71vQ_MaVonzi@willie-the-truck>
+ <20250917155931.GI1326709@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, yangjinqian1@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917155931.GI1326709@ziepe.ca>
 
-On Thu, 18 Sep 2025 07:07:26 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Wed, Sep 17, 2025 at 12:59:31PM -0300, Jason Gunthorpe wrote:
+> On Wed, Sep 17, 2025 at 04:25:35PM +0100, Will Deacon wrote:
 > 
-> Hey,
+> > Ah right, so the driver would unnecessarily issue CMOs for the structures
+> > that are just shared with the hypervisor. At least it's _functional_ that
+> > way, but I'm sure people will complain!
 > 
-> On Wed, Sep 17, 2025 at 05:58:33PM +0100, Marc Zyngier wrote:
-> 
-> Did you mean to add changelogs to these patches?
+> Yes, functional, why would anyone complain? STE and CD manipulation is
+> not fast path for anything?
 
-I actually meant to send a *different* series. Pushed out the wrong
-branch and sent crap. Apologies for the noise.
+Won't it also apply to cmdq insertion?
 
-> 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/config.c | 201 +++++++++++++++++++++++++++-------------
-> >  1 file changed, 137 insertions(+), 64 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > index da66c4a147752..42b834c82a20d 100644
-> > --- a/arch/arm64/kvm/config.c
-> > +++ b/arch/arm64/kvm/config.c
-> > @@ -8,11 +8,16 @@
-> >  #include <asm/sysreg.h>
-> >  
-> >  struct reg_bits_to_feat_map {
-> > -	u64		bits;
-> > +	union {
-> > +		u64	bits;
-> > +		u64	*res0p;
-> > +	};
-> >  
-> >  #define	NEVER_FGU	BIT(0)	/* Can trap, but never UNDEF */
-> >  #define	CALL_FUNC	BIT(1)	/* Needs to evaluate tons of crap */
-> >  #define	FIXED_VALUE	BIT(2)	/* RAZ/WI or RAO/WI in KVM */
-> > +#define	RES0_POINTER	BIT(3)	/* Pointer to RES0 value instead of bits */
-> > +
-> >  	unsigned long	flags;
-> >  
-> >  	union {
-> > @@ -28,9 +33,16 @@ struct reg_bits_to_feat_map {
-> >  	};
-> >  };
-> >  
-> > -#define __NEEDS_FEAT_3(m, f, id, fld, lim)		\
-> > +struct reg_to_feat_map {
-> > +	const char				*name;
-> > +	const struct reg_bits_to_feat_map	feat_map;
-> 
-> Some documentation might help with confusion between this and
-> bit_feat_map. IIUC you're using a single NEEDS_FEAT() expression to RES0
-> the whole sucker based on whether or not the FEAT_XXX for the EL2
-> register is present?
-> 
-> > +	const struct reg_bits_to_feat_map	*bit_feat_map;
-> > +	const unsigned int			bit_feat_map_sz;
-> > +};
-> 
-> Ok, differentiating "reg_to_feat_map" and "reg_bits_to_feat_map" is a
-> bit hard on the reader... Could this maybe be called "reg_feat_map_desc"
-> or similar?
-
-Sure thing. Things will be a bit noisier, but hey...
-
-> This refactoring could also be done as a separate patch.
-
-Yup, that's what I already have in the series I was suppose to send...
-
-I'll respin this shortly.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
