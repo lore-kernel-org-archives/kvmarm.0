@@ -1,154 +1,104 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532A82309B9
-	for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 18:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD412E2EF3;
+	Thu, 18 Sep 2025 19:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758218511; cv=none; b=my8EjosyHPbwjms/z0OlyVUzDcfLrRj7Qzn3nNC4alKnaAizX9c9lnm3u4hUoMsCgOJExYtpmI434C6c00u9e3VvCRbB6Fm1FWPnRWm1sJjeSo8i2vJAjnS1zwH5bXMBDvGLlP9+k+BQl7zbyNXiqt2CDcWUTTE8yrz5uLqrDt8=
+	t=1758224669; cv=none; b=NxJcGjMG45mAwWGJv1HeTOxAB9JgNcYkPGFsm5FdmQu6lIOcFXhjyJUMDh+69oZvK9vnul6TA4lmwLItq0E69HMXfGg/AH7MonmaBHaV3mHRaCGZoMmV5bc76ttbbP5bdRmTclZOLRdZE3ldC3xvviBVtQf4Ii+ssimCrVdX6VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758218511; c=relaxed/simple;
-	bh=C1MZGhMDAty4en0TQUdA7UUtP4wMbfS91uN7qIdATBk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=K8VcuLRVMuQnyDN6l+cbCYZK1UTnzVNpdJEg/VwAtvRGOkFSc2BRiW52ZrRTPqt2erR1UMvScEC/qnPHObL08TUmaopRPOXA7iuMydPXUqQdLiAW96o3+uJ/4vY+8BGsjzEys8uwPVheTPHVOuzfXCgW5p3F0AAJBNXGN8drlHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kc7SM/Fu; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1758224669; c=relaxed/simple;
+	bh=/fyRtjX7Acq7Ib/RG2oDrAdMcjvCIkWa8I5Em83Gg64=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=l22oLb+luEjUYKHLD0PHPkW1sT3Q97wOfvuz0QFvWbdZwWh3uCpTka34IxV8ye2ild64uTuqkvBJgo9zbM/xTiIS2EMB2lwtXF1ZNMzmiqxJO8J6UtCHHvgqfau4ws3x3gzjMInaua3OSDODOYmTkdSOZ2+CRBM1n9qKnxAesJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PW3c6aFV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kc7SM/Fu"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45f2c1556aeso4786615e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 18 Sep 2025 11:01:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758218498; x=1758823298; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6AFtYNgzFlGUfnCDw9OHKWnsFrL+D8ATC1/qMSs/P0E=;
-        b=Kc7SM/FuCf+Li0fLlzPswlSaUfuUTRUeDvI4FF9Ln5AIIZGZdXv6CfbTHf8fnnZYvk
-         tJJrX7Tc32l9hADbw3p06TMDwvEPlQKwDr0uxIt0Raj8q0M1nO5I2W3wUVgTp0ZsvMzG
-         NQP/7sbwmc5HertzqsNpDMgRUS4SJfeDkI025W0cLfoxInZLIGKakOJGfs8Ql2DvP8Jn
-         aFMZdxFx38MaP7Lph+U7YqJSVA80Do2ObsXmcBAF2iBjAWBrvqLYWJZyRXd31N94U+Hz
-         9uT0sFGG6Dl6zK8ebSdOXayM8MRUdZU/vx4G/dhIrSmqiQyGcXQNmKRyvd2XWOOusk0u
-         PUoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758218498; x=1758823298;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6AFtYNgzFlGUfnCDw9OHKWnsFrL+D8ATC1/qMSs/P0E=;
-        b=F70J1yPkBwu9l87ZwhwhAvDcGsT/GIV7nrxDAIb9l2xvv0mOSarFvkwMgdP3t8BfnC
-         UHEPiYc7m8SY9yo+DnwP3P0Or60ffq7JZuys63Ka3nRMWR9MKjHbgtdzvqx0mZGN29aE
-         fWNdpPyfrSVQsVO4LtyELv4KXN0KHbGaTPsy0u5I6F4gwWLdKK8DVDlu/PBxwBUt2HJz
-         q7jYLDfDBF9gwaTHnlY2bLZfHeKhJDFdclmX07y8kcrwk0LuFAz86D0OplfLzxLnxR7r
-         GObbupSTx1jXsaSjfBx1zo5/QYdlus7Evs30wlapaXdym/7x7PFRzP7YpBpGKof6Ewtk
-         92vg==
-X-Forwarded-Encrypted: i=1; AJvYcCVSzdT0FZ2CNCgVnC6pP/eenhGMwTDQNg91wQCvlTpE4ROzY6uYKTS9Uua1G3oROr9v+IGz02k=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw8bYsm7lmfA8Hb8hEzv+exvRBIGay81nJUt8Zn3o05OI1TRp1t
-	LIhV19+IMJcoSUwILpCzazpeqBVL8rbFGnuw4xHu/uIFVuS3wiAhApgDN4eH68FByuqtGZXIq2z
-	aIh+5tqutFiJdWPIU6qAliA==
-X-Google-Smtp-Source: AGHT+IE0s3mgC68bYqXT2U/+o4HoYc6G5jDuhQVBgFNX5eIHGXZ+lKBwfO0ohqVmckXSTclutoo8kufdndZGfzQr
-X-Received: from wmqd2.prod.google.com ([2002:a05:600c:34c2:b0:45f:29ca:4f27])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4451:b0:459:db69:56bd with SMTP id 5b1f17b1804b1-467ead682c5mr1151005e9.20.1758218498702;
- Thu, 18 Sep 2025 11:01:38 -0700 (PDT)
-Date: Thu, 18 Sep 2025 19:00:49 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PW3c6aFV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DD07C4CEE7;
+	Thu, 18 Sep 2025 19:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758224668;
+	bh=/fyRtjX7Acq7Ib/RG2oDrAdMcjvCIkWa8I5Em83Gg64=;
+	h=From:Subject:Date:To:Cc:From;
+	b=PW3c6aFVxiQWITh6uQ/YoOHRKxxI3L9bEFBR6TwvzK3VAt9z2AzpTVgc/j+W6yO6W
+	 nkn16qJAv7CO+ycRjZIgiq+cT46fXqA5py/CN5FasGMgCtDWP9Ps4sN+6SGurZtyJN
+	 xNF3Y85SGQUlejYbaLp40z1mSwsmA+knuaFXPUdyrEWgfkJ5LhhC88g3FDGPObVPvr
+	 8E3GsSL1dOri2YE0qVPyK4iP+0LE/h7Au+Jx09CpfN2jouhrIOqyt+YanXECchgfrZ
+	 +p1NDzYH5oNYrJV48B1umx3nLZudUkiSvgwiP/atuE79dnBYbRmpjgH1tPaEwk1p44
+	 6uK4LkE1X7s7Q==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 0/2] arm64: Support FEAT_LSFE (Large System Float
+ Extension)
+Date: Thu, 18 Sep 2025 20:42:05 +0100
+Message-Id: <20250918-arm64-lsfe-v4-0-0abc712101c7@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250918180050.2000445-1-vdonnefort@google.com>
-Subject: [PATCH] KVM: arm64: Validate input range for pKVM mem transitions
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org
-Cc: qperret@google.com, sebastianene@google.com, keirf@google.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAI5gzGgC/2XM3wqCMByG4VuRHbfYP+fWUfcRHej2m45MY4tRi
+ PfeFMKkw++D551QhOAholMxoQDJRz8OeYhDgUxXDy1gb/NGjLCSSFbiOtylwH10gImixDitams
+ YyuARwPnXGrtc8+58fI7hvbYTXd5vpvrNJIoJloqX1IjGVYKebxAG6I9jaNHSSWyzFeE7y7IFA
+ 1YRrbVpxJ/lm1VU7SzPtnbSCSslNFzv7DzPH9T48Y0dAQAA
+X-Change-ID: 20250625-arm64-lsfe-0810cf98adc2
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+ linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-56183
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1367; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=/fyRtjX7Acq7Ib/RG2oDrAdMcjvCIkWa8I5Em83Gg64=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBozGEW5FyWseaqc8/F+wIiqySykyyfiEMwETJHD
+ 3x47bVLit6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaMxhFgAKCRAk1otyXVSH
+ 0MnLB/sEOZMOHVacNMWbkkwuSaxy58fOnDcDG3q5SSd4PYa/uO6lM9ZG4SYsH1bv7w0L350Oml5
+ /05e0opT3uGxlCmhQL2AcdMQF8bEw45kMI6pe7XDKC0oNu5sL0D1PSUP9psLPM82dsK5FszB87U
+ gkisjR3K77ju9UxZbtP2bQJbRBg0FW1PeIv6K1gD9dwfEkEoVyqnKblRP6eQ4jyDHFwdqmHSbJF
+ vMQ5uXgp+3m0gAibiPJuhNUt4umwF2ktg6gC/4y0SXM/0jEMC/rSycbv4smm0hAXYqvWGc6l2TR
+ 8/IsnwQrH8X7xO1FsCqOpRQlONJtdgwaTwvbqLTp63iIfltT
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-There's currently no verification for host issued ranges in most of the
-pKVM memory transitions. The subsequent end boundary might therefore be
-subject to overflow and could evade the later checks.
+FEAT_LSFE is optional from v9.5, it adds new instructions for atomic
+memory operations with floating point values.  We have no immediate use
+for it in kernel, provide a hwcap so userspace can discover it and allow
+the ID register field to be exposed to KVM guests.
 
-Close this loophole with an additional range_is_valid() check on a per
-public function basis.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v4:
+- Rebase onto arm64/for-next/cpufeature, note that both patches have
+  build dependencies on this.
+- Drop unneeded cc clobber in hwcap.
+- Use STRFADD as the instruction probed in hwcap.
+- Link to v3: https://lore.kernel.org/r/20250818-arm64-lsfe-v3-0-af6f4d66eb39@kernel.org
 
-host_unshare_guest transition is already protected via
-__check_host_shared_guest(), while assert_host_shared_guest() callers
-are already ignoring host checks.
+Changes in v3:
+- Rebase onto v6.17-rc1.
+- Link to v2: https://lore.kernel.org/r/20250703-arm64-lsfe-v2-0-eced80999cb4@kernel.org
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+Changes in v2:
+- Fix result of vi dropping in hwcap test.
+- Link to v1: https://lore.kernel.org/r/20250627-arm64-lsfe-v1-0-68351c4bf741@kernel.org
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 8957734d6183..b156fb0bad0f 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -443,6 +443,11 @@ static bool range_is_memory(u64 start, u64 end)
- 	return is_in_mem_range(end - 1, &r);
- }
- 
-+static bool range_is_valid(u64 start, u64 end)
-+{
-+	return start < end;
-+}
-+
- static inline int __host_stage2_idmap(u64 start, u64 end,
- 				      enum kvm_pgtable_prot prot)
- {
-@@ -776,6 +781,9 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
- 	void *virt = __hyp_va(phys);
- 	int ret;
- 
-+	if (!range_is_valid(phys, phys + size))
-+		return -EINVAL;
-+
- 	host_lock_component();
- 	hyp_lock_component();
- 
-@@ -804,6 +812,9 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
- 	u64 virt = (u64)__hyp_va(phys);
- 	int ret;
- 
-+	if (!range_is_valid(phys, phys + size))
-+		return -EINVAL;
-+
- 	host_lock_component();
- 	hyp_lock_component();
- 
-@@ -887,6 +898,9 @@ int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages)
- 	u64 size = PAGE_SIZE * nr_pages;
- 	int ret;
- 
-+	if (!range_is_valid(phys, phys + size))
-+		return -EINVAL;
-+
- 	host_lock_component();
- 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	if (!ret)
-@@ -902,6 +916,9 @@ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages)
- 	u64 size = PAGE_SIZE * nr_pages;
- 	int ret;
- 
-+	if (!range_is_valid(phys, phys + size))
-+		return -EINVAL;
-+
- 	host_lock_component();
- 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_SHARED_OWNED);
- 	if (!ret)
-@@ -949,6 +966,9 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu
- 	if (ret)
- 		return ret;
- 
-+	if (!range_is_valid(phys, phys + size))
-+		return -EINVAL;
-+
- 	ret = check_range_allowed_memory(phys, phys + size);
- 	if (ret)
- 		return ret;
+---
+Mark Brown (2):
+      KVM: arm64: Expose FEAT_LSFE to guests
+      kselftest/arm64: Add lsfe to the hwcaps test
 
-base-commit: 8b789f2b7602a818e7c7488c74414fae21392b63
--- 
-2.51.0.470.ga7dc726c21-goog
+ arch/arm64/kvm/sys_regs.c                 |  4 +++-
+ tools/testing/selftests/arm64/abi/hwcap.c | 21 +++++++++++++++++++++
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+---
+base-commit: 220928e52cb03d223b3acad3888baf0687486d21
+change-id: 20250625-arm64-lsfe-0810cf98adc2
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
