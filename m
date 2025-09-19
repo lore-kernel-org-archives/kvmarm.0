@@ -1,31 +1,31 @@
 Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAC42C2ACE
-	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 22:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522472C0F81
+	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 22:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758319271; cv=none; b=DRGrswzpelxWzo4mX3EeV7KdX43LN+VJA4jz4AIjLY4JzeCaApsTcIVjrUxqvZcoOdPZ4kGe7qhdDMs8KdRtM//6hJG0y7qRiuiUHxPPBt4i78s/kBkVk68y11luKnvPIaeX30TlzQC9O2vm7PZjDXh+6AzIaxTrPcdelIP/AzU=
+	t=1758320881; cv=none; b=FwpRJzonEve0bH14O2W/qGPqiececxPkZ8xuu1vpcZIlUxWkc1ffidoVQybzWkoH+7d6SIXxTq7s4ioRv6VVkg2f8bAamTtrvNFEw0l3zEhw3uVeLKq52kndRmcSsCjEyqT+kXxbpobnn8cnN+/pkDUXXwoJGYW//Jx80OsvJ90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758319271; c=relaxed/simple;
-	bh=RtT4wd+CD99ymKEzg52n+A2Ka2i/uRYdoyKth8rV/PY=;
+	s=arc-20240116; t=1758320881; c=relaxed/simple;
+	bh=8UcB0oi/7oRgEcV823QkdAHAFr875yhnEdcWdcjNvI8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YutYR4UypZwtAfOfhuiONM+wa+XxRAyPfPpad2eYWc/9VdA0H9S+sZcKAWsTCryjOhp/M+2Y5dDCMMwRVYw7bjbGkrGaV1qQpA7wDBg/Rqak3wWfq8sLWQ7lH6G/YLcaPmLvPVfejLkLQ5vVzah9H8VitK8D0NNCCW+1BSfkZMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gRrKmvAx; arc=none smtp.client-ip=91.218.175.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=hevWoLvWNxopH676HDT+QquS0rSLJwK2dxCIUq+C0bTQ64l8AIzQkfRs0oRnu8ypNVg7LA6dhU7LwEt0kp5Z/0q60XMaDYueXpYh0FXtTJP4SMFWHWvYZoNmi5yxBw7d4aNaX1Qa9D1vaZH9glne6YT2iOvWWEVi26X3TORRjzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wnp+UmoB; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gRrKmvAx"
-Date: Fri, 19 Sep 2025 15:00:59 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wnp+UmoB"
+Date: Fri, 19 Sep 2025 15:27:52 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758319264;
+	t=1758320877;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HhB9XBoASZEaIPr0CT1pnpt/0SafB3c+6yxK4UJFeHU=;
-	b=gRrKmvAxzdFhtfFtQm5oCDKyPVYgW8khy+blMu1uvXudiSmtqG1OGrvgsibbKknQgBZOzd
-	P6Ixvt7X41TAc3ys29H3ScxCr10GiESRicAGewna1GcZqmyNU9Uji47jrCma1i2wIw3Viz
-	oWMHSxUOoNBQL079WcvMrCrnoWXend0=
+	bh=JPVacn2PmZ4z0RLVYVdIubbfP3TwF2TL+jrZNbrpOZY=;
+	b=wnp+UmoBpZAXPiLW7xIF+MCTKCUgSQe49oVMjUVwo32FGzBFzYThwgln/M/PavQ5rmsWHK
+	keJSMnkJTjwrtOWXId+jlkZhJivC4jle8gpL8K8e9N/ButtDNsdoPY87wCYwhUerRos2zj
+	qP8Yu+AhdtLPbcQIWoumXqdkKDX2UNI=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -33,11 +33,10 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 07/16] KVM: arm64: Populate PAR_EL1 with 52bit
- addresses
-Message-ID: <aM3Sm4vKZUw2Nu_L@linux.dev>
+Subject: Re: [PATCH v2 10/16] KVM: arm64: Allow use of S1 PTW for non-NV vcpus
+Message-ID: <aM3Y6DcAqhGJJer7@linux.dev>
 References: <20250915114451.660351-1-maz@kernel.org>
- <20250915114451.660351-8-maz@kernel.org>
+ <20250915114451.660351-11-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,48 +45,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250915114451.660351-8-maz@kernel.org>
+In-Reply-To: <20250915114451.660351-11-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 15, 2025 at 12:44:42PM +0100, Marc Zyngier wrote:
-> Expand the output address populated in PAR_EL1 to 52bit addresses.
+On Mon, Sep 15, 2025 at 12:44:45PM +0100, Marc Zyngier wrote:
+> As we are about to use the S1 PTW in non-NV contexts, we must make
+> sure that we don't evaluate the EL2 state when dealing with the EL1&0
+> translation regime.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/at.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/at.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 952c02c57d7dd..1c2f7719b6cbb 100644
+> index 1230907d0aa0a..4f6686f59d1c4 100644
 > --- a/arch/arm64/kvm/at.c
 > +++ b/arch/arm64/kvm/at.c
-> @@ -844,7 +844,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  	} else if (wr->level == S1_MMU_DISABLED) {
->  		/* MMU off or HCR_EL2.DC == 1 */
->  		par  = SYS_PAR_EL1_NSE;
-> -		par |= wr->pa & GENMASK_ULL(47, 12);
-> +		par |= wr->pa & GENMASK_ULL(52, 12);
+> @@ -108,8 +108,9 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+>  	case TR_EL20:
+>  		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & TCR2_EL2_PIE;
+>  	case TR_EL10:
+> -		return  (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) &&
+> -			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1_PIE);
+> +		return ((!vcpu_has_nv(vcpu) ||
+> +			 (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En)) &&
+> +			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1_PIE));
 
-That should be bit 51, no?
+Hmm, dealing with the effectiveness of bits gated by HCRX_EL2.xEN is a
+pain. Rather than open-coding this everywhere:
 
-Maybe just use SYS_PAR_EL1_PA as the mask.
+static bool __effective_tcr2_bit(struct kvm_vcpu *vcpu, enum trans_regime regime,
+				 unsigned int idx)
+{
+	bool bit;
 
->  		if (wi->regime == TR_EL10 &&
->  		    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-> @@ -877,7 +877,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  			mair = MEMATTR(NC, NC);
->  
->  		par |= FIELD_PREP(SYS_PAR_EL1_ATTR, mair);
-> -		par |= wr->pa & GENMASK_ULL(47, 12);
-> +		par |= wr->pa & GENMASK_ULL(52, 12);
+	if (tr != TR_EL10)
+		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & BIT(idx);
 
-Same here.
+	bit = __vcpu_read_sys_reg(vcpu, TCR2_EL1) & BIT(idx);
+	if (vcpu_has_nv(vcpu))
+		bit &= (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En);
 
->  		sh = compute_s1_sh(wi, wr, mair);
->  		par |= FIELD_PREP(SYS_PAR_EL1_SH, sh);
-> -- 
-> 2.39.2
-> 
+	return bit;
+}
+
+static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+{
+	return __effective_tcr2_bit(vcpu, regime, TCR2_EL1_PIE_SHIFT);
+}
+
+static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+{
+	if (!kvm_has_s1poe(vcpu->kvm)) {
+		wi->poe = wi->e0poe = false;
+		return;
+	}
+
+	wi->poe = __effective_tcr2_bit(vcpu, wi->regime, TCR2_EL1_POE_SHIFT);
+	if (wi->regime != TR_EL2)
+		wi->poe = __effective_tcr2_bit(vcpu, wi->regime, TCR2_EL1_E0POE_SHIFT);
+}
+
+Thoughts?
 
 Thanks,
 Oliver
