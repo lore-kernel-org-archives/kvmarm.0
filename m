@@ -1,31 +1,31 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1091228643F
-	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 22:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8A12D63E4
+	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 22:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758321392; cv=none; b=gJAkfFEO2t6oE3rvh9Ptq5osNRICztb/2x7lJzdu5CjNsTx1Z7jVofb0e6dkUfiG+jtK5rZB5/Cc9AjVXVaGOoO/4LQYBbkDZtGG+VvY9IUEeTS+kAEQEA/6wHKYb0hyWWAgTx3479rJcwOHl76bEjc8qzykqk20wC2+WHlfgAQ=
+	t=1758321443; cv=none; b=bu+1Gcr4wIpktHyQ7uZiDkJgqRoQd6WC01M+JJmkqlVbbbEx3pYvcgkh6xTHY7Imo6LvQCrVpGtZ+C0jEx1+HhZL/Gd4BToFGNn7OGppMknYf2PxXycXjk6oA6y/ls+PQWXCUtla29XOUoYGlH2GXLtmFQimbxEdhkQXTRmGwMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758321392; c=relaxed/simple;
-	bh=7eDpY1eMh5dYeqhmTzFwn1dyzrTn2HojODaQiNIzJsI=;
+	s=arc-20240116; t=1758321443; c=relaxed/simple;
+	bh=Fb3bKpKqTYr2Snp+QfFKbrmolaxY+vy8qsPMy2pNG0Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AhGLv5cwe7p5s3WsOgwB8E1daZ7M9Rkp8x7SPvKsn/+0K/8ruhXcP+FrFbQa3yErVStCw03S0vvMeV9Gxz1tw+uEimKDQm/BDNT6lBHiKnu0F0WhSPmXXJKTrJY1R3kcEZFGsUVLfTb8gPXGV9TMESZyI2awzrigIi8GlhWdot4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OZh7Dlt3; arc=none smtp.client-ip=95.215.58.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uv2h0DS97k7AErmqHgtle3pbWTfoOvUON4tyqVVwzFhXnJaRbpSj+AVu9jze1kGyuXWjRQBlnzBmmCjr8EWdXCmed6D+P/4HZzeHkOCXVAT47O5tmMKHbHy/LTmJsRSnRXtXUsFWlEdsWHuCDDXLRNqWIFI6fKfSgQSbkMvb/Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oMvitq2N; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OZh7Dlt3"
-Date: Fri, 19 Sep 2025 15:36:15 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oMvitq2N"
+Date: Fri, 19 Sep 2025 15:37:15 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758321385;
+	t=1758321439;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JXFpc6ThiFcP26DmQ5iR/Po6IMjawdunmjqXPNzL7xU=;
-	b=OZh7Dlt3NZ7BUlUFPjvmF1/oi5L3bmy8XMqUVWs0HN+KkAnj+j/kC6NdQnj2tvgXzaiH+N
-	dbPBx4++rzSOmiimw92MHBmrzm1L4aqh4cVZMIVm2MfW59HqqESsCNZvhkHvd/FCo7+5Th
-	9/5Akdc0/TlrWdygZOdq/Vdx8H4Bnz0=
+	bh=wejgJvJ+telvOoqvjuYRyYA1GW2xJkDX688ipOO2264=;
+	b=oMvitq2NwZVYf/vbOtHD66sru9qX10p1arlJYfA6krLSsktY+DMPq0bgCVAqtbWbU3b22L
+	RD+B1P5flLGIaVcxDs4RqkLOZG6lltaQB+wzcs3t0ZMCOQrEXoA1hpGN4r70pGrgpTakOd
+	kktb0CDfhLL3fuMQX3zPYSCLDpND4yU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -33,11 +33,10 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 16/16] KVM: arm64: selftest: Expand external_aborts
- test to look for TTW levels
-Message-ID: <aM3a30SHqFRNgGcm@linux.dev>
+Subject: Re: [PATCH v2 00/16] KVM: arm64: TTW reporting on SEA and 52bit PA
+ in S1 PTW
+Message-ID: <aM3bG1fkB4cYslUJ@linux.dev>
 References: <20250915114451.660351-1-maz@kernel.org>
- <20250915114451.660351-17-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,43 +45,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250915114451.660351-17-maz@kernel.org>
+In-Reply-To: <20250915114451.660351-1-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 15, 2025 at 12:44:51PM +0100, Marc Zyngier wrote:
-> Add a basic test corrupting a level-2 table entry to check that
-> the resulting abort is a SEA on a PTW at level-3.
+On Mon, Sep 15, 2025 at 12:44:35PM +0100, Marc Zyngier wrote:
+> Yes, $SUBJECT rolls off the tongue.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  .../selftests/kvm/arm64/external_aborts.c     | 43 +++++++++++++++++++
->  .../selftests/kvm/include/arm64/processor.h   |  1 +
->  .../selftests/kvm/lib/arm64/processor.c       | 13 +++++-
->  3 files changed, 56 insertions(+), 1 deletion(-)
+> This series was triggered by the realisation that when injecting an
+> SEA while on a S1PTW fault, we don't report the level of the walk and
+> instead give a bare SEA, which definitely violates the architecture.
 > 
-> diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
-> index 062bf84cced13..acb32d0f27bbe 100644
-> --- a/tools/testing/selftests/kvm/arm64/external_aborts.c
-> +++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
-> @@ -250,6 +250,48 @@ static void test_serror(void)
->  	kvm_vm_free(vm);
->  }
->  
-> +static void expect_sea_s1ptw_handler(struct ex_regs *regs)
-> +{
-> +	u64 esr = read_sysreg(esr_el1);
-> +
-> +
+> This state of things dates back to the pre-NV days, when we didn't
+> have a S1 page table walker, and really didn't want to implement one.
+> I've since moved on and reluctantly implemented one, which means we
+> now *could* provide the level if we really wanted to.
+> 
+> However, nothing is that simple. The current code in at.c is firmly
+> 48bit, as our NV implementation doesn't yet support 52bit PA, while an
+> EL1 VM can happily enjoy LPA and LPA2. As a result, it is necessary to
+> expand the S1 PTW to support both LPA and LPA2. Joy.
+> 
+> Then, once the above is achieved, we need to hook into the PTW
+> machinery to match the first level of the walk that results in
+> accessing the faulty address. For this, we introduce a simple filter
+> mechanism that could be expanded if we needed to (no, please no).
+> 
+> Finally, we can plug this into the fault injection path, and enjoy
+> seeing the translation level being populated in the ESR_ELx register.
+> 
+> Patches on top of 6.16-rc4. I intend to take this into 6.18, so shout
+> if you don't like the idea!
 
-Extra whitespace
+Just some minor gripes, otherwise this LGTM.
 
-> +	GUEST_ASSERT_EQ(regs->pc, expected_abort_pc);
-> +	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
-> +	GUEST_ASSERT_EQ((esr & ESR_ELx_FSC), ESR_ELx_FSC_SEA_TTW(3));
-> +
-> +	GUEST_DONE();
-> +}
-> +
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 Thanks,
 Oliver
