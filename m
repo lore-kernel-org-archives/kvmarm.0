@@ -1,79 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869AD247295;
-	Fri, 19 Sep 2025 18:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7576A1917ED
+	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 21:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758307108; cv=none; b=K0a86+yWwbqI0G4wzLgLgb4wZcBVZEVwTe9xBVVLnBJPbuuoE9pMQt3Iiuyi3ZAykech5Pe0RummaUubSPWfP3d3+K9SimfLgMKj/q6Ld0qAck7UBUqh5YIydqc+Qbh8F7j+ilhquMXuEUg1hy4WaByw0yh8cks58Vk6XwN2xkU=
+	t=1758319105; cv=none; b=aWNrJwfwuGzKpd4BQ4WdOwL2Jm/svhWGzzvLD9BtANW4UEGM1QO77/S1PF8zK7ADQe7d5TNtXhb9FP6cF1qL3M6+FMTmhaTlwmG+2LJ67b6MmJkXHna7g9C12JyJD8CQI13ZwGkChnAnWUbDsl2Q2S2/qyJvLI0vQB4y9OMOL/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758307108; c=relaxed/simple;
-	bh=EeZzWFrfZxrU8fh2GXxBtvaOZgVq6ueEnBhBSJauFWs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zz1yvi1c5flFE7+GpIMdyNTyO3Qi+az8MKToN7UBUh73ufya3y3s1eJelM2yWNU6LxPj+KYT0NgIdPrCn7VpPCmGS9lw3m7HCBQjoArHIjtRMsd8vodX8h+p9RGAXb9AY318fZTar9eUH2v3B1GUTYfqJDuIZn6Ij25uVSiHLrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1aIsfRY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758319105; c=relaxed/simple;
+	bh=htS0YGjfUn8eMf9fl9ey6QEdl40299whWv+cWlIhluo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J44MWInLiTk8j+40w+5BaRv7OIQsYGUY+msTvc2PWO+hPBiz3/tNj6by9qlM60agOUnMFehokHsupw6TtZqZpMP4iBncDVxqbDQNuyhS7FlEinEuj9zMd7mlgYX7WlAgXguElVjMTbwYVblLu4bwK+tl6YkFM3aCa9K8LfWnRNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HynyxMpN; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1aIsfRY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50919C4CEF0;
-	Fri, 19 Sep 2025 18:38:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758307108;
-	bh=EeZzWFrfZxrU8fh2GXxBtvaOZgVq6ueEnBhBSJauFWs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=S1aIsfRYpwgGG1ulRgCexm9tZ8cz18SxSmW+AJ/e1l9FzTrztVNzTIa5Y4SAAxR0W
-	 oipQkNRT+vAf9yvlaQ6ds6/i9hJOH70tMF9tvymO1jje7ABHNywjN41zug7yYaEY2+
-	 wgN+TEhvZpe6htN23Fb+fdqpftk20KG985QTMQeZp+fYbMcm8BQn+JuLwUnfDTT7aP
-	 Ok01ljK2KHuj+tPXU7VVbRZ38bjhTepyoU1NlNyUfC5/4KMNXoyCzXmOzUlvtYcp/a
-	 sNHOglQ0n1CFJrEUf+lUxTwmRovEDIaSwrk7JuQFw5+0OzLM9TurShOAINtombvFWy
-	 DYgp0Wy26aCsQ==
-From: Will Deacon <will@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HynyxMpN"
+Date: Fri, 19 Sep 2025 14:58:14 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758319100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ucooLY/Qz66eYBaBZSuky0Pv3RB6ntHfOz3AUckBABo=;
+	b=HynyxMpNUG/rRZP59lW/UjSDyNKUh2SFLaS6WDcrAv1UZ3aAmJ3QXn2TfE8uBGw15GXDt2
+	FS1sN298fllNGieS+/2A2nMHhQUotWgbajlFrPictri2WPeWWSjfvMazRj5trGq+chwiS6
+	kIdQFp2wXYk1ewUs8PJdx2jPRyj9hAk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Cc: kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 0/2] arm64: Support FEAT_LSFE (Large System Float Extension)
-Date: Fri, 19 Sep 2025 19:38:17 +0100
-Message-Id: <175828261879.3019927.22813258731218689.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250918-arm64-lsfe-v4-0-0abc712101c7@kernel.org>
-References: <20250918-arm64-lsfe-v4-0-0abc712101c7@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 06/16] KVM: arm64: Compute shareability for LPA2
+Message-ID: <aM3R9mshUCJgXg9K@linux.dev>
+References: <20250915114451.660351-1-maz@kernel.org>
+ <20250915114451.660351-7-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250915114451.660351-7-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 18 Sep 2025 20:42:05 +0100, Mark Brown wrote:
-> FEAT_LSFE is optional from v9.5, it adds new instructions for atomic
-> memory operations with floating point values.  We have no immediate use
-> for it in kernel, provide a hwcap so userspace can discover it and allow
-> the ID register field to be exposed to KVM guests.
-> 
-> 
+On Mon, Sep 15, 2025 at 12:44:41PM +0100, Marc Zyngier wrote:
+> +static u8 compute_s1_sh(struct s1_walk_info *wi, struct s1_walk_result *wr,
+> +			u8 attr)
+> +{
+> +	u8 sh;
+> +
+> +	/*
+> +	 * non-52bit and LPA have their basic shareability described in the
+> +	 * descriptor. LPA2 gets it from the corresponding field in TCR,
+> +	 * conveniently recorded in the walk info.
+> +	 */
+> +	if (!wi->pa52bit || BIT(wi->pgshift) == SZ_64K)
+> +		sh = FIELD_GET(PTE_SHARED, wr->desc);
 
-Applied selftest update to arm64 (for-next/selftests), thanks!
+nit: s/PTE_SHARED/KVM_PTE_LEAF_ATTR_LO_S1_SH/ makes it a bit more
+obvious what field is being used here (even though it was like this
+before).
 
-[2/2] kselftest/arm64: Add lsfe to the hwcaps test
-      https://git.kernel.org/arm64/c/777fb19ed8d6
+> @@ -798,11 +819,13 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+>  	    !MEMATTR_IS_DEVICE(final_attr))
+>  		final_attr = MEMATTR(NC, NC);
+>  
+> +	s2_sh = FIELD_GET(PTE_SHARED, tr->desc);
+> +
 
-Cheers,
--- 
-Will
+s/PTE_SHARED/KVM_PTE_LEAF_ATTR_LO_S2_SH/
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+Thanks,
+Oliver
