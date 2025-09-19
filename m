@@ -1,119 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2C43164AD;
-	Fri, 19 Sep 2025 14:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8696C2FC03B;
+	Fri, 19 Sep 2025 14:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758292021; cv=none; b=FYU+nEdIAoMG1Nm5cHfpywbEGoizJ6J1xFhqDcgqIsyP5SogXMaN10Sg0TUJo9T/RNjUtGMISAZaGeuoQ9o/G4Pht+U1Vvt5nqtgMxt6vRJAJcXE/VPBmr/wgQd7FrgmCuSouwgBpX4qHoxT6KkhFvckSIHQCu15/NkIZSeJ/zI=
+	t=1758293040; cv=none; b=Z4xWN9jZ9ckdQhNinYjAAs2l0IUqhT/AjpfBgg6XfSwXc/zx6wy/2o3Ot461hJhX16NtvwBsjZ0PiyBWuakVg6Ul3oZ82W9iR4AAppGCa0wJkyZ2LpW3L4PmTXLsB/cMaRVFoZlN/oWlYJ00wHTL2aMUdv0ffg0BG+5xpBGVspg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758292021; c=relaxed/simple;
-	bh=DzaesBYWo5gYh/9yDXkynFQps02fTLxsraKzoj6MxuQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M/5pvbEcjQi6LZF5Sqw934iiWS+drei11R9+et580ovY9iMKYXwhNCoaZhOV53gCCIiyaKuoxNUTTGYw2CLCXdQKDxXnssACKWuRhHVt58+T2dNYndipqppwQcJfyYDNDgBu0CarSPzuAkT8re7LimRp1LXZUBVXlX+1vfEOJ5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FyfwT/sP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758293040; c=relaxed/simple;
+	bh=tgkIwZkXy82iLvUj6D+P1CNw4VBnnKn2FdkseccjCec=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iGbwN3y33bsZEVlsjWVrtYQu4M1UrpBLdGs1cgwkcOhNWKuMZXVo6sUFzb0X/TLuiBvnnnkg3OxJdAiFkdGEiCbRi1DxLGw2CBM8XOFM86IgjnUjuCjzf2JuTswn8huqlHzdHQo6FAz55SLaWnf1rK/NNlBFlsggAEGeMU0fLzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XtctAxtt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FyfwT/sP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E457EC4CEF0;
-	Fri, 19 Sep 2025 14:27:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XtctAxtt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BFECC4CEF0;
+	Fri, 19 Sep 2025 14:44:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758292020;
-	bh=DzaesBYWo5gYh/9yDXkynFQps02fTLxsraKzoj6MxuQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FyfwT/sPaHbrPC7jbD8zPDjbtinrUavFc01JHGHsrlxGCYZoAk3dSlt4B0k98G19h
-	 AJlMwtio9XIyhS9She0XqcMPpy2eeO3ILXWoExq5W3V2v20TQg0yqOu32316RpOVIj
-	 MLZZSEmVVdPwuiqy0bvaGMa/RcyIQjlJb5ntvEbGbRNqJITbwgoD5ugdJdR1gHEcMW
-	 X/i8aI15ZTAu2CPiqVEbcxr+79xWF+6PZvLBdaLb/7OH8B1288oKt9U+Mo7OzJua0Y
-	 LjM+b8oxQ5dwOXVLYw4LGhSL5rVek0uHulZH+ENvwFpg/6nmN6HPd6aattPbgob+pB
-	 66ete9HqSaF+w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	s=k20201202; t=1758293040;
+	bh=tgkIwZkXy82iLvUj6D+P1CNw4VBnnKn2FdkseccjCec=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=XtctAxttB0At3TcPH73mcchGwf4+wczzFO0nvukNwWi4g4gSEIf1w3kbNi+inY2yu
+	 y/n4dZFmRxTdr77RTf/gs1RfrEnVNZXyNHWLdDBBJ13dZeU2oFgyRGaETNRm/cuSrR
+	 7YGPqQHU+45rfI5rvD5VIkBdbSeDeN2z6lFyE+SGlVgXC4bKSNpd37cGqFmNDR8oRW
+	 mPGePVGGHIjmt2pr1OVL1/42X3QF5YHmIg6zO3rIBZBGbWgZZC05V3hMi9XbyVtwWN
+	 5jHd7Nyu+FyPZ0JF4anScbTzNPYFeosEX5sxi2w+WXdRIelu33/WnhGAJk0hniV7Ge
+	 0Cv0Bsj/LL7TQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uzc4g-00000007nub-3U8t;
-	Fri, 19 Sep 2025 14:26:58 +0000
-Date: Fri, 19 Sep 2025 15:26:58 +0100
-Message-ID: <871po2zff1.wl-maz@kernel.org>
+	id 1uzcL7-00000007oFw-3HTw;
+	Fri, 19 Sep 2025 14:43:57 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: syzbot <syzbot+c41f3ddb8299a30a98b5@syzkaller.appspotmail.com>
-Cc: catalin.marinas@arm.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Mark Brown <broonie@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	suzuki.poulose@arm.com,
-	syzkaller-bugs@googlegroups.com,
-	will@kernel.org,
-	yuzenghui@huawei.com
-Subject: Re: [syzbot] [kvmarm?] kernel BUG in kvm_s2_put_page
-In-Reply-To: <68cd66b0.050a0220.139b6.000f.GAE@google.com>
-References: <68cd66b0.050a0220.139b6.000f.GAE@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: (subset) [PATCH v4 1/2] KVM: arm64: Expose FEAT_LSFE to guests
+Date: Fri, 19 Sep 2025 15:43:54 +0100
+Message-ID: <175829303126.1764550.939188785634158487.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250918-arm64-lsfe-v4-1-0abc712101c7@kernel.org>
+References: <20250918-arm64-lsfe-v4-0-0abc712101c7@kernel.org> <20250918-arm64-lsfe-v4-1-0abc712101c7@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: syzbot+c41f3ddb8299a30a98b5@syzkaller.appspotmail.com, catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, broonie@kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 19 Sep 2025 15:20:32 +0100,
-syzbot <syzbot+c41f3ddb8299a30a98b5@syzkaller.appspotmail.com> wrote:
+On Thu, 18 Sep 2025 20:42:06 +0100, Mark Brown wrote:
+> FEAT_LSFE (Large System Float Extension), providing atomic floating point
+> memory operations, is optional from v9.5. This feature adds no new
+> architectural state, expose the relevant ID register field to guests so
+> they can discover it.
 > 
-> Hello,
 > 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    62e68218ab58 Merge branch kvm-arm64/nv-debug into kvmarm-m..
-> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1551cf62580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=1b1bafe30fc85201
-> dashboard link: https://syzkaller.appspot.com/bug?extid=c41f3ddb8299a30a98b5
-> compiler:       Debian clang version 20.1.8 (++20250708123704+0de59a293f7a-1~exp1~20250708003721.134), Debian LLD 20.1.8
-> userspace arch: arm64
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-62e68218.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/99c4e665c20d/vmlinux-62e68218.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/4204d63db4b5/Image-62e68218.gz.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+c41f3ddb8299a30a98b5@syzkaller.appspotmail.com
-> 
-> raw: 01ffea8000000000 ffffc1ffc0807c48 ffffc1ffc080a888 0000000000000000
-> raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
-> page dumped because: VM_BUG_ON_PAGE(page_ref_count(page) == 0)
-> ------------[ cut here ]------------
-> kernel BUG at ./include/linux/mm.h:1036!
-> Internal error: Oops - BUG: 00000000f2000800 [#1]  SMP
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 4079 Comm: syz.1.200 Not tainted syzkaller #0 PREEMPT 
-> Hardware name: linux,dummy-virt (DT)
-> pstate: 60402009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> pc : put_page_testzero include/linux/mm.h:1036 [inline]
-> pc : folio_put_testzero include/linux/mm.h:1042 [inline]
-> pc : folio_put include/linux/mm.h:1359 [inline]
-> pc : put_page include/linux/mm.h:1429 [inline]
-> pc : kvm_s2_put_page+0x374/0x3a0 arch/arm64/kvm/mmu.c:264
-> lr : put_page_testzero include/linux/mm.h:1036 [inline]
-> lr : folio_put_testzero include/linux/mm.h:1042 [inline]
-> lr : folio_put include/linux/mm.h:1359 [inline]
-> lr : put_page include/linux/mm.h:1429 [inline]
-> lr : kvm_s2_put_page+0x374/0x3a0 arch/arm64/kvm/mmu.c:264
 
-This is likely caused by the S2 refcounting issue that has just been
-reverted in Linus' tree, and that is not in the kvmarm/next branch.
+Applied to next, thanks!
+
+[1/2] KVM: arm64: Expose FEAT_LSFE to guests
+      commit: 5d20605c8e7930254f7bee41336e421be247181c
+
+Cheers,
 
 	M.
-
 -- 
-Jazz isn't dead. It just smells funny.
+Without deviation from the norm, progress is not possible.
+
+
