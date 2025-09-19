@@ -1,98 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8386131CA4E
-	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 15:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51AE2C21F8;
+	Fri, 19 Sep 2025 15:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758297178; cv=none; b=n38VYG+4DSCdwWveMpzKRqiYgNBK1270mdIH/7HP9oG+2Y0aS/GjtP+RLydj4RuPKk4x4HseYYAzImRWFTC89YkOpEZ2k48Yi61t0t4rjQNOZvi0b1XwWv9qqPqlKLOS9Vaf1JyNS1Hau7gdnrjYRMDtdugpiA85xoshOAuWz50=
+	t=1758297191; cv=none; b=AzI3f0YUDB9kLk3xhHmLtSwMpfmXlnsYgF3Zy123OW5MrIzXWvPtk6SESFp4O3p0zicRUiJ0k00i4iEoepGFeuQsh0YaqzixTxOkS8qHYsj0ZP8IZnrK8S6bsVXkSnd/mAiUFvqlWR5y/yT6qUET/M4VRDfXVCDb68zFqxKp5kM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758297178; c=relaxed/simple;
-	bh=yFGsu4mRUbcOYey3GjettGODW0/xY2uQeP05cwu31lU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tDbsXyhAj4rmYy0PMErZIYgIsn9wD+H1l3/qCh0MGEuI/g/Cef1axRahhlZT6tXl9U7k/YsA9qalsmIWuWH3A2YkZvETYNmPaMjfmZeQKv4nOaz44OMu/mwtV01d3ogrHPByHlOpIRy1UL8Eotj4mFRW4AgBzzMPphLuvKBLxd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAIRxJWW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758297191; c=relaxed/simple;
+	bh=LY8UCU+64dez0iKU9byrdE3xtr9uB9iMyeO1oDOL/3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MvBbwZGfXxhCV87uszwgaTr94SFnHK/JckYQLs8pGpFNqxXTFJfW+DQkm6s0Y5uNJuC/uK5Z6lyq0X0+KqfR0+Vw9dbR0Y5OwcsL+NuDTEvmJeQ0pOJOyjM40tP9qONQmU0wVSN9lcLnboONKm9ip0KB7A/nX1o0YDivUvO6fko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOV8MwTf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAIRxJWW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BF17C4CEF0;
-	Fri, 19 Sep 2025 15:52:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOV8MwTf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B428BC4CEF0;
+	Fri, 19 Sep 2025 15:53:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758297178;
-	bh=yFGsu4mRUbcOYey3GjettGODW0/xY2uQeP05cwu31lU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VAIRxJWW5TdJNhgw1y9EWki5d0DaecSOZpAMHmWhffQUg/FpH38yllPm5m9aFj8Yj
-	 jhA6zed0IwzVO7Xnh9EpaE3QCEdytbIca8SKcoW6PJP0j4sc2em2ZuMfRY5Ugg4piv
-	 0l6wkhJMNJeCBx3Zfxq0+FJS7As7X1ElIXEX4nN2vEHpT12KbrbWsGACJzczCn+kBT
-	 CiX6Kj2+F41GHgHFDnygXjkRG5lXuBQ5ghpvfNXjPoth6VZJjEnT/C8D4s/yE4WbLd
-	 CMzOb2D6ypj2RMaP5PIJ23nSNuOW73qvZ+2ZiFl6luqUPixv5Cqo08aoOMuI6BvDXo
-	 x0y8wqbipLTEA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uzdPr-00000007pZi-4BEu;
-	Fri, 19 Sep 2025 15:52:56 +0000
-Date: Fri, 19 Sep 2025 16:52:55 +0100
-Message-ID: <87wm5uxwvc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<oliver.upton@linux.dev>,
-	<tangnianyao@huawei.com>,
-	<wangwudi@hisilicon.com>,
-	<liuyonglong@huawei.com>,
-	<prime.zeng@hisilicon.com>
-Subject: Re: [PATCH v2 0/4] Add workaround for HIP10/HIP10C erratum 162200802
-In-Reply-To: <fc7763d5-bed6-ace6-ace8-a50c031cab36@hisilicon.com>
-References: <20250825023954.3516381-1-wangzhou1@hisilicon.com>
-	<fc7763d5-bed6-ace6-ace8-a50c031cab36@hisilicon.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1758297191;
+	bh=LY8UCU+64dez0iKU9byrdE3xtr9uB9iMyeO1oDOL/3o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aOV8MwTfLG18DZwwAPFD7Rm3sJbkyFo6QukFWydz9vWeSc3v1IRTSVl/a7ocNxvwc
+	 wMqEh/9o0j5TxAusXbyoSzPbete1PUJjByFf64KM1Z4oeTbiDTV+gYibMfkkeQMBwS
+	 qbaBJOFWiRtx2AmG8a80m2G8+8EZ/dlJyp+QcYLrP3ReF30/gSvI0anIRYts6wkj/S
+	 LM95N3RzmWzVm4wpTF4ARgK/7l+X4l7di8KcnVlEbS5A5ZBFw+umfAduBXS0e57DoH
+	 dtEz7AaZT1SUQ3IYanPM99hXRfIAgGz3ZCkxozn+1RPQf91a4fmhmeZtmw1CJ6MWDM
+	 j1kIgvB2pty8g==
+Date: Fri, 19 Sep 2025 16:53:04 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v8 06/29] KVM: arm64: Introduce non-UNDEF FGT control
+Message-ID: <d27a1c5a-9173-465b-90f9-fec528181ba7@sirena.org.uk>
+References: <20250902-kvm-arm64-sme-v8-0-2cb2199c656c@kernel.org>
+ <20250902-kvm-arm64-sme-v8-6-2cb2199c656c@kernel.org>
+ <87zfaqxymu.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, tangnianyao@huawei.com, wangwudi@hisilicon.com, liuyonglong@huawei.com, prime.zeng@hisilicon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vZXtN3VZj3O/Y/5x"
+Content-Disposition: inline
+In-Reply-To: <87zfaqxymu.wl-maz@kernel.org>
+X-Cookie: Don't read everything you believe.
 
-On Mon, 01 Sep 2025 11:55:49 +0100,
-Zhou Wang <wangzhou1@hisilicon.com> wrote:
-> 
-> On 2025/8/25 10:39, Zhou Wang wrote:
-> > As the discussion from V1 series, V2 series firstly adds GICD.num_LPIs
-> > writable support, then add HiSilicon erratum 162200802.
-> > 
-> > Erratum number should be 162200802, make a mistake in V1, so fix it as
-> > well.
-> > 
-> > Zhou Wang (4):
-> >   KVM: arm64: Allow userspace to write GICD_TYPER.num_LPIs
-> >   KVM: arm64: selftests: Add test for GICD.num_LPIs
-> >   Documentation: KVM: arm64: Add GICD_TYPER.num_LPIs writable
-> >     description
-> >   ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200802
-> 
-> Hi Marc and Oliver,
-> 
-> As the discussion in V1 series, this series firstly adds GICD.num_LPIs
-> writable support, then add erratum patch.
 
-Given the state of this HW (as per [1]), I'd rather we start by
-working out the strategy at the GIC level, rather than exposing stuff
-to userspace before we agree on a way to make it work in the kernel.
+--vZXtN3VZj3O/Y/5x
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks,
+On Fri, Sep 19, 2025 at 04:14:49PM +0100, Marc Zyngier wrote:
 
-	M.
+> FGUs are uniform, because when something doesn't exist on a vcpu, it
+> doesn't exist on *any* vcpu. Non-FGU use of FGTs, however, has to be
+> more flexible because that's part of the emulation, and is actually
+> pretty rare that we want to trap something at all times, on all vcpus.
 
-[1] https://lore.kernel.org/r/20250909110615.129179-1-wangzhou1@hisilicon.com
+> For the same reason, conflating the R and W registers doesn't work
+> either. For the above example, I want to be able to trap write
+> accesses to MDSCR_EL1, and not reads, just like the Ampere
+> brain-damage.
 
--- 
-Jazz isn't dead. It just smells funny.
+> So please make this per-vcpu, decouple R and W FGTs, and convert the
+> Ampere horror to this scheme.
+
+OK, that makes more sense - it was a bit confusing that all the FGT
+handling was done per VM not per vCPU without even any provision for
+per-vCPU or distinct R/W stuff, it seemed strange.  Since the SME
+requirement also ends up being per VM anyway I just tried to fit in with
+what was there but if we don't want that behaviour it's certainly more
+obvious to make it per-vCPU and to split read and write.
+
+--vZXtN3VZj3O/Y/5x
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjNfGAACgkQJNaLcl1U
+h9DpYwf9GkvMEDYrTVm6kitHOpS+F99swSxSDy+9IjuOkcqkQIm18C2AoZe1iD0A
+ZOB8PfTlFDFJGW4gxWHcWHk5prOp89I4xC2kXlguPQYe3T8QHfcsDDAJFxwhX7Xb
+C0ICRPJQC6+q1td6A51wmqsCQ+N7cWd5oBz4A02evYJBcQ/7ZGlF3ykFUZTRhW+1
+c5HGNIW9RSsbdoFLFtSAJYzFmXfMSgDdJB/5AG6BJ1wdY9CF4cdRzNI9TyhmAWti
+qh/oncDSwLMg6VU1rkNhaibL7vRbtKI/7D3RldFVPyXuf+gqRjp7rC991dMcSgh7
+iXujfThG7ZrCubxYhsccwtS4pIR5Jw==
+=0qCo
+-----END PGP SIGNATURE-----
+
+--vZXtN3VZj3O/Y/5x--
