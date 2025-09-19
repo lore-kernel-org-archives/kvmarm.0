@@ -1,31 +1,31 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7576A1917ED
-	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 21:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAC42C2ACE
+	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 22:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758319105; cv=none; b=aWNrJwfwuGzKpd4BQ4WdOwL2Jm/svhWGzzvLD9BtANW4UEGM1QO77/S1PF8zK7ADQe7d5TNtXhb9FP6cF1qL3M6+FMTmhaTlwmG+2LJ67b6MmJkXHna7g9C12JyJD8CQI13ZwGkChnAnWUbDsl2Q2S2/qyJvLI0vQB4y9OMOL/I=
+	t=1758319271; cv=none; b=DRGrswzpelxWzo4mX3EeV7KdX43LN+VJA4jz4AIjLY4JzeCaApsTcIVjrUxqvZcoOdPZ4kGe7qhdDMs8KdRtM//6hJG0y7qRiuiUHxPPBt4i78s/kBkVk68y11luKnvPIaeX30TlzQC9O2vm7PZjDXh+6AzIaxTrPcdelIP/AzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758319105; c=relaxed/simple;
-	bh=htS0YGjfUn8eMf9fl9ey6QEdl40299whWv+cWlIhluo=;
+	s=arc-20240116; t=1758319271; c=relaxed/simple;
+	bh=RtT4wd+CD99ymKEzg52n+A2Ka2i/uRYdoyKth8rV/PY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J44MWInLiTk8j+40w+5BaRv7OIQsYGUY+msTvc2PWO+hPBiz3/tNj6by9qlM60agOUnMFehokHsupw6TtZqZpMP4iBncDVxqbDQNuyhS7FlEinEuj9zMd7mlgYX7WlAgXguElVjMTbwYVblLu4bwK+tl6YkFM3aCa9K8LfWnRNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HynyxMpN; arc=none smtp.client-ip=95.215.58.186
+	 Content-Type:Content-Disposition:In-Reply-To; b=YutYR4UypZwtAfOfhuiONM+wa+XxRAyPfPpad2eYWc/9VdA0H9S+sZcKAWsTCryjOhp/M+2Y5dDCMMwRVYw7bjbGkrGaV1qQpA7wDBg/Rqak3wWfq8sLWQ7lH6G/YLcaPmLvPVfejLkLQ5vVzah9H8VitK8D0NNCCW+1BSfkZMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gRrKmvAx; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HynyxMpN"
-Date: Fri, 19 Sep 2025 14:58:14 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gRrKmvAx"
+Date: Fri, 19 Sep 2025 15:00:59 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758319100;
+	t=1758319264;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ucooLY/Qz66eYBaBZSuky0Pv3RB6ntHfOz3AUckBABo=;
-	b=HynyxMpNUG/rRZP59lW/UjSDyNKUh2SFLaS6WDcrAv1UZ3aAmJ3QXn2TfE8uBGw15GXDt2
-	FS1sN298fllNGieS+/2A2nMHhQUotWgbajlFrPictri2WPeWWSjfvMazRj5trGq+chwiS6
-	kIdQFp2wXYk1ewUs8PJdx2jPRyj9hAk=
+	bh=HhB9XBoASZEaIPr0CT1pnpt/0SafB3c+6yxK4UJFeHU=;
+	b=gRrKmvAxzdFhtfFtQm5oCDKyPVYgW8khy+blMu1uvXudiSmtqG1OGrvgsibbKknQgBZOzd
+	P6Ixvt7X41TAc3ys29H3ScxCr10GiESRicAGewna1GcZqmyNU9Uji47jrCma1i2wIw3Viz
+	oWMHSxUOoNBQL079WcvMrCrnoWXend0=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -33,10 +33,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 06/16] KVM: arm64: Compute shareability for LPA2
-Message-ID: <aM3R9mshUCJgXg9K@linux.dev>
+Subject: Re: [PATCH v2 07/16] KVM: arm64: Populate PAR_EL1 with 52bit
+ addresses
+Message-ID: <aM3Sm4vKZUw2Nu_L@linux.dev>
 References: <20250915114451.660351-1-maz@kernel.org>
- <20250915114451.660351-7-maz@kernel.org>
+ <20250915114451.660351-8-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,35 +46,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250915114451.660351-7-maz@kernel.org>
+In-Reply-To: <20250915114451.660351-8-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 15, 2025 at 12:44:41PM +0100, Marc Zyngier wrote:
-> +static u8 compute_s1_sh(struct s1_walk_info *wi, struct s1_walk_result *wr,
-> +			u8 attr)
-> +{
-> +	u8 sh;
-> +
-> +	/*
-> +	 * non-52bit and LPA have their basic shareability described in the
-> +	 * descriptor. LPA2 gets it from the corresponding field in TCR,
-> +	 * conveniently recorded in the walk info.
-> +	 */
-> +	if (!wi->pa52bit || BIT(wi->pgshift) == SZ_64K)
-> +		sh = FIELD_GET(PTE_SHARED, wr->desc);
+On Mon, Sep 15, 2025 at 12:44:42PM +0100, Marc Zyngier wrote:
+> Expand the output address populated in PAR_EL1 to 52bit addresses.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/at.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 952c02c57d7dd..1c2f7719b6cbb 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -844,7 +844,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  	} else if (wr->level == S1_MMU_DISABLED) {
+>  		/* MMU off or HCR_EL2.DC == 1 */
+>  		par  = SYS_PAR_EL1_NSE;
+> -		par |= wr->pa & GENMASK_ULL(47, 12);
+> +		par |= wr->pa & GENMASK_ULL(52, 12);
 
-nit: s/PTE_SHARED/KVM_PTE_LEAF_ATTR_LO_S1_SH/ makes it a bit more
-obvious what field is being used here (even though it was like this
-before).
+That should be bit 51, no?
 
-> @@ -798,11 +819,13 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
->  	    !MEMATTR_IS_DEVICE(final_attr))
->  		final_attr = MEMATTR(NC, NC);
+Maybe just use SYS_PAR_EL1_PA as the mask.
+
+>  		if (wi->regime == TR_EL10 &&
+>  		    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> @@ -877,7 +877,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  			mair = MEMATTR(NC, NC);
 >  
-> +	s2_sh = FIELD_GET(PTE_SHARED, tr->desc);
-> +
+>  		par |= FIELD_PREP(SYS_PAR_EL1_ATTR, mair);
+> -		par |= wr->pa & GENMASK_ULL(47, 12);
+> +		par |= wr->pa & GENMASK_ULL(52, 12);
 
-s/PTE_SHARED/KVM_PTE_LEAF_ATTR_LO_S2_SH/
+Same here.
+
+>  		sh = compute_s1_sh(wi, wr, mair);
+>  		par |= FIELD_PREP(SYS_PAR_EL1_SH, sh);
+> -- 
+> 2.39.2
+> 
 
 Thanks,
 Oliver
