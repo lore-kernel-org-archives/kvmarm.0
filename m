@@ -1,181 +1,79 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E0531C583
-	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 15:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869AD247295;
+	Fri, 19 Sep 2025 18:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758297340; cv=none; b=J4+gXvVSZ8E9R5yWsQbI1fRtP5C+5YnyKB52ujZkDtkhOyK4cly04uRC1RvCeI+jYm7LGTZ/Di4eRkMHlUWmXoTkDvQsWwMHlkK1iimS880RD5RvBUxZbU4jxCPLNi8LHb+z+rjvZ8Gxg4VyhELSGPsvwKktljbSmHdNlYDrPzw=
+	t=1758307108; cv=none; b=K0a86+yWwbqI0G4wzLgLgb4wZcBVZEVwTe9xBVVLnBJPbuuoE9pMQt3Iiuyi3ZAykech5Pe0RummaUubSPWfP3d3+K9SimfLgMKj/q6Ld0qAck7UBUqh5YIydqc+Qbh8F7j+ilhquMXuEUg1hy4WaByw0yh8cks58Vk6XwN2xkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758297340; c=relaxed/simple;
-	bh=q+ltlpOidKXc+Gs5FbxaUoBvp/0NlBvUil7jiGSbDrA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rx6GspqpBapcp+dYsoGgXfh3YBkYc+CJiVeBCij5KMqwaKYlQrswoEJWazDKMlRnciDyCRJicWrS8RThhEgtg7T7y6RvcoHhTBacz1m93o7o48gvPbl5iDQ7zlypn8T+u94bmgc8ogKijVP2McuGQbPsuA5AApP7J/xvO8ZIFJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z+8e+4QE; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1758307108; c=relaxed/simple;
+	bh=EeZzWFrfZxrU8fh2GXxBtvaOZgVq6ueEnBhBSJauFWs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zz1yvi1c5flFE7+GpIMdyNTyO3Qi+az8MKToN7UBUh73ufya3y3s1eJelM2yWNU6LxPj+KYT0NgIdPrCn7VpPCmGS9lw3m7HCBQjoArHIjtRMsd8vodX8h+p9RGAXb9AY318fZTar9eUH2v3B1GUTYfqJDuIZn6Ij25uVSiHLrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1aIsfRY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z+8e+4QE"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-45b986a7b8aso12218025e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 08:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758297336; x=1758902136; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FOKSGqynaN2anerij2SkIETe5RaqqxOUKLRkUOiDZeU=;
-        b=Z+8e+4QEVdUT/PMuDm++MkVcG/qn6hrwPqBg/0n6mWXo5XYvdNjLIduRniFP545nIq
-         U9zymY2D6LChqHyv5zfY5NEdOxVQcS99P2vpmIEB8Bo1QvBHuWdF67JQl7jKTJoi6JPg
-         AwoCptboJD87NMaZB5n7KxHOSxivOSGvJhmtU/EbUG5T2EK6F5b9H29epYThC2XIT4in
-         cRn6j4Tvg2lwL3VyqpW9SdoovcSHpAw82SxukXUd5EemHFDLduczWGim+h57LTVurZ+2
-         B0GZIxw0aipkJ5mLoRxB+nz0jfNQfEYuXX1Uz9h73jJJrdQ1RN5ec2okz3I82Pu8eWTh
-         MQqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758297336; x=1758902136;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FOKSGqynaN2anerij2SkIETe5RaqqxOUKLRkUOiDZeU=;
-        b=nC/P9Vwt5Wz0GU7Sl3gvHx2cbfavRzGFTq08dWAvZQBBf9A44+DJKygLKq6Jvtm1hb
-         Zn/SgHUSI+5eImkvthr1kBRB8PPZIO9Nkb6fCdczCYLy+hys8LOBqe80mV2gAihK3oqf
-         KXyxzJ7N5dbZvhXoFUg4syxmK0LH81yV2Ty5NKQxdSQcBsu6kMJmdxc5QFkAnNEgvvwJ
-         38IYvfgO4aZop/203JRMg6lW8GrOQX06hfsqTQAoYXHZ5+EPd6hTsea8O0+3LattqqaH
-         RIc4L5+Z9YLfeBVtTuEqlCybevY9CHwVwtQxBeFEts1kreWrzFd0/6ovSJpzWKzQQKx7
-         psew==
-X-Forwarded-Encrypted: i=1; AJvYcCUnG6cHf6ZFFHyeXxg25DyDbqUk0d6z6wDoTzF900SyLEgtABZlY7RMHh8SkhbwmF2N/+nO46A=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzZGxa866n/DsY54trRXeDscrQog/94fr6/5WpfbQH2KcNuCKuU
-	6Va8md+RfaQEZzy4FZdCMQnbgUXQuevjtG1ltSzJbDDiHQFzS9oEtjvwD/hjhA9mI8gWwxuEZeu
-	K8QywvrRfb6tUOD4zftH5Qw==
-X-Google-Smtp-Source: AGHT+IEUFCbcLzkaHmj5mVgMPnutmJZ9S4AToUJFiYuLUhCLRphe53uMI81/4ePc9pYVhpGPJ8joXqow1Xo/ILf8
-X-Received: from wmbei25.prod.google.com ([2002:a05:600c:3f19:b0:45b:6337:ab6b])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4748:b0:456:1b6f:c888 with SMTP id 5b1f17b1804b1-467f2242a87mr36001815e9.23.1758297336691;
- Fri, 19 Sep 2025 08:55:36 -0700 (PDT)
-Date: Fri, 19 Sep 2025 16:50:56 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1aIsfRY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50919C4CEF0;
+	Fri, 19 Sep 2025 18:38:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758307108;
+	bh=EeZzWFrfZxrU8fh2GXxBtvaOZgVq6ueEnBhBSJauFWs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=S1aIsfRYpwgGG1ulRgCexm9tZ8cz18SxSmW+AJ/e1l9FzTrztVNzTIa5Y4SAAxR0W
+	 oipQkNRT+vAf9yvlaQ6ds6/i9hJOH70tMF9tvymO1jje7ABHNywjN41zug7yYaEY2+
+	 wgN+TEhvZpe6htN23Fb+fdqpftk20KG985QTMQeZp+fYbMcm8BQn+JuLwUnfDTT7aP
+	 Ok01ljK2KHuj+tPXU7VVbRZ38bjhTepyoU1NlNyUfC5/4KMNXoyCzXmOzUlvtYcp/a
+	 sNHOglQ0n1CFJrEUf+lUxTwmRovEDIaSwrk7JuQFw5+0OzLM9TurShOAINtombvFWy
+	 DYgp0Wy26aCsQ==
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Mark Brown <broonie@kernel.org>
+Cc: kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 0/2] arm64: Support FEAT_LSFE (Large System Float Extension)
+Date: Fri, 19 Sep 2025 19:38:17 +0100
+Message-Id: <175828261879.3019927.22813258731218689.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250918-arm64-lsfe-v4-0-0abc712101c7@kernel.org>
+References: <20250918-arm64-lsfe-v4-0-0abc712101c7@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919155056.2648137-1-vdonnefort@google.com>
-Subject: [PATCH v2] KVM: arm64: Check range args for pKVM mem transitions
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org
-Cc: qperret@google.com, sebastianene@google.com, keirf@google.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-There's currently no verification for host issued ranges in most of the
-pKVM memory transitions. The subsequent end boundary might therefore be
-subject to overflow and could evade the later checks.
+On Thu, 18 Sep 2025 20:42:05 +0100, Mark Brown wrote:
+> FEAT_LSFE is optional from v9.5, it adds new instructions for atomic
+> memory operations with floating point values.  We have no immediate use
+> for it in kernel, provide a hwcap so userspace can discover it and allow
+> the ID register field to be exposed to KVM guests.
+> 
+> 
 
-Close this loophole with an additional check_range_args() check on a per
-public function basis.
+Applied selftest update to arm64 (for-next/selftests), thanks!
 
-host_unshare_guest transition is already protected via
-__check_host_shared_guest(), while assert_host_shared_guest() callers
-are already ignoring host checks.
+[2/2] kselftest/arm64: Add lsfe to the hwcaps test
+      https://git.kernel.org/arm64/c/777fb19ed8d6
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-
----
-
- v1 -> v2:
-   - Also check for (nr_pages * PAGE_SIZE) overflow. (Quentin)
-   - Rename to check_range_args().
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 8957734d6183..65fcd2148f59 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -712,6 +712,14 @@ static int __guest_check_page_state_range(struct pkvm_hyp_vm *vm, u64 addr,
- 	return check_page_state_range(&vm->pgt, addr, size, &d);
- }
- 
-+static bool check_range_args(u64 start, u64 nr_pages, u64 *size)
-+{
-+	if (check_mul_overflow(nr_pages, PAGE_SIZE, size))
-+		return false;
-+
-+	return start < (start + *size);
-+}
-+
- int __pkvm_host_share_hyp(u64 pfn)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
-@@ -772,10 +780,13 @@ int __pkvm_host_unshare_hyp(u64 pfn)
- int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
--	u64 size = PAGE_SIZE * nr_pages;
- 	void *virt = __hyp_va(phys);
-+	u64 size;
- 	int ret;
- 
-+	if (!check_range_args(phys, nr_pages, &size))
-+		return -EINVAL;
-+
- 	host_lock_component();
- 	hyp_lock_component();
- 
-@@ -800,10 +811,13 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
- int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
--	u64 size = PAGE_SIZE * nr_pages;
- 	u64 virt = (u64)__hyp_va(phys);
-+	u64 size;
- 	int ret;
- 
-+	if (!check_range_args(phys, nr_pages, &size))
-+		return -EINVAL;
-+
- 	host_lock_component();
- 	hyp_lock_component();
- 
-@@ -884,9 +898,12 @@ void hyp_unpin_shared_mem(void *from, void *to)
- int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
--	u64 size = PAGE_SIZE * nr_pages;
-+	u64 size;
- 	int ret;
- 
-+	if (!check_range_args(phys, nr_pages, &size))
-+		return -EINVAL;
-+
- 	host_lock_component();
- 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
- 	if (!ret)
-@@ -899,9 +916,12 @@ int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages)
- int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
--	u64 size = PAGE_SIZE * nr_pages;
-+	u64 size;
- 	int ret;
- 
-+	if (!check_range_args(phys, nr_pages, &size))
-+		return -EINVAL;
-+
- 	host_lock_component();
- 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_SHARED_OWNED);
- 	if (!ret)
-@@ -945,6 +965,9 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu
- 	if (prot & ~KVM_PGTABLE_PROT_RWX)
- 		return -EINVAL;
- 
-+	if (!check_range_args(phys, nr_pages, &size))
-+		return -EINVAL;
-+
- 	ret = __guest_check_transition_size(phys, ipa, nr_pages, &size);
- 	if (ret)
- 		return ret;
-
-base-commit: 8b789f2b7602a818e7c7488c74414fae21392b63
+Cheers,
 -- 
-2.51.0.470.ga7dc726c21-goog
+Will
 
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
