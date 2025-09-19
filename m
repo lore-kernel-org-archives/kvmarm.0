@@ -1,82 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92EB619755B
-	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 10:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6955F30ACF1
+	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 12:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758279239; cv=none; b=Jm//+lp5lwDFFZqOGW504tElszoag9bWmwzaeP+A4gpr7lCD8I0vKI3nYztpnnL1kKVTRzH7kG1yCBoCiVRNUwzzJ9yrEY0N2ShtUsT/7Wv+4Q1Mh19194nZsPpmqYLPaAO5ziHQPh3WWo0TsNND/FMMObzI0YBTcWU/k2TuPLI=
+	t=1758283827; cv=none; b=SyaKFFOreetbK5mIOo1yg9LPxlZhkf0V3yGWSWygHO0g8NmQwLMhGfoxZ3/97ZcS45k27uhJt//TgiveDQs7GL3IhrA5++v+OLZINgVqV/zCzMj2HCrEpXYxBCR28wX54L8BGjq+X4FQrAvidfJ22Mqk13tBIIkz1j9ooCBWnyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758279239; c=relaxed/simple;
-	bh=gwyxNPbFQrPXNxTdH/PUvK+8/8BLW6ZHEVM2j2+Z1TA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H15t7lQNGyzZzTbAWz2p+5pC326bWhwykgt6OsR9/+a8xKZIKsMT0ie5EopqGHcxswl8NzPB4g1DohxPdH6ymElJpVph2lRZk3kxkkWmY9yO6HJtNptWmkunpmdRI+zR49LUTYPTE4bxpHKVQOxELyd+RurQG+H9RYys1F+LSvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE971169E;
-	Fri, 19 Sep 2025 03:53:48 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD2403F66E;
-	Fri, 19 Sep 2025 03:53:55 -0700 (PDT)
-Message-ID: <64c0b9fc-c970-4f17-8c3b-6a5078257f83@arm.com>
-Date: Fri, 19 Sep 2025 11:53:54 +0100
+	s=arc-20240116; t=1758283827; c=relaxed/simple;
+	bh=HCf0vunOGdMY13qTgpLjEc9Vi/FW3+z2NaR+L7cjbtk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Df3At1zq+SNQ1q70IL+Rd2GgispkIanpPXXucOdfZ1UtkVkfwd8SdSLiFUq49Dp6Wxz3KS820cGxJX6jEM2+QU33+QWr7QnTj4st17XzmzzuhQ/3pIs+qkqxmYUmvAExBM5YEW3XVEA2RlHTENer2QbXMitlL16FPP6HaXld/NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOdSXPer; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOdSXPer"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E029FC4CEF1;
+	Fri, 19 Sep 2025 12:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758283826;
+	bh=HCf0vunOGdMY13qTgpLjEc9Vi/FW3+z2NaR+L7cjbtk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fOdSXPerHh2i5Zh/hxG5EnyFmE4Pd0Nn3j1ipO3jSxLKLAH55HdwfTlG6Tk6An54m
+	 mWTLhnuxxVAGvnG8LolusFWgD6AC8Na+3VY2eK4F0M8Q5Oq4ItzSg7qqQBrTjgJW0K
+	 Rq7ZThe21P47Pn03lfNdcFgDEjT3sY1L0n5jWjGus207y+7jQJ814niCgG9QqhlbyM
+	 iXTtgVgs6VumrHWZks/dnWZLgWFF8L4bJjxxFoHMgu3I+wMFVQcMrea/cGc5m8L7aV
+	 yuIdF3rjE9+AIMDycF0D8MWmB1PVkagKt8LsB1x3pyPeM+47RUYN5i4RX6PGrc5U2D
+	 xEXGeoz8LQa+Q==
+Received: from 82-132-235-207.dab.02.net ([82.132.235.207] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uzZwW-00000007lgt-3TVe;
+	Fri, 19 Sep 2025 12:10:25 +0000
+Date: Fri, 19 Sep 2025 13:10:23 +0100
+Message-ID: <874isyzlqo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jinqian Yang <yangjinqian1@huawei.com>
+Subject: Re: [PATCH v2 10/10] KVM: arm64: Convert MDCR_EL2 RES0 handling to compute_reg_res0_bits()
+In-Reply-To: <64c0b9fc-c970-4f17-8c3b-6a5078257f83@arm.com>
+References: <20250918151402.1665315-1-maz@kernel.org>
+	<20250918151402.1665315-11-maz@kernel.org>
+	<64c0b9fc-c970-4f17-8c3b-6a5078257f83@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/10] KVM: arm64: Convert MDCR_EL2 RES0 handling to
- compute_reg_res0_bits()
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, Jinqian Yang <yangjinqian1@huawei.com>
-References: <20250918151402.1665315-1-maz@kernel.org>
- <20250918151402.1665315-11-maz@kernel.org>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20250918151402.1665315-11-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.235.207
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, yangjinqian1@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+Hi Ben,
 
-On 9/18/25 16:14, Marc Zyngier wrote:
-> While MDCR_EL2 cannot be RES0, convert it to the same infrastructure
-> anyway, as it make things cleaner.
+On Fri, 19 Sep 2025 11:53:54 +0100,
+Ben Horgan <ben.horgan@arm.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/config.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+> Hi Marc,
 > 
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 7b5c5044d4f64..109d1edcd83d4 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-[...]
-> @@ -1417,8 +1419,7 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
->  		*res1 = SCTLR_EL1_RES1;
->  		break;
->  	case MDCR_EL2:
-> -		*res0 = compute_res0_bits(kvm, mdcr_el2_feat_map,
-> -					  ARRAY_SIZE(mdcr_el2_feat_map), 0, 0);
-> +		*res0 = compute_reg_res0_bits(kvm, &mdcr_el2_desc, 0, 0);
->  		*res0 |= MDCR_EL2_RES0;
->  		*res1 = MDCR_EL2_RES1;
->  		break;
+> On 9/18/25 16:14, Marc Zyngier wrote:
+> > While MDCR_EL2 cannot be RES0, convert it to the same infrastructure
+> > anyway, as it make things cleaner.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/config.c | 9 +++++----
+> >  1 file changed, 5 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > index 7b5c5044d4f64..109d1edcd83d4 100644
+> > --- a/arch/arm64/kvm/config.c
+> > +++ b/arch/arm64/kvm/config.c
+> [...]
+> > @@ -1417,8 +1419,7 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+> >  		*res1 = SCTLR_EL1_RES1;
+> >  		break;
+> >  	case MDCR_EL2:
+> > -		*res0 = compute_res0_bits(kvm, mdcr_el2_feat_map,
+> > -					  ARRAY_SIZE(mdcr_el2_feat_map), 0, 0);
+> > +		*res0 = compute_reg_res0_bits(kvm, &mdcr_el2_desc, 0, 0);
+> >  		*res0 |= MDCR_EL2_RES0;
+> >  		*res1 = MDCR_EL2_RES1;
+> >  		break;
+> 
+> The patch itself looks fine to me but I am confused as to why MDCR_EL2
+> is the only switch case where we have:
+> 
+> *res0 |= <reg>_RES0;
+> 
+> Should this not be present in the other cases?
 
-The patch itself looks fine to me but I am confused as to why MDCR_EL2
-is the only switch case where we have:
+No, the RES0 bits should already be factored in from
+compute_reg_res0_bits(), and this line is only a benign leftover. I'll
+fix this before merging the series.
 
-*res0 |= <reg>_RES0;
+Thanks for the heads up,
 
-Should this not be present in the other cases?
+	M.
 
-Thanks,
-
-Ben
-
+-- 
+Jazz isn't dead. It just smells funny.
