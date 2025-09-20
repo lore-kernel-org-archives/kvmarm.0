@@ -1,84 +1,176 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8A12D63E4
-	for <kvmarm@lists.linux.dev>; Fri, 19 Sep 2025 22:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD314244671;
+	Sat, 20 Sep 2025 09:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758321443; cv=none; b=bu+1Gcr4wIpktHyQ7uZiDkJgqRoQd6WC01M+JJmkqlVbbbEx3pYvcgkh6xTHY7Imo6LvQCrVpGtZ+C0jEx1+HhZL/Gd4BToFGNn7OGppMknYf2PxXycXjk6oA6y/ls+PQWXCUtla29XOUoYGlH2GXLtmFQimbxEdhkQXTRmGwMQ=
+	t=1758360275; cv=none; b=JY3SEdyyftigrj5CBN+DOJTDAZLRenV2gprg/8/rr/3c+Th5dFKzKcyvYeMs04J4WtCTmcOYlqU/u/BDDnt0v+yXL0sZ+WXCJgK2ZK9hsHLHOEj0Lr73kPfn5mQOLNKWiRpUGcuqxwAcAmC/vry7UC5WO6Fg9+uI5ZPpbxqAcH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758321443; c=relaxed/simple;
-	bh=Fb3bKpKqTYr2Snp+QfFKbrmolaxY+vy8qsPMy2pNG0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uv2h0DS97k7AErmqHgtle3pbWTfoOvUON4tyqVVwzFhXnJaRbpSj+AVu9jze1kGyuXWjRQBlnzBmmCjr8EWdXCmed6D+P/4HZzeHkOCXVAT47O5tmMKHbHy/LTmJsRSnRXtXUsFWlEdsWHuCDDXLRNqWIFI6fKfSgQSbkMvb/Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oMvitq2N; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1758360275; c=relaxed/simple;
+	bh=mtx+2aOc+imRlM4qvyqennhOHihAEgTe8xpMW833+EI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cMN5auYQXxuXRC42w4VI2ACUyrAAkBVjIzjg6lFyIGQaLp5yD4Kefanr0yTPoIsKp7fCiiXj+h5ChzUUh/u8t2Bzv90hpxBNosfDg6GlAED6MVTyGE4JFgIkKQ7Js64PG1ms6qRmLU/5N564kQAxaSkOFBl8YGXOX+LFnklL7pQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wgche74h; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oMvitq2N"
-Date: Fri, 19 Sep 2025 15:37:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758321439;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wejgJvJ+telvOoqvjuYRyYA1GW2xJkDX688ipOO2264=;
-	b=oMvitq2NwZVYf/vbOtHD66sru9qX10p1arlJYfA6krLSsktY+DMPq0bgCVAqtbWbU3b22L
-	RD+B1P5flLGIaVcxDs4RqkLOZG6lltaQB+wzcs3t0ZMCOQrEXoA1hpGN4r70pGrgpTakOd
-	kktb0CDfhLL3fuMQX3zPYSCLDpND4yU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wgche74h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ED36C4CEEB;
+	Sat, 20 Sep 2025 09:24:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758360275;
+	bh=mtx+2aOc+imRlM4qvyqennhOHihAEgTe8xpMW833+EI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Wgche74hLBfRIqS/VriSj0bB1STo1mBL4iL7u87yX9H3GqGjh2VdP8lUy4lYptFX4
+	 jcuPgrQN4B4JKW4MPDHhXXTgUP7bqLOX4Nok/3tW30wUJUYN+VrXT5q7uM+VMqnyaB
+	 MG+5rBCa5K4LBdOsmWiH0w0c0Ls4fLtDNpHbY6/tq3tCeY51opScInWi+pXLMWaPmQ
+	 R2dGbIVuCIKWuUrcxP2v9k2dkJgNsJwnuW7w6EKAi/mY52J6nCq6RbBlKqR3a7zBjd
+	 ygpJO3XVgPcni5lFXj+isBVErToeSJieVUZe5ln+6x/MQL0i4xVIgJ9CJ/dEryGosS
+	 2CGnj97IVagjw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uztpZ-00000007zsj-067o;
+	Sat, 20 Sep 2025 09:24:33 +0000
+Date: Sat, 20 Sep 2025 10:24:32 +0100
+Message-ID: <87tt0xxyr3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 00/16] KVM: arm64: TTW reporting on SEA and 52bit PA
- in S1 PTW
-Message-ID: <aM3bG1fkB4cYslUJ@linux.dev>
+Subject: Re: [PATCH v2 10/16] KVM: arm64: Allow use of S1 PTW for non-NV vcpus
+In-Reply-To: <aM3Y6DcAqhGJJer7@linux.dev>
 References: <20250915114451.660351-1-maz@kernel.org>
+	<20250915114451.660351-11-maz@kernel.org>
+	<aM3Y6DcAqhGJJer7@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250915114451.660351-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Sep 15, 2025 at 12:44:35PM +0100, Marc Zyngier wrote:
-> Yes, $SUBJECT rolls off the tongue.
+On Fri, 19 Sep 2025 23:27:52 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> This series was triggered by the realisation that when injecting an
-> SEA while on a S1PTW fault, we don't report the level of the walk and
-> instead give a bare SEA, which definitely violates the architecture.
+> On Mon, Sep 15, 2025 at 12:44:45PM +0100, Marc Zyngier wrote:
+> > As we are about to use the S1 PTW in non-NV contexts, we must make
+> > sure that we don't evaluate the EL2 state when dealing with the EL1&0
+> > translation regime.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/at.c | 21 ++++++++++++++-------
+> >  1 file changed, 14 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 1230907d0aa0a..4f6686f59d1c4 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -108,8 +108,9 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+> >  	case TR_EL20:
+> >  		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & TCR2_EL2_PIE;
+> >  	case TR_EL10:
+> > -		return  (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) &&
+> > -			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1_PIE);
+> > +		return ((!vcpu_has_nv(vcpu) ||
+> > +			 (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En)) &&
+> > +			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1_PIE));
 > 
-> This state of things dates back to the pre-NV days, when we didn't
-> have a S1 page table walker, and really didn't want to implement one.
-> I've since moved on and reluctantly implemented one, which means we
-> now *could* provide the level if we really wanted to.
+> Hmm, dealing with the effectiveness of bits gated by HCRX_EL2.xEN is a
+> pain. Rather than open-coding this everywhere:
 > 
-> However, nothing is that simple. The current code in at.c is firmly
-> 48bit, as our NV implementation doesn't yet support 52bit PA, while an
-> EL1 VM can happily enjoy LPA and LPA2. As a result, it is necessary to
-> expand the S1 PTW to support both LPA and LPA2. Joy.
+> static bool __effective_tcr2_bit(struct kvm_vcpu *vcpu, enum trans_regime regime,
+> 				 unsigned int idx)
+> {
+> 	bool bit;
 > 
-> Then, once the above is achieved, we need to hook into the PTW
-> machinery to match the first level of the walk that results in
-> accessing the faulty address. For this, we introduce a simple filter
-> mechanism that could be expanded if we needed to (no, please no).
+> 	if (tr != TR_EL10)
+> 		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & BIT(idx);
 > 
-> Finally, we can plug this into the fault injection path, and enjoy
-> seeing the translation level being populated in the ESR_ELx register.
+> 	bit = __vcpu_read_sys_reg(vcpu, TCR2_EL1) & BIT(idx);
+> 	if (vcpu_has_nv(vcpu))
+> 		bit &= (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En);
 > 
-> Patches on top of 6.16-rc4. I intend to take this into 6.18, so shout
-> if you don't like the idea!
+> 	return bit;
+> }
+> 
+> static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+> {
+> 	return __effective_tcr2_bit(vcpu, regime, TCR2_EL1_PIE_SHIFT);
+> }
+> 
+> static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+> {
+> 	if (!kvm_has_s1poe(vcpu->kvm)) {
+> 		wi->poe = wi->e0poe = false;
+> 		return;
+> 	}
+> 
+> 	wi->poe = __effective_tcr2_bit(vcpu, wi->regime, TCR2_EL1_POE_SHIFT);
+> 	if (wi->regime != TR_EL2)
+> 		wi->poe = __effective_tcr2_bit(vcpu, wi->regime, TCR2_EL1_E0POE_SHIFT);
+> }
+> 
+> Thoughts?
 
-Just some minor gripes, otherwise this LGTM.
+I quite like the idea, except for passing individual bit numbers to
+the helper (I'd rather get the full value or 0, depending on TCR2En).
+Based on this, I ended up with this:
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+static u64 effective_tcr2(struct kvm_vcpu *vcpu, enum trans_regime regime)
+{
+	if (regime == TR_EL10) {
+		if (vcpu_has_nv(vcpu) &&
+		    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En))
+			return 0;
+
+		return __vcpu_read_sys_reg(vcpu, TCR2_EL1);
+	}
+
+	return vcpu_read_sys_reg(vcpu, TCR2_EL2);
+}
+
+static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+{
+	if (!kvm_has_s1pie(vcpu->kvm))
+		return false;
+
+	/* Abuse TCR2_EL1_PIE and use it for EL2 as well */
+	return effective_tcr2(vcpu, regime) & TCR2_EL1_PIE;
+}
+
+static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+{
+	u64 val;
+
+	if (!kvm_has_s1poe(vcpu->kvm)) {
+		wi->poe = wi->e0poe = false;
+		return;
+	}
+
+	val = effective_tcr2(vcpu, wi->regime);
+
+	/* Abuse TCR2_EL1_* for EL2 */
+	wi->poe = val & TCR2_EL1_POE;
+	wi->e0poe = (wi->regime != TR_EL2) && (val & TCR2_EL1_E0POE);
+}
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
