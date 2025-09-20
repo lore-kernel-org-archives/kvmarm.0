@@ -1,98 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6504A1C700C;
-	Sat, 20 Sep 2025 09:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F7D264A76;
+	Sat, 20 Sep 2025 19:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758360433; cv=none; b=XKSGq7Zk0p9uNAgeljm/6QF66r34UfgjS4g3wfnf99Kc++7qlqSss16bVhH/WtikDwxuROWUDpqhCbse+kwC4j9o3qOyB8ZdRK2SCQKfsrQGCAP4EO2sREDr/tEQ+ZY5ZBVTAPhxhs1ro5tWq4ZLQ9pK9fg7m2dYVip8ousWwwg=
+	t=1758398302; cv=none; b=d1lv7JD6PLGWhbJelVAg7H7c7IM80VR2mdxHiDXOY4nN/OVsG0JesF44FVtlrIEJESuvZuOaur6u4JbGMmtHqYH45pF4nL89hGUMqvz3atNgopLkJSAFGkFrjwwNc+B35yOSBZWJE19S0OZ/9sinIAkQYoJJxWu5BfTgCFFECQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758360433; c=relaxed/simple;
-	bh=I4s0iue0nSEPVDL9mXJlHVHLBhrFulIZ97iG0tR/S5o=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NZTSyVY7y9W5WvItPeGaFiLRE6YC9Y3blL5p10T1W+3hYLZu1H4rxj5Hh1Kfl/QmM8prtHpwiYJd0AuAWUMBKmZk5HNgqMH3iU2lWK8UyqQQqccPx+0/gZJO7iGONcxrpTmBT1/BMPMwKykPnQO+lhnkivzcsZzToKLE5qgbUjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Is/2hiQ5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758398302; c=relaxed/simple;
+	bh=N/5+0U8xq7Zk0a8gL9aaRKTgfFfm/74fnNbziAndS6o=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=t29IK8rXq/orzEbxmCc6sUTKIEJYSjMmvLu8Fg0NXKm50C1INhfkGobwN+6nDsPH0RE30MwkdZCQkzeMZ6KMDrPY6l729kiY2ps2c45MXOLAqb/jeOBWKOz4apvB/ama6QQ4OZfQh/a3ebojNrJaW49Qf/UYdiRWzrJOGmFb8l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LHp1VIKf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Is/2hiQ5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4E3CC4CEEB;
-	Sat, 20 Sep 2025 09:27:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LHp1VIKf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E32CFC4CEEB;
+	Sat, 20 Sep 2025 19:58:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758360432;
-	bh=I4s0iue0nSEPVDL9mXJlHVHLBhrFulIZ97iG0tR/S5o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Is/2hiQ5h7qIi03Zgh8kaVHwaXPJgFesBSD36iWI8omddQd6V/8x+FSmtnkVGvHpV
-	 KzKcSZSfbkHhQFU3gWqZC1VVm5Wck/YT62ugpNaIovnYaSUgdrpfMcjjcOQ6J32YQV
-	 j7QN1ABto3Lurypy7RitnzIMVqAFgojxP9Ybjib9MDiJtPT6EuFklLmS/MFzXZJPBa
-	 h7UWpHnOl554QC5Mdkudk3MCjFQJi73kC0F0uw3JDMxbuWNMLcwuMMeR9j1+bkGFzX
-	 6/ZEQj5DqbbqwOMKuqrhsmaCgaUsVP5bXDZt4HOjTqupKNF0xHYRPow0hg3/XQt99a
-	 +42V4eU1us6tg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uzts6-00000007zvS-34nc;
-	Sat, 20 Sep 2025 09:27:10 +0000
-Date: Sat, 20 Sep 2025 10:27:10 +0100
-Message-ID: <87seghxymp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 07/16] KVM: arm64: Populate PAR_EL1 with 52bit addresses
-In-Reply-To: <aM3Sm4vKZUw2Nu_L@linux.dev>
-References: <20250915114451.660351-1-maz@kernel.org>
-	<20250915114451.660351-8-maz@kernel.org>
-	<aM3Sm4vKZUw2Nu_L@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1758398302;
+	bh=N/5+0U8xq7Zk0a8gL9aaRKTgfFfm/74fnNbziAndS6o=;
+	h=From:Subject:Date:To:Cc:From;
+	b=LHp1VIKfKI+eepDbB7yikTc5ETwfy6Nq9fSlWZIeztY9wsL6No7L1c05IgVWoEXGi
+	 MRzD8R3+CfV7g7sSgQo6po6X9KrmPmsiUYrEHSTHZ93Ffp1iMs5WgbFhF1FE450Nlz
+	 n+xy7lEx8CQ4Kny5VjJA09R8etiD7AI5O6Iea9YaD792eTrtaf1H4cIVM3xJXI35ov
+	 1mf1I1h42JVEDlE56sgWsGYe51yROme8x55JrBiM4bsT2eIPRp0100MK2kB+1lSzUQ
+	 YdGXT1lusTN4Z+7RD2XS8IsQ771gLjmb38lJUNyS7MOzYhw0rw2aqScBLfk/lH9yPM
+	 8kU5mKEmsWXZQ==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH 0/2] KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in
+ set_id_regs
+Date: Sat, 20 Sep 2025 20:51:58 +0100
+Message-Id: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAN4Fz2gC/x3MTQqEMAxA4atI1gZa6xT1KuIinUYN/pKCCOLdp
+ 8zy48F7ILEKJ+iKB5QvSXLsGbYs4DvTPjFKzIbKVB/T2haXa0PSzdc5IJGvJZE65NXiaEJsKLj
+ ofIA8OJVHuf/zfnjfHyhGpbVsAAAA
+X-Change-ID: 20250919-kvm-arm64-id-aa64isar3-el1-f0bd8ab3d36b
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-56183
+X-Developer-Signature: v=1; a=openpgp-sha256; l=900; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=N/5+0U8xq7Zk0a8gL9aaRKTgfFfm/74fnNbziAndS6o=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBozwdZ263G51AbBxPCoC9tq9dlYHu5oWbxX0dPZ
+ TjHX2QkL3aJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaM8HWQAKCRAk1otyXVSH
+ 0HveB/98b1Ix+bm1YAuE6OCxpqygoEcAVSg/qamEdFKMVwqnqIS0gcuTq0pefZ1J148lRUIAYTY
+ fMMIRqjcCUmxqFE9JZ9bFX2LFL3tkueH92DSQTP4RrN+BQQ2nUwvJYNKAXVn8dvxPwYbKoCxZs/
+ +yYpfR8JYP914CavjErEowg3ozNptxtr24JASzk4KcTgXy8Vpr8U8eUrMhazn+A4umkBOASVRhd
+ xLTGQ8s7PzIlHvv7Pm5w05R57lCkqGZIKkoaU2Vg6HM2kQcv2QanNWBEdBHlLFAcpVmmuAU4diP
+ VN6pe4IrGLjYojk7DaI8GuVGJkC82LXZ7mUpviGpBwKxmB4P
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Fri, 19 Sep 2025 23:00:59 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Mon, Sep 15, 2025 at 12:44:42PM +0100, Marc Zyngier wrote:
-> > Expand the output address populated in PAR_EL1 to 52bit addresses.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/at.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index 952c02c57d7dd..1c2f7719b6cbb 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
-> > @@ -844,7 +844,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> >  	} else if (wr->level == S1_MMU_DISABLED) {
-> >  		/* MMU off or HCR_EL2.DC == 1 */
-> >  		par  = SYS_PAR_EL1_NSE;
-> > -		par |= wr->pa & GENMASK_ULL(47, 12);
-> > +		par |= wr->pa & GENMASK_ULL(52, 12);
-> 
-> That should be bit 51, no?
-> 
-> Maybe just use SYS_PAR_EL1_PA as the mask.
+The set_id_regs selftest lacks coverag for ID_AA64ISR3_EL1 which has
+several features exposed to KVM guests in it.  Add coverage, and while
+we're here adjust the test to improve maintainability a bit.  
 
-Humpf... Yes.
+The test will fail without the recently applied change adding FEAT_LSFE:
 
-Thanks,
+   https://lore.kernel.org/r/175829303126.1764550.939188785634158487.b4-ty@kernel.org
 
-	M.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Mark Brown (2):
+      KVM: arm64: selftests: Remove a duplicate register listing in set_id_regs
+      KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in set_id_regs
 
--- 
-Jazz isn't dead. It just smells funny.
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+---
+base-commit: 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
+change-id: 20250919-kvm-arm64-id-aa64isar3-el1-f0bd8ab3d36b
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
+
