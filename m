@@ -1,51 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BC8258EEF;
-	Sun, 21 Sep 2025 11:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C20260592;
+	Sun, 21 Sep 2025 11:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758452418; cv=none; b=Ijzk0KXlj6x4CTLnpZe2GLsgrkoruOiYogau8TJwHiRs6SrS/Ru1m/D9Y2YQW6+dcScTeCgzG/rQJBBE9lUaiOlemmq9F8XMmIEHdAaha43RGNhbG4uada3LuOjB8MXNhP0uOXx8yDlMpwc2OiIeHLfk3kl2aA6i1VnHwVsOuDQ=
+	t=1758454152; cv=none; b=mOFgybrNu2ZrpSLAF9sl/sFWkYl1Rad0nNs64jVjbbN9XSxRiYEaN9XsAZhClUE3Vo0Th2G7bTd0csll+7eMxobAFpXcpbC4kh7kpXBabdx2pzgqi8aN7fZpy9PqWbImK7S3wyRfWoxjNiXko+uLWLOn4ynn4liUMOzrBVwqFnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758452418; c=relaxed/simple;
-	bh=mcaq5UETXQW68M5Km24IAUwTvGYTX4atFsOueMZbGpQ=;
+	s=arc-20240116; t=1758454152; c=relaxed/simple;
+	bh=TnhBtV7gajUKTHQkLmlYsPEe/PTbeqlRt1FGOsovCI8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cq+NvJD9G95LxBEHTjPPS2bL/o5QKMcYWiCC7IVb58Ajn5VXtr3qZwRvN6AhWQteeAbv9gmwvLPtaqMUlHeP/wF2I30WmAMbF5Z0/1iFlrQ5CT2+BU6D2FLWGE53Grq69rkwScyvgsn6NjHKr06Rxof02fIfmpt2ZSwgr8Un6cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udS1F2yS; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=W/JXYMnulu/hQDxcEf4wwB9Sw7Yz8caZc7cjkrDXgpqGpeKo5GxBwLRkhRK52KigNSXtZYNxumyKDFjBPF5uWRN7gMADE1/9k47NfQJwfq4FMmbJVh6TSm9s/62OX+qb/LidEC/PKTCbgv0zf0UcB+3WUfBMdGcAerUWAE3qKqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kPTb3Y61; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udS1F2yS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 058E1C4CEE7;
-	Sun, 21 Sep 2025 11:00:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kPTb3Y61"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE4CC4CEE7;
+	Sun, 21 Sep 2025 11:29:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758452418;
-	bh=mcaq5UETXQW68M5Km24IAUwTvGYTX4atFsOueMZbGpQ=;
+	s=k20201202; t=1758454151;
+	bh=TnhBtV7gajUKTHQkLmlYsPEe/PTbeqlRt1FGOsovCI8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=udS1F2ySB4D8hkXwlAnHvYzFs1zz9juYY2mg1t4Bcy+yhN/y5aX4eSJ7cpucxJ2bc
-	 Hznv42AbObEd+C1mT5o5y2zay5l0aF7O7HhsJnz+50h3GRKAX1EUrDPWCZC7G9AA1J
-	 Cg/jYG40bRQhECniBPcjrSQF6nxUfPeljMfwQ/Vyc1RChyCo8f/H6G9SsTWdFisVSj
-	 VoV3iu8SsDPbdjAg/IRFFqxXdQSpvlQ+UiTeOaRxY6isjaP+UO454UzII5bOPq4V/a
-	 J21lI0uGTKhw8HNvXbxDuGDWxH8CqadGI67F+A1iL4xemKoSCdQztH+9T31wB9TicV
-	 ouX6UPdtBnS2g==
+	b=kPTb3Y619WykYKRmzfWQRATmeoIv20M6LRcwelGoNTBmnovLE3Gy3rjIO3Lk0XJtq
+	 lPkBppKxAEW5YR2p2/3uKK72t7hEGwXBjq8GuYh/tlU82z0a6BJVXgB1xJwVQpDopX
+	 HGPS2c4dquESbmF5NDz7AbCzHpT2wzFBoVenS32+B9+wF6dpxoYOSNsOOocCFdQqGP
+	 kjSpL5u8x+d1YYv0ANs0h1oV7KW2CFdYkj6vAVY9StDKfVaOHUSZR7bXkFabzMwqFg
+	 hwjMIoSO0xtwFyw5WZbxWY4po1fElGvzhhz1zc6V4lxOBNecGIoRov+tr21LUp81eh
+	 RfQssSV08yHJQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v0Hnj-000000089ti-2vFR;
-	Sun, 21 Sep 2025 11:00:15 +0000
-Date: Sun, 21 Sep 2025 12:00:15 +0100
-Message-ID: <87qzw0xe80.wl-maz@kernel.org>
+	id 1v0IFh-00000008A8W-0wm3;
+	Sun, 21 Sep 2025 11:29:09 +0000
+Date: Sun, 21 Sep 2025 12:29:08 +0100
+Message-ID: <87plbkxcvv.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	qperret@google.com,
+	sebastianene@google.com,
+	keirf@google.com,
 	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 00/16] KVM: arm64: TTW reporting on SEA and 52bit PA in S1 PTW
-In-Reply-To: <aM3bG1fkB4cYslUJ@linux.dev>
-References: <20250915114451.660351-1-maz@kernel.org>
-	<aM3bG1fkB4cYslUJ@linux.dev>
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v2] KVM: arm64: Check range args for pKVM mem transitions
+In-Reply-To: <20250919155056.2648137-1-vdonnefort@google.com>
+References: <20250919155056.2648137-1-vdonnefort@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,48 +63,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, sebastianene@google.com, keirf@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 19 Sep 2025 23:37:15 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, 19 Sep 2025 16:50:56 +0100,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> On Mon, Sep 15, 2025 at 12:44:35PM +0100, Marc Zyngier wrote:
-> > Yes, $SUBJECT rolls off the tongue.
-> > 
-> > This series was triggered by the realisation that when injecting an
-> > SEA while on a S1PTW fault, we don't report the level of the walk and
-> > instead give a bare SEA, which definitely violates the architecture.
-> > 
-> > This state of things dates back to the pre-NV days, when we didn't
-> > have a S1 page table walker, and really didn't want to implement one.
-> > I've since moved on and reluctantly implemented one, which means we
-> > now *could* provide the level if we really wanted to.
-> > 
-> > However, nothing is that simple. The current code in at.c is firmly
-> > 48bit, as our NV implementation doesn't yet support 52bit PA, while an
-> > EL1 VM can happily enjoy LPA and LPA2. As a result, it is necessary to
-> > expand the S1 PTW to support both LPA and LPA2. Joy.
-> > 
-> > Then, once the above is achieved, we need to hook into the PTW
-> > machinery to match the first level of the walk that results in
-> > accessing the faulty address. For this, we introduce a simple filter
-> > mechanism that could be expanded if we needed to (no, please no).
-> > 
-> > Finally, we can plug this into the fault injection path, and enjoy
-> > seeing the translation level being populated in the ESR_ELx register.
-> > 
-> > Patches on top of 6.16-rc4. I intend to take this into 6.18, so shout
-> > if you don't like the idea!
+> There's currently no verification for host issued ranges in most of the
+> pKVM memory transitions. The subsequent end boundary might therefore be
+> subject to overflow and could evade the later checks.
 > 
-> Just some minor gripes, otherwise this LGTM.
+> Close this loophole with an additional check_range_args() check on a per
+> public function basis.
 > 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> host_unshare_guest transition is already protected via
+> __check_host_shared_guest(), while assert_host_shared_guest() callers
+> are already ignoring host checks.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> ---
+> 
+>  v1 -> v2:
+>    - Also check for (nr_pages * PAGE_SIZE) overflow. (Quentin)
+>    - Rename to check_range_args().
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 8957734d6183..65fcd2148f59 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -712,6 +712,14 @@ static int __guest_check_page_state_range(struct pkvm_hyp_vm *vm, u64 addr,
+>  	return check_page_state_range(&vm->pgt, addr, size, &d);
+>  }
+>  
+> +static bool check_range_args(u64 start, u64 nr_pages, u64 *size)
+> +{
+> +	if (check_mul_overflow(nr_pages, PAGE_SIZE, size))
+> +		return false;
+> +
+> +	return start < (start + *size);
 
-Thanks for spending the time reviewing it and spotting some crucial
-mistakes. I've applied your suggestions and pushed out the result,
-which should be in the next -next.
+I will echo Oliver's concern on v1: you probably want to convert the
+boundary check to be inclusive of the end of the range. Otherwise, a
+range that ends at the top of the 64bit range will be represented as
+0, and fail the  check despite being perfectly valid.
+
+That's not a problem for PAs, as we will be stuck with at most 56bit
+PAs for quite a while, but VAs are a different story, and this sort of
+range check should be valid for VAs as well.
+
+Thanks,
 
 	M.
 
