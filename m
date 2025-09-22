@@ -1,212 +1,480 @@
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013061.outbound.protection.outlook.com [52.101.83.61])
+Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9AD2C236C
-	for <kvmarm@lists.linux.dev>; Mon, 22 Sep 2025 14:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.61
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758552620; cv=fail; b=CqfB59x/M1rLappH0/noUJHpVJXsgKSKSO940t2FSWMUhTdCv5nVEfIhoXpcDaQxPmfxZjsz96HssrJWMsEmvnRm/ZE2lJ+3UnAsW5ey/jct5dkAWc2rEAM2sliQSUZu/rMSSQ10EjhPZb7EVlGlPPT2+IAD0PmOnu5F7gRu38A=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758552620; c=relaxed/simple;
-	bh=T2D2LjlmJOKvvLZlHGYU5XoYfnk2pesHJuhiRNDlS4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Uwz9HsLELOfZBsLW7qzyp+hntHqwEht/eSnhV7vuZcplohvysUKkpfzB2dRXivntewhUVTlDrZbox72ZLNl3Pp3RThMuRloXc/9nxRbOd8FS75mFuog6Li6/DeGBzevfxJ2lciVFRC9mb8uaLEK6gWKQspcS33pB9CGSHRgzYOk=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=GtNc0KnB; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=GtNc0KnB; arc=fail smtp.client-ip=52.101.83.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB872F5322
+	for <kvmarm@lists.linux.dev>; Mon, 22 Sep 2025 20:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758572706; cv=none; b=afFOIm5bprhIklHgshDDfIxqAl2dUpkapnqTAkomNRYAHRk5C8Kg5jcXiwUrN89SE0I7g/iZtF6kP1A/xkWdyJUFBVt0iSSRtb1wsvZNdw3pM48rBbutuA15AqY0korGsbErAwbg436l0tfWqd8NRamAT58ZpoklTdJ/PAi5Wyc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758572706; c=relaxed/simple;
+	bh=Sx6cjeuAPMlzsng4URO2TN05GPcjM1qRc0nWPhgjd4A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TIc3rVUDS+FiWZXSZCzWeam3rK96uBoIoj3B7+3eFHFYNX6SJhEI9t9kyKmp28Uhk92sOlcO3cWrkzvH2VnytyoficjkHfoIk/I50hGNAk74qeEpVRADS70UVMA5XMEZtrIF8FJG5tppC5TAcPajeq5xSFsMzv72rNsDUU502YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=PAZt68rk; arc=none smtp.client-ip=52.12.53.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="GtNc0KnB";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="GtNc0KnB"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=vKFM+OIYh1gDopos7o/YaFQ+cWfp5BMtl/JbA3GgEIBdLlfaqLCZ24Y6z67oLe7Q/zI3Rd6iZ28QJqVAxMRRwhyfDHrz48g0VVWjn1HD3x0drRtnkA8+MtlNLC74BU7Fw3+t7yVoFoaDblM/BUC0R5smVJeJqXdOTvvUyi0pxOBKSRT0YJFFCob7nZESipEcjyStRB6dc47mfUx7GLXSQ3Fz7sjUctmghKDHzDmdEFxBs+jb5ieNJ6C0I9ZpVDt8oZRfuMbhKvBLIeoB0BV74v3aoEjLgvQiVl/KBUsffPQNo2uEWFl456m2+NcO9/Czf9E0okhpRk9XuWuQ4zgxhw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ic0EvWBjHYKqWQbDBG71xOwxqm/R1XLX0cgnze0doto=;
- b=Xy79SrBdd7yltmxnQm2KcHcAiXRyb5pDMP5uja7VfYy3bTl56YexgB7IdBlBY3vjIIgsKRZlQfeQ1ulVRFIWthey+CaaRDRkkToBY9PO8lLORz2Yys0fGyaUm2905CauDqVDE3X6lS/i7SvI5UMCDRLaD/7AFe7NfiKRQpM9JyqsbXuetijsH1XvZUQl6J+6GNOfun0e0vBuHs6r/sWykvSPgbnby/+ORMe611Huyl+ZVfdd/SeF4U6f39WxTS6ZMp3dRTudLmZ0JqWiJEnngMtVPU3QOS+RigEoE6DXH/Unvg4z0jq4IgCD6+xhUpfKD5+cjsIsjKw1t4iQWJMBOA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ic0EvWBjHYKqWQbDBG71xOwxqm/R1XLX0cgnze0doto=;
- b=GtNc0KnBhM3jF5e0Tu7YCAoBmhk8xlI3WNhcpuSrgrVArpQiIpQHaWgvr//SpaZIjMLspDxt9MENEVuLweIP5R0X5I/2bNYhzShR5syfarT3zQKoPzuLF07xiCGO55jx/CMTQn7diFEChuJ0K6e1Uxgng6das9HLxDq98hKe/e8=
-Received: from DU7P250CA0003.EURP250.PROD.OUTLOOK.COM (2603:10a6:10:54f::30)
- by PAWPR08MB9783.eurprd08.prod.outlook.com (2603:10a6:102:2ee::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Mon, 22 Sep
- 2025 14:50:12 +0000
-Received: from DB1PEPF000509FF.eurprd03.prod.outlook.com
- (2603:10a6:10:54f:cafe::a7) by DU7P250CA0003.outlook.office365.com
- (2603:10a6:10:54f::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.14 via Frontend Transport; Mon,
- 22 Sep 2025 14:50:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF000509FF.mail.protection.outlook.com (10.167.242.41) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.12
- via Frontend Transport; Mon, 22 Sep 2025 14:50:12 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=i1AJwlJZtqvZWtNqLBgRrCFafrxVozdhEpy0CF3XcSso4RFa71c81phcPHqHitozEQCt0ObH9B3cE//XQl7Xf0rC5YXwOh0Gbue9w4lfiwote/ml5lLh/0IvETT313gqLh/J2v8rx1ZDzXbgsvTtuE0V9xKpfXNwx+rBT6QVKcdEpQtTQ5ycZbM8ZmOn+owOA0ynzikzJOtQW2O32S9UOnaOltyNB2KaxtjBJfK+PTcvT2yScfULbLzAREPzqqomyx7ZeWOxkqaG5Fz8zcp5LDhV29POZaDbpJj3T58lZDn09Koe37ArfD0uyD6mjlWEuLqTdcmit4ttYAj5mRl5Aw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ic0EvWBjHYKqWQbDBG71xOwxqm/R1XLX0cgnze0doto=;
- b=JchaJaFM7BQ6gG12qk6PypAbSo22IJwXX91WyMJ3Km7WjbYDwY/7OYY/Xn9qKV6MkM6A3g0FqawEpkV1sTaqSjWM9gtlp0hiO4KS822j6XCkzVGGBuzxqhnJa7iIwTxx1vcIoa07bHlHczyXTIWUeGKdQWvzTMS+8p3GD5Wj52r8zLhuIN0kVaHBb3wolAMsuiTA1Kbf0E3NjHslT/coBN3Uk7g+RVUSp/ytnEHDq8vacpmEKuMu/6/9t1t2go66lS4I6zAF6t6Y/NEntBk5vELP4bWMOQP47Sip3d5SWfP5b4ZeV/b5FbCndDGhDX11OK1PgtGTljEZErh4Hubytw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ic0EvWBjHYKqWQbDBG71xOwxqm/R1XLX0cgnze0doto=;
- b=GtNc0KnBhM3jF5e0Tu7YCAoBmhk8xlI3WNhcpuSrgrVArpQiIpQHaWgvr//SpaZIjMLspDxt9MENEVuLweIP5R0X5I/2bNYhzShR5syfarT3zQKoPzuLF07xiCGO55jx/CMTQn7diFEChuJ0K6e1Uxgng6das9HLxDq98hKe/e8=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20) by DU4PR08MB11574.eurprd08.prod.outlook.com
- (2603:10a6:10:627::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Mon, 22 Sep
- 2025 14:49:40 +0000
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::d430:4ef9:b30b:c739]) by GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::d430:4ef9:b30b:c739%3]) with mapi id 15.20.9137.018; Mon, 22 Sep 2025
- 14:49:39 +0000
-Date: Mon, 22 Sep 2025 15:49:37 +0100
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, james.morse@arm.com,
-	ardb@kernel.org, scott@os.amperecomputing.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 2/5] KVM: arm64: expose FEAT_LSUI to guest
-Message-ID: <aNFiAZVT+XDCBX4r@e129823.arm.com>
-References: <20250922102244.2068414-1-yeoreum.yun@arm.com>
- <20250922102244.2068414-3-yeoreum.yun@arm.com>
- <aNEkNF8rvb_e9DKd@finisterre.sirena.org.uk>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aNEkNF8rvb_e9DKd@finisterre.sirena.org.uk>
-X-ClientProxiedBy: LO4P265CA0267.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:37c::7) To GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="PAZt68rk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1758572705; x=1790108705;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TKbiOyVBMpKh2bBgW/G0AuyVP7+bWtboi+S5aX+3tTM=;
+  b=PAZt68rks4pahIjArQkH8+aq1CNsKvrbMBiZj9rH9BIA+7eOuzxxmRyh
+   cg6M60jzt5M5LNMVKd+W86O7OTNQ4uQBOcFkjuYfIajdqzD7d+EzeW637
+   cjo/vEuRQ09WAW4iFtoHCdR1LLfi/6mJ75I0SyXubOblcLZqROe2f/uNz
+   uTCM0iT5kbkv4lpQQ0SPXWrzCysdMXXIfkeE7XzCYkUh1KZ3wGutLk6Pv
+   rHmlL7uyCV3ySZb9C2FoCL1lQD5AHmZ/ob7xpps72tPlgz5Wk0MelKeGd
+   LNgxkDkRzH0jFx7/ChfhRcSLaHI4EEy+RP8/15cyOeb6EzZiASIVQYrUd
+   w==;
+X-CSE-ConnectionGUID: LfYNyVMxT/ShDu5KS4Chkg==
+X-CSE-MsgGUID: ZnyBiV3RQKqtvE8B7j9C0Q==
+X-IronPort-AV: E=Sophos;i="6.18,286,1751241600"; 
+   d="scan'208";a="3396962"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 20:25:04 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:45178]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.121:2525] with esmtp (Farcaster)
+ id dc8e568d-8f29-43b0-8f67-dc1f42bfa638; Mon, 22 Sep 2025 20:24:59 +0000 (UTC)
+X-Farcaster-Flow-ID: dc8e568d-8f29-43b0-8f67-dc1f42bfa638
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Mon, 22 Sep 2025 20:24:59 +0000
+Received: from c889f3b3a561.amazon.com (10.106.101.18) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Mon, 22 Sep 2025 20:24:58 +0000
+From: Priscilla Lam <prl@amazon.com>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>, <joey.gouly@arm.com>,
+	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>
+CC: <dwmw@amazon.co.uk>, <gurugubs@amazon.com>, <christoffer.dall@arm.com>,
+	<graf@amazon.com>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] KVM: arm64: Implement KVM_TRANSLATE ioctl for arm64
+Date: Mon, 22 Sep 2025 13:24:52 -0700
+Message-ID: <20250922202452.45810-1-prl@amazon.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	GV1PR08MB10521:EE_|DU4PR08MB11574:EE_|DB1PEPF000509FF:EE_|PAWPR08MB9783:EE_
-X-MS-Office365-Filtering-Correlation-Id: c93f6f21-7514-4d88-7303-08ddf9e7556f
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info-Original:
- =?us-ascii?Q?ldyQjlx3aATMa82QKSaLkZMJSNKrE9Pl/2xp3i1zcsSm68IDpxvsXTo87NKn?=
- =?us-ascii?Q?am8WjwyIfAW0H8Y4IlvX3xn/GF8hyDmtvf+eQ1Be52HLdopJc4Tlr5uNW6l6?=
- =?us-ascii?Q?/Z7OgobqJlLGW+BlrfBmbhePfzkOjQYV+/VFlW+VQBCsAo3E6C83guoDc6vJ?=
- =?us-ascii?Q?k9C+2Caxl+65ju4tTcWeLV0MTFfITUOZIRs6X5QGw8/n2VW3Rk2KhV8N2yVf?=
- =?us-ascii?Q?tEP20RwZSZZWeEZwwBAWvLYLgfNjHjj8rXD6hK/L2+KSWKyqovtbOcFwiv15?=
- =?us-ascii?Q?N2xhfCeARWNnXdUr2QeeB6OMHZDTMDZFNOntCenXo3wxzZuUrF9DZ03k7fJ0?=
- =?us-ascii?Q?UV43heRKRjrzpNtwTWwi40zhn580/mD+sbrUzUNb6J4vzTERCHKpst/0Gl+o?=
- =?us-ascii?Q?GF4KC0DubRU/T4qpIMLs6OPjiPgpoGkdhIv/wMl/7quiWXBmEnrYnXLPzQ/R?=
- =?us-ascii?Q?hIRsGnB4zEBu2MoexppqSpXI1Ms0E7G/ELmjijr2MuXTtXXY2Edplom6LIFl?=
- =?us-ascii?Q?z3LONzAHDIr3nNN/DNIobbuwDMdBKbeVg1/XP1N1YP4pPJVUSpT9CMK5lEUo?=
- =?us-ascii?Q?AEwjwVElLqGE0lRAomJ9pql6i9nPtcZ8m2XyberewQTIU7V3NkJtwGM6yop8?=
- =?us-ascii?Q?raXwg805W48T9RVt4XY+TI/8dgw1V1DPQ/f1Oq8al/ppJKRp4GKFd+DInEwP?=
- =?us-ascii?Q?Tj3vSeD1Vu7etxsXF1+aeQZvfR/GbGsbCKg/2o9DGeCX7Sz9AA2MRBGKzlPW?=
- =?us-ascii?Q?xMoT37w7K7rjgFfM7ZSqq2JdgnZjgTKaaQgGQaF+CH6VWY7f/wYBWhKt54kW?=
- =?us-ascii?Q?QvNwqDdiXf/WmazKAMAkdCN9v2H7BsRs93KrzJe03Vl3QziYeiMF4UTFr1O/?=
- =?us-ascii?Q?HAVwdUAAqFyy0P6UuChBAcTNAPK5rkgA93QflqytsJ1qxSttBLMBuKJojdfu?=
- =?us-ascii?Q?x+Q6rChYQeGiGyy2Vm28gICuyeu61nrQ9EiktopLz4fIJNLNrN3+7SCeUBj0?=
- =?us-ascii?Q?+m2pqQH67RgDslpdUtJIB9vJBLI5esOtjyYxmqAm+Fbf9Pc7/wp7ThuHmad7?=
- =?us-ascii?Q?BqhfV+Wfnl8SZASnc3EovpOCCtNfR3UQIELjdpiS85mpawaA1AwOWGJZKp55?=
- =?us-ascii?Q?1JnPVo8Ir4QdMqlu6SkAZDHwqCBPb5Qw1EENAVFrr2l+seYOKwAK1aewVFew?=
- =?us-ascii?Q?EIJ45Oq+5KppQuGKgYzc8cIq9yhm6j7fMpWcECsvtizIOVJTKXnfYiGibYFB?=
- =?us-ascii?Q?QGOsZmYs9D6v5XV3qwGrftBS9sqVQ1C9K5Uwwa8cGFLoeA6rFCvUN2yHSGUg?=
- =?us-ascii?Q?U85GZ+/A70TzuYGLQypAnAavKSjNNDN7NUMRQqMpwK2JuFmEOJ52VUPk/YM0?=
- =?us-ascii?Q?VDbvZazYg/moqAf5TjLZGT5iE7NvAhNBcKnH0DVVW3Tv71WxfA=3D=3D?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR08MB11574
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF000509FF.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	73df06fe-99a2-43e9-b99f-08ddf9e741ed
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|35042699022|14060799003|376014|7416014|82310400026|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?4u7m4SWKmvLHBhIFfJH3tvP5+h2AqMPpHlTBmzCEXS31mRvtxjl/oQLrB1/Z?=
- =?us-ascii?Q?DqhHNzxaXs8BoFv90qhzsbbF7qgXCcHLxlc636GPAfAcNcZ1sE2YJ1Trbhmk?=
- =?us-ascii?Q?Wgnx4uIF1MbvCI7kg3qijc2q96/vRw1xTZ/mLoI+41kanxvMI3nM3OnOMeC4?=
- =?us-ascii?Q?ttGWMLtqXvFGUReFxqWJYrbeQWeTLJ8HgkCUE8OtIncaQUg7NQ6ul4B8K8pU?=
- =?us-ascii?Q?1ZIGCAd77+2qORxmhHYJt3YVwf5gjt5gb2c5ybzfLw8OKxBMM3x+PZMrFdZ0?=
- =?us-ascii?Q?/VIxC4AxUFwYRASOFQXXWgwDEiix0XpZlUZRS3OQobY8sf16GSCYXt78vkSO?=
- =?us-ascii?Q?J1n1Ae3qo5Ah2xtjOOjHJZt5wVA04t2sYVt2bzGD8TCiMVEqDA+IkS/OAHgn?=
- =?us-ascii?Q?pVI4oy5GRMHRMpiHDYjoA8wJWBRMEBmGWHdpcXhRKsrfm1VVIJsaOVcScrRa?=
- =?us-ascii?Q?DCRJEeYVy1kBn6G9JdYF3WoX5E5ofzc34o4M5XEw01wsFw5qlCWZwr7v9lWb?=
- =?us-ascii?Q?zrzHtRHyN7h72hh85n7Yk0UyXhFPItbI/4mSqxUYz5dc3wsH6ftKG+Q5LfF+?=
- =?us-ascii?Q?ksnb+iSvd9uKjr0B6NZoGH9tSAz5iiUVmedES51NdAY9MLN6134cWY9cKyfu?=
- =?us-ascii?Q?xP3o6+B9slM7eAwoWxcR4qgx5hnF7A2zuyTAqhM2E62L0zUh8HWYLenZbJZy?=
- =?us-ascii?Q?Kf4e/O0fQL2CJ/UHsNCNkyuYy1IIqmlTnLWeGfkRYF9JGXMaEIZo5OlwzRPB?=
- =?us-ascii?Q?2Gd8jI2IR3NXuw3XnA7sWj048McD7uFuI6naGckSOXMByEHJAaX4oM/hyvQN?=
- =?us-ascii?Q?8RDlFH7iiSVOex3tBk7+AECOEIUpdbJc5cfkztZ+tpGgPtuka+7KudmuKUeW?=
- =?us-ascii?Q?GTZpjmqInP5Data+m8I7cxXkR3wkFE/dBvJri3xmmyRwUnaFijVXcHqn7WM7?=
- =?us-ascii?Q?7IPfKtslVsldB09EM9vn4wYgOzn0E6PIJ9oZBcNvjMzwuP22eBW8wAUeiz9T?=
- =?us-ascii?Q?UYGx8VL3BJ6ooGkHH/X7wZv3EYzm3nBV38DdwjqOdiYo0rjKYFIWUZaBtBl3?=
- =?us-ascii?Q?XW5GGTQIBWCHRkQNU8mQlRhVc25sSrbYEWT/Ps3Ukjacp4rlGhlKRkU0Hotu?=
- =?us-ascii?Q?gf3WK+mkpMJgMD0ZD6rEq2RCZ0qeQh+db5e+kBIQMInsnfE1C09t048aNx1o?=
- =?us-ascii?Q?pSwnRLmRzXt6GAS4UwQPF2tV2mIviTkIEFtyxz35AdqFsFTMopjawQQu8uxV?=
- =?us-ascii?Q?vKqeQ0IfkpJABi0+sl9TIu79SGb6NAMS4w0FIE2NXobU/wwM4gW2qNc5wVTF?=
- =?us-ascii?Q?qt+DVYX2l+4yyDvAM7qOQh+ZVc+quMCJVzTb9u5D94tUHYYaivXrOM0kQu8r?=
- =?us-ascii?Q?K9r72tPtrG08b5hWengarLjdDu97j4sfPR2TJ4RBLgaT7TitMr3NxHrvPaYA?=
- =?us-ascii?Q?rnHnlGaMvVrQ5Kskogt+bAOXCHSb41KyPpvbY3Ck7G0Jrg1yVhlkAw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(14060799003)(376014)(7416014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 14:50:12.1645
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c93f6f21-7514-4d88-7303-08ddf9e7556f
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509FF.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB9783
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA003.ant.amazon.com (10.13.139.18) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hi Mark,
+There is a KVM_TRANSLATE ioctl for x86 to translate a GVA
+(guest virtual address) to a GPA (guest physical address) in EL1
+which is not yet implemented for arm64.
 
-[...]
-> >  	case SYS_ID_AA64ISAR3_EL1:
-> > -		val &= ID_AA64ISAR3_EL1_FPRCVT | ID_AA64ISAR3_EL1_FAMINMAX;
-> > +		val &= ID_AA64ISAR3_EL1_FPRCVT | ID_AA64ISAR3_EL1_FAMINMAX |
-> > +		       ID_AA64ISAR3_EL1_LSUI;
->
-> This should be added to set_id_regs, but ID_AA64ISAR3_EL1 isn't covered
-> by that yet.  I posted a series for that the other day:
->
->    https://lore.kernel.org/r/20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org
+Implement KVM_TRANSLATE on arm64 for both configurations that
+support and do not support VHE. The VHE path uses the AT
+instruction directly while the non-VHE implementation wraps the
+AT call in a hypercall to allow for its execution in EL2. Add
+selftest that tests the ioctl in both configurations.
 
-Thank to let me know missing to add kselftest feature for this.
-I'll add it :)
+Signed-off-by: Priscilla Lam <prl@amazon.com>
+---
+ arch/arm64/include/asm/kvm_asm.h              |   2 +
+ arch/arm64/kvm/guest.c                        |  89 ++++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  10 ++
+ arch/arm64/kvm/hyp/nvhe/translate.c           |  84 ++++++++++++++
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ tools/testing/selftests/kvm/arm64/translate.c | 107 ++++++++++++++++++
+ 7 files changed, 292 insertions(+), 4 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/translate.c
+ create mode 100644 tools/testing/selftests/kvm/arm64/translate.c
 
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index bec227f9500a..56ecf4691650 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -87,6 +87,7 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
++	__KVM_HOST_SMCCC_FUNC___kvm_hyp_translate,
+ };
+ 
+ #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+@@ -289,6 +290,7 @@ asmlinkage void __noreturn hyp_panic_bad_stack(void);
+ asmlinkage void kvm_unexpected_el2_exception(void);
+ struct kvm_cpu_context;
+ void handle_trap(struct kvm_cpu_context *host_ctxt);
++extern u64 __kvm_hyp_translate(struct kvm_vcpu *vcpu, u64 gva);
+ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on);
+ void __noreturn __pkvm_init_finalise(void);
+ void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 16ba5e9ac86c..180ea1df66cc 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -23,6 +23,7 @@
+ #include <linux/uaccess.h>
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
++#include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_nested.h>
+ #include <asm/sigcontext.h>
+@@ -932,10 +933,92 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+ 	return -EINVAL;
+ }
+ 
+-int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+-				  struct kvm_translation *tr)
++static inline uint64_t par_to_ipa(uint64_t par, uint64_t va)
+ {
+-	return -EINVAL;
++	uint64_t offset = va & ((1ULL << PAGE_SHIFT) - 1);
++
++	return (par & GENMASK_ULL(51, 12)) | offset;
++}
++
++static int kvm_translate_vhe(struct kvm_vcpu *vcpu, struct kvm_translation *tr)
++{
++	unsigned long flags;
++	uint64_t hcr_old, hcr_new, par;
++	const uint64_t gva = tr->linear_address;
++
++	preempt_disable();
++	local_irq_save(flags);
++
++	/* Ensure we're in the expected VHE regime and enable S2 so PAR returns IPA. */
++	hcr_old = read_sysreg(hcr_el2);
++	hcr_new = hcr_old | HCR_E2H | HCR_VM;
++	hcr_new &= ~HCR_TGE;
++	write_sysreg(hcr_new, hcr_el2);
++	isb();
++
++	/* Load guest EL1 S1 context into *_EL12 (do not write into _EL1). */
++	write_sysreg_s(vcpu_read_sys_reg(vcpu, TTBR0_EL1), SYS_TTBR0_EL12);
++	write_sysreg_s(vcpu_read_sys_reg(vcpu, TTBR1_EL1), SYS_TTBR1_EL12);
++	write_sysreg_s(vcpu_read_sys_reg(vcpu, TCR_EL1), SYS_TCR_EL12);
++	write_sysreg_s(vcpu_read_sys_reg(vcpu, MAIR_EL1), SYS_MAIR_EL12);
++	write_sysreg_s(vcpu_read_sys_reg(vcpu, SCTLR_EL1), SYS_SCTLR_EL12);
++
++	/* Check address read */
++	asm volatile("at s1e1r, %0" :: "r"(gva));
++	isb();
++
++	par = read_sysreg(par_el1);
++	if (!(par & 1)) {
++		tr->valid = true;
++		tr->physical_address = par_to_ipa(par, gva);
++	}
++
++	/* Check address write */
++	asm volatile("at s1e1w, %0" :: "r"(gva));
++	isb();
++
++	par = read_sysreg(par_el1);
++
++	if (!(par & 1)) {
++		tr->valid = true;
++		tr->writeable = true;
++		tr->physical_address = par_to_ipa(par, gva);
++	}
++
++	/* Restore HCR_EL2 and exit */
++	write_sysreg(hcr_old, hcr_el2);
++	isb();
++	local_irq_restore(flags);
++	preempt_enable();
++
++	return 0;
++}
++
++static int kvm_translate_nvhe(struct kvm_vcpu *vcpu, struct kvm_translation *tr)
++{
++	u64 ret;
++
++	preempt_disable();
++	local_irq_disable();
++	ret = kvm_call_hyp_nvhe(__kvm_hyp_translate, vcpu, tr->linear_address);
++	local_irq_enable();
++	preempt_enable();
++
++	/* Unpack result: IPA in bits 63:8, valid in bit 4, writeable in bit 0 */
++	tr->physical_address = ret >> 8;
++	tr->valid = !!(ret & (1ULL << 4));
++	tr->writeable = !!(ret & 1ULL);
++	tr->usermode = 0;
++
++	return 0;
++}
++
++int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu, struct kvm_translation *tr)
++{
++	if (has_vhe())
++		return kvm_translate_vhe(vcpu, tr);
++	else
++		return kvm_translate_nvhe(vcpu, tr);
+ }
+ 
+ /**
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 0b0a68b663d4..bcbd4e5125b1 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -24,7 +24,8 @@ CFLAGS_switch.nvhe.o += -Wno-override-init
+ 
+ hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+ 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
+-	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
++	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o \
++	 translate.o
+ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+ hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 3206b2c07f82..a52cf002822c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -573,6 +573,15 @@ static void handle___pkvm_teardown_vm(struct kvm_cpu_context *host_ctxt)
+ 	cpu_reg(host_ctxt, 1) = __pkvm_teardown_vm(handle);
+ }
+ 
++static void handle___kvm_hyp_translate(struct kvm_cpu_context *host_ctxt)
++{
++	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 1);
++	DECLARE_REG(u64, gva, host_ctxt, 2);
++
++	host_vcpu = kern_hyp_va(host_vcpu);
++	cpu_reg(host_ctxt, 1) = __kvm_hyp_translate(host_vcpu, gva);
++}
++
+ typedef void (*hcall_t)(struct kvm_cpu_context *);
+ 
+ #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
+@@ -612,6 +621,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__pkvm_vcpu_load),
+ 	HANDLE_FUNC(__pkvm_vcpu_put),
+ 	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
++	HANDLE_FUNC(__kvm_hyp_translate),
+ };
+ 
+ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+diff --git a/arch/arm64/kvm/hyp/nvhe/translate.c b/arch/arm64/kvm/hyp/nvhe/translate.c
+new file mode 100644
+index 000000000000..239a095a015d
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/translate.c
+@@ -0,0 +1,84 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright 2025 Amazon.com, Inc. or its affiliates. All rights reserved.
++ * Author: Priscilla Lam <prl@amazon.com>
++ */
++
++#include <asm/sysreg.h>
++#include <hyp/sysreg-sr.h>
++#include <nvhe/mem_protect.h>
++
++static __always_inline u64 par_to_ipa(u64 par, u64 va)
++{
++	u64 offset = va & ((1ULL << PAGE_SHIFT) - 1);
++
++	return (par & GENMASK_ULL(51, 12)) | offset;
++}
++
++/**
++ * __kvm_hyp_translate - hypercall that translates a GVA to GPA when VHE is not enabled or available
++ * @vcpu: the vCPU pointer
++ * @gva: the guest virtual address
++ *
++ * This returns the result in a packed integer. The GPA if successful will be in bits 63:8, the
++ * validity in bit 4, and if the address is writeable in bit 0.
++ */
++u64 __kvm_hyp_translate(struct kvm_vcpu *vcpu, u64 gva)
++{
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_cpu_context *guest_ctxt;
++	struct kvm_s2_mmu *mmu;
++
++	u64 hcr_old = read_sysreg(hcr_el2);
++	u64 par = 0;
++	u64 gpa = 0;
++	bool valid = false;
++	bool writeable = false;
++
++	host_ctxt = host_data_ptr(host_ctxt);
++	host_ctxt->__hyp_running_vcpu = vcpu;
++	guest_ctxt = &vcpu->arch.ctxt;
++
++	__sysreg_save_state_nvhe(host_ctxt);
++	__debug_save_host_buffers_nvhe(vcpu);
++
++	dsb(nsh);
++
++	__sysreg_restore_state_nvhe(guest_ctxt);
++
++	mmu = kern_hyp_va(vcpu->arch.hw_mmu);
++	__load_stage2(mmu, kern_hyp_va(mmu->arch));
++
++	write_sysreg((hcr_old | HCR_E2H | HCR_VM) & ~HCR_TGE, hcr_el2);
++	isb();
++
++	asm volatile("at s1e1r, %0" :: "r"(gva));
++	isb();
++
++	par = read_sysreg(par_el1);
++
++	if (!(par & 1)) {
++		gpa = par_to_ipa(par, gva);
++		valid = true;
++	}
++
++	if (valid) {
++		asm volatile("at s1e1w, %0" :: "r"(gva));
++		isb();
++
++		par = read_sysreg(par_el1);
++		if (!(par & 1))
++			writeable = true;
++	}
++
++	write_sysreg(hcr_old, hcr_el2);
++	isb();
++
++	__load_host_stage2();
++	__sysreg_restore_state_nvhe(host_ctxt);
++	__debug_restore_host_buffers_nvhe(vcpu);
++	host_ctxt->__hyp_running_vcpu = NULL;
++
++	// Pack result: GPA in bits 63:8, valid in bit 4, writeable in bit 0
++	return (gpa << 8) | (valid ? (1ULL << 4) : 0) | (writeable ? 1ULL : 0);
++}
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 41b40c676d7f..894b1b888ce4 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -163,6 +163,7 @@ TEST_GEN_PROGS_arm64 += arm64/page_fault_test
+ TEST_GEN_PROGS_arm64 += arm64/psci_test
+ TEST_GEN_PROGS_arm64 += arm64/set_id_regs
+ TEST_GEN_PROGS_arm64 += arm64/smccc_filter
++TEST_GEN_PROGS_arm64 += arm64/translate
+ TEST_GEN_PROGS_arm64 += arm64/vcpu_width_config
+ TEST_GEN_PROGS_arm64 += arm64/vgic_init
+ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+diff --git a/tools/testing/selftests/kvm/arm64/translate.c b/tools/testing/selftests/kvm/arm64/translate.c
+new file mode 100644
+index 000000000000..5cdc975ae52a
+--- /dev/null
++++ b/tools/testing/selftests/kvm/arm64/translate.c
+@@ -0,0 +1,107 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * translate: Test the KVM_TRANSLATE ioctl on AArch64 by setting up
++ * guest page table mappings and verifying that the ioctl correctly
++ * translates guest virtual addresses to guest physical addresses.
++ */
++
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++
++#define GUEST_TEST_GVA1		0x400000
++#define GUEST_TEST_GVA2		0x500000
++#define GUEST_UNMAPPED_GVA	0x600000
++
++/* AArch64 page table entry flags */
++#define PTE_RDONLY		(1ULL << 7)	/* AP[2] - Read-only */
++
++static void guest_code(void)
++{
++	GUEST_DONE();
++}
++
++/*
++ * Create a read-only page mapping by first creating a normal mapping
++ * and then modifying the PTE to add the read-only flag.
++ */
++static void virt_pg_map_readonly(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
++{
++	uint64_t *ptep;
++
++	/* First create a normal read-write mapping */
++	virt_pg_map(vm, vaddr, paddr);
++
++	/* Now find the PTE and modify it to be read-only */
++	ptep = virt_get_pte_hva(vm, vaddr);
++	TEST_ASSERT(ptep, "Failed to get PTE for GVA 0x%lx", vaddr);
++
++	/* Set the read-only bit in the PTE */
++	*ptep |= PTE_RDONLY;
++}
++
++int main(void)
++{
++	struct kvm_translation tr;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	vm_vaddr_t gva1, gva2;
++	vm_paddr_t gpa1, gpa2;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	/* Set up two different GVA to GPA mappings with different permissions. */
++	gva1 = GUEST_TEST_GVA1;
++	gpa1 = vm_phy_page_alloc(vm, vm->page_size, vm->memslots[MEM_REGION_TEST_DATA]);
++	printf("Allocated GPA1: 0x%lx for GVA1: 0x%lx\n", (unsigned long)gpa1, (unsigned long)gva1);
++	virt_pg_map(vm, gva1, gpa1);  /* Read-write mapping */
++
++	gva2 = GUEST_TEST_GVA2;
++	gpa2 = vm_phy_page_alloc(vm, vm->page_size, vm->memslots[MEM_REGION_TEST_DATA]);
++	printf("Allocated GPA2: 0x%lx for GVA2: 0x%lx\n", (unsigned long)gpa2, (unsigned long)gva2);
++	virt_pg_map_readonly(vm, gva2, gpa2);  /* Read-only mapping */
++
++	/*
++	 * The vCPU must be run at least once to initialize the system
++	 * registers needed for guest address translation.
++	 */
++	vcpu_run(vcpu);
++	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++
++	/* Verify the first mapping (read-write) translates correctly. */
++	memset(&tr, 0, sizeof(tr));
++	tr.linear_address = gva1;
++	vcpu_ioctl(vcpu, KVM_TRANSLATE, &tr);
++
++	printf("RW mapping: GVA=0x%lx -> GPA=0x%llx, valid=%d, writeable=%d\n",
++	       (unsigned long)gva1, (unsigned long long)tr.physical_address,
++	       tr.valid, tr.writeable);
++	TEST_ASSERT(tr.valid, "Translation should succeed for mapped GVA");
++	TEST_ASSERT_EQ(tr.physical_address, gpa1);
++	TEST_ASSERT(tr.writeable, "Read-write GVA should be writeable");
++
++	/* Verify the second mapping (read-only) translates correctly. */
++	memset(&tr, 0, sizeof(tr));
++	tr.linear_address = gva2;
++	vcpu_ioctl(vcpu, KVM_TRANSLATE, &tr);
++
++	printf("RO mapping: GVA=0x%lx -> GPA=0x%llx, valid=%d, writeable=%d\n",
++	       (unsigned long)gva2, (unsigned long long)tr.physical_address,
++	       tr.valid, tr.writeable);
++	TEST_ASSERT(tr.valid, "Translation should succeed for mapped GVA");
++	TEST_ASSERT_EQ(tr.physical_address, gpa2);
++	TEST_ASSERT(!tr.writeable, "Read-only GVA should not be writeable");
++
++	/* Verify that an unmapped GVA is reported as invalid. */
++	memset(&tr, 0, sizeof(tr));
++	tr.linear_address = GUEST_UNMAPPED_GVA;
++	vcpu_ioctl(vcpu, KVM_TRANSLATE, &tr);
++
++	printf("Unmapped: GVA=0x%lx -> GPA=0x%llx, valid=%d, writeable=%d\n",
++	       (unsigned long)GUEST_UNMAPPED_GVA, (unsigned long long)tr.physical_address,
++	       tr.valid, tr.writeable);
++	TEST_ASSERT(!tr.valid, "Translation should fail for unmapped GVA");
++
++	kvm_vm_free(vm);
++	return 0;
++}
+-- 
+2.43.0
 
---
-Sincerely,
-Yeoreum Yun
