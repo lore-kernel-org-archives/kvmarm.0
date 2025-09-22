@@ -1,74 +1,42 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32890221F15
-	for <kvmarm@lists.linux.dev>; Mon, 22 Sep 2025 21:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67AB27A906
+	for <kvmarm@lists.linux.dev>; Mon, 22 Sep 2025 23:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758574815; cv=none; b=jTrwwzc+dxvvWewnPGS/XTKdSjHn5MwTfZ3UPTKMhuKeCXsL92sZnudopSWT1Fbsqhfuzwy7Ft17rrUGmrf38FGgc0j7XYYRLZaOEqbHdfs+hR2To5vcAUDwJUBAcX8gkA2qTt7iClN3mXCtokWlqZ7ha4dIYtnVZaigx/T+HMs=
+	t=1758583648; cv=none; b=gCWnu2fehJzPaVw3ME4cBQ0HIe/JpPnpS/EpOxiu91SmgP8YOTZeuLi+QEu6QMhi2wDkyK011kdBQvGnsj0C58bwSyLMI21SganzAAUQX+mUG0McWlI1PjmkMHD8ecd7m6Yz0ld8atspv5VVUkCFhx9lItTUCTD9tZgYRW31+es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758574815; c=relaxed/simple;
-	bh=AggCKAT/ai9pPMS+uvkc8gHc61NeqPEoUM5TIXFt0jE=;
+	s=arc-20240116; t=1758583648; c=relaxed/simple;
+	bh=ZXX+CFA0G/zoD33DMEjaMH/vL172/ljPCfyp5hx8hHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k3IKAxDiaJCOW3n+PZFGjVZjxm9bXYbPsBXdMoGHZXEMthlfNOAzBUpFnKKHMevaIOxm9YmLLZgyKUpvFfcAmMezAgovJPdm0NyII+mcRGVxwP8w9h2/1tfPxOV/7hqKohxKqSvf5g4NIM9R9EJhpKPrEtSc+PirdfmuRy4JlQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zrRzt+Fd; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=oHqxeyOexDlNpMyKxvuZAVdxiEVEtIXmyJnr4UYWIhIQ0chwXt5Xy75+aagMSqREyzs6liTVntP7LZkmCqqzx9a9PO9aO1MsoqydlCYpge2lr4F2UEZfJoljKOaK+A+LOJq8r2WT9O7GjSQWzmgxY8pA/PraPCAx8Sa6c6Qngiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=L2GvIUii; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zrRzt+Fd"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-46c889b310dso18652745e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 22 Sep 2025 14:00:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758574811; x=1759179611; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZr0hPhFAud0Uw+aBiZrTvnM6zeOzyc8u94gFH2jTwA=;
-        b=zrRzt+FdwsDl3CYACT2mS6NStwNJJ15juBKNIqYTfVe/3jPRF5CPfO0p04X2ZVPEHM
-         j6bj5t3i10EC8U/xNygDbTaPGNh0GVAd4zhrdu9dBGZj3r2jXjhdiJ1D0hr9O22eTQqh
-         V50iKO6NM5cb9Mc4QcIDGDuwykS/q3ZVSgJm29XgiYdhWoiPuXNgoazJNv0z93odnBEz
-         76eALrAdgsqK6iBj2u+nCHJXQyw8Q3aHKuAS1XmW3QGZC57Lp35Jch701wJn90mJbvuT
-         73ctFobINQdA/B01uBt9eyR/75fymx0MTi0MLPUy6OOrH3/x2E+Of2nSxgT2iwO2furR
-         M0FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758574811; x=1759179611;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tZr0hPhFAud0Uw+aBiZrTvnM6zeOzyc8u94gFH2jTwA=;
-        b=do1sKwh3QFOIm9G0eZSGTfQbbPhh9C5YnANzWKvh2z56iNcht0WwFN7zLtiAN4wqg6
-         jXuGbqp+eVYFghnKh+xsClpqw4iGDnbTaSzgWkh24Rxy2qPCfwNqwR9l9nGfWlwtKg0V
-         cXS9ecl3Syjel1P45dX0mWohChQsG6JVhpHaHb5Q31y8E4BLLu+bCO0nVNs+/Zj8wShy
-         JvMnRHjbxwy67fbZKXRiEsmIU4MMIz5Nsilk8H5VqQVaA7ybW99sTFhOKyyZnemInwtI
-         1zNPQqHNFOOugkSftEmhoJZ56iChZGldJvdYIPYx0g+TWbypRF/Hql51Vsl4PH+Yag4B
-         qTFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXdxcp5WVbw+nVd064wB/5mdIMLfh+x5saFQX6nS+FERjIMoHoXLYtw3tEllHSUznXhE/eBddw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyCkF2JW/QQJliS9D4D46w6+JtMhYgfsHvnvSLyTeyPnG5zrg8Q
-	q8hxS9W1DrV0s2I7kObhmm84DRgfKEn0fef8aOBwgRj3rHs5+Lp/sZ7mOVgMGzBalA==
-X-Gm-Gg: ASbGncvwZXftsFWKfVjg4q0rDUosywWEK0Nw9c6/5yc9JAGUGRBM2S3C7Pr9gRMWzRt
-	2pcpYllnmsSz73ipK4VPXpfQfIS8Noht8Fo0zri8PhsPmJjT+L/joE/vjr+cMKO4iUmH0m8WPQC
-	mtBk+x/YvZTNXTFtv+M0CZ+x8bSJTyVaq3ZPv1jabiASQs5FyNdyJe1Ye2NOgmUQCx9ACPqPRyy
-	hxs6f299W0epkx25iKevuQyBGqqwPf1RfTVXRN/ZO8wC9TuW9duxv1JQr6K++XK4Tua8b6NkCjM
-	/yYxKYp00/cf/0PG0/Mj9fiNnysJqswSSoq1nDM3zgBFv5I53KCy7Y0eWHBhrI4U9AYVCkU0Wyx
-	6bJY6CaVaAVkKZAGmB1Vhf1YPMaOTfmXtlNcEmESH98EeFe0dTReb6jw4ffc4lE3Z7A==
-X-Google-Smtp-Source: AGHT+IGQQ4kfiQOVTFeyQzQt2jYtkM5/eyZicm9Wu0N0OnLEQ0zchv5LfIGa+8+xPV9iHI+UIbvczw==
-X-Received: by 2002:a05:600c:8287:b0:46d:34cc:e9c1 with SMTP id 5b1f17b1804b1-46e1e0f7c74mr978165e9.4.1758574811415;
-        Mon, 22 Sep 2025 14:00:11 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e1bc00695sm14039935e9.4.2025.09.22.14.00.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 14:00:11 -0700 (PDT)
-Date: Mon, 22 Sep 2025 22:00:07 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	qperret@google.com, sebastianene@google.com, keirf@google.com,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="L2GvIUii"
+Date: Mon, 22 Sep 2025 16:27:14 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758583644;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Dq7+iioGGBjdY4sZUiiwAdtrKxyUAcd9xWPR2FHx19w=;
+	b=L2GvIUiiyYrNMbg/rAqi2PZY32HhmJC1v8/9oNKOpk0DSAxUJSxTSE5F/EiqZfPx4CpGmh
+	bl0OxUFnk/j4FYgOmLza+Znwlrh0zg1DjJN5firsACIogIVIu1CTxTC1d322T7mC/krIOI
+	ChBHzIZcP7FoSBkjhM/EkTC97tUUGQE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Priscilla Lam <prl@amazon.com>
+Cc: maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, dwmw@amazon.co.uk, gurugubs@amazon.com,
+	christoffer.dall@arm.com, graf@amazon.com,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH v2] KVM: arm64: Check range args for pKVM mem transitions
-Message-ID: <aNG417MneSKBxyn8@google.com>
-References: <20250919155056.2648137-1-vdonnefort@google.com>
- <87plbkxcvv.wl-maz@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Implement KVM_TRANSLATE ioctl for arm64
+Message-ID: <aNHbUqTi4nOK_w5I@linux.dev>
+References: <20250922202452.45810-1-prl@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -77,66 +45,119 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87plbkxcvv.wl-maz@kernel.org>
+In-Reply-To: <20250922202452.45810-1-prl@amazon.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Sun, Sep 21, 2025 at 12:29:08PM +0100, Marc Zyngier wrote:
-> On Fri, 19 Sep 2025 16:50:56 +0100,
-> Vincent Donnefort <vdonnefort@google.com> wrote:
-> > 
-> > There's currently no verification for host issued ranges in most of the
-> > pKVM memory transitions. The subsequent end boundary might therefore be
-> > subject to overflow and could evade the later checks.
-> > 
-> > Close this loophole with an additional check_range_args() check on a per
-> > public function basis.
-> > 
-> > host_unshare_guest transition is already protected via
-> > __check_host_shared_guest(), while assert_host_shared_guest() callers
-> > are already ignoring host checks.
-> > 
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > 
-> > ---
-> > 
-> >  v1 -> v2:
-> >    - Also check for (nr_pages * PAGE_SIZE) overflow. (Quentin)
-> >    - Rename to check_range_args().
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index 8957734d6183..65fcd2148f59 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -712,6 +712,14 @@ static int __guest_check_page_state_range(struct pkvm_hyp_vm *vm, u64 addr,
-> >  	return check_page_state_range(&vm->pgt, addr, size, &d);
-> >  }
-> >  
-> > +static bool check_range_args(u64 start, u64 nr_pages, u64 *size)
-> > +{
-> > +	if (check_mul_overflow(nr_pages, PAGE_SIZE, size))
-> > +		return false;
-> > +
-> > +	return start < (start + *size);
-> 
-> I will echo Oliver's concern on v1: you probably want to convert the
-> boundary check to be inclusive of the end of the range. Otherwise, a
-> range that ends at the top of the 64bit range will be represented as
-> 0, and fail the  check despite being perfectly valid.
+Hi Priscilla,
 
-Do you mean allowing something like start == 0xfffffffffffff000 and size ==
-4096?
+On Mon, Sep 22, 2025 at 01:24:52PM -0700, Priscilla Lam wrote:
+> There is a KVM_TRANSLATE ioctl for x86 to translate a GVA
+> (guest virtual address) to a GPA (guest physical address) in EL1
+> which is not yet implemented for arm64.
+> 
+> Implement KVM_TRANSLATE on arm64 for both configurations that
+> support and do not support VHE. The VHE path uses the AT
+> instruction directly while the non-VHE implementation wraps the
+> AT call in a hypercall to allow for its execution in EL2. Add
+> selftest that tests the ioctl in both configurations.
+> 
+> Signed-off-by: Priscilla Lam <prl@amazon.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h              |   2 +
+>  arch/arm64/kvm/guest.c                        |  89 ++++++++++++++-
+>  arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  10 ++
+>  arch/arm64/kvm/hyp/nvhe/translate.c           |  84 ++++++++++++++
+>  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+>  tools/testing/selftests/kvm/arm64/translate.c | 107 ++++++++++++++++++
 
-But I guess that would still put all the following checks using "addr + size" at
-risk. Also, I believe even the code in pgtable.c wouldn't support a such range
-as it is also using a u64 end boundary.
+Please do selftests changes in a separate patch.
 
-> 
-> That's not a problem for PAs, as we will be stuck with at most 56bit
-> PAs for quite a while, but VAs are a different story, and this sort of
-> range check should be valid for VAs as well.
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Jazz isn't dead. It just smells funny.
+> +static int kvm_translate_vhe(struct kvm_vcpu *vcpu, struct kvm_translation *tr)
+
+So arch/arm64/kvm/at.c exists for this exact purpose: walking guest page
+tables. While it was previously constrained to handling NV-enabled VMs,
+Marc's SEA TTW series opens up the stage-1 walker for general use.
+
+I am not keen on adding yet another page-table walker implementation for
+the sole purpose of servicing this ioctl.
+
+https://lore.kernel.org/kvmarm/175845226586.1792635.11249464012956393475.b4-ty@kernel.org
+
+> +{
+> +	unsigned long flags;
+> +	uint64_t hcr_old, hcr_new, par;
+> +	const uint64_t gva = tr->linear_address;
+
+"linear_address" is a delightful x86-ism. I'd prefer naming that was
+either architecture-generic -or- an arm64-specific struct that used our
+architectural terms.
+
+> +	preempt_disable();
+> +	local_irq_save(flags);
+> +
+> +	/* Ensure we're in the expected VHE regime and enable S2 so PAR returns IPA. */
+> +	hcr_old = read_sysreg(hcr_el2);
+> +	hcr_new = hcr_old | HCR_E2H | HCR_VM;
+> +	hcr_new &= ~HCR_TGE;
+> +	write_sysreg(hcr_new, hcr_el2);
+> +	isb();
+
+Thanks to borken hardware, this needs to go through the write_sysreg_hcr()
+accessor.
+
+> +
+> +	/* Load guest EL1 S1 context into *_EL12 (do not write into _EL1). */
+> +	write_sysreg_s(vcpu_read_sys_reg(vcpu, TTBR0_EL1), SYS_TTBR0_EL12);
+> +	write_sysreg_s(vcpu_read_sys_reg(vcpu, TTBR1_EL1), SYS_TTBR1_EL12);
+> +	write_sysreg_s(vcpu_read_sys_reg(vcpu, TCR_EL1), SYS_TCR_EL12);
+> +	write_sysreg_s(vcpu_read_sys_reg(vcpu, MAIR_EL1), SYS_MAIR_EL12);
+> +	write_sysreg_s(vcpu_read_sys_reg(vcpu, SCTLR_EL1), SYS_SCTLR_EL12);
+
+KVM supports both FEAT_S1PIE and FEAT_S1POE, so this is not a complete
+MMU context.
+
+> +	/* Check address read */
+> +	asm volatile("at s1e1r, %0" :: "r"(gva));
+> +	isb();
+
+The AT instruction can generate an exception, which is why __kvm_at()
+exists.
+
+And this is where reusing the existing translation infrastructure is
+really important. The AT instruction *will* fail if the stage-1
+translation tables are unmapped at stage-2. The only option at that
+point is falling back to a software table walker that potentially faults
+in the missing translation tables.
+
+> +
+> +	par = read_sysreg(par_el1);
+> +	if (!(par & 1)) {
+> +		tr->valid = true;
+> +		tr->physical_address = par_to_ipa(par, gva);
+
+What about permissions besides RW?
+
+> +int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu, struct kvm_translation *tr)
+> +{
+> +	if (has_vhe())
+> +		return kvm_translate_vhe(vcpu, tr);
+> +	else
+> +		return kvm_translate_nvhe(vcpu, tr);
+>  }
+
+Yet another interesting consideration around this entire infrastructure
+is the guest's view of the translation that the VMM will now use. KVM uses a
+pseudo-TLB for the guest's VNCR page and maintains it just like a literal
+TLB.
+
+How would the guest invalidate the translation fetched by the VMM when
+unmapping/remapping the VA? Doesn't the stage-1 PTW need to set the
+Access flag as this amounts to a TLB fill?
+
+Understanding what it is you're trying to accomplish would be quite
+helpful. I'm concerned this trivializes some of the gory details of
+participating in the guest's virtual memory.
+
+Thanks,
+Oliver
