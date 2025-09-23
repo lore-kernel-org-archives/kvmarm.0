@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D464A2949E0
-	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 17:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B4F29C351
+	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 17:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758649766; cv=none; b=APinjv4QbX//3bNgrkSbxTChoMZApfZv/GhyinAVEgb6uEAhywfqE5VIBgCWaAMPhs2rUNw/0BbHh1L098rhncvnHqSPLCqg0GnadjjQ/FSXeV+l1mLOme/Wm7ORTNMjYa53uCy/ho5+S9pQQ12FXEQlzS2+4qZTPbsVe1rQ0O4=
+	t=1758649770; cv=none; b=NQYczrddGXu9S2hlsVjVU+bQ9aSY5aPpwbQN6GSNoSxKjogWUFOAZoi+CeHEnwPC+DoQ1ovfpZpVV/dzUOHhEi4JvhuojIywxblj5f6IyFpOBEQOcG3CY0j1SBtOGEoj2uaxEaJu28Y4JHCW1Fh8F/5sM8OIbXlNilURiR/NNzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758649766; c=relaxed/simple;
-	bh=Jf411jvxYLsqPZur/yDlu4YD6Al+gJMzr3Rj3+S6nac=;
+	s=arc-20240116; t=1758649770; c=relaxed/simple;
+	bh=xtIsC31tIAtKKB8qHnYm4xT7iB6zAT90RzN5yj2qix8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k4p6IHDjOO4hGFowkVtFo5YFoIg2JG6zOv1A0SMuYxRhmeqnJkWGByW6WhE17ngkqxgVSUN+qTXO0yzlHrsx9gSDBPavvCHWuIqXgOGFSdsyHWB0Wc4NGj0Z7lIPxHQU6sRMca+d5nbfMADYtorSsG2yHhltmbXcx47bNtPR6Xo=
+	 MIME-Version; b=AIgDa7BOsNhSCGjXOBVio5fUI96vaAgtnOCdJryGN33QGi/e0m1F39ApEd6i5R6sZN8npg95QmIosn0j1Jh4BZnNJ3FlQYkhzJyscWRerQsKbTom3NPDTypnZO2TA+YdASAYrfhjsWyYZrs8Q2wkHcgqKuY0+nMC8XnDi9QW/5g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EEBD7267F;
-	Tue, 23 Sep 2025 10:49:15 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D92C0497;
+	Tue, 23 Sep 2025 10:49:19 -0700 (PDT)
 Received: from e137867.cambridge.arm.com (e137867.arm.com [10.1.30.204])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 67B913F5A1;
-	Tue, 23 Sep 2025 10:49:20 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6F0BD3F5A1;
+	Tue, 23 Sep 2025 10:49:24 -0700 (PDT)
 From: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -38,9 +38,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	kasan-dev@googlegroups.com,
 	Mark Rutland <mark.rutland@arm.com>,
 	Ada Couprie Diaz <ada.coupriediaz@arm.com>
-Subject: [RFC PATCH 02/16] arm64: kasan: make kasan_hw_tags_enable() callback safe
-Date: Tue, 23 Sep 2025 18:48:49 +0100
-Message-ID: <20250923174903.76283-3-ada.coupriediaz@arm.com>
+Subject: [RFC PATCH 03/16] arm64/insn: always inline aarch64_insn_decode_register()
+Date: Tue, 23 Sep 2025 18:48:50 +0100
+Message-ID: <20250923174903.76283-4-ada.coupriediaz@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250923174903.76283-1-ada.coupriediaz@arm.com>
 References: <20250923174903.76283-1-ada.coupriediaz@arm.com>
@@ -52,43 +52,108 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Alternative callback functions are regular functions, which means they
-or any function they call could get patched or instrumented
-by alternatives or other parts of the kernel.
-Given that applying alternatives does not guarantee a consistent state
-while patching, only once done, and handles cache maintenance manually,
-it could lead to nasty corruptions and execution of bogus code.
+As it is always called with an explicit register type, we can
+check for its validity at compile time and remove the runtime error print.
 
-Make `kasan_hw_tags_enable()` safe by preventing its instrumentation.
-This is possible thanks to a previous commit making
-`kasan_hw_tags_enabled()` always inlined, preventing any instrumentation
-in the callback.
-
-As `kasan_hw_tags_enable()` is already marked as `__init`,
-which has its own text section conflicting with the `noinstr` one,
-use `__no_instr_section(".noinstr.text")` to add
-all the function attributes added by `noinstr`, without the section
-conflict.
-This can be an issue, as kprobes seems to only block the text sections,
-not based on function attributes.
+This makes `aarch64_insn_decode_register()` self-contained and safe
+for inlining and usage from patching callbacks.
 
 Signed-off-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 ---
- arch/arm64/kernel/mte.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/insn.h | 32 ++++++++++++++++++++++++++++++--
+ arch/arm64/lib/insn.c         | 29 -----------------------------
+ 2 files changed, 30 insertions(+), 31 deletions(-)
 
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index e5e773844889..a525c1d0c26d 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -239,6 +239,7 @@ static void mte_update_gcr_excl(struct task_struct *task)
- void __init kasan_hw_tags_enable(struct alt_instr *alt, __le32 *origptr,
- 				 __le32 *updptr, int nr_inst);
+diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
+index 18c7811774d3..f6bce1a62dda 100644
+--- a/arch/arm64/include/asm/insn.h
++++ b/arch/arm64/include/asm/insn.h
+@@ -7,6 +7,7 @@
+  */
+ #ifndef	__ASM_INSN_H
+ #define	__ASM_INSN_H
++#include <linux/bits.h>
+ #include <linux/build_bug.h>
+ #include <linux/types.h>
  
-+__noinstr_section(".init.text")
- void __init kasan_hw_tags_enable(struct alt_instr *alt, __le32 *origptr,
- 				 __le32 *updptr, int nr_inst)
- {
+@@ -558,8 +559,35 @@ enum aarch64_insn_encoding_class aarch64_get_insn_class(u32 insn);
+ u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn);
+ u32 aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
+ 				  u32 insn, u64 imm);
+-u32 aarch64_insn_decode_register(enum aarch64_insn_register_type type,
+-					 u32 insn);
++static __always_inline u32 aarch64_insn_decode_register(
++				 enum aarch64_insn_register_type type, u32 insn)
++{
++	compiletime_assert(type >= AARCH64_INSN_REGTYPE_RT &&
++		type <= AARCH64_INSN_REGTYPE_RS, "unknown register type encoding");
++	int shift;
++
++	switch (type) {
++	case AARCH64_INSN_REGTYPE_RT:
++	case AARCH64_INSN_REGTYPE_RD:
++		shift = 0;
++		break;
++	case AARCH64_INSN_REGTYPE_RN:
++		shift = 5;
++		break;
++	case AARCH64_INSN_REGTYPE_RT2:
++	case AARCH64_INSN_REGTYPE_RA:
++		shift = 10;
++		break;
++	case AARCH64_INSN_REGTYPE_RM:
++	case AARCH64_INSN_REGTYPE_RS:
++		shift = 16;
++		break;
++	default:
++		return 0;
++	}
++
++	return (insn >> shift) & GENMASK(4, 0);
++}
+ u32 aarch64_insn_gen_branch_imm(unsigned long pc, unsigned long addr,
+ 				enum aarch64_insn_branch_type type);
+ u32 aarch64_insn_gen_comp_branch_imm(unsigned long pc, unsigned long addr,
+diff --git a/arch/arm64/lib/insn.c b/arch/arm64/lib/insn.c
+index 4e298baddc2e..0fac78e542cf 100644
+--- a/arch/arm64/lib/insn.c
++++ b/arch/arm64/lib/insn.c
+@@ -144,35 +144,6 @@ u32 __kprobes aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
+ 	return insn;
+ }
+ 
+-u32 aarch64_insn_decode_register(enum aarch64_insn_register_type type,
+-					u32 insn)
+-{
+-	int shift;
+-
+-	switch (type) {
+-	case AARCH64_INSN_REGTYPE_RT:
+-	case AARCH64_INSN_REGTYPE_RD:
+-		shift = 0;
+-		break;
+-	case AARCH64_INSN_REGTYPE_RN:
+-		shift = 5;
+-		break;
+-	case AARCH64_INSN_REGTYPE_RT2:
+-	case AARCH64_INSN_REGTYPE_RA:
+-		shift = 10;
+-		break;
+-	case AARCH64_INSN_REGTYPE_RM:
+-		shift = 16;
+-		break;
+-	default:
+-		pr_err("%s: unknown register type encoding %d\n", __func__,
+-		       type);
+-		return 0;
+-	}
+-
+-	return (insn >> shift) & GENMASK(4, 0);
+-}
+-
+ static u32 aarch64_insn_encode_register(enum aarch64_insn_register_type type,
+ 					u32 insn,
+ 					enum aarch64_insn_register reg)
 -- 
 2.43.0
 
