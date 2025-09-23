@@ -1,104 +1,110 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73CB627A446
-	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 17:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64140189
+	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 17:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758648622; cv=none; b=RD5e+Hxva36T9pDH2LaYl6rkzbx9hSnmLBovyiIRLWDqLt/9Dq73BMT1y3mHgY8+m2Bo7IwdPjbEcKmPMZ0XXJ1iRAnsMx3+f94KUDLUY485vAA4D8fTrgO2BdP/xZsLgNc/tBj9O7mmeLFbRSC7j1/zujLkbJroiayW431QdRo=
+	t=1758649534; cv=none; b=Y6LBXRZQx+4CrFA6mVxW+sA8PurMPswUTefsoCLon81Yp43N0/XVIcSlcEPeNNjy1RGQj1jB4/vEJ1fXDspLPt9EwDXMNcyURZWUMdWd1xFivycKnxh0zr1hXou1POuxvX3t9oVAtgBusvdiIvHHGJXx8WASQJjW9RirU+icEB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758648622; c=relaxed/simple;
-	bh=cDuxXIEeELS4RlF8N85CgtustN1sXRSvqtd8M+7Ba98=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CdccAAVXHzdX+A3HrWQvqfVPm34yOJaflfvw1b2CeA80T7i0D4iBRCWFUnGZlcmHRfoPgVwbY8Uq25F+9hNBVjmGvuPccCZaZSkTqbg4zoOHHaegkkW2yM5FzBbPpjPq+72bYtXm6VOfyKE15BOft10AOi+fgIifMyLCo86kqXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DB6WDsgt; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1758649534; c=relaxed/simple;
+	bh=nKAZfoAjOKM9CWFiJ6E1W5BaQQoUhnD1jwF7C/Ohzg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gWcaPMDtFKoIwdmHLqEX+BlqeSw2Hc3nUIbduHTJ4Thd5crj86oL7KcXXBxZ7RmCVtWSDXCFHcxjvvPXd55gQoFGyGRpNGbgDT+shuvcLzDVIyPmbzwqA4brMfbBgcyQ0NuUcUXYaNBkZJ6mgfjw3cJHqvNgSZe2Vzlo7nYKxRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=B9LiQvQF; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DB6WDsgt"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758648616;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GquTSbszNKfAV4XX9XT5XFWqICROJKhCKUbSqsrqCn4=;
-	b=DB6WDsgth5FiQZw3z+cwNoxwx4dYTcyuwNCBINwkZUGB4AuScicqTv7mo1df5WBkkBWqLu
-	6+7rK4LTwMnsSTBxmIq1HBfGrq3hrWgMWqww7IyH9zYFxPackF4EwROhx2Lbo2LA2Q44Qm
-	hjYnJYOT8KFHqX6Iz0v7aQvpKMrpxFA=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: selftests: Cope with arch silliness in EL2 selftest
-Date: Tue, 23 Sep 2025 10:30:06 -0700
-Message-ID: <20250923173006.467455-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="B9LiQvQF"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-84b9484c061so230272885a.3
+        for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 10:45:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1758649531; x=1759254331; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZBIJqbmEZbrWURHaKZlCYT/zn1TgwW+8+aRFRZatnkY=;
+        b=B9LiQvQFhJpb7jWLz4oyluF4OxY0RyXzlFYmEw/fJHum5glkC7EA7GLfni58O5bVCE
+         4vxvatzkUCj8VwJ9WYczds9dE4ZihxHnWUOrZw0lQK6a9QN0K5enLVufree4PPgDLjMQ
+         4JCnMn8UggR0lWJss6wkymVgZvdg99E3Matlj75w03AbDumiTvSIdET8g6wqv+d/4oS7
+         ZNuoK9Ov9soQxZvrLJTdxv+yM6HBydU22d07dEGX+uMVLk0u4/HW9FirxBl3WyxRrFWp
+         lCXj1vkWLVmeL5aPQqJrLloA3bt71yDNzojwU9O4hQ4Lq7cBikr8NB32yyatrx/OLztK
+         bM7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758649531; x=1759254331;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZBIJqbmEZbrWURHaKZlCYT/zn1TgwW+8+aRFRZatnkY=;
+        b=KNChpofi1z1Uf1UvR7DC/T4BWJZQ0Sp1GJOHY835OvJZ5HpAfkYSPx7lSdCf7qH+QQ
+         pq+NM49KoX2lRuOYqo5wbcGZPC0JTf5vk0MrtwhMWSwlfsN7ZYKk+P9pqkaDDqA44pQe
+         JukKjakyDQaja+Ppc67uG9MgxrasOrFhza1XWHdwyZO5VAFhpJuAvCi+u2de5z7j2QXL
+         xvFRtZRDoj337Pc+/P0+ykLh3dQ5ffuUExB/Bc4+sSguBiJsSzv4W7SrbkdHekC/gg45
+         Rybm+7RodbK7ZKXJG400+XhJsN/X1idjzh6zr0IhvifYXlWTq/rIhS/qyEXL6PM19mfZ
+         lG5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWothcX6gqHJmmoRqIMsKGILpHeuHX5iPvUEJH/qEgjuiIr2jI90v2tjXEkHgPu7WQFq7XASd0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzLJ8VnmshOSdtqPZdU6TtT/gYvrGtZQslN8DzjbG2Lay4e8I7W
+	1F+dRIuOjags24Xoiijfe0K1hZCwbX+UnTtx/Mz7aNzyn9sH4Iq4nRjpmXl6gWG3tc43WzrpL9V
+	hnrdq
+X-Gm-Gg: ASbGncvliVkYSzCN2IVfCPp1ULcuTGX7mTqqv9OmiFqJlI/LfF+sjCULQkFkB9fN2Y3
+	TFmp0hV1cphisDt1CUX6fN8w+NXQRjwXa8Xfm2/phdECDiO0BQ8yRaptq+8Ms26VXnNKWUGOPzE
+	FCOvc5MzAgy/BiMimmJlTaHkVKxNbk+PlDJFc5OzUI8yvxQz714La+Zlej02XGEieYadkqs/bDd
+	jgYJ9m3Pe2R9Ng7ROzyN4rnLKlYgCPgvB+GV6AwnrKNev1nzU3pXlRWcexu61umRNw9aCE1UyS4
+	A7O7U/FmN12/P0wfAWzx3poLy6BhqzUghjmG2pRgByCjshwSgritDEVdoOUgETSORVT0UBnV
+X-Google-Smtp-Source: AGHT+IEiUq4ZNiIQ/kvtshlpB8TY+qUCVv3sM7ttZqsjKZyYCVp5SpveErcNASTGPSdrjl/Eyj3Y1g==
+X-Received: by 2002:a05:6870:15ca:b0:32f:ec51:a716 with SMTP id 586e51a60fabf-34c83545b23mr2456188fac.29.1758649088337;
+        Tue, 23 Sep 2025 10:38:08 -0700 (PDT)
+Received: from ziepe.ca ([130.41.10.202])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-336e3af73f5sm9720934fac.6.2025.09.23.10.38.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 10:38:07 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1v16xq-0000000AySS-4AaP;
+	Tue, 23 Sep 2025 14:38:07 -0300
+Date: Tue, 23 Sep 2025 14:38:06 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, robin.murphy@arm.com,
+	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
+	mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v4 15/28] iommu/arm-smmu-v3: Load the driver later in KVM
+ mode
+Message-ID: <20250923173806.GF2547959@ziepe.ca>
+References: <20250819215156.2494305-1-smostafa@google.com>
+ <20250819215156.2494305-16-smostafa@google.com>
+ <aMQmA9cLaeYWG5_C@willie-the-truck>
+ <aNKwROPzDCWgJBGQ@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <aNKwROPzDCWgJBGQ@google.com>
 
-Implementations without FEAT_FGT aren't required to trap the entire ID
-register space when HCR_EL2.TID3 is set. This is a terrible idea, as the
-hypervisor may need to advertise the absence of a feature to the VM
-using a negative value in a signed field, FEAT_E2H0 being a great
-example of this.
+On Tue, Sep 23, 2025 at 02:35:48PM +0000, Mostafa Saleh wrote:
+> If we really want to avoid the current approach, we can keep deferring probe,
+> until a check for a new flag set from “finalize_pkvm” which is called
+> unconditionally of KVM state.
 
-Cope with uncooperative implementations in the EL2 selftest by accepting
-a zero value when FEAT_FGT is absent and otherwise only tolerating the
-expected nonzero value.
+I still think the pkvm drivers should be bound to some special pkvm
+device_driver and the driver core should handle all this special
+dancing:
+ - Wait for pkvm to decide if it will start or not
+ - Claim a device for pkvm and make it visible in some generic way,eg
+   in sysfs
+ - Fall back to using the normal driver once we conclude pkvm won't
+   run.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
+It sounds like a pain to open code all this logic in every pkvm
+driver? How many do you have?
 
-Applies on top of the EL2 selftests series I shared earlier.
-
-https://lore.kernel.org/kvmarm/20250917212044.294760-1-oliver.upton@linux.dev/#t
-
- tools/testing/selftests/kvm/arm64/hello_el2.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/arm64/hello_el2.c b/tools/testing/selftests/kvm/arm64/hello_el2.c
-index 3c1f44e43f65..ff77c0ba4bb1 100644
---- a/tools/testing/selftests/kvm/arm64/hello_el2.c
-+++ b/tools/testing/selftests/kvm/arm64/hello_el2.c
-@@ -13,15 +13,28 @@
- 
- static void guest_code(void)
- {
-+	u64 mmfr0 = read_sysreg_s(SYS_ID_AA64MMFR0_EL1);
- 	u64 mmfr1 = read_sysreg_s(SYS_ID_AA64MMFR1_EL1);
- 	u64 mmfr4 = read_sysreg_s(SYS_ID_AA64MMFR4_EL1);
-+	u8 e2h0 = SYS_FIELD_GET(ID_AA64MMFR4_EL1, E2H0, mmfr4);
- 
- 	GUEST_ASSERT_EQ(get_current_el(), 2);
- 	GUEST_ASSERT(read_sysreg(hcr_el2) & HCR_EL2_E2H);
- 	GUEST_ASSERT_EQ(SYS_FIELD_GET(ID_AA64MMFR1_EL1, VH, mmfr1),
- 			ID_AA64MMFR1_EL1_VH_IMP);
--	GUEST_ASSERT_EQ(SYS_FIELD_GET(ID_AA64MMFR4_EL1, E2H0, mmfr4),
--			ID_AA64MMFR4_EL1_E2H0_NI_NV1);
-+
-+	/*
-+	 * Traps of the complete ID register space are IMPDEF without FEAT_FGT,
-+	 * which is really annoying to deal with in KVM describing E2H as RES1.
-+	 *
-+	 * If the implementation doesn't honor the trap then expect the register
-+	 * to return all zeros.
-+	 */
-+	if (e2h0 == ID_AA64MMFR4_EL1_E2H0_IMP)
-+		GUEST_ASSERT_EQ(SYS_FIELD_GET(ID_AA64MMFR0_EL1, FGT, mmfr0),
-+				ID_AA64MMFR0_EL1_FGT_NI);
-+	else
-+		GUEST_ASSERT_EQ(e2h0, ID_AA64MMFR4_EL1_E2H0_NI_NV1);
- 
- 	GUEST_DONE();
- }
--- 
-2.47.3
-
+Jason
