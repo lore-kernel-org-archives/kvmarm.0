@@ -1,71 +1,125 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F8D257853
-	for <kvmarm@lists.linux.dev>; Mon, 22 Sep 2025 23:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05FD2DEA79;
+	Tue, 23 Sep 2025 08:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758584159; cv=none; b=qXIG/1xbEi0Emqhw8m6rvSq2DqpiFjZPPkTuMOSG5UpkHz0Mrtk/yZiS7U2rZokjLfkoRv0TSlvwXtc4vfeY+HZdXlqtmUP1HL5NsbHEdlLZwQOOSV8EfQRe+o+VLTxjq9+Ryx2MnSzSV9bt+doiNYetqoj3Q/ZNAfud5EEZgw0=
+	t=1758614634; cv=none; b=iYhWStzpGCghH1/wBAZUw8h3wv1Nu5SeM53IbPi0OgswIFpULHLaLQDs/GFyxeo3s48+uq3Zb0cBfliex89D0Ur64nI6Gc+ZDn1OGjLFO4AGBhROYby3v9KuII+32qMrBPzMSvj/1XV+1jsRCQSlAyDkocsWgBCQLh0x+morT4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758584159; c=relaxed/simple;
-	bh=QvkvFySCol+f4OrBWqJ/V7kbVeZUeLaAPs0LUqnUKTY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nPRdUmYYsH6DEl+sWpdwMIC5904UoVeAkjKW6utv1rJavtHD1Wcn8H0pmmYGEk5rYJ4fliqCBaqNMHdLkqaaq5a5YrMBbrieJSL/PHxXZZPdNBIwmI9J0PajXXKpByp1q9nsxQD4Ir/KSuHekIAvZpZiOT+M1KPvrgWnP3TA7rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bhknsX6/; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1758614634; c=relaxed/simple;
+	bh=1uL8zMCWJXKjyrofklpu94Ov8wlXnfPS3LN0UwuWDeI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ur4CetbP51s75eZIYoZMQfOb1Dt4blNohwkpe/t/mTiYblrE0PP8GUWx8AdCO+qtGsRMKa1zGY/PsL6MJDTm9l2kOK0uvKlB/3KH7qlC2ObmObyRcbGeL67vO5/Dhp4yzG2z6hzmiP1FtyTz6uGhMbSsUyBqbB0o6sSA22Ee4Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r25Euohf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bhknsX6/"
-Date: Mon, 22 Sep 2025 16:35:50 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758584155;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YROanHWLsZyxpmkg+bbLtUTGJa8eSeOXO+0+S132Fq0=;
-	b=bhknsX6/vaxKSZnPvKsUbfdwHD6LKytZGBvllisw+rMQMMDWi/4rtFUuhfA4B3/v1aCWwx
-	Lp3TL0ZLYkFWymqq4yqURK4uTHU3iRkrYuECvy+ovmF+ipjkrCz8O7QI8VSLtwPLDJfEmb
-	fe6iGL/v60eF86/upnlOh+WZHIH3+qc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in
- set_id_regs
-Message-ID: <aNHdVtel5VGMltJb@linux.dev>
-References: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r25Euohf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40974C4CEF7;
+	Tue, 23 Sep 2025 08:03:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758614634;
+	bh=1uL8zMCWJXKjyrofklpu94Ov8wlXnfPS3LN0UwuWDeI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r25EuohfNyaH331n8cTzafDXav0Rz4WDmkA/kHNz+ePibetT3ACpbsTFKA7sm7Q7W
+	 uDKXw30BE0vBlXhnOmDvZ9O05nTCifB8VaVvoPXjTa0Ig2n+PU2ri66bB0q40OP9oX
+	 aOG/1Xz56aU5zthSGu7aFfs8gZyl2VpA2TeNtiNDzzCwFuhWO5aO2QQiJe1V6j9Pa4
+	 MU26HljlM9kKT9B1Dxv8MapFyJAIMpDa7hLp5W5DbLDtvgVV+QmMDHAp6YJZM5Z7HD
+	 GNdpqX5Q+y0OwLat+y1zOdx9T4C2ZFEQZYiLsdJnHGr42csmGALSEwAYXRz7CsteMO
+	 CHwVpXsT3jaZQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v0y07-00000008eJK-436N;
+	Tue, 23 Sep 2025 08:03:52 +0000
+Date: Tue, 23 Sep 2025 09:03:51 +0100
+Message-ID: <86frcd1tp4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Priscilla Lam <prl@amazon.com>
+Cc: <oliver.upton@linux.dev>,
+	<joey.gouly@arm.com>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<dwmw@amazon.co.uk>,
+	<gurugubs@amazon.com>,
+	<christoffer.dall@arm.com>,
+	<graf@amazon.com>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Implement KVM_TRANSLATE ioctl for arm64
+In-Reply-To: <20250922202452.45810-1-prl@amazon.com>
+References: <20250922202452.45810-1-prl@amazon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: prl@amazon.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, dwmw@amazon.co.uk, gurugubs@amazon.com, christoffer.dall@arm.com, graf@amazon.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Sep 20, 2025 at 08:51:58PM +0100, Mark Brown wrote:
-> The set_id_regs selftest lacks coverag for ID_AA64ISR3_EL1 which has
-> several features exposed to KVM guests in it.  Add coverage, and while
-> we're here adjust the test to improve maintainability a bit.  
+Hi Priscilla,
+
+On Mon, 22 Sep 2025 21:24:52 +0100,
+Priscilla Lam <prl@amazon.com> wrote:
 > 
-> The test will fail without the recently applied change adding FEAT_LSFE:
+> There is a KVM_TRANSLATE ioctl for x86 to translate a GVA
+> (guest virtual address) to a GPA (guest physical address) in EL1
+> which is not yet implemented for arm64.
 > 
->    https://lore.kernel.org/r/175829303126.1764550.939188785634158487.b4-ty@kernel.org
+> Implement KVM_TRANSLATE on arm64 for both configurations that
+> support and do not support VHE. The VHE path uses the AT
+> instruction directly while the non-VHE implementation wraps the
+> AT call in a hypercall to allow for its execution in EL2. Add
+> selftest that tests the ioctl in both configurations.
 > 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: Priscilla Lam <prl@amazon.com>
 > ---
-> Mark Brown (2):
->       KVM: arm64: selftests: Remove a duplicate register listing in set_id_regs
->       KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in set_id_regs
+>  arch/arm64/include/asm/kvm_asm.h              |   2 +
+>  arch/arm64/kvm/guest.c                        |  89 ++++++++++++++-
+>  arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  10 ++
+>  arch/arm64/kvm/hyp/nvhe/translate.c           |  84 ++++++++++++++
+>  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+>  tools/testing/selftests/kvm/arm64/translate.c | 107 ++++++++++++++++++
+>  7 files changed, 292 insertions(+), 4 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/translate.c
+>  create mode 100644 tools/testing/selftests/kvm/arm64/translate.c
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Oliver already gave a review of some aspects of the code. In short,
+you're going about walking the page tables the wrong way, both by
+ignoring some of the complicated architectural features (PIE, POE),
+trusting the S1 PTs to be vaguely correct, and by assuming that S1 PTs
+are never swapped out.
+
+But there is more: you are assuming that the only translation regime
+we care about is EL1&0, which isn't true. This would also need to
+cater for EL2 and EL2&0.
+
+As Oliver also pointed out, all that infrastructure already exists in
+the kernel, and is able to do the right thing, with full support of
+the expected feature set as presented to the guest.
+
+But at the end of the day, what do you need KVM_TRANSLATE for? This
+interface is an absolute turd that is unable to represent the bare
+minimum of the architecture (writable by whom? physical address in
+which translation regime? what about S2 translations?), and is better
+left in the "utter brain fart" category.
+
+Finally, and assuming that you actually need something of the sort,
+why do you expect that something in the kernel will be better than a
+pure userspace implementation?
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
