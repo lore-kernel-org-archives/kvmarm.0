@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F2C2857C6
-	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 17:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 132992BE7A0
+	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 17:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758649775; cv=none; b=sVeDS/iu1ts6Bm7l/ioujAo0YNw4OCOcpKXwUiTqLMv+mpCY8wclWow10CyARU+74UM1NJF5u7z1HPegV345hxIKHhsXSA6Q0xBUhLaEzqPbgzhA2ii+I7cWkT/IslV78MhvvKhabbcjvhLX35AWnUTpIv7KmH0uOToCb8qqYDo=
+	t=1758649777; cv=none; b=o1/Neertmp/th/QypFszYXAnHNzJLvu+V0l1dGOziQXEIMow+EywYZvYuKgtbDbwdEsn2jt1K9bZTh3oU7iIFuwXPWLKzVIAST4eorK/GH73Ycz16Ey36SQubBFa9zcM0czTJCofK4f6zjioMSAKSYWYKwgtxbrjOAFImJKu6IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758649775; c=relaxed/simple;
-	bh=cZst8SaMQq9Nj4wU3NBzuqgsLJ5jKgBxDr0f5Dvt9Ds=;
+	s=arc-20240116; t=1758649777; c=relaxed/simple;
+	bh=utee+C1D9MBTxnYgylcBivUsPRX2koBM0Ut2XMYDZkU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FM9QUhHQrlmbozLZiW9CX0vN/2w1GuwDX6jsuupFOyDthNubT5uvLgBxyxGudxbINOkaEH7xAbYfMZ9xlHmy8PYclfMAwZeE5+r3K2xyGNjBn1CzDOIYCiMEcp/oAbqCZtJ8k+A72T+aic7kRW1fbsXDKF8lqUfXLb78eUUBwuQ=
+	 MIME-Version; b=RWaB+2i23Jo77C3Tq++vXAwijwxN0lMqgHH/IZ0rcLybovMxL/70DeWGz2vm5SaArd3fdabbnsUHaEuKP7LEI24K0IiN+PnrHwI3+1P552EeymUNrqyH2FHMA8/8QXgJDhFKrWChxu0dMpNEm/oV7q7PJFnjJxssz6r90PIokFo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 72CBAFEC;
-	Tue, 23 Sep 2025 10:49:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5738B25E0;
+	Tue, 23 Sep 2025 10:49:27 -0700 (PDT)
 Received: from e137867.cambridge.arm.com (e137867.arm.com [10.1.30.204])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4AA563F5A1;
-	Tue, 23 Sep 2025 10:49:28 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id DB98A3F5A1;
+	Tue, 23 Sep 2025 10:49:31 -0700 (PDT)
 From: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -38,9 +38,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	kasan-dev@googlegroups.com,
 	Mark Rutland <mark.rutland@arm.com>,
 	Ada Couprie Diaz <ada.coupriediaz@arm.com>
-Subject: [RFC PATCH 04/16] arm64/insn: always inline aarch64_insn_encode_register()
-Date: Tue, 23 Sep 2025 18:48:51 +0100
-Message-ID: <20250923174903.76283-5-ada.coupriediaz@arm.com>
+Subject: [RFC PATCH 05/16] arm64/insn: always inline aarch64_insn_encode_immediate()
+Date: Tue, 23 Sep 2025 18:48:52 +0100
+Message-ID: <20250923174903.76283-6-ada.coupriediaz@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250923174903.76283-1-ada.coupriediaz@arm.com>
 References: <20250923174903.76283-1-ada.coupriediaz@arm.com>
@@ -52,126 +52,281 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As it is always called with an explicit register type, we can
-check for its validity at compile time and remove the runtime error print.
-The register and instruction checks cannot be made at compile time,
-as they are dynamically created. However, we can remove the error print
-as it should never appear in normal operation and will still lead to
-a fault BRK.
+As type is passed dynamically at runtime we cannot check at compile time
+that is valid.
+However, in practice this should not happen and will still result in a
+fault BRK, so remove the error print.
 
-This makes `aarch64_insn_encode_register()` self-contained and safe
-for inlining and usage from patching callbacks.
+Pull `aarch64_get_imm_shift_mask()` in the header as well and make it
+`__always_inline` as it is needed for `aarch64_insn_encode_immediate()`
+and is already safe to inline.
+This is a change of visibility, so make sure to check the input pointers
+in case it is used in other places.
+Current callers do not care about -EINVAL, they just check for an error,
+so change the return to a boolean.
 
-This is a change of visiblity, as previously the function was private to
-lib/insn.c.
-However, in order to inline more `aarch64_insn_...` functions and make
-patching callbacks safe, it needs to be accessible by those functions.
+This makes `aarch64_insn_encode_immediate()` safe for inlining and
+usage from patching callbacks.
+
+As both functions are now `__always_inline`, they do not need
+their `__kprobes` annotation anymore.
 
 Signed-off-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 ---
- arch/arm64/include/asm/insn.h | 42 +++++++++++++++++++++++++++++++++++
- arch/arm64/lib/insn.c         | 42 -----------------------------------
- 2 files changed, 42 insertions(+), 42 deletions(-)
+ arch/arm64/include/asm/insn.h | 103 +++++++++++++++++++++++++++++++++-
+ arch/arm64/lib/insn.c         | 102 +--------------------------------
+ 2 files changed, 102 insertions(+), 103 deletions(-)
 
 diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-index f6bce1a62dda..90f271483e5b 100644
+index 90f271483e5b..5f5f6a125b4e 100644
 --- a/arch/arm64/include/asm/insn.h
 +++ b/arch/arm64/include/asm/insn.h
-@@ -559,6 +559,48 @@ enum aarch64_insn_encoding_class aarch64_get_insn_class(u32 insn);
- u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn);
- u32 aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
- 				  u32 insn, u64 imm);
-+static __always_inline u32 aarch64_insn_encode_register(
-+				 enum aarch64_insn_register_type type,
-+				 u32 insn,
-+				 enum aarch64_insn_register reg)
+@@ -9,6 +9,7 @@
+ #define	__ASM_INSN_H
+ #include <linux/bits.h>
+ #include <linux/build_bug.h>
++#include <linux/sizes.h>
+ #include <linux/types.h>
+ 
+ #include <asm/insn-def.h>
+@@ -555,10 +556,108 @@ static __always_inline bool aarch64_insn_uses_literal(u32 insn)
+ 	       aarch64_insn_is_prfm_lit(insn);
+ }
+ 
++static __always_inline bool aarch64_get_imm_shift_mask(
++				 enum aarch64_insn_imm_type type, u32 *maskp, int *shiftp)
 +{
-+	compiletime_assert(type >= AARCH64_INSN_REGTYPE_RT &&
-+		type <= AARCH64_INSN_REGTYPE_RS, "unknown register type encoding");
++	u32 mask;
++	int shift;
++
++	if (maskp == NULL || shiftp == NULL)
++		return false;
++
++	switch (type) {
++	case AARCH64_INSN_IMM_26:
++		mask = BIT(26) - 1;
++		shift = 0;
++		break;
++	case AARCH64_INSN_IMM_19:
++		mask = BIT(19) - 1;
++		shift = 5;
++		break;
++	case AARCH64_INSN_IMM_16:
++		mask = BIT(16) - 1;
++		shift = 5;
++		break;
++	case AARCH64_INSN_IMM_14:
++		mask = BIT(14) - 1;
++		shift = 5;
++		break;
++	case AARCH64_INSN_IMM_12:
++		mask = BIT(12) - 1;
++		shift = 10;
++		break;
++	case AARCH64_INSN_IMM_9:
++		mask = BIT(9) - 1;
++		shift = 12;
++		break;
++	case AARCH64_INSN_IMM_7:
++		mask = BIT(7) - 1;
++		shift = 15;
++		break;
++	case AARCH64_INSN_IMM_6:
++	case AARCH64_INSN_IMM_S:
++		mask = BIT(6) - 1;
++		shift = 10;
++		break;
++	case AARCH64_INSN_IMM_R:
++		mask = BIT(6) - 1;
++		shift = 16;
++		break;
++	case AARCH64_INSN_IMM_N:
++		mask = 1;
++		shift = 22;
++		break;
++	default:
++		return false;
++	}
++
++	*maskp = mask;
++	*shiftp = shift;
++
++	return true;
++}
++
++#define ADR_IMM_HILOSPLIT	2
++#define ADR_IMM_SIZE		SZ_2M
++#define ADR_IMM_LOMASK		((1 << ADR_IMM_HILOSPLIT) - 1)
++#define ADR_IMM_HIMASK		((ADR_IMM_SIZE >> ADR_IMM_HILOSPLIT) - 1)
++#define ADR_IMM_LOSHIFT		29
++#define ADR_IMM_HISHIFT		5
++
+ enum aarch64_insn_encoding_class aarch64_get_insn_class(u32 insn);
+ u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn);
+-u32 aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
+-				  u32 insn, u64 imm);
++
++static __always_inline u32 aarch64_insn_encode_immediate(
++				 enum aarch64_insn_imm_type type, u32 insn, u64 imm)
++{
++	u32 immlo, immhi, mask;
 +	int shift;
 +
 +	if (insn == AARCH64_BREAK_FAULT)
 +		return AARCH64_BREAK_FAULT;
 +
-+	if (reg < AARCH64_INSN_REG_0 || reg > AARCH64_INSN_REG_SP) {
-+		return AARCH64_BREAK_FAULT;
-+	}
-+
 +	switch (type) {
-+	case AARCH64_INSN_REGTYPE_RT:
-+	case AARCH64_INSN_REGTYPE_RD:
++	case AARCH64_INSN_IMM_ADR:
 +		shift = 0;
-+		break;
-+	case AARCH64_INSN_REGTYPE_RN:
-+		shift = 5;
-+		break;
-+	case AARCH64_INSN_REGTYPE_RT2:
-+	case AARCH64_INSN_REGTYPE_RA:
-+		shift = 10;
-+		break;
-+	case AARCH64_INSN_REGTYPE_RM:
-+	case AARCH64_INSN_REGTYPE_RS:
-+		shift = 16;
++		immlo = (imm & ADR_IMM_LOMASK) << ADR_IMM_LOSHIFT;
++		imm >>= ADR_IMM_HILOSPLIT;
++		immhi = (imm & ADR_IMM_HIMASK) << ADR_IMM_HISHIFT;
++		imm = immlo | immhi;
++		mask = ((ADR_IMM_LOMASK << ADR_IMM_LOSHIFT) |
++			(ADR_IMM_HIMASK << ADR_IMM_HISHIFT));
 +		break;
 +	default:
-+		return AARCH64_BREAK_FAULT;
++		if (aarch64_get_imm_shift_mask(type, &mask, &shift) == false) {
++			return AARCH64_BREAK_FAULT;
++		}
 +	}
 +
-+	insn &= ~(GENMASK(4, 0) << shift);
-+	insn |= reg << shift;
++	/* Update the immediate field. */
++	insn &= ~(mask << shift);
++	insn |= (imm & mask) << shift;
 +
 +	return insn;
 +}
-+
- static __always_inline u32 aarch64_insn_decode_register(
- 				 enum aarch64_insn_register_type type, u32 insn)
- {
+ static __always_inline u32 aarch64_insn_encode_register(
+ 				 enum aarch64_insn_register_type type,
+ 				 u32 insn,
 diff --git a/arch/arm64/lib/insn.c b/arch/arm64/lib/insn.c
-index 0fac78e542cf..1810e1ea64a7 100644
+index 1810e1ea64a7..d77aef7f84f1 100644
 --- a/arch/arm64/lib/insn.c
 +++ b/arch/arm64/lib/insn.c
-@@ -144,48 +144,6 @@ u32 __kprobes aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
- 	return insn;
+@@ -13,7 +13,6 @@
+ #include <linux/types.h>
+ 
+ #include <asm/debug-monitors.h>
+-#include <asm/errno.h>
+ #include <asm/insn.h>
+ #include <asm/kprobes.h>
+ 
+@@ -21,71 +20,6 @@
+ #define AARCH64_INSN_N_BIT	BIT(22)
+ #define AARCH64_INSN_LSL_12	BIT(22)
+ 
+-static int __kprobes aarch64_get_imm_shift_mask(enum aarch64_insn_imm_type type,
+-						u32 *maskp, int *shiftp)
+-{
+-	u32 mask;
+-	int shift;
+-
+-	switch (type) {
+-	case AARCH64_INSN_IMM_26:
+-		mask = BIT(26) - 1;
+-		shift = 0;
+-		break;
+-	case AARCH64_INSN_IMM_19:
+-		mask = BIT(19) - 1;
+-		shift = 5;
+-		break;
+-	case AARCH64_INSN_IMM_16:
+-		mask = BIT(16) - 1;
+-		shift = 5;
+-		break;
+-	case AARCH64_INSN_IMM_14:
+-		mask = BIT(14) - 1;
+-		shift = 5;
+-		break;
+-	case AARCH64_INSN_IMM_12:
+-		mask = BIT(12) - 1;
+-		shift = 10;
+-		break;
+-	case AARCH64_INSN_IMM_9:
+-		mask = BIT(9) - 1;
+-		shift = 12;
+-		break;
+-	case AARCH64_INSN_IMM_7:
+-		mask = BIT(7) - 1;
+-		shift = 15;
+-		break;
+-	case AARCH64_INSN_IMM_6:
+-	case AARCH64_INSN_IMM_S:
+-		mask = BIT(6) - 1;
+-		shift = 10;
+-		break;
+-	case AARCH64_INSN_IMM_R:
+-		mask = BIT(6) - 1;
+-		shift = 16;
+-		break;
+-	case AARCH64_INSN_IMM_N:
+-		mask = 1;
+-		shift = 22;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	*maskp = mask;
+-	*shiftp = shift;
+-
+-	return 0;
+-}
+-
+-#define ADR_IMM_HILOSPLIT	2
+-#define ADR_IMM_SIZE		SZ_2M
+-#define ADR_IMM_LOMASK		((1 << ADR_IMM_HILOSPLIT) - 1)
+-#define ADR_IMM_HIMASK		((ADR_IMM_SIZE >> ADR_IMM_HILOSPLIT) - 1)
+-#define ADR_IMM_LOSHIFT		29
+-#define ADR_IMM_HISHIFT		5
+-
+ u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn)
+ {
+ 	u32 immlo, immhi, mask;
+@@ -100,7 +34,7 @@ u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn)
+ 		mask = ADR_IMM_SIZE - 1;
+ 		break;
+ 	default:
+-		if (aarch64_get_imm_shift_mask(type, &mask, &shift) < 0) {
++		if (aarch64_get_imm_shift_mask(type, &mask, &shift) == false) {
+ 			pr_err("%s: unknown immediate encoding %d\n", __func__,
+ 			       type);
+ 			return 0;
+@@ -110,40 +44,6 @@ u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn)
+ 	return (insn >> shift) & mask;
  }
  
--static u32 aarch64_insn_encode_register(enum aarch64_insn_register_type type,
--					u32 insn,
--					enum aarch64_insn_register reg)
+-u32 __kprobes aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
+-				  u32 insn, u64 imm)
 -{
+-	u32 immlo, immhi, mask;
 -	int shift;
 -
 -	if (insn == AARCH64_BREAK_FAULT)
 -		return AARCH64_BREAK_FAULT;
 -
--	if (reg < AARCH64_INSN_REG_0 || reg > AARCH64_INSN_REG_SP) {
--		pr_err("%s: unknown register encoding %d\n", __func__, reg);
--		return AARCH64_BREAK_FAULT;
--	}
--
 -	switch (type) {
--	case AARCH64_INSN_REGTYPE_RT:
--	case AARCH64_INSN_REGTYPE_RD:
+-	case AARCH64_INSN_IMM_ADR:
 -		shift = 0;
--		break;
--	case AARCH64_INSN_REGTYPE_RN:
--		shift = 5;
--		break;
--	case AARCH64_INSN_REGTYPE_RT2:
--	case AARCH64_INSN_REGTYPE_RA:
--		shift = 10;
--		break;
--	case AARCH64_INSN_REGTYPE_RM:
--	case AARCH64_INSN_REGTYPE_RS:
--		shift = 16;
+-		immlo = (imm & ADR_IMM_LOMASK) << ADR_IMM_LOSHIFT;
+-		imm >>= ADR_IMM_HILOSPLIT;
+-		immhi = (imm & ADR_IMM_HIMASK) << ADR_IMM_HISHIFT;
+-		imm = immlo | immhi;
+-		mask = ((ADR_IMM_LOMASK << ADR_IMM_LOSHIFT) |
+-			(ADR_IMM_HIMASK << ADR_IMM_HISHIFT));
 -		break;
 -	default:
--		pr_err("%s: unknown register type encoding %d\n", __func__,
--		       type);
--		return AARCH64_BREAK_FAULT;
+-		if (aarch64_get_imm_shift_mask(type, &mask, &shift) < 0) {
+-			pr_err("%s: unknown immediate encoding %d\n", __func__,
+-			       type);
+-			return AARCH64_BREAK_FAULT;
+-		}
 -	}
 -
--	insn &= ~(GENMASK(4, 0) << shift);
--	insn |= reg << shift;
+-	/* Update the immediate field. */
+-	insn &= ~(mask << shift);
+-	insn |= (imm & mask) << shift;
 -
 -	return insn;
 -}
