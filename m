@@ -1,128 +1,168 @@
-Received: from fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.143.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F35BC141
-	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 12:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.143.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D001A9F90
+	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 14:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758629655; cv=none; b=dVN2pd2QeoxxKccMY4Tb8s6OHn595y+KWFqA38uSxy/fM3zDSg4oUWpoPXblHHVFV96h2I5UyPFnEjoHZ/klqmTPI3Yx5Wt9azH1u4Zv88+lOUIceGkHefnrSANlUdu/ocXwgY8XsreBzrf9VFKxlva7wvgI7rNV7e2O/HCFFTE=
+	t=1758638156; cv=none; b=XSmTfivN6TpsCGZEsOCOujzck9q1ZwfaCKeWwKYq6sO5g0YoVbJtN4HcCHgwe2ju6ZBrDTj1I+qa3icrRCJoDIC5j/qGNrjQh8IugQ88RCIToylIlSTXRUh8QIC6xZOOW08bGtqYKJ0c9A4lHhx8K+DwI5HP8GkCHWRWLDM8lbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758629655; c=relaxed/simple;
-	bh=CpmAYnUwoKFsWa3Yk/+PnZyYX7cO9CYe1Xx6E/cVEz0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=P0tyTNljs5eZfmnppJ0AsPWTxsA1eDMxuC0tok+zAG0iJTK37gSc0MvTXSZUw0IQ7z04ULmynKiuFiStXk1EEod6G5LCgcnBqgtnEiiPcCX3pSs2DO5mlrd9Hosjj0Rntw3CecXx+sosBsllvadt9zzFI+gG1Lr0xZWMQNFvCtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=WPES5F09; arc=none smtp.client-ip=63.178.143.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1758638156; c=relaxed/simple;
+	bh=+qI76m61UBIiYSKYa7PKpe19ghecX989zXs+Qyuqc5Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B+j4GBkka+22G8kwXTWcY+k3mCGkWSoJDDxK7UdWVqS6397ykmXKPgELFwJoRhuUq2eDvr2t49KQYvRAkDbj+4yIfxe6bUv5Rh2LA0NOtu/yeCjfY34HGJJYr/u643WtPQbXCBSuqSeGbIYk9YYEUzWNfeVSt81jgtRZcaSo4e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZNXGHRvq; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="WPES5F09"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZNXGHRvq"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-46d6080d3bfso56805e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 07:35:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1758629653; x=1790165653;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=C6zoQ1uv1s7hqCsB4ZjAaLblPEL6nAmG0LEH7MpxUwU=;
-  b=WPES5F09UX3f7kfqmZKM0Ub7JuIwXvqKXPwwJ8PUrcjMiVOzX0CUpuBU
-   GiBscR2HvvPgIrvoGJ5E+LPWjNf/NvvzOVNpCQ67Bx30Jy+/hga6HN2Cz
-   uJmZaXCsExO1aVYYjw+g3RF6n1lD1elIV216Zh7liyeosCiYGgjSdPEa7
-   QWkDdLQtIFFBSof3Ac1VmLLojz813px/dFRYfnVQY+C0FKXaltFDOfFiq
-   BkRRUYOCwrsO92WhKv+7sw/nYcd+wIJRorxy478uV7aO6ZQoKbD4Uoipt
-   xoFo4GSfvEgg519f0k9N6zSVv9978HDKWkvvrgp2ZASBBLfyNnemSQdzZ
-   w==;
-X-CSE-ConnectionGUID: FBNj+l+aR1+qu6nlihE2jA==
-X-CSE-MsgGUID: h+GIaP0rSfmTrhi4K2iYPA==
-X-IronPort-AV: E=Sophos;i="6.18,288,1751241600"; 
-   d="scan'208";a="2438561"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 12:13:57 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:7935]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.38.97:2525] with esmtp (Farcaster)
- id 8181f46e-0526-4b06-9460-3a2e1a03356b; Tue, 23 Sep 2025 12:13:57 +0000 (UTC)
-X-Farcaster-Flow-ID: 8181f46e-0526-4b06-9460-3a2e1a03356b
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Tue, 23 Sep 2025 12:13:54 +0000
-Received: from [192.168.26.206] (10.106.82.20) by
- EX19D022EUC002.ant.amazon.com (10.252.51.137) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Tue, 23 Sep 2025 12:13:53 +0000
-Message-ID: <8408090a-d2cc-4b90-99fe-183d49081ea4@amazon.com>
-Date: Tue, 23 Sep 2025 13:13:51 +0100
+        d=google.com; s=20230601; t=1758638153; x=1759242953; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=w7gFiyv7OnRS5nGrN+3NtlLFQvUag+pzI6L45ZXC1s8=;
+        b=ZNXGHRvq89QfeLKMHgme5jjyytZZXhSV6L90YxQ8BCv6oA+f8xuQFs63Hd0yLdgGq7
+         PtyIrB/7IkRLHL/DTSK9THx+3PmhT/8UX+ZS95mmA7KgbcBXJpFvz34WsbzTQ7srghvn
+         nvpO9VwpIsLpx5DnE9xNjQeC/Q3Xt0MhW+rmblkkH1oz44nMo24ZSEwhoKv8HFvCzCd+
+         mRSwaDdlTOLndOAnaMd9H/mvPHzwRcRXm5xnAeO1574Tc3rM/Z+AJZ7kCGSCFYv0GD+b
+         AiLwjRwGm7R73fTxbaP8XRfwNNotmtscWY4KGMOv7jQDStCp+0XA3ZlMuiqkZ2Pu2Qj0
+         wPOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758638153; x=1759242953;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w7gFiyv7OnRS5nGrN+3NtlLFQvUag+pzI6L45ZXC1s8=;
+        b=pvrhfwELxJ2KSeSeD3y/nEeWk7PsSec16ujnPxrkevkjfpYYm0tc/AjZJScKbOhdZW
+         DwQ9IA6T/VeyrzTpz+4/cm5tYGh+qTEM+ifRQ8xyepkZFX8fKEdl8iWoKBwga3qup7s6
+         QDJSByzhyaqLTMM7Q57lFNoFAKq5FVJWZXgEbhryZyJMJtGIwkcPgLT9E3mX6zsM2eu4
+         7yEf3AZTlb8EfZqlaf4mZ7iU+mGfQ5KJ5MYqoS7RA4UVh6m6WOh3L2A2ve7Xv2mP8GE6
+         cGynVdQ6+e3TJCwRJKfpdWOx733wBs4yoN5pmIT/ULhg9YG8XGkGck45mMmvRhgbQbVa
+         ZhUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUk78N9EiM9JnCPHvLzy8263jzeFKC8bkQuXglrzUXqKwYVzHF+y7D2eeGjXTBmQJ1FlyPApE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzMuwDIDETdkUQhm1UhCIDFlEPkaHbfTQ1gowUcbvmFWrc2kz5J
+	9ZX8kDUs01tIVgdKs+AMuL815xIw2dNe/CVUh7wLsEHA6U8i6T+raoLDvrJKOH+3sw==
+X-Gm-Gg: ASbGncsKgRyOdJZCQ69uTMzYGvrKSkzopvJJR85PuuW7Z7+b0/CX3yRiuc8goWacxjR
+	MdaqsseUqbk3FQon9KDMglfC3PNnXU/MsalrkfZqKeSl036wYXpsLauKL8aRdQZrSWqwocQximp
+	oCkPF4+GvLQEBt/XfQLdjce3G8tOGUT5+wDCFnP0a/4JndCx7jmhERI+DVI5/GbfaQfVfsOp5zE
+	TeDa+GJ/V3knAoQVQkdMkSe3qvGMUhcXHy7qL46ED58hwTtEpOYuZl0gT9akYsJKZZqBSWuBrJR
+	INeFvkFeEl+Umo6m+c9k1sWXAPLF+tg3wziuX0TfQX5uWCyHUiXBSPlq8ObprxZeRaAYghtKRzY
+	L5QGWj6wDQdJmiTsGodbtSORT0z281KaMeHQ92OohwmvCLKqJuFrhpXUwyu0CwEzo17I=
+X-Google-Smtp-Source: AGHT+IFvUZC8hU4aVaM+B2ZVSTNY2pCK/nLLcGd0XFRXs64IKLx9ZNGK9gnrvBoN85r9vD2bqa+nEg==
+X-Received: by 2002:a05:600c:a40a:b0:45f:2e6d:ca01 with SMTP id 5b1f17b1804b1-46e1dc7b863mr1452625e9.4.1758638152887;
+        Tue, 23 Sep 2025 07:35:52 -0700 (PDT)
+Received: from google.com (140.240.76.34.bc.googleusercontent.com. [34.76.240.140])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee07408258sm24481309f8f.19.2025.09.23.07.35.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 07:35:52 -0700 (PDT)
+Date: Tue, 23 Sep 2025 14:35:48 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, robin.murphy@arm.com,
+	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
+	jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v4 15/28] iommu/arm-smmu-v3: Load the driver later in KVM
+ mode
+Message-ID: <aNKwROPzDCWgJBGQ@google.com>
+References: <20250819215156.2494305-1-smostafa@google.com>
+ <20250819215156.2494305-16-smostafa@google.com>
+ <aMQmA9cLaeYWG5_C@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v3 00/15] KVM: Introduce KVM Userfault
-To: Sean Christopherson <seanjc@google.com>, James Houghton
-	<jthoughton@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Oliver Upton
-	<oliver.upton@linux.dev>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier
-	<maz@kernel.org>, Yan Zhao <yan.y.zhao@intel.com>, Anish Moorthy
-	<amoorthy@google.com>, Peter Gonda <pgonda@google.com>, Peter Xu
-	<peterx@redhat.com>, David Matlack <dmatlack@google.com>,
-	<wei.w.wang@intel.com>, <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>
-References: <20250618042424.330664-1-jthoughton@google.com>
- <de7da4d8-0e9d-46f2-88ec-cfd5dc14421c@amazon.com>
- <CADrL8HVxvwB4JrnUf6QtDCyzZojEvR4tr-ELEn+fL8=1cnbMQQ@mail.gmail.com>
- <aLrXFWDgDkHqPQda@google.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <aLrXFWDgDkHqPQda@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D015EUA002.ant.amazon.com (10.252.50.219) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+In-Reply-To: <aMQmA9cLaeYWG5_C@willie-the-truck>
 
-
-
-On 05/09/2025 13:27, Sean Christopherson wrote:
-> On Thu, Sep 04, 2025, James Houghton wrote:
->> On Thu, Sep 4, 2025 at 9:43 AM Nikita Kalyazin <kalyazin@amazon.com> wrote:
->>> Are there any blockers for merging this series?  We would like to use
->>> the functionality in Firecracker for restoring guest_memfd-backed VMs
->>> from snapshots via UFFD [1].  [2] is a Firecracker feature branch that
->>> builds on top of KVM userfault, along with direct map removal [3], write
->>> syscall [4] and UFFD support [5] in guest_memfd (currently in discussion
->>> with MM at [6]) series.
->>
->> Glad to hear that you need this series. :)
+On Fri, Sep 12, 2025 at 02:54:11PM +0100, Will Deacon wrote:
+> On Tue, Aug 19, 2025 at 09:51:43PM +0000, Mostafa Saleh wrote:
+> > While in KVM mode, the driver must be loaded after the hypervisor
+> > initializes.
+> > 
+> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > ---
+> >  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 25 ++++++++++++++++-----
+> >  1 file changed, 19 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > index 10ca07c6dbe9..a04730b5fe41 100644
+> > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > @@ -4576,12 +4576,6 @@ static const struct of_device_id arm_smmu_of_match[] = {
+> >  };
+> >  MODULE_DEVICE_TABLE(of, arm_smmu_of_match);
+> >  
+> > -static void arm_smmu_driver_unregister(struct platform_driver *drv)
+> > -{
+> > -	arm_smmu_sva_notifier_synchronize();
+> > -	platform_driver_unregister(drv);
+> > -}
+> > -
+> >  static struct platform_driver arm_smmu_driver = {
+> >  	.driver	= {
+> >  		.name			= "arm-smmu-v3",
+> > @@ -4592,8 +4586,27 @@ static struct platform_driver arm_smmu_driver = {
+> >  	.remove = arm_smmu_device_remove,
+> >  	.shutdown = arm_smmu_device_shutdown,
+> >  };
+> > +
+> > +#ifndef CONFIG_ARM_SMMU_V3_PKVM
+> > +static void arm_smmu_driver_unregister(struct platform_driver *drv)
+> > +{
+> > +	arm_smmu_sva_notifier_synchronize();
+> > +	platform_driver_unregister(drv);
+> > +}
+> > +
+> >  module_driver(arm_smmu_driver, platform_driver_register,
+> >  	      arm_smmu_driver_unregister);
+> > +#else
+> > +/*
+> > + * Must be done after the hypervisor initializes at module_init()
+> > + * No need for unregister as this is a built in driver.
+> > + */
+> > +static int arm_smmu_driver_register(void)
+> > +{
+> > +	return platform_driver_register(&arm_smmu_driver);
+> > +}
+> > +device_initcall_sync(arm_smmu_driver_register);
+> > +#endif /* !CONFIG_ARM_SMMU_V3_PKVM */
 > 
-> Likewise (though I had slightly-advanced warning from Patrick that Firecracker
-> wants KVM Userfault).  The main reason I haven't pushed harder on this series is
-> that I didn't think anyone wanted to use it within the next ~year.
-> 
->> I am on the hook to get some QEMU patches to demonstrate that KVM
->> Userfault can work well with it. I'll try to get that done ASAP now
->> that you've expressed interest. The firecracker patches are a nice
->> demonstration that this could work too... (I wish the VMM I work on
->> was open-source).
->>
->> I think the current "blocker" is the kvm_page_fault stuff[*]; KVM
->> Userfault will be the first user of this API. I'll review that series
->> in the next few days. I'm pretty sure Sean doesn't have any conceptual
->> issues with KVM Userfault as implemented in this series.
-> 
-> Yep, Oliver and I (and anyone else that has an opinion) just need to align on the
-> interface for arch-neutral code.  I think that's mostly on me to spin a v2, and
-> maybe to show how it all looks when integrated with the userfault stuff.\
+> I think this is a bit grotty as we now have to reason about different
+> initialisation ordering based on CONFIG_ARM_SMMU_V3_PKVM. Could we
+> instead return -EPROBE_DEFER if the driver tries to probe before the
+> hypervisor is up?
 
-Sounds good, thanks.  Do you think you'll be having time to work on the 
-v2 soonish?  Is defining and implementing the interface a strict 
-prerequisite for this series?
+I looked a bit into this and I think the current approach would be
+better because:
+1- In case KVM fails to initialise or was disabled from command line,
+   waiting for the hypervisor means SMMUs may never probe.
+   One of the things I was cautious to get right is the error path,
+   so if KVM or if the nested driver fails at any point at initialization,
+   the SMMUs should still be probed and the systems should still be running
+   even without KVM.
 
+2- That's not as bad, but it leaks some KVM internals as we need to either
+   check (is_kvm_arm_initialised()\or kvm_protected_mode_initialized) from
+   driver code, as opposed to registering the driver late based on a kernel
+   config for the nested SMMUv3.
+
+If we really want to avoid the current approach, we can keep deferring probe,
+until a check for a new flag set from “finalize_pkvm” which is called
+unconditionally of KVM state.
+
+Thanks,
+Mostafa
+
+> 
+> Will
