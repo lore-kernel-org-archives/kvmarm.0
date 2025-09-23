@@ -1,168 +1,183 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D001A9F90
-	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 14:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021A62E7F39
+	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 16:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758638156; cv=none; b=XSmTfivN6TpsCGZEsOCOujzck9q1ZwfaCKeWwKYq6sO5g0YoVbJtN4HcCHgwe2ju6ZBrDTj1I+qa3icrRCJoDIC5j/qGNrjQh8IugQ88RCIToylIlSTXRUh8QIC6xZOOW08bGtqYKJ0c9A4lHhx8K+DwI5HP8GkCHWRWLDM8lbM=
+	t=1758644487; cv=none; b=Owgwq+qcUBKj2B1u45aFf4NJGEuuKpe4iB23gTdlAIqUcGj92VNa1DwcHAsW3LjdNI909But3FCY/gT1ulvogB7vPhadXoO3wtlPXKQwU20v1ymHjPcF34OXF8aqOXxCRNfMraasGoecizNNhAje4ojJlDOEBlTslxAA/F6SosQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758638156; c=relaxed/simple;
-	bh=+qI76m61UBIiYSKYa7PKpe19ghecX989zXs+Qyuqc5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B+j4GBkka+22G8kwXTWcY+k3mCGkWSoJDDxK7UdWVqS6397ykmXKPgELFwJoRhuUq2eDvr2t49KQYvRAkDbj+4yIfxe6bUv5Rh2LA0NOtu/yeCjfY34HGJJYr/u643WtPQbXCBSuqSeGbIYk9YYEUzWNfeVSt81jgtRZcaSo4e0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZNXGHRvq; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZNXGHRvq"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-46d6080d3bfso56805e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 07:35:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758638153; x=1759242953; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=w7gFiyv7OnRS5nGrN+3NtlLFQvUag+pzI6L45ZXC1s8=;
-        b=ZNXGHRvq89QfeLKMHgme5jjyytZZXhSV6L90YxQ8BCv6oA+f8xuQFs63Hd0yLdgGq7
-         PtyIrB/7IkRLHL/DTSK9THx+3PmhT/8UX+ZS95mmA7KgbcBXJpFvz34WsbzTQ7srghvn
-         nvpO9VwpIsLpx5DnE9xNjQeC/Q3Xt0MhW+rmblkkH1oz44nMo24ZSEwhoKv8HFvCzCd+
-         mRSwaDdlTOLndOAnaMd9H/mvPHzwRcRXm5xnAeO1574Tc3rM/Z+AJZ7kCGSCFYv0GD+b
-         AiLwjRwGm7R73fTxbaP8XRfwNNotmtscWY4KGMOv7jQDStCp+0XA3ZlMuiqkZ2Pu2Qj0
-         wPOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758638153; x=1759242953;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w7gFiyv7OnRS5nGrN+3NtlLFQvUag+pzI6L45ZXC1s8=;
-        b=pvrhfwELxJ2KSeSeD3y/nEeWk7PsSec16ujnPxrkevkjfpYYm0tc/AjZJScKbOhdZW
-         DwQ9IA6T/VeyrzTpz+4/cm5tYGh+qTEM+ifRQ8xyepkZFX8fKEdl8iWoKBwga3qup7s6
-         QDJSByzhyaqLTMM7Q57lFNoFAKq5FVJWZXgEbhryZyJMJtGIwkcPgLT9E3mX6zsM2eu4
-         7yEf3AZTlb8EfZqlaf4mZ7iU+mGfQ5KJ5MYqoS7RA4UVh6m6WOh3L2A2ve7Xv2mP8GE6
-         cGynVdQ6+e3TJCwRJKfpdWOx733wBs4yoN5pmIT/ULhg9YG8XGkGck45mMmvRhgbQbVa
-         ZhUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUk78N9EiM9JnCPHvLzy8263jzeFKC8bkQuXglrzUXqKwYVzHF+y7D2eeGjXTBmQJ1FlyPApE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzMuwDIDETdkUQhm1UhCIDFlEPkaHbfTQ1gowUcbvmFWrc2kz5J
-	9ZX8kDUs01tIVgdKs+AMuL815xIw2dNe/CVUh7wLsEHA6U8i6T+raoLDvrJKOH+3sw==
-X-Gm-Gg: ASbGncsKgRyOdJZCQ69uTMzYGvrKSkzopvJJR85PuuW7Z7+b0/CX3yRiuc8goWacxjR
-	MdaqsseUqbk3FQon9KDMglfC3PNnXU/MsalrkfZqKeSl036wYXpsLauKL8aRdQZrSWqwocQximp
-	oCkPF4+GvLQEBt/XfQLdjce3G8tOGUT5+wDCFnP0a/4JndCx7jmhERI+DVI5/GbfaQfVfsOp5zE
-	TeDa+GJ/V3knAoQVQkdMkSe3qvGMUhcXHy7qL46ED58hwTtEpOYuZl0gT9akYsJKZZqBSWuBrJR
-	INeFvkFeEl+Umo6m+c9k1sWXAPLF+tg3wziuX0TfQX5uWCyHUiXBSPlq8ObprxZeRaAYghtKRzY
-	L5QGWj6wDQdJmiTsGodbtSORT0z281KaMeHQ92OohwmvCLKqJuFrhpXUwyu0CwEzo17I=
-X-Google-Smtp-Source: AGHT+IFvUZC8hU4aVaM+B2ZVSTNY2pCK/nLLcGd0XFRXs64IKLx9ZNGK9gnrvBoN85r9vD2bqa+nEg==
-X-Received: by 2002:a05:600c:a40a:b0:45f:2e6d:ca01 with SMTP id 5b1f17b1804b1-46e1dc7b863mr1452625e9.4.1758638152887;
-        Tue, 23 Sep 2025 07:35:52 -0700 (PDT)
-Received: from google.com (140.240.76.34.bc.googleusercontent.com. [34.76.240.140])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee07408258sm24481309f8f.19.2025.09.23.07.35.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 07:35:52 -0700 (PDT)
-Date: Tue, 23 Sep 2025 14:35:48 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, robin.murphy@arm.com,
-	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v4 15/28] iommu/arm-smmu-v3: Load the driver later in KVM
- mode
-Message-ID: <aNKwROPzDCWgJBGQ@google.com>
-References: <20250819215156.2494305-1-smostafa@google.com>
- <20250819215156.2494305-16-smostafa@google.com>
- <aMQmA9cLaeYWG5_C@willie-the-truck>
+	s=arc-20240116; t=1758644487; c=relaxed/simple;
+	bh=BhQPNjONdoE+7ilTpDDFABWglhl8U6mMn7Ekr60/kI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=abTkswd/5rE/+TfuUjdkUa4wnb1+x+LrLYcRadLsu7Pm6UtxEx6cDgfz7unDIuF9iNLvzNFWiyJvbqLYAb++9xs4ZYppwENJK5+n7l4iqzqbng/Dr/qvy98RtITf45aZ9UDQDyL7ANCWedsoD7lM5cPOC/u4KiHwgq0ltqAlrmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 26597497;
+	Tue, 23 Sep 2025 09:21:17 -0700 (PDT)
+Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B5FD3F694;
+	Tue, 23 Sep 2025 09:21:24 -0700 (PDT)
+Date: Tue, 23 Sep 2025 17:21:15 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Will Deacon <will@kernel.org>, Julien Thierry
+ <julien.thierry.kdev@gmail.com>, Marc Zyngier <maz@kernel.org>,
+ <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH kvmtool v3 6/6] arm64: Generate HYP timer interrupt
+ specifiers
+Message-ID: <20250923172115.4a739ac5@donnerap.manchester.arm.com>
+In-Reply-To: <aJDIG8cJQjzbwj3w@raptor>
+References: <20250729095745.3148294-1-andre.przywara@arm.com>
+	<20250729095745.3148294-7-andre.przywara@arm.com>
+	<aJDIG8cJQjzbwj3w@raptor>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aMQmA9cLaeYWG5_C@willie-the-truck>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 12, 2025 at 02:54:11PM +0100, Will Deacon wrote:
-> On Tue, Aug 19, 2025 at 09:51:43PM +0000, Mostafa Saleh wrote:
-> > While in KVM mode, the driver must be loaded after the hypervisor
-> > initializes.
+On Mon, 4 Aug 2025 15:47:55 +0100
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+
+Hi,
+
+> On Tue, Jul 29, 2025 at 10:57:45AM +0100, Andre Przywara wrote:
+> > From: Marc Zyngier <maz@kernel.org>
 > > 
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> > FEAT_VHE introduced a non-secure EL2 virtual timer, along with its
+> > interrupt line. Consequently the arch timer DT binding introduced a fifth
+> > interrupt to communicate this interrupt number.
+> > 
+> > Refactor the interrupts property generation code to deal with a variable
+> > number of interrupts, and forward five interrupts instead of four in case
+> > nested virt is enabled.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > > ---
-> >  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 25 ++++++++++++++++-----
-> >  1 file changed, 19 insertions(+), 6 deletions(-)
+> >  arm64/arm-cpu.c           |  4 +---
+> >  arm64/include/kvm/timer.h |  2 +-
+> >  arm64/timer.c             | 29 ++++++++++++-----------------
+> >  3 files changed, 14 insertions(+), 21 deletions(-)
 > > 
-> > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > index 10ca07c6dbe9..a04730b5fe41 100644
-> > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > @@ -4576,12 +4576,6 @@ static const struct of_device_id arm_smmu_of_match[] = {
-> >  };
-> >  MODULE_DEVICE_TABLE(of, arm_smmu_of_match);
+> > diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
+> > index 1e456f2c6..abdd6324f 100644
+> > --- a/arm64/arm-cpu.c
+> > +++ b/arm64/arm-cpu.c
+> > @@ -12,11 +12,9 @@
 > >  
-> > -static void arm_smmu_driver_unregister(struct platform_driver *drv)
-> > -{
-> > -	arm_smmu_sva_notifier_synchronize();
-> > -	platform_driver_unregister(drv);
-> > -}
+> >  static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+> >  {
+> > -	int timer_interrupts[4] = {13, 14, 11, 10};
 > > -
-> >  static struct platform_driver arm_smmu_driver = {
-> >  	.driver	= {
-> >  		.name			= "arm-smmu-v3",
-> > @@ -4592,8 +4586,27 @@ static struct platform_driver arm_smmu_driver = {
-> >  	.remove = arm_smmu_device_remove,
-> >  	.shutdown = arm_smmu_device_shutdown,
-> >  };
-> > +
-> > +#ifndef CONFIG_ARM_SMMU_V3_PKVM
-> > +static void arm_smmu_driver_unregister(struct platform_driver *drv)
-> > +{
-> > +	arm_smmu_sva_notifier_synchronize();
-> > +	platform_driver_unregister(drv);
-> > +}
-> > +
-> >  module_driver(arm_smmu_driver, platform_driver_register,
-> >  	      arm_smmu_driver_unregister);
-> > +#else
-> > +/*
-> > + * Must be done after the hypervisor initializes at module_init()
-> > + * No need for unregister as this is a built in driver.
-> > + */
-> > +static int arm_smmu_driver_register(void)
-> > +{
-> > +	return platform_driver_register(&arm_smmu_driver);
-> > +}
-> > +device_initcall_sync(arm_smmu_driver_register);
-> > +#endif /* !CONFIG_ARM_SMMU_V3_PKVM */
+> >  	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip,
+> >  				kvm->cfg.arch.nested_virt);
+> > -	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
+> > +	timer__generate_fdt_nodes(fdt, kvm);
+> >  	pmu__generate_fdt_nodes(fdt, kvm);
+> >  }
+> >  
+> > diff --git a/arm64/include/kvm/timer.h b/arm64/include/kvm/timer.h
+> > index 928e9ea7a..81e093e46 100644
+> > --- a/arm64/include/kvm/timer.h
+> > +++ b/arm64/include/kvm/timer.h
+> > @@ -1,6 +1,6 @@
+> >  #ifndef ARM_COMMON__TIMER_H
+> >  #define ARM_COMMON__TIMER_H
+> >  
+> > -void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs);
+> > +void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm);
+> >  
+> >  #endif /* ARM_COMMON__TIMER_H */
+> > diff --git a/arm64/timer.c b/arm64/timer.c
+> > index 861f2d994..2ac6144f9 100644
+> > --- a/arm64/timer.c
+> > +++ b/arm64/timer.c
+> > @@ -5,31 +5,26 @@
+> >  #include "kvm/timer.h"
+> >  #include "kvm/util.h"
+> >  
+> > -void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
+> > +void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+> >  {
+> >  	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
+> >  	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
+> > -	u32 irq_prop[] = {
+> > -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+> > -		cpu_to_fdt32(irqs[0]),
+> > -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
+> > +	int irqs[5] = {13, 14, 11, 10, 12};
+> > +	int nr = ARRAY_SIZE(irqs);
+> > +	u32 irq_prop[nr * 3];
+> >  
+> > -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+> > -		cpu_to_fdt32(irqs[1]),
+> > -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
+> > +	if (!kvm->cfg.arch.nested_virt)
+> > +		nr--;  
 > 
-> I think this is a bit grotty as we now have to reason about different
-> initialisation ordering based on CONFIG_ARM_SMMU_V3_PKVM. Could we
-> instead return -EPROBE_DEFER if the driver tries to probe before the
-> hypervisor is up?
-
-I looked a bit into this and I think the current approach would be
-better because:
-1- In case KVM fails to initialise or was disabled from command line,
-   waiting for the hypervisor means SMMUs may never probe.
-   One of the things I was cautious to get right is the error path,
-   so if KVM or if the nested driver fails at any point at initialization,
-   the SMMUs should still be probed and the systems should still be running
-   even without KVM.
-
-2- That's not as bad, but it leaks some KVM internals as we need to either
-   check (is_kvm_arm_initialised()\or kvm_protected_mode_initialized) from
-   driver code, as opposed to registering the driver late based on a kernel
-   config for the nested SMMUv3.
-
-If we really want to avoid the current approach, we can keep deferring probe,
-until a check for a new flag set from “finalize_pkvm” which is called
-unconditionally of KVM state.
-
-Thanks,
-Mostafa
-
+> I'm confused.
 > 
-> Will
+> FEAT_VHE introduced the EL2 virtual timer, and my interpretation of the Arm ARM
+> is that the EL2 virtual timer is present if an only if FEAT_VHE:
+> 
+> "In an implementation of the Generic Timer that includes EL3, if EL3 can use
+> AArch64, the following timers are implemented:
+> [..]
+> * When FEAT_VHE is implemented, a Non-secure EL2 virtual timer."
+> 
+> Is my interpretation correct?
+> 
+> KVM doesn't allow FEAT_VHE and FEAT_E2H0 to coexist (in
+> nested.c::limit_nv_id_reg()), to force E2H to be RES0. Assuming my interpretion
+> is correct, shouldn't the check be:
+
+Even at the risk of going even deeper into that nitpicking rabbit hole:
+"If FEAT_E2H0 is implemented, then FEAT_VHE is implemented."
+So we have that timer, regardless of FEAT_E2H0, and regardless of whether
+HCR_EL2.E2H is actually 0 or 1?
+And indeed the configuration stanza and the pseudocode in "D24.10.9
+CNTHV_CTL_EL2, Counter-timer Virtual Timer Control Register (EL2)" do not
+mention SCR_EL2.E2H0 at all, just FEAT_VHE.
+
+Cheers,
+Andre
+
+> 	if (!kvm->cfg.arch.nested_virt || kvm->cfg.arch.e2h0)
+> 		nr--;
+> 
+> Thanks,
+> Alex
+> 
+> >  
+> > -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+> > -		cpu_to_fdt32(irqs[2]),
+> > -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
+> > -
+> > -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+> > -		cpu_to_fdt32(irqs[3]),
+> > -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
+> > -	};
+> > +	for (int i = 0; i < nr; i++) {
+> > +		irq_prop[i * 3 + 0] = cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI);
+> > +		irq_prop[i * 3 + 1] = cpu_to_fdt32(irqs[i]);
+> > +		irq_prop[i * 3 + 2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW);
+> > +	}
+> >  
+> >  	_FDT(fdt_begin_node(fdt, "timer"));
+> >  	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
+> > -	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
+> > +	_FDT(fdt_property(fdt, "interrupts", irq_prop, nr * 3 * sizeof(irq_prop[0])));
+> >  	_FDT(fdt_property(fdt, "always-on", NULL, 0));
+> >  	if (kvm->cfg.arch.force_cntfrq > 0)
+> >  		_FDT(fdt_property_cell(fdt, "clock-frequency", kvm->cfg.arch.force_cntfrq));
+> > -- 
+> > 2.25.1
+> >   
+
