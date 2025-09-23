@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550EA2D0C73
-	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 17:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1A12D5408
+	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 17:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758649790; cv=none; b=AXEocbf+DVkIiRzguJBJs6SLE5H0JhAjCG6sJT+TjTQZQv3IcPhkIq7dkZ422DPOrBH7XUDABhPEz3NR9YgkIdpVnefPFW8nIm4bpGfgEzXwSTixObTM/YBsHGiDPBU7tbDrNSkhYfpFvaY0HOUNcDaJHZiA+4RcilgU8qFhcIE=
+	t=1758649794; cv=none; b=b/OT11hFpWTvqj+7nFyNYv7rEodHxtKLUdpxrdin8As3HVAsjfDhC5ODtdC1PBD5oLVrBhbvNjy3QRd5krJO3TUwiFypLumowVn4Os87r10cWWBG/QnLyd9NWUovMq8012mhttgo/f7nsO47wlkqBCDWQNDcjMDDKRLkITH31HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758649790; c=relaxed/simple;
-	bh=6Tr4kf7vFu7YuYjDqQ3S3owB0KlK2pmWRH9TBZyDAxc=;
+	s=arc-20240116; t=1758649794; c=relaxed/simple;
+	bh=Urr8+VR0qOSdsILBhXsPbRbFoSlNV8lWhdKoJwi+ahE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gk6IenroQVZRaZW6Ei1xj2CNEodpqGnXAFUWjED3d+mWLshIittQz3/3uvVkdS8M2WyuDkzY2a8zp3U73wOn/f+ijZmZ3QQS57K2DiIHL1HsQeBVkBZ7Gj8Wqswnq9Rhh+x8O8J0RInGUO1YV7WAGDMtKzI0CxxHe59yTC3zpSQ=
+	 MIME-Version; b=N/O+xeJ/l5Z19WI+7T768i7Q5qILF7LlmzWMe8oOPUU3xWFCbe1rptMjIX9p1hAF39vs8Dpv3AkJi2qXBIIYg2gPbc1V3NUqQLT9cPVmkHWtLrd5YrYFAZ6O5RDcMtuCQ8a0hFk2xJAe0q6CV8ZiC0mBueUOQs2jef2rqW8tVt4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86C7D497;
-	Tue, 23 Sep 2025 10:49:39 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8739497;
+	Tue, 23 Sep 2025 10:49:43 -0700 (PDT)
 Received: from e137867.cambridge.arm.com (e137867.arm.com [10.1.30.204])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4E63D3F5A1;
-	Tue, 23 Sep 2025 10:49:44 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1AE8B3F5A1;
+	Tue, 23 Sep 2025 10:49:47 -0700 (PDT)
 From: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -38,9 +38,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	kasan-dev@googlegroups.com,
 	Mark Rutland <mark.rutland@arm.com>,
 	Ada Couprie Diaz <ada.coupriediaz@arm.com>
-Subject: [RFC PATCH 08/16] arm64/insn: always inline aarch64_insn_gen_logical_immediate()
-Date: Tue, 23 Sep 2025 18:48:55 +0100
-Message-ID: <20250923174903.76283-9-ada.coupriediaz@arm.com>
+Subject: [RFC PATCH 09/16] arm64/insn: always inline aarch64_insn_gen_add_sub_imm()
+Date: Tue, 23 Sep 2025 18:48:56 +0100
+Message-ID: <20250923174903.76283-10-ada.coupriediaz@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250923174903.76283-1-ada.coupriediaz@arm.com>
 References: <20250923174903.76283-1-ada.coupriediaz@arm.com>
@@ -52,337 +52,193 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As it is always called with an explicit logic instruction type, we can
-check for its validity at compile time and remove the runtime error print.
+As it is always called with an explicit instruction adsb type and variant,
+we can check for their validity at compile time and remove
+the runtime error print.
 
-Pull its helper functions, `aarch64_encode_immediate()` and
-`range_of_ones()`, into the header and make them `__always_inline`
-as well.
-This is safe as they only call other `__always_inline` functions.
+This is not the case for the immediate error print, as it checks
+dynamically. However, it should not occur in practice and will still
+generate a fault BRK, so remove it.
 
-This makes `aarch64_insn_gen_logical_immediate()` safe for inlining
-and usage from patching callbacks.
+This makes `aarch64_insn_gen_add_sub_imm()` safe for inlining
+and usage from patching callbacks, as both
+`aarch64_insn_encode_register()` and `aarch64_insn_encode_immediate()`
+have been made safe in previous commits.
 
 Signed-off-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 ---
- arch/arm64/include/asm/insn.h | 149 ++++++++++++++++++++++++++++++++--
- arch/arm64/lib/insn.c         | 136 -------------------------------
- 2 files changed, 144 insertions(+), 141 deletions(-)
+ arch/arm64/include/asm/insn.h | 68 +++++++++++++++++++++++++++++++++--
+ arch/arm64/lib/insn.c         | 62 --------------------------------
+ 2 files changed, 66 insertions(+), 64 deletions(-)
 
 diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-index 5a25e311717f..a94ecc9140f1 100644
+index a94ecc9140f1..a7caafd6f02b 100644
 --- a/arch/arm64/include/asm/insn.h
 +++ b/arch/arm64/include/asm/insn.h
-@@ -16,6 +16,8 @@
+@@ -627,6 +627,8 @@ static __always_inline bool aarch64_get_imm_shift_mask(
+ #define ADR_IMM_HISHIFT		5
  
- #ifndef __ASSEMBLY__
+ #define AARCH64_INSN_SF_BIT	BIT(31)
++#define AARCH64_INSN_LSL_12	BIT(22)
++
  
-+#include <linux/bitops.h>
+ enum aarch64_insn_encoding_class aarch64_get_insn_class(u32 insn);
+ u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn);
+@@ -788,10 +790,72 @@ u32 aarch64_insn_gen_load_store_ex(enum aarch64_insn_register reg,
+ 				   enum aarch64_insn_register state,
+ 				   enum aarch64_insn_size_type size,
+ 				   enum aarch64_insn_ldst_type type);
+-u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
 +
- enum aarch64_insn_hint_cr_op {
- 	AARCH64_INSN_HINT_NOP	= 0x0 << 5,
- 	AARCH64_INSN_HINT_YIELD	= 0x1 << 5,
-@@ -880,11 +882,148 @@ u32 aarch64_insn_gen_logical_shifted_reg(enum aarch64_insn_register dst,
- u32 aarch64_insn_gen_move_reg(enum aarch64_insn_register dst,
- 			      enum aarch64_insn_register src,
- 			      enum aarch64_insn_variant variant);
--u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
--				       enum aarch64_insn_variant variant,
--				       enum aarch64_insn_register Rn,
--				       enum aarch64_insn_register Rd,
--				       u64 imm);
-+
-+static __always_inline bool range_of_ones(u64 val)
++static __always_inline u32 aarch64_insn_gen_add_sub_imm(
++				 enum aarch64_insn_register dst,
+ 				 enum aarch64_insn_register src,
+ 				 int imm, enum aarch64_insn_variant variant,
+-				 enum aarch64_insn_adsb_type type);
++				 enum aarch64_insn_adsb_type type)
 +{
-+	/* Doesn't handle full ones or full zeroes */
-+	u64 sval = val >> __ffs64(val);
-+
-+	/* One of Sean Eron Anderson's bithack tricks */
-+	return ((sval + 1) & (sval)) == 0;
-+}
-+
-+static __always_inline u32 aarch64_encode_immediate(u64 imm,
-+				 enum aarch64_insn_variant variant,
-+				 u32 insn)
-+{
-+	unsigned int immr, imms, n, ones, ror, esz, tmp;
-+	u64 mask;
-+
-+	switch (variant) {
-+	case AARCH64_INSN_VARIANT_32BIT:
-+		esz = 32;
-+		break;
-+	case AARCH64_INSN_VARIANT_64BIT:
-+		insn |= AARCH64_INSN_SF_BIT;
-+		esz = 64;
-+		break;
-+	default:
-+		return AARCH64_BREAK_FAULT;
-+	}
-+
-+	mask = GENMASK(esz - 1, 0);
-+
-+	/* Can't encode full zeroes, full ones, or value wider than the mask */
-+	if (!imm || imm == mask || imm & ~mask)
-+		return AARCH64_BREAK_FAULT;
-+
-+	/*
-+	 * Inverse of Replicate(). Try to spot a repeating pattern
-+	 * with a pow2 stride.
-+	 */
-+	for (tmp = esz / 2; tmp >= 2; tmp /= 2) {
-+		u64 emask = BIT(tmp) - 1;
-+
-+		if ((imm & emask) != ((imm >> tmp) & emask))
-+			break;
-+
-+		esz = tmp;
-+		mask = emask;
-+	}
-+
-+	/* N is only set if we're encoding a 64bit value */
-+	n = esz == 64;
-+
-+	/* Trim imm to the element size */
-+	imm &= mask;
-+
-+	/* That's how many ones we need to encode */
-+	ones = hweight64(imm);
-+
-+	/*
-+	 * imms is set to (ones - 1), prefixed with a string of ones
-+	 * and a zero if they fit. Cap it to 6 bits.
-+	 */
-+	imms  = ones - 1;
-+	imms |= 0xf << ffs(esz);
-+	imms &= BIT(6) - 1;
-+
-+	/* Compute the rotation */
-+	if (range_of_ones(imm)) {
-+		/*
-+		 * Pattern: 0..01..10..0
-+		 *
-+		 * Compute how many rotate we need to align it right
-+		 */
-+		ror = __ffs64(imm);
-+	} else {
-+		/*
-+		 * Pattern: 0..01..10..01..1
-+		 *
-+		 * Fill the unused top bits with ones, and check if
-+		 * the result is a valid immediate (all ones with a
-+		 * contiguous ranges of zeroes).
-+		 */
-+		imm |= ~mask;
-+		if (!range_of_ones(~imm))
-+			return AARCH64_BREAK_FAULT;
-+
-+		/*
-+		 * Compute the rotation to get a continuous set of
-+		 * ones, with the first bit set at position 0
-+		 */
-+		ror = fls64(~imm);
-+	}
-+
-+	/*
-+	 * immr is the number of bits we need to rotate back to the
-+	 * original set of ones. Note that this is relative to the
-+	 * element size...
-+	 */
-+	immr = (esz - ror) % esz;
-+
-+	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_N, insn, n);
-+	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_R, insn, immr);
-+	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_S, insn, imms);
-+}
-+
-+static __always_inline u32 aarch64_insn_gen_logical_immediate(
-+					 enum aarch64_insn_logic_type type,
-+					 enum aarch64_insn_variant variant,
-+					 enum aarch64_insn_register Rn,
-+					 enum aarch64_insn_register Rd,
-+					 u64 imm)
-+{
-+	compiletime_assert(type == AARCH64_INSN_LOGIC_AND ||
-+		type == AARCH64_INSN_LOGIC_ORR ||
-+		type == AARCH64_INSN_LOGIC_EOR ||
-+		type == AARCH64_INSN_LOGIC_AND_SETFLAGS,
-+		"unknown logical encoding");
++	compiletime_assert(type >= AARCH64_INSN_ADSB_ADD &&
++		type <= AARCH64_INSN_ADSB_SUB_SETFLAGS,
++		"unknown add/sub encoding");
++	compiletime_assert(variant == AARCH64_INSN_VARIANT_32BIT ||
++		variant == AARCH64_INSN_VARIANT_64BIT,
++		"unknown variant encoding");
 +	u32 insn;
 +
 +	switch (type) {
-+	case AARCH64_INSN_LOGIC_AND:
-+		insn = aarch64_insn_get_and_imm_value();
++	case AARCH64_INSN_ADSB_ADD:
++		insn = aarch64_insn_get_add_imm_value();
 +		break;
-+	case AARCH64_INSN_LOGIC_ORR:
-+		insn = aarch64_insn_get_orr_imm_value();
++	case AARCH64_INSN_ADSB_SUB:
++		insn = aarch64_insn_get_sub_imm_value();
 +		break;
-+	case AARCH64_INSN_LOGIC_EOR:
-+		insn = aarch64_insn_get_eor_imm_value();
++	case AARCH64_INSN_ADSB_ADD_SETFLAGS:
++		insn = aarch64_insn_get_adds_imm_value();
 +		break;
-+	case AARCH64_INSN_LOGIC_AND_SETFLAGS:
-+		insn = aarch64_insn_get_ands_imm_value();
++	case AARCH64_INSN_ADSB_SUB_SETFLAGS:
++		insn = aarch64_insn_get_subs_imm_value();
 +		break;
 +	default:
 +		return AARCH64_BREAK_FAULT;
 +	}
 +
-+	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, Rd);
-+	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
-+	return aarch64_encode_immediate(imm, variant, insn);
++	switch (variant) {
++	case AARCH64_INSN_VARIANT_32BIT:
++		break;
++	case AARCH64_INSN_VARIANT_64BIT:
++		insn |= AARCH64_INSN_SF_BIT;
++		break;
++	default:
++		return AARCH64_BREAK_FAULT;
++	}
++
++	/* We can't encode more than a 24bit value (12bit + 12bit shift) */
++	if (imm & ~(BIT(24) - 1))
++		goto out;
++
++	/* If we have something in the top 12 bits... */
++	if (imm & ~(SZ_4K - 1)) {
++		/* ... and in the low 12 bits -> error */
++		if (imm & (SZ_4K - 1))
++			goto out;
++
++		imm >>= 12;
++		insn |= AARCH64_INSN_LSL_12;
++	}
++
++	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, dst);
++
++	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, src);
++
++	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_12, insn, imm);
++
++out:
++	return AARCH64_BREAK_FAULT;
 +}
 +
-+
- u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
- 			  enum aarch64_insn_register Rm,
- 			  enum aarch64_insn_register Rn,
+ u32 aarch64_insn_gen_adr(unsigned long pc, unsigned long addr,
+ 			 enum aarch64_insn_register reg,
+ 			 enum aarch64_insn_adr_type type);
 diff --git a/arch/arm64/lib/insn.c b/arch/arm64/lib/insn.c
-index 7530d51f9b2a..15634094de05 100644
+index 15634094de05..34b6f1c692b4 100644
 --- a/arch/arm64/lib/insn.c
 +++ b/arch/arm64/lib/insn.c
-@@ -1106,142 +1106,6 @@ u32 aarch32_insn_mcr_extract_crm(u32 insn)
- 	return insn & CRM_MASK;
- }
+@@ -17,7 +17,6 @@
+ #include <asm/kprobes.h>
  
--static bool range_of_ones(u64 val)
+ #define AARCH64_INSN_N_BIT	BIT(22)
+-#define AARCH64_INSN_LSL_12	BIT(22)
+ 
+ u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn)
+ {
+@@ -585,67 +584,6 @@ u32 aarch64_insn_gen_cas(enum aarch64_insn_register result,
+ }
+ #endif
+ 
+-u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
+-				 enum aarch64_insn_register src,
+-				 int imm, enum aarch64_insn_variant variant,
+-				 enum aarch64_insn_adsb_type type)
 -{
--	/* Doesn't handle full ones or full zeroes */
--	u64 sval = val >> __ffs64(val);
+-	u32 insn;
 -
--	/* One of Sean Eron Anderson's bithack tricks */
--	return ((sval + 1) & (sval)) == 0;
--}
--
--static u32 aarch64_encode_immediate(u64 imm,
--				    enum aarch64_insn_variant variant,
--				    u32 insn)
--{
--	unsigned int immr, imms, n, ones, ror, esz, tmp;
--	u64 mask;
+-	switch (type) {
+-	case AARCH64_INSN_ADSB_ADD:
+-		insn = aarch64_insn_get_add_imm_value();
+-		break;
+-	case AARCH64_INSN_ADSB_SUB:
+-		insn = aarch64_insn_get_sub_imm_value();
+-		break;
+-	case AARCH64_INSN_ADSB_ADD_SETFLAGS:
+-		insn = aarch64_insn_get_adds_imm_value();
+-		break;
+-	case AARCH64_INSN_ADSB_SUB_SETFLAGS:
+-		insn = aarch64_insn_get_subs_imm_value();
+-		break;
+-	default:
+-		pr_err("%s: unknown add/sub encoding %d\n", __func__, type);
+-		return AARCH64_BREAK_FAULT;
+-	}
 -
 -	switch (variant) {
 -	case AARCH64_INSN_VARIANT_32BIT:
--		esz = 32;
 -		break;
 -	case AARCH64_INSN_VARIANT_64BIT:
 -		insn |= AARCH64_INSN_SF_BIT;
--		esz = 64;
 -		break;
 -	default:
 -		pr_err("%s: unknown variant encoding %d\n", __func__, variant);
 -		return AARCH64_BREAK_FAULT;
 -	}
 -
--	mask = GENMASK(esz - 1, 0);
+-	/* We can't encode more than a 24bit value (12bit + 12bit shift) */
+-	if (imm & ~(BIT(24) - 1))
+-		goto out;
 -
--	/* Can't encode full zeroes, full ones, or value wider than the mask */
--	if (!imm || imm == mask || imm & ~mask)
--		return AARCH64_BREAK_FAULT;
+-	/* If we have something in the top 12 bits... */
+-	if (imm & ~(SZ_4K - 1)) {
+-		/* ... and in the low 12 bits -> error */
+-		if (imm & (SZ_4K - 1))
+-			goto out;
 -
--	/*
--	 * Inverse of Replicate(). Try to spot a repeating pattern
--	 * with a pow2 stride.
--	 */
--	for (tmp = esz / 2; tmp >= 2; tmp /= 2) {
--		u64 emask = BIT(tmp) - 1;
--
--		if ((imm & emask) != ((imm >> tmp) & emask))
--			break;
--
--		esz = tmp;
--		mask = emask;
+-		imm >>= 12;
+-		insn |= AARCH64_INSN_LSL_12;
 -	}
 -
--	/* N is only set if we're encoding a 64bit value */
--	n = esz == 64;
+-	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, dst);
 -
--	/* Trim imm to the element size */
--	imm &= mask;
+-	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, src);
 -
--	/* That's how many ones we need to encode */
--	ones = hweight64(imm);
+-	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_12, insn, imm);
 -
--	/*
--	 * imms is set to (ones - 1), prefixed with a string of ones
--	 * and a zero if they fit. Cap it to 6 bits.
--	 */
--	imms  = ones - 1;
--	imms |= 0xf << ffs(esz);
--	imms &= BIT(6) - 1;
--
--	/* Compute the rotation */
--	if (range_of_ones(imm)) {
--		/*
--		 * Pattern: 0..01..10..0
--		 *
--		 * Compute how many rotate we need to align it right
--		 */
--		ror = __ffs64(imm);
--	} else {
--		/*
--		 * Pattern: 0..01..10..01..1
--		 *
--		 * Fill the unused top bits with ones, and check if
--		 * the result is a valid immediate (all ones with a
--		 * contiguous ranges of zeroes).
--		 */
--		imm |= ~mask;
--		if (!range_of_ones(~imm))
--			return AARCH64_BREAK_FAULT;
--
--		/*
--		 * Compute the rotation to get a continuous set of
--		 * ones, with the first bit set at position 0
--		 */
--		ror = fls64(~imm);
--	}
--
--	/*
--	 * immr is the number of bits we need to rotate back to the
--	 * original set of ones. Note that this is relative to the
--	 * element size...
--	 */
--	immr = (esz - ror) % esz;
--
--	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_N, insn, n);
--	insn = aarch64_insn_encode_immediate(AARCH64_INSN_IMM_R, insn, immr);
--	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_S, insn, imms);
+-out:
+-	pr_err("%s: invalid immediate encoding %d\n", __func__, imm);
+-	return AARCH64_BREAK_FAULT;
 -}
 -
--u32 aarch64_insn_gen_logical_immediate(enum aarch64_insn_logic_type type,
--				       enum aarch64_insn_variant variant,
--				       enum aarch64_insn_register Rn,
--				       enum aarch64_insn_register Rd,
--				       u64 imm)
--{
--	u32 insn;
--
--	switch (type) {
--	case AARCH64_INSN_LOGIC_AND:
--		insn = aarch64_insn_get_and_imm_value();
--		break;
--	case AARCH64_INSN_LOGIC_ORR:
--		insn = aarch64_insn_get_orr_imm_value();
--		break;
--	case AARCH64_INSN_LOGIC_EOR:
--		insn = aarch64_insn_get_eor_imm_value();
--		break;
--	case AARCH64_INSN_LOGIC_AND_SETFLAGS:
--		insn = aarch64_insn_get_ands_imm_value();
--		break;
--	default:
--		pr_err("%s: unknown logical encoding %d\n", __func__, type);
--		return AARCH64_BREAK_FAULT;
--	}
--
--	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RD, insn, Rd);
--	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
--	return aarch64_encode_immediate(imm, variant, insn);
--}
--
- u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
- 			  enum aarch64_insn_register Rm,
- 			  enum aarch64_insn_register Rn,
+ u32 aarch64_insn_gen_bitfield(enum aarch64_insn_register dst,
+ 			      enum aarch64_insn_register src,
+ 			      int immr, int imms,
 -- 
 2.43.0
 
