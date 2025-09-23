@@ -1,125 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05FD2DEA79;
-	Tue, 23 Sep 2025 08:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2BA31D365
+	for <kvmarm@lists.linux.dev>; Tue, 23 Sep 2025 08:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758614634; cv=none; b=iYhWStzpGCghH1/wBAZUw8h3wv1Nu5SeM53IbPi0OgswIFpULHLaLQDs/GFyxeo3s48+uq3Zb0cBfliex89D0Ur64nI6Gc+ZDn1OGjLFO4AGBhROYby3v9KuII+32qMrBPzMSvj/1XV+1jsRCQSlAyDkocsWgBCQLh0x+morT4E=
+	t=1758616206; cv=none; b=JViZUrXagThrsVDbDxw7B2a9NNuKNSI4bI2Ra3/5wqSmN7HVCVwPtqDxTJcUhKQ8Q7shs9gm1AILDZBSXJYkwkF2bsXNFi+85PEOkLEmH+/RuBJWkF6kNvKJIpd9Ps4r1RF1dchOEn9hP2ZNscemi3YGmZMn0gbx8e+0kU9TcLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758614634; c=relaxed/simple;
-	bh=1uL8zMCWJXKjyrofklpu94Ov8wlXnfPS3LN0UwuWDeI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ur4CetbP51s75eZIYoZMQfOb1Dt4blNohwkpe/t/mTiYblrE0PP8GUWx8AdCO+qtGsRMKa1zGY/PsL6MJDTm9l2kOK0uvKlB/3KH7qlC2ObmObyRcbGeL67vO5/Dhp4yzG2z6hzmiP1FtyTz6uGhMbSsUyBqbB0o6sSA22Ee4Lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r25Euohf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758616206; c=relaxed/simple;
+	bh=9fhFjemDaxrZP5fRDtkRJGTFA853obiHje/fluk36po=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iTRtIxNcuVvfBbLKivajqjp3uY5eIRbtabatNYfHWIqrf1CDp6s8SZ0i+F/XrdxYjDlAjwLbvXIw8bg2/2kTGbhWfXmGtdpcTRoe6iYM1y9yOtSaHaoVejrI0VBKa29WtZoGONvzLLEw7SIvN4AufuEHCpywsm+Uj0uJaKc6eCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=An2XW3sm; arc=none smtp.client-ip=52.34.181.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r25Euohf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40974C4CEF7;
-	Tue, 23 Sep 2025 08:03:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758614634;
-	bh=1uL8zMCWJXKjyrofklpu94Ov8wlXnfPS3LN0UwuWDeI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r25EuohfNyaH331n8cTzafDXav0Rz4WDmkA/kHNz+ePibetT3ACpbsTFKA7sm7Q7W
-	 uDKXw30BE0vBlXhnOmDvZ9O05nTCifB8VaVvoPXjTa0Ig2n+PU2ri66bB0q40OP9oX
-	 aOG/1Xz56aU5zthSGu7aFfs8gZyl2VpA2TeNtiNDzzCwFuhWO5aO2QQiJe1V6j9Pa4
-	 MU26HljlM9kKT9B1Dxv8MapFyJAIMpDa7hLp5W5DbLDtvgVV+QmMDHAp6YJZM5Z7HD
-	 GNdpqX5Q+y0OwLat+y1zOdx9T4C2ZFEQZYiLsdJnHGr42csmGALSEwAYXRz7CsteMO
-	 CHwVpXsT3jaZQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v0y07-00000008eJK-436N;
-	Tue, 23 Sep 2025 08:03:52 +0000
-Date: Tue, 23 Sep 2025 09:03:51 +0100
-Message-ID: <86frcd1tp4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Priscilla Lam <prl@amazon.com>
-Cc: <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<dwmw@amazon.co.uk>,
-	<gurugubs@amazon.com>,
-	<christoffer.dall@arm.com>,
-	<graf@amazon.com>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Implement KVM_TRANSLATE ioctl for arm64
-In-Reply-To: <20250922202452.45810-1-prl@amazon.com>
-References: <20250922202452.45810-1-prl@amazon.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="An2XW3sm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1758616205; x=1790152205;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=KeaqGM/dnSt7VQMXlKJMzUPAvYn4X0kFJnsfUt3Memw=;
+  b=An2XW3smu0r0KW6KRYLfGp5kuJ7dJ1sqQRd5ElueQ503Xm3mFVNytSXr
+   aPIgsRIRf+A4lAJwYTY+dHhWwuUaI90S8/3zFywRvKWG/ej4Cs522dB1v
+   GrSlbKV2R5PjnTNup7TSTiOHvsqkWYJ+GDOmpZ5BUtW8vwt7UGdAIbqBj
+   nPIkt94Fx2etEEtW2CVHq/ts3kARHfPmL0ErkTbE9WLINDJmw5uqr4daH
+   Y2ikNfHmV+PoSj4UO4JabTMrWcIEp2MD8+C8t88Fe0J/K0HyMpQVhFwMF
+   msI15C/dehBRrmQywWovceFtk9c+lGYvBycAyTdUAjXCSiasVnQtkg3E1
+   Q==;
+X-CSE-ConnectionGUID: Y+SxHihJTXaZjG3dAprjYQ==
+X-CSE-MsgGUID: xfFWRL0GTsqKazJJtxEOcA==
+X-IronPort-AV: E=Sophos;i="6.18,263,1751241600"; 
+   d="scan'208";a="3553817"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 08:30:04 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:11530]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.21:2525] with esmtp (Farcaster)
+ id a2aa504d-997f-4357-87ea-aa2904c81b42; Tue, 23 Sep 2025 08:30:04 +0000 (UTC)
+X-Farcaster-Flow-ID: a2aa504d-997f-4357-87ea-aa2904c81b42
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Tue, 23 Sep 2025 08:30:02 +0000
+Received: from c889f3b3a561.amazon.com (10.106.101.44) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Tue, 23 Sep 2025 08:30:01 +0000
+From: Priscilla Lam <prl@amazon.com>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>
+CC: <christoffer.dall@arm.com>, <dwmw@amazon.co.uk>, <graf@amazon.com>,
+	<gurugubs@amazon.com>, <jgrall@amazon.co.uk>, <joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <prl@amazon.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>
+Subject: Re: Re: [PATCH] KVM: arm64: Implement KVM_TRANSLATE ioctl for arm64
+Date: Tue, 23 Sep 2025 01:29:55 -0700
+Message-ID: <20250923082955.66602-1-prl@amazon.com>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: 86frcd1tp4.wl-maz@kernel.org
+References: <86frcd1tp4.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: prl@amazon.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, dwmw@amazon.co.uk, gurugubs@amazon.com, christoffer.dall@arm.com, graf@amazon.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hi Priscilla,
+Hi Oliver and Marc,
 
-On Mon, 22 Sep 2025 21:24:52 +0100,
-Priscilla Lam <prl@amazon.com> wrote:
-> 
-> There is a KVM_TRANSLATE ioctl for x86 to translate a GVA
-> (guest virtual address) to a GPA (guest physical address) in EL1
-> which is not yet implemented for arm64.
-> 
-> Implement KVM_TRANSLATE on arm64 for both configurations that
-> support and do not support VHE. The VHE path uses the AT
-> instruction directly while the non-VHE implementation wraps the
-> AT call in a hypercall to allow for its execution in EL2. Add
-> selftest that tests the ioctl in both configurations.
-> 
-> Signed-off-by: Priscilla Lam <prl@amazon.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h              |   2 +
->  arch/arm64/kvm/guest.c                        |  89 ++++++++++++++-
->  arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  10 ++
->  arch/arm64/kvm/hyp/nvhe/translate.c           |  84 ++++++++++++++
->  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->  tools/testing/selftests/kvm/arm64/translate.c | 107 ++++++++++++++++++
->  7 files changed, 292 insertions(+), 4 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/translate.c
->  create mode 100644 tools/testing/selftests/kvm/arm64/translate.c
+Thanks for the detailed feedback.
 
-Oliver already gave a review of some aspects of the code. In short,
-you're going about walking the page tables the wrong way, both by
-ignoring some of the complicated architectural features (PIE, POE),
-trusting the S1 PTs to be vaguely correct, and by assuming that S1 PTs
-are never swapped out.
+> But at the end of the day, what do you need KVM_TRANSLATE for? This
+> interface is an absolute turd that is unable to represent the bare
+> minimum of the architecture (writable by whom? physical address in
+> which translation regime? what about S2 translations?), and is better
+> left in the "utter brain fart" category.
 
-But there is more: you are assuming that the only translation regime
-we care about is EL1&0, which isn't true. This would also need to
-cater for EL2 and EL2&0.
+Regarding motivation, this patch is intended to give a userspace vmm
+the ability to handle non-ISV guest faults. The Arm Arm (DDI 0487L.b,
+section B3.13.6) notes that for load/store pair faults, the syndrome
+may not provide the specifics of the access that faulted. In those
+cases, the vmm must manually decode the instruction to emulate it. The
+introduction of KVM_CAP_ARM_NISV_TO_USER
+(https://lore.kernel.org/kvm/20191120164236.29359-2-maz@kernel.org/)
+seems to have anticipated that flow by allowing exits to userspace on
+trapped NISV instructions. What is still missing is a reliable way for
+userspace to query VA->IPA translations in order to complete emulation.
 
-As Oliver also pointed out, all that infrastructure already exists in
-the kernel, and is able to do the right thing, with full support of
-the expected feature set as presented to the guest.
+> Please do selftests changes in a separate patch.
 
-But at the end of the day, what do you need KVM_TRANSLATE for? This
-interface is an absolute turd that is unable to represent the bare
-minimum of the architecture (writable by whom? physical address in
-which translation regime? what about S2 translations?), and is better
-left in the "utter brain fart" category.
+Ack, will split the kernel changes and selftests into 1/2 and 2/2.
 
-Finally, and assuming that you actually need something of the sort,
-why do you expect that something in the kernel will be better than a
-pure userspace implementation?
+> So arch/arm64/kvm/at.c exists for this exact purpose: walking guest page
+> tables. While it was previously constrained to handling NV-enabled VMs,
+> Marc's SEA TTW series opens up the stage-1 walker for general use.
+
+Thanks for the reference, I wasn't aware of this. I'll drop the bespoke 
+VHE/NVHE paths and use the shared S1 walker in v2.
+
+> "linear_address" is a delightful x86-ism. I'd prefer naming that was
+> either architecture-generic -or- an arm64-specific struct that used our
+> architectural terms.
+
+I'll switch internal naming to VA/IPA. For uAPI, I'll retain the field
+for compatibility and translate internally.
+
+> Thanks to borken hardware, this needs to go through the write_sysreg_hcr()
+> accessor.
+
+Ack, will use write_sysreg_hcr().
+
+> KVM supports both FEAT_S1PIE and FEAT_S1POE, so this is not a complete
+> MMU context.
+
+Understood. v2 will rely on the shared walker to avoid missing S1PIE/S1POE.
+
+> The AT instruction can generate an exception, which is why __kvm_at()
+> exists.
+>
+> And this is where reusing the existing translation infrastructure is
+> really important. The AT instruction *will* fail if the stage-1
+> translation tables are unmapped at stage-2. The only option at that
+> point is falling back to a software table walker that potentially faults
+> in the missing translation tables.
+
+v2 will use __kvm_at() and the fallback software walk.
+
+> What about permissions besides RW?
+
+I'll add support for the additional bit (execute and EL0) in v2.
+
+> Yet another interesting consideration around this entire infrastructure
+> is the guest's view of the translation that the VMM will now use. KVM
+> uses a pseudo-TLB for the guest's VNCR page and maintains it just like a
+> literal TLB.
+>
+> How would the guest invalidate the translation fetched by the VMM when
+> unmapping/remapping the VA? Doesn't the stage-1 PTW need to set the
+> Access flag as this amounts to a TLB fill?
+> Understanding what it is you're trying to accomplish would be quite
+> helpful. I'm concerned this trivializes some of the gory details of
+> participating in the guest's virtual memory.
+
+My intent is for this ioctl to be side-effect free with no AF updates 
+and guest-visible TLB fills. I’ll send v2 as two patches with the above
+changes.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Priscilla
