@@ -1,50 +1,50 @@
 Received: from postout2.mail.lrz.de (postout2.mail.lrz.de [129.187.255.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9460B30B52F
-	for <kvmarm@lists.linux.dev>; Wed, 24 Sep 2025 15:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54273064AA;
+	Wed, 24 Sep 2025 15:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.187.255.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758726700; cv=none; b=QmuD5LuVqhbyPuMWCGpyW5JQ5EkUVmh4+bEfABJdgn0mjMilGbFLqoKlyA5wngQlspqsqncfvJPhK3fP6uh0CuJQSWvaNjDTLsEDsZKwHgdhx+/HVA7qB+KKPYF2vZbWdJ2KtN8TmY20X0Tu/zwl0UiIcthO2QIuLsqKOk6T71c=
+	t=1758726700; cv=none; b=reTeDIwD9UtQ09WJA4bc8rdG34vFX1uoS6rwp5I2+n5BUJ6GjGAyNbYBmFwQrCjl6m7gG4L69zfBZNCdE2Z3xQqpy3LEySOrkaaWJ1mhtQZus2g0vOOJDe+FW/wyyl02mypLXVf0Qts5vmKufCnwk+bZMlNZHK0Nx/uM0q+M/Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758726700; c=relaxed/simple;
-	bh=Jm4TOb5za1zdWiB64CehdYksvd0hcBd/a5OjGHq8lgs=;
+	bh=ZNfU2/BIASQO3fWfzdEY1q9Zbqul50E24+/no2KCYus=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c1RWwz8HuuOSfa5LPhl5x5+iJlSVzKgfScXHourIfTFKhsYJ3NDLdiT5oqFPzsfUOmm1QEMM5kBo5Q8iZjhZZIiyABF6rqmQSxghwUBmDEWUzpt6CPUDm3ElBQ8kWihOUKcEOqMoHfZTd+/i7o+MlKYKYAI6uI3Uwp9JKsRDPHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=campus.lmu.de; spf=pass smtp.mailfrom=campus.lmu.de; dkim=pass (2048-bit key) header.d=lmu.de header.i=@campus.lmu.de header.b=Ds3tHqp4; arc=none smtp.client-ip=129.187.255.138
+	 MIME-Version; b=cVMhyJ0sM+1YTYCNBMTdEr0k21hUFXO4z50swILITK20vpJTOb0B+DHXd898XkwHIQp3qhpvnup0XIKlzjlQnYkCfsODK1rPHL+VWyG+foqJvkhxrCnU19CtUHWOMwtnubhMVfV84p4oRlFhAOQxcrky+EFMpm6k377i8NY099M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=campus.lmu.de; spf=pass smtp.mailfrom=campus.lmu.de; dkim=pass (2048-bit key) header.d=lmu.de header.i=@campus.lmu.de header.b=ERCmo7GN; arc=none smtp.client-ip=129.187.255.138
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=campus.lmu.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=campus.lmu.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lmu.de header.i=@campus.lmu.de header.b="Ds3tHqp4"
+	dkim=pass (2048-bit key) header.d=lmu.de header.i=@campus.lmu.de header.b="ERCmo7GN"
 Received: from lxmhs52.srv.lrz.de (localhost [127.0.0.1])
-	by postout2.mail.lrz.de (Postfix) with ESMTP id 4cX0gC2Zl1zyXy;
-	Wed, 24 Sep 2025 17:11:35 +0200 (CEST)
+	by postout2.mail.lrz.de (Postfix) with ESMTP id 4cX0gB4hkgzyTD;
+	Wed, 24 Sep 2025 17:11:34 +0200 (CEST)
 Authentication-Results: postout.lrz.de (amavis); dkim=pass (2048-bit key)
  reason="pass (just generated, assumed good)" header.d=lmu.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmu.de; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
 	:received:received; s=lm-postout21; i=@campus.lmu.de; t=
-	1758726694; bh=PniUGv6KoWbLzxsjGhaF2BGkvfN+PIVzF8ZJsy2VjBA=; b=D
-	s3tHqp43ssNDXomgsZBIvc4eGGgChOsGKqbB8qjdKMv2lHKagMLmabwzb4Spn3RE
-	8UddA5FG7r2qcfUPf4G5tP8KUJYLZHqeVXljFu6VvMXApZbymhc0YPnqs/PsM0QS
-	4Fnxf1X7QSNNc5XguswqkqWhMpjTO0axQxglgsgeTEf4Gx1J4t0rqWZJeQw6g2+H
-	AF+2u3P0wFYeJK3k4oRR0a0AMEjmlhkfvKOwlYEI7nM/9Dv7/I0Wwo+taajRFHDB
-	iePy1P7pfoaz1x/To3Yks5rBkethnWV4Fr0dFuVz+y77Ct+PM3h+DVhu5MXb7iTR
-	gGGXfxoGKznCXx+o6b43g==
+	1758726694; bh=Wp7TACVDU5DtOz71qp4hjyzNeEjUGnycsxHnG+BQylo=; b=E
+	RCmo7GN3cJorQyZx7veOPX1uJX526B979gcoqD9YQPNg2IlhNVxWPFsMFg+QS/q3
+	L/wVNxo8mJlMHtkp/bEvKP7Hn+Gec2q7CNLyZt0EpSMka0FGzp5jCLM+/4Q4Yf9m
+	bVnNe2Tm7A8+i74QMY7Y1jxU7K7i3ZBWXNk3nMdvTZsDVJlux0h/VG4Yw7pbmUSO
+	RpLfSu4b6GZEIpe3sZKqyNWAaDHGBchXBCWQzjhHNdflPiUJAQ9O1DmlqkXQb9EW
+	Uhe+iIn9Bv6pA0Z2aDaAYUqxTzRjd0IKO7k1GlUoiaatpmzPZUMKJctUANGLq63W
+	fc7ujWT6qB0l70vnk9IVA==
 X-Virus-Scanned: by amavisd-new at lrz.de in lxmhs52.srv.lrz.de
 X-Spam-Flag: NO
 X-Spam-Score: -2.887
 X-Spam-Level:
 Received: from postout2.mail.lrz.de ([127.0.0.1])
  by lxmhs52.srv.lrz.de (lxmhs52.srv.lrz.de [127.0.0.1]) (amavis, port 20024)
- with LMTP id icm6tp2oYbWr; Wed, 24 Sep 2025 17:11:34 +0200 (CEST)
+ with LMTP id bdh52MywZE5f; Wed, 24 Sep 2025 17:11:34 +0200 (CEST)
 Received: from spacestation.cable.virginm.net (oxfd-27-b2-v4wan-164230-cust474.vm42.cable.virginm.net [86.22.133.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by postout2.mail.lrz.de (Postfix) with ESMTPSA id 4cX0g74qG5zyY6;
-	Wed, 24 Sep 2025 17:11:31 +0200 (CEST)
+	by postout2.mail.lrz.de (Postfix) with ESMTPSA id 4cX0g40m58zyXY;
+	Wed, 24 Sep 2025 17:11:28 +0200 (CEST)
 From: Patrick Roy <patrick.roy@campus.lmu.de>
 To: 
 Cc: Patrick Roy <roypat@amazon.co.uk>,
@@ -107,10 +107,13 @@ Cc: Patrick Roy <roypat@amazon.co.uk>,
 	jackabt@amazon.co.uk,
 	derekmn@amazon.co.uk,
 	tabba@google.com,
-	ackerleytng@google.com
-Subject: [PATCH v7 02/12] x86/tlb: export flush_tlb_kernel_range to KVM module
-Date: Wed, 24 Sep 2025 16:10:42 +0100
-Message-ID: <20250924151101.2225820-3-patrick.roy@campus.lmu.de>
+	ackerleytng@google.com,
+	loongarch@lists.linux.dev,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org
+Subject: [PATCH v7 01/12] arch: export set_direct_map_valid_noflush to KVM module
+Date: Wed, 24 Sep 2025 16:10:41 +0100
+Message-ID: <20250924151101.2225820-2-patrick.roy@campus.lmu.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250924151101.2225820-1-patrick.roy@campus.lmu.de>
 References: <20250924151101.2225820-1-patrick.roy@campus.lmu.de>
@@ -124,55 +127,85 @@ Content-Transfer-Encoding: 7bit
 
 From: Patrick Roy <roypat@amazon.co.uk>
 
-After direct map removal, a TLB flush can be done to ensure that the
-just-unmapped memory cannot be accessed through stale TLB entries. This
-is particularly useful on modern hardware, where one can not rely on
-timely TLB-eviction to ensure these entries go away.
+Use the new per-module export functionality to allow KVM (and only KVM)
+access to set_direct_map_valid_noflush(). This allows guest_memfd to
+remove its memory from the direct map, even if KVM is built as a module.
 
-This export is only needed on x86, as arm64 (the only other architecture
-supporting guest_memfd currently) does not allow building KVM as a
-module.
+Direct map removal gives guest_memfd the same protection that
+memfd_secret enjoys, such as hardening against Spectre-like attacks
+through in-kernel gadgets.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: loongarch@lists.linux.dev
+Cc: linux-riscv@lists.infradead.org
+Cc: linux-s390@vger.kernel.org
+Reviewed-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
 ---
- arch/x86/include/asm/tlbflush.h | 3 ++-
- arch/x86/mm/tlb.c               | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/mm/pageattr.c     | 1 +
+ arch/loongarch/mm/pageattr.c | 1 +
+ arch/riscv/mm/pageattr.c     | 1 +
+ arch/s390/mm/pageattr.c      | 1 +
+ arch/x86/mm/pat/set_memory.c | 1 +
+ 5 files changed, 5 insertions(+)
 
-diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
-index 00daedfefc1b..6f57f7eb621b 100644
---- a/arch/x86/include/asm/tlbflush.h
-+++ b/arch/x86/include/asm/tlbflush.h
-@@ -317,7 +317,6 @@ extern void flush_tlb_all(void);
- extern void flush_tlb_mm_range(struct mm_struct *mm, unsigned long start,
- 				unsigned long end, unsigned int stride_shift,
- 				bool freed_tables);
--extern void flush_tlb_kernel_range(unsigned long start, unsigned long end);
+diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
+index 04d4a8f676db..4f3cddfab9b0 100644
+--- a/arch/arm64/mm/pageattr.c
++++ b/arch/arm64/mm/pageattr.c
+@@ -291,6 +291,7 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
  
- static inline void flush_tlb_page(struct vm_area_struct *vma, unsigned long a)
- {
-@@ -483,6 +482,8 @@ static inline void cpu_tlbstate_update_lam(unsigned long lam, u64 untag_mask)
- #endif
- #endif /* !MODULE */
- 
-+extern void flush_tlb_kernel_range(unsigned long start, unsigned long end);
-+
- static inline void __native_tlb_flush_global(unsigned long cr4)
- {
- 	native_write_cr4(cr4 ^ X86_CR4_PGE);
-diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
-index 39f80111e6f1..dee5018bceeb 100644
---- a/arch/x86/mm/tlb.c
-+++ b/arch/x86/mm/tlb.c
-@@ -1541,6 +1541,7 @@ void flush_tlb_kernel_range(unsigned long start, unsigned long end)
- 
- 	put_flush_tlb_info();
+ 	return set_memory_valid(addr, nr, valid);
  }
-+EXPORT_SYMBOL_FOR_MODULES(flush_tlb_kernel_range, "kvm");
++EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
  
+ #ifdef CONFIG_DEBUG_PAGEALLOC
  /*
-  * This can be used from process context to figure out what the value of
+diff --git a/arch/loongarch/mm/pageattr.c b/arch/loongarch/mm/pageattr.c
+index f5e910b68229..458f5ae6a89b 100644
+--- a/arch/loongarch/mm/pageattr.c
++++ b/arch/loongarch/mm/pageattr.c
+@@ -236,3 +236,4 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
+ 
+ 	return __set_memory(addr, 1, set, clear);
+ }
++EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
+diff --git a/arch/riscv/mm/pageattr.c b/arch/riscv/mm/pageattr.c
+index 3f76db3d2769..6db31040cd66 100644
+--- a/arch/riscv/mm/pageattr.c
++++ b/arch/riscv/mm/pageattr.c
+@@ -400,6 +400,7 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
+ 
+ 	return __set_memory((unsigned long)page_address(page), nr, set, clear);
+ }
++EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
+ 
+ #ifdef CONFIG_DEBUG_PAGEALLOC
+ static int debug_pagealloc_set_page(pte_t *pte, unsigned long addr, void *data)
+diff --git a/arch/s390/mm/pageattr.c b/arch/s390/mm/pageattr.c
+index 348e759840e7..8ffd9ef09bc6 100644
+--- a/arch/s390/mm/pageattr.c
++++ b/arch/s390/mm/pageattr.c
+@@ -413,6 +413,7 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
+ 
+ 	return __set_memory((unsigned long)page_to_virt(page), nr, flags);
+ }
++EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
+ 
+ bool kernel_page_present(struct page *page)
+ {
+diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
+index 8834c76f91c9..87e9c7d2dcdc 100644
+--- a/arch/x86/mm/pat/set_memory.c
++++ b/arch/x86/mm/pat/set_memory.c
+@@ -2661,6 +2661,7 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
+ 
+ 	return __set_pages_np(page, nr);
+ }
++EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
+ 
+ #ifdef CONFIG_DEBUG_PAGEALLOC
+ void __kernel_map_pages(struct page *page, int numpages, int enable)
 -- 
 2.51.0
 
