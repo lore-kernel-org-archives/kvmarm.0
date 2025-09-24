@@ -1,55 +1,55 @@
-Received: from fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.176.194.123])
+Received: from fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.132.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49FC311950
-	for <kvmarm@lists.linux.dev>; Wed, 24 Sep 2025 15:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.176.194.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DE130F543
+	for <kvmarm@lists.linux.dev>; Wed, 24 Sep 2025 15:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.132.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758727374; cv=none; b=p5RbVec1hESrR/LOk7ELP3Yd907EIpMAq/3vBo5/OFbUMZ+qWeK2Gqqn/KJ2fNgzatpNHdGlClomo2y0IuYNrHp99Z0rYEMbyvvD43c0sc9DqV+asj6ixHkkO+bnoPayuS71+vzCZ6HAASrfzjlEss9cRfQkVZDBR03YKTqJ3uA=
+	t=1758727375; cv=none; b=dJu69R65fluBsysFxtQ9J2u5WtSDOKk+Jh63jYP+qocW+k8jls1IKtA8SCGF86WoL+L0+gISoTBF1CF0/+P3g7BJ6hyiS9R2DuCBMYvcgcuAe3KIqOQOCg1PwhpI9o0O5udRn01sBx2sQ5KBbbG2q1tWqBNGBsvkU0eRmOoxCcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758727374; c=relaxed/simple;
-	bh=j22RUUgQ3dehYErKSiF6JM6yJfkDF60o5gLTOIY36tM=;
+	s=arc-20240116; t=1758727375; c=relaxed/simple;
+	bh=eVno82ZiutbzMIZ1VNtPIhsJL3OTaE+JWLGjvOA2GLw=;
 	h=From:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bkolcSLFONNlJJEptWj/WqTxSPY79c+0XNRamTtZ4g9wFy5wGfdRazrNou23dGml69sGZcAN58NpYHFZbKu7/T/gHxvGe28ZPuVuER80nL6IWJPcmGBxlH2RLqKtJbBReQtSWxnCIPnhbuadEGbANQapYYrq5mRIGsqnmt8PZCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=ZcJb+VMm; arc=none smtp.client-ip=63.176.194.123
+	 Content-Type:MIME-Version; b=bSQOr7WyPmiUv+bryiXEj5JqsOHqMxbdhEUsSgWUKZXBnZsFMVcxjiRCLk0s9eR2YiaLNO5sWpZG3a+4VD+nZrxTvtWzzbZ2nV8Cva97/LDS5ORPvEuHii56vsjjEQaD5rLXlfwW3mHAytxBYoZ2Y7i2yEWvud+4b9k8yWziNLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=LKBfGiCI; arc=none smtp.client-ip=63.178.132.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="ZcJb+VMm"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="LKBfGiCI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1758727372; x=1790263372;
+  s=amazoncorp2; t=1758727373; x=1790263373;
   h=from:cc:subject:date:message-id:references:in-reply-to:
    content-transfer-encoding:mime-version;
-  bh=aZ6aEnN0octnczQEslBC0QJ/62FEQzxTaKcHv32i784=;
-  b=ZcJb+VMmy9M0y0nPTwQmcgUASC/u2etpP6Wfpk+r16YgGADu7unZt7XA
-   yKs8vojoow30QcfbDRydz47CTCxY0H/fNNiMsveWK+FkJYlITdErjWdVv
-   8bDithxmp3w2efV++83leNcihrr4yKVq4vf5tDtv7c7ZBatu8BEMbAR+b
-   nuHSyz+xZcqMUSO4nFXGu1AWOouTA2RHYeMFiRxTBUHULXQEvf+z6PEGn
-   Vnx8GywAPIdrhYuETR+rXS4s2gOtONtTT/kU/kRhPsp4AQM/fg9Gjb1Uu
-   PR6tvPa0Ng3N3GrWrPtCSt/2C0pPZF94M96wlgG/XGSuJS1DA1gYV/MU9
+  bh=NJuRX5x4RLfTnYWVN5hpYKhn0fZL0PjDC+6I/zQlvOs=;
+  b=LKBfGiCIeeD9mhxvrr6YEXlMCuYeGa/04txGAOigVk+dAKl3G+djdwUU
+   m91pJLWOLFR26fbu7ZCs0KRWHvRKEMD/FURYOtRV/miMXE4qX1ovhWcIP
+   WaOOLVKzv6RnXgDYCTOCzQlQkjwOsoQCwm2lV9++W/jGtmiMq9qsVmt0Z
+   1KHRZCdWWz6S04FFKqn0FQMv7ovx+3PrbvsIHf30/PP8gHkWIZ8xev45u
+   1PzWwPjO/RHll0ma6uSRmJEzXTqp2x4xXGvKVrF1yZ329DN/mln1hKqQ4
+   B94asQuJJt3RHRyMaOEVP1gPDbgtX2qBFnyOuTwi1PHhAFxUZtmhlmnhp
    Q==;
-X-CSE-ConnectionGUID: pQcceaiESDSH7bC1cpsqVQ==
-X-CSE-MsgGUID: hlpCS6KaT2KSYTE87OW0dQ==
+X-CSE-ConnectionGUID: W1lG3sLuQUmOPmRkcn+P0A==
+X-CSE-MsgGUID: dnAkDuHpQ9awPPekd+2ukg==
 X-IronPort-AV: E=Sophos;i="6.18,290,1751241600"; 
-   d="scan'208";a="2618190"
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 15:22:42 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.226:30326]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.10.226:2525] with esmtp (Farcaster)
- id 81816518-f8e5-42a3-83ec-e3c3c2235bb6; Wed, 24 Sep 2025 15:22:41 +0000 (UTC)
-X-Farcaster-Flow-ID: 81816518-f8e5-42a3-83ec-e3c3c2235bb6
-Received: from EX19D015EUB001.ant.amazon.com (10.252.51.114) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 24 Sep 2025 15:22:41 +0000
+   d="scan'208";a="2515620"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 15:22:51 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:18646]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.5.254:2525] with esmtp (Farcaster)
+ id 77812a94-48cf-487b-9907-25d72d745b01; Wed, 24 Sep 2025 15:22:50 +0000 (UTC)
+X-Farcaster-Flow-ID: 77812a94-48cf-487b-9907-25d72d745b01
 Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19D015EUB001.ant.amazon.com (10.252.51.114) with Microsoft SMTP Server
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Wed, 24 Sep 2025 15:22:40 +0000
+ Wed, 24 Sep 2025 15:22:48 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB004.ant.amazon.com (10.252.51.13) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Wed, 24 Sep 2025 15:22:48 +0000
 Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
  EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
- 15.02.2562.020; Wed, 24 Sep 2025 15:22:40 +0000
+ 15.02.2562.020; Wed, 24 Sep 2025 15:22:48 +0000
 From: "Roy, Patrick" <roypat@amazon.co.uk>
 CC: "Roy, Patrick" <roypat@amazon.co.uk>, "pbonzini@redhat.com"
 	<pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org"
@@ -92,13 +92,13 @@ CC: "Roy, Patrick" <roypat@amazon.co.uk>, "pbonzini@redhat.com"
 	"Thomson, Jack" <jackabt@amazon.co.uk>, "derekmn@amazon.co.uk"
 	<derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>,
 	"ackerleytng@google.com" <ackerleytng@google.com>
-Subject: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling TLB
- flushing
-Thread-Topic: [PATCH v7 06/12] KVM: guest_memfd: add module param for
- disabling TLB flushing
-Thread-Index: AQHcLWcRbocNw3xUv0GREpQeD3nXQA==
-Date: Wed, 24 Sep 2025 15:22:40 +0000
-Message-ID: <20250924152214.7292-3-roypat@amazon.co.uk>
+Subject: [PATCH v7 10/12] KVM: selftests: cover GUEST_MEMFD_FLAG_NO_DIRECT_MAP
+ in existing selftests
+Thread-Topic: [PATCH v7 10/12] KVM: selftests: cover
+ GUEST_MEMFD_FLAG_NO_DIRECT_MAP in existing selftests
+Thread-Index: AQHcLWcVDySwa3KGykqApf1wGV1RGw==
+Date: Wed, 24 Sep 2025 15:22:47 +0000
+Message-ID: <20250924152214.7292-7-roypat@amazon.co.uk>
 References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
  <20250924152214.7292-1-roypat@amazon.co.uk>
 In-Reply-To: <20250924152214.7292-1-roypat@amazon.co.uk>
@@ -115,74 +115,67 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 
-Add an option to not perform TLB flushes after direct map manipulations.=0A=
-TLB flushes result in a up to 40x elongation of page faults in=0A=
-guest_memfd (scaling with the number of CPU cores), or a 5x elongation=0A=
-of memory population, which is inacceptable when wanting to use direct=0A=
-map removed guest_memfd as a drop-in replacement for existing workloads.=0A=
+Extend mem conversion selftests to cover the scenario that the guest can=0A=
+fault in and write gmem-backed guest memory even if its direct map=0A=
+removed. Also cover the new flag in guest_memfd_test.c tests.=0A=
 =0A=
-TLB flushes are not needed for functional correctness (the virt->phys=0A=
-mapping technically stays "correct", the kernel should simply not use it=0A=
-for a while), so we can skip them to keep performance in-line with=0A=
-"traditional" VMs.=0A=
-=0A=
-Enabling this option means that the desired protection from=0A=
-Spectre-style attacks is not perfect, as an attacker could try to=0A=
-prevent a stale TLB entry from getting evicted, keeping it alive until=0A=
-the page it refers to is used by the guest for some sensitive data, and=0A=
-then targeting it using a spectre-gadget.=0A=
-=0A=
-Cc: Will Deacon <will@kernel.org>=0A=
 Signed-off-by: Patrick Roy <roypat@amazon.co.uk>=0A=
 ---=0A=
- include/linux/kvm_host.h | 1 +=0A=
- virt/kvm/guest_memfd.c   | 3 ++-=0A=
- virt/kvm/kvm_main.c      | 3 +++=0A=
- 3 files changed, 6 insertions(+), 1 deletion(-)=0A=
+ tools/testing/selftests/kvm/guest_memfd_test.c             | 2 ++=0A=
+ .../selftests/kvm/x86/private_mem_conversions_test.c       | 7 ++++---=0A=
+ 2 files changed, 6 insertions(+), 3 deletions(-)=0A=
 =0A=
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h=0A=
-index 73a15cade54a..4d2bc18860fc 100644=0A=
---- a/include/linux/kvm_host.h=0A=
-+++ b/include/linux/kvm_host.h=0A=
-@@ -2298,6 +2298,7 @@ extern unsigned int halt_poll_ns;=0A=
- extern unsigned int halt_poll_ns_grow;=0A=
- extern unsigned int halt_poll_ns_grow_start;=0A=
- extern unsigned int halt_poll_ns_shrink;=0A=
-+extern bool guest_memfd_tlb_flush;=0A=
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing=
+/selftests/kvm/guest_memfd_test.c=0A=
+index b3ca6737f304..1187438b6831 100644=0A=
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c=0A=
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c=0A=
+@@ -275,6 +275,8 @@ static void test_guest_memfd(unsigned long vm_type)=0A=
  =0A=
- struct kvm_device {=0A=
- 	const struct kvm_device_ops *ops;=0A=
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c=0A=
-index b7129c4868c5..d8dd24459f0d 100644=0A=
---- a/virt/kvm/guest_memfd.c=0A=
-+++ b/virt/kvm/guest_memfd.c=0A=
-@@ -63,7 +63,8 @@ static int kvm_gmem_folio_zap_direct_map(struct folio *fo=
-lio)=0A=
- 	if (!r) {=0A=
- 		unsigned long addr =3D (unsigned long) folio_address(folio);=0A=
- 		folio->private =3D (void *) ((u64) folio->private & KVM_GMEM_FOLIO_NO_DI=
-RECT_MAP);=0A=
--		flush_tlb_kernel_range(addr, addr + folio_size(folio));=0A=
-+		if (guest_memfd_tlb_flush)=0A=
-+			flush_tlb_kernel_range(addr, addr + folio_size(folio));=0A=
+ 	if (vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP))=0A=
+ 		flags |=3D GUEST_MEMFD_FLAG_MMAP;=0A=
++	if (vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_NO_DIRECT_MAP))=0A=
++		flags |=3D GUEST_MEMFD_FLAG_NO_DIRECT_MAP;=0A=
+ =0A=
+ 	test_create_guest_memfd_multiple(vm);=0A=
+ 	test_create_guest_memfd_invalid_sizes(vm, flags, page_size);=0A=
+diff --git a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c=
+ b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c=0A=
+index 82a8d88b5338..8427d9fbdb23 100644=0A=
+--- a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c=0A=
++++ b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c=0A=
+@@ -367,7 +367,7 @@ static void *__test_mem_conversions(void *__vcpu)=0A=
+ }=0A=
+ =0A=
+ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, ui=
+nt32_t nr_vcpus,=0A=
+-				 uint32_t nr_memslots)=0A=
++				 uint32_t nr_memslots, uint64_t gmem_flags)=0A=
+ {=0A=
+ 	/*=0A=
+ 	 * Allocate enough memory so that each vCPU's chunk of memory can be=0A=
+@@ -394,7 +394,7 @@ static void test_mem_conversions(enum vm_mem_backing_sr=
+c_type src_type, uint32_t=0A=
+ =0A=
+ 	vm_enable_cap(vm, KVM_CAP_EXIT_HYPERCALL, (1 << KVM_HC_MAP_GPA_RANGE));=
+=0A=
+ =0A=
+-	memfd =3D vm_create_guest_memfd(vm, memfd_size, 0);=0A=
++	memfd =3D vm_create_guest_memfd(vm, memfd_size, gmem_flags);=0A=
+ =0A=
+ 	for (i =3D 0; i < nr_memslots; i++)=0A=
+ 		vm_mem_add(vm, src_type, BASE_DATA_GPA + slot_size * i,=0A=
+@@ -477,7 +477,8 @@ int main(int argc, char *argv[])=0A=
+ 		}=0A=
  	}=0A=
  =0A=
- 	return r;=0A=
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c=0A=
-index b5e702d95230..753c06ebba7f 100644=0A=
---- a/virt/kvm/kvm_main.c=0A=
-+++ b/virt/kvm/kvm_main.c=0A=
-@@ -95,6 +95,9 @@ unsigned int halt_poll_ns_shrink =3D 2;=0A=
- module_param(halt_poll_ns_shrink, uint, 0644);=0A=
- EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);=0A=
+-	test_mem_conversions(src_type, nr_vcpus, nr_memslots);=0A=
++	test_mem_conversions(src_type, nr_vcpus, nr_memslots, 0);=0A=
++	test_mem_conversions(src_type, nr_vcpus, nr_memslots, GUEST_MEMFD_FLAG_NO=
+_DIRECT_MAP);=0A=
  =0A=
-+bool guest_memfd_tlb_flush =3D true;=0A=
-+module_param(guest_memfd_tlb_flush, bool, 0444);=0A=
-+=0A=
- /*=0A=
-  * Allow direct access (from KVM or the CPU) without MMU notifier protecti=
-on=0A=
-  * to unpinned pages.=0A=
+ 	return 0;=0A=
+ }=0A=
 -- =0A=
 2.51.0=0A=
 =0A=
