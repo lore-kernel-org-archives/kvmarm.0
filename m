@@ -1,99 +1,118 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123282236E8;
-	Wed, 24 Sep 2025 18:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0F131B832;
+	Wed, 24 Sep 2025 18:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758738593; cv=none; b=tKDk7+47aF8xtjutZUg8PYFx0yeyGPQjP5jT5FlNyKWzxB5BZFzRgmtQ7o2meEbyRtepNkUZJ9KVFo8PT9j4d7wqpUNGJLerOBGalmD4ENH/tD294FxrJCh41PCMYDa7JRm6oyNVnJEEINSznyVACs4WYxMAIPrQQ3dr8aGwT1E=
+	t=1758739096; cv=none; b=KZBvtTLGYZoPBaFUW3noyZ0cmsASi2SK9Kav+7XNxZsUg6ydsCNbtugGZjYf1WWmcHV6jfH+8xohsPNmFVdeFOXhB/HNxYbtoFkkKU8Ohrws7EOZQv7qUouqtDxj36whQbU1Rwa1wvnQkYRyOlcS7FLwrCb7ZSketL2RFFF7Jnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758738593; c=relaxed/simple;
-	bh=ivIxj/3QNNujwPtTOLPIud3a0Z3ASU+eA3YKOvK8qgI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p0qEzOMs9/KB4sCVGl4l+lJv/b0edm0tx494gzUJ5Z29GSxteznOZwQi0Wf691LOESRAiMzTaRUoQX6Ui1cgl/tQj9/nfUNxswOAe3/pLArgr/VFiyYl6nS8yI05aC536qXMLd96qUmtEgjDgGwbOMSXIots6kqb/FIE45XGl/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rWjUNK9k; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758739096; c=relaxed/simple;
+	bh=RibivQVkgO0vX+EoL4fyGQgznIxN4M2CYO9kSjKIsv0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eTKEanw7VjfoVGHvbbNJUmdk8hsReWXf56ErqVZklTJGG6FdEdv/x1HOo7Cyl4EI+zCo1npJtzsGY64QZ8Ji/lQzqxrQV56++loJB0XrgmdLAxS2H69zYPQkf9EuKwAubPcrot5RCydmNxKbxxhqbSsvLUIGboyCey1mTb/KSr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKf/6W1L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rWjUNK9k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91E3FC4CEE7;
-	Wed, 24 Sep 2025 18:29:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKf/6W1L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C171C4CEE7;
+	Wed, 24 Sep 2025 18:38:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758738592;
-	bh=ivIxj/3QNNujwPtTOLPIud3a0Z3ASU+eA3YKOvK8qgI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rWjUNK9kxClMeZ63Z3gIKLHvqdUqP6p/OJtUHbGZ5JBtsvrdkMPFps3d7gEeZ3OAm
-	 g1EkC9VSQBfFCP1GrYfcuD7Rl4xnGY7cq/K/QJ221Rl9YLXG545UT2BUCaIMtWlSDI
-	 mxU2mHUIM45ZSVT+7wfFr1uxeupejpA9hp/XZD3ddGOOpoh4fG2v4W0ob/mwn/bovo
-	 2XNBITtn8cO+MA1JSN+58tBjAFNgtXOmi3V9uYzdj82O27tBXAhxu1HUfps7OBrZZQ
-	 35z5guGLse/9e3q8ii288GiFiSZkgSMYBipbSWySMZlH+B4KKsD7Qr/4B0CWmR0NLB
-	 13qXulRjaGDBw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	s=k20201202; t=1758739096;
+	bh=RibivQVkgO0vX+EoL4fyGQgznIxN4M2CYO9kSjKIsv0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TKf/6W1LoHc+9VB1zPOiLzVBfS4do4YbB+EfQI6uf0hx+2iNoWTP3zmbSKVDrkZrL
+	 OMhpP9oXqu45GaLrHWdcHh09AUC6vuce5lr0e2vy0+Kx7YzvnsXOUKYIKBiP+gwZZz
+	 I13JK7cEGgRltEdu7SXFmmlKEGrOfP3fG2iCbEGaOdWdjeSUQGRUYlWWg/rhElwWxg
+	 nKYh+TiqSnievc12KEfPSG5qFeAGNF9ZwW4mxqz2M387IV7QN65HaZ+H7MUeaJmwu0
+	 Pdi1pGsYRCiNc5FKwip0qPV4uvpukBpWAKVL299125fXFB9uYvqhdgGnHMtXqlTJQh
+	 Nm7aHTF2o9cuA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v1UFS-000000097Hp-0iCb;
-	Wed, 24 Sep 2025 18:29:50 +0000
-Date: Wed, 24 Sep 2025 19:29:49 +0100
-Message-ID: <87ikh7ya8y.wl-maz@kernel.org>
+	id 1v1UNa-000000097Nb-0Pye;
+	Wed, 24 Sep 2025 18:38:14 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in set_id_regs
-In-Reply-To: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
-References: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 00/13] KVM: arm64: selftests: Run selftests in VHE EL2
+Date: Wed, 24 Sep 2025 19:37:30 +0100
+Message-ID: <175873905078.2372872.15523019507687059465.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250917212044.294760-1-oliver.upton@linux.dev>
+References: <20250917212044.294760-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, seanjc@google.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 20 Sep 2025 20:51:58 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Wed, 17 Sep 2025 14:20:30 -0700, Oliver Upton wrote:
+> I've been working on some MMU-related features that are unused by KVM
+> meaning they're somewhat annoying to test. Because of that, I found the
+> time / patience to port our existing selftests infrastructure over to
+> running in VHE EL2, opportunistically promoting tests when the stars
+> align.
 > 
-> The set_id_regs selftest lacks coverag for ID_AA64ISR3_EL1 which has
-> several features exposed to KVM guests in it.  Add coverage, and while
-> we're here adjust the test to improve maintainability a bit.  
+> Creating a VGIC is a hard requirement of enabling EL2 for a VM. As a
+> consequence of this, I need to eat my words from my earlier conversation
+> with Sean on this topic and hammer in a default VGICv3. This requires
+> some participation from the arch-neutral code given the ordering
+> constraints on vCPU and VGIC creation.
 > 
-> The test will fail without the recently applied change adding FEAT_LSFE:
-> 
->    https://lore.kernel.org/r/175829303126.1764550.939188785634158487.b4-ty@kernel.org
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
-> Mark Brown (2):
->       KVM: arm64: selftests: Remove a duplicate register listing in set_id_regs
->       KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in set_id_regs
-> 
->  tools/testing/selftests/kvm/arm64/set_id_regs.c | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
-> ---
-> base-commit: 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
+> [...]
 
-$ git show 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
-fatal: bad object 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
+Applied to next, thanks!
 
-What's the point of indicating a base commit if that's not something I
-can find? You should never base any work on top of something that
-isn't a stable tag.
+[01/13] KVM: arm64: selftests: Provide kvm_arch_vm_post_create() in library code
+        commit: 7326348209a0079a83c7bd7963a0e32d26af61c8
+[02/13] KVM: arm64: selftests: Initialize VGICv3 only once
+        commit: a5022da5f9a3a791ff2caf5fe3789561ae687747
+[03/13] KVM: arm64: selftests: Add helper to check for VGICv3 support
+        commit: b712afa7a1cdb787f311f51c04df81fc6f026368
+[04/13] KVM: arm64: selftests: Add unsanitised helpers for VGICv3 creation
+        commit: b8daa7ceac1c56e39b6ef4e62510a7d846511695
+[05/13] KVM: arm64: selftests: Create a VGICv3 for 'default' VMs
+        commit: 8911c7dbc607212bf3dfc963004b062588c0ab38
+[06/13] KVM: arm64: selftests: Alias EL1 registers to EL2 counterparts
+        commit: 1c9604ba234711ca759f1147f2fbc7a94a5a486d
+[07/13] KVM: arm64: selftests: Provide helper for getting default vCPU target
+        commit: a1b91ac2381d86aa47b7109bbcde0c71e775f6d9
+[08/13] KVM: arm64: selftests: Select SMCCC conduit based on current EL
+        commit: d72543ac728ae4a4708cbefad2761df84599c268
+[09/13] KVM: arm64: selftests: Use hyp timer IRQs when test runs at EL2
+        commit: 0910778e49c6639d265ab2d7a47d0b461b8e2963
+[10/13] KVM: arm64: selftests: Use the vCPU attr for setting nr of PMU counters
+        commit: 7ae44d1cdad8a2483465373b9c9e91f0461ca9b2
+[11/13] KVM: arm64: selftests: Initialize HCR_EL2
+        commit: 05c93cbe6653e7e77567962aa6533b618df5e19f
+[12/13] KVM: arm64: selftests: Enable EL2 by default
+        commit: 2de21fb62387459f762c93eec3d04e4f7540b952
+[13/13] KVM: arm64: selftests: Add basic test for running in VHE EL2
+        commit: f677b0efa93ce0afb127ccffb8aaf708045fcf10
+
+Cheers,
 
 	M.
-
 -- 
-Jazz isn't dead. It just smells funny.
+Without deviation from the norm, progress is not possible.
+
+
