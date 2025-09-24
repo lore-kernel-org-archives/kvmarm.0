@@ -1,83 +1,113 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34F22FC874
-	for <kvmarm@lists.linux.dev>; Wed, 24 Sep 2025 12:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C270E1DE2A5
+	for <kvmarm@lists.linux.dev>; Wed, 24 Sep 2025 13:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758717577; cv=none; b=l7D81PmDW7MNfbjJslHvSCN71kvXYQShArj4n3w1U07f3YiExxVLhVveI9y3sVOGyLkM+9bqESClqm36OeL/pTov73rbOFDeci4CarMkj+ePn7FDW7xh96owY+OJxs43ryZ1DzqZ94YhHpHueEtyXFanp32bLxykgPtuN5MHHRQ=
+	t=1758721524; cv=none; b=oVy1Dw9IGreqmVYVshNc/0/xv9UccbHuV2+a5mDU+vH4OtBy8Klu5PU6DPPDRy8uYYrQcL7a7DcMUmsBR39F18EHTcRd+k3+OIlN91pWo2rsvCLcrJyszC0m/Kji4d3pm0k8cv7UOF1jxsrL7OqkbxU2VGl4WgjyZb/YGnedVPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758717577; c=relaxed/simple;
-	bh=V2/S5MXhTJkF4QgiGL3HfzT/h2NijYPEQbtg+qrGDsQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GlT0qMg6BZxzAS0vV3Adsi8V+NeaG0kpz0csD/TtPsH0HAn8H2Tmt0KVH+aGxQdMksYNB8QOYjFf/1aKzr+4F0l79ng9NO+tqumuu4y9mTgy7i+zIMTfLQWteHdRhNuMBBwjo1Kn6JzGQDnsO2PGc0cr+bDLdQ/w08opjoRGpAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-4256ef4eea3so51000565ab.1
-        for <kvmarm@lists.linux.dev>; Wed, 24 Sep 2025 05:39:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758717575; x=1759322375;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=igFS+SRzf9Z12WxHY7Jm6XPcHS03o4aQgk2xq1X3WF4=;
-        b=GmG/fKfLMn49ttwyGW3bzZvawObkoj14jP6MNmnWIdYe4txUzC/0P9O/AM4v73Lq50
-         410IpFoNBK2w8eFqyzznc+h6aMzfQQYezqZcl7sTpY9ivWXHp7+BhdOoJX9uz2O8J2Q6
-         70dlxW3TR6O74UTY84QIY7MTw0gbjXMTHQQWralB3CXpE2gzdfgLJyykSakEkyBg3cu9
-         vMNQ2he941SkSb9HqiyeBmG1GMqPNm2+0MsYrO9A8w8EgDz3nEPB6+EiIJxvhrWAtNjK
-         BrKzlJ3qmgizSbi/Kf4JqyDKGyBUia/K0ekXgn8PR17aY9e2FmxoWEstIjQ6ubKLVr0+
-         yarQ==
-X-Gm-Message-State: AOJu0Yw4FPUycnMp2ZVytsaQTKMNgYjX5jUf33i+9vCTO3HVEKCYBmef
-	w9sw/zpsRtrwxEswf9vY/I7348M9HUtoECliBce0MQP4FUQ+lW91YfUbOuM4IhVdH8enr5317PP
-	lLNixpVi4iwdf77I2r/FyGEPN9Ul0HMidwi65ccVQzbDVnBFmUgoYax1i/PQ=
-X-Google-Smtp-Source: AGHT+IHAw9v7k4lEmXT0RSpYDbkepjZ8o/GpwTKFQKjV1xNTesT+/FGryWRKD/sPKGDWYJTBXqKQZBHHSYUAhQuhOpZgib1r6rGz
+	s=arc-20240116; t=1758721524; c=relaxed/simple;
+	bh=abgqkQhYniJWCyH534lQE/FEFCkzxYytvSvB99BXO5g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ccXjssgh/OwjGgZlDOeqCpdmAQm4AG35YSoB8jCC/rVkj19f7oeBvnaQiKSlUxUEX6deGVJTZwrRQ3aTWp9bVY9xfUVbVTxVB9vR3hh/V02SbDYqXzAl8kbnWzb2kntKZGSW9zIlNqubF9ieZTkLZJ3+vHBboxMK1tyodeDc2Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09975106F;
+	Wed, 24 Sep 2025 06:45:13 -0700 (PDT)
+Received: from donnerap.arm.com (donnerap.manchester.arm.com [10.33.8.67])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F8833F5A1;
+	Wed, 24 Sep 2025 06:45:20 -0700 (PDT)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool v4 0/7] arm64: Nested virtualization support
+Date: Wed, 24 Sep 2025 14:45:04 +0100
+Message-Id: <20250924134511.4109935-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2184:b0:423:fb44:e8d4 with SMTP id
- e9e14a558f8ab-42581e0df9bmr97795075ab.6.1758717575140; Wed, 24 Sep 2025
- 05:39:35 -0700 (PDT)
-Date: Wed, 24 Sep 2025 05:39:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68d3e687.a70a0220.4f78.0025.GAE@google.com>
-Subject: [syzbot] Monthly kvmarm report (Sep 2025)
-From: syzbot <syzbot+list12018f178486b71446df@syzkaller.appspotmail.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello kvmarm maintainers/developers,
+This is v4 of the nested virt support series, slightly reworking the
+code for the maintenance IRQ. Also adding a fix from Marc for virtio
+endianess handling. Changelog below.
+========================================================
 
-This is a 31-day syzbot report for the kvmarm subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/kvmarm
+Thanks to the imperturbable efforts from Marc, arm64 support for nested
+virtualization has now reached the mainline kernel, which means the
+respective kvmtool support should now be ready as well.
 
-During the period, 3 new issues were detected and 1 were fixed.
-In total, 4 issues are still open and 6 have already been fixed.
+Patch 1 updates the kernel headers, to get the new EL2 capability, and
+the VGIC device control to setup the maintenance IRQ.
+Patch 2 introduces the new "--nested" command line option, to let the
+VCPUs start in EL2. To allow KVM guests running in such a guest, we also
+need VGIC support, which patch 3 allows by setting the maintenance IRQ.
+Patch 4 to 6 are picked from Marc's repo, and allow to set the arch
+timer offset, enable non-VHE guests (at the cost of losing recursive
+nested virtualisation), and also advertise the virtual EL2 timer IRQ.
 
-Some of the still happening issues:
+Tested on the FVP (with some good deal of patience), and some commercial
+(non-fruity) hardware, down to a guest's guest's guest.
 
-Ref Crashes Repro Title
-<1> 6087    Yes   kernel panic: Unhandled exception
-                  https://syzkaller.appspot.com/bug?extid=d173b3985bd6b9487fa1
-<2> 441     Yes   KASAN: invalid-access Read in __kvm_pgtable_walk
-                  https://syzkaller.appspot.com/bug?extid=31156cb24a340d8e2c05
-<3> 10      Yes   BUG: unable to handle kernel paging request in vgic_its_save_tables_v0
-                  https://syzkaller.appspot.com/bug?extid=4ebd710a879482a93f8f
+Cheers,
+Andre
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changelog v3 ... v4:
+- pass kvm pointer to gic__generate_fdt_nodes()
+- use macros for PPI offset and DT type identifier
+- properly calculate DT interrupt flags value
+- add patch 7 to fix virtio endianess issues
+- CAPITALISE verbs in commit message
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Changelog v2 ... v3:
+- adjust^Wreplace commit messages for E2H0 and counter-offset patch
+- check for KVM_CAP_ARM_EL2_E2H0 when --e2h0 is requested
+- update kernel headers to v6.16 release
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+Changelog v1 ... 2:
+- add three patches from Marc:
+  - add --e2h0 command line option
+  - add --counter-offset command line option
+  - advertise all five arch timer interrupts in DT
 
-You may send multiple commands in a single email message.
+
+Andre Przywara (3):
+  Sync kernel UAPI headers with v6.16
+  arm64: Initial nested virt support
+  arm64: nested: Add support for setting maintenance IRQ
+
+Marc Zyngier (4):
+  arm64: Add counter offset control
+  arm64: Add FEAT_E2H0 support
+  arm64: Generate HYP timer interrupt specifiers
+  arm64: Handle virtio endianness reset when running nested
+
+ arm64/arm-cpu.c                     |  6 +--
+ arm64/fdt.c                         |  5 +-
+ arm64/gic.c                         | 26 ++++++++-
+ arm64/include/asm/kvm.h             | 23 ++++++--
+ arm64/include/kvm/gic.h             |  2 +-
+ arm64/include/kvm/kvm-config-arch.h | 11 +++-
+ arm64/include/kvm/kvm-cpu-arch.h    |  5 +-
+ arm64/include/kvm/timer.h           |  2 +-
+ arm64/kvm-cpu.c                     | 64 +++++++++++++++++++----
+ arm64/kvm.c                         | 17 ++++++
+ arm64/timer.c                       | 29 +++++------
+ include/linux/kvm.h                 | 31 +++++++++++
+ include/linux/virtio_net.h          | 13 +++++
+ include/linux/virtio_pci.h          |  1 +
+ riscv/include/asm/kvm.h             |  2 +
+ x86/include/asm/kvm.h               | 81 +++++++++++++++++++++++++++++
+ 16 files changed, 274 insertions(+), 44 deletions(-)
+
+-- 
+2.25.1
+
