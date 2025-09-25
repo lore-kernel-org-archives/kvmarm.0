@@ -1,115 +1,94 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37673279DC9
-	for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 11:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F993279DC9;
+	Thu, 25 Sep 2025 11:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758798761; cv=none; b=Xb+B31mV+3um07LoR4nq3415FUYore49MJjpIwCTuhIGoMXNjMrYzAfW3QHkc6deOPSNkDJ9ySLq937PNqEnoSSvv66YXx9eJMYHfnFgZG0sg00np3PsGP9AnQoyUwzJx+Mof/uF7u42NTYg2weMfjzQdNqOExrYAqqXAfHMsrk=
+	t=1758798766; cv=none; b=WQpPX/dO1Da9Fx14SKDDqpEQanF2MJEjjj//AcOyJXOKuypudZRfTxu/1kNNYmXBSUVLHs6Crertgb+TNF9EDRsLvy0CUTP1EH99srduY9Y/uUPP4Cs09eB+USPKwdtzBqBMbfWwn19jGlPvSoIcTbr6kPsZEbIZLQUjcxIoeqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758798761; c=relaxed/simple;
-	bh=AZJmcnOsI+FoVdFLhr5+UdUHIUAOKZpJluPbwDdbxak=;
+	s=arc-20240116; t=1758798766; c=relaxed/simple;
+	bh=wfla3Y1dSOons3njeFEIdGceO7zZYUF9LjcXnMti018=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e7VMf5iCso2Ld0zuspvWjm9Z6QKahy/QTXV0yyIYDNgFPlzL1QH6IszYIBry4p16vIAjEG2CwFmYnH/n8eIZhUrMLzONRAtBJuiA4Ri9bWw90qxZGTgWBKSrswrtjACveNq9gAbFDba6c0YMK4vBTqOi2jJ9wBQkBq/vzSfkV/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B2071692;
-	Thu, 25 Sep 2025 04:12:31 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A32343F5A1;
-	Thu, 25 Sep 2025 04:12:38 -0700 (PDT)
-Date: Thu, 25 Sep 2025 12:12:36 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=D6H9yvvYJuKPhFetkznIGrmllPBL1bqpFPvShxjzcZNFF7hr/P+D3BPwWjRGDRUXPrfiOEC1zvRntlnNDWJCSh28Le1DsCOZEzynyfaMeep3BFVAKNlM1k7TLfsnpR23ZWTQuUp+aNfCxXUvjHZ7es1Cl6rCrECn9MRcSrLVm/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qi/ti6+U; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qi/ti6+U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03E44C4CEF0;
+	Thu, 25 Sep 2025 11:12:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758798766;
+	bh=wfla3Y1dSOons3njeFEIdGceO7zZYUF9LjcXnMti018=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qi/ti6+UFCn/UIlo3PwLexk1yaz/R6xiLWxHGTGD3mB0dB04GgRsXqKVfnRTjk8yR
+	 5x3q9UjODw+3r71sYYtUc7xf6xKEPx/0bIYcSMpTafCYt7Fs+TArK9+DDxph/ZcleQ
+	 A3HkSq4HL2/jyPqD4TLhqEjhb9hDFSy1hN+8ynZ1SqYLuwkQFiJ16yTF65UiKXxptu
+	 GGjSRKJYeTQYCOQ0m+GfXntvJ8/mgOufm7qEoN/kU2rvpX/bqvNii6AxbcY4tilT4v
+	 m7xmALPJZiroYgymzgTiBrsbaiPMbpxPi4xO4z6E45wB+PczS7Y3aTUf3NviBcdIdv
+	 /S3f///+7Kp6g==
+Date: Thu, 25 Sep 2025 12:12:41 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: nv: Use FGT write trap of MDSCR_EL1 when
- available
-Message-ID: <20250925111236.GB435166@e124191.cambridge.arm.com>
-References: <20250924235150.617451-1-oliver.upton@linux.dev>
- <20250924235150.617451-3-oliver.upton@linux.dev>
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in
+ set_id_regs
+Message-ID: <bb46cc46-f177-4cc7-b0d0-c7970d8d7a6d@sirena.org.uk>
+References: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
+ <87ikh7ya8y.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="/zaKCw9JkNIMK2ix"
+Content-Disposition: inline
+In-Reply-To: <87ikh7ya8y.wl-maz@kernel.org>
+X-Cookie: Shipping not included.
+
+
+--/zaKCw9JkNIMK2ix
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250924235150.617451-3-oliver.upton@linux.dev>
 
-On Wed, Sep 24, 2025 at 04:51:50PM -0700, Oliver Upton wrote:
-> Marc reports that the performance of running an L3 guest has regressed
-> by 60% as a result of setting MDCR_EL2.TDA to hide bad architecture.
-> That's of course terrible for the single user of recursive NV ;-)
-> 
-> While there's nothing to be done on non-FGT systems, take advantage of
-> the precise write trap of MDSCR_EL1 and leave the rest of the debug
-> registers untrapped.
-> 
-> Reported-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+On Wed, Sep 24, 2025 at 07:29:49PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> > ---
+> > base-commit: 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
 
-> ---
->  arch/arm64/kvm/config.c | 10 +++++++++-
->  arch/arm64/kvm/nested.c |  9 ++++++---
->  2 files changed, 15 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index b1cf7660efe1..24bb3f36e9d5 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -1489,6 +1489,14 @@ static void __compute_hfgwtr(struct kvm_vcpu *vcpu)
->  		*vcpu_fgt(vcpu, HFGWTR_EL2) |= HFGWTR_EL2_TCR_EL1;
->  }
->  
-> +static void __compute_hdfgwtr(struct kvm_vcpu *vcpu)
-> +{
-> +	__compute_fgt(vcpu, HDFGWTR_EL2);
-> +
-> +	if (is_hyp_ctxt(vcpu))
-> +		*vcpu_fgt(vcpu, HDFGWTR_EL2) |= HDFGWTR_EL2_MDSCR_EL1;
-> +}
-> +
->  void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
->  {
->  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> @@ -1498,7 +1506,7 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
->  	__compute_hfgwtr(vcpu);
->  	__compute_fgt(vcpu, HFGITR_EL2);
->  	__compute_fgt(vcpu, HDFGRTR_EL2);
-> -	__compute_fgt(vcpu, HDFGWTR_EL2);
-> +	__compute_hdfgwtr(vcpu);
->  	__compute_fgt(vcpu, HAFGRTR_EL2);
->  
->  	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index d828c60c6300..5009bfe849ff 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1830,13 +1830,16 @@ void kvm_nested_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->  {
->  	u64 guest_mdcr = __vcpu_sys_reg(vcpu, MDCR_EL2);
->  
-> +	if (is_nested_ctxt(vcpu))
-> +		vcpu->arch.mdcr_el2 |= (guest_mdcr & NV_MDCR_GUEST_INCLUDE);
->  	/*
->  	 * In yet another example where FEAT_NV2 is fscking broken, accesses
->  	 * to MDSCR_EL1 are redirected to the VNCR despite having an effect
->  	 * at EL2. Use a big hammer to apply sanity.
-> +	 *
-> +	 * Unless of course we have FEAT_FGT, in which case we can precisely
-> +	 * trap MDSCR_EL1.
->  	 */
-> -	if (is_hyp_ctxt(vcpu))
-> +	else if (!cpus_have_final_cap(ARM64_HAS_FGT))
->  		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
-> -	else
-> -		vcpu->arch.mdcr_el2 |= (guest_mdcr & NV_MDCR_GUEST_INCLUDE);
->  }
-> -- 
-> 2.47.3
-> 
+> $ git show 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
+> fatal: bad object 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
+
+> What's the point of indicating a base commit if that's not something I
+> can find? You should never base any work on top of something that
+> isn't a stable tag.
+
+This was due to you having applied the LSFE patch but that application
+not yet being visible to me at the time I did the rebase (I've noticed
+occasional slow mirroring on kernel.org recently, possibly it was that),
+I needed to base on the already applied patch so that I could check that
+the test binary worked properly.
+
+--/zaKCw9JkNIMK2ix
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjVI6gACgkQJNaLcl1U
+h9CWEQf+LhWPmI+TiqBpNhHF4rThKI4mBv/BM3yn+6w5SjGK/aQgfPXoKuBSa8gF
+eajZSipUrKXtenT9qN2VJu1n02ahuNh75Issa/SipMwbkjRYseunEUSZoLzfvfaW
+5aVqnQ21GIOtoQLj3as1wfVRVMQw/fntDTJBAp+NFQYPh6Iky4TPkgnSG9PTqfGJ
+MiCU4IupB+pg+zebaH/fG69j2YHS9kegvJS+E+uLa7vkE0TEsc8qUXvxQz0TSvhU
+8e0XJ3GMu3okoXZ9iNxRcVrcuG1VuBruhSG7In9NpaThNs7ilXDF+eTcOVlhDvtO
+9FRj1mHPSl4l8O0vp3BzuFgeiR8oyQ==
+=IRxn
+-----END PGP SIGNATURE-----
+
+--/zaKCw9JkNIMK2ix--
