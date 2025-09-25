@@ -1,94 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F993279DC9;
-	Thu, 25 Sep 2025 11:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D7D265CC2
+	for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 13:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758798766; cv=none; b=WQpPX/dO1Da9Fx14SKDDqpEQanF2MJEjjj//AcOyJXOKuypudZRfTxu/1kNNYmXBSUVLHs6Crertgb+TNF9EDRsLvy0CUTP1EH99srduY9Y/uUPP4Cs09eB+USPKwdtzBqBMbfWwn19jGlPvSoIcTbr6kPsZEbIZLQUjcxIoeqc=
+	t=1758807396; cv=none; b=upGYUMzCwyWadiuOnLikHQsPKN494FrWr93Ll7fZPd9AUrZLONN4Aguu2QXeYOLCNkjO77OojUP2NUkH1NMxbeefEt/CSx411IdpGzcapFYQVFV/uE+Zd0vswNw37IV7Z7t9qEamjXu8G6+XtU9mkHGMHpvaLhL7Og8ugHgld/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758798766; c=relaxed/simple;
-	bh=wfla3Y1dSOons3njeFEIdGceO7zZYUF9LjcXnMti018=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D6H9yvvYJuKPhFetkznIGrmllPBL1bqpFPvShxjzcZNFF7hr/P+D3BPwWjRGDRUXPrfiOEC1zvRntlnNDWJCSh28Le1DsCOZEzynyfaMeep3BFVAKNlM1k7TLfsnpR23ZWTQuUp+aNfCxXUvjHZ7es1Cl6rCrECn9MRcSrLVm/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qi/ti6+U; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758807396; c=relaxed/simple;
+	bh=sSqjP4cvcawLrblfY9/wyy/hyoTTAKgpnyDa32+hyZs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cIoVInrDG7tXFL4ZB1755hq854teXPqR6zGuhYaJqzBjanelHR8F/ZSUvo2GaLAoU+DSskngScJ0/RKduZfJwjzHb7bDBebpZbgUCKNVrCeszG2zgKkyGW7ATXVRsqDmcdBa5Od2Hm2FCl5gJJov+QPcS5pHpO1GiEBnOBVLNfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=akcE4PzR; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qi/ti6+U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03E44C4CEF0;
-	Thu, 25 Sep 2025 11:12:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758798766;
-	bh=wfla3Y1dSOons3njeFEIdGceO7zZYUF9LjcXnMti018=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Qi/ti6+UFCn/UIlo3PwLexk1yaz/R6xiLWxHGTGD3mB0dB04GgRsXqKVfnRTjk8yR
-	 5x3q9UjODw+3r71sYYtUc7xf6xKEPx/0bIYcSMpTafCYt7Fs+TArK9+DDxph/ZcleQ
-	 A3HkSq4HL2/jyPqD4TLhqEjhb9hDFSy1hN+8ynZ1SqYLuwkQFiJ16yTF65UiKXxptu
-	 GGjSRKJYeTQYCOQ0m+GfXntvJ8/mgOufm7qEoN/kU2rvpX/bqvNii6AxbcY4tilT4v
-	 m7xmALPJZiroYgymzgTiBrsbaiPMbpxPi4xO4z6E45wB+PczS7Y3aTUf3NviBcdIdv
-	 /S3f///+7Kp6g==
-Date: Thu, 25 Sep 2025 12:12:41 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in
- set_id_regs
-Message-ID: <bb46cc46-f177-4cc7-b0d0-c7970d8d7a6d@sirena.org.uk>
-References: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
- <87ikh7ya8y.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="akcE4PzR"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3f0134ccc0cso788922f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 06:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1758807393; x=1759412193; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fx9sm2SG/XPK/zOHzWrJwHUPoT7scPpd+/H8+WI3Eu8=;
+        b=akcE4PzRSgphY0EWJbuQUdgkKgpDcdNpEnzyRPW477QZiURLpNSgjrw0klPj0SipXQ
+         DKYSdFNukIjOUOldIox7vP/Tlz1xmwqpeExzHKKpsVxiVO1ftP74ZzPWcbSaSMenoGah
+         29umUoN5QfapcEmM4P+APAGCRZaQvSX+l7kLHinaqKSrzZa2nELzGOYn7W1QwNSeLify
+         ywk4dRYPTWcOKUr7AzdmkGPCs3vqTItEZUKoVEGE+uV7R9MG5ijVU0jNmehzvj7tsC+j
+         ZoqSU4whP2S5/poErfQhQ+O8G66xcKDqfP3XcAB4AqN1f4GRI0Arc8kO7oYAbjpT2Dqf
+         5Upg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758807393; x=1759412193;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fx9sm2SG/XPK/zOHzWrJwHUPoT7scPpd+/H8+WI3Eu8=;
+        b=AHt+S6VQ6MhFL7Gpy7ZUmd48Vo8WfOOQiQYNQOzsdHq5647pYlzW0M7LXWNprRDUCv
+         JqP4YYt5HIFT2/PfIUm+wkLyf1PS5NyhSGD5k2TSDTmACSke1u2Wq7ieo30mM7I88Mh8
+         4HtfProvDsAmpu1eIOp9y7Xtztnk6Kvj3KgUSAYMPFkl14q7iwOlNY9euLfjFSQ1sZDE
+         K2G9Dyy2clx2S8ScruApeC3IMeaE22+RJCoLvOI1mWK4c1gBHE+B+mgHdJxy2RsmVuLU
+         xSMR9r+NDaXlC3JVWzM0di9Cey8FfjD2vEerkC5lYVSekbClQlbCXfc3KyJOGqSQ6xun
+         SO5A==
+X-Forwarded-Encrypted: i=1; AJvYcCVGkrp2bdEYK8wKXA4N4L/ByWg7we/USlDbXAQ/mY78NVMCkJAuJOasZ2axyLG0UPa+I+cCEZs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxeOV8dAureZsuyY+8dm8mTYuuA9Lf7cl+YnDM00IsDpQ7wWtD1
+	cTmxODiE0laJMtqMuI5wgEgOL3pW3j5W6vpJAjUJG2isV4kbJKh0vHNBDIUvoB80WAU=
+X-Gm-Gg: ASbGncuCvzlgxVJn2RnEu2JcbceO+yCbsEBG4SuKpvRyYedYxve+uJZdAUlrzLHwP0v
+	pcqljByiM6PTojoKFVg2fjC5vOcVGgQbDHB55TgZbc3w+m2f/pBdad1Lb8+iiYYFl9ibVxCsG73
+	KbLMBqGww7BHrN4i24aSK98LPEC+EZf5NxPofbn6JVyVShN1U9mnHFCipsVeDaCYho39HeoIjE7
+	7Os529VQT7Bjxh89uDjFY4XX0U6V+/rrR+mARNhl8oowkjp26RY9z7qo0+vhqIvIdLphwQxVDlr
+	4ZtJRxx/vQfP7R/BM6tLkMntVPFrawTT+GKkfqhBVk6zV8CR2VvJk3AH8Z2VR2BuCGSuYksFMcj
+	/wbLvjeXwAI+9swxo7WyxkfpF7FuT
+X-Google-Smtp-Source: AGHT+IHR1VtsrqYdEOR5yfalGbybkOIcDKOqLqd1M8rHZFAAkkevuzTqFI72lGmxMsSzzCv1aIizeQ==
+X-Received: by 2002:a05:6000:290b:b0:3ee:154e:4f9 with SMTP id ffacd0b85a97d-40e45a92e7emr3845371f8f.20.1758807392860;
+        Thu, 25 Sep 2025 06:36:32 -0700 (PDT)
+Received: from [192.168.1.3] ([185.48.76.109])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb72fb2eesm3203962f8f.12.2025.09.25.06.36.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Sep 2025 06:36:32 -0700 (PDT)
+Message-ID: <4d5bf14a-0465-47b2-88c3-1bf85b008707@linaro.org>
+Date: Thu, 25 Sep 2025 14:36:30 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="/zaKCw9JkNIMK2ix"
-Content-Disposition: inline
-In-Reply-To: <87ikh7ya8y.wl-maz@kernel.org>
-X-Cookie: Shipping not included.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 08/12] perf: Add perf_event_attr::config4
+To: Will Deacon <will@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvmarm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
+ Namhyung Kim <namhyung@kernel.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, Leo Yan <leo.yan@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>
+References: <20250901-james-perf-feat_spe_eft-v8-0-2e2738f24559@linaro.org>
+ <20250901-james-perf-feat_spe_eft-v8-8-2e2738f24559@linaro.org>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20250901-james-perf-feat_spe_eft-v8-8-2e2738f24559@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---/zaKCw9JkNIMK2ix
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Wed, Sep 24, 2025 at 07:29:49PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+On 01/09/2025 1:40 pm, James Clark wrote:
+> Arm FEAT_SPE_FDS adds the ability to filter on the data source of a
+> packet using another 64-bits of event filtering control. As the existing
+> perf_event_attr::configN fields are all used up for SPE PMU, an
+> additional field is needed. Add a new 'config4' field.
+> 
+> Reviewed-by: Leo Yan <leo.yan@arm.com>
+> Tested-by: Leo Yan <leo.yan@arm.com>
+> Reviewed-by: Ian Rogers <irogers@google.com>
+> Signed-off-by: James Clark <james.clark@linaro.org>
+> ---
+>   include/uapi/linux/perf_event.h | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/include/uapi/linux/perf_event.h b/include/uapi/linux/perf_event.h
+> index 78a362b80027..0d0ed85ad8cb 100644
+> --- a/include/uapi/linux/perf_event.h
+> +++ b/include/uapi/linux/perf_event.h
+> @@ -382,6 +382,7 @@ enum perf_event_read_format {
+>   #define PERF_ATTR_SIZE_VER6			120	/* Add: aux_sample_size */
+>   #define PERF_ATTR_SIZE_VER7			128	/* Add: sig_data */
+>   #define PERF_ATTR_SIZE_VER8			136	/* Add: config3 */
+> +#define PERF_ATTR_SIZE_VER9			144	/* add: config4 */
+>   
+>   /*
+>    * 'struct perf_event_attr' contains various attributes that define
+> @@ -543,6 +544,7 @@ struct perf_event_attr {
+>   	__u64	sig_data;
+>   
+>   	__u64	config3; /* extension of config2 */
+> +	__u64	config4; /* extension of config3 */
+>   };
+>   
+>   /*
+> 
 
-> > ---
-> > base-commit: 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
 
-> $ git show 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
-> fatal: bad object 5db15c998c390efbe5c82f6cda77cb896a3a6a3e
+Hi Peter,
 
-> What's the point of indicating a base commit if that's not something I
-> can find? You should never base any work on top of something that
-> isn't a stable tag.
+Did you get a chance to look at this? Patches 1-7 have been taken, just 
+waiting on an ack to take this config4 change before taking the 
+remaining ones.
 
-This was due to you having applied the LSFE patch but that application
-not yet being visible to me at the time I did the rebase (I've noticed
-occasional slow mirroring on kernel.org recently, possibly it was that),
-I needed to base on the already applied patch so that I could check that
-the test binary worked properly.
+Thanks
+James
 
---/zaKCw9JkNIMK2ix
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjVI6gACgkQJNaLcl1U
-h9CWEQf+LhWPmI+TiqBpNhHF4rThKI4mBv/BM3yn+6w5SjGK/aQgfPXoKuBSa8gF
-eajZSipUrKXtenT9qN2VJu1n02ahuNh75Issa/SipMwbkjRYseunEUSZoLzfvfaW
-5aVqnQ21GIOtoQLj3as1wfVRVMQw/fntDTJBAp+NFQYPh6Iky4TPkgnSG9PTqfGJ
-MiCU4IupB+pg+zebaH/fG69j2YHS9kegvJS+E+uLa7vkE0TEsc8qUXvxQz0TSvhU
-8e0XJ3GMu3okoXZ9iNxRcVrcuG1VuBruhSG7In9NpaThNs7ilXDF+eTcOVlhDvtO
-9FRj1mHPSl4l8O0vp3BzuFgeiR8oyQ==
-=IRxn
------END PGP SIGNATURE-----
-
---/zaKCw9JkNIMK2ix--
