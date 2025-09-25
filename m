@@ -1,75 +1,198 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DE82D2495
-	for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 14:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487EA2DD5F3
+	for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 14:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758810325; cv=none; b=tG0dkjYYTklej3IUxnZDZMc3z2srlBXEserSGrqonrfhe+v3BnGHWfZy839OnRKM94DaQT6oDEfs4h2DqM0t5xDKr0C78+35Cz0Cbh6c/isRIDlDwjS9GKOuxFut7PyZLup58O6Qp2mQmaeZOPh8C+7DU9Oc5F5ULD4v2mHki9E=
+	t=1758811097; cv=none; b=oHnj3AWKXHA2O365rTIMlxVkiIXPX5RiBFKFobYSkC8DJO/empHZkQhmaofIaqvSoz+/zZV65k18JXGsdDjeWViun8UEpkSmeDPUD+99lQZqVHDPhdvbnlh5/wxhrjLZWtD+joIWNT3Lf9hS3ZUSEGaO8xMeomxJHZR0K3GtMv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758810325; c=relaxed/simple;
-	bh=A9jLbSqY15I9mE6Eiis2TaQufr1DSCVgPVJbTstp0dI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=En6it9cKIL7pyMkQA+LOv5hDYaAnLZ+WRQJgQk/31Rn7/L99GdtUK2e4rPxtRVAqWZxG/5IpUmzDcvgRWuxkaW6H8LXd/g9Mu34D5DHip0fptvN+rwT/yaVaLMK0IVN7lb/JN1P4U3W36DkeY8ueBzjw4lUz6Tu00421mJlPnXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AE091692;
-	Thu, 25 Sep 2025 07:25:15 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DA603F694;
-	Thu, 25 Sep 2025 07:25:21 -0700 (PDT)
-From: Joey Gouly <joey.gouly@arm.com>
-To: kvm@vger.kernel.org
-Cc: alexandru.elisei@arm.com,
-	joey.gouly@arm.com,
-	andrew.jones@linux.dev,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v3 10/10] arm64: add EL2 environment variable
-Date: Thu, 25 Sep 2025 15:19:58 +0100
-Message-Id: <20250925141958.468311-11-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250925141958.468311-1-joey.gouly@arm.com>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
+	s=arc-20240116; t=1758811097; c=relaxed/simple;
+	bh=FmBr4mGtKKlFm/4on96lj8NR3CpYkqcLMke3YsO0Tgs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zg3CUl08Zlu2vhE2/a1InvblNUf4xcteWkwJJHZ2y/R0WDGaIIdhbk1PQszrrKgUeMv5DFzZCqhBHiPnReJ7ra5noo+Nxj6ig9R7gHERF1YPtKqZxihnhM0SrT48Q+9huA7m3zBnN2PA2HZI8FBLT3CCOBEhm2JtrFD+XhhYtNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FHQyg1Fw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FHQyg1Fw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBA90C4CEF0;
+	Thu, 25 Sep 2025 14:38:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758811096;
+	bh=FmBr4mGtKKlFm/4on96lj8NR3CpYkqcLMke3YsO0Tgs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FHQyg1FwTkaQc+LEMcY4D1fuOy1Ut+zIf4YJqwj3HM6MlNaV7/lCRptw7kYyStvI6
+	 +jjP3RSPrgiPjsZCUEN7JEp0AQchrqEw243k8WuAwRzTFvL6a+heZJC30p+nNcllCL
+	 D3TY2e+9rfPzj337BeBgP/61zdj06siMS6fPlPrNRtRjOT0Bbv2qVWikQ6LzJBhToK
+	 yKuWw1KCxqm6pfFEtW4XtrWt+vviNKMjCR0rCgiToGHVFppuRWu5EFMVF7xRslAarz
+	 ilNtheNCjn9JDj9xe2k+SKp94V33jd9uRSZosqiRVSjVIN1zbb4RNr+kFzEeH52ioG
+	 joqljLUv8GY3g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v1n6s-00000009Oc8-2f0i;
+	Thu, 25 Sep 2025 14:38:14 +0000
+Date: Thu, 25 Sep 2025 15:38:14 +0100
+Message-ID: <865xd61tt5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jan Kotas <jank@cadence.com>,
+    Oliver Upton <oliver.upton@linux.dev>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: KVM NV + SVE host OS warning
+In-Reply-To: <799DD5E5-8BC2-47B3-A919-33429D3FB2F1@global.cadence.com>
+References: <799DD5E5-8BC2-47B3-A919-33429D3FB2F1@global.cadence.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jank@cadence.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This variable when set to 1 will cause QEMU/kvmtool to start at EL2.
----
- arm/run | 7 +++++++
- 1 file changed, 7 insertions(+)
+[+Oliver for the SVE stuff]
 
-diff --git a/arm/run b/arm/run
-index 858333fc..2a9c0de0 100755
---- a/arm/run
-+++ b/arm/run
-@@ -59,6 +59,10 @@ function arch_run_qemu()
- 		M+=",highmem=off"
- 	fi
- 
-+	if [ "$EL2" = "1" ]; then
-+		M+=",virtualization=on"
-+	fi
-+
- 	if ! $qemu $M -device '?' | grep -q virtconsole; then
- 		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
- 		exit 2
-@@ -116,6 +120,9 @@ function arch_run_kvmtool()
- 	fi
- 
- 	command="$(timeout_cmd) $kvmtool run"
-+	if [ "$EL2" = "1" ]; then
-+		command+=" --nested"
-+	fi
- 	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
- 		run_test_status $command --kernel "$@" --aarch32
- 	else
--- 
-2.25.1
+Hi Jan,
 
+On Thu, 25 Sep 2025 15:02:20 +0100,
+Jan Kotas <jank@cadence.com> wrote:
+> Hello,
+>=20
+> I=E2=80=99m experimenting with Nested Virtualization.
+> I use Linux kernel 6.16.3 from Debian backports running on Neoverse-V2.
+>=20
+> When I try to boot a GuestOS, it hangs,
+> and I can see a warning in Host's dmesg:
+>=20
+> [52417.934951] ------------[ cut here ]------------
+> [52417.934990] WARNING: CPU: 120 PID: 44115 at arch/arm64/include/asm/kvm=
+_emulate.h:553 perform_access+0x14c/0x160
+> [52417.935087] Modules linked in: nfsv3 nfs netfs snd_seq_dummy snd_hrtim=
+er snd_seq snd_seq_device snd_timer snd soundcore rfkill qrtr binfmt_misc n=
+ls_ascii nls_cp437 vfat fat aes_ce_blk aes_ce_cipher polyval_ce ghash_ce gf=
+128mul sha3_ce sha512_ce sha1_ce acpi_ipmi dax_hmem arm_smccc_trng cxl_acpi=
+ ipmi_ssif i2c_smbus arm_spe_pmu arm_smmuv3_pmu coresight_trbe spi_nor mtd =
+ipmi_devintf ipmi_msghandler coresight_stm coresight_tmc coresight_funnel s=
+tm_core coresight_etm4x coresight joydev evdev cppc_cpufreq nfsd auth_rpcgs=
+s nfs_acl lockd grace sunrpc efi_pstore configfs nfnetlink efivarfs ip_tabl=
+es x_tables autofs4 ext4 crc16 mbcache jbd2 crc32c_cryptoapi hid_generic us=
+bhid hid rndis_host cdc_ether usbnet mii dm_mod ast ixgbe drm_shmem_helper =
+xhci_pci_renesas i2c_algo_bit xfrm_algo xhci_pci drm_client_lib mdio_devres=
+ drm_kms_helper xhci_hcd of_mdio nvme fixed_phy drm fwnode_mdio usbcore nvm=
+e_core libphy sbsa_gwdt mdio_bus nvme_keyring usb_common nvme_auth mdio i2c=
+_tegra
+> [52417.935818] CPU: 120 UID: 254353 PID: 44115 Comm: kvm_vcpu0 Tainted: G=
+        W           6.16.3+deb13-arm64 #1 PREEMPTLAZY  Debian 6.16.3-1~bpo1=
+3+1
+> [52417.935855] Tainted: [W]=3DWARN
+> [52417.935866] Hardware name: Supermicro ARS-121L-DNR/G1SMH, BIOS 2.1 04/=
+17/2025
+
+Fancy HW (/me goes selling a kidney...)
+
+> [52417.935879] pstate: 62400009 (nZCv daif +PAN -UAO +TCO -DIT -SSBS BTYP=
+E=3D--)
+> [52417.935906] pc : perform_access+0x14c/0x160
+> [52417.935933] lr : perform_access+0x4c/0x160
+> [52417.935956] sp : ffff8000f30db850
+> [52417.935967] x29: ffff8000f30db850 x28: ffff000097245000 x27: 000000000=
+0000000
+> [52417.936004] x26: 0000000000000000 x25: 0000000000000000 x24: ffff10002=
+c701c28
+> [52417.936036] x23: 0000000000000000 x22: ffff000097245000 x21: ffff8000f=
+30db8a0
+> [52417.936065] x20: ffffdbf14a19eac0 x19: ffff10002c701be0 x18: 000000000=
+0000014
+> [52417.936095] x17: 000000040044ffff x16: 00100075b5503510 x15: 000000000=
+0000000
+> [52417.936127] x14: 0000000000000000 x13: 0000000000000000 x12: 000000000=
+0000000
+> [52417.936157] x11: 0000000000001348 x10: 00000000000013b0 x9 : ffffdbf14=
+91608b4
+> [52417.936188] x8 : 0000000000000001 x7 : 0000000000000000 x6 : 000000000=
+00fffff
+> [52417.936218] x5 : 000000000036cb76 x4 : ffff10027148f7c0 x3 : ffffdbf14=
+915f04c
+> [52417.936249] x2 : 0000000000000000 x1 : 0000000000000000 x0 : 000000000=
+0000009
+> [52417.936280] Call trace:
+> [52417.936291]  perform_access+0x14c/0x160 (P)
+> [52417.936325]  kvm_handle_sys_reg+0x12c/0x2a0
+> [52417.936366]  handle_exit+0x68/0x190
+> [52417.936408]  kvm_arch_vcpu_ioctl_run+0x2d8/0xa10
+> [52417.936436]  kvm_vcpu_ioctl+0x1a8/0xb18
+> [52417.936459]  __arm64_sys_ioctl+0xb4/0x120
+> [52417.936510]  invoke_syscall+0x6c/0x100
+> [52417.936547]  el0_svc_common.constprop.0+0x48/0xf0
+> [52417.936581]  do_el0_svc+0x24/0x38
+> [52417.936613]  el0_svc+0xd4/0x190
+> [52417.936643]  el0t_64_sync_handler+0x10c/0x138
+> [52417.936667]  el0t_64_sync+0x198/0x1a0
+> [52417.936690] ---[ end trace 0000000000000000 ]---
+>=20
+>=20
+> The tracing revealed, it may be caused by a ZCR_EL2 write:
+> [109] ..... 52068.375927: kvm_sys_access: PC: 806608b8 SYS_ZCR_EL2 (3,4,1=
+,2,0) write
+>=20
+> The instruction from ELR also matches: msr zcr_el2, x1
+>=20
+> The reason might be CPTR_EL2, its value just before this instruction is e=
+xecuted, is 0.
+> However before the start of the VM execution, it has 0x22ff.
+>=20
+> I can see accesses to this register in the trace log as well, just before=
+ ZCR_EL2 is accessed.
+> [109] ..... 52068.375922: kvm_sys_access: PC: 806608a4 SYS_CPTR_EL2 (3,4,=
+1,1,2) read
+> [109] ..... 52068.375925: kvm_sys_access: PC: 806608ac SYS_CPTR_EL2 (3,4,=
+1,1,2) write
+>=20
+> I=E2=80=99m running Linux 6.16.0 as my Guest.
+> Nested Virtualization works fine with SVE disabled, so does SVE without N=
+V.
+> Could it be caused by a bug in userspace hypervisor code?
+
+Unlikely. The warning indicates that we are incrementing PC while
+there is a pending exception. Having both at the same time is a very
+bad bug -- hence the warning.
+
+Looking at the code with the above in mind, something immediately
+jumps at me. Can you try the following (against 6.17, but you'll
+surely be able to apply it against 6.16):
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 91053aa832d08..a07ad5c92583d 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2705,7 +2705,7 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+=20
+ 	if (guest_hyp_sve_traps_enabled(vcpu)) {
+ 		kvm_inject_nested_sve_trap(vcpu);
+-		return true;
++		return false;
+ 	}
+=20
+ 	if (!p->is_write) {
+
+This should make the warning go away -- not sure about anything else.
+Note that I do not have access to an NV+SVE capable machine, so you're
+are basically on your own, unless Oliver has a box he can reproduce
+this on.
+
+I would also recommend to update to 6.17 -- 6.16 was the first release
+with NV, and while it may work, it will also have a lot of ugly bugs.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
