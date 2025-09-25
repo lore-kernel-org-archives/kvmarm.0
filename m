@@ -1,262 +1,433 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313962E9743
-	for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 11:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BF520CCCA
+	for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 11:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758798180; cv=none; b=DDWJGCc0wE3rdYhUSX2jlKjnprxnLNqb3hDu4uWc1ScNyY7PBOUBBZGx0+n37oeBQVUs0GIp8m0I8wKZmQiPgslrawEXkpfJBvW6g2KLN0m+Q2MDqIbnK/E8UdldOdleWCySPRgTWpAu4LCnZzN+GY+lh4Zh3V1c+I2vMSdmYJU=
+	t=1758798594; cv=none; b=p3cJTBDguRPr45+AeCGNEtiAmEkkTzoaebi8MhzmOaoythKaMntrdPWHIcymrpbmzBJ/bcbRlsb5awpeic7XixaQEV7waYUQB1g/vJpx7SqAKIvMW6cHDzNBr3X8Z5+Rp/GOKjkovqurr+XA7OHOIPMqLLbXVHiMCln1ANv+dUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758798180; c=relaxed/simple;
-	bh=SPatiG92lX3auhrm3NKSVGGSWaunSoiZhUXuxVMKexQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PC7nbZOgkxKNAy4UsOf1LUkKQgy3vsh5CeVACXgxhjP7N5+Cd6r1jIvhzKGTjFxpyXmiH6A3AWseqEShutJ0KG0DkBkm/I5yljeRrl+t3tM1RRGVmYtDrYmfS1DnFwwUDU3f3oqj2O/E4uIL1pi11Jx9S3HOBbToFoN8XbOrm3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=agBtVbfR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="agBtVbfR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758798178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=r/0to4OyeGm89Kw4M6wzRihwRzmpUZBpw2U3yaSo+SQ=;
-	b=agBtVbfR/CDX62ZoTjQe3JL2DvpN2tvcwRsuc9yztOA828Br8uHlzDG56G03045wsv/U/8
-	Typ9Sex658vDfJ509O5ol2e8YOCFIWXlwaGBxwOeXsdvKVJZpSuZ53LsjBKm7ehK8Mgi+4
-	qtg1lZOXLuEQoq+WBusxCzLO0WBEEk0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-4aau8WrENpCbe9T-gsK6OA-1; Thu, 25 Sep 2025 07:02:57 -0400
-X-MC-Unique: 4aau8WrENpCbe9T-gsK6OA-1
-X-Mimecast-MFC-AGG-ID: 4aau8WrENpCbe9T-gsK6OA_1758798176
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3f384f10762so475547f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 04:02:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758798176; x=1759402976;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r/0to4OyeGm89Kw4M6wzRihwRzmpUZBpw2U3yaSo+SQ=;
-        b=tkvQAw7ar0UD2eCLILlHkxCeqS7376P3YdfOHjDag8qjV0SGtR5bAzU69+pQSL+M7I
-         6/jUYGjwwlWG9epT061GESJFXuLEsJupPieECmGXaTrheHyfRxTi4VQjSwgSUcjPyGYX
-         QcXUEn/cQV5Azz8pYacBZMTgWS691ByjKg83vhrd4Y22Jjeeh1OCWP+Z8/te5gz8RaKR
-         NorT32SXKkNGewjhHLcLZFvZaFpxWPrFUecain+UmvWy6dsbFccrCvGo8e69sbJsnbrD
-         utlQKh2XPcT/y6zcxyk7Iv8zEGFE73b/byvVT6ecy8C+fGFsFj/pBgdgR9iSVlONPagJ
-         ET/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUgjA0klZUgl9qYgBJbh6g7b/bboNG1m5Eom88iJc+V+uLmwG1yuzmZDzkz/MMrdArIl/PdpyY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YydFP+3Vc/0yZeegm7Qb33KJXL7c7GK0aC6GYb+DvF8saBzT1Pb
-	cJ0buL8Z37HA0df96ZVHWsbglSjDVXohLHfbNW7lNtDk5+p+/muWrceIndvX1seovwBdBlV6PHr
-	i+iNqtQob3Z+Yit291dK/jTUC2cd/MOkEd3/ZyGEOXTiOpUOnb/mNq30Gvw==
-X-Gm-Gg: ASbGncsge75eeBiVo7siibpJIErgbQK58FlBScdBV6/v6snbwFHo9yXB11DaQvEt/uI
-	TuyQGZikq5iwPRI+vMLzB2N7ydm4p/aWCF/8ImyJA9xxITXlz5p5HIppQxJ66J4/tiOfN4yY8kB
-	BTsNhWd2upTYYD9GUNTHEr5oF4fLQlqEISUIypQ0apRFu2FGK4GmzgLc6sfV/K0gIk1O/vq4DaF
-	M7pceql3T2TxQ3xzuUYkLVYLWLwKoahIrqAq0WLp3DN6QQ3blqXOyEbn+DSDg2InkrM5oan2MZM
-	7KYN0sRNl2iNXkdABDb725FbpukQ/N8gSBuLL8fY70EqWzwyg5GUWqtyYBOmofjAsaJfX318vub
-	WB8WUQ3A+R6QGARq5YqNaxrKCyEO5eBGT2cayWfufoipOIOGfV73XKQvYETNDQjh86bMQ
-X-Received: by 2002:a5d:64e6:0:b0:3ea:6680:8fb5 with SMTP id ffacd0b85a97d-40e458a939fmr2659877f8f.2.1758798175635;
-        Thu, 25 Sep 2025 04:02:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHaRjs0B05ZyXvh1d6jlu1Ktfb++k8xqGa0tdnYe8v/SeU1yGa2CE1nYchZ3/8IlcM8uOiw9Q==
-X-Received: by 2002:a5d:64e6:0:b0:3ea:6680:8fb5 with SMTP id ffacd0b85a97d-40e458a939fmr2659768f8f.2.1758798174621;
-        Thu, 25 Sep 2025 04:02:54 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08? (p200300d82f3ff800c1015c9f3bc93d08.dip0.t-ipconnect.de. [2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb72facf9sm2650164f8f.13.2025.09.25.04.02.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 04:02:53 -0700 (PDT)
-Message-ID: <cf57bdec-6a2d-4d6a-b27c-991a7e2833ab@redhat.com>
-Date: Thu, 25 Sep 2025 13:02:51 +0200
+	s=arc-20240116; t=1758798594; c=relaxed/simple;
+	bh=BwWJ+7DHPREcptgpNVrJvc8XNG/78KEnj6A6WxaE29Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LKyd2Z7P069bA+M8Cy9LnPYXG2Slyi8OmiWkPUR0hq/j50vV+fYuJqSDS+yk7mB6VpvNVd7MI77uK8cVEy4O4uiHNTTeR4K74hj2qqJcUUOtu1qmR+GXMU78539yfE6Wgb4W7rrLYir5O/chqZ3wnx5bc8u5FJJvyiZL6Kv5bJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13AFA1692;
+	Thu, 25 Sep 2025 04:09:43 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2C6A03F5A1;
+	Thu, 25 Sep 2025 04:09:50 -0700 (PDT)
+Date: Thu, 25 Sep 2025 12:09:44 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Compute per-vCPU FGTs at vcpu_load()
+Message-ID: <20250925110944.GA435166@e124191.cambridge.arm.com>
+References: <20250924235150.617451-1-oliver.upton@linux.dev>
+ <20250924235150.617451-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
- TLB flushing
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>,
- "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "willy@infradead.org" <willy@infradead.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Thomson, Jack" <jackabt@amazon.co.uk>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- "tabba@google.com" <tabba@google.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk>
- <20250924152214.7292-3-roypat@amazon.co.uk>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZoEEwEIAEQCGwMCF4ACGQEFCwkIBwICIgIG
- FQoJCAsCBBYCAwECHgcWIQQb2cqtc1xMOkYN/MpN3hD3AP+DWgUCaJzangUJJlgIpAAKCRBN
- 3hD3AP+DWhAxD/9wcL0A+2rtaAmutaKTfxhTP0b4AAp1r/eLxjrbfbCCmh4pqzBhmSX/4z11
- opn2KqcOsueRF1t2ENLOWzQu3Roiny2HOU7DajqB4dm1BVMaXQya5ae2ghzlJN9SIoopTWlR
- 0Af3hPj5E2PYvQhlcqeoehKlBo9rROJv/rjmr2x0yOM8qeTroH/ZzNlCtJ56AsE6Tvl+r7cW
- 3x7/Jq5WvWeudKrhFh7/yQ7eRvHCjd9bBrZTlgAfiHmX9AnCCPRPpNGNedV9Yty2Jnxhfmbv
- Pw37LA/jef8zlCDyUh2KCU1xVEOWqg15o1RtTyGV1nXV2O/mfuQJud5vIgzBvHhypc3p6VZJ
- lEf8YmT+Ol5P7SfCs5/uGdWUYQEMqOlg6w9R4Pe8d+mk8KGvfE9/zTwGg0nRgKqlQXrWRERv
- cuEwQbridlPAoQHrFWtwpgYMXx2TaZ3sihcIPo9uU5eBs0rf4mOERY75SK+Ekayv2ucTfjxr
- Kf014py2aoRJHuvy85ee/zIyLmve5hngZTTe3Wg3TInT9UTFzTPhItam6dZ1xqdTGHZYGU0O
- otRHcwLGt470grdiob6PfVTXoHlBvkWRadMhSuG4RORCDpq89vu5QralFNIf3EysNohoFy2A
- LYg2/D53xbU/aa4DDzBb5b1Rkg/udO1gZocVQWrDh6I2K3+cCs7BTQRVy5+RARAA59fefSDR
- 9nMGCb9LbMX+TFAoIQo/wgP5XPyzLYakO+94GrgfZjfhdaxPXMsl2+o8jhp/hlIzG56taNdt
- VZtPp3ih1AgbR8rHgXw1xwOpuAd5lE1qNd54ndHuADO9a9A0vPimIes78Hi1/yy+ZEEvRkHk
- /kDa6F3AtTc1m4rbbOk2fiKzzsE9YXweFjQvl9p+AMw6qd/iC4lUk9g0+FQXNdRs+o4o6Qvy
- iOQJfGQ4UcBuOy1IrkJrd8qq5jet1fcM2j4QvsW8CLDWZS1L7kZ5gT5EycMKxUWb8LuRjxzZ
- 3QY1aQH2kkzn6acigU3HLtgFyV1gBNV44ehjgvJpRY2cC8VhanTx0dZ9mj1YKIky5N+C0f21
- zvntBqcxV0+3p8MrxRRcgEtDZNav+xAoT3G0W4SahAaUTWXpsZoOecwtxi74CyneQNPTDjNg
- azHmvpdBVEfj7k3p4dmJp5i0U66Onmf6mMFpArvBRSMOKU9DlAzMi4IvhiNWjKVaIE2Se9BY
- FdKVAJaZq85P2y20ZBd08ILnKcj7XKZkLU5FkoA0udEBvQ0f9QLNyyy3DZMCQWcwRuj1m73D
- sq8DEFBdZ5eEkj1dCyx+t/ga6x2rHyc8Sl86oK1tvAkwBNsfKou3v+jP/l14a7DGBvrmlYjO
- 59o3t6inu6H7pt7OL6u6BQj7DoMAEQEAAcLBfAQYAQgAJgIbDBYhBBvZyq1zXEw6Rg38yk3e
- EPcA/4NaBQJonNqrBQkmWAihAAoJEE3eEPcA/4NaKtMQALAJ8PzprBEXbXcEXwDKQu+P/vts
- IfUb1UNMfMV76BicGa5NCZnJNQASDP/+bFg6O3gx5NbhHHPeaWz/VxlOmYHokHodOvtL0WCC
- 8A5PEP8tOk6029Z+J+xUcMrJClNVFpzVvOpb1lCbhjwAV465Hy+NUSbbUiRxdzNQtLtgZzOV
- Zw7jxUCs4UUZLQTCuBpFgb15bBxYZ/BL9MbzxPxvfUQIPbnzQMcqtpUs21CMK2PdfCh5c4gS
- sDci6D5/ZIBw94UQWmGpM/O1ilGXde2ZzzGYl64glmccD8e87OnEgKnH3FbnJnT4iJchtSvx
- yJNi1+t0+qDti4m88+/9IuPqCKb6Stl+s2dnLtJNrjXBGJtsQG/sRpqsJz5x1/2nPJSRMsx9
- 5YfqbdrJSOFXDzZ8/r82HgQEtUvlSXNaXCa95ez0UkOG7+bDm2b3s0XahBQeLVCH0mw3RAQg
- r7xDAYKIrAwfHHmMTnBQDPJwVqxJjVNr7yBic4yfzVWGCGNE4DnOW0vcIeoyhy9vnIa3w1uZ
- 3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
- CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
- qIws/H2t
-In-Reply-To: <20250924152214.7292-3-roypat@amazon.co.uk>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: wt10vCmC3DVlDEApXo01C-uSS9vu3K8RAbNVFwHI0Nk_1758798176
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250924235150.617451-2-oliver.upton@linux.dev>
 
-On 24.09.25 17:22, Roy, Patrick wrote:
-> Add an option to not perform TLB flushes after direct map manipulations.
-> TLB flushes result in a up to 40x elongation of page faults in
-> guest_memfd (scaling with the number of CPU cores), or a 5x elongation
-> of memory population, which is inacceptable when wanting to use direct
-> map removed guest_memfd as a drop-in replacement for existing workloads.
+On Wed, Sep 24, 2025 at 04:51:49PM -0700, Oliver Upton wrote:
+> To date KVM has used the fine-grained traps for the sake of UNDEF
+> enforcement (so-called FGUs), meaning the constituent parts could be
+> computed on a per-VM basis and folded into the effective value when
+> programmed.
 > 
-> TLB flushes are not needed for functional correctness (the virt->phys
-> mapping technically stays "correct", the kernel should simply not use it
-> for a while), so we can skip them to keep performance in-line with
-> "traditional" VMs.
+> Prepare for traps changing based on the vCPU context by computing the
+> whole mess of them at vcpu_load(). Aggressively inline all the helpers
+> to preserve the build-time checks that were there before.
 > 
-> Enabling this option means that the desired protection from
-> Spectre-style attacks is not perfect, as an attacker could try to
-> prevent a stale TLB entry from getting evicted, keeping it alive until
-> the page it refers to is used by the guest for some sensitive data, and
-> then targeting it using a spectre-gadget.
-> 
-> Cc: Will Deacon <will@kernel.org>
-> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
 > ---
->   include/linux/kvm_host.h | 1 +
->   virt/kvm/guest_memfd.c   | 3 ++-
->   virt/kvm/kvm_main.c      | 3 +++
->   3 files changed, 6 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/kvm_host.h       |  50 ++++++++
+>  arch/arm64/kvm/arm.c                    |   1 +
+>  arch/arm64/kvm/config.c                 |  82 +++++++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 148 +++---------------------
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c          |   1 +
+>  5 files changed, 151 insertions(+), 131 deletions(-)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 73a15cade54a..4d2bc18860fc 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2298,6 +2298,7 @@ extern unsigned int halt_poll_ns;
->   extern unsigned int halt_poll_ns_grow;
->   extern unsigned int halt_poll_ns_grow_start;
->   extern unsigned int halt_poll_ns_shrink;
-> +extern bool guest_memfd_tlb_flush;
->   
->   struct kvm_device {
->   	const struct kvm_device_ops *ops;
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index b7129c4868c5..d8dd24459f0d 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -63,7 +63,8 @@ static int kvm_gmem_folio_zap_direct_map(struct folio *folio)
->   	if (!r) {
->   		unsigned long addr = (unsigned long) folio_address(folio);
->   		folio->private = (void *) ((u64) folio->private & KVM_GMEM_FOLIO_NO_DIRECT_MAP);
-> -		flush_tlb_kernel_range(addr, addr + folio_size(folio));
-> +		if (guest_memfd_tlb_flush)
-> +			flush_tlb_kernel_range(addr, addr + folio_size(folio));
->   	}
->   
->   	return r;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index b5e702d95230..753c06ebba7f 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -95,6 +95,9 @@ unsigned int halt_poll_ns_shrink = 2;
->   module_param(halt_poll_ns_shrink, uint, 0644);
->   EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
->   
-> +bool guest_memfd_tlb_flush = true;
-> +module_param(guest_memfd_tlb_flush, bool, 0444);
-
-The parameter name is a bit too generic. I think you somehow have to 
-incorporate the "direct_map" aspects.
-
-Also, I wonder if this could be a capability per vm/guest_memfd?
-
-Then, you could also nicely document the semantics, considerations, 
-impact etc :)
-
--- 
-Cheers
-
-David / dhildenb
-
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8ede884f091d..fadfdac3210e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -816,6 +816,11 @@ struct kvm_vcpu_arch {
+>  	u64 hcrx_el2;
+>  	u64 mdcr_el2;
+>  
+> +	struct {
+> +		u64 r;
+> +		u64 w;
+> +	} fgt[__NR_FGT_GROUP_IDS__];
+> +
+>  	/* Exception Information */
+>  	struct kvm_vcpu_fault_info fault;
+>  
+> @@ -1599,6 +1604,51 @@ static inline bool kvm_arch_has_irq_bypass(void)
+>  void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
+>  void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1);
+>  void check_feature_map(void);
+> +void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu);
+> +
+> +static __always_inline enum fgt_group_id __fgt_reg_to_group_id(enum vcpu_sysreg reg)
+> +{
+> +	switch (reg) {
+> +	case HFGRTR_EL2:
+> +	case HFGWTR_EL2:
+> +		return HFGRTR_GROUP;
+> +	case HFGITR_EL2:
+> +		return HFGITR_GROUP;
+> +	case HDFGRTR_EL2:
+> +	case HDFGWTR_EL2:
+> +		return HDFGRTR_GROUP;
+> +	case HAFGRTR_EL2:
+> +		return HAFGRTR_GROUP;
+> +	case HFGRTR2_EL2:
+> +	case HFGWTR2_EL2:
+> +		return HFGRTR2_GROUP;
+> +	case HFGITR2_EL2:
+> +		return HFGITR2_GROUP;
+> +	case HDFGRTR2_EL2:
+> +	case HDFGWTR2_EL2:
+> +		return HDFGRTR2_GROUP;
+> +	default:
+> +		BUILD_BUG_ON(1);
+> +	}
+> +}
+>  
+> +#define vcpu_fgt(vcpu, reg)						\
+> +	({								\
+> +		enum fgt_group_id id = __fgt_reg_to_group_id(reg);	\
+> +		u64 *p;							\
+> +		switch (reg) {						\
+> +		case HFGWTR_EL2:					\
+> +		case HDFGWTR_EL2:					\
+> +		case HFGWTR2_EL2:					\
+> +		case HDFGWTR2_EL2:					\
+> +			p = &(vcpu)->arch.fgt[id].w;			\
+> +			break;						\
+> +		default:						\
+> +			p = &(vcpu)->arch.fgt[id].r;			\
+> +			break;						\
+> +		}							\
+> +									\
+> +		p;							\
+> +	})
+>  
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index a59b4046617c..c74ad097a681 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -643,6 +643,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  		vcpu->arch.hcr_el2 |= HCR_TWI;
+>  
+>  	vcpu_set_pauth_traps(vcpu);
+> +	kvm_vcpu_load_fgt(vcpu);
+>  
+>  	if (is_protected_kvm_enabled()) {
+>  		kvm_call_hyp_nvhe(__pkvm_vcpu_load,
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index fbd8944a3dea..b1cf7660efe1 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -5,6 +5,8 @@
+>   */
+>  
+>  #include <linux/kvm_host.h>
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_nested.h>
+>  #include <asm/sysreg.h>
+>  
+>  /*
+> @@ -1428,3 +1430,83 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+>  		break;
+>  	}
+>  }
+> +
+> +static __always_inline struct fgt_masks *__fgt_reg_to_masks(enum vcpu_sysreg reg)
+> +{
+> +	switch (reg) {
+> +	case HFGRTR_EL2:
+> +		return &hfgrtr_masks;
+> +	case HFGWTR_EL2:
+> +		return &hfgwtr_masks;
+> +	case HFGITR_EL2:
+> +		return &hfgitr_masks;
+> +	case HDFGRTR_EL2:
+> +		return &hdfgrtr_masks;
+> +	case HDFGWTR_EL2:
+> +		return &hdfgwtr_masks;
+> +	case HAFGRTR_EL2:
+> +		return &hafgrtr_masks;
+> +	case HFGRTR2_EL2:
+> +		return &hfgrtr2_masks;
+> +	case HFGWTR2_EL2:
+> +		return &hfgwtr2_masks;
+> +	case HFGITR2_EL2:
+> +		return &hfgitr2_masks;
+> +	case HDFGRTR2_EL2:
+> +		return &hdfgrtr2_masks;
+> +	case HDFGWTR2_EL2:
+> +		return &hdfgwtr2_masks;
+> +	default:
+> +		BUILD_BUG_ON(1);
+> +	}
+> +}
+> +
+> +static __always_inline void __compute_fgt(struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
+> +{
+> +	u64 fgu = vcpu->kvm->arch.fgu[__fgt_reg_to_group_id(reg)];
+> +	struct fgt_masks *m = __fgt_reg_to_masks(reg);
+> +	u64 clear = 0, set = 0, val = m->nmask;
+> +
+> +	set |= fgu & m->mask;
+> +	clear |= fgu & m->nmask;
+> +
+> +	if (is_nested_ctxt(vcpu)) {
+> +		u64 nested = __vcpu_sys_reg(vcpu, reg);
+> +		set |= nested & m->mask;
+> +		clear |= ~nested & m->nmask;
+> +	}
+> +
+> +	val |= set;
+> +	val &= ~clear;
+> +	*vcpu_fgt(vcpu, reg) = val;
+> +}
+> +
+> +static void __compute_hfgwtr(struct kvm_vcpu *vcpu)
+> +{
+> +	__compute_fgt(vcpu, HFGWTR_EL2);
+> +
+> +	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> +		*vcpu_fgt(vcpu, HFGWTR_EL2) |= HFGWTR_EL2_TCR_EL1;
+> +}
+> +
+> +void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> +		return;
+> +
+> +	__compute_fgt(vcpu, HFGRTR_EL2);
+> +	__compute_hfgwtr(vcpu);
+> +	__compute_fgt(vcpu, HFGITR_EL2);
+> +	__compute_fgt(vcpu, HDFGRTR_EL2);
+> +	__compute_fgt(vcpu, HDFGWTR_EL2);
+> +	__compute_fgt(vcpu, HAFGRTR_EL2);
+> +
+> +	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
+> +		return;
+> +
+> +	__compute_fgt(vcpu, HFGRTR2_EL2);
+> +	__compute_fgt(vcpu, HFGWTR2_EL2);
+> +	__compute_fgt(vcpu, HFGITR2_EL2);
+> +	__compute_fgt(vcpu, HDFGRTR2_EL2);
+> +	__compute_fgt(vcpu, HDFGWTR2_EL2);
+> +}
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 84ec4e100fbb..3562e265134c 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -195,123 +195,6 @@ static inline void __deactivate_cptr_traps(struct kvm_vcpu *vcpu)
+>  		__deactivate_cptr_traps_nvhe(vcpu);
+>  }
+>  
+> -#define reg_to_fgt_masks(reg)						\
+> -	({								\
+> -		struct fgt_masks *m;					\
+> -		switch(reg) {						\
+> -		case HFGRTR_EL2:					\
+> -			m = &hfgrtr_masks;				\
+> -			break;						\
+> -		case HFGWTR_EL2:					\
+> -			m = &hfgwtr_masks;				\
+> -			break;						\
+> -		case HFGITR_EL2:					\
+> -			m = &hfgitr_masks;				\
+> -			break;						\
+> -		case HDFGRTR_EL2:					\
+> -			m = &hdfgrtr_masks;				\
+> -			break;						\
+> -		case HDFGWTR_EL2:					\
+> -			m = &hdfgwtr_masks;				\
+> -			break;						\
+> -		case HAFGRTR_EL2:					\
+> -			m = &hafgrtr_masks;				\
+> -			break;						\
+> -		case HFGRTR2_EL2:					\
+> -			m = &hfgrtr2_masks;				\
+> -			break;						\
+> -		case HFGWTR2_EL2:					\
+> -			m = &hfgwtr2_masks;				\
+> -			break;						\
+> -		case HFGITR2_EL2:					\
+> -			m = &hfgitr2_masks;				\
+> -			break;						\
+> -		case HDFGRTR2_EL2:					\
+> -			m = &hdfgrtr2_masks;				\
+> -			break;						\
+> -		case HDFGWTR2_EL2:					\
+> -			m = &hdfgwtr2_masks;				\
+> -			break;						\
+> -		default:						\
+> -			BUILD_BUG_ON(1);				\
+> -		}							\
+> -									\
+> -		m;							\
+> -	})
+> -
+> -#define compute_clr_set(vcpu, reg, clr, set)				\
+> -	do {								\
+> -		u64 hfg = __vcpu_sys_reg(vcpu, reg);			\
+> -		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
+> -		set |= hfg & m->mask;					\
+> -		clr |= ~hfg & m->nmask;					\
+> -	} while(0)
+> -
+> -#define reg_to_fgt_group_id(reg)					\
+> -	({								\
+> -		enum fgt_group_id id;					\
+> -		switch(reg) {						\
+> -		case HFGRTR_EL2:					\
+> -		case HFGWTR_EL2:					\
+> -			id = HFGRTR_GROUP;				\
+> -			break;						\
+> -		case HFGITR_EL2:					\
+> -			id = HFGITR_GROUP;				\
+> -			break;						\
+> -		case HDFGRTR_EL2:					\
+> -		case HDFGWTR_EL2:					\
+> -			id = HDFGRTR_GROUP;				\
+> -			break;						\
+> -		case HAFGRTR_EL2:					\
+> -			id = HAFGRTR_GROUP;				\
+> -			break;						\
+> -		case HFGRTR2_EL2:					\
+> -		case HFGWTR2_EL2:					\
+> -			id = HFGRTR2_GROUP;				\
+> -			break;						\
+> -		case HFGITR2_EL2:					\
+> -			id = HFGITR2_GROUP;				\
+> -			break;						\
+> -		case HDFGRTR2_EL2:					\
+> -		case HDFGWTR2_EL2:					\
+> -			id = HDFGRTR2_GROUP;				\
+> -			break;						\
+> -		default:						\
+> -			BUILD_BUG_ON(1);				\
+> -		}							\
+> -									\
+> -		id;							\
+> -	})
+> -
+> -#define compute_undef_clr_set(vcpu, kvm, reg, clr, set)			\
+> -	do {								\
+> -		u64 hfg = kvm->arch.fgu[reg_to_fgt_group_id(reg)];	\
+> -		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
+> -		set |= hfg & m->mask;					\
+> -		clr |= hfg & m->nmask;					\
+> -	} while(0)
+> -
+> -#define update_fgt_traps_cs(hctxt, vcpu, kvm, reg, clr, set)		\
+> -	do {								\
+> -		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
+> -		u64 c = clr, s = set;					\
+> -		u64 val;						\
+> -									\
+> -		ctxt_sys_reg(hctxt, reg) = read_sysreg_s(SYS_ ## reg);	\
+> -		if (is_nested_ctxt(vcpu))				\
+> -			compute_clr_set(vcpu, reg, c, s);		\
+> -									\
+> -		compute_undef_clr_set(vcpu, kvm, reg, c, s);		\
+> -									\
+> -		val = m->nmask;						\
+> -		val |= s;						\
+> -		val &= ~c;						\
+> -		write_sysreg_s(val, SYS_ ## reg);			\
+> -	} while(0)
+> -
+> -#define update_fgt_traps(hctxt, vcpu, kvm, reg)		\
+> -	update_fgt_traps_cs(hctxt, vcpu, kvm, reg, 0, 0)
+> -
+>  static inline bool cpu_has_amu(void)
+>  {
+>         u64 pfr0 = read_sysreg_s(SYS_ID_AA64PFR0_EL1);
+> @@ -320,33 +203,36 @@ static inline bool cpu_has_amu(void)
+>                 ID_AA64PFR0_EL1_AMU_SHIFT);
+>  }
+>  
+> +#define __activate_fgt(hctxt, vcpu, reg)				\
+> +	do {								\
+> +		ctxt_sys_reg(hctxt, reg) = read_sysreg_s(SYS_ ## reg);	\
+> +		write_sysreg_s(*vcpu_fgt(vcpu, reg), SYS_ ## reg);	\
+> +	} while (0)
+> +
+>  static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+> -	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+>  
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+>  		return;
+>  
+> -	update_fgt_traps(hctxt, vcpu, kvm, HFGRTR_EL2);
+> -	update_fgt_traps_cs(hctxt, vcpu, kvm, HFGWTR_EL2, 0,
+> -			    cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38) ?
+> -			    HFGWTR_EL2_TCR_EL1_MASK : 0);
+> -	update_fgt_traps(hctxt, vcpu, kvm, HFGITR_EL2);
+> -	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR_EL2);
+> -	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR_EL2);
+> +	__activate_fgt(hctxt, vcpu, HFGRTR_EL2);
+> +	__activate_fgt(hctxt, vcpu, HFGWTR_EL2);
+> +	__activate_fgt(hctxt, vcpu, HFGITR_EL2);
+> +	__activate_fgt(hctxt, vcpu, HDFGRTR_EL2);
+> +	__activate_fgt(hctxt, vcpu, HDFGWTR_EL2);
+>  
+>  	if (cpu_has_amu())
+> -		update_fgt_traps(hctxt, vcpu, kvm, HAFGRTR_EL2);
+> +		__activate_fgt(hctxt, vcpu, HAFGRTR_EL2);
+>  
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
+>  	    return;
+>  
+> -	update_fgt_traps(hctxt, vcpu, kvm, HFGRTR2_EL2);
+> -	update_fgt_traps(hctxt, vcpu, kvm, HFGWTR2_EL2);
+> -	update_fgt_traps(hctxt, vcpu, kvm, HFGITR2_EL2);
+> -	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR2_EL2);
+> -	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR2_EL2);
+> +	__activate_fgt(hctxt, vcpu, HFGRTR2_EL2);
+> +	__activate_fgt(hctxt, vcpu, HFGWTR2_EL2);
+> +	__activate_fgt(hctxt, vcpu, HFGITR2_EL2);
+> +	__activate_fgt(hctxt, vcpu, HDFGRTR2_EL2);
+> +	__activate_fgt(hctxt, vcpu, HDFGWTR2_EL2);
+>  }
+>  
+>  #define __deactivate_fgt(htcxt, vcpu, reg)				\
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 05774aed09cb..43bde061b65d 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -172,6 +172,7 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
+>  
+>  		/* Trust the host for non-protected vcpu features. */
+>  		vcpu->arch.hcrx_el2 = host_vcpu->arch.hcrx_el2;
+> +		memcpy(vcpu->arch.fgt, host_vcpu->arch.fgt, sizeof(vcpu->arch.fgt));
+>  		return 0;
+>  	}
+>  
+> -- 
+> 2.47.3
+> 
