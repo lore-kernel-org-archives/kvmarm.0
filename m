@@ -1,225 +1,98 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7593A31B824
-	for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 20:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9DF158545
+	for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 22:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758831236; cv=none; b=ti86o9VbFCsUZoXoRuLXUY2QM5L6VAMmCNM+hgFbSdBgum1s2IXjuKHPS7toFMFoCerRAvVebtRa3DQf951DeKDU5Bth3q3JpYJbquqrF3CIE6VIn0aPKJct+a3JPTmPZiDyHtykUfEQwzpb+BA7FxJFHhFAafcNyk3WUc5zcg0=
+	t=1758840423; cv=none; b=ooz/7UkKHBDwi5kfH29GOY6ypNw6TEgx7zRdEYxzLWb/mA8fUoblg0gibSlm3LSU6GBjE/fEcn6E4WiWR/aZf08RymNUBK5hnIcUT+SLCWZQ2Ugip46m74n5m3esKUoaBq4hLVT7VPuQrdMFrN0VS/sWP4J5mHFaWK6UGPMqMAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758831236; c=relaxed/simple;
-	bh=VRNU/SIeWDAUnJXorg9z/v07pFFZ+5txlBQH4Ycxe7w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZdZTSNqgOXAi7qzPTm23iBvV+DktO4lj4Pq+Re+b9580fHuerSNCQxItAC7l5kXAfrRA5y1tppYsafcBzLUwKzDRRFglx48QzjIRrqmskCI9bPXDZ1YcuVkt959PQMQyxGral/ipomM3vWxaNaiKBZzNawfZpdOzsq2LYS3MXSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EKrLCKJQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758840423; c=relaxed/simple;
+	bh=a1sAzZtMIVzsVStFgqsULDjOFyrrQTy18Vek1hP1hnQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gIq2bm2cZrXewCcPsT3NmeYidQsRQNNPDJFT8IV10Al4Hv8yTwUfJVVVAN8BUyUSDRgtugaMmPMH4sFnavAt9++R2XvzE3qZSgREbgBxvg4LkUn6MpnEie07Q9EG3HZAqKAA2YzjUdLma0ePGEGieBrFg+jmVmbeDEuQhp4AFUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XTW7y5n9; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EKrLCKJQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758831234;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XTW7y5n9"
+Date: Thu, 25 Sep 2025 15:46:51 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758840418;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Jt934pWl+waL11DifZ1ogJABhsR0QZuMWPNAUgnNLvs=;
-	b=EKrLCKJQ12cjXaEl/zjPnLr56NfKlt/k/dIUyFWINoUIsJOr8wH8ozHk2SZHA35jsVHxQj
-	9y9a6e1ZVKVYtmZgCl+mKgX6K/j5gq4PEwh6zZ5gctQ0FKJQTYE3BwZV1itr39BQupI5NG
-	9ag7/LIRC9cWuQg2afPhCgfR0crTGYM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-685-b0SG5ABGPOW9vVZ46lRoqA-1; Thu, 25 Sep 2025 16:13:53 -0400
-X-MC-Unique: b0SG5ABGPOW9vVZ46lRoqA-1
-X-Mimecast-MFC-AGG-ID: b0SG5ABGPOW9vVZ46lRoqA_1758831232
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3f93db57449so694405f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 25 Sep 2025 13:13:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758831232; x=1759436032;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jt934pWl+waL11DifZ1ogJABhsR0QZuMWPNAUgnNLvs=;
-        b=S7b/PKeJxG1WHuBU31USW2tFGa3u1syYU8eAsxgPvvwEDtzhkJXR1gpkX5527kXPn7
-         aWCGTfX5u0SdKTE+tPoRK8Fz8tv2ePGvRhMAytcTYXJhngo6Oz1lep5Y+i2jkGOZ0WBv
-         FrQhxLfzxICdO8vZGekyXwGruFf9soqfTBYsoohc9NimN4sxg/Al2/X6kBM+TUDo7AUs
-         YK1K+px5izNrcBrSZnls+y3/UX3HBwOvBy5frnBBAAHyH6htqh46W23huSHWSeaHWhnf
-         CwH/blRmKBvsy/2rBaHYjuzcyzTzbEJSQO25NqIiL8xAUgg139J883GP5T6qq+qmQWDt
-         ihHA==
-X-Forwarded-Encrypted: i=1; AJvYcCVG/eKSnNklrXok0uP8zEu0X/6Pr3fIQwONqnZn6rbLribzyDjG0qNNgOoQq21RszvukJmbUdE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxQxMCozExyEj0vZKiwrcrbaDxnBuT2gt8ECnOiouhVCQHm87sw
-	floVA0oaWDTtNK3hD2ZiuvuP7XOxU0MvG0WHm2CPKJ41POAZI4XtGOKf81f/5MjDCphjTUZFiIx
-	IjMLqM8/BueqJs23pjHBDMT+5W/Q7mlJPAfWZhHU4uGCDQxzcU4Bf50M7aQ==
-X-Gm-Gg: ASbGnctHUFgL84pIuUz7FV8/w3lbtD8sufJVVVvPTfbC+DVtvTgIijCoy2R70NwK6I+
-	jcKH9AlHloyvpiiNJT9BTpfebX9+UFhGZe6nIjJNR9G2m13Ingc+1lZT1cuJq+AWCJiXvlt7BeH
-	8EGUuPvwFChyrl72HS9HKlF/OnePPw5iZ8wGl1z0UjFApZ7pJd7TTjRGOsXJ6DgC54z8aB4xZUD
-	tEr340p3LdMUp9PuWY1xBcD0zO5kUN5fp/danPO+fJ9cxUb2P2nFWugso/JmoE1Eq37gtp1e4MB
-	3gVp9nsD5ZY8hoYOQ5xpEER0yzaxcpNWjAdiz+TJf6YvVI8w3+/tjBGk4IqSFX/1FjlX6vPXhmR
-	HhjEe4xTJqOiLXnKpWaZoZK+ZVOYrs8Ar/O97qQc0Nc5iyLPNuoVx2ok4Letobt9RkJAD
-X-Received: by 2002:a05:6000:2304:b0:3ea:bed8:7040 with SMTP id ffacd0b85a97d-40e46ad00b9mr4712250f8f.25.1758831231711;
-        Thu, 25 Sep 2025 13:13:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGFVVNLdXy4p/tTQ+NT/ePAfr5Q0kgcDHv5gQvTT3sYR20nows4MCsqZEQWfZcFoJRiSMKYvg==
-X-Received: by 2002:a05:6000:2304:b0:3ea:bed8:7040 with SMTP id ffacd0b85a97d-40e46ad00b9mr4712175f8f.25.1758831231212;
-        Thu, 25 Sep 2025 13:13:51 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08? (p200300d82f3ff800c1015c9f3bc93d08.dip0.t-ipconnect.de. [2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc82f2ff6sm4094888f8f.56.2025.09.25.13.13.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 13:13:50 -0700 (PDT)
-Message-ID: <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
-Date: Thu, 25 Sep 2025 22:13:47 +0200
+	 in-reply-to:in-reply-to:references:references;
+	bh=UCxr7/EDa6kIX3HdLra6Zg2rSstiBXln9nQtEteQlFQ=;
+	b=XTW7y5n9nkSgFryqJqKb8JmIPTPe0jZLmS08sdhnNRkfPD6WgsUgZNQverhMDkfBEY0Atu
+	W7jyN4VpOf5eFGFRBoay+IDq2/TlcEDX8V29hB69iFjW7oJEkOTApCfJC7F1edpKUdL7K+
+	8z15tGH8edDxNopsvfmaZV61oo1xS1U=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Jan Kotas <jank@cadence.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: KVM NV + SVE host OS warning
+Message-ID: <aNXGW8C_S1TbFR9-@linux.dev>
+References: <799DD5E5-8BC2-47B3-A919-33429D3FB2F1@global.cadence.com>
+ <865xd61tt5.wl-maz@kernel.org>
+ <F9556C9F-2671-4EF6-A725-D080C3793A34@global.cadence.com>
+ <864isq1r66.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
- TLB flushing
-To: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>,
- "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "willy@infradead.org" <willy@infradead.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Thomson, Jack" <jackabt@amazon.co.uk>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- "tabba@google.com" <tabba@google.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk>
- <20250924152214.7292-3-roypat@amazon.co.uk>
- <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
- <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
- <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: zyyoMANTua-uqFZM26hJq48mrXmJq5mfwT4g3eb84-s_1758831232
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <864isq1r66.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On 25.09.25 21:59, Dave Hansen wrote:
-> On 9/25/25 12:20, David Hildenbrand wrote:
->> On 25.09.25 20:27, Dave Hansen wrote:
->>> On 9/24/25 08:22, Roy, Patrick wrote:
->>>> Add an option to not perform TLB flushes after direct map manipulations.
->>>
->>> I'd really prefer this be left out for now. It's a massive can of worms.
->>> Let's agree on something that works and has well-defined behavior before
->>> we go breaking it on purpose.
->>
->> May I ask what the big concern here is?
+On Thu, Sep 25, 2025 at 04:35:13PM +0100, Marc Zyngier wrote:
+> On Thu, 25 Sep 2025 16:10:22 +0100,
+> Jan Kotas <jank@cadence.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > Thank you for a quick response.
+> > 
+> > > On 25 Sep 2025, at 16:38, Marc Zyngier <maz@kernel.org> wrote:
+> > > 
+> > > EXTERNAL MAIL
+> > > 
+> > > 
+> > > [+Oliver for the SVE stuff]
+> > > 
+> > > Hi Jan,
 > 
-> It's not a _big_ concern. 
-
-Oh, I read "can of worms" and thought there is something seriously 
-problematic :)
-
-> I just think we want to start on something
-> like this as simple, secure, and deterministic as possible.
-
-Yes, I agree. And it should be the default. Less secure would have to be 
-opt-in and documented thoroughly.
-
+> [...]
 > 
-> Let's say that with all the unmaps that load_unaligned_zeropad() faults
-> start to bite us. It'll take longer to find them if the TLB isn't flushed.
+> > > 
+> > > I would also recommend to update to 6.17 -- 6.16 was the first release
+> > > with NV, and while it may work, it will also have a lot of ugly bugs.
+> > 
+> > I will try, but as I don’t own this machine, changing kernels might
+> > be… challenging.
 > 
-> Basically, it'll make the bad things happen sooner rather than later.
+> Well, you're already passing something on the command-line that is
+> documented as "experimental and should be used with extreme caution".
+> Changing the kernel is a walk in the park compared to that ;-).
 
-Agreed.
++1, also it'd be good to know what you're doing in the L1 and the L2
+that leads to this bug.
 
--- 
-Cheers
+I just tried the original test setup I used when doing NV SVE and things
+appear to work (kvmarm/next + initramfs at L1 + L2, tested with
+sve-stress selftest).
 
-David / dhildenb
+> > If there’s anything else I can provide to help track it down,
+> > please let me know.
+> 
+> Testing the provided patch would be good -- I would if I could.
 
+Although I didn't repro the bug, the patch itself LGTM.
+
+Thanks,
+Oliver
