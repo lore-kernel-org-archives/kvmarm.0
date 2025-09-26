@@ -1,30 +1,30 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CD51D6AA
-	for <kvmarm@lists.linux.dev>; Fri, 26 Sep 2025 22:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F8629AB05
+	for <kvmarm@lists.linux.dev>; Fri, 26 Sep 2025 22:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758926580; cv=none; b=dsvz5vuCgmSN8GcsFDoAjlPUElizXdVjJDWAaA/kusKTIGQlI1BCKNc+sQ4CbfTIodGTYEHH2wYaLDa7KVnCdw9zHhSlGfr9fOAJYHySOKV1cCCFjb7ng3F6We4fXPG3Woo1h2GjRdztGz0AQ9LV6dnmyhqkyTSyTxqQVlIn514=
+	t=1758926708; cv=none; b=fAOlcTJWA4s+Rn72/b2wwv0GtKUV4UljJ65Mjcbgs77H9KzmNKmtH0zhrvsaMxLElcnH9hL9WC/juOGOVLEi1WK68v2l58lYFqgj5Bk6eOdLdgxJA4tdNNRo4OV0/GMsoqazf1lCmhC1PCTvqVwcctxBXNPLfXDWoa6uvLEIxsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758926580; c=relaxed/simple;
-	bh=NlvP7l42gOtXKHpbiYPX9byye2HL/yCr2dTdDZrru/o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s4Kp7HIUXGMdxkdj+Pxt6TKbMc/JMFUAFDSTYU2u7Wj5rolA7P3yFRKGr9i2Cr0Fq5W9qOqyoFLS4rCIEvD4F7l2EvDnLDvDYpFfsTJGEODlFpowUahZZ7EFhxXVtTSXApTFFDiCeodbL57CSD+PgicEkrrJxO2JNKkyLzMY7lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LpqCHQ+d; arc=none smtp.client-ip=91.218.175.170
+	s=arc-20240116; t=1758926708; c=relaxed/simple;
+	bh=P7FxGnEUX7LfTSPUAPo5XBamZ/KP9un8miH1uQdOC0U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mgsLUJvd8xGSl3aSn+NcUBFgjif55VFJnVZm5jg2r2o1k6bs/sxTDnkD9EwD7sHDXSTPjQr9Ezk/XhzYJYMGCsGPX6iQ0wErewueM2g7XKnwzbhs5fV95lXBdR5drrDYGGinrmMmn53m/Bu2CtihWVSU1mGe/DPm/KvwAPcPXpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=krFK/Mcm; arc=none smtp.client-ip=95.215.58.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LpqCHQ+d"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="krFK/Mcm"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758926575;
+	t=1758926704;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=2pUV+KcR5foBOJ6qzzH5M4krB4ht2srqPTxu0gojY2M=;
-	b=LpqCHQ+dR/OA6hKrjvyHorTTOtts2t3imw0iPMPuxCbv4dGiYxONP4cIRlMVERg6Brt8sj
-	Xh2wcyH4Wdbd5D2coDbO1HMFfnWoi1xRo8YWxMkjGcXWsBiIhti6eSRbaGEz/M/LNPG5kB
-	O813pBWYbNqBYijBhFhxnf81qI0i5kE=
+	bh=yd+APAjGAZuazc9NYTrTOX7161a/PiePHaRiS+4FanI=;
+	b=krFK/Mcmf/l/0rcV+79BcoGWd1A3EMp3P0P5kcOaEnm+is64hUf8qMqp8FAd71MPVGYFrP
+	mIhiUb6nIAn3zAAC+sBY5UMTcAr7GfAS6GmGuhkC6/P6aFOn+rWfOzXyxtwYDUglec2z+8
+	GFxO/679knVD8uduytinp6xJyjWk12w=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -32,9 +32,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: Use the in-context stage-1 in __kvm_find_s1_desc_level()
-Date: Fri, 26 Sep 2025 15:42:46 -0700
-Message-ID: <20250926224246.731748-1-oliver.upton@linux.dev>
+Subject: [PATCH] KVM: arm64: selftests: Test effective value of HCR_EL2.AMO
+Date: Fri, 26 Sep 2025 15:44:54 -0700
+Message-ID: <20250926224454.734066-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,42 +44,101 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Running the external_aborts selftest at EL2 leads to an ugly splat due
-to the stage-1 MMU being disabled for the walked context, owing to the
-fact that __kvm_find_s1_desc_level() is hardcoded to the EL1&0 regime.
+A defect against the architecture now allows an implementation to treat
+AMO as 1 when HCR_EL2.{E2H, TGE} = {1, 0}. KVM now takes advantage of
+this interpretation to address a quality of emulation issue w.r.t.
+SError injection.
 
-Select the appropriate translation regime for the stage-1 walk based on
-the current vCPU context.
+Add a corresponding test case and expect a pending SError to be taken.
 
-Fixes: b8e625167a32 ("KVM: arm64: Add S1 IPA to page table level walker")
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/at.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ .../selftests/kvm/arm64/external_aborts.c     | 43 +++++++++++++++++++
+ .../selftests/kvm/include/arm64/processor.h   | 12 +++++-
+ 2 files changed, 54 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 20bb9af125b1..e2e06ec8a67b 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -1602,13 +1602,17 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
- 			.fn	= match_s1_desc,
- 			.priv	= &dm,
- 		},
--		.regime	= TR_EL10,
- 		.as_el0	= false,
- 		.pan	= false,
- 	};
- 	struct s1_walk_result wr = {};
- 	int ret;
+diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
+index 592b26ded779..d8fe17a6cc59 100644
+--- a/tools/testing/selftests/kvm/arm64/external_aborts.c
++++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
+@@ -359,6 +359,44 @@ static void test_mmio_ease(void)
+ 	kvm_vm_free(vm);
+ }
  
-+	if (is_hyp_ctxt(vcpu))
-+		wi.regime = vcpu_el2_e2h_is_set(vcpu) ? TR_EL20 : TR_EL2;
-+	else
-+		wi.regime = TR_EL10;
++static void test_serror_amo_guest(void)
++{
++	/*
++	 * The ISB is entirely unnecessary (and highlights how FEAT_NV2 is borked)
++	 * since the write is redirected to memory. But don't write (intentionally)
++	 * broken code!
++	 */
++	sysreg_clear_set(hcr_el2, HCR_EL2_AMO | HCR_EL2_TGE, 0);
++	isb();
 +
- 	ret = setup_s1_walk(vcpu, &wi, &wr, va);
- 	if (ret)
- 		return ret;
++	GUEST_SYNC(0);
++	GUEST_ASSERT(read_sysreg(isr_el1) & ISR_EL1_A);
++
++	/*
++	 * KVM treats the effective value of AMO as 1 when
++	 * HCR_EL2.{E2H,TGE} = {1, 0}, meaning the SError will be taken when
++	 * unmasked.
++	 */
++	local_serror_enable();
++	isb();
++	local_serror_disable();
++
++	GUEST_FAIL("Should've taken pending SError exception");
++}
++
++static void test_serror_amo(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_serror_amo_guest,
++							unexpected_dabt_handler);
++
++	vm_install_exception_handler(vm, VECTOR_ERROR_CURRENT, expect_serror_handler);
++	vcpu_run_expect_sync(vcpu);
++	vcpu_inject_serror(vcpu);
++	vcpu_run_expect_done(vcpu);
++	kvm_vm_free(vm);
++}
++
+ int main(void)
+ {
+ 	test_mmio_abort();
+@@ -369,4 +407,9 @@ int main(void)
+ 	test_serror_emulated();
+ 	test_mmio_ease();
+ 	test_s1ptw_abort();
++
++	if (!test_supports_el2())
++		return 0;
++
++	test_serror_amo();
+ }
+diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
+index 6f481475c135..ff928716574d 100644
+--- a/tools/testing/selftests/kvm/include/arm64/processor.h
++++ b/tools/testing/selftests/kvm/include/arm64/processor.h
+@@ -305,7 +305,17 @@ void test_wants_mte(void);
+ void test_disable_default_vgic(void);
+ 
+ bool vm_supports_el2(struct kvm_vm *vm);
+-static bool vcpu_has_el2(struct kvm_vcpu *vcpu)
++
++static inline bool test_supports_el2(void)
++{
++	struct kvm_vm *vm = vm_create(1);
++	bool supported = vm_supports_el2(vm);
++
++	kvm_vm_free(vm);
++	return supported;
++}
++
++static inline bool vcpu_has_el2(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->init.features[0] & BIT(KVM_ARM_VCPU_HAS_EL2);
+ }
 
 base-commit: 10fd0285305d0b48e8a3bf15d4f17fc4f3d68cb6
 -- 
