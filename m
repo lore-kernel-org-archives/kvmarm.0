@@ -1,96 +1,123 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BB9276028
-	for <kvmarm@lists.linux.dev>; Fri, 26 Sep 2025 07:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2951244661
+	for <kvmarm@lists.linux.dev>; Fri, 26 Sep 2025 08:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758870939; cv=none; b=iiGIEcUJsjQK3k3jJmUh/9y2t0MyULluusmEZzvCYZ2Vwr9ZGRRv/ZESjJ3gHg8DduHM4o3W5z9p2HK2lVpkv2nYSaMFs/4W48KvL+MY5hXr/7mH0ogBAdF7n7xqp/ScKa7JuBSi1nvFrRDNQcKfuOIJ2GT3+JYwY2FAWaP6q3U=
+	t=1758877078; cv=none; b=orSZYDzp/Tlit81wq8AwFJGMz9GfH4Nf5NWg2fGhbgHVSf0KjM3CVfy6S5lMQ+wkBSadty7IBO+dX36kAzVMDKmW9YBIk07h/glqgMWvAciNl40LEPL84v42tro/V/CaJa7PLgtt/AoSXsfSK0AD9IT3vdST8+hb3pF9x44uMH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758870939; c=relaxed/simple;
-	bh=pzDt3laCX4gpWoGmnSNBtd03hHaJ+z2XS3IbZ2qCNo8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FFcyPsd7E62vRi3JwgufCbiYHnChYLf9xZCX3FqUc2ZfvHMzamsGh3E9X/WlC61npbko6+oMavLhqwcc0CgYduc1igeCFYb1CaAsojagowGfKrcjD7RsvulSI/0cDTPrMtdfS5b5mQybVy8qmgfyJgWSgVSI13R3AQv7ExR0Qfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cY1vX203cz2Cgn6;
-	Fri, 26 Sep 2025 15:10:48 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id AAF521402C4;
-	Fri, 26 Sep 2025 15:15:27 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 26 Sep 2025 15:15:27 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 26 Sep 2025 15:15:26 +0800
-Message-ID: <3d518b64-d66b-ca1e-0893-5b1f0faa17ee@hisilicon.com>
-Date: Fri, 26 Sep 2025 15:15:16 +0800
+	s=arc-20240116; t=1758877078; c=relaxed/simple;
+	bh=qurLT89Yq4wV40quik/K4CGBXx3csIfkitBetZbe+v0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GnEwfaKW4ZAEmrqoBkXAKLKvFkqUZItbXfiCLLhpBbiqSbz+FF6ndQOnamjdMoqtmSUFDMUdi3z9UvGhRYDsJb6U0CzvNb3J+x/z4quEjidORGpwZ/iORPWD/SuhK9+KwxhPwEpCCBsiiFSdpmnGrVfNbqOAENBl/B0QWKRgIms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MFB2haoX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MFB2haoX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DB6C4CEF4;
+	Fri, 26 Sep 2025 08:57:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758877077;
+	bh=qurLT89Yq4wV40quik/K4CGBXx3csIfkitBetZbe+v0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MFB2haoX5kW11xmuQK4wWtB6AJhjzOf9V9FbHFNTT4Fvh7mGyaxw7Yi3+MegeG+Oi
+	 LGmYdSyd8wPppK5Xyu+0+5HKZCspgLiEWxxECCNEOszh7j4DVlDS4K5LIPrJNIY6j1
+	 fmqUHx9kJ5al20V2sBSGcfgbbmkLeIQS2a3J0fMnLv6TYf+N/EwLofRZZH9X70kiml
+	 LLrofRPy9bMFeV62ly3oor1yi/Iq2DyEAyFqMozp7/BBa/A7lzyht1OTU822+ihkhf
+	 ml6yp4MrsbZJnlOHvrrOojcVKPRVtAJmECqDSV2jXsFBtAVP1TafM0hS6EoVI89xHn
+	 AdHOiNdSmEwbQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v24H5-00000009brP-0ybJ;
+	Fri, 26 Sep 2025 08:57:55 +0000
+Date: Fri, 26 Sep 2025 09:57:54 +0100
+Message-ID: <861pnt1tgt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<oliver.upton@linux.dev>,
+	<tangnianyao@huawei.com>,
+	<wangwudi@hisilicon.com>,
+	<liuyonglong@huawei.com>,
+	<prime.zeng@hisilicon.com>
+Subject: Re: [PATCH v2 0/4] Add workaround for HIP10/HIP10C erratum 162200802
+In-Reply-To: <3d518b64-d66b-ca1e-0893-5b1f0faa17ee@hisilicon.com>
+References: <20250825023954.3516381-1-wangzhou1@hisilicon.com>
+	<fc7763d5-bed6-ace6-ace8-a50c031cab36@hisilicon.com>
+	<87wm5uxwvc.wl-maz@kernel.org>
+	<3d518b64-d66b-ca1e-0893-5b1f0faa17ee@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v2 0/4] Add workaround for HIP10/HIP10C erratum 162200802
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<oliver.upton@linux.dev>, <tangnianyao@huawei.com>, <wangwudi@hisilicon.com>,
-	<liuyonglong@huawei.com>, <prime.zeng@hisilicon.com>
-References: <20250825023954.3516381-1-wangzhou1@hisilicon.com>
- <fc7763d5-bed6-ace6-ace8-a50c031cab36@hisilicon.com>
- <87wm5uxwvc.wl-maz@kernel.org>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <87wm5uxwvc.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, tangnianyao@huawei.com, wangwudi@hisilicon.com, liuyonglong@huawei.com, prime.zeng@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025/9/19 23:52, Marc Zyngier wrote:
-> On Mon, 01 Sep 2025 11:55:49 +0100,
-> Zhou Wang <wangzhou1@hisilicon.com> wrote:
->>
->> On 2025/8/25 10:39, Zhou Wang wrote:
->>> As the discussion from V1 series, V2 series firstly adds GICD.num_LPIs
->>> writable support, then add HiSilicon erratum 162200802.
->>>
->>> Erratum number should be 162200802, make a mistake in V1, so fix it as
->>> well.
->>>
->>> Zhou Wang (4):
->>>   KVM: arm64: Allow userspace to write GICD_TYPER.num_LPIs
->>>   KVM: arm64: selftests: Add test for GICD.num_LPIs
->>>   Documentation: KVM: arm64: Add GICD_TYPER.num_LPIs writable
->>>     description
->>>   ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200802
->>
->> Hi Marc and Oliver,
->>
->> As the discussion in V1 series, this series firstly adds GICD.num_LPIs
->> writable support, then add erratum patch.
+On Fri, 26 Sep 2025 08:15:16 +0100,
+Zhou Wang <wangzhou1@hisilicon.com> wrote:
 > 
-> Given the state of this HW (as per [1]), I'd rather we start by
-> working out the strategy at the GIC level, rather than exposing stuff
-> to userspace before we agree on a way to make it work in the kernel.
+> On 2025/9/19 23:52, Marc Zyngier wrote:
+> > On Mon, 01 Sep 2025 11:55:49 +0100,
+> > Zhou Wang <wangzhou1@hisilicon.com> wrote:
+> >>
+> >> On 2025/8/25 10:39, Zhou Wang wrote:
+> >>> As the discussion from V1 series, V2 series firstly adds GICD.num_LPIs
+> >>> writable support, then add HiSilicon erratum 162200802.
+> >>>
+> >>> Erratum number should be 162200802, make a mistake in V1, so fix it as
+> >>> well.
+> >>>
+> >>> Zhou Wang (4):
+> >>>   KVM: arm64: Allow userspace to write GICD_TYPER.num_LPIs
+> >>>   KVM: arm64: selftests: Add test for GICD.num_LPIs
+> >>>   Documentation: KVM: arm64: Add GICD_TYPER.num_LPIs writable
+> >>>     description
+> >>>   ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200802
+> >>
+> >> Hi Marc and Oliver,
+> >>
+> >> As the discussion in V1 series, this series firstly adds GICD.num_LPIs
+> >> writable support, then add erratum patch.
+> > 
+> > Given the state of this HW (as per [1]), I'd rather we start by
+> > working out the strategy at the GIC level, rather than exposing stuff
+> > to userspace before we agree on a way to make it work in the kernel.
+> 
+> This bug is in GICv4.0([1] is in GICv4.1), and seems having a clear way
+> to fix. How about merging this fix firstly, then continue to try to solve [1]?
 
-This bug is in GICv4.0([1] is in GICv4.1), and seems having a clear way
-to fix. How about merging this fix firstly, then continue to try to solve [1]?
+No. It has to be worked out the other way around, because this is
+introducing a new userspace ABI, and adding new ABIs to cope with
+design bugs is not really acceptable, specially when you have a
+perfectly good way to deal with the issue (don't enable GICv4).
 
-Best,
-Zhou
+I also don't understand your 4.0 vs 4.1 point. This is for HIP10 and
+HIP10C. [1] clearly says that both HIP9/10/10C are GICv4.1
+implementations. So what is what here?
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> [1] https://lore.kernel.org/r/20250909110615.129179-1-wangzhou1@hisilicon.com
-> 
+I'm mildly annoyed at being spoon-fed bits of errata with
+contradicting statements instead of being given the full picture for
+what looks like an implementation train-wreck. From what I can see,
+these implementations are broken, and not worth salvaging. There is a
+perfectly valid workaround that keeps VMs running without any extra
+change. Why can't you simply use that?
+
+Thanks,
+
+	M.
+
+[1] https://lore.kernel.org/r/20250909110615.129179-1-wangzhou1@hisilicon.com
+
+-- 
+Without deviation from the norm, progress is not possible.
