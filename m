@@ -1,32 +1,32 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FBD270EAB
-	for <kvmarm@lists.linux.dev>; Fri, 26 Sep 2025 19:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EF01A0728
+	for <kvmarm@lists.linux.dev>; Fri, 26 Sep 2025 19:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758915682; cv=none; b=KVpR6tPUZGsgyjwq5cEMYEu2Bogpt9sr0vkT4nq7Ubn7j9VE4AueaAcmL1uH7n+Vhhobp+ceg6058Pj/ab6wrUHoXNqNfWNYr2MmiHd/1eYmhmr2Ug9+F/F4gZHKvmi0Xi+tMILkpWCOVeUkC9xwtHGOwr1yL/IiNJ5cAFwlSWQ=
+	t=1758915684; cv=none; b=gOei20oZmMZF05cAnOyvzjA0gBoZIbnzvae6tpNWFMAWnYBnSxYe4I7zeHgiFxsSrfIzHZwUFsj7bwPYSG5w0rhXsv2fLLt6LNIIqW18e+iy6DaR4rUZssIGkARSnoZyCzgWgJmpFg6D7GxH2POZsMgK5dbZjg7qUBFlLsuKWZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758915682; c=relaxed/simple;
-	bh=20eLueoVDy8cScdKflRhEqJJ9eb7r9uP0Nf4vTx4k6Q=;
+	s=arc-20240116; t=1758915684; c=relaxed/simple;
+	bh=PVrjuiUuH9MiukBTnHz3bNPqONav6kNSrTQNx1uw5X0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PwvBY3/A3hHY+aoLAkKbTVESrj/PB8X1ex1toB/yngbq9aGJl64MYBxLYdLXjdajgYQPM9iUNnSy/imyynlquXAHBjEnZCrV3cILG43Rh/UF4vESa65yGtQDB0ico55FhXhF24OwNyy3arn/TfmTk+LlQVIcpPLrUbg27dapyaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jq2epYtv; arc=none smtp.client-ip=95.215.58.182
+	 MIME-Version; b=XF119qe7pIdT5BOSdkAaHUe+hne/9znfhzSMrr8c0tkOEa2j/9gtZGeWOCPlX/e9FQFw8nGWh2zb878wYXO8QySFA7QGS9xEpzCPatoDVHzUy3BUXN9RbxUt6C5RYlJcfWhuk2tSrVBBT4Y9gpTsf/oHhhsZirG0DMQD3A+tpxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VemThlej; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jq2epYtv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VemThlej"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758915679;
+	t=1758915680;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IcT5DW7Scxi1siyk1UAgrQXE8cRFfCifo1GIRY2+dCk=;
-	b=jq2epYtvCSiMp50CI+mwwqTzijLPRBSXFtSiUVx0sKEjQtuOPtSTS0xHk4sxM1B6fyn2zC
-	8+aNnXo9R+DDMNooOzyfe0EO27v+kBE0ghCdCrNDVdWi7JcJxDHEBqwh1yprL9LUkbABDB
-	8a/1R1BbJp9TwRdI3C7ZK3M6c+bWJK0=
+	bh=w5xp7XhZoQgA8gncLMzH1cbDZLAsLXHbLrYI7qe1D/I=;
+	b=VemThlejkP8Beypt2bujbc3/RqQoPzi4iM2C6d+RQz1OGrJ6sjujzBiN0uFrnBVtFG2SLW
+	1MYY3j5D+XcKHiEBHbs+7ckxJYXl1KQWKCVuaYunSO/1tzsmKpyGiRhX2qQEi46KZ8N700
+	nnAl6xpf0eLOso3kpFphlPyrcQz6n+E=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Jan Kotas <jank@cadence.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 1/2] KVM: arm64: nv: Don't treat ZCR_EL2 as a 'mapped' register
-Date: Fri, 26 Sep 2025 12:41:07 -0700
-Message-Id: <20250926194108.84093-2-oliver.upton@linux.dev>
+Subject: [PATCH 2/2] KVM: arm64: nv: Don't advance PC when pending an SVE exception
+Date: Fri, 26 Sep 2025 12:41:08 -0700
+Message-Id: <20250926194108.84093-3-oliver.upton@linux.dev>
 In-Reply-To: <20250926194108.84093-1-oliver.upton@linux.dev>
 References: <20250926194108.84093-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -49,50 +49,38 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Unlike the other mapped EL2 sysregs ZCR_EL2 isn't guaranteed to be
-resident when a vCPU is loaded as it actually follows the SVE
-context. As such, the contents of ZCR_EL1 may belong to another guest if
-the vCPU has been preempted before reaching sysreg emulation.
+From: Marc Zyngier <maz@kernel.org>
 
-Unconditionally use the in-memory value of ZCR_EL2 and switch to the
-memory-only accessors. The in-memory value is guaranteed to be valid as
-fpsimd_lazy_switch_to_{guest,host}() will restore/save the register
-appropriately.
+Jan reports that running a nested guest on Neoverse-V2 leads to a WARN
+in the host due to simultaneously pending an exception and PC increment
+after an access to ZCR_EL2.
 
+Returning true from a sysreg accessor is an indication that the sysreg
+instruction has been retired. Of course this isn't the case when we've
+pended a synchronous SVE exception for the guest. Fix the return value
+and let the exception propagate to the guest as usual.
+
+Reported-by: Jan Kotas <jank@cadence.com>
+Closes: https://lore.kernel.org/kvmarm/865xd61tt5.wl-maz@kernel.org/
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/sys_regs.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 91053aa832d0..4a75e5f0c259 100644
+index 4a75e5f0c259..ee8a7033c85b 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -203,7 +203,6 @@ static void locate_register(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg,
- 		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
- 		MAPPED_EL2_SYSREG(ELR_EL2,     ELR_EL1,	    NULL	     );
- 		MAPPED_EL2_SYSREG(SPSR_EL2,    SPSR_EL1,    NULL	     );
--		MAPPED_EL2_SYSREG(ZCR_EL2,     ZCR_EL1,     NULL	     );
- 		MAPPED_EL2_SYSREG(CONTEXTIDR_EL2, CONTEXTIDR_EL1, NULL	     );
- 		MAPPED_EL2_SYSREG(SCTLR2_EL2,  SCTLR2_EL1,  NULL	     );
- 	case CNTHCTL_EL2:
-@@ -2709,14 +2708,13 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+@@ -2704,7 +2704,7 @@ static bool access_zcr_el2(struct kvm_vcpu *vcpu,
+ 
+ 	if (guest_hyp_sve_traps_enabled(vcpu)) {
+ 		kvm_inject_nested_sve_trap(vcpu);
+-		return true;
++		return false;
  	}
  
  	if (!p->is_write) {
--		p->regval = vcpu_read_sys_reg(vcpu, ZCR_EL2);
-+		p->regval = __vcpu_sys_reg(vcpu, ZCR_EL2);
- 		return true;
- 	}
- 
- 	vq = SYS_FIELD_GET(ZCR_ELx, LEN, p->regval) + 1;
- 	vq = min(vq, vcpu_sve_max_vq(vcpu));
--	vcpu_write_sys_reg(vcpu, vq - 1, ZCR_EL2);
--
-+	__vcpu_assign_sys_reg(vcpu, ZCR_EL2, vq - 1);
- 	return true;
- }
- 
 -- 
 2.39.5
 
