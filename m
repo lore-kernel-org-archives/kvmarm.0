@@ -1,216 +1,118 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12512F8BDA;
-	Fri, 26 Sep 2025 11:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26118272814
+	for <kvmarm@lists.linux.dev>; Fri, 26 Sep 2025 11:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758884610; cv=none; b=ZGDFq/QRcAwuMAJXsNxx9wzeHmTfRybLTatFwfxfrK7eFBrK/pkS54T2X+3BX/xJ9AATULuU7qIi6L3/3HvueMCbfmWPrNtZX00MtZx4Sv8PyV4QYyaUu0N6AYj+kRem/Tu3fJpujSWQBn+Y6RiwXLlyUJF7IfDUOKXQte1gyTw=
+	t=1758886097; cv=none; b=aSJU9RT5yuLuev3XVn4McyfTxAvSJKLvcxdg7RcmNGM7LkS8hM+DmNE4SlOlZK9dkZ5HR6zYet/FPibUvo7DT1ce5IJQTddfN/nh3Jux+sHYUyNsCTy7dJIZ7aYN+wnPe3CVxL7rA4UxBDm78fkq/8thqqoGuEAJccokDAdw4To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758884610; c=relaxed/simple;
-	bh=NiM5bywEe+hqZEp48MCP0PMFIY9nEmXjNWVKXBI6nW4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B2t83yIikSXvEBS3ERyayL1+35zs0Xe+WwcUuucdnxnPLZm1S1nkLTJoQjryFM7T1vCkCFn/gJJ5bcQOGtVgMERtrLnZkyYJ2EM0EDK0Jnc83JsgSXMU2E9VO2Hk5WPRJG0JQwfB0OiPinrdcbZ9v3jbCKHrjHJ6Q0IIGh30Uw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35699168F;
-	Fri, 26 Sep 2025 04:03:20 -0700 (PDT)
-Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.38.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D63AF3F66E;
-	Fri, 26 Sep 2025 04:03:24 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Steven Price <steven.price@arm.com>
-Subject: [RFC PATCH 5/5] arm64: RME: Support num_aux_places & rtt_tree_pp realm parameters
-Date: Fri, 26 Sep 2025 12:02:54 +0100
-Message-ID: <20250926110254.55449-6-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250926110254.55449-1-steven.price@arm.com>
-References: <20250926110254.55449-1-steven.price@arm.com>
+	s=arc-20240116; t=1758886097; c=relaxed/simple;
+	bh=iH2Mk5EYcSufiuPrsYsiNX/5GAr8NvOuTM6FZJQNSMs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mBISfrI6LCNzikkqiPH1/fPCmPrR8Mz6ES15W4o++JHB1vzigk8e5vJ1lQpBhtQBtP2y7e42CB2fm57Uk8SLWhUsOU1KmrO4H8ULv3R74ZEmkaN9AL2lqDvytA1PJvBkdXYhCh7Pp1BhvSjKBp93RAOPmhvuiz3VuTNFwvxhnIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4cY7Xk0gyvz1R9XG;
+	Fri, 26 Sep 2025 19:24:54 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id E613A1A016C;
+	Fri, 26 Sep 2025 19:28:03 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 26 Sep 2025 19:28:03 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 26 Sep 2025 19:28:03 +0800
+Message-ID: <d7027fe7-01fc-d72f-078b-ed28564a413f@hisilicon.com>
+Date: Fri, 26 Sep 2025 19:28:02 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v2 0/4] Add workaround for HIP10/HIP10C erratum 162200802
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<oliver.upton@linux.dev>, <tangnianyao@huawei.com>, <wangwudi@hisilicon.com>,
+	<liuyonglong@huawei.com>, <prime.zeng@hisilicon.com>
+References: <20250825023954.3516381-1-wangzhou1@hisilicon.com>
+ <fc7763d5-bed6-ace6-ace8-a50c031cab36@hisilicon.com>
+ <87wm5uxwvc.wl-maz@kernel.org>
+ <3d518b64-d66b-ca1e-0893-5b1f0faa17ee@hisilicon.com>
+ <861pnt1tgt.wl-maz@kernel.org>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <861pnt1tgt.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
-CCA planes provides new parameters to the VMM:
- - num_aux_planes defines the number of extra planes
- - rtt_tree_pp controls whether each plane has it's own page table tree,
-   of if they share one tree.
+On 2025/9/26 16:57, Marc Zyngier wrote:
+> On Fri, 26 Sep 2025 08:15:16 +0100,
+> Zhou Wang <wangzhou1@hisilicon.com> wrote:
+>>
+>> On 2025/9/19 23:52, Marc Zyngier wrote:
+>>> On Mon, 01 Sep 2025 11:55:49 +0100,
+>>> Zhou Wang <wangzhou1@hisilicon.com> wrote:
+>>>>
+>>>> On 2025/8/25 10:39, Zhou Wang wrote:
+>>>>> As the discussion from V1 series, V2 series firstly adds GICD.num_LPIs
+>>>>> writable support, then add HiSilicon erratum 162200802.
+>>>>>
+>>>>> Erratum number should be 162200802, make a mistake in V1, so fix it as
+>>>>> well.
+>>>>>
+>>>>> Zhou Wang (4):
+>>>>>   KVM: arm64: Allow userspace to write GICD_TYPER.num_LPIs
+>>>>>   KVM: arm64: selftests: Add test for GICD.num_LPIs
+>>>>>   Documentation: KVM: arm64: Add GICD_TYPER.num_LPIs writable
+>>>>>     description
+>>>>>   ARM64: errata: Add workaround for HIP10/HIP10C erratum 162200802
+>>>>
+>>>> Hi Marc and Oliver,
+>>>>
+>>>> As the discussion in V1 series, this series firstly adds GICD.num_LPIs
+>>>> writable support, then add erratum patch.
+>>>
+>>> Given the state of this HW (as per [1]), I'd rather we start by
+>>> working out the strategy at the GIC level, rather than exposing stuff
+>>> to userspace before we agree on a way to make it work in the kernel.
+>>
+>> This bug is in GICv4.0([1] is in GICv4.1), and seems having a clear way
+>> to fix. How about merging this fix firstly, then continue to try to solve [1]?
+> 
+> No. It has to be worked out the other way around, because this is
+> introducing a new userspace ABI, and adding new ABIs to cope with
+> design bugs is not really acceptable, specially when you have a
+> perfectly good way to deal with the issue (don't enable GICv4).
+> 
+> I also don't understand your 4.0 vs 4.1 point. This is for HIP10 and
+> HIP10C. [1] clearly says that both HIP9/10/10C are GICv4.1
+> implementations. So what is what here?
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/uapi/asm/kvm.h | 12 +++++
- arch/arm64/kvm/rme.c              | 77 +++++++++++++++++++++++++++++--
- 2 files changed, 86 insertions(+), 3 deletions(-)
+HIP09/10/10C support both 4.0 and 4.1, which could be selected by a BIOS
+switch.
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 9b5d67ecbc5e..1d83da0f3aaa 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -440,6 +440,8 @@ enum {
- /* List of configuration items accepted for KVM_CAP_ARM_RME_CONFIG_REALM */
- #define ARM_RME_CONFIG_RPV			0
- #define ARM_RME_CONFIG_HASH_ALGO		1
-+#define ARM_RME_CONFIG_NUM_AUX_PLANES		2
-+#define ARM_RME_CONFIG_RTT_TREE_PP		3
- 
- #define ARM_RME_CONFIG_HASH_ALGO_SHA256		0
- #define ARM_RME_CONFIG_HASH_ALGO_SHA512		1
-@@ -459,6 +461,16 @@ struct arm_rme_config {
- 			__u32	hash_algo;
- 		};
- 
-+		/* cfg == ARM_RME_CONFIG_NUM_AUX_PLANES */
-+		struct {
-+			__u32	num_aux_planes;
-+		};
-+
-+		/* cfg == ARM_RME_CONFIG_RTT_TREE_PP */
-+		struct {
-+			__u32	rtt_tree_pp;
-+		};
-+
- 		/* Fix the size of the union */
- 		__u8	reserved[256];
- 	};
-diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 6cb938957510..fca305da1843 100644
---- a/arch/arm64/kvm/rme.c
-+++ b/arch/arm64/kvm/rme.c
-@@ -43,6 +43,28 @@ bool kvm_rme_supports_sve(void)
- 	return rme_has_feature(RMI_FEATURE_REGISTER_0_SVE_EN);
- }
- 
-+static bool kvm_rme_supports_rtt_tree_single(void)
-+{
-+	int i = u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_RTT_PLANE);
-+
-+	switch (i) {
-+	case RMI_RTT_PLANE_AUX:
-+		return false;
-+	case RMI_RTT_PLANE_AUX_SINGLE:
-+	case RMI_RTT_PLANE_SINGLE:
-+		return true;
-+	default:
-+		WARN(1, "Unknown encoding for RMI_FEATURE_REGISTER_0_RTT_PLANE: %#x", i);
-+	}
-+	return false;
-+}
-+
-+static unsigned int rme_get_max_num_aux_planes(void)
-+{
-+	return u64_get_bits(rmm_feat_reg0,
-+			    RMI_FEATURE_REGISTER_0_MAX_NUM_AUX_PLANES);
-+}
-+
- static int rmi_check_version(void)
- {
- 	struct arm_smccc_res res;
-@@ -1077,6 +1099,14 @@ int realm_map_protected(struct realm *realm,
- 	return -ENXIO;
- }
- 
-+static unsigned long pi_index_to_s2tte(unsigned long idx)
-+{
-+	return FIELD_PREP(BIT(PTE_PI_IDX_0), (idx >> 0) & 1) |
-+	       FIELD_PREP(BIT(PTE_PI_IDX_1), (idx >> 1) & 1) |
-+	       FIELD_PREP(BIT(PTE_PI_IDX_2), (idx >> 2) & 1) |
-+	       FIELD_PREP(BIT(PTE_PI_IDX_3), (idx >> 3) & 1);
-+}
-+
- int realm_map_non_secure(struct realm *realm,
- 			 unsigned long ipa,
- 			 kvm_pfn_t pfn,
-@@ -1101,9 +1131,17 @@ int realm_map_non_secure(struct realm *realm,
- 		 * so for now we permit both read and write.
- 		 */
- 		unsigned long desc = phys |
--				     PTE_S2_MEMATTR(MT_S2_FWB_NORMAL) |
--				     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |
--				     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-+				     PTE_S2_MEMATTR(MT_S2_FWB_NORMAL);
-+		/*
-+		 * FIXME: Read+Write permissions for now, and no support yet
-+		 * for setting RMI_REALM_PARAM_FLAG1_RTT_S2AP_ENCODING
-+		 */
-+		if (1)
-+			desc |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |
-+				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-+		else
-+			desc |= pi_index_to_s2tte(RMI_BASE_PERM_RW_INDEX);
-+
- 		ret = rmi_rtt_map_unprotected(rd, ipa, map_level, desc);
- 
- 		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-@@ -1653,6 +1691,33 @@ static int config_realm_hash_algo(struct realm *realm,
- 	return 0;
- }
- 
-+static int config_num_aux_planes(struct realm *realm,
-+				 struct arm_rme_config *cfg)
-+{
-+	if (cfg->num_aux_planes > rme_get_max_num_aux_planes())
-+		return -EINVAL;
-+
-+	realm->num_aux_planes = cfg->num_aux_planes;
-+	realm->params->num_aux_planes = cfg->num_aux_planes;
-+
-+	return 0;
-+}
-+
-+static int config_rtt_tree_pp(struct realm *realm,
-+			      struct arm_rme_config *cfg)
-+{
-+	if (!kvm_rme_supports_rtt_tree_single() && !cfg->rtt_tree_pp)
-+		return -EINVAL;
-+
-+	realm->rtt_tree_pp = !!cfg->rtt_tree_pp;
-+	if (realm->rtt_tree_pp)
-+		realm->params->flags1 |= RMI_REALM_PARAM_FLAG1_RTT_TREE_PP;
-+	else
-+		realm->params->flags1 &= ~RMI_REALM_PARAM_FLAG1_RTT_TREE_PP;
-+
-+	return 0;
-+}
-+
- static int kvm_rme_config_realm(struct kvm *kvm, struct kvm_enable_cap *cap)
- {
- 	struct arm_rme_config cfg;
-@@ -1672,6 +1737,12 @@ static int kvm_rme_config_realm(struct kvm *kvm, struct kvm_enable_cap *cap)
- 	case ARM_RME_CONFIG_HASH_ALGO:
- 		r = config_realm_hash_algo(realm, &cfg);
- 		break;
-+	case ARM_RME_CONFIG_NUM_AUX_PLANES:
-+		r = config_num_aux_planes(realm, &cfg);
-+		break;
-+	case ARM_RME_CONFIG_RTT_TREE_PP:
-+		r = config_rtt_tree_pp(realm, &cfg);
-+		break;
- 	default:
- 		r = -EINVAL;
- 	}
--- 
-2.43.0
-
+> 
+> I'm mildly annoyed at being spoon-fed bits of errata with
+> contradicting statements instead of being given the full picture for
+> what looks like an implementation train-wreck. From what I can see,
+> these implementations are broken, and not worth salvaging. There is a
+> perfectly valid workaround that keeps VMs running without any extra
+> change. Why can't you simply use that?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> [1] https://lore.kernel.org/r/20250909110615.129179-1-wangzhou1@hisilicon.com
+> 
