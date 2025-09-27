@@ -1,50 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4892AE8D;
-	Sat, 27 Sep 2025 11:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317032E06E6
+	for <kvmarm@lists.linux.dev>; Sat, 27 Sep 2025 11:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758972590; cv=none; b=SHXSGht07bxRatEDj0AOsy/1vUPks7pt+lKTlP+0NZlXryP0/sHyq7tCVJLLj9VKzsgrx1yqGqKyXpadBdHpxNRtBnaNXckZKx5UkI0VhB/XXd5fcLbi8jXq56W330Vly1JQbEoMIfppsPd8nT4I0DJz50sA6j7s/hL+VwynNb8=
+	t=1758972607; cv=none; b=kB6ackFRNUd0d1J5xlqeuICshVUImOYvmYZV/JihUQxOfipM58azoHlNwxT+7Tu9YUG9rwGN7TbZc4BCXR3V4ZZ+ZMa1keTtQB9C09OEEzEr2A0WKPl/5/xg55BJX9HSuZflgMrv11YUyQGcwUd1rJpiZFRC4YTpQj4427Hr0fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758972590; c=relaxed/simple;
-	bh=woOJMQVx2gK/ZTrYKUvp8Kze1O8Xv6dnLbcVNoWtA9U=;
+	s=arc-20240116; t=1758972607; c=relaxed/simple;
+	bh=OeP0i8Iirv15JrdBhSaIWmOkXYQXbERJCgqncNadi5U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AP0yOU7FP24+pD99HVBo+UL71Y6Aeo+AZ35YWPkPfq1Kzv9PUiYLjR5zcPgMBGNti/DkdfJWbBjWI+VS9/fUcTfUQIdGMyVACefLxYN0DtQoVYuJ/aPi9TYFhPeOhdBkkayigDouvJsWpy9/6v6F4P518coL18zPN6maPH9EekY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SVgcX3cw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=B9KpF9FPsDoa+4S6dODGeEahluuB62Yk4lMuepdb9DfD0hHh+GnU13NfS+/4NyWyHsELfTY8xG4v4fUDkAm1cZhO8Eamg7Y778y9OXb7kfOhrj2+MkjRgBj/TkB64BLqQXckx2Mr9+7g+z52g0E6D/YQqLAzSShViCtQrMI1wXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XJMpTBaJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SVgcX3cw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21754C4CEE7;
-	Sat, 27 Sep 2025 11:29:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XJMpTBaJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4794C4CEE7;
+	Sat, 27 Sep 2025 11:30:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758972590;
-	bh=woOJMQVx2gK/ZTrYKUvp8Kze1O8Xv6dnLbcVNoWtA9U=;
+	s=k20201202; t=1758972606;
+	bh=OeP0i8Iirv15JrdBhSaIWmOkXYQXbERJCgqncNadi5U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SVgcX3cww3I4jhHCG7p2ABBDtOytr0l9MxhhncYqy5LR8JN5xjlQyUF3pl5FRss0U
-	 kyeZAAZrF01Cms/Qa0DPHwW8Jjzr0pNLck4xq5y7BTLcUW/oKuLos+2GxbPcsGa/8i
-	 BYMt7JRiLicMmrc26p6bmo82Wyf4/jl+8OJngpMBtWqT8k6SRHtKyvDeHNtuafos98
-	 8PREpN34kn2BwkHuHiFubyMPM3l/tYJmn+subZv71IHRQVn4bk39d8IiA/VnN5bHJ8
-	 4Jr5gAjstzMheamBOOVLdgUUxsnsA0ix7Y8S+hJ7CniqBhq4gX+zxMoOhLSkWQ4l3b
-	 FD21L0Hje1EPQ==
+	b=XJMpTBaJAB0Kq3aeu8wEtefFjPJZ3waCEbgTMOHf8dAxYZniG3fSza1HbABM6VBSN
+	 fl69+R28hwmDDsQcZ8ZKwC59owuyxr9MG9hJXKLNPDVEs2PckiKDCElfr7yq/5oBXS
+	 j9QzHivPP3elo5lpzuKkCXWK2NdiT0HUXkPAK8oo+dNGGU2k+NZq48wRfapP/SgZAF
+	 LTQj6NZWLpJLmYKWUMtRBvgVyYGwq2e8pMaeQkAXII9Ogo8KbxvWvRiF6YQ1UpUePS
+	 azeNUbb7nm1xG+S/VRLnAErMairzAGRqW513LlbZ5nVFy8Rihy8UFNFatVDJC4Vr2q
+	 rEA/cOIKob9mg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v2T7b-00000009rcA-2IVo;
-	Sat, 27 Sep 2025 11:29:47 +0000
+	id 1v2T7s-00000009rd1-1aTj;
+	Sat, 27 Sep 2025 11:30:04 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Sean Christopherson <seanjc@google.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Sebastian Ott <sebott@redhat.com>
-Subject: Re: [PATCH] KVM: selftests: Track width of arm64's timer counter as "int", not "uint64_t"
-Date: Sat, 27 Sep 2025 12:29:01 +0100
-Message-ID: <175897248729.2798309.11771785872259733527.b4-ty@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jan Kotas <jank@cadence.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Fixes for NV+SVE
+Date: Sat, 27 Sep 2025 12:29:58 +0100
+Message-ID: <175897259874.2798422.14525256541540685044.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250926155838.2612205-1-seanjc@google.com>
-References: <20250926155838.2612205-1-seanjc@google.com>
+In-Reply-To: <20250926194108.84093-1-oliver.upton@linux.dev>
+References: <20250926194108.84093-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,37 +54,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, seanjc@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, sebott@redhat.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, jank@cadence.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 26 Sep 2025 08:58:38 -0700, Sean Christopherson wrote:
-> Store the width of arm64's timer counter as an "int", not a "uint64_t".
-> ilog2() returns an "int", and more importantly using what is an "unsigned
-> long" under the hood makes clang unhappy due to a type mismatch when
-> clamping the width to a sane value.
+On Fri, 26 Sep 2025 12:41:06 -0700, Oliver Upton wrote:
+> After staring at the ZCR_EL2 handling for the issue Jan reported I
+> also spotted an ugly preemption bug because ZCR_EL2 residence is *very*
+> different from the other sysregs.
 > 
->   arm64/arch_timer_edge_cases.c:1032:10: error: comparison of distinct pointer types
->      ('typeof (width) *' (aka 'unsigned long *') and 'typeof (56) *' (aka 'int *'))
->      [-Werror,-Wcompare-distinct-pointer-types]
->    1032 |         width = clamp(width, 56, 64);
->         |                 ^~~~~~~~~~~~~~~~~~~~
->   tools/include/linux/kernel.h:47:45: note: expanded from macro 'clamp'
->      47 | #define clamp(val, lo, hi)      min((typeof(val))max(val, lo), hi)
->         |                                                  ^~~~~~~~~~~~
->   tools/include/linux/kernel.h:33:17: note: expanded from macro 'max'
->      33 |         (void) (&_max1 == &_max2);              \
->         |                 ~~~~~~ ^  ~~~~~~
->   tools/include/linux/kernel.h:39:9: note: expanded from macro 'min'
->      39 |         typeof(x) _min1 = (x);                  \
->         |                ^
+> We could definitely get away with loading ZCR_ELx on the CPU at
+> vcpu_load() but I'd rather not given the amount of special treatment
+> that we need to do for it already.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/1] KVM: selftests: Track width of arm64's timer counter as "int", not "uint64_t"
-      commit 34f46fecfe96b404ef14e97b8e59cde693276f28.
+[1/2] KVM: arm64: nv: Don't treat ZCR_EL2 as a 'mapped' register
+      commit: eea94a0ea55d7c65fca192927481f9c5cb90efd9
+[2/2] KVM: arm64: nv: Don't advance PC when pending an SVE exception
+      commit: 5bd5d7d43a921ffee7dedae1b3ad5dea28fed385
 
 Cheers,
 
