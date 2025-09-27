@@ -1,146 +1,187 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F8629AB05
-	for <kvmarm@lists.linux.dev>; Fri, 26 Sep 2025 22:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC79278753
+	for <kvmarm@lists.linux.dev>; Sat, 27 Sep 2025 07:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758926708; cv=none; b=fAOlcTJWA4s+Rn72/b2wwv0GtKUV4UljJ65Mjcbgs77H9KzmNKmtH0zhrvsaMxLElcnH9hL9WC/juOGOVLEi1WK68v2l58lYFqgj5Bk6eOdLdgxJA4tdNNRo4OV0/GMsoqazf1lCmhC1PCTvqVwcctxBXNPLfXDWoa6uvLEIxsw=
+	t=1758958720; cv=none; b=O3YRCqV4hfM0qXi8v8uR8vSSnnXsFA8bfsueTcOJehcc2lbrg4VICoDmcxrZvLWlOM0RHREGCMLwsFjuthlaNz0cgQTIm5gQ8/y7BXeGP277o/j5e5tMi94H7GF7a1gcQHxXWp7pEqHSg8DfLTyryPuiFxku7l8BYolQ/4QKdU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758926708; c=relaxed/simple;
-	bh=P7FxGnEUX7LfTSPUAPo5XBamZ/KP9un8miH1uQdOC0U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mgsLUJvd8xGSl3aSn+NcUBFgjif55VFJnVZm5jg2r2o1k6bs/sxTDnkD9EwD7sHDXSTPjQr9Ezk/XhzYJYMGCsGPX6iQ0wErewueM2g7XKnwzbhs5fV95lXBdR5drrDYGGinrmMmn53m/Bu2CtihWVSU1mGe/DPm/KvwAPcPXpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=krFK/Mcm; arc=none smtp.client-ip=95.215.58.186
+	s=arc-20240116; t=1758958720; c=relaxed/simple;
+	bh=tr3cVw/fHsBObw+4/03vyNgdWXv1m3E2RPdz5cDO+i4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fsGxPZ9PqFCnRLIAA5xm7fgCePyjr0t0v0ejZ73xE8nJnpdBAIlylmyVPr/PIuZiQ9d3/U/J81KPK71g9OcGLPhQnieLLCSrbMjKCu7kQ+9FdZOfiDHu+7r/AHqCFcRO7rt773ftg528daEOFPJKwCG15evRokkvKbl0vNrTdX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MDhzVIrG; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="krFK/Mcm"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MDhzVIrG"
+Message-ID: <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758926704;
+	t=1758958715;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yd+APAjGAZuazc9NYTrTOX7161a/PiePHaRiS+4FanI=;
-	b=krFK/Mcmf/l/0rcV+79BcoGWd1A3EMp3P0P5kcOaEnm+is64hUf8qMqp8FAd71MPVGYFrP
-	mIhiUb6nIAn3zAAC+sBY5UMTcAr7GfAS6GmGuhkC6/P6aFOn+rWfOzXyxtwYDUglec2z+8
-	GFxO/679knVD8uduytinp6xJyjWk12w=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: selftests: Test effective value of HCR_EL2.AMO
-Date: Fri, 26 Sep 2025 15:44:54 -0700
-Message-ID: <20250926224454.734066-1-oliver.upton@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wr7c37MXYsi1SZjRIiCMW6TvRd9zbqLAteCUC2bU040=;
+	b=MDhzVIrG9XqOhn+X4EyvqT5WFEC48i0ScQW1M2TEQNfH+Abi956kVrFuXVs5+tNbHUeEBS
+	HSH1dZ6zZI6FfoXFd0qRETX0UB3fscW0ypzjqRJvDzeO0w95mYEUlUuw8Y//m8zDINyAux
+	7aMnDrKrTlaK0SG5hxR2LTl6ILFDhs4=
+Date: Sat, 27 Sep 2025 08:38:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
+ TLB flushing
+To: David Hildenbrand <david@redhat.com>, Will Deacon <will@kernel.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick"
+ <roypat@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "luto@kernel.org" <luto@kernel.org>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "willy@infradead.org" <willy@infradead.org>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+ "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+ "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
+ "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
+ <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
+ "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "andrii@kernel.org" <andrii@kernel.org>,
+ "martin.lau@linux.dev" <martin.lau@linux.dev>,
+ "eddyz87@gmail.com" <eddyz87@gmail.com>,
+ "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
+ <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+ "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+ "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
+ <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+ "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
+ <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "Cali, Marco" <xmarcalx@amazon.co.uk>,
+ "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+ "Thomson, Jack" <jackabt@amazon.co.uk>,
+ "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
+ "tabba@google.com" <tabba@google.com>,
+ "ackerleytng@google.com" <ackerleytng@google.com>
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk>
+ <20250924152214.7292-3-roypat@amazon.co.uk>
+ <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
+ <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
+ <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
+ <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
+ <c88514c3-e15f-4853-8acf-15e7b4b979f4@linux.dev>
+ <aNZwmPFAxm_HRYpC@willie-the-truck>
+ <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Patrick Roy <patrick.roy@linux.dev>
+Content-Language: en-US
+In-Reply-To: <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-A defect against the architecture now allows an implementation to treat
-AMO as 1 when HCR_EL2.{E2H, TGE} = {1, 0}. KVM now takes advantage of
-this interpretation to address a quality of emulation issue w.r.t.
-SError injection.
 
-Add a corresponding test case and expect a pending SError to be taken.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- .../selftests/kvm/arm64/external_aborts.c     | 43 +++++++++++++++++++
- .../selftests/kvm/include/arm64/processor.h   | 12 +++++-
- 2 files changed, 54 insertions(+), 1 deletion(-)
+On Fri, 2025-09-26 at 21:09 +0100, David Hildenbrand wrote:
+> On 26.09.25 12:53, Will Deacon wrote:
+>> On Fri, Sep 26, 2025 at 10:46:15AM +0100, Patrick Roy wrote:
+>>>
+>>>
+>>> On Thu, 2025-09-25 at 21:13 +0100, David Hildenbrand wrote:
+>>>> On 25.09.25 21:59, Dave Hansen wrote:
+>>>>> On 9/25/25 12:20, David Hildenbrand wrote:
+>>>>>> On 25.09.25 20:27, Dave Hansen wrote:
+>>>>>>> On 9/24/25 08:22, Roy, Patrick wrote:
+>>>>>>>> Add an option to not perform TLB flushes after direct map manipulations.
+>>>>>>>
+>>>>>>> I'd really prefer this be left out for now. It's a massive can of worms.
+>>>>>>> Let's agree on something that works and has well-defined behavior before
+>>>>>>> we go breaking it on purpose.
+>>>>>>
+>>>>>> May I ask what the big concern here is?
+>>>>>
+>>>>> It's not a _big_ concern.
+>>>>
+>>>> Oh, I read "can of worms" and thought there is something seriously problematic :)
+>>>>
+>>>>> I just think we want to start on something
+>>>>> like this as simple, secure, and deterministic as possible.
+>>>>
+>>>> Yes, I agree. And it should be the default. Less secure would have to be opt-in and documented thoroughly.
+>>>
+>>> Yes, I am definitely happy to have the 100% secure behavior be the
+>>> default, and the skipping of TLB flushes be an opt-in, with thorough
+>>> documentation!
+>>>
+>>> But I would like to include the "skip tlb flushes" option as part of
+>>> this patch series straight away, because as I was alluding to in the
+>>> commit message, with TLB flushes this is not usable for Firecracker for
+>>> performance reasons :(
+>>
+>> I really don't want that option for arm64. If we're going to bother
+>> unmapping from the linear map, we should invalidate the TLB.
+> 
+> Reading "TLB flushes result in a up to 40x elongation of page faults in
+> guest_memfd (scaling with the number of CPU cores), or a 5x elongation
+> of memory population,", I can understand why one would want that optimization :)
+> 
+> @Patrick, couldn't we use fallocate() to preallocate memory and batch the TLB flush within such an operation?
+> 
+> That is, we wouldn't flush after each individual direct-map modification but after multiple ones part of a single operation like fallocate of a larger range.
+> 
+> Likely wouldn't make all use cases happy.
+>
 
-diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
-index 592b26ded779..d8fe17a6cc59 100644
---- a/tools/testing/selftests/kvm/arm64/external_aborts.c
-+++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
-@@ -359,6 +359,44 @@ static void test_mmio_ease(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void test_serror_amo_guest(void)
-+{
-+	/*
-+	 * The ISB is entirely unnecessary (and highlights how FEAT_NV2 is borked)
-+	 * since the write is redirected to memory. But don't write (intentionally)
-+	 * broken code!
-+	 */
-+	sysreg_clear_set(hcr_el2, HCR_EL2_AMO | HCR_EL2_TGE, 0);
-+	isb();
-+
-+	GUEST_SYNC(0);
-+	GUEST_ASSERT(read_sysreg(isr_el1) & ISR_EL1_A);
-+
-+	/*
-+	 * KVM treats the effective value of AMO as 1 when
-+	 * HCR_EL2.{E2H,TGE} = {1, 0}, meaning the SError will be taken when
-+	 * unmasked.
-+	 */
-+	local_serror_enable();
-+	isb();
-+	local_serror_disable();
-+
-+	GUEST_FAIL("Should've taken pending SError exception");
-+}
-+
-+static void test_serror_amo(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_serror_amo_guest,
-+							unexpected_dabt_handler);
-+
-+	vm_install_exception_handler(vm, VECTOR_ERROR_CURRENT, expect_serror_handler);
-+	vcpu_run_expect_sync(vcpu);
-+	vcpu_inject_serror(vcpu);
-+	vcpu_run_expect_done(vcpu);
-+	kvm_vm_free(vm);
-+}
-+
- int main(void)
- {
- 	test_mmio_abort();
-@@ -369,4 +407,9 @@ int main(void)
- 	test_serror_emulated();
- 	test_mmio_ease();
- 	test_s1ptw_abort();
-+
-+	if (!test_supports_el2())
-+		return 0;
-+
-+	test_serror_amo();
- }
-diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
-index 6f481475c135..ff928716574d 100644
---- a/tools/testing/selftests/kvm/include/arm64/processor.h
-+++ b/tools/testing/selftests/kvm/include/arm64/processor.h
-@@ -305,7 +305,17 @@ void test_wants_mte(void);
- void test_disable_default_vgic(void);
- 
- bool vm_supports_el2(struct kvm_vm *vm);
--static bool vcpu_has_el2(struct kvm_vcpu *vcpu)
-+
-+static inline bool test_supports_el2(void)
-+{
-+	struct kvm_vm *vm = vm_create(1);
-+	bool supported = vm_supports_el2(vm);
-+
-+	kvm_vm_free(vm);
-+	return supported;
-+}
-+
-+static inline bool vcpu_has_el2(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->init.features[0] & BIT(KVM_ARM_VCPU_HAS_EL2);
- }
+For Firecracker, we rely a lot on not preallocating _all_ VM memory, and
+trying to ensure only the actual "working set" of a VM is faulted in (we
+pack a lot more VMs onto a physical host than there is actual physical
+memory available). For VMs that are restored from a snapshot, we know
+pretty well what memory needs to be faulted in (that's where @Nikita's
+write syscall comes in), so there we could try such an optimization. But
+for everything else we very much rely on the on-demand nature of guest
+memory allocation (and hence direct map removal). And even right now,
+the long pole performance-wise are these on-demand faults, so really, we
+don't want them to become even slower :(
 
-base-commit: 10fd0285305d0b48e8a3bf15d4f17fc4f3d68cb6
--- 
-2.47.3
+Also, can we really batch multiple TLB flushes as you suggest? Even if
+pages are at consecutive indices in guest_memfd, they're not guaranteed
+to be continguous physically, e.g. we couldn't just coalesce multiple
+TLB flushes into a single TLB flush of a larger range.
+
+There's probably other things we can try. Backing guest_memfd with
+hugepages would reduce the number TLB flushes by 512x (although not all
+users of Firecracker at Amazon [can] use hugepages).
+
+And I do still wonder if it's possible to have "async TLB flushes" where
+we simply don't wait for the IPI (x86 terminology, not sure what the
+mechanism on arm64 is). Looking at
+smp_call_function_many_cond()/invlpgb_kernel_range_flush() on x86, it
+seems so? Although seems like on ARM it's actually just handled by a
+single instruction (TLBI) and not some interprocess communication
+thingy. Maybe there's a variant that's faster / better for this usecase?
 
