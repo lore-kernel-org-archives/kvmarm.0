@@ -1,81 +1,82 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98F823D7C8
-	for <kvmarm@lists.linux.dev>; Mon, 29 Sep 2025 11:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBB42FF678
+	for <kvmarm@lists.linux.dev>; Mon, 29 Sep 2025 11:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759143679; cv=none; b=DgsJrsgzmdvNzL8rlNj91DB/4bgTnAg9qp2gPOad+AlavUwcdLXboSUrUklJ7COtx7U6DyVH5OnwHdvQ8RJRmQWIaPy4WUkT2q8tW0Gjkrf9uShHXI8oKA6x004sL12dX9sy/+qVmvanT2A57lnRN6HzjtoMZZNZDJ+zF0kr22s=
+	t=1759144220; cv=none; b=dxIW/ERVYfr7YLuyeSQX0eayvR4IvxfYGvl08L0uuYd3lHwBSn8xrRxcS+1CmomwtAuyvYqvpiO+66MWIVVWf7Py+Dap8SGPKiZYhvMK9g4wJr8O9IEjc7ueYO+fSEVmfoyyD4cooePwLYA5G3Dg2WQnknTrOUsQ9LeMRnba6mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759143679; c=relaxed/simple;
-	bh=pY5ptJQJD5hC5Yld/qr6VRXciRKFgD9s0GcbegbNqCE=;
+	s=arc-20240116; t=1759144220; c=relaxed/simple;
+	bh=uGU0X4XRvs5GtQI3Ay7FhA1xMjMBv4FbZpT42eARQ58=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GLqHC1Qc3ofO0vaF5Uw9vkxp1k1L/zld3Gow3LT1vTSmDk3sxWwRTwEYnsaq2vYlvJyb3Pmd9c0HOvXnyk0U0U5EMNITs8GNpoxyGI0NQOE+dS4uuPRcMhjFufRersNloD55FRSFjH1l2XR/JGTmrMmWvzVXdlW6W/Pt7AZ4xo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wd8oHkrE; arc=none smtp.client-ip=209.85.128.43
+	 Content-Type:Content-Disposition:In-Reply-To; b=XS39A1DZ7naaJKmbgr5tkg2ai4VpuqIxfTM3Psl8gjJMpUglmv0SA2sLroEK7J/kBHeJ7aAlD6V0c8HFfpivOk0/Nje6MNwUSTp2zWAI/4BTu8Qo5S/ibwiArAG4VaRv+2OgYlStd+n7gk1oCXF/4+ZHmmy6XivRcbmUDjO2G/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4PJ1wsIq; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wd8oHkrE"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-46e32c0e273so101305e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 29 Sep 2025 04:01:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4PJ1wsIq"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-46e3f213b59so118125e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 29 Sep 2025 04:10:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759143675; x=1759748475; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1759144216; x=1759749016; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Rg8kwxsOK3RvjQ0Oy8bn6on+o39qQD/CbdbTzAEerLQ=;
-        b=wd8oHkrEdkuW7yBbGQDGONoM9QAPg8E08QhNKGr6nz5dZ01YyzqAR2pPfMdtLCXAYT
-         BYP7FCGHy3aXZs6vGjiA5djyjCugWg2N6+zW3XhvoHlpNsEl+eJOxjx5TVfNQuk+CuBR
-         te87f0xyst82QzCtyjjycPNpN2OXx7eF0UeTAZQcQe45hhuxY3DuqkCRwASYZLc58Xmd
-         lN/4l12O/HJJBwhWT6RNMt87prBqTLCXl8HRWjfvpnUrjOS/C47rO1AH3ws0UOp0GVnb
-         bGc17NkCdsPKuGNywhF0xBxbwRP2/lLOQscvL1MIrLAzGICtSLW2cFScTgbo6hKWgYUz
-         wJbw==
+        bh=KBw4ejj4fmMEafZBPpzx+wYOwZgdJDUmWT9JGV8MXfA=;
+        b=4PJ1wsIqCPZSnL0M9YVkkW1WN0MS+dSnil+cGJBKCxbctKoktxNIIdz7bkXXWl4sN7
+         CXHoRy7d/Y01EG2SG7drYVoCJddPcQrnr6AMdOSO/xzEWBYr/M89C8ppTUoMxHnU4fzP
+         qVHl77ocE1Ou9BnGrZZ6v/pB/nzdX4DRdM2zgE/n9l5f2akP9gdIrHvgHhbrlAKfZnk3
+         150gz3irkvl0ytvps0YQSsW9K49cs+NkSQ7Q8WVwAKB0BEk0aOatlqP5O8fEnMQSAiaD
+         lkJa1jvEWSDRyJTnlSsdsfjO2n5iW8naNtLm/FJJf4GvL4t3GS+Y3BhSVEmSVpJ/8bOI
+         9MBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759143675; x=1759748475;
+        d=1e100.net; s=20230601; t=1759144216; x=1759749016;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rg8kwxsOK3RvjQ0Oy8bn6on+o39qQD/CbdbTzAEerLQ=;
-        b=VodO/flAT5KF+kMGhu8TknoF3Sql0DlGh7NyuUh9L5hsvVobT2ZWsiHha88C08Qn5S
-         BP80bRJpiWPStXrsvzKalJ3J/h8LmJt9BpCAZo9/JIjSJ2ti9RaKmos7/qrogcEOFzOB
-         OEppJiwIJnmhNeIQtECtARLuTsGJgGsbmLA9gSQHLDE6ofU9L2fnllaBiR6+j065Fbmg
-         rglu/EmZ4pnjefWt7dGaIlHj6EvmADkjW3CTPrulEnWEGRgVXC8+itTcByH3xvCie/tJ
-         F4whfjFdyLob+q5OpNdjCtHCvR7LEsrUp/Ekpyip5KzqTx8e+80075Co4tjkvo22cYVt
-         yq7A==
-X-Forwarded-Encrypted: i=1; AJvYcCW5QY7HnBRMe4eSnn0IXlcZ9eXqBv8/g8UBJbbRh2v7TI6k6z2+x5qWFJVOWK+464tTWeazwlM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw8eSWLT7FUKr2bRlNquckF4wIQ+oTL5ghNThNFAf970dESHkfz
-	BAcDXQWTuciCK6nzsmpzME3zZmVY3CBfOj4v+7LwqcH0HhzJbT+SBroaCT1FP11wvA==
-X-Gm-Gg: ASbGncupV+FT9GGQihgwGPzR/uMidBDJqSViHoUG6fchR7SNSudP/+COyVrP403cCDG
-	0YB1qz42EAm+4468jD2pbnsbdb1htqAiRnmpqPLji/mhNofitLcWoU6R0fMcM16Hcsp/UxWJSau
-	oqSYJyHZUpxFXFocsUXf/NvXrEa7MUAfgsnDnwB+GoTeZIGOdfuMJkyTYCNxUrXJfoo/EyQvfPO
-	gP47ru0vbi0evA6ZBhb0GHVJUL/BFZt5CGpbLr62N5eWZvPArtkNZ1o+B0LaYMrJu6e3TXDiBMa
-	8cKpJTOI20qmRnoN2vnZKouvRZgFcnwB5qDkyLqc8vQMxcxh8UEuPnXPyHt0gHTwnGf5xENNgvj
-	v8Qa0x++yfYjgmvJ3SLwPfthBHVXDbw2UGwcmLqTjm8F/9FZRJDeMRzMsIW5u0p4xaak=
-X-Google-Smtp-Source: AGHT+IFg+hCsYGMP/Ez1tXXALpy4mbn6kahyoJaMM4qeV/gbtw19iOEwbJlDUZ+YOlPn2J+hesMSFw==
-X-Received: by 2002:a05:600c:a31b:b0:45d:f51c:193 with SMTP id 5b1f17b1804b1-46e575a116emr243565e9.7.1759143674689;
-        Mon, 29 Sep 2025 04:01:14 -0700 (PDT)
+        bh=KBw4ejj4fmMEafZBPpzx+wYOwZgdJDUmWT9JGV8MXfA=;
+        b=mhKVNed9X7n13ZkN8Jou3veGo6JXaYUWcsPxp4eTH/ZD7Lh8HR6EMyQoBuP2L+hRwc
+         wmy7b0ClIfL2+9BdcC32pz2Imlkhnkbiqdf4KSz5ZXZHS/bCQh3Pi+ydepa0GRFqNxiI
+         SQv7sBGZPYGqqPPPEQTXVhgnUAgxqIX1SUKlcYQRnazuzVZeXBoCpLOhov4cAGjnFPA7
+         3hYmRviqEMJpEE6o18tNRVCCbBzlagrs9dTOVscXtiHR6+eYTNZERlW7CdGNXCIFgiI+
+         nvG4i1tfgondqU+5qe8xKq5EwqafkK8vpoGZqPAIW/0QTsBhSUtEWYcOsXVDCIxYbnzl
+         SNRw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8SUd8gWw+h2QKxhOkLwVdUYU9pFvLiwo6ewz1qLbMiFg3Ff9um60WDj43MO3xgXYuGv2Tvtc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyaLy4QJ2NxIc/6MC40G6goQyuw38PM9L6kGflPSN5oZp0ASTNu
+	9PNl0DTj7P52FCXPUqOGUwQUzY/W57/6+8dcNt31z59hLhl74sBco6CSm9uNNLx66WgZNvnKliR
+	CnwXl1Q==
+X-Gm-Gg: ASbGnctWN7gcRkJUnyTX9AEgNlGYd+y1TBUU2MhOVnUCEGhkE9snO8PGBPp0fKTNqTj
+	t76AK0rNIQRAOSH1lNKMZ2eIKes8VkZO8K+oglwykzT2rYbkt/V7t280tPwMhyAPAiZtZc93Yq3
+	DMK2qxbD/0ueWQNSjK+d62KxtfYOR8mbOVfEsEnJRovpmgTTitHZqLUCm8HJtmojQJB4/Xkhn9K
+	CJkAiTi9gyrykOesy5IHC9FM5vNNCl7lm2HL7tSq/4TziD3YrajAIQRLgU7Ycxt8jX7+1T3JVwv
+	i7pr4W2//HHgWUMOQJnb9HGmigR+dI1AUpL4LxDKkiD9o2MNBDrvAK341zDcBVtqFKkQGNaAT3K
+	ssKaARmF31bbC0fkyTqbmnUtzRvhPCWEpyeIN0qhM8zUBb47dPvwKjTvQ0AkPX8vs+8w=
+X-Google-Smtp-Source: AGHT+IFGf4k+JJs/tMEbOwTNQ+j0uedEPD+8WOGLeH7x1gD8a+XVxRfw6dvXWns5XmMqAfUaxJmdrw==
+X-Received: by 2002:a05:600c:37c3:b0:45b:9bcb:205 with SMTP id 5b1f17b1804b1-46e575a08e6mr402015e9.5.1759144216266;
+        Mon, 29 Sep 2025 04:10:16 -0700 (PDT)
 Received: from google.com (140.240.76.34.bc.googleusercontent.com. [34.76.240.140])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e4ab0bf62sm70168175e9.9.2025.09.29.04.01.13
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc5603365sm18381901f8f.37.2025.09.29.04.10.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 04:01:13 -0700 (PDT)
-Date: Mon, 29 Sep 2025 11:01:10 +0000
+        Mon, 29 Sep 2025 04:10:15 -0700 (PDT)
+Date: Mon, 29 Sep 2025 11:10:11 +0000
 From: Mostafa Saleh <smostafa@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
 	catalin.marinas@arm.com, robin.murphy@arm.com,
 	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	jgg@ziepe.ca, mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v4 10/28] KVM: arm64: iommu: Shadow host stage-2 page
- table
-Message-ID: <aNpm9odmzv__2RyA@google.com>
+	mark.rutland@arm.com, praan@google.com
+Subject: Re: [PATCH v4 15/28] iommu/arm-smmu-v3: Load the driver later in KVM
+ mode
+Message-ID: <aNppE9A3PDiDg_1W@google.com>
 References: <20250819215156.2494305-1-smostafa@google.com>
- <20250819215156.2494305-11-smostafa@google.com>
- <aMA8vz0v0Vn-02QP@willie-the-truck>
- <aMlzLsj5slPQhWEr@google.com>
- <aNamXlTErXDs1K8Z@willie-the-truck>
+ <20250819215156.2494305-16-smostafa@google.com>
+ <aMQmA9cLaeYWG5_C@willie-the-truck>
+ <aNKwROPzDCWgJBGQ@google.com>
+ <20250923173806.GF2547959@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -85,110 +86,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aNamXlTErXDs1K8Z@willie-the-truck>
+In-Reply-To: <20250923173806.GF2547959@ziepe.ca>
 
-On Fri, Sep 26, 2025 at 03:42:38PM +0100, Will Deacon wrote:
-> On Tue, Sep 16, 2025 at 02:24:46PM +0000, Mostafa Saleh wrote:
-> > On Tue, Sep 09, 2025 at 03:42:07PM +0100, Will Deacon wrote:
-> > > On Tue, Aug 19, 2025 at 09:51:38PM +0000, Mostafa Saleh wrote:
-> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-> > > > index a01c036c55be..f7d1c8feb358 100644
-> > > > --- a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-> > > > +++ b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
-> > > > @@ -4,15 +4,94 @@
-> > > >   *
-> > > >   * Copyright (C) 2022 Linaro Ltd.
-> > > >   */
-> > > > +#include <linux/iommu.h>
-> > > > +
-> > > >  #include <nvhe/iommu.h>
-> > > > +#include <nvhe/mem_protect.h>
-> > > > +#include <nvhe/spinlock.h>
-> > > >  
-> > > >  /* Only one set of ops supported */
-> > > >  struct kvm_iommu_ops *kvm_iommu_ops;
-> > > >  
-> > > > +/* Protected by host_mmu.lock */
-> > > > +static bool kvm_idmap_initialized;
-> > > > +
-> > > > +static inline int pkvm_to_iommu_prot(enum kvm_pgtable_prot prot)
-> > > > +{
-> > > > +	int iommu_prot = 0;
-> > > > +
-> > > > +	if (prot & KVM_PGTABLE_PROT_R)
-> > > > +		iommu_prot |= IOMMU_READ;
-> > > > +	if (prot & KVM_PGTABLE_PROT_W)
-> > > > +		iommu_prot |= IOMMU_WRITE;
-> > > > +	if (prot == PKVM_HOST_MMIO_PROT)
-> > > > +		iommu_prot |= IOMMU_MMIO;
-> > > 
-> > > This looks a little odd to me.
-> > > 
-> > > On the CPU side, the only different between PKVM_HOST_MEM_PROT and
-> > > PKVM_HOST_MMIO_PROT is that the former has execute permission. Both are
-> > > mapped as cacheable at stage-2 because it's the job of the host to set
-> > > the more restrictive memory type at stage-1.
-> > > 
-> > > Carrying that over to the SMMU would suggest that we don't care about
-> > > IOMMU_MMIO at stage-2 at all, so why do we need to set it here?
-> > 
-> > Unlike the CPU, the host can set the SMMU to bypass, in that case the
-> > hypervisor will attach its stage-2 with no stage-1 configured. So,
-> > stage-2 must have the correct attrs for MMIO.
+On Tue, Sep 23, 2025 at 02:38:06PM -0300, Jason Gunthorpe wrote:
+> On Tue, Sep 23, 2025 at 02:35:48PM +0000, Mostafa Saleh wrote:
+> > If we really want to avoid the current approach, we can keep deferring probe,
+> > until a check for a new flag set from “finalize_pkvm” which is called
+> > unconditionally of KVM state.
 > 
-> I'm not sure about that.
+> I still think the pkvm drivers should be bound to some special pkvm
+> device_driver and the driver core should handle all this special
+> dancing:
+>  - Wait for pkvm to decide if it will start or not
+>  - Claim a device for pkvm and make it visible in some generic way,eg
+>    in sysfs
+>  - Fall back to using the normal driver once we conclude pkvm won't
+>    run.
 > 
-> If the SMMU is in stage-1 bypass, we still have the incoming memory
-> attributes from the transaction (modulo MTCFG which we shouldn't be
-> setting) and they should combine with the stage-2 attributes in roughly
-> the same way as the CPU, no?
+> It sounds like a pain to open code all this logic in every pkvm
+> driver? How many do you have?
 
-Makes sense, we can remove that for now and map all stage-2 with
-IOMMU_CACHE. However, that might not be true for other IOMMUs,
-as they might not combine attributes as SMMUv3 stage-2, but we
-can ignore that for now. I will update the logic in v5.
+I though more about this, I think involving the driver core will be
+useful in the future for init, as it will ensure power domains are
+probed before the SMMUs when RPM is supported.
+
+One simple way to do that, is the make the KVM SMMUv3 driver bind to
+the SMMUs first until KVM finish init, then it unbinds them so the
+main driver can be bind to them, that will not require any changes
+or assumptions from the main driver, but in runtime the KVM driver
+can't interact with the driver model.
+
+Another possible solution, to keep a device bound to the KVM driver,
+is to probe the SMMUs from the KVM driver, then to create child devices;
+possibly use something as device_set_of_node_from_dev to bind those to
+the main SMMUv3 or find another way to probe the main SMMUv3 without
+changes.
+
+Then we have a clear parent/child representation in the kernel, we can
+also use sysfs/debugfs. But this might be more challenging, I will
+look more into both and will update the logic in v5.
 
 Thanks,
 Mostafa
 
 > 
-> > > > +static int __snapshot_host_stage2(const struct kvm_pgtable_visit_ctx *ctx,
-> > > > +				  enum kvm_pgtable_walk_flags visit)
-> > > > +{
-> > > > +	u64 start = ctx->addr;
-> > > > +	kvm_pte_t pte = *ctx->ptep;
-> > > > +	u32 level = ctx->level;
-> > > > +	u64 end = start + kvm_granule_size(level);
-> > > > +	int prot =  IOMMU_READ | IOMMU_WRITE;
-> > > > +
-> > > > +	/* Keep unmapped. */
-> > > > +	if (pte && !kvm_pte_valid(pte))
-> > > > +		return 0;
-> > > > +
-> > > > +	if (kvm_pte_valid(pte))
-> > > > +		prot = pkvm_to_iommu_prot(kvm_pgtable_stage2_pte_prot(pte));
-> > > > +	else if (!addr_is_memory(start))
-> > > > +		prot |= IOMMU_MMIO;
-> > > 
-> > > Why do we need to map MMIO regions pro-actively here? I'd have thought
-> > > we could just do:
-> > > 
-> > > 	if (!kvm_pte_valid(pte))
-> > > 		return 0;
-> > > 
-> > > 	prot = pkvm_to_iommu_prot(kvm_pgtable_stage2_pte_prot(pte);
-> > > 	kvm_iommu_ops->host_stage2_idmap(start, end, prot);
-> > > 	return 0;
-> > > 
-> > > but I think that IOMMU_MMIO is throwing me again...
-> > 
-> > We have to map everything pro-actively as we don’t handle page faults
-> > in the SMMUv3 driver.
-> > This would be a future work where the CPU stage-2 page table is shared with
-> > the SMMUv3.
-> 
-> Ah yes, I'd forgotten about that.
-> 
-> Thanks,
-> 
-> Will
+> Jason
