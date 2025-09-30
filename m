@@ -1,180 +1,141 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB85617A31E
-	for <kvmarm@lists.linux.dev>; Tue, 30 Sep 2025 00:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9154D29E116;
+	Tue, 30 Sep 2025 07:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759193655; cv=none; b=fcBPcG5342fvQRJJl8Ro6vE+rd5hp8whC1IMwDSb73RMxu9aQFtlklvHdu5rYvuYlD4FefC2l6VpHvhWaQRAZQ0DM/3Z9tcSajSUGId3W3SVTdVpD5eFFZLWNtQicwKJeZ93R9KtbrtEbz5vBUech2AOMlxUCcy0N1zfRRAcqDs=
+	t=1759218267; cv=none; b=M6LO83tcoyyPuPU6svoVpF7q3jsjwA4iIsdaMroVPFJp4mM1/gby1yPQjQiA12JjGqSR6xr/2Qkwx/GXWOF3btdcb88rakUPEmL31PcDbuPtRGw3wOOp6AgSHScjKP5elFmk3VjD5VgAUE28G8oaINWC8JXhZ5B3tVnsvYju7Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759193655; c=relaxed/simple;
-	bh=AcijATm3N75Ov0nMjiQqledSjmaSWMbDCp6rF3qzFUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rcypDO7Jr/oBA2Wydx5wHaYJ97cel1N25QBMEKuwiyxF8cGXibl3uKPn6R75TBqVUnKbt7MzJ1zCEzblP5//cdmX+mrdyeOmQFHaipxs0a60JilLOIrSbJv1OM6s126R8XvuWqqf1xtu3ajSq5RGzLfuscsBvgVUBfB7jjuM5wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hr3jsrtQ; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1759218267; c=relaxed/simple;
+	bh=8/Vy0IpBdnBl3FqITdTg6fXAw6N3XdQbwsG+l9Eo8mQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kAnUTwWjJndzhTQC1mHg0MD9Kmq+aJE57FITqVFj8v8kQFKVy3vuj/xmq9ZkYhztRh6yTmPnFJa76J2TNRU1QInjhMv02wzI1vyes8Hwgj83ieRaUOwWJ7lNSQ4Ixyepw3Ve0idL0Bvt2peXEVsjkb27SEN+r6OKCyQaIIgl92g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+qJ5cUP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hr3jsrtQ"
-Date: Mon, 29 Sep 2025 17:53:54 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759193641;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=toyaVjkpPinuAEIPOarMwJdLvd9BQ2PV4RPd1E3oP4E=;
-	b=hr3jsrtQsxW72gNjOEPsv4iQ9v/0A7cW0vmawVGdX45ydnDFq1yMF5QgeZ9N/xChHdvNoK
-	Q2AZGZuaDA9FmsTsSVXcIfSWlxrVeJ5PHu9hSCZTH96pzMRGRi9tqXCCqeZI7AM9YipJjr
-	qqFqGtGAkzNNTPCMu9EbjZd7HufUbP4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: "Thomson, Jack" <jackabt.amazon@gmail.com>
-Cc: maz@kernel.org, pbonzini@redhat.com, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	isaku.yamahata@intel.com, roypat@amazon.co.uk,
-	kalyazin@amazon.co.uk, jackabt@amazon.com
-Subject: Re: [PATCH 3/6] KVM: arm64: Add pre_fault_memory implementation
-Message-ID: <aNsqIsbYyROCjShQ@linux.dev>
-References: <20250911134648.58945-1-jackabt.amazon@gmail.com>
- <20250911134648.58945-4-jackabt.amazon@gmail.com>
- <aMMYKqWsAZ4y0WI7@linux.dev>
- <7d109638-3d26-443a-b24d-eb7a0059b80f@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+qJ5cUP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F3D3C4CEF0;
+	Tue, 30 Sep 2025 07:44:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759218267;
+	bh=8/Vy0IpBdnBl3FqITdTg6fXAw6N3XdQbwsG+l9Eo8mQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=I+qJ5cUPYt9zuzbo3fVNhdOCGiIJeWqXPLm8P121Hi3fEM4gLQ9Uc4HUM9JggJZrJ
+	 AOYTlWZz/qprgsasmnH+PE4GGRDc7oioJ1laPXjGKuNUA21CyawfZ7azyZzdZ/CPNj
+	 H3dXhezGRebrLbcYm1HwChXGdMChBxPnwrlKMHQgRhwXZeupXYPMW4VXmolt5EjEqN
+	 C5BTIwItLLankmAr4YDD4GqCza9i2kdgbCStkM7/qCprmprAN9UdO9hv2MWieNYp1J
+	 bSP5fXqYEpTtKaBMMfUAH34bz40isnMzCtPOmQ7gZny/vM0eDvHjLdU8tuX1QkQ9Tb
+	 DlvuhrHU+XQ3w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v3V28-0000000ASrQ-2v5h;
+	Tue, 30 Sep 2025 07:44:24 +0000
+Date: Tue, 30 Sep 2025 08:44:24 +0100
+Message-ID: <86zfacz8o7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 01/13] KVM: arm64: Hide CNTHV_*_EL2 from userspace for nVHE guests
+In-Reply-To: <aNslu47Dl13iNcaL@linux.dev>
+References: <20250929160458.3351788-1-maz@kernel.org>
+	<20250929160458.3351788-2-maz@kernel.org>
+	<aNslu47Dl13iNcaL@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7d109638-3d26-443a-b24d-eb7a0059b80f@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Sep 29, 2025 at 02:59:35PM +0100, Thomson, Jack wrote:
-> Hi Oliver,
+On Tue, 30 Sep 2025 01:35:07 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Thanks for reviewing!
+> Hey,
 > 
-> On 11/09/2025 7:42 pm, Oliver Upton wrote:
-> > On Thu, Sep 11, 2025 at 02:46:45PM +0100, Jack Thomson wrote:
-> > > @@ -1607,7 +1611,7 @@ static int __user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > >   			    struct kvm_s2_trans *nested,
-> > >   			    struct kvm_memory_slot *memslot,
-> > >   			    long *page_size, unsigned long hva,
-> > > -			    bool fault_is_perm)
-> > > +			    bool fault_is_perm, bool pre_fault)
-> > >   {
-> > >   	int ret = 0;
-> > >   	bool topup_memcache;
-> > > @@ -1631,10 +1635,13 @@ static int __user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > >   	vm_flags_t vm_flags;
-> > >   	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-> > > +	if (pre_fault)
-> > > +		flags |= KVM_PGTABLE_WALK_PRE_FAULT;
-> > > +
-> > >   	if (fault_is_perm)
-> > >   		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
-> > > -	write_fault = kvm_is_write_fault(vcpu);
-> > > -	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-> > > +	write_fault = !pre_fault && kvm_is_write_fault(vcpu);
-> > > +	exec_fault = !pre_fault && kvm_vcpu_trap_is_exec_fault(vcpu);
+> On Mon, Sep 29, 2025 at 05:04:45PM +0100, Marc Zyngier wrote:
+> > Although we correctly UNDEF any CNTHV_*_EL2 access from the guest
+> > when E2H==0, we still expose these registers to userspace, which
+> > is a bad idea.
 > > 
-> > I'm not a fan of this. While user_mem_abort() is already a sloppy mess,
-> > one thing we could reliably assume is the presence of a valid fault
-> > context. Now we need to remember to special-case our interpretation of a
-> > fault on whether or not we're getting invoked for a pre-fault.
+> > Drop the ad-hoc UNDEF injection and switch to a .visibility()
+> > callback which will also hide the register from userspace.
 > > 
-> > I'd rather see the pre-fault infrastructure compose a synthetic fault
-> > context (HPFAR_EL2, ESR_EL2, etc.). It places the complexity where it
-> > belongs and the rest of the abort handling code should 'just work'.
+> > Fixes: 0e45981028550 ("KVM: arm64: timer: Don't adjust the EL2 virtual timer offset")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 26 +++++++++++++-------------
+> >  1 file changed, 13 insertions(+), 13 deletions(-)
 > > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index ee8a7033c85bf..9f2f4e0b042e8 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1594,16 +1594,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+> >  	return true;
+> >  }
+> >  
+> > -static bool access_hv_timer(struct kvm_vcpu *vcpu,
+> > -			    struct sys_reg_params *p,
+> > -			    const struct sys_reg_desc *r)
+> > -{
+> > -	if (!vcpu_el2_e2h_is_set(vcpu))
+> > -		return undef_access(vcpu, p, r);
+> > -
+> > -	return access_arch_timer(vcpu, p, r);
+> > -}
+> > -
+> >  static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
+> >  				    s64 new, s64 cur)
+> >  {
+> > @@ -2831,6 +2821,16 @@ static unsigned int s1pie_el2_visibility(const struct kvm_vcpu *vcpu,
+> >  	return __el2_visibility(vcpu, rd, s1pie_visibility);
+> >  }
+> >  
+> > +static unsigned int cnthv_visibility(const struct kvm_vcpu *vcpu,
+> > +				     const struct sys_reg_desc *rd)
+> > +{
+> > +	if (vcpu_has_nv(vcpu) &&
+> > +	    !vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2_E2H0))
+> > +		return 0;
+> > +
+> > +	return REG_HIDDEN;
+> > +}
 > 
-> Agreed, it looks much better with the synthetic abort. Is this the
-> approach you had in mind?
+> Hmm. We've already exposed these to userspace at this point, we just
+> conveniently last the get-reg-list test to assert the accessibility of
+> these (broken) exposures.
+> 
+> Given the amount of UAPI mishaps we've had with registers in the past I
+> don't have much appetite for taking away something we already
+> advertised.
+> 
+> What about making these RAZ/WI from userspace?
 
-Pretty much. Thanks for taking a moment to fiddle with it.
+Honestly, I don't think we should bother.
 
-> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-> +				    struct kvm_pre_fault_memory *range)
-> +{
-> +	int ret, idx;
-> +	hva_t hva;
-> +	phys_addr_t end;
-> +	u64 esr, hpfar;
-> +	struct kvm_memory_slot *memslot;
-> +	struct kvm_vcpu_fault_info *fault_info;
-> +
-> +	long page_size = PAGE_SIZE;
-> +	phys_addr_t ipa = range->gpa;
-> +	gfn_t gfn = gpa_to_gfn(range->gpa);
-> +
-> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> +
-> +	if (ipa >= kvm_phys_size(vcpu->arch.hw_mmu)) {
-> +		ret = -ENOENT;
-> +		goto out_unlock;
-> +	}
-> +
-> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-> +	if (!memslot) {
-> +		ret = -ENOENT;
-> +		goto out_unlock;
-> +	}
-> +
-> +	fault_info = &vcpu->arch.fault;
-> +
-> +	esr = fault_info->esr_el2;
-> +	hpfar = fault_info->hpfar_el2;
-
-nit: Just snapshot the entire struct, makes this forward-compatible with
-new fields showing up.
-
-> +
-> +	fault_info->esr_el2 = ESR_ELx_FSC_ACCESS_L(KVM_PGTABLE_LAST_LEVEL);
-
-A translation fault would be a more accurate representation what you're
-trying to do Access flag faults aren't expected in user_mem_abort() and
-instead handled in handle_access_fault().
-
-You're also missing the rest of the ESR fields that are relevant here,
-such as ESR_ELx.EC which would actually indicate a data abort. I think
-you'd also want to communicate this as a nISV fault (i.e.
-ESR_ELx.ISV=0).
-
-> +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
-> +		((ipa >> (12 - HPFAR_EL2_FIPA_SHIFT)) & HPFAR_EL2_FIPA_MASK);
-
-FIELD_PREP()?
-
-> +
-> +	if (kvm_slot_has_gmem(memslot)) {
-> +		ret = gmem_abort(vcpu, ipa, NULL, memslot, false);
-> +	} else {
-> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
-> +		if (kvm_is_error_hva(hva)) {
-> +			ret = -EFAULT;
-> +			goto out;
-> +		}
-> +		ret = user_mem_abort(vcpu, ipa, NULL, memslot, &page_size, hva,
-> +				     false);
-> +	}
-> +
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	end = (range->gpa & ~(page_size - 1)) + page_size;
-> +	ret = min(range->size, end - range->gpa);
-> +
-> +out:
-> +	fault_info->esr_el2 = esr;
-> +	fault_info->hpfar_el2 = hpfar;
-> +out_unlock:
-> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> +	return ret;
-> +}
+The only VMM supporting NV is QEMU, and it explicitly isn't able to
+select E2H0. I'm happy to Cc stable on this, but worrying about nVHE
+save/restore at this stage seems like an overreaction -- I'm pretty
+sure NV save/restore is generally broken in many more ways.
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
