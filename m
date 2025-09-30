@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6185D2FBE14
-	for <kvmarm@lists.linux.dev>; Tue, 30 Sep 2025 10:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4ED52FC873
+	for <kvmarm@lists.linux.dev>; Tue, 30 Sep 2025 10:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759228330; cv=none; b=mvNXaCNA5D2oruF/R7hWzcwFzWyYtUVSqXGyTcxVhd0cIWnDRM/h86oM9K3EheH7wx+NNmpUQ9BpMFGoFwVRF/st93D+OeoaZIu+o69o0tdb31Zoib9awSex4Ib0q4aiXEN4U4csOFSEXkaydbNQsuLmhw7j63tDIfRtf4uM04U=
+	t=1759228332; cv=none; b=cJL1bx6jmgsPZmN5TSLy1Z1W53R6IhDyMOovQpYXvL1SZz1A+R6ZFDwQQXlJANZ63RlDBoSQJL6kHKn2+a0Gjpm/4hvDB6rppjGC+foYfdLmsrgbpMSL4OOkkE8xSjrIcm2nLkFmfmtycaFuC/5qsAzrA61Wo7SD1iQgVWKVhZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759228330; c=relaxed/simple;
-	bh=prhCATdq12Wg6GsRPdM8icT5iWq8nPur+2BMAWqhTL4=;
+	s=arc-20240116; t=1759228332; c=relaxed/simple;
+	bh=QwmzwrU0DndkFRCTtb3aUeansxkTK7ugdY5cxMSKME8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IFRJ9FaHxaK4/AFwfM1iukWyqt/UNyY80GPZt9MDddegJOpZZvI8Jm3Fnyv74u9cOT+npCsEBFQG8bFGqkC109dFtlu70Tz5lje0PnrvLpA/PW/b1VQBcBLIuVvQOR/nVrVZ975dlzHpidajJ/YTFugVYYaoAIFrLm6X7t42EIo=
+	 MIME-Version; b=Q4dGECIwZa+NqCaz+nwZwA4evaIn+XiBS1FUaWdlzjFJm1gZMMHuMoOPmw4EMXhaklD9XbcpwMZ1KH+ZTYjztYhaBJCUqQt0dgM2ZWet/FYty05qFs2nQBFxi57FAssy0nYbt9kjd9Om2gCPRMJCAFAyjYTK2MynE/yHEa5ZV1Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E60502680;
-	Tue, 30 Sep 2025 03:32:00 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 887572681;
+	Tue, 30 Sep 2025 03:32:02 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 93BE03F66E;
-	Tue, 30 Sep 2025 03:32:07 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3E0D53F66E;
+	Tue, 30 Sep 2025 03:32:09 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -30,9 +30,9 @@ Cc: kvm@vger.kernel.org,
 	steven.price@arm.com,
 	tabba@google.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH kvmtool v4 05/15] arm64: Stash kvm_vcpu_init for later use
-Date: Tue, 30 Sep 2025 11:31:20 +0100
-Message-ID: <20250930103130.197534-7-suzuki.poulose@arm.com>
+Subject: [PATCH kvmtool v4 06/15] arm64: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
+Date: Tue, 30 Sep 2025 11:31:21 +0100
+Message-ID: <20250930103130.197534-8-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250930103130.197534-1-suzuki.poulose@arm.com>
 References: <20250930103130.197534-1-suzuki.poulose@arm.com>
@@ -46,43 +46,48 @@ Content-Transfer-Encoding: 8bit
 
 From: Oliver Upton <oliver.upton@linux.dev>
 
-A subsequent change will add support for resetting a vCPU, which
-requires reissuing the KVM_ARM_VCPU_INIT ioctl. Save the kvm_vcpu_init
-worked out for later use.
+Using the POWER_OFF flag in kvm_vcpu_init gets in the way of resetting a
+vCPU in response to a PSCI CPU_ON call, for obvious reasons. Drop the
+flag in favor of using the KVM_SET_MP_STATE call for non-boot vCPUs.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm64/include/kvm/kvm-cpu-arch.h | 2 +-
- arm64/kvm-cpu.c                  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arm64/kvm-cpu.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
-index 1af394aa..2f189abc 100644
---- a/arm64/include/kvm/kvm-cpu-arch.h
-+++ b/arm64/include/kvm/kvm-cpu-arch.h
-@@ -17,7 +17,7 @@ struct kvm_cpu {
- 	pthread_t	thread;
- 
- 	unsigned long	cpu_id;
--	unsigned long	cpu_type;
-+	struct kvm_vcpu_init	init;
- 	const char	*cpu_compatible;
- 
- 	struct kvm	*kvm;
 diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-index 94c08a4d..3d914112 100644
+index 3d914112..c7286484 100644
 --- a/arm64/kvm-cpu.c
 +++ b/arm64/kvm-cpu.c
-@@ -194,7 +194,7 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	/* Populate the vcpu structure. */
- 	vcpu->kvm		= kvm;
- 	vcpu->cpu_id		= cpu_id;
--	vcpu->cpu_type		= vcpu_init.target;
-+	vcpu->init		= vcpu_init;
- 	vcpu->cpu_compatible	= target->compatible;
- 	vcpu->is_running	= true;
+@@ -143,10 +143,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 	if (vcpu->kvm_run == MAP_FAILED)
+ 		die("unable to mmap vcpu fd");
  
+-	/* VCPU 0 is the boot CPU, the others start in a poweroff state. */
+-	if (cpu_id > 0)
+-		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_POWER_OFF);
+-
+ 	/* Set KVM_ARM_VCPU_PSCI_0_2 if available */
+ 	if (kvm__supports_extension(kvm, KVM_CAP_ARM_PSCI_0_2)) {
+ 		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_PSCI_0_2);
+@@ -201,6 +197,16 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 	if (err || target->init(vcpu))
+ 		die("Unable to initialise vcpu");
+ 
++	/* VCPU 0 is the boot CPU, the others start in a poweroff state. */
++	if (cpu_id > 0) {
++		struct kvm_mp_state mp_state = {
++			.mp_state	= KVM_MP_STATE_STOPPED,
++		};
++
++		if (ioctl(vcpu->vcpu_fd, KVM_SET_MP_STATE, &mp_state))
++			die_perror("KVM_SET_MP_STATE failed");
++	}
++
+ 	coalesced_offset = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION,
+ 				 KVM_CAP_COALESCED_MMIO);
+ 	if (coalesced_offset)
 -- 
 2.43.0
 
