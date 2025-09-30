@@ -1,43 +1,47 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E6C15C158
-	for <kvmarm@lists.linux.dev>; Tue, 30 Sep 2025 00:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB85617A31E
+	for <kvmarm@lists.linux.dev>; Tue, 30 Sep 2025 00:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759192872; cv=none; b=J4grQNslJz/zUcXa+PlLiXdIvPnfYYYRFOtMG5IAQRXohOAK2x9VvG58Tr/+OTtw9ghvMjMZLdl/DHorUFMMg0LTyojy9MHIPh6HEoQ73OJjN51lZWq0My0/E8rmsGMeofC9FlpNOpOWhcCBiFTSwcVn+KSZr460KHy6CZpTpoY=
+	t=1759193655; cv=none; b=fcBPcG5342fvQRJJl8Ro6vE+rd5hp8whC1IMwDSb73RMxu9aQFtlklvHdu5rYvuYlD4FefC2l6VpHvhWaQRAZQ0DM/3Z9tcSajSUGId3W3SVTdVpD5eFFZLWNtQicwKJeZ93R9KtbrtEbz5vBUech2AOMlxUCcy0N1zfRRAcqDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759192872; c=relaxed/simple;
-	bh=xNGfxvXwebFTFuKGAKsECpF1yxmK6Bzc5LgyjKt0Qjg=;
+	s=arc-20240116; t=1759193655; c=relaxed/simple;
+	bh=AcijATm3N75Ov0nMjiQqledSjmaSWMbDCp6rF3qzFUg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UZ3vD4W/u1zK5hZas1sa1xgc3pSknbuJbplEfjuK1qoq7WTwbUQ8N+MhV+xYsadMt5KSUSYksGUufFb8Kp2BpUeBrvJlKaMUrN8d8Ke8Yl8jEa7H+MXNRuwgHbGaIOM3Oc64S6o5h9ak7/aUwSjBqCxii2pfR8AqLy6153zdDgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vQstJueR; arc=none smtp.client-ip=95.215.58.189
+	 Content-Type:Content-Disposition:In-Reply-To; b=rcypDO7Jr/oBA2Wydx5wHaYJ97cel1N25QBMEKuwiyxF8cGXibl3uKPn6R75TBqVUnKbt7MzJ1zCEzblP5//cdmX+mrdyeOmQFHaipxs0a60JilLOIrSbJv1OM6s126R8XvuWqqf1xtu3ajSq5RGzLfuscsBvgVUBfB7jjuM5wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hr3jsrtQ; arc=none smtp.client-ip=95.215.58.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vQstJueR"
-Date: Mon, 29 Sep 2025 17:41:01 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hr3jsrtQ"
+Date: Mon, 29 Sep 2025 17:53:54 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759192867;
+	t=1759193641;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=al7NVeWVCt6wvSuuBxYz51Qa667pYwu4Fk/SDCBU8o0=;
-	b=vQstJueROGg1w9KYIsYzevZvj3jdAImXxYvZHg6r0xf7aDZpDUjKTklTa23GulRsOgMbzp
-	4GJHGn7COhl1od6DtkQORkHPigpwCeXXC1lVpRpGNjgvHP+/0Aqm5ix8LMKrsGsxR+GiNH
-	6XeSzLIpbzFIxKg4si7NhCs8RxIgtkg=
+	bh=toyaVjkpPinuAEIPOarMwJdLvd9BQ2PV4RPd1E3oP4E=;
+	b=hr3jsrtQsxW72gNjOEPsv4iQ9v/0A7cW0vmawVGdX45ydnDFq1yMF5QgeZ9N/xChHdvNoK
+	Q2AZGZuaDA9FmsTsSVXcIfSWlxrVeJ5PHu9hSCZTH96pzMRGRi9tqXCCqeZI7AM9YipJjr
+	qqFqGtGAkzNNTPCMu9EbjZd7HufUbP4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 05/13] KVM: arm64: Add timer UAPI workaround to sysreg
- infrastructure
-Message-ID: <aNsnHUTaHgrql07j@linux.dev>
-References: <20250929160458.3351788-1-maz@kernel.org>
- <20250929160458.3351788-6-maz@kernel.org>
+To: "Thomson, Jack" <jackabt.amazon@gmail.com>
+Cc: maz@kernel.org, pbonzini@redhat.com, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	isaku.yamahata@intel.com, roypat@amazon.co.uk,
+	kalyazin@amazon.co.uk, jackabt@amazon.com
+Subject: Re: [PATCH 3/6] KVM: arm64: Add pre_fault_memory implementation
+Message-ID: <aNsqIsbYyROCjShQ@linux.dev>
+References: <20250911134648.58945-1-jackabt.amazon@gmail.com>
+ <20250911134648.58945-4-jackabt.amazon@gmail.com>
+ <aMMYKqWsAZ4y0WI7@linux.dev>
+ <7d109638-3d26-443a-b24d-eb7a0059b80f@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,49 +50,131 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250929160458.3351788-6-maz@kernel.org>
+In-Reply-To: <7d109638-3d26-443a-b24d-eb7a0059b80f@gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 29, 2025 at 05:04:49PM +0100, Marc Zyngier wrote:
-> Amongst the numerous bugs that plague the KVM/arm64 UAPI, one of
-> the most annoying thing is that the userspace view of the virtual
-> timer has its CVAL and CNT encodings swapped.
+On Mon, Sep 29, 2025 at 02:59:35PM +0100, Thomson, Jack wrote:
+> Hi Oliver,
 > 
-> In order to reduce the amount of code that has to know about this,
-> start by adding handling for this bug in the sys_reg code.
+> Thanks for reviewing!
 > 
-> Nothing is making use of it yet, as the code responsible for userspace
-> interaction is catching the accesses early.
+> On 11/09/2025 7:42 pm, Oliver Upton wrote:
+> > On Thu, Sep 11, 2025 at 02:46:45PM +0100, Jack Thomson wrote:
+> > > @@ -1607,7 +1611,7 @@ static int __user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > >   			    struct kvm_s2_trans *nested,
+> > >   			    struct kvm_memory_slot *memslot,
+> > >   			    long *page_size, unsigned long hva,
+> > > -			    bool fault_is_perm)
+> > > +			    bool fault_is_perm, bool pre_fault)
+> > >   {
+> > >   	int ret = 0;
+> > >   	bool topup_memcache;
+> > > @@ -1631,10 +1635,13 @@ static int __user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > >   	vm_flags_t vm_flags;
+> > >   	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
+> > > +	if (pre_fault)
+> > > +		flags |= KVM_PGTABLE_WALK_PRE_FAULT;
+> > > +
+> > >   	if (fault_is_perm)
+> > >   		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
+> > > -	write_fault = kvm_is_write_fault(vcpu);
+> > > -	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+> > > +	write_fault = !pre_fault && kvm_is_write_fault(vcpu);
+> > > +	exec_fault = !pre_fault && kvm_vcpu_trap_is_exec_fault(vcpu);
+> > 
+> > I'm not a fan of this. While user_mem_abort() is already a sloppy mess,
+> > one thing we could reliably assume is the presence of a valid fault
+> > context. Now we need to remember to special-case our interpretation of a
+> > fault on whether or not we're getting invoked for a pre-fault.
+> > 
+> > I'd rather see the pre-fault infrastructure compose a synthetic fault
+> > context (HPFAR_EL2, ESR_EL2, etc.). It places the complexity where it
+> > belongs and the rest of the abort handling code should 'just work'.
+> > 
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 33 ++++++++++++++++++++++++++++++---
->  arch/arm64/kvm/sys_regs.h |  6 ++++++
->  2 files changed, 36 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9f2f4e0b042e8..8e6f50f54b4bf 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -5231,15 +5231,28 @@ static int demux_c15_set(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
->  	}
->  }
->  
-> +static u64 kvm_one_reg_to_id(const struct kvm_one_reg *reg)
-> +{
-> +	switch(reg->id) {
-> +	case KVM_REG_ARM_TIMER_CVAL:
-> +		return TO_ARM64_SYS_REG(CNTV_CVAL_EL0);
-> +	case KVM_REG_ARM_TIMER_CNT:
-> +		return TO_ARM64_SYS_REG(CNTVCT_EL0);
-> +	default:
-> +		return reg->id;
-> +	}
-> +}
-> +
+> Agreed, it looks much better with the synthetic abort. Is this the
+> approach you had in mind?
 
-Seems like a good spot to name n' blame the commit that introduced this
-bug as a comment.
+Pretty much. Thanks for taking a moment to fiddle with it.
+
+> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> +				    struct kvm_pre_fault_memory *range)
+> +{
+> +	int ret, idx;
+> +	hva_t hva;
+> +	phys_addr_t end;
+> +	u64 esr, hpfar;
+> +	struct kvm_memory_slot *memslot;
+> +	struct kvm_vcpu_fault_info *fault_info;
+> +
+> +	long page_size = PAGE_SIZE;
+> +	phys_addr_t ipa = range->gpa;
+> +	gfn_t gfn = gpa_to_gfn(range->gpa);
+> +
+> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +
+> +	if (ipa >= kvm_phys_size(vcpu->arch.hw_mmu)) {
+> +		ret = -ENOENT;
+> +		goto out_unlock;
+> +	}
+> +
+> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+> +	if (!memslot) {
+> +		ret = -ENOENT;
+> +		goto out_unlock;
+> +	}
+> +
+> +	fault_info = &vcpu->arch.fault;
+> +
+> +	esr = fault_info->esr_el2;
+> +	hpfar = fault_info->hpfar_el2;
+
+nit: Just snapshot the entire struct, makes this forward-compatible with
+new fields showing up.
+
+> +
+> +	fault_info->esr_el2 = ESR_ELx_FSC_ACCESS_L(KVM_PGTABLE_LAST_LEVEL);
+
+A translation fault would be a more accurate representation what you're
+trying to do Access flag faults aren't expected in user_mem_abort() and
+instead handled in handle_access_fault().
+
+You're also missing the rest of the ESR fields that are relevant here,
+such as ESR_ELx.EC which would actually indicate a data abort. I think
+you'd also want to communicate this as a nISV fault (i.e.
+ESR_ELx.ISV=0).
+
+> +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
+> +		((ipa >> (12 - HPFAR_EL2_FIPA_SHIFT)) & HPFAR_EL2_FIPA_MASK);
+
+FIELD_PREP()?
+
+> +
+> +	if (kvm_slot_has_gmem(memslot)) {
+> +		ret = gmem_abort(vcpu, ipa, NULL, memslot, false);
+> +	} else {
+> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
+> +		if (kvm_is_error_hva(hva)) {
+> +			ret = -EFAULT;
+> +			goto out;
+> +		}
+> +		ret = user_mem_abort(vcpu, ipa, NULL, memslot, &page_size, hva,
+> +				     false);
+> +	}
+> +
+> +	if (ret < 0)
+> +		goto out;
+> +
+> +	end = (range->gpa & ~(page_size - 1)) + page_size;
+> +	ret = min(range->size, end - range->gpa);
+> +
+> +out:
+> +	fault_info->esr_el2 = esr;
+> +	fault_info->hpfar_el2 = hpfar;
+> +out_unlock:
+> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +	return ret;
+> +}
 
 Thanks,
 Oliver
