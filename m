@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E6F219301
-	for <kvmarm@lists.linux.dev>; Tue, 30 Sep 2025 10:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5A92F747C
+	for <kvmarm@lists.linux.dev>; Tue, 30 Sep 2025 10:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759228321; cv=none; b=s+jPOinaYqUBiCycppYQ79aDpQws62B4Gs/w06DidGe4/1gVaCOqFXkjmS/nhSUq4cGdRqI2qOVKfIU8oWmKxY9vN2rWQW0R1ESv1OpTSWVzfCTEETwXvFbTNQUO/7Q4FqkPYm4ypMhLt66itBJTBC/FnSqE3Vam3e1uVn7d+W0=
+	t=1759228323; cv=none; b=rXtoZtOznQPnQyQR3BCNUceK1Qkk4m0gPvXjsB89hOXrNqk3kx3g7NTNf5AznVRlqsHswI/BZ6A5RH5Y4w/Q4s2VdJ+pXLWo+ezDTcXRhWdjf7j562bqkPBKjqKTzTweCAS8Q9iMjGEd4n4QZgLIYJw+7S9uaT5XHw/CDT3JS/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759228321; c=relaxed/simple;
-	bh=MmWWeWN2VszbM6u7oDU+wa7E68fvdskDjNBmxAo7sms=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cOPsYrfsj83ZG1ZWk7oHd/qJes1NUmfk3lM+CpjnsFtGnREuMkRtE0JJRC6Mf/PkiVewguq+cB71zBQUOZvO9LeFV8Gow1libLHbp49GKzodLA/gvpHIY8vw9dX6lgCxPVL4pFxNr43YKvNQXqK84E/1uaYxfpSnIyEhcph27zc=
+	s=arc-20240116; t=1759228323; c=relaxed/simple;
+	bh=cNOojZNTDfNff1cYoVV9T3yoSM39FVuA322b8IlHOC4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=B4kjL6QxOk7AWKCyOIh8vfFxJImswecrbgCEslOtqebUsYrkr8GXSEtA0W85W+luVKSJOmLVVnBSnl8Mf4bo7PI2nqKUQ1c3JGT3vU1eB7aEOqh5VhATVWZYrStoJvW3frHQo2SHuRy7Vgtp2fyUqpM6gWXiA3jXQS8+5G087bw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 29AB82008;
-	Tue, 30 Sep 2025 03:31:51 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2735202C;
+	Tue, 30 Sep 2025 03:31:52 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D22ED3F66E;
-	Tue, 30 Sep 2025 03:31:57 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 751093F66E;
+	Tue, 30 Sep 2025 03:31:59 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -29,10 +30,12 @@ Cc: kvm@vger.kernel.org,
 	steven.price@arm.com,
 	tabba@google.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH kvmtool 00/15] arm64: Handle PSCI calls in userspace
-Date: Tue, 30 Sep 2025 11:31:14 +0100
-Message-ID: <20250930103130.197534-1-suzuki.poulose@arm.com>
+Subject: [PATCH kvmtool v4 01/15] Allow pausing the VM from vcpu thread
+Date: Tue, 30 Sep 2025 11:31:15 +0100
+Message-ID: <20250930103130.197534-2-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250930103130.197534-1-suzuki.poulose@arm.com>
+References: <20250930103130.197534-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,62 +44,90 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is version 4 of the patch series, originally posted by Oliver [0]. Mostly
-remains the same as v3, except for
+Pausing the VM from a vCPU thread doesn't work today, as it waits indefinitely
+for a signal that never comes. By using the "current_kvm_cpu", enlighten the
+kvm__pause() to skip the current CPU and do it inline. This also brings in a
+restriction that a following kvm__continue() must be called from the same vCPU
+thread.
 
- - Address Will's comment on the race between pause/resume - Patch 1
- - Rebase on to v6.17-rc7
- - Drop importing cputype.h, which was not used by the series
+Cc: Will Deacon <will@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Link: https://lore.kernel.org/all/20230918104028.GA17744@willie-the-truck/
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ kvm.c | 35 +++++++++++++++++++++++++++++++----
+ 1 file changed, 31 insertions(+), 4 deletions(-)
 
-[0] https://lore.kernel.org/all/20230802234255.466782-1-oliver.upton@linux.dev/
-
-
-Oliver Upton (12):
-  Import arm-smccc.h from Linux 6.17-rc7
-  arm64: Stash kvm_vcpu_init for later use
-  arm64: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
-  arm64: Expose ARM64_CORE_REG() for general use
-  arm64: Add support for finding vCPU for given MPIDR
-  arm64: Add skeleton implementation for PSCI
-  arm64: psci: Implement CPU_SUSPEND
-  arm64: psci: Implement CPU_ON
-  arm64: psci: Implement AFFINITY_INFO
-  arm64: psci: Implement MIGRATE_INFO_TYPE
-  arm64: psci: Implement SYSTEM_{OFF,RESET}
-  arm64: smccc: Start sending PSCI to userspace
-
-Suzuki K Poulose (3):
-  Allow pausing the VM from vcpu thread
-  update_headers: arm64: Track psci.h for PSCI definitions
-  update headers: Linux v6.17-rc7
-
- Makefile                            |   2 +
- arm64/include/asm/kvm.h             |  23 ++-
- arm64/include/asm/smccc.h           |  65 ++++++
- arm64/include/kvm/kvm-arch.h        |   2 +
- arm64/include/kvm/kvm-config-arch.h |   8 +-
- arm64/include/kvm/kvm-cpu-arch.h    |  30 ++-
- arm64/kvm-cpu.c                     |  51 +++--
- arm64/kvm.c                         |  20 ++
- arm64/psci.c                        | 207 +++++++++++++++++++
- arm64/smccc.c                       |  81 ++++++++
- include/linux/arm-smccc.h           | 305 ++++++++++++++++++++++++++++
- include/linux/kvm.h                 |  33 +++
- include/linux/psci.h                |  52 +++++
- include/linux/virtio_net.h          |  46 +++++
- include/linux/virtio_pci.h          |   1 +
- kvm-cpu.c                           |  13 ++
- kvm.c                               |  35 +++-
- powerpc/include/asm/kvm.h           |  13 --
- riscv/include/asm/kvm.h             |   3 +
- util/update_headers.sh              |  17 +-
- x86/include/asm/kvm.h               |  81 ++++++++
- 21 files changed, 1030 insertions(+), 58 deletions(-)
- create mode 100644 arm64/include/asm/smccc.h
- create mode 100644 arm64/psci.c
- create mode 100644 arm64/smccc.c
- create mode 100644 include/linux/arm-smccc.h
-
+diff --git a/kvm.c b/kvm.c
+index 07089cf1..cc25ecdb 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -59,6 +59,8 @@ const char *kvm_exit_reasons[] = {
+ 
+ static int pause_event;
+ static DEFINE_MUTEX(pause_lock);
++static struct kvm_cpu *pause_req_cpu;
++
+ extern struct kvm_ext kvm_req_ext[];
+ 
+ static char kvm_dir[PATH_MAX];
+@@ -573,9 +575,25 @@ void kvm__reboot(struct kvm *kvm)
+ 
+ void kvm__continue(struct kvm *kvm)
+ {
++	/*
++	 * We must ensure that the resume request comes from the same context
++	 * as the one requested the pause, especially if it was issued from a
++	 * vCPU thread.
++	 */
++	if (current_kvm_cpu) {
++		if (pause_req_cpu != current_kvm_cpu ||
++		    !current_kvm_cpu->paused)
++			die("Trying to resume VM from invalid context");
++		current_kvm_cpu->paused = 0;
++	}
+ 	mutex_unlock(&pause_lock);
+ }
+ 
++/*
++ * Mark all active CPUs as paused, until kvm__continue() is issued.
++ * NOTE: If this is called from a cpu thread, kvm__continue() must
++ * be called from the same thread.
++ */
+ void kvm__pause(struct kvm *kvm)
+ {
+ 	int i, paused_vcpus = 0;
+@@ -590,10 +608,17 @@ void kvm__pause(struct kvm *kvm)
+ 	if (pause_event < 0)
+ 		die("Failed creating pause notification event");
+ 	for (i = 0; i < kvm->nrcpus; i++) {
+-		if (kvm->cpus[i]->is_running && kvm->cpus[i]->paused == 0)
+-			pthread_kill(kvm->cpus[i]->thread, SIGKVMPAUSE);
+-		else
+-			paused_vcpus++;
++		if (kvm->cpus[i]->is_running && kvm->cpus[i]->paused == 0) {
++			if (current_kvm_cpu != kvm->cpus[i]) {
++				pthread_kill(kvm->cpus[i]->thread, SIGKVMPAUSE);
++				continue;
++			} else if (current_kvm_cpu) {
++				current_kvm_cpu->paused = 1;
++				pause_req_cpu = current_kvm_cpu;
++				/* fall through to update our count */
++			}
++		}
++		paused_vcpus++;
+ 	}
+ 
+ 	while (paused_vcpus < kvm->nrcpus) {
+@@ -604,6 +629,8 @@ void kvm__pause(struct kvm *kvm)
+ 		paused_vcpus += cur_read;
+ 	}
+ 	close(pause_event);
++	/* Remember the context requesting pause */
++	pause_req_cpu = current_kvm_cpu;
+ }
+ 
+ void kvm__notify_paused(void)
 -- 
 2.43.0
 
