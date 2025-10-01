@@ -1,208 +1,206 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5073A1DE4F1
-	for <kvmarm@lists.linux.dev>; Wed,  1 Oct 2025 17:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304112D3EC1
+	for <kvmarm@lists.linux.dev>; Wed,  1 Oct 2025 18:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759339953; cv=none; b=EF+2ZEzg0PNBmSMobb9XGnkHG/dU7EEZjxk4i9jizqwu4iKMbl/CaFFH1Lmj+/+tQNAqJkO8MrP6b8a07ZSMWiI23pGn4ZTy9r3DB2xBMRaJxNpNoWX5lSCMlmguIY8cdBUC5+V9KjUrg9CnSrLZ8ZubAV6Vef6v8U0B98euV1M=
+	t=1759342467; cv=none; b=PPLPxNkxol3VH1GLVD4CoodpXvPAUs7opaW1JRAdB+CORXlw1Dev51Wsp3WYlH2rLPYjzKKPfN/GBt5UI0u+hy7RO+Vzva5+3vHdHdE2daYQNmYniEOg3W/Z57QYEEVnK4TPdFUFDCvEJLr4UQmPSgDt/k7p8MJJrFpTqTb7na8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759339953; c=relaxed/simple;
-	bh=rHk1d9c2nYAN1GlB0Qqqi7n0BwmF7bTieJ3BBoipGQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=msthW0JHhiAKNvwyFzMCueOiWUs4nNbwfi3PfRL2lDTV4mQH+C9uy/N0f/ILVYYdW/dK6ywjzXAARmYqSYspAgIfn5E9ILoT+Avzz/crjnHMEfGUjakqKDxnQwYOXSFKgCiHIjXlnZzYQ6eE2iebHXyzLdY4uw/lTJnKgM6v5BA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KkI98xNJ; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1759342467; c=relaxed/simple;
+	bh=F7w6+iS6qdAPIESuSb4CMj9IywBNbDaDryHHYM/oA78=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OE2tMd+XzMDcFQvxw3L/c9WCdsvuXQhbHdkqqdSB5BlJwXl0zHQWs5UH0VBaGMhUkUhPukXClNFoDXrv1VO9H6s1CE0LJtFjgurSG17EZ2gNzzVaZVTeiNgTceMTuQRhbxt7y72T3XNJPacZYP7F9r01KwlIcy/2da5BS18z+HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZBs8J8Ib; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KkI98xNJ"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-27eeafd4882so15555ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 01 Oct 2025 10:32:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZBs8J8Ib"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ecab3865dso262596a91.1
+        for <kvmarm@lists.linux.dev>; Wed, 01 Oct 2025 11:14:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759339951; x=1759944751; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=o/YWYDtjG6ffJt7pjNnPORxoGZIxj6mJz/9fII2K1Ck=;
-        b=KkI98xNJcp/8L/rqUaDCSS/3RZ8PL1nKF4a2RW0AZ9aLU78SgDU2jDd51nMHHtS7Jq
-         LqwxJQ4GujLzwJZ+x277GNtyvr95sPMuiqVGHvcDqpwMM4JGJjHpWCoxYOj8BQUvLIH6
-         TaIwi6RqRk2BY6uJr+qouzQe3ug/9mFntT5UlCzC7ruvF74zK6p1VkUI1KndAC6WEQmk
-         px+N0DeUsZioOGBm2TUdCzBaZaLv76WIxspDjfouWP99dm0Aqa0V0VFxFqFOIOSESmMr
-         ObLqd0nkGhADHhkafafEJj5N91nWl4Lilqk6vxAAAEHo4NT9qFcCRJmtR0EZtFpJ0Ilm
-         rUSA==
+        d=google.com; s=20230601; t=1759342465; x=1759947265; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LOBNzl0piewZaB0fEWYxjiNzOXTgJ+Q2XdYBWxqPDCY=;
+        b=ZBs8J8IbKywLzdqQM5UpVpkE4mtGJ2R5KfsEmRiDAit/PLAmepGMGdXIAkgExZOa36
+         qLuH9nQl0n+mx98FLrfe+5Lvfx5b8S3ZgmajyBG5GlpgT7SWZw//BkaUPunUNIt9yGjq
+         UfwSIhFUAgrTQvh3fcojpGJ6op47t13jLk29HVabHqDXSXic0eCCXpH4nloSivWdlI1/
+         35Ne1+kRIBMunOBkwx4ZigYjT/S3OH/Nw5jhNVGAqz1kLfhN7lyWrXzRQQiTLyuiD4YK
+         PpajQur393ijC0qsMH+zTcjxlBzs6nflfe0bXcL64BhL+sXq4r1eOvXWkTcAHGMPgR4v
+         9j2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759339951; x=1759944751;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o/YWYDtjG6ffJt7pjNnPORxoGZIxj6mJz/9fII2K1Ck=;
-        b=aSUxolFJAV3TXFDrg9PiZFPX+Dc14O6lJO4XaH17gykKt641RLYxDLmoaVb5zXaRkH
-         VKPy4ifD9zinew3ig8QmPGXOhGfRbcJkyyFcmSXckDgZKHSxyM4SRaM01ccWp1Afb/el
-         xe5IL3quAy5/nnkfeLXhIzlKJ65V9RJPA+N/l+GPTz+5uYOD8mO4j636Eut9KwQggjeP
-         ZHbJmN40FjqZpuGCcNNuHZYJKZTB+JJuAuJCdynsoEGTm5yC+0QC9M5wbRs5IBgD+7r+
-         TU5hvMBKEWIz3yVF7RkoC/G9cSXWt6TwccekMNqw+bxKoOESsArLmL5+4R8bI5FU5qRF
-         tJQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXto7tWJaOG7LpQZ40uvLn2hR5b6HKplaf0v181t2wI6Fksw33d4brTb52Y0+Hs8IOmI3HSTjQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwkDVdjJ4X8ILRFuWdujlP95tEq8on4mmnwTesV6o2V0qzH2y0a
-	wAb8CmLZ8vgjyr+0h2mssireMxL/VsDvnky/DeLvbifjoVhqU2iVJs0ppG8dBJ8FGw==
-X-Gm-Gg: ASbGncv39Txp1/MljXAc0G2yI45d54A6G/i5D2khab6ZlP7ApH9crNItuiWcNWfnSRs
-	6TQE++B8VxUqhLQWarj8jFNJFduBLqEtpAhSc23h6wRwQnxZ8rbO0cNQUt4/8GntPZWGekqEusR
-	XRWnej8nXz4EWiizDUKlMxaXV4te3FyzqUqLODW/vAlfE0nBqlonqLTXjp8/lopkpcxIF0l+LJd
-	nTtp5VdpiMl5BBauANHV/OLYL2ugBA3KHkWfep/Rvqx8D5oJJIEwLb9kKGatnmLzdaX4tWYlWzs
-	hQR0e0AZ4sbGrTZzKNKjYDro2fiKsJ6P9k7jN9Gm5aUjrYG+HlI1xgWm+ADmroB1OEQxQ9TyHdK
-	P4J3KvS8/JrIJDpY+MtRikP0sj/ZlnLMV5mp5xF7+gro4LOdV1zKeNLqHUEqiAX3JLf1hbO/NVc
-	n14UjhjHCbFBnEV6MSyg==
-X-Google-Smtp-Source: AGHT+IHx7ebKepLK2+ba7wopXv1hEpDMMQTNfdMH8JIKjgqqvoILE8tuG/fflLyAGOySPePvLbMnkQ==
-X-Received: by 2002:a17:903:22c2:b0:26d:a02f:b046 with SMTP id d9443c01a7336-28e8dd04808mr80535ad.11.1759339950898;
-        Wed, 01 Oct 2025 10:32:30 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-339a6ff0dddsm2827615a91.18.2025.10.01.10.32.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Oct 2025 10:32:30 -0700 (PDT)
-Date: Wed, 1 Oct 2025 10:32:25 -0700
-From: Vipin Sharma <vipinsh@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, seanjc@google.com,
-	pbonzini@redhat.com, borntraeger@linux.ibm.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org,
-	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn,
-	chenhuacai@kernel.org, oliver.upton@linux.dev,
-	ajones@ventanamicro.com
-Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM
- selftests runner
-Message-ID: <20251001173225.GA420255.vipinsh@google.com>
-References: <20250930163635.4035866-1-vipinsh@google.com>
- <20250930163635.4035866-10-vipinsh@google.com>
- <86qzvnypsp.wl-maz@kernel.org>
+        d=1e100.net; s=20230601; t=1759342465; x=1759947265;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LOBNzl0piewZaB0fEWYxjiNzOXTgJ+Q2XdYBWxqPDCY=;
+        b=Lz3p39G6epJwoYaNRcjQ/gw+UE2sGglThF8WiFIvRY56uj8l3ghOeMd4ef5Prtu914
+         wlvjqzUOzvfZ8QQqluOBqO8b2G9ddqTkWMPaHSQsZny2kOUvO6Vjh1KdlcCz9HJ33dOu
+         wSgwNUh45A6eI4mMXUlEWaAygg9tVJeUQaE+y6ALzRv/usgM/fE6C+gEfjbsnkyzE0f3
+         Cfd8SEGref3BEmYI/1xFeHUPggRioIp/eDKn58YHtGr07dOBYobXQ8ZKUhYM/XCCeRus
+         Gz0Z+b0kDCDWyRXv5EHu9Wf1jaGajAeigk849o8TxBR26p+27bhbB4qoOy6VKq87AWsH
+         JRww==
+X-Forwarded-Encrypted: i=1; AJvYcCVSLUcfCIua/H+P4ajY/ljxEsYKr5jSyCjBiqyoH7LlzJehf34aEn0O4eHcMOZESxyv67+XKcc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzd1U51D9tzZIINEByQDt83SFjwsKZ5CZ4V51TGvFOGIupx2Mgd
+	9TcFDOHz3b7AVTAyb6yse/AUEI2F8sIIP2N9Rb4BmwBWjbRFsIESh9eEgcSCoR38/zZjdsYkeAw
+	ao9kSrw==
+X-Google-Smtp-Source: AGHT+IGJbul18z2pAriB4M9Dv7xuCXJyXC/vErDTd2EuWuyjJTHyZFET/F4MY3SeMRgMCYc9TSFDnBqrzsg=
+X-Received: from pjbjs19.prod.google.com ([2002:a17:90b:1493:b0:327:7035:d848])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33cf:b0:32b:8b8d:c2d1
+ with SMTP id 98e67ed59e1d1-339a6f076edmr5249061a91.21.1759342465480; Wed, 01
+ Oct 2025 11:14:25 -0700 (PDT)
+Date: Wed, 1 Oct 2025 11:14:23 -0700
+In-Reply-To: <f896966e-8925-4b4f-8f0d-f1ae8aa197f7@amd.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <86qzvnypsp.wl-maz@kernel.org>
+Mime-Version: 1.0
+References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-33-seanjc@google.com>
+ <f896966e-8925-4b4f-8f0d-f1ae8aa197f7@amd.com>
+Message-ID: <aN1vfykNs8Dmv_g0@google.com>
+Subject: Re: [PATCH v5 32/44] KVM: x86/pmu: Disable interception of select PMU
+ MSRs for mediated vPMUs
+From: Sean Christopherson <seanjc@google.com>
+To: Sandipan Das <sandidas@amd.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
+	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 2025-10-01 09:44:22, Marc Zyngier wrote:
-> On Tue, 30 Sep 2025 17:36:35 +0100,
-> Vipin Sharma <vipinsh@google.com> wrote:
+On Fri, Sep 26, 2025, Sandipan Das wrote:
+> On 8/7/2025 1:26 AM, Sean Christopherson wrote:
+> > From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > > 
-> > +KVM selftest runner is highly configurable test executor that allows to run
-> > +tests with different configurations (not just the default), parallely, save
-> 
-> s/parallely/in parallel/
-> 
+> > For vCPUs with a mediated vPMU, disable interception of counter MSRs for
+> > PMCs that are exposed to the guest, and for GLOBAL_CTRL and related MSRs
+> > if they are fully supported according to the vCPU model, i.e. if the MSRs
+> > and all bits supported by hardware exist from the guest's point of view.
+> > 
+> > Do NOT passthrough event selector or fixed counter control MSRs, so that
+> > KVM can enforce userspace-defined event filters, e.g. to prevent use of
+> > AnyThread events (which is unfortunately a setting in the fixed counter
+> > control MSR).
+> > 
+> > Defer support for nested passthrough of mediated PMU MSRs to the future,
+> > as the logic for nested MSR interception is unfortunately vendor specific.
 
-Thanks, I will fix it.
+...
 
-> > +output to disk hierarchically, control what gets printed on console, provide
-> > +execution status.
+> >  #define MSR_AMD64_LBR_SELECT			0xc000010e
+> > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> > index 4246e1d2cfcc..817ef852bdf9 100644
+> > --- a/arch/x86/kvm/pmu.c
+> > +++ b/arch/x86/kvm/pmu.c
+> > @@ -715,18 +715,14 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+> >  	return 0;
+> >  }
+> >  
+> > -bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+> > +bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> >  
+> >  	if (!kvm_vcpu_has_mediated_pmu(vcpu))
+> >  		return true;
+> >  
+> > -	/*
+> > -	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
+> > -	 * in Ring3 when CR4.PCE=0.
+> > -	 */
+> > -	if (enable_vmware_backdoor)
+> > +	if (!kvm_pmu_has_perf_global_ctrl(pmu))
+> >  		return true;
+> >  
+> >  	/*
+> > @@ -735,7 +731,22 @@ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+> >  	 * capabilities themselves may be a subset of hardware capabilities.
+> >  	 */
+> >  	return pmu->nr_arch_gp_counters != kvm_host_pmu.num_counters_gp ||
+> > -	       pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed ||
+> > +	       pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed;
+> > +}
+> > +EXPORT_SYMBOL_GPL(kvm_need_perf_global_ctrl_intercept);
 > > +
-> > +To generate default tests use::
+> > +bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
 > > +
-> > +  # make tests_install
+> > +	/*
+> > +	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
+> > +	 * in Ring3 when CR4.PCE=0.
+> > +	 */
+> > +	if (enable_vmware_backdoor)
+> > +		return true;
 > > +
-> > +This will create ``testcases_default_gen`` directory which will have testcases
+> > +	return kvm_need_perf_global_ctrl_intercept(vcpu) ||
+> >  	       pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
+> >  	       pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
+> >  }
 > 
-> I don't think using the future tense is correct here. I'd rather see
-> something written in the present tense, possibly imperative. For
-> example:
-> 
-> "Create 'blah' directory containing 'foo' files, one per test-case.
-> 
+> There is a case for AMD processors where the global MSRs are absent in the guest
+> but the guest still uses the same number of counters as what is advertised by the
+> host capabilities. So RDPMC interception is not necessary for all cases where
+> global control is unavailable.o
 
-Thanks, I will fix it.
+Hmm, I think Intel would be the same?  Ah, no, because the host will have fixed
+counters, but the guest will not.  However, that's not directly related to
+kvm_pmu_has_perf_global_ctrl(), so I think this would be correct?
 
-> > +in `default.test` files. Each KVM selftest will have a directory in  which
-> > +`default.test` file will be created with executable path relative to KVM
-> > +selftest root directory i.e. `/tools/testing/selftests/kvm`.
-> 
-> Shouldn't this honor the existing build output directives? If it
-> actually does, then you want to call this out.
-> 
-
-To generate default test files in a specific directory one can use
-"OUTPUT" in the make command
-
-  make OUTPUT="~/test/directory/path" tests_install
-
-This allows to generate testcases_default_gen in the given output
-directory. default.test files will still have test binary path relative
-kvm selftest root directory. 
-
-$OUTPUT
-└── testcases_default_gen
-    ├── access_tracking_perf_test
-    │   └── default.test
-    ├── arch_timer
-    │   └── default.test
-    ├── arm64
-    │   ├── aarch32_id_regs
-    │   │   └── default.test
-    │   ├── arch_timer_edge_cases
-    │   │   └── default.test
-    │   ├── debug-exceptions
-    │   │   └── default.test
-    │   ├── external_aborts
-    │   │   └── default.test
-    │   │   └── default.test
-    │   └── ...
-    ├── coalesced_io_test
-    │   └── default.test
-    ├── demand_paging_test
-    │   └── default.test
-    ├── ...
-
-So, arm64/aarch32_id_regs/default.test will have 'arm64/aarch32_id_regs'
-
-User can then supply -p/--path with the path of build output directory
-to runner. 
-
-  python3 runner -p ~/path/to/selftest/binaries -d $OUTPUT/testcases_default_gen
-
-If -p not given then current directory is considered for test
-executables.
-
-> > For example, the
-> > +`dirty_log_perf_test` will have::
-> > +
-> > +  # cat testcase_default_gen/dirty_log_perf_test/default.test
-> > +  dirty_log_perf_test
-> > +
-> > +Runner will execute `dirty_log_perf_test`. Testcases files can also provide
-> > +extra arguments to the test::
-> > +
-> > +  # cat tests/dirty_log_perf_test/2slot_5vcpu_10iter.test
-> > +  dirty_log_perf_test -x 2 -v 5 -i 10
-> > +
-> > +In this case runner will execute the `dirty_log_perf_test` with the options.
-> > +
-> 
-> The beginning of the text talks about "non-default' configurations,
-> but you only seem to talk about the default stuff. How does one deals
-> with a non-default config?
-> 
-
-In the patch 1, I created two sample tests files,
-2slot_5vcpu_10iter.test and no_dirty_log_protect.test, in the directory
-tools/testing/selftests/kvm/tests/dirty_log_perf_test.
-
-Contents of those files provide non-default arguments to test, for example,
-2slot_5vcpu10iter.test has the command:
-
-  dirty_log_perf_test -x 2 -v 5  -i 10
-
-One can run these non-default tests as (assuming current directory is
-kvm selftests):
-
-  python3 runner -d ./tests
-
-Over the time we will add more of these non-default interesting
-testcases. One can then run:
-
-  python3 runner -d ./tests ./testcases_default_gen
-
-
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 4414d070c4f9..4c5b2712ee4c 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -744,16 +744,13 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+        return 0;
+ }
+ 
+-bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
++static bool kvm_need_pmc_intercept(struct kvm_vcpu *vcpu)
+ {
+        struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 
+        if (!kvm_vcpu_has_mediated_pmu(vcpu))
+                return true;
+ 
+-       if (!kvm_pmu_has_perf_global_ctrl(pmu))
+-               return true;
+-
+        /*
+         * Note!  Check *host* PMU capabilities, not KVM's PMU capabilities, as
+         * KVM's capabilities are constrained based on KVM support, i.e. KVM's
+@@ -762,6 +759,13 @@ bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
+        return pmu->nr_arch_gp_counters != kvm_host_pmu.num_counters_gp ||
+               pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed;
+ }
++
++bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
++{
++
++       return kvm_need_pmc_intercept(vcpu) ||
++              !kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu));
++}
+ EXPORT_SYMBOL_GPL(kvm_need_perf_global_ctrl_intercept);
+ 
+ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+@@ -775,7 +779,7 @@ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+        if (enable_vmware_backdoor)
+                return true;
+ 
+-       return kvm_need_perf_global_ctrl_intercept(vcpu) ||
++       return kvm_need_pmc_intercept(vcpu) ||
+               pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
+               pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
+ }
