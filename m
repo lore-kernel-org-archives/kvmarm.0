@@ -1,218 +1,221 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63C82FC022;
-	Wed,  1 Oct 2025 13:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483043019CB;
+	Wed,  1 Oct 2025 14:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759326644; cv=none; b=LwXjy6dFkiSjESP9b5OfMt/sC0TSW3LMgPsd1QpoYy0G4w/cmKQ9aVuR9PVhINU+uQJ60kmK1nWxkhoDtsKczR1KKeeW5SYuglOm3httuuuVjFWh3YEwJB3D9RbgiF1uZ6j67XlfhDPQcYeNHCGlR8YcehX9KHM8g/BgaAftsiM=
+	t=1759327512; cv=none; b=sN0aQFPks6+I+jTiGvBhSTPpp5NEVSJYHUltrvqL9hHxrm2XTn7tmCrNKSKpQdB9rmRQGmun5GIeS42f8kr0SuTLSetyygocUsdcuOh5t73/7DaK/+Z0x1/OvJwI/G+MyQ2vImj/z4c6d/Uoj3ivDb90pPIb95ElWNHyoalz8Bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759326644; c=relaxed/simple;
-	bh=ZdhaWAfKmxbKABNyDvOv6tEXnr56Ewe14zIvrLNS+q0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QSZ7eSvr9W/eIlDLEAzRjv7fQAgwXEwrMI3qCwqn6NetOjUqdATeVpkMJK/85PoxnUM1XH/Gx6YHldWOB4p1NSnvOkNcN3Bsy+wuSBolM6QHE6DuSSWF15TG9EPsx8tXD4oQcIlDX1wb1lfG80QRzPF3GFe9aSvY2MQ3Q3ap+tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StWNG2X4; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StWNG2X4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 112B2C4CEF1;
-	Wed,  1 Oct 2025 13:50:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759326644;
-	bh=ZdhaWAfKmxbKABNyDvOv6tEXnr56Ewe14zIvrLNS+q0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=StWNG2X43Oln/YTs39wgGNy2vivNkf3C+7Q9ZKEkvKLqU6ivY6UUbwJO2s5fpqi7V
-	 zDyY4ias5QmrcL4bn0bOcijCxxS86WzRffaQ4k15osdCSYrKYXn+X5yqpIXiUo+6Gw
-	 or8kEjUjJ35ksXmKxgKnM71neNwPM2fy0yx8t50Lv1maBWMbjdqV0A6wcZLmsmQlCP
-	 HRy9aMRLl40+wdbLBWI6IAh18rjqwovKTacejOeqZv2qbz+QXrqBGN6n4yw2sR4NLT
-	 zAV0f19ZTdgAuxYn/PblZd93t56iNeYq5AkXM5ORfZj7e7aOD9OLgVimcTxq7IoHZD
-	 WwCFwRSr/Bspg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v3xE9-0000000Aor0-4Bb3;
-	Wed, 01 Oct 2025 13:50:42 +0000
-Date: Wed, 01 Oct 2025 14:50:41 +0100
-Message-ID: <86frc2zq6m.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v10 09/43] KVM: arm64: Allow passing machine type in KVM creation
-In-Reply-To: <20250820145606.180644-10-steven.price@arm.com>
-References: <20250820145606.180644-1-steven.price@arm.com>
-	<20250820145606.180644-10-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1759327512; c=relaxed/simple;
+	bh=oWFIvq6oE4Bis32InxYXskecssaW5/5hnuHe3y+UwFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L7yuCaNNQ0CcX9MM5e28lO7YOzsWV10r6D3Nn0WFivb3cgMygE5d0nOk2XZuzCUScSCeE78+avD64xIeaPlpiyQN2wgaDYKLTuR/2Y3ROY7DXL3wPWJMNMqyxpgBcjOuTT61a96zr/jpTOtG9KPXNuSkYIy0mX1JLW0K+45WRbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23D3816F2;
+	Wed,  1 Oct 2025 07:05:01 -0700 (PDT)
+Received: from [10.57.0.204] (unknown [10.57.0.204])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 771943F66E;
+	Wed,  1 Oct 2025 07:05:04 -0700 (PDT)
+Message-ID: <990a62ee-c7a7-4cdf-9e0a-efc7908a1f2e@arm.com>
+Date: Wed, 1 Oct 2025 15:05:02 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the
+ RMM
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+ <20250820145606.180644-4-steven.price@arm.com> <86o6qrym2b.wl-maz@kernel.org>
+ <747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com> <86ldluzvdb.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <86ldluzvdb.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 20 Aug 2025 15:55:29 +0100,
-Steven Price <steven.price@arm.com> wrote:
+On 01/10/2025 12:58, Marc Zyngier wrote:
+> On Wed, 01 Oct 2025 12:00:14 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 01/10/2025 11:05, Marc Zyngier wrote:
+>>> On Wed, 20 Aug 2025 15:55:23 +0100,
+>>> Steven Price <steven.price@arm.com> wrote:
+>>>>
+>>>> The RMM (Realm Management Monitor) provides functionality that can be
+>>>> accessed by SMC calls from the host.
+>>>>
+>>>> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+>>>>
+>>>> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+>>>>
+>>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>> ---
+>>>> Changes since v9:
+>>>>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+>>>>    this is an 8-bit type with padding afterwards (rather than a u64).
+>>>> Changes since v8:
+>>>>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+>>>>    permits to be modified.
+>>>> Changes since v6:
+>>>>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>>>>    these are flag values.
+>>>> Changes since v5:
+>>>>  * Sorted the SMC #defines by value.
+>>>>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>>>>    RMI calls.
+>>>>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>>>>    number of available list registers could be lower.
+>>>>  * Provided a define for the reserved fields of FeatureRegister0.
+>>>>  * Fix inconsistent names for padding fields.
+>>>> Changes since v4:
+>>>>  * Update to point to final released RMM spec.
+>>>>  * Minor rearrangements.
+>>>> Changes since v3:
+>>>>  * Update to match RMM spec v1.0-rel0-rc1.
+>>>> Changes since v2:
+>>>>  * Fix specification link.
+>>>>  * Rename rec_entry->rec_enter to match spec.
+>>>>  * Fix size of pmu_ovf_status to match spec.
+>>>> ---
+>>>>  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
+>>>>  1 file changed, 269 insertions(+)
+>>>>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+>>>> new file mode 100644
+>>>> index 000000000000..1000368f1bca
+>>>> --- /dev/null
+>>>> +++ b/arch/arm64/include/asm/rmi_smc.h
+>>>
+>>> [...]
+>>>
+>>>> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+>>>> +					 ICH_HCR_EL2_LRENPIE |		\
+>>>> +					 ICH_HCR_EL2_NPIE |		\
+>>>> +					 ICH_HCR_EL2_VGrp0EIE |		\
+>>>> +					 ICH_HCR_EL2_VGrp0DIE |		\
+>>>> +					 ICH_HCR_EL2_VGrp1EIE |		\
+>>>> +					 ICH_HCR_EL2_VGrp1DIE |		\
+>>>> +					 ICH_HCR_EL2_TDIR)
+>>>
+>>> Why should KVM care about what bits the RMM wants to use? Also, why
+>>> should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
+>>> interrupt delivery is the host's business, then the RMM has no
+>>> business interfering with the GIC programming.
+>>
+>> The RMM receives the guest's GIC state in a field within the REC entry
+>> structure (enter.gicv3_hcr). The RMM spec states that the above is the
+>> list of fields that will be considered and that everything else must be
+>> 0[1]. So this is used to filter the configuration to make sure it's
+>> valid for the RMM.
+>>
+>> In terms of TALL0/TALL1/TC bits: these control trapping to EL2, and when
+>> in a realm guest the RMM is EL2 - so it's up to the RMM to configure
+>> these bits appropriately as it is the RMM which will have to deal with
+>> the trap.
 > 
-> Previously machine type was used purely for specifying the physical
-> address size of the guest. Reserve the higher bits to specify an ARM
-> specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
-> used to create a realm guest.
+> And I claim this is *wrong*. Again, if the host is in charge of
+> interrupt injection, then the RMM has absolutely no business is
+> deciding what can or cannot be trapped. There is zero information
+> exposed by these traps that the host is not already aware of.
 > 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v9:
->  * Explictly set realm.state to REALM_STATE_NONE rather than rely on the
->    zeroing of the structure.
-> Changes since v7:
->  * Add some documentation explaining the new machine type.
-> Changes since v6:
->  * Make the check for kvm_rme_is_available more visible and report an
->    error code of -EPERM (instead of -EINVAL) to make it explicit that
->    the kernel supports RME, but the platform doesn't.
-> ---
->  Documentation/virt/kvm/api.rst | 16 ++++++++++++++--
->  arch/arm64/kvm/arm.c           | 16 ++++++++++++++++
->  arch/arm64/kvm/mmu.c           |  3 ---
->  include/uapi/linux/kvm.h       | 19 +++++++++++++++----
->  4 files changed, 45 insertions(+), 9 deletions(-)
+>> [1] RWVGFJ in the 1.0 spec from
+>> https://developer.arm.com/documentation/den0137/latest
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 69c0a9eba6c5..fad3191df311 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -181,8 +181,20 @@ flag KVM_VM_MIPS_VZ.
->  ARM64:
->  ^^^^^^
->  
-> -On arm64, the physical address size for a VM (IPA Size limit) is limited
-> -to 40bits by default. The limit can be configured if the host supports the
-> +On arm64, the machine type identifier is used to encode a type and the
-> +physical address size for the VM. The lower byte (bits[7-0]) encode the
-> +address size and the upper bits[11-8] encode a machine type. The machine
-> +types that might be available are:
-> +
-> + ======================   ============================================
-> + KVM_VM_TYPE_ARM_NORMAL   A standard VM
-> + KVM_VM_TYPE_ARM_REALM    A "Realm" VM using the Arm Confidential
-> +                          Compute extensions, the VM's memory is
-> +                          protected from the host.
-> + ======================   ============================================
-> +
-> +The physical address size for a VM (IPA Size limit) is limited to 40bits
-> +by default. The limit can be configured if the host supports the
->  extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
->  KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
->  identifier, where IPA_Bits is the maximum width of any physical
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8c0e9ec34f0a..5b582b705eee 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -172,6 +172,22 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	mutex_unlock(&kvm->lock);
->  #endif
->  
-> +	if (type & ~(KVM_VM_TYPE_ARM_MASK | KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
-> +		return -EINVAL;
-> +
-> +	switch (type & KVM_VM_TYPE_ARM_MASK) {
-> +	case KVM_VM_TYPE_ARM_NORMAL:
-> +		break;
-> +	case KVM_VM_TYPE_ARM_REALM:
-> +		if (!static_branch_unlikely(&kvm_rme_is_available))
-> +			return -EPERM;
+> Well, until someone explains what this is protecting against, I
+> consider this as broken.
 
-EPERM? That's rather odd. You can only do that if the CCA capability
-has been advertised. So asking for it when you can find that it is not
-there deserves more of an EINVAL response.
+I'm not sure I understand how you want this to work. Ultimately the
+realm guest entry is a bounce from NS-EL2 to EL3 to R-EL2 to R-EL1/0. So
+the RMM has to have some control over the trapping behaviour for its own
+protection. The current spec means that the RMM does not have to
+implement the trap handlers for TALL0/TALL1/TC and can simply force
+these bits to 0. Allowing the host to enable traps that the RMM isn't
+expecting will obviously end in problems.
 
-> +		WRITE_ONCE(kvm->arch.realm.state, REALM_STATE_NONE);
-> +		kvm->arch.is_realm = true;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
->  	kvm_init_nested(kvm);
->  
->  	ret = kvm_share_hyp(kvm, kvm + 1);
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index de10dbde4761..130f28dfb3cb 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -881,9 +881,6 @@ static int kvm_init_ipa_range(struct kvm *kvm,
->  	if (kvm_is_realm(kvm))
->  		kvm_ipa_limit = kvm_realm_ipa_limit();
->  
-> -	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
-> -		return -EINVAL;
-> -
+If your argument is that because the NS host is emulating the GIC it
+needs to be able to do these traps, then that's something that can be
+fed back to the spec and hopefully improved. In that case the trap
+information would be provided in the rec_entry structure and on trap the
+RMM would return prepare information in the rec_exit structure. This
+could in theory be handled similar to an emulatable data abort with a
+new exit reason.
 
-How about the *other* bits? You need to be able to detect that
-userspace is using the reserved bits and error out.
+The other approach would be to push more GIC handling into the RMM such
+that these trap bits are not needed (i.e. there's no requirement to exit
+to the NS host to handle the trap, and the RMM can program them
+independently). I'm afraid I don't understand the GIC well enough to
+know how these traps are used and how feasible it is for the RMM to just
+"do the right thing" here.
 
->  	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
->  	if (is_protected_kvm_enabled()) {
->  		phys_shift = kvm_ipa_limit;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 7dafb443368a..b70ecee918de 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -672,14 +672,25 @@ struct kvm_enable_cap {
->  #define KVM_S390_SIE_PAGE_OFFSET 1
->  
->  /*
-> - * On arm64, machine type can be used to request the physical
-> - * address size for the VM. Bits[7-0] are reserved for the guest
-> - * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
-> - * value 0 implies the default IPA size, 40bits.
-> + * On arm64, machine type can be used to request both the machine type and
-> + * the physical address size for the VM.
-> + *
-> + * Bits[11-8] are reserved for the ARM specific machine type.
-> + *
-> + * Bits[7-0] are reserved for the guest PA size shift (i.e, log2(PA_Size)).
-> + * For backward compatibility, value 0 implies the default IPA size, 40bits.
->   */
-> +#define KVM_VM_TYPE_ARM_SHIFT		8
-> +#define KVM_VM_TYPE_ARM_MASK		(0xfULL << KVM_VM_TYPE_ARM_SHIFT)
-> +#define KVM_VM_TYPE_ARM(_type)		\
-> +	(((_type) << KVM_VM_TYPE_ARM_SHIFT) & KVM_VM_TYPE_ARM_MASK)
-> +#define KVM_VM_TYPE_ARM_NORMAL		KVM_VM_TYPE_ARM(0)
-> +#define KVM_VM_TYPE_ARM_REALM		KVM_VM_TYPE_ARM(1)
+>>>> +	union { /* 0x300 */
+>>>> +		struct {
+>>>> +			u64 gicv3_hcr;
+>>>> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+>>>> +			u64 gicv3_misr;
+>>>
+>>> Why do we care about ICH_MISR_EL2? Surely we get everything in the
+>>> registers themselves, right? I think this goes back to my question
+>>> above: why is the RMM getting in the way of ICH_*_EL2 accesses?
+>>
+>> As mentioned above, the state of the guest's GIC isn't passed through
+>> the CPU's registers, but instead using the rec_enter/rec_exit
+>> structures. So unlike a normal guest entry we don't set all the CPU's
+>> register state before entering, but instead hand over a shared data
+>> structure and the RMM is responsible for actually programming the
+>> registers on the CPU. Since many of the registers are (deliberately)
+>> unavailable to the host (e.g. all the GPRs) it makes some sense the RMM
+>> also handles the GIC registers save/restore.
+> 
+> And I claim this is nonsense. There is nothing in these registers that
+> the host doesn't need to know about, which is why they are basically
+> copied over.
 
-Why can't that be just "PROTECTED", using bit 31, just like pKVM?  I
-don't see the point in deviating from an established practice.
+Well it's fairly obvious that the host (generally) doesn't need to know
+the general purpose registers. And it's fairly clear that confidential
+compute would be pretty pointless if the hypervisor leaked those
+registers. So I hope we agree that some architectural registers are
+going to have to be handled differently from a normal guest.
 
-	M.
+The GIC is unusual because it's (partly) emulated by the host. The
+configuration is also complex because during guest entry rather than
+just dropping down to EL1/0 we're actually performing an SMC to EL3 and
+world-switching. So I'm not sure to what extent programming the
+architectural registers in the normal world would work.
 
--- 
-Without deviation from the norm, progress is not possible.
+> It all feels just wrong.
+
+I think fundamentally the confusing thing is there are two hypervisors
+pretending to be one. Both KVM and the RMM are providing part of the
+role of the hypervisor. It would "feel" neater for the RMM to take on
+more responsibility of the hypervisor role but that leads to more
+complexity in the RMM (whose simplicity is part of the value of CCA) and
+potentially less flexibility because you haven't got the functionality
+of KVM.
+
+Thanks,
+Steve
