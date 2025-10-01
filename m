@@ -1,210 +1,213 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93BB46B5;
-	Wed,  1 Oct 2025 10:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607502C21F2;
+	Wed,  1 Oct 2025 11:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759313105; cv=none; b=rfZ1Z2UlVM7ITQXUCdLZL+9Dkohg1jK8IcrKYagD1oOmNzevBTCNAvcll6lo4gMvnVQTC9oyFBatnMI02vHphMU3MqIsMfA5BDzIbJ7scwu5Ninu9An+o/k63tGqxZ73/NFCfANBGj3mLST7q6b1iHc5LCrY3vChP/AyFd5VQo8=
+	t=1759316426; cv=none; b=pv/PP4hIvT91yzKRb/r0jyn6yklDd4p6x2E2zi5vVw/fcua+O9mpnU0rUokGteZOQ9163h+BujBbGc9Xk4OYPyAnhjrGIywNdGGE5AZcHJgLg1m/yaFLGHuXppbkxQ1xaaLYz/oqmFPx8ZfBYGWYUlomRRfO/Pxwd8CN1gJq+mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759313105; c=relaxed/simple;
-	bh=GkDZ6NXoxTMf23WDTs15nu962/34sSuHxOTDvtqezTE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VI+qzy7/uhAv7WLb+NK91cHFHz8vi4HRqBdI+V7mdcJONl88nW8syUNMevRLgZKoKBiySiL4OJ48k+Pk0WA0+Zp5/7HVI1XWK5lu+7jl1XlTWpY7L18S0udwFwmuo9jfXWnCw9JKIi8rs9e01NVeB2Mv5So89DIKqCGjlKrQUoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D9qFXftc; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9qFXftc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42433C116C6;
-	Wed,  1 Oct 2025 10:05:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759313104;
-	bh=GkDZ6NXoxTMf23WDTs15nu962/34sSuHxOTDvtqezTE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D9qFXftckYU8UZNcyAyVFAjSHt6W8vXaQM46Df3/j2uJZmSW8m84coZ/j1zjfUidE
-	 n7SNHslwRuxinAykPqkM/8Jn4JIMk7PHcDyVBvkgCsq7P8l9Ep+pwXAB5WHplsnAyH
-	 EDuZT6LJzdg0YRo874RJOeIR2w59HlGEMGs5GPPJkQhwLAJB+iXJTpsPIY5//ku6iP
-	 F6/jlw2yhtO3fXYMdGHMZ4oe03jkFLy80nAk3CiOtY03JyBtgZ/4CvavoQsrxe8HPC
-	 LqwAx0MtS8JVQBQxo84mLov2DbVYEUPIKPpRd2HG4wzsWNa6KRKFz2DH5T3nDCisXL
-	 ZFSFmu0ICqfNQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v3thl-0000000AlcY-0RZd;
-	Wed, 01 Oct 2025 10:05:01 +0000
-Date: Wed, 01 Oct 2025 11:05:00 +0100
-Message-ID: <86o6qrym2b.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the RMM
-In-Reply-To: <20250820145606.180644-4-steven.price@arm.com>
-References: <20250820145606.180644-1-steven.price@arm.com>
-	<20250820145606.180644-4-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1759316426; c=relaxed/simple;
+	bh=3ru9c1ecAoC6W72Wb/VITcP/ZIDp+n1MNRQULN/BlhI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YEEc1wZuyQSAywJXFqkK71ZiIurakPYqxyhokhQutekvSG4DveXpMNXslDGoqVG69kmr1j5AvdSvH7fxp1yrz/7VbrGkJ3JltaWKJKlyOmzcynmxELiCzMLQ31rbGMUgwkOkbSwXnOSVMleFq2vhc/Mssx+2m16RWG+U8y2q79Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8995816F2;
+	Wed,  1 Oct 2025 04:00:15 -0700 (PDT)
+Received: from [10.57.0.204] (unknown [10.57.0.204])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06CB33F59E;
+	Wed,  1 Oct 2025 04:00:18 -0700 (PDT)
+Message-ID: <747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com>
+Date: Wed, 1 Oct 2025 12:00:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the
+ RMM
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+ <20250820145606.180644-4-steven.price@arm.com> <86o6qrym2b.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <86o6qrym2b.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 20 Aug 2025 15:55:23 +0100,
-Steven Price <steven.price@arm.com> wrote:
+Hi Marc,
+
+On 01/10/2025 11:05, Marc Zyngier wrote:
+> On Wed, 20 Aug 2025 15:55:23 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> The RMM (Realm Management Monitor) provides functionality that can be
+>> accessed by SMC calls from the host.
+>>
+>> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+>>
+>> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+>>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v9:
+>>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+>>    this is an 8-bit type with padding afterwards (rather than a u64).
+>> Changes since v8:
+>>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+>>    permits to be modified.
+>> Changes since v6:
+>>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>>    these are flag values.
+>> Changes since v5:
+>>  * Sorted the SMC #defines by value.
+>>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>>    RMI calls.
+>>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>>    number of available list registers could be lower.
+>>  * Provided a define for the reserved fields of FeatureRegister0.
+>>  * Fix inconsistent names for padding fields.
+>> Changes since v4:
+>>  * Update to point to final released RMM spec.
+>>  * Minor rearrangements.
+>> Changes since v3:
+>>  * Update to match RMM spec v1.0-rel0-rc1.
+>> Changes since v2:
+>>  * Fix specification link.
+>>  * Rename rec_entry->rec_enter to match spec.
+>>  * Fix size of pmu_ovf_status to match spec.
+>> ---
+>>  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
+>>  1 file changed, 269 insertions(+)
+>>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+>>
+>> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+>> new file mode 100644
+>> index 000000000000..1000368f1bca
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/rmi_smc.h
 > 
-> The RMM (Realm Management Monitor) provides functionality that can be
-> accessed by SMC calls from the host.
+> [...]
 > 
-> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+>> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+>> +					 ICH_HCR_EL2_LRENPIE |		\
+>> +					 ICH_HCR_EL2_NPIE |		\
+>> +					 ICH_HCR_EL2_VGrp0EIE |		\
+>> +					 ICH_HCR_EL2_VGrp0DIE |		\
+>> +					 ICH_HCR_EL2_VGrp1EIE |		\
+>> +					 ICH_HCR_EL2_VGrp1DIE |		\
+>> +					 ICH_HCR_EL2_TDIR)
 > 
-> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+> Why should KVM care about what bits the RMM wants to use? Also, why
+> should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
+> interrupt delivery is the host's business, then the RMM has no
+> business interfering with the GIC programming.
+
+The RMM receives the guest's GIC state in a field within the REC entry
+structure (enter.gicv3_hcr). The RMM spec states that the above is the
+list of fields that will be considered and that everything else must be
+0[1]. So this is used to filter the configuration to make sure it's
+valid for the RMM.
+
+In terms of TALL0/TALL1/TC bits: these control trapping to EL2, and when
+in a realm guest the RMM is EL2 - so it's up to the RMM to configure
+these bits appropriately as it is the RMM which will have to deal with
+the trap.
+
+[1] RWVGFJ in the 1.0 spec from
+https://developer.arm.com/documentation/den0137/latest
+
+>> +
+>> +struct rec_enter {
+>> +	union { /* 0x000 */
+>> +		u64 flags;
+>> +		u8 padding0[0x200];
+>> +	};
+>> +	union { /* 0x200 */
+>> +		u64 gprs[REC_RUN_GPRS];
+>> +		u8 padding1[0x100];
+>> +	};
+>> +	union { /* 0x300 */
+>> +		struct {
+>> +			u64 gicv3_hcr;
+>> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+>> +		};
+>> +		u8 padding2[0x100];
+>> +	};
+>> +	u8 padding3[0x400];
+>> +};
+>> +
+>> +#define RMI_EXIT_SYNC			0x00
+>> +#define RMI_EXIT_IRQ			0x01
+>> +#define RMI_EXIT_FIQ			0x02
+>> +#define RMI_EXIT_PSCI			0x03
+>> +#define RMI_EXIT_RIPAS_CHANGE		0x04
+>> +#define RMI_EXIT_HOST_CALL		0x05
+>> +#define RMI_EXIT_SERROR			0x06
+>> +
+>> +struct rec_exit {
+>> +	union { /* 0x000 */
+>> +		u8 exit_reason;
+>> +		u8 padding0[0x100];
+>> +	};
+>> +	union { /* 0x100 */
+>> +		struct {
+>> +			u64 esr;
+>> +			u64 far;
+>> +			u64 hpfar;
+>> +		};
+>> +		u8 padding1[0x100];
+>> +	};
+>> +	union { /* 0x200 */
+>> +		u64 gprs[REC_RUN_GPRS];
+>> +		u8 padding2[0x100];
+>> +	};
+>> +	union { /* 0x300 */
+>> +		struct {
+>> +			u64 gicv3_hcr;
+>> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+>> +			u64 gicv3_misr;
 > 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v9:
->  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
->    this is an 8-bit type with padding afterwards (rather than a u64).
-> Changes since v8:
->  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
->    permits to be modified.
-> Changes since v6:
->  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
->    these are flag values.
-> Changes since v5:
->  * Sorted the SMC #defines by value.
->  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
->    RMI calls.
->  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
->    number of available list registers could be lower.
->  * Provided a define for the reserved fields of FeatureRegister0.
->  * Fix inconsistent names for padding fields.
-> Changes since v4:
->  * Update to point to final released RMM spec.
->  * Minor rearrangements.
-> Changes since v3:
->  * Update to match RMM spec v1.0-rel0-rc1.
-> Changes since v2:
->  * Fix specification link.
->  * Rename rec_entry->rec_enter to match spec.
->  * Fix size of pmu_ovf_status to match spec.
-> ---
->  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
->  1 file changed, 269 insertions(+)
->  create mode 100644 arch/arm64/include/asm/rmi_smc.h
-> 
-> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-> new file mode 100644
-> index 000000000000..1000368f1bca
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rmi_smc.h
+> Why do we care about ICH_MISR_EL2? Surely we get everything in the
+> registers themselves, right? I think this goes back to my question
+> above: why is the RMM getting in the way of ICH_*_EL2 accesses?
 
-[...]
-
-> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
-> +					 ICH_HCR_EL2_LRENPIE |		\
-> +					 ICH_HCR_EL2_NPIE |		\
-> +					 ICH_HCR_EL2_VGrp0EIE |		\
-> +					 ICH_HCR_EL2_VGrp0DIE |		\
-> +					 ICH_HCR_EL2_VGrp1EIE |		\
-> +					 ICH_HCR_EL2_VGrp1DIE |		\
-> +					 ICH_HCR_EL2_TDIR)
-
-Why should KVM care about what bits the RMM wants to use? Also, why
-should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
-interrupt delivery is the host's business, then the RMM has no
-business interfering with the GIC programming.
-
-> +
-> +struct rec_enter {
-> +	union { /* 0x000 */
-> +		u64 flags;
-> +		u8 padding0[0x200];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		struct {
-> +			u64 gicv3_hcr;
-> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
-> +		};
-> +		u8 padding2[0x100];
-> +	};
-> +	u8 padding3[0x400];
-> +};
-> +
-> +#define RMI_EXIT_SYNC			0x00
-> +#define RMI_EXIT_IRQ			0x01
-> +#define RMI_EXIT_FIQ			0x02
-> +#define RMI_EXIT_PSCI			0x03
-> +#define RMI_EXIT_RIPAS_CHANGE		0x04
-> +#define RMI_EXIT_HOST_CALL		0x05
-> +#define RMI_EXIT_SERROR			0x06
-> +
-> +struct rec_exit {
-> +	union { /* 0x000 */
-> +		u8 exit_reason;
-> +		u8 padding0[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		struct {
-> +			u64 esr;
-> +			u64 far;
-> +			u64 hpfar;
-> +		};
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		struct {
-> +			u64 gicv3_hcr;
-> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
-> +			u64 gicv3_misr;
-
-Why do we care about ICH_MISR_EL2? Surely we get everything in the
-registers themselves, right? I think this goes back to my question
-above: why is the RMM getting in the way of ICH_*_EL2 accesses?
-
-> +			u64 gicv3_vmcr;
-> +		};
+As mentioned above, the state of the guest's GIC isn't passed through
+the CPU's registers, but instead using the rec_enter/rec_exit
+structures. So unlike a normal guest entry we don't set all the CPU's
+register state before entering, but instead hand over a shared data
+structure and the RMM is responsible for actually programming the
+registers on the CPU. Since many of the registers are (deliberately)
+unavailable to the host (e.g. all the GPRs) it makes some sense the RMM
+also handles the GIC registers save/restore.
 
 Thanks,
+Steve
 
-	M.
+>> +			u64 gicv3_vmcr;
+>> +		};
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
--- 
-Without deviation from the norm, progress is not possible.
