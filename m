@@ -1,87 +1,168 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3111547E7
-	for <kvmarm@lists.linux.dev>; Wed,  1 Oct 2025 02:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64960226165
+	for <kvmarm@lists.linux.dev>; Wed,  1 Oct 2025 07:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759287231; cv=none; b=bcGeTMnDGooxqzQGF9vUzgOKLig66IAi33bAFq5l7e71ZG8p8mnP3IOs7bJLtcTitzwBneP659rJUGEzxnCddUIpA79nB7sPCVNIh6kSZ8XGS0u766dycG6RRF/GZplPjzVw4dcySn0haVTUt6/n0CyLLKetB1L+6faU0YO8PQQ=
+	t=1759303392; cv=none; b=iqchfXF5IjKRHuROXi7CPGW+T3e9Zl82PJ54XC6uIllklh78t6Aqpf3RVW8kuDDgE9q4lZih87s/i4OpEx2bAVALD5JHlW2A25GmHHv97ITnnBHvYrnN8cch9lcankPJX3oBf7/0BGPniN9ScdPg8ngiXNAtpNg6lWXAJlTo3Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759287231; c=relaxed/simple;
-	bh=KzThYHZ5eYcdF8LJVbDojnPU19X+AhFyKI8FAJPoTrs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GbtkSx13pEtLp976lP/Chz6TmU4CLp7k9HhwllVT6d2KzfRW3aqW9ila4+MGqBZ9tTrlBWabjj3S0U4aq57x+8SUnOqD01uL9mCgrBX8xRDFY4qUEMhfw3Rkm21tng+UIhOMN5LnZP5HC5Q4nqk1EDrEgNgDz9vF3Xjm16Gy1wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i/s5jkHr; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1759303392; c=relaxed/simple;
+	bh=UfXu+QTDzaOVLLUaPTAIak1Yvw3illXn2S/PL5K7QtU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s+D0NLhRrxmbM9FrO2IHQlT+olqIlgXELJNZV3iR8btgT9qqaLL1iMj8PShvexZM5Z0epetK9rpboiPBdTLJSetZtNnlS2cBJkxExE+2n6n19SmvTZAXEdXzsEoP5oR7QuzU4MTP6PlLv2XuFDrCpmrR/IcFC8SPcf07Oe5a8KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nhkWbNCk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i/s5jkHr"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759287226;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=vDxUkFE6RsCFHlrGYN+iMQpt+iwaOr4BU0dAo2nVaY0=;
-	b=i/s5jkHrVLRon1PmpztO67zgXqTkByBTxs1I0TymkQtmZwItm4apmkMGQefxG/6wIf5cIT
-	NsJm4EqzEtnOWDcd8F169g833Ymq9hR2MIzZxD6Zjw4c+wAT65yOBBG7KlvMhHx/oMP2g1
-	3elhv0jfyeBLFwoWMeMH2LIOBCVvXqE=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2] KVM: arm64: Document vCPU event ioctls as requiring init'ed vCPU
-Date: Tue, 30 Sep 2025 16:36:20 -0700
-Message-Id: <20250930233620.124607-1-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nhkWbNCk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BC0C4CEF4;
+	Wed,  1 Oct 2025 07:23:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759303391;
+	bh=UfXu+QTDzaOVLLUaPTAIak1Yvw3illXn2S/PL5K7QtU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nhkWbNCk7jx86Ir4oMOxxi4gy+gc7y4UeX6PNtInoxoDCvEp2gEOToFqIA8/oiTdi
+	 y1Bwe9VvABqy7Elyc+pF3HSsXZDnujhEa2CdVy3T1XUihFJHP3BS7zxrIZ5oMry7y3
+	 1X1bZJtVfoZZ723nvbxS7PvVjWap4u9egG6cLJ7gE8vXv3L6IeaTYd7TrwrGnGoRPy
+	 RxYM+LcPjGpEy30arpfbFHRJ/74vq5t34Zl8DHt+NmPpyxl5UJOkxCR/tmON3JLbni
+	 PvcTaWkA0nX7JTgYRPQSOfeHpy+kHi1H/cDHjokqBWvGRpEE82y1A8NZDew5MK7EaW
+	 j8TYEqfhgbjvg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v3rB7-0000000Aix6-2O3Z;
+	Wed, 01 Oct 2025 07:23:09 +0000
+Date: Wed, 01 Oct 2025 08:23:09 +0100
+Message-ID: <86seg3ytk2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Dmytro Terletskyi
+	<Dmytro_Terletskyi@epam.com>, kvmarm <kvmarm@lists.linux.dev>
+Subject: Re: KVM: Nested VGIC emulation leads to infinite IRQ exceptions
+In-Reply-To: <87bjmrprvq.fsf@epam.com>
+References: <87bjmrprvq.fsf@epam.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Volodymyr_Babchuk@epam.com, linux-arm-kernel@lists.infradead.org, Dmytro_Terletskyi@epam.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-KVM rejects calls to KVM_{GET,SET}_VCPU_EVENTS for an uninitialized vCPU
-as of commit cc96679f3c03 ("KVM: arm64: Prevent access to vCPU events
-before init"). Update the corresponding API documentation.
+Please use the kvmarm mailing list for KVM related discussions (added
+for your convenience).
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
+On Tue, 30 Sep 2025 22:11:54 +0100,
+Volodymyr Babchuk <Volodymyr_Babchuk@epam.com> wrote:
+> 
+> 
+> Hi all,
+> 
+> We are trying to run Xen as KVM nested hypervisor (again!) and we have
+> encountered strange issue with GIC nested emulation. I am certain that
+> we'll dig to the root cause, but probably someone on the ML will save us
+> a couple of days of debugging by providing with some insights.
+> 
+> So, setup is following: QEMU 9.2 is running Xen 4.20 with KVM (latest
+> Linux master branch) as accelerator.
 
-v1 -> v2:
- - I can't read.
+9.2 is an odd choice, specially as it doesn't have any NV support.
+ISTR that 10.1 is the first version to have some NV support, although
+without E2H0 enablement which I expect Xen requires.
 
- Documentation/virt/kvm/api.rst | 5 +++++
- 1 file changed, 5 insertions(+)
+Anyway, if you're already running something, then I expect you're
+patched QEMU to death to get there.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 6aa40ee05a4a..15235a465879 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1229,6 +1229,9 @@ It is not possible to read back a pending external abort (injected via
- KVM_SET_VCPU_EVENTS or otherwise) because such an exception is always delivered
- directly to the virtual CPU).
- 
-+Calling this ioctl on a vCPU that hasn't been initialized will return
-+-ENOEXEC.
-+
- ::
- 
-   struct kvm_vcpu_events {
-@@ -1309,6 +1312,8 @@ exceptions by manipulating individual registers using the KVM_SET_ONE_REG API.
- 
- See KVM_GET_VCPU_EVENTS for the data structure.
- 
-+Calling this ioctl on a vCPU that hasn't been initialized will return
-+-ENOEXEC.
- 
- 4.33 KVM_GET_DEBUGREGS
- ----------------------
+> QEMU provides a couple of virtio
+> devices to the VM and some of these device are passed thought to DomU
+> (we had to hook these devices to vSMMU, but this is another
+> story). Sometimes we observe the following sequence of events:
+> 
+> 1. DomU gets IRQ from a virtio device
+> 2. DomU acknowledges the IRQ by reading IAR1 register
+> 3. DomU is unable to deactivate the IRQ (there is no write to the
+>    EOI register)
+> 
+> We are not sure why this happens, but our current theory is that DomU's
+> vvcpu0 is interrupted during handling of the IRQ by Xen's timer
+> interrupt. Also, we are not able to catch this specific moment in KVM
+> trace because of lots of lost events. Anyways, after this we are seeing
+> the following loop:
+> 
+> 4. vCPU switches to Xen via IRQ Exception
+> 5. Xen reads IAR1 to get IRQ nr, but gets 1023 (aka no IRQs)
+> 6. Xen issues ERET to return back to guest
+> 7. GOTO 4.
 
-base-commit: 10fd0285305d0b48e8a3bf15d4f17fc4f3d68cb6
+What is the configuration of ICH_HCR_EL2 in Xen at the point of
+reading IAR? My hunch is that you are taking a maintenance interrupt,
+disable the virtual CPU interface on taking that interrupt, which of
+course results in no interrupt to acknowledge.
+
+Reading ICH_MISR_EL2 at the point of entering Xen should give you a
+clue of the reason why this is happening -- assuming my hunch is
+correct.
+
+> This basically renders the whole vCPU stuck. Also we noticed that DomU's
+> vvCPU is stuck right after accessing virtio mmio register. So looks like
+> this is what happens:
+> 
+> 1. QEMU sends virtio IRQ to the VM
+> 2. Xen handles the IRQ and injects it into DomU
+> 3. DomU tries to handle it and accesses a virtio mmio register
+> 4. This produces a memory fault that leads to switch back to KVM (and
+> then to QEMU of course) so QEMU can handle MMIO access
+> 5. When QEMU continues vCPU thread, it immediately gets switched back to
+> vEL2 (probably due to timer IRQ, but this is my speculation)
+> 6. the vCPU is spinning in the aforementioned loop
+> 
+> Looks like this happens because of empty LRs, but we still didn't
+> confirmed this because the issue is not 100% reproducible. I'll be glad
+> to hear any suggestions.
+
+I don't think this is likely. If the guest hasn't done an EOI, then
+the interrupt should still be in the LR in the context of DomU, with
+at least an Active state. You want to try and look at what Xen sees
+there.
+
+> This is a part of the KVM trace, where you can see that vCPU in question
+> tries to perform ERET to Linux in DomU but is being brought back to
+> vEL2. In this particular case this is vCPU1 / vvCPU0. I filtered out
+> other vCPUs to reduce clutter.
+> 
+>  qemu-system-aar-41290   [000] d.... 12023.695620: kvm_entry: PC: 0x00000a0000267c80
+>  qemu-system-aar-41290   [000] d.... 12023.695620: vgic_update_irq_pending: VCPU: 1, IRQ 25, level: 0
+>  qemu-system-aar-41290   [000] d.... 12023.695621: kvm_get_timer_map: VCPU: 1, dv: 2, dp: 3, ev: 1, ep: 0
+>  qemu-system-aar-41290   [000] d.... 12023.695621: kvm_timer_emulate: arch_timer_ctx_index: 1 (should_fire: 1)
+>  qemu-system-aar-41290   [000] d.... 12023.695621: kvm_timer_emulate: arch_timer_ctx_index: 0 (should_fire: 0)
+>  qemu-system-aar-41290   [000] ..... 12023.695621: kvm_exit: TRAP: HSR_EC: 0x001a (ERET), PC: 0x00000a00002674e0
+
+[...]
+
+There isn't much to go on here, as we mostly see the timers, which do
+not help at all. I'd suggest you look at the maintenance interrupt,
+and how Xen manipulates ICH_HCR_EL2, but that's the extent of what I
+can do.
+
+To help you further, I'd need a reproducer. I've asked you more than
+once to provide a way to reproduce your setup, but got no answer. The
+Debian package doesn't boot (it just messes up grub), and I don't have
+the time to learn how to deal with Xen from scratch.
+
+Until then, you'll have to apply some debugging by yourself.
+
+Thanks,
+
+	M.
+
 -- 
-2.39.5
-
+Without deviation from the norm, progress is not possible.
