@@ -1,156 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1A9270553;
-	Wed,  1 Oct 2025 08:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E702D59EF;
+	Wed,  1 Oct 2025 08:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759308266; cv=none; b=g2IBWtWeiewscKiYYxpXa1xIt8R+gbZ8cPapvQUJCTES4oNbelqwkdjfA8u7t/1wEdmQYMW6wrX9E37iTx9wBnAsRZ0XzFkBsDZ/8e4uHPBJak5yOHOge+DGS+2vunUipQObWLegs4zUfsPwphfRRxbNKcUplv3akPhxX2yzij4=
+	t=1759308927; cv=none; b=ahWi03vC06/lNsW+CgMzRH7h76PZeA9fgbRI7YkGagGslEVrD1uMvyyb18iIF0b7nyJNaCXJWoqERRy0dJb9NTLUNHgwlx/0B72NgBX7j9VFwW2r05XL+LYXl3Fz0CpvtYiAZQugsR8z1bfgx6hqzBAc+DuS3CUkmlg4YOLZX94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759308266; c=relaxed/simple;
-	bh=OITbHtBiKQulBfkyYae+4T6+4pYA0XrXm6IhiHjoxnw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pu96krDoJR/Vrpaf6WpBcF3eeXfmuJ1olEu8VL3N9hO7jX0dSaoYgNbXZbqjgfHd/hQegg7WG9ZOcZxCW6VSbgdkvo6GcIfc1slgoFxwC0Arns9ssuwtOzpg0kn+HYOeC/ZLR9yGtSPrVfBpinkSk8rLY8ksi6ycTMgm4aZQHXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Plqo/NgC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759308927; c=relaxed/simple;
+	bh=p8W6QHVJ850QiSHTlZrw/v+EW9y4/nqCmdTPGPlBhPs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jJj87qnlz4CSL6Bh/AHYe2wAbxDRYI3W1ZQ+SjRSO3g6SHqLSxlmF2EuQIkL9Lucq7YDOZh5c9chlbwmvAtt7vu/Dbd12mcb/KnB1mvUw4v8i7Gi4WRlVRHtQN0G0uqrHS8g1x1RTGEA6ybZzed75LXmFG8ICDa2/Lu9xLs+nPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PNrTXExD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Plqo/NgC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71C1AC4CEF4;
-	Wed,  1 Oct 2025 08:44:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PNrTXExD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6034FC4CEF4;
+	Wed,  1 Oct 2025 08:55:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759308265;
-	bh=OITbHtBiKQulBfkyYae+4T6+4pYA0XrXm6IhiHjoxnw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Plqo/NgC3CS3b/cef7CYFgq3oEFShqUTYQrA7AQxkoGnGvb2uG1WVNI7AgBiSt58V
-	 LjpMQ6S+4rxbvcEMeHFmv8Teg1jsTGO82+31mRAhfpoBxhFc5BOqSuIUobj+goVLr9
-	 YAkJalMWxd7ck/Ncyh0thM049zf/w5iOSRdY8rIbNpUqjTmK5K3IMeAkr3tceEOd7U
-	 KcenwMIdFMgXAPrf9UbWTwg11GjzpYwGFwF2OH+09WyUrCZX7KqmQnN+6VOHW1JktR
-	 BcSuEYIx9znSuONefevTRqPPjAYhf2H/ExldrlIuC+sqq/J+QjT64z37AkiP8RU8Xn
-	 IMbpdXklAQp9Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1759308926;
+	bh=p8W6QHVJ850QiSHTlZrw/v+EW9y4/nqCmdTPGPlBhPs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=PNrTXExDV5EC+PTr3jh7KC3iuQCZ+ikvIn7Gtf83cpUo2wAKTnhLFLRtMpmqi2OfE
+	 8ESPh7CzdTfGeTdJxJoa1dEPAQF22wY50jMtkc3B1FyK2RsK0Hdea8rWlW3+RDFUQe
+	 X+hSHyewtwAw59GAxH4ml5dg6FhWHGG2UXaI8HpiVigiv5xX+PPnshsps7wT44kLUy
+	 PXZg1Y6/4wujopJ1Bv7N7T5bntMT627qZboyevwaGvHvfNwyT3hAFAuGydaxiqRy7y
+	 0okdB1lj39KYtk09FpOrCTR6xQoaUlEIFo9n5EU9lYdV9QRBUZ+Vd3XaX8BmFwNMkr
+	 IYFxzZXNmNLlQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3sRj-0000000AkPc-0VsO;
-	Wed, 01 Oct 2025 08:44:23 +0000
-Date: Wed, 01 Oct 2025 09:44:22 +0100
-Message-ID: <86qzvnypsp.wl-maz@kernel.org>
+	id 1v3scO-0000000Akat-0Fhm;
+	Wed, 01 Oct 2025 08:55:24 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	borntraeger@linux.ibm.com,
-	frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com,
-	anup@brainfault.org,
-	atish.patra@linux.dev,
-	zhaotianrui@loongson.cn,
-	maobibo@loongson.cn,
-	chenhuacai@kernel.org,
-	oliver.upton@linux.dev,
-	ajones@ventanamicro.com
-Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM selftests runner
-In-Reply-To: <20250930163635.4035866-10-vipinsh@google.com>
-References: <20250930163635.4035866-1-vipinsh@google.com>
-	<20250930163635.4035866-10-vipinsh@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] KVM: selftests: Fix irqfd_test for non-x86 architectures
+Date: Wed,  1 Oct 2025 09:55:13 +0100
+Message-ID: <175930891339.3590343.14549026164847245253.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250930193301.119859-1-oliver.upton@linux.dev>
+References: <20250930193301.119859-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vipinsh@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, seanjc@google.com, pbonzini@redhat.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, pbonzini@redhat.com, sebott@redhat.com, naresh.kamboju@linaro.org, seanjc@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 30 Sep 2025 17:36:35 +0100,
-Vipin Sharma <vipinsh@google.com> wrote:
+On Tue, 30 Sep 2025 12:33:02 -0700, Oliver Upton wrote:
+> The KVM_IRQFD ioctl fails if no irqchip is present in-kernel, which
+> isn't too surprising as there's not much KVM can do for an IRQ if it
+> cannot resolve a destination.
 > 
-> Add README.rst for KVM selftest runner and explain how to use the
-> runner.
+> As written the irqfd_test assumes that a 'default' VM created in
+> selftests has an in-kernel irqchip created implicitly. That may be the
+> case on x86 but it isn't necessarily true on other architectures.
 > 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |  1 +
->  tools/testing/selftests/kvm/runner/README.rst | 54 +++++++++++++++++++
->  2 files changed, 55 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/runner/README.rst
-> 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 548d435bde2f..83aa2fe01bac 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -4,6 +4,7 @@
->  !*.c
->  !*.h
->  !*.py
-> +!*.rst
->  !*.S
->  !*.sh
->  !*.test
-> diff --git a/tools/testing/selftests/kvm/runner/README.rst b/tools/testing/selftests/kvm/runner/README.rst
-> new file mode 100644
-> index 000000000000..83b071c0a0e6
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/runner/README.rst
-> @@ -0,0 +1,54 @@
-> +KVM Selftest Runner
-> +===================
-> +
-> +KVM selftest runner is highly configurable test executor that allows to run
-> +tests with different configurations (not just the default), parallely, save
+> [...]
 
-s/parallely/in parallel/
+Applied to fixes, thanks!
 
-> +output to disk hierarchically, control what gets printed on console, provide
-> +execution status.
-> +
-> +To generate default tests use::
-> +
-> +  # make tests_install
-> +
-> +This will create ``testcases_default_gen`` directory which will have testcases
+[1/1] KVM: selftests: Fix irqfd_test for non-x86 architectures
+      commit: 3ba969c9415f56c7cc20e9693cb4b5364840b668
 
-I don't think using the future tense is correct here. I'd rather see
-something written in the present tense, possibly imperative. For
-example:
-
-"Create 'blah' directory containing 'foo' files, one per test-case.
-
-> +in `default.test` files. Each KVM selftest will have a directory in  which
-> +`default.test` file will be created with executable path relative to KVM
-> +selftest root directory i.e. `/tools/testing/selftests/kvm`.
-
-Shouldn't this honor the existing build output directives? If it
-actually does, then you want to call this out.
-
-> For example, the
-> +`dirty_log_perf_test` will have::
-> +
-> +  # cat testcase_default_gen/dirty_log_perf_test/default.test
-> +  dirty_log_perf_test
-> +
-> +Runner will execute `dirty_log_perf_test`. Testcases files can also provide
-> +extra arguments to the test::
-> +
-> +  # cat tests/dirty_log_perf_test/2slot_5vcpu_10iter.test
-> +  dirty_log_perf_test -x 2 -v 5 -i 10
-> +
-> +In this case runner will execute the `dirty_log_perf_test` with the options.
-> +
-
-The beginning of the text talks about "non-default' configurations,
-but you only seem to talk about the default stuff. How does one deals
-with a non-default config?
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
