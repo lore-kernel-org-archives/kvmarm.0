@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483043019CB;
-	Wed,  1 Oct 2025 14:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F0825A2DA;
+	Wed,  1 Oct 2025 14:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759327512; cv=none; b=sN0aQFPks6+I+jTiGvBhSTPpp5NEVSJYHUltrvqL9hHxrm2XTn7tmCrNKSKpQdB9rmRQGmun5GIeS42f8kr0SuTLSetyygocUsdcuOh5t73/7DaK/+Z0x1/OvJwI/G+MyQ2vImj/z4c6d/Uoj3ivDb90pPIb95ElWNHyoalz8Bo=
+	t=1759329863; cv=none; b=gLUtMbJvGyk5I8ILVrxADk4eDBmyx1ZPjWMtL9wD0+ZnYOylw5W1p+MrbT8hjw/FOe9k1sEGW4OPndIFoZJf/0xM94N2r5QQxD0kcHlOmuyPsa5DbUDfhooSaCd2dYaXLhndITn3O8Vig0rx9OvSuX4H7RVdQxKNAZRgNJ2UclM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759327512; c=relaxed/simple;
-	bh=oWFIvq6oE4Bis32InxYXskecssaW5/5hnuHe3y+UwFk=;
+	s=arc-20240116; t=1759329863; c=relaxed/simple;
+	bh=1Lcqc85C00iYU4HRastdvLjqrHRP5c0EmvdBfz/P9i8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L7yuCaNNQ0CcX9MM5e28lO7YOzsWV10r6D3Nn0WFivb3cgMygE5d0nOk2XZuzCUScSCeE78+avD64xIeaPlpiyQN2wgaDYKLTuR/2Y3ROY7DXL3wPWJMNMqyxpgBcjOuTT61a96zr/jpTOtG9KPXNuSkYIy0mX1JLW0K+45WRbk=
+	 In-Reply-To:Content-Type; b=kgKi4kP2Hc79m5UL1M3esDOpMOe35HUpCERMoFahywGkSylozxpFN2uOs6x2wJFojy2WKM0LtR8KTqsp3vY1MxKxzv5fcEG/G7wOYkjpjhLFWR+6heOyJkjgL9QRZ4X4sdDxq3aUiI0o3Hzwr+Jn7MH3NCs4DxErwzS1rhdkupo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23D3816F2;
-	Wed,  1 Oct 2025 07:05:01 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E54A16F2;
+	Wed,  1 Oct 2025 07:44:13 -0700 (PDT)
 Received: from [10.57.0.204] (unknown [10.57.0.204])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 771943F66E;
-	Wed,  1 Oct 2025 07:05:04 -0700 (PDT)
-Message-ID: <990a62ee-c7a7-4cdf-9e0a-efc7908a1f2e@arm.com>
-Date: Wed, 1 Oct 2025 15:05:02 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20E6F3F66E;
+	Wed,  1 Oct 2025 07:44:14 -0700 (PDT)
+Message-ID: <47a7bc06-9d44-42f8-88df-f6db3bc997bc@arm.com>
+Date: Wed, 1 Oct 2025 15:44:11 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the
- RMM
+Subject: Re: [PATCH v10 06/43] arm64: RME: Define the user ABI
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
@@ -45,177 +44,250 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>
 References: <20250820145606.180644-1-steven.price@arm.com>
- <20250820145606.180644-4-steven.price@arm.com> <86o6qrym2b.wl-maz@kernel.org>
- <747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com> <86ldluzvdb.wl-maz@kernel.org>
+ <20250820145606.180644-7-steven.price@arm.com> <86jz1eztz4.wl-maz@kernel.org>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <86ldluzvdb.wl-maz@kernel.org>
+In-Reply-To: <86jz1eztz4.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 01/10/2025 12:58, Marc Zyngier wrote:
-> On Wed, 01 Oct 2025 12:00:14 +0100,
+On 01/10/2025 13:28, Marc Zyngier wrote:
+> On Wed, 20 Aug 2025 15:55:26 +0100,
 > Steven Price <steven.price@arm.com> wrote:
 >>
->> Hi Marc,
+>> There is one (multiplexed) CAP which can be used to create, populate and
+>> then activate the realm.
 >>
->> On 01/10/2025 11:05, Marc Zyngier wrote:
->>> On Wed, 20 Aug 2025 15:55:23 +0100,
->>> Steven Price <steven.price@arm.com> wrote:
->>>>
->>>> The RMM (Realm Management Monitor) provides functionality that can be
->>>> accessed by SMC calls from the host.
->>>>
->>>> The SMC definitions are based on DEN0137[1] version 1.0-rel0
->>>>
->>>> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
->>>>
->>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
->>>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>> ---
->>>> Changes since v9:
->>>>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
->>>>    this is an 8-bit type with padding afterwards (rather than a u64).
->>>> Changes since v8:
->>>>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
->>>>    permits to be modified.
->>>> Changes since v6:
->>>>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
->>>>    these are flag values.
->>>> Changes since v5:
->>>>  * Sorted the SMC #defines by value.
->>>>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
->>>>    RMI calls.
->>>>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
->>>>    number of available list registers could be lower.
->>>>  * Provided a define for the reserved fields of FeatureRegister0.
->>>>  * Fix inconsistent names for padding fields.
->>>> Changes since v4:
->>>>  * Update to point to final released RMM spec.
->>>>  * Minor rearrangements.
->>>> Changes since v3:
->>>>  * Update to match RMM spec v1.0-rel0-rc1.
->>>> Changes since v2:
->>>>  * Fix specification link.
->>>>  * Rename rec_entry->rec_enter to match spec.
->>>>  * Fix size of pmu_ovf_status to match spec.
->>>> ---
->>>>  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
->>>>  1 file changed, 269 insertions(+)
->>>>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
->>>>
->>>> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
->>>> new file mode 100644
->>>> index 000000000000..1000368f1bca
->>>> --- /dev/null
->>>> +++ b/arch/arm64/include/asm/rmi_smc.h
->>>
->>> [...]
->>>
->>>> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
->>>> +					 ICH_HCR_EL2_LRENPIE |		\
->>>> +					 ICH_HCR_EL2_NPIE |		\
->>>> +					 ICH_HCR_EL2_VGrp0EIE |		\
->>>> +					 ICH_HCR_EL2_VGrp0DIE |		\
->>>> +					 ICH_HCR_EL2_VGrp1EIE |		\
->>>> +					 ICH_HCR_EL2_VGrp1DIE |		\
->>>> +					 ICH_HCR_EL2_TDIR)
->>>
->>> Why should KVM care about what bits the RMM wants to use? Also, why
->>> should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
->>> interrupt delivery is the host's business, then the RMM has no
->>> business interfering with the GIC programming.
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>> Changes since v9:
+>>  * Improvements to documentation.
+>>  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+>> Changes since v8:
+>>  * Minor improvements to documentation following review.
+>>  * Bump the magic numbers to avoid conflicts.
+>> Changes since v7:
+>>  * Add documentation of new ioctls
+>>  * Bump the magic numbers to avoid conflicts
+>> Changes since v6:
+>>  * Rename some of the symbols to make their usage clearer and avoid
+>>    repetition.
+>> Changes from v5:
+>>  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>>    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+>> ---
+>>  Documentation/virt/kvm/api.rst    | 71 +++++++++++++++++++++++++++++++
+>>  arch/arm64/include/uapi/asm/kvm.h | 49 +++++++++++++++++++++
+>>  include/uapi/linux/kvm.h          | 10 +++++
+>>  3 files changed, 130 insertions(+)
 >>
->> The RMM receives the guest's GIC state in a field within the REC entry
->> structure (enter.gicv3_hcr). The RMM spec states that the above is the
->> list of fields that will be considered and that everything else must be
->> 0[1]. So this is used to filter the configuration to make sure it's
->> valid for the RMM.
->>
->> In terms of TALL0/TALL1/TC bits: these control trapping to EL2, and when
->> in a realm guest the RMM is EL2 - so it's up to the RMM to configure
->> these bits appropriately as it is the RMM which will have to deal with
->> the trap.
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index 6aa40ee05a4a..69c0a9eba6c5 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -3549,6 +3549,11 @@ Possible features:
+>>  	  Depends on KVM_CAP_ARM_EL2_E2H0.
+>>  	  KVM_ARM_VCPU_HAS_EL2 must also be set.
+>>  
+>> +	- KVM_ARM_VCPU_REC: Allocate a REC (Realm Execution Context) for this
+>> +	  VCPU. This must be specified on all VCPUs created in a Realm VM.
+>> +	  Depends on KVM_CAP_ARM_RME.
+>> +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_REC).
+>> +
+>>  4.83 KVM_ARM_PREFERRED_TARGET
+>>  -----------------------------
+>>  
+>> @@ -5122,6 +5127,7 @@ Recognised values for feature:
+>>  
+>>    =====      ===========================================
+>>    arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
+>> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
+>>    =====      ===========================================
+>>  
+>>  Finalizes the configuration of the specified vcpu feature.
+>> @@ -6476,6 +6482,30 @@ the capability to be present.
+>>  
+>>  `flags` must currently be zero.
+>>  
+>> +4.144 KVM_ARM_VCPU_RMM_PSCI_COMPLETE
+>> +------------------------------------
+>> +
+>> +:Capability: KVM_CAP_ARM_RME
+>> +:Architectures: arm64
+>> +:Type: vcpu ioctl
+>> +:Parameters: struct kvm_arm_rmm_psci_complete (in)
+>> +:Returns: 0 if successful, < 0 on error
+>> +
+>> +::
+>> +
+>> +  struct kvm_arm_rmm_psci_complete {
+>> +	__u64 target_mpidr;
+>> +	__u32 psci_status;
+>> +	__u32 padding[3];
+>> +  };
+>> +
+>> +Where PSCI functions are handled by user space, the RMM needs to be informed of
+>> +the target of the operation using `target_mpidr`, along with the status
+>> +(`psci_status`). The RMM v1.0 specification defines two functions that require
+>> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+>> +
+>> +If the kernel is handling PSCI then this is done automatically and the VMM
+>> +doesn't need to call this ioctl.
 > 
-> And I claim this is *wrong*. Again, if the host is in charge of
-> interrupt injection, then the RMM has absolutely no business is
-> deciding what can or cannot be trapped. There is zero information
-> exposed by these traps that the host is not already aware of.
+> Why should userspace involved in this? Why can't this be a
+> notification that the host delivers to the RMM when the vcpu is about
+> to run?
+
+This is only when PSCI is being handled by user space. If the kernel
+(i.e KVM) is handling PSCI then indeed there's no user space involvement.
+
+I'm not sure how we could avoid this when PSCI is being implemented in
+user space. Or am I missing something?
+
+>>  
+>>  .. _kvm_run:
+>>  
+>> @@ -8662,6 +8692,47 @@ This capability indicate to the userspace whether a PFNMAP memory region
+>>  can be safely mapped as cacheable. This relies on the presence of
+>>  force write back (FWB) feature support on the hardware.
+>>  
+>> +7.44 KVM_CAP_ARM_RME
+>> +--------------------
+>> +
+>> +:Architectures: arm64
+>> +:Target: VM
+>> +:Parameters: args[0] provides an action, args[1] points to a structure in
+>> +             memory for the action.
+>> +:Returns: 0 on success, negative value on error
+>> +
+>> +Used to configure and set up the memory for a Realm. The available actions are:
+>> +
+>> +================================= =============================================
+>> + KVM_CAP_ARM_RME_CONFIG_REALM     Takes struct arm_rme_config as args[1] and
+>> +                                  configures realm parameters prior to it being
+>> +                                  created.
+>> +
+>> +                                  Options are ARM_RME_CONFIG_RPV to set the
+>> +                                  "Realm Personalization Value" and
+>> +                                  ARM_RME_CONFIG_HASH_ALGO to set the hash
+>> +                                  algorithm.
+>> +
+>> + KVM_CAP_ARM_RME_CREATE_REALM     Request the RMM to create the realm. The
+>> +                                  realm's configuration parameters must be set
+>> +                                  first.
+>> +
+>> + KVM_CAP_ARM_RME_INIT_RIPAS_REALM Takes struct arm_rme_init_ripas as args[1]
+>> +                                  and sets the RIPAS (Realm IPA State) to
+>> +                                  RIPAS_RAM of a specified area of the realm's
+>> +                                  IPA.
+>> +
+>> + KVM_CAP_ARM_RME_POPULATE_REALM   Takes struct arm_rme_populate_realm as
+>> +                                  args[1] and populates a region of protected
+>> +                                  address space by copying the data from the
+>> +                                  shared alias.
+>> +
+>> + KVM_CAP_ARM_RME_ACTIVATE_REALM   Request the RMM to activate the realm. No
+>> +                                  changes can be made to the Realm's populated
+>> +                                  memory, IPA state, configuration parameters
+>> +                                  or vCPU additions after this step.
+>> +================================= =============================================
+>> +
 > 
->> [1] RWVGFJ in the 1.0 spec from
->> https://developer.arm.com/documentation/den0137/latest
+> These are not capabilities, they are actions that the VMM may perform
+> on a VM. You don't configure a VM using capabilities. You use it to
+> buy into some behaviours, but that's all.
 > 
-> Well, until someone explains what this is protecting against, I
-> consider this as broken.
-
-I'm not sure I understand how you want this to work. Ultimately the
-realm guest entry is a bounce from NS-EL2 to EL3 to R-EL2 to R-EL1/0. So
-the RMM has to have some control over the trapping behaviour for its own
-protection. The current spec means that the RMM does not have to
-implement the trap handlers for TALL0/TALL1/TC and can simply force
-these bits to 0. Allowing the host to enable traps that the RMM isn't
-expecting will obviously end in problems.
-
-If your argument is that because the NS host is emulating the GIC it
-needs to be able to do these traps, then that's something that can be
-fed back to the spec and hopefully improved. In that case the trap
-information would be provided in the rec_entry structure and on trap the
-RMM would return prepare information in the rec_exit structure. This
-could in theory be handled similar to an emulatable data abort with a
-new exit reason.
-
-The other approach would be to push more GIC handling into the RMM such
-that these trap bits are not needed (i.e. there's no requirement to exit
-to the NS host to handle the trap, and the RMM can program them
-independently). I'm afraid I don't understand the GIC well enough to
-know how these traps are used and how feasible it is for the RMM to just
-"do the right thing" here.
-
->>>> +	union { /* 0x300 */
->>>> +		struct {
->>>> +			u64 gicv3_hcr;
->>>> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
->>>> +			u64 gicv3_misr;
->>>
->>> Why do we care about ICH_MISR_EL2? Surely we get everything in the
->>> registers themselves, right? I think this goes back to my question
->>> above: why is the RMM getting in the way of ICH_*_EL2 accesses?
->>
->> As mentioned above, the state of the guest's GIC isn't passed through
->> the CPU's registers, but instead using the rec_enter/rec_exit
->> structures. So unlike a normal guest entry we don't set all the CPU's
->> register state before entering, but instead hand over a shared data
->> structure and the RMM is responsible for actually programming the
->> registers on the CPU. Since many of the registers are (deliberately)
->> unavailable to the host (e.g. all the GPRs) it makes some sense the RMM
->> also handles the GIC registers save/restore.
+> And then there is the semantic of this stuff. Why do I need something
+> like KVM_CAP_ARM_RME_CREATE_REALM when I can just pass this as part of
+> the VM type? Why do I need a new way to describe memory region when we
+> already have memslots for that exact purpose?
 > 
-> And I claim this is nonsense. There is nothing in these registers that
-> the host doesn't need to know about, which is why they are basically
-> copied over.
+> Overall, you are leaking the RMM interface into userspace, and that's
+> an absolute show-stopper. We have an API, it is not pretty, but it
+> exists. We don't need another one that will be just as broken. If the
+> RMM needs some impedance matching, that's the kernel's job.
 
-Well it's fairly obvious that the host (generally) doesn't need to know
-the general purpose registers. And it's fairly clear that confidential
-compute would be pretty pointless if the hypervisor leaked those
-registers. So I hope we agree that some architectural registers are
-going to have to be handled differently from a normal guest.
+So I'll admit the (ab)use of capabilities to set up the realm is a bit
+of a hack. I initially did it this way to maintain some compatibility
+with a prototype implementation, but it's taken until v10 for anyone to
+express displeasure with the approach! It would of course be possible to
+implement these are separate ioctls.
 
-The GIC is unusual because it's (partly) emulated by the host. The
-configuration is also complex because during guest entry rather than
-just dropping down to EL1/0 we're actually performing an SMC to EL3 and
-world-switching. So I'm not sure to what extent programming the
-architectural registers in the normal world would work.
+However, it seems we need to pin down the semantics before I do that
+refactoring.
 
-> It all feels just wrong.
+KVM_CAP_ARM_RME_CREATE_REALM
+============================
 
-I think fundamentally the confusing thing is there are two hypervisors
-pretending to be one. Both KVM and the RMM are providing part of the
-role of the hypervisor. It would "feel" neater for the RMM to take on
-more responsibility of the hypervisor role but that leads to more
-complexity in the RMM (whose simplicity is part of the value of CCA) and
-potentially less flexibility because you haven't got the functionality
-of KVM.
+The desire is that you can configure the aspects of the realm piecemeal
+and then later trigger the SMC to the RMM. This avoids the need for a
+big structure (which will grow with new features) containing all the
+configuration. It also allows KVM_CAP_ARM_RME_CONFIG_REALM to validate
+each configuration and provide immediate failure when a configuration
+option is invalid.
+
+Would you prefer ditching KVM_CAP_ARM_RME_CONFIG_REALM and passing a
+structure of all the configuration options to
+KVM_CAP_ARM_RME_CREATE_REALM? It would make identifying what part of an
+invalid configuration is problematic harder. And we'd probably therefore
+need to add a new discovery mechanism to find e.g. which hash algorithms
+are supported.
+
+KVM_CAP_ARM_RME_INIT_RIPAS_REALM
+================================
+
+This is a property that doesn't exist for a normal guest and as such the
+VMM is going to have to do something extra to describe which areas of
+RAM are protected and which are shared. I guess with the recent
+guest_memfd changes it might be possible to pull that from the
+guest_memfd instance(s). But note that it's entirely valid (from the CCA
+perspective) to have both protected and shared regions that are not
+backed at guest start. So setting the RIPAS to RAM (i.e. making an area
+of memory protected) is independent of the guest_memfd backing status.
+
+KVM_CAP_ARM_RME_POPULATE_REALM
+==============================
+
+This ties in with the above. This is effectively doing a data-preserving
+conversion of shared to protected. We need some form of this to set the
+initial data for the guest (boot loader/kernel image etc).
+
+In this patch set this API is a little broken as it requires double
+backing (both a valid VMA in the VMM and allocation in the guest_memfd).
+My expectation was to replace this with a version that simply does an
+in-place data-preserving conversion in guest_memfd. The only drawback is
+that this requires a double memcpy() - KVM would need to copy the data
+to a temporary buffer, and then the RMM would copy it back (after
+dealing with memory encryption setup).
+
+The alternative would be to provide a separate input buffer for
+POPULATE_REALM. That could e.g. be a mmap()ed file, but that moves CCA
+further away from a standard interface.
+
+KVM_CAP_ARM_RME_ACTIVATE_REALM
+==============================
+
+This is easiest to drop - we could just do this step when the VMM first
+tries to start a VCPU. The main benefits are:
+
+ * It makes error reporting more obvious (you can tell the difference
+between the RMM failing the activate and something else preventing a
+VCPU entry).
+
+ * It makes the KVM code slightly clearer because the state transition
+is triggered by an obvious action from the VMM, and there's less
+potential for races.
+
+
+I agree it's a shame that the VMM can't just use the standard KVM
+interface for realm guest setup. But there are some fundamental
+differences between a normal guest and a realm guest. So the VMM will
+need to be enlightened. Feel free to comment on the above if you have
+suggestions on how the above API can be improved.
 
 Thanks,
 Steve
+
