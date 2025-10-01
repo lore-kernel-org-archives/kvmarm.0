@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F0825A2DA;
-	Wed,  1 Oct 2025 14:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309DF259CA0;
+	Wed,  1 Oct 2025 15:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759329863; cv=none; b=gLUtMbJvGyk5I8ILVrxADk4eDBmyx1ZPjWMtL9wD0+ZnYOylw5W1p+MrbT8hjw/FOe9k1sEGW4OPndIFoZJf/0xM94N2r5QQxD0kcHlOmuyPsa5DbUDfhooSaCd2dYaXLhndITn3O8Vig0rx9OvSuX4H7RVdQxKNAZRgNJ2UclM=
+	t=1759331967; cv=none; b=Ap/9RHI7WuL6vSC3XrKnZ/QcdT01NIEnm97ZQYeOP2dguywItVGNddcW3PaB+jP9q124KDvSs9BlxFBe6+RqTwYDSStEQpC/xmDvYzEV2HZD3LX9usBvQhZGWBoEigxYHdEOpNQy0n3s8rB7Wa5YcnOOcCx1H32NKyz6bwxixAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759329863; c=relaxed/simple;
-	bh=1Lcqc85C00iYU4HRastdvLjqrHRP5c0EmvdBfz/P9i8=;
+	s=arc-20240116; t=1759331967; c=relaxed/simple;
+	bh=AuwwvpeSpDso60zCvsa1OUltjVmGQt8y3NeOBslXwNk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kgKi4kP2Hc79m5UL1M3esDOpMOe35HUpCERMoFahywGkSylozxpFN2uOs6x2wJFojy2WKM0LtR8KTqsp3vY1MxKxzv5fcEG/G7wOYkjpjhLFWR+6heOyJkjgL9QRZ4X4sdDxq3aUiI0o3Hzwr+Jn7MH3NCs4DxErwzS1rhdkupo=
+	 In-Reply-To:Content-Type; b=B2KGxWb+XzBfMgU8qx/73YTZvjrs5uTvu8OnokI6hr1FVB7YBCI0txZa9+dtKRHOCReMsGM9gpKs+gmhzOAp6JSK8uFb+oGKqsPU20/g0noL8fSqXjxGg2D9R/ekJFcCvfjFItWDkshXoqbbhVZDgVtrIToVOrlVNZI03WlJbjU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E54A16F2;
-	Wed,  1 Oct 2025 07:44:13 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DB241424;
+	Wed,  1 Oct 2025 08:19:16 -0700 (PDT)
 Received: from [10.57.0.204] (unknown [10.57.0.204])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20E6F3F66E;
-	Wed,  1 Oct 2025 07:44:14 -0700 (PDT)
-Message-ID: <47a7bc06-9d44-42f8-88df-f6db3bc997bc@arm.com>
-Date: Wed, 1 Oct 2025 15:44:11 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C5E213F59E;
+	Wed,  1 Oct 2025 08:19:18 -0700 (PDT)
+Message-ID: <765f8a3e-2bdd-4352-ba89-99ce3dbc6e4c@arm.com>
+Date: Wed, 1 Oct 2025 16:19:16 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,13 +27,14 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 06/43] arm64: RME: Define the user ABI
+Subject: Re: [PATCH v10 08/43] kvm: arm64: Don't expose debug capabilities for
+ realm guests
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
@@ -44,249 +45,36 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>
 References: <20250820145606.180644-1-steven.price@arm.com>
- <20250820145606.180644-7-steven.price@arm.com> <86jz1eztz4.wl-maz@kernel.org>
+ <20250820145606.180644-9-steven.price@arm.com> <86ikgyzrzj.wl-maz@kernel.org>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <86jz1eztz4.wl-maz@kernel.org>
+In-Reply-To: <86ikgyzrzj.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 01/10/2025 13:28, Marc Zyngier wrote:
-> On Wed, 20 Aug 2025 15:55:26 +0100,
+On 01/10/2025 14:11, Marc Zyngier wrote:
+> On Wed, 20 Aug 2025 15:55:28 +0100,
 > Steven Price <steven.price@arm.com> wrote:
 >>
->> There is one (multiplexed) CAP which can be used to create, populate and
->> then activate the realm.
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 >>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->> ---
->> Changes since v9:
->>  * Improvements to documentation.
->>  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
->> Changes since v8:
->>  * Minor improvements to documentation following review.
->>  * Bump the magic numbers to avoid conflicts.
->> Changes since v7:
->>  * Add documentation of new ioctls
->>  * Bump the magic numbers to avoid conflicts
->> Changes since v6:
->>  * Rename some of the symbols to make their usage clearer and avoid
->>    repetition.
->> Changes from v5:
->>  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->>    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
->> ---
->>  Documentation/virt/kvm/api.rst    | 71 +++++++++++++++++++++++++++++++
->>  arch/arm64/include/uapi/asm/kvm.h | 49 +++++++++++++++++++++
->>  include/uapi/linux/kvm.h          | 10 +++++
->>  3 files changed, 130 insertions(+)
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 6aa40ee05a4a..69c0a9eba6c5 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -3549,6 +3549,11 @@ Possible features:
->>  	  Depends on KVM_CAP_ARM_EL2_E2H0.
->>  	  KVM_ARM_VCPU_HAS_EL2 must also be set.
->>  
->> +	- KVM_ARM_VCPU_REC: Allocate a REC (Realm Execution Context) for this
->> +	  VCPU. This must be specified on all VCPUs created in a Realm VM.
->> +	  Depends on KVM_CAP_ARM_RME.
->> +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_REC).
->> +
->>  4.83 KVM_ARM_PREFERRED_TARGET
->>  -----------------------------
->>  
->> @@ -5122,6 +5127,7 @@ Recognised values for feature:
->>  
->>    =====      ===========================================
->>    arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
->> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
->>    =====      ===========================================
->>  
->>  Finalizes the configuration of the specified vcpu feature.
->> @@ -6476,6 +6482,30 @@ the capability to be present.
->>  
->>  `flags` must currently be zero.
->>  
->> +4.144 KVM_ARM_VCPU_RMM_PSCI_COMPLETE
->> +------------------------------------
->> +
->> +:Capability: KVM_CAP_ARM_RME
->> +:Architectures: arm64
->> +:Type: vcpu ioctl
->> +:Parameters: struct kvm_arm_rmm_psci_complete (in)
->> +:Returns: 0 if successful, < 0 on error
->> +
->> +::
->> +
->> +  struct kvm_arm_rmm_psci_complete {
->> +	__u64 target_mpidr;
->> +	__u32 psci_status;
->> +	__u32 padding[3];
->> +  };
->> +
->> +Where PSCI functions are handled by user space, the RMM needs to be informed of
->> +the target of the operation using `target_mpidr`, along with the status
->> +(`psci_status`). The RMM v1.0 specification defines two functions that require
->> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
->> +
->> +If the kernel is handling PSCI then this is done automatically and the VMM
->> +doesn't need to call this ioctl.
+>> RMM v1.0 provides no mechanism for the host to perform debug operations
+>> on the guest. So don't expose KVM_CAP_SET_GUEST_DEBUG and report 0
+>> breakpoints and 0 watch points.
 > 
-> Why should userspace involved in this? Why can't this be a
-> notification that the host delivers to the RMM when the vcpu is about
-> to run?
+> What is the guest seeing for the same things?
 
-This is only when PSCI is being handled by user space. If the kernel
-(i.e KVM) is handling PSCI then indeed there's no user space involvement.
+The number of breakpoints/watchpoints is configured using the usual
+architectural register ID_AA64DFR0_EL1. So the VMM can configure the
+guest as it pleases to be able to debug itself.
 
-I'm not sure how we could avoid this when PSCI is being implemented in
-user space. Or am I missing something?
+Obviously CCA is about the host not seeing into the guest so debugging
+the guest is generally not permitted.
 
->>  
->>  .. _kvm_run:
->>  
->> @@ -8662,6 +8692,47 @@ This capability indicate to the userspace whether a PFNMAP memory region
->>  can be safely mapped as cacheable. This relies on the presence of
->>  force write back (FWB) feature support on the hardware.
->>  
->> +7.44 KVM_CAP_ARM_RME
->> +--------------------
->> +
->> +:Architectures: arm64
->> +:Target: VM
->> +:Parameters: args[0] provides an action, args[1] points to a structure in
->> +             memory for the action.
->> +:Returns: 0 on success, negative value on error
->> +
->> +Used to configure and set up the memory for a Realm. The available actions are:
->> +
->> +================================= =============================================
->> + KVM_CAP_ARM_RME_CONFIG_REALM     Takes struct arm_rme_config as args[1] and
->> +                                  configures realm parameters prior to it being
->> +                                  created.
->> +
->> +                                  Options are ARM_RME_CONFIG_RPV to set the
->> +                                  "Realm Personalization Value" and
->> +                                  ARM_RME_CONFIG_HASH_ALGO to set the hash
->> +                                  algorithm.
->> +
->> + KVM_CAP_ARM_RME_CREATE_REALM     Request the RMM to create the realm. The
->> +                                  realm's configuration parameters must be set
->> +                                  first.
->> +
->> + KVM_CAP_ARM_RME_INIT_RIPAS_REALM Takes struct arm_rme_init_ripas as args[1]
->> +                                  and sets the RIPAS (Realm IPA State) to
->> +                                  RIPAS_RAM of a specified area of the realm's
->> +                                  IPA.
->> +
->> + KVM_CAP_ARM_RME_POPULATE_REALM   Takes struct arm_rme_populate_realm as
->> +                                  args[1] and populates a region of protected
->> +                                  address space by copying the data from the
->> +                                  shared alias.
->> +
->> + KVM_CAP_ARM_RME_ACTIVATE_REALM   Request the RMM to activate the realm. No
->> +                                  changes can be made to the Realm's populated
->> +                                  memory, IPA state, configuration parameters
->> +                                  or vCPU additions after this step.
->> +================================= =============================================
->> +
-> 
-> These are not capabilities, they are actions that the VMM may perform
-> on a VM. You don't configure a VM using capabilities. You use it to
-> buy into some behaviours, but that's all.
-> 
-> And then there is the semantic of this stuff. Why do I need something
-> like KVM_CAP_ARM_RME_CREATE_REALM when I can just pass this as part of
-> the VM type? Why do I need a new way to describe memory region when we
-> already have memslots for that exact purpose?
-> 
-> Overall, you are leaking the RMM interface into userspace, and that's
-> an absolute show-stopper. We have an API, it is not pretty, but it
-> exists. We don't need another one that will be just as broken. If the
-> RMM needs some impedance matching, that's the kernel's job.
-
-So I'll admit the (ab)use of capabilities to set up the realm is a bit
-of a hack. I initially did it this way to maintain some compatibility
-with a prototype implementation, but it's taken until v10 for anyone to
-express displeasure with the approach! It would of course be possible to
-implement these are separate ioctls.
-
-However, it seems we need to pin down the semantics before I do that
-refactoring.
-
-KVM_CAP_ARM_RME_CREATE_REALM
-============================
-
-The desire is that you can configure the aspects of the realm piecemeal
-and then later trigger the SMC to the RMM. This avoids the need for a
-big structure (which will grow with new features) containing all the
-configuration. It also allows KVM_CAP_ARM_RME_CONFIG_REALM to validate
-each configuration and provide immediate failure when a configuration
-option is invalid.
-
-Would you prefer ditching KVM_CAP_ARM_RME_CONFIG_REALM and passing a
-structure of all the configuration options to
-KVM_CAP_ARM_RME_CREATE_REALM? It would make identifying what part of an
-invalid configuration is problematic harder. And we'd probably therefore
-need to add a new discovery mechanism to find e.g. which hash algorithms
-are supported.
-
-KVM_CAP_ARM_RME_INIT_RIPAS_REALM
-================================
-
-This is a property that doesn't exist for a normal guest and as such the
-VMM is going to have to do something extra to describe which areas of
-RAM are protected and which are shared. I guess with the recent
-guest_memfd changes it might be possible to pull that from the
-guest_memfd instance(s). But note that it's entirely valid (from the CCA
-perspective) to have both protected and shared regions that are not
-backed at guest start. So setting the RIPAS to RAM (i.e. making an area
-of memory protected) is independent of the guest_memfd backing status.
-
-KVM_CAP_ARM_RME_POPULATE_REALM
-==============================
-
-This ties in with the above. This is effectively doing a data-preserving
-conversion of shared to protected. We need some form of this to set the
-initial data for the guest (boot loader/kernel image etc).
-
-In this patch set this API is a little broken as it requires double
-backing (both a valid VMA in the VMM and allocation in the guest_memfd).
-My expectation was to replace this with a version that simply does an
-in-place data-preserving conversion in guest_memfd. The only drawback is
-that this requires a double memcpy() - KVM would need to copy the data
-to a temporary buffer, and then the RMM would copy it back (after
-dealing with memory encryption setup).
-
-The alternative would be to provide a separate input buffer for
-POPULATE_REALM. That could e.g. be a mmap()ed file, but that moves CCA
-further away from a standard interface.
-
-KVM_CAP_ARM_RME_ACTIVATE_REALM
-==============================
-
-This is easiest to drop - we could just do this step when the VMM first
-tries to start a VCPU. The main benefits are:
-
- * It makes error reporting more obvious (you can tell the difference
-between the RMM failing the activate and something else preventing a
-VCPU entry).
-
- * It makes the KVM code slightly clearer because the state transition
-is triggered by an obvious action from the VMM, and there's less
-potential for races.
-
-
-I agree it's a shame that the VMM can't just use the standard KVM
-interface for realm guest setup. But there are some fundamental
-differences between a normal guest and a realm guest. So the VMM will
-need to be enlightened. Feel free to comment on the above if you have
-suggestions on how the above API can be improved.
+RMM v1.1 should provide some mechanisms for the host to debug a realm -
+but this would also change the attestation measurement so needs buy in
+from the guest's attestation flow. I don't think the RMM API for that is
+finalised yet, and I certainly don't have any Linux patches.
 
 Thanks,
 Steve
