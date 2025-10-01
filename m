@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6CF19DF4F;
-	Wed,  1 Oct 2025 11:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288182E611B;
+	Wed,  1 Oct 2025 11:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759316761; cv=none; b=RMb9tDc7h26h/KUyLJJXjJouZOy2kelHE4QGQI1skDdtJKUD9cAiGAYtPUYHRjNkscMONwJjO1qbf0MjjDOq9oWDuA/Bhl4JBAN7J90Nf/LtkvJu2Jzq5BArEuIPICVS+B9KhyQihA/039TKfzyES3LcdEKMXcqV4F6OYnXxfyE=
+	t=1759319924; cv=none; b=fVeQWB7Z1SY4R08gWo6TSpDeYja11FEEWEZXreVWIQYN4NgYYw/GPA6DbH+xWom+SC9mo1mUzsoRjS2HhDfAgTPiVyVvsEWgnthW4f6DM0dYlIeXAzJ10Tr9RW0/MeAkwO5cWx/1Gf+uzjM2PA8YVu+1/23ZkPUap/Bak44GbYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759316761; c=relaxed/simple;
-	bh=BBQTY11uPcvv9rvZ3xpgazdEbhNoa7n1ec1bbV18sIk=;
+	s=arc-20240116; t=1759319924; c=relaxed/simple;
+	bh=q2oyD5KugDIaW6JSBh1QBJ0TUR6MW5UO2WCtAgLmeh8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nXcs2HKpCa//S5WLhyOd150VcAE0N2b8rmjSZWv/Ut5zXB1r3M7ptPhnI4oB6sh7t5BuaC/bjrbPbCQSFI5aItsQkrcwwsffNvqlsnw/V948xEBh6wYqxm9T9GRIPTz3p6HBinA7ew61gI5p7KRk5K0YnURbV/0+1eTZE2CYjTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fO5S/ltQ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=LMIJhE1DmN+XEtQdpKi1cC2VRCm7mOHjK5y329aLWhwBOk5dbAE2KoNVX7clCujy0nitrTO6lGzNW6pgy7UBRhE53hw8DVcgHD3OadtdqbdVdspI6cdgNqwJNr+56SClLrgueTcpX3iDa0RseSLaRers9ZhQbK13/q4KbXfl1FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qZCPm84S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fO5S/ltQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D19A4C4CEF4;
-	Wed,  1 Oct 2025 11:06:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qZCPm84S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABEC3C4CEF4;
+	Wed,  1 Oct 2025 11:58:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759316761;
-	bh=BBQTY11uPcvv9rvZ3xpgazdEbhNoa7n1ec1bbV18sIk=;
+	s=k20201202; t=1759319923;
+	bh=q2oyD5KugDIaW6JSBh1QBJ0TUR6MW5UO2WCtAgLmeh8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fO5S/ltQCfJbMtQ6/ZUyMaSOM6TbHn3SBVMfywlHB9NeL1YHyjF5tLPSpc5XQ3rop
-	 SKku27McJ+bfiTFkcX9LDFyjSeFp6xvQ69OOZaVZmudG5qLL3w0NBWuGB3ckCwm8zl
-	 VRZs3g69e2F6E724KnFiZux7FRE93kcbpsBjRqGjuvuOCNwZ6ZulDA6OJ9Ib1/f6KB
-	 Dz9VsaAE6iNvA0FPInNtD0d/d/SPJcVZLr26kUaUkPr/1V4VMJhKcK+sxlvznxME9Z
-	 ZxhGYbH04e5IMm5WCZ9mNN1K23lVLVU/1kIzyXdBUTCnOIYMZ+JKEJtEz7cCoKEqeh
-	 2mouohLM6mL0Q==
+	b=qZCPm84S00rcJ/5DZZiAQBlbVyFTQO+QHK5ZY/4bD3YhlyN4HVP7XkS2p9o0/WGh3
+	 Fu0nDDQctiP6lxSelsLnadRvYKULsWI1WRhAhmH6CXE1dLQ89MYv9TvbMUz125aMY0
+	 b7MnaqQtvm381/diXi6A8LLLTaUlgQvmOS3WMVGXEudJ5Tjr//6BHC0XKb6J7bBdHg
+	 V1waUBZjdW9YJvCaUhesrG2cMrLgerZcmHlbd6wtZ1SApJXoP+jvecGK65TRwkZ/iq
+	 L2rqLAFdjZC53pMBqGe9hGrOgSBfKJol4kn4Fhtc/G9JstpqBcvX0WfuNp+3Jwww3a
+	 pUBGKgU9Bopng==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3uek-0000000AmO3-29VK;
-	Wed, 01 Oct 2025 11:05:58 +0000
-Date: Wed, 01 Oct 2025 12:05:58 +0100
-Message-ID: <86ms6azxt5.wl-maz@kernel.org>
+	id 1v3vTl-0000000AnCw-1j7p;
+	Wed, 01 Oct 2025 11:58:41 +0000
+Date: Wed, 01 Oct 2025 12:58:40 +0100
+Message-ID: <86ldluzvdb.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org,
@@ -43,7 +43,8 @@ Cc: kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -55,13 +56,16 @@ Cc: kvm@vger.kernel.org,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	"Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v10 05/43] arm64: RME: Check for RME support at KVM init
-In-Reply-To: <20250820145606.180644-6-steven.price@arm.com>
+Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the RMM
+In-Reply-To: <747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com>
 References: <20250820145606.180644-1-steven.price@arm.com>
-	<20250820145606.180644-6-steven.price@arm.com>
+	<20250820145606.180644-4-steven.price@arm.com>
+	<86o6qrym2b.wl-maz@kernel.org>
+	<747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -77,290 +81,125 @@ X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 20 Aug 2025 15:55:25 +0100,
+On Wed, 01 Oct 2025 12:00:14 +0100,
 Steven Price <steven.price@arm.com> wrote:
 > 
-> Query the RMI version number and check if it is a compatible version. A
-> static key is also provided to signal that a supported RMM is available.
+> Hi Marc,
 > 
-> Functions are provided to query if a VM or VCPU is a realm (or rec)
-> which currently will always return false.
+> On 01/10/2025 11:05, Marc Zyngier wrote:
+> > On Wed, 20 Aug 2025 15:55:23 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> The RMM (Realm Management Monitor) provides functionality that can be
+> >> accessed by SMC calls from the host.
+> >>
+> >> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+> >>
+> >> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+> >>
+> >> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> >> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >> Signed-off-by: Steven Price <steven.price@arm.com>
+> >> ---
+> >> Changes since v9:
+> >>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+> >>    this is an 8-bit type with padding afterwards (rather than a u64).
+> >> Changes since v8:
+> >>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+> >>    permits to be modified.
+> >> Changes since v6:
+> >>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+> >>    these are flag values.
+> >> Changes since v5:
+> >>  * Sorted the SMC #defines by value.
+> >>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+> >>    RMI calls.
+> >>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+> >>    number of available list registers could be lower.
+> >>  * Provided a define for the reserved fields of FeatureRegister0.
+> >>  * Fix inconsistent names for padding fields.
+> >> Changes since v4:
+> >>  * Update to point to final released RMM spec.
+> >>  * Minor rearrangements.
+> >> Changes since v3:
+> >>  * Update to match RMM spec v1.0-rel0-rc1.
+> >> Changes since v2:
+> >>  * Fix specification link.
+> >>  * Rename rec_entry->rec_enter to match spec.
+> >>  * Fix size of pmu_ovf_status to match spec.
+> >> ---
+> >>  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
+> >>  1 file changed, 269 insertions(+)
+> >>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+> >>
+> >> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> >> new file mode 100644
+> >> index 000000000000..1000368f1bca
+> >> --- /dev/null
+> >> +++ b/arch/arm64/include/asm/rmi_smc.h
+> > 
+> > [...]
+> > 
+> >> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+> >> +					 ICH_HCR_EL2_LRENPIE |		\
+> >> +					 ICH_HCR_EL2_NPIE |		\
+> >> +					 ICH_HCR_EL2_VGrp0EIE |		\
+> >> +					 ICH_HCR_EL2_VGrp0DIE |		\
+> >> +					 ICH_HCR_EL2_VGrp1EIE |		\
+> >> +					 ICH_HCR_EL2_VGrp1DIE |		\
+> >> +					 ICH_HCR_EL2_TDIR)
+> > 
+> > Why should KVM care about what bits the RMM wants to use? Also, why
+> > should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
+> > interrupt delivery is the host's business, then the RMM has no
+> > business interfering with the GIC programming.
 > 
-> Later patches make use of struct realm and the states as the ioctls
-> interfaces are added to support realm and REC creation and destruction.
+> The RMM receives the guest's GIC state in a field within the REC entry
+> structure (enter.gicv3_hcr). The RMM spec states that the above is the
+> list of fields that will be considered and that everything else must be
+> 0[1]. So this is used to filter the configuration to make sure it's
+> valid for the RMM.
 > 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v8:
->  * No need to guard kvm_init_rme() behind 'in_hyp_mode'.
-> Changes since v6:
->  * Improved message for an unsupported RMI ABI version.
-> Changes since v5:
->  * Reword "unsupported" message from "host supports" to "we want" to
->    clarify that 'we' are the 'host'.
-> Changes since v2:
->  * Drop return value from kvm_init_rme(), it was always 0.
->  * Rely on the RMM return value to identify whether the RSI ABI is
->    compatible.
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->  arch/arm64/include/asm/kvm_host.h    |  4 ++
->  arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->  arch/arm64/include/asm/virt.h        |  1 +
->  arch/arm64/kvm/Makefile              |  2 +-
->  arch/arm64/kvm/arm.c                 |  5 +++
->  arch/arm64/kvm/rme.c                 | 56 ++++++++++++++++++++++++++++
->  7 files changed, 141 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/include/asm/kvm_rme.h
->  create mode 100644 arch/arm64/kvm/rme.c
+> In terms of TALL0/TALL1/TC bits: these control trapping to EL2, and when
+> in a realm guest the RMM is EL2 - so it's up to the RMM to configure
+> these bits appropriately as it is the RMM which will have to deal with
+> the trap.
+
+And I claim this is *wrong*. Again, if the host is in charge of
+interrupt injection, then the RMM has absolutely no business is
+deciding what can or cannot be trapped. There is zero information
+exposed by these traps that the host is not already aware of.
+
+> [1] RWVGFJ in the 1.0 spec from
+> https://developer.arm.com/documentation/den0137/latest
+
+Well, until someone explains what this is protecting against, I
+consider this as broken.
+
+> >> +	union { /* 0x300 */
+> >> +		struct {
+> >> +			u64 gicv3_hcr;
+> >> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+> >> +			u64 gicv3_misr;
+> > 
+> > Why do we care about ICH_MISR_EL2? Surely we get everything in the
+> > registers themselves, right? I think this goes back to my question
+> > above: why is the RMM getting in the way of ICH_*_EL2 accesses?
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index fa8a08a1ccd5..ab4093e41c4b 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -674,4 +674,22 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->  			vcpu->arch.hcrx_el2 |= HCRX_EL2_SCTLR2En;
->  	}
->  }
-> +
-> +static inline bool kvm_is_realm(struct kvm *kvm)
-> +{
-> +	if (static_branch_unlikely(&kvm_rme_is_available) && kvm)
+> As mentioned above, the state of the guest's GIC isn't passed through
+> the CPU's registers, but instead using the rec_enter/rec_exit
+> structures. So unlike a normal guest entry we don't set all the CPU's
+> register state before entering, but instead hand over a shared data
+> structure and the RMM is responsible for actually programming the
+> registers on the CPU. Since many of the registers are (deliberately)
+> unavailable to the host (e.g. all the GPRs) it makes some sense the RMM
+> also handles the GIC registers save/restore.
 
-Under what circumstances would you call this with a NULL pointer?
+And I claim this is nonsense. There is nothing in these registers that
+the host doesn't need to know about, which is why they are basically
+copied over.
 
-> +		return kvm->arch.is_realm;
-> +	return false;
-> +}
-> +
-> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
-> +{
-> +	return READ_ONCE(kvm->arch.realm.state);
-> +}
-> +
-> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2f2394cce24e..d1511ce26191 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -27,6 +27,7 @@
->  #include <asm/fpsimd.h>
->  #include <asm/kvm.h>
->  #include <asm/kvm_asm.h>
-> +#include <asm/kvm_rme.h>
->  #include <asm/vncr_mapping.h>
->  
->  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -404,6 +405,9 @@ struct kvm_arch {
->  	 * the associated pKVM instance in the hypervisor.
->  	 */
->  	struct kvm_protected_vm pkvm;
-> +
-> +	bool is_realm;
-> +	struct realm realm;
-
-Given that pkvm and CCA are pretty much exclusive, I don't think we
-need to store both states separately. Make those a union.
-
->  };
->  
->  struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> new file mode 100644
-> index 000000000000..9c8a0b23e0e4
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -0,0 +1,56 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_KVM_RME_H
-> +#define __ASM_KVM_RME_H
-
-None of that is about RME. This is about CCA, which is purely a SW
-construct, and not a CPU architecture feature.
-
-So 's/rme/cca/' everywhere that describe something that is not a
-direct effect of FEAT_RME being implemented on the CPU, but instead
-something that is CCA-specific.
-
-> +
-> +/**
-> + * enum realm_state - State of a Realm
-> + */
-> +enum realm_state {
-> +	/**
-> +	 * @REALM_STATE_NONE:
-> +	 *      Realm has not yet been created. rmi_realm_create() may be
-> +	 *      called to create the realm.
-> +	 */
-> +	REALM_STATE_NONE,
-> +	/**
-> +	 * @REALM_STATE_NEW:
-> +	 *      Realm is under construction, not eligible for execution. Pages
-> +	 *      may be populated with rmi_data_create().
-> +	 */
-> +	REALM_STATE_NEW,
-> +	/**
-> +	 * @REALM_STATE_ACTIVE:
-> +	 *      Realm has been created and is eligible for execution with
-> +	 *      rmi_rec_enter(). Pages may no longer be populated with
-> +	 *      rmi_data_create().
-> +	 */
-> +	REALM_STATE_ACTIVE,
-> +	/**
-> +	 * @REALM_STATE_DYING:
-> +	 *      Realm is in the process of being destroyed or has already been
-> +	 *      destroyed.
-> +	 */
-> +	REALM_STATE_DYING,
-> +	/**
-> +	 * @REALM_STATE_DEAD:
-> +	 *      Realm has been destroyed.
-> +	 */
-> +	REALM_STATE_DEAD
-> +};
-> +
-> +/**
-> + * struct realm - Additional per VM data for a Realm
-> + *
-> + * @state: The lifetime state machine for the realm
-> + */
-> +struct realm {
-> +	enum realm_state state;
-> +};
-> +
-> +void kvm_init_rme(void);
-> +
-> +#endif /* __ASM_KVM_RME_H */
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index aa280f356b96..db73c9bfd8c9 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -82,6 +82,7 @@ void __hyp_reset_vectors(void);
->  bool is_kvm_arm_initialised(void);
->  
->  DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-> +DECLARE_STATIC_KEY_FALSE(kvm_rme_is_available);
-
-Same thing about RME.
-
->  
->  static inline bool is_pkvm_initialized(void)
->  {
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 3ebc0570345c..70fa017831b3 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
->  kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 inject_fault.o va_layout.o handle_exit.o config.o \
->  	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
-> -	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
-> +	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rme.o \
->  	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
->  	 vgic/vgic.o vgic/vgic-init.o \
->  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 888f7c7abf54..76177c56f1ef 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -40,6 +40,7 @@
->  #include <asm/kvm_nested.h>
->  #include <asm/kvm_pkvm.h>
->  #include <asm/kvm_ptrauth.h>
-> +#include <asm/kvm_rme.h>
->  #include <asm/sections.h>
->  
->  #include <kvm/arm_hypercalls.h>
-> @@ -59,6 +60,8 @@ enum kvm_wfx_trap_policy {
->  static enum kvm_wfx_trap_policy kvm_wfi_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
->  static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
->  
-> +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
-> +
->  DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->  
->  DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
-> @@ -2836,6 +2839,8 @@ static __init int kvm_arm_init(void)
->  
->  	in_hyp_mode = is_kernel_in_hyp_mode();
->  
-> +	kvm_init_rme();
-> +
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
->  	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
->  		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> new file mode 100644
-> index 000000000000..67cf2d94cb2d
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -0,0 +1,56 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/rmi_cmds.h>
-> +#include <asm/virt.h>
-> +
-> +static int rmi_check_version(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	unsigned short version_major, version_minor;
-> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-> +						     RMI_ABI_MINOR_VERSION);
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
-
-Shouldn't you first check that RME is actually available, by looking
-at ID_AA64PFR0_EL1.RME?
-
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-> +		return -ENXIO;
-> +
-> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
-> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
-> +
-> +	if (res.a0 != RMI_SUCCESS) {
-> +		unsigned short high_version_major, high_version_minor;
-> +
-> +		high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
-> +		high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
-> +
-> +		kvm_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
-> +			version_major, version_minor,
-> +			high_version_major, high_version_minor,
-> +			RMI_ABI_MAJOR_VERSION,
-> +			RMI_ABI_MINOR_VERSION);
-> +		return -ENXIO;
-> +	}
-> +
-> +	kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
-> +
-> +	return 0;
-> +}
-> +
-> +void kvm_init_rme(void)
-> +{
-> +	if (PAGE_SIZE != SZ_4K)
-> +		/* Only 4k page size on the host is supported */
-> +		return;
-
-Move the comment above the check (same thing below).
+It all feels just wrong.
 
 	M.
 
