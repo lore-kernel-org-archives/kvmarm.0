@@ -1,82 +1,165 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDB82D77F6;
-	Wed,  1 Oct 2025 08:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2592527AC21;
+	Wed,  1 Oct 2025 09:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759308935; cv=none; b=a0e/KCJG7+NbQaVyRug+8A9UFICfpGqPdBDOWeD7SEI9/YN+tFRjMdgfVqy5uUiW+McK6Fmosl1ZK3ZH/e2tGl8gCi3LelcMR/jVlJHxaXfMjTQ8PXg+tVwgzJDvVl+Ff/nmrkTYH6Pyq+YRa5cbLzgLH41YOC+BKQdVQg27CsA=
+	t=1759311450; cv=none; b=JMGvb8rcyZOX07tGzDoZ4ci1ZlfbxxXyxgZy233A8GEZDCUBZBZd/gfIJQxrwskrNLYSwDb+rHUearJ42zbtPHeAi5B/U39IBWGpLQYjbzE+PevhnoFSmDO7CTdH0kgVP6t0sEg6IfqB7e26ONsvTTTOmcbaYSD3HipQY+s5WFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759308935; c=relaxed/simple;
-	bh=wryoM0pYpUXsQEkqU0pa4KCIgDFGqs0LofSC+bJAj3s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ldqx52BZ3yX32W5lwBO77TIYdjJKCCOw+uFi0RU0rcJRiMjiKNjGQhq7sQawUFHbWimGFsfO1lSdIbgDOzJZYYfv+uV2zs1RzscpnNPHXj2jijFwAl7o3ibqEDtmddRvrHD+8dl/P9iB2APW82YE0IUhfW18ZdSonGNQzwGe22Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHL+q6yM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759311450; c=relaxed/simple;
+	bh=yUwz9b/V4agTqssJqQHqviKU+dbCf1nmT12k5bfGpK0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bhrCkl/GitECO7DupYpw3REabba/9DgGmUwQ3rDDIKO+y9asoUVn+P9BV/oo+g3f9DDQoKSsEUvoZEiVVz9i4QuGAo3SWmBVbUTmu8xToOyLN1FOFX85Mnt1F1Lq5G7NsSGpQksC3zsaQE3kCo9kvmky7E1YZYITvx2MSKkuD/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FG97sGvN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHL+q6yM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32D9AC4CEF4;
-	Wed,  1 Oct 2025 08:55:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FG97sGvN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABBD0C4CEF4;
+	Wed,  1 Oct 2025 09:37:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759308935;
-	bh=wryoM0pYpUXsQEkqU0pa4KCIgDFGqs0LofSC+bJAj3s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nHL+q6yMo6fQWn+9jmpefGfwfcwBuA3EavvDxqJRyGNmSUNrffT0gWw456PGlo8Rp
-	 Hk9ZuAla77ahah1RwXA/UjSA/0lztF0IJSicT+PYj9QB+Gn/ROHAKFYdTKMIUoUZY3
-	 cem++1rW7r8ZwzvwHfKq3Hy/6HKcL3NYdX8iCW0jHXtHYS/8D6fSbM1oVtqRuaHNBE
-	 pO3i7uN0Qc1zXvXX7Dp2iNLjAOdo8v0bjzfoNUowwO9ukvPc24VUMToDnEu5qhRD7+
-	 23mdQAunfcxyl3ijnBxoivqQx+2RQL1aMLEkbVz4J84z9fdtHsYIf8G2kHnswEvVu2
-	 a/dLN+1+WfPLQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1759311449;
+	bh=yUwz9b/V4agTqssJqQHqviKU+dbCf1nmT12k5bfGpK0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FG97sGvNZXd8fesXtHKLgUPb5LZbDvRzvKO/kZxorNjvuJaepu3EJLgAQu/M2tRy0
+	 x/k7vWxK55gxum0CaPPhAfVunO3k+XD/tx3/kQ1GCeiW5KlqL0Gg/HnREhKzUYctMg
+	 Z9722ah9pSAWuyjzYJjhhvacQX4yzUR4jnzKpqeZ1QsYc3u4oBNC8yIFKOx1aX6vmN
+	 JA2A70xlzZ2MCpy/NsRP9PgCQJhMKdnBRNzE8jgZwM0exZmmWtMO6MoWm4pjIqU+OH
+	 USijivUwA8lQIG2ubyMJClLLRjZW5B6syXQcdDA4kT2hI6ocAVCarWmONdulrhRM3c
+	 vsr/cjEmvW7HQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3scX-0000000Akaz-0WpK;
-	Wed, 01 Oct 2025 08:55:33 +0000
+	id 1v3tH5-0000000AlAr-2Cby;
+	Wed, 01 Oct 2025 09:37:27 +0000
+Date: Wed, 01 Oct 2025 10:37:26 +0100
+Message-ID: <86plb7ync9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: oliver.upton@linux.dev,
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
 	catalin.marinas@arm.com,
 	will@kernel.org,
-	Osama Abdelkader <osama.abdelkader@gmail.com>
-Cc: linux-arm-kernel@lists.infradead.org,
+	qperret@google.com,
+	sebastianene@google.com,
+	keirf@google.com,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Remove unreachable break after return
-Date: Wed,  1 Oct 2025 09:55:27 +0100
-Message-ID: <175930892727.3590435.8643027286411287206.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250930135621.162050-1-osama.abdelkader@gmail.com>
-References: <20250930135621.162050-1-osama.abdelkader@gmail.com>
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH v2] KVM: arm64: Check range args for pKVM mem transitions
+In-Reply-To: <aNJmA-1ZlikW2Knw@google.com>
+References: <20250919155056.2648137-1-vdonnefort@google.com>
+	<87plbkxcvv.wl-maz@kernel.org>
+	<aNG417MneSKBxyn8@google.com>
+	<aNHcxAJXHeS2T7TH@linux.dev>
+	<aNJmA-1ZlikW2Knw@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, osama.abdelkader@gmail.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, sebastianene@google.com, keirf@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 30 Sep 2025 16:56:21 +0300, Osama Abdelkader wrote:
-> Remove an unnecessary 'break' statement that follows a 'return'
-> in arch/arm64/kvm/at.c. The break is unreachable.
+On Tue, 23 Sep 2025 10:18:59 +0100,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
+> On Mon, Sep 22, 2025 at 04:33:24PM -0700, Oliver Upton wrote:
+> > On Mon, Sep 22, 2025 at 10:00:07PM +0100, Vincent Donnefort wrote:
+> > > On Sun, Sep 21, 2025 at 12:29:08PM +0100, Marc Zyngier wrote:
+> > > > On Fri, 19 Sep 2025 16:50:56 +0100,
+> > > > Vincent Donnefort <vdonnefort@google.com> wrote:
+> > > > > 
+> > > > > There's currently no verification for host issued ranges in most of the
+> > > > > pKVM memory transitions. The subsequent end boundary might therefore be
+> > > > > subject to overflow and could evade the later checks.
+> > > > > 
+> > > > > Close this loophole with an additional check_range_args() check on a per
+> > > > > public function basis.
+> > > > > 
+> > > > > host_unshare_guest transition is already protected via
+> > > > > __check_host_shared_guest(), while assert_host_shared_guest() callers
+> > > > > are already ignoring host checks.
+> > > > > 
+> > > > > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > > > > 
+> > > > > ---
+> > > > > 
+> > > > >  v1 -> v2:
+> > > > >    - Also check for (nr_pages * PAGE_SIZE) overflow. (Quentin)
+> > > > >    - Rename to check_range_args().
+> > > > > 
+> > > > > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > > > > index 8957734d6183..65fcd2148f59 100644
+> > > > > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > > > > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > > > > @@ -712,6 +712,14 @@ static int __guest_check_page_state_range(struct pkvm_hyp_vm *vm, u64 addr,
+> > > > >  	return check_page_state_range(&vm->pgt, addr, size, &d);
+> > > > >  }
+> > > > >  
+> > > > > +static bool check_range_args(u64 start, u64 nr_pages, u64 *size)
+> > > > > +{
+> > > > > +	if (check_mul_overflow(nr_pages, PAGE_SIZE, size))
+> > > > > +		return false;
+> > > > > +
+> > > > > +	return start < (start + *size);
+> > > > 
+> > > > I will echo Oliver's concern on v1: you probably want to convert the
+> > > > boundary check to be inclusive of the end of the range. Otherwise, a
+> > > > range that ends at the top of the 64bit range will be represented as
+> > > > 0, and fail the  check despite being perfectly valid.
+> > > 
+> > > Do you mean allowing something like start == 0xfffffffffffff000 and size ==
+> > > 4096?
+> > 
+> > Yes, this is what I was alluding to on v1.
+> > 
+> > > But I guess that would still put all the following checks using "addr + size" at
+> > > risk. Also, I believe even the code in pgtable.c wouldn't support a such range
+> > > as it is also using a u64 end boundary.
+> > 
+> > I'm not sure I follow. Ranges are pretty commonly expressed as a range
+> > terminated by an exclusive value. This just hasn't been an issue yet as
+> > the page table code is only ever dealing with TTBR0 or VTTBR
+> > translations.
 > 
+> If I do exclude the end boundary, evading checks would be as simple as making
+> sure we overflow the end boundary?
+> 
+> e.g. __pkvm_host_share_guest(phys = 0xfffffffffffff000, size = 4096) 
+> 
+>         check_range_allowed_memory(phys, phys + size) /* nop */
+> 	....
+> 	for_each_hyp_page(page, phys, size) {  /* nop */
+>                ...
+> 	} 
+> 	...
+> 	/* Install a valid mapping to phys */
+> 	kvm_pgtable_stage2_map(&vm->pgt, ipa, size, phys, ...) 
 
-Applied to fixes, thanks!
+Why shouldn't this be as simple as this:
 
-[1/1] KVM: arm64: Remove unreachable break after return
-      commit: 55eeaa24c9ac3a22f9c220500e23ee8b6ddff751
+static bool check_range_args(u64 start, u64 nr_pages, u64 *size)
+{
+	if (check_mul_overflow(nr_pages, PAGE_SIZE, size))
+		return false;
 
-Cheers,
+	return start < (start + *size - 1);
+}
+
+which correctly deals with the boundary issue?
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
