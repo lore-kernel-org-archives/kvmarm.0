@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309DF259CA0;
-	Wed,  1 Oct 2025 15:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2481D88B4;
+	Wed,  1 Oct 2025 15:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759331967; cv=none; b=Ap/9RHI7WuL6vSC3XrKnZ/QcdT01NIEnm97ZQYeOP2dguywItVGNddcW3PaB+jP9q124KDvSs9BlxFBe6+RqTwYDSStEQpC/xmDvYzEV2HZD3LX9usBvQhZGWBoEigxYHdEOpNQy0n3s8rB7Wa5YcnOOcCx1H32NKyz6bwxixAo=
+	t=1759332908; cv=none; b=RzPnRqcOhXrCfKRWMmxlO+mRjIS57+EYBBbnRMETFDk4zrCicK8U6XgeGE2MhjijJl6CxxWsKDn5qleLAqG9kxk3F5Hfu3PYMUrYBXv/jr9/i8XeLMeu8lJ/rw8ipN1hrrtNji7BsvAWFoIEQoz3hv9VuTL/TUckebecNuRbri8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759331967; c=relaxed/simple;
-	bh=AuwwvpeSpDso60zCvsa1OUltjVmGQt8y3NeOBslXwNk=;
+	s=arc-20240116; t=1759332908; c=relaxed/simple;
+	bh=59Mqh0CdSpOWIsPEyEauP63ultt2BPHEwJ6nY4gUEKs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B2KGxWb+XzBfMgU8qx/73YTZvjrs5uTvu8OnokI6hr1FVB7YBCI0txZa9+dtKRHOCReMsGM9gpKs+gmhzOAp6JSK8uFb+oGKqsPU20/g0noL8fSqXjxGg2D9R/ekJFcCvfjFItWDkshXoqbbhVZDgVtrIToVOrlVNZI03WlJbjU=
+	 In-Reply-To:Content-Type; b=q4G98jP0AQ9oBO8vg1f+Gw/YtB9GYBKi6ZH2VEkdyccdFUBEa93AHYdEZQxutLltW6FNvJJty0vBoTxdADvMJoI+Rmw276EYTSPa4TSL1sIxmC2t8BYToLkQapra+xvuZJwPbpCW4owFpvl5iYUhABS/dPtFYHLAY1o7+CzLrmM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DB241424;
-	Wed,  1 Oct 2025 08:19:16 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 608601692;
+	Wed,  1 Oct 2025 08:34:58 -0700 (PDT)
 Received: from [10.57.0.204] (unknown [10.57.0.204])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C5E213F59E;
-	Wed,  1 Oct 2025 08:19:18 -0700 (PDT)
-Message-ID: <765f8a3e-2bdd-4352-ba89-99ce3dbc6e4c@arm.com>
-Date: Wed, 1 Oct 2025 16:19:16 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D1A183F59E;
+	Wed,  1 Oct 2025 08:35:01 -0700 (PDT)
+Message-ID: <99de8b04-7e7d-404b-aab8-5759a1f28c1a@arm.com>
+Date: Wed, 1 Oct 2025 16:34:59 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,14 +27,13 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 08/43] kvm: arm64: Don't expose debug capabilities for
- realm guests
+Subject: Re: [PATCH v10 05/43] arm64: RME: Check for RME support at KVM init
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
@@ -45,36 +44,55 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>
 References: <20250820145606.180644-1-steven.price@arm.com>
- <20250820145606.180644-9-steven.price@arm.com> <86ikgyzrzj.wl-maz@kernel.org>
+ <20250820145606.180644-6-steven.price@arm.com> <86ms6azxt5.wl-maz@kernel.org>
+ <2226e62f-76ca-4467-a8ae-460fd463df0a@arm.com> <86h5wizqvn.wl-maz@kernel.org>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <86ikgyzrzj.wl-maz@kernel.org>
+In-Reply-To: <86h5wizqvn.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 01/10/2025 14:11, Marc Zyngier wrote:
-> On Wed, 20 Aug 2025 15:55:28 +0100,
+On 01/10/2025 14:35, Marc Zyngier wrote:
+> On Wed, 01 Oct 2025 14:20:13 +0100,
 > Steven Price <steven.price@arm.com> wrote:
 >>
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>> +static int rmi_check_version(void)
+>>>> +{
+>>>> +	struct arm_smccc_res res;
+>>>> +	unsigned short version_major, version_minor;
+>>>> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
+>>>> +						     RMI_ABI_MINOR_VERSION);
+>>>> +
+>>>> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
+>>>
+>>> Shouldn't you first check that RME is actually available, by looking
+>>> at ID_AA64PFR0_EL1.RME?
 >>
->> RMM v1.0 provides no mechanism for the host to perform debug operations
->> on the guest. So don't expose KVM_CAP_SET_GUEST_DEBUG and report 0
->> breakpoints and 0 watch points.
+>> Well, you made a good point above that this isn't RME, it's CCA. And I
+>> guess there's a possible world where the CCA interface could be
+>> supported with something other than FEAT_RME (FEAT_RME2 maybe?) so I'm
+>> not sure it necessarily a good idea to pin this on a CPU feature
+>> bit.
 > 
-> What is the guest seeing for the same things?
+> But you cannot have CCA without RME. You cannot have CCA with
+> GICv3. And my point was more that RME could be used by something other
+> than CCA  - I certainly don't anticipate someone else adopting the CCA
+> interface for anything...
+> 
+>> Ultimately what we want to know is whether the firmware thinks it can
+>> supply us with the CCA interface and we don't really care how it
+>> achieves it.
+> 
+> I disagree. You rely on specific feature sets to be available (hell,
+> everything is baked around GICv3... GICv5 anyone?).
+> 
+> For this sort of stuff, you absolutely need to know what you are
+> running on, not what some broken firmware tries to pretend it is.
 
-The number of breakpoints/watchpoints is configured using the usual
-architectural register ID_AA64DFR0_EL1. So the VMM can configure the
-guest as it pleases to be able to debug itself.
-
-Obviously CCA is about the host not seeing into the guest so debugging
-the guest is generally not permitted.
-
-RMM v1.1 should provide some mechanisms for the host to debug a realm -
-but this would also change the attestation measurement so needs buy in
-from the guest's attestation flow. I don't think the RMM API for that is
-finalised yet, and I certainly don't have any Linux patches.
+Well I don't agree, but equally I think the chances of the RMM interface
+existing without RME is nil, so I guess the extra check doesn't really
+matter. So I'll add it. In the (highly) unlikely event that it causes a
+problem then it would be easy enough to remove.
 
 Thanks,
 Steve
