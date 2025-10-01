@@ -1,168 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64960226165
-	for <kvmarm@lists.linux.dev>; Wed,  1 Oct 2025 07:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6FD283686
+	for <kvmarm@lists.linux.dev>; Wed,  1 Oct 2025 08:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759303392; cv=none; b=iqchfXF5IjKRHuROXi7CPGW+T3e9Zl82PJ54XC6uIllklh78t6Aqpf3RVW8kuDDgE9q4lZih87s/i4OpEx2bAVALD5JHlW2A25GmHHv97ITnnBHvYrnN8cch9lcankPJX3oBf7/0BGPniN9ScdPg8ngiXNAtpNg6lWXAJlTo3Bk=
+	t=1759307396; cv=none; b=McrmxOaqPFo9iaJ8RS5KoheCnGFlxBUCpmZAbR3eV1vJHgB/IL8xzpIGAJc5y/Tksuel0Jolu+BsYTSf3yCovSOsSz+//b5YFfZNphixrSNKGKEYIGCU8pytyqNDuh8YNF+EOZC8+Wd6QUQsovdz9163MgVTonwLHHjL/Jr0rP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759303392; c=relaxed/simple;
-	bh=UfXu+QTDzaOVLLUaPTAIak1Yvw3illXn2S/PL5K7QtU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s+D0NLhRrxmbM9FrO2IHQlT+olqIlgXELJNZV3iR8btgT9qqaLL1iMj8PShvexZM5Z0epetK9rpboiPBdTLJSetZtNnlS2cBJkxExE+2n6n19SmvTZAXEdXzsEoP5oR7QuzU4MTP6PlLv2XuFDrCpmrR/IcFC8SPcf07Oe5a8KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nhkWbNCk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759307396; c=relaxed/simple;
+	bh=8d2FeShPt3OFSicjzFUqkohSkj/9t9rRZEI7uyAAgto=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rBYixaY32ojdkKZBpSPb5k60zpHwz4UpRBB1syO8omHbccFQGa9Rleq9HHVN87dQKWtaoZM9MtbBM2IOeTgpfEOJF8dNzCVejpnaH//xr/+6GtQpoHOBYkgo012AXoPjokLC91BblUzLFHE9uuifZ7mifGlCacdI6bNOeXW2w4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nSoBuz0I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nhkWbNCk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BC0C4CEF4;
-	Wed,  1 Oct 2025 07:23:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nSoBuz0I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0B72C4CEF4;
+	Wed,  1 Oct 2025 08:29:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759303391;
-	bh=UfXu+QTDzaOVLLUaPTAIak1Yvw3illXn2S/PL5K7QtU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nhkWbNCk7jx86Ir4oMOxxi4gy+gc7y4UeX6PNtInoxoDCvEp2gEOToFqIA8/oiTdi
-	 y1Bwe9VvABqy7Elyc+pF3HSsXZDnujhEa2CdVy3T1XUihFJHP3BS7zxrIZ5oMry7y3
-	 1X1bZJtVfoZZ723nvbxS7PvVjWap4u9egG6cLJ7gE8vXv3L6IeaTYd7TrwrGnGoRPy
-	 RxYM+LcPjGpEy30arpfbFHRJ/74vq5t34Zl8DHt+NmPpyxl5UJOkxCR/tmON3JLbni
-	 PvcTaWkA0nX7JTgYRPQSOfeHpy+kHi1H/cDHjokqBWvGRpEE82y1A8NZDew5MK7EaW
-	 j8TYEqfhgbjvg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1759307396;
+	bh=8d2FeShPt3OFSicjzFUqkohSkj/9t9rRZEI7uyAAgto=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nSoBuz0I87X08s4l5Vhpo8x3bEz9psISHEiuJlNuE7XNOhan6Jri/EbunnO965RgF
+	 N0IGEnISwiN6pKXLc2q3tSSIP75DyMaj7CulGD8+2+TxXa/wiQvvI6UuItn0/3jrwt
+	 +3nUsCnpJHU19xM8YLOZq/jpHQDReLTz8xnX+T24aNlgWGHIca7oGKfzqKMZHCaOKV
+	 /ktvBcrd+gDW7IV865lQCdXzCYH63KjLg3RUu9gCwr/Hx9d8FM37hdfgjI+lRvhpRl
+	 vaitzsgvD31xPNXGBC7JJGCP7x9ZPV9aTblaxscIefYyCPy0AgDbUR//gAzTRpaFIG
+	 WwzAlyZBt2nJg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3rB7-0000000Aix6-2O3Z;
-	Wed, 01 Oct 2025 07:23:09 +0000
-Date: Wed, 01 Oct 2025 08:23:09 +0100
-Message-ID: <86seg3ytk2.wl-maz@kernel.org>
+	id 1v3sDh-0000000Ak9o-2kUY;
+	Wed, 01 Oct 2025 08:29:53 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Dmytro Terletskyi
-	<Dmytro_Terletskyi@epam.com>, kvmarm <kvmarm@lists.linux.dev>
-Subject: Re: KVM: Nested VGIC emulation leads to infinite IRQ exceptions
-In-Reply-To: <87bjmrprvq.fsf@epam.com>
-References: <87bjmrprvq.fsf@epam.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2] KVM: arm64: Document vCPU event ioctls as requiring init'ed vCPU
+Date: Wed,  1 Oct 2025 09:29:43 +0100
+Message-ID: <175930738368.3589838.15442036213916250539.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250930233620.124607-1-oliver.upton@linux.dev>
+References: <20250930233620.124607-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Volodymyr_Babchuk@epam.com, linux-arm-kernel@lists.infradead.org, Dmytro_Terletskyi@epam.com, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Please use the kvmarm mailing list for KVM related discussions (added
-for your convenience).
-
-On Tue, 30 Sep 2025 22:11:54 +0100,
-Volodymyr Babchuk <Volodymyr_Babchuk@epam.com> wrote:
+On Tue, 30 Sep 2025 16:36:20 -0700, Oliver Upton wrote:
+> KVM rejects calls to KVM_{GET,SET}_VCPU_EVENTS for an uninitialized vCPU
+> as of commit cc96679f3c03 ("KVM: arm64: Prevent access to vCPU events
+> before init"). Update the corresponding API documentation.
 > 
 > 
-> Hi all,
-> 
-> We are trying to run Xen as KVM nested hypervisor (again!) and we have
-> encountered strange issue with GIC nested emulation. I am certain that
-> we'll dig to the root cause, but probably someone on the ML will save us
-> a couple of days of debugging by providing with some insights.
-> 
-> So, setup is following: QEMU 9.2 is running Xen 4.20 with KVM (latest
-> Linux master branch) as accelerator.
 
-9.2 is an odd choice, specially as it doesn't have any NV support.
-ISTR that 10.1 is the first version to have some NV support, although
-without E2H0 enablement which I expect Xen requires.
+Applied to fixes, thanks!
 
-Anyway, if you're already running something, then I expect you're
-patched QEMU to death to get there.
+[1/1] KVM: arm64: Document vCPU event ioctls as requiring init'ed vCPU
+      commit: 7775af6d1cc6f398ceb16abe13d1469065abb1d8
 
-> QEMU provides a couple of virtio
-> devices to the VM and some of these device are passed thought to DomU
-> (we had to hook these devices to vSMMU, but this is another
-> story). Sometimes we observe the following sequence of events:
-> 
-> 1. DomU gets IRQ from a virtio device
-> 2. DomU acknowledges the IRQ by reading IAR1 register
-> 3. DomU is unable to deactivate the IRQ (there is no write to the
->    EOI register)
-> 
-> We are not sure why this happens, but our current theory is that DomU's
-> vvcpu0 is interrupted during handling of the IRQ by Xen's timer
-> interrupt. Also, we are not able to catch this specific moment in KVM
-> trace because of lots of lost events. Anyways, after this we are seeing
-> the following loop:
-> 
-> 4. vCPU switches to Xen via IRQ Exception
-> 5. Xen reads IAR1 to get IRQ nr, but gets 1023 (aka no IRQs)
-> 6. Xen issues ERET to return back to guest
-> 7. GOTO 4.
-
-What is the configuration of ICH_HCR_EL2 in Xen at the point of
-reading IAR? My hunch is that you are taking a maintenance interrupt,
-disable the virtual CPU interface on taking that interrupt, which of
-course results in no interrupt to acknowledge.
-
-Reading ICH_MISR_EL2 at the point of entering Xen should give you a
-clue of the reason why this is happening -- assuming my hunch is
-correct.
-
-> This basically renders the whole vCPU stuck. Also we noticed that DomU's
-> vvCPU is stuck right after accessing virtio mmio register. So looks like
-> this is what happens:
-> 
-> 1. QEMU sends virtio IRQ to the VM
-> 2. Xen handles the IRQ and injects it into DomU
-> 3. DomU tries to handle it and accesses a virtio mmio register
-> 4. This produces a memory fault that leads to switch back to KVM (and
-> then to QEMU of course) so QEMU can handle MMIO access
-> 5. When QEMU continues vCPU thread, it immediately gets switched back to
-> vEL2 (probably due to timer IRQ, but this is my speculation)
-> 6. the vCPU is spinning in the aforementioned loop
-> 
-> Looks like this happens because of empty LRs, but we still didn't
-> confirmed this because the issue is not 100% reproducible. I'll be glad
-> to hear any suggestions.
-
-I don't think this is likely. If the guest hasn't done an EOI, then
-the interrupt should still be in the LR in the context of DomU, with
-at least an Active state. You want to try and look at what Xen sees
-there.
-
-> This is a part of the KVM trace, where you can see that vCPU in question
-> tries to perform ERET to Linux in DomU but is being brought back to
-> vEL2. In this particular case this is vCPU1 / vvCPU0. I filtered out
-> other vCPUs to reduce clutter.
-> 
->  qemu-system-aar-41290   [000] d.... 12023.695620: kvm_entry: PC: 0x00000a0000267c80
->  qemu-system-aar-41290   [000] d.... 12023.695620: vgic_update_irq_pending: VCPU: 1, IRQ 25, level: 0
->  qemu-system-aar-41290   [000] d.... 12023.695621: kvm_get_timer_map: VCPU: 1, dv: 2, dp: 3, ev: 1, ep: 0
->  qemu-system-aar-41290   [000] d.... 12023.695621: kvm_timer_emulate: arch_timer_ctx_index: 1 (should_fire: 1)
->  qemu-system-aar-41290   [000] d.... 12023.695621: kvm_timer_emulate: arch_timer_ctx_index: 0 (should_fire: 0)
->  qemu-system-aar-41290   [000] ..... 12023.695621: kvm_exit: TRAP: HSR_EC: 0x001a (ERET), PC: 0x00000a00002674e0
-
-[...]
-
-There isn't much to go on here, as we mostly see the timers, which do
-not help at all. I'd suggest you look at the maintenance interrupt,
-and how Xen manipulates ICH_HCR_EL2, but that's the extent of what I
-can do.
-
-To help you further, I'd need a reproducer. I've asked you more than
-once to provide a way to reproduce your setup, but got no answer. The
-Debian package doesn't boot (it just messes up grub), and I don't have
-the time to learn how to deal with Xen from scratch.
-
-Until then, you'll have to apply some debugging by yourself.
-
-Thanks,
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
