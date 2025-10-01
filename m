@@ -1,61 +1,67 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2592527AC21;
-	Wed,  1 Oct 2025 09:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93BB46B5;
+	Wed,  1 Oct 2025 10:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759311450; cv=none; b=JMGvb8rcyZOX07tGzDoZ4ci1ZlfbxxXyxgZy233A8GEZDCUBZBZd/gfIJQxrwskrNLYSwDb+rHUearJ42zbtPHeAi5B/U39IBWGpLQYjbzE+PevhnoFSmDO7CTdH0kgVP6t0sEg6IfqB7e26ONsvTTTOmcbaYSD3HipQY+s5WFg=
+	t=1759313105; cv=none; b=rfZ1Z2UlVM7ITQXUCdLZL+9Dkohg1jK8IcrKYagD1oOmNzevBTCNAvcll6lo4gMvnVQTC9oyFBatnMI02vHphMU3MqIsMfA5BDzIbJ7scwu5Ninu9An+o/k63tGqxZ73/NFCfANBGj3mLST7q6b1iHc5LCrY3vChP/AyFd5VQo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759311450; c=relaxed/simple;
-	bh=yUwz9b/V4agTqssJqQHqviKU+dbCf1nmT12k5bfGpK0=;
+	s=arc-20240116; t=1759313105; c=relaxed/simple;
+	bh=GkDZ6NXoxTMf23WDTs15nu962/34sSuHxOTDvtqezTE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bhrCkl/GitECO7DupYpw3REabba/9DgGmUwQ3rDDIKO+y9asoUVn+P9BV/oo+g3f9DDQoKSsEUvoZEiVVz9i4QuGAo3SWmBVbUTmu8xToOyLN1FOFX85Mnt1F1Lq5G7NsSGpQksC3zsaQE3kCo9kvmky7E1YZYITvx2MSKkuD/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FG97sGvN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=VI+qzy7/uhAv7WLb+NK91cHFHz8vi4HRqBdI+V7mdcJONl88nW8syUNMevRLgZKoKBiySiL4OJ48k+Pk0WA0+Zp5/7HVI1XWK5lu+7jl1XlTWpY7L18S0udwFwmuo9jfXWnCw9JKIi8rs9e01NVeB2Mv5So89DIKqCGjlKrQUoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D9qFXftc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FG97sGvN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABBD0C4CEF4;
-	Wed,  1 Oct 2025 09:37:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9qFXftc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42433C116C6;
+	Wed,  1 Oct 2025 10:05:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759311449;
-	bh=yUwz9b/V4agTqssJqQHqviKU+dbCf1nmT12k5bfGpK0=;
+	s=k20201202; t=1759313104;
+	bh=GkDZ6NXoxTMf23WDTs15nu962/34sSuHxOTDvtqezTE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FG97sGvNZXd8fesXtHKLgUPb5LZbDvRzvKO/kZxorNjvuJaepu3EJLgAQu/M2tRy0
-	 x/k7vWxK55gxum0CaPPhAfVunO3k+XD/tx3/kQ1GCeiW5KlqL0Gg/HnREhKzUYctMg
-	 Z9722ah9pSAWuyjzYJjhhvacQX4yzUR4jnzKpqeZ1QsYc3u4oBNC8yIFKOx1aX6vmN
-	 JA2A70xlzZ2MCpy/NsRP9PgCQJhMKdnBRNzE8jgZwM0exZmmWtMO6MoWm4pjIqU+OH
-	 USijivUwA8lQIG2ubyMJClLLRjZW5B6syXQcdDA4kT2hI6ocAVCarWmONdulrhRM3c
-	 vsr/cjEmvW7HQ==
+	b=D9qFXftckYU8UZNcyAyVFAjSHt6W8vXaQM46Df3/j2uJZmSW8m84coZ/j1zjfUidE
+	 n7SNHslwRuxinAykPqkM/8Jn4JIMk7PHcDyVBvkgCsq7P8l9Ep+pwXAB5WHplsnAyH
+	 EDuZT6LJzdg0YRo874RJOeIR2w59HlGEMGs5GPPJkQhwLAJB+iXJTpsPIY5//ku6iP
+	 F6/jlw2yhtO3fXYMdGHMZ4oe03jkFLy80nAk3CiOtY03JyBtgZ/4CvavoQsrxe8HPC
+	 LqwAx0MtS8JVQBQxo84mLov2DbVYEUPIKPpRd2HG4wzsWNa6KRKFz2DH5T3nDCisXL
+	 ZFSFmu0ICqfNQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3tH5-0000000AlAr-2Cby;
-	Wed, 01 Oct 2025 09:37:27 +0000
-Date: Wed, 01 Oct 2025 10:37:26 +0100
-Message-ID: <86plb7ync9.wl-maz@kernel.org>
+	id 1v3thl-0000000AlcY-0RZd;
+	Wed, 01 Oct 2025 10:05:01 +0000
+Date: Wed, 01 Oct 2025 11:05:00 +0100
+Message-ID: <86o6qrym2b.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	qperret@google.com,
-	sebastianene@google.com,
-	keirf@google.com,
-	linux-arm-kernel@lists.infradead.org,
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v2] KVM: arm64: Check range args for pKVM mem transitions
-In-Reply-To: <aNJmA-1ZlikW2Knw@google.com>
-References: <20250919155056.2648137-1-vdonnefort@google.com>
-	<87plbkxcvv.wl-maz@kernel.org>
-	<aNG417MneSKBxyn8@google.com>
-	<aNHcxAJXHeS2T7TH@linux.dev>
-	<aNJmA-1ZlikW2Knw@google.com>
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the RMM
+In-Reply-To: <20250820145606.180644-4-steven.price@arm.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+	<20250820145606.180644-4-steven.price@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,97 +73,136 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, sebastianene@google.com, keirf@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 23 Sep 2025 10:18:59 +0100,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On Wed, 20 Aug 2025 15:55:23 +0100,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> On Mon, Sep 22, 2025 at 04:33:24PM -0700, Oliver Upton wrote:
-> > On Mon, Sep 22, 2025 at 10:00:07PM +0100, Vincent Donnefort wrote:
-> > > On Sun, Sep 21, 2025 at 12:29:08PM +0100, Marc Zyngier wrote:
-> > > > On Fri, 19 Sep 2025 16:50:56 +0100,
-> > > > Vincent Donnefort <vdonnefort@google.com> wrote:
-> > > > > 
-> > > > > There's currently no verification for host issued ranges in most of the
-> > > > > pKVM memory transitions. The subsequent end boundary might therefore be
-> > > > > subject to overflow and could evade the later checks.
-> > > > > 
-> > > > > Close this loophole with an additional check_range_args() check on a per
-> > > > > public function basis.
-> > > > > 
-> > > > > host_unshare_guest transition is already protected via
-> > > > > __check_host_shared_guest(), while assert_host_shared_guest() callers
-> > > > > are already ignoring host checks.
-> > > > > 
-> > > > > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > > > > 
-> > > > > ---
-> > > > > 
-> > > > >  v1 -> v2:
-> > > > >    - Also check for (nr_pages * PAGE_SIZE) overflow. (Quentin)
-> > > > >    - Rename to check_range_args().
-> > > > > 
-> > > > > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > > > index 8957734d6183..65fcd2148f59 100644
-> > > > > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > > > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > > > @@ -712,6 +712,14 @@ static int __guest_check_page_state_range(struct pkvm_hyp_vm *vm, u64 addr,
-> > > > >  	return check_page_state_range(&vm->pgt, addr, size, &d);
-> > > > >  }
-> > > > >  
-> > > > > +static bool check_range_args(u64 start, u64 nr_pages, u64 *size)
-> > > > > +{
-> > > > > +	if (check_mul_overflow(nr_pages, PAGE_SIZE, size))
-> > > > > +		return false;
-> > > > > +
-> > > > > +	return start < (start + *size);
-> > > > 
-> > > > I will echo Oliver's concern on v1: you probably want to convert the
-> > > > boundary check to be inclusive of the end of the range. Otherwise, a
-> > > > range that ends at the top of the 64bit range will be represented as
-> > > > 0, and fail the  check despite being perfectly valid.
-> > > 
-> > > Do you mean allowing something like start == 0xfffffffffffff000 and size ==
-> > > 4096?
-> > 
-> > Yes, this is what I was alluding to on v1.
-> > 
-> > > But I guess that would still put all the following checks using "addr + size" at
-> > > risk. Also, I believe even the code in pgtable.c wouldn't support a such range
-> > > as it is also using a u64 end boundary.
-> > 
-> > I'm not sure I follow. Ranges are pretty commonly expressed as a range
-> > terminated by an exclusive value. This just hasn't been an issue yet as
-> > the page table code is only ever dealing with TTBR0 or VTTBR
-> > translations.
+> The RMM (Realm Management Monitor) provides functionality that can be
+> accessed by SMC calls from the host.
 > 
-> If I do exclude the end boundary, evading checks would be as simple as making
-> sure we overflow the end boundary?
+> The SMC definitions are based on DEN0137[1] version 1.0-rel0
 > 
-> e.g. __pkvm_host_share_guest(phys = 0xfffffffffffff000, size = 4096) 
+> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
 > 
->         check_range_allowed_memory(phys, phys + size) /* nop */
-> 	....
-> 	for_each_hyp_page(page, phys, size) {  /* nop */
->                ...
-> 	} 
-> 	...
-> 	/* Install a valid mapping to phys */
-> 	kvm_pgtable_stage2_map(&vm->pgt, ipa, size, phys, ...) 
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v9:
+>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+>    this is an 8-bit type with padding afterwards (rather than a u64).
+> Changes since v8:
+>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+>    permits to be modified.
+> Changes since v6:
+>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>    these are flag values.
+> Changes since v5:
+>  * Sorted the SMC #defines by value.
+>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>    RMI calls.
+>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>    number of available list registers could be lower.
+>  * Provided a define for the reserved fields of FeatureRegister0.
+>  * Fix inconsistent names for padding fields.
+> Changes since v4:
+>  * Update to point to final released RMM spec.
+>  * Minor rearrangements.
+> Changes since v3:
+>  * Update to match RMM spec v1.0-rel0-rc1.
+> Changes since v2:
+>  * Fix specification link.
+>  * Rename rec_entry->rec_enter to match spec.
+>  * Fix size of pmu_ovf_status to match spec.
+> ---
+>  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
+>  1 file changed, 269 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+> 
+> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> new file mode 100644
+> index 000000000000..1000368f1bca
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rmi_smc.h
 
-Why shouldn't this be as simple as this:
+[...]
 
-static bool check_range_args(u64 start, u64 nr_pages, u64 *size)
-{
-	if (check_mul_overflow(nr_pages, PAGE_SIZE, size))
-		return false;
+> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+> +					 ICH_HCR_EL2_LRENPIE |		\
+> +					 ICH_HCR_EL2_NPIE |		\
+> +					 ICH_HCR_EL2_VGrp0EIE |		\
+> +					 ICH_HCR_EL2_VGrp0DIE |		\
+> +					 ICH_HCR_EL2_VGrp1EIE |		\
+> +					 ICH_HCR_EL2_VGrp1DIE |		\
+> +					 ICH_HCR_EL2_TDIR)
 
-	return start < (start + *size - 1);
-}
+Why should KVM care about what bits the RMM wants to use? Also, why
+should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
+interrupt delivery is the host's business, then the RMM has no
+business interfering with the GIC programming.
 
-which correctly deals with the boundary issue?
+> +
+> +struct rec_enter {
+> +	union { /* 0x000 */
+> +		u64 flags;
+> +		u8 padding0[0x200];
+> +	};
+> +	union { /* 0x200 */
+> +		u64 gprs[REC_RUN_GPRS];
+> +		u8 padding1[0x100];
+> +	};
+> +	union { /* 0x300 */
+> +		struct {
+> +			u64 gicv3_hcr;
+> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+> +		};
+> +		u8 padding2[0x100];
+> +	};
+> +	u8 padding3[0x400];
+> +};
+> +
+> +#define RMI_EXIT_SYNC			0x00
+> +#define RMI_EXIT_IRQ			0x01
+> +#define RMI_EXIT_FIQ			0x02
+> +#define RMI_EXIT_PSCI			0x03
+> +#define RMI_EXIT_RIPAS_CHANGE		0x04
+> +#define RMI_EXIT_HOST_CALL		0x05
+> +#define RMI_EXIT_SERROR			0x06
+> +
+> +struct rec_exit {
+> +	union { /* 0x000 */
+> +		u8 exit_reason;
+> +		u8 padding0[0x100];
+> +	};
+> +	union { /* 0x100 */
+> +		struct {
+> +			u64 esr;
+> +			u64 far;
+> +			u64 hpfar;
+> +		};
+> +		u8 padding1[0x100];
+> +	};
+> +	union { /* 0x200 */
+> +		u64 gprs[REC_RUN_GPRS];
+> +		u8 padding2[0x100];
+> +	};
+> +	union { /* 0x300 */
+> +		struct {
+> +			u64 gicv3_hcr;
+> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+> +			u64 gicv3_misr;
+
+Why do we care about ICH_MISR_EL2? Surely we get everything in the
+registers themselves, right? I think this goes back to my question
+above: why is the RMM getting in the way of ICH_*_EL2 accesses?
+
+> +			u64 gicv3_vmcr;
+> +		};
+
+Thanks,
 
 	M.
 
