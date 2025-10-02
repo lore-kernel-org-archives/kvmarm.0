@@ -1,206 +1,167 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304112D3EC1
-	for <kvmarm@lists.linux.dev>; Wed,  1 Oct 2025 18:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E7F2FE04B;
+	Thu,  2 Oct 2025 08:46:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759342467; cv=none; b=PPLPxNkxol3VH1GLVD4CoodpXvPAUs7opaW1JRAdB+CORXlw1Dev51Wsp3WYlH2rLPYjzKKPfN/GBt5UI0u+hy7RO+Vzva5+3vHdHdE2daYQNmYniEOg3W/Z57QYEEVnK4TPdFUFDCvEJLr4UQmPSgDt/k7p8MJJrFpTqTb7na8=
+	t=1759394798; cv=none; b=UyDHTgv9ru7vocjZ4D79YUxmr6noWloHRJpRRQvFLdwmpyIjlySqubzzNl3S45kyQ8i6eb1PP2ThRe2Qv7sTUN/TfCqZub6oGEDDWxu1jeq5cXG/cnckuonbZq0CnjVWlL3wS9w8uG8eXLNeDa3iqb3p12iRyHRJsqgoVq+JDmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759342467; c=relaxed/simple;
-	bh=F7w6+iS6qdAPIESuSb4CMj9IywBNbDaDryHHYM/oA78=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OE2tMd+XzMDcFQvxw3L/c9WCdsvuXQhbHdkqqdSB5BlJwXl0zHQWs5UH0VBaGMhUkUhPukXClNFoDXrv1VO9H6s1CE0LJtFjgurSG17EZ2gNzzVaZVTeiNgTceMTuQRhbxt7y72T3XNJPacZYP7F9r01KwlIcy/2da5BS18z+HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZBs8J8Ib; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZBs8J8Ib"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ecab3865dso262596a91.1
-        for <kvmarm@lists.linux.dev>; Wed, 01 Oct 2025 11:14:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759342465; x=1759947265; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LOBNzl0piewZaB0fEWYxjiNzOXTgJ+Q2XdYBWxqPDCY=;
-        b=ZBs8J8IbKywLzdqQM5UpVpkE4mtGJ2R5KfsEmRiDAit/PLAmepGMGdXIAkgExZOa36
-         qLuH9nQl0n+mx98FLrfe+5Lvfx5b8S3ZgmajyBG5GlpgT7SWZw//BkaUPunUNIt9yGjq
-         UfwSIhFUAgrTQvh3fcojpGJ6op47t13jLk29HVabHqDXSXic0eCCXpH4nloSivWdlI1/
-         35Ne1+kRIBMunOBkwx4ZigYjT/S3OH/Nw5jhNVGAqz1kLfhN7lyWrXzRQQiTLyuiD4YK
-         PpajQur393ijC0qsMH+zTcjxlBzs6nflfe0bXcL64BhL+sXq4r1eOvXWkTcAHGMPgR4v
-         9j2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759342465; x=1759947265;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LOBNzl0piewZaB0fEWYxjiNzOXTgJ+Q2XdYBWxqPDCY=;
-        b=Lz3p39G6epJwoYaNRcjQ/gw+UE2sGglThF8WiFIvRY56uj8l3ghOeMd4ef5Prtu914
-         wlvjqzUOzvfZ8QQqluOBqO8b2G9ddqTkWMPaHSQsZny2kOUvO6Vjh1KdlcCz9HJ33dOu
-         wSgwNUh45A6eI4mMXUlEWaAygg9tVJeUQaE+y6ALzRv/usgM/fE6C+gEfjbsnkyzE0f3
-         Cfd8SEGref3BEmYI/1xFeHUPggRioIp/eDKn58YHtGr07dOBYobXQ8ZKUhYM/XCCeRus
-         Gz0Z+b0kDCDWyRXv5EHu9Wf1jaGajAeigk849o8TxBR26p+27bhbB4qoOy6VKq87AWsH
-         JRww==
-X-Forwarded-Encrypted: i=1; AJvYcCVSLUcfCIua/H+P4ajY/ljxEsYKr5jSyCjBiqyoH7LlzJehf34aEn0O4eHcMOZESxyv67+XKcc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzd1U51D9tzZIINEByQDt83SFjwsKZ5CZ4V51TGvFOGIupx2Mgd
-	9TcFDOHz3b7AVTAyb6yse/AUEI2F8sIIP2N9Rb4BmwBWjbRFsIESh9eEgcSCoR38/zZjdsYkeAw
-	ao9kSrw==
-X-Google-Smtp-Source: AGHT+IGJbul18z2pAriB4M9Dv7xuCXJyXC/vErDTd2EuWuyjJTHyZFET/F4MY3SeMRgMCYc9TSFDnBqrzsg=
-X-Received: from pjbjs19.prod.google.com ([2002:a17:90b:1493:b0:327:7035:d848])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33cf:b0:32b:8b8d:c2d1
- with SMTP id 98e67ed59e1d1-339a6f076edmr5249061a91.21.1759342465480; Wed, 01
- Oct 2025 11:14:25 -0700 (PDT)
-Date: Wed, 1 Oct 2025 11:14:23 -0700
-In-Reply-To: <f896966e-8925-4b4f-8f0d-f1ae8aa197f7@amd.com>
+	s=arc-20240116; t=1759394798; c=relaxed/simple;
+	bh=6F+DR4WRZKG0j8hQTKo5t/bxdCuQDOz0ydW2ZYJ1qT0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jX5v/9Deqken6Cddu/E3pKtqcYc7OpH82TcV9Od3StsipIN8uX78SM/xvJDKaG/ttyM1aYj3K+/Vxvd770zthMcvTgpC3cMx6dMinWJBicblk1QCmchjNrxWcbx9ys0K2PV30kqYymb2boBkpaOX6DlGmir9abq7tyNeRAepAfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2721C1692;
+	Thu,  2 Oct 2025 01:46:27 -0700 (PDT)
+Received: from [10.1.27.48] (unknown [10.1.27.48])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 584853F66E;
+	Thu,  2 Oct 2025 01:46:31 -0700 (PDT)
+Message-ID: <6d3953f3-14ce-4a58-a018-3636e77dbdf8@arm.com>
+Date: Thu, 2 Oct 2025 09:46:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-33-seanjc@google.com>
- <f896966e-8925-4b4f-8f0d-f1ae8aa197f7@amd.com>
-Message-ID: <aN1vfykNs8Dmv_g0@google.com>
-Subject: Re: [PATCH v5 32/44] KVM: x86/pmu: Disable interception of select PMU
- MSRs for mediated vPMUs
-From: Sean Christopherson <seanjc@google.com>
-To: Sandipan Das <sandidas@amd.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
-	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 06/43] arm64: RME: Define the user ABI
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+ <20250820145606.180644-7-steven.price@arm.com> <86jz1eztz4.wl-maz@kernel.org>
+ <47a7bc06-9d44-42f8-88df-f6db3bc997bc@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <47a7bc06-9d44-42f8-88df-f6db3bc997bc@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 26, 2025, Sandipan Das wrote:
-> On 8/7/2025 1:26 AM, Sean Christopherson wrote:
-> > From: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> > 
-> > For vCPUs with a mediated vPMU, disable interception of counter MSRs for
-> > PMCs that are exposed to the guest, and for GLOBAL_CTRL and related MSRs
-> > if they are fully supported according to the vCPU model, i.e. if the MSRs
-> > and all bits supported by hardware exist from the guest's point of view.
-> > 
-> > Do NOT passthrough event selector or fixed counter control MSRs, so that
-> > KVM can enforce userspace-defined event filters, e.g. to prevent use of
-> > AnyThread events (which is unfortunately a setting in the fixed counter
-> > control MSR).
-> > 
-> > Defer support for nested passthrough of mediated PMU MSRs to the future,
-> > as the logic for nested MSR interception is unfortunately vendor specific.
-
-...
-
-> >  #define MSR_AMD64_LBR_SELECT			0xc000010e
-> > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> > index 4246e1d2cfcc..817ef852bdf9 100644
-> > --- a/arch/x86/kvm/pmu.c
-> > +++ b/arch/x86/kvm/pmu.c
-> > @@ -715,18 +715,14 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
-> >  	return 0;
-> >  }
-> >  
-> > -bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
-> > +bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> >  
-> >  	if (!kvm_vcpu_has_mediated_pmu(vcpu))
-> >  		return true;
-> >  
-> > -	/*
-> > -	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
-> > -	 * in Ring3 when CR4.PCE=0.
-> > -	 */
-> > -	if (enable_vmware_backdoor)
-> > +	if (!kvm_pmu_has_perf_global_ctrl(pmu))
-> >  		return true;
-> >  
-> >  	/*
-> > @@ -735,7 +731,22 @@ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
-> >  	 * capabilities themselves may be a subset of hardware capabilities.
-> >  	 */
-> >  	return pmu->nr_arch_gp_counters != kvm_host_pmu.num_counters_gp ||
-> > -	       pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed ||
-> > +	       pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed;
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_need_perf_global_ctrl_intercept);
-> > +
-> > +bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> > +
-> > +	/*
-> > +	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
-> > +	 * in Ring3 when CR4.PCE=0.
-> > +	 */
-> > +	if (enable_vmware_backdoor)
-> > +		return true;
-> > +
-> > +	return kvm_need_perf_global_ctrl_intercept(vcpu) ||
-> >  	       pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
-> >  	       pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
-> >  }
+On 01/10/2025 15:44, Steven Price wrote:
+> On 01/10/2025 13:28, Marc Zyngier wrote:
+>> On Wed, 20 Aug 2025 15:55:26 +0100,
+>> Steven Price <steven.price@arm.com> wrote:
+>>>
+>>> There is one (multiplexed) CAP which can be used to create, populate and
+>>> then activate the realm.
+>>>
+>>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>> ---
+>>> Changes since v9:
+>>>   * Improvements to documentation.
+>>>   * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+>>> Changes since v8:
+>>>   * Minor improvements to documentation following review.
+>>>   * Bump the magic numbers to avoid conflicts.
+>>> Changes since v7:
+>>>   * Add documentation of new ioctls
+>>>   * Bump the magic numbers to avoid conflicts
+>>> Changes since v6:
+>>>   * Rename some of the symbols to make their usage clearer and avoid
+>>>     repetition.
+>>> Changes from v5:
+>>>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>>>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+>>> ---
+>>>   Documentation/virt/kvm/api.rst    | 71 +++++++++++++++++++++++++++++++
+>>>   arch/arm64/include/uapi/asm/kvm.h | 49 +++++++++++++++++++++
+>>>   include/uapi/linux/kvm.h          | 10 +++++
+>>>   3 files changed, 130 insertions(+)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>>> index 6aa40ee05a4a..69c0a9eba6c5 100644
+>>> --- a/Documentation/virt/kvm/api.rst
+>>> +++ b/Documentation/virt/kvm/api.rst
+>>> @@ -3549,6 +3549,11 @@ Possible features:
+>>>   	  Depends on KVM_CAP_ARM_EL2_E2H0.
+>>>   	  KVM_ARM_VCPU_HAS_EL2 must also be set.
+>>>   
+>>> +	- KVM_ARM_VCPU_REC: Allocate a REC (Realm Execution Context) for this
+>>> +	  VCPU. This must be specified on all VCPUs created in a Realm VM.
+>>> +	  Depends on KVM_CAP_ARM_RME.
+>>> +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_REC).
+>>> +
+>>>   4.83 KVM_ARM_PREFERRED_TARGET
+>>>   -----------------------------
+>>>   
+>>> @@ -5122,6 +5127,7 @@ Recognised values for feature:
+>>>   
+>>>     =====      ===========================================
+>>>     arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
+>>> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
+>>>     =====      ===========================================
+>>>   
+>>>   Finalizes the configuration of the specified vcpu feature.
+>>> @@ -6476,6 +6482,30 @@ the capability to be present.
+>>>   
+>>>   `flags` must currently be zero.
+>>>   
+>>> +4.144 KVM_ARM_VCPU_RMM_PSCI_COMPLETE
+>>> +------------------------------------
+>>> +
+>>> +:Capability: KVM_CAP_ARM_RME
+>>> +:Architectures: arm64
+>>> +:Type: vcpu ioctl
+>>> +:Parameters: struct kvm_arm_rmm_psci_complete (in)
+>>> +:Returns: 0 if successful, < 0 on error
+>>> +
+>>> +::
+>>> +
+>>> +  struct kvm_arm_rmm_psci_complete {
+>>> +	__u64 target_mpidr;
+>>> +	__u32 psci_status;
+>>> +	__u32 padding[3];
+>>> +  };
+>>> +
+>>> +Where PSCI functions are handled by user space, the RMM needs to be informed of
+>>> +the target of the operation using `target_mpidr`, along with the status
+>>> +(`psci_status`). The RMM v1.0 specification defines two functions that require
+>>> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+>>> +
+>>> +If the kernel is handling PSCI then this is done automatically and the VMM
+>>> +doesn't need to call this ioctl.
+>>
+>> Why should userspace involved in this? Why can't this be a
+>> notification that the host delivers to the RMM when the vcpu is about
+>> to run?
 > 
-> There is a case for AMD processors where the global MSRs are absent in the guest
-> but the guest still uses the same number of counters as what is advertised by the
-> host capabilities. So RDPMC interception is not necessary for all cases where
-> global control is unavailable.o
+> This is only when PSCI is being handled by user space. If the kernel
+> (i.e KVM) is handling PSCI then indeed there's no user space involvement.
+> 
+> I'm not sure how we could avoid this when PSCI is being implemented in
+> user space. Or am I missing something?
 
-Hmm, I think Intel would be the same?  Ah, no, because the host will have fixed
-counters, but the guest will not.  However, that's not directly related to
-kvm_pmu_has_perf_global_ctrl(), so I think this would be correct?
+I think there is a bit of disconnect here.
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 4414d070c4f9..4c5b2712ee4c 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -744,16 +744,13 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
-        return 0;
- }
- 
--bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
-+static bool kvm_need_pmc_intercept(struct kvm_vcpu *vcpu)
- {
-        struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 
-        if (!kvm_vcpu_has_mediated_pmu(vcpu))
-                return true;
- 
--       if (!kvm_pmu_has_perf_global_ctrl(pmu))
--               return true;
--
-        /*
-         * Note!  Check *host* PMU capabilities, not KVM's PMU capabilities, as
-         * KVM's capabilities are constrained based on KVM support, i.e. KVM's
-@@ -762,6 +759,13 @@ bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
-        return pmu->nr_arch_gp_counters != kvm_host_pmu.num_counters_gp ||
-               pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed;
- }
-+
-+bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
-+{
-+
-+       return kvm_need_pmc_intercept(vcpu) ||
-+              !kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu));
-+}
- EXPORT_SYMBOL_GPL(kvm_need_perf_global_ctrl_intercept);
- 
- bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
-@@ -775,7 +779,7 @@ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
-        if (enable_vmware_backdoor)
-                return true;
- 
--       return kvm_need_perf_global_ctrl_intercept(vcpu) ||
-+       return kvm_need_pmc_intercept(vcpu) ||
-               pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
-               pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
- }
+The RMM doesn't track the RECs for a given vCPU. So, when it requires
+the REC object for a given vCPU, the Host provides this via an 
+RMI_PSCI_COMPLETE call. This is used for PSCI_CPU_ON and 
+PSCI_AFFINITY_INFO today, where the RMM can do the book keeping
+for the REC and emulate the PSCI. Now, the host does have a control
+on whether to ACCEPT or REJECT a request (for CPU_ON).
+The RMM requires the PSCI_COMPLETE call, before it can return the
+PSCI_CPU_ON back to the caller and also before the target vCPU can
+run. Thus, this cannot be delayed until the "new VCPU" is run.
+
+Like Steven mentioned, this is only useful in the UABI if the VMM is
+handling the PSCI. And this must be issued, before the target vCPU
+can be scheduled.
+
+Suzuki
