@@ -1,157 +1,131 @@
-Received: from fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.132.221])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898502D4B6D
-	for <kvmarm@lists.linux.dev>; Fri,  3 Oct 2025 17:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.132.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3343118B0F;
+	Fri,  3 Oct 2025 18:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759512257; cv=none; b=cDXQ7fnAaPbdnwJWJ7HWtiVkhtqO2pDYVT1cV2QyloNjctIFDVP2d9GrzMDE+EHvI4eDaPej7HvxmpWCShUtqIkwrVnDpA58I80qbEFj8hhMPod2Empj9oRXb/U1B7sH2VZbGcSPQevSEk9uRUN2sZ495zVYUyd35uAVuV7HewI=
+	t=1759516767; cv=none; b=IIJLxLBaJV7wMVD892tzWqR2PNnlvolD8rIHnLQpuymx2q5bk4j0R+nqUsCEG3uU+JAk5fAmAN8ClYj+B4YxN7QRLsKB5qmD17206FfJObNzWilwbCcIaFglzAYy8Ebl6CzzuW4uAqcK0Zz2gSeWN5whR08kDKt62cCsJvOpE2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759512257; c=relaxed/simple;
-	bh=mFfzPBlsrBjZYoYWR5CsI5nmru5owMjyTu2F9V71tbY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RLgvw3Fl5LNVXnK9/PZ/uTYyPls+YRjK9HqBsWGQRzmgvks4JuRyq0C2122Ct9M6xZHki2TODAbb3SFS51W9lFA/jKdx/eewvoMtCAAOIjpH4k3XvcW1C2srTV5yhUj4Omu9tl1V2nAeO+T+fZxE9N+et9q23qzosi6zOeYt64w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=XWGJ23jX; arc=none smtp.client-ip=63.178.132.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1759516767; c=relaxed/simple;
+	bh=X9mbfiVpyjaBvKvtq2HzUowGHUTbwmVHntwpOYm/1Gg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QWaJP6RACtbWfIXYlXTk1RQeY2provEPF0QlC06MTkIW3LMLwArPT9DjycPVsDSdtJJjVkf85Y262LTVk3NENT73R5NlMWus4V3Yt8rvdpo3cZY9/gINxQNWFvlmVqD8r56PluA3rtLSWmVWAL6HHKo16nGfj86Yieeggdf0Jl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vqzg5aJI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="XWGJ23jX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1759512255; x=1791048255;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=eKU8SJ09O6RAdk9rzTuf+EPgBar7M5OPCHBeslmadhA=;
-  b=XWGJ23jXQ294Clb4UrCWio24YqwnWy9dNhMItYDIgCdtEI0ItenpdLtt
-   q/IokEOUkeVX4zxIObAMNBaq3mdxg43FE8frFjgMaR/LbLUKq53uOwx2/
-   MmvWXrgSmcguUoXgZORNcoBv6+px9opCYmSQF15w0ZZsA/GIu/0liIqAw
-   8LDMCSdCRlcxK4RlTR5ZNsFRDBm6H5lUoyqS2vdBErfc+eVBU5LHcYh53
-   YTywHXOiYInO8qTJ5b9qPV/epEHs72ZKuz9SnLxGAPjGIQYD96z9cWyHp
-   kSqVoXMPbH6oaagChelHbnpZANiKFZU9tUVNEzCZxMRomGGMmZqYxdyZA
-   w==;
-X-CSE-ConnectionGUID: /bGeMqI5QHGO7ZeMBtXCHg==
-X-CSE-MsgGUID: d1ZXsYzERHSwet8rfgRFpg==
-X-IronPort-AV: E=Sophos;i="6.18,313,1751241600"; 
-   d="scan'208";a="2975643"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 17:24:05 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:5746]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.33.147:2525] with esmtp (Farcaster)
- id f44c7b7f-75fc-43b3-8033-16cf4d5d0ded; Fri, 3 Oct 2025 17:24:04 +0000 (UTC)
-X-Farcaster-Flow-ID: f44c7b7f-75fc-43b3-8033-16cf4d5d0ded
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Fri, 3 Oct 2025 17:24:04 +0000
-Received: from [192.168.4.149] (10.106.83.12) by EX19D022EUC002.ant.amazon.com
- (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Fri, 3 Oct 2025
- 17:24:02 +0000
-Message-ID: <fc0bb268-07b7-41ef-9a82-791d381f56ac@amazon.com>
-Date: Fri, 3 Oct 2025 18:23:57 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vqzg5aJI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF493C4CEF5;
+	Fri,  3 Oct 2025 18:39:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759516766;
+	bh=X9mbfiVpyjaBvKvtq2HzUowGHUTbwmVHntwpOYm/1Gg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Vqzg5aJIIQKstWacrTpClrbSUuMLXJQvF5dn+/YO6mvOi/qoRJF8UEwl3Km7r0503
+	 WFyjBONDyLy9bWPiztFlUHfWBVLGj2fKsIcTNV4PuayC3pBup3Q5VDOUfZLyja2LkP
+	 qFXuzWvSkxkq/XKREug/3rQEkEygOuCgyc00W58aDW3LUuYttawncbiFBiMH/YqJnE
+	 KfX/oa3KvZNWceuRQdFijYeLaLYH/2QGSmJqHCnmu3oIwidM9FgMyqhLwcF9vVbIIt
+	 7F6zrOvdiloooJIh1ApKIsRBJLVdZZeftwPJJ3KMThuu6On4MWakenIQOcbiXYcCus
+	 2A3YTXH9OG3DA==
+From: Will Deacon <will@kernel.org>
+To: stable@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Kenneth Van Alstyne <kvanals@kvanals.org>
+Subject: [STABLE 5.15.y] [PATCH] KVM: arm64: Fix softirq masking in FPSIMD register saving sequence
+Date: Fri,  3 Oct 2025 19:39:17 +0100
+Message-Id: <20251003183917.4209-1-will@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH 15/34] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	"Oliver Upton" <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
-	"Michael Ellerman" <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
-	"Paul Walmsley" <paul.walmsley@sifive.com>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson
-	<seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
- Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)"
-	<willy@infradead.org>, "Andrew Morton" <akpm@linux-foundation.org>
-CC: <kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-mips@vger.kernel.org>,
-	<linuxppc-dev@lists.ozlabs.org>, <kvm-riscv@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>, Xiaoyao Li
-	<xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>, Chao Peng
-	<chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, Jarkko Sakkinen
-	<jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, David Matlack
-	<dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata
-	<isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?= =?UTF-8?Q?n?=
-	<mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve
-	<vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, "Maciej
- Szmigiero" <mail@maciej.szmigiero.name>, David Hildenbrand
-	<david@redhat.com>, Quentin Perret <qperret@google.com>, Michael Roth
-	<michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, Liam Merwick
-	<liam.merwick@oracle.com>, "Isaku Yamahata" <isaku.yamahata@gmail.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231105163040.14904-1-pbonzini@redhat.com>
- <20231105163040.14904-16-pbonzini@redhat.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <20231105163040.14904-16-pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D013EUA004.ant.amazon.com (10.252.50.48) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+Content-Transfer-Encoding: 8bit
 
+Stable commit 23249dade24e ("KVM: arm64: Fix kernel BUG() due to bad
+backport of FPSIMD/SVE/SME fix") fixed a kernel BUG() caused by a bad
+backport of upstream commit fbc7e61195e2 ("KVM: arm64: Unconditionally
+save+flush host FPSIMD/SVE/SME state") by ensuring that softirqs are
+disabled/enabled across the fpsimd register save operation.
 
+Unfortunately, although this fixes the original issue, it can now lead
+to deadlock when re-enabling softirqs causes pending softirqs to be
+handled with locks already held:
 
-On 05/11/2023 16:30, Paolo Bonzini wrote:
-> From: Sean Christopherson <seanjc@google.com>
-> 
-> Introduce an ioctl(), KVM_CREATE_GUEST_MEMFD, to allow creating file-based
-> memory that is tied to a specific KVM virtual machine and whose primary
-> purpose is to serve guest memory.
+ | BUG: spinlock recursion on CPU#7, CPU 3/KVM/57616
+ |  lock: 0xffff3045ef850240, .magic: dead4ead, .owner: CPU 3/KVM/57616, .owner_cpu: 7
+ | CPU: 7 PID: 57616 Comm: CPU 3/KVM Tainted: G           O       6.1.152 #1
+ | Hardware name: SoftIron SoftIron Platform Mainboard/SoftIron Platform Mainboard, BIOS 1.31 May 11 2023
+ | Call trace:
+ |  dump_backtrace+0xe4/0x110
+ |  show_stack+0x20/0x30
+ |  dump_stack_lvl+0x6c/0x88
+ |  dump_stack+0x18/0x34
+ |  spin_dump+0x98/0xac
+ |  do_raw_spin_lock+0x70/0x128
+ |  _raw_spin_lock+0x18/0x28
+ |  raw_spin_rq_lock_nested+0x18/0x28
+ |  update_blocked_averages+0x70/0x550
+ |  run_rebalance_domains+0x50/0x70
+ |  handle_softirqs+0x198/0x328
+ |  __do_softirq+0x1c/0x28
+ |  ____do_softirq+0x18/0x28
+ |  call_on_irq_stack+0x30/0x48
+ |  do_softirq_own_stack+0x24/0x30
+ |  do_softirq+0x74/0x90
+ |  __local_bh_enable_ip+0x64/0x80
+ |  fpsimd_save_and_flush_cpu_state+0x5c/0x68
+ |  kvm_arch_vcpu_put_fp+0x4c/0x88
+ |  kvm_arch_vcpu_put+0x28/0x88
+ |  kvm_sched_out+0x38/0x58
+ |  __schedule+0x55c/0x6c8
+ |  schedule+0x60/0xa8
 
-...
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index f1a575d39b3b..8f46d757a2c5 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
+Take a tiny step towards the upstream fix in 9b19700e623f ("arm64:
+fpsimd: Drop unneeded 'busy' flag") by additionally disabling hardirqs
+while saving the fpsimd registers.
 
-...
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Lee Jones <lee@kernel.org>
+Cc: Sasha Levin <sashal@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org
+Cc: <stable@vger.kernel.org> # 5.15.y
+Fixes: 23249dade24e ("KVM: arm64: Fix kernel BUG() due to bad backport of FPSIMD/SVE/SME fix")
+Reported-by: Kenneth Van Alstyne <kvanals@kvanals.org>
+Link: https://lore.kernel.org/r/010001999bae0958-4d80d25d-8dda-4006-a6b9-798f3e774f6c-000000@email.amazonses.com
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ arch/arm64/kernel/fpsimd.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-> -static int check_memory_region_flags(const struct kvm_userspace_memory_region2 *mem)
-> +static int check_memory_region_flags(struct kvm *kvm,
-> +				     const struct kvm_userspace_memory_region2 *mem)
->   {
->   	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
->   
-> +	if (kvm_arch_has_private_mem(kvm))
-> +		valid_flags |= KVM_MEM_GUEST_MEMFD;
-> +
-> +	/* Dirty logging private memory is not currently supported. */
-> +	if (mem->flags & KVM_MEM_GUEST_MEMFD)
-> +		valid_flags &= ~KVM_MEM_LOG_DIRTY_PAGES;
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index fc51cdd5aaa7..db1ed940a6dc 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -1300,13 +1300,17 @@ static void fpsimd_flush_cpu_state(void)
+  */
+ void fpsimd_save_and_flush_cpu_state(void)
+ {
++	unsigned long flags;
++
+ 	if (!system_supports_fpsimd())
+ 		return;
+ 	WARN_ON(preemptible());
+-	get_cpu_fpsimd_context();
++	local_irq_save(flags);
++	__get_cpu_fpsimd_context();
+ 	fpsimd_save();
+ 	fpsimd_flush_cpu_state();
+-	put_cpu_fpsimd_context();
++	__put_cpu_fpsimd_context();
++	local_irq_restore(flags);
+ }
+ 
+ #ifdef CONFIG_KERNEL_MODE_NEON
+-- 
+2.51.0.618.g983fd99d29-goog
 
-I was wondering whether this restriction is still required at this stage 
-or can be lifted in cases where the guest memory is accessible by the 
-host.  Specifically, it would be useful to support differential memory 
-snapshots based on dirty page tracking in Firecracker [1] or in live 
-migration.  As an experiment, I removed the check and was able to 
-produce a diff snapshot and restore a Firecracker VM from it.
-
-[1] 
-https://github.com/firecracker-microvm/firecracker/blob/main/docs/snapshotting/snapshot-support.md#creating-diff-snapshots
-
-> +
->   #ifdef __KVM_HAVE_READONLY_MEM
->   	valid_flags |= KVM_MEM_READONLY;
->   #endif
-> @@ -2018,7 +2029,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   	int as_id, id;
->   	int r;
->   
-> -	r = check_memory_region_flags(mem);
-> +	r = check_memory_region_flags(kvm, mem);
->   	if (r)
->   		return r;
