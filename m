@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3343118B0F;
-	Fri,  3 Oct 2025 18:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CBF1F0991;
+	Fri,  3 Oct 2025 18:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759516767; cv=none; b=IIJLxLBaJV7wMVD892tzWqR2PNnlvolD8rIHnLQpuymx2q5bk4j0R+nqUsCEG3uU+JAk5fAmAN8ClYj+B4YxN7QRLsKB5qmD17206FfJObNzWilwbCcIaFglzAYy8Ebl6CzzuW4uAqcK0Zz2gSeWN5whR08kDKt62cCsJvOpE2o=
+	t=1759516828; cv=none; b=TJYaeAsI+C/i+AoM6Wx75Uuh+lrkmUGTuUvm/+tzKzkfjz3kwO1A6+4uiNl+3+mbRLb9Fn5jdrAoibtgxjSddgPEqkgo/eiWXyd9hu5DZ0WnJX0ctbOSlXTzu1+lNUPizHQjVZM4hF03Y904UKSPKNYxPdxwpwV6SJXXvQT+rYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759516767; c=relaxed/simple;
-	bh=X9mbfiVpyjaBvKvtq2HzUowGHUTbwmVHntwpOYm/1Gg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QWaJP6RACtbWfIXYlXTk1RQeY2provEPF0QlC06MTkIW3LMLwArPT9DjycPVsDSdtJJjVkf85Y262LTVk3NENT73R5NlMWus4V3Yt8rvdpo3cZY9/gINxQNWFvlmVqD8r56PluA3rtLSWmVWAL6HHKo16nGfj86Yieeggdf0Jl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vqzg5aJI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759516828; c=relaxed/simple;
+	bh=jmWoLxGdvgZIEzoFN4sKOqTG7UUYTTku1IhoUrAB+lg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jZnZMDTln6PXfkXHasJ0ei3etkXlOk8Dtbkx3wgb0GqbOL4zIlIwgmQM0cq8nze7+8Guq+7eng5NOLBLLZoN2dkq8Z6J9cxPzH54vlDPlamuY5r/pA4UJc5nl48CWndtomI9UA2CQdYiIylhlUunYwtr2410sHjagj9dX9bNk/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FaCmS1ul; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vqzg5aJI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF493C4CEF5;
-	Fri,  3 Oct 2025 18:39:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FaCmS1ul"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59EF3C4CEF5;
+	Fri,  3 Oct 2025 18:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759516766;
-	bh=X9mbfiVpyjaBvKvtq2HzUowGHUTbwmVHntwpOYm/1Gg=;
+	s=k20201202; t=1759516828;
+	bh=jmWoLxGdvgZIEzoFN4sKOqTG7UUYTTku1IhoUrAB+lg=;
 	h=From:To:Cc:Subject:Date:From;
-	b=Vqzg5aJIIQKstWacrTpClrbSUuMLXJQvF5dn+/YO6mvOi/qoRJF8UEwl3Km7r0503
-	 WFyjBONDyLy9bWPiztFlUHfWBVLGj2fKsIcTNV4PuayC3pBup3Q5VDOUfZLyja2LkP
-	 qFXuzWvSkxkq/XKREug/3rQEkEygOuCgyc00W58aDW3LUuYttawncbiFBiMH/YqJnE
-	 KfX/oa3KvZNWceuRQdFijYeLaLYH/2QGSmJqHCnmu3oIwidM9FgMyqhLwcF9vVbIIt
-	 7F6zrOvdiloooJIh1ApKIsRBJLVdZZeftwPJJ3KMThuu6On4MWakenIQOcbiXYcCus
-	 2A3YTXH9OG3DA==
+	b=FaCmS1ullccxRzbFtKoPIFjlfDaHjSHaWcsDrvBfAuJErEzu6hRAwvzA9hgAkQMBf
+	 FhhOy+2PXdyWBhnwSJJfQx+Tq5mKhpOxLykVm5ekERcwEqWLlWRWXJNbFja4Tsf6j/
+	 L2IgX4e0OJgXlOwJ5S90Up/K03IcyQEqe1KJoWsVIQv5t/6KiWdWUesXC3kre/1xas
+	 OkfZ1AiKVVN6BMIWLI5RG1qYqzYbPPhG60RtYVRNz+jyV5yOU/U02+tH0rDKX6o9WM
+	 xgvgT94QMXl/GvDzT7xLPPVTfLvaBFUStgFhmLd7cngsGrtjpeXriJ3/YkbfJouioa
+	 HH7ezdX9gMT7Q==
 From: Will Deacon <will@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -33,10 +33,11 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Lee Jones <lee@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Kenneth Van Alstyne <kvanals@kvanals.org>
-Subject: [STABLE 5.15.y] [PATCH] KVM: arm64: Fix softirq masking in FPSIMD register saving sequence
-Date: Fri,  3 Oct 2025 19:39:17 +0100
-Message-Id: <20251003183917.4209-1-will@kernel.org>
+Subject: [STABLE 6.1.y] [PATCH] KVM: arm64: Fix softirq masking in FPSIMD register saving sequence
+Date: Fri,  3 Oct 2025 19:40:18 +0100
+Message-Id: <20251003184018.4264-1-will@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,7 +47,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Stable commit 23249dade24e ("KVM: arm64: Fix kernel BUG() due to bad
+Stable commit 8f4dc4e54eed ("KVM: arm64: Fix kernel BUG() due to bad
 backport of FPSIMD/SVE/SME fix") fixed a kernel BUG() caused by a bad
 backport of upstream commit fbc7e61195e2 ("KVM: arm64: Unconditionally
 save+flush host FPSIMD/SVE/SME state") by ensuring that softirqs are
@@ -92,9 +93,9 @@ while saving the fpsimd registers.
 Cc: Ard Biesheuvel <ardb@kernel.org>
 Cc: Lee Jones <lee@kernel.org>
 Cc: Sasha Levin <sashal@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org
-Cc: <stable@vger.kernel.org> # 5.15.y
-Fixes: 23249dade24e ("KVM: arm64: Fix kernel BUG() due to bad backport of FPSIMD/SVE/SME fix")
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: <stable@vger.kernel.org> # 6.1.y
+Fixes: 8f4dc4e54eed ("KVM: arm64: Fix kernel BUG() due to bad backport of FPSIMD/SVE/SME fix")
 Reported-by: Kenneth Van Alstyne <kvanals@kvanals.org>
 Link: https://lore.kernel.org/r/010001999bae0958-4d80d25d-8dda-4006-a6b9-798f3e774f6c-000000@email.amazonses.com
 Signed-off-by: Will Deacon <will@kernel.org>
@@ -103,10 +104,10 @@ Signed-off-by: Will Deacon <will@kernel.org>
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index fc51cdd5aaa7..db1ed940a6dc 100644
+index bc42163a7fd1..62780cf901dc 100644
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -1300,13 +1300,17 @@ static void fpsimd_flush_cpu_state(void)
+@@ -1848,13 +1848,17 @@ static void fpsimd_flush_cpu_state(void)
   */
  void fpsimd_save_and_flush_cpu_state(void)
  {
