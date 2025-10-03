@@ -1,133 +1,143 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49BCF9C0
-	for <kvmarm@lists.linux.dev>; Fri,  3 Oct 2025 00:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3013F22EE5
+	for <kvmarm@lists.linux.dev>; Fri,  3 Oct 2025 01:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759449875; cv=none; b=Jtq/FpTyZyg/LAj4IMTFx8CbeJnCSfeejg7YqaccrhBdiDUq2PPd//AnIej2OSokTL71FWev7/rP1BLisaPw6vkGW4dSPjXUaMYMCmcNsyWVQkc7EuIlL6dKMMafRa4Gal3UjgoUWBkcX0kebIry4zreLTjz9EbuLLg/252p2LI=
+	t=1759453335; cv=none; b=glKMAQ2vRAr34XQmxRc7Y12Z/cDjXBHmy2PRbfom5e4x6zvpd1ug/Ankm5O65vjnzBHiTlHFQGpNH/R9frPAjtD5coTXlAcsdP70phxUvTQ6/A4yXvDxzEFhmQggoHcgfYFkx8ludl/l5G0NGAyx+TZjZ0BXEAZO3xX42GkeKJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759449875; c=relaxed/simple;
-	bh=j2aNLIyCaCGd69AdirvOB2Gaoi0yVQ5cqrWrzaky7lM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TdK8AWi2rva7xkDYIqrHOZtsXq7Ed5wtRetQe5PABCmnGUouWD4GjQrmIqo26t3obNIm4eouYscwDbQVdIc9ifUxdO2fIerCZj5EhPo76Lad0hqWhfBjxUIQuLbM0CRVRFWgDyA2Emv7FNZlOjhhvA1EHOZk/pM/El+eSkX9nJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qg4zTlvU; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1759453335; c=relaxed/simple;
+	bh=jqE3376I8gSsa7WU72LhrXs1ZvXwcQ0QX2XY+V7sWTE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=geRmhkdOIwG8XCfw3xj4HyabeR1OP+R5Ox465AcMck7mks1VMmuFLUvsMg3dPn8DM6gssUmDYGE7Xqi5W3vns3Od8EqVvf654sD4c1E+vvbZProkYaQgr195jcvAuxwkNSmGBxPk+yu6ECNme2Jjh02kZC8+1NTwIdexAq8t+Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JjZMhQDk; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qg4zTlvU"
-Date: Thu, 2 Oct 2025 17:04:11 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759449861;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kkFgpezMQKS/gQLXn3AyZkGxBPfCkQ1RwNxBP22utPM=;
-	b=qg4zTlvUUnUwY8urfG2Q95TBycGvvpK1Cdx3XhQ7mPJesKFOtu62Az3Ad8+VzmqKFyYLNB
-	XSmjjuDXsUQAkoO6YZuHaXhLtGg23SF78swtq3aPOQv0uEqIAWFSLfGnucRINVvtS5aE6R
-	fGBZW4/o9mH5RNv2EUQSLOGGkSzefJg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Alok Tiwari <alok.a.tiwari@oracle.com>
-Subject: Re: [PATCH] KVM: arm64: nv: do not inject L2-bound IRQs to L1
- hypervisor
-Message-ID: <aN8S-8HJFLjq6i2M@linux.dev>
-References: <20251002205939.1219901-1-volodymyr_babchuk@epam.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JjZMhQDk"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33428befc5bso1819804a91.0
+        for <kvmarm@lists.linux.dev>; Thu, 02 Oct 2025 18:02:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759453329; x=1760058129; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Jhsi/hyS7a38NhT2Hqz3OM4Bzlch84UkK/Xe3cm3J0=;
+        b=JjZMhQDkwmJBYis4Zwasa9YsS5qqcNJWSXn6gC+tN6BglUWA4mZVDgUG84vl8dGTIp
+         fg634+zr03Z9bMNVpjzRDiKUc1cjjDLkrnOE1FtophQtSrl4FPIwd8g1WzZcQchGerAe
+         jzu6tPOWyskenWsAcgAkvM2vgo3rGpP1O4dDIfrRl/CGNgMqrq+hWtkT7Rk33sUTmp3o
+         6flRmCVsUS9jOe9NdG3KnUi+pyYAJ+c2j40RCZVmYEcGexC9BtAOy6cgxrHoILHx77ss
+         dWK+Q4SNksdPNoTtkBQ4QBRjpqeOQ/cI0luGebEPt4bBFUe77JqO4zN7GQmz87CH+FLM
+         ifjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759453329; x=1760058129;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Jhsi/hyS7a38NhT2Hqz3OM4Bzlch84UkK/Xe3cm3J0=;
+        b=slLIaWoVRjORxDEHNwW02k+h1SV0iT6EzfItcjg42K7XuOx82vlVIPCXPYuemBmWII
+         FpFZvHXfZ6mAd9c8SGA5b+/0VBRvczqK/7uLK/53zyS1pfqM4SqlYlLk92D3cCNy1GRx
+         t8WRXfc2fpX8EH4A528m8ZZF9ijYOEJAPbd9jXwx/laGHlp66QTPOrzF9W4zpmdwPsRX
+         l08em/MNTuWl12YXn3GD08/IH6ESFAA+IaNeAXJ0GbDMjk5UJPzkPDS1Y7A+jBu/btfi
+         65rJ08egpYxgittuXy0MDfSoQ+gpuIKxPlvtCfBw+3S4T0/dUwQqTTt86pRZ2PK9ef4a
+         9yOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAUm9TDR5xZuDTo7iwuB595QqX4gXRL/QpahLrhcLSh7UKcw4IexMmbpgAhz/xHwU3cP6a/9Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw7AG+yht9cyEglAqigWJK9jvie73aqFA0gy4LOPaTsB9HMbbiJ
+	lwTwNeO8c2Zx0X3IMjLGm47VRg9hIGvPYcbXG5tOdZci85Xx4Lv3DrPI+xk5hE9+ZvOc8rxzJ3c
+	2fXDebg==
+X-Google-Smtp-Source: AGHT+IFwurIZ5wEQactgz/Wb47f7lyl+S//nCwqNIeLCXTOqPn/FvG0AeALewYCWSg5yph5QxPM5itarytY=
+X-Received: from pjpo10.prod.google.com ([2002:a17:90a:9f8a:b0:32e:a3c3:df27])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a91:b0:32e:c6b6:956b
+ with SMTP id 98e67ed59e1d1-339c2765e06mr1319063a91.4.1759453329295; Thu, 02
+ Oct 2025 18:02:09 -0700 (PDT)
+Date: Thu, 2 Oct 2025 18:02:08 -0700
+In-Reply-To: <86a529z7qh.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251002205939.1219901-1-volodymyr_babchuk@epam.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250930163635.4035866-1-vipinsh@google.com> <20250930163635.4035866-10-vipinsh@google.com>
+ <86qzvnypsp.wl-maz@kernel.org> <20251001173225.GA420255.vipinsh@google.com> <86a529z7qh.wl-maz@kernel.org>
+Message-ID: <aN8gkEMHuvIVPcCt@google.com>
+Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM
+ selftests runner
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, pbonzini@redhat.com, borntraeger@linux.ibm.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, 
+	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, 
+	chenhuacai@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Volodymyr,
+On Thu, Oct 02, 2025, Marc Zyngier wrote:
+> On Wed, 01 Oct 2025 18:32:25 +0100,
+> > One can run these non-default tests as (assuming current directory is
+> > kvm selftests):
+> > 
+> >   python3 runner -d ./tests
+> > 
+> > Over the time we will add more of these non-default interesting
+> > testcases. One can then run:
+> > 
+> >   python3 runner -d ./tests ./testcases_default_gen
+> 
+> That's not what I am complaining about. What you call "configuration"
+> seems to just be "random set of parameters for a random test".
 
-On Thu, Oct 02, 2025 at 09:00:11PM +0000, Volodymyr Babchuk wrote:
-> Difference between nested virtualization and "baremetal" case is that
-> real GIC can track lots of active interrupts simultaneously, but vGIC
-> is limited only to 4..16 LRs.
+Hopefully s/random/interesting, but yes, the design of the runner is specifically
+to support running tests with different parameters, and not much more (from a
+configuration perspective).
 
-There isn't an architectural limitation here. Nothing prevents a
-virtualized GIC from representing more active IRQs than there are LRs in
-hardware.
+> In practice, your runner does not seem configurable at all. You just
+> treat all possible configurations of a single test as different tests.
+> 
+> My (admittedly very personal) view of what a configuration should be
+> is "run this single test with these parameters varying in these
+> ranges, for this long".
 
-ICH_HCR_EL2.LRENPIE allows you to take a trap when an EOI is received
-for an IRQ that exists outside of teh list registers which would allow
-the deactivation of the SW view of that IRQ.
+Ya, but personal preference is precisely why we kept the runner fairly minimal.
+The goal is to provide:
 
-As Marc suggested, the correct thing to do is adjust the sorting of IRQs
-such that pending IRQs fill LRs before those in an active state.
+ 1. A way to upstream non-standard test invocations so that they can be shared
+    with others, and to improve the coverage provided when developers just run
+    whatever tests are upstream (which probably covers most contributions?).
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> index 7f1259b49c505..bdd1fb78e3682 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> @@ -286,9 +286,13 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
->  		if (WARN_ON(!irq)) /* Shouldn't happen as we check on load */
->  			continue;
->  
-> +		irq->targets_l2 = true;
-> +
->  		lr = __gic_v3_get_lr(lr_map_idx_to_shadow_idx(shadow_if, i));
-> -		if (!(lr & ICH_LR_STATE))
-> +		if (!(lr & ICH_LR_STATE)) {
->  			irq->active = false;
-> +			irq->targets_l2 = false;
-> +		}
->  
->  		vgic_put_irq(vcpu->kvm, irq);
->  	}
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 6dd5a10081e27..6f6759a74569a 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -858,6 +858,17 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
->  			break;
->  		}
->  
-> +		/*
-> +		 * If we are switching to L1 Hypervisor - populate LR with
-> +		 * IRQs that targeting it especially and are not targeting
-> +		 * its L2 guest
-> +		 */
-> +		if (vcpu_has_nv(vcpu) && !vgic_state_is_nested(vcpu) &&
-> +		    irq->targets_l2) {
-> +			raw_spin_unlock(&irq->irq_lock);
-> +			continue;
-> +		}
-> +
->  		if (likely(vgic_target_oracle(irq) == vcpu)) {
->  			vgic_populate_lr(vcpu, irq, count++);
+ 2. Provide "basic" functionality so that each developer doesn't have to reinvent
+    the wheel.
 
-This has some serious issues as it violates our architectural model of
-the GIC.
+    E.g. I have a (horrific) bash script to run selftests in parallel, and while
+    it works well enough for my purposes, it's far from perfect, e.g. there's no
+    timeouts, it's super hard to see what tests are still running, the logging is
+    hacky, etc.
+ 
+    The idea with this runner is to deal with those low-level details that are
+    painful to implement from scratch, and that generally don't require foisting
+    a highly opinionated view on anyone.  E.g. if someone really doesn't want to
+    see certain output, or wants to fully serialize tests, it's easy to do so.
+   
+ 3. Tooling that power users (and hoepfully CI?) can build on, e.g. via wrapper
+    scripts, or something even fancier, again without having to be too opinionated.
 
-The existence of an LR associating a vIRQ to a pIRQ only has relevance
-when in a nested state, specifically when handling vIRQ deactivation.
-Besides that it is just a number...
+    E.g. thanks to the myraid module params in x86, I run all selftests with 5-6
+    different versions of KVM (by unloading and reloading KVM modules).  We
+    deliberately chose not to allow specifying module params of sysfs knobs as
+    part of the runner, because:
 
-For example, imagine the guest hypervisor associated an EL1 timer IRQ
-with an LR and later tried to clear the active state and re-arm the
-timer. Seems like we would miss the IRQ entirely.
+        (a) Handling system-wide changes in a runner gets nasty because of the
+            need to express and track dependencies/conflicts.
+        (b) It's easy (or should be easy) to query dependencies in selftests.
+        (c) Selftests need to query them anyways, e.g. to avoid failure when
+            run with a "bad configuration".
+        (d) Permuting on system-wide things outside of the runner isn't terribly
+            difficult (and often requires elevated privileges).
 
-I'd really like to see a solution similar to Marc's proposal which
-addresses the fundamental problem of active IRQs overflowing the list
-registers. 
+So yeah, there are definitely limitations, but for the most part they are self-
+imposed.  Partly to avoid boiling the ocean in the initial version (e.g. many
+tests won't benefit from running with a range of values/parameters), but also so
+that we don't end up in a situation where the runner only suits the needs of a
+few people, e.g. because it's too opinionated and/or tailored to certain use cases.
 
-Thanks,
-Oliver
+I'm definitely not against providing more functionality/flexibility in the future,
+but for a first go I'd like to stick to a relatively minimal implementation.
