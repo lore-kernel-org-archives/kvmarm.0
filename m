@@ -1,208 +1,115 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1768E26B742
-	for <kvmarm@lists.linux.dev>; Fri,  3 Oct 2025 21:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA16258EEF
+	for <kvmarm@lists.linux.dev>; Sun,  5 Oct 2025 14:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759527280; cv=none; b=Xxk+OikYuCys2h35O0L8uhfB1TVyNlTwj9eBKzYIcHix1HGWs/4qx0qbpiRb9b4WqZAXi/2dTdDrwLGKIyq/+0+Bhkt1zRSiuPXq4QMyqjwmSK0TOjy+lItfTsEyzvO/WO4gqpdZdgp0ILsxtOG4YzHbsChnoREuNjlVahzScHY=
+	t=1759676208; cv=none; b=Tlx48itleoh+/6V640T1AZelNgtItcZ2ynjiz7izUhx6EFFcg7k6LCc0xOt3znJTADzhjudB8SIrQD6FvIpSdz0gQtFH3Ru7j9CdADdjl30myFsXscmoHG7nKoC242DYNhfRxFdNifB9smH8CXWye+anGGl0CU3JTJQXmsdngX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759527280; c=relaxed/simple;
-	bh=i2NrTqq/SkzZHBEgQ7eO1+wlsUWMi9F4A/jiIevvQwI=;
+	s=arc-20240116; t=1759676208; c=relaxed/simple;
+	bh=Yj4tiE4dTWU4yfDRcYohrrunQ86WlGRjquzJPgYlLoo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IegLFIb3ID54gw0HULdMahV33pcx89PV9PPa2g/Kh/p9TWqyIwy452B62yH6pJ5fV17+53DR1rcQSPqHeEgnqR/gpEucYSMizWVUtUqbub6rw8QAxTxWkFSPPfwpGOu58b4auMGSxCM4MagBl6PTrdd5KKj/w7jWNTxw9YnuIEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dc4BMUOM; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=qRD/iOzGskEOxy0vZL8HT6syHVnzsZZpje18HoqdO3krYAG6E9X7QboLYGywULg5PDAk2u5SH4vKBC4tzyWwnnd+mnzWvV/M+adDBteHWtxIQcM7PYQR/hwukEkdO0jKzTkwPO5TQVPkiLItXbsWXfIsJyLYqLbsIQX8o0ybjWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bM39Lkrn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dc4BMUOM"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-46e3bcf272aso19145e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 03 Oct 2025 14:34:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759527275; x=1760132075; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AolOsZu5isQ6acd/8wA384z0bhlwgTK8nhLOayCIhiU=;
-        b=dc4BMUOMa0eS86Fap67U6oWy7McavXzCP/UQq4JU9YkBPDMcLWiNB9W0Q6InwGwoTW
-         jCIWgo2kPg7AgoIeioC7JeHekd3y7wUE+dnn/ZYALqNRbSnDQHo2D5504Ys7PkmxJNkJ
-         NNqLGcTpnki9GlzmgRM8AYSpDiujDydIarBo6+w4D/RCLFm5yY9YpYnb08MtiEneCqCY
-         viOhAeumQK5REKf5z5IPsI1Rr1IsynZvwUsP7+FqsqUfaAcmqdP8NDyzRNtVA7mfXKP3
-         /iXtM9eXfUUi7rjHMXoyOOFKi6UFmEzndRQ/HMNphmS1tC3rG7TdJ23p3aYesJjRMWUM
-         ebgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759527275; x=1760132075;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AolOsZu5isQ6acd/8wA384z0bhlwgTK8nhLOayCIhiU=;
-        b=pigSEc5SbIzD9dSAwzsne5wnVosGwol9K40xqBTEuSVWwLDJsUCFBzXpjx282RVa04
-         Y5oPSii2weQDik9+BQtPzj2UuDEer0R/jRDVYlYoSoFoTNzRjnkBKnPkj5/UDS0rGSJu
-         nTEsCgbg7IssT0cjsZiMkYdr8x8mvYhvDV+jBAd/i298Wus8yy303HhZjwOfhdTSCmc+
-         2Sae8H4zRpXd7DAXdAoMTrmoTczZn+Wa2J1w0RfStFnvuzdG1Heuwm5UiNkrzsD/cPTK
-         Go4X8IxnEw4aQiFGWIbATdON50MxZsdS0dpasH2OEz7K/juBvTXX7UF9ixv+o+jLrxZl
-         hN5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXIKe63LGhIsUf6cF6ZF0oSKDdKw0YfKTaUI/B1Acc51yhDL95CmNHjljwyKD+Cc41ccm7SfYc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzaLMPijEGNByM8j/6S81N+51meu8tscAsKybsFT5tuKGUqYDrx
-	7F2Un6N4V9Vp5VSq9JXfKos70K091Rg3cc2tKAjyL5mDZI6m2C+UB0aUwoiUJ541paN5yD3mB0A
-	2hP3aOOnrAvAGqe+Ey4VGVK+N1Gj8AOUYoSslF2S8XmKsZsZhPxOvP+mxXWg=
-X-Gm-Gg: ASbGnct+4kockUYdnS6zIL47FNXMlNO+xw15MinPc8cDIPn0KUjelw7odMgJBxZNRUu
-	0Yhy5TKfmX+yOWHSYoH8eSFO6xgIPerxWS9VVpWn80PEhRhAXWR9zUPGKJBCnBu+8FIZCwXSOwk
-	W4z96DgX7ZUzgXXImVPpc5piYwd52R3/RUeDQj+rJS9h1GbxxRSjForj5AUmRn0q1VU5G3mN0Qo
-	5KMlk+7cncPen/OeE4vcEHB9vlg8Zptc7ldGp2ZBkMgzL+9LcyJT3sN9j6NxQHfu33Dc40B5QPP
-	FYU=
-X-Google-Smtp-Source: AGHT+IG+g888nHbRtas0R01E+jPK4UfBpLJ8GQnOWINQky6xv5HWVReEjuHHu18tH8G5o/mleUJVD+7aBJEJSt2Urkg=
-X-Received: by 2002:a05:600c:8582:b0:45f:2e6d:ca01 with SMTP id
- 5b1f17b1804b1-46e789ad00amr340925e9.4.1759527275228; Fri, 03 Oct 2025
- 14:34:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bM39Lkrn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A73EC4AF0B
+	for <kvmarm@lists.linux.dev>; Sun,  5 Oct 2025 14:56:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759676208;
+	bh=Yj4tiE4dTWU4yfDRcYohrrunQ86WlGRjquzJPgYlLoo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=bM39LkrnNqlprILFdRvaDox5bzxzS2ZLyd4b/WpKjBb7l/K7x+qXirkK+cOJTdNTC
+	 3fe+/9CUlhP5Wm73T82uUg5mR0NIGY62ZMS34qPzzXrS1TyFEv4HcORRU4CtVpfRlv
+	 E6NqAAjYn1TgPm2f8AKt4WMYL1cpimRHR0gr54ht/BGx0acP0ERt6WgTWITF5Gi3pg
+	 SrPnRk8n/TeffzlvYlutXyG5lbRdoZ3dNoB0ot+X4617yvliFCApWnsa615NShxZmH
+	 oaQQsVtG3wEId6xmZUXKoYyXKOYpR1PGF7959cR9nIXmU4FjBy/WMbrPncy2YYIkZs
+	 EUX238+/UCznw==
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-373a1ab2081so32674011fa.3
+        for <kvmarm@lists.linux.dev>; Sun, 05 Oct 2025 07:56:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCW18RnXEKgWJWVO7R96M/nNRhDzLvhuTjha3NOkKBk9nw6e0piky+uIx/uVtzuCOCarrwtY3U4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwWlY2lCj+AcciNcX/xjpw+4gRowa8QO6ITxQEz/eYT6mogQRpl
+	hxET7dEtrojVWFmJlW8ibzHQ0M6ztdzSMs75viDKZZq21FZ4/LlKGaCqvJR4uwXLXqqaOep8Q8F
+	FH+1jIOmVs+f2sWg1HQzEMM5SNTJSISg=
+X-Google-Smtp-Source: AGHT+IHTBpde/4YqplVs3DvfJcUY45IE5HyynZLYjJZCEhLnl34hecKm47NpIOXlv+NwHQkGQNpDfmKYcWNAPQWIcTw=
+X-Received: by 2002:a2e:bd13:0:b0:372:a12c:45a5 with SMTP id
+ 38308e7fff4ca-374c3841062mr34212861fa.33.1759676206685; Sun, 05 Oct 2025
+ 07:56:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250731205844.1346839-1-jiaqiyan@google.com>
-In-Reply-To: <20250731205844.1346839-1-jiaqiyan@google.com>
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Fri, 3 Oct 2025 14:34:23 -0700
-X-Gm-Features: AS18NWC200qL2INhmKRcSigwRYSlRaKCFejFFI6CifV04SzXltQ6LUTRzublc7I
-Message-ID: <CACw3F51QG70YpSfWaj_gQjAwoPcZ6uFa5dfd+Ave5PxQYDt-Ew@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] VMM can handle guest SEA via KVM_EXIT_ARM_SEA
-To: maz@kernel.org, oliver.upton@linux.dev
-Cc: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	shuah@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	duenwen@google.com, rananta@google.com, jthoughton@google.com
+References: <20251003183917.4209-1-will@kernel.org> <aOAZR0-4ZCq78DZ8@willie-the-truck>
+In-Reply-To: <aOAZR0-4ZCq78DZ8@willie-the-truck>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sun, 5 Oct 2025 16:56:35 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXE0v7mtDbOLMmXkmSJVQFcjTPvib1D+MnHSHCfximyixA@mail.gmail.com>
+X-Gm-Features: AS18NWCWnxptvHIz8dittp-mT7s9UTTlScpg8LcZAgmaKGO2Z1S4zTcYNuKocPU
+Message-ID: <CAMj1kXE0v7mtDbOLMmXkmSJVQFcjTPvib1D+MnHSHCfximyixA@mail.gmail.com>
+Subject: Re: [STABLE 5.15.y] [PATCH] KVM: arm64: Fix softirq masking in FPSIMD
+ register saving sequence
+To: Will Deacon <will@kernel.org>
+Cc: stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, Lee Jones <lee@kernel.org>, Sasha Levin <sashal@kernel.org>, 
+	Kenneth Van Alstyne <kvanals@kvanals.org>, gregkh@linuxfoundation.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Marc, Oliver, and other upstream friends, can you help review this
-patch series? I would really appreciate any comments and feedback.
+On Fri, 3 Oct 2025 at 20:43, Will Deacon <will@kernel.org> wrote:
+>
+> On Fri, Oct 03, 2025 at 07:39:17PM +0100, Will Deacon wrote:
+> > Stable commit 23249dade24e ("KVM: arm64: Fix kernel BUG() due to bad
+> > backport of FPSIMD/SVE/SME fix") fixed a kernel BUG() caused by a bad
+> > backport of upstream commit fbc7e61195e2 ("KVM: arm64: Unconditionally
+> > save+flush host FPSIMD/SVE/SME state") by ensuring that softirqs are
+> > disabled/enabled across the fpsimd register save operation.
+> >
+> > Unfortunately, although this fixes the original issue, it can now lead
+> > to deadlock when re-enabling softirqs causes pending softirqs to be
+> > handled with locks already held:
+> >
+> >  | BUG: spinlock recursion on CPU#7, CPU 3/KVM/57616
+> >  |  lock: 0xffff3045ef850240, .magic: dead4ead, .owner: CPU 3/KVM/57616, .owner_cpu: 7
+> >  | CPU: 7 PID: 57616 Comm: CPU 3/KVM Tainted: G           O       6.1.152 #1
+> >  | Hardware name: SoftIron SoftIron Platform Mainboard/SoftIron Platform Mainboard, BIOS 1.31 May 11 2023
+> >  | Call trace:
+> >  |  dump_backtrace+0xe4/0x110
+> >  |  show_stack+0x20/0x30
+> >  |  dump_stack_lvl+0x6c/0x88
+> >  |  dump_stack+0x18/0x34
+> >  |  spin_dump+0x98/0xac
+> >  |  do_raw_spin_lock+0x70/0x128
+> >  |  _raw_spin_lock+0x18/0x28
+> >  |  raw_spin_rq_lock_nested+0x18/0x28
+> >  |  update_blocked_averages+0x70/0x550
+> >  |  run_rebalance_domains+0x50/0x70
+> >  |  handle_softirqs+0x198/0x328
+> >  |  __do_softirq+0x1c/0x28
+> >  |  ____do_softirq+0x18/0x28
+> >  |  call_on_irq_stack+0x30/0x48
+> >  |  do_softirq_own_stack+0x24/0x30
+> >  |  do_softirq+0x74/0x90
+> >  |  __local_bh_enable_ip+0x64/0x80
+> >  |  fpsimd_save_and_flush_cpu_state+0x5c/0x68
+> >  |  kvm_arch_vcpu_put_fp+0x4c/0x88
+> >  |  kvm_arch_vcpu_put+0x28/0x88
+> >  |  kvm_sched_out+0x38/0x58
+> >  |  __schedule+0x55c/0x6c8
+> >  |  schedule+0x60/0xa8
+> >
+> > Take a tiny step towards the upstream fix in 9b19700e623f ("arm64:
+> > fpsimd: Drop unneeded 'busy' flag") by additionally disabling hardirqs
+> > while saving the fpsimd registers.
+> >
+> > Cc: Ard Biesheuvel <ardb@kernel.org>
+> > Cc: Lee Jones <lee@kernel.org>
+> > Cc: Sasha Levin <sashal@kernel.org>
+> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org
+>
+> Sorry, Greg, I lost a stray '>' here ^^^  and so you didn't end up on CC
+> for this one.
+>
 
-[sorry for resending, as previous msg was sent as HTML]
-
-
-
-On Thu, Jul 31, 2025 at 1:58=E2=80=AFPM Jiaqi Yan <jiaqiyan@google.com> wro=
-te:
->
-> Problem
-> =3D=3D=3D=3D=3D=3D=3D
->
-> When host APEI is unable to claim a synchronous external abort (SEA)
-> during guest abort, today KVM directly injects an asynchronous SError
-> into the VCPU then resumes it. The injected SError usually results in
-> unpleasant guest kernel panic.
->
-> One of the major situation of guest SEA is when VCPU consumes recoverable
-> uncorrected memory error (UER), which is not uncommon at all in modern
-> datacenter servers with large amounts of physical memory. Although SError
-> and guest panic is sufficient to stop the propagation of corrupted memory=
-,
-> there is room to recover from an UER in a more graceful manner.
->
-> Proposed Solution
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> The idea is, we can replay the SEA to the faulting VCPU. If the memory
-> error consumption or the fault that cause SEA is not from guest kernel,
-> the blast radius can be limited to the poison-consuming guest process,
-> while the VM can keep running.
->
-> In addition, instead of doing under the hood without involving userspace,
-> there are benefits to redirect the SEA to VMM:
->
-> - VM customers care about the disruptions caused by memory errors, and
->   VMM usually has the responsibility to start the process of notifying
->   the customers of memory error events in their VMs. For example some
->   cloud provider emits a critical log in their observability UI [1], and
->   provides a playbook for customers on how to mitigate disruptions to
->   their workloads.
->
-> - VMM can protect future memory error consumption by unmapping the poison=
-ed
->   pages from stage-2 page table with KVM userfault [2], or by splitting t=
-he
->   memslot that contains the poisoned pages.
->
-> - VMM can keep track of SEA events in the VM. When VMM thinks the status
->   on the host or the VM is bad enough, e.g. number of distinct SEAs
->   exceeds a threshold, it can restart the VM on another healthy host.
->
-> - Behavior parity with x86 architecture. When machine check exception
->   (MCE) is caused by VCPU, kernel or KVM signals userspace SIGBUS to
->   let VMM either recover from the MCE, or terminate itself with VM.
->   The prior RFC proposes to implement SIGBUS on arm64 as well, but
->   Marc preferred KVM exit over signal [3]. However, implementation
->   aside, returning SEA to VMM is on par with returning MCE to VMM.
->
-> Once SEA is redirected to VMM, among other actions, VMM is encouraged
-> to inject external aborts into the faulting VCPU.
->
-> New UAPIs
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> This patchset introduces following userspace-visible changes to empower
-> VMM to control what happens for SEA on guest memory:
->
-> - KVM_CAP_ARM_SEA_TO_USER. While taking SEA, if userspace has enabled
->   this new capability at VM creation, and the SEA is not owned by kernel
->   allocated memory, instead of injecting SError, return KVM_EXIT_ARM_SEA
->   to userspace.
->
-> - KVM_EXIT_ARM_SEA. This is the VM exit reason VMM gets. The details
->   about the SEA is provided in arm_sea as much as possible, including
->   sanitized ESR value at EL2, faulting guest virtual and physical
->   addresses if available.
->
-> * From v2 [4]:
->   - Rebased on "[PATCH] KVM: arm64: nv: Handle SEAs due to VNCR redirecti=
-on" [5]
->     and kvmarm/next commit 7b8346bd9fce ("KVM: arm64: Don't attempt vLPI
->     mappings when vPE allocation is disabled")
->   - Took the host_owns_sea implementation from Oliver [6, 7].
->   - Excluded the guest SEA injection patches.
->   - Updated selftest.
->
-> * From v1 [8]:
->   - Rebased on commit 4d62121ce9b5 ("KVM: arm64: vgic-debug: Avoid
->     dereferencing NULL ITE pointer").
->   - Sanitize ESR_EL2 before reporting it to userspace.
->   - Do not do KVM_EXIT_ARM_SEA when SEA is caused by memory allocated to
->     stage-2 translation table.
->
-> [1] https://cloud.google.com/solutions/sap/docs/manage-host-errors
-> [2] https://lore.kernel.org/kvm/20250109204929.1106563-1-jthoughton@googl=
-e.com
-> [3] https://lore.kernel.org/kvm/86pljbqqh0.wl-maz@kernel.org
-> [4] https://lore.kernel.org/kvm/20250604050902.3944054-1-jiaqiyan@google.=
-com/
-> [5] https://lore.kernel.org/kvmarm/20250729182342.3281742-1-oliver.upton@=
-linux.dev/
-> [6] https://lore.kernel.org/kvm/aHFohmTb9qR_JG1E@linux.dev/#t
-> [7] https://lore.kernel.org/kvm/aHK-DPufhLy5Dtuk@linux.dev/
-> [8] https://lore.kernel.org/kvm/20250505161412.1926643-1-jiaqiyan@google.=
-com
->
-> Jiaqi Yan (3):
->   KVM: arm64: VM exit to userspace to handle SEA
->   KVM: selftests: Test for KVM_EXIT_ARM_SEA
->   Documentation: kvm: new UAPI for handling SEA
->
->  Documentation/virt/kvm/api.rst                |  61 ++++
->  arch/arm64/include/asm/kvm_host.h             |   2 +
->  arch/arm64/kvm/arm.c                          |   5 +
->  arch/arm64/kvm/mmu.c                          |  68 +++-
->  include/uapi/linux/kvm.h                      |  10 +
->  tools/arch/arm64/include/asm/esr.h            |   2 +
->  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->  .../testing/selftests/kvm/arm64/sea_to_user.c | 327 ++++++++++++++++++
->  tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
->  9 files changed, 476 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/arm64/sea_to_user.c
->
-> --
-> 2.50.1.565.gc32cd1483b-goog
->
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
