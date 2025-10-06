@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B72F221299;
-	Mon,  6 Oct 2025 10:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D9B220F36;
+	Mon,  6 Oct 2025 10:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759745310; cv=none; b=kXBS3V8P/OhfSN7w7tv7apC0EZZUPUNJYmTXkHx1LeTlIrltXbszJhmlmFsjzOdTMpQr1H6mcwibgVabiEisA6ifKLZHD+pCp9NJ+Csv+8ChXfGL0bKQQf0J1U5fI0wBDZl5/bg+S3Mp6S8W9rsg+CEYE7jJgUZgtCO56wbv5tc=
+	t=1759745317; cv=none; b=IIm+7hLIVorVHIeaHOWvp6DOs3aCP6YG6FhI85fS9Yo6jLwnxOoWqCmLB9njH+p2s5Yis/ouR6yY8fI0T5At5LO2geqDmZMBu79UbCCuiD6XQ4g7r5c8cY4UQ1XE7elAr2LWC0pxqKVEOulQ9OYaWsA4gfwUHW9nhAnPYc3frZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759745310; c=relaxed/simple;
-	bh=iIYO0s9UtU7Q7Gt2JwSqUA7KSDRufOd3WQgBvzG/7Uc=;
+	s=arc-20240116; t=1759745317; c=relaxed/simple;
+	bh=9l3H9m98dWuqVcEguJJCwW2d8nWAjAjRtMaaZIkr8e8=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=aWQLkZQtZI46779jhpEG7xDAVW1GhjOJl8UGGvV/wlUdyJKe1PpN3og5M+VduKdEzRTDyttGxqhPWpPm/2RPVKDsw5Zv5UEy4Qd72e0/e8W/MqGyErKhfnjVad0zEAXZ0LiyU3k61p0ZO0nTX+YQ+gP8BORO+5sMTSjONLENc4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Y1BlAtI7; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type; b=majyPWY9jJsU8mY4ZMQtMI1Ydei9CjsaNnmqRM5dVDAJHt2Uz9sGlKGp2DMpJSogqYSeTJEMcesFn5wcuGS7VkUu+e0Fz3q7DOH0PvEDiLuq130+tynJOLCVhwgFYdQRvF4Mnx46OCvbhT0X/nMDdVguoY4b9Fd6HSwlGy56nHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=lzU5ayyB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Y1BlAtI7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC78BC4CEF7;
-	Mon,  6 Oct 2025 10:08:27 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="lzU5ayyB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39955C4CEF5;
+	Mon,  6 Oct 2025 10:08:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1759745308;
-	bh=iIYO0s9UtU7Q7Gt2JwSqUA7KSDRufOd3WQgBvzG/7Uc=;
+	s=korg; t=1759745316;
+	bh=9l3H9m98dWuqVcEguJJCwW2d8nWAjAjRtMaaZIkr8e8=;
 	h=Subject:To:Cc:From:Date:In-Reply-To:From;
-	b=Y1BlAtI7QqLU9rnXDZyOKRf9TRbFNMM4tyqucLEcPyHa4/udQS+ZC4Wn7ppt9lUY6
-	 C/avAIkclpsKLaoCVFjOSmuWoRhNlHPG5JWtZ83o0PjyYDu48Al5qp0pTaVWa2Ns6E
-	 /AQ0tiXVFLNnKyXgQKmu4LczCtJWwOYRzUvfT0lQ=
-Subject: Patch "KVM: arm64: Fix softirq masking in FPSIMD register saving sequence" has been added to the 6.1-stable tree
+	b=lzU5ayyB3/nLpMp1mvbssfCh14ecYJQO9HvzGQiIlAjYYzTCxhWSqtJMt4Qvp+ze+
+	 40NOSNBP6ewWIU7are/aX6kKsQ/Tlj7HjEM3tysG8DBxIzQa8tdpdfur/2cjSvV4wb
+	 yrpDHtp29hMzwy8/IQ3O+5hfVrqgBdO4kA84bCmA=
+Subject: Patch "KVM: arm64: Fix softirq masking in FPSIMD register saving sequence" has been added to the 6.6-stable tree
 To: ardb@kernel.org,gregkh@linuxfoundation.org,kvanals@kvanals.org,kvmarm@lists.linux.dev,lee@kernel.org,linux-arm-kernel@lists.infradead.org,sashal@kernel.org,will@kernel.org
 Cc: <stable-commits@vger.kernel.org>
 From: <gregkh@linuxfoundation.org>
-Date: Mon, 06 Oct 2025 12:08:17 +0200
-In-Reply-To: <20251003184018.4264-1-will@kernel.org>
-Message-ID: <2025100617-partition-rink-868c@gregkh>
+Date: Mon, 06 Oct 2025 12:08:26 +0200
+In-Reply-To: <20251003184054.4286-1-will@kernel.org>
+Message-ID: <2025100626-tinderbox-captive-517f@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,28 +46,28 @@ This is a note to let you know that I've just added the patch titled
 
     KVM: arm64: Fix softirq masking in FPSIMD register saving sequence
 
-to the 6.1-stable tree which can be found at:
+to the 6.6-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
      kvm-arm64-fix-softirq-masking-in-fpsimd-register-saving-sequence.patch
-and it can be found in the queue-6.1 subdirectory.
+and it can be found in the queue-6.6 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
 
 
-From will@kernel.org  Mon Oct  6 12:00:09 2025
+From will@kernel.org  Mon Oct  6 11:58:17 2025
 From: Will Deacon <will@kernel.org>
-Date: Fri,  3 Oct 2025 19:40:18 +0100
+Date: Fri,  3 Oct 2025 19:40:54 +0100
 Subject: KVM: arm64: Fix softirq masking in FPSIMD register saving sequence
 To: stable@vger.kernel.org
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Lee Jones <lee@kernel.org>, Sasha Levin <sashal@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kenneth Van Alstyne <kvanals@kvanals.org>
-Message-ID: <20251003184018.4264-1-will@kernel.org>
+Message-ID: <20251003184054.4286-1-will@kernel.org>
 
 From: Will Deacon <will@kernel.org>
 
-Stable commit 8f4dc4e54eed ("KVM: arm64: Fix kernel BUG() due to bad
+Stable commit 28b82be094e2 ("KVM: arm64: Fix kernel BUG() due to bad
 backport of FPSIMD/SVE/SME fix") fixed a kernel BUG() caused by a bad
 backport of upstream commit fbc7e61195e2 ("KVM: arm64: Unconditionally
 save+flush host FPSIMD/SVE/SME state") by ensuring that softirqs are
@@ -113,19 +113,23 @@ while saving the fpsimd registers.
 Cc: Ard Biesheuvel <ardb@kernel.org>
 Cc: Lee Jones <lee@kernel.org>
 Cc: Sasha Levin <sashal@kernel.org>
-Cc: <stable@vger.kernel.org> # 6.1.y
-Fixes: 8f4dc4e54eed ("KVM: arm64: Fix kernel BUG() due to bad backport of FPSIMD/SVE/SME fix")
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: <stable@vger.kernel.org> # 6.6.y
+Fixes: 28b82be094e2 ("KVM: arm64: Fix kernel BUG() due to bad backport of FPSIMD/SVE/SME fix")
 Reported-by: Kenneth Van Alstyne <kvanals@kvanals.org>
 Link: https://lore.kernel.org/r/010001999bae0958-4d80d25d-8dda-4006-a6b9-798f3e774f6c-000000@email.amazonses.com
 Signed-off-by: Will Deacon <will@kernel.org>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/arm64/kernel/fpsimd.c |    8 ++++++--
+ arch/arm64/kernel/fpsimd.c | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index d0d836448a76..83827384982e 100644
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -1848,13 +1848,17 @@ static void fpsimd_flush_cpu_state(void)
+@@ -1873,13 +1873,17 @@ static void fpsimd_flush_cpu_state(void)
   */
  void fpsimd_save_and_flush_cpu_state(void)
  {
@@ -145,8 +149,11 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  }
  
  #ifdef CONFIG_KERNEL_MODE_NEON
+-- 
+2.51.0.618.g983fd99d29-goog
+
 
 
 Patches currently in stable-queue which might be from will@kernel.org are
 
-queue-6.1/kvm-arm64-fix-softirq-masking-in-fpsimd-register-saving-sequence.patch
+queue-6.6/kvm-arm64-fix-softirq-masking-in-fpsimd-register-saving-sequence.patch
