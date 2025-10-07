@@ -1,29 +1,29 @@
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010015.outbound.protection.outlook.com [52.101.84.15])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013045.outbound.protection.outlook.com [40.107.159.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF1C42AA3
-	for <kvmarm@lists.linux.dev>; Tue,  7 Oct 2025 15:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3123E1F3BBB
+	for <kvmarm@lists.linux.dev>; Tue,  7 Oct 2025 15:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.45
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759851362; cv=fail; b=tOsasgt6fIlzY6eOVMut9eE+K0WrxtJCC2SQN906r0ArDRDWCxYydNbhe9I4MdrZXhw9cSjQmu0Wcf3k0P1tU0rA7Bw+4ZmbWY7OFaX5c5RVypd0UiPrWhuF3iO+Q6tMs8s6KrOVjO8Aefr+BoXPV0BH4IUx6pTv/c+vkK21j4A=
+	t=1759851363; cv=fail; b=SXyUsuJz32Bakq7eyFm0RLydP0h/nN97Ff4JTMw3ZJC1mg3Yqo42i/eH/ItQA+Om+0G6mGTx70/N/cjaoVhozGvaHW2AmEtHkmbNdQr0sULfHTg1HhDm0Q9OkRkXw45m91B+udKgFqkzpLhgZSsbGmmHBJYw2weio9KNc7yszeo=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759851362; c=relaxed/simple;
-	bh=5cmrxOYnMhgY4T78VF1mfpAiL1sDO8ojM33GKLYM8Ls=;
+	s=arc-20240116; t=1759851363; c=relaxed/simple;
+	bh=B6HWImSG5fswzWMi9ej5SBsXLaQOLv8aKESgRuZfq8A=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eGjZ81tMzfoVejgkVgfMxn1ybPWsQ6PbJfDMzs89u7++6lys4W4C29m7b79c4hE4y1vAc60EgsCVwI2NZIwaXUQR1Ff12UMIGJ2D7U13g+U/tv8GHDrhtz+lP43ugVGnmBaBcqoom5tyzf5BJWczWLjrKcvg3NSD0reFHeVOjKc=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QxkTequf; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QxkTequf; arc=fail smtp.client-ip=52.101.84.15
+	 Content-Type:MIME-Version; b=W/Utuo82pv81eOCrQqfCUX/3pHgPZnD7IXgcfBUDPKAy5rq/QvO/PKNtpRBmBGN7sI5QJrkMKmcp62kpXkoyI7Qg+gMfriSsBNPyBMOncJx3qNf0Q6bT7DnsnOzS16oklEsqXy4cwgF1Sx9TtCjNGPzKz92UsrESJHRrhPJSOtA=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=W974FT/o; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=W974FT/o; arc=fail smtp.client-ip=40.107.159.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QxkTequf";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QxkTequf"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="W974FT/o";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="W974FT/o"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=WGj2JqBoEjAMB+c2x1Pn9V6PR8iBdBptOhIJ2zwCbG+kPZRIBjKJPrBn/fSI2fY9ZYopu+1+NP4SYpro32OilatRI1xkkYOQqDO9FPhRRCL1Gl5JS39nDP2EDHTjU6rF5HPEcCLhcJRBxgLcVMcEZw1fTNim5rg9xqjhBy2ujcfsAc3V8FcvjGoGzaE9Lhr+sgdn2lhHfbweLHfMCxM5oQswVx93cOv9d1lIqz1zN0BW5pE+Bmj0Kxg8CJO6uDGoHezAxdZEZdtvaqe+qJjZImmsJObio5KZR+tyGTx6Zm6LQpeNl8Zcs7yTxYukPTCmHcivDZ9RsvRJeiUt7K+Szw==
+ b=iC0V5+oauQC6ceeuGQKo4OXjrANpnM/pCqBjqhoOjyBtzMc/thiUqOLmMpS1wjG10iku4KRVZDiJuy5FTG0w7KzpcJ0lDOBhCknmhkPruGGcczS5snGPRf++TOnKTW0UG+/GIE6hI2Ic2MYnnT1QeSgtP2FWKTWTxSDpJI9mOTMEOSPku93k7WI/4CtupgtLPYvcSYd9Lcehi0q9QqeJXBKJiIRDjPgeHE7+UYGNanBR/ZLaX0Ba7h0ShpZ8T4xHn4ARd23N5ZrUyH6Wn7IjXN0CR36y3K4RYVJpnawGch7vVykaiZlNw6P+XDDzLPEJFlMhQU2zy76ZR7RTYC839g==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XEqYmqIZbfVY0YXKsD66bpQ94f0RbuJqeJhJxdP/pxM=;
- b=Rztn4fSDpOMLEVXsdQhSuBh9EbkgcOv04O/9FpcabL8YrzJGKIQlNwo/9qDfuZ6YsjrhfHAAm06t/Xc+bO2KEoRsP0ZBfCoD1kGRR370MVVsMvpITt1Yr/nQOs1dQSRuMzeRqIpr4zb4LIz64q/q1xqwgVt+X/YJ8muD6xaLDmeDaDrYknznJSbrbHp5d6HKNsly+sDCH0myjyBQ6e3Qbz64XYkigXzgtWJrcWlLi8moix6RRQoVZ1XXWuTHxyq0wVtwaK3E6HGZLjdXe6LHEk5ddsyeIlxPluhGfepmRm5OMmsfxsSkHApYxmGz6BuJB5/2m/Az5Rs3FVSd/Atk+Q==
+ bh=KPxE5omc8PnGDMkQYi4U2Ijg3Zof/vWmYW68bYpwK/g=;
+ b=vJJX4wwOe5CyvYB7YSBfcpgZ2hrtn8wsMe+YIhAr+tVbNm9OdkxS6c/CscYKlxPp0yhcQ8u0hjIaEmQPOv2iGQz3BZ7jGd+lN0dEefUcCcYMoYl/UJt/f5ngTNzpqUDifYAEE+HvW9ZHxsZ+6EwwDIa7OXZnDH/+wDBM4NVRZ6vw29ox/e8EN/ZBP8aR8H8emzW5xeebeAxJTW1zLk9Z+kDp15QzNYxV2Z/Jz7vxMaCwUEmB3xtw8kPdOdmbXddJsj0sWQ5sPX0DbRXVXHdbB8Nc8AaUmT4TH/lnnIf8I6d/DjtDvmkiR8xwFEdZRk05WFOVFfVLJTLWFyazBTNFJA==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XEqYmqIZbfVY0YXKsD66bpQ94f0RbuJqeJhJxdP/pxM=;
- b=QxkTequfka5T6DBnKeMDwYj0zXWs66+EUbXmtDyTuVcxCfEORJtCqk+3d7GuMGb3YmeIO/OiF0jV5/T7e6gbKx56bwGTuXkguiR4EweQVtmOpGHlRSxc2j940jFNYyg8Q6TdTaEsumcvDVend9J1L3bsXOURO4oy18jIr9pIb2M=
-Received: from DUZPR01CA0336.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b8::21) by VI1PR08MB10242.eurprd08.prod.outlook.com
- (2603:10a6:800:1be::9) with Microsoft SMTP Server (version=TLS1_2,
+ bh=KPxE5omc8PnGDMkQYi4U2Ijg3Zof/vWmYW68bYpwK/g=;
+ b=W974FT/ocSNgYfVBe/0679yNpUMXPM7VPV8Uit70cZXKPwKxAWioh4OBhxh0TT3/3iadTiptqn3JNSQSyRSFSPeuNJLLmKDXL7SMYhukdTBVnR08qCNi9hLuBXDYjC2gr1DsVIy30j91H5759Rlj7KIS6rbyxlFG0c5zxh6+G7c=
+Received: from AM0P190CA0020.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::30)
+ by AS4PR08MB7478.eurprd08.prod.outlook.com (2603:10a6:20b:4e5::9) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9182.20; Tue, 7 Oct
- 2025 15:35:54 +0000
-Received: from DB5PEPF00014B9C.eurprd02.prod.outlook.com
- (2603:10a6:10:4b8:cafe::6e) by DUZPR01CA0336.outlook.office365.com
- (2603:10a6:10:4b8::21) with Microsoft SMTP Server (version=TLS1_3,
+ 2025 15:35:53 +0000
+Received: from AM1PEPF000252DA.eurprd07.prod.outlook.com
+ (2603:10a6:208:190:cafe::94) by AM0P190CA0020.outlook.office365.com
+ (2603:10a6:208:190::30) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9182.20 via Frontend Transport; Tue,
- 7 Oct 2025 15:35:58 +0000
+ 7 Oct 2025 15:35:53 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -51,23 +51,23 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB5PEPF00014B9C.mail.protection.outlook.com (10.167.8.170) with Microsoft
+ AM1PEPF000252DA.mail.protection.outlook.com (10.167.16.52) with Microsoft
  SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9203.9
- via Frontend Transport; Tue, 7 Oct 2025 15:35:52 +0000
+ via Frontend Transport; Tue, 7 Oct 2025 15:35:53 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xZ8pF3rervoWGUw0ZuW+GnfwZhNCCZwY6XzsHpv6Vv6j9uOVjOYz1jZZqu7W59swqHfNaR38s8uftbbYQPc3lLSiDdGiCX+mqGZkFfXQfrEW2Az1FzgvctoHmnEL3Ej7mFn6v8I3L8pttXanrMGcAGGY+b/xnY3rtI7qTYI9eTsYswhMQ/qSwTWIjEhkEa2MX0x2meCYHBOwivZOoxbp09ALz5qneKbMmVpMgUA6D3biMgxxTfbMGDmWecMVFjAjmYe5rjbSmkxJ76zRfJqz1SAkXXY1U8ssybhcoXIso6/WCZ+hgys96WH6jekwMn+P8DXfXCIWvmaLp4U47T+zBA==
+ b=xfFmK+DiRjf7Itn3wrrmQRb0lt4c4ob2BtZP5vXN84bxF6wrfZBlZ9woFpFsgCgYutLfTIQxKqDRdfPYXp3U5vwEzghenjR9spJ4YBaONu+VygDx6vxkEtfG4ERLKP4UZq6PXVfxRo/YWic2SUpqbpQLG2nZvtgmUTxa0YCsg9o5l8+zcdNYpWiClMRDDWe9i5nLPW+39AkFXO21EGvqCuFreYLQMN30ae1ibDbvw+jIjIuAX04rlJON8pSNNr9PdnqlfK4uEs/+5fb2hL0PnVwCuUrcN5s6O9OYodvHO1TKEyACvGlwRuoNKXz9rQ4HSYAMdEFQ+hVj/V06GA+yGQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XEqYmqIZbfVY0YXKsD66bpQ94f0RbuJqeJhJxdP/pxM=;
- b=BBJPmrn5ubaHpGCKB61MFoHV5zWWNtQH3TsrsQE2oRUydZPLe+KFFQp+bJhyx3xRnRRi+cneBf4uSIu4cEHIlcE28VldAkKue6RXErTSVDCnWyM9TyGxU/FWr8gLB6d9h5eqwrgJ2Xqwef8T4KRo8hP6FTaefzgcfmk5zqdELWpnfjrydlqEUSFEUoNTd8LvmNzLkupLZYwl6yeKko2MpA+MJ4HZf2VsSaxuHYmaQvCY5DLchlTOYvn08aghLUISEiufh89nt3Ttdt5hb2vzWDnmv8x/JnkGUeOXMt/+6yq1r71/J8XvTiT4IGL/b6t4MQJFZxg/eG0ihipnVbUbeg==
+ bh=KPxE5omc8PnGDMkQYi4U2Ijg3Zof/vWmYW68bYpwK/g=;
+ b=Qft5sIA8cHqzDvDRtL0U/lP20mYz9zObmyNCVmwg+r8vzpbYrHxZgzXJV8XX2LosUnhlfnn95nct3mrEqspBb2YGoNfVy8FXx+Xjk0/ElYn+rF318SPJxLc8Lso8xpsSvBO25aZhz+V5xO8cJsiMBReKQJ6+qMT7KVVlFO8PINslfQKsTZFX1uFOCkLvVwdja+FS0ER0z1Kac1c0zqle40t+XgJiyMlFzPTdbC4qt3mMRuZHPL0OJBZmW2cO8oAA/IlR/YAf/ZLrr1usdqGsopBzAghzowBn9nefTW8hJhfjvjPLLEZBPRuVDuPdvZeka+zKFd89gy8KY9QCsNr4ZQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XEqYmqIZbfVY0YXKsD66bpQ94f0RbuJqeJhJxdP/pxM=;
- b=QxkTequfka5T6DBnKeMDwYj0zXWs66+EUbXmtDyTuVcxCfEORJtCqk+3d7GuMGb3YmeIO/OiF0jV5/T7e6gbKx56bwGTuXkguiR4EweQVtmOpGHlRSxc2j940jFNYyg8Q6TdTaEsumcvDVend9J1L3bsXOURO4oy18jIr9pIb2M=
+ bh=KPxE5omc8PnGDMkQYi4U2Ijg3Zof/vWmYW68bYpwK/g=;
+ b=W974FT/ocSNgYfVBe/0679yNpUMXPM7VPV8Uit70cZXKPwKxAWioh4OBhxh0TT3/3iadTiptqn3JNSQSyRSFSPeuNJLLmKDXL7SMYhukdTBVnR08qCNi9hLuBXDYjC2gr1DsVIy30j91H5759Rlj7KIS6rbyxlFG0c5zxh6+G7c=
 Received: from PR3PR08MB5786.eurprd08.prod.outlook.com (2603:10a6:102:85::9)
  by PA6PR08MB10593.eurprd08.prod.outlook.com (2603:10a6:102:3c8::18) with
  Microsoft SMTP Server (version=TLS1_2,
@@ -89,13 +89,11 @@ CC: nd <nd@arm.com>, Mark Rutland <Mark.Rutland@arm.com>, Mark Brown
 	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
 	"will@kernel.org" <will@kernel.org>, "lpieralisi@kernel.org"
 	<lpieralisi@kernel.org>
-Subject: [PATCH 1/3] arm64/sysreg: Support feature-specific fields with 'Feat'
- descriptor
-Thread-Topic: [PATCH 1/3] arm64/sysreg: Support feature-specific fields with
- 'Feat' descriptor
-Thread-Index: AQHcN5/5lSWDfFM9m0quOC/kafkicw==
+Subject: [PATCH 2/3] arm64/sysreg: Add ICH_VMCR_EL2
+Thread-Topic: [PATCH 2/3] arm64/sysreg: Add ICH_VMCR_EL2
+Thread-Index: AQHcN5/5pM74vroA00KtAM4qMTcklg==
 Date: Tue, 7 Oct 2025 15:35:14 +0000
-Message-ID: <20251007153505.1606208-2-sascha.bischoff@arm.com>
+Message-ID: <20251007153505.1606208-3-sascha.bischoff@arm.com>
 References: <20251007153505.1606208-1-sascha.bischoff@arm.com>
 In-Reply-To: <20251007153505.1606208-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -106,8 +104,8 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	PR3PR08MB5786:EE_|PA6PR08MB10593:EE_|DB5PEPF00014B9C:EE_|VI1PR08MB10242:EE_
-X-MS-Office365-Filtering-Correlation-Id: 99597c52-457f-47ef-7aba-08de05b73337
+	PR3PR08MB5786:EE_|PA6PR08MB10593:EE_|AM1PEPF000252DA:EE_|AS4PR08MB7478:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8fb92087-1a01-4297-9f6f-08de05b73368
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
@@ -115,33 +113,33 @@ X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
  BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700021;
 X-Microsoft-Antispam-Message-Info-Original:
- =?iso-8859-1?Q?27Kp21X3zt3k6nYi0lB9MYXinTnKijc0mOO2E9LdfKY84jqI2Z7c4zWNZT?=
- =?iso-8859-1?Q?buh3lGLBXgSjagEUqftxjTJd3qw4b0P9+3Ts/bnUmvrQJbgkEk3CrYGvnf?=
- =?iso-8859-1?Q?8EC5Kro4kdmLmLNKZZ3RkIoyySYUOGV+SURC8hFcZHmGZlrjUXwvr1G0DW?=
- =?iso-8859-1?Q?1VAIPiwfp+w21l6FiyZgY4/aY7XMFjWT7HaBvZ3YtjrjsITJQvNl25nkG5?=
- =?iso-8859-1?Q?aBZujRgpoaCey/C40aeuGyYtQhvbetIBN+dDQt83VRv7uTZAVi6zb2E0ul?=
- =?iso-8859-1?Q?uJ+6O+WETvDJ1VOPZLJtLn4UPgUzrWqMKORu5Gmi4QSaWRJMG4t+F01M53?=
- =?iso-8859-1?Q?gLl9HkpUJX0wXhE+DIRoU3MI6WjQWxRoGwD/Um+WNu2+LeDlau1CZChcph?=
- =?iso-8859-1?Q?Wu7/nYawDZWSQtd56cvua5k1+0dbgiYMTIipyicEbgq9UlNmlJiNrxii46?=
- =?iso-8859-1?Q?jR/v+9EeExoGhN/tgtrBJMiA5eS3UOGfKLYm4Bp/XRKDxkvrTnaeprAqwB?=
- =?iso-8859-1?Q?Xf1frlTeOx0BORzPuLfxg/kibrACbAN4mtI8H3jdJKgO/z71RhbUnc1OLv?=
- =?iso-8859-1?Q?xhTArf4XstEcBJiGlHXkGzdBJwLLaZzquqMY1alYULVuBDlXL5ZPhZCvOa?=
- =?iso-8859-1?Q?Z/SuWcEhsKoVfXNOCCd6p9RzpHpQEKPiUcnAwNP33SdRyFKyhEKf5r9zEx?=
- =?iso-8859-1?Q?DIBXSNDTCaBxVX+zn5nt7F5dCURiBE1ILgF0dXGQP1baDz/O8WXmLBOh6z?=
- =?iso-8859-1?Q?ES+NA7UiD/YT+RzX8eVKnXalDdKg7GrQ9IdDCpqUC0IuJc2i5hU5e0A4He?=
- =?iso-8859-1?Q?9AfbJ3qJhei7RhjdrJIz6KDZC+mVea73L2tzAWLgIidG2aESyGl2mLYabz?=
- =?iso-8859-1?Q?gWlgd4BUwoSHN3EtYtr2NGLokTB1WmplG0ueo5JnqQtsC/nR4snR3e47t6?=
- =?iso-8859-1?Q?aE1y1QwUno0Dff7hCDyIJyNizdMzO1JEOucwCjy6meKi6nOFB4lPrl0+yL?=
- =?iso-8859-1?Q?wL0Fned6qle/lpMzJisagXJJN/2kGyjtNiqzXCEQoPtDIU2hXppCxG6EeF?=
- =?iso-8859-1?Q?cilfjy7JLeOtOcJRWPbofb+8S0U75+oEBSihv5rZYp6H6ZvZb+z+YvegQH?=
- =?iso-8859-1?Q?7V2MMsu8+8/d/nLb2xWm/ngKeLLFo2+JAYKsx0qnnxjvcxlzxRoFERZib/?=
- =?iso-8859-1?Q?0f2yOz3D1qBaUyCxAic0qaR8LYxM4+fXtxBFMANZFO+0ppcRmm3OTT+SwA?=
- =?iso-8859-1?Q?W8tDKHm2mwatstPDdF76K1CBUyozRtls4WTOwNa/EkNhiU5SbeCKa7uQOX?=
- =?iso-8859-1?Q?k/Wl4FxE1yQYNEfoloe90Ivj+mVHk3+LQyKWuBum7m5Q6Lf6AEr7U9kh+A?=
- =?iso-8859-1?Q?NTxVA0LJcica2kmwQ73JCFZLQqfCI3rjD5NsXmLAQSTQ37NS8qebBRLX70?=
- =?iso-8859-1?Q?v8YoSMmMfO3lfhXwc+OCMY0WN2AKBlx0KSyGZsKHdMdK1f82g4Woihcp/C?=
- =?iso-8859-1?Q?ML7YLlHVsv9yFpcAro/TM+orrFbeF8SbpBrkbpt79OuJAlrkKoegF1xDbF?=
- =?iso-8859-1?Q?i7CNsZEzTikYqLLs2Cy5r07DnJ7D?=
+ =?iso-8859-1?Q?2r4rfNG62jh8ySGOVh4W2ib3zLc+1t7diOB9tsRacZhJxJ5fcKGhiRkvdE?=
+ =?iso-8859-1?Q?DeYee063iFaQKnH2jAWe/JOvDzKB8tSZoWL2j9KF6LervOHidHq+QzbK5g?=
+ =?iso-8859-1?Q?eH5XrIq4YKfep+FSxgILx72SZp1doj2bGPNy4sJU6VjI5pvd/IM8MLFNg6?=
+ =?iso-8859-1?Q?WmyBEB2yjA4SiAJNvhqabDzpOnSqNkixi7EFNte45arG1ITXv0qpwTJMCx?=
+ =?iso-8859-1?Q?P8T9gqVzUE/7g50LsLwJvgdhM9ycqRSVJncsoo9APeM8G12RTV0Y6iTh/M?=
+ =?iso-8859-1?Q?1mGnCz10q6YZYhQZKMC0PbGzGr6nWApinwukprCMS+43j5d3Ydh2Uuw4bc?=
+ =?iso-8859-1?Q?rJ3uF6j5AkxrvaDjoK90Datx+C5gvFflvloNtn3/jepvsWHY8f/5tvGGRk?=
+ =?iso-8859-1?Q?5NtsbAyQzrWEGd+lhXI5zXPE5V+GxY52TTOmTIW4/zUru9wjO2wUndXwSK?=
+ =?iso-8859-1?Q?JgUeIwQbPwVwLNDBaf2zy6flJgT9fiIjxeogf3MvZfa8FegeOYhSO9Vl1J?=
+ =?iso-8859-1?Q?IjiYxm6KKjpvW7WO4WvOTq4BejYpeRI1ddooMwD7SUgd0AiI4+PUYN0Qdl?=
+ =?iso-8859-1?Q?iigeHMKfLiMvi9BKLY/hQVl8Mz4aFW1BcYDu+NwAeCg4rvwNQEcAeGS8Vd?=
+ =?iso-8859-1?Q?RxDFy3vm/meyIkqSW3+O0lZ/3HnfF5z72cfPTM4tuvLminH5KwOh42qN5h?=
+ =?iso-8859-1?Q?nBEy32y+6Dh8G8Z+8a/x7sL58lvebQuHBwXEwKjx32nBboul9BVCF8QjJ2?=
+ =?iso-8859-1?Q?W+sjy2vC/C810CiilENthAMq6zEsOPGs/NmpO/7w0Yg8SdMl8kkWFxmYzZ?=
+ =?iso-8859-1?Q?DGZwf73BHS4CJ1iWaoVgXJDWr6IWqJ2r6s4F3LwVlgSRVj924JvV9r7dIv?=
+ =?iso-8859-1?Q?SVDXLkNuP934eJKEp15caRVWds/w/Se0IDhcpbrmdRkL52VMXOVtyMOojA?=
+ =?iso-8859-1?Q?z0QUzvT15SkOQ1a9REVBsSt5GJ92YqdUHeWDHYPPTZ4iqEKyk5MlrMkkrW?=
+ =?iso-8859-1?Q?f+fhVVd6fXcdjzriSodTp1/8jTPq44+zcosYLrDVTBm2+v0kt8wGrx9qYh?=
+ =?iso-8859-1?Q?JaT4hZBZJwLg/n9yHYAs++dRULBJUSNSci1+jzn9vamB2o/NRSmWsTAmLy?=
+ =?iso-8859-1?Q?QcEltjyRDq3OcZCu8pPBEzFTD3eKGHCikeuff3KCPT97JJ/XrwjELk60GV?=
+ =?iso-8859-1?Q?ch+iKX1weY688TYj7BuMlZFoy7kaZp+E3r1kaUql9CIJtfM9xq4GKOb7L0?=
+ =?iso-8859-1?Q?PeW8e1T57L8uQpj/8CporTsHCol9I7K7TtExO7A/+DOHx1MOcfjdSJ9Dio?=
+ =?iso-8859-1?Q?VeylPE/3UUsY2ORruZDw4juPdahkDy5q/jD/sTeaaX7O3HTU0ZCUDllKT8?=
+ =?iso-8859-1?Q?7XjKJcFRsmWeV9PL0yr4rfO8n3NnCpJz6GvpAE6zyhwi2huqSDzplEbNTI?=
+ =?iso-8859-1?Q?9A1ouimRpvRhFc9Dncu2UoKvFa4xgtIugRLJstP7WK/EX83sK2t4ttNLKL?=
+ =?iso-8859-1?Q?GfyFrko/pjzygPS+g6bTF3geipOVtgFEoH9yhxGLpyE9c9vDWs3Mc8Zdnp?=
+ =?iso-8859-1?Q?ApMHjbOONy2Tt2R80xQd84uQuNFZ?=
 X-Forefront-Antispam-Report-Untrusted:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR3PR08MB5786.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
@@ -155,401 +153,101 @@ MIME-Version: 1.0
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR08MB10593
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB5PEPF00014B9C.eurprd02.prod.outlook.com
+ AM1PEPF000252DA.eurprd07.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	d938974c-6d49-4b8b-3631-08de05b71c1e
+	d5b870f0-8f5c-4fcc-853f-08de05b71c56
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|14060799003|35042699022|1800799024|36860700013|82310400026;
+	BCL:0;ARA:13230040|82310400026|35042699022|14060799003|7416014|36860700013|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?iso-8859-1?Q?OnS1RNPakNqp8z3nG1PDm4SR//nTW9xnDSAKM+kQK4eJRj30ohHBo/8W3o?=
- =?iso-8859-1?Q?PDgyrmYAWZiItrzG3ay6r3CvuNF3HmaeyXUPBnIUE0vqlPgjltFmXjN288?=
- =?iso-8859-1?Q?RdV7dyaHPVowaK9o58nkxaK+oqPb/XFiuwZN8ARN82WzHoO+EYbiIHJIMN?=
- =?iso-8859-1?Q?s8zRCr4xKFWvvp2eFid/xTrwyEm4L4pm+vJlY4IEDK4ZOhW8q5dzHL+UEt?=
- =?iso-8859-1?Q?qren9yv6yvftwsDt/CGirB5wxNBVIXKPkatknkD0ySGcgLVQgjMMrw6zu0?=
- =?iso-8859-1?Q?o4VXpGP/fVj6STX3NX3eNKKCrsPSJU5A42Q4rvrKdgkCpUvKqLSNjucenO?=
- =?iso-8859-1?Q?P7xxx9KVekYfGTQuUECTobvib9htseDoKTOi9w1Pph0O8NGpBBwnpIEhBW?=
- =?iso-8859-1?Q?ZXj/z6ArHQj8jnFLo9wMrteJGUX52H6E/BPH3gfPnw3FZRZz8qQMCBI1v0?=
- =?iso-8859-1?Q?8kMqinZcr85NZyG12A13Z/GBgV7gW2/n54uk7atSYsc3Of7Iu+CkGfBUqW?=
- =?iso-8859-1?Q?b5dBsmaesWOh4bTk3hCicZIt2x4N/y9tXwW9X2FzgSkUyZPChip5eAiNP1?=
- =?iso-8859-1?Q?+6C6ufqukNQ6A/Fwx3IwnanDnFgEptfCx/AknDAU9kKuMpzaH03MQqkDsY?=
- =?iso-8859-1?Q?+wuntIS544UJhTtNIhmHqDJtxgn5dvgv7QFaOyNJWKemiN8gxq4BlFSucA?=
- =?iso-8859-1?Q?2fE09kbkq2OX6CG7mGJfvJZCDsejld7caqO5cuid+xNBCGr8753dv6Pqao?=
- =?iso-8859-1?Q?gNTHi8GqgQOUkEjF6qoaxGy/f1LLkr+85bvSFiLbQPsvaNtT5feCl+GYWa?=
- =?iso-8859-1?Q?7JTuo3Iyasf8FQ2LejndkONHeFR+4fTqRr9mgTLzYTXTuCgnFCi+oBSpf8?=
- =?iso-8859-1?Q?6tbKrVgfE6LXXqPUoR/derQbIjx3Y4677/DMJA7qXKwYauejIm+Sd3xjR2?=
- =?iso-8859-1?Q?OL+kehlZteqeBvoMpunef3uEyrsfj2/J7n6tBL4UocfkyBUSysXjz/wpOI?=
- =?iso-8859-1?Q?m2aWfRhnhoublV/RP5Fx7oiybYXghO7vz65iQ2NnB9KRmm7iSxPmY0mxs5?=
- =?iso-8859-1?Q?8+BMguc/ghp/R0x872vkjygBFoU8k6+ns3y9C9vBz0SRYLFB7E63QB7f1x?=
- =?iso-8859-1?Q?nyS1ytklFb1bt99c8bq/DQr7SWTFl5Lwo729xoG9Fe9YxmJlXVeIB3BQuJ?=
- =?iso-8859-1?Q?NYRWJuH2xjv0rJlGe0DGVwfdvG+4gQFJuhcDxiOM+GLHIopY98TIGj0snZ?=
- =?iso-8859-1?Q?5l7SfMS4MPGyTKveiMxt3xx9ng8vep3Q8/upbWCH3KdM+rptb5Ar1KI9Md?=
- =?iso-8859-1?Q?pAX1H0jrAc7F0U418iAqh/2ZrGjZvIpmy5zSV0yOnSPEvFtzGUdo4xAKNh?=
- =?iso-8859-1?Q?FP1EJ0RwtiFIBNOVlLA/JJrtYIs9b5WJtCkHGELwDEk0b6uJhvHgHDwtS5?=
- =?iso-8859-1?Q?srLS4EKamYJ+d59cztvv5z0gzEoZ9/rRI1ZbxwcvW6j/FS+JqlSjn8+ERX?=
- =?iso-8859-1?Q?nO0K9SFYZCSwSb7ZMR2b6ZVEX01vJSWjoScICqryWTUVCtbyea7ECt6F86?=
- =?iso-8859-1?Q?tYJHM/SQZ1xOVhxL8iXl1gtVy8mv5x/re+hgeU/0elR4U0zHLjGIcmroSi?=
- =?iso-8859-1?Q?X6kDpi8Gl4iFo=3D?=
+	=?iso-8859-1?Q?z/FkPu4EJAT/J8VFtGfNMKmYDtyrhvV8/4xHgI2TEXSeYLhJNJTT/2k7ZM?=
+ =?iso-8859-1?Q?IDVeazHJeivlSDMQ9/ESG9jd6+jmz6Jk5O+YbmGc1h4J+ftbYSYjP9nCoW?=
+ =?iso-8859-1?Q?UIf4WAbE4aHs97YR0/UWMjcP2YSRqcFg/HU9c1kiMrpis9/foy0n87uUZv?=
+ =?iso-8859-1?Q?ycDuiKNrYX3fHxg1VidweHYV5acmeBdMYCc6TcGSgwFM11iZX8IaU2KAXU?=
+ =?iso-8859-1?Q?lZgGcrG49n8ftLp7WzlYyqEGTQqN42w/N8SBd2NeuRTdeDHlGm3DQVtNyJ?=
+ =?iso-8859-1?Q?QiMrjb1M4vk4SVunJMe/8DXA+wAeV5drE+b1uJIssHyccRDC7D8+Ja/Mxt?=
+ =?iso-8859-1?Q?v3hWJ/MX6DVm40527FInG4MSkvI08cplWwISYx7FY6ZKbAAATtoWd8IIgF?=
+ =?iso-8859-1?Q?AfHQZDxrzbXNTaJcMp32dxOX//fp1BbFAyP8vxISIzhGiDyfk+CIsP13H+?=
+ =?iso-8859-1?Q?cfLn4zbY8rC0QSQegRPwqW/FDZJUkMs9i6NnN8Xt0fDHbZB8QOWJuYjJ+b?=
+ =?iso-8859-1?Q?xNDpbUpfQBtXQMDXtHrZ44RVy2SQr7vAhs0/HeeI504s+/DyIhSsswzo5Y?=
+ =?iso-8859-1?Q?5nyjzCf6UFsBNSiSc0E9qOT+FcNPlFwBGFqUS7GqXBFy45x6laVxyY9cgt?=
+ =?iso-8859-1?Q?fy5niYrKeeCK+twy6FYHz/6pA1hEhZjIblUDSozG7rcxpe7Taj+3e6erwW?=
+ =?iso-8859-1?Q?ghHV/Vmlt9+OrvutkAhakbWUKFJTB7yaY9IpP+cG1dW+iBApIGPNTmY4mU?=
+ =?iso-8859-1?Q?loN1pWqHwGgWsjZlUOnpGsProxgONlsgrBJkpE14oRkZFUJBhpo33yr/Cy?=
+ =?iso-8859-1?Q?xGPFQke9UpdfnT9JbqGOiA+LXZikCNNGmy7JYP4ULIsgtxFOCae+Rwa38g?=
+ =?iso-8859-1?Q?4DIBidvZ8sgycCwcgWS0W1HMyp9uBPsNR9OVsng4LxRgz5YyhcDEQRGsF7?=
+ =?iso-8859-1?Q?H0jH7WtPqB9VvCgWWxFIh43w7f6haZMBJngFpf8M+TlRJ3hoyx4LhK/LBA?=
+ =?iso-8859-1?Q?KmRQBEsNexY04NJVePvgqtI3GIT0RfDvCFETQLAVuGqx8hNQyts4hHeGcs?=
+ =?iso-8859-1?Q?Pi2QdHZ1gV6J/caEaMo/1YpYOPQk8EcaKj8WP2rYe0Jw7NtKb3kTNDwKCv?=
+ =?iso-8859-1?Q?ZqNOg8LcMs+DTFNNGlsjPVmyY0/yMFlZtRC6DYh19P5cGTHI2KCQpSfiyG?=
+ =?iso-8859-1?Q?9F0qv9zjFihzXC3tgQLdlh/aUirO4iw9xob9UNIz89zs7yGOZ9OxaJ2GH4?=
+ =?iso-8859-1?Q?fF7xwMUsB7vjxVsRsNFKLOotGA0yXgImv6pyGzdvINNyoV2YMCirQMPic/?=
+ =?iso-8859-1?Q?y4UOd1/QziEVdJVzk7Uw43s4rtqOx+BkXlUsjW8of+6zzDwgwXTDc8aZHh?=
+ =?iso-8859-1?Q?NyXcsME66kwO+EWUVWjBOsNuGAslNve5f+JWEpAWyADJFjY+zcCs9MEd01?=
+ =?iso-8859-1?Q?gktzHUjh2O8RhImRF+PymXIyqr9foSElB4KcwKXryDt0XXLik+LJkm0p9A?=
+ =?iso-8859-1?Q?NatfX3KjzBongcuCVnA3NQlAidl6BswYLOGpDYU9GNLRrZ+Uhx9wDTK8hK?=
+ =?iso-8859-1?Q?+I0XLPs6RW8pO8CEOq339yjUAEe487q+rDWdiljuIR6c8utYSYqiH7/aRr?=
+ =?iso-8859-1?Q?CBRfdTCGQRr5M=3D?=
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(14060799003)(35042699022)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(35042699022)(14060799003)(7416014)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2025 15:35:52.8534
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2025 15:35:53.1941
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99597c52-457f-47ef-7aba-08de05b73337
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8fb92087-1a01-4297-9f6f-08de05b73368
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DB5PEPF00014B9C.eurprd02.prod.outlook.com
+	AM1PEPF000252DA.eurprd07.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB10242
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR08MB7478
 
-Some system register field encodings change based on the available and
-in-use architecture features. In order to support these different
-field encodings, introduce the Feat descriptor (Feat, ElseFeat,
-EndFeat) for describing such sysregs.
+Add the ICH_VMCR_EL2 register, which is required for the upcoming
+GICv5 KVM support. This register has two different field encodings,
+based on if it is used for GICv3 or GICv5-based VMs. The
+GICv5-specific field encodings are generated with a FEAT_GCIE prefix.
 
-The Feat descriptor can be used in the following way (Feat acts as
-both an if and an else-if):
-
-        Sysreg  EXAMPLE 0    1    2    3    4
-        Feat    FEAT_A
-	Field   63:0    Foo
-	Feat    FEAT_B
-	Field   63:1    Bar
- 	Res0    0
-        ElseFeat
-        Field   63:0    Baz
-        EndFeat
-        EndSysreg
-
-This will generate a single set of system register encodings (REG_,
-SYS_, ...), and then generate three sets of field definitions for the
-system register called EXAMPLE. The first set is prefixed by FEAT_A,
-e.g. FEAT_A_EXAMPLE_Foo. The second set is prefixed by FEAT_B, e.g.,
-FEAT_B_EXAMPLE_Bar. The third set is not given a prefix at all,
-e.g. EXAMPLE_BAZ. For each set, a corresponding set of defines for
-Res0, Res1, and Unkn is generated.
-
-The intent for the final prefix-less ElseFeat is for describing
-default or legacy field encodings. This ensure that new
-feature-conditional encodings can be added to already-present sysregs
-without affecting existing legacy code.
-
-The Feat descriptor can be used within Sysreg or SysregFields
-blocks. Field, Res0, Res1, Unkn, Rax, SignedEnum, Enum can all be used
-within a Feat block. Fields and Mapping can not. Fields that vary with
-features must be described as part of a SysregFields block,
-instead. Mappings, which are just a code comment, make little sense in
-this context, and have hence not been included.
-
-There are no changes to the generated system register definitions as
-part of this change.
+This register is already described in the GICv3 KVM code
+directly. This will be ported across to use the generated encodings as
+part of an upcoming change.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arch/arm64/tools/gen-sysreg.awk | 148 ++++++++++++++++++++++----------
- 1 file changed, 104 insertions(+), 44 deletions(-)
+ arch/arm64/tools/sysreg | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.=
-awk
-index f2a1732cb1f63..c1bb6d5087a99 100755
---- a/arch/arm64/tools/gen-sysreg.awk
-+++ b/arch/arm64/tools/gen-sysreg.awk
-@@ -44,23 +44,35 @@ function expect_fields(nf) {
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 696ab1f32a674..a2bf8a689f968 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -4668,6 +4668,28 @@ Field	1	V3
+ Field	0	En
+ EndSysreg
 =20
- # Print a CPP macro definition, padded with spaces so that the macro bodie=
-s
- # line up in a column
--function define(name, val) {
--	printf "%-56s%s\n", "#define " name, val
-+function define(feat, name, val) {
-+	printf "%-56s%s\n", "#define " feat name, val
- }
-=20
- # Print standard BITMASK/SHIFT/WIDTH CPP definitions for a field
--function define_field(reg, field, msb, lsb) {
--	define(reg "_" field, "GENMASK(" msb ", " lsb ")")
--	define(reg "_" field "_MASK", "GENMASK(" msb ", " lsb ")")
--	define(reg "_" field "_SHIFT", lsb)
--	define(reg "_" field "_WIDTH", msb - lsb + 1)
-+function define_field(feat, reg, field, msb, lsb) {
-+	define(feat, reg "_" field, "GENMASK(" msb ", " lsb ")")
-+	define(feat, reg "_" field "_MASK", "GENMASK(" msb ", " lsb ")")
-+	define(feat, reg "_" field "_SHIFT", lsb)
-+	define(feat, reg "_" field "_WIDTH", msb - lsb + 1)
- }
-=20
- # Print a field _SIGNED definition for a field
--function define_field_sign(reg, field, sign) {
--	define(reg "_" field "_SIGNED", sign)
-+function define_field_sign(feat, reg, field, sign) {
-+	define(feat, reg "_" field "_SIGNED", sign)
- }
-=20
-+# Print the Res0, Res1, Unkn masks
-+function define_resx_unkn(feat, reg, res0, res1, unkn) {
-+	if (res0 !=3D null)
-+		define(feat, reg "_RES0", "(" res0 ")")
-+	if (res1 !=3D null)
-+		define(feat, reg "_RES1", "(" res1 ")")
-+	if (unkn !=3D null)
-+		define(feat, reg "_UNKN", "(" unkn ")")
-+	if (res0 !=3D null || res1 !=3D null || unkn !=3D null)
-+		print ""
-+	}
++Sysreg	ICH_VMCR_EL2	3	4	12	11	7
++Feat	FEAT_GCIE
++Res0	63:32
++Field	31:27	VPMR
++Res0	26:1
++Field	0	EN
++ElseFeat
++Res0	63:32
++Field	31:24	VPMR
++Field	23:21	VBPR0
++Field	20:18	VBPR1
++Res0	17:10
++Field	9	VEOIM
++Res0	8:5
++Field	4	VCBPR
++Field	3	VFIQEn
++Field	2	VAckCtl
++Field	1	VENG1
++Field	0	VENG0
++EndFeat
++EndSysreg
 +
- # Parse a "<msb>[:<lsb>]" string into the global variables @msb and @lsb
- function parse_bitdef(reg, field, bitdef, _bits)
- {
-@@ -132,10 +144,7 @@ $1 =3D=3D "EndSysregFields" && block_current() =3D=3D =
-"SysregFields" {
- 	if (next_bit > 0)
- 		fatal("Unspecified bits in " reg)
-=20
--	define(reg "_RES0", "(" res0 ")")
--	define(reg "_RES1", "(" res1 ")")
--	define(reg "_UNKN", "(" unkn ")")
--	print ""
-+	define_resx_unkn(feat, reg, res0, res1, unkn)
-=20
- 	reg =3D null
- 	res0 =3D null
-@@ -162,14 +171,16 @@ $1 =3D=3D "Sysreg" && block_current() =3D=3D "Root" {
- 	res1 =3D "UL(0)"
- 	unkn =3D "UL(0)"
-=20
--	define("REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
--	define("SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", " op2 ")"=
-)
-+	feat =3D null
-+
-+	define(feat, "REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
-+	define(feat, "SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", " o=
-p2 ")")
-=20
--	define("SYS_" reg "_Op0", op0)
--	define("SYS_" reg "_Op1", op1)
--	define("SYS_" reg "_CRn", crn)
--	define("SYS_" reg "_CRm", crm)
--	define("SYS_" reg "_Op2", op2)
-+	define(feat, "SYS_" reg "_Op0", op0)
-+	define(feat, "SYS_" reg "_Op1", op1)
-+	define(feat, "SYS_" reg "_CRn", crn)
-+	define(feat, "SYS_" reg "_CRm", crm)
-+	define(feat, "SYS_" reg "_Op2", op2)
-=20
- 	print ""
-=20
-@@ -183,14 +194,7 @@ $1 =3D=3D "EndSysreg" && block_current() =3D=3D "Sysre=
-g" {
- 	if (next_bit > 0)
- 		fatal("Unspecified bits in " reg)
-=20
--	if (res0 !=3D null)
--		define(reg "_RES0", "(" res0 ")")
--	if (res1 !=3D null)
--		define(reg "_RES1", "(" res1 ")")
--	if (unkn !=3D null)
--		define(reg "_UNKN", "(" unkn ")")
--	if (res0 !=3D null || res1 !=3D null || unkn !=3D null)
--		print ""
-+	define_resx_unkn(feat, reg, res0, res1, unkn)
-=20
- 	reg =3D null
- 	op0 =3D null
-@@ -201,6 +205,7 @@ $1 =3D=3D "EndSysreg" && block_current() =3D=3D "Sysreg=
-" {
- 	res0 =3D null
- 	res1 =3D null
- 	unkn =3D null
-+	feat =3D null
-=20
- 	block_pop()
- 	next
-@@ -225,8 +230,7 @@ $1 =3D=3D "EndSysreg" && block_current() =3D=3D "Sysreg=
-" {
- 	next
- }
-=20
--
--$1 =3D=3D "Res0" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields") {
-+$1 =3D=3D "Res0" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
- 	expect_fields(2)
- 	parse_bitdef(reg, "RES0", $2)
- 	field =3D "RES0_" msb "_" lsb
-@@ -236,7 +240,7 @@ $1 =3D=3D "Res0" && (block_current() =3D=3D "Sysreg" ||=
- block_current() =3D=3D "SysregFields
- 	next
- }
-=20
--$1 =3D=3D "Res1" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields") {
-+$1 =3D=3D "Res1" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
- 	expect_fields(2)
- 	parse_bitdef(reg, "RES1", $2)
- 	field =3D "RES1_" msb "_" lsb
-@@ -246,7 +250,7 @@ $1 =3D=3D "Res1" && (block_current() =3D=3D "Sysreg" ||=
- block_current() =3D=3D "SysregFields
- 	next
- }
-=20
--$1 =3D=3D "Unkn" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields") {
-+$1 =3D=3D "Unkn" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
- 	expect_fields(2)
- 	parse_bitdef(reg, "UNKN", $2)
- 	field =3D "UNKN_" msb "_" lsb
-@@ -256,58 +260,58 @@ $1 =3D=3D "Unkn" && (block_current() =3D=3D "Sysreg" =
-|| block_current() =3D=3D "SysregFields
- 	next
- }
-=20
--$1 =3D=3D "Field" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields") {
-+$1 =3D=3D "Field" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
- 	expect_fields(3)
- 	field =3D $3
- 	parse_bitdef(reg, field, $2)
-=20
--	define_field(reg, field, msb, lsb)
-+	define_field(feat, reg, field, msb, lsb)
- 	print ""
-=20
- 	next
- }
-=20
--$1 =3D=3D "Raz" && (block_current() =3D=3D "Sysreg" || block_current() =3D=
-=3D "SysregFields") {
-+$1 =3D=3D "Raz" && (block_current() =3D=3D "Sysreg" || block_current() =3D=
-=3D "SysregFields" || block_current() =3D=3D "Feat") {
- 	expect_fields(2)
- 	parse_bitdef(reg, field, $2)
-=20
- 	next
- }
-=20
--$1 =3D=3D "SignedEnum" && (block_current() =3D=3D "Sysreg" || block_curren=
-t() =3D=3D "SysregFields") {
-+$1 =3D=3D "SignedEnum" && (block_current() =3D=3D "Sysreg" || block_curren=
-t() =3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
- 	block_push("Enum")
-=20
- 	expect_fields(3)
- 	field =3D $3
- 	parse_bitdef(reg, field, $2)
-=20
--	define_field(reg, field, msb, lsb)
--	define_field_sign(reg, field, "true")
-+	define_field(feat, reg, field, msb, lsb)
-+	define_field_sign(feat, reg, field, "true")
-=20
- 	next
- }
-=20
--$1 =3D=3D "UnsignedEnum" && (block_current() =3D=3D "Sysreg" || block_curr=
-ent() =3D=3D "SysregFields") {
-+$1 =3D=3D "UnsignedEnum" && (block_current() =3D=3D "Sysreg" || block_curr=
-ent() =3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
- 	block_push("Enum")
-=20
- 	expect_fields(3)
- 	field =3D $3
- 	parse_bitdef(reg, field, $2)
-=20
--	define_field(reg, field, msb, lsb)
--	define_field_sign(reg, field, "false")
-+	define_field(feat, reg, field, msb, lsb)
-+	define_field_sign(feat, reg, field, "false")
-=20
- 	next
- }
-=20
--$1 =3D=3D "Enum" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields") {
-+$1 =3D=3D "Enum" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
- 	block_push("Enum")
-=20
- 	expect_fields(3)
- 	field =3D $3
- 	parse_bitdef(reg, field, $2)
-=20
--	define_field(reg, field, msb, lsb)
-+	define_field(feat, reg, field, msb, lsb)
-=20
- 	next
- }
-@@ -329,7 +333,63 @@ $1 =3D=3D "EndEnum" && block_current() =3D=3D "Enum" {
- 	val =3D $1
- 	name =3D $2
-=20
--	define(reg "_" field "_" name, "UL(" val ")")
-+	define(feat, reg "_" field "_" name, "UL(" val ")")
-+	next
-+}
-+
-+$1 =3D=3D "Feat" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
-+	# Don't push a new block if we're already in a Feat
-+	# block. This is to support constructs such as:
-+	#	Feat FEAT_A
-+	#	...
-+	#	Feat FEAT_B
-+	#	...
-+	#	ElseFeat
-+	#	...
-+	#	EndFeat
-+	if (block_current() !=3D "Feat")
-+		block_push("Feat")
-+	else
-+		define_resx_unkn(feat, reg, res0, res1, unkn)
-+
-+	expect_fields(2)
-+	feat =3D $2 "_"
-+
-+	next_bit =3D 63
-+
-+	res0 =3D "UL(0)"
-+	res1 =3D "UL(0)"
-+	unkn =3D "UL(0)"
-+
-+	next
-+}
-+
-+$1 =3D=3D "ElseFeat" && block_current() =3D=3D "Feat" {
-+	expect_fields(1)
-+
-+	define_resx_unkn(feat, reg, res0, res1, unkn)
-+
-+	res0 =3D "UL(0)"
-+	res1 =3D "UL(0)"
-+	unkn =3D "UL(0)"
-+	feat =3D null
-+	next_bit =3D 63
-+
-+	next
-+}
-+
-+$1 =3D=3D "EndFeat" && block_current() =3D=3D "Feat" {
-+	expect_fields(1)
-+
-+	define_resx_unkn(feat, reg, res0, res1, unkn)
-+
-+	res0 =3D null
-+	res1 =3D null
-+	unkn =3D null
-+	feat =3D null
-+
-+	block_pop()
-+
- 	next
- }
-=20
+ Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
+ Fields	CONTEXTIDR_ELx
+ EndSysreg
 --=20
 2.34.1
