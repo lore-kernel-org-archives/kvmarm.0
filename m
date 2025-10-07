@@ -1,156 +1,86 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BF2277028
-	for <kvmarm@lists.linux.dev>; Tue,  7 Oct 2025 22:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCDE235C01
+	for <kvmarm@lists.linux.dev>; Tue,  7 Oct 2025 23:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759875302; cv=none; b=niFMp5VMUlL0PhvUJc+l6+y9P3RmTAP6yXh8xNVxaNSnnP1/sxNEIAhcpOpG1aC4CLYXHxq4h4KvwTxfUibIC/KpBuZXEpjz8aSJYjUSmG5BU7XHrRhbiHWwZJKBBJAPu1sK1dt8ih9e1E5fqHcqe1rWRQxYXt1PjFYCRqo04xI=
+	t=1759879587; cv=none; b=GiSNUULCMYwUTGz18hWl8Y0Xiq20UxsfgHWexqnND4TMqKwI9gqe8pv8WQ5LVxCsaKrtf6VTO+v+az33nA2TlXKkK/pVcj8OPCnKfKtmOviYdsGaAfRIg13Y8bFLqRri5kDyMj6M+xxo1EgqtQsTfoaXJFPgFyA9jBljnlm1vKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759875302; c=relaxed/simple;
-	bh=ercJrCIZ2Uh4j1w9fwtjPtGjrYq3ynhNx8655WKwJ3E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aeCq7X7A6o2FpF8G7Hi6cecJMgRAR9mlmxeE+9aiEO2XsUWGjUYn7LHKvS35Noa0W5KkcbSvzvJdwyjxYJTD/Zbs4YLYD48qPmnFI6wcRONxxuKx50nzY+NMcgRJGZqf8TOptoCUnXMmUL2uT5ciLwUsbi6aTPlKUC9vEh38h2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Fa9N7nW; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1759879587; c=relaxed/simple;
+	bh=x9Hj7pps/DCj63r8ZU2YP6qTMJf1vzu9l3cbjHgb0GM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R3wq5M8rAZIobr6eOognOr2dYdVWCvSzJ/T20o+z4DB4rFSZQPRAzKIr8rFXcF5+yw2gDlJU+SYEFfnaiKRLApHq+m7Vc2snyMlIw+VDjHpMNAIbA9VT06Qp4uwF9YQ06vfC684gBvTnbA8CZrYuaQYVH2Z2YgMbPvVvbc4C7tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FS8QTTiF; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Fa9N7nW"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2699ed6d43dso67558875ad.1
-        for <kvmarm@lists.linux.dev>; Tue, 07 Oct 2025 15:15:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759875300; x=1760480100; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=7fMZ7OhM8JOlJvnfA26tbvkth+uO96Z3bmtnJ/qhoYI=;
-        b=1Fa9N7nWSnm2NiGGOKFiUqZe5WcZ+PxSgG4tbDdkx6Fa6217PxeX9OeoxVqzKhJYfp
-         qZkixmZGz6RNWMw8ybJZpOEqdrTDyP5OeojHxnv85oINslVuE6qffcLMi1zDFk1t+nDT
-         bK4h8wlFhzcTkH1duts4S5psdyLHKJSNnFu4A5ProrufE7IcOgh2j+YZ299jqLtgoflz
-         yDB/8iOG3qkZ/Dm3PEh5hERocUHnN4TiBT+qxNym0PUXLbGENKs5YHHBi9C1/As2wP33
-         ujeGbq5N4IEeg6bjhOJGKRApVdgEVRvDPG7nqI64HQwxa5B/nIwp0cBzzB/0uwoE6rVW
-         9mcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759875300; x=1760480100;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7fMZ7OhM8JOlJvnfA26tbvkth+uO96Z3bmtnJ/qhoYI=;
-        b=ncfV308ZCfF3K84+7LmuPiNF/d6dFApcS3Ug8GS2Y+D3TTpmc6i7Al8BXyRO1cYv+I
-         A5c1RnTIFNgVCjhTt7gd8h/pUKRZQxIO93Feov3835AaReQZjEU8T7AW8Zj8o3V9AAc9
-         iXCOJC++YAF4KbLavTUge10+OfdR5Q37aIPV65mYCYpFLyZUwfn9g2LVk3PBANWwpDEc
-         bp86j4iUCvmRsprnyJH3qFGhTu5nAkeLWBQzfnY2fKbLi/QI8kDhnGuJmt79Fwv8bT+X
-         gZnvhJw9b8fYCwCI4TjozKbtAIiILEKNrwe9Vl8GFFO6u1R2qxBmcA6YCfv3PIkfpzbV
-         qH5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXRFmYT7Jdn5XSDTk9lA1UWZFRxjgairEX4DpabmhKmG7x1+Ur2ydMjiZ2zVDFvp8VGtshu6Q4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzK9Qoz/lWHsrWHhewv6x8QsXqQe8BFDWaAtGIVGDpZ+kChHwnu
-	oSkdXDLPtfmRWWHixYPhuvifjkC2R3EIyP6aaee0z2zMwkoortnWA65T15nosZReBjSAqSHVxod
-	7QJZwcA==
-X-Google-Smtp-Source: AGHT+IECKNXtIHUW5N14ZiXdwr22UXg6a0qRVDT9HGhdqQLa/WqCTYC09KfmHy6MwiN8aQHU+fr/YvGCioI=
-X-Received: from plblb3.prod.google.com ([2002:a17:902:fa43:b0:269:a2bc:79bc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2c5:b0:27f:1c1a:ee57
- with SMTP id d9443c01a7336-290273736d4mr15592295ad.16.1759875300207; Tue, 07
- Oct 2025 15:15:00 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  7 Oct 2025 15:14:20 -0700
-In-Reply-To: <20251007221420.344669-1-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FS8QTTiF"
+Date: Tue, 7 Oct 2025 16:26:14 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1759879582;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g03LvFQRmEMkNtv8DIpDALsz8Mtogbh+FxF6LYdiL5Y=;
+	b=FS8QTTiF6ggBAVHhyzBsWz22l74ZvpkuB84cxa5A7K2zFbb2TOxID3KzvNQducnHcZKSzW
+	jWT3+Rqmt5V+//jJJGTec2m4PMpxfZ99RUGNJiEq7544d44ArQbQuszqH/4uIdF1qQjMMT
+	QQVKtQ4WdAmhB/KnN9c5iOiy6sEp/DI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Jan Kotas <jank@cadence.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: KVM NV + SVE host OS warning
+Message-ID: <aOWhlvC1kROWfMSv@linux.dev>
+References: <799DD5E5-8BC2-47B3-A919-33429D3FB2F1@global.cadence.com>
+ <865xd61tt5.wl-maz@kernel.org>
+ <F9556C9F-2671-4EF6-A725-D080C3793A34@global.cadence.com>
+ <864isq1r66.wl-maz@kernel.org>
+ <aNXGW8C_S1TbFR9-@linux.dev>
+ <25C5E00D-62BC-4188-8642-21913446B32C@global.cadence.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251007221420.344669-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.710.ga91ca5db03-goog
-Message-ID: <20251007221420.344669-13-seanjc@google.com>
-Subject: [PATCH v12 12/12] KVM: guest_memfd: Add gmem_inode.flags field
- instead of using i_private
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Shivank Garg <shivankg@amd.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <25C5E00D-62BC-4188-8642-21913446B32C@global.cadence.com>
+X-Migadu-Flow: FLOW_OUT
 
-Track a guest_memfd instance's flags in gmem_inode instead of burying them
-in i_private.  Burning an extra 8 bytes per inode is well worth the added
-clarity provided by explicit tracking.
+On Tue, Oct 07, 2025 at 11:12:31AM +0000, Jan Kotas wrote:
+> Hello,
+> 
+> I was finally able to do some validation, sorry for a long delay.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- virt/kvm/guest_memfd.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+No worries, thanks for testing.
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 95267c92983b..10df35a9ffd4 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -30,6 +30,8 @@ struct gmem_file {
- struct gmem_inode {
- 	struct shared_policy policy;
- 	struct inode vfs_inode;
-+
-+	u64 flags;
- };
- 
- static __always_inline struct gmem_inode *GMEM_I(struct inode *inode)
-@@ -162,7 +164,7 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
- 
- static enum kvm_gfn_range_filter kvm_gmem_get_invalidate_filter(struct inode *inode)
- {
--	if ((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED)
-+	if (GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_INIT_SHARED)
- 		return KVM_FILTER_SHARED;
- 
- 	return KVM_FILTER_PRIVATE;
-@@ -398,9 +400,7 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
- 
- static bool kvm_gmem_supports_mmap(struct inode *inode)
- {
--	const u64 flags = (u64)inode->i_private;
--
--	return flags & GUEST_MEMFD_FLAG_MMAP;
-+	return GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_MMAP;
- }
- 
- static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
-@@ -412,7 +412,7 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
- 	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
- 		return VM_FAULT_SIGBUS;
- 
--	if (!((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED))
-+	if (!(GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_INIT_SHARED))
- 		return VM_FAULT_SIGBUS;
- 
- 	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-@@ -601,7 +601,6 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 		goto err_fops;
- 	}
- 
--	inode->i_private = (void *)(unsigned long)flags;
- 	inode->i_op = &kvm_gmem_iops;
- 	inode->i_mapping->a_ops = &kvm_gmem_aops;
- 	inode->i_mode |= S_IFREG;
-@@ -611,6 +610,8 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 	/* Unmovable mappings are supposed to be marked unevictable as well. */
- 	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
- 
-+	GMEM_I(inode)->flags = flags;
-+
- 	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR, &kvm_gmem_fops);
- 	if (IS_ERR(file)) {
- 		err = PTR_ERR(file);
-@@ -931,6 +932,8 @@ static struct inode *kvm_gmem_alloc_inode(struct super_block *sb)
- 		return NULL;
- 
- 	mpol_shared_policy_init(&gi->policy, NULL);
-+
-+	gi->flags = 0;
- 	return &gi->vfs_inode;
- }
- 
--- 
-2.51.0.710.ga91ca5db03-goog
+> First I applied the "Don't advance PC" patch on top of 6.16.9.
+> It fixed the error message, but the Guest didn’t boot.
+> I didn’t debug it further.
+> 
+> Then I applied it on top of 6.17 along with Oliver’s second patch.
+> Guest OS stops booting because of an exception, when accessing ZCR_EL2.
+> 
+> I checked the ESR_EL2 register and it has 0x66000000:
+> 
+> Access to SVE functionality trapped as a result of CPACR_EL1.ZEN,
+> CPTR_EL2.ZEN, CPTR_EL2.TZ, or CPTR_EL3.EZ
+> 
+> I’ll continue the debug to make sure the issue is not on our end.
 
+Could you please share the repro steps? Also, is the guest kernel
+unmodified? FWIW, I tested kvmarm/next as the kernel at all levels,
+kvmtool as the VMM and E2H=RES1.
+
+While the trap to L0 is unavoidable, reinjecting the SVE trap depends on
+the L0 view of CPTR_EL2 which originates from the in-memory value.
+Unless there's a bug lurking this should always be in agreement with the
+effective value programmed in CPACR_EL1.
+
+Thanks,
+Oliver
