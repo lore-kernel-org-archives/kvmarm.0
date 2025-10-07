@@ -1,57 +1,57 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD2D259CBF
-	for <kvmarm@lists.linux.dev>; Tue,  7 Oct 2025 22:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3CD25A2C9
+	for <kvmarm@lists.linux.dev>; Tue,  7 Oct 2025 22:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759875293; cv=none; b=IPjc7V6tmHlfSnM2qvdXjB1SDq4jS4YI7/3kAoYq6eBkwZk0qF6R5xI7ZN5o8+2n1zcpslCUlAw8VDOVvUIhyFu+FzoRzIwM0ltx+ODhBB9nuqt7Z39wG9r/Q67ahDLWeczaKYzzNRAj6FxWStemnMlej203HGhrxPZ6ZsBwps8=
+	t=1759875298; cv=none; b=ob8qzaN0i5UCd4PnPEWSjPmY8yhkrrPM3E3PtQjeuZ5F+x7o/SZqBUFkoMbR17QXqOnkHjnfY3uFZ4v17MWtPXlrAWavdi6dNQg8ODWG5H4o3w1vSoicNverbHR0NVy1Xnd9mLX75/DwHE03uKxZpOiwxRHsyUSzsYkRYzdI5pM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759875293; c=relaxed/simple;
-	bh=5cUK2vsz2aeKXQeo1630DELsLZCEu5/ef8gHUAuGDsQ=;
+	s=arc-20240116; t=1759875298; c=relaxed/simple;
+	bh=iKrUI9LQBOh4k9pZFLc/fEW3XuLEnIsg8figDKSsXGA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VBkmRqXJ8ukPdyL58Ln7nQ/s90gJ+MF/6IpLegA7vlTboQU2v6v3YiL8Wlb2boUSvAXMJpGA2wY3r6ccIVeyamjMClR1v8AOyEweBkOfMpB8avvolos9mwMHJtigBbYRZotQjn6/iMOQguoheKJ9hlGNh0agBNDPZEFu8Mp/mI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l27ZxRug; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=L3cGthvTtCIufQKuYmvX8bmZJayuxOELaybEXiXHOXvTn6gkDriw50Nnd1H+cBYplBJzNuDi8sO5ESb2B0rO9VnbOQ3lN1ZWuTDQz6AguFPzNezEfVX1mopSOjnAX/VCdBANIC8qS6odOkGMFeI/UkNKeb/5dgzb5BIQGlazP/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N1IZxrOe; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l27ZxRug"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b557abaad02so8345784a12.3
-        for <kvmarm@lists.linux.dev>; Tue, 07 Oct 2025 15:14:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N1IZxrOe"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-339d5dbf58aso8264564a91.3
+        for <kvmarm@lists.linux.dev>; Tue, 07 Oct 2025 15:14:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759875291; x=1760480091; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1759875293; x=1760480093; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=rE2tP6gNwSGYC+ytU0WdagFGaT6zZ0FH31dgxqOixoc=;
-        b=l27ZxRugrUIGU8DsroW4TmdfF6YMK5MO/ymTfXQEW4IH72PRrkoa2tyXFnLF593aqe
-         XTvikZgErmdv+6LhjZTz+D76HZIlRx0/IRccDAM1AAS0JkRjDahjUDH2qAmzZIa+uUwI
-         8T+8swcazo8+2V8ToFuCGKIxSJDEq5FXWV1gyYjip/2q4TyYAAHGkF8EiBH+S3H1E2Hg
-         qxTHXvppFdjZOkhSLJ/jWH5zBCSprbfZlfn8hQpLuIakUNQ7jBZeS4C3Cx3/YoWuWirv
-         RJ7ELveTgNS9xrU0XCKCGsUyoWonlb02aPCeSeHUdn/S6ADkRuwontaz+pxGdirE0b6R
-         /2Vg==
+        bh=efPtgGQoMr4oubNxAv1qKprX0Kma5wbATW1PH+6tg30=;
+        b=N1IZxrOeOpO3IqsqkXuQzsuXo2d4T5277Bjn6QKT+j9C2tN+vgklodOZ8LQIaJqe+b
+         i76mxd3yOV60o5tA0oKWNCGMpLg0BOHH0gR2E0cR2eBqTYjUqFyulBhiFGFHfrU5fTnX
+         Ds/YseQYjdj5G7YDv7i83GRJBNEkZXdu/V3lwHS3gl2N3Cllk3MjxV9N8lE0hTBsD1oH
+         JO8VRb5Ln6eTWaIwJe03FrNJC9lgKqFDA8WHm/O58sgkMIGN7L2r4rKBASnb/H1nmPJ1
+         G0Qda1kIewKrBfzymfvBMHTa//spmqPpLninf3c+P9eG6BTusND0lWCLyVGW4HPfQ07F
+         qb4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759875291; x=1760480091;
+        d=1e100.net; s=20230601; t=1759875293; x=1760480093;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rE2tP6gNwSGYC+ytU0WdagFGaT6zZ0FH31dgxqOixoc=;
-        b=XXII5k+Oo53P0Q9kSci4sITIiQzcaa4B842YIEKazA5qU+nFhmfy0UQ/NHZy8hBMnZ
-         wHPC62l5RcZbIZxnsdy6FB+SAOPoMD0U0h4Gi2+YmM+l1xfid4vpqqbzSqUiuWOlmGOJ
-         6GarR6fZF3pTUPCvmz9qEW+JpqLsBsgCEYX/0Ea3cLnQ3Eagw7peYb9BivSWIjy7nN/W
-         y5klHng3i5I8KcqPvqB0yb1mGE1INyFU+fHjeOjOQwWYp5SvHhcZJ1eXlST3PJf4YFHC
-         3eADfHKHI1j2Z4Dh8N1E1GDPs4WyQmSfExhWm0ajKocAtm8hyEeFG/TFq/qIaWKuPAuB
-         al1w==
-X-Forwarded-Encrypted: i=1; AJvYcCVtPD40qVGJ1BiSlg/3Oipkte+1GsVsU7rlLtZ+G2Rnn+zhFPgMeZIsu+mY4VB+hQ/D2JhUPgA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzC7UmbzvGhbRDKOwTE3JV7STvz/lbHwOx5NLsxBmtMWoEIU0To
-	/gFTR61RAxcsw8HErwqLgoOQz8T9prkRTNf0P/ZMOPJ5wfxhxuZLrtcwjUVZSEqIKO8qXpmZcDC
-	PvHq67w==
-X-Google-Smtp-Source: AGHT+IHT/CfaeIxGRmxefyc3Lic0lFv3xjNb/u7y6hJFRFl3s3gaiIHFCNdvEBNOqVG5LYVtjeYwLccHX/o=
-X-Received: from pgkh14.prod.google.com ([2002:a63:e14e:0:b0:b4e:4eb5:3895])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:914c:b0:32b:7220:8536
- with SMTP id adf61e73a8af0-32da8138b18mr1530904637.16.1759875291520; Tue, 07
- Oct 2025 15:14:51 -0700 (PDT)
+        bh=efPtgGQoMr4oubNxAv1qKprX0Kma5wbATW1PH+6tg30=;
+        b=ATVH5eBMP0PNG94kGhJP22QUF28+IOV7uU7Aps4TXUe2KiuKADLMFharilvDNw2pe6
+         FfiZDOzwu8PSohHPAHp1tKP+jnyHgKxCHtiipPrCWFLqBYjfdrQZMY9QLzDd04aDFThP
+         XNvyGr4I+4oP5anAhoc7PPRL+Gd8eE91NEm9x/mi/Bf4mTQ389tvNJXBg8bm5xkYOP3s
+         9usgRiIG2Pp63vF0L0b39oRWIvb8B/ufsKQjJy+QjoWlZwxo/IChTSBq8FOpxBe6uqog
+         9rsNPQEynHqN3e4hDiMmoXgJhjHKNzDp4mnxqj2aFroMCw70M+RzUz044DRLkXbZECgf
+         594w==
+X-Forwarded-Encrypted: i=1; AJvYcCXevn1yAkNlhVr2MGUJJtS84wGKtBEjfiefkNAP57nOd8q07rsaWNiwnbpVREbbvGqebYV1hb4=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxmos6MjnFtVHmbjDVb+L8ngv6rsVE4qPgsWW7hYRoEoYFJE3S4
+	RcAUFSsiAqftwdJGWriFLHbSNO3r9fbHbJG0mj3DcfDfADFM/1Siqp8F3A19sHPoi+51ilwGkUV
+	++5jxiA==
+X-Google-Smtp-Source: AGHT+IFTaBPktlqVR37VqVA9cZzZZ/8OTio3uAd9mQ94N7kdyxx902DDy6/7iqhCbZbcOwfgNKOb2jtvL6Q=
+X-Received: from pjbsn6.prod.google.com ([2002:a17:90b:2e86:b0:32b:61c4:e48b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1806:b0:32d:db5b:7636
+ with SMTP id 98e67ed59e1d1-33b513cdaf5mr1179313a91.27.1759875293062; Tue, 07
+ Oct 2025 15:14:53 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  7 Oct 2025 15:14:16 -0700
+Date: Tue,  7 Oct 2025 15:14:17 -0700
 In-Reply-To: <20251007221420.344669-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251007221420.344669-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.710.ga91ca5db03-goog
-Message-ID: <20251007221420.344669-9-seanjc@google.com>
-Subject: [PATCH v12 08/12] KVM: selftests: Add additional equivalents to
- libnuma APIs in KVM's numaif.h
+Message-ID: <20251007221420.344669-10-seanjc@google.com>
+Subject: [PATCH v12 09/12] KVM: selftests: Use proper uAPI headers to pick up
+ mempolicy.h definitions
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
@@ -74,91 +74,67 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
 Content-Type: text/plain; charset="UTF-8"
 
-Add APIs for all syscalls defined in the kernel's mm/mempolicy.c to match
-those that would be provided by linking to libnuma.  Opportunistically use
-the recently inroduced KVM_SYSCALL_DEFINE() builders to take care of the
-boilderplate, and to fix a flaw where the two existing wrappers would
-generate multiple symbols if numaif.h were to be included multiple times.
+Include mempolicy.h in KVM's numaif.h to pick up the kernel-provided NUMA
+definitions, and drop selftests' definitions, which are _mostly_
+equivalent.  The syscall numbers in particular are subtly x86_64-specific,
+i.e. will cause problems if/when numaif.h is used outsize of x86.
 
+Opportunistically clean up the file comment and make the syscall wrappers
+static inline so that including the header multiple times won't lead to
+weirdness (currently numaif.h is included by exactly one header).
+
+Fixes: 346b59f220a2 ("KVM: selftests: Add missing header file needed by xAPIC IPI tests")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/include/numaif.h  | 36 +++++++++++--------
- .../selftests/kvm/x86/xapic_ipi_test.c        |  5 ++-
- 2 files changed, 23 insertions(+), 18 deletions(-)
+ tools/testing/selftests/kvm/include/numaif.h | 32 +-------------------
+ 1 file changed, 1 insertion(+), 31 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/numaif.h b/tools/testing/selftests/kvm/include/numaif.h
-index b020547403fd..aaa4ac174890 100644
+index aaa4ac174890..1554003c40a1 100644
 --- a/tools/testing/selftests/kvm/include/numaif.h
 +++ b/tools/testing/selftests/kvm/include/numaif.h
-@@ -13,23 +13,29 @@
+@@ -1,14 +1,5 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * tools/testing/selftests/kvm/include/numaif.h
+- *
+- * Copyright (C) 2020, Google LLC.
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2.
+- *
+- * Header file that provides access to NUMA API functions not explicitly
+- * exported to user space.
+- */
++/* Copyright (C) 2020, Google LLC. */
+ 
  #ifndef SELFTEST_KVM_NUMAIF_H
  #define SELFTEST_KVM_NUMAIF_H
+@@ -37,25 +28,4 @@ KVM_SYSCALL_DEFINE(mbind, 6, void *, addr, unsigned long, size, int, mode,
+ 		   const unsigned long *, nodemask, unsigned long, maxnode,
+ 		   unsigned int, flags);
  
--#define __NR_get_mempolicy 239
--#define __NR_migrate_pages 256
-+#include <linux/mempolicy.h>
- 
--/* System calls */
--long get_mempolicy(int *policy, const unsigned long *nmask,
--		   unsigned long maxnode, void *addr, int flags)
--{
--	return syscall(__NR_get_mempolicy, policy, nmask,
--		       maxnode, addr, flags);
--}
-+#include "kvm_syscalls.h"
- 
--long migrate_pages(int pid, unsigned long maxnode,
--		   const unsigned long *frommask,
--		   const unsigned long *tomask)
--{
--	return syscall(__NR_migrate_pages, pid, maxnode, frommask, tomask);
--}
-+KVM_SYSCALL_DEFINE(get_mempolicy, 5, int *, policy, const unsigned long *, nmask,
-+		   unsigned long, maxnode, void *, addr, int, flags);
-+
-+KVM_SYSCALL_DEFINE(set_mempolicy, 3, int, mode, const unsigned long *, nmask,
-+		   unsigned long, maxnode);
-+
-+KVM_SYSCALL_DEFINE(set_mempolicy_home_node, 4, unsigned long, start,
-+		   unsigned long, len, unsigned long, home_node,
-+		   unsigned long, flags);
-+
-+KVM_SYSCALL_DEFINE(migrate_pages, 4, int, pid, unsigned long, maxnode,
-+		   const unsigned long *, frommask, const unsigned long *, tomask);
-+
-+KVM_SYSCALL_DEFINE(move_pages, 6, int, pid, unsigned long, count, void *, pages,
-+		   const int *, nodes, int *, status, int, flags);
-+
-+KVM_SYSCALL_DEFINE(mbind, 6, void *, addr, unsigned long, size, int, mode,
-+		   const unsigned long *, nodemask, unsigned long, maxnode,
-+		   unsigned int, flags);
- 
- /* Policies */
- #define MPOL_DEFAULT	 0
-diff --git a/tools/testing/selftests/kvm/x86/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
-index 35cb9de54a82..ae4a4b6c05ca 100644
---- a/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
-+++ b/tools/testing/selftests/kvm/x86/xapic_ipi_test.c
-@@ -256,7 +256,7 @@ void do_migrations(struct test_data_page *data, int run_secs, int delay_usecs,
- 	int nodes = 0;
- 	time_t start_time, last_update, now;
- 	time_t interval_secs = 1;
--	int i, r;
-+	int i;
- 	int from, to;
- 	unsigned long bit;
- 	uint64_t hlt_count;
-@@ -267,9 +267,8 @@ void do_migrations(struct test_data_page *data, int run_secs, int delay_usecs,
- 		delay_usecs);
- 
- 	/* Get set of first 64 numa nodes available */
--	r = get_mempolicy(NULL, &nodemask, sizeof(nodemask) * 8,
-+	kvm_get_mempolicy(NULL, &nodemask, sizeof(nodemask) * 8,
- 			  0, MPOL_F_MEMS_ALLOWED);
--	TEST_ASSERT(r == 0, "get_mempolicy failed errno=%d", errno);
- 
- 	fprintf(stderr, "Numa nodes found amongst first %lu possible nodes "
- 		"(each 1-bit indicates node is present): %#lx\n",
+-/* Policies */
+-#define MPOL_DEFAULT	 0
+-#define MPOL_PREFERRED	 1
+-#define MPOL_BIND	 2
+-#define MPOL_INTERLEAVE	 3
+-
+-#define MPOL_MAX MPOL_INTERLEAVE
+-
+-/* Flags for get_mem_policy */
+-#define MPOL_F_NODE	    (1<<0)  /* return next il node or node of address */
+-				    /* Warning: MPOL_F_NODE is unsupported and
+-				     * subject to change. Don't use.
+-				     */
+-#define MPOL_F_ADDR	    (1<<1)  /* look up vma using address */
+-#define MPOL_F_MEMS_ALLOWED (1<<2)  /* query nodes allowed in cpuset */
+-
+-/* Flags for mbind */
+-#define MPOL_MF_STRICT	     (1<<0) /* Verify existing pages in the mapping */
+-#define MPOL_MF_MOVE	     (1<<1) /* Move pages owned by this process to conform to mapping */
+-#define MPOL_MF_MOVE_ALL     (1<<2) /* Move every page to conform to mapping */
+-
+ #endif /* SELFTEST_KVM_NUMAIF_H */
 -- 
 2.51.0.710.ga91ca5db03-goog
 
