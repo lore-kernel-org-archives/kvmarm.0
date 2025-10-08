@@ -1,150 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6933A2F3607
-	for <kvmarm@lists.linux.dev>; Wed,  8 Oct 2025 15:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20ACA29BDAC
+	for <kvmarm@lists.linux.dev>; Wed,  8 Oct 2025 15:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759936954; cv=none; b=k+AhZmcmeiXDEubYEtz0v7I5Rv2tdE4Je4x5GbvwyFtXN6bTc7iZtJgEQ8+t8oi441JFqLp6lUsGeMwKFPIlKIx5rkOUwEVN+6dvSz5z0PTXoUwJAJCgJ1fYma15wPNNMXLLpZxe91xMxbVbYFhRhPSwdGlwjCj3tY/6YwjV8OU=
+	t=1759938403; cv=none; b=gGzhX0fWtO7y7YkjH1eitHQmLE9bEI9TmcKT1Shw7B0gIZlwtl4GdIpGhDxsaRQqg2v6eM7vG7N5Y3lEQa6DHmhXHrt7wm7Q7BUSnYL2NTIM71KmNgqAZ8EOJ7dYI9KILmSl+19gY4aKTjTrHacKzqOBWWIXqVqWgs/2yF2VzpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759936954; c=relaxed/simple;
-	bh=w24pNi2bHHfGA5EziVFh2Wen8X598y8wA70XLCZwCvo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M/uehiZ6yG4t8EPMfWkA6KuA/jjQRJrn803+6cSd1OTxXQxn1HmJ2TKaT+yuwziC6acWeuQyGkcs4drDv3MhCREJMjHjYl0FCWdEHL6oIcaHF26aRor47ZPJfFcFgIOuVqxZ+cdY+geQlGxLUI+FWbaCFhylA9jmX3SWOIidRO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9i1pYNi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759938403; c=relaxed/simple;
+	bh=3wecD8tDbMduXMg+9TJnfvZ/c3CKE6Q3RD2TETZcXlE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Nns3HPD7qKAmypDMNMc2dUGCKtYpDX+8XKA0fn6+XDcwHJVUZX1HsEz9OzIJ2QPPx2fm+tjC0pnwsp7WDOyHwjrd2u6r4UjvWFqZtSqBP3EnaSbt9GKHkxBBi1Ca+Rn9n85st0CleQjuYYGcPYTBix4MI1UFryk7J2Vvv3LoD+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rcezhYdo; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9i1pYNi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA370C4CEE7;
-	Wed,  8 Oct 2025 15:22:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759936953;
-	bh=w24pNi2bHHfGA5EziVFh2Wen8X598y8wA70XLCZwCvo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k9i1pYNiSeNXhLN6YP9QKC/OZOxnentlVFTYoihZ74ERjbO4LFED2zinxoVYrbkoN
-	 fQAWKyK5TnRt5Tael2BQwbxLTJIFG/Q+Sf0jAuHKBTzlvWjxt6bOyQlgTTWTooJqDW
-	 2LiBtkJaikLrPk7DdUW5l2c0sirHWwx/hxb0bsJ2EOe0SS4YIORId8ToAj6aP4eJub
-	 KEwwDkz+89tZ4eNE8fxxUpbie5bvt/TDbT+2ueVtQEyZG1Tu2tdsTbsjK244Vum/QQ
-	 /sVbZ7PUZCYIRiMJ9NRDfWJJTyKQScovqLav8tcxH2XFJco1uUHuu2DEGvOYmd9Rey
-	 t65XmhGDn58PA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v6Vzr-0000000CNzu-2kAb;
-	Wed, 08 Oct 2025 15:22:31 +0000
-Date: Wed, 08 Oct 2025 16:22:31 +0100
-Message-ID: <86y0plxvt4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jan Kotas <jank@cadence.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Subject: Re: KVM NV + SVE host OS warning
-In-Reply-To: <15A85F2B-1A0C-4FA7-9FE4-EEC2203CC09E@global.cadence.com>
-References: <799DD5E5-8BC2-47B3-A919-33429D3FB2F1@global.cadence.com>
-	<865xd61tt5.wl-maz@kernel.org>
-	<F9556C9F-2671-4EF6-A725-D080C3793A34@global.cadence.com>
-	<864isq1r66.wl-maz@kernel.org>
-	<aNXGW8C_S1TbFR9-@linux.dev>
-	<25C5E00D-62BC-4188-8642-21913446B32C@global.cadence.com>
-	<aOWhlvC1kROWfMSv@linux.dev>
-	<1271032F-41BB-4896-AAED-8660D5459E7D@global.cadence.com>
-	<E2FD1CD0-AE1F-4F9C-86FF-D576C212832B@global.cadence.com>
-	<864is9zqs9.wl-maz@kernel.org>
-	<677A529C-B3D7-4BD1-BEED-D8414D961BBD@global.cadence.com>
-	<86zfa1y58i.wl-maz@kernel.org>
-	<15A85F2B-1A0C-4FA7-9FE4-EEC2203CC09E@global.cadence.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rcezhYdo"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1759938398;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=d/u4jReseop0/bCsd+wYtyXTYZOtdfFVumMqa5wsKfA=;
+	b=rcezhYdoDGbo67O7mVxNiF7OAuu7Nr92tcfx/Beh0AJb5OvqT3NVpzQHtTaJa812Vsxe//
+	iXJD/VxrdptNvozqNBMxTEvuw7seNY6W4OXD0/hcgA0ee6uFOJxCJ3b2vOOAz0qF5rwOM+
+	1FyyfI2En61qXOJzc+HmFWrkVGleibQ=
+From: Zenghui Yu <zenghui.yu@linux.dev>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	Zenghui Yu <zenghui.yu@linux.dev>
+Subject: [PATCH] KVM: arm64: selftests: Allocate vcpus with correct size
+Date: Wed,  8 Oct 2025 23:45:20 +0800
+Message-Id: <20251008154520.54801-1-zenghui.yu@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jank@cadence.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 08 Oct 2025 14:43:29 +0100,
-Jan Kotas <jank@cadence.com> wrote:
-> >>
-> >> Is it possible to trap/emulate HCR_EL2, and make sure E2H is always 1,
-> >> in cases when only KVM_ARM_VCPU_HAS_EL2 is set?
-> >> Would that help?
-> >=20
-> > There are no traps for HCR_EL2.
-> >=20
-> >> As a test, I tried forcing this bit before running VCPUs, but
-> >> reading it via MRS got a value without it being set.
-> >=20
-> > Where did you read that from?
->=20
-> I checked the X1 register, after: mrs x1, hcr_el2 in __check_hvhe.
+vcpus array contains pointers to struct kvm_vcpu {}. It is way overkill
+to allocate the array with (nr_cpus * sizeof(struct kvm_vcpu)). Fix the
+allocation by using the correct size.
 
-That's too late. At this point, the write to HCR_EL2 will have already
-occurred,
+Signed-off-by: Zenghui Yu <zenghui.yu@linux.dev>
+---
+ tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->=20
->=20
-> > If you apply the following change to your guest, does it start
-> > behaving?
-> >=20
-> > M.
-> >=20
-> > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/as=
-m/el2_setup.h
-> > index 46033027510cc..392c9f4016f2e 100644
-> > --- a/arch/arm64/include/asm/el2_setup.h
-> > +++ b/arch/arm64/include/asm/el2_setup.h
-> > @@ -34,7 +34,7 @@
-> > mrs_s x1, SYS_ID_AA64MMFR4_EL1
-> > sbfx x1, x1, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
-> > cmp x1, #0
-> > - b.ge .LnVHE_\@
-> > +// b.ge .LnVHE_\@
-> >=20
-> > orr x0, x0, #HCR_E2H
-> > .LnVHE_\@:
-> >=20
->=20
-> With this change Guest OS starts the boot process.
->=20
-> [ 0.000000] CPU features: detected: Virtualization Host Extensions
-> [ 6.998696] SMP: Total of 4 processors activated.
-> [ 7.257045] CPU: All CPU(s) started at EL2
-> [ 185.781062] SVE: maximum available vector length 16 bytes per vector
-> [ 186.104159] SVE: default vector length 16 bytes per vector
+diff --git a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+index 87922a89b134..b134a304f0a6 100644
+--- a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
++++ b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+@@ -331,7 +331,7 @@ static void setup_vm(void)
+ {
+ 	int i;
+ 
+-	vcpus = malloc(test_data.nr_cpus * sizeof(struct kvm_vcpu));
++	vcpus = malloc(test_data.nr_cpus * sizeof(struct kvm_vcpu *));
+ 	TEST_ASSERT(vcpus, "Failed to allocate vCPU array");
+ 
+ 	vm = vm_create_with_vcpus(test_data.nr_cpus, guest_code, vcpus);
+-- 
+2.34.1
 
-Great. That confirms my suspicion that we cannot advertise VHE on CPUs
-that do not have FEAT_FGT. Oh well. I'll post a patch to forbid VHE
-guests on these machines.
-
-> I also observed something interesting.
-> When PSCI method is set to HVC, I get a kernel panic.
-> This wasn=E2=80=99t a problem in all other test cases.
-
-Well, that's completely expected. HVC is handled by EL2. You run at
-EL2. You end-up calling yourself, which you don't really expect.
-
-SMC is the way for EL2 guests, as if they were on bare-metal.
-
-> On a side note, thank you for giving me some pointers.
-> With HAS_EL2_E2H the original Guest OS boots fine in nVHE.
->=20
-> [    0.204744] CPU: All CPU(s) started at EL2
-> [   18.483737] SVE: maximum available vector length 16 bytes per vector
-> [   18.500959] SVE: default vector length 16 bytes per vector
-> [   25.999475] kvm [1]: Hyp nVHE mode initialized successfully
-
-Yup. I'll kill the ability to run VHE guests on crappy old HW then.
-
-Thanks for giving it a go!
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
