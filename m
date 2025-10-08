@@ -1,207 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B941F92E
-	for <kvmarm@lists.linux.dev>; Wed,  8 Oct 2025 11:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E287C24C076
+	for <kvmarm@lists.linux.dev>; Wed,  8 Oct 2025 12:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759924736; cv=none; b=S0mDNPgjIiKGAuH6rAX44pE66erKFmiZ49DIYZ0t2xGmnG2ZsGjR5x9JK5k666V+6aw6/nnMfnlZKox3XlSC7r42tU4tOmv8j5Vi6vNRf25DcQ/vQAWPwqR+ZKK5muNK7iO3UyyzcLPTsEri1cGuNOTOZJFzkx0toLvlayQihPE=
+	t=1759927246; cv=none; b=OyoB11xuDwlT+uA1vhtQExbvhphwBzxOnel5J9f2yfaYcdK4DsnfmFomOZnAWQMil+DfgwoTzDEBMVxQPlMw+gq63HqgcFqoBbrelzW1nPzIdHC2HekUE8rh4OmD3ut1WLF5HPdfnwzUpxy/Ldx+hhZnBqaLZ6lmAUora8XgbTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759924736; c=relaxed/simple;
-	bh=jYHJTWOjN36HBHpKSmLEi103ZytK5+Ab5/2OP7gKmPM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vkv4fvFHnjfp5ZQOcUe+1jlIsqkiXNEQjjWojCbc7t2AuI/NtJ/z7Lk4vev8nFOOBmPaIdVqtYrZtq8pNEoPMYqZA5PWoYIQZxoEDMIx5Tyodg1Y51uOGzdFlLgwP/DcZ5wdcpZM1B24VFeMne3HiNChvtvtgYzO18xjRFomV0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnld+RtI; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnld+RtI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6C33C4CEF4;
-	Wed,  8 Oct 2025 11:58:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759924735;
-	bh=jYHJTWOjN36HBHpKSmLEi103ZytK5+Ab5/2OP7gKmPM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bnld+RtIWBvzt5IiG5dqR3SYixjW9lu+r7cwQiXws5ow24hSbEwZyEWb4Cf1PV9Iy
-	 lYu0XENMx1S2gJ8oCGIZB/ubOYLj8IfvZg1OeFpJAqECQsgMjKfYFuEucj+4xgVclP
-	 FVZuXcxV4jIjt+HjgcMQzQfrNrDojh7riCxghGZB1ZzxGLMQYeQTNCA+32d/w4ZO6z
-	 cQRXF1VtH19PUj7UVruDwl9na++3cvPrWgULGdRTs8DeBWo5pL0KFhyCZ5g1pYrO8C
-	 q9u4uEmpGJDuWB4lEv9jGv+uvCwtdqoeyT8UeoLidGH8ATckvasdZcJKkNFnDPxplQ
-	 VNogsr8aOhFMg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v6Son-0000000CL6n-30ag;
-	Wed, 08 Oct 2025 11:58:53 +0000
-Date: Wed, 08 Oct 2025 12:58:53 +0100
-Message-ID: <86zfa1y58i.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jan Kotas <jank@cadence.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Subject: Re: KVM NV + SVE host OS warning
-In-Reply-To: <677A529C-B3D7-4BD1-BEED-D8414D961BBD@global.cadence.com>
-References: <799DD5E5-8BC2-47B3-A919-33429D3FB2F1@global.cadence.com>
-	<865xd61tt5.wl-maz@kernel.org>
-	<F9556C9F-2671-4EF6-A725-D080C3793A34@global.cadence.com>
-	<864isq1r66.wl-maz@kernel.org>
-	<aNXGW8C_S1TbFR9-@linux.dev>
-	<25C5E00D-62BC-4188-8642-21913446B32C@global.cadence.com>
-	<aOWhlvC1kROWfMSv@linux.dev>
-	<1271032F-41BB-4896-AAED-8660D5459E7D@global.cadence.com>
-	<E2FD1CD0-AE1F-4F9C-86FF-D576C212832B@global.cadence.com>
-	<864is9zqs9.wl-maz@kernel.org>
-	<677A529C-B3D7-4BD1-BEED-D8414D961BBD@global.cadence.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1759927246; c=relaxed/simple;
+	bh=xnw1k6sqpWoaqzrDSju1NOU1Ov2L4Pj8El+q2fMBNT8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hPQXHytsgUSkzuPkXO8V1fAJFv2fIYJOQF4THB9H/cnIrZbvcr2gAoXEdNBzMxXtak//hrQ5ekYsvdVKUAvMMlkxLtY1okddfM48MzZEafHNp1gIZ43T8bDrMA/cC1+i5F55gt7HTBS2kr/sqC078dW37S49HKcvWOd52KYATb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 11AC022FC;
+	Wed,  8 Oct 2025 05:40:35 -0700 (PDT)
+Received: from localhost (e132581.arm.com [10.1.196.87])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CEA73F738;
+	Wed,  8 Oct 2025 05:40:42 -0700 (PDT)
+Date: Wed, 8 Oct 2025 13:40:40 +0100
+From: Leo Yan <leo.yan@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>,
+	Oliver Upton <oliver.upton@linux.dev>, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, alexandru.elisei@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Check cpu_has_spe() before initializing
+ PMSCR_EL1 in VHE
+Message-ID: <20251008124040.GC77665@e132581.arm.com>
+References: <20251007182356.2813920-1-mukesh.ojha@oss.qualcomm.com>
+ <aOVckTSJET5ORY1n@linux.dev>
+ <861pndzn4w.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jank@cadence.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <861pndzn4w.wl-maz@kernel.org>
 
-On Wed, 08 Oct 2025 10:45:51 +0100,
-Jan Kotas <jank@cadence.com> wrote:
->=20
-> Hi Marc,
->=20
-> Thanks for looking into this.
->=20
->=20
-> > On 8 Oct 2025, at 11:28, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > EXTERNAL MAIL
-> >=20
-> >=20
-> > On Wed, 08 Oct 2025 08:29:38 +0100,
-> > Jan Kotas <jank@cadence.com> wrote:
-> >>=20
-> >>=20
-> >>=20
-> >>>=20
-> >>> On 8 Oct 2025, at 08:32, Jan Kotas <jank@cadence.com> wrote:
-> >>>=20
-> >>> Hi Oliver,
-> >>>=20
-> >>>> On 8 Oct 2025, at 01:26, Oliver Upton <oliver.upton@linux.dev> wrote:
-> >>>>=20
-> >>>> EXTERNAL MAIL
-> >>>>=20
-> >>>>=20
-> >>>> On Tue, Oct 07, 2025 at 11:12:31AM +0000, Jan Kotas wrote:
-> >>>>> Hello,
-> >>>>>=20
-> >>>>> I was finally able to do some validation, sorry for a long delay.
-> >>>>=20
-> >>>> No worries, thanks for testing.
-> >>>>=20
-> >>>>> First I applied the "Don't advance PC" patch on top of 6.16.9.
-> >>>>> It fixed the error message, but the Guest didn=E2=80=99t boot.
-> >>>>> I didn=E2=80=99t debug it further.
-> >>>>>=20
-> >>>>> Then I applied it on top of 6.17 along with Oliver=E2=80=99s second=
- patch.
-> >>>>> Guest OS stops booting because of an exception, when accessing ZCR_=
-EL2.
-> >>>>>=20
-> >>>>> I checked the ESR_EL2 register and it has 0x66000000:
-> >>>>>=20
-> >>>>> Access to SVE functionality trapped as a result of CPACR_EL1.ZEN,
-> >>>>> CPTR_EL2.ZEN, CPTR_EL2.TZ, or CPTR_EL3.EZ
-> >>>>>=20
-> >>>>> I=E2=80=99ll continue the debug to make sure the issue is not on ou=
-r end.
-> >>>>=20
-> >>>> Could you please share the repro steps? Also, is the guest kernel
-> >>>> unmodified? FWIW, I tested kvmarm/next as the kernel at all levels,
-> >>>> kvmtool as the VMM and E2H=3DRES1.
-> >>>=20
-> >>> I=E2=80=99m running a minimal, unmodified Linux 6.16.0, for my integr=
-ation tests.
-> >>> It only has a CPU, a GIC, a few UARTs, and uses initramfs.
-> >>>=20
-> >>> In my VMM I only set KVM_ARM_VCPU_HAS_EL2, without HAS_EL2_E2H0.
-> >>> To start the kernel I set the X0-X3 registers.
-> >>> It worked fine, so far, for all other cases than SVE && NV.
-> >>>=20
-> >>>> While the trap to L0 is unavoidable, reinjecting the SVE trap depend=
-s on
-> >>>> the L0 view of CPTR_EL2 which originates from the in-memory value.
-> >>>> Unless there's a bug lurking this should always be in agreement with=
- the
-> >>>> effective value programmed in CPACR_EL1.
-> >>>=20
-> >>> I checked the place, where it=E2=80=99s failing.
-> >>> It looks like Guest clears CPTR_EL2 from 0x33ff to 0.
-> >>> CPACR_EL1 is 0 at this point. This doesn=E2=80=99t seem to be correct.
-> >>>=20
-> >>> 8062192c:   mrs     x0, cptr_el2
-> >>> 80621930:   and     x0, x0, #0xfffffffffffffeff
-> >>> 80621934:   msr     cptr_el2, x0
-> >>> 80621938:   isb
-> >>>=20
-> >>> And accessing ZCR_EL2 is trapped, and causes an exception.
-> >>> 8062193c:   mov     x1, #0xf
-> >>> 80621940:   msr     zcr_el2, x1
-> >>>=20
-> >>> Looks like the Guest OS executes
-> >>> .Lcptr_nvhe_\@: // nVHE case
-> >>> from el2_setup.h.
-> >>=20
-> >> I did some more debugging.
-> >> I checked __check_hvhe and it looks like it jumps to fail.
-> >> HCR_EL2 has 0x100030080000000.
-> >> E2H is set to 0, even though it should be RES1?
-> >=20
-> > The value itself doesn't matter for KVM. However, the guest can write
-> > anything it wants, and that value will hold *in the register*.
-> >=20
-> >> I changed the value using a debugger, so the check passed.
-> >> The code took a different branch and it seems the SVE init passed.
-> >=20
-> > Oh crap. You are on V2, which doesn't have FGT, so ID_AA64MMFR4_EL1
-> > doesn't trap, and the kernel end-up assuming that the CPU is nVHE
-> > capable. Nothing works after that.
-> >=20
-> > I'm afraid there is no real fix for this, only hacks...
->=20
-> Is it possible to trap/emulate HCR_EL2, and make sure E2H is always 1,
-> in cases when only KVM_ARM_VCPU_HAS_EL2 is set?
-> Would that help?
+On Wed, Oct 08, 2025 at 11:46:55AM +0100, Marc Zyngier wrote:
 
-There are no traps for HCR_EL2.
+[...]
 
-> As a test, I tried forcing this bit before running VCPUs, but
-> reading it via MRS got a value without it being set.
+> > > Lets guard the change with cpu_has_spe() check so that it only affects
+> > > the cpu which has SPE feature supported.
+> > 
+> > This could benefit from being spelled out a bit more. In both cases we
+> > check for the presence of FEAT_SPE, however I believe the issue you
+> > observe is EL3 hasn't delegated ownership of the Profiling Buffer to
+> > Non-secure nor does it reinject an UNDEF in response to the sysreg trap.
+> > 
+> > I agree that the change is correct but the rationale needs to be clear.
+> 
+> To me, this smells a lot more like some sort of papering over a
+> firmware bug. Why isn't SPE available the first place?
 
-Where did you read that from?
+TF-a grants permission to non-secure world [1], only access from secure
+world or realm will trap to EL3.
 
-If you apply the following change to your guest, does it start
-behaving?
+So yes, it would be good to check if any issue in firmware.
 
-	M.
+Thanks,
+Leo
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el=
-2_setup.h
-index 46033027510cc..392c9f4016f2e 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -34,7 +34,7 @@
- 	mrs_s	x1, SYS_ID_AA64MMFR4_EL1
- 	sbfx	x1, x1, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
- 	cmp	x1, #0
--	b.ge	.LnVHE_\@
-+//	b.ge	.LnVHE_\@
-=20
- 	orr	x0, x0, #HCR_E2H
- .LnVHE_\@:
-
---=20
-Without deviation from the norm, progress is not possible.
+[1] https://git.trustedfirmware.org/plugins/gitiles/TF-A/trusted-firmware-a.git/+/refs/heads/master/lib/extensions/spe/spe.c#52
