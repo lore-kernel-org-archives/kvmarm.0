@@ -1,215 +1,140 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD265C2EA;
-	Thu,  9 Oct 2025 02:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CD81D5147;
+	Thu,  9 Oct 2025 07:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759976394; cv=none; b=Vxkuypk4kqskjHcTNYLh2W+vxBvMfhwjRHFTi0JeBRVLA2YtDOIOtKpv75B+rIU5Ze1uf4qMtINooBcHUWsmkMhePs3SR0jNQyJ00wS8FNBytcICNrcyznCjZOMyGZK1L2K27AW5xlKwq4aTCbOeIIdnMJzqelniv3bYbTUFL4U=
+	t=1759994243; cv=none; b=uoE/U5fCKjukOMIl6jcFAJ44K79vXd5CwLGcA4HR4JHPlPI/wgbOjdf2Dz78JEyvtxSBqbSBCmNK37zJ6N8DiTwGq2SO3WkIUuXq84L/3kghBMex/MH0oOKf6kxRvxmjxg4sy/S7/bvpKAbaRvjCz0bcFUAM0K1dWo/O9fXPDpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759976394; c=relaxed/simple;
-	bh=MKwwAjIvNTVYzVSKLCj93oAfQ4vIbNdKNB8W0YNJ6Qg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s95IvXUDhDYba3zHhucg/eFA2kgezI0plkZ/8B0wqq1JuDEOT9JFzgb/LdaSmuPldT2eIauiUmUr5W0CRWT316L24h45IBgzUJ0OeK8332pTiyIwYtO9lOfOQIyh9OglQrdRTr9NXIcZoHzhgLYahs5EMShv++DnrIjiol/ipKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jBBW05E1; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1759994243; c=relaxed/simple;
+	bh=qpw+6J2ytukjMwUmxCZyRh0+7i8HVvt1dA1nhFhJDmU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=BNC/oceX+tU1YGuoKylkuACpQ/f/PVh+ztmpYCG+vj0CNV+yTP3JbRlrKeeewH8y/OKpKH9uPRGD6KQpTFtByPKLOVzio4fmUFaPGrsyr6X2zXJIXSPJKA+ugPJTY8OaxyX+ibM9lwxQUfFzWp4PBjdoLVyuaR596FNKQuGT+W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxabBT8/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jBBW05E1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759976391; x=1791512391;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=MKwwAjIvNTVYzVSKLCj93oAfQ4vIbNdKNB8W0YNJ6Qg=;
-  b=jBBW05E1MUnYFZWaxdB/CrGNH0YhcZIm6QcYaCyKHBRYGwEypd7EPUQb
-   /+MQkOd1iQfrAVSs8CBM1Uj39Oq7VX+kh0DsfP/AUZAifJOMfUxKl5h0x
-   HvHW6em/ugZFcBsDESnaqQQ+juCXybb18nGjBRX2bDD67mqFulYS5F5c0
-   6pV0+TZNkxkrfdy6OplVUGptqP6tkM45HSHR0MEraGGWkCTDgKLpD8pPL
-   hIl2bMhCWf73SW/PISpd2ShsPlrI5wIu/mu5Yn7sGFNqOPWpGiitroA53
-   CPgcjDWK39+lCJ3JLwhBD5nV+U9nTrfAGmB5ne2KGVlHw0sX5ndmRhNmK
-   A==;
-X-CSE-ConnectionGUID: eRgdLF9GTOWQsytSU8PDbg==
-X-CSE-MsgGUID: IsecIxkIRHSGjWKxfmQAnA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62097744"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="62097744"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 19:19:51 -0700
-X-CSE-ConnectionGUID: SjjAIAIGQgGwYyFr6uTBmQ==
-X-CSE-MsgGUID: dnnE1byERkONzbCEalT4rw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,215,1754982000"; 
-   d="scan'208";a="211538774"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.232.209]) ([10.124.232.209])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 19:19:44 -0700
-Message-ID: <0276af52-c697-46c3-9db8-9284adb6beee@linux.intel.com>
-Date: Thu, 9 Oct 2025 10:19:41 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxabBT8/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 071D0C4CEE7;
+	Thu,  9 Oct 2025 07:17:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759994242;
+	bh=qpw+6J2ytukjMwUmxCZyRh0+7i8HVvt1dA1nhFhJDmU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=qxabBT8/OBr9oWRsRZC1T4SCz/d/UL9LHnDRBeT7LDEoOnY+JcC5Ohyn1VkvPB+TZ
+	 vSgOdO85UFh3UoszH9719MuF7wO7/Pskv+1/Ng2ROmVD4wyEZzJByKOKYSzPrDgHdb
+	 5c/DfzhDI9lL4N11239fttCX6M3z66/aZ84n4HgVDBIMwkGweyFNzW6dDYhckhE3iL
+	 Go5yre6HVBnDlrQJkT85vwQF03rQgOymEEf4UpDKpf7d52/HfC85wUVCSEC0Zu4fR1
+	 UZ9BqOKHsYBT2Q2vrMJV5xHTRfiQz8gFYwXjbM/wUvO97hAfsYzJERUJ5aJLr6sCNj
+	 1zcsL+43/ZMFw==
+X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: dan.j.williams@intel.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, gregkh@linuxfounation.org
+Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm
+ platform device
+In-Reply-To: <688d61b1c4c8c_55f09100f4@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-12-aneesh.kumar@kernel.org>
+ <20250729181045.0000100b@huawei.com> <20250729231948.GJ26511@ziepe.ca>
+ <yq5aqzxy9ij1.fsf@kernel.org> <20250730113827.000032b8@huawei.com>
+ <20250731121133.GP26511@ziepe.ca>
+ <688d61b1c4c8c_55f09100f4@dwillia2-xfh.jf.intel.com.notmuch>
+Date: Thu, 09 Oct 2025 12:47:14 +0530
+Message-ID: <yq5aikgoa6it.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 32/44] KVM: x86/pmu: Disable interception of select PMU
- MSRs for mediated vPMUs
-To: Sean Christopherson <seanjc@google.com>, Sandipan Das <sandidas@amd.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
- Mingwei Zhang <mizhang@google.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Sandipan Das <sandipan.das@amd.com>
-References: <20250806195706.1650976-1-seanjc@google.com>
- <20250806195706.1650976-33-seanjc@google.com>
- <f896966e-8925-4b4f-8f0d-f1ae8aa197f7@amd.com> <aN1vfykNs8Dmv_g0@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aN1vfykNs8Dmv_g0@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+<dan.j.williams@intel.com> writes:
 
-On 10/2/2025 2:14 AM, Sean Christopherson wrote:
-> On Fri, Sep 26, 2025, Sandipan Das wrote:
->> On 8/7/2025 1:26 AM, Sean Christopherson wrote:
->>> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
->>>
->>> For vCPUs with a mediated vPMU, disable interception of counter MSRs for
->>> PMCs that are exposed to the guest, and for GLOBAL_CTRL and related MSRs
->>> if they are fully supported according to the vCPU model, i.e. if the MSRs
->>> and all bits supported by hardware exist from the guest's point of view.
->>>
->>> Do NOT passthrough event selector or fixed counter control MSRs, so that
->>> KVM can enforce userspace-defined event filters, e.g. to prevent use of
->>> AnyThread events (which is unfortunately a setting in the fixed counter
->>> control MSR).
->>>
->>> Defer support for nested passthrough of mediated PMU MSRs to the future,
->>> as the logic for nested MSR interception is unfortunately vendor specific.
-> ...
+> Jason Gunthorpe wrote:
+>> On Wed, Jul 30, 2025 at 11:38:27AM +0100, Jonathan Cameron wrote:
+>> > On Wed, 30 Jul 2025 14:12:26 +0530
+>> > "Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
+>> >=20
+>> > > Jason Gunthorpe <jgg@ziepe.ca> writes:
+>> > >=20
+>> > > > On Tue, Jul 29, 2025 at 06:10:45PM +0100, Jonathan Cameron wrote:
+>> > > >=20=20
+>> > > >> > +static struct platform_device cca_host_dev =3D {=20=20
+>> > > >> Hmm. Greg is getting increasingly (and correctly in my view) grum=
+py with
+>> > > >> platform devices being registered with no underlying resources et=
+c as glue
+>> > > >> layers.  Maybe some of that will come later.=20=20
+>> > > >
+>> > > > Is faux_device a better choice? I admit to not knowing entirely wh=
+at
+>> > > > it is for..
+>> >=20
+>> > I'll go with a cautious yes to faux_device. This case of a glue device
+>> > with no resources and no reason to be on a particular bus was definite=
+ly
+>> > the intent but I'm not 100% sure without trying it that we don't run
+>> > into any problems.
+>> >=20
+>> > Not that many examples yet, but cpuidle-psci.c looks like a vaguely si=
+milar
+>> > case to this one.=20=20
+>> >=20
+>> > All it really does is move the location of the device and
+>> > smash together the device registration with probe/remove.
+>> > That means the device disappears if probe() fails, which is cleaner
+>> > in many ways than leaving a pointless stub behind.
+>> >=20
+>> > Maybe it isn't appropriate it if is actually useful to rmmod/modprobe =
+the
+>> > driver.=20
+>>=20
+>> Yeah, exactly. Can a TSM driver even be modular? If it has to be built
+>> in then there is no reason to do this:
 >
->>>  #define MSR_AMD64_LBR_SELECT			0xc000010e
->>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->>> index 4246e1d2cfcc..817ef852bdf9 100644
->>> --- a/arch/x86/kvm/pmu.c
->>> +++ b/arch/x86/kvm/pmu.c
->>> @@ -715,18 +715,14 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
->>>  	return 0;
->>>  }
->>>  
->>> -bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
->>> +bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
->>>  {
->>>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->>>  
->>>  	if (!kvm_vcpu_has_mediated_pmu(vcpu))
->>>  		return true;
->>>  
->>> -	/*
->>> -	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
->>> -	 * in Ring3 when CR4.PCE=0.
->>> -	 */
->>> -	if (enable_vmware_backdoor)
->>> +	if (!kvm_pmu_has_perf_global_ctrl(pmu))
->>>  		return true;
->>>  
->>>  	/*
->>> @@ -735,7 +731,22 @@ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
->>>  	 * capabilities themselves may be a subset of hardware capabilities.
->>>  	 */
->>>  	return pmu->nr_arch_gp_counters != kvm_host_pmu.num_counters_gp ||
->>> -	       pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed ||
->>> +	       pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed;
->>> +}
->>> +EXPORT_SYMBOL_GPL(kvm_need_perf_global_ctrl_intercept);
->>> +
->>> +bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
->>> +{
->>> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->>> +
->>> +	/*
->>> +	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
->>> +	 * in Ring3 when CR4.PCE=0.
->>> +	 */
->>> +	if (enable_vmware_backdoor)
->>> +		return true;
->>> +
->>> +	return kvm_need_perf_global_ctrl_intercept(vcpu) ||
->>>  	       pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
->>>  	       pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
->>>  }
->> There is a case for AMD processors where the global MSRs are absent in the guest
->> but the guest still uses the same number of counters as what is advertised by the
->> host capabilities. So RDPMC interception is not necessary for all cases where
->> global control is unavailable.o
-> Hmm, I think Intel would be the same?  Ah, no, because the host will have fixed
-> counters, but the guest will not.  However, that's not directly related to
-> kvm_pmu_has_perf_global_ctrl(), so I think this would be correct?
+> For example, CRYPTO_DEV_CCP_DD, the AMD PCI device driver that will call
+> tsm_register(), is already modular.
 >
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 4414d070c4f9..4c5b2712ee4c 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -744,16 +744,13 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
->         return 0;
->  }
->  
-> -bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
-> +static bool kvm_need_pmc_intercept(struct kvm_vcpu *vcpu)
-
-The function name kvm_need_pmc_intercept() seems a little bit misleading
-and make users think this function is used to check if a certain PMC is
-intercepted. Maybe we can rename the function to kvm_need_global_intercept().
-
-Others look good to me. Thanks.
-
-
->  {
->         struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->  
->         if (!kvm_vcpu_has_mediated_pmu(vcpu))
->                 return true;
->  
-> -       if (!kvm_pmu_has_perf_global_ctrl(pmu))
-> -               return true;
-> -
->         /*
->          * Note!  Check *host* PMU capabilities, not KVM's PMU capabilities, as
->          * KVM's capabilities are constrained based on KVM support, i.e. KVM's
-> @@ -762,6 +759,13 @@ bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
->         return pmu->nr_arch_gp_counters != kvm_host_pmu.num_counters_gp ||
->                pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed;
->  }
-> +
-> +bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
-> +{
-> +
-> +       return kvm_need_pmc_intercept(vcpu) ||
-> +              !kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu));
-> +}
->  EXPORT_SYMBOL_GPL(kvm_need_perf_global_ctrl_intercept);
->  
->  bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
-> @@ -775,7 +779,7 @@ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
->         if (enable_vmware_backdoor)
->                 return true;
->  
-> -       return kvm_need_perf_global_ctrl_intercept(vcpu) ||
-> +       return kvm_need_pmc_intercept(vcpu) ||
->                pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
->                pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
->  }
+>> > > The goal is to have tsm class device to be parented by the platform
+>> > > device.
+>>=20
+>> IMHO the only real point of that is to trigger module autoloading.
 >
+> Right. For TDX, and I expect CCA as well, the arch code that knows that
+> PCI/TSM functionality is available and can register a device, may be
+> running too early to attach a driver to that device.
+>
+> I.e. I would like to just use faux_device, but without the ability to do
+> EPROBE_DEFER, for example to await the plaform IOMMU driver. It needs to
+> move to its own bus so the attach event can be handled at a better time.
+>
+
+One of the issues I=E2=80=99ve run into after switching to the faux_device =
+model
+is determining how to automatically load the guest and host TSM drivers
+based on the availability of the device assignment feature.
+
+The platform device previously provided a clean abstraction for this
+behavior, which made autoloading straightforward
+
+>
+>> Otherwise the tsm core should accept NULL as the parent pointer during
+>> registration, it probably already does..
+>
+> Yes, NULL @parent "just works" with tsm_register().
+>
+> However, I expect all tsm_register() callers to be from modular drivers.
+
+-aneesh
