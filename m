@@ -1,92 +1,98 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F611F09A5
-	for <kvmarm@lists.linux.dev>; Thu,  9 Oct 2025 21:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFEC253F12
+	for <kvmarm@lists.linux.dev>; Thu,  9 Oct 2025 21:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760045447; cv=none; b=RDesmccQ0zpt+5yjmW0gXyT35h0XWeASvazRezcWHWdhF4IjQ8FH1pW7JkRTbFHZnL1TUUOWp/xiBD6NcTZF21ilm33IKacwHi39OgTJoPSaQ6a0dSxXK1mEQ+PIkK3PKXbpe6Ydf47oNXcifk/K8kgy7kTDaViRFLWRNGzH1xw=
+	t=1760045951; cv=none; b=lVK19GRJMH/QDGmlmjhKT0e4acq8QP7cHxh3PSCL/TEt/UO1kbKI36xo06iliXzqkhiBKfBHeZrbpQsymDufEqZNkFQzaBNs3WxdtCy0ThN/3b3tMBf1Xg+gr3rB01rxslLZ9rQR+HslpWUyUZfIe61Izczmesizx0KpzVALvzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760045447; c=relaxed/simple;
-	bh=++/quOYLjEw95EfHjyvc4Cm2aEvAnz8aluCCkeJN3ko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y9vqyGW2V+rkFqXNNeNCFfciiUlNtG9xJ3T/UlYM3KBu846dI0a3//PWkej0mrVFjoOEV7t/7Dx//mc+bvgEfnEtp+OSsLLkwgbXQboX7LomC01e6gGhPOdYkv7cAmuAY1MrWtU0HJzRCAyunaBUuPerYMI2tQzfoqImOcMfm6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LYBnXVhr; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1760045951; c=relaxed/simple;
+	bh=BEzPWEG2tTMKJDi1Ui0rZYJQnidu+uUR6toMxPc1JGI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hPLVOjsWVNiA45Vt/LCiFQWMItao0ag+9jaDIUpSQFEzRyoEnaOvucITGWB/mG9iYGbKEU9tjDCNHVcuXLx7pJReSFd38hjgllYhyvg2HxP5YkNbHB5mORfN2ZWEJvmuDdLEEUFGCam9ZpehIdwHwHaamXho84dg9sS8RaY6b2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1pavlea2; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LYBnXVhr"
-Date: Thu, 9 Oct 2025 14:30:34 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760045442;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hklQ8tRKwaKYDErRF1YB8TiLgUmmzMXzG7ufFj2s09M=;
-	b=LYBnXVhr7HKEZhFK/rpCBX05+lNJQbAeLcyG6znaqW322vOApbiJ11HbXmcSeloGn6inU+
-	UB1sdWNkpE26QkRLpsDh/SOvJmV4p+EiO5/sLHOdOeCTgGWpbLAYXLOH3hoyqFaxjMlG6T
-	9DVXB3nksCyhIe04RrgnTvECZjxrSlY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>, Jan Kotas <jank@cadence.com>
-Subject: Re: [PATCH] arm64: Revamp HCR_EL2.E2H RES1 detection
-Message-ID: <aOgpesxEKsnbKGs3@linux.dev>
-References: <20251009121239.29370-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1pavlea2"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-28d1747f23bso24658385ad.3
+        for <kvmarm@lists.linux.dev>; Thu, 09 Oct 2025 14:39:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760045949; x=1760650749; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GAMGpTBb5JIMylmtnuNcSJ5s50b2UQUcn7vzXw649qs=;
+        b=1pavlea2dCUN4nVbvh6g7YvqnPjtLrf1UwSeA3HT1bgLRIA0bB5GYi3+6uFMELBFjr
+         IEejHle+ckr9qzJgCq3qfIP/5/a74ISQyWh+WBTpB88JhRhYM+mQ3Jzi77/5aR8HqNsB
+         GoKEWtnQhu/uhNN9fxyKyL092lrhyIkVITTBxwRdIW16U+qHEOAvWQ0hU4E2zQ68icsK
+         QlstNZFoBfCdZBPLyDe7o1+FdVZEbMB86I78lQXxwM92ET4mSL7VOqGPUz8gGChRsNzi
+         +1DK3d4qCuT5HTkn1RmzBHi9TIvavkZiKRARMBQg9ACMjNBVPVLIYdkHcKeRRCdtDM3s
+         zW9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760045949; x=1760650749;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GAMGpTBb5JIMylmtnuNcSJ5s50b2UQUcn7vzXw649qs=;
+        b=YRk/qSSjrb+GU5oV2liQZn+yI1YG52zKlgKL3r3BPlTekm9HjSohe7BwlebfdokacE
+         ClYVZet/d0BhsXW5EqSyuZGSQKf5+JL3uJUlHiwclq7j90wInRshxJhO9zTl0knzKKqZ
+         XRzHTlTzOl8sYTyPaVc+5+6NVeQ8Pr94k2g1oYHq4K76OYKngBEFN99gFy5j6bhXdMIh
+         A3n/yQ1w3Ch2OoyoDBAA8Kauwz++xkYQgigzOi/ac1uxJlP0rmuem1bAWw4Gp3JmLD8c
+         aGi8XMhii5ce2Ap5p8F3T+Gy6LtP1AudQZzhh0DJCNAq2Waawdu05RWeSNUkGZCYcPFx
+         /c8g==
+X-Forwarded-Encrypted: i=1; AJvYcCUSNF/aWEPEvhGFKZ0jBc4xk4ukcRL7sL8FVejl0zUCgA26ORa0VSRVTKJ2ratjIdqgUszUtoE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx0Bfr/9hfOxdEElzYB7iHDv9g567rwJTpdG8Xwrv3BC98KQPT/
+	6XPSlAvc0kw5OINGhPYzXIOpU6EgItm+R3+t/QbnxVFAh3APZgjSiaf3sJMchLCHtN08qG8GXf/
+	zNISY/oPL0EebDlqfY2VT3S+VzA==
+X-Google-Smtp-Source: AGHT+IHiLO0Tc7T4efMeJ7arhzRn2QVrxkkt3xAe4o5ah0mgwx2R8IQxbSx0reBo3eWBl5LTjIgto1JJK2FqbDLCmg==
+X-Received: from pjbne5.prod.google.com ([2002:a17:90b:3745:b0:330:8b1f:c4e7])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:1b50:b0:332:250e:eec8 with SMTP id 98e67ed59e1d1-33b51168e20mr13156235a91.15.1760045949059;
+ Thu, 09 Oct 2025 14:39:09 -0700 (PDT)
+Date: Thu, 09 Oct 2025 14:39:07 -0700
+In-Reply-To: <20251007221420.344669-5-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251009121239.29370-1-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20251007221420.344669-1-seanjc@google.com> <20251007221420.344669-5-seanjc@google.com>
+Message-ID: <diqztt07hi10.fsf@google.com>
+Subject: Re: [PATCH v12 04/12] KVM: guest_memfd: Add slab-allocated inode cache
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Shivank Garg <shivankg@amd.com>, 
+	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
 
-Hey,
+Sean Christopherson <seanjc@google.com> writes:
 
-On Thu, Oct 09, 2025 at 01:12:39PM +0100, Marc Zyngier wrote:
-> We currently have two ways to identify CPUs that only implement FEAT_VHE
-> and not FEAT_E2H0:
-> 
-> - either they advertise it via ID_AA64MMFR4_EL1.E2H0,
-> - or the HCR_EL2.E2H bit is RAO/WI
-> 
-> However, there is a third category of "cpus" that fall between these
-> two cases: on CPUs that do not implement FEAT_FGT, it is IMPDEF whether
-> an access to ID_AA64MMFR4_EL1 can trap to EL2 when the register value
-> is zero.
-> 
-> A consequence of this is that on systems such as Neoverse V2, a NV
-> guest cannot reliably detect that it is in a VHE-only configuration
-> (E2H is writable, and ID_AA64MMFR0_EL1 is 0), despite the hypervisor's
-> best effort to repaint the id register.
-> 
-> Replace the RAO/WI test by a sequence that makes use of the VHE
-> register remnapping between EL1 and EL2 to detect this situation,
-> and work out whether we get the VHE behaviour even after having
-> set HCR_EL2.E2H to 0.
-> 
-> This solves the NV problem, and provides a more reliable acid test
-> for CPUs that do not completely follow the letter of the architecture
-> while providing a RES1 behaviour for HCR_EL2.E2H.
-> 
-> Suggested-by: Marc Rutland <mark.rutland@arm.com>
-		^~~~
+> From: Shivank Garg <shivankg@amd.com>
+>
+> Add a dedicated gmem_inode structure and a slab-allocateda inode cache for
+> guest memory backing, similar to how shmem handles inodes.
+>
+> This adds the necessary allocation/destruction functions and prepares
+> for upcoming guest_memfd NUMA policy support changes.  Using a dedicated
+> structure will also allow for additional cleanups, e.g. to track flags in
+> gmem_inode instead of i_private.
+>
+> Signed-off-by: Shivank Garg <shivankg@amd.com>
+> Tested-by: Ashish Kalra <ashish.kalra@amd.com>
+> [sean: s/kvm_gmem_inode_info/gmem_inode, name init_once()]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Thank you *Mark* for the suggestion here, neat trick :)
+Reviewed-by: Ackerley Tng <ackerleytng@google.com>
+Tested-by: Ackerley Tng <ackerleytng@google.com>
 
-I'd be in favor of this patch being sent to stable, happy to handle the
-backports if you don't have the time for it. VMs mysteriously dying
-isn't a very good experience on NV and I'd like to not scare folks away.
-
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-Thanks,
-Oliver
+> ---
+>  virt/kvm/guest_memfd.c | 77 +++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 76 insertions(+), 1 deletion(-)
+>
+> 
+> [...snip...]
+> 
