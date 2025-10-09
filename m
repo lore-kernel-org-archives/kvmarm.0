@@ -1,147 +1,179 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A6C25A659
-	for <kvmarm@lists.linux.dev>; Thu,  9 Oct 2025 12:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7E019E967;
+	Thu,  9 Oct 2025 12:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760012548; cv=none; b=r5hoK/UgBsC1JO72w+GWV605GTfcqfU65oStq9nCmVgcrLNv/JB5fMB73TD94jixkjVPPG1EYNheoi3bI1h+VI5pRAN8DS/Z9nEw2B8O4HTGLiv7ueUZoDXeZ7elh79DV+tulWUWgCEtcxRWu8EZ66wntB89q5nrXOHoRjd0ooM=
+	t=1760013773; cv=none; b=tV/UKTm/t+dDIqtc7lOJvtBsAtE9clwxwIj+ps2DRo+6/2hXBCW79yqfFIbpi6Tpl2FrtfZQapPL/t83m0ehnsLSzk3mrNI0YjE5MPISJG9eFmcD927wRbDNhwBrUVfoJbRQHwKd+IKvoFgTyh9xxIu1jIa4g80aXfOndY6ldj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760012548; c=relaxed/simple;
-	bh=Kn6xHKo0JXEWHVTtUBTdlwgV/s4gzg31YRonTQrYxpg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BISeIq9/cWHko8LvOqSihgB0N8FPpwUnGVfaSygY78OQPdMBoMmIe08gTY21ywbsVh559ywOroJHL9BZK0P5SsmMKjRElOR/x2WRsgWJE4UKHuVziQXBwF6Fm8o7YWUZbjHYuxcpsAfXkfVtNWdtEeg37NE14S8Tjj6kaUNDmtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MRSpGCpU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760013773; c=relaxed/simple;
+	bh=x7NTeLf98YsKIjLW5txYL5wOM6+bi+M1w4d21NY76zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fn7BWNPapYgMlzz8NOWaLpX6MBlq1RUMC6dqdpgESobDWocVUGV93KQqBSimRxfKz1jbKvVwfTsvvq4Q5kAqrLqjWdnA617pUy5/ZnJHX7NVH8GzWX9QF98An8Oe42/3Z7Pxeb1V9BQDs4cCeUJBMFtysy2VOpYDPK7R817Aky0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=teLU8SNd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRSpGCpU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25598C4CEE7;
-	Thu,  9 Oct 2025 12:22:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="teLU8SNd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0608BC4CEE7;
+	Thu,  9 Oct 2025 12:42:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760012547;
-	bh=Kn6xHKo0JXEWHVTtUBTdlwgV/s4gzg31YRonTQrYxpg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MRSpGCpUzw2FxBbFoFzcerIr91PVvabn+kickj7IGFCWG2kxJk3eei+cdFhb0F0h/
-	 FKApQDJH7p+A8Jgyn6sXEjmp0R7nggqry9Bi8EFtH3SjlPQ3t7zpzbTAmSrMMnhjIV
-	 0iCVZrl7CRx1l7K9PozSMxy13md7Ww5M38wdQNMYkf0FHdUL5w4umY+ipGTEmQMOis
-	 DR7qrN9/w9/At4AqqdWWDI2nMNn86q6YBHJtEMS+hMBjZIwZnIKcGSoaQ9+zt1xmCS
-	 7FIkPNEga5AsuvFdWO61qURmXyQ0M6tKO1PL9aigNIv0UfFYfZsj8wBhkxmU6aq4aX
-	 elklVkcplT/lg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v6pf7-0000000Ccgs-0A6g;
-	Thu, 09 Oct 2025 12:22:25 +0000
-Date: Thu, 09 Oct 2025 13:22:24 +0100
-Message-ID: <86wm54xo1r.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jan Kotas <jank@cadence.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Subject: Re: KVM NV + SVE host OS warning
-In-Reply-To: <86y0plxvt4.wl-maz@kernel.org>
-References: <799DD5E5-8BC2-47B3-A919-33429D3FB2F1@global.cadence.com>
-	<865xd61tt5.wl-maz@kernel.org>
-	<F9556C9F-2671-4EF6-A725-D080C3793A34@global.cadence.com>
-	<864isq1r66.wl-maz@kernel.org>
-	<aNXGW8C_S1TbFR9-@linux.dev>
-	<25C5E00D-62BC-4188-8642-21913446B32C@global.cadence.com>
-	<aOWhlvC1kROWfMSv@linux.dev>
-	<1271032F-41BB-4896-AAED-8660D5459E7D@global.cadence.com>
-	<E2FD1CD0-AE1F-4F9C-86FF-D576C212832B@global.cadence.com>
-	<864is9zqs9.wl-maz@kernel.org>
-	<677A529C-B3D7-4BD1-BEED-D8414D961BBD@global.cadence.com>
-	<86zfa1y58i.wl-maz@kernel.org>
-	<15A85F2B-1A0C-4FA7-9FE4-EEC2203CC09E@global.cadence.com>
-	<86y0plxvt4.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1760013772;
+	bh=x7NTeLf98YsKIjLW5txYL5wOM6+bi+M1w4d21NY76zc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=teLU8SNdu0sPz8WlsTxct4Ekg49SftyC6bjJKTyIgMjj1wdbMgzu45cicz8qWNo37
+	 9rdHU8we029VbJnznae2+sa+t2VvTGOJZ+4BJNzhj0rCjKiZgqQV7jzSlkNKNGPRnl
+	 vHGmDUR92YxbJMMXpXzECk7K2fB9WMRyx6wBFroJmYYtZ9JwldvAj7wEPuJ0YzzD5C
+	 PsaJO1VXw7GlJKRWdHgko81Vexcr7AFSA7fYl+GEHchCWEp23fNqGAsJkL3EckxE3N
+	 4xGcBLEcsozXuT4gza/6mdTQacngO6ef+jmNIr/Xoa2EPCSOwp9QsXJpAJ4sePn3MY
+	 qhQ/mklUzopFQ==
+Date: Thu, 9 Oct 2025 13:42:47 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>, nd <nd@arm.com>,
+	Mark Rutland <Mark.Rutland@arm.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Catalin Marinas <Catalin.Marinas@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"will@kernel.org" <will@kernel.org>
+Subject: Re: [PATCH 1/3] arm64/sysreg: Support feature-specific fields with
+ 'Feat' descriptor
+Message-ID: <5ac755f3-d7e4-421a-85bd-43d7aa7fbfde@sirena.org.uk>
+References: <20251007153505.1606208-1-sascha.bischoff@arm.com>
+ <20251007153505.1606208-2-sascha.bischoff@arm.com>
+ <26d69b0d-3529-454f-9385-99a914bf1ebc@sirena.org.uk>
+ <0a3a60082d13b27388a0893abce8be47b045c107.camel@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jank@cadence.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gG3MP3AzN4q55W5n"
+Content-Disposition: inline
+In-Reply-To: <0a3a60082d13b27388a0893abce8be47b045c107.camel@arm.com>
+X-Cookie: Today is what happened to yesterday.
 
-On Wed, 08 Oct 2025 16:22:31 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Wed, 08 Oct 2025 14:43:29 +0100,
-> Jan Kotas <jank@cadence.com> wrote:
-> > >>
-> > >> Is it possible to trap/emulate HCR_EL2, and make sure E2H is always 1,
-> > >> in cases when only KVM_ARM_VCPU_HAS_EL2 is set?
-> > >> Would that help?
-> > > 
-> > > There are no traps for HCR_EL2.
-> > > 
-> > >> As a test, I tried forcing this bit before running VCPUs, but
-> > >> reading it via MRS got a value without it being set.
-> > > 
-> > > Where did you read that from?
-> > 
-> > I checked the X1 register, after: mrs x1, hcr_el2 in __check_hvhe.
-> 
-> That's too late. At this point, the write to HCR_EL2 will have already
-> occurred,
-> 
-> > 
-> > 
-> > > If you apply the following change to your guest, does it start
-> > > behaving?
-> > > 
-> > > M.
-> > > 
-> > > diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-> > > index 46033027510cc..392c9f4016f2e 100644
-> > > --- a/arch/arm64/include/asm/el2_setup.h
-> > > +++ b/arch/arm64/include/asm/el2_setup.h
-> > > @@ -34,7 +34,7 @@
-> > > mrs_s x1, SYS_ID_AA64MMFR4_EL1
-> > > sbfx x1, x1, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
-> > > cmp x1, #0
-> > > - b.ge .LnVHE_\@
-> > > +// b.ge .LnVHE_\@
-> > > 
-> > > orr x0, x0, #HCR_E2H
-> > > .LnVHE_\@:
-> > > 
-> > 
-> > With this change Guest OS starts the boot process.
-> > 
-> > [ 0.000000] CPU features: detected: Virtualization Host Extensions
-> > [ 6.998696] SMP: Total of 4 processors activated.
-> > [ 7.257045] CPU: All CPU(s) started at EL2
-> > [ 185.781062] SVE: maximum available vector length 16 bytes per vector
-> > [ 186.104159] SVE: default vector length 16 bytes per vector
-> 
-> Great. That confirms my suspicion that we cannot advertise VHE on CPUs
-> that do not have FEAT_FGT. Oh well. I'll post a patch to forbid VHE
-> guests on these machines.
 
-As an alternative, and in an effort to keep at least VHE guests
-running on V2 (and other machines suffering from the same situation),
-I have posted a potential workaround at [1] for the guest to reliably
-detect the situation.
+--gG3MP3AzN4q55W5n
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Could you please test it with your setup and report whether this
-allows you to boot a VHE guest? You will need to patch the guest.
+On Thu, Oct 09, 2025 at 09:48:36AM +0000, Sascha Bischoff wrote:
+> On Tue, 2025-10-07 at 17:28 +0100, Mark Brown wrote:
 
-Note that this still won't let you recursively virtualise EL2 (the HW
-can do it, but KVM in the guest doesn't know it), but that's better
-than nothing.
+> > logic for generating the conditionals in a manner that's not tied to
+> > features with a layer on top that generates standard naming for
+> > common
+> > patterns like FEAT, but OTOH part of why that's not been done because
+> > it's got a bunch of nasty issues so perhaps just doing the simpler
+> > case
+> > is fine.
 
-Thanks,
+> I agree that there are plenty of cases where sysreg fields change based
+> on more than just architectural features. Whilst my intent for this
+> change wasn't strictly to cover all of those cases, it could arguably
+> be used for that. Effectively, all this change is doing is to add a
+> prefix to the field definitions so it can be used however works best.
 
-	M.
+Yeah, I don't know that we need to cover all the cases in the user
+visible syntax right now - my thought was more about the code.
 
-[1] https://lore.kernel.org/r/20251009121239.29370-1-maz@kernel.org
+> It does feel as if Feat was potentially the wrong name to choose.
+> Something like Fieldset, Prefix, AltLayout, etc might be better. I'm
+> rather open to suggestions here - naming is hard!
 
--- 
-Without deviation from the norm, progress is not possible.
+It is :)
+
+> > > The Feat descriptor can be used in the following way (Feat acts as
+> > > both an if and an else-if):
+
+> > > =A0=A0=A0=A0=A0=A0=A0 Sysreg=A0 EXAMPLE 0=A0=A0=A0 1=A0=A0=A0 2=A0=A0=
+=A0 3=A0=A0=A0 4
+> > > =A0=A0=A0=A0=A0=A0=A0 Feat=A0=A0=A0 FEAT_A
+> > > =A0=A0=A0=A0=A0=A0=A0 Field=A0=A0 63:0=A0=A0=A0 Foo
+> > > =A0=A0=A0=A0=A0=A0=A0 Feat=A0=A0=A0 FEAT_B
+
+> > This assumes that there will never be nesting of these conditions in
+> > the architecture.
+
+> My thinking was that for something like that one could do:
+
+>         Feat    FEAT_A_B
+
+> Or similar. Yes, it means that anything that is nested needs to be
+> flattened, but it does allow one to describe that situation. In the
+> end, all this effectively does is to add a prefix, and said prefix can
+> be anything. Double so if we move away from calling it Feat, and use
+> something more generic instead.
+
+You could definitely do it that way, and for the limited implementation
+you're proposing it probably works as well.  My thinking here is about
+what happens with the syntax when someone comes along and implements
+nesting of fatures - the existing syntax would be broken since you
+couldn't distinguish between an implicit else and nested FEAT_.
+
+> > Probably worth complaining if we end a sysreg with a feature/prefix
+> > defined.
+
+> This is already be caught as we hit the EndSysreg directive while still
+> in the Feat block:
+
+> Error at 4690: unhandled statement
+> Error at 4690: Missing terminator for Feat block
+
+> I can be more specific in catching that, if you like.
+
+No, it's fine so long sa there's a warning.
+
+> > This is only going to work if the whole register is in a FEAT_ block,
+> > so
+> > you coudn't have:
+
+=2E..
+
+> > but then supporting partial registers does have entertaining
+> > consequences for handling Res0 and Res1.=A0 If we're OK with that
+> > restriction then the program should complain if someone tries to=20
+> > define a smaller FEAT block.
+
+> It was my intent to only support whole registers here. Anything else
+> gets insanely complex rather quickly, and much of the benefit gets lost
+> IMO. By only operating on whole Sysregs (or SysregFields) we are able
+> to re-use the existing logic to ensure that definitions are complete,
+> and the generator's state tracking remains simple. And, as you say, it
+> would break the ResX, Unkn side of things if we did anything else.
+
+> When I add the missing check I mentioned above, then it will complain
+> if fewer than 64 bits are in a defined block.
+
+Yes, I think it's a reasonable simplification for the implementation and
+so long as the syntax in the file can cope with someone doing the more
+complicated cases it seems fine to leave them for later.  It's not like
+it's a small bit of extra work it'd be easy to tack on, there's some
+thorny issues there.
+
+--gG3MP3AzN4q55W5n
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjnrcYACgkQJNaLcl1U
+h9ATfQf/casVQpgbpHM7Ag5qGzcf07FmU19LCgtzxPcUAuVl5aE9enSeRtWZbcF0
+SBtbVWCd/N+OqWhF+DmQgxCjtQH4c6A9T4+N9zNh6BUf89ehECjit9XvvvRPzfcB
+nP10Vd/qJ9wfnNYyyyYXvTncSi6YPRSRhpmcp0Gp79/XDjDEejsx0CvQUnQttJA9
+iHiMCkxiuifOnHAlp+VuYhFaPlzfXM6hqZ+IdkGHKoAVmWlxJMzgBRZtRuJPfbq8
+XLnB39TwPWVqoVRH+6D4r+EtAe8sM91nkOxGV0/nDDlKDTwqQlLm0/k7bl9LMoj9
+I3DeIxVGcseaS2PyaUTvzswN+yYLmQ==
+=ljFO
+-----END PGP SIGNATURE-----
+
+--gG3MP3AzN4q55W5n--
