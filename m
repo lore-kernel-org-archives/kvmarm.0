@@ -1,179 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7E019E967;
-	Thu,  9 Oct 2025 12:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282DD2AD0D
+	for <kvmarm@lists.linux.dev>; Thu,  9 Oct 2025 13:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760013773; cv=none; b=tV/UKTm/t+dDIqtc7lOJvtBsAtE9clwxwIj+ps2DRo+6/2hXBCW79yqfFIbpi6Tpl2FrtfZQapPL/t83m0ehnsLSzk3mrNI0YjE5MPISJG9eFmcD927wRbDNhwBrUVfoJbRQHwKd+IKvoFgTyh9xxIu1jIa4g80aXfOndY6ldj0=
+	t=1760014833; cv=none; b=IKYZLmnFOWifT03PKMR8t81XJSB8Xzo/ebyeHO9ELqfeDWCew8R9nB3T+I2IC+FB+bUuVOs9Vr8bjBGNzR9aFNuTpNNLGKabzJKD9WNNFmHMSsxZMzM3XCoN0e9MyRnTJGv48lL/SjJs/IhEhbuexsYCnSbiSKkDCc7QqgjEKkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760013773; c=relaxed/simple;
-	bh=x7NTeLf98YsKIjLW5txYL5wOM6+bi+M1w4d21NY76zc=;
+	s=arc-20240116; t=1760014833; c=relaxed/simple;
+	bh=4BeadEdq46vRlMZAJa6rcoRGrBfWWzjnGnkKDvo9nkQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fn7BWNPapYgMlzz8NOWaLpX6MBlq1RUMC6dqdpgESobDWocVUGV93KQqBSimRxfKz1jbKvVwfTsvvq4Q5kAqrLqjWdnA617pUy5/ZnJHX7NVH8GzWX9QF98An8Oe42/3Z7Pxeb1V9BQDs4cCeUJBMFtysy2VOpYDPK7R817Aky0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=teLU8SNd; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="teLU8SNd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0608BC4CEE7;
-	Thu,  9 Oct 2025 12:42:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760013772;
-	bh=x7NTeLf98YsKIjLW5txYL5wOM6+bi+M1w4d21NY76zc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=teLU8SNdu0sPz8WlsTxct4Ekg49SftyC6bjJKTyIgMjj1wdbMgzu45cicz8qWNo37
-	 9rdHU8we029VbJnznae2+sa+t2VvTGOJZ+4BJNzhj0rCjKiZgqQV7jzSlkNKNGPRnl
-	 vHGmDUR92YxbJMMXpXzECk7K2fB9WMRyx6wBFroJmYYtZ9JwldvAj7wEPuJ0YzzD5C
-	 PsaJO1VXw7GlJKRWdHgko81Vexcr7AFSA7fYl+GEHchCWEp23fNqGAsJkL3EckxE3N
-	 4xGcBLEcsozXuT4gza/6mdTQacngO6ef+jmNIr/Xoa2EPCSOwp9QsXJpAJ4sePn3MY
-	 qhQ/mklUzopFQ==
-Date: Thu, 9 Oct 2025 13:42:47 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>, nd <nd@arm.com>,
-	Mark Rutland <Mark.Rutland@arm.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"will@kernel.org" <will@kernel.org>
-Subject: Re: [PATCH 1/3] arm64/sysreg: Support feature-specific fields with
- 'Feat' descriptor
-Message-ID: <5ac755f3-d7e4-421a-85bd-43d7aa7fbfde@sirena.org.uk>
-References: <20251007153505.1606208-1-sascha.bischoff@arm.com>
- <20251007153505.1606208-2-sascha.bischoff@arm.com>
- <26d69b0d-3529-454f-9385-99a914bf1ebc@sirena.org.uk>
- <0a3a60082d13b27388a0893abce8be47b045c107.camel@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJGmaOQUju/Ykzy4SFQxatGrtLWiLwvjgBtl1SxwbQl60Yg3ZhhY/UOG5N6+qsjsmoR1Pe79H0C4KCtpGMneqkSDWn/i6B+jxriJMFLM+CTBxDadyQi3b69r54gOxOCkp7gzIGnk5kSSY3ksWT8JtbQeVvOnuplkDZhtBNiZBsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7EF59176A;
+	Thu,  9 Oct 2025 06:00:21 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8E423F59E;
+	Thu,  9 Oct 2025 06:00:27 -0700 (PDT)
+Date: Thu, 9 Oct 2025 14:00:22 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jan Kotas <jank@cadence.com>
+Subject: Re: [PATCH] arm64: Revamp HCR_EL2.E2H RES1 detection
+Message-ID: <aOex5rmMU5Q-vvss@J2N7QTR9R3>
+References: <20251009121239.29370-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gG3MP3AzN4q55W5n"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0a3a60082d13b27388a0893abce8be47b045c107.camel@arm.com>
-X-Cookie: Today is what happened to yesterday.
+In-Reply-To: <20251009121239.29370-1-maz@kernel.org>
 
+On Thu, Oct 09, 2025 at 01:12:39PM +0100, Marc Zyngier wrote:
+> We currently have two ways to identify CPUs that only implement FEAT_VHE
+> and not FEAT_E2H0:
+> 
+> - either they advertise it via ID_AA64MMFR4_EL1.E2H0,
+> - or the HCR_EL2.E2H bit is RAO/WI
+> 
+> However, there is a third category of "cpus" that fall between these
+> two cases: on CPUs that do not implement FEAT_FGT, it is IMPDEF whether
+> an access to ID_AA64MMFR4_EL1 can trap to EL2 when the register value
+> is zero.
+> 
+> A consequence of this is that on systems such as Neoverse V2, a NV
+> guest cannot reliably detect that it is in a VHE-only configuration
+> (E2H is writable, and ID_AA64MMFR0_EL1 is 0), despite the hypervisor's
+> best effort to repaint the id register.
+> 
+> Replace the RAO/WI test by a sequence that makes use of the VHE
+> register remnapping between EL1 and EL2 to detect this situation,
+> and work out whether we get the VHE behaviour even after having
+> set HCR_EL2.E2H to 0.
+> 
+> This solves the NV problem, and provides a more reliable acid test
+> for CPUs that do not completely follow the letter of the architecture
+> while providing a RES1 behaviour for HCR_EL2.E2H.
+> 
+> Suggested-by: Marc Rutland <mark.rutland@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/15A85F2B-1A0C-4FA7-9FE4-EEC2203CC09E@global.cadence.com
+> ---
+>  arch/arm64/include/asm/el2_setup.h | 30 ++++++++++++++++++++++++------
+>  1 file changed, 24 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index 46033027510cc..b7640e2c20503 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -24,22 +24,40 @@
+>  	 * ID_AA64MMFR4_EL1.E2H0 < 0. On such CPUs HCR_EL2.E2H is RES1, but it
+>  	 * can reset into an UNKNOWN state and might not read as 1 until it has
+>  	 * been initialized explicitly.
+> -	 *
+> -	 * Fruity CPUs seem to have HCR_EL2.E2H set to RAO/WI, but
+> -	 * don't advertise it (they predate this relaxation).
+> -	 *
+>  	 * Initalize HCR_EL2.E2H so that later code can rely upon HCR_EL2.E2H
+>  	 * indicating whether the CPU is running in E2H mode.
+>  	 */
+>  	mrs_s	x1, SYS_ID_AA64MMFR4_EL1
+>  	sbfx	x1, x1, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
+>  	cmp	x1, #0
+> -	b.ge	.LnVHE_\@
+> +	b.lt	.LnE2H0_\@
+>  
 
---gG3MP3AzN4q55W5n
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +	/*
+> +	 * Fruity CPUs seem to have HCR_EL2.E2H set to RAO/WI, but don't
+> +	 * advertise it (they predate this relaxation). Check for an
+> +	 * essential VHE property (system register remapping) to decide
+> +	 * whether we're effectively VHE-only or not.
+> +	 *
+> +	 * This is also useful for for NV guests on CPUs that can't trap
+> +	 * ID_AA64MMFR4_EL1 as they don't have FEAT_FGT.
+> +	 */
 
-On Thu, Oct 09, 2025 at 09:48:36AM +0000, Sascha Bischoff wrote:
-> On Tue, 2025-10-07 at 17:28 +0100, Mark Brown wrote:
+Would you be happy to elaborate this comment to:
 
-> > logic for generating the conditionals in a manner that's not tied to
-> > features with a layer on top that generates standard naming for
-> > common
-> > patterns like FEAT, but OTOH part of why that's not been done because
-> > it's got a bunch of nasty issues so perhaps just doing the simpler
-> > case
-> > is fine.
+	/*
+	 * Unfortunately, HCR_EL2.E2H can be RES1 even if not advertised
+	 * as such via ID_AA64MMFR4_EL1.E2H0:
+	 *
+	 * - Fruity CPUs predate the !FEAT_E2H0 relaxation, and seem to
+	 *   have HCR_EL2.E2H implemented as RAO/WI.
+	 *
+	 * - On CPUs that lack FEAT_FGT, a hypervisor can't trap guest
+	 *   reads of ID_AA64MMFR4_EL1 to advertise !FEAT_E2H0. NV
+	 *   guests on these hosts can write to HCR_EL2.E2H without
+	 *   trapping to the hypervisor, but these writes have no
+	 *   functional effect.
+	 *
+	 * Handle both cases by checking for an essential VHE property
+	 * (system register remapping) to decide whether we're
+	 * effectively VHE-only or not.
+	 */
 
-> I agree that there are plenty of cases where sysreg fields change based
-> on more than just architectural features. Whilst my intent for this
-> change wasn't strictly to cover all of those cases, it could arguably
-> be used for that. Effectively, all this change is doing is to add a
-> prefix to the field definitions so it can be used however works best.
+Other than that, this all looks good to me:
 
-Yeah, I don't know that we need to cover all the cases in the user
-visible syntax right now - my thought was more about the code.
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 
-> It does feel as if Feat was potentially the wrong name to choose.
-> Something like Fieldset, Prefix, AltLayout, etc might be better. I'm
-> rather open to suggestions here - naming is hard!
+Mark.
 
-It is :)
-
-> > > The Feat descriptor can be used in the following way (Feat acts as
-> > > both an if and an else-if):
-
-> > > =A0=A0=A0=A0=A0=A0=A0 Sysreg=A0 EXAMPLE 0=A0=A0=A0 1=A0=A0=A0 2=A0=A0=
-=A0 3=A0=A0=A0 4
-> > > =A0=A0=A0=A0=A0=A0=A0 Feat=A0=A0=A0 FEAT_A
-> > > =A0=A0=A0=A0=A0=A0=A0 Field=A0=A0 63:0=A0=A0=A0 Foo
-> > > =A0=A0=A0=A0=A0=A0=A0 Feat=A0=A0=A0 FEAT_B
-
-> > This assumes that there will never be nesting of these conditions in
-> > the architecture.
-
-> My thinking was that for something like that one could do:
-
->         Feat    FEAT_A_B
-
-> Or similar. Yes, it means that anything that is nested needs to be
-> flattened, but it does allow one to describe that situation. In the
-> end, all this effectively does is to add a prefix, and said prefix can
-> be anything. Double so if we move away from calling it Feat, and use
-> something more generic instead.
-
-You could definitely do it that way, and for the limited implementation
-you're proposing it probably works as well.  My thinking here is about
-what happens with the syntax when someone comes along and implements
-nesting of fatures - the existing syntax would be broken since you
-couldn't distinguish between an implicit else and nested FEAT_.
-
-> > Probably worth complaining if we end a sysreg with a feature/prefix
-> > defined.
-
-> This is already be caught as we hit the EndSysreg directive while still
-> in the Feat block:
-
-> Error at 4690: unhandled statement
-> Error at 4690: Missing terminator for Feat block
-
-> I can be more specific in catching that, if you like.
-
-No, it's fine so long sa there's a warning.
-
-> > This is only going to work if the whole register is in a FEAT_ block,
-> > so
-> > you coudn't have:
-
-=2E..
-
-> > but then supporting partial registers does have entertaining
-> > consequences for handling Res0 and Res1.=A0 If we're OK with that
-> > restriction then the program should complain if someone tries to=20
-> > define a smaller FEAT block.
-
-> It was my intent to only support whole registers here. Anything else
-> gets insanely complex rather quickly, and much of the benefit gets lost
-> IMO. By only operating on whole Sysregs (or SysregFields) we are able
-> to re-use the existing logic to ensure that definitions are complete,
-> and the generator's state tracking remains simple. And, as you say, it
-> would break the ResX, Unkn side of things if we did anything else.
-
-> When I add the missing check I mentioned above, then it will complain
-> if fewer than 64 bits are in a defined block.
-
-Yes, I think it's a reasonable simplification for the implementation and
-so long as the syntax in the file can cope with someone doing the more
-complicated cases it seems fine to leave them for later.  It's not like
-it's a small bit of extra work it'd be easy to tack on, there's some
-thorny issues there.
-
---gG3MP3AzN4q55W5n
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjnrcYACgkQJNaLcl1U
-h9ATfQf/casVQpgbpHM7Ag5qGzcf07FmU19LCgtzxPcUAuVl5aE9enSeRtWZbcF0
-SBtbVWCd/N+OqWhF+DmQgxCjtQH4c6A9T4+N9zNh6BUf89ehECjit9XvvvRPzfcB
-nP10Vd/qJ9wfnNYyyyYXvTncSi6YPRSRhpmcp0Gp79/XDjDEejsx0CvQUnQttJA9
-iHiMCkxiuifOnHAlp+VuYhFaPlzfXM6hqZ+IdkGHKoAVmWlxJMzgBRZtRuJPfbq8
-XLnB39TwPWVqoVRH+6D4r+EtAe8sM91nkOxGV0/nDDlKDTwqQlLm0/k7bl9LMoj9
-I3DeIxVGcseaS2PyaUTvzswN+yYLmQ==
-=ljFO
------END PGP SIGNATURE-----
-
---gG3MP3AzN4q55W5n--
+> +	msr_hcr_el2 x0		// Setup HCR_EL2 as nVHE
+> +	isb
+> +	mov	x1, #1		// Write something to FAR_EL1
+> +	msr	far_el1, x1
+> +	isb
+> +	mov	x1, #2		// Try to overwrite it via FAR_EL2
+> +	msr	far_el2, x1
+> +	isb
+> +	mrs	x1, far_el1	// If we see the latest write in FAR_EL1,
+> +	cmp	x1, #2		// we can safely assume we are VHE only.
+> +	b.ne	.LnVHE_\@	// Otherwise, we know that nVHE works.
+> +
+> +.LnE2H0_\@:
+>  	orr	x0, x0, #HCR_E2H
+> -.LnVHE_\@:
+>  	msr_hcr_el2 x0
+>  	isb
+> +.LnVHE_\@:
+>  .endm
+>  
+>  .macro __init_el2_sctlr
+> -- 
+> 2.47.3
+> 
+> 
