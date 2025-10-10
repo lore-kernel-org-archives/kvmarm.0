@@ -1,152 +1,173 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11D42701B6
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 17:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088E62F7442
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 18:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760119174; cv=none; b=McEb7WM5qtILil1l435vc01lWDNcBN2JFRca3VMDWrkOgFeC5DEsxZNBx0EGxVzRLpkB2ZgLMulWIlO8eeE04h4PEo24MwhUvVWLG4Vz+LEoj7JBRRp8d5pxx1GyJcU1jInYe8j7Rwwl2mGDdHJC/td9BVBJhXPu0xaOlTo1Roc=
+	t=1760120050; cv=none; b=C7HkXxvbyv3PL/QK9iidON0UZJ4xZTFU/0hYnC1E6T210XoUt4rt/tbbY7N1SbjsO9nTX5UXofnynDciXowuP0bmp07HUMzda42z+OCYfgcPYT7TFwQgqV7SQ7GTChdZyxgL6FsxJ7M+4w9f+KNoFKaCdYWdIBooURNaBgPr2j4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760119174; c=relaxed/simple;
-	bh=/O4J+xOHjAuEp3KBUHoVkp1FiMuNBMhKCunHsW3BgCY=;
+	s=arc-20240116; t=1760120050; c=relaxed/simple;
+	bh=V0gMhKNlFvxaSiIwQX6I3iUUMqcn4Gj0ndcSzOb074I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iFr++XIzeNgn5h9u1HzR4L3AojmukCWTsAZxj4RE/7+GxaiarSYj9cCv6SL+d3HXqruvEumYgeYMmY1wA3ZlomdhWSrq3/w8XLk/N3Lis10lMny5rVFsyx/UHJbU6JoHPMAV+qDD1h7YbDXEVlpJa49gz2XhGV+XSdyRUAGdBc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mgv+ozsl; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=mVNME9Z6T4aAZR3P1tmp8dNienT+Yl4q67Z7Cbr6xByC47fmF8+spHx7iboZ1sD/dzL7okVWonU7stBnfyqu9d9PExYGSIsJBhGxNc8xeLFhNTnjR65T/rD2ByNpQ0tiYJq2RmR6EKeQqTqu51q6ZdxReC1Hu8TlDnhuOyIEaks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JlH5ifyE; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mgv+ozsl"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-780f9cc532bso3720363b3a.0
-        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 10:59:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JlH5ifyE"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2699ebc0319so45173685ad.3
+        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 11:14:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760119171; x=1760723971; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1760120048; x=1760724848; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XsiTGDp45+d8REu3L6sx1lSo7GE9fyB7bHGlv479Ljo=;
-        b=Mgv+ozslhJ/SFnh33DkxQ3lBVhgoCtyeq5tqmEbxCyWgnkJRnUxdX+Rm0vLMlv90xI
-         dzDo8lUHynA7qJaaLsy0RcBxXJKEJUEO3SAQvzRCuj9mUOm/Qnnk4LV299B0NjZr8KPM
-         oCyUeX19uqRLUu3VnFaNCLM8ygF4kseV91LVe5MbPNk9IMGMlEUaJl8uzuITi2hNndhW
-         SvkrgLicl01CB0chStbO/PJ6kh45SWxgEul+Qa1OyJv++eR7awBmJZqDeOl96LeHIMwy
-         17PLqI54UyGQmlwjiWoQzzdWL9sA71bycuVYx77HGf4tCXqwStasIoLIjPTfJeme2vXd
-         W3wQ==
+        bh=RRqqebB5b3S+5bGOfhb1j8iKUMVMXWWcx0kI9eE51UQ=;
+        b=JlH5ifyE58O0F/ACJiDZZEyD/anKufMeDk4H4Zm9pZsCSoVjsCGK2wP8/O5cdevcnE
+         KTEj2b72u29yj6SQrwpveHKlhu1EEkAEfrwYqgSXKvEapuQRBQLP04U1YfEOBiL/mz42
+         DDKxcE/U+XEoWeDQyaj42u1YUouRYDMjfQlz7a+6fh0d9S024I3Jb+QLfkuq/CsALj+x
+         WEDp+oP8TEVtSV2kVWf69vIu8powGNBFrlQVV4XHBfABhhFavtaa24dB316VbuvZTiZI
+         FrRtNoGiFb8JCqfTGr9Mh9iIKfYnUWBa73Tv/28mdmUkckrZeCODtOw4nXlu+yEWVOX3
+         39Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760119171; x=1760723971;
+        d=1e100.net; s=20230601; t=1760120048; x=1760724848;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XsiTGDp45+d8REu3L6sx1lSo7GE9fyB7bHGlv479Ljo=;
-        b=uQZRHJOUMQALvRrcJurhaEbdTYSuT7xbm5284QZw1GsiVNU3tQIrO3leFlz9RP6y9U
-         Gjtsu6pdUo42Nyq3Ym4hQ378OYFm0R/3vShMKe4AUh1jGo7KUT9W23idRVNWzS13AyEC
-         MU18bhV69yYmZPL1ae8SXgiG1o7pkniFVoZ6SXLIFj8LoFnO6220RSk1tu25hJxxJ9fW
-         W9J8tFw14LsXqiskj1Oql/l24/DhoSAFEg14LkDDfgCYTc09Z/0u+HLNXyiu8m+bg8VX
-         EDyCfzyeASWzKEzkd4Es38Jetm4RZDkbWciUlCTCzdOUL552/ltRBIQj+/t4+jZiq5qn
-         X4og==
-X-Forwarded-Encrypted: i=1; AJvYcCWRyoj5/FZO5UpVXjE7TFFEY4D5qcNKVEPzdbc+hszWQnYNVGdamZuOWw7UU2mJfSElA/SuuHY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyxNT7P8E+nD0Qj59qzyHEs8CMUphOk+FJh22ckU5JxhFeqoYck
-	o0lj0Lq34AjBCAFtc8ZStFoDA00mxHpGlt44pjk2FGw6ppNi+cUTGp/XRwbXJ2xA2ZFiS5N/ABE
-	RdvCeTa1sSyWPwQaE76f8MuJUBw==
-X-Google-Smtp-Source: AGHT+IFFulhZ6XtWtUEt5DU+FzApmeb72eQ72O6ZaO2RaynTOo8A78bn76Qqn2PHdxN8Dmi5RIdQ4MD/+FcahKppIg==
-X-Received: from pjca12.prod.google.com ([2002:a17:90b:5b8c:b0:32b:35fb:187f])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:6d93:b0:2ca:f345:5673 with SMTP id adf61e73a8af0-32da90145fdmr15350975637.27.1760119171293;
- Fri, 10 Oct 2025 10:59:31 -0700 (PDT)
-Date: Fri, 10 Oct 2025 10:59:29 -0700
-In-Reply-To: <20251007221420.344669-10-seanjc@google.com>
+        bh=RRqqebB5b3S+5bGOfhb1j8iKUMVMXWWcx0kI9eE51UQ=;
+        b=XMYjNg5zLcUwjiy8+n7VtICbAPWa83t8RtvzoEzxB9c+9CPHOoZNjdyCfrQGz4kfNM
+         lNC/9Ow+4YJbdtNvKG1KhGULOCygCW4sHWfpVWp9e7sjiS1dVpnNSW43+4uEWBN8kqM0
+         fjpx1T77plTvgXAP1ZVBoNjxbuTE1SIwcnVlj1KOV/svzDAEYAUGVvsGMCyOFl/zVWk+
+         p3ufzfz47x91K9VqVQzBwoke4EFzWKyjmGU0g0TOgLLXT7HdV+mjmS8FhZPwpMGkNTDF
+         s11oznrKgeiF1G4+K2ly+Jq40dE9Xue8MP/uuQr8V2g1hHLYQb3C1SercC+nz2BiuhA1
+         LH9A==
+X-Forwarded-Encrypted: i=1; AJvYcCWJNGoX5/tUVVfgyH4aRtedj2pmfq40/1iKFf+uEu6eU6A3c8ZiM+vUCiwCp7x9BDH/M3umaMg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxyBZoOll/0iGlI4nPAUG+0gzKXXjI8IFIFv9wjmtiBqESk3Bue
+	V26QOpuAyP57e2mtyDL4rH5wedd0g7Kc2Xe+hhYMcTErrW0eS9BH2GXykZYS4GMI0qUmvydhibA
+	yJu7nkw==
+X-Google-Smtp-Source: AGHT+IH7cFlVTSNM+0j4l/xFWY5dLqOboXxalLgs1PnQJ4K/8YINWNO1tWQ0AvtHmyKAMc8BcWffcUfPi8Q=
+X-Received: from plkb3.prod.google.com ([2002:a17:903:fa3:b0:268:1af:fcff])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f54b:b0:265:47:a7b0
+ with SMTP id d9443c01a7336-290272117f0mr156739855ad.10.1760120048173; Fri, 10
+ Oct 2025 11:14:08 -0700 (PDT)
+Date: Fri, 10 Oct 2025 11:14:06 -0700
+In-Reply-To: <DDEJY5ON407O.2O7CMOY9311NV@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20251007221420.344669-1-seanjc@google.com> <20251007221420.344669-10-seanjc@google.com>
-Message-ID: <diqzy0pifxj2.fsf@google.com>
-Subject: Re: [PATCH v12 09/12] KVM: selftests: Use proper uAPI headers to pick
- up mempolicy.h definitions
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Shivank Garg <shivankg@amd.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
+References: <20250930163635.4035866-1-vipinsh@google.com> <20250930163635.4035866-10-vipinsh@google.com>
+ <DDEJY5ON407O.2O7CMOY9311NV@google.com>
+Message-ID: <aOlM7ngJJsEW-5sV@google.com>
+Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM
+ selftests runner
+From: Sean Christopherson <seanjc@google.com>
+To: Brendan Jackman <jackmanb@google.com>
+Cc: Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, pbonzini@redhat.com, borntraeger@linux.ibm.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, 
+	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, 
+	chenhuacai@kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	ajones@ventanamicro.com, kvm-riscv <kvm-riscv-bounces@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
 
-Sean Christopherson <seanjc@google.com> writes:
+On Fri, Oct 10, 2025, Brendan Jackman wrote:
+> On Tue Sep 30, 2025 at 4:36 PM UTC, Vipin Sharma wrote:
+> > @@ -0,0 +1,54 @@
+> > +KVM Selftest Runner
+> > +===================
+> > +
+> > +KVM selftest runner is highly configurable test executor that allows to run
+> > +tests with different configurations (not just the default), parallely, save
+> > +output to disk hierarchically, control what gets printed on console, provide
+> > +execution status.
 
-> Include mempolicy.h in KVM's numaif.h to pick up the kernel-provided NUMA
-> definitions,
+...
 
-mempolicy.h was actually already added in the patch before this, maybe
-rephrase as
+> I understand that for reasons of velocity
 
-Use included mempolicy.h's definitions
+It's not just velocity, it's also for stability and maintainability.  Selftests are
+the wild, wild west; there's no central authority, and many subsystems have "needs"
+and opinions.  E.g. tools/testing/selftests/kselftest_harness.h is quite opionated,
+_and_ it has fatally been broken multiple due to one subsystem making changes that
+broke usage for other subsystems.  Obviously those bugs got sorted out, but it's a
+painful experience.
 
-> and drop selftests' definitions, which are _mostly_
-> equivalent.  The syscall numbers in particular are subtly x86_64-specific,
-> i.e. will cause problems if/when numaif.h is used outsize of x86.
->
-> Opportunistically clean up the file comment
+I guess you could say those things are all about velocity in the end; but I want
+to call out that it's not just about the initial velocity of landing the series,
+it's also about the long-term velocity of being able to make changes to fit KVM's
+needs without getting bogged down due to other susbystems adding requirements and
+use cases that are irrelevant or at odds with KVM's.
 
-This is true
+> it might make sense to do this as a KVM-specific thing, but IIUC very little
+> of this has anything to do with KVM in particular, right?
 
-> and make the syscall wrappers
-> static inline so that including the header multiple times won't lead to
-> weirdness (currently numaif.h is included by exactly one header).
->
+The actual implementation doesn't have any dependencies on KVM, but the design
+and its goal are tailored to the needs of KVM.
 
-The inlining part doesn't appear in this patch, I think it was already
-inlined right from the introduction in patch 6.
+> Is there an expectation to evolve in a more KVM-specific direction?
 
-> Fixes: 346b59f220a2 ("KVM: selftests: Add missing header file needed by xAPIC IPI tests")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  tools/testing/selftests/kvm/include/numaif.h | 32 +-------------------
->  1 file changed, 1 insertion(+), 31 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/include/numaif.h b/tools/testing/selftests/kvm/include/numaif.h
-> index aaa4ac174890..1554003c40a1 100644
-> --- a/tools/testing/selftests/kvm/include/numaif.h
-> +++ b/tools/testing/selftests/kvm/include/numaif.h
-> @@ -1,14 +1,5 @@
->  /* SPDX-License-Identifier: GPL-2.0-only */
-> -/*
-> - * tools/testing/selftests/kvm/include/numaif.h
-> - *
-> - * Copyright (C) 2020, Google LLC.
-> - *
-> - * This work is licensed under the terms of the GNU GPL, version 2.
-> - *
-> - * Header file that provides access to NUMA API functions not explicitly
-> - * exported to user space.
-> - */
-> +/* Copyright (C) 2020, Google LLC. */
->  
->  #ifndef SELFTEST_KVM_NUMAIF_H
->  #define SELFTEST_KVM_NUMAIF_H
-> @@ -37,25 +28,4 @@ KVM_SYSCALL_DEFINE(mbind, 6, void *, addr, unsigned long, size, int, mode,
->  		   const unsigned long *, nodemask, unsigned long, maxnode,
->  		   unsigned int, flags);
->  
-> -/* Policies */
-> -#define MPOL_DEFAULT	 0
-> -#define MPOL_PREFERRED	 1
-> -#define MPOL_BIND	 2
-> -#define MPOL_INTERLEAVE	 3
-> -
-> -#define MPOL_MAX MPOL_INTERLEAVE
-> -
-> -/* Flags for get_mem_policy */
-> -#define MPOL_F_NODE	    (1<<0)  /* return next il node or node of address */
-> -				    /* Warning: MPOL_F_NODE is unsupported and
-> -				     * subject to change. Don't use.
-> -				     */
-> -#define MPOL_F_ADDR	    (1<<1)  /* look up vma using address */
-> -#define MPOL_F_MEMS_ALLOWED (1<<2)  /* query nodes allowed in cpuset */
-> -
-> -/* Flags for mbind */
-> -#define MPOL_MF_STRICT	     (1<<0) /* Verify existing pages in the mapping */
-> -#define MPOL_MF_MOVE	     (1<<1) /* Move pages owned by this process to conform to mapping */
-> -#define MPOL_MF_MOVE_ALL     (1<<2) /* Move every page to conform to mapping */
-> -
->  #endif /* SELFTEST_KVM_NUMAIF_H */
-> -- 
-> 2.51.0.710.ga91ca5db03-goog
+Sort of?  I don't think we'll ever pick up direct dependencies, but I do think
+we'll continue to tailor the runner to the needs of the KVM community.
+
+> (One thing that might be KVM-specific is the concurrency. I assume there
+> are a bunch of KVM tests that are pretty isolated from one another and
+> reasonable to run in parallel.
+
+Every KVM selftest should be able to run in parallel.  That's actually a very
+intentional design property of the runner: any system-level configuration needs
+to be done by a "higher" authority, e.g. the human manually running the test, a
+wrapper script, some form of CI infrastructure, etc.
+
+> Testing _the_ mm like that just isn't gonna work most of the time. I still
+> think this is really specific to individual sets of tests though, in a more
+> mature system there would be a metadata mechanism for marking tests as
+> parallelisable wrt each other.
+
+Dependency and friendliness tracking is again something we specifically avoided
+doing, because the KVM selftests need to be self-contained anyways.  E.g. if a
+test requires KVM module param X to be enabled, then the test needs to skip.
+The runner takes advantage of that behavior in order to simplify the code; it
+really is just a "dumb" executor.
+
+> I guess this patchset is part of an effort to have a more mature system that
+> enables that kind of thing.).
+
+Sort of?  My response to Marc covered more of the goals in detail:
+
+https://lore.kernel.org/all/aN8gkEMHuvIVPcCt@google.com
+
+> To avoid confusing people and potentially leave the door open to a
+> cleaner integration, please can you add some bits here about how this
+> relates to the rest of the kselftest infrastructure? Some questions I
+> think are worth answering:
+> 
+> - As someone who runs KVM selftests, but doesn't work specifically on
+>   KVM, to what extent do I need to know about this tool? Can I still run
+>   the selftests "the old fashioned way" and if so what do I lose as
+>   compared to using the KVM runner?
+
+The runner is purely optional.  You'll lose whatever you don't have, that the
+runner provides.  E.g. I have (hacky) scripts to run KVM selftests in parallel,
+but without much of the niceties provided by this runner.
+
+> - Does this system change the "data model" of the selftests at all, and
+>   if so how? I.e. I think (but honestly I'm not sure) that kselftests
+>   are a 2-tier hierarchy of $suite:$test without any further
+>   parameterisation or nesting (where there is more detail, it's hidden
+>   as implementation details of individual $tests). Do the KVM selftests
+>   have this structure?
+
+More or less.
+
+>   If it differs, how does that effect the view from run_kselftest.sh?
+
+AFAIK, nothing in KVM selftests is at odds with run_kselftest.sh.
+
+> - I think (again, not very sure) that in kselftest that each $test is a
+>   command executing a process. And this process communicates its status
+>   by printing KTAP and returning an exit code. Is that stuff the same
+>   for this runner?
+
+Yes?  Except most KVM selftests don't support TAP (yet).
