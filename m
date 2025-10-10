@@ -1,107 +1,104 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9F52367D7
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 09:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D0623BD1D
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 09:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760088973; cv=none; b=DvmvkpG42dFw0xXBKyRomNZDxsQJSOtJ6y+cXUKI0TOBqynZY5r/keXG0MdhSS/FFh5ZS1zbUrfL2Wz3drzAsq61odvmG7af+m/VFTJpCfOIBQoeJR+/mMY9KL9wjx7SDyizc63wDG9eQ0MMLNYxrAP5LksM56yE+/j2VRoIrZc=
+	t=1760089053; cv=none; b=riKWZFN2RNU5b91vQfxhkAWxiDW7CfinI9GQGRAAuc8BiHWxmWY0MZ14dSeyR2LBSBUDI9+a7s+4As/AidxTNezeoRZwWYp8kfivp1eKLsZ7lxuNTPxzzdJUVMABiEMvmNdLJB5wUxcs14GSrjNn9bVn4zLmXBgl73C4VgFku6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760088973; c=relaxed/simple;
-	bh=DZmLp7oCNNsiQ4JHVx+qEByTqktU3gfT/F8tnerBTAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O/4mcAkSeD8nVGT7bWe+UKlRMXrHE/8/9PLpKDzjDSJhyjxpvzCCkkuzgV81gB1aX9WjV0RfKjZVYJO3WacBB0mZeX2EowWR+nDkIzJY0dxXDOjDe+abXr12yl+J+wvaQ+HwLyhELE36jlU88B9ACqkn5ZhMdDdmyBYk3S4Na/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CAB241595;
-	Fri, 10 Oct 2025 02:36:02 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E03CE3F738;
-	Fri, 10 Oct 2025 02:36:08 -0700 (PDT)
-Date: Fri, 10 Oct 2025 10:36:03 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
+	s=arc-20240116; t=1760089053; c=relaxed/simple;
+	bh=iFbyE8S7JFCS1yJrw7lORPs6Acrmbco1uJMtkn1k9Fw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dLs7aftWHneI8StawB8JYmH4R9rJd6m2M5OTm/ET8ESVlYmS4VUQxCBqAn4keb6eBW9iJ5nTyTkT80d6VUj1os5rbt+xgg86MTtBBznxbVNNmwatpOOUlS8wZ7nkEKD6npoyhbjTMG54JStn4LRT8C+hH5BxcNpYNRedA2j/8kQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IGnDeQNE; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IGnDeQNE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C172C4CEF1;
+	Fri, 10 Oct 2025 09:37:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760089053;
+	bh=iFbyE8S7JFCS1yJrw7lORPs6Acrmbco1uJMtkn1k9Fw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IGnDeQNEm2wtJiFYq2hdKSZ+nc5nfR34R9tYxo+9+SeQlvT29/SX+zWoOpU9fVM+i
+	 eZHlnrA1DcrYJ9xLvcWjFiI+UP031K+CuetDsx5kUUdzrzwYSW4bmi4Asjrl4xADv1
+	 dP/1ZFSgGOecVhhhQEPtbMPaxhEau4Vont/DtQ1B/LTJH8cCTqhO2LcVg3gYBM7iaS
+	 5nxeWu3MPjuIG/lxM9Z7rPJF41VwGMgCG2LJF4p5+iOv4j73yCd9IXSdIuTiLbz7vP
+	 hwiKZ83FpqO8VuKfvqk9eC9K+M+UG/ITGlwrFL1uEaiwzxTxIsoBxOjBMvZH2Xlno8
+	 7iwOo1iofKyKg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v79Z5-0000000Cs9A-20JD;
+	Fri, 10 Oct 2025 09:37:31 +0000
+Date: Fri, 10 Oct 2025 10:37:31 +0100
+Message-ID: <86ikgnxfl0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jan Kotas <jank@cadence.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jan Kotas <jank@cadence.com>
-Subject: Re: [PATCH] arm64: Revamp HCR_EL2.E2H RES1 detection
-Message-ID: <aOjTg3he873VqEgY@J2N7QTR9R3>
-References: <20251009121239.29370-1-maz@kernel.org>
- <aOgpesxEKsnbKGs3@linux.dev>
- <86ldljxgad.wl-maz@kernel.org>
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: HCR_EL2 GET_ONE_REG value difference
+In-Reply-To: <47FBDCE7-F8D8-4071-93D8-E4E494D41F34@global.cadence.com>
+References: <47FBDCE7-F8D8-4071-93D8-E4E494D41F34@global.cadence.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ldljxgad.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jank@cadence.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Oct 10, 2025 at 10:22:18AM +0100, Marc Zyngier wrote:
-> On Thu, 09 Oct 2025 22:30:34 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > Hey,
-> > 
-> > On Thu, Oct 09, 2025 at 01:12:39PM +0100, Marc Zyngier wrote:
-> > > We currently have two ways to identify CPUs that only implement FEAT_VHE
-> > > and not FEAT_E2H0:
-> > > 
-> > > - either they advertise it via ID_AA64MMFR4_EL1.E2H0,
-> > > - or the HCR_EL2.E2H bit is RAO/WI
-> > > 
-> > > However, there is a third category of "cpus" that fall between these
-> > > two cases: on CPUs that do not implement FEAT_FGT, it is IMPDEF whether
-> > > an access to ID_AA64MMFR4_EL1 can trap to EL2 when the register value
-> > > is zero.
-> > > 
-> > > A consequence of this is that on systems such as Neoverse V2, a NV
-> > > guest cannot reliably detect that it is in a VHE-only configuration
-> > > (E2H is writable, and ID_AA64MMFR0_EL1 is 0), despite the hypervisor's
-> > > best effort to repaint the id register.
-> > > 
-> > > Replace the RAO/WI test by a sequence that makes use of the VHE
-> > > register remnapping between EL1 and EL2 to detect this situation,
-> > > and work out whether we get the VHE behaviour even after having
-> > > set HCR_EL2.E2H to 0.
-> > > 
-> > > This solves the NV problem, and provides a more reliable acid test
-> > > for CPUs that do not completely follow the letter of the architecture
-> > > while providing a RES1 behaviour for HCR_EL2.E2H.
-> > > 
-> > > Suggested-by: Marc Rutland <mark.rutland@arm.com>
-> > 		^~~~
-> > 
-> > Thank you *Mark* for the suggestion here, neat trick :)
-> 
-> Too many Mar[ck]s. I'm struggling! ;-)
+On Fri, 10 Oct 2025 09:30:12 +0100,
+Jan Kotas <jank@cadence.com> wrote:
+>=20
+> Hello,
+>=20
+> During NV debugging I noticed a difference in HCR_EL2 value.
+>=20
+> The value I get from accessing this register, using KVM_GET_ONE_REG:
+> 0x30480000000
 
-Time to file a deed poll. ;)
+These bits are API, APK, E2H, RW.
 
-> > I'd be in favor of this patch being sent to stable, happy to handle the
-> > backports if you don't have the time for it. VMs mysteriously dying
-> > isn't a very good experience on NV and I'd like to not scare folks away.
-> 
-> I think Mark (yes, him!) had a plan to backport some of the !FEAT_E2H0
-> patches back to earlier kernels. I'll let him comment on that.
+When did you access this? After the vcpu has run? Before it has run?
+What NV configuration did you use?
 
-Yep; I had a (delayed) plan to backport:
+>
+> However, X1 value after executing mrs x1, hcr_el2 in guest:
+> 0x100030080000000
 
-  https://lore.kernel.org/linux-arm-kernel/20250227180526.1204723-1-mark.rutland@arm.com/ 
+You have ATA, API, APK, RW. Is that the *only* thing that has run in
+your guest?
 
-... to v6.12, as folk are trying to run stable/android v6.12 kernels on
-models and HW with the RES1 behaviour, and IIRC we didn't try to handle
-this at all back in v6.6 (so no need to backport that far). I was
-expecting to backport this patch at the same time.
+> I access both of these at the same place.
 
-If someone else has the time to do the backport, I'm more than happy to
-leave it to them! Otherwise, I was planning to wait for this patch to
-land in mainline before starting that.
+"at the same place"? What do you mean? One is accessed from host
+userspace, and the other from the guest. How can that be the same
+place?
 
-Mark.
+> I get the list of available registers from KVM_GET_REG_LIST.
+>=20
+> I double checked my encoding, and it seems to be correct.
+> HCR_EL2 3, 4, 1, 1, 0
+>=20
+> I can check other registers, but I first wanted to check, if this expecte=
+d?
+> Is there something I=E2=80=99m missing, when accessing emulated registers?
+
+Could you please start by clarifying what you are doing?
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
