@@ -1,146 +1,136 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F381E2C026A
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 19:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7941DDC33
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 20:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760125140; cv=none; b=RANHurv8PmQGMA3Q0hndLTnB/JkC2f99THmEfmCzeslWP83C3Rgu4a7OO1lMSeRPdNwBZkCRuk/FL3FFP/5PyTFTgmrgcEUECAkjtcZqpv5RNO23H2CLSfJAqFp76AXkq8yiBZOuN0JGqcWxb8HQowlOk0coWxY9B02VxtOH7ZQ=
+	t=1760128398; cv=none; b=QFlcjvSR8lObQGICvmbFheUlYZ1LBmgXsMtmCRFQvcQ9mJNM8QgbaLLzF9k2qheUwv6v7yYR5OYGz9tE9jH0Kyl1VVOktYm2nQUqQlaPi2UTHV9KpA9CDBmqrzDFUj4yWm3r0Bf4DwbH0L1bLwxgUdImD/VyQrEI5yaL59N7dmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760125140; c=relaxed/simple;
-	bh=paRUeA0Q8aNKiUJJNXbdcpKV+MxyQuLaa5qB2qCiaUc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RDyJU66cL9Ba3QMb57pipcY2iv1+nK5CaC9nOLZSYPa81V+3QeW4dWfXee238pG8TUX7rVcpZndfjSE4nOSHfJBMB22fLdtg5RJ7RYu9aZGxPQ9DPU2V8Z/0FCYqmKkIVInZ4DrRVl6KIJxelEQxtgKZo4XTTUqSgUfrf+bcF74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G/gegTYu; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1760128398; c=relaxed/simple;
+	bh=X0w1t+jGMBVtCc8oN5Do4EjNj28nEcw8nzBfMN0pS4o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=T1ynHYWFECmEcL0xY4qYclZyqLPqAweVcLPAD9ClqKBInGtWk87tLssVTPRPiJ1W4PcUtJUHNMJdABHjNDMqIJf5neQlHLqzEejz9wb62v0lNYVmEecTn3sWPF31TWcvAOcEnSgiLzucJjt6E0BtI2kmDwg/sfDIIt6R9jsiGUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kfCt7UsG; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G/gegTYu"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-46e2b7eee0dso375e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 12:38:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kfCt7UsG"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-277f0ea6fc6so105205295ad.2
+        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 13:33:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760125137; x=1760729937; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G42i/u8MRJ9M6Twy2bIRqjYAwcznw/QdFBR+ThWzAOg=;
-        b=G/gegTYuvfSOmW0xivNoVm7xuZUuIeJVJbHa5Oir3bMyKUql2gMghk0tUMeqEVC52I
-         spHpSks3lk2pmyWHmcNHBNSXw3G6qCSbDCM6C9xgeW0SmhlzbO+l9MUEwh1uMPOBSvK7
-         wfPB9rkqeN6o3vnic+UYFAU50bQnNcmFo2PNeWzwrptXjshjrzparXb2Ig/rT/IsXEFF
-         wH1w+UzdQv/Wa8TnHSLR3oN0cWIv1LNd4MEM4Mjo8niYl5hCr6iPeT02WC2vTindt9+K
-         957QuW8dPdAshoVvek8JkcZSTnTNBe337aYUJEw0AvUfjSqvTJyZc2igPBYSNTNe86MN
-         dbBw==
+        d=google.com; s=20230601; t=1760128396; x=1760733196; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L4WKjl2E9WbuIFhs5JLmpEcHpxZyN+nyEAJYdJG5kGQ=;
+        b=kfCt7UsGo1PSrWbGIOTdlais9uiJV28VNCf59HSq36Xw7gewxBy80GfHDrLnBaij3K
+         PcLdDlWew4nd4dkjHi3+tWvsjMcendZpCr6O+Fk61wxKahi+Qg5lFYzfEqsvk1wVF9NG
+         kef9JJoApEBNlYVb4Jr8fihWG8fur1og8Ef7N/rFlTPBVikjQeTOjUWT6nZBvV27HOTs
+         rc++3eq8LSH5sfeambOcPGmPklELWhyCZQ/4ghYSDza+mkwl64mqnvNvvjUnLVdx6TjU
+         XVgChApwgL21xVh9xriv8pyKjuv94txzXIUY358jYKlmI2Bi9qMcGFzVbLfNDIDGtwf0
+         I7Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760125137; x=1760729937;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G42i/u8MRJ9M6Twy2bIRqjYAwcznw/QdFBR+ThWzAOg=;
-        b=P8zYpMz8C5lw3v59wyRLg/DUZ8uux41eYpmRVTogmWhYI1ZIL1yLVf4pFP6WdjJwUE
-         ge9L+JXGyE7wJ89yv+tIldnV3lf1Wt1tzeYTUkTnB7g77i0E1hsma8y4/+fapZhoi/S/
-         YtG7cpKIeVrAUrtuTyYeASw7BKjsgWbAhYjhb+hN2hjmvMe8Q3In6cN4f5lbSq6qcnov
-         L5Hp882mN9x7pxq3/QF0ncsnTw/USL9fdIyYplsQjT3MKZN9LaffGCgZWfruOMS5cF99
-         eCkUY9DfZkYU9fUtYQhpY7YkWsLhJiSrEmehPoNsNw5248GPqw270LfgSbJIY85ynfX+
-         YTCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUABxLLRZX/0fkaTj5/4Qy9XO/LkeRRQqYNmPTeD6zX2ZXG4rs/kdfcwv3NKIBtT++nKnOKja4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxV6qFRPlWAFzFopkUVI0TCTbgNGu62//z8damAM0XXhaurXyMI
-	MR8P4meK6zhPI9mXQ3/hFf/x2A7zfWYwvmvYvEZxnpbkiGS0Kz8TJOmYLhuvm9Xc3IZVv3xZaKv
-	v7Rc23Eo5RH0vz1F+sz0u5fmcZuX+eHxxozvCHGHn
-X-Gm-Gg: ASbGnctjDQCdWgx8xo17hbFeET+ZuYoQ6OR50HTQe2wk3Ubags1We8CQ/xPGgtJu6q3
-	x2YziVmafgAGDY1jPXddqkt7R+yCCS8ZnYKtMd2q59vE8KeitdxTk4igrCRGrOzzdOJXqRlgf6c
-	qBv81vifPKq3/KqGKNeAN0Oaitx0zeXnTkaigH7Mab/qwG3WlN4oAeCLkL4ZWsXISEbJjJv+VKc
-	/iN2MY1pYZOK+JhV6mJEHCiqdVSy2I8RJDNn6DEWguQ+2qYWZVXhyiLEaDZqBoXP73eJZG35Q==
-X-Google-Smtp-Source: AGHT+IHIodl2NROYEXh/33nRBxbfEbLDzR8sSJgEr+hrINiKOgEMjhQA45bKdj70j3vWXJWBDjRujP7bStH4hSJ2gwQ=
-X-Received: by 2002:a05:600c:c1d7:20b0:45d:f6a6:a13e with SMTP id
- 5b1f17b1804b1-46fa9a94635mr7264035e9.1.1760125137119; Fri, 10 Oct 2025
- 12:38:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760128396; x=1760733196;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L4WKjl2E9WbuIFhs5JLmpEcHpxZyN+nyEAJYdJG5kGQ=;
+        b=X2AU9yWvfgnuwwzvy8d1cj6s7wS1sepPmxJJjZVKDpKERUhorxlKIJ0Khq7DKr7kZj
+         uP50yENFGuyRON9SG0Ux2mIrrrcvbbOHqdNL67gMcpE3XAV847Qx1qd7OSMJGBR+vvEn
+         Ns4cdkDwTB4QXzuXZZ831K/kYjPsRXl/fI+YUv7Pl5S3JBljRRJaVIUnaqC9+Ld9UTvq
+         7J2jwpzCkfH8sOGpkfi8mZAu3O/JgYf5hze0XkwB9vOb1R+oZXyA9dSBYenm4j/f8Kjm
+         Bf9ZiCVno4gYxmAYTHUuh+xPx3trmzYvamIrNk1LRXE7gAdvmFiSpqf8FA+vkGu6zctn
+         y3JQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeNF+klr32u2OGbIuD8m1m4bdNyZVpN/W0fM2T3hrTlRYx7NPJuMzbT2j9Z4SrbaktJ95hPqA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwmaH71jVXZTD9bu/5AC9hCDhfjtGUTTcJ9pczH5xmHjNK+iUL/
+	kk1gl5AihXTUiHjIRNOhDP9uBYoLI12YpyJA1kq75QmJrwa4h0g1I9iNdvEke3bnElqJ94RFuHR
+	XajlQRQ==
+X-Google-Smtp-Source: AGHT+IHFcGHBjt5WD8SXsC1G25bD9P3AfNkPCXsvq/nAV+y/iv/KTrwq4V0pmquBSd24rCSDN6ZBdmCxlM8=
+X-Received: from plpo9.prod.google.com ([2002:a17:903:3e09:b0:27e:ed03:b5a5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3bc7:b0:269:8404:9a6b
+ with SMTP id d9443c01a7336-2902741e466mr159655195ad.57.1760128395608; Fri, 10
+ Oct 2025 13:33:15 -0700 (PDT)
+Date: Fri, 10 Oct 2025 13:33:14 -0700
+In-Reply-To: <e9bd02ba-ff0e-47a3-a12e-9a53717dde9b@amd.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20250930163635.4035866-1-vipinsh@google.com> <20250930163635.4035866-10-vipinsh@google.com>
- <DDEJY5ON407O.2O7CMOY9311NV@google.com> <aOlM7ngJJsEW-5sV@google.com>
-In-Reply-To: <aOlM7ngJJsEW-5sV@google.com>
-From: Vipin Sharma <vipinsh@google.com>
-Date: Fri, 10 Oct 2025 12:38:19 -0700
-X-Gm-Features: AS18NWBZyUvCG4kU2gu0uAzSe3onaIPRVz7Z1T1oN44tuheRWwvOLEuzuPBM3VY
-Message-ID: <CAHVum0e9fFfivmDg2N9VvWQfPdc4DfV0_qEhrRaFQXFjhr8LRA@mail.gmail.com>
-Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM
- selftests runner
-To: Sean Christopherson <seanjc@google.com>, Brendan Jackman <jackmanb@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	pbonzini@redhat.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com, anup@brainfault.org, atish.patra@linux.dev, 
-	zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com, 
-	kvm-riscv <kvm-riscv-bounces@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20251007221420.344669-1-seanjc@google.com> <20251007221420.344669-6-seanjc@google.com>
+ <diqzo6qfhgc9.fsf@google.com> <e9bd02ba-ff0e-47a3-a12e-9a53717dde9b@amd.com>
+Message-ID: <aOltikRvKzCy1DXN@google.com>
+Subject: Re: [PATCH v12 05/12] KVM: guest_memfd: Enforce NUMA mempolicy using
+ shared policy
+From: Sean Christopherson <seanjc@google.com>
+To: Shivank Garg <shivankg@amd.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Vlastimil Babka <vbabka@suse.cz>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 10, 2025 at 11:14=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Fri, Oct 10, 2025, Brendan Jackman wrote:
-> > To avoid confusing people and potentially leave the door open to a
-> > cleaner integration, please can you add some bits here about how this
-> > relates to the rest of the kselftest infrastructure? Some questions I
-> > think are worth answering:
-> >
+On Fri, Oct 10, 2025, Shivank Garg wrote:
+> >> @@ -112,6 +114,19 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+> >>  	return r;
+> >>  }
+> >>  
+> >> +static struct mempolicy *kvm_gmem_get_folio_policy(struct gmem_inode *gi,
+> >> +						   pgoff_t index)
+> > 
+> > How about kvm_gmem_get_index_policy() instead, since the policy is keyed
+> > by index?
 
-It's a good point, I should write about how it compares with kselftest
-infrastructure.
+But isn't the policy tied to the folio?  I assume/hope that something will split
+folios if they have different policies for their indices when a folio contains
+more than one page.  In other words, how will this work when hugepage support
+comes along?
 
-> > - As someone who runs KVM selftests, but doesn't work specifically on
-> >   KVM, to what extent do I need to know about this tool? Can I still ru=
-n
-> >   the selftests "the old fashioned way" and if so what do I lose as
-> >   compared to using the KVM runner?
->
-> The runner is purely optional.  You'll lose whatever you don't have, that=
- the
-> runner provides.  E.g. I have (hacky) scripts to run KVM selftests in par=
-allel,
-> but without much of the niceties provided by this runner.
->
+So yeah, I agree that the lookup is keyed on the index, but conceptually aren't
+we getting the policy for the folio?  The index is a means to an end.
 
-For occasional contributors, it will provide opportunity to run the
-default tests and run tests with different combinations of their
-command line options. Overall, provides better test coverage and
-confidence before sending patches upstream.
+> >> +{
+> >> +#ifdef CONFIG_NUMA
+> >> +	struct mempolicy *mpol;
+> >> +
+> >> +	mpol = mpol_shared_policy_lookup(&gi->policy, index);
+> >> +	return mpol ? mpol : get_task_policy(current);
+> > 
+> > Should we be returning NULL if no shared policy was defined?
+> > 
+> > By returning NULL, __filemap_get_folio_mpol() can handle the case where
+> > cpuset_do_page_mem_spread().
+> > 
+> > If we always return current's task policy, what if the user wants to use
+> > cpuset_do_page_mem_spread()?
+> > 
+> 
+> I initially followed shmem's approach here.
+> I agree that returning NULL maintains consistency with the current default
+> behavior of cpuset_do_page_mem_spread(), regardless of CONFIG_NUMA.
+> 
+> I'm curious what could be the practical implications of cpuset_do_page_mem_spread()
+> v/s get_task_policy() as the fallback?
 
-For regular contributors and maintainers, a fast execution of
-selftests + more coverage. Runner allows them to configure output and
-results as per their wish/workflows.
+Userspace could enable page spreading on the task that triggers guest_memfd
+allocation.  I can't conjure up a reason to do that, but I've been surprised
+more than once by KVM setups.
 
-For everyone, to upload their interesting test combinations they use
-so that the overall KVM community gets benefit out of it.
+> Which is more appropriate for guest_memfd when no policy is explicitly set
+> via mbind()?
 
-> > - Does this system change the "data model" of the selftests at all, and
-> >   if so how? I.e. I think (but honestly I'm not sure) that kselftests
-> >   are a 2-tier hierarchy of $suite:$test without any further
-> >   parameterisation or nesting (where there is more detail, it's hidden
-> >   as implementation details of individual $tests). Do the KVM selftests
-> >   have this structure?
->
-> More or less.
->
-> >   If it differs, how does that effect the view from run_kselftest.sh?
->
-> AFAIK, nothing in KVM selftests is at odds with run_kselftest.sh.
->
-> > - I think (again, not very sure) that in kselftest that each $test is a
-> >   command executing a process. And this process communicates its status
-> >   by printing KTAP and returning an exit code. Is that stuff the same
-> >   for this runner?
->
-> Yes?  Except most KVM selftests don't support TAP (yet).
+I don't think we need to answer that question?  Userspace _has_ set a policy,
+just through cpuset, not via mbind().  So while I can't imagine there's a sane
+use case for cpuset_do_page_mem_spread() with guest_memfd, I also don't see a
+reason why KVM should effectively disallow it.
 
-Here each test is executed in its own subprocess. Output of runner is
-not in KTAP format, same for majority of the KVM tests.
+And unless I'm missing something, allocation will eventually fallback to
+get_task_policy() (in alloc_frozen_pages_noprof()), so by explicitly getting the
+task policy in guest_memfd, KVM is doing _more_ work than necessary _and_ is
+unnecessarily restricting usersepace.
 
-Execution is any command written in *.test file, which is interpreted
-as a command to execute in a shell. This allows us to write tests
-which can run based on the resources on the host like number of vcpus
-to use, how much memory to allocate, etc.
+Add in that returning NULL would align this code with the ->get_policy hook (and
+could be shared again, I assume), and my vote is definitely to return NULL and
+not get in the way.
