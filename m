@@ -1,201 +1,200 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012029.outbound.protection.outlook.com [52.101.48.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B14B1DDC2B
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 06:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760076245; cv=none; b=W6e/9n0bn+W+zBZ14WxIqAQ2i5FB9rp4+xBUMGzXV8HZyrSwdYgzmWyQcoWzAGzDo5jr+7zPf/yqFVmrosiy8j38Gjk0E1qEzz1tmpH7HNg9XBbCDDGwS6myZfFRP9d3PhiPtACUZ8uOpraLsRTzy7mJVJkeo64GDjY6GPduE/U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760076245; c=relaxed/simple;
-	bh=Knw0Xm5x7sagdbZ2CjV09CXcu6GCzFXbWHzdPW7//lo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o2UyV/vgSc/4uDVdNRCDU9q3pyB8WIy3PFzybKZ9K5htH9D9FhiueBBjVwPosAZ5LairTIRhbtzUhuuytKm4vkkIMNU6AL32zSCJcXj5K5N5VW+llorUzJ0VnjW9EdklilEIeEr7Vm4xteDXP2iPRdb1QZR6lsbt1NUz+q6ScA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=hK7Xad1j; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864D623E320
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 07:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.29
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760083082; cv=fail; b=BGiwTnWpY6N8DA0RHOIR2T6Oe8ZxyJlY7iBBVzoQ4PZj4hCxzWsDsXUgy0A3NGqMo8M2npLbvEsaLymu7cPzKEz0ZPv6D+CKUQuvs7e//efzgS2/dPVLezOltAOfKfIxvqi410O0YGn0Gn51kaAuwgaCBj0ywW4hYohA/fx1AuE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760083082; c=relaxed/simple;
+	bh=RSyiS3mnLafUgmAZmoR3rC+XufedYsZvSGR+tCECiR0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=IJ4BPxXKWXlP0jMAj3AJorhM/FZYs+FFIjSG0kC8KM03tk88g2XwXuyIjs2i4GkdbG8s0ix6UXiUvT21vCvCFlkdsr5v6huj63TDBPdZPmCecTSwcuyVf+dts5nL8+UTVBfRxnXSWshDHOLhXku5nqJpIn4P29g58KnhEEIY7LU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uj1lN/zX; arc=fail smtp.client-ip=52.101.48.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="hK7Xad1j"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3ee12332f3dso373927f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 09 Oct 2025 23:04:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1760076241; x=1760681041; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0r1NWqbZEzbO/7uoD9Io08Y9S0vOpUmxWufTX689ooo=;
-        b=hK7Xad1j7L3Svt0RCZhQ/OmObg7edGLGzYX6qJ/4/Ogb4yj8yvayr4RrkunUUJD3Bf
-         3X13r7T17+izcb42hbFUWU09NepK2i/yNBjTPYKJeoYAJbutnzMFJ/Fd4D5SRVkShAo/
-         PJVnBKzpwGAB3RieVxGRB53rqx2TIu0ib7O7W02/Neig+oMHoQ3HDDfG3IAE5+IlsaQi
-         679vmX2I+oBT+FnMt53AoVU5d78Q/E+K+yvfcy9F8vYqqDamNTpriZAzs92//YFepX7V
-         2woiLDu0aXFRPDG9vo4zyasYHOjIIXHI/ECGCSibLXrXdduM54CaXdsxgZvvGRmGcXEn
-         yXnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760076241; x=1760681041;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0r1NWqbZEzbO/7uoD9Io08Y9S0vOpUmxWufTX689ooo=;
-        b=OKbNJYmGQiiCNIQbLv4tlr3D+cdEXHblqE1IqLdztB873JcGKzf6Luz/KedCvx+aay
-         Bgeh4SXSMr0HCqb1WwCrjmIAE2E7r1+1m8Ci8vOjokAj0y/UEX8LvxVoGIxABjBG9HAb
-         jyKttB+QY+CzsAE3VkrNrMf6Y+fNzWrTzWL4htiu1tylgpYB4GvSO49YQknvrxpCVww7
-         p9i7Vhkfd5ktXvV1sBNSHqE0IHolo/36w0roKxW9hUHiUj03dlOQYwMBGvn36Dkpm6QW
-         UvjJqBM0gpA/SfJB+tND36aBUwqHyGWQLasC15hQpCpJKXNv6ff6e7/C7CtgVUnrsIbr
-         KBJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkOLfrhP3UhUmzHs//GdZ3l3lPMJhVtYGOVL0aaEmTw2McSdOzl4BFLFmo3s6RzFM0qbGDIas=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyjUV3HJWedP5OsCJjA2iSj/0PKW/VTY4/9AfWMemPBkUop81DQ
-	6u2eTSYfDFsY09NeWDubXAS4s99M7eYHNAUQNohN+roAV/2MQun9cCRLX4zkv6wxCFs=
-X-Gm-Gg: ASbGnctoMW4P4Q0T8lBBoyJ4toTVR1vYrQsMd0DOf5QPD5d9949oCeZInY6pFU2OwmA
-	IBiDjBbuiACA8U7D5d7uKurzXnOhmziw2LLXKAjDaG+M8uBiDYebgi63HBZwmSFuN9h398N1fzo
-	oknSHv+0ftWhoKSFHs4azNIfDIVlw7fh4x6TmJFoX3YpyZueyVlHkdDm/Qj0s3jzlmtbqSlbSZz
-	hVkujClF5SiTOpC6NpjpkBpoNKEaktLHBVUOrE/dbY6I2lRtLyl2/eXsgKZ0vmw6fhjKfxcxIzn
-	oKRXD2bfuARsOEDCyvE1WonqYCxN3vksYK1/J1Ji3OFM/wpHWg5yzWcrGmfwY03NnuEfdhwQV2w
-	FYv1nI8rv72LS/Ql4mS7dIyfIRvwqQ8N+qzChynOlkXQPTB+AbKCAZD/m/8NDs3PJMtPtyP/mMf
-	SC3IS2HymLmfv1aRArOwl11AWRiq5xE/8IhVVUrFdQRTsvqKy6tIA6q9lqIawzF3RKiG1cNsg25
-	yQ4Zdhx9FVpfGs=
-X-Google-Smtp-Source: AGHT+IGdlF1jJjO4YieAmsTi+1sflzPmBHkkN/w6hIawqy3/GnHDDQIxkQU107FHhfo85ITKsyPITg==
-X-Received: by 2002:a05:6000:18a6:b0:40f:5eb7:f234 with SMTP id ffacd0b85a97d-4266e7cea15mr6381158f8f.5.1760076240292;
-        Thu, 09 Oct 2025 23:04:00 -0700 (PDT)
-Received: from ?IPV6:2003:fa:af00:da00:8e63:e663:d61a:1504? (p200300faaf00da008e63e663d61a1504.dip0.t-ipconnect.de. [2003:fa:af00:da00:8e63:e663:d61a:1504])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce5e8309sm2387739f8f.50.2025.10.09.23.03.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Oct 2025 23:03:59 -0700 (PDT)
-Message-ID: <47d87ba2-83c1-4a0d-ba8a-cc7adc2b105c@grsecurity.net>
-Date: Fri, 10 Oct 2025 08:03:58 +0200
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uj1lN/zX"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=esER1L6tZGZXAMsJ9kOfulqq7JfE7LWodAZPHPBEmrxyZc2tFHRx8/JDUh6TW3RuU9vR31sju+FtLRiC2Uz+qqhttAn/dLFM3fR4JPirZCH9WjoOhjRpJSDYKJhVSdMmRazYA4udmgiWMp5Mc18kiBccAvJq3qkAsnSBepnUPXETwDT9Q8WIpQGNX/KR7Hyt0f829DTiqqJE2yjhI3Frq42yp5iXpbiGmt6bFyk9BqYiQsSVzFMd3eoKv5bbSiN8nRN2LXgvgaToK4GajWGjYHlp5Rsn4NUfRy7Tunt77liwSqtpFCY0Ef/yO5ZVk2s9aUKTtTW/lZchcbRyy0eN4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b34AaXwwXBJyVyZu1hTjS4F5L3KqPZtWrngtpPaJ+T8=;
+ b=ETSQriBfiyD2ZR1HsOWU5zQ9+/qroLPry22YCYKlqtV9mXnM2Szsgs+mYQMaCs7iWvOcyjqWEo6NXXaXOJqgqM54bYBROua1nK901bn0ZcdwFSHuj1AVoue1fjd7U/eG+TR6fys2PtgthAbqcGLDUr7xg/4of/A6Aq+jfuPfLuI4FVJui7hxapDHhzpyvWMyyNnsPcE5XRr7kRxV9EUHaQPsjeM8k9GVFeaX3nIYpD0usbTJDXYUecQndaO16qirRHxB8yXEwbdStCpnPpMs4Osay4Ut0CbuM5rf5CTMaTQgour9pLKHQ84OpMxsszSa43d7wnhP9KM02LDUHJVzwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b34AaXwwXBJyVyZu1hTjS4F5L3KqPZtWrngtpPaJ+T8=;
+ b=uj1lN/zXEummLqAaZJQQOnIxDaSLPuK9BxG3LEEsqdTCN/ZQrU8UQYyd1Mrmu0dg9UwF8ii7Mk/rUGB6gYXz6Eh6l+kGaYmhIZ/DdY6Iwk+F/NJFgEiOm0g73UpIXrto0v0KhkyHYwYrT0lKPQc0HygCkMQygSTPqRyZcAnkjLc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA0PR12MB8301.namprd12.prod.outlook.com (2603:10b6:208:40b::13)
+ by MN2PR12MB4485.namprd12.prod.outlook.com (2603:10b6:208:269::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.9; Fri, 10 Oct
+ 2025 07:57:57 +0000
+Received: from IA0PR12MB8301.namprd12.prod.outlook.com
+ ([fe80::e929:57f5:f4db:5823]) by IA0PR12MB8301.namprd12.prod.outlook.com
+ ([fe80::e929:57f5:f4db:5823%4]) with mapi id 15.20.9203.009; Fri, 10 Oct 2025
+ 07:57:57 +0000
+Message-ID: <e9bd02ba-ff0e-47a3-a12e-9a53717dde9b@amd.com>
+Date: Fri, 10 Oct 2025 13:27:47 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 05/12] KVM: guest_memfd: Enforce NUMA mempolicy using
+ shared policy
+To: Ackerley Tng <ackerleytng@google.com>,
+ Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
+ Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
+References: <20251007221420.344669-1-seanjc@google.com>
+ <20251007221420.344669-6-seanjc@google.com> <diqzo6qfhgc9.fsf@google.com>
+Content-Language: en-US
+From: "Garg, Shivank" <shivankg@amd.com>
+In-Reply-To: <diqzo6qfhgc9.fsf@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BM1PR01CA0154.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:68::24) To IA0PR12MB8301.namprd12.prod.outlook.com
+ (2603:10b6:208:40b::13)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 2/4] x86: Better backtraces for leaf
- functions
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Thomas Huth <thuth@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-References: <20250915215432.362444-1-minipli@grsecurity.net>
- <20250915215432.362444-3-minipli@grsecurity.net>
-Content-Language: en-US, de-DE
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <20250915215432.362444-3-minipli@grsecurity.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA0PR12MB8301:EE_|MN2PR12MB4485:EE_
+X-MS-Office365-Filtering-Correlation-Id: c3f78387-e832-4744-6126-08de07d2b997
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Qzl2YXRkSVpKY1FGU1NvaS9JVGZpd3VPYmNpT1NmM1NEeVZZcXB3cnRLcTdD?=
+ =?utf-8?B?M2FRQm9rcFZma3lnK1F4VGVWUTkwU3d3WmZ2Vlo0MTNhRG5lbHhGdURZMytM?=
+ =?utf-8?B?d3VMZ05yU001dzFOODBWYnZJUjRNK2xJZHFWYzMwVzRyUExYbkFFL2lWUCs2?=
+ =?utf-8?B?ejdRelV0cUhycUhnT08vRmJFNTJmNmdheVFYTWdWNkVwR3g4TTdaakE4SG1V?=
+ =?utf-8?B?MGt6cVc2WUZ2alg5VmtPbkJRdm5Gak4yUVhuRkFlbGZtK09SSXVmd3pEbHY4?=
+ =?utf-8?B?K3JjM0VmWU84SlJHZThneC9rVzVLL09vemJXbFVLYTFzMktEVHZZZEtpenlt?=
+ =?utf-8?B?eE1SbFd0ZndvRHlVK1VQNlVOSGRWUm1GYlNYbEF3ZGducXRvYXl5VGExQzVO?=
+ =?utf-8?B?TW9QWHM2c0owbEVTMk9xeWVPMU52ZFlwK1NoWDRVMEVHMWZ6VkJXVFRLTFJh?=
+ =?utf-8?B?b1VEOTIzL2plQW5LSGFZYVh0M0tqWU9sc3hQaytRdzdlZ3JXb215UDZ5TkxJ?=
+ =?utf-8?B?TzhnSUdGMmVrZDlIRDRrVXQyend3YW92KytHNXFTc0JsVkhEUFF1cDBhNGZK?=
+ =?utf-8?B?bTZvL1NycXB2MVhpTEl4OS8zRmdWTzJLdmZCV0ZScTdyOVkydlY0UGdXdUF4?=
+ =?utf-8?B?WC95MjVzeEs5akw5Q2VRSU5HRWZOTGgrUTJjTWhFNHhxTW5qTE1RVXFKQVVh?=
+ =?utf-8?B?cjNpREUrakdFSEJxNXljVi8vWkw3OVFaczV4YmNUOWh1c1hVWmN6ZXJOd2xx?=
+ =?utf-8?B?aUZoS1orWFY1c3ZRSHNYZGFrK1RwT3hrdDB0T0lzaFpZd0JBemdxMXFXZVZx?=
+ =?utf-8?B?VDZpSzFUN0xLajArT3orNWhyeUtVZXVweUxZVlRGWW16akdJYm5qWXhOeEo4?=
+ =?utf-8?B?T1gzL1RJR1FDUEtkZDNMeW9wSVpYL1YzeGR0RDhyUEhmenFVOHBUdlk0R3ZM?=
+ =?utf-8?B?bG9tVVlpYmJhekErWFEraElJRlhmbVpBTnZxam94dGFYUWE5L2d5QnhIMjIv?=
+ =?utf-8?B?WXVEOW5WbDFQcTVubG5lQnFXN3pUaERsS0Vod2p4MmtHMFdkbDB2YXV0SkFK?=
+ =?utf-8?B?Z1pWRGFqUDhnR1pxQXlNWGR1ZHRaTUhZSkZab1MrZ01Pdno3MHBRSjNyaGND?=
+ =?utf-8?B?bE8wN0JOc0Qyb1FVNHVZcnZ6VGV3dkVtUUlqTzh5NERqQXJPVFlxTHlDN2dD?=
+ =?utf-8?B?U05WNUE5QTdnWFpEK20xZk9VL0UwR2tPYk9EYW1xUDdBZnVFanZyaUNTaUQ4?=
+ =?utf-8?B?TGlrd0s3L2EvT2NORjlibEJwRHpwUUpoTk1ldFM3SmtSSFVvNVpmb0IyVjJi?=
+ =?utf-8?B?MEg2QVdXWkpvUWF6NzNrT0U4NkVQaXJHR3lXK0hZenI4Wk1Rc2h6SFlzL0hB?=
+ =?utf-8?B?NWU2dUxDcERKSzNKSFFmbXgvOGhvZFF4eGtObmxzbHNpVmE5eFdkblp0aHZR?=
+ =?utf-8?B?R1JVMW5OY2hKUkJOTHAxTGR1RGM4d0FDUFZvb3kvQ0VaK1lhUEhQeUxXUER5?=
+ =?utf-8?B?eGg3MzY3T0NPOCtrZjhQY29oQThHS0tQYVJQTW5FVHlSOWRCRFI2QWJWR1Y5?=
+ =?utf-8?B?dW9UMmRZek1xcDFhYVJNYmg4UXZQMGlXaS9XbWFsWjdmVzA1OXdvQWpuR3Nu?=
+ =?utf-8?B?RC84NU5oSzVSZmgzcVZ1eHFDam0xT0N2a3lFNHZXZ25yUHM1TW95M3crVlZw?=
+ =?utf-8?B?WEk1NDQxS0tNd1FaMVJZdVN5ZUFBVnBDRGhXVVJJSGJsQnErZW1NTVpSU2hY?=
+ =?utf-8?B?WVF6RUpLdzJFSlJVZWdMYzIzeC9ONmdzNUx4V2tyVXlRdFNDaXZUM2dkY1Bw?=
+ =?utf-8?B?ZEprcStod1dnNWpUOFFLRHJLK0hqalBoU0s4SjdOSGxkNUhzaTg2MHBDRGEz?=
+ =?utf-8?B?RHRXYzd6YzNSek1VWThTUGlkU1QvMU5rNHJsQUJSNCsydyt6Q0c5eEQ1dVFH?=
+ =?utf-8?Q?+yTBJCHLZAlyMAgDasyq6LCJuxkS7zFe?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8301.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VGMvU3ZubC9odEF4Y3RvZ1BtRDdhTkpXOVFQSFJxRE12SGNySUN1YVg2YU5K?=
+ =?utf-8?B?dm0wV2JjSGZmZWlRNXQ1RExLNzNZWjl4SU5mbkwwVC9zWWpSMEx4VFZ1WnR2?=
+ =?utf-8?B?TEtmWkFZcldhbW9NTFNkV0M5eUQ1ZkVxU2tROU9mcjh3SDFwUUs5WC96aHhD?=
+ =?utf-8?B?UUtmeURIOTJJQ2ZsR3h6SDM0REEySEd3blEvcVlXZzBGMjAzTjlqRDR6TWZM?=
+ =?utf-8?B?cEZqVG1Iai9aZnk1UWdEQ0gyREEyTGE1V2ltZHZ4UmVPc3JyMU9mNWVwUmVN?=
+ =?utf-8?B?bmY2WTZhMjRaN3lmNHRXbnJ0dmJyUW1TeElzU3dWaVFPMlgzTTNNdXIxRStk?=
+ =?utf-8?B?WjRaK21NU1liK1Vjemx3UTZmTUgveEF6eFE1K2p5aVZtNVBmZUc2YWx2OWU3?=
+ =?utf-8?B?UVNaRDkwNmp1dFhmV09hcnpSK0pwdVlhWFJUYVdxbS9FRHZZNlZDbEtUSi9J?=
+ =?utf-8?B?dDFBaXhKQlBWRmlCUy9peG96QU40KzRzUHhtVS9BbkM3bUdPRVpKZDlob0hn?=
+ =?utf-8?B?aFN2M0Y0d2lmVmZCWXdtQmxGR2hGWnhlRHMreWMvQ3VCOU82cW9rYUFDcW9n?=
+ =?utf-8?B?elRXdjVZakZLNnI1MVhjdUp4TDQ4dll2amR4eHRWTTlicDUwYnA0ckR2dEFy?=
+ =?utf-8?B?UW5TeVRBb0h0bGZva3psZ3hSZEhveE9yRnRldzZRNWZCYUtLZWhZbmR4MWJp?=
+ =?utf-8?B?NVJIN0xwUzBReUVCM3lxSjAwNXhmczFoczFnYjhOL0dtTEVXVEJQbmJoekls?=
+ =?utf-8?B?RW1KaUwwNGlKdTNDWFVuTU5aaUZKK2pSTEMrS0VQOWF1NHg5eElYdjV5dXZR?=
+ =?utf-8?B?bkI0dTl0M1JhejJQRFBUQ0xPSFRJTG5tZndYenVObG4vN0hnVktRVzNTWXNI?=
+ =?utf-8?B?VlN1RElJYUlIUUcxRi91dDdXZnhybzJtdEc1UFRJQkJqN1J5SmN0L21HYkNP?=
+ =?utf-8?B?T0tzTnRIYTZMcjZudjRDd1ZZVUdTN0xQY1hTNDA4TDNJVGNtK3FtckRZTkt5?=
+ =?utf-8?B?MGRtM2xiTVZ3WUpaSXRzOVVJeDdqMmZIME5VQUZTemI1YzJuaTZobjhHOFND?=
+ =?utf-8?B?ajFmOVRpdHFZREdDcEFvZFduY2x2aXM4RVVsRjEvZmtSUG9iRWhldWcyR3NH?=
+ =?utf-8?B?eUxTZzJPMWIvaVZWeUhlNGxXMFJuVU5sMWZSNEtFOC82SUw3K3J4YXRCZlVw?=
+ =?utf-8?B?cWVpZmdNL2FRbVhlN1gvK0VScWJ2T0I0QlVEdC81QTl0OHlILzVLSkd6U3Bu?=
+ =?utf-8?B?UEFKYytnTENFeEdkaGh2RHFldkd2aGxvM2djMkcxd284N1BWM0Q5cDlyM0tT?=
+ =?utf-8?B?VEltenRlVUNiamhsWG5NVHNraCs5clRydk9KSy9UMHhmNVJpZDlNODRzOUI5?=
+ =?utf-8?B?bm50RVZIWnlJWUJyK2pjQ0hFaHBwQUpzcHRzeGduazgvVjdHbCtKY1NTN3kr?=
+ =?utf-8?B?MWRmUzkxaURXRWR5YzNXWTIxdi9ISjczSExKYWJocUhuZzBxcmJrblA1UEpp?=
+ =?utf-8?B?TDYrWWtJTm5EME95WlBSNXR6K1JNRHBDY1JtTnBZRjFvYU1kR29qdXdoSFV0?=
+ =?utf-8?B?M3R2ZytjRGZyN0p0T1hiQm5oNlc0UHQyRngyUlcwUFlmV0JMRVczVU8vaUVY?=
+ =?utf-8?B?NmJEbTZZSUREa3RRaXVuZWd4cWZ2R0QrTFlIUnhqM3VZay9SRnBRMkttNGtt?=
+ =?utf-8?B?K3B4ZG45ZXpJRnl2eXJNN2pEalE5WlRkWkRnaldZQW1SUlpicVVVd1NRMmFV?=
+ =?utf-8?B?Q3U4bTEzTldxNkdGdXkxUnlzNFVXcGV0OE53cHZMRDB3SWFpZlhCUzJQejkv?=
+ =?utf-8?B?ZW0za2xPTWxSNkRWL2lsaXJlSStTLy9KRkdPZzR3WmcyL3dlQkFQbzVDeFJF?=
+ =?utf-8?B?Ri9yakcwcUV5bzRZWE01V21NRGlVdmFrSVpKNW8yczJHT09IQjhnRjAzK2J0?=
+ =?utf-8?B?UjgybTFJd2pyaWhqZ3B6eW5ianphSm85MExtSFM0MGE5bWMvSCtjSWVkSGdh?=
+ =?utf-8?B?ZUJwSDl4WlBvYTdlemk4KzZUdVh6VlFuVjJGS0xNRWpYZ1BkblBwY3VLU0hi?=
+ =?utf-8?B?SHNaN3ZPSFNaYkFucG43czdpTnU5VHd6K1IrYzJadExGQUFpN3cvZjVwZFps?=
+ =?utf-8?Q?z1MwMPCSOKjG66sx+measMySx?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3f78387-e832-4744-6126-08de07d2b997
+X-MS-Exchange-CrossTenant-AuthSource: IA0PR12MB8301.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2025 07:57:57.6059
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ldM4lAA9n+B+Jc3Uz6uUo1tkh7kGYCwe3Kt6oopQj/hXbd6Cwrq8LZVP3IF3sd4Uaz7FzbOUH/iPIwd2wvph+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4485
 
-On 9/15/25 23:54, Mathias Krause wrote:
-> Leaf functions are problematic for backtraces as they lack the frame
-> pointer setup epilogue. If such a function causes a fault, the original
-> caller won't be part of the backtrace. That's problematic if, for
-> example, memcpy() is failing because it got passed a bad pointer. The
-> generated backtrace will look like this, providing no clue what the
-> issue may be:
-> 
-> 	STACK: @401b31 4001ad
->   0x0000000000401b31: memcpy at lib/string.c:136 (discriminator 3)
->         	for (i = 0; i < n; ++i)
->       > 		a[i] = b[i];
-> 
->   0x00000000004001ac: gdt32_end at x86/cstart64.S:127
->         	lea __environ(%rip), %rdx
->       > 	call main
->         	mov %eax, %edi
-> 
-> By abusing profiling, we can force the compiler to emit a frame pointer
-> setup epilogue even for leaf functions, making the above backtrace
-> change like this:
-> 
-> 	STACK: @401c21 400512 4001ad
->   0x0000000000401c21: memcpy at lib/string.c:136 (discriminator 3)
->         	for (i = 0; i < n; ++i)
->       > 		a[i] = b[i];
-> 
->   0x0000000000400511: main at x86/hypercall.c:91 (discriminator 24)
-> 
->       > 	memcpy((void *)~0xbadc0de, (void *)0xdeadbeef, 42);
-> 
->   0x00000000004001ac: gdt32_end at x86/cstart64.S:127
->         	lea __environ(%rip), %rdx
->       > 	call main
->         	mov %eax, %edi
-> 
-> Above backtrace includes the failing memcpy() call, making it much
-> easier to spot the bug.
-> 
-> Enable "fake profiling" if supported by the compiler to get better
-> backtraces. The runtime overhead should be negligible for the gained
-> debugability as the profiling call is actually a NOP.
-> 
-> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-> ---
-> One may argure that the "ifneq ($(KEEP_FRAME_POINTER),) ... endif"
-> wrapping isn't needed, and that's true. However, it simplifies toggling
-> that variable, if there'll ever be a need for it.
-> 
->  x86/Makefile.common | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 5663a65d3df4..be18a77a779e 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -43,6 +43,17 @@ COMMON_CFLAGS += -O1
->  # stack.o relies on frame pointers.
->  KEEP_FRAME_POINTER := y
->  
-> +ifneq ($(KEEP_FRAME_POINTER),)
-> +# Fake profiling to force the compiler to emit a frame pointer setup also in
-> +# leaf function (-mno-omit-leaf-frame-pointer doesn't work, unfortunately).
-> +#
-> +# Note:
-> +# We need to defer the cc-option test until -fno-pic or -no-pie have been
-> +# added to CFLAGS as -mnop-mcount needs it. The lazy evaluation of CFLAGS
-> +# during compilation makes this do "The Right Thing."
-> +LATE_CFLAGS += $(call cc-option, -pg -mnop-mcount, "")
-> +endif
-> +
->  FLATLIBS = lib/libcflat.a
->  
->  ifeq ($(CONFIG_EFI),y)
 
-Paolo, can you please comment on this one, so the fixes for ARM and
-AArch64 are no longer blocked and, ideally, this series can be merged?
+>>  
+>> @@ -112,6 +114,19 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>>  	return r;
+>>  }
+>>  
+>> +static struct mempolicy *kvm_gmem_get_folio_policy(struct gmem_inode *gi,
+>> +						   pgoff_t index)
+> 
+> How about kvm_gmem_get_index_policy() instead, since the policy is keyed
+> by index?
+> 
+>> +{
+>> +#ifdef CONFIG_NUMA
+>> +	struct mempolicy *mpol;
+>> +
+>> +	mpol = mpol_shared_policy_lookup(&gi->policy, index);
+>> +	return mpol ? mpol : get_task_policy(current);
+> 
+> Should we be returning NULL if no shared policy was defined?
+> 
+> By returning NULL, __filemap_get_folio_mpol() can handle the case where
+> cpuset_do_page_mem_spread().
+> 
+> If we always return current's task policy, what if the user wants to use
+> cpuset_do_page_mem_spread()?
+> 
 
-Thanks,
-Mathias
+I initially followed shmem's approach here.
+I agree that returning NULL maintains consistency with the current default
+behavior of cpuset_do_page_mem_spread(), regardless of CONFIG_NUMA.
+
+I'm curious what could be the practical implications of cpuset_do_page_mem_spread()
+v/s get_task_policy() as the fallback?
+Which is more appropriate for guest_memfd when no policy is explicitly set via mbind()?
+
+
