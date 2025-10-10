@@ -1,208 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2621C5F27
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 11:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8DE286898;
+	Fri, 10 Oct 2025 12:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760097567; cv=none; b=ZJzKIffBuFGUh0fIJa3+SlkMrSVOQvZfsW+0ofGhLgGDCZXZC3wu4avt8OmajGMrGAQJv6F5z06TstSFHOeuDfN75jTHvOInZbuGGJfmUVa9F/YCvsL8u18ZOXARIRJBoQCkO/MoMQuVqlV/OjkZG5QoXbneAqZHtGjbb0I0gfQ=
+	t=1760098262; cv=none; b=nRzj0/bPaD+yH5QuWdw/FUgbP6ZhXxrLrBl8Z+uZEb3t2Un3BiY4u6cakbc+jcanBK9CpJeM3erYAQ9bKnqYxV3XBNXGe68jl7WJfYYZbC+UJgb08MBCilWdn9IW8se7EK7nWHlcReZHHW+kCylBipTXik6DjPX1cH2dsFpHKYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760097567; c=relaxed/simple;
-	bh=ddXvIR7mD4Ov7MBBEte7owEaebA/LyAnnsCarb6JVAw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X2zZqsD5prW0KyO3TSKZ2n5RthxsphwhTDbxqJ/wuWUjTGbnRiSisjNNBr9QYincSV5hoyzqgqJI9nibWi7TpXlS3w4NuYS8Bus0mAkeOrAmeTxB88gF2HBFa98UgIUNDB9WPvGUgcpXQ+C0oO0N3fyzAI9qgeCg9OxageLKlkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VbZ/ocqk; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VbZ/ocqk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 390DCC4CEF1;
-	Fri, 10 Oct 2025 11:59:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760097567;
-	bh=ddXvIR7mD4Ov7MBBEte7owEaebA/LyAnnsCarb6JVAw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VbZ/ocqkYvwvhoq8l3rSCkaYPAPHK+sAck3qSoXf0yUVaBlTrGJnIz+ihcrc0jB/c
-	 V2L2ZdKnhbYbe3jTejgeSZE2fXEBk77NJLKtZtaHmefte7KATWw9EHaEpQ6fiNGXCi
-	 EoBLqpY6/gXO2N5DVgKH5dPSVRTaM6HS+FYgDwjB9TvmNrUJOdne/3iJFWTjJ07Pdt
-	 L50RWg++1peAk536IjW5YEzZ8zENL2iG04tdvqEeup7CAXYoqaE0L2SwwVWh7aB89o
-	 0DEXeZxdror3NcANFy1dzJVOTBWobdfc0zDG+B9Oyf4i58LcQyFbfbreV4rQycKfWf
-	 RZmAzEaqxVuDw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v7BmO-0000000CtnI-3mJC;
-	Fri, 10 Oct 2025 11:59:24 +0000
-Date: Fri, 10 Oct 2025 12:59:24 +0100
-Message-ID: <86ecrbx90j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jan Kotas <jank@cadence.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Subject: Re: HCR_EL2 GET_ONE_REG value difference
-In-Reply-To: <3E1DF662-DD3A-49B4-A67E-55E9658BAF52@global.cadence.com>
-References: <47FBDCE7-F8D8-4071-93D8-E4E494D41F34@global.cadence.com>
-	<86ikgnxfl0.wl-maz@kernel.org>
-	<2268E166-0EA0-4C9D-B1AF-EEECB48B926B@global.cadence.com>
-	<86frbrxd2m.wl-maz@kernel.org>
-	<3E1DF662-DD3A-49B4-A67E-55E9658BAF52@global.cadence.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1760098262; c=relaxed/simple;
+	bh=Rf79rZFiOw6r+O6kn1K8Xn5L0CWlYxIVq8z4Vl++tBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D33292Q+18v6N/IZj4sS8Kc0mBh1luuz7MyxWDUj65vZ7pHulpHl83XGkws++7zye7CCFrF3NcV4pWbyd1GlbOSGpe7k/wkEiwWbCfPt9MIU6wCjU5bDXb9ok68MnGTUQSLIpiKhud0Z7e3kRhs1ixWE+fgvIFc1+PZF3fS7Z94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A1721596;
+	Fri, 10 Oct 2025 05:10:52 -0700 (PDT)
+Received: from [192.168.20.16] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E04C3F738;
+	Fri, 10 Oct 2025 05:10:59 -0700 (PDT)
+Message-ID: <b3ec55da-822a-4098-b030-4d76825f358e@arm.com>
+Date: Fri, 10 Oct 2025 07:10:58 -0500
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jank@cadence.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
+ device
+To: Greg KH <gregkh@linuxfoundation.org>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Dan Williams <dan.j.williams@intel.com>,
+ linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+ linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
+ lukas@wunner.de, Samuel Ortiz <sameo@rivosinc.com>,
+ Xu Yilun <yilun.xu@linux.intel.com>,
+ Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+ Steven Price <steven.price@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
+ <20250728135216.48084-12-aneesh.kumar@kernel.org>
+ <20250729181045.0000100b@huawei.com> <20250729231948.GJ26511@ziepe.ca>
+ <yq5aqzxy9ij1.fsf@kernel.org> <20250730113827.000032b8@huawei.com>
+ <20250730132333.00006fbf@huawei.com>
+ <2025073035-bulginess-rematch-b92e@gregkh>
+Content-Language: en-US
+From: Jeremy Linton <jeremy.linton@arm.com>
+In-Reply-To: <2025073035-bulginess-rematch-b92e@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 10 Oct 2025 11:59:45 +0100,
-Jan Kotas <jank@cadence.com> wrote:
->=20
->=20
-> > On 10 Oct 2025, at 12:31, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > EXTERNAL MAIL
-> >=20
-> >=20
-> > On Fri, 10 Oct 2025 10:51:52 +0100,
-> > Jan Kotas <jank@cadence.com> wrote:
-> >>=20
-> >>=20
-> >>> On 10 Oct 2025, at 11:37, Marc Zyngier <maz@kernel.org> wrote:
-> >>>=20
-> >>> EXTERNAL MAIL
-> >>>=20
-> >>>=20
-> >>> On Fri, 10 Oct 2025 09:30:12 +0100,
-> >>> Jan Kotas <jank@cadence.com> wrote:
-> >>>>=20
-> >>>> Hello,
-> >>>>=20
-> >>>> During NV debugging I noticed a difference in HCR_EL2 value.
-> >>>>=20
-> >>>> The value I get from accessing this register, using KVM_GET_ONE_REG:
-> >>>> 0x30480000000
-> >>>=20
-> >>> These bits are API, APK, E2H, RW.
-> >>>=20
-> >>> When did you access this? After the vcpu has run? Before it has run?
-> >>> What NV configuration did you use?
-> >>=20
-> >> Hi Marc,
-> >>=20
-> >> I wanted to reproduce the conditions when I observed it.
-> >>=20
-> >> I run the guest without the improved EL2 detection,
-> >> which was posted yesterday, in VHE mode.=20
-> >> I=E2=80=99m investigating the place at which E2H detection happens,
-> >> just before an exception on ZCR_EL2.
-> >>=20
-> >>>=20
-> >>>>=20
-> >>>> However, X1 value after executing mrs x1, hcr_el2 in guest:
-> >>>> 0x100030080000000
-> >>>=20
-> >>> You have ATA, API, APK, RW. Is that the *only* thing that has run in
-> >>> your guest?
-> >>=20
-> >> I just booted the kernel directly without E2H0.
-> >>=20
-> >>>=20
-> >>>> I access both of these at the same place.
-> >>>=20
-> >>> "at the same place"? What do you mean? One is accessed from host
-> >>> userspace, and the other from the guest. How can that be the same
-> >>> place?
-> >>=20
-> >> By the same place I mean the same KVM_EXIT.
-> >> Without resuming vCPUs, at the same PC.
-> >>=20
-> >>>=20
-> >>>> I get the list of available registers from KVM_GET_REG_LIST.
-> >>>>=20
-> >>>> I double checked my encoding, and it seems to be correct.
-> >>>> HCR_EL2 3, 4, 1, 1, 0
-> >>>>=20
-> >>>> I can check other registers, but I first wanted to check, if this ex=
-pected?
-> >>>> Is there something I=E2=80=99m missing, when accessing emulated regi=
-sters?
-> >>>=20
-> >>> Could you please start by clarifying what you are doing?
-> >>=20
-> >> I placed a HW breakpoint at the MRS instruction.
-> >> I did a single step, and then I checked X1 and HCR_EL2 values.
-> >> By calling GET_ONE_REG on both, I see different values.
-> >=20
-> > I'm very surprised that debug actually works, but hey, maybe I should
-> > admit that miracles can happen... ;-)
->=20
-> Great, I gave some positive feedback for once. :)
+Hi,
 
-Hey, there's no bad feedback, and your contribution is greatly
-appreciated.
 
->=20
-> > The guest can write whatever it wants to the HCR_EL2 register. That's
-> > just a 64bit chunk of memory, and if it wants to write Pi to it, it
-> > can. Nothing the guest writes there will have any effect as long as it
-> > doesn't ERET to EL1 anyway.
-> >=20
-> > What GET_ONE_REG returns is the *sanitised* view of that register,
-> > after having applied RES0 and RES1 masks, as well as the constraints
-> > that are specific to your exact configuration.
-> >=20
-> > Since you are running without the patch that makes the two views
-> > consistent, your kernel is probably taking the wrong path, and
-> > configuring bits that have no meaning in that configuration and
-> > resulting in, amongst other things, E2H appearing to be 0 while
-> > GET_ONE_REG clearly tells you it is 1.
->=20
-> I got a feeling it will be something like this.
->=20
-> Maybe it would be useful to have a capability/flag
-> for GET_ONE_REG to get non-sanitized values?
+On 7/30/25 8:07 AM, Greg KH wrote:
+> On Wed, Jul 30, 2025 at 01:23:33PM +0100, Jonathan Cameron wrote:
+>> On Wed, 30 Jul 2025 11:38:27 +0100
+>> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+>>
+>>> On Wed, 30 Jul 2025 14:12:26 +0530
+>>> "Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
+>>>
+>>>> Jason Gunthorpe <jgg@ziepe.ca> writes:
+>>>>    
+>>>>> On Tue, Jul 29, 2025 at 06:10:45PM +0100, Jonathan Cameron wrote:
+>>>>>     
+>>>>>>> +static struct platform_device cca_host_dev = {
+>>>>>> Hmm. Greg is getting increasingly (and correctly in my view) grumpy with
+>>>>>> platform devices being registered with no underlying resources etc as glue
+>>>>>> layers.  Maybe some of that will come later.
+>>>>>
+>>>>> Is faux_device a better choice? I admit to not knowing entirely what
+>>>>> it is for..
+>>>
+>>> I'll go with a cautious yes to faux_device. This case of a glue device
+>>> with no resources and no reason to be on a particular bus was definitely
+>>> the intent but I'm not 100% sure without trying it that we don't run
+>>> into any problems.
+>>>
+>>> Not that many examples yet, but cpuidle-psci.c looks like a vaguely similar
+>>> case to this one.
+>>>
+>>> All it really does is move the location of the device and
+>>> smash together the device registration with probe/remove.
+>>> That means the device disappears if probe() fails, which is cleaner
+>>> in many ways than leaving a pointless stub behind.
+>>>
+>>> Maybe it isn't appropriate it if is actually useful to rmmod/modprobe the
+>>> driver.
+>>>
+>>> +CC Greg on basis I may have wrong end of the stick ;)
+>> This time with at least one less typo in Greg's email address.
+> 
+> Yes, use faux_device if you need/want a struct device to represent
+> something in the tree and it does NOT have any real platform resources
+> behind it.  That's explicitly what it was designed for.
 
-GET_ONE_REG is the save/restore interface. It is there to present
-architecturally correct information that can be restored to another
-machine. Having non-sanitised information would potentially prevent
-that.
+Right, but this code is intended to trigger the kmod/userspace module 
+loader.
 
-> Or a way for a VMM to access the raw NV2 memory?
+AFAIK, the faux device is currently missing a faux_device_id in 
+mod_devicetable, alias matching logic in file2alias, and probably a few 
+other things which keeps it from performing this function.
 
-The whole point of this sanitisation is that there should be no way to
-obtain bad data from within KVM, even if the guest messes things up.
-Also, see below.
+thanks,
 
-> I=E2=80=99m just wondering, if Guest does something unexpected,
-> debugging it, may be harder, if a user sees different stuff than SW.
-
-This sort of problems exists on real HW already. If a bit is RES1 in
-the architecture, it doesn't mean that this bit is always 1. It means
-it is interpreted as 1 by the HW, but the bit could be set to any
-value and read as such.
-
-And that's exactly what we have here. SW writes 0 to E2H, and that's
-what you read from the register in the context of the guest itself.
-But GET_ONE_REG shows you how the "HW" interprets this bit, and that
-is where having the two views is actually valuable: different values
-are likely to result in different behaviours. KVM gives you the tool
-to see what both the guest programs (debug or access to the GPR using
-GET_ONE_REG), and how KVM interpret the programmed value (access to
-HCR_EL2 using GET_ONE_REG).
-
-Given that, my take is that what we have today is not only correct,
-but actually the desirable behaviour.
-
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
