@@ -1,193 +1,153 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2517C2C159D
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 09:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B286034BA39
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 10:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760090330; cv=none; b=mG6tHskuIkNkz5CRX5sSDhTGEOSKNyXV0PiOFq9S1g42yUJPB2bNbVcrxtZFTeAa6yOD5nNMRlpOS8GbXHsGz1I5cQ2XPhg6BeB4RLDZ+RI42/Jwwrv7/2MTFMqkwomsV9zUiUQ6aF3TO7ewMhPWk6/u3Q2/Sw4HscLmlZQRHZ4=
+	t=1760092307; cv=none; b=qrzDF6MAUKrO85EROE9QBXVcpySCyVqC5t1ZJ8ysoEkGrndiWZs0rvk6ZCcTwx7Syw3W0T7cgfLiPnSoCS1RZPZcNzx0IfZ8lMyTxo0X817qhHYUnMYVJI1c97g9HYe809NLooVb8vRW3RpfTStGw+xZuudh+I//MH/n5LfX2k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760090330; c=relaxed/simple;
-	bh=mh6zOEGaP4Urq2/R26m36fxu8TENj6LiLLSaMCjHpIE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uZBPefd4R/DhygvDcXuHMF7NAUKkNUueM8UfYLK/4avb1SrhWlUTpUmCjanAtcZDo3DxHZ3krgfTFyhUjIHtir+8LXcw4zVqq6iffDJqhPOyvvf7AsWp2PKboiNiaCIY9zkrK3UuZP8Qsi9ZP9+226cJE375JtiPg516fUBktDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3sNW9GUl; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+	s=arc-20240116; t=1760092307; c=relaxed/simple;
+	bh=WrRWYWrLrzR/+HGJstCaY+cqsMP1PYa4QvWEDB8P1Mc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vo4oPY0Zzlr72c1mdUK/fY0YM0aJ9MTP1sbbxDkKglotMPXIfxNeWam4h70MD80UCLLEHEy4BWkzJnnGBxUVujOYNK9wHf4vAQ8ItwfeB0LT2ztnEGFHEDYLzrKlTP4DBVAp6rhJ3NGBJcoENhaotw8qirrpk/194tHbDIBMLb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QepyVKHE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3sNW9GUl"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-46e4335fa87so11475125e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 02:58:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760090327; x=1760695127; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zj/uK/0xnB0ZmAgqvqZKJ167+Wzz4WpLCK/iSob8rPE=;
-        b=3sNW9GUlFVZhZLNX9AZRJjmMnyRwE1hvfJ8BOTW3miXaUNtyHPnc1rCu95sOaKSAAg
-         JbuhZe+Mur07roLzNi8YSP7MWUduJ95EdnqnywqXBm0hQu5RvEhp0oMhMPONtIOJja2X
-         G+LdadMbXyJlFbIz2xaEnT1/z3Ml65RVTA5CkXT5/ONyKK859We4aK1H0QD3XwJ9/6dg
-         A642I7JN0F4o2XHD7Au9hit/qVQxvwD5HPrXmAYQW3U/VvRjzxXPW4JqP8bN3afPhMGv
-         M21ldZFWhUOjH+LqOkf9dQeUSyuo6To/15SSK1I21+lrgt5JYMPDE7NRvbCPgPPW86/1
-         iYVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760090327; x=1760695127;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zj/uK/0xnB0ZmAgqvqZKJ167+Wzz4WpLCK/iSob8rPE=;
-        b=mw7QxXupHiNyk3pm329Lm7W9S/2ry/L2DthaCkjBrkU9p1TlfH9ucfHkvqCVwgu506
-         kjoI9Ppc5OlDgNbVPVkqSMNkaM/XoEBqS3Z5L5X2C52qPmSMIrt1sAlQHSe8GiL/nNPU
-         sBQuQ4CfehwF3Kom5aoSVHdJzlgy6Y9t9xnjskx6fqO9bMx6zFg5ovl7pyGvFUMemp7Z
-         /sa03vqxXnfUKTXCQvTjSZWsGzm/0tVzgttDRhOw5fJ782My/bKgafP5pWVp5ko7URLN
-         xTRQSuZ/HyICzlySW9ClwUtHHXLvtM4z1oNJIGIzDO43ryd3U0BU9vu1ilYz5JAaSBON
-         NFMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHIJtunyCGgZSPqiZEKxo9A3sE4s7tmQkk1o4q3ffznZpSRnXy9DiCYXFDiJYYd+APmfNXjgA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywf4IMTmMR+RSmJI/M6BI6buVT9hVAwyB7Ogk2ossgll2GWP+sV
-	UD+nWhYuUR/k0OOXEHQXmUFuK5zC15ku/yiiX5Yi4IXE8slRuvoLNRmmph22Oti2rjqRhpCcBRX
-	rpIHCA1SNRDwZVA==
-X-Google-Smtp-Source: AGHT+IE9u+S1m4RvSQpcC4dhxfuWaCPOQKXUOfLx4fze56fNXcannsh6o7Uhc8MhG1M6iartSBP/RZWrRlO7LA==
-X-Received: from wmco8.prod.google.com ([2002:a05:600c:a308:b0:45f:28be:a3aa])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:34c5:b0:46e:4ac4:b7b8 with SMTP id 5b1f17b1804b1-46fa9b05361mr68861915e9.25.1760090327657;
- Fri, 10 Oct 2025 02:58:47 -0700 (PDT)
-Date: Fri, 10 Oct 2025 09:58:46 +0000
-In-Reply-To: <20250930163635.4035866-10-vipinsh@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QepyVKHE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42FF5C4CEF1;
+	Fri, 10 Oct 2025 10:31:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760092307;
+	bh=WrRWYWrLrzR/+HGJstCaY+cqsMP1PYa4QvWEDB8P1Mc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QepyVKHEqEN69ilmmt9qyXNVLWe7JAkMsY/MUkIXT9P3oRaFhF9FR4wb+teVvilRc
+	 T5wERyR0UYxms19iIQEXBIfCHtELpj5fLVCvCDS3oDHeZ8UKzZ7eioaWtErnRnHVn4
+	 Bv/KZ/p0FHNJEGh3WMJtWsv6FMqIj1TQxEekq3Jdy6zESYc09+IKNsu5XP+QIF62wT
+	 m42okbUObD+4rqI+8T65LWs49pF8uwFfh9VRcybolrsweh25y51VOdGED73mEluirw
+	 BwqK/41Dk6T6Jd+VM4OAjButsO5Ifzu8Q7F4x5uLPf2aGH350/bhUtRf6OBRsGAchc
+	 86deQiKTSq0HQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v7APZ-0000000Csly-1c7P;
+	Fri, 10 Oct 2025 10:31:45 +0000
+Date: Fri, 10 Oct 2025 11:31:45 +0100
+Message-ID: <86frbrxd2m.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jan Kotas <jank@cadence.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: HCR_EL2 GET_ONE_REG value difference
+In-Reply-To: <2268E166-0EA0-4C9D-B1AF-EEECB48B926B@global.cadence.com>
+References: <47FBDCE7-F8D8-4071-93D8-E4E494D41F34@global.cadence.com>
+	<86ikgnxfl0.wl-maz@kernel.org>
+	<2268E166-0EA0-4C9D-B1AF-EEECB48B926B@global.cadence.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250930163635.4035866-1-vipinsh@google.com> <20250930163635.4035866-10-vipinsh@google.com>
-X-Mailer: aerc 0.21.0
-Message-ID: <DDEJY5ON407O.2O7CMOY9311NV@google.com>
-Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM
- selftests runner
-From: Brendan Jackman <jackmanb@google.com>
-To: Vipin Sharma <vipinsh@google.com>, <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, 
-	<kvm-riscv@lists.infradead.org>
-Cc: <seanjc@google.com>, <pbonzini@redhat.com>, <borntraeger@linux.ibm.com>, 
-	<frankja@linux.ibm.com>, <imbrenda@linux.ibm.com>, <anup@brainfault.org>, 
-	<atish.patra@linux.dev>, <zhaotianrui@loongson.cn>, <maobibo@loongson.cn>, 
-	<chenhuacai@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>, 
-	<ajones@ventanamicro.com>, 
-	kvm-riscv <kvm-riscv-bounces@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jank@cadence.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue Sep 30, 2025 at 4:36 PM UTC, Vipin Sharma wrote:
-> Add README.rst for KVM selftest runner and explain how to use the
-> runner.
->
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |  1 +
->  tools/testing/selftests/kvm/runner/README.rst | 54 +++++++++++++++++++
->  2 files changed, 55 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/runner/README.rst
->
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 548d435bde2f..83aa2fe01bac 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -4,6 +4,7 @@
->  !*.c
->  !*.h
->  !*.py
-> +!*.rst
->  !*.S
->  !*.sh
->  !*.test
-> diff --git a/tools/testing/selftests/kvm/runner/README.rst b/tools/testing/selftests/kvm/runner/README.rst
-> new file mode 100644
-> index 000000000000..83b071c0a0e6
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/runner/README.rst
-> @@ -0,0 +1,54 @@
-> +KVM Selftest Runner
-> +===================
-> +
-> +KVM selftest runner is highly configurable test executor that allows to run
-> +tests with different configurations (not just the default), parallely, save
-> +output to disk hierarchically, control what gets printed on console, provide
-> +execution status.
-> +
-> +To generate default tests use::
-> +
-> +  # make tests_install
-> +
-> +This will create ``testcases_default_gen`` directory which will have testcases
-> +in `default.test` files. Each KVM selftest will have a directory in  which
-> +`default.test` file will be created with executable path relative to KVM
-> +selftest root directory i.e. `/tools/testing/selftests/kvm`. For example, the
-> +`dirty_log_perf_test` will have::
-> +
-> +  # cat testcase_default_gen/dirty_log_perf_test/default.test
-> +  dirty_log_perf_test
-> +
-> +Runner will execute `dirty_log_perf_test`. Testcases files can also provide
-> +extra arguments to the test::
-> +
-> +  # cat tests/dirty_log_perf_test/2slot_5vcpu_10iter.test
-> +  dirty_log_perf_test -x 2 -v 5 -i 10
-> +
-> +In this case runner will execute the `dirty_log_perf_test` with the options.
-> +
-> +Example
-> +=======
-> +
-> +To see all of the options::
-> +
-> +  # python3 runner -h
-> +
-> +To run all of the default tests::
-> +
-> +  # python3 runner -d testcases_default_gen
-> +
-> +To run tests parallely::
-> +
-> +  # python3 runner -d testcases_default_gen -j 40
-> +
-> +To print only passed test status and failed test stderr::
-> +
-> +  # python3 runner -d testcases_default_gen --print-passed status \
-> +  --print-failed stderr
-> +
-> +To run tests binary which are in some other directory (out of tree builds)::
-> +
-> +  # python3 runner -d testcases_default_gen -p /path/to/binaries
+On Fri, 10 Oct 2025 10:51:52 +0100,
+Jan Kotas <jank@cadence.com> wrote:
+>=20
+>=20
+> > On 10 Oct 2025, at 11:37, Marc Zyngier <maz@kernel.org> wrote:
+> >=20
+> > EXTERNAL MAIL
+> >=20
+> >=20
+> > On Fri, 10 Oct 2025 09:30:12 +0100,
+> > Jan Kotas <jank@cadence.com> wrote:
+> >>=20
+> >> Hello,
+> >>=20
+> >> During NV debugging I noticed a difference in HCR_EL2 value.
+> >>=20
+> >> The value I get from accessing this register, using KVM_GET_ONE_REG:
+> >> 0x30480000000
+> >=20
+> > These bits are API, APK, E2H, RW.
+> >=20
+> > When did you access this? After the vcpu has run? Before it has run?
+> > What NV configuration did you use?
+>=20
+> Hi Marc,
+>=20
+> I wanted to reproduce the conditions when I observed it.
+>=20
+> I run the guest without the improved EL2 detection,
+> which was posted yesterday, in VHE mode.=20
+> I=E2=80=99m investigating the place at which E2H detection happens,
+> just before an exception on ZCR_EL2.
+>=20
+> >=20
+> >>=20
+> >> However, X1 value after executing mrs x1, hcr_el2 in guest:
+> >> 0x100030080000000
+> >=20
+> > You have ATA, API, APK, RW. Is that the *only* thing that has run in
+> > your guest?
+>=20
+> I just booted the kernel directly without E2H0.
+>=20
+> >=20
+> >> I access both of these at the same place.
+> >=20
+> > "at the same place"? What do you mean? One is accessed from host
+> > userspace, and the other from the guest. How can that be the same
+> > place?
+>=20
+> By the same place I mean the same KVM_EXIT.
+> Without resuming vCPUs, at the same PC.
+>=20
+> >=20
+> >> I get the list of available registers from KVM_GET_REG_LIST.
+> >>=20
+> >> I double checked my encoding, and it seems to be correct.
+> >> HCR_EL2 3, 4, 1, 1, 0
+> >>=20
+> >> I can check other registers, but I first wanted to check, if this expe=
+cted?
+> >> Is there something I=E2=80=99m missing, when accessing emulated regist=
+ers?
+> >=20
+> > Could you please start by clarifying what you are doing?
+>=20
+> I placed a HW breakpoint at the MRS instruction.
+> I did a single step, and then I checked X1 and HCR_EL2 values.
+> By calling GET_ONE_REG on both, I see different values.
 
-I understand that for reasons of velocity it might make sense to do this
-as a KVM-specific thing, but IIUC very little of this has anything to do
-with KVM in particular, right? Is there an expectation to evolve in a
-more KVM-specific direction?
+I'm very surprised that debug actually works, but hey, maybe I should
+admit that miracles can happen... ;-)
 
-(One thing that might be KVM-specific is the concurrency. I assume there
-are a bunch of KVM tests that are pretty isolated from one another and
-reasonable to run in parallel. Testing _the_ mm like that just isn't
-gonna work most of the time. I still think this is really specific to
-individual sets of tests though, in a more mature system there would be
-a metadata mechanism for marking tests as parallelisable wrt each other.
-I guess this patchset is part of an effort to have a more mature system
-that enables that kind of thing.).
+The guest can write whatever it wants to the HCR_EL2 register. That's
+just a 64bit chunk of memory, and if it wants to write Pi to it, it
+can. Nothing the guest writes there will have any effect as long as it
+doesn't ERET to EL1 anyway.
 
-To avoid confusing people and potentially leave the door open to a
-cleaner integration, please can you add some bits here about how this
-relates to the rest of the kselftest infrastructure? Some questions I
-think are worth answering:
+What GET_ONE_REG returns is the *sanitised* view of that register,
+after having applied RES0 and RES1 masks, as well as the constraints
+that are specific to your exact configuration.
 
-- As someone who runs KVM selftests, but doesn't work specifically on
-  KVM, to what extent do I need to know about this tool? Can I still run
-  the selftests "the old fashioned way" and if so what do I lose as
-  compared to using the KVM runner?
+Since you are running without the patch that makes the two views
+consistent, your kernel is probably taking the wrong path, and
+configuring bits that have no meaning in that configuration and
+resulting in, amongst other things, E2H appearing to be 0 while
+GET_ONE_REG clearly tells you it is 1.
 
-- Does this system change the "data model" of the selftests at all, and
-  if so how? I.e. I think (but honestly I'm not sure) that kselftests
-  are a 2-tier hierarchy of $suite:$test without any further
-  parameterisation or nesting (where there is more detail, it's hidden
-  as implementation details of individual $tests). Do the KVM selftests
-  have this structure? If it differs, how does that effect the view from
-  run_kselftest.sh?
+	M.
 
-- I think (again, not very sure) that in kselftest that each $test is a
-  command executing a process. And this process communicates its status
-  by printing KTAP and returning an exit code. Is that stuff the same
-  for this runner?
+--=20
+Without deviation from the norm, progress is not possible.
