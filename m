@@ -1,119 +1,108 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C95063CB
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 15:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D512F9985
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 15:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760110255; cv=none; b=HW8rWaasPfXS5qVGObIhEo8xuj9oMgFS2rlcXqVhPU0/0mfow5SPy0MhtB6DsUygdoBrNAfv8chrtTsWYqdJiLLF8AYgo5SqzCwJs4nVAu5BtsJH9TuQAJOF3FgbjD7Hk8CMbrBeZdGu+Uia6l0wPzQNRlyO2KxtAU1240W77gs=
+	t=1760110441; cv=none; b=Rh468bX21SPm2eNlwaaoLRr/yyTXCMWDJ7cZVf31NxcvuAjwYZ1M6/B5+ydkNSm6KdqH1Be8k8hIUe9PR7sipM+bgOknjGuoIJIMuYqmsnkcOWGUl+C4YgtdkoSb3UVoY8n/e4Hlk8nCWdFKGiEZJBwvNfb4vGyhSurpIKwKaAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760110255; c=relaxed/simple;
-	bh=YweDjybfnRXAUjAFM2cXyTvz7RwWQP0buSdnlIEIdyI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kb8MeS9gpFSLczs/g9NnIsZnrNbsO4nyWv6HyBhhnaD9yNHRkwlehIQ+gg82vJibtAJuGauG1rMLS01e/gz/HraFmyNI33K/TKn8stgS3TFKWx2iLyQAatAzjb/LiHnxWVFZ7O43l1bgHVUqIMgBLb5oTI+RixGn4+HnDX4FeXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=j5ntdxnZ; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1760110441; c=relaxed/simple;
+	bh=frUkYpzcUrHXA6VVFUE2ZzYeLLnhLDbl0nvpcjfOcKY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=My8pHSEZBTndXaG5i8dwYsBz/UwCRq1Qb8BHZoKktBOwgm/0ZJTeJ5hwfn2/3QL3f25rIzD81NRYP6Gw0BSS3MDkbNAFVbrrC9Pwbr5oCDVzOaJS8zPrVUBvKLe1kNf8JvNM8xIBs1PPiKwz1cvGfpb+w9IaD4YA35AFZtNY7RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ab2/y1oG; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="j5ntdxnZ"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-78eba712e89so21160316d6.3
-        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 08:30:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ab2/y1oG"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-71d603a269cso22490797b3.1
+        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 08:33:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1760110253; x=1760715053; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6cOfIK7qdN8qKLRMhM71lR4Nf+xbZ2+eVm4l2+34ic=;
-        b=j5ntdxnZhwokfZ7GwQ0MXIZII8RpMEFYoa7cclFhZ5HVEjQFU9n5rgZcBMYIRObngp
-         SYTBfSBPZwyvW4lAWNZhP/yX+4TZn+7n77Y3ybNMQpFOtRXQj/j8ce8cp7ol/5knmGMx
-         Sagg44BeajqF1urzk10YTae1mcUW/O46Ji4iavgZcUU5/0i45tZUX6van5LlzP/hi+ii
-         wHp3N3MDVoE1Ln43uRwvAXAQtUiVOZZeOjGPVI2oq83AvXmYxZ6i4+9AWRREyznNZbii
-         vE5ODABc3ynS/4nNIfJs4A9gUFNVMVnKRcNQq2u7BGgzM4u378DtLMpWvAaEicnjgnEq
-         3pyg==
+        d=linaro.org; s=google; t=1760110437; x=1760715237; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=frUkYpzcUrHXA6VVFUE2ZzYeLLnhLDbl0nvpcjfOcKY=;
+        b=Ab2/y1oGjORPfR/WZuloK6id6iDV8rbsqT6zjTJf8BqfM6PtQFT4VqL9QNKA9/BZEj
+         MafuD42HXwxcm3vmpXngeeDG12mXlJC489rcAC9dC5mt1ydirCZkbU2IlL3SCDyNlNPb
+         mk9R7q20lt+qzkoNHJ7zgbdLy54OBp56vlmA79H8VtU18i+P9GYTtH/y1mwG0rSBzbo9
+         cHR3H22kr2rBEuXt2SjtuRdENOeHuQDp/Hm01/fxZoD7MxnGppwLoeF9LE2ojLcrOsbq
+         hEw+jYvC9jP/YQ9wtkGWPhdvqAKU7dZiBJlCJKhQ92BSR0jnXGEpqUDFnWc/YPrFMosq
+         AWUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760110253; x=1760715053;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e6cOfIK7qdN8qKLRMhM71lR4Nf+xbZ2+eVm4l2+34ic=;
-        b=fSo+sigg9lxL73FXa07S2lk6f7D8OXlnEuW+sfB0JFmpzMN5g1ozkt84MtM6620fjs
-         lfd8ocifDUA5SAAixlYKUUORvGU2LzQT0bEuDXb6v1tip1ZGSdWA+aNFThxxZ9FC+GHe
-         fvWw7vOMy7U/BMG2qswGKqRTcqowQyiSaoHGa2DScbg9P1h9l1nidM9IT/ATRBfPyGUe
-         SiU/RXpeFXGUGp1CELjpYt/Fh01jNvch80349gJULQGJl4B8Pu2oqtryStl2iVFwEb6Q
-         HOtEBTXBiS/vxOUNnTzcBeppKeXZ79z2An364CiwIK+P539YVz3cS9bI9/IiuDnwYhy7
-         ZXHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXenVRsZjQL0D/sHoIMTRhLlVlmECunmzUeZigBZ4Cm1MD73o82YMllEbhJxlp2tJvPZnyM01I=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy7k7EFwg/sHG+Q+o4QhDi8V6GUgznEp0gPsnVj2bNH/+wab1JT
-	zTLCKpR4gkA8jy9ZPvRH9+eEaXW0WvyjjrAoKmYB+k47Gf4sewm+O/PF9SxUz1efY40=
-X-Gm-Gg: ASbGncsn19wrr9sYygMQJlcZPrT2inlZdpvGNuRriMqr2OU8dq6CaJsiW7BFiDS/5fq
-	Bw6uuCASf5JF2rldV8JC6uWzBG7BU2vyBRhneDgqZWacNd/iAWQdzSrdS2NFbElVy6zoY80k2+c
-	z1pngrKkZRyb8tGpBaPsTaCd+p/nlZI/o5E6SH9Op07VWDUGqLIROkjaU4kjWdLtb7mj6+EFkIJ
-	2x0kx6PK4MqSuY58uRUB1K2m7yi7H0Qtmbb7oSWpndllPG+0hQVzCNMQHrRfkmLOcFyhozkKoMe
-	ytMClxe2dugDfsPpPyBZVN75l58U3hsJynb8Acyrxba98Ln0qdBLubFH58JMXtNn3OVUC+Uc3BY
-	ONgR3wV9RAX10Yd36um/VuiQJMN5tB2TTmEV3+YwIu+T6EYI/OPgaaiSt/5of7xg81ilJRJu0Qe
-	8uwSLp8cdkwA8=
-X-Google-Smtp-Source: AGHT+IGgKhRm3oNF4ALMXNjdHTaNK2zfI9rzl46bTecy6J4CNJ6lSFvDvqcPlarS77J3/CcjSy9rWQ==
-X-Received: by 2002:a05:6214:c64:b0:830:5c6d:419 with SMTP id 6a1803df08f44-87b210728c4mr182061246d6.4.1760110247638;
-        Fri, 10 Oct 2025 08:30:47 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87bc3570c1esm18187826d6.40.2025.10.10.08.30.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Oct 2025 08:30:47 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1v7F4w-0000000GWAu-2XWh;
-	Fri, 10 Oct 2025 12:30:46 -0300
-Date: Fri, 10 Oct 2025 12:30:46 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Jeremy Linton <jeremy.linton@arm.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>, linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
- device
-Message-ID: <20251010153046.GF3833649@ziepe.ca>
-References: <20250728135216.48084-12-aneesh.kumar@kernel.org>
- <20250729181045.0000100b@huawei.com>
- <20250729231948.GJ26511@ziepe.ca>
- <yq5aqzxy9ij1.fsf@kernel.org>
- <20250730113827.000032b8@huawei.com>
- <20250730132333.00006fbf@huawei.com>
- <2025073035-bulginess-rematch-b92e@gregkh>
- <b3ec55da-822a-4098-b030-4d76825f358e@arm.com>
- <20251010135922.GC3833649@ziepe.ca>
- <4a7d84b2-2ec4-4773-a2d5-7b63d5c683cf@arm.com>
+        d=1e100.net; s=20230601; t=1760110437; x=1760715237;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=frUkYpzcUrHXA6VVFUE2ZzYeLLnhLDbl0nvpcjfOcKY=;
+        b=H/XpnboeOGvTb6Onbj+LfaltBtqEnfYSrmEeyCeA4KI5f2/t8Uigxwv6mPzU/kVa27
+         a94HzwrGSdjabdU+VUDdud+Cx9s0iAhB0qdGGAy6Kv9yFAln+aSpRA2OjD3whXLwOSTo
+         Zk7JHXNdT+8czblhGU910N6sQoCDV7HjvKgJAUWN3V4hLTnL9czlGXyJjzL1sTEjRzoa
+         yNPGt3XRj/KBzpzbVWjzXAa5im9GCAE5cW9RKjwjJIKgU/nv4PrBKlvz8EJxxPjjt66+
+         4hpwTv1XWi+RVY9N2xYQHd49LxLuycHDZgZcPn9sQYMT1sFkgNM5jMdqv06bfd+vaZbc
+         aU4Q==
+X-Gm-Message-State: AOJu0Yza64DFccCr5DregN62eyn5eOq+LvDOW05ZaO5TrREEnLAoJRtL
+	JVXfgNBcsLPnevd3UKylAJfsbZlnzeNHtDpgbWQLsKFHEo/nlu8mqFj0xGHOS5QLvnTHSuhhGx/
+	/VSl+DEFJf4/Y+VSoyij90r9fuZZ7uIL2KhgUTiKExFlv+L6I93Ux
+X-Gm-Gg: ASbGncvHjoOiy/m79nrpTC3grSE4hNndKSD57imhS+PQPqumR85hIeQhlRlAiMX3kKs
+	uBj9uL5+nGqvjGu/aUaLOOaaJes3I5rvBgxTq/HjuWT6BVoeSeFTE2Rj4nviolkGqBnP0EEAbVW
+	RuIZzQmnQmIBRnhozuQuuAXaQOJH6Xm+QP5ttewu8d3RsuVqF4rJ3ZgLc4FORBAr1GSvTIAMAMH
+	rrizRVrvtsnIZQWf45+5aGJlkdPFv1+cHHGxyV4Ig==
+X-Google-Smtp-Source: AGHT+IGXQ1qHRPjaHHpeCld1hjx723piat0vYL7kxBAa78fV5yV5CB2g1rdceNDsSmts7Wn3+w+vffhbfITY7B7esDg=
+X-Received: by 2002:a05:690e:10d:b0:635:4ece:20ad with SMTP id
+ 956f58d0204a3-63ccb9325dbmr8348969d50.50.1760110436654; Fri, 10 Oct 2025
+ 08:33:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4a7d84b2-2ec4-4773-a2d5-7b63d5c683cf@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 Oct 2025 16:33:45 +0100
+X-Gm-Features: AS18NWCy8McSdx9_JL_LhBOWDQKGxePj-5XJXb6naQ834XykmkXm9J_6uNSFgkk
+Message-ID: <CAFEAcA8TpQduexT=8rdRYC=yxm_073COjzgWJAvc26_T+-F5vA@mail.gmail.com>
+Subject: Saving and restoring state of a KVM VM using GICv2 fails
+To: "open list:ARM" <kvmarm@lists.linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 10, 2025 at 10:28:36AM -0500, Jeremy Linton wrote:
+I was testing doing saving and restoring state of a KVM VM that
+happened to be using GICv2, and I discovered that it doesn't
+seem to work. Running the VM works fine, as does the state save,
+but when you try to reload the state it fails:
 
-> > So you could use auxiliary_device, you'd consider SMC itself to be the
-> > shared HW block and all the auxiliary drivers are per-subsystem
-> > aspects of that shared SMC interface. It is not a terrible fit for
-> > what it was intended for at least.
-> 
-> Turns out that changing any of this, will at the moment break systemd's
-> confidential vm detection, because they wanted the earliest indicator the
-> guest was capable and that turned out to be this platform device.
+$ /work/test-images/virtv8/runme ./build/arm/qemu-system-aarch64
+-enable-kvm -machine gic-version=2 -loadvm gic2
+qemu-system-aarch64: Could not set register op0:3 op1:0 crn:0 crm:1
+op2:1 to 11011 (is 10011011)
+qemu-system-aarch64: error while loading state for instance 0x0 of
+device 'cpu': post load hook failed for: cpu, version_id: 22,
+minimum_version: 22, ret: -1
 
-Having systemd detect a software created platform device sounds
-compltely crazy, don't do that. Make a proper sysfs uapi for such a
-general idea please.
+This is QEMU saying that it tried to do the KVM_SET_ONE_REG for
+ID_PFR1_EL1 to 0x11011, and failed, and that KVM thinks that register's
+value is 0x10011011. The difference is that KVM has the GIC field set
+(bits [31:28]).
 
-Jason
+Looking at the kernel code, I think this happens because the kernel
+only clears out the GIC field of the idreg in kvm_finalize_sys_regs(),
+which gets called when the vcpu is first run. So because state save
+happens after the vcpu has run for a bit, it sees the value of the
+register with the GIC field set to 0, and that's what it writes out
+into the saved state data. But the loadvm operation happens
+with a fresh new VM which has never been run. So the kernel still
+thinks the GIC field in the idreg should be 1, and it fails the
+SET_ONE_REG operation which tries to write it to 0.
+
+This kernel reports itself as
+ 6.14.0-1012-aws #12~24.04.1-Ubuntu SMP Fri Aug 15 00:07:14 UTC 2025
+
+The failure happens for both aarch32 and aarch64 guests.
+I haven't tested whether it happens on a host that has only
+64-bit EL1 (i.e. where ID_PFR1_EL1 doesn't exist). It may be
+that there's some flexibility about writes to ID_AA64PFR0_EL1.GIC
+which needs to also be permitted for ID_PFR1_EL1.GIC.
+
+thanks
+-- PMM
