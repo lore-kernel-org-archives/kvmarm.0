@@ -1,101 +1,104 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1A62F6192;
-	Fri, 10 Oct 2025 15:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DC72F9982
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 15:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760110119; cv=none; b=ctJ/Qc8P4ecfE65pwyTYRi2I85hhepTQV0uLqY/YvEdwLRne5HBFKKwkk90LZ+I8oncyLciyurzEmOwlrNPz/TxtRWHu2+VrOrbEsVTw/fYzB0CCWgILb0lSJ0Ql1ykN3yh7pxPI2xDMmsCwxpBS1+ul/f//yLee8k3Gzlrk+XU=
+	t=1760110182; cv=none; b=mVrywHlxydxn1hJMYEnFK2uwXaSMslrMa+78ph4E/XpyrKPX2T0jq5J48LazTA6eQI370RwjjrhnYVjOAv8Ccz+X5Vt1jwA61nPCZwNgUjsoq1HYWtvon0XH1xheTMEIenYEuksSNmTR4NVdABxirdXBEJ7xA2qc1OHc+fQ1y+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760110119; c=relaxed/simple;
-	bh=UNtfwV6gt9YzjTUxdiegipEiAdiDLfreV8nIpQ/mlQU=;
+	s=arc-20240116; t=1760110182; c=relaxed/simple;
+	bh=bQjmRzwvDlWBNOUknLBSMmasOFXzjkSWSgwrVNUwjTM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ChMrvA/KRwS0xN4dv3XZIIy4lf797yfK3URbNcXKsNw1WfriRHIdP/XNvglu8lfrsLAdSGAqtPtGamcr46V+Xeq3YyE2poH+3L3b5oSbHeRlrguQNeHVpLkBm50UhHmppps7ejW00+jmF7CumJBk4tcObFYNXWjn91C60Igkizk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3A431595;
-	Fri, 10 Oct 2025 08:28:29 -0700 (PDT)
-Received: from [192.168.20.16] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1AFE43F66E;
-	Fri, 10 Oct 2025 08:28:37 -0700 (PDT)
-Message-ID: <4a7d84b2-2ec4-4773-a2d5-7b63d5c683cf@arm.com>
-Date: Fri, 10 Oct 2025 10:28:36 -0500
+	 In-Reply-To:Content-Type; b=HdLf1U8Uz37llaJ+yVbub+5Tz3OfFxYogEb0nHWB8RmBxAAdKWWRXvCWHaaVM66yzITIjqp4is3kf6RPmCN7WA3iBJKDuTqS4WVkUsuAO84mM4RbGl1pBBKRvizrQQ2TH7rr5+3FIrlfOo0VYXG5Au5M6kKV1+8hfe+y7YUQVvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uReHgcMI; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uReHgcMI"
+Message-ID: <25cf9d85-0f42-46d9-a4b6-618b406256f1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760110177;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CKUrS5jDQSXSheSIBCNgkQhgEHNgs+CbGyP1+oymFao=;
+	b=uReHgcMIl9041kVUV2NYDBnZ17LLwXhi8mvrSAKSipFDx+9sk8nnrtoxVG+nhoQME8efbV
+	VfpjoyvLoDgbLz2tKB9fE8dfI8ksz5xi4VLtD6mPs2LwpjGLG2Kjw7S4f0hFqCdzvhPKBf
+	bEl3VZgTHMhk8gEeVvNpO5c5riztYKE=
+Date: Fri, 10 Oct 2025 23:29:15 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
- device
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Greg KH <gregkh@linuxfoundation.org>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Dan Williams <dan.j.williams@intel.com>, linux-coco@lists.linux.dev,
- kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
- Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>,
- Suzuki K Poulose <Suzuki.Poulose@arm.com>,
- Steven Price <steven.price@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-12-aneesh.kumar@kernel.org>
- <20250729181045.0000100b@huawei.com> <20250729231948.GJ26511@ziepe.ca>
- <yq5aqzxy9ij1.fsf@kernel.org> <20250730113827.000032b8@huawei.com>
- <20250730132333.00006fbf@huawei.com>
- <2025073035-bulginess-rematch-b92e@gregkh>
- <b3ec55da-822a-4098-b030-4d76825f358e@arm.com>
- <20251010135922.GC3833649@ziepe.ca>
+Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in
+ set_id_regs
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
+ <20250920-kvm-arm64-id-aa64isar3-el1-v1-2-1764c1c1c96d@kernel.org>
 Content-Language: en-US
-From: Jeremy Linton <jeremy.linton@arm.com>
-In-Reply-To: <20251010135922.GC3833649@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <20250920-kvm-arm64-id-aa64isar3-el1-v1-2-1764c1c1c96d@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+On 2025/9/21 03:52, Mark Brown wrote:
+> We have a couple of writable bitfields in ID_AA64ISAR3_EL1 but the
+> set_id_regs selftest does not cover this register at all, add coverage.
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  tools/testing/selftests/kvm/arm64/set_id_regs.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> index bfb70926272d..c7c38b1a1f10 100644
+> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> @@ -125,6 +125,13 @@ static const struct reg_ftr_bits ftr_id_aa64isar2_el1[] = {
+>  	REG_FTR_END,
+>  };
+>  
+> +static const struct reg_ftr_bits ftr_id_aa64isar3_el1[] = {
+> +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, FPRCVT, 0),
+> +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, LSFE, 0),
+> +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, FAMINMAX, 0),
+> +	REG_FTR_END,
+> +};
+> +
+>  static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV3, 0),
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV2, 0),
+> @@ -221,6 +228,7 @@ static struct test_feature_reg test_regs[] = {
+>  	TEST_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0_el1),
+>  	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
+>  	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
+> +	TEST_REG(SYS_ID_AA64ISAR3_EL1, ftr_id_aa64isar3_el1),
+>  	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
+>  	TEST_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
+>  	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
+> @@ -239,6 +247,7 @@ static void guest_code(void)
+>  	GUEST_REG_SYNC(SYS_ID_AA64ISAR0_EL1);
+>  	GUEST_REG_SYNC(SYS_ID_AA64ISAR1_EL1);
+>  	GUEST_REG_SYNC(SYS_ID_AA64ISAR2_EL1);
+> +	GUEST_REG_SYNC(SYS_ID_AA64ISAR3_EL1);
+>  	GUEST_REG_SYNC(SYS_ID_AA64PFR0_EL1);
+>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
+>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
 
-On 10/10/25 8:59 AM, Jason Gunthorpe wrote:
-> On Fri, Oct 10, 2025 at 07:10:58AM -0500, Jeremy Linton wrote:
->>> Yes, use faux_device if you need/want a struct device to represent
->>> something in the tree and it does NOT have any real platform resources
->>> behind it.  That's explicitly what it was designed for.
->>
->> Right, but this code is intended to trigger the kmod/userspace module
->> loader.
-> 
-> Faux devices are not intended to be bound, it says so right on the label:
-> 
->   * A "simple" faux bus that allows devices to be created and added
->   * automatically to it.  This is to be used whenever you need to create a
->   * device that is not associated with any "real" system resources, and do
->   * not want to have to deal with a bus/driver binding logic.  It is
->                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
->   * intended to be very simple, with only a create and a destroy function
->   * available.
-> 
-> auxiliary_device is quite similar to faux except it is intended to be
-> bound to drivers, supports module autoloading and so on.
-> 
-> What you have here is the platform firmware provides the ARM SMC
-> (Secure Monitor Call Calling Convention) interface which is a generic
-> function call multiplexer between the OS and ARM firmware.
-> 
-> Then we have things like the TSM subsystem that want to load a driver
-> to use calls over SMC if the underlying platform firmware supports the
-> RSI group of SMC APIs. You'd have a TSM subsystem driver that uses the
-> RSI call group over SMC that autobinds when the RSI call group is
-> detected when the SMC is first discovered.
-> 
-> So you could use auxiliary_device, you'd consider SMC itself to be the
-> shared HW block and all the auxiliary drivers are per-subsystem
-> aspects of that shared SMC interface. It is not a terrible fit for
-> what it was intended for at least.
+Not related to this patch but seems that we forgot to sync several
+registers (ID_AA64PFR1, MPIDR, CLIDR) in guest to make sure the guest
+had seen the written value.
 
-Turns out that changing any of this, will at the moment break systemd's 
-confidential vm detection, because they wanted the earliest indicator 
-the guest was capable and that turned out to be this platform device.
-
-
+Zenghui
