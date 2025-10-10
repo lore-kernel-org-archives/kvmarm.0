@@ -1,139 +1,174 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251C12F363E
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 13:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743EE2F7AD8
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 15:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760104768; cv=none; b=MdwSOQxvE6okz91rxrld+EUS6tbkoFMLC+pQafvLg16SjDayFi0Jp2Yap36pExQMuUYKIx9ZQmJ0Vt7DfXghsGQjl26FHLlGdermz1YCNrqV2F+MT74mrUoty7kq1+LDj4JFbsJssrDTiyMo5JQngJgH5qkzcQbzsOzwmpJBGR8=
+	t=1760108877; cv=none; b=TDnH1Oi7yHFyQvA7kCc9eY4k36Rmp+M67+yT1Bsgb8Asv3QfRPT1Y/opX1IgL54uM1RgG+FTo2ao/EYzPlRORVaEsUoGic03yUh2znjoW7P3zO/LQthwT9nOogoSbauE3rv37APj/DYt4YyAq1YIPd8dnMvDRzV0nRXs8X3zLMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760104768; c=relaxed/simple;
-	bh=hZPZVS2QtrtI/5LeWNnPEpjPSsnogRA4qP9cGK1n1G4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tCwMQdEJuBi+bZWRj+TCu0aS9lNKvbOkJqvFf/aTAvwJHgrG5JFnG7wPpXFd7RhzZXatTS0k+JvUx+7Gl9lNtaT6FyqNVKXKp/t2nTaj2CGaGnf6oOG3FRv/l/lpXdwaCoCeIA+wWYLRcWSndDcQgv5ZBsOcRu0cfEQ8iSIzG9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fzZAQ3Py; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1760108877; c=relaxed/simple;
+	bh=gQrwr4gwxMvke4mFhglRe1Cg7eWP4zQ10dzsO7O6LTw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LCY6mNFnYTYVV7XB5K/5F6v1+/s+yfR+tcymUMftlaE4VY+rxR4Sq/zSffDQfAieHK1++nfXmfqMgNHm0sL+vILyUxSGpFyXXHoUBkbPC/zvBMWst5XEtMFGSYB5eTSM6fmJLirY2TR1c/zoMcQxl1oyOiNfMqvLFhMmqedl4hU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B3kfaUFx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fzZAQ3Py"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-858183680b4so271560285a.2
-        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 06:59:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1760104765; x=1760709565; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VNvJ31G0uSRPH3SSYUmcqBJNw8nBZA0aR9UpQ5R7KAM=;
-        b=fzZAQ3Py2bcUm9lYJvHwciv9/R4mEv57MOeJU8xSjk1ltDnKdJXPDNmWnYaz1Gct8t
-         JYkZk26dhPFinb49VUjUOL5/0+W1UktkX1/W7yKVJiKeNx0SeQHnKHAnEHsAENdG7WnR
-         +GZ4J8d/zC++yPa8E9QQYZ/eDh7I0aV4JlQHBTE5b/EE5fYN7+dEgZl1WJ1nxdjyqzNo
-         fqe4+0SRgkOiHCIZ1qF/9GcfWNcJ7FR+mZkf3qEXLbnb5CyyHLgZzy4FE3VMeZ7Vnsiy
-         +GCF+Yox+m/9RR0YoegkPPNbTNDapQVAVpFqBKtNn5a7osMUW9ZvffZBj2wSsuiQaZwG
-         0P0w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B3kfaUFx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760108875;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LZmqunuZRQwJHo8CjkO0APHqvfQELPC5kOsrm4zYYHY=;
+	b=B3kfaUFxyZO/o/FLPFPL6ttjnU9wn8IH/sxwVLdDcSXL1l4M6+wbsYjAl1QsxGpsz/i9hg
+	CPkhiK5whhaf+6XOFhB4Nf+9LQOvQrqW4PoYn1CyWD7m2Spu8Okf2ZYyXpEcSZRCReyXsn
+	DIW/K2dLi0DB8ZyX0EGu/YwVc83jkRs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-E9dWoHAKOKWP7X5b7qWULA-1; Fri, 10 Oct 2025 11:07:53 -0400
+X-MC-Unique: E9dWoHAKOKWP7X5b7qWULA-1
+X-Mimecast-MFC-AGG-ID: E9dWoHAKOKWP7X5b7qWULA_1760108871
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46b303f6c9cso17558025e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 08:07:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760104765; x=1760709565;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VNvJ31G0uSRPH3SSYUmcqBJNw8nBZA0aR9UpQ5R7KAM=;
-        b=RDDgT6yzbVyXU8CL4LtQcGIJHC6tTbahOMaOBYMVBdayjF5sJG4TdoR9syrhQ3YDbb
-         5IoaiZiZGoFDytM088BgKkjZ4vAQgWq6cSQef7JEyiE5WjVG8NYGLBWNNjig28cOIA7x
-         krq5hlstux6liI7bUAZ3iOACvJpvVXPK8z6cH6fm+4svzN8/FIkL2XUa0iltpC7ID11z
-         qzY2DX0fzjXegX25gvbOkSRyOLJnJQIA2UKt4Tvqv0DkWz5mQFWV0M5OrKjWtA6tFyhD
-         0sLJDf9BaWFgNegVBfDoxPjBnArJxWu8NBFbsMQDyeolIV//VE7fXosm4peFJHK6v90E
-         5teQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWLCxMp/MG6RtJBELN6BIe/Y6Y4uAgdl2Uq2k56EfF8zNzKzfHjzl3SOLt48rzprqk6M7DL45k=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywwev1x4l3bEA+hBDFZHK8RaOZ+MxaC15is0B5l3LHqC63mHmzi
-	EYLeSGslCpugnWGkNVaI/hnb6M5L6XNI5JhnL5cm858rjwDUEDSRJbszfunygkJVa40=
-X-Gm-Gg: ASbGncv/SGNJ4e/x49d8lRn7VNAz/ZvJMuACQfJ3Gq/x0XxVvca1Tjyz3zzZ16wiKyN
-	FbFp+rDr9wEGk1+c0lfce5t+gupOIe0N4iWWAbUkPxxN48QjEBx6OeV3VLSH4bi2+b2QaD8kn4g
-	PDvNyrkbeUAqUA1RuleDGNE5UZZ8G/9Bz6rp4/w6s1P+WatLwYR82MJe6ih7bKr5pJwRLcp0Vcy
-	Pbd3FHOIs534eSN81Dd2W/vTejBQ63OnrnJZ5sgQEFwepUGnaurJk9v/0LNsgmQs/5+kgtWRtA+
-	LOoKPmvlGDg6y51mPFGwPM9RRihVdtcqq70Imr1bAXLYeA6nMIblubl6HAqkY6zA99HFsrSvHYF
-	Z0qkVwj86D3V3WgL/pH248OEYGMmP5OEB+sAn1STE2OYr8WIiXhJUWIBctI9+0ovvNK+mQf1NwV
-	60hLgLaDsqbFaMGn/KV3OmVw==
-X-Google-Smtp-Source: AGHT+IExPwaL1TTGwP76ooAIbGqIBucYWqZgImMdJPw3egaQEtYFbCr/oHIOKZgGp1qijtOpyq8L8A==
-X-Received: by 2002:a05:620a:414f:b0:86f:4009:dea6 with SMTP id af79cd13be357-883527c7719mr1533083385a.59.1760104764491;
-        Fri, 10 Oct 2025 06:59:24 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-884a293bcbasm413337685a.58.2025.10.10.06.59.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Oct 2025 06:59:23 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1v7DeU-0000000GVew-44jV;
-	Fri, 10 Oct 2025 10:59:22 -0300
-Date: Fri, 10 Oct 2025 10:59:22 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Jeremy Linton <jeremy.linton@arm.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>, linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
- device
-Message-ID: <20251010135922.GC3833649@ziepe.ca>
-References: <20250728135216.48084-1-aneesh.kumar@kernel.org>
- <20250728135216.48084-12-aneesh.kumar@kernel.org>
- <20250729181045.0000100b@huawei.com>
- <20250729231948.GJ26511@ziepe.ca>
- <yq5aqzxy9ij1.fsf@kernel.org>
- <20250730113827.000032b8@huawei.com>
- <20250730132333.00006fbf@huawei.com>
- <2025073035-bulginess-rematch-b92e@gregkh>
- <b3ec55da-822a-4098-b030-4d76825f358e@arm.com>
+        d=1e100.net; s=20230601; t=1760108871; x=1760713671;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LZmqunuZRQwJHo8CjkO0APHqvfQELPC5kOsrm4zYYHY=;
+        b=Dsyxkmcxe8BniAc0sdwUYOe1Jxyujvpw1DQiPUAB3U/5Scq54NBjD0FrvE3AuTzFsw
+         cyFa/Raa9RZijzY8Q0CU3CZbGhMAH7SQPIwSg6QKKwo++qadikBT78y2d8Cp8vlNkyIo
+         wCGK3Wxmy8T7N/CGsWUOei+i8c993nj1nxkNarq6l4BHg2xeW9H0ymsWx29w3rqzRJKi
+         eTm9e2fzMTpPgDEDIH5gsC9Nmgly9SyK2/xT9KnkLSbEbrer+j0VXUBTRfCT+0tNa3cj
+         Tpgfbh5cZfeHSGUXZPRZqiy42+DRLKt64Wo2yWAPOglMvfNddNV6HmL8T4n8VrAJs5VP
+         Sa5A==
+X-Forwarded-Encrypted: i=1; AJvYcCXPlZlEHs0v5n1T9R/fx8BG9D2n0Mchv6HnO3FmuthqY8CpoUdGmWYJPPSRBotDtuArzPZota8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyUHDW9YRab5bbAt10cE0lMuqz10C1RCocTnvOsB/86G1DzMGhx
+	XrWdOAlp1sSO/KIYsH6nHbJXZR5uHf/K3yq+QjlFN1qOk5nHgG9drXY8dsg1O+FGivT+DqTge+z
+	IljJbXFcbkAedfd6KLLqbHtQgnsCyBImwCGFt8MplKWxKZy4tdbGKAI945w==
+X-Gm-Gg: ASbGncswmBoX+qxKSW3oWzUn/pUwdlIVvLxH6dhPNh5+xyBBqlZ6/Agk2GY8mfEereW
+	I0AWme2rNrKOWhswy+yt1CHxMpnfZE4Xg48eWwIe5ntLqz5jqE9eW1fG5FPZ4L66Bq/B5vN5ndm
+	bLeUcOlpDyq0B8H8SNqwLERaIK28Ny+LgSUKWmU/HhClV7Z/wT0VTRdLvbcf4f2q9YEuFIiqdpm
+	Jt/JB+AWIy8lEyIaARpD9/Vh78NJbdgASSyqij1jD2LhRRKyC24EWjGeyaAGVYvnZmFNbN3c8X2
+	687q53bMJxkFM4DT3h1ykmCALuYsGtMF74yKGF25bkuflMQkhufH8YNno2QfiqK6/UZpqeDqneX
+	Mga0=
+X-Received: by 2002:a05:600c:4750:b0:45f:28d2:bd38 with SMTP id 5b1f17b1804b1-46fa9af3095mr88636105e9.18.1760108870680;
+        Fri, 10 Oct 2025 08:07:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5JHSDo+98ZcIlXqkfGtP4ZZEWBP769aS/wsbUmwWkDRX+gxG1VW9W555xuFif1HCTIaL95g==
+X-Received: by 2002:a05:600c:4750:b0:45f:28d2:bd38 with SMTP id 5b1f17b1804b1-46fa9af3095mr88635835e9.18.1760108870194;
+        Fri, 10 Oct 2025 08:07:50 -0700 (PDT)
+Received: from [192.168.3.141] (tmo-083-189.customers.d1-online.com. [80.187.83.189])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb489ad27sm51946505e9.15.2025.10.10.08.07.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Oct 2025 08:07:49 -0700 (PDT)
+Message-ID: <c8f74a07-9003-433a-9b1f-888df335e31b@redhat.com>
+Date: Fri, 10 Oct 2025 17:07:45 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3ec55da-822a-4098-b030-4d76825f358e@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 01/12] KVM: guest_memfd: Rename "struct kvm_gmem" to
+ "struct gmem_file"
+To: "Garg, Shivank" <shivankg@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Fuad Tabba <tabba@google.com>, Ackerley Tng <ackerleytng@google.com>,
+ Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
+References: <20251007221420.344669-1-seanjc@google.com>
+ <20251007221420.344669-2-seanjc@google.com>
+ <dd948073-0839-4f75-8cec-1f3041231ed7@amd.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZoEEwEIAEQCGwMCF4ACGQEFCwkIBwICIgIG
+ FQoJCAsCBBYCAwECHgcWIQQb2cqtc1xMOkYN/MpN3hD3AP+DWgUCaJzangUJJlgIpAAKCRBN
+ 3hD3AP+DWhAxD/9wcL0A+2rtaAmutaKTfxhTP0b4AAp1r/eLxjrbfbCCmh4pqzBhmSX/4z11
+ opn2KqcOsueRF1t2ENLOWzQu3Roiny2HOU7DajqB4dm1BVMaXQya5ae2ghzlJN9SIoopTWlR
+ 0Af3hPj5E2PYvQhlcqeoehKlBo9rROJv/rjmr2x0yOM8qeTroH/ZzNlCtJ56AsE6Tvl+r7cW
+ 3x7/Jq5WvWeudKrhFh7/yQ7eRvHCjd9bBrZTlgAfiHmX9AnCCPRPpNGNedV9Yty2Jnxhfmbv
+ Pw37LA/jef8zlCDyUh2KCU1xVEOWqg15o1RtTyGV1nXV2O/mfuQJud5vIgzBvHhypc3p6VZJ
+ lEf8YmT+Ol5P7SfCs5/uGdWUYQEMqOlg6w9R4Pe8d+mk8KGvfE9/zTwGg0nRgKqlQXrWRERv
+ cuEwQbridlPAoQHrFWtwpgYMXx2TaZ3sihcIPo9uU5eBs0rf4mOERY75SK+Ekayv2ucTfjxr
+ Kf014py2aoRJHuvy85ee/zIyLmve5hngZTTe3Wg3TInT9UTFzTPhItam6dZ1xqdTGHZYGU0O
+ otRHcwLGt470grdiob6PfVTXoHlBvkWRadMhSuG4RORCDpq89vu5QralFNIf3EysNohoFy2A
+ LYg2/D53xbU/aa4DDzBb5b1Rkg/udO1gZocVQWrDh6I2K3+cCs7BTQRVy5+RARAA59fefSDR
+ 9nMGCb9LbMX+TFAoIQo/wgP5XPyzLYakO+94GrgfZjfhdaxPXMsl2+o8jhp/hlIzG56taNdt
+ VZtPp3ih1AgbR8rHgXw1xwOpuAd5lE1qNd54ndHuADO9a9A0vPimIes78Hi1/yy+ZEEvRkHk
+ /kDa6F3AtTc1m4rbbOk2fiKzzsE9YXweFjQvl9p+AMw6qd/iC4lUk9g0+FQXNdRs+o4o6Qvy
+ iOQJfGQ4UcBuOy1IrkJrd8qq5jet1fcM2j4QvsW8CLDWZS1L7kZ5gT5EycMKxUWb8LuRjxzZ
+ 3QY1aQH2kkzn6acigU3HLtgFyV1gBNV44ehjgvJpRY2cC8VhanTx0dZ9mj1YKIky5N+C0f21
+ zvntBqcxV0+3p8MrxRRcgEtDZNav+xAoT3G0W4SahAaUTWXpsZoOecwtxi74CyneQNPTDjNg
+ azHmvpdBVEfj7k3p4dmJp5i0U66Onmf6mMFpArvBRSMOKU9DlAzMi4IvhiNWjKVaIE2Se9BY
+ FdKVAJaZq85P2y20ZBd08ILnKcj7XKZkLU5FkoA0udEBvQ0f9QLNyyy3DZMCQWcwRuj1m73D
+ sq8DEFBdZ5eEkj1dCyx+t/ga6x2rHyc8Sl86oK1tvAkwBNsfKou3v+jP/l14a7DGBvrmlYjO
+ 59o3t6inu6H7pt7OL6u6BQj7DoMAEQEAAcLBfAQYAQgAJgIbDBYhBBvZyq1zXEw6Rg38yk3e
+ EPcA/4NaBQJonNqrBQkmWAihAAoJEE3eEPcA/4NaKtMQALAJ8PzprBEXbXcEXwDKQu+P/vts
+ IfUb1UNMfMV76BicGa5NCZnJNQASDP/+bFg6O3gx5NbhHHPeaWz/VxlOmYHokHodOvtL0WCC
+ 8A5PEP8tOk6029Z+J+xUcMrJClNVFpzVvOpb1lCbhjwAV465Hy+NUSbbUiRxdzNQtLtgZzOV
+ Zw7jxUCs4UUZLQTCuBpFgb15bBxYZ/BL9MbzxPxvfUQIPbnzQMcqtpUs21CMK2PdfCh5c4gS
+ sDci6D5/ZIBw94UQWmGpM/O1ilGXde2ZzzGYl64glmccD8e87OnEgKnH3FbnJnT4iJchtSvx
+ yJNi1+t0+qDti4m88+/9IuPqCKb6Stl+s2dnLtJNrjXBGJtsQG/sRpqsJz5x1/2nPJSRMsx9
+ 5YfqbdrJSOFXDzZ8/r82HgQEtUvlSXNaXCa95ez0UkOG7+bDm2b3s0XahBQeLVCH0mw3RAQg
+ r7xDAYKIrAwfHHmMTnBQDPJwVqxJjVNr7yBic4yfzVWGCGNE4DnOW0vcIeoyhy9vnIa3w1uZ
+ 3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
+ CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
+ qIws/H2t
+In-Reply-To: <dd948073-0839-4f75-8cec-1f3041231ed7@amd.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: YqX1thMuSJL_mUg0MSOKT55LwZKDlTrljyQFErHudWQ_1760108871
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 10, 2025 at 07:10:58AM -0500, Jeremy Linton wrote:
-> > Yes, use faux_device if you need/want a struct device to represent
-> > something in the tree and it does NOT have any real platform resources
-> > behind it.  That's explicitly what it was designed for.
+>> -	struct file *gmem_file = READ_ONCE(slot->gmem.file);
+>> -	struct kvm_gmem *gmem = file->private_data;
+>> +	struct file *slot_file = READ_ONCE(slot->gmem.file);
+>> +	struct gmem_file *f = file->private_data;
+> 			^^^
+>>   	struct folio *folio;
+>>   
+>> -	if (file != gmem_file) {
+>> -		WARN_ON_ONCE(gmem_file);
+>> +	if (file != slot_file) {
+>> +		WARN_ON_ONCE(slot_file);
+>>   		return ERR_PTR(-EFAULT);
+>>   	}
+>>   
+>> -	gmem = file->private_data;
+>> -	if (xa_load(&gmem->bindings, index) != slot) {
+>> -		WARN_ON_ONCE(xa_load(&gmem->bindings, index));
+>> +	f = file->private_data;
 > 
-> Right, but this code is intended to trigger the kmod/userspace module
-> loader.
+> This redundant initialization can be dropped.
+> 
+> I sent a cleanup patch including this change a few weeks ago:
+> 
+> https://lore.kernel.org/kvm/20250902080307.153171-2-shivankg@amd.com
 
-Faux devices are not intended to be bound, it says so right on the label:
+Yeah, Sean/Oaolo, can you take a look and pick that up as well?
 
- * A "simple" faux bus that allows devices to be created and added
- * automatically to it.  This is to be used whenever you need to create a
- * device that is not associated with any "real" system resources, and do
- * not want to have to deal with a bus/driver binding logic.  It is
-                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
- * intended to be very simple, with only a create and a destroy function
- * available.
+-- 
+Cheers
 
-auxiliary_device is quite similar to faux except it is intended to be
-bound to drivers, supports module autoloading and so on.
+David / dhildenb
 
-What you have here is the platform firmware provides the ARM SMC
-(Secure Monitor Call Calling Convention) interface which is a generic
-function call multiplexer between the OS and ARM firmware.
-
-Then we have things like the TSM subsystem that want to load a driver
-to use calls over SMC if the underlying platform firmware supports the
-RSI group of SMC APIs. You'd have a TSM subsystem driver that uses the
-RSI call group over SMC that autobinds when the RSI call group is
-detected when the SMC is first discovered.
-
-So you could use auxiliary_device, you'd consider SMC itself to be the
-shared HW block and all the auxiliary drivers are per-subsystem
-aspects of that shared SMC interface. It is not a terrible fit for
-what it was intended for at least.
-
-Jason
