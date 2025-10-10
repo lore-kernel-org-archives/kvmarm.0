@@ -1,104 +1,119 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DC72F9982
-	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 15:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C95063CB
+	for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 15:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760110182; cv=none; b=mVrywHlxydxn1hJMYEnFK2uwXaSMslrMa+78ph4E/XpyrKPX2T0jq5J48LazTA6eQI370RwjjrhnYVjOAv8Ccz+X5Vt1jwA61nPCZwNgUjsoq1HYWtvon0XH1xheTMEIenYEuksSNmTR4NVdABxirdXBEJ7xA2qc1OHc+fQ1y+o=
+	t=1760110255; cv=none; b=HW8rWaasPfXS5qVGObIhEo8xuj9oMgFS2rlcXqVhPU0/0mfow5SPy0MhtB6DsUygdoBrNAfv8chrtTsWYqdJiLLF8AYgo5SqzCwJs4nVAu5BtsJH9TuQAJOF3FgbjD7Hk8CMbrBeZdGu+Uia6l0wPzQNRlyO2KxtAU1240W77gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760110182; c=relaxed/simple;
-	bh=bQjmRzwvDlWBNOUknLBSMmasOFXzjkSWSgwrVNUwjTM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HdLf1U8Uz37llaJ+yVbub+5Tz3OfFxYogEb0nHWB8RmBxAAdKWWRXvCWHaaVM66yzITIjqp4is3kf6RPmCN7WA3iBJKDuTqS4WVkUsuAO84mM4RbGl1pBBKRvizrQQ2TH7rr5+3FIrlfOo0VYXG5Au5M6kKV1+8hfe+y7YUQVvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uReHgcMI; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1760110255; c=relaxed/simple;
+	bh=YweDjybfnRXAUjAFM2cXyTvz7RwWQP0buSdnlIEIdyI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kb8MeS9gpFSLczs/g9NnIsZnrNbsO4nyWv6HyBhhnaD9yNHRkwlehIQ+gg82vJibtAJuGauG1rMLS01e/gz/HraFmyNI33K/TKn8stgS3TFKWx2iLyQAatAzjb/LiHnxWVFZ7O43l1bgHVUqIMgBLb5oTI+RixGn4+HnDX4FeXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=j5ntdxnZ; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uReHgcMI"
-Message-ID: <25cf9d85-0f42-46d9-a4b6-618b406256f1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760110177;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CKUrS5jDQSXSheSIBCNgkQhgEHNgs+CbGyP1+oymFao=;
-	b=uReHgcMIl9041kVUV2NYDBnZ17LLwXhi8mvrSAKSipFDx+9sk8nnrtoxVG+nhoQME8efbV
-	VfpjoyvLoDgbLz2tKB9fE8dfI8ksz5xi4VLtD6mPs2LwpjGLG2Kjw7S4f0hFqCdzvhPKBf
-	bEl3VZgTHMhk8gEeVvNpO5c5riztYKE=
-Date: Fri, 10 Oct 2025 23:29:15 +0800
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="j5ntdxnZ"
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-78eba712e89so21160316d6.3
+        for <kvmarm@lists.linux.dev>; Fri, 10 Oct 2025 08:30:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1760110253; x=1760715053; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e6cOfIK7qdN8qKLRMhM71lR4Nf+xbZ2+eVm4l2+34ic=;
+        b=j5ntdxnZhwokfZ7GwQ0MXIZII8RpMEFYoa7cclFhZ5HVEjQFU9n5rgZcBMYIRObngp
+         SYTBfSBPZwyvW4lAWNZhP/yX+4TZn+7n77Y3ybNMQpFOtRXQj/j8ce8cp7ol/5knmGMx
+         Sagg44BeajqF1urzk10YTae1mcUW/O46Ji4iavgZcUU5/0i45tZUX6van5LlzP/hi+ii
+         wHp3N3MDVoE1Ln43uRwvAXAQtUiVOZZeOjGPVI2oq83AvXmYxZ6i4+9AWRREyznNZbii
+         vE5ODABc3ynS/4nNIfJs4A9gUFNVMVnKRcNQq2u7BGgzM4u378DtLMpWvAaEicnjgnEq
+         3pyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760110253; x=1760715053;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e6cOfIK7qdN8qKLRMhM71lR4Nf+xbZ2+eVm4l2+34ic=;
+        b=fSo+sigg9lxL73FXa07S2lk6f7D8OXlnEuW+sfB0JFmpzMN5g1ozkt84MtM6620fjs
+         lfd8ocifDUA5SAAixlYKUUORvGU2LzQT0bEuDXb6v1tip1ZGSdWA+aNFThxxZ9FC+GHe
+         fvWw7vOMy7U/BMG2qswGKqRTcqowQyiSaoHGa2DScbg9P1h9l1nidM9IT/ATRBfPyGUe
+         SiU/RXpeFXGUGp1CELjpYt/Fh01jNvch80349gJULQGJl4B8Pu2oqtryStl2iVFwEb6Q
+         HOtEBTXBiS/vxOUNnTzcBeppKeXZ79z2An364CiwIK+P539YVz3cS9bI9/IiuDnwYhy7
+         ZXHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXenVRsZjQL0D/sHoIMTRhLlVlmECunmzUeZigBZ4Cm1MD73o82YMllEbhJxlp2tJvPZnyM01I=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy7k7EFwg/sHG+Q+o4QhDi8V6GUgznEp0gPsnVj2bNH/+wab1JT
+	zTLCKpR4gkA8jy9ZPvRH9+eEaXW0WvyjjrAoKmYB+k47Gf4sewm+O/PF9SxUz1efY40=
+X-Gm-Gg: ASbGncsn19wrr9sYygMQJlcZPrT2inlZdpvGNuRriMqr2OU8dq6CaJsiW7BFiDS/5fq
+	Bw6uuCASf5JF2rldV8JC6uWzBG7BU2vyBRhneDgqZWacNd/iAWQdzSrdS2NFbElVy6zoY80k2+c
+	z1pngrKkZRyb8tGpBaPsTaCd+p/nlZI/o5E6SH9Op07VWDUGqLIROkjaU4kjWdLtb7mj6+EFkIJ
+	2x0kx6PK4MqSuY58uRUB1K2m7yi7H0Qtmbb7oSWpndllPG+0hQVzCNMQHrRfkmLOcFyhozkKoMe
+	ytMClxe2dugDfsPpPyBZVN75l58U3hsJynb8Acyrxba98Ln0qdBLubFH58JMXtNn3OVUC+Uc3BY
+	ONgR3wV9RAX10Yd36um/VuiQJMN5tB2TTmEV3+YwIu+T6EYI/OPgaaiSt/5of7xg81ilJRJu0Qe
+	8uwSLp8cdkwA8=
+X-Google-Smtp-Source: AGHT+IGgKhRm3oNF4ALMXNjdHTaNK2zfI9rzl46bTecy6J4CNJ6lSFvDvqcPlarS77J3/CcjSy9rWQ==
+X-Received: by 2002:a05:6214:c64:b0:830:5c6d:419 with SMTP id 6a1803df08f44-87b210728c4mr182061246d6.4.1760110247638;
+        Fri, 10 Oct 2025 08:30:47 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87bc3570c1esm18187826d6.40.2025.10.10.08.30.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Oct 2025 08:30:47 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1v7F4w-0000000GWAu-2XWh;
+	Fri, 10 Oct 2025 12:30:46 -0300
+Date: Fri, 10 Oct 2025 12:30:46 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Jeremy Linton <jeremy.linton@arm.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>, linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
+ device
+Message-ID: <20251010153046.GF3833649@ziepe.ca>
+References: <20250728135216.48084-12-aneesh.kumar@kernel.org>
+ <20250729181045.0000100b@huawei.com>
+ <20250729231948.GJ26511@ziepe.ca>
+ <yq5aqzxy9ij1.fsf@kernel.org>
+ <20250730113827.000032b8@huawei.com>
+ <20250730132333.00006fbf@huawei.com>
+ <2025073035-bulginess-rematch-b92e@gregkh>
+ <b3ec55da-822a-4098-b030-4d76825f358e@arm.com>
+ <20251010135922.GC3833649@ziepe.ca>
+ <4a7d84b2-2ec4-4773-a2d5-7b63d5c683cf@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Cover ID_AA64ISAR3_EL1 in
- set_id_regs
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250920-kvm-arm64-id-aa64isar3-el1-v1-0-1764c1c1c96d@kernel.org>
- <20250920-kvm-arm64-id-aa64isar3-el1-v1-2-1764c1c1c96d@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <20250920-kvm-arm64-id-aa64isar3-el1-v1-2-1764c1c1c96d@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4a7d84b2-2ec4-4773-a2d5-7b63d5c683cf@arm.com>
 
-On 2025/9/21 03:52, Mark Brown wrote:
-> We have a couple of writable bitfields in ID_AA64ISAR3_EL1 but the
-> set_id_regs selftest does not cover this register at all, add coverage.
+On Fri, Oct 10, 2025 at 10:28:36AM -0500, Jeremy Linton wrote:
+
+> > So you could use auxiliary_device, you'd consider SMC itself to be the
+> > shared HW block and all the auxiliary drivers are per-subsystem
+> > aspects of that shared SMC interface. It is not a terrible fit for
+> > what it was intended for at least.
 > 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  tools/testing/selftests/kvm/arm64/set_id_regs.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> index bfb70926272d..c7c38b1a1f10 100644
-> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> @@ -125,6 +125,13 @@ static const struct reg_ftr_bits ftr_id_aa64isar2_el1[] = {
->  	REG_FTR_END,
->  };
->  
-> +static const struct reg_ftr_bits ftr_id_aa64isar3_el1[] = {
-> +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, FPRCVT, 0),
-> +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, LSFE, 0),
-> +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, FAMINMAX, 0),
-> +	REG_FTR_END,
-> +};
-> +
->  static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV3, 0),
->  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV2, 0),
-> @@ -221,6 +228,7 @@ static struct test_feature_reg test_regs[] = {
->  	TEST_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0_el1),
->  	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
->  	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
-> +	TEST_REG(SYS_ID_AA64ISAR3_EL1, ftr_id_aa64isar3_el1),
->  	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
->  	TEST_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
->  	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
-> @@ -239,6 +247,7 @@ static void guest_code(void)
->  	GUEST_REG_SYNC(SYS_ID_AA64ISAR0_EL1);
->  	GUEST_REG_SYNC(SYS_ID_AA64ISAR1_EL1);
->  	GUEST_REG_SYNC(SYS_ID_AA64ISAR2_EL1);
-> +	GUEST_REG_SYNC(SYS_ID_AA64ISAR3_EL1);
->  	GUEST_REG_SYNC(SYS_ID_AA64PFR0_EL1);
->  	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
->  	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
+> Turns out that changing any of this, will at the moment break systemd's
+> confidential vm detection, because they wanted the earliest indicator the
+> guest was capable and that turned out to be this platform device.
 
-Not related to this patch but seems that we forgot to sync several
-registers (ID_AA64PFR1, MPIDR, CLIDR) in guest to make sure the guest
-had seen the written value.
+Having systemd detect a software created platform device sounds
+compltely crazy, don't do that. Make a proper sysfs uapi for such a
+general idea please.
 
-Zenghui
+Jason
