@@ -1,79 +1,131 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5475D285CB4
-	for <kvmarm@lists.linux.dev>; Sun, 12 Oct 2025 15:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2A0156CA
+	for <kvmarm@lists.linux.dev>; Sun, 12 Oct 2025 17:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760283854; cv=none; b=p7cqoiSSKcHw0CW7mL2rXuFUEKwlEIiGeOn/aK6nNlTfmzXKUNZc8nF2ps/87Ev97IsxcMTumdKRKM2gyfEONi+yxy3vE8KJ9lNTpXIAHTD/ohDfSDbh4/4uz/t+bx0c20k9wS2JKJt2+3y4EdGRwBLne9PhpUjxZaOW2yul448=
+	t=1760289268; cv=none; b=Iax6oogv3MNkk4byOM20GZyp/EDuM3cATv8Uw7TBvNjhVfFWc6k/TrTfIRFF32TyjNi9hf6UQ1G8GDy/MkWBEYzT0V/T3bEgrq2VyJzF5dQHpfc5itKpQFOaZud0ncPMmS+wql/BSuFJljyNLIN+FXyqNIh1etZN/EuUYyi86iQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760283854; c=relaxed/simple;
-	bh=b6hDAD8c81FN+jynGvjXEey6OQ4Pw37W+Khp/jCjT9Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ixNQWbm4k9uWyYo0a2AgU5B4ZsbEToU01iZXqoOxxGRYLKhqPubs4I2VPh1OrFUs7tlYv2uqaC5tVcKctqcCl5BRInjiZYPxVWYyzPBecHtH+zp1EyqvD38wphAxDmjdRo7OSSa965a6rkIbnnyl19oEHD2H8tbCppl2zSU6Eu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bHOHnH3e; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1760289268; c=relaxed/simple;
+	bh=ndQSaJR8sUGovQVdmLMB2LZgOwuduk7viVvSOrlf1G8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kWpQQxFpIJdMZyVm5AwEIj58zvGRZ3RTy9P+3HhDiUc7fSZhC2RirFFiuo5HRzxSAEswkRwVh0lBPE4mJT6dCMNlkaal/NS7pBh9DKzp3zL34X6VcuR2Adpi07Pnok7hL7r17K1IGnlR1S8CQi4v/ody2YeeqczFRokb/g3I2iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMI2Txic; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bHOHnH3e"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760283847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=etGXtXgYukUwOM3oh9xUMwzEF3+F73hM03oAFvr8aAo=;
-	b=bHOHnH3eJTHwsi1Fj7c3KNiiKjZdFYo821vrKDIiZbQUB7028AdAa9tb9hzMHq3CLNqc24
-	Evbf740RK9A5zEr67dFFqOmIaHfmAg46qdmtwP5f42FRoh7nVLrg1vBhfWawL6D+I6THUL
-	4zsnjBGWnWDUKRfXHJWggrh5FN1e2SU=
-From: Zenghui Yu <zenghui.yu@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	Zenghui Yu <zenghui.yu@linux.dev>
-Subject: [PATCH] KVM: arm64: selftests: Sync ID_AA64PFR1, MPIDR, CLIDR in guest
-Date: Sun, 12 Oct 2025 23:43:52 +0800
-Message-Id: <20251012154352.61133-1-zenghui.yu@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMI2Txic"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EBA2C4CEF8;
+	Sun, 12 Oct 2025 17:14:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760289268;
+	bh=ndQSaJR8sUGovQVdmLMB2LZgOwuduk7viVvSOrlf1G8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kMI2TxicQvgOLWGqDXYpKrNgXU8+ojjvWMY0RIm7/NRNTZ8tYDJPswEVUdogxXXYC
+	 iwAT6F1TT4fnbbiI3/RY9KCiE0Pwe4L/JA0pTrc3YZ/PMcF+v2oXJ3YViEMzF3kWCX
+	 +sqwTbA29WWDo5e8bc0LzeI3+Y/M5ro8CHTh3MMJ00LQogyxdbywpTU1bxg3H1fZ1S
+	 WhgVf0qp1U7TQxJMUz672Tm95b7Ce0wmedrZmr7vPOvusK5XnhJXAZu6By0rJPt+pf
+	 WdCErHaQ4Cbls5TyQJtD8CrIbIugcjExwQeFKjHqyhcDLHSQVGvNtFDPK2ErzZrilq
+	 vBluRIai9vFZw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v7zeL-0000000DK2I-3I03;
+	Sun, 12 Oct 2025 17:14:25 +0000
+Date: Sun, 12 Oct 2025 18:14:25 +0100
+Message-ID: <87h5w4xcsu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "open list:ARM" <kvmarm@lists.linux.dev>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	"Suzuki K. Poulose" <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: Saving and restoring state of a KVM VM using GICv2 fails
+In-Reply-To: <CAFEAcA8TpQduexT=8rdRYC=yxm_073COjzgWJAvc26_T+-F5vA@mail.gmail.com>
+References: <CAFEAcA8TpQduexT=8rdRYC=yxm_073COjzgWJAvc26_T+-F5vA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We forgot to sync several registers (ID_AA64PFR1, MPIDR, CLIDR) in guest to
-make sure that the guest had seen the written value.
+On Fri, 10 Oct 2025 16:33:45 +0100,
+Peter Maydell <peter.maydell@linaro.org> wrote:
+> 
+> I was testing doing saving and restoring state of a KVM VM that
+> happened to be using GICv2, and I discovered that it doesn't
+> seem to work. Running the VM works fine, as does the state save,
+> but when you try to reload the state it fails:
+> 
+> $ /work/test-images/virtv8/runme ./build/arm/qemu-system-aarch64
+> -enable-kvm -machine gic-version=2 -loadvm gic2
+> qemu-system-aarch64: Could not set register op0:3 op1:0 crn:0 crm:1
+> op2:1 to 11011 (is 10011011)
+> qemu-system-aarch64: error while loading state for instance 0x0 of
+> device 'cpu': post load hook failed for: cpu, version_id: 22,
+> minimum_version: 22, ret: -1
+> 
+> This is QEMU saying that it tried to do the KVM_SET_ONE_REG for
+> ID_PFR1_EL1 to 0x11011, and failed, and that KVM thinks that register's
+> value is 0x10011011. The difference is that KVM has the GIC field set
+> (bits [31:28]).
+> 
+> Looking at the kernel code, I think this happens because the kernel
+> only clears out the GIC field of the idreg in kvm_finalize_sys_regs(),
+> which gets called when the vcpu is first run. So because state save
+> happens after the vcpu has run for a bit, it sees the value of the
+> register with the GIC field set to 0, and that's what it writes out
+> into the saved state data. But the loadvm operation happens
+> with a fresh new VM which has never been run. So the kernel still
+> thinks the GIC field in the idreg should be 1, and it fails the
+> SET_ONE_REG operation which tries to write it to 0.
 
-Add them to the list.
+Right, this fires on upstream as well. We allow writes to
+ID_AA64PFR0_EL1.GIC, but we don't let ID_PFR1_EL1.GIC being written,
+while we otherwise insist on keeping them in sync.
 
-Signed-off-by: Zenghui Yu <zenghui.yu@linux.dev>
----
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 3 +++
- 1 file changed, 3 insertions(+)
+I think there's a few changes that need making:
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 8ff1e853f7f8..5e24f77868b5 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -249,11 +249,14 @@ static void guest_code(void)
- 	GUEST_REG_SYNC(SYS_ID_AA64ISAR2_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ISAR3_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64PFR0_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64PFR1_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR3_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
-+	GUEST_REG_SYNC(SYS_MPIDR_EL1);
-+	GUEST_REG_SYNC(SYS_CLIDR_EL1);
- 	GUEST_REG_SYNC(SYS_CTR_EL0);
- 	GUEST_REG_SYNC(SYS_MIDR_EL1);
- 	GUEST_REG_SYNC(SYS_REVIDR_EL1);
+- let ID_PDR1_EL1.GIC being written to
+
+- manage ID_{AA64PFR0,PFR1}_EL1.GIC from the point where we create the
+  in-kernel GIC
+
+- reserve the 'finalize' treatment for the case where we don't have an
+  in-kernel GIC
+
+> This kernel reports itself as
+>  6.14.0-1012-aws #12~24.04.1-Ubuntu SMP Fri Aug 15 00:07:14 UTC 2025
+
+Yup, that's consistent with the above being introduced in 6.12.
+
+> The failure happens for both aarch32 and aarch64 guests.
+> I haven't tested whether it happens on a host that has only
+> 64-bit EL1 (i.e. where ID_PFR1_EL1 doesn't exist). It may be
+> that there's some flexibility about writes to ID_AA64PFR0_EL1.GIC
+> which needs to also be permitted for ID_PFR1_EL1.GIC.
+
+We treat all the non-AA64 idregs as RAZ/WI when the host is not
+AArch32 capable, so at least that particular aspect should be OK (and
+GICv2, AArch64-only machines should be relatively rare...). But the
+32/64bit feature matching has been off for some time, and we probably
+have more of those lurking.
+
+Anyway, I'll post the fixes shortly once I've written commit messages.
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1
-
+Jazz isn't dead. It just smells funny.
