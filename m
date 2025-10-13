@@ -1,189 +1,98 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB0B30E846
-	for <kvmarm@lists.linux.dev>; Mon, 13 Oct 2025 15:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26CDC25D546
+	for <kvmarm@lists.linux.dev>; Mon, 13 Oct 2025 16:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760368550; cv=none; b=ffIGqQRZwH9SDmE5mMqxp1Pxx7QB+0cyO4PbReTA5kTnyadi7sHa/kwEhSUDgN7vSWLFAimG92jk0/QbXPYf+ba06SgXjZEm7KMiWCoOG6+rKzkBIrv8NTLMQ385f1Ltog4Yx8bVgEBPo0iKn/4XefJPeIlhxOKKrXiSk65xDeo=
+	t=1760372060; cv=none; b=S06dnafGgMfRR377Y5qGhq+XNkJjj73VYD5LYz8VtxqIetrLRnNlDS6V0s5UAMr/wBTx/W8jUsw3R416djUOqgHH+R+LUuSVxUyS5T7PBFcNuiDKX8DOgamGkZ1LAR9XAp93OGgAHaurUnB5ignYqyQH73KAkqP/LFDwb3d+rzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760368550; c=relaxed/simple;
-	bh=AfUKt9Y64nk4DJCkkE4xk0dAPQmcJX1fmTUpYECF7XQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gc/cJLK0xlk/GOKfmM8BxjFchhrQ6wQXSdcq0h7HEUsla3tVa8DMeBBj3K4UzzituRc+oqYWRzadj1K5a8fyo/HUUQ1Kqc+VRZ+vBztE1bgOsCVmI9MygFIE6QDd9XFLU0wxbbwiLPXi+RR37Xp/OGz9uVr6n3HONY41E0euMTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QLMHtURt; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLMHtURt"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-46fc5e54cceso8045925e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 13 Oct 2025 08:15:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760368547; x=1760973347; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mzQnDluOQWqcbRXyu07+4Pf89SEymkI9ph5TfK7+5co=;
-        b=QLMHtURt9e5GDYf9BAAF0mZaOLyf8lrxSFZz1r9WwaTIHVTB8ebUm9TaqqIKg5Ufa8
-         nsZKLOtnD2elwd51jBLXLW7QZZuERSqXUm5YO194fooJ8LiqJ69MZcS/2M5uVbZoCBrF
-         Hlj83Th6aUyYEqCwNlOu9AiuoR3DX7ekDPxsM6l7h4MkQWxI1T2MRRI0SUL/CAOyuhr/
-         AquqzI5gyDg07Fuhf1tKpsBwmRypYAeNnJIbbLRYRcwaTuR5y7221gByh/WOJ0TqFeTs
-         zHEmy51yJsRxC4HpmzlB1JfbHS/yDo1BUEgdcSLFGyiI0AdNuYjewL65iAuf8GERM+pC
-         Vrlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760368547; x=1760973347;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mzQnDluOQWqcbRXyu07+4Pf89SEymkI9ph5TfK7+5co=;
-        b=gSdWnmRz/wh6NwGBV0I3Jk8iF4fWmeXzPdMJ0fiwGiSA7sv6RQ9pYZeP6tp4mxkCou
-         gDmBfR2KLVkAs4fKPNcGSJhsBfMKs8KJwTgFOAo6gfQw4uIHuPEeAAXwA8ZiRF3JH2Vq
-         Krgpd0RdZjVSayeghwm4CNO2UF5Tl+jAzjmWBmMYTPJdxAxk0YNqkuHIJqv/lVAhZTSS
-         kZurxcHJyMH0or1XdTdSW55OXG9AWm2cS3Z0nYKCvO2uxhka+4uZA+wg6uFqftXdYqDL
-         0hJA7pEBllStbBz9JUKCUOboq9svyXNfcmlCw722CrNbyuS5Hj8JxvEAmNoMZJ/p6e6U
-         dHKA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHFswW2aA8Q696YKa0TomPfsjIjjkT2ExNoNnwHkLr8dkC1hMIp8F1THe7hCtmhqN2veABM1o=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyPrtLv7QQr8jMDGftJ6leYlbxnec8npzCF2eqg/+vyxGtnhTp8
-	iL7eZiSqgz+2bRe1CPGjN/dxi1m7/sIcHcbT2QZ3cqsrqkugAj1Lck/C
-X-Gm-Gg: ASbGncvRheDn1Vte7yCfcFiv9DIjXuSyVQmm/LF4TF6QdNTY1a1M4OI5bdyZR1UgM5f
-	v3K1oIww5E1tN/37gZoU0kwnwN+V++XvgSTMV8Gt5ugjrPeK6RIp1vEBwx2fwrhzaNTVsdMgJx3
-	FzdtU2madkTnjgQYgsuqePBKKJn8s/38+svMcT/NfNEv0M9+amFaALa8zuoY5OC2mhjlX6t5YEk
-	S3SyrixQ6vilgVvD2lbaKUt6Ip/EzRmdWaRn0sYjyMXe1HTH90yzO9EZYtPwhTNLFsztc8VEAUa
-	fcRjcA04kVZPzZRmdttgtCfAKWF51ADm8E+mdkew7ph6EPhqbbLRuP1CUo+mlgLcyEiavdHW0NA
-	EGFMsaa0SngIl2gfjuBnQX/EoucrOJEil8YMBaCcSgSstABL7uTK30gE6S9fIDsr6hdOGlyMBmi
-	lOfMEWgaSfJTFYYU8Irh5C5EQkMA==
-X-Google-Smtp-Source: AGHT+IHgTeXKHH2vcpsvzOcBDeWFCxx7j6NWXF765EtO+25xvlfpvrezTIu3A7FfM3RO5CiMYA9Vog==
-X-Received: by 2002:a05:600c:1e85:b0:46e:39e4:1721 with SMTP id 5b1f17b1804b1-46fa9aa261amr141333095e9.12.1760368546663;
-        Mon, 13 Oct 2025 08:15:46 -0700 (PDT)
-Received: from f4d4888f22f2.ant.amazon.com.com ([15.248.3.91])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fab36a773sm135545825e9.0.2025.10.13.08.15.45
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 13 Oct 2025 08:15:46 -0700 (PDT)
-From: Jack Thomson <jackabt.amazon@gmail.com>
-To: maz@kernel.org,
-	oliver.upton@linux.dev,
-	pbonzini@redhat.com
-Cc: joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	shuah@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	isaku.yamahata@intel.com,
-	roypat@amazon.co.uk,
-	kalyazin@amazon.co.uk,
-	jackabt@amazon.com
-Subject: [PATCH v2 4/4] KVM: selftests: Add option for different backing in pre-fault tests
-Date: Mon, 13 Oct 2025 16:15:01 +0100
-Message-ID: <20251013151502.6679-5-jackabt.amazon@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251013151502.6679-1-jackabt.amazon@gmail.com>
-References: <20251013151502.6679-1-jackabt.amazon@gmail.com>
+	s=arc-20240116; t=1760372060; c=relaxed/simple;
+	bh=zUCAV8CPpFSrgTn4UQQPBM784hXZgomTmf3YnQwkLm4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=nkrRSNlPVB+HDss70uIsmavZj/6NYy/FxfMahdFSywlLvE6bkJhExm+HJr2BUwIZIXA78qGz4OUQbgO1nn53Yf/wQM1yOHVg2j5I+cpfxjNYZjLy5j2tiKMb4WV6OBMhOXoRwxqUT9AlBp2zrlJlgq7/VgczLLxH8XL2LOoD0ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4741F113E;
+	Mon, 13 Oct 2025 09:14:09 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2BD2D3F738;
+	Mon, 13 Oct 2025 09:14:16 -0700 (PDT)
+Message-ID: <75f13087-80fa-45cb-9327-aa85522203e0@arm.com>
+Date: Mon, 13 Oct 2025 17:14:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: selftests: Sync ID_AA64PFR1, MPIDR, CLIDR in
+ guest
+From: Ben Horgan <ben.horgan@arm.com>
+To: Zenghui Yu <zenghui.yu@linux.dev>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+ suzuki.poulose@arm.com
+References: <20251012154352.61133-1-zenghui.yu@linux.dev>
+ <25a19af8-2026-45b6-8d0f-42c371c8ff95@arm.com>
+Content-Language: en-US
+In-Reply-To: <25a19af8-2026-45b6-8d0f-42c371c8ff95@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jack Thomson <jackabt@amazon.com>
 
-Add a -m option to specify different memory backing types for the
-pre-fault tests (e.g., anonymous, hugetlb), allowing testing of the
-pre-fault functionality across different memory configurations.
 
-Signed-off-by: Jack Thomson <jackabt@amazon.com>
----
- .../selftests/kvm/pre_fault_memory_test.c     | 31 ++++++++++++++++---
- 1 file changed, 26 insertions(+), 5 deletions(-)
+On 10/13/25 13:20, Ben Horgan wrote:
+> Hi Zenghui,
+> 
+> On 10/12/25 16:43, Zenghui Yu wrote:
+>> We forgot to sync several registers (ID_AA64PFR1, MPIDR, CLIDR) in guest to
+>> make sure that the guest had seen the written value.
+>>
+>> Add them to the list.
+>>
+>> Signed-off-by: Zenghui Yu <zenghui.yu@linux.dev>
+>> ---
+>>  tools/testing/selftests/kvm/arm64/set_id_regs.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+>> index 8ff1e853f7f8..5e24f77868b5 100644
+>> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
+>> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+>> @@ -249,11 +249,14 @@ static void guest_code(void)
+>>  	GUEST_REG_SYNC(SYS_ID_AA64ISAR2_EL1);
+>>  	GUEST_REG_SYNC(SYS_ID_AA64ISAR3_EL1);
+>>  	GUEST_REG_SYNC(SYS_ID_AA64PFR0_EL1);
+>> +	GUEST_REG_SYNC(SYS_ID_AA64PFR1_EL1);
+>>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
+>>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
+>>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
+>>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR3_EL1);
+>>  	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
+>> +	GUEST_REG_SYNC(SYS_MPIDR_EL1);
+>> +	GUEST_REG_SYNC(SYS_CLIDR_EL1);
+> 
+> Why did you choose this position in the list for these 2?
+> 
+>>  	GUEST_REG_SYNC(SYS_CTR_EL0);
+>>  	GUEST_REG_SYNC(SYS_MIDR_EL1);
+>>  	GUEST_REG_SYNC(SYS_REVIDR_EL1);
+> 
+> Looks good to me.
+> 
+> Reviewed-By: Ben Horgan <ben.horgan@arm.com>
+> Thanks,
+> 
+> Ben
+> 
 
-diff --git a/tools/testing/selftests/kvm/pre_fault_memory_test.c b/tools/testing/selftests/kvm/pre_fault_memory_test.c
-index ed9848a8af60..22e2e53945d9 100644
---- a/tools/testing/selftests/kvm/pre_fault_memory_test.c
-+++ b/tools/testing/selftests/kvm/pre_fault_memory_test.c
-@@ -76,6 +76,7 @@ static void pre_fault_memory(struct kvm_vcpu *vcpu, u64 gpa, u64 size,
- struct test_params {
- 	unsigned long vm_type;
- 	bool private;
-+	enum vm_mem_backing_src_type mem_backing_src;
- };
- 
- static void __test_pre_fault_memory(enum vm_guest_mode guest_mode, void *arg)
-@@ -94,7 +95,11 @@ static void __test_pre_fault_memory(enum vm_guest_mode guest_mode, void *arg)
- 	uint64_t guest_test_virt_mem;
- 	uint64_t alignment, guest_page_size;
- 
-+	size_t backing_src_pagesz = get_backing_src_pagesz(p->mem_backing_src);
-+
- 	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(guest_mode));
-+	pr_info("Testing memory backing src type: %s\n",
-+		vm_mem_backing_src_alias(p->mem_backing_src)->name);
- 
- 	vm = vm_create_shape_with_one_vcpu(shape, &vcpu, guest_code);
- 
-@@ -110,10 +115,11 @@ static void __test_pre_fault_memory(enum vm_guest_mode guest_mode, void *arg)
- #else
- 	alignment = SZ_2M;
- #endif
-+	alignment = max(alignment, backing_src_pagesz);
- 	guest_test_phys_mem = align_down(guest_test_phys_mem, alignment);
- 	guest_test_virt_mem = guest_test_phys_mem & ((1ULL << (vm->va_bits - 1)) - 1);
- 
--	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+	vm_userspace_mem_region_add(vm, p->mem_backing_src,
- 				    guest_test_phys_mem, TEST_SLOT, test_config.test_num_pages,
- 				    p->private ? KVM_MEM_GUEST_MEMFD : 0);
- 	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, test_config.test_num_pages);
-@@ -155,7 +161,8 @@ static void __test_pre_fault_memory(enum vm_guest_mode guest_mode, void *arg)
- 	kvm_vm_free(vm);
- }
- 
--static void test_pre_fault_memory(unsigned long vm_type, bool private)
-+static void test_pre_fault_memory(unsigned long vm_type, enum vm_mem_backing_src_type backing_src,
-+				  bool private)
- {
- 	if (vm_type && !(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type))) {
- 		pr_info("Skipping tests for vm_type 0x%lx\n", vm_type);
-@@ -165,6 +172,7 @@ static void test_pre_fault_memory(unsigned long vm_type, bool private)
- 	struct test_params p = {
- 		.vm_type = vm_type,
- 		.private = private,
-+		.mem_backing_src = backing_src,
- 	};
- 
- 	for_each_guest_mode(__test_pre_fault_memory, &p);
-@@ -174,10 +182,23 @@ int main(int argc, char *argv[])
- {
- 	TEST_REQUIRE(kvm_check_cap(KVM_CAP_PRE_FAULT_MEMORY));
- 
--	test_pre_fault_memory(0, false);
-+	int opt;
-+	enum vm_mem_backing_src_type backing = VM_MEM_SRC_ANONYMOUS;
-+
-+	while ((opt = getopt(argc, argv, "m:")) != -1) {
-+		switch (opt) {
-+		case 'm':
-+			backing = parse_backing_src_type(optarg);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	test_pre_fault_memory(0, backing, false);
- #ifdef __x86_64__
--	test_pre_fault_memory(KVM_X86_SW_PROTECTED_VM, false);
--	test_pre_fault_memory(KVM_X86_SW_PROTECTED_VM, true);
-+	test_pre_fault_memory(KVM_X86_SW_PROTECTED_VM, backing, false);
-+	test_pre_fault_memory(KVM_X86_SW_PROTECTED_VM, backing, true);
- #endif
- 	return 0;
- }
--- 
-2.43.0
+On running this, I note test_guest_reg_read() doesn't announce its
+presence. How about adding a ksft_test_result_pass("%s\n", __func__) and
+bumping the number of tests?
+
+Thanks,
+
+Ben
 
