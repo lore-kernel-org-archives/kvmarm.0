@@ -1,98 +1,87 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26CDC25D546
-	for <kvmarm@lists.linux.dev>; Mon, 13 Oct 2025 16:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8ED1F419B;
+	Mon, 13 Oct 2025 16:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760372060; cv=none; b=S06dnafGgMfRR377Y5qGhq+XNkJjj73VYD5LYz8VtxqIetrLRnNlDS6V0s5UAMr/wBTx/W8jUsw3R416djUOqgHH+R+LUuSVxUyS5T7PBFcNuiDKX8DOgamGkZ1LAR9XAp93OGgAHaurUnB5ignYqyQH73KAkqP/LFDwb3d+rzA=
+	t=1760374569; cv=none; b=YvNfiAv4Iis/NIG7D52hhDV5A/98ARdgFu7TmnHYwFyzadvvxeBmouwaHfyVs2usZKEuq5Bx+E1OiYL9I+8zcgkQKO6Ezn2gHS/AxnZoHgImfdOYSNio0hmP3AYZ4oQQiSSuDFoSiOw87R1UiqTgtvJFxeq5+qSiN1QKQ12ZwOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760372060; c=relaxed/simple;
-	bh=zUCAV8CPpFSrgTn4UQQPBM784hXZgomTmf3YnQwkLm4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=nkrRSNlPVB+HDss70uIsmavZj/6NYy/FxfMahdFSywlLvE6bkJhExm+HJr2BUwIZIXA78qGz4OUQbgO1nn53Yf/wQM1yOHVg2j5I+cpfxjNYZjLy5j2tiKMb4WV6OBMhOXoRwxqUT9AlBp2zrlJlgq7/VgczLLxH8XL2LOoD0ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4741F113E;
-	Mon, 13 Oct 2025 09:14:09 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2BD2D3F738;
-	Mon, 13 Oct 2025 09:14:16 -0700 (PDT)
-Message-ID: <75f13087-80fa-45cb-9327-aa85522203e0@arm.com>
-Date: Mon, 13 Oct 2025 17:14:14 +0100
+	s=arc-20240116; t=1760374569; c=relaxed/simple;
+	bh=V/MAAI6c/W2kXvAAM5vLnSBH5PzenfxxUv7lXNVHDf0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g5gNKTXcZTVEqvhu+eSP60dJQhP17iY+2Y+kdSUGIq08AHmfmdpwZu1W9queEoikFX+E1uSXP8ikLHvsYVZF2nXJ0+j76k7oU6RsRlPKTa13oJFcP5Mv5JluZmuFqAaEss1bAb4hIdlWFgmtmhVff1ypEx3w+0DTO15uPDMcsyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jF4RAZSK; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jF4RAZSK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06314C116B1;
+	Mon, 13 Oct 2025 16:56:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760374569;
+	bh=V/MAAI6c/W2kXvAAM5vLnSBH5PzenfxxUv7lXNVHDf0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jF4RAZSKXO3/wzVMsevgsaewpkLC0B2J8nl5Yc1Io10RtKWu2D4oSTPU+MWqYoBYF
+	 /vMzHsLzzH8x6Z6/XET5+J546Nm6m8OoABIkWNWYuyNJWWVxU9MFNDTlDuCvRfdQPF
+	 0IAUIcxuJuw0ZCRze57yrwXpuM0O4rChgaDoMsAp97Np/ajxwBeurSvVflzw49CXNI
+	 nd9NZeEN+XMcJRSDo1Fvu0ilsrYRjsj6hXxkqUTheVWsjPkQvjuTYdOF0GCdm2A6OE
+	 mNYWvFD34hHOxbg3rUCGQdeiikHZk5hT5giw54WGJbuJoVYMtVvGEJZTfR9r1Gmdoi
+	 Ya4LNurAJzzzw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v8LqA-0000000DaUU-2pWO;
+	Mon, 13 Oct 2025 16:56:06 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Guard PMSCR_EL1 initialization with SPE presence check
+Date: Mon, 13 Oct 2025 17:56:03 +0100
+Message-ID: <176037441177.969330.7925084033862079350.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251010174707.1684200-1-mukesh.ojha@oss.qualcomm.com>
+References: <20251010174707.1684200-1-mukesh.ojha@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: arm64: selftests: Sync ID_AA64PFR1, MPIDR, CLIDR in
- guest
-From: Ben Horgan <ben.horgan@arm.com>
-To: Zenghui Yu <zenghui.yu@linux.dev>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
- suzuki.poulose@arm.com
-References: <20251012154352.61133-1-zenghui.yu@linux.dev>
- <25a19af8-2026-45b6-8d0f-42c371c8ff95@arm.com>
-Content-Language: en-US
-In-Reply-To: <25a19af8-2026-45b6-8d0f-42c371c8ff95@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, alexandru.elisei@arm.com, mukesh.ojha@oss.qualcomm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 10 Oct 2025 23:17:07 +0530, Mukesh Ojha wrote:
+> Commit efad60e46057 ("KVM: arm64: Initialize PMSCR_EL1 when in VHE")
+> does not perform sufficient check before initializing PMSCR_EL1 to 0
+> when running in VHE mode. On some platforms, this causes the system to
+> hang during boot, as EL3 has not delegated access to the Profiling
+> Buffer to the Non-secure world, nor does it reinject an UNDEF on sysreg
+> trap.
+> 
+> [...]
 
+Applied to fixes, thanks!
 
-On 10/13/25 13:20, Ben Horgan wrote:
-> Hi Zenghui,
-> 
-> On 10/12/25 16:43, Zenghui Yu wrote:
->> We forgot to sync several registers (ID_AA64PFR1, MPIDR, CLIDR) in guest to
->> make sure that the guest had seen the written value.
->>
->> Add them to the list.
->>
->> Signed-off-by: Zenghui Yu <zenghui.yu@linux.dev>
->> ---
->>  tools/testing/selftests/kvm/arm64/set_id_regs.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
->> index 8ff1e853f7f8..5e24f77868b5 100644
->> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
->> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
->> @@ -249,11 +249,14 @@ static void guest_code(void)
->>  	GUEST_REG_SYNC(SYS_ID_AA64ISAR2_EL1);
->>  	GUEST_REG_SYNC(SYS_ID_AA64ISAR3_EL1);
->>  	GUEST_REG_SYNC(SYS_ID_AA64PFR0_EL1);
->> +	GUEST_REG_SYNC(SYS_ID_AA64PFR1_EL1);
->>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
->>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
->>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
->>  	GUEST_REG_SYNC(SYS_ID_AA64MMFR3_EL1);
->>  	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
->> +	GUEST_REG_SYNC(SYS_MPIDR_EL1);
->> +	GUEST_REG_SYNC(SYS_CLIDR_EL1);
-> 
-> Why did you choose this position in the list for these 2?
-> 
->>  	GUEST_REG_SYNC(SYS_CTR_EL0);
->>  	GUEST_REG_SYNC(SYS_MIDR_EL1);
->>  	GUEST_REG_SYNC(SYS_REVIDR_EL1);
-> 
-> Looks good to me.
-> 
-> Reviewed-By: Ben Horgan <ben.horgan@arm.com>
-> Thanks,
-> 
-> Ben
-> 
+[1/1] KVM: arm64: Guard PMSCR_EL1 initialization with SPE presence check
+      commit: c35dd838666d47de2848639234ec32e3ba22b49f
 
-On running this, I note test_guest_reg_read() doesn't announce its
-presence. How about adding a ksft_test_result_pass("%s\n", __func__) and
-bumping the number of tests?
+Cheers,
 
-Thanks,
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-Ben
 
