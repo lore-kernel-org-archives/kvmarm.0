@@ -1,89 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3672F5A3C;
-	Mon, 13 Oct 2025 08:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF5B222587
+	for <kvmarm@lists.linux.dev>; Mon, 13 Oct 2025 11:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760344339; cv=none; b=mty40eLFD0fGKVjXQJ5UdrG96exvHts0gunTh9YsxLegQvLTepMGgr8dkD2NpGaEypv9K9HLZjTARsCz4EOREDb7FYftPCfA6dFTtxuJJfglWW38uTBUJRFi3+KtM6G4HY6pLJaQKfxNZmu951m05QAeBQlZLv+ytsg+GzakI/U=
+	t=1760354277; cv=none; b=S81Qr/TVw56G4JwVtZFq12TzBOlsH2yZCvq90V7s+v8Rw8XdP4MwDcNre6z2y5jhE8MtznfSGA1j2vKJiEQetnSfHr4kh795eKh07uCEGhWhtzlAIB+d5C7vkaMIFC8QeB1PcugmeXpIONfXZ6RNpAu2j3UbZ1AUbr6elRW6030=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760344339; c=relaxed/simple;
-	bh=HFbqiH3fVeEghecXQ5XW07ZfgkipM0nl6smfp7yY2AE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HLCxZglewrVTzOkN7xPIuU+t1vQeQ4tKJlrWaW68vPt0eVSr7nprwZ/BH7HColx/wJaH4A5BM7FjNJlUN/rtZnmmhCf7M7cSUGCPWlmfm6KVbs2IZby43i+BD5+O5iA7i5OHO45T7fz0gP1eJ2RcFCHhsds4i5RvMMU+PQvEegU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kb2exZYl; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kb2exZYl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16096C4CEFE;
-	Mon, 13 Oct 2025 08:32:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760344339;
-	bh=HFbqiH3fVeEghecXQ5XW07ZfgkipM0nl6smfp7yY2AE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kb2exZYlc7VgJTXuZjUYTjJcuSv7qO5YyYoE221at/D1Ku+xCdvEMKyH6mFERxDch
-	 9HSaCLzS34XpCKKGxb2XcdHKc8lqyZpz1RYi/ESs5DSwZNmp7bcev02GKhFqfbuBXS
-	 gMLRJok23MELnXcijcYxxHsiNt2FOiI96Fi/8SdRNQBL5MJhk3Obx1ITRxxRT+lfSC
-	 Xugq/VJqbDwbDFbENeBAH12gr03X9UZ6rueBsF/jk0uZowDZVqXldwZLPbUE0bYwQG
-	 +FQVZWi8+1sC53JDwuUAmi44zqfuBF3l065N5yEOWwT8dbZDH4xkxL/APydxagXPJp
-	 ajLymYjtnrCuA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v8Dyb-0000000DRrP-11gd;
-	Mon, 13 Oct 2025 08:32:17 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	s=arc-20240116; t=1760354277; c=relaxed/simple;
+	bh=sY89/6Dacq1qFYsIHAuhpoIT/fPwZiv/ml+mZ4Z1CH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X3XMhT4TPjBY9U5XZl49STnWF55yRJR8/K9+3DW4ltTPREXnQ31Bbup8wujGkp/uZAE7UR0OW0amc+b+pfmSnex7fvkc5jilP3PpbaFaZIB9JLEo+TMQoFo67WlBlkPgFIG4HkQHDddIHoLOQfWGKwL8iSH/ogZS2ec79iZ+7mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFC4CC4CEE7;
+	Mon, 13 Oct 2025 11:17:54 +0000 (UTC)
+Date: Mon, 13 Oct 2025 12:17:52 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 3/3] KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
-Date: Mon, 13 Oct 2025 09:32:07 +0100
-Message-ID: <20251013083207.518998-4-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251013083207.518998-1-maz@kernel.org>
-References: <20251013083207.518998-1-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>, Jan Kotas <jank@cadence.com>
+Subject: Re: [PATCH] arm64: Revamp HCR_EL2.E2H RES1 detection
+Message-ID: <aOzf4A6nVZhnLvka@arm.com>
+References: <20251009121239.29370-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, peter.maydell@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251009121239.29370-1-maz@kernel.org>
 
-Now that the idreg's GIC field is in sync with the irqchip, limit
-the runtime clearing of these fields to the pathological case where
-we do not have an in-kernel GIC.
+On Thu, Oct 09, 2025 at 01:12:39PM +0100, Marc Zyngier wrote:
+> We currently have two ways to identify CPUs that only implement FEAT_VHE
+> and not FEAT_E2H0:
+> 
+> - either they advertise it via ID_AA64MMFR4_EL1.E2H0,
+> - or the HCR_EL2.E2H bit is RAO/WI
+> 
+> However, there is a third category of "cpus" that fall between these
+> two cases: on CPUs that do not implement FEAT_FGT, it is IMPDEF whether
+> an access to ID_AA64MMFR4_EL1 can trap to EL2 when the register value
+> is zero.
+> 
+> A consequence of this is that on systems such as Neoverse V2, a NV
+> guest cannot reliably detect that it is in a VHE-only configuration
+> (E2H is writable, and ID_AA64MMFR0_EL1 is 0), despite the hypervisor's
+> best effort to repaint the id register.
+> 
+> Replace the RAO/WI test by a sequence that makes use of the VHE
+> register remnapping between EL1 and EL2 to detect this situation,
+> and work out whether we get the VHE behaviour even after having
+> set HCR_EL2.E2H to 0.
+> 
+> This solves the NV problem, and provides a more reliable acid test
+> for CPUs that do not completely follow the letter of the architecture
+> while providing a RES1 behaviour for HCR_EL2.E2H.
+> 
+> Suggested-by: Marc Rutland <mark.rutland@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/15A85F2B-1A0C-4FA7-9FE4-EEC2203CC09E@global.cadence.com
 
-Fixes: 5cb57a1aff755 ("KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is presented to the guest")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 73dcefe51a3e7..25cfd0f9541f5 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5494,9 +5494,7 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
- 
- 	guard(mutex)(&kvm->arch.config_lock);
- 
--	if (!(static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) &&
--	      irqchip_in_kernel(kvm) &&
--	      kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)) {
-+	if (!irqchip_in_kernel(kvm)) {
- 		kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] &= ~ID_AA64PFR0_EL1_GIC_MASK;
- 		kvm->arch.id_regs[IDREG_IDX(SYS_ID_PFR1_EL1)] &= ~ID_PFR1_EL1_GIC_MASK;
- 	}
--- 
-2.47.3
-
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
