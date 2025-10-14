@@ -1,25 +1,37 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04A63093CD;
-	Mon, 13 Oct 2025 20:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E671CEACB;
+	Tue, 14 Oct 2025 01:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760388179; cv=none; b=RSMS1x3Ox/vmd+MX4FrIQEInIpm2lzovsTnMBhCFdZP5s9DqSYW6wd02hZn4MHyWICSyshB1MXod60NdzKxU5LBzSK9sApe5xtX2+KxKQ6MiwVFy2izrtqQ3bWiG35MgAVnMTWZsslUgrqDmbwqqG3bYztW+x/VvUNaCDI0Vjr0=
+	t=1760406716; cv=none; b=h5QfhYH21j373uLqmpSac5KEePTB39m3oyb1YVtdJJmds5feeYGaYV+uTnKLnJSUSb7jDz6D5o8pW5U96XAtFNNrHDB3DSKDAEhNFcvm8eWsjwHBhXWmoBdVjeqad4yjhPqzxYsumLpGfqZnwP5eCEgnw68G8hcW2LlXXEVzV5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760388179; c=relaxed/simple;
-	bh=xKtQgJRsuX5tKVTVViYkngB+tljb7gYCso27qJYidUA=;
+	s=arc-20240116; t=1760406716; c=relaxed/simple;
+	bh=D5pq7pWAQYFwhyzSZxyrhL2+MSp19sOiqhoesc+kuCg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E0NaccxjEDtlktpDR9rdnzOcr+5dvbPY98DMLmQNWhUix452xyyBK+m9Xf3eEDTM626q+hduAYLt+bBSIbBrlmKi+4e6GmUx/AfSGsI89/CFQwnqS3dPUUc7xG01KKsDoz6Embvv5ojWrprATuGc+rnJVRO2J00xfwkkKQFf3LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1CCE71063;
-	Mon, 13 Oct 2025 13:42:47 -0700 (PDT)
-Received: from [192.168.20.16] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F12F3F738;
-	Mon, 13 Oct 2025 13:42:50 -0700 (PDT)
-Message-ID: <ef4c0cbc-bf5e-4e55-b495-8bafa8a84c32@arm.com>
-Date: Mon, 13 Oct 2025 15:42:50 -0500
+	 In-Reply-To:Content-Type; b=q8tal22yz/gOiwBhSJ2lCQ0H7mMhSjy54WW2c3uzK0y8uNOxZ8mSI9MF29HGmrAOrwPvi8xxbflAjlRNED53KG42JxSQZ0Rvg3JnbW+1J72yS/MKScfmjHbqdvdebHRRxQxPPfqcWtvTTNnspWfZJZB8cy+yhk15eKeyed2RE08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DhO0hF6g; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DhO0hF6g"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=GdHHVHX1eK4OumztheWLpvPpWCbLWAPVj4gP9BXPPI8=; b=DhO0hF6gqhy8rmkGEl7on7+oJv
+	VtSUYvYuPcOlDu5fO8rCTFa2F1N/jdAP20m8Nb67fTrBo/fW7xZkTs3E4kNWHnFynKs20G0xEsolC
+	MqH/ufxF3g2GzV+W64oAUH6OPetfyV6FPMJEqWTE/ij6PONb6v3EHCJOmal94Lc0Bi4hK+35ayHKR
+	mt+8n05mNcD2DsFYZBume6lwYieckkKHhLNsYjifIvTzRXNk9td5Pk/x3BSq6HPF1OGCgGKUidim1
+	8H0TuKmkhlQR6ai4NxMDf9cGRmyXPY/ia4v6vaMJvdCXmK4AZRsHC3b9HHij78SAmfr3e1ZC9jXim
+	CxkRoeLg==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1v8UCc-0000000EvJR-1Gkr;
+	Tue, 14 Oct 2025 01:51:50 +0000
+Message-ID: <3efcf624-58f1-4390-b6e2-a0aa5e62a9a3@infradead.org>
+Date: Mon, 13 Oct 2025 18:51:49 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,99 +39,129 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
- device
-To: Jason Gunthorpe <jgg@ziepe.ca>, dan.j.williams@intel.com
-Cc: Greg KH <gregkh@linuxfoundation.org>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, linux-coco@lists.linux.dev,
- kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, aik@amd.com, lukas@wunner.de,
- Samuel Ortiz <sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>,
- Suzuki K Poulose <Suzuki.Poulose@arm.com>,
- Steven Price <steven.price@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-References: <yq5aqzxy9ij1.fsf@kernel.org> <20250730113827.000032b8@huawei.com>
- <20250730132333.00006fbf@huawei.com>
- <2025073035-bulginess-rematch-b92e@gregkh>
- <b3ec55da-822a-4098-b030-4d76825f358e@arm.com>
- <20251010135922.GC3833649@ziepe.ca>
- <4a7d84b2-2ec4-4773-a2d5-7b63d5c683cf@arm.com>
- <20251010153046.GF3833649@ziepe.ca>
- <f6cf20f6-0f19-4814-b917-4f92dad39648@arm.com>
- <68e953f484464_1992810065@dwillia2-mobl4.notmuch>
- <20251010223444.GA3938986@ziepe.ca>
+Subject: Re: [PATCH v4 3/3] Documentation: kvm: new UAPI for handling SEA
+To: Jiaqi Yan <jiaqiyan@google.com>, maz@kernel.org, oliver.upton@linux.dev
+Cc: duenwen@google.com, rananta@google.com, jthoughton@google.com,
+ vsethi@nvidia.com, jgg@nvidia.com, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
+ will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20251013185903.1372553-1-jiaqiyan@google.com>
+ <20251013185903.1372553-4-jiaqiyan@google.com>
 Content-Language: en-US
-From: Jeremy Linton <jeremy.linton@arm.com>
-In-Reply-To: <20251010223444.GA3938986@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20251013185903.1372553-4-jiaqiyan@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On 10/10/25 5:34 PM, Jason Gunthorpe wrote:
-> On Fri, Oct 10, 2025 at 11:44:04AM -0700, dan.j.williams@intel.com wrote:
->> Jeremy Linton wrote:
->>> On 10/10/25 10:30 AM, Jason Gunthorpe wrote:
->>>> On Fri, Oct 10, 2025 at 10:28:36AM -0500, Jeremy Linton wrote:
->>>>
->>>>>> So you could use auxiliary_device, you'd consider SMC itself to be the
->>>>>> shared HW block and all the auxiliary drivers are per-subsystem
->>>>>> aspects of that shared SMC interface. It is not a terrible fit for
->>>>>> what it was intended for at least.
->>>>>
->>>>> Turns out that changing any of this, will at the moment break systemd's
->>>>> confidential vm detection, because they wanted the earliest indicator the
->>>>> guest was capable and that turned out to be this platform device.
->>>>
->>>> Having systemd detect a software created platform device sounds
->>>> compltely crazy, don't do that. Make a proper sysfs uapi for such a
->>>> general idea please.
->>>
->>> Yes, I agree, its just at the time the statment was around what is the
->>> most reliable early indicator, and since there isn't a hwcap or anything
->>> that ended up being the choice, as disgusting as it is.
->>>
->>> Presumably once all this works out the sysfs/api surface will be more
->>> 'defined'
->>
->> It has definition today.
->>
->> All guest-side TSM drivers currently call tsm_report_register(), that
->> establishes /sys/kernel/config/tsm/report which is the common cross-arch
->> transport for retrieving CVM launch attestation reports.
-> 
-> I suspect this ins't a TSM question but an existing question if any of
-> the underlying CC frameworks are enabled.
-> 
-> It is this stuff:
-> 
-> https://github.com/systemd/systemd/blob/main/src/basic/confidential-virt.c
-> https://github.com/systemd/systemd/commit/2572bf6a39b6c548acef07fd25f461c5a88560af
-> 
->    Like the s390 detection logic, the sysfs path being checked is not labeled
->    as ABI, and may change in the future. It was chosen because its
->    directly tied to the kernel's detection of the realm service interface
->    rather to the Trusted Security Module (TSM) which is what is being
->    triggered by the device entry.
-> 
-> Maybe a /sys/firmware/smc/rsi file might be appropriate?
-
-Except that you can see from the code that this problem is being solved 
-in a hw platform dependent way for 4+ platforms now.
-
-Ideally the sysfs node would be common across all those hw platforms and 
-reflect the vm capabilities so the code doesn't' need #ifdef's. Meaning 
-it shouldn't have the smc/rsi arm'ism in the name, and maybe shouldn't 
-be in /sys/firmware
 
 
-Thanks,
+On 10/13/25 11:59 AM, Jiaqi Yan wrote:
+> Document the new userspace-visible features and APIs for handling
+> synchronous external abort (SEA)
+> - KVM_CAP_ARM_SEA_TO_USER: How userspace enables the new feature.
+> - KVM_EXIT_ARM_SEA: exit userspace gets when it needs to handle SEA
+>   and what userspace gets while taking the SEA.
+> 
+> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 61 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 61 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 6ae24c5ca5598..43bc2a1d78e01 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -7272,6 +7272,55 @@ exit, even without calls to ``KVM_ENABLE_CAP`` or similar.  In this case,
+>  it will enter with output fields already valid; in the common case, the
+>  ``unknown.ret`` field of the union will be ``TDVMCALL_STATUS_SUBFUNC_UNSUPPORTED``.
+>  Userspace need not do anything if it does not wish to support a TDVMCALL.
+> +
+> +::
+> +		/* KVM_EXIT_ARM_SEA */
+> +		struct {
+> +  #define KVM_EXIT_ARM_SEA_FLAG_GPA_VALID   (1ULL << 0)
+> +			__u64 flags;
+> +			__u64 esr;
+> +			__u64 gva;
+> +			__u64 gpa;
+> +		} arm_sea;
+> +
+> +Used on arm64 systems. When the VM capability KVM_CAP_ARM_SEA_TO_USER is
+> +enabled, a VM exit is generated if guest causes a synchronous external abort
+> +(SEA) and the host APEI fails to handle the SEA.
+> +
+> +Historically KVM handles SEA by first delegating the SEA to host APEI as there
+> +is high chance that the SEA is caused by consuming uncorrected memory error.
+> +However, not all platforms support SEA handling in APEI, and KVM's fallback
+> +is to inject an asynchronous SError into the guest, which usually panics
+> +guest kernel unpleasantly. As an alternative, userspace can participate into
 
-> 
-> Given how small a deployed fooprint ARM CCA has right now (ie none) it
-> would be good to fix this ASAP so it doesn't become entrenched.
-> 
-> Jason
+                                                                           in
+
+> +the SEA handling by enabling KVM_CAP_ARM_SEA_TO_USER at VM creation, after
+> +querying the capability. Once enabled, when KVM has to handle the guest
+
+                                                                     guest-
+> +caused SEA, it returns to userspace with KVM_EXIT_ARM_SEA, with details
+> +about the SEA available in 'arm_sea'.
+> +
+> +The 'esr' field holds the value of the exception syndrome register (ESR) while
+> +KVM taking the SEA, which tells userspace the character of the current SEA,
+   KVM takes
+
+> +such as its Exception Class, Synchronous Error Type, Fault Specific Code and
+> +so on. For more details on ESR, check the Arm Architecture Registers
+> +documentation.
+> +
+> +The following values are defined for the 'flags' field
+
+Above needs an ending like '.' or ':'.
+(or maybe "::" depending how it is processed by Sphinx)
+
+> +
+> +  - KVM_EXIT_ARM_SEA_FLAG_GPA_VALID -- the faulting guest physical address
+> +    is valid and userspace can get its value in the 'gpa' field.
+> +
+> +Note userspace can tell whether the faulting guest virtual address is valid
+> +from the FnV bit in 'esr' field. If FnV bit in 'esr' field is not set, the
+> +'gva' field hols the valid faulting guest virtual address.
+
+               holds (or contains)> +
+> +Userspace needs to take actions to handle guest SEA synchronously, namely in
+> +the same thread that runs KVM_RUN and receives KVM_EXIT_ARM_SEA. One of the
+> +encouraged approaches is to utilize the KVM_SET_VCPU_EVENTS to inject the SEA
+> +to the faulting VCPU. This way, the guest has the opportunity to keep running
+> +and limit the blast radius of the SEA to the particular guest application that
+> +caused the SEA. Userspace may also emulate the SEA to VM by itself using the
+> +KVM_SET_ONE_REG API. In this case, it can use the valid values from 'gva' and
+> +'gpa' fields to manipulate VCPU's registers (e.g. FAR_EL1, HPFAR_EL1).
+> +
+>  ::
+>  
+>  		/* Fix the size of the union. */
+> @@ -8689,6 +8738,18 @@ This capability indicate to the userspace whether a PFNMAP memory region
+>  can be safely mapped as cacheable. This relies on the presence of
+>  force write back (FWB) feature support on the hardware.
+>  
+> +7.45 KVM_CAP_ARM_SEA_TO_USER
+> +----------------------------
+> +
+> +:Architecture: arm64
+> +:Target: VM
+> +:Parameters: none
+> +:Returns: 0 on success, -EINVAL if unsupported.
+> +
+> +This capability, if KVM_CHECK_EXTENSION indicates that it is available, means
+> +that KVM has an implementation that allows userspace to participate in handling
+> +synchronous external abort caused by VM, by an exit of KVM_EXIT_ARM_SEA.
+> +
+>  8. Other capabilities.
+>  ======================
+>  
+
+-- 
+~Randy
 
