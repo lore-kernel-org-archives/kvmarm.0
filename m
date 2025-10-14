@@ -1,167 +1,120 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E671CEACB;
-	Tue, 14 Oct 2025 01:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9FB2773FC
+	for <kvmarm@lists.linux.dev>; Tue, 14 Oct 2025 06:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760406716; cv=none; b=h5QfhYH21j373uLqmpSac5KEePTB39m3oyb1YVtdJJmds5feeYGaYV+uTnKLnJSUSb7jDz6D5o8pW5U96XAtFNNrHDB3DSKDAEhNFcvm8eWsjwHBhXWmoBdVjeqad4yjhPqzxYsumLpGfqZnwP5eCEgnw68G8hcW2LlXXEVzV5I=
+	t=1760425179; cv=none; b=Pckhq3rXU41MyJEZS3bkMpqIXuyD0xEazc4XBrNeilKqoZfSDWRBO3a82WmXFEmtmj6z0mH4T0obmGXWQVZW1DLvhu5syuG/v1HTkd9s2fLJ4dVa3OdX0S79GjvPXLBrGMZAvCNlj7MiFPQp/e5nQXFRpKf+ExEJvv80m8UOJwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760406716; c=relaxed/simple;
-	bh=D5pq7pWAQYFwhyzSZxyrhL2+MSp19sOiqhoesc+kuCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q8tal22yz/gOiwBhSJ2lCQ0H7mMhSjy54WW2c3uzK0y8uNOxZ8mSI9MF29HGmrAOrwPvi8xxbflAjlRNED53KG42JxSQZ0Rvg3JnbW+1J72yS/MKScfmjHbqdvdebHRRxQxPPfqcWtvTTNnspWfZJZB8cy+yhk15eKeyed2RE08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DhO0hF6g; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1760425179; c=relaxed/simple;
+	bh=BSlWLMBtPi4wldcJDwfz0qmi04s95WosXdniMkHDPp0=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=EHLcNjno8t/2s1tWnMEL9FldWkW1gKUDBf87f7DDJgBqMBZG42eA03IlijUb4V2H3YVPg60suT1oYJNbmyxYIHqbhsUvSfTnkUKRV2JcjAwoM6zkagTvKKwZ3rG0OGrNev2+RZe9SqI+Z0wcO+WZew/3yHlSi2SAz+MvVy7PrJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=zw/KdMpA; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DhO0hF6g"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=GdHHVHX1eK4OumztheWLpvPpWCbLWAPVj4gP9BXPPI8=; b=DhO0hF6gqhy8rmkGEl7on7+oJv
-	VtSUYvYuPcOlDu5fO8rCTFa2F1N/jdAP20m8Nb67fTrBo/fW7xZkTs3E4kNWHnFynKs20G0xEsolC
-	MqH/ufxF3g2GzV+W64oAUH6OPetfyV6FPMJEqWTE/ij6PONb6v3EHCJOmal94Lc0Bi4hK+35ayHKR
-	mt+8n05mNcD2DsFYZBume6lwYieckkKHhLNsYjifIvTzRXNk9td5Pk/x3BSq6HPF1OGCgGKUidim1
-	8H0TuKmkhlQR6ai4NxMDf9cGRmyXPY/ia4v6vaMJvdCXmK4AZRsHC3b9HHij78SAmfr3e1ZC9jXim
-	CxkRoeLg==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v8UCc-0000000EvJR-1Gkr;
-	Tue, 14 Oct 2025 01:51:50 +0000
-Message-ID: <3efcf624-58f1-4390-b6e2-a0aa5e62a9a3@infradead.org>
-Date: Mon, 13 Oct 2025 18:51:49 -0700
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="zw/KdMpA"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=gzKL1XMF2X7NDYIZWTFtjqhUAQB7pXraoI6fG4GLHS4=;
+	b=zw/KdMpAFTlf5zt4yJ0H+Z74xhTR52zV2PQrKVuVm98Z773lfrOGRba1Yj9GOKjTkkzmylSo6
+	sqPOPOe8lIi5/hEPkvdMbeJaWNvk+aNRhZ3P7P/IUcjcs8cdoSbYm2pGsUHZ8aOksWkNtMPJhmL
+	T8z+XFFt6TsZ+NPqTAMbln8=
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4cm4nm3kwZz1K97v;
+	Tue, 14 Oct 2025 14:59:08 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6FBB4140135;
+	Tue, 14 Oct 2025 14:59:27 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 14 Oct 2025 14:59:26 +0800
+Subject: Re: [PATCH] KVM: arm64: selftests: Sync ID_AA64PFR1, MPIDR, CLIDR in
+ guest
+To: Ben Horgan <ben.horgan@arm.com>
+CC: Zenghui Yu <zenghui.yu@linux.dev>, <kvmarm@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>, <maz@kernel.org>,
+	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>
+References: <20251012154352.61133-1-zenghui.yu@linux.dev>
+ <25a19af8-2026-45b6-8d0f-42c371c8ff95@arm.com>
+ <75f13087-80fa-45cb-9327-aa85522203e0@arm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <f71d620a-87c9-7cd3-425b-e6052a38e268@huawei.com>
+Date: Tue, 14 Oct 2025 14:59:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/3] Documentation: kvm: new UAPI for handling SEA
-To: Jiaqi Yan <jiaqiyan@google.com>, maz@kernel.org, oliver.upton@linux.dev
-Cc: duenwen@google.com, rananta@google.com, jthoughton@google.com,
- vsethi@nvidia.com, jgg@nvidia.com, joey.gouly@arm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
- will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20251013185903.1372553-1-jiaqiyan@google.com>
- <20251013185903.1372553-4-jiaqiyan@google.com>
+In-Reply-To: <75f13087-80fa-45cb-9327-aa85522203e0@arm.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20251013185903.1372553-4-jiaqiyan@google.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-
-
-On 10/13/25 11:59 AM, Jiaqi Yan wrote:
-> Document the new userspace-visible features and APIs for handling
-> synchronous external abort (SEA)
-> - KVM_CAP_ARM_SEA_TO_USER: How userspace enables the new feature.
-> - KVM_EXIT_ARM_SEA: exit userspace gets when it needs to handle SEA
->   and what userspace gets while taking the SEA.
+On 2025/10/14 0:14, Ben Horgan wrote:
 > 
-> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
-> ---
->  Documentation/virt/kvm/api.rst | 61 ++++++++++++++++++++++++++++++++++
->  1 file changed, 61 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 6ae24c5ca5598..43bc2a1d78e01 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7272,6 +7272,55 @@ exit, even without calls to ``KVM_ENABLE_CAP`` or similar.  In this case,
->  it will enter with output fields already valid; in the common case, the
->  ``unknown.ret`` field of the union will be ``TDVMCALL_STATUS_SUBFUNC_UNSUPPORTED``.
->  Userspace need not do anything if it does not wish to support a TDVMCALL.
-> +
-> +::
-> +		/* KVM_EXIT_ARM_SEA */
-> +		struct {
-> +  #define KVM_EXIT_ARM_SEA_FLAG_GPA_VALID   (1ULL << 0)
-> +			__u64 flags;
-> +			__u64 esr;
-> +			__u64 gva;
-> +			__u64 gpa;
-> +		} arm_sea;
-> +
-> +Used on arm64 systems. When the VM capability KVM_CAP_ARM_SEA_TO_USER is
-> +enabled, a VM exit is generated if guest causes a synchronous external abort
-> +(SEA) and the host APEI fails to handle the SEA.
-> +
-> +Historically KVM handles SEA by first delegating the SEA to host APEI as there
-> +is high chance that the SEA is caused by consuming uncorrected memory error.
-> +However, not all platforms support SEA handling in APEI, and KVM's fallback
-> +is to inject an asynchronous SError into the guest, which usually panics
-> +guest kernel unpleasantly. As an alternative, userspace can participate into
+> On 10/13/25 13:20, Ben Horgan wrote:
+> > Hi Zenghui,
+> >
+> > On 10/12/25 16:43, Zenghui Yu wrote:
+> > > We forgot to sync several registers (ID_AA64PFR1, MPIDR, CLIDR) in guest to
+> > > make sure that the guest had seen the written value.
+> > >
+> > > Add them to the list.
+> > >
+> > > Signed-off-by: Zenghui Yu <zenghui.yu@linux.dev>
+> > > ---
+> > >  tools/testing/selftests/kvm/arm64/set_id_regs.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> > > index 8ff1e853f7f8..5e24f77868b5 100644
+> > > --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> > > +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> > > @@ -249,11 +249,14 @@ static void guest_code(void)
+> > >  	GUEST_REG_SYNC(SYS_ID_AA64ISAR2_EL1);
+> > >  	GUEST_REG_SYNC(SYS_ID_AA64ISAR3_EL1);
+> > >  	GUEST_REG_SYNC(SYS_ID_AA64PFR0_EL1);
+> > > +	GUEST_REG_SYNC(SYS_ID_AA64PFR1_EL1);
+> > >  	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
+> > >  	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
+> > >  	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
+> > >  	GUEST_REG_SYNC(SYS_ID_AA64MMFR3_EL1);
+> > >  	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
+> > > +	GUEST_REG_SYNC(SYS_MPIDR_EL1);
+> > > +	GUEST_REG_SYNC(SYS_CLIDR_EL1);
+> >
+> > Why did you choose this position in the list for these 2?
 
-                                                                           in
+Technically there are no restrictions on the order. I just want it to
+look consistent with test_reset_preserves_id_regs().
 
-> +the SEA handling by enabling KVM_CAP_ARM_SEA_TO_USER at VM creation, after
-> +querying the capability. Once enabled, when KVM has to handle the guest
+> >
+> >>  	GUEST_REG_SYNC(SYS_CTR_EL0);
+> >>  	GUEST_REG_SYNC(SYS_MIDR_EL1);
+> >>  	GUEST_REG_SYNC(SYS_REVIDR_EL1);
+> >
+> > Looks good to me.
+> >
+> > Reviewed-By: Ben Horgan <ben.horgan@arm.com>
 
-                                                                     guest-
-> +caused SEA, it returns to userspace with KVM_EXIT_ARM_SEA, with details
-> +about the SEA available in 'arm_sea'.
-> +
-> +The 'esr' field holds the value of the exception syndrome register (ESR) while
-> +KVM taking the SEA, which tells userspace the character of the current SEA,
-   KVM takes
+Thanks!
 
-> +such as its Exception Class, Synchronous Error Type, Fault Specific Code and
-> +so on. For more details on ESR, check the Arm Architecture Registers
-> +documentation.
-> +
-> +The following values are defined for the 'flags' field
+> On running this, I note test_guest_reg_read() doesn't announce its
+> presence. How about adding a ksft_test_result_pass("%s\n", __func__) and
+> bumping the number of tests?
 
-Above needs an ending like '.' or ':'.
-(or maybe "::" depending how it is processed by Sphinx)
+Yup, I agreed.
 
-> +
-> +  - KVM_EXIT_ARM_SEA_FLAG_GPA_VALID -- the faulting guest physical address
-> +    is valid and userspace can get its value in the 'gpa' field.
-> +
-> +Note userspace can tell whether the faulting guest virtual address is valid
-> +from the FnV bit in 'esr' field. If FnV bit in 'esr' field is not set, the
-> +'gva' field hols the valid faulting guest virtual address.
-
-               holds (or contains)> +
-> +Userspace needs to take actions to handle guest SEA synchronously, namely in
-> +the same thread that runs KVM_RUN and receives KVM_EXIT_ARM_SEA. One of the
-> +encouraged approaches is to utilize the KVM_SET_VCPU_EVENTS to inject the SEA
-> +to the faulting VCPU. This way, the guest has the opportunity to keep running
-> +and limit the blast radius of the SEA to the particular guest application that
-> +caused the SEA. Userspace may also emulate the SEA to VM by itself using the
-> +KVM_SET_ONE_REG API. In this case, it can use the valid values from 'gva' and
-> +'gpa' fields to manipulate VCPU's registers (e.g. FAR_EL1, HPFAR_EL1).
-> +
->  ::
->  
->  		/* Fix the size of the union. */
-> @@ -8689,6 +8738,18 @@ This capability indicate to the userspace whether a PFNMAP memory region
->  can be safely mapped as cacheable. This relies on the presence of
->  force write back (FWB) feature support on the hardware.
->  
-> +7.45 KVM_CAP_ARM_SEA_TO_USER
-> +----------------------------
-> +
-> +:Architecture: arm64
-> +:Target: VM
-> +:Parameters: none
-> +:Returns: 0 on success, -EINVAL if unsupported.
-> +
-> +This capability, if KVM_CHECK_EXTENSION indicates that it is available, means
-> +that KVM has an implementation that allows userspace to participate in handling
-> +synchronous external abort caused by VM, by an exit of KVM_EXIT_ARM_SEA.
-> +
->  8. Other capabilities.
->  ======================
->  
-
--- 
-~Randy
-
+Thanks,
+Zenghui
