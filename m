@@ -1,144 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5752DC785
-	for <kvmarm@lists.linux.dev>; Tue, 14 Oct 2025 08:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454522F5468
+	for <kvmarm@lists.linux.dev>; Tue, 14 Oct 2025 10:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760432002; cv=none; b=QRxnAxV7bSIBvyOu+lWOQyhJcEDom9lF0kE3oxbYpU+wj91o1XhpStvRXheWBU2j5w6UG+iGCy8GF4mxCpvoYoyL8CiwpnJCqaO0aA2q9orQ1TKgYzCjjbSpIOf/aPIwfZsuYOgrjbHVeYzgVGayQq5WGVcgQ5Mk7Q9unFrCPSU=
+	t=1760437278; cv=none; b=Eug6TVdMW6HywEoxDXJGnEggQ5tevRFmTtZWaSPEJRli9C3M/ZnS5ZugNaX8cDqtTl+VC/l4dfDpyKodASlbW5/85pOghVx08cm01KFNm9QCgSZsgEHIotNXltOHPeHQeH2n9PUruyKWRf6bVSkzh2KwPaNX7fAvxw6+iSJB1e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760432002; c=relaxed/simple;
-	bh=X3vCau+tCof/m+yBHiwPhsi6lnLig+ymTJHrbW0T/Js=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eOCHQJ1L2k+1pRhBk0CiZoVoIru4aIfLPxMT2v7R7x7ZllSq6qXYiKy868vaFEQAs0R+gLigI7ol6HSmaFmKrLMNzrYuW4fv3WSWyWS/naUySnVo701O+RU4y344BlXuixucmKZavkeVcaAn0IY8n5gMlzdH++/egIzcVapY+6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d/mxAdnh; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d/mxAdnh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D462C4CEF9;
-	Tue, 14 Oct 2025 08:53:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760432002;
-	bh=X3vCau+tCof/m+yBHiwPhsi6lnLig+ymTJHrbW0T/Js=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d/mxAdnhO+kPqdx1/iG24n3prY9Iq9P+itNylAHkf0ZE0wKiEvoIhzCbXgTjECPvi
-	 k/UA19oeTQiQ3CC7XDI4lwsxSBwFx4yCr7pGc5IFAyX9hd4gTINaHceS4k6ZeA4aAB
-	 G2LmCHRXcS7mDXomd5x/S1dYKM0Ezg4ypbTlKyQ2WjaYbPIlijffhKSm6RJmNp6RTL
-	 7wxFRGENWP1AwCE0n7dHBtSzib2hBkl0yeNl/ccm1BTpTc9UDE9ps3hxaVAZQGUCv3
-	 JEBwtaQ34pAgkkC2IbruqPoycpqDJihQgDuF1v85Et6mMMBDIVZ+77ATnghwW8nGrk
-	 gY8PuVHyBJigQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v8amV-0000000Dmxt-2CI7;
-	Tue, 14 Oct 2025 08:53:19 +0000
-Date: Tue, 14 Oct 2025 09:53:19 +0100
-Message-ID: <86347lyidc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+	s=arc-20240116; t=1760437278; c=relaxed/simple;
+	bh=/DarjTY2o5nKRTrsiQwnrnJ42bafWIM90Ki1mpHGWEg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ffqwhGQ+vv2LtFkuB8jG/+/04h238Mproay/o0F6HdmqVuigFFS03xrKGmNau44PXTbcScsD3Rcyap0qlT2LX/6fwB589J8A5Je4nZKxBQlsDIsHWyN9Mj7Ahn48e0my2b38T4UPYegKN/rwW7IAGV8+xPuYLKW+6ujGFi84mlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A37C41A9A;
+	Tue, 14 Oct 2025 03:21:08 -0700 (PDT)
+Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D452E3F6A8;
+	Tue, 14 Oct 2025 03:21:14 -0700 (PDT)
+From: Ben Horgan <ben.horgan@arm.com>
+To: catalin.marinas@arm.com,
+	will@kernel.org,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jan Kotas <jank@cadence.com>
-Subject: Re: [PATCH] arm64: Revamp HCR_EL2.E2H RES1 detection
-In-Reply-To: <aOjTg3he873VqEgY@J2N7QTR9R3>
-References: <20251009121239.29370-1-maz@kernel.org>
-	<aOgpesxEKsnbKGs3@linux.dev>
-	<86ldljxgad.wl-maz@kernel.org>
-	<aOjTg3he873VqEgY@J2N7QTR9R3>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	shuah@kernel.org
+Cc: Ben Horgan <ben.horgan@arm.com>
+Subject: [PATCH 0/3] set_id_regs cleanup
+Date: Tue, 14 Oct 2025 11:21:05 +0100
+Message-ID: <20251014102108.2442391-1-ben.horgan@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com, jank@cadence.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Fri, 10 Oct 2025 10:36:03 +0100,
-Mark Rutland <mark.rutland@arm.com> wrote:
-> 
-> On Fri, Oct 10, 2025 at 10:22:18AM +0100, Marc Zyngier wrote:
-> > On Thu, 09 Oct 2025 22:30:34 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > Hey,
-> > > 
-> > > On Thu, Oct 09, 2025 at 01:12:39PM +0100, Marc Zyngier wrote:
-> > > > We currently have two ways to identify CPUs that only implement FEAT_VHE
-> > > > and not FEAT_E2H0:
-> > > > 
-> > > > - either they advertise it via ID_AA64MMFR4_EL1.E2H0,
-> > > > - or the HCR_EL2.E2H bit is RAO/WI
-> > > > 
-> > > > However, there is a third category of "cpus" that fall between these
-> > > > two cases: on CPUs that do not implement FEAT_FGT, it is IMPDEF whether
-> > > > an access to ID_AA64MMFR4_EL1 can trap to EL2 when the register value
-> > > > is zero.
-> > > > 
-> > > > A consequence of this is that on systems such as Neoverse V2, a NV
-> > > > guest cannot reliably detect that it is in a VHE-only configuration
-> > > > (E2H is writable, and ID_AA64MMFR0_EL1 is 0), despite the hypervisor's
-> > > > best effort to repaint the id register.
-> > > > 
-> > > > Replace the RAO/WI test by a sequence that makes use of the VHE
-> > > > register remnapping between EL1 and EL2 to detect this situation,
-> > > > and work out whether we get the VHE behaviour even after having
-> > > > set HCR_EL2.E2H to 0.
-> > > > 
-> > > > This solves the NV problem, and provides a more reliable acid test
-> > > > for CPUs that do not completely follow the letter of the architecture
-> > > > while providing a RES1 behaviour for HCR_EL2.E2H.
-> > > > 
-> > > > Suggested-by: Marc Rutland <mark.rutland@arm.com>
-> > > 		^~~~
-> > > 
-> > > Thank you *Mark* for the suggestion here, neat trick :)
-> > 
-> > Too many Mar[ck]s. I'm struggling! ;-)
-> 
-> Time to file a deed poll. ;)
-> 
-> > > I'd be in favor of this patch being sent to stable, happy to handle the
-> > > backports if you don't have the time for it. VMs mysteriously dying
-> > > isn't a very good experience on NV and I'd like to not scare folks away.
-> > 
-> > I think Mark (yes, him!) had a plan to backport some of the !FEAT_E2H0
-> > patches back to earlier kernels. I'll let him comment on that.
-> 
-> Yep; I had a (delayed) plan to backport:
-> 
->   https://lore.kernel.org/linux-arm-kernel/20250227180526.1204723-1-mark.rutland@arm.com/ 
-> 
-> ... to v6.12, as folk are trying to run stable/android v6.12 kernels on
-> models and HW with the RES1 behaviour, and IIRC we didn't try to handle
-> this at all back in v6.6 (so no need to backport that far). I was
-> expecting to backport this patch at the same time.
-> 
-> If someone else has the time to do the backport, I'm more than happy to
-> leave it to them! Otherwise, I was planning to wait for this patch to
-> land in mainline before starting that.
+Tidies up a few small things in set_id_regs. The removal of
+ARM64_FEATURE_FIELD_BITS touches other code only so much as it removes
+the define but set_id_regs.c is the only place its used.
 
-So I've taken the patch as is, without a Cc: stable, because I don't
-trust this to be automatically AI-slopped^W^Wbackported to stable, and
-the dependency chain isn't in stable either.
+Based on v6.18-rc1
 
-Happy to help with that though.
+Ben Horgan (3):
+  KVM: arm64: selftests: Count test_guest_reg_read() as a test
+  KVM: arm64: selftests: Remove ARM64_FEATURE_FIELD_BITS and its last
+    user
+  KVM: arm64: selftests: Consider all 7 possible levels of cache
 
-Thanks,
-
-	M.
+ arch/arm64/include/asm/sysreg.h                 |  2 --
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 14 ++++++++++----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.0
+
