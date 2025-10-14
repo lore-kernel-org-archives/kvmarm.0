@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09162F5A17
-	for <kvmarm@lists.linux.dev>; Tue, 14 Oct 2025 10:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C292F5A17
+	for <kvmarm@lists.linux.dev>; Tue, 14 Oct 2025 10:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760437283; cv=none; b=ZeA8shcv62LGzweFLHmlXLjdSMNtP/dn1IgEudkw58FLUelcqvRD2USzTwZ7RrPNJtFjFbKfZGqkoYR6F7TY3ibF9LVcEON0PoA7xgwPmllwhJYM02FzigNzZAybJVvyXZmfNebk//T/0i8pdBMvMim2z7xxx/oiNmSQ28a3s1w=
+	t=1760437287; cv=none; b=Qpd/8YbZqQ3ZX7BfEyaiqGlVal2dG33UypKDU6y/ERBXcdnagLT8dnBNTyjjggTMPnpqtss4Fus5FZm7weceLVWIjycJpb3PlvFlvdAjPaNc6gi8UcqLAD12xWGL4XXT/PjWRGDt7Darr1HQaBlD3T4ot6FbTp/fsN0mAQOOsXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760437283; c=relaxed/simple;
-	bh=coVtKSwRQrbySSkPHYLuKKcEgJPLwn7tA74OhNVSbuk=;
+	s=arc-20240116; t=1760437287; c=relaxed/simple;
+	bh=NkupKOVbo7cjNjVqst9xNEad9gQmRx/G5Y2VJNMv9pI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bkUfdm22K4+5Wv0r6HPG953lGFYLJxJQHofLKB37o18qfiIbbaa2jjdkNBrovLQZlmw6MImo+72LKdpRhVzdCpMEDF/GiTjG1ljbmyYR4KZdY1eb0L4Qasf1hTvAn4qnMkTBLW3Ot/cE0JpOZ/+3/xAIOmugAprTPKRP0epLHPs=
+	 MIME-Version; b=CDmy3x2jgZeHPAQ33/dFh6TAYjbQBI8tput+TNF9XV0XAHVHIdCAS+vPb9LsxMO7tCVRrqRxHkF2Wv3hLzJxdkEonZnXqEBdikYo1ZNBelFXDjCn9OcPv8Hn700yHgiPVMn1UEdUkPnyw7F5y/DTe4OFWcckBWJ+G/rl8skH6MI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3BAF81A9A;
-	Tue, 14 Oct 2025 03:21:13 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3A6D1BB2;
+	Tue, 14 Oct 2025 03:21:17 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6D7F83F6A8;
-	Tue, 14 Oct 2025 03:21:19 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id EC99C3F6A8;
+	Tue, 14 Oct 2025 03:21:23 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -30,9 +30,9 @@ To: catalin.marinas@arm.com,
 	kvmarm@lists.linux.dev,
 	shuah@kernel.org
 Cc: Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH 1/3] KVM: arm64: selftests: Count test_guest_reg_read() as a test
-Date: Tue, 14 Oct 2025 11:21:06 +0100
-Message-ID: <20251014102108.2442391-2-ben.horgan@arm.com>
+Subject: [PATCH 2/3] KVM: arm64: selftests: Remove ARM64_FEATURE_FIELD_BITS and its last user
+Date: Tue, 14 Oct 2025 11:21:07 +0100
+Message-ID: <20251014102108.2442391-3-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251014102108.2442391-1-ben.horgan@arm.com>
 References: <20251014102108.2442391-1-ben.horgan@arm.com>
@@ -44,36 +44,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The test test_guest_reg_read() is run without announcing its presence or
-contributing to the test count. Rectify this.
+ARM64_FEATURE_FIELD_BITS is set to 4 but not all ID register fields are 4
+bits. See for instance ID_AA64SMFR0_EL1. The last user of this define,
+ARM64_FEATURE_FIELD_BITS, is the set_id_regs selftest. Its logic assumes
+the fields aren't a single bits; assert that's the case and stop using the
+define. As there are no more users, ARM64_FEATURE_FIELD_BITS is removed.
 
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/sysreg.h                 | 2 --
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 8 ++++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 6455db1b54fd..d9aa76d08e13 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -1129,8 +1129,6 @@
+ #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
+ #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
+ 
+-#define ARM64_FEATURE_FIELD_BITS	4
+-
+ #ifdef __ASSEMBLY__
+ 
+ 	.macro	mrs_s, rt, sreg
 diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 5e24f77868b5..6878ee23310e 100644
+index 6878ee23310e..a0b81b627037 100644
 --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
 +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -655,6 +655,8 @@ static void test_guest_reg_read(struct kvm_vcpu *vcpu)
- 			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
- 		}
- 	}
+@@ -268,7 +268,9 @@ static void guest_code(void)
+ /* Return a safe value to a given ftr_bits an ftr value */
+ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ {
+-	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
++	uint64_t ftr_max = ftr_bits->mask >> ftr_bits->shift;
 +
-+	ksft_test_result_pass("%s\n", __func__);
- }
++	TEST_ASSERT(ftr_max > 1, "This test doesn't support single bit features");
  
- /* Politely lifted from arch/arm64/include/asm/cache.h */
-@@ -786,7 +788,7 @@ int main(void)
+ 	if (ftr_bits->sign == FTR_UNSIGNED) {
+ 		switch (ftr_bits->type) {
+@@ -320,7 +322,9 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ /* Return an invalid value to a given ftr_bits an ftr value */
+ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ {
+-	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
++	uint64_t ftr_max = ftr_bits->mask >> ftr_bits->shift;
++
++	TEST_ASSERT(ftr_max > 1, "This test doesn't support single bit features");
  
- 	ksft_print_header();
- 
--	test_cnt = 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
-+	test_cnt = 4 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
- 	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
- 		for (j = 0; test_regs[i].ftr_bits[j].type != FTR_END; j++)
- 			test_cnt++;
+ 	if (ftr_bits->sign == FTR_UNSIGNED) {
+ 		switch (ftr_bits->type) {
 -- 
 2.43.0
 
