@@ -1,31 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E102326D4B;
-	Wed, 15 Oct 2025 11:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4764324B23
+	for <kvmarm@lists.linux.dev>; Wed, 15 Oct 2025 12:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760529462; cv=none; b=cTaScsRRvfR1iJNqK4PXYkdHBO9onZPkv1tHQ7e2CXgUd/NAJm2VicjBrrUG7DQCTDgCtRyOMWW448f4Qts/i2eGV6oUE6dpeR9uO3jXCSvkWIjblainPTYkJlRpVFmlI3JEV0tecKwscrzNLHS1WRuWxtMnNN9C58aHJn+m3vE=
+	t=1760530537; cv=none; b=iBBtj/PQg57h9J5Voo8IvvKifxjHAppiazfeGkZpKhk+ARGCzsjbs1ytl1bDyqwgY/+rfCNPUPSXzhz/eGLngOuRAMTEClVmreczIeUVEgqif645cfwXUGkOfQrIyhPieOHz0cu3k77bmR7tp2r2ahTm2bdJ6RQAI9wTh6rZtPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760529462; c=relaxed/simple;
-	bh=ITnl1Ixrn/9uFYahs1nyx1kHy9PHO6avdkREAF2GEgg=;
+	s=arc-20240116; t=1760530537; c=relaxed/simple;
+	bh=mjHQrbbDrwX6GQ7o9PGjEA7im+oTQeT6k/wmhYoPpbo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sjU8Am0dX3s5edfV6ZGku7HJYp5tnG8/ppRwlmZepa7toMphMbpGtAs6v4VOkOLko9l5RYPSP+DB6BLVZCb9uu5DcNOSPUR7kfEtafPmjHgeSAY95k+lk4oKrpGYcUrfWBsruPG+viqQLFWwdOjcB0/RRFwoSGtYH132qU+D59k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Lt7YCPGf; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=GQwKSVKpvLlWU5q2yb6/YrIjHUkQT7puCjkPtweuubKVHp9tU3q1yhzgg+2++mpFxoonGHk2EAbu1mSwgNn1/aHNa+cGuber3rzcCajYDy0OmBSIxppNYRt6YH2XapiBy0GIqNEfyIJU+RhKa3/5SXNDLUGK/IYAzIB9dLcvg+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=legGRLvy; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Lt7YCPGf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B281C19421;
-	Wed, 15 Oct 2025 11:57:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1760529461;
-	bh=ITnl1Ixrn/9uFYahs1nyx1kHy9PHO6avdkREAF2GEgg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Lt7YCPGfS8UpQn46FIW5N7YqNrIcf0HpUWWH+8bhEI65Gi4YU4gmHhF0kEgTx8Gkb
-	 MFRoD/k8f+XHelZ4dpctt2bNRALKEz8DCSd+OwYu1KVA28qgjFt4VLiZ0Y5TPMHEOu
-	 5uLTv5PzPdZsUfVcAsCEl7Wa6CllczIYecXAW2c0=
-Date: Wed, 15 Oct 2025 13:57:38 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="legGRLvy"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-33067909400so4745083a91.2
+        for <kvmarm@lists.linux.dev>; Wed, 15 Oct 2025 05:15:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1760530535; x=1761135335; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j3fPSrHORtZHq6E/vA63d68c0Rr3vVgkT2wP5kavB8E=;
+        b=legGRLvyGvPgShmHNxzyKaRVIHBNwOwepM9ggFet9w9QEtffSJGEmFhKqUVTZ2Np9J
+         7G8HJufFqFmODiLqYQgBqNfr7Jj+GBGtnVmRp9YcUsnwfl1+OK0BoqSz4seds59tTLxL
+         bSk4QCswcRDF5E5gIYN1x00zGa6M8eFoh+rkpvqoRIRoHedRunkzsM0fCwXI6Fp4MV4W
+         Dy7M1IH2iLtno0Cx5wL+bkLC7OAnlzE7AT6yp2C6ElIggGPq+JMjtwjMc3dU3KFzZNP3
+         NVv8YX2lotAdEaMx7VdBe/y5ebLaMXVI0mRSQKe5k10jh1hlZaC9tUED19TngiJ0qNFG
+         jfGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760530535; x=1761135335;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j3fPSrHORtZHq6E/vA63d68c0Rr3vVgkT2wP5kavB8E=;
+        b=HtRFJRu99yG7uoW+MuoQw2owh/QBkMttAsBtn9HPlvNNKCFA5rQlh/2GSd9jwCFe1Z
+         5KAKt5uhiiRnISUi2Lm99gUVKozKcfe/Fz/oJmWPWn8onqkx0HFhsGA/IeHXFoBOJ1BI
+         70tPu55jVeNpGlmfYrSRg35Mdt0Lu8VAaotl2nZvU8PwLYCFf4G8xvhBoFUQzMShF18j
+         o3RxuoOVFhBtn13vR7jkweINRy/sz7UgbGAUVpT0mlnFzkc0EX81fva6kC+HcwLGItQu
+         kH78mkulEuqxheLpXyJHPbuaL5u+WlKsgf79xEwPu0EMkBrbYbZu0uaRGjmwH3rmUSZ2
+         1ImQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUciUYIuh19b05seWAWeYsWdXGHcD8V+Vb4AOi1on9ZxGp/rH6+MFyGPTT78cro0eAkOSxr4QM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YykQy4pP8yT1XEuKhnHHC76TriRqL2cd9k6MdWbhvaKqtfomcsi
+	+TkGtbN8hYWVOc9H8DgdZqtyK5mERn/lFyzuJ9/nneLqZwN49OvTRLqS93fDdBudbyc=
+X-Gm-Gg: ASbGncu5Q0l6RTHZWwnh1ku0EQwovolZVH5S7awvtEwCeDVP7DtL5r8oqPZex4qAevA
+	hRoHis/9jut8LYHSInd04y1f6OPJMlKwpMN/pSj7L/0ZqRlMsIINxz5M3MzHkC/CxYTS9BUpELX
+	AJVmUpxmFeS9+ldFmqRJwTNwJ+uQ5lzL8LknKtj1IgZ0qM68ZAGsQtEzV2Mos4io1UArGU7fO9/
+	n91K20zOMFGZCgJVKwd2cviHUHW8DQzPGS7jmrhf7SLc5RVQBXSGuggrN6Zuy2VV4HO+EhSPy35
+	BqRTLB/Mfe94qamKuTzabSGh25CtxBuYP3D1vk1BFzaTGQMzn426SRgsmexZIfE3Ao+7Be6+ueL
+	zkrWmw5q/zJHzopv5DKm+nv9xP86Zmkg2hlaJfAIp4hE4eZxUbC3Cr2KaR0Ws
+X-Google-Smtp-Source: AGHT+IH0oN0GQSOhSxcUM3EYcPBObyIHiYZ5l2qwqp0SzcDahjgm/x0qX3kZMHorNm24TIg/Rs94NA==
+X-Received: by 2002:a17:90b:4d05:b0:32e:96b1:fb70 with SMTP id 98e67ed59e1d1-33b51118904mr41185997a91.12.1760530534910;
+        Wed, 15 Oct 2025 05:15:34 -0700 (PDT)
+Received: from ziepe.ca ([130.41.10.202])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b67d313e7f9sm6775819a12.12.2025.10.15.05.15.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Oct 2025 05:15:34 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1v90Pl-0000000HOiL-1Vvt;
+	Wed, 15 Oct 2025 09:15:33 -0300
+Date: Wed, 15 Oct 2025 09:15:33 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Greg KH <gregkh@linuxfoundation.org>
 Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
 	Jeremy Linton <jeremy.linton@arm.com>,
 	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
@@ -41,9 +79,8 @@ Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>
 Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm platform
  device
-Message-ID: <2025101534-frosty-shank-00b1@gregkh>
-References: <20250729231948.GJ26511@ziepe.ca>
- <yq5aqzxy9ij1.fsf@kernel.org>
+Message-ID: <20251015121533.GF3938986@ziepe.ca>
+References: <yq5aqzxy9ij1.fsf@kernel.org>
  <20250730113827.000032b8@huawei.com>
  <20250730132333.00006fbf@huawei.com>
  <2025073035-bulginess-rematch-b92e@gregkh>
@@ -52,109 +89,33 @@ References: <20250729231948.GJ26511@ziepe.ca>
  <yq5a347kmqzn.fsf@kernel.org>
  <2025101523-evil-dole-66a3@gregkh>
  <20251015115044.GE3938986@ziepe.ca>
+ <2025101534-frosty-shank-00b1@gregkh>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251015115044.GE3938986@ziepe.ca>
+In-Reply-To: <2025101534-frosty-shank-00b1@gregkh>
 
-On Wed, Oct 15, 2025 at 08:50:44AM -0300, Jason Gunthorpe wrote:
-> On Wed, Oct 15, 2025 at 11:58:25AM +0200, Greg KH wrote:
-> > On Wed, Oct 15, 2025 at 03:22:28PM +0530, Aneesh Kumar K.V wrote:
-> > > Jason Gunthorpe <jgg@ziepe.ca> writes:
-> > > 
-> > > > On Fri, Oct 10, 2025 at 07:10:58AM -0500, Jeremy Linton wrote:
-> > > >> > Yes, use faux_device if you need/want a struct device to represent
-> > > >> > something in the tree and it does NOT have any real platform resources
-> > > >> > behind it.  That's explicitly what it was designed for.
-> > > >> 
-> > > >> Right, but this code is intended to trigger the kmod/userspace module
-> > > >> loader.
-> > > >
-> > > > Faux devices are not intended to be bound, it says so right on the label:
-> > > >
-> > > >  * A "simple" faux bus that allows devices to be created and added
-> > > >  * automatically to it.  This is to be used whenever you need to create a
-> > > >  * device that is not associated with any "real" system resources, and do
-> > > >  * not want to have to deal with a bus/driver binding logic.  It is
-> > > >                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > > >  * intended to be very simple, with only a create and a destroy function
-> > > >  * available.
-> > > >
-> > > > auxiliary_device is quite similar to faux except it is intended to be
-> > > > bound to drivers, supports module autoloading and so on.
-> > > >
-> > > > What you have here is the platform firmware provides the ARM SMC
-> > > > (Secure Monitor Call Calling Convention) interface which is a generic
-> > > > function call multiplexer between the OS and ARM firmware.
-> > > >
-> > > > Then we have things like the TSM subsystem that want to load a driver
-> > > > to use calls over SMC if the underlying platform firmware supports the
-> > > > RSI group of SMC APIs. You'd have a TSM subsystem driver that uses the
-> > > > RSI call group over SMC that autobinds when the RSI call group is
-> > > > detected when the SMC is first discovered.
-> > > >
-> > > > So you could use auxiliary_device, you'd consider SMC itself to be the
-> > > > shared HW block and all the auxiliary drivers are per-subsystem
-> > > > aspects of that shared SMC interface. It is not a terrible fit for
-> > > > what it was intended for at least.
-> > > >
-> > > 
-> > > IIUC, auxiliary_device needs a parent device, and the documentation
-> > > explains that it’s intended for cases where a large driver is split into
-> > > multiple dependent smaller ones.
-> 
-> Which is the case here, you have a SMC interface that you want to
-> fracture into multiple subsystems.
-> 
-> > > If we want to use auxiliary_device for this case, what would serve as
-> > > the parent device?
-> 
-> You probably need to make a platform device for the discovered PSCI
-> interface from the firmware. Looks like DT will already have one, ACPI
-> could invent one..
->  
-> > The real device that has the resources you wish to share access to.  Are
-> > there physical resources here you are sharing?  If so, that device is
-> > the parent.  If there is no such thing, then just make a bunch of faux
-> > devices and be done with it :)
-> 
-> At the very bottom of the stack it looks like the PSCI interface is
-> discovered first through DT/ACPI. The PSCI interface has RPCs that are
-> then used to discover if SMC/etc/etc are present and along the way it
-> makes platform devices to plug in subsystems to it based on what it
-> can discover.
+On Wed, Oct 15, 2025 at 01:57:38PM +0200, Greg KH wrote:
 
-Great, so you have a real platform device down there at the "root" of
-all of this, that is doleing out resources to other "child" drivers.
+> If this really is a firmware thing, and you have a firmware device, then
+> I am confused why this was even brought up at all?  Use a real platform
+> device, with the resources that are needed to talk to this platform
+> device and you should be fine.
 
-> It is just not sharing "resources" in the traditional sense, PSCI has
-> no registers or interrupts, yet it is a service provided by the
-> platform firmare.
+I think the issue today is the PSCI does not always get a
+platform_device, fixing that seems straightforward then all the
+downstream things can switch from using more platform devices to using
+an aux device with the PSCI as the parent..
 
-Great, so it's a real firmware device, use that as a platform device and
-use the resources available there.
+> BUT, if you are making child devices that are NOT actually talking to
+> the firmware,
 
-> Again faux devices don't serve the need here to load modules and do
-> driver binding.
+This thread is about how to bind various subsystems to this shared
+firmware interface.
 
-If this really is a firmware thing, and you have a firmware device, then
-I am confused why this was even brought up at all?  Use a real platform
-device, with the resources that are needed to talk to this platform
-device and you should be fine.
-
-BUT, if you are making child devices that are NOT actually talking to
-the firmware, then make it a faux device and deal with the fact that you
-can't load modules because it's a fake device that no hardware
-definition is there for :)
-
-Does that make sense?
-
-thanks,
-
-greg k-h
+Jason
